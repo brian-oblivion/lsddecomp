@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BCF4` on 2026-09-23 (tools/rename.py). Address 0x8003bcf4.
 
-**Unit:** code_2c054 · **Size:** 7 instructions (0x1C bytes) · **Status:** MATCHED (7/7 words, whole-image SHA1 green), first attempt
+**Unit:** Task · **Size:** 7 instructions (0x1C bytes) · **Status:** MATCHED (7/7 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -42,7 +42,7 @@ by hand.
 
 ## New struct/header knowledge
 
-Named `StreamTaskObj::unk40` in `include/code_2c054.h`.
+Named `StreamTaskObj::unk40` in `include/Task.h`.
 
 ## Proposed learning
 

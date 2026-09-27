@@ -137,7 +137,7 @@ global) is retired for `BgLayerRgb` (`include/BgLayer.h`, already included by
 the unit). Evidence: the copy compiles to `lb`/`sb` per byte, so the record is
 a signed 3-byte `s8` triple -- not Sony's `CVECTOR` (4 bytes, `u_char`); and
 `baseColor`, the first of the three, is what `TaskCore__OnInit`
-(`code_2c054.c`) hands to `BgLayer`'s `setColor` as a `BgLayerRgb *`, and
+(`Task.c`) hands to `BgLayer`'s `setColor` as a `BgLayerRgb *`, and
 `TaskCore__TickColorFade` hands it the faded copy of it the same way. `unk93`/`unk96` are filled from the same rodata table
 (`sTaskCoreDefaultColors`, three records 3 bytes apart) and `unk93` goes to the same
 TaskTextObj slot78 as `baseColor`, so one record type covers all three.
@@ -145,7 +145,7 @@ Byte-identical: whole image green, 0 new warnings, nonmatching green.
 
 Proposed, not applied (header edit, other units): `TaskCore.h`'s `baseColor`,
 `unk93`, `unk96` retyped from `u8[3]` to `BgLayerRgb`, which would drop the
-casts here and in `code_2c054.c`. `code_2cc8c_f.c`'s `RGB80040790`
+casts here and in `Task.c`. `code_2cc8c_f.c`'s `RGB80040790`
 (`BoxFill__ApplyColor`) is the same shape (s8 r, g, b, struct-copied); a
 separate job.
 
@@ -154,8 +154,8 @@ separate job.
 Parameters `a1..a3` -> `base`, `clear`, `color96` (slot and prototype in
 TaskCore.h too). `unk93` is the colour TaskCore__OnDeinit (when unk34 is
 set) and TitleMenu__OnDeinit clear the screen to; its accessors are in
-code_2c054 and class_3bb8c_d, so the name (`clearColor`) is a proposal.
+Task and class_3bb8c_d, so the name (`clearColor`) is a proposal.
 `unk96` has no reader anywhere (Reset sets it to 128 grey from sTaskCoreDefaultColors);
 kept. Retyping all three to BgLayerRgb (delta's round-98 lead) would drop
-these casts but changes code_2c054's accessors: proposed. The casts carry a
+these casts but changes Task's accessors: proposed. The casts carry a
 MATCHING line. Byte-identical.

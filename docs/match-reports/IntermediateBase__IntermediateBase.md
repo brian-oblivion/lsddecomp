@@ -16,7 +16,7 @@ getter `Get_vtable_IntermediateBase`), then dispatches its own freshly-installed
 Same self-typing convention as this unit's other already-matched siblings
 from the same shared table (`IntermediateBase__ResetCounters`, `IntermediateBase__IncrementFrameCounter`, `IntermediateBase__OnState2`):
 `Obj86B60 *self`, even though the class is generically shared across many
-unrelated tables (`code_2c054.h`'s `TaskUtilMethods` names the same function
+unrelated tables (`Task.h`'s `TaskUtilMethods` names the same function
 `gIntermediateBaseMethods+0x008`, called there as `Get_vtable_IntermediateBase()->slot08(self)` on a
 `StreamTaskObj *self`).
 
@@ -56,10 +56,10 @@ sibling queue functions' exact slot identities in one pass; see
 ## Naming
 
 **IntermediateBase__IntermediateBase** (renamed from `func_8003DFDC`, round 55,
-runner alpha). Tier A: `include/code_2c054.h` independently documents
+runner alpha). Tier A: `include/Task.h` independently documents
 `D_8006E878+0x008 = func_8003DFDC` -- i.e. this function IS the `ctor` slot
 occupant of the shared "IntermediateBase" ancestor table (named identically,
-independently, in `include/TaskViewport.h`, `include/code_2c054.h` and
+independently, in `include/TaskViewport.h`, `include/Task.h` and
 `include/class_39e08.h`, per this project's own established convention for
 that class). Named `Class__Class` per the constructor convention, matching
 the already-established `BasicClass__BasicClass` precedent at the
@@ -67,7 +67,7 @@ equivalent slot in `BasicClass`'s own table. It is not `Obj86B60`-specific
 despite this local view typing `self` as `Obj86B60 *` -- it is carved here
 only because its address (0x8003DFDC) falls in this unit's window; the
 function itself is the shared ancestor's own ctor, called from at least
-three unrelated class hierarchies (`code_2c054.c`, `class_39e08.c`, and this
+three unrelated class hierarchies (`Task.c`, `class_39e08.c`, and this
 unit).
 
 ## Track 4 (2026-09-25, round 82, charlie)

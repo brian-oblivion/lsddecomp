@@ -7,7 +7,7 @@
 ## What it does
 
 A tiny getter: returns the address of the static table `gTaskCoreMethods`
-(`TaskCoreMethods`, per `include/code_2c054.h`'s own richer local view of
+(`TaskCoreMethods`, per `include/Task.h`'s own richer local view of
 the same table -- that unit's `StreamTask__OnInit`/`StreamTask__Update`/etc. dispatch
 through several of its slots). This unit never dereferences the table, only
 returns its address, so it is declared here as an opaque `u8[]`.
@@ -33,7 +33,7 @@ first build.
 **Get_vtable_TaskCore** (renamed from `func_8003DFBC`, round 55, runner alpha).
 Tier A: pure leaf getter, returns `&gTaskCoreMethods` (formerly `D_8006E730`).
 Already independently declared and named `TaskCoreMethods *func_8003DFBC(void)`
-in `include/code_2c054.h` (that unit's own richer local view of the same
+in `include/Task.h` (that unit's own richer local view of the same
 table) -- this rename aligns the function's own name with the established
 type name (`Get_vtable_BasicClass` naming precedent already used in this
 project for exactly this shape: a no-argument getter returning a shared

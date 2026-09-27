@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C1DC` on 2026-09-23 (tools/rename.py). Address 0x8003c1dc.
 
-**Unit:** code_2c054 · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
+**Unit:** Task · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -62,7 +62,7 @@ that header under the parallel-run rules); worth the head reconciling in
 
 ## New struct/header knowledge
 
-Added `include/code_2c054.h`'s `TaskUtilMethods` (this unit's own local view
+Added `include/Task.h`'s `TaskUtilMethods` (this unit's own local view
 of `gIntermediateBaseMethods`) with slot `+0x044` typed
 `void (*)(StreamTaskObj *self, s32 a1, s32 a2)` (its own return is
 discarded at this call site, so its true type is unconfirmed either way).

@@ -14,7 +14,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "code_2c054.h"
+#include "Task.h"
 #include "BMemPMgr.h"
 #include "VabStreamObj.h"
 #include "BgLayer.h"

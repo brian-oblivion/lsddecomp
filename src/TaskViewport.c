@@ -849,7 +849,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
  *
  * TaskCore__GetActiveSlotCount, Get_vtable_TaskCore and
  * GetDefaultMovieFrame come first: one TaskCore method and two plain
- * accessors for data used far more widely (code_2c054.c, class_3bb8c_t.c).
+ * accessors for data used far more widely (Task.c, class_3bb8c_t.c).
  *
  * Then IntermediateBase (include/IntermediateBase.h, whose banner says what
  * the class does): the ctor, onNotify's split by the sender's root class,
@@ -874,7 +874,7 @@ TaskCoreMethods *Get_vtable_TaskCore(void) {
 }
 
 /* The default movie frame, {640, 0, 320, 240}: StreamTask's default initData
- * and the rect TaskCore__OnInit clears (code_2c054.h). */
+ * and the rect TaskCore__OnInit clears (Task.h). */
 extern DrawRect gDefaultMovieFrame;
 
 DrawRect *GetDefaultMovieFrame(void) {

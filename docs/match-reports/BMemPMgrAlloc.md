@@ -748,7 +748,7 @@ green.
 (round 73), matching `SetupBMemPMgrFreeList`'s setup and `BMemPMgrFree`'s
 (this unit's `BMemPMgrFree`) release, same list, same `sizeAndFlags`
 encoding. Called from a wide cross-section of units (`code_171e0`,
-`code_179d8_*`, `code_2c054`, `code_2cc8c_*`, `code_55dd4`, `code_d294`,
+`code_179d8_*`, `Task`, `code_2cc8c_*`, `code_55dd4`, `code_d294`,
 `main`, plus this unit's own `PushBasicClassListNode`) — confirming it is
 the game's general small-object pool allocator, not something narrower.
 

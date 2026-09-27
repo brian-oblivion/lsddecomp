@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BE84` on 2026-09-23 (tools/rename.py). Address 0x8003be84.
 
-**Unit:** code_2c054 · **Size:** 4 instructions (0x10 bytes) · **Status:** MATCHED (4/4 words, whole-image SHA1 green), first attempt
+**Unit:** Task · **Size:** 4 instructions (0x10 bytes) · **Status:** MATCHED (4/4 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -43,7 +43,7 @@ Matches the `lui`/`addiu` idiom already confirmed elsewhere in this project:
 
 ## New struct/header knowledge
 
-Added `include/code_2c054.h`'s `StreamTaskObjMethods` (currently just the
+Added `include/Task.h`'s `StreamTaskObjMethods` (currently just the
 header word -- no other slot of this table is dereferenced by anything in
 this unit's queue) and `extern StreamTaskObjMethods gStreamTaskMethods;`.
 

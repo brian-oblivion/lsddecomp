@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BDE4` on 2026-09-23 (tools/rename.py). Address 0x8003bde4.
 
-**Unit:** code_2c054 · **Size:** 1 instruction (0x4 bytes, `jr $ra; nop`) · **Status:** MATCHED
+**Unit:** Task · **Size:** 1 instruction (0x4 bytes, `jr $ra; nop`) · **Status:** MATCHED
 
 ## What it does
 

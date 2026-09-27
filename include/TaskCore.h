@@ -6,7 +6,7 @@
 /*
  * TaskCore -- class id 0x130, method table gTaskCoreMethods: the
  * IntermediateBase subclass behind the game's menu/screen tasks. Methods in
- * src/code_2c054.c (ctor, finalize, reset and the init/deinit hooks) and
+ * src/Task.c (ctor, finalize, reset and the init/deinit hooks) and
  * src/TaskViewport.c, TaskViewport.c, TaskViewport.c (everything from +0x058
  * on). The object is 0xA4 bytes (New_TaskCore). Three classes derive from
  * it, each ctor calling TaskCore__TaskCore first (`typeviews.py --tree`):

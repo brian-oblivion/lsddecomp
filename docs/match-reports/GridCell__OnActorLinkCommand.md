@@ -172,7 +172,7 @@ near-miss):
   from `NodeGuardedViewport__Update` via the OTHER getter, `GetViewportMethods` -- a DIFFERENT
   global/table). Same-offset arity conflict means different table/different
   class, per this project's established split policy (see
-  `TaskCoreObjMethods` in `include/code_2c054.h` for the precedent this
+  `TaskCoreObjMethods` in `include/Task.h` for the precedent this
   follows). This is a type-NAME change only: `GridCell__GridCell`'s own
   already-matched call (`GetSceneNodeMethods(self)->ctor(self)`) only touches the
   `+0x008 ctor` slot, whose layout is byte-identical in both names, so

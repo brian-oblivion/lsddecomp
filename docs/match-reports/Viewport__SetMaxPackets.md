@@ -50,15 +50,15 @@ Renamed from `Unk18Obj__SetUnk44`. Slot +0x04C `setUnk44`. unk44 * unk48 is each
 
 ## Proposed field names (round 95, alpha)
 
-Viewport's `unk44` -> `maxPackets`, slot `setUnk44` -> `setMaxPackets`, this function -> `Viewport__SetMaxPackets` (tier B). InitOt sizes each half's packet area as `unk48 * unk44`; the defaults are 2000 and 64, and 64 is a per-primitive byte budget on the scale of Psy-Q's own samples (`PACKETMAX * 24`), while the caller that varies one of them per scene (class_39e08.c, `setUnk44(vp, 1200)`) varies this one. Callers of the slot outside this unit: class_39e08.c, code_2c054.c; the field is accessed only in TaskViewport.c. Not applied: include/Viewport.h is not this job's.
+Viewport's `unk44` -> `maxPackets`, slot `setUnk44` -> `setMaxPackets`, this function -> `Viewport__SetMaxPackets` (tier B). InitOt sizes each half's packet area as `unk48 * unk44`; the defaults are 2000 and 64, and 64 is a per-primitive byte budget on the scale of Psy-Q's own samples (`PACKETMAX * 24`), while the caller that varies one of them per scene (class_39e08.c, `setUnk44(vp, 1200)`) varies this one. Callers of the slot outside this unit: class_39e08.c, Task.c; the field is accessed only in TaskViewport.c. Not applied: include/Viewport.h is not this job's.
 
 
 ## Track 7 (round 100, echo, polish pass)
 
 ## Naming
 
-Renamed `Viewport__SetUnk44` -> `Viewport__SetPacketCount` -> `Viewport__SetMaxPackets` with `tools/rename.py` (two runs; the second takes round 95's proposal above, whose name says the value is a capacity): tier B. The field is now `maxPackets` (include/Viewport.h, field rule: every accessor is in TaskViewport.c). Evidence which factor is the count: InitOt sizes each packet area as `packetSize * maxPackets`; the defaults are 2000 and 64, and 64 is a per-primitive byte budget (the largest GPU polygon primitive, POLY_GT4, is 52 bytes) where the other factor is what callers vary per scene (class_39e08.c passes 1200, TaskCore's reset 300); TaskCore (code_2c054.c) already names the value it passes to the other setter `packetSize`; Psy-Q's samples size their packet areas `PACKETMAX * size`. The multiplication itself is symmetric, which is why this stays tier B. Parameter `value` -> `maxPackets`.
+Renamed `Viewport__SetUnk44` -> `Viewport__SetPacketCount` -> `Viewport__SetMaxPackets` with `tools/rename.py` (two runs; the second takes round 95's proposal above, whose name says the value is a capacity): tier B. The field is now `maxPackets` (include/Viewport.h, field rule: every accessor is in TaskViewport.c). Evidence which factor is the count: InitOt sizes each packet area as `packetSize * maxPackets`; the defaults are 2000 and 64, and 64 is a per-primitive byte budget (the largest GPU polygon primitive, POLY_GT4, is 52 bytes) where the other factor is what callers vary per scene (class_39e08.c passes 1200, TaskCore's reset 300); TaskCore (Task.c) already names the value it passes to the other setter `packetSize`; Psy-Q's samples size their packet areas `PACKETMAX * size`. The multiplication itself is symmetric, which is why this stays tier B. Parameter `value` -> `maxPackets`.
 
 ## Proposed field names
 
-Slot +0x04C `setUnk44` -> `setMaxPackets` (callers outside this unit: class_39e08.c, code_2c054.c).
+Slot +0x04C `setUnk44` -> `setMaxPackets` (callers outside this unit: class_39e08.c, Task.c).

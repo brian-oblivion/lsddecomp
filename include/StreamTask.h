@@ -8,7 +8,7 @@
  * StreamTask -- class id 0x1130, method table gStreamTaskMethods, a TaskCore
  * subclass (`tools/classtable.py gStreamTaskMethods --vs gTaskCoreMethods`:
  * fourteen overrides and five slots of its own). No class derives from it.
- * src/code_2c054.c holds the whole class: allocator, ctor, every override,
+ * src/Task.c holds the whole class: allocator, ctor, every override,
  * the setters and the getter. The object is 0xDC bytes (New_StreamTask).
  *
  * The name is the table's stem with its `Obj` dropped (track 4 step 2);

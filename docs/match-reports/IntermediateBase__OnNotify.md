@@ -72,7 +72,7 @@ functions except `New_Viewport`/`Viewport__Viewport`/`Viewport__Finalize`/
 When a unit's queue functions are all small and share a ROM range, run
 `tools/classtable.py <addr>` against every nearby vtable found via
 `grep -rn func_NAME asm/data/*.s` (or a sibling unit's own header comments
-citing the same table, as `code_2c054.h`'s `TaskUtilMethods` did here) before
+citing the same table, as `Task.h`'s `TaskUtilMethods` did here) before
 reading any single function's disassembly in isolation. The table dump
 resolves not just the CURRENT function's identity but its callers' and
 callees' argument SHAPES (arity, and often a concrete non-`s32` type) for

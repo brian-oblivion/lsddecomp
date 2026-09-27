@@ -73,7 +73,7 @@ the whole image after any further edit there.)
   *out`). This call site sets up a THIRD argument (`self->unkA4` in `$a2`)
   that unit's own signature never receives -- the same independent-arities
   situation already on file for `Get_vtable_TaskCore`/`BaseTaskCtorTable_
-  3bb8c_c` vs. `TaskCoreMethods` (`include/code_2c054.h`). This unit's own
+  3bb8c_c` vs. `TaskCoreMethods` (`include/Task.h`). This unit's own
   local 3-argument extern matches what THIS call site actually needs;
   class_3bb8c_c.c's 2-argument declaration is untouched. (`include/class_
   3bb8c.h`'s own comment on `Ctx678_3bb8c_c`, written when this call site

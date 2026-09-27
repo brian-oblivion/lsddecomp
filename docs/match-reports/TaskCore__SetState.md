@@ -155,7 +155,7 @@ why this rules out a `TitleMenu__`/`GraphRoomObj__` prefix.
 
 `Obj86B60::unk3C` (s32, +0x03C) -> `notifyMode`. Tier B. Grep shows
 `TaskViewport.c`, `code_2cc8c_d.c` and several unrelated `class_3bb8c_*`/
-`libsnd_seqread.c`/`code_2c054.c` files also contain an `unk3C` textual hit, so
+`libsnd_seqread.c`/`Task.c` files also contain an `unk3C` textual hit, so
 per CLAUDE.md's "textual search over-counts" warning this is NOT renamed in
 the shared header -- only the compiler (a definition-only rename + rebuild)
 can settle which of those are the SAME struct. Evidence for the name from

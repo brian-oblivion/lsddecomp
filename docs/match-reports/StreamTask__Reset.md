@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BA38` on 2026-09-23 (tools/rename.py). Address 0x8003ba38.
 
-**Unit:** code_2c054 · **Size:** 8 instructions (0x20 bytes) · **Status:** MATCHED (8/8 words, whole-image SHA1 green), first attempt
+**Unit:** Task · **Size:** 8 instructions (0x20 bytes) · **Status:** MATCHED (8/8 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -43,7 +43,7 @@ this order -- no reshaping needed).
 
 ## New struct/header knowledge
 
-Named the five fields in `include/code_2c054.h`'s `StreamTaskObj` (shared
+Named the five fields in `include/Task.h`'s `StreamTaskObj` (shared
 with the setters' report).
 
 ## Proposed learning

@@ -9,7 +9,7 @@
 ## What it does
 
 Registers a "loader" task for a named resource: allocates a `LoaderTask`
-(`New_TaskCore`, a `New_X`-shaped allocator in uncarved `code_2c054`, 0xA4
+(`New_TaskCore`, a `New_X`-shaped allocator in uncarved `Task`, 0xA4
 bytes), gives it a completion callback (`GameApplication__LoaderTaskDoneCallback`, already matched in
 this unit) and a context pointer (`self`), then sets its remaining
 parameters (`path`, `self->unk1C`) and starts it. Called twice by
