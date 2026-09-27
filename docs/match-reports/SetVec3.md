@@ -30,13 +30,13 @@ plausible from the call site alone — the `addu` in this function's own body is
 what settles it):
 
 ```c
-typedef struct Vec3_171e0 {
+typedef struct ResourceRequest {
     s32 x;
     s32 y;
     s32 z;
-} Vec3_171e0;
+} ResourceRequest;
 
-Vec3_171e0 *SetVec3(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
+ResourceRequest *SetVec3(ResourceRequest *this, s32 x, s32 y, s32 z) {
     this->x = x;
     this->y = y;
     this->z = z;
@@ -63,5 +63,5 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80026CE8` | `SetVec3` | A |
 
-**Evidence.** Writes `x`/`y`/`z` into a `Vec3_171e0` and returns the pointer
+**Evidence.** Writes `x`/`y`/`z` into a `ResourceRequest` and returns the pointer
 -- a pure "set and return this" setter. Mechanics are its purpose.

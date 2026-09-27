@@ -16,11 +16,11 @@
 /* A 3-word vector-like object, written wholesale by SetVec3. Only the
  * first three words are touched; nothing here says whether a further field
  * follows. */
-typedef struct Vec3_171e0 {
+typedef struct ResourceRequest {
     s32 x;
     s32 y;
     s32 z;
-} Vec3_171e0;
+} ResourceRequest;
 
 extern void *BMemPMgrAlloc(s32 size); /* one arg confirmed by New_GameApplication.md (code_1677c) */
 extern void BMemPMgrFree(void *arg);

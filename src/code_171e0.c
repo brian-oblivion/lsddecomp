@@ -123,7 +123,7 @@ void *GetActiveDataSourceMethods(void) {
     }
 }
 
-Vec3_171e0 *SetVec3(Vec3_171e0 *this, s32 x, s32 y, s32 z) {
+ResourceRequest *SetVec3(ResourceRequest *this, s32 x, s32 y, s32 z) {
     this->x = x;
     this->y = y;
     this->z = z;
