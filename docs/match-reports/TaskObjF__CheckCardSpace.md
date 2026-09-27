@@ -56,3 +56,8 @@ and made things worse).
 ## Naming (round 78, track 3)
 
 `func_8004EC5C` -> `TaskObjF__CheckCardSpace`. **Tier B.** Sits at `gTaskObjFMethods` +0x060. Retries `TaskObjF__ProbeCardFreeSpace` up to 10 times. Mechanics only (retry wrapper); see `TaskObjF__ProbeCardFreeSpace` for what it actually checks.
+
+## Constants (round 98, track 7)
+
+The retry count 10 is `MEMCARD_RETRIES` (include/TaskObjF.h, "Attempts
+after the first before a card operation gives up"). Zero bytes changed.

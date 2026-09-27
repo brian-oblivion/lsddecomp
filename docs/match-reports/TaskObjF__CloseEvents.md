@@ -41,3 +41,9 @@ wrappers.
 ## Naming (round 78, track 3)
 
 `func_8004E678` -> `TaskObjF__CloseEvents`. **Tier A.** Sits at `gTaskObjFMethods` +0x048. Disables events (`TaskObjF__DisableEvents`) then closes all 4 via `TaskObjF__ForEachEvent(self, CloseEvent, 1)` -- the exact teardown counterpart of `TaskObjF__OpenEvents`, which this unit's own +0x044 slot opens the same 4 events.
+
+## Declarations (round 98, track 7)
+
+`CloseEvent` now comes from `<kernel.h>` (`long CloseEvent(long)`), so it is
+cast to `TaskObjF__ForEachEvent`'s `s32 (*)(s32)` callback type; the
+unit's own `s32` extern is gone. Zero bytes changed.

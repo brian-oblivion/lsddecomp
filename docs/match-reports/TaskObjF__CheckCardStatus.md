@@ -413,3 +413,8 @@ both green with the wrapped form in place.
 ## Naming (round 78, track 3)
 
 `func_8004E6B8` -> `TaskObjF__CheckCardStatus`. **Tier B.** Sits at `gTaskObjFMethods` +0x04C, matching `TaskObjFMethods`'s own `slot4C(self, s32*, s32*, s32*)` signature exactly (include/class_3bb8c.h). Retries `TaskObjF__CardInfoAndLoadStatus` up to 10 times, combining its out-flags. Mechanics are clear (poll card info/load status with retry); what the three `s32*` outputs mean to the game beyond error/info-unformatted/load-unformatted is not established here, so tier B.
+
+## Constants (round 98, track 7)
+
+The retry count 10 is `MEMCARD_RETRIES` (include/TaskObjF.h, "Attempts
+after the first before a card operation gives up"). Zero bytes changed.

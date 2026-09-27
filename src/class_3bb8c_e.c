@@ -11,58 +11,45 @@
 #include "FrameClock.h"
 
 /*
- * class_3bb8c_e (round 14; named round 78, track 3): 19 TaskObjF methods
- * (include/TaskObjF.h, track 4 round 89), carved from the same class_3bb8c
- * remainder segment as class_3bb8c_b/_c/_d/_f. 13 are entries of
- * gTaskObjFMethods --
- *   +0x00C finalize          = TaskObjF__Finalize
- *   +0x010 addChild          = TaskObjF__AddChild
- *   +0x014 removeChild       = TaskObjF__RemoveChild
- *   +0x018 removeAllChildren = TaskObjF__RemoveAllChildren
- *   +0x040..+0x060 (9 contiguous slots) = TaskObjF__SetCardSlot,
- *     TaskObjF__OpenEvents, TaskObjF__CloseEvents, TaskObjF__CheckCardStatus,
- *     TaskObjF__FormatCard, TaskObjF__ProbeMemcardFile,
- *     TaskObjF__FindUnusedMemcardName, TaskObjF__CollectExistingMemcardFiles,
- *     TaskObjF__CheckCardSpace
- * -- and the other six (`TaskObjF__ClearLinks`,
- * `TaskObjF__CardInfoAndLoadStatus`, `TaskObjF__CardInfoStatus`,
- * `TaskObjF__CardLoadStatus`, `TaskObjF__OpenAndReadMemcardFile`,
- * `TaskObjF__ProbeCardFreeSpace`) are private helpers the slotted functions
- * call, mostly wrapping the PS-X memory-card BIOS calls
- * (`_card_info`/`_card_load`/`_card_clear`, `open`/`read`/`close`/`delete`,
- * `format`) behind this class's own retry idiom.
+ * TaskObjF's child links, card events, card checks and file probes
+ * (include/TaskObjF.h: slots +0x00C..+0x018 and +0x040..+0x060, and the
+ * helpers they call), in address order:
  *
- * Until round 89 this unit read the object through its own view,
- * `Node3bb8cE` (round 78 confirmed it was TaskObjF): its res02/res05/
- * res10/res20 are TaskObjF's inputSource/tickSource/textEntry/itemList,
- * filed by AddChild on the child's class id, and its zero-only `unk68` is
- * spriteParent.
+ * - Children. TaskObjF__AddChild files a child by its class id into one of
+ *   four links: a Pad as inputSource, a FrameClock as tickSource, a
+ *   TextEntry, an ItemList. TaskObjF__RemoveChild and
+ *   TaskObjF__RemoveAllChildren clear them; TaskObjF__ClearLinks clears
+ *   them and spriteParent at construction.
+ * - The card. TaskObjF__SetCardSlot picks slot 0 or 1 and its BIOS channel.
+ *   TaskObjF__OpenEvents opens one SwCARD event per gCardEventSpecs entry;
+ *   TaskObjF__CloseEvents closes them.
+ * - Card checks. TaskObjF__CheckCardStatus retries
+ *   TaskObjF__CardInfoAndLoadStatus, which asks _card_info whether a card is
+ *   there and new (TaskObjF__CardInfoStatus), then _card_load whether it is
+ *   formatted (TaskObjF__CardLoadStatus). TaskObjF__FormatCard retries
+ *   format().
+ * - Files, named "bu00:"/"bu10:" plus a prefix and a suffix
+ *   (BuildMemcardPath). TaskObjF__ProbeMemcardFile opens one and can copy
+ *   out its title (TaskObjF__OpenAndReadMemcardFile);
+ *   TaskObjF__FindUnusedMemcardName and
+ *   TaskObjF__CollectExistingMemcardFiles probe a list of suffixes through
+ *   the probeMemcardFile slot. TaskObjF__CheckCardSpace retries
+ *   TaskObjF__ProbeCardFreeSpace, which creates and deletes a TEMP file of
+ *   the save's size.
+ *
+ * A retried call is tried once, then up to MEMCARD_RETRIES more times while
+ * it fails (TaskObjF__ProbeMemcardFile's loop: no more times).
  */
 
-/* Helpers this unit calls into, defined in class_3bb8c_f.c (extern for a
- * function OUTSIDE this unit). */
-/* BuildMemcardPath(dest, selector, suffix): 3-parameter, and both of this
- * unit's call sites pass all three. TaskObjF__OpenAndReadMemcardFile emits no $a2 set-up
- * because its own 3rd parameter arrives in $a2 and is forwarded unchanged
- * (round 75; this was an `arity-ok` K&R declaration until then, on the
- * reading that TaskObjF__OpenAndReadMemcardFile made a 2-argument call). */
+/* Defined in class_3bb8c_f.c, which types `dest` as McDevicePath *: it
+ * writes the device name, appends `suffix`, and returns `dest`. */
 extern char *BuildMemcardPath(void *dest, s32 cardSlot, char *suffix);
 
-/* PSX thread-table constant walked by TaskObjF__OpenEvents (4 entries, one per
- * OpenTh-style thread it starts). Address-only-derived walk (lui/addiu then
- * plain lw at increasing offsets), never gp-relative, so unaffected by the
- * project's gp_rel blocker. */
-extern s32 gCardEventSpecs[4];
-
-/* Literal "TEMP" (asm/data/7B12C.sdata.s) -- the throwaway suffix
- * TaskObjF__ProbeCardFreeSpace passes as BuildMemcardPath's 3rd argument to
- * build a placeholder file name when probing free space. */
+/* "TEMP": the name TaskObjF__ProbeCardFreeSpace creates to test for space. */
 extern char sMcTempFileSuffix[];
 
 extern void *BMemPMgrAlloc(s32 size);
-extern void *BMemPMgrFree(void *ptr);
 extern char *strcpy(char *dest, char *src);
-extern char *strcat(char *dest, char *src);
 
 void TaskObjF__ClearLinks(TaskObjF *self) {
     self->inputSource = NULL;
@@ -150,10 +137,15 @@ s32 TaskObjF__OpenEvents(TaskObjF *self) {
 
 s32 TaskObjF__CloseEvents(TaskObjF *self) {
     TaskObjF__DisableEvents(self);
+    /* kernel.h spells CloseEvent with `long`, ForEachEvent's callback with s32. */
     TaskObjF__ForEachEvent(self, (s32 (*)(s32))CloseEvent, 1);
     return 1;
 }
 
+/* Nonzero when a card answered. *error is set when it answered with an error,
+ * *cardChanged when the first or the last try found a new card, *formatted
+ * when it is formatted. An error or an unformatted card also counts as a
+ * failed try. */
 s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 *formatted) {
     s32 retries;
     s32 firstChanged;
@@ -162,6 +154,8 @@ s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 
     retries = MEMCARD_RETRIES;
     *cardChanged = 0;
     result = TaskObjF__CardInfoAndLoadStatus(self, error, &firstChanged, formatted);
+    /* MATCHING: the retry count is tested after the call; testing it first
+     * cross-jumps the two calls into one. */
     while (result == 0 || *error != 0 || *formatted == 0) {
         result = TaskObjF__CardInfoAndLoadStatus(self, error, cardChanged, formatted);
         if (retries-- == 0) {
@@ -172,6 +166,9 @@ s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 
     return result;
 }
 
+/* Returns whatever the last call left in $v0: CardInfoStatus's 0, or
+ * CardLoadStatus's status.
+ * MATCHING: an explicit return adds two words. */
 s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 *formatted) {
     if (TaskObjF__CardInfoStatus(self, error, cardChanged) != 0) {
         TaskObjF__CardLoadStatus(self, error, formatted);
@@ -183,6 +180,7 @@ s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *error, s32 *cardChanged) {
     s32 answer;
 
     status = 1;
+    /* MATCHING: one expression keeps both stores ahead of TestEvents. */
     *cardChanged = *error = 0;
     TaskObjF__TestEvents(self);
     while (_card_info(self->cardHandle) == 0)
@@ -205,6 +203,7 @@ s32 TaskObjF__CardLoadStatus(TaskObjF *self, s32 *error, s32 *formatted) {
     s32 answer;
 
     status = 1;
+    /* MATCHING: one expression keeps both stores ahead of TestEvents. */
     *formatted = (*error = 0, status);
     TaskObjF__TestEvents(self);
     while (_card_load(self->cardHandle) == 0)
@@ -229,22 +228,19 @@ s32 TaskObjF__FormatCard(TaskObjF *self) {
     retries = MEMCARD_RETRIES;
     do {
         path = self->cardSlot != 0 ? &gMcDevicePath1 : &gMcDevicePath0;
-        result = format((char *)path);
+        result = format((char *)path); /* the device name, "bu00:" or "bu10:" */
     } while (result == 0 && retries-- != 0);
     return result;
 }
 
-/* TaskObjF__OpenAndReadMemcardFile's 3rd parameter is the file-name suffix, forwarded verbatim
- * by TaskObjF__ProbeMemcardFile (after rejecting NULL/empty) and by TaskObjF__OpenAndReadMemcardFile as
- * BuildMemcardPath's 3rd argument. Round 75 corrected the earlier reading
- * that TaskObjF__OpenAndReadMemcardFile never used it: it never TOUCHES $a2, because the value
- * is already where the call wants it. */
+/* Nonzero when the file prefix+suffix exists; copies its title to destTitle
+ * unless that is NULL. An empty suffix names no file. */
 s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destTitle, char *suffix) {
     s32 retries;
     s32 result;
 
-    retries = 0;
-    if (suffix == NULL || *suffix == 0) {
+    retries = 0; /* the class's retry loop, run once */
+    if (suffix == NULL || *suffix == '\0') {
         return 0;
     }
     do {
@@ -267,7 +263,7 @@ s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destTitle, char *suff
     if (destTitle != NULL) {
         header = BMemPMgrAlloc(MEMCARD_SECTOR_SIZE);
         read(handle, header, MEMCARD_SECTOR_SIZE);
-        strcpy(destTitle, (char *)header + 4);
+        strcpy(destTitle, (char *)header + 4); /* the save header's title */
         BMemPMgrFree(header);
     }
     close(handle);
@@ -278,7 +274,7 @@ char *TaskObjF__FindUnusedMemcardName(TaskObjF *self, char *buf, char *prefix, c
     while (*suffixes != NULL) {
         strcpy(buf, prefix);
         strcat(buf, *suffixes);
-        if (self->methods->probeMemcardFile(self, 0, buf) == 0) {
+        if (self->methods->probeMemcardFile(self, NULL, buf) == 0) {
             return buf;
         }
         suffixes++;
@@ -317,12 +313,15 @@ s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 iconFrames, s32 size) {
     return result;
 }
 
+/* Creates, then deletes, a file big enough for `size` bytes of save data
+ * after the save header: nonzero when the card has room. */
 s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
     char pathBuf[32];
     char *path;
     s32 handle;
     s32 blocks;
 
+    /* MATCHING: the u32 cast makes the shift retail's srl. */
     blocks = (u32)(size + MEMCARD_SAVE_HEADER_SIZE + MEMCARD_BLOCK_SIZE - 1) >> MEMCARD_BLOCK_SHIFT;
     path = BuildMemcardPath(pathBuf, self->cardSlot, sMcTempFileSuffix);
     handle = open(path, MEMCARD_OPEN_BLOCKS(blocks) | O_CREAT);
@@ -330,6 +329,7 @@ s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
         return 0;
     }
     close(handle);
+    /* MATCHING: delete(path), the same address, changes the code. */
     delete (pathBuf);
     return 1;
 }

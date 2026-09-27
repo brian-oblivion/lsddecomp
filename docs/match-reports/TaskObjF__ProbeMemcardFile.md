@@ -71,3 +71,13 @@ function's bytes are unchanged (see `TaskObjF__OpenAndReadMemcardFile.md`).
 ## Naming (round 78, track 3)
 
 `func_8004E9AC` -> `TaskObjF__ProbeMemcardFile`. **Tier B.** Sits at `gTaskObjFMethods` +0x054, matching `Node3bb8cE`'s own `SelfMethods3bb8cE.slot54(self, s32, char*)` -- the slot `TaskObjF__FindUnusedMemcardName`/`TaskObjF__CollectExistingMemcardFiles` dispatch through on themselves. Guards an empty/NULL suffix, then makes a single (`retries = 0`, structurally never loops) call to `TaskObjF__OpenAndReadMemcardFile`. Named for what it mechanically is (a single-attempt existence/read probe used as the vtable's file-check slot); the two different calling conventions its callers use (`destBuf == NULL` for existence-only, non-NULL to also read) keep this tier B rather than A.
+
+## Source comment moved here (round 98, track 7)
+
+"TaskObjF__OpenAndReadMemcardFile's 3rd parameter is the file-name suffix,
+forwarded verbatim by TaskObjF__ProbeMemcardFile (after rejecting NULL/empty)
+and by TaskObjF__OpenAndReadMemcardFile as BuildMemcardPath's 3rd argument.
+Round 75 corrected the earlier reading that TaskObjF__OpenAndReadMemcardFile
+never used it: it never TOUCHES $a2, because the value is already where the
+call wants it." The source now says what the function returns; `*suffix ==
+0` reads `'\0'`. Zero bytes changed.

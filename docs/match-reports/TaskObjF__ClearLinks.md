@@ -40,3 +40,27 @@ needs nothing beyond a direct transcription.
 ## Naming (round 78, track 3)
 
 `func_8004E3F4` -> `TaskObjF__ClearLinks`. **Tier B.** NOT a `gTaskObjFMethods` entry (checked against the full table) -- called once, directly, from `TaskObjF__TaskObjF`'s own ctor (class_3bb8c_d.c), before `self->methods->slot40(self, arg2)` (`TaskObjF__SetCardSlot`). Zeroes the same five resource-slot pointers (`res02`/`res05`/`unk68`/`res10`/`res20`) that `TaskObjF__RemoveAllChildren` zeroes before chaining to the base class. Mechanics are exact (construction-time init of the resource slots); tier B because it is one line of evidence (a single call site) rather than two independent callers agreeing.
+
+## Naming (round 98, track 7)
+
+`TaskObjF__ClearResourceSlots` -> `TaskObjF__ClearLinks` (tools/rename.py).
+**Tier A.** It NULLs TaskObjF's five object pointers -- `inputSource`,
+`tickSource`, `spriteParent`, `textEntry`, `itemList` -- which are links to
+other objects (four of them children `TaskObjF__AddChild` files by class id),
+not resources in the `FileResource` sense the old name suggested.
+`TaskObjF__RemoveAllChildren` clears the same five before chaining to
+BasicClass. One caller, the ctor.
+
+## Unit banner history (moved from src/class_3bb8c_e.c, round 98)
+
+The unit's banner used to carry its history, now here because this is the
+unit's first function: class_3bb8c_e was carved in round 14 from the same
+class_3bb8c remainder segment as class_3bb8c_b/_c/_d/_f, its class was named
+TaskObjF in round 78 (track 3), and it moved onto include/TaskObjF.h in
+round 89 (track 4). Until round 89 the unit read the object through its own
+view, `Node3bb8cE` (round 78 confirmed it was TaskObjF): its
+res02/res05/res10/res20 are TaskObjF's inputSource/tickSource/textEntry/
+itemList, filed by AddChild on the child's class id, and its zero-only
+`unk68` is spriteParent. The banner also listed the 13 `gTaskObjFMethods`
+entries by offset; include/TaskObjF.h's method table is now the place for
+that.
