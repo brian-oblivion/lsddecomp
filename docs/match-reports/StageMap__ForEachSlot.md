@@ -85,3 +85,8 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ForEachElem` -> `StageMap__ForEachSlot` (`python3 tools/rename.py StageMap__ForEachElem StageMap__ForEachSlot`, tier A): an iterator over the seven slots (slot callback, then the cell callback over its cells).
+
+## Round 96 (track 7, delta)
+
+Parameters `arg1`/`arg2` -> `cellFn`/`slotFn` (the prototype's `elemFn`
+follows), `e` -> `slot`; loop bound `ARRAY_COUNT(self->slots)`.

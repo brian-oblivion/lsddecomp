@@ -138,7 +138,7 @@ covers the base case but not this one.
 ## Round 18 (echo) — two more declaration-order variants, both fully inert
 
 Confirmed this is the SAME class CLAUDE.md/`docs/DECOMPILATION_LEARNINGS.md`
-document via `StageMap__BuildFootprintSlots` (7 variants, zero movement) and
+document via `StageMap__BuildFootprintRects` (7 variants, zero movement) and
 `TaskObjF__WriteMemcardSaveFile` (this same round, also stalled): "full register-identity
 PERMUTATION with zero address drift." Two more attempts, both real-oracle
 verified (`build-and-verify.sh`), both **byte-for-byte identical** to the
@@ -208,7 +208,7 @@ reshaping).
 ### Proposed learning (reinforces existing entry, does not add a new class)
 
 **Three independent functions across two different header families
-(`class_3bb8c_b`'s `StageMap__BuildFootprintSlots`, `class_3bb8c_f`'s `TaskObjF__WriteMemcardSaveFile`,
+(`class_3bb8c_b`'s `StageMap__BuildFootprintRects`, `class_3bb8c_f`'s `TaskObjF__WriteMemcardSaveFile`,
 `class_3bb8c_j`'s `ItemList__LoadResources`) now confirm the same negative result
 for the SAME lever (declaration/introduction order of the contested
 locals).** This is strong enough evidence to stop treating "try a

@@ -1,4 +1,6 @@
-# StageMap__SetFootprintCellFlag — MATCHED (97/97 words)
+# StageMap__SetFootprintVisible — MATCHED (97/97 words)
+
+> Renamed from `StageMap__SetFootprintCellFlag` on 2026-09-27 (tools/rename.py). Address 0x8004ce24.
 
 > Renamed from `Class866E8__SetFootprintCellFlag` on 2026-09-26 (tools/rename.py). Address 0x8004ce24.
 
@@ -12,7 +14,7 @@ pointer grid (row stride 20 cells, `slot->h4`/`h6` the starting column/row,
 31 of `EntryChildObj::unk10` for every cell in the rectangle AND every
 node in that cell's `unk38` singly-linked chain.
 
-`self->slots8C` and `self->unk88` are the SAME memory `StageMap__InitFootprintSlot`
+`self->slots8C` and `self->unk88` are the SAME memory `StageMap__InitFootprintRect`
 (matched earlier this round, a different unit's function) writes via a
 coarser `Unk54Struct` whole-block-copy view — this function establishes
 the finer-grained field layout from the READ side.
@@ -27,7 +29,7 @@ the finer-grained field layout from the READ side.
   a hard ceiling, not an inferred one.
 - New type **`CellRect`** (0xC bytes): `elemIdx` (`s32`, +0x0),
   `h4`/`h6`/`h8`/`hA` (`s16` each, +0x4/+0x6/+0x8/+0xA). This is a
-  DIFFERENT, more granular view of the same memory `StageMap__InitFootprintSlot`
+  DIFFERENT, more granular view of the same memory `StageMap__InitFootprintRect`
   addresses as a flat `Unk54Struct` (3x `s32`) — kept as two independent
   views per the project's established convention (a whole-struct copy
   doesn't care about the internal layout it copies, so the coarser
@@ -43,7 +45,7 @@ the finer-grained field layout from the READ side.
 ## Final C
 
 ```c
-void StageMap__SetFootprintCellFlag(Obj866E8 *self, s32 setBit) {
+void StageMap__SetFootprintVisible(Obj866E8 *self, s32 setBit) {
     s32 i;
     s32 j;
     s32 k;
@@ -183,3 +185,19 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 96 (track 7, delta)
+
+### Naming
+
+Renamed from `StageMap__SetFootprintCellFlag` (tools/rename.py), tier A:
+the flag is libgs's GsDOFF (bit 31 of GsDOBJ2 attribute, display off);
+nonzero clears it on every cell under `rects` and every cell chained behind
+it (`nextInCell`), zero sets it. RefreshFootprint calls it with 0 before
+rebuilding `rects` and with 1 after. Parameter `setBit` -> `visible`;
+locals `slot` -> `rect` (CellRect), `e` -> `slot` (ChunkSlot).
+
+### Constants
+
+`0x7FFFFFFF`/`0x80000000` -> `~GsDOFF`/`GsDOFF` (libgs.h); `20` ->
+`STAGE_CHUNK_CELLS` (the row stride); `next != 0` -> `!= NULL`.

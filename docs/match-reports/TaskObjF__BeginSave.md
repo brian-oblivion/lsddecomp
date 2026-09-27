@@ -277,7 +277,7 @@ function can override, since attempts 3-5 already explored the full range
 from "0 extra fetches" (variant 2) to "2 extra fetches" (variant 5) without
 finding a 3-fetch shape that lands the LAST word correctly. The next thing
 worth trying, if this function is revisited: an isolated `cpp|cc1|maspsx`
-reproducer (per `docs/DECOMPILATION_LEARNINGS.md`'s `StageMap__BuildFootprintSlots`
+reproducer (per `docs/DECOMPILATION_LEARNINGS.md`'s `StageMap__BuildFootprintRects`
 precedent) to iterate on this ONE tail-merge shape in under a second per
 variant, rather than a full project rebuild per attempt — this report's 5
 variants each needed a full `build-and-verify.sh` cycle.

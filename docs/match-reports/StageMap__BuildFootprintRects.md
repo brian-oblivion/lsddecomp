@@ -1,4 +1,6 @@
-# StageMap__BuildFootprintSlots -- MATCHED 109/109, round 75 (echo)
+# StageMap__BuildFootprintRects -- MATCHED 109/109, round 75 (echo)
+
+> Renamed from `StageMap__BuildFootprintSlots` on 2026-09-27 (tools/rename.py). Address 0x8004c93c.
 
 > Renamed from `Class866E8__BuildFootprintSlots` on 2026-09-26 (tools/rename.py). Address 0x8004c93c.
 
@@ -6,7 +8,7 @@
 
 REVISITED, round 75: MATCHED 109/109, whole image `OK: build matches retail`,
 `tools/check-nonmatching.sh` green; names/types not relevant (no struct or
-header change; one unit-local prototype for `StageMap__SplitFootprintSlot`).
+header change; one unit-local prototype for `StageMap__SplitFootprintRect`).
 
 **Lever: source shape, three parts -- one reused slot pointer, a separate
 `over` local, and the `h6 += 0x14` placement retail actually executes.** Filed
@@ -22,7 +24,7 @@ length, zero drift -- identical to the recorded figure.
 
 Retail stores slot 0's fields through `self` (`sw v0,0x8C($s2)`,
 `sh v1,0x90($s2)`, ...), keeps `&self->slots8C[0]` in `$s3` only to pass it
-to `StageMap__SplitFootprintSlot`, and then REUSES `$s3` for `&self->slots8C[count]`. The two
+to `StageMap__SplitFootprintRect`, and then REUSES `$s3` for `&self->slots8C[count]`. The two
 `addiu $s3,$s2,0x8C` copies are not two source statements: there is one at
 the join after the `h6 < 0` test; reorg filled the `bgez $s5` delay slot from
 that target (redirecting to the next label) and then deleted the copy on the
@@ -52,7 +54,7 @@ Six builds total. No permuter.
 ## Matched body
 
 ```c
-void StageMap__BuildFootprintSlots(Obj866E8 *self) {
+void StageMap__BuildFootprintRects(Obj866E8 *self) {
     s32 flag;
     s32 h4;
     s32 width;
@@ -96,7 +98,7 @@ void StageMap__BuildFootprintSlots(Obj866E8 *self) {
     if (span >= 0x15) {
         over = span - 0x14;
         slot->h8 = width - over;
-        count = StageMap__SplitFootprintSlot(self, slot, 0, quadrant, h4, h6, width, height);
+        count = StageMap__SplitFootprintRect(self, slot, 0, quadrant, h4, h6, width, height);
         count += 1;
         slot = &self->slots8C[count];
         slot->elemIdx = self->methods->slot120(self, quadrant + 1);
@@ -106,14 +108,14 @@ void StageMap__BuildFootprintSlots(Obj866E8 *self) {
         slot->hA = self->slots8C[0].hA;
     } else {
         slot->h8 = width;
-        count = StageMap__SplitFootprintSlot(self, slot, 0, quadrant, h4, h6, width, height);
+        count = StageMap__SplitFootprintRect(self, slot, 0, quadrant, h4, h6, width, height);
     }
     count += 1;
     self->unk88 = count;
 }
 ```
 
-It calls `StageMap__SplitFootprintSlot` (defined next in ROM order) through a unit-local
+It calls `StageMap__SplitFootprintRect` (defined next in ROM order) through a unit-local
 prototype identical to that function's definition.
 
 ### Proposed learning
@@ -175,9 +177,9 @@ prototype identical to that function's definition.
 > `TaskObjF__WriteMemcardSaveFile`.
 >
 > **Permuter scaffold rebuilt from scratch** (`tools/setup-permuter.sh
-> StageMap__BuildFootprintSlots <seed>`, seed = this report's own 45/109 body verbatim,
+> StageMap__BuildFootprintRects <seed>`, seed = this report's own 45/109 body verbatim,
 > plus a forward declaration for the not-yet-matched sibling
-> `StageMap__SplitFootprintSlot`). `--debug --stack-diffs`: **base score 2153 -- 8
+> `StageMap__SplitFootprintRect`). `--debug --stack-diffs`: **base score 2153 -- 8
 > insertions, 8 deletions, 4 reorderings, 61 register differences.** The
 > real in-context build's own residue (confirmed immediately above, same
 > build) is a **pure zero-drift, zero-insertion, zero-deletion register
@@ -190,7 +192,7 @@ prototype identical to that function's definition.
 > scaffold: 11 insertions/11 deletions) on a freshly-built scaffold four
 > rounds later, with a different absolute count but the same qualitative
 > mismatch. **Per Gate 3, a disagreement means STOP -- no search launched.**
-> This function now belongs in the same class as `StageMap__SplitFootprintSlot`,
+> This function now belongs in the same class as `StageMap__SplitFootprintRect`,
 > `StageMap__ComputeFootprintDescriptor` and `StageMap__ApplyChunkLoads`: real residue is a clean register
 > rotation, but no runner-buildable isolated scaffold reproduces it, so the
 > permuter route needs more surrounding-file context than
@@ -211,7 +213,7 @@ prototype identical to that function's definition.
 > three additions (`quadrant`, `flag`, `span`) complete the set of locals
 > with a provable value range in this function. All five are now
 > individually tested and negative; nothing narrower remains to try here.
-> **A fourth function (`StageMap__BuildFootprintSlots`, joining `StageMap__SplitFootprintSlot`,
+> **A fourth function (`StageMap__BuildFootprintRects`, joining `StageMap__SplitFootprintRect`,
 > `StageMap__ComputeFootprintDescriptor`, `StageMap__ApplyChunkLoads`) now confirms the same scaffold-mismatch
 > class in this one unit** -- worth flagging as a property of this specific
 > header/class's functions (heavy `Obj866E8` self-pointer traffic, deep
@@ -229,7 +231,7 @@ prototype identical to that function's definition.
 > **delay slot**, so the increment executes on BOTH paths whenever `h6 < 0`.
 >
 > **The delay-slot reading is confirmed** — `asm/nonmatchings/class_3bb8c_b/
-> StageMap__BuildFootprintSlots.s` lines 32-33, verified by the head. The source inference
+> StageMap__BuildFootprintRects.s` lines 32-33, verified by the head. The source inference
 > does not follow, and both spellings of it measure WORSE than the 45/109
 > baseline:
 >
@@ -261,7 +263,7 @@ prototype identical to that function's definition.
 > **ROUND 33, head — ONE MORE LEVER TRIED HERE AND INERT.** A runner left an
 > uncommitted experiment in the worktree at teardown: the preserved body with
 > `(u16)` narrow casts added on the two `self->slots8C[0]` halfword reads
-> (`h6`, `hA`), plus a forward declaration of `StageMap__SplitFootprintSlot`. That is
+> (`h6`, `hA`), plus a forward declaration of `StageMap__SplitFootprintRect`. That is
 > round 33's `narrow-cast-defeats-strength-reduction` idiom, which was worth
 > 10 words on `vmNoiseOn2` in a different unit the same round.
 >
@@ -349,7 +351,7 @@ prototype identical to that function's definition.
 > real in-context build does not have** (real build: 0 drift, exactly
 > 109 words). This is the THIRD confirmed instance in this exact
 > unit/header of the scaffold-vs-real-build mismatch already documented
-> in `IsPointOutOfBounds`'s and `StageMap__SplitFootprintSlot`'s reports -- no search was run
+> in `IsPointOutOfBounds`'s and `StageMap__SplitFootprintRect`'s reports -- no search was run
 > against it. **This mismatch is now common enough in this one header
 > (`class_3bb8c.h`, three functions) that it looks systemic to something
 > about this class's real in-context register pressure, not
@@ -381,15 +383,15 @@ prototype identical to that function's definition.
 
 ## What it does
 
-`void StageMap__BuildFootprintSlots(Obj866E8 *self)`. Computes a "quadrant" index and a
+`void StageMap__BuildFootprintRects(Obj866E8 *self)`. Computes a "quadrant" index and a
 clamped `(h4, h6)` sub-cell offset from `self->unk7C`/`self->unk7E`
 (each signed, clamped into `[0, 0x14)` with a `-0xA`/`+0xA` secondary split
 when both axes are negative), fills `self->slots8C[0]` via
 `self->methods->slot120(self, quadrant)`, then decides whether the
 horizontal footprint (`h4 + self->unk80`) fits in one 20-unit grid cell or
 needs a second `CellRect` — filling that second slot directly when it
-does — before calling the documented-STALL `StageMap__SplitFootprintSlot` (signature per
-its own report, `docs/match-reports/StageMap__SplitFootprintSlot.md`) to (possibly) append
+does — before calling the documented-STALL `StageMap__SplitFootprintRect` (signature per
+its own report, `docs/match-reports/StageMap__SplitFootprintRect.md`) to (possibly) append
 further slots on the OTHER axis, and finally writing the total slot count to
 `self->unk88`.
 
@@ -461,16 +463,16 @@ order, boolean-vs-requery, read order, pointer-assignment timing).
 
 ## Preserved near-miss body (`#if 0`) -- round 19, 45/109, zero address drift
 
-Requires `StageMap__SplitFootprintSlot`'s forward extern (already declared with this
+Requires `StageMap__SplitFootprintRect`'s forward extern (already declared with this
 exact signature elsewhere in this unit, see
-`docs/match-reports/StageMap__SplitFootprintSlot.md`) if spliced back in — add
-`extern s32 StageMap__SplitFootprintSlot(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8);`
-before it (this function is defined AFTER `StageMap__BuildFootprintSlots` in ROM order in
+`docs/match-reports/StageMap__SplitFootprintRect.md`) if spliced back in — add
+`extern s32 StageMap__SplitFootprintRect(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8);`
+before it (this function is defined AFTER `StageMap__BuildFootprintRects` in ROM order in
 `src/class_3bb8c_b.c`).
 
 ```c
 #if 0
-void StageMap__BuildFootprintSlots(Obj866E8 *self) {
+void StageMap__BuildFootprintRects(Obj866E8 *self) {
     s32 flag;
     s32 h4;
     s32 width;
@@ -519,7 +521,7 @@ void StageMap__BuildFootprintSlots(Obj866E8 *self) {
     if (span >= 0x15) {
         span -= 0x14;
         slot0->h8 = width - span;
-        count = StageMap__SplitFootprintSlot(self, slot0, 0, quadrant, h4, h6, width, height);
+        count = StageMap__SplitFootprintRect(self, slot0, 0, quadrant, h4, h6, width, height);
         count += 1;
         slot1 = &self->slots8C[count];
         slot1->elemIdx = self->methods->slot120(self, quadrant + 1);
@@ -529,7 +531,7 @@ void StageMap__BuildFootprintSlots(Obj866E8 *self) {
         slot1->hA = self->slots8C[0].hA;
     } else {
         slot0->h8 = width;
-        count = StageMap__SplitFootprintSlot(self, slot0, 0, quadrant, h4, h6, width, height);
+        count = StageMap__SplitFootprintRect(self, slot0, 0, quadrant, h4, h6, width, height);
     }
     count += 1;
     self->unk88 = count;
@@ -551,8 +553,8 @@ retype of anything already named:
 - `s16 Obj866E8::unk7C` (+0x7C) — signed sub-cell horizontal offset.
 - `s16 Obj866E8::unk7E` (+0x7E) — same convention, vertical.
 - `s32 Obj866E8::unk80` (+0x80) — horizontal span, forwarded to
-  `StageMap__SplitFootprintSlot`'s `p7`.
-- `s32 Obj866E8::unk84` (+0x84) — forwarded to `StageMap__SplitFootprintSlot`'s `p8`.
+  `StageMap__SplitFootprintRect`'s `p7`.
+- `s32 Obj866E8::unk84` (+0x84) — forwarded to `StageMap__SplitFootprintRect`'s `p8`.
 
 These four exactly fill `0x7C..0x88` (`0xC` bytes: `2+2+4+4`), matching the
 existing gap's size, so no other offset in the struct moves.
@@ -567,13 +569,13 @@ existing gap's size, so no other offset in the struct moves.
   even when it doesn't explain WHY — it lets 5+ variants be checked in
   under a second each rather than paying a full project rebuild, which is
   what made 7 real attempts affordable inside one budget.** Consider this
-  exactly the "biggest lever untried" caution from `StageMap__SplitFootprintSlot`'s own
+  exactly the "biggest lever untried" caution from `StageMap__SplitFootprintRect`'s own
   report (also in this header/unit): that stall's fix (per its head note)
   is "give each distinct value its own named local" to let the frame grow
   — already the case here (10 named locals, matching retail's implied live
   set) — so the SAME lever does not obviously generalize to a permutation
   residue with no length/frame difference. This looks like a genuinely
-  distinct residue class from `StageMap__SplitFootprintSlot`'s missing-variable one, and
+  distinct residue class from `StageMap__SplitFootprintRect`'s missing-variable one, and
   from every register-identity case documented so far in this project's
   `%N`/receiver-timing lore (all of which involved 1-2 registers, not a
   whole-function permutation) — worth flagging for whoever revisits this
@@ -616,7 +618,7 @@ OTHER single value in the function (e.g. `flag`, `quadrant`, or `span`
 individually) the way `TaskObjF__WriteMemcardSaveFile` narrowed exactly one parameter and
 nothing else.
 
-**Permuter scaffold prepared (`permuter-work/StageMap__BuildFootprintSlots`, plain seed,
+**Permuter scaffold prepared (`permuter-work/StageMap__BuildFootprintRects`, plain seed,
 no PERM macros -- default randomization already covers type mutations,
 which is what actually found `TaskObjF__WriteMemcardSaveFile`'s fix) but the bounded search
 was NEVER LAUNCHED this round** -- wind-down landed first. `--debug` base
@@ -636,7 +638,7 @@ number.**
 for the next round on this unit: launch
 `PATH=$PWD/permuter-work/bin:$PATH timeout 600 .venv/bin/python3
 tools/decomp-permuter/permuter.py -j 6 --stop-on-zero --best-only
-permuter-work/StageMap__BuildFootprintSlots` (scaffold already provisioned, no setup
+permuter-work/StageMap__BuildFootprintRects` (scaffold already provisioned, no setup
 needed) and, independently, try narrowing `flag` and `quadrant` (both
 provably 2-3 valued) one at a time rather than `h4`/`h6` wholesale.
 
@@ -672,7 +674,7 @@ register-identity stall).
 
 **Tier B.** Turns the column/row/width/height computed by
 `StageMap__ComputeFootprintFromRotation` into one or two
-`self->gridSlots[]` entries, splitting via `StageMap__SplitFootprintSlot`
+`self->gridSlots[]` entries, splitting via `StageMap__SplitFootprintRect`
 when the footprint would run past the grid's 20-unit edge. Mechanics
 evidenced; game-level purpose not.
 
@@ -703,3 +705,40 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 96 (track 7, delta)
+
+Moved here from the unit, verbatim (history, derivation or retail addresses a
+source comment no longer carries; the code keeps one `MATCHING:` line):
+
+```c
+/* Matched round 75. Three source-shape levers closed what was filed since
+ * round 19 as a whole-function register rotation
+ * (docs/match-reports/StageMap__BuildFootprintRects.md): ONE slot pointer reused for the
+ * second slot (no separate slot1), assigned once at the join after the
+ * row<0 test (reorg fills the bgez delay slot from it and deletes the
+ * redundant copy on the other path -- no barrier, no duplicate); the
+ * clipped remainder in its own local `over` rather than `span -= 0x14`;
+ * and `count += 1` as a statement in each arm plus at the join. */
+```
+
+Kept as a one-line `MATCHING:` note under a new descriptive comment.
+
+### Naming
+
+- Renamed from `StageMap__BuildFootprintSlots` (tools/rename.py), tier A:
+  it builds `rects` (CellRects) from the footprint; in this class "slot" is
+  a ChunkSlot, which these are not.
+- Locals: `quadrant` -> `key`: the value goes to findSlotIndexByNeighbour,
+  which compares it with LbdFile::elemKey, a neighbour key (enum
+  ChunkNeighbour). `flag` -> `wrappedCol` (the column was negative and moved
+  into the chunk to the left). `slot` -> `rect`.
+
+### Constants
+
+- `3`, `2`, `0`, `1` -> `CHUNK_NEIGHBOUR_CENTRE`, `_PREV_COL` (start left
+  of the chunk), `_PREV_ROW_LO`/`_PREV_ROW_HI` (start above it).
+  `key + 1`, the slot of the part past the right edge, stays arithmetic.
+- `0x14` -> `STAGE_CHUNK_CELLS`; `>= 0x15` -> `> STAGE_CHUNK_CELLS` (same
+  code); `0xA` -> `STAGE_CHUNK_HALF_CELLS`, new in StageMap.h (additive,
+  `STAGE_CHUNK_CELLS / 2`, the odd-row stagger).

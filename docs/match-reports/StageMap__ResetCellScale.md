@@ -19,8 +19,8 @@ move  $a0, $a1              ; a0 = item (original arg0, "self", is discarded ent
 sw    $ra, 0x10($sp)
 lw    $v0, 0x0($a0)         ; v0 = item->methods
 lw    $v0, 0x48($v0)        ; v0 = item->methods->slot48
-lui   $a2, %hi(D_800869CC)
-addiu $a2, $a2, %lo(D_800869CC)
+lui   $a2, %hi(sScaleOne)
+addiu $a2, $a2, %lo(sScaleOne)
 jalr  $v0
  ori  $a1, $zero, 0x1
 ...epilogue
@@ -40,13 +40,13 @@ same call shape, same two-parameter signature required by the eventual
 
 ```c
 void StageMap__ResetCellScale(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
-    item->methods->slot48(item, 1, D_800869CC);
+    item->methods->slot48(item, 1, sScaleOne);
 }
 ```
 
 ## New struct/global knowledge
 
-- `extern s32 D_800869CC[3];` — a 3-word (12-byte) data block, address-of
+- `extern s32 sScaleOne[3];` — a 3-word (12-byte) data block, address-of
   only. Never dereferenced in this unit, so left untyped beyond its size.
 
 ## Attempts
@@ -61,7 +61,7 @@ None new beyond `StageMap__AddScaleStepToCell`'s (same call-chain-tracing lesson
 
 **Tier B.** Not a vtable slot -- the `StageMap__EndScaleRamp` callback
 sibling of `StageMap__AddScaleStepToCell`. Body: `item->methods->slot48(
-item, 1, &D_800869CC)`, the constant "off" entry rather than the parent's
+item, 1, &sScaleOne)`, the constant "off" entry rather than the parent's
 own `rateEntry`. Named to read as the inverse of `ApplyRateToChild`.
 
 ## Track 6 (2026-09-26, round 93, alpha)
@@ -93,3 +93,11 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ResetChildRate` -> `StageMap__ResetCellScale` (`python3 tools/rename.py StageMap__ResetChildRate StageMap__ResetCellScale`, tier A): one-line callback: `updateScale(cell, 1 = set, 1/1 x3)`.
+
+## Round 96 (track 7, delta)
+
+Parameter `item` -> `cell`. `D_800869CC` -> `sScaleOne` (tools/rename.py,
+first as sScaleOneStep, then sScaleOne; tier A: 1/1, 1/1, 1/1, set with
+updateScale's `set` = 1). Its extern moved from include/class_3bb8c.h into
+class_3bb8c_b.c, the only reader. SceneNode's SCALE_ONE holds the same
+values at another address.

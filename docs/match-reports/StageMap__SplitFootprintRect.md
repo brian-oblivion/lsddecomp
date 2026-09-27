@@ -1,4 +1,6 @@
-# StageMap__SplitFootprintSlot — MATCHED 97/97 (round 71, delta; revisit). Previously: STALL, 97 words exact length, 62/97, first diff at the prologue register saves
+# StageMap__SplitFootprintRect — MATCHED 97/97 (round 71, delta; revisit). Previously: STALL, 97 words exact length, 62/97, first diff at the prologue register saves
+
+> Renamed from `StageMap__SplitFootprintSlot` on 2026-09-27 (tools/rename.py). Address 0x8004caf0.
 
 > Renamed from `Class866E8__SplitFootprintSlot` on 2026-09-26 (tools/rename.py). Address 0x8004caf0.
 
@@ -64,7 +66,7 @@ spent (Gate 3 not run; not needed).
 ```c
 #if 0
 /* needs: common.h, class_3bb8c.h (Obj866E8, CellRect, slots8C, methods->slot120) */
-s32 StageMap__SplitFootprintSlot(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
+s32 StageMap__SplitFootprintRect(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 col, s32 row, s32 width, s32 height) {
     s32 overflow;
     s32 span;
     s32 elemArg;
@@ -240,13 +242,13 @@ STALL (best 8/92 words; frame size off by 8 bytes)
 The biggest attempted this round (97 words) and the one that resisted
 byte-exactness. An 8-parameter function that populates one or two
 `CellRect` entries (the same type established this round from
-`StageMap__SetFootprintCellFlag`/`StageMap__InitFootprintSlot`), advancing and returning `self->unk88`
+`StageMap__SetFootprintVisible`/`StageMap__InitFootprintRect`), advancing and returning `self->unk88`
 (the slot count) as it goes.
 
 ## What the function does (control flow and semantics, not in doubt)
 
 ```c
-s32 StageMap__SplitFootprintSlot(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 StageMap__SplitFootprintRect(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 v;
     s32 hSpan;
     s32 h4sum;
@@ -314,7 +316,7 @@ own `-0x38` frame, i.e. the 5th-8th arguments):
 
 Confirmed against the raw asm line-by-line: every branch target, every
 field write (`elemIdx`@0, `h4`@4, `h6`@6, `h8`@8, `hA`@0xA — the SAME
-`CellRect` layout `StageMap__SetFootprintCellFlag` established), and every arithmetic
+`CellRect` layout `StageMap__SetFootprintVisible` established), and every arithmetic
 op matches retail's OPERATIONS. The residue is a REGISTER ALLOCATION /
 frame-size difference, not a logic difference.
 
@@ -363,7 +365,7 @@ a pure scheduling residue).
 
 ```c
 #if 0
-s32 StageMap__SplitFootprintSlot(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 StageMap__SplitFootprintRect(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 v;
     s32 hSpan;
     s32 h4sum;
@@ -450,7 +452,7 @@ genuinely separate value neither attempt captured), not just the naming.
 
 ```c
 #if 0
-s32 StageMap__SplitFootprintSlot(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
+s32 StageMap__SplitFootprintRect(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8) {
     s32 hSpan;
     s32 hSpan2;
     s32 h4;
@@ -543,7 +545,7 @@ from one existing struct instance into another. The shape does not occur.
 
 ## Round 33 (charlie) — re-derived from the raw asm by hand, register rotation confirmed genuine; permuter scaffold mismatch re-checked, still unusable
 
-Traced every instruction in `asm/nonmatchings/class_3bb8c_b/StageMap__SplitFootprintSlot.s`
+Traced every instruction in `asm/nonmatchings/class_3bb8c_b/StageMap__SplitFootprintRect.s`
 fresh against the round-19 preserved body, line by line, specifically hunting
 for anything the earlier rounds might have missed (in the spirit of this
 round's other stall on this unit, `StageMap__ComputeFootprintFromRotation`, where the same exercise
@@ -741,11 +743,11 @@ body agree with that body rebuilt in the real tree? — was never actually run;
 what was compared was two tools' *summary numbers*. Run properly this round:
 
 ```sh
-tools/binutils/bin/mipsel-linux-gnu-objdump -d permuter-work/StageMap__SplitFootprintSlot/base.o
+tools/binutils/bin/mipsel-linux-gnu-objdump -d permuter-work/StageMap__SplitFootprintRect/base.o
 tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/class_3bb8c_b.c.o
 ```
 
-`StageMap__SplitFootprintSlot` is **byte-identical** between the two, instruction for
+`StageMap__SplitFootprintRect` is **byte-identical** between the two, instruction for
 instruction, with the only textual differences being the absolute targets of
 `j`/`bnez` (`j 4cbbc` vs `j cc`) — which is what a standalone object always
 shows, because those are section-relative until link time. 98 vs 99 lines,
@@ -959,3 +961,39 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 96 (track 7, delta)
+
+Moved here from the unit, verbatim (history, derivation or retail addresses a
+source comment no longer carries; the code keeps one `MATCHING:` line):
+
+```c
+        /* The rectangle runs past the bottom edge (row 20): clip this rect
+         * and open a new one for the part below. */
+
+            /* Stored in BOTH arms: cross-jumping merges the copies, and
+             * the join label keeps the col reload below after it. */
+
+            /* ...and past the right edge (column 20) too. */
+
+            /* Two statements, not `(width + 20) - span`: fold rewrites
+             * that tree as `width - (span - 20)` and CSE then shares
+             * `span - 20` with the store below (round 71). */
+```
+
+The first and third stay without the literal edges; the second and fourth
+are `MATCHING:` lines.
+
+### Naming
+
+- Renamed from `StageMap__SplitFootprintSlot` (tools/rename.py), tier A: it
+  splits a CellRect at the chunk's bottom (and then right) edge.
+- Parameters and locals: `slot` -> `rect`, `baseIdx` -> `key` (the first
+  rect's neighbour key; the part below takes key + 2 or key + 3, and its own
+  right part that key + 1), `elemArg` -> `belowKey`, `overflow` ->
+  `rowsBelow`.
+
+### Constants
+
+`21`/`20` -> `> STAGE_CHUNK_CELLS`/`STAGE_CHUNK_CELLS`, `10` ->
+`STAGE_CHUNK_HALF_CELLS`.

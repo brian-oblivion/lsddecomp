@@ -86,7 +86,7 @@ The in-tree definition is this body with `s32 angle` changed to `u16 angle`.
 #if 0
 /* needs: common.h, class_3bb8c.h (Obj866E8, Unk6C14SubObj, CC74QueryBuf,
  * QueryTemplate866E8, D_8008E98C, RotMatrix, ApplyMatrixLV), plus
- * extern void StageMap__BuildFootprintSlots(Obj866E8 *self); */
+ * extern void StageMap__BuildFootprintRects(Obj866E8 *self); */
 void StageMap__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
     CC74QueryBuf buf;
@@ -148,7 +148,7 @@ void StageMap__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) 
     } else {
         self->unk7E = (u16)self->unk7E + offset;
     }
-    StageMap__BuildFootprintSlots(self);
+    StageMap__BuildFootprintRects(self);
 }
 #endif
 ```
@@ -167,7 +167,7 @@ its base pointer is loaded) before filing a register-class residue.
 ---
 
 
-**Unit:** class_3bb8c_b · **Status:** STALL — register-class/frame-size gap (same class as `StageMap__SplitFootprintSlot`)
+**Unit:** class_3bb8c_b · **Status:** STALL — register-class/frame-size gap (same class as `StageMap__SplitFootprintRect`)
 
 > **ROUND 34 UPDATE.** Re-derived from scratch (shallow attempt history per
 > this round's brief: only 2 hand attempts and a round-18 review with no new
@@ -292,7 +292,7 @@ selecting one of two near-symmetric branches that write
 "do nothing extra" third path) converge on a shared clamp of a
 descriptor-derived value against `±self->unk78`, added into either
 `unk7C` or `unk7E` depending on which branch fired, before tail-calling
-`StageMap__BuildFootprintSlots(self)` (this unit's OTHER round-13 register-identity stall,
+`StageMap__BuildFootprintRects(self)` (this unit's OTHER round-13 register-identity stall,
 see its own report).
 
 ## Where it stands
@@ -308,7 +308,7 @@ PLUS `$fp` — confirmed by
 → 9, one past the "8 means no spare register" saturation point CLAUDE.md's
 `TaskCore__RefreshSlotView` lesson describes). Every C shape tried compiles to a
 `-0x90` frame using only `$s0`-`$s7` (8 registers, no `$fp` spill) — one
-whole register short, the SAME symptom `StageMap__SplitFootprintSlot`'s own report
+whole register short, the SAME symptom `StageMap__SplitFootprintRect`'s own report
 documents in this same header/unit ("retail's frame... saves EIGHT
 callee-saved registers... every C shape tried compiles to a frame of
 `-0x30`... saving at most six").
@@ -334,7 +334,7 @@ few wrong instructions.
    a *timing* residue in Entity_d, did not reach for the *count* residue
    here.
 
-Given `StageMap__SplitFootprintSlot`'s own report already tried (and exhausted, within
+Given `StageMap__SplitFootprintRect`'s own report already tried (and exhausted, within
 that round's budget) the two most obvious levers for a missing-register
 gap — reassigning a pointer in place vs. introducing a second named
 variable for it — and BOTH still collapsed onto fewer registers than
@@ -352,7 +352,7 @@ names, not the old `func_800160B0`/`func_80015618` placeholders).
 
 ```c
 #if 0
-extern void StageMap__BuildFootprintSlots(Obj866E8 *self);
+extern void StageMap__BuildFootprintRects(Obj866E8 *self);
 
 void StageMap__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
@@ -454,7 +454,7 @@ shared:
     } else {
         self->unk7E = (u16)self->unk7E + s3;
     }
-    StageMap__BuildFootprintSlots(self);
+    StageMap__BuildFootprintRects(self);
 }
 #endif
 ```
@@ -464,7 +464,7 @@ shared:
 **A value whose live range never crosses a function call can still be the
 one retail promotes into a callee-saved register, and this is a distinct
 mechanism from every other register-count residue documented so far**
-(`StageMap__SplitFootprintSlot`'s "give each value its own named local", `StageMap__BuildFootprintSlots`'s
+(`StageMap__SplitFootprintRect`'s "give each value its own named local", `StageMap__BuildFootprintRects`'s
 pure permutation). Naming the value separately does not force the
 promotion — cc1 CSEs a call-free single-use pointer expression back into
 the call site regardless of source spelling (confirmed identical output
@@ -502,7 +502,7 @@ Reaches 60/165 in-range (address drift past that point, per the register
 gap above). Needs no additional header declarations beyond what is already
 committed (`Unk6C14SubObj`, `QueryTemplate866E8`, `D_8008E98C`,
 `func_800160B0`, `func_80015618`, all added this round — see below — plus
-`StageMap__BuildFootprintSlots`'s existing extern, needed as a forward declaration since it
+`StageMap__BuildFootprintRects`'s existing extern, needed as a forward declaration since it
 is defined AFTER this function in ROM order).
 
 ```c
@@ -519,7 +519,7 @@ is defined AFTER this function in ROM order).
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-extern void StageMap__BuildFootprintSlots(Obj866E8 *self);
+extern void StageMap__BuildFootprintRects(Obj866E8 *self);
 
 void StageMap__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
@@ -620,7 +620,7 @@ shared:
     } else {
         self->unk7E += s3;
     }
-    StageMap__BuildFootprintSlots(self);
+    StageMap__BuildFootprintRects(self);
 }
 #endif
 ```
@@ -663,7 +663,7 @@ Notes on the derivation, for whoever revisits this:
   `pad74[0x78-0x74]`, now a plain `s32` filling that exact 4-byte gap).
 - Comment-only additions to `Obj866E8Methods::slot10C` (new caller noted)
   and to the EXISTING `Obj866E8::unk7C`/`unk7E`/`unk80`/`unk84` field
-  comments (all four already added this round for `StageMap__BuildFootprintSlots` — now
+  comments (all four already added this round for `StageMap__BuildFootprintRects` — now
   noted as ALSO written directly by this function). No type or name
   changed on any of the four.
 
@@ -673,12 +673,12 @@ Notes on the derivation, for whoever revisits this:
   callee-saved `$s` registers, forcing a `$fp` spill) is the same residue
   CLASS regardless of which function in a unit exhibits it, and neither of
   the two "give it its own local" / "reassign in place" levers that failed
-  on `StageMap__SplitFootprintSlot` fixed it here either (a THIRD source-shape lever —
+  on `StageMap__SplitFootprintRect` fixed it here either (a THIRD source-shape lever —
   collapsing a call argument into the call expression — moved the score by
   one word, not by a register).** Two independent functions in the same
-  header (`StageMap__SplitFootprintSlot`, `StageMap__ComputeFootprintFromRotation`) and a THIRD in the same unit
+  header (`StageMap__SplitFootprintRect`, `StageMap__ComputeFootprintFromRotation`) and a THIRD in the same unit
   showing a related-but-distinct register-PERMUTATION residue
-  (`StageMap__BuildFootprintSlots`) suggests this header/class's functions are unusually
+  (`StageMap__BuildFootprintRects`) suggests this header/class's functions are unusually
   prone to GCC 2.6.3 register-allocation sensitivity that resists the
   usual small reshaping levers — worth flagging to whoever next works this
   header (`IsPointOutOfBounds`/`StageMap__StartScaleRamp`, already-documented stalls, are
@@ -688,7 +688,7 @@ Notes on the derivation, for whoever revisits this:
   outcome.** `StageMap__ComputeFootprintFromRotation` showed 9 saved registers before a single line
   of C was written; that number alone predicted (correctly) that this
   function would land in the same stall class as its already-documented
-  sibling `StageMap__SplitFootprintSlot`, and bounded the number of reshaping attempts
+  sibling `StageMap__SplitFootprintRect`, and bounded the number of reshaping attempts
   worth spending before treating it as a stall rather than a
   still-in-progress match.
 
@@ -711,7 +711,7 @@ every C shape tried saturates at 8) is structurally different from
 type-driven register cascade — and the "check parameter/local types before
 accepting a register-identity stall" lever this round established does
 not apply here. Not re-attempted further this round (lowest priority of
-the four escalated register-shaped stalls; `StageMap__SplitFootprintSlot`'s own report,
+the four escalated register-shaped stalls; `StageMap__SplitFootprintRect`'s own report,
 same class, already exhausted the two most obvious levers).
 
 ---
@@ -780,3 +780,52 @@ includes (the header's own `void RotMatrix(void *, QueryTemplate866E8 *)` and
 `void ApplyMatrixLV(QueryTemplate866E8 *, s32 *, s32 *)` re-declarations are
 gone). `extern MATRIX D_8008E98C;` moved into class_3bb8c_b.c, its only
 reader. Byte-exact, zero bytes changed.
+
+## Round 96 (track 7, delta)
+
+Moved here from the unit, verbatim (history, derivation or retail addresses a
+source comment no longer carries; the code keeps one `MATCHING:` line):
+
+```c
+    u16 angle; /* u16, not s32: the s32 form is byte-identical except
+                     * for an 8-byte-smaller frame (round 71) */
+
+    /* (0, 0, gridSpan) rotated in place: t is both the input and the output. */
+```
+
+The first is kept as `/* MATCHING: u16; s32 makes the frame 8 bytes smaller */`;
+new one-liners mark the `rot` assignment before the getTargetDescriptor call
+(round 71's lever, above), the (u16) casts (retail's `lhu`), and the second
+`else if` test (the two tests cover every angle, so a plain `else` would drop
+retail's compare).
+
+### Naming (locals and parameters)
+
+- `arg1`/`arg2` -> `acrossCells`/`aheadCells`, tier B. Evidence: facing +-x
+  (first arm) the column starts at the target's cell (t[0] > 0) and the
+  window is aheadCells wide, the row is centred (cellRow - gridHalfCells +-1)
+  and acrossCells high; facing +-z (second arm) the same with rows and
+  columns swapped. RefreshFootprint passes gridHalfCells * 2 and gridCells,
+  equal (20) at the default span. The backward start in the first arm,
+  `cellCol - acrossCells + 1`, uses acrossCells where aheadCells is the
+  width: retail's own, harmless while the two are equal. StageMap.h's
+  prototype said `width, height`, which each arm contradicts; it now says
+  `acrossCells, aheadCells`.
+- `sub` -> `param` (the coord2's GsCOORD2PARAM), `buf` -> `desc`,
+  `point0`/`point1` -> `cellCol`/`cellRow` (Descriptor10 b2/b3),
+  `offset` -> `lateral` (the facing vector's off-axis component, in cells
+  after `>> STAGE_CELL_SHIFT`, clamped to within half the grid),
+  `flag` -> `shiftCol` (1: the shift moves the column).
+
+### Constants
+
+- `0x1000` -> `ONE` (libgte; a full turn, added to a negative angle).
+- `0x200`, `0x400`, `0x600`, `0xA00`, `0xC00` -> `ANGLE_DEG(45)`, `(90)`,
+  `(135)`, `(225)`, `(270)`: new in include/common.h,
+  `((deg) * 4096 / 360)`, exact at multiples of 45. The tests read: facing
+  within 45 degrees of 90 or 270 (x), else of 180 or 0 (z).
+- `>> 11` -> `>> STAGE_CELL_SHIFT` (StageMap.h: world units to cells).
+- `D_8008E98C` -> Sony's `GsIDMATRIX` (config/psyq-objects.ld pins it for
+  nine libgs objects); the unit includes `<libgpu.h>` and `<libgs.h>`, the
+  local extern is gone. The old extern's comment called it bss; it is libgs
+  data, the identity matrix.

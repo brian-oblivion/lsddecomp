@@ -1,4 +1,6 @@
-# StageMap__InitFootprintSlot — MATCHED (32/32 words)
+# StageMap__InitFootprintRect — MATCHED (32/32 words)
+
+> Renamed from `StageMap__InitFootprintSlot` on 2026-09-27 (tools/rename.py). Address 0x8004cda4.
 
 > Renamed from `Class866E8__InitFootprintSlot` on 2026-09-26 (tools/rename.py). Address 0x8004cda4.
 
@@ -37,7 +39,7 @@ function itself discards it).
 ## Final C
 
 ```c
-s32 StageMap__InitFootprintSlot(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
+s32 StageMap__InitFootprintRect(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
     Unk54Struct *slot;
 
     slot = (Unk54Struct *) ((u8 *) self + 0x8C + key * sizeof(Unk54Struct));
@@ -68,7 +70,7 @@ together in the same statement.
 **Tier B.** Not a vtable slot. Writes the constant `Unk54Struct` template
 `gFullSlotRect` into a `self->gridSlots[]`-shaped entry, then overwrites its
 `elemIdx` word via `slot124`. Called by both
-`StageMap__BuildFootprintSlots`'s sibling paths and
+`StageMap__BuildFootprintRects`'s sibling paths and
 `StageMap__SetFootprintFromQuery`, always to seed a fresh slot -- hence
 "init", not "set" (it does not preserve any prior content of the slot).
 
@@ -99,3 +101,10 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 96 (track 7, delta)
+
+Renamed from `StageMap__InitFootprintSlot` (tools/rename.py), tier A: it
+fills rects[index] (a CellRect) with gFullSlotRect and the slot index of the
+chunk. Parameters `key` -> `index`, `arg3` -> `chunkIndex` (passed to
+findSlotIndexByChunk), `slot` -> `rect`; the prototype follows.

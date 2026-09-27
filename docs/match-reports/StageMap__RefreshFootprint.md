@@ -5,9 +5,9 @@
 > Renamed from `func_8004C620` on 2026-09-24 (tools/rename.py). Address 0x8004c620.
 
 Dispatcher: gated by `self->unk1B8`, doubles `self->unk78` into an index,
-calls `StageMap__SetFootprintCellFlag(self, 0)` unconditionally, then branches on
+calls `StageMap__SetFootprintVisible(self, 0)` unconditionally, then branches on
 `self->unk68->unk4` between `StageMap__ComputeFootprintFromRotation` and `StageMap__SetFootprintFromQuery`, finishing
-with `StageMap__SetFootprintCellFlag(self, 1)`.
+with `StageMap__SetFootprintVisible(self, 1)`.
 
 ## New struct knowledge (`include/class_3bb8c.h`)
 
@@ -32,7 +32,7 @@ is read here too, no header change needed for that one.
  * own definitions appear. Signatures are typed from the registers loaded
  * at each call site, per this unit's established convention for calling a
  * same-unit function whose body is still INCLUDE_ASM. */
-extern void StageMap__SetFootprintCellFlag(Obj866E8 *self, s32 arg1);
+extern void StageMap__SetFootprintVisible(Obj866E8 *self, s32 arg1);
 extern void StageMap__SetFootprintFromQuery(Obj866E8 *self);
 extern void StageMap__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2);
 
@@ -43,13 +43,13 @@ void StageMap__RefreshFootprint(Obj866E8 *self) {
         return;
     }
     idx = self->unk78 * 2;
-    StageMap__SetFootprintCellFlag(self, 0);
+    StageMap__SetFootprintVisible(self, 0);
     if (self->unk68->unk4 == 0) {
         StageMap__ComputeFootprintFromRotation(self, idx, self->unk7A);
     } else {
         StageMap__SetFootprintFromQuery(self);
     }
-    StageMap__SetFootprintCellFlag(self, 1);
+    StageMap__SetFootprintVisible(self, 1);
 }
 ```
 
@@ -120,3 +120,9 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 96 (track 7, delta)
+
+`idx` -> `acrossCells` (gridHalfCells * 2, ComputeFootprintFromRotation's
+across-the-facing extent). Callee renamed `StageMap__SetFootprintCellFlag` ->
+`StageMap__SetFootprintVisible` (tools/rename.py; see its report). Zero bytes.

@@ -122,3 +122,7 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ApplyRateToChild` -> `StageMap__AddScaleStepToCell` (`python3 tools/rename.py StageMap__ApplyRateToChild StageMap__AddScaleStepToCell`, tier A): one-line callback: `updateScale(cell, 0 = add, scaleStep)`.
+
+## Round 96 (track 7, delta)
+
+Parameter `item` -> `cell`. The `0` to updateScale is its `set` flag (add).

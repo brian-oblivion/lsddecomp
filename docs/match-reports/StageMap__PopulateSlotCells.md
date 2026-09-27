@@ -65,7 +65,7 @@ rotation, so the tell is a caller-saved register mismatch instead.
 > real-build residue description (a pure register-allocation choice, no
 > instruction-shape difference) exactly. This function is NOT one of the
 > five confirmed `class_3bb8c`/`Obj866E8` scaffold-mismatch cases
-> (`StageMap__ApplyChunkLoads`, `StageMap__ComputeFootprintDescriptor`, `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintSlots`,
+> (`StageMap__ApplyChunkLoads`, `StageMap__ComputeFootprintDescriptor`, `StageMap__SplitFootprintRect`, `StageMap__BuildFootprintRects`,
 > `IsPointOutOfBounds`); its 34,293-iteration search stands as a real,
 > validated negative, not a voided one.
 >

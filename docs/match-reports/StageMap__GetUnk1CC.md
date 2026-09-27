@@ -78,3 +78,9 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Round 96 (track 7, delta)
+
+Nothing changed. `unk1CC` stays: StageMap__Reset (class_3ac78.c) sets it and
+the three words after it to -1, and this getter takes its address; no code
+reads it, so nothing names it.

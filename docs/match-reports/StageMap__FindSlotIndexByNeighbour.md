@@ -135,3 +135,33 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__FindElemIndexByUnk32` -> `StageMap__FindSlotIndexByNeighbour` (`python3 tools/rename.py StageMap__FindElemIndexByUnk32 StageMap__FindSlotIndexByNeighbour`, tier B): the same test, returning the index (0 when none).
+
+## Round 96 (track 7, delta)
+
+Locals: `result` -> `index`, `e` -> `slot` (a ChunkSlot). The loop bound is
+`ARRAY_COUNT(self->slots)` (7). New comment: returns 0, not -1, when no slot
+has the key. Zero bytes.
+
+The unit banner was rewritten (what the file holds); the old one, verbatim:
+
+```c
+/*
+ * class_3bb8c_b -- the last third of StageMap (include/StageMap.h),
+ * sharing include/class_3bb8c.h with class_3bb8c.c.
+ *
+ *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: slot lookups.
+ *  - The footprint: once every chunk is loaded, RefreshFootprint sets bit
+ *    31 of `attribute` (libgs GsDOFF, display off) on the cells of the
+ *    current `rects` and every cell chained behind them, rebuilds `rects`,
+ *    the up to four cell rectangles around the target
+ *    (ComputeFootprintFromRotation and BuildFootprintSlots/
+ *    SplitFootprintSlot in a flat grid, SetFootprintFromQuery and
+ *    InitFootprintSlot in a vertical one), and clears the bit on the new
+ *    ones (SetFootprintCellFlag). IsPointOutOfBounds tests a cell against
+ *    `bounds` (SetBounds).
+ *  - The scale ramp: StartScaleRamp, StepScaleRamp, EndScaleRamp and their
+ *    per-cell callbacks AddScaleStepToCell and ResetCellScale, run over
+ *    every cell by ForEachSlot/ForEachSlotCell.
+ *  - GetUnk1CC, and GetStageMapMethods.
+ */
+```

@@ -137,18 +137,18 @@ void StageMap__StartScaleRamp(Obj866E8 *self, s32 rate, s32 flag) {
     if (rate <= 0) {
         goto rate_le;
     }
-    table = &D_8008699C;
+    table = &sScaleStepUpSlow;
     if (flag == 0) {
         goto store;
     }
-    self->unk1E4 = &D_800869A8;
+    self->unk1E4 = &sScaleStepUpFast;
     goto merge;
 rate_le:
-    table = &D_800869B4;
+    table = &sScaleStepDownSlow;
     if (flag == 0) {
         goto store;
     }
-    table = &D_800869C0;
+    table = &sScaleStepDownFast;
 store:
     self->unk1E4 = table;
 merge:
@@ -170,9 +170,9 @@ byte-exact first half, and useful for whoever picks this back up.
 
 - New type `EntryDesc866E8`: a 0xC-byte struct, only `+0x006` (`s16`,
   `unk6`) typed — the rest is unproven padding.
-- `D_8008699C`, `D_800869A8`, `D_800869B4`, `D_800869C0` — four static
+- `sScaleStepUpSlow`, `sScaleStepUpFast`, `sScaleStepDownSlow`, `sScaleStepDownFast` — four static
   instances of `EntryDesc866E8`, addresses confirmed 0xC apart. The
-  existing `D_800869CC` (`extern s32 D_800869CC[3]`, declared by an
+  existing `sScaleOne` (`extern s32 sScaleOne[3]`, declared by an
   earlier round from `StageMap__ResetCellScale`) is a plausible fifth entry of the
   same table by the same stride, but is left independently declared —
   nothing in this unit reaches it through the `EntryDesc866E8` type.
@@ -331,7 +331,7 @@ neutral one.
 
 Assigned as one of three functions in a round-53 Sonnet calibration slot for
 the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `IsPointOutOfBounds`
-and `StageMap__SplitFootprintSlot`. This report's disposition (round 18: "bounded search
+and `StageMap__SplitFootprintRect`. This report's disposition (round 18: "bounded search
 exhausted its time budget with no improvement, NOT permuter-exhausted") is
 the reason it was picked over the plan's higher-ranked but
 levers-measurably-spent `code_2cc8c_e` job.
@@ -370,7 +370,7 @@ the shape that already gets the closest — untried combination.
 
 **Result: 15/28, WORSE, and it broke the already-solved first half too.**
 The table-selection code (byte-exact since round 9) diverged starting at the
-very first `%lo(D_8008699C)` immediate — the built object referenced a
+very first `%lo(sScaleStepUpSlow)` immediate — the built object referenced a
 DIFFERENT static table entry at that position than retail/every prior
 attempt. Nothing about the first half's source changed; only the second
 half's assignment target did. This means writing directly to the struct
@@ -456,7 +456,7 @@ The first half (the `goto` ladder selecting one of the four
 | # | second-half shape | result |
 | --- | --- | --- |
 | s0 | the report's recorded best body: default-then-overwrite, field access in both places | **17/28, length changes (drift)** |
-| s1 | s0 with a `do { … break; … } while (0)` around it (round 58's new lever from `StageMap__SplitFootprintSlot`) | **17/28, drift** — byte-identical to s0 |
+| s1 | s0 with a `do { … break; … } while (0)` around it (round 58's new lever from `StageMap__SplitFootprintRect`) | **17/28, drift** — byte-identical to s0 |
 | s2 | explicit `if`/`else` with `val`, but the field access still written in both arms | **10/28, drift** — worse than s0 |
 | s3 | explicit `if`/`else` **plus** the cached `scale` local | **28/28, exact, whole image green** |
 
@@ -511,7 +511,7 @@ additive.** Each alone measured as a regression (17/28 and 10/28 against a
 17/28 baseline); together they were byte-exact on the first build. When two
 axes are both suspected, try the product before concluding either is inert.
 
-`do { } while (0)`, round 58's new lever from `StageMap__SplitFootprintSlot`, was tried
+`do { } while (0)`, round 58's new lever from `StageMap__SplitFootprintRect`, was tried
 here (s1) and is **byte-identical to s0** — a clean negative that helps
 scope it: it moves scheduling and delay-slot placement, and does not touch
 how cc1 expands a statement into `mult` + `mflo`.
@@ -554,3 +554,46 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ConfigureRateEntry` -> `StageMap__StartScaleRamp` (`python3 tools/rename.py StageMap__ConfigureRateEntry StageMap__StartScaleRamp`, tier B): picks one of four Ratio16[3] steps (y +1/64, +1/4, -1/64, -1/4 by the sign of the amount and the flag) and sets `scaleRampTicks` to |amount| times the step's y den, so the ramp changes every cell's y scale by the amount. Callers: Entity_b/e/g with (1,1), (-1,0), (4,0).
+
+## Round 96 (track 7, delta)
+
+Moved here from the unit, verbatim (history, derivation or retail addresses a
+source comment no longer carries; the code keeps one `MATCHING:` line):
+
+```c
+/* Picks one of the four static Ratio16[3] scale steps by the sign of
+ * `rate` and by `flag`, then sets scaleRampTicks to |rate| scaled by the chosen
+ * step's y denominator (scaleStep[1].den).
+ *
+ * Two source shapes here are load-bearing and neither is cosmetic:
+ *
+ *  - The `goto` ladder, and its asymmetry. Retail emits TWO stores to
+ *    scaleStep: the rate>0/flag!=0 path has its own (in a `j`'s delay slot at
+ *    0x8004CFDC) and the other three SHARE one (0x8004CFF8). Writing the
+ *    field directly on that one path and going through `table` on the other
+ *    three is what reproduces that split. Byte-exact since round 9.
+ *  - `scale` and `val`. Retail loads the step's y denominator ONCE (`lh $v1,6($v0)`)
+ *    before the sign branch and keeps a single `mflo` after the join, with a
+ *    `mult` in each arm. Caching the load in `scale` and letting an explicit
+ *    if/else assign a local `val` is what defers that `mflo`; the
+ *    default-then-overwrite spelling makes cc1 extract it eagerly, and
+ *    storing to self->scaleRampTicks directly instead of through `val` perturbs the
+ *    table-selection half as well. Both were measured -- round 58 and
+ *    docs/match-reports/StageMap__StartScaleRamp.md.
+ *
+ * `~rate + 1` is retail's own negation (`nor`/`addiu`), not `-rate`. */
+```
+
+Replaced by a short description and a `MATCHING:` line naming the three
+load-bearing shapes.
+
+### Naming
+
+- `flag` -> `fast` (parameter; also the prototype and slot +0x138): nonzero
+  picks the 1/4 step over 1/64. Callers pass (1, 1), (-1, 0), (4, 0).
+- The tables (tools/rename.py, tier A, their contents): `D_8008699C`
+  `sScaleStepUpSlow` (y +1/64), `D_800869A8` `sScaleStepUpFast` (+1/4),
+  `D_800869B4` `sScaleStepDownSlow` (-1/64), `D_800869C0`
+  `sScaleStepDownFast` (-1/4); x and z 0/1 in each. Unit-static data: this
+  unit alone reads them, so their externs moved from include/class_3bb8c.h
+  into class_3bb8c_b.c.

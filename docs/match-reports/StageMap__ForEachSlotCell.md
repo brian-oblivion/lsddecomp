@@ -160,3 +160,8 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ForEachEntryChild` -> `StageMap__ForEachSlotCell` (`python3 tools/rename.py StageMap__ForEachEntryChild StageMap__ForEachSlotCell`, tier A): an iterator over one slot's 410 cells.
+
+## Round 96 (track 7, delta)
+
+`callback` -> `cellFn`, `item` -> `slot`, `p` -> `cell`; `0x668 / 4` ->
+`STAGE_SLOT_CELLS` (StageMap.h, 410: the lattice and its 10 overflow cells).

@@ -79,7 +79,7 @@ allocation wrong.
 > correct prior disposition was already "not searched, scaffold
 > untrustworthy", and it still is. Not re-attempted; the family-wide
 > pattern is now 5 confirmed instances (`StageMap__ApplyChunkLoads`, `StageMap__ComputeFootprintDescriptor`,
-> `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintSlots`, `IsPointOutOfBounds`), reinforcing round
+> `StageMap__SplitFootprintRect`, `StageMap__BuildFootprintRects`, `IsPointOutOfBounds`), reinforcing round
 > 46's own read that this is structural to the family's
 > `self->methods->slotNN` call-chain shape, not a per-function fluke --
 > still a tooling question for the operator, not something to fix
@@ -133,8 +133,8 @@ allocation wrong.
 > round 13 (six prior rounds' worth of confirmation: 17, 19, 20, 27, 32,
 > 39, 40, 41), the isolated permuter scaffold provably scores a different
 > residue than the real build (round 17/40, and this class recurs
-> elsewhere in this unit this round -- see `StageMap__SplitFootprintSlot`,
-> `StageMap__ComputeFootprintDescriptor`, `StageMap__BuildFootprintSlots`, `IsPointOutOfBounds`), and neither of this
+> elsewhere in this unit this round -- see `StageMap__SplitFootprintRect`,
+> `StageMap__ComputeFootprintDescriptor`, `StageMap__BuildFootprintRects`, `IsPointOutOfBounds`), and neither of this
 > round's two new levers applies. **SKIPPING further attempts this
 > round** per this round's own guidance on functions whose cheap levers
 > are spent.

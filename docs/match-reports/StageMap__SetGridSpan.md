@@ -49,7 +49,7 @@ The three numbers, and why they are not a guess:
 - `gridHalfCells = span >> 12` = `0xA000 >> 12` = **10**.
 - The constructor places grid cells `0x800` apart on both axes, and
   `0xA000 / 0x800` = **20**.
-- `class_3bb8c_b`'s `StageMap__SetFootprintCellFlag` is BYTE-MATCHED and indexes the same cell
+- `class_3bb8c_b`'s `StageMap__SetFootprintVisible` is BYTE-MATCHED and indexes the same cell
   block with a row stride of **20** (`e->unk10 + slot->h4 + slot->h6 * 20`,
   and `cell += 20 - slot->h8` at each row's end).
 - `StageMap__SetFootprintRect` treats `0x13` = 19 as the last valid column
