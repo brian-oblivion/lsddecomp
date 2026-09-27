@@ -9,7 +9,7 @@ out-of-range drift.
 
 ## What it does
 
-Record accessor: calls GetStreamPool2(&count) (which writes 7 and returns record 0x237 of GetRecordTable's table), forwards the count to `*countOut` when non-NULL, returns the record pointer.
+Record accessor: calls GetEndingMovieRecord(&count) (which writes 7 and returns record 0x237 of GetRecordTable's table), forwards the count to `*countOut` when non-NULL, returns the record pointer.
 
 ## Source
 
@@ -19,7 +19,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 ```c
 Rec1C *GetStreamChannelInit(s32 *countOut) {
     s32 count;
-    Rec1C *rec = GetStreamPool2(&count);
+    Rec1C *rec = GetEndingMovieRecord(&count);
     if (countOut != NULL) {
         *countOut = count;
     }
@@ -44,7 +44,7 @@ Rec1C *GetStreamChannelInit(s32 *countOut) {
 
 externcheck flags GameApplication.h's 2-parameter extern against this
 1-parameter definition. The body reads only `$a0` and does not forward
-`$a1` (GetStreamPool2 takes one argument), so this is not the forwarding
+`$a1` (GetEndingMovieRecord takes one argument), so this is not the forwarding
 idiom; but the caller's second argument is retail (`move a1,zero` in the
 jal's delay slot at 0x80026974), so the extern cannot drop it. The extern
 line carries `/* arity-ok: ... */`.

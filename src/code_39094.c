@@ -286,7 +286,7 @@ Rec1C *PickOpeningMovie(s32 *countOut, s32 arg1) {
     return &rec[r];
 }
 
-Rec1C *GetStreamPool2(s32 *countOut) {
+Rec1C *GetEndingMovieRecord(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 7;
     }
@@ -295,7 +295,7 @@ Rec1C *GetStreamPool2(s32 *countOut) {
 
 Rec1C *GetStreamChannelInit(s32 *countOut) {
     s32 count;
-    Rec1C *rec = GetStreamPool2(&count);
+    Rec1C *rec = GetEndingMovieRecord(&count);
     if (countOut != NULL) {
         *countOut = count;
     }

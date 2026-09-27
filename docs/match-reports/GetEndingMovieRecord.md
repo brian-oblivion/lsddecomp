@@ -1,4 +1,6 @@
-# GetStreamPool2 -- MATCHED (12/12 words)
+# GetEndingMovieRecord -- MATCHED (12/12 words)
+
+> Renamed from `GetStreamPool2` on 2026-09-27 (tools/rename.py). Address 0x800491cc.
 
 > Renamed from `func_800491CC` on 2026-09-25 (tools/rename.py). Address 0x800491cc.
 
@@ -17,7 +19,7 @@ Same shape as GetOpeningMovieRecords: `*out = 7`, returns record 0x237 (offset 0
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
 void *GetRecordTable(s32 *out);   /* defined earlier in this unit */
 
-Rec1C *GetStreamPool2(s32 *countOut) {
+Rec1C *GetEndingMovieRecord(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 7;
     }
@@ -37,6 +39,6 @@ Rec1C *GetStreamPool2(s32 *countOut) {
 
 ## Naming
 
-- **Name:** `GetStreamPool2`
+- **Name:** `GetEndingMovieRecord`
 - **Tier:** B
 - **Evidence:** pure getter: &gRecordTable[0x237], count 7; only used internally by GetStreamChannelInit.
