@@ -5,7 +5,7 @@
  * (request queue, service pump, file table) is code_179d8_q/_r.
  *
  * Open/Close/Seek/Read/LoadFile share one shape. With the driver in plain
- * synchronous mode (gCdAsyncEnabled and D_8008A860 both 0) each forwards to
+ * synchronous mode (gCdAsyncEnabled and gCdSyncQueueMode both 0) each forwards to
  * code_179d8_h.c's blocking OpenCdFile/CloseCdFile/GetCdFileSize/ReadCdFile
  * (LoadFile to the base class's FileResource__LoadFile). Otherwise a call
  * from outside the queue only enqueues a CD_OP_* request; when
@@ -84,7 +84,7 @@ void CdDriver__Open(CdDriver *self, char *name, s32 arg2, s32 arg3) {
     s32 size;
     s32 v0;
 
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         OpenCdFile(self, name);
         return;
     }
@@ -126,7 +126,7 @@ void CdDriver__Open(CdDriver *self, char *name, s32 arg2, s32 arg3) {
 }
 
 void CdDriver__Close(CdDriver *self) {
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         CloseCdFile(self);
         return;
     }
@@ -155,7 +155,7 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
     s32 v0;
     u32 sectors;
 
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         return GetCdFileSize(self);
     }
     LockCd();
@@ -209,7 +209,7 @@ extern void ResetCdStateMachine(void);
 s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
     s32 v1;
 
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         ReadCdFile(self, buf, size);
         return 0;
     }
@@ -257,7 +257,7 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
     void *ret;
     s32 v1;
 
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         ((LoadFileNoArgsFn)FileResource__LoadFile)();
         self->flags |= CD_FLAG_LOAD_FILE_DONE;
         self->methods->setFlag(self);

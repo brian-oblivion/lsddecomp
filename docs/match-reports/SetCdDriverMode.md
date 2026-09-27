@@ -19,7 +19,7 @@ extern s32 GetDrawSystem(void); /* returns gDrawSystem, a singleton object */
 extern s32 ServiceCdDriver(void);
 extern s32 gCdBusy;
 extern s32 gCdAsyncEnabled;
-extern s32 D_8008A860;
+extern s32 gCdSyncQueueMode;
 extern s32 gCdUseVSyncCallback;
 
 /* The singleton GetDrawSystem returns; only the slot this call site
@@ -59,7 +59,7 @@ s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)
 
         gCdUseVSyncCallback = useVSyncCallback;
         gCdAsyncEnabled = async;
-        D_8008A860 = mode2;
+        gCdSyncQueueMode = mode2;
 
         return 1;
     }
@@ -124,7 +124,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 **Evidence for the function.** It refuses (returns 0) while `gCdBusy`, and
 otherwise stores its three arguments into `gCdUseVSyncCallback`,
-`gCdAsyncEnabled` and `D_8008A860` and returns 1 -- the write half of the
+`gCdAsyncEnabled` and `gCdSyncQueueMode` and returns 1 -- the write half of the
 pair `GetCdDriverMode` reads back. `code_171e0.c`'s `SetActiveDataSourceDriverMode` calls it
 in a `do {} while (fn(...) == 0)` loop, i.e. "retry until the driver accepts
 the new mode", which is what the refusal-while-busy return value is for.

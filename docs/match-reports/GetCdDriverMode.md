@@ -9,13 +9,13 @@ Round 45, runner echo (second sitting), `src/code_179d8_q.c`.
 Byte-exact on the first attempt.
 
 ```c
-extern s32 D_8008A860;
+extern s32 gCdSyncQueueMode;
 extern s32 gCdAsyncEnabled;
 
 s32 GetCdDriverMode(s32 *a0)
 {
     if (a0 != NULL) {
-        *a0 = D_8008A860;
+        *a0 = gCdSyncQueueMode;
     }
     return gCdAsyncEnabled;
 }
@@ -24,7 +24,7 @@ s32 GetCdDriverMode(s32 *a0)
 ## Derivation
 
 Straight read of the disassembly: `beqz $a0, .L80027F0C` guards a store of
-`D_8008A860` (gp_rel) into `*a0`; fallthrough loads `gCdAsyncEnabled` (gp_rel) into
+`gCdSyncQueueMode` (gp_rel) into `*a0`; fallthrough loads `gCdAsyncEnabled` (gp_rel) into
 `$v0` and returns it unconditionally. Both globals are in the same
 `gCdAsyncEnabled..gCdQueueEnabled` sdata block this unit's other getter/setters touch
 (see `GetCdDriverMethods`'s header comment in the `.c` for the class map). No
@@ -45,7 +45,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80027EF8` | `GetCdDriverMode` | B |
 | `D_8008A85C` | `gCdAsyncEnabled` | A |
-| `D_8008A860` | *(kept -- see below)* | C |
+| `gCdSyncQueueMode` | *(kept -- see below)* | C |
 
 **Evidence for the function.** It is the read half of `SetCdDriverMode`:
 it returns `gCdAsyncEnabled` and, through an optional out-parameter, the
@@ -64,10 +64,10 @@ call the method directly. `SetCdDriverMode` also uses it to decide whether to
 install or clear the service callback. Asynchronous operation is what the
 flag switches on; tier A.
 
-**`D_8008A860` keeps its placeholder, on purpose.** Its only writer stores
+**`gCdSyncQueueMode` keeps its placeholder, on purpose.** Its only writer stores
 `SetCdDriverMode`'s second argument verbatim, and its only readers are this
 getter and five guards in `code_179d8_s` of the form
-`gCdAsyncEnabled == 0 && D_8008A860 == 0` -- i.e. "neither mode is on, take
+`gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` -- i.e. "neither mode is on, take
 the plain synchronous path". That tells you the two are alternative modes and
 nothing at all about what the second one is. Naming it would be invention;
 the `.c` now carries this paragraph as a comment instead.

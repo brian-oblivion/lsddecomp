@@ -6,7 +6,7 @@
 
 108/108 words, byte-exact, file 0x17AD0-0x17C80. Cold ground. First function
 in ROM order in this unit, so the shared `Obj80027480` local struct and
-`gCdAsyncEnabled`/`D_8008A860`/`gCdBusy`/`LockCd`/`StartCdOperation`/
+`gCdAsyncEnabled`/`gCdSyncQueueMode`/`gCdBusy`/`LockCd`/`StartCdOperation`/
 `ResetCdStateMachine`/`EnqueueCdRequest`/`UnlockCd` externs were moved ahead of
 it (they were previously declared between it and `CdDriver__Close`).
 
@@ -51,7 +51,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
     s32 temp;
     s32 v0;
 
-    if (gCdAsyncEnabled == 0 && D_8008A860 == 0) {
+    if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         OpenCdFile(self, suffix);
         return;
     }
@@ -248,8 +248,8 @@ uninitialised pointer).
 
 Globals: `D_8006D574` -> `gCdSeekLoc` (A: 8 bytes of .data written only by
 `CdDriver__Seek`'s `CdIntToPos` and used as its CdlSetloc target).
-`D_8008A860` keeps its placeholder for code_179d8_q's stated reason: every
-read here is the `gCdAsyncEnabled == 0 && D_8008A860 == 0` sync-mode test and
+`gCdSyncQueueMode` keeps its placeholder for code_179d8_q's stated reason: every
+read here is the `gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` sync-mode test and
 nothing names the second mode.
 
 
