@@ -5,7 +5,9 @@
  * chunk into its slot's cells, and the queries that turn a position back
  * into a slot and cell. class_3ac78.c holds the methods before these and
  * class_3bb8c_b.c those after; the class's data tables are declared in
- * include/class_3bb8c.h.
+ * include/class_3bb8c.h. The unit's one type of its own is
+ * ResourceSourceRequest, the descriptor PopulateSlotCells builds for
+ * New_LinkResource.
  *
  *  - SetTargetAndLoadChunks, ComputeCellOffsets, ComputeCellWorldOffsets:
  *    a cell descriptor to a world position and the chunk it lies in.
@@ -371,12 +373,15 @@ void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 command) {
     }
 }
 
-/* New_LinkResource's descriptor (GraphicsResources.c's ResourceSource) as
- * PopulateSlotCells builds it: only the buffer is set. */
-
+/* The descriptor PopulateSlotCells hands New_LinkResource, cast to its
+ * ResourceSource (GraphicsResources.c: a buffer to adopt, else a file name
+ * to request). Only the buffer is set: the model block that follows the
+ * chunk header's placements. The name and the last two words are never
+ * written.
+ * MATCHING: 0x10 bytes, not ResourceSource's 8 (8 makes the frame 0x78). */
 typedef struct ResourceSourceRequest {
-    void *buffer; /* +0x000, New_LinkResource's descriptor's buffer (GraphicsResources.c's ResourceSource) */
-    u8 pad4[0x10 - 0x4];
+    /* +0x00 */ void *buffer;
+    /* +0x04 */ u8 pad4[0x10 - 0x4];
 } ResourceSourceRequest;
 
 /* Links a loaded chunk into its slot: points the slot's PlacementGrid at the

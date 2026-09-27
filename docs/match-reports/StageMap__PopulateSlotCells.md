@@ -915,3 +915,35 @@ Measured and left: walking `cells` by index instead of byte offset (`&slot->cell
 ```
 
 The barrier's two-line comment became `/* MATCHING: keeps the rec.x/.y/.z loads below the coord2 load */` (evidence in "asm sites" above).
+
+## Track 6 (2026-09-27, round 96, delta)
+
+`BE54LoadReq` -> `ResourceSourceRequest` (tier A). It is the descriptor the
+body passes to `New_LinkResource`, cast to that ctor's `struct
+ResourceSource` (src/GraphicsResources.c: `{ void *buffer; char *name; }`,
+a buffer to adopt, or with `buffer` NULL a file name to request), and the
+body sets only `buffer`, to the chunk header's model block
+(`header + placementsOffset + placementsSize`). The name follows
+include/LinkResource.h's banner ("the callers outside GraphicsResources
+build it in their own 0x10-byte request types").
+
+Its 0x10 size is load-bearing, measured this round: giving it
+ResourceSource's own 8 bytes (`buffer`, `name`) builds the frame at 0x78
+instead of 0x80 and the function at 132/150. So it cannot be replaced by
+ResourceSource itself; the body keeps a `MATCHING` line on the type. The
+unread +0x04..+0x0F stays padding (no code reads or writes it).
+
+**Proposed (head, not applied: outside this job's edit set).** The same
+0x10-byte record is declared twice more, with ResourceSource's fields under
+other names: include/class_39e08.h `LoadRequest` and src/code_1677c.c
+`LoadModelRequest`, both `{ s32 type; const char *path; s32 unk08; s32
+unk0C; }`, whose callers write `type = 0` (ResourceSource's NULL `buffer`)
+and `path` (its `name`) before `New_LinkResource`. One
+`ResourceSourceRequest { void *buffer; char *name; u8 pad8[8]; }` in the
+header owning ResourceSource (LinkResource.h, or FileResource.h, the
+common parent of the five ctors that take it, once ResourceSource itself
+moves out of GraphicsResources.c) would retire all three; field renames
+`type` -> `buffer`, `path` -> `name`. The three-word SetVec3 descriptors
+(GraphicsResources.c `ResourceSourceArgs`, include/code_4cd08.h
+`DreamAuxLoadReq`, include/code_171e0.h `Vec3_171e0`) are the same family
+at 0x0C and are left to that job.
