@@ -126,3 +126,24 @@ parameter added. The callers upcast (`(SceneNode *)this`,
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+The `u8 buf[0x20]` buffer is now `MATRIX rot`, and `table` is `worldPos`: byte-identical. The per-axis parent test was re-measured: hoisting it to one `worldPos` computation scores 17/48 with 294257 bytes drifted, so the source comment keeps a one-line `MATCHING:` note. The old comment's `self->unkC` is `self->parent` (SceneNode.h).
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* Turns an offset given in the object's own local frame into a world
+ * position: rotate `src` by the object's orientation (slot84, un-negated
+ * angles, same as SceneNode__RotateLocalVector above) and add the object's
+ * accumulated world translation. That translation is `coord2->workm.t`, which
+ * is GsCOORDINATE2.workm.t -- the composed world matrix's own translation
+ * (+0x24 workm, +0x14 into MATRIX = +0x38). SceneNode__RaycastVertical is the function
+ * that maintains it, by summing coord.t down the owner chain.
+ *
+ * The `self->unkC != 0 ? ... : 0` ternary is recomputed before EACH of the
+ * three additions rather than hoisted: retail genuinely redoes the NULL
+ * test and the address computation three times. When `unkC` is NULL the
+ * resulting NULL is still dereferenced, exactly as retail does. */
+```

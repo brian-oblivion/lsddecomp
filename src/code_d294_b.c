@@ -327,10 +327,10 @@ s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *arg1, TmdVec3 *d) {
  * (corner m against corner m+4, m = 1, 2) tested against every plane, and a
  * hit sets plane bit i in self->hitMask and box bit k in *outFlag. `hit` is
  * written only as 0, but retail still tests it. Round 76. Byte levers:
- * the D_8008A838 gate is two arms that each set the bit, so loop.c sees two
+ * the gHitHeightGate gate is two arms that each set the bit, so loop.c sees two
  * equal constant-1 loads (savings 2) and hoists the 1 into $s1; Part 1 walks
  * `p`, `v` and `hi` as pointers. */
-extern s32 D_8008A838;
+extern s32 gHitHeightGate;
 
 s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *diff, TmdHull *list) {
     TmdVec3 mid[2];
@@ -368,7 +368,7 @@ s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *dif
         if (ClipSegmentToBox(NULL, plane, &mid[0], &mid[1])) {
             if (TmdModel__RaycastFaces(self->model, &bigConst, (TmdVec3 *)diff, &outWord,
                                        (TmdVec3 *)&mid[0], (TmdVec3 *)&mid[1])) {
-                if (D_8008A838 == 0) {
+                if (gHitHeightGate == 0) {
                     self->hitMask |= 1 << i;
                 } else if (outWord >= 0x201) {
                     self->hitMask |= 1 << i;

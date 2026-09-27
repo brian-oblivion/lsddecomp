@@ -87,3 +87,19 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * chosen functions only ever pass the pointer through, never dereference
  * the pair themselves. */
 ```
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+Locals `q1`/`r1`/`q2` -> `whole`/`rem`/`frac`, and `<< 12` -> `* ONE` (GCC emits the same `sll`): byte-identical.
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* `(pair->num << 12) / pair->den` in 20.12 fixed point, computed as a
+ * split division so the shift cannot overflow: quotient and remainder from
+ * one divide, then the shifted remainder divided again. GCC 2.6.3 fuses the
+ * `/` and `%` over the same operands into a single `div`.
+ *
+ * The pair is a ratio, numerator over denominator; every producer in this
+ * unit sets `den` to 1. */
+```

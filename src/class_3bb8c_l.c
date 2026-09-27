@@ -71,12 +71,12 @@ void ObjM__DetachTarget(ObjM *self) {
 
 /* Defined elsewhere, no header: src/code_39094.c (PickVariant and
  * PickDailyVariant return a Rec1C *, a 0x1C-byte record handed on here as a
- * name), src/code_d294_c.c (func_8001EF60 sets the flag
+ * name), src/code_d294_c.c (GetSetHitHeightGate sets the flag
  * SceneNode__ClassifyAgainstPlanes tests) and class_3bb8c_m
  * (RegisterStyleConfig, which keeps `sceneRefs` as gStyleSceneRefs). */
 extern s32 PickVariant(s32 stage, s32 unused);
 extern s32 PickDailyVariant(s32 stage, s32 unused, s32 day);
-extern s32 func_8001EF60(s32 value);
+extern s32 GetSetHitHeightGate(s32 value);
 extern s32 RegisterStyleConfig(void *grid, s32 stage, s32 *sceneRefs, s32 day, s32 arg4);
 
 /* The viewport's view point and reference point (attachViewChild), the
@@ -150,7 +150,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
     if (gridSpan == 0) {
         self->gridSpan = DEFAULT_GRID_SPAN;
     }
-    func_8001EF60(flag);
+    GetSetHitHeightGate(flag);
 
     self->dreamSys->methods->setPendingExtra(self->dreamSys, gStagePendingExtras[self->stage]);
     self->state = 5;

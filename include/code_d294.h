@@ -29,7 +29,7 @@ extern u8 SCALE_ONE[0xC];
 /* dst[i] = m * src[i] over `count` elements, through Sony's ApplyMatrixSV
  * (6-byte s16 vectors) and ApplyMatrixLV (0xC-byte s32 vectors). The first
  * argument is the destination; dst == src transforms in place. */
-extern void ApplyMatrixToSVArray(void *dst, void *src, s32 count, void *m);
+extern void ApplyMatrixToSVArray(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m);
 void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
 
 /* Replaces the `width` bits at bit `shift` of *word with `value` and returns

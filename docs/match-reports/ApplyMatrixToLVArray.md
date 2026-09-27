@@ -462,3 +462,24 @@ The header's banner was rewritten as documentation in round 95; the comments it 
  * `ApplyMatrixLV(m, src, dst)` inside the loop. The same correction
  * applies to ApplyMatrixToSVArray's declaration above. */
 ```
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+The `(u8 *)p + 0xC` byte walks are now `(LongVec3 *)p + 1` element walks: byte-identical. The parameters stay `void *` because src/code_2864.c declares its own `void *` extern of this function while also including code_d294.h, so a typed prototype there would be `conflicting types` in a unit outside this job (proposed to the head). Typed locals copied from the parameters score 25/31 for the same prologue-order reason as ApplyMatrixToSVArray.
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* `dst[i] = m * src[i]` for `count` elements of 0xC bytes each, via Sony's
+ * ApplyMatrixLV (`v1 = m * v0`, VECTOR in and out) -- the long-vector
+ * sibling of ApplyMatrixToSVArray above, and no unaligned-copy dance
+ * needed since both arrays are read and written in place.
+ *
+ * The `if (0)` call is NOT dead code to delete: retail reserves 24 bytes of
+ * outgoing-argument space, six words, where this function's one live call
+ * needs four. GCC 2.6.3 sizes that area from every call expression's
+ * argument count during RTL expansion, before dead-branch elimination, so
+ * the 6-argument call in the unreachable branch is what produces retail's
+ * frame. Full derivation in docs/match-reports/ApplyMatrixToLVArray.md;
+ * this is also why that call goes through an unprototyped function type. */
+```

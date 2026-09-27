@@ -48,3 +48,18 @@ No new struct or vtable-slot knowledge.
   rewritten to `dest[i] = to[i] - from[i]`, same expression, so that the
   operand order is readable at the call site: the subtrahend is the 2nd
   argument and the minuend the 3rd. Byte-identical.
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+The old comment's `buf18` and `buf28` are RaycastVertical's `origin` and `hit`, so SubVec3S16 there computes hit - origin, both in the node's own frame.
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* dest = to - from, over three components, widening s16 inputs to s32.
+ * Parameter ORDER is the subtrahend first: the value subtracted is the 2nd
+ * argument, the value subtracted FROM is the 3rd. What the two vectors
+ * represent is not established -- SceneNode__RaycastVertical is the only known caller,
+ * and it passes `buf18` (slotA4's rotated delta) as `from` and `buf28`
+ * (TmdModel__RaycastFaces's own output) as `to`. */
+```

@@ -3020,3 +3020,5 @@ gTextEntryPanelPos = 0x8008AACC;
 gTextEntryTextPos = 0x8008AAD4;
 gTextEntryCursorPos = 0x8008AADC;
 StageMap__NoOpSlotD8 = 0x8004B324; // type:func
+gHitHeightGate = 0x8008A838;
+GetSetHitHeightGate = 0x8001EF60; // type:func

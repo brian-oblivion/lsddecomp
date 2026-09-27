@@ -19,7 +19,7 @@ unit's other functions also write with 4/5/6 -- see
 extern s32 PickVariant(void *arg0, s32 arg1);
 extern s32 PickDailyVariant(void *arg0, s32 arg1, s32 arg2);
 extern s32 New_TimBlockSrc(s32 arg0);
-extern void func_8001EF60(s32 arg0);
+extern void GetSetHitHeightGate(s32 arg0);
 extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
 
 extern s32 gObjMViewPoint;
@@ -79,7 +79,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
     if (arg1 == 0) {
         self->unk48 = 0xA000;
     }
-    func_8001EF60(flag);
+    GetSetHitHeightGate(flag);
 
     self->unk3C->methods->slotEC(self->unk3C, gStagePendingExtras[(s32) self->unk38]);
     self->unk20 = 5;
@@ -87,7 +87,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
 ```
 
 Cross-unit helpers (`PickVariant`, `PickDailyVariant`, `New_TimBlockSrc`,
-`func_8001EF60`, `RegisterStyleConfig`) have no established prototypes anywhere
+`GetSetHitHeightGate`, `RegisterStyleConfig`) have no established prototypes anywhere
 else in the project (all still `INCLUDE_ASM` in their own units), so they
 are declared locally per CLAUDE.md's rule. `gObjMViewPoint`/`gObjMViewRefPoint` are
 referenced only by address (never loaded), so their real type is unknown;
@@ -139,7 +139,7 @@ different residue, closed it:
    CLAUDE.md's test. Source-level statement reordering (tried first, at no
    cost) had NO effect on this scheduling choice, same as observed
    elsewhere this round; only the barrier moved it.
-   Also needed: swapping `func_8001EF60(flag);` to AFTER (not before) the
+   Also needed: swapping `GetSetHitHeightGate(flag);` to AFTER (not before) the
    `self->unk48 = arg1; if (arg1 == 0) { ... }` block -- another pure
    order fix, this one resolved by plain statement reordering (no barrier
    needed).
@@ -255,5 +255,5 @@ Naming, all zero bytes:
   gridSpan >> 12 = 10).
 - `arg3` / `unk4C` kept: stored, never read, and IntermediateBase__Init
   passes 0, so nothing names it.
-- `flag` kept: it goes to func_8001EF60, whose global's meaning is not
+- `flag` kept: it goes to GetSetHitHeightGate, whose global's meaning is not
   established (code_d294_c.c's tier-C note).

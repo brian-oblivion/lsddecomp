@@ -280,3 +280,28 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * parameters (names only) to say which is which. Declared with the opaque
  * shape its callers need. */
 ```
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+The definition and its prototype in include/code_d294.h now take `(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m)` and walk by element (`dst + count`, `src++`), replacing the `(u8 *)p + 6` byte walks; the local `ApplyMatrixSV` extern takes Sony's signature `SVECTOR *(MATRIX *, SVECTOR *, SVECTOR *)` (this SDK's libgte.h omits it). Byte-identical. Measured on the way: keeping `void *` parameters and copying them into typed locals (`out = dst; in = src;`) scores 31/37, because the new pseudos reorder the callee-saved register saves in the prologue; typing the parameters themselves does not.
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* `dst[i] = m * src[i]` for `count` elements of 6 bytes each, via Sony's
+ * ApplyMatrixSV (`v1 = m * v0`, SVECTOR in and out). NOTE the parameter
+ * order: the WRITE destination is the 1st argument and the read source the
+ * 2nd, which is the opposite of the names this body carried before -- read
+ * off the byte-exact call, `ApplyMatrixSV(m, &buf, dst)` with `buf` copied
+ * out of `src`. Both of this function's call sites (code_d294_b) pass the
+ * same address for both, so the asymmetry is invisible from them.
+ *
+ * The per-element stack copy must be a struct whose members are ALL s16:
+ * that gives it alignment 2, which is what makes the whole-struct
+ * assignment compile to unaligned lwl/lwr + swl/swr (the idiom in
+ * DECOMPILATION_LEARNINGS, confirmed here by an isolated toolchain
+ * reproducer in round 19). `TmdVec3` is exactly that shape, and is
+ * the right READING too: ApplyMatrixSV consumes SVECTORs, so the 6 bytes
+ * are three s16 components, not the "32-bit value + trailing s16" the
+ * former local `Rec6_d294` typedef guessed. Byte-identical either way. */
+```
