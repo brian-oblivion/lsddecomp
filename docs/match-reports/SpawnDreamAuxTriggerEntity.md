@@ -68,7 +68,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
         obj = (DreamAuxObj *)gDreamAuxStageMap;
         ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
         ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, D_80088F18 + rec->val2 * 12);
-        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, gDreamAuxWorld, D_8008AC08, (void *)gDreamAuxStageMap, outBuf);
+        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, gDreamAuxWorld, gDreamAuxFrameClock, (void *)gDreamAuxStageMap, outBuf);
         return false;
     }
     return true;
@@ -169,6 +169,6 @@ rename, confirmed confined to this unit by rebuild).
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are the typed slots updateRotation and attachToParent (through TodActorAttachToParentFn: peer gDreamAuxWorld, companion D_8008AC08, parent gDreamAuxStageMap, offset outBuf), same bytes. DreamAuxObjFn11/13 deleted.
+The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are the typed slots updateRotation and attachToParent (through TodActorAttachToParentFn: peer gDreamAuxWorld, companion gDreamAuxFrameClock, parent gDreamAuxStageMap, offset outBuf), same bytes. DreamAuxObjFn11/13 deleted.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

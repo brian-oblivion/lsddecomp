@@ -25,7 +25,7 @@ extern s32 gDreamAuxStage;
 extern s32 gDreamAuxStageMap;
 extern s32 gDreamAuxWorld;
 extern s32 gDreamAuxSound;
-extern s32 D_8008AC08;
+extern s32 gDreamAuxFrameClock;
 
 void SetTeleportsEnabled(s32 triggerType);
 
@@ -38,7 +38,7 @@ void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
     gDreamAuxStageMap = a1;
     gDreamAuxWorld = a2;
     gDreamAuxSound = a3;
-    D_8008AC08 = a4;
+    gDreamAuxFrameClock = a4;
 
     for (i = 0; i < 1; i++) {
         s32 buf[4];

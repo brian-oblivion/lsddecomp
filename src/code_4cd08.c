@@ -51,7 +51,7 @@ extern s32 gDreamAuxStage;
 extern StageMap *gDreamAuxStageMap; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
 extern DreamSys *gDreamAuxWorld; /* the player DreamSys: class_3bb8c_l passes its `target` */
 extern s32 gDreamAuxSound;
-extern s32 D_8008AC08;
+extern s32 gDreamAuxFrameClock;
 
 void SetTeleportsEnabled(s32 triggerType);
 
@@ -63,7 +63,7 @@ void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4) {
     gDreamAuxStageMap = (StageMap *)a1;
     gDreamAuxWorld = world;
     gDreamAuxSound = a3;
-    D_8008AC08 = a4;
+    gDreamAuxFrameClock = a4;
 
     for (i = 0; i < 1; i++) {
         s32 buf[4];
@@ -415,7 +415,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry) {
         gDreamAuxStageMap->methods->computeCellOffsets(gDreamAuxStageMap, outBuf, &coords);
         entity->methods->updateRotation(entity, 1, D_80088F18 + rec->val2 * 12);
         ((TodActorAttachToParentFn)entity->methods->attachToParent)(
-            (TodActor *)entity, (TodActor *)gDreamAuxWorld, (void *)D_8008AC08,
+            (TodActor *)entity, (TodActor *)gDreamAuxWorld, (void *)gDreamAuxFrameClock,
             (void *)gDreamAuxStageMap, outBuf);
         return false;
     }
@@ -429,7 +429,7 @@ void DespawnDreamAuxEntity(DreamAuxSlot *a0) {
         a0->entity->methods->detachFromParent(a0->entity);
         SceneNode__LocalOffsetToWorldPos((SceneNode *)gDreamAuxWorld, localPos, a0->pos, 0);
         ((TodActorAttachToParentFn)a0->entity->methods->attachToParent)(
-            (TodActor *)a0->entity, (TodActor *)gDreamAuxWorld, (void *)D_8008AC08,
+            (TodActor *)a0->entity, (TodActor *)gDreamAuxWorld, (void *)gDreamAuxFrameClock,
             (void *)gDreamAuxStageMap, localPos);
         SceneNode__FaceTarget((SceneNode *)a0->entity, (SceneNode *)gDreamAuxWorld, 1, 0, 0);
     }
