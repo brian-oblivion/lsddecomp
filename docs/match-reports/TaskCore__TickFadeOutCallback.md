@@ -195,3 +195,8 @@ instead of 5 on completion. Kept tier C for the same reason as `TaskCore__SetFad
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__func_8003CCDC (tools/rename.py). Occupant of +0x0C0 (`tickFadeOutCallback`, update's state 7). It runs +0x08C (fadeOutCallback, see TaskCore__SetFadeOutCallbackEnabled) and moves to state 8 when it reports done. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 98, alpha)
+
+`result` -> `done` (the callback reports whether the fade is finished); the
+`goto epilogue` carries a MATCHING line. Byte-identical.

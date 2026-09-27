@@ -149,7 +149,7 @@ struct TaskCoreTarget {
     /* +0x098 */ void (*setCallback)(Self *self, void (*callback)(void *ctx), void *ctx); /* TaskCore__SetCallback */ \
     /* +0x09C */ void (*setFadeCallbackEnabled)(Self *self, s32 enable);    /* TaskCore__SetFadeCallbackEnabled */ \
     /* +0x0A0 */ void (*setFadeOutCallbackEnabled)(Self *self, s32 enable); /* TaskCore__SetFadeOutCallbackEnabled */ \
-    /* +0x0A4 */ void (*setColors)(Self *self, u8 *base, u8 *color93, u8 *color96); /* TaskCore__SetColors */ \
+    /* +0x0A4 */ void (*setColors)(Self *self, u8 *base, u8 *clear, u8 *color96); /* TaskCore__SetColors */ \
     /* +0x0A8 */ void (*setFadeRate)(Self *self, s32 rate);      /* TaskCore__SetFadeRate */       \
     /* +0x0AC */ s32 (*tickFadeCallback)(Self *self);            /* TaskCore__TickFadeCallback: update's state 4 */ \
     /* +0x0B0 */ s32 (*tickColorFade)(Self *self);               /* TaskCore__TickColorFade: the fade-in callback */ \
@@ -213,8 +213,8 @@ struct TaskCoreTarget {
     /* +0x088 */ s32 (*fadeInCallback)(TaskCore *self);  /* setFadeCallbackEnabled: NULL or tickColorFade; nonzero: onInit sets baseColor */ \
     /* +0x08C */ s32 (*fadeOutCallback)(TaskCore *self); /* setFadeOutCallbackEnabled: NULL or tickFadeColor */ \
     /* +0x090 */ u8 baseColor[3];       /* setColors; the fade-in's start colour */                \
-    /* +0x093 */ u8 unk93[3];           /* setColors */                                            \
-    /* +0x096 */ u8 unk96[3];           /* setColors */                                            \
+    /* +0x093 */ u8 unk93[3];           /* setColors; onDeinit (unk34 set) and TitleMenu's clear the screen to it */                                            \
+    /* +0x096 */ u8 unk96[3];           /* setColors (reset: 128 grey); no code reads it */                                            \
     /* +0x099 */ u8 pad099[3];                                                                     \
     /* +0x09C */ void (*viewCallback)(void *ctx); /* setCallback; refreshViewValue calls it */     \
     /* +0x0A0 */ void *viewCallbackCtx  /* the object is 0xA4 bytes: StreamTask's own fields start at +0x0A4 */
@@ -254,7 +254,7 @@ void TaskCore__RefreshViewValue(TaskCore *self);
 void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx);
 void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable);
 void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable);
-void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *color93, u8 *color96);
+void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *color96);
 void TaskCore__SetFadeRate(TaskCore *self, s32 rate);
 s32 TaskCore__TickFadeCallback(TaskCore *self);
 s32 TaskCore__TickColorFade(TaskCore *self);

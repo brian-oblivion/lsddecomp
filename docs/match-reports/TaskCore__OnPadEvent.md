@@ -127,3 +127,35 @@ switch and the slot's universal, unoverridden occupancy), so tier A.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__OnTag2Notify (tools/rename.py). Occupant of +0x058 (`onPadEvent`: IntermediateBase__OnNotify's case for a Pad sender), named for the slot. Its cases call +0x074..+0x084 with self alone (byte-identical to passing the sender, which stays in $a1). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Unit history, moved from code_2cc8c.c's banner (round 98, alpha, track 7)
+
+code_2cc8c was carved in round 10 as the first 20-function slice of the
+0x2CC8C block (153 functions; the rest became code_2cc8c_b and later
+units), on the belief that it had the lowest toolchain-blocker density of
+any uncarved segment. That belief was retracted the same round for this
+function and `TaskCore__SetState`, whose jump-table dispatch hits
+`addiu $at, $at, %lo(jtbl_*)`. The retraction was right: a `jtbl_*` symbol
+is not a safe exception to that screen, because cc1 emits the same generic
+pseudo-op for an indexed data global and a switch jump table and the fold
+happens in maspsx, below cc1, which cannot tell them apart. This unit is
+where that discriminator was established, and the finding outlived the
+blocker.
+
+Both were matched in round 23, after round 21 resolved `addiu_at` itself
+(maspsx `--addiu-at`, docs/research/addiu-at-blocker.md). Only the verdict
+expired; the analysis stands.
+
+The object was viewed in this unit as `Obj86B60` until track 4 unified it
+as TaskCore (include/TaskCore.h, round 84). Round 78 (delta) named all 20
+functions with tools/rename.py and corrected the header's slot74..slot84
+occupant mapping, which had the five handlers reversed; each function's
+`## Naming` section has the evidence.
+
+## Track 7 (round 98, alpha)
+
+The cases now read `PAD_EVENT_PRESSED + PAD_BUTTON_*` (include/Pad.h):
+0x12 Lup -> onPadPrev, 0x13 Ldown -> onPadNext, 0x21 Start -> onPadStart,
+0x17 Rdown (cross) -> onPadCancel, 0x19 Rright (circle) -> onPadConfirm.
+The gate is `inputMode != TASKCORE_INPUT_NONE`. Case order is unchanged
+(the residue above) and carries a MATCHING line. Byte-identical.

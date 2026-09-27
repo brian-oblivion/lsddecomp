@@ -148,3 +148,14 @@ Proposed, not applied (header edit, other units): `TaskCore.h`'s `baseColor`,
 casts here and in `code_2c054.c`. `code_2cc8c_f.c`'s `RGB80040790`
 (`BoxFill__ApplyColor`) is the same shape (s8 r, g, b, struct-copied); a
 separate job.
+
+## Track 7 (round 98, alpha)
+
+Parameters `a1..a3` -> `base`, `clear`, `color96` (slot and prototype in
+TaskCore.h too). `unk93` is the colour TaskCore__OnDeinit (when unk34 is
+set) and TitleMenu__OnDeinit clear the screen to; its accessors are in
+code_2c054 and class_3bb8c_d, so the name (`clearColor`) is a proposal.
+`unk96` has no reader anywhere (Reset sets it to 128 grey from D_8006E860);
+kept. Retyping all three to BgLayerRgb (delta's round-98 lead) would drop
+these casts but changes code_2c054's accessors: proposed. The casts carry a
+MATCHING line. Byte-identical.
