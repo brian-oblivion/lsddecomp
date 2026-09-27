@@ -13,7 +13,7 @@
  *    then the FILM .STR and IMG .TIM files): random-or-forced
  *    pickers (SeedAndRandom, SetPickOverrides/gForcedSoundBank/
  *    gForcedStageBgm), per-stage record-group accessors indexed by
- *    gRecordIndexTable and, for GetGridRecordXY, by StageGrid.h's cell
+ *    gStageFirstRecord and, for GetGridRecordXY, by StageGrid.h's cell
  *    columns, and a family of "stream channel" lookups (GetIntroStreamName,
  *    PickWeeklyStreamChannel, GetStreamChannelInit, ResolveCinematicChannel,
  *    GetGraphRoomStreamChannel) whose shapes match their call sites in
@@ -153,7 +153,7 @@ extern u8 gRecordTable[];
 extern char *gSoundEffectDirPtr; /* -> "SND\\SE" */
 extern const char sAsmkStreamPath[];
 extern s16 gStreamTypeToGroupTable[];
-extern s16 gRecordIndexTable[];
+extern s16 gStageFirstRecord[];
 
 /* slot +0x088 of gLbdFileMethods */
 void LbdFile__SetAutoLoadData(LbdFile *self, s32 value) {
@@ -218,7 +218,7 @@ char *GetSoundEffectDir(void) {
 }
 
 Rec1C *GetRecordGroup(s32 index) {
-    return &((Rec1C *)GetRecordTable(NULL))[gRecordIndexTable[index]];
+    return &((Rec1C *)GetRecordTable(NULL))[gStageFirstRecord[index]];
 }
 
 Rec1C *GetRecordGroupAlias(s32 index) {
