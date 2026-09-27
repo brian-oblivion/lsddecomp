@@ -39,7 +39,7 @@
  *    initialises the box from them; the ctor calls it through
  *    BoxFillResetFn.
  *  - +0x04C attachToParent: BoxFill__AttachToParent's third argument is a
- *    screen position (a Pair32E99C) where the slot, SceneNode's, types a
+ *    screen position (a BoxFillPos) where the slot, SceneNode's, types a
  *    LongVec3 offset; it attaches with a NULL offset, then setPosition.
  *    Callers cast to BoxFillAttachToParentFn (class_3bb8c_m/_n,
  *    code_2cc8c_b) or, through a SceneNode pointer, cast the argument
@@ -55,7 +55,7 @@
 typedef struct BoxFill BoxFill;
 typedef struct BoxFillMethods BoxFillMethods;
 typedef struct SkipShort2 SkipShort2;
-typedef struct Pair32E99C Pair32E99C;
+typedef struct BoxFillPos BoxFillPos;
 
 /* The ctor's (and Reset's) size argument: two words of which only the low
  * halfwords are read (lhu at +0x000 and +0x004), into boxW and boxH. The
@@ -71,7 +71,7 @@ struct SkipShort2 {
 /* A two-word screen position (setPosition, attachToParent's third argument):
  * copied whole into posX/posY. FadeBox's position stack and gTextRowMethods's
  * layout loops use the same record. */
-struct Pair32E99C {
+struct BoxFillPos {
     s32 a; /* +0x000, x */
     s32 b; /* +0x004, y */
 };
@@ -85,9 +85,9 @@ struct Pair32E99C {
 #define BOXFILL_SLOTS(Self, CtorParams)                                                            \
     SCENENODE_SLOTS(Self, CtorParams);                                                            \
     /* +0x0B8 */ void (*setColor)(Self *self, s32 overwrite, void *rgb);  /* BoxFill__SetColor: copy the 3 bytes, or add them when overwrite is 0 */ \
-    /* +0x0BC */ void (*setPosition)(Self *self, Pair32E99C *pos);        /* BoxFill__SetPosition: only while attached */ \
+    /* +0x0BC */ void (*setPosition)(Self *self, BoxFillPos *pos);        /* BoxFill__SetPosition: only while attached */ \
     /* +0x0C0 */ void (*setSize)(Self *self, s32 *size);                  /* BoxFill__SetSize: {w, h} words, low halves; only while attached */ \
-    /* +0x0C4 */ void (*attachAbsolute)(Self *self, SceneNode *parent, Pair32E99C *pos, s32 arg3); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = arg3 */ \
+    /* +0x0C4 */ void (*attachAbsolute)(Self *self, SceneNode *parent, BoxFillPos *pos, s32 arg3); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = arg3 */ \
     /* +0x0C8 */ void (*setPri)(Self *self, s32 pri);                     /* BoxFill__SetPri */          \
     /* +0x0CC */ s32 (*setMask)(Self *self, s32 bits)                     /* BoxFill__SetMask: mask = (1 << bits) - 1; Reset passes 13 */
 /* clang-format on */
@@ -124,22 +124,22 @@ extern BoxFillMethods *GetBoxFillMethods(void); /* returns &gBoxFillMethods */
 /* +0x040's and +0x04C's occupants, as a caller reaching them through the
  * inherited slots casts them (see the banner). */
 typedef void (*BoxFillResetFn)(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
-typedef void (*BoxFillAttachToParentFn)(BoxFill *self, SceneNode *parent, Pair32E99C *pos);
+typedef void (*BoxFillAttachToParentFn)(BoxFill *self, SceneNode *parent, BoxFillPos *pos);
 
 /* The class's own methods, in ROM order (code_2cc8c_e, then code_2cc8c_f).
  * A subclass reaches the base ones through GetBoxFillMethods() and upcasts. */
 BoxFill *New_BoxFill(void *size, void *color, s32 pri);
 void BoxFill__BoxFill(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
 void BoxFill__Reset(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
-void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, Pair32E99C *pos);
+void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, BoxFillPos *pos);
 s32 BoxFill__SetDisplay(BoxFill *self, s32 on);
 s32 BoxFill__SetSemiTrans(BoxFill *self, s32 on);
 s32 BoxFill__SetSemiTransRate(BoxFill *self, s32 rate);
 void BoxFill__SetColor(BoxFill *self, s32 overwrite, u8 *rgb);
 void BoxFill__ApplyColor(BoxFill *self, u8 *dst, u8 *src, s32 overwrite);
-void BoxFill__SetPosition(BoxFill *self, Pair32E99C *pos);
+void BoxFill__SetPosition(BoxFill *self, BoxFillPos *pos);
 void BoxFill__SetSize(BoxFill *self, s32 *size);
-void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, Pair32E99C *pos, s32 arg3);
+void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, s32 arg3);
 void BoxFill__SetPri(BoxFill *self, s32 pri);
 s32 BoxFill__SetMask(BoxFill *self, s32 bits);
 

@@ -71,7 +71,7 @@ struct FadeBoxMethods {
     /* +0x0E0 */ void (*stop)(FadeBox *self, BasicClass *source); /* FadeBox__Stop */
     /* +0x0E4 */ void *(*getColor)(FadeBox *self); /* FadeBox__GetColor: the mask's table entry */
     /* +0x0E8 */ void (*pushPosition)(FadeBox *self, SkipShort2 *size,
-                                      Pair32E99C *pos); /* FadeBox__PushPosition: only while attached */
+                                      BoxFillPos *pos); /* FadeBox__PushPosition: only while attached */
     /* +0x0EC */ void (*popPosition)(FadeBox *self); /* FadeBox__PopPosition */
     /* +0x0F0 */ void (*setDivisorMode)(FadeBox *self, s32 altMode, s32 divisor); /* FadeBox__SetDivisorMode */
 };
@@ -87,7 +87,7 @@ struct FadeBox {
     /* +0x084 */ s32 maskPerTick; /* configure: BoxFill's mask / ticksLeft; no reader */
     /* +0x088 */ s32 savedW;      /* pushPosition's copy of boxW, restored by popPosition */
     /* +0x08C */ s32 savedH;      /* ... of boxH */
-    /* +0x090 */ s32 savedPosX;   /* ... of posX (copied with posY as one Pair32E99C) */
+    /* +0x090 */ s32 savedPosX;   /* ... of posX (copied with posY as one BoxFillPos) */
     /* +0x094 */ s32 savedPosY;   /* ... of posY */
     /* +0x098 */ s32 altMode; /* setDivisorMode: shortens ticksLeft by 1/divisor; startFadeUp keeps the colour */
     /* +0x09C */ s32 divisor; /* setDivisorMode */
@@ -110,7 +110,7 @@ void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 a
 s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3);
 void FadeBox__Stop(FadeBox *self, BasicClass *source);
 void *FadeBox__GetColor(FadeBox *self);
-void FadeBox__PushPosition(FadeBox *self, SkipShort2 *size, Pair32E99C *pos);
+void FadeBox__PushPosition(FadeBox *self, SkipShort2 *size, BoxFillPos *pos);
 void FadeBox__PopPosition(FadeBox *self);
 void FadeBox__SetDivisorMode(FadeBox *self, s32 altMode, s32 divisor);
 

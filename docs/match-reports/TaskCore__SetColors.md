@@ -75,7 +75,7 @@ Within that scope, though, the evidence is broader than "one struct's
 idiom" and worth stating precisely:
 
 - **Two genuinely independent struct SHAPES.** A 2x`s32`, 4-byte-aligned
-  pair (`Pair32E99C`: `FadeBox__PushPosition`, `BoxFill__SetPosition`, `TextRow__SetPosition`,
+  pair (`BoxFillPos`: `FadeBox__PushPosition`, `BoxFill__SetPosition`, `TextRow__SetPosition`,
   `TextRow__AttachToParent`) and a 3x`s8`, 1-byte-aligned, non-power-of-two triple
   (this function's own RGB-shaped struct, and `BoxFill__ApplyColor`'s copy arm
   in the SAME unit). These have nothing in common at the ABI level
@@ -83,7 +83,7 @@ idiom" and worth stating precisely:
   because of some accident specific to a 2-word-aligned pair, the 3-byte
   case should not have closed. It did, on the first attempt, with no
   adjustment.
-- **Two genuinely independent class/vtable families.** `Pair32E99C` copies
+- **Two genuinely independent class/vtable families.** `BoxFillPos` copies
   live in `Obj6EAC0`/`FadeBoxObj` (units `code_2cc8c_e`/`_f`); THIS
   function's 3-byte struct lives in `Obj86B60` (unit `code_2cc8c`,
   matched by a DIFFERENT runner in an EARLIER round before this round's

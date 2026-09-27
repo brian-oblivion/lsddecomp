@@ -20,19 +20,19 @@ instead of two scalar assignments, exactly as `FadeBox__PushPosition` documented
 ## Final body (byte-exact, 11/11, no drift)
 
 ```c
-void BoxFill__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
+void BoxFill__SetPosition(Obj6EAC0 *self, BoxFillPos *a1) {
     if (self->unkC != 0) {
-        *(Pair32E99C *)&self->unk50 = *a1;
+        *(BoxFillPos *)&self->unk50 = *a1;
     }
 }
 ```
 
-`Pair32E99C` (`include/code_2cc8c.h`) is the existing two-`s32`-record
+`BoxFillPos` (`include/code_2cc8c.h`) is the existing two-`s32`-record
 type introduced for `FadeBox__PushPosition`'s own `a2` argument; `self->unk50`/
 `unk54` are already documented there as "first/second word of a 2-word
 struct copied from their own `a1` argument", so this is the same shape,
 not a new one. `Obj6EAC0Methods::slotBC`'s prototype was retyped from
-`void *a1` to `Pair32E99C *a1` to match (the only call site,
+`void *a1` to `BoxFillPos *a1` to match (the only call site,
 `BoxFill__AttachToParent`'s `self->methods->slotBC(self, a2)` in this same unit,
 compiles unchanged since `a2` there is still `void *` and C89 converts
 either direction implicitly).
@@ -88,7 +88,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 | `func_800407F8` | `BoxFill__SetPosition` | B |
 
 **Evidence.** Base occupant of `slotBC`: `if (self->hasChildren != 0) {
-*(Pair32E99C *)&self->posX = *a1; }` -- stores an incoming 2-word pair
+*(BoxFillPos *)&self->posX = *a1; }` -- stores an incoming 2-word pair
 into `posX`/`posY` (renamed from `unk50`/`unk54`), but only when the
 object has children. The derived occupant of the SAME slot
 (`TextRow__SetPosition`, this unit) treats the equivalent pair as a

@@ -324,7 +324,7 @@ STALL, 1 word short; naming is unaffected by match state per track 3.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-gStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` view's +0x04C is attachToParent, cast to BoxFillAttachToParentFn with the PairXY position cast to Pair32E99C *. Zero bytes.
+gStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` view's +0x04C is attachToParent, cast to BoxFillAttachToParentFn with the PairXY position cast to BoxFillPos *. Zero bytes.
 
 ## Round 93 polish (delta, track 7)
 
@@ -332,7 +332,7 @@ gStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` vi
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `gStyleDecorPosAX`/`AY` | `gStyleDecorPosX`/`Y` | A | copied whole and passed as attachToParent's third argument, BoxFill's screen position (Pair32E99C). |
+| `gStyleDecorPosAX`/`AY` | `gStyleDecorPosX`/`Y` | A | copied whole and passed as attachToParent's third argument, BoxFill's screen position (BoxFillPos). |
 | `gStyleDecorPosBX`/`BY` | `gStyleDecorSizeW`/`H` | A | copied whole and passed as New_BoxFill's first argument, the size (BoxFill.h: SkipShort2, width then height); `h` drops by 7 per band. |
 | `gStyleCueSelf` | `gStyleGrid` | A | RegisterStyleConfig stores its arg0; its one caller passes ObjM's `unk14`, the StageMap (IntermediateBase.h, ObjM.h); this unit calls StageMap's computeCellOffsets on it and parents every effect under it. |
 | `0x12` | `STYLE_DECOR_BANDS` (18) | A | the band count: New_BoxFill loop bound, ReleaseBasicClassArray count, the colour tables' 18 triples. |

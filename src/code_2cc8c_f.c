@@ -24,7 +24,7 @@
 #include "code_2cc8c.h"
 #include "TextRow.h"
 
-void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, Pair32E99C *pos) {
+void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, BoxFillPos *pos) {
     if (self->parent == NULL) {
         GetSceneNodeMethods()->attachToParent((SceneNode *)self, parent, 0);
         self->methods->setPosition(self, pos);
@@ -63,9 +63,9 @@ void BoxFill__ApplyColor(BoxFill *self, u8 *dst, u8 *src, s32 overwrite) {
     }
 }
 
-void BoxFill__SetPosition(BoxFill *self, Pair32E99C *pos) {
+void BoxFill__SetPosition(BoxFill *self, BoxFillPos *pos) {
     if (self->parent != NULL) {
-        *(Pair32E99C *)&self->posX = *pos;
+        *(BoxFillPos *)&self->posX = *pos;
     }
 }
 
@@ -79,7 +79,7 @@ void BoxFill__SetSize(BoxFill *self, s32 *size) {
 /* +0x04C is called with FOUR arguments through an unprototyped pointer: its
  * occupant reads three, and the fourth is this function's own a3, already in
  * $a3 (BoxFill.h's banner). */
-void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, Pair32E99C *pos, s32 arg3) {
+void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, s32 arg3) {
     void (*fn)();
     BoxFill *q;
 

@@ -7,8 +7,8 @@
 ## Final body (byte-exact, full oracle green)
 
 ```c
-void TextRow__AttachToParent(Obj6EAC0 *self, s32 a1, Pair32E99C *a2) {
-    Pair32E99C buf;
+void TextRow__AttachToParent(Obj6EAC0 *self, s32 a1, BoxFillPos *a2) {
+    BoxFillPos buf;
     s32 i, bound;
     Obj6EAC0 **elemp;
 
@@ -43,7 +43,7 @@ genuinely whole-image byte-exact.
 1. **Whole-struct assignment for the `a2`-copy buffer** (this round's
    recurring lever -- see `FadeBox__PushPosition`/`BoxFill__SetPosition`/`TaskCore__SetColors`/
    `BoxFill__ApplyColor`/`TextRow__SetPosition`): retyped the local `s32 buf[2]` to
-   the existing `Pair32E99C` and `a2` to `Pair32E99C *`, replaced
+   the existing `BoxFillPos` and `a2` to `BoxFillPos *`, replaced
    `buf[0]=a2[0]; buf[1]=a2[1];` with `buf = *a2;`. This alone closed
    the ORIGINAL report's +2-word length gap outright and jumped the
    score from 16/70 to 62/70 in one step.

@@ -207,7 +207,7 @@ Outside this job's edit set (the head applies them by type scope):
 - `FadeBox::unk7C` stays: configure stores its third argument there and
   update skips stepping while it is 9, but every caller passes 0, so what
   9 means is not shown.
-- `Pair32E99C` (include/BoxFill.h) is named after this class's old
+- `BoxFillPos` (include/BoxFill.h) is named after this class's old
   address; it is BoxFill's position record (setPosition, attachToParent,
   TextRow's layout) and belongs to BoxFill.h's job, not this one.
 

@@ -185,14 +185,14 @@ void *FadeBox__GetColor(FadeBox *self) {
 
 /* MATCHING: both position pairs are copied as whole structs; the block
  * copy is what moves `self` and `size` out of their incoming registers. */
-void FadeBox__PushPosition(FadeBox *self, SkipShort2 *size, Pair32E99C *pos) {
+void FadeBox__PushPosition(FadeBox *self, SkipShort2 *size, BoxFillPos *pos) {
     if (self->parent != 0) {
         self->savedW = self->boxW;
         self->savedH = self->boxH;
-        *(Pair32E99C *)&self->savedPosX = *(Pair32E99C *)&self->posX;
+        *(BoxFillPos *)&self->savedPosX = *(BoxFillPos *)&self->posX;
         self->boxW = size->x;
         self->boxH = size->y;
-        *(Pair32E99C *)&self->posX = *pos;
+        *(BoxFillPos *)&self->posX = *pos;
     }
 }
 

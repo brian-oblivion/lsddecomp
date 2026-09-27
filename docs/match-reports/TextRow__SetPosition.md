@@ -10,9 +10,9 @@ below saturation.
 ## Final body (byte-exact, full oracle green)
 
 ```c
-void TextRow__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
+void TextRow__SetPosition(Obj6EAC0 *self, BoxFillPos *a1) {
     if (self->unkC != 0) {
-        Pair32E99C buf;
+        BoxFillPos buf;
         s32 i;
         s32 bound;
         Obj6EAC0 **elemp;
@@ -34,10 +34,10 @@ void TextRow__SetPosition(Obj6EAC0 *self, Pair32E99C *a1) {
 }
 ```
 
-`Pair32E99C` is the existing two-`s32` record from `FadeBox__PushPosition`; this
+`BoxFillPos` is the existing two-`s32` record from `FadeBox__PushPosition`; this
 is the same type `BoxFill__SetPosition` (this unit's `slotBC` base occupant, also
 matched this round) uses for its own `a1`. `Obj6EAC0Methods::slotBC` was
-already retyped to `Pair32E99C *a1` for that function, so this derived
+already retyped to `BoxFillPos *a1` for that function, so this derived
 occupant picks up the same prototype for free.
 
 `build-and-verify.sh` exits 0 (`OK: build matches retail SLPS_015.56`) --
@@ -53,7 +53,7 @@ retail's 50) with a `s32 buf[2]` stack array copied field-by-field
    `BoxFill__SetPosition`/`TaskCore__SetColors`/`BoxFill__ApplyColor` this round and last):
    replacing the two scalar array-element copies with one `buf = *a1;`
    struct assignment (after retyping the buffer from a raw `s32[2]` to
-   the existing `Pair32E99C` type) closed the length gap outright,
+   the existing `BoxFillPos` type) closed the length gap outright,
    48/50 immediately -- the two-scalar-copy shape was adding real
    instructions retail doesn't have, not just picking different
    registers.
@@ -115,7 +115,7 @@ hypothesis) is not independently confirmed, hence tier B. Sibling of
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->setPosition((CharSprite *)self, (ScreenSpritePos *)a1)` (was `->slotBC(self, a1)`): an upcast and a cast of the view's Pair32E99C to ScreenSprite's pair, no code. Image byte-identical.
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->setPosition((CharSprite *)self, (ScreenSpritePos *)a1)` (was `->slotBC(self, a1)`): an upcast and a cast of the view's BoxFillPos to ScreenSprite's pair, no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 

@@ -2,7 +2,7 @@
 
 > Renamed from `Class6E99C__PushPosition` on 2026-09-26 (tools/rename.py). Address 0x8004042c.
 
-REVISITED, round 73: MATCHED 25/25 (whole-image SHA1 green); names/types not relevant (the existing `SkipShort2 *a1` / `Pair32E99C *a2` signature was kept; retyping `a1` as `Pair32E99C *` measured byte-identical)
+REVISITED, round 73: MATCHED 25/25 (whole-image SHA1 green); names/types not relevant (the existing `SkipShort2 *a1` / `BoxFillPos *a2` signature was kept; retyping `a1` as `BoxFillPos *` measured byte-identical)
 
 ## Round 73 (runner bravo): MATCHED -- the "redundant move" is a block-move CLOBBER
 
@@ -34,26 +34,26 @@ move earlier in the body -- it conflicts with 4/5, 6 (`a2`, live) and 7
 batched shape a two-word `movstrsi` emits.
 
 **The lever, one build:** write the stash as a whole-struct assignment,
-`*(Pair32E99C *)&self->unk90 = *(Pair32E99C *)&self->unk50;`. 25/25, ins
+`*(BoxFillPos *)&self->unk90 = *(BoxFillPos *)&self->unk50;`. 25/25, ins
 0 / del 0, skeleton 0, `build exit=0`. The three `__asm__("" ::: "memory")`
 barriers the body carried are then unnecessary (removed: still 25/25,
 green).
 
-Builds this round: 1 (preserved body) + 1 (retype `a1` to `Pair32E99C *`,
+Builds this round: 1 (preserved body) + 1 (retype `a1` to `BoxFillPos *`,
 inert, 22/25) + 1 (stash as struct copy: 25/25) + 2 cleanups (no
 barriers; `a1` back to `SkipShort2 *`), all 25/25 after the lever.
 
 ### Matched body
 
 ```c
-void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, BoxFillPos *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
-        *(Pair32E99C *)&self->unk90 = *(Pair32E99C *)&self->unk50;
+        *(BoxFillPos *)&self->unk90 = *(BoxFillPos *)&self->unk50;
         self->unk60 = a1->x;
         self->unk62 = a1->y;
-        *(Pair32E99C *)&self->unk50 = *a2;
+        *(BoxFillPos *)&self->unk50 = *a2;
     }
 }
 ```
@@ -197,7 +197,7 @@ function's own `lhu` (zero-extending) when WIDENING them into the now-`s32`
 
 ```c
 #if 0
-void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, BoxFillPos *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -299,7 +299,7 @@ the C level -- and for this shape specifically, GCC 2.6.3 interleaves it
 too, where retail batches it.
 
 **Fix: write the final pair as a single whole-struct assignment instead of
-two scalar ones** -- `*(Pair32E99C *)&self->unk50 = *a2;` (both sides are
+two scalar ones** -- `*(BoxFillPos *)&self->unk50 = *a2;` (both sides are
 word-aligned `s32` pairs, no unaligned-access concern). This makes GCC emit
 the aggregate-copy lowering (`lw`/`lw`/`sw`/`sw`, no barrier needed, no
 `nop`), which is exactly retail's batched form. `--debug` score dropped
@@ -319,7 +319,7 @@ changed.
 
 ```c
 #if 0
-void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, Pair32E99C *a2) {
+void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, BoxFillPos *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -330,7 +330,7 @@ void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, Pair32E99C *a2) {
         self->unk60 = a1->x;
         self->unk62 = a1->y;
         __asm__("" ::: "memory");
-        *(Pair32E99C *)&self->unk50 = *a2;
+        *(BoxFillPos *)&self->unk50 = *a2;
     }
 }
 #endif
@@ -402,7 +402,7 @@ whole-function register-bank swap the original report misdiagnosed.
    scalar assignments): no change (780) -- the interleave/batch choice for
    this exact 2-statement shape does not depend on a neighbouring barrier.
 4. **Whole-struct assignment for the final pair**
-   (`*(Pair32E99C*)&self->unk50 = *a2;`): 210 -- fixed the pair's own
+   (`*(BoxFillPos*)&self->unk50 = *a2;`): 210 -- fixed the pair's own
    batching AND `self`'s register identity throughout the function, as one
    change. Current best.
 5. Explicit `SkipShort2 *src = a1;` local (attempt 4's body, `a1->x`/`a1->y`
@@ -472,9 +472,9 @@ negative:**
 1. Built a real `SkipShort2 tmp = *a1;` whole-struct read (mirroring
    the lever that fixed `self`'s own register identity elsewhere in
    this function), then `self->unk60 = tmp.x; self->unk62 = tmp.y;`.
-   This does NOT parallel the `a2`/`Pair32E99C` case: `SkipShort2` has a
+   This does NOT parallel the `a2`/`BoxFillPos` case: `SkipShort2` has a
    real gap between `x` (+0x000) and `y` (+0x004), so it is not a
-   plain 4-byte contiguous struct the way `Pair32E99C` is. GCC 2.6.3
+   plain 4-byte contiguous struct the way `BoxFillPos` is. GCC 2.6.3
    lowers the unaligned/gapped struct copy via a real stack temporary
    (a new `addiu sp,sp,-8` frame appears), REGRESSING hard to 1/25 with
    ~184KB of whole-image drift. Reverted immediately.
