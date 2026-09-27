@@ -3037,13 +3037,76 @@ GetSsTicksPerSecond = 0x8002CC28; // type:func
 sListViewSize = 0x8008A8E8;
 sListViewColor = 0x8008A8F0;
 gCharSpriteCellRect = 0x8006ED40;
+// identified (round 99, echo, track 7; tools/sonydata.py's aligner run on
+// the placeholder): every aligned access at ratio >= 0.95 in libsnd/vmanager
+// (discs 3.3, 3.5) and its 3.6 split objects names this symbol; only low-
+// ratio 3.0 alignments disagree. Weak bss Sony's linker scattered (3.5's
+// vmanager.o puts _svm_okon2 at .bss+0x752, which the _svm_sreg_buf anchor would
+// land at 0x8008DF42, not here), so the verdict is the access, as for
+// _svm_auto_kof_mode. Report: SpuVmKeyOnNow.md.
 _svm_okon2 = 0x8008E22C;
+// identified (round 99, echo, track 7; tools/sonydata.py's aligner run on
+// the placeholder): every aligned access at ratio >= 0.95 in libsnd/vmanager
+// (discs 3.3, 3.5) and its 3.6 split objects names this symbol; only low-
+// ratio 3.0 alignments disagree. Weak bss Sony's linker scattered (3.5's
+// vmanager.o puts _svm_orev1 at .bss+0x748, which the _svm_sreg_buf anchor would
+// land at 0x8008DF38, not here), so the verdict is the access, as for
+// _svm_auto_kof_mode. Report: SpuVmKeyOnNow.md.
 _svm_orev1 = 0x8008E230;
+// identified (round 99, echo, track 7; tools/sonydata.py's aligner run on
+// the placeholder): every aligned access at ratio >= 0.95 in libsnd/vmanager
+// (discs 3.3, 3.5) and its 3.6 split objects names this symbol; only low-
+// ratio 3.0 alignments disagree. Weak bss Sony's linker scattered (3.5's
+// vmanager.o puts _svm_orev2 at .bss+0x74A, which the _svm_sreg_buf anchor would
+// land at 0x8008DF3A, not here), so the verdict is the access, as for
+// _svm_auto_kof_mode. Report: SpuVmKeyOnNow.md.
 _svm_orev2 = 0x8008E234;
+// identified (round 99, echo, track 7; tools/sonydata.py's aligner run on
+// the placeholder): every aligned access at ratio >= 0.95 in libsnd/vmanager
+// (discs 3.3, 3.5) and its 3.6 split objects names this symbol; only low-
+// ratio 3.0 alignments disagree. Weak bss Sony's linker scattered (3.5's
+// vmanager.o puts _svm_okof1 at .bss+0x74C, which the _svm_sreg_buf anchor would
+// land at 0x8008DF3C, not here), so the verdict is the access, as for
+// _svm_auto_kof_mode. Report: SpuVmKeyOnNow.md.
 _svm_okof1 = 0x80090C60;
+// identified (round 99, echo, track 7; tools/sonydata.py's aligner run on
+// the placeholder): every aligned access at ratio >= 0.95 in libsnd/vmanager
+// (discs 3.3, 3.5) and its 3.6 split objects names this symbol; only low-
+// ratio 3.0 alignments disagree. Weak bss Sony's linker scattered (3.5's
+// vmanager.o puts _svm_okof2 at .bss+0x74E, which the _svm_sreg_buf anchor would
+// land at 0x8008DF3E, not here), so the verdict is the access, as for
+// _svm_auto_kof_mode. Report: SpuVmKeyOnNow.md.
 _svm_okof2 = 0x80090C64;
+// identified (round 99, echo, track 7): libsnd/vm_g.o weak bss (3.5 +0x120),
+// scattered like _svm_auto_kof_mode; every aligned access at ratio >= 0.95
+// (SpuVmKeyOnNow, vmNoiseOn, SetAutoVol, SetAutoPan; discs 3.3, 3.5, 3.6)
+// names it. Report: SpuVmKeyOnNow.md.
 _svm_stereo_mono = 0x8008E8C0;
+// identified (round 99, echo, track 7): libsnd/vm_g.o weak bss (3.5 +0x0,
+// 1 byte), scattered; every aligned access at ratio >= 0.95 across 16
+// vmanager functions on discs 3.3, 3.5, 3.6 names it (the voice count the
+// allocator loops over). Report: SpuVmAlloc.md.
 spuVmMaxVoice = 0x8008E9D0;
+// identified (round 99, echo, track 7): libsnd/vmanager.o (disc 3.5) .data
+// +0x0. Layout lands: retail's bytes from 0x8006DAD4 equal that object's
+// .data (0x1F801C00, then the note2pitch table at +4; 32 bytes compared).
+// Static there, so 3.3/3.5 name nothing; 3.6 split vmanager and its vm_f.o
+// defines the same word as global `_svm_sreg` (ut_vvol/ut_ako read it by
+// that name, aligned 1.00). Report: vmNoiseOn2.md.
 _svm_sreg = 0x8006DAD4;
+// identified (round 99, echo, track 7): libsnd/vmanager SsUtVibrateOn
+// (LIBSND.H). Fingerprint TINY (2 words, `jr ra; nop`); position settles it,
+// as for KeyOnCheck: vmanager.o on discs 3.3 and 3.5 lays out SePitchBend,
+// SsUtVibrateOn, SsUtVibrateOff, SeAutoVol, the last three 8 bytes apart,
+// and retail has SePitchBend (0x1C0 bytes) ending at 0x8002E2F8, then 8, 8,
+// then SeAutoVol at 0x8002E308. Report: SsUtVibrateOn.md.
 SsUtVibrateOn = 0x8002E2F8; // type:func
+// identified (round 99, echo, track 7): libsnd/vmanager SsUtVibrateOff
+// (LIBSND.H), by position; see SsUtVibrateOn. Report: SsUtVibrateOff.md.
 SsUtVibrateOff = 0x8002E300; // type:func
+// identified (round 99, echo, track 7): libsnd/vmanager.o (disc 3.5) .data
+// +0x4, a STATIC no disc names (3.6's vm_n2p/note2pitch also reaches it
+// section-relative): the note-to-SPU-pitch table note2pitch and note2pitch2
+// index by semitone * 16 + fine step. Anchored by _svm_sreg at .data+0 and
+// the object's .data bytes found at 0x8006DAD4. Kept as its placeholder.
+D_8006DAD8 = 0x8006DAD8;
