@@ -19,3 +19,7 @@ void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, voi
     return ((SpriteResetFn)self->methods->reset)(self, texture, abr, rect, arg4, arg5);
 }
 ```
+
+## Track 7 (round 99, charlie)
+
+`arg4`/`arg5` are `resetArg`/`resetWord` (see New_Sprite's report), in the local `SpriteResetFn` too. Byte-exact.

@@ -37,3 +37,7 @@ void LightRig__SetAmbientColor(LightRig *self, LightRigRgb *rgb, s32 swap) {
 ## Track 4
 
 2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__SetAmbientColor`, tier A: slot +0x0BC, named `setAmbientColor` in the header. `self` is `LightRig *` (was `D_8006EFACObj`); the colour is `LightRigRgb`, include/LightRig.h's own all-s8 3-byte colour (was Sprite.h's `SpriteRgb`, the same shape: the lb,lb,lb/sb,sb,sb copies are unchanged). The Source block above is the unified spelling. Image byte-identical.
+
+## Track 7 (round 99, charlie)
+
+`<< 4` -> `<< AMBIENT_TO_FIX12_SHIFT` (unit-local): a 0..255 channel to GsSetAmbient's 0..ONE scale. The unit's local `GsSetAmbient` and `GetTPage` prototypes were dropped in favour of Sony's (<libgs.h>, <libgpu.h>). Byte-exact.

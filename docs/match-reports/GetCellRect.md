@@ -5,7 +5,7 @@
 Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table (called by CharSprite__SetCell) (`tools/classtable.py`).
-- **What:** Copies the 12-byte record `D_8006ED40` = {u 0, v 0, w 8, h 8} into `*dst`, then adds `(cell & 0x1F) * 8` to u and `(cell >> 5) * 8` to v: an 8x8 cell in a 32-wide grid.
+- **What:** Copies the 12-byte record `gCharSpriteCellRect` = {u 0, v 0, w 8, h 8} into `*dst`, then adds `(cell & 0x1F) * 8` to u and `(cell >> 5) * 8` to v: an 8x8 cell in a 32-wide grid.
 - **Result:** byte-exact; 20/20 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK).
 - **Types:** local views and prototypes live in the unit; no shared header was touched.
 
@@ -16,9 +16,9 @@ Three builds. (1) `u8 cell` parameter: cc1 drops the `andi 0xFF` and folds `(cel
 ## Source
 
 ```c
-/* Cell index -> 8x8 rect in a 32-wide grid, offset from D_8006ED40. */
+/* Cell index -> 8x8 rect in a 32-wide grid, offset from gCharSpriteCellRect. */
 void GetCellRect(SpriteRect *dst, u32 cell) {
-    *dst = D_8006ED40;
+    *dst = gCharSpriteCellRect;
     cell &= 0xFF;
     dst->u += (cell & 0x1F) * 8;
     dst->v += (cell >> 5) * 8;
@@ -31,12 +31,20 @@ Retail `andi a1,a1,0xFF` emitted mid-body (after unrelated work), followed by `s
 
 ## Track 4 (2026-09-25, round 82, alpha)
 
-`CellRect_322b4` became `SpriteRect` (include/Sprite.h), the Sprite class's texture-cell type; D_8006ED40 is declared `SpriteRect`. The the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
+`CellRect_322b4` became `SpriteRect` (include/Sprite.h), the Sprite class's texture-cell type; gCharSpriteCellRect is declared `SpriteRect`. The the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
 
 ## Naming
 
-- `GetCellRect` -- tier A. Free function: cell index -> 8x8 rect in a 32-wide grid, offset from the D_8006ED40 origin table. Pure computation, called by both CharSprite__CharSprite (fixed cell) and CharSprite__SetCell (caller's cell); not a method of one class.
+- `GetCellRect` -- tier A. Free function: cell index -> 8x8 rect in a 32-wide grid, offset from the gCharSpriteCellRect origin table. Pure computation, called by both CharSprite__CharSprite (fixed cell) and CharSprite__SetCell (caller's cell); not a method of one class.
 
 ## Track 4
 
 2026-09-26, round 86 (bravo): the class whose methods call it is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74); its prototype moved there from the unit, beside the ctor and setCell that share it. The function is unchanged. Image byte-identical.
+
+## Track 7 (round 99, charlie)
+
+`(cell & 0x1F) * 8` and `(cell >> 5) * 8` are spelled `(cell % CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE` and `(cell / CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE` (32 and 8, include/CharSprite.h); `cell` is `u32`, so `%`/`/` by 32 are the same `andi`/`srl`. `cell &= 0xFF` stays: a byte mask, hex.
+
+### Naming: `D_8006ED40` -> `gCharSpriteCellRect`
+
+Tier A. A 12-byte `SpriteRect` in data, {u 0, v 0, w 8, h 8}, read only here: GetCellRect copies it and moves u,v to the cell's column and row, so it is the rect of cell 0 of CharSprite's font texture. `g` prefix: a splat-owned global, not unit-static. Byte-exact (`tools/rename.py`).

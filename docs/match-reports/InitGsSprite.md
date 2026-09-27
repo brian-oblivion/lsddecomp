@@ -60,3 +60,7 @@ Byte-identical. `sprite` stays the local SpriteGs rather than Sony's
 GsSPRITE: Sprite__SetColor's whole-struct copy needs `rgb` as one SpriteRgb,
 and GetSetBitField takes `attribute` as u32 * (Sony's is unsigned long), so
 Sony's type would add four casts to save two (Viewport__DrawNode).
+
+## Track 7 (round 99, charlie)
+
+`& 3` -> `& 0x3` (a mask); `mode << 24` -> `mode << SPRITE_ATTR_MODE_SHIFT`; `0x80` -> `SPRITE_RGB_NEUTRAL` (128, decimal: a colour); `0x1000` -> Sony's `ONE` (scale 1.0 in 4.12). The shifts and the grey are defined in include/Sprite.h beside SpriteGs. Byte-exact.

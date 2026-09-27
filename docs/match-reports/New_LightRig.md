@@ -33,3 +33,7 @@ LightRig *New_LightRig(void) {
 ## Track 4
 
 2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `New_D8006EFAC`, tier A: the allocator, `BMemPMgrAlloc(0x54)` (the object size in include/LightRig.h). Returns `LightRig *` (was `void *`) and calls `GetLightRigMethods()->ctor(obj)` (was a `Slot08Methods_322b4` cast). Its one caller, IntermediateBase__Init, casts the result to IntermediateBase's `BasicClass *unk14`. The Source block above is the unified spelling. Image byte-identical.
+
+## Track 7 (round 99, charlie)
+
+Allocation size spelled `sizeof(LightRig)` (0x54). Byte-exact.

@@ -36,3 +36,7 @@ void CharSprite__SetCell(CharSprite *self, u8 cell) {
 ## Track 4
 
 2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `D8006EC74__SetCell`, tier A: slot +0x0C4, which the header names `setCell` for it. `self` is `CharSprite *`; `cellIndex` (+0x0A8) is the class's one own field, and u,v are Sprite's `sprite.u`/`sprite.v` (+0x072/+0x073, the offsets `SpriteView_322b4` gave them). The Source block above is the unified spelling. Image byte-identical.
+
+## Track 7 (round 99, charlie)
+
+Local `r` is `cellRect`. Byte-exact.

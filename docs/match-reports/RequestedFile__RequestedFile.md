@@ -85,3 +85,7 @@ The table and getter followed (`gRequestedFileMethods`,
 renametype.py also rewrote the old class name inside earlier sections'
 history prose in this and sibling reports (known, pending an operator
 decision; not hand-reverted).
+
+## Track 7 (round 99, charlie)
+
+`char buf[32]` -> `char nameCopy[REQUESTEDFILE_NAME_SIZE]` (32, include/RequestedFile.h). Byte-exact.

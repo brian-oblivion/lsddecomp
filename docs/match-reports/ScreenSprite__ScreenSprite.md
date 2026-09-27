@@ -32,3 +32,7 @@ void ScreenSprite__ScreenSprite(ScreenSprite *self, void *texture, SpriteRect *r
 ## Track 4
 
 2026-09-25, round 84 (charlie): class unified in `include/ScreenSprite.h`. Renamed from `D8006ED4C__D8006ED4C`, tier A: the ctor slot (+0x008), `Class__Class`. `self` is `ScreenSprite *`; the base call upcasts, `GetSpriteMethods()->ctor((Sprite *)self, texture, 0, rect, NULL, arg3)`. This is the ctor chain that confirms the id tree: Sprite's ctor first, and CharSprite__CharSprite calls this one first. The Source block above is the unified spelling. Image byte-identical.
+
+## Track 7 (round 99, charlie)
+
+`arg3` is `resetWord`, forwarded to the Sprite ctor's last argument. Byte-exact.

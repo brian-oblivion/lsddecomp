@@ -54,7 +54,7 @@ struct SpriteRgb {
 
 /* A texture cell: 16-bit origin in the texture page, 32-bit extent. The
  * ctor's `rect`, copied to `rect` by reset; gVariantSpriteCells (VariantSprite's two
- * cells) and D_8006ED40 (CharSprite's 8x8 cell origin) are these. */
+ * cells) and gCharSpriteCellRect (CharSprite's 8x8 cell origin) are these. */
 struct SpriteRect {
     /* +0x000 */ u16 u;
     /* +0x002 */ u16 v;
@@ -88,6 +88,15 @@ struct SpriteGs {
     /* +0x020 */ s32 rotate; /* updateRotation (Sprite__UpdateRotation): 4096 per degree */
 };
 
+/* Bit positions in SpriteGs.attribute, as libgs.h documents GsSPRITE's. */
+#define SPRITE_ATTR_MODE_SHIFT 24 /* colour mode, 2 bits: the TIM's pmode & 0x3 */
+#define SPRITE_ATTR_RATE_SHIFT 28 /* semitransparency rate, 2 bits (GsAZERO..GsATHREE) */
+#define SPRITE_ATTR_ALON_SHIFT 30 /* GsALON: semitransparency on */
+#define SPRITE_ATTR_DOFF_SHIFT 31 /* GsDOFF: display off */
+
+/* The r, g, b InitGsSprite sets: 128 draws the texture at its own brightness. */
+#define SPRITE_RGB_NEUTRAL 128
+
 /* SceneNode's slots, then this class's own. Occupants in gSpriteMethods
  * named at each own slot; `tools/classtable.py gSpriteMethods --vs
  * gSceneNodeMethods` lists the overrides of the inherited ones (Sprite__Sprite,
@@ -113,7 +122,8 @@ struct SpriteGs {
 /* clang-format on */
 
 struct SpriteMethods {
-    SPRITE_SLOTS(Sprite, (Sprite * self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5));
+    SPRITE_SLOTS(Sprite, (Sprite * self, void *texture, s32 abr, SpriteRect *rect, void *resetArg,
+                          s32 resetWord));
 };
 
 struct Sprite {
@@ -124,8 +134,9 @@ extern SpriteMethods gSpriteMethods;
 extern SpriteMethods *GetSpriteMethods(void); /* returns &gSpriteMethods */
 
 /* The class's own methods, in address order. */
-Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg4);
-void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5);
+Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *resetArg, s32 resetWord);
+void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *resetArg,
+                     s32 resetWord);
 void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect);
 void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, GsIMAGE *tim);
 void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table);

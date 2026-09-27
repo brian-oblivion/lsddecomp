@@ -40,3 +40,57 @@ Allocator/wrapper whose prologue has the constant arg set (`li a0,K`) BEFORE a c
 ## Track 4
 
 2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `New_D8006EC74`, tier A: the allocator, `New_<Class>`. Returns `CharSprite *` and calls the ctor through the unified table; the unit-local `CellCtorMethods_322b4` is gone, as are the callers' local declarations (include/code_2cc8c.h's `Obj6EAC0 *(s32, s32)`, class_3bb8c_i's `ChildObj86ED0 *(ChildObj86ED0 *, s32)`); both callers now cast the result to their own field types. The Source block above is the unified spelling. Image byte-identical.
+
+## Track 7 (round 99, charlie)
+
+Allocation size spelled `sizeof(CharSprite)` (0xAC, the struct's size with word padding after `cellIndex`). Byte-exact.
+
+### History: code_322b4's unit banner before round 99
+
+The unit's banner was rewritten as documentation of what the file holds; the previous text, with the unit's carving and matching history, is kept here verbatim.
+
+```c
+/*
+ * code_322b4 -- GAME code carved from psyq_322b4 on 2026-09-25 (FINISHING-PLAN
+ * revision 18). 0x322B4..0x330F4 (vram 0x80041AB4..0x800428F4). It was counted
+ * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
+ * into game code, a method-table entry beside game methods, or contiguity with
+ * those, and no Sony fingerprint). Owns jtbl_80011290 (attached rodata
+ * sub-slot 0x1A90).
+ *
+ * Round 82 matched every function in the unit (getters, accessors, empty
+ * overrides, then the 11- to 20-word bodies: the sprite attribute-bit
+ * setters, cell selection, finalize chains, the FrameClock allocator), then
+ * named it (track 3): every function is real C, not `func_`.
+ *
+ * Sprite (include/Sprite.h, gSpriteMethods), its direct subclass
+ * ScreenSprite (include/ScreenSprite.h, gScreenSpriteMethods, id 0x144: the
+ * screen-space sprite, adding setPosition (+0x0BC, screenPos) and a
+ * pivot-anchor setter (+0x0C0, centre/left/right/top/bottom)) and ITS
+ * subclass CharSprite (include/CharSprite.h, gCharSpriteMethods, id 0x1144:
+ * one 8x8 font character, adding setCell/getCell (+0x0C4/+0x0C8); GetCellRect
+ * is the free helper its ctor and setCell use to turn a cell index into a
+ * rect) are unified; their own methods (New_Sprite, Sprite__*, InitGsSprite,
+ * GetSpriteMethods, New_ScreenSprite, ScreenSprite__*, GetScreenSpriteMethods,
+ * New_CharSprite, CharSprite__*, GetCharSpriteMethods) live here. Every
+ * class owning methods in this unit is now unified (track 4; FrameClock, the
+ * last, round 88). gTextRowMethods (0x11144, below CharSprite) and
+ * gVariantSpriteMethods (0x1F44, class_3bb8c_p/q/t) are Sprite subclasses too but own
+ * no methods in this unit.
+ * FrameClock (include/FrameClock.h, gFrameClockMethods, id 0x5) is unified:
+ * a BasicClass subclass ticked once per DrawSystem frame that tells its
+ * parents event 2 (counted), 3 (paused) or 4 (flag14); its own methods
+ * (New_FrameClock, FrameClock__*, Get_vtable_FrameClock) live here.
+ * RequestedFile (include/RequestedFile.h, gRequestedFileMethods, id 0xB03) is
+ * unified: a FileResource that requests one named file from the active driver
+ * at construction and sets `loaded` when the driver's setFlag reports it
+ * read (WBgm's SEQ file); its own methods (New_RequestedFile,
+ * RequestedFile__*, GetRequestedFileMethods) live here.
+ * LightRig (include/LightRig.h, gLightRigMethods, id 0x14) is unified too: a
+ * SceneNode subclass owning three FlatLightObj children and an ambient
+ * colour (SetAmbientColor -> GsSetAmbient); its own methods (New_LightRig,
+ * LightRig__*, GetLightRigMethods) live here. Its getLight (+0x0B8) is
+ * inherited unchanged by StageMap's own table (gStageMapMethods), which is why
+ * one function occupies the same slot in both.
+ */
+```
