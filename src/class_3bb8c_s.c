@@ -9,6 +9,9 @@
  * class_3bb8c_r.c; the rest of the sprite helpers in class_3bb8c_o.c.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "Actor.h"
 #include "VariantSprite.h"
 #include "StyleEffect.h"

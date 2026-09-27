@@ -13,6 +13,9 @@
  */
 
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "VariantSprite.h"
 
 /*

@@ -28,6 +28,9 @@
  * constructs anyway, CLAUDE.md "Open toolchain blockers").
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "Actor.h"
 #include "DreamSys.h"
 #include "StageMap.h"

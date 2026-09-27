@@ -31,6 +31,9 @@
  * Header edits must be strictly ADDITIVE.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "class_3bb8c.h"
 #include "DreamSys.h"
 #include "LbdFile.h"

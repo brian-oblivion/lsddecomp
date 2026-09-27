@@ -39,6 +39,9 @@
  * the start of DreamSys rather than the save block.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "GraphRoom.h"
 #include "BoxFill.h"
 #include "DreamSys.h"

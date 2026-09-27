@@ -18,6 +18,9 @@
  * splat-generated `jr $ra; nop` occupants.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_2cc8c.h"
 #include "TextRow.h"
 

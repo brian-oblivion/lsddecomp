@@ -24,6 +24,9 @@
  * report.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "Actor.h"
 #include "StyleEffect.h"
 #include "SoundCueSet.h"
