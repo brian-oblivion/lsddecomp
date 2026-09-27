@@ -105,3 +105,16 @@ named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
 at volume 0x60. TextEntry::target and ItemList::target (+0x03C) and both
 attachTarget prototypes are `struct VabStreamObj *`, the casts at the call
 sites are gone, and `slot80` is `playTone`. Zero bytes changed.
+
+## History (moved from src/class_3bb8c_j.c, round 100)
+
+The comment above this function read: "The first addChild passes all four
+words through (ItemListAddChildWideFn, no code): see this function's report
+for the do/while." It now says what the function does, and the do/while (0)
+with the cached slot and zero keep a MATCHING line.
+
+## Track 7 (round 100, charlie)
+
+Parameters `child1`/`child2` renamed `inputSource`/`tickSource` in the
+definition (the header prototype keeps child1/child2: see the unit's
+proposals), local `fn` renamed `addChildWide`. Zero bytes changed.

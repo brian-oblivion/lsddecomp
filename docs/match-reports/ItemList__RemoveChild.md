@@ -36,3 +36,9 @@ Matched first try.
 ## Naming
 
 - `ItemList__RemoveChild` -- tier A. The removeChild occupant (classtable.py gItemListMethods +0x014): clears the matching tag cache then chains the base removeChild. Mirrors ItemList__AddChild.
+
+## Track 7 (round 100, charlie)
+
+The child's kind is read as `((BasicClass *)x)->methods->header &
+CLASS_ID_ROOT_MASK` and compared with PAD_CLASS_ID/FRAMECLOCK_CLASS_ID
+(were a raw `**(s32 **)x & 0xF` against 2 and 5). Zero bytes changed.

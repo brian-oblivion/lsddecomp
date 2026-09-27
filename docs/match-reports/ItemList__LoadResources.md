@@ -314,3 +314,31 @@ ItemListHandle_3bb8c_j *New_TimImage(char *)` is deleted. `handle1`/
 TimImage__Upload), `slot4` -> the inherited `release`; `handle2` is cast to
 `ItemListHandle_3bb8c_j *` for slot8C, whose parameter is this class's
 own view (not TimImage's to retype). Image byte-identical.
+
+## History (moved from src/class_3bb8c_j.c, round 100)
+
+The comment above this function read: "Two handle variables, not one:
+handle1 and handle2 are disjoint live ranges, and merging them into one `h`
+gives the rotation filed as the round-18/19 stall (75/95, both addresses
+and the handle swapped among $s0-$s2). Same shape as class_3bb8c_i's
+TextEntry__LoadCardResources." It is now a one-line MATCHING comment on the
+two declarations, which are renamed `panelTim`/`fontTim` as in
+TextEntry__LoadCardResources.
+
+## Naming (track 7, round 100, charlie)
+
+Data this function reads, renamed with tools/rename.py:
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| D_80087028 | gItemListPanelRect | A | the only reference is this New_ScreenSprite call's rect: SELECT.TIM's cell, SpriteRect {0, 0, 256, 160}; sibling of gTextEntryPanelRect |
+| D_8008AAF8 | gItemListPanelPos | A | the panel's attachToParent position (-100, -60), a ScreenSpritePos; sibling of gTextEntryPanelPos |
+| D_8008AB14 | sStrSelect | A | the string "SELECT", the panel TIM's name; sibling of sStrComInput |
+| D_800116E4 | sItemListStrFontIcon | A | this unit's copy of "FONTICON" (class_3bb8c_i's is sStrFontIcon, 0x8001161C) |
+| D_8008AB1C | sItemListCardPathPrefix | A | this unit's copy of "CARD\\" (class_3bb8c_i's is sCardPathPrefix) |
+| D_8008AB24 | sItemListTimExt | A | this unit's copy of ".TIM" (class_3bb8c_i's is sTimExt) |
+
+The path buffer's 0x20 is `CARD_TIM_PATH_SIZE` (32, unit-local). The two
+data externs are typed as what they are (`SpriteRect`, `ScreenSpritePos`,
+were `s32`), so the rect needs no cast; the position keeps its `LongVec3 *`
+cast, which SceneNode's attachToParent slot demands (include/ScreenSprite.h).

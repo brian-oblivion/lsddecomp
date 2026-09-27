@@ -71,3 +71,9 @@ exit"), reinforcing that this sub-shape specifically wants `goto`.
 ## Naming
 
 - `New_ItemList` -- tier A. BMemPMgrAlloc(0x54) + dispatch through GetItemListMethods()->ctor(...) -- the project's standard New_X allocator shape, named per the "constructors New_Class" convention. Class identity (0x54-byte ItemList_3bb8c_j, table gItemListMethods) from class_3bb8c.h's round-15 HEAD NOTE plus classtable.py gItemListMethods.
+
+## Track 7 (round 100, charlie)
+
+`BMemPMgrAlloc(0x54)` is `BMemPMgrAlloc(sizeof(ItemList))` (the struct in
+include/ItemList.h ends at +0x054). The goto keeps a one-line MATCHING
+comment; its derivation is "Residue and how it closed" above.

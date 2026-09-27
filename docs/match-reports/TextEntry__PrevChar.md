@@ -101,3 +101,9 @@ exact shape (early-exit-style reset vs. a call as the "main" path).
 Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 Renamed from Obj86ED0__AdvanceCountdown: it decrements charIndex and, while it stays above 0, writes that table byte at the cursor through setCharAt(cursorIndex, charIndex, 1); at 0 it wraps charIndex to charCount without writing. NextChar's mirror. Earlier prose here calling unk1C a 'countdown' predates the class being identified. Tier B.
+
+## History (moved from src/class_3bb8c_j.c's banner, round 100)
+
+The unit banner carried this process note, now in the runner prompts
+instead: "include/class_3bb8c.h is shared with every other class_3bb8c_*
+unit; edits to it must be strictly additive."

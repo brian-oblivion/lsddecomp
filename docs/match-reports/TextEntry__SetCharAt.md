@@ -90,3 +90,14 @@ TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 `setColor` (`gTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
 +0x0C4 `setCell`, called through `TextRowSetCellAtFn` because
 TextRow__SetCellAt takes the index too. Zero bytes changed.
+
+## History (moved from src/class_3bb8c_j.c, round 100)
+
+The comment on this unit's `extern u8 *gNameCharTable;` read: "VALUE-of
+`%gp_rel`, round 45's TextEntry__SetCharAt only -- a byte lookup table (ROM
+image initialises it to D_800115D0, still-uncarved rodata)." It now says
+what the table is.
+
+## Track 7 (round 100, charlie)
+
+Local `obj` renamed `row` (the TextEntry's textRow). Zero bytes changed.

@@ -47,3 +47,9 @@ gBasicClassMethods`: OVERRIDDEN BasicClass__OnNotify), and it chains
 `Get_vtable_BasicClass()->onNotify` first, so the override takes the slot's
 name (FINISHING-PLAN track 4 step 6). The tag-2 child's notifications go to
 `handleInputCode` (+0x05C), the tag-5 child's to `tickClosing` (+0x058).
+
+## Track 7 (round 100, charlie)
+
+The child's kind is read as `((BasicClass *)x)->methods->header &
+CLASS_ID_ROOT_MASK` and compared with PAD_CLASS_ID/FRAMECLOCK_CLASS_ID
+(were a raw `**(s32 **)x & 0xF` against 2 and 5). Zero bytes changed.

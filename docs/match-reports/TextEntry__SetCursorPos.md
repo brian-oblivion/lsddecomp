@@ -108,3 +108,10 @@ gTextEntryCursorPos.x;`. `D_8008AAE0` was that position's y (-12, the word at
 to the same bytes as `%gp_rel(D_8008AAE0)`, and the whole image stayed
 byte-exact. The splat label D_8008AAE0 remains in the data listing with no C
 reference.
+
+## Track 7 (round 100, charlie)
+
+Locals `local`/`obj` renamed `screenPos`/`cursor`. The `* 7` is
+TEXTROW_DEFAULT_PITCH (include/TextRow.h): gTextEntryCursorPos.x (-62)
+equals gTextEntryTextPos.x (-62, class_3bb8c_i), so the cursor steps across
+the text row's cells at the row's own default pitch. Zero bytes changed.
