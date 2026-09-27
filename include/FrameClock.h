@@ -40,6 +40,13 @@
 typedef struct FrameClock FrameClock;
 typedef struct FrameClockMethods FrameClockMethods;
 
+/* The events tick sends its parents (notifyParents(self, event)). */
+enum FrameClockEvent {
+    FRAMECLOCK_EVENT_RUNNING = 2, /* counted: frameCount += 1 first */
+    FRAMECLOCK_EVENT_PAUSED = 3,  /* paused set: not counted */
+    FRAMECLOCK_EVENT_FLAG14 = 4   /* flag14 set: not counted, takes precedence */
+};
+
 /* BasicClass's slots, then this class's own, named for their occupants. */
 struct FrameClockMethods {
     BASICCLASS_SLOTS(FrameClock, (FrameClock * self)); /* FrameClock__FrameClock */

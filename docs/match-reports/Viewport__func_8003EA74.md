@@ -1,12 +1,14 @@
-# func_8003EA74 — MATCHED
+# Viewport__func_8003EA74 — MATCHED
+
+> Renamed from `func_8003EA74` on 2026-09-27 (tools/rename.py). Address 0x8003ea74.
 
 Unit: `code_2cc8c_d`. Round 73, runner charlie (report written retroactively;
-same shape as `func_8003EA6C` immediately above it in ROM order).
+same shape as `Viewport__func_8003EA6C` immediately above it in ROM order).
 
 ## Signature
 
 ```c
-void func_8003EA74(void);
+void Viewport__func_8003EA74(void);
 ```
 
 Not a `gViewportMethods` vtable slot occupant, not a method (no `self`), no caller
@@ -18,9 +20,16 @@ Nothing: `jr $ra; nop`.
 
 ## Naming
 
-Kept `func_8003EA74`. Same reasoning as `func_8003EA6C`: no evidence ties it
+Kept `Viewport__func_8003EA74`. Same reasoning as `Viewport__func_8003EA6C`: no evidence ties it
 to any class or caller.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
 Occupant of Viewport's +0x05C (`slot5C` in `include/Viewport.h`; also in gNodeGuardedViewportMethods). Empty and never called, so neither the slot nor the function is named. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+
+
+## Track 7 (round 95, alpha, polish pass)
+
+## Naming
+
+Renamed from `func_8003EA74` with `tools/rename.py`: tier C, `Class__func_xxxxx`, occupant of gViewportMethods +0x05C (and gNodeGuardedViewportMethods'). Empty body, no C caller of the slot.

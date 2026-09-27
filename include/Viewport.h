@@ -43,7 +43,7 @@
  * Not settled here: fadeBox holds a FadeBox (0x164, below gBoxFillMethods,
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
  * position where SceneNode's attachToParent slot takes a LongVec3 offset;
- * the ctor and Viewport__SetFadeBox pass D_8008A904 (-100, -100) through the
+ * the ctor and Viewport__SetFadeBox pass gFadeBoxAttachPos (-100, -100) through the
  * inherited slot with a pointer cast. unk44 and unk48 multiply to each
  * buffer's packet area (InitOt; defaults 2000 and 64); which is the count
  * and which the size is not shown. drawNode (Viewport__DrawNode) reads its
@@ -62,7 +62,7 @@ typedef struct ViewportOt ViewportOt;
 
 /* The screen size: drawNode reads it as the width and height the box and
  * screen-space sprite paths take percentages of. Defaults 256 x 240
- * (D_8008A8FC, D_8008A900). setScreenSize copies it whole: retail loads both
+ * (gDefaultViewportWidth, gDefaultViewportHeight). setScreenSize copies it whole: retail loads both
  * words before storing either. */
 struct ViewportSize {
     s32 width;
@@ -104,19 +104,19 @@ struct ViewportOt {
     /* +0x04C */ void (*setUnk44)(Self *self, s32 value);          /* Viewport__SetUnk44, before InitOt only */ \
     /* +0x050 */ void (*setUnk48)(Self *self, s32 value);          /* Viewport__SetUnk48, before InitOt only */ \
     /* +0x054 */ void (*setProjection)(Self *self, s32 h);         /* Viewport__SetProjection */     \
-    /* +0x058 */ void (*slot58)(void);                             /* func_8003EA6C, empty */        \
-    /* +0x05C */ void (*slot5C)(void);                             /* func_8003EA74, empty */        \
+    /* +0x058 */ void (*slot58)(void);                             /* Viewport__func_8003EA6C, empty */        \
+    /* +0x05C */ void (*slot5C)(void);                             /* Viewport__func_8003EA74, empty */        \
     /* +0x060 */ void (*setLightMode)(Self *self, s32 mode);       /* Viewport__SetLightMode */      \
     /* +0x064 */ void (*setClearColor)(Self *self, ViewportRgb *color); /* Viewport__SetClearColor */ \
     /* +0x068 */ void (*setFarColor)(Self *self, ViewportRgb *color);   /* Viewport__SetFarColor */ \
     /* +0x06C */ void (*setFogNear)(Self *self, s32 fogNear);      /* Viewport__SetFogNear */        \
-    /* +0x070 */ void (*attachViewChild)(Self *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr, Ratio16 *twist); /* Viewport__AttachViewChild; NULL twist: D_8008A8F4 */ \
+    /* +0x070 */ void (*attachViewChild)(Self *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr, Ratio16 *twist); /* Viewport__AttachViewChild; NULL twist: gDefaultViewTwist */ \
     /* +0x074 */ void (*detachViewChild)(Self *self);              /* Viewport__DetachViewChild */   \
     /* +0x078 */ void (*setViewPoint)(Self *self, LongVec3 *vp);  /* Viewport__SetViewPoint */      \
     /* +0x07C */ void (*setViewRef)(Self *self, LongVec3 *vr);    /* Viewport__SetViewRef */        \
     /* +0x080 */ void (*setTwist)(Self *self, Ratio16 *twist); /* Viewport__SetTwist */       \
-    /* +0x084 */ void (*slot84)(void);                             /* func_8003ECC0, empty */        \
-    /* +0x088 */ void (*slot88)(void);                             /* func_8003ECC8, empty */        \
+    /* +0x084 */ void (*slot84)(void);                             /* Viewport__func_8003ECC0, empty */        \
+    /* +0x088 */ void (*slot88)(void);                             /* Viewport__func_8003ECC8, empty */        \
     /* +0x08C */ void (*initOt)(Self *self);                       /* Viewport__InitOt */            \
     /* +0x090 */ void (*deinitOt)(Self *self);                     /* Viewport__DeinitOt */          \
     /* +0x094 */ void (*onNotifyTag5)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag5: onNotify's class-5 (FrameClock) case */ \
@@ -189,8 +189,8 @@ void Viewport__SetOtLength(Viewport *self, s32 length);
 void Viewport__SetUnk44(Viewport *self, s32 value);
 void Viewport__SetUnk48(Viewport *self, s32 value);
 void Viewport__SetProjection(Viewport *self, s32 h);
-void func_8003EA6C(void);
-void func_8003EA74(void);
+void Viewport__func_8003EA6C(void);
+void Viewport__func_8003EA74(void);
 void Viewport__SetLightMode(Viewport *self, s32 mode);
 void Viewport__SetClearColor(Viewport *self, ViewportRgb *color);
 void Viewport__SetFarColor(Viewport *self, ViewportRgb *color);
@@ -201,8 +201,8 @@ void Viewport__DetachViewChild(Viewport *self);
 void Viewport__SetViewPoint(Viewport *self, LongVec3 *vp);
 void Viewport__SetViewRef(Viewport *self, LongVec3 *vr);
 void Viewport__SetTwist(Viewport *self, Ratio16 *twist);
-void func_8003ECC0(void);
-void func_8003ECC8(void);
+void Viewport__func_8003ECC0(void);
+void Viewport__func_8003ECC8(void);
 void Viewport__InitOt(Viewport *self);
 void Viewport__DeinitOt(Viewport *self);
 void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event);

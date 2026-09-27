@@ -1,23 +1,41 @@
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_2cc8c.h"
 #include "Viewport.h"
+#include "FrameClock.h"
 
 /*
- * The rest of Viewport's own table (gViewportMethods, include/Viewport.h,
- * whose banner says what the class does): the ctor, finalize and the child
- * overrides live in the sibling unit code_2cc8c_c.c; this unit holds the
- * onNotify override and its two per-sender handlers, the field setters,
- * the view-node attach/detach (the node, its GsRVIEW2 viewpoint, reference
- * point and twist, handed to Sony's GsSetRefView2), the double-buffered GsOT
- * allocation (InitOt/DeinitOt) and the two per-frame methods: Update
- * (projection, near clip, light mode, fog, ref view, clears this frame's OT
- * and draws the scene into it) and Flip (sorts the clear, draws the OT and
- * takes the next buffer index from the DrawSystem).
+ * code_2cc8c_d -- Viewport's methods from onNotify (+0x038) to the end of
+ * gViewportMethods (include/Viewport.h, whose banner says what the class
+ * is); the ctor, finalize and the child overrides are in code_2cc8c_c.c,
+ * drawNode in code_2864.c. In table order:
+ *  - onNotify and its two per-sender handlers: a FrameClock event runs
+ *    update, the DrawSystem's VSync event runs flip;
+ *  - initDefaults and the field setters (screen size, OT length, the two
+ *    packet-area factors, which only take before initOt, projection, light
+ *    mode, clear and far colours, fog near); four slots hold empty bodies;
+ *  - attachViewChild/detachViewChild and the setters of the GsRVIEW2 that
+ *    GsSetRefView2 takes (viewpoint, reference point, twist);
+ *  - initOt/deinitOt: one allocation holding both halves of the
+ *    double-buffered GsOT, each a header, its tags and its packet area;
+ *  - update, per frame: projection, near clip, light mode and fog, the
+ *    reference view, then this half's packet area and cleared OT, and the
+ *    scene drawn into it;
+ *  - flip: takes the buffer index from the DrawSystem, swaps, sorts the
+ *    clear into the OT and draws it;
+ *  - setFadeBox/getFadeBox and two flag setters.
+ * Then the table getter, GetRootNode (update's helper) and Sony's
+ * GsSetProjection.
+ *
+ * The (GsOT *) and (GsRVIEW2 *) casts stand until include/Viewport.h spells
+ * ViewportOt and ViewportRefView as Sony's own types.
  */
 
-/* Forwards to the base onNotify, then dispatches self's own onNotifyTag5 or
- * onNotifyTag1 by the sender's class-id nibble (5 or 1; the same tag idiom as
- * Viewport__AddChild). Neither dispatch happens for any other tag. */
+/* Forwards to the base onNotify, then dispatches on the sender's class-id
+ * nibble: 5 (a FrameClock) to onNotifyTag5, 1 (the DrawSystem) to
+ * onNotifyTag1, anything else nowhere. */
 void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
     s32 tag;
 
@@ -31,43 +49,33 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
     }
 }
 
-/* MATCHED round 49. Two levers were needed, see docs/match-reports/Viewport__InitDefaults.md:
- * (1) retail reloads the address of `D_8008A8F8` INDEPENDENTLY for each of
- * the two whole-struct copies (two separate lui/addiu pairs); GCC 2.6.3
- * otherwise CSEs that into one shared computation. Declaring a second
- * extern name aliased to the same symbol via `__asm__("D_8008A8F8")` (the
- * same alternate-name idiom `code_179d8_m.c` already uses) gives the
- * second copy a textually distinct symbol, defeating the CSE without
- * `volatile`'s much worse codegen. (2) Two bare `__asm__("")` scheduling
- * barriers pin the two independent zero-inits and the two global-loaded
- * stores to retail's own early positions instead of letting the scheduler
- * defer them to just before the byte copies. */
-extern s32 D_8008A8FC;
-extern s32 D_8008A900;
-extern ViewportRgb D_8008A8F8;
-extern ViewportRgb D_8008A8F8_b __asm__("D_8008A8F8");
+extern s32 gDefaultViewportWidth;
+extern s32 gDefaultViewportHeight;
+extern ViewportRgb gDefaultViewportColor;
+/* MATCHING: a second name for the same symbol, so cc1 cannot share one
+ * address computation between the two copies; retail loads it twice. */
+extern ViewportRgb gDefaultViewportColorAlias __asm__("gDefaultViewportColor");
 
+/* Every field's default; both colours start black (gDefaultViewportColor). */
 void Viewport__InitDefaults(Viewport *self) {
     self->unk90 = 0;
     self->otReady = 0;
-    /* Keeps the D_8008A8FC / D_8008A900 loads below the unk90 and otReady
-     * zero stores; without it GCC hoists both loads to the top. */
+    /* MATCHING: without it both loads hoist above the two zero stores. */
     __asm__("");
-    self->screenSize.width = D_8008A8FC;
-    self->screenSize.height = D_8008A900;
-    /* Keeps the two screenSize stores directly after their loads; without
-     * it they sink below the otLength..fogNear constant stores. */
+    self->screenSize.width = gDefaultViewportWidth;
+    self->screenSize.height = gDefaultViewportHeight;
+    /* MATCHING: without it both stores sink below the constant stores. */
     __asm__("");
-    self->otLength = 0xD;
-    self->unk44 = 0x7D0;
-    self->unk48 = 0x40;
-    self->projH = 0x100;
-    self->nearZ = 0xA;
-    self->farZ = 0x10000;
+    self->otLength = 13;
+    self->unk44 = 2000;
+    self->unk48 = 64;
+    self->projH = 256;
+    self->nearZ = 10;
+    self->farZ = 65536;
     self->lightMode = 0;
-    self->fogNear = 0x4E20;
-    self->farColor = D_8008A8F8;
-    self->clearColor = D_8008A8F8_b;
+    self->fogNear = 20000;
+    self->farColor = gDefaultViewportColor;
+    self->clearColor = gDefaultViewportColorAlias;
     self->unkB4 = 0;
     self->drawEnabled = 1;
 }
@@ -80,14 +88,14 @@ void Viewport__SetOtLength(Viewport *self, s32 length) {
     self->otLength = length;
 }
 
-/* Only writes unk44 the first time (guarded by the otReady latch). */
+/* Takes only before InitOt: unk44 is one factor of each packet area. */
 void Viewport__SetUnk44(Viewport *self, s32 value) {
     if (self->otReady == 0) {
         self->unk44 = value;
     }
 }
 
-/* Same guard as Viewport__SetUnk44, writes unk48 instead. */
+/* The same guard, for the other factor, unk48. */
 void Viewport__SetUnk48(Viewport *self, s32 value) {
     if (self->otReady == 0) {
         self->unk48 = value;
@@ -98,9 +106,9 @@ void Viewport__SetProjection(Viewport *self, s32 h) {
     self->projH = h;
 }
 
-void func_8003EA6C(void) {}
+void Viewport__func_8003EA6C(void) {}
 
-void func_8003EA74(void) {}
+void Viewport__func_8003EA74(void) {}
 
 void Viewport__SetLightMode(Viewport *self, s32 mode) {
     self->lightMode = mode;
@@ -118,29 +126,22 @@ void Viewport__SetFogNear(Viewport *self, s32 fogNear) {
     self->fogNear = fogNear;
 }
 
-/* GsSetRefView2 is Sony's (`libgs/gs_131.o`, linked from the SDK object).
-   Declared LOCALLY rather than in include/code_2cc8c.h, which six units
-   include: the real `LIBGS.H` prototype for this name will collide there.
-   This is only the shape THIS unit's call sites use -- the real one takes a
-   GsRVIEW2*. */
-extern void GsSetRefView2(void *arg0);
-
 /* One-time init, skipped once a view node is set: adds `node` as a child
  * (addChild caches it as viewNode), sets the viewpoint, reference point and
- * twist (D_8008A8F4 when `twist` is NULL), then hands refView to
+ * twist (gDefaultViewTwist when `twist` is NULL), then hands refView to
  * GsSetRefView2. */
 void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr,
                                Ratio16 *twist) {
-    ViewportMethods *m = self->methods;
+    ViewportMethods *methods = self->methods;
 
     if (self->viewNode != NULL) {
         return;
     }
-    m->addChild(self, node);
-    m->setViewPoint(self, vp);
-    m->setViewRef(self, vr);
-    m->setTwist(self, twist != NULL ? twist : &D_8008A8F4);
-    GsSetRefView2(&self->refView);
+    methods->addChild(self, node);
+    methods->setViewPoint(self, vp);
+    methods->setViewRef(self, vr);
+    methods->setTwist(self, twist != NULL ? twist : &gDefaultViewTwist);
+    GsSetRefView2((GsRVIEW2 *)&self->refView);
 }
 
 /* Teardown counterpart to Viewport__AttachViewChild: removes the view node
@@ -167,45 +168,29 @@ void Viewport__SetViewRef(Viewport *self, LongVec3 *vr) {
 }
 
 void Viewport__SetTwist(Viewport *self, Ratio16 *twist) {
-    s32 q1, r1, q2;
+    s32 whole, rem, frac;
 
     if (self->viewNode != NULL) {
-        q1 = twist->num / twist->den;
-        r1 = twist->num % twist->den;
-        q2 = (r1 << 12) / twist->den;
-        self->refView.rz = (q1 << 12) + q2;
+        whole = twist->num / twist->den;
+        rem = twist->num % twist->den;
+        frac = rem * ONE / twist->den;
+        self->refView.rz = whole * ONE + frac;
     }
 }
 
-void func_8003ECC0(void) {}
+void Viewport__func_8003ECC0(void) {}
 
-void func_8003ECC8(void) {}
+void Viewport__func_8003ECC8(void) {}
 
-/* One-time allocation of this object's two ordering tables (see
- * docs/match-reports/Viewport__InitOt.md). Each half of the buffer is a
- * 0x14-byte GsOT header, 4 << otLength bytes of OT tags, then unk48 * unk44
- * bytes of packet area. The header size is a LOCAL on purpose: written as a
- * literal, fold() reassociates the constant to the outside of the sum and
- * the final addu/addiu pair swaps (round 71). */
-extern void GsClearOt(s32 a0, s32 a1, ViewportOt *ot);
-/* Two more, identified in round 78 (FINISHING-PLAN track 2) and moved here
- * from include/code_2cc8c.h. Both prototypes are LIBGS.H's own; PACKET is
- * LIBGS.H's `typedef unsigned char PACKET`.
- *   GsSetNearClip   libgs/gs_101   was func_8003FB0C
- *   GsSetWorkBase   libgs/gs_124   was func_8003FBE4
- * And one identified in round 79, also LIBGS.H's own prototype:
- *   GsSetProjection libgs/gs_106   was Unk18Obj__SetGeomScreen (its argument
- *                                  is the projection distance h, which this
- *                                  unit also passes as SetFogNear's h) */
-extern void GsSetNearClip(long clip_near);
-extern void GsSetWorkBase(unsigned char *outpacketp);
-extern void GsSetProjection(long h);
-extern void *BMemPMgrAlloc(s32 size);
-
+/* One-time allocation of the two ordering tables. Each half of the buffer
+ * is a GsOT header, its 1 << otLength four-byte tags, then unk48 * unk44
+ * bytes of packet area. */
 void Viewport__InitOt(Viewport *self) {
     s32 size;
     s32 buf;
-    s32 hdrSize = 0x14; /* sizeof(GsOT) */
+    /* MATCHING: written inline, the constant reassociates out of the sum and
+     * the final addu/addiu pair swaps. */
+    s32 hdrSize = sizeof(GsOT);
 
     if (self->otReady != 0) {
         return;
@@ -219,7 +204,7 @@ void Viewport__InitOt(Viewport *self) {
     }
 
     self->ot[0] = (ViewportOt *)buf;
-    self->otTags[0] = buf + 0x14;
+    self->otTags[0] = buf + sizeof(GsOT);
     self->workBase[0] = (4 << self->otLength) + self->otTags[0];
 
     self->ot[1] = (ViewportOt *)(size + (s32)self->ot[0]);
@@ -232,20 +217,12 @@ void Viewport__InitOt(Viewport *self) {
     self->ot[1]->length = self->otLength;
     self->ot[1]->org = self->otTags[1];
 
-    GsClearOt(0, 0, self->ot[0]);
-    GsClearOt(0, 0, self->ot[1]);
+    GsClearOt(0, 0, (GsOT *)self->ot[0]);
+    GsClearOt(0, 0, (GsOT *)self->ot[1]);
 
     self->otReady = 1;
     self->otIndex = 0;
 }
-
-/* Sony's `DrawSync` (libgpu/sys, fingerprint exact vs the disc corpus, not
- * yet linked from an SDK object). LOCAL to this unit, not code_2cc8c.h --
- * see the note on ResetGraph/GsClearOt above: a second declaration of this
- * name in a header six units include is exactly where LIBGPU.H's own
- * prototype (`extern int DrawSync(int mode);`) will one day collide. This
- * call site passes a literal 0 and ignores the return. */
-extern void DrawSync(s32 mode);
 
 /* Teardown counterpart to Viewport__InitOt's init. */
 void Viewport__DeinitOt(Viewport *self) {
@@ -256,14 +233,16 @@ void Viewport__DeinitOt(Viewport *self) {
     }
 }
 
-/* Counts the notification in unk90, and runs update on events 2 and 3. */
+/* A FrameClock event: counts every one in unk90, and runs update on a tick
+ * whether the clock is running or paused (not on FRAMECLOCK_EVENT_FLAG14). */
 void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event) {
     self->unk90 = self->unk90 + 1;
-    if (event == 2 || event == 3) {
+    if (event == FRAMECLOCK_EVENT_RUNNING || event == FRAMECLOCK_EVENT_PAUSED) {
         self->methods->update(self);
     }
 }
 
+/* A DrawSystem event: its per-VSync event (2) runs flip. */
 void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event) {
     if (event == 2) {
         self->methods->flip(self);
@@ -276,31 +255,6 @@ void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event) {
  * marks its super coordinate for recompute, recomputes zDiv, sets this
  * half's packet area and clears its OT, then draws sceneRoot and the root
  * of the view node's parent chain. */
-/* Psy-Q's GTE far-colour register writer (libgte/reg03, linked from Sony's
- * own SDK object). LOCAL to this unit, not code_2cc8c.h -- see the note on
- * SetGeomScreen below. This call site reads self->farColor's own three bytes
- * UNSIGNED (`lbu`, not `lb`) even though Viewport__SetFarColor writes them as signed
- * bytes; the disagreement is kept as a local cast rather than a retype of the
- * field. Sony's own argument type is `long` for each. */
-extern void SetFarColor(u8 a0, u8 a1, u8 a2);
-
-/* Three more of Sony's, linked from the SDK objects since round 34 and
- * declared LOCALLY for the same reason as GsSetRefView2 above: they used to
- * sit in include/code_2cc8c.h as `func_8003Fxxx`, and under their real names
- * a header six units include is exactly where LIBGS.H's own prototypes will
- * one day collide. These are only the shapes THIS unit's call sites use.
- *   GsSetLightMode  libgs/gs_108   was func_8003FC70
- *   SetFogNear      libgte/fog_01  was func_8003FD4C
- *   GsClearOt       libgs/gs_113   was func_8003FC18
- * GsClearOt's real third argument is a `GsOT *` (its first two are Sony's
- * `offset` and `point`). This call site already passed it as a plain word, so
- * it is left that way -- the shape the header carried before round 14 retyped
- * it to a `TexPageDesc *`, which was code_2cc8c_e.c's reading of that same
- * GsOT. */
-extern void GsSetLightMode(s32 a0);
-extern void SetFogNear(s32 a0, s32 a1);
-extern void GsClearOt(s32 a0, s32 a1, ViewportOt *ot);
-
 void Viewport__Update(Viewport *self) {
     s32 idx;
     SceneNode *root;
@@ -317,22 +271,21 @@ void Viewport__Update(Viewport *self) {
     GsSetNearClip(self->nearZ);
     GsSetLightMode(self->lightMode);
 
-    if (self->lightMode == 1 || self->lightMode == 3) {
-        u8 *rawBytes = (u8 *)&self->farColor;
-        SetFarColor(rawBytes[0], rawBytes[1], rawBytes[2]);
+    if (self->lightMode == GsLMODE_FOG || self->lightMode == 3) {
+        SetFarColor((u8)self->farColor.r, (u8)self->farColor.g, (u8)self->farColor.b);
         SetFogNear(self->fogNear, self->projH);
     }
 
-    GsSetRefView2(&self->refView);
+    GsSetRefView2((GsRVIEW2 *)&self->refView);
     self->refView.super->flg = 0;
 
     self->zDiv = (u32)(self->farZ - self->nearZ) / (u32)(1 << self->otLength) + 1;
 
     idx = self->otIndex;
-    GsSetWorkBase((unsigned char *)self->workBase[idx]);
+    GsSetWorkBase((PACKET *)self->workBase[idx]);
 
     idx = self->otIndex;
-    GsClearOt(0, 0, self->ot[idx]);
+    GsClearOt(0, 0, (GsOT *)self->ot[idx]);
 
     self->methods->drawNode(self, self->sceneRoot);
 
@@ -342,31 +295,12 @@ void Viewport__Update(Viewport *self) {
     }
 }
 
-/* Sony's `GsDrawOt` (libgs/gs_111, linked from the SDK object since round
- * 34; was func_8003FBF4, and was declared in include/code_2cc8c.h until this
- * round). Local for the same collision reason as the three above. Sony's own
- * argument is a `GsOT *`; this call site passes the same otIndex-indexed slot
- * it hands GsClearOt, as a plain word, and is left that way.
- * gs_111 and gs_112 are byte-identical objects defining GsDrawOt and
- * GsDrawOtIO at this one address -- gs_111/GsDrawOt is what the build links. */
-extern void GsDrawOt(ViewportOt *ot);
-
-/* Sony's `GsSortClear` (libgs/gs_001, fingerprint exact vs the disc corpus,
- * not yet linked from an SDK object). Local for the same collision reason as
- * the three above: LIBGS.H's own prototype is `void GsSortClear(u_char r,
- * u_char g, u_char b, GsOT *ot);`. This call site reads self->clearColor's own
- * three bytes UNSIGNED (same "writer reads signed, this reader reads
- * unsigned" situation as farColor/Viewport__Update) and passes the fourth as a
- * plain word, same as GsClearOt/GsDrawOt above. */
-extern void GsSortClear(u8 a0, u8 a1, u8 a2, ViewportOt *ot);
-
-/* Takes otIndex from the DrawSystem's getActiveBuffer (+0x054); when drawing
- * is enabled, resets the GPU, swaps (+0x050; once more on buffer 0 when
- * unkB4 is set), sorts the clear into this half's OT and draws it (and swaps
- * again on buffer 0 with unkB4); then flips otIndex to the other half. */
+/* Takes otIndex from the DrawSystem's getActiveBuffer; when drawing is
+ * enabled, resets the GPU, swaps (once more on buffer 0 when unkB4 is set),
+ * sorts the clear into this half's OT and draws it (and swaps again on
+ * buffer 0 with unkB4); then flips otIndex to the other half. */
 void Viewport__Flip(Viewport *self) {
     s32 idx;
-    u8 *rawBytes;
 
     if (self->otReady == 0) {
         return;
@@ -387,11 +321,10 @@ void Viewport__Flip(Viewport *self) {
     }
 
     idx = self->otIndex;
-    rawBytes = (u8 *)&self->clearColor;
-    GsSortClear(rawBytes[0], rawBytes[1], rawBytes[2], self->ot[idx]);
+    GsSortClear(self->clearColor.r, self->clearColor.g, self->clearColor.b, (GsOT *)self->ot[idx]);
 
     idx = self->otIndex;
-    GsDrawOt(self->ot[idx]);
+    GsDrawOt((GsOT *)self->ot[idx]);
 
     if (self->unkB4 != 0 && self->otIndex == 0) {
         self->drawSystem->methods->swapBuffers(self->drawSystem);
@@ -401,12 +334,12 @@ tail_check:
     self->otIndex = (self->otIndex == 0);
 }
 
-/* Only while no view node is set: releases the current fadeBox, installs
- * `handle`, and attaches it under sceneRoot at D_8008A904 (-100, -100). The
- * occupant of handle's +0x04C (BoxFill__AttachToParent, a FadeBox's) takes a
- * screen position where SceneNode's attachToParent slot types a LongVec3
- * offset, hence the cast (include/Viewport.h, "Not settled here"). */
-void Viewport__SetFadeBox(Viewport *self, SceneNode *handle) {
+/* Only while no view node is set: releases the current fade box, installs
+ * `fadeBox`, and attaches it under sceneRoot at gFadeBoxAttachPos
+ * (-100, -100). A FadeBox's attachToParent (BoxFill__AttachToParent) takes a
+ * screen position where SceneNode's slot types a LongVec3 offset, hence the
+ * cast (include/Viewport.h, "Not settled here"). */
+void Viewport__SetFadeBox(Viewport *self, SceneNode *fadeBox) {
     if (self->viewNode != NULL) {
         return;
     }
@@ -415,9 +348,9 @@ void Viewport__SetFadeBox(Viewport *self, SceneNode *handle) {
         self->fadeBox->methods->release(self->fadeBox);
     }
 
-    self->fadeBox = handle;
-    if (handle != NULL) {
-        handle->methods->attachToParent(handle, self->sceneRoot, (LongVec3 *)D_8008A904);
+    self->fadeBox = fadeBox;
+    if (fadeBox != NULL) {
+        fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
     }
 }
 
@@ -447,20 +380,8 @@ SceneNode *GetRootNode(SceneNode *node) {
     return node;
 }
 
-/* Psy-Q's GTE far-colour and geometric-screen-distance register writers
- * (libgte/reg03, linked from Sony's own SDK object). Declared LOCAL to this
- * unit rather than in code_2cc8c.h, which nine units include, since they
- * belong to another translation unit (CLAUDE.md's header-contention rule).
- * Both take `long` as LIBGTE.H declares them.
- *
- * GsSetProjection below is Sony's libgs/gs_106 (round 79, FINISHING-PLAN
- * track 2: an 18-way EXACT tie that position settles -- it is the last word
- * before the placed libgs run, zero gap to gs_131, and gs_106 is the only
- * libgs module among the ties -- and LIBGS.H's `GsSetProjection(long h)`
- * agrees with its call site). It is kept here as matched C because no object
- * places it; progress.py counts it as library via its `identified` line. */
-extern void SetGeomScreen(long h);
-
+/* Sony's libgs GsSetProjection (gs_106). No SDK object places it, so it is
+ * carried as C; progress.py counts it as library. */
 void GsSetProjection(long h) {
     SetGeomScreen(h);
 }

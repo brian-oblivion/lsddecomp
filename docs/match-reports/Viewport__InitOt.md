@@ -673,3 +673,46 @@ otherwise.
 ## Track 4 (2026-09-25, round 85, bravo)
 
 Renamed from `Unk18Obj__InitOt`. Slot +0x08C `initOt`. Its carving names the fields: `ot[2]` (+0x078, each a 0x14-byte GsOT header, `ViewportOt`, whose `length` and `org` it sets), `otTags[2]` (+0x080, each OT's tag array) and `workBase[2]` (+0x088, each half's packet area). The arithmetic is unchanged: ot[1] is still `(ViewportOt *)(size + (s32)ot[0])`, the int form, and GsClearOt's local prototype takes a `ViewportOt *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+
+## Sony's headers (round 95, alpha, polish pass)
+
+src/code_2cc8c_d.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsClearOt(0, 0, (GsOT *)self->ot[0])` and `[1]`: `ViewportOt` is Sony's GsOT under a local name (include/Viewport.h).
+
+The comments that sat on the deleted prototypes, moved here verbatim:
+
+```c
+/* One-time allocation of this object's two ordering tables (see
+ * docs/match-reports/Viewport__InitOt.md). Each half of the buffer is a
+ * 0x14-byte GsOT header, 4 << otLength bytes of OT tags, then unk48 * unk44
+ * bytes of packet area. The header size is a LOCAL on purpose: written as a
+ * literal, fold() reassociates the constant to the outside of the sum and
+ * the final addu/addiu pair swaps (round 71). */
+extern void GsClearOt(s32 a0, s32 a1, ViewportOt *ot);
+/* Two more, identified in round 78 (FINISHING-PLAN track 2) and moved here
+ * from include/code_2cc8c.h. Both prototypes are LIBGS.H's own; PACKET is
+ * LIBGS.H's `typedef unsigned char PACKET`.
+ *   GsSetNearClip   libgs/gs_101   was func_8003FB0C
+ *   GsSetWorkBase   libgs/gs_124   was func_8003FBE4
+ * And one identified in round 79, also LIBGS.H's own prototype:
+ *   GsSetProjection libgs/gs_106   was Unk18Obj__SetGeomScreen (its argument
+ *                                  is the projection distance h, which this
+ *                                  unit also passes as SetFogNear's h) */
+extern void GsSetNearClip(long clip_near);
+extern void GsSetWorkBase(unsigned char *outpacketp);
+extern void GsSetProjection(long h);
+extern void *BMemPMgrAlloc(s32 size);
+```
+
+
+## Track 7 (round 95, alpha, polish pass)
+
+The 0x14 header is `sizeof(GsOT)` (the unit now includes `<libgs.h>`). The local `hdrSize` stays: re-measured this round, writing `(s32)sizeof(GsOT)` inline in the sum fails the image at word 14 (0x8003ED08: retail `3c00038e`, built `3c00028e`), the same reassociation the old comment described. `buf + 0x14` is `buf + sizeof(GsOT)`, byte-identical. The function comment, before, verbatim:
+
+```c
+/* One-time allocation of this object's two ordering tables (see
+ * docs/match-reports/Viewport__InitOt.md). Each half of the buffer is a
+ * 0x14-byte GsOT header, 4 << otLength bytes of OT tags, then unk48 * unk44
+ * bytes of packet area. The header size is a LOCAL on purpose: written as a
+ * literal, fold() reassociates the constant to the outside of the sum and
+ * the final addu/addiu pair swaps (round 71). */
+```

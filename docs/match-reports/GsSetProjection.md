@@ -75,3 +75,30 @@ as the callee; the body calls libgte's `SetGeomScreen`.
 Renamed with `tools/rename.py`, retyped to LIBGS.H's shape (`long h`), and its
 prototype moved out of `include/code_2cc8c.h` into `src/code_2cc8c_d.c`,
 following round 78's `GsSetNearClip` precedent. Byte-identical.
+
+## Sony's headers (round 95, alpha, polish pass)
+
+src/code_2cc8c_d.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: none: the definition already had LIBGS.H's shape; `SetGeomScreen` now comes from `<libgte.h>`.
+
+The comments that sat on the deleted prototypes, moved here verbatim:
+
+```c
+/* Psy-Q's GTE far-colour and geometric-screen-distance register writers
+ * (libgte/reg03, linked from Sony's own SDK object). Declared LOCAL to this
+ * unit rather than in code_2cc8c.h, which nine units include, since they
+ * belong to another translation unit (CLAUDE.md's header-contention rule).
+ * Both take `long` as LIBGTE.H declares them.
+ *
+ * GsSetProjection below is Sony's libgs/gs_106 (round 79, FINISHING-PLAN
+ * track 2: an 18-way EXACT tie that position settles -- it is the last word
+ * before the placed libgs run, zero gap to gs_131, and gs_106 is the only
+ * libgs module among the ties -- and LIBGS.H's `GsSetProjection(long h)`
+ * agrees with its call site). It is kept here as matched C because no object
+ * places it; progress.py counts it as library via its `identified` line. */
+extern void SetGeomScreen(long h);
+```
+
+
+## Track 7 (round 95, alpha, polish pass)
+
+Its comment in the unit is now two lines (Sony's libgs gs_106, carried as C because no object places it); the identification history stays above.

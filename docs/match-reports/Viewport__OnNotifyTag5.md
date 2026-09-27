@@ -51,3 +51,12 @@ what retail's own disassembly shows, not a general rule either way.
 ## Track 4 (2026-09-25, round 85, bravo)
 
 Renamed from `Unk18Obj__OnNotifyTag5`. Slot +0x094 `onNotifyTag5`, onNotify's class-5 (FrameClock) case: counts in unk90 and runs +0x09C `update` on events 2 and 3. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+
+
+## Track 7 (round 95, alpha, polish pass)
+
+Events 2 and 3 are `FRAMECLOCK_EVENT_RUNNING` and `FRAMECLOCK_EVENT_PAUSED`, a new `enum FrameClockEvent` in include/FrameClock.h (values from FrameClock__Tick, the clock's own banner). Byte-identical.
+
+## Proposed field names (round 95, alpha)
+
+Viewport's `unk90` -> `clockEventCount` (tier A: this function increments it on every FrameClock event and InitDefaults zeroes it; nothing in this unit reads it).
