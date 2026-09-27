@@ -75,7 +75,7 @@ before trusting anything downstream.
 Round 52 (alpha), FINISHING-PLAN track 3.
 
 Not renamed. `SetDataDirectory` is a setter (`D_8008A854 = value;`) and
-`func_800270B8` its getter (`return D_8008A854;`). `D_8008A854` is a real
+`GetDataDirectory` its getter (`return D_8008A854;`). `D_8008A854` is a real
 `.sdata` global initialized to `0x8006D4A8`, which sits at (or just past)
 the tail of the gFileResourceMethods method table as splat has it carved -- possibly
 meaning the table boundary is one word short and this actually points at a
@@ -83,5 +83,5 @@ separate, unidentified global. No caller of either function was found
 anywhere in the tree, so there is no usage evidence to lean on either. A
 wrong tier-A/B guess here (e.g. asserting this is some kind of shared-vtable
 pointer cache) would be worse than the placeholder. Kept as
-`SetDataDirectory`/`func_800270B8`; write down what is known and revisit once
+`SetDataDirectory`/`GetDataDirectory`; write down what is known and revisit once
 `D_8006D4A8` or a caller is identified.

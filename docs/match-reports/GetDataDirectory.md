@@ -1,4 +1,6 @@
-# func_800270B8 -- MATCHED 3/3 words, round 42 (2026-09-15)
+# GetDataDirectory -- MATCHED 3/3 words, round 42 (2026-09-15)
+
+> Renamed from `func_800270B8` on 2026-09-27 (tools/rename.py). Address 0x800270b8.
 
 > **VERDICT CORRECTED, round 42 (2026-09-15). THIS FUNCTION IS MATCHED.**
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
@@ -16,7 +18,7 @@
 > derivation may still be right, its VERDICT is not. Rebuild before believing
 > any score in it.
 
-# func_800270B8
+# GetDataDirectory
 
 **Unit:** code_171e0 · **Size:** 3 instructions · **Status:** STALLED, class TOOLCHAIN
 
@@ -38,7 +40,7 @@ reproducer.
 ```c
 extern void *D_8008A854;
 
-void *func_800270B8(void) {
+void *GetDataDirectory(void) {
     return D_8008A854;
 }
 ```
