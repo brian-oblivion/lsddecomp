@@ -116,3 +116,25 @@ and docs/match-reports/SceneNode__RaycastVertical.md, round 57)
 ## Track 4 (2026-09-25, round 82, delta)
 
 Renamed from `DreamSys__AcceptGridElem`. Helper of Actor__ScanGridWindow. No self parameter, so no class prefix. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 96, bravo)
+
+Comments quoted below are verbatim as the file stood before this round's
+comment pass, i.e. with this round's renames already applied (the
+`LinkQueryBuf` one as it stood before step 2).
+
+- Parameters `arg0`/`arg1`/`arg2` -> `cell`/`offset`/`pos`, and the local
+  extern of SceneNode__RaycastVertical names its `out`/`target` the same
+  way: it writes the hit less the ray's start into `offset`, and `pos` is
+  the actor's `coord2->tx` (Actor__FindNearbyLink). Types unchanged.
+
+The extern's comment, verbatim:
+
+```c
+/* The real signature, established when code_d294_c matched this function in
+ * round 57: it is a SceneNode method taking (self, out, target). This unit
+ * had long declared it `(void)` and called it with no arguments, which is
+ * byte-identical here only because arg0-arg2 are already in $a0-$a2 -- the
+ * byte oracle cannot see a wrong prototype. Spelled out so the forwarding is
+ * visible; verified byte-exact. */
+```

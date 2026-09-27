@@ -1,31 +1,24 @@
 /*
- * class_3bb8c_p -- vram 0x800574C4..0x80057DBC, carved round 17
- * (2026-09-04), immediately behind class_3bb8c_o. Actor methods
- * (include/Actor.h; before round 82 they carried DreamSys's name, but they
- * are occupants of the BASE table gActorMethods, +0x0C8..+0x0EC) plus one
- * unrelated constructor:
+ * class_3bb8c_p -- Actor's movement and link-search methods (include/Actor.h,
+ * occupants of the base table gActorMethods, +0x0C8..+0x0EC), and
+ * VariantSprite's allocator and ctor.
  *
- *  - The local-axis moves (Actor__MoveLocalX/Y, the shared
- *    Actor__MoveAlongLocalAxis, and Actor__MoveLocalZOrFindLink /
- *    MoveLocalXOrFindLink through Actor__MoveOrFindNearbyLink): write one
- *    component of the local move vector gActorLocalMove, apply it through
- *    addLocalTranslation, clear it, and fall back to a grid-based
- *    nearby-link search (Actor__FindNearbyLink, Actor__BuildLinkQueries,
- *    Actor__ScanLinkCandidates, Actor__ScanGridWindow, AcceptGridElem) when
- *    the move alone did not set linkTarget.
+ *  - Local-axis moves. Actor__MoveLocalX/Y put `val` into one component of
+ *    the local move vector gActorLocalMove, apply it through
+ *    addLocalTranslation and clear it again (Actor__MoveAlongLocalAxis;
+ *    MoveLocalZ is in class_3bb8c_o.c).
+ *  - Move, else find a link. Actor__MoveLocalZOrFindLink/XOrFindLink clear
+ *    linkTarget and move; when the move set no linkTarget,
+ *    Actor__FindNearbyLink searches the StageMap grid round the actor's
+ *    position for a GridCell whose model a vertical ray hits
+ *    (BuildLinkQueries, ScanLinkCandidates, ScanGridWindow,
+ *    AcceptGridElem), links to it and moves onto the hit.
  *  - The link-command pair (Actor__OnActorLinkCommand,
- *    Actor__OnGridCellLinkCommand) forwarding through the SceneNode base
- *    table and, for an event in [5,9), the object's own tryAttachNearby.
- *  - Actor__SetLastOffsetValue/SetPendingExtra, GetActorMethods: plain
- *    setters/getter.
- *  - New_VariantSprite + VariantSprite__VariantSprite: allocator and
- *    constructor of an unrelated class, VariantSprite (a Sprite subclass,
- *    include/VariantSprite.h).
- *
- * No stalls: Actor__BuildLinkQueries, the last one, matched in round 75
- * (2-argument method call, see its report). No switch jump table in this slice, and no gp_rel/addiu_at/
- * nop_mflo_mfhi anywhere in it (all three are resolved toolchain
- * constructs anyway, CLAUDE.md "Open toolchain blockers").
+ *    Actor__OnGridCellLinkCommand): SceneNode's dispatchLinkCommand and,
+ *    for an Actor sender's events 5..8, tryAttachNearby.
+ *  - Actor__SetLastOffsetValue/SetPendingExtra and GetActorMethods.
+ *  - New_VariantSprite and VariantSprite__VariantSprite, of an unrelated
+ *    class (include/VariantSprite.h) that happens to follow in ROM.
  */
 #include "common.h"
 #include <libgte.h>
@@ -38,15 +31,10 @@
 #include "GridCell.h"
 #include "VariantSprite.h"
 
-/* Two-element s16 array -- Actor__MoveLocalX and Actor__MoveLocalY each write one
- * element (index 0 and 1 respectively) via a plain `sh` through a pointer
- * computed as %hi/%lo of `gActorLocalMove + 2*index`, so splat's single-word
- * dlabel is really this 2-element array, not a lone s32 (round 2026-09-04).
- * Not referenced anywhere else in the repo (checked with grep), so this is
- * this unit's own reading -- kept local rather than added to a shared
- * header. It is the x and y of Actor's local move vector: the z is the next
- * halfword, D_8008ABA8, which class_3bb8c_o's Actor__MoveLocalZ writes, and
- * SceneNode__RotateLocalVector reads src[0..2]. */
+/* The local move vector's x and y (s16; the z, D_8008ABA8, is the next
+ * halfword, class_3bb8c_o.c). All three stay 0 between moves: a move sets
+ * one component, addLocalTranslation rotates the whole vector by the
+ * actor's orientation, and the component is cleared again. */
 extern s16 gActorLocalMove[2];
 
 void Actor__MoveLocalX(Actor *self, s32 val, void *notify) {
@@ -57,23 +45,11 @@ void Actor__MoveLocalY(Actor *self, s32 val, void *notify) {
     Actor__MoveAlongLocalAxis(self, &gActorLocalMove[1], val, notify, 8);
 }
 
-/* `count` is `volatile` so it stays a stack reference reloaded at its one use
- * site, rather than being promoted to a callee-saved register across the
- * intervening Actor__AddLocalTranslation call -- confirmed with a standalone reproducer
- * through the pinned toolchain: dropping `volatile` grows the frame by one
- * callee-saved register (s3) and changes 0x1c/0x20 byte offsets throughout,
- * which is not what retail does (round 2026-09-04).
- *
- * `val` arrives as `s32` (its callers forward an incoming register with no
- * conversion -- typing it `s16` here made the CALLERS re-sign-extend it on
- * every call, which retail does not do), but the two stores below are
- * genuinely 16-bit (`sh`). Truncating once into a local `s16` and storing
- * THAT (rather than truncating `val` twice inline) is what reproduces
- * retail's callee-saved register assignment for `slot`/`extra`
- * (confirmed with a standalone reproducer: inline truncation swaps which
- * of s0/s1 holds which, round 2026-09-04). */
+/* Moves the actor by `val` along one local axis (`axis` is that component of
+ * gActorLocalMove), keeps `val` in lastOffsetValue and, when `notify` is
+ * non-NULL, sends `event` (6, 7, 8 for z, x, y) through notifyWithHull. */
 void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, s32 event) {
-    s16 val16 = (s16)val;
+    s16 val16 = (s16)val; /* MATCHING: truncating at each store does not match */
     *axis = val16;
     self->lastOffsetValue = val16;
     self->methods->addLocalTranslation(self, &gActorLocalMove[0]);
@@ -93,6 +69,7 @@ void Actor__MoveLocalXOrFindLink(Actor *self, s32 val, void *notify) {
 
 void Actor__NoOpSlotD8(void) {}
 
+/* Clears linkTarget, moves; if the move did not link, looks for a link. */
 void Actor__MoveOrFindNearbyLink(Actor *self, void (*move)(Actor *, s32, void *), s32 val, void *notify) {
     self->linkTarget = NULL;
     move(self, val, notify);
@@ -101,12 +78,9 @@ void Actor__MoveOrFindNearbyLink(Actor *self, void (*move)(Actor *, s32, void *)
     }
 }
 
-/* A 12-byte {s16,s16,s32,s32} query/result record. Built by this unit's
- * own Actor__BuildLinkQueries into caller-supplied buffers, and
- * walked as an array (stride 0xC) by Actor__ScanLinkCandidates. Describes a
- * rectangular window of the grid Actor__ScanGridWindow walks: `startCol`/
- * `startRow` is the window's origin bucket, `numCols`/`numRows` its extent --
- * confirmed directly from that function's own body (round 57 naming pass). */
+/* A window of one chunk slot's cells, in cells: from (startCol, startRow),
+ * numCols to the right and numRows DOWN (to lower row indices;
+ * Actor__ScanGridWindow). */
 typedef struct GridQuery {
     s16 startCol;
     s16 startRow;
@@ -114,26 +88,24 @@ typedef struct GridQuery {
     s32 numRows;
 } GridQuery;
 
-/* The grid (self->grid) is a StageMap (include/StageMap.h). Its
- * elements (ChunkSlot) are what Actor__BuildLinkQueries collects: the
- * loader's headerReady gates Actor__ScanLinkCandidates, its ownerKey is the
- * element key BuildLinkQueries steps by one, and `cells` is the 20-wide grid
- * of GridCell cells (each with its `nextInCell` chain) Actor__ScanGridWindow
- * walks. */
-
 void *AcceptGridElem(void *cell, void *offset, void *pos);
 s32 Actor__BuildLinkQueries(Actor *self, GridQuery *queries, ChunkSlot **slots,
                             Descriptor10Ext *desc, s32 span);
 void *Actor__ScanLinkCandidates(Actor *self, void *offset, void *pos, s32 count, GridQuery *queries,
                                 ChunkSlot **slots);
 
+/* Looks in the actor's grid for a GridCell a vertical ray from the actor's
+ * position hits: in the actor's own cell of its chunk slot and, in a
+ * vertical grid, the same cell in the slots above and below
+ * (BuildLinkQueries with span 1). On a hit the cell becomes linkTarget, the
+ * actor moves by the ray's offset (addTranslation) and notifyWithHull gets
+ * -1; with no hit, linkTarget is NULL and it gets -2. Returns whether it
+ * linked; 0 as well when the actor has no grid or no slot holds its
+ * position. */
 s32 Actor__FindNearbyLink(Actor *self) {
     Descriptor10Ext desc;
     GridQuery queries[3];
-    /* No known field needs this gap; empirically required to reproduce
-     * retail's exact stack layout for slots/offset below (round 2026-09-04,
-     * see this function's match report). */
-    u8 pad48Tail[8];
+    u8 pad48Tail[8]; /* MATCHING: retail leaves these 8 bytes between queries and slots */
     ChunkSlot *slots[3];
     LongVec3 offset;
 
@@ -157,6 +129,13 @@ s32 Actor__FindNearbyLink(Actor *self) {
     return 0;
 }
 
+/* Fills queries[]/slots[] with the cell windows to search round the cell
+ * `desc` locates, and returns how many. An even span is rounded up to odd.
+ * Span 1: the cell itself in desc's slot and, when the grid is vertical,
+ * the same cell in the slots whose elemKey is one more and one less (as far
+ * as the grid has rows), up to 3. A wider span: one window in desc's slot,
+ * starting one column lower and one row higher than the cell, clipped at the
+ * chunk's edges (FindNearbyLink, the one caller, passes 1). */
 s32 Actor__BuildLinkQueries(Actor *self, GridQuery *queries, ChunkSlot **slots,
                             Descriptor10Ext *desc, s32 span) {
     s32 cellCol = desc->base.b2;
@@ -167,7 +146,7 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *queries, ChunkSlot **slots,
     s32 row;
     s32 count;
 
-    numRows = !(span & 1) ? ++span : span;
+    numRows = !(span & 1) ? ++span : span; /* MATCHING: the ternary, inverted, into numRows */
     numCols = numRows;
     col = cellCol;
     row = cellRow;
@@ -194,7 +173,7 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *queries, ChunkSlot **slots,
         key = slotKey + 1;
         if (key < dims->rows) {
             slots[1] = map->methods->findSlotByNeighbour(map, key);
-            count = 2;
+            count = 2; /* MATCHING: after the call, for the delay-slot fill */
             queries[1] = queries[0];
         }
         key = slotKey - 1;
@@ -232,19 +211,16 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *queries, ChunkSlot **slots,
 
 void *Actor__ScanGridWindow(Actor *self, void *offset, void *pos, GridQuery *query, ChunkSlot *slot);
 
-/* Walks `count` entries of `arr1` (a `GridQuery[]`, stride 0xC) paired
- * element-for-element with `arr2` (a `ChunkSlot *[]`, stride 4),
- * skipping any entry whose element's loader does not have `headerReady`
- * set, and calling `Actor__ScanGridWindow` on the rest; returns the first
- * non-NULL result, or NULL if every entry was skipped or came back empty
- * (round 2026-09-04). */
+/* Scans each of the `count` windows in its slot, skipping a slot whose
+ * LbdFile header is not in yet; returns the first cell AcceptGridElem
+ * accepts, or NULL. */
 void *Actor__ScanLinkCandidates(Actor *self, void *offset, void *pos, s32 count, GridQuery *queries,
                                 ChunkSlot **slots) {
     s32 i;
 
     for (i = 0; i < count;) {
         ChunkSlot *slot = *slots;
-        i++;
+        i++; /* MATCHING: here, not in the for header */
         if (slot->loader->headerReady != 0) {
             void *result = Actor__ScanGridWindow(self, offset, pos, queries, slot);
             if (result != NULL) {
@@ -257,16 +233,9 @@ void *Actor__ScanLinkCandidates(Actor *self, void *offset, void *pos, s32 count,
     return NULL;
 }
 
-/* Scans a rectangular window of a grid of GridCell cell chains, rooted
- * at `source->cells`, `query->numRows` rows by `query->numCols` columns,
- * starting at row `query->startRow`, column `query->startCol` (each row is
- * 0x50 bytes = 20 bucket-head pointers; each column step is one bucket-head
- * pointer, 4 bytes). For each bucket, tries `AcceptGridElem` against the
- * head first, then each linked element in turn (`->nextInCell`), returning the
- * first one `AcceptGridElem` accepts (non-NULL); NULL if the whole window
- * comes up empty. `self` (this function's own first argument) is read
- * from `a0` in the disassembly but never touched by the body -- present
- * only to match its caller's calling convention (round 2026-09-04). */
+/* Tries every cell of the window, each lattice cell and then the cells
+ * chained from it (nextInCell), and returns the first AcceptGridElem
+ * accepts, or NULL. `self` is not used. */
 void *Actor__ScanGridWindow(Actor *self, void *offset, void *pos, GridQuery *query, ChunkSlot *slot) {
     s32 row, col;
     GridCell **bucket;
@@ -276,6 +245,7 @@ void *Actor__ScanGridWindow(Actor *self, void *offset, void *pos, GridQuery *que
         for (col = 0; col < query->numCols; col++) {
             GridCell *node;
 
+            /* MATCHING: *bucket re-read at each use; a local costs a register */
             if (AcceptGridElem(*bucket, offset, pos) != NULL) {
                 return *bucket;
             }
@@ -291,14 +261,13 @@ void *Actor__ScanGridWindow(Actor *self, void *offset, void *pos, GridQuery *que
     return NULL;
 }
 
-/* The real signature, established when code_d294_c matched this function in
- * round 57: it is a SceneNode method taking (self, out, target). This unit
- * had long declared it `(void)` and called it with no arguments, which is
- * byte-identical here only because arg0-arg2 are already in $a0-$a2 -- the
- * byte oracle cannot see a wrong prototype. Spelled out so the forwarding is
- * visible; verified byte-exact. */
+/* code_d294_c.c: casts a vertical ray from `pos` against the node's model,
+ * one way and then the other; on a hit writes the hit less the ray's start
+ * to `offset` and returns 1. */
 extern s32 SceneNode__RaycastVertical(void *self, void *offset, void *pos);
 
+/* `cell` if it is non-NULL and a vertical ray from `pos` hits its model
+ * (the offset to the hit into `offset`), else NULL. */
 void *AcceptGridElem(void *cell, void *offset, void *pos) {
     if (cell != NULL) {
         if (SceneNode__RaycastVertical(cell, offset, pos) != 0) {
@@ -308,19 +277,19 @@ void *AcceptGridElem(void *cell, void *offset, void *pos) {
     return NULL;
 }
 
-/* tryAttachNearby is called with (self, sender, event): SceneNode's slot
- * declares self alone (its occupant's second parameter arrives in the
- * caller's untouched $a1), and here both are reloaded after the base call,
- * so the call spells them out through a cast. */
+/* gActorMethods +0x0DC: a link command from another Actor. SceneNode's
+ * handling, then, for events 5..8, tryAttachNearby with (self, sender,
+ * event): SceneNode's slot declares self alone, hence the cast. */
 void Actor__OnActorLinkCommand(Actor *self, void *sender, s32 event) {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
     if (event < 9) {
-        if (event >= 5) {
+        if (event >= 5) { /* MATCHING: nested, as && folds to one unsigned test */
             ((void (*)(Actor *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
         }
     }
 }
 
+/* gActorMethods +0x0E0: a link command from a GridCell; SceneNode's handling. */
 void Actor__OnGridCellLinkCommand(Actor *self, void *sender, s32 event) {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
 }
@@ -341,8 +310,8 @@ ActorMethods *GetActorMethods(void) {
 
 extern void *BMemPMgrAlloc(s32 size);
 
-/* VariantSprite (include/VariantSprite.h, track 4, round 87): its allocator and
- * ctor. The other methods are in class_3bb8c_q.c and class_3bb8c_t.c. */
+/* VariantSprite's allocator; its other methods are in class_3bb8c_q.c and
+ * class_3bb8c_t.c. */
 VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
     void *obj = BMemPMgrAlloc(sizeof(VariantSprite));
     if (obj != NULL) {
@@ -357,11 +326,10 @@ VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
  * (0x10,0x20), 16x16. */
 extern SpriteRect gVariantSpriteCells[2];
 
-/* The base-class ctor, Sprite__Sprite, through GetSpriteMethods(), with
- * `self` upcast; then this class's table, and its reset slot
- * (VariantSprite__SetVariantClut) with the variant, through VariantSpriteResetFn.
- * The retail ctor ends in that call without setting $v0: it returns
- * nothing. */
+/* Sprite's ctor with the variant's cell, then this class's table, and the
+ * reset slot (VariantSprite__SetVariantClut) with the variant, through
+ * VariantSpriteResetFn. Returns nothing: it ends in that call and sets no
+ * $v0. */
 void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetArg, void *texture) {
     GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &gVariantSpriteCells[variant], resetArg, 0);
     self->methods = GetVariantSpriteMethods();

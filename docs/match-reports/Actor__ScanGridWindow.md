@@ -107,3 +107,33 @@ re-dereferenced form before assuming a call is required to trigger it.
 ## Track 4 (2026-09-25, round 82, delta)
 
 Renamed from `DreamSys__ScanGridWindow`. Helper of Actor__ScanLinkCandidates (self unused). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 96, bravo)
+
+Comments quoted below are verbatim as the file stood before this round's
+comment pass, i.e. with this round's renames already applied (the
+`LinkQueryBuf` one as it stood before step 2).
+
+- The byte arithmetic became cell arithmetic, byte-identical (79/79):
+  `(GridCell **)((u8 *)source->cells + startRow * 0x50 + startCol * 4)` is
+  `slot->cells + startRow * STAGE_CHUNK_CELLS + startCol`, and the row step
+  `(u8 *)bucket - (numCols * 4 + 0x50)` is `bucket -= numCols +
+  STAGE_CHUNK_CELLS`: back to the start of the row, then one row lower. So
+  a window runs from startRow DOWN, which GridQuery's comment now says.
+- Parameters `arg1`/`arg2`/`source` -> `offset`/`pos`/`slot`.
+- The re-dereferenced `*bucket` keeps one `/* MATCHING: */` line.
+
+The function comment, verbatim:
+
+```c
+/* Scans a rectangular window of a grid of GridCell cell chains, rooted
+ * at `source->cells`, `query->numRows` rows by `query->numCols` columns,
+ * starting at row `query->startRow`, column `query->startCol` (each row is
+ * 0x50 bytes = 20 bucket-head pointers; each column step is one bucket-head
+ * pointer, 4 bytes). For each bucket, tries `AcceptGridElem` against the
+ * head first, then each linked element in turn (`->nextInCell`), returning the
+ * first one `AcceptGridElem` accepts (non-NULL); NULL if the whole window
+ * comes up empty. `self` (this function's own first argument) is read
+ * from `a0` in the disassembly but never touched by the body -- present
+ * only to match its caller's calling convention (round 2026-09-04). */
+```

@@ -144,3 +144,24 @@ history prose (the known renametype behaviour pending an operator
 decision); those lines were left as the tool wrote them.
 
 Its only caller is `StyleEffect__SpawnSprites`, with variant 0.
+
+## Track 7 (2026-09-27, round 96, bravo)
+
+Comments quoted below are verbatim as the file stood before this round's
+comment pass, i.e. with this round's renames already applied (the
+`LinkQueryBuf` one as it stood before step 2).
+
+- `BMemPMgrAlloc(0xA8)` became `sizeof(VariantSprite)` (0xA8,
+  VariantSprite.h), byte-identical.
+- Parameter `arg2` -> `resetArg` (tier B), here, in the ctor and in
+  VariantSprite.h's prototypes and CtorParams: it is forwarded to Sprite's
+  ctor as its `arg4`, which Sprite__Sprite hands on to reset, and
+  Sprite__Reset does not read it; the one caller (StyleEffect__SpawnSprites)
+  passes 0.
+
+The function comment, verbatim:
+
+```c
+/* VariantSprite (include/VariantSprite.h, track 4, round 87): its allocator and
+ * ctor. The other methods are in class_3bb8c_q.c and class_3bb8c_t.c. */
+```

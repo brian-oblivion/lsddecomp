@@ -116,3 +116,22 @@ today (inherited, unoverridden) while being byte-different call shapes.
 ## Track 4 (2026-09-25, round 82, delta)
 
 Renamed from `DreamSys__DispatchLinkCommandAndTryAttach`. Occupant of +0x0DC, which Actor__DispatchLinkCommand (+0x09C) calls when the SENDER's class byte is 0x34 (an Actor); DreamSys overrides it as DreamSys__DispatchInstanceEffect (testing for an Entity, 0x1F234) and Entity as Entity__NotifyLinkStage. Body: chain SceneNode's dispatchLinkCommand, then tryAttachNearby for events 5..8 -- called through a function-pointer cast with (self, sender, event), since SceneNode's slot declares self alone and both arguments are reloaded after the base call. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 96, bravo)
+
+Comments quoted below are verbatim as the file stood before this round's
+comment pass, i.e. with this round's renames already applied (the
+`LinkQueryBuf` one as it stood before step 2).
+
+- Re-measured this round: `if (event >= 5 && event < 9)` and `if (event <
+  9 && event >= 5)` both break the image; the nested pair stays, with one
+  `/* MATCHING: */` line.
+
+The function comment, verbatim:
+
+```c
+/* tryAttachNearby is called with (self, sender, event): SceneNode's slot
+ * declares self alone (its occupant's second parameter arrives in the
+ * caller's untouched $a1), and here both are reloaded after the base call,
+ * so the call spells them out through a cast. */
+```

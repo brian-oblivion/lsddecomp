@@ -375,3 +375,67 @@ tools/check-nonmatching.sh # OK: 45 NON_MATCHING bodies in 15 units
 ## Track 4 (2026-09-25, round 82, delta)
 
 Renamed from `DreamSys__BuildLinkQueries`. Helper of Actor__FindNearbyLink; `self->linkMgr` is now `self->grid` (cast to the DreamSysUnk4CObj view). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 96, bravo)
+
+Comments quoted below are verbatim as the file stood before this round's
+comment pass, i.e. with this round's renames already applied (the
+`LinkQueryBuf` one as it stood before step 2).
+
+### Naming (locals and parameters, zero bytes)
+
+| old | new | why |
+| --- | --- | --- |
+| `arr1`, `arr2` | `queries`, `slots` | the GridQuery[] and ChunkSlot *[] it fills |
+| `arg3` | `desc` | computeFootprintDescriptor's `out` (StageMap.h) |
+| `arg4` | `span` | the window's width in cells, rounded up to odd; StageMap__SetFootprintFromCell's own name for its span |
+| `f2`, `f3` | `cellCol`, `cellRow` | Descriptor10's b2/b3, the cell column/row in the chunk |
+| `idx` | `count` | the number of queries filled, the return value |
+| `unk4C`, `unk68` | `map`, `dims` | the StageMap and its StageGridDimensions |
+| `src`, `s3`, `pos` | `slot`, `slotKey`, `key` | desc's slot, its loader's elemKey, findSlotByNeighbour's `key` |
+
+- `desc` is now StageMap.h's `Descriptor10Ext *` (this unit's view
+  `LinkQueryBuf` retired: `queryCol`/`queryRow`/`source` are
+  `base.b2`/`base.b3`/`slot`; its 4 trailing bytes were not needed, measured).
+- `0x13` is `STAGE_CHUNK_CELLS - 1`, the last cell column/row of a chunk.
+- `isVertical != idx` became `isVertical != 1`: 116/116 either way (the
+  s0 that holds both 1 and `idx` in retail is CSE, not the source).
+- One `/* MATCHING: */` line each for the inverted ternary (levers 5-7) and
+  `count = 2` after the call (lever 8).
+
+Three comments lost their history; what they said, verbatim:
+
+```c
+/* A 12-byte {s16,s16,s32,s32} query/result record. Built by this unit's
+ * own Actor__BuildLinkQueries into caller-supplied buffers, and
+ * walked as an array (stride 0xC) by Actor__ScanLinkCandidates. Describes a
+ * rectangular window of the grid Actor__ScanGridWindow walks: `startCol`/
+ * `startRow` is the window's origin bucket, `numCols`/`numRows` its extent --
+ * confirmed directly from that function's own body (round 57 naming pass). */
+```
+
+```c
+/* The grid (self->grid) is a StageMap (include/StageMap.h). Its
+ * elements (ChunkSlot) are what Actor__BuildLinkQueries collects: the
+ * loader's headerReady gates Actor__ScanLinkCandidates, its ownerKey is the
+ * element key BuildLinkQueries steps by one, and `cells` is the 20-wide grid
+ * of GridCell cells (each with its `nextInCell` chain) Actor__ScanGridWindow
+ * walks. */
+```
+
+```c
+/* Output buffer filled in by the grid's computeFootprintDescriptor (a
+ * Descriptor10Ext, include/StageMap.h: queryCol/queryRow are base.b2/b3,
+ * source is unk24; this view is 0x30 bytes, and the frame needs it) and read back by this unit's own Actor__BuildLinkQueries.
+ * Only the three fields actually touched are named. `queryCol`/`queryRow`
+ * feed straight into GridQuery::startCol/startRow (Actor__BuildLinkQueries,
+ * matched round 75; round 57 naming pass). */
+typedef struct LinkQueryBuf {
+    u8 pad00[0x2];
+    s8 queryCol;
+    s8 queryRow;
+    u8 pad04[0x24 - 0x4];
+    ChunkSlot *source;
+    u8 pad28[0x30 - 0x28];
+} LinkQueryBuf;
+```

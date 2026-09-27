@@ -137,3 +137,40 @@ in the same function; truncate once into a named local instead).
 ## Track 4 (2026-09-25, round 82, delta)
 
 Renamed from `DreamSys__ApplyOffsetSlotAndNotify`. The body behind the three moves: store val in one component (`axis`) of the local move vector gActorLocalMove, keep it in lastOffsetValue, addLocalTranslation (+0x0C0) the whole vector, clear the component, and when `notify` is non-NULL call notifyIfUnk20Active (+0x088) with the move's event (6 z, 7 x, 8 y). DreamSys__NotifyLinkAttempt was DreamSys's override of that slot, not the slot. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 96, bravo)
+
+Comments quoted below are verbatim as the file stood before this round's
+comment pass, i.e. with this round's renames already applied (the
+`LinkQueryBuf` one as it stood before step 2).
+
+- **`volatile` dropped from `event`** (here and in `include/Actor.h`'s
+  prototype). It was never needed: `event` is the fifth argument, so it
+  arrives on the caller's stack and GCC loads it there at its one use.
+  Measured: 31/31 and the whole image byte-identical without it. The
+  "dropping `volatile` grows the frame" note below predates the current
+  body and no longer reproduces.
+- The `val16` local IS still needed (measured this round: storing `val`
+  directly at both sites changes the function's length). It keeps one
+  `/* MATCHING: */` line.
+
+The function comment, which carried the derivation, verbatim (its `count`,
+`slot` and `extra` are names from an earlier body):
+
+```c
+/* `count` is `volatile` so it stays a stack reference reloaded at its one use
+ * site, rather than being promoted to a callee-saved register across the
+ * intervening Actor__AddLocalTranslation call -- confirmed with a standalone reproducer
+ * through the pinned toolchain: dropping `volatile` grows the frame by one
+ * callee-saved register (s3) and changes 0x1c/0x20 byte offsets throughout,
+ * which is not what retail does (round 2026-09-04).
+ *
+ * `val` arrives as `s32` (its callers forward an incoming register with no
+ * conversion -- typing it `s16` here made the CALLERS re-sign-extend it on
+ * every call, which retail does not do), but the two stores below are
+ * genuinely 16-bit (`sh`). Truncating once into a local `s16` and storing
+ * THAT (rather than truncating `val` twice inline) is what reproduces
+ * retail's callee-saved register assignment for `slot`/`extra`
+ * (confirmed with a standalone reproducer: inline truncation swaps which
+ * of s0/s1 holds which, round 2026-09-04). */
+```
