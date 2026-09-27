@@ -1272,7 +1272,8 @@
       },
       "flagged": {
         "DrawNode": "code_2864's local view of the scene node Viewport.h's drawNode slot types as SceneNode * (echo, round 94) (2026-09-26)",
-        "EntityMoodHandlerArg": "it is SoundCueSet (Entity.h's own comment; code_179d8_e.c and code_179d8_l.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)"
+        "EntityMoodHandlerArg": "it is SoundCueSet (Entity.h's own comment; code_179d8_e.c and code_179d8_l.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)",
+        "LoadRequest": "one of three 0x10-byte views of the descriptor New_LinkResource and the other FileResource ctors take (ResourceSource {buffer, name}, defined in src/GraphicsResources.c): LoadRequest (class_39e08.h), LoadModelRequest (code_1677c.c), ResourceSourceRequest (class_3bb8c.c). Move ResourceSource to the header owning it (FileResource.h or LinkResource.h), unify the three on one ResourceSourceRequest there (type->buffer, path->name), keep the 0x10 size (frame; delta, round 96) (2026-09-27)"
       },
       "parked": {
         "S16Quad_d294": "IS Sony's SVECTOR by layout and use (echo, round 91, SceneNode__SceneNode.md); substitution blocked while SceneNode.h's includers re-declare Sony names (python3 tools/sonyheaders.py: 24 units broke with <libgs.h> in SceneNode.h). Unpark (--undo) when sonyheaders.py lists none of them, then use Sony's type. (2026-09-26)",
