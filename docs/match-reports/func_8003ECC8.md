@@ -1,7 +1,7 @@
 # func_8003ECC8 — MATCHED
 
 Unit: `code_2cc8c_d`. Round 73, runner charlie (report written retroactively;
-same shape as `Viewport__func_8003EA6C`/`Viewport__func_8003EA74`/`func_8003ECC0`).
+same shape as `Viewport__func_8003EA6C`/`Viewport__func_8003EA74`/`Viewport__func_8003ECC0`).
 
 ## Signature
 

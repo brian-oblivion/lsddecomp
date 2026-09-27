@@ -173,7 +173,7 @@ void Viewport__SetTwist(Viewport *self, Ratio16 *twist) {
     }
 }
 
-void func_8003ECC0(void) {}
+void Viewport__func_8003ECC0(void) {}
 
 void func_8003ECC8(void) {}
 

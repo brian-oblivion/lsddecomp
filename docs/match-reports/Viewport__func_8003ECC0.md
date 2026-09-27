@@ -1,4 +1,6 @@
-# func_8003ECC0 — MATCHED
+# Viewport__func_8003ECC0 — MATCHED
+
+> Renamed from `func_8003ECC0` on 2026-09-27 (tools/rename.py). Address 0x8003ecc0.
 
 Unit: `code_2cc8c_d`. Round 73, runner charlie (report written retroactively;
 same shape as `Viewport__func_8003EA6C`/`Viewport__func_8003EA74`).
@@ -6,7 +8,7 @@ same shape as `Viewport__func_8003EA6C`/`Viewport__func_8003EA74`).
 ## Signature
 
 ```c
-void func_8003ECC0(void);
+void Viewport__func_8003ECC0(void);
 ```
 
 Not a `gViewportMethods` vtable slot occupant, not a method (no `self`), no caller
@@ -18,7 +20,7 @@ Nothing: `jr $ra; nop`.
 
 ## Naming
 
-Kept `func_8003ECC0`. No evidence of any kind.
+Kept `Viewport__func_8003ECC0`. No evidence of any kind.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 

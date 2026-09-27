@@ -115,7 +115,7 @@ struct ViewportOt {
     /* +0x078 */ void (*setViewPoint)(Self *self, LongVec3 *vp);  /* Viewport__SetViewPoint */      \
     /* +0x07C */ void (*setViewRef)(Self *self, LongVec3 *vr);    /* Viewport__SetViewRef */        \
     /* +0x080 */ void (*setTwist)(Self *self, Ratio16 *twist); /* Viewport__SetTwist */       \
-    /* +0x084 */ void (*slot84)(void);                             /* func_8003ECC0, empty */        \
+    /* +0x084 */ void (*slot84)(void);                             /* Viewport__func_8003ECC0, empty */        \
     /* +0x088 */ void (*slot88)(void);                             /* func_8003ECC8, empty */        \
     /* +0x08C */ void (*initOt)(Self *self);                       /* Viewport__InitOt */            \
     /* +0x090 */ void (*deinitOt)(Self *self);                     /* Viewport__DeinitOt */          \
@@ -201,7 +201,7 @@ void Viewport__DetachViewChild(Viewport *self);
 void Viewport__SetViewPoint(Viewport *self, LongVec3 *vp);
 void Viewport__SetViewRef(Viewport *self, LongVec3 *vr);
 void Viewport__SetTwist(Viewport *self, Ratio16 *twist);
-void func_8003ECC0(void);
+void Viewport__func_8003ECC0(void);
 void func_8003ECC8(void);
 void Viewport__InitOt(Viewport *self);
 void Viewport__DeinitOt(Viewport *self);
