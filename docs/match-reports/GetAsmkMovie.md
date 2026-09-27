@@ -1,4 +1,6 @@
-# GetIntroStreamName -- MATCHED (7/7 words), round 81
+# GetAsmkMovie -- MATCHED (7/7 words), round 81
+
+> Renamed from `GetIntroStreamName` on 2026-09-27 (tools/rename.py). Address 0x800490f4.
 
 > Renamed from `func_800490F4` on 2026-09-25 (tools/rename.py). Address 0x800490f4.
 
@@ -14,7 +16,7 @@ the first build; whole-image SHA1 green.
 ## Source
 
 ```c
-const char *GetIntroStreamName(s32 *typeCodeOut) {
+const char *GetAsmkMovie(s32 *typeCodeOut) {
     if (typeCodeOut != NULL) {
         *typeCodeOut = 0x31;
     }
@@ -24,6 +26,6 @@ const char *GetIntroStreamName(s32 *typeCodeOut) {
 
 ## Naming
 
-- **Name:** `GetIntroStreamName`
+- **Name:** `GetAsmkMovie`
 - **Tier:** A
 - **Evidence:** its one caller, GameApplication__LoadIntroLogoSequence, uses the returned path directly as a StreamTask's stream name; matches exactly.

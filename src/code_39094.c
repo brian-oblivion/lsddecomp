@@ -14,7 +14,7 @@
  *    pickers (SeedAndRandom, SetPickOverrides/gForcedSoundBank/
  *    gForcedStageBgm), per-stage record-group accessors indexed by
  *    gStageFirstRecord and, for GetStageMapChunkRecordXY, by StageGrid.h's cell
- *    columns, and a family of "stream channel" lookups (GetIntroStreamName,
+ *    columns, and a family of "stream channel" lookups (GetAsmkMovie,
  *    PickWeeklyStreamChannel, GetStreamChannelInit, ResolveCinematicChannel,
  *    GetGraphRoomStreamChannel) whose shapes match their call sites in
  *    code_1677c.c one for one. The records' other fields and the channels'
@@ -262,7 +262,7 @@ Rec1C *GetStageMapChunkRecordXY(s32 index, s32 x, s32 y) {
     return GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y);
 }
 
-const char *GetIntroStreamName(s32 *typeCodeOut) {
+const char *GetAsmkMovie(s32 *typeCodeOut) {
     if (typeCodeOut != NULL) {
         *typeCodeOut = 0x31;
     }

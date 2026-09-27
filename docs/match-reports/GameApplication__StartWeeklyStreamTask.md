@@ -20,7 +20,7 @@ the task the same way `GameApplication__LoadIntroLogoSequence` does -- minus tha
 
 Structurally identical to the second half of `GameApplication__LoadIntroLogoSequence` (already
 matched), with `PickWeeklyStreamChannel(&typeCode, 0)` in place of
-`GetIntroStreamName(&typeCode)`:
+`GetAsmkMovie(&typeCode)`:
 
 ```c
 void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
@@ -54,7 +54,7 @@ to expose `+0x08` (`unk08`, this function's gate) as its own field,
 matching the existing `+0x0C` (`unk0C`, `GameApplication__LoadIntroLogoSequence`'s gate). Declared
 `PickWeeklyStreamChannel` (day/week-style helper, `psyq_memset.s`, same "write an
 index to *out, return a related but different value" shape as
-`GetIntroStreamName`).
+`GetAsmkMovie`).
 
 ## Proposed learning
 

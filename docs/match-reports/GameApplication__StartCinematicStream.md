@@ -113,7 +113,7 @@ kept by this function -- easy to miss since most callers of "write to
 ## Proposed learning
 
 When a "write to `*out`, also returns a value" helper (this unit has
-several: `GetIntroStreamName`, `PickWeeklyStreamChannel`, `GetGraphRoomStreamChannel`, now
+several: `GetAsmkMovie`, `PickWeeklyStreamChannel`, `GetGraphRoomStreamChannel`, now
 `ResolveCinematicChannel`) is followed immediately by ANOTHER call whose own return
 is discarded, check which call's return actually lands in the next
 persistent register via the delay-slot-capture idiom before assuming it's

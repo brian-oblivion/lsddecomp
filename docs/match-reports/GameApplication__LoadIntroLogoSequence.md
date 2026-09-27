@@ -26,9 +26,9 @@ jal  SetActiveDataSourceDriverMode(0, 0, 0)
 jal  GameApplication__StartLoaderTask(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
 jal  New_StreamTask(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
 addiu $a0, $sp, 0x18
-jal  GetIntroStreamName                          ; writes 0x31 to local, returns &sAsmkStreamPath
+jal  GetAsmkMovie                          ; writes 0x31 to local, returns &sAsmkStreamPath
  (delay: s1 = v0, i.e. the PRECEDING call's return = task)
-lw   $a0, 0x18($sp)                          ; reload the type code (0x31) GetIntroStreamName just wrote
+lw   $a0, 0x18($sp)                          ; reload the type code (0x31) GetAsmkMovie just wrote
 jal  GetStreamGroupForType(a0=0x31)                    ; halfword lookup in gStreamTypeToGroupTable
  (delay: s0 = v0, i.e. the PRECEDING call's return = streamName, &sAsmkStreamPath)
 move $a0, $s1                                    ; a0 = task
@@ -59,7 +59,7 @@ void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         GameApplication__StartLoaderTask(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
-        streamName = GetIntroStreamName(&typeCode);
+        streamName = GetAsmkMovie(&typeCode);
         typeLookup = GetStreamGroupForType(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->slot4(task);
@@ -88,7 +88,7 @@ a memory load) exposed the real data flow. Always check what the delay slot
 
 **2. Register (s0 vs s1) assignment for two callee-saved temporaries tracked
 declaration order, not statement/liveness order.** `task` (from
-`New_StreamTask`) and `streamName` (from `GetIntroStreamName`) are both live
+`New_StreamTask`) and `streamName` (from `GetAsmkMovie`) are both live
 across further calls, `task` for longer (reloaded twice more). The first
 attempt declared `task` before `streamName` and code assigned `task` first
 (chronologically first live); GCC put `task` in `s0` and `streamName` in
@@ -123,7 +123,7 @@ register, a different axis).
 **`GameApplication__LoadIntroLogoSequence` -- tier B.** Mechanics established
 from the body and its string constants: gated by `arg->unk0C`, registers a
 loader task for `"ETC\ASMKLOGO.TIM"`, then a stream task for whatever
-`GetIntroStreamName` resolves (`"ETC\ASMK.STR"` per the header comment), then a
+`GetAsmkMovie` resolves (`"ETC\ASMK.STR"` per the header comment), then a
 second loader task for `"ETC\OSDLOGO.TIM"` -- three named boot-time assets
 loaded in sequence. "Intro logo sequence" describes what the function DOES
 (loads these three specific assets, gated, in this order); it does not

@@ -113,7 +113,7 @@ renamed):
  *    SetPickOverrides/gForcedSoundBank/gForcedStageBgm), record-group
  *    accessors indexed by gStageFirstRecord and, for GetStageMapChunkRecordXY, by
  *    StageGrid.h's cell columns, and a family of "stream channel" lookups
- *    (GetIntroStreamName, PickWeeklyStreamChannel, GetStreamChannelInit,
+ *    (GetAsmkMovie, PickWeeklyStreamChannel, GetStreamChannelInit,
  *    ResolveCinematicChannel, GetGraphRoomStreamChannel) whose shapes match
  *    their exact call sites in code_1677c.c one for one. The records' own
  *    fields and the channels' in-game meaning are not established.
