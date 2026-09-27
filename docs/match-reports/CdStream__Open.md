@@ -87,3 +87,15 @@ identical returns (words short) or reorders the blocks.
 Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
 
 Renamed from CdStreamObj__Open (tools/rename.py), the class rename only.
+
+## Naming (track 7, round 99)
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_8008A954` | `gCdStreamVersionSuffix` | A | sdata `.asciz ";1"`, strcat'd after the name to make the ISO9660 path CdSearchFile looks up; same role as `gCdFileVersionSuffix` (code_179d8_h.c), a separate copy |
+| `D_8008A94C` | `gCdStreamAudioMixSet` | B | written only here, with SetupCdStreamAudio's return (always 1) after the SPU CD mix is set; read nowhere in the executable (only reference in asm/ is its sdata definition) |
+
+Constants: the path buffer is `CDSTREAM_PATH_SIZE` (32, unit-local; the CD
+driver's `CD_PATH_SIZE` is 64). The `CdlFILE *` cast on `&self->file` is
+because CdStream.h spells Sony's CdlFILE as its own `CdStreamFile`
+(same 24-byte layout) to stay free of `<libcd.h>`.

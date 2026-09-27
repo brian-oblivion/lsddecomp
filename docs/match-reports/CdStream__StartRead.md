@@ -58,3 +58,9 @@ void CdStream__StartRead(CdStreamObj *self, u32 startFrame, s32 arg2) {
 Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
 
 Renamed from CdStreamObj__StartRead (tools/rename.py), the class rename only.
+
+## Constants (track 7, round 99)
+
+`0x1C0` / `0x140` are `CDSTREAM_MODE_2X` (`CdlModeStream | CdlModeSpeed |
+CdlModeRT`) and `CDSTREAM_MODE_1X` (`CdlModeStream | CdlModeRT`), Sony's
+bits from `<libcd.h>`; command 2 is `CdlSetloc`.

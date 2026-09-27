@@ -31,3 +31,12 @@ s32 SetupCdStreamAudio(CdStreamObj *self) {
     return 1;
 }
 ```
+
+## Constants (track 7, round 99)
+
+`0x2C3` is `SPU_COMMON_MVOLL | SPU_COMMON_MVOLR | SPU_COMMON_CDVOLL |
+SPU_COMMON_CDVOLR | SPU_COMMON_CDMIX` (`<libspu.h>`), exactly the five
+fields the body sets; `cd.mix = 1` is `SPU_ON`. The volumes are
+`CDSTREAM_MASTER_VOLUME` 0x3FFF (half of the 15-bit range) and
+`CDSTREAM_CD_VOLUME` 0x7FFF (full). The unit now takes `SpuCommonAttr` and
+`SpuSetCommonAttr` from Sony's header instead of re-declaring them.

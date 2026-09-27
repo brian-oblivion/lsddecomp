@@ -76,3 +76,10 @@ what exposed it.
 Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
 
 Renamed from CdStreamObj__GetNextFrame (tools/rename.py), the class rename only.
+
+## Constants (track 7, round 99)
+
+`0x800000` is `CDSTREAM_NEXT_FRAME_TRIES` (8388608, decimal as a count).
+`header[2]` is `((StHEADER *)header)->frameCount`: Sony's STR sector header
+(`<libcd.h>`) has four u16 words, then `frameCount` at byte 8, the word the
+body loaded. Same `lw`, zero bytes changed.
