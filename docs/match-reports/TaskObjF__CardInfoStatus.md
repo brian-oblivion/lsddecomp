@@ -107,3 +107,12 @@ further on this residue class.
 ## Naming (round 78, track 3)
 
 `func_8004E7D0` -> `TaskObjF__CardInfoStatus`. **Tier B.** Private helper called only by `TaskObjF__CardInfoAndLoadStatus`. Polls `_card_info(self->cardHandle)` until ready, waits for the resulting event (`TaskObjF__WaitForReadyEvent`), and decodes the status code into two output flags, clearing the card (`_card_clear`) on code 0x2000. Named for the BIOS call it wraps; the status codes' game-level meaning is not established.
+
+## Constants (round 98, track 7)
+
+The answers `TaskObjF__WaitForReadyEvent` returns are `gCardEventSpecs`
+entries, i.e. `<kernel.h>` event specs: 0x100 `EvSpTIMOUT` (no card
+answered), 0x8000 `EvSpERROR`, 0x2000 `EvSpNEW` (for `_card_info` a newly
+inserted card, which is then `_card_clear`ed; for `_card_load` an
+unformatted one). The BIOS calls come from `<kernel.h>` instead of local
+externs. Zero bytes changed.

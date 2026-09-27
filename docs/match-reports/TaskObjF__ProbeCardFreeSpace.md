@@ -105,3 +105,23 @@ function's bytes are unchanged (see `TaskObjF__OpenAndReadMemcardFile.md`).
 ## Naming (round 78, track 3)
 
 `func_8004ECCC` -> `TaskObjF__ProbeCardFreeSpace`. **Tier A.** Private helper called only by `TaskObjF__CheckCardSpace`. Computes a sector count from `sizeArg` with the identical round-up formula class_3bb8c_f.c's already-matched `TaskObjF__TryWriteMemcardSaveFile` uses (`(size + 0x21FF) >> 13`), builds a path with the placeholder suffix `sMcTempFileSuffix` (literal "TEMP", asm/data/7B12C.sdata.s), OPENS a file of that many reserved sectors, then immediately closes and deletes it. This is the same create-then-delete idiom `TaskObjF__TryWriteMemcardSaveFile` uses on its real save path (open with `(sectors<<16)|0x200` fails with -1 if there isn't room) -- here applied to a throwaway file purely to test whether that much free space exists, without leaving a file behind. The `id` parameter is unused in the body. Tier A: the create/delete idiom and the dedicated placeholder suffix make the mechanism unambiguous.
+
+## Source comment moved here, and constants (round 98, track 7)
+
+The unit's `sMcTempFileSuffix` extern carried: "Literal "TEMP"
+(asm/data/7B12C.sdata.s) -- the throwaway suffix passed as
+BuildMemcardPath's 3rd argument to build a placeholder file name when
+probing free space."
+
+Constants: `(size + 0x21FF) >> 13` is `(size + MEMCARD_SAVE_HEADER_SIZE +
+MEMCARD_BLOCK_SIZE - 1) >> MEMCARD_BLOCK_SHIFT` (512 + 8192 - 1 = 0x21FF),
+TryWriteMemcardSaveFile's spelling of the block count; `(blocks << 16) |
+0x200` is `MEMCARD_OPEN_BLOCKS(blocks) | O_CREAT`. The path buffer is
+`char[32]` (was `s32[8]`, byte-identical).
+
+**`delete(pathBuf)` must stay `delete(pathBuf)`.** BuildMemcardPath returns
+`dest`, so `delete(path)` names the same address, but it compiles
+differently: round 97's unbuilt polish made that change and the image
+differed by 182885 bytes, a shift. Round 98 re-applied that polish one
+change at a time with the whole-image oracle after each, and this was the
+only change that moved a byte. The source carries a MATCHING line.

@@ -57,3 +57,9 @@ None new.
 ## Naming (round 78, track 3)
 
 `func_8004E77C` -> `TaskObjF__CardInfoAndLoadStatus`. **Tier B.** Private helper (not a `gTaskObjFMethods` entry) called only by `TaskObjF__CheckCardStatus`. Calls `TaskObjF__CardInfoStatus`, and if it reports OK, `TaskObjF__CardLoadStatus`. Mechanics only; the composed purpose (why info-then-load) is inferred, not proven.
+
+## Round 98 (track 7)
+
+The source declares it `s32` (as TaskObjF.h does) with the body still
+falling off the end, and a MATCHING line says why: it returns whatever the
+last call left in `$v0`, and an explicit return adds two words.

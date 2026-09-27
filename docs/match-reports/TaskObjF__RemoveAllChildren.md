@@ -7,7 +7,7 @@
 ## What it does
 
 `void TaskObjF__RemoveAllChildren(Node3bb8cE *self)`. Zeroes the same five resource-slot
-fields `TaskObjF__ClearResourceSlots` zeroes, then chains to the base class's
+fields `TaskObjF__ClearLinks` zeroes, then chains to the base class's
 `removeAllChildren` (+0x018 on the `Get_vtable_BasicClass()` vtable). Reads as a
 finalize/reset helper distinct from `TaskObjF__Finalize` (which only chains
 `finalize`, +0x00C, without touching the resource slots).
@@ -34,4 +34,4 @@ None new.
 
 ## Naming (round 78, track 3)
 
-`func_8004E588` -> `TaskObjF__RemoveAllChildren`. **Tier A.** Sits at `gTaskObjFMethods` +0x018, the offset this unit's own `BaseMethods3bb8cE` view had already named `removeAllChildren`. Clears all five resource-slot pointers (the same five `TaskObjF__ClearResourceSlots` zeroes) then chains to the base class's `removeAllChildren`.
+`func_8004E588` -> `TaskObjF__RemoveAllChildren`. **Tier A.** Sits at `gTaskObjFMethods` +0x018, the offset this unit's own `BaseMethods3bb8cE` view had already named `removeAllChildren`. Clears all five resource-slot pointers (the same five `TaskObjF__ClearLinks` zeroes) then chains to the base class's `removeAllChildren`.

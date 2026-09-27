@@ -56,3 +56,13 @@ this same unit share the shape).
 header, `path` is a `McDevicePath *`, and `format()` is declared with the
 BIOS's device-name parameter (`char *`). Byte-identical; no new `-Wall`
 warning.
+
+## Source comment moved here (round 98, track 7)
+
+The unit declared `format` itself, under: "The PS-X BIOS format(), which
+takes a device name. gMcDevicePath0/1 are the "bu00:"/"bu10:" templates
+include/class_3bb8c.h declares (track 4b, round 85: this unit had its own
+`s32` view for this address-only use)." `format` now comes from
+`<kernel.h>`, and `MEMCARD_RETRIES` (include/TaskObjF.h) replaces the 10.
+The `(char *)path` cast stays: `McDevicePath` is the device name typed as a
+struct so BuildMemcardPath's copy matches, and `format` takes the string.

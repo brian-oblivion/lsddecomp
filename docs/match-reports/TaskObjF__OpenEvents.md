@@ -73,3 +73,21 @@ direction: NOT introducing the intermediate pointer.
 ## Naming (round 78, track 3)
 
 `func_8004E5E4` -> `TaskObjF__OpenEvents`. **Tier A.** Sits at `gTaskObjFMethods` +0x044. Opens 4 PSX kernel events (`OpenEvent`) into `self->events[0..3]` (matches `TaskObjF::events`, include/class_3bb8c.h, at the identical +0x014 offset -- corroborated cross-unit since round 60, see TaskObjF__EnableEvents.md) inside a critical section, then calls `TaskObjF__EnableEvents(self)`. Paired with `TaskObjF__CloseEvents`.
+
+## Constants (round 98, track 7)
+
+`OpenEvent(0xF4000001, spec, 0x2000, NULL)` is
+`OpenEvent(SwCARD, spec, EvMdNOINTR, NULL)` from `<kernel.h>` (`SwCARD` is
+`DescSW | 0x01`, the BIOS memory-card event class). `gCardEventSpecs`
+(asm/data/76DC8.data.s, 0x80086E78) holds 0x4, 0x8000, 0x100, 0x2000:
+`EvSpIOE`, `EvSpERROR`, `EvSpTIMOUT`, `EvSpNEW`, the spec
+`WaitForReadyEvent` returns for the event that fired. (splat's
+`gCardIconNames` label at 0x80086E80 falls inside that 4-word table; only
+the first two words sit under `gCardEventSpecs`'s own dlabel.) The loop
+bound is `ARRAY_COUNT(self->events)`. Zero bytes changed.
+
+The unit used to declare its own `extern s32 gCardEventSpecs[4]` under a
+comment calling it a "PSX thread-table constant ... one per OpenTh-style
+thread it starts", with a note that its lui/addiu-then-lw walk is never
+gp-relative. The table is event specs, not threads; the local declaration
+is gone in favour of include/class_3bb8c.h's.

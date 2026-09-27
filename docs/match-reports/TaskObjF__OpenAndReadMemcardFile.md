@@ -311,3 +311,19 @@ the wrapped form in place.
 ## Naming (round 78, track 3)
 
 `func_8004EA38` -> `TaskObjF__OpenAndReadMemcardFile`. **Tier B.** Private helper called only by `TaskObjF__ProbeMemcardFile`. Builds a memcard path (`BuildMemcardPath(pathBuf, self->cardSlot, suffix)`), opens it, and if `destBuf` is non-NULL reads the first 0x80 bytes and `strcpy`s from offset +4 into `destBuf` (skipping what looks like a 4-byte header field). Mechanics only; what the copied bytes represent to the game (a save's title/comment field, by position) is not confirmed here.
+
+## Source comment moved here, and constants (round 98, track 7)
+
+The unit's `BuildMemcardPath` extern carried: "3-parameter, and both of this
+unit's call sites pass all three. TaskObjF__OpenAndReadMemcardFile emits no
+$a2 set-up because its own 3rd parameter arrives in $a2 and is forwarded
+unchanged (round 75; this was an `arity-ok` K&R declaration until then, on
+the reading that TaskObjF__OpenAndReadMemcardFile made a 2-argument call)."
+
+Constants: `open(path, 1)` is `O_RDONLY` (`<sys/file.h>`, as
+class_3bb8c_f.c's TryReadMemcardFile spells it); the 0x80 allocation and
+read are `MEMCARD_SECTOR_SIZE` (include/TaskObjF.h), the title sector;
+the path buffer is `char[32]` (was `s32[8]`, byte-identical). The `+ 4`
+is the save header's title (`McSaveHeader::title`, which class_3bb8c_f.c
+defines locally); the head has the proposal to move that struct into
+TaskObjF.h so this reads `header->title`. Zero bytes changed.
