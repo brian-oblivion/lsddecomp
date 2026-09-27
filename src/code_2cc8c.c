@@ -279,14 +279,12 @@ void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable) {
     }
 }
 
-typedef struct {
-    s8 r, g, b;
-} RGB8003CB68;
-
+/* Each colour is copied as a BgLayerRgb (GsBG r, g, b; lb/sb, so signed):
+ * baseColor is what TickColorFade's base and the BgLayer's setColor take. */
 void TaskCore__SetColors(TaskCore *self, u8 *a1, u8 *a2, u8 *a3) {
-    *(RGB8003CB68 *)self->baseColor = *(RGB8003CB68 *)a1;
-    *(RGB8003CB68 *)self->unk93 = *(RGB8003CB68 *)a2;
-    *(RGB8003CB68 *)self->unk96 = *(RGB8003CB68 *)a3;
+    *(BgLayerRgb *)self->baseColor = *(BgLayerRgb *)a1;
+    *(BgLayerRgb *)self->unk93 = *(BgLayerRgb *)a2;
+    *(BgLayerRgb *)self->unk96 = *(BgLayerRgb *)a3;
 }
 
 void TaskCore__SetFadeRate(TaskCore *self, s32 rate) {
