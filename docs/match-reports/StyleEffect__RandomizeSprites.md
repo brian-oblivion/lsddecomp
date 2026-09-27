@@ -138,3 +138,7 @@ another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 
 View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
+
+## Track 7 (round 99, alpha)
+
+`python3 tools/rename.py gLinkElemVec3Table gStyleEffectJitterScales`, **tier A**: six entries of three Ratio16 (the old local view was an s32 Vec3O, same 12-byte stride): {1/16, 7/1, 1/1}, {7/1, 1/16, 1/1}, then the same with 3 and with 2, so each one shapes a sprite into a thin streak along y or along x; this function, its only accessor, hands a rand()-picked one to each jittering sprite's updateScale (VariantSprite__UpdateScale reads x and y). It is declared `Ratio16 [6][3]` now and the index bound is ARRAY_COUNT of it; the loop bound is ARRAY_COUNT(self->sprites) - 1 (sprites[1..4]); the rotation is `(rand() % 360) * ONE` (GsSPRITE.rotate is 4096ths of a degree; the same sll 12). rand() comes from Sony's <rand.h>. Locals p/r -> sprite/pick.

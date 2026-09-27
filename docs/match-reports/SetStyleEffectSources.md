@@ -105,3 +105,7 @@ applied, a prototype and body outside the header): its `Actor *self`
 parameter and the `Actor *` view of gStyleEffectTmd in class_3bb8c_o.c/_s.c
 are really `LinkResource *`, and the `setBackClip` calls through it are
 `getModel`; its prototype belongs in include/StyleEffect.h, not Actor.h.
+
+## Track 7 (round 99, alpha)
+
+Parameters named (unused, tmd, tim, viewport), in the prototype in include/Actor.h too; the local `ret` is `TmdModel *model`, and the local prototype of TmdModel__SetFirstPrimClut takes its definition's (TmdModel *, s16 *xy). `python3 tools/rename.py D_8008AB94 gStyleEffectClutPos`, **tier A**: an s16[2] VRAM position, 0x01FF03F0 = (x 1008, y 511), which TmdModel__SetFirstPrimClut turns into a CLUT id (x / 16 + y * 64) for the first primitive of each model; this function is its only accessor. The comment on the three source globals, which said "track 4b, round 85", is covered by the Track 4b section above; it now says what they are. Still PROPOSED from track 6 (bravo): `tmd` and gStyleEffectTmd are a LinkResource (the +0x080 slot is LinkResource's getModel, returning a TmdModel), which would drop the Actor view and the cast; that changes class_3bb8c_s.c's declaration too.

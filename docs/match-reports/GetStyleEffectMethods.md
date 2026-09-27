@@ -57,3 +57,7 @@ Left as `func_` for consistency with the rest of this getter family.
 ## Track 4 (2026-09-26, round 88, charlie)
 
 StyleEffect unified (include/StyleEffect.h): the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/StyleEffect.h (the getter now returns `StyleEffectMethods *`; it was typed as its parent's `ActorMethods`). Image byte-identical.
+
+## Track 7 (round 99, alpha)
+
+The comment that it sits among Actor's methods by address moved into the unit banner.

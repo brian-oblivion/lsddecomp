@@ -1,26 +1,22 @@
 /*
- * class_3bb8c_o -- functions 54..73 of the 113-function `class_3bb8c_n`
- * remainder, 0x475F0..0x47CC4 (vram 0x80056DF0..0x800574C4). Carved round 17
- * (2026-09-04); `class_3bb8c_n` keeps its name for the 54 functions in front
- * of this slice and `class_3bb8c_q` is the 19-function tail behind
- * `class_3bb8c_p`. All 20 functions matched, byte-exact; zero INCLUDE_ASM
- * stalls, zero NON_MATCHING bodies. Owns no switch jump table.
+ * The tail of StyleEffect's sprite helpers, then the first half of Actor's
+ * own methods (the second half is class_3bb8c_p.c). The file is cut by
+ * address, not by class, so it holds two groups:
  *
- * Named round 52 (runner bravo). SPANS TWO CLASSES, cut at a ROM address,
- * not a class boundary (`tools/classtable.py`, confirmed round 17/52):
- *
- *  - StyleEffect's sprite-array helpers (`NoOpIgnoreArgs`,
- *    `StyleEffect__ReleaseSprites[B]`, `StyleEffect__RandomizeSprites`,
- *    `StyleEffect__SpawnPlainSprites`; include/StyleEffect.h). Two more of
- *    its pieces sit inside the Actor group by ROM address: its table getter
- *    `GetStyleEffectMethods`, and `SetStyleEffectSources`, which stores the
- *    TMD resource, TIM image and viewport its methods read.
- *  - `Actor` (`GetStyleEffectMethods` onward; include/Actor.h, unified round
- *    82): the base class of `DreamSys`, `TodActor` and `StyleEffect`.
- *    `Actor__Actor` is the BASE's own constructor: `TodActor__TodActor`
- *    calls it to chain to the base first, then overwrites `self->methods`
- *    with its own table. `GetStyleEffectMethods` is the StyleEffect
- *    subclass's table getter (named round 73), placed here by ROM address.
+ *  - StyleEffect (include/StyleEffect.h): the per-kind pieces for its two
+ *    sprite kinds that StyleEffect__UpdateByKind and ReleaseByKind
+ *    (class_3bb8c_s.c) call. SpawnPlainSprites builds the five sprites,
+ *    RandomizeSprites re-shapes four of them every frame, NoOpIgnoreArgs is
+ *    the empty per-frame step, and ReleaseSprites / ReleaseSpritesB are two
+ *    identical functions that release them. Behind them, by address, sit the
+ *    class's table getter and SetStyleEffectSources, which records the
+ *    TMD resource, TIM image and viewport every StyleEffect draws from.
+ *  - Actor (include/Actor.h), the base of TodActor, DreamSys and
+ *    StyleEffect: New_Actor and the constructor, the child bookkeeping that
+ *    keeps the grid manager and the frame clock in `grid` and `ticker`,
+ *    Reset, NotifyMove (the hull sweep sent after a move),
+ *    DispatchLinkCommand, and the translation setters that end in
+ *    MoveLocalZ.
  */
 #include "common.h"
 #include <libgte.h>
@@ -33,15 +29,12 @@
 #include "FrameClock.h"
 #include "GridCell.h"
 
+/* STYLE_EFFECT_SPRITES' per-frame step: nothing. Its caller passes
+ * (self, pos), which it does not read. */
 void NoOpIgnoreArgs(void) {}
 
 /* ------------------------------------------------------------------ *
- * Group 1: StyleEffect's sprite-array helpers (include/StyleEffect.h), called
- * only from its per-kind dispatch in class_3bb8c_s.c. ReleaseSprites and
- * ReleaseSpritesB are two identical, separate ROM functions (see their
- * reports). RandomizeSprites walks sprites[1..4]: each gets a random scale
- * ratio table through its updateScale slot (VariantSprite__UpdateScale) and a
- * random sprite.rotate, `(rand() % 360) << 12` (4096 per degree).
+ * StyleEffect's sprite kinds (STYLE_EFFECT_SPRITES, _JITTER_SPRITES).
  * ------------------------------------------------------------------ */
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
@@ -51,14 +44,18 @@ extern void ReleaseBasicClassArray(void **array, s32 count);
  * the same with 3 and 2; z is 1/1. VariantSprite__UpdateScale reads x and y. */
 extern Ratio16 gStyleEffectJitterScales[6][3];
 
+/* Kind 2's release; ReleaseSpritesB, kind 3's, is the same body. */
 void StyleEffect__ReleaseSprites(StyleEffect *self) {
     ReleaseBasicClassArray((void **)self->sprites, ARRAY_COUNT(self->sprites));
 }
 
+/* Five sprites of variant 0 at their default scale. */
 void StyleEffect__SpawnPlainSprites(StyleEffect *self) {
     StyleEffect__SpawnSprites(self, 0, 0, 0);
 }
 
+/* STYLE_EFFECT_JITTER_SPRITES' per-frame step: every sprite but the first
+ * takes a random streak shape and a random whole-degree rotation. */
 void StyleEffect__RandomizeSprites(StyleEffect *self) {
     VariantSprite **sprite = &self->sprites[1];
     s32 i;
@@ -76,19 +73,15 @@ void StyleEffect__ReleaseSpritesB(StyleEffect *self) {
     ReleaseBasicClassArray((void **)self->sprites, ARRAY_COUNT(self->sprites));
 }
 
-/* ------------------------------------------------------------------ *
- * Group 2: GetStyleEffectMethods onward -- Actor (include/Actor.h), the
- * shared base of DreamSys, TodActor and StyleEffect.
- * ------------------------------------------------------------------ */
-
-/* StyleEffect's getter (include/StyleEffect.h), placed here by ROM address. */
+/* StyleEffect's table getter. */
 StyleEffectMethods *GetStyleEffectMethods(void) {
     return &gStyleEffectMethods;
 }
 
-/* Captured here for StyleEffect's methods (class_3bb8c_s.c, which declares
- * the same three with the same types; track 4b, round 85): the Actor this
- * runs on, and two objects passed through. */
+/* What StyleEffect's methods (class_3bb8c_s.c, which declares the same
+ * globals) draw from: the scene's TMD resource, its TIM image and the
+ * viewport. The TMD resource's getModel slot sits where Actor has
+ * setBackClip, hence the Actor view. */
 extern Actor *gStyleEffectTmd;
 extern void *gStyleEffectTim;
 extern void *gStyleEffectViewport;
@@ -97,6 +90,8 @@ extern s16 gStyleEffectClutPos[2];
 
 extern void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy);
 
+/* Records the three sources, then points the first primitive of the TMD's
+ * models 0 and 2 (gStyleEffectModelIds) at the CLUT at gStyleEffectClutPos. */
 void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
     s32 i;
     TmdModel *model;
@@ -142,6 +137,9 @@ fail:
     return NULL;
 }
 
+/* addChild, removeChild and removeAllChildren chain SceneNode's and keep
+ * two companions: a StageMap child (class id 0x114, three nibbles) in
+ * `grid`, a FrameClock child in `ticker`. */
 void Actor__AddChild(Actor *self, BasicClass *child) {
     s32 classId;
 
@@ -171,6 +169,8 @@ void Actor__RemoveAllChildren(Actor *self) {
     GetSceneNodeMethods()->removeAllChildren((SceneNode *)self);
 }
 
+/* The distance NotifyMove stretches the hull by until a move or
+ * setLastOffsetValue sets one; no extra. */
 void Actor__Reset(Actor *self) {
     self->lastOffsetValue = 300;
     self->pendingExtra = 0;
@@ -178,12 +178,17 @@ void Actor__Reset(Actor *self) {
 
 extern void RotateAndOffsetHullList(TmdHull *hull, s32 turn, s32 back, s32 delta);
 
+/* notifyWithHull: SceneNode's, then, for events ACTOR_EVENT_UNSWEPT to
+ * ACTOR_EVENT_MOVED_Y on a model with bounds, the model's hull goes to the
+ * parents through transformAndNotifyParents. For a move it is first
+ * stretched: one face pushed out by the last move's distance plus
+ * pendingExtra, an x face for ACTOR_EVENT_MOVED_X (RotateAndOffsetHullList
+ * turns the box a quarter first), a z face otherwise; the max face after a
+ * forward move, the min face after a backward one. An Actor linkTarget then
+ * gets slotE8, which every Actor class leaves empty. */
 void Actor__NotifyMove(Actor *self, s32 event) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, event);
-    /* Written as two nested guards, not a combined `event >= 5 && event < 9`
-     * range test -- the combined form optimizes into a single unsigned
-     * `(event-5) < 4` comparison, which is not what retail does (two
-     * separate `slti`s). */
+    /* MATCHING: two nested ifs; `&&` folds into one unsigned compare */
     if (event <= ACTOR_EVENT_MOVED_Y) {
         if (event >= ACTOR_EVENT_UNSWEPT) {
             TmdHull hull;
@@ -196,8 +201,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                     s32 forward = (offset >= 0);
                     s32 delta;
 
-                    /* `goto`, not `if/else`, to match retail's actual
-                     * branch shape (see the match report). */
+                    /* MATCHING: goto, not if/else, for retail's branch order */
                     if (offset < 0) {
                         goto backward;
                     }
@@ -209,7 +213,6 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                     RotateAndOffsetHullList(&hull, alongX, forward, delta);
                 }
                 self->methods->transformAndNotifyParents(self, &hull, event);
-                /* The link target's class byte: an Actor gets slotE8. */
                 if (self->linkTarget != NULL) {
                     if ((u8)self->linkTarget->methods->header == ACTOR_CLASS_ID) {
                         ((Actor *)self->linkTarget)->methods->slotE8((Actor *)self->linkTarget);
@@ -220,9 +223,9 @@ void Actor__NotifyMove(Actor *self, s32 event) {
     }
 }
 
-/* Only the low byte of the sender's class id is read. Both targets are
- * called with self alone in C terms, but they read the sender and event
- * this function received: $a1/$a2 are never touched before the call. */
+/* Routes a link command by the sender's class id byte: from an Actor (or
+ * any class below it) to onActorLinkCommand, from a GridCell to
+ * onGridCellLinkCommand, from anything else nowhere. */
 void Actor__DispatchLinkCommand(Actor *self, BasicClass *sender, s32 event) {
     if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
         self->methods->onActorLinkCommand(self, sender, event);
@@ -239,15 +242,14 @@ void Actor__AddTranslation(Actor *self, LongVec3 *delta) {
     Actor__UpdateTranslation(self, 0, delta);
 }
 
-/* coord2->coord.t (+0x018 of the GsCOORDINATE2) is set (set != 0) or added
- * to, then flg is cleared so the coordinate is recomputed. The assignment
- * is a whole-Vec3 copy. */
+/* Sets (set != 0) or adds to the offset from the parent, coord2->coord.t,
+ * then clears coord2->flg so libgs recomputes the matrix. */
 void Actor__UpdateTranslation(Actor *self, s32 set, LongVec3 *v) {
     Actor *actor = self; /* MATCHING: a second name for self; without it $a0 is used, not $t0 */
     GsCOORDINATE2 *coord = actor->coord2;
 
     if (set) {
-        *(LongVec3 *)coord->coord.t = *v;
+        *(LongVec3 *)coord->coord.t = *v; /* MATCHING: one struct copy, loads before stores */
     } else {
         coord->coord.t[0] += v->x;
         coord->coord.t[1] += v->y;
@@ -256,6 +258,7 @@ void Actor__UpdateTranslation(Actor *self, s32 set, LongVec3 *v) {
     actor->coord2->flg = 0;
 }
 
+/* Moves by `local` turned by the actor's own rotation. */
 void Actor__AddLocalTranslation(Actor *self, s16 *local) {
     LongVec3 delta;
 
@@ -263,7 +266,8 @@ void Actor__AddLocalTranslation(Actor *self, s16 *local) {
     self->methods->addTranslation(self, &delta);
 }
 
-/* z component of the local move vector gActorLocalMove (class_3bb8c_p.c). */
+/* The z of the s16 local move vector whose x and y are gActorLocalMove
+ * (class_3bb8c_p.c, with MoveLocalX/Y and MoveAlongLocalAxis). */
 extern s16 gActorLocalMoveZ;
 
 void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {

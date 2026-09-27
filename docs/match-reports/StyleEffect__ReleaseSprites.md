@@ -83,3 +83,7 @@ another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 
 View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
+
+## Track 7 (round 99, alpha)
+
+The count is ARRAY_COUNT(self->sprites) (5); a comment says kind 2 releases through it and kind 3 through the identical StyleEffect__ReleaseSpritesB.

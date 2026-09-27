@@ -149,3 +149,13 @@ most consequential unknown in the unit.
 ## Track 4 (2026-09-25, round 82, delta)
 
 Renamed from `BaseObjO__func_571f8`. Override of +0x088 (notifyIfUnk20Active). Not named for the slot because the body does more: it chains the base, then for events 5..8 with an active model reads the model data (readUnk20Data, +0x08C), for events other than 5 adjusts it by lastOffsetValue +- pendingExtra (RotateAndOffsetHullList), hands it to transformAndNotifyParents (+0x090), and calls slotE8 on an Actor linkTarget. Events 6, 7 and 8 are exactly the ones Actor__MoveLocalZ/X/Y pass (through Actor__MoveAlongLocalAxis); tier B. The fields read here: unk20 = SceneNode.model, unk28 = linkTarget, unk48 = lastOffsetValue, unk54 = pendingExtra (s32: this function's addu/subu settle the merge CONFLICT with DreamSys's void *). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 99, alpha)
+
+Name unchanged (tier B). Constants: the event tests use enum ActorMoveEvent (include/Actor.h; 5 ACTOR_EVENT_UNSWEPT, 6..8 ACTOR_EVENT_MOVED_Z/X/Y, the events Actor__MoveAlongLocalAxis sends), the class-byte test ACTOR_CLASS_ID, read as `(u8)linkTarget->methods->header` (the same lbu) instead of `*(u8 *)methods`. Locals: h/isSeven/nonneg/adjusted -> offset/alongX/forward/delta, which are RotateAndOffsetHullList's delta/turn/back; labels negative/joinAdjust -> backward/offsetHull. The two derivation comments (nested guards, goto) are one `MATCHING:` line each now; the derivation is items 2 and 3 above.
+
+**The buffer is a plain TmdHull, measured.** The unit carried a local `Buf38O { u8 raw[0x38]; }` with this comment, moved here as history:
+
+> Actor__NotifyMove's model-data buffer, filled by readUnk20Data and handed to RotateAndOffsetHullList and transformAndNotifyParents. Retail's frame needs it to be 0x38 bytes (sp+0x10 .. sp+0x47, the saved registers from sp+0x48); a smaller buffer shifts everything after the function. Its layout is not established here.
+
+The frame does need 0x38 bytes there, but a `TmdHull` (0x34: count plus eight TmdVec3 corners) gets the same slot, because cc1 rounds the local to 8: with `TmdHull hull;` the function is 74/74 and the whole image byte-identical. So the type and both casts (`(TmdHull *)&buf`) are gone.
