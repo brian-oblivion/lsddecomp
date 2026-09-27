@@ -51,6 +51,10 @@
 typedef struct LbdFile LbdFile;
 typedef struct LbdFileMethods LbdFileMethods;
 
+/* `headerReady` once StageMap__OnNotifyTag1 has linked the header's
+ * placements into the slot's cells (1 is "read, not yet consumed"). */
+#define LBDFILE_HEADER_CONSUMED 2
+
 /* The start of the header block loadHeader reads into `buffer`. */
 typedef struct LbdFileHeader {
     /* +0x00 */ u8 pad0[0x2];

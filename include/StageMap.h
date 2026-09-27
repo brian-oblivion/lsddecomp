@@ -99,6 +99,37 @@ typedef struct StageMap StageMap;
 typedef struct StageMapMethods StageMapMethods;
 typedef struct ChunkSlot ChunkSlot;
 
+/* The grid's geometry, in world units. A cell is STAGE_CELL_SIZE square:
+ * ComputeFootprintDescriptor shifts a position's offset from its slot's
+ * origin right by STAGE_CELL_SHIFT for the cell column/row. A chunk is
+ * STAGE_CHUNK_CELLS cells square (the ctor's 20 x 20 lattice, 0x800 apart),
+ * so STAGE_CHUNK_SIZE (0xA000, also gDefaultGridSpan) wide; odd rows sit
+ * STAGE_CHUNK_SIZE / 2 to -x (ComputeCellWorldOffsets). */
+#define STAGE_CELL_SHIFT 11
+#define STAGE_CELL_SIZE (1 << STAGE_CELL_SHIFT)
+#define STAGE_CHUNK_CELLS 20
+#define STAGE_CHUNK_SIZE (STAGE_CHUNK_CELLS * STAGE_CELL_SIZE)
+
+/* A slot's `cells`: the lattice, row stride STAGE_CHUNK_CELLS, then 10
+ * overflow cells PopulateSlotCells hangs chained placements in; 410 in all
+ * (the ctor's BMemPMgrAlloc(0x668), ClearSlotCells' walk). */
+#define STAGE_SLOT_LATTICE_CELLS (STAGE_CHUNK_CELLS * STAGE_CHUNK_CELLS)
+#define STAGE_SLOT_CELLS (STAGE_SLOT_LATTICE_CELLS + 10)
+
+/* What StageMap passes its parents (notifyParents). CHUNK_CHANGED:
+ * UpdateFootprintTracking, when the target's chunk column/row changes. The
+ * two slot events go through notifyWithHull (StageMap__OnSlotEvent), which
+ * records the slot as lastEventSlot before passing the command on:
+ * SLOT_RELEASE before a slot is reloaded or its load cancelled
+ * (ApplyChunkLoads; UnloadAllSlots and Finalize), releasing its heldObj;
+ * SLOT_DATA_READY when the slot's LbdFile has read its data block
+ * (OnNotifyTag1, on `dataReady`). */
+enum StageMapEvent {
+    STAGEMAP_EVENT_CHUNK_CHANGED = 5,
+    STAGEMAP_EVENT_SLOT_RELEASE = 6,
+    STAGEMAP_EVENT_SLOT_DATA_READY = 7
+};
+
 /* A grid-cell descriptor, 10 bytes, alignment 2 (every member s8/s16, so a
  * whole copy is lwl/lwr + swl/swr + sh: SetTargetAndLoadChunks). b0/b1 the
  * chunk column/row (SplitChunkIndex: index % columns, index / columns),
@@ -155,6 +186,28 @@ typedef struct ChunkNeighbourDelta {
     s32 colDeltaOddRow;  /* +0x4 */
     s32 colDeltaEvenRow; /* +0x8 */
 } ChunkNeighbourDelta;
+
+/* The neighbour keys (ChunkSlotSpec::neighbour, ChunkSlot::neighbour,
+ * LbdFile::elemKey): the centre chunk and the six around it, as
+ * sChunkNeighbourDeltas steps to them (rows, then columns for an odd / even
+ * centre row) and sNeighbourOffsets places them (a row is +z, a column +x).
+ * Each adjacent row touches two chunks, the lower and the higher column.
+ * A vertical grid uses keys 0 .. rows - 1 as its stacked layers instead
+ * (ComputeNeighbourMask, FindSlotForPosition). */
+enum ChunkNeighbour {
+    CHUNK_NEIGHBOUR_PREV_ROW_LO = 0, /* row -1; column -1 (odd row) or 0 (even) */
+    CHUNK_NEIGHBOUR_PREV_ROW_HI = 1, /* row -1; column 0 (odd row) or +1 (even) */
+    CHUNK_NEIGHBOUR_PREV_COL = 2,    /* column -1 */
+    CHUNK_NEIGHBOUR_CENTRE = 3,
+    CHUNK_NEIGHBOUR_NEXT_COL = 4,    /* column +1 */
+    CHUNK_NEIGHBOUR_NEXT_ROW_LO = 5, /* row +1; column -1 (odd row) or 0 (even) */
+    CHUNK_NEIGHBOUR_NEXT_ROW_HI = 6, /* row +1; column 0 (odd row) or +1 (even) */
+    CHUNK_NEIGHBOUR_COUNT = 7
+};
+
+/* A key's bit, as sNeighbourBits holds it; ComputeNeighbourMask returns a
+ * mask of the keys whose chunk lies on the grid. */
+#define CHUNK_NEIGHBOUR_BIT(key) (1 << (key))
 
 /* applyChunkLoads' 0xC-byte entries, one per slot to (re)load: the file
  * record chunkFileFn returned for the chunk (NULL: cancel the slot's load), the

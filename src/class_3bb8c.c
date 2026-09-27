@@ -28,6 +28,10 @@
 #include "LbdFile.h"
 #include "GridCell.h"
 
+/* The height of one layer of a vertical grid: FindSlotForPosition gives
+ * neighbour key i the y range (-(i + 1) * height, -i * height]. */
+#define VERTICAL_LAYER_HEIGHT 2048
+
 s32 StageMap__SetTargetAndLoadChunks(StageMap *self, void *outPos, SceneNode *target, Descriptor10 *cell) {
     s32 chunkCentre[3];
     s32 chunkIndex;
@@ -71,20 +75,20 @@ s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dim
         row = 0;
         chunkIndex = 0;
     }
-    x = (origin->x - dims->columns * 0x5000) + cell->b0 * 0xA000;
-    z = origin->z - rowSpan * 0x5000;
+    x = (origin->x - dims->columns * (STAGE_CHUNK_SIZE / 2)) + cell->b0 * STAGE_CHUNK_SIZE;
+    z = origin->z - rowSpan * (STAGE_CHUNK_SIZE / 2);
     chunkPos[0] = x;
     if (row & 1) {
-        chunkPos[0] = x - 0x5000;
+        chunkPos[0] = x - STAGE_CHUNK_SIZE / 2;
     }
     chunkPos[1] = origin->y;
-    halfCell = 0x400;
-    chunkPos[2] = z + row * 0xA000;
-    outPos[0] = (cell->b2 << 11) + chunkPos[0] + (cell->h4 + halfCell);
+    halfCell = STAGE_CELL_SIZE / 2;
+    chunkPos[2] = z + row * STAGE_CHUNK_SIZE;
+    outPos[0] = (cell->b2 << STAGE_CELL_SHIFT) + chunkPos[0] + (cell->h4 + halfCell);
     outPos[1] = cell->h6 + chunkPos[1];
-    outPos[2] = (cell->b3 << 11) + chunkPos[2] + (cell->h8 + halfCell);
-    chunkPos[0] += 0x5000;
-    chunkPos[2] = chunkPos[2] + 0x5000;
+    outPos[2] = (cell->b3 << STAGE_CELL_SHIFT) + chunkPos[2] + (cell->h8 + halfCell);
+    chunkPos[0] += STAGE_CHUNK_SIZE / 2;
+    chunkPos[2] = chunkPos[2] + STAGE_CHUNK_SIZE / 2;
     return chunkIndex;
 }
 
@@ -124,7 +128,7 @@ s32 StageMap__UpdateFootprintTracking(StageMap *self) {
     self->targetCell = desc;
 
     if ((s16)oldChunk != *(s16 *)&desc) {
-        self->methods->notifyParents(self, 5);
+        self->methods->notifyParents(self, STAGEMAP_EVENT_CHUNK_CHANGED);
     }
 
     return specIndex;
@@ -153,7 +157,7 @@ void StageMap__LoadChunksAround(StageMap *self, s32 centreChunk, LongVec3 *centr
     ChunkSlot *slot;
     SplitCoord2 *origin;
     LongVec3 *offset;
-    ChunkLoadEntry loads[7];
+    ChunkLoadEntry loads[CHUNK_NEIGHBOUR_COUNT];
 
     if (specs != 0) {
         columns = self->config->columns;
@@ -161,7 +165,7 @@ void StageMap__LoadChunksAround(StageMap *self, s32 centreChunk, LongVec3 *centr
         onGridMask = StageMap__ComputeNeighbourMask(self, centreChunk, oddRow);
 
         count = 0;
-        for (i = 0; i < 7; i++) {
+        for (i = 0; i < CHUNK_NEIGHBOUR_COUNT; i++) {
             slot = self->methods->findSlotByNeighbour(self, i);
             slot->neighbour = specs[i].neighbour;
             if (specs[i].load != 0) {
@@ -172,9 +176,9 @@ void StageMap__LoadChunksAround(StageMap *self, s32 centreChunk, LongVec3 *centr
                     origin->ty = centrePos->y;
                     origin->tz.w = centrePos->z + offset->z;
                 } else {
-                    origin->tx.w = centrePos->x - 0x5000;
+                    origin->tx.w = centrePos->x - (STAGE_CHUNK_SIZE / 2);
                     origin->ty = centrePos->y + offset->y;
-                    origin->tz.w = centrePos->z - 0x5000;
+                    origin->tz.w = centrePos->z - (STAGE_CHUNK_SIZE / 2);
                 }
                 slot->cellParent->coord2->flg = 0;
                 StageMap__ComputeChunkLoadEntry(self, &loads[count], columns, oddRow, centreChunk,
@@ -183,7 +187,7 @@ void StageMap__LoadChunksAround(StageMap *self, s32 centreChunk, LongVec3 *centr
             }
         }
 
-        for (i = 0; i < 7; i++) {
+        for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
             slot = &self->slots[i];
             slot->loader->elemKey = slot->neighbour;
         }
@@ -205,17 +209,26 @@ s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 chunk, s32 oddRow) {
     isVertical = dims->isVertical;
     rows = dims->rows;
     if (isVertical == 0) {
-        offGrid = (chunk < columns) ? 3 : 0;
+        offGrid = (chunk < columns) ? CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_PREV_ROW_LO) |
+                                          CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_PREV_ROW_HI)
+                                    : 0;
         if (chunk >= columns * (rows - 1)) {
-            offGrid |= 0x60;
+            offGrid |= CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_NEXT_ROW_LO) |
+                       CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_NEXT_ROW_HI);
         }
         if (chunk % columns == 0) {
-            offGrid |= oddRow ? 0x25 : 4;
+            offGrid |= oddRow ? CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_PREV_ROW_LO) |
+                                    CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_PREV_COL) |
+                                    CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_NEXT_ROW_LO)
+                              : CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_PREV_COL);
         }
         if ((chunk + 1) % columns != 0) {
             return ~offGrid;
         }
-        offGrid |= oddRow ? 0x10 : 0x52;
+        offGrid |= oddRow ? CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_NEXT_COL)
+                          : CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_PREV_ROW_HI) |
+                                CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_NEXT_COL) |
+                                CHUNK_NEIGHBOUR_BIT(CHUNK_NEIGHBOUR_NEXT_ROW_HI);
         return ~offGrid;
     } else {
         offGrid = -1;
@@ -300,7 +313,8 @@ void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entry, s32 count)
     for (i = 0; i < count; i++) {
         tail = (ChunkLoadEntryTail *)&entry->chunkIndex;
         slot = self->methods->findSlotByNeighbour(self, tail->neighbour);
-        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, slot, i);
+        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, STAGEMAP_EVENT_SLOT_RELEASE,
+                                                               slot, i);
         if (entry->file != 0) {
             if (slot->loader->headerReady != 0) {
                 self->methods->clearSlotCells(self, slot);
@@ -328,7 +342,7 @@ s32 StageMap__CountPendingLoads(StageMap *self) {
     s32 i;
 
     count = 0;
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
         if (self->slots[i].loadPending != 0) {
             count++;
         }
@@ -341,20 +355,21 @@ void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 command) {
     ChunkSlot *slot;
     s32 pending;
 
-    if (command != 2) {
+    if (command != DRAWSYSTEM_EVENT_VSYNC) {
         return;
     }
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
         slot = &self->slots[i];
         if (slot->loader->dataReady != 0) {
             slot->loader->dataReady = 0;
-            ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 7, slot, i);
+            ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(
+                self, STAGEMAP_EVENT_SLOT_DATA_READY, slot, i);
         }
         pending = self->loadsPending;
         if (pending == 1 && slot->loadPending != 0) {
             if (slot->loader->headerReady != 0) {
                 self->methods->populateSlotCells(self, slot);
-                slot->loader->headerReady = 2;
+                slot->loader->headerReady = LBDFILE_HEADER_CONSUMED;
                 slot->loadPending = 0;
                 if (--self->pendingLoadCount == 0) {
                     self->pendingLoadCount = 0;
@@ -379,7 +394,7 @@ void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 command) {
 
 typedef struct BE54LoadReq {
     void *buffer; /* +0x000, New_LinkResource's descriptor's buffer (code_33808.c's Src6F240) */
-    u8 pad4[0xC];
+    u8 pad4[0x10 - 0x4];
 } BE54LoadReq;
 
 void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
@@ -419,9 +434,9 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     rec.next = 0;
 
     i = 0;
-    hidden = 0x80000000;
+    hidden = GsDOFF;
     cellOff = 0;
-    overflowOff = 0x640;
+    overflowOff = STAGE_SLOT_LATTICE_CELLS * sizeof(GridCell *);
     for (;;) {
         model = ((PlacementGridResolveEntryFn)grid->methods->processBuffer)(grid, &rec, i);
         if (model == 0) {
@@ -438,7 +453,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
             cells = (u8 *)slot->cells;
             if (rec.chained != 0) {
                 cell = (GridCell **)(cells + overflowOff);
-                overflowOff += 4;
+                overflowOff += sizeof(GridCell *);
             } else {
                 cell = (GridCell **)(cells + cellOff);
             }
@@ -473,7 +488,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
             (*cell)->nextInCell = *overflow;
             continue;
         }
-        cellOff += 4;
+        cellOff += sizeof(GridCell *);
         (*cell)->nextInCell = 0;
         i++;
     }
@@ -485,9 +500,9 @@ void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *slot) {
 
     if (slot->loader->chunkIndex >= 0) {
         ((LbdFileReleaseHeaderElemFn)slot->loader->methods->releaseHeader)(slot->loader, slot);
-        end = slot->cells + 0x19A;
+        end = slot->cells + STAGE_SLOT_CELLS;
         for (p = slot->cells; p < end; p++) {
-            (*p)->attribute |= 0x80000000;
+            (*p)->attribute |= GsDOFF;
             (*p)->model = 0;
             (*p)->tmd = 0;
         }
@@ -540,9 +555,9 @@ s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, S
 
         chunkOrigin = (SplitCoord2 *)self->methods->findSlotByNeighbour(self, slot->loader->elemKey)
                           ->cellParent->coord2;
-        out->chunkCentre.x = chunkOrigin->tx.w + 0x5000;
+        out->chunkCentre.x = chunkOrigin->tx.w + STAGE_CHUNK_SIZE / 2;
         out->chunkCentre.y = chunkOrigin->ty;
-        out->chunkCentre.z = chunkOrigin->tz.w + 0x5000;
+        out->chunkCentre.z = chunkOrigin->tz.w + STAGE_CHUNK_SIZE / 2;
 
         origin = (SplitCoord2 *)slot->cellParent->coord2;
         out->relPos.x = pos->x.w - out->chunkCentre.x;
@@ -551,21 +566,21 @@ s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, S
 
         rel = pos->x.w - origin->tx.w;
         if (rel < 0) {
-            rel += 0x7FF;
+            rel += STAGE_CELL_SIZE - 1;
         }
-        out->base.b2 = rel >> 11;
+        out->base.b2 = rel >> STAGE_CELL_SHIFT;
 
         rel = pos->z.w - origin->tz.w;
         if (rel < 0) {
-            rel += 0x7FF;
+            rel += STAGE_CELL_SIZE - 1;
         }
-        out->base.b3 = rel >> 11;
+        out->base.b3 = rel >> STAGE_CELL_SHIFT;
 
         cellCol = out->base.b2;
-        out->base.h4 = pos->x.h - (origin->tx.h + (cellCol << 11) + 0x400);
+        out->base.h4 = pos->x.h - (origin->tx.h + (cellCol << STAGE_CELL_SHIFT) + STAGE_CELL_SIZE / 2);
         out->base.h6 = pos->y.h;
         cellRow = out->base.b3;
-        out->base.h8 = pos->z.h - (origin->tz.h + (cellRow << 11) + 0x400);
+        out->base.h8 = pos->z.h - (origin->tz.h + (cellRow << STAGE_CELL_SHIFT) + STAGE_CELL_SIZE / 2);
         out->slot = slot;
 
         return 0;
@@ -587,7 +602,7 @@ ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 neighbour) {
     s32 i;
     ChunkSlot *slot;
 
-    for (i = 0; i < 7; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
         slot = &self->slots[i];
         if (slot->loader->elemKey == neighbour) {
             return slot;
@@ -613,9 +628,9 @@ ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
     s32 edge;
 
     i = 0;
-    span = 0xA000;
+    span = STAGE_CHUNK_SIZE;
     layerTop = 0;
-    for (; i < 7; i++, layerTop -= 0x800) {
+    for (; i < CHUNK_NEIGHBOUR_COUNT; i++, layerTop -= VERTICAL_LAYER_HEIGHT) {
         slot = self->methods->findSlotByNeighbour(self, i);
         origin = (SplitCoord2 *)slot->cellParent->coord2;
         if (pos->x >= origin->tx.w && pos->x < (edge = origin->tx.w) + span) {
@@ -624,7 +639,7 @@ ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
                     return slot;
                 }
                 if (layerTop >= pos->y) {
-                    if (layerTop - 0x800 >= pos->y) {
+                    if (layerTop - VERTICAL_LAYER_HEIGHT >= pos->y) {
                         continue;
                     }
                     return slot;
