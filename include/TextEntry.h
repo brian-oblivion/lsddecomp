@@ -79,7 +79,7 @@ struct TextEntryMethods {
     /* +0x08C */ void (*moveCursorLeft)(TextEntry *self);      /* TextEntry__MoveCursorLeft */
     /* +0x090 */ void (*nextChar)(TextEntry *self);            /* TextEntry__NextChar */
     /* +0x094 */ void (*prevChar)(TextEntry *self);            /* TextEntry__PrevChar */
-    /* +0x098 */ void (*toggleActOnHeld)(TextEntry *self);     /* TextEntry__ToggleAltCommands */
+    /* +0x098 */ void (*toggleActOnHeld)(TextEntry *self);     /* TextEntry__ToggleActOnHeld */
     /* +0x09C */ void (*resetChar)(TextEntry *self);           /* TextEntry__ResetChar */
     /* +0x0A0 */ void (*resetAllChars)(TextEntry *self);       /* TextEntry__ResetAllChars */
     /* +0x0A4 */ void (*setCursorPos)(TextEntry *self, s32 pos, s32 notify); /* TextEntry__SetCursorPos */
@@ -135,7 +135,7 @@ void TextEntry__MoveCursorRight(TextEntry *self);
 void TextEntry__MoveCursorLeft(TextEntry *self);
 void TextEntry__NextChar(TextEntry *self);
 void TextEntry__PrevChar(TextEntry *self);
-void TextEntry__ToggleAltCommands(TextEntry *self);
+void TextEntry__ToggleActOnHeld(TextEntry *self);
 void TextEntry__ResetChar(TextEntry *self);
 void TextEntry__ResetAllChars(TextEntry *self);
 void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify);

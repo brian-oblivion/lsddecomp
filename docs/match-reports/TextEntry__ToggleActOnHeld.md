@@ -1,4 +1,6 @@
-# TextEntry__ToggleAltCommands -- MATCHED (10/10 words)
+# TextEntry__ToggleActOnHeld -- MATCHED (10/10 words)
+
+> Renamed from `TextEntry__ToggleAltCommands` on 2026-09-27 (tools/rename.py). Address 0x800517ec.
 
 > Renamed from `Obj86ED0__ToggleFlag20` on 2026-09-26 (tools/rename.py). Address 0x800517ec.
 
@@ -10,7 +12,7 @@ the class-identity evidence shared across this group).
 ## Body
 
 ```c
-void TextEntry__ToggleAltCommands(Obj86ED0 *self)
+void TextEntry__ToggleActOnHeld(Obj86ED0 *self)
 {
     if (self->unk48) {
         self->unk20 ^= 1;
@@ -24,7 +26,7 @@ group uses -- it is XOR-toggled here and nowhere else read in this unit.
 
 ## Naming
 
-- `TextEntry__ToggleAltCommands` -- tier B. self->unk20 ^= 1, gated on self->unk48. A pure boolean toggle with no further use of unk20 in this unit -- mechanics are the whole of what's known. classtable.py gTextEntryMethods +0x098.
+- `TextEntry__ToggleActOnHeld` -- tier B. self->unk20 ^= 1, gated on self->unk48. A pure boolean toggle with no further use of unk20 in this unit -- mechanics are the whole of what's known. classtable.py gTextEntryMethods +0x098.
 
 ## Track 4 (2026-09-26, round 87)
 

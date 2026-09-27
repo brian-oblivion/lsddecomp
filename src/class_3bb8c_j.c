@@ -37,7 +37,7 @@ void TextEntry__PrevChar(TextEntry *self) {
     }
 }
 
-void TextEntry__ToggleAltCommands(TextEntry *self) {
+void TextEntry__ToggleActOnHeld(TextEntry *self) {
     if (self->panelSprite) {
         self->actOnHeld ^= 1;
     }

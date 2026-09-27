@@ -55,7 +55,7 @@ void TextEntry__SetCursorPos(Obj86ED0 *self, s32 arg1, s32 arg2)
 ```
 
 Part of the same `Obj86ED0` "countdown/flush" group established in round 15
-(`TextEntry__PrevChar`/`TextEntry__ToggleAltCommands`/`TextEntry__ResetChar`/`TextEntry__ResetAllChars`, same
+(`TextEntry__PrevChar`/`TextEntry__ToggleActOnHeld`/`TextEntry__ResetChar`/`TextEntry__ResetAllChars`, same
 unit): tests `self->unk48` as a readiness gate, then calls through
 `self->unk40`'s own method table at slot `0xBC` with a 2-word stack-local
 argument block, then records `self->unk18 = arg1` and, if `arg2` is
