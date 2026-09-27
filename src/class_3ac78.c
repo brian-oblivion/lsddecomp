@@ -6,19 +6,18 @@
  *
  * This third holds the object's life and its command path: the allocator
  * and ctor (seven slots, each an LbdFile, a placement list, a cellParent
- * GridCell attached at `origin` and 410 cells on a 0x800 lattice, row stride
- * 20), Finalize, OnNotify, Reset, OnSlotEvent, the per-tick update
- * (UpdateIfEnabled: footprint tracking, then the scale ramp), UnloadAllSlots,
- * the setters ObjM configures it through (SetChildParams, SetCallback,
- * SetAcceptedTags, SetGridSpan, SetConfig), and the path a command takes to
- * the cells: DispatchLinkCommand and ForwardAcceptedCommand filter the
- * sender against acceptedTags, ApplyToSenderFootprint turns the sender's
- * position into one cell rectangle (SetFootprintFromCell or
- * SetFootprintRect), and DispatchToRectCells hands the command to every cell
- * in it and every cell chained behind each (NotifyGridCell).
- *
- * StageMap__NoOpSlotD8 is the empty +0x0D8 stub; nothing calls it, so it keeps its
- * placeholder name, like SceneNode__NoOpSlot5C in code_d294_b.
+ * GridCell attached at `origin` and STAGE_SLOT_CELLS cells STAGE_CELL_SIZE
+ * apart, row stride STAGE_CHUNK_CELLS), Finalize, OnNotify, Reset,
+ * OnSlotEvent, the per-tick update (UpdateIfEnabled: footprint tracking,
+ * then the scale ramp), UnloadAllSlots, the setters ObjM configures it
+ * through (SetChildParams, SetCallback, SetAcceptedTags, SetGridSpan,
+ * SetConfig), and the path a command takes to the cells:
+ * DispatchLinkCommand passes on an Actor sender's, ForwardAcceptedCommand
+ * filters the sender against acceptedTags, ApplyToSenderFootprint turns
+ * the sender's position into a 3 x 3 cell footprint (SetFootprintFromCell
+ * or SetFootprintRect), and DispatchToRectCells hands the command to every
+ * cell in it and every cell chained behind each (NotifyGridCell).
+ * StageMap__NoOpSlotD8 is the empty +0x0D8 slot; nothing calls it.
  */
 #include "common.h"
 #include <libgte.h>
@@ -38,8 +37,8 @@
 #include "BMemPMgr.h"
 
 /* TimedTask::sound is BasicClass * (it may be the ctor's own argument); when
- * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. */
-
+ * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. Plays
+ * `tone` at full volume (127) throughout. */
 void TimedTask__PlaySound(TimedTask *self, s32 tone) {
     VabStreamObj *sound = (VabStreamObj *)self->sound;
 
@@ -117,6 +116,8 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
         pos.y = 0;
         pos.z = STAGE_CELL_SIZE / 2;
 
+        /* MATCHING: `end` from `cells` before `cursor = cells`, or the load
+         * of slot->cells no longer goes through $v0. */
         cells = slot->cells;
         end = cells + STAGE_SLOT_CELLS;
         cursor = cells;
@@ -125,12 +126,15 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
             *cursor = cell;
             cell->methods->attachToParent(cell, (SceneNode *)slot->cellParent, &pos);
 
+            /* Cell centres, row by row; the test lets a row reach
+             * STAGE_CHUNK_CELLS + 1 positions before it wraps. */
             pos.x += STAGE_CELL_SIZE;
             if (pos.x > STAGE_CHUNK_SIZE + STAGE_CELL_SIZE / 2) {
                 pos.x = STAGE_CELL_SIZE / 2;
                 pos.z += STAGE_CELL_SIZE;
             }
 
+            /* MATCHING: each use reloads *cursor. */
             cell = *cursor;
             cell->methods->setLightMode(cell, 1); /* GsFOG */
             cell = *cursor;
@@ -190,10 +194,7 @@ void StageMap__Finalize(StageMap *self) {
     GetLightRigMethods()->finalize((LightRig *)self);
 }
 
-/* GetSceneNodeMethods: include/SceneNode.h. Round 59 measured the two
- * arguments these calls used to pass the no-argument getter as zero-cost (the
- * jal's delay slot holds a callee-save spill); track 4 dropped them. */
-
+/* A sender of DrawSystem's class (id nibble 0x1) goes on to onNotifyTag1. */
 void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command) {
     GetSceneNodeMethods()->onNotify((SceneNode *)self, sender, command);
 
@@ -215,9 +216,13 @@ void StageMap__Reset(StageMap *self) {
     self->unk1D8 = -1;
 }
 
-void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *elem) {
+/* Records the slot and passes a slot event on to the parents; a
+ * STAGEMAP_EVENT_SLOT_RELEASE also releases the slot's heldObj. */
+void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *slot) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, command);
 
+    /* MATCHING: two literal if+goto tests; an if/else-if chain inverts the
+     * branches. */
     if (command == STAGEMAP_EVENT_SLOT_RELEASE)
         goto release;
     if (command == STAGEMAP_EVENT_SLOT_DATA_READY)
@@ -225,12 +230,12 @@ void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *elem) {
     return;
 
 release:
-    if (elem->heldObj != NULL) {
-        elem->heldObj = elem->heldObj->methods->release(elem->heldObj);
+    if (slot->heldObj != NULL) {
+        slot->heldObj = slot->heldObj->methods->release(slot->heldObj);
     }
 
 record:
-    self->lastEventSlot = elem;
+    self->lastEventSlot = slot;
     self->methods->notifyParents(self, command);
 }
 
@@ -247,10 +252,8 @@ void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 comma
     }
 }
 
-/* Reset every one of the seven grid elements, then the two counters.
- * Matched round 71: `&self->slots[i]` is what produces retail's
- * base + running-offset walk (GCC's strength reduction), not a hand-rolled
- * byte offset. */
+/* Cancel every slot's load, clear and release what it holds, then zero
+ * the load counters and end the scale ramp. */
 void StageMap__UnloadAllSlots(StageMap *self) {
     s32 i;
     ChunkSlot *slot;
@@ -300,7 +303,7 @@ void StageMap__SetAcceptedTags(StageMap *self, s32 *tags) {
 
 void StageMap__ForwardAcceptedCommand(StageMap *self, void *sender, s32 command) {
     s32 *tag;
-    u8 unused[24];
+    u8 unused[24]; /* MATCHING: retail's frame is 24 bytes larger than the locals need */
 
     switch (command) {
         case 2:
@@ -370,10 +373,11 @@ void StageMap__SetFootprintFromCell(StageMap *self, Descriptor10Ext *desc, s32 s
     StageMap__BuildFootprintRects(self);
 }
 
-/* Clamp a span x span footprint centred on desc's cell to the 20 x 20 grid:
- * a cell on the low edge (0) loses one row/column, one on the high edge
- * (0x13) loses one too. The edge tests read a COPY of each byte taken before
- * the decrement, and the height companion is `span` itself. Matched round 71. */
+/* Clamp a span x span footprint centred on desc's cell to the chunk's
+ * STAGE_CHUNK_CELLS x STAGE_CHUNK_CELLS lattice: a cell on the low edge (0)
+ * or the high edge loses one row/column there.
+ * MATCHING: the edge tests read copies taken before the decrement, and the
+ * height is `span` itself. */
 void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span) {
     s32 col;
     s32 row;
@@ -414,9 +418,8 @@ void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span)
 }
 
 /* Notify every cell of every rectangle, and every object chained behind
- * each cell. Matched round 71: the ORDER of the comma-separated increments
- * is load-bearing in both loops (`entry++, i++` and `cell++, col++`); the
- * reverse order was the whole 95/117 residue. */
+ * each cell, with the cell's key in curCell while it is notified.
+ * MATCHING: the comma increments go `rect++, i++` and `cell++, col++`. */
 void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 command) {
     s32 i;
     s32 row;
@@ -433,6 +436,7 @@ void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 comman
             cell = (slot->cells + rect->col) + rect->row * STAGE_CHUNK_CELLS;
             for (row = 0; row < rect->height; row++) {
                 for (col = 0; col < rect->width; cell++, col++) {
+                    /* MATCHING: b0/b1 as one halfword; two byte copies are two lb/sb */
                     *(u16 *)&self->curCell = *(u16 *)&self->targetCell;
                     self->curCell.b2 = rect->col + col;
                     self->curCell.b3 = rect->row + row;
@@ -447,16 +451,8 @@ void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 comman
     }
 }
 
-/* Widened this round (StageMap__DispatchToRectCells) from a single-param signature to
- * accept two more, unused, forwarded params: StageMap__DispatchToRectCells's own call
- * sites explicitly set up $a1/$a2 before every call here (unlike
- * GetSceneNodeMethods's "leftover, already-there" args -- these are real,
- * explicit `move` instructions), so the call itself needs a matching
- * 3-param prototype to compile. Confirmed harmless to THIS function's own
- * already-matched body: neither extra param is read, and GCC does not
- * reserve stack space for unused trailing integer/pointer args on this
- * target, so the definition's own bytes are unaffected (reverified
- * 18/18 after the widening). */
+/* Hands the command to a cell flagged GRIDCELL_FLAG_TAKES_COMMANDS. sender
+ * and command arrive as DispatchToRectCells' own. */
 void NotifyGridCell(GridCell *cell, SceneNode *sender, s32 command) {
     if (cell != NULL && (cell->flags36 & GRIDCELL_FLAG_TAKES_COMMANDS)) {
         cell->methods->onNotify(cell, sender, command);

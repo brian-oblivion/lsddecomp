@@ -160,3 +160,7 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 98, charlie)
+
+`BMemPMgrAlloc(0x1E8)` -> `BMemPMgrAlloc(sizeof(StageMap))` (the struct is 0x1E8, include/StageMap.h); zero bytes.

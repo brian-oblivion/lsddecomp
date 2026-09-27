@@ -760,3 +760,7 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 98, charlie)
+
+Moved here from the `.c` comment: "Clamp a span x span footprint centred on desc's cell to the 20 x 20 grid: a cell on the low edge (0) loses one row/column, one on the high edge (0x13) loses one too. The edge tests read a COPY of each byte taken before the decrement, and the height companion is `span` itself. Matched round 71." The comment keeps the description and a `MATCHING:` line for the two load-bearing shapes; `0x13` is `STAGE_CHUNK_CELLS - 1`. Zero bytes.

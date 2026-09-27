@@ -108,3 +108,7 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 98, charlie)
+
+`span >> 11` / `>> 12` -> `STAGE_CELL_SHIFT` / `STAGE_CELL_SHIFT + 1` (include/StageMap.h): the span in cells, and half that. Zero bytes.

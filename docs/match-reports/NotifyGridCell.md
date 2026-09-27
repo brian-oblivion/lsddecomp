@@ -75,3 +75,9 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 98, charlie)
+
+Moved here from the `.c` comment above the function: "Widened this round (StageMap__DispatchToRectCells) from a single-param signature to accept two more, unused, forwarded params: StageMap__DispatchToRectCells's own call sites explicitly set up $a1/$a2 before every call here (unlike GetSceneNodeMethods's "leftover, already-there" args -- these are real, explicit `move` instructions), so the call itself needs a matching 3-param prototype to compile. Confirmed harmless to THIS function's own already-matched body: neither extra param is read, and GCC does not reserve stack space for unused trailing integer/pointer args on this target, so the definition's own bytes are unaffected (reverified 18/18 after the widening)." (Note: the parameters ARE read -- the body forwards them to `onNotify` -- so "neither extra param is read" was already stale.)
+
+Constant: `flags36 & 0x80` is `GRIDCELL_FLAG_TAKES_COMMANDS`, new in include/GridCell.h, tier B: this function forwards a command only to a cell with the bit; the bit comes from the placement record's `cellFlags` (StageMap__PopulateSlotCells). What the game uses such a cell for is not established; DreamSys__NotifyLinkAttempt reads the same word's low seven bits as a voice index.

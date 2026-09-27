@@ -53,3 +53,9 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 98, charlie)
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B324` | `StageMap__NoOpSlotD8` | A | The body is empty (`jr $ra; nop`), so its mechanics are its whole purpose: a leaf whose mechanics ARE its purpose is tier A by the naming rules. The form follows the project's other empty slots (`SceneNode__NoOpSlot5C`, `CdStream__NoOpSlot5C`, `MoviePlayer__NoOpSlot5C`, `NodeGuardedViewport__NoOpSlotB8`). This supersedes round 67's KEEP above, which predates the `NoOpSlotNN` precedent; round 67's reasoning (no caller, no known signature) still holds and the name claims neither. The slot keeps its name `slotD8`, as `slot5C` does for the others. |

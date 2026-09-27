@@ -172,3 +172,7 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 98, charlie)
+
+`u8 unused[24]` keeps a one-line `MATCHING:` comment (the frame gap above). Local `p` -> `tag`. The case labels 2, 3, 5, 6, 7, 8 stay: which commands they are is not established here.

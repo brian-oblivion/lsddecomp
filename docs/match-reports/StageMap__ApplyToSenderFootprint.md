@@ -195,3 +195,7 @@ an operator decision; not hand-reverted).
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## Track 7 (2026-09-27, round 98, charlie)
+
+Locals `buf` -> `desc`, `saved` -> `savedRects`. Zero bytes.
