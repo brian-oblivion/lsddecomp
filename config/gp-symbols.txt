@@ -64,7 +64,6 @@ D_8008AB1C
 D_8008AB24
 D_8008AB38
 D_8008AB40
-D_8008AB44
 D_8008AB58
 D_8008AB60
 D_8008AB78
@@ -211,6 +210,7 @@ sMoodCue78TransitionDone
 sNdivOverride
 sNdivOverrideSet
 sPadRefCount
+sPauseText
 sSaveFileName
 sSaveTitleBlanks
 sSaveTitleColorChannel

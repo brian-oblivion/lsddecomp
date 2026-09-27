@@ -58,7 +58,7 @@ extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
 
 /* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
-extern char D_8008AB44[]; /* "Pause" (asm/data/7B008.sdata.s) */
+extern char sPauseText[]; /* "Pause" (asm/data/7B008.sdata.s) */
 extern s32 D_8008AB38;    /* two words: the position */
 extern s32 D_8008AB40;    /* one word: the colour */
 
@@ -177,7 +177,7 @@ void ObjM__CloseAndNotifyC(ObjM *self) {
 void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->pauseSetupStep;
     if (state == 0) {
-        self->pauseText = New_TextRow(self->etcTim, 5, &D_8008AB44[0]);
+        self->pauseText = New_TextRow(self->etcTim, 5, &sPauseText[0]);
         self->pauseText->methods->attachToParent(self->pauseText, (SceneNode *)self->unk14,
                                                  (LongVec3 *)&D_8008AB38);
         self->pauseText->methods->setColor(self->pauseText, (SpriteRgb *)&D_8008AB40);

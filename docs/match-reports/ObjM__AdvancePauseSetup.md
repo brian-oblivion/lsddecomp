@@ -24,7 +24,7 @@ A small state machine gated on `self->unk80`:
 void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->unk80;
     if (state == 0) {
-        self->unk7C = New_TextRow(self->unk74, 5, &D_8008AB44[0]);
+        self->unk7C = New_TextRow(self->unk74, 5, &sPauseText[0]);
         self->unk7C->methods->slot4C(self->unk7C, self->unk14, &D_8008AB38);
         self->unk7C->methods->slotB8(self->unk7C, &D_8008AB40);
         self->unk80 = state + 1;
@@ -41,7 +41,7 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
 }
 ```
 
-`D_8008AB44` is the string `"Pause"` (`asm/data/7B008.sdata.s`); the two
+`sPauseText` is the string `"Pause"` (`asm/data/7B008.sdata.s`); the two
 other literal-address arguments (`D_8008AB38`, `D_8008AB40`) are small
 opaque blocks, address-only in this unit.
 
@@ -134,7 +134,7 @@ in this session; the reproducers themselves were scratch files under
 
 ## Naming
 
-**ObjM__AdvancePauseSetup** -- tier B. A 5-step counter (`self->unk80`, 0..4) driving a state machine: on step 0, builds an object literally named "Pause" (`New_TextRow(self->unk74, 5, &D_8008AB44[0])`, `D_8008AB44` == "Pause", asm/data/7B008.sdata.s); on the final step (4), notifies several sibling components. The literal string is strong, concrete evidence for the "pause overlay" reading, but the class's exact game role stays tier B.
+**ObjM__AdvancePauseSetup** -- tier B. A 5-step counter (`self->unk80`, 0..4) driving a state machine: on step 0, builds an object literally named "Pause" (`New_TextRow(self->unk74, 5, &sPauseText[0])`, `sPauseText` == "Pause", asm/data/7B008.sdata.s); on the final step (4), notifies several sibling components. The literal string is strong, concrete evidence for the "pause overlay" reading, but the class's exact game role stays tier B.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
