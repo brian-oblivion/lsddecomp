@@ -29,10 +29,10 @@
 
 /* A counted box list of one: TmdModel__GetHull's local (its count is set
  * to 1, as the hull's is, and never read). */
-typedef struct TypedBox_fa50 {
+typedef struct BoxList {
     s32 count;  /* +0x000 */
     TmdBox box; /* +0x004 */
-} TypedBox_fa50;
+} BoxList;
 
 /* The eight corners of a box as two faces of four (TmdHull's v[0..3] and
  * v[4..7]: the min-z face, then the max-z face). */
@@ -163,7 +163,7 @@ TmdBox *TmdModel__GetBoundsBuffer(TmdModel *self, s32 i) {
 }
 
 void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
-    TypedBox_fa50 b;
+    BoxList b;
 
     TmdModel__ComputeBounds(self, &b.box);
     b.count = 1;
