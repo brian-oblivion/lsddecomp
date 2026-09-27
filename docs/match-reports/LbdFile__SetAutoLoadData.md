@@ -27,7 +27,7 @@ typedef struct DataSrc39094 {
 } DataSrc39094;
 
 extern u8 gLbdFileMethods[];   /* method table, 34 slots */
-extern s32 D_8008A960;
+extern s32 gDefaultDataDirectory;
 extern s32 gForcedWeeklyGroup;
 extern s32 gForcedVariant;
 extern u8 gWeeklyGroupTable[];

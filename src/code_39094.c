@@ -145,7 +145,7 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
     }
 }
 
-extern s32 D_8008A960;
+extern s32 gDefaultDataDirectory;
 extern s32 gForcedWeeklyGroup;
 extern s32 gForcedVariant;
 extern u8 gWeeklyGroupTable[];
@@ -165,7 +165,7 @@ LbdFileMethods *GetLbdFileMethods(void) {
 }
 
 s32 GetDefaultDataDirectory(void) {
-    return D_8008A960;
+    return gDefaultDataDirectory;
 }
 
 s32 SeedAndRandom(s32 seed, s32 unused) {
