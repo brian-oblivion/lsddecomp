@@ -142,6 +142,6 @@ extern bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry
 extern void EnableTeleportsForKind(s32 kind);
 extern bool IsStyleVariantEven(void);
 extern bool IsCurrentDreamColor(s32 idx);
-extern bool MatchesDreamAuxProgression(s32 a0, s32 a1);
+extern bool IsDayInPeriodPhase(s32 a0, s32 a1);
 
 #endif

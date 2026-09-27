@@ -292,7 +292,7 @@ have_idx:
         case 0:
         case 1:
         case 2:
-            if (!MatchesDreamAuxProgression(value, idx - 1)) {
+            if (!IsDayInPeriodPhase(value, idx - 1)) {
                 return false;
             }
             break;
@@ -350,7 +350,7 @@ bool IsCurrentDreamColor(s32 idx) {
     return val == result;
 }
 
-bool MatchesDreamAuxProgression(s32 a0, s32 a1) {
+bool IsDayInPeriodPhase(s32 a0, s32 a1) {
     s32 target = (a0 - 1) / 30 + 1;
     s32 i;
 

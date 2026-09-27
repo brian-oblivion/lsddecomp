@@ -369,7 +369,7 @@ when `record->triggered` (offset `0x0`, signed byte; named round 63 --
 see `## Naming` below) is nonzero, else `idx = -sel`. Dispatches on
 `idx - 2` through a 20-entry jump table:
 
-- 0,1,2: delegate to `MatchesDreamAuxProgression(value, idx - 1)`.
+- 0,1,2: delegate to `IsDayInPeriodPhase(value, idx - 1)`.
 - 3: succeed iff `value % 3 == 0`.
 - 4: succeed iff `value % 3 != 0`.
 - 5: succeed iff `IsStyleVariantEven()` (no args) is truthy.
@@ -419,7 +419,7 @@ have_idx:
     case 0:
     case 1:
     case 2:
-        if (!MatchesDreamAuxProgression(value, idx - 1)) {
+        if (!IsDayInPeriodPhase(value, idx - 1)) {
             return false;
         }
         break;
@@ -506,7 +506,7 @@ have_idx:
     case 0:
     case 1:
     case 2:
-        if (!MatchesDreamAuxProgression(value, idx - 1)) {
+        if (!IsDayInPeriodPhase(value, idx - 1)) {
             return false;
         }
         break;
@@ -560,8 +560,8 @@ success:
 }
 ```
 
-Needs `TriggerRecord`, `MatchesDreamAuxProgression`, `IsStyleVariantEven`, `IsCurrentDreamColor` from
-`include/code_4cd08.h` (already added this round -- `MatchesDreamAuxProgression` is
+Needs `TriggerRecord`, `IsDayInPeriodPhase`, `IsStyleVariantEven`, `IsCurrentDreamColor` from
+`include/code_4cd08.h` (already added this round -- `IsDayInPeriodPhase` is
 matched, see its own report; `IsStyleVariantEven`/`IsCurrentDreamColor` are still
 `INCLUDE_ASM` elsewhere in this unit and off-limits this round, gp-relative-
 blocked per `docs/research/gp-relative-blocker.md`).
