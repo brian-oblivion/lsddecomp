@@ -65,7 +65,7 @@ Tier A: pure leaf getter (a pure leaf whose mechanics ARE its purpose,
 CLAUDE.md/track 3's own definition) -- returns `self->unk60[self->unk58]`,
 the running count for the currently-active ring-buffer slot (`unk60` is an
 array indexed by the `unk58` slot index, established across
-`Obj86B60__GetActiveSlotCount`/TaskCore__AdvanceSlotCursor/TaskCore__RetreatSlotCursor, code_2cc8c_b.c). No purpose beyond
+`Obj86B60__GetActiveSlotCount`/TaskCore__AdvanceSlotCursor/TaskCore__RetreatSlotCursor, code_2cc8c.c). No purpose beyond
 the getter itself is claimed.
 
 ## Proposed field names
@@ -75,13 +75,13 @@ the getter itself is claimed.
   slot is currently selected -- established across `TaskCore__Tick`,
   `TaskCore__FindNextFreeSlot`, `TaskCore__BroadcastToSlots`, `TaskCore__ReleaseSlotElements` (code_2cc8c.c/_b.c) and
   this function. NOT renamed directly: heavily shared with `code_2cc8c.c`
-  and `code_2cc8c_b.c` (the same class, split by address range). Head
+  and `code_2cc8c.c` (the same class, split by address range). Head
   applies by type scope.
 - `Obj86B60::unk60` -> `slotCounts` (tier B). A per-slot running count
   array, indexed by `unk58`/`activeSlot` above, incremented by
-  `TaskCore__AdvanceSlotCursor` and decremented by `TaskCore__RetreatSlotCursor` (both code_2cc8c_b.c)
+  `TaskCore__AdvanceSlotCursor` and decremented by `TaskCore__RetreatSlotCursor` (both code_2cc8c.c)
   -- this function is the plain getter for the active slot's own entry.
-  NOT renamed directly: shared with `code_2cc8c_b.c`. Head applies by type
+  NOT renamed directly: shared with `code_2cc8c.c`. Head applies by type
   scope.
 
 ## Track 4 (2026-09-25, round 84, alpha)

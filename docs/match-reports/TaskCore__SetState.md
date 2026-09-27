@@ -108,7 +108,7 @@ it with no other change.
 this is a shared-header vtable slot edit** (`include/code_2cc8c.h`, six units):
 
 - `slot110`'s occupant `TaskCore__CancelElementScroll` is **already matched** in
-  `src/code_2cc8c_b.c` as `void TaskCore__CancelElementScroll(Obj86B60 *self)`. That is positive
+  `src/code_2cc8c.c` as `void TaskCore__CancelElementScroll(Obj86B60 *self)`. That is positive
   evidence, not inference from the function under test.
 - Neither slot had any other caller anywhere: the header's own comment recorded
   both as `OBSERVED: TaskCore__SetState (STALL, not attempted)` — i.e. the `s32` had
@@ -154,7 +154,7 @@ why this rules out a `TitleMenu__`/`GraphRoomObj__` prefix.
 ## Proposed field names (round 78, delta -- NOT applied, cross-unit)
 
 `Obj86B60::unk3C` (s32, +0x03C) -> `notifyMode`. Tier B. Grep shows
-`code_2cc8c_b.c`, `code_2cc8c_d.c` and several unrelated `class_3bb8c_*`/
+`code_2cc8c.c`, `code_2cc8c_d.c` and several unrelated `class_3bb8c_*`/
 `libsnd_seqread.c`/`code_2c054.c` files also contain an `unk3C` textual hit, so
 per CLAUDE.md's "textual search over-counts" warning this is NOT renamed in
 the shared header -- only the compiler (a definition-only rename + rebuild)
@@ -168,7 +168,7 @@ describes that mechanic without asserting which in-game states 1/2 are.
 
 **UPDATE (round 78, delta, same session):** echo posted a competing proposal
 for this exact field on the broadcast -- `unk3C -> scrollState` -- from
-code_2cc8c_b, with more context than this report has alone (that unit's own
+code_2cc8c, with more context than this report has alone (that unit's own
 `unk4C -> target`/`Unk4CObj::unk24 -> slotEntries` proposals, and functions
 named `BeginElementScroll`/`SetTarget`, suggest `Obj86B60`'s `unk4C` target
 is a scrollable list and `unk3C` may be that scroll's own state). Echo's

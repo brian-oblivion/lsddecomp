@@ -57,7 +57,7 @@ passes three arguments. The shared header was left untouched (additive-only
 rule); the unit carries a local `Unk68Slot4CFn` call type and casts at the
 call site. Retyping the slot to `(Unk68Obj *self, s32 a1, void *pos)` and
 dropping the cast is a zero-byte cleanup. Likewise `Unk24Elem`'s +0x10/+0x14
-could become one struct member (only `code_2cc8c_b.c` uses `Unk24Elem`).
+could become one struct member (only `code_2cc8c.c` uses `Unk24Elem`).
 
 ### Proposed learning
 
@@ -200,7 +200,7 @@ as already-known, cross-function evidence rather than a fresh mystery.
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP, reason recorded
 
 Re-spliced the exact preserved body below (unchanged) into
-`src/code_2cc8c_b.c` in isolation (every other INCLUDE_ASM in all four of
+`src/code_2cc8c.c` in isolation (every other INCLUDE_ASM in all four of
 this runner's units confirmed still wrapped first) and rebuilt through
 the full oracle: reproduces **50/145 words, with the expected
 `WARNING: differs OUTSIDE this range too (232312 bytes)`** -- exactly the
@@ -263,14 +263,14 @@ concatenating every file's output in a fixed order, a 4-byte shrink in
 this unit's `.text` shifts the START address of every later file's
 sections by 4 bytes, which is exactly what showed up as a mismatch deep
 inside `code_2cc8c_e`'s already-matched rodata. Confirmed by direct
-section-size diffing (`objdump -h` on `code_2cc8c_b.c.o`, INCLUDE_ASM
+section-size diffing (`objdump -h` on `code_2cc8c.c.o`, INCLUDE_ASM
 vs. this body: `.text` `0x1258` -> `0x1254`, exactly 4 bytes) --
 CLAUDE.md's own "one instruction short, everything after it shifted"
 category, not a new failure mode. **Also confirmed, separately: splat's
 `make extract` is match-status-aware of `src/*.c`** -- while this
 function was defined as real C (mid-investigation), a fresh `make
 clean && make extract` did not regenerate
-`asm/nonmatchings/code_2cc8c_b/TaskCore__RefreshSlotView.s` at all, because splat
+`asm/nonmatchings/code_2cc8c/TaskCore__RefreshSlotView.s` at all, because splat
 saw the symbol already implemented in C and skipped generating a
 nonmatching stub for it. Restoring `INCLUDE_ASM` and re-running `make
 extract` regenerated it correctly. Recording this because it means **an
@@ -374,7 +374,7 @@ swap, since this looks close to the ideal case for that specific macro
 (two adjacent, provably-independent statements whose ORDER alone
 differs).
 
-Restored to `INCLUDE_ASM`. `asm/nonmatchings/code_2cc8c_b/TaskCore__RefreshSlotView.s`
+Restored to `INCLUDE_ASM`. `asm/nonmatchings/code_2cc8c/TaskCore__RefreshSlotView.s`
 regenerated via `make extract` in that state. Full oracle re-confirmed
 green (`build exit=0`, `OK: build matches retail`) before moving on to
 `TaskCore__CommitElementScroll`.
@@ -637,8 +637,8 @@ should do.**
 Measured on the retail side, which settles it:
 
 ```sh
-grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/TaskCore__RefreshSlotView.s | sort -u | wc -l   # 8  ($s0..$s7)
-grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c_b/TaskCore__CommitElementScroll.s | sort -u | wc -l   # 6  ($s0..$s5)
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c/TaskCore__RefreshSlotView.s | sort -u | wc -l   # 8  ($s0..$s7)
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/code_2cc8c/TaskCore__CommitElementScroll.s | sort -u | wc -l   # 6  ($s0..$s5)
 ```
 
 - **`TaskCore__CommitElementScroll` has no register-count problem at all.** Its own report

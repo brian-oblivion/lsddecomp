@@ -122,7 +122,7 @@ A ScreenSpritePos is always a percentage of half the screen from the centre;
 a BoxFillPos is that only while `relative` is set, and pixels after
 `attachAbsolute` (GraphRoom's dots, class_3bb8c_t, pass
 `dx * 10 - 5`-style pixel offsets). TaskCore__RefreshSlotView
-(code_2cc8c_b.c) passes one local SlotPos to both a BoxFill and its
+(code_2cc8c.c) passes one local SlotPos to both a BoxFill and its
 TextRows, so a single `ScreenPos` in SceneNode.h is a reasonable proposal
 for the head; it cannot be done through `renametype.py` (the new name
 already exists) and would touch ScreenSprite.h and SceneNode.h, outside

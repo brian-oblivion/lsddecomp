@@ -128,7 +128,7 @@ information from the larger search.**
 
 ### The sibling's new lever (named-temp + barrier) does NOT transfer here either
 
-This round's `TaskCore__RefreshSlotView` (same runner, sibling unit `code_2cc8c_b`)
+This round's `TaskCore__RefreshSlotView` (same runner, sibling unit `code_2cc8c`)
 closed a long-standing `sll`/`lw` INSTRUCTION-ORDERING swap by naming an
 independent sub-computation and adding a bare `__asm__("")` barrier
 immediately after its declaration. Tried the analogous shape here,

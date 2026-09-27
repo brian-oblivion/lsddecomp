@@ -8,7 +8,7 @@
  * tasks; this file holds its allocator, ctor, finalize, resetCounters, init
  * and the onInit/onDeinit hooks, which build and tear down the TileAtlas ->
  * TileMap -> BgLayer chain, clear the screen and configure the viewport. The
- * rest of TaskCore is in code_2cc8c.c, code_2cc8c_b.c and code_2cc8c_c.c.
+ * rest of TaskCore is in code_2cc8c.c, code_2cc8c.c and code_2cc8c_c.c.
  */
 #include "common.h"
 #include <libgte.h>

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003D6D4` on 2026-09-24 (tools/rename.py). Address 0x8003d6d4.
 
-**Unit:** code_2cc8c_b · **Size:** 26 words · **Result:** byte-exact, first attempt
+**Unit:** code_2cc8c · **Size:** 26 words · **Result:** byte-exact, first attempt
 
 ## What it does
 

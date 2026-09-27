@@ -17,7 +17,7 @@ typedef struct TexPageDesc TexPageDesc;
 
 /*
  * TaskCore (class id 0x130, gTaskCoreMethods) is declared once, in
- * include/TaskCore.h (track 4, round 84): code_2cc8c.c, code_2cc8c_b.c and
+ * include/TaskCore.h (track 4, round 84): code_2cc8c.c, code_2cc8c.c and
  * the first function of code_2cc8c_c.c are its methods from +0x058 on. Its
  * object used to be viewed here as `Obj86B60`, after the address of a
  * SUBCLASS table (gTitleMenuMethods); the views are gone.
@@ -28,15 +28,15 @@ typedef struct TexPageDesc TexPageDesc;
  * VabStreamObj, is cast to include/VabStreamObj.h's type; `bgLayer` is a
  * BgLayer, include/BgLayer.h since round 88 (its `Unk78Obj` view is gone);
  * `subHandle` and TaskCoreTarget's `handle` are TimImages, include/TimImage.h,
- * cast at code_2cc8c_b's accessors; the slot and item widgets are TextRows,
+ * cast at code_2cc8c's accessors; the slot and item widgets are TextRows,
  * include/TextRow.h; `listView` is a BoxFill, include/BoxFill.h). The
- * record TaskCoreTarget::unk24[] points to is code_2cc8c_b.c's `SlotEntry`.
+ * record TaskCoreTarget::unk24[] points to is code_2cc8c.c's `SlotEntry`.
  */
 typedef struct HeaderObj HeaderObj;
 typedef struct EventArg EventArg;
 
 /*
- * FOR THE NEXT RUNNER (code_2cc8c_b, same 153-function block, same class
+ * FOR THE NEXT RUNNER (code_2cc8c, same 153-function block, same class
  * framework): a note on how much to trust `Unk48Obj`/`Unk4CObj`/`Unk78Obj`
  * below, since all three are minimal placeholder types and it matters
  * which part of that is "confirmed small" vs. "not yet looked at".
@@ -50,7 +50,7 @@ typedef struct EventArg EventArg;
  *   object with its own real fields beyond offset 0, this unit's
  *   functions simply never touch them. Treat every `padNNN` here as "ends
  *   here only because our evidence ends here", and extend/narrow it the
- *   moment a function in `code_2cc8c_b` (or any other unit) reads inside
+ *   moment a function in `code_2cc8c` (or any other unit) reads inside
  *   one of these ranges.
  * - **Offset 0 being a method-table pointer IS confirmed for two of the
  *   three** (`Unk48Obj`, `Unk78Obj`) -- each is dereferenced through the
@@ -103,7 +103,7 @@ extern void *BMemPMgrFree(void *ptr);                   /* matching free/release
                                             the real return value, so this
                                             unit's shared view is retyped.
                                             Every existing call site in
-                                            this unit (code_2cc8c_b.c,
+                                            this unit (code_2cc8c.c,
                                             code_2cc8c_d.c) discards the
                                             result too, so this is a
                                             zero-byte-cost retype -- full

@@ -1209,7 +1209,6 @@ segments:
       # HIGHEST-YIELD SLICE OF THIS ROUND: zero gp_rel and zero addiu-$at
       # hits across all 20 functions, and zero `jlabel`/`jr $t2`, so no
       # rodata slot needs attaching and no hasm/.word disposition applies.
-      - [0x2D548, c, code_2cc8c_b]
       # code_2cc8c_c: third 20-function slice, 0x2E7A0..0x2F0B8.
       # 0x2F0B8 (func_8003E8B8) is a real boundary -- func_8003E874 closes
       # `addiu $sp, $sp, 0x18; jr $ra; nop` and func_8003E8B8 opens with

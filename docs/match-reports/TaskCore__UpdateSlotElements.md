@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003D194` on 2026-09-24 (tools/rename.py). Address 0x8003d194.
 
-**Unit:** code_2cc8c_b · round 12 straggler.
+**Unit:** code_2cc8c · round 12 straggler.
 
 ## What it does
 

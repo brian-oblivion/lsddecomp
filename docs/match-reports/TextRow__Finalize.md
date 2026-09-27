@@ -31,7 +31,7 @@ typing. Its own (still-`INCLUDE_ASM`) disassembly
 function is the first in this unit to actually USE that return value
 (`self->unkB4 = BMemPMgrFree(self->unkB4)`). Retyped to
 `void *BMemPMgrFree(void *ptr)`. Every other call site in this unit
-(`code_2cc8c_b.c`, `code_2cc8c_d.c`) discards the result as a bare
+(`code_2cc8c.c`, `code_2cc8c_d.c`) discards the result as a bare
 statement, so the retype changes no compiled bytes there; confirmed by
 a full green `build-and-verify.sh`.
 

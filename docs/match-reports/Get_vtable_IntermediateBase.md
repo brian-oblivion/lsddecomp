@@ -29,7 +29,7 @@ IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
 
 `include/code_2cc8c.h` already declared
 `extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void);` with a comment
-saying "still raw asm elsewhere in the still-uncarved code_2cc8c_b portion
+saying "still raw asm elsewhere in the still-uncarved code_2cc8c portion
 of this segment -- not this unit's function to write". That comment is now
 stale (this round carved it into `code_2cc8c_c.c`) and was updated in place
 -- flagged in this unit's final summary as a change to an existing

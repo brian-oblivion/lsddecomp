@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CE98` on 2026-09-24 (tools/rename.py). Address 0x8003ce98.
 
-**Unit:** code_2cc8c_b · round 12, one of the unit's 5 round-11-straggler
+**Unit:** code_2cc8c · round 12, one of the unit's 5 round-11-straggler
 functions (fresh ground, no prior report existed for any of the five).
 
 ## What it does
@@ -163,7 +163,7 @@ accessors the compiler lists, in both units):
   (see `Unk4CObj`'s own header comment); this report's own function is its
   constructor/setter.
 - `Unk4CObj::unk24` -> `slotEntries`, type `SlotEntry **` (tier B, retype +
-  rename). Every dereference in `code_2cc8c_b.c` (`TaskCore__CommitElementScroll`,
+  rename). Every dereference in `code_2cc8c.c` (`TaskCore__CommitElementScroll`,
   `TaskCore__RefreshSlotView`, `TaskCore__CancelElementScroll`, `TaskCore__SetSlotCursor`)
   already casts it to `SlotEntry *`/`(SlotEntry *)...` locally; `TaskCore__Tick`
   (code_2cc8c.c, not attempted) reads it as a generic word-pointer array and

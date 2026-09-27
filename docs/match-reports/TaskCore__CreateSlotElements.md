@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003D5CC` on 2026-09-24 (tools/rename.py). Address 0x8003d5cc.
 
-**Unit:** code_2cc8c_b · **Size:** 66 words · **Result:** byte-exact
+**Unit:** code_2cc8c · **Size:** 66 words · **Result:** byte-exact
 
 ## What it does
 
@@ -76,7 +76,7 @@ No existing declaration's type or offset changed.
 First attempt used a plain pre-test `while (*list != NULL) { count++;
 list++; }` for the counting loop and compiled 2 WORDS LONGER than retail
 (68 vs. retail's 66) — confirmed directly with `objdump -d
-build/src/code_2cc8c_b.c.o` (the "outside this range" warning was six
+build/src/code_2cc8c.c.o` (the "outside this range" warning was six
 figures because the size mismatch shifted everything after this function
 in the whole linked image, not because of anything genuinely wrong
 elsewhere).
