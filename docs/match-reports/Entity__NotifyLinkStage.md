@@ -148,3 +148,5 @@ Entity.h's old claim that they were "SEPARATE global arrays (own base
 symbols, own lui/addiu) ... not sub-fields of the gEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.
+
+- Step 3: parameters arg1, arg2 -> sender, event. The effect code reuses `event` (see above: a separate local compiles differently); the body now says so with a MATCHING line.

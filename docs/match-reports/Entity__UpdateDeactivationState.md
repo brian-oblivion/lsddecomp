@@ -136,3 +136,5 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Polish (round 96, bravo, track 7)
 
 - Step 2: EntityMoodRow::unk5 (+0x05) -> activeRange, tier B: its two readers (this body and its sibling) pass it as Entity__IsNearTarget's distance and skip the range test when it is 0; no other accessor (compiler error list).
+
+- Step 3: locals doDetach, dist, scaled -> doDeactivate, near, tick.

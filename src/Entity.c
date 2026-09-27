@@ -27,22 +27,22 @@
 #include "Entity.h"
 #include "DreamSys.h"
 
-Entity *New_Entity(s32 moodIndex, void *desc, void *arg2) {
+Entity *New_Entity(s32 moodIndex, void *desc, void *sound) {
     Entity *obj;
 
     obj = BMemPMgrAlloc(0x108);
     if (obj == NULL) {
         return NULL;
     }
-    if (Get_vtable_Entity()->ctor(obj, moodIndex, desc, arg2) == NULL) {
+    if (Get_vtable_Entity()->ctor(obj, moodIndex, desc, sound) == NULL) {
         BMemPMgrFree(obj);
         return NULL;
     }
     return obj;
 }
 
-Entity *Entity__Entity(Entity *this, s32 moodIndex, void *desc, void *arg2) {
-    if (GetTodActorMethods()->ctor((TodActor *)this, desc, arg2) != NULL) {
+Entity *Entity__Entity(Entity *this, s32 moodIndex, void *desc, void *sound) {
+    if (GetTodActorMethods()->ctor((TodActor *)this, desc, sound) != NULL) {
         this->methods = Get_vtable_Entity();
         this->moodIndex = moodIndex;
         this->soundCueSet.tag = 0;
@@ -54,34 +54,34 @@ Entity *Entity__Entity(Entity *this, s32 moodIndex, void *desc, void *arg2) {
     return NULL;
 }
 
-FadeBox *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void *arg3, s32 arg4) {
+FadeBox *Entity__GetOrCreateFadeBox(Entity *this, void *size, void *offset, void *step, s32 pri) {
     FadeBox *cached;
-    FadeBox *sub;
-    FadeBoxMethods *m;
-    void *dispatchArg2;
+    FadeBox *box;
+    FadeBoxMethods *boxMethods;
+    void *attachOffset;
 
     cached = this->fadeBox;
     if (cached == NULL) {
-        if (name == NULL) {
-            name = gEntityFadeBoxDefaultSize;
+        if (size == NULL) {
+            size = gEntityFadeBoxDefaultSize;
         }
-        sub = New_FadeBox(name, 0, arg4);
-        if (sub == NULL) {
+        box = New_FadeBox(size, 0, pri);
+        if (box == NULL) {
             return NULL;
         }
-        this->fadeBox = sub;
+        this->fadeBox = box;
     } else {
-        sub = cached;
+        box = cached;
     }
-    sub->methods->detachFromParent(sub);
-    m = sub->methods;
-    dispatchArg2 = arg2;
-    if (dispatchArg2 == NULL) {
-        dispatchArg2 = gEntityFadeBoxDefaultOffset;
+    box->methods->detachFromParent(box);
+    boxMethods = box->methods;
+    attachOffset = offset;
+    if (attachOffset == NULL) {
+        attachOffset = gEntityFadeBoxDefaultOffset;
     }
-    m->attachToParent(sub, (SceneNode *)this, dispatchArg2);
-    sub->methods->setStep(sub, (s32)arg3);
-    return sub;
+    boxMethods->attachToParent(box, (SceneNode *)this, attachOffset);
+    box->methods->setStep(box, (s32)step);
+    return box;
 }
 
 void Entity__Finalize(Entity *this) {
@@ -131,7 +131,7 @@ void Entity__DetachFromParent(Entity *this) {
     }
 }
 
-void Entity__Update(Entity *this, void *a1, s32 a2) {
+void Entity__Update(Entity *this, void *sender, s32 event) {
     if (this->methods->updateActivationState(this) != 0) {
         this->methods->updateDeactivationState(this);
     }
@@ -139,38 +139,38 @@ void Entity__Update(Entity *this, void *a1, s32 a2) {
         this->methods->updateSoundCueStop(this);
     }
     this->methods->updateTargetProximity(this);
-    GetTodActorMethods()->update((TodActor *)this, a1, a2);
+    GetTodActorMethods()->update((TodActor *)this, sender, event);
 }
 
-void Entity__NotifyLinkStage(Entity *this, void *arg1, s32 arg2) {
+void Entity__NotifyLinkStage(Entity *this, void *sender, s32 event) {
     s32 linkStage;
 
     linkStage = gEntityMoodTable[this->moodIndex].linkStage;
-    if ((u32)(arg2 - 2) < 7) {
+    if ((u32)(event - 2) < 7) {
         if (linkStage <= 0) {
             return;
         }
     }
-    GetTodActorMethods()->onActorLinkCommand((TodActor *)this, arg1, arg2);
-    if (arg2 != 4) {
+    GetTodActorMethods()->onActorLinkCommand((TodActor *)this, sender, event);
+    if (event != 4) {
         return;
     }
     if (linkStage <= 0) {
         return;
     }
     if (linkStage != 0x7F) {
-        arg2 = 0xA;
+        event = 0xA;
     } else if (gEntityMoodTable[this->moodIndex].eventVideo != 0) {
-        arg2 = 0xB;
+        event = 0xB;
     } else {
-        arg2 = 0xC;
+        event = 0xC;
     }
-    this->methods->notifyParents(this, arg2);
+    this->methods->notifyParents(this, event);
 }
 
-void Entity__OnGridCellLinkCommand(Entity *this, void *a1, s32 a2) {
-    GetTodActorMethods()->onGridCellLinkCommand((TodActor *)this, a1, a2);
-    if (a2 == 4) {
+void Entity__OnGridCellLinkCommand(Entity *this, void *sender, s32 event) {
+    GetTodActorMethods()->onGridCellLinkCommand((TodActor *)this, sender, event);
+    if (event == 4) {
         this->methods->deactivate(this);
     }
 }
@@ -180,46 +180,46 @@ void Entity__TickSoundCue(Entity *this) {
     this->moodTimer++;
 }
 
-s32 Entity__IsNearTarget(Entity *this, void *pos, s32 arg2, s32 arg3) {
-    LongVec3 local;
+s32 Entity__IsNearTarget(Entity *this, void *pos, s32 range, s32 tolerance) {
+    LongVec3 point;
     s32 kind;
 
-    local = *(LongVec3 *)pos;
+    point = *(LongVec3 *)pos;
     kind = (u8)gEntityMoodTable[this->moodIndex].unlockKind;
     if ((u32)((kind + 9) & 0xFF) < 9) {
-        local.y += (s8)kind * 1024;
+        point.y += (s8)kind * 1024;
     }
-    if (arg3 < 0) {
-        arg3 = 0x800 / (~arg3 + 1);
+    if (tolerance < 0) {
+        tolerance = 0x800 / (~tolerance + 1);
     } else {
-        arg3 <<= 11;
+        tolerance <<= 11;
     }
     return ((DreamSys *)this->peer)
-        ->methods->projectPointAtDistance((DreamSys *)this->peer, 0, arg2 << 11, (s32 *)&local, arg3);
+        ->methods->projectPointAtDistance((DreamSys *)this->peer, 0, range << 11, (s32 *)&point,
+                                          tolerance);
 }
 
 s32 Entity__DistanceToPeer(Entity *this, TodActor *peer) {
-    s32 *world;
-    SceneNodeSub14 *pos;
+    s32 *peerPos;
+    SceneNodeSub14 *coord;
     s32 dx;
     s32 dz;
 
-    world = NULL;
+    peerPos = NULL;
     if (peer->parent != 0) {
-        world = peer->coord2->unk38;
+        peerPos = peer->coord2->unk38;
     }
-    pos = this->coord2;
-    dx = pos->tx - world[0];
+    coord = this->coord2;
+    dx = coord->tx - peerPos[0];
     if (dx < 0) {
         dx = ~dx + 1;
     }
-    dz = pos->tz - world[2];
+    dz = coord->tz - peerPos[2];
     return (dz >= 0) ? (dx + dz) : (dx - dz);
 }
 
 s32 Entity__GetProximityRatio(Entity *this) {
     s32 result;
-    Entity *self;
     s32 threshold;
 
     do {
@@ -227,13 +227,12 @@ s32 Entity__GetProximityRatio(Entity *this) {
             return -1;
         }
     } while (0);
-    self = this;
-    result = this->methods->distanceToPeer(this, self->peer);
-    threshold = gEntityMoodTable[self->moodIndex].proximityThreshold << 11;
+    result = this->methods->distanceToPeer(this, this->peer);
+    threshold = gEntityMoodTable[this->moodIndex].proximityThreshold << 11;
     if (threshold < result) {
         return -1;
     }
-    return result / (threshold / self->soundCueSet.attenuationSteps);
+    return result / (threshold / this->soundCueSet.attenuationSteps);
 }
 
 EntityMoodRow *Entity__GetMoodEffect(Entity *this) {
@@ -270,11 +269,11 @@ void Entity__Deactivate(Entity *this) {
     this->active = 0;
 }
 
-void Entity__SetTargetReached(Entity *this, s32 arg1) {
-    if (arg1 != 0) {
+void Entity__SetTargetReached(Entity *this, s32 reached) {
+    if (reached != 0) {
         this->methods->notifyParents(this, 9);
     }
-    this->targetReached = arg1;
+    this->targetReached = reached;
 }
 
 /* code_179d8_e.c's; SoundCueSet.h does not declare it. */
@@ -299,11 +298,11 @@ void Entity__StopSoundCue(Entity *this) {
 
 s32 Entity__UpdateActivationState(Entity *this) {
     EntityMoodRow *row;
-    s32 doDetach;
+    s32 doActivate;
 
     if (this->active == 0 && this->state != 1) {
         row = &gEntityMoodTable[this->moodIndex];
-        doDetach = 0;
+        doActivate = 0;
         if (row->detachKind != 0) {
             if (row->detachKind == 4) {
                 goto randCheck;
@@ -312,12 +311,12 @@ s32 Entity__UpdateActivationState(Entity *this) {
                 if (Entity__IsNearTarget(this, &this->coord2->tx, row->activeRange,
                                          row->nearTolerance) != 0) {
                     if (row->detachKind == 1) {
-                        doDetach = 1;
+                        doActivate = 1;
                     } else if (row->detachKind == 3) {
                         goto randCheck;
                     }
                 } else if (row->detachKind == 2) {
-                    doDetach = 1;
+                    doActivate = 1;
                 }
             }
         }
@@ -325,11 +324,11 @@ s32 Entity__UpdateActivationState(Entity *this) {
 
     randCheck:
         if ((rand() & 0x7F) == 0) {
-            doDetach = 1;
+            doActivate = 1;
         }
 
     merge:
-        if (doDetach) {
+        if (doActivate) {
             this->methods->activate(this);
         }
     }
@@ -338,32 +337,32 @@ s32 Entity__UpdateActivationState(Entity *this) {
 
 s32 Entity__UpdateDeactivationState(Entity *this) {
     EntityMoodRow *row;
-    s32 doDetach;
-    s32 dist;
-    s32 scaled;
+    s32 doDeactivate;
+    s32 near;
+    s32 tick;
 
     if (this->active != 0) {
         row = &gEntityMoodTable[this->moodIndex];
-        doDetach = 0;
+        doDeactivate = 0;
         Entity__NotifyIfTargetInRange(this, 0);
         if (row->linkKind != 0 && row->linkKind != 3) {
             if (row->linkKind >= 10) {
-                scaled = this->tick;
-                if ((scaled ^ (row->linkKind * 15)) == 0) {
-                    doDetach = 1;
+                tick = this->tick;
+                if ((tick ^ (row->linkKind * 15)) == 0) {
+                    doDeactivate = 1;
                 }
             } else if (row->activeRange != 0) {
-                dist = Entity__IsNearTarget(this, &this->coord2->tx, row->activeRange, row->nearTolerance);
-                if (dist != 0) {
+                near = Entity__IsNearTarget(this, &this->coord2->tx, row->activeRange, row->nearTolerance);
+                if (near != 0) {
                     if (row->linkKind == 1) {
-                        doDetach = 1;
+                        doDeactivate = 1;
                     }
                 } else if (row->linkKind == 2) {
-                    doDetach = 1;
+                    doDeactivate = 1;
                 }
             }
         }
-        if (doDetach) {
+        if (doDeactivate) {
             this->methods->deactivate(this);
         }
     }

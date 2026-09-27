@@ -70,7 +70,7 @@ typedef struct EntityMoodRow EntityMoodRow;
  * Entity__TickSoundCue; `tools/classtable.py gEntityMethods --vs
  * gTodActorMethods`), then this class's own. */
 struct EntityMethods {
-    TODACTOR_SLOTS(Entity, (Entity * self, s32 moodIndex, void *desc, void *arg2));
+    TODACTOR_SLOTS(Entity, (Entity * self, s32 moodIndex, void *desc, void *sound));
     /* +0x144 */ s32 (*distanceToPeer)(Entity *self, TodActor *peer); /* Entity__DistanceToPeer: |dx| + |dz| from coord2's translation to peer's world position */
     /* +0x148 */ s32 (*getProximityRatio)(Entity *self); /* Entity__GetProximityRatio: -1 when no peer or out of range */
     /* +0x14C */ EntityMoodRow *(*getMoodEffect)(Entity *self); /* Entity__GetMoodEffect: &gEntityMoodTable[moodIndex] */
@@ -175,9 +175,9 @@ extern s8 gEntityEventVideoTable[]; /* the eventVideo column (Entity_b) */
 
 /* The class's own methods, in ROM order (Entity, then Entity_b). A caller
  * reaching the base ones goes through GetTodActorMethods() and upcasts. */
-Entity *New_Entity(s32 moodIndex, void *desc, void *arg2);
-Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *arg2);
-FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *name, void *arg2, void *arg3, s32 arg4);
+Entity *New_Entity(s32 moodIndex, void *desc, void *sound);
+Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *sound);
+FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *size, void *offset, void *step, s32 pri);
 void Entity__Finalize(Entity *self);
 void Entity__Reset(Entity *self);
 void Entity__AttachToParent(Entity *self, TodActor *peer, void *companion, struct StageMap *parent,
@@ -187,7 +187,7 @@ void Entity__Update(Entity *self, void *sender, s32 event);
 void Entity__NotifyLinkStage(Entity *self, void *sender, s32 event);
 void Entity__OnGridCellLinkCommand(Entity *self, void *sender, s32 event);
 void Entity__TickSoundCue(Entity *self);
-s32 Entity__IsNearTarget(Entity *self, void *pos, s32 arg2, s32 arg3);
+s32 Entity__IsNearTarget(Entity *self, void *pos, s32 range, s32 tolerance);
 s32 Entity__DistanceToPeer(Entity *self, TodActor *peer);
 s32 Entity__GetProximityRatio(Entity *self);
 EntityMoodRow *Entity__GetMoodEffect(Entity *self);
