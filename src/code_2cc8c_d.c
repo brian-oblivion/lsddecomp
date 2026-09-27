@@ -109,7 +109,7 @@ void Viewport__SetProjection(Viewport *self, s32 h) {
 
 void Viewport__NoOpSlot58(void) {}
 
-void Viewport__func_8003EA74(void) {}
+void Viewport__NoOpSlot5C(void) {}
 
 void Viewport__SetLightMode(Viewport *self, s32 mode) {
     self->lightMode = mode;
