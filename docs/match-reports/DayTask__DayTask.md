@@ -302,3 +302,16 @@ a result (StreamTask) and its parent, TimedTask.
 
 The unit banner (include/class_39e08.h) no longer carries "track 4, round
 88/89"; that history is this section and the Track 4 sections above.
+
+## Track 6 (round 96, delta): the request local is ResourceSourceRequest
+
+include/class_39e08.h `LoadRequest`, `{ s32 type; const char *path; s32 unk08; s32 unk0C; }`, is the same
+0x10-byte record as class_3bb8c.c's and the third caller's: the body writes
+`type = 0` (ResourceSource's NULL `buffer`: no buffer to adopt) and `path`
+(its `name`: the file to request) and passes it to New_LinkResource. It
+retired onto include/FileResource.h's `ResourceSourceRequest` (a
+`ResourceSource src` then 8 bytes of padding; tier A: the fields are the
+ctor's own descriptor, read by LinkResource__LinkResource as `src->buffer`
+and `src->name`). The body now writes `req.src.buffer = NULL` and
+`req.src.name` and passes `&req.src` with no cast; byte-exact. The 0x10
+size is kept (8 changes the frame, measured on StageMap__PopulateSlotCells).

@@ -26,9 +26,9 @@
  *  - MoviePlayer, CD-streamed and MDEC-decoded FMV (CdStream frames,
  *    DecDCTvlc, then DecDCTin/DecDCTout in 16-pixel strips uploaded as they
  *    finish), one movie at a time (gActiveMoviePlayer).
- * The unit's own types: ResourceSource, the {buffer, file name} descriptor
- * those ctors take (ResourceSourceArgs, the three-word local ResourceRequest__Set fills
- * for it); UnprototypedCtorTable, the view the allocators call a ctor slot
+ * The ctors take include/FileResource.h's ResourceSource. The unit's own
+ * types: ResourceSourceArgs, the three-word local ResourceRequest__Set fills for that
+ * descriptor; UnprototypedCtorTable, the view the allocators call a ctor slot
  * through when they test its result; TimBlockHeader (and its byte copy,
  * TimBlockHeaderBytes), ModelDataHeader and SubBlockTable, the layouts of
  * TimBlockSrc's, ModelData's and TodSet's / TriggerWorld's buffers.
@@ -398,15 +398,6 @@ void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
 TimBlockSrcMethods *GetTimBlockSrcMethods(void) {
     return &gTimBlockSrcMethods;
 }
-
-/* The descriptor the LinkResource, Tod, TodSet, ModelData and TriggerWorld
- * ctors take: a buffer to adopt, or else (buffer NULL) a file name to
- * request. Callers in other units build their own larger locals and pass
- * them cast to this. */
-typedef struct ResourceSource {
-    /* +0x00 */ void *buffer;
-    /* +0x04 */ char *name;
-} ResourceSource;
 
 /* Allocate and construct a LinkResource; NULL, the object freed, when the
  * ctor fails. */
@@ -922,7 +913,8 @@ typedef struct ModelDataHeader {
 } ModelDataHeader;
 
 /* code_171e0.c: stores its three words into *req, returns req. */
-extern ResourceSourceArgs *ResourceRequest__Set(ResourceSourceArgs *req, void *buffer, char *name, s32 mode);
+extern ResourceSourceArgs *ResourceRequest__Set(ResourceSourceArgs *req, void *buffer, char *name,
+                                                s32 mode);
 
 /* +0x078: when it owns them, build the LinkResource and the TodSet over
  * the buffer; 1, with both released, when either fails. */
@@ -930,7 +922,8 @@ s32 ModelData__BuildResources(ModelData *self) {
     ResourceSourceArgs req;
 
     if (self->ownsResources != 0) {
-        ResourceRequest__Set(&req, (u8 *)self->buffer + ((ModelDataHeader *)self->buffer)->tmdOffset, 0, 1);
+        ResourceRequest__Set(&req, (u8 *)self->buffer + ((ModelDataHeader *)self->buffer)->tmdOffset,
+                             0, 1);
         self->linkResource = New_LinkResource((ResourceSource *)&req);
         if (self->linkResource != NULL) {
             req.buffer = ((ModelDataHeader *)self->buffer)->tods;

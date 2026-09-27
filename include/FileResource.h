@@ -91,6 +91,24 @@ struct FileResource {
     FILERESOURCE_FIELDS(FileResourceMethods);
 };
 
+/* The descriptor the file-backed subclasses' ctors take (LinkResource, Tod,
+ * TodSet, ModelData, TriggerWorld): a buffer to adopt, or else (buffer
+ * NULL) a file name to request through requestLoadFile. */
+typedef struct ResourceSource {
+    /* +0x00 */ void *buffer;
+    /* +0x04 */ char *name;
+} ResourceSource;
+
+/* The four-word local callers outside src/GraphicsResources.c build that
+ * descriptor in (StageMap__PopulateSlotCells, DayTask__DayTask,
+ * GameApplication__GameApplication, each for New_LinkResource). Only `src`
+ * is ever written.
+ * MATCHING: 0x10 bytes; ResourceSource's 8 changes the callers' frames. */
+typedef struct ResourceSourceRequest {
+    /* +0x00 */ ResourceSource src;
+    /* +0x08 */ u8 pad8[0x10 - 0x8];
+} ResourceSourceRequest;
+
 extern FileResourceMethods gFileResourceMethods;
 extern FileResourceMethods *GetFileResourceMethods(void);
 

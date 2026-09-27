@@ -20,16 +20,6 @@
  * rather than a typed pointer because every New_X in the game calls it. */
 extern void *BMemPMgrAlloc(s32 size);
 
-/* Model-file-load request block used by GameApplication__GameApplication: {type; path}. Only
- * one call site is known so far (GameApplication__GameApplication, loading "ETC\DREAME5.TMD"
- * via sModelPathDreamE5), so field names are provisional. */
-typedef struct LoadModelRequest {
-    s32 type;
-    const char *path;
-    s32 unk08;
-    s32 unk0C;
-} LoadModelRequest;
-
 extern const char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
 
 extern s32 func_80048CF0(void);       /* reads a small-data global, unnamed so far */
@@ -115,15 +105,15 @@ GameApplication *New_GameApplication(GameApplicationConfig *arg) {
  * object's owned DreamSys from it, dispatches one DreamSys init call, then
  * runs this class's own slot40 (GameApplication__SeedRandom) once. */
 void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *arg) {
-    LoadModelRequest req;
+    ResourceSourceRequest req;
 
     GetApplicationMethods()->ctor((Application *)self, arg->dataSource);
     self->methods = GetGameApplicationMethods();
     self->config = arg;
     func_800270AC(func_80048CF0());
-    req.type = 0;
-    req.path = sModelPathDreamE5;
-    self->dreamSys = New_DreamSys(New_LinkResource((struct ResourceSource *)&req), 0, 0);
+    req.src.buffer = NULL;
+    req.src.name = (char *)sModelPathDreamE5;
+    self->dreamSys = New_DreamSys(New_LinkResource(&req.src), 0, 0);
     self->skipGraphRoomPoll = 0;
     self->dreamSys->methods->slot228(self->dreamSys, arg->unk14);
     ((GameApplicationSeedRandomFn)self->methods->setScreenDims)(self);
