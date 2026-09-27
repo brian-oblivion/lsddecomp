@@ -33,7 +33,7 @@ extern s32 gForcedStageBgm;
 extern u8 gSoundBankPaths[];
 extern u8 gRecordTable[];
 extern char *gSoundEffectDirPtr;  /* -> "SND\\SE" */
-extern const char sAsmkStreamPath[];
+extern const char sAsmkMoviePath[];
 extern s16 gMovieFrameCounts[];
 
 /* slot +0x088 of gLbdFileMethods */

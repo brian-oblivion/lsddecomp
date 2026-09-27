@@ -151,7 +151,7 @@ extern s32 gForcedStageBgm;
 extern u8 gSoundBankPaths[];
 extern u8 gRecordTable[];
 extern char *gSoundEffectDirPtr; /* -> "SND\\SE" */
-extern const char sAsmkStreamPath[];
+extern const char sAsmkMoviePath[];
 extern s16 gMovieFrameCounts[];
 extern s16 gStageFirstRecord[];
 
@@ -266,7 +266,7 @@ const char *GetAsmkMovie(s32 *typeCodeOut) {
     if (typeCodeOut != NULL) {
         *typeCodeOut = 0x31;
     }
-    return sAsmkStreamPath;
+    return sAsmkMoviePath;
 }
 
 Rec1C *GetOpeningMovieRecords(s32 *countOut) {
