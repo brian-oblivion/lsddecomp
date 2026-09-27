@@ -904,9 +904,6 @@ typedef struct ModelDataHeader {
     /* +0x0C */ u8 tods[1];
 } ModelDataHeader;
 
-/* code_171e0.c: stores its three words into *req, returns req. */
-extern ResourceRequest *ResourceRequest__Set(ResourceRequest *req, void *buffer, char *name, s32 mode);
-
 /* +0x078: when it owns them, build the LinkResource and the TodSet over
  * the buffer; 1, with both released, when either fails. */
 s32 ModelData__BuildResources(ModelData *self) {

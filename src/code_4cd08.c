@@ -14,7 +14,7 @@ const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
 const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM";
 
 void InitDreamAux(void) {
-    DreamAuxLoadReq req;
+    ResourceRequest req;
     u32 i;
     s32 j;
 
@@ -24,11 +24,11 @@ void InitDreamAux(void) {
         }
     }
 
-    ResourceRequest__Set(&req, 0, gMomPathSymSpy, 1);
+    ResourceRequest__Set(&req, 0, (char *)gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        gDreamAuxSlots[i].obj = New_ModelData((struct ResourceSource *)&req);
-        req.name = gMomPathSymDog;
+        gDreamAuxSlots[i].obj = New_ModelData(&req.src);
+        req.src.name = (char *)gMomPathSymDog;
     }
 }
 
