@@ -119,11 +119,11 @@ void VabDriver__VabDriver(void) {}
 void VabDriver__Destroy(void) {}
 
 void VabDriver__NoOpSlot40(void) {
-    char buf[0x40];
+    char unused[0x40];
 }
 
 void VabDriver__Open(void) {
-    char buf[0x40];
+    char unused[0x40];
 }
 
 void VabDriver__Close(void) {}
