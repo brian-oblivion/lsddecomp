@@ -402,7 +402,9 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     s32 cellOff;
     s32 overflowOff;
     CellPlacement rec;
-    ResourceSourceRequest req;
+    /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
+     * frame by 8. */
+    ResourceRequest req;
 
     loader = slot->loader;
     grid = slot->placements;
