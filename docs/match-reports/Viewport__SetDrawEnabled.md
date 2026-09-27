@@ -16,7 +16,7 @@ void Viewport__SetDrawEnabled(Unk18Obj *self, s32 a1);
 
 ## What it does
 
-One-instruction field setter, sibling of `Viewport__SetExtraSwapOnBuffer0`.
+One-instruction field setter, sibling of `Viewport__SetExtraSwap`.
 
 ```c
 void Viewport__SetDrawEnabled(Unk18Obj *self, s32 a1) {

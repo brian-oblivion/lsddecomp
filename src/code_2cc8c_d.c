@@ -372,7 +372,7 @@ SceneNode *Viewport__GetFadeBox(Viewport *self) {
     return self->fadeBox;
 }
 
-void Viewport__SetExtraSwapOnBuffer0(Viewport *self, s32 on) {
+void Viewport__SetExtraSwap(Viewport *self, s32 on) {
     self->extraSwapOnBuffer0 = on;
 }
 
