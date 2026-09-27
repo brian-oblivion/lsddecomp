@@ -898,7 +898,8 @@ segments:
       # SpuVmSetProgPan, SpuVmGetProgPan.  Reclassifying them out of the game
       # count is the correction, not a regression.  It sits in the MIDDLE of
       # the slice, so the slice is now [c][o][c] and everything from
-      # func_80030980 on lives in `src/code_179d8_j_b.c`.  Text-only.
+      # func_80030980 on lived in `code_179d8_j_b` (now
+      # `src/libsnd_vm_vol_ut_key_ut_keyv.c`, round 96).  Text-only.
       #
       # NO RODATA ATTACH MOVED, and that is measured: the old code_179d8_mid_c
       # monolith contains zero `jtbl_` and zero `.word .L`, so no unit in this
@@ -911,7 +912,7 @@ segments:
       # ROUND 34, SECOND split of the same original slice: `libsnd/ut_pb`
       # (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244 = `SsUtPitchBend`, which
       # was func_800319B4 and had been MATCHED as C.  It sits in the MIDDLE of
-      # code_179d8_j_b, so that unit is now [c][o][c] too and its own tail
+      # code_179d8_j_b (now libsnd_vm_vol_ut_key_ut_keyv), so that unit is [c][o][c] too and its own tail
       # became `code_179d8_j_c` -- `_b` was already taken by the vm_prog split
       # above, which is what the `_c` suffix records.  Text-only; still no
       # rodata attach anywhere in this family.
@@ -1343,7 +1344,7 @@ segments:
       - [0x330F4, o, libgs/gs_110]     # GsSetAmbient
       - [0x3311c, c, code_3311c]       # game code (revision 18; was psyq_3311c)
       - [0x3328C, o, libgs/gs_107]     # GsSetFlatLight, gte_set_lc, gte_read_lc
-      - [0x33808, c, GraphicsResources]       # game code (revision 18; was the head of psyq_33808)
+      - [0x33808, c, GraphicsResources] # game code (revision 18; was the head of psyq_33808)
       - [0x36654, asm, psyq_36654]     # libpress/libpress from DecDCTReset
       - [0x36D38, o, libc2/exit]       # exit
       - [0x36d48, asm, psyq_36d48]
