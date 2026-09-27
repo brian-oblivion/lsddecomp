@@ -276,7 +276,7 @@ void *BMemPMgrFree(ptr, pool)
     return NULL;
 }
 
-void func_80017EA8(void) {}
+void NoOp5(void) {}
 
 void *BasicClass__Release(BasicClass *self) {
     self->methods->finalize(self);

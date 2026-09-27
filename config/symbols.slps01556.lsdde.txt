@@ -3004,3 +3004,4 @@ sSaveTitleColorChannel = 0x8008AA28;
 sSaveTitleColorFrame = 0x8008AA2C;
 sTaskObjFCount = 0x8008AA30;
 gActorLocalMove = 0x8008ABA4;
+NoOp5 = 0x80017EA8; // type:func
