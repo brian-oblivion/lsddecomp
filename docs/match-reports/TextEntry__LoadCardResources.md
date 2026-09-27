@@ -179,3 +179,28 @@ TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 `setColor` (`gTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
 +0x0C4 `setCell`, called through `TextRowSetCellAtFn` because
 TextRow__SetCellAt takes the index too. Zero bytes changed.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+Renamed with `tools/rename.py`, tier A each (the call they are passed to
+says what they are):
+
+| old | new | evidence |
+| --- | --- | --- |
+| D_80086F7C | gTextEntryPanelRect | New_ScreenSprite's rect for COMINPUT.TIM: {0, 0, 224, 120} |
+| D_8008AAC8 | gTextEntryTextColor | the text row's setColor: (128, 128, 0) |
+| D_8008AACC | gTextEntryPanelPos | the panel's attachToParent position: (-70, -60) |
+| D_8008AAD4 | gTextEntryTextPos | the text row's attachToParent position: (-62, -15) |
+| D_8008AADC | gTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (class_3bb8c_j) reads its x |
+
+The externs are typed `SpriteRect`, `SpriteRgb` and `ScreenSpritePos`
+(TaskObjF's gCardIconRect/gCardIconPos are the precedent), so two casts
+are gone; the three positions still go through the LongVec3 slot with a
+cast. Locals `handle1`/`handle2` -> `panelTim`/`fontTim`, parameter
+`arg1` -> `parent`, `path[0x20]` -> `path[32]`, the cursor cell `0x5F` ->
+`'_'`. Zero bytes changed.
+
+Proposed (class_3bb8c_j's): D_8008AAE0 is the cursor position's y (-12),
+read by SetCursorPos; a name such as `gTextEntryCursorY`, or reading it as
+`gTextEntryCursorPos.y` once class_3bb8c_j types gTextEntryCursorPos as a
+ScreenSpritePos.

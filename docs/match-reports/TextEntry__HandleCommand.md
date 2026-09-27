@@ -211,3 +211,46 @@ Posted to `tools/broadcast.sh` for whoever is next on class_3bb8c_j.
 ## Track 4 (2026-09-26, round 87)
 
 Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+The commands are Pad events (include/Pad.h: `PAD_EVENT_PRESSED` 0x12 /
+`PAD_EVENT_HELD` 0x02 plus the button index), and the command's sender is
+the child of class 2, the Pad (onNotify). Every case label is now spelled
+that way, zero bytes changed:
+
+| value | event | action |
+| --- | --- | --- |
+| 25 | PRESSED + RRIGHT (circle) | write back, sound, close ACCEPTED |
+| 23 | PRESSED + RDOWN (cross) | sound, close CANCELLED |
+| 32 | PRESSED + L2 | resetAllChars |
+| 31 | PRESSED + L1 | resetChar |
+| 28 | PRESSED + SELECT | toggleAltCommands |
+| 21 / 5 | PRESSED / HELD + LRIGHT | moveCursorRight |
+| 20 / 4 | PRESSED / HELD + LLEFT | moveCursorLeft |
+| 18 / 2 | PRESSED / HELD + LUP | nextChar |
+| 19 / 3 | PRESSED / HELD + LDOWN | prevChar |
+
+So `altCommands` selects between acting on presses (clear) and on held
+buttons (set); the field-name proposal is below. `setState(2)`/`(3)` are
+`TEXTENTRY_RESULT_ACCEPTED`/`CANCELLED`; the sound `0x10` is `1 << 4`,
+VAB program 1 tone 0 (playTone keys program index >> 4, tone index & 0xF;
+class_3bb8c_g/_t's spelling). The `slot94Call` label is `callPrevChar`.
+Parameters `arg1`/`arg2` -> `sender`/`command`.
+
+Moved here from the comment on `EncodeFullWidthSjis` (stale: it is matched
+in code_2cc8c_f.c since round 38): "TextEntry__HandleCommand's own
+name-copy helper -- uncarved elsewhere (`code_2cc8c_f`, still
+`INCLUDE_ASM`), typed purely from this call site's own register usage:
+`a0`/`a1` are `self->textBuf`/`self->editBuf` (both `char *`, the same pair
+`strcpy` is fed in the other arm), return value unused. Same
+declare-locally convention as `DecodeFullWidthSjis` above (a different unit
+types this same-shaped function with a different signature from its own
+call site)."
+
+### Proposed field names (round 98)
+
+- TextEntry +0x020 `altCommands` -> `actOnHeld` (accessors: this unit's
+  AttachTarget/HandleCommand, class_3bb8c_j's ToggleAltCommands); slot
+  +0x098 `toggleAltCommands` and `TextEntry__ToggleAltCommands` would follow
+  (`toggleActOnHeld`). Evidence: the table above.

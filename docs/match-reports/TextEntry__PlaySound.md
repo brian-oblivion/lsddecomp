@@ -71,3 +71,22 @@ named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
 at volume 0x60. TextEntry::target and ItemList::target (+0x03C) and both
 attachTarget prototypes are `struct VabStreamObj *`, the casts at the call
 sites are gone, and `slot80` is `playTone`. Zero bytes changed.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+Renamed from `TextEntry__NotifyTarget` (`tools/rename.py`), tier A: a leaf
+whose mechanics are its purpose, the same body as `TaskObjF__PlaySound`
+(class_3bb8c_g): `target->methods->playTone(target, tone, 96, 96)` when a
+target is attached. The volumes are decimal now (96, TaskObjF's are 127);
+parameter `arg1` -> `tone`. HandleCommand's argument `0x10` is `1 << 4`.
+Zero bytes changed.
+
+### Proposed field names (round 98)
+
+- gTextEntryMethods +0x060 `notifyTarget` -> `playSound` (accessors: this
+  unit's HandleCommand, class_3bb8c_j's SetCursorPos/SetCharAt), so the
+  slot is named like its occupant; the prototype's `arg1` -> `tone`.
+- TextEntry +0x03C `target` -> `sound`, TaskObjF's name for the same
+  object (accessors: this unit's AttachTarget/DetachTarget/PlaySound only;
+  left because ItemList, the sibling with the identical layout, calls its
+  field `target` too, and the two should move together).

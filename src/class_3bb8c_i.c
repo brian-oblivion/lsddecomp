@@ -1,16 +1,20 @@
 /*
- * class_3bb8c_i -- third carved slice of the class_3bb8c block, 20 functions,
- * carved round 14. All 20 are TextEntry methods (gTextEntryMethods,
- * `D_80086ED0`, 42 slots; `tools/classtable.py gTextEntryMethods`), declared
- * in include/TextEntry.h, whose banner has the evidence for the class name.
- * The other seven own methods (PrevChar .. SetCharAt, GetTextEntryMethods)
- * are class_3bb8c_j's. TextEntry edits a caller-owned string: it loads the
- * `CARD\COMINPUT.TIM`/`CARD\FONTICON.TIM` panel, text row and cursor
- * (LoadCardResources), keeps the caller's buffer (`textBuf`) and its own
- * working copy (`editBuf`, decoded/encoded with DecodeFullWidthSjis/
- * EncodeFullWidthSjis in mode 1), and routes a numeric command switch
- * (HandleCommand) to cursor moves, character stepping, commit (25) and
- * cancel (23).
+ * class_3bb8c_i -- TextEntry's methods from New_TextEntry to NextChar
+ * (include/TextEntry.h); PrevChar .. SetCharAt and GetTextEntryMethods are
+ * in class_3bb8c_j.c.
+ *
+ * A TextEntry edits a caller-owned string on screen. setText keeps the
+ * caller's buffer and copies it into its own `editBuf` (decoding full-width
+ * SJIS in TEXTENTRY_MODE_FULLWIDTH). loadCardResources makes the panel
+ * (CARD\COMINPUT.TIM), the text row and the '_' cursor (CARD\FONTICON.TIM).
+ * attachTarget adds a Pad and a FrameClock as children and keeps a
+ * VabStreamObj to play sounds on. onNotify sends the Pad's button events to
+ * handleCommand: left/right move the cursor, up/down step the character
+ * under it, L1/L2 reset it/every character, Select switches between acting
+ * on presses and on held buttons, circle writes the edit back and closes
+ * ACCEPTED, cross closes CANCELLED. It sends the FrameClock's ticks to
+ * tickState, which reports the result to the parents on the second tick
+ * after the close.
  */
 #include "common.h"
 #include <libgte.h>
@@ -26,14 +30,11 @@
 #include "Pad.h"
 #include "FrameClock.h"
 
-/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- TextEntry__SetText's own
- * call. Translates each byte of `src` (a name string) into `dest` (folding a
- * couple of special-case byte ranges) and returns `dest`, same convention as
- * `strcpy`. Typed purely from this call site's own register usage. Declared
- * HERE, not in include/class_3bb8c.h: src/class_3bb8c_j.c types the same
- * (still undefined) function as `void (void *, void *)` from its own call
- * site, and two call-site typings of one function cannot share a header. */
+/* code_2cc8c_f.c's, which types both u8 *(u8 *dst, u8 *src); declared on
+ * TextEntry's char buffers. Decode turns full-width SJIS into one byte a
+ * character, Encode turns it back. */
 extern char *DecodeFullWidthSjis(char *dest, char *src);
+extern void EncodeFullWidthSjis(char *dest, char *src);
 
 TextEntry *New_TextEntry(char *text, s32 mode) {
     TextEntry *self;
@@ -46,11 +47,8 @@ TextEntry *New_TextEntry(char *text, s32 mode) {
     return NULL;
 }
 
-/* VALUE-of `%gp_rel`, round 45's own local view -- same global as
- * class_3bb8c_j's `gNameCharTable` (a byte lookup table whose length this
- * function counts by hand rather than via `strlen`, since GCC 2.6.3 with
- * `-fno-builtin` never turns a `strlen` CALL into inline code -- the
- * inline loop below has to be literal source, not a call). */
+/* The characters nextChar/prevChar step through, NUL-terminated
+ * (class_3bb8c_j.c). */
 extern u8 *gNameCharTable;
 
 void TextEntry__TextEntry(TextEntry *self, char *text, s32 mode) {
@@ -62,6 +60,7 @@ void TextEntry__TextEntry(TextEntry *self, char *text, s32 mode) {
     self->textLen = strlen(text);
     self->editBuf = BMemPMgrAlloc(self->textLen + 4);
 
+    /* MATCHING: counted inline; strlen(gNameCharTable) would be a call. */
     p = gNameCharTable;
     count = 0;
     while (*p != 0) {
@@ -146,12 +145,9 @@ void TextEntry__SetText(TextEntry *self, char *text, s32 mode) {
     }
 }
 
-/*
- * TextEntry__LoadCardResources's own helpers/data -- builds two "CARD\\<name>.TIM"
- * paths (BuildFileName, code_171e0.c), loads each through New_TimImage, and
- * makes panelSprite (New_ScreenSprite), textRow (New_TextRow) and
- * cursorSprite (New_CharSprite) from the loaded handles.
- */
+/* LoadCardResources' data. BuildFileName (code_171e0.c) writes dir, name
+ * and ext into dest and returns it. Positions are percent of half the
+ * screen from the centre (include/ScreenSprite.h). */
 extern char *BuildFileName(char *dest, const char *name, const char *dir, const char *ext);
 
 extern const char sStrComInput[];          /* "COMINPUT" */
@@ -258,15 +254,10 @@ void TextEntry__TickState(TextEntry *self) {
     }
 }
 
-/* TextEntry__HandleCommand's own name-copy helper -- uncarved elsewhere (`code_2cc8c_f`,
- * still `INCLUDE_ASM`), typed purely from this call site's own register
- * usage: `a0`/`a1` are `self->textBuf`/`self->editBuf` (both `char *`, the same
- * pair `strcpy` is fed in the other arm), return value unused. Same
- * declare-locally convention as `DecodeFullWidthSjis` above (a different unit
- * types this same-shaped function with a different signature from its own
- * call site). */
-extern void EncodeFullWidthSjis(char *dest, char *src);
-
+/* With altCommands clear the arrows act on presses, with it set on held
+ * buttons. MATCHING: the arms are in retail's code order, default first,
+ * and the down press jumps into the held down's call rather than making
+ * its own. */
 void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command) {
     switch (command) {
         default:
@@ -277,11 +268,11 @@ void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command) {
             } else {
                 strcpy(self->textBuf, self->editBuf);
             }
-            self->methods->notifyTarget(self, 1 << 4);
+            self->methods->notifyTarget(self, 1 << 4); /* VAB program 1, tone 0 */
             self->methods->setState(self, TEXTENTRY_RESULT_ACCEPTED);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN:
-            self->methods->notifyTarget(self, 1 << 4);
+            self->methods->notifyTarget(self, 1 << 4); /* VAB program 1, tone 0 */
             self->methods->setState(self, TEXTENTRY_RESULT_CANCELLED);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_L2:

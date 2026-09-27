@@ -61,3 +61,25 @@ regardless of which branch runs) before deciding it is conditional.
 Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 Renamed from Obj86ED0__SetName (tools/rename.py): nothing shows the string is a name, so the method is named for the buffer it takes. Slot +0x040 setText.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+Parameter `arg1` -> `text`. `mode == 1` is `TEXTENTRY_MODE_FULLWIDTH`
+(new `enum TextEntryMode` in include/TextEntry.h: mode 1 decodes the
+caller's full-width SJIS into editBuf and halves textLen, mode 0 is a
+plain strcpy; HandleCommand's circle arm encodes back in the same mode).
+`strcpy` comes from Sony's `<strings.h>` (libc2/strcpy.o is linked), not a
+local prototype. Zero bytes changed.
+
+Moved here from src/class_3bb8c_i.c (stale history; DecodeFullWidthSjis
+is matched in code_2cc8c_f.c since round 38, typed `u8 *(u8 *dst, u8
+*src)`): "This project's own strcpy (matched elsewhere) -- TextEntry__SetText's
+own caller, same local-declaration convention as class_3bb8c_e.c/others."
+and "Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM --
+TextEntry__SetText's own call. Translates each byte of `src` (a name
+string) into `dest` (folding a couple of special-case byte ranges) and
+returns `dest`, same convention as `strcpy`. Typed purely from this call
+site's own register usage. Declared HERE, not in include/class_3bb8c.h:
+src/class_3bb8c_j.c types the same (still undefined) function as `void
+(void *, void *)` from its own call site, and two call-site typings of one
+function cannot share a header."
