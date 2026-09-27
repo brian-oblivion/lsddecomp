@@ -97,3 +97,8 @@ this report's earlier history too (known, pending an operator decision).
 ## Track 7 (round 100, charlie)
 
 - Local `old` -> `ticks`: the countdown's value before the decrement.
+- `event != 2` is `event != FRAMECLOCK_EVENT_RUNNING`: the sender is the
+  fade's source, which every caller passes as a FrameClock (ObjM's
+  IntermediateBase `unk10`, "init's own New_FrameClock()"; Entity's
+  `ticker`, Actor.h's class-5 FrameClock child), and FrameClock's tick
+  sends event 2 to its parents when it counts a frame.

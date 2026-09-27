@@ -6,11 +6,16 @@
 #include "code_2cc8c.h"
 
 /*
- * code_2cc8c_e -- FadeBox's methods (include/FadeBox.h: a BoxFill whose
- * colour ramps a step per update, the screen fade), New_FadeBox to
- * GetFadeBoxMethods, then BoxFill's allocator, ctor and Reset
- * (include/BoxFill.h: a GsBOXF screen rectangle; the rest of its methods
- * open code_2cc8c_f.c).
+ * code_2cc8c_e -- the screen fade, and the first methods of the box it draws.
+ *
+ * FadeBox (include/FadeBox.h), New_FadeBox to GetFadeBoxMethods: a BoxFill
+ * whose colour steps once per FrameClock tick away from a channel mask's
+ * colour (gFadeBoxMaskColors) or up from black (gFadeBoxBlackColors), with
+ * semi-transparency on, and notifies its parents when the ramp runs out.
+ * Viewport's fadeBox and Entity's are the two users.
+ *
+ * Then BoxFill's allocator, ctor and Reset (include/BoxFill.h: a GsBOXF
+ * screen rectangle); the rest of BoxFill's methods open code_2cc8c_f.c.
  */
 
 FadeBox *New_FadeBox(void *size, s32 channels, s32 pri) {
