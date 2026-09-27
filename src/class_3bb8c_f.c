@@ -5,6 +5,7 @@
 #include "class_3bb8c.h"
 #include "TaskObjF.h"
 #include "TimImage.h"
+#include <sys/file.h>
 
 /*
  * class_3bb8c_f: `TaskObjF` methods (include/TaskObjF.h, track 4 round 89),
@@ -131,7 +132,7 @@ s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 ou
     s32 retries;
     s32 result;
 
-    retries = 10;
+    retries = MEMCARD_RETRIES;
     do {
         result = TaskObjF__TryReadMemcardFile(self, suffix, outBuf, outSize);
         if (result != 0) {
@@ -142,7 +143,7 @@ s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 ou
 }
 
 s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
-    char pathBuf[0x20];
+    char pathBuf[32];
     char *path;
     s32 handle;
     McSaveHeader *header;
@@ -150,16 +151,19 @@ s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
     u8 iconFlag;
 
     path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, suffix);
-    handle = open(path, 1);
+    handle = open(path, O_RDONLY);
     if (handle == -1) {
         return 0;
     }
-    header = BMemPMgrAlloc(0x80);
-    read(handle, header, 0x80);
+    header = BMemPMgrAlloc(MEMCARD_SECTOR_SIZE);
+    read(handle, header, MEMCARD_SECTOR_SIZE);
     iconFlag = header->iconDisplayFlag;
-    seekPos = (iconFlag << 7) - 0x780;
+    /* The data follows the title sector and the icon frames.
+     * MATCHING: (iconFlag - 0xF) * MEMCARD_SECTOR_SIZE reorders the arithmetic. */
+    seekPos =
+        (iconFlag << MEMCARD_SECTOR_SHIFT) - ((MEMCARD_ICON_FLAG_BASE - 1) << MEMCARD_SECTOR_SHIFT);
     BMemPMgrFree(header);
-    lseek(handle, seekPos, 0);
+    lseek(handle, seekPos, SEEK_SET);
     read(handle, outBuf, outSize);
     close(handle);
     return 1;
@@ -170,7 +174,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, 
     s32 retries;
     s32 result;
 
-    retries = 10;
+    retries = MEMCARD_RETRIES;
     CopyMemcardIconTemplate((s32)title, (s32)fileName);
     do {
         result = TaskObjF__TryWriteMemcardSaveFile(self, fileName, title, iconFrames & 0xFF, icon,
@@ -197,7 +201,7 @@ extern void printf(const char *fmt); /* own local view: this call site passes on
 
 s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 iconFrames,
                                       struct TimImage *icon, void *data, s32 size) {
-    char pathBuf[0x20];
+    char pathBuf[32];
     char *path;
     s32 fileHandle;
     s32 openMode;
@@ -206,32 +210,37 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
 
     path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, fileName);
     delete (path);
-    openMode = ((((u32)size + 0x21FF) >> 13) << 16) | 0x200;
+    openMode = MEMCARD_OPEN_BLOCKS(((u32)size + (MEMCARD_SAVE_HEADER_SIZE + MEMCARD_BLOCK_SIZE - 1)) >>
+                                   MEMCARD_BLOCK_SHIFT) |
+               O_CREAT;
     fileHandle = open(path, openMode);
     if (fileHandle == -1) {
         printf(sFileNotCreatedMsg);
         return 0;
     }
     close(fileHandle);
-    fileHandle = open(path, 2);
+    fileHandle = open(path, O_WRONLY);
     if (fileHandle == -1) {
         return 0;
     }
     iconSrc = (McIconSource *)icon->buffer;
-    header = (McSaveHeader *)BMemPMgrAlloc(0x200);
+    header = (McSaveHeader *)BMemPMgrAlloc(sizeof(McSaveHeader));
     header->magic0 = 'S';
     header->magic1 = 'C';
-    header->iconDisplayFlag = iconFrames + 0x10;
-    header->blockCount = ((u32)size + 0x1FFF) >> 13;
+    header->iconDisplayFlag = iconFrames + MEMCARD_ICON_FLAG_BASE;
+    header->blockCount = ((u32)size + (MEMCARD_BLOCK_SIZE - 1)) >> MEMCARD_BLOCK_SHIFT;
     strcpy(header->title, title);
     header->palette[0] = iconSrc->palette[0];
     header->palette[1] = iconSrc->palette[1];
     header->frame0 = iconSrc->frame0;
     header->frame1 = iconSrc->frame1;
     header->frame2 = iconSrc->frame2;
-    write(fileHandle, header, (iconFrames << 7) + 0x80);
+    /* The title sector and the icon frames.
+     * MATCHING: (iconFrames + 1) * MEMCARD_SECTOR_SIZE reorders the arithmetic. */
+    write(fileHandle, header, (iconFrames << MEMCARD_SECTOR_SHIFT) + MEMCARD_SECTOR_SIZE);
     BMemPMgrFree(header);
-    write(fileHandle, data, (((u32)size + 0x7F) >> 7) << 7);
+    write(fileHandle, data,
+          (((u32)size + (MEMCARD_SECTOR_SIZE - 1)) >> MEMCARD_SECTOR_SHIFT) << MEMCARD_SECTOR_SHIFT);
     close(fileHandle);
     return 1;
 }
@@ -288,7 +297,7 @@ s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 critical) {
     if (critical) {
         EnterCriticalSection();
     }
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->events); i++) {
         result = callback(self->events[i]);
         if (result == 0) {
             break;
@@ -301,7 +310,7 @@ s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 critical) {
 }
 
 s32 TaskObjF__WaitForReadyEvent(TaskObjF *self) {
-    return WaitForReadyEvent(self->events, 4);
+    return WaitForReadyEvent(self->events, ARRAY_COUNT(self->events));
 }
 
 s32 WaitForReadyEvent(s32 *events, s32 count) {
@@ -320,19 +329,19 @@ void TaskObjF__Init(TaskObjF *self, char *namePrefix, char **nameSuffixes, Basic
                     BasicClass *tickSource, struct SceneNode *spriteParent, struct VabStreamObj *sound) {
     self->namePrefix = namePrefix;
     self->nameSuffixes = nameSuffixes;
-    self->titles = 0;
+    self->titles = NULL;
     self->spriteParent = spriteParent;
     self->sound = sound;
     self->methods->addChild(self, inputSource);
     self->methods->addChild(self, tickSource);
-    self->cardIcon = 0;
-    self->state = 0;
-    self->opMode = 0;
+    self->cardIcon = NULL;
+    self->state = TASKOBJF_STATE_IDLE;
+    self->opMode = TASKOBJF_OP_NONE;
 }
 
 void TaskObjF__Deinit(TaskObjF *self) {
-    self->sound = 0;
-    self->spriteParent = 0;
+    self->sound = NULL;
+    self->spriteParent = NULL;
     self->methods->removeChild(self, self->inputSource);
     self->methods->removeChild(self, self->tickSource);
 }
@@ -344,7 +353,7 @@ void TaskObjF__BeginLoad(TaskObjF *self, char *fileName, char *title, void *data
     self->fileName = fileName;
     self->title = title;
     self->data = data;
-    self->opMode = 1;
+    self->opMode = TASKOBJF_OP_LOAD;
     self->dataSize = size;
     if (TaskObjF__Validate(self)) {
         TaskObjF__FreeBuffers(self);
@@ -354,14 +363,14 @@ void TaskObjF__BeginLoad(TaskObjF *self, char *fileName, char *title, void *data
         self->bufCount = found;
         if (found != 0) {
             TaskObjF__FreeUnusedBuffers(self);
-            if (self->state == 0xE) {
-                state = 0xF;
+            if (self->state == TASKOBJF_STATE_LOAD_WARNING) {
+                state = TASKOBJF_STATE_LOADING;
             } else {
-                state = 0x12;
+                state = TASKOBJF_STATE_CHOOSE_FILE;
             }
         } else {
-            state = 0xD;
-            self->bufCount = 0xF;
+            state = TASKOBJF_STATE_LOAD_NOT_FOUND;
+            self->bufCount = TASKOBJF_MAX_FILES;
         }
         self->methods->setState(self, state);
     }
@@ -370,28 +379,28 @@ void TaskObjF__BeginLoad(TaskObjF *self, char *fileName, char *title, void *data
 void TaskObjF__AllocBuffers(TaskObjF *self) {
     s32 i;
 
-    if (self->titles == 0) {
-        self->titles = BMemPMgrAlloc(0x40);
-        for (i = 0; i < 15; i++) {
-            self->titles[i] = BMemPMgrAlloc(0x41);
+    if (self->titles == NULL) {
+        self->titles = BMemPMgrAlloc((TASKOBJF_MAX_FILES + 1) * sizeof(char *));
+        for (i = 0; i < TASKOBJF_MAX_FILES; i++) {
+            self->titles[i] = BMemPMgrAlloc(TASKOBJF_TITLE_SIZE);
         }
-        self->foundSuffixes = BMemPMgrAlloc(0x40);
+        self->foundSuffixes = BMemPMgrAlloc((TASKOBJF_MAX_FILES + 1) * sizeof(char *));
     }
 }
 
 void TaskObjF__FreeUnusedBuffers(TaskObjF *self) {
     s32 i;
 
-    for (i = self->bufCount; i < 15; i++) {
+    for (i = self->bufCount; i < TASKOBJF_MAX_FILES; i++) {
         self->titles[i] = BMemPMgrFree(self->titles[i]);
     }
-    self->titles[i] = 0;
+    self->titles[i] = NULL;
 }
 
 void TaskObjF__FreeBuffers(TaskObjF *self) {
     s32 i;
 
-    if (self->titles != 0) {
+    if (self->titles != NULL) {
         BMemPMgrFree(self->foundSuffixes);
         for (i = 0; i < self->bufCount; i++) {
             BMemPMgrFree(self->titles[i]);
@@ -413,27 +422,27 @@ void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleE
     self->fileName = fileName;
     self->title = title;
     self->titleEditPos = titleEditPos;
-    self->opMode = 2;
+    self->opMode = TASKOBJF_OP_SAVE;
     self->iconFrames = iconFrames;
     self->iconImage = icon;
     self->data = data;
     self->dataSize = size;
     if (TaskObjF__Validate(self)) {
         if (self->methods->probeMemcardFile(self, 0, fileName) != 0) {
-            state = 0xA;
+            state = TASKOBJF_STATE_SAVE_OVERWRITE_WARNING;
             if (self->state == state) {
-                state = 0x11;
-            } else if (self->state == 0x11) {
-                state = 0xB;
+                state = TASKOBJF_STATE_EDIT_TITLE;
+            } else if (self->state == TASKOBJF_STATE_EDIT_TITLE) {
+                state = TASKOBJF_STATE_SAVING;
             }
             self->methods->setState(self, state);
         } else if (!self->methods->checkCardSpace(self, iconFrames, size)) {
-            self->methods->setState(self, 9);
+            self->methods->setState(self, TASKOBJF_STATE_SAVE_NO_SPACE);
         } else {
             methods = self->methods;
-            state = 0x11;
+            state = TASKOBJF_STATE_EDIT_TITLE;
             if (self->state == state) {
-                state = 0xB;
+                state = TASKOBJF_STATE_SAVING;
             }
             methods->setState(self, state);
         }
@@ -458,17 +467,17 @@ s32 TaskObjF__Validate(TaskObjF *self) {
     }
 
     if (responded == 0) {
-        state = 2;
+        state = TASKOBJF_STATE_NO_CARD;
     } else if (error != 0) {
-        state = 3;
+        state = TASKOBJF_STATE_CARD_ERROR;
     } else if (cardChanged != 0) {
-        state = 4;
+        state = TASKOBJF_STATE_CARD_CHANGED;
     } else if (formatted != 0) {
         goto dispatch;
-    } else if (self->opMode == 1) {
-        state = 5;
+    } else if (self->opMode == TASKOBJF_OP_LOAD) {
+        state = TASKOBJF_STATE_UNFORMATTED_LOAD;
     } else {
-        state = 6;
+        state = TASKOBJF_STATE_UNFORMATTED_SAVE;
     }
 
 dispatch:
@@ -488,9 +497,9 @@ void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
 
     tag = ((BasicClass *)sender)->methods->header;
     kind = tag & 0xF;
-    if (kind == 2) {
+    if (kind == 0x2) {
         methods->onInputEvent(self, sender, event);
-    } else if (kind == 5) {
+    } else if (kind == 0x5) {
         methods->tickStateDelay(self, sender, event);
     } else {
         kind = tag & 0xFF;
