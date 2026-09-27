@@ -1,10 +1,25 @@
 /*
- * code_1677c -- GameApplication (include/GameApplication.h), the game's
- * Application subclass: its allocator and ctor, the RNG seed and initSystems
- * overrides, and the six hooks Application's main loop calls -- the intro
- * logos, the weekly stream, the GraphRoom poll, the DayTask run and the
- * streams that follow it -- with the loader- and poll-task helpers they share.
- * The table getter is in src/code_171e0.c.
+ * code_1677c -- GameApplication (include/GameApplication.h, which documents
+ * the class): the game's Application. Its allocator and ctor, the RNG seed
+ * and initSystems overrides, then the hooks Application__RunMainLoop calls,
+ * each with the helpers it uses, in ROM order:
+ *  - ShowIntroLogos: ETC\ASMKLOGO.TIM, the ETC\ASMK.STR movie, ETC\OSDLOGO.TIM
+ *    (ShowImage for each image);
+ *  - PlayOpeningMovie: one of the opening movies, at random;
+ *  - RunTitleMenu: the day's GraphRoom (and PlaySpecialDayMovies when it
+ *    scored), then the TitleMenu, and GraphRoom again whenever the menu's
+ *    GRAPH is chosen (RunTask runs each);
+ *  - RunDayTask: one day (a DayTask), then the cinematic DreamSys holds
+ *    (PlayCinematic); nonzero once a year has gone by;
+ *  - PlayEndingMovie: ETC\ENDING.STR.
+ * Every hook but RunDayTask first calls SetActiveDataSourceDriverMode(0, 0,
+ * 0). Every task is handed the Application's `aux` as its
+ * IntermediateBaseInitArgs, runs to its end inside init, and is released. A
+ * movie is a StreamTask given the path and movie id GameFiles.c's getters
+ * return, the id turned into a frame count by GetMovieFrameCount; an image is
+ * a TaskCore showing the TIM. Every movie but the intro's is gated by
+ * config->playStreams. The table and its getter are in
+ * src/code_171e0.c.
  */
 #include "common.h"
 #include <libgte.h>
@@ -60,20 +75,8 @@ extern const char *GetEndingMovie(s32 *movieIdOut, s32 unused); /* arity-ok: the
  * *movieIdOut is -1 for a record that is a TIM image. */
 extern const char *GetSpecialDayOrEventRecord(s32 *movieIdOut, s32 packedPick);
 
-/* The `New_X` allocator for the class whose method table is gGameApplicationMethods:
- * allocates a 0x2C-byte instance and, on success, runs the class's own
- * constructor through slot +0x008 of the table GetGameApplicationMethods() returns.
- *
- * The null path deliberately falls off the end rather than returning a
- * value. That is not an oversight in the transcription -- it is what
- * retail does, and it is the ONLY form that matches. `BMemPMgrAlloc`
- * already left the null in $v0, so the original source never had to
- * restate it; every spelling that returns explicitly on that path
- * (`return 0`, `return self`, an early return, a goto to a shared exit)
- * costs an extra instruction that retail does not have. GCC 2.6.3 warns
- * "control reaches end of non-void function" here, and the warning is
- * correct about the C -- the bytes are what say the original had it too.
- * See docs/match-reports/New_GameApplication.md for the full derivation. */
+/* MATCHING: the NULL path falls off the end; any explicit return there costs
+ * an instruction (BMemPMgrAlloc's NULL is already in $v0). */
 GameApplication *New_GameApplication(GameApplicationConfig *config) {
     GameApplication *self = BMemPMgrAlloc(sizeof(GameApplication));
 
@@ -83,11 +86,10 @@ GameApplication *New_GameApplication(GameApplicationConfig *config) {
     }
 }
 
-/* Constructs a GameApplication instance: runs the intermediate base class's own
- * constructor (through its ctor slot), installs this class's own vtable,
- * stores the ctor argument, loads the "ETC\DREAME5.TMD" model, builds this
- * object's owned DreamSys from it, dispatches one DreamSys init call, then
- * runs this class's own slot40 (GameApplication__SeedRandom) once. */
+/* ctor: Application's ctor with config->dataSource, this table, the config
+ * kept, the data directory reset to its default, the DreamSys built from
+ * ETC\DREAME5.TMD, config->unk14 handed to it, then the RNG seeded through
+ * +0x040 (GameApplication__SeedRandom). */
 void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *config) {
     /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
      * frame by 8. */
@@ -107,25 +109,20 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
 
 extern s32 SeedAndRandom(s32 seed, s32 unused);
 
-/* Seeds the C library's random generator from the scratchpad word at
- * 0x1F800000 (the PS-X data-cache-as-RAM region) reduced mod 365; the
- * random value SeedAndRandom returns is discarded. */
+/* +0x040: seeds rand() from the first scratchpad word, mod DAYS_PER_YEAR. */
 void GameApplication__SeedRandom(GameApplication *self) {
     SeedAndRandom(*(s32 *)getScratchAddr(0) % DAYS_PER_YEAR, 0);
 }
 
-/* initSystems (+0x044): runs Application's own initSystems unless the parent's
- * `initialized` latch is already set. */
+/* +0x044: Application's initSystems, unless already initialized. */
 void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem, struct Pad *pad) {
     if (self->initialized == 0) {
         GetApplicationMethods()->initSystems((Application *)self, drawSystem, pad, 0);
     }
 }
 
-/* Optional stream-load block, gated by self->config->showIntroLogos: registers a
- * "loader" task for "ETC\ASMKLOGO.TIM" (GameApplication__ShowImage), then a separate
- * "stream" task for whatever type code GetAsmkMovie hands back
- * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
+/* +0x050, gated by config->showIntroLogos: the ASMK logo, the ASMK movie,
+ * the OSD logo. */
 void GameApplication__ShowIntroLogos(GameApplication *self) {
     const char *moviePath;
     s32 movieId;
@@ -145,16 +142,12 @@ void GameApplication__ShowIntroLogos(GameApplication *self) {
     }
 }
 
-/* Registers a "loader" task for the given resource path: allocates the
- * task, gives it a completion callback (GameApplication__RegisterFilesCallback) and context
- * (self), then sets its remaining parameters (path, the parent's aux as its init args) and
- * starts it. */
+/* Shows the TIM at `path` in a TaskCore (frame bound 0); its view callback,
+ * run as the image ends, registers the game's files. */
 void GameApplication__ShowImage(GameApplication *self, const char *path) {
     TaskCore *task = New_TaskCore(0, 0, 0);
 
-    /* setCallback's occupant stores a void (*)(void *ctx); this callback
-     * takes nothing and returns RegisterRecordTableFiles's value, which
-     * TaskCore__RefreshViewValue ignores. */
+    /* The callback takes no ctx and returns a value nobody reads. */
     task->methods->setCallback(task, (void (*)(void *))GameApplication__RegisterFilesCallback, self);
     task->methods->setFrameBound(task, 0);
     task->methods->setSubHandle(task, path, 0);
@@ -162,16 +155,15 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     task->methods->release(task);
 }
 
-extern s32 RegisterRecordTableFiles(s32 all);
+extern s32 RegisterRecordTableFiles(s32 all); /* class_39e08.c */
 
+/* ShowImage's view callback: registers gRecordTable's files with the CD
+ * driver. */
 s32 GameApplication__RegisterFilesCallback(void) {
     return RegisterRecordTableFiles(0);
 }
 
-/* Optional stream-task init block, gated by self->config->playStreams (the same
- * shape as GameApplication__ShowIntroLogos's self->config->showIntroLogos gate, minus the two
- * GameApplication__ShowImage loader-task calls, and using PickOpeningMovie instead of
- * GetAsmkMovie to derive the type code). */
+/* +0x054: one of the seven opening movies, picked at random. */
 void GameApplication__PlayOpeningMovie(GameApplication *self) {
     const char *moviePath;
     s32 movieId;
@@ -189,13 +181,12 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
     }
 }
 
-/* Gated by self->config->pollGraphRoom. Checks the DreamSys's own status slot
- * (+0x1A0); if it isn't already "1" and self->skipGraphRoomPoll hasn't latched, kicks
- * off one PollTask (New_GraphRoom) and, if THAT reports "2", runs
- * GameApplication__PlaySpecialDayMovies. Then polls a second PollTask (New_TitleMenu) in a loop,
- * restarting the first PollTask each time it reports "2", until it
- * reports anything else; clears self->skipGraphRoomPoll and returns 0 or 2 depending
- * on whether that final status was below 1. */
+/* +0x058, gated by config->pollGraphRoom (0: straight to the day). Unless
+ * it is day 1 or skipGraphRoomPoll is set (the last DayTask CLOSED), runs the
+ * GraphRoom, then PlaySpecialDayMovies if it scored. Then the TitleMenu,
+ * again after a GraphRoom each time it returns GRAPH. Returns
+ * GAMEAPPLICATION_LOOP_DAY for the menu's result 0, else
+ * GAMEAPPLICATION_LOOP_OPENING. */
 s32 GameApplication__RunTitleMenu(GameApplication *self) {
     s32 status;
     s32 graphResult; /* MATCHING: set after the GraphRoom check, it holds its 2 in a saved register */
@@ -204,7 +195,7 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
 
         status = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-        if (status != 1) {
+        if (status != 1) { /* the day number, 1-based */
             if (self->skipGraphRoomPoll == 0) {
                 status = GameApplication__RunTask((NewTaskFn)New_GraphRoom, self->dreamSys,
                                                   (IntermediateBaseInitArgs *)self->aux);
@@ -225,7 +216,7 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
         }
 
         self->skipGraphRoomPoll = 0;
-        return ((u32)status < 1) << 1;
+        return ((u32)status < 1) << 1; /* MATCHING: status == 0 ? LOOP_DAY : LOOP_OPENING */
     }
     return GAMEAPPLICATION_LOOP_DAY;
 }
@@ -241,11 +232,9 @@ s32 GameApplication__RunTask(NewTaskFn newTask, struct DreamSys *dreamSys,
     return result;
 }
 
-/* Called by GameApplication__RunTitleMenu when its first PollTask reports "2". Gated by
- * self->config->playStreams (same gate as GameApplication__PlayOpeningMovie). Builds a StreamTask,
- * derives a count via GetSpecialDayMovieSpan, sets the task's frame bound
- * to that count / 15 and clears skipOnConfirm, then runs its init (stream
- * group -1, unlike the other call sites) and releases it. */
+/* Streams FILM\SPDAY01A.STR with no frame count for the player (-1), a
+ * frame bound of the total frames of the first ten special days' movies
+ * (GetSpecialDayMovieSpan), and no skip on confirm. */
 void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     StreamTask *task;
 
@@ -269,34 +258,12 @@ void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     }
 }
 
+/* +0x05C: empty. */
 void GameApplication__NoOpSlot5C(void) {}
 
-/* Builds a DayTask (include/DayTask.h), runs its init with self
- * alone (DayTask__Init takes nothing else, hence DayTaskInitFn) and
- * releases it; init's return, TimedTask::result, is a status code: 2 runs GameApplication__PlayCinematic, 3 latches self->skipGraphRoomPoll.
- * Then queries the DreamSys status slot again (as GameApplication__RunTitleMenu does),
- * this time passing an out-param, and derives a 0/1 result from both the
- * call's return and the out-param. */
-/* Builds a DayTask for this instance's current state, reads one status
- * code off it, tears it down, and reacts to two of the codes. Then asks the
- * owned DreamSys a question and reports whether its answer was 1.
- *
- * Two things here were long-standing misreadings, both worth keeping written
- * down (docs/match-reports/GameApplication__RunDayTask.md):
- *
- *  - `case 3` stores 1, NOT 3. Retail's `li $v0, 0x1` sits in the delay slot
- *    of the case-3 branch, so it executes before the jump is taken and $v0
- *    holds 1 -- not the 3 it held for the comparison -- by the time the
- *    store runs. Reading the store as `unk24 = 3` (the discriminant) was
- *    what produced the old 53/57 and the "the compiler materialises an
- *    unused default-arm constant" theory attached to it. There is no unused
- *    constant: `li $v0, 0x1` is the value being stored, hoisted into a delay
- *    slot on the only path that needs it.
- *  - `result = (check == 1)` is the whole comparison. GCC 2.6.3 lowers an
- *    equality test against a small constant to `xori` + `sltiu`, which reads
- *    back out of the disassembly as `(u32)(check ^ 1) < 1`. That transcription
- *    is arithmetically right and cost two instructions; the plain `== 1` is
- *    what the source said. */
+/* +0x060: runs one DayTask. Its CINEMATIC result plays the cinematic
+ * (PlayCinematic), CLOSED sets skipGraphRoomPoll. Returns nonzero when the
+ * day is now day 1 of a year past the first, which runs +0x064. */
 s32 GameApplication__RunDayTask(GameApplication *self) {
     s32 status;
     DayTask *dayTask;
@@ -326,11 +293,9 @@ s32 GameApplication__RunDayTask(GameApplication *self) {
     return result;
 }
 
-/* Reads DreamSys's current cinematic slot, resolves it to a channel index
- * (GetSpecialDayOrEventRecord); if that fails (-1), starts a LoaderTask on the fixed
- * "no cinematic" path; otherwise, if self->config->playStreams gates it, starts a
- * StreamTask on the resolved channel. Either branch finishes by starting
- * whichever task it built; if neither branch runs, nothing happens. */
+/* The special day record or event movie DreamSys's getCinematic names: a
+ * movie is streamed (gated by config->playStreams, no skip on confirm), a
+ * TIM image (movie id -1) is shown for 10 seconds. */
 void GameApplication__PlayCinematic(GameApplication *self) {
     CinematicCall cc;
 
@@ -367,12 +332,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
     }
 }
 
-/* GameApplicationMethods slot +0x064. Gated by self->config->playStreams (same gate as
- * GameApplication__PlayOpeningMovie/GameApplication__PlaySpecialDayMovies). Builds a StreamTask, clears its skipOnConfirm,
- * derives a type code via GetEndingMovie, looks it up via GetMovieFrameCount,
- * initializes the task with it, then starts it -- the same shape as
- * GameApplication__ShowIntroLogos/GameApplication__PlayOpeningMovie, but with setSkipOnConfirm(0) added and GetEndingMovie
- * in place of GetAsmkMovie/PickOpeningMovie. */
+/* +0x064: ETC\ENDING.STR, with no skip on confirm. */
 void GameApplication__PlayEndingMovie(GameApplication *self) {
     StreamTask *task;
     s32 movieId;
