@@ -221,7 +221,7 @@ not touched by this pass.
 - All six occurrences of the GTE fixed-point descale (`/= 4096` x5, `>=
   0x1000` x1 -- the same value, two bases) are now `ONE` (libgte.h's own
   `#define ONE 4096`), matching the project's standing use of `ONE` for this
-  exact GTE constant (`src/code_8220_b.c`, `src/code_33808.c`). Decimal/hex
+  exact GTE constant (`src/code_8220_b.c`, `src/GraphicsResources.c`). Decimal/hex
   consistency was the point: a mixed base on one semantic constant is the
   round-92 defect this pass exists to catch.
 - The remaining magic literals (`0x7FFFFFFF` sentinel, `0x80000000` sign

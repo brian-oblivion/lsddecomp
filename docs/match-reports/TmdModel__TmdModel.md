@@ -38,7 +38,7 @@ object-table entry and the TMD data header, marks the class constructed.
 ## Track 4 (2026-09-26, round 87, delta)
 
 Parameter retyped `void *arg` -> `TmdObject *object` (include/TmdModel.h),
-byte-identical. Callers checked: `LinkResource__BuildModels` (code_33808)
+byte-identical. Callers checked: `LinkResource__BuildModels` (GraphicsResources)
 is the only caller of `New_TmdModel`, passing entry `i` of the loaded TMD's
 0x1C-byte object table (buffer + 0xC); `New_TmdModel` is the only caller of
 the ctor, through slot +0x008. The ctor stores the argument in `object` and

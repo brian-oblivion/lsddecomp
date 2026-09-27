@@ -907,7 +907,7 @@ segments:
       # code_179d8_c_b, which DID have to carry its attach across.
       - [0x20ADC, c, code_179d8_j]
       - [0x20FF0, o, libsnd/vm_prog]    # SpuVmSet/GetProgVol, SpuVmSet/GetProgPan
-      - [0x21180, c, code_179d8_j_b]
+      - [0x21180, c, libsnd_vm_vol_ut_key_ut_keyv]
       # ROUND 34, SECOND split of the same original slice: `libsnd/ut_pb`
       # (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244 = `SsUtPitchBend`, which
       # was func_800319B4 and had been MATCHED as C.  It sits in the MIDDLE of
@@ -1343,7 +1343,7 @@ segments:
       - [0x330F4, o, libgs/gs_110]     # GsSetAmbient
       - [0x3311c, c, code_3311c]       # game code (revision 18; was psyq_3311c)
       - [0x3328C, o, libgs/gs_107]     # GsSetFlatLight, gte_set_lc, gte_read_lc
-      - [0x33808, c, code_33808]       # game code (revision 18; was the head of psyq_33808)
+      - [0x33808, c, GraphicsResources]       # game code (revision 18; was the head of psyq_33808)
       - [0x36654, asm, psyq_36654]     # libpress/libpress from DecDCTReset
       - [0x36D38, o, libc2/exit]       # exit
       - [0x36d48, asm, psyq_36d48]

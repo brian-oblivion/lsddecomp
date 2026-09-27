@@ -49,7 +49,7 @@ fold, so it is not a volatile-insn check that stops combine here.
 **SsUtKeyOn extern: observed, NOT changed, because this function did not need
 it.** The unit declares `extern s16 SsUtKeyOn(s16, s16, s16, s16, s32, s32,
 s32);`. `include/psyq/libsnd.h` has `short SsUtKeyOn(short x7)`, and the
-`#ifdef NON_MATCHING` definition in `src/code_179d8_j_b.c` reads it as `s32
+`#ifdef NON_MATCHING` definition in `src/libsnd_vm_vol_ut_key_ut_keyv.c` reads it as `s32
 SsUtKeyOn(s16, s16, s16, s16, u16, s16, s16)`. That definition is a stall
 (65/252), not a byte-exact one. Callers checked: `grep -rln "jal *SsUtKeyOn$"
 asm/` finds exactly one, this function, and `grep` in `src/` finds no other C

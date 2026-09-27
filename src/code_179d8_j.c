@@ -25,8 +25,8 @@
  * Reclassifying four matched functions out of the game count is the correction
  * CLAUDE.md asks for, not a regression; their C is DELETED, not commented out.
  * A placed object cannot live inside a `c` segment, so the slice became
- * [c code_179d8_j][o libsnd/vm_prog][c code_179d8_j_b] and everything from
- * SpuVmSetVol on moved to `src/code_179d8_j_b.c`.
+ * [c code_179d8_j][o libsnd/vm_prog][c libsnd_vm_vol_ut_key_ut_keyv] and everything from
+ * SpuVmSetVol on moved to `src/libsnd_vm_vol_ut_key_ut_keyv.c`.
  *
  * THE `SlotE968` LOCAL VIEW LEFT WITH THEM.  Those four accessors were this
  * file's only readers of `D_8008E968`, so the typedef and the extern went with

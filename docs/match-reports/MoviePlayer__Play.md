@@ -2,7 +2,7 @@
 
 > Renamed from `func_800457C0` on 2026-09-25 (tools/rename.py). Address 0x800457c0.
 
-Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
+Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 59/59 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x040.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/code_33808.c`.
+top of / earlier in `src/GraphicsResources.c`.
 
 ```c
 /* gMoviePlayerMethods +0x040: start playing -- only when no movie is active
@@ -113,7 +113,7 @@ The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Strea
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj457C0 is gone. `rect` -> `frame` (a DrawRect, so the clearImage call needs no cast); `unk5C` -> `frameCount` (startRead's frameCount in Advance), `unk58` -> `loops`, `unk68` -> `autoPlay`, `unk3C`/`unk40`/`unk44`/`unk48`/`unk4C` -> `frameIndex`/`haveFrame`/`finished`/`streamEnded`/`frameDone`, `unk54` kept. `gMovieFrameRect` was renamed `gMovieClearColor` (rename.py) and typed `u8[4]`, so the color argument needs no cast either. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/GraphicsResources.c` are gone; Obj457C0 is gone. `rect` -> `frame` (a DrawRect, so the clearImage call needs no cast); `unk5C` -> `frameCount` (startRead's frameCount in Advance), `unk58` -> `loops`, `unk68` -> `autoPlay`, `unk3C`/`unk40`/`unk44`/`unk48`/`unk4C` -> `frameIndex`/`haveFrame`/`finished`/`streamEnded`/`frameDone`, `unk54` kept. `gMovieFrameRect` was renamed `gMovieClearColor` (rename.py) and typed `u8[4]`, so the color argument needs no cast either. Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 

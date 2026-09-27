@@ -30,7 +30,7 @@ uses was already in the unit).**
 > cannot be the shape that produced retail's bytes, whatever its total word
 > count says.
 
-Unit: `src/code_179d8_j_b.c`. Size: 324 words (0x510 bytes), file offset
+Unit: `src/libsnd_vm_vol_ut_key_ut_keyv.c`. Size: 324 words (0x510 bytes), file offset
 `0x21180`, vram `0x80030980`.
 
 ## Step (a): the inherited body, rebuilt before anything was changed
@@ -69,7 +69,7 @@ lesson of this revisit in one line.
 
 ## Step (b): fresh re-read of the disassembly, and what it gives
 
-Read cold from `asm/nonmatchings/code_179d8_j_b/SpuVmSetVol.s`, not from the
+Read cold from `asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv/SpuVmSetVol.s`, not from the
 previous attempts' line. Two source-level facts fell straight out, both kept:
 
 ### Fix 1 -- the loop index is `(u8)i`, not `i`. (`u8 i`)
@@ -172,7 +172,7 @@ it is *downstream* of the shape difference above, not the thing to attack.
 
 ## Best-derived body (315/324 words, 10/324 raw, ins 76 / del 76; preserved for the next attempt)
 
-Declarations used, all of them already present in `src/code_179d8_j_b.c`
+Declarations used, all of them already present in `src/libsnd_vm_vol_ut_key_ut_keyv.c`
 before this round (`Rec34D994`, `SlotE968`, `RecordE978`, `SsScore`,
 `ObjE970`, `D_8008E9D0`, `D_8008EA22`, `D_8008E8C0`, `_svm_sreg_buf`,
 `_svm_sreg_dirty`, `SpuVmVSetUp`).
@@ -357,7 +357,7 @@ reading.
 > cascade round 45 already characterised (residue 1, below), now isolated
 > with a clean, driftless measurement instead of a drift-affected one.
 
-Unit: `src/code_179d8_j_b.c`. Size: 324 words (0x510 bytes), file offset
+Unit: `src/libsnd_vm_vol_ut_key_ut_keyv.c`. Size: 324 words (0x510 bytes), file offset
 `0x21180`, vram `0x80030980`.
 
 ## What it computes
@@ -738,7 +738,7 @@ than either prior attempt had.
 > residue is a whole-function-scale register-allocation-cascade difference,
 > not a missing construct.
 
-Unit: `src/code_179d8_j_b.c`. Size: 324 words (0x510 bytes), file offset
+Unit: `src/libsnd_vm_vol_ut_key_ut_keyv.c`. Size: 324 words (0x510 bytes), file offset
 `0x21180`, vram `0x80030980`.
 
 ## What it computes
@@ -807,7 +807,7 @@ loop-plus-nested-branches function, not in any individual construct.
 
 All of `Rec34D994`, `SlotE968`, `RecordE978`, `D_8008E9D0`, `D_8008EA22`,
 `D_80090C60`/`64`, `D_8008E228`/`22C` were ALREADY declared in this unit
-(`src/code_179d8_j_b.c`) before this round, for `SsUtKeyOn`'s existing
+(`src/libsnd_vm_vol_ut_key_ut_keyv.c`) before this round, for `SsUtKeyOn`'s existing
 stall. Added this round, following `vmNoiseOn`/`SpuVmKeyOnNow`'s
 already-proven declarations verbatim:
 
@@ -978,7 +978,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 
 Within the 30-attempt cap (3 real builds used):
 1. Direct transcription from an m2c-seeded skeleton
-   (`tools/m2ctx.py code_179d8_j_b --sig 's32 SpuVmSetVol(s32 a0, s32 a1,
+   (`tools/m2ctx.py libsnd_vm_vol_ut_key_ut_keyv --sig 's32 SpuVmSetVol(s32 a0, s32 a1,
    s32 a2, s32 a3, u16 a4)' --run`), with EVERY divisor/magic-constant
    claim cross-checked against the pinned-pipeline reproducer before
    writing it down (the `/127` signed magic `0x81020409`/shift-6 was
@@ -1101,7 +1101,7 @@ still current -- no correction needed here, unlike this unit's other two
 stalls.
 
 **Disposition: promoted to `#ifdef NON_MATCHING ... #else INCLUDE_ASM
-... #endif`** in `src/code_179d8_j_b.c`, using round 62's body (not round
+... #endif`** in `src/libsnd_vm_vol_ut_key_ut_keyv.c`, using round 62's body (not round
 50's -- round 50's 324/324 "length-exact" body is FALSIFIED at ins101/del101,
 a worse structural match despite the matching word count; see round 62's
 "Step (a)" above). Comment names the current score, verified build

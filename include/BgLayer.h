@@ -9,7 +9,7 @@
  * 0x4 -> 0x54 is the ctor chain) whose own fields, +0x044..+0x067, are
  * exactly libgs's GsBG (LIBGS.H: attribute, x, y, w, h, scrollx, scrolly,
  * r, g, b, map, mx, my, scalex, scaley, rotate). Methods in
- * src/code_33808.c; no class derives from it.
+ * src/GraphicsResources.c; no class derives from it.
  *
  * The name is round 83's, and the evidence is the GsBG: Viewport__DrawNode
  * (src/code_2864.c) passes a class-0x54 node's +0x044 to GsSortBg, and

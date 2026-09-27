@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043B18` on 2026-09-25 (tools/rename.py). Address 0x80043b18.
 
-Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
+Round 82, runner echo (GraphicsResources session, echo #6), 2026-09-25. Unit `GraphicsResources`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 9/9 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gLinkResourceMethods +0x078.
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/code_33808.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
@@ -62,4 +62,4 @@ Byte-identical.
 
 ## Round 95 (alpha, track 6: Sony headers)
 
-The unit-local GsMapModelingData prototype (`u_long *`, spelled locally while TimImage.h, TileMap.h and TileAtlas.h re-declared GsIMAGE, GsMAP and GsCELL) is deleted: code_33808.c includes <libgs.h>, whose prototype takes `unsigned long *`, so the call casts `(unsigned long *)`. Byte-identical.
+The unit-local GsMapModelingData prototype (`u_long *`, spelled locally while TimImage.h, TileMap.h and TileAtlas.h re-declared GsIMAGE, GsMAP and GsCELL) is deleted: GraphicsResources.c includes <libgs.h>, whose prototype takes `unsigned long *`, so the call casts `(unsigned long *)`. Byte-identical.

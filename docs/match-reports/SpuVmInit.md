@@ -723,8 +723,8 @@ lists most of the cluster: `D_8006DAD4Edd4`/`D_8006DAD4` (this unit's two
 independent local views of the same base pointer) is the PS1 SPU hardware
 base address `0x1F801C00`, per `vmNoiseOn2`'s own report in
 `code_179d8_l`. Proposing (not applying -- shared with bravo's live
-`code_179d8_j_b.c` this round, see broadcast) a base-pointer rename to
-`gSpuRegs` once no live runner touches `code_179d8_j_b`/`_l`/`_j`/`_j_c`/
+`libsnd_vm_vol_ut_key_ut_keyv.c` this round, see broadcast) a base-pointer rename to
+`gSpuRegs` once no live runner touches `libsnd_vm_vol_ut_key_ut_keyv`/`_l`/`_j`/`_j_c`/
 `_k`/`_p`. See the broadcast post from this round for the fuller list of
 globals this unit shares with that cluster (`D_8008EA26` -> `gSelectedVoice`,
 `D_8008E9D0` -> `gVoiceCount`, `D_80090C60`/`D_80090C64` ->

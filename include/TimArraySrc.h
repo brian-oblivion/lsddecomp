@@ -8,7 +8,7 @@
  * gTimArraySrcMethods) whose buffer holds one block of TIM images -- a count, then
  * that many byte offsets from the block's start -- and which turns it into
  * an array of TimImage objects (include/TimImage.h). Methods in
- * src/code_33808.c. No classes derive from it (`typeviews.py --tree`), so
+ * src/GraphicsResources.c. No classes derive from it (`typeviews.py --tree`), so
  * there are no FIELDS/SLOTS macros.
  *
  * The ctor chain agrees with the id: TimArraySrc__TimArraySrc's first call

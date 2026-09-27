@@ -4,7 +4,7 @@
 
 > **[RETRACTED round 70: the blocker below is resolved; see the title.]** **TOOLCHAIN-BLOCKED -- note added round 62 by bravo, who did not work this
 > function.** While revisiting its near twin `SsUtKeyOn` (same unit,
-> `src/code_179d8_j_b.c`), a below-cc1 blocker was found and escalated: a
+> `src/libsnd_vm_vol_ut_key_ut_keyv.c`), a below-cc1 blocker was found and escalated: a
 > load-delay `nop` that ASPSX 2.34 emits after an indexed load whose next
 > unexpanded instruction is a store-to-symbol macro of the loaded register,
 > and that maspsx suppresses because the expansion interposes `lui $at`.
@@ -19,7 +19,7 @@
 > round-62 section. Nothing else in this report has been changed.
 
 
-Unit `code_179d8_j_b` (re-carved round 34; the round-26 text below says `code_179d8_j`, its name before the split). Round 26 (2026-09-09). Not a class method. **Read
+Unit `libsnd_vm_vol_ut_key_ut_keyv` (re-carved round 34; the round-26 text below says `code_179d8_j`, its name before the split). Round 26 (2026-09-09). Not a class method. **Read
 `SsUtKeyOn`'s report first** -- this is that function's near-twin, with
 one structural difference: instead of allocating a fresh channel slot via
 `SpuVmAlloc`, the caller supplies the slot index directly (`idx`,
@@ -238,7 +238,7 @@ see that report). Restored to `INCLUDE_ASM`; still a STALL.
 
 Same rename as `SsUtKeyOn` (`func_80032148` -> `SpuVmVSetUp`, round
 34's `libsnd/vm_vsu.o` conversion) and the same three declaration gaps
-round 34's carve left in `src/code_179d8_j_b.c` (`SpuVmVSetUp` itself,
+round 34's carve left in `src/libsnd_vm_vol_ut_key_ut_keyv.c` (`SpuVmVSetUp` itself,
 `D_8008EA22`, the `SlotE968`/`D_8008E968` pair) -- see `SsUtKeyOn.md`'s
 round-36 addendum for the full derivation; adding them once in this shared
 file fixed both functions' preserved bodies.
@@ -264,7 +264,7 @@ STALL.
 ### The corrected, linkable body (237/253 words, this round's measurement)
 
 Positioned where it would compile: replacing the `INCLUDE_ASM` for
-`SsUtKeyOnV` in `src/code_179d8_j_b.c`, between `SsUtKeyOff` and
+`SsUtKeyOnV` in `src/libsnd_vm_vol_ut_key_ut_keyv.c`, between `SsUtKeyOff` and
 `SsUtKeyOffV`. Needs the same `SlotE968`/`D_8008E968`/`D_8008EA22`
 declarations as `SsUtKeyOn`'s corrected body (see that report), all
 now present in the shared file.
@@ -538,7 +538,7 @@ going into this continuation); still a STALL, same five residues, now
 confirmed exhausted under a real permuter search of 63315 iterations as
 well as hand reshaping and direct transfer from the sibling function.
 
-Also added the `SpuVmVSetUp` extern to `src/code_179d8_j_b.c` (shared fix,
+Also added the `SpuVmVSetUp` extern to `src/libsnd_vm_vol_ut_key_ut_keyv.c` (shared fix,
 same gap `SsUtKeyOn.md`'s continuation describes -- this function's
 preserved body needs the same declaration and it was likewise missing).
 
@@ -585,7 +585,7 @@ were before a length-exact measurement existed. Not re-characterized
 further -- this is a measurement, not a matching attempt.
 
 **Disposition: promoted to `#ifdef NON_MATCHING ... #else INCLUDE_ASM
-... #endif`** in `src/code_179d8_j_b.c`, comment updated to the current
+... #endif`** in `src/libsnd_vm_vol_ut_key_ut_keyv.c`, comment updated to the current
 score, verified build unchanged (`./build-and-verify.sh` green,
 `tools/check-nonmatching.sh` green). The title line and the round-62 note
 at the top of this file are now STALE (both still say

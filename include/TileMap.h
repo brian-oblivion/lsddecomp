@@ -7,7 +7,7 @@
  * TileMap -- a FileResource data source (class id 0x203, method table
  * gTileMapMethods) whose own fields, +0x02C..+0x03B, are exactly libgs's GsMAP
  * (LIBGS.H: cellw, cellh, ncellw, ncellh, base, index). Methods in
- * src/code_33808.c. No classes derive from it (`typeviews.py --tree`), so
+ * src/GraphicsResources.c. No classes derive from it (`typeviews.py --tree`), so
  * there are no FIELDS/SLOTS macros.
  *
  * The ctor chain agrees with the id: TileMap__TileMap's first call is

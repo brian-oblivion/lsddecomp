@@ -57,14 +57,14 @@ code_2cc8c_b: warning: assignment from incompatible pointer type
 code_2cc8c_b: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
 code_2cc8c_f: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
 code_322b4: warning: unused variable `pad'
-code_33808: warning: `sx' might be used uninitialized in this function
-code_33808: warning: `sy' might be used uninitialized in this function
-code_33808: warning: control reaches end of non-void function
-code_33808: warning: control reaches end of non-void function
-code_33808: warning: unused variable `unused'
-code_33808: warning: unused variable `unused'
-code_33808: warning: unused variable `unused'
-code_33808: warning: unused variable `unused'
+GraphicsResources: warning: `sx' might be used uninitialized in this function
+GraphicsResources: warning: `sy' might be used uninitialized in this function
+GraphicsResources: warning: control reaches end of non-void function
+GraphicsResources: warning: control reaches end of non-void function
+GraphicsResources: warning: unused variable `unused'
+GraphicsResources: warning: unused variable `unused'
+GraphicsResources: warning: unused variable `unused'
+GraphicsResources: warning: unused variable `unused'
 code_55dd4: warning: unused variable `unused'
 code_d294_b: warning: unused variable `pad'
 code_d294_b: warning: unused variable `unused'

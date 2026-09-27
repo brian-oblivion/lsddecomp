@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043EE4` on 2026-09-25 (tools/rename.py). Address 0x80043ee4.
 
-Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
+Round 82, runner echo (GraphicsResources session, echo #8), 2026-09-25. Unit `GraphicsResources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 37/37 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTodMethods +0x008.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/code_33808.c`.
+`src/GraphicsResources.c`.
 
 ```c
 typedef struct ResourceSource {

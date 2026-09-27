@@ -2,7 +2,7 @@
 
 > Renamed from `func_800431A8` on 2026-09-25 (tools/rename.py). Address 0x800431a8.
 
-Round 82, runner echo (code_33808 session, echo #7), 2026-09-25. Unit `code_33808`.
+Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 22/22 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x00C (finalize).
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/code_33808.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
 
 ```c
 /* gTimBlockSrcMethods +0x00C: finalize -- release the object array at +0x30 (+0x2C
@@ -43,4 +43,4 @@ void TimBlockSrc__Finalize(DataSrc33808 *self) {
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of +0x00C: releases `blocks` (`blockCount` entries), frees it, then the active driver's finalize. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of +0x00C: releases `blocks` (`blockCount` entries), frees it, then the active driver's finalize. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

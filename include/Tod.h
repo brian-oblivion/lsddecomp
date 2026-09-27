@@ -5,7 +5,7 @@
 
 /*
  * Tod -- a FileResource data source (class id 0x4F03, method table gTodMethods)
- * over one TOD animation's packet stream. Methods in src/code_33808.c; one
+ * over one TOD animation's packet stream. Methods in src/GraphicsResources.c; one
  * subclass, TodSet (gTodSetMethods, 0x14F03), whose ctor calls this class's
  * first (TodSet__TodSet: GetTodMethods()->ctor(self, arg)) and whose
  * TodSet__BuildTods makes one Tod per sub-block of its buffer (New_Tod).
@@ -33,9 +33,9 @@
  * array); ModelData__ForwardScanPackets casts it (an inherited slot keeps
  * the parent's name).
  *
- * The ctor's descriptor is code_33808.c's ResourceSource ({buffer to adopt, file
+ * The ctor's descriptor is GraphicsResources.c's ResourceSource ({buffer to adopt, file
  * name to request}); only the tag is declared here, as include/ModelData.h
- * does. The allocators reach the ctor through code_33808.c's unprototyped
+ * does. The allocators reach the ctor through GraphicsResources.c's unprototyped
  * UnprototypedCtorTable view.
  */
 

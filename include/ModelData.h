@@ -8,7 +8,7 @@
  * gModelDataMethods) that splits one loaded file into a LinkResource (gLinkResourceMethods,
  * an array of TMD models) and a TodSet (gTodSetMethods, an array of TOD
  * animations), and forwards TOD packet scanning to the TodSet. Methods in
- * src/code_33808.c; one subclass, TriggerWorld (gTriggerWorldMethods, 0x15F03), whose
+ * src/GraphicsResources.c; one subclass, TriggerWorld (gTriggerWorldMethods, 0x15F03), whose
  * ctor calls this class's first (TriggerWorld__TriggerWorld:
  * GetModelDataMethods()->ctor(self, arg, 0)).
  *
@@ -33,10 +33,10 @@
  *
  * The ctor returns self or NULL (New_ModelData tests it), but
  * FILERESOURCE_SLOTS declares +0x008 returning void, as FileResource's own ctor
- * does; the allocators reach the ctor through code_33808.c's unprototyped
+ * does; the allocators reach the ctor through GraphicsResources.c's unprototyped
  * UnprototypedCtorTable view instead.
  *
- * The ctor's descriptor is code_33808.c's ResourceSource ({buffer to adopt, file
+ * The ctor's descriptor is GraphicsResources.c's ResourceSource ({buffer to adopt, file
  * name to request}); only the tag is declared here, so that any header may
  * repeat the declaration.
  */

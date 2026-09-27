@@ -1,11 +1,23 @@
 /*
- * code_179d8_j_b -- five functions of Sony's libsnd voice manager
- * (vmanager), carried as C: SpuVmSetVol, SsUtKeyOn, SsUtKeyOff, SsUtKeyOnV
- * and SsUtKeyOffV. Retail's vmanager is a build no SDK disc carries, so it
- * never placed as an object; progress.py counts these functions as library
- * by address, and they keep Sony's names and <libsnd.h>'s prototypes. The
- * linked objects libsnd/vm_prog.o and libsnd/ut_pb.o sit immediately before
- * and after this file.
+ * libsnd_vm_vol_ut_key_ut_keyv -- five functions of Sony's libsnd voice
+ * manager, carried as C: SpuVmSetVol, SsUtKeyOn, SsUtKeyOff, SsUtKeyOnV
+ * and SsUtKeyOffV. On the 3.0/3.3/3.5 discs all five sit in one object,
+ * vmanager.o; on the 3.6 disc they are three, vm_vol.o (SpuVmSetVol),
+ * ut_key.o (SsUtKeyOn, SsUtKeyOff) and ut_keyv.o (SsUtKeyOnV, SsUtKeyOffV),
+ * in this order, and the file is named for those three because its
+ * neighbours are 3.6-only split modules. Retail's build of them is on no
+ * SDK disc, so they never placed as objects; progress.py counts these
+ * functions as library by address, and they keep Sony's names and
+ * <libsnd.h>'s prototypes.
+ *
+ * What decided its edges (python3 tools/tuboundary.py): the placed object
+ * libsnd/vm_prog precedes it ("start edge possible") and the placed object
+ * libsnd/ut_pb follows it ("start edge possible"), so there is nothing to
+ * merge with. Inside, every edge is "boundary possible": the binary neither
+ * proves nor forbids a file boundary. PARKED: the content says three files
+ * (after SpuVmSetVol and after SsUtKeyOff, the 3.6 module edges), but that
+ * split is a new carve, not a merge or rename, so the file keeps its carve
+ * edges and is named for all three modules.
  *
  *   SpuVmSetVol  rescales every voice one sequence plays on a given VAB and
  *                program: voice level x the VAB's, the program's and the
@@ -219,7 +231,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     return result;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SpuVmSetVol);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SpuVmSetVol);
 #endif
 #ifdef NON_MATCHING
 /* NON_MATCHING: 252/252 words, length exact; raw word-match 65/252,
@@ -317,7 +329,7 @@ fail_nolock:
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOn);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOn);
 #endif
 
 s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
@@ -458,7 +470,7 @@ fail:
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOnV);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOnV);
 #endif
 
 /* The "release channel" twin of SsUtKeyOff's else-branch above: same

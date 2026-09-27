@@ -2,7 +2,7 @@
 
 > Renamed from `func_80045E18` on 2026-09-25 (tools/rename.py). Address 0x80045e18.
 
-Round 82, runner echo (code_33808 session, echo #6), 2026-09-25. Unit `code_33808`.
+Round 82, runner echo (GraphicsResources session, echo #6), 2026-09-25. Unit `GraphicsResources`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 9/9 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (no data word references it).
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/code_33808.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/GraphicsResources.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
@@ -50,7 +50,7 @@ caller. Byte-identical.
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; the Obj45CFC parameter is `MoviePlayer *`; `unk4C` -> `frameDone`. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/GraphicsResources.c` are gone; the Obj45CFC parameter is `MoviePlayer *`; `unk4C` -> `frameDone`. Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 

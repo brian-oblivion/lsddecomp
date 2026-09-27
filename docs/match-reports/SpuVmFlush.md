@@ -800,10 +800,10 @@ this unit, with its own logic implying a recurring caller elsewhere.
 
 This function is the best-evidenced site for several of this cluster's
 shared globals, but per the ownership rule (and this round's
-call-graph-contention note on the broadcast: `code_179d8_j_b.c`, bravo's
+call-graph-contention note on the broadcast: `libsnd_vm_vol_ut_key_ut_keyv.c`, bravo's
 live unit this round, references nearly all of them) none are applied
 here -- proposing for the head to apply once no runner is live on
-`code_179d8_j_b`/`_l`/`_j`/`_j_c`/`_k`/`_p`:
+`libsnd_vm_vol_ut_key_ut_keyv`/`_l`/`_j`/`_j_c`/`_k`/`_p`:
 
 - `D_8008EA26` -> `gSelectedVoice` ("currently selected channel" scratch,
   already documented `volatile`, read back via a plain `u8 *` cast --
