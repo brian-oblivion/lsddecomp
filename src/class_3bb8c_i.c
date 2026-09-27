@@ -354,7 +354,7 @@ void TextEntry__HandleCommand(TextEntry *self, void *arg1, s32 arg2) {
     }
 }
 
-void TextEntry__NotifyTarget(TextEntry *self, s32 arg1) {
+void TextEntry__PlaySound(TextEntry *self, s32 arg1) {
     VabStreamObj *target;
 
     target = self->target;

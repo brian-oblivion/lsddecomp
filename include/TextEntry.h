@@ -62,7 +62,7 @@ struct TextEntryMethods {
     /* +0x058 */ void (*tickState)(TextEntry *self, void *sender,
                                    s32 event); /* TextEntry__TickState (reads only self; see the banner) */
     /* +0x05C */ void (*handleCommand)(TextEntry *self, void *sender, s32 command); /* TextEntry__HandleCommand */
-    /* +0x060 */ void (*notifyTarget)(TextEntry *self, s32 arg1); /* TextEntry__NotifyTarget */
+    /* +0x060 */ void (*notifyTarget)(TextEntry *self, s32 arg1); /* TextEntry__PlaySound */
     /* +0x064 */ void *slot64[9];                                 /* NULL */
     /* +0x088 */ void (*moveCursorRight)(TextEntry *self);        /* TextEntry__MoveCursorRight */
     /* +0x08C */ void (*moveCursorLeft)(TextEntry *self);         /* TextEntry__MoveCursorLeft */
@@ -115,7 +115,7 @@ void TextEntry__DetachTarget(TextEntry *self);
 void TextEntry__SetState(TextEntry *self, s32 state);
 void TextEntry__TickState(TextEntry *self);
 void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command);
-void TextEntry__NotifyTarget(TextEntry *self, s32 arg1);
+void TextEntry__PlaySound(TextEntry *self, s32 arg1);
 void TextEntry__MoveCursorRight(TextEntry *self);
 void TextEntry__MoveCursorLeft(TextEntry *self);
 void TextEntry__NextChar(TextEntry *self);

@@ -39,7 +39,7 @@ was right from the very first attempt.
 (`self->unk18`) and `$a3` (`1`), while `$a2` is never freshly loaded or
 `li`'d for the call -- it's still holding the just-computed incremented
 `unk1C` value from a few instructions earlier. Same "leftover register is
-actually a forwarded argument" shape as `TextEntry__NotifyTarget`'s `slot80` fix
+actually a forwarded argument" shape as `TextEntry__PlaySound`'s `slot80` fix
 earlier this round. The first attempt (correct store placement, but the
 call written as `self->methods->slotA8(self, self->unk18, 1)` against the
 stale 2-arg header) scored only 5/25, with a register swap AND a length

@@ -10,7 +10,7 @@ Unit `class_3bb8c_i`, carved round 14.
 addChild` (the class's OWN overridden addChild, `TextEntry__AddChild`, reached
 through `self->methods` rather than the explicit base-table call this
 time), stashes a third pointer verbatim into `unk3C` (typed `TargetObj86ED0
-*`, the same opaque type `TextEntry__NotifyTarget` dispatches through), and resets
+*`, the same opaque type `TextEntry__PlaySound` dispatches through), and resets
 two counters.
 
 ```c

@@ -156,7 +156,7 @@ the head to apply by type scope:
 - `unk18` -> `cursorIndex` (tier B). The name-buffer edit-cursor index,
   moved by `TextEntry__MoveCursorRight`/`Left`, forwarded as `arg1` to both
   `slotA4`/`slotA8` (class_3bb8c_j's Dispatch* pair) and to `slot60`
-  (`TextEntry__NotifyTarget`).
+  (`TextEntry__PlaySound`).
 - `unk1C` -- **NOT proposed, dual-use ambiguity found and deliberately left
   alone.** In this unit (`TextEntry__NextChar`) it is INCREMENTED as
   a character-picker selection index, capped by `unk14`, wrapping to 0 on
@@ -192,7 +192,7 @@ the head to apply by type scope:
   from `New_CharSprite` on the same `FONTICON.TIM` handle with a `0x5F`
   literal (a distinct icon sub-resource of the same TIM). Also accessed by
   class_3bb8c_j's Dispatch* pair (`unk40`/`unk44` only, not `unk48`).
-- `slot60` -> `notifyTarget` (tier B). This IS `TextEntry__NotifyTarget`'s own
+- `slot60` -> `notifyTarget` (tier B). This IS `TextEntry__PlaySound`'s own
   vtable slot (`gTextEntryMethods +0x060`, classtable.py) -- dispatched by
   this function's `case 25`/`23` (arg1=`0x10`) and by class_3bb8c_j's
   `TextEntry__SetCursorPos`/`TextEntry__SetCharAt` (arg1=`0`).
