@@ -706,9 +706,9 @@ struct DreamSysMethods {
     /* +0x108 */ s32 (*getDreamTimerScaled)(DreamSys *self); /* DreamSys__GetDreamTimerScaled: tick / 15 */
     /* +0x10C */ void (*setSoundObj)(DreamSys *self, s32 value); /* DreamSys__SetSoundObj */
     /* +0x110 */ void (*setViewport)(DreamSys *self, struct Viewport *value); /* DreamSys__SetViewport */
-    /* +0x114 */ void (*slot114)(DreamSys *self, s32 value); /* DreamSys__SetEtcTim: etcTim = value */
-    /* +0x118 */ void (*updateTickState)(DreamSys *self);    /* DreamSys__UpdateTickState */
-    /* +0x11C */ void (*runTickCallbacks)(DreamSys *self);   /* DreamSys__RunTickCallbacks */
+    /* +0x114 */ void (*setEtcTim)(DreamSys *self, s32 value); /* DreamSys__SetEtcTim: etcTim = value */
+    /* +0x118 */ void (*updateTickState)(DreamSys *self);      /* DreamSys__UpdateTickState */
+    /* +0x11C */ void (*runTickCallbacks)(DreamSys *self);     /* DreamSys__RunTickCallbacks */
     /* +0x120 */ s32 (*projectPointAtDistance)(DreamSys *self, s32 *out, s32 dist, s32 *reference,
                                                s32 tolerance); /* DreamSys__ProjectPointAtDistance */
     /* +0x124 */ void (*slot124)(DreamSys *self); /* DreamSys__func_59590: unk_0x7C = 0 */

@@ -61,6 +61,25 @@ struct TimImage;
 struct LinkResource;
 struct ObjM; /* include/ObjM.h */
 
+/* DayTask::phase: which ObjM step DayTask__AdvancePhase takes on the next
+ * DrawSystem VSync. */
+enum DayTaskPhase {
+    DAYTASK_PHASE_IDLE = 0,        /* resetCounters (DayTask__ResetPhase) */
+    DAYTASK_PHASE_READY = 1,       /* onInit: the next VSync runs startDay */
+    DAYTASK_PHASE_RUNNING = 2,     /* StartObjM: an ObjM is running */
+    DAYTASK_PHASE_REPLACE_OBJM = 3 /* an ObjM link state: the next VSync replaces the ObjM */
+};
+
+/* TimedTask::result as a DayTask sets it: what its init returns to
+ * GameApplication__PollStatusObj. */
+enum DayTaskResult {
+    DAYTASK_RESULT_ENDED = 1,     /* ObjM's TIME_UP, endDay(0) returned 0, no cinematic entry */
+    DAYTASK_RESULT_CINEMATIC = 2, /* as ENDED with a cinematic entry, or startDay refused the day;
+                                     PollStatusObj starts the cinematic stream */
+    DAYTASK_RESULT_CLOSED = 3     /* TIME_UP with endDay nonzero, or an ObjM close; PollStatusObj
+                                     sets skipGraphRoomPoll */
+};
+
 /* TimedTask's slots, then this class's own. Overridden: ctor, finalize,
  * onNotify, resetCounters (DayTask__ResetPhase), init, deinit, onInit,
  * onDeinit, onTag1Notify (DayTask__AdvancePhase) and onState4. */
@@ -84,7 +103,7 @@ struct ObjM; /* include/ObjM.h */
 
 struct DayTaskMethods {
     DAYTASK_SLOTS(DayTask, (DayTask * self, IntermediateBaseInitArgs *initArgs,
-                            struct DreamSys *dreamSys, s32 arg3));
+                            struct DreamSys *dreamSys, s32 syncDriver));
 };
 
 struct DayTask {
@@ -99,9 +118,9 @@ typedef s32 (*DayTaskInitFn)(DayTask *self);
 
 /* The class's own methods, in address order. */
 DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys,
-                     s32 arg3); /* BMemPMgrAlloc(0x50), then ctor */
+                     s32 syncDriver); /* BMemPMgrAlloc(0x50), then ctor */
 void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys,
-                      s32 arg3);
+                      s32 syncDriver);
 void DayTask__Finalize(DayTask *self);
 void DayTask__OnNotify(DayTask *self, BasicClass *sender, s32 event);
 void DayTask__ResetPhase(DayTask *self);

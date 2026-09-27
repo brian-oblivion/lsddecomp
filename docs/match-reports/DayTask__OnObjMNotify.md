@@ -165,3 +165,10 @@ the 4-byte struct compiles to the same frame.
 ## Track 4 (2026-09-26, round 88, DayTask)
 
 The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from Obj865C8__OnTag2Notify: own slot +0x084, which DayTask__OnNotify calls for a sender whose id & 0xFFFFF is 0x2F230 (gObjMMethods, the ObjM StartObjM builds). Events 4/0xC/0xD end the day through the DreamSys and set TimedTask's `result` then setState(3); 5..8 and 0xA set phase 3.
+
+## Naming (track 7, round 99, charlie)
+
+The cases are ObjM.h's `enum ObjMState` (its banner already names this
+function as the reader of each), the results DayTask.h's new `enum
+DayTaskResult`, `setState(3)` IntermediateBase's `INTERMEDIATEBASE_STATE_STOP`.
+Local `pos` -> `cinematic` (getCinematic's CinematicCall).

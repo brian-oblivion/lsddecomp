@@ -29,8 +29,8 @@ jal   GetDayTaskMethods
  nop
 jal   InitDreamAux
  sw   $v0, 0x0($s1)            ; self->methods = GetDayTaskMethods() (== &gDayTaskMethods)
-lui   $a0, %hi(D_800113EC)
-addiu $a0, $a0, %lo(D_800113EC)
+lui   $a0, %hi(sEtcTimPath)
+addiu $a0, $a0, %lo(sEtcTimPath)
 jal   New_TimImage
  nop
 sw    $v0, 0x44($s1)           ; self->unk44 = New_TimImage("ETC\ETC.TIM")
@@ -47,8 +47,8 @@ lw    $v0, 0x5C($v0)
 jalr  $v0
  nop                            ; self->unk44->methods->slot5C(self->unk44), discarded
 addiu $a0, $sp, 0x10            ; &req
-lui   $v0, %hi(D_800113F8)
-addiu $v0, $v0, %lo(D_800113F8)
+lui   $v0, %hi(sDreamerTmdPath)
+addiu $v0, $v0, %lo(sDreamerTmdPath)
 sw    $zero, 0x10($sp)          ; req.type = 0
 jal   New_LinkResource
  sw   $v0, 0x14($sp)             ; req.path = "ETC\DREAMER.TMD"
@@ -60,9 +60,9 @@ addu  $a1, $zero, $zero
 jal   New_WBgm
  ori  $a2, $zero, 0x1               ; New_WBgm(PickWeeklyGroup(0), 0, 1)
 ori   $a0, $zero, 0x1
-jal   func_8004A070
+jal   RegisterRecordTableFiles
  sw   $v0, 0x40($s1)                 ; self->unk40 = New_WBgm(...)
-sltiu $a0, $s4, 0x1                   ; a0 = (unsigned)(arg3 < 1)   -- func_8004A070(1)'s own return discarded
+sltiu $a0, $s4, 0x1                   ; a0 = (unsigned)(arg3 < 1)   -- RegisterRecordTableFiles(1)'s own return discarded
 ori   $a1, $zero, 0x1
 jal   SetActiveDataSourceDriverMode
  ori  $a2, $zero, 0x1                   ; SetActiveDataSourceDriverMode(arg3<1u, 1, 1), discarded
@@ -110,15 +110,15 @@ void DayTask__DayTask(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     GetTimedTaskMethods()->ctor(self, GetSoundEffectDir(0), 0);
     self->methods = GetDayTaskMethods();
     InitDreamAux();
-    self->unk44 = New_TimImage(D_800113EC);
+    self->unk44 = New_TimImage(sEtcTimPath);
     self->unk44->methods->slot78(self->unk44);
     self->unk44->methods->slot5C(self->unk44);
     req.type = 0;
-    req.path = D_800113F8;
+    req.path = sDreamerTmdPath;
     self->unk48 = New_LinkResource(&req);
     tmp = PickWeeklyGroup(0);
     self->unk40 = New_WBgm(tmp, 0, 1);
-    func_8004A070(1);
+    RegisterRecordTableFiles(1);
     SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
     self->unk0C = arg1;
     arg1->unk10 = New_NodeGuardedViewport();
@@ -205,11 +205,11 @@ needed anywhere in this 107-word function.
   convention. Declared 0x10 bytes (4 fields) even though only the first two
   are written, per that report's own hard-won lesson ("local struct SIZE
   matters, not shape").
-- New rodata externs `D_800113EC` ("ETC\ETC.TIM") and `D_800113F8`
+- New rodata externs `sEtcTimPath` ("ETC\ETC.TIM") and `sDreamerTmdPath`
   ("ETC\DREAMER.TMD"), both `const char[]`.
 - Nine new function externs, several deliberately re-declared locally with
   a DIFFERENT (but ABI-compatible) type than an existing declaration
-  elsewhere in the project (`New_LinkResource`, `func_8004A070`,
+  elsewhere in the project (`New_LinkResource`, `RegisterRecordTableFiles`,
   `SetActiveDataSourceDriverMode`, `New_StageMap`) — all four already have an extern
   somewhere else (`GameApplication.h` or `code_1677c.c`); this unit keeps its
   own local view rather than cross-including, per established policy. The
@@ -325,3 +325,58 @@ unchanged (`req.src...` writes, `&req.src` to New_LinkResource). A plain
 8 and move every callee-save slot, and an unused pad local is dropped by
 cc1, so ResourceRequest is the smallest existing type that keeps the frame.
 Byte-exact. Table and details: ResourceRequest__Set.md, round 97 second job.
+
+## History moved from comments (track 7, round 99, charlie)
+
+The unit banner used to live in `include/class_39e08.h`; it now sits at the
+top of `src/class_39e08.c`, and the header's own comment says only what the
+header declares. Text the header carried until round 99, kept here:
+
+- Banner: "Unit class_39e08: the methods of two classes, in ROM order.
+  DayTask (gDayTaskMethods, 0x1F230), New_DayTask through GetDayTaskMethods
+  ... TimedTask (gTimedTaskMethods, 0x230), its parent, New_TimedTask through
+  TimedTask__SetTimeout ... NoOpSlot58, CheckTimeout, SetState and SetTimeout
+  are TimedTask's own methods that DayTask inherits unchanged. plus
+  func_8004A070 [now RegisterRecordTableFiles], called once from DayTask's
+  ctor and once from code_1677c: it manages a pair of file-scope globals and
+  loops on RegisterFileTableEntries; nothing pins down what it registers.
+  What stays here are the call-site views of objects this unit reaches
+  without a unified class to type them ... ObjM (DayTask::objM) is
+  include/ObjM.h."
+- SubObjE: "Opaque view of whatever object DayTask__OnInit reaches through
+  IntermediateBaseInitArgs::unk0" (that field is `drawSystem` now, and
+  the slot is the DrawSystem's getDims: DayTask__OnInit.md).
+- BMemPMgrAlloc: "see code_171e0.h / code_55dd4.h / Entity.h /
+  class_16334.h for the other units that also declare it locally."
+- InitDreamAux: "Matched in code_4cd08.c (still called `InitDreamAux` there,
+  STALLED at 40/56 -- see docs/match-reports/InitDreamAux.md)". Stale: that
+  report records the match at 56/56 in round 24.
+- GetSoundEffectDir: "MATCHED, src/code_39094.c (`char
+  *GetSoundEffectDir(void)`)". The extern now returns `char *` like the
+  definition, which dropped the ctor's `(char *)` cast; the dead `0`
+  argument stays, as its `arity-ok` note says.
+- sEtcTimPath/sDreamerTmdPath (then D_800113EC/D_800113F8): "Filenames right
+  next to each other in the same rodata blob (asm/data/1A90.rodata.s)". The
+  blob is `asm/data/1B84.rodata.s` today.
+- RegisterRecordTableFiles: "Also declared in code_1677c.c as `extern s32
+  func_8004A070(s32 a0)`." SetActiveDataSourceDriverMode: "Also declared in
+  src/code_1677c.c with this exact signature. Return value discarded at this
+  call site." "New_StageMap is declared in include/StageMap.h."
+
+## Naming (track 7, round 99, charlie)
+
+- Parameter `arg3` -> `syncDriver` (tier B). Its only use is
+  `SetActiveDataSourceDriverMode(syncDriver == 0, 1, 1)`, whose first
+  parameter is SetCdDriverMode's `async`: a nonzero value selects a
+  synchronous driver mode. The caller passes
+  `GameApplication::config->unk04`, whose meaning is not established.
+  `(u32)syncDriver < 1` was m2c's spelling of `== 0`; the plain form is
+  byte-identical (verified).
+- Local `tmp` -> `vabPath`: PickWeeklyGroup's word is a VAB path, and it is
+  New_WBgm's `vabPath`. Kept `s32`, as PickWeeklyGroup returns it.
+- `D_800113EC` -> `sEtcTimPath` ("ETC\\ETC.TIM") and `D_800113F8` ->
+  `sDreamerTmdPath` ("ETC\\DREAMER.TMD") (tier A: the rodata strings
+  themselves, in `asm/data/1B84.rodata.s`, loaded into `etcTim` and
+  `dreamerTmd`). Unit-static: no other code reads them.
+- DreamSys +0x114 `slot114` -> `setEtcTim`, the name DreamSys__SetEtcTim.md
+  proposed; this unit holds the slot's only accessor.

@@ -8,8 +8,6 @@ D_8008A924
 D_8008A958
 D_8008A960
 D_8008A970
-D_8008A978
-D_8008A97C
 D_8008A984
 D_8008A988
 D_8008A98C
@@ -208,6 +206,8 @@ sPadRefCount
 sPauseText
 sPauseTextColor
 sPauseTextPos
+sRecordFirstBatchCount
+sRecordRegisterCalls
 sSaveFileName
 sSaveTitleBlanks
 sSaveTitleColorChannel

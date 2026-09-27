@@ -1,4 +1,6 @@
-# func_8004A070 — MATCHED (round 45, 48/48 words)
+# RegisterRecordTableFiles — MATCHED (round 45, 48/48 words)
+
+> Renamed from `func_8004A070` on 2026-09-27 (tools/rename.py). Address 0x8004a070.
 
 **Unit:** class_39e08 · **Size:** 48 words (0xC0 bytes)
 
@@ -17,10 +19,10 @@ in round 42 (`--gp-symbols`, pinned in the Makefile).
 extern void *GetRecordTable(s32 *out);
 extern s32 RegisterFileTableEntries(void *arg0, s32 arg1);
 
-extern s32 D_8008A978;
-extern s32 D_8008A97C;
+extern s32 sRecordRegisterCalls;
+extern s32 sRecordFirstBatchCount;
 
-s32 func_8004A070(s32 arg0)
+s32 RegisterRecordTableFiles(s32 arg0)
 {
     s32 local;
     void *obj;
@@ -28,20 +30,20 @@ s32 func_8004A070(s32 arg0)
     s32 result;
 
     obj = GetRecordTable(&local);
-    prev = D_8008A978;
-    D_8008A978 = prev + 1;
+    prev = sRecordRegisterCalls;
+    sRecordRegisterCalls = prev + 1;
 
     switch (prev + 1) {
     case 1:
         if (arg0 != 0) {
-            D_8008A978 = prev + 2;
+            sRecordRegisterCalls = prev + 2;
         } else {
             local = local / 2;
-            D_8008A97C = local;
+            sRecordFirstBatchCount = local;
         }
         break;
     case 2:
-        local = local - D_8008A97C;
+        local = local - sRecordFirstBatchCount;
         break;
     default:
         local = 0;
@@ -60,9 +62,9 @@ s32 func_8004A070(s32 arg0)
 SDK-owned functions.
 
 The return type had to be `s32`, not `void`: `include/class_39e08.h`
-already carries `extern s32 func_8004A070(s32 arg1);` (this unit's own
+already carries `extern s32 RegisterRecordTableFiles(s32 arg1);` (this unit's own
 prior local view, noting "already declared elsewhere as `extern s32
-func_8004A070(s32 a0)`"), and the definition here must match it exactly or
+RegisterRecordTableFiles(s32 a0)`"), and the definition here must match it exactly or
 `cc1` rejects it as `conflicting types`. Retail's own asm supports this: at
 `jr $ra` the last thing written to `$v0` is the final (non-zero) return
 value of the tail `RegisterFileTableEntries` call — genuinely live register content,
@@ -94,13 +96,42 @@ else.
 
 ## Naming
 
-`func_8004A070` -- left unrenamed (round 73, alpha, track-3 pass). Called
-once from `DayTask__DayTask`'s ctor as `func_8004A070(1)` (return
-discarded) and once from `code_1677c.c` as `func_8004A070(0)` (also
+`RegisterRecordTableFiles` -- left unrenamed (round 73, alpha, track-3 pass). Called
+once from `DayTask__DayTask`'s ctor as `RegisterRecordTableFiles(1)` (return
+discarded) and once from `code_1677c.c` as `RegisterRecordTableFiles(0)` (also
 discarded). It is not a class method (no `self` parameter, not reachable
 through any vtable slot in either the 33-slot or 28-slot table this unit
 resolved), and its own body -- a two-call-deep counter over
-`D_8008A978`/`D_8008A97C` feeding a loop on `RegisterFileTableEntries` --
+`sRecordRegisterCalls`/`sRecordFirstBatchCount` feeding a loop on `RegisterFileTableEntries` --
 does not establish what it is registering. Per CLAUDE.md, "a wrong tier-A
-name is worse than `func_`"; this stays `func_8004A070` rather than assert
+name is worse than `func_`"; this stays `RegisterRecordTableFiles` rather than assert
 a guess.
+
+## History moved from comments (track 7, round 99, charlie)
+
+The unit's comment on `GetRecordTable` read: "Sony's, from the
+still-uncarved psyq_39094 SDK segment (asm/psyq_39094.s): `if (out != NULL)
+*out = 0x230; return &gRecordTable;` ... Declared locally per CLAUDE.md's
+rule against writing C for SDK-owned code." That is no longer true:
+GetRecordTable is game code, matched in `src/code_39094.c`, and the comment
+now says so. (The derivation above quotes the old comment as it was.)
+
+## Naming (track 7, round 99, charlie)
+
+`func_8004A070` -> `RegisterRecordTableFiles` (tier B). The body, read with
+its two callees: GetRecordTable returns gRecordTable (0x230 records of 0x1C
+bytes, each a file path first; code_39094.c's banner) and its count;
+RegisterFileTableEntries (code_171e0.c) appends `count` records to the CD
+driver's file table and resolves them, returns 0 to be retried, and 1 when
+the CD driver is not the active source. So the function registers the record
+table's files with the CD driver: on its first call all of them when `all`
+is set (and it then counts itself as two calls), else the first half; on its
+second call the rest; later calls register nothing. The mechanics are
+certain; why the table is registered in halves (DayTask's ctor passes 1,
+GameApplication__LoaderTaskDoneCallback 0) is not, hence B.
+
+- `D_8008A978` -> `sRecordRegisterCalls` (tier A: a call counter, read and
+  written only here).
+- `D_8008A97C` -> `sRecordFirstBatchCount` (tier A: the first batch's record
+  count, which the second call subtracts).
+- Parameter `arg0` -> `all`; locals `local`/`obj` -> `count`/`table`.

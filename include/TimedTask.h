@@ -41,6 +41,16 @@
 typedef struct TimedTask TimedTask;
 typedef struct TimedTaskMethods TimedTaskMethods;
 
+/* The state update enters once frameCounter passes timeoutFrames;
+ * TimedTask__SetState answers it by setting result to
+ * TIMEDTASK_RESULT_TIMED_OUT and calling onState4. */
+enum TimedTaskState { TIMEDTASK_STATE_TIMED_OUT = 4 };
+
+#define TIMEDTASK_RESULT_TIMED_OUT 1
+
+/* setTimeout(n) arms the timeout at n * TIMEDTASK_TIMEOUT_UNIT_FRAMES frames. */
+#define TIMEDTASK_TIMEOUT_UNIT_FRAMES 20
+
 /* clang-format off */
 #define TIMEDTASK_SLOTS(Self, CtorParams)                                                         \
     INTERMEDIATEBASE_SLOTS(Self, CtorParams);                                                      \
