@@ -915,3 +915,7 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 The NON_MATCHING body now stores `_svm_voice[D_8008EA26[0]].unk04/unk1B`; normalized disassembly identical.
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body keeps its halfword indexing, now `((s16 *)_svm_sreg_buf)[(u16)chanIdx + 2]` / `[(u16)chanIdx]` / `[(u16)chanIdx + 1]` for the old `D_8008D7F4[(u16)chanIdx]` / `[-2]` / `[-1]`; normalized disassembly identical.
+
+## Types (round 98, alpha)
+
+This unit's `D8008E978Entry` is now `<libsnd.h>`'s `VagAtr` and `ObjE970` is `VabHdr` (unk4 -> `center`, unk5 -> `shift`, unk12 -> `pbmin`, unk13 -> `pbmax`, ObjE970.unk18 -> `mvol`); preserved bodies above keep the old spellings. See SpuVmAlloc.md, "Unit banner history".
