@@ -67,10 +67,10 @@ enum RayResult { RAY_MISS = 0, RAY_HIT = 1, RAY_PARALLEL = 2 };
 #define FACE_BOX_MARGIN 24
 
 /* The scratch VECTOR that also holds the candidate triangle's box. */
-typedef union VecBox_fa50 {
+typedef union VectorOrBox {
     VECTOR v;
     TmdBox b;
-} VecBox_fa50;
+} VectorOrBox;
 
 extern TmdBox gTmdModelBoundsBuf[];
 extern void *BMemPMgrAlloc(s32 size);
@@ -286,7 +286,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
         VECTOR work;
         VECTOR dirVec;
         VECTOR dirSq;
-        VecBox_fa50 scratch;
+        VectorOrBox scratch;
         s32 dist[2]; /* MATCHING: an array, so it stays in memory (dist[1] unused) */
         s32 frac;
         s32 q;
