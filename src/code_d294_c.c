@@ -44,19 +44,19 @@ void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src) {
  * resulting NULL is still dereferenced, exactly as retail does. */
 void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 unused) {
     MATRIX rot;
-    long *table;
+    long *worldPos;
 
     self->methods->getRotMatrix(self, &rot, 0);
     ApplyMatrixToLVArray(dst, src, 1, &rot);
 
-    table = self->parent != 0 ? self->coord2->workm.t : 0;
-    dst[0] = dst[0] + table[0];
+    worldPos = self->parent != 0 ? self->coord2->workm.t : 0;
+    dst[0] = dst[0] + worldPos[0];
 
-    table = self->parent != 0 ? self->coord2->workm.t : 0;
-    dst[1] = dst[1] + table[1];
+    worldPos = self->parent != 0 ? self->coord2->workm.t : 0;
+    dst[1] = dst[1] + worldPos[1];
 
-    table = self->parent != 0 ? self->coord2->workm.t : 0;
-    dst[2] = dst[2] + table[2];
+    worldPos = self->parent != 0 ? self->coord2->workm.t : 0;
+    dst[2] = dst[2] + worldPos[2];
 }
 
 /* Reads the object's three Euler angles -- GsCOORD2PARAM.rotate, i.e.
@@ -150,12 +150,12 @@ extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
  * `node->workm.t != NULL` is retail's own check, not a typo for
  * `node != NULL`: the disassembly forms &workm.t (node + 0x38) first and
  * tests THAT. */
-s32 SceneNode__RaycastVertical(SceneNode *self, s32 *arg1, s32 *arg2) {
-    long *table;
-    s16 buf18[4];
-    s16 delta[4];
-    s16 buf28[4];
-    s16 buf30[4];
+s32 SceneNode__RaycastVertical(SceneNode *self, s32 *offset, s32 *target) {
+    long *worldPos;
+    SVECTOR origin;
+    SVECTOR end;
+    SVECTOR hit;
+    s32 best;
     GsCOORDINATE2 *node;
     SceneNode *cur;
 
@@ -184,25 +184,25 @@ s32 SceneNode__RaycastVertical(SceneNode *self, s32 *arg1, s32 *arg2) {
             }
         }
 
-        table = self->parent != 0 ? self->coord2->workm.t : 0;
-        delta[0] = (u16)arg2[0] - (u16)table[0];
-        delta[1] = (u16)arg2[1] - (u16)table[1];
-        delta[2] = (u16)arg2[2] - (u16)table[2];
+        worldPos = self->parent != 0 ? self->coord2->workm.t : 0;
+        end.vx = (u16)target[0] - (u16)worldPos[0];
+        end.vy = (u16)target[1] - (u16)worldPos[1];
+        end.vz = (u16)target[2] - (u16)worldPos[2];
 
-        self->methods->composeAndApplyRotation(self, 0, buf18, delta, 1);
+        self->methods->composeAndApplyRotation(self, 0, &origin, &end, 1);
 
-        delta[0] = buf18[0];
-        delta[1] = (u16)buf18[1] - 0x400;
-        delta[2] = buf18[2];
-        if (TmdModel__RaycastFaces(self->model, (s32 *)buf30, (TmdVec3 *)buf28, NULL,
-                                   (TmdVec3 *)buf18, (TmdVec3 *)delta)) {
-            SubVec3S16(arg1, buf18, buf28);
+        end.vx = origin.vx;
+        end.vy = (u16)origin.vy - 0x400;
+        end.vz = origin.vz;
+        if (TmdModel__RaycastFaces(self->model, &best, (TmdVec3 *)&hit, NULL, (TmdVec3 *)&origin,
+                                   (TmdVec3 *)&end)) {
+            SubVec3S16(offset, &origin.vx, &hit.vx);
             return 1;
         }
-        delta[1] = (u16)buf18[1] + 0x400;
-        if (TmdModel__RaycastFaces(self->model, (s32 *)buf30, (TmdVec3 *)buf28, NULL,
-                                   (TmdVec3 *)buf18, (TmdVec3 *)delta)) {
-            SubVec3S16(arg1, buf18, buf28);
+        end.vy = (u16)origin.vy + 0x400;
+        if (TmdModel__RaycastFaces(self->model, &best, (TmdVec3 *)&hit, NULL, (TmdVec3 *)&origin,
+                                   (TmdVec3 *)&end)) {
+            SubVec3S16(offset, &origin.vx, &hit.vx);
             return 1;
         }
     }
@@ -234,31 +234,32 @@ void SubVec3S16(s32 *dest, s16 *from, s16 *to) {
  * correction for a caller that already swapped the two at the call site.
  * That is the mechanism behind the argument-swap correlation Entity.h
  * records; see docs/match-reports/SceneNode__FaceTarget.md. */
-void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 arg2, s32 arg3, void *arg4) {
+void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 zeroPitch, s32 noHalfTurn,
+                           void *extraRotation) {
     long *pos;
-    long *table;
+    long *targetPos;
     s32 dx;
     s32 dz;
     Ratio16 out[3];
 
     pos = self->coord2->coord.t;
-    table = target->parent != 0 ? target->coord2->workm.t : 0;
+    targetPos = target->parent != 0 ? target->coord2->workm.t : 0;
 
-    if (table[0] != pos[0]) {
-        dx = table[0] - pos[0];
-        dz = table[2] - pos[2];
+    if (targetPos[0] != pos[0]) {
+        dx = targetPos[0] - pos[0];
+        dz = targetPos[2] - pos[2];
         out[1].num = ratan2(dx, dz);
     } else {
-        dz = table[2] - pos[2];
+        dz = targetPos[2] - pos[2];
         out[1].num = ratan2(1, dz);
     }
 
-    if (table[2] != pos[2]) {
-        dz = table[2] - pos[2];
-        dx = table[1] - pos[1];
+    if (targetPos[2] != pos[2]) {
+        dz = targetPos[2] - pos[2];
+        dx = targetPos[1] - pos[1];
         out[0].num = ratan2(dz, dx);
     } else {
-        dx = table[1] - pos[1];
+        dx = targetPos[1] - pos[1];
         out[0].num = ratan2(1, dx);
     }
 
@@ -269,16 +270,16 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 arg2, s32 arg
     out[2].den = 1;
     out[1].den = 1;
     out[0].den = 1;
-    if (arg2 != 0) {
+    if (zeroPitch != 0) {
         out[0].num = 0;
     }
-    if (arg3 == 0) {
+    if (noHalfTurn == 0) {
         out[1].num = out[1].num + 0xB4;
     }
 
     self->methods->updateRotation(self, 1, out);
-    if (arg4 != 0) {
-        self->methods->updateRotation(self, 0, arg4);
+    if (extraRotation != 0) {
+        self->methods->updateRotation(self, 0, extraRotation);
     }
 }
 
@@ -291,13 +292,13 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 arg2, s32 arg
  * unit sets `den` to 1. */
 s32 RatioToFixed12(void *pair) {
     Ratio16 *p;
-    s32 q1, r1, q2;
+    s32 whole, rem, frac;
 
     p = (Ratio16 *)pair;
-    q1 = p->num / p->den;
-    r1 = p->num % p->den;
-    q2 = (r1 << 12) / p->den;
-    return (q1 << 12) + q2;
+    whole = p->num / p->den;
+    rem = p->num % p->den;
+    frac = (rem << 12) / p->den;
+    return (whole << 12) + frac;
 }
 
 /* Cohen-Sutherland style outcode: one bit pair per axis, high bit set when
