@@ -74,20 +74,20 @@
  * `_SsInit`'s data: `_snd_openflag`/`_snd_ev_flag` are Sony-pinned in
  * `config/psyq-objects.ld` and carry those names (the head applied them
  * with `rename.py` in round 78). The two SPU
- * register-init templates `D_8006DC5C`/`D_8006DC6C` and the per-voice
- * state array `D_80090368` are read only by `_SsInit` itself (a Sony
- * function), so per the "field only Sony functions read" rule they are
- * left unnamed rather than given game names, even though the two
- * templates are textually unique to this unit.
+ * register-init templates `D_8006DC5C`/`D_8006DC6C` are read only by
+ * `_SsInit` itself (a Sony function), so per the "field only Sony functions
+ * read" rule they are left unnamed rather than given game names.
+ * `D_80090368` is Sony's mark-callback table (`SsMarkCallbackProc [32][16]`,
+ * <libsnd.h>'s type; the table SsSetMarkCallback fills and ContNrpn1 calls
+ * through), which `_SsInit` clears.
  */
 #include "common.h"
+#include <libetc.h>
+#include <libsnd.h>
+#include <libspu.h>
 
-
-extern s32 ResetCallback(void);
-extern void SpuInit(void); /* Psy-Q LIBSPU.H: extern void SpuInit (void); -- track 2 identification, round 64 */
 extern void SpuInitHot(void); /* Sony libspu/s_ih, track 2 identification, round 78 (not in this SDK's LIBSPU.H) */
 extern void SpuVmInit(s32 arg0);
-extern s32 GetVideoMode(void);
 extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
 extern s32 VBLANK_MINUS;
@@ -99,12 +99,10 @@ extern void (*_snd_vsync_cb)(void);
 extern s32 _snd_video_mode;
 extern s32 _snd_ev_flag;
 
-/* One 0x40-byte per-voice software state slot; the init below just zeroes it. */
-typedef struct {
-    s32 pad0[0x10];
-} VoiceState80090368;
-
-extern VoiceState80090368 D_80090368[0x20];
+/* The mark callbacks SsSetMarkCallback installs, one per (access number,
+ * sequence number); _SsInit clears them all.  Same table ContNrpn1
+ * (code_179d8_k) calls through. */
+extern SsMarkCallbackProc D_80090368[0x20][16];
 
 /*
  * Sound-system init.  Reached only through SsInit (arg0 = 0) and
@@ -163,7 +161,7 @@ void _SsInit(s32 arg0) {
 
     for (j = 0; j < 0x20; j++) {
         for (i = 15; i >= 0; i--) {
-            D_80090368[j].pad0[i] = 0;
+            D_80090368[j][i] = NULL;
         }
     }
 
