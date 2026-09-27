@@ -1,29 +1,35 @@
 /*
- * code_2864 -- Viewport__DrawNode, the scene-graph walk that draws one node
- * and its drawable children into the Viewport's current ordering table
- * (vram 0x80012064..0x80012768).
+ * code_2864 -- Viewport__DrawNode: draws one SceneNode into the Viewport's
+ * current ordering table, after first drawing each of its SceneNode children
+ * the same way.
  *
  * It is slot +0x0A0 (drawNode) of gViewportMethods, inherited unchanged by
- * gNodeGuardedViewportMethods (include/Viewport.h); `self` is the Viewport
- * and `node` a SceneNode (include/SceneNode.h). The class-id low byte picks
- * the draw path, and each path reads the node as the subclass that id names:
- * 0x54 a BgLayer (its GsBG at +0x044 to GsSortBg), 0x64 a BoxFill (its GsBOXF
- * placed in percent of the half-screen while `relative` is set), 0x144 a
- * ScreenSprite (its GsSPRITE placed from `screenPos`), any other 0x44 a
- * Sprite projected from its GsCOORDINATE2's world position, and anything
- * else the node's own GsDOBJ2 (+0x010) sorted by SortTmdObject
- * (TmdRenderer.c), the game's replacement for GsSortObject4. A GridCell
- * (0x24) whose GsDOFF bit is set is skipped outright.
+ * gNodeGuardedViewportMethods (include/Viewport.h). The node's class id
+ * picks the draw path, and each path reads the node as the class it tests
+ * for:
+ *  - a BgLayer: its GsBG to GsSortBg, at the OT's last tag;
+ *  - a BoxFill (FadeBox too): its GsBOXF placed from posX/posY, in percent
+ *    of the half-screen while `relative` is set and in pixels otherwise, to
+ *    GsSortBoxFill at the object's own pri;
+ *  - a ScreenSprite (and its subclasses): its GsSPRITE placed from
+ *    screenPos, percent of the half-screen from the centre, plus its pivot
+ *    (mx, my), to GsSortSprite at tag 0;
+ *  - any other Sprite: a world-space sprite. Its coord2's position goes
+ *    through the local-screen matrix and a perspective divide by the
+ *    Viewport's projH. It is dropped unless its depth is in 1..0xFFFF (the
+ *    GTE's 16-bit screen z) and past nearZ, its x/y are clamped to
+ *    SPRITE_POS_LIMIT, and its depth past nearZ over zDiv is its OT tag;
+ *  - anything else: the node's own GsDOBJ2 (+0x010), under GsGetLws's light
+ *    and local-screen matrices, to SortTmdObject (TmdRenderer.c), the
+ *    game's replacement for GsSortObject4, when it has a TMD.
+ * A GridCell whose GsDOFF bit is set is skipped, children and all.
  *
- * Before drawing, a node whose coord2 is dirty (flg == 0) rebuilds its matrix
- * from GsCOORD2PARAM's rotate and scale and marks its children dirty;
- * children (class-id low nibble 4, parent == node) are drawn first, so the
- * order in the OT is children before parent.
+ * Before drawing, a node whose coord2 is dirty (flg == 0) rebuilds its
+ * matrix from its GsCOORD2PARAM's rotate and scale and marks each child it
+ * draws dirty in turn.
  *
- * Types are Sony's (libgte.h, libgs.h) and the classes' own. SceneNode's
- * coord2 is Sony's GsCOORDINATE2; the subclasses spell their
- * GsBG/GsBOXF/GsSPRITE field by field: hence the casts to Sony's types at
- * the libgs calls. The OT is Viewport's own GsOT.
+ * The subclasses spell their GsBG/GsBOXF/GsSPRITE field by field, hence the
+ * casts to Sony's types at the libgs calls.
  */
 #include "common.h"
 #include <libgte.h>
@@ -51,24 +57,15 @@
  * half-size is 320x240. */
 #define SPRITE_POS_LIMIT 512
 
-/* code_d294_c.c (include/code_d294.h) */
+/* code_d294_c.c. include/code_d294.h declares it the same way; this unit
+ * does not include that header. */
 extern void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
 /* TmdRenderer.c */
 extern void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch);
 
 /*
- * Draw `node` into self's current ordering table, after first drawing every
- * child whose class-id low nibble is 4 and whose parent is `node`.
- *
- * Source-shape notes (all measured; see the match report):
- *  - `ls`/`lw` are explicit pointers to the two stack matrices: retail keeps
- *    &lsBuf/&lwBuf live in s5/s7 from the prologue on.
- *  - `pos` and the unused `scr` live in the world-space-sprite block: that
- *    puts them ABOVE child/cursor in the frame, and `scr` is the 8 bytes of
- *    frame retail reserves and never touches.
- *  - `box`/`screenSprite` are separate copies of `node` (retail's move a3/a1/a0,s2);
- *    the ratio ternaries are one store each (the second copy of the store
- *    is the delay-slot filler's); `~v + 1` is retail's nor/addiu negate.
+ * Draws `node` into self->ot[self->otIndex], after first drawing, in list
+ * order, every child that is a SceneNode and whose parent is `node`.
  */
 void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     MATRIX lsBuf;
@@ -85,9 +82,10 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     u32 classId;
 
     dirty = 0;
+    /* MATCHING: explicit pointers; retail keeps both addresses in s-registers */
     ls = &lsBuf;
     lw = &lwBuf;
-    if ((u8)node->methods->header == GRIDCELL_CLASS_ID && (s32)node->attribute < 0) {
+    if ((u8)node->methods->header == GRIDCELL_CLASS_ID && (s32)node->attribute < 0) { /* GsDOFF, bit 31 */
         return;
     }
 
@@ -138,7 +136,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         GsSortBg((GsBG *)&((BgLayer *)node)->bgAttribute, self->ot[self->otIndex],
                  (1 << self->otLength) - 1);
     } else if ((classId & 0xFF) == BOXFILL_CLASS_ID) {
-        BoxFill *box = (BoxFill *)node;
+        BoxFill *box = (BoxFill *)node; /* MATCHING: a copy of node, not a cast at each use */
         if (box->relative) {
             box->boxX = ((self->screenSize.width >> 1) * box->posX) / 100;
             box->boxY = ((self->screenSize.height >> 1) * box->posY) / 100;
@@ -156,6 +154,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
                           OTZ_BITS - self->otLength, getScratchAddr(0));
         }
     } else if ((classId & 0xFFF) == SCREENSPRITE_CLASS_ID) {
+        /* MATCHING: a copy of node; each ternary is one store */
         ScreenSprite *screenSprite = (ScreenSprite *)node;
         GsSPRITE *gsSprite = (GsSPRITE *)&screenSprite->sprite;
         s32 *screen = &self->screenSize.width;
@@ -169,8 +168,10 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         gsSprite->y += gsSprite->my;
         GsSortSprite(gsSprite, self->ot[self->otIndex], 0);
     } else {
+        /* MATCHING: declared here, not at the top, for the frame layout; scr is
+         * never used and reserves 8 frame bytes retail leaves untouched */
         VECTOR pos;
-        SVECTOR scr; /* never used; reserves retail's 8 unused frame bytes */
+        SVECTOR scr;
         Sprite *worldSprite;
 
         GsGetLs(node->coord2, ls);
@@ -192,6 +193,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             pos.vy = (pos.vy * self->projH) / pos.vz;
             pos.vz = (pos.vz - self->nearZ) / self->zDiv;
             worldSprite = (Sprite *)node;
+            /* MATCHING: ~v + 1, not -v (nor/addiu, not negu) */
             if ((pos.vx < 0 ? ~pos.vx + 1 : pos.vx) <= SPRITE_POS_LIMIT) {
                 worldSprite->sprite.x = pos.vx;
             } else {

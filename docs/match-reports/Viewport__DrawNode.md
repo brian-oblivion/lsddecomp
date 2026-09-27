@@ -120,3 +120,87 @@ Update's `(PACKET *)` cast are gone. Byte-identical (whole image green).
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## Round 99 (delta): track 7, moved from src/code_2864.c
+
+Locals renamed for their roles (zero bytes): `c` -> `coord2`, `m` -> `elem`,
+`sc` -> `scale`, `tag` -> `classId`, `b` -> `box`, the ScreenSprite `n` ->
+`screenSprite` and `sp` -> `gsSprite`, `size` -> `screen`, the Sprite `n` ->
+`worldSprite`. `scr` keeps its name (it has no role; typeviews' baselined
+`unused variable` warning names it).
+
+Constants (each byte-identical, whole image green): `0x24` ->
+`GRIDCELL_CLASS_ID`; `& 0xF) == 4` -> `& CLASS_ID_ROOT_MASK) ==
+SCENENODE_CLASS_ID`; `0x54`/`0x64`/`0x44`/`0x144` -> the new
+`BGLAYER_CLASS_ID`/`BOXFILL_CLASS_ID`/`SPRITE_CLASS_ID`/`SCREENSPRITE_CLASS_ID`
+(values from `plan.py classes`: gBgLayerMethods 0x54, gBoxFillMethods 0x64,
+gSpriteMethods 0x44, gScreenSpriteMethods 0x144); `>> 12` -> `FIX12_SHIFT`
+(GsCOORD2PARAM.scale is 20.12, ONE = unit); `(void *)0x1F800000` -> libetc's
+`getScratchAddr(0)` (the scratchpad base, as Sony's samples pass
+GsSortObject4); `14` -> unit-local `OTZ_BITS` (SortTmdObject indexes
+`otBase[otz >> otShift]`, TmdRenderer.c, so `14 - otLength` spans a 14-bit
+OTZ over 1 << otLength tags); `0x200` -> unit-local `SPRITE_POS_LIMIT 512`.
+Left literal: the class-id nibble masks `0xFF`/`0xFFF` (no name in
+BasicClass.h beyond CLASS_ID_ROOT_MASK; proposed), the percent scale `100`
+and `10000` (= 100 * 100, the ScreenSprite spelling of `half * pos / 100`),
+and `0xFFFF`, the GTE's 16-bit screen-z bound, explained where it is used.
+
+The extern `ApplyMatrixToLVArray(void *, void *, s32, void *)` stays in this
+unit: code_2864 does NOT include include/code_d294.h (round 98's note that it
+did came from a grep matching this unit's comment `(include/code_d294.h)`),
+so typing code_d294.h's prototype cannot collide here.
+
+The unit banner, verbatim, as it was before this pass:
+
+```c
+/*
+ * code_2864 -- Viewport__DrawNode, the scene-graph walk that draws one node
+ * and its drawable children into the Viewport's current ordering table
+ * (vram 0x80012064..0x80012768).
+ *
+ * It is slot +0x0A0 (drawNode) of gViewportMethods, inherited unchanged by
+ * gNodeGuardedViewportMethods (include/Viewport.h); `self` is the Viewport
+ * and `node` a SceneNode (include/SceneNode.h). The class-id low byte picks
+ * the draw path, and each path reads the node as the subclass that id names:
+ * 0x54 a BgLayer (its GsBG at +0x044 to GsSortBg), 0x64 a BoxFill (its GsBOXF
+ * placed in percent of the half-screen while `relative` is set), 0x144 a
+ * ScreenSprite (its GsSPRITE placed from `screenPos`), any other 0x44 a
+ * Sprite projected from its GsCOORDINATE2's world position, and anything
+ * else the node's own GsDOBJ2 (+0x010) sorted by SortTmdObject
+ * (TmdRenderer.c), the game's replacement for GsSortObject4. A GridCell
+ * (0x24) whose GsDOFF bit is set is skipped outright.
+ *
+ * Before drawing, a node whose coord2 is dirty (flg == 0) rebuilds its matrix
+ * from GsCOORD2PARAM's rotate and scale and marks its children dirty;
+ * children (class-id low nibble 4, parent == node) are drawn first, so the
+ * order in the OT is children before parent.
+ *
+ * Types are Sony's (libgte.h, libgs.h) and the classes' own. SceneNode's
+ * coord2 is Sony's GsCOORDINATE2; the subclasses spell their
+ * GsBG/GsBOXF/GsSPRITE field by field: hence the casts to Sony's types at
+ * the libgs calls. The OT is Viewport's own GsOT.
+ */
+```
+
+The function comment it replaced, verbatim (the source-shape notes now sit
+as one `/* MATCHING: */` line at each construct; the measurements behind
+them are "Levers" above):
+
+```c
+
+/*
+ * Draw `node` into self's current ordering table, after first drawing every
+ * child whose class-id low nibble is 4 and whose parent is `node`.
+ *
+ * Source-shape notes (all measured; see the match report):
+ *  - `ls`/`lw` are explicit pointers to the two stack matrices: retail keeps
+ *    &lsBuf/&lwBuf live in s5/s7 from the prologue on.
+ *  - `pos` and the unused `scr` live in the world-space-sprite block: that
+ *    puts them ABOVE child/cursor in the frame, and `scr` is the 8 bytes of
+ *    frame retail reserves and never touches.
+ *  - `box`/`screenSprite` are separate copies of `node` (retail's move a3/a1/a0,s2);
+ *    the ratio ternaries are one store each (the second copy of the store
+ *    is the delay-slot filler's); `~v + 1` is retail's nor/addiu negate.
+```
+
+The extern's comment was `/* code_d294_c.c (include/code_d294.h) */`, and `scr`'s was `/* never used; reserves retail's 8 unused frame bytes */`.
