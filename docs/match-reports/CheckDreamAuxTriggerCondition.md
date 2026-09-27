@@ -125,7 +125,7 @@
 >
 > Restoring round 23's exact preserved body and building it gave **108/100
 > words -- 8 WORDS TOO LONG**, not 99/100 (confirmed via `nm` on the linked
-> ELF: `CheckDreamAuxWorldState` landed at `+0x1B0` from this function's start, not
+> ELF: `IsCurrentDreamColor` landed at `+0x1B0` from this function's start, not
 > retail's `+0x190`). Round 23 never re-derived this number from a build; it
 > inherited round 13's asm-differ read and treated the dispatch fix as the
 > whole story.
@@ -202,7 +202,7 @@
 >
 > **Translated to real C and re-verified against the actual oracle, this
 > REGRESSES: 98/100 (2 words short), not an improvement** -- confirmed via
-> `nm` (`CheckDreamAuxWorldState` moved to `+0x188`, not `+0x190`). This is exactly the
+> `nm` (`IsCurrentDreamColor` moved to `+0x188`, not `+0x190`). This is exactly the
 > documented caution that a permuter score is not the project's oracle
 > (MATCHING-GUIDE.md's "Permuter" section): the permuter's own weighted
 > penalty improved (fewer visible mismatched instructions in ITS diff) while
@@ -369,7 +369,7 @@ when `record->triggered` (offset `0x0`, signed byte; named round 63 --
 see `## Naming` below) is nonzero, else `idx = -sel`. Dispatches on
 `idx - 2` through a 20-entry jump table:
 
-- 0,1,2: delegate to `MatchesDreamAuxProgression(value, idx - 1)`.
+- 0,1,2: delegate to `IsDayInPeriodPhase(value, idx - 1)`.
 - 3: succeed iff `value % 3 == 0`.
 - 4: succeed iff `value % 3 != 0`.
 - 5: succeed iff `IsStyleVariantEven()` (no args) is truthy.
@@ -379,7 +379,7 @@ see `## Naming` below) is nonzero, else `idx = -sel`. Dispatches on
 - 19: succeed iff `value` is odd.
 - default (indices 8-17, and anything outside the table's `idx` range of
   roughly `[2, 22)`): succeed unconditionally if `idx < 10`; otherwise
-  delegate to `CheckDreamAuxWorldState(idx)`.
+  delegate to `IsCurrentDreamColor(idx)`.
 
 On any success path, `record->triggered` is set to `1` before returning `true`.
 
@@ -419,7 +419,7 @@ have_idx:
     case 0:
     case 1:
     case 2:
-        if (!MatchesDreamAuxProgression(value, idx - 1)) {
+        if (!IsDayInPeriodPhase(value, idx - 1)) {
             return false;
         }
         break;
@@ -456,7 +456,7 @@ have_idx:
         break;
     default:
         if (idx >= 10) {
-            if (!CheckDreamAuxWorldState(idx)) {
+            if (!IsCurrentDreamColor(idx)) {
                 return false;
             }
         }
@@ -506,7 +506,7 @@ have_idx:
     case 0:
     case 1:
     case 2:
-        if (!MatchesDreamAuxProgression(value, idx - 1)) {
+        if (!IsDayInPeriodPhase(value, idx - 1)) {
             return false;
         }
         break;
@@ -547,7 +547,7 @@ have_idx:
         break;
     default:
         if (idx >= 10) {
-            if (!CheckDreamAuxWorldState(idx)) {
+            if (!IsCurrentDreamColor(idx)) {
                 return false;
             }
         }
@@ -560,9 +560,9 @@ success:
 }
 ```
 
-Needs `TriggerRecord`, `MatchesDreamAuxProgression`, `IsStyleVariantEven`, `CheckDreamAuxWorldState` from
-`include/code_4cd08.h` (already added this round -- `MatchesDreamAuxProgression` is
-matched, see its own report; `IsStyleVariantEven`/`CheckDreamAuxWorldState` are still
+Needs `TriggerRecord`, `IsDayInPeriodPhase`, `IsStyleVariantEven`, `IsCurrentDreamColor` from
+`include/code_4cd08.h` (already added this round -- `IsDayInPeriodPhase` is
+matched, see its own report; `IsStyleVariantEven`/`IsCurrentDreamColor` are still
 `INCLUDE_ASM` elsewhere in this unit and off-limits this round, gp-relative-
 blocked per `docs/research/gp-relative-blocker.md`).
 
@@ -775,3 +775,28 @@ game-level meaning of `sel`'s cases is not established from this unit alone,
 hence B not A. Renamed `record->unk0` to `triggered` in the struct
 definition as part of this pass (see the commit renaming struct fields);
 every accessor was confined to this unit, confirmed by rebuild.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+`value` -> `day`, `sel` -> `condition`, `idx` -> `id`. The ids are
+enum TriggerCondition (include/code_4cd08.h), and `switch (idx - 2)` with
+cases 0..19 is `switch (id)` with the enum's cases: GCC subtracts the lowest
+case itself, byte-identical. Two MATCHING lines stand for the derivation
+below and above: the `id = condition; goto have_idx;` arm placed before
+`negate:`, and `~condition + 1` (nor + addiu, where -condition is one negu).
+
+The function comment, as it stood:
+
+```c
+/* CheckDreamAuxTriggerCondition -- MATCHED round 25.  The last word came from BASIC-BLOCK
+ * ORDER, not from the expression shapes.  Retail lays the `sel >= 0` arm
+ * out BETWEEN the `return false` path and the `~sel + 1` tail, so it needs
+ * an explicit `j` over the join; the obvious spelling
+ * (`if (sel < 0) { ...; idx = ~sel + 1; goto have_idx; } idx = sel;`) lets
+ * the `sel >= 0` arm fall through into the join instead and is one word
+ * short forever.  Writing the inner test as `if (triggered == 0) goto negate;
+ * return false;`, with the `idx = sel; goto have_idx;` block placed
+ * textually BEFORE the `negate:` label, reproduces retail's block order
+ * exactly.  See docs/match-reports/CheckDreamAuxTriggerCondition.md.
+ */
+```

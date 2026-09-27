@@ -14,28 +14,28 @@ attempted -- the stub carried no derivation. Round 43 derived and matched it.
 ## What it does
 
 Look up a table entry via `LookupDreamAuxTrigger`; if found, check a parity
-condition via `CheckTriggerParity` and either dispatch into `FireDreamAuxTriggerEntries`
+condition via `CheckTriggerDayParity` and either dispatch into `FireDreamAuxTriggerEntries`
 (returning its result) or -- on a small random/parity chance -- spawn via
-`DespawnDreamAuxEntity`:
+`PlaceDreamAuxEntityByPlayer`:
 
 ```c
 extern s32 rand(void);
 
 s32 LookupDreamAuxTrigger(s16 *a0);
-bool CheckTriggerParity(s32 coordParity, s8 *entry);
+bool CheckTriggerDayParity(s32 coordParity, s8 *entry);
 s32 FireDreamAuxTriggerEntries(s32 a0, s32 a1, s32 a2);
-void DespawnDreamAuxEntity(DreamAuxSlot *a0);
+void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *a0);
 
 s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
 {
     s32 record = LookupDreamAuxTrigger(a1);
 
     if (record != 0) {
-        if (CheckTriggerParity(a2, (s8 *)record)) {
+        if (CheckTriggerDayParity(a2, (s8 *)record)) {
             return FireDreamAuxTriggerEntries(a2, record, a0);
         }
         if (gDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
-            DespawnDreamAuxEntity(gDreamAuxSlots);
+            PlaceDreamAuxEntityByPlayer(gDreamAuxSlots);
         }
     }
     return 0;
@@ -44,7 +44,7 @@ s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
 
 `LookupDreamAuxTrigger`'s return value (a small-record pointer or 0, per that
 function's own report) is kept as a plain `s32` and cast to `s8 *` only at
-the point `CheckTriggerParity` needs it (that function's own signature takes a
+the point `CheckTriggerDayParity` needs it (that function's own signature takes a
 raw `s8 *`, per its existing match report) -- there is no evidence either
 way that this is a distinct pointer type worth naming, so it stays untyped
 like `gDreamAuxWorld` elsewhere in this unit.
@@ -108,7 +108,15 @@ the extra `sra` count and final `sll` shift, not off the constant.
 Looks up a trigger record by key (`LookupDreamAuxTrigger`); on a hit, either
 dispatches it (`FireDreamAuxTriggerEntries`, whose result it returns) or, on
 a small random/parity chance, silently despawns instead
-(`DespawnDreamAuxEntity`); returns 0 on a miss or on the despawn branch.
+(`PlaceDreamAuxEntityByPlayer`); returns 0 on a miss or on the despawn branch.
 "Try" reflects the function's own fallible, silently-returning-0 shape; the
 broader game meaning of the (value, key, parity) triple it is handed is not
 established from this unit alone, hence B not A.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+Parameters from the caller (ObjM__CheckAuxTrigger, class_3bb8c_m.c): a0 ->
+`data` (the chunk's loaded data block), a1 -> `chunkKey` (a ChunkCoord read
+as one s16), a2 -> `day` (DreamSys getCurrentDayAndYear); `record` ->
+`trigger`, typed DreamAuxTriggerEntry *. `rand() % 12` stays a literal (a 1
+in 12 chance). Byte-identical.

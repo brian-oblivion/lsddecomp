@@ -1,4 +1,6 @@
-# TickDreamAuxSlots -- MATCHED
+# ReleaseDreamAuxModels -- MATCHED
+
+> Renamed from `TickDreamAuxSlots` on 2026-09-27 (tools/rename.py). Address 0x8005c5e8.
 
 > Renamed from `func_8005C5E8` on 2026-09-21 (tools/rename.py). Address 0x8005c5e8.
 
@@ -13,7 +15,7 @@ with the object itself as the argument, and overwrite the slot with whatever
 the call returns.
 
 ```c
-void TickDreamAuxSlots(void)
+void ReleaseDreamAuxModels(void)
 {
     DreamAuxSlot *slot = gDreamAuxSlots;
     u32 done;
@@ -45,7 +47,7 @@ no leading guard before `.L8005C604`, and `beqz $s1, .L8005C604` as the
 back-edge test. Do not "clean this up" to a plain `if` -- the loop shape
 *is* what produces the byte-exact instruction sequence.
 
-Same shape recurs at `TickDreamAuxSlots2` (below, over `gDreamAuxSlots2`) and, per
+Same shape recurs at `ReleaseDreamAuxEntities` (below, over `gDreamAuxSlots2`) and, per
 splat's asm, in `SetDreamAuxWorld` and `InitDreamAux`'s second loop (both
 off-limits/gp-relative or already stalled elsewhere in this unit) -- this
 looks like a recurring internal idiom for "process slot 0 of a small
@@ -90,7 +92,7 @@ this function alone), so the type is deliberately generic
   GCC 2.6.3 -O2 compiles it to a `do`-style loop with a `beqz $reg` back-edge
   test (no leading guard, no `slti`), and removing the "loop" in favor of a
   plain `if` changes the instruction count. Confirmed independently on two
-  functions in `code_4cd08` (`TickDreamAuxSlots`, `TickDreamAuxSlots2`); the same
+  functions in `code_4cd08` (`ReleaseDreamAuxModels`, `ReleaseDreamAuxEntities`); the same
   shape also appears in `SetDreamAuxWorld` and `InitDreamAux`'s tail (both
   otherwise blocked/stalled). Likely a shared "process the first slot of an
   N-slot table" macro/pattern in the original source where N happened to be
@@ -98,10 +100,24 @@ this function alone), so the type is deliberately generic
 
 ## Naming
 
-**TickDreamAuxSlots** — tier A. A pure leaf over `gDreamAuxSlots`: if slot 0's
+**ReleaseDreamAuxModels** — tier A. A pure leaf over `gDreamAuxSlots`: if slot 0's
 `obj` is live, call its vtable slot 1 (the unit's own established
 `DreamAuxTickFn` typedef, already named "tick" before this round) and store
 the result back. The mechanics ARE the name (a tick pass), so this qualifies
 as tier A by FINISHING-PLAN's "pure leaf whose mechanics are its purpose"
 rule regardless of why the caller (`DayTask__Finalize`, apparently a destructor)
 invokes it once at that point.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+## Naming (round 100)
+
+**ReleaseDreamAuxModels** (was TickDreamAuxSlots) -- tier A. The method
+table slot it calls, +0x004, is BasicClass's `release` (finalize, free,
+return NULL), not a tick, and the slots hold the ModelData InitDreamAux made.
+Its only caller is DayTask__Finalize (src/class_39e08.c), right after the
+other releases, mirroring DayTask's ctor calling InitDreamAux. The call is
+now `model->methods->release(model)` through ModelData's own table;
+DreamAuxObj/DreamAuxTickFn are gone. `done` -> `i`, bound
+ARRAY_COUNT(gDreamAuxSlots) (1). Byte-identical. The tier-A argument in the
+section above was made for the old name and reading.

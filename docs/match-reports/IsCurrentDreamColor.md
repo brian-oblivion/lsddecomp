@@ -1,4 +1,6 @@
-# CheckDreamAuxWorldState
+# IsCurrentDreamColor
+
+> Renamed from `CheckDreamAuxWorldState` on 2026-09-27 (tools/rename.py). Address 0x8005cd58.
 
 > Renamed from `func_8005CD58` on 2026-09-21 (tools/rename.py). Address 0x8005cd58.
 
@@ -23,7 +25,7 @@ result against a per-`idx` signed byte from a small lookup table
 ```c
 typedef s32 (*TriggerWorldFn80)(TriggerWorld *self);
 
-bool CheckDreamAuxWorldState(s32 idx)
+bool IsCurrentDreamColor(s32 idx)
 {
     TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
     s32 val = D_80088D16[idx];
@@ -71,7 +73,7 @@ the point of use here rather than declared as a pointer at file scope, since
 `SetDreamAuxWorld` treats the same global as a generic `s32` parameter store.
 `TriggerWorldFn80` started as a local typedef distinct from `TriggerWorldFn`
 (vtable slot 0x22, different arity) and was promoted into
-`include/code_4cd08.h` once `AdjustDreamAuxTriggerOffset` (matched immediately after, same
+`include/code_4cd08.h` once `RemapTriggerForDreamColor` (matched immediately after, same
 round) turned out to need the identical alias -- see that function's report.
 `D_80088D16` (a small `s8[]` lookup table, layout otherwise unknown) is now
 declared in `include/code_4cd08.h` alongside this unit's other module-owned
@@ -90,7 +92,7 @@ before treating a residue like this as a deeper stall.
 
 ## Naming
 
-**CheckDreamAuxWorldState** — tier A. A pure predicate: calls
+**IsCurrentDreamColor** — tier A. A pure predicate: calls
 `gDreamAuxWorld`'s vtable slot 0x80 (self-only) and compares the result
 against a per-`idx` entry of `D_80088D16`. The mechanics (query the world,
 compare) ARE the name; tier A by the pure-leaf rule even though what the
@@ -105,3 +107,31 @@ unchanged). The name `TriggerWorld` now belongs to the class gTriggerWorldMethod
 (include/TriggerWorld.h), whose table is 0x8C bytes: this call loads byte
 +0x200 of its object's table (`lw v0,512(v0)`), so gDreamAuxWorld is not a
 TriggerWorld. Its real class is unresolved. Bytes unchanged.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+## Naming (round 100)
+
+**IsCurrentDreamColor** (was CheckDreamAuxWorldState) -- tier A, a leaf.
+It returns whether the player's getDreamColor (DreamSys +0x200) equals a
+signed byte at D_80088D16 + idx. D_80088D16 is splat's split of SPECIAL_DAYS'
+last 10 bytes, and its only caller passes ids 10..17, so the bytes read are
+SPECIAL_COLORS[0..7] (0x80088D20; DreamSys.h, previously with no reader):
+`SPECIAL_COLORS[condition - TRIGGER_COND_DREAM_COLOR_FIRST]` is
+byte-identical and the D_80088D16 extern is gone. Locals idx/w/val/result ->
+condition/player/color/current.
+
+The comments, as they stood:
+
+```c
+/* Compares gDreamAuxWorld's getDreamColor (DreamSys +0x200) against a per-idx signed byte from D_80088D16. */
+
+/* A small signed-byte lookup table read by CheckDreamAuxWorldState, indexed by its
+ * `idx` parameter. Layout beyond "one signed byte per entry" is not known
+ * from this unit alone. */
+
+/* gDreamAuxWorld is the player DreamSys (include/DreamSys.h, track 4
+ * round 88): the +0x200 its table is called at is getDreamColor, and
+ * class_3bb8c_l hands SetDreamAuxWorld its DreamSys `target`. code_4cd08.c
+ * declares it; the DreamAuxWorld view that stood here is gone. */
+```

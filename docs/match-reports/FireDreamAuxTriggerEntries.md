@@ -64,7 +64,7 @@ a small 8-byte slot to a function that privately treats it as a much larger
 struct, which is safe here only because the recursive (`kind == 2`) arm of
 `ProcessDreamAuxTriggerRecord` is never taken for these particular records. This is the
 same kind of cross-type reinterpretation CLAUDE.md documents for
-`CheckDreamAuxWorldState`/`AdjustDreamAuxTriggerOffset`'s shared `gDreamAuxWorld` global, just at a
+`IsCurrentDreamColor`/`RemapTriggerForDreamColor`'s shared `gDreamAuxWorld` global, just at a
 struct-pointer level instead of a scalar.
 
 `New_TriggerWorld` is a new symbol, not owned by this unit and not previously
@@ -105,10 +105,10 @@ first build, but the STACK FRAME size was wrong twice:
 Two entries, both reinforcing patterns already on file rather than new
 mechanisms:
 
-- Confirms the round-43 `DespawnDreamAuxEntity`/`SetDreamAuxWorld` observation that a
+- Confirms the round-43 `PlaceDreamAuxEntityByPlayer`/`SetDreamAuxWorld` observation that a
   scratch buffer handed to an external call can be WIDER than what the
   caller itself writes -- a THIRD instance in this same unit
-  (`SetDreamAuxWorld`'s `New_Entity` buffer, `DespawnDreamAuxEntity`'s implicit
+  (`SetDreamAuxWorld`'s `New_Entity` buffer, `PlaceDreamAuxEntityByPlayer`'s implicit
   `localPos`, now `FireDreamAuxTriggerEntries`'s `ctxArg[4]`). When a local's frame
   footprint comes up short by a clean multiple of 4 bytes with every
   instruction otherwise matching, suspect an under-sized scratch buffer
@@ -139,3 +139,12 @@ takes the ctor's descriptor (`struct ResourceSource *`: {buffer, name}), so the
 call casts the stack array whose first word is the buffer:
 `New_TriggerWorld((struct ResourceSource *)ctxArg)`. A pointer cast, no code; bytes
 unchanged.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+Parameters a0/a1/a2 -> day/trigger/data; returns TriggerWorld *. The
+descriptor is a ResourceRequest (`req.src.buffer = data`): a bare
+ResourceSource shrinks the frame by 8 (measured this round), so it keeps a
+MATCHING line. The records are `&records[index]` of TriggerRecord (8-byte,
+the same records InitDreamAux clears) instead of a `(u8 *)base + entry * 8`
+cast, and the index list is trigger->recordIndices. Byte-identical.

@@ -69,6 +69,6 @@ is in a still-unnamed or still-`INCLUDE_ASM` unit — `...Seconds` becomes
 correct and tier A, and this section is the evidence to retire.
 
 This is the round-63 precedent applied again (`MatchesDreamAuxRange` ->
-`MatchesDreamAuxProgression`, corrected at naming review because the body
+`IsDayInPeriodPhase`, corrected at naming review because the body
 tests a stride-3 progression, not a contiguous range): the head corrects the
 name in place rather than discarding the pass, and records why.

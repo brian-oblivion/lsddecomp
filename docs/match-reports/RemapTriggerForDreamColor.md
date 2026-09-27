@@ -1,4 +1,6 @@
-# AdjustDreamAuxTriggerOffset
+# RemapTriggerForDreamColor
+
+> Renamed from `AdjustDreamAuxTriggerOffset` on 2026-09-27 (tools/rename.py). Address 0x8005c930.
 
 > Renamed from `func_8005C930` on 2026-09-21 (tools/rename.py). Address 0x8005c930.
 
@@ -18,7 +20,7 @@ dispatch idiom.
 ## What it does
 
 ```c
-s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
+s32 RemapTriggerForDreamColor(s32 a0, s32 a1)
 {
     s32 val = gDreamAuxStage;
 
@@ -36,7 +38,7 @@ s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
 
 `a0 + 0x1E` (30) only happens when the unit is in state 4 (`gDreamAuxStage == 4`),
 the caller passes `0x10` as `a1`, and a re-check of the same vtable-0x80
-predicate used by `CheckDreamAuxWorldState` still reports state 4. Otherwise `a0` is
+predicate used by `IsCurrentDreamColor` still reports state 4. Otherwise `a0` is
 returned unchanged. `val` is read once into a local and reused both for the
 initial `== 4` test and the post-call re-check (`result == val`), matching
 retail's single `lw $s1, %gp_rel(gDreamAuxStage)($gp)` cached across the call --
@@ -45,7 +47,7 @@ re-reading the global a second time in C, or comparing against the literal
 tested since the cached-local reading matched on the first build.
 
 `TriggerWorldFn80` (vtable slot 0x80, self-only, `s32` return) was promoted
-from a function-local typedef in `CheckDreamAuxWorldState`'s first draft to a shared
+from a function-local typedef in `IsCurrentDreamColor`'s first draft to a shared
 typedef in `include/code_4cd08.h`, since this function needed the identical
 one immediately after -- two independent call sites is the point past which
 sharing beats duplicating for a same-unit type. `TriggerWorldFn` (the
@@ -54,7 +56,7 @@ to each other in the header with a comment distinguishing slot/arity.
 
 ## Proposed learning
 
-None new -- this is a straight application of `CheckDreamAuxWorldState`'s
+None new -- this is a straight application of `IsCurrentDreamColor`'s
 newly-derived `TriggerWorldFn80` idiom, and it matched on the first build.
 Worth noting as a *process* point rather than a technical one: solving the
 smaller sibling first and immediately re-using its vtable-slot typedef paid
@@ -62,7 +64,7 @@ off completely here -- zero iteration needed on the second function.
 
 ## Naming
 
-**AdjustDreamAuxTriggerOffset** — tier B. Adds `0x1E` (30) to its `a0`
+**RemapTriggerForDreamColor** — tier B. Adds `0x1E` (30) to its `a0`
 (really an entry pointer smuggled through as `s32`, per
 `LookupDreamAuxTrigger`) when the unit is in state 4 AND `a1 == 0x10` AND a
 re-check of the world's vtable-0x80 predicate still reports state 4;
@@ -79,3 +81,18 @@ unchanged). The name `TriggerWorld` now belongs to the class gTriggerWorldMethod
 (include/TriggerWorld.h), whose table is 0x8C bytes: this call loads byte
 +0x200 of its object's table (`lw v0,512(v0)`), so gDreamAuxWorld is not a
 TriggerWorld. Its real class is unresolved. Bytes unchanged.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+## Naming (round 100)
+
+**RemapTriggerForDreamColor** (was AdjustDreamAuxTriggerOffset) -- tier B.
+The `+0x1E` is five 6-byte DreamAuxTriggerEntries, so on stage 4 the chunk
+trigger at index 16 is replaced by index 21 when the player's dream colour
+(DreamSys getDreamColor, slot +0x200) is DREAM_COLOR_RED (4). The retry
+check "still reports state 4" above was the colour compared against the
+cached stage, which happens to be 4 too: `color == DREAM_COLOR_RED` is
+byte-identical (tested this round), so the enum is the spelling. Tier B: the
+mechanics are exact; why that one trigger has a red variant is not known.
+Parameters a0/a1 -> trigger/index, locals val/w/result -> stage/player/color;
+the function takes and returns DreamAuxTriggerEntry *. Byte-identical.

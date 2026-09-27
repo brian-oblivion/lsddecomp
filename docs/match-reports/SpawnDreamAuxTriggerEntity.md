@@ -41,14 +41,14 @@ typedef struct {
 } DreamAuxPos6;
 
 extern DreamAuxPos6 gDreamAuxPosTable[];
-extern u8 D_80088F18[];
+extern u8 gDreamAuxSpawnRotations[];
 
 typedef void (*DreamAuxObjFn11)(DreamAuxObj *self, s32 arg1, void *arg2);
 typedef void (*DreamAuxObjFn3A)(DreamAuxObj *self, void *arg1, void *arg2);
 
 bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 {
-    DreamAuxObj *entity = (DreamAuxObj *)New_Entity((void *)kind, out, (void *)D_8008AC04);
+    DreamAuxObj *entity = (DreamAuxObj *)New_Entity((void *)kind, out, (void *)gDreamAuxSound);
 
     if (entity != NULL) {
         DreamAuxSpawnInfo *rec;
@@ -65,10 +65,10 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
         coords.recordVal0 = rec->val0;
         coords.pos = gDreamAuxPosTable[rec->posIndex];
 
-        obj = (DreamAuxObj *)D_8008ABFC;
+        obj = (DreamAuxObj *)gDreamAuxStageMap;
         ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
-        ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, D_80088F18 + rec->val2 * 12);
-        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, gDreamAuxWorld, D_8008AC08, (void *)D_8008ABFC, outBuf);
+        ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, gDreamAuxSpawnRotations + rec->val2 * 12);
+        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, gDreamAuxWorld, gDreamAuxFrameClock, (void *)gDreamAuxStageMap, outBuf);
         return false;
     }
     return true;
@@ -76,15 +76,15 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 ```
 
 `New_Entity`'s three arguments here are the exact same shape as
-`SetDreamAuxWorld`'s call: `(kind, out, D_8008AC04)`, where `out` is THIS
+`SetDreamAuxWorld`'s call: `(kind, out, gDreamAuxSound)`, where `out` is THIS
 function's own `void *out` parameter, itself a 4-word caller-provided
 scratch buffer per the header's existing comment on this function's
 signature (`ProcessDreamAuxTriggerRecord`'s `scratch[4]`). `gDreamAuxSpawnInfo`/`gDreamAuxPosTable` are two
 more small unit-owned lookup tables (a 4-byte "spawn info" record indexed by
 `entry`, and a 6-byte position record indexed by that record's `posIndex`
-field, named round 63). `entity->vtable[0x13]` is the SAME slot `DespawnDreamAuxEntity` (matched
+field, named round 63). `entity->vtable[0x13]` is the SAME slot `PlaceDreamAuxEntityByPlayer` (matched
 earlier this round) dispatches through, reusing `DreamAuxObjFn13`.
-`D_8008ABFC`'s vtable slot 0x3A (byte offset 0xE8) and `entity`'s slot 0x11
+`gDreamAuxStageMap`'s vtable slot 0x3A (byte offset 0xE8) and `entity`'s slot 0x11
 (byte offset 0x44) are new, function-local typedefs.
 
 ## Derivation notes
@@ -159,7 +159,7 @@ handled at the wrong granularity" issue.
 **SpawnDreamAuxTriggerEntity** — tier B. Spawns an `Entity` via `New_Entity`
 for a trigger `entry`; on success, fills a local coordinate buffer from
 `gDreamAuxSpawnInfo`/`gDreamAuxPosTable` and dispatches it through three
-vtable calls (two through the new entity, one through `D_8008ABFC`); on
+vtable calls (two through the new entity, one through `gDreamAuxStageMap`); on
 `New_Entity` failure returns `true` (treated as "handled" by callers) rather
 than `false`. Named for the mechanic that dominates the body (spawn +
 attach); tier B since the exact game meaning of the coordinate/dispatch
@@ -169,6 +169,43 @@ rename, confirmed confined to this unit by rebuild).
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are the typed slots updateRotation and attachToParent (through TodActorAttachToParentFn: peer gDreamAuxWorld, companion D_8008AC08, parent D_8008ABFC, offset outBuf), same bytes. DreamAuxObjFn11/13 deleted.
+The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are the typed slots updateRotation and attachToParent (through TodActorAttachToParentFn: peer gDreamAuxWorld, companion gDreamAuxFrameClock, parent gDreamAuxStageMap, offset outBuf), same bytes. DreamAuxObjFn11/13 deleted.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+Parameters kind/out/ctx/entry -> moodIndex/desc/trigger/spawnIndex (`ctx` is
+the chunk's DreamAuxTriggerEntry; `*(u16 *)ctx` is `trigger->key`; reading it
+through the s16 field is byte-identical). The local cell descriptor
+is StageMap.h's Descriptor10 as computeCellOffsets reads it: `chunk` (the
+chunk's column/row), `cell` (DreamAuxSpawnInfo.cell, was val0), `offset`
+(gDreamAuxPosTable[offsetIndex], was posIndex). D_80088F18 was renamed
+gDreamAuxSpawnRotations (tools/rename.py, tier A): four Ratio16 triples,
+yaw 0, -90, +90, 180, typed Ratio16[][3] and indexed by rotationIndex (was
+val2) instead of `+ val2 * 12`. outBuf -> worldPos. Byte-identical.
+
+The comments, as they stood:
+
+```c
+/* `out` is a 4-word (0x10-byte) caller stack scratch buffer, reused across
+ * every call in ProcessDreamAuxTriggerRecord's loop. Its LAST word is pre-populated by the
+ * caller with the return value of the TriggerWorld getModelData (+0x088) call before
+ * the loop starts (`scratch[3] = (s32)callResult;` in ProcessDreamAuxTriggerRecord) --
+ * confirmed load-bearing: the match was 19/69 without it, 69/69 with it, no
+ * other change. SpawnDreamAuxTriggerEntity itself MATCHED round 43 (once the
+ * gp-relative blocker was resolved, see docs/research/gp-relative-blocker.md)
+ * and never reads `out` -- it only forwards it untouched to `New_Entity`'s
+ * 2nd argument; its own outgoing buffer is a separate local `outBuf[4]`. */
+
+/* A 4-byte record indexed by `entry` (this function's own last parameter):
+ * a u16 followed by two signed bytes. `val2` indexes D_80088F18 (stride
+ * 0xC, element type undiscovered -- only its address is ever taken here)
+ * and `posIndex` indexes gDreamAuxPosTable (stride 6, see DreamAuxPos6
+ * below; named round 63 -- confirmed by this struct's only reader). */
+
+/* A 6-byte position record: a 4-byte (x,y) pair copied as ONE unaligned
+ * whole-struct assignment (the idiom CLAUDE.md documents: an all-s8/s16
+ * struct at alignment 2 compiles a whole-struct copy to lwl/lwr), plus a
+ * separate z half-word. Indexed by DreamAuxSpawnInfo.posIndex. */
+```

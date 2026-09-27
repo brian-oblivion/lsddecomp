@@ -44,7 +44,7 @@ on an even value, and always clears `unk_0xA8` in passing.
    scheduled it into the branch's delay slot for free, exactly the
    "default value slides into the guarding branch's delay slot" idiom
    already documented in CLAUDE.md/DECOMPILATION_LEARNINGS.md for
-   `CheckTriggerParity`, just with the "default" write appearing BEFORE the
+   `CheckTriggerDayParity`, just with the "default" write appearing BEFORE the
    guard textually instead of after. Rewriting as a single unconditional
    `this->unk_0xA8 = 0;` followed by a plain (no early-return) `if
    (this->unk_0xA0 != 0) { ... }` matched immediately.

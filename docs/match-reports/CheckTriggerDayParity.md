@@ -1,4 +1,6 @@
-# CheckTriggerParity
+# CheckTriggerDayParity
+
+> Renamed from `CheckTriggerParity` on 2026-09-27 (tools/rename.py). Address 0x8005c9a4.
 
 > Renamed from `func_8005C9A4` on 2026-09-21 (tools/rename.py). Address 0x8005c9a4.
 
@@ -11,7 +13,7 @@ byte at offset `0x2` is zero (no constraint), otherwise `true` iff that byte
 disagrees with `coordParity`'s own parity (`coordParity % 2 + 1`, computed
 with C's round-toward-zero `%`, not `& 1` — see below).
 
-Called from `TryDreamAuxTrigger` as `CheckTriggerParity(thirdParam, candidateRecord)`
+Called from `TryDreamAuxTrigger` as `CheckTriggerDayParity(thirdParam, candidateRecord)`
 where `candidateRecord` comes from `LookupDreamAuxTrigger`, one of this unit's
 stage-table lookups (6-byte-stride records, same size as `StageSpawn` /
 `StaticLinkTrigger` in `include/DreamSys.h`, but the field this function reads
@@ -48,7 +50,7 @@ the arithmetic shift, so the remainder keeps the dividend's sign) — confirms
 the source used `%`, not `& 1`, matching CLAUDE.md's residue list.
 
 ```c
-bool CheckTriggerParity(s32 coordParity, s8 *entry)
+bool CheckTriggerDayParity(s32 coordParity, s8 *entry)
 {
     bool result = true;
 
@@ -89,7 +91,7 @@ shape before anything more exotic.
 
 ## Naming
 
-**CheckTriggerParity** — tier A. A pure predicate over `entry`'s side/parity
+**CheckTriggerDayParity** — tier A. A pure predicate over `entry`'s side/parity
 byte at offset `0x2` and a caller-supplied `coordParity`: true when the byte
 is 0 (no constraint) or when it disagrees with `coordParity`'s own parity.
 The mechanics (a parity comparison) ARE the name, tier A by the pure-leaf
@@ -98,3 +100,24 @@ since this predicate reads a byte offset shared with `TriggerRecord.parity`
 without being proven to be the same field (see the header's own caveat on
 `TriggerRecord`'s offset-0x2 comment) -- "Trigger" alone reflects that
 looser confidence.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+## Naming (round 100)
+
+**CheckTriggerDayParity** (was CheckTriggerParity) -- tier A. Its first
+argument is the day (TryDreamAuxTrigger's `day`, DreamSys
+getCurrentDayAndYear), not a coordinate: dayParity 0 passes every day, 1 odd
+days, 2 even days. It takes DreamAuxTriggerEntry * (field `dayParity`, was
+`entry[2]`). Byte-identical.
+
+The function comment, as it stood:
+
+```c
+/* True when `entry`'s side/parity byte (offset 0x2) disagrees with
+ * `coordParity`'s own parity. `entry` is a candidate spawn/link record from
+ * one of this unit's stage tables (see LookupDreamAuxTrigger); its layout beyond this
+ * one byte is not yet known here, so it is addressed by byte offset rather
+ * than through a named struct. A parity byte of 0 means "no side constraint",
+ * hence the early `true`. */
+```

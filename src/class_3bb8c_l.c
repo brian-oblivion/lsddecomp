@@ -159,7 +159,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
 /* onDeinit. */
 void ObjM__TeardownStyle(ObjM *self) {
     self->methods->exitSceneStyle(self);
-    TickDreamAuxSlots2();
+    ReleaseDreamAuxEntities();
     StyleTeardown();
     self->bgm->methods->stop(self->bgm);
 }

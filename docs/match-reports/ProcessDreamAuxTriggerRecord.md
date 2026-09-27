@@ -176,3 +176,47 @@ ModelData, which is why it goes to `scratch[3]`: New_Entity's descriptor word
 +0x00C is the ModelData TodActor__AcquireModelData borrows. The former
 `TriggerWorld { void **vtable; }` / `TriggerWorldFn` view in
 include/code_4cd08.h is gone. Bytes unchanged.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+TriggerRecord is 8 bytes (FireDreamAuxTriggerEntries' and InitDreamAux's
+stride), so the kind-2 recursion, `record + 1` of a 0x38-byte struct, is
+`record + 7`: the same +0x38 (retail `addiu a2,s1,56`), now spelled as seven
+records on. Fields: sel -> condition, parity -> modelIndex (it is
+TriggerWorld getModelData's index; CheckTriggerDayParity reads a different
+struct), kind -> moodIndex (New_Entity's mood row), entries -> spawnIndices
+(gDreamAuxSpawnInfo indices). Locals: value -> day, ctx -> trigger (typed),
+callResult -> model (ModelData *), scratch -> desc, p -> spawn. Byte-identical.
+
+The header comments, as they stood:
+
+```c
+/* A trigger/spawn record walked by ProcessDreamAuxTriggerRecord and CheckDreamAuxTriggerCondition. Only
+ * three fields and the overall stride (0x38 -- ProcessDreamAuxTriggerRecord recurses on
+ * `record + 1`, i.e. the next record in what is evidently an array) are
+ * established:
+ *  - offset 0x0 (`triggered`): 0 until CheckDreamAuxTriggerCondition's `success`
+ *    path sets it to 1; while `sel < 0`, a nonzero value here short-circuits
+ *    the whole condition check to `false` instead of re-testing `sel`. Reads
+ *    as a "fire once" latch, though nothing here explains WHY only the
+ *    `sel < 0` path consults it.
+ *  - offset 0x1: a selector CheckDreamAuxTriggerCondition switches on (its own param, not
+ *    yet named the same as `kind` below -- may or may not be the same
+ *    logical field; not proven either way).
+ *  - offset 0x2 (`parity`): compared against a caller-supplied coordinate
+ *    parity by CheckTriggerParity's `entry` parameter -- same struct, most
+ *    likely, given the shared 8-byte-ish record shape in this unit, but
+ *    that function takes a raw `s8 *` and was matched without this type.
+ *  - offset 0x3 (`kind`): read by ProcessDreamAuxTriggerRecord for EnableTeleportsForKind and
+ *    SpawnDreamAuxTriggerEntity's first argument, and compared against the literal `2`
+ *    to decide whether to recurse into the next record.
+ *  - offset 0x4..0x7 (`entries`): up to 4 signed bytes, terminated early by
+ *    a `-1` sentinel, each tried against SpawnDreamAuxTriggerEntity.
+ * Everything else is undiscovered padding. */
+
+/* ProcessDreamAuxTriggerRecord's `world` is a TriggerWorld (gTriggerWorldMethods,
+ * include/TriggerWorld.h; FireDreamAuxTriggerEntries gets it from
+ * New_TriggerWorld), unified in track 4 (round 88); code_4cd08.c includes
+ * that header. This file's former `TriggerWorld { void **vtable; }` view
+ * is gone. */
+```

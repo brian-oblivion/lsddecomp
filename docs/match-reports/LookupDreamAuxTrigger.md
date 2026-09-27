@@ -15,9 +15,9 @@ Round 43 derived and matched it fresh.
 ## What it does
 
 A linear search over one of 14 parallel groups (selected by `gDreamAuxStage`,
-the same index this unit also uses in `AdjustDreamAuxTriggerOffset`/`CheckDreamAuxWorldState`) for
+the same index this unit also uses in `RemapTriggerForDreamColor`/`IsCurrentDreamColor`) for
 an entry whose 2-byte `key` matches `*a0`, dispatching the match (or its
-absence) into `AdjustDreamAuxTriggerOffset`:
+absence) into `RemapTriggerForDreamColor`:
 
 ```c
 typedef struct DreamAuxTriggerEntry {
@@ -37,7 +37,7 @@ s32 LookupDreamAuxTrigger(s16 *a0)
 
     for (i = 0; i < count; i++) {
         if (*a0 == entry->key) {
-            return AdjustDreamAuxTriggerOffset((s32)entry, i);
+            return RemapTriggerForDreamColor((s32)entry, i);
         }
         entry++;
     }
@@ -50,7 +50,7 @@ family in this unit, structurally identical to the already-documented
 `gDreamAuxGroupCounts`/`gDreamAuxGroupRecords` (`InitDreamAux`) but a different stride (6 bytes,
 not 8) and a different index space (`gDreamAuxStage`, not a loop counter). The
 record type is named `DreamAuxTriggerEntry` since `LookupDreamAuxTrigger`'s only
-consumer of the match, `AdjustDreamAuxTriggerOffset`, is itself part of this unit's
+consumer of the match, `RemapTriggerForDreamColor`, is itself part of this unit's
 trigger-dispatch cluster (`ProcessDreamAuxTriggerRecord`/`CheckDreamAuxTriggerCondition`/etc.).
 
 ## Derivation notes
@@ -67,7 +67,7 @@ One attempt short of byte-exact, one fix:
   Byte-exact immediately after.
 
 This is a different mechanism from the `lbu`-vs-`lb` sign-extend idiom
-documented for `CheckDreamAuxWorldState` earlier this round (that one was about load
+documented for `IsCurrentDreamColor` earlier this round (that one was about load
 INSTRUCTION CHOICE; here the load instruction was already `lb` in both
 versions -- the difference was an extra copy into the register a
 longer-lived variable needed to occupy). Both point the same direction
@@ -92,5 +92,24 @@ issue.
 **LookupDreamAuxTrigger** — tier A. A linear search over
 `gDreamAuxTriggerEntries[gDreamAuxStage]` for an entry whose `key` matches
 `*a0`, dispatching the match (or its absence) into
-`AdjustDreamAuxTriggerOffset`. The search IS the function's purpose, so tier
+`RemapTriggerForDreamColor`. The search IS the function's purpose, so tier
 A applies even though it delegates the on-hit adjustment to a sibling.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+Returns `DreamAuxTriggerEntry *` (was the entry smuggled as s32); a0 ->
+`chunkKey`, idx -> `stage`, entry -> `trigger`. DreamAuxTriggerEntry's other
+four bytes are named: `dayParity` (CheckTriggerDayParity's byte 2) and
+`recordIndices[3]` (FireDreamAuxTriggerEntries' bytes 3..5). Byte-identical.
+
+The header comment, as it stood:
+
+```c
+/* A second parallel-group family, same "count + pointer to array" shape as
+ * DreamAuxGroupRecord above but a different stride and a different index
+ * space: 14 (0xE) groups selected by `gDreamAuxStage` (not a loop index),
+ * gDreamAuxTriggerCounts[i] a signed count, gDreamAuxTriggerEntries[i] a pointer to an array of
+ * count 6-byte records whose first 2 bytes (`key`, read with `lh`) are the
+ * only field LookupDreamAuxTrigger accesses. The remaining 4 bytes are undiscovered
+ * from this unit alone. */
+```

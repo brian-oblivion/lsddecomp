@@ -71,7 +71,7 @@ audio-stream-request object:
    `code_171e0.c` as a plain 3-word field setter) with `flag=0`,
    `name="ETC\\SYMSPY.MOM"`, `mode=1`.
 3. A `for (i = 0; i < 1; i++)` loop (see the "loop that only runs once" note
-   in `TickDreamAuxSlots`'s report -- same confirmed idiom) that calls
+   in `ReleaseDreamAuxModels`'s report -- same confirmed idiom) that calls
    `New_ModelData((struct ResourceSource *)&req)` and stores the result into `gDreamAuxSlots[0].obj`,
    then overwrites `req.name` with `"ETC\\SYMDOG.MOM"`. Because the loop
    only runs once, that second name write is dead in THIS retail build --
@@ -138,7 +138,7 @@ sw    v0, %lo(gDreamAuxSlots)(at)   ; <-- %lo folded into the store's own
 Both compute the identical target address; mine is one instruction shorter.
 This is the ONLY residue in the function -- the two preceding loops, the
 `ResourceRequest__Set` call, and the loop-control shape of the final loop (see
-`TickDreamAuxSlots`'s report for why `for (i=0;i<1;i++)` is the right shape, not
+`ReleaseDreamAuxModels`'s report for why `for (i=0;i<1;i++)` is the right shape, not
 decompiler noise) are all byte-exact already (confirmed via `asm-differ`,
 which shows the first ~46 instructions matching before this one diverges).
 
@@ -237,3 +237,78 @@ comes from that header. The unit's own view of the record and its local
 extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`, and
 `(ResourceSource *)&req` becomes `&req.src`. Byte-identical.
 The two MOM path names are `const char[]` and are passed as `(char *)`, since ResourceSource.name is `char *`.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+The pass rewrote the unit's banner (now at the top of src/code_4cd08.c) and
+every declaration comment in include/code_4cd08.h. The comments that carried
+history or superseded readings are kept here verbatim, as they stood before
+the pass (names as they were at round 99).
+
+Findings of the pass that change what those comments said: DreamAuxGroupRecord
+is TriggerRecord (the same 8-byte records; `flag` is `triggered`), so the view
+is gone and the record is TriggerRecord.triggered; the per-stage tables are 14
+pointers each (DREAM_AUX_STAGE_COUNT, from the label spacing) and the slot
+arrays hold ONE slot (gDreamAuxPosTable starts 0x14 after gDreamAuxSlots), not
+14; a slot's first word is the ModelData New_ModelData returns (`model`), and
+the "tick" at method slot +0x004 is BasicClass's release. The MOM files are
+ModelData files (a TMD and a TodSet, include/ModelData.h), not audio. With one
+slot, SYMDOG.MOM is never requested. Locals: `j` -> `record`; the 14 and 1
+loop bounds are ARRAY_COUNT of the tables they walk. Byte-identical.
+
+The header banner:
+
+```c
+/* This unit is lsddecomp's "DreamAux". Fully matched, round 43 (0
+ * INCLUDE_ASM); track 3 naming pass round 63. It owns the 0x206C rodata
+ * slot (its switch jump tables) and manages a small "trigger record" system:
+ * a table of 8-byte TriggerRecord entries, each gating on a caller-supplied
+ * `value` (CheckDreamAuxTriggerCondition) and a coordinate parity
+ * (CheckTriggerParity), that on success spawns or despawns an Entity into
+ * one of two 14-slot object-tracking families (SpawnDreamAuxTriggerEntity /
+ * DespawnDreamAuxEntity, backed by gDreamAuxSlots / gDreamAuxSlots2) and can
+ * gate the game's teleport flag (EnableTeleportsForKind, SetTeleportsEnabled
+ * in DreamSys.c). InitDreamAux/TickDreamAuxSlots/TickDreamAuxSlots2 are the
+ * construct/tick/destruct hooks a caller in class_39e08.c and
+ * class_3bb8c_l.c drives this subsystem through. `gDreamAuxStage`,
+ * `gDreamAuxWorld` and three sibling globals SetDreamAuxWorld installs are
+ * the shared context every other function in the unit reads.
+ */
+```
+
+The slot and its object view (DreamAuxObj / DreamAuxTickFn, deleted):
+
+```c
+/* An object whose method table pointer sits at offset 0 (every object in
+ * this game's class framework, per CLAUDE.md's "Writing a class method").
+ * Only slot 1 (offset 0x4 in the table) is known here: a "tick" method that
+ * takes the object and returns a (possibly new/updated) object pointer. */
+
+/* A slot in the 0x80088D28 / 0x80088D2C families: one live-object pointer
+ * (ticked once per call by calling obj->vtable[1](obj) and storing the
+ * result back into the same slot); an Entity at +0x4 (include/Entity.h)
+ * that SetDreamAuxWorld makes with New_Entity and DespawnDreamAuxEntity
+ * detaches and re-attaches (detachFromParent, attachToParent with the
+ * player gDreamAuxWorld as the peer);
+ * and a 3-word position vector at +0x8 that DespawnDreamAuxEntity passes as
+ * `SceneNode__LocalOffsetToWorldPos`'s `src` (that function's own signature, `code_d294.h`,
+ * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
+ * confirmed by SetDreamAuxWorld's walk over gDreamAuxSlots. */
+```
+
+The group-record view (deleted; TriggerRecord):
+
+```c
+/* A tiny fixed-size record family read by InitDreamAux: 14 (0xE) parallel
+ * groups, gDreamAuxGroupCounts[i] a signed count and gDreamAuxGroupRecords[i] a pointer to an
+ * array of count 8-byte records whose first byte InitDreamAux clears. The
+ * record's remaining 7 bytes are not accessed here. */
+```
+
+The MOM paths:
+
+```c
+/* "ETC\\SYMSPY.MOM" / "ETC\\SYMDOG.MOM" -- MOM = this game's audio-stream
+ * format (per lsddecomp naming elsewhere in the project). Defined in
+ * code_4cd08.c, right before InitDreamAux which is their only reader. */
+```

@@ -254,7 +254,7 @@ extern void GetStageMapChunkRecordXY(s32 index, s32 x, s32 y);
 extern void TickStyle(void *arg0, void *arg1, s32 arg2);
 
 /* ObjM__TeardownStyle's helpers (src/code_4cd08.c, src/class_3bb8c_n.c). */
-extern void TickDreamAuxSlots2(void);
+extern void ReleaseDreamAuxEntities(void);
 extern void StyleTeardown(void);
 
 #endif

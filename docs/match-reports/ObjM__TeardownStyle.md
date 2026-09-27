@@ -10,13 +10,13 @@
 ```c
 void ObjM__TeardownStyle(Obj87034_3bb8c_l *self) {
     self->methods->slot84(self);
-    TickDreamAuxSlots2();
+    ReleaseDreamAuxEntities();
     StyleTeardown();
     self->unk54->methods->slot48(self->unk54);
 }
 ```
 
-Straight-line dispatch chain. `TickDreamAuxSlots2` is already matched
+Straight-line dispatch chain. `ReleaseDreamAuxEntities` is already matched
 elsewhere (`src/code_4cd08.c`); `StyleTeardown` is still uncarved ground
 (`asm/class_3bb8c_n.s`). Both are called with no arguments and their
 return values are unused, declared as plain `extern void func(void);` in
@@ -28,7 +28,7 @@ return values are unused, declared as plain `extern void func(void);` in
   self dispatches directly in `ObjM__DetachTarget`, reused here on a sibling
   object of the presumed-same class (`Obj87034_3bb8c_l *unk54`).
 - Diffed clean immediately after `ObjM__PollTimBlockLoad` and `ObjM__DispatchPadEvent` were
-  fixed — this function's own two `jal` targets (`TickDreamAuxSlots2`,
+  fixed — this function's own two `jal` targets (`ReleaseDreamAuxEntities`,
   `StyleTeardown`) initially resolved to addresses 0xC bytes past retail's,
   purely because OTHER not-yet-fixed functions in this unit were still the
   wrong size and shifting every later cross-unit symbol. Not a bug in this
@@ -44,7 +44,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_80053134` | `ObjM__TeardownStyle` | B | see below |
 
-**Evidence.** vtable slot +0x050. Calls the global `StyleTeardown()` and `TickDreamAuxSlots2()` directly, then notifies `self->unk54` (another `ObjM` instance) via its own `slot48`. Named for the one global call whose own name is already established.
+**Evidence.** vtable slot +0x050. Calls the global `StyleTeardown()` and `ReleaseDreamAuxEntities()` directly, then notifies `self->unk54` (another `ObjM` instance) via its own `slot48`. Named for the one global call whose own name is already established.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

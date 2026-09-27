@@ -83,7 +83,7 @@ accesses are plain uses of existing fields, not new ones.
 - **Corroborated by both callers**, which is what makes the direction
   (offset in, position out) more than a reading: `DreamSys.c`'s
   `DreamSys__ProjectPointAtDistance` feeds it a 3-word offset and treats the result as a map
-  position; `code_4cd08.c`'s `DespawnDreamAuxEntity` does the same for an aux slot.
+  position; `code_4cd08.c`'s `PlaceDreamAuxEntityByPlayer` does the same for an aux slot.
 
 ## Extern arity (round 59)
 
@@ -101,7 +101,7 @@ definition in `src/code_d294_c.c` says.
 80059468:  jal   8001e600 <SceneNode__LocalOffsetToWorldPos>
 
 8005cf78:  jal   8001e600 <SceneNode__LocalOffsetToWorldPos>
-8005cf7c:  move  a3,zero                                  <- DespawnDreamAuxEntity (code_4cd08.c)
+8005cf7c:  move  a3,zero                                  <- PlaceDreamAuxEntityByPlayer (code_4cd08.c)
 ```
 
 Reducing either declaration to the definition's three parameters makes the

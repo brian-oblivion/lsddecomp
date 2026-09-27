@@ -71,3 +71,8 @@ MATCHED there round 43 (this report's "still `INCLUDE_ASM` at the time of
 this report" note is accurate for when it was written but is now stale;
 left as historical record rather than rewritten). It is DreamSys's function
 to name, not this unit's, so it keeps `func_` here.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+Parameter `triggerType` -> `stage` (SetDreamAuxWorld passes its stage);
+`0xB` written 11 (a stage index, decimal). Byte-identical.

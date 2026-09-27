@@ -1,4 +1,6 @@
-# DespawnDreamAuxEntity
+# PlaceDreamAuxEntityByPlayer
+
+> Renamed from `DespawnDreamAuxEntity` on 2026-09-27 (tools/rename.py). Address 0x8005cf34.
 
 > Renamed from `func_8005CF34` on 2026-09-21 (tools/rename.py). Address 0x8005cf34.
 
@@ -22,14 +24,14 @@ globals to vtable slot 0x13, then call `SceneNode__FaceTarget` on it.
 extern void SceneNode__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
 extern void SceneNode__FaceTarget(void *self, void *target, s32 arg2, s32 arg3, void *arg4);
 
-void DespawnDreamAuxEntity(DreamAuxSlot *a0)
+void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *a0)
 {
     if (a0->entity != NULL) {
         s32 localPos[3];
 
         ((DreamAuxObjFn14)a0->entity->vtable[0x14])(a0->entity);
         SceneNode__LocalOffsetToWorldPos((void *)gDreamAuxWorld, localPos, a0->pos, 0);
-        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, gDreamAuxWorld, D_8008AC08, (void *)D_8008ABFC, localPos);
+        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, gDreamAuxWorld, gDreamAuxFrameClock, (void *)gDreamAuxStageMap, localPos);
         SceneNode__FaceTarget(a0->entity, (void *)gDreamAuxWorld, 1, 0, 0);
     }
 }
@@ -68,7 +70,7 @@ alias (`s32, s32, void *, void *`) rather than importing Entity.h's.
 ## Derivation notes
 
 One attempt short of byte-exact, one fix, and it is the SAME shape as the
-`DespawnDreamAuxEntity`-adjacent learning already on file for `LookupDreamAuxTrigger`
+`PlaceDreamAuxEntityByPlayer`-adjacent learning already on file for `LookupDreamAuxTrigger`
 (narrow value kept live too long) but the opposite direction:
 
 - **First pass (5/42, one word too long):** cached `a0->entity` into a local
@@ -96,7 +98,7 @@ a cached local at all.
 
 ## Naming
 
-**DespawnDreamAuxEntity** — tier B. Given a `DreamAuxSlot *`, if its `entity`
+**PlaceDreamAuxEntityByPlayer** — tier B. Given a `DreamAuxSlot *`, if its `entity`
 is live: ticks its vtable slot 0x14, computes a world-space position from
 the slot's stored `pos` via `SceneNode__LocalOffsetToWorldPos`, dispatches
 that position through vtable slot 0x13, then calls
@@ -113,3 +115,16 @@ not read directly off any single instruction.
 `a0->entity` is now `Entity *` and its raw `vtable[0x14]`/`vtable[0x13]` calls are detachFromParent and attachToParent (through TodActorAttachToParentFn), same bytes. DreamAuxObjFn13/14 deleted.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+## Naming (round 100)
+
+**PlaceDreamAuxEntityByPlayer** (was DespawnDreamAuxEntity) -- tier A. It
+despawns nothing: it detaches the slot's entity, converts the slot's `pos`
+(an offset from the player, {0, -200, 8000} in the image) to a world
+position with SceneNode__LocalOffsetToWorldPos, re-attaches the entity there
+and turns it to face the player (SceneNode__FaceTarget, zeroPitch 1).
+TryDreamAuxTrigger calls it when a chunk trigger's day parity rules the day
+out. a0 -> slot, localPos -> worldPos (it is the world position the
+conversion writes). Byte-identical.
