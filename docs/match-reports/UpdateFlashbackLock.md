@@ -181,3 +181,17 @@ said so. Zero bytes changed.
 Proposed (not applied, a symbol rename outside this types job):
 `CheckSaveScoreFlag` -> `UpdateFlashbackLock` (tier B: the mechanics are
 certain, the two DreamSys field names are inherited).
+
+## Naming (round 100, track 7)
+
+**UpdateFlashbackLock** (was `CheckSaveScoreFlag`), tier B, as round 94
+proposed: the body sets TitleMenu's FLASHBACK entry
+(`registrationSlots[TITLEMENU_FLASHBACK]`) locked unless the save block's
+`totalFlasbackUnlockScore` is past 9999999 and `amountFlashbacksAvailable`
+is nonzero; its one caller, TitleMenu__RefreshMenu, runs it on every
+refresh. Tier B because both DreamSys field names are inherited hypotheses.
+The old name described a flag, not what the flag is.
+
+Constants: `FLASHBACK_UNLOCK_SCORE` (9999999, unit-local `#define`; no
+other code has the literal) and `TITLEMENU_FLASHBACK` (include/TitleMenu.h's
+enum, already defined) for the slot index 1.

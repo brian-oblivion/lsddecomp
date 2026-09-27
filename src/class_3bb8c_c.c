@@ -1,28 +1,22 @@
 /*
- * class_3bb8c_c -- three small sibling classes, each built by its own
- * New_X/ctor pair (allocate, chain a base ctor, install the class's own
- * vtable): NodeGuardedViewport, GridCell and TitleMenu. All three follow
- * the same class-framework shape documented in
- * docs/research/class-framework.md and already used elsewhere in this
- * codebase (e.g. class_3ac78.c's StageMap).
+ * class_3bb8c_c -- the constructors and table methods of two small classes,
+ * and TitleMenu's allocator and ctor with its two save-title helpers.
  *
  * NodeGuardedViewport (include/NodeGuardedViewport.h) is a Viewport whose
- * update skips the frame while no view node is attached; its seven table
- * methods, New_ and the getter are all here. GridCell (include/GridCell.h,
- * a SceneNode) is one cell of StageMap's grid, carrying the model placed
- * there; its five table methods, New_ and the getter are all here too.
- * TitleMenu (include/TitleMenu.h, a TaskCore) is the menu between days;
- * only its allocator and ctor are here, its other methods in
- * class_3bb8c_d.c.
+ * update skips the frame while no view node is attached or the ordering
+ * table is not ready; its seven table methods, New_ and the table getter are
+ * all here. GridCell (include/GridCell.h, a SceneNode) is one cell of
+ * StageMap's grid, carrying the model placed there; its five table methods,
+ * New_ and the getter are all here too. Each New_X allocates the object and
+ * calls the ctor through the class's table; the ctor chains the parent's
+ * ctor, then installs its own table.
  *
- * Two free functions serve TitleMenu: UpdateFlashbackLock (called from
- * TitleMenu__RefreshMenu) writes the menu's FLASHBACK lock,
- * registrationSlots[1], from two words of the save block; and
- * StampSaveTitleDay (called from the ctor with the current day) writes
- * the day as three full-width digits into the save title, "LSD   Day001"
- * (FullWidthChars3, include/TitleMenu.h's type for the title's characters).
- *
- * All 20 definitions here are matched, 0 INCLUDE_ASM.
+ * TitleMenu (include/TitleMenu.h, a TaskCore) is the menu between days; its
+ * other methods are in class_3bb8c_d.c. Two free functions serve it:
+ * UpdateFlashbackLock (called from TitleMenu__RefreshMenu) locks or unlocks
+ * the menu's FLASHBACK entry from two words of the save block, and
+ * StampSaveTitleDay (called from the ctor with the current day) writes the
+ * day as three full-width digits into the save title, "LSD   Day001".
  */
 #include "common.h"
 #include <libgte.h>
@@ -96,16 +90,18 @@ void GridCell__GridCell(GridCell *self) {
 
 void GridCell__Reset(void) {}
 
-/* Only the low byte of the sender's class id is read: 0x34 is an Actor
- * (Actor__DispatchLinkCommand makes the same test the other way round). */
+/* Passes on only a link command from an Actor or a class below it (the low
+ * byte of the sender's class id); Actor__DispatchLinkCommand makes the same
+ * test for a GridCell sender. */
 void GridCell__DispatchLinkCommand(GridCell *self, BasicClass *sender, s32 event) {
     if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
         self->methods->onActorLinkCommand(self, sender, event);
     }
 }
 
-/* tryAttachNearby keeps SceneNode's one-parameter slot type; this caller
- * passes the sender and event too, as Actor__OnActorLinkCommand does. */
+/* SceneNode's handling, then tryAttachNearby for events 5..8, the body of
+ * Actor__OnActorLinkCommand. tryAttachNearby keeps SceneNode's one-parameter
+ * slot type; this caller passes the sender and event too. */
 void GridCell__OnActorLinkCommand(GridCell *self, void *sender, s32 event) {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
     if (event < 9) {
@@ -150,9 +146,12 @@ void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     ((TitleMenuResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
 
-/* The total flashback unlock score FLASHBACK needs to be past. */
+/* The save block's total flashback unlock score must be past this for the
+ * menu to offer FLASHBACK. */
 #define FLASHBACK_UNLOCK_SCORE 9999999
 
+/* FLASHBACK stays locked unless the unlock score is past the threshold and at
+ * least one flashback is stored. */
 void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target) {
     DreamSaveBlock *save = (DreamSaveBlock *)self->saveBlock;
     s32 locked = 1;
@@ -160,7 +159,7 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target) {
     if (save->totalFlasbackUnlockScore > FLASHBACK_UNLOCK_SCORE) {
         locked = (save->amountFlashbacksAvailable == 0);
     }
-    /* A NULL entry is a slot the cursor can stop on; slot 1 is FLASHBACK. */
+    /* A NULL entry is one the cursor can stop on. */
     target->registrationSlots[TITLEMENU_FLASHBACK] = (void *)locked;
 }
 

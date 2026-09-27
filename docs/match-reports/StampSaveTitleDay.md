@@ -150,3 +150,34 @@ idiom as Vec2s16, FlagLargePolyForDivide), but the trailing 2 bytes can no
 longer be proven 2-byte aligned, so there is no safe halfword move for
 them and the compiler falls back to two individual signed-byte
 loads/stores."
+
+## Naming (round 100, track 7)
+
+- **StampSaveTitleDay** (was `FormatNumberIntoBuffer`), tier A: the one
+  caller, TitleMenu__TitleMenu, passes DreamSys's getCurrentDayAndYear, and
+  the body writes it as FullWidthChars3 at characters 9..11 of the save
+  title, the "001" of "LSD   Day001" (layout measured round 95,
+  StampSaveTitleFileLetter.md). The name pairs with StampSaveTitleFileLetter,
+  the other writer of the same title. Its parameter `arg0` is `day`.
+- **sDayDigits** (was `D_8008AA24`), tier A: the buffer
+  FormatFullWidthNumber writes the day's three digits into before they are
+  copied to the title. Only this unit reads it. Its ROM value points at the
+  "7654321" string D_8008AA1C.
+
+Constants: `SAVE_TITLE_DAY` (9) and `SAVE_TITLE_DAY_DIGITS` (3),
+unit-local, on class_3bb8c_g.c's `SAVE_TITLE_*` model; the store is
+`*(FullWidthChars3 *)&((FullWidthChar *)gSaveTitle)[SAVE_TITLE_DAY]`, as
+StampSaveTitleFileLetter indexes its `FullWidthChar *title`, in place of
+`(s8 *)gSaveTitle + 0x12`. Byte-identical.
+
+## History: the FormatFullWidthNumber extern's comment (moved round 100)
+
+The local extern now takes the definition's parameters,
+`(u8 *dst, s32 value, s32 width, s32 unpadded)`. Its comment as it stood,
+verbatim:
+
+> FormatFullWidthNumber is GAME code (matched round 38, src/code_2cc8c_f.c --
+> its own C definition, not a Sony object), which formats a1 as a zero-padded
+> `width`-digit decimal string into `self`, the output buffer (the
+> definition's `u8 *dst`; it was typed as a TextRow view until round 88).
+> This unit's own local view keeps it `void *`.

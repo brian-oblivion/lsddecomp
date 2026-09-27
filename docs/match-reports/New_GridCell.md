@@ -37,3 +37,10 @@ Matched on the first attempt; same idiom as New_NodeGuardedViewport. No residue.
 **New_GridCell** -- tier A. Same `New_X` allocator idiom as
 `New_NodeGuardedViewport` (see that report), mirrored exactly for this sibling
 class.
+
+## Constants (round 100, track 7)
+
+`BMemPMgrAlloc(0x3C)` is `BMemPMgrAlloc(GRIDCELL_SIZE)`, `#define
+GRIDCELL_SIZE 60` added to include/GridCell.h. Not `sizeof(GridCell)`: the
+struct expands SCENENODE_FIELDS whole, so sizeof is SceneNode's 0x44, eight
+bytes more than the object (GridCell.h's banner).

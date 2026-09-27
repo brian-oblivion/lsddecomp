@@ -211,3 +211,21 @@ comments now say only what the data is. Moved here:
   include/X.h (round 87/88/89, track 4)" for NodeGuardedViewport, GridCell,
   TitleMenu, TaskObjF, ItemList, TextEntry, ObjM and gObjMMethods are
   replaced by the unit-to-class table in the header's banner.
+
+## Naming (round 100, track 7)
+
+- `sTitleMenuTarget` (was `D_80086D44`), tier A: the TaskCoreTarget this
+  ctor passes both to TaskCore's ctor and to setTarget, TitleMenu's menu
+  description. `s`: only this unit's code reads it.
+- `sTitleMenuSoundBankPath` (was `D_800114DC`), tier A: "ETC\ETCSE", the
+  `soundBankPath` TaskCore's ctor makes `sound` from; same form as
+  GraphRoom's `sGraphSoundBankPath`.
+
+## Track 7 (round 100)
+
+The local `DreamSys *dream = dreamSys;` alias is gone and the two DreamSys
+calls go through `dreamSys` directly: `struct DreamSys *` and `DreamSys *`
+are one type, and the image is byte-identical. The null `sound` argument,
+the `saveCtrl` clear and getCurrentDayAndYear's `outYear` are `NULL`;
+setPitchOffset(-1) is commented (octave -1: pitchOffset = -1 * 12 - 24 =
+-36 semitones, VabStreamObj.h).
