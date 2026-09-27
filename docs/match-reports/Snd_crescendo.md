@@ -220,3 +220,14 @@ Snd_crescendo (240w) is this unit's ONLY function and is MATCHED (round
 
 Expect low-level driver-shaped code rather than class-framework code, as
 elsewhere in code_179d8; confirm with tools/classtable.py, do not assume.
+
+## File name (round 97, charlie, track 8)
+
+`code_179d8_f.c` became `src/libsnd_cres.c` (`tools/unitfile.py rename`,
+image byte-identical). Evidence: `tuboundary.py --unit code_179d8_f` reports
+`code_179d8_f (after sony:libsnd/vm_doff): start edge possible`, and the yaml
+places `libsnd/stop` directly after it, so both edges are Sony objects and
+the region is one file. `nm` over `sdk/work/<disc>/elf/libsnd/cres.o` gives
+one text symbol on every disc (`Snd_crescendo` on 3.0/3.3,
+`_SsSndCrescendo` on 3.5/3.6), text 0x474 / 0x57C / 0x2DC / 0x2DC against
+retail's 0x3C0: the module is `cres`, and no disc holds retail's build.
