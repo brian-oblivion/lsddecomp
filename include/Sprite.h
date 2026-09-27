@@ -113,7 +113,8 @@ struct SpriteGs {
 /* clang-format on */
 
 struct SpriteMethods {
-    SPRITE_SLOTS(Sprite, (Sprite * self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5));
+    SPRITE_SLOTS(Sprite, (Sprite * self, void *texture, s32 abr, SpriteRect *rect, void *resetArg,
+                          s32 resetWord));
 };
 
 struct Sprite {
@@ -124,8 +125,9 @@ extern SpriteMethods gSpriteMethods;
 extern SpriteMethods *GetSpriteMethods(void); /* returns &gSpriteMethods */
 
 /* The class's own methods, in address order. */
-Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg4);
-void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5);
+Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *resetArg, s32 resetWord);
+void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *resetArg,
+                     s32 resetWord);
 void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect);
 void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, GsIMAGE *tim);
 void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table);

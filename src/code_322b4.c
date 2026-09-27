@@ -83,10 +83,10 @@ CharSprite *New_CharSprite(void *texture, u8 cell) {
 /* CharSprite slot +0x008 (ctor): the ScreenSprite ctor with cell 0x20's rect,
  * install the table, then reset to the caller's cell. */
 void CharSprite__CharSprite(CharSprite *self, void *texture, u8 cell) {
-    SpriteRect r;
+    SpriteRect cellRect;
 
-    GetCellRect(&r, 0x20);
-    GetScreenSpriteMethods()->ctor((ScreenSprite *)self, texture, &r, 0);
+    GetCellRect(&cellRect, 0x20);
+    GetScreenSpriteMethods()->ctor((ScreenSprite *)self, texture, &cellRect, 0);
     self->methods = GetCharSpriteMethods();
     ((CharSpriteResetFn)self->methods->reset)(self, cell);
 }
@@ -98,12 +98,12 @@ void CharSprite__Reset(CharSprite *self, u8 cell) {
 
 /* CharSprite slot +0x0C4: store the cell index and point u,v at its 8x8 cell. */
 void CharSprite__SetCell(CharSprite *self, u8 cell) {
-    SpriteRect r;
+    SpriteRect cellRect;
 
     self->cellIndex = cell;
-    GetCellRect(&r, cell);
-    self->sprite.u = r.u;
-    self->sprite.v = r.v;
+    GetCellRect(&cellRect, cell);
+    self->sprite.u = cellRect.u;
+    self->sprite.v = cellRect.v;
 }
 
 /* CharSprite slot +0x0C8: read the byte at +0x0A8. */
@@ -127,20 +127,20 @@ void GetCellRect(SpriteRect *dst, u32 cell) {
 }
 
 /* Allocate and construct a ScreenSprite (0xA8 bytes). */
-ScreenSprite *New_ScreenSprite(void *texture, SpriteRect *rect, s32 arg3) {
+ScreenSprite *New_ScreenSprite(void *texture, SpriteRect *rect, s32 resetWord) {
     ScreenSprite *obj = BMemPMgrAlloc(0xA8);
 
     if (obj != NULL) {
-        GetScreenSpriteMethods()->ctor(obj, texture, rect, arg3);
+        GetScreenSpriteMethods()->ctor(obj, texture, rect, resetWord);
         return obj;
     }
     return NULL;
 }
 
-/* gScreenSpriteMethods slot +0x008 (ctor): the Sprite ctor with abr 0 and arg4 NULL,
+/* gScreenSpriteMethods slot +0x008 (ctor): the Sprite ctor with abr 0 and resetArg NULL,
  * install the table, then reset. */
-void ScreenSprite__ScreenSprite(ScreenSprite *self, void *texture, SpriteRect *rect, s32 arg3) {
-    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, rect, NULL, arg3);
+void ScreenSprite__ScreenSprite(ScreenSprite *self, void *texture, SpriteRect *rect, s32 resetWord) {
+    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, rect, NULL, resetWord);
     self->methods = GetScreenSpriteMethods();
     self->methods->reset(self);
 }
@@ -196,11 +196,11 @@ ScreenSpriteMethods *GetScreenSpriteMethods(void) {
 }
 
 /* Allocate and construct a Sprite (0xA0 bytes). */
-Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg4) {
+Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *resetArg, s32 resetWord) {
     Sprite *obj = BMemPMgrAlloc(0xA0);
 
     if (obj != NULL) {
-        GetSpriteMethods()->ctor(obj, texture, abr, rect, arg3, arg4);
+        GetSpriteMethods()->ctor(obj, texture, abr, rect, resetArg, resetWord);
         return obj;
     }
     return NULL;
@@ -211,15 +211,16 @@ Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg
  * without them (Sprite.h, "Not settled"), and Sprite__Reset reads the first
  * three. Local, where CharSpriteResetFn and VariantSpriteResetFn sit in their
  * headers, because only this ctor calls through it. */
-typedef void *(*SpriteResetFn)(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4,
-                               s32 arg5);
+typedef void *(*SpriteResetFn)(Sprite *self, void *texture, s32 abr, SpriteRect *rect,
+                               void *resetArg, s32 resetWord);
 
 /* gSpriteMethods slot +0x008 (ctor): the SceneNode ctor, install the table,
  * and hand every argument to reset. */
-void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5) {
+void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *resetArg,
+                     s32 resetWord) {
     GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetSpriteMethods();
-    return ((SpriteResetFn)self->methods->reset)(self, texture, abr, rect, arg4, arg5);
+    return ((SpriteResetFn)self->methods->reset)(self, texture, abr, rect, resetArg, resetWord);
 }
 
 /* gSpriteMethods slot +0x040 (reset): bind the texture and cell, rebuild the GsSPRITE. */
@@ -271,18 +272,18 @@ void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table) {
 }
 
 /* Sprite classes slot +0x060: display on/off (attribute bit 31, inverted). */
-s32 Sprite__SetDisplay(Sprite *self, s32 a1) {
-    return GetSetBitField(&self->sprite.attribute, 0x1F, 1, a1 == 0) == 0;
+s32 Sprite__SetDisplay(Sprite *self, s32 on) {
+    return GetSetBitField(&self->sprite.attribute, 0x1F, 1, on == 0) == 0;
 }
 
 /* Sprite classes slot +0x064: attribute bit 30. */
-s32 Sprite__SetSemiTrans(Sprite *self, s32 a1) {
-    return GetSetBitField(&self->sprite.attribute, 0x1E, 1, a1 != 0);
+s32 Sprite__SetSemiTrans(Sprite *self, s32 on) {
+    return GetSetBitField(&self->sprite.attribute, 0x1E, 1, on != 0);
 }
 
 /* Sprite classes slot +0x068: attribute bits 28..29. */
-s32 Sprite__SetSemiTransRate(Sprite *self, s32 a1) {
-    return GetSetBitField(&self->sprite.attribute, 0x1C, 2, a1);
+s32 Sprite__SetSemiTransRate(Sprite *self, s32 rate) {
+    return GetSetBitField(&self->sprite.attribute, 0x1C, 2, rate);
 }
 
 /* gTextRowMethods and gCharSpriteMethods slot +0x098 (update): empty override. */
@@ -314,14 +315,14 @@ RequestedFile *New_RequestedFile(char *name) {
  * the table, clear `loaded`, and pass a stack copy of the name to
  * requestLoadFile (+0x06C). */
 void RequestedFile__RequestedFile(RequestedFile *self, char *name) {
-    char buf[32];
+    char nameCopy[32];
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetRequestedFileMethods();
     self->loaded = 0;
     if (name != NULL) {
-        strcpy(buf, name);
-        self->methods->requestLoadFile(self, buf);
+        strcpy(nameCopy, name);
+        self->methods->requestLoadFile(self, nameCopy);
     }
 }
 

@@ -65,7 +65,8 @@ struct ScreenSpritePos {
 /* clang-format on */
 
 struct ScreenSpriteMethods {
-    SCREENSPRITE_SLOTS(ScreenSprite, (ScreenSprite * self, void *texture, SpriteRect *rect, s32 arg3));
+    SCREENSPRITE_SLOTS(ScreenSprite,
+                       (ScreenSprite * self, void *texture, SpriteRect *rect, s32 resetWord));
 };
 
 struct ScreenSprite {
@@ -76,8 +77,8 @@ extern ScreenSpriteMethods gScreenSpriteMethods;
 extern ScreenSpriteMethods *GetScreenSpriteMethods(void); /* returns &gScreenSpriteMethods */
 
 /* The class's own methods, in address order. */
-ScreenSprite *New_ScreenSprite(void *texture, SpriteRect *rect, s32 arg3);
-void ScreenSprite__ScreenSprite(ScreenSprite *self, void *texture, SpriteRect *rect, s32 arg3);
+ScreenSprite *New_ScreenSprite(void *texture, SpriteRect *rect, s32 resetWord);
+void ScreenSprite__ScreenSprite(ScreenSprite *self, void *texture, SpriteRect *rect, s32 resetWord);
 void ScreenSprite__Reset(ScreenSprite *self);
 void ScreenSprite__AttachToParent(ScreenSprite *self, SceneNode *parent, ScreenSpritePos *pos);
 void ScreenSprite__SetPosition(ScreenSprite *self, ScreenSpritePos *pos);
