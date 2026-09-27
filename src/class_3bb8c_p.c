@@ -187,7 +187,7 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *queries, ChunkSlot **slots,
         slots[0] = slot;
         map = self->grid;
         dims = map->config;
-        if (dims->isVertical != count) {
+        if (dims->isVertical != 1) {
             return 1;
         }
         slotKey = slot->loader->elemKey;
@@ -211,10 +211,10 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *queries, ChunkSlot **slots,
     } else {
         col--;
     }
-    if (cellCol == 0x13) {
+    if (cellCol == STAGE_CHUNK_CELLS - 1) {
         numCols--;
     }
-    if (cellRow == 0x13) {
+    if (cellRow == STAGE_CHUNK_CELLS - 1) {
         numRows--;
     } else {
         row++;
@@ -344,7 +344,7 @@ extern void *BMemPMgrAlloc(s32 size);
 /* VariantSprite (include/VariantSprite.h, track 4, round 87): its allocator and
  * ctor. The other methods are in class_3bb8c_q.c and class_3bb8c_t.c. */
 VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
-    void *obj = BMemPMgrAlloc(0xA8);
+    void *obj = BMemPMgrAlloc(sizeof(VariantSprite));
     if (obj != NULL) {
         GetVariantSpriteMethods()->ctor(obj, variant, resetArg, texture);
         return obj;
