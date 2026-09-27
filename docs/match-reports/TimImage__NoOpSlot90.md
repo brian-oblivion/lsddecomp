@@ -1,4 +1,6 @@
-# TimImage__func_8003B5D4 -- MATCHED (2/2 words), round 81
+# TimImage__NoOpSlot90 -- MATCHED (2/2 words), round 81
+
+> Renamed from `TimImage__func_8003B5D4` on 2026-09-27 (tools/rename.py). Address 0x8003b5d4.
 
 > Renamed from `func_8003B5D4` on 2026-09-25 (tools/rename.py). Address 0x8003b5d4.
 
@@ -9,7 +11,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 - **What:** empty slot override: `jr $ra; nop`.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 2/2,
   and the whole-image SHA1 is green (`OK: build matches retail`).
-- **Name:** `TimImage__func_8003B5D4`, tier C (round 81 naming pass, runner bravo): the
+- **Name:** `TimImage__NoOpSlot90`, tier C (round 81 naming pass, runner bravo): the
   class is confirmed as `TimImage` (see `## Naming` below), but this slot's
   body is empty (`jr $ra; nop`) and no caller relies on it doing anything, so
   its purpose is unknown -- the tier-C `Class__func_xxxxx` form applies.
@@ -17,7 +19,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 ## Source
 
 ```c
-void TimImage__func_8003B5D4(void) {
+void TimImage__NoOpSlot90(void) {
 }
 ```
 
@@ -39,7 +41,7 @@ extern FileResourceMethods gTimImageMethods;
 
 ## Naming
 
-- **`TimImage__func_8003B5D4`**, tier C: class confirmed as `TimImage` (this round; see
+- **`TimImage__NoOpSlot90`**, tier C: class confirmed as `TimImage` (this round; see
   `docs/match-reports/TimImage__TimImage.md`), slot +0x090. Empty body
   (`jr $ra; nop`), no caller overrides it with anything else, so its
   purpose is unknown -- `Class__func_xxxxx` per the tier-C convention for a

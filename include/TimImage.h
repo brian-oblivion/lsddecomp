@@ -76,7 +76,7 @@ void TimImage__NoOpSlot80(void);
 void TimImage__NoOpSlot84(void);
 void TimImage__NoOpSlot88(void);
 void TimImage__NoOpSlot8C(void);
-void TimImage__func_8003B5D4(void);
+void TimImage__NoOpSlot90(void);
 void TimImage__func_8003B5DC(void);
 void TimImage__func_8003B5E4(TimImage *self);
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim);
