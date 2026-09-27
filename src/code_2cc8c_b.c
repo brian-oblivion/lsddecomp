@@ -350,7 +350,7 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *a1, s32 a2) {
         s32 buf[2];
 
         ((BoxFillAttachToParentFn)((BoxFill *)self->listView)->methods->attachToParent)(
-            (BoxFill *)self->listView, (SceneNode *)self->unk14, (Pair32E99C *)&pos);
+            (BoxFill *)self->listView, (SceneNode *)self->unk14, (BoxFillPos *)&pos);
         buf[0] = 0x28;
         buf[1] = count * 12;
         ((BoxFill *)self->listView)->methods->setSize((BoxFill *)self->listView, buf);

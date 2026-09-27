@@ -186,7 +186,7 @@ void StyleBuildDecorSet(void) {
         band = New_BoxFill(&size, (void *)(gStyleDecorColors + i * 3), STYLE_DECOR_PRI);
         gStyleDecorSlots[i] = band;
         ((BoxFillAttachToParentFn)band->methods->attachToParent)(
-            band, (SceneNode *)gStyleDecorSlots[0], (Pair32E99C *)&pos);
+            band, (SceneNode *)gStyleDecorSlots[0], (BoxFillPos *)&pos);
         pos.y += 3;
         size.y -= 7;
     }
@@ -194,7 +194,7 @@ void StyleBuildDecorSet(void) {
     viewport = ((StyleSceneRefs *)gStyleSceneRefs)->viewport;
     parent = viewport->methods->getFadeBox(viewport);
     ((BoxFillAttachToParentFn)gStyleDecorSlots[0]->methods->attachToParent)(
-        gStyleDecorSlots[0], parent, (Pair32E99C *)&pos);
+        gStyleDecorSlots[0], parent, (BoxFillPos *)&pos);
 }
 
 void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta);
@@ -238,7 +238,7 @@ void StyleUpdateDecorSet(void) {
         band = *slot;
         i++;
         colorOfs += 3;
-        band->methods->setPosition(band, (Pair32E99C *)&pos);
+        band->methods->setPosition(band, (BoxFillPos *)&pos);
         pos.y += 3;
         slot++;
     } while (i < STYLE_DECOR_BANDS);

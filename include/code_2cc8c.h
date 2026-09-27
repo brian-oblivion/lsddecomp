@@ -295,7 +295,7 @@ extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 /* FadeBox (class id 0x164, gFadeBoxMethods): include/FadeBox.h (track 4,
  * round 87; it was a local FadeBoxObj view here). */
 
-/* SkipShort2 and Pair32E99C: include/BoxFill.h. */
+/* SkipShort2 and BoxFillPos: include/BoxFill.h. */
 
 /* A small "shift/stride/width/height" texture-page-like descriptor --
  * func_8003FC18's own 3rd argument (round 14, code_2cc8c_e). Only the

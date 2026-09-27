@@ -16,7 +16,7 @@
  *    otherwise) and calls GsSortBoxFill(&box, ot, pri) with `pri`.
  *  - The class's own slots set exactly those: setColor (the GsBOXF r,g,b),
  *    setPosition, setSize (w, h), setPri, and attachAbsolute, which attaches
- *    and clears `relative`. Its setDisplay/setSemiTrans/setSemiTransRate
+ *    and clears `relative`. Its setDisplay/setSemiTransOn/setSemiTransRate
  *    overrides are SceneNode's GetSetBitField accessors at the same bit
  *    positions (31, 30, 28..29), over the GsBOXF attribute instead of the
  *    GsDOBJ2 one.
@@ -24,7 +24,7 @@
  *    attached at the list's position, then setSize(40, rows * 12)),
  *    GraphRoom's 100 plotted dots, and the style decoration boxes of
  *    class_3bb8c_m/_n (class_3bb8c_m makes its box semi-transparent:
- *    setSemiTrans(1), setSemiTransRate(0)).
+ *    setSemiTransOn(1), setSemiTransRate(0)).
  *
  * Ctor chain: BoxFill__BoxFill calls GetSceneNodeMethods()->ctor first, so
  * the id parent (0x4) is the ctor-chain parent. One class derives from it,
@@ -39,7 +39,7 @@
  *    initialises the box from them; the ctor calls it through
  *    BoxFillResetFn.
  *  - +0x04C attachToParent: BoxFill__AttachToParent's third argument is a
- *    screen position (a Pair32E99C) where the slot, SceneNode's, types a
+ *    screen position (a BoxFillPos) where the slot, SceneNode's, types a
  *    LongVec3 offset; it attaches with a NULL offset, then setPosition.
  *    Callers cast to BoxFillAttachToParentFn (class_3bb8c_m/_n,
  *    code_2cc8c_b) or, through a SceneNode pointer, cast the argument
@@ -55,7 +55,7 @@
 typedef struct BoxFill BoxFill;
 typedef struct BoxFillMethods BoxFillMethods;
 typedef struct SkipShort2 SkipShort2;
-typedef struct Pair32E99C Pair32E99C;
+typedef struct BoxFillPos BoxFillPos;
 
 /* The ctor's (and Reset's) size argument: two words of which only the low
  * halfwords are read (lhu at +0x000 and +0x004), into boxW and boxH. The
@@ -68,12 +68,14 @@ struct SkipShort2 {
     s16 y; /* +0x004, the height */
 };
 
-/* A two-word screen position (setPosition, attachToParent's third argument):
- * copied whole into posX/posY. FadeBox's position stack and gTextRowMethods's
- * layout loops use the same record. */
-struct Pair32E99C {
-    s32 a; /* +0x000, x */
-    s32 b; /* +0x004, y */
+/* The box's screen position (setPosition, attachToParent's third argument,
+ * attachAbsolute's; FadeBox's pushPosition): copied whole into posX/posY, so
+ * percent of half the screen width/height while `relative` is set and pixels
+ * after attachAbsolute. ScreenSprite's ScreenSpritePos has the same layout
+ * but is always a percentage. */
+struct BoxFillPos {
+    s32 x; /* +0x000 */
+    s32 y; /* +0x004 */
 };
 
 /* SceneNode's slots, then this class's own. `tools/classtable.py
@@ -85,9 +87,9 @@ struct Pair32E99C {
 #define BOXFILL_SLOTS(Self, CtorParams)                                                            \
     SCENENODE_SLOTS(Self, CtorParams);                                                            \
     /* +0x0B8 */ void (*setColor)(Self *self, s32 overwrite, void *rgb);  /* BoxFill__SetColor: copy the 3 bytes, or add them when overwrite is 0 */ \
-    /* +0x0BC */ void (*setPosition)(Self *self, Pair32E99C *pos);        /* BoxFill__SetPosition: only while attached */ \
+    /* +0x0BC */ void (*setPosition)(Self *self, BoxFillPos *pos);        /* BoxFill__SetPosition: only while attached */ \
     /* +0x0C0 */ void (*setSize)(Self *self, s32 *size);                  /* BoxFill__SetSize: {w, h} words, low halves; only while attached */ \
-    /* +0x0C4 */ void (*attachAbsolute)(Self *self, SceneNode *parent, Pair32E99C *pos, s32 arg3); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = arg3 */ \
+    /* +0x0C4 */ void (*attachAbsolute)(Self *self, SceneNode *parent, BoxFillPos *pos, s32 arg3); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = arg3 */ \
     /* +0x0C8 */ void (*setPri)(Self *self, s32 pri);                     /* BoxFill__SetPri */          \
     /* +0x0CC */ s32 (*setMask)(Self *self, s32 bits)                     /* BoxFill__SetMask: mask = (1 << bits) - 1; Reset passes 13 */
 /* clang-format on */
@@ -100,7 +102,7 @@ struct Pair32E99C {
     /* +0x04C */ s32 unk4C;        /* zeroed by Reset; attachAbsolute's fourth argument; no reader */ \
     /* +0x050 */ s32 posX;         /* setPosition; DrawNode's source for boxX */                   \
     /* +0x054 */ s32 posY;         /* setPosition; DrawNode's source for boxY */                   \
-    /* +0x058 */ u32 boxAttribute; /* GsBOXF.attribute: the setDisplay/setSemiTrans/setSemiTransRate bits */ \
+    /* +0x058 */ u32 boxAttribute; /* GsBOXF.attribute: the setDisplay/setSemiTransOn/setSemiTransRate bits */ \
     /* +0x05C */ s16 boxX;         /* GsBOXF.x: zeroed by Reset, written by DrawNode */            \
     /* +0x05E */ s16 boxY;         /* GsBOXF.y */                                                  \
     /* +0x060 */ u16 boxW;         /* GsBOXF.w: Reset and setSize (FadeBox reads it lhu) */    \
@@ -124,22 +126,22 @@ extern BoxFillMethods *GetBoxFillMethods(void); /* returns &gBoxFillMethods */
 /* +0x040's and +0x04C's occupants, as a caller reaching them through the
  * inherited slots casts them (see the banner). */
 typedef void (*BoxFillResetFn)(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
-typedef void (*BoxFillAttachToParentFn)(BoxFill *self, SceneNode *parent, Pair32E99C *pos);
+typedef void (*BoxFillAttachToParentFn)(BoxFill *self, SceneNode *parent, BoxFillPos *pos);
 
 /* The class's own methods, in ROM order (code_2cc8c_e, then code_2cc8c_f).
  * A subclass reaches the base ones through GetBoxFillMethods() and upcasts. */
 BoxFill *New_BoxFill(void *size, void *color, s32 pri);
 void BoxFill__BoxFill(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
 void BoxFill__Reset(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
-void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, Pair32E99C *pos);
+void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, BoxFillPos *pos);
 s32 BoxFill__SetDisplay(BoxFill *self, s32 on);
 s32 BoxFill__SetSemiTrans(BoxFill *self, s32 on);
 s32 BoxFill__SetSemiTransRate(BoxFill *self, s32 rate);
 void BoxFill__SetColor(BoxFill *self, s32 overwrite, u8 *rgb);
 void BoxFill__ApplyColor(BoxFill *self, u8 *dst, u8 *src, s32 overwrite);
-void BoxFill__SetPosition(BoxFill *self, Pair32E99C *pos);
+void BoxFill__SetPosition(BoxFill *self, BoxFillPos *pos);
 void BoxFill__SetSize(BoxFill *self, s32 *size);
-void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, Pair32E99C *pos, s32 arg3);
+void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, s32 arg3);
 void BoxFill__SetPri(BoxFill *self, s32 pri);
 s32 BoxFill__SetMask(BoxFill *self, s32 bits);
 

@@ -331,6 +331,6 @@ void ApplyStyleDecorationIfSet(void) {
                   ->unkC->methods->slotAC(((FieldAC7CHolder *)gStyleSceneRefs)->unkC);
 
         ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorObj)->methods->attachToParent)(
-            (BoxFill *)gStyleDecorObj, (SceneNode *)tmp, (Pair32E99C *)&D_8008AB58);
+            (BoxFill *)gStyleDecorObj, (SceneNode *)tmp, (BoxFillPos *)&D_8008AB58);
     }
 }

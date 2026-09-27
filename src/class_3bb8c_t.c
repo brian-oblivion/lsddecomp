@@ -247,12 +247,12 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
             firstPoint = point;
             flag = 1;
         } else {
-            self->points[i]->methods->attachAbsolute(self->points[i], parent, (Pair32E99C *)&point, 0);
+            self->points[i]->methods->attachAbsolute(self->points[i], parent, (BoxFillPos *)&point, 0);
         }
     }
 
     if (flag) {
-        self->points[0]->methods->attachAbsolute(self->points[0], parent, (Pair32E99C *)&firstPoint, 0);
+        self->points[0]->methods->attachAbsolute(self->points[0], parent, (BoxFillPos *)&firstPoint, 0);
     }
 }
 
