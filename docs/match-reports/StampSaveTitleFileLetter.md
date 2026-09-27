@@ -186,3 +186,31 @@ Comments moved out of the source (verbatim):
 
 The `## Naming` section above (tier B, "template copy") is superseded by
 this one.
+
+## Track 6 (2026-09-27, round 96)
+
+The three copy types, named for what they hold (tools/renametype.py, image
+byte-identical at every step):
+
+- `Pair2_3bb8c_g` -> `FullWidthChar`, tier A: every `gSaveTitleGlyphs`
+  element and every title position is one 2-byte full-width Shift-JIS
+  character (the data measured in round 95, above). Fields `a`, `b` ->
+  `lead`, `trail` (the SJIS lead and trail bytes); no code accesses either,
+  every use is a whole-struct copy.
+- `Buf6_3bb8c_g` -> `FullWidthChars3`, tier A: three full-width characters,
+  the title's letter field (characters 3..5) blanked from three spaces.
+  Now `FullWidthChar chars[3]` in place of `s8 raw[6]`.
+- `Buf12_3bb8c_g` -> `FullWidthChars6`, tier A: six full-width characters,
+  "   Day" into characters 3..8. Now `FullWidthChar chars[6]` in place of
+  `s8 raw[12]`.
+
+Alignment stays 1 (all-`s8` leaves), which is the whole reason these are
+structs: the source keeps its one `MATCHING:` line. No existing type in
+`include/` or `src/` named a full-width character (grepped for
+Sjis/FullWidth/Glyph), so these are new and stay unit-local.
+
+`class_3bb8c_c`'s `Buf6_3bb8c_c` (`s8 a..f`, the formatted day number
+copied into the same title at +0x12, characters 9..11) is the same record
+as `FullWidthChars3`: a later job, left untouched here. If a second unit
+takes these types they move to the header that owns the save title
+(proposed: `include/TitleMenu.h`, which describes the SJIS title buffer).
