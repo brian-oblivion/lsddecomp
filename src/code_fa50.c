@@ -13,7 +13,7 @@
  * collision helpers in code_d294_b.c/code_d294_c.c.
  *
  * RotateAndOffsetHullList takes a hull list, not a TmdModel, and is a free
- * function; the tail of the file (AccumulateTargetOffset, TmdModel__SetFirstPrimClut)
+ * function; the tail of the file (TmdModel__AddFirstPrimClut, TmdModel__SetFirstPrimClut)
  * is NOT TmdModel either: a separate Outer_fa50/Inner_fa50/Target_fa50
  * pointer chain with no confirmed owning class, and TmdModel__SetFirstPrimClut's one
  * caller is class_3bb8c_o.c.
@@ -629,7 +629,7 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
 /* Adds to the first primitive's CLUT id (every textured TMD packet has it at
  * +0x006, after tu0/tv0) the id of VRAM position (xy[0], xy[1]): x / 16 +
  * y * 64, libgpu's getClut() spelled with a division and an add. */
-void AccumulateTargetOffset(TmdModel *self, s32 *xy) {
+void TmdModel__AddFirstPrimClut(TmdModel *self, s32 *xy) {
     TMD_P_TF3 *t = (TMD_P_TF3 *)self->object->prims;
 
     t->clut += xy[0] / 16;

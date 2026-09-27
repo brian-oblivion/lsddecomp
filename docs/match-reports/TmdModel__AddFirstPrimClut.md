@@ -1,4 +1,6 @@
-# AccumulateTargetOffset -- MATCHED (16/16 words), round 82
+# TmdModel__AddFirstPrimClut -- MATCHED (16/16 words), round 82
+
+> Renamed from `AccumulateTargetOffset` on 2026-09-27 (tools/rename.py). Address 0x800204d0.
 
 > Renamed from `func_800204D0` on 2026-09-25 (tools/rename.py). Address 0x800204d0.
 
@@ -16,7 +18,7 @@ typedef struct Target_fa50 { u8 pad0[0x6]; s16 unk6; } Target_fa50;
 typedef struct Inner_fa50 { u8 pad0[0x10]; Target_fa50 *unk10; } Inner_fa50;
 typedef struct Outer_fa50 { u8 pad0[0x10]; Inner_fa50 *unk10; } Outer_fa50;
 
-void AccumulateTargetOffset(Outer_fa50 *self, s32 *xy) {
+void TmdModel__AddFirstPrimClut(Outer_fa50 *self, s32 *xy) {
     Target_fa50 *t = self->unk10->unk10;
 
     t->unk6 += xy[0] / 16;
@@ -30,7 +32,7 @@ A double store to one s16 field with `lhu` before the first add and no reload be
 
 ## Naming
 
-`AccumulateTargetOffset` -- tier B. Free function, `VerbNoun`: `t->unk6 +=
+`TmdModel__AddFirstPrimClut` -- tier B. Free function, `VerbNoun`: `t->unk6 +=
 xy[0] / 16; t->unk6 += xy[1] * 64;` on the `Outer_fa50`/`Inner_fa50`/
 `Target_fa50` chain, which is NOT the TmdModel class (a different `self`
 type, unrelated to gTmdModelMethods). No caller exists anywhere in `src/` yet (its

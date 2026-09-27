@@ -31,19 +31,19 @@ void TmdModel__SetFirstPrimClut(Outer_fa50 *self, s16 *xy) {
 (`t->unk6 = xy[0]/16; t->unk6 = ... + xy[1]*64;`, a double store overwriting
 the field), but its only caller is `src/class_3bb8c_o.c`, a live types-runner
 unit this round; the class owning the `Outer_fa50`/`Inner_fa50`/`Target_fa50`
-chain is itself unconfirmed (see `AccumulateTargetOffset.md`, its sibling).
+chain is itself unconfirmed (see `TmdModel__AddFirstPrimClut.md`, its sibling).
 
 ## Proposed name
 
 `TmdModel__SetFirstPrimClut` -- tier B, discriminating it from its sibling
-`AccumulateTargetOffset` (renamed this round, no collision): this one SETS
+`TmdModel__AddFirstPrimClut` (renamed this round, no collision): this one SETS
 the field from a fresh value, the sibling ACCUMULATES onto the existing
 one. Posted to the broadcast for the head to apply once `class_3bb8c_o.c`
 is not live and the owning class is known.
 
 ## Track 7 (2026-09-26, round 94, bravo)
 
-Named the fields (see `AccumulateTargetOffset.md`'s matching entry for the
+Named the fields (see `TmdModel__AddFirstPrimClut.md`'s matching entry for the
 full rationale; both functions share the same three structs and both are
 the only readers/writers, all inside this unit): `Target_fa50::unk6` ->
 `offset`, `Inner_fa50::unk10` -> `target`, `Outer_fa50::unk10` -> `inner`.
