@@ -300,7 +300,7 @@ extern s16 D_8008E9FC;
 extern s16 _svm_damper;
 extern s16 gMasterVolL;
 extern s16 gMasterVolR;
-extern s16 D_8008E230;
+extern s16 _svm_orev1;
 extern s16 D_8008E234;
 extern s32 D_8008E258;
 extern s32 D_8008E25C;
@@ -465,7 +465,7 @@ void SpuVmInit(s32 a0) {
     D_8008E228 = 0;
     _svm_okon2 = 0;
     D_80090C60 = 0;
-    D_8008E230 = 0;
+    _svm_orev1 = 0;
     D_8008E234 = 0;
     D_8008E258 = 0;
     D_8008E25C = 0;

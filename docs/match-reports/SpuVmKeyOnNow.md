@@ -74,7 +74,7 @@ source object and a DIFFERENT tail:
   multiple-independent-local-views convention) rather than reusing another
   unit's header.
 - **The write order in the enable-bit tail is REVERSED from `vmNoiseOn`**:
-  this function updates the `D_8008EA20`-gated `D_8008E230`/`234` pair
+  this function updates the `D_8008EA20`-gated `_svm_orev1`/`234` pair
   FIRST, then `D_8008E228`/`22C`/`80090C60`/`64` SECOND -- the opposite
   order from D8E0. Confirmed structurally correct by m2c's own independent
   decode; not treated as an error.
@@ -125,7 +125,7 @@ extern u16 D_8008E228;
 extern u16 _svm_okon2;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
-extern u16 D_8008E230;
+extern u16 _svm_orev1;
 extern u16 D_8008E234;
 
 /* Object holding a per-note "priority"-ish scale byte at +0x18; only field
@@ -218,10 +218,10 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     }
 
     if (D_8008EA20 & 4) {
-        D_8008E230 |= lowBit;
+        _svm_orev1 |= lowBit;
         D_8008E234 |= highBit;
     } else {
-        D_8008E230 &= ~lowBit;
+        _svm_orev1 &= ~lowBit;
         D_8008E234 &= ~highBit;
     }
 
@@ -485,7 +485,7 @@ several times in one function.
   round-65 section): write `G = x | G;` not `G |= x;` (retail's `or $v1,$a2,$v1`
   puts the loaded value SECOND), and order the four global updates by retail's
   LOAD order `E228, E22C, C60, C64` rather than `E228, C60, E22C, C64`. The
-  same applies to the `D_8008E230`/`D_8008E234` pair in the `D_8008EA20 & 4`
+  same applies to the `_svm_orev1`/`D_8008E234` pair in the `D_8008EA20 & 4`
   arm. 4240 -> 3765.
 
 ### Levers tried and their verdicts
@@ -626,10 +626,10 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     }
 
     if (D_8008EA20 & 4) {
-        D_8008E230 = lowBit | D_8008E230;
+        _svm_orev1 = lowBit | _svm_orev1;
         D_8008E234 = highBit | D_8008E234;
     } else {
-        D_8008E230 = D_8008E230 & ~lowBit;
+        _svm_orev1 = _svm_orev1 & ~lowBit;
         D_8008E234 = D_8008E234 & ~highBit;
     }
 
@@ -833,10 +833,10 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     }
 
     if (D_8008EA20 & 4) {
-        D_8008E230 = lowBit | D_8008E230;
+        _svm_orev1 = lowBit | _svm_orev1;
         D_8008E234 = highBit | D_8008E234;
     } else {
-        D_8008E230 = D_8008E230 & ~lowBit;
+        _svm_orev1 = _svm_orev1 & ~lowBit;
         D_8008E234 = D_8008E234 & ~highBit;
     }
 
@@ -889,7 +889,7 @@ placeholder"); recorded here rather than guessed into a rename:
   Candidate pan/balance-style controls; three of them cascaded suggests a
   main/aux/reverb-style stack, not confirmed.
 - `D_8008EA20` -- single bit (`& 4`) selects which direction
-  `D_8008E230`/`D_8008E234` gets updated. Candidate per-voice routing/output
+  `_svm_orev1`/`D_8008E234` gets updated. Candidate per-voice routing/output
   flag byte; not confirmed.
 
 These recur identically in `vmNoiseOn` (same unit, matching cascade shape --

@@ -54,7 +54,7 @@ the 16-byte-stride `_svm_sreg_buf`/`D_8008D7F2` tables, OR `3` into
 table's low bit for every live voice (`D_8008E9D0` of them) then mark this
 channel's own slot `2`, OR the enable bits into `D_8008E228`/`_svm_okon2`
 and AND-NOT them out of `D_80090C60`/`D_80090C64`, conditionally OR/AND-NOT
-them into a second enable pair (`D_8008E230`/`D_8008E234`, gated on
+them into a second enable pair (`_svm_orev1`/`D_8008E234`, gated on
 `D_8008EA20 & 4` -- new globals, not touched by `vmNoiseOn2`), and
 finally write the bits to the SPU key-on registers via `D_8006DAD4`. Also
 patches one field of `D_8006DAD4[0xD5]` (byte offset `0x1AA`) with a 6-bit
@@ -127,9 +127,9 @@ extern u16 D_8008E228;
 extern u16 _svm_okon2;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
-extern u16 D_8008E230;   /* new -- second enable/mask pair, gated on D_8008EA20 & 4 */
+extern u16 _svm_orev1;   /* new -- second enable/mask pair, gated on D_8008EA20 & 4 */
 extern u16 D_8008E234;   /* new */
-extern u8 D_8008EA20;    /* new -- flag byte, bit 2 selects D_8008E230/234 direction */
+extern u8 D_8008EA20;    /* new -- flag byte, bit 2 selects _svm_orev1/234 direction */
 ```
 
 `_ss_score`'s two-level indexing was derived from the raw address
@@ -173,7 +173,7 @@ extern u16 D_8008E228;
 extern u16 _svm_okon2;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
-extern u16 D_8008E230;
+extern u16 _svm_orev1;
 extern u16 D_8008E234;
 extern u8 D_8008EA20;
 
@@ -280,10 +280,10 @@ void vmNoiseOn(s32 a0) {
     D_80090C64 = c64;
 
     if (D_8008EA20 & 4) {
-        D_8008E230 |= lowBit;
+        _svm_orev1 |= lowBit;
         D_8008E234 |= highBit;
     } else {
-        D_8008E230 &= ~lowBit;
+        _svm_orev1 &= ~lowBit;
         D_8008E234 &= ~highBit;
     }
 

@@ -260,7 +260,7 @@ extern char D_8008DEB0[]; /* Sony's _ss_spu_vm_rec + 8 (libsnd/vmanager.o bss; s
 
 extern s16 D_8008E9FC;
 extern s16 _svm_damper;
-extern s16 D_8008E230;
+extern s16 _svm_orev1;
 extern s16 D_8008E234;
 
 extern SpuReverbAttr _svm_rattr; /* pinned in config/psyq-objects.ld (libsnd/vm_g.o) */
@@ -379,7 +379,7 @@ void SpuVmInit(s32 a0) {
     D_8008E228 = 0;
     _svm_okon2 = 0;
     D_80090C60 = 0;
-    D_8008E230 = 0;
+    _svm_orev1 = 0;
     D_8008E234 = 0;
     _svm_rattr.mask = 0;
     _svm_rattr.mode = 0;
@@ -670,7 +670,7 @@ void SpuVmFlush(void) {
         u16 highMask = D_80090C64;
         u16 lowActive = D_8008E228;
         u16 highActive = _svm_okon2;
-        s16 v230 = D_8008E230;
+        s16 v230 = _svm_orev1;
         s16 v234 = D_8008E234;
 
         D_80090C60 = 0;

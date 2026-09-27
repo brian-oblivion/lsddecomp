@@ -169,7 +169,7 @@ extern u16 D_8008E228;
 extern u16 _svm_okon2;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
-extern u16 D_8008E230;
+extern u16 _svm_orev1;
 extern u16 D_8008E234;
 
 /* STALL -- see docs/match-reports/SpuVmKeyOnNow.md. Best body reached
@@ -267,10 +267,10 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     }
 
     if (D_8008EA20 & 4) {
-        D_8008E230 = lowBit | D_8008E230;
+        _svm_orev1 = lowBit | _svm_orev1;
         D_8008E234 = highBit | D_8008E234;
     } else {
-        D_8008E230 = D_8008E230 & ~lowBit;
+        _svm_orev1 = _svm_orev1 & ~lowBit;
         D_8008E234 = D_8008E234 & ~highBit;
     }
 
@@ -295,7 +295,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 
 /* The blend-cascade globals
  * (D_8008EA16/17/19/1A/11/20/22, D_8008E8C0, D_8008E228/22C, D_80090C60/64,
- * D_8008E230/234, _svm_sreg_dirty/98C/9A3) are already declared above, before
+ * _svm_orev1/234, _svm_sreg_dirty/98C/9A3) are already declared above, before
  * SpuVmKeyOnNow (ROM-earlier, same shapes) -- reused here, not redeclared. */
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
