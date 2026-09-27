@@ -3008,3 +3008,4 @@ NoOp5 = 0x80017EA8; // type:func
 sBMemPMgrInitFailFmt = 0x8001028C;
 gGraphPointBaseColor = 0x8008ABB8;
 sGraphSoundBankPath = 0x8001176C;
+sGraphTimPath = 0x80011778;

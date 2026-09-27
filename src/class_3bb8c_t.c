@@ -112,12 +112,12 @@ void GraphRoom__GraphRoom(GraphRoom *self, struct DreamSys *dreamSys) {
     ((GraphRoomResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
 
-extern char D_80011778[];
+extern char sGraphTimPath[];
 
 void GraphRoom__Reset(GraphRoom *self) {
     self->fadeRate = 5;
     self->unk2C = 0x190;
-    self->methods->setSubHandle(self, D_80011778, 0);
+    self->methods->setSubHandle(self, sGraphTimPath, 0);
     self->methods->setFrameBound(self, 0xA);
 }
 

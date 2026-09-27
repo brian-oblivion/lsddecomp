@@ -16,19 +16,19 @@ void GraphRoom__Reset(D_80087AACObj *self);
 ## Body
 
 ```c
-extern char D_80011778[];
+extern char sGraphTimPath[];
 
 void GraphRoom__Reset(D_80087AACObj *self) {
     self->unk_0x84 = 5;
     self->unk_0x2C = 0x190;
-    self->methods->slotD4(self, D_80011778, 0);
+    self->methods->slotD4(self, sGraphTimPath, 0);
     self->methods->slot6C(self, 0xA);
 }
 ```
 
-Uses `D_80011778` (the `"ETC\HGRAPH.TIM"` string, one of the two
+Uses `sGraphTimPath` (the `"ETC\HGRAPH.TIM"` string, one of the two
 standalone strings this unit's own header comment names -- resolved by
-symbol, declared locally as `extern char D_80011778[];` since it is not
+symbol, declared locally as `extern char sGraphTimPath[];` since it is not
 referenced by any other unit). Names `D_80087AACMethods::slot6C/slotD4`
 and `D_80087AACObj::unk_0x2C/unk_0x84` (additive extensions).
 
