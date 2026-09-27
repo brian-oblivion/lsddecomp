@@ -40,16 +40,17 @@
 typedef struct FrameClock FrameClock;
 typedef struct FrameClockMethods FrameClockMethods;
 
-/* FrameClock's class id (gFrameClockMethods word +0x000). A single nibble, so
- * `(header & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID` tests for it or a subclass. */
-#define FRAMECLOCK_CLASS_ID 0x5
-
 /* The events tick sends its parents (notifyParents(self, event)). */
 enum FrameClockEvent {
     FRAMECLOCK_EVENT_RUNNING = 2, /* counted: frameCount += 1 first */
     FRAMECLOCK_EVENT_PAUSED = 3,  /* paused set: not counted */
     FRAMECLOCK_EVENT_FLAG14 = 4   /* flag14 set: not counted, takes precedence */
 };
+
+/* FrameClock's class id (gFrameClockMethods word +0x000). A single nibble,
+ * so `(header & 0xF) == FRAMECLOCK_CLASS_ID` is its is-kind-of test (the
+ * listeners above; TextEntry's addChild/removeChild/onNotify). */
+#define FRAMECLOCK_CLASS_ID 0x5
 
 /* BasicClass's slots, then this class's own, named for their occupants. */
 struct FrameClockMethods {
