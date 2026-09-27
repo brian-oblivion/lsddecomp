@@ -113,7 +113,7 @@ extern StyleEffectMethods *GetStyleEffectMethods(void); /* class_3bb8c_o.c; retu
  * but a caller in class_3bb8c_s.c passes a dead second argument that is
  * byte-load-bearing (the `arity-ok` notes there and in the reports). */
 StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *parent,
-                             LongVec3 *pos); /* BMemPMgrAlloc(0x98), then ctor */
+                             LongVec3 *pos); /* BMemPMgrAlloc(sizeof(StyleEffect)), then ctor */
 StyleEffect *StyleEffect__StyleEffect(StyleEffect *self, s32 kind, StyleEffectParams *params,
                                       SceneNode *parent, LongVec3 *pos);
 void StyleEffect__Finalize(StyleEffect *self);
