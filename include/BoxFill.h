@@ -78,6 +78,18 @@ struct BoxFillPos {
     s32 y; /* +0x004 */
 };
 
+/* The box's colour, GsBOXF r, g, b: what setColor copies into `color` (or
+ * adds to it when overwrite is 0), and the ctor's (and Reset's) colour
+ * argument. Not Sony's CVECTOR, which is four bytes and unsigned.
+ * MATCHING: signed, and exactly three bytes -- a whole-struct copy is three
+ * lb/sb pairs (BoxFill__ApplyColor, GraphRoom__BuildGraphPoints). The field
+ * and the slot parameter stay `u8 color[3]` and `void *rgb`. */
+typedef struct BoxFillRgb {
+    s8 r;
+    s8 g;
+    s8 b;
+} BoxFillRgb;
+
 /* SceneNode's slots, then this class's own. `tools/classtable.py
  * gBoxFillMethods --vs gSceneNodeMethods` lists the overrides of the
  * inherited ones: +0x008 (BoxFill__BoxFill), +0x040 (BoxFill__Reset), +0x04C

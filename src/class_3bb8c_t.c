@@ -125,23 +125,16 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
     }
 }
 
-/* A graph point's colour, New_BoxFill's colour argument: BoxFill__SetColor
- * copies the three bytes into the box's GsBOXF r, g, b. Not Sony's CVECTOR,
- * which is four bytes and unsigned.
- * MATCHING: signed, and exactly three bytes -- the whole-struct copy is three
- * lb/sb pairs. */
-typedef struct GraphPointColor {
-    s8 r;
-    s8 g;
-    s8 b;
-} GraphPointColor;
-
+/* A graph point's colour is New_BoxFill's colour argument, a BoxFillRgb
+ * (include/BoxFill.h).
+ * MATCHING: signed, and exactly three bytes -- the whole-struct copy of `rgb`
+ * below is three lb/sb pairs. */
 extern s32 gGraphPointSize[2];
-extern GraphPointColor gGraphPointNewestColor;
-extern GraphPointColor gGraphPointBaseColor;
+extern BoxFillRgb gGraphPointNewestColor;
+extern BoxFillRgb gGraphPointBaseColor;
 
 void GraphRoom__BuildGraphPoints(GraphRoom *self) {
-    GraphPointColor rgb;
+    BoxFillRgb rgb;
     s32 i;
 
     self->points[0] = New_BoxFill(gGraphPointSize, &gGraphPointNewestColor, 0);
@@ -298,7 +291,7 @@ fail:
     return 0;
 }
 
-extern GraphPointColor gGraphPointHighlightColor;
+extern BoxFillRgb gGraphPointHighlightColor;
 
 void GraphRoom__TickHighlight(GraphRoom *self) {
     if (self->scored != 0) {
