@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BA58` on 2026-09-23 (tools/rename.py). Address 0x8003ba58.
 
-**Unit:** code_2c054 · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
+**Unit:** Task · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -56,7 +56,7 @@ the following `jal`'s delay slot on its own, no manual reshaping needed.
 
 ## New struct/header knowledge
 
-Named `StreamTaskObj::unkB8`/`unkBC`/`unkC0` in `include/code_2c054.h`, and
+Named `StreamTaskObj::unkB8`/`unkBC`/`unkC0` in `include/Task.h`, and
 `TaskCoreMethods::slot44` (`s32 (*)(StreamTaskObj *self, s32 a1, s32 a2)` --
 see the note below on why this unit's local typing differs from
 `GameApplication.h`'s for the FUNCTION `TaskCore__Init` that occupies this same

@@ -10,7 +10,7 @@ before this round.
 Takes no arguments; gated entirely on the global `gStyleDecorColor` (set by
 `ApplyStyleConfig`, matched earlier this round). If it's non-NULL: builds an
 object via `New_BoxFill(&sStyleDecorBoxSize, gStyleDecorColor, 0)` (already known
-elsewhere as returning `ClassEAC0Obj *` from `include/code_2cc8c.h`, a header
+elsewhere as returning `ClassEAC0Obj *` from `include/TaskViewport.h`, a header
 this unit doesn't own -- see below), stashes it in `gStyleDecorObj`, and
 dispatches three method calls on it (`slot64(obj,1)`, `slot68(obj,0)`,
 `slot4C(obj,tmp,&sStyleDecorBoxPos)`) plus one call on a completely different
@@ -19,7 +19,7 @@ feeds the `slot4C` call's middle argument).
 
 ```c
 /* Local view only -- New_BoxFill already returns `ClassEAC0Obj *` per
- * include/code_2cc8c.h, a header owned by a different unit. This function
+ * include/TaskViewport.h, a header owned by a different unit. This function
  * only ever reaches slots 0x4C/0x64/0x68, so it gets its own minimal local
  * type instead of pulling that header in. */
 typedef struct LocalM4D0Obj LocalM4D0Obj;

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003D2CC` on 2026-09-24 (tools/rename.py). Address 0x8003d2cc.
 
-**Unit:** code_2cc8c_b · **Size:** 57 words · **Result:** byte-exact
+**Unit:** TaskViewport · **Size:** 57 words · **Result:** byte-exact
 
 ## What it does
 
@@ -45,7 +45,7 @@ void TaskCore__BroadcastToSlots(Obj86B60 *self, void *a1)
 
 ## Header additions
 
-`include/code_2cc8c.h`: new field `unk54` on `Obj86B60`
+`include/TaskViewport.h`: new field `unk54` on `Obj86B60`
 (`Unk64Elem **`, walked with an incrementing pointer — the established
 idiom from `TaskCore__BroadcastToSlotElements`), carved from what had been 4 bytes of padding
 immediately after `unk50`. New slot `slot104` on `Obj86B60Methods`

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E628` on 2026-09-19 (tools/rename.py). Address 0x8003e628.
 
-**Unit:** code_2cc8c_c · **Size:** 41 instructions
+**Unit:** TaskViewport · **Size:** 41 instructions
 
 ## What it does
 
@@ -82,7 +82,7 @@ before the byte-level score did.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
+round 13 (2026-09-03), runner alpha, unit TaskViewport. Matched on the
 first build (after correctly re-reading the delay-slot ordering above).
 
 ## Naming
@@ -91,7 +91,7 @@ first build (after correctly re-reading the delay-slot ordering above).
 alpha). Tier A: the `Class__Class` constructor convention (matching
 `BasicClass__BasicClass`) -- confirmed as `Unk18ObjMethods::ctor`'s
 occupant (called by `New_Viewport` via `GetViewportMethods()->ctor(self)`,
-`GetViewportMethods` being this class's own vtable getter, code_2cc8c_d.c).
+`GetViewportMethods` being this class's own vtable getter, TaskViewport.c).
 Chains `Get_vtable_BasicClass()->ctor` first, then installs its own vtable
 and sets up `self->unkAC`/`self->unkB0` -- the standard base-then-derived
 construction shape.

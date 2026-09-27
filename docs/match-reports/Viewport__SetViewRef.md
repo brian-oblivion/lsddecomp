@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EBF8` on 2026-09-23 (tools/rename.py). Address 0x8003ebf8.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. 13/13 words, full match.
+Unit: `TaskViewport`. Round 14, runner delta. 13/13 words, full match.
 
 ## Signature
 
@@ -29,7 +29,7 @@ void Viewport__SetViewRef(Unk18Obj *self, Vec3_2cc8c *a1) {
 
 ## Header changes
 
-`include/code_2cc8c.h`: `Unk18Obj` gains `unk20` (`+0x020`, `Vec3_2cc8c`,
+`include/TaskViewport.h`: `Unk18Obj` gains `unk20` (`+0x020`, `Vec3_2cc8c`,
 immediately after `unk14`, no gap); `Unk18ObjMethods::slot7C` retyped from
 `void *` to `Vec3_2cc8c *`.
 

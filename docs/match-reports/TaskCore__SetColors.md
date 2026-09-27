@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CB68` on 2026-09-24 (tools/rename.py). Address 0x8003cb68.
 
-**Unit:** code_2cc8c · **Size:** 20 instructions
+**Unit:** TaskViewport · **Size:** 20 instructions
 
 ## Round 19: closed with the untried "struct-typed argument" axis
 
@@ -65,8 +65,8 @@ first try.
 
 Before this generalizes further than warranted: **all five of this
 round's whole-struct-assignment closures are within units descended from
-the same original `code_2cc8c` monolith** (`code_2cc8c`, `code_2cc8c_b`,
-`code_2cc8c_c`, `code_2cc8c_e`, `code_2cc8c_f` -- all carved from one
+the same original `TaskViewport` monolith** (`TaskViewport`, `code_2cc8c_b`,
+`TaskViewport`, `code_2cc8c_e`, `code_2cc8c_f` -- all carved from one
 segment across earlier rounds). I have not tried this lever, or seen it
 tried, anywhere outside that family (`Entity.c`, `DreamSys.c`,
 `class_3bb8c*.c`, etc.), so I cannot personally attest it holds there.
@@ -85,7 +85,7 @@ idiom" and worth stating precisely:
   adjustment.
 - **Two genuinely independent class/vtable families.** `BoxFillPos` copies
   live in `Obj6EAC0`/`FadeBoxObj` (units `code_2cc8c_e`/`_f`); THIS
-  function's 3-byte struct lives in `Obj86B60` (unit `code_2cc8c`,
+  function's 3-byte struct lives in `Obj86B60` (unit `TaskViewport`,
   matched by a DIFFERENT runner in an EARLIER round before this round's
   fix) while `BoxFill__ApplyColor`'s matching 3-byte case lives in `Obj6EAC0`
   (unit `code_2cc8c_f`) -- so the SAME struct shape closed in two
@@ -101,7 +101,7 @@ but the supporting evidence is still entirely within one segment's
 descendant units. Treat it as: safe to try broadly as a lever (cheap,
 mechanistic, not tied to a specific field layout), NOT yet safe to
 promote to "closes any two-or-more-statement scalar copy in this
-codebase" without a confirmation outside the `code_2cc8c` family. Round
+codebase" without a confirmation outside the `TaskViewport` family. Round
 18's over-promotion of the type/declaration-order lever on one success is
 the cautionary precedent this is deliberately not repeating.
 
@@ -137,7 +137,7 @@ global) is retired for `BgLayerRgb` (`include/BgLayer.h`, already included by
 the unit). Evidence: the copy compiles to `lb`/`sb` per byte, so the record is
 a signed 3-byte `s8` triple -- not Sony's `CVECTOR` (4 bytes, `u_char`); and
 `baseColor`, the first of the three, is what `TaskCore__OnInit`
-(`code_2c054.c`) hands to `BgLayer`'s `setColor` as a `BgLayerRgb *`, and
+(`Task.c`) hands to `BgLayer`'s `setColor` as a `BgLayerRgb *`, and
 `TaskCore__TickColorFade` hands it the faded copy of it the same way. `unk93`/`unk96` are filled from the same rodata table
 (`sTaskCoreDefaultColors`, three records 3 bytes apart) and `unk93` goes to the same
 TaskTextObj slot78 as `baseColor`, so one record type covers all three.
@@ -145,7 +145,7 @@ Byte-identical: whole image green, 0 new warnings, nonmatching green.
 
 Proposed, not applied (header edit, other units): `TaskCore.h`'s `baseColor`,
 `unk93`, `unk96` retyped from `u8[3]` to `BgLayerRgb`, which would drop the
-casts here and in `code_2c054.c`. `code_2cc8c_f.c`'s `RGB80040790`
+casts here and in `Task.c`. `code_2cc8c_f.c`'s `RGB80040790`
 (`BoxFill__ApplyColor`) is the same shape (s8 r, g, b, struct-copied); a
 separate job.
 
@@ -154,8 +154,8 @@ separate job.
 Parameters `a1..a3` -> `base`, `clear`, `color96` (slot and prototype in
 TaskCore.h too). `unk93` is the colour TaskCore__OnDeinit (when unk34 is
 set) and TitleMenu__OnDeinit clear the screen to; its accessors are in
-code_2c054 and class_3bb8c_d, so the name (`clearColor`) is a proposal.
+Task and class_3bb8c_d, so the name (`clearColor`) is a proposal.
 `unk96` has no reader anywhere (Reset sets it to 128 grey from sTaskCoreDefaultColors);
 kept. Retyping all three to BgLayerRgb (delta's round-98 lead) would drop
-these casts but changes code_2c054's accessors: proposed. The casts carry a
+these casts but changes Task's accessors: proposed. The casts carry a
 MATCHING line. Byte-identical.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C63C` on 2026-09-24 (tools/rename.py). Address 0x8003c63c.
 
-Unit: `code_2cc8c` · Size: 100 instructions · Round 23 (2026-09-07), head.
+Unit: `TaskViewport` · Size: 100 instructions · Round 23 (2026-09-07), head.
 Second of the five `REOPENED -- ASSIGNABLE` functions to be closed, sibling of
 `TaskCore__OnPadEvent`.
 
@@ -105,10 +105,10 @@ Retyping `Obj86B60Methods::slot10C` and `::slot110` from `s32` to `void` closed
 it with no other change.
 
 **The retype was justified independently of the match, which matters because
-this is a shared-header vtable slot edit** (`include/code_2cc8c.h`, six units):
+this is a shared-header vtable slot edit** (`include/TaskViewport.h`, six units):
 
 - `slot110`'s occupant `TaskCore__CancelElementScroll` is **already matched** in
-  `src/code_2cc8c_b.c` as `void TaskCore__CancelElementScroll(Obj86B60 *self)`. That is positive
+  `src/TaskViewport.c` as `void TaskCore__CancelElementScroll(Obj86B60 *self)`. That is positive
   evidence, not inference from the function under test.
 - Neither slot had any other caller anywhere: the header's own comment recorded
   both as `OBSERVED: TaskCore__SetState (STALL, not attempted)` — i.e. the `s32` had
@@ -148,14 +148,14 @@ matching `Obj86B60Methods::slot60`) and this function's name as the class
 family's DEFAULT implementation a sibling class overrides -- not something
 `TitleMenu` or `GraphRoomObj` introduces (both keep it: `GraphRoomObj`'s own
 table has this exact occupant at slot60, unoverridden). See
-`include/code_2cc8c.h`'s round-78 header comment for the full derivation and
+`include/TaskViewport.h`'s round-78 header comment for the full derivation and
 why this rules out a `TitleMenu__`/`GraphRoomObj__` prefix.
 
 ## Proposed field names (round 78, delta -- NOT applied, cross-unit)
 
 `Obj86B60::unk3C` (s32, +0x03C) -> `notifyMode`. Tier B. Grep shows
-`code_2cc8c_b.c`, `code_2cc8c_d.c` and several unrelated `class_3bb8c_*`/
-`libsnd_seqread.c`/`code_2c054.c` files also contain an `unk3C` textual hit, so
+`TaskViewport.c`, `code_2cc8c_d.c` and several unrelated `class_3bb8c_*`/
+`libsnd_seqread.c`/`Task.c` files also contain an `unk3C` textual hit, so
 per CLAUDE.md's "textual search over-counts" warning this is NOT renamed in
 the shared header -- only the compiler (a definition-only rename + rebuild)
 can settle which of those are the SAME struct. Evidence for the name from
@@ -168,7 +168,7 @@ describes that mechanic without asserting which in-game states 1/2 are.
 
 **UPDATE (round 78, delta, same session):** echo posted a competing proposal
 for this exact field on the broadcast -- `unk3C -> scrollState` -- from
-code_2cc8c_b, with more context than this report has alone (that unit's own
+TaskViewport, with more context than this report has alone (that unit's own
 `unk4C -> target`/`Unk4CObj::unk24 -> slotEntries` proposals, and functions
 named `BeginElementScroll`/`SetTarget`, suggest `Obj86B60`'s `unk4C` target
 is a scrollable list and `unk3C` may be that scroll's own state). Echo's

@@ -21,7 +21,7 @@
  * index table 0..299 over it.
  *
  * How it is used, at the one New_TileAtlas call site (TaskCore__TaskCore,
- * src/code_2c054.c): New_TileAtlas(0), then New_TileMap(0, atlas), then
+ * src/Task.c): New_TileAtlas(0), then New_TileMap(0, atlas), then
  * New_BgLayer(tileMap, 1); TaskCore__Finalize releases the three (+0x004).
  *
  * SLOTS (`classtable.py gTileAtlasMethods --vs gFileResourceMethods`, 30 against 30; the

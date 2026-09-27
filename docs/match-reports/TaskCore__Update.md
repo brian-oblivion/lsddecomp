@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C51C` on 2026-09-24 (tools/rename.py). Address 0x8003c51c.
 
-**Unit:** code_2cc8c · **Size:** 72 instructions -- the second-largest function
+**Unit:** TaskViewport · **Size:** 72 instructions -- the second-largest function
 in the unit (after the two `addiu_at`-blocked switch dispatchers, see
 `TaskCore__OnPadEvent`/`TaskCore__SetState`'s reports).
 
@@ -44,7 +44,7 @@ void TaskCore__Update(Obj86B60 *self, s32 a1, s32 a2)
 
 First forwards to the shared "IntermediateBase" utility class
 (`Get_vtable_IntermediateBase()->slot5C(self, a1, a2)`, same idiom already used in
-`src/code_2c054.c`/`src/class_39e08.c`). Then, if `unk3C` is set and
+`src/Task.c`/`src/class_39e08.c`). Then, if `unk3C` is set and
 `unk40` is (unsigned) less than `unk1C`, calls `slot60` with reason `6`.
 Finally switches on `unk20` and forwards to one of four more vtable slots
 depending on its value -- two of which (`slotAC`/`slotC0`) ARE this unit's
@@ -141,7 +141,7 @@ under-apply on a function this size:
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit code_2cc8c. This function was
+round 2026-09-02, runner echo, unit TaskViewport. This function was
 overlooked during the main pass through the unit (the runner worked the
 smaller queued functions first per the assigned cheapest-first order,
 intended to circle back, and the circle-back was initially missed --

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EA24` on 2026-09-23 (tools/rename.py). Address 0x8003ea24.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. 2/2 words, full match.
+Unit: `TaskViewport`. Round 14, runner delta. 2/2 words, full match.
 
 ## Signature
 
@@ -26,7 +26,7 @@ void Viewport__SetOtLength(Unk18Obj *self, s32 a1) {
 
 ## Header changes
 
-`include/code_2cc8c.h`: `Unk18Obj` gains `s32 unk3C` at `+0x03C` (splits the
+`include/TaskViewport.h`: `Unk18Obj` gains `s32 unk3C` at `+0x03C` (splits the
 `pad034[0x0AC-0x034]` span). See `Viewport__SetMaxPackets`'s report for the sibling
 setters carved from the same span in one pass.
 

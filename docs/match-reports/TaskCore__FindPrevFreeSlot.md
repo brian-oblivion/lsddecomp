@@ -4,11 +4,11 @@
 
 > Renamed from `func_8003D444` on 2026-09-24 (tools/rename.py). Address 0x8003d444.
 
-**Unit:** code_2cc8c_b · **Size:** 38 words · **Result:** byte-exact, first attempt
+**Unit:** TaskViewport · **Size:** 38 words · **Result:** byte-exact, first attempt
 
 ## What it does
 
-`Obj86B60Methods::slotEC` (already recorded in `code_2cc8c.h`). The
+`Obj86B60Methods::slotEC` (already recorded in `TaskViewport.h`). The
 mirror image of `TaskCore__FindNextFreeSlot`: searches BACKWARD from `self->unk58 - 1`
 for the next free (null) slot in `self->unk4C->unk18[]`, wrapping to
 `self->unk50 - 1` when it goes negative, stopping either on an empty slot

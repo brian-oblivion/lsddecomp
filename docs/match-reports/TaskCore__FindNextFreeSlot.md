@@ -4,11 +4,11 @@
 
 > Renamed from `func_8003D3B0` on 2026-09-24 (tools/rename.py). Address 0x8003d3b0.
 
-**Unit:** code_2cc8c_b · **Size:** 37 words · **Result:** byte-exact
+**Unit:** TaskViewport · **Size:** 37 words · **Result:** byte-exact
 
 ## What it does
 
-`Obj86B60Methods::slotE8` (already recorded in `code_2cc8c.h` as
+`Obj86B60Methods::slotE8` (already recorded in `TaskViewport.h` as
 `TaskCore__FindNextFreeSlot`). Finds the next free (null) slot in
 `self->unk4C->unk18[]`, starting just after the current index
 `self->unk58` and wrapping at the capacity `self->unk50`, stopping either
@@ -46,7 +46,7 @@ void TaskCore__FindNextFreeSlot(Obj86B60 *self)
 
 ## Header additions
 
-`include/code_2cc8c.h`:
+`include/TaskViewport.h`:
 
 - New field `unk50` on `Obj86B60` (`s32`, the wrap capacity for the
   `unk58`-indexed search), carved out of existing padding

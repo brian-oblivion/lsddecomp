@@ -7,7 +7,7 @@
 > **Type rename note (round 73, track 3):** every `TaskCoreObjMethods` /
 > `TaskCoreObj` below (the type this function's own body split off from
 > `TaskCoreMethods`) was renamed to `StreamTaskUnk18Methods` /
-> `StreamTaskUnk18Obj` in `include/code_2c054.h` -- `TaskCoreObj` was doing
+> `StreamTaskUnk18Obj` in `include/Task.h` -- `TaskCoreObj` was doing
 > double duty for two unrelated classes (this one, and New_TaskCore's own
 > 0xA4-byte allocation), and freeing the name for the latter matches the
 > `StreamTaskUnkNNObj` convention already used for this class's other private
@@ -15,7 +15,7 @@
 > `tools/rename.py` since C type names carry no address for it to resolve.
 > The text below is left as originally written for the history.
 
-**Unit:** code_2c054 · **Size:** 102 words · **Status:** MATCHED (102/102)
+**Unit:** Task · **Size:** 102 words · **Status:** MATCHED (102/102)
 
 This occupies `TaskCoreMethods`'s (`gTaskCoreMethods`) own slot `+0x04C` (per
 `classtable.py gTaskCoreMethods`, and confirmed by `StreamTask__OnInit`'s own
@@ -72,7 +72,7 @@ function -- and it is unambiguously single-argument (confirmed by
 `StreamTask__OnInit`'s already byte-exact call). A vtable slot's signature has to
 agree across every instance of one class; a genuine arity conflict at a
 shared offset is proof `self->unk18` is a sibling class, not the same one.
-Split into a new `TaskCoreObjMethods` type (`include/code_2c054.h`), moving
+Split into a new `TaskCoreObjMethods` type (`include/Task.h`), moving
 `slot74`/`slot90` out of `TaskCoreMethods` into it and adding the three new
 slots plus `+0x08C`. **Updated `TaskCore__OnDeinit.md`'s "New structure
 discovered" section with a correction note** rather than rewriting it.
@@ -195,15 +195,15 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj casts are g
 
 ## Proposed field names
 
-Accessors outside code_2c054 (the compiler's error list), so for the head
+Accessors outside Task (the compiler's error list), so for the head
 to apply by type scope:
 
 - IntermediateBase `+0x014 unk14` -> `lightRig`: its own comment says it is
   `initArgs->lightRig` or init's `New_LightRig()`; this function hangs the
   BgLayer and the slot widgets under it and attaches the view to it.
-  Accessors: code_2c054.c, class_3bb8c_d.c, class_3bb8c_l.c, class_3bb8c_m.c.
+  Accessors: Task.c, class_3bb8c_d.c, class_3bb8c_l.c, class_3bb8c_m.c.
 - TaskCore `+0x02C unk2C` -> `packetCount` (tier B, TaskCore__Reset's
-  report): handed to the viewport's `setUnk44`. Accessors: code_2c054.c,
+  report): handed to the viewport's `setUnk44`. Accessors: Task.c,
   class_3bb8c_d.c (TitleMenu__Reset), class_3bb8c_t.c (GraphRoom__Reset).
   Viewport's own `unk44`/`unk48` and `setUnk44`/`setUnk48` would follow as
   `packetCount`/`packetSize`.

@@ -1,5 +1,5 @@
-#ifndef CODE_2C054_H
-#define CODE_2C054_H
+#ifndef TASK_H
+#define TASK_H
 
 #include "common.h"
 #include "TaskCore.h"
@@ -9,13 +9,13 @@
 #include "DrawSystem.h"
 
 /*
- * code_2c054's own declarations: the data, and the one outside accessor,
+ * Task's own declarations: the data, and the one outside accessor,
  * that StreamTask's and TaskCore's methods here reach and no other unit
  * does. The classes themselves are in include/StreamTask.h and
  * include/TaskCore.h.
  */
 
-/* Defined in code_2cc8c_c.c: &gDefaultMovieFrame. */
+/* Defined in TaskViewport.c: &gDefaultMovieFrame. */
 extern DrawRect *GetDefaultMovieFrame(void);
 
 /* resetCounters' colours for setColors, three RGB triples back to back:

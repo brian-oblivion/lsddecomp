@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003F25C` on 2026-09-23 (tools/rename.py). Address 0x8003f25c.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. 12/12 words, full match (3
+Unit: `TaskViewport`. Round 14, runner delta. 12/12 words, full match (3
 real attempts).
 
 ## Signature

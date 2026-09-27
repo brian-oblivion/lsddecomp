@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BDE4` on 2026-09-23 (tools/rename.py). Address 0x8003bde4.
 
-**Unit:** code_2c054 · **Size:** 1 instruction (0x4 bytes, `jr $ra; nop`) · **Status:** MATCHED
+**Unit:** Task · **Size:** 1 instruction (0x4 bytes, `jr $ra; nop`) · **Status:** MATCHED
 
 ## What it does
 
@@ -23,7 +23,7 @@ still needed a name.
 override; the mechanics ARE the whole purpose (do nothing when this slot is
 dispatched). Matches the `Class__NoOpSlotNN` convention already established
 in this codebase for the identical shape (`DreamSys.h`'s
-`DreamSys__NoOpSlotE8Default`/`Actor__NoOpSlotD8`, `code_2cc8c.h`'s
+`DreamSys__NoOpSlotE8Default`/`Actor__NoOpSlotD8`, `TaskViewport.h`'s
 `TextRow__NoOpGetCell`/`TextRow__NoOpSlotD0`).
 
 ## Track 4 (2026-09-26, round 87)

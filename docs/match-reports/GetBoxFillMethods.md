@@ -15,7 +15,7 @@ Obj6EAC0Methods *GetBoxFillMethods(void) {
 A plain "get the base class table" getter, same shape as
 `Get_vtable_IntermediateBase`/`Get_vtable_BasicClass` elsewhere in this project.
 `gBoxFillMethods` is the base method table for a previously-unnamed
-BasicClass-derived class (see `include/code_2cc8c.h`'s `Obj6EAC0`
+BasicClass-derived class (see `include/TaskViewport.h`'s `Obj6EAC0`
 comment); this unit's `GetTextRowMethods` is the matching getter for the
 override table `gTextRowMethods`.
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CB30` on 2026-09-24 (tools/rename.py). Address 0x8003cb30.
 
-**Unit:** code_2cc8c · **Size:** 14 instructions
+**Unit:** TaskViewport · **Size:** 14 instructions
 
 ## What it does
 
@@ -39,7 +39,7 @@ to this class's own vtable slot `+0xC4` (external `TaskCore__TickFadeColor`).
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit code_2cc8c. 1 attempt.
+round 2026-09-02, runner echo, unit TaskViewport. 1 attempt.
 
 ## Naming (round 78, delta)
 

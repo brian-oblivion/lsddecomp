@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CCDC` on 2026-09-24 (tools/rename.py). Address 0x8003ccdc.
 
-**Unit:** code_2cc8c · **Size:** 27 instructions
+**Unit:** TaskViewport · **Size:** 27 instructions
 
 > **UPDATE (targeted permuter pass, round 17).** MATCHED. The lever was a
 > `goto` to a single shared epilogue instead of an early `return` inside the
@@ -173,7 +173,7 @@ needing genuinely different C shapes despite that.
 
 ## Provenance
 
-Originally: round 2026-09-02, runner echo, unit code_2cc8c. 11 attempts (4
+Originally: round 2026-09-02, runner echo, unit TaskViewport. 11 attempts (4
 against the real build across two sessions, 5 in an isolated reproducer,
 plus a ~24k-iteration permuter search that found no improvement) — filed as
 a stall at 26/27.

@@ -624,7 +624,7 @@ clean before and after.
 **A permuter search can find the SAME kind of UB/logic-bug candidate
 round 48's delta lever describes on a completely different function and
 residue shape** (there: a variable reassigned and read under its old
-meaning in a UB-relevant context on `code_2cc8c`; here: a loop-counter
+meaning in a UB-relevant context on `TaskViewport`; here: a loop-counter
 field snapshotted once before a loop and re-read stale every iteration on
 a register-identity-swap function) — this is now a second, independent
 confirmation that the "trace every touched variable forward to its next

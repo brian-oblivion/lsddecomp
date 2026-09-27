@@ -52,7 +52,7 @@ buffer being two GsOT headers plus tags plus packet area, and with both
 halves being handed to `GsClearOt`. Left as an `s32` field layout (no
 struct edit this round).
 
-### Matched body (as committed in `src/code_2cc8c_d.c`)
+### Matched body (as committed in `src/TaskViewport.c`)
 
 ```c
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
@@ -128,7 +128,7 @@ information from the larger search.**
 
 ### The sibling's new lever (named-temp + barrier) does NOT transfer here either
 
-This round's `TaskCore__RefreshSlotView` (same runner, sibling unit `code_2cc8c_b`)
+This round's `TaskCore__RefreshSlotView` (same runner, sibling unit `TaskViewport`)
 closed a long-standing `sll`/`lw` INSTRUCTION-ORDERING swap by naming an
 independent sub-computation and adding a bare `__asm__("")` barrier
 immediately after its declaration. Tried the analogous shape here,
@@ -186,13 +186,13 @@ even though neither run is "exhaustive" in any formal sense.
 
 ## ROUND 46 (runner delta): drift-checked fresh, no new lever -- DELIBERATE SKIP, plus a self-caught cross-contamination scare worth recording
 
-Re-spliced the round-36 body (with `GsClearOt`) into `src/code_2cc8c_d.c`
+Re-spliced the round-36 body (with `GsClearOt`) into `src/TaskViewport.c`
 and rebuilt. **First attempt showed a spurious `WARNING: differs OUTSIDE
 this range too (22 bytes)`** that had nothing to do with this function --
 `cmp -l build/SLPS_015.56 disk/SLPS_015.56` plus
 `vram = (N-1) - 0x800 + 0x80010000` pointed at `0x8003e4bc`, which is
 `IntermediateBase__SetState` (a DIFFERENT function in a DIFFERENT unit,
-`code_2cc8c_c`) -- I had left that function's own stall body live from an
+`TaskViewport`) -- I had left that function's own stall body live from an
 earlier hand-lever test in this same round instead of restoring its
 `INCLUDE_ASM` before moving on. Restored it (`grep -c '^INCLUDE_ASM'`
 checked across all four of this runner's units to confirm exactly one
@@ -305,7 +305,7 @@ tell which one was actually run.** This one hid a 55-word difference under
 "no change either way" for four rounds, and the next reader inherits it as a
 closed axis. When an attempt has two spellings, record two rows.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. Best score: 71/73 words
+Unit: `TaskViewport`. Round 14, runner delta. Best score: 71/73 words
 in-range, build clean at that score. ~14 real attempts, all on the SAME
 2-word residue. Restored to `INCLUDE_ASM` per project rule.
 
@@ -467,7 +467,7 @@ wrong.
 
 ## Header changes kept
 
-`include/code_2cc8c.h` — all MEASURED from the disassembly, independent of
+`include/TaskViewport.h` — all MEASURED from the disassembly, independent of
 the stall:
 - `Unk18Obj::unk70`'s own comment updated: this function is its set site
   (previously "not itself written by any function this unit attempted").
@@ -490,7 +490,7 @@ actually been rebuilt in its current form since that rename — the 71/73
 figure was correct but unverified against the current tree.
 
 **Rebuilt with the corrected name.** `extern void GsClearOt(s32, s32, s32);`
-already existed in `src/code_2cc8c_d.c` (added when round 34 retyped this
+already existed in `src/TaskViewport.c` (added when round 34 retyped this
 unit's other Sony calls), just declared after this function's own call
 sites; added a second, identical declaration ahead of `Viewport__InitOt`
 itself (same pattern this unit already uses for its other local externs)
@@ -676,7 +676,7 @@ Renamed from `Unk18Obj__InitOt`. Slot +0x08C `initOt`. Its carving names the fie
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/code_2cc8c_d.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsClearOt(0, 0, (GsOT *)self->ot[0])` and `[1]`: `ViewportOt` is Sony's GsOT under a local name (include/Viewport.h).
+src/TaskViewport.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsClearOt(0, 0, (GsOT *)self->ot[0])` and `[1]`: `ViewportOt` is Sony's GsOT under a local name (include/Viewport.h).
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 
@@ -689,7 +689,7 @@ The comments that sat on the deleted prototypes, moved here verbatim:
  * the final addu/addiu pair swaps (round 71). */
 extern void GsClearOt(s32 a0, s32 a1, ViewportOt *ot);
 /* Two more, identified in round 78 (FINISHING-PLAN track 2) and moved here
- * from include/code_2cc8c.h. Both prototypes are LIBGS.H's own; PACKET is
+ * from include/TaskViewport.h. Both prototypes are LIBGS.H's own; PACKET is
  * LIBGS.H's `typedef unsigned char PACKET`.
  *   GsSetNearClip   libgs/gs_101   was func_8003FB0C
  *   GsSetWorkBase   libgs/gs_124   was func_8003FBE4

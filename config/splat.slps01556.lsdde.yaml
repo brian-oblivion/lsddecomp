@@ -165,7 +165,7 @@ segments:
       # its references the other way. That remainder is renamed by each
       # carve of this block (code_2cc8c_b -> code_2cc8c_c in round 11), so
       # the owning function is named here rather than the segment.
-      - [0x1890, .rodata, code_2cc8c]
+      - [0x1890, .rodata, TaskViewport]
       # 0x1908 holds jtbl_80011108, func_8003FB1C's jump table. ATTACHED to
       # code_2cc8c_e in round 14 when that segment was carved: its words are
       # `.L` labels LOCAL to func_8003FB1C's own .s file, which a standalone
@@ -1190,14 +1190,14 @@ segments:
       - [0x2ba94, o, libcd/event]        # CdInit, def_cbsync, def_cbready, def_cbread
       - [0x2bb9c, c, code_2bb9c]       # 0x2BB9C..0x2BF70, game code (revision 18)
       - [0x2bf70, o, libgs/gs_122]       # GsGetTimInfo, closing the block at 0x2C054
-      - [0x2c054, c, code_2c054]
+      - [0x2c054, c, Task]
       # code_2cc8c is 153 functions. Round 10 carved the first 20-function
       # slice (0x2CC8C..0x2D548) as a C unit; the remainder stays asm as
       # code_2cc8c_b. Blocker census at carve time: 4 of 153 functions
       # (3%) hit the gp_rel / addiu-$at blockers -- the lowest density of
       # any uncarved segment, which is why this block was picked over the
       # larger code_179d8 (43% blocked).
-      - [0x2cc8c, c, code_2cc8c]
+      - [0x2cc8c, c, TaskViewport]
       # code_2cc8c_b: second 20-function slice, 0x2D548..0x2E7A0.
       # 0x2E7A0 (func_8003DFA0) is a real boundary -- func_8003DE9C closes
       # `jr $ra; nop` + endlabel, and func_8003DFA0 opens by loading through
@@ -1209,7 +1209,6 @@ segments:
       # HIGHEST-YIELD SLICE OF THIS ROUND: zero gp_rel and zero addiu-$at
       # hits across all 20 functions, and zero `jlabel`/`jr $t2`, so no
       # rodata slot needs attaching and no hasm/.word disposition applies.
-      - [0x2D548, c, code_2cc8c_b]
       # code_2cc8c_c: third 20-function slice, 0x2E7A0..0x2F0B8.
       # 0x2F0B8 (func_8003E8B8) is a real boundary -- func_8003E874 closes
       # `addiu $sp, $sp, 0x18; jr $ra; nop` and func_8003E8B8 opens with
@@ -1225,7 +1224,6 @@ segments:
       # the asm remainder, where the yaml already parks its rodata slot at
       # 0x1908. So nothing to attach and no hasm/.word disposition; that
       # decision lands on whoever carves past function 59.
-      - [0x2E7A0, c, code_2cc8c_c]
       # code_2cc8c_d: first slice of the 93-function code_2cc8c remainder,
       # 0x2F0B8..0x2FAAC, 33 functions. Carved round 13.
       #
@@ -1246,7 +1244,6 @@ segments:
       # docs/research/addiu-at-blocker.md turning into a queued one). Both
       # carry stub reports. Nothing in the slice demands 5+ callee-saved
       # registers.
-      - [0x2F0B8, c, code_2cc8c_d]
       # code_2cc8c_e: the remaining 60 functions, 0x2FAAC.. -- left UNCARVED
       # deliberately, so whoever carves it screens it themselves.
       #

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CDE0` on 2026-09-24 (tools/rename.py). Address 0x8003cde0.
 
-**Unit:** code_2cc8c_b · **Size:** 46 words · **Result:** byte-exact
+**Unit:** TaskViewport · **Size:** 46 words · **Result:** byte-exact
 
 ## What it does
 
@@ -38,7 +38,7 @@ each arm by the compiler rather than needing to be written twice by hand.
 
 ## Header additions
 
-`include/code_2cc8c.h`:
+`include/TaskViewport.h`:
 
 - New type `Unk74Obj`/`Unk74ObjMethods` for `self->unk74`'s pointee, with
   three call sites resolving three slots:
@@ -52,7 +52,7 @@ each arm by the compiler rather than needing to be written twice by hand.
   carved out of what had been undifferentiated padding
   (`pad05C[0x078-0x05C]`). This is a new field inside previously-unread
   padding, not a change to any already-typed field, so it does not affect
-  `code_2cc8c.c`'s 16 already-matched functions.
+  `TaskViewport.c`'s 16 already-matched functions.
 - `extern Unk74Obj *New_TimImage(const char *path);` — a local retyped view
   of the already-matched `class_39e08.c` function of the same name, which
   there returns its own unit's local view `SubObjG *`. Per this project's
@@ -96,7 +96,7 @@ Renamed from Obj86B60__SetSubHandle (tools/rename.py): the class prefix. Occupan
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`) and `include/code_2cc8c.h`'s
+TimImage is unified (`include/TimImage.h`) and `include/TaskViewport.h`'s
 `Unk74Obj`/`Unk74ObjMethods` view of it is deleted, together with that
 header's local `extern` of New_TimImage. The handle is cast to
 `TimImage *` (TaskCore.h still types the field `BasicClass *`); its slots are

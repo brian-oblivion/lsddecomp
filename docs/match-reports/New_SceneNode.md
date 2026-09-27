@@ -57,4 +57,4 @@ round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attemp
 
 ## Naming
 
-Round 71 (alpha). `func_8001CA94` -> `New_SceneNode`, **tier A**. Allocates 0x44 bytes, runs `GetSceneNodeMethods()->ctor` on it, frees and returns NULL if the ctor fails. The project's `New_Class` allocator convention (New_Entity, New_Actor). Not a table slot. Caller: Viewport__Viewport (code_2cc8c_c) stores the result.
+Round 71 (alpha). `func_8001CA94` -> `New_SceneNode`, **tier A**. Allocates 0x44 bytes, runs `GetSceneNodeMethods()->ctor` on it, frees and returns NULL if the ctor fails. The project's `New_Class` allocator convention (New_Entity, New_Actor). Not a table slot. Caller: Viewport__Viewport (TaskViewport) stores the result.

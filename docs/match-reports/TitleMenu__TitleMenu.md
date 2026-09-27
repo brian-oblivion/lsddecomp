@@ -13,7 +13,7 @@ The ctor (slot +0x008) for the new `TitleMenu` sibling class (allocated by
 (`Get_vtable_TaskCore()->slot08`, 4 args), installs this class's own vtable
 directly (rather than fetching it through another getter -- the base-class
 constructor chaining pattern already documented for
-`TaskCoreMethods::slotD8` in `include/code_2c054.h`), tears down an object
+`TaskCoreMethods::slotD8` in `include/Task.h`), tears down an object
 handed to it by the base ctor chain (`self->unk48`), stores its own
 `dreamSys` argument, zeroes one field, makes two calls through `dreamSys`'s
 own vtable (storing one result, forwarding the other's return value to the
@@ -64,7 +64,7 @@ presence anywhere in the project. Placed as one new block right before the
   is why this is a confident field boundary and not a guess).
 - `TitleMenuUnk48Obj`/`TitleMenuUnk48ObjMethods`: opaque, only `slot9C`
   (+0x09C, this function's own call, arg `-1`) typed. Deliberately a
-  SEPARATE local type from `include/code_2c054.h`'s `StreamTaskUnkB4Obj`
+  SEPARATE local type from `include/Task.h`'s `StreamTaskUnkB4Obj`
   (also a base-ctor-chain output at the same +0x048 offset on ITS class)
   since that type's own known slots don't include +0x09C and nothing ties
   the two classes together -- same independent-view policy used
@@ -79,13 +79,13 @@ presence anywhere in the project. Placed as one new block right before the
 - `BaseTaskCtorTable_3bb8c_c`: this function's own local view of
   `Get_vtable_TaskCore`'s return type, typing `slot08` (+0x008) as a 4-argument
   call (`self, arg1, arg2, arg3`). **This is the SAME real global,
-  `gTaskCoreMethods`, as `include/code_2c054.h`'s already-established
+  `gTaskCoreMethods`, as `include/Task.h`'s already-established
   `TaskCoreMethods`** (that header's own comment documents `Get_vtable_TaskCore`
   returning `&gTaskCoreMethods`, and its `slot08` is independently confirmed
   3-argument-plus-self by a byte-exact call in `StreamTask__StreamTask`, matching
   THIS call site's arity exactly -- both units agree on the real arity
   here, unlike the `GetSceneNodeMethods` situation elsewhere in this file). Kept
-  as a separate local declaration rather than `#include "code_2c054.h"`,
+  as a separate local declaration rather than `#include "Task.h"`,
   since each translation unit in this project gets its own extern
   prototype for a given external symbol and this unit does not otherwise
   need that header.

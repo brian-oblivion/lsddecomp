@@ -658,9 +658,9 @@ describes the measured gate-then-link mechanics; the game-level meaning
 of "nearby" (why `+/-0x4000` specifically, what kind of object `other`
 is) is not established. Held back from an actual rename because this
 symbol is referenced (in comments) from `include/DreamSys.h:895` and
-`include/code_2cc8c.h:752` -- two different units, both discussing this
+`include/TaskViewport.h:752` -- two different units, both discussing this
 function as cross-unit precedent (DreamSys.h for the vtable slot
-resolution, code_2cc8c.h for the `switch`-vs-`if` residue). Posted to
+resolution, TaskViewport.h for the `switch`-vs-`if` residue). Posted to
 the broadcast.
 
 ### Proposed field names (SceneNodeMethods, shared header)
@@ -689,7 +689,7 @@ Apply by type scope (edit `SceneNodeMethods`'s own definition in
 lists), per CLAUDE.md's shared-struct-hazard rule -- a whole-tree text
 replace of e.g. `slotA4` would corrupt every OTHER class's own
 identically-named, unrelated `slotA4` field (measured: `class_3bb8c_f.c`,
-`code_2cc8c_d.c`, `class_3bb8c_i.c`/`_j.c`/`_l.c` all have their own,
+`TaskViewport.c`, `class_3bb8c_i.c`/`_j.c`/`_l.c` all have their own,
 different `slotA4`).
 
 ## Round 55 (charlie): REVISITED (round 55) -- LENGTH closed exactly

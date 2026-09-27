@@ -29,8 +29,8 @@ only to match the real arity (three integer-class argument registers are
 consumed by the caller regardless). `pair` ($a2) is a caller-supplied
 `{s16 whole; s16 frac;}` pair, twice over (axis 0 at `+0x0`/`+0x2`, axis
 1 at `+0x4`/`+0x6`), read as a raw `s16 *` rather than a named struct --
-same shape and same precedent as `code_2cc8c_d.c`'s `Viewport__SetTwist` and
-`code_d294_c.c`'s `RatioToFixed12` (`code_2cc8c.h`'s own note on
+same shape and same precedent as `TaskViewport.c`'s `Viewport__SetTwist` and
+`code_d294_c.c`'s `RatioToFixed12` (`TaskViewport.h`'s own note on
 `Ratio16`: "a different unit's own local view of the same shape,
 not a shared type").
 
@@ -74,7 +74,7 @@ The `q = a/b; r = a%b; q2 = (r<<12)/b; ratio = (q<<12)+q2;` block is the
 project's already-established 20.12 fixed-point split-division idiom
 (one `div` reused for quotient+remainder via `mflo`/`mfhi`, then a SECOND
 `div` for the shifted remainder) -- confirmed live and matched at
-`code_2cc8c_d.c:Viewport__SetTwist` and referenced from
+`TaskViewport.c:Viewport__SetTwist` and referenced from
 `code_d294_c.c:RatioToFixed12`. Read straight off the two GTE-style
 overflow-check idioms (`bnez`/`break 7` for divide-by-zero, the
 `-1`/`0x80000000` pair check/`break 6` for `INT_MIN / -1`) that GCC 2.6.3

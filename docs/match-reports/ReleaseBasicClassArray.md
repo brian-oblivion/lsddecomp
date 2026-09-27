@@ -72,7 +72,7 @@ mechanics are its purpose.
 Evidence: walks `count` entries of a `BasicClass *` array, calls each
 element's vtable slot `+0x004` (`release`) and stores the returned pointer
 back into the slot. Every one of the six call sites outside this unit
-(`class_3bb8c_n.c`, `class_3bb8c_o.c`, `class_3bb8c_s.c`, `code_2cc8c_b.c`,
-`code_2cc8c_f.c`, plus `include/code_2cc8c.h`'s declaration) passes a
+(`class_3bb8c_n.c`, `class_3bb8c_o.c`, `class_3bb8c_s.c`, `TaskViewport.c`,
+`code_2cc8c_f.c`, plus `include/TaskViewport.h`'s declaration) passes a
 contiguous array of object pointers and an element count. "Release" is the
 slot's own established name in `BasicClassMethods`, not a new word.

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003EA48` on 2026-09-23 (tools/rename.py). Address 0x8003ea48.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. 7/7 words, full match.
+Unit: `TaskViewport`. Round 14, runner delta. 7/7 words, full match.
 
 ## Signature
 
@@ -31,7 +31,7 @@ void Viewport__SetPacketSize(Unk18Obj *self, s32 a1) {
 
 ## Header changes
 
-`include/code_2cc8c.h`: `Unk18Obj` gains `unk48` (`+0x048`), part of the
+`include/TaskViewport.h`: `Unk18Obj` gains `unk48` (`+0x048`), part of the
 same carve pass as `Viewport__SetMaxPackets`.
 
 ## Naming
@@ -44,15 +44,15 @@ Renamed from `Unk18Obj__SetUnk48`. Slot +0x050 `setUnk48`; see Viewport__SetMaxP
 
 ## Proposed field names (round 95, alpha)
 
-Viewport's `unk48` -> `packetSize`, slot `setUnk48` -> `setPacketSize`, this function -> `Viewport__SetPacketSize` (tier B; see Viewport__SetMaxPackets.md for the evidence and which factor is which). Slot caller outside this unit: code_2c054.c.
+Viewport's `unk48` -> `packetSize`, slot `setUnk48` -> `setPacketSize`, this function -> `Viewport__SetPacketSize` (tier B; see Viewport__SetMaxPackets.md for the evidence and which factor is which). Slot caller outside this unit: Task.c.
 
 
 ## Track 7 (round 100, echo, polish pass)
 
 ## Naming
 
-Renamed from `Viewport__SetUnk48` with `tools/rename.py`: tier B, the other half of `Viewport__SetMaxPackets`'s evidence (see that report). The field is now `packetSize` (include/Viewport.h; every accessor is in code_2cc8c_d.c). Parameter `value` -> `size`.
+Renamed from `Viewport__SetUnk48` with `tools/rename.py`: tier B, the other half of `Viewport__SetMaxPackets`'s evidence (see that report). The field is now `packetSize` (include/Viewport.h; every accessor is in TaskViewport.c). Parameter `value` -> `size`.
 
 ## Proposed field names
 
-Slot +0x050 `setUnk48` -> `setPacketSize` (caller outside this unit: code_2c054.c).
+Slot +0x050 `setUnk48` -> `setPacketSize` (caller outside this unit: Task.c).

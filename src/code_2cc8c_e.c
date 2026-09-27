@@ -2,7 +2,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "code_2cc8c.h"
+#include "TaskViewport.h"
 
 /*
  * code_2cc8c_e -- FadeBox's methods (include/FadeBox.h: a BoxFill whose

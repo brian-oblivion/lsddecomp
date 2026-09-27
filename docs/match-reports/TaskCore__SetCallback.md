@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CAEC` on 2026-09-24 (tools/rename.py). Address 0x8003caec.
 
-**Unit:** code_2cc8c · **Size:** 3 instructions
+**Unit:** TaskViewport · **Size:** 3 instructions
 
 ## What it does
 
@@ -22,7 +22,7 @@ A pure setter, establishing `Obj86B60::unk9C`/`unkA0` as an
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit code_2cc8c. 1 attempt.
+round 2026-09-02, runner echo, unit TaskViewport. 1 attempt.
 
 ## Naming (round 78, delta)
 
@@ -38,7 +38,7 @@ context argument verbatim, no other logic. Corroborated by
 `Obj86B60::unkA0` (`void *`, +0x0A0) -> `viewCallbackCtx`. Tier B (mechanics:
 a callback+context pair invoked by `TaskCore__RefreshViewValue`, hence
 "view"; not a guess about what the callback itself does). Grep shows
-`unk9C`/`unkA0` textual hits in class_3bb8c_n.c/class_3bb8c_q.c/code_2c054.c/
+`unk9C`/`unkA0` textual hits in class_3bb8c_n.c/class_3bb8c_q.c/Task.c/
 libsnd_decre.c (unrelated structs sharing the name), so proposal only.
 
 

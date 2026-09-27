@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C858` on 2026-09-24 (tools/rename.py). Address 0x8003c858.
 
-**Unit:** code_2cc8c · **Size:** 30 instructions
+**Unit:** TaskViewport · **Size:** 30 instructions
 
 ## What it does
 
@@ -46,7 +46,7 @@ confirms `unk3C == 1` is a real, meaningful state value (not just a
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit code_2cc8c. 2 attempts.
+round 2026-09-02, runner echo, unit TaskViewport. 2 attempts.
 
 ## Naming (round 78, delta)
 

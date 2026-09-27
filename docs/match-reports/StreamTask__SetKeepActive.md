@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003BE5C` on 2026-09-23 (tools/rename.py). Address 0x8003be5c.
 
-**Unit:** code_2c054 · **Size:** 2 instructions (0x8 bytes) · **Status:** MATCHED (2/2 words, whole-image SHA1 green), first attempt
+**Unit:** Task · **Size:** 2 instructions (0x8 bytes) · **Status:** MATCHED (2/2 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -44,7 +44,7 @@ return's delay slot", no residue.
 
 ## New struct/header knowledge
 
-Added `include/code_2c054.h`: this unit's own local view of the `StreamTask`
+Added `include/Task.h`: this unit's own local view of the `StreamTask`
 class (named `StreamTaskObj`/`StreamTaskObjMethods` here, independent of
 `GameApplication.h`'s same-named-concept `StreamTask`, per the `Entity.h` /
 `code_55dd4.h` precedent of keeping local views separate rather than editing
