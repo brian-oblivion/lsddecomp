@@ -60,3 +60,8 @@ Events 2 and 3 are `FRAMECLOCK_EVENT_RUNNING` and `FRAMECLOCK_EVENT_PAUSED`, a n
 ## Proposed field names (round 95, alpha)
 
 Viewport's `unk90` -> `clockEventCount` (tier A: this function increments it on every FrameClock event and InitDefaults zeroes it; nothing in this unit reads it).
+
+
+## Track 7 (round 100, echo, polish pass)
+
+Round 95's proposal applied: `unk90` -> `clockEventCount` (include/Viewport.h; the accessors are this function and InitDefaults, both in code_2cc8c_d.c).

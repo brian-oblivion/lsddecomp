@@ -746,3 +746,10 @@ s32 address the allocation arithmetic is written in):
     GsClearOt(0, 0, self->ot[0]);
     GsClearOt(0, 0, self->ot[1]);
 ```
+
+
+## Track 7 (round 100, echo, polish pass)
+
+## Constants
+
+`4 << otLength` -> `sizeof(GsOT_TAG) << otLength` (both uses): the tag array's byte size. Byte-identical although the expression is now unsigned. Fields `unk44`/`unk48` are now `maxPackets`/`packetSize`.

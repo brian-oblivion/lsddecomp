@@ -45,3 +45,14 @@ Renamed from `Unk18Obj__SetUnk48`. Slot +0x050 `setUnk48`; see Viewport__SetMaxP
 ## Proposed field names (round 95, alpha)
 
 Viewport's `unk48` -> `packetSize`, slot `setUnk48` -> `setPacketSize`, this function -> `Viewport__SetPacketSize` (tier B; see Viewport__SetMaxPackets.md for the evidence and which factor is which). Slot caller outside this unit: code_2c054.c.
+
+
+## Track 7 (round 100, echo, polish pass)
+
+## Naming
+
+Renamed from `Viewport__SetUnk48` with `tools/rename.py`: tier B, the other half of `Viewport__SetMaxPackets`'s evidence (see that report). The field is now `packetSize` (include/Viewport.h; every accessor is in code_2cc8c_d.c). Parameter `value` -> `size`.
+
+## Proposed field names
+
+Slot +0x050 `setUnk48` -> `setPacketSize` (caller outside this unit: code_2c054.c).

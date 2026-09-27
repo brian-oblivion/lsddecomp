@@ -35,3 +35,10 @@ Occupant of Viewport's +0x05C (`slot5C` in `include/Viewport.h`; also in gNodeGu
 ## Naming
 
 Renamed from `func_8003EA74` with `tools/rename.py`: tier C, `Class__func_xxxxx`, occupant of gViewportMethods +0x05C (and gNodeGuardedViewportMethods'). Empty body, no C caller of the slot.
+
+
+## Track 7 (round 100, echo, polish pass)
+
+## Naming
+
+Renamed from `Viewport__func_8003EA74` with `tools/rename.py`: tier A. The body is empty (`jr $ra; nop`), and an empty occupant's mechanics are its purpose, so the name says it does nothing and which slot of gViewportMethods (+0x05C) holds it. The form follows the project's other empty occupants (`NodeGuardedViewport__NoOpSlotB8`, `MoviePlayer__NoOpSlot5C`, `StreamTask__NoOpSlot88`). An empty body says nothing about the slot's arguments (DECOMPILATION_LEARNINGS), so the prototype keeps `(void)`. The slot keeps its offset name `slot5C`: nothing calls it.

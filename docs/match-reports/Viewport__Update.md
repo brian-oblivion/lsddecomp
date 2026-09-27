@@ -258,3 +258,10 @@ Sony's `GsOT *`, `otTags[2]` Sony's `GsOT_TAG *` (each header's `org`) and
 including Viewport.h takes Sony's headers after common.h. The `(GsOT *)`
 casts at GsClearOt, GsSortClear, GsDrawOt and drawNode's five sort calls and
 Update's `(PACKET *)` cast are gone. Byte-identical (whole image green).
+
+
+## Track 7 (round 100, echo, polish pass)
+
+## Constants
+
+`lightMode == 3` -> `lightMode == (GsLMODE_LOFF | GsLMODE_FOG)`: libgs's modes are 0 normal, 1 fog, 2 lighting off, and 3 is lighting off with fog; the body sets the fog exactly for the two modes with GsLMODE_FOG's bit. Byte-identical.
