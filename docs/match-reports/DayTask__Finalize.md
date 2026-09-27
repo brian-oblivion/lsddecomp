@@ -50,7 +50,7 @@ lw    $a0, 0x48($s1)         ; self->unk48
 ...(same shape)...            ; self->unk48->methods->slot4(self->unk48), result discarded
 lw    $a0, 0x44($s1)         ; self->unk44
 ...(same shape)...            ; self->unk44->methods->slot4(self->unk44), result discarded
-jal   TickDreamAuxSlots
+jal   ReleaseDreamAuxModels
  nop
 jal   GetTimedTaskMethods
  nop
@@ -78,7 +78,7 @@ void DayTask__Finalize(Obj865C8 *self) {
     self->unk40->methods->slot4(self->unk40);
     self->unk48->methods->slot4(self->unk48);
     self->unk44->methods->slot4(self->unk44);
-    TickDreamAuxSlots();
+    ReleaseDreamAuxModels();
     GetTimedTaskMethods()->dtor(self);
 }
 ```

@@ -32,7 +32,7 @@ void InitDreamAux(void) {
     }
 }
 
-void TickDreamAuxSlots(void) {
+void ReleaseDreamAuxModels(void) {
     DreamAuxSlot *slot = gDreamAuxSlots;
     u32 done;
 

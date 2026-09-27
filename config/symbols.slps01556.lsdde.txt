@@ -1076,7 +1076,7 @@ _svm_auto_kof_mode = 0x8008EA40;
 // reverb depth rather than a master volume; SpuVmInit now writes the fields.
 D_8008DEB0 = 0x8008DEB0;
 InitDreamAux = 0x8005C508; // type:func
-TickDreamAuxSlots = 0x8005C5E8; // type:func
+ReleaseDreamAuxModels = 0x8005C5E8; // type:func
 SetDreamAuxWorld = 0x8005C650; // type:func
 EnableTeleportsForKind = 0x8005C714; // type:func
 TickDreamAuxSlots2 = 0x8005C76C; // type:func

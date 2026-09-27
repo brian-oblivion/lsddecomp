@@ -95,7 +95,7 @@ void DayTask__Finalize(DayTask *self) {
     self->bgm->methods->release(self->bgm);
     self->dreamerTmd->methods->release(self->dreamerTmd);
     self->etcTim->methods->release(self->etcTim);
-    TickDreamAuxSlots();
+    ReleaseDreamAuxModels();
     GetTimedTaskMethods()->finalize((TimedTask *)self);
 }
 

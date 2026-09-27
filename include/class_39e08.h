@@ -31,14 +31,14 @@ extern void *BMemPMgrAlloc(s32 size);
 
 /* src/code_4cd08.c; DayTask's finalize calls it after releasing its
  * resources. */
-extern void TickDreamAuxSlots(void);
+extern void ReleaseDreamAuxModels(void);
 
 /* src/code_39094.c: the "SND\\SE" sound bank path, which DayTask's ctor
  * passes as TimedTask's soundBankPath. */
 extern char *GetSoundEffectDir(s32 unused); /* arity-ok: the definition takes no parameter and reads no argument register, but this dead argument IS byte-load-bearing -- retail emits `move a0,zero` at 0x800496A8 ahead of the jal at 0x800496B0 */
 
 /* src/code_4cd08.c; DayTask's ctor calls it, and its finalize
- * TickDreamAuxSlots. */
+ * ReleaseDreamAuxModels. */
 extern void InitDreamAux(void);
 
 /* "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD", the files DayTask's ctor loads. */

@@ -60,7 +60,7 @@ Two derivation points worth recording:
   `beqz $s0, .L8005C68C` (`f7ff0012`), the `s32` build emitted
   `blez $s0, ...` (`f7ff001a`). GCC 2.6.3 lowers a *signed* `for (i=0;i<1;i++)`
   to a `<=0` backward test (since it cannot assume `i` never goes negative)
-  but a matched sibling in this same unit, `TickDreamAuxSlots`
+  but a matched sibling in this same unit, `ReleaseDreamAuxModels`
   (`for (done = 0; done < 1; done++)` with `u32 done`), already demonstrated
   the `beqz` form for the identical "run once" shape. Switching `i` to `u32`
   reproduced `beqz` and closed the last word. **This unit now has two
@@ -102,7 +102,7 @@ Add to the corpus: **an unsigned loop counter is required for the
 backward branch** -- a signed counter of the same shape compiles to `blez`
 instead, one word different, easy to miss since both are logically correct.
 Two independent instances now confirm it in this unit alone
-(`TickDreamAuxSlots`, `SetDreamAuxWorld`).
+(`ReleaseDreamAuxModels`, `SetDreamAuxWorld`).
 
 ## Naming
 

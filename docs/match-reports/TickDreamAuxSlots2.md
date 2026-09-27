@@ -3,7 +3,7 @@
 > Renamed from `func_8005C76C` on 2026-09-21 (tools/rename.py). Address 0x8005c76c.
 
 Unit `code_4cd08` ("DreamAux"). 26/26 words, `0x4CF6C`-`0x4CFD4`. Whole-image
-`build-and-verify.sh` green. Same shape as `TickDreamAuxSlots`, over `gDreamAuxSlots2`
+`build-and-verify.sh` green. Same shape as `ReleaseDreamAuxModels`, over `gDreamAuxSlots2`
 instead of `gDreamAuxSlots` (see that report for the object/vtable/loop-shape
 derivation -- not repeated here).
 
@@ -30,7 +30,7 @@ void TickDreamAuxSlots2(void)
 
 ## Residue: prologue spill/init INTERLEAVING, not just store order
 
-The first, direct port of `TickDreamAuxSlots`'s shape (`DreamAuxSlot *slot =
+The first, direct port of `ReleaseDreamAuxModels`'s shape (`DreamAuxSlot *slot =
 gDreamAuxSlots2; u32 done;`, initializers at declaration) built clean but only
 21/26 -- the two callee-save spills and their register inits were emitted in
 the wrong relative order:
@@ -46,7 +46,7 @@ sw   ra, 0x18(sp)                   sw   ra, 0x18(sp)
 ```
 
 Retail interleaves per-variable (spill `s1`, init `s1`, spill `s0`, init
-`s0`), in the OPPOSITE variable order from `TickDreamAuxSlots`'s retail (which is
+`s0`), in the OPPOSITE variable order from `ReleaseDreamAuxModels`'s retail (which is
 slot/`s0` first, done/`s1` second) even though the two functions are
 otherwise structurally identical. Per the head's broadcast on
 `Pad__DispatchEvents` (Lever 1: prologue callee-save store order is not reachable
@@ -70,7 +70,7 @@ this is the same class of residue before reshaping further:
   declarator (not just cosmetically -- GCC 2.6.3 apparently schedules
   spill/init pairs for straight assignment statements as a unit, in
   STATEMENT order, whereas declarator initializers get scheduled by some
-  other heuristic that produced `TickDreamAuxSlots`'s order regardless of which
+  other heuristic that produced `ReleaseDreamAuxModels`'s order regardless of which
   declarator came first).
 
 ## Proposed learning
@@ -88,7 +88,7 @@ this is the same class of residue before reshaping further:
 
 ## Naming
 
-**TickDreamAuxSlots2** — tier A. Identical mechanics to `TickDreamAuxSlots`,
+**TickDreamAuxSlots2** — tier A. Identical mechanics to `ReleaseDreamAuxModels`,
 over `gDreamAuxSlots2` instead of `gDreamAuxSlots` (see that report/entry for
 the shared derivation). Tier A for the same reason: the tick pass over the
 slot family IS the function's purpose. Called from `ObjM__TeardownStyle`

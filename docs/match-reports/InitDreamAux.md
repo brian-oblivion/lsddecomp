@@ -71,7 +71,7 @@ audio-stream-request object:
    `code_171e0.c` as a plain 3-word field setter) with `flag=0`,
    `name="ETC\\SYMSPY.MOM"`, `mode=1`.
 3. A `for (i = 0; i < 1; i++)` loop (see the "loop that only runs once" note
-   in `TickDreamAuxSlots`'s report -- same confirmed idiom) that calls
+   in `ReleaseDreamAuxModels`'s report -- same confirmed idiom) that calls
    `New_ModelData((struct ResourceSource *)&req)` and stores the result into `gDreamAuxSlots[0].obj`,
    then overwrites `req.name` with `"ETC\\SYMDOG.MOM"`. Because the loop
    only runs once, that second name write is dead in THIS retail build --
@@ -138,7 +138,7 @@ sw    v0, %lo(gDreamAuxSlots)(at)   ; <-- %lo folded into the store's own
 Both compute the identical target address; mine is one instruction shorter.
 This is the ONLY residue in the function -- the two preceding loops, the
 `ResourceRequest__Set` call, and the loop-control shape of the final loop (see
-`TickDreamAuxSlots`'s report for why `for (i=0;i<1;i++)` is the right shape, not
+`ReleaseDreamAuxModels`'s report for why `for (i=0;i<1;i++)` is the right shape, not
 decompiler noise) are all byte-exact already (confirmed via `asm-differ`,
 which shows the first ~46 instructions matching before this one diverges).
 
