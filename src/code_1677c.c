@@ -108,7 +108,9 @@ GameApplication *New_GameApplication(GameApplicationConfig *arg) {
  * object's owned DreamSys from it, dispatches one DreamSys init call, then
  * runs this class's own slot40 (GameApplication__SeedRandom) once. */
 void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *arg) {
-    ResourceSourceRequest req;
+    /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
+     * frame by 8. */
+    ResourceRequest req;
 
     GetApplicationMethods()->ctor((Application *)self, arg->dataSource);
     self->methods = GetGameApplicationMethods();

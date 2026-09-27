@@ -315,3 +315,13 @@ ctor's own descriptor, read by LinkResource__LinkResource as `src->buffer`
 and `src->name`). The body now writes `req.src.buffer = NULL` and
 `req.src.name` and passes `&req.src` with no cast; byte-exact. The 0x10
 size is kept (8 changes the frame, measured on StageMap__PopulateSlotCells).
+
+## Track 6 (round 97, alpha): the request local is ResourceRequest
+
+`ResourceSourceRequest` is deleted. The local is now `ResourceRequest req;`
+(include/FileResource.h, 0x0C) with `mode` left unset; the body is
+unchanged (`req.src...` writes, `&req.src` to New_LinkResource). A plain
+`ResourceSource` (8 bytes) was measured to shrink this function's frame by
+8 and move every callee-save slot, and an unused pad local is dropped by
+cc1, so ResourceRequest is the smallest existing type that keeps the frame.
+Byte-exact. Table and details: ResourceRequest__Set.md, round 97 second job.

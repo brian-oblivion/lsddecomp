@@ -100,7 +100,9 @@ typedef struct ResourceSource {
 } ResourceSource;
 
 /* The descriptor ResourceRequest__Set fills (src/code_171e0.c) and callers
- * pass on as its `src`. Every caller sets mode 1, and no ctor reads it. */
+ * pass on as its `src`. Every ResourceRequest__Set caller sets mode 1; the
+ * callers that fill `src` by hand (StageMap__PopulateSlotCells, DayTask__DayTask,
+ * GameApplication__GameApplication) leave it unset, and no ctor reads it. */
 typedef struct ResourceRequest {
     /* +0x00 */ ResourceSource src;
     /* +0x08 */ s32 mode;
@@ -108,16 +110,6 @@ typedef struct ResourceRequest {
 
 /* Fill *req and return it (src/code_171e0.c). */
 ResourceRequest *ResourceRequest__Set(ResourceRequest *req, void *buffer, char *name, s32 mode);
-
-/* The four-word local callers outside src/GraphicsResources.c build that
- * descriptor in (StageMap__PopulateSlotCells, DayTask__DayTask,
- * GameApplication__GameApplication, each for New_LinkResource). Only `src`
- * is ever written.
- * MATCHING: 0x10 bytes; ResourceSource's 8 changes the callers' frames. */
-typedef struct ResourceSourceRequest {
-    /* +0x00 */ ResourceSource src;
-    /* +0x08 */ u8 pad8[0x10 - 0x8];
-} ResourceSourceRequest;
 
 extern FileResourceMethods gFileResourceMethods;
 extern FileResourceMethods *GetFileResourceMethods(void);
