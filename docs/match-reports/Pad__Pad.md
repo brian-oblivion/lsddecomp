@@ -54,3 +54,12 @@ against `gBasicClassMethods` (`BasicClassMethods`) shows overrides
 convention. Confirmed, not guessed: this body's own call to `PadInit` on the
 first live instance is what establishes the `Pad` class hypothesis in the
 first place.
+
+## Round 95 (delta): Sony's declarations
+
+`include/class_16334.h` now takes `PadInit`/`PadRead`/`PadStop` from Sony's
+`<libetc.h>` instead of local prototypes (`PadInit(void *)` became Sony's
+`PadInit(int mode)`). The ctor's first parameter forwards straight to
+`PadInit`, so `New_Pad`, `Pad__Pad` and the Pad ctor slot now take
+`s32 mode` where the body above says `void *arg1`. Byte-identical; whole-image
+SHA1 unchanged.
