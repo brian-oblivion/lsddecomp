@@ -44,7 +44,7 @@ void FadeBox__StartFadeUp(FadeBoxObj *self, s32 a1, s32 a2, s32 a3) {
     if (self->altMode != 0) {
         self->unk80--;
     } else {
-        self->methods->slotB8(self, 1, &D_8006EAA8[a2 * 3]);
+        self->methods->slotB8(self, 1, &gFadeBoxBlackColors[a2 * 3]);
     }
     self->state = 2;
 }
@@ -158,7 +158,7 @@ register swap, which is why the drift guard fires here and not there.
    direct disassembly, byte-identical to the baseline.
 4. Named local `entry` for the table-address computation, declared at
    the top of the else-block and used in the `slotB8` call
-   (`void *entry = &D_8006EAA8[idx * 3]; ...slotB8(self, 1, entry);`):
+   (`void *entry = &gFadeBoxBlackColors[idx * 3]; ...slotB8(self, 1, entry);`):
    no change.
 
 None of the four moved the delay-slot filler choice at all -- confirmed
@@ -268,7 +268,7 @@ void FadeBox__StartFadeUp(FadeBoxObj *self, s32 a1, s32 a2) {
     if (self->altMode != 0) {
         self->unk80--;
     } else {
-        self->methods->slotB8(self, 1, &D_8006EAA8[idx * 3]);
+        self->methods->slotB8(self, 1, &gFadeBoxBlackColors[idx * 3]);
     }
     self->state = 2;
 }
@@ -353,14 +353,14 @@ unchanged by this rename). `FadeBoxMethods::startFadeDefault` (`+0x0D8`). Mirror
 of `FadeBox__StartFadeDown` (see that report's naming note for the
 pairing evidence): guards on `state == 0`, and either just decrements the
 countdown (`altMode != 0`, i.e. "resume") or dispatches the FIXED
-`D_8006EAA8[idx * 3]` color entry and sets `state = 2`. "Default" reflects
-`D_8006EAA8` being the same table `FadeBox__Stop` falls back to when
+`gFadeBoxBlackColors[idx * 3]` color entry and sets `state = 2`. "Default" reflects
+`gFadeBoxBlackColors` being the same table `FadeBox__Stop` falls back to when
 `unk78 == 0xF` (its own documented "use the fixed table" sentinel).
 
 ## Track 4 (2026-09-26, round 87, echo)
 
 Renamed from `FadeBox__StartFadeDefault` to `FadeBox__StartFadeUp`.
-"Default" named the colour source (`D_8006EAA8`, whose entries are all
+"Default" named the colour source (`gFadeBoxBlackColors`, whose entries are all
 black in the retail bytes); the mechanics are the fade direction. Unless
 `altMode` is set it sets the box colour to black, and `step` stays positive
 (`FadeBox__Stop` restores a negated one, `FadeBox__Reset` sets 10), so

@@ -47,7 +47,7 @@ a byte-offset shift.
 ## Misread caught before committing
 
 First reading treated `a2` as a MODE flag (0 vs nonzero) selecting between
-two fixed tables (`D_8008A924`/`D_8006EAA8`). Re-reading the raw
+two fixed tables (`D_8008A924`/`gFadeBoxBlackColors`). Re-reading the raw
 instructions closely: retail's `bnez $a2, .L80040628` branches on `a2`
 ITSELF being nonzero, and when `a2 == 0` the fallthrough OVERWRITES `a2`
 with `&D_8008A924` before the shared call -- i.e. `a2` isn't a flag at

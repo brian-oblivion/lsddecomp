@@ -31,7 +31,7 @@ void FadeBox__FadeBox(FadeBox *self, void *size, s32 channels, s32 pri) {
     if (channels != 0) {
         color = &gFadeBoxMaskColors[channels * 3];
     } else {
-        color = D_8006EAA8;
+        color = gFadeBoxBlackColors;
     }
     base->ctor((BoxFill *)self, size, color, pri);
     self->methods = GetFadeBoxMethods();
@@ -101,7 +101,7 @@ void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 a
     if (self->altMode != 0) {
         self->ticksLeft--;
     } else {
-        self->methods->setColor(self, 1, &D_8006EAA8[channels * 3]);
+        self->methods->setColor(self, 1, &gFadeBoxBlackColors[channels * 3]);
     }
     self->state = 2;
 }
@@ -163,7 +163,7 @@ void FadeBox__Stop(FadeBox *self, BasicClass *source) {
         event = 6;
         if (self->altMode != 0) {
             if (self->channels == 0xF) {
-                methods->setColor(self, 1, D_8006EAA8);
+                methods->setColor(self, 1, gFadeBoxBlackColors);
             }
             methods->setSemiTransOn(self, 0);
         }
@@ -178,7 +178,7 @@ void FadeBox__Stop(FadeBox *self, BasicClass *source) {
 
 void *FadeBox__GetColor(FadeBox *self) {
     if (self->channels == 0xF) {
-        return D_8006EAA8;
+        return gFadeBoxBlackColors;
     }
     return &gFadeBoxMaskColors[self->channels * 3];
 }

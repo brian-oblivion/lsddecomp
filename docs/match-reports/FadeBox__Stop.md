@@ -28,7 +28,7 @@ void FadeBox__Stop(FadeBoxObj *self, void *a1) {
         mode = 6;
         if (self->altMode != 0) {
             if (self->unk78 == 0xF) {
-                methods->slotB8(self, 1, D_8006EAA8);
+                methods->slotB8(self, 1, gFadeBoxBlackColors);
             }
             methods->slot64(self, 0);
         }

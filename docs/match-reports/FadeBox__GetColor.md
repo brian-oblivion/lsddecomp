@@ -9,7 +9,7 @@ Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::getColor` (`+0x0E4`).
 ```c
 void *FadeBox__GetColor(FadeBoxObj *self) {
     if (self->unk78 == 0xF) {
-        return D_8006EAA8;
+        return gFadeBoxBlackColors;
     }
     return &gFadeBoxMaskColors[self->unk78 * 3];
 }
@@ -23,7 +23,7 @@ elsewhere in this unit as a mode/flags word tested against `0xF`).
 ## Naming (round 61, track 3)
 
 **`FadeBox__GetColor`** -- tier A. `FadeBoxMethods::getColor`
-(`+0x0E4`). Pure getter: returns `D_8006EAA8` (the fixed/default table)
+(`+0x0E4`). Pure getter: returns `gFadeBoxBlackColors` (the fixed/default table)
 when `unk78 == 0xF`, else `&gFadeBoxMaskColors[unk78 * 3]` (the indexed table) --
 the same two tables `FadeBox__StartFadeDown`/`StartFadeUp`
 write through `slotB8`. A pure leaf whose mechanics ARE its purpose (a
