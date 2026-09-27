@@ -919,3 +919,50 @@ The NON_MATCHING body now stores `_svm_voice[D_8008EA26[0]].unk04/unk1B`; normal
 ## Types (round 98, alpha)
 
 This unit's `D8008E978Entry` is now `<libsnd.h>`'s `VagAtr` and `ObjE970` is `VabHdr` (unk4 -> `center`, unk5 -> `shift`, unk12 -> `pbmin`, unk13 -> `pbmax`, ObjE970.unk18 -> `mvol`); preserved bodies above keep the old spellings. See SpuVmAlloc.md, "Unit banner history".
+
+## Naming (round 99, echo, track 7): the vmanager voice masks take Sony's names
+
+Every global below is read only by libsnd code (`progress.py` counts every
+accessor as library), so it takes Sony's name or none. The names come from
+`tools/sonydata.py`'s aligner, run on the placeholders (it only lists
+game-named data by itself): each of our accessors aligned opcode by opcode
+against the same function in every SDK object, then the relocation on the
+aligned Sony instruction names the symbol. Every alignment at ratio >= 0.95
+(discs 3.3, 3.5, 3.6) agrees; only lower-ratio 3.0 alignments disagree. None
+of them lands on 3.5 vmanager.o's own bss layout (its copies would be at
+0x8008DF38..DF42 from the `_svm_sreg_buf` anchor), so these are weak
+definitions Sony's linker placed elsewhere, the `_svm_auto_kof_mode` case.
+The access is the verdict. Tier: Sony's name.
+
+| old | new | Sony accessors aligned |
+| --- | --- | --- |
+| `D_8008E22C` | `_svm_okon2` | SpuVmFlush 1.00 (3.3), SpuVmKeyOnNow/vmNoiseOn 0.99 |
+| `D_8008E230` | `_svm_orev1` | SpuVmFlush 1.00, SpuVmKeyOnNow/vmNoiseOn 0.99 |
+| `D_8008E234` | `_svm_orev2` | same |
+| `D_80090C60` | `_svm_okof1` | SpuVmFlush 1.00, SpuVmKeyOnNow/vmNoiseOn 0.99 |
+| `D_80090C64` | `_svm_okof2` | same |
+| `D_8008E8C0` | `_svm_stereo_mono` | SpuVmKeyOnNow, vmNoiseOn, SetAutoVol, SetAutoPan 0.99 (libsnd/vm_g.o weak bss) |
+
+What the body shows they do: `_svm_okon1/2` gather the voices keyed on this
+flush (voices 0-15 in 1, 16-23 in 2), `_svm_okof1/2` the voices keyed off,
+with every key-on cleared out of the key-off masks; `_svm_orev1/2` the
+voices routed to reverb, set or cleared by bit 2 of `_svm_cur`'s +0x14 byte;
+`_svm_stereo_mono == 1` makes both pans equal (mono).
+
+**Not renamed: `D_8008E228`, Sony's `_svm_okon1`.** Same evidence as its
+pair, but `rename.py` refuses it: `sony_data_owner` takes `dc_cr`'s size
+(pinned at 0x8008E224, libpress/vlc2) as the MAXIMUM over every disc, 8 on
+disc 3.0, while the object actually placed is disc 3.3's vlc2, where
+`dc_cr` is 4 bytes. So the tool thinks 0x8008E228 is `dc_cr+4`. Proposed to
+the head as a tool fix (use the placed disc's size); then `rename.py
+D_8008E228 _svm_okon1`.
+
+**Not renamable: the `_svm_cur` offsets.** `D_8008EA10`, `D_8008EA11`,
+`D_8008EA16`, `D_8008EA17`, `D_8008EA19`, `D_8008EA1A`, `D_8008EA20`,
+`D_8008EA22` and `D_8008EA26` lie inside Sony's `_svm_cur` (pinned at
+0x8008EA0C, 0x20 bytes in 3.5's vm_g.o), and `rename.py` refuses them:
+their spelling is `_svm_cur.<field>` once the struct is typed. That is a type
+job (track 6), across this unit, `code_179d8_m.c` and
+`libsnd_vm_vol_ut_key_ut_keyv.c`, and the `D_8008EA26[]` incomplete-array
+declaration is load-bearing here (see the round 65 section), so the typed
+spelling has to be measured, not assumed. Proposed to the head.

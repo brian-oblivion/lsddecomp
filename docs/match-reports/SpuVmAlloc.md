@@ -1119,3 +1119,17 @@ The NON_MATCHING body moves from byte-pointer arithmetic over per-field symbols 
 `src/code_179d8_l.c`'s banner was rewritten as documentation in round 98 (track 6); the history it carried is kept here. `code_179d8_l`/`code_179d8_m` split what was one uncarved 24-function remainder (carved round 24, 2026-09-08); the split was a staffing cut, not a density one, and the unit owns no jump table and no rodata attach (checked at carve time). Round 74 (track 2) identified 9 of its 12 functions as Sony's own `libsnd/vmanager` source by shape/fingerprint match against the disc-3.3 SDK; they carry Sony's names, and are built as game C only because retail's copy diverges from the SDK reference build (see each function's `## Naming` section). `ServiceSoundCueSet` is the unit's one game-style name, confirmed tier A against `DreamSys`'s `cueServiceActive` field. All four toolchain blockers the unit was once screened against are RESOLVED project-wide (CLAUDE.md).
 
 Round 98 also retired the unit's local types: `D8008E978Entry` (the `_svm_tn` record) is `<libsnd.h>`'s `VagAtr` field for field (+0x4 `center`, +0x5 `shift`, +0xC `pbmin`, +0xD `pbmax`, +0x10/+0x12 `adsr1`/`adsr2`, 0x20 bytes; `code_179d8_m.c` already declared `_svm_tn` so); `ObjE970` (`_svm_vh`) is `VabHdr`, its +0x18 byte `mvol`; the local `SsScore` view (+0x74/+0x76) moved onto `include/SsScore.h`; and this unit's `D_8006DAD4` is `SvmData.h`'s `SpuRegs *` (vmNoiseOn2's `[0xCA]`/`[0xCB]` halfwords are `noiseOn[0]`/`noiseOn[1]`). Zero bytes changed.
+
+## Naming (round 99, echo, track 7)
+
+`D_8008E9D0` -> **`spuVmMaxVoice`**, Sony's name, via `rename.py`: the voice
+count the allocator scans (`idx < spuVmMaxVoice`) and the fallback voice
+when none is free. libsnd/vm_g.o weak bss (3.5: +0x0, 1 byte), placed
+elsewhere by Sony's linker; every aligned access at ratio >= 0.95, across 16
+vmanager functions on discs 3.3, 3.5 and 3.6 (SpuVmFlush, SpuVmPitchBend,
+SpuVmNoiseOn, SsUtKeyOn ... all 1.00), names it. The preserved bodies above
+keep the old spelling.
+
+`D_8008EA1B` stays: it is `_svm_cur+0xF` (the key-on priority), inside the
+pinned `_svm_cur`, so `rename.py` refuses it. See `SpuVmKeyOnNow.md`,
+round 99 naming.

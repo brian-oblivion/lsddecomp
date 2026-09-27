@@ -706,3 +706,16 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 The NON_MATCHING body drops its `idx52`/`li` byte offsets for `_svm_voice[(u8)a3].unk04/unk1B/unk02` and `_svm_voice[(u16)i].unk1B`; compiled length 107 -> 108 of 112, mnemonic ratio vs retail 0.831 -> 0.864. Still a stall.
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body now stores `_svm_sreg_buf[a0].unk2 = a2` / `.unk0 = a1` in place of `*(u16 *)(D_8008D7F2 + off16)` / `D_8008D7F0 + off16` (`off16` is gone). This moved it closer to retail again: its prologue now schedules exactly as retail's first 16 words (mnemonic ratio 0.864 -> 0.909).
+
+## Naming (round 99, echo, track 7)
+
+`D_8006DAD4` -> **`_svm_sreg`**, via `rename.py`. It is libsnd/vmanager.o's
+first `.data` word on disc 3.5, and the layout lands: retail's bytes from
+0x8006DAD4 equal that object's `.data` (0x1F801C00, the SPU register base,
+then the note2pitch table; 32 bytes compared). It is static in the 3.3 and
+3.5 objects, so they name nothing; disc 3.6 split vmanager into smaller
+objects and made the same word a global, `_svm_sreg` in `vm_f.o` (value
+0x1F801C00), which `ut_vvol.o`'s SsUtGetVVol reads by that name, aligned
+1.00 against ours. Tier: Sony's name (3.6's spelling of the same variable).
+The type stays `SvmData.h`'s `SpuRegs *`; this body's writes are
+`_svm_sreg->noiseOn[0]` / `[1]`.
