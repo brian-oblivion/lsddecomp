@@ -35,7 +35,7 @@ Per-unit debt (track 8), over game bodies:
     `#define` and `enum` lines -- the ones a reader has to decode;
   - rawoff: byte-pointer casts `(u8 *)`, `(s8 *)`, `(char *)`, the signature
     of offset arithmetic that should be a field access;
-  - m2c: m2c-style local names (`var_s0`, `temp_v0`, `sp10`, `arg0`),
+  - m2c: m2c-style local names (`var_s0`, `temp_v0`, `sp10`, `arg0`; m2c writes stack slots in uppercase hex, so `speed` is not one),
     counted once per function they appear in;
   - history: project history inside comments, `round NN` and retail
     addresses `0x800xxxxx` (the whole file, headers too: operator decision
@@ -138,7 +138,7 @@ def placeholder_types():
 
 
 # --- per-unit debt ----------------------------------------------------------
-M2C_RE = re.compile(r"\b(var_[a-z][0-9a-z_]*|temp_[a-z][0-9a-z_]*|sp[0-9A-Fa-f]{2,3}|arg[0-9]+)\b")
+M2C_RE = re.compile(r"\b(var_[a-z][0-9a-z_]*|temp_[a-z][0-9a-z_]*|sp[0-9A-F]{2,3}|arg[0-9]+)\b")
 RAWOFF_RE = re.compile(r"\(\s*(?:u8|s8|char|u_char|unsigned char|signed char)\s*\*\s*\)")
 NUM_RE = re.compile(r"(?<![\w.])(0[xX][0-9A-Fa-f]+|\d+)[uUlL]*(?![\w.])")
 UNK_RE = re.compile(r"(?:->|\.)unk_?0?x?[0-9A-Fa-f]+\b")
