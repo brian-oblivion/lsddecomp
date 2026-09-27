@@ -172,7 +172,7 @@ byte-exact first half, and useful for whoever picks this back up.
   `unk6`) typed — the rest is unproven padding.
 - `sScaleStepUpSlow`, `sScaleStepUpFast`, `sScaleStepDownSlow`, `sScaleStepDownFast` — four static
   instances of `EntryDesc866E8`, addresses confirmed 0xC apart. The
-  existing `sScaleOneStep` (`extern s32 sScaleOneStep[3]`, declared by an
+  existing `sScaleOne` (`extern s32 sScaleOne[3]`, declared by an
   earlier round from `StageMap__ResetCellScale`) is a plausible fifth entry of the
   same table by the same stride, but is left independently declared —
   nothing in this unit reaches it through the `EntryDesc866E8` type.

@@ -2983,4 +2983,4 @@ sScaleStepUpSlow = 0x8008699C;
 sScaleStepUpFast = 0x800869A8;
 sScaleStepDownSlow = 0x800869B4;
 sScaleStepDownFast = 0x800869C0;
-sScaleOneStep = 0x800869CC;
+sScaleOne = 0x800869CC;

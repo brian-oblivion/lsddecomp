@@ -425,7 +425,7 @@ void StageMap__AddScaleStepToCell(StageMap *self, GridCell *item) {
 }
 
 void StageMap__ResetCellScale(StageMap *self, GridCell *item) {
-    item->methods->updateScale(item, 1, sScaleOneStep);
+    item->methods->updateScale(item, 1, sScaleOne);
 }
 
 void StageMap__ForEachSlot(StageMap *self, StageMapCellFn arg1, ChunkSlotFn arg2) {
