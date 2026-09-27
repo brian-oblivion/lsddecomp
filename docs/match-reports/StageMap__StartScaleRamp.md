@@ -148,7 +148,7 @@ rate_le:
     if (flag == 0) {
         goto store;
     }
-    table = &D_800869C0;
+    table = &sScaleStepDownFast;
 store:
     self->unk1E4 = table;
 merge:
@@ -170,7 +170,7 @@ byte-exact first half, and useful for whoever picks this back up.
 
 - New type `EntryDesc866E8`: a 0xC-byte struct, only `+0x006` (`s16`,
   `unk6`) typed — the rest is unproven padding.
-- `sScaleStepUpSlow`, `sScaleStepUpFast`, `sScaleStepDownSlow`, `D_800869C0` — four static
+- `sScaleStepUpSlow`, `sScaleStepUpFast`, `sScaleStepDownSlow`, `sScaleStepDownFast` — four static
   instances of `EntryDesc866E8`, addresses confirmed 0xC apart. The
   existing `D_800869CC` (`extern s32 D_800869CC[3]`, declared by an
   earlier round from `StageMap__ResetCellScale`) is a plausible fifth entry of the

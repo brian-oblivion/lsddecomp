@@ -100,7 +100,7 @@ struct SplitCoord2 {
 extern Ratio16 sScaleStepUpSlow[3];
 extern Ratio16 sScaleStepUpFast[3];
 extern Ratio16 sScaleStepDownSlow[3];
-extern Ratio16 D_800869C0[3];
+extern Ratio16 sScaleStepDownFast[3];
 
 /* 1/1, 1/1, 1/1: the scale StageMap__ResetCellScale sets on every cell. */
 extern Ratio16 D_800869CC[3];

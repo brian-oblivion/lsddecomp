@@ -390,7 +390,7 @@ rate_le:
     if (flag == 0) {
         goto store;
     }
-    table = D_800869C0;
+    table = sScaleStepDownFast;
 store:
     self->scaleStep = table;
 merge:
