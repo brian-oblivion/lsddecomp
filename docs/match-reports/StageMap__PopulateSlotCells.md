@@ -876,3 +876,42 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__LoadElementResources` -> `StageMap__PopulateSlotCells` (`python3 tools/rename.py StageMap__LoadElementResources StageMap__PopulateSlotCells`, tier B): links the slot's loaded chunk header's placements and models into its cells.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Unit-local views. `LinkResEntry` is gone: it was a view of TmdModel read only
+for its +0x010, and the body now reads `((TmdModel *)(*slot)->model)->object`
+(include/TmdModel.h), cast to `s32` for SceneNode's `tmd` and to `u_long` for
+Sony's `GsLinkObject4`. The comment that stood on it, moved here: *"PlacementGrid__ResolveEntry's
+non-0/non-(-1) return value (what LinkResource__GetModel returns): a TmdModel
+(include/TmdModel.h), read only for its +0x010, TmdModel's `object`. A view of
+TmdModel, left for that class (round 89, LinkResource's unification did not
+retype it)."* `BE54LoadReq.field0` is `buffer` (tier A: it is the first word of
+New_LinkResource's descriptor, code_33808.c's `Src6F240 { void *buffer; char
+*name; }`, and holds the address of the chunk header's model block). The type
+keeps its placeholder name (track 6); its 0x10 size is kept, not measured as
+load-bearing. Byte-identical.
+
+Sony's `GsLinkObject4` now comes from `<libgs.h>` (the unit takes libgte,
+libgpu, libgs after common.h) instead of a local `(s32, void *, s32)`
+prototype; the cell is passed as `(GsDOBJ2 *)&(*slot)->attribute`, SceneNode's
++0x010..+0x01C being GsDOBJ2's attribute/coord2/tmd/id. Byte-identical.
+
+Parameters and locals, tier A: `entry` -> `slot`, `hdr` -> `loader`, `info`/`info2` -> `header`/`header2` (the LbdFileHeader; two locals, MATCHING), `target` -> `grid` (the PlacementGrid), `res` -> `oldResource`, `slot` -> `cell` (a `GridCell **`), `base` -> `cells`, `gpu` -> `coord`, `vec` -> `param`, `b`/`c`/`d` -> `x`/`y`/`z`, `h1` -> `rotY`, `idxVal` -> `model` (the resolver's return: 0 end, -1 no model, else the TmdModel), `flagBit` -> `hidden`, `off1` -> `cellOff`, `off2` -> `overflowOff`, `outBuf` -> `rec`, `req` -> `src`, `flags10a`/`flags10` -> `attr`, `next` -> `overflow`.
+
+Constants: 0x80000000 -> Sony's `GsDOFF` (libgs.h, `1<<31`: the bit StageMap's drawn window clears), 0x640 -> `STAGE_SLOT_LATTICE_CELLS * sizeof(GridCell *)` (the first overflow cell), `+= 4` -> `+= sizeof(GridCell *)`.
+
+Measured and left: walking `cells` by index instead of byte offset (`&slot->cells[cellOff]`, `cellOff++`, overflow from 400) does not build byte-identical (the image changes size), so the byte offsets stay, with a `MATCHING` note. The two comments that stood on the function and its local struct, moved here verbatim:
+
+```c
+/* MATCH, round 73 (bravo): 150/150. The 142/150 residue carried since
+ * round 40 (`info` in $a1 where retail has $v0) was ONE `info` local
+ * assigned on both sides of the slot4 call. Two locals (`info`, `info2`)
+ * make each block-local, so local-alloc ties each to its addu result.
+ * See docs/match-reports/StageMap__PopulateSlotCells.md. */
+/* StageMap__PopulateSlotCells (populateSlotCells, +0x104) -- own local view of the
+ * records reached only from here. Kept in this .c, not class_3bb8c.h: none
+ * of the 11 sibling units sharing that header touch these. */
+```
+
+The barrier's two-line comment became `/* MATCHING: keeps the rec.x/.y/.z loads below the coord2 load */` (evidence in "asm sites" above).

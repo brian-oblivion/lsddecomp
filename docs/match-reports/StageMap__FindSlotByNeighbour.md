@@ -132,3 +132,7 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__FindElemByUnk32` -> `StageMap__FindSlotByNeighbour` (`python3 tools/rename.py StageMap__FindElemByUnk32 StageMap__FindSlotByNeighbour`, tier B): returns the slot whose `loader->elemKey` is the key; LoadChunksAround sets elemKey to the slot's neighbour key (0..6).
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameter `key` -> `neighbour` (a neighbour key, compared with `loader->elemKey`), `e` -> `slot`; loop bound 7 -> `ARRAY_COUNT(self->slots)`.

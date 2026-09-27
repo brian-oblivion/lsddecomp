@@ -389,3 +389,23 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameters and locals, tier A from the body: `arg0` -> `outPos` (the cell point), `outBuf` -> `chunkPos` (the chunk corner, then +half a chunk, its centre), `arg2` -> `dims`, `arg3` -> `origin`, `arg4` -> `cell`, `idx` -> `row` (the chunk row, `cell->b1`), `factor` -> `rowSpan` (`rows`, or 1 in a vertical grid), `sum` -> `chunkIndex` (column + columns * row, the return value), `v1` -> `x`, `a0v` -> `z`, `off` -> `halfCell`.
+
+Constants: 0x5000 -> `STAGE_CHUNK_SIZE / 2`, 0xA000 -> `STAGE_CHUNK_SIZE`, `<< 11` -> `<< STAGE_CELL_SHIFT`, 0x400 -> `STAGE_CELL_SIZE / 2` (include/StageMap.h; evidence on the definitions). The one-line `/* MATCHING */` on `halfCell` replaces the history below.
+
+The comment that stood above the function in `src/class_3bb8c.c`, moved here verbatim (its local names are the pre-track-7 ones):
+
+```c
+/* MATCH, round 40 (bravo): permuter-found zero, first-ever search on this
+ * function (1838 iterations, rc=0). The lead: hoist the shared `0x400`
+ * constant used by BOTH `arg0[0]`/`arg0[2]`'s tail addend into a named
+ * local, declared between the `outBuf[1]` and `outBuf[2]` assignment
+ * statements -- the exact position retail's own constant-load sits,
+ * confirmed by the score dropping straight to 0. Every prior round's
+ * attempts targeted the outBuf[0]/outBuf[2] STORE-vs-LOAD scheduling
+ * directly and never touched this constant; the permuter found a
+ * completely different axis. See docs/match-reports/ComputeCellWorldOffsets.md. */
+```

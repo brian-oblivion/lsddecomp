@@ -81,3 +81,7 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ComputeDivisorSplit` -> `StageMap__SplitChunkIndex` (`python3 tools/rename.py StageMap__ComputeDivisorSplit StageMap__SplitChunkIndex`, tier A): `out[0] = index % columns`, `out[1] = index / columns`.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameter `val` -> `chunkIndex`. Proposed (head): the `u8 *out` parameter and the +0x114 slot become `Descriptor10 *` with `out->b0`/`out->b1`; not done here because the prototype is in include/StageMap.h and ObjM (class_3bb8c_m.c) calls through the slot.

@@ -29,6 +29,10 @@
 typedef struct DrawSystem DrawSystem;
 typedef struct DrawSystemMethods DrawSystemMethods;
 
+/* The command runLoop passes its parents on every VSync pass
+ * (notifyParents(self, 2)); StageMap__OnNotifyTag1 acts only on it. */
+#define DRAWSYSTEM_EVENT_VSYNC 2
+
 /* A {width, height} pair: the screen size initGraph hands to GsInitGraph
  * and getDims returns. Application keeps one (its default is
  * gDefaultScreenDims = {320, 240}) and passes it to initGraph. */

@@ -651,3 +651,23 @@ cellParent->coord2, a GsCOORDINATE2 with tx/tz as word-or-halfword unions.
 Its fields are named for the GsCOORDINATE2 words they overlay: `unk18` ->
 `tx` (coord.t[0]), `unk1C` -> `ty`, `unk20` -> `tz`; `unk0` (flg) had no
 accessor through this view and is padding. Zero bytes changed.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameters and locals, tier A: `arg1` -> `pos`, `tol` -> `span` (a chunk's width), `threshold` -> `layerTop` (a vertical grid: the top of key i's layer), `candidate` -> `slot`, `r` -> `origin`, `w` -> `edge` (MATCHING).
+
+Constants: 0xA000 -> `STAGE_CHUNK_SIZE`; loop bound 7 -> `CHUNK_NEIGHBOUR_COUNT`; 0x800 -> the unit-local `VERTICAL_LAYER_HEIGHT` (2048). Not `STAGE_CELL_SIZE`: nothing shows a vertical layer is one cell tall, only that the value is the same.
+
+The comment that stood above the function in `src/class_3bb8c.c`, moved here verbatim (its local names are the pre-track-7 ones):
+
+```c
+/* MATCH, round 73 (bravo): 70/70. The last word was the operand order
+ * of the second bounds `addu`. At expand time a MEM operand of a
+ * commutative `+` is placed second whatever the source order, while a
+ * named variable keeps its source position; retail's `field + tol` order
+ * therefore needs the field in a named local at the add. Assigning `w`
+ * INSIDE the upper-bound test keeps the `arg1` load ahead of the field
+ * load, as retail schedules it (a `w = ...;` statement before the `if`
+ * fixes the add but swaps those two loads). See
+ * docs/match-reports/StageMap__FindSlotForPosition.md. */
+```

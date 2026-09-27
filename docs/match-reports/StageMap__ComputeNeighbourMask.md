@@ -136,3 +136,9 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ComputeRateFlags` -> `StageMap__ComputeNeighbourMask` (`python3 tools/rename.py StageMap__ComputeRateFlags StageMap__ComputeNeighbourMask`, tier B): a bit per neighbour key (`sNeighbourBits`) whose chunk is inside the grid: the edge tests clear keys 0/1 (top row), 5/6 (bottom), and the side neighbours of the first/last column by row parity; a vertical grid keeps the low `rows` bits.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameters and locals, tier A: `val` -> `chunk`, `flag` -> `oddRow`, `u` -> `dims`, `divisor` -> `columns`, `unk4` -> `isVertical`, `count` -> `rows`, `flags` -> `offGrid` (the neighbours off the grid; the return value is its complement).
+
+Constants: each mask is spelled as `CHUNK_NEIGHBOUR_BIT()`s of the keys it covers (include/StageMap.h): 3 = PREV_ROW_LO | PREV_ROW_HI (first row), 0x60 = NEXT_ROW_LO | NEXT_ROW_HI (last row), 0x25 = PREV_ROW_LO | PREV_COL | NEXT_ROW_LO and 4 = PREV_COL (first column, odd / even row), 0x10 = NEXT_COL and 0x52 = PREV_ROW_HI | NEXT_COL | NEXT_ROW_HI (last column, odd / even row). The key names come from sChunkNeighbourDeltas' data, (row, col odd, col even): 0 (-1,-1,0), 1 (-1,0,1), 2 (0,-1,-1), 3 (0,0,0), 4 (0,1,1), 5 (1,-1,0), 6 (1,0,1); and sNeighbourOffsets' z (row) and x (column) agree. The masks are exactly the keys each edge case puts off the grid, which is the cross-check.

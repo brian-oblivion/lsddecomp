@@ -615,3 +615,30 @@ cellParent->coord2, a GsCOORDINATE2 with tx/tz as word-or-halfword unions.
 Its fields are named for the GsCOORDINATE2 words they overlay: `unk18` ->
 `tx` (coord.t[0]), `unk1C` -> `ty`, `unk20` -> `tz`; `unk0` (flg) had no
 accessor through this view and is padding. Zero bytes changed.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameters and locals, tier A: `in` -> `pos`, `e` -> `slot`, `u14a` -> `chunkOrigin` (the origin of the slot holding this slot's neighbour key, from which the chunk centre is taken), `u14b` -> `origin` (this slot's own cellParent origin), `rate` -> `chunkIndex`, `t` -> `rel`, `b2`/`b3` -> `cellCol`/`cellRow`.
+
+Constants: 0x5000 -> `STAGE_CHUNK_SIZE / 2`, 0x7FF -> `STAGE_CELL_SIZE - 1` (the bias that makes the shift of a negative offset truncate toward zero, as a division would), 11 -> `STAGE_CELL_SHIFT`, 0x400 -> `STAGE_CELL_SIZE / 2`. The three source-shape points keep a two-line `MATCHING` note.
+
+Left: `StageMap__SplitChunkIndex(self, (u8 *)out, ...)`; the prototype and the +0x114 slot take `u8 *`. Proposed: `Descriptor10 *` (it writes b0/b1).
+
+The comment that stood above the function in `src/class_3bb8c.c`, moved here verbatim (its local names are the pre-track-7 ones):
+
+```c
+/* MATCH, round 63 (delta): closed a six-round stall (72/106 since round 19)
+ * with three source-shape corrections, none of them register pinning -- see
+ * docs/match-reports/StageMap__ComputeFootprintDescriptor.md.
+ *   1. `b2`/`b3` are s32 locals RE-READ from `out->base.b2`/`b3` after the
+ *      byte stores. An s8 field shifted directly in the expression compiles
+ *      to `lbu` + `sll 0x18` + `sra 0xd`; assigning it to an s32 local first
+ *      folds the sign extension into retail's `lb` + `sll 0xb`.
+ *   2. The 0x400 sits INSIDE the subtracted group -- `x - (y + (b<<11) +
+ *      0x400)`. GCC reassociates that to retail's `addiu a0,a0,-0x400`.
+ *      Writing `(x - 0x400) - (...)` instead narrows the constant to HImode
+ *      and emits `li 0xfc00` + `addu`.
+ *   3. `out->unk24 = e;` is the LAST statement of the block. Every earlier
+ *      placement schedules its `sw` too early; only trailing it after the
+ *      h8 store reproduces retail's order. */
+```
