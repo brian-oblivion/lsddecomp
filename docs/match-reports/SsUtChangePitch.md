@@ -35,7 +35,7 @@ original draft of this report (correctly identifying the missing `nop`
 but stating the two numbers -- "51/88" and "off by exactly one word" -- in
 the same breath without saying how they relate) left ambiguous.
 
-Unit `code_179d8_l`, round 23 (2026-09-07). Not a class method. Bounds-checks
+Unit `libsnd_vmanager`, round 23 (2026-09-07). Not a class method. Bounds-checks
 `idx`, validates it against three parallel 52-byte-stride records
 (`D_8008D99E`/`D_8008D99A`/`D_8008D994`, same family as `SsUtChangeADSR`/
 `SsUtKeyOff`), then on a full match calls `func_80032148`, sets the
@@ -302,7 +302,7 @@ not in banned territory.
 Positioned where it would compile: immediately after `func_800319A4`'s
 closing brace and before the `extern Rec16D7F0 D_8008D7F8[];` block, in
 strict ROM-address order. The declarations it needs already exist in
-`src/code_179d8_l.c` at the lines noted; they are repeated here so the body
+`src/libsnd_vmanager.c` at the lines noted; they are repeated here so the body
 travels complete.
 
 ```c
@@ -670,7 +670,7 @@ code_179d8_j_c.c took <libsnd.h> and its banner was rewritten as documentation. 
  * comment still stands -- only the blocker verdicts are withdrawn.
  * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
  *
- * code_179d8_j_c -- the TAIL of the old code_179d8_l slice, split off in round
+ * code_179d8_j_c -- the TAIL of the old libsnd_vmanager slice, split off in round
  * 34 (2026-09-12) when Sony's `libsnd/ut_pb.o` was linked into the middle of
  * `libsnd_vm_vol_ut_key_ut_keyv`.  Now 0x22244..0x2273C (vram 0x80031A44..0x80031F3C), eight
  * functions (SsUtChangePitch .. SsUtAutoPan).
@@ -691,7 +691,7 @@ code_179d8_j_c.c took <libsnd.h> and its banner was rewritten as documentation. 
  * NO RODATA ATTACH CAME WITH THIS HALF, and that is measured, not assumed: the
  * old code_179d8_mid_c monolith contains zero `jtbl_` and zero `.word .L`
  * across its whole extent, and the splat yaml's rodata slot list names none of
- * `code_179d8_l`, `_j_b` or `_j_c`.  Unlike round 33's libsnd_ssinit_libapi_counter there
+ * `libsnd_vmanager`, `_j_b` or `_j_c`.  Unlike round 33's libsnd_ssinit_libapi_counter there
  * was nothing to move, and a link failure of the form
  * `undefined reference to '.L8003....'` would mean something else.
  *

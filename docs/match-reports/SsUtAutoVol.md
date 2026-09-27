@@ -2,7 +2,7 @@
 
 > Renamed from `func_80031E94` on 2026-09-23 (tools/rename.py). Address 0x80031e94.
 
-Unit `code_179d8_l`, round 21 (2026-09-06). Not a class method (calls a
+Unit `libsnd_vmanager`, round 21 (2026-09-06). Not a class method (calls a
 plain function, no vtable dereference). Sibling of `SsUtAutoPan`
 (identical shape, different callee).
 

@@ -57,7 +57,7 @@ axis".
 Replaced in the source by a comment that says what the code does; kept here as written.
 
 ```c
-/* code_179d8_l's SoundCueSet service pair, as this unit calls them
+/* libsnd_vmanager's SoundCueSet service pair, as this unit calls them
    (DreamSys__TickDrift / DreamSys__StopDrift: (soundObj, soundCueSet)).
    Moved here from DreamSys.h in track 4 (round 88): Entity.h declares the
    same functions with `void *` parameters, and a unit including both

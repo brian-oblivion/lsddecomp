@@ -13,7 +13,7 @@ missing/extra instruction. (An earlier draft of this report, before the
 the improvement moved the residue's START, it did not just improve the
 raw count.)
 
-Unit `code_179d8_l`, round 23 (2026-09-07). Not a class method. Scans
+Unit `libsnd_vmanager`, round 23 (2026-09-07). Not a class method. Scans
 `D_8008D996[0..spuVmMaxVoice)` for an entry equal to `(s16) p0`; on a match,
 runs this unit's "clear channel bits" tail (the same block as
 `SsUtKeyOffV`, see that function's report) keyed by the loop index. Called
@@ -67,7 +67,7 @@ void SpuVmSeqKeyOff(s32 p0)
 ```
 
 Needs this unit's shared `_snd_ev_flag`-adjacent globals declared near the
-top of `code_179d8_l.c` (`D_8008EA26`, `spuVmMaxVoice`, `D_8008D996`/`D_8008D9A3`/
+top of `libsnd_vmanager.c` (`D_8008EA26`, `spuVmMaxVoice`, `D_8008D996`/`D_8008D9A3`/
 `_svm_voice`/`D_8008D98C`, `_svm_okof1`/`_svm_okof2`, `_svm_okon1`/`_svm_okon2`).
 
 ## One CLOSED finding: masking the induction variable is what enables strength reduction to match
@@ -235,7 +235,7 @@ round 23 already showed backfires.
 ## Round 47 (2026-09-16), runner delta -- rebuilt in-tree (third confirmation), then permuter DECLINED on check (b)
 
 **Rebuild-before-trusting-the-score, third time.** Spliced the preserved
-body into `src/code_179d8_l.c` (with this unit's own local reduced-view
+body into `src/libsnd_vmanager.c` (with this unit's own local reduced-view
 declarations for `spuVmMaxVoice`, `D_8008D996`/`D_8008D9A3`/`_svm_voice`/
 `D_8008D98C`, `D_8008EA26`, `_svm_okof1`/`_svm_okof2`, `_svm_okon1`/
 `_svm_okon2`, copied from `libsnd_vm_vol_ut_key_ut_keyv.c`'s equivalents per this

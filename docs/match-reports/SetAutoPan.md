@@ -4,12 +4,12 @@
 
 > Renamed from `func_8002EA44` on 2026-09-20 (tools/rename.py). Address 0x8002ea44.
 
-Unit: `src/code_179d8_l.c`. Round 24 (second pass), runner bravo.
+Unit: `src/libsnd_vmanager.c`. Round 24 (second pass), runner bravo.
 
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_l/SetAutoPan.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/libsnd_vmanager/SetAutoPan.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -17,7 +17,7 @@ grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no 
 
 `./build-and-verify.sh` GREEN with `INCLUDE_ASM` restored. Best attempt built
 clean (no compile error) but is the WRONG SIZE: 223 words against retail's
-228 (measured directly off `objdump -d build/src/code_179d8_l.c.o`, since
+228 (measured directly off `objdump -d build/src/libsnd_vmanager.c.o`, since
 `funcdiff`'s own in-range count is unreliable once drift appears -- see
 CLAUDE.md's four-ways-a-score-lies list). `funcdiff.py` reports `13/228`
 in-range and 238767 bytes of out-of-range drift, both **not fully
@@ -29,7 +29,7 @@ the next attempt.
 
 Re-spliced this exact preserved body and rebuilt from scratch. **All title
 figures reconfirmed:** built length **223 words** (`objdump -t
-build/src/code_179d8_l.c.o` confirms `SetAutoPan` at `0x37c` bytes = 223
+build/src/libsnd_vmanager.c.o` confirms `SetAutoPan` at `0x37c` bytes = 223
 words, retail 228, so 5 short), `funcdiff.py`'s in-range figure **13/228**
 with drift (238724 bytes this run, matching the report's own figure to
 within measurement noise).
@@ -136,11 +136,11 @@ obvious from context.
   reinterpreted through a cast (`((Rec34HalfU *) D_8008D9B2)[a0].unk0`)
   rather than redeclared, same rule as everywhere else in this file.
 - `Rec16D7F0` / `_svm_sreg_buf[]`, `D_8008D7F2[]`: the SAME 0x10-byte-stride
-  record family `code_179d8_l.c` documents as `Rec16D7F0`.
+  record family `libsnd_vmanager.c` documents as `Rec16D7F0`.
 
   > **HEAD ADJUDICATION, round 24: this bullet's "important correction" is
   > WITHDRAWN. `_svm_sreg_buf`/`D_8008D7F2` remain the two FIELDS of one
-  > 0x10-stride record, as `code_179d8_l.c`'s `Rec16D7F0` models them.**
+  > 0x10-stride record, as `libsnd_vmanager.c`'s `Rec16D7F0` models them.**
   >
   > The observation was accurate and the inference from it was not. What the
   > disassembly shows here (measured again by the head at lines 230-239 of
@@ -177,7 +177,7 @@ obvious from context.
   > independent arrays would have to coincide in both stride and index.
   >
   > Kept rather than deleted because the OTHER half of the bullet is right
-  > and useful: `code_179d8_l.c`'s `_svm_sreg_buf`/`D_8008D7F4` genuinely are
+  > and useful: `libsnd_vmanager.c`'s `_svm_sreg_buf`/`D_8008D7F4` genuinely are
   > two independent arrays of that record shape, which is what makes this
   > family easy to misread in either direction.
 - `ObjE970` / `_svm_vh` (pointer variable, `lw`-loaded): only the byte
@@ -322,7 +322,7 @@ spliced back into the live unit and rebuilt from scratch BEFORE trusting
 its recorded score.
 
 **The rebuild reproduces the exact same C, but the true built length is
-222 words, not 223.** `objdump -t build/src/code_179d8_l.c.o` gives
+222 words, not 223.** `objdump -t build/src/libsnd_vmanager.c.o` gives
 `SetAutoPan` at `0x378` bytes = 222 words (confirmed independently by
 counting disassembled instructions from the function's `addiu sp,sp,-0x18`
 line to its final `nop`, inclusive: 222 lines). Retail is 228, so this is
@@ -450,7 +450,7 @@ typedef struct {
     u8 pad2[0x34 - 0x2];
 } Rec34HalfU;
 
-/* Same 0x10-byte-stride record family code_179d8_l.c documents as
+/* Same 0x10-byte-stride record family libsnd_vmanager.c documents as
  * Rec16D7F0 (that unit's own _svm_sreg_buf/D_8008D7F4 pair); local view.
  * _svm_sreg_buf and D_8008D7F2 here are TWO INDEPENDENT arrays of this
  * shape (each gets its own %hi/%lo pair in the disassembly), not one
@@ -608,7 +608,7 @@ not established from this function's body alone.
 
 ## NON_MATCHING body promoted, round 67
 
-Placed in `src/code_179d8_l.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+Placed in `src/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
 kept in `#else`. All of the preserved body's own local `Rec34HalfU`/
 `Rec16D7F0`/plain-byte-global declarations were already present in the
 unit's shared prelude (moved up for `SetAutoVol`, first in ROM
@@ -617,7 +617,7 @@ update: the body's own local `ObjE970` (`unk18`) collided with the shared
 `ObjE970` the prelude already declares with the same offset under the name
 `masterVolume`; the access was changed to `_svm_vh->masterVolume`, same
 offset, no behavior change. `./build-and-verify.sh` green (zero bytes
-changed) and `tools/check-nonmatching.sh code_179d8_l` green.
+changed) and `tools/check-nonmatching.sh libsnd_vmanager` green.
 
 ## Round 73 (delta): REVISIT -- 13/228 (6 short) -> 220/228 length-exact, ins 1 / del 1
 
@@ -877,4 +877,4 @@ The NON_MATCHING body now uses `_svm_voice[voice].unk28`..`unk32` (and `*(u8 *) 
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/code_179d8_l.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjE970` is `VabHdr` (`_svm_vh`): this body reads `D_8008E970->mvol` (+0x18, was `masterVolume`). Normalized disassembly unchanged.
+Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjE970` is `VabHdr` (`_svm_vh`): this body reads `D_8008E970->mvol` (+0x18, was `masterVolume`). Normalized disassembly unchanged.

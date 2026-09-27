@@ -12,7 +12,7 @@ positional skeleton diffs 114.
 
 **Lever: sibling body.** This report and the unit's carve note both said
 this function is a near-identical sibling of `SeAutoPan` in
-`code_179d8_l`, which is matched. That body was copied with the
+`libsnd_vmanager`, which is matched. That body was copied with the
 `_svm_voice +0x28..+0x32` arrays renamed to the `_svm_voice +0x1C..+0x26` family, and it matched on
 the first build. The whole five-round residue came from the preserved body
 declaring its parameters `s32` and hand-narrowing them into `s16` locals.
@@ -24,7 +24,7 @@ local were all artifacts of fighting a wrong parameter type. Nothing else
 needed to change: `(from - to < 0 ? to - from : from - to) < duration` is
 retail's two-branch abs compare as written.
 
-This is the counterpart `code_179d8_l`'s header asks about: the "Begin"
+This is the counterpart `libsnd_vmanager`'s header asks about: the "Begin"
 for `SetAutoVol`. It sets `D_8008D9A4`, `D_8008D9AC`,
 `D_8008D9AE` and then either `Step=1, Interval=Countdown=q` or
 `Interval=0, Step=q`. Naming it (for example `BeginVoiceEnvelope`) is
@@ -102,7 +102,7 @@ the unit's carve-time header comment**, not a BIOS trampoline: the opening
 each of three incoming parameters in a raw (un-narrowed) register BEFORE the
 same three registers get narrowed to `s16` in place (`sll..16`/`sra..16`).
 Confirmed by hand, matching the header's note that `SeAutoPan` in
-`code_179d8_l` (this round's runner bravo) opens with the identical
+`libsnd_vmanager` (this round's runner bravo) opens with the identical
 three-register preserve-then-narrow prologue and the same early-out branch
 comparing two of the narrowed arguments — **this is the same shape as that
 sibling, derived independently from this side**, exactly as the carve note
@@ -254,7 +254,7 @@ try reordering which parameter is preserved/narrowed first.
 Re-verified the inherited 118/116-word body first (per the round-33 "check
 inherited bodies" instruction): it reproduces exactly as claimed — compiled
 length 0x1D8 (118 words), confirmed via
-`mipsel-linux-gnu-objdump -t build/src/code_179d8_l.c.o` on the size column,
+`mipsel-linux-gnu-objdump -t build/src/libsnd_vmanager.c.o` on the size column,
 not via `funcdiff.py`'s raw score (which is meaningless here: the 8-byte
 size mismatch shifts every downstream absolute address in the whole image,
 producing a 230400-byte "outside range" warning — an expected consequence
@@ -328,7 +328,7 @@ four queued functions.
 ## Round 35 update (runner bravo): the algebraic value-numbering lever, tried and negative
 
 Re-verified the inherited 118/116-word body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `SeAutoVol` compiles to `0x1d8`
+`build/src/libsnd_vmanager.c.o` confirms `SeAutoVol` compiles to `0x1d8`
 bytes = 118 words, matching round 33's figure exactly.
 
 **Tried round 33's own proposed next lever — rewriting the "far" arm's
@@ -383,7 +383,7 @@ what's now confirmed twice each.
 ## Round 37 update (runner alpha): first permuter search on this function, negative
 
 Re-verified the inherited 118/116 body first: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `SeAutoVol` compiles to `0x1d8`
+`build/src/libsnd_vmanager.c.o` confirms `SeAutoVol` compiles to `0x1d8`
 bytes = 118 words, matching rounds 33/35's figure exactly.
 
 **`--debug --stack-diffs` sanity check:** base score = **6315** — far from
@@ -446,7 +446,7 @@ oracle — a bigger drop is not more trustworthy.
 ## Round 44 update (runner delta): inherited body re-verified real, not re-attempted further
 
 Re-verified the inherited 118/116 body: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `SeAutoVol` compiles to `0x1d8`
+`build/src/libsnd_vmanager.c.o` confirms `SeAutoVol` compiles to `0x1d8`
 bytes = 118 words, matching rounds 33/35/37's figure exactly. Given three
 prior rounds' worth of levers already tried and confirmed negative
 (algebraic-identity rewrite, `volatile` at two different sites both
@@ -461,7 +461,7 @@ here. Restored to `INCLUDE_ASM` unchanged.
 Already carries its real name: identified round 74 (track 2, runner bravo)
 as `libsnd/vmanager SeAutoVol` (shape 0.97 vs the disc-3.3 reference, 110w
 reference vs our 116w; the same tied candidate at this shape score as its
-own sibling `SeAutoPan` in `code_179d8_l.c` -- see the symbols file for the
+own sibling `SeAutoPan` in `libsnd_vmanager.c` -- see the symbols file for the
 disambiguation). Sony symbol; this pass does not rename it further. Matched
 round 73, 116/116.
 

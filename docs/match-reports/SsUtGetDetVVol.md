@@ -2,7 +2,7 @@
 
 > Renamed from `func_80031C98` on 2026-09-23 (tools/rename.py). Address 0x80031c98.
 
-Unit `code_179d8_l`, round 21 (2026-09-06). Not a class method
+Unit `libsnd_vmanager`, round 21 (2026-09-06). Not a class method
 (`_svm_sreg` is a plain global pointer variable, no `classtable.py`
 hit). This is the "raw getter" half of a pair with `SsUtGetVVol`
 (same table, same bounds, `SsUtGetVVol` divides each field by 129
@@ -62,7 +62,7 @@ shape, not something GCC restructured.
 
 `EntryDAD4` (the unit's local view of `_svm_sreg` as an array of 0x10-byte
 entries, fields `unk0`/`unk2`) is the SPU voice register block: libsnd
-vmanager's first .data word points at 0x1F801C00, and code_179d8_l.c's
+vmanager's first .data word points at 0x1F801C00, and libsnd_vmanager.c's
 SpuVmInit had already typed it `SpuRegs *` with a 24 x 0x10 `voice[]` array
 at +0. `unk0`/`unk2` are `volL`/`volR`. The type moved to include/SvmData.h.
 

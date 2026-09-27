@@ -502,7 +502,7 @@ are two distinct symbols at two distinct addresses, 0x8002CD08 vs
 Object/field identity (`self`/`set`): confirmed against `code_179d8_d.c`'s
 own `VabStreamObj`/`SoundCueSet`/`SoundCueSlot` and `gVabStreamObjMethods`
 (`tools/classtable.py gVabStreamObjMethods`) -- see the struct comment in
-`src/code_179d8_l.c` above the type definitions, and `FlushSoundCueSet.md`/
+`src/libsnd_vmanager.c` above the type definitions, and `FlushSoundCueSet.md`/
 `DreamSys__SetSoundObj.md` for the cross-unit trail. Renamed fields, tier A
 unless noted:
 
@@ -564,7 +564,7 @@ setPitchOffset's argument is an octave: `pitchOffset = octave * 12 - 24`.
 
 `include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
 `SoundCueSlot`. It replaced three views: code_179d8_d.c's (named
-`tag`/`owner`/`callback`/`slots[].index` only), code_179d8_l.c's (named
+`tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
 include/Entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
 whole-image SHA1 is unchanged.
@@ -592,7 +592,7 @@ Names, tier A, each from what its readers do:
 | - / `unk10` / `unk10` | `attenuation` | zeroed per tick, then each volume loses (vol / attenuationSteps) per unit; < 0 skips keying; handlers store a proximity ratio in 0..10 |
 | `unk14` / `unk14` / `unk14` | `attenuationSteps` | set to 10 by Init; the divisor above, and the scale both proximity helpers map a distance onto |
 
-Why not `note`/`pitchOffset` (code_179d8_l.c) or the earlier proposal's
+Why not `note`/`pitchOffset` (libsnd_vmanager.c) or the earlier proposal's
 `voiceNTone`/`voiceNPitch` (Entity__MoodCue07.md): the value is neither a
 note nor a tone. VabStreamObj__PlayTone's `index` is program << 4 | tone,
 and ServiceSoundCueSet always sends tone 0, so what the callback writes is a
@@ -608,7 +608,7 @@ with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.
 
-The comment that stood above code_179d8_l.c's local view, moved here:
+The comment that stood above libsnd_vmanager.c's local view, moved here:
 round 75 (naming) confirmed `self`/`set` are the objects code_179d8_d.c names
 `VabStreamObj`/`SoundCueSet`: the +0x80/+0x84/+0x9C slots this function
 dispatches are `tools/classtable.py gVabStreamObjMethods`'

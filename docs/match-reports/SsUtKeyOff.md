@@ -2,7 +2,7 @@
 
 > Renamed from `func_80031280` on 2026-09-24 (tools/rename.py). Address 0x80031280.
 
-Unit `code_179d8_l`, round 26 (2026-09-09). Not a class method. Sibling of
+Unit `libsnd_vmanager`, round 26 (2026-09-09). Not a class method. Sibling of
 `SsUtGetDetVVol`/`SsUtSetDetVVol`/`SsUtSetVVol` (same 0x18-entry bounds check
 idiom, same busy-lock reentrancy guard as `SsUtKeyOn`/`SsUtKeyOffV`'s
 class) -- this one is a "stop a channel" operation: it validates the

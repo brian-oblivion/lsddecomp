@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002F2A4` on 2026-09-20 (tools/rename.py). Address 0x8002f2a4.
 
-Unit: `src/code_179d8_l.c`. Round 24, runner bravo.
+Unit: `src/libsnd_vmanager.c`. Round 24, runner bravo.
 
 ## Result
 
@@ -57,15 +57,15 @@ fields on a separate "current object" cleared unconditionally inside the
 same `if`.
 
 `D_8008D9A3` and `D_8008D98C` are the same 0x34 (52)-byte-stride
-channel-configuration record family `code_179d8_l.c` already documents
+channel-configuration record family `libsnd_vmanager.c` already documents
 (`Rec34Byte`/`Rec34Half` there) -- redeclared here as this unit's own local
 view per the project's multiple-independent-local-views convention (no
-shared header). `_svm_sreg` is the same symbol `code_179d8_l.c` reads as
+shared header). `_svm_sreg` is the same symbol `libsnd_vmanager.c` reads as
 `EntryDAD4 *` (an array of 0x10-byte records indexed by channel); this
 function instead reads two FIXED offsets (`+0x194`, `+0x196`) off the same
 pointer's value with no index scaling at all -- a different reading of the
 same base pointer, so it gets its own local type (`SpuRegs`, padded out to
-0x194 bytes) rather than reusing `code_179d8_l.c`'s `EntryDAD4`.
+0x194 bytes) rather than reusing `libsnd_vmanager.c`'s `EntryDAD4`.
 
 ## The one snag: two width truncations of the same loop variable
 
@@ -109,7 +109,7 @@ occurrence's own narrower codegen.
 
 **SpuVmNoiseOff** (was `func_8002F2A4`) -- Tier B. Releases every
 voice whose state byte (`D_8008D9A3`) reads exactly `2`. The value `2` is
-the same one `SpuVmAlloc` (code_179d8_l) and SpuVmFlush both
+the same one `SpuVmAlloc` (libsnd_vmanager) and SpuVmFlush both
 react to by calling their respective "silence the SPU noise generator"
 Sony/library function (`func_800375E8` / `SpuSetNoiseVoice`) before
 clearing state -- three independent sites agreeing on what state `2`
@@ -127,4 +127,4 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/code_179d8_l.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjDAD4` is `SpuRegs`, the SPU register block at 0x1F801C00; its +0x194/+0x196 (`unk194`/`unk196`) are `noiseOn[0]`/`noiseOn[1]`, the SPU noise-mode enable bits for voices 0-15 and 16-23. Normalized disassembly unchanged.
+Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjDAD4` is `SpuRegs`, the SPU register block at 0x1F801C00; its +0x194/+0x196 (`unk194`/`unk196`) are `noiseOn[0]`/`noiseOn[1]`, the SPU noise-mode enable bits for voices 0-15 and 16-23. Normalized disassembly unchanged.

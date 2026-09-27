@@ -19,7 +19,7 @@
 > round-62 section. Nothing else in this report has been changed.
 
 
-Unit `libsnd_vm_vol_ut_key_ut_keyv` (re-carved round 34; the round-26 text below says `code_179d8_l`, its name before the split). Round 26 (2026-09-09). Not a class method. **Read
+Unit `libsnd_vm_vol_ut_key_ut_keyv` (re-carved round 34; the round-26 text below says `libsnd_vmanager`, its name before the split). Round 26 (2026-09-09). Not a class method. **Read
 `SsUtKeyOn`'s report first** -- this is that function's near-twin, with
 one structural difference: instead of allocating a fresh channel slot via
 `SpuVmAlloc`, the caller supplies the slot index directly (`idx`,

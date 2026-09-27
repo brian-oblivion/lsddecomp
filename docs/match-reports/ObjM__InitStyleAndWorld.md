@@ -125,7 +125,7 @@ different residue, closed it:
    never found one): reading the INNER occurrence through a
    `(void * volatile *)` cast on the field's ADDRESS --
    `*(void * volatile *) &self->unk38` -- rather than through `self->unk38`
-   directly. This is the same idiom `code_179d8_l.c` documents for
+   directly. This is the same idiom `libsnd_vmanager.c` documents for
    `D_8008EA26` (a volatile-qualified POINTER TYPE at the read site changes
    the load, independent of the pointee's own declared volatility), used
    in the OPPOSITE direction: there it was applied to fold a load that
@@ -175,7 +175,7 @@ silently break an unrelated already-matched function.
 ## Proposed learning
 
 **The `(void * volatile *)` / `*(u8 *)&sym` family of idioms is
-bidirectional.** `code_179d8_l.c`'s documented use forces a COMPACT fold
+bidirectional.** `libsnd_vmanager.c`'s documented use forces a COMPACT fold
 (collapsing what would otherwise be two loads into one, by defeating a
 volatile object's forced reload through a non-volatile-qualified pointer
 type at the read site). This function needed the mirror image: forcing a
@@ -233,7 +233,7 @@ text, moved here:
 > Retail reloads self->stage here even though the outer `if` just read it
 > and nothing wrote it in between -- a volatile-qualified POINTER TYPE at
 > the read site (not a volatile object) forces the reload without changing
-> the field's own declared type, the same idiom code_179d8_l.c documents
+> the field's own declared type, the same idiom libsnd_vmanager.c documents
 > for D_8008EA26's `*(u8 *)&sym`, used here in the opposite direction
 > (forcing a reload instead of permitting a fold).
 

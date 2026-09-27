@@ -2,7 +2,7 @@
 
 > Renamed from `func_80031BA4` on 2026-09-24 (tools/rename.py). Address 0x80031ba4.
 
-Unit `code_179d8_l`. Round 22. Runner alpha reached 57/61 and filed this as a
+Unit `libsnd_vmanager`. Round 22. Runner alpha reached 57/61 and filed this as a
 scheduling stall, concluding that **"stack-passed argument loads sit outside
 ordinary scheduling-barrier reach"** -- i.e. that the four-instruction
 block-reorder at the top of the function was not source-reachable. That
@@ -119,7 +119,7 @@ functions it matched.
 
 ## Final body
 
-Lives in `src/code_179d8_l.c` in ROM order.
+Lives in `src/libsnd_vmanager.c` in ROM order.
 
 ### Proposed learning
 

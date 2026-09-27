@@ -193,7 +193,7 @@ typedef struct {
 } D8008E978Entry;
 ```
 
-This edit is ALREADY LIVE in `src/code_179d8_l.c` (kept even though this
+This edit is ALREADY LIVE in `src/libsnd_vmanager.c` (kept even though this
 function stalled, since `note2pitch2` — matched — still compiles
 correctly against it and the layout is now-confirmed knowledge for whoever
 picks this function back up).
@@ -459,7 +459,7 @@ the observed range so far).
 
 Re-verified the inherited 113/112 body first (per the "compile every inherited
 body before trusting it" instruction): it reproduces exactly — `objdump -t`
-on `build/src/code_179d8_l.c.o` shows `SePitchBend` at `0x1c4` bytes = 113
+on `build/src/libsnd_vmanager.c.o` shows `SePitchBend` at `0x1c4` bytes = 113
 words, matching round 33's claim exactly. Confirmed via `asm-differ`'s
 realigned diff that the residues are exactly as round 33 described: the
 extra `move a0,s0` (later reappearing in a different register depending on
@@ -538,7 +538,7 @@ changes the allocator sees through.
 
 Per this round's thesis (permuter is the primary lever for the four
 never-searched functions in this unit), re-verified the inherited 113/112
-body first: `objdump -t` on `build/src/code_179d8_l.c.o` confirms
+body first: `objdump -t` on `build/src/libsnd_vmanager.c.o` confirms
 `SePitchBend` compiles to `0x1c4` bytes = 113 words, matching round 33's
 figure exactly.
 
@@ -620,7 +620,7 @@ scramble rather than a simple candidate rewrite).
 ## Round 44 update (runner delta): inherited body re-verified real, not re-attempted further
 
 Re-verified the inherited 113/112 body: `objdump -t` on
-`build/src/code_179d8_l.c.o` confirms `SePitchBend` compiles to `0x1c4`
+`build/src/libsnd_vmanager.c.o` confirms `SePitchBend` compiles to `0x1c4`
 bytes = 113 words, matching rounds 33/35/37's figure exactly -- this is a
 genuine, reproducible near-miss, not a stale claim. Given three prior
 rounds' worth of levers already tried and confirmed negative (declaration

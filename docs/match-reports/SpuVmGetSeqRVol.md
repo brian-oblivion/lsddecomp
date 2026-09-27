@@ -2,7 +2,7 @@
 
 > Renamed from `func_80030648` on 2026-09-23 (tools/rename.py). Address 0x80030648.
 
-Unit `code_179d8_l`, round 22 (2026-09-06). Sibling of `SpuVmGetSeqLVol` (see
+Unit `libsnd_vmanager`, round 22 (2026-09-06). Sibling of `SpuVmGetSeqLVol` (see
 that report for the shared `_ss_score[screen][slot]` shape and the
 inline-vs-named `sra`/`srl` finding). This one reads the OTHER leading
 field (`+0x76` instead of `+0x74`) and stores the FULL packed `p0` into

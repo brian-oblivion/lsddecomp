@@ -4,7 +4,7 @@
 
 > Renamed from `func_800300D0` on 2026-09-20 (tools/rename.py). Address 0x800300d0.
 
-Unit: `src/code_179d8_l.c`. Round 24, runner bravo.
+Unit: `src/libsnd_vmanager.c`. Round 24, runner bravo.
 
 ## Result
 
@@ -85,7 +85,7 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
 
 Scan every record `i` in `[0, spuVmMaxVoice)` for one whose four key fields
 (`D_8008D994`, `D_8008D99A`, `D_8008D996`, `D_8008D99E` -- s16 fields of the
-same 0x34-stride record family `code_179d8_l.c` documents as
+same 0x34-stride record family `libsnd_vmanager.c` documents as
 `Rec34D994`, redeclared here as a local `Rec34S16`) match the caller's
 `(a3, a2, a0, a1)`. For every match, do one of two cleanups depending on
 `_svm_voice[i]`:
@@ -98,7 +98,7 @@ same 0x34-stride record family `code_179d8_l.c` documents as
   channel" scratch global `D_8008EA26`, re-read it, clear `D_8008D9A3`/
   `D_8008D98C`/`_svm_voice` at the CHANNEL index (not `i` -- same value in
   practice, but a fresh read, matching the project's documented idiom),
-  then update the two 16-channel bitmask pairs `code_179d8_l.c` already
+  then update the two 16-channel bitmask pairs `libsnd_vmanager.c` already
   documents (`_svm_okof1`/`_svm_okon1` for channels 0-15,
   `_svm_okof2`/`_svm_okon2` for channels 16-31): OR the appropriate mask
   into the "channel" word, then AND-NOT the freshly updated channel word
@@ -151,7 +151,7 @@ reset.
 
    So the one-line fix, once isolated, is simply: promote the shared
    `D_8008EA26` declaration to `extern volatile u16 D_8008EA26;` (matching
-   `code_179d8_l.c`'s own declaration for this symbol) and read it plainly
+   `libsnd_vmanager.c`'s own declaration for this symbol) and read it plainly
    everywhere. `SpuVmNoiseOn`/`SpuVmNoiseOnWithAdsr`'s byte-cast reads were
    re-verified to still match after this change -- their `*(u8 *)&...`
    pattern is unaffected by the object gaining `volatile`, because the
@@ -205,8 +205,8 @@ symbol or one like it.
 **SpuVmKeyOff** (was `func_800300D0`) -- Tier A. Same evidence as SpuVmKeyOn:
 `libsnd_seqread.c`'s `NoteOn` calls this in its zero-velocity branch
 (the MIDI note-off convention) and SpuVmKeyOn in the nonzero-velocity
-branch of the same switch; `code_179d8_l.c`'s `SpuVmSeKeyOff` wraps this
-with the same fixed leading identity constant `code_179d8_l.c`'s
+branch of the same switch; `libsnd_vmanager.c`'s `SpuVmSeKeyOff` wraps this
+with the same fixed leading identity constant `libsnd_vmanager.c`'s
 `SpuVmSeKeyOn` uses to wrap SpuVmKeyOn. Scans every voice for one whose
 four identity fields match the caller's, and releases it (a no-op
 bookkeeping clear if it was never actually keyed on, per the
@@ -221,4 +221,4 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/code_179d8_l.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjDAD4` is `SpuRegs`, the SPU register block at 0x1F801C00; its +0x194/+0x196 (`unk194`/`unk196`) are `noiseOn[0]`/`noiseOn[1]`, the SPU noise-mode enable bits for voices 0-15 and 16-23. Normalized disassembly unchanged.
+Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjDAD4` is `SpuRegs`, the SPU register block at 0x1F801C00; its +0x194/+0x196 (`unk194`/`unk196`) are `noiseOn[0]`/`noiseOn[1]`, the SPU noise-mode enable bits for voices 0-15 and 16-23. Normalized disassembly unchanged.

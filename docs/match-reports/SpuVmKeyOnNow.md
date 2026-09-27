@@ -14,7 +14,7 @@
 > already-documented register-identity class. Round 45 is this function's
 > first-ever attempt.
 
-Unit: `src/code_179d8_l.c` (carved round 24, 2026-09-08) · Size: 316 words
+Unit: `src/libsnd_vmanager.c` (carved round 24, 2026-09-08) · Size: 316 words
 (0x4F0 bytes), file offset `0x1D9B4`, vram `0x8002D1B4`.
 
 ## What it computes
@@ -28,7 +28,7 @@ source object and a DIFFERENT tail:
   byte, NOT the per-note `_ss_score` entry) and combines it with
   `D_8008EA10` through a SIGNED division by `16129` (`=127²`, confirmed
   against the SAME magic constant `0x82061029`/shift-13 the sibling unit's
-  own report `SetAutoPan.md` -- `code_179d8_l.c`, read for reference
+  own report `SetAutoPan.md` -- `libsnd_vmanager.c`, read for reference
   only, not edited -- already brute-force-identified as divisor 16129 via a
   batch-compiled `int f(int){return a/N;}` sweep through the pinned
   pipeline). The result is then multiplied by `D_8008EA16` and `D_8008EA19`
@@ -268,14 +268,14 @@ the STACK FRAME ALLOCATION.
 3. **`D_8008EA26`'s per-read signedness may not be uniform across the
    function** -- the very first read (feeding `chanIdx`) is confirmed `lh`,
    but a full per-call-site audit of the ~5 raw `D_8008EA26` references in
-   `asm/nonmatchings/code_179d8_l/SpuVmKeyOnNow.s` (rather than trusting one
+   `asm/nonmatchings/libsnd_vmanager/SpuVmKeyOnNow.s` (rather than trusting one
    blanket `volatile s16` declaration to cover all of them) was not
    completed this round -- next concrete step.
 
 ## Attempts
 
 Within the 30-attempt cap (9 real builds used):
-1. m2c-seeded skeleton (`tools/m2ctx.py code_179d8_l --sig 'void
+1. m2c-seeded skeleton (`tools/m2ctx.py libsnd_vmanager --sig 'void
    SpuVmKeyOnNow(s32 a0, s32 a1)' --run`) transcribed directly, entry-field-
    first multiply order (`_svm_vh->unk18 * 0x3FFF * D_8008EA10 / 16129`):
    compiled, but the very FIRST instruction loaded `D_8008EA10` before
@@ -371,7 +371,7 @@ restructuring reached it this round.
 > Delta ran out of round budget before reaching it; nothing about it was tried
 > and found difficult.
 
-Unit: `src/code_179d8_l.c` (carved round 24, 2026-09-08) · Size: 316 words.
+Unit: `src/libsnd_vmanager.c` (carved round 24, 2026-09-08) · Size: 316 words.
 
 ## Evidence (obsolete -- kept for history)
 
@@ -850,7 +850,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
 ## NON_MATCHING body promoted, round 69
 
 Promoted the round-65 FINAL preserved body (316/316 exact, 201/316 matched,
-the one this report's TITLE figures describe) into `src/code_179d8_l.c`
+the one this report's TITLE figures describe) into `src/libsnd_vmanager.c`
 under `#ifdef NON_MATCHING` (verified build unchanged, keeps `INCLUDE_ASM`);
 `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green. One
 cosmetic change from the literal preserved text: the permuter's reused `tmp`
@@ -962,7 +962,7 @@ D_8008E228 _svm_okon1`.
 `D_8008EA22` and `D_8008EA26` lie inside Sony's `_svm_cur` (pinned at
 0x8008EA0C, 0x20 bytes in 3.5's vm_g.o), and `rename.py` refuses them:
 their spelling is `_svm_cur.<field>` once the struct is typed. That is a type
-job (track 6), across this unit, `code_179d8_l.c` and
+job (track 6), across this unit, `libsnd_vmanager.c` and
 `libsnd_vm_vol_ut_key_ut_keyv.c`, and the `D_8008EA26[]` incomplete-array
 declaration is load-bearing here (see the round 65 section), so the typed
 spelling has to be measured, not assumed. Proposed to the head.

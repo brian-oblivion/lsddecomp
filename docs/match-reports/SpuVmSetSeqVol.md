@@ -28,7 +28,7 @@ diverges from the start, and the missing-length gap is a separate
 symptom of the same early register-allocation difference, not an
 independent thing to hunt for later in the function.
 
-Unit `code_179d8_l`, round 23 (2026-09-07). Not a class method. Looks up
+Unit `libsnd_vmanager`, round 23 (2026-09-07). Not a class method. Looks up
 `_ss_score[screen][slot]` (screen = low byte of `p0`, slot = high byte),
 writes/clamps two fields of the found `Entry90902E8` record, computes two
 `0x81`-scaled values from `p1`/`p2`, and -- gated on `p3 == 1` -- runs this
@@ -287,7 +287,7 @@ placement will transfer.
 ## Round 47 (2026-09-16), runner delta -- rebuilt in-tree (third confirmation), then permuter DECLINED on check (b)
 
 **Rebuild-before-trusting-the-score, third time.** Spliced the preserved
-body into `src/code_179d8_l.c` (local reduced-view declarations for
+body into `src/libsnd_vmanager.c` (local reduced-view declarations for
 `spuVmMaxVoice`, `D_8008D996`, `_svm_sreg_buf`, `_svm_sreg_dirty`, reusing this file's
 own already-declared `Entry90902E8`/`D_8008EA22`) and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `funcdiff.py` reproduces
@@ -504,7 +504,7 @@ s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
 #endif
 ```
 
-`Entry90902E8` and `_ss_score`/`D_8008EA22` are `src/code_179d8_l.c`'s own
+`Entry90902E8` and `_ss_score`/`D_8008EA22` are `src/libsnd_vmanager.c`'s own
 existing top-of-file declarations; only the block above is new.
 
 ### The ONE residue that remains
@@ -688,7 +688,7 @@ and spell the sum at every one of the six accesses instead:
 
 Translated to correct C and built on the real oracle, this **produces
 retail's `addu $v1, $v0, <base>` and all six `0x74($v1)` / `0x76($v1)`
-accesses**. Verified by `objdump` on `build/src/code_179d8_l.c.o`:
+accesses**. Verified by `objdump` on `build/src/libsnd_vmanager.c.o`:
 `addu v1,v0,a1` followed by `sh t0,116(v1)` / `lhu v0,116(v1)` /
 `sh a2,118(v1)` / `sh v0,116(v1)` / `lhu v0,118(v1)` / `sh v0,118(v1)`.
 **The seven-word register-identity residue that this report's round-56

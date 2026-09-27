@@ -238,7 +238,7 @@ Tried this round, both inert (byte-identical output to the array form):
   surface syntax entirely as a lever for THIS specific commutative pair.
 
 This is the same "commutative operand order, not independently reachable"
-class as `code_179d8_l`'s `SsUtKeyOff` (per round 26's own note), which
+class as `libsnd_vmanager`'s `SsUtKeyOff` (per round 26's own note), which
 needed the permuter to close. Set up this round with
 `tools/setup-permuter.sh StyleEffect__DriftModelChildren <seed>` using the 117/121 body above
 as the seed. `--debug --stack-diffs` measured a base score of 30 (a single,

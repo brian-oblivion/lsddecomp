@@ -22,7 +22,7 @@
 #include "common.h"
 #include "SsScore.h"
 
-/* libsnd's sequence-volume accessors, defined in code_179d8_l.c. The access
+/* libsnd's sequence-volume accessors, defined in libsnd_vmanager.c. The access
  * number packs the SEQ/SEP access in the low byte and the sequence in the
  * high byte. */
 extern s32 SpuVmSetSeqVol(s16 a0, u16 a1, u16 a2, s32 a3);

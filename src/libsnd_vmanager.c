@@ -1,5 +1,5 @@
 /*
- * code_179d8_l -- the front of libsnd's voice manager (Sony's
+ * libsnd_vmanager -- the front of libsnd's voice manager (Sony's
  * `libsnd/vmanager`), plus one game function ahead of it.
  *
  * ServiceSoundCueSet (game code) runs one tick of a SoundCueSet
@@ -204,7 +204,7 @@ s32 SpuVmAlloc(s32 unused) {
     return (u8)chosen;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmAlloc);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmAlloc);
 #endif
 
 #ifdef NON_MATCHING
@@ -302,16 +302,16 @@ void SpuVmKeyOnNow(s32 unused, s32 pitch) {
 }
 #undef KEYON_VOICE
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmKeyOnNow);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmKeyOnNow);
 #endif
 
 /* Not yet C: the best body (142/143 words) is in
  * docs/match-reports/SpuVmDoAllocate.md. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmDoAllocate);
 
 /* Not yet C: the best body (309/311 words) is in
  * docs/match-reports/vmNoiseOn.md. */
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", vmNoiseOn);
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 107/112 words, 5 short; the residue is a register role swap
@@ -367,7 +367,7 @@ void vmNoiseOn2(s32 voice, s32 volL, s32 volR, s32 unusedAdsr1, s32 unusedAdsr2)
     _svm_sreg->noiseOn[1] = highBit;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn2);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", vmNoiseOn2);
 #endif
 
 /* The SPU pitch of _svm_cur's note on its tone: semitones from the centre
@@ -523,14 +523,14 @@ void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
  *     calls SpuVmKeyOff instead. SpuVmKeyOff releases every voice playing
  *     that sequence, VAB, program and note, and returns how many.
  *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: allocate a voice and key it on
- *     the noise generator (vmNoiseOn2, code_179d8_l); SpuVmNoiseOff
+ *     the noise generator (vmNoiseOn2, libsnd_vmanager); SpuVmNoiseOff
  *     releases every noise voice.
  *   - SpuVmPBVoice: bends one matching voice's pitch by a 0..127 value
  *     centred on 0x40, scaled by the tone's pbmin/pbmax; SpuVmPitchBend
  *     applies it to every voice and returns how many matched.
  *   - SeAutoPan sets a pan ramp; SetAutoVol / SetAutoPan step a voice's
  *     volume/pan ramp once (SeAutoVol, the volume setter, is in
- *     code_179d8_l).
+ *     libsnd_vmanager).
  *   - SpuVmFlush, once per tick: records which voices' envelopes have died,
  *     releases voices silent across that history (unless _svm_auto_kof_mode
  *     is set), steps the ramps, copies dirty shadow registers to the SPU
@@ -639,7 +639,7 @@ void SetAutoVol(s16 voice) {
     _svm_sreg_dirty[v] |= 3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SetAutoVol);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SetAutoVol);
 #endif
 
 void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
@@ -747,7 +747,7 @@ void SetAutoPan(s16 voice) {
     _svm_sreg_dirty[v] |= 3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SetAutoPan);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SetAutoPan);
 #endif
 
 extern void _spu_setInTransfer(s32 a0);
@@ -1016,7 +1016,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     return 1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmPBVoice);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmPBVoice);
 #endif
 
 /* "Currently selected channel" scratch global -- same idiom as
@@ -1180,7 +1180,7 @@ void SpuVmFlush(void) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmFlush);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmFlush);
 #endif
 
 #ifdef NON_MATCHING
@@ -1333,7 +1333,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
     return s3;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmKeyOn);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmKeyOn);
 #endif
 
 /* A pair of 16-bit bitmasks split across a 0..0x1F channel space (low
@@ -1420,7 +1420,7 @@ s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
  * records it in D_8008EA22, vmanager's current-sequence global
  * (SpuVmGetSeqLVol records only the access byte).
  *
- * Edges (python3 tools/tuboundary.py): code_179d8_l before it ("start edge
+ * Edges (python3 tools/tuboundary.py): libsnd_vmanager before it ("start edge
  * possible"), the placed object libsnd/vm_prog after it; every edge inside
  * is "boundary possible".
  */
@@ -1464,7 +1464,7 @@ s32 SpuVmSeKeyOff(s16 vabId, s16 prog, u16 note) {
 
 void KeyOnCheck(void) {}
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmSetSeqVol);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmSetSeqVol);
 
 /* Returns the packed number, read back through D_8008EA22. */
 s32 SpuVmGetSeqVol(s32 seqSepNo, s16 *volL, s16 *volR) {
@@ -1501,4 +1501,4 @@ s32 SpuVmGetSeqRVol(s32 seqSepNo) {
     return (s16)seqs[(seqSepNo & 0xFF00) >> 8].unk76;
 }
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmSeqKeyOff);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmSeqKeyOff);

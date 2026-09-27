@@ -2,7 +2,7 @@
 
 > Renamed from `func_80031EE8` on 2026-09-23 (tools/rename.py). Address 0x80031ee8.
 
-Unit `code_179d8_l`, round 21 (2026-09-06). Sibling of `SsUtAutoVol`
+Unit `libsnd_vmanager`, round 21 (2026-09-06). Sibling of `SsUtAutoVol`
 (see that report) -- identical shape, calls `SeAutoPan` instead of
 `SeAutoVol`.
 

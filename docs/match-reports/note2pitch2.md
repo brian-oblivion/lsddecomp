@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002E038` on 2026-09-23 (tools/rename.py). Address 0x8002e038.
 
-`code_179d8_l`, vram `0x8002E038`, file offset `0x1E838`. Frameless, 64 words
+`libsnd_vmanager`, vram `0x8002E038`, file offset `0x1E838`. Frameless, 64 words
 (0x100 bytes). Sibling in shape to `note2pitch` (same unit, same tail:
 div-by-12 magic multiply + `D_8006DAD8[]` table lookup + magnitude-based
 shift), but with more front-matter: a struct-array lookup and a div-by-8

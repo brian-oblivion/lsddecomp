@@ -11,7 +11,7 @@
  *    running (tag != 0): it stores the owner's tag, owner and callback,
  *    frees every slot's voice (-1), zeroes the tick and sets
  *    attenuationSteps to 10. Returns 1 when it started the cue.
- *  - ServiceSoundCueSet (code_179d8_l.c), once per tick while tag > 0:
+ *  - ServiceSoundCueSet (libsnd_vmanager.c), once per tick while tag > 0:
  *    resets every slot's request (program -1, octave 0, vol 0x7F,
  *    endVol 0x40) and attenuation, calls callback(owner, set), and then,
  *    unless the callback left attenuation negative, keys the requests: for

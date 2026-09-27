@@ -4,12 +4,12 @@
 
 > Renamed from `func_8002F3E8` on 2026-09-20 (tools/rename.py). Address 0x8002f3e8.
 
-Unit: `src/code_179d8_l.c`. Round 24 (second pass), runner bravo.
+Unit: `src/libsnd_vmanager.c`. Round 24 (second pass), runner bravo.
 
 ## Screens (clean)
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_l/SpuVmPBVoice.s            -> no hits
+grep -n 'gp_rel' asm/nonmatchings/libsnd_vmanager/SpuVmPBVoice.s            -> no hits
 grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no hits
 ```
 
@@ -119,12 +119,12 @@ own score (77/138 before and after), so it is recorded as a correction to
   the score from 1/138 to 38/138 in one edit. Padded to `0x20 - 0xE` bytes
   after `unkD` to get the right stride.
 - `Rec16D7F4` / `D_8008D7F4[]`: same 0x10-byte-stride record family
-  `code_179d8_l.c` already documents as `Rec16D7F0` (its own
+  `libsnd_vmanager.c` already documents as `Rec16D7F0` (its own
   `_svm_sreg_buf`/`D_8008D7F4` pair) -- local view, `s16 unk0`.
 - `_svm_sreg_dirty[]`: plain byte-stride flags array (no per-record multiply in
   its own addressing, unlike every 0x34/0x10-stride array above).
 - `D_8008EA13`, `D_8008EA18`: plain byte globals.
-- `note2pitch2` (defined in `code_179d8_l`, still `INCLUDE_ASM` there):
+- `note2pitch2` (defined in `libsnd_vmanager`, still `INCLUDE_ASM` there):
   called as `note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF)`, guessed
   `extern s16 note2pitch2(u16 a0, u16 a1);` from the call-site register
   widths and the fact its return value gets stored into a `s16`-shaped
@@ -276,7 +276,7 @@ typedef struct {
 } Tbl32E978;
 extern Tbl32E978 *_svm_tn;
 
-/* Same 0x10-byte-stride record family code_179d8_l.c documents as
+/* Same 0x10-byte-stride record family libsnd_vmanager.c documents as
  * Rec16D7F0 (that unit's _svm_sreg_buf/D_8008D7F4 pair); local view. */
 typedef struct {
     s16 unk0; /* +0x0 */
@@ -530,7 +530,7 @@ The naming pass rested "PitchBend" on this function's own shape (a 0-127
 depth centred at `0x40`, signed into `bendCurveUp`/`bendCurveDown`). That
 reading is right, and there is a second, independent line of evidence the
 pass did not cite: the callee it writes its result through,
-`note2pitch2` (`src/code_179d8_l.c:183`), is a note-to-pitch converter on
+`note2pitch2` (`src/libsnd_vmanager.c:183`), is a note-to-pitch converter on
 its face. It computes `origA0 + 0x3C - e->unk4`, divides the result by 12,
 indexes a table 16 entries per semitone, and finishes with a shift by
 `q12 - 5`. `0x3C` is 60, MIDI middle C; 12 is semitones per octave; the
@@ -540,11 +540,11 @@ function that produces it, not only by the MIDI-shaped depth encoding here.
 
 Two independent kinds of evidence, so tier A stands. `note2pitch2` is
 itself a naming candidate (a note-to-SPU-pitch converter) for whoever takes
-`code_179d8_l`; it was correctly left alone this round as out of unit.
+`libsnd_vmanager`; it was correctly left alone this round as out of unit.
 
 ## NON_MATCHING body promoted, round 67
 
-Placed in `src/code_179d8_l.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
+Placed in `src/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM`
 kept in `#else`. Field references updated from the report's original
 `unkC`/`unkD` to the unit's current `bendCurveUp`/`bendCurveDown` names
 (mapped by OFFSET, not by the field's "Up"/"Down" label: `unkD` (+0xD, used
@@ -553,7 +553,7 @@ for `threshold > 0`) is `bendCurveDown`, and `unkC` (+0xC, used for
 the opposite polarity, which looks like a naming-pass error worth a
 separate look, not something this promotion should silently paper over).
 `./build-and-verify.sh` green (zero bytes changed) and
-`tools/check-nonmatching.sh code_179d8_l` green.
+`tools/check-nonmatching.sh libsnd_vmanager` green.
 
 ## Track 2 (round 86, 2026-09-26, alpha)
 
@@ -565,4 +565,4 @@ The NON_MATCHING body now reads `_svm_voice[a0].unk0E/unk16/unk12/unk14/unk0C`; 
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/code_179d8_l.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `Tbl32E978` was a local view of libsnd's `_svm_tn` (0x8008E978, pinned) and is `<libsnd.h>`'s `VagAtr`: `bendCurveUp` (+0xC) is `pbmin`, used when the bend is below 0x40, and `bendCurveDown` (+0xD) is `pbmax`, used above it. The preserved body now reads `D_8008E978[...].pbmax`/`.pbmin`. `D_8008EA18` is `_svm_cur + 0xC`, the current tone number.
+Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `Tbl32E978` was a local view of libsnd's `_svm_tn` (0x8008E978, pinned) and is `<libsnd.h>`'s `VagAtr`: `bendCurveUp` (+0xC) is `pbmin`, used when the bend is below 0x40, and `bendCurveDown` (+0xD) is `pbmax`, used above it. The preserved body now reads `D_8008E978[...].pbmax`/`.pbmin`. `D_8008EA18` is `_svm_cur + 0xC`, the current tone number.

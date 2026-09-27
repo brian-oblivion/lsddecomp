@@ -112,7 +112,7 @@ Reading the body with the proposed `SoundCueSet` field names: `unk4` = tick (0 o
 
 ## Proposed field names
 
-`EntityMoodHandlerArg` is Entity.h's local view of `SoundCueSet` (src/code_179d8_d.c). `ServiceSoundCueSet` hands the set itself to the callback, and every offset below lines up with that struct. Evidence comes from `ServiceSoundCueSet`'s body (asm/nonmatchings/code_179d8_l/ServiceSoundCueSet.s). Each tick it writes -1/0/0x7F/0x40 into each voice slot's +0x4/+0x8/+0xC/+0x10 (stride 0x14 from +0x18) and zeroes set+0x10. Then it calls the callback. If set+0x10 >= 0, for each slot whose request is >= 0 it stops the old voice (channel vt+0x84, `VabStreamObj__StopVoice`), calls `VabStreamObj__SetPitchOffset` (vt+0x9C) with slot+0x8, and plays `VabStreamObj__PlayTone` (vt+0x80) with `request << 4` and two volumes, each reduced by `vol / set->unk14(=10) * set+0x10`. A request of -2 stops the voice. Finally it increments set+0x4. The compiler lists accessors of every one of these fields in Entity_b through Entity_g, so they are proposals only:
+`EntityMoodHandlerArg` is Entity.h's local view of `SoundCueSet` (src/code_179d8_d.c). `ServiceSoundCueSet` hands the set itself to the callback, and every offset below lines up with that struct. Evidence comes from `ServiceSoundCueSet`'s body (asm/nonmatchings/libsnd_vmanager/ServiceSoundCueSet.s). Each tick it writes -1/0/0x7F/0x40 into each voice slot's +0x4/+0x8/+0xC/+0x10 (stride 0x14 from +0x18) and zeroes set+0x10. Then it calls the callback. If set+0x10 >= 0, for each slot whose request is >= 0 it stops the old voice (channel vt+0x84, `VabStreamObj__StopVoice`), calls `VabStreamObj__SetPitchOffset` (vt+0x9C) with slot+0x8, and plays `VabStreamObj__PlayTone` (vt+0x80) with `request << 4` and two volumes, each reduced by `vol / set->unk14(=10) * set+0x10`. A request of -2 stops the voice. Finally it increments set+0x4. The compiler lists accessors of every one of these fields in Entity_b through Entity_g, so they are proposals only:
 
 | field | proposed | tier | evidence |
 | --- | --- | --- | --- |
@@ -131,7 +131,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 `include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
 `SoundCueSlot`. It replaced three views: code_179d8_d.c's (named
-`tag`/`owner`/`callback`/`slots[].index` only), code_179d8_l.c's (named
+`tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
 include/Entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
 whole-image SHA1 is unchanged.
@@ -159,7 +159,7 @@ Names, tier A, each from what its readers do:
 | - / `unk10` / `unk10` | `attenuation` | zeroed per tick, then each volume loses (vol / attenuationSteps) per unit; < 0 skips keying; handlers store a proximity ratio in 0..10 |
 | `unk14` / `unk14` / `unk14` | `attenuationSteps` | set to 10 by Init; the divisor above, and the scale both proximity helpers map a distance onto |
 
-Why not `note`/`pitchOffset` (code_179d8_l.c) or the earlier proposal's
+Why not `note`/`pitchOffset` (libsnd_vmanager.c) or the earlier proposal's
 `voiceNTone`/`voiceNPitch` (Entity__MoodCue07.md): the value is neither a
 note nor a tone. VabStreamObj__PlayTone's `index` is program << 4 | tone,
 and ServiceSoundCueSet always sends tone 0, so what the callback writes is a

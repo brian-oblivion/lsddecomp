@@ -734,7 +734,7 @@ than either prior attempt had.
 > toolchain blockers"). Round 45 is this function's first-ever attempt, and
 > it reached a genuine, complete structural derivation reusing every idiom
 > this project has already established for the game's SPU voice-level
-> family (`vmNoiseOn`, `SpuVmKeyOnNow` in `code_179d8_l.c`). The
+> family (`vmNoiseOn`, `SpuVmKeyOnNow` in `libsnd_vmanager.c`). The
 > residue is a whole-function-scale register-allocation-cascade difference,
 > not a missing construct.
 
@@ -1055,7 +1055,7 @@ for the current disposition and the next attempt's most promising avenue.
 > (`addiu_at` round 21, `nop_mflo_mfhi` round 42). Everything below is
 > evidence from before the fix: kept for history only.
 
-Unit `code_179d8_l (round 21, 2026-09-06)`. **Not attempted at the time.**
+Unit `libsnd_vmanager (round 21, 2026-09-06)`. **Not attempted at the time.**
 
 ## Classification (obsolete -- kept for history)
 
@@ -1130,7 +1130,7 @@ The unit's placeholder types, as this function reads them:
   typedef exists (no libsnd internal header ships on any SDK disc), so the
   name is derived from Sony's variable, as `SvmVoice` is from `_svm_voice`.
   Fields stay offset-named (Sony-only data). +0x74/+0x76 are the sequence's
-  left/right volume: Sony's `SpuVmSetSeqVol` (code_179d8_l, INCLUDE_ASM)
+  left/right volume: Sony's `SpuVmSetSeqVol` (libsnd_vmanager, INCLUDE_ASM)
   stores its voll/volr there, each clamped to 0x7F, and this function scales
   a voice's two levels by them / 127.
 - `ObjE970` -> Sony's **`VabHdr`**: `D_8008E970` is vmanager's `_svm_vh`

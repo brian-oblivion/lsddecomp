@@ -64,7 +64,7 @@ ramping" flag, and every exit path that is not an off-period tick re-checks
 `unk98 == 0 || unk40 == 0` and clears it there too.
 
 The key passed to both callees is `(s16)(screen | (slot << 8))`, consistent
-with `code_179d8_l.c`'s established `SpuVmGetSeqVol(s32 p0, s16 *, s16 *)`.
+with `libsnd_vmanager.c`'s established `SpuVmGetSeqVol(s32 p0, s16 *, s16 *)`.
 
 ## Claims of the previous report: what round 58 CONFIRMED
 
