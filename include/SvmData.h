@@ -97,4 +97,34 @@ typedef struct SvmSreg {
 extern SvmSreg _svm_sreg_buf[]; /* 24 voices */
 extern u8 _svm_sreg_dirty[];    /* 24 voices: which _svm_sreg_buf fields SpuVmFlush must copy out */
 
+/*
+ * SpuVoiceRegs, SpuRegs -- the PS1 SPU's own register block at 0x1F801C00,
+ * which libsnd/vmanager.o's first .data word (D_8006DAD4) points at: 24
+ * voices of 0x10 bytes, then the global key-on/key-off/noise/reverb bit
+ * masks. Unlike the bss tables above these are hardware registers, so the
+ * fields carry the hardware's names; only registers some accessor touches
+ * are named. Units declare D_8006DAD4 themselves, each with the pointee
+ * spelling its bodies match against.
+ */
+typedef struct {
+    s16 volL;  /* +0x0 -- left volume */
+    s16 volR;  /* +0x2 -- right volume */
+    s16 pitch; /* +0x4 -- sample rate; 0x1000 plays at 44.1 kHz */
+    s16 addr;  /* +0x6 -- start address in sound RAM, in 8-byte units */
+    s16 adsr1; /* +0x8 */
+    s16 adsr2; /* +0xA */
+    u16 envx;  /* +0xC -- current envelope level; 0 once the voice has died */
+    u8 padE[0x10 - 0xE];
+} SpuVoiceRegs;
+
+typedef struct {
+    SpuVoiceRegs voice[24]; /* +0x000 */
+    u8 pad180[0x188 - 0x180];
+    u16 keyOn[2];  /* +0x188 -- voices 0-15, 16-23: a set bit keys the voice on */
+    u16 keyOff[2]; /* +0x18C -- a set bit releases the voice */
+    u8 pad190[0x194 - 0x190];
+    u16 noiseOn[2];  /* +0x194 -- a set bit plays the voice from the noise generator */
+    u16 reverbOn[2]; /* +0x198 -- a set bit sends the voice to the reverb */
+} SpuRegs;
+
 #endif
