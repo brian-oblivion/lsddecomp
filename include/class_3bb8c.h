@@ -99,7 +99,7 @@ struct SplitCoord2 {
  * (rate <= 0); x and z 0/1. */
 extern Ratio16 sScaleStepUpSlow[3];
 extern Ratio16 sScaleStepUpFast[3];
-extern Ratio16 D_800869B4[3];
+extern Ratio16 sScaleStepDownSlow[3];
 extern Ratio16 D_800869C0[3];
 
 /* 1/1, 1/1, 1/1: the scale StageMap__ResetCellScale sets on every cell. */

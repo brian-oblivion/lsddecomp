@@ -386,7 +386,7 @@ void StageMap__StartScaleRamp(StageMap *self, s32 rate, s32 flag) {
     self->scaleStep = sScaleStepUpFast;
     goto merge;
 rate_le:
-    table = D_800869B4;
+    table = sScaleStepDownSlow;
     if (flag == 0) {
         goto store;
     }
