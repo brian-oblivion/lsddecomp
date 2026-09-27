@@ -137,3 +137,24 @@ Renamed `func_8004DB18` -> `TitleMenu__CreateSaveTitle`. **Tier B**: SJIS-decode
 ## Track 4 (2026-09-26, round 88, bravo)
 
 TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The setTarget override (+0x0D8). Its argument is the TaskCoreTarget the ctor passes (&D_80086D44); the one field read, +0x004, is `handle`, New_TextRow's texture. Arg1DB18_3bb8c_d is gone. `nameField` is a `struct TextRow *` now: unkAB/unkAC/unkAA are visibleCount/firstVisible/gapIndex; the New_TextRow cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+
+## Track 7 (round 96, echo)
+
+Naming: `D_8008AA18` -> `gSaveTitle` (tier A: the pointer every reader
+uses as the save title's full-width text; class_3bb8c_c.c writes the day
+into it, hence `g`); `D_8008AA14` -> `sSaveTitleBlanks` (tier A: its ROM
+value points at 19 full-width spaces). Both retyped `void *` -> `char *`
+in include/class_3bb8c.h, which removes the `(char *)` casts. `+ 0x18` is
+`SAVE_TITLE_PADDING * 2`, the same character index class_3bb8c_g.c's
+SAVE_TITLE_PADDING (12) names; each character is 2 bytes. Locals:
+`size` -> `cellCount`, `buf` -> `text`.
+
+Comments moved here from the unit:
+
+- strcpy/strlen are Sony's, linked from libc2 (config/psyq-objects.txt:
+  libc2/strcpy, libc2/strlen), declared locally per the per-unit
+  convention for these two (src/class_3bb8c_i.c, src/class_3bb8c_j.c).
+- DecodeFullWidthSjis is this unit's own view of the matched function in
+  src/code_2cc8c_f.c: `void`, because the return value is unused at these
+  call sites, unlike that unit's own `u8 *` view (independent-arities
+  convention).

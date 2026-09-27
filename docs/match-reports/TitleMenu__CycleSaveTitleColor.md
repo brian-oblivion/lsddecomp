@@ -306,3 +306,18 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 ## Track 4 (2026-09-26, round 88, bravo)
 
 TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The broadcastToSlots override (+0x0E4). Arg1DCD0_3bb8c_d was SpriteRgb (include/Sprite.h: three `s8`, the same layout), and the name field's +0x0B8 is setColor(SpriteRgb *); `unk3C` is TaskCore's `inputMode`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+
+## Track 7 (round 96, echo)
+
+Naming: `D_8008AA28` -> `sSaveTitleColorChannel`, `D_8008AA2C` ->
+`sSaveTitleColorFrame` (tier A: the lit channel 0..2 and the frame
+counter, both read only here). Locals `buf` -> `rgb`, `base` ->
+`channels`. Constants (unit-local, decimal): `SAVE_TITLE_LIT` 128 (the
+lit level and what is added), `SAVE_TITLE_RED_FRAMES` 128,
+`SAVE_TITLE_CYCLE_FRAMES` 257.
+
+Comment moved here from the unit: "MATCHED round 75 (was STALL round
+43). `base` is taken BEFORE the first call (so it crosses a call and gets
+$s1), `buf = *color` is one struct copy (SpriteRgb is three `s8`: three
+`lb`, then three `sb`), and each arm indexes `base[D_8008AA28]` directly."
+The unit keeps a one-line MATCHING note.

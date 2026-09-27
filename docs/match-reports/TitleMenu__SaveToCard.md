@@ -108,3 +108,12 @@ these are PROPOSALS, not renames. Also posted to the round-77 broadcast.
 ## Track 4 (2026-09-26, round 88, bravo)
 
 TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). slot128 is this class's beginMemcardSave; `unk60->unk14` is TaskCore's slotCounts[5]; unkBC/unkC0 are saveBlock/saveBlockSize, saveBlock cast to s32 for the TaskObjF view's s32 parameter (no code). Byte-identical (whole image green, 0 new warnings, nonmatching green).
+
+## Track 7 (round 96, echo)
+
+Naming: `D_8008AA10` -> `sSaveFileName` (tier A: beginSave/beginLoad's
+`fileName`; ROM value "BISLPS-01556xxx"), retyped `char *`, so the new
+game's `*(u8 *)D_8008AA10 = 0` is `sSaveFileName[0] = '\0'`. Local `buf`
+-> `shake`. `0xD` is `SAVE_TITLE_EDIT_POS` (13, unit-local): beginSave's
+titleEditPos, the first character the player's text goes in, one past
+SAVE_TITLE_PADDING's first space.

@@ -77,3 +77,11 @@ Renamed `func_8004E230` -> `TitleMenu__OnCardEvent`. **Tier B**: The exclusive d
 ## Track 4 (2026-09-26, round 88, bravo)
 
 TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The occupant of this class's own +0x138, `onTagBValue`, which TitleMenu__OnNotify calls with its (sender, event): the parameters are retyped `BasicClass *sender, s32 event`. slot12C is endMemcardSave, slot124 commitNameEntry. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+
+## Track 7 (round 96, echo)
+
+Constants: `event < 0x18` / `>= 0x16` / `== 0x16` are
+`<= TASKOBJF_STATE_ABORTED` / `>= TASKOBJF_STATE_DONE` / `==
+TASKOBJF_STATE_DONE` (include/TaskObjF.h's TaskObjFState: the event is
+the state TaskObjF's setState notifies its parents with). Byte-identical
+(`<= 0x17` compiles to the same `slti 0x18`).

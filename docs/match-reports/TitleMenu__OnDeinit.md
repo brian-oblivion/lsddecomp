@@ -92,3 +92,16 @@ is two 0xC-byte DrawRects, `{0, 0, 320, 240}` and `{0, 240, 320, 240}`
 the body casts to `DrawSystem *` and calls `clearImage`, the cursor is a
 `DrawRect *` stepped with `rect++`, and `sDisplayBufferRects` is
 `extern DrawRect sDisplayBufferRects[2]` (was `s32`). Zero bytes changed.
+
+## Track 7 (round 96, echo)
+
+Naming: `D_80086DAC` -> `sDisplayBufferRects` (tier A: two DrawRects,
+320 x 240 at y 0 and y 240, the two display buffers; only this function
+reads it). The comment says it replaces TaskCore's onDeinit (it sits in
+slot +0x050 and does not call the base).
+
+## Proposed field names
+
+TaskCore's `unk93` (include/TaskCore.h; code_2c054.c and code_2cc8c.c
+access it) -> `clearColor`: both TaskCore__OnDeinit and this override
+pass it as the colour to the DrawSystem's clear.

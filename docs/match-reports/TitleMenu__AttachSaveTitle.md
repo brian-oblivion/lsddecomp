@@ -52,3 +52,11 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 ## Track 4 (2026-09-26, round 88, bravo)
 
 TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The updateSlotElements override (+0x0E0). Its argument is typed as the slot's `void *parent`; the name field's +0x04C is TextRow's attachToParent (SceneNode's), so the call casts parent to SceneNode * and &sSaveTitleOffset to LongVec3 * (its offset). No code from either cast. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+
+## Track 7 (round 96, echo)
+
+Naming: `D_8008A9B4` -> `sSaveTitleOffset` (tier A: the position
+attachToParent places the save title at, -4, -23). Retyped `s32` ->
+`struct ScreenSpritePos` in include/class_3bb8c.h: a TextRow's position
+is a ScreenSpritePos (include/TextRow.h's banner) passed through
+SceneNode's LongVec3 slot, so the `(LongVec3 *)` cast stays.

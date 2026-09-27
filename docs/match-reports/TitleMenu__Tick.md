@@ -111,3 +111,11 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 ## Track 4 (2026-09-26, round 88, bravo)
 
 TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `state` (+0x058) is TaskCore's `activeSlot` and `unk38` its `result` (TaskCore__Init returns it: 0 on activeSlot 1, 2 on activeSlot 4, the value GameApplication__PollGraphRoomStatus retries on); slot94 is refreshViewValue, slot130/134 this class's updateMemcardSaveWithIcon/updateMemcardSaveStatus. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+
+## Track 7 (round 96, echo)
+
+Constants: the cases are `enum TitleMenuEntry` (include/TitleMenu.h,
+added: START 0 .. SHAKE 5, the order of the target's `names`), and
+GRAPH's result is `TITLEMENU_RESULT_GRAPH` (2: GameApplication__PollGraphRoomStatus
+reruns GraphRoom while the menu returns it). FLASHBACK's `result = 0`
+stays a literal: 0 is also TaskCore's default and no caller names it.

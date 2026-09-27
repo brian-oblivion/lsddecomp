@@ -152,3 +152,27 @@ Renamed `func_8004DE08` -> `TitleMenu__RefreshMenu`. **Tier B**: Allocates/fills
 ## Track 4 (2026-09-26, round 88, bravo)
 
 TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `nameField->unkA9` is TextRow's cellCount and +0x0CC its setText; `state` is TaskCore's activeSlot; slotE0 updateSlotElements, slot60 setState, slot11C setSlotCursor, slotF0 setActiveSlot (origSlot is s32 now, no cast); `unk4C` is TaskCore's `target`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+
+## Track 7 (round 96, echo)
+
+Locals `size` -> `cellCount`, `buf1` -> `text`, `buf2` -> `shake`;
+`activeSlot = 5` -> `TITLEMENU_SHAKE`. CheckSaveScoreFlag's local view
+now types its parameters (TitleMenu *self, TaskCoreTarget *target,
+struct DreamSys *dreamSys) instead of three `void *`. The 0xB/0xF
+setState arguments are TaskCore states (see TitleMenu__SetState's
+report).
+
+Comment moved here from the unit: CheckSaveScoreFlag is matched in
+src/class_3bb8c_c.c as a 2-argument function, but this call site sets up
+a 3rd argument (self->dreamSys in $a2) that the definition never
+receives; the same independent-arities situation was documented for
+Get_vtable_TaskCore until round 84. The extern's arity-ok note said: the
+callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the
+3rd argument is byte-load-bearing here: retail emits `lw a2,164(s0)` at
+0x8004DE74.
+
+## Proposed field names
+
+IntermediateBase's `unk14` (include/IntermediateBase.h, many accessors)
+-> `lightRig`: initArgs' `lightRig`, or init's own New_LightRig(); also
+passed as TaskObjF's sprite parent. `unk10` -> `frameClock`, likewise.

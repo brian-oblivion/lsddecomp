@@ -121,3 +121,18 @@ TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus
 `TitleMenuUnkACObjMethods_3bb8c_d::slot6C`, a view deleted when TaskObjF was
 unified; they are TaskObjF's init (+0x06C) `namePrefix` and `nameSuffixes`.
 Both were described as "round 43's" readings.
+
+## Track 7 (round 96, echo)
+
+Naming: `D_800114F8` -> `sSaveIconTimPath` (tier A: the rodata string
+"CARD\\FILEICN1.TIM"); `D_8008A9D0` -> `sCardFilePrefix` (tier A: TaskObjF
+init's `namePrefix`, the ROM value points at "BISLPS-01556");
+`D_80086D6C` -> `sSaveFileSuffixes` (tier A: init's `nameSuffixes`,
+"-01".."-15" then NULL). The last two retyped in include/class_3bb8c.h
+(`char *`, `char *[]`), removing the `(char **)&` cast. The `(char *)` on
+sSaveIconTimPath casts away `const` for New_TimImage's `char *` and stays.
+
+## Proposed field names
+
+IntermediateBase's `unk10` -> `frameClock` and `unk14` -> `lightRig`
+(see TitleMenu__RefreshMenu's report).

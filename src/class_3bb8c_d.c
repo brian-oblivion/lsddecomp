@@ -1,7 +1,7 @@
 /*
- * class_3bb8c_d -- TitleMenu's methods (include/TitleMenu.h; the allocator and
- * ctor are in class_3bb8c_c.c), then its getter, then TaskObjF's allocator
- * and ctor.
+ * class_3bb8c_d -- TitleMenu's methods (include/TitleMenu.h; its allocator
+ * and ctor are in class_3bb8c_c.c) and its getter, then TaskObjF's
+ * allocator and ctor (include/TaskObjF.h).
  *
  * TitleMenu is the TaskCore menu between days: START, FLASHBACK, SAVE, LOAD,
  * GRAPH and SHAKE over ETC\TITLE.TIM. In ROM order here: finalize, onNotify,
@@ -10,6 +10,11 @@
  * the save-title TextRow in place of TaskCore's slot widgets, refreshMenu,
  * and the memory-card methods that drive `saveCtrl`, a TaskObjF, for SAVE
  * and LOAD. The header's banner describes the class.
+ *
+ * The data they share is in include/class_3bb8c.h: gSaveTitle, the
+ * full-width save title the TextRow shows and the card save carries;
+ * sSaveFileName; the card's name prefix and suffix table; and the colour
+ * cycle's channel and frame counters.
  */
 #include "common.h"
 #include <libgte.h>
@@ -45,6 +50,8 @@ void TitleMenu__Reset(TitleMenu *self) {
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 0);
 }
 
+/* Replaces TaskCore's onDeinit: clears both display buffers to the colour
+ * unk93. */
 void TitleMenu__OnDeinit(TitleMenu *self) {
     u32 i;
     DrawRect *rect;
@@ -104,17 +111,12 @@ void TitleMenu__RefreshViewValue(TitleMenu *self) {
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
 
-/* Sony's, linked from libc2 (config/psyq-objects.txt: libc2/strcpy,
- * libc2/strlen); declared locally per this project's established
- * per-unit convention for these two (see e.g. src/class_3bb8c_i.c,
- * src/class_3bb8c_j.c). */
+/* Sony's (libc2). */
 extern char *strcpy(char *dest, char *src);
 extern s32 strlen(char *s);
 
-/* This unit's own view of DecodeFullWidthSjis (already matched,
- * src/code_2cc8c_f.c) -- return value unused at this call site, unlike
- * that unit's own `u8 *` view, so kept minimal per the project's
- * independent-arities convention. */
+/* Decodes full-width SJIS into one byte a character (src/code_2cc8c_f.c);
+ * nothing here reads its result. */
 extern void DecodeFullWidthSjis(void *dst, void *src);
 
 /* gSaveTitle is 2-byte full-width characters; the characters from here on
@@ -125,7 +127,10 @@ extern void DecodeFullWidthSjis(void *dst, void *src);
 #define SAVE_TITLE_EDIT_POS 13
 
 /* The setTarget override: `target` is the TaskCoreTarget the ctor passes
- * (&D_80086D44); only its `handle` is read, as the TextRow's texture. */
+ * (&D_80086D44); only its `handle` is read, as the TextRow's texture. On a
+ * new game the title's padding is reblanked and its letter field cleared
+ * first. The TextRow has a cell a character plus 4, eight of them shown
+ * from cell 4, with a gap before cell 9. */
 void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
     u32 cellCount;
     char *text;
@@ -165,11 +170,12 @@ void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
 #define SAVE_TITLE_RED_FRAMES 128
 #define SAVE_TITLE_CYCLE_FRAMES 257
 
-/* MATCHED round 75 (was STALL round 43) -- see
- * docs/match-reports/TitleMenu__CycleSaveTitleColor.md. `base` is taken BEFORE the first call
- * (so it crosses a call and gets $s1), `buf = *color` is one struct copy
- * (SpriteRgb is three `s8`: three `lb`, then three `sb`), and each arm
- * indexes `base[sSaveTitleColorChannel]` directly. */
+/* The broadcastToSlots override, once a frame: the save title's colour.
+ * While the menu takes input it is black with one channel lit, the channel
+ * moving each frame; otherwise `color` with red lifted for the first frames
+ * of each cycle and the moving channel after.
+ * MATCHING: `channels` is taken before the first call (it lives in $s1)
+ * and `rgb = *color` is one struct copy. */
 void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
     SpriteRgb rgb;
     u8 *channels;
@@ -199,15 +205,14 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
     self->saveTitle->methods->setColor(self->saveTitle, &rgb);
 }
 
-/* CheckSaveScoreFlag is ALREADY MATCHED (src/class_3bb8c_c.c), as a genuinely
- * 2-argument function -- but THIS call site sets up a 3rd argument
- * (self->dreamSys, in $a2) that the other unit's own 2-parameter view never
- * receives. Same independent-arities situation already documented for
- * Get_vtable_TaskCore until round 84: this unit's own local view
- * matches what THIS call site needs. */
+/* FLASHBACK's lock (src/class_3bb8c_c.c). */
 extern void CheckSaveScoreFlag(TitleMenu *self, TaskCoreTarget *target,
-                               struct DreamSys *dreamSys); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
+                               struct DreamSys *dreamSys); /* arity-ok: the definition takes 2; retail loads dreamSys into $a2 here */
 
+/* setState(5)'s and a finished card operation's: the save title's text reloaded,
+ * FLASHBACK's lock recomputed, the widgets re-attached and SHAKE's cursor
+ * set from DreamSys's setting; then the entry that was active is
+ * reselected. */
 void TitleMenu__RefreshMenu(TitleMenu *self) {
     s32 cellCount;
     s32 origSlot;
@@ -270,6 +275,8 @@ void TitleMenu__LoadFromCard(TitleMenu *self) {
                                        self->saveBlockSize);
 }
 
+/* saveCtrl's terminal states: either gives input back; a completed save or
+ * load also clears the new-game flag and refreshes the menu. */
 void TitleMenu__OnCardEvent(TitleMenu *self, BasicClass *sender, s32 event) {
     if (event <= TASKOBJF_STATE_ABORTED) {
         if (event >= TASKOBJF_STATE_DONE) {
@@ -299,14 +306,12 @@ fail:
     return NULL;
 }
 
-/* libcard, linked SDK objects (config/psyq-objects.txt: libcard/a74,
- * libcard/a75, libcard/c112 -- see docs/match-reports/TaskObjF__TaskObjF.md).
- * Declared locally rather than in the shared header, same policy as
- * malloc/free/printf (CLAUDE.md, "To include/ has one exception"). */
+/* Sony's (libcard). */
 extern void InitCARD(s32 padEnable);
 extern void StartCARD(void);
 extern void _bu_init(void);
 
+/* The card libraries are started once, by the first TaskObjF made. */
 void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
     s32 count;
 

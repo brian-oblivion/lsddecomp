@@ -85,3 +85,19 @@ getSetFlashbackSession(0, 0); no up-call to TaskCore__Reset. The TIM path,
 the old name's only evidence, is the sub-handle setSubHandle loads, which is
 TaskCore's mechanism, not something this function shows. Slot names at each
 call now TaskCore's (setSubHandle, setFrameBound) instead of slotD4/slot6C.
+
+## Track 7 (round 96, echo)
+
+Naming: `D_800114E8` -> `sTitleTimPath` (tier A: the rodata string
+"ETC\\TITLE.TIM", setSubHandle's path; only this function reads it).
+Constants: `unk2C = 0x190` and `setFrameBound(self, 0xA)` are written 400
+and 10 (decimal: a viewport quantity and a frame bound); neither is named,
+since `unk2C`'s meaning is not established and 10 is the slot's `bound`.
+
+## Proposed field names
+
+TaskCore's (include/TaskCore.h, accessed by code_2c054.c/code_2cc8c*.c):
+`unk34` -> `clearOnDeinit` (TaskCore__OnDeinit clears the display with
+`unk93` only when it is nonzero; this Reset sets 0 and TitleMenu's own
+onDeinit clears both buffers instead). `unk2C` stays: it is the viewport's
++0x04C value (Viewport__SetUnk44) and that setter is unnamed.
