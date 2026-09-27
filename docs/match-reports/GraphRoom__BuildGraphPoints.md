@@ -45,7 +45,7 @@ typedef struct GraphPointColor {
     s8 g;
     s8 b;
 } GraphPointColor;
-extern u8 D_8008ABAC;
+extern u8 gGraphPointSize;
 extern u8 D_8008ABB4;
 extern GraphPointColor gGraphPointBaseColor;
 extern D_80087AACEntry *New_BoxFill(void *a0, void *a1, s32 a2);
@@ -54,12 +54,12 @@ void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
     GraphPointColor rgb;
     s32 i;
 
-    self->unk_0xA8[0] = New_BoxFill(&D_8008ABAC, &D_8008ABB4, 0);
+    self->unk_0xA8[0] = New_BoxFill(&gGraphPointSize, &D_8008ABB4, 0);
     rgb = gGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->unk_0xA8[i] = New_BoxFill(&D_8008ABAC, &rgb, 0);
+        self->unk_0xA8[i] = New_BoxFill(&gGraphPointSize, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;
@@ -72,10 +72,10 @@ void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
 }
 ```
 
-`New_BoxFill` is called with `&D_8008ABAC` (its own address, opaque,
+`New_BoxFill` is called with `&gGraphPointSize` (its own address, opaque,
 never dereferenced by this function) as the first argument -- the
-salvaged snapshot below passed `D_8008ABAC` bare (without `&`), which
-would only compile/link correctly if `D_8008ABAC` were itself already a
+salvaged snapshot below passed `gGraphPointSize` bare (without `&`), which
+would only compile/link correctly if `gGraphPointSize` were itself already a
 pointer-typed global; declaring it as a plain byte and taking its address
 explicitly is the safer, self-consistent reading and is what was used
 here.
@@ -165,12 +165,12 @@ void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
     GraphPointColor rgb;
     s32 i;
 
-    self->unk_0xA8[0] = New_BoxFill(D_8008ABAC, &D_8008ABB4, 0);
+    self->unk_0xA8[0] = New_BoxFill(gGraphPointSize, &D_8008ABB4, 0);
     rgb = gGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->unk_0xA8[i] = New_BoxFill(D_8008ABAC, &rgb, 0);
+        self->unk_0xA8[i] = New_BoxFill(gGraphPointSize, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;
@@ -200,7 +200,7 @@ comment); also allocates the 4-byte `matchedDayIndices` scratch buffer
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-The points are New_BoxFill boxes (include/BoxFill.h): size &D_8008ABAC, colour &D_8008ABB4 then the fading `rgb`, priority 0. Zero bytes.
+The points are New_BoxFill boxes (include/BoxFill.h): size &gGraphPointSize, colour &D_8008ABB4 then the fading `rgb`, priority 0. Zero bytes.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__BuildGraphPoints` -> `GraphRoom__BuildGraphPoints`
 

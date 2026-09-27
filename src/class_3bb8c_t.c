@@ -151,7 +151,7 @@ typedef struct GraphPointColor {
     s8 b;
 } GraphPointColor;
 
-extern u8 D_8008ABAC;
+extern u8 gGraphPointSize;
 extern u8 D_8008ABB4;
 extern GraphPointColor gGraphPointBaseColor;
 
@@ -159,12 +159,12 @@ void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     GraphPointColor rgb;
     s32 i;
 
-    self->points[0] = New_BoxFill(&D_8008ABAC, &D_8008ABB4, 0);
+    self->points[0] = New_BoxFill(&gGraphPointSize, &D_8008ABB4, 0);
     rgb = gGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->points[i] = New_BoxFill(&D_8008ABAC, &rgb, 0);
+        self->points[i] = New_BoxFill(&gGraphPointSize, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;
