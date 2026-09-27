@@ -428,3 +428,37 @@ source-level answer.
   section above and is the reason `ApplyMatrixLV` is declared unprototyped.
   A reader deleting it as dead code breaks the match, so the unit now says
   so at the site as well as here.
+
+## Round 95 (bravo): Sony's declarations
+
+`include/code_d294.h` no longer declares `ApplyMatrixLV` unprototyped; the
+three SceneNode units take libgte.h's prototype, `VECTOR *ApplyMatrixLV(MATRIX
+*, VECTOR *, VECTOR *)`. The six-argument call in the `if (0)` branch, which
+only sizes the outgoing-argument area, now goes through a cast to an
+unprototyped function type, `((void (*)())ApplyMatrixLV)(m, src, dst, 0, 0,
+0)`. The frame is still 24 bytes; whole-image SHA1 unchanged.
+
+
+## Round 95 (bravo): moved from include/code_d294.h
+
+The header's banner was rewritten as documentation in round 95; the comments it carried about this function, verbatim:
+
+```c
+/* ApplyMatrixToLVArray (this unit, round 14; MATCHED round 19, echo -- see
+ * docs/match-reports/ApplyMatrixToLVArray.md): a paired-array iteration sibling
+ * to ApplyMatrixToSVArray above -- `count` iterations, 0xC bytes/element (no
+ * unaligned-load complication this time, both `a`/`b` are read directly),
+ * calling `ApplyMatrixLV(fixed, b, a)` once per element and advancing both
+ * `a`/`b` by 0xC each time while `fixed` stays constant across every call.
+ * SceneNode__RotateLocalVector (this unit, round 14) calls it as `ApplyMatrixToLVArray(dst, dst,
+ * 1, &buf)` where `dst` is SceneNode__RotateLocalVector's own 2nd argument and `buf` is a
+ * 0xC-byte stack vector `self->methods`'s own `slot84` just filled in --
+ * i.e. `a`/`b` here are the SAME pointer at that one call site, so it does
+ * not by itself distinguish their roles. */
+
+/* CHANGED round 50 (charlie), parameter NAMES only -- no type, arity or
+ * order change: (a, b, count, fixed) -> (dst, src, count, m). `a` is the
+ * WRITE destination and `b` the read source, per the byte-exact call
+ * `ApplyMatrixLV(m, src, dst)` inside the loop. The same correction
+ * applies to ApplyMatrixToSVArray's declaration above. */
+```

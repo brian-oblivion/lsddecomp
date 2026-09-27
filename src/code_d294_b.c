@@ -11,6 +11,9 @@
  */
 
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_d294.h"
 #include "TmdModel.h"
 
@@ -43,7 +46,7 @@ s32 SceneNode__SetBackClip(SceneNode *self, s32 a1) {
 }
 
 /* self->unk14->unk44 is a 0x28-byte heap block whose +0x10 holds an
- * S16Quad_d294 (see include/code_d294.h). a2 selects between negating x/y/z
+ * S16Quad_d294 (SVECTOR's layout, include/SceneNode.h). a2 selects between negating x/y/z
  * into a local copy (the 4th short left uninitialised, exactly as retail's
  * own negate path never stores to it) or copying the quad verbatim, then
  * forwards the result -- plus a1, passed straight through -- to the PsyQ
@@ -59,7 +62,8 @@ void SceneNode__GetRotMatrix(SceneNode *self, s32 a1, s32 a2) {
     } else {
         buf = *src;
     }
-    RotMatrix(&buf, a1);
+    /* Casts: S16Quad_d294 is SVECTOR's layout, and SceneNode.h types `out` as s32. */
+    RotMatrix((SVECTOR *)&buf, (MATRIX *)a1);
 }
 
 /* a1 gates a small range (2 <= a1 < 4). When self->model is set and
@@ -233,24 +237,24 @@ z_done:
  * twice: once for (arg2, arg3, count), once more for (arg1, arg1, 1) when
  * arg1 is non-NULL. */
 void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *arg1, void *arg2, void *arg3, s32 count) {
-    u8 buf2[0x20];
-    u8 buf1[0x20];
+    MATRIX buf2;
+    MATRIX buf1;
     SceneNode *node;
 
-    self->methods->getRotMatrix(self, buf1, 1);
+    self->methods->getRotMatrix(self, &buf1, 1);
 
     node = self->parent;
     if (node != NULL) {
         do {
-            node->methods->getRotMatrix(node, buf2, 1);
-            MulMatrix2(buf2, buf1);
+            node->methods->getRotMatrix(node, &buf2, 1);
+            MulMatrix2(&buf2, &buf1);
             node = node->parent;
         } while (node != NULL);
     }
 
-    ApplyMatrixToSVArray(arg2, arg3, count, buf1);
+    ApplyMatrixToSVArray(arg2, arg3, count, &buf1);
     if (arg1 != NULL) {
-        ApplyMatrixToSVArray(arg1, arg1, 1, buf1);
+        ApplyMatrixToSVArray(arg1, arg1, 1, &buf1);
     }
 }
 
@@ -261,56 +265,56 @@ void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *arg1, void *arg2,
  * (retail stores every field every iteration), and the source compares
  * with `>` for a min so the slt operands load in retail's order. */
 s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *arg1, TmdVec3 *d) {
-    CornerList_d294 *list;
+    TmdHull *list;
     TmdVec3 *v;
     TmdVec3 *end;
-    BoundsBox_d294 mm;
-    BoundsBox_d294 *b;
-    BoundsBox_d294 *p;
-    BoundsBox_d294 *end2;
+    TmdBox mm;
+    TmdBox *b;
+    TmdBox *p;
+    TmdBox *end2;
     s32 n;
     s32 ret;
-    BoundsBox_d294 box;
+    TmdBox box;
 
-    list = (CornerList_d294 *)arg1;
-    v = &list->hdr;
+    list = arg1;
+    v = list->v;
     v->x += d->x;
     v->y += d->y;
     end = v + list->count * 8;
     v->z += d->z;
-    mm.lo = *v;
-    mm.hi = *v;
+    mm.min = *v;
+    mm.max = *v;
     b = &mm;
     for (v++; v < end; v++) {
         v->x += d->x;
         v->y += d->y;
         v->z += d->z;
-        b->lo.x = (b->lo.x > v->x) ? v->x : b->lo.x;
-        b->lo.y = (b->lo.y > v->y) ? v->y : b->lo.y;
-        b->lo.z = (b->lo.z > v->z) ? v->z : b->lo.z;
-        b->hi.x = (b->hi.x < v->x) ? v->x : b->hi.x;
-        b->hi.y = (b->hi.y < v->y) ? v->y : b->hi.y;
-        b->hi.z = (b->hi.z < v->z) ? v->z : b->hi.z;
+        b->min.x = (b->min.x > v->x) ? v->x : b->min.x;
+        b->min.y = (b->min.y > v->y) ? v->y : b->min.y;
+        b->min.z = (b->min.z > v->z) ? v->z : b->min.z;
+        b->max.x = (b->max.x < v->x) ? v->x : b->max.x;
+        b->max.y = (b->max.y < v->y) ? v->y : b->max.y;
+        b->max.z = (b->max.z < v->z) ? v->z : b->max.z;
     }
 
     TmdModel__UpdateBoundsBuffer(self->model);
-    p = (BoundsBox_d294 *)TmdModel__GetBoundsBuffer(self->model, 0);
+    p = TmdModel__GetBoundsBuffer(self->model, 0);
     n = TmdModel__GetBoundsCount(self->model);
     box = *p;
     end2 = p + n;
     for (p++; p < end2; p++) {
-        box.lo.x = (box.lo.x > p->lo.x) ? p->lo.x : box.lo.x;
-        box.lo.y = (box.lo.y > p->lo.y) ? p->lo.y : box.lo.y;
-        box.lo.z = (box.lo.z > p->lo.z) ? p->lo.z : box.lo.z;
-        box.hi.x = (box.hi.x < p->hi.x) ? p->hi.x : box.hi.x;
-        box.hi.y = (box.hi.y < p->hi.y) ? p->hi.y : box.hi.y;
-        box.hi.z = (box.hi.z < p->hi.z) ? p->hi.z : box.hi.z;
+        box.min.x = (box.min.x > p->min.x) ? p->min.x : box.min.x;
+        box.min.y = (box.min.y > p->min.y) ? p->min.y : box.min.y;
+        box.min.z = (box.min.z > p->min.z) ? p->min.z : box.min.z;
+        box.max.x = (box.max.x < p->max.x) ? p->max.x : box.max.x;
+        box.max.y = (box.max.y < p->max.y) ? p->max.y : box.max.y;
+        box.max.z = (box.max.z < p->max.z) ? p->max.z : box.max.z;
     }
 
     ret = 0;
-    if (!(mm.lo.z > box.hi.z) && !(mm.hi.z < box.lo.z) && !(mm.lo.x > box.hi.x) &&
-        !(mm.hi.x < box.lo.x) && !(mm.lo.y > box.hi.y)) {
-        ret = !(mm.hi.y < box.lo.y);
+    if (!(mm.min.z > box.max.z) && !(mm.max.z < box.min.z) && !(mm.min.x > box.max.x) &&
+        !(mm.max.x < box.min.x) && !(mm.min.y > box.max.y)) {
+        ret = !(mm.max.y < box.min.y);
     }
     return ret;
 }
@@ -333,7 +337,7 @@ s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *dif
     TmdVec3 *hi;
     s32 count1;
     s32 i;
-    Sixteen6_d294 *plane;
+    TmdBox *plane;
     s32 hit;
     s32 cnt2;
     TmdVec3 *v;
@@ -359,8 +363,8 @@ s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *dif
     count1 = TmdModel__GetBoundsCount(self->model);
     hit = 0;
     for (i = 0; i < count1; i++) {
-        plane = (Sixteen6_d294 *)TmdModel__GetBoundsBuffer(self->model, i);
-        if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
+        plane = TmdModel__GetBoundsBuffer(self->model, i);
+        if (ClipSegmentToBox(NULL, plane, &mid[0], &mid[1])) {
             if (TmdModel__RaycastFaces(self->model, &bigConst, (TmdVec3 *)diff, &outWord,
                                        (TmdVec3 *)&mid[0], (TmdVec3 *)&mid[1])) {
                 if (D_8008A838 == 0) {
@@ -383,12 +387,12 @@ s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *dif
     *outFlag = 0;
     cnt2 = list->count;
     for (i = 0; i < count1; i++) {
-        plane = (Sixteen6_d294 *)TmdModel__GetBoundsBuffer(self->model, i);
+        plane = TmdModel__GetBoundsBuffer(self->model, i);
         v = list->v;
         for (k = 0; k < cnt2; k++) {
             for (m = 0; m < 4; m++) {
                 if (m == 1 || m == 2) {
-                    if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, v, v + 4)) {
+                    if (ClipSegmentToBox(NULL, plane, v, v + 4)) {
                         if (TmdModel__RaycastFaces(self->model, &bigConst, (TmdVec3 *)diff,
                                                    &outWord, (TmdVec3 *)v, (TmdVec3 *)(v + 4))) {
                             if (outWord >= 0x201) {
@@ -421,7 +425,7 @@ s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *dif
  * matching retail exactly. Kept because it is what's needed for
  * byte-exactness, not because it means anything; see the report for the
  * hand-lever history this replaced. */
-s32 ClipSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *p1, TmdVec3 *p2) {
+s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2) {
     u8 r1;
     u8 r2;
     TmdVec3 mid;
@@ -497,7 +501,7 @@ combined:
  * overshot, so it becomes the new `far`, otherwise it becomes the new
  * `near` -- each written into one of two ping-pong stack buffers so the
  * OTHER endpoint's storage is never disturbed. */
-void BisectSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *near, TmdVec3 *far) {
+void BisectSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *near, TmdVec3 *far) {
     TmdVec3 buf0;
     TmdVec3 buf1;
     TmdVec3 *dst;
@@ -516,19 +520,19 @@ void BisectSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *near, TmdVec
         }
 
         flags = 0;
-        if (box->hi.x < out->x) {
+        if (box->max.x < out->x) {
             flags = 8;
-        } else if (out->x < box->lo.x) {
+        } else if (out->x < box->min.x) {
             flags = 4;
         }
-        if (box->hi.y < out->y) {
+        if (box->max.y < out->y) {
             flags |= 2;
-        } else if (out->y < box->lo.y) {
+        } else if (out->y < box->min.y) {
             flags |= 1;
         }
-        if (box->hi.z < out->z) {
+        if (box->max.z < out->z) {
             flags |= 0x20;
-        } else if (out->z < box->lo.z) {
+        } else if (out->z < box->min.z) {
             flags |= 0x10;
         }
 

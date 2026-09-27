@@ -260,3 +260,23 @@ swap between a function's own parameters.
   unaffected), but the correct reading: `ApplyMatrixSV` consumes SVECTORs,
   so the 6 bytes are three `s16` components, not the "32-bit value plus a
   trailing s16" the typedef guessed. Byte-identical.
+
+
+## Round 95 (bravo): moved from include/code_d294.h
+
+The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
+
+```c
+/* ApplyMatrixToSVArray (src/code_d294_c.c; MATCHED round 19, echo -- see
+ * docs/match-reports/ApplyMatrixToSVArray.md): `dst[i] = m * src[i]` for
+ * `count` elements of 6 bytes each. Each iteration copies one element out
+ * of `src` into an all-s16 stack local (alignment 2, which is what makes
+ * retail's unaligned lwl/lwr + swl/swr copy come out) and forwards it to
+ * Sony's `ApplyMatrixSV(m, &buf, dst)` -- so the 1st parameter is the
+ * WRITE destination and the 2nd the read source, confirmed against the
+ * byte-exact disassembly. `SceneNode__TransformAndNotifyParents` (code_d294_b) calls it with both
+ * equal to the SAME address, which is why the asymmetry was invisible
+ * until this function was actually matched; round 50 renamed the
+ * parameters (names only) to say which is which. Declared with the opaque
+ * shape its callers need. */
+```

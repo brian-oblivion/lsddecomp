@@ -831,3 +831,47 @@ exists only to make `addiu $sp` agree is a symptom to explain, not a fix.
 Discriminator: `lhu tK,off(box)` before the compare, `sh tK,off(box)` after
 the join, every field. Companion: the compare's two loads come in source
 operand order, so a min whose default is loaded first is spelled `f > v`.
+
+
+## Round 95 (bravo): Sixteen6_d294 and CornerList_d294 retired
+
+Both placeholders in include/code_d294.h are deleted. `Sixteen6_d294` (six
+s16s) was only ever a view of a `TmdModel__GetBoundsBuffer` record, which is a
+`TmdBox`; `SceneNode__ClassifyAgainstPlanes` now holds its `plane` as `TmdBox *`
+with no casts. `CornerList_d294` (a count, then corner[0] with the rest after
+it) is include/TmdModel.h's `TmdHull`, which is what
+`SceneNode__TryAttachNearby` passes as this function's `corners`: the body
+reads `list->v` for `&list->hdr`. Byte-identical. The comments the two types
+carried, moved here verbatim:
+
+```c
+/* Round 13 (SceneNode__CheckBoundsOverlap): a 12-byte, all-s16, 6-field record -- MEASURED,
+ * same all-s16-struct-copy idiom as TmdVec3 (whole-value assignment
+ * compiles to unaligned lwl/lwr). Used as TmdModel__GetBoundsBuffer's own return-array
+ * element type and as this function's own second running-tracker. Round 73
+ * (the match): the pairing is NOT scrambled -- TmdModel__GetBoundsBuffer's records are
+ * BoundsBox_d294 boxes (f0..f2 = lo, f3..f5 = hi), the matched body reads
+ * them through that type, and its tail is an ordinary per-axis AABB overlap
+ * (docs/match-reports/SceneNode__CheckBoundsOverlap.md). This view is kept
+ * only for any remaining accessor; track 4 folds it into BoundsBox_d294. */
+typedef struct Sixteen6_d294 {
+    s16 f0;
+    s16 f1;
+    s16 f2;
+    s16 f3;
+    s16 f4;
+    s16 f5;
+} Sixteen6_d294;
+
+/* Round 13 (SceneNode__CheckBoundsOverlap): `arg1`'s own struct -- a count followed by the
+ * FIRST corner (`hdr`), with `count*8 - 1` more TmdVec3 corners
+ * immediately after (stride 6, walked by raw pointer arithmetic since a
+ * C89 flexible array member isn't available). MEASURED: `count*48` is the
+ * byte span from `&hdr` to the array's end, i.e. 8 corners per `count`. */
+typedef struct CornerList_d294 CornerList_d294;
+
+struct CornerList_d294 {
+    s32 count;   /* +0x000 */
+    TmdVec3 hdr; /* +0x004, corner[0]; corner[1..] follow at +0x00A */
+};
+```

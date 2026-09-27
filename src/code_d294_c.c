@@ -8,6 +8,9 @@
  */
 
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_d294.h"
 #include "TmdModel.h"
 
@@ -93,7 +96,9 @@ void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
 void SceneNode__LinkModel(SceneNode *self, void *model) {
     self->model = model;
     self->tmd = (s32)((TmdModel *)model)->object;
-    GsLinkObject4(((TmdModel *)self->model)->data->objects, &self->attribute, 0);
+    /* Casts: Sony types tmd_base as an address (`unsigned long`), and
+     * SceneNode.h spells the embedded GsDOBJ2 as four separate fields. */
+    GsLinkObject4((u_long)((TmdModel *)self->model)->data->objects, (GsDOBJ2 *)&self->attribute, 0);
 }
 
 /* Clears exactly the two fields SceneNode__LinkModel sets: the GsDOBJ2's
@@ -300,23 +305,23 @@ s32 RatioToFixed12(void *pair) {
  * minimum (x -> 8/4, y -> 2/1, z -> 0x20/0x10). Returned unmasked; callers
  * do their own `andi ..., 0xFF`. The first axis assigns rather than ORs
  * only because `flags` is provably 0 there. */
-s32 CalcBoxOutcode(BoundsBox_d294 *box, TmdVec3 *point) {
+s32 CalcBoxOutcode(TmdBox *box, TmdVec3 *point) {
     s32 flags;
 
     flags = 0;
-    if (box->hi.x < point->x) {
+    if (box->max.x < point->x) {
         flags = 8;
-    } else if (point->x < box->lo.x) {
+    } else if (point->x < box->min.x) {
         flags = 4;
     }
-    if (box->hi.y < point->y) {
+    if (box->max.y < point->y) {
         flags |= 2;
-    } else if (point->y < box->lo.y) {
+    } else if (point->y < box->min.y) {
         flags |= 1;
     }
-    if (box->hi.z < point->z) {
+    if (box->max.z < point->z) {
         flags |= 0x20;
-    } else if (point->z < box->lo.z) {
+    } else if (point->z < box->min.z) {
         flags |= 0x10;
     }
     return flags;
@@ -388,8 +393,7 @@ void ApplyMatrixToSVArray(void *dst, void *src, s32 count, void *m) {
  * argument count during RTL expansion, before dead-branch elimination, so
  * the 6-argument call in the unreachable branch is what produces retail's
  * frame. Full derivation in docs/match-reports/ApplyMatrixToLVArray.md;
- * this is also why `ApplyMatrixLV` is declared unprototyped in
- * include/code_d294.h. */
+ * this is also why that call goes through an unprototyped function type. */
 void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m) {
     u8 *end;
 
@@ -400,7 +404,9 @@ void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m) {
         src = (u8 *)src + 0xC;
     }
     if (0) {
-        ApplyMatrixLV(m, src, dst, 0, 0, 0);
+        /* Cast to an unprototyped function type: libgte.h's prototype
+         * rejects six arguments, and only the count matters here. */
+        ((void (*)())ApplyMatrixLV)(m, src, dst, 0, 0, 0);
     }
 }
 

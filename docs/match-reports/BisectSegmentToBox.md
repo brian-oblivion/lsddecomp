@@ -124,3 +124,23 @@ against an AABB until the running midpoint exactly equals one endpoint,
 writing the midpoint into `*out` every iteration. Mechanics unambiguous
 from the body and the one caller. Purely local to this unit + its
 header.
+
+
+## Round 95 (bravo): BoundsBox_d294 is TmdBox
+
+`BoundsBox_d294` (low corner, high corner, three s16 each) was the same
+struct as include/TmdModel.h's `TmdBox` (min, max), which is also what
+`TmdModel__GetBoundsBuffer` returns. The placeholder is deleted; this function,
+`ClipSegmentToBox`, `CalcBoxOutcode` and `SceneNode__CheckBoundsOverlap` take
+`TmdBox *`, with `lo`/`hi` read as `min`/`max`. Byte-identical. The comment
+the placeholder carried in include/code_d294.h, moved here verbatim:
+
+```c
+/* Round 13 (BisectSegmentToBox): an axis-aligned bounding box, low corner then
+ * high corner -- MEASURED from BisectSegmentToBox's own field offsets
+ * (+0x0/+0x2/+0x4 = lo.x/y/z, +0x6/+0x8/+0xA = hi.x/y/z). */
+typedef struct BoundsBox_d294 {
+    TmdVec3 lo;
+    TmdVec3 hi;
+} BoundsBox_d294;
+```

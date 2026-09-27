@@ -9,6 +9,9 @@
  * GsDOBJ2.attribute. Part 2 is code_d294_b.c, part 3 code_d294_c.c.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_d294.h"
 
 /* The low nibble of a class table's header word is its class tag. */
@@ -111,7 +114,8 @@ void SceneNode__OnNotify(SceneNode *self, BasicClass *sender, s32 event) {
 void SceneNode__Reset(SceneNode *self) {
     self->tick = 0;
     self->attribute = 0;
-    GsInitCoordinate2(0, self->coord2);
+    /* Cast: SceneNode.h spells coord2 as SceneNodeSub14, GsCOORDINATE2's layout. */
+    GsInitCoordinate2(NULL, (GsCOORDINATE2 *)self->coord2);
     self->methods->updateRotation(self, 1, ROTATION_ZERO);
     self->methods->updateScale(self, 1, SCALE_ONE);
     self->coord2->flg = 1;

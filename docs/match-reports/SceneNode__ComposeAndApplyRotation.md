@@ -148,3 +148,9 @@ reasonable reading, not an independently confirmed one. Purely local to
 this unit + its header for the FUNCTION rename; the underlying vtable
 FIELD name (`slotA4`) is proposed, not renamed -- see below, it is also
 dispatched from `code_d294_c.c` (a different unit).
+
+## Round 95 (bravo): Sony's declarations
+
+`MulMatrix2` now comes from `<libgte.h>`, `MATRIX *MulMatrix2(MATRIX *m0,
+MATRIX *m1)`. The two 0x20-byte `u8` stack buffers became `MATRIX` locals,
+passed by address. Byte-identical: same frame, same offsets.

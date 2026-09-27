@@ -68,3 +68,19 @@ current derivation.
   outcode segment-vs-box trivial-accept/reject test.
 - Parameters already carry the derived types `BoundsBox_d294 *` /
   `Vec3S16_d294 *` from an earlier round; unchanged.
+
+
+## Round 95 (bravo): moved from include/code_d294.h
+
+The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
+
+```c
+/* CalcBoxOutcode (round 54 correction: this banner was STALE -- it is
+ * now carved and MATCHED in src/code_d294_c.c):
+ * computes the SAME 6-bit box-vs-point outcode BisectSegmentToBox's own `flags`
+ * computation does (bit-for-bit identical comparison chain against the
+ * same 6 field offsets) -- MEASURED, not guessed; this is the shared
+ * primitive both functions build on. Returns the accumulated flags in
+ * `$v0` unmasked (the mask is the CALLER's job, per ClipSegmentToBox's own
+ * repeated `andi ...,0xFF` every time it re-reads a stored result). */
+```
