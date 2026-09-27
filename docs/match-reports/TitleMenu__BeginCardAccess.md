@@ -21,7 +21,7 @@ void TitleMenu__BeginCardAccess(TitleMenu *self)
         self->iconHandle = New_TimImage(sSaveIconTimPath);
         self->unkAC = New_TaskObjF((void *)1, NULL);
     }
-    self->unkAC->methods->slot6C(self->unkAC, D_8008A9D0, &D_80086D6C,
+    self->unkAC->methods->slot6C(self->unkAC, D_8008A9D0, &sSaveFileSuffixes,
                                   self->handlerTable->unk4, self->unk10, self->unk14,
                                   self->unk48);
     self->methods->slot10(self, self->unkAC);
@@ -57,7 +57,7 @@ SLPS_015.56`.
   opaquely: `D_8008A9D0` (a NEW `%gp_rel` VALUE-of global, same pattern as
   `D_8008AA10`/`D_8008AA18`/`D_8008AA14` -- holds `0x80011454`, the
   "BISLPS-01556" string in the same unowned `D_80011434` rodata block,
-  again with no `dlabel` of its own), `&D_80086D6C` (a real 16-entry
+  again with no `dlabel` of its own), `&sSaveFileSuffixes` (a real 16-entry
   pointer table, `asm/data/76DC8.data.s`, reached only by address here),
   `self->handlerTable->unk4` (already `void *`), `self->unk10` (already `void
   *`), a NEW field `self->unk14` (`void *`, established here -- lands
@@ -80,7 +80,7 @@ SLPS_015.56`.
   `pad008[0x06C-0x008]` + the new slot (0x06C-0x070, exactly 4 bytes, no
   remainder).
 - New externs: `sSaveIconTimPath` (`const char[]`, a real string dlabel),
-  `D_8008A9D0` (`void *`, VALUE-of `%gp_rel`), `D_80086D6C` (`s32`,
+  `D_8008A9D0` (`void *`, VALUE-of `%gp_rel`), `sSaveFileSuffixes` (`s32`,
   address-of placeholder for a real 16-entry pointer table).
 - `src/class_3bb8c_d.c`: local extern for `New_TimImage` (own arity/
   return type, per the project's established independent-views
@@ -117,7 +117,7 @@ TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus
 
 ## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
 
-`D_8008A9D0` and `D_80086D6C`'s comments named their consumer as
+`D_8008A9D0` and `sSaveFileSuffixes`'s comments named their consumer as
 `TitleMenuUnkACObjMethods_3bb8c_d::slot6C`, a view deleted when TaskObjF was
 unified; they are TaskObjF's init (+0x06C) `namePrefix` and `nameSuffixes`.
 Both were described as "round 43's" readings.

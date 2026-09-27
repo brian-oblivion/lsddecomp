@@ -118,7 +118,7 @@ struct TaskObjF {
     /* +0x028 */ s32 state;  /* setState; init clears it */
     /* +0x02C */ s32 bufCount; /* collectExistingMemcardFiles's count; how many `titles` buffers are kept */
     /* +0x030 */ char *namePrefix; /* init: the product code ("BISLPS-01556", D_8008A9D0); file names are prefix + suffix */
-    /* +0x034 */ char **nameSuffixes; /* init: a NULL-terminated table of candidate suffixes (D_80086D6C) */
+    /* +0x034 */ char **nameSuffixes; /* init: a NULL-terminated table of candidate suffixes (sSaveFileSuffixes) */
     /* +0x038 */ char **titles; /* AllocBuffers: 16 pointers, 15 buffers of 0x41; the existing files' titles; the item list's strings */
     /* +0x03C */ char **foundSuffixes; /* AllocBuffers: 0x40 bytes; the suffix of each file in `titles` */
     /* +0x040 */ char *fileName; /* beginLoad/beginSave; advanceState builds it from the chosen entry */

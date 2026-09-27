@@ -223,7 +223,7 @@ void TitleMenu__BeginCardAccess(TitleMenu *self) {
         self->saveIcon = New_TimImage((char *)sSaveIconTimPath);
         self->saveCtrl = New_TaskObjF(1, 0);
     }
-    self->saveCtrl->methods->init(self->saveCtrl, D_8008A9D0, (char **)&D_80086D6C,
+    self->saveCtrl->methods->init(self->saveCtrl, D_8008A9D0, (char **)&sSaveFileSuffixes,
                                   self->initArgs->pad, self->unk10, (struct SceneNode *)self->unk14,
                                   (struct VabStreamObj *)self->sound);
     self->methods->addChild(self, (BasicClass *)self->saveCtrl);

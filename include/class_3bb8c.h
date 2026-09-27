@@ -152,7 +152,7 @@ extern void *D_8008A9D0;
 
 /* TaskObjF's init `nameSuffixes` (TitleMenu__BeginCardAccess): 16 string
  * pointers, D_8008AA0C down to D_8008A9D4, then NULL. Address only. */
-extern s32 D_80086D6C;
+extern s32 sSaveFileSuffixes;
 
 /* TitleMenu__CycleSaveTitleColor's index (0, 1, 2) into its 3-byte colour.
  * The storage is a word; every access is a byte (lbu/sb). */

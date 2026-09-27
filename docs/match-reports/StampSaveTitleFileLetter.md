@@ -132,7 +132,7 @@ icon: measured from the executable, the pointer at 0x8008AAC4 points at
 followed at glyph 15 by three full-width spaces and "Day". TitleMenu's
 save title (D_8008AA18 -> 0x8001149C) starts as full-width "LSD   Day001",
 and the file names are namePrefix "BISLPS-01556" + "-01".."-15"
-(D_80086D6C). So the body writes characters 3..8 as "   Day", character
+(sSaveFileSuffixes). So the body writes characters 3..8 as "   Day", character
 12 as a space, and character 4 as the letter for the file's number; with a
 NULL file name it blanks characters 3..5. The `'8'` test exists because
 Sony's atoi (libc2/atoi.o, read from lib/) takes a leading 0 as octal, so
