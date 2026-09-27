@@ -3042,3 +3042,4 @@ _svm_orev1 = 0x8008E230;
 _svm_orev2 = 0x8008E234;
 _svm_okof1 = 0x80090C60;
 _svm_okof2 = 0x80090C64;
+_svm_stereo_mono = 0x8008E8C0;

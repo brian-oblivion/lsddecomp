@@ -162,7 +162,7 @@ extern u8 D_8008EA19;
 extern u8 D_8008EA17;
 extern u8 D_8008EA11;
 extern u8 D_8008EA1A;
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 extern u16 D_8008EA22;
 extern u8 D_8008EA20;
 extern u16 D_8008E228;
@@ -239,7 +239,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
         pan1 = (pan1 * (0x7F - D_8008EA11)) / 63;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (pan1 < pan2) {
             pan1 = pan2;
         } else {
@@ -294,7 +294,7 @@ extern VagAtr *_svm_tn;
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 
 /* The blend-cascade globals
- * (D_8008EA16/17/19/1A/11/20/22, D_8008E8C0, D_8008E228/22C, _svm_okof1/64,
+ * (D_8008EA16/17/19/1A/11/20/22, _svm_stereo_mono, D_8008E228/22C, _svm_okof1/64,
  * _svm_orev1/234, _svm_sreg_dirty/98C/9A3) are already declared above, before
  * SpuVmKeyOnNow (ROM-earlier, same shapes) -- reused here, not redeclared. */
 extern u8 D_8008EA0E;

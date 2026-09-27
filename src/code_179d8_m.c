@@ -55,7 +55,7 @@ extern u8 D_8008EA17;
 extern u8 D_8008EA19;
 extern u8 D_8008EA1A;
 
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 231/231 words, length exact, 223/231 raw, funcdiff
@@ -129,7 +129,7 @@ void SetAutoVol(s16 voice) {
         val1 = (val1 * (0x7F - p)) / 64;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (val2 > val1) {
             val1 = val2;
         } else {
@@ -237,7 +237,7 @@ void SetAutoPan(s16 voice) {
         val1 = (val1 * (0x7F - p)) / 64;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (val2 > val1) {
             val1 = val2;
         } else {
@@ -384,7 +384,7 @@ void SpuVmInit(s32 a0) {
     _svm_rattr.mask = 0;
     _svm_rattr.mode = 0;
     _svm_auto_kof_mode = 0;
-    D_8008E8C0 = 0;
+    _svm_stereo_mono = 0;
     kMaxPrograms = 0x80;
     SpuVmFlush();
 }

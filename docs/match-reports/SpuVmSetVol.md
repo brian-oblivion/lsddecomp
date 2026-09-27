@@ -174,7 +174,7 @@ it is *downstream* of the shape difference above, not the thing to attack.
 
 Declarations used, all of them already present in `src/libsnd_vm_vol_ut_key_ut_keyv.c`
 before this round (`Rec34D994`, `SlotE968`, `RecordE978`, `SsScore`,
-`ObjE970`, `D_8008E9D0`, `D_8008EA22`, `D_8008E8C0`, `_svm_sreg_buf`,
+`ObjE970`, `D_8008E9D0`, `D_8008EA22`, `_svm_stereo_mono`, `_svm_sreg_buf`,
 `_svm_sreg_dirty`, `SpuVmVSetUp`).
 
 ```c
@@ -250,7 +250,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     }
 
                     pan1sq = pan1 * pan1;
-                    if (D_8008E8C0 == 1) {
+                    if (_svm_stereo_mono == 1) {
                         if (pan1 < pan2) {
                             pan1 = pan2;
                         } else {
@@ -448,7 +448,7 @@ typedef struct {
 } ObjE970;
 extern ObjE970 *_svm_vh;
 
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 extern u8 _svm_sreg_buf[];
 extern u8 _svm_sreg_dirty[];
 extern Rec34D994 D_8008D990[];   /* added round 45, in this unit's existing Rec34D994 block */
@@ -528,7 +528,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     }
 
                     pan1sq = pan1 * pan1;
-                    if (D_8008E8C0 == 1) {
+                    if (_svm_stereo_mono == 1) {
                         if (pan1 < pan2) {
                             pan1 = pan2;
                         } else {
@@ -788,7 +788,7 @@ signed 16-bit values). On a match:
   `SlotE968.unk4`, and the function's own 5th parameter (`a4`, passed on
   the STACK per MIPS o32 register-argument exhaustion, loaded via `lhu` at
   `sp+0x48`).
-- The same `D_8008E8C0`-gated clamp shape as both siblings.
+- The same `_svm_stereo_mono`-gated clamp shape as both siblings.
 - Squares both final pan values and divides each by `16383` (same magic
   `0x00040011` `SpuVmKeyOnNow`'s tail already established), writing the
   results into `_svm_sreg_buf`'s 16-byte-stride slots (`vmNoiseOn`'s own
@@ -826,7 +826,7 @@ typedef struct {
 } ObjE970;
 extern ObjE970 *_svm_vh;
 
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 extern u8 _svm_sreg_buf[];
 extern u8 _svm_sreg_dirty[];
 extern Rec34D994 D_8008D990[];   /* added to this unit's existing Rec34D994 block */
@@ -909,7 +909,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     }
 
                     pan1sq = pan1 * pan1;
-                    if (D_8008E8C0 == 1) {
+                    if (_svm_stereo_mono == 1) {
                         if (pan1 < pan2) {
                             pan1 = pan2;
                         } else {

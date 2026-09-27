@@ -470,7 +470,7 @@ void SpuVmInit(s32 a0) {
     D_8008E258 = 0;
     D_8008E25C = 0;
     _svm_auto_kof_mode = 0;
-    D_8008E8C0 = 0;
+    _svm_stereo_mono = 0;
     kMaxPrograms = 0x80;
     SpuVmFlush();
 }

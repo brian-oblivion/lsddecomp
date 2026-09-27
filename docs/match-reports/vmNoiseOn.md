@@ -46,7 +46,7 @@ see below), producing `lvl1`/`lvl2` and then `lvl1b`/`lvl2b` from those.
 Three successive `if (byte < 0x40) ... else ...` blends (division by 63,
 using either the raw control byte or `0x7F` minus it) combine `lvl1b`/`lvl2b`
 into a final `pan1`/`pan2` pair, clamped so neither exceeds the other when a
-global flag (`D_8008E8C0 == 1`) is set. The rest is the tail this unit's
+global flag (`_svm_stereo_mono == 1`) is set. The rest is the tail this unit's
 `vmNoiseOn2` already established byte-for-byte: write `pan1`/`pan2` into
 the 16-byte-stride `_svm_sreg_buf`/`D_8008D7F2` tables, OR `3` into
 `_svm_sreg_dirty[chan]`, compute a 32-bit voice-enable bit split across
@@ -112,7 +112,7 @@ extern u8 D_8008EA19;
 extern u8 D_8008EA17;
 extern u8 D_8008EA11;
 extern u8 D_8008EA1A;
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 extern u16 D_8008EA22;
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
@@ -158,7 +158,7 @@ extern u8 D_8008EA19;
 extern u8 D_8008EA17;
 extern u8 D_8008EA11;
 extern u8 D_8008EA1A;
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 extern u16 D_8008EA22;
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
@@ -229,7 +229,7 @@ void vmNoiseOn(s32 a0) {
         pan1 = (pan1 * (0x7F - D_8008EA11)) / 63;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (pan1 < pan2) {
             pan1 = pan2;
         } else {

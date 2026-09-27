@@ -21,7 +21,7 @@ Unit: `src/code_179d8_l.c` (carved round 24, 2026-09-08) · Size: 316 words
 
 Sibling of `vmNoiseOn` in the same unit (same two-level `_ss_score`
 entry table, same three-stage `D_8008EA1A`/`17`/`11` blend cascade, same
-`D_8008E8C0`-gated clamp, same low/high enable-bit split) but a DIFFERENT
+`_svm_stereo_mono`-gated clamp, same low/high enable-bit split) but a DIFFERENT
 source object and a DIFFERENT tail:
 
 - **Level source**: reads `_svm_vh->unk18` (a per-session "priority"-ish
@@ -115,7 +115,7 @@ extern u8 D_8008EA19;
 extern u8 D_8008EA17;
 extern u8 D_8008EA11;
 extern u8 D_8008EA1A;
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 extern u16 D_8008EA22;
 extern u8 D_8008EA20;
 extern u8 _svm_sreg_dirty[];
@@ -190,7 +190,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     }
 
     pan1sq = pan1 * pan1;
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (pan1 < pan2) {
             pan1 = pan2;
         } else {
@@ -324,7 +324,7 @@ structurally-near-identical sibling's gap WORSE, even within the same unit
 and even when both chain the same family of magic-multiply divisions.**
 `vmNoiseOn` and `SpuVmKeyOnNow` share the two-level `_ss_score`
 lookup, the exact same three-stage blend cascade, and the same
-`D_8008E8C0` clamp shape, and both have unresolved frame-size/position
+`_svm_stereo_mono` clamp shape, and both have unresolved frame-size/position
 gaps -- but marking the chained-division intermediates `volatile` (which
 took D8E0 from 295 to 309/311) makes D1B4 regress from 332 to 342. Do not
 assume a documented frame-size fix generalizes to a "similar-looking"
@@ -472,7 +472,7 @@ several times in one function.
 
 ### Third: two more levers, one of them transferred straight from `vmNoiseOn2` this same round
 
-- **`pan1sq` belongs AFTER the `D_8008E8C0` clamp, not before-and-again-inside.**
+- **`pan1sq` belongs AFTER the `_svm_stereo_mono` clamp, not before-and-again-inside.**
   Round 45's body computed `pan1sq = pan1*pan1;` before the `if`, then again
   inside it. Retail has two `mult $a2,$a2` and only ONE `mflo` — which is a
   single source-level multiply after the block, with GCC filling the `bne`
@@ -599,7 +599,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
         pan1 = (pan1 * (0x7F - D_8008EA11)) / 63;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (pan1 < pan2) {
             pan1 = pan2;
         } else {
@@ -804,7 +804,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
         pan1 = (pan1 * (0x7F - D_8008EA11)) / 63;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (pan1 < pan2) {
             pan1 = pan2;
         } else {

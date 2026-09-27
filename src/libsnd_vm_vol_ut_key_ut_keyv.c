@@ -130,7 +130,7 @@ extern u16 _svm_okon2;
  * header. */
 extern VabHdr *_svm_vh;
 
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 315/324 words, 9 words short; raw word-match 10/324,
@@ -208,7 +208,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     }
 
                     pan1sq = pan1 * pan1;
-                    if (D_8008E8C0 == 1) {
+                    if (_svm_stereo_mono == 1) {
                         if (pan1 < pan2) {
                             pan1 = pan2;
                         } else {

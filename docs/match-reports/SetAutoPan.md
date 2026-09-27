@@ -185,7 +185,7 @@ obvious from context.
 - `D_8008EA10`, `D_8008EA11`, `D_8008EA16`, `D_8008EA17`, `D_8008EA19`,
   `D_8008EA1A`: plain byte scratch globals feeding the percentage-chain
   calculation.
-- `D_8008E8C0`: an `s16` mode flag; when it equals `1`, both output values
+- `_svm_stereo_mono`: an `s16` mode flag; when it equals `1`, both output values
   get forced to their shared maximum.
 
 ## Shape (believed correct)
@@ -204,7 +204,7 @@ combine two byte-scratch globals through the identified 16129 divisor
 THREE successive "if (byte < 0x40) scale channel A by byte/64 else scale
 channel B by (127-byte)/64" passes (against `D_8008EA1A`, then
 `D_8008EA17`, then the just-clamped accumulator's own low byte), optionally
-force both channels to their shared max if `D_8008E8C0 == 1`, then store
+force both channels to their shared max if `_svm_stereo_mono == 1`, then store
 the two results into `D_8008D7F2`/`_svm_sreg_buf` and OR a flag bit into
 `_svm_sreg_dirty[a0]`.
 
@@ -486,7 +486,7 @@ extern u8 D_8008EA1A;
 
 /* Mode flag: forces both output channels to the same (maximum) level
  * when set to 1. */
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 
 void SetAutoPan(s16 a0) {
     s16 idxCopy;
@@ -577,7 +577,7 @@ void SetAutoPan(s16 a0) {
         val1 = tmp / 64;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (val1 < val2) {
             val1 = val2;
         } else {
@@ -780,7 +780,7 @@ extern u8 D_8008EA16;
 extern u8 D_8008EA17;
 extern u8 D_8008EA19;
 extern u8 D_8008EA1A;
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 extern Rec34Half D_8008D9B0[];
 extern Rec34Half D_8008D9B2[];
 extern Rec34Half D_8008D9B4[];
@@ -853,7 +853,7 @@ void SetAutoPan(s16 voice)
         val1 = (val1 * (0x7F - p)) / 64;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (val2 > val1) {
             val1 = val2;
         } else {
