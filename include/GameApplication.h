@@ -54,8 +54,8 @@ typedef struct GameApplicationMethods GameApplicationMethods;
  * gate below is read `!= 0` by the methods it names. */
 typedef struct GameApplicationConfig {
     /* +0x00 */ s32 dataSource; /* Application's ctor argument (0x13 = the CD driver's class id) */
-    /* +0x04 */ s32 unk04;      /* New_DayTask's 3rd argument, in PollStatusObj: that ctor
-                            * passes (unk04 == 0) to SetActiveDataSourceDriverMode */
+    /* +0x04 */ s32 dayTaskSyncDriver; /* New_DayTask's syncDriver, in RunDayTask: that ctor
+                            * passes (syncDriver == 0) to SetActiveDataSourceDriverMode */
     /* +0x08 */ s32 playStreams; /* gates every StreamTask: StartWeeklyStreamTask, StartGraphRoomStreamTask,
                                      * StartCinematicStream's stream branch, StartStreamTaskWithInit */
     /* +0x0C */ s32 showIntroLogos; /* gates LoadIntroLogoSequence */

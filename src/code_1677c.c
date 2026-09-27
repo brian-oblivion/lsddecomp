@@ -23,7 +23,7 @@
  * rather than a typed pointer because every New_X in the game calls it. */
 extern void *BMemPMgrAlloc(s32 size);
 
-extern const char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
+extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
 
 extern char *GetDefaultDataDirectory(void); /* GameFiles.c: "CDI\\" */
 extern void SetDataDirectory(char *dir);    /* code_171e0.c */
@@ -39,34 +39,13 @@ extern s32 PickOpeningMovie(s32 *out, s32 param2); /* psyq_memset.s: day/week-st
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char sLogoPathOsd[];  /* "ETC\OSDLOGO.TIM" */
 
-/* The PollTasks GameApplication__RunTask runs (New_GraphRoom, New_TitleMenu)
- * are TaskCore-family classes; this is this unit's own minimal view of
- * them: +0x004 is BasicClass's release, +0x044 IntermediateBase's init.
- * Constructed directly by a caller-supplied function pointer
- * (GameApplication__RunTask's own a0) rather than a New_X-style allocator. */
-typedef struct PollTaskMethods {
-    s32 header;                                                              /* +0x000 */
-    void (*slot4)(void *self);                                               /* +0x004 */
-    u8 pad08[0x044 - 0x008];                                                 /* +0x008 .. +0x043 */
-    s32 (*slot44)(void *self, IntermediateBaseInitArgs *initArgs, s32 mode); /* +0x044 */
-} PollTaskMethods;
+/* What GameApplication__RunTask builds: an IntermediateBase allocator taking
+ * the DreamSys, New_GraphRoom or New_TitleMenu cast to this type. */
+typedef IntermediateBase *(*NewTaskFn)(struct DreamSys *dreamSys);
 
-typedef struct PollTask {
-    PollTaskMethods *methods;
-} PollTask;
-
-typedef PollTask *(*PollTaskCtor)(void *arg);
-
-/* This unit's own function, defined later in ROM order (forward declared
- * for GameApplication__RunTitleMenu, which comes first). Constructs a PollTask via the
- * caller-supplied `ctor`, dispatches slot44(task, initArgs, 0) and slot4(task)
- * on it, and returns slot44's result. */
-s32 GameApplication__RunTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseInitArgs *initArgs);
-
-/* PollTask constructors (not this unit's to write). Called directly (not
- * through any vtable) as GameApplication__RunTask's `ctor` argument.
- * New_GraphRoom is include/GraphRoom.h's and New_TitleMenu
- * include/TitleMenu.h's, each cast to PollTaskCtor. */
+/* Defined below GameApplication__RunTitleMenu, its caller. */
+s32 GameApplication__RunTask(NewTaskFn newTask, struct DreamSys *dreamSys,
+                             IntermediateBaseInitArgs *initArgs);
 
 extern s32 GetSpecialDayMovieSpan(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
 /* GameFiles.c: same "write to *out, return a separate value" shape as
@@ -117,7 +96,7 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
     self->config = arg;
     SetDataDirectory(GetDefaultDataDirectory());
     req.src.buffer = NULL;
-    req.src.name = (char *)sModelPathDreamE5;
+    req.src.name = sModelPathDreamE5;
     self->dreamSys = New_DreamSys(New_LinkResource(&req.src), 0, 0);
     self->skipGraphRoomPoll = 0;
     self->dreamSys->methods->slot228(self->dreamSys, arg->unk14);
@@ -225,8 +204,8 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
         status = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->skipGraphRoomPoll == 0) {
-                status = GameApplication__RunTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
-                                                      (IntermediateBaseInitArgs *)self->aux);
+                status = GameApplication__RunTask((NewTaskFn)New_GraphRoom, self->dreamSys,
+                                                  (IntermediateBaseInitArgs *)self->aux);
                 if (status == 2) {
                     GameApplication__PlaySpecialDayMovies(self);
                 }
@@ -235,11 +214,11 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
 
         pollDone = 2;
     retry:
-        status = GameApplication__RunTask((PollTaskCtor)New_TitleMenu, self->dreamSys,
-                                              (IntermediateBaseInitArgs *)self->aux);
+        status = GameApplication__RunTask((NewTaskFn)New_TitleMenu, self->dreamSys,
+                                          (IntermediateBaseInitArgs *)self->aux);
         if (status == pollDone) {
-            GameApplication__RunTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
-                                         (IntermediateBaseInitArgs *)self->aux);
+            GameApplication__RunTask((NewTaskFn)New_GraphRoom, self->dreamSys,
+                                     (IntermediateBaseInitArgs *)self->aux);
             goto retry;
         }
 
@@ -249,14 +228,14 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
     return 2;
 }
 
-/* Constructs a PollTask via the caller-supplied `ctor`, dispatches
- * slot44(task, initArgs, 0) and slot4(task) on it (fire-and-forget), and
- * returns slot44's result. */
-s32 GameApplication__RunTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseInitArgs *initArgs) {
-    PollTask *task = ctor(dreamSys);
-    s32 result = task->methods->slot44(task, initArgs, 0);
+/* Builds a task with newTask(dreamSys), runs its init to the end (mode 0),
+ * releases it and returns init's result. */
+s32 GameApplication__RunTask(NewTaskFn newTask, struct DreamSys *dreamSys,
+                             IntermediateBaseInitArgs *initArgs) {
+    IntermediateBase *task = newTask(dreamSys);
+    s32 result = task->methods->init(task, initArgs, 0);
 
-    task->methods->slot4(task);
+    task->methods->release(task);
     return result;
 }
 
@@ -268,10 +247,10 @@ s32 GameApplication__RunTask(PollTaskCtor ctor, void *dreamSys, IntermediateBase
 void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     StreamTask *task;
 
+    /* MATCHING: the frame keeps 12 bytes here, frameTotal in the last 4. */
     struct {
-        u32 unk00;
-        u32 unk04;
-        u32 count;
+        u8 pad00[8];
+        u32 frameTotal;
     } buf;
 
     s32 extra;
@@ -279,8 +258,8 @@ void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        extra = GetSpecialDayMovieSpan(&buf.count, 0, 10);
-        task->methods->setFrameBound(task, buf.count / 15);
+        extra = GetSpecialDayMovieSpan(&buf.frameTotal, 0, 10);
+        task->methods->setFrameBound(task, buf.frameTotal / 15);
         task->methods->setSkipOnConfirm(task, 0);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux, extra,
                                                 -1, 1);
@@ -323,7 +302,8 @@ s32 GameApplication__RunDayTask(GameApplication *self) {
     s32 check;
     s32 result;
 
-    obj = New_DayTask((IntermediateBaseInitArgs *)self->aux, self->dreamSys, self->config->unk04);
+    obj = New_DayTask((IntermediateBaseInitArgs *)self->aux, self->dreamSys,
+                      self->config->dayTaskSyncDriver);
     status = ((DayTaskInitFn)obj->methods->init)(obj);
     obj->methods->release(obj);
 
@@ -352,10 +332,10 @@ s32 GameApplication__RunDayTask(GameApplication *self) {
 void GameApplication__PlayCinematic(GameApplication *self) {
     CinematicCall cc;
 
+    /* MATCHING: the frame keeps 12 bytes here, movieId in the first 4. */
     struct {
-        s32 chan;
-        u32 unk04;
-        u32 unk08;
+        s32 movieId;
+        u8 pad04[8];
     } chanBuf;
 
     s32 groupId;
@@ -363,15 +343,15 @@ void GameApplication__PlayCinematic(GameApplication *self) {
     TaskCore *task;
 
     cc = self->dreamSys->methods->getCinematic(self->dreamSys);
-    groupId = GetSpecialDayOrEventRecord(&chanBuf.chan, (u16)cc.bank | ((u32)(u16)cc.entry << 16));
+    groupId = GetSpecialDayOrEventRecord(&chanBuf.movieId, (u16)cc.bank | ((u32)(u16)cc.entry << 16));
     SetActiveDataSourceDriverMode(0, 0, 0);
 
-    if (chanBuf.chan != -1) {
+    if (chanBuf.movieId != -1) {
         if (self->config->playStreams != 0) {
             StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
             streamTask->methods->setSkipOnConfirm(streamTask, 0);
-            lookup = GetMovieFrameCount(chanBuf.chan);
+            lookup = GetMovieFrameCount(chanBuf.movieId);
             ((StreamTaskInitFn)streamTask->methods->init)(
                 streamTask, (IntermediateBaseInitArgs *)self->aux, groupId, lookup, 1);
             streamTask->methods->release(streamTask);
