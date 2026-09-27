@@ -85,7 +85,7 @@ segments:
       - [0xABC, rodata]   # psyq_GsLinkObject4 (D_800102BC, jtbl_800102DC)
       # jtbl_80010354 is code_fa50's switch table: `.L` labels local to its
       # function's own `.s`, so the sub-slot is ATTACHED (Gate 2). 0x80 bytes.
-      - [0xB54, .rodata, code_fa50]
+      - [0xB54, .rodata, TmdModel]
       - [0xBD4, rodata]   # 0xEBC..0xF25 is libetc/intr's .rdata, SHADOWED (see the manifest)
       - [0xF28, o, libetc/intr_dma, .rdata]   # "DMA bus error" strings
       - [0xF54, o, libetc/vsync, .rdata]      # "VSync: timeout"
@@ -469,7 +469,7 @@ segments:
       - [0xF8C8, o, libgte/ratan]       # ratan2, ratan (Psy-Q 3.3). .data at 0x5BE9C
       # 0xFA50..0x10D48: game code (revision 18; was psyq_fa50). Owns
       # jtbl_80010354 through the attached 0xB54 rodata sub-slot.
-      - [0xFA50, c, code_fa50]
+      - [0xFA50, c, TmdModel]
       - [0x10D48, o, libgs/gs_105]      # GsMapModelingData (Psy-Q 3.3). bss via the fragment
       - [0x10DC0, o, libgte/msc01]      # SquareRoot0, SquareRoot12. .data at 0x5C6F0
       # 0x10EE0..0x11474: game code (revision 18; was the head of psyq_10ee0).

@@ -166,7 +166,7 @@ The header's banner was rewritten as documentation in round 95; the comments it 
  * reach these blocks. A later pass can do it with the offsets above.
  * ========================================================================= */
 
-/* The model SceneNode keeps at +0x020 is a TmdModel (code_fa50). Its
+/* The model SceneNode keeps at +0x020 is a TmdModel (TmdModel). Its
  * methods -- TmdModel__GetHull, TmdModel__GetBoundsCount,
  * TmdModel__UpdateBoundsBuffer/GetBoundsBuffer, TmdModel__RaycastFaces --
  * are declared once, in include/TmdModel.h, which code_d294_b.c and

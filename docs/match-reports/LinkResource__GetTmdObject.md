@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-`sll 3; subu; sll 2` (index*28), `lw 0x10(a0)` (FileResource `buffer`), `addiu 0xC`, `addu` = `&((Buf6F13C *)self->buffer)->recs[index]` with 0x1C-byte records from +0x0C of the buffer. Same shape as charlie's round-82 lever in code_fa50.
+`sll 3; subu; sll 2` (index*28), `lw 0x10(a0)` (FileResource `buffer`), `addiu 0xC`, `addu` = `&((Buf6F13C *)self->buffer)->recs[index]` with 0x1C-byte records from +0x0C of the buffer. Same shape as charlie's round-82 lever in TmdModel.
 
 Table slot (`tools/classtable.py`): gLinkResourceMethods +0x07C.
 

@@ -2,7 +2,7 @@
 
 > Renamed from `new_class_6bea0` on 2026-09-25 (tools/rename.py). Address 0x8001f250.
 
-Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
+Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/TmdModel.c`. Fresh ground, no prior attempt.
 
 - **What:** the allocator of class gTmdModelMethods: `p = BMemPMgrAlloc(0x24); if (p != NULL) { Get_vtable_TmdModel()->ctor(p, arg); return p; } return NULL;`. The ctor (slot +0x008, `TmdModel__TmdModel`) takes the allocator's argument as its second parameter.
 - **Result:** byte-exact; 24/24 words, whole-image SHA1 green. First build (the broadcast allocator shape).
