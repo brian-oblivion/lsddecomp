@@ -47,6 +47,9 @@ typedef struct TmdBox {
 
 /* A counted list of boxes' eight corners; TmdModel__GetHull writes a list of
  * one: v[0..3] the min-z face, v[4..7] the max-z face. */
+#define HULL_FACE_CORNERS 4 /* corners per face of a TmdHull box */
+#define HULL_BOX_CORNERS 8  /* corners per box: two faces */
+
 typedef struct TmdHull {
     /* +0x000 */ s32 count;
     /* +0x004 */ TmdVec3 v[8];
@@ -122,6 +125,9 @@ void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box);
 void TmdModel__UpdateBoundsBuffer(TmdModel *self);
 TmdBox *TmdModel__GetBoundsBuffer(TmdModel *self, s32 i);
 void TmdModel__GetHull(TmdModel *self, TmdHull *out);
+/* TmdModel__RaycastFaces: *best before any face is hit (the largest s32). */
+#define DIST_NONE 0x7FFFFFFF
+
 s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *height, TmdVec3 *origin,
                            TmdVec3 *end);
 TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *out, u32 *count);

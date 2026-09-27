@@ -18,12 +18,28 @@
 #include "TmdModel.h"
 #include "Actor.h"
 
+/* Bit positions in GsDOBJ2.attribute (self->attribute), include/psyq/libgs.h:
+ * the fields the setters in this file replace. code_d294.c names the rest. */
+#define ATTR_LDIM_SHIFT 0   /* GsLDIM0..GsLDIM7, 3 bits */
+#define ATTR_ZIGNR_SHIFT 7  /* GsZIGNR */
+#define ATTR_NBACKC_SHIFT 8 /* GsNBACKC */
+#define ATTR_DIV_SHIFT 9    /* GsDIV1..GsDIV5, 3 bits */
+
+/* TryAttachNearby's range: the other node is tested only when its world
+ * position is within this distance of this node's on each axis. */
+#define ATTACH_AXIS_RANGE 16384
+
+/* RaycastHullAgainstFaces: an edge hit counts only above this height (the
+ * hit point's y above the face box's minimum, TmdModel__RaycastFaces); so
+ * does a centre-line hit while gHitHeightGate is set. */
+#define HIT_HEIGHT_THRESHOLD 512
+
 /* Sibling of SceneNode__SetDisplay/D374/D3A0/D3CC/D3F8 (code_d294.c): a thin
  * wrapper around GetSetBitField over &self->unk10, shift 0 width 3. Raw
  * pass-through value and raw pass-through result -- same shape as
  * SceneNode__SetSemiTrans/D3A0/D3F8 (no `== 0` on either side). */
 u32 SceneNode__SetLightDim(SceneNode *self, u32 value) {
-    return GetSetBitField(&self->attribute, 0, 3, value);
+    return GetSetBitField(&self->attribute, ATTR_LDIM_SHIFT, 3, value);
 }
 
 /* Sibling of SceneNode__SetDisplay (the ONLY one of the five already-matched
@@ -33,17 +49,17 @@ u32 SceneNode__SetLightDim(SceneNode *self, u32 value) {
  * return type as SceneNode__SetDisplay rather than the plain `u32` of the other
  * three siblings. */
 s32 SceneNode__SetUseZ(SceneNode *self, s32 on) {
-    return GetSetBitField(&self->attribute, 7, 1, on == 0) == 0;
+    return GetSetBitField(&self->attribute, ATTR_ZIGNR_SHIFT, 1, on == 0) == 0;
 }
 
 /* Same family as SceneNode__SetLightDim, shift 9 width 3. Raw pass-through. */
 u32 SceneNode__SetSubdivision(SceneNode *self, u32 value) {
-    return GetSetBitField(&self->attribute, 9, 3, value);
+    return GetSetBitField(&self->attribute, ATTR_DIV_SHIFT, 3, value);
 }
 
 /* Same family as SceneNode__SetUseZ: double-inversion shape, shift 8 width 1. */
 s32 SceneNode__SetBackClip(SceneNode *self, s32 on) {
-    return GetSetBitField(&self->attribute, 8, 1, on == 0) == 0;
+    return GetSetBitField(&self->attribute, ATTR_NBACKC_SHIFT, 1, on == 0) == 0;
 }
 
 /* coord2->param is a 0x28-byte GsCOORD2PARAM whose +0x10 holds the SVECTOR
@@ -113,7 +129,7 @@ void SceneNode__GetModelHull(SceneNode *self, void *dest) {
  * (an inherited BasicClass slot, not this unit's own code), then clears
  * unk30 again. */
 void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *verts, s32 event) {
-    ApplyMatrixToSVArray(verts->v, verts->v, verts->count * 8, &self->coord2->workm);
+    ApplyMatrixToSVArray(verts->v, verts->v, verts->count * HULL_BOX_CORNERS, &self->coord2->workm);
     self->linkTarget = 0;
     self->hitMask = 0;
     self->notifyVerts = verts;
@@ -154,7 +170,7 @@ void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
     LongVec3 offset;
     TmdVec3 delta;
     s32 mag;
-    u8 unused[0x20]; /* sp+0x30, never referenced; reserves retail's slot */
+    u8 unused[32]; /* sp+0x30, never referenced; reserves retail's slot */
     TmdHull hull;
 
     if (self->model == NULL) {
@@ -175,39 +191,39 @@ void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
     if (offset.x < 0) {
         goto x_neg;
     }
-    if (offset.x < 0x4001) {
+    if (offset.x <= ATTACH_AXIS_RANGE) {
         goto x_done;
     }
     return;
 x_neg:
     mag = ~offset.x + 1;
-    if (mag >= 0x4001) {
+    if (mag > ATTACH_AXIS_RANGE) {
         return;
     }
 x_done:
     if (offset.y < 0) {
         goto y_neg;
     }
-    if (offset.y < 0x4001) {
+    if (offset.y <= ATTACH_AXIS_RANGE) {
         goto y_done;
     }
     return;
 y_neg:
     mag = ~offset.y + 1;
-    if (mag >= 0x4001) {
+    if (mag > ATTACH_AXIS_RANGE) {
         return;
     }
 y_done:
     if (offset.z < 0) {
         goto z_neg;
     }
-    if (offset.z < 0x4001) {
+    if (offset.z <= ATTACH_AXIS_RANGE) {
         goto z_done;
     }
     return;
 z_neg:
     mag = ~offset.z + 1;
-    if (mag >= 0x4001) {
+    if (mag > ATTACH_AXIS_RANGE) {
         return;
     }
 z_done:
@@ -219,7 +235,8 @@ z_done:
     hull.count = other->notifyVerts->count;
     {
         TmdHull *otherHull = other->notifyVerts;
-        self->methods->composeAndApplyRotation(self, &delta, hull.v, otherHull->v, hull.count * 8);
+        self->methods->composeAndApplyRotation(self, &delta, hull.v, otherHull->v,
+                                               hull.count * HULL_BOX_CORNERS);
     }
 
     if (!self->methods->checkBoundsOverlap(self, &hull, &delta)) {
@@ -282,7 +299,7 @@ s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta
     corner = hull->v;
     corner->x += delta->x;
     corner->y += delta->y;
-    cornerEnd = corner + hull->count * 8;
+    cornerEnd = corner + hull->count * HULL_BOX_CORNERS;
     corner->z += delta->z;
     hullBox.min = *corner;
     hullBox.max = *corner;
@@ -348,18 +365,18 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *
     s32 j;
     s32 nearest;
     s32 height;
-    u8 pad[0x18];
+    u8 pad[24];
 
-    nearest = 0x7FFFFFFF;
+    nearest = DIST_NONE;
 
     corner = hull->v;
-    opposite = hull->v + 2;
+    opposite = hull->v + 2; /* the diagonally opposite corner of the same face */
     for (c = center; c < &center[2]; c++) {
         c->x = (corner->x + opposite->x) >> 1;
         c->y = (corner->y + opposite->y) >> 1;
         c->z = (corner->z + opposite->z) >> 1;
-        corner += 4;
-        opposite += 4;
+        corner += HULL_FACE_CORNERS;
+        opposite += HULL_FACE_CORNERS;
     }
 
     self->hitMask = 0;
@@ -372,7 +389,7 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *
                                        (TmdVec3 *)&center[0], (TmdVec3 *)&center[1])) {
                 if (gHitHeightGate == 0) {
                     self->hitMask |= 1 << i;
-                } else if (height >= 0x201) {
+                } else if (height > HIT_HEIGHT_THRESHOLD) {
                     self->hitMask |= 1 << i;
                 }
             }
@@ -393,12 +410,13 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *
         bounds = TmdModel__GetBoundsBuffer(self->model, i);
         corner = hull->v;
         for (k = 0; k < hullCount; k++) {
-            for (j = 0; j < 4; j++) {
+            for (j = 0; j < HULL_FACE_CORNERS; j++) {
                 if (j == 1 || j == 2) {
-                    if (ClipSegmentToBox(NULL, bounds, corner, corner + 4)) {
+                    if (ClipSegmentToBox(NULL, bounds, corner, corner + HULL_FACE_CORNERS)) {
                         if (TmdModel__RaycastFaces(self->model, &nearest, (TmdVec3 *)delta, &height,
-                                                   (TmdVec3 *)corner, (TmdVec3 *)(corner + 4))) {
-                            if (height >= 0x201) {
+                                                   (TmdVec3 *)corner,
+                                                   (TmdVec3 *)(corner + HULL_FACE_CORNERS))) {
+                            if (height > HIT_HEIGHT_THRESHOLD) {
                                 self->hitMask |= 1 << i;
                                 *hullHits |= 1 << k;
                             }
@@ -407,7 +425,7 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *
                 }
                 corner++;
             }
-            corner += 4;
+            corner += HULL_FACE_CORNERS;
         }
     }
 
@@ -440,7 +458,7 @@ s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2) {
         if (code2 != 0) {
             goto shared_test;
         }
-        return 1;
+        return CLIP_INSIDE;
     }
     if (code2 != 0) {
         goto shared_test;
@@ -448,7 +466,7 @@ s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2) {
     if (out != NULL) {
         BisectSegmentToBox(out, box, p2, p1);
     }
-    return 3;
+    return CLIP_P2_INSIDE;
 
 shared_test:
     if (code1 != 0) {
@@ -457,11 +475,11 @@ shared_test:
     if (out != NULL) {
         BisectSegmentToBox(out, box, p1, p2);
     }
-    return 2;
+    return CLIP_P1_INSIDE;
 
 combined:
     if ((code1 & code2) != 0) {
-        return 0;
+        return CLIP_MISS;
     }
 
     mid.x = (p1->x + p2->x) >> 1;
@@ -469,10 +487,10 @@ combined:
     mid.z = (p1->z + p2->z) >> 1;
 
     if (p1->x == mid.x && p1->y == mid.y && p1->z == mid.z) {
-        return 0;
+        return CLIP_MISS;
     }
     if (p2->x == mid.x && p2->y == mid.y && p2->z == mid.z) {
-        return 0;
+        return CLIP_MISS;
     }
 
     {
@@ -488,9 +506,9 @@ combined:
         }
     }
     if (mid.y) {
-        return 0;
+        return CLIP_MISS;
     } else {
-        return 0;
+        return CLIP_MISS;
     }
 }
 
@@ -524,19 +542,19 @@ void BisectSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *near, TmdVec3 *far) 
 
         outcode = 0;
         if (box->max.x < out->x) {
-            outcode = 8;
+            outcode = OUTCODE_X_MAX;
         } else if (out->x < box->min.x) {
-            outcode = 4;
+            outcode = OUTCODE_X_MIN;
         }
         if (box->max.y < out->y) {
-            outcode |= 2;
+            outcode |= OUTCODE_Y_MAX;
         } else if (out->y < box->min.y) {
-            outcode |= 1;
+            outcode |= OUTCODE_Y_MIN;
         }
         if (box->max.z < out->z) {
-            outcode |= 0x20;
+            outcode |= OUTCODE_Z_MAX;
         } else if (out->z < box->min.z) {
-            outcode |= 0x10;
+            outcode |= OUTCODE_Z_MIN;
         }
 
         if (outcode != 0) {
