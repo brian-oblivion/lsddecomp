@@ -32,13 +32,13 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, Arg1DB18_3bb8c_d *arg1)
         return;
     }
     if (self->unkA4->methods->slot1AC(self->unkA4)) {
-        strcpy((char *)D_8008AA18 + 0x18, (char *)sSaveTitleBlanks);
-        StampSaveTitleFileLetter((s32)D_8008AA18, 0);
+        strcpy((char *)gSaveTitle + 0x18, (char *)sSaveTitleBlanks);
+        StampSaveTitleFileLetter((s32)gSaveTitle, 0);
     }
-    size = strlen((char *)D_8008AA18);
+    size = strlen((char *)gSaveTitle);
     size = (size >> 1) + 4;
     buf = BMemPMgrAlloc(size);
-    DecodeFullWidthSjis(buf, D_8008AA18);
+    DecodeFullWidthSjis(buf, gSaveTitle);
     self->nameField = (TitleMenuUnkB0Obj_3bb8c_d *)New_TextRow(arg1->unk4, size, buf);
     self->nameField->unkAB = 8;
     self->nameField->unkAC = 4;
@@ -57,18 +57,18 @@ SLPS_015.56`.
   `beqz $s3` gate at function entry.
 - `self->unkA4->methods->slot1AC(self->unkA4)` -- the SAME slot this
   round's `TitleMenu__SaveToCard` established, reused verbatim.
-- Inside that gate: `strcpy((char *)D_8008AA18 + 0x18, (char *)sSaveTitleBlanks)`
-  then `StampSaveTitleFileLetter(D_8008AA18, 0)` -- `StampSaveTitleFileLetter` is the
+- Inside that gate: `strcpy((char *)gSaveTitle + 0x18, (char *)sSaveTitleBlanks)`
+  then `StampSaveTitleFileLetter(gSaveTitle, 0)` -- `StampSaveTitleFileLetter` is the
   already-canonical `extern s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1);`
-  (`include/class_3bb8c.h`); `D_8008AA18` (`void *`) converts to its `s32`
+  (`include/class_3bb8c.h`); `gSaveTitle` (`void *`) converts to its `s32`
   parameter with an explicit cast (a value pass, not dereferenced, so the
   representation is unchanged).
-- `size = strlen(D_8008AA18); size = (size >> 1) + 4;` -- the `srl` in the
+- `size = strlen(gSaveTitle); size = (size >> 1) + 4;` -- the `srl` in the
   disassembly (not `sra`) is what fixes `size` as `u32`: an `s32` `/2` or
   `>>1` on a signed type would need sign-correction retail does not emit
   for this half-length-plus-pad allocation idiom.
 - `buf = BMemPMgrAlloc(size);` (pool allocator, already canonical) then
-  `DecodeFullWidthSjis(buf, D_8008AA18)` -- `DecodeFullWidthSjis` is already matched
+  `DecodeFullWidthSjis(buf, gSaveTitle)` -- `DecodeFullWidthSjis` is already matched
   (`src/code_2cc8c_f.c`, `u8 *DecodeFullWidthSjis(u8 *dst, u8 *src)`), return
   value unused here, so this unit's own local view stays `void`-returning
   per the project's independent-arities convention (same idiom already
@@ -105,9 +105,9 @@ SLPS_015.56`.
   the SAME real class those units call `Unk64Elem`/`FieldM7C`, consistent
   with `New_TextRow`'s return value landing there.
 - New extern `sSaveTitleBlanks` (`void *`, VALUE-of `%gp_rel`, same pattern as
-  `sSaveFileName`/`D_8008AA18`).
-- Expanded comment on `D_8008AA18`/`sSaveFileName`: this function proves
-  `D_8008AA18`'s RUNTIME value must be a writable buffer (it is both a
+  `sSaveFileName`/`gSaveTitle`).
+- Expanded comment on `gSaveTitle`/`sSaveFileName`: this function proves
+  `gSaveTitle`'s RUNTIME value must be a writable buffer (it is both a
   `strcpy` destination and a `strlen` argument here), which cannot be the
   ROM image's own `.rodata` initial value -- nothing in this unit
   reassigns it, so whatever sets the real value is outside this unit's
@@ -124,7 +124,7 @@ No EXISTING declaration was retyped or resized.
 
 A `%gp_rel`-loaded global whose static ROM-image value points into
 `.rodata` is not necessarily read-only in practice: `TitleMenu__CreateSaveTitle` writes
-through `D_8008AA18` (a `strcpy` destination) despite its ROM-image value
+through `gSaveTitle` (a `strcpy` destination) despite its ROM-image value
 sitting inside an unowned rodata string table. When a function treats a
 gp-relative global's value as a destination/buffer rather than a source,
 check for this before assuming the static initializer is the value that
@@ -132,7 +132,7 @@ matters at runtime -- some other, likely-uncarved code reassigns it first.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DB18` -> `TitleMenu__CreateSaveTitle`. **Tier B**: SJIS-decodes `D_8008AA18` (a writable name-text buffer, per its own header comment) into a pool buffer and constructs `self->nameField` through `New_TextRow`, tagging it with three literal flag bytes. Named for what it builds (a text-field sub-object); the field's role in the larger UI is not established.
+Renamed `func_8004DB18` -> `TitleMenu__CreateSaveTitle`. **Tier B**: SJIS-decodes `gSaveTitle` (a writable name-text buffer, per its own header comment) into a pool buffer and constructs `self->nameField` through `New_TextRow`, tagging it with three literal flag bytes. Named for what it builds (a text-field sub-object); the field's role in the larger UI is not established.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

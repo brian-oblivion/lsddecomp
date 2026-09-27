@@ -130,15 +130,15 @@ extern s32 sSaveTitleOffset;
  * TaskObjF's beginSave/beginLoad as `fileName` and `title`. The ROM image
  * points each into the rodata block at D_80011434 (0x80011464, 0x8001149C;
  * no symbol of their own there), so they are opaque `void *`.
- * TitleMenu__CreateSaveTitle strcpy's into D_8008AA18 + 0x18 and strlen's
- * it, so at run time D_8008AA18 holds a writable buffer; nothing in these
+ * TitleMenu__CreateSaveTitle strcpy's into gSaveTitle + 0x18 and strlen's
+ * it, so at run time gSaveTitle holds a writable buffer; nothing in these
  * units sets it.
  */
 extern void *sSaveFileName;
-extern void *D_8008AA18;
+extern void *gSaveTitle;
 
 /* The buffer FormatNumberIntoBuffer formats the day into
- * (FormatFullWidthNumber) before copying it into D_8008AA18's title. The
+ * (FormatFullWidthNumber) before copying it into gSaveTitle's title. The
  * ROM image points it at the "7654321" string D_8008AA1C. */
 extern void *D_8008AA24;
 

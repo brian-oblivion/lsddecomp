@@ -41,7 +41,7 @@
  *
  * The save title replaces TaskCore's slot widgets as what setTarget,
  * releaseTarget, updateSlotElements and broadcastToSlots manage:
- * createSaveTitle makes `saveTitle` from the SJIS title in D_8008AA18's buffer
+ * createSaveTitle makes `saveTitle` from the SJIS title in gSaveTitle's buffer
  * (blanked from +0x18 on a new game), 8 cells visible from cell 4 with a gap
  * before cell 9; cycleSaveTitleColor lights one colour channel a frame.
  *

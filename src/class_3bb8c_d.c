@@ -127,13 +127,13 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
         return;
     }
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
-        strcpy((char *)D_8008AA18 + 0x18, (char *)sSaveTitleBlanks);
-        StampSaveTitleFileLetter((char *)D_8008AA18, NULL);
+        strcpy((char *)gSaveTitle + 0x18, (char *)sSaveTitleBlanks);
+        StampSaveTitleFileLetter((char *)gSaveTitle, NULL);
     }
-    size = strlen((char *)D_8008AA18);
+    size = strlen((char *)gSaveTitle);
     size = (size >> 1) + 4;
     buf = BMemPMgrAlloc(size);
-    DecodeFullWidthSjis(buf, D_8008AA18);
+    DecodeFullWidthSjis(buf, gSaveTitle);
     self->saveTitle = New_TextRow(target->handle, size, buf);
     self->saveTitle->visibleCount = 8;
     self->saveTitle->firstVisible = 4;
@@ -204,7 +204,7 @@ void TitleMenu__RefreshMenu(TitleMenu *self) {
     size = self->saveTitle->cellCount;
     origSlot = self->activeSlot;
     buf1 = BMemPMgrAlloc(size);
-    DecodeFullWidthSjis(buf1, D_8008AA18);
+    DecodeFullWidthSjis(buf1, gSaveTitle);
     self->saveTitle->methods->setText(self->saveTitle, buf1);
     BMemPMgrFree(buf1);
     CheckSaveScoreFlag(self, self->target, self->dreamSys);
@@ -247,13 +247,13 @@ void TitleMenu__SaveToCard(TitleMenu *self) {
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
         *(u8 *)sSaveFileName = 0;
     }
-    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, D_8008AA18, 0xD, 3,
+    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, gSaveTitle, 0xD, 3,
                                        self->saveIcon, self->saveBlock, self->saveBlockSize);
 }
 
 void TitleMenu__LoadFromCard(TitleMenu *self) {
     self->methods->beginCardAccess(self);
-    self->saveCtrl->methods->beginLoad(self->saveCtrl, sSaveFileName, D_8008AA18, self->saveBlock,
+    self->saveCtrl->methods->beginLoad(self->saveCtrl, sSaveFileName, gSaveTitle, self->saveBlock,
                                        self->saveBlockSize);
 }
 

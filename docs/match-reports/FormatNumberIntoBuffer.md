@@ -22,7 +22,7 @@ typedef struct {
 void FormatNumberIntoBuffer(s32 arg0)
 {
     FormatFullWidthNumber(D_8008AA24, arg0, 3, 0);
-    *(Buf6_3bb8c_c *)((s8 *)D_8008AA18 + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;
+    *(Buf6_3bb8c_c *)((s8 *)gSaveTitle + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;
 }
 ```
 
@@ -35,7 +35,7 @@ project's independent-local-view convention.
 
 `D_8008AA24` is a new declaration in `include/class_3bb8c.h`
 (`extern void *D_8008AA24;`), added additively next to the existing
-`sSaveFileName`/`D_8008AA18` VALUE-of `%gp_rel` globals — same pattern: the ROM
+`sSaveFileName`/`gSaveTitle` VALUE-of `%gp_rel` globals — same pattern: the ROM
 image initializes it to a rodata placeholder (`D_8008AA1C`, the "7654321"
 string in `asm/data/7B12C.sdata.s`) but the runtime value is a writable
 buffer that `FormatFullWidthNumber` formats into.
@@ -105,8 +105,8 @@ struct-copy question.
 `TitleMenu__TitleMenu`, not through any vtable), `VerbNoun`. Mechanics are
 fully evident: formats `arg0` via `FormatFullWidthNumber` into
 `D_8008AA24`'s buffer, then copies 6 raw bytes of that buffer into
-`D_8008AA18`'s buffer at `+0x12`. Purpose is explicitly NOT established --
-the header's own comments on `D_8008AA18`/`D_8008AA24` document both as
+`gSaveTitle`'s buffer at `+0x12`. Purpose is explicitly NOT established --
+the header's own comments on `gSaveTitle`/`D_8008AA24` document both as
 "writable-buffer placeholders" whose real runtime role is outside this
 unit's own carved ground (a nearby string, "CARD\FILEICN1.TIM", and the
 disc's own product-code string sit in the same rodata block, which is
@@ -114,5 +114,5 @@ disc's own product-code string sit in the same rodata block, which is
 that is exactly the kind of purpose-guess the naming rule forbids without
 a function that actually establishes it). Named for the one certain
 mechanic -- format a number, copy it into another buffer -- and nothing
-more. `D_8008AA24`/`D_8008AA18` themselves are left unrenamed for the same
+more. `D_8008AA24`/`gSaveTitle` themselves are left unrenamed for the same
 reason.

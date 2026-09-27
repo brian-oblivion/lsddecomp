@@ -55,7 +55,7 @@ SLPS_015.56`.
   +0x06C, immediately before the already-known `slot70`
   (`TitleMenu__EndCardAccess`) with no gap. Every non-`self` argument is forwarded
   opaquely: `sCardFilePrefix` (a NEW `%gp_rel` VALUE-of global, same pattern as
-  `sSaveFileName`/`D_8008AA18`/`sSaveTitleBlanks` -- holds `0x80011454`, the
+  `sSaveFileName`/`gSaveTitle`/`sSaveTitleBlanks` -- holds `0x80011454`, the
   "BISLPS-01556" string in the same unowned `D_80011434` rodata block,
   again with no `dlabel` of its own), `&sSaveFileSuffixes` (a real 16-entry
   pointer table, `asm/data/76DC8.data.s`, reached only by address here),
