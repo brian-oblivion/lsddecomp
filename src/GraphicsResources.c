@@ -26,9 +26,9 @@
  *  - MoviePlayer, CD-streamed and MDEC-decoded FMV (CdStream frames,
  *    DecDCTvlc, then DecDCTin/DecDCTout in 16-pixel strips uploaded as they
  *    finish), one movie at a time (gActiveMoviePlayer).
- * The ctors take include/FileResource.h's ResourceSource. The unit's own
- * types: ResourceSourceArgs, the three-word local ResourceRequest__Set fills for that
- * descriptor; UnprototypedCtorTable, the view the allocators call a ctor slot
+ * The ctors take include/FileResource.h's ResourceSource; the build steps
+ * that make them fill one as a ResourceRequest's `src`. The unit's own
+ * types: UnprototypedCtorTable, the view the allocators call a ctor slot
  * through when they test its result; TimBlockHeader (and its byte copy,
  * TimBlockHeaderBytes), ModelDataHeader and SubBlockTable, the layouts of
  * TimBlockSrc's, ModelData's and TodSet's / TriggerWorld's buffers.
@@ -895,14 +895,6 @@ void ModelData__Load(ModelData *self) {
     ((s32 (*)())self->methods->processBuffer)(self);
 }
 
-/* The three words ResourceRequest__Set stores (buffer, name, mode), passed on as a
- * ResourceSource: the name is NULL here, and no constructor reads the mode
- * (1). */
-typedef struct ResourceSourceArgs {
-    /* +0x00 */ void *buffer;
-    /* +0x04 */ u8 pad4[8];
-} ResourceSourceArgs;
-
 /* A ModelData's buffer (a .MOM file: InitDreamAux requests ETC\\SYMSPY.MOM
  * through New_ModelData): the LinkResource's TMD at `tmdOffset`, the
  * TodSet's data from +0x0C. */
@@ -912,22 +904,18 @@ typedef struct ModelDataHeader {
     /* +0x0C */ u8 tods[1];
 } ModelDataHeader;
 
-/* code_171e0.c: stores its three words into *req, returns req. */
-extern ResourceSourceArgs *ResourceRequest__Set(ResourceSourceArgs *req, void *buffer, char *name,
-                                                s32 mode);
-
 /* +0x078: when it owns them, build the LinkResource and the TodSet over
  * the buffer; 1, with both released, when either fails. */
 s32 ModelData__BuildResources(ModelData *self) {
-    ResourceSourceArgs req;
+    ResourceRequest req;
 
     if (self->ownsResources != 0) {
         ResourceRequest__Set(&req, (u8 *)self->buffer + ((ModelDataHeader *)self->buffer)->tmdOffset,
                              0, 1);
-        self->linkResource = New_LinkResource((ResourceSource *)&req);
+        self->linkResource = New_LinkResource(&req.src);
         if (self->linkResource != NULL) {
-            req.buffer = ((ModelDataHeader *)self->buffer)->tods;
-            self->todSet = (FileResource *)New_TodSet((ResourceSource *)&req);
+            req.src.buffer = ((ModelDataHeader *)self->buffer)->tods;
+            self->todSet = (FileResource *)New_TodSet(&req.src);
             if (self->todSet != NULL) {
                 return 0;
             }
@@ -1010,7 +998,7 @@ void TriggerWorld__Load(TriggerWorld *self) {
 /* +0x078: build a ModelData over each of the buffer's sub-blocks, in place
  * of its offset; 1, with those built released, when one fails. */
 s32 TriggerWorld__BuildResources(TriggerWorld *self) {
-    ResourceSourceArgs req;
+    ResourceRequest req;
     SubBlockTable *buf;
     s32 *p;
     s32 i;
@@ -1023,8 +1011,8 @@ s32 TriggerWorld__BuildResources(TriggerWorld *self) {
     p = buf->entries;
     self->modelDataCount = 0;
     for (; i < n; i++) {
-        req.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
-        *p = (s32)New_ModelData((ResourceSource *)&req);
+        req.src.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
+        *p = (s32)New_ModelData(&req.src);
         if (*p == 0) {
             goto fail;
         }
@@ -1262,7 +1250,7 @@ void TodSet__Finalize(TodSet *self) {
 /* setFlag (+0x064): build a Tod over each of the buffer's sub-blocks, in
  * place of its offset; 1, with those built released, when one fails. */
 s32 TodSet__BuildTods(TodSet *self) {
-    ResourceSourceArgs req;
+    ResourceRequest req;
     SubBlockTable *buf;
     Tod **p;
     s32 i;
@@ -1274,8 +1262,8 @@ s32 TodSet__BuildTods(TodSet *self) {
     n = buf->count;
     p = (Tod **)buf->entries;
     for (; i < n; i++) {
-        req.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
-        *p = New_Tod((ResourceSource *)&req);
+        req.src.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
+        *p = New_Tod(&req.src);
         if (*p == NULL) {
             while (i != 0) {
                 i--;

@@ -57,11 +57,11 @@ typedef struct TodHeader {
 
 /* The ctor's descriptor, forwarded through setupModelData into
  * TodActor__AcquireModelData: the ModelData at +0x0C is borrowed; when there
- * is none, New_ModelData(desc) makes one from the descriptor's leading
- * {buffer, name} (include/FileResource.h's ResourceSource) and the TodActor owns it. */
+ * is none, New_ModelData(&desc->src) makes one and the TodActor owns it. */
 typedef struct TodActorDesc {
-    u8 pad00[0x0C];       /* +0x000 New_ModelData's source; not read here */
-    ModelData *modelData; /* +0x00C */
+    /* +0x000 */ ResourceSource src;
+    /* +0x008 */ u8 pad8[4];
+    /* +0x00C */ ModelData *modelData;
 } TodActorDesc;
 
 extern void *BMemPMgrAlloc(s32 size);

@@ -228,3 +228,12 @@ alone, hence tier B rather than A.
 ## Track 4
 
 2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. code_4cd08 includes it, and include/code_4cd08.h's local `extern void *New_ModelData(DreamAuxLoadReq *req)` is deleted. The call reads `New_ModelData((struct ResourceSource *)&req)`, a pointer cast with no code. DreamAuxLoadReq {flag, name, mode} has the descriptor's own shape: word 0 is the buffer to adopt, and it is 0 here, so ModelData__ModelData requests the MOM file named in word 1. Image byte-identical.
+
+### Track 6 (round 97, alpha)
+
+The request local (was `DreamAuxLoadReq {flag, name, mode}`; word 0 is the buffer, NULL here) is now include/FileResource.h's `ResourceRequest`
+(`{ ResourceSource src; s32 mode; }`), and ResourceRequest__Set's prototype
+comes from that header. The unit's own view of the record and its local
+extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`, and
+`(ResourceSource *)&req` becomes `&req.src`. Byte-identical.
+The two MOM path names are `const char[]` and are passed as `(char *)`, since ResourceSource.name is `char *`.

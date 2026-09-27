@@ -81,3 +81,11 @@ parent's occupant so the pair reads as one. Class unified in
 `include/TriggerWorld.h`.
 
 Retyped in the same round: `self` is `TriggerWorld *`, +0x038 is `modelDataCount` (was DataSrc33808.unk38), and the failure path calls `releaseResources(self)` (was the unit-local `slot7C`). Bytes unchanged.
+
+### Track 6 (round 97, alpha)
+
+The request local is now include/FileResource.h's `ResourceRequest`
+(`{ ResourceSource src; s32 mode; }`), and ResourceRequest__Set's prototype
+comes from that header. The unit's own view of the record and its local
+extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`, and
+`(ResourceSource *)&req` becomes `&req.src`. Byte-identical.

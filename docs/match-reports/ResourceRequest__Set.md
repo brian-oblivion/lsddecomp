@@ -108,3 +108,27 @@ them is a head decision (proposed below), not a rename.
 - `ResourceRequest__Set`'s prototype is not in `include/code_171e0.h`: three
   units declare their own (typed to their local view), and code_4cd08.h's
   would conflict with it in any file including both.
+
+### Track 6 (round 97, alpha): one definition
+
+`ResourceRequest` now lives in `include/FileResource.h`, beside the
+`ResourceSource` it extends, as `{ ResourceSource src; s32 mode; }`, with
+`ResourceRequest__Set`'s one prototype under it. `include/code_171e0.h` no
+longer defines it. The body reads `this->src.buffer = buffer;
+this->src.name = name; this->mode = mode;`. Retired onto it:
+GraphicsResources.c's `ResourceSourceArgs` (ModelData__BuildResources,
+TriggerWorld__BuildResources, TodSet__BuildTods) and include/code_4cd08.h's
+`DreamAuxLoadReq` (InitDreamAux), along with the local
+`ResourceRequest__Set` externs typed to them. Every `(ResourceSource *)&req`
+cast became `&req.src`. `mode` stays tier B: every caller passes 1 and no
+code reads it. Image byte-identical after every step.
+
+Kept: `ResourceSourceRequest` (FileResource.h, 0x10 bytes; StageMap__PopulateSlotCells,
+DayTask__DayTask, GameApplication__GameApplication). Its callers write only
+`src.buffer` and never call ResourceRequest__Set. Measured this round:
+shrinking its pad to 4 bytes (so it is 0x0C, ResourceRequest's size) still
+builds byte-exact, so its size does not tell the two apart. Retiring it onto
+`ResourceRequest` is proposed, not applied, because its three units are
+outside this job's edit set. `TodActorDesc` (include/code_55dd4.h) now opens
+with a `ResourceSource src` but is not a ResourceRequest: see
+TodActor__AcquireModelData.md.

@@ -13,16 +13,7 @@
  * the method table type it needs (FileResourceMethods) is declared. */
 
 
-/* The descriptor the LinkResource, Tod, TodSet, ModelData and TriggerWorld
- * ctors take (GraphicsResources.c's ResourceSource, which declares only the
- * first two words): a buffer to adopt, or else (buffer NULL) a file name to
- * request. ResourceRequest__Set fills all three words; every caller passes
- * mode 1, and no ctor reads it. */
-typedef struct ResourceRequest {
-    /* +0x00 */ void *buffer;
-    /* +0x04 */ char *name;
-    /* +0x08 */ s32 mode;
-} ResourceRequest;
+/* ResourceRequest, which ResourceRequest__Set fills, is include/FileResource.h's. */
 
 extern void *BMemPMgrAlloc(s32 size); /* one arg confirmed by New_GameApplication.md (code_1677c) */
 extern void BMemPMgrFree(void *arg);

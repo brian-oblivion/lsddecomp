@@ -117,3 +117,13 @@ UnkArg1Obj TodActorDesc --any-stem`). Tier B: only its +0x00C (a ModelData to
 borrow) is read here; when that is NULL the whole descriptor goes to
 New_ModelData as GraphicsResources.c's ResourceSource ({buffer, name}). Its +0x000..+0x00B
 stay padding in this view.
+
+### Track 6 (round 97, alpha)
+
+`TodActorDesc` is now `{ ResourceSource src; u8 pad8[4]; ModelData *modelData; }`,
+and the fallback reads `New_ModelData(&other->src)` without the cast. Its
+first 8 bytes are a ResourceSource because they go straight to
+New_ModelData, which reads them as one. +0x08 is not typed as
+ResourceRequest's `mode`: no code writes it. The two builders (code_4cd08's
+SetDreamAuxWorld and ProcessDreamAuxTriggerRecord) fill only word 3 of an
+`s32[4]`, and nothing calls ResourceRequest__Set on it. Byte-identical.

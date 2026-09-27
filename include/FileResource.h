@@ -99,6 +99,16 @@ typedef struct ResourceSource {
     /* +0x04 */ char *name;
 } ResourceSource;
 
+/* The descriptor ResourceRequest__Set fills (src/code_171e0.c) and callers
+ * pass on as its `src`. Every caller sets mode 1, and no ctor reads it. */
+typedef struct ResourceRequest {
+    /* +0x00 */ ResourceSource src;
+    /* +0x08 */ s32 mode;
+} ResourceRequest;
+
+/* Fill *req and return it (src/code_171e0.c). */
+ResourceRequest *ResourceRequest__Set(ResourceRequest *req, void *buffer, char *name, s32 mode);
+
 /* The four-word local callers outside src/GraphicsResources.c build that
  * descriptor in (StageMap__PopulateSlotCells, DayTask__DayTask,
  * GameApplication__GameApplication, each for New_LinkResource). Only `src`

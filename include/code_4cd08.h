@@ -86,20 +86,6 @@ extern s8 D_80088D16[];
 extern const char gMomPathSymSpy[];
 extern const char gMomPathSymDog[];
 
-/* A 3-word request record, physically the same shape as code_171e0.h's
- * ResourceRequest (ResourceRequest__Set there does `this->x=x; this->y=y; this->z=z;
- * return this;` regardless of what the caller's fields actually mean) but
- * used here to hold a load flag, a MOM filename pointer, and a mode byte for
- * New_ModelData. Declared locally because code_4cd08.c does not otherwise
- * need code_171e0.h. */
-typedef struct DreamAuxLoadReq {
-    s32 flag;
-    const char *name;
-    s32 mode;
-} DreamAuxLoadReq;
-
-extern DreamAuxLoadReq *ResourceRequest__Set(DreamAuxLoadReq *this, s32 flag, const char *name, s32 mode);
-
 /* A trigger/spawn record walked by ProcessDreamAuxTriggerRecord and CheckDreamAuxTriggerCondition. Only
  * three fields and the overall stride (0x38 -- ProcessDreamAuxTriggerRecord recurses on
  * `record + 1`, i.e. the next record in what is evidently an array) are
