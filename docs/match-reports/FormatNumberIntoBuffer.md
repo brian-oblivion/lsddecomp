@@ -116,3 +116,35 @@ a function that actually establishes it). Named for the one certain
 mechanic -- format a number, copy it into another buffer -- and nothing
 more. `D_8008AA24`/`D_8008AA18` themselves are left unrenamed for the same
 reason.
+
+## Track 6 (2026-09-27, round 96)
+
+`Buf6_3bb8c_c` (`s8 a, b, c, d, e, f`) retired for `FullWidthChars3`
+(`FullWidthChar chars[3]`, `FullWidthChar` = `s8 lead, trail`), tier A:
+the six bytes are three full-width Shift-JIS digits, which
+`FormatFullWidthNumber(..., 3, 0)` writes and the copy puts at the save
+title's +0x12, characters 9..11 (the "001" of "LSD   Day001"; the title's
+layout was measured in round 95, StampSaveTitleFileLetter.md). It is the
+same record class_3bb8c_g's StampSaveTitleFileLetter copies, so the three
+types (`FullWidthChar`, `FullWidthChars3`, `FullWidthChars6`) moved from
+class_3bb8c_g.c into `include/TitleMenu.h`: the save title is TitleMenu's
+buffer (its banner: createSaveTitle builds `saveTitle` from the SJIS title
+in D_8008AA18's buffer; both writers serve it), and `TaskObjF.h` only sees
+a `char *title` passed in. Alignment is still 1 (all-`s8` leaves), so the
+copy is still one `lwl`/`lwr` word plus two `lb`/`sb` pairs, as derived
+above; the header keeps the one `MATCHING:` line. Image byte-identical.
+
+Left for track 7 (this unit's polish): the raw `(s8 *)D_8008AA18 + 0x12`
+(could read `&((FullWidthChar *)D_8008AA18)[9]`) and the
+`D_8008AA18`/`D_8008AA24` names.
+
+Comment moved out of the source (verbatim), on the old local type:
+"The 6-byte value formatted into D_8008AA24's buffer by FormatFullWidthNumber
+above, copied whole into D_8008AA18's buffer at +0x12 as ONE struct
+assignment. All-`s8` fields (alignment 1, not 2 or 4) is what makes
+retail's block-move split this way: the leading 4 bytes go via the
+unaligned lwl/lwr word copy regardless of declared alignment (same
+idiom as Vec2s16, FlagLargePolyForDivide), but the trailing 2 bytes can no
+longer be proven 2-byte aligned, so there is no safe halfword move for
+them and the compiler falls back to two individual signed-byte
+loads/stores."
