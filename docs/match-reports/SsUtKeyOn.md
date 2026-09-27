@@ -713,7 +713,7 @@ function's callee from `func_80032148` to `SpuVmVSetUp`, AND split the old
 body needs:
 
 - `SpuVmVSetUp` itself (not yet declared in this file -- the sibling unit
-  `libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c` had it, this one did not).
+  `code_179d8_j_c.c` had it, this one did not).
 - `D_8008EA22`, dropped by round 34 on the stated grounds that `SsUtPitchBend`
   and a deleted function were its only readers in this family -- **false**
   for this file's own two remaining stalls, which both WRITE it

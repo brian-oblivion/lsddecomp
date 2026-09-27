@@ -78,7 +78,7 @@ derivation only -- it is not the best-reached body and it does not splice.**
 
 ```c
 #if 0
-/* Round 34's carve dropped these three from libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c. Runner delta
+/* Round 34's carve dropped these three from code_179d8_j_c.c. Runner delta
  * recovered them into libsnd_vm_vol_ut_key_ut_keyv.c for ITS two stalls and did not carry
  * them here, so this body was still un-compilable after its names were
  * corrected: `D_8008EA22'/`D_8008EA26'/`D_8008EA18' undeclared. Carried
@@ -528,7 +528,7 @@ stale-symbol trap: the 84/88 figure was correct as measured at the time,
 but had never been rebuilt since the rename, so it was unverified against
 the current tree.
 
-`src/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c` already declares `extern s32 SpuVmVSetUp(s16 a0,
+`src/code_179d8_j_c.c` already declares `extern s32 SpuVmVSetUp(s16 a0,
 s16 a1);` at file scope (added when this unit was split off in round 34),
 so restoring the salvaged body only needed the callee's NAME corrected,
 not a new declaration. Rebuilt: clean compile (`build exit=2`, zero grep
@@ -614,10 +614,10 @@ because the UNIT grew declarations underneath it.** Spliced over the
 `INCLUDE_ASM` with its names corrected, this body does not compile:
 
 ```
-src/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c:132: conflicting types for 'D_8008D99C'
-src/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c:86:  previous declaration of 'D_8008D99C'
-src/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c:136: conflicting types for 'SpuVmVSetUp'
-src/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c:55:  previous declaration of 'SpuVmVSetUp'
+src/code_179d8_j_c.c:132: conflicting types for 'D_8008D99C'
+src/code_179d8_j_c.c:86:  previous declaration of 'D_8008D99C'
+src/code_179d8_j_c.c:136: conflicting types for 'SpuVmVSetUp'
+src/code_179d8_j_c.c:55:  previous declaration of 'SpuVmVSetUp'
 ```
 
 The body travels with its own `extern` preamble, as CLAUDE.md requires ("with
@@ -655,7 +655,7 @@ This function is still `INCLUDE_ASM` and its C was not touched, but the per-fiel
 
 ## Round 97 (bravo, track 6): the unit banner and comments, moved here
 
-libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c took <libsnd.h> and its banner was rewritten as documentation. The history it carried, verbatim:
+code_179d8_j_c.c took <libsnd.h> and its banner was rewritten as documentation. The history it carried, verbatim:
 
 ```c
 /*
@@ -670,7 +670,7 @@ libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c took <libsnd.h> and its banner
  * comment still stands -- only the blocker verdicts are withdrawn.
  * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
  *
- * libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop -- the TAIL of the old code_179d8_j slice, split off in round
+ * code_179d8_j_c -- the TAIL of the old code_179d8_j slice, split off in round
  * 34 (2026-09-12) when Sony's `libsnd/ut_pb.o` was linked into the middle of
  * `libsnd_vm_vol_ut_key_ut_keyv`.  Now 0x22244..0x2273C (vram 0x80031A44..0x80031F3C), eight
  * functions (SsUtChangePitch .. SsUtAutoPan).
