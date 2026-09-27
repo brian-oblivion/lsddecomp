@@ -78,21 +78,6 @@ typedef union VecBox_fa50 {
     TmdBox b;
 } VecBox_fa50;
 
-typedef struct Target_fa50 {
-    u8 pad0[0x6];
-    s16 offset; /* +0x006: AccumulateTargetOffset/SetTargetOffset's field */
-} Target_fa50;
-
-typedef struct Inner_fa50 {
-    u8 pad0[0x10];
-    Target_fa50 *target; /* +0x010 */
-} Inner_fa50;
-
-typedef struct Outer_fa50 {
-    u8 pad0[0x10];
-    Inner_fa50 *inner; /* +0x010 */
-} Outer_fa50;
-
 extern TmdBox gTmdModelBoundsBuf[];
 extern void *BMemPMgrAlloc(s32 size);
 
@@ -641,18 +626,22 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
     return (TmdPrim *)((u8 *)p + size);
 }
 
-void AccumulateTargetOffset(Outer_fa50 *self, s32 *xy) {
-    Target_fa50 *t = self->inner->target;
+/* Adds to the first primitive's CLUT id (every textured TMD packet has it at
+ * +0x006, after tu0/tv0) the id of VRAM position (xy[0], xy[1]): x / 16 +
+ * y * 64, libgpu's getClut() spelled with a division and an add. */
+void AccumulateTargetOffset(TmdModel *self, s32 *xy) {
+    TMD_P_TF3 *t = (TMD_P_TF3 *)self->object->prims;
 
-    t->offset += xy[0] / 16;
-    t->offset += xy[1] * 64;
+    t->clut += xy[0] / 16;
+    t->clut += xy[1] * 64;
 }
 
-void SetTargetOffset(Outer_fa50 *self, s16 *xy) {
-    Target_fa50 *t = self->inner->target;
+/* Points the first primitive's CLUT id at the CLUT at VRAM (xy[0], xy[1]). */
+void SetTargetOffset(TmdModel *self, s16 *xy) {
+    TMD_P_TF3 *t = (TMD_P_TF3 *)self->object->prims;
     s32 v;
 
     v = xy[0] / 16;
-    t->offset = v;
-    t->offset = v + xy[1] * 64;
+    t->clut = v;
+    t->clut = v + xy[1] * 64;
 }

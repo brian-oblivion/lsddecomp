@@ -49,3 +49,34 @@ the only readers/writers, all inside this unit): `Target_fa50::unk6` ->
 opaque pointers and never names these fields itself, so the field rename
 does not touch it. Compiler-verified accessor list, build and
 check-nonmatching.sh green.
+
+## Naming
+
+Track 6 (2026-09-27, round 95, delta): the `Outer_fa50`/`Inner_fa50`/
+`Target_fa50` chain is TmdModel -> TmdObject -> the first TMD primitive, and
+the field is that primitive's CLUT id. All three placeholder types are
+deleted.
+
+- **`Outer_fa50` -> `TmdModel`** (`inner` -> `object`). The one caller,
+  `SetStyleEffectSources` (class_3bb8c_o.c), passes the value
+  `gStyleEffectTmd`'s slot +0x080 returns for a model id; the same slot's
+  result for the same `gStyleEffectModelIds[]` is what
+  `StyleEffect__InitByKind` (class_3bb8c_s.c) hands to
+  `SceneNode__LinkModel`, which reads it as a `TmdModel` (`->object`,
+  `->data->objects`). TmdModel's +0x010 is `object`.
+- **`Inner_fa50` -> `TmdObject`** (`target` -> `prims`): TmdObject's +0x010
+  is its primitive list.
+- **`Target_fa50` -> Sony's `TMD_P_TF3`** (`offset` -> `clut`): +0x006 of
+  every textured TMD packet (`TMD_P_TF3`/`TF4`/`TNF3`/..., `<libgs.h>`) is
+  `u_short clut`, after `tu0, tv0`. The value stored is `x / 16 + y * 64`,
+  which is libgpu's `getClut(x, y)` (`(y << 6) | ((x >> 4) & 0x3f)`) for a
+  non-negative 16-aligned x; and the caller's argument `D_8008AB94` is the
+  pair `{0x3F0, 0x1FF}`, VRAM (1008, 511), a standard CLUT position (its
+  CLUT id is 0x7FFF). The macro itself is not used: its shift and OR are not
+  the division and add retail compiles.
+
+Byte-identical (`lhu`/`sh` unchanged: `u_short` loads as `lhu`, as the s16
+placeholder did in its sibling).
+
+Function name kept here, renamed separately with `tools/rename.py` (see the
+next entry if present).

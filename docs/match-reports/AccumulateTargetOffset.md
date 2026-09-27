@@ -62,3 +62,13 @@ literal field this pair of functions is named for. `Inner_fa50::unk10` ->
 `target` and `Outer_fa50::unk10` -> `inner`: each names what it points to,
 the only fact established about a plain link in the chain. Compiler-verified
 accessor list (this unit only), build and check-nonmatching.sh green.
+
+## Naming (track 6, round 95)
+
+2026-09-27, delta: the three placeholder types are replaced by `TmdModel`,
+`TmdObject` and Sony's `TMD_P_TF3`, and `offset` is the first primitive's
+`clut`. Evidence in `SetTargetOffset.md`'s `## Naming`: the chain matches
+TmdModel's `object` (+0x010) and TmdObject's `prims` (+0x010), the value is
+getClut's `x / 16 + y * 64`, and the sibling's caller passes VRAM
+(1008, 511). This function takes the pair as `s32 *` and adds, where the
+sibling takes `s16 *` and sets. Byte-identical.
