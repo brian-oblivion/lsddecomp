@@ -247,14 +247,14 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
 }
 
 extern s32 D_80087424;
-extern s8 *D_800873EC[];
+extern s8 *sStyleStageConfigs[];
 extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
 extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
-    s8 *cfg = D_800873EC[gStyleStage];
+    s8 *cfg = sStyleStageConfigs[gStyleStage];
 
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
