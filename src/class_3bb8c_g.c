@@ -360,11 +360,10 @@ extern Pair2_3bb8c_g *gSaveTitleGlyphs;
  * number. With no file name it only blanks the letter field. -08 and -09
  * are parsed from their second digit, which atoi would otherwise read as
  * octal. Returns a pointer into gSaveTitleGlyphs that no caller reads.
- * The s32 parameters are include/class_3bb8c.h's prototype. MATCHING:
+ * MATCHING:
  * `glyphs` is the return value, not a second read of the global. */
-s32 StampSaveTitleFileLetter(s32 titleAddr, s32 fileNameAddr) {
-    Pair2_3bb8c_g *title = (Pair2_3bb8c_g *)titleAddr;
-    char *fileName = (char *)fileNameAddr;
+s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
+    Pair2_3bb8c_g *title = (Pair2_3bb8c_g *)titleText;
     s32 numberPos;
     s32 letter;
     Pair2_3bb8c_g *glyph;

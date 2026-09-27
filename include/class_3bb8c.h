@@ -230,7 +230,7 @@ extern char *strcat(char *dest, char *src);
  * around its retry loop, and with (arg, 0) when the loop gives up. The BIOS
  * file calls (open, read, lseek, close, delete; Sony's libapi) are declared
  * in the units that call them. */
-extern s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1);
+extern s32 StampSaveTitleFileLetter(char *titleText, char *fileName);
 
 /* ---- ObjM -------------------------------------------------------- */
 

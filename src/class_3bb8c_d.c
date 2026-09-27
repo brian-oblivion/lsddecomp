@@ -128,7 +128,7 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
     }
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
         strcpy((char *)D_8008AA18 + 0x18, (char *)D_8008AA14);
-        StampSaveTitleFileLetter((s32)D_8008AA18, 0);
+        StampSaveTitleFileLetter((char *)D_8008AA18, NULL);
     }
     size = strlen((char *)D_8008AA18);
     size = (size >> 1) + 4;
