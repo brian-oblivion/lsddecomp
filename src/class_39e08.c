@@ -31,7 +31,9 @@ DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32
 }
 
 void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
-    ResourceSourceRequest req;
+    /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
+     * frame by 8. */
+    ResourceRequest req;
     s32 tmp;
 
     GetTimedTaskMethods()->ctor((TimedTask *)self, (char *)GetSoundEffectDir(0), 0);
