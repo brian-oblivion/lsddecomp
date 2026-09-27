@@ -429,21 +429,21 @@ s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b) {
     return 1;
 }
 
-extern s32 D_8008A838;
+extern s32 gHitHeightGate;
 
 /* TIER C -- deliberately still `func_`. Mechanically this is a get-and-set
- * of the global `D_8008A838` (read old, store new, return old), the shape
+ * of the global `gHitHeightGate` (read old, store new, return old), the shape
  * the project spells `GetSet...` elsewhere. What the global MEANS is not
  * established, so there is no noun to put in the name: its only known
- * reader is SceneNode__ClassifyAgainstPlanes (code_d294_b), where `D_8008A838 == 0 || outWord
+ * reader is SceneNode__ClassifyAgainstPlanes (code_d294_b), where `gHitHeightGate == 0 || outWord
  * >= 0x201` gates accepting a hit, and its only known writer is
  * class_3bb8c_l.c's ObjM__InitStyleAndWorld, which passes a flag derived from a
  * stage/mode value of 3, 5 or 6. Two call sites, neither naming the thing.
- * D_8008A838 keeps its placeholder name for the same reason. */
+ * gHitHeightGate keeps its placeholder name for the same reason. */
 s32 func_8001EF60(s32 value) {
     s32 old;
 
-    old = D_8008A838;
-    D_8008A838 = value;
+    old = gHitHeightGate;
+    gHitHeightGate = value;
     return old;
 }
