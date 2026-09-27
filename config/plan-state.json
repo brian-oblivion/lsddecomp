@@ -1233,6 +1233,16 @@
           "note": "4b reopened by Entity_d's polish (seven motion-template externs retyped Ratio16[] locally); charlie declared all 31 templates once in include/Entity.h. 0 two-typed globals again.",
           "round": 93,
           "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-27",
+          "matches": 1,
+          "model": "opus",
+          "note": "Reopened by the tree twice this round (polish passes typed a global in one unit): gTextEntryCursorPos -> one ScreenSpritePos in TextEntry.h (bravo, with TextEntry playSound/actOnHeld/toggleActOnHeld); gStyleCueSlots -> StyleCueSlot *[2] in class_3bb8c_m too (head).",
+          "round": 98,
+          "runners": 1
         }
       ],
       "status": "auto"
@@ -1358,6 +1368,16 @@
           "note": "Premium head, cap 5, rolling slots; names sampled per job, none sent back. SceneNode.h onto Sony's SVECTOR/GsCOORD2PARAM/GsCOORDINATE2 across its 45-unit includer set (alpha, no collisions). Sony types: StatBuf179D8H -> CdlFILE (code_179d8_h onto libcd), VoiceState80090368 -> SsMarkCallbackProc[32][16] (code_179d8_c), EntryDAD4 -> SpuRegs (moved to SvmData.h), four Entry90902E8 views (f/i/j/k) -> include/SsScore.h (unk74 is the left volume). Names: DataSourceSetDriverModeFn, GraphPointColor/gGraphPointBaseColor. ResourceRequest is { ResourceSource src; s32 mode; } in FileResource.h, retiring ResourceSourceArgs and DreamAuxLoadReq; ResourceSourceRequest retired onto it (mode unset: a bare ResourceSource shrinks three frames by 8, measured). Plan revision 35: flag-type --units.",
           "round": 97,
           "runners": 12
+        },
+        {
+          "attempts": 4,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 4,
+          "model": "opus",
+          "note": "Last four placeholder types; track 6 measures done. code_179d8_l onto Sony's VagAtr (D8008E978Entry) and VabHdr (ObjE970), SsScore.h, SpuRegs; RGB8003CB68 is BgLayerRgb; RGB80040790 and round 97's GraphPointColor are one BoxFillRgb in BoxFill.h; SpriteCtorReset_322b4 -> SpriteResetFn (the cast Sprite's ctor calls reset through).",
+          "round": 98,
+          "runners": 4
         }
       ],
       "status": "auto",
@@ -1448,6 +1468,16 @@
           "note": "code_8220 (BMemPMgr block layout macros, freeListHead/Tail, BASICCLASS_EVENT_FINALIZED) and class_3bb8c_t (GraphRoom's dots, colours, score moods) accepted after five samples each. class_3bb8c_e: only steps 2-3 merged; steps 4-5 and a rename.py run never compiled (the runner's builds ran in the main checkout: the Bash tool resets cwd between calls), kept under local tag r97-bravo-class_3bb8c_e-unbuilt; unit not marked, re-send. Plan revision 36: runner commands start cd <worktree> &&, the oracle's OK line names its tree.",
           "round": 97,
           "runners": 3
+        },
+        {
+          "attempts": 9,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 9,
+          "model": "opus",
+          "note": "Nine units marked after five samples each: class_3bb8c_i (TextEntry on Pad events), code_2cc8c_c (IntermediateBase/Viewport through Pad and DrawSystem slots, CLASS_ID_ROOT_MASK, <CLASS>_CLASS_IDs), class_3bb8c_e (re-send of round 97's unbuilt pass: delete(path) for delete(pathBuf) was what shifted the image), class_3ac78 (StageMap front third, ACTOR_CLASS_ID), code_d294_c (SceneNode part 3, gHitHeightGate tier B), class_3bb8c_m (ObjMState, FadeBoxEvent, DreamSysMoveOverride, style setup), code_2cc8c (TaskCoreState tier B, TaskCoreInputMode, OnPadStart), code_179d8_e (VabStreamObj on <libsnd.h>), code_2cc8c_b (two-level slot picker, SlotEntry fields). Every runner OK named its own worktree (revision 36).",
+          "round": 98,
+          "runners": 9
         }
       ],
       "status": "auto",
@@ -1528,6 +1558,16 @@
           "note": "Five regions: code_179d8_c -> libsnd_ssinit, code_179d8_f -> libsnd_cres, code_179d8_i -> libsnd_decre, code_179d8_j_c..p -> libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop + libsnd_ut_ako (3.6's split modules, nm), code_8220..code_8220_c -> BMemPMgr.c + TmdRenderer.c (b+c merged; BasicClass tail parked at TmdRenderer's head, a split). Sony names from nm over sdk/work/<disc>/elf/libsnd; none linkable (text sizes differ).",
           "round": 97,
           "runners": 3
+        },
+        {
+          "attempts": 1,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 1,
+          "model": "opus",
+          "note": "code_179d8_i_b..k -> libsnd_play.c (play.o, 0x2C on 3.0/3.3/3.5) + libsnd_seqread.c (3.3's seqread.o with one function 0x7C shorter); edge kept, separate objects in every build. Lead: play.o may be linkable as an o segment (3.3 match.txt AMBIGUOUS x4, resolved by the Snd_play pin).",
+          "round": 98,
+          "runners": 1
         }
       ],
       "status": "auto"
