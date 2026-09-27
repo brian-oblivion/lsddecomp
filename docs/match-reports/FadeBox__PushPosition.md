@@ -550,3 +550,15 @@ is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
 already says what the body does. renametype.py rewrote the old class name in
 this report's earlier history too (known, pending an operator decision).
 
+
+## Track 6 (round 99, alpha)
+
+`SkipShort2` (`s16 x; u8 pad2[2]; s16 y;`, named for its layout) is now
+`BoxFillSize` (`tools/renametype.py SkipShort2 BoxFillSize --any-stem`), and
+its fields are what every caller passes: two words, `s32 w; s32 h;`. Storing
+an s32 field into the u16 `boxW`/`boxH` still reads only the low halfword
+(`lhu` at +0x000/+0x004): measured byte-exact with the whole image, so the
+halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
+became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
+BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
+its caller in code_2cc8c_b passes an `s32 size[2]`).

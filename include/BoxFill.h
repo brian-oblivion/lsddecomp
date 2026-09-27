@@ -65,15 +65,16 @@ typedef struct BoxFillPos BoxFillPos;
 #define BOXFILL_ATTR_ALON_SHIFT 30 /* GsALON: semitransparency on */
 #define BOXFILL_ATTR_DOFF_SHIFT 31 /* GsDOFF: display off */
 
-/* The ctor's (and Reset's) size argument: two words of which only the low
- * halfwords are read (lhu at +0x000 and +0x004), into boxW and boxH. The
- * callers pass s32 pairs of their own types (class_3bb8c_n's PairXY,
- * sListViewSize[2]), so New_BoxFill and the ctor slot take `void *` and the
- * occupants read it as this. */
+/* The box's size in pixels, width then height: the ctor's (and Reset's)
+ * size argument, setSize's and FadeBox's pushPosition's. Each word is stored
+ * into the u16 boxW/boxH, which reads only its low halfword (lhu at +0x000
+ * and +0x004). The callers pass two-word arrays and pairs of their own
+ * (sListViewSize, gGraphPointSize, sStyleDecorBoxSize, class_3bb8c_n's
+ * PairXY), so New_BoxFill and the ctor slot take `void *` and setSize
+ * `s32 *`. The same layout as BoxFillPos, which is a position. */
 struct BoxFillSize {
-    s16 x; /* +0x000, the width */
-    u8 pad2[0x004 - 0x002];
-    s16 y; /* +0x004, the height */
+    s32 w; /* +0x000 */
+    s32 h; /* +0x004 */
 };
 
 /* The box's screen position (setPosition, attachToParent's third argument,

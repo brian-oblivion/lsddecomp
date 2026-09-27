@@ -65,3 +65,15 @@ Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport
 ## Track 7 (round 99, bravo)
 
 The size argument is read as `((BoxFillSize *)size)->x` / `->y` instead of `((u16 *)size)[0]` / `((u16 *)&size[1])[0]`. Byte-exact; the slot keeps `s32 *size`.
+
+## Track 6 (round 99, alpha)
+
+`SkipShort2` (`s16 x; u8 pad2[2]; s16 y;`, named for its layout) is now
+`BoxFillSize` (`tools/renametype.py SkipShort2 BoxFillSize --any-stem`), and
+its fields are what every caller passes: two words, `s32 w; s32 h;`. Storing
+an s32 field into the u16 `boxW`/`boxH` still reads only the low halfword
+(`lhu` at +0x000/+0x004): measured byte-exact with the whole image, so the
+halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
+became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
+BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
+its caller in code_2cc8c_b passes an `s32 size[2]`).

@@ -190,8 +190,8 @@ void FadeBox__PushPosition(FadeBox *self, BoxFillSize *size, BoxFillPos *pos) {
         self->savedW = self->boxW;
         self->savedH = self->boxH;
         *(BoxFillPos *)&self->savedPosX = *(BoxFillPos *)&self->posX;
-        self->boxW = size->x;
-        self->boxH = size->y;
+        self->boxW = size->w;
+        self->boxH = size->h;
         *(BoxFillPos *)&self->posX = *pos;
     }
 }
@@ -245,8 +245,8 @@ void BoxFill__Reset(BoxFill *self, BoxFillSize *size, void *color, s32 pri) {
     self->boxAttribute = 0;
     self->boxX = 0;
     self->boxY = 0;
-    self->boxW = size->x;
-    self->boxH = size->y;
+    self->boxW = size->w;
+    self->boxH = size->h;
     methods = self->methods;
     if (color == NULL) {
         color = D_8008A924;
