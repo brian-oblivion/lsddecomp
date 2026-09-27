@@ -172,3 +172,11 @@ agrees). Sony symbol; this pass does not rename it further. Matched,
 ## Types (round 98, alpha)
 
 This unit's `D8008E978Entry` is now `<libsnd.h>`'s `VagAtr` and `ObjE970` is `VabHdr` (unk4 -> `center`, unk5 -> `shift`, unk12 -> `pbmin`, unk13 -> `pbmax`, ObjE970.unk18 -> `mvol`); preserved bodies above keep the old spellings. See SpuVmAlloc.md, "Unit banner history".
+
+## Round 99 (echo, track 7): locals
+
+Parameters `note`, `fine`; locals by role (`toneIndex`, `tone`,
+`fineTotal`, `steps`, `carry`, `step`, `semitones`, `octave`, `semitone`,
+`tableIndex`, `pitch`). The body's first line, `origA0 = a0;`, copied the
+argument into a second local that was only read once; removing it is
+byte-identical, so it is gone. `0x3C` is written 60.

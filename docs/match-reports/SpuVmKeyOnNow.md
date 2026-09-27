@@ -21,7 +21,7 @@ Unit: `src/code_179d8_l.c` (carved round 24, 2026-09-08) · Size: 316 words
 
 Sibling of `vmNoiseOn` in the same unit (same two-level `_ss_score`
 entry table, same three-stage `D_8008EA1A`/`17`/`11` blend cascade, same
-`D_8008E8C0`-gated clamp, same low/high enable-bit split) but a DIFFERENT
+`_svm_stereo_mono`-gated clamp, same low/high enable-bit split) but a DIFFERENT
 source object and a DIFFERENT tail:
 
 - **Level source**: reads `_svm_vh->unk18` (a per-session "priority"-ish
@@ -74,7 +74,7 @@ source object and a DIFFERENT tail:
   multiple-independent-local-views convention) rather than reusing another
   unit's header.
 - **The write order in the enable-bit tail is REVERSED from `vmNoiseOn`**:
-  this function updates the `D_8008EA20`-gated `D_8008E230`/`234` pair
+  this function updates the `D_8008EA20`-gated `_svm_orev1`/`234` pair
   FIRST, then `D_8008E228`/`22C`/`80090C60`/`64` SECOND -- the opposite
   order from D8E0. Confirmed structurally correct by m2c's own independent
   decode; not treated as an error.
@@ -115,18 +115,18 @@ extern u8 D_8008EA19;
 extern u8 D_8008EA17;
 extern u8 D_8008EA11;
 extern u8 D_8008EA1A;
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 extern u16 D_8008EA22;
 extern u8 D_8008EA20;
 extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
-extern u16 D_80090C60;
-extern u16 D_80090C64;
-extern u16 D_8008E230;
-extern u16 D_8008E234;
+extern u16 _svm_okon2;
+extern u16 _svm_okof1;
+extern u16 _svm_okof2;
+extern u16 _svm_orev1;
+extern u16 _svm_orev2;
 
 /* Object holding a per-note "priority"-ish scale byte at +0x18; only field
  * this function needs. */
@@ -190,7 +190,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     }
 
     pan1sq = pan1 * pan1;
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (pan1 < pan2) {
             pan1 = pan2;
         } else {
@@ -218,17 +218,17 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     }
 
     if (D_8008EA20 & 4) {
-        D_8008E230 |= lowBit;
-        D_8008E234 |= highBit;
+        _svm_orev1 |= lowBit;
+        _svm_orev2 |= highBit;
     } else {
-        D_8008E230 &= ~lowBit;
-        D_8008E234 &= ~highBit;
+        _svm_orev1 &= ~lowBit;
+        _svm_orev2 &= ~highBit;
     }
 
     D_8008E228 |= lowBit;
-    D_80090C60 &= ~D_8008E228;
-    D_8008E22C |= highBit;
-    D_80090C64 &= ~D_8008E22C;
+    _svm_okof1 &= ~D_8008E228;
+    _svm_okon2 |= highBit;
+    _svm_okof2 &= ~_svm_okon2;
 }
 ```
 
@@ -324,7 +324,7 @@ structurally-near-identical sibling's gap WORSE, even within the same unit
 and even when both chain the same family of magic-multiply divisions.**
 `vmNoiseOn` and `SpuVmKeyOnNow` share the two-level `_ss_score`
 lookup, the exact same three-stage blend cascade, and the same
-`D_8008E8C0` clamp shape, and both have unresolved frame-size/position
+`_svm_stereo_mono` clamp shape, and both have unresolved frame-size/position
 gaps -- but marking the chained-division intermediates `volatile` (which
 took D8E0 from 295 to 309/311) makes D1B4 regress from 332 to 342. Do not
 assume a documented frame-size fix generalizes to a "similar-looking"
@@ -472,7 +472,7 @@ several times in one function.
 
 ### Third: two more levers, one of them transferred straight from `vmNoiseOn2` this same round
 
-- **`pan1sq` belongs AFTER the `D_8008E8C0` clamp, not before-and-again-inside.**
+- **`pan1sq` belongs AFTER the `_svm_stereo_mono` clamp, not before-and-again-inside.**
   Round 45's body computed `pan1sq = pan1*pan1;` before the `if`, then again
   inside it. Retail has two `mult $a2,$a2` and only ONE `mflo` — which is a
   single source-level multiply after the block, with GCC filling the `bne`
@@ -485,7 +485,7 @@ several times in one function.
   round-65 section): write `G = x | G;` not `G |= x;` (retail's `or $v1,$a2,$v1`
   puts the loaded value SECOND), and order the four global updates by retail's
   LOAD order `E228, E22C, C60, C64` rather than `E228, C60, E22C, C64`. The
-  same applies to the `D_8008E230`/`D_8008E234` pair in the `D_8008EA20 & 4`
+  same applies to the `_svm_orev1`/`_svm_orev2` pair in the `D_8008EA20 & 4`
   arm. 4240 -> 3765.
 
 ### Levers tried and their verdicts
@@ -599,7 +599,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
         pan1 = (pan1 * (0x7F - D_8008EA11)) / 63;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (pan1 < pan2) {
             pan1 = pan2;
         } else {
@@ -626,17 +626,17 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     }
 
     if (D_8008EA20 & 4) {
-        D_8008E230 = lowBit | D_8008E230;
-        D_8008E234 = highBit | D_8008E234;
+        _svm_orev1 = lowBit | _svm_orev1;
+        _svm_orev2 = highBit | _svm_orev2;
     } else {
-        D_8008E230 = D_8008E230 & ~lowBit;
-        D_8008E234 = D_8008E234 & ~highBit;
+        _svm_orev1 = _svm_orev1 & ~lowBit;
+        _svm_orev2 = _svm_orev2 & ~highBit;
     }
 
     D_8008E228 = lowBit | D_8008E228;
-    D_8008E22C = highBit | D_8008E22C;
-    D_80090C60 = D_80090C60 & ~D_8008E228;
-    D_80090C64 = D_80090C64 & ~D_8008E22C;
+    _svm_okon2 = highBit | _svm_okon2;
+    _svm_okof1 = _svm_okof1 & ~D_8008E228;
+    _svm_okof2 = _svm_okof2 & ~_svm_okon2;
 }
 #endif
 
@@ -804,7 +804,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
         pan1 = (pan1 * (0x7F - D_8008EA11)) / 63;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (pan1 < pan2) {
             pan1 = pan2;
         } else {
@@ -833,17 +833,17 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     }
 
     if (D_8008EA20 & 4) {
-        D_8008E230 = lowBit | D_8008E230;
-        D_8008E234 = highBit | D_8008E234;
+        _svm_orev1 = lowBit | _svm_orev1;
+        _svm_orev2 = highBit | _svm_orev2;
     } else {
-        D_8008E230 = D_8008E230 & ~lowBit;
-        D_8008E234 = D_8008E234 & ~highBit;
+        _svm_orev1 = _svm_orev1 & ~lowBit;
+        _svm_orev2 = _svm_orev2 & ~highBit;
     }
 
     D_8008E228 = lowBit | D_8008E228;
-    D_8008E22C = highBit | D_8008E22C;
-    D_80090C60 = D_80090C60 & ~D_8008E228;
-    D_80090C64 = D_80090C64 & ~D_8008E22C;
+    _svm_okon2 = highBit | _svm_okon2;
+    _svm_okof1 = _svm_okof1 & ~D_8008E228;
+    _svm_okof2 = _svm_okof2 & ~_svm_okon2;
 }
 #endif
 
@@ -889,7 +889,7 @@ placeholder"); recorded here rather than guessed into a rename:
   Candidate pan/balance-style controls; three of them cascaded suggests a
   main/aux/reverb-style stack, not confirmed.
 - `D_8008EA20` -- single bit (`& 4`) selects which direction
-  `D_8008E230`/`D_8008E234` gets updated. Candidate per-voice routing/output
+  `_svm_orev1`/`_svm_orev2` gets updated. Candidate per-voice routing/output
   flag byte; not confirmed.
 
 These recur identically in `vmNoiseOn` (same unit, matching cascade shape --
@@ -919,3 +919,79 @@ The NON_MATCHING body now stores `_svm_voice[D_8008EA26[0]].unk04/unk1B`; normal
 ## Types (round 98, alpha)
 
 This unit's `D8008E978Entry` is now `<libsnd.h>`'s `VagAtr` and `ObjE970` is `VabHdr` (unk4 -> `center`, unk5 -> `shift`, unk12 -> `pbmin`, unk13 -> `pbmax`, ObjE970.unk18 -> `mvol`); preserved bodies above keep the old spellings. See SpuVmAlloc.md, "Unit banner history".
+
+## Naming (round 99, echo, track 7): the vmanager voice masks take Sony's names
+
+Every global below is read only by libsnd code (`progress.py` counts every
+accessor as library), so it takes Sony's name or none. The names come from
+`tools/sonydata.py`'s aligner, run on the placeholders (it only lists
+game-named data by itself): each of our accessors aligned opcode by opcode
+against the same function in every SDK object, then the relocation on the
+aligned Sony instruction names the symbol. Every alignment at ratio >= 0.95
+(discs 3.3, 3.5, 3.6) agrees; only lower-ratio 3.0 alignments disagree. None
+of them lands on 3.5 vmanager.o's own bss layout (its copies would be at
+0x8008DF38..DF42 from the `_svm_sreg_buf` anchor), so these are weak
+definitions Sony's linker placed elsewhere, the `_svm_auto_kof_mode` case.
+The access is the verdict. Tier: Sony's name.
+
+| old | new | Sony accessors aligned |
+| --- | --- | --- |
+| `D_8008E22C` | `_svm_okon2` | SpuVmFlush 1.00 (3.3), SpuVmKeyOnNow/vmNoiseOn 0.99 |
+| `D_8008E230` | `_svm_orev1` | SpuVmFlush 1.00, SpuVmKeyOnNow/vmNoiseOn 0.99 |
+| `D_8008E234` | `_svm_orev2` | same |
+| `D_80090C60` | `_svm_okof1` | SpuVmFlush 1.00, SpuVmKeyOnNow/vmNoiseOn 0.99 |
+| `D_80090C64` | `_svm_okof2` | same |
+| `D_8008E8C0` | `_svm_stereo_mono` | SpuVmKeyOnNow, vmNoiseOn, SetAutoVol, SetAutoPan 0.99 (libsnd/vm_g.o weak bss) |
+
+What the body shows they do: `_svm_okon1/2` gather the voices keyed on this
+flush (voices 0-15 in 1, 16-23 in 2), `_svm_okof1/2` the voices keyed off,
+with every key-on cleared out of the key-off masks; `_svm_orev1/2` the
+voices routed to reverb, set or cleared by bit 2 of `_svm_cur`'s +0x14 byte;
+`_svm_stereo_mono == 1` makes both pans equal (mono).
+
+**Not renamed: `D_8008E228`, Sony's `_svm_okon1`.** Same evidence as its
+pair, but `rename.py` refuses it: `sony_data_owner` takes `dc_cr`'s size
+(pinned at 0x8008E224, libpress/vlc2) as the MAXIMUM over every disc, 8 on
+disc 3.0, while the object actually placed is disc 3.3's vlc2, where
+`dc_cr` is 4 bytes. So the tool thinks 0x8008E228 is `dc_cr+4`. Proposed to
+the head as a tool fix (use the placed disc's size); then `rename.py
+D_8008E228 _svm_okon1`.
+
+**Not renamable: the `_svm_cur` offsets.** `D_8008EA10`, `D_8008EA11`,
+`D_8008EA16`, `D_8008EA17`, `D_8008EA19`, `D_8008EA1A`, `D_8008EA20`,
+`D_8008EA22` and `D_8008EA26` lie inside Sony's `_svm_cur` (pinned at
+0x8008EA0C, 0x20 bytes in 3.5's vm_g.o), and `rename.py` refuses them:
+their spelling is `_svm_cur.<field>` once the struct is typed. That is a type
+job (track 6), across this unit, `code_179d8_m.c` and
+`libsnd_vm_vol_ut_key_ut_keyv.c`, and the `D_8008EA26[]` incomplete-array
+declaration is load-bearing here (see the round 65 section), so the typed
+spelling has to be measured, not assumed. Proposed to the head.
+
+## History moved from the source (round 99, echo, track 7)
+
+Three comments left `src/code_179d8_l.c` for this report:
+
+- Ahead of the `#ifdef`, a stale STALL line from before round 65: "Best
+  body reached (332/316 built words, 16 words LONG; 33/316 raw word-match,
+  drift-affected) preserved there in #if 0". The live figures are the
+  NON_MATCHING comment's.
+- The NON_MATCHING comment's detail: 201/316 raw word-match, funcdiff
+  insertions/deletions 46/46, the frame residue as `addiu sp,sp,-8` against
+  retail's `-0x10`. The body is hand-derived plus one permuter hoist (round
+  65: `pan1sq / 16383` computed before `pan2sq`), reviewed as a pure
+  reordering and kept.
+- On `D_8008EA26[]`: "NOT volatile, and declared as an incomplete ARRAY on
+  purpose: the array spelling is what makes GCC 2.6.3 materialise the
+  address once into a GPR and spend one word per read, which is retail.
+  Retail's five reloads come from ordinary CSE invalidation by the stores
+  between them." The source keeps a one-line MATCHING note pointing here.
+
+The globals this body reads were declared in three scattered groups (one
+comment explained that a later group "reused" an earlier one). They are now
+one block at the top of the file, `_svm_cur`'s bytes with their offsets and
+the other vmanager globals under Sony's names; the NON_MATCHING object's
+disassembly, relocations included, is identical before and after. The
+locals now say what they hold (`pan1`/`pan2` -> `volL`/`volR`, `prio` ->
+`masterVol`, `lvl0`/`lvl1` -> `toneVol`/`vol`, `chanIdx` -> `sregIndex`,
+the unread first parameter `unused`, the second `pitch`); the preserved
+bodies above keep the old spellings.

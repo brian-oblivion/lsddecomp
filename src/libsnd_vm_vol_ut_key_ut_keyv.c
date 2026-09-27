@@ -55,7 +55,7 @@ extern VagAtr *_svm_tn;
  * halfwords as libsnd_ut_ako.c's SsUtAllKeyOff indexes it.
  * MATCHING: not volatile here; volatile moves SsUtKeyOff's second store out
  * of its branch delay slot. */
-extern u16 *D_8006DAD4;
+extern u16 *_svm_sreg;
 
 /* The SPU's noise-mode enable register pair (NON, 0x1F801D94/0x1F801D96:
  * one bit per voice, voices 0-15 then 16-23), as halfword indices from
@@ -115,22 +115,22 @@ extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 /* Loop bound for a small table of active "objects" (screen/slot
  * pairs); see libsnd_decre.c's D_80090B68/6C for the sibling reading of
  * an analogous count. */
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 /* A pair of 16-bit bitmasks split across a 0..0x1F channel space
  * (low 16 channels in the first word, next 16 in the second), each
  * paired with an "active mask" word that is cleared wherever the
  * channel mask bit is set. */
-extern u16 D_80090C60;
-extern u16 D_80090C64;
+extern u16 _svm_okof1;
+extern u16 _svm_okof2;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 
 /* libsnd vmanager's _svm_vh (pinned at this address): the current VAB's
  * header. */
 extern VabHdr *_svm_vh;
 
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 315/324 words, 9 words short; raw word-match 10/324,
@@ -150,7 +150,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     SpuVmVSetUp((s16)a1, (s16)a2);
     D_8008EA22 = (u16)a0;
 
-    if (D_8008E9D0 != 0) {
+    if (spuVmMaxVoice != 0) {
         i = 0;
         do {
             if (_svm_voice[i].unk0E == (s16)a0) {
@@ -208,7 +208,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     }
 
                     pan1sq = pan1 * pan1;
-                    if (D_8008E8C0 == 1) {
+                    if (_svm_stereo_mono == 1) {
                         if (pan1 < pan2) {
                             pan1 = pan2;
                         } else {
@@ -226,7 +226,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                 }
             }
             i++;
-        } while (i < D_8008E9D0);
+        } while (i < spuVmMaxVoice);
     }
     return result;
 }
@@ -289,7 +289,7 @@ s16 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
         goto fail;
     }
     result = (s32)(u8)SpuVmAlloc();
-    if ((u8)result == D_8008E9D0) {
+    if ((u8)result == spuVmMaxVoice) {
         goto fail;
     }
     __asm__("");
@@ -351,8 +351,8 @@ s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
     if (_svm_voice[idx].unk00 == 0xFF) {
         _svm_voice[(u8)idx].unk1B = 0;
         _svm_voice[(u8)idx].unk04 = 0;
-        D_8006DAD4[SPU_NOISE_ON_LO] = 0;
-        D_8006DAD4[SPU_NOISE_ON_HI] = 0;
+        _svm_sreg[SPU_NOISE_ON_LO] = 0;
+        _svm_sreg[SPU_NOISE_ON_HI] = 0;
     } else {
         D_8008EA26 = idx;
         chan = D_8008EA26;
@@ -366,10 +366,10 @@ s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
         _svm_voice[chan].unk1B = 0;
         _svm_voice[chan].unk04 = 0;
         _svm_voice[chan].unk00 = 0;
-        D_80090C60 = mask0 | D_80090C60;
-        D_80090C64 |= mask1;
-        D_8008E228 &= ~D_80090C60;
-        D_8008E22C &= ~D_80090C64;
+        _svm_okof1 = mask0 | _svm_okof1;
+        _svm_okof2 |= mask1;
+        D_8008E228 &= ~_svm_okof1;
+        _svm_okon2 &= ~_svm_okof2;
     }
     _snd_ev_flag = 0;
     return 0;
@@ -509,10 +509,10 @@ s16 SsUtKeyOffV(s16 idx) {
     _svm_voice[chan].unk04 = 0;
     _svm_voice[chan].unk00 = 0;
     _snd_ev_flag = 0;
-    D_80090C60 = mask0 | D_80090C60;
-    D_80090C64 |= mask1;
-    D_8008E228 &= ~D_80090C60;
-    D_8008E22C &= ~D_80090C64;
+    _svm_okof1 = mask0 | _svm_okof1;
+    _svm_okof2 |= mask1;
+    D_8008E228 &= ~_svm_okof1;
+    _svm_okon2 &= ~_svm_okof2;
     return 0;
 
 fail:

@@ -19,21 +19,21 @@ toolchain blocker.
 
 ## What it computes
 
-SPU voice-channel setup: `D_8006DAD4` holds `0x1F801C00`, the PS1 SPU base
+SPU voice-channel setup: `_svm_sreg` holds `0x1F801C00`, the PS1 SPU base
 hardware address (confirmed by reading `asm/data/57070.data.s`), and the
 function writes to `+0x194`/`+0x196` from it — the SPU key-on-low/key-on-high
 registers. `a0` is the voice-channel number (0-31, masked to a byte), `a1`
 and `a2` are per-voice values written into two 16-byte-stride parameter
 tables (`_svm_sreg_buf`, `D_8008D7F2`); `_svm_sreg_dirty[chan]` is a per-voice flag
-byte OR'd with `3`; a loop over all `D_8008E9D0` (a voice count) entries of a
+byte OR'd with `3`; a loop over all `spuVmMaxVoice` (a voice count) entries of a
 52-byte-stride array at `D_8008D9A3` masks each entry's low bit; the target
 channel's own 52-byte-stride slot gets three fields set (`D_8008D98C+2`←10
 [before the loop, if the earlier `sll v0,a0,4` load offset arithmetic is
 read as `D_8008D98C` base itself rather than a sub-field — not fully
 resolved, see below], `D_8008D9A3+0`←2, `D_8008D98A+0`←0); and finally the
 computed `lowBit`/`highBit` (a 32-bit voice-enable mask split across two
-16-bit halves by whether `chan<16`) get OR'd into `D_8008E228`/`D_8008E22C`
-and AND-NOT'd into `D_80090C60`/`D_80090C64` (an enable/mute pair), then
+16-bit halves by whether `chan<16`) get OR'd into `D_8008E228`/`_svm_okon2`
+and AND-NOT'd into `_svm_okof1`/`_svm_okof2` (an enable/mute pair), then
 written to the two SPU key-on registers.
 
 ## Best-derived body (98/112 words, preserved for the next attempt)
@@ -42,17 +42,17 @@ written to the two SPU key-on registers.
 extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
 extern u8 _svm_sreg_dirty[];
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 extern u8 D_8008D98A[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
-extern u16 D_80090C60;
-extern u16 D_80090C64;
-extern u16 *D_8006DAD4;
+extern u16 _svm_okon2;
+extern u16 _svm_okof1;
+extern u16 _svm_okof2;
+extern u16 *_svm_sreg;
 
 void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 a3;
@@ -87,32 +87,32 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
 
     idx52 = (u8)a3 * 52;
     *(u16 *)(D_8008D98C + idx52) = 10;
-    if (D_8008E9D0 != 0) {
+    if (spuVmMaxVoice != 0) {
         i = 0;
         do {
             li = i * 52;
             *(u8 *)(D_8008D9A3 + li) = *(u8 *)(D_8008D9A3 + li) & 1;
             i++;
-        } while ((u16)i < D_8008E9D0);
+        } while ((u16)i < spuVmMaxVoice);
     }
     idx52 = (u8)a3 * 52;
     *(u8 *)(D_8008D9A3 + idx52) = 2;
 
     e228 = D_8008E228;
-    e22c = D_8008E22C;
+    e22c = _svm_okon2;
     *(u16 *)(D_8008D98A + idx52) = 0;
-    c60 = D_80090C60;
+    c60 = _svm_okof1;
     e228 = lowBit | e228;
     e22c = highBit | e22c;
     D_8008E228 = e228;
     c60 = c60 & ~e228;
-    D_8008E22C = e22c;
-    c64 = D_80090C64;
-    D_80090C60 = c60;
+    _svm_okon2 = e22c;
+    c64 = _svm_okof2;
+    _svm_okof1 = c60;
     c64 = c64 & ~e22c;
-    D_80090C64 = c64;
-    D_8006DAD4[0xCA] = lowBit;
-    D_8006DAD4[0xCB] = highBit;
+    _svm_okof2 = c64;
+    _svm_sreg[0xCA] = lowBit;
+    _svm_sreg[0xCB] = highBit;
 }
 ```
 
@@ -142,7 +142,7 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
    store by GCC 2.6.3's scheduler even with no aliasing justification; a
    scheduling barrier is the documented-permitted fix (order-only, not
    register-identity) per CLAUDE.md's test.
-3. **A 14-word length gap, isolated to the `D_8008E9D0`-bounded loop over
+3. **A 14-word length gap, isolated to the `spuVmMaxVoice`-bounded loop over
    `D_8008D9A3`.** `tools/asm-differ/diff.py` shows retail recomputing the
    full 5-instruction `i*52` shift-add sequence (`sll,addu,sll,addu,sll`)
    on EVERY iteration, while the natural `do { li = i*52; ...; i++; }
@@ -214,7 +214,7 @@ with the `(u8)` cast, one instruction differed in MASK WIDTH — retail's
 loop-condition/index-use sequence masks with `0xffff` (`andi v1,a1,0xffff`)
 at a specific point the `(u8)`-cast version instead masked with `0xff`.
 Changing the cast in the multiply from `(u8)i` to `(u16)i` (the loop bound
-comparison `while ((u16)i < D_8008E9D0)` already used `u16`; the multiply
+comparison `while ((u16)i < spuVmMaxVoice)` already used `u16`; the multiply
 itself had not) reproduced the `0xffff` mask exactly, with the compiled
 length unchanged (still 108/112 — a byte-correctness fix, not a
 word-count one). **Lesson: when applying the "narrow-cast defeats strength
@@ -230,7 +230,7 @@ the compiled body doesn't (retail preserves the raw channel in `$a3` and
 narrows `$a0` in place; the compiled body does the reverse), plus a
 missing `addiu sp,sp,-8`/`+8` frame retail allocates (residue 4 from the
 original report) and several downstream register-choice differences in
-the tail (`D_8008E228`/`D_8008E22C`/`D_80090C60`/`D_80090C64` update
+the tail (`D_8008E228`/`_svm_okon2`/`_svm_okof1`/`_svm_okof2` update
 sequence) that read as cascading consequences of the same root register
 allocation difference rather than independent residues — the tail's LOAD/
 OP/STORE statement order in the preserved C already matches retail's
@@ -250,17 +250,17 @@ stall, not a new independent residue.
 extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
 extern u8 _svm_sreg_dirty[];
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 extern u8 D_8008D98A[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
-extern u16 D_80090C60;
-extern u16 D_80090C64;
-extern u16 *D_8006DAD4;
+extern u16 _svm_okon2;
+extern u16 _svm_okof1;
+extern u16 _svm_okof2;
+extern u16 *_svm_sreg;
 
 void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 a3;
@@ -295,32 +295,32 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
 
     idx52 = (u8)a3 * 52;
     *(u16 *)(D_8008D98C + idx52) = 10;
-    if (D_8008E9D0 != 0) {
+    if (spuVmMaxVoice != 0) {
         i = 0;
         do {
             li = (u16)i * 52;
             *(u8 *)(D_8008D9A3 + li) = *(u8 *)(D_8008D9A3 + li) & 1;
             i++;
-        } while ((u16)i < D_8008E9D0);
+        } while ((u16)i < spuVmMaxVoice);
     }
     idx52 = (u8)a3 * 52;
     *(u8 *)(D_8008D9A3 + idx52) = 2;
 
     e228 = D_8008E228;
-    e22c = D_8008E22C;
+    e22c = _svm_okon2;
     *(u16 *)(D_8008D98A + idx52) = 0;
-    c60 = D_80090C60;
+    c60 = _svm_okof1;
     e228 = lowBit | e228;
     e22c = highBit | e22c;
     D_8008E228 = e228;
     c60 = c60 & ~e228;
-    D_8008E22C = e22c;
-    c64 = D_80090C64;
-    D_80090C60 = c60;
+    _svm_okon2 = e22c;
+    c64 = _svm_okof2;
+    _svm_okof1 = c60;
     c64 = c64 & ~e22c;
-    D_80090C64 = c64;
-    D_8006DAD4[0xCA] = lowBit;
-    D_8006DAD4[0xCB] = highBit;
+    _svm_okof2 = c64;
+    _svm_sreg[0xCA] = lowBit;
+    _svm_sreg[0xCB] = highBit;
 }
 ```
 
@@ -506,11 +506,11 @@ Two sub-levers inside that rewrite, both independently measured:
   wrong. Reordering to `E228, E22C, C60, C64` closed the rest of the tail.
   (Stores stay in source order in both, so only the loads discriminate.)
 
-**3. A third, smaller one: the `D_8008E9D0` guard read.** Retail loads
-`D_8008E9D0` *before* the `D_8008D98C[idx52] = 10` store, which fills the
+**3. A third, smaller one: the `spuVmMaxVoice` guard read.** Retail loads
+`spuVmMaxVoice` *before* the `D_8008D98C[idx52] = 10` store, which fills the
 load-delay slot with the `li v0,0xa`. The inherited body read it inline in
 the `if`, so maspsx inserted a `nop`. Reading it into a local first
-(`n = D_8008E9D0;` above the store, `if (n != 0)`) removes the `nop` and
+(`n = spuVmMaxVoice;` above the store, `if (n != 0)`) removes the `nop` and
 reproduces retail's order — this is why the body is 107 words, not 108: it
 lost a word it should never have had. The loop's own condition still re-reads
 the global each iteration (retail does too), so this is a guard-only hoist.
@@ -541,18 +541,18 @@ That is exactly the 5-word gap: `move` + `addiu sp,-8` + duplicated
 | delete the four tail temps, direct global expressions | **POSITIVE** — whole tail exact, +fixed `t0`/`a2` upstream |
 | `lowBit \| D_X` vs `D_X \|= lowBit` | **POSITIVE** — operand order |
 | reorder the four global updates to retail's load order | **POSITIVE** |
-| hoist the `D_8008E9D0` guard read into a local | **POSITIVE** — drops a spurious `nop` |
+| hoist the `spuVmMaxVoice` guard read into a local | **POSITIVE** — drops a spurious `nop` |
 | separate masked local (`ch = (u8)a0`) instead of reassigning the parameter | inert — identical 1835, same swap. Re-confirms round 26 on the NEW body |
 | masked local typed `u32` / `u16` / `s32` | all three inert on the swap and on the score |
 | removing the existing `__asm__("")` barrier | **NEGATIVE** — 1835 -> 2520. The barrier is still load-bearing |
 | a SECOND `__asm__("")` at the top, and one before the tail | both inert (1835 unchanged) |
-| long live range: cache `D_8006DAD4` in a local from the top | **REGRESSION** — 107 -> 108 words, 1835 -> 2790 |
+| long live range: cache `_svm_sreg` in a local from the top | **REGRESSION** — 107 -> 108 words, 1835 -> 2790 |
 | `D_8008D98A` store placement sweep, 5 positions | see below |
 | arm-order (write the jumping arm NOT-last) | **not applicable** — retail's arm order already matches ours instruction-for-instruction; its `li v0,0x1` duplication is caused by the frame taking the delay slot, not by block layout. This is the delay-slot counter-indication the lever's own entry warns about |
 | delete-a-local across a CALL | **not applicable** — this function is a leaf, zero calls, so the live range that lever needs cannot exist here |
 
 **The `D_8008D98A` store placement sweep is worth recording as a trap.**
-Five source positions were measured. The position after the `D_80090C60`
+Five source positions were measured. The position after the `_svm_okof1`
 statement scores **better** on asm-differ (1675 vs 1835) than the position
 kept in the body below — and it is the WRONG one. Retail's store order is
 `D98A, E228, E22C, C60, C64`; at 1675 the compiler emits `D98A` *last*, which
@@ -588,8 +588,8 @@ spending the session's one search where it can bite.
 
 Needs, in addition to the unit's existing declarations before
 `SpuVmKeyOnNow` and `vmNoiseOn` (`_svm_sreg_buf`, `D_8008D7F2`,
-`_svm_sreg_dirty`, `D_8008D98C`, `D_8008D9A3`, `D_8008E228`, `D_8008E22C`,
-`D_80090C60`, `D_80090C64`, `D_8008E9D0`, `D_8006DAD4`), one extra:
+`_svm_sreg_dirty`, `D_8008D98C`, `D_8008D9A3`, `D_8008E228`, `_svm_okon2`,
+`_svm_okof1`, `_svm_okof2`, `spuVmMaxVoice`, `_svm_sreg`), one extra:
 
 #if 0
 extern u8 D_8008D98A[];
@@ -623,7 +623,7 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     }
 
     idx52 = (u8)a3 * 52;
-    n = D_8008E9D0;
+    n = spuVmMaxVoice;
     *(u16 *)(D_8008D98C + idx52) = 10;
     if (n != 0) {
         i = 0;
@@ -631,18 +631,18 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
             li = (u16)i * 52;
             *(u8 *)(D_8008D9A3 + li) = *(u8 *)(D_8008D9A3 + li) & 1;
             i++;
-        } while ((u16)i < D_8008E9D0);
+        } while ((u16)i < spuVmMaxVoice);
     }
     idx52 = (u8)a3 * 52;
     *(u8 *)(D_8008D9A3 + idx52) = 2;
 
     *(u16 *)(D_8008D98A + idx52) = 0;
     D_8008E228 = lowBit | D_8008E228;
-    D_8008E22C = highBit | D_8008E22C;
-    D_80090C60 = D_80090C60 & ~D_8008E228;
-    D_80090C64 = D_80090C64 & ~D_8008E22C;
-    D_8006DAD4[0xCA] = lowBit;
-    D_8006DAD4[0xCB] = highBit;
+    _svm_okon2 = highBit | _svm_okon2;
+    _svm_okof1 = _svm_okof1 & ~D_8008E228;
+    _svm_okof2 = _svm_okof2 & ~_svm_okon2;
+    _svm_sreg[0xCA] = lowBit;
+    _svm_sreg[0xCB] = highBit;
 }
 #endif
 
@@ -706,3 +706,23 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 The NON_MATCHING body drops its `idx52`/`li` byte offsets for `_svm_voice[(u8)a3].unk04/unk1B/unk02` and `_svm_voice[(u16)i].unk1B`; compiled length 107 -> 108 of 112, mnemonic ratio vs retail 0.831 -> 0.864. Still a stall.
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body now stores `_svm_sreg_buf[a0].unk2 = a2` / `.unk0 = a1` in place of `*(u16 *)(D_8008D7F2 + off16)` / `D_8008D7F0 + off16` (`off16` is gone). This moved it closer to retail again: its prologue now schedules exactly as retail's first 16 words (mnemonic ratio 0.864 -> 0.909).
+
+## Naming (round 99, echo, track 7)
+
+`D_8006DAD4` -> **`_svm_sreg`**, via `rename.py`. It is libsnd/vmanager.o's
+first `.data` word on disc 3.5, and the layout lands: retail's bytes from
+0x8006DAD4 equal that object's `.data` (0x1F801C00, the SPU register base,
+then the note2pitch table; 32 bytes compared). It is static in the 3.3 and
+3.5 objects, so they name nothing; disc 3.6 split vmanager into smaller
+objects and made the same word a global, `_svm_sreg` in `vm_f.o` (value
+0x1F801C00), which `ut_vvol.o`'s SsUtGetVVol reads by that name, aligned
+1.00 against ours. Tier: Sony's name (3.6's spelling of the same variable).
+The type stays `SvmData.h`'s `SpuRegs *`; this body's writes are
+`_svm_sreg->noiseOn[0]` / `[1]`.
+
+## History moved from the source (round 99, echo, track 7)
+
+The NON_MATCHING comment said the residue was "the a0/a3 role-swap
+register-identity class (this unit's documented class)" and that the body
+was hand-derived; the parameters are now `voice`, `volL`, `volR` and the
+copy `voiceArg` (`a3` in the preserved bodies above), `v1` is `dirty`.

@@ -299,7 +299,7 @@ time rather than a symbol.
 **Fix: moved the shared typedef block (`Rec34Half` and its
 `D_8008D9B0`.`D_8008D9BA` externs, `Rec34HalfU`, `Rec16D7F0` +
 `_svm_sreg_buf`/`D_8008D7F2`, `_svm_sreg_dirty`, `ObjE970` + `_svm_vh`, the six
-`D_8008EA1*` scratch bytes, `D_8008E8C0`) from its old position (between
+`D_8008EA1*` scratch bytes, `_svm_stereo_mono`) from its old position (between
 `SeAutoPan` and `SetAutoPan`) up to right after `#include
 "common.h"`, adding this function's own `D_8008D9A4`/`A6`/`A8`/`AA`/`AC`/`AE`
 externs (same `Rec34Half` shape, disjoint symbols) alongside the existing
@@ -412,7 +412,7 @@ tail-duplication fix, not from the padding move itself.
 order in the unit, so its shared record-family types (`Rec34Half` and
 `D_8008D9A4`/`A6`/`A8`/`AA`/`AC`/`AE`, `Rec34HalfU`, `Rec16D7F0` +
 `_svm_sreg_buf`/`D_8008D7F2`, `_svm_sreg_dirty`, `ObjE970` + `_svm_vh`, the six
-`D_8008EA1*` scratch bytes, `D_8008E8C0`) had to be declared BEFORE this
+`D_8008EA1*` scratch bytes, `_svm_stereo_mono`) had to be declared BEFORE this
 function rather than duplicated under function-local names — duplicating
 them (tried first, see the compile errors this produced) hits the
 project's "one extern symbol/typedef cannot carry two conflicting
@@ -482,7 +482,7 @@ extern u8 D_8008EA17;
 extern u8 D_8008EA19;
 extern u8 D_8008EA1A;
 
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 
 /* Same 0x10-byte-stride record family code_179d8_j.c documents as
  * Rec16D7F0 -- accessed here through a flat `s16 *` halfword-indexed
@@ -517,7 +517,7 @@ void SetAutoVol(s16 a0) {
      * the point of use (indexing an `s16 *`, which then scales by 2),
      * reaching idx*16 -- the real per-channel byte stride for these two
      * 0x10-stride, single-field arrays. Same base idiom as
-     * SpuVmInit's D_8006DAD4 fix, but kept `s16` (not `u16`) until
+     * SpuVmInit's _svm_sreg fix, but kept `s16` (not `u16`) until
      * point of use -- see this report's "non-loop" analysis for why the
      * loop-context version of the idiom does not transfer directly. */
     idxCopy = a0;
@@ -596,7 +596,7 @@ void SetAutoVol(s16 a0) {
         val1 = tmp / 64;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (val1 < val2) {
             val1 = val2;
         } else {
@@ -721,7 +721,7 @@ extern u8 D_8008EA16;
 extern u8 D_8008EA17;
 extern u8 D_8008EA19;
 extern u8 D_8008EA1A;
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 extern Rec34Half D_8008D9A4[];
 extern Rec34Half D_8008D9A6[];
 extern Rec34Half D_8008D9A8[];
@@ -794,7 +794,7 @@ void SetAutoVol(s16 voice)
         val1 = (val1 * (0x7F - p)) / 64;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (val2 > val1) {
             val1 = val2;
         } else {

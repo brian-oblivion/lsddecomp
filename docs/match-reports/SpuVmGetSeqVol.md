@@ -57,7 +57,7 @@ Retail reuses ONE computed entry-pointer for both `unk74`/`unk76` reads;
 writing the same `(p0 & 0xFF00) >> 8` index expression at both textual
 sites was sufficient for GCC to CSE it into a single address computation,
 same as the already-matched `SsUtGetDetVVol`'s double-field read of
-`D_8006DAD4[idx]`.)
+`_svm_sreg[idx]`.)
 
 ### Proposed learning
 

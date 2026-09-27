@@ -65,9 +65,9 @@ window:
 1. **Ring-buffer bookkeeping.** `_svm_envx_ptr` is a rotating index (`(x+1)
    & 0xF`), stored back immediately; `_svm_envx_hist[ringIdx]` (an `s32[16]`
    array) is the new ring slot, zeroed.
-2. **Per-channel "ready" snapshot**, guarded by `D_8008E9D0 > 0`: for each
-   channel `i`, copy `D_8006DAD4[i].unkC` (a NEW field on the already
-   `+0x194`/`+0x196`-known `D_8006DAD4` object, read here as part of an
+2. **Per-channel "ready" snapshot**, guarded by `spuVmMaxVoice > 0`: for each
+   channel `i`, copy `_svm_sreg[i].unkC` (a NEW field on the already
+   `+0x194`/`+0x196`-known `_svm_sreg` object, read here as part of an
    independent 0x10-byte-stride array view — see struct notes below) into
    `D_8008D98E[i]` (unsigned 16-bit; re-read via `lhu` after the store, so
    needs an UNSIGNED view, not the existing signed `Rec34Half`), and if
@@ -83,7 +83,7 @@ window:
    (`func_800375E8(0, 0xFFFFFF)` if `D_8008D9A3[i] == 2`, then zero it
    regardless).
 4. Two unconditional bitmask updates:
-   `D_8008E228 &= ~D_80090C60; D_8008E22C &= ~D_80090C64;`
+   `D_8008E228 &= ~_svm_okof1; _svm_okon2 &= ~_svm_okof2;`
 5. **Per-channel interpolation dispatch**, unconditional 0..0x17 loop:
    `SetAutoVol(i)` if `D_8008D9A4[i] != 0`, `SetAutoPan(i)` if
    `D_8008D9B0[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
@@ -91,18 +91,18 @@ window:
 6. **Flag-driven per-channel field copy**, another unconditional 0..0x17
    loop, testing four independent bits of `_svm_sreg_dirty[i]` (1, 4, 8, 0x10)
    and copying the corresponding `_svm_sreg_buf`/`D_8008D7F4`/`D_8008D7F6`
-   field into the matching `D_8006DAD4[i]` field (`+0`/`+2` for bit 1,
+   field into the matching `_svm_sreg[i]` field (`+0`/`+2` for bit 1,
    `+4` for bit 4, `+6` for bit 8, `+8`/`+0xA` for bit 0x10), then zeroing
    `_svm_sreg_dirty[i]`. **`_svm_sreg_dirty[i]` must be re-read fresh for EACH of the
    four `if` conditions, not cached in a local** — caching it into one
    `u8 flags` local changed nothing measurably here (this function had a
    different problem at the time), but is the established idiom project-
    wide and was kept removed on principle.
-7. Unconditional tail: read `D_80090C60`/`D_80090C64`/`D_8008E228`/
-   `D_8008E22C`/`D_8008E230`/`D_8008E234` into locals, zero the first four
-   globals, then store all six into fixed offsets of the SAME `D_8006DAD4`
+7. Unconditional tail: read `_svm_okof1`/`_svm_okof2`/`D_8008E228`/
+   `_svm_okon2`/`_svm_orev1`/`_svm_orev2` into locals, zero the first four
+   globals, then store all six into fixed offsets of the SAME `_svm_sreg`
    object phase 2 read as an array (`+0x18C`/`+0x18E`/`+0x188`/`+0x18A`/
-   `+0x198`/`+0x19A` — a THIRD independent view of `D_8006DAD4`, alongside
+   `+0x198`/`+0x19A` — a THIRD independent view of `_svm_sreg`, alongside
    the `+0x194`/`+0x196` single-struct view and the 0x10-stride array
    view).
 
@@ -114,7 +114,7 @@ window:
   existing signed `Rec34Half`) — confirmed by the `lhu` re-read after the
   store, same idiom already established for other members of this 0x34-
   stride family elsewhere in this unit.
-- `D_8006DAD4` gains a THIRD independent local view in this function
+- `_svm_sreg` gains a THIRD independent local view in this function
   (`Rec16DAD4C`, 0x10-byte stride, fields at `+0`,`+2`,`+4`,`+6`,`+8`,`+0xA`,
   and now also `+0xC` [`u16`, read via `lhu`] beyond the six fields
   `SpuVmInit`'s stalled report already established) — on top of the
@@ -129,15 +129,15 @@ window:
   other multi-width symbol in this file).
 - `D_8008D7F6[]`: a NEW 0x10-byte-stride array, same shape as the already-
   established `Rec16D7F4`/`D_8008D7F4`.
-- `_svm_auto_kof_mode` (`u8` flag), `D_8008E230`/`D_8008E234` (`s16`).
+- `_svm_auto_kof_mode` (`u8` flag), `_svm_orev1`/`_svm_orev2` (`s16`).
 
 ## Axes tried, in order, with effect on built length (retail is 241 words)
 
 1. **Baseline: `array[i]` indexing throughout, including for
-   `D_8008D98E`/`D_8006DAD4` in phase 2**: **258/241 (17 words too LONG).**
+   `D_8008D98E`/`_svm_sreg` in phase 2**: **258/241 (17 words too LONG).**
    Recomputing the 0x34-stride and 0x10-stride offsets via multiply-chains
    each iteration, instead of walking pointers, produced substantially MORE
-   code than retail for phase 2's loop. Retail visibly hoists a `D_8006DAD4`
+   code than retail for phase 2's loop. Retail visibly hoists a `_svm_sreg`
    base LOAD and TWO derived-pointer sets (`Rec34Half`-typed and
    `Rec16DAD4`-typed) OUTSIDE the loop and increments them by one record
    each iteration — this is the standard MIPS-o32-at-`-O2` "dual induction
@@ -173,13 +173,13 @@ window:
    pointer for `_svm_sreg_buf` (all four field offsets via one struct
    pointer), but KEPT a second walking pointer (`pDad`) for `D_6006DAD4`
    as well**: **233/241 (8 words short)** — WORSE than #3. Reading the
-   disassembly closely at this point showed retail RE-LOADS `D_8006DAD4`
+   disassembly closely at this point showed retail RE-LOADS `_svm_sreg`
    (a fresh `lui`/`lw` pair) inside EACH of the four `if` blocks
    individually, rather than hoisting it once — the opposite of what
    phase 2 does for the SAME symbol. Introducing a shared `pDad` pointer
    here was the wrong lever for this specific loop.
 5. **Kept the `_svm_sreg_buf` walking pointer from #4, but switched
-   `D_6006DAD4` back to a fresh `((Rec16DAD4C *) D_8006DAD4)[i]` cast in
+   `D_6006DAD4` back to a fresh `((Rec16DAD4C *) _svm_sreg)[i]` cast in
    EACH of the four conditional blocks** (matching the fresh-reload
    pattern observed): **237/241 (4 words short)** — the best result
    reached, and the one preserved below. Within the true `0x1ff00`-
@@ -232,7 +232,7 @@ of several independent `if` blocks, rather than hoisting it once outside
 them, is not automatically "wrong" or "worse" — it can be the CORRECT
 match even when a walking-pointer hoist is exactly right for a superficially
 similar loop earlier in the SAME function.** Phase 2 (this function) and
-phase 6 both index through the SAME `D_8006DAD4` global pointer inside a
+phase 6 both index through the SAME `_svm_sreg` global pointer inside a
 loop, and the correct C shape for one (a hoisted, incremented pointer) was
 measurably WRONG for the other (which wants a fresh cast-and-index at each
 use site). The discriminator was not obvious from either loop's shape in
@@ -356,7 +356,7 @@ real, localized residue right after the frame/prologue: this build's
 before the `beqz`, where retail uses a single `blez a0,...` directly on the
 freshly-`lbu`-loaded (already zero-extended) value, with no re-mask.
 Changing the local's declared type from `u8 count` to `s32 count` (still
-correctly holding a `D_8008E9D0` value, 0-255) drops the spurious mask and
+correctly holding a `spuVmMaxVoice` value, 0-255) drops the spurious mask and
 reproduces retail's `blez` exactly, at the exact same address (`0x1ff50`
 both sides). **Raw word-match jumped 54/241 -> 93/241.** Built length moved
 to **236/241 (5 words short, one word SHORTER** than before this fix,
@@ -470,7 +470,7 @@ typedef struct {
     u8 padC[0x10 - 0xC];
 } Rec16D7F0Wide;
 
-/* D_8006DAD4, already declared above as `SpuRegs *` (one struct, fields
+/* _svm_sreg, already declared above as `SpuRegs *` (one struct, fields
  * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
  * per-channel records here -- another independent local view of the
  * same pointed-to object (see also code_179d8_j.c's own array-of-0x10
@@ -500,12 +500,12 @@ void SpuVmFlush(void) {
     ringIdx = (_svm_envx_ptr + 1) & 0xF;
     _svm_envx_ptr = ringIdx;
     slot = &_svm_envx_hist[ringIdx];
-    count = D_8008E9D0;
+    count = spuVmMaxVoice;
     *slot = 0;
 
     if (count > 0) {
         Rec34HalfU2 *p98E = (Rec34HalfU2 *) D_8008D98E;
-        Rec16DAD4C *pDad = (Rec16DAD4C *) D_8006DAD4;
+        Rec16DAD4C *pDad = (Rec16DAD4C *) _svm_sreg;
 
         for (i = 0; i < count; i++) {
             p98E->unk0 = pDad->unkC;
@@ -526,7 +526,7 @@ void SpuVmFlush(void) {
             mask &= _svm_envx_hist[j];
         }
 
-        for (i = 0; i < D_8008E9D0; i++) {
+        for (i = 0; i < spuVmMaxVoice; i++) {
             s32 bit = 1 << i;
 
             if (mask & bit) {
@@ -538,8 +538,8 @@ void SpuVmFlush(void) {
         }
     }
 
-    D_8008E228 &= ~D_80090C60;
-    D_8008E22C &= ~D_80090C64;
+    D_8008E228 &= ~_svm_okof1;
+    _svm_okon2 &= ~_svm_okof2;
 
     for (i = 0; i < 0x18; i++) {
         if (D_8008D9A4[i].unk0 != 0) {
@@ -555,18 +555,18 @@ void SpuVmFlush(void) {
 
     for (i = 0; i < 0x18; i++) {
         if (_svm_sreg_dirty[i] & 1) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk0 = p7F0->unk0;
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk2 = p7F0->unk2;
+            ((Rec16DAD4C *) _svm_sreg)[i].unk0 = p7F0->unk0;
+            ((Rec16DAD4C *) _svm_sreg)[i].unk2 = p7F0->unk2;
         }
         if (_svm_sreg_dirty[i] & 4) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk4 = D_8008D7F4[i].unk0;
+            ((Rec16DAD4C *) _svm_sreg)[i].unk4 = D_8008D7F4[i].unk0;
         }
         if (_svm_sreg_dirty[i] & 8) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk6 = D_8008D7F6[i].unk0;
+            ((Rec16DAD4C *) _svm_sreg)[i].unk6 = D_8008D7F6[i].unk0;
         }
         if (_svm_sreg_dirty[i] & 0x10) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk8 = p7F0->unk8;
-            ((Rec16DAD4C *) D_8006DAD4)[i].unkA = p7F0->unkA;
+            ((Rec16DAD4C *) _svm_sreg)[i].unk8 = p7F0->unk8;
+            ((Rec16DAD4C *) _svm_sreg)[i].unkA = p7F0->unkA;
         }
 
         _svm_sreg_dirty[i] = 0;
@@ -575,18 +575,18 @@ void SpuVmFlush(void) {
     }
 
     {
-        SpuRegs *rec = D_8006DAD4;
-        u16 lowMask = D_80090C60;
-        u16 highMask = D_80090C64;
+        SpuRegs *rec = _svm_sreg;
+        u16 lowMask = _svm_okof1;
+        u16 highMask = _svm_okof2;
         u16 lowActive = D_8008E228;
-        u16 highActive = D_8008E22C;
-        s16 v230 = D_8008E230;
-        s16 v234 = D_8008E234;
+        u16 highActive = _svm_okon2;
+        s16 v230 = _svm_orev1;
+        s16 v234 = _svm_orev2;
 
-        D_80090C60 = 0;
-        D_80090C64 = 0;
+        _svm_okof1 = 0;
+        _svm_okof2 = 0;
         D_8008E228 = 0;
-        D_8008E22C = 0;
+        _svm_okon2 = 0;
 
         *(u16 *) ((u8 *) rec + 0x18C) = lowMask;
         *(u16 *) ((u8 *) rec + 0x18E) = highMask;
@@ -622,12 +622,12 @@ extern Rec34Half D_8008D9A4[];
  * release" scan below. */
 extern u8 _svm_auto_kof_mode;
 
-extern u16 D_80090C60;
-extern u16 D_80090C64;
+extern u16 _svm_okof1;
+extern u16 _svm_okof2;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
-extern s16 D_8008E230;
-extern s16 D_8008E234;
+extern u16 _svm_okon2;
+extern s16 _svm_orev1;
+extern s16 _svm_orev2;
 extern s32 D_8008E258;
 extern s32 D_8008E25C;
 
@@ -650,7 +650,7 @@ typedef struct {
     u8 padC[0x10 - 0xC];
 } Rec16D7F0Wide;
 
-/* D_8006DAD4, already declared above as `SpuRegs *` (one struct, fields
+/* _svm_sreg, already declared above as `SpuRegs *` (one struct, fields
  * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
  * per-channel records here -- another independent local view of the
  * same pointed-to object (see also code_179d8_j.c's own array-of-0x10
@@ -675,12 +675,12 @@ void SpuVmFlush(void) {
     ringIdx = (_svm_envx_ptr + 1) & 0xF;
     _svm_envx_ptr = ringIdx;
     slot = &_svm_envx_hist[ringIdx];
-    count = D_8008E9D0;
+    count = spuVmMaxVoice;
     *slot = 0;
 
     if (count > 0) {
         Rec34HalfU2 *p98E = D_8008D98E;
-        Rec16DAD4C *pDad = (Rec16DAD4C *) D_8006DAD4;
+        Rec16DAD4C *pDad = (Rec16DAD4C *) _svm_sreg;
 
         for (i = 0; i < count; i++) {
             p98E->unk0 = pDad->unkC;
@@ -701,7 +701,7 @@ void SpuVmFlush(void) {
             mask &= _svm_envx_hist[j];
         }
 
-        for (i = 0; i < D_8008E9D0; i++) {
+        for (i = 0; i < spuVmMaxVoice; i++) {
             s32 bit = 1 << i;
 
             if (mask & bit) {
@@ -713,8 +713,8 @@ void SpuVmFlush(void) {
         }
     }
 
-    D_8008E228 &= ~D_80090C60;
-    D_8008E22C &= ~D_80090C64;
+    D_8008E228 &= ~_svm_okof1;
+    _svm_okon2 &= ~_svm_okof2;
 
     for (i = 0; i < 0x18; i++) {
         if (D_8008D9A4[i].unk0 != 0) {
@@ -730,18 +730,18 @@ void SpuVmFlush(void) {
 
     for (i = 0; i < 0x18; i++) {
         if (_svm_sreg_dirty[i] & 1) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk0 = p7F0->unk0;
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk2 = p7F0->unk2;
+            ((Rec16DAD4C *) _svm_sreg)[i].unk0 = p7F0->unk0;
+            ((Rec16DAD4C *) _svm_sreg)[i].unk2 = p7F0->unk2;
         }
         if (_svm_sreg_dirty[i] & 4) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk4 = D_8008D7F4[i].unk0;
+            ((Rec16DAD4C *) _svm_sreg)[i].unk4 = D_8008D7F4[i].unk0;
         }
         if (_svm_sreg_dirty[i] & 8) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk6 = D_8008D7F6[i].unk0;
+            ((Rec16DAD4C *) _svm_sreg)[i].unk6 = D_8008D7F6[i].unk0;
         }
         if (_svm_sreg_dirty[i] & 0x10) {
-            ((Rec16DAD4C *) D_8006DAD4)[i].unk8 = p7F0->unk8;
-            ((Rec16DAD4C *) D_8006DAD4)[i].unkA = p7F0->unkA;
+            ((Rec16DAD4C *) _svm_sreg)[i].unk8 = p7F0->unk8;
+            ((Rec16DAD4C *) _svm_sreg)[i].unkA = p7F0->unkA;
         }
 
         _svm_sreg_dirty[i] = 0;
@@ -750,18 +750,18 @@ void SpuVmFlush(void) {
     }
 
     {
-        SpuRegs *rec = D_8006DAD4;
-        u16 lowMask = D_80090C60;
-        u16 highMask = D_80090C64;
+        SpuRegs *rec = _svm_sreg;
+        u16 lowMask = _svm_okof1;
+        u16 highMask = _svm_okof2;
         u16 lowActive = D_8008E228;
-        u16 highActive = D_8008E22C;
-        s16 v230 = D_8008E230;
-        s16 v234 = D_8008E234;
+        u16 highActive = _svm_okon2;
+        s16 v230 = _svm_orev1;
+        s16 v234 = _svm_orev2;
 
-        D_80090C60 = 0;
-        D_80090C64 = 0;
+        _svm_okof1 = 0;
+        _svm_okof2 = 0;
         D_8008E228 = 0;
-        D_8008E22C = 0;
+        _svm_okon2 = 0;
 
         *(u16 *) ((u8 *) rec + 0x18C) = lowMask;
         *(u16 *) ((u8 *) rec + 0x18E) = highMask;
@@ -808,20 +808,20 @@ here -- proposing for the head to apply once no runner is live on
 - `D_8008EA26` -> `gSelectedVoice` ("currently selected channel" scratch,
   already documented `volatile`, read back via a plain `u8 *` cast --
   see SpuVmKeyOff's own report for why that specific cast matters).
-- `D_8008E9D0` -> `gVoiceCount` ("loop bound for a small table of active
+- `spuVmMaxVoice` -> `gVoiceCount` ("loop bound for a small table of active
   objects", consistently the upper bound of every per-voice loop in this
   unit and its siblings).
-- `D_80090C60`/`D_80090C64` -> `gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`
+- `_svm_okof1`/`_svm_okof2` -> `gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`
   (OR'd with a per-voice bit when releasing a voice, split low/high 16
   across the 0..0x1F channel space).
-- `D_8008E228`/`D_8008E22C` -> `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`
+- `D_8008E228`/`_svm_okon2` -> `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`
   (AND-NOT'd with the enable mask above -- the actual SPU key bitmask
   pair, per `vmNoiseOn2`'s report).
 - `_svm_sreg_dirty` -> `gVoiceFlags` (per-voice byte OR'd with 3 or 4 by
   several functions in this cluster; never fully decoded here).
 - `D_8008D9A3` -> `gVoiceState` (the byte SpuVmKeyOff/SpuVmNoiseOff/
   `SpuVmAlloc` all compare against `2` for "noise voice").
-- `D_8006DAD4` (and this unit's two local views `SpuRegs`/`SpuRegsEdd4`)
+- `_svm_sreg` (and this unit's two local views `SpuRegs`/`SpuRegsEdd4`)
   -> `gSpuRegs`: confirmed to be the PS1 SPU's own hardware base address
   `0x1F801C00` by `vmNoiseOn2`'s report in `code_179d8_l`.
 
@@ -839,8 +839,8 @@ declarations (the `_svm_envx_hist*` pair, `Rec34HalfU2`,
 `SetAutoPan` externs, `D_8008D7F6`) are new to the unit and were kept
 local to this function's `#ifdef` block, per CLAUDE.md's rule against
 adding to a shared header; everything else it touches (`D_8008D9A3`,
-`D_8006DAD4`, `_svm_sreg_dirty`, `D_80090C60`/`64`, `D_8008E228`/`22C`,
-`D_8008E230`/`234`, `_svm_sreg_buf`, `D_8008D7F4`, `D_8008E9D0`,
+`_svm_sreg`, `_svm_sreg_dirty`, `_svm_okof1`/`64`, `D_8008E228`/`22C`,
+`_svm_orev1`/`234`, `_svm_sreg_buf`, `D_8008D7F4`, `spuVmMaxVoice`,
 `_svm_auto_kof_mode`, `D_8008D9A4`, `D_8008D9B0`) was
 already declared earlier in the unit and needed no change.
 `./build-and-verify.sh` green (zero bytes changed) and
@@ -868,4 +868,4 @@ because splat names only addresses some asm references. Byte-identical.
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `D_8006DAD4`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from D_80090C60/64), `keyOn[0..1]` (+0x188, from D_8008E228/22C) and `reverbOn[0..1]` (+0x198, from D_8008E230/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `Rec34HalfU2` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.
+Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `_svm_sreg`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from _svm_okof1/64), `keyOn[0..1]` (+0x188, from D_8008E228/22C) and `reverbOn[0..1]` (+0x198, from _svm_orev1/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `Rec34HalfU2` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.

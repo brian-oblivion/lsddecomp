@@ -629,7 +629,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   closes) versus DECLINED on an ordinary global that measured no change — only two units touch
   hardware addresses. (a §"`volatile` is a legitimate, and much NARROWER, tool", §"Round 16")
 - **`volatile` on a POINTEE is a scheduling barrier, and cc1 2.6.3 orders volatile accesses only
-  against OTHER volatile accesses.** With `D_8006DAD4` (the SPU voice registers, `0x1F801C00`)
+  against OTHER volatile accesses.** With `_svm_sreg` (the SPU voice registers, `0x1F801C00`)
   typed `u16 *`, cc1 hoisted an unrelated `volatile u16` global's store/reload pair across six
   stores through that pointer; typing it `volatile u16 *` pinned the pair back, worth 54/131 ->
   98/131 on its own. So when a near-miss looks like "cc1 hoisted something retail left in place",

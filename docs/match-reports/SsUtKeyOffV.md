@@ -39,10 +39,10 @@ s32 SsUtKeyOffV(s16 idx)
     D_8008D98C[chan].unk0 = 0;
     _svm_voice[chan].unk0 = 0;
     _snd_ev_flag = 0;
-    D_80090C60 = mask0 | D_80090C60;
-    D_80090C64 |= mask1;
-    D_8008E228 &= ~D_80090C60;
-    D_8008E22C &= ~D_80090C64;
+    _svm_okof1 = mask0 | _svm_okof1;
+    _svm_okof2 |= mask1;
+    D_8008E228 &= ~_svm_okof1;
+    _svm_okon2 &= ~_svm_okof2;
     return 0;
 
 fail:
@@ -78,12 +78,12 @@ retail, and its `else` branch is this function's whole body. Dumping
 
 ```
 sb   zero, D_8008D9A3[chan]
-lhu  D_80090C60 ; lhu D_80090C64
+lhu  _svm_okof1 ; lhu _svm_okof2
 sh   zero, D_8008D98C[chan] ; sh zero, _svm_voice[chan]
 lhu  D_8008E228
-or / sh D_80090C60 / nor / and / sh D_8008E228
-lhu  D_8008E22C
-or / sh D_80090C64 / nor / and / sh D_8008E22C
+or / sh _svm_okof1 / nor / and / sh D_8008E228
+lhu  _svm_okon2
+or / sh _svm_okof2 / nor / and / sh _svm_okon2
 sw   zero, _snd_ev_flag
 ```
 
@@ -104,8 +104,8 @@ asymmetry against this function's matched pair of `u16`s, tried the retype,
 got byte-identical output, and concluded -- in a "Proposed learning" section --
 that a working idiom from a matched sibling need not transfer. The types were
 never the transferable part. What transfers is that **the sibling caches
-nothing**: it writes `D_80090C60 = mask0 | D_80090C60;` and
-`D_8008E228 &= ~D_80090C60;` directly, where every attempt on this function
+nothing**: it writes `_svm_okof1 = mask0 | _svm_okof1;` and
+`D_8008E228 &= ~_svm_okof1;` directly, where every attempt on this function
 since round 23 carried four cached locals (`old60`, `old64`, `e228`, `e22c`).
 That difference is invisible in a C-to-C reading -- a cached read of a global
 looks like a faithful transcription of the same operation, and rounds 23 and 40
@@ -126,7 +126,7 @@ is why neither ever moved:
   described: the cached-locals build loads the four globals in the order
   **C60, E228, C64, E22C** (confirmed from the relocations) where retail loads
   **C60, C64, E228, E22C**, and it sinks the `D_8008E228` store six
-  instructions past retail's position, below the `D_8008E22C` load. Removing
+  instructions past retail's position, below the `_svm_okon2` load. Removing
   the locals restores both.
 
 ## Negatives confirmed this round (not stale -- re-measured on the current pipeline)
@@ -229,8 +229,8 @@ Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Bounds-checks
 `idx` against 0x18 under a `_snd_ev_flag` reentrancy lock (same lock/idiom as
 `libsnd_decre.c`'s `func_80033738`), converts the channel into a 32-bit-wide
 `(loBit, hiBit)` bitmask pair, clears three per-channel fields, then ORs the
-new bits into two running masks (`D_80090C60`/`D_80090C64`) and clears the
-corresponding bits out of two "active" masks (`D_8008E228`/`D_8008E22C`).
+new bits into two running masks (`_svm_okof1`/`_svm_okof2`) and clears the
+corresponding bits out of two "active" masks (`D_8008E228`/`_svm_okon2`).
 
 ## What it is (best-reached body, 51/73 words, whole-image SHA1 red)
 
@@ -261,17 +261,17 @@ s32 SsUtKeyOffV(s16 idx)
     D_8008D9A3[bankIdx].unk0 = 0;
     D_8008D98C[bankIdx].unk0 = 0;
     _svm_voice[bankIdx].unk0 = 0;
-    old60 = D_80090C60;
-    old64 = D_80090C64;
+    old60 = _svm_okof1;
+    old64 = _svm_okof2;
     e228 = D_8008E228;
     _snd_ev_flag = 0;
     old60 = loBit | old60;
-    D_80090C60 = old60;
+    _svm_okof1 = old60;
     D_8008E228 = e228 & ~old60;
-    e22c = D_8008E22C;
+    e22c = _svm_okon2;
     old64 = hiBit | old64;
-    D_80090C64 = old64;
-    D_8008E22C = e22c & ~old64;
+    _svm_okof2 = old64;
+    _svm_okon2 = e22c & ~old64;
     return 0;
 
 fail_unlock:
@@ -283,8 +283,8 @@ fail_locked:
 ```
 
 (Uses this unit's already-shared `_snd_ev_flag`, `Rec34Byte D_8008D9A3[]`,
-`Rec34Half _svm_voice[]`/`D_8008D98C[]`, and the scalar `D_80090C60`,
-`D_80090C64`, `D_8008E228`, `D_8008E22C` globals declared near the top of
+`Rec34Half _svm_voice[]`/`D_8008D98C[]`, and the scalar `_svm_okof1`,
+`_svm_okof2`, `D_8008E228`, `_svm_okon2` globals declared near the top of
 `code_179d8_j.c`.)
 
 ## Two findings worth keeping regardless of the stall
@@ -354,14 +354,14 @@ rather than guessed from the funcdiff hex:
 - **The two mask-update sequences interleave differently.** Retail
   fully completes channel-60's `or`/store/`nor`/`and`/store sequence
   (including a freshly-computed `~newBits` complement) before starting
-  channel-64's (with `D_8008E22C`'s read deferred until *after*
-  `D_80090C60`'s store, not prefetched early like `D_8008E228`'s read
+  channel-64's (with `_svm_okon2`'s read deferred until *after*
+  `_svm_okof1`'s store, not prefetched early like `D_8008E228`'s read
   is). This build's compiled output, despite the C statements appearing
   in that exact same order, computes both `or`s first, then interleaves
   the `nor`/`and`/store pairs across the two channels, reusing `$a0`/`$a1`
   across both halves in an order this project's toolchain-pinned
   pipeline chose independently of the C statement order. Tried: naming
-  `D_8008E228`bandwidth's and `D_8008E22C`'s reads as separate locals
+  `D_8008E228`bandwidth's and `_svm_okon2`'s reads as separate locals
   (`e228`, `e22c`) matching retail's own early/late fetch split --
   **zero effect**, byte-identical output to the direct-expression form
   (GCC already treats them equivalently); a bare `__asm__("")` barrier
@@ -388,7 +388,7 @@ the residue sideways or made it worse, never smaller.
   also perturbs the SECOND cluster, so the two clusters are not fully
   independent in how the register allocator responds to local pressure).
 - Second-half interleaving: named early/late locals for `D_8008E228`/
-  `D_8008E22C` mirroring retail's own fetch timing (no effect, byte-identical
+  `_svm_okon2` mirroring retail's own fetch timing (no effect, byte-identical
   to the unnamed form), a mid-sequence `__asm__("")` barrier (regressed to
   28/73).
 
@@ -459,9 +459,9 @@ Rebuilt the preserved body verbatim through the current pinned pipeline.
 Noticed that `SsUtKeyOff` -- an ALREADY-MATCHED sibling in this same
 unit whose `else` branch is the identical bit-mask/store idiom used here
 (same `D_8008D9A3`/`D_8008D98C`/`_svm_voice` clears, same
-`D_80090C60`/`D_80090C64`/`D_8008E228`/`D_8008E22C` mask-update sequence)
+`_svm_okof1`/`_svm_okof2`/`D_8008E228`/`_svm_okon2` mask-update sequence)
 -- declares its two mask locals with ASYMMETRIC types: `u32 mask0` (the
-`D_80090C60`-bound one) against `u16 mask1` (the `D_80090C64`-bound one),
+`_svm_okof1`-bound one) against `u16 mask1` (the `_svm_okof2`-bound one),
 not the matched pair of `u16`s this function's preserved body uses for
 `loBit`/`hiBit`. Since `SsUtKeyOff` reproduces retail byte-for-byte with
 that asymmetry, it looked like a promising, evidence-backed (not guessed)
@@ -475,7 +475,7 @@ places** (confirmed via `tools/funcdiff.py`'s diff line list, not just the
 raw count -- the exact same file offsets diverge in the exact same way).
 The type asymmetry that matters in `SsUtKeyOff` does NOT transfer here.
 The likely reason: in `SsUtKeyOff`, `1 << chan`/`1 << (chan-0x10)` are
-directly the VALUES eventually stored into `D_80090C60`/`D_80090C64`
+directly the VALUES eventually stored into `_svm_okof1`/`_svm_okof2`
 without any intervening OR against a cached local of a specific width in
 the same way -- whereas here (per the CLOSED finding above) the -O2
 pipeline's own promotion/narrowing rules make the `u16`-vs-`u32` distinction
@@ -540,8 +540,8 @@ scaffold-local artifacts, not real levers**:
   just the raw count). Zero effect on the real oracle.
 - **Score 145** (`output-145-1`): a dead-store idiom
   (`new_var = 0; _snd_ev_flag = new_var;` instead of `_snd_ev_flag = 0;`)
-  combined with folding the `D_80090C60` store into the `old60` assignment
-  expression (`old60 = (D_80090C60 = loBit | old60);`). Tried the
+  combined with folding the `_svm_okof1` store into the `old60` assignment
+  expression (`old60 = (_svm_okof1 = loBit | old60);`). Tried the
   assignment-fold half in isolation (the dead-store half is unambiguous
   permuter noise, not worth a real-C translation): **regressed to 48/73**,
   three words worse than baseline. Reverted.

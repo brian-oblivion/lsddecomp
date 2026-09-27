@@ -16,7 +16,7 @@ out-of-range drift.
 
 ```c
 extern u16 D_8008EA26;
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern u8 D_8008EA1B;
 
 extern s32 SpuVmAlloc(s32 a0);
@@ -28,7 +28,7 @@ void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
     D_8008EA1B = 0x7F;
     v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
-    if (v0 < D_8008E9D0) {
+    if (v0 < spuVmMaxVoice) {
         vmNoiseOn2(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, a2 & 0xFFFF, a3 & 0xFFFF);
     }
 }
@@ -40,7 +40,7 @@ The 4-argument sibling of `SpuVmNoiseOn` (same report has the full
 derivation of the mixed-width `D_8008EA26` access and the two wrong turns
 that preceded the working form -- read that first). Same gate: force
 `D_8008EA1B`, call `SpuVmAlloc(0xFF)`, mask, stash into `D_8008EA26`,
-compare to `D_8008E9D0`, and conditionally forward into `vmNoiseOn2`.
+compare to `spuVmMaxVoice`, and conditionally forward into `vmNoiseOn2`.
 
 The only structural difference from `SpuVmNoiseOn` is the callee's
 argument SOURCE: where `SpuVmNoiseOn` passed two of its own narrowed
@@ -51,7 +51,7 @@ passes all four of ITS OWN arguments, each independently narrowed to
 positions). Confirms `vmNoiseOn2`'s signature derived from the sibling:
 `(channel_byte, s32, s32, s32, s32)`.
 
-Reused the `D_8008EA26`/`D_8008E9D0`/`D_8008EA1B`/`SpuVmAlloc`/
+Reused the `D_8008EA26`/`spuVmMaxVoice`/`D_8008EA1B`/`SpuVmAlloc`/
 `vmNoiseOn2` declarations verbatim from `SpuVmNoiseOn` (moved up to
 before `SpuVmNoiseOnWithAdsr`, the first user in ROM order -- these two functions
 are adjacent modulo the frameless `SpuVmNoiseOff` between them). One build
@@ -75,7 +75,7 @@ those functions and moves them out of tracks 1/1b/3.
 
 **SpuVmNoiseOnWithAdsr** (was `func_8002F20C`) -- Tier B. Allocates a free voice via
 `SpuVmAlloc` (code_179d8_l, "voice-steal candidate scan") and, if one
-is available (`v0 < D_8008E9D0`, the voice count), keys it on via
+is available (`v0 < spuVmMaxVoice`, the voice count), keys it on via
 `vmNoiseOn2` (code_179d8_l, confirmed to write the PS1 SPU's key-on
 registers) forwarding all four caller-supplied parameters unchanged. The
 generic name reflects that this is the "just play it" wrapper, in

@@ -127,3 +127,13 @@ as `libsnd/vmanager note2pitch`, fingerprint EXACT masked 1.00 vs the
 disc-3.3 reference (position between `libc2/strncmp` and `libsnd/vm_prog`
 agrees). Sony symbol; this pass does not rename it further. Matched,
 47/47.
+
+## Naming (round 99, echo, track 7)
+
+`D_8006DAD8`, the pitch table, keeps its placeholder: it is
+libsnd/vmanager.o's `.data+0x4` on disc 3.5, found in retail right after
+`_svm_sreg` with the object's bytes, and STATIC in every object on every
+disc (3.6's vm_n2p.o reaches it section-relative too), so no disc names it.
+Recorded in the symbols file with an `identified` comment. It holds 12
+semitones x 16 fine steps of SPU pitch for octave 5; `note2pitch` and
+`note2pitch2` index it `semitone * 16 + step` and shift by the octave.

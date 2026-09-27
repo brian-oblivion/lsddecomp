@@ -46,18 +46,18 @@ see below), producing `lvl1`/`lvl2` and then `lvl1b`/`lvl2b` from those.
 Three successive `if (byte < 0x40) ... else ...` blends (division by 63,
 using either the raw control byte or `0x7F` minus it) combine `lvl1b`/`lvl2b`
 into a final `pan1`/`pan2` pair, clamped so neither exceeds the other when a
-global flag (`D_8008E8C0 == 1`) is set. The rest is the tail this unit's
+global flag (`_svm_stereo_mono == 1`) is set. The rest is the tail this unit's
 `vmNoiseOn2` already established byte-for-byte: write `pan1`/`pan2` into
 the 16-byte-stride `_svm_sreg_buf`/`D_8008D7F2` tables, OR `3` into
 `_svm_sreg_dirty[chan]`, compute a 32-bit voice-enable bit split across
 `lowBit`/`highBit` by `chan<16`, reset the whole `D_8008D9A3` 52-byte-stride
-table's low bit for every live voice (`D_8008E9D0` of them) then mark this
-channel's own slot `2`, OR the enable bits into `D_8008E228`/`D_8008E22C`
-and AND-NOT them out of `D_80090C60`/`D_80090C64`, conditionally OR/AND-NOT
-them into a second enable pair (`D_8008E230`/`D_8008E234`, gated on
+table's low bit for every live voice (`spuVmMaxVoice` of them) then mark this
+channel's own slot `2`, OR the enable bits into `D_8008E228`/`_svm_okon2`
+and AND-NOT them out of `_svm_okof1`/`_svm_okof2`, conditionally OR/AND-NOT
+them into a second enable pair (`_svm_orev1`/`_svm_orev2`, gated on
 `D_8008EA20 & 4` -- new globals, not touched by `vmNoiseOn2`), and
-finally write the bits to the SPU key-on registers via `D_8006DAD4`. Also
-patches one field of `D_8006DAD4[0xD5]` (byte offset `0x1AA`) with a 6-bit
+finally write the bits to the SPU key-on registers via `_svm_sreg`. Also
+patches one field of `_svm_sreg[0xD5]` (byte offset `0x1AA`) with a 6-bit
 delta between `D_8008EA0E` and `D_8008EA1C`, shifted into the high byte.
 
 ## The `x/127` and `x/63` magic-multiply idiom -- verified against the pinned pipeline before writing any C
@@ -112,24 +112,24 @@ extern u8 D_8008EA19;
 extern u8 D_8008EA17;
 extern u8 D_8008EA11;
 extern u8 D_8008EA1A;
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 extern u16 D_8008EA22;
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
-extern u16 *D_8006DAD4;
+extern u16 *_svm_sreg;
 extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
 extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
-extern u16 D_80090C60;
-extern u16 D_80090C64;
-extern u16 D_8008E230;   /* new -- second enable/mask pair, gated on D_8008EA20 & 4 */
-extern u16 D_8008E234;   /* new */
-extern u8 D_8008EA20;    /* new -- flag byte, bit 2 selects D_8008E230/234 direction */
+extern u16 _svm_okon2;
+extern u16 _svm_okof1;
+extern u16 _svm_okof2;
+extern u16 _svm_orev1;   /* new -- second enable/mask pair, gated on D_8008EA20 & 4 */
+extern u16 _svm_orev2;   /* new */
+extern u8 D_8008EA20;    /* new -- flag byte, bit 2 selects _svm_orev1/234 direction */
 ```
 
 `_ss_score`'s two-level indexing was derived from the raw address
@@ -158,23 +158,23 @@ extern u8 D_8008EA19;
 extern u8 D_8008EA17;
 extern u8 D_8008EA11;
 extern u8 D_8008EA1A;
-extern s16 D_8008E8C0;
+extern s16 _svm_stereo_mono;
 extern u16 D_8008EA22;
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
-extern u16 *D_8006DAD4;
+extern u16 *_svm_sreg;
 extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
 extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
-extern u16 D_80090C60;
-extern u16 D_80090C64;
-extern u16 D_8008E230;
-extern u16 D_8008E234;
+extern u16 _svm_okon2;
+extern u16 _svm_okof1;
+extern u16 _svm_okof2;
+extern u16 _svm_orev1;
+extern u16 _svm_orev2;
 extern u8 D_8008EA20;
 
 void vmNoiseOn(s32 a0) {
@@ -229,7 +229,7 @@ void vmNoiseOn(s32 a0) {
         pan1 = (pan1 * (0x7F - D_8008EA11)) / 63;
     }
 
-    if (D_8008E8C0 == 1) {
+    if (_svm_stereo_mono == 1) {
         if (pan1 < pan2) {
             pan1 = pan2;
         } else {
@@ -238,7 +238,7 @@ void vmNoiseOn(s32 a0) {
     }
 
     chan = (u8)chanRaw;
-    D_8006DAD4[0xD5] = (u16)((D_8006DAD4[0xD5] & 0xC0FF) | (((D_8008EA0E - D_8008EA1C) & 0x3F) << 8));
+    _svm_sreg[0xD5] = (u16)((_svm_sreg[0xD5] & 0xC0FF) | (((D_8008EA0E - D_8008EA1C) & 0x3F) << 8));
 
     off16 = chan << 4;
     *(u16 *)(D_8008D7F2 + off16) = pan2;
@@ -255,40 +255,40 @@ void vmNoiseOn(s32 a0) {
 
     idx52 = (u8)chanRaw * 52;
     *(u16 *)(D_8008D98C + idx52) = 10;
-    if (D_8008E9D0 != 0) {
+    if (spuVmMaxVoice != 0) {
         i = 0;
         do {
             idx52 = i * 52;
             *(u8 *)(D_8008D9A3 + idx52) = *(u8 *)(D_8008D9A3 + idx52) & 1;
             i++;
-        } while (i < D_8008E9D0);
+        } while (i < spuVmMaxVoice);
     }
     idx52 = (u8)chanRaw * 52;
     *(u8 *)(D_8008D9A3 + idx52) = 2;
 
     e228 = D_8008E228;
-    e22c = D_8008E22C;
-    c60 = D_80090C60;
+    e22c = _svm_okon2;
+    c60 = _svm_okof1;
     e228 = lowBit | e228;
     e22c = highBit | e22c;
     D_8008E228 = e228;
     c60 = c60 & ~e228;
-    D_8008E22C = e22c;
-    c64 = D_80090C64;
-    D_80090C60 = c60;
+    _svm_okon2 = e22c;
+    c64 = _svm_okof2;
+    _svm_okof1 = c60;
     c64 = c64 & ~e22c;
-    D_80090C64 = c64;
+    _svm_okof2 = c64;
 
     if (D_8008EA20 & 4) {
-        D_8008E230 |= lowBit;
-        D_8008E234 |= highBit;
+        _svm_orev1 |= lowBit;
+        _svm_orev2 |= highBit;
     } else {
-        D_8008E230 &= ~lowBit;
-        D_8008E234 &= ~highBit;
+        _svm_orev1 &= ~lowBit;
+        _svm_orev2 &= ~highBit;
     }
 
-    D_8006DAD4[0xCA] = lowBit;
-    D_8006DAD4[0xCB] = highBit;
+    _svm_sreg[0xCA] = lowBit;
+    _svm_sreg[0xCB] = highBit;
 }
 ```
 
@@ -348,7 +348,7 @@ Within the 30-attempt cap (roughly 12 real builds used):
 6. The "narrow-cast defeats loop-strength-reduction" idiom (already
    validated in this unit for `vmNoiseOn2`/`SpuVmAlloc`) applied to
    this function's OWN `D_8008D9A3`-clearing loop (`idx52 = (s16)i * 52`,
-   `while ((s16)i < D_8008E9D0)`): **regressed hard**, to 320/311 -- this
+   `while ((s16)i < spuVmMaxVoice)`): **regressed hard**, to 320/311 -- this
    loop is NOT the same shape as `vmNoiseOn2`'s (retail already recomputes
    the shift-add fresh per iteration WITHOUT any narrowing cast needed here,
    confirmed by re-reading the raw `.s`: `sll v1,a1,0x10`/`sra v1,v1,0x10` in
@@ -369,7 +369,7 @@ Within the 30-attempt cap (roughly 12 real builds used):
 ### Proposed learnings
 
 - **The unit's own established "narrow-cast defeats strength-reduction"
-  idiom is NOT a blanket fix for every `D_8008E9D0`-bounded loop over
+  idiom is NOT a blanket fix for every `spuVmMaxVoice`-bounded loop over
   52-byte-stride tables in this unit** -- it fixed `vmNoiseOn2`'s loop
   (10-word swing) but actively regressed this function's structurally
   similar-looking loop by 25 words. The two loops differ in whether the
@@ -486,3 +486,11 @@ short, see above).
 ## Track 2 (round 86, 2026-09-26, alpha)
 
 This function is still `INCLUDE_ASM` and its C was not touched, but the per-field symbols this report uses (`D_8008D988`..`D_8008D9BA` at a 0x34 stride) are ONE Sony table: libsnd/vmanager.o's `_svm_voice` (0x8008D988, 24 x 0x34 = 0x4E0 bytes), typed in `include/SvmData.h` with fields by offset (`D_8008D98C` is `_svm_voice[i].unk04`, `D_8008D9A3` is `unk1B`, and so on: address minus 0x8008D988). The next attempt should write `_svm_voice[i].unkNN`: in every converted accessor (libsnd_vm_vol_ut_key_ut_keyv/j_c/l/m/p) the struct spelling compiled byte-identically to the separate symbols, and two NON_MATCHING bodies moved closer to retail. The other `D_` spellings in preserved bodies below still link (splat keeps them as auto-symbols).
+
+## History moved from the source (round 99, echo, track 7)
+
+The source's "STALL -- see docs/match-reports/vmNoiseOn.md. Best body
+reached (309/311 built words, 2 words SHORT) preserved there in #if 0" is
+now a one-line "not yet C" pointer. It also carried the note that
+`vmNoiseOn`'s cascade globals were declared ahead of `SpuVmKeyOnNow` and
+reused; all of them are now one block at the top of the file.

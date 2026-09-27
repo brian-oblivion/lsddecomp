@@ -24,7 +24,7 @@ s32 SsUtGetVVol(s16 idx, s16 *out1, s16 *out2)
     s16 f0, f2;
 
     if ((u16) idx < 0x18) {
-        e = &D_8006DAD4[idx];
+        e = &_svm_sreg[idx];
         f0 = e->unk0;
         f2 = e->unk2;
         *out1 = f0 / 129;
@@ -36,7 +36,7 @@ s32 SsUtGetVVol(s16 idx, s16 *out1, s16 *out2)
 ```
 
 The "divide by 129" sibling of `SsUtGetDetVVol`'s raw getter: same 0x18-entry
-bounds check on `idx`, same cached `D_8006DAD4[idx]` entry pointer (confirmed
+bounds check on `idx`, same cached `_svm_sreg[idx]` entry pointer (confirmed
 via `asm-differ` back in round 21 to be load-bearing over double-indexing),
 but each field is divided by 129 before being written to `*out1`/`*out2`.
 The divisor was confirmed arithmetically in round 21 (see that round's probe
@@ -126,5 +126,5 @@ grouping and only moved surrounding pointer-rescue statements around it.
 ## Round 97 (bravo, track 6)
 
 The definition now takes <libsnd.h>'s prototype: return type `s32` became `s16` (Sony's `short`). Zero bytes.
-The local `EntryDAD4 *e` became `SpuVoiceRegs *e = &D_8006DAD4->voice[idx]`
+The local `EntryDAD4 *e` became `SpuVoiceRegs *e = &_svm_sreg->voice[idx]`
 (fields `volL`/`volR`); see SsUtGetDetVVol.md for the SpuRegs evidence.

@@ -25,17 +25,17 @@ extern Rec34S16 D_8008D99A[];
 extern Rec34S16 D_8008D99E[];
 extern Rec34S16 _svm_voice[];
 
-extern u16 D_80090C60;
-extern u16 D_80090C64;
+extern u16 _svm_okof1;
+extern u16 _svm_okof2;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 
 u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 i;
     u8 count;
 
     count = 0;
-    for (i = 0; i < D_8008E9D0; i++) {
+    for (i = 0; i < spuVmMaxVoice; i++) {
         if (D_8008D994[i].unk0 != a3) {
             continue;
         }
@@ -51,8 +51,8 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
         if (_svm_voice[i].unk0 == 0xFF) {
             D_8008D9A3[i].unk0 = 0;
             D_8008D98C[i].unk0 = 0;
-            D_8006DAD4->unk194 = 0;
-            D_8006DAD4->unk196 = 0;
+            _svm_sreg->unk194 = 0;
+            _svm_sreg->unk196 = 0;
         } else {
             u16 chan;
             u16 lowMask;
@@ -70,10 +70,10 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
             D_8008D9A3[chan].unk0 = 0;
             D_8008D98C[chan].unk0 = 0;
             _svm_voice[chan].unk0 = 0;
-            D_80090C60 |= lowMask;
-            D_80090C64 |= highMask;
-            D_8008E228 &= ~D_80090C60;
-            D_8008E22C &= ~D_80090C64;
+            _svm_okof1 |= lowMask;
+            _svm_okof2 |= highMask;
+            D_8008E228 &= ~_svm_okof1;
+            _svm_okon2 &= ~_svm_okof2;
         }
         count++;
     }
@@ -83,7 +83,7 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
 
 ## Shape
 
-Scan every record `i` in `[0, D_8008E9D0)` for one whose four key fields
+Scan every record `i` in `[0, spuVmMaxVoice)` for one whose four key fields
 (`D_8008D994`, `D_8008D99A`, `D_8008D996`, `D_8008D99E` -- s16 fields of the
 same 0x34-stride record family `code_179d8_j.c` documents as
 `Rec34D994`, redeclared here as a local `Rec34S16`) match the caller's
@@ -92,15 +92,15 @@ same 0x34-stride record family `code_179d8_j.c` documents as
 
 - **`== 0xFF`:** the same "type A" reset `SpuVmKeyOff`'s neighbours use
   -- clear `D_8008D9A3[i]`, `D_8008D98C[i]`, and the current object's
-  `unk194`/`unk196` fields (`D_8006DAD4`, both already declared for
+  `unk194`/`unk196` fields (`_svm_sreg`, both already declared for
   `SpuVmNoiseOff`).
 - **otherwise:** a "channel" reset: stash `i` into the "currently selected
   channel" scratch global `D_8008EA26`, re-read it, clear `D_8008D9A3`/
   `D_8008D98C`/`_svm_voice` at the CHANNEL index (not `i` -- same value in
   practice, but a fresh read, matching the project's documented idiom),
   then update the two 16-channel bitmask pairs `code_179d8_j.c` already
-  documents (`D_80090C60`/`D_8008E228` for channels 0-15,
-  `D_80090C64`/`D_8008E22C` for channels 16-31): OR the appropriate mask
+  documents (`_svm_okof1`/`D_8008E228` for channels 0-15,
+  `_svm_okof2`/`_svm_okon2` for channels 16-31): OR the appropriate mask
   into the "channel" word, then AND-NOT the freshly updated channel word
   into the "active" word. **Both pairs are touched unconditionally on
   every call** -- whichever mask doesn't apply to this channel's half is
@@ -159,8 +159,8 @@ reset.
 
 2. **A pure register-identity residue in the bitmask-update tail, fixed by
    INTERLEAVING two independent statement pairs rather than grouping
-   them.** Grouped as `D_80090C60 |= lowMask; D_8008E228 &= ~D_80090C60;
-   D_80090C64 |= highMask; D_8008E22C &= ~D_80090C64;` (each OR immediately
+   them.** Grouped as `_svm_okof1 |= lowMask; D_8008E228 &= ~_svm_okof1;
+   _svm_okof2 |= highMask; _svm_okon2 &= ~_svm_okof2;` (each OR immediately
    followed by its own AND-NOT), the function matched everywhere EXCEPT a
    pure `$a1`/`$a2` register swap across ~12 words, both in the earlier
    mask-selection `if`/`else` and in the four bitmask-update instructions
@@ -172,8 +172,8 @@ reset.
    (one reordering attempt made it worse, 104/131, by additionally
    swapping which physical global each mask fed). What worked:
    INTERLEAVING the two ORs before either AND-NOT --
-   `D_80090C60 |= lowMask; D_80090C64 |= highMask; D_8008E228 &=
-   ~D_80090C60; D_8008E22C &= ~D_80090C64;` -- closed the whole residue on
+   `_svm_okof1 |= lowMask; _svm_okof2 |= highMask; D_8008E228 &=
+   ~_svm_okof1; _svm_okon2 &= ~_svm_okof2;` -- closed the whole residue on
    the first try after the grouped form was ruled out.
 
 ### Proposed learning

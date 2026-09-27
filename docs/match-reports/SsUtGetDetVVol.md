@@ -3,7 +3,7 @@
 > Renamed from `func_80031C98` on 2026-09-23 (tools/rename.py). Address 0x80031c98.
 
 Unit `code_179d8_j`, round 21 (2026-09-06). Not a class method
-(`D_8006DAD4` is a plain global pointer variable, no `classtable.py`
+(`_svm_sreg` is a plain global pointer variable, no `classtable.py`
 hit). This is the "raw getter" half of a pair with `SsUtGetVVol`
 (same table, same bounds, `SsUtGetVVol` divides each field by 129
 before returning it -- see that function's stall report).
@@ -17,13 +17,13 @@ typedef struct EntryDAD4 {
     s16 unk2; /* +0x2 */
     u8 pad4[0x10 - 0x4];
 } EntryDAD4;
-extern EntryDAD4 *D_8006DAD4;
+extern EntryDAD4 *_svm_sreg;
 
 s32 SsUtGetDetVVol(s16 idx, s16 *out1, s16 *out2)
 {
     if ((u16) idx < 0x18) {
-        *out1 = D_8006DAD4[idx].unk0;
-        *out2 = D_8006DAD4[idx].unk2;
+        *out1 = _svm_sreg[idx].unk0;
+        *out2 = _svm_sreg[idx].unk2;
         return 0;
     }
     return -1;
@@ -38,7 +38,7 @@ guard-clause form produces the opposite branch polarity (`beqz` to a
 tail fail-block) for this specific shape. Second attempt (the if/else
 form above) matched immediately.
 
-Confirms retail re-loads the `D_8006DAD4` global pointer a second time
+Confirms retail re-loads the `_svm_sreg` global pointer a second time
 between the two field reads (there is an intervening store to `*out1`
 that the compiler can't prove doesn't alias the global) -- writing the
 two field copies as two independent indexing expressions reproduces
@@ -60,18 +60,18 @@ shape, not something GCC restructured.
 
 ## Round 97 (bravo, track 6): EntryDAD4 retired onto SpuRegs
 
-`EntryDAD4` (the unit's local view of `D_8006DAD4` as an array of 0x10-byte
+`EntryDAD4` (the unit's local view of `_svm_sreg` as an array of 0x10-byte
 entries, fields `unk0`/`unk2`) is the SPU voice register block: libsnd
 vmanager's first .data word points at 0x1F801C00, and code_179d8_m.c's
 SpuVmInit had already typed it `SpuRegs *` with a 24 x 0x10 `voice[]` array
 at +0. `unk0`/`unk2` are `volL`/`volR`. The type moved to include/SvmData.h.
 
-Measured: `D_8006DAD4->voice[idx].volL` is 19/22 -- the two address `addu`s
+Measured: `_svm_sreg->voice[idx].volL` is 19/22 -- the two address `addu`s
 come out `addu v0,v0,v1` where retail has `addu v0,v1,v0` (3 words, same
-length). `(D_8006DAD4->voice + idx)->volL` is 22/22, byte-exact, and is the
-spelling in src/ with a MATCHING line. The old `D_8006DAD4[idx].unk0`
+length). `(_svm_sreg->voice + idx)->volL` is 22/22, byte-exact, and is the
+spelling in src/ with a MATCHING line. The old `_svm_sreg[idx].unk0`
 (pointer indexed directly) matched for the same reason: GCC orders the addu
 operands differently for an ARRAY_REF of a struct member than for pointer
-arithmetic. SsUtGetVVol's `&D_8006DAD4->voice[idx]` is byte-exact either way.
+arithmetic. SsUtGetVVol's `&_svm_sreg->voice[idx]` is byte-exact either way.
 
 The return type is now `s16`, Sony's `short` from <libsnd.h>; zero bytes.

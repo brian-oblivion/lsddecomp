@@ -34,7 +34,7 @@
  *
  * Every call takes a voice number 0..23 and returns -1 for anything else.
  * The shadow registers are include/SvmData.h's _svm_sreg_buf, flushed to
- * the SPU by SpuVmFlush; D_8006DAD4 points at the SPU register block itself
+ * the SPU by SpuVmFlush; _svm_sreg points at the SPU register block itself
  * (SvmData.h's SpuRegs).
  */
 
@@ -50,7 +50,7 @@ extern s16 SpuVmPBVoice(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
 extern void SeAutoVol(s16 a0, s16 a1, s16 a2, s16 a3);
 extern void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3);
 
-extern SpuRegs *D_8006DAD4;
+extern SpuRegs *_svm_sreg;
 
 /* STALL -- docs/match-reports/SsUtChangePitch.md (84/88 words). */
 INCLUDE_ASM("asm/nonmatchings/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop", SsUtChangePitch);
@@ -83,9 +83,9 @@ s16 SsUtChangeADSR(s16 idx, s16 p1, s16 p2, s16 p3, u16 p4, u16 p5) {
 
 s16 SsUtGetDetVVol(s16 idx, s16 *out1, s16 *out2) {
     if ((u16)idx < 0x18) {
-        /* MATCHING: `D_8006DAD4->voice[idx]` swaps the addu's operands. */
-        *out1 = (D_8006DAD4->voice + idx)->volL;
-        *out2 = (D_8006DAD4->voice + idx)->volR;
+        /* MATCHING: `_svm_sreg->voice[idx]` swaps the addu's operands. */
+        *out1 = (_svm_sreg->voice + idx)->volL;
+        *out2 = (_svm_sreg->voice + idx)->volR;
         return 0;
     }
     return -1;
@@ -109,7 +109,7 @@ s16 SsUtGetVVol(s16 idx, s16 *out1, s16 *out2) {
     s16 f0, f2;
 
     if ((u16)idx < 0x18) {
-        e = &D_8006DAD4->voice[idx];
+        e = &_svm_sreg->voice[idx];
         f0 = e->volL;
         f2 = e->volR;
         *out1 = f0 / 129;

@@ -68,7 +68,7 @@ it on the first build:
 
 ```c
 s16 woff = i * 8;
-... D_8006DAD4[woff + 3] = 0x200;    /* u16 *, so byte offset = woff*2 + 6 */
+... _svm_sreg[woff + 3] = 0x200;    /* u16 *, so byte offset = woff*2 + 6 */
 ```
 
 Mechanism: `(i<<19)>>15` (arithmetic) is `sext16(i*8) * 2`. A `u16` truncation
@@ -85,9 +85,9 @@ is that only the signed spelling produces the pair at all.
 Retail interleaves load / compute / store tightly for the SPU key-on pair:
 
 ```
-lhu v1,D_80090C60 ; lhu a0,D_80090C64 ; ... ; lhu v0,D_8008E228
-or v1,a3,v1 ; sh v1,D_80090C60 ; nor v1,zero,v1 ; and v0,v0,v1 ; sh v0,D_8008E228
-lhu v0,D_8008E22C ; or a0,a2,a0 ; sh a0,D_80090C64 ; nor a0 ; and ; sh
+lhu v1,_svm_okof1 ; lhu a0,_svm_okof2 ; ... ; lhu v0,D_8008E228
+or v1,a3,v1 ; sh v1,_svm_okof1 ; nor v1,zero,v1 ; and v0,v0,v1 ; sh v0,D_8008E228
+lhu v0,_svm_okon2 ; or a0,a2,a0 ; sh a0,_svm_okof2 ; nor a0 ; and ; sh
 ```
 
 Caching all four globals in four locals (`hw0`/`hw1`/`mask0`/`mask1`, the
@@ -99,12 +99,12 @@ retail, and uses direct RMW for the two software masks: 98 -> 103.
 
 ### 4. `volatile` ON THE POINTEE pins cc1's scheduler — worth 44 words here
 
-`D_8006DAD4` holds `0x1F801C00`, the SPU voice register block (established when
+`_svm_sreg` holds `0x1F801C00`, the SPU voice register block (established when
 `code_179d8_m` was named as the 24-voice sound driver). So its pointee is
 hardware:
 
 ```c
-extern volatile u16 *D_8006DAD4;   /* NOT `u16 *` */
+extern volatile u16 *_svm_sreg;   /* NOT `u16 *` */
 ```
 
 Measured, with everything else held fixed: **54/131 -> 98/131**, and it is what
@@ -112,12 +112,12 @@ closed the last word of the length gap.
 
 Mechanism, and this is the transferable half: **cc1 2.6.3 WILL hoist a volatile
 access across non-volatile stores, but NOT across another volatile store.**
-Directly observed in cc1's own output — with `D_8006DAD4` non-volatile, cc1
+Directly observed in cc1's own output — with `_svm_sreg` non-volatile, cc1
 moved the `D_8008EA26` volatile store/reload pair *six stores earlier*, to fill
 the load-delay slots of the `lw` and the `lhu`:
 
 ```
-	lw	$2,D_8006DAD4
+	lw	$2,_svm_sreg
 	sra	$4,$4,15
 	#.set	volatile
 	sh	$8,D_8008EA26      <- hoisted past the six stores below
@@ -150,7 +150,7 @@ cc1 fill it. `while (i < N) { ... i++; }` is byte-identical to the `for` form.
 
 ## Best body (length EXACT, 103/131, ins/del 10/10)
 
-Declarations, as they must appear (note the `volatile` on `D_8006DAD4`'s
+Declarations, as they must appear (note the `volatile` on `_svm_sreg`'s
 pointee and the `u16 *` retype — this replaces round 31's `Rec16DAD4` struct):
 
 ```c
@@ -182,13 +182,13 @@ extern Rec34U8 D_8008D9A3[];
 extern volatile u16 D_8008EA26;
 
 /* "Loop bound / threshold" -- code_179d8_m.c's own comment on this symbol. */
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 /*
- * This function's OWN reading of D_8006DAD4: a POINTER VARIABLE (loaded with
+ * This function's OWN reading of _svm_sreg: a POINTER VARIABLE (loaded with
  * `lw`, not an array base) into the PS1 SPU voice register block -- the value
  * is 0x1F801C00, established when code_179d8_m was named as the 24-voice
- * sound driver.  Indexed as HALFWORDS: `D_8006DAD4[woff + N]` with
+ * sound driver.  Indexed as HALFWORDS: `_svm_sreg[woff + N]` with
  * `s16 woff = i * 8`, i.e. 8 halfwords (0x10 bytes) per voice, which is the
  * SPU's own per-voice register stride.  code_179d8_m.c reads the SAME symbol
  * as a fixed-offset object pointer (its own SpuRegs, offsets 0x194/0x196) --
@@ -202,16 +202,16 @@ extern u8 D_8008E9D0;
  * spelling (stride 0x10, fields f0..fA) is RETRACTED: it compiles the index as
  * a plain late `sll 4` instead of retail's split `sll 19` / `sra 15`.
  */
-extern volatile u16 *D_8006DAD4;
+extern volatile u16 *_svm_sreg;
 
 /* PS1 SPU voice key-on/off pair, split low/high across two 16-bit halves
- * (voices 0-15 / 16-31) -- D_80090C60/64 are the hardware-mirrored "just
+ * (voices 0-15 / 16-31) -- _svm_okof1/64 are the hardware-mirrored "just
  * keyed on" mask, D_8008E228/22C a software mask this function clears the
  * same bit from (a "no longer fading out" bookkeeping flag). */
-extern u16 D_80090C60;
-extern u16 D_80090C64;
+extern u16 _svm_okof1;
+extern u16 _svm_okof2;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 ```
 
 ```c
@@ -226,7 +226,7 @@ void SsUtAllKeyOff(void)
     u16 hw0;
     u16 hw1;
 
-    for (i = 0; i < D_8008E9D0; i++) {
+    for (i = 0; i < spuVmMaxVoice; i++) {
         woff = i * 8;
         D_8008D98A[i].unk0 = 0x18;
         _svm_voice[i].unk0 = 0xFF;
@@ -238,12 +238,12 @@ void SsUtAllKeyOff(void)
         D_8008D99A[i].unk0 = 0;
         D_8008D99C[i].unk0 = 0xFF;
 
-        D_8006DAD4[woff + 3] = 0x200;
-        D_8006DAD4[woff + 2] = 0x1000;
-        D_8006DAD4[woff + 4] = 0x80FF;
-        D_8006DAD4[woff + 0] = 0;
-        D_8006DAD4[woff + 1] = 0;
-        D_8006DAD4[woff + 5] = 0x4000;
+        _svm_sreg[woff + 3] = 0x200;
+        _svm_sreg[woff + 2] = 0x1000;
+        _svm_sreg[woff + 4] = 0x80FF;
+        _svm_sreg[woff + 0] = 0;
+        _svm_sreg[woff + 1] = 0;
+        _svm_sreg[woff + 5] = 0x4000;
 
         D_8008EA26 = i;
         bitpos = D_8008EA26 & 0xFFFF;
@@ -259,14 +259,14 @@ void SsUtAllKeyOff(void)
         D_8008D98C[bitpos & 0xFFFF].unk0 = 0;
         _svm_voice[bitpos & 0xFFFF].unk0 = 0;
 
-        hw0 = D_80090C60;
-        hw1 = D_80090C64;
+        hw0 = _svm_okof1;
+        hw1 = _svm_okof2;
         hw0 = bitLo | hw0;
-        D_80090C60 = hw0;
+        _svm_okof1 = hw0;
         D_8008E228 = D_8008E228 & ~hw0;
         hw1 = bitHi | hw1;
-        D_80090C64 = hw1;
-        D_8008E22C = D_8008E22C & ~hw1;
+        _svm_okof2 = hw1;
+        _svm_okon2 = _svm_okon2 & ~hw1;
     }
 }
 #endif
@@ -291,7 +291,7 @@ instruction-for-instruction identical to retail.
    increment in the clause, `for (i=0; i<N; )` with an explicit `i++` after the
    if/else, the same with `i++` at the body end, and a bare `__asm__("")`
    barrier after the if/else. Not source-reachable.
-3. **Hoisted-load choice swapped.** Retail hoists `lhu D_80090C64` into the
+3. **Hoisted-load choice swapped.** Retail hoists `lhu _svm_okof2` into the
    early slot and keeps `lhu D_8008E228` next to its use; the build does the
    opposite, and correspondingly sinks the `D_8008E228` store to the end. Four
    spellings of the tail were measured (below); none moves it.
@@ -303,17 +303,17 @@ instruction-for-instruction identical to retail.
 | baseline, round-31 body rebuilt | 42/131, 9 short, 29/29 |
 | + two missing stores, + `s16 woff = i * 8` | 21/131, **length exact**, 21/21 |
 | + direct global RMW in the SPU tail | 30/131, 19/19 |
-| index `D_8006DAD4[...]` directly vs a `u16 *spu` local | **byte-identical** — cc1 CSEs the pointer load either way |
+| index `_svm_sreg[...]` directly vs a `u16 *spu` local | **byte-identical** — cc1 CSEs the pointer load either way |
 | + `for (i = 0; i < N; i++)` instead of guard + `for(;;)` | 54/131 |
-| + `volatile u16 *D_8006DAD4` | **98/131** |
+| + `volatile u16 *_svm_sreg` | **98/131** |
 | + `hw0`/`hw1` locals, masks still direct RMW | **103/131**, 10/10 |
 | swap `bitLo`/`bitHi` declaration order | byte-identical |
-| split `D_80090C60 = hw0 = ...` into two statements | byte-identical |
+| split `_svm_okof1 = hw0 = ...` into two statements | byte-identical |
 | `while (i < N) { ... i++; }` | byte-identical to the `for` form |
 | `for (;cond;)` + explicit `i++`, two positions | byte-identical |
 | `__asm__("")` after the if/else | byte-identical |
 | `do { ... } while (i < N)` with a guard | **4/131**, skeleton 125 — far worse |
-| hw locals + `~D_80090C60` (global) in the `nor` | 98/131 |
+| hw locals + `~_svm_okof1` (global) in the `nor` | 98/131 |
 | `hw1` local only, `hw0` direct | 100/131 |
 | mask locals read at point of use | byte-identical to 103 |
 | `__asm__("")` before the hw reads | 84/131 |
@@ -354,7 +354,7 @@ were each shown source-inert across four and four spellings respectively.
 
 **`volatile` on a pointee is a scheduling barrier, not just a reload
 guarantee — and cc1 2.6.3 orders volatile accesses only against OTHER volatile
-accesses.** Measured both directions in this function: with `D_8006DAD4` typed
+accesses.** Measured both directions in this function: with `_svm_sreg` typed
 `u16 *`, cc1 hoisted an unrelated `volatile u16` global's store/reload pair
 across six stores through that pointer; typing it `volatile u16 *` pinned the
 pair back and moved the function 54/131 -> 98/131. So when a near-miss looks

@@ -647,3 +647,12 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 ## Types (round 98, alpha)
 
 This unit's `D8008E978Entry` is now `<libsnd.h>`'s `VagAtr` and `ObjE970` is `VabHdr` (unk4 -> `center`, unk5 -> `shift`, unk12 -> `pbmin`, unk13 -> `pbmax`, ObjE970.unk18 -> `mvol`); preserved bodies above keep the old spellings. See SpuVmAlloc.md, "Unit banner history".
+
+## History moved from the source (round 99, echo, track 7)
+
+The source's "Matched round 73 -- docs/match-reports/SePitchBend.md" line is
+gone (the report is keyed by name). Locals renamed by role: `off` ->
+`sregIndex`, `b` -> `amount`, `idx` -> `toneIndex`, `p` -> `curProg`.
+`curProg`, the pointer to `_svm_cur`'s program byte, is load-bearing:
+writing `D_8008EA13` directly instead does not match (measured round 99),
+and the source now says so in one MATCHING line.

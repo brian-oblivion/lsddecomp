@@ -308,7 +308,7 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
         goto fail;
     }
     result = (u8) SpuVmAlloc();
-    if (result == D_8008E9D0) {
+    if (result == spuVmMaxVoice) {
         goto fail;
     }
     D_8008EA26 = result;
@@ -826,7 +826,7 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
         goto fail;
     }
     result = (s32)(u8) SpuVmAlloc();
-    if ((u8) result == D_8008E9D0) {
+    if ((u8) result == spuVmMaxVoice) {
         goto fail;
     }
     __asm__("");
@@ -990,7 +990,7 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
         goto fail;
     }
     result = (s32)(u8) SpuVmAlloc();
-    if ((u8) result == D_8008E9D0) {
+    if ((u8) result == spuVmMaxVoice) {
         goto fail;
     }
     __asm__("");

@@ -58,6 +58,12 @@ typedef struct SoundCueSlot {
 /* SoundCueSet::attenuationSteps for a new cue (InitSoundCueSet). */
 #define SOUND_CUE_ATTENUATION_STEPS 10
 
+/* SoundCueSlot::vol and endVol as ServiceSoundCueSet resets them each tick:
+ * playTone keys the tone at vol and ramps it to endVol (SsUtAutoVol);
+ * 127 is libsnd's full volume. */
+#define SOUND_CUE_DEFAULT_VOL 127
+#define SOUND_CUE_DEFAULT_END_VOL 64
+
 struct SoundCueSet {
     /* +0x00 */ s32 tag; /* the owner's tag while running (Entity: moodIndex + 1); 0 when stopped; serviced only while > 0 */
     /* +0x04 */ s32 tick;    /* zeroed by InitSoundCueSet, advanced after each service pass */

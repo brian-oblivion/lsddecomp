@@ -2,9 +2,9 @@
  * libsnd_ut_ako -- Sony's libsnd/ut_ako module, carried as disassembly
  * because no SDK disc carries the build retail linked.
  *
- * SsUtAllKeyOff resets every voice the voice manager owns (D_8008E9D0 of
+ * SsUtAllKeyOff resets every voice the voice manager owns (spuVmMaxVoice of
  * them): its _svm_voice record (include/SvmData.h), its SPU voice
- * registers (D_8006DAD4 points at them, 0x1F801C00, eight halfwords per
+ * registers (_svm_sreg points at them, 0x1F801C00, eight halfwords per
  * voice), and its bit in the key-off masks. It keeps Sony's name and
  * <libsnd.h>'s prototype.
  *
@@ -33,13 +33,13 @@
 extern volatile u16 D_8008EA26;
 
 /* "Loop bound / threshold" -- code_179d8_m.c's own comment on this symbol. */
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 /*
- * This function's OWN reading of D_8006DAD4: a POINTER VARIABLE (loaded with
+ * This function's OWN reading of _svm_sreg: a POINTER VARIABLE (loaded with
  * `lw`, not an array base) into the PS1 SPU voice register block -- the value
  * is 0x1F801C00, established when code_179d8_m was named as the 24-voice
- * sound driver.  Indexed as HALFWORDS: `D_8006DAD4[woff + N]` with
+ * sound driver.  Indexed as HALFWORDS: `_svm_sreg[woff + N]` with
  * `s16 woff = i * 8`, i.e. 8 halfwords (0x10 bytes) per voice, which is the
  * SPU's own per-voice register stride.  code_179d8_m.c reads the SAME symbol
  * as a fixed-offset object pointer (its own SpuRegs, offsets 0x194/0x196) --
@@ -53,23 +53,23 @@ extern u8 D_8008E9D0;
  * spelling (stride 0x10, fields f0..fA) is RETRACTED: it compiles the index as
  * a plain late `sll 4` instead of retail's split `sll 19` / `sra 15`.
  */
-extern volatile u16 *D_8006DAD4;
+extern volatile u16 *_svm_sreg;
 
 /* PS1 SPU voice key-on/off pair, split low/high across two 16-bit halves
- * (voices 0-15 / 16-31) -- D_80090C60/64 are the hardware-mirrored "just
+ * (voices 0-15 / 16-31) -- _svm_okof1/64 are the hardware-mirrored "just
  * keyed on" mask, D_8008E228/22C a software mask this function clears the
  * same bit from (a "no longer fading out" bookkeeping flag). */
-extern u16 D_80090C60;
-extern u16 D_80090C64;
+extern u16 _svm_okof1;
+extern u16 _svm_okof2;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 
 /* STALL -- see docs/match-reports/SsUtAllKeyOff.md.  Round 66 revisit:
  * best-derived body now compiles to EXACT LENGTH (was 9 words SHORT);
  * raw word-match 103/131 (was 42/131); first real diff at vram 0x80032064
  * (file 0x22864) -- `sllv a3,t2,a0` vs `sllv a2,t2,a0`, a register-identity
  * residue on bitLo/bitHi.  Preserved here for the next attempt.  Note the
- * four load-bearing spellings: D_8006DAD4's POINTEE is volatile (it holds
+ * four load-bearing spellings: _svm_sreg's POINTEE is volatile (it holds
  * 0x1F801C00, the SPU voice registers) which is what pins cc1's scheduler;
  * `s16 woff = i * 8` (SIGNED) is what fuses into retail's sll19/sra15 split
  * shift; the loop is a `for`, not a guard plus `for(;;)`; and the tail does
@@ -86,7 +86,7 @@ void SsUtAllKeyOff(void)
     u16 hw0;
     u16 hw1;
 
-    for (i = 0; i < D_8008E9D0; i++) {
+    for (i = 0; i < spuVmMaxVoice; i++) {
         woff = i * 8;
         _svm_voice[i].unk02 = 0x18;
         _svm_voice[i].unk00 = 0xFF;
@@ -98,12 +98,12 @@ void SsUtAllKeyOff(void)
         _svm_voice[i].unk12 = 0;
         _svm_voice[i].unk14 = 0xFF;
 
-        D_8006DAD4[woff + 3] = 0x200;
-        D_8006DAD4[woff + 2] = 0x1000;
-        D_8006DAD4[woff + 4] = 0x80FF;
-        D_8006DAD4[woff + 0] = 0;
-        D_8006DAD4[woff + 1] = 0;
-        D_8006DAD4[woff + 5] = 0x4000;
+        _svm_sreg[woff + 3] = 0x200;
+        _svm_sreg[woff + 2] = 0x1000;
+        _svm_sreg[woff + 4] = 0x80FF;
+        _svm_sreg[woff + 0] = 0;
+        _svm_sreg[woff + 1] = 0;
+        _svm_sreg[woff + 5] = 0x4000;
 
         D_8008EA26 = i;
         bitpos = D_8008EA26 & 0xFFFF;
@@ -119,14 +119,14 @@ void SsUtAllKeyOff(void)
         _svm_voice[bitpos & 0xFFFF].unk04 = 0;
         _svm_voice[bitpos & 0xFFFF].unk00 = 0;
 
-        hw0 = D_80090C60;
-        hw1 = D_80090C64;
+        hw0 = _svm_okof1;
+        hw1 = _svm_okof2;
         hw0 = bitLo | hw0;
-        D_80090C60 = hw0;
+        _svm_okof1 = hw0;
         D_8008E228 = D_8008E228 & ~hw0;
         hw1 = bitHi | hw1;
-        D_80090C64 = hw1;
-        D_8008E22C = D_8008E22C & ~hw1;
+        _svm_okof2 = hw1;
+        _svm_okon2 = _svm_okon2 & ~hw1;
     }
 }
 #endif
