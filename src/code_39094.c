@@ -29,10 +29,6 @@
 #include "LbdFile.h"
 #include "StageGrid.h"
 
-/* FileResource::flags: the driver's read into the buffer has completed
- * (setFlag). Same value and spelling as GraphicsResources.c's. */
-#define CD_FLAG_READ_DONE 0x080
-
 /* gRecordTable's record indices. The first RECORD_TABLE_COUNT are the
  * sound banks (SND\*.VH/VB) and then each stage's files; the movie records
  * follow. */

@@ -112,9 +112,6 @@ VabStreamObj *New_VabStreamObj(char *path) {
  * build on the stack. */
 #define VAB_PATH_SIZE 32
 
-/* FileResource::flags bit the CD driver sets when a loadFile/requestLoadFile
- * finishes (code_179d8_s.c's CD_FLAG_LOAD_FILE_DONE). */
-#define CD_FLAG_LOAD_FILE_DONE 0x200
 
 /* SsSetMVol's level for both channels, set once when the first bank's
  * attributes are loaded (Sony's maximum is 127). */

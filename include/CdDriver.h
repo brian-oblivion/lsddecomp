@@ -136,19 +136,6 @@ typedef struct CdRequestNode {
 #define CD_STATE_READ 7        /* issue CdRead */
 #define CD_STATE_READ_WAIT 8   /* poll CdReadSync */
 
-/* Bits CdDriver__RunRequestQueue ORs into a client's FileResource::flags
- * when one of its requests completes; the clients poll them
- * (GraphicsResources.c and code_179d8_e.c define the two they read the same
- * way). Bit 0 (1) is left a literal: it is also FileResource__SetFlag's bit,
- * and the queue node field that sets it (`unk4`) has no established meaning. */
-#define CD_FLAG_DONE 0x002         /* some request completed */
-#define CD_FLAG_NONE_PENDING 0x004 /* ... and pendingRequests reached 0 */
-#define CD_FLAG_OPEN_DONE 0x010
-#define CD_FLAG_CLOSE_DONE 0x020
-#define CD_FLAG_SEEK_DONE 0x040
-#define CD_FLAG_READ_DONE 0x080
-#define CD_FLAG_LOAD_FILE_DONE 0x200
-
 /* A CD-ROM data sector's user data (2048 bytes; <libcd.h>'s CdlModeSize0/1
  * clear). CdRead counts sectors, so byte sizes and offsets are shifted by
  * CD_SECTOR_SHIFT (ReadCdFile, CdDriver__Seek), and GetCdFileSize reports a

@@ -70,11 +70,6 @@
 #include "CdStream.h"
 #include "MoviePlayer.h"
 
-/* FileResource `flags` bits the CD driver sets when a request completes
- * (spelled as src/code_179d8_s.c defines them). */
-#define CD_FLAG_READ_DONE 0x080
-#define CD_FLAG_LOAD_FILE_DONE 0x200
-
 #define CD_SECTOR_SIZE 2048 /* a CD-ROM data sector: TimBlockSrc's first read */
 #define FIX12_SHIFT 12      /* ONE == 1 << FIX12_SHIFT: 20.12 fixed point */
 
