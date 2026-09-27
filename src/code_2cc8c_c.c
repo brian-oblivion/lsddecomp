@@ -36,13 +36,12 @@ TaskCoreMethods *Get_vtable_TaskCore(void) {
     return &gTaskCoreMethods;
 }
 
-/* A 3-word struct (see code_2c054.h's own StreamTaskInitData local view);
- * opaque here since this unit never dereferences it, only returns its
- * address. */
-extern u8 gDefaultStreamTaskInitData[];
+/* The default movie frame, {640, 0, 320, 240}: StreamTask's default initData
+ * and the rect TaskCore__OnInit clears (code_2c054.h). */
+extern DrawRect gDefaultStreamTaskInitData;
 
 void *GetDefaultStreamTaskInitData(void) {
-    return gDefaultStreamTaskInitData;
+    return &gDefaultStreamTaskInitData;
 }
 
 void IntermediateBase__IntermediateBase(IntermediateBase *self) {
