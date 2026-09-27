@@ -54,7 +54,7 @@ discovering this.
 
 Renamed `func_8002C468` -> `SetVabDriverMode`, tier B. Same evidence as
 `GetVabDriverMode` (its report): `code_171e0.c`'s `func_80026F34` assigns
-this function to a `Func80026F34Fn` variable used exactly where it assigns
+this function to a `DataSourceSetDriverModeFn` variable used exactly where it assigns
 Sony's `SetCdDriverMode` on the other branch of `gActiveDataSource == 0x13`
 -- a genuine drop-in substitute for a named "set driver mode" call, for
 this backend's own state pair.

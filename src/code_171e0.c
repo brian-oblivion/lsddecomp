@@ -232,11 +232,11 @@ s32 GetActiveDataSourceState(void) {
     return 0;
 }
 
-typedef s32 (*Func80026F34Fn)(s32, s32, s32);
+typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
 /* round 58 (alpha, externcheck.py): SetVabDriverMode's real definition
  * (code_179d8_e.c) takes 2 args; SetCdDriverMode's (code_179d8_q.c)
  * genuinely takes 3. Both are only ever REFERENCED here, never called
- * directly -- `fn` dispatches through the shared 3-arg Func80026F34Fn
+ * directly -- `fn` dispatches through the shared 3-arg DataSourceSetDriverModeFn
  * pointer type SetCdDriverMode needs, with SetVabDriverMode's own body
  * simply not reading the 3rd word. Declaring SetVabDriverMode's own
  * arity honestly (2, matching its definition) costs nothing byte-wise --
@@ -247,7 +247,7 @@ extern s32 SetVabDriverMode(s32 a, s32 b);
 extern s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2);
 
 void SetActiveDataSourceDriverMode(s32 arg0, s32 arg1, s32 arg2) {
-    Func80026F34Fn fn;
+    DataSourceSetDriverModeFn fn;
 
     fn = SetVabDriverMode;
     if (gActiveDataSource == DATASOURCE_CD) {
