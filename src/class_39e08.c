@@ -17,7 +17,7 @@
  * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000), the data
  * right before gTimedTaskMethods. */
 extern LongVec3 sDayViewPoint;
-extern LongVec3 D_8008665C;
+extern LongVec3 sDayViewRef;
 
 DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
     DayTask *self;
@@ -125,7 +125,7 @@ void DayTask__OnInit(DayTask *self) {
     ret = vp->methods->getFadeBox(vp);
     ret->methods->setDisplay(ret, 1);
     vp->methods->setUnk44(vp, 0x4B0);
-    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sDayViewPoint, &D_8008665C, 0);
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sDayViewPoint, &sDayViewRef, 0);
     vp->methods->initOt(vp);
     self->phase = 1;
 }

@@ -52,10 +52,10 @@ addiu $a2, $a2, %lo(sDayViewPoint)
 sw    $zero, 0x10($sp)       ; 5th (stack) arg = 0
 lw    $a1, 0x38($s1)         ; self->unk38
 lw    $v0, 0x70($v0)         ; methods->slot70
-lui   $a3, %hi(D_8008665C)
-addiu $a3, $a3, %lo(D_8008665C)
+lui   $a3, %hi(sDayViewRef)
+addiu $a3, $a3, %lo(sDayViewRef)
 jalr  $v0
- addu $a0, $s0, $zero        ; subA->methods->slot70(subA, self->unk38, &sDayViewPoint, &D_8008665C, 0)
+ addu $a0, $s0, $zero        ; subA->methods->slot70(subA, self->unk38, &sDayViewPoint, &sDayViewRef, 0)
 lw    $v0, 0x0($s0)          ; subA->methods (reload)
 nop
 lw    $v0, 0x8C($v0)         ; methods->slot8C
@@ -83,7 +83,7 @@ void DayTask__OnInit(Obj865C8 *self) {
     ret = subA->methods->slot0xAC(subA);
     ret->methods->slot60(ret, 1);
     subA->methods->slot4C(subA, 0x4B0);
-    subA->methods->slot70(subA, self->unk38, sDayViewPoint, D_8008665C, 0);
+    subA->methods->slot70(subA, self->unk38, sDayViewPoint, sDayViewRef, 0);
     subA->methods->slot8C(subA);
     self->unk3C = 1;
 }
@@ -103,7 +103,7 @@ void DayTask__OnInit(Obj865C8 *self) {
   `slot74`/`slot90`).
 - New opaque type `SubObjF`/`SubObjFMethods` (`slot60`, `void (*)(SubObjF
   *self, s32 arg1)`) — what `slot0xAC` returns.
-- Two new rodata symbol externs, `sDayViewPoint`/`D_8008665C` (`extern u8 [];`,
+- Two new rodata symbol externs, `sDayViewPoint`/`sDayViewRef` (`extern u8 [];`,
   address-only, real element type unknown) — both sit just before this
   unit's own `gTimedTaskMethods` vtable in memory (0x18 and 0xC bytes before it
   respectively), passed straight through to `slot70` without dereferencing.
@@ -152,4 +152,4 @@ forward-declared struct bodies as a bare `struct X { ... };`, never repeat
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from Obj865C8__StartSubA: it is the +0x04C onInit override (IntermediateBase__Init calls it). subA was IntermediateBase's viewport (+0x018), which holds the NodeGuardedViewport the ctor made, and SubObjA's slots are Viewport's: setScreenSize, getSubHandle (then SceneNode setDisplay(1)), setUnk44(0x4B0), attachViewChild(dreamSys, &sDayViewPoint, &D_8008665C, NULL), initOt. It takes self alone; the slot keeps (self, s32, s32, s32).
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from Obj865C8__StartSubA: it is the +0x04C onInit override (IntermediateBase__Init calls it). subA was IntermediateBase's viewport (+0x018), which holds the NodeGuardedViewport the ctor made, and SubObjA's slots are Viewport's: setScreenSize, getSubHandle (then SceneNode setDisplay(1)), setUnk44(0x4B0), attachViewChild(dreamSys, &sDayViewPoint, &sDayViewRef, NULL), initOt. It takes self alone; the slot keeps (self, s32, s32, s32).
