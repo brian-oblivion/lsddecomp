@@ -874,3 +874,7 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 The NON_MATCHING body now uses `_svm_voice[voice].unk28`..`unk32` (and `*(u8 *) &_svm_voice[v].unk30`); normalized disassembly identical to before, stall unchanged.
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body keeps `((s16 *) _svm_sreg_buf)[off]`/`[off + 1]` and `_svm_sreg_dirty`; normalized disassembly identical.
+
+## Track 6 (round 96, charlie)
+
+Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `ObjE970` is `VabHdr` (`_svm_vh`): this body reads `D_8008E970->mvol` (+0x18, was `masterVolume`). Normalized disassembly unchanged.

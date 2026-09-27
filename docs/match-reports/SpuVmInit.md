@@ -353,8 +353,8 @@ typedef struct {
     u8 pad[0x194];
     u16 unk194; /* +0x194 */
     u16 unk196; /* +0x196 */
-} ObjDAD4;
-extern ObjDAD4 *D_8006DAD4;
+} SpuRegs;
+extern SpuRegs *D_8006DAD4;
 
 void SpuVmInit(s32 a0) {
     s16 i;
@@ -756,11 +756,11 @@ because splat names only addresses some asm references. Byte-identical.
 
 Round 89 (runner delta, track 5 `asm-sites`), two sites:
 
-- **Retired: the asm-label alias** `extern ObjDAD4Edd4 *D_8006DAD4Edd4
+- **Retired: the asm-label alias** `extern SpuRegsEdd4 *D_8006DAD4Edd4
   __asm__("D_8006DAD4");`. SpuVmInit was its only user (six `(s16 *)`/`(u16 *)`
-  cast stores). The unit's `ObjDAD4` typedef and `extern ObjDAD4 *D_8006DAD4;`
+  cast stores). The unit's `SpuRegs` typedef and `extern SpuRegs *D_8006DAD4;`
   moved up to where the alias stood (SpuVmNoiseOff, later in the unit, still
-  uses them), the identical `ObjDAD4Edd4` typedef was dropped, and SpuVmInit
+  uses them), the identical `SpuRegsEdd4` typedef was dropped, and SpuVmInit
   now names `D_8006DAD4` directly. `build/src/code_179d8_m.c.o` came out
   byte-identical (`cmp`), `./build-and-verify.sh` green, and
   `tools/check-nonmatching.sh code_179d8_m` still passes.
@@ -772,3 +772,27 @@ Round 89 (runner delta, track 5 `asm-sites`), two sites:
   `lhu` reload hoisted above the six `D_8006DAD4` halfword stores
   (`sh ... 6/4/8/0/2/0xa(a0)`) that retail performs first. Instruction order
   only; the barrier now carries a one-line comment saying so.
+
+## Track 6 (round 96, charlie)
+
+Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile.
+
+- The local `SpuVolume`/`SpuReverbAttr` mirrors and the local `SpuInitMalloc(s32, void *)` prototype are gone: `<libspu.h>` supplies all three (`SpuInitMalloc(long, char *)`, so `D_8008DEB0` is declared `char[]`).
+- `ObjDAD4` is now `SpuRegs` (`tools/renametype.py ObjDAD4 SpuRegs`): `D_8006DAD4` holds 0x1F801C00, the first `.data` word of libsnd/vmanager.o on disc 3.3 (`001c801f`), the PS1 SPU register block. It is laid out as `SpuVoiceRegs voice[24]` (volL, volR, pitch, addr, adsr1, adsr2, envx at +0x0..+0xC) plus the keyOn (+0x188), keyOff (+0x18C), noiseOn (+0x194) and reverbOn (+0x198) words. The six cast stores here are unchanged (their index spelling carries the match); each comment now names the register: +0x6 addr = 0x200, +0x4 pitch = 0x1000 (44.1 kHz), +0x8 adsr1 = 0x80FF, +0x0/+0x2 volL/volR = 0, +0xA adsr2 = 0x4000.
+- The function comment above SpuVmInit is now one `MATCHING:` line. Its previous text:
+
+```c
+/* MATCHED round 32 (bravo), 270/270 -- closes the register-identity stall
+ * every prior round's hand-reshaping (10 axes) and one earlier permuter
+ * run (100k+ iterations) could not move.  Permuter-found: a SINGLE scratch
+ * variable (`scratch`, `s32`), reused for TWO textually unrelated
+ * purposes -- once to break the `a0`-vs-`s0` min-clamp tie, and again
+ * ~150 lines later as the `D_8006DAD4[woff]` store's index -- is what
+ * reproduces retail's exact register allocation.  Splitting these into
+ * two separately-named locals (the natural, more readable choice) gives a
+ * WORSE result than either leaving `a0` alone or this single-variable
+ * reuse; the reuse itself is load-bearing, not cosmetic.  See
+ * docs/match-reports/SpuVmInit.md for the full derivation, the
+ * permuter trace, and why the naive two-variable translation regresses
+ * sharply (47/270) despite being semantically identical. */
+```

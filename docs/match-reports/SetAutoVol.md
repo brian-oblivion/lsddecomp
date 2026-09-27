@@ -815,3 +815,93 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 The NON_MATCHING body now uses `_svm_voice[voice].unk1C`..`unk26`; its normalized disassembly is identical to the per-field version, so the stall and its residue are unchanged.
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body keeps `((s16 *) _svm_sreg_buf)[off]`/`[off + 1]` and `_svm_sreg_dirty`; normalized disassembly identical.
+
+## Track 6 (round 96, charlie): Sony types; unit history moved here
+
+Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile.
+
+- `ObjE970` was a local view of libsnd's `_svm_vh` (0x8008E970, pinned in `config/psyq-objects.ld`) and is `<libsnd.h>`'s `VabHdr`: `masterVolume` (+0x18) is `VabHdr.mvol`, `difficultyThreshold` (+0x12) is `VabHdr.ps`, the bank's program count. The "difficulty" reading of `D_8008EA13` was wrong: it is `_svm_cur + 7`, the current program number (SpuVmKeyOn refuses one at or past `ps`, and it indexes `_svm_tn` in steps of 16 tones). This body now reads `D_8008E970->mvol`; normalized disassembly unchanged.
+
+The unit banner was rewritten as documentation. Its previous text and the shared-prelude comment that used to open this function are kept here verbatim, since they are the unit's history:
+
+```c
+/*
+ * code_179d8_m -- part of the game's SPU sound driver: the per-voice
+ * envelope/fade stepper, the per-tick voice updater, and a NoteOn/NoteOff
+ * pair for a 24-voice (0..0x17) PS1 SPU wavetable player driven by MIDI-
+ * shaped events (confirmed: code_179d8_k.c's caller switches on a status
+ * byte with the MIDI 0x90/0xB0/0xC0/0xE0/0xFF nibbles; D_8006DAD4 is the
+ * PS1 SPU's real hardware base, 0x1F801C00, per vmNoiseOn2's report in
+ * code_179d8_l). Plain free functions, no vtable -- `tools/classtable.py`
+ * lists no method table at these addresses.
+ *
+ * Twelve functions, functions 161..172 of the original 274-function
+ * code_179d8 monolith, 0x1ECD8..0x20ADC (vram 0x8002E4D8..0x800302DC).
+ * Carved round 24 (2026-09-08); `code_179d8_l` is the front half (owns the
+ * shared carve-time census) and `code_179d8_j` follows behind. No jump
+ * table, no rodata attach, no BIOS trampoline (every function ends in its
+ * own `jr $ra`, none open on `$sp`) -- see code_179d8_l's header for the
+ * full carve-time survey.
+ *
+ * WHAT EACH FUNCTION DOES (see docs/match-reports/<name>.md for the full
+ * derivation and evidence):
+ *   - SpuVmKeyOn / SpuVmKeyOff: a matched NoteOn/NoteOff pair. Given a packed
+ *     [screen|slot] identity, note, volume/program and (for SpuVmKeyOn) a
+ *     velocity and a computed stereo pan split, SpuVmKeyOn registers a new
+ *     active-voice record; SpuVmKeyOff scans every voice for one whose
+ *     identity fields match and releases it, returning the count released.
+ *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: find a free voice (SpuVmAlloc, in
+ *     code_179d8_l) and, if one exists, key it on (vmNoiseOn2, also
+ *     code_179d8_l) with the caller's parameters or, for SpuVmNoiseOn,
+ *     two hardcoded constants.
+ *   - SeAutoPan / SetAutoPan: a linear-ramp pair over _svm_voice
+ *     +0x28..+0x32 (include/SvmData.h) -- Se sets a start/target/step-rate;
+ *     Step advances the accumulator (throttled by an interval/countdown
+ *     pair), clamps at the target, and writes the resulting stereo output
+ *     level.
+ *   - SetAutoVol: the same accumulate-until-limit shape over _svm_voice
+ *     +0x1C..+0x26; its setter is SeAutoVol in code_179d8_l.
+ *   - SpuVmFlush: the per-tick dispatcher. Maintains a 16-slot
+ *     ring buffer of per-tick voice-activity bitmasks; when a voice has
+ *     shown no activity for 16 consecutive ticks it force-releases it
+ *     (disabling the SPU noise generator if that voice was in noise
+ *     state); then calls SetAutoVol/SetAutoPan for every voice
+ *     whose respective flag is set. Called once at the end of
+ *     SpuVmInit and, going by its own ring-buffer/mask-clearing logic,
+ *     meant to run every frame thereafter.
+ *   - SpuVmNoiseOff: releases every voice whose state byte reads
+ *     exactly 2 (the same value SpuVmKeyOff/SpuVmFlush/SpuVmAlloc
+ *     treat as "noise voice needing SpuSetNoiseVoice/func_800375E8 cleanup").
+ *   - SpuVmPBVoice / SpuVmPitchBend: match a voice by
+ *     identity and apply a curve-table-driven pitch bend from a 0-127
+ *     depth value centered at 0x40, writing the result through
+ *     note2pitch2; the "AllVoices" wrapper calls Sony's SpuVmVSetUp once
+ *     and then runs this over every voice, returning the count affected.
+ *   - SpuVmInit: the SPU driver's init call -- _spu_setInTransfer,
+ *     SpuInitMalloc, zeroes every per-voice table and the two master
+ *     volume globals (reset to 0x3FFF, the SPU's real max), then calls
+ *     SpuVmFlush once.
+ *
+ * STALLS: SpuVmPBVoice, SpuVmKeyOn, SpuVmFlush,
+ * SetAutoVol, SetAutoPan -- all five are the same "whole-function
+ * register-count decision predates any of the function's own locals"
+ * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
+ */
+
+/* Round 48 (echo): testing charlie's ContDataEntry frame-padding lever on
+ * this function's frame gap (0x10 built vs retail's 0x18, 8 bytes; retail
+ * saves ZERO callee-saved registers and addresses NOTHING via $sp beyond
+ * the prologue/epilogue immediate itself, confirmed via grep -- textbook
+ * pure-padding shape). See docs/match-reports/SetAutoVol.md for the
+ * full derivation this body is otherwise unchanged from.
+ *
+ * This function sits FIRST in ROM order in this unit, so the shared
+ * record-family types its sibling stalls also use (ObjE970, the volume/pan scratch bytes, D_8008E8C0) are
+ * defined HERE instead of duplicated -- their old definitions further
+ * down this file (originally written for SetAutoPan's isolated splice)
+ * are removed; the plain externs that used to accompany them there are
+ * left in place and now just reference these same, earlier-defined types
+ * (a harmless duplicate extern declaration, not a redefinition). Same
+ * "move the shared prelude up, do not duplicate" fix round 37 already
+ * used here; declaration order carries no code. */
+```
