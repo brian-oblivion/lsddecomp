@@ -1,4 +1,6 @@
-# GetVariantBlock -- MATCHED (9/9 words)
+# GetStageBgmRecords -- MATCHED (9/9 words)
+
+> Renamed from `GetVariantBlock` on 2026-09-27 (tools/rename.py). Address 0x80048f60.
 
 > Renamed from `func_80048F60` on 2026-09-25 (tools/rename.py). Address 0x80048f60.
 
@@ -17,7 +19,7 @@ Record index arithmetic: `GetStageRecords(index) + 0x70` is four 0x1C-byte recor
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
 Rec1C *GetStageRecords(s32 index);   /* INCLUDE_ASM in this unit */
 
-Rec1C *GetVariantBlock(s32 index) {
+Rec1C *GetStageBgmRecords(s32 index) {
     return &GetStageRecords(index)[4];
 }
 ```
@@ -34,6 +36,6 @@ Rec1C *GetVariantBlock(s32 index) {
 
 ## Naming
 
-- **Name:** `GetVariantBlock`
+- **Name:** `GetStageBgmRecords`
 - **Tier:** A
 - **Evidence:** pure getter: &GetStageRecords(index)[4].

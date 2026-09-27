@@ -231,7 +231,7 @@ Rec1C *PickStageTexture(s32 index, s32 arg1, s32 day) {
     return &GetStageTextureRecords(index)[r];
 }
 
-Rec1C *GetVariantBlock(s32 index) {
+Rec1C *GetStageBgmRecords(s32 index) {
     return &GetStageRecords(index)[4];
 }
 
@@ -246,7 +246,7 @@ Rec1C *PickVariant(s32 index, s32 arg1) {
             gForcedStageBgm = 4;
         }
     }
-    rec = GetVariantBlock(index);
+    rec = GetStageBgmRecords(index);
     return &rec[gForcedStageBgm != 0 ? gForcedStageBgm - 1 : r];
 }
 
