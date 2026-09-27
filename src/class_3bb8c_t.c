@@ -145,18 +145,18 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
  * the natural sequential order is what matches, no reordering needed).
  * Field names are a plausible RGB reading of a colour-cycling table
  * builder, not confirmed evidence; see this function's own match report. */
-typedef struct D_8008ABB8Color {
+typedef struct GraphPointColor {
     s8 r;
     s8 g;
     s8 b;
-} D_8008ABB8Color;
+} GraphPointColor;
 
 extern u8 D_8008ABAC;
 extern u8 D_8008ABB4;
-extern D_8008ABB8Color D_8008ABB8;
+extern GraphPointColor D_8008ABB8;
 
 void GraphRoom__BuildGraphPoints(GraphRoom *self) {
-    D_8008ABB8Color rgb;
+    GraphPointColor rgb;
     s32 i;
 
     self->points[0] = New_BoxFill(&D_8008ABAC, &D_8008ABB4, 0);

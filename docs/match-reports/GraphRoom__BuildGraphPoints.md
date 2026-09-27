@@ -40,18 +40,18 @@ allocates a 4-byte scratch buffer into `self->unk_0x240`.
  * the natural sequential order is what matches, no reordering needed).
  * Field names are a plausible RGB reading of a colour-cycling table
  * builder, not confirmed evidence. */
-typedef struct D_8008ABB8Color {
+typedef struct GraphPointColor {
     s8 r;
     s8 g;
     s8 b;
-} D_8008ABB8Color;
+} GraphPointColor;
 extern u8 D_8008ABAC;
 extern u8 D_8008ABB4;
-extern D_8008ABB8Color D_8008ABB8;
+extern GraphPointColor D_8008ABB8;
 extern D_80087AACEntry *New_BoxFill(void *a0, void *a1, s32 a2);
 
 void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
-    D_8008ABB8Color rgb;
+    GraphPointColor rgb;
     s32 i;
 
     self->unk_0xA8[0] = New_BoxFill(&D_8008ABAC, &D_8008ABB4, 0);
@@ -162,7 +162,7 @@ where the build stores at `+0x12`.
 ```c
 #if 0
 void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
-    D_8008ABB8Color rgb;
+    GraphPointColor rgb;
     s32 i;
 
     self->unk_0xA8[0] = New_BoxFill(D_8008ABAC, &D_8008ABB4, 0);
