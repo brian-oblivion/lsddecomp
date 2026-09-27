@@ -159,7 +159,7 @@ extern s32 sSaveFileSuffixes;
 extern u8 sSaveTitleColorChannel;
 
 /* TitleMenu__CycleSaveTitleColor's frame counter (wraps to 0 at 0x101). */
-extern s32 D_8008AA2C;
+extern s32 sSaveTitleColorFrame;
 
 /* TaskObjF__TaskObjF's construction count: InitCARD/StartCARD/_bu_init run
  * only on the first construction, when it was 0 before the increment. */

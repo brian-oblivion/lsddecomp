@@ -170,7 +170,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
         base[sSaveTitleColorChannel] = 0x80;
     } else {
         buf = *color;
-        if (D_8008AA2C < 0x80) {
+        if (sSaveTitleColorFrame < 0x80) {
             base[0] += 0x80;
         } else {
             base[sSaveTitleColorChannel] += 0x80;
@@ -179,9 +179,9 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
     if (++sSaveTitleColorChannel >= 3) {
         sSaveTitleColorChannel = 0;
     }
-    D_8008AA2C++;
-    if (D_8008AA2C >= 0x101) {
-        D_8008AA2C = 0;
+    sSaveTitleColorFrame++;
+    if (sSaveTitleColorFrame >= 0x101) {
+        sSaveTitleColorFrame = 0;
     }
     self->saveTitle->methods->setColor(self->saveTitle, &buf);
 }

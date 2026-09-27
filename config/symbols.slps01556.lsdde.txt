@@ -2994,3 +2994,4 @@ sSaveFileName = 0x8008AA10;
 sSaveTitleBlanks = 0x8008AA14;
 gSaveTitle = 0x8008AA18;
 sSaveTitleColorChannel = 0x8008AA28;
+sSaveTitleColorFrame = 0x8008AA2C;

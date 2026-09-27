@@ -58,7 +58,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, Arg1DCD0_3bb8c_d *arg1)
         base[sSaveTitleColorChannel] = 0x80;
     } else {
         buf = *arg1;
-        if (D_8008AA2C < 0x80) {
+        if (sSaveTitleColorFrame < 0x80) {
             base[0] += 0x80;
         } else {
             base[sSaveTitleColorChannel] += 0x80;
@@ -67,9 +67,9 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, Arg1DCD0_3bb8c_d *arg1)
     if (++sSaveTitleColorChannel >= 3) {
         sSaveTitleColorChannel = 0;
     }
-    D_8008AA2C++;
-    if (D_8008AA2C >= 0x101) {
-        D_8008AA2C = 0;
+    sSaveTitleColorFrame++;
+    if (sSaveTitleColorFrame >= 0x101) {
+        sSaveTitleColorFrame = 0;
     }
     self->nameField->methods->slotB8(self->nameField, &buf);
 }
@@ -161,7 +161,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, Arg1DCD0_3bb8c_d *arg1)
     base[0] = arg1->b0;
     base[1] = arg1->b1;
     base[2] = arg1->b2;
-    if (D_8008AA2C < 0x80) {
+    if (sSaveTitleColorFrame < 0x80) {
         base[0] = base[0] + 0x80;
         goto skip;
     }
@@ -174,9 +174,9 @@ skip:
     if (sSaveTitleColorChannel >= 3) {
         sSaveTitleColorChannel = 0;
     }
-    D_8008AA2C++;
-    if (D_8008AA2C >= 0x101) {
-        D_8008AA2C = 0;
+    sSaveTitleColorFrame++;
+    if (sSaveTitleColorFrame >= 0x101) {
+        sSaveTitleColorFrame = 0;
     }
     self->nameField->methods->slotB8(self->nameField, buf);
 }
@@ -211,7 +211,7 @@ This is preserved verbatim, `#if 0`-wrapped, immediately above the
   diverged from word 1) to the near-miss reported here.
 - `sSaveTitleColorChannel` (`u8`, rolling 0/1/2 index, `asm/data/7B12C.sdata.s` --
   declared as a full `.word` there but accessed only via `lbu`/`sb`) and
-  `D_8008AA2C` (`s32`, rolling counter) -- both **confirmed correct**,
+  `sSaveTitleColorFrame` (`s32`, rolling counter) -- both **confirmed correct**,
   including the `andi v0,v0,0xff` re-mask retail emits after storing
   `sSaveTitleColorChannel` back (the ordinary compiled shape of an unsigned-char
   increment-and-wrap).
@@ -297,7 +297,7 @@ project-wide from a runner worktree.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DCD0` -> `TitleMenu__CycleSaveTitleColor`. **Tier B**: Guarded by `self->unk3C`, cycles a 3-byte colour-like buffer through a rolling index (`sSaveTitleColorChannel`, 0-2) and a counter (`D_8008AA2C`, wraps at 0x101), then forwards the buffer to `self->nameField`'s `slotB8`. Read as a counter-driven colour/blink update on the name field's cursor; the exact visual effect is not established.
+Renamed `func_8004DCD0` -> `TitleMenu__CycleSaveTitleColor`. **Tier B**: Guarded by `self->unk3C`, cycles a 3-byte colour-like buffer through a rolling index (`sSaveTitleColorChannel`, 0-2) and a counter (`sSaveTitleColorFrame`, wraps at 0x101), then forwards the buffer to `self->nameField`'s `slotB8`. Read as a counter-driven colour/blink update on the name field's cursor; the exact visual effect is not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
