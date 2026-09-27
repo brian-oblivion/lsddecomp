@@ -69,15 +69,15 @@ typedef struct SrcDesc {
 } SrcDesc;
 
 s32 TaskCore__TickFadeColor(TaskCore *self) {
-    s32 c = 0x80 - (self->frameCounter * self->fadeRate);
-    u8 buf[3];
+    s32 level = 0x80 - (self->frameCounter * self->fadeRate);
+    u8 color[3];
 
-    buf[0] = c;
-    buf[1] = c;
-    buf[2] = c;
-    self->methods->broadcastToSlots(self, buf);
-    self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)buf);
-    return (u8)c >= 0x81;
+    color[0] = level;
+    color[1] = level;
+    color[2] = level;
+    self->methods->broadcastToSlots(self, color);
+    self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)color);
+    return (u8)level >= 0x81;
 }
 
 void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle) {
@@ -95,84 +95,84 @@ void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle
     self->subHandlePath = path;
 }
 
-void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1) {
-    char **list;
+void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *target) {
+    char **names;
     s32 count;
     s32 size;
-    TextRow **arr;
-    TimImage *handle;
+    TextRow **widget;
+    TimImage *texture;
     s32 i;
 
-    self->target = a1;
-    if (a1 == NULL) {
+    self->target = target;
+    if (target == NULL) {
         return;
     }
 
-    list = a1->names;
+    names = target->names;
     count = 0;
-    while (*list++ != NULL) {
+    while (*names++ != NULL) {
         count++;
     }
     size = count * 4;
-    arr = BMemPMgrAlloc(size);
-    self->slotElements = (BasicClass **)arr;
+    widget = BMemPMgrAlloc(size);
+    self->slotElements = (BasicClass **)widget;
     self->itemCounts = BMemPMgrAlloc(size);
     self->slotCounts = BMemPMgrAlloc(size);
     self->itemLists = BMemPMgrAlloc(size);
     self->slotCount = count;
 
-    if (a1->path != NULL) {
-        handle = New_TimImage((char *)a1->path);
-        ((TimImageUploadFn)handle->methods->processBuffer)(handle);
-        handle->methods->freeBuffer(handle);
+    if (target->path != NULL) {
+        texture = New_TimImage((char *)target->path);
+        ((TimImageUploadFn)texture->methods->processBuffer)(texture);
+        texture->methods->freeBuffer(texture);
     } else {
-        handle = (TimImage *)a1->handle;
+        texture = (TimImage *)target->handle;
     }
 
-    list = a1->names;
+    names = target->names;
     i = 0;
-    if (*list != NULL) {
+    if (*names != NULL) {
         do {
-            void *extra = a1->unk24[i];
-            s32 len = strlen(*list);
+            void *itemList = target->unk24[i];
+            s32 len = strlen(*names);
 
-            *arr = New_TextRow(handle, len, *list);
-            arr++;
-            if (extra != NULL) {
+            *widget = New_TextRow(texture, len, *names);
+            widget++;
+            if (itemList != NULL) {
                 self->activeSlot = i;
-                self->methods->createSlotElements(self, extra, handle);
+                self->methods->createSlotElements(self, itemList, texture);
             }
-            list++;
+            names++;
             i++;
-        } while (*list != NULL);
+        } while (*names != NULL);
     }
 
     self->listView = New_BoxFill(sListViewSize, &sListViewColor, 0);
-    a1->handle = (BasicClass *)handle;
+    target->handle = (BasicClass *)texture;
 }
 
 void TaskCore__ReleaseTarget(TaskCore *self) {
-    TextRow **arr;
+    TextRow **widget;
     s32 i;
 
     if (self->target == NULL) {
         return;
     }
     if (self->target->path != NULL) {
-        TimImage *o = (TimImage *)self->target->handle;
-        o->methods->release(o);
+        TimImage *texture = (TimImage *)self->target->handle;
+        texture->methods->release(texture);
     }
     self->listView->methods->release(self->listView);
-    arr = (TextRow **)self->slotElements;
-    for (i = 0; i < self->slotCount; arr++) {
-        TextRow *elem;
+    widget = (TextRow **)self->slotElements;
+    for (i = 0; i < self->slotCount; widget++) {
+        TextRow *row;
 
         if (self->target->unk24[i] != NULL) {
             self->activeSlot = i;
             self->methods->releaseSlotElements(self);
         }
-        elem = *arr;
-        elem->methods->release(elem);
+        row = *widget;
+        row->methods->release(row);
         i++;
     }
     BMemPMgrFree(self->itemLists);
@@ -181,58 +181,58 @@ void TaskCore__ReleaseTarget(TaskCore *self) {
     BMemPMgrFree(self->slotElements);
 }
 
-void TaskCore__UpdateSlotElements(TaskCore *self, void *a1) {
-    TextRow **arr;
-    u8 *ptr;
+void TaskCore__UpdateSlotElements(TaskCore *self, void *parent) {
+    TextRow **widget;
+    u8 *position;
     s32 i;
 
     if (self->target == NULL) {
         return;
     }
-    arr = (TextRow **)self->slotElements;
-    ptr = self->target->externalRecords;
-    for (i = 0; i < self->slotCount; i++, arr++, ptr += 8) {
+    widget = (TextRow **)self->slotElements;
+    position = self->target->externalRecords;
+    for (i = 0; i < self->slotCount; i++, widget++, position += 8) {
         if (self->target->registrationSlots[i] == NULL) {
-            TextRow *elem = *arr;
+            TextRow *row = *widget;
 
-            elem->methods->attachToParent(elem, a1, (LongVec3 *)ptr);
+            row->methods->attachToParent(row, parent, (LongVec3 *)position);
             if (self->target->unk24[i] != NULL) {
                 self->activeSlot = i;
-                self->methods->refreshSlotView(self, a1, 0);
+                self->methods->refreshSlotView(self, parent, 0);
             }
         } else {
-            TextRow *elem = *arr;
+            TextRow *row = *widget;
 
-            elem->methods->detachFromParent(elem);
+            row->methods->detachFromParent(row);
         }
     }
 }
 
-void TaskCore__BroadcastToSlots(TaskCore *self, void *a1) {
-    s32 origIdx;
-    TextRow **arr;
+void TaskCore__BroadcastToSlots(TaskCore *self, void *color) {
+    s32 savedSlot;
+    TextRow **widget;
     s32 i;
 
     if (self->target == NULL) {
         return;
     }
-    arr = (TextRow **)self->slotElements;
-    origIdx = self->activeSlot;
+    widget = (TextRow **)self->slotElements;
+    savedSlot = self->activeSlot;
     for (i = 0; i < self->slotCount;) {
-        TextRow *elem = *arr;
+        TextRow *row = *widget;
 
-        arr++;
-        elem->methods->setColor(elem, a1);
+        widget++;
+        row->methods->setColor(row, color);
         if (self->target->unk24[i] != NULL) {
             self->activeSlot = i;
-            self->methods->broadcastToSlotElements(self, a1);
+            self->methods->broadcastToSlotElements(self, color);
         }
         i++;
         /* Keeps i++ ahead of the self->slotCount reload, leaving retail's nop
          * in that load's delay slot; without it GCC moves i++ into the slot. */
         __asm__("");
     }
-    self->activeSlot = origIdx;
+    self->activeSlot = savedSlot;
 }
 
 void TaskCore__FindNextFreeSlot(TaskCore *self) {
@@ -283,23 +283,23 @@ void TaskCore__FindPrevFreeSlot(TaskCore *self) {
     self->methods->setActiveSlot(self, i, 1);
 }
 
-void TaskCore__SetActiveSlot(TaskCore *self, s32 a1, void *a2) {
-    s32 idx;
-    TextRow *elemB;
-    TextRow *elemA;
+void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, void *withSound) {
+    s32 prev;
+    TextRow *prevWidget;
+    TextRow *nextWidget;
 
     if (self->target == NULL) {
         return;
     }
-    idx = self->activeSlot;
-    elemB = ((TextRow **)self->slotElements)[idx];
-    elemA = ((TextRow **)self->slotElements)[a1];
-    if (idx >= 0) {
-        elemB->methods->setColor(elemB, (SpriteRgb *)self->target->unselectedColor);
+    prev = self->activeSlot;
+    prevWidget = ((TextRow **)self->slotElements)[prev];
+    nextWidget = ((TextRow **)self->slotElements)[slot];
+    if (prev >= 0) {
+        prevWidget->methods->setColor(prevWidget, (SpriteRgb *)self->target->unselectedColor);
     }
-    elemA->methods->setColor(elemA, (SpriteRgb *)self->target->selectedColor);
-    self->activeSlot = a1;
-    if (a2 != NULL) {
+    nextWidget->methods->setColor(nextWidget, (SpriteRgb *)self->target->selectedColor);
+    self->activeSlot = slot;
+    if (withSound != NULL) {
         self->methods->playSound(self, 0);
     }
     self->methods->setState(self, 9);
@@ -309,32 +309,32 @@ s32 TaskCore__GetActiveSlot(TaskCore *self) {
     return self->activeSlot;
 }
 
-void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *a2) {
-    char **list;
-    s32 idx;
+void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *texture) {
+    char **names;
+    s32 slot;
     s32 count;
-    TextRow **buf;
+    TextRow **item;
 
-    list = ((SrcDesc *)desc)->itemNames;
-    idx = self->activeSlot;
+    names = ((SrcDesc *)desc)->itemNames;
+    slot = self->activeSlot;
     count = 0;
-    while (*list++ != NULL) {
+    while (*names++ != NULL) {
         count++;
     }
-    buf = BMemPMgrAlloc(count * 4);
-    self->itemLists[idx] = (void *)buf;
-    self->slotCounts[idx] = ((SrcDesc *)desc)->savedCursor;
-    self->itemCounts[idx] = count;
+    item = BMemPMgrAlloc(count * 4);
+    self->itemLists[slot] = (void *)item;
+    self->slotCounts[slot] = ((SrcDesc *)desc)->savedCursor;
+    self->itemCounts[slot] = count;
 
-    list = ((SrcDesc *)desc)->itemNames;
-    if (*list != NULL) {
+    names = ((SrcDesc *)desc)->itemNames;
+    if (*names != NULL) {
         do {
-            s32 len = strlen(*list);
+            s32 len = strlen(*names);
 
-            *buf = New_TextRow(a2, len, *list);
-            list++;
-            buf++;
-        } while (*list != NULL);
+            *item = New_TextRow(texture, len, *names);
+            names++;
+            item++;
+        } while (*names != NULL);
     }
 }
 
@@ -343,118 +343,118 @@ void TaskCore__ReleaseSlotElements(TaskCore *self) {
     BMemPMgrFree(self->itemLists[self->activeSlot]);
 }
 
-void TaskCore__RefreshSlotView(TaskCore *self, void *a1, s32 a2) {
-    s32 idx;
-    TextRow **arr;
+void TaskCore__RefreshSlotView(TaskCore *self, void *parent, s32 show) {
+    s32 slot;
+    TextRow **item;
     s32 count;
-    s32 counter;
+    s32 cursor;
     SlotPos pos;
     s32 i;
 
-    idx = self->activeSlot;
-    arr = (TextRow **)self->itemLists[idx];
+    slot = self->activeSlot;
+    item = (TextRow **)self->itemLists[slot];
     {
-        SlotEntry *target = (SlotEntry *)self->target->unk24[idx];
+        SlotEntry *entry = (SlotEntry *)self->target->unk24[slot];
 
-        count = self->itemCounts[idx];
-        counter = target->savedCursor;
+        count = self->itemCounts[slot];
+        cursor = entry->savedCursor;
     }
 
     for (i = 0; i < count; i++) {
-        (*arr)->methods->detachFromParent(*arr);
-        arr++;
+        (*item)->methods->detachFromParent(*item);
+        item++;
     }
 
-    pos = ((SlotEntry *)self->target->unk24[idx])->pos;
-    pos.y -= counter * 10;
+    pos = ((SlotEntry *)self->target->unk24[slot])->pos;
+    pos.y -= cursor * 10;
 
-    if (a2 != 0) {
-        s32 buf[2];
+    if (show != 0) {
+        s32 size[2];
 
         ((BoxFillAttachToParentFn)((BoxFill *)self->listView)->methods->attachToParent)(
             (BoxFill *)self->listView, (SceneNode *)self->unk14, (BoxFillPos *)&pos);
-        buf[0] = 0x28;
-        buf[1] = count * 12;
-        ((BoxFill *)self->listView)->methods->setSize((BoxFill *)self->listView, buf);
+        size[0] = 0x28;
+        size[1] = count * 12;
+        ((BoxFill *)self->listView)->methods->setSize((BoxFill *)self->listView, size);
     } else {
         ((BoxFill *)self->listView)->methods->detachFromParent((BoxFill *)self->listView);
     }
 
-    arr = (TextRow **)self->itemLists[idx];
+    item = (TextRow **)self->itemLists[slot];
     for (i = 0; i < count; i++) {
-        (*arr)->methods->attachToParent(*arr, a1, (LongVec3 *)&pos);
-        (*arr)->methods->setDisplay(*arr, a2);
+        (*item)->methods->attachToParent(*item, parent, (LongVec3 *)&pos);
+        (*item)->methods->setDisplay(*item, show);
         pos.y += 10;
-        arr++;
+        item++;
     }
 
-    arr = (TextRow **)self->itemLists[idx];
-    arr[counter]->methods->setDisplay(arr[counter], 1);
+    item = (TextRow **)self->itemLists[slot];
+    item[cursor]->methods->setDisplay(item[cursor], 1);
 }
 
-void TaskCore__BroadcastToSlotElements(TaskCore *self, void *a1) {
-    s32 idx = self->activeSlot;
-    TextRow **arr = (TextRow **)self->itemLists[idx];
-    s32 count = self->itemCounts[idx];
+void TaskCore__BroadcastToSlotElements(TaskCore *self, void *color) {
+    s32 slot = self->activeSlot;
+    TextRow **item = (TextRow **)self->itemLists[slot];
+    s32 count = self->itemCounts[slot];
     s32 i;
 
     for (i = 0; i < count; i++) {
-        TextRow *elem = *arr;
-        arr++;
-        elem->methods->setColor(elem, a1);
+        TextRow *row = *item;
+        item++;
+        row->methods->setColor(row, color);
     }
 }
 
 void TaskCore__BeginElementScroll(TaskCore *self) {
-    s32 idx;
-    TextRow *elem;
+    s32 slot;
+    TextRow *item;
     SpriteRgb *cursorColor;
 
     if (self->inputMode != 1) {
         return;
     }
-    idx = self->activeSlot;
+    slot = self->activeSlot;
     self->methods->refreshSlotView(self, self->unk14, 1);
-    elem = ((TextRow **)self->itemLists[idx])[self->slotCounts[idx]];
-    cursorColor = &((SlotEntry *)self->target->unk24[idx])->cursorColor;
-    elem->methods->setColor(elem, cursorColor);
+    item = ((TextRow **)self->itemLists[slot])[self->slotCounts[slot]];
+    cursorColor = &((SlotEntry *)self->target->unk24[slot])->cursorColor;
+    item->methods->setColor(item, cursorColor);
     self->inputMode = 2;
     self->methods->setState(self, 14);
 }
 
 void TaskCore__CommitElementScroll(TaskCore *self) {
-    s32 idx;
-    s32 counter;
+    s32 slot;
+    s32 cursor;
     SlotPos pos;
-    TextRow **arr;
+    TextRow **item;
     s32 count;
     s32 i;
 
     if (self->inputMode != 2) {
         return;
     }
-    idx = self->activeSlot;
-    counter = self->slotCounts[idx];
-    pos = ((SlotEntry *)self->target->unk24[idx])->pos;
-    pos.y -= counter * 10;
+    slot = self->activeSlot;
+    cursor = self->slotCounts[slot];
+    pos = ((SlotEntry *)self->target->unk24[slot])->pos;
+    pos.y -= cursor * 10;
 
-    arr = (TextRow **)self->itemLists[idx];
-    count = self->itemCounts[idx];
+    item = (TextRow **)self->itemLists[slot];
+    count = self->itemCounts[slot];
     for (i = 0; i < count; i++) {
-        (*arr)->methods->setDisplay(*arr, 0);
-        (*arr)->methods->setPosition(*arr, (ScreenSpritePos *)&pos);
+        (*item)->methods->setDisplay(*item, 0);
+        (*item)->methods->setPosition(*item, (ScreenSpritePos *)&pos);
         pos.y += 10;
-        arr++;
+        item++;
     }
 
     {
-        TextRow *elem = ((TextRow **)self->itemLists[idx])[counter];
+        TextRow *row = ((TextRow **)self->itemLists[slot])[cursor];
 
-        elem->methods->setDisplay(elem, 1);
-        elem->methods->setColor(elem, (SpriteRgb *)self->target->unselectedColor);
+        row->methods->setDisplay(row, 1);
+        row->methods->setColor(row, (SpriteRgb *)self->target->unselectedColor);
     }
 
-    ((SlotEntry *)self->target->unk24[idx])->savedCursor = counter;
+    ((SlotEntry *)self->target->unk24[slot])->savedCursor = cursor;
 
     ((BoxFill *)self->listView)->methods->detachFromParent((BoxFill *)self->listView);
 
@@ -463,70 +463,70 @@ void TaskCore__CommitElementScroll(TaskCore *self) {
 }
 
 void TaskCore__CancelElementScroll(TaskCore *self) {
-    s32 idx;
-    s32 counter;
-    TextRow **arr;
-    TextRow *elem1;
-    TextRow *elem2;
-    s32 newVal;
+    s32 slot;
+    s32 cursor;
+    TextRow **items;
+    TextRow *prevItem;
+    TextRow *savedItem;
+    s32 saved;
 
     if (self->inputMode != 2) {
         return;
     }
-    idx = self->activeSlot;
-    counter = self->slotCounts[idx];
+    slot = self->activeSlot;
+    cursor = self->slotCounts[slot];
     self->methods->refreshSlotView(self, self->unk14, 0);
-    arr = (TextRow **)self->itemLists[idx];
-    elem1 = arr[counter];
-    elem1->methods->setColor(elem1, (SpriteRgb *)self->target->unselectedColor);
-    newVal = ((SlotEntry *)self->target->unk24[idx])->savedCursor;
-    self->slotCounts[idx] = newVal;
-    elem2 = arr[newVal];
-    elem2->methods->setDisplay(elem2, 1);
+    items = (TextRow **)self->itemLists[slot];
+    prevItem = items[cursor];
+    prevItem->methods->setColor(prevItem, (SpriteRgb *)self->target->unselectedColor);
+    saved = ((SlotEntry *)self->target->unk24[slot])->savedCursor;
+    self->slotCounts[slot] = saved;
+    savedItem = items[saved];
+    savedItem->methods->setDisplay(savedItem, 1);
     self->inputMode = 1;
     self->methods->setState(self, 17);
 }
 
 void TaskCore__AdvanceSlotCursor(TaskCore *self) {
-    s32 idx = self->activeSlot;
-    s32 v = self->slotCounts[idx];
+    s32 slot = self->activeSlot;
+    s32 cursor = self->slotCounts[slot];
 
-    v++;
-    if (v >= self->itemCounts[idx]) {
-        v = 0;
+    cursor++;
+    if (cursor >= self->itemCounts[slot]) {
+        cursor = 0;
     }
-    self->methods->setSlotCursor(self, v, 1);
+    self->methods->setSlotCursor(self, cursor, 1);
 }
 
 void TaskCore__RetreatSlotCursor(TaskCore *self) {
-    s32 idx = self->activeSlot;
-    s32 v = self->slotCounts[idx];
+    s32 slot = self->activeSlot;
+    s32 cursor = self->slotCounts[slot];
 
-    v--;
-    if (v < 0) {
-        v = self->itemCounts[idx] - 1;
+    cursor--;
+    if (cursor < 0) {
+        cursor = self->itemCounts[slot] - 1;
     }
-    self->methods->setSlotCursor(self, v, 1);
+    self->methods->setSlotCursor(self, cursor, 1);
 }
 
-void TaskCore__SetSlotCursor(TaskCore *self, s32 a1, void *a2) {
-    s32 idx;
-    s32 counter;
-    TextRow **arr;
-    TextRow *elem1;
-    TextRow *elem2;
+void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
+    s32 slot;
+    s32 prev;
+    TextRow **items;
+    TextRow *prevItem;
+    TextRow *nextItem;
     SpriteRgb *cursorColor;
 
-    idx = self->activeSlot;
-    counter = self->slotCounts[idx];
-    arr = (TextRow **)self->itemLists[idx];
-    elem1 = arr[counter];
-    elem2 = arr[a1];
-    elem1->methods->setColor(elem1, (SpriteRgb *)self->target->unselectedColor);
-    cursorColor = &((SlotEntry *)self->target->unk24[idx])->cursorColor;
-    elem2->methods->setColor(elem2, cursorColor);
-    self->slotCounts[idx] = a1;
-    if (a2 != NULL) {
+    slot = self->activeSlot;
+    prev = self->slotCounts[slot];
+    items = (TextRow **)self->itemLists[slot];
+    prevItem = items[prev];
+    nextItem = items[cursor];
+    prevItem->methods->setColor(prevItem, (SpriteRgb *)self->target->unselectedColor);
+    cursorColor = &((SlotEntry *)self->target->unk24[slot])->cursorColor;
+    nextItem->methods->setColor(nextItem, cursorColor);
+    self->slotCounts[slot] = cursor;
+    if (withSound != NULL) {
         self->methods->playSound(self, 0);
     }
     self->methods->setState(self, 9);
