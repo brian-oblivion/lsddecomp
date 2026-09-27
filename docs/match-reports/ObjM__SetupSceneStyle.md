@@ -154,3 +154,36 @@ the TimBlockSrc fades to clearColor), `unk18` -> `farColor` (setFarColor
 otherwise), `unk1C` -> `fogNear` (setFogNear). Tier B for `colorMode`, whose
 two tested values are read by different methods for different choices.
 Zero bytes changed.
+
+## Round 95 (track 7, echo)
+
+The unit-local view `UnkCObj_3bb8c_l` / `UnkCObjMethods_3bb8c_l` was deleted:
+it was the DrawSystem (IntermediateBaseInitArgs::drawSystem) seen through
++0x07C, which include/DrawSystem.h has as `getDims(self, DrawRect *out)`
+returning `ScreenDims *`. The body now reads
+`drawSystem->methods->getDims(drawSystem, NULL)->w`, byte-identical. Its
+comment, moved here:
+
+> initArgs->unk0 as SetupSceneStyle reads it: its +0x07C returns a pointer
+> to one word (class_39e08.h's SubObjE is the same call from
+> DayTask__OnInit).
+
+Proposed for the head: class_39e08.h's `SubObjE` is the same DrawSystem
+call and can go the same way.
+
+Comment history moved from the unit's externs:
+
+> code_4cd08.c's (MATCHED round 43); no header declares it. `world` is the
+> DreamSys it installs as gDreamAuxWorld (track 4, round 88).
+
+> GetStageGridDimensions comes from include/StageGrid.h, through DreamSys.h.
+
+> The StageMap's accepted tags (setAcceptedTags), an opaque .data block
+> (asm/data/76DC8.data.s) reached by address.
+
+SetDreamAuxWorld's local prototype takes its parameter names from what the
+definition does with them (stage, grid, world, sound, clock).
+`gObjMViewPoint`, `gObjMViewRefPoint` and `gObjMAcceptedClassIds` are typed
+(LongVec3, s32[]), dropping their casts. `/* GsFOG */` on EnterStyleSession's
+setLightMode(vp, 1): SceneNode__SetLightMode writes a 3-bit field at bit 3
+of the GsDOBJ2 attribute, where 1 is libgs's GsFOG (1<<3).

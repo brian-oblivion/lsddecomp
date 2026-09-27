@@ -308,3 +308,12 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 ## Track 4 (2026-09-26, round 89, echo)
 
 The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+
+## Round 95 (track 7, echo)
+
+`local18` is `DreamColors color` (getSetFlashbackSession's own `out` type,
+no cast); its values are DREAM_COLOR_BLACK / RED / WHITE, and the
+flashback path's `ObjM__StartFadeUp(self, 0, ...)` is DREAM_COLOR_BLACK.
+`span` -> `phase`, `arg3` -> `step` (StartFadeUp's parameter), 0xA -> 10.
+The `t = phase` copy carries `/* MATCHING: */`: it is the round 19
+permuter lever described above. Byte-identical.

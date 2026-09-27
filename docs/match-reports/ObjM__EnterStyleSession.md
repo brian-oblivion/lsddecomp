@@ -185,3 +185,9 @@ the TimBlockSrc fades to clearColor), `unk18` -> `farColor` (setFarColor
 otherwise), `unk1C` -> `fogNear` (setFogNear). Tier B for `colorMode`, whose
 two tested values are read by different methods for different choices.
 Zero bytes changed.
+
+## Round 95 (track 7, echo)
+
+Locals by role: `local10` -> `DreamColors flashColor` (the slot's own type,
+cast dropped), `ret` -> `flashback`, `a2` -> `channels` (startFadeDown's
+parameter), `a1` -> `farColor`. Byte-identical.

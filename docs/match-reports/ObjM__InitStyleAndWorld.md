@@ -224,3 +224,36 @@ the TimBlockSrc fades to clearColor), `unk18` -> `farColor` (setFarColor
 otherwise), `unk1C` -> `fogNear` (setFogNear). Tier B for `colorMode`, whose
 two tested values are read by different methods for different choices.
 Zero bytes changed.
+
+## Round 95 (track 7, echo)
+
+Two comments in the body were cut to `/* MATCHING: */` lines; their full
+text, moved here:
+
+> Retail reloads self->stage here even though the outer `if` just read it
+> and nothing wrote it in between -- a volatile-qualified POINTER TYPE at
+> the read site (not a volatile object) forces the reload without changing
+> the field's own declared type, the same idiom code_179d8_m.c documents
+> for D_8008EA26's `*(u8 *)&sym`, used here in the opposite direction
+> (forcing a reload instead of permitting a fold).
+
+> Order-only: without this barrier the scheduler moves `three`'s `li` past
+> the `self->unk40` store; removing it does not change which register holds
+> which value.
+
+Naming, all zero bytes:
+- `ObjM::unk40` -> `tickPeriod`, `unk44` -> `moveMode` (include/ObjM.h;
+  the compiler's accessor list after the rename was this unit only).
+  Evidence: EnterStyleSession passes them to the DreamSys's resetLinkState,
+  and DreamSys__ResetLinkState's own parameters are `(moveMode,
+  tickPeriod)`: getSetMoveMode(moveMode), setTickPeriod(tickPeriod). moveMode
+  2/3 index MOVE_MODE_SPEEDS {0, 24, 64, 128, 384}. Tier A (mechanics).
+- local `ret1` split into `record` (PickVariant / PickDailyVariant results)
+  and `day` (getCurrentDayAndYear); the split compiled identically.
+- `0x10` -> 16, `0xA000` -> `DEFAULT_GRID_SPAN` (40960, unit-local; the value
+  of gDefaultGridSpan, what StageMap starts with; StageMap::gridHalfCells is
+  gridSpan >> 12 = 10).
+- `arg3` / `unk4C` kept: stored, never read, and IntermediateBase__Init
+  passes 0, so nothing names it.
+- `flag` kept: it goes to func_8001EF60, whose global's meaning is not
+  established (code_d294_c.c's tier-C note).

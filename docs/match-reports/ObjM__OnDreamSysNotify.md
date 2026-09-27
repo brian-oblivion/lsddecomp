@@ -115,3 +115,21 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 ## Track 4 (2026-09-26, round 89, echo)
 
 Renamed from `ObjM__HandleStateCode` (rename.py): it occupies gObjMMethods +0x090, which `ObjM__OnNotify` runs for a sender whose class id is 0x1F34 (DreamSys), as DayTask's +0x080 is its onDreamSysNotify. While IntermediateBase::state is 0, codes 0xA..0x11 run enterState4..notifyParentsCodeB (0xB none); otherwise a code from 9 up clears the DreamSys's Actor::state. Tier A for the mechanics.
+
+## Round 95 (track 7, echo)
+
+`switch (code - 0xA)` with cases 0..7 became `switch (code)` over
+include/DreamSys.h's `enum DreamSysLinkCode` (DREAMSYS_TIME_UP ..
+DREAMSYS_LINK_TELEPORT), and the DreamSys's state is cleared with
+DREAMSYS_NO_LINK: byte-identical (GCC subtracts the lowest case itself, the
+same jump table). The `code >= 9` test keeps its literal: 9 is not a link
+code. The banner's note that this function owns `jtbl_8001174C` moved to
+ObjM__NoOpSlot40.md with the rest of the banner's history.
+
+Proposed for the head (ObjM.h slots, accessors in class_3bb8c_m too):
+enterState4..A / notifyParentsCodeB could be named by the link code that
+reaches each (enterState4 on DREAMSYS_TIME_UP, enterState5 on
+DREAMSYS_LINK_DYNAMIC, enterState6 on DREAMSYS_LINK_WALL, enterState7
+flashback, enterState8 tunnel, enterStateA stage timer, notifyParentsCodeB
+teleport). The state values 4/5/6 were left as literals: onInit also sets 5,
+so "the state a dynamic link enters" is not all that 5 means.

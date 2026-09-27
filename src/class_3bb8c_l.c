@@ -1,22 +1,29 @@
 /*
- * class_3bb8c_l -- sixth carved slice of the class_3bb8c block
- * (0x435E0..0x44518, vram 0x80052DE0..0x80053D18), 20 functions, ALL
- * MATCHED. Carved round 15; fully matched by round 45.
+ * class_3bb8c_l -- ObjM's methods from resetCounters (+0x040) through
+ * enterState6 (+0x09C), in table order. The class is include/ObjM.h.
  *
- * This slice is entirely ObjM's own methods (gObjMMethods, include/ObjM.h;
- * track 4, round 89 unified the class_3bb8c_k/_l/_m views there), slots
- * +0x040..+0x09C in table order: the init/deinit pair (AttachTarget keeps
- * the DreamSys and hooks the StageMap's callback, DetachTarget), onInit
- * and onDeinit (InitStyleAndWorld, TeardownStyle), onTag1Notify with the
- * TimBlockSrc poll it runs (PollTimBlockLoad), onPadEvent
- * (DispatchPadEvent), update, togglePause (ObjM__TogglePause), the style scene
- * slots +0x080..+0x08C, the DreamSys notification dispatcher
- * (OnDreamSysNotify, owning `jtbl_8001174C`) and EnterState4/5/6, which
- * set IntermediateBase::state and start a fade (ObjM__StartFadeUp,
- * class_3bb8c_m). NoOpSlot40 and NoOpSlot7C are empty.
+ *  - init and deinit (AttachTarget, DetachTarget): install
+ *    ObjM__GetGridRecord as the StageMap's chunk-record callback and keep
+ *    the DreamSys as a child.
+ *  - onInit and onDeinit (InitStyleAndWorld, TeardownStyle): pick the
+ *    stage's BGM sequence and the day's TIM block, register the stage's
+ *    StyleConfig, set the viewport's view and the StageMap's bounds; stop
+ *    it all again.
+ *  - onTag1Notify's event 2 runs PollTimBlockLoad: once the TIM block has
+ *    loaded (or failed) the scene is set up, and once the StageMap has
+ *    nothing pending the style session starts.
+ *  - onPadEvent (DispatchPadEvent) maps Start, Select and triangle onto the
+ *    pause and close slots; update ticks the style, or the pause overlay
+ *    while it is being built; togglePause.
+ *  - the style scene slots +0x080..+0x08C: SetupSceneStyle,
+ *    ExitSceneStyle, EnterStyleSession, TickStyle.
+ *  - OnDreamSysNotify turns the DreamSys's link codes into enterState4..B;
+ *    EnterState4/5/6 set IntermediateBase::state and start a fade up
+ *    (ObjM__StartFadeUp, class_3bb8c_m).
+ * NoOpSlot40 and NoOpSlot7C are empty.
  *
- * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
- * Header edits must be strictly ADDITIVE.
+ * include/class_3bb8c.h is shared with every other class_3bb8c_* unit;
+ * edits to it are additive.
  */
 #include "common.h"
 #include "class_3bb8c.h"
@@ -32,7 +39,7 @@
 
 void ObjM__NoOpSlot40(void) {}
 
-/* init. `args` is the building DayTask's init args: args->unkC is its
+/* init. `args` is the building DayTask's init args: args->lightRig is its
  * StageMap (IntermediateBase__Init keeps it as unk14), whose callback
  * becomes ObjM__GetGridRecord. */
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dreamSys) {
@@ -43,6 +50,9 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
     self->methods->addChild(self, (BasicClass *)dreamSys);
 }
 
+/* The StageMap's chunkFileFn: a chunk's file record, by linear cell index,
+ * or by x/y when the index is negative. The record is left as the return
+ * value for the StageMap (GetGridRecordXY is declared void). */
 void ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
     if (cell >= 0) {
         GetGridRecordAt(self->stage, cell);
@@ -56,18 +66,19 @@ void ObjM__DetachTarget(ObjM *self) {
     GetTimedTaskMethods()->deinit((TimedTask *)self);
 }
 
-/* Cross-unit helpers, src/code_39094.c (PickVariant, PickDailyVariant:
- * `Rec1C *(s32 index, ...)`, read here as the value handed on),
- * src/code_d294_c.c (func_8001EF60) and class_3bb8c_m (RegisterStyleConfig,
- * whose third argument is kept as gStyleSceneRefs). */
+/* Defined elsewhere, no header: src/code_39094.c (PickVariant and
+ * PickDailyVariant return a Rec1C *, a 0x1C-byte record handed on here as a
+ * name), src/code_d294_c.c (func_8001EF60 sets the flag
+ * SceneNode__ClassifyAgainstPlanes tests) and class_3bb8c_m
+ * (RegisterStyleConfig, which keeps `sceneRefs` as gStyleSceneRefs). */
 extern s32 PickVariant(s32 stage, s32 unused);
 extern s32 PickDailyVariant(s32 stage, s32 unused, s32 day);
 extern s32 func_8001EF60(s32 value);
 extern s32 RegisterStyleConfig(void *grid, s32 stage, s32 *sceneRefs, s32 day, s32 arg4);
 
-/* Data reached by address: the viewport's view point and view reference
- * (attachViewChild), the StageMap's bounds; and gStagePendingExtras, one
- * setPendingExtra value per stage. */
+/* The viewport's view point and reference point (attachViewChild), the
+ * StageMap's bounds on stage 0, and one DreamSys setPendingExtra value per
+ * stage. */
 extern LongVec3 gObjMViewPoint;
 extern LongVec3 gObjMViewRefPoint;
 extern s32 gStagePendingExtras[];
@@ -110,19 +121,11 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
         s32 stage;
         s32 three;
 
-        /* Retail reloads self->stage here even though the outer `if`
-         * just read it and nothing wrote it in between -- a volatile-
-         * qualified POINTER TYPE at the read site (not a volatile
-         * object) forces the reload without changing the field's own
-         * declared type, the same idiom code_179d8_m.c documents for
-         * D_8008EA26's `*(u8 *)&sym`, used here in the opposite
-         * direction (forcing a reload instead of permitting a fold). */
+        /* MATCHING: the volatile read keeps retail's second load of self->stage. */
         stage = *(s32 volatile *)&self->stage;
         self->tickPeriod = 16;
         three = 3;
-        /* Order-only: without this barrier the scheduler moves `three`'s
-         * `li` past the `self->tickPeriod` store; removing it does not change
-         * which register holds which value. */
+        /* MATCHING: without the barrier `three`'s li moves past the store above. */
         __asm__("");
         flag = (stage == 5);
         if (stage == 6) {
@@ -166,8 +169,8 @@ void ObjM__OnTag1Notify(ObjM *self, void *sender, s32 event) {
 
 /* `src` is always self->timBlockSrc. Loaded, its CLUT rows fade to a
  * styleConfig colour; failed or loaded, it is released and the scene set
- * up (a failure also adds 0x1E to the DreamSys's time limit). With nothing
- * pending and the StageMap idle, the style session starts. */
+ * up (a failure also adds 30 seconds to the DreamSys's time limit). With
+ * nothing pending and the StageMap idle, the style session starts. */
 void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
     s32 timer;
     s32 colorMode;
@@ -203,8 +206,10 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
     }
 }
 
-/* onPadEvent: 0x21 togglePause, 0xC updateCloseReadyFlag, 0x2C
- * clearCloseReadyFlag, 0x16 closeAndNotifyD; only in session. */
+/* onPadEvent, only in session: Start pressed toggles the pause, Select
+ * held and released sets and clears the close-ready flag, triangle pressed
+ * closes (closeAndNotifyD).
+ * MATCHING: the gotos keep retail's compare order; a switch sorts the cases. */
 void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code) {
     ObjMMethods *m = self->methods;
     void (*fn)(ObjM *);
@@ -272,18 +277,17 @@ void ObjM__TogglePause(ObjM *self) {
 
 void ObjM__NoOpSlot7C(void) {}
 
-/* code_4cd08.c's (MATCHED round 43); no header declares it. `world` is the
- * DreamSys it installs as gDreamAuxWorld (track 4, round 88). */
-extern void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4);
+/* src/code_4cd08.c's; no header declares it. It keeps the stage, the
+ * StageMap, the DreamSys (gDreamAuxWorld), the sound and the FrameClock for
+ * the dream's aux entities. */
+extern void SetDreamAuxWorld(s32 stage, s32 grid, DreamSys *world, s32 sound, s32 clock);
 
-/* GetStageGridDimensions comes from include/StageGrid.h, through
- * DreamSys.h. */
-
-/* A plain `s32` bias added to the projection distance (%gp_rel value). */
+/* Added to the viewport's projection distance; 0 in the image and never
+ * written. */
 extern s32 gObjMProjectionBias;
 
-/* The StageMap's accepted tags (setAcceptedTags), an opaque .data block
- * (asm/data/76DC8.data.s) reached by address. */
+/* The StageMap's accepted tags (setAcceptedTags): the class ids of DreamSys
+ * (0x1F34) and Entity (0x1F234), 0-terminated. */
 extern s32 gObjMAcceptedClassIds[];
 
 void ObjM__SetupSceneStyle(ObjM *self) {
@@ -372,9 +376,9 @@ void ObjM__TickStyle(ObjM *self) {
               0, 0);
 }
 
-/* The DreamSys's codes 0xA..0x11 run enterState4..notifyParentsCodeB while
- * the state is 0; any code from 9 up otherwise clears the DreamSys's own
- * state (Actor::state). */
+/* While ObjM's state is 0 each DreamSys link code runs its enterState slot
+ * (DREAMSYS_LINK_DAY_START none); otherwise any code from 9 up clears the
+ * DreamSys's own state. */
 void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code) {
     if (self->state == 0) {
         switch (code) {
@@ -416,7 +420,7 @@ void ObjM__EnterState4(ObjM *self) {
     self->state = 4;
     if (self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &color, -1) == 0) {
         phase = (self->frameCounter + self->stage) & 3;
-        t = phase;
+        t = phase; /* MATCHING: the copy keeps retail's extra move. */
         if (t == 0) {
             self->methods->notifyParents(self, 4);
             return;

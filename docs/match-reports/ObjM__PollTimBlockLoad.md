@@ -120,3 +120,10 @@ the TimBlockSrc fades to clearColor), `unk18` -> `farColor` (setFarColor
 otherwise), `unk1C` -> `fogNear` (setFogNear). Tier B for `colorMode`, whose
 two tested values are read by different methods for different choices.
 Zero bytes changed.
+
+## Round 95 (track 7, echo)
+
+Locals `ret` -> `timer`, `sel` -> `colorMode`; the failure path's `0x1E`
+is 30 (seconds, getSetDreamTimeLimit's unit per DreamSys.h's
+DREAM_TICKS_PER_SECOND). colorMode's values (1, 2) stay literals:
+StyleConfig belongs to include/class_3bb8c.h, proposed there as an enum.

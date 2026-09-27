@@ -78,3 +78,21 @@ GetGridRecordAt/GetGridRecordXY were declared K&R (unprototyped) and called
 with one argument until round 82's externcheck pass. OnRegistrantEvent's
 `code >= 0` branch leaves its incoming `code` in $a1 at the jal, so `code`
 is the second argument; the forwarded form is byte-identical.
+
+## Round 95 (track 7, echo)
+
+Renamed from `ObjM__OnRegistrantEvent` (`tools/rename.py`). Tier A: the
+body is a lookup leaf, and its one use is as the StageMap's chunkFileFn
+(ObjM__AttachTarget's setCallback; StageMap.h: ComputeChunkLoadEntry calls
+`chunkFileFn(ctx, value, 0, 0)` and keeps the result as the entry's file
+record). The name mirrors the two functions it forwards to,
+GetGridRecordAt and GetGridRecordXY. "Registrant event" described nothing
+the body does. Parameters: `code, arg2, arg3` -> `cell, x, y` (GetGridRecordAt's
+`sub` is a linear cell index; GetGridRecordXY takes x, y). ObjM.h's
+prototype follows.
+
+The body stays `void`: class_3bb8c.h declares GetGridRecordXY `void`
+although code_39094.c defines it returning `Rec1C *`, so the record is
+returned only because it is still in $v0. Proposed for the head: that
+prototype returns `Rec1C *` (or `void *`), after which this body can
+`return` both calls.
