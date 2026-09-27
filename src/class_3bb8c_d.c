@@ -97,11 +97,11 @@ void TitleMenu__Tick(TitleMenu *self) {
 }
 
 void TitleMenu__RefreshViewValue(TitleMenu *self) {
-    s32 buf;
+    s32 shake;
 
     Get_vtable_TaskCore()->refreshViewValue((TaskCore *)self);
-    buf = self->slotCounts[5];
-    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf);
+    shake = self->slotCounts[5];
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
 
 /* Sony's, linked from libc2 (config/psyq-objects.txt: libc2/strcpy,
@@ -124,8 +124,8 @@ extern void DecodeFullWidthSjis(void *dst, void *src);
 /* The setTarget override: `target` is the TaskCoreTarget the ctor passes
  * (&D_80086D44); only its `handle` is read, as the TextRow's texture. */
 void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
-    u32 size;
-    char *buf;
+    u32 cellCount;
+    char *text;
 
     if (target == NULL) {
         return;
@@ -134,15 +134,15 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
         strcpy(gSaveTitle + SAVE_TITLE_PADDING * 2, sSaveTitleBlanks);
         StampSaveTitleFileLetter(gSaveTitle, NULL);
     }
-    size = strlen(gSaveTitle);
-    size = (size >> 1) + 4;
-    buf = BMemPMgrAlloc(size);
-    DecodeFullWidthSjis(buf, gSaveTitle);
-    self->saveTitle = New_TextRow(target->handle, size, buf);
+    cellCount = strlen(gSaveTitle);
+    cellCount = (cellCount >> 1) + 4;
+    text = BMemPMgrAlloc(cellCount);
+    DecodeFullWidthSjis(text, gSaveTitle);
+    self->saveTitle = New_TextRow(target->handle, cellCount, text);
     self->saveTitle->visibleCount = 8;
     self->saveTitle->firstVisible = 4;
     self->saveTitle->gapIndex = 9;
-    BMemPMgrFree(buf);
+    BMemPMgrFree(text);
 }
 
 void TitleMenu__DestroySaveTitle(TitleMenu *self) {
@@ -162,22 +162,22 @@ void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
  * (SpriteRgb is three `s8`: three `lb`, then three `sb`), and each arm
  * indexes `base[sSaveTitleColorChannel]` directly. */
 void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
-    SpriteRgb buf;
-    u8 *base;
+    SpriteRgb rgb;
+    u8 *channels;
 
-    base = (u8 *)&buf;
+    channels = (u8 *)&rgb;
     Get_vtable_TaskCore()->broadcastToSlots((TaskCore *)self, (u8 *)color);
     if (self->inputMode != 0) {
-        base[0] = 0;
-        base[1] = 0;
-        base[2] = 0;
-        base[sSaveTitleColorChannel] = 0x80;
+        channels[0] = 0;
+        channels[1] = 0;
+        channels[2] = 0;
+        channels[sSaveTitleColorChannel] = 0x80;
     } else {
-        buf = *color;
+        rgb = *color;
         if (sSaveTitleColorFrame < 0x80) {
-            base[0] += 0x80;
+            channels[0] += 0x80;
         } else {
-            base[sSaveTitleColorChannel] += 0x80;
+            channels[sSaveTitleColorChannel] += 0x80;
         }
     }
     if (++sSaveTitleColorChannel >= 3) {
@@ -187,7 +187,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
     if (sSaveTitleColorFrame >= 0x101) {
         sSaveTitleColorFrame = 0;
     }
-    self->saveTitle->methods->setColor(self->saveTitle, &buf);
+    self->saveTitle->methods->setColor(self->saveTitle, &rgb);
 }
 
 /* CheckSaveScoreFlag is ALREADY MATCHED (src/class_3bb8c_c.c), as a genuinely
@@ -196,30 +196,30 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
  * receives. Same independent-arities situation already documented for
  * Get_vtable_TaskCore until round 84: this unit's own local view
  * matches what THIS call site needs. */
-extern void CheckSaveScoreFlag(void *arg0, void *arg1,
-                               void *arg2); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
+extern void CheckSaveScoreFlag(TitleMenu *self, TaskCoreTarget *target,
+                               struct DreamSys *dreamSys); /* arity-ok: the definition is 2-parameter and the callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the 3rd argument is byte-load-bearing here -- retail emits `lw a2,164(s0)` at 0x8004DE74 */
 
 void TitleMenu__RefreshMenu(TitleMenu *self) {
-    s32 size;
+    s32 cellCount;
     s32 origSlot;
-    char *buf1;
-    s32 buf2;
+    char *text;
+    s32 shake;
 
-    size = self->saveTitle->cellCount;
+    cellCount = self->saveTitle->cellCount;
     origSlot = self->activeSlot;
-    buf1 = BMemPMgrAlloc(size);
-    DecodeFullWidthSjis(buf1, gSaveTitle);
-    self->saveTitle->methods->setText(self->saveTitle, buf1);
-    BMemPMgrFree(buf1);
+    text = BMemPMgrAlloc(cellCount);
+    DecodeFullWidthSjis(text, gSaveTitle);
+    self->saveTitle->methods->setText(self->saveTitle, text);
+    BMemPMgrFree(text);
     CheckSaveScoreFlag(self, self->target, self->dreamSys);
     self->methods->updateSlotElements(self, self->unk14);
-    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf2);
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
     self->activeSlot = 5;
     self->methods->setState(self, 0xB);
-    self->methods->setSlotCursor(self, buf2, 1);
+    self->methods->setSlotCursor(self, shake, 1);
     self->methods->setState(self, 0xF);
     self->methods->setActiveSlot(self, origSlot, 0);
-    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf2);
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
 
 void TitleMenu__BeginCardAccess(TitleMenu *self) {
@@ -243,10 +243,10 @@ void TitleMenu__EndCardAccess(TitleMenu *self) {
 }
 
 void TitleMenu__SaveToCard(TitleMenu *self) {
-    s32 buf;
+    s32 shake;
 
-    buf = self->slotCounts[5];
-    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf);
+    shake = self->slotCounts[5];
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
     self->methods->beginCardAccess(self);
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
         sSaveFileName[0] = '\0';
