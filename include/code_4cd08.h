@@ -29,6 +29,9 @@
  * `SceneNode__LocalOffsetToWorldPos`'s `src` (that function's own signature, `code_d294.h`,
  * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
  * confirmed by SetDreamAuxWorld's walk over gDreamAuxSlots. */
+/* Slot i's entity uses mood row DREAM_AUX_FIRST_MOOD + i. */
+#define DREAM_AUX_FIRST_MOOD 98
+
 typedef struct DreamAuxSlot {
     struct ModelData *model;
     struct Entity *entity;
@@ -45,14 +48,18 @@ extern DreamAuxSlot gDreamAuxSlots2[1];
  * count 6-byte records whose first 2 bytes (`key`, read with `lh`) are the
  * only field LookupDreamAuxTrigger accesses. The remaining 4 bytes are undiscovered
  * from this unit alone. */
+/* The per-stage tables hold 14 pointers each (0x38 bytes between one
+ * table's label and the next). */
+#define DREAM_AUX_STAGE_COUNT 14
+
 typedef struct DreamAuxTriggerEntry {
     s16 key;
     s8 dayParity;
     s8 recordIndices[3];
 } DreamAuxTriggerEntry;
 
-extern s8 gDreamAuxTriggerCounts[];
-extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[];
+extern s8 gDreamAuxTriggerCounts[DREAM_AUX_STAGE_COUNT];
+extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[DREAM_AUX_STAGE_COUNT];
 
 /* "ETC\\SYMSPY.MOM" / "ETC\\SYMDOG.MOM" -- MOM = this game's audio-stream
  * format (per lsddecomp naming elsewhere in the project). Defined in
@@ -82,6 +89,25 @@ extern const char gMomPathSymDog[];
  *  - offset 0x4..0x7 (`entries`): up to 4 signed bytes, terminated early by
  *    a `-1` sentinel, each tried against SpawnDreamAuxTriggerEntity.
  * Everything else is undiscovered padding. */
+/* TriggerRecord.condition: CheckDreamAuxTriggerCondition's tests, by id. A
+ * negative condition tests -condition and passes only while the record has
+ * not triggered. Id 0 passes; 18, 19 and ids from 22 up reach the
+ * dream-colour test and index SPECIAL_COLORS past its 8 entries. */
+enum TriggerCondition {
+    TRIGGER_COND_ALWAYS = 1,
+    TRIGGER_COND_PERIOD_PHASE_1 = 2, /* 2..4: IsDayInPeriodPhase(day, id - 1) */
+    TRIGGER_COND_PERIOD_PHASE_2 = 3,
+    TRIGGER_COND_PERIOD_PHASE_3 = 4,
+    TRIGGER_COND_DAY_MOD3_IS_0 = 5,
+    TRIGGER_COND_DAY_MOD3_NOT_0 = 6,
+    TRIGGER_COND_STYLE_VARIANT_EVEN = 7, /* IsStyleVariantEven */
+    TRIGGER_COND_DAY_MOD3_IS_1 = 8,      /* 8, 9: day % 3 == id - 7 */
+    TRIGGER_COND_DAY_MOD3_IS_2 = 9,
+    TRIGGER_COND_DREAM_COLOR_FIRST = 10, /* 10..17: IsCurrentDreamColor */
+    TRIGGER_COND_EVEN_DAY = 20,
+    TRIGGER_COND_ODD_DAY = 21
+};
+
 typedef struct TriggerRecord {
     s8 triggered;
     s8 condition;
@@ -90,8 +116,8 @@ typedef struct TriggerRecord {
     s8 spawnIndices[4];
 } TriggerRecord;
 
-extern s8 gDreamAuxGroupCounts[];
-extern TriggerRecord *gDreamAuxGroupRecords[];
+extern s8 gDreamAuxGroupCounts[DREAM_AUX_STAGE_COUNT];
+extern TriggerRecord *gDreamAuxGroupRecords[DREAM_AUX_STAGE_COUNT];
 
 /* ProcessDreamAuxTriggerRecord's `world` is a TriggerWorld (gTriggerWorldMethods,
  * include/TriggerWorld.h; FireDreamAuxTriggerEntries gets it from

@@ -18,7 +18,7 @@ void InitDreamAux(void) {
     u32 i;
     s32 record;
 
-    for (i = 0; i < 14; i++) {
+    for (i = 0; i < ARRAY_COUNT(gDreamAuxGroupRecords); i++) {
         for (record = 0; record < gDreamAuxGroupCounts[i]; record++) {
             gDreamAuxGroupRecords[i][record].triggered = 0;
         }
@@ -26,7 +26,7 @@ void InitDreamAux(void) {
 
     ResourceRequest__Set(&req, 0, (char *)gMomPathSymSpy, 1);
 
-    for (i = 0; i < 1; i++) {
+    for (i = 0; i < ARRAY_COUNT(gDreamAuxSlots); i++) {
         gDreamAuxSlots[i].model = New_ModelData(&req.src);
         req.src.name = (char *)gMomPathSymDog;
     }
@@ -36,7 +36,7 @@ void ReleaseDreamAuxModels(void) {
     DreamAuxSlot *slot = gDreamAuxSlots;
     u32 i;
 
-    for (i = 0; i < 1; i++) {
+    for (i = 0; i < ARRAY_COUNT(gDreamAuxSlots); i++) {
         ModelData *model = slot->model;
 
         if (model != NULL) {
@@ -64,10 +64,10 @@ void SetDreamAuxWorld(s32 stage, s32 stageMap, DreamSys *world, s32 sound, s32 f
     gDreamAuxSound = (struct VabStreamObj *)sound;
     gDreamAuxFrameClock = (struct FrameClock *)frameClock;
 
-    for (i = 0; i < 1; i++) {
+    for (i = 0; i < ARRAY_COUNT(gDreamAuxSlots); i++) {
         s32 desc[4];
         desc[3] = (s32)slot->model;
-        slot->entity = New_Entity(i + 0x62, desc, gDreamAuxSound);
+        slot->entity = New_Entity(i + DREAM_AUX_FIRST_MOOD, desc, gDreamAuxSound);
         slot++;
     }
     SetTeleportsEnabled(stage);
@@ -76,23 +76,23 @@ void SetDreamAuxWorld(s32 stage, s32 stageMap, DreamSys *world, s32 sound, s32 f
 extern void SetInstantTeleportersEnabled(bool value);
 
 void SetTeleportsEnabled(s32 stage) {
-    SetInstantTeleportersEnabled(stage == 0xB || stage == 3);
+    SetInstantTeleportersEnabled(stage == 11 || stage == 3);
 }
 
 void EnableTeleportsForKind(s32 moodIndex) {
-    if (moodIndex == 0x4E) {
+    if (moodIndex == 78) {
         goto call;
     }
-    if (moodIndex < 0x4F) {
-        if (moodIndex == 0xB) {
+    if (moodIndex < 79) {
+        if (moodIndex == 11) {
             goto call;
         }
-        if (moodIndex == 0x38) {
+        if (moodIndex == 56) {
             goto call;
         }
         return;
     }
-    if (moodIndex != 0x5D) {
+    if (moodIndex != 93) {
         return;
     }
 call:
@@ -106,7 +106,7 @@ void ReleaseDreamAuxEntities(void) {
     i = 0;
     slot = gDreamAuxSlots2;
 
-    for (; i < 1; i++) {
+    for (; i < ARRAY_COUNT(gDreamAuxSlots2); i++) {
         Entity *entity = (Entity *)slot->model;
 
         if (entity != NULL) {
@@ -157,7 +157,7 @@ DreamAuxTriggerEntry *LookupDreamAuxTrigger(s16 *chunkKey) {
 DreamAuxTriggerEntry *RemapTriggerForDreamColor(DreamAuxTriggerEntry *trigger, s32 index) {
     s32 stage = gDreamAuxStage;
 
-    if (stage == 4 && index == 0x10) {
+    if (stage == 4 && index == 16) {
         DreamSys *player = gDreamAuxWorld;
         s32 color = player->methods->getDreamColor(player);
 
@@ -199,7 +199,7 @@ TriggerWorld *FireDreamAuxTriggerEntries(s32 day, DreamAuxTriggerEntry *trigger,
     if (world != NULL) {
         TriggerRecord *records = gDreamAuxGroupRecords[gDreamAuxStage];
         s8 *next = trigger->recordIndices;
-        s8 *end = trigger->recordIndices + 3;
+        s8 *end = trigger->recordIndices + ARRAY_COUNT(trigger->recordIndices);
 
         while (next < end) {
             s8 index = *next;
@@ -229,7 +229,7 @@ bool ProcessDreamAuxTriggerRecord(s32 day, DreamAuxTriggerEntry *trigger, Trigge
     EnableTeleportsForKind(record->moodIndex);
 
     spawn = record->spawnIndices;
-    end = record->spawnIndices + 4;
+    end = record->spawnIndices + ARRAY_COUNT(record->spawnIndices);
     model = world->methods->getModelData(world, record->modelIndex);
     desc[3] = (s32)model;
 
@@ -272,7 +272,7 @@ bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record) {
     s8 condition = record->condition;
     s32 id;
 
-    if (condition == 1) {
+    if (condition == TRIGGER_COND_ALWAYS) {
         goto success;
     }
 
@@ -290,47 +290,47 @@ negate:
 
 have_idx:
 
-    switch (id - 2) {
-        case 0:
-        case 1:
-        case 2:
+    switch (id) {
+        case TRIGGER_COND_PERIOD_PHASE_1:
+        case TRIGGER_COND_PERIOD_PHASE_2:
+        case TRIGGER_COND_PERIOD_PHASE_3:
             if (!IsDayInPeriodPhase(day, id - 1)) {
                 return false;
             }
             break;
-        case 3:
+        case TRIGGER_COND_DAY_MOD3_IS_0:
             if (day % 3 != 0) {
                 return false;
             }
             break;
-        case 4:
+        case TRIGGER_COND_DAY_MOD3_NOT_0:
             if (day % 3 == 0) {
                 return false;
             }
             break;
-        case 5:
+        case TRIGGER_COND_STYLE_VARIANT_EVEN:
             if (!IsStyleVariantEven()) {
                 return false;
             }
             break;
-        case 6:
-        case 7:
+        case TRIGGER_COND_DAY_MOD3_IS_1:
+        case TRIGGER_COND_DAY_MOD3_IS_2:
             if (day % 3 != id - 7) {
                 return false;
             }
             break;
-        case 18:
+        case TRIGGER_COND_EVEN_DAY:
             if ((day & 1) != 0) {
                 return false;
             }
             break;
-        case 19:
+        case TRIGGER_COND_ODD_DAY:
             if ((day & 1) == 0) {
                 return false;
             }
             break;
         default:
-            if (id >= 10) {
+            if (id >= TRIGGER_COND_DREAM_COLOR_FIRST) {
                 if (!IsCurrentDreamColor(id)) {
                     return false;
                 }
@@ -347,14 +347,17 @@ success:
  * condition `idx` (10..17). */
 bool IsCurrentDreamColor(s32 condition) {
     DreamSys *player = gDreamAuxWorld;
-    s32 color = SPECIAL_COLORS[condition - 10];
+    s32 color = SPECIAL_COLORS[condition - TRIGGER_COND_DREAM_COLOR_FIRST];
     s32 current = player->methods->getDreamColor(player);
 
     return color == current;
 }
 
+/* The length of the periods IsDayInPeriodPhase counts, in days. */
+#define DREAM_PERIOD_DAYS 30
+
 bool IsDayInPeriodPhase(s32 day, s32 phase) {
-    s32 period = (day - 1) / 30 + 1;
+    s32 period = (day - 1) / DREAM_PERIOD_DAYS + 1;
     s32 i;
 
     for (i = 0; i < 4; i++) {
@@ -434,6 +437,6 @@ void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *slot) {
         ((TodActorAttachToParentFn)slot->entity->methods->attachToParent)(
             (TodActor *)slot->entity, (TodActor *)gDreamAuxWorld, gDreamAuxFrameClock,
             (void *)gDreamAuxStageMap, worldPos);
-        SceneNode__FaceTarget((SceneNode *)slot->entity, (SceneNode *)gDreamAuxWorld, 1, 0, 0);
+        SceneNode__FaceTarget((SceneNode *)slot->entity, (SceneNode *)gDreamAuxWorld, 1, 0, NULL);
     }
 }
