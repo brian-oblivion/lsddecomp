@@ -907,7 +907,7 @@ segments:
       # code_179d8_c_b, which DID have to carry its attach across.
       - [0x20ADC, c, code_179d8_j]
       - [0x20FF0, o, libsnd/vm_prog]    # SpuVmSet/GetProgVol, SpuVmSet/GetProgPan
-      - [0x21180, c, code_179d8_j_b]
+      - [0x21180, c, libsnd_vm_vol_ut_key_ut_keyv]
       # ROUND 34, SECOND split of the same original slice: `libsnd/ut_pb`
       # (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244 = `SsUtPitchBend`, which
       # was func_800319B4 and had been MATCHED as C.  It sits in the MIDDLE of

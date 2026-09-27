@@ -1,5 +1,5 @@
 /*
- * code_179d8_j_b -- five functions of Sony's libsnd voice manager
+ * libsnd_vm_vol_ut_key_ut_keyv -- five functions of Sony's libsnd voice manager
  * (vmanager), carried as C: SpuVmSetVol, SsUtKeyOn, SsUtKeyOff, SsUtKeyOnV
  * and SsUtKeyOffV. Retail's vmanager is a build no SDK disc carries, so it
  * never placed as an object; progress.py counts these functions as library
@@ -219,7 +219,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     return result;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SpuVmSetVol);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SpuVmSetVol);
 #endif
 #ifdef NON_MATCHING
 /* NON_MATCHING: 252/252 words, length exact; raw word-match 65/252,
@@ -317,7 +317,7 @@ fail_nolock:
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOn);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOn);
 #endif
 
 s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
@@ -458,7 +458,7 @@ fail:
     return -1;
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOnV);
+INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOnV);
 #endif
 
 /* The "release channel" twin of SsUtKeyOff's else-branch above: same

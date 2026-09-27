@@ -7,7 +7,7 @@ from the MATCHED sibling `SsUtKeyOff`'s idiom, and the local names
 (`chan`, `mask0`, `mask1`) are that sibling's own, reused deliberately rather
 than re-invented.**
 
-Unit: `src/code_179d8_j_b.c`. 73 words (0x124 bytes), file offset `0x22090`,
+Unit: `src/libsnd_vm_vol_ut_key_ut_keyv.c`. 73 words (0x124 bytes), file offset `0x22090`,
 vram `0x80031890`.
 
 ## The closing body
@@ -74,7 +74,7 @@ target's retail `.s` -- do not read the sibling's C.**
 
 `SsUtKeyOff` sits about 1500 bytes up the same unit, is byte-exact against
 retail, and its `else` branch is this function's whole body. Dumping
-`build/src/code_179d8_j_b.c.o` and reading its tail gives, in order:
+`build/src/libsnd_vm_vol_ut_key_ut_keyv.c.o` and reading its tail gives, in order:
 
 ```
 sb   zero, D_8008D9A3[chan]
@@ -202,7 +202,7 @@ Two corollaries, both paid for here:
 
 ## Disposition
 
-**MATCHED.** C committed in `src/code_179d8_j_b.c` in ROM-address order (last
+**MATCHED.** C committed in `src/libsnd_vm_vol_ut_key_ut_keyv.c` in ROM-address order (last
 function in the unit), with a comment pointing at the sibling relationship so
 the next reader does not have to re-derive it. `./build-and-verify.sh` green,
 `git status --porcelain` empty. The round-23 `volatile D_8008EA26` and

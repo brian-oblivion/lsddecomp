@@ -12,7 +12,7 @@
  *
  * code_179d8_j_c -- the TAIL of the old code_179d8_j slice, split off in round
  * 34 (2026-09-12) when Sony's `libsnd/ut_pb.o` was linked into the middle of
- * `code_179d8_j_b`.  Now 0x22244..0x2273C (vram 0x80031A44..0x80031F3C), eight
+ * `libsnd_vm_vol_ut_key_ut_keyv`.  Now 0x22244..0x2273C (vram 0x80031A44..0x80031F3C), eight
  * functions (SsUtChangePitch .. SsUtAutoPan).
  *
  * WHY THE SPLIT EXISTS.  `func_800319B4` is Sony's `SsUtPitchBend`
@@ -20,11 +20,11 @@
  * covering exactly that one function).  It had been MATCHED as C;
  * reclassifying it out of the game count is the correction CLAUDE.md asks for,
  * not a regression.  A placed object cannot live inside a `c` segment, so
- * `code_179d8_j_b` became [c][o][c] and this half needed its own name.
+ * `libsnd_vm_vol_ut_key_ut_keyv` became [c][o][c] and this half needed its own name.
  *
  * This is the SECOND split of the same original slice in the same round --
  * `libsnd/vm_prog` took 0x20FF0..0x21180 first, which is what created
- * `code_179d8_j_b`.  Hence the `_c` suffix: `_b` was already taken.  The
+ * `libsnd_vm_vol_ut_key_ut_keyv`.  Hence the `_c` suffix: `_b` was already taken.  The
  * precedent for a second-generation split name is the yaml's own note on
  * `<unit>_b` / `<unit>_c`.
  *

@@ -632,7 +632,7 @@ declared in this unit but only used by functions still `INCLUDE_ASM`
 function) -- the field renames are live in `src/code_179d8_m.c` now (pure
 documentation, nothing compiled references them yet); the base symbols
 themselves (`D_8008E970`, `D_8008E978`) were not renamed since
-`D_8008E978` is shared with bravo's live `code_179d8_j_b.c` this round
+`D_8008E978` is shared with bravo's live `libsnd_vm_vol_ut_key_ut_keyv.c` this round
 (see broadcast).
 
 ## NON_MATCHING body promoted, round 67

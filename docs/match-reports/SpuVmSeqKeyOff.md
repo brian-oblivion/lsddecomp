@@ -238,7 +238,7 @@ round 23 already showed backfires.
 body into `src/code_179d8_j.c` (with this unit's own local reduced-view
 declarations for `D_8008E9D0`, `D_8008D996`/`D_8008D9A3`/`_svm_voice`/
 `D_8008D98C`, `D_8008EA26`, `D_80090C60`/`D_80090C64`, `D_8008E228`/
-`D_8008E22C`, copied from `code_179d8_j_b.c`'s equivalents per this
+`D_8008E22C`, copied from `libsnd_vm_vol_ut_key_ut_keyv.c`'s equivalents per this
 project's per-unit reduced-local-view convention) and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `funcdiff.py` shows **45/85
 raw word-match with NO out-of-range drift warning** -- the compiled length
@@ -324,7 +324,7 @@ GCC 2.6.3's loop-invariant motion then hoists the `(set (reg) (symbol_ref))`
 into the preheader and the build emits retail's `lui t2,%hi(D_8008EA26)` /
 `addiu t2,t2,%lo(D_8008EA26)` / `sh ...,0(t2)` **byte-for-byte**. The global
 is still declared `extern volatile u16 D_8008EA26;` (as its matched sibling
-`SsUtKeyOff` in `code_179d8_j_b.c` declares it), so the read-back
+`SsUtKeyOff` in `libsnd_vm_vol_ut_key_ut_keyv.c` declares it), so the read-back
 `bankIdx = D_8008EA26;` still compiles to a fresh `lui`/`lhu %lo` -- which is
 exactly retail's own asymmetry between the store and the reload, and the
 thing that made the residue look unexplainable.
@@ -369,7 +369,7 @@ loop-carried copy of the induction variable.
 
 ```c
 #if 0
-/* file-local reduced view, all already present in code_179d8_j_b.c under
+/* file-local reduced view, all already present in libsnd_vm_vol_ut_key_ut_keyv.c under
  * the same names/types -- keep them local to the unit, not in a header */
 extern u8 D_8008E9D0;
 extern volatile u16 D_8008EA26;
@@ -812,7 +812,7 @@ local is what distinguishes them, and it is load-bearing.
 
 ```c
 #if 0
-/* file-local reduced view, all already present in code_179d8_j_b.c under
+/* file-local reduced view, all already present in libsnd_vm_vol_ut_key_ut_keyv.c under
  * the same names/types -- keep them local to the unit, not in a header */
 extern u8 D_8008E9D0;
 extern volatile u16 D_8008EA26;
@@ -976,4 +976,4 @@ instruction's operand order, the lever is the destination, not the operands.
 
 ## Track 2 (round 86, 2026-09-26, alpha)
 
-This function is still `INCLUDE_ASM` and its C was not touched, but the per-field symbols this report uses (`D_8008D988`..`D_8008D9BA` at a 0x34 stride) are ONE Sony table: libsnd/vmanager.o's `_svm_voice` (0x8008D988, 24 x 0x34 = 0x4E0 bytes), typed in `include/SvmData.h` with fields by offset (`D_8008D98C` is `_svm_voice[i].unk04`, `D_8008D9A3` is `unk1B`, and so on: address minus 0x8008D988). The next attempt should write `_svm_voice[i].unkNN`: in every converted accessor (code_179d8_j_b/j_c/l/m/p) the struct spelling compiled byte-identically to the separate symbols, and two NON_MATCHING bodies moved closer to retail. The other `D_` spellings in preserved bodies below still link (splat keeps them as auto-symbols); `D_8008D988` itself now reads `_svm_voice` above, since that address is the table's own symbol.
+This function is still `INCLUDE_ASM` and its C was not touched, but the per-field symbols this report uses (`D_8008D988`..`D_8008D9BA` at a 0x34 stride) are ONE Sony table: libsnd/vmanager.o's `_svm_voice` (0x8008D988, 24 x 0x34 = 0x4E0 bytes), typed in `include/SvmData.h` with fields by offset (`D_8008D98C` is `_svm_voice[i].unk04`, `D_8008D9A3` is `unk1B`, and so on: address minus 0x8008D988). The next attempt should write `_svm_voice[i].unkNN`: in every converted accessor (libsnd_vm_vol_ut_key_ut_keyv/j_c/l/m/p) the struct spelling compiled byte-identically to the separate symbols, and two NON_MATCHING bodies moved closer to retail. The other `D_` spellings in preserved bodies below still link (splat keeps them as auto-symbols); `D_8008D988` itself now reads `_svm_voice` above, since that address is the table's own symbol.
