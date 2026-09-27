@@ -445,3 +445,9 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 98, charlie)
+
+Moved here from the `.c` comment: "Notify every cell of every rectangle, and every object chained behind each cell. Matched round 71: the ORDER of the comma-separated increments is load-bearing in both loops (`entry++, i++` and `cell++, col++`); the reverse order was the whole 95/117 residue." The comment keeps the description and a `MATCHING:` line. Locals `entry` -> `rect`, `obj` -> `chained`; `20` is `STAGE_CHUNK_CELLS`.
+
+Measured this round: writing the `*(u16 *)&self->curCell = *(u16 *)&self->targetCell` copy as two byte stores (`curCell.b0 = targetCell.base.b0; curCell.b1 = ...b1`) breaks the image, so the halfword copy carries a `MATCHING:` line.

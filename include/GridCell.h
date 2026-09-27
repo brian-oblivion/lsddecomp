@@ -65,6 +65,12 @@ typedef struct GridCellMethods GridCellMethods;
     SCENENODE_FIELDS(Methods) /* no own fields; the object is 0x3C bytes (New_GridCell), see the banner */
 /* clang-format on */
 
+/* flags36 (a placement record's cellFlags, PopulateSlotCells): the cell
+ * takes the commands StageMap hands the cells under a sender's footprint
+ * (NotifyGridCell skips a cell without it). DreamSys__NotifyLinkAttempt
+ * reads the low seven bits of the same word as a voice index. */
+#define GRIDCELL_FLAG_TAKES_COMMANDS 0x80
+
 struct GridCellMethods {
     GRIDCELL_SLOTS(GridCell, (GridCell * self));
 };

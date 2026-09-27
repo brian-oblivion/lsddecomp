@@ -85,3 +85,7 @@ table family may read them.
 deleted. `sound` is cast to `VabStreamObj *` (`include/VabStreamObj.h`) and
 calls `playTone`, the same slot at the same type. The whole image stays
 byte-identical. `TimedTask::sound` stays `BasicClass *`.
+
+## Track 7 (2026-09-27, round 98, charlie)
+
+`playTone(sound, tone, 0x7F, 0x7F)` -> decimal `127, 127` (volumes are levels, decimal by the base rule; libsnd volumes run 0..127). No name: none exists in Sony's headers and one would restate the value. Comment now says it plays at full volume.

@@ -6,25 +6,25 @@
  *
  * This third holds the object's life and its command path: the allocator
  * and ctor (seven slots, each an LbdFile, a placement list, a cellParent
- * GridCell attached at `origin` and 410 cells on a 0x800 lattice, row stride
- * 20), Finalize, OnNotify, Reset, OnSlotEvent, the per-tick update
- * (UpdateIfEnabled: footprint tracking, then the scale ramp), UnloadAllSlots,
- * the setters ObjM configures it through (SetChildParams, SetCallback,
- * SetAcceptedTags, SetGridSpan, SetConfig), and the path a command takes to
- * the cells: DispatchLinkCommand and ForwardAcceptedCommand filter the
- * sender against acceptedTags, ApplyToSenderFootprint turns the sender's
- * position into one cell rectangle (SetFootprintFromCell or
- * SetFootprintRect), and DispatchToRectCells hands the command to every cell
- * in it and every cell chained behind each (NotifyGridCell).
- *
- * func_8004B324 is the empty +0x0D8 stub; nothing calls it, so it keeps its
- * placeholder name, like SceneNode__NoOpSlot5C in code_d294_b.
+ * GridCell attached at `origin` and STAGE_SLOT_CELLS cells STAGE_CELL_SIZE
+ * apart, row stride STAGE_CHUNK_CELLS), Finalize, OnNotify, Reset,
+ * OnSlotEvent, the per-tick update (UpdateIfEnabled: footprint tracking,
+ * then the scale ramp), UnloadAllSlots, the setters ObjM configures it
+ * through (SetChildParams, SetCallback, SetAcceptedTags, SetGridSpan,
+ * SetConfig), and the path a command takes to the cells:
+ * DispatchLinkCommand passes on an Actor sender's, ForwardAcceptedCommand
+ * filters the sender against acceptedTags, ApplyToSenderFootprint turns
+ * the sender's position into a 3 x 3 cell footprint (SetFootprintFromCell
+ * or SetFootprintRect), and DispatchToRectCells hands the command to every
+ * cell in it and every cell chained behind each (NotifyGridCell).
+ * StageMap__NoOpSlotD8 is the empty +0x0D8 slot; nothing calls it.
  */
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include "StageMap.h"
+#include "Actor.h"
 #include "VabStreamObj.h"
 #include "LightRig.h"
 #include "TimedTask.h"
@@ -34,17 +34,16 @@
 #include "LbdFile.h"
 #include "GridCell.h"
 #include "FlatLightObj.h"
-
-extern void *BMemPMgrAlloc(s32 size);
+#include "BMemPMgr.h"
 
 /* TimedTask::sound is BasicClass * (it may be the ctor's own argument); when
- * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. */
-
+ * it is a New_VabStreamObj object, +0x080 is VabStreamObj__PlayTone. Plays
+ * `tone` at full volume (127) throughout. */
 void TimedTask__PlaySound(TimedTask *self, s32 tone) {
     VabStreamObj *sound = (VabStreamObj *)self->sound;
 
     if (sound != NULL) {
-        sound->methods->playTone(sound, tone, 0x7F, 0x7F);
+        sound->methods->playTone(sound, tone, 127, 127);
     }
 }
 
@@ -55,7 +54,7 @@ TimedTaskMethods *GetTimedTaskMethods(void) {
 StageMap *New_StageMap(LongVec3 *origin, s32 autoLoad) {
     StageMap *self;
 
-    self = BMemPMgrAlloc(0x1E8);
+    self = BMemPMgrAlloc(sizeof(StageMap));
     if (self != NULL) {
         GetStageMapMethods()->ctor(self, origin, autoLoad);
         return self;
@@ -63,21 +62,16 @@ StageMap *New_StageMap(LongVec3 *origin, s32 autoLoad) {
     return NULL;
 }
 
-/*
- * StageMap__StageMap's own helpers -- all still-uncarved elsewhere, typed
- * purely from this call site's own register usage.
- */
-extern void BMemPMgrFree(void *arg1);
 extern LongVec3 gDefaultOrigin;
 
 void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     s32 i;
-    ChunkSlot *entry;
-    GridCell *obj;
-    GridCell **cellp;
-    u8 *p;
-    u8 *end;
-    s32 buf[3];
+    ChunkSlot *slot;
+    GridCell *cell;
+    GridCell **cells;
+    GridCell **cursor;
+    GridCell **end;
+    LongVec3 pos;
 
     GetLightRigMethods()->ctor((LightRig *)self);
     self->methods = GetStageMapMethods();
@@ -93,54 +87,59 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     self->chunksLoaded = 0;
     self->enabled = 0;
     self->target = NULL;
-    self->acceptedTags = 0;
+    self->acceptedTags = NULL;
     self->scaleRampTicks = 0;
 
-    for (i = 0; i < 7; i++) {
-        entry = &self->slots[i];
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
+        slot = &self->slots[i];
 
-        entry->loader = New_LbdFile();
-        entry->loader->freeGuard = (entry->loader->buffer != NULL);
-        entry->loader->elemKey = i;
-        entry->loader->methods->setAutoLoadData(entry->loader, autoLoad);
+        slot->loader = New_LbdFile();
+        slot->loader->freeGuard = (slot->loader->buffer != NULL);
+        slot->loader->elemKey = i;
+        slot->loader->methods->setAutoLoadData(slot->loader, autoLoad);
 
-        entry->heldObj = NULL;
-        entry->unk18 = 0;
-        entry->neighbour = i;
-        entry->loadPending = 0;
+        slot->heldObj = NULL;
+        slot->unk18 = 0;
+        slot->neighbour = i;
+        slot->loadPending = 0;
 
-        entry->placements = New_PlacementGrid(0);
-        entry->cellParent = New_GridCell();
-        entry->cellParent->methods->attachToParent(entry->cellParent, (SceneNode *)self, &self->origin);
+        slot->placements = New_PlacementGrid(0);
+        slot->cellParent = New_GridCell();
+        slot->cellParent->methods->attachToParent(slot->cellParent, (SceneNode *)self, &self->origin);
 
-        entry->cells = (GridCell **)BMemPMgrAlloc(0x668);
-        if (entry->cells == NULL) {
+        slot->cells = (GridCell **)BMemPMgrAlloc(STAGE_SLOT_CELLS * sizeof(GridCell *));
+        if (slot->cells == NULL) {
             return;
         }
 
-        buf[0] = 0x400;
-        buf[1] = 0;
-        buf[2] = 0x400;
+        pos.x = STAGE_CELL_SIZE / 2;
+        pos.y = 0;
+        pos.z = STAGE_CELL_SIZE / 2;
 
-        cellp = entry->cells;
-        end = (u8 *)cellp + 0x668;
-        p = (u8 *)cellp;
-        while (p < end) {
-            obj = New_GridCell();
-            *(GridCell **)p = obj;
-            obj->methods->attachToParent(obj, (SceneNode *)entry->cellParent, (LongVec3 *)buf);
+        /* MATCHING: `end` from `cells` before `cursor = cells`, or the load
+         * of slot->cells no longer goes through $v0. */
+        cells = slot->cells;
+        end = cells + STAGE_SLOT_CELLS;
+        cursor = cells;
+        while (cursor < end) {
+            cell = New_GridCell();
+            *cursor = cell;
+            cell->methods->attachToParent(cell, (SceneNode *)slot->cellParent, &pos);
 
-            buf[0] += 0x800;
-            if (buf[0] > 0xA400) {
-                buf[0] = 0x400;
-                buf[2] += 0x800;
+            /* Cell centres, row by row; the test lets a row reach
+             * STAGE_CHUNK_CELLS + 1 positions before it wraps. */
+            pos.x += STAGE_CELL_SIZE;
+            if (pos.x > STAGE_CHUNK_SIZE + STAGE_CELL_SIZE / 2) {
+                pos.x = STAGE_CELL_SIZE / 2;
+                pos.z += STAGE_CELL_SIZE;
             }
 
-            obj = *(GridCell **)p;
-            obj->methods->setLightMode(obj, 1);
-            obj = *(GridCell **)p;
-            p += 4;
-            obj->attribute |= 0x80000000;
+            /* MATCHING: each use reloads *cursor. */
+            cell = *cursor;
+            cell->methods->setLightMode(cell, 1); /* GsFOG */
+            cell = *cursor;
+            cursor++;
+            cell->attribute |= GsDOFF;
         }
     }
 
@@ -150,54 +149,52 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
 
 void StageMap__Finalize(StageMap *self) {
     s32 i;
-    ChunkSlot *entry;
-    GridCell *obj;
-    GridCell **cellp;
-    u8 *p;
-    u8 *end;
+    ChunkSlot *slot;
+    GridCell *cell;
+    GridCell **cells;
+    GridCell **cursor;
+    GridCell **end;
 
     self->methods->removeChild(self, (BasicClass *)GetDrawSystem());
 
-    for (i = 0; i < 7; i++) {
-        entry = &self->slots[i];
-        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
+        slot = &self->slots[i];
+        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, STAGEMAP_EVENT_SLOT_RELEASE,
+                                                               slot, i);
 
-        if (entry->loader != NULL) {
-            entry->loader->methods->release(entry->loader);
+        if (slot->loader != NULL) {
+            slot->loader->methods->release(slot->loader);
         }
 
-        if (entry->placements != NULL) {
-            if (entry->placements->linkResource != NULL) {
-                entry->placements->linkResource->methods->release(entry->placements->linkResource);
+        if (slot->placements != NULL) {
+            if (slot->placements->linkResource != NULL) {
+                slot->placements->linkResource->methods->release(slot->placements->linkResource);
             }
-            entry->placements = entry->placements->methods->release(entry->placements);
+            slot->placements = slot->placements->methods->release(slot->placements);
         }
 
-        if (entry->cellParent != NULL) {
-            entry->cellParent->methods->release(entry->cellParent);
+        if (slot->cellParent != NULL) {
+            slot->cellParent->methods->release(slot->cellParent);
         }
 
-        cellp = entry->cells;
-        end = (u8 *)cellp + 0x668;
-        p = (u8 *)cellp;
-        while (p < end) {
-            obj = *(GridCell **)p;
-            if (obj != NULL) {
-                obj->methods->release(obj);
+        cells = slot->cells;
+        end = cells + STAGE_SLOT_CELLS;
+        cursor = cells;
+        while (cursor < end) {
+            cell = *cursor;
+            if (cell != NULL) {
+                cell->methods->release(cell);
             }
-            p += 4;
+            cursor++;
         }
 
-        BMemPMgrFree(entry->cells);
+        BMemPMgrFree(slot->cells);
     }
 
     GetLightRigMethods()->finalize((LightRig *)self);
 }
 
-/* GetSceneNodeMethods: include/SceneNode.h. Round 59 measured the two
- * arguments these calls used to pass the no-argument getter as zero-cost (the
- * jal's delay slot holds a callee-save spill); track 4 dropped them. */
-
+/* A sender of DrawSystem's class (id nibble 0x1) goes on to onNotifyTag1. */
 void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command) {
     GetSceneNodeMethods()->onNotify((SceneNode *)self, sender, command);
 
@@ -210,7 +207,7 @@ extern s32 gDefaultGridSpan;
 
 void StageMap__Reset(StageMap *self) {
     self->config = NULL;
-    self->acceptedTags = 0;
+    self->acceptedTags = NULL;
     self->rectCount = 0;
     self->methods->setGridSpan(self, gDefaultGridSpan);
     self->unk1CC = -1;
@@ -219,22 +216,26 @@ void StageMap__Reset(StageMap *self) {
     self->unk1D8 = -1;
 }
 
-void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *elem) {
+/* Records the slot and passes a slot event on to the parents; a
+ * STAGEMAP_EVENT_SLOT_RELEASE also releases the slot's heldObj. */
+void StageMap__OnSlotEvent(StageMap *self, s32 command, ChunkSlot *slot) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, command);
 
-    if (command == 6)
-        goto handle6;
-    if (command == 7)
-        goto merge;
+    /* MATCHING: two literal if+goto tests; an if/else-if chain inverts the
+     * branches. */
+    if (command == STAGEMAP_EVENT_SLOT_RELEASE)
+        goto release;
+    if (command == STAGEMAP_EVENT_SLOT_DATA_READY)
+        goto record;
     return;
 
-handle6:
-    if (elem->heldObj != NULL) {
-        elem->heldObj = elem->heldObj->methods->release(elem->heldObj);
+release:
+    if (slot->heldObj != NULL) {
+        slot->heldObj = slot->heldObj->methods->release(slot->heldObj);
     }
 
-merge:
-    self->lastEventSlot = elem;
+record:
+    self->lastEventSlot = slot;
     self->methods->notifyParents(self, command);
 }
 
@@ -246,31 +247,31 @@ void StageMap__UpdateIfEnabled(StageMap *self) {
 }
 
 void StageMap__DispatchLinkCommand(StageMap *self, BasicClass *sender, s32 command) {
-    if ((u8)sender->methods->header == 0x34) {
+    if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
         self->methods->forwardAcceptedCommand(self, sender, command);
     }
 }
 
-/* Reset every one of the seven grid elements, then the two counters.
- * Matched round 71: `&self->slots[i]` is what produces retail's
- * base + running-offset walk (GCC's strength reduction), not a hand-rolled
- * byte offset. */
+/* Cancel every slot's load, clear and release what it holds, then zero
+ * the load counters and end the scale ramp. */
 void StageMap__UnloadAllSlots(StageMap *self) {
     s32 i;
-    ChunkSlot *entry;
-    PlacementGrid *list;
+    ChunkSlot *slot;
+    PlacementGrid *placements;
 
-    for (i = 0; i < 7; i++) {
-        entry = &self->slots[i];
-        entry->loader->methods->cancelRequests(entry->loader);
-        entry->loadPending = 0;
-        self->methods->clearSlotCells(self, entry);
-        list = entry->placements;
-        if (list->linkResource != NULL) {
-            list->linkResource = list->linkResource->methods->release(list->linkResource);
+    for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
+        slot = &self->slots[i];
+        slot->loader->methods->cancelRequests(slot->loader);
+        slot->loadPending = 0;
+        self->methods->clearSlotCells(self, slot);
+        placements = slot->placements;
+        if (placements->linkResource != NULL) {
+            placements->linkResource =
+                placements->linkResource->methods->release(placements->linkResource);
         }
-        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, entry, i);
-        entry->loader->methods->releaseDataBlock(entry->loader);
+        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, STAGEMAP_EVENT_SLOT_RELEASE,
+                                                               slot, i);
+        slot->loader->methods->releaseDataBlock(slot->loader);
     }
 
     self->chunksLoaded = 0;
@@ -285,9 +286,9 @@ void StageMap__SetChildParams(StageMap *self, s32 count, s32 dirs, s32 colors) {
     for (i = 0; i < count; i++) {
         light = (FlatLightObj *)self->methods->getLight(self, i);
         light->methods->setColor(light, 1, (FlatLightColor *)colors);
-        colors += 3;
+        colors += sizeof(FlatLightColor);
         light->methods->setDirection(light, 1, (s16 *)dirs);
-        dirs += 6;
+        dirs += 3 * sizeof(s16);
     }
 }
 
@@ -301,8 +302,8 @@ void StageMap__SetAcceptedTags(StageMap *self, s32 *tags) {
 }
 
 void StageMap__ForwardAcceptedCommand(StageMap *self, void *sender, s32 command) {
-    s32 *p;
-    u8 unused[24];
+    s32 *tag;
+    u8 unused[24]; /* MATCHING: retail's frame is 24 bytes larger than the locals need */
 
     switch (command) {
         case 2:
@@ -316,24 +317,24 @@ void StageMap__ForwardAcceptedCommand(StageMap *self, void *sender, s32 command)
             return;
     }
 
-    p = self->acceptedTags;
-    if (p == NULL)
+    tag = self->acceptedTags;
+    if (tag == NULL)
         return;
-    if (*p == 0)
+    if (*tag == 0)
         return;
 
     do {
-        if (*p == ((BasicClass *)sender)->methods->header) {
+        if (*tag == ((BasicClass *)sender)->methods->header) {
             self->methods->applyToSenderFootprint(self, sender, command);
         }
-        p++;
-    } while (*p != 0);
+        tag++;
+    } while (*tag != 0);
 }
 
 void StageMap__ApplyToSenderFootprint(StageMap *self, SceneNode *sender, s32 command) {
     SplitLongVec3 *pos;
-    CellRectSet saved;
-    Descriptor10Ext buf;
+    CellRectSet savedRects;
+    Descriptor10Ext desc;
     s32 savedRectCount;
 
     if (sender->parent != NULL) {
@@ -342,40 +343,41 @@ void StageMap__ApplyToSenderFootprint(StageMap *self, SceneNode *sender, s32 com
         pos = NULL;
     }
 
-    if (self->methods->computeFootprintDescriptor(self, &buf, pos) != 0) {
+    if (self->methods->computeFootprintDescriptor(self, &desc, pos) != 0) {
         return;
     }
 
     savedRectCount = self->rectCount;
-    saved = self->rects;
+    savedRects = self->rects;
 
     if (self->config->isVertical == 0) {
-        StageMap__SetFootprintFromCell(self, &buf, 3);
+        StageMap__SetFootprintFromCell(self, &desc, 3);
     } else {
-        StageMap__SetFootprintRect(self, &buf, 3);
+        StageMap__SetFootprintRect(self, &desc, 3);
     }
 
     StageMap__DispatchToRectCells(self, sender, command);
 
     self->rectCount = savedRectCount;
-    self->rects = saved;
+    self->rects = savedRects;
 }
 
 void StageMap__SetFootprintFromCell(StageMap *self, Descriptor10Ext *desc, s32 span) {
-    s16 t;
+    s16 row;
 
     self->footprintCol = desc->base.b2 - 1;
-    t = desc->base.b3 - 1;
+    row = desc->base.b3 - 1;
     self->footprintWidth = span;
     self->footprintHeight = span;
-    self->footprintRow = t;
+    self->footprintRow = row;
     StageMap__BuildFootprintRects(self);
 }
 
-/* Clamp a span x span footprint centred on desc's cell to the 20 x 20 grid:
- * a cell on the low edge (0) loses one row/column, one on the high edge
- * (0x13) loses one too. The edge tests read a COPY of each byte taken before
- * the decrement, and the height companion is `span` itself. Matched round 71. */
+/* Clamp a span x span footprint centred on desc's cell to the chunk's
+ * STAGE_CHUNK_CELLS x STAGE_CHUNK_CELLS lattice: a cell on the low edge (0)
+ * or the high edge loses one row/column there.
+ * MATCHING: the edge tests read copies taken before the decrement, and the
+ * height is `span` itself. */
 void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span) {
     s32 col;
     s32 row;
@@ -394,7 +396,7 @@ void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span)
     } else {
         col--;
     }
-    if (origCol == 0x13) {
+    if (origCol == STAGE_CHUNK_CELLS - 1) {
         width--;
     }
 
@@ -403,7 +405,7 @@ void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span)
     } else {
         row--;
     }
-    if (origRow == 0x13) {
+    if (origRow == STAGE_CHUNK_CELLS - 1) {
         span--;
     }
 
@@ -416,51 +418,43 @@ void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span)
 }
 
 /* Notify every cell of every rectangle, and every object chained behind
- * each cell. Matched round 71: the ORDER of the comma-separated increments
- * is load-bearing in both loops (`entry++, i++` and `cell++, col++`); the
- * reverse order was the whole 95/117 residue. */
+ * each cell, with the cell's key in curCell while it is notified.
+ * MATCHING: the comma increments go `rect++, i++` and `cell++, col++`. */
 void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 command) {
     s32 i;
     s32 row;
     s32 col;
-    CellRect *entry;
+    CellRect *rect;
     ChunkSlot *slot;
     GridCell **cell;
-    GridCell *obj;
+    GridCell *chained;
 
-    entry = self->rects.e;
-    for (i = 0; i < self->rectCount; entry++, i++) {
-        slot = &self->slots[entry->slotIndex];
+    rect = self->rects.e;
+    for (i = 0; i < self->rectCount; rect++, i++) {
+        slot = &self->slots[rect->slotIndex];
         if (slot->loader->headerReady != 0) {
-            cell = (slot->cells + entry->col) + entry->row * 20;
-            for (row = 0; row < entry->height; row++) {
-                for (col = 0; col < entry->width; cell++, col++) {
+            cell = (slot->cells + rect->col) + rect->row * STAGE_CHUNK_CELLS;
+            for (row = 0; row < rect->height; row++) {
+                for (col = 0; col < rect->width; cell++, col++) {
+                    /* MATCHING: b0/b1 as one halfword; two byte copies are two lb/sb */
                     *(u16 *)&self->curCell = *(u16 *)&self->targetCell;
-                    self->curCell.b2 = entry->col + col;
-                    self->curCell.b3 = entry->row + row;
+                    self->curCell.b2 = rect->col + col;
+                    self->curCell.b3 = rect->row + row;
                     NotifyGridCell(*cell, sender, command);
-                    for (obj = (*cell)->nextInCell; obj != NULL; obj = obj->nextInCell) {
-                        NotifyGridCell(obj, sender, command);
+                    for (chained = (*cell)->nextInCell; chained != NULL; chained = chained->nextInCell) {
+                        NotifyGridCell(chained, sender, command);
                     }
                 }
-                cell += 20 - entry->width;
+                cell += STAGE_CHUNK_CELLS - rect->width;
             }
         }
     }
 }
 
-/* Widened this round (StageMap__DispatchToRectCells) from a single-param signature to
- * accept two more, unused, forwarded params: StageMap__DispatchToRectCells's own call
- * sites explicitly set up $a1/$a2 before every call here (unlike
- * GetSceneNodeMethods's "leftover, already-there" args -- these are real,
- * explicit `move` instructions), so the call itself needs a matching
- * 3-param prototype to compile. Confirmed harmless to THIS function's own
- * already-matched body: neither extra param is read, and GCC does not
- * reserve stack space for unused trailing integer/pointer args on this
- * target, so the definition's own bytes are unaffected (reverified
- * 18/18 after the widening). */
+/* Hands the command to a cell flagged GRIDCELL_FLAG_TAKES_COMMANDS. sender
+ * and command arrive as DispatchToRectCells' own. */
 void NotifyGridCell(GridCell *cell, SceneNode *sender, s32 command) {
-    if (cell != NULL && (cell->flags36 & 0x80)) {
+    if (cell != NULL && (cell->flags36 & GRIDCELL_FLAG_TAKES_COMMANDS)) {
         cell->methods->onNotify(cell, sender, command);
     }
 }
@@ -469,12 +463,12 @@ Descriptor10 *StageMap__GetCurrentCellKey(StageMap *self) {
     return &self->curCell;
 }
 
-void func_8004B324(void) {}
+void StageMap__NoOpSlotD8(void) {}
 
 void StageMap__SetGridSpan(StageMap *self, s32 span) {
     self->gridSpan = span;
-    self->gridCells = (s16)(span >> 11);
-    self->gridHalfCells = (s16)(span >> 12);
+    self->gridCells = (s16)(span >> STAGE_CELL_SHIFT);
+    self->gridHalfCells = (s16)(span >> (STAGE_CELL_SHIFT + 1));
 }
 
 void StageMap__SetConfig(StageMap *self, StageGridDimensions *config) {

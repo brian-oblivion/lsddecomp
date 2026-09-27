@@ -1,7 +1,9 @@
-# func_8004B324
+# StageMap__NoOpSlotD8
+
+> Renamed from `func_8004B324` on 2026-09-27 (tools/rename.py). Address 0x8004b324.
 
 **Unit:** class_3ac78 &middot; **Size:** 2 words &middot; **Status:** MATCHED
-(`void func_8004B324(void) {}`)
+(`void StageMap__NoOpSlotD8(void) {}`)
 
 ## What it does
 
@@ -16,7 +18,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B324` | `func_8004B324` (KEPT) | C | An empty vtable stub. Nothing establishes its purpose, and nothing establishes its signature either: `void (void)` is what the empty body PERMITS, not what a caller was seen to pass, and no decompiled function dispatches slot `+0x0D8`. This project already has a precedent for exactly this case -- `code_8220.h` keeps `BasicClassMethods::slot34` unnamed for the same reason, and `code_d294_b` keeps `SceneNode__NoOpSlot5C`/`SceneNode__OnPadEvent`/`SceneNode__Update`/`SceneNode__NoOpSlotB0` unnamed as "vtable no-op stubs". A tier-A name here would be pure invention, and FINISHING-PLAN.md is explicit that a wrong tier-A name is worse than a placeholder. |
+| `StageMap__NoOpSlotD8` | `StageMap__NoOpSlotD8` (KEPT) | C | An empty vtable stub. Nothing establishes its purpose, and nothing establishes its signature either: `void (void)` is what the empty body PERMITS, not what a caller was seen to pass, and no decompiled function dispatches slot `+0x0D8`. This project already has a precedent for exactly this case -- `code_8220.h` keeps `BasicClassMethods::slot34` unnamed for the same reason, and `code_d294_b` keeps `SceneNode__NoOpSlot5C`/`SceneNode__OnPadEvent`/`SceneNode__Update`/`SceneNode__NoOpSlotB0` unnamed as "vtable no-op stubs". A tier-A name here would be pure invention, and FINISHING-PLAN.md is explicit that a wrong tier-A name is worse than a placeholder. |
 
 What IS known, written down so the next reader does not re-derive it: the slot
 is `+0x0D8`, it sits between `StageMap__GetCurrentCellKey` (`+0x0D4`) and
@@ -51,3 +53,9 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 98, charlie)
+
+| symbol | name | tier | evidence |
+| --- | --- | --- | --- |
+| `func_8004B324` | `StageMap__NoOpSlotD8` | A | The body is empty (`jr $ra; nop`), so its mechanics are its whole purpose: a leaf whose mechanics ARE its purpose is tier A by the naming rules. The form follows the project's other empty slots (`SceneNode__NoOpSlot5C`, `CdStream__NoOpSlot5C`, `MoviePlayer__NoOpSlot5C`, `NodeGuardedViewport__NoOpSlotB8`). This supersedes round 67's KEEP above, which predates the `NoOpSlotNN` precedent; round 67's reasoning (no caller, no known signature) still holds and the name claims neither. The slot keeps its name `slotD8`, as `slot5C` does for the others. |

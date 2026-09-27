@@ -26,7 +26,7 @@ report per function, matched ones included.
 **NodeGuardedViewport__NoOpSlotB8** -- tier C, kept deliberately. This project's established
 precedent for a genuinely empty, no-established-purpose vtable stub is to
 keep the bare `func_` name even when the occupying class IS known
-(`func_8004B324` in `src/class_3ac78.c`, `SceneNode__NoOpSlot5C` in
+(`StageMap__NoOpSlotD8` in `src/class_3ac78.c`, `SceneNode__NoOpSlot5C` in
 `src/code_d294.c` -- both documented "keeps its placeholder name
 deliberately"). This function fits the same shape exactly: `void (void)`,
 zero registers read, no caller in any carved unit dispatches it with

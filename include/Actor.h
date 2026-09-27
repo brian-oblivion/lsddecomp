@@ -46,6 +46,11 @@ typedef struct ActorMethods ActorMethods;
 /* The grid manager (include/StageMap.h); only its address is kept here. */
 struct StageMap;
 
+/* Actor's class id (gActorMethods word +0x000). Two nibbles, so
+ * `(u8)header == ACTOR_CLASS_ID` tests for Actor or a class below it
+ * (TodActor, 0x234): StageMap__DispatchLinkCommand. */
+#define ACTOR_CLASS_ID 0x34
+
 /* Occupants in gActorMethods named at each slot; `tools/classtable.py
  * <subclass table> --vs gActorMethods` lists a subclass's overrides. The
  * inherited slots keep SceneNode's names; this class overrides +0x008,

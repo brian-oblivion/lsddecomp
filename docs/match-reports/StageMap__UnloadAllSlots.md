@@ -414,3 +414,7 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ResetAllElements` -> `StageMap__UnloadAllSlots` (`python3 tools/rename.py StageMap__ResetAllElements StageMap__UnloadAllSlots`, tier B): every slot: cancel loads, clear cells, release the placements' LinkResource, event 6, release the data block; then `chunksLoaded` 0 and EndScaleRamp.
+
+## Track 7 (2026-09-27, round 98, charlie)
+
+Moved here from the `.c` comment: "Reset every one of the seven grid elements, then the two counters. Matched round 71: `&self->slots[i]` is what produces retail's base + running-offset walk (GCC's strength reduction), not a hand-rolled byte offset." The comment now says what the function does. Locals: `entry` -> `slot`, `list` -> `placements`; the loop bound is `ARRAY_COUNT(self->slots)` and the event `STAGEMAP_EVENT_SLOT_RELEASE` (was 7 and 6). Zero bytes.
