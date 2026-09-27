@@ -18,7 +18,7 @@ Declarations: the local views at the top of `src/code_39094.c` (`Rec1C`).
 
 ```c
 Rec1C *PickWeeklyStreamChannel(s32 *countOut, s32 arg1) {
-    u32 r = (u32)SeedAndRandom(0, arg1) % 7;  /* arg1 only forwarded, like PickDailyVariant's */
+    u32 r = (u32)SeedAndRandom(0, arg1) % 7;  /* arg1 only forwarded, like PickStageTexture's */
     s32 count;
     Rec1C *rec = GetWeeklyStreamPool(&count);
     if (countOut != NULL) {
@@ -41,7 +41,7 @@ uninitialized``). The body never writes `$a1` before `jal SeedAndRandom`, so
 SeedAndRandom receives PickWeeklyStreamChannel's own incoming `$a1`, and its
 caller (code_1677c.c, via GameApplication.h's 2-parameter extern) loads it
 explicitly (`move a1,zero` at the jal). Forwarding idiom: the definition now
-takes `s32 arg1` and forwards it, as PickDailyVariant does. Byte-identical;
+takes `s32 arg1` and forwards it, as PickStageTexture does. Byte-identical;
 the warning is gone and the extern agrees with the definition.
 
 ## Naming

@@ -1,4 +1,6 @@
-# PickDailyVariant -- MATCHED (48/48 words)
+# PickStageTexture -- MATCHED (48/48 words)
+
+> Renamed from `PickDailyVariant` on 2026-09-27 (tools/rename.py). Address 0x80048ea0.
 
 > Renamed from `func_80048EA0` on 2026-09-25 (tools/rename.py). Address 0x80048ea0.
 
@@ -14,7 +16,7 @@ days of a 40-day cycle) at random from the group `GetStageTextureRecords(index)`
 ## Source
 
 ```c
-Rec1C *PickDailyVariant(s32 index, s32 arg1, s32 day) {
+Rec1C *PickStageTexture(s32 index, s32 arg1, s32 day) {
     s32 n = ((day - 1) % 40) / 10 + 1;
     s32 r = SeedAndRandom(0, arg1) % n;
     return &GetStageTextureRecords(index)[r];
@@ -23,6 +25,6 @@ Rec1C *PickDailyVariant(s32 index, s32 arg1, s32 day) {
 
 ## Naming
 
-- **Name:** `PickDailyVariant`
+- **Name:** `PickStageTexture`
 - **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
 - **Evidence:** leaf picker: 1-of-n random pick (n grows every ten days of a 40-day cycle, per the existing report's derivation) from GetStageTextureRecords(index).

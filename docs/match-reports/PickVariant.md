@@ -16,7 +16,7 @@ override is set, else `&rec[r]`.
 
 ```c
 Rec1C *PickVariant(s32 index, s32 arg1) {
-    u32 r = (u32)SeedAndRandom(0, arg1) % 5;  /* arg1 only forwarded, like PickDailyVariant's */
+    u32 r = (u32)SeedAndRandom(0, arg1) % 5;  /* arg1 only forwarded, like PickStageTexture's */
     Rec1C *rec;
     if (index == 9) {
         if (r == 2) {
@@ -50,7 +50,7 @@ so the register SeedAndRandom receives is PickVariant's own incoming `$a1`,
 and its only caller (ObjM__InitStyleAndWorld, class_3bb8c_l.c) loads it
 explicitly (`move a1,zero` at the jal). That is the forwarding idiom:
 PickVariant takes a second parameter and forwards it, exactly as
-PickDailyVariant does with its `arg1`. Rewritten with the parameter;
+PickStageTexture does with its `arg1`. Rewritten with the parameter;
 byte-identical (whole-image SHA1 green), the warning is gone, and the
 caller's 2-parameter extern now agrees with the definition.
 
