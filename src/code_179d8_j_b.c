@@ -68,25 +68,9 @@
 #include <libsnd.h>
 #include "SvmData.h"
 
-/* 0x20-byte-stride record indexed by `D_8008EA18 + D_8008EA13*16`
- * (SsUtKeyOn's own computed index, not a channel id). Every field
- * this unit's own accessor touches is named; offsets are exact (read
- * from SsUtKeyOn's own lbu/lhu immediates), field names are not. */
-typedef struct {
-    u8 unk0; /* +0x0 */
-    u8 unk1; /* +0x1 */
-    u8 unk2; /* +0x2 */
-    u8 unk3; /* +0x3 */
-    u8 unk4; /* +0x4 */
-    u8 unk5; /* +0x5 */
-    u8 unk6; /* +0x6 */
-    u8 unk7; /* +0x7 */
-    u8 pad8[0x16 - 0x8];
-    u16 unk16; /* +0x16 */
-    u8 pad18[0x20 - 0x18];
-} RecordE978;
-
-extern RecordE978 *D_8008E978;
+/* libsnd vmanager's _svm_tn (pinned at this address): the current VAB's
+ * tone table, 16 VagAtr per program, indexed prog * 16 + tone. */
+extern VagAtr *D_8008E978;
 
 /* Base pointer for a table of 0x10-byte entries, indexed by a 0..0x17
  * id.  Only the two leading s16 fields this unit's own accessors touch
@@ -115,23 +99,9 @@ extern volatile u16 D_8008EA26;
 extern volatile u8 D_8008EA18;
 extern u16 D_8008EA22;
 
-/* Base pointer for a table of 0x10-byte slots, indexed by the same <0x18
- * channel space SsUtKeyOn validates via SpuVmVSetUp. This unit's own
- * reduced view: only the fields SsUtKeyOn itself touches are named.
- * The sibling accessors that used to share this typedef (SpuVmSetProgVol
- * and friends, code_179d8_j.c's old `SlotE968`) are Sony's own object as
- * of round 34's split and never touched offset 0; SsUtKeyOn does, so
- * this unit's own copy of the type names it (see func_80030864.md, the
- * matched sibling's report, for the +0x1/+0x4 fields' provenance). */
-typedef struct SlotE968 {
-    u8 unk0; /* +0x0 */
-    u8 unk1; /* +0x1 */
-    u8 pad2[0x4 - 0x2];
-    u8 unk4; /* +0x4 */
-    u8 pad5[0x10 - 0x5];
-} SlotE968;
-
-extern SlotE968 *D_8008E968;
+/* libsnd vmanager's _svm_pg (pinned at this address): the current VAB's
+ * program table, indexed by program number. */
+extern ProgAtr *D_8008E968;
 
 /* SsUtKeyOn's own scratch globals -- a "start channel" setup
  * routine that stages its parameters and a couple of table lookups
@@ -191,12 +161,9 @@ typedef struct {
 
 extern D800902E8Entry *_ss_score[];
 
-typedef struct {
-    u8 pad0[0x18];
-    u8 unk18; /* +0x18 */
-} ObjE970;
-
-extern ObjE970 *D_8008E970;
+/* libsnd vmanager's _svm_vh (pinned at this address): the current VAB's
+ * header. */
+extern VabHdr *D_8008E970;
 
 extern s16 D_8008E8C0;
 
@@ -224,8 +191,8 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
             if (_svm_voice[i].unk0E == (s16)a0) {
                 s32 t0 = _svm_voice[i].unk12;
                 if (t0 == (s16)a2 && _svm_voice[i].unk16 == (s16)a1) {
-                    u8 e968FromD998 = D_8008E968[_svm_voice[i].unk10].unk1;
-                    u8 e968FromT0 = D_8008E968[t0].unk1;
+                    u8 e968FromD998 = D_8008E968[_svm_voice[i].unk10].mvol;
+                    u8 e968FromT0 = D_8008E968[t0].mvol;
                     s32 lvl0;
                     s32 prio;
                     s32 lvl1;
@@ -240,7 +207,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 
                     lvl0 = _svm_voice[i].unk08 * (u16)a3 / 127;
                     prio = lvl0 * 0x3FFF;
-                    lvl1 = D_8008E970->unk18 * prio / 16129;
+                    lvl1 = D_8008E970->mvol * prio / 16129;
 
                     if (e968FromD998 != e968FromT0) {
                         lvl1b = lvl1 * e968FromT0;
@@ -248,21 +215,21 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         lvl1b = lvl1 * e968FromD998;
                     }
 
-                    e978c = D_8008E978[_svm_voice[i].unk14].unk2;
+                    e978c = D_8008E978[_svm_voice[i].unk14].vol;
                     lvl1c = lvl1b * e978c;
                     lvl2 = lvl1c / 16129;
 
                     pan1 = (lvl2 * e->unk74) / 127;
                     pan2 = (lvl2 * e->unk76) / 127;
 
-                    e978d = D_8008E978[_svm_voice[i].unk14].unk3;
+                    e978d = D_8008E978[_svm_voice[i].unk14].pan;
                     if (e978d < 0x40) {
                         pan2 = (pan2 * e978d) / 63;
                     } else {
                         pan1 = (pan1 * (0x7F - e978d)) / 63;
                     }
 
-                    e968d = D_8008E968[_svm_voice[i].unk10].unk4;
+                    e968d = D_8008E968[_svm_voice[i].unk10].mpan;
                     if (e968d < 0x40) {
                         pan2 = (pan2 * e968d) / 63;
                     } else {
@@ -308,8 +275,8 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SpuVmSetVol);
  * since `--nop-at-expansion` closed the old length gap
  * (docs/match-reports/SsUtKeyOn.md). Hand-derived. */
 s16 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
-    SlotE968 *slot;
-    RecordE978 *rec;
+    ProgAtr *slot;
+    VagAtr *rec;
     s32 result;
     u16 note;
     u8 pending18;
@@ -337,21 +304,21 @@ s16 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
     }
 
     slot = D_8008E968;
-    D_8008EA16 = slot[p1].unk1;
-    D_8008EA17 = slot[p1].unk4;
-    D_8008EA0C = slot[p1].unk0;
+    D_8008EA16 = slot[p1].mvol;
+    D_8008EA17 = slot[p1].mpan;
+    D_8008EA0C = slot[p1].tones;
 
     rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
-    D_8008EA1B = rec->unk0;
-    note = rec->unk16;
+    D_8008EA1B = rec->prior;
+    note = rec->vag;
     D_8008EA24 = note;
-    D_8008EA19 = rec->unk2;
-    D_8008EA1A = rec->unk3;
-    D_8008EA1C = rec->unk4;
-    D_8008EA1D = rec->unk5;
-    D_8008EA20 = rec->unk1;
-    D_8008EA1E = rec->unk6;
-    D_8008EA1F = rec->unk7;
+    D_8008EA19 = rec->vol;
+    D_8008EA1A = rec->pan;
+    D_8008EA1C = rec->center;
+    D_8008EA1D = rec->shift;
+    D_8008EA20 = rec->mode;
+    D_8008EA1E = rec->min;
+    D_8008EA1F = rec->max;
 
     if ((s16)note == 0) {
         goto fail;
@@ -455,7 +422,7 @@ fail_nolock:
  * `--nop-at-expansion` closed 11 of the old 16
  * (docs/match-reports/SsUtKeyOnV.md). Hand-derived. */
 s16 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
-    RecordE978 *rec;
+    VagAtr *rec;
     u16 note;
     u8 pending18;
 
@@ -484,21 +451,21 @@ s16 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) 
         D_8008EA11 = 0x7F - ((p5 << 6) / p6);
     }
 
-    D_8008EA16 = D_8008E968[p1].unk1;
-    D_8008EA17 = D_8008E968[p1].unk4;
-    D_8008EA0C = D_8008E968[p1].unk0;
+    D_8008EA16 = D_8008E968[p1].mvol;
+    D_8008EA17 = D_8008E968[p1].mpan;
+    D_8008EA0C = D_8008E968[p1].tones;
 
     rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
-    D_8008EA1B = rec->unk0;
-    note = rec->unk16;
+    D_8008EA1B = rec->prior;
+    note = rec->vag;
     D_8008EA24 = note;
-    D_8008EA19 = rec->unk2;
-    D_8008EA1A = rec->unk3;
-    D_8008EA1C = rec->unk4;
-    D_8008EA1D = rec->unk5;
-    D_8008EA20 = rec->unk1;
-    D_8008EA1E = rec->unk6;
-    D_8008EA1F = rec->unk7;
+    D_8008EA19 = rec->vol;
+    D_8008EA1A = rec->pan;
+    D_8008EA1C = rec->center;
+    D_8008EA1D = rec->shift;
+    D_8008EA20 = rec->mode;
+    D_8008EA1E = rec->min;
+    D_8008EA1F = rec->max;
 
     if ((s16)note == 0) {
         goto fail;
