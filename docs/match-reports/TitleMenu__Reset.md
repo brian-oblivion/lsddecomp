@@ -49,7 +49,7 @@ reshaping needed.
   `TitleMenuMethods::slotF0` (see `TitleMenu__SetState`'s report) -- same
   offset number, two unrelated tables, no conflict.
 - New `extern s32 sTitleTimPath;` (address-of only, placeholder type, same
-  convention as the neighbouring `D_80086D44`/`D_800114DC`).
+  convention as the neighbouring `sTitleMenuTarget`/`D_800114DC`).
 
 ### Proposed learning
 

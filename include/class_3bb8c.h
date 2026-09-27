@@ -101,8 +101,8 @@ extern void *BMemPMgrAlloc(s32 size);
 /* ---- TitleMenu --------------------------------------------------- */
 
 /* TitleMenu's menu description, a TaskCoreTarget: TitleMenu__TitleMenu
- * passes &D_80086D44 as TaskCore's ctor's `target` and again to setTarget. */
-extern TaskCoreTarget D_80086D44;
+ * passes &sTitleMenuTarget as TaskCore's ctor's `target` and again to setTarget. */
+extern TaskCoreTarget sTitleMenuTarget;
 
 /* "ETC\ETCSE", TitleMenu__TitleMenu's soundBankPath for TaskCore's ctor
  * (the ctor casts away the const for its `char *`). */

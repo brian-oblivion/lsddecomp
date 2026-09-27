@@ -127,7 +127,7 @@ extern void DecodeFullWidthSjis(void *dst, void *src);
 #define SAVE_TITLE_EDIT_POS 13
 
 /* The setTarget override: `target` is the TaskCoreTarget the ctor passes
- * (&D_80086D44); only its `handle` is read, as the TextRow's texture. On a
+ * (&sTitleMenuTarget); only its `handle` is read, as the TextRow's texture. On a
  * new game the title's padding is reblanked and its letter field cleared
  * first. The TextRow has a cell a character plus 4, eight of them shown
  * from cell 4, with a gap before cell 9. */

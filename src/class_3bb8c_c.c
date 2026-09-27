@@ -141,7 +141,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     DreamSys *dream;
     VabStreamObj *sound;
 
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, &D_80086D44, (char *)D_800114DC, 0);
+    Get_vtable_TaskCore()->ctor((TaskCore *)self, &sTitleMenuTarget, (char *)D_800114DC, 0);
     self->methods = GetTitleMenuMethods();
     sound = (VabStreamObj *)self->sound;
     sound->methods->setPitchOffset(sound, -1);
@@ -150,7 +150,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     dream = dreamSys;
     self->saveBlock = dream->methods->getSaveBlock(dream, &self->saveBlockSize);
     FormatNumberIntoBuffer(dream->methods->getCurrentDayAndYear(dream, 0));
-    self->methods->setTarget(self, &D_80086D44);
+    self->methods->setTarget(self, &sTitleMenuTarget);
     ((TitleMenuResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
 

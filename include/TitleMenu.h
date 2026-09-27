@@ -6,7 +6,7 @@
 /*
  * TitleMenu -- the menu over ETC\TITLE.TIM that the game returns to between
  * days: START, FLASHBACK, SAVE, LOAD, GRAPH and SHAKE (the six `names` of its
- * TaskCoreTarget, D_80086D44), with the memory-card save title ("LSD   Day001")
+ * TaskCoreTarget, sTitleMenuTarget), with the memory-card save title ("LSD   Day001")
  * shown as a TextRow. A TaskCore (class id 0x1F130, table gTitleMenuMethods;
  * fourteen overrides and six slots of its own); no class derives from it.
  * src/class_3bb8c_c.c holds the allocator and ctor, src/class_3bb8c_d.c every

@@ -28,7 +28,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, void *dreamSys)
     DreamSysView_3bb8c_c *dream;
     TitleMenuUnk48Obj *obj;
 
-    Get_vtable_TaskCore()->slot08(self, &D_80086D44, &D_800114DC, 0);
+    Get_vtable_TaskCore()->slot08(self, &sTitleMenuTarget, &D_800114DC, 0);
     self->methods = GetTitleMenuMethods();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);
@@ -37,7 +37,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, void *dreamSys)
     dream = dreamSys;
     self->unkBC = dream->methods->slot1B0(dream, &self->unkC0);
     FormatNumberIntoBuffer(dream->methods->slot1A0(dream, 0));
-    self->methods->slotD8(self, &D_80086D44);
+    self->methods->slotD8(self, &sTitleMenuTarget);
     self->methods->slot40(self, dreamSys);
 }
 ```
@@ -89,7 +89,7 @@ presence anywhere in the project. Placed as one new block right before the
   since each translation unit in this project gets its own extern
   prototype for a given external symbol and this unit does not otherwise
   need that header.
-- `D_80086D44`, `D_800114DC`: address-of-only placeholder `s32` globals
+- `sTitleMenuTarget`, `D_800114DC`: address-of-only placeholder `s32` globals
   (same convention as this file's existing `sDefaultTargetSpecs`).
 - `FormatNumberIntoBuffer` prototype: `extern void FormatNumberIntoBuffer(s32 arg0);` -- the
   unit's own still-blocked (gp_rel) function; needed here only as a
@@ -144,7 +144,7 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The body now reads at TaskCore's names: `unk48` is TaskCore's `sound`, called at +0x09C through VabStreamObj (setPitchOffset, as GraphRoom's ctor does); `slotD8` is setTarget, with D_80086D44 retyped TaskCoreTarget; `onConstruct` (+0x040) is resetCounters, called through TitleMenuResetCallFn because the call passes dreamSys and the slot (and TitleMenu__Reset) take self alone; `unkBC`/`unkC0` are `saveBlock` (`s32 *`, getSaveBlock's result, no cast now) and `saveBlockSize`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The body now reads at TaskCore's names: `unk48` is TaskCore's `sound`, called at +0x09C through VabStreamObj (setPitchOffset, as GraphRoom's ctor does); `slotD8` is setTarget, with sTitleMenuTarget retyped TaskCoreTarget; `onConstruct` (+0x040) is resetCounters, called through TitleMenuResetCallFn because the call passes dreamSys and the slot (and TitleMenu__Reset) take self alone; `unkBC`/`unkC0` are `saveBlock` (`s32 *`, getSaveBlock's result, no cast now) and `saveBlockSize`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 6 (2026-09-26, round 93, delta): the class is TitleMenu
 
@@ -152,7 +152,7 @@ TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus
 address, gClass86B60Methods at 0x80086B60). Tier A for the class name, from
 data the class itself reads:
 
-- its TaskCoreTarget, D_80086D44, has `names` = D_80086CF8 = "START",
+- its TaskCoreTarget, sTitleMenuTarget, has `names` = D_80086CF8 = "START",
   "FLASHBACK", "SAVE", "LOAD", "GRAPH", "SHAKE" (asm/data/7B12C.sdata.s,
   1C34.rodata.s), and TitleMenu__Reset sets the backdrop to "ETC\TITLE.TIM";
 - tick's cases agree with that order: 1 (FLASHBACK) opens a flashback session
