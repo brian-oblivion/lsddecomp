@@ -865,3 +865,7 @@ comments hold the evidence): `gDisableVoiceStarveScan` is libsnd/vm_g.o's
 writes the fields through a local mirror of the SDK struct. `gSpuMallocArea`
 is `_ss_spu_vm_rec + 8` (vmanager.o bss, 3.5 layout), spelled `D_8008DEB0`
 because splat names only addresses some asm references. Byte-identical.
+
+## Track 6 (round 96, charlie)
+
+Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `D_8006DAD4`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from D_80090C60/64), `keyOn[0..1]` (+0x188, from D_8008E228/22C) and `reverbOn[0..1]` (+0x198, from D_8008E230/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `Rec34HalfU2` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.

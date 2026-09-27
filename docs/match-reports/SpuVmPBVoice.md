@@ -562,3 +562,7 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 The NON_MATCHING body now reads `_svm_voice[a0].unk0E/unk16/unk12/unk14/unk0C`; the old unsigned views (`Rec34U16`) became plain `s16` field reads assigned to the same `u16` locals, and the normalized disassembly is identical. Stall unchanged.
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body now stores the pitch to `_svm_sreg_buf[a0].unk4` (was `D_8008D7F4[a0].unk0`); normalized disassembly identical.
+
+## Track 6 (round 96, charlie)
+
+Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. `Tbl32E978` was a local view of libsnd's `_svm_tn` (0x8008E978, pinned) and is `<libsnd.h>`'s `VagAtr`: `bendCurveUp` (+0xC) is `pbmin`, used when the bend is below 0x40, and `bendCurveDown` (+0xD) is `pbmax`, used above it. The preserved body now reads `D_8008E978[...].pbmax`/`.pbmin`. `D_8008EA18` is `_svm_cur + 0xC`, the current tone number.

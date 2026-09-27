@@ -1,64 +1,41 @@
 /*
- * code_179d8_m -- part of the game's SPU sound driver: the per-voice
- * envelope/fade stepper, the per-tick voice updater, and a NoteOn/NoteOff
- * pair for a 24-voice (0..0x17) PS1 SPU wavetable player driven by MIDI-
- * shaped events (confirmed: code_179d8_k.c's caller switches on a status
- * byte with the MIDI 0x90/0xB0/0xC0/0xE0/0xFF nibbles; D_8006DAD4 is the
- * PS1 SPU's real hardware base, 0x1F801C00, per vmNoiseOn2's report in
- * code_179d8_l). Plain free functions, no vtable -- `tools/classtable.py`
- * lists no method table at these addresses.
+ * code_179d8_m -- Sony libsnd `vmanager`, second half: voice key-on/off,
+ * noise voices, pitch bend, the volume/pan ramps and the per-tick flush.
  *
- * Twelve functions, functions 161..172 of the original 274-function
- * code_179d8 monolith, 0x1ECD8..0x20ADC (vram 0x8002E4D8..0x800302DC).
- * Carved round 24 (2026-09-08); `code_179d8_l` is the front half (owns the
- * shared carve-time census) and `code_179d8_j` follows behind. No jump
- * table, no rodata attach, no BIOS trampoline (every function ends in its
- * own `jr $ra`, none open on `$sp`) -- see code_179d8_l's header for the
- * full carve-time survey.
+ * Every function here is Sony's. Retail's vmanager is a build no SDK disc
+ * carries, so its object never placed and the module is carried as C (the
+ * symbols file identifies each function against discs 3.3/3.5); progress.py
+ * counts all of it as library by address. The functions keep Sony's names
+ * and the data keeps Sony's types: the current VAB's header, programs and
+ * tones are <libsnd.h>'s VabHdr/ProgAtr/VagAtr behind libsnd's _svm_vh,
+ * _svm_pg and _svm_tn (pinned in config/psyq-objects.ld, spelled here by
+ * their D_ addresses), a sequence is include/SsScore.h's record, and the
+ * per-voice state is include/SvmData.h's _svm_voice/_svm_sreg_buf. SpuRegs,
+ * below, is the SPU's own register block at 0x1F801C00.
  *
- * WHAT EACH FUNCTION DOES (see docs/match-reports/<name>.md for the full
- * derivation and evidence):
- *   - SpuVmKeyOn / SpuVmKeyOff: a matched NoteOn/NoteOff pair. Given a packed
- *     [screen|slot] identity, note, volume/program and (for SpuVmKeyOn) a
- *     velocity and a computed stereo pan split, SpuVmKeyOn registers a new
- *     active-voice record; SpuVmKeyOff scans every voice for one whose
- *     identity fields match and releases it, returning the count released.
- *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: find a free voice (SpuVmAlloc, in
- *     code_179d8_l) and, if one exists, key it on (vmNoiseOn2, also
- *     code_179d8_l) with the caller's parameters or, for SpuVmNoiseOn,
- *     two hardcoded constants.
- *   - SeAutoPan / SetAutoPan: a linear-ramp pair over _svm_voice
- *     +0x28..+0x32 (include/SvmData.h) -- Se sets a start/target/step-rate;
- *     Step advances the accumulator (throttled by an interval/countdown
- *     pair), clamps at the target, and writes the resulting stereo output
- *     level.
- *   - SetAutoVol: the same accumulate-until-limit shape over _svm_voice
- *     +0x1C..+0x26; its setter is SeAutoVol in code_179d8_l.
- *   - SpuVmFlush: the per-tick dispatcher. Maintains a 16-slot
- *     ring buffer of per-tick voice-activity bitmasks; when a voice has
- *     shown no activity for 16 consecutive ticks it force-releases it
- *     (disabling the SPU noise generator if that voice was in noise
- *     state); then calls SetAutoVol/SetAutoPan for every voice
- *     whose respective flag is set. Called once at the end of
- *     SpuVmInit and, going by its own ring-buffer/mask-clearing logic,
- *     meant to run every frame thereafter.
- *   - SpuVmNoiseOff: releases every voice whose state byte reads
- *     exactly 2 (the same value SpuVmKeyOff/SpuVmFlush/SpuVmAlloc
- *     treat as "noise voice needing SpuSetNoiseVoice/func_800375E8 cleanup").
- *   - SpuVmPBVoice / SpuVmPitchBend: match a voice by
- *     identity and apply a curve-table-driven pitch bend from a 0-127
- *     depth value centered at 0x40, writing the result through
- *     note2pitch2; the "AllVoices" wrapper calls Sony's SpuVmVSetUp once
- *     and then runs this over every voice, returning the count affected.
- *   - SpuVmInit: the SPU driver's init call -- _spu_setInTransfer,
- *     SpuInitMalloc, zeroes every per-voice table and the two master
- *     volume globals (reset to 0x3FFF, the SPU's real max), then calls
- *     SpuVmFlush once.
+ *   - SpuVmInit: resets the voice manager: every voice, its shadow
+ *     registers and the SPU voice registers, the reverb depth to 0x3FFF,
+ *     then one SpuVmFlush.
+ *   - SpuVmKeyOn: keys on every tone of the current program whose note
+ *     range holds the note, one allocated voice per tone; a volume of 0
+ *     calls SpuVmKeyOff instead. SpuVmKeyOff releases every voice playing
+ *     that sequence, VAB, program and note, and returns how many.
+ *   - SpuVmNoiseOnWithAdsr / SpuVmNoiseOn: allocate a voice and key it on
+ *     the noise generator (vmNoiseOn2, code_179d8_l); SpuVmNoiseOff
+ *     releases every noise voice.
+ *   - SpuVmPBVoice: bends one matching voice's pitch by a 0..127 value
+ *     centred on 0x40, scaled by the tone's pbmin/pbmax; SpuVmPitchBend
+ *     applies it to every voice and returns how many matched.
+ *   - SeAutoPan sets a pan ramp; SetAutoVol / SetAutoPan step a voice's
+ *     volume/pan ramp once (SeAutoVol, the volume setter, is in
+ *     code_179d8_l).
+ *   - SpuVmFlush, once per tick: records which voices' envelopes have died,
+ *     releases voices silent across that history (unless _svm_auto_kof_mode
+ *     is set), steps the ramps, copies dirty shadow registers to the SPU
+ *     and writes the key-on/key-off/reverb masks.
  *
- * STALLS: SpuVmPBVoice, SpuVmKeyOn, SpuVmFlush,
- * SetAutoVol, SetAutoPan -- all five are the same "whole-function
- * register-count decision predates any of the function's own locals"
- * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
+ * No jump table and no rodata attach. Five functions are preserved
+ * NON_MATCHING bodies; each report gives its residue.
  */
 #include "common.h"
 #include <libsnd.h>
@@ -327,19 +304,8 @@ typedef struct {
 
 extern SpuRegs *D_8006DAD4;
 
-/* MATCHED round 32 (bravo), 270/270 -- closes the register-identity stall
- * every prior round's hand-reshaping (10 axes) and one earlier permuter
- * run (100k+ iterations) could not move.  Permuter-found: a SINGLE scratch
- * variable (`scratch`, `s32`), reused for TWO textually unrelated
- * purposes -- once to break the `a0`-vs-`s0` min-clamp tie, and again
- * ~150 lines later as the `D_8006DAD4[woff]` store's index -- is what
- * reproduces retail's exact register allocation.  Splitting these into
- * two separately-named locals (the natural, more readable choice) gives a
- * WORSE result than either leaving `a0` alone or this single-variable
- * reuse; the reuse itself is load-bearing, not cosmetic.  See
- * docs/match-reports/SpuVmInit.md for the full derivation, the
- * permuter trace, and why the naive two-variable translation regresses
- * sharply (47/270) despite being semantically identical. */
+/* MATCHING: `scratch` is one local reused for the clamp and for the
+ * volL store's index; two locals change the register allocation. */
 void SpuVmInit(s32 a0) {
     s16 i;
     s32 scratch;
@@ -749,7 +715,8 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SpuVmFlush);
 #endif
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 402/387 words, 15 words long. Residue: two independent
+/* NON_MATCHING: 414 built words vs 387 (measured round 96; an earlier
+ * score read 402). Residue as recorded then: two independent
  * pieces -- an early-materialization scheduling point (~2-3 words) and a
  * mid-loop addressing-cost difference for D_8008EA26 and neighbors
  * (~10-12 words); round 48's frame-padding lever realigned the frame
