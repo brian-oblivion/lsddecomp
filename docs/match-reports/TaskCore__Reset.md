@@ -15,7 +15,7 @@ then eight literal field stores.
 void TaskCore__Reset(StreamTaskObj *self) {
     StreamTaskObjMethods *methods = self->methods;
     methods->slot6C(self, -1);
-    methods->slotA4(self, &D_8006E860[0], &D_8006E860[3], &D_8006E860[6]);
+    methods->slotA4(self, &sTaskCoreDefaultColors[0], &sTaskCoreDefaultColors[3], &sTaskCoreDefaultColors[6]);
     methods->slot9C(self, 1);
     methods->slotA0(self, 1);
     self->unk84 = 9;
@@ -45,9 +45,9 @@ void TaskCore__Reset(StreamTaskObj *self) {
   results), confirmed to exist via `tools/classtable.py gStreamTaskMethods`:
   `+0x09C = TaskCore__SetFadeCallbackEnabled`, `+0x0A0 = TaskCore__SetFadeOutCallbackEnabled`,
   `+0x0A4 = TaskCore__SetColors` (all extern, other units).
-- `slotA4`'s three pointer arguments are `&D_8006E860[0]`, `&D_8006E860[3]`,
-  `&D_8006E860[6]` — a `lui`/`addiu` to the symbol with offsets added, never
-  dereferenced here, so `D_8006E860` is declared as a plain `extern u8[]`
+- `slotA4`'s three pointer arguments are `&sTaskCoreDefaultColors[0]`, `&sTaskCoreDefaultColors[3]`,
+  `&sTaskCoreDefaultColors[6]` — a `lui`/`addiu` to the symbol with offsets added, never
+  dereferenced here, so `sTaskCoreDefaultColors` is declared as a plain `extern u8[]`
   with unknown real element shape.
 - Eight new `s32` fields carved out of what was padding: `unk28`, `unk2C`,
   `unk30`, `unk3C`, `unk84`, `unk9C`, `unkA0`, plus `unk34` (a field already

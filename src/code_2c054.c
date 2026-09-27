@@ -213,7 +213,8 @@ void TaskCore__Finalize(TaskCore *self) {
 void TaskCore__Reset(TaskCore *self) {
     TaskCoreMethods *methods = self->methods;
     methods->setFrameBound(self, -1);
-    methods->setColors(self, &D_8006E860[0], &D_8006E860[3], &D_8006E860[6]);
+    methods->setColors(self, &sTaskCoreDefaultColors[0], &sTaskCoreDefaultColors[3],
+                       &sTaskCoreDefaultColors[6]);
     methods->setFadeCallbackEnabled(self, 1);
     methods->setFadeOutCallbackEnabled(self, 1);
     self->fadeRate = 9;

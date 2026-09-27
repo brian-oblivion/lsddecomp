@@ -25,7 +25,7 @@ extern StreamTaskInitData *GetDefaultStreamTaskInitData(void);
  * `lw`/`sw` here) -- passed to setColors as three pointers 3 bytes apart
  * (base, base+3, base+6). Never decoded further by this unit's queued
  * functions, so typed as a plain byte array. */
-extern u8 D_8006E860[];
+extern u8 sTaskCoreDefaultColors[];
 
 /* Two more rodata symbols reached only by address (round 2, TaskCore__OnInit):
  * `gDefaultStreamTaskInitData`, passed as `TaskTextMethods::slot78`'s 3rd argument, and
