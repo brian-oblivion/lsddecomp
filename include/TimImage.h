@@ -30,27 +30,13 @@
  * +0x078 is FileResource's `void *slot78` (NULL there); this table's occupant
  * is TimImage__Upload, called through TimImageUploadFn (no code; FINISHING-
  * PLAN track 4 step 6).
+ *
+ * `tim` is <libgs.h>'s GsIMAGE, so an includer takes Sony's headers first
+ * (`common.h`, <libgte.h>, <libgpu.h>, <libgs.h>).
  */
 
 typedef struct TimImage TimImage;
 typedef struct TimImageMethods TimImageMethods;
-
-/* LIBGS.H GsIMAGE, laid out as the SDK declares it: GsGetTimInfo fills it
- * and TimImage__Upload reads it field by field. The tag is the one
- * include/Sprite.h forward-declares. */
-typedef struct GsIMAGE {
-    /* +0x00 */ u32 pmode;
-    /* +0x04 */ s16 px;
-    /* +0x06 */ s16 py;
-    /* +0x08 */ u16 pw;
-    /* +0x0A */ u16 ph;
-    /* +0x0C */ u32 *pixel;
-    /* +0x10 */ s16 cx;
-    /* +0x12 */ s16 cy;
-    /* +0x14 */ u16 cw;
-    /* +0x16 */ u16 ch;
-    /* +0x18 */ u32 *clut;
-} GsIMAGE;
 
 struct TimImageMethods {
     FILERESOURCE_SLOTS(TimImage, (TimImage * self, char *name));

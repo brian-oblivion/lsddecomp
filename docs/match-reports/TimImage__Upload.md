@@ -98,3 +98,7 @@ instead.
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (gDrawSystemMethods unified). Byte-identical.
+
+## Round 95 (alpha, track 6: Sony headers)
+
+`self->tim` is <libgs.h>'s GsIMAGE, whose pixel and clut are `unsigned long *`; DrawSystem's loadImage slot takes `u32 *`, so the two calls cast `(u32 *)`. Byte-identical.

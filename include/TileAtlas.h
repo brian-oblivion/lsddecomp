@@ -14,11 +14,11 @@
  * GetActiveDataSourceMethods()->ctor, and finalize forwards to the active
  * driver's, as TileMap, TimImage and TimBlockSrc do.
  *
- * The name is round 83's, and the evidence is the cells: TileAtlas__
- * BuildCells allocates 300 GsCELLs (LIBGS.H's layout, 8 bytes each) and
- * fills them as 16 x 16-texel cells over VRAM from x 0x280, u,v stepping
- * by 16, a new texture page every 64 x; TileMap__BuildMap takes `cells` as
- * its GsMAP's base and lays out a 20 x 15 index table 0..299 over it.
+ * The name is the cells': TileAtlas__BuildCells allocates 300 libgs
+ * GsCELLs (8 bytes each) and fills them as 16 x 16-texel cells over VRAM
+ * from x 0x280, u,v stepping by 16, a new texture page every 64 x;
+ * TileMap__BuildMap takes `cells` as its GsMAP's base and lays out a 20 x 15
+ * index table 0..299 over it.
  *
  * How it is used, at the one New_TileAtlas call site (TaskCore__TaskCore,
  * src/code_2c054.c): New_TileAtlas(0), then New_TileMap(0, atlas), then
@@ -41,21 +41,13 @@
  *
  * FIELDS: the cell array, two u16 flags and a word only Finalize frees;
  * the object is 0x38 bytes (New_TileAtlas).
+ *
+ * GsCELL is <libgs.h>'s, so an includer takes Sony's headers first
+ * (`common.h`, <libgte.h>, <libgpu.h>, <libgs.h>).
  */
 
 typedef struct TileAtlas TileAtlas;
 typedef struct TileAtlasMethods TileAtlasMethods;
-
-/* LIBGS.H GsCELL, laid out as the SDK declares it (as include/TimImage.h
- * does for GsIMAGE); TileMap's GsMAP (include/TileMap.h) points its base
- * at an array of them. */
-typedef struct GsCELL {
-    /* +0x00 */ u8 u;
-    /* +0x01 */ u8 v;
-    /* +0x02 */ u16 cba;
-    /* +0x04 */ u16 flag;
-    /* +0x06 */ u16 tpage;
-} GsCELL;
 
 struct TileAtlasMethods {
     FILERESOURCE_SLOTS(TileAtlas, (TileAtlas * self, s32 arg1));

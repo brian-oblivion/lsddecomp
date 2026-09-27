@@ -13,6 +13,9 @@
  * cancel (23).
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "class_3bb8c.h"
 #include "TextEntry.h"
 #include "CharSprite.h"

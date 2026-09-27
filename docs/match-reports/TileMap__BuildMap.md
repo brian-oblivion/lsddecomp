@@ -88,3 +88,7 @@ Later the same round (alpha, third class): TileAtlas unified (`include/TileAtlas
 | --- | --- | --- | --- |
 | `20`, `15`, `16` | `TILEMAP_COLS`, `TILEMAP_ROWS`, `TILE_SIZE` | A | the GsMAP's ncellw, ncellh and cellw/cellh |
 | `n * 2` | `n * sizeof(*self->map.index)` | A | the u16 index table |
+
+## Round 95 (alpha, track 6: Sony headers)
+
+`map` is <libgs.h>'s GsMAP (the header's local copy, same layout and field names, deleted); `base` is Sony's `GsCELL *`. No accessor changed. Byte-identical.

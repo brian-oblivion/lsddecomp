@@ -1,4 +1,7 @@
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "class_39e08.h"
 #include "VabStreamObj.h"
 #include "NodeGuardedViewport.h"
@@ -27,8 +30,7 @@ DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32
     return NULL;
 }
 
-void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs,
-                            DreamSys *dreamSys, s32 arg3) {
+void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
     LoadRequest req;
     s32 tmp;
 

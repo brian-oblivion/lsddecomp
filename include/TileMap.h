@@ -14,10 +14,10 @@
  * GetActiveDataSourceMethods()->ctor, and finalize forwards to the active
  * driver's, as TimImage and TimBlockSrc do.
  *
- * The name is round 83's, and the evidence is the GsMAP: TileMap__BuildMap
- * fills cellw/cellh = 16, ncellw = 20, ncellh = 15 (a 320 x 240 screen of
- * 16 x 16 cells), allocates the ncellw * ncellh u16 index table and fills
- * it 0..n-1, and takes `base` from its atlas's cells; BgLayer__Reset
+ * The name is the GsMAP's: TileMap__BuildMap fills cellw/cellh = 16,
+ * ncellw = 20, ncellh = 15 (a 320 x 240 screen of 16 x 16 cells),
+ * allocates the ncellw * ncellh u16 index table and fills it 0..n-1, and
+ * takes `base` from its atlas's cells; BgLayer__Reset
  * (include/BgLayer.h) points a GsBG's map at &map and sizes the layer from
  * cellw * ncellw by cellh * ncellh.
  *
@@ -42,24 +42,15 @@
  *
  * FIELDS: the GsMAP at +0x02C, then the atlas, then two u16 flags; the
  * object is 0x44 bytes (New_TileMap).
+ *
+ * GsMAP is <libgs.h>'s, so an includer takes Sony's headers first
+ * (`common.h`, <libgte.h>, <libgpu.h>, <libgs.h>).
  */
 
 struct TileAtlas;
 
 typedef struct TileMap TileMap;
 typedef struct TileMapMethods TileMapMethods;
-
-/* LIBGS.H GsMAP, laid out as the SDK declares it (as include/TimImage.h
- * does for GsIMAGE); BgLayer's GsBG points at it. GsCELL is by tag only:
- * include/TileAtlas.h defines it. */
-typedef struct GsMAP {
-    /* +0x00 */ u8 cellw;
-    /* +0x01 */ u8 cellh;
-    /* +0x02 */ u16 ncellw;
-    /* +0x04 */ u16 ncellh;
-    /* +0x08 */ struct GsCELL *base;
-    /* +0x0C */ u16 *index;
-} GsMAP;
 
 struct TileMapMethods {
     FILERESOURCE_SLOTS(TileMap, (TileMap * self, s32 arg1, struct TileAtlas *atlas));

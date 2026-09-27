@@ -14,6 +14,9 @@
  * to it must be strictly additive.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "class_3bb8c.h"
 #include "class_39e08.h"
 #include "TimedTask.h"
