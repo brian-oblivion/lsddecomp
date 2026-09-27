@@ -97,7 +97,7 @@ extern const char gCardPathSuffix[]; /* ".TIM" */
 /* 3 words, `New_ScreenSprite`'s rect: a SpriteRect {0, 0, 160, 120}. */
 extern s32 gCardIconRect;
 /* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
-extern s32 D_8008AA94;
+extern s32 gCardIconPos;
 
 void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1) {
     char path[0x20];
@@ -128,7 +128,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1) {
     newVal = New_ScreenSprite(handle, (SpriteRect *)&gCardIconRect, 0);
     self->cardIcon = newVal;
     handle->methods->release(handle);
-    newVal->methods->attachToParent(newVal, self->spriteParent, (LongVec3 *)&D_8008AA94);
+    newVal->methods->attachToParent(newVal, self->spriteParent, (LongVec3 *)&gCardIconPos);
 }
 
 void TaskObjF__ReleaseCardIcon(TaskObjF *self) {
