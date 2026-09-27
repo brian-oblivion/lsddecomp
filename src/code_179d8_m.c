@@ -61,6 +61,8 @@
  * class CLAUDE.md treats as banned-to-fix-by-pinning; see each report.
  */
 #include "common.h"
+#include <libsnd.h>
+#include <libspu.h>
 #include "SvmData.h"
 
 /* Round 48 (echo): testing charlie's ContDataEntry frame-padding lever on
@@ -294,30 +296,14 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SetAutoPan);
 #endif
 
 extern void _spu_setInTransfer(s32 a0);
-extern void SpuInitMalloc(s32 a0, void *a1);
 extern void SpuVmFlush(void);
 
-extern u8 D_8008DEB0[]; /* Sony's _ss_spu_vm_rec + 8 (libsnd/vmanager.o bss; symbols file) */
+extern char D_8008DEB0[]; /* Sony's _ss_spu_vm_rec + 8 (libsnd/vmanager.o bss; symbols file) */
 
 extern s16 D_8008E9FC;
 extern s16 D_8008E84C;
 extern s16 D_8008E230;
 extern s16 D_8008E234;
-
-/* libspu's SpuReverbAttr (Psy-Q LIBSPU.H), mirrored rather than included:
- * LIBSPU.H's prototypes disagree with this unit's (SpuInitMalloc). */
-typedef struct {
-    s16 left;
-    s16 right;
-} SpuVolume;
-
-typedef struct {
-    u32 mask;
-    s32 mode;
-    SpuVolume depth;
-    s32 delay;
-    s32 feedback;
-} SpuReverbAttr;
 
 extern SpuReverbAttr _svm_rattr; /* pinned in config/psyq-objects.ld (libsnd/vm_g.o) */
 extern u8 _svm_auto_kof_mode;
@@ -671,7 +657,6 @@ typedef struct {
     u8 pad2[0x34 - 0x2];
 } Rec34HalfU2;
 
-extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 extern void SetAutoVol(s16 a0);
 extern void SetAutoPan(s16 a0);
 
