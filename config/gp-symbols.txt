@@ -2,7 +2,6 @@
 # segments of config/splat.slps01556.lsdde.yaml. maspsx --gp-symbols
 # addresses these off $gp. Regenerate after any sdata/sbss carve.
 D_8008A850
-D_8008A854
 D_8008A860
 D_8008A924
 D_8008A958
@@ -98,6 +97,7 @@ gCdStreamVersionSuffix
 gCdTickStep
 gCdTimeoutCounter
 gCdUseVSyncCallback
+gDataDirectory
 gDefaultBMemPMgr
 gDefaultGridSpan
 gDefaultScreenDims

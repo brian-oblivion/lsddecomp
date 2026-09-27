@@ -6,7 +6,7 @@
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- `D_8008A854 = value;`, as this report predicted. The C is in `src/code_171e0.c`. Everything below is the
+> the live tests -- `gDataDirectory = value;`, as this report predicted. The C is in `src/code_171e0.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
@@ -24,19 +24,19 @@
 
 ## What it does
 
-A setter: `D_8008A854 = value;`. `D_8008A854` is another slot in the same
+A setter: `gDataDirectory = value;`. `gDataDirectory` is another slot in the same
 `.sdata` region as `gActiveDataSource` (file `0x7b008`; see
 `asm/data/7B008.sdata.s`), initialized in retail to `0x8006D4A8` — a pointer
 value. `D_8006D4A8` itself sits right at the tail of the `gFileResourceMethods` method
 table as splat has that table carved (see `include/code_171e0.h`), which may
-mean the table's boundary was drawn one word short and `D_8008A854` actually
+mean the table's boundary was drawn one word short and `gDataDirectory` actually
 points at the start of a separate, still-unidentified global — not resolved
 here.
 
 ## Residue
 
-Retail: `sw $a0, %gp_rel(D_8008A854)($gp)` — one instruction. Compiling
-`extern void *D_8008A854; void SetDataDirectory(void *value) { D_8008A854 = value; }`
+Retail: `sw $a0, %gp_rel(gDataDirectory)($gp)` — one instruction. Compiling
+`extern void *gDataDirectory; void SetDataDirectory(void *value) { gDataDirectory = value; }`
 under this project's pinned `-G0` produces the two-instruction absolute
 `lui`/`sw` form instead — same root cause as `LockActiveDataSource` (full isolated
 reproducer there): cc1's own `-G` value gates whether it emits the
@@ -52,10 +52,10 @@ else in the unit.
 ## Preserved body
 
 ```c
-extern void *D_8008A854;
+extern void *gDataDirectory;
 
 void SetDataDirectory(void *value) {
-    D_8008A854 = value;
+    gDataDirectory = value;
 }
 ```
 
@@ -74,8 +74,8 @@ before trusting anything downstream.
 
 Round 52 (alpha), FINISHING-PLAN track 3.
 
-Not renamed. `SetDataDirectory` is a setter (`D_8008A854 = value;`) and
-`GetDataDirectory` its getter (`return D_8008A854;`). `D_8008A854` is a real
+Not renamed. `SetDataDirectory` is a setter (`gDataDirectory = value;`) and
+`GetDataDirectory` its getter (`return gDataDirectory;`). `gDataDirectory` is a real
 `.sdata` global initialized to `0x8006D4A8`, which sits at (or just past)
 the tail of the gFileResourceMethods method table as splat has it carved -- possibly
 meaning the table boundary is one word short and this actually points at a

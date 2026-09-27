@@ -21,7 +21,7 @@
  * resource classes' ctors take (include/FileResource.h's ResourceRequest).
  * GetGameApplicationMethods and BuildFileName are unrelated utilities that
  * happen to live in this segment; SetDataDirectory/GetDataDirectory (a
- * getter/setter pair for D_8008A854) are left unnamed -- see their reports.
+ * getter/setter pair for gDataDirectory) are left unnamed -- see their reports.
  */
 #include "common.h"
 #include "code_171e0.h"
@@ -298,14 +298,14 @@ s32 RegisterFileTableEntries(void *arg0, s32 arg1) {
     return 1;
 }
 
-extern void *D_8008A854;
+extern void *gDataDirectory;
 
 void SetDataDirectory(void *value) {
-    D_8008A854 = value;
+    gDataDirectory = value;
 }
 
 void *GetDataDirectory(void) {
-    return D_8008A854;
+    return gDataDirectory;
 }
 
 char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3) {

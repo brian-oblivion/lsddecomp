@@ -3052,3 +3052,4 @@ sTaskCoreDefaultColors = 0x8006E860;
 sTaskCoreViewOrigin = 0x8006E86C;
 SetDataDirectory = 0x800270AC; // type:func
 GetDataDirectory = 0x800270B8; // type:func
+gDataDirectory = 0x8008A854;
