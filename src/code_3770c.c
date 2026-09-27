@@ -29,7 +29,8 @@
 #define CDSTREAM_FRAME_UNIT 2054
 /* open: "\<data directory><name>;1" must fit. */
 #define CDSTREAM_PATH_SIZE 32
-/* SetupCdStreamAudio: master volume at half scale, CD input at full. */
+/* SetupCdStreamAudio: master volume and CD input volume, each the top of
+ * its libspu range (master -0x4000..0x3FFF, CD -0x8000..0x7FFF). */
 #define CDSTREAM_MASTER_VOLUME 0x3FFF
 #define CDSTREAM_CD_VOLUME 0x7FFF
 /* startRead: stream with XA-ADPCM on, at double or normal speed. */
