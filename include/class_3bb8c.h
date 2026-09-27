@@ -241,7 +241,7 @@ typedef struct StyleConfig {
     u8 pad10[0x014 - 0x010];
     s32 colorMode; /* +0x014, EnterStyleSession: 1 makes the far colour clearColor; PollTimBlockLoad: 2 fades to clearColor, else farColor */
     void *farColor; /* +0x018, EnterStyleSession: setFarColor unless colorMode is 1; a gStylePalette entry */
-    s32 fogNear; /* +0x01C, EnterStyleSession: the viewport's setFogNear; a D_8008730C value */
+    s32 fogNear; /* +0x01C, EnterStyleSession: the viewport's setFogNear; a sStyleFogNears value */
 } StyleConfig;
 
 /* ObjM__GetGridRecord's grid lookups (src/code_39094.c): a

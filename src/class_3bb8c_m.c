@@ -276,23 +276,23 @@ void *ApplyStyleConfig(void) {
  * gStylePalette is a table of 24 three-byte entries (0x48 bytes; the first four
  * are 00/00/00, 40/40/40, 80/80/80, FF/FF/FF -- a greyscale ramp, so RGB
  * triples). Indexing it as `u8[][3]` is what produces retail's `i*2 + i + base`
- * stride-3 address arithmetic. D_8008730C is six words, 0x6800 down to 0x0800. */
+ * stride-3 address arithmetic. sStyleFogNears is six words, 0x6800 down to 0x0800. */
 struct StyleM {
     u8 pad000[0x00C];
     const u8 *unkC; /* +0x00C, a gStylePalette entry */
     u8 pad010[0x014 - 0x010];
     s32 unk14;       /* +0x014, cfg[0] sign-extended */
     const u8 *unk18; /* +0x018, a gStylePalette entry */
-    s32 unk1C;       /* +0x01C, a D_8008730C value */
+    s32 unk1C;       /* +0x01C, a sStyleFogNears value */
 };
 
 extern u8 gStylePalette[][3];
-extern s32 D_8008730C[];
+extern s32 sStyleFogNears[];
 
 void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
     style->unkC = gStylePalette[cfg[3]];
     style->unk18 = gStylePalette[cfg[2]];
-    style->unk1C = D_8008730C[cfg[1]];
+    style->unk1C = sStyleFogNears[cfg[1]];
     style->unk14 = cfg[0];
 }
 
