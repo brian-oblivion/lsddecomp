@@ -1190,22 +1190,6 @@ def jobs(d, n):
             class_hdrs = {j["header"] for j in p2["_class_jobs"]}
             sony_hdrs = {f: n for f, n in p2["_sony"].items()
                          if f.startswith("include/") and f not in class_hdrs}
-            groups = []   # [(set of includer units, [(header, names)])]
-            for f, names in sorted(sony_hdrs.items()):
-                us, fs = set(sony_includers(f)), [(f, names)]
-                for g in [g for g in groups if g[0] & us]:
-                    groups.remove(g)
-                    us |= g[0]
-                    fs = g[1] + fs
-                groups.append((us, sorted(fs)))
-            for us, fs in sorted(((sorted(u), f) for u, f in groups), key=lambda g: g[1][0][0]):
-                what = "; ".join(f"{f}: it re-declares {', '.join(names)}"
-                                 + (f", and name its placeholder type(s) {', '.join(sorted(p2['_homes'][f]))}"
-                                    if f in p2["_homes"] else "") for f, names in fs)
-                q6.append(("6", f"use Sony's own declarations in {what} "
-                                f"(FINISHING-PLAN track 6 step 4; tools/sonyheaders.py) "
-                                f"(units: {','.join([f for f, _ in fs] + list(us))})",
-                           MODELS["types_runner"]))
             # A flagged job the head marked `--after` waits until every file it
             # names has left tools/sonyheaders.py's list: its fix needs Sony's
             # headers in files those collisions would break.
@@ -1213,7 +1197,40 @@ def jobs(d, n):
             def waits_on(names):
                 return sorted({w for n in names for w in p2["_after"].get(n, []) if w in p2["_sony"]})
             first = {f for f, names in p2["_homes"].items() if any(is_flagged(n) for n in names)}
-            for f in sorted(first):
+            # Once it is ready, a flagged `--after` HEADER is a collision
+            # header's job in all but name: its fix puts Sony's headers in it,
+            # so every includer takes them too, and it joins the group of any
+            # collision header it shares an includer with (round 96:
+            # ViewportOt's <libgs.h> in Viewport.h reaches code_2864 and
+            # code_2cc8c_d, both Sprite.h's, and two runners would each have
+            # added the same Sony #include block to them).
+            sony_views = {f for f in first if f.startswith("include/") and f not in sony_hdrs
+                          and f not in class_hdrs and not waits_on(p2["_homes"][f])
+                          and any(n in p2["_after"] for n in p2["_homes"][f] if is_flagged(n))}
+            groups = []   # [(set of includer units, [(header, names or None for a sony view)])]
+            for f in sorted(set(sony_hdrs) | sony_views):
+                us, fs = set(sony_includers(f)), [(f, sony_hdrs.get(f))]
+                for g in [g for g in groups if g[0] & us]:
+                    groups.remove(g)
+                    us |= g[0]
+                    fs = g[1] + fs
+                groups.append((us, sorted(fs, key=lambda x: x[0])))
+
+            def part(f, names):
+                if names is None:
+                    ts = sorted(p2["_homes"][f])
+                    why = "; ".join(p2["_types"][n][0] for n in ts if is_flagged(n))
+                    return f"{f}: name its flagged type(s) {', '.join(ts)} ({why})"
+                return (f"{f}: it re-declares {', '.join(names)}"
+                        + (f", and name its placeholder type(s) {', '.join(sorted(p2['_homes'][f]))}"
+                           if f in p2["_homes"] else ""))
+            for us, fs in sorted(((sorted(u), f) for u, f in groups), key=lambda g: g[1][0][0]):
+                what = "; ".join(part(f, names) for f, names in fs)
+                q6.append(("6", f"use Sony's own declarations in {what} "
+                                f"(FINISHING-PLAN track 6 step 4; tools/sonyheaders.py) "
+                                f"(units: {','.join([f for f, _ in fs] + list(us))})",
+                           MODELS["types_runner"]))
+            for f in sorted(first - sony_views):
                 names = p2["_homes"][f]
                 u = Path(f).stem if f.startswith("src/") else f
                 why = "; ".join(p2["_types"][n][0] for n in sorted(names) if is_flagged(n))

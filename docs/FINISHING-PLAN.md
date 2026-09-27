@@ -19,9 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 33 (2026-09-27, round 95's premium head: a Sony-collision
-header job's edit set includes the units that include it; the polish
-runner stays on Opus).
+Plan revision: 34 (2026-09-27, round 96's premium head: a ready flagged
+`--after` header takes a Sony-collision header's edit set and joins its
+job).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -209,7 +209,9 @@ takes Sony's headers in the same fix; headers sharing an includer are one
 job (round 95). A flagged fix that needs
 Sony's headers where those collisions sit is flagged `--after <files>`, and
 `plan.py` lists it as WAITING until each has left `tools/sonyheaders.py`,
-and ranks the polish pass of a unit it waits on first.
+and ranks the polish pass of a unit it waits on first; once ready, a flagged
+header's job takes the same edit set and joins a collision header's job it
+shares an includer with (round 96: `Viewport.h` with `Sprite.h`).
 A class job's edit set is its header plus the units holding the class's own
 methods (their banners and field accessors), so a polish pass on one of those
 units defers behind it (round 93: class_3bb8c behind StageMap's job).
