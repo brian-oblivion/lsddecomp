@@ -261,7 +261,7 @@ extern const char D_8008AB14[]; /* "SELECT" */
 extern const char D_8008AB1C[]; /* "CARD\\" */
 extern const char D_8008AB24[]; /* ".TIM" */
 extern s32 gItemListPanelRect; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 256, 160} */
-extern s32 D_8008AAF8;
+extern s32 gItemListPanelPos;
 extern const char D_800116E4[]; /* "FONTICON" */
 
 /*
@@ -291,7 +291,7 @@ void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
     ((TimImageUploadFn)handle1->methods->processBuffer)(handle1);
     self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&gItemListPanelRect, 0);
     handle1->methods->release(handle1);
-    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&D_8008AAF8);
+    self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&gItemListPanelPos);
 
     handle2 = New_TimImage(BuildFileName(path, D_800116E4, dir, ext));
     ((TimImageUploadFn)handle2->methods->processBuffer)(handle2);

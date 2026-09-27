@@ -3144,3 +3144,4 @@ gFadeBoxMaskColors = 0x8006EA90;
 gFadeBoxBlackColors = 0x8006EAA8;
 gBoxFillDefaultColor = 0x8008A924;
 gItemListPanelRect = 0x80087028;
+gItemListPanelPos = 0x8008AAF8;
