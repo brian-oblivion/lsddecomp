@@ -498,32 +498,11 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
  * refuses one at or past _svm_vh->ps. */
 extern u8 D_8008EA13;
 
-/* Pointer to a 0x20-byte-stride table. Originally only the two
- * trailing byte fields SpuVmPBVoice reads (unkC/unkD) were named;
- * SpuVmKeyOn (below) additionally needs unk0/unk1/unk2/unk3/unk4/
- * unk5/unk6/unk7/unk16, all in the same struct (no offset conflicts,
- * per this project's convention of extending rather than duplicating
- * a local view when the fields don't overlap). */
-typedef struct {
-    u8 unk0; /* +0x0 */
-    u8 unk1; /* +0x1 */
-    u8 unk2; /* +0x2 */
-    u8 unk3; /* +0x3 */
-    u8 unk4; /* +0x4 */
-    u8 unk5; /* +0x5 */
-    u8 unk6; /* +0x6 */
-    u8 unk7; /* +0x7 */
-    u8 pad8[0xC - 0x8];
-    u8 bendCurveUp; /* +0xC -- multiplier used when the bend threshold is positive, per SpuVmPBVoice's report */
-    u8 bendCurveDown; /* +0xD -- multiplier used when the bend threshold is negative */
-    u8 pad0E[0x16 - 0xE];
-    u8 unk16; /* +0x16 */
-    u8 pad17[0x20 - 0x17];
-} Tbl32E978;
+/* libsnd's _svm_tn (pinned at this address): the current VAB's tone
+ * attributes, 16 per program. */
+extern VagAtr *D_8008E978;
 
-extern Tbl32E978 *D_8008E978;
-
-/* Selected-channel debug byte, write-only here. */
+/* _svm_cur + 0xC: the current tone number within the program. */
 extern u8 D_8008EA18;
 
 extern s16 note2pitch2(u16 a0, u16 a1);
@@ -561,7 +540,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     baseValue = _svm_voice[a0].unk0C;
 
     if (threshold > 0) {
-        tableByte = D_8008E978[someTotal].bendCurveDown;
+        tableByte = D_8008E978[someTotal].pbmax;
         product = threshold * tableByte;
         q = product / 63;
         outA2 = baseValue + q;
@@ -570,7 +549,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     } else {
         outA2 = baseValue;
         if (threshold < 0) {
-            tableByte = D_8008E978[someTotal].bendCurveUp;
+            tableByte = D_8008E978[someTotal].pbmin;
             product = threshold * tableByte;
             q = product / 64;
             outA2 = baseValue + q - 1;
@@ -863,15 +842,15 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
     if (a4 != 0) {
         matchCount = 0;
         for (chanScan = 0; chanScan < D_8008EA0C; chanScan++) {
-            Tbl32E978 *entry = &D_8008E978[D_8008EA13 * 16 + chanScan];
+            VagAtr *entry = &D_8008E978[D_8008EA13 * 16 + chanScan];
 
-            if (D_8008EA0E < entry->bendCurveUp) {
+            if (D_8008EA0E < entry->min) {
                 continue;
             }
-            if (entry->bendCurveDown < D_8008EA0E) {
+            if (entry->max < D_8008EA0E) {
                 continue;
             }
-            idBuf[matchCount] = entry->unk16;
+            idBuf[matchCount] = entry->vag;
             chanBuf[matchCount] = chanScan;
             matchCount++;
         }
@@ -882,20 +861,20 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
 
             s2 = a4 * 127;
             for (s1 = 0; s1 < matchCount; s1++) {
-                Tbl32E978 *entry2;
+                VagAtr *entry2;
 
                 D_8008EA24 = idBuf[s1];
                 D_8008EA18 = chanBuf[s1];
 
                 entry2 = &D_8008E978[D_8008EA13 * 16 + D_8008EA18];
-                D_8008EA1B = entry2->unk0;
-                D_8008EA19 = entry2->unk2;
-                D_8008EA1A = entry2->unk3;
-                D_8008EA1C = entry2->unk4;
-                D_8008EA1D = entry2->unk5;
-                D_8008EA20 = entry2->unk1;
-                D_8008EA1E = entry2->unk6;
-                D_8008EA1F = entry2->unk7;
+                D_8008EA1B = entry2->prior;
+                D_8008EA19 = entry2->vol;
+                D_8008EA1A = entry2->pan;
+                D_8008EA1C = entry2->center;
+                D_8008EA1D = entry2->shift;
+                D_8008EA20 = entry2->mode;
+                D_8008EA1E = entry2->min;
+                D_8008EA1F = entry2->max;
 
                 chan = SpuVmAlloc(0) & 0xFF;
                 D_8008EA26 = chan;
