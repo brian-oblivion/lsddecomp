@@ -36,9 +36,8 @@
  * does; the allocators reach the ctor through GraphicsResources.c's unprototyped
  * UnprototypedCtorTable view instead.
  *
- * The ctor's descriptor is GraphicsResources.c's ResourceSource ({buffer to adopt, file
- * name to request}); only the tag is declared here, so that any header may
- * repeat the declaration.
+ * The ctor's descriptor is include/FileResource.h's ResourceSource ({buffer
+ * to adopt, file name to request}).
  */
 
 struct ResourceSource;

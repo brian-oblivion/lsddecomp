@@ -33,9 +33,8 @@
  * array); ModelData__ForwardScanPackets casts it (an inherited slot keeps
  * the parent's name).
  *
- * The ctor's descriptor is GraphicsResources.c's ResourceSource ({buffer to adopt, file
- * name to request}); only the tag is declared here, as include/ModelData.h
- * does. The allocators reach the ctor through GraphicsResources.c's unprototyped
+ * The ctor's descriptor is include/FileResource.h's ResourceSource ({buffer
+ * to adopt, file name to request}). The allocators reach the ctor through GraphicsResources.c's unprototyped
  * UnprototypedCtorTable view.
  */
 
