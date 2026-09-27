@@ -9,7 +9,7 @@
 `s32 TaskObjF__OpenEvents(Node3bb8cE *self)`. Enters a critical section
 (`func_80024CE0`), starts 4 PSX threads via `func_80038F7C` (an
 `OpenTh`-style call: fixed mode `0xF4000001`, entry point from
-`D_80086E78[i]`, stack size `0x2000`, priority `0`), storing each returned
+`gCardEventSpecs[i]`, stack size `0x2000`, priority `0`), storing each returned
 handle into `self->threads[i]` (new field, offsets `+0x014`..`+0x020`),
 leaves the critical section (`func_80024CF0`), calls `TaskObjF__EnableEvents(self)`
 and returns `1` unconditionally.
@@ -39,7 +39,7 @@ s32 TaskObjF__OpenEvents(Node3bb8cE *self)
     i = 0;
     cur = self;
     do {
-        cur->threads[0] = func_80038F7C(0xF4000001, D_80086E78[i], 0x2000, 0);
+        cur->threads[0] = func_80038F7C(0xF4000001, gCardEventSpecs[i], 0x2000, 0);
         i++;
         cur = (Node3bb8cE *)((u8 *)cur + 4);
     } while (i < 4);

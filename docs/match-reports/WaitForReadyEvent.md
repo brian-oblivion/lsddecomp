@@ -12,7 +12,7 @@
 around an inner scan: for `i` in `[0, count)`, call `func_800390F4(arr[i])`
 (the same validity-check callback `TaskObjF__ForEachEvent` also uses); the first
 `i` for which it returns nonzero wins, and the function returns
-`D_80086E78[i]`. If no entry qualifies, the WHOLE array is rescanned from
+`gCardEventSpecs[i]`. If no entry qualifies, the WHOLE array is rescanned from
 the top forever (retail's own `blez count,.L8004F4F8` sits at the loop's
 own re-entry point, so `count <= 0` also spins here — no special case
 needed in the C, a plain `for (;;) { for (i = 0; i < count; i++) ... }`
@@ -26,7 +26,7 @@ the single early `return` inside it turned out to need only `$s0`/`$s1`.
 
 ## Header additions
 
-- `extern s32 D_80086E78[];` — the lookup table (`asm/data/76DC8.data.s`),
+- `extern s32 gCardEventSpecs[];` — the lookup table (`asm/data/76DC8.data.s`),
   left unsized (bound not established from this unit alone).
 - `extern s32 WaitForReadyEvent(s32 *arr, s32 count);` (forward declaration,
   needed because `TaskObjF__WaitForReadyEvent`, earlier in ROM order, calls it).
@@ -40,7 +40,7 @@ only caller in this unit).
 
 `func_8004F4C8` -> `WaitForReadyEvent`. **Tier A.** Free function
 (operates on a caller-supplied `s32 *arr`, not a `self`): forever-scans
-up to `count` entries with `TestEvent`, returning `D_80086E78[i]` for the
+up to `count` entries with `TestEvent`, returning `gCardEventSpecs[i]` for the
 first ready one, re-scanning the whole array from the top if none
 qualify yet. Mechanics and purpose (find which event fired) both
 directly evident from the body.

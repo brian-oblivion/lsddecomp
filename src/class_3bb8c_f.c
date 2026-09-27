@@ -309,7 +309,7 @@ s32 WaitForReadyEvent(s32 *arr, s32 count) {
     for (;;) {
         for (i = 0; i < count; i++) {
             if (TestEvent(arr[i]) != 0) {
-                return D_80086E78[i];
+                return gCardEventSpecs[i];
             }
         }
     }
