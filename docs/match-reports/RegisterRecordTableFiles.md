@@ -19,7 +19,7 @@ in round 42 (`--gp-symbols`, pinned in the Makefile).
 extern void *GetRecordTable(s32 *out);
 extern s32 RegisterFileTableEntries(void *arg0, s32 arg1);
 
-extern s32 D_8008A978;
+extern s32 sRecordRegisterCalls;
 extern s32 D_8008A97C;
 
 s32 RegisterRecordTableFiles(s32 arg0)
@@ -30,13 +30,13 @@ s32 RegisterRecordTableFiles(s32 arg0)
     s32 result;
 
     obj = GetRecordTable(&local);
-    prev = D_8008A978;
-    D_8008A978 = prev + 1;
+    prev = sRecordRegisterCalls;
+    sRecordRegisterCalls = prev + 1;
 
     switch (prev + 1) {
     case 1:
         if (arg0 != 0) {
-            D_8008A978 = prev + 2;
+            sRecordRegisterCalls = prev + 2;
         } else {
             local = local / 2;
             D_8008A97C = local;
@@ -102,7 +102,7 @@ discarded) and once from `code_1677c.c` as `RegisterRecordTableFiles(0)` (also
 discarded). It is not a class method (no `self` parameter, not reachable
 through any vtable slot in either the 33-slot or 28-slot table this unit
 resolved), and its own body -- a two-call-deep counter over
-`D_8008A978`/`D_8008A97C` feeding a loop on `RegisterFileTableEntries` --
+`sRecordRegisterCalls`/`D_8008A97C` feeding a loop on `RegisterFileTableEntries` --
 does not establish what it is registering. Per CLAUDE.md, "a wrong tier-A
 name is worse than `func_`"; this stays `RegisterRecordTableFiles` rather than assert
 a guess.

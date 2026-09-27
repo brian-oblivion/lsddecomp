@@ -224,7 +224,7 @@ DayTaskMethods *GetDayTaskMethods(void) {
 extern void *GetRecordTable(s32 *out);
 extern s32 RegisterFileTableEntries(void *arg0, s32 arg1);
 
-extern s32 D_8008A978;
+extern s32 sRecordRegisterCalls;
 extern s32 D_8008A97C;
 
 s32 RegisterRecordTableFiles(s32 arg0) {
@@ -234,13 +234,13 @@ s32 RegisterRecordTableFiles(s32 arg0) {
     s32 result;
 
     obj = GetRecordTable(&local);
-    prev = D_8008A978;
-    D_8008A978 = prev + 1;
+    prev = sRecordRegisterCalls;
+    sRecordRegisterCalls = prev + 1;
 
     switch (prev + 1) {
         case 1:
             if (arg0 != 0) {
-                D_8008A978 = prev + 2;
+                sRecordRegisterCalls = prev + 2;
             } else {
                 local = local / 2;
                 D_8008A97C = local;

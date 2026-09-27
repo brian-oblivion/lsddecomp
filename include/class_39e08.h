@@ -15,7 +15,7 @@
  *    class_3ac78. NoOpSlot58, CheckTimeout, SetState and SetTimeout are
  *    TimedTask's own methods that DayTask inherits unchanged.
  * plus RegisterRecordTableFiles, called once from DayTask's ctor and once from
- * code_1677c: it manages a pair of file-scope globals (D_8008A978/
+ * code_1677c: it manages a pair of file-scope globals (sRecordRegisterCalls/
  * D_8008A97C) and loops on RegisterFileTableEntries; nothing pins down
  * what it registers.
  *
