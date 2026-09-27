@@ -21,8 +21,6 @@
  * functions read this record.
  *
  * Only the fields a unit including this header accesses are declared.
- * code_179d8_l still carries its own reduced view of the same record (a local
- * SsScore); its fields join this definition when it moves onto it.
  */
 typedef struct SsScore {
     u8 unk0; /* +0x00 -- _SsSndNextSep's second argument when GetMetaEvent stops the sequence (unk3C is the first) */
