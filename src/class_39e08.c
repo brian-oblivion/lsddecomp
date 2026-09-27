@@ -240,7 +240,7 @@ DayTaskMethods *GetDayTaskMethods(void) {
     return &gDayTaskMethods;
 }
 
-/* src/code_39094.c: returns gRecordTable and writes its record count to
+/* src/GameFiles.c: returns gRecordTable and writes its record count to
  * *out. */
 extern void *GetRecordTable(s32 *out);
 /* src/code_171e0.c: appends `count` records of `table` to the CD driver's

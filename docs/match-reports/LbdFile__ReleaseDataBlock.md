@@ -6,7 +6,7 @@
 
 > Renamed from `func_80048C98` on 2026-09-25 (tools/rename.py). Address 0x80048c98.
 
-Round 82, runner echo, 2026-09-25. Unit `code_39094` (carved revision 18).
+Round 82, runner echo, 2026-09-25. Unit `GameFiles` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
 (`./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`), funcdiff
 16/16, 0 insertions / 0 deletions, no out-of-range drift. No levers needed.
@@ -18,7 +18,7 @@ Method slot +0x084 of gLbdFileMethods (table word at 0x800819C4). Clears `dataRe
 ## Source
 
 ```c
-/* DataSrc39094: the local view at the top of src/code_39094.c --
+/* DataSrc39094: the local view at the top of src/GameFiles.c --
  * FILERESOURCE_FIELDS, then u16 headerReady, u16 dataReady, u8 pad30[4], void *dataBuffer, s32 autoLoadData. */
 extern void *BMemPMgrFree(void *ptr);
 

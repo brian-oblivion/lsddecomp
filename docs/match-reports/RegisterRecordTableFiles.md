@@ -120,7 +120,7 @@ now says so. (The derivation above quotes the old comment as it was.)
 
 `func_8004A070` -> `RegisterRecordTableFiles` (tier B). The body, read with
 its two callees: GetRecordTable returns gRecordTable (0x230 records of 0x1C
-bytes, each a file path first; code_39094.c's banner) and its count;
+bytes, each a file path first; GameFiles.c's banner) and its count;
 RegisterFileTableEntries (code_171e0.c) appends `count` records to the CD
 driver's file table and resolves them, returns 0 to be retried, and 1 when
 the CD driver is not the active source. So the function registers the record

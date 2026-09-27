@@ -2,7 +2,7 @@
 
 > Renamed from `func_80048CFC` on 2026-09-25 (tools/rename.py). Address 0x80048cfc.
 
-Round 82, runner echo, 2026-09-25. Unit `code_39094` (carved revision 18).
+Round 82, runner echo, 2026-09-25. Unit `GameFiles` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
 (`./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`), funcdiff
 11/11, 0 insertions / 0 deletions, no out-of-range drift. No levers needed.
@@ -37,7 +37,7 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
 
 ## The second parameter (round 82, alpha, track 3 externcheck)
 
-The source block above had drifted from `src/code_39094.c`, which has
+The source block above had drifted from `src/GameFiles.c`, which has
 always compiled the 2-parameter form. The second parameter is dead in the
 body (`$a1` is never read), but it is real at every call: two callers load
 it explicitly (GameApplication__SeedRandom: `move a1,zero` at

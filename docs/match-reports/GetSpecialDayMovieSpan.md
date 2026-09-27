@@ -4,7 +4,7 @@
 
 > Renamed from `func_800493E4` on 2026-09-25 (tools/rename.py). Address 0x800493e4.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `code_39094`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
 Byte-exact on build 12; whole-image SHA1 green, funcdiff 39/39.
 
 ## What it does
@@ -15,7 +15,7 @@ a 10-unit gap between entries), returns `rec`.
 
 ## Source
 
-Declarations: `FilePathRecord` and `extern s16 gMovieFrameCounts[];` in `src/code_39094.c`.
+Declarations: `FilePathRecord` and `extern s16 gMovieFrameCounts[];` in `src/GameFiles.c`.
 
 ```c
 FilePathRecord *GetSpecialDayMovieSpan(s32 *total, s32 n, s32 len) {

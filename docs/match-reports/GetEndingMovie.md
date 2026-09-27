@@ -4,7 +4,7 @@
 
 > Renamed from `func_800491FC` on 2026-09-25 (tools/rename.py). Address 0x800491fc.
 
-Round 82, runner echo (second echo session), 2026-09-25. Unit `code_39094`.
+Round 82, runner echo (second echo session), 2026-09-25. Unit `GameFiles`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
 retail SLPS_015.56`), funcdiff 17/17, 0 insertions / 0 deletions, no
 out-of-range drift.
@@ -15,7 +15,7 @@ Record accessor: calls GetEndingMovieRecord(&count) (which writes 7 and returns 
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/code_39094.c`
+Declarations it needs are the local views at the top of `src/GameFiles.c`
 (`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c

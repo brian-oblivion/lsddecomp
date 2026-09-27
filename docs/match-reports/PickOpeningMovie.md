@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004913C` on 2026-09-25 (tools/rename.py). Address 0x8004913c.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `code_39094`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
 Byte-exact on the first build; whole-image SHA1 green, funcdiff 36/36,
 0 insertions / 0 deletions.
 
@@ -16,7 +16,7 @@ Random pick within the record block at 0x230: `r = (u32)SeedAndRandom(0, ?) % 7`
 
 ## Source
 
-Declarations: the local views at the top of `src/code_39094.c` (`FilePathRecord`).
+Declarations: the local views at the top of `src/GameFiles.c` (`FilePathRecord`).
 
 ```c
 FilePathRecord *PickOpeningMovie(s32 *countOut, s32 arg1) {

@@ -33,7 +33,7 @@ extern void *BMemPMgrAlloc(s32 size);
  * resources. */
 extern void ReleaseDreamAuxModels(void);
 
-/* src/code_39094.c: the "SND\\SE" sound bank path, which DayTask's ctor
+/* src/GameFiles.c: the "SND\\SE" sound bank path, which DayTask's ctor
  * passes as TimedTask's soundBankPath. */
 extern char *GetSoundEffectDir(s32 unused); /* arity-ok: the definition takes no parameter and reads no argument register, but this dead argument IS byte-load-bearing -- retail emits `move a0,zero` at 0x800496A8 ahead of the jal at 0x800496B0 */
 
@@ -45,7 +45,7 @@ extern void InitDreamAux(void);
 extern const char sEtcTimPath[];
 extern const char sDreamerTmdPath[];
 
-/* src/code_39094.c: one of the seven gSoundBankPaths words, each a VAB
+/* src/GameFiles.c: one of the seven gSoundBankPaths words, each a VAB
  * path string ("SND\\AMBIENT" ... "SND\\STANDERD"), which DayTask's ctor
  * passes to New_WBgm as its vabPath. */
 extern s32 PickSoundBank(s32 unused);
