@@ -75,9 +75,9 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
     ChunkSlot *entry;
     GridCell *obj;
     GridCell **cellp;
-    u8 *p;
-    u8 *end;
-    s32 buf[3];
+    GridCell **cell;
+    GridCell **end;
+    LongVec3 pos;
 
     GetLightRigMethods()->ctor((LightRig *)self);
     self->methods = GetStageMapMethods();
@@ -118,28 +118,28 @@ void StageMap__StageMap(StageMap *self, LongVec3 *origin, s32 autoLoad) {
             return;
         }
 
-        buf[0] = 0x400;
-        buf[1] = 0;
-        buf[2] = 0x400;
+        pos.x = 0x400;
+        pos.y = 0;
+        pos.z = 0x400;
 
         cellp = entry->cells;
-        end = (u8 *)cellp + 0x668;
-        p = (u8 *)cellp;
-        while (p < end) {
+        end = cellp + 410;
+        cell = cellp;
+        while (cell < end) {
             obj = New_GridCell();
-            *(GridCell **)p = obj;
-            obj->methods->attachToParent(obj, (SceneNode *)entry->cellParent, (LongVec3 *)buf);
+            *cell = obj;
+            obj->methods->attachToParent(obj, (SceneNode *)entry->cellParent, &pos);
 
-            buf[0] += 0x800;
-            if (buf[0] > 0xA400) {
-                buf[0] = 0x400;
-                buf[2] += 0x800;
+            pos.x += 0x800;
+            if (pos.x > 0xA400) {
+                pos.x = 0x400;
+                pos.z += 0x800;
             }
 
-            obj = *(GridCell **)p;
+            obj = *cell;
             obj->methods->setLightMode(obj, 1);
-            obj = *(GridCell **)p;
-            p += 4;
+            obj = *cell;
+            cell++;
             obj->attribute |= 0x80000000;
         }
     }
@@ -153,8 +153,8 @@ void StageMap__Finalize(StageMap *self) {
     ChunkSlot *entry;
     GridCell *obj;
     GridCell **cellp;
-    u8 *p;
-    u8 *end;
+    GridCell **cell;
+    GridCell **end;
 
     self->methods->removeChild(self, (BasicClass *)GetDrawSystem());
 
@@ -178,14 +178,14 @@ void StageMap__Finalize(StageMap *self) {
         }
 
         cellp = entry->cells;
-        end = (u8 *)cellp + 0x668;
-        p = (u8 *)cellp;
-        while (p < end) {
-            obj = *(GridCell **)p;
+        end = cellp + 410;
+        cell = cellp;
+        while (cell < end) {
+            obj = *cell;
             if (obj != NULL) {
                 obj->methods->release(obj);
             }
-            p += 4;
+            cell++;
         }
 
         BMemPMgrFree(entry->cells);
