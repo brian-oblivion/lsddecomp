@@ -51,7 +51,7 @@ void TaskObjF__SetState(TaskObjF *self, s32 arg1) {
             methods->setState(self, arg1);
             break;
         case 0x14:
-            if (*(u8 *)self->fileName == 0) {
+            if (self->fileName[0] == '\0') {
                 methods->findUnusedMemcardName(self, self->fileName, self->namePrefix, self->nameSuffixes);
             }
             ret = methods->writeMemcardSaveFile(self, self->fileName, self->title, self->iconFrames,
@@ -95,9 +95,9 @@ extern char *gCardIconNames[];
 extern const char gCardPathPrefix[]; /* "CARD\\" */
 extern const char gCardPathSuffix[]; /* ".TIM" */
 /* 3 words, `New_ScreenSprite`'s rect: a SpriteRect {0, 0, 160, 120}. */
-extern s32 gCardIconRect;
+extern SpriteRect gCardIconRect;
 /* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
-extern s32 gCardIconPos;
+extern ScreenSpritePos gCardIconPos;
 
 void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1) {
     char path[0x20];
@@ -125,7 +125,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1) {
 
     handle = New_TimImage(buf);
     ((TimImageUploadFn)handle->methods->processBuffer)(handle);
-    newVal = New_ScreenSprite(handle, (SpriteRect *)&gCardIconRect, 0);
+    newVal = New_ScreenSprite(handle, &gCardIconRect, 0);
     self->cardIcon = newVal;
     handle->methods->release(handle);
     newVal->methods->attachToParent(newVal, self->spriteParent, (LongVec3 *)&gCardIconPos);
@@ -239,7 +239,7 @@ void TaskObjF__TickStateDelay(TaskObjF *self) {
 void TaskObjF__AttachTextEntry(TaskObjF *self) {
     if (self->spriteParent != 0 && self->inputSource != 0) {
         if (self->textEntry == NULL) {
-            self->textEntry = New_TextEntry((self->titleEditPos << 1) + self->title, 1);
+            self->textEntry = New_TextEntry(&self->title[self->titleEditPos * 2], 1);
             self->ownsWidget = 1;
         }
         self->methods->addChild(self, (BasicClass *)self->textEntry);
@@ -323,7 +323,6 @@ extern s32 atoi(char *s);
  * (ROM image still-uncarved, `asm/data/1C34.rodata.s` region) this
  * function copies raw byte ranges out of; also read by
  * `class_3bb8c_d.c`'s own (differently-typed) local view. */
-extern u8 *gSaveTitleGlyphs;
 
 /* Struct-copy helper types for round 45's StampSaveTitleFileLetter, all deliberately
  * all-`s8` (alignment 1) per this round's FormatNumberIntoBuffer lever: retail
@@ -343,6 +342,8 @@ typedef struct {
     s8 a, b;
 } Pair2_3bb8c_g;
 
+extern Pair2_3bb8c_g *gSaveTitleGlyphs;
+
 /* Signature is `include/class_3bb8c.h`'s ALREADY-shared
  * `extern s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1);` (class_3bb8c_m's own
  * caller, TaskObjF__WriteMemcardSaveFile), matched exactly -- this unit's own definition
@@ -352,26 +353,26 @@ typedef struct {
  * template in every path) confirms the real return type is a pointer,
  * loosely read as `s32` by the caller that never dereferences it. */
 s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1) {
-    u8 *self = (u8 *)arg0;
+    Pair2_3bb8c_g *self = (Pair2_3bb8c_g *)arg0;
     u8 *src = (u8 *)arg1;
     s32 t0;
     s32 idx;
-    u8 *p;
+    Pair2_3bb8c_g *p;
 
     if (src != NULL) {
         t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
 
-        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(gSaveTitleGlyphs + 0x1E);
-        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(gSaveTitleGlyphs + 0x1E);
+        self[12] = gSaveTitleGlyphs[15];
+        *(Buf12_3bb8c_g *)&self[3] = *(Buf12_3bb8c_g *)&gSaveTitleGlyphs[15];
 
         idx = atoi((char *)(src + t0)) - 1;
-        p = gSaveTitleGlyphs + idx * 2;
-        *(Pair2_3bb8c_g *)(self + 0x8) = *(Pair2_3bb8c_g *)p;
+        p = &gSaveTitleGlyphs[idx];
+        self[4] = *p;
         return (s32)p;
     } else {
-        u8 *q = gSaveTitleGlyphs;
+        Pair2_3bb8c_g *q = gSaveTitleGlyphs;
 
-        *(Buf6_3bb8c_g *)(self + 0x6) = *(Buf6_3bb8c_g *)(q + 0x1E);
+        *(Buf6_3bb8c_g *)&self[3] = *(Buf6_3bb8c_g *)&q[15];
         return (s32)q;
     }
 }
