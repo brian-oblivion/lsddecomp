@@ -4,7 +4,7 @@
 
 > Renamed from `func_80042790` on 2026-09-25 (tools/rename.py). Address 0x80042790.
 
-Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gLightRigMethods slot +0x00C (finalize) (`tools/classtable.py`).
 - **What:** For i = 0..2, fetches child i through its own slot +0x0B8 (LightRig__GetLight) and calls that child's release (+0x004); then SceneNode's finalize via `GetSceneNodeMethods()`.

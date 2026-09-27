@@ -4,7 +4,7 @@
 
 > Renamed from `func_80042400` on 2026-09-25 (tools/rename.py). Address 0x80042400.
 
-Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (third re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table (allocator) (`tools/classtable.py`).
 - **What:** `BMemPMgrAlloc(0x1C)`; if non-NULL, calls slot +0x008 of `Get_vtable_FrameClock()` (the gFrameClockMethods table) on it and returns it, else NULL. Delta's round-82 allocator shape (`if (obj != NULL) { ctor; return obj; } return NULL;`) matched first build.
@@ -32,7 +32,7 @@ void *New_FrameClock(void) {
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Renamed from `New_D8006EF50`: the allocator (BMemPMgrAlloc(0x1C), then the table's ctor). Now returns `FrameClock *` and calls `Get_vtable_FrameClock()->ctor(obj)` instead of the unit-local `Slot08Methods_322b4` view. Its two callers (IntermediateBase__Init, DayTask__DayTask) upcast the result into their own `BasicClass *` / `SubObjG *` fields. The class (id 0x5, table `gFrameClockMethods`, formerly `D_8006EF50`) is unified as `FrameClock` in `include/FrameClock.h`, whose banner holds the evidence for the class name: its tick (+0x044) is called by IntermediateBase__OnTag1Notify on the DrawSystem's per-VSync event 2, counts one frame and tells its parents event 2, or 3 while paused, or 4 while flag14 is set. Fields renamed: `count` -> `frameCount`, `flag10` -> `paused`. Any source block above is the pre-unification spelling (`D_8006EF50Obj`); the live body in `src/code_322b4.c` takes `FrameClock *`, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `New_D8006EF50`: the allocator (BMemPMgrAlloc(0x1C), then the table's ctor). Now returns `FrameClock *` and calls `Get_vtable_FrameClock()->ctor(obj)` instead of the unit-local `Slot08Methods_322b4` view. Its two callers (IntermediateBase__Init, DayTask__DayTask) upcast the result into their own `BasicClass *` / `SubObjG *` fields. The class (id 0x5, table `gFrameClockMethods`, formerly `D_8006EF50`) is unified as `FrameClock` in `include/FrameClock.h`, whose banner holds the evidence for the class name: its tick (+0x044) is called by IntermediateBase__OnTag1Notify on the DrawSystem's per-VSync event 2, counts one frame and tells its parents event 2, or 3 while paused, or 4 while flag14 is set. Fields renamed: `count` -> `frameCount`, `flag10` -> `paused`. Any source block above is the pre-unification spelling (`D_8006EF50Obj`); the live body in `src/Sprite.c` takes `FrameClock *`, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, charlie)
 

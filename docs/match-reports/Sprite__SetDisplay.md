@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004220C` on 2026-09-25 (tools/rename.py). Address 0x8004220c.
 
-Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (third re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** slot +0x060 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gVariantSpriteMethods (`tools/classtable.py`).
 - **What:** `GetSetBitField(&self->sprite.attribute, 0x1F, 1, a1 == 0) == 0` (inverted display flag, bit 31).

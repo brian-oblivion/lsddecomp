@@ -2,7 +2,7 @@
 
 > Renamed from `func_80042294` on 2026-09-25 (tools/rename.py). Address 0x80042294.
 
-Round 82, runner alpha (re-staffed slot). Unit `src/code_322b4.c`. Fresh
+Round 82, runner alpha (re-staffed slot). Unit `src/Sprite.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 - **Where:** gTextRowMethods and gCharSpriteMethods slot +0x098 (update, over SceneNode__Update) (`tools/classtable.py`).

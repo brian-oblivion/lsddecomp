@@ -16,7 +16,7 @@
  * The class is declared in include/FlatLightObj.h (track 4, round 87): the
  * object, its table and the evidence for the name live there. The unit's
  * only outside caller of New_FlatLightObj is LightRig__LightRig
- * (src/code_322b4.c, include/LightRig.h), with light ids 0, 1, 2.
+ * (src/Sprite.c, include/LightRig.h), with light ids 0, 1, 2.
  */
 
 extern void *BMemPMgrAlloc(s32 size);

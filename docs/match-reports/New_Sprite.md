@@ -1,6 +1,6 @@
 # New_Sprite -- MATCHED (40/40 words), round 82
 
-Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** not in any method table (allocator) (`tools/classtable.py`).
 - **What:** `BMemPMgrAlloc(0xA0)`; if non-NULL, Sprite's ctor through `GetSpriteMethods()` with all five arguments (two on the stack), returns the object, else NULL. The round's allocator shape, first build.

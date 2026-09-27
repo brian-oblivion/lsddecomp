@@ -7,7 +7,7 @@
  * CharSprite -- one character of an 8x8 font (class id 0x1144, method table
  * gCharSpriteMethods): ScreenSprite's subclass, a screen-space sprite whose
  * texture cell is picked by a one-byte character code. Methods in
- * src/code_322b4.c. The name is for what the class's own methods do, and the
+ * src/Sprite.c. The name is for what the class's own methods do, and the
  * evidence is this:
  *  - setCell (+0x0C4) stores the byte in `cellIndex` and points the
  *    GsSPRITE's u,v at its cell through GetCellRect: column `cell & 0x1F`,

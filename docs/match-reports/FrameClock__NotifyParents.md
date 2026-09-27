@@ -4,7 +4,7 @@
 
 > Renamed from `func_80042550` on 2026-09-25 (tools/rename.py). Address 0x80042550.
 
-Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gFrameClockMethods slot +0x030 (notifyParents override) (`tools/classtable.py`).
 - **What:** Seeds the +0x018 cursor from `parentRefs` (+0x008), walks it with `GetNextBasicClass`, calls each parent's onNotify (+0x038) with (parent, self, event), then clears the cursor. FrameClock__RemoveParentRef (removeParentRef) keeps that cursor valid when a parent is removed mid-walk.
@@ -42,4 +42,4 @@ A loop whose only call site sits at the bottom, reached by an entry `j` (`j L; .
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Renamed from `D8006EF50__NotifyParents`: override of +0x030, named for its slot. The class (id 0x5, table `gFrameClockMethods`, formerly `D_8006EF50`) is unified as `FrameClock` in `include/FrameClock.h`, whose banner holds the evidence for the class name: its tick (+0x044) is called by IntermediateBase__OnTag1Notify on the DrawSystem's per-VSync event 2, counts one frame and tells its parents event 2, or 3 while paused, or 4 while flag14 is set. Fields renamed: `count` -> `frameCount`, `flag10` -> `paused`. Any source block above is the pre-unification spelling (`D_8006EF50Obj`); the live body in `src/code_322b4.c` takes `FrameClock *`, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `D8006EF50__NotifyParents`: override of +0x030, named for its slot. The class (id 0x5, table `gFrameClockMethods`, formerly `D_8006EF50`) is unified as `FrameClock` in `include/FrameClock.h`, whose banner holds the evidence for the class name: its tick (+0x044) is called by IntermediateBase__OnTag1Notify on the DrawSystem's per-VSync event 2, counts one frame and tells its parents event 2, or 3 while paused, or 4 while flag14 is set. Fields renamed: `count` -> `frameCount`, `flag10` -> `paused`. Any source block above is the pre-unification spelling (`D_8006EF50Obj`); the live body in `src/Sprite.c` takes `FrameClock *`, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

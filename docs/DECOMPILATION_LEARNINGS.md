@@ -159,7 +159,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   action is `for (f(); cond; f())` with the call written TWICE**: cross-jump merges the copies into
   retail's single bottom call. `while (f(), cond)` puts the exit test at the top and is four words
   short. The operand order inside a for-init (`i = 0, p = base`) is a scheduling lever like the
-  increment's, deciding which setup lands around an intervening `jalr`. (round 82, code_322b4)
+  increment's, deciding which setup lands around an intervening `jalr`. (round 82, Sprite)
 - **One store retail shows at a join may be the SAME store written in both arms**: GCC merges the
   identical stores into the join block, and the label that merge creates stops a following reload
   from hoisting above it. `StageMap__SplitFootprintRect` 97/97; the barriers and `do{}while(0)` it had carried were
@@ -242,7 +242,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   wants `u32` (kills a spurious `andi`) or `s32` (gets `slt`, not `sltu`); `andi 0xff` -> `blez` was
   +44 raw words. It can TRADE one defect for another (15/24 either way) — a changed SET of differing
   words means the lever worked and exposed a second defect. (a §"The lever the diagnostic step
-  actually surfaced") The converse holds for a PARAMETER: an `andi 0xff` at the USE (a call's delay slot) with the prologue's `li` moved is a `u8` parameter (s32/u32: same length, 24/27); an `andi` mid-body before `srl`/`sll` is a `u32` parameter masked by an explicit `x &= 0xFF;` (`u8` drops the mask, `s32` gives `sra`). (round 82, code_322b4)
+  actually surfaced") The converse holds for a PARAMETER: an `andi 0xff` at the USE (a call's delay slot) with the prologue's `li` moved is a `u8` parameter (s32/u32: same length, 24/27); an `andi` mid-body before `srl`/`sll` is a `u32` parameter masked by an explicit `x &= 0xFF;` (`u8` drops the mask, `s32` gives `sra`). (round 82, Sprite)
 - **A struct of all `s8`/`s16` has alignment 2, and alignment is a TWO-WAY lever read off retail's
   instruction WIDTH.** Alignment 2 makes a whole-struct assignment compile to `lwl`/`lwr` +
   `swl`/`swr` and one stray `s32` breaks it (4x); inversely, if retail's tail is `lb`/`sb` where

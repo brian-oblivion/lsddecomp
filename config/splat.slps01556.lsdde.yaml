@@ -232,7 +232,7 @@ segments:
       - [0x19B4, o, libc2/sprintf, .rdata]
       # jtbl_80011290 (5 words) is code_322b4's switch table, ATTACHED for its
       # `.L` labels; D_800112A4 onward is psyq_36654's (libpress) and stays plain.
-      - [0x1A90, .rodata, code_322b4]
+      - [0x1A90, .rodata, Sprite]
       - [0x1AA4, rodata]
       # 0x1B -> 0x1B6B; retail's next string is at 0x1B6C, which is exactly
       # where SUBALIGN(2) puts it, so no pad line is needed.
@@ -1338,7 +1338,7 @@ segments:
       - [0x319A8, o, libc2/itoa]       # itoa
       - [0x319E8, o, libc2/sprintf]    # sprintf
       - [0x32248, o, libc2/memmove]    # memmove
-      - [0x322b4, c, code_322b4]       # game code (revision 18; was psyq_322b4)
+      - [0x322b4, c, Sprite]       # game code (revision 18; was psyq_322b4)
       # psyq_memset chunk B: three short runs in the libgs/libcd remainder.
       - [0x330F4, o, libgs/gs_110]     # GsSetAmbient
       - [0x3311c, c, code_3311c]       # game code (revision 18; was psyq_3311c)

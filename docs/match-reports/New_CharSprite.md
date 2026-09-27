@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041AB4` on 2026-09-25 (tools/rename.py). Address 0x80041ab4.
 
-Round 82, runner alpha (fourth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha (fourth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior attempt.
 
 - **Where:** not in any method table (allocator for CharSprite, the 8x8-cell sprite). Called from class_3bb8c_i.c (`New_CharSprite(handle2, 0x5F)`) and code_2cc8c_f.c (`New_CharSprite(a1, 0x20)`).
 - **What:** `BMemPMgrAlloc(0xAC)`; if non-NULL, calls slot +0x008 (ctor, CharSprite__CharSprite) of `GetCharSpriteMethods()` (the gCharSpriteMethods table) with `(obj, texture, cell)` and returns obj, else NULL.

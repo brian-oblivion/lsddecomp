@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004283C` on 2026-09-25 (tools/rename.py). Address 0x8004283c.
 
-Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gLightRigMethods slot +0x0BC (`tools/classtable.py`).
 - **What:** Sets the 3-byte ambient colour at +0x050 from `*rgb`; when the third argument is non-zero it first swaps (old colour written back into `*rgb` via a stack temp). Then `GsSetAmbient(r << 4, g << 4, b << 4)` read back unsigned (`lbu`).
