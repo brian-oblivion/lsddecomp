@@ -116,7 +116,7 @@ gFileTable
 gFileTableCount
 gFileTableRegistered
 gForcedSoundBank
-gForcedVariant
+gForcedStageBgm
 gGameApplication
 gGraphPointBaseColor
 gGraphPointHighlightColor

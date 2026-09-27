@@ -12,7 +12,7 @@
  *    SND\*.VH/VB; then per stage its TEXx.TIX, BGx.SEQ and Mnnn.LBD files;
  *    then the FILM .STR and IMG .TIM files): random-or-forced
  *    pickers (SeedAndRandom, SetPickOverrides/gForcedSoundBank/
- *    gForcedVariant), per-stage record-group accessors indexed by
+ *    gForcedStageBgm), per-stage record-group accessors indexed by
  *    gRecordIndexTable and, for GetGridRecordXY, by StageGrid.h's cell
  *    columns, and a family of "stream channel" lookups (GetIntroStreamName,
  *    PickWeeklyStreamChannel, GetStreamChannelInit, ResolveCinematicChannel,
@@ -147,7 +147,7 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
 
 extern char *gDefaultDataDirectory; /* "CDI\\" (sdata) */
 extern s32 gForcedSoundBank;
-extern s32 gForcedVariant;
+extern s32 gForcedStageBgm;
 extern u8 gSoundBankPaths[];
 extern u8 gRecordTable[];
 extern char *gSoundEffectDirPtr; /* -> "SND\\SE" */
@@ -180,7 +180,7 @@ void SetPickOverrides(s32 a, s32 b) {
         gForcedSoundBank = a;
     }
     if (b >= 0) {
-        gForcedVariant = b;
+        gForcedStageBgm = b;
     }
 }
 
@@ -242,12 +242,12 @@ Rec1C *PickVariant(s32 index, s32 arg1) {
         if (r == 2) {
             r = 3;
         }
-        if (gForcedVariant == 3) {
-            gForcedVariant = 4;
+        if (gForcedStageBgm == 3) {
+            gForcedStageBgm = 4;
         }
     }
     rec = GetVariantBlock(index);
-    return &rec[gForcedVariant != 0 ? gForcedVariant - 1 : r];
+    return &rec[gForcedStageBgm != 0 ? gForcedStageBgm - 1 : r];
 }
 
 Rec1C *GetGridRecordBase(s32 index) {

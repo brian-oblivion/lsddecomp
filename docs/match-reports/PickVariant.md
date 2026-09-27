@@ -9,7 +9,7 @@ Byte-exact on the second build; whole-image SHA1 green, funcdiff 46/46.
 
 Random pick of one of five records in the block `GetVariantBlock(index)`
 (record 4 of the group): `r = rand % 5`; for group 9, r 2 becomes 3 and an
-override gForcedVariant of 3 becomes 4. Returns `&rec[gForcedVariant - 1]` when the
+override gForcedStageBgm of 3 becomes 4. Returns `&rec[gForcedStageBgm - 1]` when the
 override is set, else `&rec[r]`.
 
 ## Source
@@ -22,12 +22,12 @@ Rec1C *PickVariant(s32 index, s32 arg1) {
         if (r == 2) {
             r = 3;
         }
-        if (gForcedVariant == 3) {
-            gForcedVariant = 4;
+        if (gForcedStageBgm == 3) {
+            gForcedStageBgm = 4;
         }
     }
     rec = GetVariantBlock(index);
-    return &rec[gForcedVariant != 0 ? gForcedVariant - 1 : r];
+    return &rec[gForcedStageBgm != 0 ? gForcedStageBgm - 1 : r];
 }
 ```
 
@@ -58,4 +58,4 @@ caller's 2-parameter extern now agrees with the definition.
 
 - **Name:** `PickVariant`
 - **Tier:** A
-- **Evidence:** leaf picker: 1-of-5 random-or-forced pick (gForcedVariant) from GetVariantBlock(index), with an index==9 special case.
+- **Evidence:** leaf picker: 1-of-5 random-or-forced pick (gForcedStageBgm) from GetVariantBlock(index), with an index==9 special case.
