@@ -31,7 +31,7 @@ DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32
 }
 
 void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
-    LoadRequest req;
+    ResourceSourceRequest req;
     s32 tmp;
 
     GetTimedTaskMethods()->ctor((TimedTask *)self, (char *)GetSoundEffectDir(0), 0);
@@ -40,9 +40,9 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     self->etcTim = New_TimImage((char *)D_800113EC);
     ((TimImageUploadFn)self->etcTim->methods->processBuffer)(self->etcTim);
     self->etcTim->methods->freeBuffer(self->etcTim);
-    req.type = 0;
-    req.path = D_800113F8;
-    self->dreamerTmd = New_LinkResource((struct ResourceSource *)&req);
+    req.src.buffer = NULL;
+    req.src.name = (char *)D_800113F8;
+    self->dreamerTmd = New_LinkResource(&req.src);
     tmp = PickWeeklyGroup(0);
     self->bgm = New_WBgm((char *)tmp, NULL, 1);
     func_8004A070(1);

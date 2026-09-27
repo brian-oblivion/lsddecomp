@@ -62,18 +62,6 @@ extern void InitDreamAux(void);
 extern const char D_800113EC[];
 extern const char D_800113F8[];
 
-/* Same request-block shape src/code_1677c.c established at
- * `GameApplication__GameApplication`'s call site (`LoadModelRequest`, learned there to be
- * 0x10 bytes even though only the first two fields are ever written --
- * "local struct SIZE matters, not shape"). New_LinkResource
- * (include/LinkResource.h) takes it cast to its descriptor, struct ResourceSource. */
-typedef struct LoadRequest {
-    s32 type;
-    const char *path;
-    s32 unk08;
-    s32 unk0C;
-} LoadRequest;
-
 /* src/code_39094.c: one of the seven gWeeklyGroupTable words, each a VAB
  * path string ("SND\\AMBIENT" ... "SND\\STANDERD"). Its return value is
  * forwarded as `New_WBgm`'s own 1st argument (include/WBgm.h). */
