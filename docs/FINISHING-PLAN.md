@@ -19,8 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 32 (2026-09-26, round 94's premium head: a header that
-re-declares a Sony name ranks first; a flagged job can wait `--after` them).
+Plan revision: 33 (2026-09-27, round 95's premium head: a Sony-collision
+header job's edit set includes the units that include it).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -201,7 +201,10 @@ first, since other jobs' debt usually waits on it (round 92: SoundCueSet).
 Ahead even of that, a header that re-declares a Sony name gets a job of its
 own, because none of its includers can take Sony's headers until it does
 (round 94: `ViewportOt` is Sony's anonymous `GsOT`, and `Viewport.h` could
-not include `<libgs.h>` past four such headers). A flagged fix that needs
+not include `<libgs.h>` past four such headers). Its edit set is the header
+and every unit including it, directly or through another header, since each
+takes Sony's headers in the same fix; headers with the same includers are
+one job (round 95). A flagged fix that needs
 Sony's headers where those collisions sit is flagged `--after <files>`, and
 `plan.py` lists it as WAITING until each has left `tools/sonyheaders.py`.
 A class job's edit set is its header plus the units holding the class's own

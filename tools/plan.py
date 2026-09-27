@@ -1142,6 +1142,21 @@ def jobs(d, n):
     p2 = d["_p2"]
     P = MODELS["head_when_new_procedure"]
     q6, q7, q8, q9 = [], [], [], []
+    def sony_includers(header):
+        """Units that include `header`, directly or through another project
+        header: the ones that must take Sony's headers when it stops
+        re-declaring Sony's names."""
+        import headercontention
+        base = Path(header).name
+        inc = {h.name: set(re.findall(r'#include\s+"([^"]+)"', h.read_text(errors="replace")))
+               for h in Path("include").glob("*.h")}
+        closure, grew = {base}, True
+        while grew:
+            more = {h for h, hs in inc.items() if hs & closure} - closure
+            closure |= more
+            grew = bool(more)
+        return sorted(u for u, hs in headercontention.build_map().items() if hs & closure)
+
     def sony_note(f):
         names = p2["_sony"].get(f) or next((n for k, n in p2["_sony"].items()
                                              if k.startswith("src/") and Path(k).stem == f), None)
@@ -1163,9 +1178,20 @@ def jobs(d, n):
             # eleven includers on TimImage.h's GsIMAGE, TileMap.h's GsMAP,
             # TileAtlas.h's GsCELL and class_3bb8c.h's RotMatrix, while those
             # headers' own jobs ranked last).
+            # Its edit set is the header AND every unit that includes it,
+            # because each of those takes Sony's headers in the same fix; two
+            # headers with the same includers are one job (round 95: TileAtlas.h
+            # and TileMap.h, both included only by code_33808 and code_2c054,
+            # listed as two jobs whose edit sets said they did not overlap).
+            groups = {}
             for f, names in sorted(p2["_sony_left"].items()):
-                q6.append(("6", f"use Sony's own declarations in {f}: it re-declares {', '.join(names)} "
-                                f"(FINISHING-PLAN track 6 step 4; tools/sonyheaders.py) (units: {f})",
+                us = tuple(sony_includers(f))
+                groups.setdefault(us, []).append((f, names))
+            for us, fs in sorted(groups.items(), key=lambda kv: kv[1][0][0]):
+                what = "; ".join(f"{f}: it re-declares {', '.join(names)}" for f, names in fs)
+                q6.append(("6", f"use Sony's own declarations in {what} "
+                                f"(FINISHING-PLAN track 6 step 4; tools/sonyheaders.py) "
+                                f"(units: {','.join([f for f, _ in fs] + list(us))})",
                            MODELS["types_runner"]))
             # A flagged job the head marked `--after` waits until every file it
             # names has left tools/sonyheaders.py's list: its fix needs Sony's
