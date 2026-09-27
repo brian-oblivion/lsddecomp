@@ -246,7 +246,7 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     return 0;
 }
 
-extern s32 D_80087424;
+extern s32 sStyleConfig;
 extern s8 *sStyleStageConfigs[];
 extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
@@ -259,14 +259,14 @@ void *ApplyStyleConfig(void) {
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
     }
-    FillStyleFromConfig((struct StyleM *)&D_80087424, cfg);
+    FillStyleFromConfig((struct StyleM *)&sStyleConfig, cfg);
     if (cfg[1] >= 4) {
         gStyleDecorColor = gStylePalette[cfg[2]];
     }
-    return &D_80087424;
+    return &sStyleConfig;
 }
 
-/* FillStyleFromConfig's destination (D_80087424, via ApplyStyleConfig) is
+/* FillStyleFromConfig's destination (sStyleConfig, via ApplyStyleConfig) is
  * not an ObjM: it is the record ObjM keeps as `styleConfig`, which
  * include/class_3bb8c.h views as StyleConfig (its +0x00C/+0x018
  * colours and +0x01C fog value agree with the fields below). The two views

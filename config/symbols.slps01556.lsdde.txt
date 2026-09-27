@@ -3019,3 +3019,4 @@ sPauseTextColor = 0x8008AB40;
 sStyleDecorBoxPos = 0x8008AB58;
 sStyleDecorBoxSize = 0x8008AB60;
 sStyleStageConfigs = 0x800873EC;
+sStyleConfig = 0x80087424;

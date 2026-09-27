@@ -11,18 +11,18 @@ Looks up a "cfg" byte-array pointer for the current style index
 (`gStyleStage`, set by `RegisterStyleConfig`) in the 14-entry pointer table
 `sStyleStageConfigs`; if the slot is NULL, falls back to `PickStyleFallbackConfig()` to
 produce one. Feeds `cfg` into the already-matched `FillStyleFromConfig(style,
-cfg)` against the fixed global `D_80087424` (a `StyleM` instance, split by
-splat into two adjacent labels `D_80087424`/`gStyleKind2AltColor` purely because
+cfg)` against the fixed global `sStyleConfig` (a `StyleM` instance, split by
+splat into two adjacent labels `sStyleConfig`/`gStyleKind2AltColor` purely because
 something else references the middle of it -- the object is one 0x20-byte
 struct). Then does its own separate raw-byte read of `cfg[1]`/`cfg[2]`: if
 `cfg[1] >= 4`, stores a `gStylePalette[cfg[2]]` colour-table entry pointer into
-`gStyleDecorColor`. Always returns `&D_80087424`.
+`gStyleDecorColor`. Always returns `&sStyleConfig`.
 
 ```c
 struct StyleM;   /* forward tag; full definition stays where it already is,
                   * right before FillStyleFromConfig further down this unit */
 
-extern s32 D_80087424;
+extern s32 sStyleConfig;
 extern s8 *sStyleStageConfigs[];
 extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
@@ -35,11 +35,11 @@ void *ApplyStyleConfig(void) {
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
     }
-    FillStyleFromConfig((struct StyleM *) &D_80087424, cfg);
+    FillStyleFromConfig((struct StyleM *) &sStyleConfig, cfg);
     if (cfg[1] >= 4) {
         gStyleDecorColor = gStylePalette[cfg[2]];
     }
-    return &D_80087424;
+    return &sStyleConfig;
 }
 ```
 
@@ -49,10 +49,10 @@ First attempt wrote the natural-looking guard form:
 
 ```c
 if (cfg[1] < 4) {
-    return &D_80087424;
+    return &sStyleConfig;
 }
 gStyleDecorColor = gStylePalette[cfg[2]];
-return &D_80087424;
+return &sStyleConfig;
 ```
 
 This built 40/41 words with the tail one word SHORT: retail has an extra
@@ -67,7 +67,7 @@ the delay slot -- so GCC correctly elided the now-redundant restore, but
 that made the two versions different LENGTHS, not just different register
 names, and the whole build shifted the same way every drift bug in this
 project does. **Rewriting the two-return form as a single-join form** (`if
-(cfg[1] >= 4) { store; } return &D_80087424;`) changed which registers GCC
+(cfg[1] >= 4) { store; } return &sStyleConfig;`) changed which registers GCC
 picked for the store's address arithmetic, which coincidentally restored the
 exact retail register assignment and the redundant `move` reappeared,
 matching byte-for-byte on the next build.
