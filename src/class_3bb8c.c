@@ -28,20 +28,20 @@
 #include "LbdFile.h"
 #include "GridCell.h"
 
-s32 StageMap__SetTargetAndLoadChunks(StageMap *self, void *arg1, SceneNode *arg2, Descriptor10 *arg3) {
-    s32 stackBuf[3];
-    s32 ret;
+s32 StageMap__SetTargetAndLoadChunks(StageMap *self, void *outPos, SceneNode *target, Descriptor10 *cell) {
+    s32 chunkCentre[3];
+    s32 chunkIndex;
 
-    self->target = arg2;
-    self->targetCell.base = *arg3;
-    ret = ComputeCellWorldOffsets(arg1, stackBuf, self->config, &self->origin, arg3);
-    return self->methods->loadChunksAround(self, ret, (LongVec3 *)stackBuf, sDefaultTargetSpecs);
+    self->target = target;
+    self->targetCell.base = *cell;
+    chunkIndex = ComputeCellWorldOffsets(outPos, chunkCentre, self->config, &self->origin, cell);
+    return self->methods->loadChunksAround(self, chunkIndex, (LongVec3 *)chunkCentre, sDefaultTargetSpecs);
 }
 
-s32 StageMap__ComputeCellOffsets(StageMap *self, void *arg1, void *arg2) {
-    s32 outBuf[3];
+s32 StageMap__ComputeCellOffsets(StageMap *self, void *outPos, void *cell) {
+    s32 chunkCentre[3];
 
-    return ComputeCellWorldOffsets(arg1, outBuf, self->config, &self->origin, arg2);
+    return ComputeCellWorldOffsets(outPos, chunkCentre, self->config, &self->origin, cell);
 }
 
 /* MATCH, round 40 (bravo): permuter-found zero, first-ever search on this
@@ -53,39 +53,39 @@ s32 StageMap__ComputeCellOffsets(StageMap *self, void *arg1, void *arg2) {
  * attempts targeted the outBuf[0]/outBuf[2] STORE-vs-LOAD scheduling
  * directly and never touched this constant; the permuter found a
  * completely different axis. See docs/match-reports/ComputeCellWorldOffsets.md. */
-s32 ComputeCellWorldOffsets(s32 *arg0, s32 *outBuf, StageGridDimensions *arg2, LongVec3 *arg3,
-                            Descriptor10 *arg4) {
-    s32 idx;
-    s32 factor;
-    s32 sum;
-    s32 v1;
-    s32 a0v;
-    s32 off;
+s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dims, LongVec3 *origin,
+                            Descriptor10 *cell) {
+    s32 row;
+    s32 rowSpan;
+    s32 chunkIndex;
+    s32 x;
+    s32 z;
+    s32 halfCell;
 
-    if (arg2->isVertical == 0) {
-        idx = arg4->b1;
-        factor = arg2->rows;
-        sum = arg4->b0 + arg2->columns * idx;
+    if (dims->isVertical == 0) {
+        row = cell->b1;
+        rowSpan = dims->rows;
+        chunkIndex = cell->b0 + dims->columns * row;
     } else {
-        factor = 1;
-        idx = 0;
-        sum = 0;
+        rowSpan = 1;
+        row = 0;
+        chunkIndex = 0;
     }
-    v1 = (arg3->x - arg2->columns * 0x5000) + arg4->b0 * 0xA000;
-    a0v = arg3->z - factor * 0x5000;
-    outBuf[0] = v1;
-    if (idx & 1) {
-        outBuf[0] = v1 - 0x5000;
+    x = (origin->x - dims->columns * 0x5000) + cell->b0 * 0xA000;
+    z = origin->z - rowSpan * 0x5000;
+    chunkPos[0] = x;
+    if (row & 1) {
+        chunkPos[0] = x - 0x5000;
     }
-    outBuf[1] = arg3->y;
-    off = 0x400;
-    outBuf[2] = a0v + idx * 0xA000;
-    arg0[0] = (arg4->b2 << 11) + outBuf[0] + (arg4->h4 + off);
-    arg0[1] = arg4->h6 + outBuf[1];
-    arg0[2] = (arg4->b3 << 11) + outBuf[2] + (arg4->h8 + off);
-    outBuf[0] += 0x5000;
-    outBuf[2] = outBuf[2] + 0x5000;
-    return sum;
+    chunkPos[1] = origin->y;
+    halfCell = 0x400;
+    chunkPos[2] = z + row * 0xA000;
+    outPos[0] = (cell->b2 << 11) + chunkPos[0] + (cell->h4 + halfCell);
+    outPos[1] = cell->h6 + chunkPos[1];
+    outPos[2] = (cell->b3 << 11) + chunkPos[2] + (cell->h8 + halfCell);
+    chunkPos[0] += 0x5000;
+    chunkPos[2] = chunkPos[2] + 0x5000;
+    return chunkIndex;
 }
 
 void StageMap__Enable(StageMap *self) {
@@ -99,35 +99,35 @@ void StageMap__Disable(StageMap *self) {
 
 /* StageMap__UpdateFootprintTracking -- see docs/match-reports/StageMap__UpdateFootprintTracking.md. */
 s32 StageMap__UpdateFootprintTracking(StageMap *self) {
-    Descriptor10Ext buf;
-    ChunkSlot *e;
-    s32 key;
-    s32 result;
-    u16 oldRaw;
+    Descriptor10Ext desc;
+    ChunkSlot *slot;
+    s32 neighbour;
+    s32 specIndex;
+    u16 oldChunk;
 
-    if (self->methods->getTargetDescriptor(self, &buf, 0) == 0) {
+    if (self->methods->getTargetDescriptor(self, &desc, 0) == 0) {
         return 0;
     }
 
-    e = buf.slot;
-    key = e->loader->elemKey;
-    result = sFootprintResultRemap[key];
+    slot = desc.slot;
+    neighbour = slot->loader->elemKey;
+    specIndex = sFootprintResultRemap[neighbour];
 
     if (self->config->isVertical == 0) {
-        self->methods->loadChunksAround(self, buf.chunkIndex, &buf.chunkCentre,
-                                        sFootprintResultPtrTable[result]);
+        self->methods->loadChunksAround(self, desc.chunkIndex, &desc.chunkCentre,
+                                        sFootprintResultPtrTable[specIndex]);
     }
 
     self->methods->refreshFootprint(self);
 
-    oldRaw = *(u16 *)&self->targetCell;
-    self->targetCell = buf;
+    oldChunk = *(u16 *)&self->targetCell;
+    self->targetCell = desc;
 
-    if ((s16)oldRaw != *(s16 *)&buf) {
+    if ((s16)oldChunk != *(s16 *)&desc) {
         self->methods->notifyParents(self, 5);
     }
 
-    return result;
+    return specIndex;
 }
 
 /* MATCH, round 63 (delta): closed a 137/140 stall that had stood since round
@@ -143,85 +143,86 @@ s32 StageMap__UpdateFootprintTracking(StageMap *self) {
  * round.
  * The `__asm__("")` barrier this body used to carry before `u14 = ...` is gone:
  * with `e` merged it is no longer needed, verified by whole-image rebuild. */
-void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *arg2, ChunkSlotSpec *arg3) {
-    s32 divisor;
-    s32 flag;
-    s32 savedResult;
+void StageMap__LoadChunksAround(StageMap *self, s32 centreChunk, LongVec3 *centrePos,
+                                ChunkSlotSpec *specs) {
+    s32 columns;
+    s32 oddRow;
+    s32 onGridMask;
     s32 count;
     s32 i;
-    ChunkSlot *e;
-    SplitCoord2 *u14;
-    LongVec3 *tbl;
-    ChunkLoadEntry stackBuf[7];
+    ChunkSlot *slot;
+    SplitCoord2 *origin;
+    LongVec3 *offset;
+    ChunkLoadEntry loads[7];
 
-    if (arg3 != 0) {
-        divisor = self->config->columns;
-        flag = (val / divisor) & 1;
-        savedResult = StageMap__ComputeNeighbourMask(self, val, flag);
+    if (specs != 0) {
+        columns = self->config->columns;
+        oddRow = (centreChunk / columns) & 1;
+        onGridMask = StageMap__ComputeNeighbourMask(self, centreChunk, oddRow);
 
         count = 0;
         for (i = 0; i < 7; i++) {
-            e = self->methods->findSlotByNeighbour(self, i);
-            e->neighbour = arg3[i].neighbour;
-            if (arg3[i].load != 0) {
-                tbl = &sNeighbourOffsets[arg3[i].neighbour];
-                u14 = (SplitCoord2 *)e->cellParent->coord2;
+            slot = self->methods->findSlotByNeighbour(self, i);
+            slot->neighbour = specs[i].neighbour;
+            if (specs[i].load != 0) {
+                offset = &sNeighbourOffsets[specs[i].neighbour];
+                origin = (SplitCoord2 *)slot->cellParent->coord2;
                 if (self->config->isVertical == 0) {
-                    u14->tx.w = arg2->x + tbl->x;
-                    u14->ty = arg2->y;
-                    u14->tz.w = arg2->z + tbl->z;
+                    origin->tx.w = centrePos->x + offset->x;
+                    origin->ty = centrePos->y;
+                    origin->tz.w = centrePos->z + offset->z;
                 } else {
-                    u14->tx.w = arg2->x - 0x5000;
-                    u14->ty = arg2->y + tbl->y;
-                    u14->tz.w = arg2->z - 0x5000;
+                    origin->tx.w = centrePos->x - 0x5000;
+                    origin->ty = centrePos->y + offset->y;
+                    origin->tz.w = centrePos->z - 0x5000;
                 }
-                e->cellParent->coord2->flg = 0;
-                StageMap__ComputeChunkLoadEntry(self, &stackBuf[count], divisor, flag, val,
-                                                savedResult, arg3[i].neighbour);
+                slot->cellParent->coord2->flg = 0;
+                StageMap__ComputeChunkLoadEntry(self, &loads[count], columns, oddRow, centreChunk,
+                                                onGridMask, specs[i].neighbour);
                 count++;
             }
         }
 
         for (i = 0; i < 7; i++) {
-            e = &self->slots[i];
-            e->loader->elemKey = e->neighbour;
+            slot = &self->slots[i];
+            slot->loader->elemKey = slot->neighbour;
         }
 
-        self->methods->applyChunkLoads(self, stackBuf, count);
+        self->methods->applyChunkLoads(self, loads, count);
     }
 }
 
-s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag) {
-    StageGridDimensions *u;
-    s32 divisor;
-    s32 unk4;
-    s32 count;
-    s32 flags;
+s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 chunk, s32 oddRow) {
+    StageGridDimensions *dims;
+    s32 columns;
+    s32 isVertical;
+    s32 rows;
+    s32 offGrid;
     s32 i;
 
-    u = self->config;
-    divisor = u->columns;
-    unk4 = u->isVertical;
-    count = u->rows;
-    if (unk4 == 0) {
-        flags = (val < divisor) ? 3 : 0;
-        if (val >= divisor * (count - 1)) {
-            flags |= 0x60;
+    dims = self->config;
+    columns = dims->columns;
+    isVertical = dims->isVertical;
+    rows = dims->rows;
+    if (isVertical == 0) {
+        offGrid = (chunk < columns) ? 3 : 0;
+        if (chunk >= columns * (rows - 1)) {
+            offGrid |= 0x60;
         }
-        if (val % divisor == 0) {
-            flags |= flag ? 0x25 : 4;
+        if (chunk % columns == 0) {
+            offGrid |= oddRow ? 0x25 : 4;
         }
-        if ((val + 1) % divisor != 0) {
-            return ~flags;
+        if ((chunk + 1) % columns != 0) {
+            return ~offGrid;
         }
-        flags |= flag ? 0x10 : 0x52;
-        return ~flags;
+        offGrid |= oddRow ? 0x10 : 0x52;
+        return ~offGrid;
     } else {
-        flags = -1;
-        for (i = 0; i < count; i++) {
-            flags <<= 1;
+        offGrid = -1;
+        for (i = 0; i < rows; i++) {
+            offGrid <<= 1;
         }
-        return ~flags;
+        return ~offGrid;
     }
 }
 
@@ -238,48 +239,48 @@ s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag) {
  * iterations without ever reaching the merged shape.
  * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
  * image. It was inherited with the near-miss body and is verified here. */
-s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *arg1, s32 divisor, s32 flag,
-                                    s32 val, s32 savedResult, s32 key) {
-    s32 mask = sNeighbourBits[key];
+s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 columns, s32 oddRow,
+                                    s32 centreChunk, s32 onGridMask, s32 neighbour) {
+    s32 bit = sNeighbourBits[neighbour];
     s32 result;
 
-    if ((savedResult & mask) == 0) {
+    if ((onGridMask & bit) == 0) {
         result = 0;
         goto nullCase;
     }
 
     if (self->config->isVertical == 0) {
-        const ChunkNeighbourDelta *entry = &sChunkNeighbourDeltas[key];
-        s32 value;
-        s32 sum;
+        const ChunkNeighbourDelta *delta = &sChunkNeighbourDeltas[neighbour];
+        s32 chunk;
+        s32 step;
 
-        if (entry->rowDelta == 0) {
-            sum = entry->colDeltaOddRow;
+        if (delta->rowDelta == 0) {
+            step = delta->colDeltaOddRow;
         } else {
-            sum = divisor * entry->rowDelta;
-            if (flag != 0) {
-                sum += entry->colDeltaOddRow;
+            step = columns * delta->rowDelta;
+            if (oddRow != 0) {
+                step += delta->colDeltaOddRow;
             } else {
-                sum += entry->colDeltaEvenRow;
+                step += delta->colDeltaEvenRow;
             }
         }
-        value = val + sum;
-        *(s32 *)((u8 *)arg1 + 4) = value;
+        chunk = centreChunk + step;
+        *(s32 *)((u8 *)out + 4) = chunk;
     } else {
-        *(s32 *)((u8 *)arg1 + 4) = val + key;
+        *(s32 *)((u8 *)out + 4) = centreChunk + neighbour;
     }
 
-    arg1->file = self->chunkFileFn(self->chunkFileCtx, *(s32 *)((u8 *)arg1 + 4), 0, 0);
+    out->file = self->chunkFileFn(self->chunkFileCtx, *(s32 *)((u8 *)out + 4), 0, 0);
     do {
     } while (0);
     result = 1;
     goto storeKey;
 
 nullCase:
-    arg1->file = NULL;
+    out->file = NULL;
 
 storeKey:
-    arg1->neighbour = key;
+    out->neighbour = neighbour;
     return result;
 }
 
@@ -291,33 +292,33 @@ storeKey:
  * `sp` is therefore assigned from `arr1` inside the body and `arr1` is
  * advanced directly; the old `ep = arr1` copy is what swapped s3/s4.
  * See docs/match-reports/StageMap__ApplyChunkLoads.md. */
-void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *arr1, s32 count) {
+void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entry, s32 count) {
     s32 i;
-    ChunkSlot *e;
-    ChunkLoadEntryTail *sp;
+    ChunkSlot *slot;
+    ChunkLoadEntryTail *tail;
 
     for (i = 0; i < count; i++) {
-        sp = (ChunkLoadEntryTail *)&arr1->chunkIndex;
-        e = self->methods->findSlotByNeighbour(self, sp->neighbour);
-        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, e, i);
-        if (arr1->file != 0) {
-            if (e->loader->headerReady != 0) {
-                self->methods->clearSlotCells(self, e);
+        tail = (ChunkLoadEntryTail *)&entry->chunkIndex;
+        slot = self->methods->findSlotByNeighbour(self, tail->neighbour);
+        ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 6, slot, i);
+        if (entry->file != 0) {
+            if (slot->loader->headerReady != 0) {
+                self->methods->clearSlotCells(self, slot);
             }
-            e->loader->chunkIndex = sp->chunkIndex;
-            ((LbdFileLoadHeaderFn)e->loader->methods->processBuffer)(e->loader, arr1->file);
-            e->loadPending = 1;
+            slot->loader->chunkIndex = tail->chunkIndex;
+            ((LbdFileLoadHeaderFn)slot->loader->methods->processBuffer)(slot->loader, entry->file);
+            slot->loadPending = 1;
             self->loadsPending = 1;
         } else {
-            if (e->loader->headerReady != 0) {
-                self->methods->clearSlotCells(self, e);
+            if (slot->loader->headerReady != 0) {
+                self->methods->clearSlotCells(self, slot);
             }
-            if (e->loader->loadState != 0) {
-                e->loader->methods->cancelRequests(e->loader);
-                e->loadPending = 0;
+            if (slot->loader->loadState != 0) {
+                slot->loader->methods->cancelRequests(slot->loader);
+                slot->loadPending = 0;
             }
         }
-        arr1++;
+        entry++;
     }
     self->pendingLoadCount = StageMap__CountPendingLoads(self);
 }
@@ -335,33 +336,33 @@ s32 StageMap__CountPendingLoads(StageMap *self) {
     return count;
 }
 
-void StageMap__OnNotifyTag1(StageMap *self, void *arg1, s32 mode) {
+void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 command) {
     s32 i;
-    ChunkSlot *e;
-    s32 curMode;
+    ChunkSlot *slot;
+    s32 pending;
 
-    if (mode != 2) {
+    if (command != 2) {
         return;
     }
     for (i = 0; i < 7; i++) {
-        e = &self->slots[i];
-        if (e->loader->dataReady != 0) {
-            e->loader->dataReady = 0;
-            ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 7, e, i);
+        slot = &self->slots[i];
+        if (slot->loader->dataReady != 0) {
+            slot->loader->dataReady = 0;
+            ((StageMapOnSlotEventFn)self->methods->notifyWithHull)(self, 7, slot, i);
         }
-        curMode = self->loadsPending;
-        if (curMode == 1 && e->loadPending != 0) {
-            if (e->loader->headerReady != 0) {
-                self->methods->populateSlotCells(self, e);
-                e->loader->headerReady = 2;
-                e->loadPending = 0;
+        pending = self->loadsPending;
+        if (pending == 1 && slot->loadPending != 0) {
+            if (slot->loader->headerReady != 0) {
+                self->methods->populateSlotCells(self, slot);
+                slot->loader->headerReady = 2;
+                slot->loadPending = 0;
                 if (--self->pendingLoadCount == 0) {
                     self->pendingLoadCount = 0;
                     self->loadsPending = 0;
-                    self->chunksLoaded = curMode;
+                    self->chunksLoaded = pending;
                 }
-            } else if (e->loader->loadState == 0) {
-                e->loadPending = 0;
+            } else if (slot->loader->loadState == 0) {
+                slot->loadPending = 0;
             }
         }
     }
@@ -381,111 +382,111 @@ typedef struct BE54LoadReq {
     u8 pad4[0xC];
 } BE54LoadReq;
 
-void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *entry) {
-    LbdFileHeader *info;
-    LbdFileHeader *info2;
-    LbdFile *hdr;
-    PlacementGrid *target;
-    LinkResource *res;
-    GridCell **slot;
-    u8 *base;
-    SceneNodeSub14 *gpu;
-    SceneNodeSub44 *vec;
-    s32 b;
-    s32 c;
-    s32 d;
-    s32 h1;
-    s32 idxVal;
-    s32 flagBit;
+void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
+    LbdFileHeader *header;
+    LbdFileHeader *header2;
+    LbdFile *loader;
+    PlacementGrid *grid;
+    LinkResource *oldResource;
+    GridCell **cell;
+    u8 *cells;
+    SceneNodeSub14 *coord;
+    SceneNodeSub44 *param;
+    s32 x;
+    s32 y;
+    s32 z;
+    s32 rotY;
+    s32 model;
+    s32 hidden;
     s32 i;
-    s32 off1;
-    s32 off2;
-    CellPlacement outBuf;
-    BE54LoadReq req;
+    s32 cellOff;
+    s32 overflowOff;
+    CellPlacement rec;
+    BE54LoadReq src;
 
-    hdr = entry->loader;
-    target = entry->placements;
-    info = hdr->buffer;
-    target->buffer = (u8 *)info + info->placementsOffset;
-    target->bufferSize = 0;
-    res = target->linkResource;
-    if (res != 0) {
-        res->methods->release(res);
+    loader = slot->loader;
+    grid = slot->placements;
+    header = loader->buffer;
+    grid->buffer = (u8 *)header + header->placementsOffset;
+    grid->bufferSize = 0;
+    oldResource = grid->linkResource;
+    if (oldResource != 0) {
+        oldResource->methods->release(oldResource);
     }
-    info2 = hdr->buffer;
-    req.buffer = (u8 *)info2 + info2->placementsOffset + info2->placementsSize;
-    target->linkResource = New_LinkResource((struct Src6F240 *)&req);
-    outBuf.next = 0;
+    header2 = loader->buffer;
+    src.buffer = (u8 *)header2 + header2->placementsOffset + header2->placementsSize;
+    grid->linkResource = New_LinkResource((struct Src6F240 *)&src);
+    rec.next = 0;
 
     i = 0;
-    flagBit = 0x80000000;
-    off1 = 0;
-    off2 = 0x640;
+    hidden = 0x80000000;
+    cellOff = 0;
+    overflowOff = 0x640;
     for (;;) {
-        idxVal = ((PlacementGridResolveEntryFn)target->methods->processBuffer)(target, &outBuf, i);
-        if (idxVal == 0) {
+        model = ((PlacementGridResolveEntryFn)grid->methods->processBuffer)(grid, &rec, i);
+        if (model == 0) {
             return;
         }
-        if (idxVal == -1) {
-            s32 flags10a;
-            slot = (GridCell **)((u8 *)entry->cells + off1);
-            flags10a = (*slot)->attribute;
-            (*slot)->attribute = flags10a | flagBit;
-            (*slot)->model = 0;
-            (*slot)->tmd = 0;
+        if (model == -1) {
+            s32 attr;
+            cell = (GridCell **)((u8 *)slot->cells + cellOff);
+            attr = (*cell)->attribute;
+            (*cell)->attribute = attr | hidden;
+            (*cell)->model = 0;
+            (*cell)->tmd = 0;
         } else {
-            base = (u8 *)entry->cells;
-            if (outBuf.chained != 0) {
-                slot = (GridCell **)(base + off2);
-                off2 += 4;
+            cells = (u8 *)slot->cells;
+            if (rec.chained != 0) {
+                cell = (GridCell **)(cells + overflowOff);
+                overflowOff += 4;
             } else {
-                slot = (GridCell **)(base + off1);
+                cell = (GridCell **)(cells + cellOff);
             }
-            (*slot)->model = (void *)idxVal;
-            (*slot)->tmd = (s32)((TmdModel *)(*slot)->model)->object;
-            GsLinkObject4((u_long)((TmdModel *)(*slot)->model)->object,
-                          (GsDOBJ2 *)&(*slot)->attribute, 0);
-            gpu = (*slot)->coord2;
-            /* Keeps the outBuf.x/.y/.z stack loads below the load of
-             * (*slot)->coord2; without it GCC hoists all three above it. */
+            (*cell)->model = (void *)model;
+            (*cell)->tmd = (s32)((TmdModel *)(*cell)->model)->object;
+            GsLinkObject4((u_long)((TmdModel *)(*cell)->model)->object,
+                          (GsDOBJ2 *)&(*cell)->attribute, 0);
+            coord = (*cell)->coord2;
+            /* Keeps the rec.x/.y/.z stack loads below the load of
+             * (*cell)->coord2; without it GCC hoists all three above it. */
             __asm__("");
-            b = outBuf.x;
-            c = outBuf.y;
-            d = outBuf.z;
-            gpu->tx = b;
-            gpu->ty = c;
-            gpu->tz = d;
-            vec = (*slot)->coord2->param;
-            vec->rotate.x = 0;
-            h1 = outBuf.rotY;
-            vec->rotate.z = 0;
-            vec->rotate.y = h1;
-            (*slot)->flags36 = outBuf.cellFlags;
-            (*slot)->coord2->flg = 0;
+            x = rec.x;
+            y = rec.y;
+            z = rec.z;
+            coord->tx = x;
+            coord->ty = y;
+            coord->tz = z;
+            param = (*cell)->coord2->param;
+            param->rotate.x = 0;
+            rotY = rec.rotY;
+            param->rotate.z = 0;
+            param->rotate.y = rotY;
+            (*cell)->flags36 = rec.cellFlags;
+            (*cell)->coord2->flg = 0;
             {
-                s32 flags10 = (*slot)->attribute;
-                (*slot)->attribute = flags10 | flagBit;
+                s32 attr = (*cell)->attribute;
+                (*cell)->attribute = attr | hidden;
             }
         }
-        if (outBuf.next) {
-            GridCell **next = (GridCell **)((u8 *)entry->cells + off2);
-            (*slot)->nextInCell = *next;
+        if (rec.next) {
+            GridCell **overflow = (GridCell **)((u8 *)slot->cells + overflowOff);
+            (*cell)->nextInCell = *overflow;
             continue;
         }
-        off1 += 4;
-        (*slot)->nextInCell = 0;
+        cellOff += 4;
+        (*cell)->nextInCell = 0;
         i++;
     }
 }
 
-void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *entry) {
+void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *slot) {
     GridCell **p;
     GridCell **end;
 
-    if (entry->loader->chunkIndex >= 0) {
-        ((LbdFileReleaseHeaderElemFn)entry->loader->methods->releaseHeader)(entry->loader, entry);
-        end = entry->cells + 0x19A;
-        for (p = entry->cells; p < end; p++) {
+    if (slot->loader->chunkIndex >= 0) {
+        ((LbdFileReleaseHeaderElemFn)slot->loader->methods->releaseHeader)(slot->loader, slot);
+        end = slot->cells + 0x19A;
+        for (p = slot->cells; p < end; p++) {
             (*p)->attribute |= 0x80000000;
             (*p)->model = 0;
             (*p)->tmd = 0;
@@ -493,15 +494,15 @@ void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *entry) {
     }
 }
 
-Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *arg1, void **out) {
-    void *v1;
+Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *desc, void **outPos) {
+    void *pos;
 
-    v1 = &self->target->coord2->tx;
-    if (out != 0) {
-        *out = v1;
+    pos = &self->target->coord2->tx;
+    if (outPos != 0) {
+        *outPos = pos;
     }
-    if (arg1 != 0) {
-        if (self->methods->computeFootprintDescriptor(self, arg1, v1) != 0) {
+    if (desc != 0) {
+        if (self->methods->computeFootprintDescriptor(self, desc, pos) != 0) {
             return 0;
         }
     }
@@ -522,59 +523,59 @@ Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *arg
  *   3. `out->unk24 = e;` is the LAST statement of the block. Every earlier
  *      placement schedules its `sw` too early; only trailing it after the
  *      h8 store reproduces retail's order. */
-s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *in) {
-    ChunkSlot *e;
-    SplitCoord2 *u14a;
-    SplitCoord2 *u14b;
-    s32 rate;
-    s32 t;
-    s32 b2;
-    s32 b3;
+s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *pos) {
+    ChunkSlot *slot;
+    SplitCoord2 *chunkOrigin;
+    SplitCoord2 *origin;
+    s32 chunkIndex;
+    s32 rel;
+    s32 cellCol;
+    s32 cellRow;
 
-    e = self->methods->findSlotForPosition(self, (LongVec3 *)in);
-    if (e != 0) {
-        rate = e->loader->chunkIndex;
-        out->chunkIndex = rate;
-        StageMap__SplitChunkIndex(self, (u8 *)out, rate);
+    slot = self->methods->findSlotForPosition(self, (LongVec3 *)pos);
+    if (slot != 0) {
+        chunkIndex = slot->loader->chunkIndex;
+        out->chunkIndex = chunkIndex;
+        StageMap__SplitChunkIndex(self, (u8 *)out, chunkIndex);
 
-        u14a =
-            (SplitCoord2 *)self->methods->findSlotByNeighbour(self, e->loader->elemKey)->cellParent->coord2;
-        out->chunkCentre.x = u14a->tx.w + 0x5000;
-        out->chunkCentre.y = u14a->ty;
-        out->chunkCentre.z = u14a->tz.w + 0x5000;
+        chunkOrigin = (SplitCoord2 *)self->methods->findSlotByNeighbour(self, slot->loader->elemKey)
+                          ->cellParent->coord2;
+        out->chunkCentre.x = chunkOrigin->tx.w + 0x5000;
+        out->chunkCentre.y = chunkOrigin->ty;
+        out->chunkCentre.z = chunkOrigin->tz.w + 0x5000;
 
-        u14b = (SplitCoord2 *)e->cellParent->coord2;
-        out->relPos.x = in->x.w - out->chunkCentre.x;
-        out->relPos.y = in->y.w;
-        out->relPos.z = in->z.w - out->chunkCentre.z;
+        origin = (SplitCoord2 *)slot->cellParent->coord2;
+        out->relPos.x = pos->x.w - out->chunkCentre.x;
+        out->relPos.y = pos->y.w;
+        out->relPos.z = pos->z.w - out->chunkCentre.z;
 
-        t = in->x.w - u14b->tx.w;
-        if (t < 0) {
-            t += 0x7FF;
+        rel = pos->x.w - origin->tx.w;
+        if (rel < 0) {
+            rel += 0x7FF;
         }
-        out->base.b2 = t >> 11;
+        out->base.b2 = rel >> 11;
 
-        t = in->z.w - u14b->tz.w;
-        if (t < 0) {
-            t += 0x7FF;
+        rel = pos->z.w - origin->tz.w;
+        if (rel < 0) {
+            rel += 0x7FF;
         }
-        out->base.b3 = t >> 11;
+        out->base.b3 = rel >> 11;
 
-        b2 = out->base.b2;
-        out->base.h4 = in->x.h - (u14b->tx.h + (b2 << 11) + 0x400);
-        out->base.h6 = in->y.h;
-        b3 = out->base.b3;
-        out->base.h8 = in->z.h - (u14b->tz.h + (b3 << 11) + 0x400);
-        out->slot = e;
+        cellCol = out->base.b2;
+        out->base.h4 = pos->x.h - (origin->tx.h + (cellCol << 11) + 0x400);
+        out->base.h6 = pos->y.h;
+        cellRow = out->base.b3;
+        out->base.h8 = pos->z.h - (origin->tz.h + (cellRow << 11) + 0x400);
+        out->slot = slot;
 
         return 0;
     }
     return 1;
 }
 
-void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 val) {
-    out[0] = val % self->config->columns;
-    out[1] = val / self->config->columns;
+void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 chunkIndex) {
+    out[0] = chunkIndex % self->config->columns;
+    out[1] = chunkIndex / self->config->columns;
 }
 
 ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, u8 *out) {
@@ -582,14 +583,14 @@ ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, u8 *out) {
     return self->lastEventSlot;
 }
 
-ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 key) {
+ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 neighbour) {
     s32 i;
-    ChunkSlot *e;
+    ChunkSlot *slot;
 
     for (i = 0; i < 7; i++) {
-        e = &self->slots[i];
-        if (e->loader->elemKey == key) {
-            return e;
+        slot = &self->slots[i];
+        if (slot->loader->elemKey == neighbour) {
+            return slot;
         }
     }
 }
@@ -603,30 +604,30 @@ ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 key) {
  * load, as retail schedules it (a `w = ...;` statement before the `if`
  * fixes the add but swaps those two loads). See
  * docs/match-reports/StageMap__FindSlotForPosition.md. */
-ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *arg1) {
+ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
     s32 i;
-    s32 tol;
-    s32 threshold;
-    ChunkSlot *candidate;
-    SplitCoord2 *r;
-    s32 w;
+    s32 span;
+    s32 layerTop;
+    ChunkSlot *slot;
+    SplitCoord2 *origin;
+    s32 edge;
 
     i = 0;
-    tol = 0xA000;
-    threshold = 0;
-    for (; i < 7; i++, threshold -= 0x800) {
-        candidate = self->methods->findSlotByNeighbour(self, i);
-        r = (SplitCoord2 *)candidate->cellParent->coord2;
-        if (arg1->x >= r->tx.w && arg1->x < (w = r->tx.w) + tol) {
-            if (arg1->z >= r->tz.w && arg1->z < (w = r->tz.w) + tol) {
+    span = 0xA000;
+    layerTop = 0;
+    for (; i < 7; i++, layerTop -= 0x800) {
+        slot = self->methods->findSlotByNeighbour(self, i);
+        origin = (SplitCoord2 *)slot->cellParent->coord2;
+        if (pos->x >= origin->tx.w && pos->x < (edge = origin->tx.w) + span) {
+            if (pos->z >= origin->tz.w && pos->z < (edge = origin->tz.w) + span) {
                 if (self->config->isVertical == 0) {
-                    return candidate;
+                    return slot;
                 }
-                if (threshold >= arg1->y) {
-                    if (threshold - 0x800 >= arg1->y) {
+                if (layerTop >= pos->y) {
+                    if (layerTop - 0x800 >= pos->y) {
                         continue;
                     }
-                    return candidate;
+                    return slot;
                 }
             }
         }
