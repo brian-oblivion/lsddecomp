@@ -109,7 +109,7 @@ holds. The old one, verbatim:
   Actor__MoveAlongLocalAxis passes `&gActorLocalMove[0]` to
   addLocalTranslation (which rotates a local s16 vector by the actor's
   orientation, Actor.h) and clears the element again; class_3bb8c_o's
-  MoveLocalZ does the same through the next halfword, `D_8008ABA8` (not
+  MoveLocalZ does the same through the next halfword, `gActorLocalMoveZ` (not
   renamed here: not this unit's; proposed as `gActorLocalMoveZ`).
 
 The declaration's comment lost its history; what it said, verbatim:
@@ -122,6 +122,6 @@ The declaration's comment lost its history; what it said, verbatim:
  * Not referenced anywhere else in the repo (checked with grep), so this is
  * this unit's own reading -- kept local rather than added to a shared
  * header. It is the x and y of Actor's local move vector: the z is the next
- * halfword, D_8008ABA8, which class_3bb8c_o's Actor__MoveLocalZ writes, and
+ * halfword, gActorLocalMoveZ, which class_3bb8c_o's Actor__MoveLocalZ writes, and
  * SceneNode__RotateLocalVector reads src[0..2]. */
 ```

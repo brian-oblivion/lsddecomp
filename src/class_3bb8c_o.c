@@ -273,8 +273,8 @@ void Actor__AddLocalTranslation(Actor *self, s16 *local) {
 }
 
 /* z component of the local move vector gActorLocalMove (class_3bb8c_p.c). */
-extern s16 D_8008ABA8;
+extern s16 gActorLocalMoveZ;
 
 void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &D_8008ABA8, val, notify, 6);
+    Actor__MoveAlongLocalAxis(self, &gActorLocalMoveZ, val, notify, 6);
 }

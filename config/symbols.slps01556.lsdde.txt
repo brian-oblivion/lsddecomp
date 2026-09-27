@@ -3037,3 +3037,4 @@ GetSsTicksPerSecond = 0x8002CC28; // type:func
 sListViewSize = 0x8008A8E8;
 sListViewColor = 0x8008A8F0;
 gStyleEffectClutPos = 0x8008AB94;
+gActorLocalMoveZ = 0x8008ABA8;

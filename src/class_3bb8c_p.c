@@ -31,7 +31,7 @@
 #include "GridCell.h"
 #include "VariantSprite.h"
 
-/* The local move vector's x and y (s16; the z, D_8008ABA8, is the next
+/* The local move vector's x and y (s16; the z, gActorLocalMoveZ, is the next
  * halfword, class_3bb8c_o.c). All three stay 0 between moves: a move sets
  * one component, addLocalTranslation rotates the whole vector by the
  * actor's orientation, and the component is cleared again. */
