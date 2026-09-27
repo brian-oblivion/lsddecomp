@@ -50,14 +50,14 @@ void FadeBox__Reset(FadeBox *self, s32 channels) {
 }
 
 void FadeBox__Update(FadeBox *self, void *sender, s32 event) {
-    s32 old;
+    s32 ticks;
 
     if (event != 2) {
         return;
     }
-    old = self->ticksLeft;
-    self->ticksLeft = old - 1;
-    if (old > 0) {
+    ticks = self->ticksLeft;
+    self->ticksLeft = ticks - 1;
+    if (ticks > 0) {
         if (self->mode == 9) {
             return;
         }
@@ -81,23 +81,23 @@ void FadeBox__SetStep(FadeBox *self, s32 step) {
 
 /* MATCHING: both StartFade functions pass their own arguments on to
  * configure; a `(self)`-only call reorders the instructions. */
-void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 arg3) {
-    s32 idx;
+void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 mode) {
+    s32 mask;
 
     if (self->state != 0) {
         return;
     }
-    idx = self->methods->configure(self, source, channels, arg3);
-    self->methods->setColor(self, 1, &gFadeBoxMaskColors[idx * 3]);
+    mask = self->methods->configure(self, source, channels, mode);
+    self->methods->setColor(self, 1, &gFadeBoxMaskColors[mask * 3]);
     self->state = 1;
     self->step = -self->step;
 }
 
-void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 arg3) {
+void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 mode) {
     if (self->state != 0) {
         return;
     }
-    channels = self->methods->configure(self, source, channels, arg3);
+    channels = self->methods->configure(self, source, channels, mode);
     if (self->altMode != 0) {
         self->ticksLeft--;
     } else {
@@ -106,10 +106,10 @@ void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 a
     self->state = 2;
 }
 
-s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3) {
+s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 mode) {
     FadeBoxMethods *methods;
     s32 rate;
-    s32 q1, q2;
+    s32 ticks, cut;
 
     methods = self->methods;
     if (channels < 0) {
@@ -124,20 +124,19 @@ s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3
         rate = 2;
         self->channels = 0xF;
     }
+    /* MATCHING: retail stores the mask twice; one store drops four instructions. */
     self->channels = channels;
     if (channels == 0) {
         self->channels = 0xF;
     }
-    q1 = 0x100 / self->step;
-    self->mode = arg3;
-    self->ticksLeft = q1;
+    ticks = 0x100 / self->step;
+    self->mode = mode;
+    self->ticksLeft = ticks;
     if (self->altMode != 0) {
-        q2 = q1 / self->divisor;
-        self->ticksLeft = q1 - (s16)q2;
+        cut = ticks / self->divisor;
+        self->ticksLeft = ticks - cut;
     }
-    q2 = self->mask;
-    q2 = q2 / self->ticksLeft;
-    self->maskPerTick = q2;
+    self->maskPerTick = self->mask / self->ticksLeft;
     methods->addChild(self, source);
     methods->setSemiTransOn(self, 1);
     methods->setSemiTransRate(self, rate);
@@ -197,12 +196,12 @@ void FadeBox__PushPosition(FadeBox *self, BoxFillSize *size, BoxFillPos *pos) {
 }
 
 void FadeBox__PopPosition(FadeBox *self) {
-    s32 t0, t1;
+    s32 x, y;
 
-    t0 = self->savedPosX;
-    t1 = self->savedPosY;
-    self->posX = t0;
-    self->posY = t1;
+    x = self->savedPosX;
+    y = self->savedPosY;
+    self->posX = x;
+    self->posY = y;
     /* MATCHING: without it GCC hoists the savedW/savedH loads above the
      * posX/posY stores. */
     __asm__("");

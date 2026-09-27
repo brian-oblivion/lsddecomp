@@ -404,3 +404,19 @@ The field this method writes at +0x084 is now `maskPerTick` (was `unk84`):
   the tree passes 0 (Entity_d/_f/_g, class_3bb8c_l, and ObjM__StartFadeUp's
   `fadeMode`, whose own callers all pass 0), so no other value is observed;
   "mode" says only that it selects a variant.
+- Parameter `arg3` -> `mode` here, in StartFadeDown and StartFadeUp, and in
+  FadeBox.h's three slots and prototypes; locals `q1` -> `ticks`.
+
+### History: the in-place division is no longer load-bearing (round 100)
+
+Round 21 closed this function by writing the third division in place
+(`q2 = self->unk68; q2 = q2 / self->unk80; self->unk84 = q2;`), because
+the same `q2` also held the first division's quotient. With the two
+quotients given their own locals (`cut = ticks / self->divisor;`, and no
+local at all for the third), the plain spelling
+`self->maskPerTick = self->mask / self->ticksLeft;` is byte-exact
+(whole image green, 103/103), and so is `ticks - cut` without round 20's
+`(s16)` cast. The register residue came from sharing one variable across
+the two divisions, not from the division's spelling. The double store of
+`channels` (both branches, then again with the 0xF fix-up) is retail's:
+dropping the second store and its test builds 99 words, measured.

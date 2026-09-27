@@ -17,7 +17,7 @@
  * black.
  *
  * One fade:
- *  - configure(source, channels, arg3) adds `source` as a child (the node
+ *  - configure(source, channels, mode) adds `source` as a child (the node
  *    whose updates drive the fade), stores the mask (a negative one means
  *    `defaultChannels`), sets `ticksLeft` to 0x100 / step, and turns the
  *    box's display and semi-transparency on: rate 1 (added to what is
@@ -71,11 +71,11 @@ struct FadeBoxMethods {
     BOXFILL_SLOTS(FadeBox, (FadeBox * self, void *size, s32 channels, s32 pri));
     /* +0x0D0 */ void (*setStep)(FadeBox *self, s32 step); /* FadeBox__SetStep */
     /* +0x0D4 */ void (*startFadeDown)(FadeBox *self, BasicClass *source, s32 channels,
-                                       s32 arg3); /* FadeBox__StartFadeDown */
+                                       s32 mode); /* FadeBox__StartFadeDown */
     /* +0x0D8 */ void (*startFadeUp)(FadeBox *self, BasicClass *source, s32 channels,
-                                     s32 arg3); /* FadeBox__StartFadeUp */
+                                     s32 mode); /* FadeBox__StartFadeUp */
     /* +0x0DC */ s32 (*configure)(FadeBox *self, BasicClass *source, s32 channels,
-                                  s32 arg3); /* FadeBox__Configure: returns the mask it stored */
+                                  s32 mode); /* FadeBox__Configure: returns the mask it stored */
     /* +0x0E0 */ void (*stop)(FadeBox *self, BasicClass *source); /* FadeBox__Stop */
     /* +0x0E4 */ void *(*getColor)(FadeBox *self); /* FadeBox__GetColor: the mask's table entry */
     /* +0x0E8 */ void (*pushPosition)(FadeBox *self, BoxFillSize *size,
@@ -113,9 +113,9 @@ void FadeBox__FadeBox(FadeBox *self, void *size, s32 channels, s32 pri);
 void FadeBox__Reset(FadeBox *self, s32 channels);
 void FadeBox__Update(FadeBox *self, void *sender, s32 event);
 void FadeBox__SetStep(FadeBox *self, s32 step);
-void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 arg3);
-void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 arg3);
-s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3);
+void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 mode);
+void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 mode);
+s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 mode);
 void FadeBox__Stop(FadeBox *self, BasicClass *source);
 void *FadeBox__GetColor(FadeBox *self);
 void FadeBox__PushPosition(FadeBox *self, BoxFillSize *size, BoxFillPos *pos);

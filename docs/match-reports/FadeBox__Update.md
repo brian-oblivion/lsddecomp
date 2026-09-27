@@ -93,3 +93,7 @@ is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
 already says what the body does. renametype.py rewrote the old class name in
 this report's earlier history too (known, pending an operator decision).
 
+
+## Track 7 (round 100, charlie)
+
+- Local `old` -> `ticks`: the countdown's value before the decrement.
