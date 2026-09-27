@@ -61,15 +61,15 @@ void IntermediateBase__IntermediateBase(IntermediateBase *self) {
 }
 
 void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 event) {
-    s32 header;
+    s32 rootClass;
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
-    header = sender->methods->header & 0xF;
-    if (header == 1) {
+    rootClass = sender->methods->header & 0xF;
+    if (rootClass == 1) {
         self->methods->onTag1Notify(self, sender, event);
-    } else if (header == 2) {
+    } else if (rootClass == 2) {
         self->methods->onPadEvent(self, sender, event);
-    } else if (header == 5) {
+    } else if (rootClass == 5) {
         self->methods->update(self, sender, event);
     }
 }
@@ -210,16 +210,16 @@ Viewport *New_Viewport(void) {
 }
 
 void Viewport__Viewport(Viewport *self) {
-    SceneNode *obj;
+    SceneNode *fadeBox;
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetViewportMethods();
     self->drawSystem = 0;
     self->viewNode = 0;
     self->sceneRoot = New_SceneNode();
-    obj = (SceneNode *)New_FadeBox(gViewportFadeBoxSize, 0, 0);
-    self->fadeBox = obj;
-    obj->methods->attachToParent(obj, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
+    fadeBox = (SceneNode *)New_FadeBox(gViewportFadeBoxSize, 0, 0);
+    self->fadeBox = fadeBox;
+    fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
     self->methods->initDefaults(self);
 }
 
@@ -232,26 +232,26 @@ void Viewport__Finalize(Viewport *self) {
 }
 
 void Viewport__AddChild(Viewport *self, BasicClass *child) {
-    s32 header;
+    s32 rootClass;
 
     Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
-    header = child->methods->header & 0xF;
-    if (header == 4) {
+    rootClass = child->methods->header & 0xF;
+    if (rootClass == 4) {
         self->viewNode = (SceneNode *)child;
         self->refView.super = ((SceneNode *)child)->coord2;
-    } else if (header == 1) {
+    } else if (rootClass == 1) {
         self->drawSystem = (DrawSystem *)child;
     }
 }
 
 void Viewport__RemoveChild(Viewport *self, BasicClass *child) {
-    s32 header;
+    s32 rootClass;
 
-    header = child->methods->header & 0xF;
-    if (header == 4) {
+    rootClass = child->methods->header & 0xF;
+    if (rootClass == 4) {
         self->refView.super = 0;
         self->viewNode = NULL;
-    } else if (header == 1) {
+    } else if (rootClass == 1) {
         self->drawSystem = NULL;
     }
     Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
