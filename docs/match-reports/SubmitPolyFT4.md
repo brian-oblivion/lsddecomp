@@ -43,12 +43,12 @@ NON_MATCHING body promoted, round 65.
 ## ROUND 65 (charlie): NON_MATCHING body promoted
 
 Track 1b mechanical promotion. The standing `#if 0` snapshot in
-`src/code_8220_c.c` (family-shared register-identity residue, hand-derived
+`src/code_8220_b.c` (family-shared register-identity residue, hand-derived
 per the round-13 HEAD PASS analysis — see `SubmitPolyF3.md`) is not a
 permuter candidate. Wrapped it in `#ifdef NON_MATCHING ... #else
 INCLUDE_ASM ... #endif` in place, no bytes changed. `./build-and-verify.sh`:
 `build exit=0`, `OK: build matches retail`. `tools/check-nonmatching.sh
-code_8220_c`: `OK`. No stale symbol references (`RCpolyFT4` is already the
+code_8220_b`: `OK`. No stale symbol references (`RCpolyFT4` is already the
 current name).
 
 ## ROUND 48 (bravo): first REAL per-function permuter search — not closed, no new mechanism, third identical confirmation
@@ -80,7 +80,7 @@ the third identical outcome: the same two shapes are the only sub-260
 attractors, regardless of which sibling's own disassembly seeds the
 search. This is now strong evidence the attractor pair is a property of
 the RESIDUE CLASS itself (the `addPrim`-macro re-evaluation + duplicated
-OT-mask shape shared by all 8 `code_8220_c` RCpoly siblings), not an
+OT-mask shape shared by all 8 `code_8220_b` RCpoly siblings), not an
 artifact of any one function's particular instruction stream. Reverted;
 `git diff --stat` empty.
 
@@ -113,14 +113,14 @@ as `SubmitPolyF3`; not re-attempted beyond this verification.
 > cross-reference quotes exactly that evidence. So a faithfully-attributed
 > sibling figure makes this function read as SEARCHED and spent, which is the
 > expensive direction of error (round 37 corrected the same screen once already,
-> when it measured vocabulary instead of runs). Six of the nine `code_8220_c`
+> when it measured vocabulary instead of runs). Six of the nine `code_8220_b`
 > RCpoly siblings are in this position; one search covers the family.
 
 
 ## ROUND 40 (alpha): Job 1 rebuild-verify, third independent reproduction — 80/88, byte-identical
 
 Re-ran the Job-1 rebuild independently of round 36 and round 39 (bravo): the
-LIVE `#if 0` body in `src/code_8220_c.c` (round-36 symbol-corrected,
+LIVE `#if 0` body in `src/code_8220_b.c` (round-36 symbol-corrected,
 `RCpolyFT4` not `func_8001BAB4`) toggled over `INCLUDE_ASM`, full oracle in
 isolation, reverted. `build exit=2`, zero compile-error/`undefined
 reference` hits.
@@ -161,7 +161,7 @@ shared position.
 ## ROUND 36: symbol rename verified, rebuilt LIVE, MEASURED (confirms the figure below)
 
 Round 34's SDK-object conversion renamed this function's Psy-Q callee
-`func_8001BAB4` -> `RCpolyFT4` (a real `libgte` symbol). `src/code_8220_c.c`'s
+`func_8001BAB4` -> `RCpolyFT4` (a real `libgte` symbol). `src/code_8220_b.c`'s
 preserved `#if 0` snapshot was updated to the new name in that same commit
 (`50fd52c`) but never rebuilt, so the `80/88` figure below was carried
 forward UNVERIFIED. This round swapped the snapshot in over the
@@ -173,7 +173,7 @@ against the linked SDK object, no `undefined reference`), and re-ran
 drift warning.** The rename did not disturb the residue.
 
 The corrected, LINKABLE snapshot (identical to what's live in
-`src/code_8220_c.c`):
+`src/code_8220_b.c`):
 
 ```c
 #if 0
@@ -212,13 +212,13 @@ void SubmitPolyFT4(void *arg0, void *arg1) {
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", SubmitPolyFT4);
+INCLUDE_ASM("asm/nonmatchings/code_8220_b", SubmitPolyFT4);
 ```
 
 (`OtTag` and `RCpolyFT4`'s prototype come from `include/code_8220.h`,
 already included by the unit.)
 
-Unit: `src/code_8220_c.c`. Sixth sibling of the `SubmitPolyF3` OT-splice-
+Unit: `src/code_8220_b.c`. Sixth sibling of the `SubmitPolyF3` OT-splice-
 or-calls family. Calls-branch shape combines `SubmitPolyFT3`'s
 `FillDivPolygonHeader(...,1,self->0xE,self->0x16)` argument pattern with
 `SubmitPolyG4`'s quad (4-record) output and `FillRVectors4` call; tail
@@ -341,7 +341,7 @@ re-confirming the four already recorded) against this refined rule rather
 than the raw one, though all four already measured are consistent with
 both readings and don't distinguish them.
 
-## RUNNER PASS, permuter round (alpha, code_8220_c): base confirmed, cross-reference only
+## RUNNER PASS, permuter round (alpha, code_8220_b): base confirmed, cross-reference only
 
 Framing correction: HARD RULE 6 bans the asm/operand-constraint MECHANISM
 for register identity, not the outcome of a register differing -- see

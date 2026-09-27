@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001A380` on 2026-09-24 (tools/rename.py). Address 0x8001a380.
 
-Unit `code_8220_c`. Reopened round 42 after the `gp_rel` blocker that stalled
+Unit `code_8220_b`. Reopened round 42 after the `gp_rel` blocker that stalled
 it at carve time (round 13) was resolved (`--gp-symbols`, see
 `docs/research/gp-relative-blocker.md`). This report supersedes the round-13
 stub, which recorded no attempt and no score.
@@ -197,4 +197,4 @@ History moved from include/code_8220.h's old extern comment: this function
 was matched in round 44 once the gp_rel blocker that stalled it at carve
 time (round 13) was resolved, and the extern lived in the shared header only
 so that SubmitPolyF3, then still INCLUDE_ASM, could compile. The
-declaration is now a prototype in code_8220_c.c, the only unit that calls it.
+declaration is now a prototype in code_8220_b.c, the only unit that calls it.

@@ -127,7 +127,7 @@ denominator shrinks by exactly those functions.
 divgt3a divgt4a` — the `RCpoly*` polygon-subdivision family, text-only, no
 data sections. Replacing the five `psyq_rcpoly*` asm segments with eight `o`
 segments, adding `o_path: lib/`, mirroring `lib/**/*.o` into `build/lib/` in
-the Makefile and renaming the eight `func_*` callers in `code_8220_c.c` to
+the Makefile and renaming the eight `func_*` callers in `code_8220_b.c` to
 `RCpolyF3` … `RCpolyGT4`: `./build-and-verify.sh` -> `OK: build matches
 retail`. First attempt.
 

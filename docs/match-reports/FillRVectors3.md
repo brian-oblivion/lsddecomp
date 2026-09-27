@@ -40,7 +40,7 @@
 > struct copy is merely awkward to TYPE, which is a different thing, and the
 > original text cited `TransformAndCullPoly` as precedent for it — so left standing
 > this would have become the precedent for transcribing any hard-to-type
-> function. Every other `__asm__` block remaining in `code_8220_c` is
+> function. Every other `__asm__` block remaining in `code_8220_b` is
 > `swc2`-only and legitimate; this was the only avoidable one.
 >
 > **And "no C form exists" deserves the same standard as a toolchain lead:
@@ -49,7 +49,7 @@
 > force `lwl`/`lwr` at two non-adjacent offsets" — but that struct type was
 > not a guess, it was written down.
 
-Unit: `src/code_8220_c.c`. Copies three unaligned 8-byte fields
+Unit: `src/code_8220_b.c`. Copies three unaligned 8-byte fields
 (`arg1[0]`/`[4]`/`[8]` -> `arg0[0]`/`[4]`/`[8]`, treating `arg0`/`arg1` as
 arrays of 3 pointers) and, for each of the three destinations, an unaligned
 4-byte field from a separate source pointer (`arg2`, `arg3`, `arg4`

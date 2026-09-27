@@ -45,12 +45,12 @@ NON_MATCHING body promoted, round 65.
 ## ROUND 65 (charlie): NON_MATCHING body promoted
 
 Track 1b mechanical promotion. The standing `#if 0` snapshot in
-`src/code_8220_c.c` (family-shared register-identity residue, hand-derived
+`src/code_8220_b.c` (family-shared register-identity residue, hand-derived
 per the round-13 HEAD PASS analysis — see `SubmitPolyF3.md`) is not a
 permuter candidate. Wrapped it in `#ifdef NON_MATCHING ... #else
 INCLUDE_ASM ... #endif` in place, no bytes changed. `./build-and-verify.sh`:
 `build exit=0`, `OK: build matches retail`. `tools/check-nonmatching.sh
-code_8220_c`: `OK`. No stale symbol references (`RCpolyFT3` is already the
+code_8220_b`: `OK`. No stale symbol references (`RCpolyFT3` is already the
 current name).
 
 > **SEARCH PROVENANCE CORRECTED (round 41, head): the permuter figure in this
@@ -67,7 +67,7 @@ current name).
 > cross-reference quotes exactly that evidence. So a faithfully-attributed
 > sibling figure makes this function read as SEARCHED and spent, which is the
 > expensive direction of error (round 37 corrected the same screen once already,
-> when it measured vocabulary instead of runs). Six of the nine `code_8220_c`
+> when it measured vocabulary instead of runs). Six of the nine `code_8220_b`
 > RCpoly siblings are in this position; one search covers the family.
 
 ## ROUND 48 (bravo): first REAL per-function permuter search — not closed, fourth identical confirmation
@@ -100,7 +100,7 @@ instruction stream. Reverted; `git diff --stat` empty.
 ## ROUND 40 (alpha): Job 1 rebuild-verify, third independent reproduction — 70/78, byte-identical
 
 Re-ran the Job-1 rebuild independently of round 36 and round 39 (bravo): the
-LIVE `#if 0` body in `src/code_8220_c.c` (round-36 symbol-corrected,
+LIVE `#if 0` body in `src/code_8220_b.c` (round-36 symbol-corrected,
 `RCpolyFT3` not `func_8001B6B4`) toggled over `INCLUDE_ASM`, full oracle in
 isolation, reverted. `build exit=2`, zero compile-error/`undefined
 reference` hits.
@@ -141,7 +141,7 @@ shared position.
 ## ROUND 36: symbol rename verified, rebuilt LIVE, MEASURED (confirms the figure below)
 
 Round 34's SDK-object conversion renamed this function's Psy-Q callee
-`func_8001B6B4` -> `RCpolyFT3` (a real `libgte` symbol). `src/code_8220_c.c`'s
+`func_8001B6B4` -> `RCpolyFT3` (a real `libgte` symbol). `src/code_8220_b.c`'s
 preserved `#if 0` snapshot was updated to the new name in that same commit
 (`50fd52c`) but never rebuilt, so the `70/78` figure below was carried
 forward UNVERIFIED. This round swapped the snapshot in over the
@@ -153,7 +153,7 @@ against the linked SDK object, no `undefined reference`), and re-ran
 drift warning.** The rename did not disturb the residue.
 
 The corrected, LINKABLE snapshot (identical to what's live in
-`src/code_8220_c.c`):
+`src/code_8220_b.c`):
 
 ```c
 #if 0
@@ -189,13 +189,13 @@ void SubmitPolyFT3(void *arg0, void *arg1) {
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", SubmitPolyFT3);
+INCLUDE_ASM("asm/nonmatchings/code_8220_b", SubmitPolyFT3);
 ```
 
 (`OtTag`, `PolyVtx`, `PolyUV4` and `RCpolyFT3`'s prototype come from
 `include/code_8220.h`, already included by the unit.)
 
-Unit: `src/code_8220_c.c`. Gouraud-triangle-flavored sibling of
+Unit: `src/code_8220_b.c`. Gouraud-triangle-flavored sibling of
 `SubmitPolyF3`/`SubmitPolyF4`/`SubmitPolyG3` (this unit, all stalled at
 the same underlying residue) — same `prim->0x78`-gated OT-splice-or-calls
 shape. Calls-branch differs from `SubmitPolyG3`'s: `FillDivPolygonHeader` gets a
@@ -319,7 +319,7 @@ $v0,$s1,0x20` — matches the verified cross-sibling formula in
 field this function touches, a `u16` at `+0x1E`). Not independently
 re-attempted; see `SubmitPolyF3.md` for the ruled-out hypotheses.
 
-## RUNNER PASS, permuter round (alpha, code_8220_c): base confirmed, cross-reference only
+## RUNNER PASS, permuter round (alpha, code_8220_b): base confirmed, cross-reference only
 
 Framing correction: HARD RULE 6 bans the asm/operand-constraint MECHANISM
 for register identity, not the outcome of a register differing -- see
@@ -340,7 +340,7 @@ size formula. Permuter scaffold left provisioned at
 ## RUNNER PASS, round 19 second head-directed pass (delta): drift-verified, aggregate-assignment axis checked -- clean negative
 
 Re-verified this report's exact preserved body by rebuilding it directly
-into `src/code_8220_c.c` (not just re-reading the report), per this
+into `src/code_8220_b.c` (not just re-reading the report), per this
 round's standing drift-re-verification check: `build exit=2` (expected,
 not byte-exact), no compile error, `funcdiff.py SubmitPolyFT3` reports
 **70/78, no outside-range drift warning** -- the claim holds, this is a

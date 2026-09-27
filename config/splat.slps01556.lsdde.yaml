@@ -410,7 +410,6 @@ segments:
       # on a segment boundary, so there is no data tail to declare.
       # Blocker profile: 14 of 16 functions clean, only func_8001A380
       # (4 hits) and func_8001A54C (2 hits) are gp_rel-blocked.
-      - [0x9F74, c, code_8220_c]
       # Psy-Q library code LINKED FROM THE SDK'S OWN OBJECTS (type `o`): the
       # bytes come from lib/<lib>/<module>.o, which tools/setup.sh converts
       # from the user's Psy-Q disc with psyq-obj-parser. tools/match_obj.py

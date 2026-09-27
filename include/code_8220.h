@@ -122,18 +122,18 @@ extern s32 D_8008E248;
  * definition in the .c file. */
 extern s32 TransformAndCullPoly(void *arg0, void *arg1);
 
-/* code_8220_c. Called by ProjectTriFace/ProjectQuadFace for a face that
+/* code_8220_b. Called by ProjectTriFace/ProjectQuadFace for a face that
  * survived the cull: takes the screen bounding box of its `count` (3 or 4)
  * cached XYs and sets ctx+0x78, the flag that makes the SubmitPoly*
  * wrappers subdivide the face through RCpoly*, when the box is wider or
  * taller than 256 pixels. */
 extern void FlagLargePolyForDivide(void *ctx, s32 count);
 
-/* The two subdivision work buffers code_8220_c's SubmitPoly* wrappers hand
+/* The two subdivision work buffers code_8220_b's SubmitPoly* wrappers hand
  * Sony's RCpoly* packers: a DIVPOLYGON3 and a DIVPOLYGON4 (libgte.h), laid
  * out back to back (0x218 bytes apart, sizeof(DIVPOLYGON3)). Declared as
  * bytes here because this header does not include <libgte.h>; code_8220_b
- * only takes their addresses (InitDivPolygonPtrs) and code_8220_c casts. */
+ * only takes their addresses (InitDivPolygonPtrs) and code_8220_b casts. */
 extern u8 gDivPolygon3[];
 extern u8 gDivPolygon4[];
 

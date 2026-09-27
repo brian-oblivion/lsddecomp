@@ -11,7 +11,7 @@
 > MATCH" at the end for what actually closed it and why the whole prior
 > approach could never have reached retail's own instruction sequence.
 
-Unit: `src/code_8220_c.c`. `void FillRVectors4(PolyVtx **dst, PolyVtx **src,
+Unit: `src/code_8220_b.c`. `void FillRVectors4(PolyVtx **dst, PolyVtx **src,
 PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3)` — calls
 `FillRVectors3(dst, src, uv0, uv1, uv2)` (matched round 13, same unit), then
 does its own single unaligned 8-byte copy (`src[3]->xy` -> `dst[3]->xy`) and
@@ -92,7 +92,7 @@ sw    $ra,0x24($sp)
 jal   FillRVectors3
 ```
 
-My best body's built object (`objdump -d build/src/code_8220_c.c.o`)
+My best body's built object (`objdump -d build/src/code_8220_b.c.o`)
 confirms the SAME register assignment (`$s0`=arg0, `$s1`=arg1, `$s2`=arg5,
 each saved at the SAME stack offsets 0x18/0x1c/0x20) — this took several
 attempts to reach (see below) — but orders the four save/load groups
@@ -177,7 +177,7 @@ order before spending further attempts — an order-only residue with
 correct registers is the stronger signal that no more attempts are likely
 to help, not a reason to keep trying "just one more" reordering.
 
-## RUNNER PASS, permuter round (alpha, code_8220_c): base confirmed, floor held, two degenerate leads not pursued
+## RUNNER PASS, permuter round (alpha, code_8220_b): base confirmed, floor held, two degenerate leads not pursued
 
 `--debug` on this report's preserved body (prologue store-order residue,
 28/35 words): base score = **210**, decomposing as 3 reorderings x 60 = 180
@@ -356,4 +356,4 @@ SVECTOR, DVECTOR); body `FillRVectors3(dst, src, sxy0, sxy1, sxy2);
 dst[3]->v = *src[3]; dst[3]->sxy = *sxy3;`, byte-identical. The shared
 header's old extern comment ("extends CopyPolyVtx3 to a 4th vertex ...
 round 20") is this report's ROUND 20 section; the prototype now lives in
-code_8220_c.c.
+code_8220_b.c.

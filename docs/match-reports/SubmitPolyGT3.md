@@ -46,12 +46,12 @@ NON_MATCHING body promoted, round 65.
 ## ROUND 65 (charlie): NON_MATCHING body promoted
 
 Track 1b mechanical promotion. The standing `#if 0` snapshot in
-`src/code_8220_c.c` (family-shared register-identity residue, hand-derived
+`src/code_8220_b.c` (family-shared register-identity residue, hand-derived
 per the round-13 HEAD PASS analysis — see `SubmitPolyF3.md`) is not a
 permuter candidate. Wrapped it in `#ifdef NON_MATCHING ... #else
 INCLUDE_ASM ... #endif` in place, no bytes changed. `./build-and-verify.sh`:
 `build exit=0`, `OK: build matches retail`. `tools/check-nonmatching.sh
-code_8220_c`: `OK`. No stale symbol references (`RCpolyGT3` is already the
+code_8220_b`: `OK`. No stale symbol references (`RCpolyGT3` is already the
 current name).
 
 ## ROUND 48 (bravo): first REAL per-function permuter search — not closed, no new mechanism
@@ -114,14 +114,14 @@ residue class as `SubmitPolyF3`; not re-attempted this round.
 > cross-reference quotes exactly that evidence. So a faithfully-attributed
 > sibling figure makes this function read as SEARCHED and spent, which is the
 > expensive direction of error (round 37 corrected the same screen once already,
-> when it measured vocabulary instead of runs). Six of the nine `code_8220_c`
+> when it measured vocabulary instead of runs). Six of the nine `code_8220_b`
 > RCpoly siblings are in this position; one search covers the family.
 
 
 ## ROUND 40 (alpha): Job 1 rebuild-verify, third independent reproduction — 88/96, byte-identical
 
 Re-ran the Job-1 rebuild independently of round 36 and round 39 (bravo): the
-LIVE `#if 0` body in `src/code_8220_c.c` (round-36 symbol-corrected,
+LIVE `#if 0` body in `src/code_8220_b.c` (round-36 symbol-corrected,
 `RCpolyGT3` not `func_8001BFD4`) toggled over `INCLUDE_ASM`, full oracle in
 isolation, reverted. `build exit=2`, zero compile-error/`undefined
 reference` hits.
@@ -162,7 +162,7 @@ shared position.
 ## ROUND 36: symbol rename verified, rebuilt LIVE, MEASURED (confirms the figure below)
 
 Round 34's SDK-object conversion renamed this function's Psy-Q callee
-`func_8001BFD4` -> `RCpolyGT3` (a real `libgte` symbol). `src/code_8220_c.c`'s
+`func_8001BFD4` -> `RCpolyGT3` (a real `libgte` symbol). `src/code_8220_b.c`'s
 preserved `#if 0` snapshot was updated to the new name in that same commit
 (`50fd52c`) but never rebuilt, so the `88/96` figure below was carried
 forward UNVERIFIED. This round swapped the snapshot in over the
@@ -174,7 +174,7 @@ against the linked SDK object, no `undefined reference`), and re-ran
 drift warning.** The rename did not disturb the residue.
 
 The corrected, LINKABLE snapshot (identical to what's live in
-`src/code_8220_c.c`):
+`src/code_8220_b.c`):
 
 ```c
 #if 0
@@ -224,13 +224,13 @@ void SubmitPolyGT3(void *arg0, void *arg1) {
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_c", SubmitPolyGT3);
+INCLUDE_ASM("asm/nonmatchings/code_8220_b", SubmitPolyGT3);
 ```
 
 (`OtTag`, `PolyVtx`, `PolyUV4` and `RCpolyGT3`'s prototype come from
 `include/code_8220.h`, already included by the unit.)
 
-Unit: `src/code_8220_c.c`. Seventh sibling of the `SubmitPolyF3` OT-splice-
+Unit: `src/code_8220_b.c`. Seventh sibling of the `SubmitPolyF3` OT-splice-
 or-calls family — Gouraud-triangle flavor combining `SubmitPolyFT3`'s
 `FillDivPolygonHeader` argument shape (`a3=1`, two `u16` stack args) with
 `FillRVectors3` (triangle, 3-record output). Calls `func_8001BFD4` (Psy-Q
@@ -341,7 +341,7 @@ align-4 refinement: last touched `self` field is `+0x24` (`u16`, raw end
 re-attempted; see `SubmitPolyF3.md`/`SubmitPolyFT4.md` for the ruled-out
 hypotheses.
 
-## RUNNER PASS, permuter round (alpha, code_8220_c): base confirmed, cross-reference only
+## RUNNER PASS, permuter round (alpha, code_8220_b): base confirmed, cross-reference only
 
 Framing correction: HARD RULE 6 bans the asm/operand-constraint MECHANISM
 for register identity, not the outcome of a register differing -- see

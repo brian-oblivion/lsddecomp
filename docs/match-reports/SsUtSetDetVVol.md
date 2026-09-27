@@ -99,7 +99,7 @@ Getting N wrong fails the whole-image build outright rather than scoring
 low, so the oracle tells you immediately.
 
 This is directly actionable on the live queue: `FlagLargePolyForDivide`
-(`code_8220_c`) is filed as *"unused-frame placement residue, 53/70 words"*
+(`code_8220_b`) is filed as *"unused-frame placement residue, 53/70 words"*
 and has never been tried against this lever.
 
 ## Track 2 (round 86, 2026-09-26, alpha)

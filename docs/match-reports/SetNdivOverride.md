@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001A54C` on 2026-09-24 (tools/rename.py). Address 0x8001a54c.
 
-Unit `code_8220_c`. Reopened round 42 after the `gp_rel` blocker that stalled
+Unit `code_8220_b`. Reopened round 42 after the `gp_rel` blocker that stalled
 it at carve time (round 13) was resolved (`--gp-symbols`, see
 `docs/research/gp-relative-blocker.md`). This report supersedes the round-13
 stub, which recorded no attempt and no score.
@@ -36,7 +36,7 @@ jr   $ra
 
 `sNdivOverrideSet` and `sNdivOverride` (`asm/data/7B018.sdata.s`) are plain `.sdata`
 words, initialized to `1` and `2` respectively, and referenced from nowhere
-else in the executable except this function and its `code_8220_c` sibling
+else in the executable except this function and its `code_8220_b` sibling
 `FillDivPolygonHeader` (also assigned this round -- see `FillDivPolygonHeader.md`). No
 existing type information anywhere else in the codebase constrains them
 further, so they are declared `s32`.
@@ -62,7 +62,7 @@ any GTE macro.
 
 ### Proposed learning
 
-`sNdivOverrideSet`/`sNdivOverride` are declared locally in `src/code_8220_c.c` (not in
+`sNdivOverrideSet`/`sNdivOverride` are declared locally in `src/code_8220_b.c` (not in
 `include/code_8220.h`) per the project convention: nothing outside this unit
 currently references them, so putting the extern in a shared header would
 just be an unused collision surface for a sibling unit that never touches

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001A224` on 2026-09-24 (tools/rename.py). Address 0x8001a224.
 
-Unit: `src/code_8220_c.c`. Immediately precedes `FlagLargePolyForDivide` in ROM
+Unit: `src/code_8220_b.c`. Immediately precedes `FlagLargePolyForDivide` in ROM
 order — likely a helper it calls, though `FlagLargePolyForDivide` itself is not yet
 matched (queued next). `kind` is the same "primitive kind" code seen
 already in `code_8220_b` (`ProjectTriFace`/`ProjectQuadFace` pass `3`

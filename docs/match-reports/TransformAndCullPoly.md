@@ -194,6 +194,6 @@ that byte-matched; `tagLen` is `unk3`/`unk14` renamed in place.
 (the 8-bit bitfield compiles to the same `sb`), the near-plane test is
 `ctx->dp >= ONE` (libgte), the FLAG test names `GTE_FLAG_SZ3_OTZ_SAT`
 (bit 18), and `saturated` is the context's `divide` field, the flag the
-code_8220_c submit wrappers route to RCpoly* subdivision. The comment's
+code_8220_b submit wrappers route to RCpoly* subdivision. The comment's
 history (splat's "handwritten" tag, the whole-function `__asm__` of earlier
 rounds) is this report's own table above.
