@@ -97,7 +97,7 @@ struct SplitCoord2 {
 /* The four scale steps (Ratio16[3], x/y/z) startScaleRamp picks for
  * `scaleStep`: y +1/64, +1/4 (rate > 0; flag 0, nonzero), -1/64, -1/4
  * (rate <= 0); x and z 0/1. */
-extern Ratio16 D_8008699C[3];
+extern Ratio16 sScaleStepUpSlow[3];
 extern Ratio16 D_800869A8[3];
 extern Ratio16 D_800869B4[3];
 extern Ratio16 D_800869C0[3];

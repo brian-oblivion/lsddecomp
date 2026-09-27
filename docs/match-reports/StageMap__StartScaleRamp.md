@@ -137,7 +137,7 @@ void StageMap__StartScaleRamp(Obj866E8 *self, s32 rate, s32 flag) {
     if (rate <= 0) {
         goto rate_le;
     }
-    table = &D_8008699C;
+    table = &sScaleStepUpSlow;
     if (flag == 0) {
         goto store;
     }
@@ -170,7 +170,7 @@ byte-exact first half, and useful for whoever picks this back up.
 
 - New type `EntryDesc866E8`: a 0xC-byte struct, only `+0x006` (`s16`,
   `unk6`) typed — the rest is unproven padding.
-- `D_8008699C`, `D_800869A8`, `D_800869B4`, `D_800869C0` — four static
+- `sScaleStepUpSlow`, `D_800869A8`, `D_800869B4`, `D_800869C0` — four static
   instances of `EntryDesc866E8`, addresses confirmed 0xC apart. The
   existing `D_800869CC` (`extern s32 D_800869CC[3]`, declared by an
   earlier round from `StageMap__ResetCellScale`) is a plausible fifth entry of the
@@ -370,7 +370,7 @@ the shape that already gets the closest — untried combination.
 
 **Result: 15/28, WORSE, and it broke the already-solved first half too.**
 The table-selection code (byte-exact since round 9) diverged starting at the
-very first `%lo(D_8008699C)` immediate — the built object referenced a
+very first `%lo(sScaleStepUpSlow)` immediate — the built object referenced a
 DIFFERENT static table entry at that position than retail/every prior
 attempt. Nothing about the first half's source changed; only the second
 half's assignment target did. This means writing directly to the struct

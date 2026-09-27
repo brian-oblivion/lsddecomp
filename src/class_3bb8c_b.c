@@ -379,7 +379,7 @@ void StageMap__StartScaleRamp(StageMap *self, s32 rate, s32 flag) {
     if (rate <= 0) {
         goto rate_le;
     }
-    table = D_8008699C;
+    table = sScaleStepUpSlow;
     if (flag == 0) {
         goto store;
     }

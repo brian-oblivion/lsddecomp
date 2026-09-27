@@ -2979,3 +2979,4 @@ gCardEventSpecs = 0x80086E78;
 sFileNotCreatedMsg = 0x80011530;
 gCardIconRect = 0x80086EC4;
 gCardIconPos = 0x8008AA94;
+sScaleStepUpSlow = 0x8008699C;
