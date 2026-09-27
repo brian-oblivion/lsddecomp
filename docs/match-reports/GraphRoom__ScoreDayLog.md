@@ -237,3 +237,31 @@ the log against those four targets, feeding `GraphRoom__TickHighlight`.
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__ScoreDayLog` -> `GraphRoom__ScoreDayLog`
 
 The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only; not a slot (called by PopulateGraphPoints alone). The log is the DreamSys save block: `days` is moodPreviousDays, `scored` (+0x467 of the block, DreamSys +0x5DF, the last byte of DreamSys's unknown_values_0x5d8) is renamed graphScored in the unit's record. The round-24 "not DreamSys" note compared the offsets against DreamSys's start rather than saveMagic (+0x178).
+
+## Track 7 (2026-09-27, round 97, delta)
+
+- **Naming: `D_80087BD4` -> `gGraphScoreMoods`** (tier B: the mechanics are certain, what the game makes of these four moods is not). Four `.data` halfwords `0x01FF, 0x0101, 0x0000, 0xFD00`, i.e. MoodGraphPoint `(dynamic, upper)` = (-1, 1), (1, 1), (0, 0), (0, -3). This function is its only user. Declared `MoodGraphPoint[GRAPH_SCORE_MOOD_COUNT]` and compared by `.value`; `targets`/`days` are `MoodGraphPoint *`. Zero bytes changed.
+- `GRAPH_SCORE_MOOD_COUNT` (4, unit-local): the table's length, this loop's bound, matchedDayIndices' allocation and TickHighlight's bound.
+- `limit`'s 100s are `ARRAY_COUNT(self->points)`; the wrap index 0x16C is `DAYS_PER_YEAR - 1` (DreamSys.h). Locals: `p` -> `targets`, `idx` -> `day`, `j` -> `dot`, `found` -> `matches`.
+- The source comments below were replaced by a function comment and a one-line `MATCHING:` note. Verbatim as they stood (with the step-1/3 renames already applied):
+
+```c
+/* Four halfword targets, 0x01FF/0x0101/0x0000/0xFD00 -- exactly the i < 4
+ * bound below, which is why the loop count is the table's length and not a
+ * coincidence. */
+extern MoodGraphPoint gGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
+
+/* Round 41 (2026-09-14): matched from a permuter-found lead. `targets` and `days`
+ * are LOCAL pointer caches of gGraphScoreMoods and log->moodPreviousDays respectively -- not
+ * because retail's semantics need them (both globals are re-derivable
+ * without a temporary), but because caching them THIS WAY is what makes
+ * cc1 2.6.3 stop strength-reducing gGraphScoreMoods[i] into a pointer induction
+ * variable hoisted across the outer loop (see the match report for the
+ * full derivation). The `else { targets = gGraphScoreMoods; }` branch below and the
+ * `targets = (days = gGraphScoreMoods);` chained assignment are BOTH semantically
+ * inert -- targets is unconditionally overwritten with the same value either
+ * way -- but removing either one measurably regresses the codegen (round
+ * 41 confirmed both empirically, byte-exact with them, off by dozens of
+ * words without). Do not "simplify" this without re-running
+ * ./build-and-verify.sh. */
+```

@@ -212,3 +212,9 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 - **Not Sony's `CVECTOR`**: `CVECTOR` is `u_char r, g, b, cd`, four bytes. Retail copies the global into the local with three `lb`/`sb` pairs (signed, three bytes), so a four-byte unsigned struct would not compile to it. Kept as its own `s8` triple, like `BgLayerRgb`/`ViewportRgb`.
 - **`gGraphPointBaseColor`** (tier A): 4 bytes of sdata `FF FF FF 00`, white. This function is its only reader: points 1..99 start from a copy of it and darken by 0x14 per point for the first six, then by 1. (Point 0 takes `gGraphPointNewestColor`, `FF 00 00`, red -- left unnamed, outside the job.)
 - The type's comment moved round 19's history here and says what the type is; zero bytes changed.
+
+## Track 7 (2026-09-27, round 97, delta)
+
+- **Naming: `D_8008ABAC` -> `gGraphPointSize`** (tier A): two sdata words `{10, 10}`, New_BoxFill's size argument (BoxFill reads the low halfwords into boxW/boxH, include/BoxFill.h `SkipShort2`) for all 100 dots. Its only user. Now declared `s32 gGraphPointSize[2]` and passed bare instead of `&` of a `u8`: zero bytes changed.
+- **Naming: `D_8008ABB4` -> `gGraphPointNewestColor`** (tier A): sdata `FF 00 00`, red, the colour of `points[0]`, which PopulateGraphPoints plots from the newest logged day (`currentDay - 1`) and Update blinks. Its only user. Declared `GraphPointColor` instead of `u8`: zero bytes changed.
+- Local `dec` -> `step`; the loop bound is `ARRAY_COUNT(self->points)`; the darkening step 0x14 is decimal 20; `matchedDayIndices` is `BMemPMgrAlloc(GRAPH_SCORE_MOOD_COUNT * sizeof(s8))`, one byte per gGraphScoreMoods entry.

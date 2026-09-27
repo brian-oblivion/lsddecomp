@@ -53,3 +53,9 @@ specific verb.
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__InitDisplay` -> `GraphRoom__Reset`
 
 The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Named for its slot, track 4 step 6: +0x040 is IntermediateBase's `resetCounters`, TaskCore__Reset in the parent table, and the ctor's last call, which is how this body runs. It sets fadeRate (+0x084, was unk_0x84) 5 and unk2C 0x190 (TaskCore's reset sets 9 and 0x12C), then setSubHandle (+0x0D4, was `loadTexture`) with "ETC\HGRAPH.TIM" and setFrameBound (+0x06C, was slot6C) 10. It does not up-call TaskCore__Reset.
+
+## Track 7 (2026-09-27, round 97, delta)
+
+- **Naming: `D_80011778` -> `sGraphTimPath`** (tier A): the rodata string `"ETC\HGRAPH.TIM"`, Reset's path for `setSubHandle`; its only user.
+- Constants in decimal: `unk2C = 400` (the 0x190; TaskCore's reset writes 300, class_3bb8c_d writes 400; it becomes Viewport's `unk44`, one factor of each buffer's packet area), `setFrameBound(10)` (frameBound = 10 * 20). `setSubHandle`'s handle is `NULL`. Zero bytes changed.
+- Left: `unk2C` is TaskCore's field, accessed in code_2c054.c and class_3bb8c_d.c too: a name is proposed to the head rather than applied.

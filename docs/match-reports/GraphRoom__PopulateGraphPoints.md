@@ -218,3 +218,26 @@ points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__PopulateGraphPoints` -> `GraphRoom__PopulateGraphPoints`
 
 The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Occupies +0x0E0, TaskCore's `updateSlotElements`, and keeps its own name (step 6: after the base call it scores the log and places one dot a day). The +0x1B0 call is DreamSys__GetSaveBlock through DreamSys.h; the record is DreamSaveBlock (fields currentYear/currentDay/moodPreviousDays, DreamSys's names at the same offsets from saveMagic).
+
+## Track 7 (2026-09-27, round 97, delta)
+
+- **The raw offsets are fields.** `p = (s8 *)((u8 *)result + idx * 2); dx = p[0x18]; dy = p[0x19];` is now `save->moodPreviousDays[day].axis.dynamic` / `.axis.upper`: DreamSaveBlock's ring is typed `MoodGraphPoint[DAYS_PER_YEAR]` (include/common.h's union, the type DreamSys.h declares the ring with). Zero bytes changed.
+- **Measured: the pointer form does not match.** `MoodGraphPoint *p = &save->moodPreviousDays[day]; dx = p->axis.dynamic; dy = p->axis.upper;` makes cc1 add the array's +0x018 to the pointer first (an extra `addiu`, the loop shifted from word 50 on). Indexing the array twice is byte-exact, and carries a `MATCHING:` line.
+- `Point2` deleted: it was `BoxFillPos` (include/BoxFill.h), the type attachAbsolute takes, and the two `(BoxFillPos *)` casts went with it.
+- Constants: the 100s are `ARRAY_COUNT(self->points)` (`count >= 0x65` is `count > ARRAY_COUNT(...)`), 0x16C is `DAYS_PER_YEAR - 1`, and `* 10 - 5` is `* GRAPH_PIXELS_PER_MOOD - GRAPH_POINT_SIZE / 2`: gGraphPointSize is 10 square and BoxFill's position is the GsBOXF's top-left, so the -5 centres each dot on its mood times 10. Two names because the two 10s mean different things.
+- Locals: `result` -> `save`, `idx` -> `day`, `flag` -> `haveNewest`.
+- Moved from the source, verbatim, the DreamSaveBlock comment's history and the Point2 comment:
+
+```c
+/* What DreamSys__GetSaveBlock (the DreamSys's +0x1B0) returns: &saveMagic,
+ * the 0x700-byte save block. This record reads it from there; the offsets
+ * are DreamSys's own fields relative to saveMagic (DreamSys +0x178):
+ * currentYear, currentDay, moodPreviousDays[365] (include/DreamSys.h). The
+ * round-24 reading of this record ("a separate day-log object, not
+ * DreamSys") predates knowing who passes the ctor's argument:
+ * GameApplication__PollGraphRoomStatus passes its dreamSys.
+ *
+ * +0x467 is DreamSys +0x5DF, the last byte of DreamSys's
+ * unknown_values_0x5d8[8]: ScoreDayLog fails once it is set and sets it on
+ * success, so the graph's highlight runs once per save. */
+```

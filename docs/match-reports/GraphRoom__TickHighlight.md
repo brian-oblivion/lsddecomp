@@ -81,3 +81,8 @@ points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__TickHighlight` -> `GraphRoom__TickHighlight`
 
 The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. The class's own slot +0x124, `tickHighlight`. The field the round-19 view called elapsedHours is IntermediateBase's s32 frameCounter; the body's `sltiu`/`divu` need it unsigned, so it is read as `(u32)self->frameCounter`.
+
+## Track 7 (2026-09-27, round 97, delta)
+
+- **Naming: `D_8008ABBC` -> `gGraphPointHighlightColor`** (tier A): sdata `00 FF 00`, green; this function `setColor(1, ...)`s (overwrite) each matched dot to it. Its only user. Declared `GraphPointColor` instead of `s32`: zero bytes changed.
+- Local `idx` -> `dot`; `highlightCount < GRAPH_SCORE_MOOD_COUNT`; `0x1F` is decimal 31. The 31 and 24 stay literals (one highlight every 24 frames once frameCounter passes 30): a name would only restate them.

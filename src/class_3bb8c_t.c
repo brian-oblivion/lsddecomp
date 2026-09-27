@@ -1,42 +1,22 @@
 /*
- * class_3bb8c_t -- functions 96..112 of the 113-function `class_3bb8c_n`
- * remainder, 0x48738..0x48F74 (vram 0x80057F38..0x80058774).  Carved
- * MID-round 17 (2026-09-04) to re-staff a runner whose own unit was
- * exhausted.  This is the LAST slice of the class_3bb8c block.
+ * class_3bb8c_t -- the graph room, and the tail of VariantSprite.
  *
- * EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS.  It is cut at ROM
- * addresses, not class boundaries.  Identify each with tools/classtable.py.
- * It holds two classes:
+ * - VariantSprite (include/VariantSprite.h): four empty methods and the
+ *   table getter. Its ctor is in class_3bb8c_p, two more methods in
+ *   class_3bb8c_q.
+ * - GraphRoom (include/GraphRoom.h, whose banner has the slots and fields),
+ *   a TaskCore subclass, whole: allocator, ctor, every override, ScoreDayLog
+ *   and the getter.
  *
- * - Four empty leaves plus the table getter (VariantSprite__Update,
- *   VariantSprite__NoOpSlotBC/C0/C4, GetVariantSpriteMethods) of the
- *   unrelated VariantSprite (include/VariantSprite.h; its ctor is in
- *   `class_3bb8c_p`, two more methods in `class_3bb8c_q`).
- * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
- *   73 slots), a TaskCore subclass, unified in include/GraphRoom.h (track 4,
- *   round 87; the header's banner has the slots, fields and evidence).
- *   This unit owns the entire class: allocator, ctor, every override,
- *   ScoreDayLog and the getter.
- *
- * `GraphRoom`'s identity (round 75, track 3 naming pass; tier B -- the
- * MECHANICS below are certain, the in-game name is a strong but unconfirmed
- * read): `GraphRoom__Reset` sets the literal texture string
- * `"ETC\HGRAPH.TIM"` as the sub-handle. The class owns a 100-entry array of
- * small coloured `New_BoxFill` point objects (`points`) built by
- * `BuildGraphPoints` and positioned by `PopulateGraphPoints` from a
- * backwards walk of the DreamSys's 365-entry mood ring
- * (`DreamSaveBlock::moodPreviousDays`, reached through the save block
- * `dreamSys`'s GetSaveBlock returns) -- each day's two signed bytes become
- * an `{x, y}` point handed to a point's `attachAbsolute`. `ScoreDayLog`
- * separately scans that same ring for four fixed mood targets
- * (`gGraphScoreMoods`) and records, per target, the dot index it last matched at;
- * `TickHighlight` later highlights the matching point. Together this is
- * the in-game graph screen that plots mood history as coloured dots.
- * Round 87 correction: the ring IS DreamSys's `moodPreviousDays` -- the
- * ctor's argument is GameApplication's dreamSys, and the record's offsets are
- * DreamSys's fields relative to saveMagic (see DreamSaveBlock below). The
- * earlier "not DreamSys, the offsets don't line up" compared them against
- * the start of DreamSys rather than the save block.
+ * GraphRoom loads "ETC\HGRAPH.TIM" and plots up to 100 days of the
+ * DreamSys's mood ring (moodPreviousDays, read from the save block
+ * DreamSys__GetSaveBlock returns), newest first, as 10-pixel BoxFill dots:
+ * a day's two signed mood bytes, times 10, are its dot's centre, the upper
+ * axis pointing up the screen. The newest dot is red and blinks while
+ * inputMode is 1; the others fade from white. ScoreDayLog checks, once per
+ * save, that four fixed moods (gGraphScoreMoods) all appear among the
+ * plotted days, and TickHighlight then turns each one's dot green, one
+ * every 24 frames once frameCounter passes 30.
  */
 #include "common.h"
 #include <libgte.h>
@@ -78,21 +58,15 @@ VariantSpriteMethods *GetVariantSpriteMethods(void) {
     return &gVariantSpriteMethods;
 }
 
-/* GraphRoom's object, table and methods: include/GraphRoom.h (track 4,
- * round 87). The base implementations are reached through
- * Get_vtable_TaskCore() with `self` upcast. */
+/* GraphRoom's object, table and methods: include/GraphRoom.h. The base
+ * implementations are reached through Get_vtable_TaskCore() with `self`
+ * upcast. */
 
-/* What DreamSys__GetSaveBlock (the DreamSys's +0x1B0) returns: &saveMagic,
- * the 0x700-byte save block. This record reads it from there; the offsets
- * are DreamSys's own fields relative to saveMagic (DreamSys +0x178):
- * currentYear, currentDay, moodPreviousDays[365] (include/DreamSys.h). The
- * round-24 reading of this record ("a separate day-log object, not
- * DreamSys") predates knowing who passes the ctor's argument:
- * GameApplication__PollGraphRoomStatus passes its dreamSys.
- *
- * +0x467 is DreamSys +0x5DF, the last byte of DreamSys's
- * unknown_values_0x5d8[8]: ScoreDayLog fails once it is set and sets it on
- * success, so the graph's highlight runs once per save. */
+/* What DreamSys__GetSaveBlock (DreamSys +0x1B0) returns: &saveMagic, the
+ * 0x700-byte save block, viewed from there. The fields are DreamSys's own
+ * (include/DreamSys.h), each at its DreamSys offset less saveMagic's
+ * +0x178; graphScored is DreamSys +0x5DF, the last byte of
+ * unknown_values_0x5d8[8]. */
 typedef struct DreamSaveBlock {
     u8 pad00[0x4];
     /* +0x004 */ s32 currentYear; /* nonzero: the ring is full, plot all 100 days */
@@ -240,6 +214,8 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
         if (day < 0) {
             day = DAYS_PER_YEAR - 1;
         }
+        /* MATCHING: indexed twice; through a `MoodGraphPoint *` to the day,
+         * cc1 adds the array's +0x018 to the pointer first. */
         dx = save->moodPreviousDays[day].axis.dynamic;
         point.x = dx * GRAPH_PIXELS_PER_MOOD - GRAPH_POINT_SIZE / 2;
         dy = save->moodPreviousDays[day].axis.upper;
@@ -259,24 +235,17 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
     }
 }
 
-/* Four halfword targets, 0x01FF/0x0101/0x0000/0xFD00 -- exactly the i < 4
- * bound below, which is why the loop count is the table's length and not a
- * coincidence. */
+/* The four moods ScoreDayLog looks for, as (dynamic, upper): (-1, 1),
+ * (1, 1), (0, 0), (0, -3). */
 extern MoodGraphPoint gGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
 
-/* Round 41 (2026-09-14): matched from a permuter-found lead. `targets` and `days`
- * are LOCAL pointer caches of gGraphScoreMoods and log->moodPreviousDays respectively -- not
- * because retail's semantics need them (both globals are re-derivable
- * without a temporary), but because caching them THIS WAY is what makes
- * cc1 2.6.3 stop strength-reducing gGraphScoreMoods[i] into a pointer induction
- * variable hoisted across the outer loop (see the match report for the
- * full derivation). The `else { targets = gGraphScoreMoods; }` branch below and the
- * `targets = (days = gGraphScoreMoods);` chained assignment are BOTH semantically
- * inert -- targets is unconditionally overwritten with the same value either
- * way -- but removing either one measurably regresses the codegen (round
- * 41 confirmed both empirically, byte-exact with them, off by dozens of
- * words without). Do not "simplify" this without re-running
- * ./build-and-verify.sh. */
+/* Whether every gGraphScoreMoods entry appears among the plotted days (the
+ * window PopulateGraphPoints walks, newest first), recording in
+ * matchedDayIndices the oldest dot holding each. Fails at once when
+ * graphScored is set, and sets it on success.
+ * MATCHING: the `targets`/`days` caches, the dead else branch and the
+ * chained assignment are all inert; without any one, cc1 strength-reduces
+ * gGraphScoreMoods[i] into a pointer hoisted across the outer loop. */
 s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     u32 i;
     MoodGraphPoint *days;
