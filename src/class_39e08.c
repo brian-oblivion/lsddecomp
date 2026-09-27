@@ -43,7 +43,7 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     ((TimImageUploadFn)self->etcTim->methods->processBuffer)(self->etcTim);
     self->etcTim->methods->freeBuffer(self->etcTim);
     req.src.buffer = NULL;
-    req.src.name = (char *)D_800113F8;
+    req.src.name = (char *)sDreamerTmdPath;
     self->dreamerTmd = New_LinkResource(&req.src);
     tmp = PickWeeklyGroup(0);
     self->bgm = New_WBgm((char *)tmp, NULL, 1);

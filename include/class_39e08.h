@@ -60,7 +60,7 @@ extern void InitDreamAux(void);
 /* Filenames right next to each other in the same rodata blob
  * (asm/data/1A90.rodata.s): "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD". */
 extern const char sEtcTimPath[];
-extern const char D_800113F8[];
+extern const char sDreamerTmdPath[];
 
 /* src/code_39094.c: one of the seven gWeeklyGroupTable words, each a VAB
  * path string ("SND\\AMBIENT" ... "SND\\STANDERD"). Its return value is

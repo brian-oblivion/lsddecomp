@@ -47,8 +47,8 @@ lw    $v0, 0x5C($v0)
 jalr  $v0
  nop                            ; self->unk44->methods->slot5C(self->unk44), discarded
 addiu $a0, $sp, 0x10            ; &req
-lui   $v0, %hi(D_800113F8)
-addiu $v0, $v0, %lo(D_800113F8)
+lui   $v0, %hi(sDreamerTmdPath)
+addiu $v0, $v0, %lo(sDreamerTmdPath)
 sw    $zero, 0x10($sp)          ; req.type = 0
 jal   New_LinkResource
  sw   $v0, 0x14($sp)             ; req.path = "ETC\DREAMER.TMD"
@@ -114,7 +114,7 @@ void DayTask__DayTask(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     self->unk44->methods->slot78(self->unk44);
     self->unk44->methods->slot5C(self->unk44);
     req.type = 0;
-    req.path = D_800113F8;
+    req.path = sDreamerTmdPath;
     self->unk48 = New_LinkResource(&req);
     tmp = PickWeeklyGroup(0);
     self->unk40 = New_WBgm(tmp, 0, 1);
@@ -205,7 +205,7 @@ needed anywhere in this 107-word function.
   convention. Declared 0x10 bytes (4 fields) even though only the first two
   are written, per that report's own hard-won lesson ("local struct SIZE
   matters, not shape").
-- New rodata externs `sEtcTimPath` ("ETC\ETC.TIM") and `D_800113F8`
+- New rodata externs `sEtcTimPath` ("ETC\ETC.TIM") and `sDreamerTmdPath`
   ("ETC\DREAMER.TMD"), both `const char[]`.
 - Nine new function externs, several deliberately re-declared locally with
   a DIFFERENT (but ABI-compatible) type than an existing declaration
