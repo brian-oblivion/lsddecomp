@@ -208,7 +208,7 @@ void TextEntry__AttachTarget(TextEntry *self, void *inputSource, void *tickSourc
     self->methods->addChild(self, tickSource);
     self->target = target;
     self->closeState = 0;
-    self->altCommands = 0;
+    self->actOnHeld = 0;
 }
 
 void TextEntry__DetachTarget(TextEntry *self) {
@@ -253,7 +253,7 @@ void TextEntry__TickState(TextEntry *self) {
     }
 }
 
-/* With altCommands clear the arrows act on presses, with it set on held
+/* With actOnHeld clear the arrows act on presses, with it set on held
  * buttons. MATCHING: the arms are in retail's code order, default first,
  * and the down press jumps into the held down's call rather than making
  * its own. */
@@ -267,11 +267,11 @@ void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command) {
             } else {
                 strcpy(self->textBuf, self->editBuf);
             }
-            self->methods->notifyTarget(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
             self->methods->setState(self, TEXTENTRY_RESULT_ACCEPTED);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN:
-            self->methods->notifyTarget(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
             self->methods->setState(self, TEXTENTRY_RESULT_CANCELLED);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_L2:
@@ -281,51 +281,51 @@ void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command) {
             self->methods->resetChar(self);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_SELECT:
-            self->methods->toggleAltCommands(self);
+            self->methods->toggleActOnHeld(self);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_LRIGHT:
-            if (self->altCommands != 0) {
+            if (self->actOnHeld != 0) {
                 return;
             }
             self->methods->moveCursorRight(self);
             return;
         case PAD_EVENT_HELD + PAD_BUTTON_LRIGHT:
-            if (self->altCommands == 0) {
+            if (self->actOnHeld == 0) {
                 return;
             }
             self->methods->moveCursorRight(self);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_LLEFT:
-            if (self->altCommands != 0) {
+            if (self->actOnHeld != 0) {
                 return;
             }
             self->methods->moveCursorLeft(self);
             return;
         case PAD_EVENT_HELD + PAD_BUTTON_LLEFT:
-            if (self->altCommands == 0) {
+            if (self->actOnHeld == 0) {
                 return;
             }
             self->methods->moveCursorLeft(self);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_LUP:
-            if (self->altCommands != 0) {
+            if (self->actOnHeld != 0) {
                 return;
             }
             self->methods->nextChar(self);
             return;
         case PAD_EVENT_HELD + PAD_BUTTON_LUP:
-            if (self->altCommands == 0) {
+            if (self->actOnHeld == 0) {
                 return;
             }
             self->methods->nextChar(self);
             return;
         case PAD_EVENT_PRESSED + PAD_BUTTON_LDOWN:
-            if (self->altCommands == 0) {
+            if (self->actOnHeld == 0) {
                 goto callPrevChar;
             }
             return;
         case PAD_EVENT_HELD + PAD_BUTTON_LDOWN:
-            if (self->altCommands == 0) {
+            if (self->actOnHeld == 0) {
                 return;
             }
         callPrevChar:

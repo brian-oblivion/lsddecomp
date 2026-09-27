@@ -39,7 +39,7 @@ void TextEntry__PrevChar(TextEntry *self) {
 
 void TextEntry__ToggleAltCommands(TextEntry *self) {
     if (self->panelSprite) {
-        self->altCommands ^= 1;
+        self->actOnHeld ^= 1;
     }
 }
 
@@ -78,7 +78,7 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
         obj->methods->setPosition(obj, &local);
         self->cursorIndex = pos;
         if (notify) {
-            self->methods->notifyTarget(self, 0);
+            self->methods->playSound(self, 0);
         }
     }
 }
@@ -97,7 +97,7 @@ void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
         self->cursorIndex = pos;
         self->charIndex = charIndex;
         if (notify) {
-            self->methods->notifyTarget(self, 0);
+            self->methods->playSound(self, 0);
         }
     }
 }

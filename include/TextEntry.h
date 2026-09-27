@@ -73,15 +73,15 @@ struct TextEntryMethods {
     /* +0x058 */ void (*tickState)(TextEntry *self, void *sender,
                                    s32 event); /* TextEntry__TickState (reads only self; see the banner) */
     /* +0x05C */ void (*handleCommand)(TextEntry *self, void *sender, s32 command); /* TextEntry__HandleCommand */
-    /* +0x060 */ void (*notifyTarget)(TextEntry *self, s32 arg1); /* TextEntry__PlaySound */
-    /* +0x064 */ void *slot64[9];                                 /* NULL */
-    /* +0x088 */ void (*moveCursorRight)(TextEntry *self);        /* TextEntry__MoveCursorRight */
-    /* +0x08C */ void (*moveCursorLeft)(TextEntry *self);         /* TextEntry__MoveCursorLeft */
-    /* +0x090 */ void (*nextChar)(TextEntry *self);               /* TextEntry__NextChar */
-    /* +0x094 */ void (*prevChar)(TextEntry *self);               /* TextEntry__PrevChar */
-    /* +0x098 */ void (*toggleAltCommands)(TextEntry *self);      /* TextEntry__ToggleAltCommands */
-    /* +0x09C */ void (*resetChar)(TextEntry *self);              /* TextEntry__ResetChar */
-    /* +0x0A0 */ void (*resetAllChars)(TextEntry *self);          /* TextEntry__ResetAllChars */
+    /* +0x060 */ void (*playSound)(TextEntry *self, s32 tone); /* TextEntry__PlaySound */
+    /* +0x064 */ void *slot64[9];                              /* NULL */
+    /* +0x088 */ void (*moveCursorRight)(TextEntry *self);     /* TextEntry__MoveCursorRight */
+    /* +0x08C */ void (*moveCursorLeft)(TextEntry *self);      /* TextEntry__MoveCursorLeft */
+    /* +0x090 */ void (*nextChar)(TextEntry *self);            /* TextEntry__NextChar */
+    /* +0x094 */ void (*prevChar)(TextEntry *self);            /* TextEntry__PrevChar */
+    /* +0x098 */ void (*toggleActOnHeld)(TextEntry *self);     /* TextEntry__ToggleAltCommands */
+    /* +0x09C */ void (*resetChar)(TextEntry *self);           /* TextEntry__ResetChar */
+    /* +0x0A0 */ void (*resetAllChars)(TextEntry *self);       /* TextEntry__ResetAllChars */
     /* +0x0A4 */ void (*setCursorPos)(TextEntry *self, s32 pos, s32 notify); /* TextEntry__SetCursorPos */
     /* +0x0A8 */ void (*setCharAt)(TextEntry *self, s32 pos, s32 charIndex, s32 notify); /* TextEntry__SetCharAt */
 };
@@ -93,7 +93,7 @@ struct TextEntry {
     /* +0x014 */ s32 charCount; /* ctor: length of gNameCharTable; nextChar's bound, prevChar's wrap value */
     /* +0x018 */ s32 cursorIndex; /* setText zeroes; moveCursorRight/Left, setCursorPos, setCharAt */
     /* +0x01C */ s32 charIndex; /* setText zeroes; index into gNameCharTable: nextChar/prevChar/resetChar, setCharAt */
-    /* +0x020 */ s32 altCommands; /* toggleAltCommands flips it; handleCommand's arrow cases act on Pad presses when 0, on held buttons when set */
+    /* +0x020 */ s32 actOnHeld; /* toggleActOnHeld flips it; handleCommand's arrow cases act on Pad presses when 0, on held buttons when set */
     /* +0x024 */ char *textBuf; /* setText: the caller's buffer; a circle press (handleCommand) writes editBuf back into it */
     /* +0x028 */ char *editBuf; /* ctor allocates textLen + 4, finalize frees; setText copies into it, setCharAt writes it */
     /* +0x02C */ s32 closeState; /* setState: 2 or 3; setState(4) notifies parents with it */
@@ -130,7 +130,7 @@ void TextEntry__DetachTarget(TextEntry *self);
 void TextEntry__SetState(TextEntry *self, s32 state);
 void TextEntry__TickState(TextEntry *self);
 void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command);
-void TextEntry__PlaySound(TextEntry *self, s32 arg1);
+void TextEntry__PlaySound(TextEntry *self, s32 tone);
 void TextEntry__MoveCursorRight(TextEntry *self);
 void TextEntry__MoveCursorLeft(TextEntry *self);
 void TextEntry__NextChar(TextEntry *self);
