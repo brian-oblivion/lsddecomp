@@ -12,7 +12,7 @@
  * one of two 14-slot object-tracking families (SpawnDreamAuxTriggerEntity /
  * DespawnDreamAuxEntity, backed by gDreamAuxSlots / gDreamAuxSlots2) and can
  * gate the game's teleport flag (EnableTeleportsForKind, SetTeleportsEnabled
- * in DreamSys.c). InitDreamAux/ReleaseDreamAuxModels/TickDreamAuxSlots2 are the
+ * in DreamSys.c). InitDreamAux/ReleaseDreamAuxModels/ReleaseDreamAuxEntities are the
  * construct/tick/destruct hooks a caller in class_39e08.c and
  * class_3bb8c_l.c drives this subsystem through. `gDreamAuxStage`,
  * `gDreamAuxWorld` and three sibling globals SetDreamAuxWorld installs are

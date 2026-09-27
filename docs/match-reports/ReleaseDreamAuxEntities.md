@@ -1,4 +1,6 @@
-# TickDreamAuxSlots2 -- MATCHED
+# ReleaseDreamAuxEntities -- MATCHED
+
+> Renamed from `TickDreamAuxSlots2` on 2026-09-27 (tools/rename.py). Address 0x8005c76c.
 
 > Renamed from `func_8005C76C` on 2026-09-21 (tools/rename.py). Address 0x8005c76c.
 
@@ -8,7 +10,7 @@ instead of `gDreamAuxSlots` (see that report for the object/vtable/loop-shape
 derivation -- not repeated here).
 
 ```c
-void TickDreamAuxSlots2(void)
+void ReleaseDreamAuxEntities(void)
 {
     u32 done;
     DreamAuxSlot *slot;
@@ -88,7 +90,7 @@ this is the same class of residue before reshaping further:
 
 ## Naming
 
-**TickDreamAuxSlots2** — tier A. Identical mechanics to `ReleaseDreamAuxModels`,
+**ReleaseDreamAuxEntities** — tier A. Identical mechanics to `ReleaseDreamAuxModels`,
 over `gDreamAuxSlots2` instead of `gDreamAuxSlots` (see that report/entry for
 the shared derivation). Tier A for the same reason: the tick pass over the
 slot family IS the function's purpose. Called from `ObjM__TeardownStyle`

@@ -255,7 +255,7 @@ runs `ApplyStyleDecorationIfSet`/`StyleBuildDecorSet`/`StyleBuildEffectSlots`
 flush-or-start steps. Called from `src/class_3bb8c_l.c`'s `ObjM__TickStyle`
 (the call this unit had already forward-declared as its own entry point),
 which is a genuine per-tick call site -- the evidence for "Tick" over a
-generic "Update", matching this codebase's existing `TickDreamAuxSlots2`
+generic "Update", matching this codebase's existing `ReleaseDreamAuxEntities`
 convention. MATCHED, 77/77 (round 47, permuter-closed register-colour
 swap).
 

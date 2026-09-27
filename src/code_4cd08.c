@@ -100,7 +100,7 @@ call:
     SetInstantTeleportersEnabled(1);
 }
 
-void TickDreamAuxSlots2(void) {
+void ReleaseDreamAuxEntities(void) {
     u32 done;
     DreamAuxSlot *slot;
 

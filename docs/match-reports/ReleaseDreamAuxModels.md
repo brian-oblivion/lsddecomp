@@ -47,7 +47,7 @@ no leading guard before `.L8005C604`, and `beqz $s1, .L8005C604` as the
 back-edge test. Do not "clean this up" to a plain `if` -- the loop shape
 *is* what produces the byte-exact instruction sequence.
 
-Same shape recurs at `TickDreamAuxSlots2` (below, over `gDreamAuxSlots2`) and, per
+Same shape recurs at `ReleaseDreamAuxEntities` (below, over `gDreamAuxSlots2`) and, per
 splat's asm, in `SetDreamAuxWorld` and `InitDreamAux`'s second loop (both
 off-limits/gp-relative or already stalled elsewhere in this unit) -- this
 looks like a recurring internal idiom for "process slot 0 of a small
@@ -92,7 +92,7 @@ this function alone), so the type is deliberately generic
   GCC 2.6.3 -O2 compiles it to a `do`-style loop with a `beqz $reg` back-edge
   test (no leading guard, no `slti`), and removing the "loop" in favor of a
   plain `if` changes the instruction count. Confirmed independently on two
-  functions in `code_4cd08` (`ReleaseDreamAuxModels`, `TickDreamAuxSlots2`); the same
+  functions in `code_4cd08` (`ReleaseDreamAuxModels`, `ReleaseDreamAuxEntities`); the same
   shape also appears in `SetDreamAuxWorld` and `InitDreamAux`'s tail (both
   otherwise blocked/stalled). Likely a shared "process the first slot of an
   N-slot table" macro/pattern in the original source where N happened to be
