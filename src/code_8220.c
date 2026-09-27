@@ -47,7 +47,7 @@ void *BMemPMgrInit(s32 poolSize) {
     }
     pool = malloc(poolSize + 0x20);
     if (pool != NULL) {
-        pool->freeListHead = (u8 *)pool + 0x1C;
+        pool->firstBlock = (u8 *)pool + 0x1C;
         pool->poolSize = poolSize;
         SetupBMemPMgrFreeList(pool);
     } else {
@@ -73,13 +73,13 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool) {
     if (mgr == NULL) {
         mgr = pool;
     }
-    mgr->unk10 = 1;
-    header = mgr->freeListHead;
-    mgr->freeListStart = header;
-    mgr->freeListEnd = header;
+    mgr->initialized = 1;
+    header = mgr->firstBlock;
+    mgr->freeListTail = header;
+    mgr->freeListHead = header;
     header->sizeAndFlags = mgr->poolSize | 0x40000000;
-    mgr->freeListStart->prev = NULL;
-    mgr->freeListEnd->next = NULL;
+    mgr->freeListTail->prev = NULL;
+    mgr->freeListHead->next = NULL;
     end = (u8 *)header + (header->sizeAndFlags & 0xFFFFFFF);
     *(BMemBlockHdr **)(end - 4) = header;
     *(u32 *)end = 0x80000000;
@@ -113,7 +113,7 @@ void *BMemPMgrAlloc(size, pool)
         if ((u32)size < 0xC) {
             size = 0xC;
         }
-        cursor = mgr->freeListStart;
+        cursor = mgr->freeListTail;
         size += 4;
         while (cursor != NULL) {
             blockSize = cursor->sizeAndFlags & 0xFFFFFFF;
@@ -130,7 +130,7 @@ void *BMemPMgrAlloc(size, pool)
                         if (p != NULL) {
                             p->next = n;
                         } else {
-                            mgr->freeListEnd = n;
+                            mgr->freeListHead = n;
                         }
                     }
                     {
@@ -141,7 +141,7 @@ void *BMemPMgrAlloc(size, pool)
                         if (n != NULL) {
                             n->prev = p;
                         } else {
-                            mgr->freeListStart = p;
+                            mgr->freeListTail = p;
                         }
                     }
                 } else {
@@ -156,7 +156,7 @@ void *BMemPMgrAlloc(size, pool)
                         if (p != NULL) {
                             p->next = remainder;
                         } else {
-                            mgr->freeListEnd = remainder;
+                            mgr->freeListHead = remainder;
                         }
                     }
                     {
@@ -165,7 +165,7 @@ void *BMemPMgrAlloc(size, pool)
                         if (n != NULL) {
                             n->prev = remainder;
                         } else {
-                            mgr->freeListStart = remainder;
+                            mgr->freeListTail = remainder;
                         }
                     }
                     *(BMemBlockHdr **)((u8 *)remainder + (remainder->sizeAndFlags & 0xFFFFFFF) - 4) =
@@ -213,7 +213,7 @@ void *BMemPMgrFree(ptr, pool)
                 if (p != NULL) {
                     p->next = n;
                 } else {
-                    mgr->freeListEnd = n;
+                    mgr->freeListHead = n;
                 }
             }
             {
@@ -223,7 +223,7 @@ void *BMemPMgrFree(ptr, pool)
                 if (n != NULL) {
                     n->prev = p;
                 } else {
-                    mgr->freeListStart = p;
+                    mgr->freeListTail = p;
                 }
             }
         }
@@ -239,7 +239,7 @@ void *BMemPMgrFree(ptr, pool)
                 if (p != NULL) {
                     p->next = n;
                 } else {
-                    mgr->freeListEnd = n;
+                    mgr->freeListHead = n;
                 }
             }
             {
@@ -255,18 +255,18 @@ void *BMemPMgrFree(ptr, pool)
                 if (nextSize) {
                     n->prev = p;
                 } else {
-                    mgr->freeListStart = p;
+                    mgr->freeListTail = p;
                 }
             }
             next = (BMemBlockHdr *)((u8 *)header + (header->sizeAndFlags & 0xFFFFFFF));
         }
-        header->prev = mgr->freeListStart;
-        mgr->freeListStart = header;
+        header->prev = mgr->freeListTail;
+        mgr->freeListTail = header;
         header->next = NULL;
         if (header->prev != NULL) {
             header->prev->next = header;
         } else {
-            mgr->freeListEnd = header;
+            mgr->freeListHead = header;
         }
         *(BMemBlockHdr **)((u8 *)next - 4) = header;
         header->sizeAndFlags |= 0x40000000;

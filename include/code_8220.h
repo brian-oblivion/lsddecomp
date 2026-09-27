@@ -10,12 +10,12 @@
 #include "BasicClass.h"
 
 /*
- * BMemBlockHdr -- a single free-list node inside a BMemPMgr's pool area.
- * `sizeAndFlags` packs the block's byte size into the low 28 bits and
- * flag bits into the high 4 (0x40000000 = free); `prev`/`next` link the
- * pool's doubly-linked free list. Derived from SetupBMemPMgrFreeList (round 45)
- * and reused by BMemPMgrAlloc/BMemPMgrFree's still-undecoded bodies,
- * which walk this same list via BMemPMgr's freeListStart/freeListEnd.
+ * BMemBlockHdr -- the header word of one block in a BMemPMgr pool, and, while
+ * the block is free, the two free-list links that follow it. `sizeAndFlags`
+ * packs the block's byte size (header word included) into the low 28 bits
+ * and flag bits into the high 4. `prev`/`next` link the pool's
+ * doubly-linked free list, `prev` toward `freeListHead` and `next` toward
+ * `freeListTail`. An allocated block's links are its caller's payload.
  */
 typedef struct BMemBlockHdr BMemBlockHdr;
 
@@ -26,21 +26,20 @@ struct BMemBlockHdr {
 };
 
 /*
- * bMemPMgr -- BMemPMgrInit's own pool-header object. `freeListHead`/
- * `poolSize` are the two fields BMemPMgrInit itself writes; the three
- * below them (round 45, SetupBMemPMgrFreeList) round out the pool's free-list
- * bookkeeping. What remains opaque is the pool AREA itself (poolSize +
- * 0x20 bytes total, starting at `freeListHead`), walked as a chain of
- * BMemBlockHdr nodes rather than through any field of this struct.
+ * BMemPMgr -- a pool's header, at the start of the one malloc'd area that
+ * also holds its blocks. The blocks begin at `firstBlock` and are walked by
+ * size, not through this struct; the free ones are also linked from
+ * `freeListHead` to `freeListTail`. BMemPMgrFree appends a freed block at
+ * the tail and BMemPMgrAlloc searches from the tail backward.
  */
 typedef struct BMemPMgr BMemPMgr;
 
 struct BMemPMgr {
-    /* +0x000 */ void *freeListHead; /* set to `self + 0x1C` by BMemPMgrInit; the pool's first free-list node */
-    /* +0x004 */ s32 poolSize;
-    /* +0x008 */ BMemBlockHdr *freeListStart; /* free list head, SetupBMemPMgrFreeList/B34/CFC */
-    /* +0x00C */ BMemBlockHdr *freeListEnd;   /* free list tail, same trio */
-    /* +0x010 */ s32 unk10; /* set to 1 by SetupBMemPMgrFreeList; not yet read by any decoded function */
+    /* +0x000 */ void *firstBlock; /* the first block, just past this header */
+    /* +0x004 */ s32 poolSize;     /* bytes of blocks, from firstBlock */
+    /* +0x008 */ BMemBlockHdr *freeListTail;
+    /* +0x00C */ BMemBlockHdr *freeListHead;
+    /* +0x010 */ s32 initialized; /* set to 1 by SetupBMemPMgrFreeList; no reader */
 };
 
 /* The generic pool allocator/free pair, established already by
