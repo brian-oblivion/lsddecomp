@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
+Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `UnprototypedCtorTable` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
 
 Table slot (`tools/classtable.py`): none (allocator for gTodMethods, object size 0x2C).
 
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTodMethods, object size
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Allocate and construct a gTodMethods object. */
@@ -25,7 +25,7 @@ void *New_Tod(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x2C);
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetTodMethods())->ctor(obj, arg0);
+        ((UnprototypedCtorTable *)GetTodMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;
@@ -46,7 +46,7 @@ void *New_Tod(s32 arg0) {
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-Now `Tod *New_Tod(Src6F240 *src)` (include/Tod.h): its one caller, TodSet__BuildTods, passes the address of a descriptor whose first word is the buffer Tod__Tod adopts, and stores the result as an object; the caller casts both (`(Src6F240 *)&req`, `(DataSrc33808 *)`), no code. Bytes unchanged.
+Now `Tod *New_Tod(ResourceSource *src)` (include/Tod.h): its one caller, TodSet__BuildTods, passes the address of a descriptor whose first word is the buffer Tod__Tod adopts, and stores the result as an object; the caller casts both (`(ResourceSource *)&req`, `(DataSrc33808 *)`), no code. Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 

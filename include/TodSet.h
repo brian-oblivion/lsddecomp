@@ -32,18 +32,18 @@
  *
  * The ctor returns self or NULL (New_TodSet tests it), but TOD_SLOTS
  * declares +0x008 returning void, as Tod's own ctor does; the allocator
- * reaches it through code_33808.c's unprototyped Ctor33808 view, as every
- * allocator in that unit does. The descriptor is code_33808.c's Src6F240;
+ * reaches it through code_33808.c's unprototyped UnprototypedCtorTable view, as every
+ * allocator in that unit does. The descriptor is code_33808.c's ResourceSource;
  * only the tag is declared here, as include/Tod.h does.
  */
 
-struct Src6F240;
+struct ResourceSource;
 
 typedef struct TodSet TodSet;
 typedef struct TodSetMethods TodSetMethods;
 
 struct TodSetMethods {
-    TOD_SLOTS(TodSet, (TodSet * self, struct Src6F240 *src));
+    TOD_SLOTS(TodSet, (TodSet * self, struct ResourceSource *src));
 };
 
 struct TodSet {
@@ -53,8 +53,8 @@ struct TodSet {
 extern TodSetMethods gTodSetMethods;
 extern TodSetMethods *GetTodSetMethods(void);
 
-TodSet *New_TodSet(struct Src6F240 *src);
-void *TodSet__TodSet(TodSet *self, struct Src6F240 *src);
+TodSet *New_TodSet(struct ResourceSource *src);
+void *TodSet__TodSet(TodSet *self, struct ResourceSource *src);
 void TodSet__Finalize(TodSet *self);
 s32 TodSet__BuildTods(TodSet *self);
 u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel);

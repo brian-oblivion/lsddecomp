@@ -17,19 +17,19 @@ Table slot (`tools/classtable.py`): gLinkResourceMethods +0x008.
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
+fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
 `src/code_33808.c`.
 
 ```c
-typedef struct Src6F240 {
+typedef struct ResourceSource {
     /* +0x00 */ void *buffer;
     /* +0x04 */ char *name;
-} Src6F240;
+} ResourceSource;
 
 /* gLinkResourceMethods +0x008: constructor -- the active driver's, then this table;
  * with a descriptor, adopt its buffer (size 0) and run its own +0x064, whose
  * nonzero result fails the construction (NULL), or else request its file. */
-void *LinkResource__LinkResource(DataSrc33808 *self, Src6F240 *src) {
+void *LinkResource__LinkResource(DataSrc33808 *self, ResourceSource *src) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetLinkResourceMethods();
     if (src != NULL) {
@@ -62,12 +62,13 @@ Matched on build 7. **Lever: a `goto fail` to a `return NULL` placed AFTER the f
 | `return r ? NULL : self;` | 38/41: branchless |
 | `if (r) goto fail;` ... `return self; fail: return NULL;` | **41/41** |
 
-Src6F240 moved up the file to precede this function (no layout change); Tod__Tod uses it unchanged.
+ResourceSource moved up the file to precede this function (no layout change); Tod__Tod uses it unchanged.
 
 ## Naming
 
 - **LinkResource__LinkResource**, tier B (head review, round 83: was A). Constructor of the class external code already names LinkResource.
   Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (class_3bb8c.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
+- **ResourceSource** (type, was `Src6F240`), tier A (round 95, bravo, track 6). This ctor, and Tod's, TodSet's, ModelData's and TriggerWorld's, read `src->buffer` and adopt it when non-NULL, else call `requestLoadFile(self, src->name)`: a buffer to adopt, or a file to request. Named for that mechanism, not for any one class, since five ctors share it. Callers in class_39e08.c, code_1677c.c, class_3bb8c.c, code_4cd08.c and code_55dd4.c pass larger locals of their own cast to it (their stack sizes matter), so it stays defined in src/code_33808.c; the five class headers forward-declare it.
 
 ## Track 4
 
@@ -77,5 +78,5 @@ unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 `Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
 `self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
 read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
-`Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
+`ResourceSource *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.

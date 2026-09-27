@@ -33,13 +33,13 @@
  * array); ModelData__ForwardScanPackets casts it (an inherited slot keeps
  * the parent's name).
  *
- * The ctor's descriptor is code_33808.c's Src6F240 ({buffer to adopt, file
+ * The ctor's descriptor is code_33808.c's ResourceSource ({buffer to adopt, file
  * name to request}); only the tag is declared here, as include/ModelData.h
  * does. The allocators reach the ctor through code_33808.c's unprototyped
- * Ctor33808 view.
+ * UnprototypedCtorTable view.
  */
 
-struct Src6F240;
+struct ResourceSource;
 
 /* A TOD packet's header word, as DecodeTodPacketWord splits it (Sony's TOD
  * format): object id in bits 0..15 (the low byte is kept), packet type in
@@ -74,7 +74,7 @@ typedef struct TodMethods TodMethods;
 /* clang-format on */
 
 struct TodMethods {
-    TOD_SLOTS(Tod, (Tod * self, struct Src6F240 *src));
+    TOD_SLOTS(Tod, (Tod * self, struct ResourceSource *src));
 };
 
 struct Tod {
@@ -84,8 +84,8 @@ struct Tod {
 extern TodMethods gTodMethods;
 extern TodMethods *GetTodMethods(void);
 
-Tod *New_Tod(struct Src6F240 *src);
-void Tod__Tod(Tod *self, struct Src6F240 *src);
+Tod *New_Tod(struct ResourceSource *src);
+void Tod__Tod(Tod *self, struct ResourceSource *src);
 void Tod__Finalize(Tod *self);
 u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel);
 u8 ScanTodPackets(Tod *self, u8 *out, u32 *sel, u32 *data);

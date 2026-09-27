@@ -371,11 +371,11 @@ void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 command) {
     }
 }
 
-/* New_LinkResource's descriptor (code_33808.c's Src6F240) as
+/* New_LinkResource's descriptor (code_33808.c's ResourceSource) as
  * PopulateSlotCells builds it: only the buffer is set. */
 
 typedef struct BE54LoadReq {
-    void *buffer; /* +0x000, New_LinkResource's descriptor's buffer (code_33808.c's Src6F240) */
+    void *buffer; /* +0x000, New_LinkResource's descriptor's buffer (code_33808.c's ResourceSource) */
     u8 pad4[0x10 - 0x4];
 } BE54LoadReq;
 
@@ -423,7 +423,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     }
     header2 = loader->buffer;
     src.buffer = (u8 *)header2 + header2->placementsOffset + header2->placementsSize;
-    grid->linkResource = New_LinkResource((struct Src6F240 *)&src);
+    grid->linkResource = New_LinkResource((struct ResourceSource *)&src);
     rec.next = 0;
 
     i = 0;

@@ -135,7 +135,7 @@ established from this unit alone, hence B.
 `world` is now the unified `TriggerWorld *` (include/TriggerWorld.h, class
 gTriggerWorldMethods), which code_4cd08.c includes; the unit's local
 `extern TriggerWorld *New_TriggerWorld(s32 *ctx)` is gone. New_TriggerWorld
-takes the ctor's descriptor (`struct Src6F240 *`: {buffer, name}), so the
+takes the ctor's descriptor (`struct ResourceSource *`: {buffer, name}), so the
 call casts the stack array whose first word is the buffer:
-`New_TriggerWorld((struct Src6F240 *)ctxArg)`. A pointer cast, no code; bytes
+`New_TriggerWorld((struct ResourceSource *)ctxArg)`. A pointer cast, no code; bytes
 unchanged.

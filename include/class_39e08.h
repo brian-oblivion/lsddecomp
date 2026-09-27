@@ -66,7 +66,7 @@ extern const char D_800113F8[];
  * `GameApplication__GameApplication`'s call site (`LoadModelRequest`, learned there to be
  * 0x10 bytes even though only the first two fields are ever written --
  * "local struct SIZE matters, not shape"). New_LinkResource
- * (include/LinkResource.h) takes it cast to its descriptor, struct Src6F240. */
+ * (include/LinkResource.h) takes it cast to its descriptor, struct ResourceSource. */
 typedef struct LoadRequest {
     s32 type;
     const char *path;

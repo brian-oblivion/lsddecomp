@@ -17,28 +17,28 @@ Table slot (`tools/classtable.py`): gModelDataMethods +0x078 (called by ModelDat
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
+fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
 `src/code_33808.c`.
 
 ```c
 #include "ModelData.h"
 
-typedef struct Req44858 {
+typedef struct ResourceSourceArgs {
     /* +0x00 */ void *buffer;
     /* +0x04 */ s32 unk4;
     /* +0x08 */ s32 unk8;
-} Req44858;
+} ResourceSourceArgs;
 
-typedef struct Buf44858 {
+typedef struct ModelDataHeader {
     /* +0x00 */ u8 pad0[8];
     /* +0x08 */ s32 offset;
-} Buf44858;
+} ModelDataHeader;
 
 s32 ModelData__BuildResources(ModelData *self) {
-    Req44858 req;
+    ResourceSourceArgs req;
 
     if (self->ownsResources != 0) {
-        SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->offset, 0, 1);
+        SetVec3(&req, (u8 *)self->buffer + ((ModelDataHeader *)self->buffer)->offset, 0, 1);
         self->linkResource = New_LinkResource((s32)&req);
         if (self->linkResource != NULL) {
             req.buffer = (u8 *)self->buffer + 0xC;
@@ -62,6 +62,8 @@ First build. The redundant `sw zero, 0x30` on the second failure is an explicit 
 ## Naming
 
 - **ModelData__BuildResources**, tier A. Slot +0x078: builds the LinkResource (tmd) and TodSet (tods) sub-objects over the buffer's two sub-blocks.
+- **ResourceSourceArgs** (type, was `Req44858`), tier B (round 95, bravo, track 6). The 12-byte local SetVec3 fills with (buffer, name, mode) and that is passed cast to `ResourceSource *` to New_LinkResource, New_TodSet (here), New_ModelData (TriggerWorld__BuildResources) and New_Tod (TodSet__BuildTods). Only `buffer` is written directly; the name and mode words are written only by SetVec3 and never read by a ctor, so they stay padding. include/code_4cd08.h's `DreamAuxLoadReq` is the same three words in the same role (InitDreamAux: SetVec3 then New_ModelData) but names word 0 `flag`; unifying the two is proposed, not applied (another unit's header).
+- **ModelDataHeader** (type, was `Buf44858`), tier A (round 95, bravo, track 6). ModelData's buffer as this body reads it: the word at +0x08 is the offset of the TMD New_LinkResource is built over, and +0x0C is where New_TodSet's data starts. Words +0x00 and +0x04 are read by no code (padding). The buffer is a .MOM file by the one file-name caller (InitDreamAux: `ETC\SYMSPY.MOM`), but the name is the class's so it claims no more than the code.
 
 ## Track 4
 
@@ -69,7 +71,7 @@ First build. The redundant `sw zero, 0x30` on the second failure is an explicit 
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct Src6F240 *)`, so the call reads `self->todSet = (FileResource *)New_TodSet((Src6F240 *)&req)`; the forward declaration that stood before this function is gone. Bytes unchanged.
+New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct ResourceSource *)`, so the call reads `self->todSet = (FileResource *)New_TodSet((ResourceSource *)&req)`; the forward declaration that stood before this function is gone. Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 
@@ -77,6 +79,6 @@ New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct S
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `Buf44858.offset` | `tmdOffset` | A | the sub-block New_LinkResource is built over, which LinkResource__BuildModels reads as a TmdFile |
-| `(u8 *)buffer + 0xC` | `Buf44858.tods` | A | New_TodSet's buffer |
-| `Req44858.unk4`, `unk8` | `pad4[8]` | A | no code here reads them; SetVec3 writes the name (NULL) and a 1 there. Its prototype's parameters are now `(buffer, name, mode)`, as include/code_4cd08.h reads the same call |
+| `ModelDataHeader.offset` | `tmdOffset` | A | the sub-block New_LinkResource is built over, which LinkResource__BuildModels reads as a TmdFile |
+| `(u8 *)buffer + 0xC` | `ModelDataHeader.tods` | A | New_TodSet's buffer |
+| `ResourceSourceArgs.unk4`, `unk8` | `pad4[8]` | A | no code here reads them; SetVec3 writes the name (NULL) and a 1 there. Its prototype's parameters are now `(buffer, name, mode)`, as include/code_4cd08.h reads the same call |

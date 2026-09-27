@@ -19,7 +19,7 @@ Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x078.
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
+fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
@@ -28,8 +28,8 @@ top of / earlier in `src/code_33808.c`.
  * words, counting them at +0x38; 0 when all exist, otherwise slot +0x07C
  * (release) and 1. */
 s32 TriggerWorld__BuildResources(DataSrc33808 *self) {
-    Req44858 req;
-    CountedBuf33808 *buf;
+    ResourceSourceArgs req;
+    SubBlockTable *buf;
     s32 *p;
     s32 i;
     s32 n;
@@ -41,8 +41,8 @@ s32 TriggerWorld__BuildResources(DataSrc33808 *self) {
     p = buf->entries;
     self->unk38 = 0;
     for (; i < n; i++) {
-        req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = (s32)New_ModelData((Src6F240 *)&req);
+        req.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
+        *p = (s32)New_ModelData((ResourceSource *)&req);
         if (*p == 0) {
             goto fail;
         }
@@ -63,10 +63,11 @@ First build. The loop pointer walks `buf->entries` while the offset is re-read t
 ## Naming
 
 - **TriggerWorld__BuildResources**, tier A. Slot +0x078: builds a ModelData (not owning) over each sub-block of the buffer's counted offset table, counting them at +0x38.
+- **SubBlockTable** (type, was `CountedBuf33808`), tier B (round 95, bravo, track 6). TriggerWorld's and TodSet's buffer as their bodies read it: `count` at +0x04, then `entries[count]`, each an offset from the buffer's start to a sub-block, which this body (ModelData) and TodSet__BuildTods (Tod) overwrite in place with the object built over it; Finalize/ReleaseResources release them from the same array, GetModelData indexes it, and TodSet__ScanPackets reads the TOD that follows it. The word at +0x00 is read by no code (padding). Tier B: what the game keeps in these containers is not established here.
 
 ## Track 4
 
-2026-09-25, round 84 (delta): Its parent ModelData (gModelDataMethods) is unified in `include/ModelData.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((Src6F240 *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
+2026-09-25, round 84 (delta): Its parent ModelData (gModelDataMethods) is unified in `include/ModelData.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((ResourceSource *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

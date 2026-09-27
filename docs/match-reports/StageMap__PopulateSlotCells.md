@@ -887,7 +887,7 @@ non-0/non-(-1) return value (what LinkResource__GetModel returns): a TmdModel
 (include/TmdModel.h), read only for its +0x010, TmdModel's `object`. A view of
 TmdModel, left for that class (round 89, LinkResource's unification did not
 retype it)."* `BE54LoadReq.field0` is `buffer` (tier A: it is the first word of
-New_LinkResource's descriptor, code_33808.c's `Src6F240 { void *buffer; char
+New_LinkResource's descriptor, code_33808.c's `ResourceSource { void *buffer; char
 *name; }`, and holds the address of the chunk header's model block). The type
 keeps its placeholder name (track 6); its 0x10 size is kept, not measured as
 load-bearing. Byte-identical.

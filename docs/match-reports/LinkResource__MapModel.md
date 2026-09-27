@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gLinkResourceMethods +0x078.
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
@@ -49,7 +49,7 @@ unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 `Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
 `self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
 read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
-`Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
+`ResourceSource *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.
 
 ## Round 93 polish (charlie, track 7)

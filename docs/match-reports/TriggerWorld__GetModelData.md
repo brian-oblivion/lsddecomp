@@ -19,14 +19,14 @@ Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x088.
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
 /* gTriggerWorldMethods +0x088: entry `index` of the buffer's counted word array, 0 when
  * out of range. */
 s32 TriggerWorld__GetModelData(DataSrc33808 *self, u32 index) {
-    CountedBuf33808 *buf = self->buffer;
+    SubBlockTable *buf = self->buffer;
 
     if (index < buf->count) {
         return buf->entries[index];

@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (not in any table).
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Unless +0x0C is set, free the four allocations at +0x14, +0x18, +0x10,

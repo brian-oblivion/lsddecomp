@@ -26,6 +26,12 @@
  *  - MoviePlayer, CD-streamed and MDEC-decoded FMV (CdStream frames,
  *    DecDCTvlc, then DecDCTin/DecDCTout in 16-pixel strips uploaded as they
  *    finish), one movie at a time (gActiveMoviePlayer).
+ * The unit's own types: ResourceSource, the {buffer, file name} descriptor
+ * those ctors take (ResourceSourceArgs, the three-word local SetVec3 fills
+ * for it); UnprototypedCtorTable, the view the allocators call a ctor slot
+ * through when they test its result; TimBlockHeader (and its byte copy,
+ * TimBlockHeaderBytes), ModelDataHeader and SubBlockTable, the layouts of
+ * TimBlockSrc's, ModelData's and TodSet's / TriggerWorld's buffers.
  */
 #include "common.h"
 #include <libgte.h>
@@ -101,11 +107,11 @@
 /* A TodSet's or TriggerWorld's buffer: a word, a count, then that many
  * offsets from the buffer's start, which BuildTods / BuildResources
  * overwrite with the objects built over them. */
-typedef struct CountedBuf33808 {
+typedef struct SubBlockTable {
     /* +0x00 */ u8 pad0[4];
     /* +0x04 */ u32 count;
     /* +0x08 */ s32 entries[1];
-} CountedBuf33808;
+} SubBlockTable;
 
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
@@ -114,10 +120,10 @@ extern void *BMemPMgrAlloc(s32 size);
 
 /* A method table's ctor slot, unprototyped: the allocators that check the
  * ctor's result call it through this. */
-typedef struct Ctor33808 {
+typedef struct UnprototypedCtorTable {
     /* +0x000 */ u8 pad0[8];
     /* +0x008 */ s32 (*ctor)();
-} Ctor33808;
+} UnprototypedCtorTable;
 
 /* Allocate a TimBlockSrc and construct it over the file `name`. */
 void *New_TimBlockSrc(s32 name) {
@@ -131,17 +137,17 @@ void *New_TimBlockSrc(s32 name) {
 }
 
 /* A TIM-block file's header, as copied. */
-typedef struct Hdr43200 {
+typedef struct TimBlockHeaderBytes {
     u8 bytes[36];
-} Hdr43200;
+} TimBlockHeaderBytes;
 
 /* The same header, read: a block count, then the blocks' file offsets and
  * their sizes. */
-typedef struct Buf434DC {
+typedef struct TimBlockHeader {
     /* +0x00 */ u32 count;
     /* +0x04 */ u32 offsets[4];
     /* +0x14 */ u32 sizes[4];
-} Buf434DC;
+} TimBlockHeader;
 
 extern s16 gTimBlockClutShift;
 
@@ -176,11 +182,11 @@ void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
         e->clutW = CLUT_COLORS;
         e->clutH = 1;
     }
-    hdr = BMemPMgrAlloc(sizeof(Hdr43200));
+    hdr = BMemPMgrAlloc(sizeof(TimBlockHeaderBytes));
     if (hdr != NULL) {
         self->sector = BMemPMgrAlloc(CD_SECTOR_SIZE);
         if (self->sector != NULL) {
-            self->bufferSize = sizeof(Hdr43200);
+            self->bufferSize = sizeof(TimBlockHeaderBytes);
             self->buffer = hdr;
             self->loadState = TIMBLOCK_LOAD_HEADER;
             self->failed = 0;
@@ -216,10 +222,11 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
         case TIMBLOCK_LOAD_HEADER:
             if (self->flags & CD_FLAG_READ_DONE) {
                 /* MATCHING: a byte-aligned struct copy; a word-aligned one loses retail's runtime alignment test */
-                *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
+                *(TimBlockHeaderBytes *)self->buffer = *(TimBlockHeaderBytes *)self->sector;
                 BMemPMgrFree(self->sector);
                 max = FindMaxTimBlockSize((FileResource *)self);
-                self->blocks = BMemPMgrAlloc(((Buf434DC *)self->buffer)->count * sizeof(*self->blocks));
+                self->blocks =
+                    BMemPMgrAlloc(((TimBlockHeader *)self->buffer)->count * sizeof(*self->blocks));
                 if (self->blocks == NULL) {
                     goto fail;
                 }
@@ -228,7 +235,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                     goto fail;
                 }
                 self->sectorSize = max;
-                self->methods->seek(self, ((Buf434DC *)self->buffer)->offsets[0], 0);
+                self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[0], 0);
                 self->methods->read(self, self->sector, max);
                 self->loadState = TIMBLOCK_LOAD_BLOCK;
             }
@@ -245,8 +252,8 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 (*p)->methods->setFlag(*p);
                 ((TimArraySrcUploadFn)(*p)->methods->processBuffer)(*p);
                 self->blockCount = n;
-                if (n < ((Buf434DC *)self->buffer)->count) {
-                    self->methods->seek(self, ((Buf434DC *)self->buffer)->offsets[n], 0);
+                if (n < ((TimBlockHeader *)self->buffer)->count) {
+                    self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[n], 0);
                     self->methods->read(self, self->sector, self->sectorSize);
                     self->loadState = TIMBLOCK_LOAD_BLOCK;
                 } else {
@@ -268,7 +275,7 @@ out:
 }
 
 u32 FindMaxTimBlockSize(FileResource *self) {
-    Buf434DC *buf = self->buffer;
+    TimBlockHeader *buf = self->buffer;
     u32 i;
     u32 max = 0;
 
@@ -379,20 +386,22 @@ TimBlockSrcMethods *GetTimBlockSrcMethods(void) {
     return &gTimBlockSrcMethods;
 }
 
-/* A data source's construction descriptor: a buffer to adopt, or else a
- * file name to request. */
-typedef struct Src6F240 {
+/* The descriptor the LinkResource, Tod, TodSet, ModelData and TriggerWorld
+ * ctors take: a buffer to adopt, or else (buffer NULL) a file name to
+ * request. Callers in other units build their own larger locals and pass
+ * them cast to this. */
+typedef struct ResourceSource {
     /* +0x00 */ void *buffer;
     /* +0x04 */ char *name;
-} Src6F240;
+} ResourceSource;
 
 /* Allocate and construct a LinkResource; NULL, the object freed, when the
  * ctor fails. */
-LinkResource *New_LinkResource(Src6F240 *src) {
+LinkResource *New_LinkResource(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(LinkResource));
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetLinkResourceMethods())->ctor(obj, src)) {
+        if (((UnprototypedCtorTable *)GetLinkResourceMethods())->ctor(obj, src)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -402,7 +411,7 @@ LinkResource *New_LinkResource(Src6F240 *src) {
 
 /* ctor (+0x008): adopt the descriptor's buffer and build the models (NULL
  * when that fails), or request its file. */
-void *LinkResource__LinkResource(LinkResource *self, Src6F240 *src) {
+void *LinkResource__LinkResource(LinkResource *self, ResourceSource *src) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetLinkResourceMethods();
     if (src != NULL) {
@@ -574,18 +583,18 @@ TimArraySrcMethods *GetTimArraySrcMethods(void) {
 }
 
 /* Allocate and construct a Tod. */
-Tod *New_Tod(Src6F240 *src) {
+Tod *New_Tod(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(Tod));
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetTodMethods())->ctor(obj, src);
+        ((UnprototypedCtorTable *)GetTodMethods())->ctor(obj, src);
         return obj;
     }
     return NULL;
 }
 
 /* ctor (+0x008): adopt the descriptor's buffer, or request its file. */
-void Tod__Tod(Tod *self, Src6F240 *src) {
+void Tod__Tod(Tod *self, ResourceSource *src) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTodMethods();
     if (src->buffer != NULL) {
@@ -838,11 +847,11 @@ BgLayerMethods *GetBgLayerMethods(void) {
 
 /* Allocate and construct a ModelData that owns its LinkResource and TodSet;
  * NULL, the object freed, when the ctor fails. */
-ModelData *New_ModelData(Src6F240 *src) {
+ModelData *New_ModelData(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(ModelData));
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetModelDataMethods())->ctor(obj, src, 1)) {
+        if (((UnprototypedCtorTable *)GetModelDataMethods())->ctor(obj, src, 1)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -852,7 +861,7 @@ ModelData *New_ModelData(Src6F240 *src) {
 
 /* ctor (+0x008): adopt the descriptor's buffer and load it (NULL when that
  * fails), or request its file. */
-void *ModelData__ModelData(ModelData *self, Src6F240 *src, s32 owns) {
+void *ModelData__ModelData(ModelData *self, ResourceSource *src, s32 owns) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetModelDataMethods();
     self->ownsResources = owns;
@@ -882,35 +891,37 @@ void ModelData__Load(ModelData *self) {
     ((s32 (*)())self->methods->processBuffer)(self);
 }
 
-/* A Src6F240 with a third word: SetVec3 also stores the name (NULL here)
- * and a 1 that no constructor here reads. */
-typedef struct Req44858 {
+/* The three words SetVec3 stores (buffer, name, mode), passed on as a
+ * ResourceSource: the name is NULL here, and no constructor reads the mode
+ * (1). */
+typedef struct ResourceSourceArgs {
     /* +0x00 */ void *buffer;
     /* +0x04 */ u8 pad4[8];
-} Req44858;
+} ResourceSourceArgs;
 
-/* A ModelData's buffer: the LinkResource's TMD at `tmdOffset`, the TodSet's
- * data from +0x0C. */
-typedef struct Buf44858 {
+/* A ModelData's buffer (a .MOM file: InitDreamAux requests ETC\\SYMSPY.MOM
+ * through New_ModelData): the LinkResource's TMD at `tmdOffset`, the
+ * TodSet's data from +0x0C. */
+typedef struct ModelDataHeader {
     /* +0x00 */ u8 pad0[8];
     /* +0x08 */ s32 tmdOffset;
     /* +0x0C */ u8 tods[1];
-} Buf44858;
+} ModelDataHeader;
 
 /* code_171e0.c: stores its three words into *req, returns req. */
-extern Req44858 *SetVec3(Req44858 *req, void *buffer, char *name, s32 mode);
+extern ResourceSourceArgs *SetVec3(ResourceSourceArgs *req, void *buffer, char *name, s32 mode);
 
 /* +0x078: when it owns them, build the LinkResource and the TodSet over
  * the buffer; 1, with both released, when either fails. */
 s32 ModelData__BuildResources(ModelData *self) {
-    Req44858 req;
+    ResourceSourceArgs req;
 
     if (self->ownsResources != 0) {
-        SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->tmdOffset, 0, 1);
-        self->linkResource = New_LinkResource((Src6F240 *)&req);
+        SetVec3(&req, (u8 *)self->buffer + ((ModelDataHeader *)self->buffer)->tmdOffset, 0, 1);
+        self->linkResource = New_LinkResource((ResourceSource *)&req);
         if (self->linkResource != NULL) {
-            req.buffer = ((Buf44858 *)self->buffer)->tods;
-            self->todSet = (FileResource *)New_TodSet((Src6F240 *)&req);
+            req.buffer = ((ModelDataHeader *)self->buffer)->tods;
+            self->todSet = (FileResource *)New_TodSet((ResourceSource *)&req);
             if (self->todSet != NULL) {
                 return 0;
             }
@@ -954,11 +965,11 @@ ModelDataMethods *GetModelDataMethods(void) {
 
 /* Allocate and construct a TriggerWorld; NULL, the object freed, when the
  * ctor fails. */
-TriggerWorld *New_TriggerWorld(Src6F240 *src) {
+TriggerWorld *New_TriggerWorld(ResourceSource *src) {
     TriggerWorld *obj = BMemPMgrAlloc(sizeof(TriggerWorld));
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetTriggerWorldMethods())->ctor(obj, src)) {
+        if (((UnprototypedCtorTable *)GetTriggerWorldMethods())->ctor(obj, src)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -968,8 +979,8 @@ TriggerWorld *New_TriggerWorld(Src6F240 *src) {
 
 /* ctor (+0x008): ModelData's, not owning; with an adopted buffer, build the
  * ModelData array (NULL when that fails). */
-void *TriggerWorld__TriggerWorld(TriggerWorld *self, Src6F240 *src) {
-    ((Ctor33808 *)GetModelDataMethods())->ctor(self, src, 0);
+void *TriggerWorld__TriggerWorld(TriggerWorld *self, ResourceSource *src) {
+    ((UnprototypedCtorTable *)GetModelDataMethods())->ctor(self, src, 0);
     self->methods = GetTriggerWorldMethods();
     if (src->buffer != NULL) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
@@ -993,8 +1004,8 @@ void TriggerWorld__Load(TriggerWorld *self) {
 /* +0x078: build a ModelData over each of the buffer's sub-blocks, in place
  * of its offset; 1, with those built released, when one fails. */
 s32 TriggerWorld__BuildResources(TriggerWorld *self) {
-    Req44858 req;
-    CountedBuf33808 *buf;
+    ResourceSourceArgs req;
+    SubBlockTable *buf;
     s32 *p;
     s32 i;
     s32 n;
@@ -1006,8 +1017,8 @@ s32 TriggerWorld__BuildResources(TriggerWorld *self) {
     p = buf->entries;
     self->modelDataCount = 0;
     for (; i < n; i++) {
-        req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = (s32)New_ModelData((Src6F240 *)&req);
+        req.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
+        *p = (s32)New_ModelData((ResourceSource *)&req);
         if (*p == 0) {
             goto fail;
         }
@@ -1022,14 +1033,13 @@ fail:
 
 /* releaseResources (+0x07C): release the ModelData built so far. */
 void TriggerWorld__ReleaseResources(TriggerWorld *self) {
-    ReleaseBasicClassArray((BasicClass **)((CountedBuf33808 *)self->buffer)->entries,
-                           self->modelDataCount);
+    ReleaseBasicClassArray((BasicClass **)((SubBlockTable *)self->buffer)->entries, self->modelDataCount);
     self->modelDataCount = 0;
 }
 
 /* +0x088: ModelData `index`, NULL when out of range. */
 ModelData *TriggerWorld__GetModelData(TriggerWorld *self, u32 index) {
-    CountedBuf33808 *buf = self->buffer;
+    SubBlockTable *buf = self->buffer;
 
     if (index < buf->count) {
         return (ModelData *)buf->entries[index];
@@ -1210,11 +1220,11 @@ TileAtlasMethods *GetTileAtlasMethods(void) {
 
 /* Allocate and construct a TodSet; NULL, the object freed, when the ctor
  * fails. */
-TodSet *New_TodSet(Src6F240 *src) {
+TodSet *New_TodSet(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(TodSet));
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetTodSetMethods())->ctor(obj, src)) {
+        if (((UnprototypedCtorTable *)GetTodSetMethods())->ctor(obj, src)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -1224,7 +1234,7 @@ TodSet *New_TodSet(Src6F240 *src) {
 
 /* ctor (+0x008): Tod's; with an adopted buffer, build the Tods (NULL when
  * that fails). */
-void *TodSet__TodSet(TodSet *self, Src6F240 *src) {
+void *TodSet__TodSet(TodSet *self, ResourceSource *src) {
     GetTodMethods()->ctor((Tod *)self, src);
     self->methods = GetTodSetMethods();
     if (src->buffer != NULL) {
@@ -1237,7 +1247,7 @@ void *TodSet__TodSet(TodSet *self, Src6F240 *src) {
 
 /* finalize (+0x00C): release the Tods. */
 void TodSet__Finalize(TodSet *self) {
-    CountedBuf33808 *buf = self->buffer;
+    SubBlockTable *buf = self->buffer;
 
     ReleaseBasicClassArray((BasicClass **)buf->entries, buf->count);
     GetTodMethods()->finalize((Tod *)self);
@@ -1246,8 +1256,8 @@ void TodSet__Finalize(TodSet *self) {
 /* setFlag (+0x064): build a Tod over each of the buffer's sub-blocks, in
  * place of its offset; 1, with those built released, when one fails. */
 s32 TodSet__BuildTods(TodSet *self) {
-    Req44858 req;
-    CountedBuf33808 *buf;
+    ResourceSourceArgs req;
+    SubBlockTable *buf;
     Tod **p;
     s32 i;
     s32 n;
@@ -1258,8 +1268,8 @@ s32 TodSet__BuildTods(TodSet *self) {
     n = buf->count;
     p = (Tod **)buf->entries;
     for (; i < n; i++) {
-        req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = New_Tod((Src6F240 *)&req);
+        req.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
+        *p = New_Tod((ResourceSource *)&req);
         if (*p == NULL) {
             while (i != 0) {
                 i--;
@@ -1276,7 +1286,7 @@ s32 TodSet__BuildTods(TodSet *self) {
 /* +0x078: scanTodPackets over the first frame of the TOD that follows the
  * counted array. */
 u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *tmdId) {
-    CountedBuf33808 *buf = self->buffer;
+    SubBlockTable *buf = self->buffer;
 
     return self->methods->scanTodPackets(self, out, tmdId, ((TodFile *)&buf->entries[buf->count])->frames);
 }

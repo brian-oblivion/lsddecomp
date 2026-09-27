@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gTodSetMethods +0x064.
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
+fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
@@ -25,8 +25,8 @@ top of / earlier in `src/code_33808.c`.
  * buffer's counted offset table, into the table's own words; 0 when all
  * exist, otherwise release the ones already built and 1. */
 s32 TodSet__BuildTods(DataSrc33808 *self) {
-    Req44858 req;
-    CountedBuf33808 *buf;
+    ResourceSourceArgs req;
+    SubBlockTable *buf;
     DataSrc33808 **p;
     s32 i;
     s32 n;
@@ -37,7 +37,7 @@ s32 TodSet__BuildTods(DataSrc33808 *self) {
     n = buf->count;
     p = (DataSrc33808 **)buf->entries;
     for (; i < n; i++) {
-        req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
+        req.buffer = (u8 *)self->buffer + ((SubBlockTable *)self->buffer)->entries[i];
         *p = New_Tod((s32)&req);
         if (*p == NULL) {
 while (i != 0) {
@@ -63,7 +63,7 @@ Fourth build. The first shape, `for (p--; i != 0; i--, p--) release(*p);`, measu
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-Touched by Tod's unification (charlie): the call is now `*p = (DataSrc33808 *)New_Tod((Src6F240 *)&req);`, because New_Tod is prototyped `Tod *New_Tod(Src6F240 *)` in include/Tod.h. Two pointer casts, no code; this function's own views (TodSet's) are unchanged. Bytes unchanged.
+Touched by Tod's unification (charlie): the call is now `*p = (DataSrc33808 *)New_Tod((ResourceSource *)&req);`, because New_Tod is prototyped `Tod *New_Tod(ResourceSource *)` in include/Tod.h. Two pointer casts, no code; this function's own views (TodSet's) are unchanged. Bytes unchanged.
 
 ## Track 4 (2026-09-26, round 88, delta)
 

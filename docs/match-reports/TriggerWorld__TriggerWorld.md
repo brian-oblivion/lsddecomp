@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x008.
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
+fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
 `src/code_33808.c`.
 
 ```c
@@ -25,7 +25,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
  * 0), then this table; when the argument's first word is set, its own
  * +0x064 runs, and a nonzero result fails the construction (NULL). */
 void *TriggerWorld__TriggerWorld(DataSrc33808 *self, s32 *arg) {
-    ((Ctor33808 *)GetModelDataMethods())->ctor(self, arg, 0);
+    ((UnprototypedCtorTable *)GetModelDataMethods())->ctor(self, arg, 0);
     self->methods = GetTriggerWorldMethods();
     if (*arg != 0) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
@@ -47,4 +47,4 @@ First build; the same shape as TodSet__TodSet (gTodSetMethods's ctor). The alloc
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Now `void *TriggerWorld__TriggerWorld(TriggerWorld *self, struct Src6F240 *src)`: the `s32 *arg` was ModelData's descriptor, so `*arg != 0` reads `src->buffer != NULL`. The parent ctor is still called through Ctor33808 (it takes a third argument, 0, that the void-typed slot has no room for) and +0x064 through an `s32 (*)()` cast (setFlag is void; TriggerWorld__Load returns nothing, but the ctor tests $v0, as retail does). Bytes unchanged.
+Now `void *TriggerWorld__TriggerWorld(TriggerWorld *self, struct ResourceSource *src)`: the `s32 *arg` was ModelData's descriptor, so `*arg != 0` reads `src->buffer != NULL`. The parent ctor is still called through UnprototypedCtorTable (it takes a third argument, 0, that the void-typed slot has no room for) and +0x064 through an `s32 (*)()` cast (setFlag is void; TriggerWorld__Load returns nothing, but the ctor tests $v0, as retail does). Bytes unchanged.

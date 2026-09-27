@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. If the constructor returns zero the object is freed and NULL returned: `if (obj != NULL) { if (ctor(obj, a)) return obj; BMemPMgrFree(obj); } return NULL;`.
+Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `UnprototypedCtorTable` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. If the constructor returns zero the object is freed and NULL returned: `if (obj != NULL) { if (ctor(obj, a)) return obj; BMemPMgrFree(obj); } return NULL;`.
 
 Table slot (`tools/classtable.py`): none (allocator for LinkResource (gLinkResourceMethods), object size 0x30).
 
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for LinkResource (gLinkResou
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/code_33808.c`.
 
 ```c
 /* Allocate and construct a LinkResource (gLinkResourceMethods) object; freed and NULL when the constructor fails. */
@@ -25,7 +25,7 @@ void *New_LinkResource(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x30);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetLinkResourceMethods())->ctor(obj, arg0)) {
+        if (((UnprototypedCtorTable *)GetLinkResourceMethods())->ctor(obj, arg0)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -46,6 +46,7 @@ void *New_LinkResource(s32 arg0) {
 
 - **New_LinkResource**, tier B (head review, round 83: was A). src/class_3bb8c.c and include/code_55dd4.h already declare this allocator's return type as `LinkResource *` at their own call sites.
   Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (class_3bb8c.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
+- **UnprototypedCtorTable** (type, was `Ctor33808`), tier A (round 95, bravo, track 6). A method-table view with only the +0x008 ctor slot, typed `s32 (*)()`: New_LinkResource, New_ModelData, New_TriggerWorld, New_TodSet and New_Tod call the ctor through it (TriggerWorld__TriggerWorld calls ModelData's with an extra `owns` argument), because each class header declares the slot returning void with a fixed parameter list (BASICCLASS_SLOTS), and all but New_Tod test the result. The name says what it is to the code: the table, its ctor unprototyped.
 
 ## Track 4
 
@@ -55,7 +56,7 @@ unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 `Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
 `self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
 read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
-`Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
+`ResourceSource *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.
 
 ## Round 93 polish (charlie, track 7)

@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x008 (its allocator Ne
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
+fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c
@@ -112,7 +112,7 @@ Occupant of +0x008. Fields now named: +0x2C `blockCount`, +0x30 `blocks`, +0x38 
 | --- | --- | --- | --- |
 | `0x1E0` | `CLUT_FADE_Y` (480) | A | the ramps' clutY base here, FadeClutRow's src.y base, and TimArraySrc__BuildImages' CLUT-row origin: the VRAM row the fade CLUTs start at |
 | `0x100` | `CLUT_COLORS` (256) | A | the width of each ramp's CLUT RECT; FadeClutRow reads and writes rows of that many 16-bit colours |
-| `0x24` | `sizeof(Hdr43200)` | A | the header buffer's allocation and bufferSize, the size AdvanceLoadState copies |
+| `0x24` | `sizeof(TimBlockHeaderBytes)` | A | the header buffer's allocation and bufferSize, the size AdvanceLoadState copies |
 | `0x800` | `CD_SECTOR_SIZE` (2048) | A | the first read of the file, whose first 36 bytes are the header |
 | `9` | `TIMBLOCK_LOAD_HEADER` | A | set before the header-sector read; AdvanceLoadState's branch for it parses the header |
 | `4` | `ARRAY_COUNT(self->entries)` | A | the loop fills `entries[4]` |

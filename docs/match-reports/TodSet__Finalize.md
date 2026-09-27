@@ -17,14 +17,14 @@ Table slot (`tools/classtable.py`): gTodSetMethods +0x00C (finalize).
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `CountedBuf33808` sit at the top of `src/code_33808.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/code_33808.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
 /* gTodSetMethods +0x00C: finalize -- release the buffer's counted object array,
  * then the parent gTodMethods's. */
 void TodSet__Finalize(DataSrc33808 *self) {
-    CountedBuf33808 *buf = self->buffer;
+    SubBlockTable *buf = self->buffer;
 
     ReleaseBasicClassArray((BasicClass **)buf->entries, buf->count);
     ((DataSrc33808Methods *)GetTodMethods())->finalize(self);

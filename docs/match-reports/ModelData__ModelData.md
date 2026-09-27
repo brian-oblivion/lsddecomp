@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gModelDataMethods +0x008 (the allocator New_
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
+fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
 `src/code_33808.c`.
 
 ```c
@@ -27,7 +27,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
  * `owns` at +0x34; adopt the descriptor's buffer (size 0) and run its own
  * +0x064, whose nonzero result fails the construction (NULL), or else
  * request its file. */
-void *ModelData__ModelData(ModelData *self, Src6F240 *src, s32 owns) {
+void *ModelData__ModelData(ModelData *self, ResourceSource *src, s32 owns) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetModelDataMethods();
     self->ownsResources = owns;

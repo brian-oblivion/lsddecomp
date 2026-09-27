@@ -17,16 +17,16 @@ Table slot (`tools/classtable.py`): gTodMethods +0x008.
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
+fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
 `src/code_33808.c`.
 
 ```c
-typedef struct Src6F240 {
+typedef struct ResourceSource {
     /* +0x00 */ void *buffer;
     /* +0x04 */ char *name;
-} Src6F240;
+} ResourceSource;
 
-void Tod__Tod(DataSrc33808 *self, Src6F240 *src) {
+void Tod__Tod(DataSrc33808 *self, ResourceSource *src) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTodMethods();
     if (src->buffer != NULL) {
