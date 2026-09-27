@@ -1348,6 +1348,16 @@
           "note": "Premium head, cap 5, rolling slots; three names sampled per job, none sent back. Sony headers: Sprite.h and Viewport.h as ONE job (revision 34: a ready flagged --after header joins the collision header it shares includers with) onto GsIMAGE/GsOT/GsOT_TAG/PACKET, ViewportOt deleted, SceneNode slot +0x064 setSemiTransOn (libgpu's setSemiTrans macro); code_179d8_m onto libsnd/libspu (VabHdr, VagAtr, ProgAtr, SsScore; ObjDAD4 -> SpuRegs); code_179d8_q onto libetc/libcd (CdlFILE, CdRequestNode; UnkC80 removed). Types: BoxFillPos; FullWidthChar/FullWidthChars3/FullWidthChars6 moved to TitleMenu.h (class_3bb8c_g, _c); Vec3_171e0 -> ResourceRequest (SetVec3 -> ResourceRequest__Set); ResourceSource and one ResourceSourceRequest in FileResource.h (LoadRequest, LoadModelRequest, BE54LoadReq retired; flagged job); FieldAC7CHolder -> StyleSceneRefs view. Flagged for next: ResourceRequest's 0x0C family.",
           "round": 96,
           "runners": 10
+        },
+        {
+          "attempts": 12,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 12,
+          "model": "opus",
+          "note": "Premium head, cap 5, rolling slots; names sampled per job, none sent back. SceneNode.h onto Sony's SVECTOR/GsCOORD2PARAM/GsCOORDINATE2 across its 45-unit includer set (alpha, no collisions). Sony types: StatBuf179D8H -> CdlFILE (code_179d8_h onto libcd), VoiceState80090368 -> SsMarkCallbackProc[32][16] (code_179d8_c), EntryDAD4 -> SpuRegs (moved to SvmData.h), four Entry90902E8 views (f/i/j/k) -> include/SsScore.h (unk74 is the left volume). Names: DataSourceSetDriverModeFn, GraphPointColor/gGraphPointBaseColor. ResourceRequest is { ResourceSource src; s32 mode; } in FileResource.h, retiring ResourceSourceArgs and DreamAuxLoadReq; ResourceSourceRequest retired onto it (mode unset: a bare ResourceSource shrinks three frames by 8, measured). Plan revision 35: flag-type --units.",
+          "round": 97,
+          "runners": 12
         }
       ],
       "status": "auto",
@@ -1428,6 +1438,16 @@
           "note": "Opus polish, all five accepted after five samples each: class_3bb8c_b (scale-step tables, GsIDMATRIX, CHUNK_NEIGHBOUR_*, ANGLE_DEG in common.h), Entity (the flat mood tables are columns of gEntityMoodTable's row; EntityActivateKind/DeactivateKind), class_3bb8c_r (style cues, decimal literals, plain range tests), class_3bb8c_d (TitleMenu data, TitleMenuEntry, TASKOBJF_CLASS_ID), class_3bb8c_p (gActorLocalMove, Descriptor10Ext). Head: seven D_ libsnd globals to their psyq-objects.ld names (_svm_pg/vh/tn/damper, kMaxPrograms, _svm_vab_used/_vab_count).",
           "round": 96,
           "runners": 5
+        },
+        {
+          "attempts": 3,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 2,
+          "model": "opus",
+          "note": "code_8220 (BMemPMgr block layout macros, freeListHead/Tail, BASICCLASS_EVENT_FINALIZED) and class_3bb8c_t (GraphRoom's dots, colours, score moods) accepted after five samples each. class_3bb8c_e: only steps 2-3 merged; steps 4-5 and a rename.py run never compiled (the runner's builds ran in the main checkout: the Bash tool resets cwd between calls), kept under local tag r97-bravo-class_3bb8c_e-unbuilt; unit not marked, re-send. Plan revision 36: runner commands start cd <worktree> &&, the oracle's OK line names its tree.",
+          "round": 97,
+          "runners": 3
         }
       ],
       "status": "auto",
@@ -1489,6 +1509,16 @@
           "note": "code_179d8_j_b -> libsnd_vm_vol_ut_key_ut_keyv (3.6's vm_vol/ut_key/ut_keyv, checked with nm; content says three files, parked unsplit), code_33808 -> GraphicsResources (nine FileResource sources, BgLayer, MoviePlayer; content would split per class, parked unsplit). Both edges placed Sony objects.",
           "round": 96,
           "runners": 1
+        },
+        {
+          "attempts": 3,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 3,
+          "model": "opus",
+          "note": "Five regions: code_179d8_c -> libsnd_ssinit, code_179d8_f -> libsnd_cres, code_179d8_i -> libsnd_decre, code_179d8_j_c..p -> libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop + libsnd_ut_ako (3.6's split modules, nm), code_8220..code_8220_c -> BMemPMgr.c + TmdRenderer.c (b+c merged; BasicClass tail parked at TmdRenderer's head, a split). Sony names from nm over sdk/work/<disc>/elf/libsnd; none linkable (text sizes differ).",
+          "round": 97,
+          "runners": 3
         }
       ],
       "status": "auto"
