@@ -342,7 +342,7 @@ extern s32 atoi(char *s);
  * bytes; alignment 2 would merge a two-byte tail into a halfword. */
 typedef struct {
     s8 raw[6];
-} Buf6_3bb8c_g;
+} FullWidthChars3;
 
 typedef struct {
     s8 raw[12];
@@ -383,8 +383,8 @@ s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
     } else {
         FullWidthChar *glyphs = gSaveTitleGlyphs;
 
-        *(Buf6_3bb8c_g *)&title[SAVE_TITLE_LETTER_FIELD] =
-            *(Buf6_3bb8c_g *)&glyphs[SAVE_TITLE_GLYPH_SPACES];
+        *(FullWidthChars3 *)&title[SAVE_TITLE_LETTER_FIELD] =
+            *(FullWidthChars3 *)&glyphs[SAVE_TITLE_GLYPH_SPACES];
         return (s32)glyphs;
     }
 }

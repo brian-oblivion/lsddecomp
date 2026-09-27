@@ -19,7 +19,7 @@ extern u8 *gSaveTitleGlyphs;
 
 typedef struct {
     s8 raw[6];
-} Buf6_3bb8c_g;
+} FullWidthChars3;
 typedef struct {
     s8 raw[12];
 } Buf12_3bb8c_g;
@@ -48,7 +48,7 @@ s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1)
     } else {
         u8 *q = gSaveTitleGlyphs;
 
-        *(Buf6_3bb8c_g *)(self + 0x6) = *(Buf6_3bb8c_g *)(q + 0x1E);
+        *(FullWidthChars3 *)(self + 0x6) = *(FullWidthChars3 *)(q + 0x1E);
         return (s32)q;
     }
 }
@@ -72,7 +72,7 @@ individual loads/stores rather than a merged halfword.
   `atoi(...)  - 1`, doubled) into `self[0x8..0xA)`.
 - `Buf12_3bb8c_g` (12 bytes, exactly 3 word chunks, no tail) — the `src !=
   NULL` path's bulk copy `self[0x6..0x12) = gSaveTitleGlyphs[0x1E..0x2A)`.
-- `Buf6_3bb8c_g` (6 bytes, one word chunk + 2 tail bytes) — the `src ==
+- `FullWidthChars3` (6 bytes, one word chunk + 2 tail bytes) — the `src ==
   NULL` path's shorter copy `self[0x6..0xC) = gSaveTitleGlyphs[0x1E..0x24)`,
   identical shape to `FormatNumberIntoBuffer`'s own struct this round.
 
