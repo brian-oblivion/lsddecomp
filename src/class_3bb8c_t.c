@@ -162,16 +162,16 @@ void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     self->points[0] = New_BoxFill(gGraphPointSize, &gGraphPointNewestColor, 0);
     rgb = gGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
-        s32 dec;
+        s32 step;
 
         self->points[i] = New_BoxFill(gGraphPointSize, &rgb, 0);
-        dec = 1;
+        step = 1;
         if (i < 7) {
-            dec = 0x14;
+            step = 0x14;
         }
-        rgb.r -= dec;
-        rgb.g -= dec;
-        rgb.b -= dec;
+        rgb.r -= step;
+        rgb.g -= step;
+        rgb.b -= step;
     }
     self->matchedDayIndices = BMemPMgrAlloc(4);
 }
@@ -199,51 +199,51 @@ s32 GraphRoom__Init(GraphRoom *self, IntermediateBaseInitArgs *args, s32 mode) {
 }
 
 void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
-    DreamSaveBlock *result;
+    DreamSaveBlock *save;
     s32 count;
     s32 i;
-    s32 idx;
-    s32 flag;
+    s32 day;
+    s32 haveNewest;
     BoxFillPos point;
     BoxFillPos firstPoint;
 
     Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
-    result = (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
-    self->scored = GraphRoom__ScoreDayLog(self, result);
+    save = (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
+    self->scored = GraphRoom__ScoreDayLog(self, save);
 
-    flag = 0;
-    if (result->currentYear != 0) {
+    haveNewest = 0;
+    if (save->currentYear != 0) {
         count = 100;
     } else {
-        count = result->currentDay;
+        count = save->currentDay;
         if (count >= 0x65) {
             count = 100;
         }
     }
 
-    idx = result->currentDay - 1;
-    for (i = 0; i < count; i++, idx--) {
+    day = save->currentDay - 1;
+    for (i = 0; i < count; i++, day--) {
         s8 dx, dy;
         s32 ndy;
 
-        if (idx < 0) {
-            idx = 0x16C;
+        if (day < 0) {
+            day = 0x16C;
         }
-        dx = result->moodPreviousDays[idx].axis.dynamic;
+        dx = save->moodPreviousDays[day].axis.dynamic;
         point.x = dx * 10 - 5;
-        dy = result->moodPreviousDays[idx].axis.upper;
+        dy = save->moodPreviousDays[day].axis.upper;
         ndy = -dy;
         point.y = ndy * 10 - 5;
 
         if (i == 0) {
             firstPoint = point;
-            flag = 1;
+            haveNewest = 1;
         } else {
             self->points[i]->methods->attachAbsolute(self->points[i], parent, &point, 0);
         }
     }
 
-    if (flag) {
+    if (haveNewest) {
         self->points[0]->methods->attachAbsolute(self->points[0], parent, &firstPoint, 0);
     }
 }
@@ -253,15 +253,15 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
  * coincidence. */
 extern MoodGraphPoint gGraphScoreMoods[4];
 
-/* Round 41 (2026-09-14): matched from a permuter-found lead. `p` and `days`
+/* Round 41 (2026-09-14): matched from a permuter-found lead. `targets` and `days`
  * are LOCAL pointer caches of gGraphScoreMoods and log->moodPreviousDays respectively -- not
  * because retail's semantics need them (both globals are re-derivable
  * without a temporary), but because caching them THIS WAY is what makes
  * cc1 2.6.3 stop strength-reducing gGraphScoreMoods[i] into a pointer induction
  * variable hoisted across the outer loop (see the match report for the
- * full derivation). The `else { p = gGraphScoreMoods; }` branch below and the
- * `p = (days = gGraphScoreMoods);` chained assignment are BOTH semantically
- * inert -- p is unconditionally overwritten with the same value either
+ * full derivation). The `else { targets = gGraphScoreMoods; }` branch below and the
+ * `targets = (days = gGraphScoreMoods);` chained assignment are BOTH semantically
+ * inert -- targets is unconditionally overwritten with the same value either
  * way -- but removing either one measurably regresses the codegen (round
  * 41 confirmed both empirically, byte-exact with them, off by dozens of
  * words without). Do not "simplify" this without re-running
@@ -269,10 +269,10 @@ extern MoodGraphPoint gGraphScoreMoods[4];
 s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     u32 i;
     MoodGraphPoint *days;
-    s32 j;
-    MoodGraphPoint *p;
-    s32 idx;
-    s32 found;
+    s32 dot;
+    MoodGraphPoint *targets;
+    s32 day;
+    s32 matches;
     s32 limit;
 
     if (log->graphScored != 0) {
@@ -289,23 +289,23 @@ s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     }
 
     for (i = 0; i < 4; i++) {
-        found = 0;
-        idx = log->currentDay - 1;
-        for (j = 0; j < limit; j++) {
-            if (idx < 0) {
-                idx = 0x16C;
+        matches = 0;
+        day = log->currentDay - 1;
+        for (dot = 0; dot < limit; dot++) {
+            if (day < 0) {
+                day = 0x16C;
             } else {
-                p = gGraphScoreMoods;
+                targets = gGraphScoreMoods;
             }
-            p = (days = gGraphScoreMoods);
+            targets = (days = gGraphScoreMoods);
             days = log->moodPreviousDays;
-            if (p[i].value == days[idx].value) {
-                self->matchedDayIndices[i] = j;
-                found++;
+            if (targets[i].value == days[day].value) {
+                self->matchedDayIndices[i] = dot;
+                matches++;
             }
-            idx--;
+            day--;
         }
-        if (found == 0) {
+        if (matches == 0) {
             goto fail;
         }
     }
@@ -325,8 +325,8 @@ void GraphRoom__TickHighlight(GraphRoom *self) {
         if ((u32)self->frameCounter >= 0x1F) {
             if (self->highlightCount < 4) {
                 if (((u32)self->frameCounter % 24) == 0) {
-                    s8 idx = self->matchedDayIndices[self->highlightCount];
-                    self->points[idx]->methods->setColor(self->points[idx], 1, &gGraphPointHighlightColor);
+                    s8 dot = self->matchedDayIndices[self->highlightCount];
+                    self->points[dot]->methods->setColor(self->points[dot], 1, &gGraphPointHighlightColor);
                     self->highlightCount += 1;
                 }
             }
