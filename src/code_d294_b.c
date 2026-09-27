@@ -69,7 +69,7 @@ s32 SceneNode__SetBackClip(SceneNode *self, s32 on) {
  * straight through -- to the PsyQ helper RotMatrix. MATCHING: SVECTOR's
  * all-short members give it alignment 2, which is what makes the
  * whole-struct copy compile to lwl/lwr. */
-void SceneNode__GetRotMatrix(SceneNode *self, s32 out, s32 invert) {
+void SceneNode__GetRotMatrix(SceneNode *self, MATRIX *out, s32 invert) {
     SVECTOR angles;
     SVECTOR *rotate = &self->coord2->param->rotate;
 
@@ -80,8 +80,7 @@ void SceneNode__GetRotMatrix(SceneNode *self, s32 out, s32 invert) {
     } else {
         angles = *rotate;
     }
-    /* Cast: SceneNode.h types `out` as s32. */
-    RotMatrix(&angles, (MATRIX *)out);
+    RotMatrix(&angles, out);
 }
 
 /* a1 gates a small range (2 <= a1 < 4). When self->model is set and
@@ -130,7 +129,7 @@ void SceneNode__GetModelHull(SceneNode *self, void *dest) {
  * unk30 again. */
 void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *verts, s32 event) {
     ApplyMatrixToSVArray(verts->v, verts->v, verts->count * HULL_BOX_CORNERS, &self->coord2->workm);
-    self->linkTarget = 0;
+    self->linkTarget = NULL;
     self->hitMask = 0;
     self->notifyVerts = verts;
     self->methods->notifyParents(self, event);
@@ -351,7 +350,7 @@ s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta
  * `p`, `v` and `hi` as pointers. */
 extern s32 gHitHeightGate;
 
-s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *delta, TmdHull *hull) {
+s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *hitPoint, TmdHull *hull) {
     TmdVec3 center[2];
     TmdVec3 *c;
     TmdVec3 *opposite;
@@ -385,8 +384,7 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *
     for (i = 0; i < boundsCount; i++) {
         bounds = TmdModel__GetBoundsBuffer(self->model, i);
         if (ClipSegmentToBox(NULL, bounds, &center[0], &center[1])) {
-            if (TmdModel__RaycastFaces(self->model, &nearest, (TmdVec3 *)delta, &height,
-                                       (TmdVec3 *)&center[0], (TmdVec3 *)&center[1])) {
+            if (TmdModel__RaycastFaces(self->model, &nearest, hitPoint, &height, &center[0], &center[1])) {
                 if (gHitHeightGate == 0) {
                     self->hitMask |= 1 << i;
                 } else if (height > HIT_HEIGHT_THRESHOLD) {
@@ -413,9 +411,8 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *
             for (j = 0; j < HULL_FACE_CORNERS; j++) {
                 if (j == 1 || j == 2) {
                     if (ClipSegmentToBox(NULL, bounds, corner, corner + HULL_FACE_CORNERS)) {
-                        if (TmdModel__RaycastFaces(self->model, &nearest, (TmdVec3 *)delta, &height,
-                                                   (TmdVec3 *)corner,
-                                                   (TmdVec3 *)(corner + HULL_FACE_CORNERS))) {
+                        if (TmdModel__RaycastFaces(self->model, &nearest, hitPoint, &height, corner,
+                                                   corner + HULL_FACE_CORNERS)) {
                             if (height > HIT_HEIGHT_THRESHOLD) {
                                 self->hitMask |= 1 << i;
                                 *hullHits |= 1 << k;

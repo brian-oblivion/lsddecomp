@@ -105,7 +105,7 @@ struct Ratio16 {
     /* +0x0A0 */ void (*tryAttachNearby)(Self *self); /* SceneNode__TryAttachNearby; its 2nd parameter arrives as the caller's untouched $a1 */ \
     /* +0x0A4 */ void (*composeAndApplyRotation)(Self *self, void *vec, void *dst, void *src, s32 count); /* SceneNode__ComposeAndApplyRotation */ \
     /* +0x0A8 */ s32 (*checkBoundsOverlap)(Self *self, void *corners, TmdVec3 *delta); /* SceneNode__CheckBoundsOverlap */ \
-    /* +0x0AC */ s32 (*raycastHullAgainstFaces)(Self *self, void *hullHits, TmdVec3 *delta, void *hull); /* SceneNode__RaycastHullAgainstFaces */ \
+    /* +0x0AC */ s32 (*raycastHullAgainstFaces)(Self *self, void *hullHits, TmdVec3 *hitPoint, void *hull); /* SceneNode__RaycastHullAgainstFaces */ \
     /* +0x0B0 */ void (*slotB0)(void); /* SceneNode__NoOpSlotB0; never called */ \
     /* +0x0B4 */ void (*addToActorParents)(Self *self, void *node) /* SceneNode__AddToActorParents */
 /* clang-format on */
@@ -167,7 +167,7 @@ u32 SceneNode__SetLightDim(SceneNode *self, u32 value);
 s32 SceneNode__SetUseZ(SceneNode *self, s32 on);
 u32 SceneNode__SetSubdivision(SceneNode *self, u32 value);
 s32 SceneNode__SetBackClip(SceneNode *self, s32 on);
-void SceneNode__GetRotMatrix(SceneNode *self, s32 out, s32 invert);
+void SceneNode__GetRotMatrix(SceneNode *self, MATRIX *out, s32 invert);
 void SceneNode__NotifyWithHull(SceneNode *self, s32 event);
 void SceneNode__GetModelHull(SceneNode *self, void *dest);
 void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *verts, s32 event);
@@ -177,7 +177,7 @@ void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event);
 void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other);
 void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *vec, void *dst, void *src, s32 count);
 s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta);
-s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *delta, TmdHull *hull);
+s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *hitPoint, TmdHull *hull);
 void SceneNode__NoOpSlotB0(void);
 void SceneNode__AddToActorParents(SceneNode *self, void *node);
 
