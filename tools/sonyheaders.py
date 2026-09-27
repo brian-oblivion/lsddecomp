@@ -13,7 +13,9 @@ struct, `PadInit` with another signature) cannot sit beside those headers:
 cc1 stops with `conflicting types` or `redefinition`. This tool compiles each
 game header, and each unit, after the whole Sony set and lists what collides.
 Every hit is a Sony-type substitution for track 6 (or, for a unit-local
-prototype, deleting it in favour of Sony's). Warnings are not collisions:
+prototype, deleting it in favour of Sony's). So is spelling one of Sony's
+untagged typedefs as a struct tag (`struct GsIMAGE *`), which compiles and
+leaves the type incomplete. Warnings are not collisions:
 passing a `u32 *` where Sony takes `u_long *` is fine (include/types.h).
 """
 import json
@@ -41,15 +43,42 @@ def probe(text, name):
                    if (m := HIT.match(line)) and m.group(1) == name})
 
 
+def anonymous_typedefs():
+    """Sony's typedefs of an UNTAGGED struct or union (`typedef struct {...}
+    GsIMAGE;`). A game file that spells one as `struct GsIMAGE` names a tag
+    Sony never defines: it compiles beside Sony's headers, but the type stays
+    incomplete, so every accessor through it fails (round 95: Sprite.h's
+    `struct GsIMAGE *image`, once TimImage.h took Sony's GsIMAGE)."""
+    names = set()
+    for h in (ROOT / "include" / "psyq").glob("*.h"):
+        t = re.sub(r"/\*.*?\*/", " ", h.read_text(errors="replace"), flags=re.S)
+        for m in re.finditer(r"\btypedef\s+(?:struct|union)\s*\{", t):
+            depth, i = 1, m.end()
+            while depth and i < len(t):
+                depth += {"{": 1, "}": -1}.get(t[i], 0)
+                i += 1
+            n = re.match(r"\s*(\w+)\s*;", t[i:])
+            if n:
+                names.add(n.group(1))
+    return names
+
+
+def tag_uses(text, anon):
+    code = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
+    return sorted({f"struct {n}" for n in re.findall(r"\b(?:struct|union)\s+(\w+)", code) if n in anon})
+
+
 def collect():
     out = {}
+    anon = anonymous_typedefs()
     for h in sorted((ROOT / "include").glob("*.h")):
         if h.name not in SKIP:
-            names = probe(f'#include "{h.name}"\n', f"include/{h.name}")
+            names = probe(f'#include "{h.name}"\n', f"include/{h.name}") + tag_uses(h.read_text(errors="replace"), anon)
             if names:
                 out[f"include/{h.name}"] = names
     for c in sorted((ROOT / "src").rglob("*.c")):
-        names = probe(c.read_text(errors="replace"), c.relative_to(ROOT).as_posix())
+        text = c.read_text(errors="replace")
+        names = probe(text, c.relative_to(ROOT).as_posix()) + tag_uses(text, anon)
         if names:
             out[c.relative_to(ROOT).as_posix()] = names
     return out

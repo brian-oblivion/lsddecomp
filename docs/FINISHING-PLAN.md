@@ -187,7 +187,8 @@ calls; project headers last. `include/types.h` defines `u_char` to `u_long`
 under `<sys/types.h>`'s guards (`u_long` stays `unsigned int`, so a `u32 *`
 passes without a cast). Never include `<inline.h>` (ASPSX flavour;
 `include/gte.h` replaces it). A file that re-declares a Sony name its own way
-(a local `GsIMAGE`, a local `PadInit` prototype) cannot sit beside these;
+(a local `GsIMAGE`, a local `PadInit` prototype, or `struct GsIMAGE` for
+Sony's untagged typedef) cannot sit beside these;
 `python3 tools/sonyheaders.py` lists them, and `plan.py` attaches each to its
 job: a header's to track 6, a unit's to its polish pass. The fix is always
 Sony's declaration, never a rename of Sony's.
