@@ -10,7 +10,7 @@
  * comment still stands -- only the blocker verdicts are withdrawn.
  * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
  *
- * code_179d8_p -- SsUtAllKeyOff, 0x2273C..0x22948 (vram 0x80031F3C..
+ * libsnd_ut_ako -- SsUtAllKeyOff, 0x2273C..0x22948 (vram 0x80031F3C..
  * 0x80032148).  A single 131-word function.  Carved round 26 (2026-09-09)
  * out of what had been the `code_179d8_mid_d` remainder; renamed on carve
  * because "mid_d" named a leftover and the leftover is now fully consumed.
@@ -148,4 +148,4 @@ void SsUtAllKeyOff(void)
     }
 }
 #endif
-INCLUDE_ASM("asm/nonmatchings/code_179d8_p", SsUtAllKeyOff);
+INCLUDE_ASM("asm/nonmatchings/libsnd_ut_ako", SsUtAllKeyOff);

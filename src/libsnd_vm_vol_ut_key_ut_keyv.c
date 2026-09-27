@@ -52,7 +52,7 @@
 extern VagAtr *_svm_tn;
 
 /* Holds the base of the SPU register block, 0x1F801C00, indexed in
- * halfwords as code_179d8_p.c's SsUtAllKeyOff indexes it.
+ * halfwords as libsnd_ut_ako.c's SsUtAllKeyOff indexes it.
  * MATCHING: not volatile here; volatile moves SsUtKeyOff's second store out
  * of its branch delay slot. */
 extern u16 *D_8006DAD4;

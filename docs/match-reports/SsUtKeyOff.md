@@ -204,7 +204,7 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 - Return type is now Sony's `short` (`<libsnd.h>`: `short SsUtKeyOff(short,
   short, short, short, short)`), byte-identical.
 - `EntryDAD4` is DELETED. `D_8006DAD4` holds 0x1F801C00, the SPU register
-  base (code_179d8_p.c's reading, halfword-indexed). The old `[25].unk4` /
+  base (libsnd_ut_ako.c's reading, halfword-indexed). The old `[25].unk4` /
   `[25].unk6` were byte offsets 0x194/0x196 = 0x1F801D94/0x1F801D96, the
   SPU's noise-mode enable pair (NON), cleared on the noise-voice path
   (`unk00 == 0xFF`). The unit now declares `extern u16 *D_8006DAD4;` and

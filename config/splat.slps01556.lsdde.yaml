@@ -946,7 +946,7 @@ segments:
       # and D_8006DAD4), so the "split scaled index" idiom and its
       # loop-versus-non-loop refinement in DECOMPILATION_LEARNINGS are
       # likely to apply directly.  Read that entry before starting.
-      - [0x2273C, c, code_179d8_p]
+      - [0x2273C, c, libsnd_ut_ako]
       # code_179d8_c: window [200..219], 0x22948..0x23500 (20 functions).
       # ROUND 33: func_80032148 (53w), the first function of this slice, is
       # Sony's `libsnd/vm_vsu` and is linked from the object.  Text-only, and

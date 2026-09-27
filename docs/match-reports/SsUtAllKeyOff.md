@@ -2,7 +2,7 @@
 
 > Renamed from `func_80031F3C` on 2026-09-24 (tools/rename.py). Address 0x80031f3c.
 
-`code_179d8_p`, vram `0x80031F3C`, file offset `0x2273C`, 131 instructions
+`libsnd_ut_ako`, vram `0x80031F3C`, file offset `0x2273C`, 131 instructions
 (0x20C bytes). Frameless. Only function in the unit.
 
 **Round 66 supersedes the round 26/31 title.** That title read *"best compiled
@@ -334,7 +334,7 @@ both objects with relocations masked:
 ```sh
 sh permuter-work/SsUtAllKeyOff/compile.sh permuter-work/SsUtAllKeyOff/base.c -o /tmp/scaf.o
 tools/binutils/bin/mipsel-linux-gnu-objdump -d /tmp/scaf.o
-tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/code_179d8_p.c.o
+tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/libsnd_ut_ako.c.o
 ```
 
 The two disassemblies are **identical, 132 lines each**. The scaffold compiles
