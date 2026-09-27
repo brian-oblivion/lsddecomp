@@ -15,7 +15,7 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
   6. removing the spare VECTORs: frame 0x168. `s32 dist[1]` went into a register (an extra `s7` save, size changed).
   7. **`s32 dist[2]`** (8 bytes, 4-byte aligned, so BLKmode, so memory): 486/486.
 - **Frame, measured:** the 0x38 bytes above the locals (0x104..0x13F in retail) are dead reload slots. The six box-field pointers have `sp+K` equivalences, and each of the loop's six compares plus the `nverts - 1` bound adds 8 bytes to `vars=` in cc1's `.frame` comment (delete them one at a time and it shrinks by 8 each time), with no access ever made to them. Do not fill that gap with locals.
-- **Types:** new `Ray_fa50`, `Vec4_fa50` (LIBGTE `VECTOR`, local), `VecBox_fa50`, the `ABS_fa50` macro, local prototypes for `OuterProduct0`/`Square0`/`SquareRoot0` (Sony libgte, called and not written) and for `TmdModel__NextPrimitive` (defined after this function). All in this unit.
+- **Types:** new `Ray`, `Vec4_fa50` (LIBGTE `VECTOR`, local), `VectorOrBox`, the `ABS_fa50` macro, local prototypes for `OuterProduct0`/`Square0`/`SquareRoot0` (Sony libgte, called and not written) and for `TmdModel__NextPrimitive` (defined after this function). All in this unit.
 
 ## Source
 
@@ -23,9 +23,9 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
 typedef struct Vec3_fa50 { s16 x, y, z; } Vec3_fa50;
 typedef struct SVec_fa50 { s16 x, y, z, pad; } SVec_fa50;
 typedef struct Box_fa50 { Vec3_fa50 min; Vec3_fa50 max; } Box_fa50;
-typedef struct Ray_fa50 { Vec3_fa50 org; Vec3_fa50 dir; } Ray_fa50;
+typedef struct Ray { Vec3_fa50 org; Vec3_fa50 dir; } Ray;
 typedef struct Vec4_fa50 { s32 vx, vy, vz, pad; } Vec4_fa50;
-typedef union VecBox_fa50 { Vec4_fa50 v; Box_fa50 b; } VecBox_fa50;
+typedef union VectorOrBox { Vec4_fa50 v; Box_fa50 b; } VectorOrBox;
 #define ABS_fa50(x) ((x) < 0 ? ~(x) + 1 : (x))
 extern void OuterProduct0(Vec4_fa50 *v0, Vec4_fa50 *v1, Vec4_fa50 *v2);
 extern void Square0(Vec4_fa50 *v0, Vec4_fa50 *v1);
@@ -35,7 +35,7 @@ extern s32 SquareRoot0(s32 a);
 s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
     Vec3_fa50 tri[4];
     Vec4_fa50 plane;
-    Ray_fa50 ray;
+    Ray ray;
     Vec3_fa50 hit;
     s32 nverts;
     u32 count;
@@ -62,7 +62,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *he
         Vec4_fa50 vC0;
         Vec4_fa50 vD0;
         Vec4_fa50 vE0;
-        VecBox_fa50 uF0;
+        VectorOrBox uF0;
         s32 dist[2];
         s32 frac;
         s32 q;
@@ -212,7 +212,7 @@ not touched by this pass.
 ## Track 7 (2026-09-26, round 94, bravo)
 
 - The unit-local `Vec4_fa50` (a hand-copy of libgte's `VECTOR`, `{s32 vx,
-  vy, vz, pad;}`) is gone; every local and `VecBox_fa50`'s scratch member
+  vy, vz, pad;}`) is gone; every local and `VectorOrBox`'s scratch member
   now use `VECTOR` from `<libgte.h>` (`tools/sonyheaders.py` flagged this
   unit's `OuterProduct0`/`Square0`/`SquareRoot0` externs as conflicting with
   Sony's own declarations in `include/psyq/libgte.h`; the fix is Sony's
@@ -262,3 +262,17 @@ Byte-identical, first build.
 Later in the same pass: `MATCHING:` lines on `ABS_fa50` (build 3), the
 loop-body declarations (build 2) and the six box-field pointers (the frame
 measurement above). Comments only.
+
+## Naming (track 6, round 95)
+
+2026-09-27, delta, both with `tools/renametype.py`:
+
+- `Ray_fa50` -> `Ray`, tier A: `{ TmdVec3 org; TmdVec3 dir; }`, filled once
+  as `origin` and `end - origin` and read as the segment in every face test.
+  It must stay one 12-byte struct (build 2 above), so it is not two
+  `TmdVec3` locals; no project header defines an origin/direction pair.
+- `VecBox_fa50` -> `VectorOrBox`, tier A for mechanics: a union of Sony's
+  `VECTOR` and `TmdBox`, used as `Square0`'s output (`.v`) and then as the
+  candidate face's bounding box (`.b`). It exists because retail addresses
+  both at one frame slot (build 4); the name says exactly that and claims no
+  more.

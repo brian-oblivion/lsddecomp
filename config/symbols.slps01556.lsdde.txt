@@ -788,7 +788,7 @@ TmdModel__GetBoundsBuffer = 0x8001F50C; // type:func
 TmdModel__GetHull = 0x8001F51C; // type:func
 RotateAndOffsetHullList = 0x8001F66C; // type:func
 TmdModel__RaycastFaces = 0x8001F8B8; // type:func
-SetTargetOffset = 0x80020510; // type:func
+TmdModel__SetFirstPrimClut = 0x80020510; // type:func
 GetDrawSystem = 0x80020C5C; // type:func
 // unidentified: masked 0.17 SsEnd (libsnd), too weak.
 func_80038E44 = 0x80038E44; // type:func
@@ -2699,7 +2699,7 @@ TmdModel__ComputeBounds = 0x8001F3B0; // type:func
 gTmdModelBoundsBuf = 0x8008B21C;
 gTmdModelBoundsCount = 0x8008AC4C;
 TmdModel__NextPrimitive = 0x80020050; // type:func
-AccumulateTargetOffset = 0x800204D0; // type:func
+TmdModel__AddFirstPrimClut = 0x800204D0; // type:func
 CharSprite__CharSprite = 0x80041B20; // type:func
 CharSprite__Reset = 0x80041BAC; // type:func
 CharSprite__SetCell = 0x80041BDC; // type:func

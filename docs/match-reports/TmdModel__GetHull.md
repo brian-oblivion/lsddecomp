@@ -14,12 +14,12 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
 ```c
 typedef struct Vec3_fa50 { s16 x, y, z; } Vec3_fa50;
 typedef struct Box_fa50 { Vec3_fa50 min; Vec3_fa50 max; } Box_fa50;
-typedef struct TypedBox_fa50 { s32 type; Box_fa50 box; } TypedBox_fa50;
+typedef struct BoxList { s32 type; Box_fa50 box; } BoxList;
 typedef struct Hull_fa50 { s32 type; Vec3_fa50 v[8]; } Hull_fa50;
 /* TmdModel and TmdModel__ComputeBounds: see TmdModel__ComputeBounds.md */
 
 void TmdModel__GetHull(TmdModel *self, Hull_fa50 *out) {
-    TypedBox_fa50 b;
+    BoxList b;
 
     TmdModel__ComputeBounds(self, &b.box);
     b.type = 1;
@@ -61,8 +61,17 @@ specific in-game role.
 
 ## Track 7, re-send (2026-09-26, round 94, bravo)
 
-`TypedBox_fa50::type` -> `count`: the local's leading word is set to 1
+`BoxList::type` -> `count`: the local's leading word is set to 1
 exactly as `out->count` is, and never read, so the local is a counted box
 list of one, not a typed box. `out->count = 1` carries a `MATCHING:` line
 (build 1 above: `out->count = b.count` reloads the word and costs 3 words).
 Byte-identical.
+
+## Naming (track 6, round 95)
+
+2026-09-27, delta: `TypedBox_fa50` -> `BoxList` (`tools/renametype.py`),
+tier A. The local is `{ s32 count; TmdBox box; }`, its count set to 1 and
+never read: the box analogue of the `TmdHull` it fills (`{ s32 count;
+TmdVec3 v[8]; }`, count 1), i.e. a counted list of boxes holding one. No
+project type has that layout (`gTmdModelBoundsBuf` is a bare `TmdBox[]`
+with its count in a separate global).

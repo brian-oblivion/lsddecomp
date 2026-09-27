@@ -4,7 +4,7 @@
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
 
-- **What:** walks a counted list of box-corner sets (`HullList_fa50`: `s32 n` then `n` x 48-byte `Corners_fa50`, eight `{s16 x,y,z}` as two faces of four; `TmdModel__GetHull` writes a list of one). For each: if `turn`, copy the 48 bytes to a stack temp and permute the corners back in (a quarter turn of the box), then add `d` to `.x` of face `back`; otherwise add `d` to `.z` of face `back`. Caller: `class_3bb8c_o.c` (`RotateAndOffsetHullList(&buf, isSeven, nonneg, adjusted)`).
+- **What:** walks a counted list of box-corner sets (`HullList_fa50`: `s32 n` then `n` x 48-byte `BoxCorners`, eight `{s16 x,y,z}` as two faces of four; `TmdModel__GetHull` writes a list of one). For each: if `turn`, copy the 48 bytes to a stack temp and permute the corners back in (a quarter turn of the box), then add `d` to `.x` of face `back`; otherwise add `d` to `.z` of face `back`. Caller: `class_3bb8c_o.c` (`RotateAndOffsetHullList(&buf, isSeven, nonneg, adjusted)`).
 - **Result:** byte-exact; 147/147 words, whole-image SHA1 green. Build 5.
 - **Builds / levers, measured:**
   1. flat `Vec3 v[8]`, face loops as `v[k]` / `v[k + 4]`: 106/147, 1 word long per `+4` loop (`li a1,0x18; addu v0,t1,a1` instead of retail's `move v1,t1` + `0x18(v1)`).
@@ -18,12 +18,12 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
 
 ```c
 typedef struct Vec3_fa50 { s16 x, y, z; } Vec3_fa50;
-typedef struct Corners_fa50 { Vec3_fa50 f[2][4]; } Corners_fa50;
-typedef struct HullList_fa50 { s32 n; Corners_fa50 c[1]; } HullList_fa50;
+typedef struct BoxCorners { Vec3_fa50 f[2][4]; } BoxCorners;
+typedef struct HullList_fa50 { s32 n; BoxCorners c[1]; } HullList_fa50;
 
 void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 d) {
-    Corners_fa50 tmp;
-    Corners_fa50 *c;
+    BoxCorners tmp;
+    BoxCorners *c;
     s32 i;
 
     for (i = 0; i < h->n; i++) {
@@ -89,8 +89,27 @@ live.
 
 Unit-local fields renamed (every accessor is in this function):
 `HullList_fa50::n` -> `count` and `::c` -> `boxes` (the same shape as
-TmdHull's `count`), `Corners_fa50::f` -> `face` (two faces of four corners:
+TmdHull's `count`), `BoxCorners::f` -> `face` (two faces of four corners:
 TmdModel__GetHull's v[0..3] min-z face and v[4..7] max-z face). Parameter
 `d` -> `delta` (added to x or z of one face). `turn` and `back` kept: they
 already say what they select. A `MATCHING:` line marks the per-branch `k`
 (build 5 above). The types themselves are track 6's. Byte-identical.
+
+## Naming (track 6, round 95)
+
+2026-09-27, delta: `HullList_fa50` (`s32 count; BoxCorners boxes[1];`) is
+deleted and the parameter is `include/TmdModel.h`'s `TmdHull`. Same layout
+(0x34 bytes: the count, then 48 bytes of corners) and the same object: the
+one caller, `Actor__NotifyMove` (class_3bb8c_o.c), fills its buffer through
+`getModelHull` (TmdModel__GetHull writes a `TmdHull`) and hands the same
+buffer on as `(TmdHull *)&buf`; TmdHull's own comment already calls it a
+counted list of boxes' corners. Box `i` is `&((corners type *)h->v)[i]`, the
+`v[8]` array viewed as groups of eight: byte-identical to `&h->boxes[i]`
+(the address is `h + 4 + i * 48` either way). The two-faces-of-four corner
+type stays, because the rotation permutes faces (build 2 above: the flat
+`v[k + 4]` form costs a word per loop).
+
+`Corners_fa50` -> `BoxCorners` (`tools/renametype.py`), tier A: the 48-byte
+element is the eight corners of one box as two faces of four
+(`TmdModel__GetHull` writes them in that order: min-z face, max-z face), and
+this function permutes and offsets them as such.

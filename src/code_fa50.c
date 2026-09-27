@@ -12,11 +12,12 @@
  * segment against every face (TmdModel__RaycastFaces) for SceneNode's own
  * collision helpers in code_d294_b.c/code_d294_c.c.
  *
- * RotateAndOffsetHullList takes a hull list, not a TmdModel, and is a free
- * function; the tail of the file (AccumulateTargetOffset, SetTargetOffset)
- * is NOT TmdModel either: a separate Outer_fa50/Inner_fa50/Target_fa50
- * pointer chain with no confirmed owning class, and SetTargetOffset's one
- * caller is class_3bb8c_o.c.
+ * RotateAndOffsetHullList is a free function over a TmdHull (a counted list
+ * of box corners, the buffer Actor__NotifyMove fills through getModelHull):
+ * it turns each box a quarter turn and offsets one face. The last two,
+ * TmdModel__AddFirstPrimClut and TmdModel__SetFirstPrimClut, move or set the
+ * CLUT id of the model's first primitive (TMD_P_TF3's clut) from a VRAM
+ * position; SetStyleEffectSources (class_3bb8c_o.c) calls the second.
  *
  * Tiers and match evidence for every function are in each function's own
  * docs/match-reports/ file; the unit's own history is in New_TmdModel's.
@@ -29,28 +30,22 @@
 
 /* A counted box list of one: TmdModel__GetHull's local (its count is set
  * to 1, as the hull's is, and never read). */
-typedef struct TypedBox_fa50 {
+typedef struct BoxList {
     s32 count;  /* +0x000 */
     TmdBox box; /* +0x004 */
-} TypedBox_fa50;
+} BoxList;
 
 /* The eight corners of a box as two faces of four (TmdHull's v[0..3] and
  * v[4..7]: the min-z face, then the max-z face). */
-typedef struct Corners_fa50 {
+typedef struct BoxCorners {
     TmdVec3 face[2][4];
-} Corners_fa50;
-
-/* A counted list of boxes' corners (TmdHull is the one-box case). */
-typedef struct HullList_fa50 {
-    s32 count;             /* +0x000 */
-    Corners_fa50 boxes[1]; /* +0x004 */
-} HullList_fa50;
+} BoxCorners;
 
 /* A segment: start and direction (end - start). */
-typedef struct Ray_fa50 {
+typedef struct Ray {
     TmdVec3 org; /* +0x000 */
     TmdVec3 dir; /* +0x006 */
-} Ray_fa50;
+} Ray;
 
 /* A TMD packet's mode byte is its GPU command code (<libgs.h>'s GPU_COM_*),
  * plus this bit for a semi-transparent face (libgpu's setSemiTrans bit). */
@@ -72,26 +67,12 @@ enum RayResult { RAY_MISS = 0, RAY_HIT = 1, RAY_PARALLEL = 2 };
  * still counts as on the face. */
 #define FACE_BOX_MARGIN 24
 
-/* The scratch VECTOR that also holds the candidate triangle's box. */
-typedef union VecBox_fa50 {
+/* TmdModel__RaycastFaces' per-face scratch: Square0's output VECTOR, then
+ * the face's bounding box. */
+typedef union VectorOrBox {
     VECTOR v;
     TmdBox b;
-} VecBox_fa50;
-
-typedef struct Target_fa50 {
-    u8 pad0[0x6];
-    s16 offset; /* +0x006: AccumulateTargetOffset/SetTargetOffset's field */
-} Target_fa50;
-
-typedef struct Inner_fa50 {
-    u8 pad0[0x10];
-    Target_fa50 *target; /* +0x010 */
-} Inner_fa50;
-
-typedef struct Outer_fa50 {
-    u8 pad0[0x10];
-    Inner_fa50 *inner; /* +0x010 */
-} Outer_fa50;
+} VectorOrBox;
 
 extern TmdBox gTmdModelBoundsBuf[];
 extern void *BMemPMgrAlloc(s32 size);
@@ -184,7 +165,7 @@ TmdBox *TmdModel__GetBoundsBuffer(TmdModel *self, s32 i) {
 }
 
 void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
-    TypedBox_fa50 b;
+    BoxList b;
 
     TmdModel__ComputeBounds(self, &b.box);
     b.count = 1;
@@ -215,13 +196,13 @@ void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
     out->count = 1; /* MATCHING: the literal, not b.count, which is reloaded */
 }
 
-void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 delta) {
-    Corners_fa50 tmp;
-    Corners_fa50 *c;
+void RotateAndOffsetHullList(TmdHull *h, s32 turn, s32 back, s32 delta) {
+    BoxCorners tmp;
+    BoxCorners *c;
     s32 i;
 
     for (i = 0; i < h->count; i++) {
-        c = &h->boxes[i];
+        c = &((BoxCorners *)h->v)[i]; /* v[] as count boxes of eight corners */
         if (turn != 0) {
             tmp = *c;
             c->face[0][3] = tmp.face[0][0];
@@ -278,7 +259,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
                            TmdVec3 *end) {
     TmdVec3 tri[4];
     VECTOR plane;
-    Ray_fa50 ray;
+    Ray ray;
     TmdVec3 hit;
     s32 nverts;
     u32 count;
@@ -307,7 +288,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
         VECTOR work;
         VECTOR dirVec;
         VECTOR dirSq;
-        VecBox_fa50 scratch;
+        VectorOrBox scratch;
         s32 dist[2]; /* MATCHING: an array, so it stays in memory (dist[1] unused) */
         s32 frac;
         s32 q;
@@ -641,18 +622,22 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
     return (TmdPrim *)((u8 *)p + size);
 }
 
-void AccumulateTargetOffset(Outer_fa50 *self, s32 *xy) {
-    Target_fa50 *t = self->inner->target;
+/* Adds to the first primitive's CLUT id (every textured TMD packet has it at
+ * +0x006, after tu0/tv0) the id of VRAM position (xy[0], xy[1]): x / 16 +
+ * y * 64, libgpu's getClut() spelled with a division and an add. */
+void TmdModel__AddFirstPrimClut(TmdModel *self, s32 *xy) {
+    TMD_P_TF3 *t = (TMD_P_TF3 *)self->object->prims;
 
-    t->offset += xy[0] / 16;
-    t->offset += xy[1] * 64;
+    t->clut += xy[0] / 16;
+    t->clut += xy[1] * 64;
 }
 
-void SetTargetOffset(Outer_fa50 *self, s16 *xy) {
-    Target_fa50 *t = self->inner->target;
+/* Points the first primitive's CLUT id at the CLUT at VRAM (xy[0], xy[1]). */
+void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy) {
+    TMD_P_TF3 *t = (TMD_P_TF3 *)self->object->prims;
     s32 v;
 
     v = xy[0] / 16;
-    t->offset = v;
-    t->offset = v + xy[1] * 64;
+    t->clut = v;
+    t->clut = v + xy[1] * 64;
 }
