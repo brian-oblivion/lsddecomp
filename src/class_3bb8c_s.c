@@ -9,6 +9,9 @@
  * class_3bb8c_r.c; the rest of the sprite helpers in class_3bb8c_o.c.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "Actor.h"
 #include "VariantSprite.h"
 #include "StyleEffect.h"
@@ -285,7 +288,7 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
         m->setColor(child, arg);
     } else {
         child = self->sprites[1];
-        child->methods->setSemiTrans(child, 1);
+        child->methods->setSemiTransOn(child, 1);
         child->methods->setSemiTransRate(child, 0);
         child->methods->updateScale(child, 1, (parity != 0) ? gSpriteScaleLarge : gSpriteScaleSmall);
     }

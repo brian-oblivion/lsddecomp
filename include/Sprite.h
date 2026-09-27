@@ -23,7 +23,7 @@
  * (mx, my) at the cell's centre and scale 1.0.
  *
  * The inherited slots that act on the GsDOBJ2 in SceneNode act on the
- * GsSPRITE here: setDisplay/setSemiTrans/setSemiTransRate edit
+ * GsSPRITE here: setDisplay/setSemiTransOn/setSemiTransRate edit
  * sprite.attribute (bit 31 inverted, bit 30, bits 28-29: GsDOFF, GsALON,
  * the semitrans rate), updateRotation writes sprite.rotate.
  *
@@ -33,6 +33,9 @@
  * SceneNode's type (it is that class's to change), so a C call through it
  * with arguments needs a cast until SceneNode's slot is retyped.
  *
+ * `image` and InitGsSprite's `tim` are <libgs.h>'s GsIMAGE, so an includer
+ * takes Sony's headers first (`common.h`, <libgte.h>, <libgpu.h>, <libgs.h>).
+ *
  * The object is 0xA0 bytes (New_Sprite).
  */
 
@@ -41,11 +44,6 @@ typedef struct SpriteMethods SpriteMethods;
 typedef struct SpriteRgb SpriteRgb;
 typedef struct SpriteRect SpriteRect;
 typedef struct SpriteGs SpriteGs;
-
-/* The GsIMAGE a TimImage describes its TIM into: Sony's untagged typedef
- * (<libgs.h>), spelled by tag until this header takes Sony's headers
- * (`python3 tools/sonyheaders.py`); only its address is kept here. */
-struct GsIMAGE;
 
 /* A 3-byte colour. All-s8 members give it alignment 1, which is what makes
  * Sprite__SetColor's whole-struct copy compile to lb,lb,lb then sb,sb,sb
@@ -64,7 +62,12 @@ struct SpriteRect {
     /* +0x008 */ s32 h;
 };
 
-/* libgs GsSPRITE, 0x24 bytes (LIBGS.H), with r,g,b as one SpriteRgb. */
+/* libgs GsSPRITE, 0x24 bytes, field for field, with r,g,b as one SpriteRgb.
+ * Kept local rather than Sony's GsSPRITE: Sprite__SetColor copies the colour
+ * as one SpriteRgb (the whole-struct copy is what matches), and
+ * GetSetBitField takes `attribute` as a u32 *, where Sony's is unsigned long;
+ * Sony's type would cost a cast at each of those four sites to save the two
+ * in Viewport__DrawNode. */
 struct SpriteGs {
     /* +0x000 */ u32 attribute; /* GetSetBitField's word: bit 31 GsDOFF, 30 GsALON, 28-29 rate, 24-25 colour mode */
     /* +0x004 */ s16 x;
@@ -100,7 +103,7 @@ struct SpriteGs {
 #define SPRITE_FIELDS(Methods)                                                                     \
     SCENENODE_FIELDS(Methods);                                                                    \
     /* +0x044 */ u8 pad44[4];                                                                      \
-    /* +0x048 */ struct GsIMAGE *image; /* reset: &texture->tim (the TimImage's +0x02C) */          \
+    /* +0x048 */ GsIMAGE *image;        /* reset: &texture->tim (the TimImage's +0x02C) */          \
     /* +0x04C */ SpriteRect rect;       /* reset: a copy of the ctor's cell */                     \
     /* +0x058 */ s32 unk58;             /* zeroed by reset; VariantSprite__UpdateScale: non-zero scales unk5C/unk60 instead of the sprite */ \
     /* +0x05C */ s32 unk5C;             /* VariantSprite__UpdateScale: times the x ratio when unk58 != 0 */ \
@@ -124,7 +127,7 @@ extern SpriteMethods *GetSpriteMethods(void); /* returns &gSpriteMethods */
 Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg4);
 void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5);
 void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect);
-void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, struct GsIMAGE *image);
+void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, GsIMAGE *tim);
 void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table);
 s32 Sprite__SetDisplay(Sprite *self, s32 on);
 s32 Sprite__SetSemiTrans(Sprite *self, s32 on);

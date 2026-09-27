@@ -29,8 +29,9 @@
  * Then the table getter, GetRootNode (update's helper) and Sony's
  * GsSetProjection.
  *
- * The (GsOT *) and (GsRVIEW2 *) casts stand until include/Viewport.h spells
- * ViewportOt and ViewportRefView as Sony's own types.
+ * refView is Viewport.h's ViewportRefView, GsRVIEW2's layout with vp and vr
+ * as vectors (its comment says why), hence the (GsRVIEW2 *) cast at
+ * GsSetRefView2.
  */
 
 /* Forwards to the base onNotify, then dispatches on the sender's class-id
@@ -203,13 +204,13 @@ void Viewport__InitOt(Viewport *self) {
         return;
     }
 
-    self->ot[0] = (ViewportOt *)buf;
-    self->otTags[0] = buf + sizeof(GsOT);
-    self->workBase[0] = (4 << self->otLength) + self->otTags[0];
+    self->ot[0] = (GsOT *)buf;
+    self->otTags[0] = (GsOT_TAG *)(buf + sizeof(GsOT));
+    self->workBase[0] = (PACKET *)self->otTags[0] + (4 << self->otLength);
 
-    self->ot[1] = (ViewportOt *)(size + (s32)self->ot[0]);
-    self->otTags[1] = size + self->otTags[0];
-    self->workBase[1] = size + self->workBase[0];
+    self->ot[1] = (GsOT *)((PACKET *)self->ot[0] + size);
+    self->otTags[1] = (GsOT_TAG *)((PACKET *)self->otTags[0] + size);
+    self->workBase[1] = self->workBase[0] + size;
 
     self->ot[0]->length = self->otLength;
     self->ot[0]->org = self->otTags[0];
@@ -217,8 +218,8 @@ void Viewport__InitOt(Viewport *self) {
     self->ot[1]->length = self->otLength;
     self->ot[1]->org = self->otTags[1];
 
-    GsClearOt(0, 0, (GsOT *)self->ot[0]);
-    GsClearOt(0, 0, (GsOT *)self->ot[1]);
+    GsClearOt(0, 0, self->ot[0]);
+    GsClearOt(0, 0, self->ot[1]);
 
     self->otReady = 1;
     self->otIndex = 0;
@@ -282,10 +283,10 @@ void Viewport__Update(Viewport *self) {
     self->zDiv = (u32)(self->farZ - self->nearZ) / (u32)(1 << self->otLength) + 1;
 
     idx = self->otIndex;
-    GsSetWorkBase((PACKET *)self->workBase[idx]);
+    GsSetWorkBase(self->workBase[idx]);
 
     idx = self->otIndex;
-    GsClearOt(0, 0, (GsOT *)self->ot[idx]);
+    GsClearOt(0, 0, self->ot[idx]);
 
     self->methods->drawNode(self, self->sceneRoot);
 
@@ -321,10 +322,10 @@ void Viewport__Flip(Viewport *self) {
     }
 
     idx = self->otIndex;
-    GsSortClear(self->clearColor.r, self->clearColor.g, self->clearColor.b, (GsOT *)self->ot[idx]);
+    GsSortClear(self->clearColor.r, self->clearColor.g, self->clearColor.b, self->ot[idx]);
 
     idx = self->otIndex;
-    GsDrawOt((GsOT *)self->ot[idx]);
+    GsDrawOt(self->ot[idx]);
 
     if (self->unkB4 != 0 && self->otIndex == 0) {
         self->drawSystem->methods->swapBuffers(self->drawSystem);

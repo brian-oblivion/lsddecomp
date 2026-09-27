@@ -42,6 +42,9 @@
  */
 
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_2cc8c.h"
 #include "VabStreamObj.h"
 #include "BgLayer.h"

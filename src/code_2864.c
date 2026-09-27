@@ -22,9 +22,8 @@
  *
  * Types are Sony's (libgte.h, libgs.h) and the classes' own. SceneNode's
  * coord2 is the parked SceneNodeSub14 view of GsCOORDINATE2, the subclasses
- * spell their GsBG/GsBOXF/GsSPRITE field by field, and Viewport.h's
- * ViewportOt is a local view of GsOT: hence the casts to Sony's types at the
- * libgs calls.
+ * spell their GsBG/GsBOXF/GsSPRITE field by field: hence the casts to
+ * Sony's types at the libgs calls. The OT is Viewport's own GsOT.
  */
 #include "common.h"
 #include <libgte.h>
@@ -121,7 +120,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
 
     tag = node->methods->header;
     if ((tag & 0xFF) == 0x54) {
-        GsSortBg((GsBG *)&((BgLayer *)node)->bgAttribute, (GsOT *)self->ot[self->otIndex],
+        GsSortBg((GsBG *)&((BgLayer *)node)->bgAttribute, self->ot[self->otIndex],
                  (1 << self->otLength) - 1);
     } else if ((tag & 0xFF) == 0x64) {
         BoxFill *b = (BoxFill *)node;
@@ -132,14 +131,14 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             b->boxX = b->posX;
             b->boxY = b->posY;
         }
-        GsSortBoxFill((GsBOXF *)&b->boxAttribute, (GsOT *)self->ot[self->otIndex], b->pri);
+        GsSortBoxFill((GsBOXF *)&b->boxAttribute, self->ot[self->otIndex], b->pri);
     } else if ((tag & 0xFF) != 0x44) {
         GsGetLws((GsCOORDINATE2 *)node->coord2, lw, ls);
         GsSetLightMatrix(lw);
         GsSetLsMatrix(ls);
         if (node->tmd != 0) {
-            SortTmdObject((GsDOBJ2 *)&node->attribute, (GsOT *)self->ot[self->otIndex],
-                          14 - self->otLength, (void *)0x1F800000);
+            SortTmdObject((GsDOBJ2 *)&node->attribute, self->ot[self->otIndex], 14 - self->otLength,
+                          (void *)0x1F800000);
         }
     } else if ((tag & 0xFFF) == 0x144) {
         ScreenSprite *n = (ScreenSprite *)node;
@@ -149,7 +148,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         sp->y = (n->screenPos.y != 0) ? ((size[1] >> 1) * 100) / (10000 / n->screenPos.y) : 0;
         sp->x += sp->mx;
         sp->y += sp->my;
-        GsSortSprite(sp, (GsOT *)self->ot[self->otIndex], 0);
+        GsSortSprite(sp, self->ot[self->otIndex], 0);
     } else {
         VECTOR pos;
         SVECTOR scr; /* never used; reserves retail's 8 unused frame bytes */
@@ -184,7 +183,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             } else {
                 n->sprite.y = 0x200;
             }
-            GsSortSprite((GsSPRITE *)&n->sprite, (GsOT *)self->ot[self->otIndex], pos.vz);
+            GsSortSprite((GsSPRITE *)&n->sprite, self->ot[self->otIndex], pos.vz);
         }
     }
 }

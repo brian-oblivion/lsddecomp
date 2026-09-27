@@ -120,7 +120,7 @@ struct SceneNodeSub14 {
     /* +0x058 */ void (*getNextAttachedChild)(Self *self, SceneNode **entry, BasicClassListNode **cursor); /* SceneNode__GetNextAttachedChild */ \
     /* +0x05C */ void (*slot5C)(Self *self, s32 arg1); /* SceneNode__NoOpSlot5C; Finalize passes (self, 0) */ \
     /* +0x060 */ s32 (*setDisplay)(Self *self, s32 on); /* SceneNode__SetDisplay: GsDOFF */ \
-    /* +0x064 */ u32 (*setSemiTrans)(Self *self, s32 on); /* SceneNode__SetSemiTrans: GsALON */ \
+    /* +0x064 */ u32 (*setSemiTransOn)(Self *self, s32 on); /* SceneNode__SetSemiTrans: GsALON; not setSemiTrans, which is <libgpu.h>'s macro */ \
     /* +0x068 */ u32 (*setSemiTransRate)(Self *self, u32 rate); /* SceneNode__SetSemiTransRate: GsAZERO..GsATHREE */ \
     /* +0x06C */ u32 (*setLighting)(Self *self, s32 on); /* SceneNode__SetLighting: GsLOFF */ \
     /* +0x070 */ u32 (*setLightMode)(Self *self, u32 mode); /* SceneNode__SetLightMode: GsFOG, GsMATE, GsLLMOD */ \

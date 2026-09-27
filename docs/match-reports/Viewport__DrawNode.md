@@ -108,3 +108,11 @@ Renamed from `Unk18Obj__DrawNode`. Slot +0x0A0 `drawNode`. `self` is now `Viewpo
   SceneNode__LinkModel spells it for GsLinkObject4; coord2 is cast to `GsCOORDINATE2 *` where
   its matrix or param is read (SceneNode.h's SceneNodeSub14 is still the parked view). Byte-exact
   on the first build.
+
+Round 96 (alpha, track 6). include/Viewport.h's local `ViewportOt` (a
+0x14-byte view of the GsOT header: length, org, pad) is deleted: `ot[2]` is
+Sony's `GsOT *`, `otTags[2]` Sony's `GsOT_TAG *` (each header's `org`) and
+`workBase[2]` Sony's `PACKET *` (GsSetWorkBase's argument), and every unit
+including Viewport.h takes Sony's headers after common.h. The `(GsOT *)`
+casts at GsClearOt, GsSortClear, GsDrawOt and drawNode's five sort calls and
+Update's `(PACKET *)` cast are gone. Byte-identical (whole image green).

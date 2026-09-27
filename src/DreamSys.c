@@ -30,6 +30,9 @@
  *    records the link (enum DreamSysLinkCode) in Actor's `state` and tells
  *    the parents. */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include <memory.h>
 #include <rand.h>
 #include "DreamSys.h"

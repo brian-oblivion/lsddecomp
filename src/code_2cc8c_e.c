@@ -1,4 +1,7 @@
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_2cc8c.h"
 
 /*
@@ -42,7 +45,7 @@ void FadeBox__Reset(FadeBox *self, s32 channels) {
     self->channels = 0;
     self->unk7C = 0;
     self->methods->setDisplay(self, 0);
-    self->methods->setSemiTrans(self, 0);
+    self->methods->setSemiTransOn(self, 0);
     self->altMode = 0;
 }
 
@@ -136,7 +139,7 @@ s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3
     q2 = q2 / self->ticksLeft;
     self->maskPerTick = q2;
     methods->addChild(self, source);
-    methods->setSemiTrans(self, 1);
+    methods->setSemiTransOn(self, 1);
     methods->setSemiTransRate(self, rate);
     methods->setDisplay(self, 1);
     return channels;
@@ -154,7 +157,7 @@ void FadeBox__Stop(FadeBox *self, BasicClass *source) {
         event = 5;
         if (self->altMode == 0) {
             methods->setDisplay(self, 0);
-            methods->setSemiTrans(self, 0);
+            methods->setSemiTransOn(self, 0);
         }
     } else {
         event = 6;
@@ -162,7 +165,7 @@ void FadeBox__Stop(FadeBox *self, BasicClass *source) {
             if (self->channels == 0xF) {
                 methods->setColor(self, 1, D_8006EAA8);
             }
-            methods->setSemiTrans(self, 0);
+            methods->setSemiTransOn(self, 0);
         }
     }
     methods->removeChild(self, source);

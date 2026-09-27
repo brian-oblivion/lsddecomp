@@ -250,3 +250,11 @@ extern void GsClearOt(s32 a0, s32 a1, ViewportOt *ot);
 ## Track 7 (round 95, alpha, polish pass)
 
 Light mode 1 is `GsLMODE_FOG` (libgs.h); 3 stays a literal, since LIBGS.H names only modes 0..2 (`GsLMODE_NORMAL`, `GsLMODE_FOG`, `GsLMODE_LOFF`). The far colour is read as `(u8)self->farColor.r` etc. rather than through a `u8 *` over the struct, and `GsSetWorkBase` takes a `(PACKET *)`; byte-identical. Measured for a proposal: retyping ViewportRgb's three fields to `u8` (include/Viewport.h) is byte-identical across the whole image, and would drop the casts.
+
+Round 96 (alpha, track 6). include/Viewport.h's local `ViewportOt` (a
+0x14-byte view of the GsOT header: length, org, pad) is deleted: `ot[2]` is
+Sony's `GsOT *`, `otTags[2]` Sony's `GsOT_TAG *` (each header's `org`) and
+`workBase[2]` Sony's `PACKET *` (GsSetWorkBase's argument), and every unit
+including Viewport.h takes Sony's headers after common.h. The `(GsOT *)`
+casts at GsClearOt, GsSortClear, GsDrawOt and drawNode's five sort calls and
+Update's `(PACKET *)` cast are gone. Byte-identical (whole image green).

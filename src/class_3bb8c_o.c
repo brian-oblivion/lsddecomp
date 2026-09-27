@@ -23,6 +23,9 @@
  *    subclass's table getter (named round 73), placed here by ROM address.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "Actor.h"
 #include "TmdModel.h"
 #include "StyleEffect.h"

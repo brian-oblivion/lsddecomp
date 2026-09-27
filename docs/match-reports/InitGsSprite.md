@@ -52,3 +52,11 @@ A byte store of a constant >= 0x80 into an s8 field compiles to `li reg,-0x80..`
 ## Round 95 (alpha, track 6: Sony headers)
 
 Its prototype (include/Sprite.h) still spells the parameter `struct GsIMAGE *`, an incomplete tag now that TimImage's GsIMAGE is Sony's anonymous typedef; the body reads through a `GsIMAGE *tim = (GsIMAGE *)image` local (was `image->`). Interim until Sprite.h takes `GsIMAGE *` (see Sprite__Reset). Byte-identical.
+
+Round 96 (alpha, track 6). The parameter is Sony's `GsIMAGE *tim` in the
+prototype (include/Sprite.h) and the definition; the `GsIMAGE *tim =
+(GsIMAGE *)image` local is gone and the body reads `tim->` directly.
+Byte-identical. `sprite` stays the local SpriteGs rather than Sony's
+GsSPRITE: Sprite__SetColor's whole-struct copy needs `rgb` as one SpriteRgb,
+and GetSetBitField takes `attribute` as u32 * (Sony's is unsigned long), so
+Sony's type would add four casts to save two (Viewport__DrawNode).

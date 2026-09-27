@@ -28,6 +28,9 @@
  */
 
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_2cc8c.h"
 #include "Viewport.h"
 #include "LightRig.h"

@@ -221,7 +221,7 @@ void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, voi
 
 /* gSpriteMethods slot +0x040 (reset): bind the texture and cell, rebuild the GsSPRITE. */
 void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
-    self->image = (struct GsIMAGE *)&((TimImage *)texture)->tim;
+    self->image = &((TimImage *)texture)->tim;
     self->rect = *rect;
     InitGsSprite(&self->sprite, abr, rect, self->image);
     self->unk58 = 0;
@@ -229,13 +229,8 @@ void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
 
 /* Fill a GsSPRITE from a texture image and a cell: colour mode and tpage
  * from the image, size and u,v from the cell, the pivot at its centre,
- * neutral colour, scale 1.0 and no rotation. `image` is <libgs.h>'s GsIMAGE
- * (a TimImage's `tim`); include/Sprite.h still spells it by the tag `struct
- * GsIMAGE`, which Sony's anonymous typedef never completes, so this body and
- * Sprite__Reset cast until Sprite.h can take <libgs.h> (code_2cc8c_d.c, one
- * of its includers, cannot yet). */
-void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, struct GsIMAGE *image) {
-    GsIMAGE *tim = (GsIMAGE *)image;
+ * neutral colour, scale 1.0 and no rotation. `tim` is a TimImage's GsIMAGE. */
+void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, GsIMAGE *tim) {
     s32 mode = tim->pmode & 3;
     s32 grey = 0x80;
 
