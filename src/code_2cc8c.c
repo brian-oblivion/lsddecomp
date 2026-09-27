@@ -1,44 +1,17 @@
-/* code_2cc8c -- first 20-function slice of the 0x2CC8C block (153 functions
- * total; the remainder is the code_2cc8c_b asm segment).
+/* code_2cc8c -- TaskCore's own methods from +0x058 to +0x0C0: the pad
+ * dispatch and its five button handlers, the state machine (update and
+ * setState), the frame bound, the sound call, the view callback and the
+ * fade-in/fade-out pair. Each is the default for its slot in
+ * gTaskCoreMethods, which StreamTask, TitleMenu and GraphRoom inherit or
+ * override; include/TaskCore.h's banner describes the class and its states.
+ * The slot and item-list methods that follow are in code_2cc8c_b.c.
  *
- * Carved in round 10 on the belief that this block had the LOWEST
- * toolchain-blocker density of any uncarved segment. That belief was
- * retracted the same round for two of the 20 -- `TaskCore__OnPadEvent` and
- * `TaskCore__SetState`, whose jump-table dispatch hits
- * `addiu $at, $at, %lo(jtbl_*)`. The retraction was RIGHT: a `jtbl_*` symbol
- * is not a safe exception to that screen, because cc1 emits the same generic
- * pseudo-op for an indexed data global and a switch jump table and the fold
- * happens in maspsx, below cc1, which cannot tell them apart.
- *
- * BOTH OF THOSE ARE NOW MATCHED (round 23). The analysis above stands; only
- * the VERDICT expired, because round 21 resolved `addiu_at` itself -- maspsx
- * gained a `--addiu-at` flag that emits retail's unfolded four-instruction
- * indexed form directly (docs/research/addiu-at-blocker.md). `addiu_at` is
- * no longer a blocker anywhere; do not screen for it and do not file a stall
- * against it -- and as of round 63 (CLAUDE.md, "Open toolchain blockers")
- * there are no open toolchain blockers of any kind left in this project.
- *
- * The history is kept rather than deleted because it is this unit that
- * established the jtbl-is-not-an-exception discriminator, and that finding
- * outlived the blocker it was about.
- *
- * Shape: this is class-framework code. Every function in this file is
- * TaskCore's own (include/TaskCore.h, track 4 round 84; its object was
- * viewed here as `Obj86B60` until then), the default for its slot in
- * gTaskCoreMethods, which StreamTask, TitleMenu and GraphRoom
- * inherit or override. TaskCore__OnPadEvent is IntermediateBase's Pad
- * case, switching on the event to the five onPad* handlers;
- * TaskCore__Update and TaskCore__SetState drive the state machine the
- * header's banner describes; the rest are the frame bound, the sound
- * call, the view callback and the fade-in/fade-out pair (a running colour
- * from `frameCounter * fadeRate` against `baseColor`).
- *
- * Round 78 (delta): full track-3 naming pass. All 20 functions were already
- * matched (rounds 10-23); this round named every one via `tools/rename.py`
- * and corrected a pre-existing error in the header's slot74..slot84
- * occupant mapping (it had the five message handlers reversed -- see
- * include/code_2cc8c.h's own comment on that struct field). See each
- * function's own match report's `## Naming` section for evidence.
+ * Input: while inputMode is not NONE, onPadEvent maps a press to a handler;
+ * each handler plays the button tone (or moves a cursor) and reports what
+ * happened as a state, which setState passes to the parents and then folds
+ * back into ACTIVE. Fades: tickColorFade adds frameCounter * fadeRate to
+ * baseColor and pushes the result to every slot widget and the BgLayer,
+ * until it passes TASKCORE_FADE_FULL.
  */
 
 #include "common.h"
@@ -48,26 +21,28 @@
 #include "code_2cc8c.h"
 #include "VabStreamObj.h"
 #include "BgLayer.h"
+#include "Pad.h"
 
 void TaskCore__OnPadEvent(TaskCore *self, BasicClass *sender, s32 event) {
     TaskCoreMethods *methods;
 
     methods = self->methods;
-    if (self->inputMode != 0) {
+    if (self->inputMode != TASKCORE_INPUT_NONE) {
+        /* MATCHING: the case order is retail's arm order (its jump table). */
         switch (event) {
-            case 0x12:
+            case PAD_EVENT_PRESSED + PAD_BUTTON_LUP:
                 methods->onPadPrev(self);
                 break;
-            case 0x13:
+            case PAD_EVENT_PRESSED + PAD_BUTTON_LDOWN:
                 methods->onPadNext(self);
                 break;
-            case 0x21:
-                methods->onPad21(self);
+            case PAD_EVENT_PRESSED + PAD_BUTTON_START:
+                methods->onPadStart(self);
                 break;
-            case 0x17:
+            case PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN:
                 methods->onPadCancel(self);
                 break;
-            case 0x19:
+            case PAD_EVENT_PRESSED + PAD_BUTTON_RRIGHT:
                 methods->onPadConfirm(self);
                 break;
         }
@@ -79,26 +54,27 @@ void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event) {
 
     methods = self->methods;
     Get_vtable_IntermediateBase()->update((IntermediateBase *)self, sender, event);
-    if (self->inputMode != 0) {
-        u32 bound;
+    if (self->inputMode != TASKCORE_INPUT_NONE) {
+        u32 frames;
 
-        bound = self->frameCounter;
-        if ((u32)self->frameBound < bound) {
-            methods->setState(self, 6);
+        /* MATCHING: frameCounter is loaded before frameBound. */
+        frames = self->frameCounter;
+        if ((u32)self->frameBound < frames) {
+            methods->setState(self, TASKCORE_STATE_TIMED_OUT);
         }
     }
     switch (self->state) {
-        case 2:
-            methods->setState(self, 4);
+        case INTERMEDIATEBASE_STATE_START:
+            methods->setState(self, TASKCORE_STATE_FADE_IN);
             break;
-        case 4:
+        case TASKCORE_STATE_FADE_IN:
             methods->tickFadeCallback(self);
             break;
-        case 7:
+        case TASKCORE_STATE_FADE_OUT:
             methods->tickFadeOutCallback(self);
             break;
-        case 8:
-            methods->setState(self, 3);
+        case TASKCORE_STATE_FADED_OUT:
+            methods->setState(self, INTERMEDIATEBASE_STATE_STOP);
             break;
     }
 }
@@ -109,41 +85,41 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
     methods = self->methods;
     Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, state);
     switch (state) {
-        case 5:
+        case TASKCORE_STATE_ACTIVE:
             methods->broadcastToSlots(self, self->target->unselectedColor);
             methods->setActiveSlot(self, self->target->unk8, 0);
             self->frameCounter = 0;
-            self->inputMode = 1;
+            self->inputMode = TASKCORE_INPUT_CHOOSING_SLOT;
             break;
-        case 6:
+        case TASKCORE_STATE_TIMED_OUT:
             self->result = 1;
             methods->refreshViewValue(self);
             break;
-        case 4:
-        case 7:
+        case TASKCORE_STATE_FADE_IN:
+        case TASKCORE_STATE_FADE_OUT:
             self->frameCounter = 0;
-            self->inputMode = 0;
+            self->inputMode = TASKCORE_INPUT_NONE;
             break;
-        case 8:
+        case TASKCORE_STATE_FADED_OUT:
             self->frameCounter = 0;
             break;
-        case 9:
-        case 0xA:
-        case 0xB:
-        case 0xE:
-        case 0xF:
-        case 0x10:
-        case 0x11:
-            self->state = 5;
+        case TASKCORE_STATE_CURSOR_MOVED:
+        case TASKCORE_STATE_START_PRESSED:
+        case TASKCORE_STATE_SLOT_CONFIRMED:
+        case TASKCORE_STATE_SCROLL_OPENED:
+        case TASKCORE_STATE_ITEM_CONFIRMED:
+        case TASKCORE_STATE_SCROLL_COMMITTED:
+        case TASKCORE_STATE_SCROLL_CANCELLED:
+            self->state = TASKCORE_STATE_ACTIVE;
             self->frameCounter = 0;
             switch (state) {
-                case 0xB:
+                case TASKCORE_STATE_SLOT_CONFIRMED:
                     methods->tick(self);
                     break;
-                case 0xF:
+                case TASKCORE_STATE_ITEM_CONFIRMED:
                     methods->commitElementScroll(self);
                     break;
-                case 0x11:
+                case TASKCORE_STATE_SCROLL_CANCELLED:
                     methods->cancelElementScroll(self);
                     break;
             }
@@ -154,7 +130,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
 void TaskCore__SetFrameBound(TaskCore *self, s32 bound) {
     self->frameBound = bound;
     if (bound >= 0) {
-        self->frameBound = bound * 20;
+        self->frameBound = bound * TASKCORE_FRAMES_PER_SECOND;
     }
 }
 
@@ -163,46 +139,46 @@ void TaskCore__PlaySound(TaskCore *self, s32 tone) {
 
     sound = (VabStreamObj *)self->sound;
     if (sound != NULL) {
-        sound->methods->playTone(sound, tone, 0x60, 0x60);
+        sound->methods->playTone(sound, tone, TASKCORE_TONE_VOLUME, TASKCORE_TONE_VOLUME);
     }
 }
 
-void TaskCore__func_8003C7F4(TaskCore *self) {
+void TaskCore__OnPadStart(TaskCore *self) {
     if (self->target != NULL) {
-        self->methods->playSound(self, 0x10);
-        self->methods->setState(self, 0xA);
+        self->methods->playSound(self, TASKCORE_TONE_BUTTON);
+        self->methods->setState(self, TASKCORE_STATE_START_PRESSED);
     }
 }
 
 void TaskCore__OnPadConfirm(TaskCore *self) {
-    s32 reason;
+    s32 state;
 
     if (self->target != NULL) {
-        self->methods->playSound(self, 0x10);
-        reason = 0xF;
-        if (self->inputMode == 1) {
-            reason = 0xB;
+        self->methods->playSound(self, TASKCORE_TONE_BUTTON);
+        state = TASKCORE_STATE_ITEM_CONFIRMED;
+        if (self->inputMode == TASKCORE_INPUT_CHOOSING_SLOT) {
+            state = TASKCORE_STATE_SLOT_CONFIRMED;
         }
-        self->methods->setState(self, reason);
+        self->methods->setState(self, state);
     }
 }
 
 void TaskCore__OnPadCancel(TaskCore *self) {
-    if (self->target != NULL && self->inputMode != 1) {
-        self->methods->playSound(self, 0x10);
-        self->methods->setState(self, 0x11);
+    if (self->target != NULL && self->inputMode != TASKCORE_INPUT_CHOOSING_SLOT) {
+        self->methods->playSound(self, TASKCORE_TONE_BUTTON);
+        self->methods->setState(self, TASKCORE_STATE_SCROLL_CANCELLED);
     }
 }
 
 void TaskCore__OnPadPrev(TaskCore *self) {
-    void (*handler)(TaskCore *self);
+    void (*handler)(TaskCore *self); /* MATCHING: one call site, not one per arm */
 
     if (self->target == NULL) {
         return;
     }
-    if (self->inputMode == 1) {
+    if (self->inputMode == TASKCORE_INPUT_CHOOSING_SLOT) {
         handler = self->methods->findPrevFreeSlot;
-    } else if (self->inputMode == 2) {
+    } else if (self->inputMode == TASKCORE_INPUT_SCROLLING) {
         handler = self->methods->retreatSlotCursor;
     } else {
         return;
@@ -211,14 +187,14 @@ void TaskCore__OnPadPrev(TaskCore *self) {
 }
 
 void TaskCore__OnPadNext(TaskCore *self) {
-    void (*handler)(TaskCore *self);
+    void (*handler)(TaskCore *self); /* MATCHING: one call site, not one per arm */
 
     if (self->target == NULL) {
         return;
     }
-    if (self->inputMode == 1) {
+    if (self->inputMode == TASKCORE_INPUT_CHOOSING_SLOT) {
         handler = self->methods->findNextFreeSlot;
-    } else if (self->inputMode == 2) {
+    } else if (self->inputMode == TASKCORE_INPUT_SCROLLING) {
         handler = self->methods->advanceSlotCursor;
     } else {
         return;
@@ -228,13 +204,13 @@ void TaskCore__OnPadNext(TaskCore *self) {
 
 void TaskCore__Tick(TaskCore *self) {
     TaskCoreTarget *target;
-    s32 idx;
+    s32 slot;
 
     target = self->target;
-    idx = self->activeSlot;
-    if (target->unk24[idx] != NULL) {
+    slot = self->activeSlot;
+    if (target->unk24[slot] != NULL) {
         self->methods->beginElementScroll(self);
-    } else if (idx == target->unkC) {
+    } else if (slot == target->exitSlot) {
         self->methods->refreshViewValue(self);
     }
 }
@@ -243,7 +219,7 @@ void TaskCore__RefreshViewValue(TaskCore *self) {
     if (self->viewCallback != NULL) {
         self->viewCallback(self->viewCallbackCtx);
     }
-    self->methods->setState(self, 7);
+    self->methods->setState(self, TASKCORE_STATE_FADE_OUT);
 }
 
 void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx) {
@@ -254,7 +230,7 @@ void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ct
 void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable) {
     TaskCoreMethods *methods;
 
-    methods = self->methods;
+    methods = self->methods; /* MATCHING: loaded before the switch, on every path */
     switch (enable) {
         case 0:
             self->fadeInCallback = NULL;
@@ -268,7 +244,7 @@ void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable) {
 void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable) {
     TaskCoreMethods *methods;
 
-    methods = self->methods;
+    methods = self->methods; /* MATCHING: loaded before the switch, on every path */
     switch (enable) {
         case 0:
             self->fadeOutCallback = NULL;
@@ -279,12 +255,13 @@ void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable) {
     }
 }
 
-/* Each colour is copied as a BgLayerRgb (GsBG r, g, b; lb/sb, so signed):
- * baseColor is what TickColorFade's base and the BgLayer's setColor take. */
-void TaskCore__SetColors(TaskCore *self, u8 *a1, u8 *a2, u8 *a3) {
-    *(BgLayerRgb *)self->baseColor = *(BgLayerRgb *)a1;
-    *(BgLayerRgb *)self->unk93 = *(BgLayerRgb *)a2;
-    *(BgLayerRgb *)self->unk96 = *(BgLayerRgb *)a3;
+/* baseColor is where the fade-in starts; unk93 is what onDeinit clears the
+ * screen to (TaskCore__Reset's defaults: black, black, 128 grey).
+ * MATCHING: each colour is copied as a BgLayerRgb (signed bytes: lb/sb). */
+void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *color96) {
+    *(BgLayerRgb *)self->baseColor = *(BgLayerRgb *)base;
+    *(BgLayerRgb *)self->unk93 = *(BgLayerRgb *)clear;
+    *(BgLayerRgb *)self->unk96 = *(BgLayerRgb *)color96;
 }
 
 void TaskCore__SetFadeRate(TaskCore *self, s32 rate) {
@@ -292,42 +269,43 @@ void TaskCore__SetFadeRate(TaskCore *self, s32 rate) {
 }
 
 s32 TaskCore__TickFadeCallback(TaskCore *self) {
-    s32 result;
+    s32 done;
 
-    result = 1;
+    done = 1;
     if (self->fadeInCallback != NULL) {
-        result = self->fadeInCallback(self);
+        done = self->fadeInCallback(self);
     }
-    if (result != 0) {
-        self->methods->setState(self, 5);
+    if (done != 0) {
+        self->methods->setState(self, TASKCORE_STATE_ACTIVE);
     }
-    return result;
+    return done;
 }
 
 s32 TaskCore__TickColorFade(TaskCore *self) {
-    s32 prod;
-    u8 buffer[3];
+    s32 level;
+    u8 color[3];
 
-    prod = self->frameCounter * self->fadeRate;
-    buffer[0] = prod + self->baseColor[0];
-    buffer[1] = prod + self->baseColor[1];
-    buffer[2] = prod + self->baseColor[2];
-    self->methods->broadcastToSlots(self, buffer);
-    self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)buffer);
-    return (u8)prod >= 0x81;
+    level = self->frameCounter * self->fadeRate;
+    /* MATCHING: level first; base + level swaps the addu operands. */
+    color[0] = level + self->baseColor[0];
+    color[1] = level + self->baseColor[1];
+    color[2] = level + self->baseColor[2];
+    self->methods->broadcastToSlots(self, color);
+    self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)color);
+    return (u8)level > TASKCORE_FADE_FULL;
 }
 
 s32 TaskCore__TickFadeOutCallback(TaskCore *self) {
-    s32 result;
+    s32 done;
 
-    result = 1;
+    done = 1;
     if (self->fadeOutCallback != NULL) {
-        result = self->fadeOutCallback(self);
-        if (result == 0) {
-            goto epilogue;
+        done = self->fadeOutCallback(self);
+        if (done == 0) {
+            goto epilogue; /* MATCHING: an early return here branches differently */
         }
     }
-    self->methods->setState(self, 8);
+    self->methods->setState(self, TASKCORE_STATE_FADED_OUT);
 epilogue:
-    return result;
+    return done;
 }

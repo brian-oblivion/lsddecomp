@@ -67,3 +67,12 @@ definition-only rename + rebuild can tell which are this same struct.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__SetFrameBound (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 98, alpha)
+
+`bound * 20` is `bound * TASKCORE_FRAMES_PER_SECOND` (tier B, include/TaskCore.h):
+DrawSystem__Init sets vsyncCount 3, so the game draws 20 frames a second
+and frameCounter counts them, which makes `bound` seconds. A negative bound
+is stored as is, and TaskCore__Update's unsigned compare then never fires:
+no time limit. StreamTask__SetFrameBound's 15 is a different rate
+(proposed as its own constant). Byte-identical.

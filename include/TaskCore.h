@@ -39,7 +39,7 @@
  *
  * Input. onPadEvent (IntermediateBase's Pad case) is a switch on the event
  * while inputMode is nonzero: 0x12 onPadPrev, 0x13 onPadNext, 0x17
- * onPadCancel, 0x19 onPadConfirm, 0x21 onPad21. inputMode 1 moves between
+ * onPadCancel, 0x19 onPadConfirm, 0x21 onPadStart. inputMode 1 moves between
  * the target's slots (find{Next,Prev}FreeSlot, setActiveSlot), 2 scrolls
  * the active slot's item list (beginElementScroll from tick, then
  * {advance,retreat}SlotCursor and commit/cancel). Confirm, cancel and 0x21
@@ -75,14 +75,56 @@ typedef struct TaskCore TaskCore;
 typedef struct TaskCoreMethods TaskCoreMethods;
 typedef struct TaskCoreTarget TaskCoreTarget;
 
+/* TaskCore's states, above IntermediateBase's START/STOP. setState passes
+ * each to the parents (notifyParents) before acting on it, so the codes from
+ * CURSOR_MOVED on are also events a parent reacts to (TitleMenu__SetState's
+ * START_PRESSED); every one of them returns the menu to ACTIVE. */
+enum TaskCoreState {
+    TASKCORE_STATE_FADE_IN = 4, /* update from START: tickFadeCallback until the fade-in is done */
+    TASKCORE_STATE_ACTIVE = 5,  /* the target's unk8 slot selected, inputMode CHOOSING_SLOT */
+    TASKCORE_STATE_TIMED_OUT = 6, /* update: frameCounter passed frameBound; result 1, refreshViewValue */
+    TASKCORE_STATE_FADE_OUT = 7, /* refreshViewValue: tickFadeOutCallback until the fade-out is done */
+    TASKCORE_STATE_FADED_OUT = 8,       /* update goes on to IntermediateBase's STOP */
+    TASKCORE_STATE_CURSOR_MOVED = 9,    /* setActiveSlot, setSlotCursor */
+    TASKCORE_STATE_START_PRESSED = 10,  /* onPadStart */
+    TASKCORE_STATE_SLOT_CONFIRMED = 11, /* onPadConfirm while choosing a slot: runs tick */
+    TASKCORE_STATE_SCROLL_OPENED = 14,  /* beginElementScroll */
+    TASKCORE_STATE_ITEM_CONFIRMED = 15, /* onPadConfirm while scrolling: runs commitElementScroll */
+    TASKCORE_STATE_SCROLL_COMMITTED = 16, /* commitElementScroll */
+    TASKCORE_STATE_SCROLL_CANCELLED =
+        17 /* onPadCancel while scrolling, then cancelElementScroll: runs cancelElementScroll */
+};
+
+/* inputMode: what the pad events move. */
+enum TaskCoreInputMode {
+    TASKCORE_INPUT_NONE = 0,          /* fading: onPadEvent ignores the pad */
+    TASKCORE_INPUT_CHOOSING_SLOT = 1, /* Up/Down move between the target's slots */
+    TASKCORE_INPUT_SCROLLING = 2      /* Up/Down move the active slot's item cursor */
+};
+
+/* playSound's tones: VabStreamObj__PlayTone indices, program << 4 | tone. */
+#define TASKCORE_TONE_CURSOR 0x00 /* setActiveSlot, setSlotCursor: the cursor moved */
+#define TASKCORE_TONE_BUTTON 0x10 /* onPadStart, onPadConfirm, onPadCancel */
+#define TASKCORE_TONE_VOLUME 96   /* playSound's PlayTone vol and endVol */
+
+/* The fades' end point: a GsBG/sprite colour of 128 draws the texture at its
+ * own brightness. tickColorFade counts up from baseColor and is done past it,
+ * tickFadeColor counts down from it and is done when it wraps below 0. */
+#define TASKCORE_FADE_FULL 128
+
+/* setFrameBound's unit: DrawSystem__Init sets vsyncCount 3, so the game
+ * draws 60 / 3 = 20 frames a second and frameCounter counts them;
+ * setFrameBound(bound) is `bound` seconds. (StreamTask's override uses 15.) */
+#define TASKCORE_FRAMES_PER_SECOND 20
+
 /* The menu description setTarget builds its slot widgets from (the ctor's
  * first argument; TitleMenu passes &D_80086D44). One slot per `names`
  * entry. */
 struct TaskCoreTarget {
     /* +0x000 */ const char *path; /* non-NULL: setTarget loads `handle` from it (New_TimImage) and releaseTarget releases that */
     /* +0x004 */ BasicClass *handle; /* New_TimImage(path), or the caller's own when path is NULL; the slot widgets' first argument */
-    /* +0x008 */ s32 unk8; /* setState(5): setActiveSlot(unk8, 0) */
-    /* +0x00C */ s32 unkC; /* tick: confirming this slot runs refreshViewValue */
+    /* +0x008 */ s32 unk8;     /* setState(5): setActiveSlot(unk8, 0) */
+    /* +0x00C */ s32 exitSlot; /* tick: confirming this slot (one with no item list) runs refreshViewValue, which fades the menu out */
     /* +0x010 */ u8 unselectedColor[3]; /* broadcastToSlots at state 5; the colour a slot or item loses focus to */
     /* +0x013 */ u8 selectedColor[3]; /* setActiveSlot's colour for the new slot */
     /* +0x016 */ u8 pad16[2];
@@ -95,12 +137,12 @@ struct TaskCoreTarget {
 /* clang-format off */
 #define TASKCORE_SLOTS(Self, CtorParams)                                                           \
     INTERMEDIATEBASE_SLOTS(Self, CtorParams);                                                      \
-    /* +0x06C */ void (*setFrameBound)(Self *self, s32 bound);   /* TaskCore__SetFrameBound: frameBound = bound * 20 (negative: kept) */ \
+    /* +0x06C */ void (*setFrameBound)(Self *self, s32 bound);   /* TaskCore__SetFrameBound: frameBound = bound seconds of frames (negative: kept, no bound) */ \
     /* +0x070 */ void (*playSound)(Self *self, s32 tone);        /* TaskCore__PlaySound */         \
     /* +0x074..+0x084: onPadEvent's cases. Called with self alone: $a1 still  \
      * holds the sender at that call, but no occupant in any of the four     \
      * tables reads it, and StreamTask's overrides up-call with self only. */ \
-    /* +0x074 */ void (*onPad21)(Self *self);      /* TaskCore__func_8003C7F4: onPadEvent's 0x21 */ \
+    /* +0x074 */ void (*onPadStart)(Self *self);   /* TaskCore__OnPadStart: onPadEvent's 0x21 */ \
     /* +0x078 */ void (*onPadConfirm)(Self *self); /* TaskCore__OnPadConfirm: 0x19 */ \
     /* +0x07C */ void (*onPadCancel)(Self *self);  /* TaskCore__OnPadCancel: 0x17 */ \
     /* +0x080 */ void (*onPadPrev)(Self *self);    /* TaskCore__OnPadPrev: 0x12 */ \
@@ -112,7 +154,7 @@ struct TaskCoreTarget {
     /* +0x098 */ void (*setCallback)(Self *self, void (*callback)(void *ctx), void *ctx); /* TaskCore__SetCallback */ \
     /* +0x09C */ void (*setFadeCallbackEnabled)(Self *self, s32 enable);    /* TaskCore__SetFadeCallbackEnabled */ \
     /* +0x0A0 */ void (*setFadeOutCallbackEnabled)(Self *self, s32 enable); /* TaskCore__SetFadeOutCallbackEnabled */ \
-    /* +0x0A4 */ void (*setColors)(Self *self, u8 *base, u8 *color93, u8 *color96); /* TaskCore__SetColors */ \
+    /* +0x0A4 */ void (*setColors)(Self *self, u8 *base, u8 *clear, u8 *color96); /* TaskCore__SetColors */ \
     /* +0x0A8 */ void (*setFadeRate)(Self *self, s32 rate);      /* TaskCore__SetFadeRate */       \
     /* +0x0AC */ s32 (*tickFadeCallback)(Self *self);            /* TaskCore__TickFadeCallback: update's state 4 */ \
     /* +0x0B0 */ s32 (*tickColorFade)(Self *self);               /* TaskCore__TickColorFade: the fade-in callback */ \
@@ -176,8 +218,8 @@ struct TaskCoreTarget {
     /* +0x088 */ s32 (*fadeInCallback)(TaskCore *self);  /* setFadeCallbackEnabled: NULL or tickColorFade; nonzero: onInit sets baseColor */ \
     /* +0x08C */ s32 (*fadeOutCallback)(TaskCore *self); /* setFadeOutCallbackEnabled: NULL or tickFadeColor */ \
     /* +0x090 */ u8 baseColor[3];       /* setColors; the fade-in's start colour */                \
-    /* +0x093 */ u8 unk93[3];           /* setColors */                                            \
-    /* +0x096 */ u8 unk96[3];           /* setColors */                                            \
+    /* +0x093 */ u8 unk93[3];           /* setColors; onDeinit (unk34 set) and TitleMenu's clear the screen to it */                                            \
+    /* +0x096 */ u8 unk96[3];           /* setColors (reset: 128 grey); no code reads it */                                            \
     /* +0x099 */ u8 pad099[3];                                                                     \
     /* +0x09C */ void (*viewCallback)(void *ctx); /* setCallback; refreshViewValue calls it */     \
     /* +0x0A0 */ void *viewCallbackCtx  /* the object is 0xA4 bytes: StreamTask's own fields start at +0x0A4 */
@@ -207,7 +249,7 @@ void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event);
 void TaskCore__SetState(TaskCore *self, s32 state);
 void TaskCore__SetFrameBound(TaskCore *self, s32 bound);
 void TaskCore__PlaySound(TaskCore *self, s32 tone);
-void TaskCore__func_8003C7F4(TaskCore *self);
+void TaskCore__OnPadStart(TaskCore *self);
 void TaskCore__OnPadConfirm(TaskCore *self);
 void TaskCore__OnPadCancel(TaskCore *self);
 void TaskCore__OnPadPrev(TaskCore *self);
@@ -217,7 +259,7 @@ void TaskCore__RefreshViewValue(TaskCore *self);
 void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx);
 void TaskCore__SetFadeCallbackEnabled(TaskCore *self, s32 enable);
 void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable);
-void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *color93, u8 *color96);
+void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *color96);
 void TaskCore__SetFadeRate(TaskCore *self, s32 rate);
 s32 TaskCore__TickFadeCallback(TaskCore *self);
 s32 TaskCore__TickColorFade(TaskCore *self);

@@ -25,7 +25,7 @@ void TaskCore__Tick(Obj86B60 *self)
 ```
 
 The first function in the unit to DEREFERENCE `self->unk4C` rather than
-just null-check it (see `TaskCore__func_8003C7F4` and siblings) -- establishes real
+just null-check it (see `TaskCore__OnPadStart` and siblings) -- establishes real
 fields on its pointee, `Unk4CObj`: `+0x00C` (s32, compared directly against
 `self->unk58`) and `+0x024` (a `void **`, indexed by `self->unk58` and
 null-checked: `target->unk24[idx]`).
@@ -82,3 +82,15 @@ independently-named `TitleMenu__Tick`, settling the name the same way as
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__Tick (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Naming (round 98, alpha, track 7)
+
+`TaskCoreTarget::unkC` -> `exitSlot` (tier B). Its only accessor is this
+function (compiler error list): confirming the active slot when it has no
+item list (`unk24[idx] == NULL`) and is this slot runs refreshViewValue,
+which calls viewCallback and sets state 7, the fade-out. So it is the slot
+whose confirm ends the menu; why a given menu picks it is data.
+`TaskCoreTarget::unk8` was renamed too (initialSlot) and reverted:
+TitleMenu__SetState in class_3bb8c_d reads it, so it is a proposal.
+
+Local `idx` -> `slot`. Byte-identical.

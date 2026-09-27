@@ -1,4 +1,6 @@
-# TaskCore__func_8003C7F4 — MATCH (25/25 words)
+# TaskCore__OnPadStart — MATCH (25/25 words)
+
+> Renamed from `TaskCore__func_8003C7F4` on 2026-09-27 (tools/rename.py). Address 0x8003c7f4.
 
 > Renamed from `Obj86B60__func_8003C7F4` on 2026-09-25 (tools/rename.py). Address 0x8003c7f4.
 
@@ -9,7 +11,7 @@
 ## What it does
 
 ```c
-void TaskCore__func_8003C7F4(Obj86B60 *self, s32 a1)
+void TaskCore__OnPadStart(Obj86B60 *self, s32 a1)
 {
     if (self->unk4C != NULL) {
         self->methods->slot70(self, 0x10);
@@ -20,7 +22,7 @@ void TaskCore__func_8003C7F4(Obj86B60 *self, s32 a1)
 
 `self->unk4C` is used ONLY as a null/non-null gate here (never dereferenced)
 -- the first of five functions in this unit
-(`TaskCore__func_8003C7F4`/`TaskCore__OnPadConfirm`/`TaskCore__OnPadCancel`/`TaskCore__OnPadPrev`/
+(`TaskCore__OnPadStart`/`TaskCore__OnPadConfirm`/`TaskCore__OnPadCancel`/`TaskCore__OnPadPrev`/
 `TaskCore__OnPadNext`) that share this exact gate-then-forward shape, all reached
 from the same message dispatcher (`TaskCore__OnPadEvent`, STALL -- see its report)
 via consecutive vtable slots `+0x074`..`+0x084`. `slot70` IS this unit's own
@@ -61,3 +63,22 @@ class-scoped form rather than guessing.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__func_8003C7F4 (tools/rename.py): the class prefix. Occupant of +0x074 (`onPad21`, onPadEvent's 0x21 case). Kept func_: its only effect past playSound(0x10) is setState(0xA), which sets state 5 and nothing else. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Naming (round 98, alpha, track 7)
+
+**Tier A**: `TaskCore__func_8003C7F4` -> `TaskCore__OnPadStart`, slot +0x074
+`onPad21` -> `onPadStart`. onPadEvent calls this slot on event 0x21, and
+include/Pad.h says what that event is: Pad__DispatchEvents sends
+`PAD_EVENT_PRESSED` (0x12) plus the button's index in sButtonMasks, and
+index 15 is `PAD_BUTTON_START` (PADstart). Its four siblings already carry
+their buttons' names (0x12 Lup, 0x13 Ldown, 0x17 cross, 0x19 circle), so
+this is the same form. The body is the Start press: with a target, it plays
+the button tone and sets state 0xA (TASKCORE_STATE_START_PRESSED), which
+TaskCore__SetState treats as a return to the active state and which parents
+see through notifyParents; TitleMenu__SetState acts on it (cancel, jump to
+the target's first slot, confirm). The slot's only accessor is
+TaskCore__OnPadEvent (compiler error list).
+
+## Track 7 (round 98, alpha)
+
+Constants: TASKCORE_TONE_BUTTON, TASKCORE_STATE_START_PRESSED (include/TaskCore.h). Byte-identical.
