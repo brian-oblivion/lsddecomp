@@ -1128,3 +1128,19 @@ code_55dd4.c now includes <libgte.h>, <libgpu.h>, <libgs.h>. Byte-identical.
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## Track 7 (round 99, bravo): readable spelling, byte-identical
+
+The live body now spells the decoded header as a `TodPacketHeader head`
+(`objectId`, `type`, `flag`, `length`; `include/code_55dd4.h`) instead of
+`u8 outbuf[4]`, and the data as `s32 *data` indexed `data[i]` (still the
+round-75 lever: the blob is indexed, not walked) with `data += 3` / `data += 2`
+for the old `+ 0xC` / `+ 8`. Locals: `packet` (was `acc`), `part` (`elem`),
+`partIndex`, `rot` / `scale` / `trans`, `angle`, `partCoord` (`coordB`),
+`x`/`y`/`z`, `modelId`, `model` (now `struct TmdModel *`, getModel's return
+type), `parentId`, `parentIndex`. Constants: `TOD_ROTATE_PER_ANGLE` (360: a TOD
+rotation is in 1/4096 degree, so /360 is a GTE angle), `ONE` (4096) for the
+angle wrap and the fixed-point scale, `TOD_PARENT_ROOT` (0xFFFF). The return
+is `(u32 *)packet + head.length` (was `(u8 *)packet + length * 4`). The
+`__asm__("")` comment is now a one-line `MATCHING:`; its measurement is the
+"asm sites" section above. Whole image `OK`.

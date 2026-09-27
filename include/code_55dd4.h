@@ -11,8 +11,9 @@
 /*
  * code_55dd4's own readings of what TodActor (include/TodActor.h) reaches
  * that is not TodActor: the ctor's descriptor, onNotify's sender, the TOD
- * format (file header, packet types) and a TodSet's table of Tods. The
- * class itself -- object, table, getter, method prototypes -- is
+ * format (file, frame and packet headers, packet types and flags, the
+ * rotation unit) and a TodSet's table of Tods, plus the unit's own tuning
+ * values. The class itself -- object, table, getter, method prototypes -- is
  * include/TodActor.h's; the sound bank is include/VabStreamObj.h's and a
  * part's coordinate parameters are Sony's GsCOORD2PARAM.
  */

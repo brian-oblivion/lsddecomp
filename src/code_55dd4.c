@@ -1,7 +1,9 @@
 /*
  * TodActor's methods (include/TodActor.h: an Actor that owns one Actor part
  * per object of a TOD animation and plays the TOD over them), in ROM order,
- * ending with its getter GetTodActorMethods.
+ * ending with its getter GetTodActorMethods. The TOD layouts they read (file,
+ * frame and packet headers, a TodSet's table of Tods) are this unit's, in
+ * include/code_55dd4.h.
  *
  * - construction and teardown: New_TodActor, the ctor, Finalize; the
  *   ModelData is borrowed from the descriptor or made (AcquireModelData /
@@ -198,15 +200,13 @@ s32 TodActor__FindPartIndex(TodActor *self, s32 id) {
     s32 count;
     s32 i;
     u8 wanted;
-    u8 unused[8];
+    u8 unused[8]; /* MATCHING: retail's 8-byte frame; without it the frame is empty */
 
     if (self->partIds == NULL) {
         return -1;
     }
     ids = self->partIds;
-    /* Keeps ids's register copy above the self->partCount load; without it
-     * GCC moves the copy into the delay slot of the count <= 0 branch. */
-    __asm__("");
+    __asm__(""); /* MATCHING: keeps the copy of ids above the partCount load, not in blez's delay slot */
     count = self->partCount;
     if (count <= 0) {
         return -1;
@@ -236,8 +236,12 @@ void TodActor__TeardownParts(TodActor *self) {
     }
 }
 
+/* One Actor per object the TOD's first frame creates. The first scan counts
+ * the objects and leaves the number of model-id packets in tmdId[0]; the
+ * second fills partIds and turns tmdId[0] into the index of the object drawn
+ * with that TMD id, which becomes mainPart. 0, or 1 with the parts released. */
 s32 TodActor__CreateParts(TodActor *self) {
-    s32 tmdId[4];
+    s32 tmdId[4]; /* MATCHING: [1] changes the frame; only [0] is used */
     s32 count;
     s32 i;
     Actor **p;
@@ -379,6 +383,11 @@ void *TodActor__ApplyTodFrame(TodActor *self, void *frame, void *extra) {
     return frame;
 }
 
+/* Applies one packet to the part its object id names (none: skipped) and
+ * returns the next packet. A coordinate packet's flag says which of
+ * rotation, scale and translation follow and whether they are absolute or
+ * added to the part's GsCOORD2PARAM (an added scale multiplies, ONE = 1.0); a
+ * translation, when present, is then copied into the part's matrix. */
 void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
     TodPacketHeader head;
     s32 *data;
@@ -424,7 +433,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     for (i = 0; i < 3; i++, scale++) {
                         *scale = (((s16 *)data)[i] * *scale) / ONE;
                     }
-                    data += 2;
+                    data += 2; /* three s16 scales, padded to two words */
                 }
                 if (!(head.flag & TOD_COORD_TRANSLATE)) {
                     goto end;
@@ -475,9 +484,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                 partCoord->coord.t[0] = x;
                 partCoord->coord.t[1] = y;
                 partCoord->coord.t[2] = z;
-                /* Keeps the partCoord->coord.t[2] store ahead of the break's jump, leaving retail's
-             * nop in its delay slot; without it GCC moves the store into the slot. */
-                __asm__("");
+                __asm__(""); /* MATCHING: keeps the t[2] store ahead of break's jump, whose delay slot stays a nop */
             }
             break;
         }
@@ -503,6 +510,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
             } else {
                 s32 parentIndex;
 
+                /* the parent's object id, low byte, as partIds holds it */
                 parentIndex = TodActor__FindPartIndex(self, *(u8 *)data);
                 part->methods->attachToParent(part, (SceneNode *)self->parts[parentIndex], NULL);
             }

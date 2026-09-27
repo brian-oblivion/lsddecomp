@@ -142,3 +142,9 @@ Measured by deleting it alone: the image went red (14 bytes, same length),
 `funcdiff` 18/22, and asm-differ shows `move a2,v0` (the copy of `arr`) moved
 from before `lw a0,0x6c(a0)` (the `self->partCount` load) into the delay slot
 of `blez a0` (the `count <= 0` test). Instruction order.
+
+## Track 7 (round 99, bravo): readable spelling, byte-identical
+
+`arr`/`value`/`target` are `ids`/`id`/`wanted`. `unused[8]` and the
+`__asm__("")` each carry a one-line `MATCHING:` comment; the measurements are
+"Two residues, two different fixes" and "asm sites" above.

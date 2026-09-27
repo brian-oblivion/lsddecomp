@@ -741,3 +741,13 @@ Round 75 (charlie), track 3.
 ## Track 4 (2026-09-25, round 85, alpha)
 
 The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 99, bravo): readable spelling, byte-identical
+
+`buf[4]` is now `tmdId[4]`, the name TodSet__ScanPackets / ScanTodPackets give
+that argument: the first scan (out NULL) leaves the model-id packet count in
+it, the second turns it into the index of the object whose model-id packet
+names that TMD id, and that part becomes `mainPart`. Measured: `tmdId[1]` turns
+the image red, so the `[4]` carries a `MATCHING:` line. The `& 0xFF` on the
+first scan's result is dropped: the slot returns `u8`, and the image stays
+`OK` without it. `count * 4` is `count * sizeof(Actor *)`.
