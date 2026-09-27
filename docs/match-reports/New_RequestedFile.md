@@ -70,3 +70,7 @@ The table and getter followed (`gRequestedFileMethods`,
 renametype.py also rewrote the old class name inside earlier sections'
 history prose in this and sibling reports (known, pending an operator
 decision; not hand-reverted).
+
+## Track 7 (round 99, charlie)
+
+Allocation size spelled `sizeof(RequestedFile)` (0x30). Byte-exact.

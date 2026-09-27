@@ -21,3 +21,7 @@ Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg
     return NULL;
 }
 ```
+
+## Track 7 (round 99, charlie)
+
+Allocation size spelled `sizeof(Sprite)` (0xA0). `arg3`/`arg4` are `resetArg`/`resetWord`: the ctor hands both to reset, which reads only `texture`, `abr` and `rect` (VariantSprite's ctor already calls the same pointer argument `resetArg`). Byte-exact.

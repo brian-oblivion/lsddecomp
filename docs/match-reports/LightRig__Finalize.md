@@ -35,3 +35,7 @@ void LightRig__Finalize(LightRig *self) {
 ## Track 4
 
 2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__Finalize`, tier A: slot +0x00C. `self` is `LightRig *` (was `D_8006EFACObj`); the +0x0B8 call is now `getLight` (was `getChild`). The Source block above is the unified spelling. Image byte-identical.
+
+## Track 7 (round 99, charlie)
+
+Loop bound `3` -> `ARRAY_COUNT(self->lights)`. Byte-exact.

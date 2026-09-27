@@ -1,45 +1,28 @@
 /*
- * code_322b4 -- GAME code carved from psyq_322b4 on 2026-09-25 (FINISHING-PLAN
- * revision 18). 0x322B4..0x330F4 (vram 0x80041AB4..0x800428F4). It was counted
- * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
- * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). Owns jtbl_80011290 (attached rodata
- * sub-slot 0x1A90).
+ * The sprite classes, and three small classes beside them.
  *
- * Round 82 matched every function in the unit (getters, accessors, empty
- * overrides, then the 11- to 20-word bodies: the sprite attribute-bit
- * setters, cell selection, finalize chains, the FrameClock allocator), then
- * named it (track 3): every function is real C, not `func_`.
+ * Sprites (include/Sprite.h and its subclasses' headers): Sprite (class id
+ * 0x44) is a SceneNode that draws an embedded GsSPRITE; ScreenSprite
+ * (0x144) places it in screen space with a position and a pivot anchor;
+ * CharSprite (0x1144) is one character of an 8x8 font, its texture cell
+ * picked by a character code. Here are their allocators, ctors (each chains
+ * to its parent's, installs its table, then calls reset), and the methods
+ * each adds or overrides: texture binding (Sprite__Reset, InitGsSprite),
+ * rotation, the display and semitransparency attribute bits, colour, screen
+ * position and pivot, and the cell. GetCellRect is the free helper that turns
+ * a character code into its cell in the font texture. TextRow and
+ * VariantSprite are Sprite subclasses too, with their methods elsewhere.
  *
- * Sprite (include/Sprite.h, gSpriteMethods), its direct subclass
- * ScreenSprite (include/ScreenSprite.h, gScreenSpriteMethods, id 0x144: the
- * screen-space sprite, adding setPosition (+0x0BC, screenPos) and a
- * pivot-anchor setter (+0x0C0, centre/left/right/top/bottom)) and ITS
- * subclass CharSprite (include/CharSprite.h, gCharSpriteMethods, id 0x1144:
- * one 8x8 font character, adding setCell/getCell (+0x0C4/+0x0C8); GetCellRect
- * is the free helper its ctor and setCell use to turn a cell index into a
- * rect) are unified; their own methods (New_Sprite, Sprite__*, InitGsSprite,
- * GetSpriteMethods, New_ScreenSprite, ScreenSprite__*, GetScreenSpriteMethods,
- * New_CharSprite, CharSprite__*, GetCharSpriteMethods) live here. Every
- * class owning methods in this unit is now unified (track 4; FrameClock, the
- * last, round 88). gTextRowMethods (0x11144, below CharSprite) and
- * gVariantSpriteMethods (0x1F44, class_3bb8c_p/q/t) are Sprite subclasses too but own
- * no methods in this unit.
- * FrameClock (include/FrameClock.h, gFrameClockMethods, id 0x5) is unified:
- * a BasicClass subclass ticked once per DrawSystem frame that tells its
- * parents event 2 (counted), 3 (paused) or 4 (flag14); its own methods
- * (New_FrameClock, FrameClock__*, Get_vtable_FrameClock) live here.
- * RequestedFile (include/RequestedFile.h, gRequestedFileMethods, id 0xB03) is
- * unified: a FileResource that requests one named file from the active driver
- * at construction and sets `loaded` when the driver's setFlag reports it
- * read (WBgm's SEQ file); its own methods (New_RequestedFile,
- * RequestedFile__*, GetRequestedFileMethods) live here.
- * LightRig (include/LightRig.h, gLightRigMethods, id 0x14) is unified too: a
- * SceneNode subclass owning three FlatLightObj children and an ambient
- * colour (SetAmbientColor -> GsSetAmbient); its own methods (New_LightRig,
- * LightRig__*, GetLightRigMethods) live here. Its getLight (+0x0B8) is
- * inherited unchanged by StageMap's own table (gStageMapMethods), which is why
- * one function occupies the same slot in both.
+ * RequestedFile (include/RequestedFile.h, 0xB03): a FileResource that asks
+ * the active data-source driver for one named file at construction and
+ * records when it has arrived.
+ *
+ * FrameClock (include/FrameClock.h, 0x5): a BasicClass ticked once per
+ * DrawSystem frame that counts frames and tells its parents whether it is
+ * running, paused or stopped.
+ *
+ * LightRig (include/LightRig.h, 0x14): a SceneNode that owns three flat
+ * lights and the ambient colour. StageMap inherits its getLight unchanged.
  */
 #include "common.h"
 #include <libgte.h>
@@ -52,27 +35,22 @@
 #include "TimImage.h"
 #include "FrameClock.h"
 
-extern void GsSetAmbient(long r, long g, long b);
-
-extern u16 GetTPage(s32 tp, s32 abr, s32 x, s32 y);
-
+/* Defined in other units. */
+extern void *BMemPMgrAlloc(s32 size);
+extern char *strcpy(char *dst, char *src);
+extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
+extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* The zero offset ScreenSprite__AttachToParent attaches with. */
 extern LongVec3 gVec3Zero;
-extern char *strcpy(char *dst, char *src);
 
-/* The cell origin GetCellRect copies: {0, 0, 8, 8}. */
+/* Cell 0 of the font texture, {u 0, v 0, w 8, h 8}: GetCellRect offsets it. */
 extern SpriteRect gCharSpriteCellRect;
-
-extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
-extern void *BMemPMgrAlloc(s32 size);
-
-extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* A 0..255 colour channel to GsSetAmbient's 0..ONE scale (255 << 4 is 4080). */
 #define AMBIENT_TO_FIX12_SHIFT 4
 
-/* Allocate and construct a CharSprite (0xAC bytes): one character cell. */
+/* Allocate and construct a CharSprite showing character `cell`. */
 CharSprite *New_CharSprite(void *texture, u8 cell) {
     CharSprite *obj = BMemPMgrAlloc(sizeof(CharSprite));
 
@@ -83,8 +61,8 @@ CharSprite *New_CharSprite(void *texture, u8 cell) {
     return NULL;
 }
 
-/* CharSprite slot +0x008 (ctor): the ScreenSprite ctor with cell 0x20's rect,
- * install the table, then reset to the caller's cell. */
+/* CharSprite slot +0x008 (ctor): the ScreenSprite ctor sized by the space
+ * character's cell, install the table, then reset to the caller's cell. */
 void CharSprite__CharSprite(CharSprite *self, void *texture, u8 cell) {
     SpriteRect cellRect;
 
@@ -109,9 +87,9 @@ void CharSprite__SetCell(CharSprite *self, u8 cell) {
     self->sprite.v = cellRect.v;
 }
 
-/* CharSprite slot +0x0C8: read the byte at +0x0A8. */
+/* CharSprite slot +0x0C8: the character setCell stored. */
 u8 CharSprite__GetCell(CharSprite *self) {
-    u8 pad[16]; /* unused: it is what gives retail its 0x10-byte frame */
+    u8 pad[16]; /* MATCHING: unused, but it gives the function its 16-byte frame */
 
     return self->cellIndex;
 }
@@ -121,7 +99,8 @@ CharSpriteMethods *GetCharSpriteMethods(void) {
     return &gCharSpriteMethods;
 }
 
-/* Cell index -> 8x8 rect in a 32-wide grid, offset from gCharSpriteCellRect. */
+/* The rect of character `cell` in the font texture: gCharSpriteCellRect moved
+ * to the cell's column and row. Only the low byte of `cell` counts. */
 void GetCellRect(SpriteRect *dst, u32 cell) {
     *dst = gCharSpriteCellRect;
     cell &= 0xFF;
@@ -129,7 +108,7 @@ void GetCellRect(SpriteRect *dst, u32 cell) {
     dst->v += (cell / CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE;
 }
 
-/* Allocate and construct a ScreenSprite (0xA8 bytes). */
+/* Allocate and construct a ScreenSprite on the texture cell `rect`. */
 ScreenSprite *New_ScreenSprite(void *texture, SpriteRect *rect, s32 resetWord) {
     ScreenSprite *obj = BMemPMgrAlloc(sizeof(ScreenSprite));
 
@@ -152,8 +131,8 @@ void ScreenSprite__ScreenSprite(ScreenSprite *self, void *texture, SpriteRect *r
 void ScreenSprite__Reset(ScreenSprite *self) {}
 
 /* gCharSpriteMethods and gScreenSpriteMethods slot +0x04C (attachToParent): when not yet
- * attached, attach through Sprite's with a zero offset, then hand the
- * caller's third argument to slot +0x0BC. */
+ * attached, attach through Sprite's with a zero offset, then hand `pos` to
+ * setPosition (+0x0BC). */
 void ScreenSprite__AttachToParent(ScreenSprite *self, SceneNode *parent, ScreenSpritePos *pos) {
     if (self->parent == NULL) {
         GetSpriteMethods()->attachToParent((Sprite *)self, parent, &gVec3Zero);
@@ -161,7 +140,8 @@ void ScreenSprite__AttachToParent(ScreenSprite *self, SceneNode *parent, ScreenS
     }
 }
 
-/* gCharSpriteMethods and gScreenSpriteMethods slot +0x0BC. */
+/* gCharSpriteMethods and gScreenSpriteMethods slot +0x0BC (setPosition): store
+ * the screen position, once attached. */
 void ScreenSprite__SetPosition(ScreenSprite *self, ScreenSpritePos *pos) {
     if (self->parent != NULL) {
         self->screenPos = *pos;
@@ -169,7 +149,7 @@ void ScreenSprite__SetPosition(ScreenSprite *self, ScreenSpritePos *pos) {
 }
 
 /* gCharSpriteMethods and gScreenSpriteMethods slot +0x0C0: when attached, move the sprite's
- * pivot: 0 centre, 1 left, 2 right, 3 top, 4 bottom. */
+ * pivot (mx, my) to the edge or centre `anchor` names (enum ScreenSpriteAnchor). */
 void ScreenSprite__SetPivotAnchor(ScreenSprite *self, u32 anchor) {
     if (self->parent != NULL) {
         switch (anchor) {
@@ -198,7 +178,7 @@ ScreenSpriteMethods *GetScreenSpriteMethods(void) {
     return &gScreenSpriteMethods;
 }
 
-/* Allocate and construct a Sprite (0xA0 bytes). */
+/* Allocate and construct a Sprite on the texture cell `rect`. */
 Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *resetArg, s32 resetWord) {
     Sprite *obj = BMemPMgrAlloc(sizeof(Sprite));
 
@@ -275,17 +255,20 @@ void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table) {
     }
 }
 
-/* Sprite classes slot +0x060: display on/off (attribute bit 31, inverted). */
+/* Sprite classes slot +0x060 (setDisplay): display on or off (GsDOFF, inverted);
+ * returns whether it was on. */
 s32 Sprite__SetDisplay(Sprite *self, s32 on) {
     return GetSetBitField(&self->sprite.attribute, SPRITE_ATTR_DOFF_SHIFT, 1, on == 0) == 0;
 }
 
-/* Sprite classes slot +0x064: attribute bit 30. */
+/* Sprite classes slot +0x064: semitransparency on or off (GsALON); returns the
+ * old bit. */
 s32 Sprite__SetSemiTrans(Sprite *self, s32 on) {
     return GetSetBitField(&self->sprite.attribute, SPRITE_ATTR_ALON_SHIFT, 1, on != 0);
 }
 
-/* Sprite classes slot +0x068: attribute bits 28..29. */
+/* Sprite classes slot +0x068: the semitransparency rate (2 bits); returns the
+ * old rate. */
 s32 Sprite__SetSemiTransRate(Sprite *self, s32 rate) {
     return GetSetBitField(&self->sprite.attribute, SPRITE_ATTR_RATE_SHIFT, 2, rate);
 }
@@ -304,7 +287,7 @@ SpriteMethods *GetSpriteMethods(void) {
     return &gSpriteMethods;
 }
 
-/* Allocate and construct a RequestedFile (0x30 bytes). */
+/* Allocate and construct a RequestedFile, requesting the file `name`. */
 RequestedFile *New_RequestedFile(char *name) {
     RequestedFile *obj = BMemPMgrAlloc(sizeof(RequestedFile));
 
@@ -348,7 +331,7 @@ RequestedFileMethods *GetRequestedFileMethods(void) {
     return &gRequestedFileMethods;
 }
 
-/* Allocate and construct a FrameClock (0x1C bytes). */
+/* Allocate and construct a FrameClock at frame 0. */
 FrameClock *New_FrameClock(void) {
     FrameClock *obj = BMemPMgrAlloc(sizeof(FrameClock));
 
@@ -380,8 +363,8 @@ void FrameClock__RemoveParentRef(FrameClock *self, BasicClass *parent) {
     Get_vtable_BasicClass()->removeParentRef((BasicClass *)self, parent);
 }
 
-/* gFrameClockMethods slot +0x030 (notifyParents): walk the parent refs with the
- * cursor at +0x018 (which removeParentRef keeps valid) and pass each the
+/* gFrameClockMethods slot +0x030 (notifyParents): walk the parent refs with
+ * parentCursor (which removeParentRef keeps valid) and pass each the
  * event through its onNotify. */
 void FrameClock__NotifyParents(FrameClock *self, s32 event) {
     BasicClass *parent;
@@ -394,7 +377,8 @@ void FrameClock__NotifyParents(FrameClock *self, s32 event) {
     self->parentCursor = NULL;
 }
 
-/* gFrameClockMethods slot +0x040 (reset). */
+/* gFrameClockMethods slot +0x040 (reset): set the frame count, clear both
+ * flags and the cursor. */
 void FrameClock__Reset(FrameClock *self, s32 frameCount) {
     self->frameCount = frameCount;
     self->flag14 = 0;
@@ -402,8 +386,8 @@ void FrameClock__Reset(FrameClock *self, s32 frameCount) {
     self->parentCursor = 0;
 }
 
-/* gFrameClockMethods slot +0x044: notify event 4 if flag14, else 3 if paused, else
- * count up and notify 2. */
+/* gFrameClockMethods slot +0x044 (tick): notify FLAG14 if flag14 is set, else
+ * PAUSED if paused, else count the frame and notify RUNNING. */
 void FrameClock__Tick(FrameClock *self) {
     s32 event;
 
@@ -448,7 +432,7 @@ FrameClockMethods *Get_vtable_FrameClock(void) {
     return &gFrameClockMethods;
 }
 
-/* Allocate and construct a LightRig (0x54 bytes). */
+/* Allocate and construct a LightRig with its three lights. */
 LightRig *New_LightRig(void) {
     LightRig *obj = BMemPMgrAlloc(sizeof(LightRig));
 

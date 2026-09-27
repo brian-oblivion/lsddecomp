@@ -21,3 +21,7 @@ s32 Sprite__SetSemiTrans(Sprite *self, s32 a1) {
 ## Track 4 (2026-09-25, round 82, alpha)
 
 Renamed from `func_8004223C` for its slot (+0x064 `setSemiTrans`): attribute bit 30 is GsALON, the same bit SceneNode__SetSemiTrans sets on the GsDOBJ2. And the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
+
+## Track 7 (round 99, charlie)
+
+Bit position `0x1E` -> `SPRITE_ATTR_ALON_SHIFT` (30); `a1` -> `on`. Byte-exact.
