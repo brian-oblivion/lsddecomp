@@ -24,7 +24,7 @@ extern void *New_Entity(void *arg0, void *arg1, void *arg2);
 extern s32 gDreamAuxStage;
 extern s32 gDreamAuxStageMap;
 extern s32 gDreamAuxWorld;
-extern s32 D_8008AC04;
+extern s32 gDreamAuxSound;
 extern s32 D_8008AC08;
 
 void SetTeleportsEnabled(s32 triggerType);
@@ -37,13 +37,13 @@ void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
     gDreamAuxStage = a0;
     gDreamAuxStageMap = a1;
     gDreamAuxWorld = a2;
-    D_8008AC04 = a3;
+    gDreamAuxSound = a3;
     D_8008AC08 = a4;
 
     for (i = 0; i < 1; i++) {
         s32 buf[4];
         buf[3] = (s32)slot->obj;
-        slot->entity = New_Entity((void *)(i + 0x62), buf, (void *)D_8008AC04);
+        slot->entity = New_Entity((void *)(i + 0x62), buf, (void *)gDreamAuxSound);
         slot++;
     }
     SetTeleportsEnabled(a0);

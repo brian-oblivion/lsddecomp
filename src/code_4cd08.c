@@ -50,7 +50,7 @@ void TickDreamAuxSlots(void) {
 extern s32 gDreamAuxStage;
 extern StageMap *gDreamAuxStageMap; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
 extern DreamSys *gDreamAuxWorld; /* the player DreamSys: class_3bb8c_l passes its `target` */
-extern s32 D_8008AC04;
+extern s32 gDreamAuxSound;
 extern s32 D_8008AC08;
 
 void SetTeleportsEnabled(s32 triggerType);
@@ -62,13 +62,13 @@ void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4) {
     gDreamAuxStage = a0;
     gDreamAuxStageMap = (StageMap *)a1;
     gDreamAuxWorld = world;
-    D_8008AC04 = a3;
+    gDreamAuxSound = a3;
     D_8008AC08 = a4;
 
     for (i = 0; i < 1; i++) {
         s32 buf[4];
         buf[3] = (s32)slot->obj;
-        slot->entity = New_Entity(i + 0x62, buf, (void *)D_8008AC04);
+        slot->entity = New_Entity(i + 0x62, buf, (void *)gDreamAuxSound);
         slot++;
     }
     SetTeleportsEnabled(a0);
@@ -394,7 +394,7 @@ extern DreamAuxPos6 gDreamAuxPosTable[];
 extern u8 D_80088F18[];
 
 bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry) {
-    Entity *entity = New_Entity(kind, out, (void *)D_8008AC04);
+    Entity *entity = New_Entity(kind, out, (void *)gDreamAuxSound);
 
     if (entity != NULL) {
         DreamAuxSpawnInfo *rec;
