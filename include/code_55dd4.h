@@ -43,6 +43,20 @@ typedef struct TagCheckArg {
 #define TOD_COORD_SCALE 4
 #define TOD_COORD_TRANSLATE 8
 
+/* A TOD rotation is in 1/4096 degree; divided by 360 it is a GTE angle
+ * (ONE to the turn), which ApplyTodPacket then wraps with % ONE. */
+#define TOD_ROTATE_PER_ANGLE 360
+
+/* A parent packet naming object 0 or TOD_PARENT_ROOT attaches the part to
+ * the TodActor itself rather than to another part. */
+#define TOD_PARENT_ROOT 0xFFFF
+
+/* TickCallbackA's move along local Z each tick (Actor's moveLocalZ). */
+#define TODACTOR_STEP_Z (-30)
+
+/* PlayTone's volume, both arguments of the bank's playTone (vol, endVol). */
+#define TODACTOR_TONE_VOLUME 110
+
 /* A TOD packet's header word, as decodePacketWord writes it out byte by
  * byte. */
 typedef struct TodPacketHeader {

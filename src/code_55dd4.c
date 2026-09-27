@@ -26,7 +26,7 @@ void *New_TodActor(void *desc, void *sound) {
     TodActor *self;
     TodActorMethods *vt;
 
-    self = (TodActor *)BMemPMgrAlloc(0x98);
+    self = (TodActor *)BMemPMgrAlloc(sizeof(TodActor));
     if (self == NULL) {
         return NULL;
     }
@@ -82,7 +82,7 @@ void TodActor__Reset(TodActor *self) {
     base = GetActorMethods();
     base->setDisplay((Actor *)self, 0);
     self->methods->setMainPartNotifies(self, 1);
-    self->methods->setLastOffsetValue(self, 0x12C);
+    self->methods->setLastOffsetValue(self, 300);
     self->methods->disableTickCallback(self);
     self->methods->selectTickCallback(self, TICK_CALLBACK_A);
     self->methods->stopTod(self);
@@ -242,8 +242,8 @@ s32 TodActor__CreateParts(TodActor *self) {
     s32 i;
     Actor **p;
 
-    count = self->modelData->methods->scanPackets(self->modelData, 0, (s32)tmdId) & 0xFF;
-    self->parts = BMemPMgrAlloc(count * 4);
+    count = self->modelData->methods->scanPackets(self->modelData, 0, (s32)tmdId);
+    self->parts = BMemPMgrAlloc(count * sizeof(Actor *));
     if (self->parts == NULL) {
         goto alloc_fail;
     }
@@ -330,7 +330,7 @@ void TodActor__DisableTickCallback(TodActor *self) {
 }
 
 void TodActor__TickCallbackA(TodActor *self) {
-    self->methods->moveLocalZ(self, -0x1E, 0);
+    self->methods->moveLocalZ(self, TODACTOR_STEP_Z, 0);
     if (self->mainPartNotifies == 1 && self->mainPart != NULL) {
         self->mainPart->methods->notifyWithHull(self->mainPart, 6);
     }
@@ -345,7 +345,7 @@ void TodActor__PlayTone(TodActor *self, s32 index) {
 
     sound = self->sound;
     if (sound != NULL) {
-        sound->methods->playTone(sound, index, 0x6E, 0x6E);
+        sound->methods->playTone(sound, index, TODACTOR_TONE_VOLUME, TODACTOR_TONE_VOLUME);
     }
 }
 
@@ -412,9 +412,9 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     for (i = 0; i < 3; i++, rot++) {
                         s16 angle;
 
-                        angle = *rot + data[i] / 360;
+                        angle = *rot + data[i] / TOD_ROTATE_PER_ANGLE;
                         *rot = angle;
-                        *rot = angle % 4096;
+                        *rot = angle % ONE;
                     }
                     data += 3;
                 }
@@ -422,7 +422,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     long *scale = &param->scale.vx;
 
                     for (i = 0; i < 3; i++, scale++) {
-                        *scale = (((s16 *)data)[i] * *scale) / 4096;
+                        *scale = (((s16 *)data)[i] * *scale) / ONE;
                     }
                     data += 2;
                 }
@@ -441,7 +441,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
                     s16 *rot = &param->rotate.vx;
 
                     for (i = 0; i < 3; i++, rot++) {
-                        *rot = data[i] / 360;
+                        *rot = data[i] / TOD_ROTATE_PER_ANGLE;
                     }
                     data += 3;
                 }
@@ -498,7 +498,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
             s32 parentId;
 
             parentId = data[0];
-            if (parentId == 0 || parentId == 0xFFFF) {
+            if (parentId == 0 || parentId == TOD_PARENT_ROOT) {
                 part->methods->attachToParent(part, (SceneNode *)self, NULL);
             } else {
                 s32 parentIndex;
