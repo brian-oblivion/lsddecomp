@@ -389,3 +389,23 @@ Round 89 (runner delta, track 5 `asm-sites`), three sites, all kept:
   words shorter, 39 against 41, `funcdiff` 17/39, and the whole image after it
   drifted). So the alias is load-bearing; which instructions went missing was
   not itemised. Kept.
+
+
+## Track 7 (round 95, alpha, polish pass)
+
+Constants in decimal (otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 65536, fogNear 20000). The data it reads are renamed with `tools/rename.py`: `D_8008A8FC`/`D_8008A900` -> `gDefaultViewportWidth`/`gDefaultViewportHeight` (256, 240), `D_8008A8F8` -> `gDefaultViewportColor` ({0, 0, 0}); the local alias `D_8008A8F8_b` is now `gDefaultViewportColorAlias` (a C identifier only; its `__asm__` name is the symbol). The comment above the externs now keeps only `MATCHING:` lines; what it said, verbatim:
+
+```c
+/* MATCHED round 49. Two levers were needed, see docs/match-reports/Viewport__InitDefaults.md:
+ * (1) retail reloads the address of `gDefaultViewportColor` INDEPENDENTLY for each of
+ * the two whole-struct copies (two separate lui/addiu pairs); GCC 2.6.3
+ * otherwise CSEs that into one shared computation. Declaring a second
+ * extern name aliased to the same symbol via `__asm__("gDefaultViewportColor")` (the
+ * same alternate-name idiom `code_179d8_m.c` already uses) gives the
+ * second copy a textually distinct symbol, defeating the CSE without
+ * `volatile`'s much worse codegen. (2) Two bare `__asm__("")` scheduling
+ * barriers pin the two independent zero-inits and the two global-loaded
+ * stores to retail's own early positions instead of letting the scheduler
+ * defer them to just before the byte copies. */
+
+```

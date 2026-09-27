@@ -43,3 +43,7 @@ beyond "a stored word".
 ## Track 4 (2026-09-25, round 85, bravo)
 
 Renamed from `Unk18Obj__SetUnk44`. Slot +0x04C `setUnk44`. unk44 * unk48 is each buffer's packet area (InitOt); which of the two is the packet count and which the size is not shown, so the field keeps its offset name. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+
+## Proposed field names (round 95, alpha)
+
+Viewport's `unk44` -> `maxPackets`, slot `setUnk44` -> `setMaxPackets`, this function -> `Viewport__SetMaxPackets` (tier B). InitOt sizes each half's packet area as `unk48 * unk44`; the defaults are 2000 and 64, and 64 is a per-primitive byte budget on the scale of Psy-Q's own samples (`PACKETMAX * 24`), while the caller that varies one of them per scene (class_39e08.c, `setUnk44(vp, 1200)`) varies this one. Callers of the slot outside this unit: class_39e08.c, code_2c054.c; the field is accessed only in code_2cc8c_d.c. Not applied: include/Viewport.h is not this job's.

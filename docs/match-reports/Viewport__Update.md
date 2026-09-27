@@ -245,3 +245,8 @@ extern void GsSetLightMode(s32 a0);
 extern void SetFogNear(s32 a0, s32 a1);
 extern void GsClearOt(s32 a0, s32 a1, ViewportOt *ot);
 ```
+
+
+## Track 7 (round 95, alpha, polish pass)
+
+Light mode 1 is `GsLMODE_FOG` (libgs.h); 3 stays a literal, since LIBGS.H names only modes 0..2 (`GsLMODE_NORMAL`, `GsLMODE_FOG`, `GsLMODE_LOFF`). The far colour is read as `(u8)self->farColor.r` etc. rather than through a `u8 *` over the struct, and `GsSetWorkBase` takes a `(PACKET *)`; byte-identical. Measured for a proposal: retyping ViewportRgb's three fields to `u8` (include/Viewport.h) is byte-identical across the whole image, and would drop the casts.

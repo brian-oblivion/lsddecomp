@@ -97,3 +97,8 @@ The comments that sat on the deleted prototypes, moved here verbatim:
  * places it; progress.py counts it as library via its `identified` line. */
 extern void SetGeomScreen(long h);
 ```
+
+
+## Track 7 (round 95, alpha, polish pass)
+
+Its comment in the unit is now two lines (Sony's libgs gs_106, carried as C because no object places it); the identification history stays above.

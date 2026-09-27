@@ -125,3 +125,8 @@ extern void GsDrawOt(ViewportOt *ot);
  * plain word, same as GsClearOt/GsDrawOt above. */
 extern void GsSortClear(u8 a0, u8 a1, u8 a2, ViewportOt *ot);
 ```
+
+
+## Track 7 (round 95, alpha, polish pass)
+
+The clear colour is passed as `self->clearColor.r/.g/.b` (GsSortClear's own `unsigned char` parameters make the load `lbu`), no `u8 *` over the struct; the slot-offset notes (+0x050, +0x054) are gone from the comment, the slot names say it. Byte-identical.

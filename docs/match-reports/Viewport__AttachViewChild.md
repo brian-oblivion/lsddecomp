@@ -129,3 +129,8 @@ The comments that sat on the deleted prototypes, moved here verbatim:
    GsRVIEW2*. */
 extern void GsSetRefView2(void *arg0);
 ```
+
+
+## Track 7 (round 95, alpha, polish pass)
+
+`D_8008A8F4` -> `gDefaultViewTwist` (tier A: Ratio16 {0, 1}, read only here as the twist when the argument is NULL), local `m` -> `methods`.
