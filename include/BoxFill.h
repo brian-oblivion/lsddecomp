@@ -16,7 +16,7 @@
  *    otherwise) and calls GsSortBoxFill(&box, ot, pri) with `pri`.
  *  - The class's own slots set exactly those: setColor (the GsBOXF r,g,b),
  *    setPosition, setSize (w, h), setPri, and attachAbsolute, which attaches
- *    and clears `relative`. Its setDisplay/setSemiTrans/setSemiTransRate
+ *    and clears `relative`. Its setDisplay/setSemiTransOn/setSemiTransRate
  *    overrides are SceneNode's GetSetBitField accessors at the same bit
  *    positions (31, 30, 28..29), over the GsBOXF attribute instead of the
  *    GsDOBJ2 one.
@@ -24,7 +24,7 @@
  *    attached at the list's position, then setSize(40, rows * 12)),
  *    GraphRoom's 100 plotted dots, and the style decoration boxes of
  *    class_3bb8c_m/_n (class_3bb8c_m makes its box semi-transparent:
- *    setSemiTrans(1), setSemiTransRate(0)).
+ *    setSemiTransOn(1), setSemiTransRate(0)).
  *
  * Ctor chain: BoxFill__BoxFill calls GetSceneNodeMethods()->ctor first, so
  * the id parent (0x4) is the ctor-chain parent. One class derives from it,
@@ -68,12 +68,14 @@ struct SkipShort2 {
     s16 y; /* +0x004, the height */
 };
 
-/* A two-word screen position (setPosition, attachToParent's third argument):
- * copied whole into posX/posY. FadeBox's position stack and gTextRowMethods's
- * layout loops use the same record. */
+/* The box's screen position (setPosition, attachToParent's third argument,
+ * attachAbsolute's; FadeBox's pushPosition): copied whole into posX/posY, so
+ * percent of half the screen width/height while `relative` is set and pixels
+ * after attachAbsolute. ScreenSprite's ScreenSpritePos has the same layout
+ * but is always a percentage. */
 struct BoxFillPos {
-    s32 a; /* +0x000, x */
-    s32 b; /* +0x004, y */
+    s32 x; /* +0x000 */
+    s32 y; /* +0x004 */
 };
 
 /* SceneNode's slots, then this class's own. `tools/classtable.py
@@ -100,7 +102,7 @@ struct BoxFillPos {
     /* +0x04C */ s32 unk4C;        /* zeroed by Reset; attachAbsolute's fourth argument; no reader */ \
     /* +0x050 */ s32 posX;         /* setPosition; DrawNode's source for boxX */                   \
     /* +0x054 */ s32 posY;         /* setPosition; DrawNode's source for boxY */                   \
-    /* +0x058 */ u32 boxAttribute; /* GsBOXF.attribute: the setDisplay/setSemiTrans/setSemiTransRate bits */ \
+    /* +0x058 */ u32 boxAttribute; /* GsBOXF.attribute: the setDisplay/setSemiTransOn/setSemiTransRate bits */ \
     /* +0x05C */ s16 boxX;         /* GsBOXF.x: zeroed by Reset, written by DrawNode */            \
     /* +0x05E */ s16 boxY;         /* GsBOXF.y */                                                  \
     /* +0x060 */ u16 boxW;         /* GsBOXF.w: Reset and setSize (FadeBox reads it lhu) */    \
