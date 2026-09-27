@@ -8,6 +8,15 @@
  * _SsSetControlChange). The functions keep Sony's names and are never retyped
  * as game code.
  *
+ * Edges: this file is the whole module and nothing else. Its 18 functions
+ * are seqread.o's 18, in seqread.o's order; their offsets equal the 3.3
+ * build's through _SsSetControlChange and sit 0x7C below them after it
+ * (3.0's and 3.5's differ from GetSeqData on), and the file is 0x1E04 bytes,
+ * 3.3's 0x1E80 less those 0x7C. Before it: libsnd_play.c (libsnd/play.o),
+ * where tuboundary.py reads "start edge possible" -- the rodata is silent,
+ * and the edge is kept because play and seqread are separate objects in
+ * every libsnd build. After it: libsnd/adsr, a placed Sony object.
+ *
  * Each sequence's play state is an SsScore (include/SsScore.h), reached as
  * _ss_score[access][seq]; the (a0, a1) pair the event handlers take is that
  * (access, seq) pair. Per-channel state (pan, program, volume) is indexed by
