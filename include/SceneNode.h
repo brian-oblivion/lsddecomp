@@ -105,7 +105,7 @@ struct Ratio16 {
     /* +0x0A0 */ void (*tryAttachNearby)(Self *self); /* SceneNode__TryAttachNearby; its 2nd parameter arrives as the caller's untouched $a1 */ \
     /* +0x0A4 */ void (*composeAndApplyRotation)(Self *self, void *vec, void *dst, void *src, s32 count); /* SceneNode__ComposeAndApplyRotation */ \
     /* +0x0A8 */ s32 (*checkBoundsOverlap)(Self *self, void *corners, TmdVec3 *delta); /* SceneNode__CheckBoundsOverlap */ \
-    /* +0x0AC */ s32 (*raycastHullAgainstFaces)(Self *self, void *outFlag, TmdVec3 *delta, void *corners); /* SceneNode__RaycastHullAgainstFaces */ \
+    /* +0x0AC */ s32 (*raycastHullAgainstFaces)(Self *self, void *hullHits, TmdVec3 *delta, void *hull); /* SceneNode__RaycastHullAgainstFaces */ \
     /* +0x0B0 */ void (*slotB0)(void); /* SceneNode__NoOpSlotB0; never called */ \
     /* +0x0B4 */ void (*addToActorParents)(Self *self, void *node) /* SceneNode__AddToActorParents */
 /* clang-format on */
@@ -177,7 +177,7 @@ void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event);
 void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other);
 void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *vec, void *dst, void *src, s32 count);
 s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta);
-s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *outFlag, TmdVec3 *delta, TmdHull *corners);
+s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *delta, TmdHull *hull);
 void SceneNode__NoOpSlotB0(void);
 void SceneNode__AddToActorParents(SceneNode *self, void *node);
 

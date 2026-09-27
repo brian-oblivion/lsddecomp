@@ -22,8 +22,8 @@
  * wrapper around GetSetBitField over &self->unk10, shift 0 width 3. Raw
  * pass-through value and raw pass-through result -- same shape as
  * SceneNode__SetSemiTrans/D3A0/D3F8 (no `== 0` on either side). */
-u32 SceneNode__SetLightDim(SceneNode *self, u32 a1) {
-    return GetSetBitField(&self->attribute, 0, 3, a1);
+u32 SceneNode__SetLightDim(SceneNode *self, u32 value) {
+    return GetSetBitField(&self->attribute, 0, 3, value);
 }
 
 /* Sibling of SceneNode__SetDisplay (the ONLY one of the five already-matched
@@ -32,18 +32,18 @@ u32 SceneNode__SetLightDim(SceneNode *self, u32 a1) {
  * exactly that double-inversion, at shift 7 width 1, hence the same `s32`
  * return type as SceneNode__SetDisplay rather than the plain `u32` of the other
  * three siblings. */
-s32 SceneNode__SetUseZ(SceneNode *self, s32 a1) {
-    return GetSetBitField(&self->attribute, 7, 1, a1 == 0) == 0;
+s32 SceneNode__SetUseZ(SceneNode *self, s32 on) {
+    return GetSetBitField(&self->attribute, 7, 1, on == 0) == 0;
 }
 
 /* Same family as SceneNode__SetLightDim, shift 9 width 3. Raw pass-through. */
-u32 SceneNode__SetSubdivision(SceneNode *self, u32 a1) {
-    return GetSetBitField(&self->attribute, 9, 3, a1);
+u32 SceneNode__SetSubdivision(SceneNode *self, u32 value) {
+    return GetSetBitField(&self->attribute, 9, 3, value);
 }
 
 /* Same family as SceneNode__SetUseZ: double-inversion shape, shift 8 width 1. */
-s32 SceneNode__SetBackClip(SceneNode *self, s32 a1) {
-    return GetSetBitField(&self->attribute, 8, 1, a1 == 0) == 0;
+s32 SceneNode__SetBackClip(SceneNode *self, s32 on) {
+    return GetSetBitField(&self->attribute, 8, 1, on == 0) == 0;
 }
 
 /* coord2->param is a 0x28-byte GsCOORD2PARAM whose +0x10 holds the SVECTOR
@@ -53,19 +53,19 @@ s32 SceneNode__SetBackClip(SceneNode *self, s32 a1) {
  * straight through -- to the PsyQ helper RotMatrix. MATCHING: SVECTOR's
  * all-short members give it alignment 2, which is what makes the
  * whole-struct copy compile to lwl/lwr. */
-void SceneNode__GetRotMatrix(SceneNode *self, s32 a1, s32 a2) {
-    SVECTOR buf;
-    SVECTOR *src = &self->coord2->param->rotate;
+void SceneNode__GetRotMatrix(SceneNode *self, s32 out, s32 invert) {
+    SVECTOR angles;
+    SVECTOR *rotate = &self->coord2->param->rotate;
 
-    if (a2) {
-        buf.vx = -src->vx;
-        buf.vy = -src->vy;
-        buf.vz = -src->vz;
+    if (invert) {
+        angles.vx = -rotate->vx;
+        angles.vy = -rotate->vy;
+        angles.vz = -rotate->vz;
     } else {
-        buf = *src;
+        angles = *rotate;
     }
     /* Cast: SceneNode.h types `out` as s32. */
-    RotMatrix(&buf, (MATRIX *)a1);
+    RotMatrix(&angles, (MATRIX *)out);
 }
 
 /* a1 gates a small range (2 <= a1 < 4). When self->model is set and
@@ -75,18 +75,18 @@ void SceneNode__GetRotMatrix(SceneNode *self, s32 a1, s32 a2) {
  * that same buffer, retyped as a TmdHull, into +0x90
  * (SceneNode__TransformAndNotifyParents, also already matched in this unit), with the original
  * a1 passed through as SceneNode__TransformAndNotifyParents's own a2. */
-void SceneNode__NotifyWithHull(SceneNode *self, s32 a1) {
+void SceneNode__NotifyWithHull(SceneNode *self, s32 event) {
     /* Sized to reproduce retail's own frame (0x58): SceneNode__GetModelHull's own
      * target (TmdModel__GetHull, TmdModel) writes a TmdHull
      * (include/TmdModel.h: a count word and eight 6-byte corners, 0x34
      * bytes) into its `dest`, so the true destination struct is bigger than
      * the 8 bytes a count and one corner would reserve. */
-    u8 buf[0x38];
+    TmdHull hull;
 
-    if (a1 >= 4) {
+    if (event >= 4) {
         return;
     }
-    if (a1 < 2) {
+    if (event < 2) {
         return;
     }
     if (self->model == NULL) {
@@ -95,8 +95,8 @@ void SceneNode__NotifyWithHull(SceneNode *self, s32 a1) {
     if (!TmdModel__GetBoundsCount(self->model)) {
         return;
     }
-    self->methods->getModelHull(self, buf);
-    self->methods->transformAndNotifyParents(self, (TmdHull *)buf, a1);
+    self->methods->getModelHull(self, &hull);
+    self->methods->transformAndNotifyParents(self, &hull, event);
 }
 
 /* Forwards self->model (the TmdModel, held as `void *` in SceneNode.h) and
@@ -112,12 +112,12 @@ void SceneNode__GetModelHull(SceneNode *self, void *dest) {
  * for the duration of a single self->methods->slot30(self, a2) dispatch
  * (an inherited BasicClass slot, not this unit's own code), then clears
  * unk30 again. */
-void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *a1, s32 a2) {
-    ApplyMatrixToSVArray(a1->v, a1->v, a1->count * 8, &self->coord2->workm);
+void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *verts, s32 event) {
+    ApplyMatrixToSVArray(verts->v, verts->v, verts->count * 8, &self->coord2->workm);
     self->linkTarget = 0;
     self->hitMask = 0;
-    self->notifyVerts = a1;
-    self->methods->notifyParents(self, a2);
+    self->notifyVerts = verts;
+    self->methods->notifyParents(self, event);
     self->notifyVerts = NULL;
 }
 
@@ -149,13 +149,13 @@ void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event) {
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->linkTarget and notifying it via its own +0x038 slot. */
 void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
-    LongVec3 *posA;
-    LongVec3 *posB;
-    LongVec3 diffRaw;
-    TmdVec3 diff;
-    s32 abs;
+    LongVec3 *otherPos;
+    LongVec3 *selfPos;
+    LongVec3 offset;
+    TmdVec3 delta;
+    s32 mag;
     u8 unused[0x20]; /* sp+0x30, never referenced; reserves retail's slot */
-    TmdHull list;
+    TmdHull hull;
 
     if (self->model == NULL) {
         return;
@@ -164,68 +164,68 @@ void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
         return;
     }
 
-    posA = (other->parent != NULL) ? (LongVec3 *)other->coord2->workm.t : NULL;
-    diffRaw = *posA;
+    otherPos = (other->parent != NULL) ? (LongVec3 *)other->coord2->workm.t : NULL;
+    offset = *otherPos;
 
-    posB = (self->parent != NULL) ? (LongVec3 *)self->coord2->workm.t : NULL;
-    diffRaw.x = diffRaw.x - posB->x;
-    diffRaw.y = diffRaw.y - posB->y;
-    diffRaw.z = diffRaw.z - posB->z;
+    selfPos = (self->parent != NULL) ? (LongVec3 *)self->coord2->workm.t : NULL;
+    offset.x = offset.x - selfPos->x;
+    offset.y = offset.y - selfPos->y;
+    offset.z = offset.z - selfPos->z;
 
-    if (diffRaw.x < 0) {
+    if (offset.x < 0) {
         goto x_neg;
     }
-    if (diffRaw.x < 0x4001) {
+    if (offset.x < 0x4001) {
         goto x_done;
     }
     return;
 x_neg:
-    abs = ~diffRaw.x + 1;
-    if (abs >= 0x4001) {
+    mag = ~offset.x + 1;
+    if (mag >= 0x4001) {
         return;
     }
 x_done:
-    if (diffRaw.y < 0) {
+    if (offset.y < 0) {
         goto y_neg;
     }
-    if (diffRaw.y < 0x4001) {
+    if (offset.y < 0x4001) {
         goto y_done;
     }
     return;
 y_neg:
-    abs = ~diffRaw.y + 1;
-    if (abs >= 0x4001) {
+    mag = ~offset.y + 1;
+    if (mag >= 0x4001) {
         return;
     }
 y_done:
-    if (diffRaw.z < 0) {
+    if (offset.z < 0) {
         goto z_neg;
     }
-    if (diffRaw.z < 0x4001) {
+    if (offset.z < 0x4001) {
         goto z_done;
     }
     return;
 z_neg:
-    abs = ~diffRaw.z + 1;
-    if (abs >= 0x4001) {
+    mag = ~offset.z + 1;
+    if (mag >= 0x4001) {
         return;
     }
 z_done:
 
-    diff.x = diffRaw.x;
-    diff.y = diffRaw.y;
-    diff.z = diffRaw.z;
+    delta.x = offset.x;
+    delta.y = offset.y;
+    delta.z = offset.z;
 
-    list.count = other->notifyVerts->count;
+    hull.count = other->notifyVerts->count;
     {
-        TmdHull *countList = other->notifyVerts;
-        self->methods->composeAndApplyRotation(self, &diff, list.v, countList->v, list.count * 8);
+        TmdHull *otherHull = other->notifyVerts;
+        self->methods->composeAndApplyRotation(self, &delta, hull.v, otherHull->v, hull.count * 8);
     }
 
-    if (!self->methods->checkBoundsOverlap(self, &list, &diff)) {
+    if (!self->methods->checkBoundsOverlap(self, &hull, &delta)) {
         return;
     }
-    if (!self->methods->raycastHullAgainstFaces(self, &other->hitMask, &diff, &list)) {
+    if (!self->methods->raycastHullAgainstFaces(self, &other->hitMask, &delta, &hull)) {
         return;
     }
 
@@ -238,25 +238,25 @@ z_done:
  * MulMatrix2) before using buf1 as ApplyMatrixToSVArray's own "out" argument,
  * twice: once for (arg2, arg3, count), once more for (arg1, arg1, 1) when
  * arg1 is non-NULL. */
-void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *arg1, void *arg2, void *arg3, s32 count) {
-    MATRIX buf2;
-    MATRIX buf1;
-    SceneNode *node;
+void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *vec, void *dst, void *src, s32 count) {
+    MATRIX parentRot;
+    MATRIX rot;
+    SceneNode *parent;
 
-    self->methods->getRotMatrix(self, &buf1, 1);
+    self->methods->getRotMatrix(self, &rot, 1);
 
-    node = self->parent;
-    if (node != NULL) {
+    parent = self->parent;
+    if (parent != NULL) {
         do {
-            node->methods->getRotMatrix(node, &buf2, 1);
-            MulMatrix2(&buf2, &buf1);
-            node = node->parent;
-        } while (node != NULL);
+            parent->methods->getRotMatrix(parent, &parentRot, 1);
+            MulMatrix2(&parentRot, &rot);
+            parent = parent->parent;
+        } while (parent != NULL);
     }
 
-    ApplyMatrixToSVArray(arg2, arg3, count, &buf1);
-    if (arg1 != NULL) {
-        ApplyMatrixToSVArray(arg1, arg1, 1, &buf1);
+    ApplyMatrixToSVArray(dst, src, count, &rot);
+    if (vec != NULL) {
+        ApplyMatrixToSVArray(vec, vec, 1, &rot);
     }
 }
 
@@ -266,59 +266,60 @@ void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *arg1, void *arg2,
  * three axes. Each running min/max is a ternary stored back unconditionally
  * (retail stores every field every iteration), and the source compares
  * with `>` for a min so the slt operands load in retail's order. */
-s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *arg1, TmdVec3 *d) {
-    TmdHull *list;
-    TmdVec3 *v;
-    TmdVec3 *end;
-    TmdBox mm;
-    TmdBox *b;
-    TmdBox *p;
-    TmdBox *end2;
-    s32 n;
-    s32 ret;
-    TmdBox box;
+s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta) {
+    TmdHull *hull;
+    TmdVec3 *corner;
+    TmdVec3 *cornerEnd;
+    TmdBox hullBox;
+    TmdBox *grow;
+    TmdBox *bounds;
+    TmdBox *boundsEnd;
+    s32 boundsCount;
+    s32 overlap;
+    TmdBox modelBox;
 
-    list = arg1;
-    v = list->v;
-    v->x += d->x;
-    v->y += d->y;
-    end = v + list->count * 8;
-    v->z += d->z;
-    mm.min = *v;
-    mm.max = *v;
-    b = &mm;
-    for (v++; v < end; v++) {
-        v->x += d->x;
-        v->y += d->y;
-        v->z += d->z;
-        b->min.x = (b->min.x > v->x) ? v->x : b->min.x;
-        b->min.y = (b->min.y > v->y) ? v->y : b->min.y;
-        b->min.z = (b->min.z > v->z) ? v->z : b->min.z;
-        b->max.x = (b->max.x < v->x) ? v->x : b->max.x;
-        b->max.y = (b->max.y < v->y) ? v->y : b->max.y;
-        b->max.z = (b->max.z < v->z) ? v->z : b->max.z;
+    hull = corners;
+    corner = hull->v;
+    corner->x += delta->x;
+    corner->y += delta->y;
+    cornerEnd = corner + hull->count * 8;
+    corner->z += delta->z;
+    hullBox.min = *corner;
+    hullBox.max = *corner;
+    grow = &hullBox;
+    for (corner++; corner < cornerEnd; corner++) {
+        corner->x += delta->x;
+        corner->y += delta->y;
+        corner->z += delta->z;
+        grow->min.x = (grow->min.x > corner->x) ? corner->x : grow->min.x;
+        grow->min.y = (grow->min.y > corner->y) ? corner->y : grow->min.y;
+        grow->min.z = (grow->min.z > corner->z) ? corner->z : grow->min.z;
+        grow->max.x = (grow->max.x < corner->x) ? corner->x : grow->max.x;
+        grow->max.y = (grow->max.y < corner->y) ? corner->y : grow->max.y;
+        grow->max.z = (grow->max.z < corner->z) ? corner->z : grow->max.z;
     }
 
     TmdModel__UpdateBoundsBuffer(self->model);
-    p = TmdModel__GetBoundsBuffer(self->model, 0);
-    n = TmdModel__GetBoundsCount(self->model);
-    box = *p;
-    end2 = p + n;
-    for (p++; p < end2; p++) {
-        box.min.x = (box.min.x > p->min.x) ? p->min.x : box.min.x;
-        box.min.y = (box.min.y > p->min.y) ? p->min.y : box.min.y;
-        box.min.z = (box.min.z > p->min.z) ? p->min.z : box.min.z;
-        box.max.x = (box.max.x < p->max.x) ? p->max.x : box.max.x;
-        box.max.y = (box.max.y < p->max.y) ? p->max.y : box.max.y;
-        box.max.z = (box.max.z < p->max.z) ? p->max.z : box.max.z;
+    bounds = TmdModel__GetBoundsBuffer(self->model, 0);
+    boundsCount = TmdModel__GetBoundsCount(self->model);
+    modelBox = *bounds;
+    boundsEnd = bounds + boundsCount;
+    for (bounds++; bounds < boundsEnd; bounds++) {
+        modelBox.min.x = (modelBox.min.x > bounds->min.x) ? bounds->min.x : modelBox.min.x;
+        modelBox.min.y = (modelBox.min.y > bounds->min.y) ? bounds->min.y : modelBox.min.y;
+        modelBox.min.z = (modelBox.min.z > bounds->min.z) ? bounds->min.z : modelBox.min.z;
+        modelBox.max.x = (modelBox.max.x < bounds->max.x) ? bounds->max.x : modelBox.max.x;
+        modelBox.max.y = (modelBox.max.y < bounds->max.y) ? bounds->max.y : modelBox.max.y;
+        modelBox.max.z = (modelBox.max.z < bounds->max.z) ? bounds->max.z : modelBox.max.z;
     }
 
-    ret = 0;
-    if (!(mm.min.z > box.max.z) && !(mm.max.z < box.min.z) && !(mm.min.x > box.max.x) &&
-        !(mm.max.x < box.min.x) && !(mm.min.y > box.max.y)) {
-        ret = !(mm.max.y < box.min.y);
+    overlap = 0;
+    if (!(hullBox.min.z > modelBox.max.z) && !(hullBox.max.z < modelBox.min.z) &&
+        !(hullBox.min.x > modelBox.max.x) && !(hullBox.max.x < modelBox.min.x) &&
+        !(hullBox.min.y > modelBox.max.y)) {
+        overlap = !(hullBox.max.y < modelBox.min.y);
     }
-    return ret;
+    return overlap;
 }
 
 /* Tests the corner list against every model plane. Part 1 averages two
@@ -333,45 +334,45 @@ s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *arg1, TmdVec3 *d) {
  * `p`, `v` and `hi` as pointers. */
 extern s32 gHitHeightGate;
 
-s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *outFlag, TmdVec3 *diff, TmdHull *list) {
-    TmdVec3 mid[2];
-    TmdVec3 *p;
-    TmdVec3 *hi;
-    s32 count1;
+s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *delta, TmdHull *hull) {
+    TmdVec3 center[2];
+    TmdVec3 *c;
+    TmdVec3 *opposite;
+    s32 boundsCount;
     s32 i;
-    TmdBox *plane;
+    TmdBox *bounds;
     s32 hit;
-    s32 cnt2;
-    TmdVec3 *v;
+    s32 hullCount;
+    TmdVec3 *corner;
     s32 k;
-    s32 m;
-    s32 bigConst;
-    s32 outWord;
+    s32 j;
+    s32 nearest;
+    s32 height;
     u8 pad[0x18];
 
-    bigConst = 0x7FFFFFFF;
+    nearest = 0x7FFFFFFF;
 
-    v = list->v;
-    hi = list->v + 2;
-    for (p = mid; p < &mid[2]; p++) {
-        p->x = (v->x + hi->x) >> 1;
-        p->y = (v->y + hi->y) >> 1;
-        p->z = (v->z + hi->z) >> 1;
-        v += 4;
-        hi += 4;
+    corner = hull->v;
+    opposite = hull->v + 2;
+    for (c = center; c < &center[2]; c++) {
+        c->x = (corner->x + opposite->x) >> 1;
+        c->y = (corner->y + opposite->y) >> 1;
+        c->z = (corner->z + opposite->z) >> 1;
+        corner += 4;
+        opposite += 4;
     }
 
     self->hitMask = 0;
-    count1 = TmdModel__GetBoundsCount(self->model);
+    boundsCount = TmdModel__GetBoundsCount(self->model);
     hit = 0;
-    for (i = 0; i < count1; i++) {
-        plane = TmdModel__GetBoundsBuffer(self->model, i);
-        if (ClipSegmentToBox(NULL, plane, &mid[0], &mid[1])) {
-            if (TmdModel__RaycastFaces(self->model, &bigConst, (TmdVec3 *)diff, &outWord,
-                                       (TmdVec3 *)&mid[0], (TmdVec3 *)&mid[1])) {
+    for (i = 0; i < boundsCount; i++) {
+        bounds = TmdModel__GetBoundsBuffer(self->model, i);
+        if (ClipSegmentToBox(NULL, bounds, &center[0], &center[1])) {
+            if (TmdModel__RaycastFaces(self->model, &nearest, (TmdVec3 *)delta, &height,
+                                       (TmdVec3 *)&center[0], (TmdVec3 *)&center[1])) {
                 if (gHitHeightGate == 0) {
                     self->hitMask |= 1 << i;
-                } else if (outWord >= 0x201) {
+                } else if (height >= 0x201) {
                     self->hitMask |= 1 << i;
                 }
             }
@@ -379,38 +380,38 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *outFlag, TmdVec3 *d
     }
 
     if (self->hitMask != 0) {
-        *outFlag = 1;
+        *hullHits = 1;
         if (hit != 0) {
             return 2;
         }
         return 1;
     }
 
-    *outFlag = 0;
-    cnt2 = list->count;
-    for (i = 0; i < count1; i++) {
-        plane = TmdModel__GetBoundsBuffer(self->model, i);
-        v = list->v;
-        for (k = 0; k < cnt2; k++) {
-            for (m = 0; m < 4; m++) {
-                if (m == 1 || m == 2) {
-                    if (ClipSegmentToBox(NULL, plane, v, v + 4)) {
-                        if (TmdModel__RaycastFaces(self->model, &bigConst, (TmdVec3 *)diff,
-                                                   &outWord, (TmdVec3 *)v, (TmdVec3 *)(v + 4))) {
-                            if (outWord >= 0x201) {
+    *hullHits = 0;
+    hullCount = hull->count;
+    for (i = 0; i < boundsCount; i++) {
+        bounds = TmdModel__GetBoundsBuffer(self->model, i);
+        corner = hull->v;
+        for (k = 0; k < hullCount; k++) {
+            for (j = 0; j < 4; j++) {
+                if (j == 1 || j == 2) {
+                    if (ClipSegmentToBox(NULL, bounds, corner, corner + 4)) {
+                        if (TmdModel__RaycastFaces(self->model, &nearest, (TmdVec3 *)delta, &height,
+                                                   (TmdVec3 *)corner, (TmdVec3 *)(corner + 4))) {
+                            if (height >= 0x201) {
                                 self->hitMask |= 1 << i;
-                                *outFlag |= 1 << k;
+                                *hullHits |= 1 << k;
                             }
                         }
                     }
                 }
-                v++;
+                corner++;
             }
-            v += 4;
+            corner += 4;
         }
     }
 
-    return (*outFlag != 0);
+    return (*hullHits != 0);
 }
 
 /* Round 41: MATCHED, 118/118, byte-exact. Round 20 got the CFG (a
@@ -428,20 +429,20 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *outFlag, TmdVec3 *d
  * byte-exactness, not because it means anything; see the report for the
  * hand-lever history this replaced. */
 s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2) {
-    u8 r1;
-    u8 r2;
+    u8 code1;
+    u8 code2;
     TmdVec3 mid;
 
-    r1 = CalcBoxOutcode(box, p1);
-    r2 = CalcBoxOutcode(box, p2);
+    code1 = CalcBoxOutcode(box, p1);
+    code2 = CalcBoxOutcode(box, p2);
 
-    if (r1 == 0) {
-        if (r2 != 0) {
+    if (code1 == 0) {
+        if (code2 != 0) {
             goto shared_test;
         }
         return 1;
     }
-    if (r2 != 0) {
+    if (code2 != 0) {
         goto shared_test;
     }
     if (out != NULL) {
@@ -450,7 +451,7 @@ s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2) {
     return 3;
 
 shared_test:
-    if (r1 != 0) {
+    if (code1 != 0) {
         goto combined;
     }
     if (out != NULL) {
@@ -459,7 +460,7 @@ shared_test:
     return 2;
 
 combined:
-    if ((r1 & r2) != 0) {
+    if ((code1 & code2) != 0) {
         return 0;
     }
 
@@ -504,10 +505,10 @@ combined:
  * `near` -- each written into one of two ping-pong stack buffers so the
  * OTHER endpoint's storage is never disturbed. */
 void BisectSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *near, TmdVec3 *far) {
-    TmdVec3 buf0;
-    TmdVec3 buf1;
+    TmdVec3 insideBuf;
+    TmdVec3 outsideBuf;
     TmdVec3 *dst;
-    u8 flags;
+    u8 outcode;
 
     for (;;) {
         out->x = (near->x + far->x) >> 1;
@@ -521,28 +522,28 @@ void BisectSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *near, TmdVec3 *far) 
             return;
         }
 
-        flags = 0;
+        outcode = 0;
         if (box->max.x < out->x) {
-            flags = 8;
+            outcode = 8;
         } else if (out->x < box->min.x) {
-            flags = 4;
+            outcode = 4;
         }
         if (box->max.y < out->y) {
-            flags |= 2;
+            outcode |= 2;
         } else if (out->y < box->min.y) {
-            flags |= 1;
+            outcode |= 1;
         }
         if (box->max.z < out->z) {
-            flags |= 0x20;
+            outcode |= 0x20;
         } else if (out->z < box->min.z) {
-            flags |= 0x10;
+            outcode |= 0x10;
         }
 
-        if (flags != 0) {
-            dst = &buf1;
+        if (outcode != 0) {
+            dst = &outsideBuf;
             far = dst;
         } else {
-            dst = &buf0;
+            dst = &insideBuf;
             near = dst;
         }
         *dst = *out;
@@ -558,21 +559,21 @@ void SceneNode__NoOpSlotB0(void) {}
  * literal 4 into $s1. The goto form of earlier rounds had no loop notes, so
  * it needed a named `tag` and could not get retail's register order. */
 void SceneNode__AddToActorParents(SceneNode *self, void *node) {
-    SceneNode *entry;
+    SceneNode *parent;
     void *cursor;
 
-    entry = NULL;
+    parent = NULL;
     do {
         do {
-            BasicClass__GetNextParentRef(node, (BasicClass **)&entry, (BasicClassListNode **)&cursor);
-            if (entry != NULL && (entry->methods->header & CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID) {
+            BasicClass__GetNextParentRef(node, (BasicClass **)&parent, (BasicClassListNode **)&cursor);
+            if (parent != NULL && (parent->methods->header & CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID) {
                 goto found;
             }
         } while (cursor != NULL);
-        entry = NULL;
+        parent = NULL;
     found:
-        if (entry != NULL && (u8)entry->methods->header == ACTOR_CLASS_ID) {
-            entry->methods->addChild(entry, (BasicClass *)self);
+        if (parent != NULL && (u8)parent->methods->header == ACTOR_CLASS_ID) {
+            parent->methods->addChild(parent, (BasicClass *)self);
         }
     } while (cursor != NULL);
 }
