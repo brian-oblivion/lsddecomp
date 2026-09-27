@@ -64,12 +64,12 @@ void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 
     s32 rootClass;
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
-    rootClass = sender->methods->header & 0xF;
-    if (rootClass == 1) {
+    rootClass = sender->methods->header & CLASS_ID_ROOT_MASK;
+    if (rootClass == DRAWSYSTEM_CLASS_ID) {
         self->methods->onTag1Notify(self, sender, event);
-    } else if (rootClass == 2) {
+    } else if (rootClass == PAD_CLASS_ID) {
         self->methods->onPadEvent(self, sender, event);
-    } else if (rootClass == 5) {
+    } else if (rootClass == FRAMECLOCK_CLASS_ID) {
         self->methods->update(self, sender, event);
     }
 }
@@ -144,7 +144,7 @@ void IntermediateBase__Deinit(IntermediateBase *self) {
 void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, s32 event) {
     Pad *pad;
 
-    if (event == 2) {
+    if (event == DRAWSYSTEM_EVENT_VSYNC) {
         ((FrameClock *)self->unk10)->methods->tick((FrameClock *)self->unk10);
         pad = (Pad *)self->initArgs->pad;
         pad->methods->updateMasks(pad);
@@ -201,7 +201,7 @@ IntermediateBaseMethods *Get_vtable_IntermediateBase(void) {
 Viewport *New_Viewport(void) {
     Viewport *self;
 
-    self = BMemPMgrAlloc(0xBC);
+    self = BMemPMgrAlloc(sizeof(Viewport));
     if (self != NULL) {
         GetViewportMethods()->ctor(self);
         return self;
@@ -214,8 +214,8 @@ void Viewport__Viewport(Viewport *self) {
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetViewportMethods();
-    self->drawSystem = 0;
-    self->viewNode = 0;
+    self->drawSystem = NULL;
+    self->viewNode = NULL;
     self->sceneRoot = New_SceneNode();
     fadeBox = (SceneNode *)New_FadeBox(gViewportFadeBoxSize, 0, 0);
     self->fadeBox = fadeBox;
@@ -235,11 +235,11 @@ void Viewport__AddChild(Viewport *self, BasicClass *child) {
     s32 rootClass;
 
     Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
-    rootClass = child->methods->header & 0xF;
-    if (rootClass == 4) {
+    rootClass = child->methods->header & CLASS_ID_ROOT_MASK;
+    if (rootClass == SCENENODE_CLASS_ID) {
         self->viewNode = (SceneNode *)child;
         self->refView.super = ((SceneNode *)child)->coord2;
-    } else if (rootClass == 1) {
+    } else if (rootClass == DRAWSYSTEM_CLASS_ID) {
         self->drawSystem = (DrawSystem *)child;
     }
 }
@@ -247,11 +247,11 @@ void Viewport__AddChild(Viewport *self, BasicClass *child) {
 void Viewport__RemoveChild(Viewport *self, BasicClass *child) {
     s32 rootClass;
 
-    rootClass = child->methods->header & 0xF;
-    if (rootClass == 4) {
-        self->refView.super = 0;
+    rootClass = child->methods->header & CLASS_ID_ROOT_MASK;
+    if (rootClass == SCENENODE_CLASS_ID) {
+        self->refView.super = NULL;
         self->viewNode = NULL;
-    } else if (rootClass == 1) {
+    } else if (rootClass == DRAWSYSTEM_CLASS_ID) {
         self->drawSystem = NULL;
     }
     Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
@@ -261,8 +261,8 @@ void Viewport__RemoveChild(Viewport *self, BasicClass *child) {
  * gNodeGuardedViewportMethods): clears the three child caches AddChild fills, then
  * the base. */
 void Viewport__RemoveAllChildren(Viewport *self) {
-    self->refView.super = 0;
-    self->viewNode = 0;
+    self->refView.super = NULL;
+    self->viewNode = NULL;
     self->drawSystem = NULL;
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }

@@ -29,6 +29,10 @@
 typedef struct DrawSystem DrawSystem;
 typedef struct DrawSystemMethods DrawSystemMethods;
 
+/* DrawSystem's class id (gDrawSystemMethods word +0x000). A single nibble, so
+ * `(header & CLASS_ID_ROOT_MASK) == DRAWSYSTEM_CLASS_ID` tests for it or a subclass. */
+#define DRAWSYSTEM_CLASS_ID 0x1
+
 /* The command runLoop passes its parents on every VSync pass
  * (notifyParents(self, 2)); StageMap__OnNotifyTag1 acts only on it. */
 #define DRAWSYSTEM_EVENT_VSYNC 2

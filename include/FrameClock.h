@@ -40,6 +40,10 @@
 typedef struct FrameClock FrameClock;
 typedef struct FrameClockMethods FrameClockMethods;
 
+/* FrameClock's class id (gFrameClockMethods word +0x000). A single nibble, so
+ * `(header & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID` tests for it or a subclass. */
+#define FRAMECLOCK_CLASS_ID 0x5
+
 /* The events tick sends its parents (notifyParents(self, event)). */
 enum FrameClockEvent {
     FRAMECLOCK_EVENT_RUNNING = 2, /* counted: frameCount += 1 first */

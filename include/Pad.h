@@ -49,6 +49,10 @@ enum PadButton {
 typedef struct Pad Pad;
 typedef struct PadMethods PadMethods;
 
+/* Pad's class id (gPadMethods word +0x000). A single nibble, so
+ * `(header & CLASS_ID_ROOT_MASK) == PAD_CLASS_ID` tests for it or a subclass. */
+#define PAD_CLASS_ID 0x2
+
 struct PadMethods {
     BASICCLASS_SLOTS(Pad, (Pad * self, s32 mode, s32 port));
     /* +0x040 */ void (*init)(Pad *self, s32 port); /* Pad__Init */
