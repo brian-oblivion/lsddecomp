@@ -113,11 +113,11 @@ void Entity__AttachToParent(Entity *this, TodActor *peer, void *companion, struc
     ((TodActorAttachToParentFn)GetTodActorMethods()->attachToParent)((TodActor *)this, peer,
                                                                      companion, parent, offset);
     this->grid = parent;
-    if (D_80089EA7[this->moodIndex * 0x10] != 0) {
+    if (gEntityMoodTable[this->moodIndex].detachKind != 0) {
         return;
     }
     this->methods->activate(this);
-    if (D_80089EAF[this->moodIndex * 0x10] != 0) {
+    if (gEntityMoodTable[this->moodIndex].cueRange != 0) {
         return;
     }
     this->methods->startSoundCue(this);

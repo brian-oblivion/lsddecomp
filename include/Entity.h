@@ -160,24 +160,22 @@ extern s32 gEntityDefaultOffset[2];
  * not by the project's usual char convention). */
 struct EntityMoodRow {
     u8 pad00[0x03];
-    s8 detachKind;     /* +0x03, read by Entity__UpdateActivationState */
+    s8 detachKind; /* +0x03, read by Entity__UpdateActivationState; 0: Entity__AttachToParent activates at once */
     u8 linkKind;       /* +0x04, read by Entity__UpdateDeactivationState (unsigned load) */
     s8 unk5;           /* +0x05 */
     s8 proximityRange; /* +0x06, read by Entity__UpdateTargetProximity only (compiler-checked, round 71): magnitude (after abs) is Entity__IsNearTarget's distance arg for raising targetReached via setTargetReached; a NEGATIVE value also makes the entity face its target every tick */
     u8 pad07[0x02];
     s8 nearTolerance; /* +0x09, Entity__IsNearTarget's tolerance for every range test on this row (activation, deactivation, proximity, cue start/stop) */
     u8 pad0A[0x01];
-    s8 cueRange; /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop only (compiler-checked, round 71): 0 = the cue never auto-starts; magnitude (after abs) is Entity__IsNearTarget's distance arg for starting the sound cue; a NEGATIVE value also stops it again once the target leaves that range. SEPARATE field from proximityRange (+0x06) */
+    s8 cueRange; /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop and Entity__AttachToParent: 0 = the cue starts at attach (when the entity activated there) and never on range; magnitude (after abs) is Entity__IsNearTarget's distance arg for starting the sound cue; a NEGATIVE value also stops it again once the target leaves that range. SEPARATE field from proximityRange (+0x06) */
     u8 pad0C[0x04];
 };
 
 extern EntityMoodRow gEntityMoodTable[];
 extern s8 gEntityUnlockKindTable[]; /* GetUnlockEffect */
-extern s8 D_80089EA7[]; /* read by Entity__AttachToParent, own base symbol immediately after gEntityUnlockKindTable, moodIndex*0x10-indexed like the rest of this family */
-extern s8 gEntityLinkStageTable[];          /* GetLinkStage */
-extern s8 gEntityEventVideoTable[];         /* GetEventVideo */
-extern s8 gEntityProximityThresholdTable[]; /* read by Entity__GetProximityRatio, own base symbol immediately before D_80089EAF, moodIndex*0x10-indexed like the rest of this family */
-extern s8 D_80089EAF[]; /* read by Entity__AttachToParent, own base symbol immediately after gEntityEventVideoTable, moodIndex*0x10-indexed like the rest of this family */
+extern s8 gEntityLinkStageTable[];  /* GetLinkStage */
+extern s8 gEntityEventVideoTable[]; /* GetEventVideo */
+extern s8 gEntityProximityThresholdTable[]; /* read by Entity__GetProximityRatio, moodIndex*0x10-indexed like the rest of this family */
 
 /* The class's own methods, in ROM order (Entity, then Entity_b). A caller
  * reaching the base ones goes through GetTodActorMethods() and upcasts. */
