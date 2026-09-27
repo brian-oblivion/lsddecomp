@@ -4,6 +4,7 @@
 #include <libgs.h>
 #include "code_2cc8c.h"
 #include "Viewport.h"
+#include "FrameClock.h"
 
 /*
  * The rest of Viewport's own table (gViewportMethods, include/Viewport.h,
@@ -61,14 +62,14 @@ void Viewport__InitDefaults(Viewport *self) {
     /* Keeps the two screenSize stores directly after their loads; without
      * it they sink below the otLength..fogNear constant stores. */
     __asm__("");
-    self->otLength = 0xD;
-    self->unk44 = 0x7D0;
-    self->unk48 = 0x40;
-    self->projH = 0x100;
-    self->nearZ = 0xA;
-    self->farZ = 0x10000;
+    self->otLength = 13;
+    self->unk44 = 2000;
+    self->unk48 = 64;
+    self->projH = 256;
+    self->nearZ = 10;
+    self->farZ = 65536;
     self->lightMode = 0;
-    self->fogNear = 0x4E20;
+    self->fogNear = 20000;
     self->farColor = gDefaultViewportColor;
     self->clearColor = D_8008A8F8_b;
     self->unkB4 = 0;
@@ -168,8 +169,8 @@ void Viewport__SetTwist(Viewport *self, Ratio16 *twist) {
     if (self->viewNode != NULL) {
         whole = twist->num / twist->den;
         rem = twist->num % twist->den;
-        frac = (rem << 12) / twist->den;
-        self->refView.rz = (whole << 12) + frac;
+        frac = rem * ONE / twist->den;
+        self->refView.rz = whole * ONE + frac;
     }
 }
 
@@ -186,7 +187,7 @@ void Viewport__func_8003ECC8(void) {}
 void Viewport__InitOt(Viewport *self) {
     s32 size;
     s32 buf;
-    s32 hdrSize = 0x14; /* sizeof(GsOT) */
+    s32 hdrSize = sizeof(GsOT);
 
     if (self->otReady != 0) {
         return;
@@ -200,7 +201,7 @@ void Viewport__InitOt(Viewport *self) {
     }
 
     self->ot[0] = (ViewportOt *)buf;
-    self->otTags[0] = buf + 0x14;
+    self->otTags[0] = buf + sizeof(GsOT);
     self->workBase[0] = (4 << self->otLength) + self->otTags[0];
 
     self->ot[1] = (ViewportOt *)(size + (s32)self->ot[0]);
@@ -232,7 +233,7 @@ void Viewport__DeinitOt(Viewport *self) {
 /* Counts the notification in unk90, and runs update on events 2 and 3. */
 void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event) {
     self->unk90 = self->unk90 + 1;
-    if (event == 2 || event == 3) {
+    if (event == FRAMECLOCK_EVENT_RUNNING || event == FRAMECLOCK_EVENT_PAUSED) {
         self->methods->update(self);
     }
 }
@@ -265,7 +266,7 @@ void Viewport__Update(Viewport *self) {
     GsSetNearClip(self->nearZ);
     GsSetLightMode(self->lightMode);
 
-    if (self->lightMode == 1 || self->lightMode == 3) {
+    if (self->lightMode == GsLMODE_FOG || self->lightMode == 3) {
         SetFarColor((u8)self->farColor.r, (u8)self->farColor.g, (u8)self->farColor.b);
         SetFogNear(self->fogNear, self->projH);
     }
