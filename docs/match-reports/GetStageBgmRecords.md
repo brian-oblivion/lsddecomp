@@ -38,4 +38,8 @@ Rec1C *GetStageBgmRecords(s32 index) {
 
 - **Name:** `GetStageBgmRecords`
 - **Tier:** A
-- **Evidence:** pure getter: &GetStageRecords(index)[4].
+- **Evidence:** &GetStageRecords(stage)[4]: records 4..8 of every group are BGA..BGE.SEQ (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100).
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetVariantBlock` with tools/rename.py, on the record paths and callers above; previous tier A.

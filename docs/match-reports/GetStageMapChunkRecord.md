@@ -38,4 +38,8 @@ Rec1C *GetStageMapChunkRecord(s32 index, s32 sub) {
 
 - **Name:** `GetStageMapChunkRecord`
 - **Tier:** A
-- **Evidence:** pure getter: &GetStageMapChunkRecords(index)[sub].
+- **Evidence:** record `chunk` of GetStageMapChunkRecords: STGnn\Mnnn.LBD, which StageMap hands an LbdFile (include/LbdFile.h).
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetGridRecordAt` with tools/rename.py, on the record paths and callers above; previous tier A.

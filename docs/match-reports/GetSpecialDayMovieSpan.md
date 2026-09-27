@@ -59,5 +59,9 @@ extends (`len += start`) rather than a fresh `end`.
 ## Naming
 
 - **Name:** `GetSpecialDayMovieSpan`
-- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** its one caller, GameApplication__StartGraphRoomStreamTask, uses the returned record and *total (divided by 15) as the StreamTask's channel and ring size; matches exactly.
+- **Tier:** B
+- **Evidence:** returns special day `day`'s first movie and writes the sum of (frame count + 10) over the 2 * dayCount movies from it, minus 10. Its caller (GameApplication__StartGraphRoomStreamTask, (0, 10)) streams it with frameBound = total / 15, so the span covers SPDAY01A..SPDAY10B. Why 10 frames per movie is not established.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetGraphRoomStreamChannel` with tools/rename.py, on the record paths and callers above; previous tier B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established).

@@ -26,5 +26,9 @@ Rec1C *PickStageTexture(s32 index, s32 arg1, s32 day) {
 ## Naming
 
 - **Name:** `PickStageTexture`
-- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** leaf picker: 1-of-n random pick (n grows every ten days of a 40-day cycle, per the existing report's derivation) from GetStageTextureRecords(index).
+- **Tier:** A
+- **Evidence:** picks one of the first ((day - 1) % 40) / 10 + 1 of the stage's TEX?.TIX records (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100); caller passes ObjM::stage and DreamSys's current day, and hands the record to New_TimBlockSrc.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `PickDailyVariant` with tools/rename.py, on the record paths and callers above; previous tier B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established).

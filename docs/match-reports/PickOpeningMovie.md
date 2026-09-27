@@ -49,5 +49,9 @@ the warning is gone and the extern agrees with the definition.
 ## Naming
 
 - **Name:** `PickOpeningMovie`
-- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** its one caller, GameApplication__StartWeeklyStreamTask, uses the return value as the StreamTask's group id directly; matches exactly.
+- **Tier:** A
+- **Evidence:** random one of the seven GetOpeningMovieRecords (`% OPENING_MOVIE_COUNT`), with its movie id; its caller (GameApplication__StartWeeklyStreamTask) streams it. The pick is `rand() % 7` with no seed, not a day of the week.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `PickWeeklyStreamChannel` with tools/rename.py, on the record paths and callers above; previous tier B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established).

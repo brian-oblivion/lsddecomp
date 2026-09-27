@@ -41,4 +41,8 @@ Rec1C *GetStageRecords(s32 index) {
 
 - **Name:** `GetStageRecords`
 - **Tier:** A
-- **Evidence:** pure getter: &gRecordTable[gStageFirstRecord[index]]; a getter is tier A by the leaf-mechanics rule, purpose of the group itself not established.
+- **Evidence:** returns &gRecordTable[gStageFirstRecord[stage]] (gStageFirstRecord renamed from gRecordIndexTable); the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100: record 0 of each group is STGnn\TEXA.TIX, and gStageFirstRecord[0] = 16 is the first record after the sound banks. Every caller passes ObjM::stage.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetRecordGroup` with tools/rename.py, on the record paths and callers above; previous tier A.

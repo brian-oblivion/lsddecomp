@@ -28,4 +28,8 @@ const char *GetAsmkMovie(s32 *typeCodeOut) {
 
 - **Name:** `GetAsmkMovie`
 - **Tier:** A
-- **Evidence:** its one caller, GameApplication__LoadIntroLogoSequence, uses the returned path directly as a StreamTask's stream name; matches exactly.
+- **Evidence:** returns sAsmkMoviePath (renamed from sAsmkStreamPath), "ETC\ASMK.STR", an STR movie, and writes movie id 49 (MOVIE_ASMK), whose gMovieFrameCounts entry GameApplication__LoadIntroLogoSequence passes to the StreamTask. Named for the file, not for a role.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetIntroStreamName` with tools/rename.py, on the record paths and callers above; previous tier A.

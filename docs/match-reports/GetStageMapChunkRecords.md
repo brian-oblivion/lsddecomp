@@ -38,4 +38,8 @@ Rec1C *GetStageMapChunkRecords(s32 index) {
 
 - **Name:** `GetStageMapChunkRecords`
 - **Tier:** A
-- **Evidence:** pure getter: &GetStageRecords(index)[9].
+- **Evidence:** &GetStageRecords(stage)[9]: records 9 on are the stage's Mnnn.LBD files (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100); LbdFile loads them (include/LbdFile.h).
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetGridRecordBase` with tools/rename.py, on the record paths and callers above; previous tier A.

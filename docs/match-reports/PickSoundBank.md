@@ -71,5 +71,9 @@ shift.
 ## Naming
 
 - **Name:** `PickSoundBank`
-- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** leaf picker: forced-or-random index into GetSoundBankPaths(), gated by gForcedSoundBank; a picker is tier A by the leaf-mechanics rule.
+- **Tier:** A
+- **Evidence:** returns gSoundBankPaths[gForcedSoundBank - 1] or a random one of the seven (`% SOUND_BANK_COUNT`); its one caller, DayTask__DayTask, hands the path to New_WBgm as the VAB base (include/WBgm.h). gForcedWeeklyGroup was renamed gForcedSoundBank with it.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `PickWeeklyGroup` with tools/rename.py, on the record paths and callers above; previous tier B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established).

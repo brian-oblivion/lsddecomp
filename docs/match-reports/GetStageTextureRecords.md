@@ -27,4 +27,8 @@ void *GetStageTextureRecords(s32 index) {
 
 - **Name:** `GetStageTextureRecords`
 - **Tier:** A
-- **Evidence:** pure one-line tail wrapper of GetStageRecords; no distinguishing caller found (grep across src/ and include/), so named for exactly what it does and nothing more.
+- **Evidence:** tail call of GetStageRecords: the group's first four records are TEXA..TEXD.TIX (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100); PickStageTexture indexes it and ObjM hands the pick to New_TimBlockSrc (class_3bb8c_l.c).
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetRecordGroupAlias` with tools/rename.py, on the record paths and callers above; previous tier A.

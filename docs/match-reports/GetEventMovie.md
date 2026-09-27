@@ -45,5 +45,9 @@ Rec1C *GetEventMovie(s32 *countOut, s32 sub) {
 ## Naming
 
 - **Name:** `GetEventMovie`
-- **Tier:** B
-- **Evidence:** pure getter: index into GetEventMovieRecords(); no cross-unit caller found (only reached internally via GetSpecialDayOrEventRecord's negative-group fallback).
+- **Tier:** A
+- **Evidence:** record `event` of GetEventMovieRecords, with movie id 8 + event.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetStreamPool3Channel` with tools/rename.py, on the record paths and callers above; previous tier B.

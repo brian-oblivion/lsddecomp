@@ -60,4 +60,8 @@ caller's 2-parameter extern now agrees with the definition.
 
 - **Name:** `PickStageBgm`
 - **Tier:** A
-- **Evidence:** leaf picker: 1-of-5 random-or-forced pick (gForcedStageBgm) from GetStageBgmRecords(index), with an index==9 special case.
+- **Evidence:** random 1-of-5 (or gForcedStageBgm, renamed from gForcedVariant) of GetStageBgmRecords; its caller hands the record to the WBgm's setSeq (class_3bb8c_l.c). Stage 9 skips index 2, BGC.SEQ.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `PickVariant` with tools/rename.py, on the record paths and callers above; previous tier A.

@@ -44,5 +44,9 @@ Rec1C *GetSpecialDayRecords(s32 *countOut, s32 n) {
 ## Naming
 
 - **Name:** `GetSpecialDayRecords`
-- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** used by both GetSpecialDayOrEventRecord (bank/entry resolve) and GetSpecialDayMovieSpan with a bank id `n`; base 0x23E, stride 6 records, matches both callers' own naming.
+- **Tier:** A
+- **Evidence:** &gRecordTable[574 + 6 * day], the six SPDAYnn records of special day `day` (FILM\SPDAYnnA/B.STR, IMG1\SPDAYnnC..F.TIM; the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100), and movie id 14 + 2 * day, its A movie's. `Special day` is the files' own SPDAY.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetCinematicBank` with tools/rename.py, on the record paths and callers above; previous tier B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established).

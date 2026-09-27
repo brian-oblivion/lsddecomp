@@ -24,5 +24,9 @@ void *GetSoundBankPaths(void) {
 ## Naming
 
 - **Name:** `GetSoundBankPaths`
-- **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** table getter: returns gSoundBankPaths.
+- **Tier:** A
+- **Evidence:** getter: returns gSoundBankPaths (renamed from gWeeklyGroupTable), whose seven words point to "SND\AMBIENT", "SND\CARTOON", "SND\ELECTRO", "SND\ETHNOVA", "SND\HUMAN", "SND\LOVELY", "SND\STANDERD" (retail data at 0x800819CC); the same seven bases as the VH/VB pairs at gRecordTable[0..13]. Nothing in the code or data is weekly.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetWeeklyGroupTable` with tools/rename.py, on the record paths and callers above; previous tier B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established).

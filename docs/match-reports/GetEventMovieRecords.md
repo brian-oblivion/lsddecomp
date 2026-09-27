@@ -40,5 +40,9 @@ Rec1C *GetEventMovieRecords(s32 *countOut) {
 ## Naming
 
 - **Name:** `GetEventMovieRecords`
-- **Tier:** B
-- **Evidence:** pure getter: &gRecordTable[0x238], count 8; no cross-unit caller found for it or GetEventMovie, named for the mechanics it has.
+- **Tier:** A
+- **Evidence:** &gRecordTable[568], FILM\EVENT1..6.STR (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100), and movie id 8, the first event movie's.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetStreamPool3` with tools/rename.py, on the record paths and callers above; previous tier B.

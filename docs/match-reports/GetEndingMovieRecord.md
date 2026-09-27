@@ -40,5 +40,9 @@ Rec1C *GetEndingMovieRecord(s32 *countOut) {
 ## Naming
 
 - **Name:** `GetEndingMovieRecord`
-- **Tier:** B
-- **Evidence:** pure getter: &gRecordTable[0x237], count 7; only used internally by GetEndingMovie.
+- **Tier:** A
+- **Evidence:** &gRecordTable[567], ETC\ENDING.STR (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100), and movie id 7.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetStreamPool2` with tools/rename.py, on the record paths and callers above; previous tier B.

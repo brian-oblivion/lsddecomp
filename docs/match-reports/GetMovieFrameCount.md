@@ -25,4 +25,8 @@ s32 GetMovieFrameCount(s32 index) {
 
 - **Name:** `GetMovieFrameCount`
 - **Tier:** A
-- **Evidence:** every one of its 4 call sites in code_1677c.c reads `typeLookup = GetMovieFrameCount(typeCode)` immediately before a StreamTask configure() call; matches exactly.
+- **Evidence:** returns gMovieFrameCounts[movieId] (renamed from gStreamTypeToGroupTable); every caller passes it to StreamTask__Init, which hands it to MoviePlayer__Play as `frameCount` (src/GraphicsResources.c). Its argument is always a movie id from this unit's movie getters.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetStreamGroupForType` with tools/rename.py, on the record paths and callers above; previous tier A.

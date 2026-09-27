@@ -40,5 +40,9 @@ Rec1C *GetOpeningMovieRecords(s32 *countOut) {
 ## Naming
 
 - **Name:** `GetOpeningMovieRecords`
-- **Tier:** B
-- **Evidence:** pure getter: &gRecordTable[0x230], count 0; only used internally by PickOpeningMovie.
+- **Tier:** A
+- **Evidence:** &gRecordTable[560] and movie id 0: records 560..566 are ETC\OPENINGA..G.STR (the record paths are retail's gRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100).
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetWeeklyStreamPool` with tools/rename.py, on the record paths and callers above; previous tier B.

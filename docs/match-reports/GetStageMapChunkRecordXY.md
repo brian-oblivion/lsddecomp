@@ -40,5 +40,9 @@ Rec1C *GetStageMapChunkRecordXY(s32 index, s32 x, s32 y) {
 ## Naming
 
 - **Name:** `GetStageMapChunkRecordXY`
-- **Tier:** B
-- **Evidence:** calls GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y) -- the strongest evidence in this family that the record group is addressed as a 2-D grid over StageGrid.h's own dimensions.
+- **Tier:** A
+- **Evidence:** GetStageMapChunkRecord(stage, x + columns * y), columns from GetStageGridDimensions(stage): the chunk at grid cell (x, y).
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetGridRecordXY` with tools/rename.py, on the record paths and callers above; previous tier B.

@@ -55,4 +55,8 @@ line carries `/* arity-ok: ... */`.
 
 - **Name:** `GetEndingMovie`
 - **Tier:** A
-- **Evidence:** its one caller, GameApplication__StartStreamTaskWithInit, uses the return value as the StreamTask's group id directly; matches exactly.
+- **Evidence:** wrapper of GetEndingMovieRecord that forwards the movie id; its caller (GameApplication__StartStreamTaskWithInit, slot +0x064) streams it.
+
+## Naming history
+
+- Round 100 (bravo, polish): renamed from `GetStreamChannelInit` with tools/rename.py, on the record paths and callers above; previous tier A.
