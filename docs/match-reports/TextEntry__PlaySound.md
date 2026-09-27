@@ -90,3 +90,10 @@ Zero bytes changed.
   object (accessors: this unit's AttachTarget/DetachTarget/PlaySound only;
   left because ItemList, the sibling with the identical layout, calls its
   field `target` too, and the two should move together).
+
+## Round 98: slot +0x060 named `playSound`
+
+This function is the slot's occupant, so the slot `notifyTarget` became
+`playSound` and the prototype's `arg1` became `tone` (the definition already
+said `tone`). Callers: HandleCommand (`1 << 4`, accept and cancel),
+SetCursorPos and SetCharAt (0, when `notify`). Zero bytes changed.

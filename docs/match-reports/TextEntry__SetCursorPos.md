@@ -55,7 +55,7 @@ void TextEntry__SetCursorPos(Obj86ED0 *self, s32 arg1, s32 arg2)
 ```
 
 Part of the same `Obj86ED0` "countdown/flush" group established in round 15
-(`TextEntry__PrevChar`/`TextEntry__ToggleAltCommands`/`TextEntry__ResetChar`/`TextEntry__ResetAllChars`, same
+(`TextEntry__PrevChar`/`TextEntry__ToggleActOnHeld`/`TextEntry__ResetChar`/`TextEntry__ResetAllChars`, same
 unit): tests `self->unk48` as a readiness gate, then calls through
 `self->unk40`'s own method table at slot `0xBC` with a 2-word stack-local
 argument block, then records `self->unk18 = arg1` and, if `arg2` is
@@ -96,3 +96,15 @@ verdict was set aside.
 Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 Renamed from Obj86ED0__DispatchIndexValue: moves cursorSprite with its setPosition slot (ScreenSprite +0x0BC) to x = pos * 7 + gTextEntryCursorPos, y = D_8008AAE0 (the stack block is a ScreenSpritePos), stores cursorIndex, and calls notifyTarget(0) when `notify`. Occupant of slot +0x0A4, called by MoveCursorRight/Left and ResetAllChars. Tier A (the body is the name).
+
+## Round 98: gTextEntryCursorPos unified (track 4b)
+
+`gTextEntryCursorPos` (0x8008AADC) now has one declaration, `extern
+ScreenSpritePos gTextEntryCursorPos;` in include/TextEntry.h; this unit's
+`extern s32 gTextEntryCursorPos` and `extern s32 D_8008AAE0` are gone. The
+body reads `local.y = gTextEntryCursorPos.y; local.x = pos * 7 +
+gTextEntryCursorPos.x;`. `D_8008AAE0` was that position's y (-12, the word at
++4, `ScreenSpritePos.y`): the `%gp_rel(gTextEntryCursorPos+4)` load assembles
+to the same bytes as `%gp_rel(D_8008AAE0)`, and the whole image stayed
+byte-exact. The splat label D_8008AAE0 remains in the data listing with no C
+reference.

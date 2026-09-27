@@ -30,7 +30,7 @@ below already existed there).
 `self` is `Obj86ED0`. This function only touches offsets 0x10-0x48, all
 of which were previously unnamed padding there. Established this as a
 "countdown/flush" subsystem alongside three siblings in this same unit
-(`TextEntry__ToggleAltCommands`, `TextEntry__ResetChar`,
+(`TextEntry__ToggleActOnHeld`, `TextEntry__ResetChar`,
 `TextEntry__ResetAllChars`) and two gp_rel-blocked siblings that touch the identical
 fields (`TextEntry__SetCursorPos`, `TextEntry__SetCharAt`).
 

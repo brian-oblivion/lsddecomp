@@ -140,7 +140,7 @@ No existing declaration's TYPE changed.
 Cross-unit fields/slots of `Obj86ED0` (shared header `include/class_3bb8c.h`)
 that this unit's own functions read/write but that class_3bb8c_j ALSO
 accesses -- left unrenamed per the field-ownership rule (compiler-checked:
-class_3bb8c_j's `TextEntry__PrevChar`/`TextEntry__ToggleAltCommands`/
+class_3bb8c_j's `TextEntry__PrevChar`/`TextEntry__ToggleActOnHeld`/
 `TextEntry__ResetChar`/`TextEntry__ResetAllChars`/
 `TextEntry__SetCursorPos`/`TextEntry__SetCharAt` are the other
 accessors). PROPOSED for whoever next runs track 3 on class_3bb8c_j, or for
@@ -172,7 +172,7 @@ the head to apply by type scope:
   whatever drives the name-entry screen's per-frame tick) to settle it.
 - `unk20` -> tentatively `altInputFlag` (tier C-ish B; NOT confident enough
   to apply even if it were unit-exclusive). Toggled by class_3bb8c_j's
-  `TextEntry__ToggleAltCommands` (`^= 1`), zeroed by `TextEntry__AttachTarget`,
+  `TextEntry__ToggleActOnHeld` (`^= 1`), zeroed by `TextEntry__AttachTarget`,
   tested with OPPOSITE polarity by every paired case in this function's own
   switch (`21` vs `5`, `20` vs `4`, `18` vs `2`, `19` vs `3`). Mechanics are
   solid; which real input condition it represents (a mode key held down? an
@@ -252,5 +252,21 @@ call site)."
 
 - TextEntry +0x020 `altCommands` -> `actOnHeld` (accessors: this unit's
   AttachTarget/HandleCommand, class_3bb8c_j's ToggleAltCommands); slot
-  +0x098 `toggleAltCommands` and `TextEntry__ToggleAltCommands` would follow
+  +0x098 `toggleAltCommands` and `TextEntry__ToggleActOnHeld` would follow
   (`toggleActOnHeld`). Evidence: the table above.
+
+## Round 98: proposals applied
+
+- slot +0x060 `notifyTarget` -> `playSound` (prototype `arg1` -> `tone`):
+  its occupant is TextEntry__PlaySound, `playTone(target, tone, 96, 96)` on
+  the attached VabStreamObj; this body calls it with `1 << 4` on accept and
+  cancel, SetCursorPos/SetCharAt with 0.
+- field +0x020 `altCommands` -> `actOnHeld`: every arrow case below runs on
+  PAD_EVENT_PRESSED when it is 0 and on PAD_EVENT_HELD when it is set;
+  AttachTarget zeroes it.
+- slot +0x098 `toggleAltCommands` -> `toggleActOnHeld`, occupant renamed by
+  rename.py to TextEntry__ToggleActOnHeld (`actOnHeld ^= 1`); SELECT's press
+  calls it.
+
+Accessors were the compiler's error list (class_3bb8c_i, class_3bb8c_j);
+zero bytes changed.
