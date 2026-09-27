@@ -12,11 +12,12 @@
  * segment against every face (TmdModel__RaycastFaces) for SceneNode's own
  * collision helpers in code_d294_b.c/code_d294_c.c.
  *
- * RotateAndOffsetHullList takes a hull list, not a TmdModel, and is a free
- * function; the tail of the file (TmdModel__AddFirstPrimClut, TmdModel__SetFirstPrimClut)
- * is NOT TmdModel either: a separate Outer_fa50/Inner_fa50/Target_fa50
- * pointer chain with no confirmed owning class, and TmdModel__SetFirstPrimClut's one
- * caller is class_3bb8c_o.c.
+ * RotateAndOffsetHullList is a free function over a TmdHull (a counted list
+ * of box corners, the buffer Actor__NotifyMove fills through getModelHull):
+ * it turns each box a quarter turn and offsets one face. The last two,
+ * TmdModel__AddFirstPrimClut and TmdModel__SetFirstPrimClut, move or set the
+ * CLUT id of the model's first primitive (TMD_P_TF3's clut) from a VRAM
+ * position; SetStyleEffectSources (class_3bb8c_o.c) calls the second.
  *
  * Tiers and match evidence for every function are in each function's own
  * docs/match-reports/ file; the unit's own history is in New_TmdModel's.
@@ -66,7 +67,8 @@ enum RayResult { RAY_MISS = 0, RAY_HIT = 1, RAY_PARALLEL = 2 };
  * still counts as on the face. */
 #define FACE_BOX_MARGIN 24
 
-/* The scratch VECTOR that also holds the candidate triangle's box. */
+/* TmdModel__RaycastFaces' per-face scratch: Square0's output VECTOR, then
+ * the face's bounding box. */
 typedef union VectorOrBox {
     VECTOR v;
     TmdBox b;

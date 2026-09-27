@@ -262,3 +262,17 @@ Byte-identical, first build.
 Later in the same pass: `MATCHING:` lines on `ABS_fa50` (build 3), the
 loop-body declarations (build 2) and the six box-field pointers (the frame
 measurement above). Comments only.
+
+## Naming (track 6, round 95)
+
+2026-09-27, delta, both with `tools/renametype.py`:
+
+- `Ray_fa50` -> `Ray`, tier A: `{ TmdVec3 org; TmdVec3 dir; }`, filled once
+  as `origin` and `end - origin` and read as the segment in every face test.
+  It must stay one 12-byte struct (build 2 above), so it is not two
+  `TmdVec3` locals; no project header defines an origin/direction pair.
+- `VecBox_fa50` -> `VectorOrBox`, tier A for mechanics: a union of Sony's
+  `VECTOR` and `TmdBox`, used as `Square0`'s output (`.v`) and then as the
+  candidate face's bounding box (`.b`). It exists because retail addresses
+  both at one frame slot (build 4); the name says exactly that and claims no
+  more.

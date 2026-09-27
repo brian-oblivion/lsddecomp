@@ -108,3 +108,8 @@ counted list of boxes' corners. Box `i` is `&((corners type *)h->v)[i]`, the
 (the address is `h + 4 + i * 48` either way). The two-faces-of-four corner
 type stays, because the rotation permutes faces (build 2 above: the flat
 `v[k + 4]` form costs a word per loop).
+
+`Corners_fa50` -> `BoxCorners` (`tools/renametype.py`), tier A: the 48-byte
+element is the eight corners of one box as two faces of four
+(`TmdModel__GetHull` writes them in that order: min-z face, max-z face), and
+this function permutes and offsets them as such.

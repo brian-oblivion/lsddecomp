@@ -66,3 +66,12 @@ exactly as `out->count` is, and never read, so the local is a counted box
 list of one, not a typed box. `out->count = 1` carries a `MATCHING:` line
 (build 1 above: `out->count = b.count` reloads the word and costs 3 words).
 Byte-identical.
+
+## Naming (track 6, round 95)
+
+2026-09-27, delta: `TypedBox_fa50` -> `BoxList` (`tools/renametype.py`),
+tier A. The local is `{ s32 count; TmdBox box; }`, its count set to 1 and
+never read: the box analogue of the `TmdHull` it fills (`{ s32 count;
+TmdVec3 v[8]; }`, count 1), i.e. a counted list of boxes holding one. No
+project type has that layout (`gTmdModelBoundsBuf` is a bare `TmdBox[]`
+with its count in a separate global).
