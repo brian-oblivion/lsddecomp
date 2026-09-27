@@ -55,7 +55,7 @@ extern VagAtr *_svm_tn;
  * halfwords as libsnd_ut_ako.c's SsUtAllKeyOff indexes it.
  * MATCHING: not volatile here; volatile moves SsUtKeyOff's second store out
  * of its branch delay slot. */
-extern u16 *D_8006DAD4;
+extern u16 *_svm_sreg;
 
 /* The SPU's noise-mode enable register pair (NON, 0x1F801D94/0x1F801D96:
  * one bit per voice, voices 0-15 then 16-23), as halfword indices from
@@ -351,8 +351,8 @@ s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
     if (_svm_voice[idx].unk00 == 0xFF) {
         _svm_voice[(u8)idx].unk1B = 0;
         _svm_voice[(u8)idx].unk04 = 0;
-        D_8006DAD4[SPU_NOISE_ON_LO] = 0;
-        D_8006DAD4[SPU_NOISE_ON_HI] = 0;
+        _svm_sreg[SPU_NOISE_ON_LO] = 0;
+        _svm_sreg[SPU_NOISE_ON_HI] = 0;
     } else {
         D_8008EA26 = idx;
         chan = D_8008EA26;

@@ -19,7 +19,7 @@ toolchain blocker.
 
 ## What it computes
 
-SPU voice-channel setup: `D_8006DAD4` holds `0x1F801C00`, the PS1 SPU base
+SPU voice-channel setup: `_svm_sreg` holds `0x1F801C00`, the PS1 SPU base
 hardware address (confirmed by reading `asm/data/57070.data.s`), and the
 function writes to `+0x194`/`+0x196` from it — the SPU key-on-low/key-on-high
 registers. `a0` is the voice-channel number (0-31, masked to a byte), `a1`
@@ -52,7 +52,7 @@ extern u16 D_8008E228;
 extern u16 _svm_okon2;
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
-extern u16 *D_8006DAD4;
+extern u16 *_svm_sreg;
 
 void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 a3;
@@ -111,8 +111,8 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     _svm_okof1 = c60;
     c64 = c64 & ~e22c;
     _svm_okof2 = c64;
-    D_8006DAD4[0xCA] = lowBit;
-    D_8006DAD4[0xCB] = highBit;
+    _svm_sreg[0xCA] = lowBit;
+    _svm_sreg[0xCB] = highBit;
 }
 ```
 
@@ -260,7 +260,7 @@ extern u16 D_8008E228;
 extern u16 _svm_okon2;
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
-extern u16 *D_8006DAD4;
+extern u16 *_svm_sreg;
 
 void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     s32 a3;
@@ -319,8 +319,8 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     _svm_okof1 = c60;
     c64 = c64 & ~e22c;
     _svm_okof2 = c64;
-    D_8006DAD4[0xCA] = lowBit;
-    D_8006DAD4[0xCB] = highBit;
+    _svm_sreg[0xCA] = lowBit;
+    _svm_sreg[0xCB] = highBit;
 }
 ```
 
@@ -546,7 +546,7 @@ That is exactly the 5-word gap: `move` + `addiu sp,-8` + duplicated
 | masked local typed `u32` / `u16` / `s32` | all three inert on the swap and on the score |
 | removing the existing `__asm__("")` barrier | **NEGATIVE** — 1835 -> 2520. The barrier is still load-bearing |
 | a SECOND `__asm__("")` at the top, and one before the tail | both inert (1835 unchanged) |
-| long live range: cache `D_8006DAD4` in a local from the top | **REGRESSION** — 107 -> 108 words, 1835 -> 2790 |
+| long live range: cache `_svm_sreg` in a local from the top | **REGRESSION** — 107 -> 108 words, 1835 -> 2790 |
 | `D_8008D98A` store placement sweep, 5 positions | see below |
 | arm-order (write the jumping arm NOT-last) | **not applicable** — retail's arm order already matches ours instruction-for-instruction; its `li v0,0x1` duplication is caused by the frame taking the delay slot, not by block layout. This is the delay-slot counter-indication the lever's own entry warns about |
 | delete-a-local across a CALL | **not applicable** — this function is a leaf, zero calls, so the live range that lever needs cannot exist here |
@@ -589,7 +589,7 @@ spending the session's one search where it can bite.
 Needs, in addition to the unit's existing declarations before
 `SpuVmKeyOnNow` and `vmNoiseOn` (`_svm_sreg_buf`, `D_8008D7F2`,
 `_svm_sreg_dirty`, `D_8008D98C`, `D_8008D9A3`, `D_8008E228`, `_svm_okon2`,
-`_svm_okof1`, `_svm_okof2`, `spuVmMaxVoice`, `D_8006DAD4`), one extra:
+`_svm_okof1`, `_svm_okof2`, `spuVmMaxVoice`, `_svm_sreg`), one extra:
 
 #if 0
 extern u8 D_8008D98A[];
@@ -641,8 +641,8 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     _svm_okon2 = highBit | _svm_okon2;
     _svm_okof1 = _svm_okof1 & ~D_8008E228;
     _svm_okof2 = _svm_okof2 & ~_svm_okon2;
-    D_8006DAD4[0xCA] = lowBit;
-    D_8006DAD4[0xCB] = highBit;
+    _svm_sreg[0xCA] = lowBit;
+    _svm_sreg[0xCB] = highBit;
 }
 #endif
 

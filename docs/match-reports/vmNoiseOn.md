@@ -56,8 +56,8 @@ channel's own slot `2`, OR the enable bits into `D_8008E228`/`_svm_okon2`
 and AND-NOT them out of `_svm_okof1`/`_svm_okof2`, conditionally OR/AND-NOT
 them into a second enable pair (`_svm_orev1`/`_svm_orev2`, gated on
 `D_8008EA20 & 4` -- new globals, not touched by `vmNoiseOn2`), and
-finally write the bits to the SPU key-on registers via `D_8006DAD4`. Also
-patches one field of `D_8006DAD4[0xD5]` (byte offset `0x1AA`) with a 6-bit
+finally write the bits to the SPU key-on registers via `_svm_sreg`. Also
+patches one field of `_svm_sreg[0xD5]` (byte offset `0x1AA`) with a 6-bit
 delta between `D_8008EA0E` and `D_8008EA1C`, shifted into the high byte.
 
 ## The `x/127` and `x/63` magic-multiply idiom -- verified against the pinned pipeline before writing any C
@@ -116,7 +116,7 @@ extern s16 _svm_stereo_mono;
 extern u16 D_8008EA22;
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
-extern u16 *D_8006DAD4;
+extern u16 *_svm_sreg;
 extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
 extern u8 _svm_sreg_dirty[];
@@ -162,7 +162,7 @@ extern s16 _svm_stereo_mono;
 extern u16 D_8008EA22;
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
-extern u16 *D_8006DAD4;
+extern u16 *_svm_sreg;
 extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
 extern u8 _svm_sreg_dirty[];
@@ -238,7 +238,7 @@ void vmNoiseOn(s32 a0) {
     }
 
     chan = (u8)chanRaw;
-    D_8006DAD4[0xD5] = (u16)((D_8006DAD4[0xD5] & 0xC0FF) | (((D_8008EA0E - D_8008EA1C) & 0x3F) << 8));
+    _svm_sreg[0xD5] = (u16)((_svm_sreg[0xD5] & 0xC0FF) | (((D_8008EA0E - D_8008EA1C) & 0x3F) << 8));
 
     off16 = chan << 4;
     *(u16 *)(D_8008D7F2 + off16) = pan2;
@@ -287,8 +287,8 @@ void vmNoiseOn(s32 a0) {
         _svm_orev2 &= ~highBit;
     }
 
-    D_8006DAD4[0xCA] = lowBit;
-    D_8006DAD4[0xCB] = highBit;
+    _svm_sreg[0xCA] = lowBit;
+    _svm_sreg[0xCB] = highBit;
 }
 ```
 

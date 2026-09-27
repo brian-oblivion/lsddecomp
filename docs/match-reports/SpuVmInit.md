@@ -31,7 +31,7 @@ grep -A2 -nE '\b(mflo|mfhi)\b' ... | grep -E '\b(mult|multu|div|divu)\b'  -> no 
 
 `./build-and-verify.sh` GREEN with `INCLUDE_ASM` restored. This round closed
 the gap from the first pass's stall (269/270, one word short, wrong shape in
-the D_8006DAD4 store block) all the way to **267/270 raw words matching, at
+the _svm_sreg store block) all the way to **267/270 raw words matching, at
 EXACT retail length** — the three remaining differing words are the SAME
 three instructions with ONE register swapped (`a0` in retail, `s0` in this
 attempt), not a different instruction, count, or control-flow shape. Per
@@ -87,17 +87,17 @@ into a single `sll #4` and never produces either instruction.
 
 **The fix, applied exactly as prescribed:** declare `u16 woff;` at the loop's
 declaration block, assign `woff = (u16) i * 8;` as the loop body's FIRST
-statement, and index the six `D_8006DAD4` fields as a flat `s16 *`:
+statement, and index the six `_svm_sreg` fields as a flat `s16 *`:
 
 ```c
 woff = (u16) i * 8;
 ... (twenty 0x34-stride record zero/init stores, UNCHANGED from before) ...
-((s16 *) D_8006DAD4)[woff + 3] = 0x200;   /* +0x6 */
-((s16 *) D_8006DAD4)[woff + 2] = 0x1000;  /* +0x4 */
-((u16 *) D_8006DAD4)[woff + 4] = 0x80FF;  /* +0x8 -- see note below */
-((s16 *) D_8006DAD4)[woff + 0] = 0;       /* +0x0 */
-((s16 *) D_8006DAD4)[woff + 1] = 0;       /* +0x2 */
-((s16 *) D_8006DAD4)[woff + 5] = 0x4000;  /* +0xA */
+((s16 *) _svm_sreg)[woff + 3] = 0x200;   /* +0x6 */
+((s16 *) _svm_sreg)[woff + 2] = 0x1000;  /* +0x4 */
+((u16 *) _svm_sreg)[woff + 4] = 0x80FF;  /* +0x8 -- see note below */
+((s16 *) _svm_sreg)[woff + 0] = 0;       /* +0x0 */
+((s16 *) _svm_sreg)[woff + 1] = 0;       /* +0x2 */
+((s16 *) _svm_sreg)[woff + 5] = 0x4000;  /* +0xA */
 ```
 
 This reproduced retail's early `sll #3`, the mid-block `andi ...,0xffff` on
@@ -106,7 +106,7 @@ the product, and the LATE base-pointer load, **instruction for instruction**
 block through this section now shows zero content differences (only the
 downstream register-identity residue noted below). This is the single
 biggest structural fix of the round and should be treated as the
-established idiom for this record family's D_8006DAD4-array writes
+established idiom for this record family's _svm_sreg-array writes
 whenever they occur inside a LOOP (see the caveat under
 `SetAutoVol`'s report on the non-loop case, which behaves differently).
 
@@ -256,7 +256,7 @@ and stored identically to retail.
    reassigning the parameter when the original wide value is never needed
    again.
 4. **The `woff`-halfword-index idiom for a small-struct array proven inside
-   a loop (this function's D_8006DAD4 fix, confirmed byte-exact) does NOT
+   a loop (this function's _svm_sreg fix, confirmed byte-exact) does NOT
    transfer cleanly to the equivalent access OUTSIDE a loop** — see
    `SetAutoVol`'s report, attempted this same round with the identical
    idiom against a single (non-looping) call site, which reduced but did
@@ -354,7 +354,7 @@ typedef struct {
     u16 unk194; /* +0x194 */
     u16 unk196; /* +0x196 */
 } SpuRegs;
-extern SpuRegs *D_8006DAD4;
+extern SpuRegs *_svm_sreg;
 
 void SpuVmInit(s32 a0) {
     s16 i;
@@ -391,7 +391,7 @@ void SpuVmInit(s32 a0) {
         u16 lowMask;
         u16 highMask;
 
-        /* Halfword-indexed byte-offset for the six D_8006DAD4 fields
+        /* Halfword-indexed byte-offset for the six _svm_sreg fields
          * below: idx*8 computed first (matches retail's very first
          * instruction of the loop body, an early `sll #3` well before
          * the 0x34-stride chain even starts), then indexed as `woff+N`
@@ -426,15 +426,15 @@ void SpuVmInit(s32 a0) {
         D_8008D9B8[(u16) i].unk0 = 0;
         D_8008D9AC[(u16) i].unk0 = 0;
 
-        ((s16 *) D_8006DAD4)[woff + 3] = 0x200;   /* +0x6 */
-        ((s16 *) D_8006DAD4)[woff + 2] = 0x1000;  /* +0x4 */
-        ((u16 *) D_8006DAD4)[woff + 4] = 0x80FF;  /* +0x8 -- `u16` needed for `ori` vs `addiu` */
-        ((s16 *) D_8006DAD4)[woff + 0] = 0;       /* +0x0 */
-        ((s16 *) D_8006DAD4)[woff + 1] = 0;       /* +0x2 */
-        ((s16 *) D_8006DAD4)[woff + 5] = 0x4000;  /* +0xA */
+        ((s16 *) _svm_sreg)[woff + 3] = 0x200;   /* +0x6 */
+        ((s16 *) _svm_sreg)[woff + 2] = 0x1000;  /* +0x4 */
+        ((u16 *) _svm_sreg)[woff + 4] = 0x80FF;  /* +0x8 -- `u16` needed for `ori` vs `addiu` */
+        ((s16 *) _svm_sreg)[woff + 0] = 0;       /* +0x0 */
+        ((s16 *) _svm_sreg)[woff + 1] = 0;       /* +0x2 */
+        ((s16 *) _svm_sreg)[woff + 5] = 0x4000;  /* +0xA */
 
         /* Scheduling barrier: load-bearing. Without it, GCC hoists the
-         * D_8008EA26 write+re-read ABOVE the six D_8006DAD4 stores
+         * D_8008EA26 write+re-read ABOVE the six _svm_sreg stores
          * (still correct VALUE-wise, but 1 word shorter than retail,
          * which keeps this AFTER the stores). Confirmed by direct
          * removal test: 269/270 words without the barrier, 270/270
@@ -625,7 +625,7 @@ substitutions, all using ONE permuter-inserted `int new_var;`:
    parameter"), which axis 4's isolated testing found WORSE (an extra
    spurious `move`) when tried ALONE.
 2. `new_var = woff + 0; ... [new_var] = 0;` in place of the direct
-   `[woff + 0] = 0;` for the `D_8006DAD4` zero-store -- hoists the identical
+   `[woff + 0] = 0;` for the `_svm_sreg` zero-store -- hoists the identical
    arithmetic value into a temp, computed one statement earlier, textually
    ahead of the intervening `+2`/`+4` stores.
 3. `woff = _svm_okof1; D_8008E228 &= ~woff;` -- reuses the (by-then-dead)
@@ -719,7 +719,7 @@ sound driver"; nothing about it is guessed beyond what the body does.
 ## Proposed field names
 
 Not this function's own struct, but noting here since this report already
-lists most of the cluster: `D_8006DAD4Edd4`/`D_8006DAD4` (this unit's two
+lists most of the cluster: `D_8006DAD4Edd4`/`_svm_sreg` (this unit's two
 independent local views of the same base pointer) is the PS1 SPU hardware
 base address `0x1F801C00`, per `vmNoiseOn2`'s own report in
 `code_179d8_l`. Proposing (not applying -- shared with bravo's live
@@ -757,11 +757,11 @@ because splat names only addresses some asm references. Byte-identical.
 Round 89 (runner delta, track 5 `asm-sites`), two sites:
 
 - **Retired: the asm-label alias** `extern SpuRegsEdd4 *D_8006DAD4Edd4
-  __asm__("D_8006DAD4");`. SpuVmInit was its only user (six `(s16 *)`/`(u16 *)`
-  cast stores). The unit's `SpuRegs` typedef and `extern SpuRegs *D_8006DAD4;`
+  __asm__("_svm_sreg");`. SpuVmInit was its only user (six `(s16 *)`/`(u16 *)`
+  cast stores). The unit's `SpuRegs` typedef and `extern SpuRegs *_svm_sreg;`
   moved up to where the alias stood (SpuVmNoiseOff, later in the unit, still
   uses them), the identical `SpuRegsEdd4` typedef was dropped, and SpuVmInit
-  now names `D_8006DAD4` directly. `build/src/code_179d8_m.c.o` came out
+  now names `_svm_sreg` directly. `build/src/code_179d8_m.c.o` came out
   byte-identical (`cmp`), `./build-and-verify.sh` green, and
   `tools/check-nonmatching.sh code_179d8_m` still passes.
 - **Justified: the bare `__asm__("")`** before `D_8008EA26 = i;`. Measured by
@@ -769,7 +769,7 @@ Round 89 (runner delta, track 5 `asm-sites`), two sites:
   came out one word shorter -- retail's `nop` after the `lhu` reload is gone --
   and everything after it drifted), `funcdiff` 163/269, and
   asm-differ shows the `sh a1,-0x15da(at)` store to `D_8008EA26` and its
-  `lhu` reload hoisted above the six `D_8006DAD4` halfword stores
+  `lhu` reload hoisted above the six `_svm_sreg` halfword stores
   (`sh ... 6/4/8/0/2/0xa(a0)`) that retail performs first. Instruction order
   only; the barrier now carries a one-line comment saying so.
 
@@ -778,7 +778,7 @@ Round 89 (runner delta, track 5 `asm-sites`), two sites:
 Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile.
 
 - The local `SpuVolume`/`SpuReverbAttr` mirrors and the local `SpuInitMalloc(s32, void *)` prototype are gone: `<libspu.h>` supplies all three (`SpuInitMalloc(long, char *)`, so `D_8008DEB0` is declared `char[]`).
-- `ObjDAD4` is now `SpuRegs` (`tools/renametype.py ObjDAD4 SpuRegs`): `D_8006DAD4` holds 0x1F801C00, the first `.data` word of libsnd/vmanager.o on disc 3.3 (`001c801f`), the PS1 SPU register block. It is laid out as `SpuVoiceRegs voice[24]` (volL, volR, pitch, addr, adsr1, adsr2, envx at +0x0..+0xC) plus the keyOn (+0x188), keyOff (+0x18C), noiseOn (+0x194) and reverbOn (+0x198) words. The six cast stores here are unchanged (their index spelling carries the match); each comment now names the register: +0x6 addr = 0x200, +0x4 pitch = 0x1000 (44.1 kHz), +0x8 adsr1 = 0x80FF, +0x0/+0x2 volL/volR = 0, +0xA adsr2 = 0x4000.
+- `ObjDAD4` is now `SpuRegs` (`tools/renametype.py ObjDAD4 SpuRegs`): `_svm_sreg` holds 0x1F801C00, the first `.data` word of libsnd/vmanager.o on disc 3.3 (`001c801f`), the PS1 SPU register block. It is laid out as `SpuVoiceRegs voice[24]` (volL, volR, pitch, addr, adsr1, adsr2, envx at +0x0..+0xC) plus the keyOn (+0x188), keyOff (+0x18C), noiseOn (+0x194) and reverbOn (+0x198) words. The six cast stores here are unchanged (their index spelling carries the match); each comment now names the register: +0x6 addr = 0x200, +0x4 pitch = 0x1000 (44.1 kHz), +0x8 adsr1 = 0x80FF, +0x0/+0x2 volL/volR = 0, +0xA adsr2 = 0x4000.
 - The function comment above SpuVmInit is now one `MATCHING:` line. Its previous text:
 
 ```c
@@ -787,7 +787,7 @@ Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<li
  * run (100k+ iterations) could not move.  Permuter-found: a SINGLE scratch
  * variable (`scratch`, `s32`), reused for TWO textually unrelated
  * purposes -- once to break the `a0`-vs-`s0` min-clamp tie, and again
- * ~150 lines later as the `D_8006DAD4[woff]` store's index -- is what
+ * ~150 lines later as the `_svm_sreg[woff]` store's index -- is what
  * reproduces retail's exact register allocation.  Splitting these into
  * two separately-named locals (the natural, more readable choice) gives a
  * WORSE result than either leaving `a0` alone or this single-variable

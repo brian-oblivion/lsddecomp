@@ -9,7 +9,7 @@ class) -- this one is a "stop a channel" operation: it validates the
 caller's (p1,p2,p3,p4) against the four cached config records for `idx`,
 then either clears the channel's active-mask bits or (if it was already in
 the "0xFF" idle state) clears a fixed slot-25 pair of fields on the shared
-`D_8006DAD4` table instead.
+`_svm_sreg` table instead.
 
 ## What it is
 
@@ -36,8 +36,8 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
     if (_svm_voice[idx].unk0 == 0xFF) {
         D_8008D9A3[(u8) idx].unk0 = 0;
         D_8008D98C[(u8) idx].unk0 = 0;
-        D_8006DAD4[25].unk4 = 0;
-        D_8006DAD4[25].unk6 = 0;
+        _svm_sreg[25].unk4 = 0;
+        _svm_sreg[25].unk6 = 0;
     } else {
         D_8008EA26 = idx;
         chan = D_8008EA26;
@@ -91,12 +91,12 @@ fail_nolock:
 
 ## Key findings (all measured, not inferred)
 
-### 1. `D_8006DAD4[25]` is a fixed literal index, not `idx`
+### 1. `_svm_sreg[25]` is a fixed literal index, not `idx`
 
 The tail of the `==0xFF` branch does `sh $zero, 0x194($v0)` / `sh $zero,
-0x196($v0)` where `$v0` holds the bare `D_8006DAD4` pointer value with NO
+0x196($v0)` where `$v0` holds the bare `_svm_sreg` pointer value with NO
 index-register addition. `0x194 = 25*0x10 + 0x4` and `0x196 = 25*0x10 +
-0x6` are compile-time constants, i.e. `D_8006DAD4[25].unk4/unk6` -- entry
+0x6` are compile-time constants, i.e. `_svm_sreg[25].unk4/unk6` -- entry
 25 is a fixed "shared/global" slot in the same table the 0..0x17 loop
 index uses elsewhere, addressed directly because 25 is a literal, not
 `idx`. This explains an otherwise-mysterious "struct pointer dereferenced
@@ -203,12 +203,12 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 
 - Return type is now Sony's `short` (`<libsnd.h>`: `short SsUtKeyOff(short,
   short, short, short, short)`), byte-identical.
-- `EntryDAD4` is DELETED. `D_8006DAD4` holds 0x1F801C00, the SPU register
+- `EntryDAD4` is DELETED. `_svm_sreg` holds 0x1F801C00, the SPU register
   base (libsnd_ut_ako.c's reading, halfword-indexed). The old `[25].unk4` /
   `[25].unk6` were byte offsets 0x194/0x196 = 0x1F801D94/0x1F801D96, the
   SPU's noise-mode enable pair (NON), cleared on the noise-voice path
-  (`unk00 == 0xFF`). The unit now declares `extern u16 *D_8006DAD4;` and
-  writes `D_8006DAD4[SPU_NOISE_ON_LO]` / `[SPU_NOISE_ON_HI]` (0x194/2,
+  (`unk00 == 0xFF`). The unit now declares `extern u16 *_svm_sreg;` and
+  writes `_svm_sreg[SPU_NOISE_ON_LO]` / `[SPU_NOISE_ON_HI]` (0x194/2,
   0x196/2). `volatile` on the pointee, as p.c spells it, is NOT
   byte-identical here: it moves the second store out of the `j` delay slot
   (measured), so this unit keeps it non-volatile with a MATCHING line.

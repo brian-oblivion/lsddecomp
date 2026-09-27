@@ -10,7 +10,7 @@
  * tones are <libsnd.h>'s VabHdr/ProgAtr/VagAtr behind libsnd's _svm_vh,
  * _svm_pg and _svm_tn (pinned in config/psyq-objects.ld, spelled here by
  * their D_ addresses), a sequence is include/SsScore.h's record, and the
- * per-voice state is include/SvmData.h's _svm_voice/_svm_sreg_buf. D_8006DAD4
+ * per-voice state is include/SvmData.h's _svm_voice/_svm_sreg_buf. _svm_sreg
  * points at the SPU's own register block, SvmData.h's SpuRegs.
  *
  *   - SpuVmInit: resets the voice manager: every voice, its shadow
@@ -278,7 +278,7 @@ extern u16 _svm_okon2;
 
 /* Declared without volatile, the spelling this unit's matched bodies were
  * derived against. */
-extern SpuRegs *D_8006DAD4;
+extern SpuRegs *_svm_sreg;
 
 /* MATCHING: `scratch` is one local reused for the clamp and for the
  * volL store's index; two locals change the register allocation. */
@@ -343,16 +343,16 @@ void SpuVmInit(s32 a0) {
         _svm_voice[(u16)i].unk30 = 0;
         _svm_voice[(u16)i].unk24 = 0;
 
-        ((s16 *)D_8006DAD4)[woff + 3] = 0x200; /* voice[i].addr */
+        ((s16 *)_svm_sreg)[woff + 3] = 0x200; /* voice[i].addr */
         scratch = woff;
-        ((s16 *)D_8006DAD4)[woff + 2] = 0x1000; /* voice[i].pitch */
-        ((u16 *)D_8006DAD4)[woff + 4] = 0x80FF; /* voice[i].adsr1 */
-        ((s16 *)D_8006DAD4)[scratch] = 0;       /* voice[i].volL */
-        ((s16 *)D_8006DAD4)[woff + 1] = 0;      /* voice[i].volR */
-        ((s16 *)D_8006DAD4)[woff + 5] = 0x4000; /* voice[i].adsr2 */
+        ((s16 *)_svm_sreg)[woff + 2] = 0x1000; /* voice[i].pitch */
+        ((u16 *)_svm_sreg)[woff + 4] = 0x80FF; /* voice[i].adsr1 */
+        ((s16 *)_svm_sreg)[scratch] = 0;       /* voice[i].volL */
+        ((s16 *)_svm_sreg)[woff + 1] = 0;      /* voice[i].volR */
+        ((s16 *)_svm_sreg)[woff + 5] = 0x4000; /* voice[i].adsr2 */
 
         /* Keeps the D_8008EA26 store and its reload below the six
-         * D_8006DAD4 halfword stores; without it GCC hoists them above. */
+         * _svm_sreg halfword stores; without it GCC hoists them above. */
         __asm__("");
         D_8008EA26 = i;
         chan = D_8008EA26;
@@ -431,8 +431,8 @@ void SpuVmNoiseOff(void) {
         if (_svm_voice[i].unk1B == 2) {
             _svm_voice[(u8)i].unk1B = 0;
             _svm_voice[(u8)i].unk04 = 0;
-            D_8006DAD4->noiseOn[0] = 0;
-            D_8006DAD4->noiseOn[1] = 0;
+            _svm_sreg->noiseOn[0] = 0;
+            _svm_sreg->noiseOn[1] = 0;
         }
     }
 }
@@ -595,7 +595,7 @@ void SpuVmFlush(void) {
 
     if (count > 0) {
         Rec34HalfU2 *p98E = (Rec34HalfU2 *)&_svm_voice[0].unk06;
-        SpuVoiceRegs *pDad = D_8006DAD4->voice;
+        SpuVoiceRegs *pDad = _svm_sreg->voice;
 
         for (i = 0; i < count; i++) {
             p98E->unk0 = pDad->envx;
@@ -645,18 +645,18 @@ void SpuVmFlush(void) {
 
         for (i = 0; i < 0x18; i++) {
             if (_svm_sreg_dirty[i] & 1) {
-                D_8006DAD4->voice[i].volL = p7F0->unk0;
-                D_8006DAD4->voice[i].volR = p7F0->unk2;
+                _svm_sreg->voice[i].volL = p7F0->unk0;
+                _svm_sreg->voice[i].volR = p7F0->unk2;
             }
             if (_svm_sreg_dirty[i] & 4) {
-                D_8006DAD4->voice[i].pitch = _svm_sreg_buf[i].unk4;
+                _svm_sreg->voice[i].pitch = _svm_sreg_buf[i].unk4;
             }
             if (_svm_sreg_dirty[i] & 8) {
-                D_8006DAD4->voice[i].addr = _svm_sreg_buf[i].unk6;
+                _svm_sreg->voice[i].addr = _svm_sreg_buf[i].unk6;
             }
             if (_svm_sreg_dirty[i] & 0x10) {
-                D_8006DAD4->voice[i].adsr1 = p7F0->unk8;
-                D_8006DAD4->voice[i].adsr2 = p7F0->unkA;
+                _svm_sreg->voice[i].adsr1 = p7F0->unk8;
+                _svm_sreg->voice[i].adsr2 = p7F0->unkA;
             }
 
             _svm_sreg_dirty[i] = 0;
@@ -665,7 +665,7 @@ void SpuVmFlush(void) {
     }
 
     {
-        SpuRegs *rec = D_8006DAD4;
+        SpuRegs *rec = _svm_sreg;
         u16 lowMask = _svm_okof1;
         u16 highMask = _svm_okof2;
         u16 lowActive = D_8008E228;
@@ -874,8 +874,8 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
         if (_svm_voice[i].unk00 == 0xFF) {
             _svm_voice[i].unk1B = 0;
             _svm_voice[i].unk04 = 0;
-            D_8006DAD4->noiseOn[0] = 0;
-            D_8006DAD4->noiseOn[1] = 0;
+            _svm_sreg->noiseOn[0] = 0;
+            _svm_sreg->noiseOn[1] = 0;
         } else {
             u16 chan;
             u16 lowMask;

@@ -51,8 +51,8 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
         if (_svm_voice[i].unk0 == 0xFF) {
             D_8008D9A3[i].unk0 = 0;
             D_8008D98C[i].unk0 = 0;
-            D_8006DAD4->unk194 = 0;
-            D_8006DAD4->unk196 = 0;
+            _svm_sreg->unk194 = 0;
+            _svm_sreg->unk196 = 0;
         } else {
             u16 chan;
             u16 lowMask;
@@ -92,7 +92,7 @@ same 0x34-stride record family `code_179d8_j.c` documents as
 
 - **`== 0xFF`:** the same "type A" reset `SpuVmKeyOff`'s neighbours use
   -- clear `D_8008D9A3[i]`, `D_8008D98C[i]`, and the current object's
-  `unk194`/`unk196` fields (`D_8006DAD4`, both already declared for
+  `unk194`/`unk196` fields (`_svm_sreg`, both already declared for
   `SpuVmNoiseOff`).
 - **otherwise:** a "channel" reset: stash `i` into the "currently selected
   channel" scratch global `D_8008EA26`, re-read it, clear `D_8008D9A3`/

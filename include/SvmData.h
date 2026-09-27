@@ -79,7 +79,7 @@ extern SvmVoice _svm_voice[]; /* 24 voices */
 /*
  * SvmSreg -- one record of libsnd's _svm_sreg_buf, the per-voice shadow
  * of the SPU voice registers that SpuVmFlush copies out through
- * D_8006DAD4 (the SPU voice register block) for every voice whose
+ * _svm_sreg (the SPU voice register block) for every voice whose
  * _svm_sreg_dirty byte has bits set. Same provenance and naming rule as
  * SvmVoice: libsnd/vmanager.o bss +0x000, 24 voices x 0x10, 0x8008D7F0;
  * fields by offset only.
@@ -99,11 +99,11 @@ extern u8 _svm_sreg_dirty[];    /* 24 voices: which _svm_sreg_buf fields SpuVmFl
 
 /*
  * SpuVoiceRegs, SpuRegs -- the PS1 SPU's own register block at 0x1F801C00,
- * which libsnd/vmanager.o's first .data word (D_8006DAD4) points at: 24
+ * which libsnd/vmanager.o's first .data word (_svm_sreg) points at: 24
  * voices of 0x10 bytes, then the global key-on/key-off/noise/reverb bit
  * masks. Unlike the bss tables above these are hardware registers, so the
  * fields carry the hardware's names; only registers some accessor touches
- * are named. Units declare D_8006DAD4 themselves, each with the pointee
+ * are named. Units declare _svm_sreg themselves, each with the pointee
  * spelling its bodies match against.
  */
 typedef struct {

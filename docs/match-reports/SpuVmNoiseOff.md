@@ -32,7 +32,7 @@ typedef struct {
     u16 unk194; /* +0x194 */
     u16 unk196; /* +0x196 */
 } SpuRegs;
-extern SpuRegs *D_8006DAD4;
+extern SpuRegs *_svm_sreg;
 
 void SpuVmNoiseOff(void) {
     s16 i;
@@ -41,8 +41,8 @@ void SpuVmNoiseOff(void) {
         if (D_8008D9A3[i].unk0 == 2) {
             D_8008D9A3[(u8) i].unk0 = 0;
             D_8008D98C[(u8) i].unk0 = 0;
-            D_8006DAD4->unk194 = 0;
-            D_8006DAD4->unk196 = 0;
+            _svm_sreg->unk194 = 0;
+            _svm_sreg->unk196 = 0;
         }
     }
 }
@@ -60,7 +60,7 @@ same `if`.
 channel-configuration record family `code_179d8_j.c` already documents
 (`Rec34Byte`/`Rec34Half` there) -- redeclared here as this unit's own local
 view per the project's multiple-independent-local-views convention (no
-shared header). `D_8006DAD4` is the same symbol `code_179d8_j.c` reads as
+shared header). `_svm_sreg` is the same symbol `code_179d8_j.c` reads as
 `EntryDAD4 *` (an array of 0x10-byte records indexed by channel); this
 function instead reads two FIXED offsets (`+0x194`, `+0x196`) off the same
 pointer's value with no index scaling at all -- a different reading of the

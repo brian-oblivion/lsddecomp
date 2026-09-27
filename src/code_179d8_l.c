@@ -299,7 +299,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
  * SpuVmKeyOnNow (ROM-earlier, same shapes) -- reused here, not redeclared. */
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
-extern SpuRegs *D_8006DAD4;
+extern SpuRegs *_svm_sreg;
 extern u8 spuVmMaxVoice;
 
 /* STALL -- see docs/match-reports/vmNoiseOn.md. Best body reached
@@ -352,8 +352,8 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     _svm_okon2 = highBit | _svm_okon2;
     _svm_okof1 = _svm_okof1 & ~D_8008E228;
     _svm_okof2 = _svm_okof2 & ~_svm_okon2;
-    D_8006DAD4->noiseOn[0] = lowBit;
-    D_8006DAD4->noiseOn[1] = highBit;
+    _svm_sreg->noiseOn[0] = lowBit;
+    _svm_sreg->noiseOn[1] = highBit;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn2);

@@ -517,7 +517,7 @@ void SetAutoVol(s16 a0) {
      * the point of use (indexing an `s16 *`, which then scales by 2),
      * reaching idx*16 -- the real per-channel byte stride for these two
      * 0x10-stride, single-field arrays. Same base idiom as
-     * SpuVmInit's D_8006DAD4 fix, but kept `s16` (not `u16`) until
+     * SpuVmInit's _svm_sreg fix, but kept `s16` (not `u16`) until
      * point of use -- see this report's "non-loop" analysis for why the
      * loop-context version of the idiom does not transfer directly. */
     idxCopy = a0;
