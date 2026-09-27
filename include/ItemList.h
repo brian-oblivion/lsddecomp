@@ -84,7 +84,7 @@ struct ItemListMethods {
     /* +0x040 */ void (*resetView)(ItemList *self); /* ItemList__ResetView; the ctor's tail */
     /* +0x044 */ void (*loadResources)(ItemList *self, struct SceneNode *parent); /* ItemList__LoadResources */
     /* +0x048 */ void (*releaseResources)(ItemList *self); /* ItemList__ReleaseResources */
-    /* +0x04C */ void (*attachTarget)(ItemList *self, void *child1, void *child2,
+    /* +0x04C */ void (*attachTarget)(ItemList *self, void *inputSource, void *tickSource,
                                       struct VabStreamObj *target); /* ItemList__AttachTarget */
     /* +0x050 */ void (*detachTarget)(ItemList *self);              /* ItemList__DetachTarget */
     /* +0x054 */ void (*setState)(ItemList *self, s32 state); /* ItemList__SetState: 2/3 close, 4 notifies parents */
@@ -137,7 +137,7 @@ extern struct SpriteRgb gItemListCursorColor;
 /* The overrides whose parameter lists differ from their slot's (see the
  * banner), as a caller that passes the extra arguments casts them: attachTarget
  * reaches its own addChild override with all four of its words once. */
-typedef void (*ItemListAddChildWideFn)(ItemList *self, void *child1, void *child2,
+typedef void (*ItemListAddChildWideFn)(ItemList *self, void *inputSource, void *tickSource,
                                        struct VabStreamObj *target);
 
 /* The class's own methods, in address order. */
@@ -152,7 +152,8 @@ void ItemList__OnNotify(ItemList *self, void *sender, s32 event);
 void ItemList__ResetView(ItemList *self);
 void ItemList__LoadResources(ItemList *self, struct SceneNode *parent);
 void ItemList__ReleaseResources(ItemList *self);
-void ItemList__AttachTarget(ItemList *self, void *child1, void *child2, struct VabStreamObj *target);
+void ItemList__AttachTarget(ItemList *self, void *inputSource, void *tickSource,
+                            struct VabStreamObj *target);
 void ItemList__DetachTarget(ItemList *self);
 void ItemList__SetState(ItemList *self, s32 state);
 void ItemList__TickClosing(ItemList *self);

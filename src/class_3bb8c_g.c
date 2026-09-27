@@ -283,7 +283,7 @@ void TaskObjF__OnTextEntryResult(TaskObjF *self, void *sender, s32 result) {
 void TaskObjF__AttachItemList(TaskObjF *self) {
     if (self->spriteParent != 0 && self->inputSource != 0) {
         if (self->itemList == NULL) {
-            self->itemList = New_ItemList(self->titles, 1);
+            self->itemList = New_ItemList(self->titles, ITEMLIST_MODE_FULLWIDTH);
             self->ownsWidget = 1;
         }
         self->methods->addChild(self, (BasicClass *)self->itemList);
