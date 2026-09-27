@@ -305,7 +305,7 @@ extern s16 D_8008E234;
 extern s32 D_8008E258;
 extern s32 D_8008E25C;
 extern u8 _svm_auto_kof_mode;
-extern s16 D_8008E938;
+extern s16 kMaxPrograms;
 
 extern Rec34Half D_8008D98A[]; /* value forced to 0x18 at init */
 
@@ -471,7 +471,7 @@ void SpuVmInit(s32 a0) {
     D_8008E25C = 0;
     _svm_auto_kof_mode = 0;
     D_8008E8C0 = 0;
-    D_8008E938 = 0x80;
+    kMaxPrograms = 0x80;
     SpuVmFlush();
 }
 #endif

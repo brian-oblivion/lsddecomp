@@ -2988,3 +2988,4 @@ _svm_pg = 0x8008E968;
 _svm_vh = 0x8008E970;
 _svm_tn = 0x8008E978;
 _svm_damper = 0x8008E84C;
+kMaxPrograms = 0x8008E938;

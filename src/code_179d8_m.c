@@ -265,7 +265,7 @@ extern s16 D_8008E234;
 
 extern SpuReverbAttr _svm_rattr; /* pinned in config/psyq-objects.ld (libsnd/vm_g.o) */
 extern u8 _svm_auto_kof_mode;
-extern s16 D_8008E938;
+extern s16 kMaxPrograms;
 
 extern volatile u16 D_8008EA26;
 extern u8 D_8008E9D0;
@@ -409,7 +409,7 @@ void SpuVmInit(s32 a0) {
     _svm_rattr.mode = 0;
     _svm_auto_kof_mode = 0;
     D_8008E8C0 = 0;
-    D_8008E938 = 0x80;
+    kMaxPrograms = 0x80;
     SpuVmFlush();
 }
 
