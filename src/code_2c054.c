@@ -273,8 +273,8 @@ void TaskCore__OnInit(TaskCore *self) {
     ((DrawSystem *)self->initArgs->drawSystem)
         ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor, NULL);
     viewportMethods->setOtLength(viewport, self->otLength);
-    viewportMethods->setUnk44(viewport, self->unk2C);
-    viewportMethods->setUnk48(viewport, self->packetSize);
+    viewportMethods->setMaxPackets(viewport, self->unk2C);
+    viewportMethods->setPacketSize(viewport, self->packetSize);
     viewportMethods->attachViewChild(viewport, self->unk14, &sTaskCoreViewOrigin,
                                      &sTaskCoreViewOrigin, NULL);
     viewportMethods->initOt(viewport);

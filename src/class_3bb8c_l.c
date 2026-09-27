@@ -357,7 +357,7 @@ void ObjM__EnterStyleSession(ObjM *self) {
         farColor = style->clearColor;
     }
     m->setFarColor(vp, farColor);
-    vp->methods->setUnkB4(vp, 0);
+    vp->methods->setExtraSwap(vp, 0);
     vp->methods->setDrawEnabled(vp, 1);
 
     fade = (FadeBox *)vp->methods->getFadeBox(vp);

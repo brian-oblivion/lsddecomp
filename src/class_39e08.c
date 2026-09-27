@@ -145,7 +145,7 @@ void DayTask__OnInit(DayTask *self) {
     vp->methods->setScreenSize(vp, size);
     fadeBox = vp->methods->getFadeBox(vp);
     fadeBox->methods->setDisplay(fadeBox, 1);
-    vp->methods->setUnk44(vp, 1200);
+    vp->methods->setMaxPackets(vp, 1200);
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sDayViewPoint, &sDayViewRef, 0);
     vp->methods->initOt(vp);
     self->phase = DAYTASK_PHASE_READY;

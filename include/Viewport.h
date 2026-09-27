@@ -102,8 +102,8 @@ struct ViewportRefView {
     /* +0x040 */ void (*initDefaults)(Self *self);                  /* Viewport__InitDefaults; NodeGuardedViewport: NodeGuardedViewport__InitDefaults, empty */ \
     /* +0x044 */ void (*setScreenSize)(Self *self, ViewportSize *size); /* Viewport__SetScreenSize */ \
     /* +0x048 */ void (*setOtLength)(Self *self, s32 length);      /* Viewport__SetOtLength */       \
-    /* +0x04C */ void (*setUnk44)(Self *self, s32 value);          /* Viewport__SetMaxPackets, before InitOt only */ \
-    /* +0x050 */ void (*setUnk48)(Self *self, s32 value);          /* Viewport__SetPacketSize, before InitOt only */ \
+    /* +0x04C */ void (*setMaxPackets)(Self *self, s32 n);         /* Viewport__SetMaxPackets, before InitOt only */ \
+    /* +0x050 */ void (*setPacketSize)(Self *self, s32 n);         /* Viewport__SetPacketSize, before InitOt only */ \
     /* +0x054 */ void (*setProjection)(Self *self, s32 h);         /* Viewport__SetProjection */     \
     /* +0x058 */ void (*slot58)(void);                             /* Viewport__NoOpSlot58, empty */        \
     /* +0x05C */ void (*slot5C)(void);                             /* Viewport__NoOpSlot5C, empty */        \
@@ -127,7 +127,7 @@ struct ViewportRefView {
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
     /* +0x0A8 */ void (*setFadeBox)(Self *self, SceneNode *handle); /* Viewport__SetFadeBox */  \
     /* +0x0AC */ SceneNode *(*getFadeBox)(Self *self);          /* Viewport__GetFadeBox */      \
-    /* +0x0B0 */ void (*setUnkB4)(Self *self, s32 value);          /* Viewport__SetExtraSwap */          \
+    /* +0x0B0 */ void (*setExtraSwap)(Self *self, s32 on);          /* Viewport__SetExtraSwap */          \
     /* +0x0B4 */ void (*setDrawEnabled)(Self *self, s32 on)        /* Viewport__SetDrawEnabled */
 /* clang-format on */
 
