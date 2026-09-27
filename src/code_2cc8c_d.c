@@ -127,15 +127,15 @@ void Viewport__SetFogNear(Viewport *self, s32 fogNear) {
  * GsSetRefView2. */
 void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr,
                                Ratio16 *twist) {
-    ViewportMethods *m = self->methods;
+    ViewportMethods *methods = self->methods;
 
     if (self->viewNode != NULL) {
         return;
     }
-    m->addChild(self, node);
-    m->setViewPoint(self, vp);
-    m->setViewRef(self, vr);
-    m->setTwist(self, twist != NULL ? twist : &gDefaultViewTwist);
+    methods->addChild(self, node);
+    methods->setViewPoint(self, vp);
+    methods->setViewRef(self, vr);
+    methods->setTwist(self, twist != NULL ? twist : &gDefaultViewTwist);
     GsSetRefView2((GsRVIEW2 *)&self->refView);
 }
 
@@ -163,13 +163,13 @@ void Viewport__SetViewRef(Viewport *self, LongVec3 *vr) {
 }
 
 void Viewport__SetTwist(Viewport *self, Ratio16 *twist) {
-    s32 q1, r1, q2;
+    s32 whole, rem, frac;
 
     if (self->viewNode != NULL) {
-        q1 = twist->num / twist->den;
-        r1 = twist->num % twist->den;
-        q2 = (r1 << 12) / twist->den;
-        self->refView.rz = (q1 << 12) + q2;
+        whole = twist->num / twist->den;
+        rem = twist->num % twist->den;
+        frac = (rem << 12) / twist->den;
+        self->refView.rz = (whole << 12) + frac;
     }
 }
 
@@ -333,7 +333,7 @@ tail_check:
  * occupant of handle's +0x04C (BoxFill__AttachToParent, a FadeBox's) takes a
  * screen position where SceneNode's attachToParent slot types a LongVec3
  * offset, hence the cast (include/Viewport.h, "Not settled here"). */
-void Viewport__SetFadeBox(Viewport *self, SceneNode *handle) {
+void Viewport__SetFadeBox(Viewport *self, SceneNode *fadeBox) {
     if (self->viewNode != NULL) {
         return;
     }
@@ -342,9 +342,9 @@ void Viewport__SetFadeBox(Viewport *self, SceneNode *handle) {
         self->fadeBox->methods->release(self->fadeBox);
     }
 
-    self->fadeBox = handle;
-    if (handle != NULL) {
-        handle->methods->attachToParent(handle, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
+    self->fadeBox = fadeBox;
+    if (fadeBox != NULL) {
+        fadeBox->methods->attachToParent(fadeBox, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
     }
 }
 
