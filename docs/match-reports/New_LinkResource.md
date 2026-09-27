@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. If the constructor returns zero the object is freed and NULL returned: `if (obj != NULL) { if (ctor(obj, a)) return obj; BMemPMgrFree(obj); } return NULL;`.
+Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `UnprototypedCtorTable` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. If the constructor returns zero the object is freed and NULL returned: `if (obj != NULL) { if (ctor(obj, a)) return obj; BMemPMgrFree(obj); } return NULL;`.
 
 Table slot (`tools/classtable.py`): none (allocator for LinkResource (gLinkResourceMethods), object size 0x30).
 
@@ -25,7 +25,7 @@ void *New_LinkResource(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x30);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetLinkResourceMethods())->ctor(obj, arg0)) {
+        if (((UnprototypedCtorTable *)GetLinkResourceMethods())->ctor(obj, arg0)) {
             return obj;
         }
         BMemPMgrFree(obj);

@@ -33,7 +33,7 @@
  * differ from them in two places, and the callers cast:
  *   +0x008 ctor: LinkResource__LinkResource returns self, or NULL when the
  *          buffer it adopted fails to build (New_LinkResource tests it,
- *          through code_33808.c's unprototyped Ctor33808 view).
+ *          through code_33808.c's unprototyped UnprototypedCtorTable view).
  *   +0x064 setFlag: LinkResource__BuildModels(self), s32: 1 when an
  *          allocation fails, else 0 after the active driver's setFlag.
  *   +0x078 slot78 (NULL in FileResource): LinkResource__MapModel(self).

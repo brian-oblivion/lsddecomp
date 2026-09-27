@@ -114,10 +114,10 @@ extern void *BMemPMgrAlloc(s32 size);
 
 /* A method table's ctor slot, unprototyped: the allocators that check the
  * ctor's result call it through this. */
-typedef struct Ctor33808 {
+typedef struct UnprototypedCtorTable {
     /* +0x000 */ u8 pad0[8];
     /* +0x008 */ s32 (*ctor)();
-} Ctor33808;
+} UnprototypedCtorTable;
 
 /* Allocate a TimBlockSrc and construct it over the file `name`. */
 void *New_TimBlockSrc(s32 name) {
@@ -392,7 +392,7 @@ LinkResource *New_LinkResource(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(LinkResource));
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetLinkResourceMethods())->ctor(obj, src)) {
+        if (((UnprototypedCtorTable *)GetLinkResourceMethods())->ctor(obj, src)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -578,7 +578,7 @@ Tod *New_Tod(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(Tod));
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetTodMethods())->ctor(obj, src);
+        ((UnprototypedCtorTable *)GetTodMethods())->ctor(obj, src);
         return obj;
     }
     return NULL;
@@ -842,7 +842,7 @@ ModelData *New_ModelData(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(ModelData));
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetModelDataMethods())->ctor(obj, src, 1)) {
+        if (((UnprototypedCtorTable *)GetModelDataMethods())->ctor(obj, src, 1)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -958,7 +958,7 @@ TriggerWorld *New_TriggerWorld(ResourceSource *src) {
     TriggerWorld *obj = BMemPMgrAlloc(sizeof(TriggerWorld));
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetTriggerWorldMethods())->ctor(obj, src)) {
+        if (((UnprototypedCtorTable *)GetTriggerWorldMethods())->ctor(obj, src)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -969,7 +969,7 @@ TriggerWorld *New_TriggerWorld(ResourceSource *src) {
 /* ctor (+0x008): ModelData's, not owning; with an adopted buffer, build the
  * ModelData array (NULL when that fails). */
 void *TriggerWorld__TriggerWorld(TriggerWorld *self, ResourceSource *src) {
-    ((Ctor33808 *)GetModelDataMethods())->ctor(self, src, 0);
+    ((UnprototypedCtorTable *)GetModelDataMethods())->ctor(self, src, 0);
     self->methods = GetTriggerWorldMethods();
     if (src->buffer != NULL) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
@@ -1214,7 +1214,7 @@ TodSet *New_TodSet(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(TodSet));
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetTodSetMethods())->ctor(obj, src)) {
+        if (((UnprototypedCtorTable *)GetTodSetMethods())->ctor(obj, src)) {
             return obj;
         }
         BMemPMgrFree(obj);

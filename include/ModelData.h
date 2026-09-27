@@ -34,7 +34,7 @@
  * The ctor returns self or NULL (New_ModelData tests it), but
  * FILERESOURCE_SLOTS declares +0x008 returning void, as FileResource's own ctor
  * does; the allocators reach the ctor through code_33808.c's unprototyped
- * Ctor33808 view instead.
+ * UnprototypedCtorTable view instead.
  *
  * The ctor's descriptor is code_33808.c's ResourceSource ({buffer to adopt, file
  * name to request}); only the tag is declared here, so that any header may

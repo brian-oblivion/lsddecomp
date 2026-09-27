@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. If the constructor returns zero the object is freed and NULL returned: `if (obj != NULL) { if (ctor(obj, a)) return obj; BMemPMgrFree(obj); } return NULL;`.
+Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `UnprototypedCtorTable` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. If the constructor returns zero the object is freed and NULL returned: `if (obj != NULL) { if (ctor(obj, a)) return obj; BMemPMgrFree(obj); } return NULL;`.
 
 Table slot (`tools/classtable.py`): none (allocator for gTriggerWorldMethods, object size 0x3C).
 
@@ -25,7 +25,7 @@ void *New_TriggerWorld(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x3C);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetTriggerWorldMethods())->ctor(obj, arg0)) {
+        if (((UnprototypedCtorTable *)GetTriggerWorldMethods())->ctor(obj, arg0)) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -49,7 +49,7 @@ void *New_TriggerWorld(s32 arg0) {
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Now `TriggerWorld *New_TriggerWorld(struct ResourceSource *src)` (include/TriggerWorld.h): the argument is the construction descriptor the ctor hands to ModelData__ModelData, and the object is a TriggerWorld (0x3C bytes, one own field at +0x038). The ctor is still reached through the unprototyped Ctor33808 view, because MODELDATA_SLOTS types +0x008 returning void while this ctor returns self or NULL. code_4cd08's FireDreamAuxTriggerEntries, the one caller, casts its stack array in. Bytes unchanged.
+Now `TriggerWorld *New_TriggerWorld(struct ResourceSource *src)` (include/TriggerWorld.h): the argument is the construction descriptor the ctor hands to ModelData__ModelData, and the object is a TriggerWorld (0x3C bytes, one own field at +0x038). The ctor is still reached through the unprototyped UnprototypedCtorTable view, because MODELDATA_SLOTS types +0x008 returning void while this ctor returns self or NULL. code_4cd08's FireDreamAuxTriggerEntries, the one caller, casts its stack array in. Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 

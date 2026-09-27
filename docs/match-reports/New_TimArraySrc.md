@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
+Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `UnprototypedCtorTable` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
 
 Table slot (`tools/classtable.py`): none (allocator for gTimArraySrcMethods, object size 0x3C).
 
@@ -25,7 +25,7 @@ void *New_TimArraySrc(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x3C);
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetTimArraySrcMethods())->ctor(obj, arg0);
+        ((UnprototypedCtorTable *)GetTimArraySrcMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;
@@ -46,7 +46,7 @@ void *New_TimArraySrc(s32 arg0) {
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
-Class unified as TimArraySrc (include/TimArraySrc.h). Now declared `TimArraySrc *New_TimArraySrc(char *name)` and calls the prototyped `GetTimArraySrcMethods()->ctor(obj, name)` instead of casting the table to the unit-local Ctor33808: the ctor's second parameter is `name` (TimArraySrc__TimArraySrc passes it to requestLoadFile) and the one caller, TimBlockSrc__AdvanceLoadState, passes 0 (now NULL). Byte-identical.
+Class unified as TimArraySrc (include/TimArraySrc.h). Now declared `TimArraySrc *New_TimArraySrc(char *name)` and calls the prototyped `GetTimArraySrcMethods()->ctor(obj, name)` instead of casting the table to the unit-local UnprototypedCtorTable: the ctor's second parameter is `name` (TimArraySrc__TimArraySrc passes it to requestLoadFile) and the one caller, TimBlockSrc__AdvanceLoadState, passes 0 (now NULL). Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

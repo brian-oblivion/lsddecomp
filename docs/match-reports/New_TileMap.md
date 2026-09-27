@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
+Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `UnprototypedCtorTable` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
 
 Table slot (`tools/classtable.py`): none (allocator for gTileMapMethods, object size 0x44, two constructor arguments).
 
@@ -27,7 +27,7 @@ void *New_TileMap(s32 arg0, s32 arg1) {
     void *obj = BMemPMgrAlloc(0x44);
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetTileMapMethods())->ctor(obj, arg0, arg1);
+        ((UnprototypedCtorTable *)GetTileMapMethods())->ctor(obj, arg0, arg1);
         return obj;
     }
     return NULL;
@@ -48,7 +48,7 @@ void *New_TileMap(s32 arg0, s32 arg1) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. Returns `TileMap *` (was `void *`); the second parameter is `FileResource *atlas` (was `s32 arg1`: a TileAtlas, gTileAtlasMethods, typed by its nearest unified ancestor); the ctor is reached through `GetTileMapMethods()->ctor` (was the unit-local `Ctor33808` cast). The prototype `extern StreamTaskUnkB4Obj *New_TileMap(...)` in include/code_2c054.h is gone. Byte-identical.
+Class unified in `include/TileMap.h`. Returns `TileMap *` (was `void *`); the second parameter is `FileResource *atlas` (was `s32 arg1`: a TileAtlas, gTileAtlasMethods, typed by its nearest unified ancestor); the ctor is reached through `GetTileMapMethods()->ctor` (was the unit-local `UnprototypedCtorTable` cast). The prototype `extern StreamTaskUnkB4Obj *New_TileMap(...)` in include/code_2c054.h is gone. Byte-identical.
 
 Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter is `TileAtlas *` (was `FileResource *`), in the prototype in include/TileMap.h (`struct TileAtlas *`, by tag) and in the ctor slot's parameter list. Byte-identical.
 

@@ -36,7 +36,7 @@
  * The ctor's descriptor is code_33808.c's ResourceSource ({buffer to adopt, file
  * name to request}); only the tag is declared here, as include/ModelData.h
  * does. The allocators reach the ctor through code_33808.c's unprototyped
- * Ctor33808 view.
+ * UnprototypedCtorTable view.
  */
 
 struct ResourceSource;

@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x064 (setFlag override
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `Ctor33808`, `CountedBuf33808` and `Req44858` sit at the
+fields +0x2C..+0x38), `UnprototypedCtorTable`, `CountedBuf33808` and `Req44858` sit at the
 top of / earlier in `src/code_33808.c`.
 
 ```c

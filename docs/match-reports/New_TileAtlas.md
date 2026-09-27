@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
+Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `UnprototypedCtorTable` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
 
 Table slot (`tools/classtable.py`): none (allocator for gTileAtlasMethods, object size 0x38).
 
@@ -25,7 +25,7 @@ void *New_TileAtlas(s32 arg0) {
     void *obj = BMemPMgrAlloc(0x38);
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetTileAtlasMethods())->ctor(obj, arg0);
+        ((UnprototypedCtorTable *)GetTileAtlasMethods())->ctor(obj, arg0);
         return obj;
     }
     return NULL;
@@ -46,7 +46,7 @@ void *New_TileAtlas(s32 arg0) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). Returns `TileAtlas *` (was `void *`; include/code_2c054.h's local view returned `StreamTaskUnkB4Obj *` and is deleted); the ctor is reached through the typed `TileAtlasMethods` ctor slot `(TileAtlas *self, s32 arg1)` instead of the unit's `Ctor33808` cast. One caller, TaskCore__TaskCore (src/code_2c054.c), which stores the result in TaskCore::tileAtlas and passes it to New_TileMap. No rename. Byte-identical.
+Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). Returns `TileAtlas *` (was `void *`; include/code_2c054.h's local view returned `StreamTaskUnkB4Obj *` and is deleted); the ctor is reached through the typed `TileAtlasMethods` ctor slot `(TileAtlas *self, s32 arg1)` instead of the unit's `UnprototypedCtorTable` cast. One caller, TaskCore__TaskCore (src/code_2c054.c), which stores the result in TaskCore::tileAtlas and passes it to New_TileMap. No rename. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

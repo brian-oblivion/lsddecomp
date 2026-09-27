@@ -40,7 +40,7 @@
  * The ctor returns self or NULL (New_TriggerWorld tests it), but
  * MODELDATA_SLOTS declares +0x008 returning void, as FileResource's own ctor
  * does; the allocator reaches it through code_33808.c's unprototyped
- * Ctor33808 view, as every allocator in that unit does. The descriptor is
+ * UnprototypedCtorTable view, as every allocator in that unit does. The descriptor is
  * code_33808.c's ResourceSource ({buffer to adopt, file name to request}); only the
  * tag is declared here, as include/ModelData.h does.
  */

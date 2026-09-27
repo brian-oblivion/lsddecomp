@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gTodSetMethods +0x008.
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
+fields +0x2C..+0x38), `UnprototypedCtorTable` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
@@ -25,7 +25,7 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
  * table; when the argument's first word is set, its own +0x064 runs, and a
  * nonzero result fails the construction (NULL). */
 void *TodSet__TodSet(DataSrc33808 *self, s32 *arg) {
-    ((Ctor33808 *)GetTodMethods())->ctor(self, arg);
+    ((UnprototypedCtorTable *)GetTodMethods())->ctor(self, arg);
     self->methods = GetTodSetMethods();
     if (*arg != 0) {
         if (((s32 (*)())self->methods->setFlag)(self)) {
@@ -38,7 +38,7 @@ void *TodSet__TodSet(DataSrc33808 *self, s32 *arg) {
 
 ## Notes
 
-First build. Slot +0x064 is `void setFlag(Self *)` in the unified macro, but this class's override returns a status: cast at the call site (`((s32 (*)())self->methods->setFlag)(self)`), shared slot not retyped. The parent ctor goes through the unprototyped Ctor33808 view.
+First build. Slot +0x064 is `void setFlag(Self *)` in the unified macro, but this class's override returns a status: cast at the call site (`((s32 (*)())self->methods->setFlag)(self)`), shared slot not retyped. The parent ctor goes through the unprototyped UnprototypedCtorTable view.
 
 ## Naming
 
@@ -46,4 +46,4 @@ First build. Slot +0x064 is `void setFlag(Self *)` in the unified macro, but thi
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `void *TodSet__TodSet(TodSet *self, struct ResourceSource *src)` (include/TodSet.h). The parent call goes through the typed base table, `GetTodMethods()->ctor((Tod *)self, src)`, instead of Ctor33808 (Tod__Tod returns nothing, so the void slot fits it). `*arg != 0` is now `src->buffer != NULL`: it is the same first word, the buffer Tod__Tod adopts. The +0x064 call keeps its cast: the inherited slot is `void setFlag`, the occupant TodSet__BuildTods returns s32. Bytes unchanged.
+Now `void *TodSet__TodSet(TodSet *self, struct ResourceSource *src)` (include/TodSet.h). The parent call goes through the typed base table, `GetTodMethods()->ctor((Tod *)self, src)`, instead of UnprototypedCtorTable (Tod__Tod returns nothing, so the void slot fits it). `*arg != 0` is now `src->buffer != NULL`: it is the same first word, the buffer Tod__Tod adopts. The +0x064 call keeps its cast: the inherited slot is `void setFlag`, the occupant TodSet__BuildTods returns s32. Bytes unchanged.

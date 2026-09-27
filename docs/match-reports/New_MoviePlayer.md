@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator; constructs gMoviePlayerMeth
 
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
-fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
+fields +0x2C..+0x38), `UnprototypedCtorTable` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
@@ -25,7 +25,7 @@ void *New_MoviePlayer(s32 arg0, s32 arg1, s32 arg2) {
     void *obj = BMemPMgrAlloc(0x6C);
 
     if (obj != NULL) {
-        if (((Ctor33808 *)GetMoviePlayerMethods())->ctor(obj, arg0, arg1, arg2) == 0) {
+        if (((UnprototypedCtorTable *)GetMoviePlayerMethods())->ctor(obj, arg0, arg1, arg2) == 0) {
             return obj;
         }
         BMemPMgrFree(obj);
@@ -44,7 +44,7 @@ First build. The failing-ctor allocator lever with the test inverted: this class
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; it returns `MoviePlayer *` and takes `(DrawRect *frame, s32 speed, s32 external)`, calling the typed ctor slot instead of the `Ctor33808` cast. Its one caller, StreamTask__StreamTask, passes `(DrawRect *)GetDefaultStreamTaskInitData()`: the ctor hands it to InitFrame, which copies it whole into `frame`/`stripRect` and reads its w/h words, so the three-word StreamTaskInitData is the frame rectangle. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; it returns `MoviePlayer *` and takes `(DrawRect *frame, s32 speed, s32 external)`, calling the typed ctor slot instead of the `UnprototypedCtorTable` cast. Its one caller, StreamTask__StreamTask, passes `(DrawRect *)GetDefaultStreamTaskInitData()`: the ctor hands it to InitFrame, which copies it whole into `frame`/`stripRect` and reads its w/h words, so the three-word StreamTaskInitData is the frame rectangle. Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 

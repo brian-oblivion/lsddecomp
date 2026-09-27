@@ -32,7 +32,7 @@
  *
  * The ctor returns self or NULL (New_TodSet tests it), but TOD_SLOTS
  * declares +0x008 returning void, as Tod's own ctor does; the allocator
- * reaches it through code_33808.c's unprototyped Ctor33808 view, as every
+ * reaches it through code_33808.c's unprototyped UnprototypedCtorTable view, as every
  * allocator in that unit does. The descriptor is code_33808.c's ResourceSource;
  * only the tag is declared here, as include/Tod.h does.
  */

@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `Ctor33808` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
+Allocator shape: `BMemPMgrAlloc(size)`, then the constructor (+0x008) through the class's table getter, called through the unit-local `UnprototypedCtorTable` view (an unprototyped `s32 (*ctor)()` at +0x008, declared at the top of the unit with the getter prototypes), since each class's constructor takes different arguments. Shape: `if (obj != NULL) { ctor; return obj; } return NULL;`.
 
 Table slot (`tools/classtable.py`): none (allocator for gBgLayerMethods, object size 0x68, two constructor arguments).
 
@@ -25,7 +25,7 @@ void *New_BgLayer(s32 arg0, s32 arg1) {
     void *obj = BMemPMgrAlloc(0x68);
 
     if (obj != NULL) {
-        ((Ctor33808 *)GetBgLayerMethods())->ctor(obj, arg0, arg1);
+        ((UnprototypedCtorTable *)GetBgLayerMethods())->ctor(obj, arg0, arg1);
         return obj;
     }
     return NULL;
@@ -46,7 +46,7 @@ void *New_BgLayer(s32 arg0, s32 arg1) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/BgLayer.h`. Returns `BgLayer *` and takes `(struct Map44294 *src, s32 mode)` (was `void *` / `s32, s32`); the ctor is called through the typed `GetBgLayerMethods()->ctor` (was the unit-local unprototyped `Ctor33808` view). The slot keeps SceneNode's `void *` return; the value is ignored, as before. The local views of it in include/code_2c054.h are gone. Byte-identical.
+Class unified in `include/BgLayer.h`. Returns `BgLayer *` and takes `(struct Map44294 *src, s32 mode)` (was `void *` / `s32, s32`); the ctor is called through the typed `GetBgLayerMethods()->ctor` (was the unit-local unprototyped `UnprototypedCtorTable` view). The slot keeps SceneNode's `void *` return; the value is ignored, as before. The local views of it in include/code_2c054.h are gone. Byte-identical.
 
 Later the same round (alpha, second class): TileMap unified too (`include/TileMap.h`, same round): `src` is `TileMap *` (was `struct Map44294 *`). Byte-identical.
 
