@@ -343,7 +343,7 @@ extern Rec34Half D_8008D9A4[];
 extern volatile u16 D_8008EA26;
 extern u8 D_8008E9D0;
 extern s16 D_80090BD0;
-extern u8 D_8008EA2C[];
+extern u8 _svm_vab_used[];
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
@@ -375,7 +375,7 @@ void SpuVmInit(s32 a0) {
     D_80090BD0 = 0;
 
     for (i = 0; (u16) i < 0x10; i++) {
-        D_8008EA2C[(u16) i] = 0;
+        _svm_vab_used[(u16) i] = 0;
     }
 
     a0 = (u8) a0;

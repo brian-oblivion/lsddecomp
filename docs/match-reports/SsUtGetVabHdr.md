@@ -75,7 +75,7 @@ typedef struct {
     u32 reserved1;
 } VabHdr;
 
-extern u8 D_8008EA2C[];
+extern u8 _svm_vab_used[];
 extern VabHdr *D_8008E80C[];
 extern VabHdr *_svm_vh;
 
@@ -83,7 +83,7 @@ short SsUtGetVabHdr(short vabId, VabHdr *hdr)
 {
     VabHdr *vab;
 
-    if (D_8008EA2C[vabId] != 1) {
+    if (_svm_vab_used[vabId] != 1) {
         return -1;
     }
     vab = D_8008E80C[vabId];
@@ -106,7 +106,7 @@ short SsUtGetVabHdr(short vabId, VabHdr *hdr)
 
 `D_8008E80C` is an array of `VabHdr*` (each slot 4 bytes, indexed
 `vabId*4`) — a per-slot loaded-VAB-header table shared with the sibling
-functions in this unit that also index `D_8008EA2C`/`D_80090BD4`-style
+functions in this unit that also index `_svm_vab_used`/`D_80090BD4`-style
 tables by the same small id. `_svm_vh` is a one-deep "last-fetched VAB
 header" cache: retail assigns it mid-copy (right after fetching `vs`) and
 then reads `pan`/`attr1`/`attr2` back **through the global** rather than
