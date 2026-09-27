@@ -390,7 +390,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     LinkResource *oldResource;
     GridCell **cell;
     u8 *cells;
-    SceneNodeSub14 *coord;
+    GsCOORDINATE2 *coord;
     GsCOORD2PARAM *param;
     s32 x;
     s32 y;
@@ -452,9 +452,9 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
             x = rec.x;
             y = rec.y;
             z = rec.z;
-            coord->tx = x;
-            coord->ty = y;
-            coord->tz = z;
+            coord->coord.t[0] = x;
+            coord->coord.t[1] = y;
+            coord->coord.t[2] = z;
             param = (*cell)->coord2->param;
             param->rotate.vx = 0;
             rotY = rec.rotY;
@@ -496,7 +496,7 @@ void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *slot) {
 Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *desc, void **outPos) {
     void *pos;
 
-    pos = &self->target->coord2->tx;
+    pos = self->target->coord2->coord.t;
     if (outPos != 0) {
         *outPos = pos;
     }

@@ -67,7 +67,7 @@ void *SceneNode__SceneNode(SceneNode *self) {
 }
 
 void SceneNode__Finalize(SceneNode *self) {
-    SceneNodeSub14 *sub;
+    GsCOORDINATE2 *sub;
 
     self->methods->detachFromParent(self);
     self->methods->detachAttachedChildren(self);
@@ -114,8 +114,7 @@ void SceneNode__OnNotify(SceneNode *self, BasicClass *sender, s32 event) {
 void SceneNode__Reset(SceneNode *self) {
     self->tick = 0;
     self->attribute = 0;
-    /* Cast: SceneNode.h spells coord2 as SceneNodeSub14, GsCOORDINATE2's layout. */
-    GsInitCoordinate2(NULL, (GsCOORDINATE2 *)self->coord2);
+    GsInitCoordinate2(NULL, self->coord2);
     self->methods->updateRotation(self, 1, ROTATION_ZERO);
     self->methods->updateScale(self, 1, SCALE_ONE);
     self->coord2->flg = 1;
@@ -172,7 +171,7 @@ void SceneNode__UpdateScale(SceneNode *self, s32 flag, void *data) {
 }
 
 SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *obj, LongVec3 *vec) {
-    SceneNodeSub14 *sub;
+    GsCOORDINATE2 *sub;
 
     if (self->parent == NULL) {
         self->parent = obj;
@@ -181,13 +180,13 @@ SceneNode *SceneNode__AttachToParent(SceneNode *self, SceneNode *obj, LongVec3 *
         obj->methods->addChild(obj, (BasicClass *)self);
         sub = self->coord2;
         if (vec != NULL) {
-            sub->tx = vec->x;
-            sub->ty = vec->y;
-            sub->tz = vec->z;
+            sub->coord.t[0] = vec->x;
+            sub->coord.t[1] = vec->y;
+            sub->coord.t[2] = vec->z;
         } else {
-            sub->tx = 0;
-            sub->ty = 0;
-            sub->tz = 0;
+            sub->coord.t[0] = 0;
+            sub->coord.t[1] = 0;
+            sub->coord.t[2] = 0;
         }
         self->coord2->flg = 0;
     }

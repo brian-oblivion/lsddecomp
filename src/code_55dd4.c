@@ -381,7 +381,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
     void *data;
     s32 idx;
     Actor *elem;
-    SceneNodeSub14 *coord;
+    GsCOORDINATE2 *coord;
     GsCOORD2PARAM *param;
     s32 i;
 
@@ -394,7 +394,7 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
     elem = self->parts[idx];
     coord = elem->coord2;
     coord->flg = 0;
-    param = (GsCOORD2PARAM *)coord->param;
+    param = coord->param;
 
     switch (outbuf[1]) {
         case TOD_PACKET_ATTRIBUTE:
@@ -461,17 +461,17 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
                 }
             }
             {
-                SceneNodeSub14 *coordB;
+                GsCOORDINATE2 *coordB;
                 s32 v1, v2, v3;
 
                 coordB = elem->coord2;
                 v1 = param->trans.vx;
                 v2 = param->trans.vy;
                 v3 = param->trans.vz;
-                coordB->tx = v1;
-                coordB->ty = v2;
-                coordB->tz = v3;
-                /* Keeps the coordB->tz store ahead of the break's jump, leaving retail's
+                coordB->coord.t[0] = v1;
+                coordB->coord.t[1] = v2;
+                coordB->coord.t[2] = v3;
+                /* Keeps the coordB->coord.t[2] store ahead of the break's jump, leaving retail's
              * nop in its delay slot; without it GCC moves the store into the slot. */
                 __asm__("");
             }

@@ -214,21 +214,21 @@ s32 Entity__IsNearTarget(Entity *this, void *pos, s32 range, s32 tolerance) {
 }
 
 s32 Entity__DistanceToPeer(Entity *this, TodActor *peer) {
-    s32 *peerPos;
-    SceneNodeSub14 *coord;
+    long *peerPos;
+    GsCOORDINATE2 *coord;
     s32 dx;
     s32 dz;
 
     peerPos = NULL;
     if (peer->parent != 0) {
-        peerPos = peer->coord2->unk38;
+        peerPos = peer->coord2->workm.t;
     }
     coord = this->coord2;
-    dx = coord->tx - peerPos[0];
+    dx = coord->coord.t[0] - peerPos[0];
     if (dx < 0) {
         dx = ~dx + 1; /* MATCHING: -dx compiles differently */
     }
-    dz = coord->tz - peerPos[2];
+    dz = coord->coord.t[2] - peerPos[2];
     return (dz >= 0) ? (dx + dz) : (dx - dz);
 }
 
@@ -326,7 +326,7 @@ s32 Entity__UpdateActivationState(Entity *this) {
                 goto randCheck;
             }
             if (row->activeRange != 0) {
-                if (Entity__IsNearTarget(this, &this->coord2->tx, row->activeRange,
+                if (Entity__IsNearTarget(this, this->coord2->coord.t, row->activeRange,
                                          row->nearTolerance) != 0) {
                     if (row->activateKind == ENTITY_ACTIVATE_NEAR) {
                         doActivate = 1;
@@ -369,7 +369,8 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
                     doDeactivate = 1;
                 }
             } else if (row->activeRange != 0) {
-                near = Entity__IsNearTarget(this, &this->coord2->tx, row->activeRange, row->nearTolerance);
+                near = Entity__IsNearTarget(this, this->coord2->coord.t, row->activeRange,
+                                            row->nearTolerance);
                 if (near != 0) {
                     if (row->deactivateKind == ENTITY_DEACTIVATE_NEAR) {
                         doDeactivate = 1;

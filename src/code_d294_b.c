@@ -163,10 +163,10 @@ void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
         return;
     }
 
-    posA = (other->parent != NULL) ? (LongVec3 *)other->coord2->unk38 : NULL;
+    posA = (other->parent != NULL) ? (LongVec3 *)other->coord2->workm.t : NULL;
     diffRaw = *posA;
 
-    posB = (self->parent != NULL) ? (LongVec3 *)self->coord2->unk38 : NULL;
+    posB = (self->parent != NULL) ? (LongVec3 *)self->coord2->workm.t : NULL;
     diffRaw.x = diffRaw.x - posB->x;
     diffRaw.y = diffRaw.y - posB->y;
     diffRaw.z = diffRaw.z - posB->z;

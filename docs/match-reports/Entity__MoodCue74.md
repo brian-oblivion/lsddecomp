@@ -124,3 +124,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Track 7 (round 93, echo)
 
 Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). `D_8008AC1C` -> `sMoodCue74ClearColor` (`python3 tools/rename.py`, tier A): a ViewportRgb {0, 100, 190} in .sdata (the word 0x00BE6400) whose address this function alone passes to the viewport's setClearColor; declared as the ViewportRgb it is, so the cast went. notifyParents' 10 is ENTITY_EFFECT_LINK_STAGE; setTickCallbacks(1, 1) is MOVE_CALLBACK_TICK_MOVE, LOOK_CALLBACK_STEP_LOOK. The range test `(u32)(moodTimer - 0x14) < 0x64` reads as `moodTimer >= 20 && moodTimer < 120`: the same bytes, cc1 folds the pair into the unsigned test (as in Entity_d). Byte-identical (whole image green).
+
+## Round 97 (alpha): Sony's GsCOORDINATE2
+
+SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.

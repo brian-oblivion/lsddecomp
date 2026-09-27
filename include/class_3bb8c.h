@@ -71,7 +71,7 @@ extern ChunkSlotSpec *sFootprintResultPtrTable[7];
 
 /*
  * A chunk slot's origin: its cellParent->coord2, a GsCOORDINATE2
- * (SceneNodeSub14, include/SceneNode.h), with the translation's x and z
+ * (Sony's, include/psyq/libgs.h), with the translation's x and z
  * readable as the whole word or its low halfword, as SplitLongVec3's are.
  * StageMap__LoadChunksAround writes all three words;
  * StageMap__ComputeFootprintDescriptor reads tx/tz whole for the cell and

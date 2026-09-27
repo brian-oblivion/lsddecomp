@@ -813,3 +813,7 @@ residue outright without ever addressing it.
 ## Track 6 (round 91, echo): named `SceneNode__RaycastVertical`, tier B
 
 A SceneNode method `(self, out, target)`: refreshes coord2's workm.t as coord.t plus every parent's coord.t, rotates `target` minus that into the node's frame (composeAndApplyRotation), then casts TmdModel__RaycastFaces from the point along -Y by 0x400 and, failing that, +Y by 0x400; on a hit writes hit minus point to `out` and returns 1. Mechanics; its one caller is AcceptGridElem (class_3bb8c_p.c), a grid-query filter. Was `func_8001E7BC`, kept tier C by track 3 for want of a verb. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+
+## Round 97 (alpha): Sony's GsCOORDINATE2
+
+SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.

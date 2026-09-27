@@ -294,7 +294,7 @@ void Entity__MoodCue49(Entity *this, SoundCueSet *out) {
                 this->methods->notifyParents(this, ENTITY_EFFECT_LINK_STAGE);
             } else if (((DreamSys *)this->peer)->methods->getLinkCommandFlag((DreamSys *)this->peer) != 0) {
                 peerMethods = ((DreamSys *)this->peer)->methods;
-                translation = this->parent ? this->coord2->unk38 : NULL;
+                translation = this->parent ? this->coord2->workm.t : NULL;
                 peerMethods->setTranslation((DreamSys *)this->peer, translation);
                 ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, ROTATION_YAW_MINUS90);
                 ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, false);
@@ -303,7 +303,7 @@ void Entity__MoodCue49(Entity *this, SoundCueSet *out) {
             }
         } else if (this->state == 11) {
             peerMethods = ((DreamSys *)this->peer)->methods;
-            translation = this->parent ? this->coord2->unk38 : NULL;
+            translation = this->parent ? this->coord2->workm.t : NULL;
             peerMethods->setTranslation((DreamSys *)this->peer, translation);
             if (this->moodTimer == 100) {
                 this->methods->notifyParents(this, ENTITY_EFFECT_LINK_STAGE);
@@ -422,7 +422,7 @@ void Entity__MoodCue57(Entity *this, SoundCueSet *out) {
             out->slots[2].program = 22;
             out->slots[2].octave = -2;
         } else if (frame == 48) {
-            if (Entity__IsNearTarget(this, &this->coord2->tx, 15, 10)) {
+            if (Entity__IsNearTarget(this, this->coord2->coord.t, 15, 10)) {
                 if (Entity__GetOrCreateFadeBox(this, NULL, NULL, (void *)10, 0) != NULL) {
                     this->fadeBox->methods->startFadeDown(this->fadeBox, (BasicClass *)this->ticker,
                                                           4, 0);

@@ -39,17 +39,16 @@
  * `python3 tools/plan.py classes` (Actor, Sprite, LightRig, BoxFill and
  * more); they expand SCENENODE_FIELDS and SCENENODE_SLOTS first.
  *
- * Three member types are libgs's and are parked under project names:
- * SceneNodeSub14 is GsCOORDINATE2, SceneNodeSub44 GsCOORD2PARAM and
- * S16Quad_d294 SVECTOR, offset for offset (the table is in
- * docs/match-reports/SceneNode__SceneNode.md). Using Sony's needs <libgs.h>
- * here, which waits until every unit that includes this header compiles
- * beside it (`python3 tools/sonyheaders.py`).
+ * The coordinate blocks are Sony's own types: coord2 is a GsCOORDINATE2
+ * (the offset from the parent in coord.t, the composed world matrix in
+ * workm, whose workm.t is the world position), and coord2->param its
+ * GsCOORD2PARAM (scale, the SVECTOR rotate in 4096ths of a turn, trans).
+ * So an includer takes Sony's headers first: `common.h`, <libgte.h>,
+ * <libgpu.h>, <libgs.h>.
  */
 
 typedef struct SceneNode SceneNode;
 typedef struct SceneNodeMethods SceneNodeMethods;
-typedef struct SceneNodeSub14 SceneNodeSub14;
 
 /* Three 32-bit components (Sony's "long vector" without VECTOR's pad word;
  * arrays of it have a 0xC stride): positions, offsets and translations. */
@@ -67,20 +66,6 @@ typedef struct Ratio16 Ratio16;
 struct Ratio16 {
     s16 num;
     s16 den;
-};
-
-/* GsCOORDINATE2, 0x50 bytes: the ctor's first allocation. */
-struct SceneNodeSub14 {
-    s32 flg;                 /* +0x000, 0 = recompute the matrix */
-    u8 pad04[0x018 - 0x004]; /* +0x004, coord.m */
-    s32 tx;                  /* +0x018, coord.t[0]: the offset from the parent */
-    s32 ty;                  /* +0x01C, coord.t[1] */
-    s32 tz;                  /* +0x020, coord.t[2] */
-    u8 workm[0x038 - 0x024]; /* +0x024, workm.m: the world matrix transformAndNotifyParents applies */
-    s32 unk38[3];            /* +0x038, workm.t: the world position */
-    GsCOORD2PARAM *param;    /* +0x044 */
-    SceneNodeSub14 *super;   /* +0x048, the parent's coordinate */
-    SceneNodeSub14 *sub;     /* +0x04C; no accessor */
 };
 
 /* The slots, each named for the occupant in gSceneNodeMethods; `python3
@@ -126,7 +111,7 @@ struct SceneNodeSub14 {
     BASICCLASS_FIELDS(Methods); \
     /* +0x00C */ SceneNode *parent; /* attachToParent/detachFromParent; the chain ComposeAndApplyRotation walks */ \
     /* +0x010 */ u32 attribute; /* GsDOBJ2.attribute: the setters' packed word (libgs.h's attribute bits) */ \
-    /* +0x014 */ SceneNodeSub14 *coord2; /* GsDOBJ2.coord2: the ctor's 0x50-byte GsCOORDINATE2 */ \
+    /* +0x014 */ GsCOORDINATE2 *coord2; /* GsDOBJ2.coord2: the ctor's 0x50-byte GsCOORDINATE2 */ \
     /* +0x018 */ s32 tmd; /* GsDOBJ2.tmd: LinkModel copies the model's +0x10, UnlinkModel clears it */ \
     /* +0x01C */ s32 id; /* GsDOBJ2.id; no accessor */ \
     /* +0x020 */ void *model; /* the TmdModel child LinkModel linked; NULL when none */ \

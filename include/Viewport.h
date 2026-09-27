@@ -86,10 +86,10 @@ struct ViewportRgb {
  * InterpolateKeyframeValue as its two points. Sony's flat vpx..vrz would put
  * a LongVec3 cast at each copy to save the two at GsSetRefView2. */
 struct ViewportRefView {
-    LongVec3 vp;           /* +0x000, viewpoint: setViewPoint */
-    LongVec3 vr;           /* +0x00C, reference point: setViewRef */
-    s32 rz;                /* +0x018, twist, 20.12 (setTwist) */
-    SceneNodeSub14 *super; /* +0x01C, the view node's GsCOORDINATE2 (AddChild) */
+    LongVec3 vp;          /* +0x000, viewpoint: setViewPoint */
+    LongVec3 vr;          /* +0x00C, reference point: setViewRef */
+    s32 rz;               /* +0x018, twist, 20.12 (setTwist) */
+    GsCOORDINATE2 *super; /* +0x01C, the view node's GsCOORDINATE2 (AddChild) */
 };
 
 /* BasicClass's slots, then this class's own. `tools/classtable.py

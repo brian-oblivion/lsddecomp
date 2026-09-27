@@ -144,3 +144,7 @@ an arbitrary number of blocks that converge on one shared tail.
 ## Naming
 
 - **Tier B.** Forwards `arg1` to the base class's generic +0x88 notify slot unconditionally, then handles two DreamSys-specific sentinel values: -1 and -2, called with exactly those literals by Actor__FindNearbyLink (class_3bb8c_p.c) on link-found / link-not-found, and with a small positive mode code by Actor__MoveAlongLocalAxis (same unit).
+
+## Round 97 (alpha): Sony's GsCOORDINATE2
+
+SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.

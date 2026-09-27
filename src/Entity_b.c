@@ -37,13 +37,13 @@
 
 s32 Entity__UpdateTargetProximity(Entity *this) {
     EntityMoodRow *row;
-    s32 *pos;
+    long *pos;
     s32 dist;
 
     row = &gEntityMoodTable[this->moodIndex];
     if (this->active != 0) {
         if (this->targetReached == 0) {
-            pos = &this->coord2->tx;
+            pos = this->coord2->coord.t;
             dist = row->proximityRange;
             if (dist < 0) {
                 dist = ~dist + 1; /* MATCHING: -dist compiles differently */
@@ -61,13 +61,13 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
 
 s32 Entity__UpdateSoundCueStart(Entity *this) {
     EntityMoodRow *row;
-    s32 *pos;
+    long *pos;
     s32 dist;
 
     if (this->active != 0 && this->soundCueActive == 0 && this->state != ENTITY_STATE_DONE) {
         row = &gEntityMoodTable[this->moodIndex];
         if (row->cueRange != 0) {
-            pos = &this->coord2->tx;
+            pos = this->coord2->coord.t;
             dist = row->cueRange;
             if (dist < 0) {
                 dist = ~dist + 1; /* MATCHING: -dist compiles differently */
@@ -100,8 +100,8 @@ s32 Entity__IsTargetInRange(Entity *this, s32 range) {
     s32 oy, ty;
 
     other = this->peer;
-    oy = other->coord2->ty;
-    ty = this->coord2->ty;
+    oy = other->coord2->coord.t[1];
+    ty = this->coord2->coord.t[1];
     /* MATCHING: two ifs and a goto; one || with plain returns compiles differently */
     if (oy + 512 < ty) {
         goto fail;
@@ -118,7 +118,7 @@ fail:
 
 s32 Entity__UpdateSoundCueStop(Entity *this) {
     EntityMoodRow *row;
-    s32 *pos;
+    long *pos;
     s32 dist;
 
     if (this->active != 0 && this->soundCueActive != 0) {
@@ -126,7 +126,7 @@ s32 Entity__UpdateSoundCueStop(Entity *this) {
         dist = row->cueRange;
         if (dist < 0) {
             dist = ~dist + 1; /* MATCHING: -dist compiles differently */
-            pos = &this->coord2->tx;
+            pos = this->coord2->coord.t;
             if (Entity__IsNearTarget(this, pos, dist, row->nearTolerance) == 0) {
                 this->methods->stopSoundCue(this);
             }
@@ -216,7 +216,7 @@ void Entity__MoodCue07(Entity *this, SoundCueSet *out) {
     if (this->moodTimer >= 121) {
         this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
         this->methods->moveLocalZ(this, -320, 0);
-    } else if (this->moodTimer >= 56 || Entity__IsNearTarget(this, &this->coord2->tx, 1, 1) != 0) {
+    } else if (this->moodTimer >= 56 || Entity__IsNearTarget(this, this->coord2->coord.t, 1, 1) != 0) {
         this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
     } else if (this->moodTimer >= 10) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
@@ -317,7 +317,7 @@ void Entity__MoodCue12(Entity *this) {
             this->state = 11;
         }
     }
-    y = this->coord2->ty;
+    y = this->coord2->coord.t[1];
     if (y < 2000) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
     }
