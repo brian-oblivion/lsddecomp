@@ -43,10 +43,10 @@ typedef struct StyleCueParam StyleCueParam;
  * `StyleCueEntryView`). */
 typedef struct StyleCueParamMethods {
     u8 pad0[0x6];
-    s8 countSign; /* +0x006, the record's cue index (its gStyleCueCallbacks
-                   * row and InitSoundCueSet tag), negated while a slot has
-                   * it claimed; ComputeStyleCueFalloff indexes
-                   * gStyleCueDistanceTable with its negative. */
+    s8 cue; /* +0x006, the record's cue index (its gStyleCueCallbacks row
+             * and InitSoundCueSet tag), negated while a slot has it
+             * claimed; ComputeStyleCueFalloff indexes gStyleCueDistanceTable
+             * with its negative. */
 } StyleCueParamMethods;
 
 struct StyleCueParam {
@@ -274,12 +274,12 @@ void StyleCue13(StyleCueParam *ctx, SoundCueSet *set) {
 }
 
 /* One range per cue record (15), indexed by the record's cue index: the
- * negative of `countSign` while a slot has the record claimed. IsStyleCueNear
+ * negative of `cue` while a slot has the record claimed. IsStyleCueNear
  * tests the slot's distance against the same row. */
 extern s32 gStyleCueDistanceTable[];
 
 s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
-    s32 range = gStyleCueDistanceTable[-ctx->entry->countSign];
+    s32 range = gStyleCueDistanceTable[-ctx->entry->cue];
     s32 stepDist = range / ctx->cueSet.attenuationSteps;
 
     return ctx->lastDist / stepDist;

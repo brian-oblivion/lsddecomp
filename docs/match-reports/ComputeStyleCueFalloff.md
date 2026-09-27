@@ -133,3 +133,8 @@ Derivation above) and now read as documentation. What they said, verbatim:
  * (`gStyleCueDistanceTable - tag*4`, i.e. `gStyleCueDistanceTable[-tag]` for `tag` in [-14, 0]).
  * `asm/data/76DC8.data.s` confirms exactly 15 words at this address. */
 ```
+
+The unit-local record view's +0x006 field is `cue`, not `countSign`: the
+name class_3bb8c_n.c's own view (`StyleCueEntryView::cue`) already gives the
+same byte, which IsStyleCueNear reads as `gStyleCueDistanceTable[-cue]`
+exactly as this function does. It is a cue index, not a count. Zero bytes.
