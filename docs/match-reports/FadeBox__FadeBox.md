@@ -14,7 +14,7 @@ void FadeBox__FadeBox(FadeBoxObj *self, void *a1, s32 a2, s32 a3) {
 
     base = GetBoxFillMethods();
     if (a2 != 0) {
-        tableEntry = &D_8006EA90[a2 * 3];
+        tableEntry = &gFadeBoxMaskColors[a2 * 3];
     } else {
         tableEntry = D_8006EAA8;
     }

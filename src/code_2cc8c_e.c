@@ -29,7 +29,7 @@ void FadeBox__FadeBox(FadeBox *self, void *size, s32 channels, s32 pri) {
 
     base = GetBoxFillMethods();
     if (channels != 0) {
-        color = &D_8006EA90[channels * 3];
+        color = &gFadeBoxMaskColors[channels * 3];
     } else {
         color = D_8006EAA8;
     }
@@ -88,7 +88,7 @@ void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32
         return;
     }
     idx = self->methods->configure(self, source, channels, arg3);
-    self->methods->setColor(self, 1, &D_8006EA90[idx * 3]);
+    self->methods->setColor(self, 1, &gFadeBoxMaskColors[idx * 3]);
     self->state = 1;
     self->step = -self->step;
 }
@@ -180,7 +180,7 @@ void *FadeBox__GetColor(FadeBox *self) {
     if (self->channels == 0xF) {
         return D_8006EAA8;
     }
-    return &D_8006EA90[self->channels * 3];
+    return &gFadeBoxMaskColors[self->channels * 3];
 }
 
 /* MATCHING: both position pairs are copied as whole structs; the block

@@ -11,7 +11,7 @@ void *FadeBox__GetColor(FadeBoxObj *self) {
     if (self->unk78 == 0xF) {
         return D_8006EAA8;
     }
-    return &D_8006EA90[self->unk78 * 3];
+    return &gFadeBoxMaskColors[self->unk78 * 3];
 }
 ```
 
@@ -24,7 +24,7 @@ elsewhere in this unit as a mode/flags word tested against `0xF`).
 
 **`FadeBox__GetColor`** -- tier A. `FadeBoxMethods::getColor`
 (`+0x0E4`). Pure getter: returns `D_8006EAA8` (the fixed/default table)
-when `unk78 == 0xF`, else `&D_8006EA90[unk78 * 3]` (the indexed table) --
+when `unk78 == 0xF`, else `&gFadeBoxMaskColors[unk78 * 3]` (the indexed table) --
 the same two tables `FadeBox__StartFadeDown`/`StartFadeUp`
 write through `slotB8`. A pure leaf whose mechanics ARE its purpose (a
 getter) is tier A by this project's own naming rule.
