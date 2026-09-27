@@ -41,3 +41,9 @@ ServiceSoundCueSet's per-tick 0). Tone numbers in decimal, like the MoodCue
 row numbers. `Entity__MoodCue82` and `Entity__MoodCue89` write the same
 voice 0/1 pair inline without voice 2, so this is not a unique
 "the" cue; purpose not established, tier B.
+
+## Track 7 (2026-09-27, round 95, bravo)
+
+### Constants
+
+- `program = 0x12` is 18, a VAB program; no name.

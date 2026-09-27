@@ -1,34 +1,37 @@
-/* Entity_f -- one of the Entity class's split units (Entity_c..Entity_g
- * hold its 97-function remainder after Entity/Entity_b), 0x800634A8..
- * 0x80064618, fully matched.
+/* Entity_f: fifteen of Entity's MoodCue handlers and the two tone setters
+ * they share.
  *
- * 15 of the 17 functions are `gEntityMoodHandlerTable` callbacks
- * (Entity.h), `Entity__MoodCueNN` for the row whose `handler` word holds
- * their address: rows 82-96, consecutive and in address order here, read
- * from disk/SLPS_015.56 (base 0x80089EB0, stride 0x10). `Entity__MoodCue93`
- * also occupies row 107, named for its lower row as in Entity_c/_e/_g.
- * ServiceSoundCueSet calls each once per tick with the entity's SoundCueSet
- * (`SoundCueSet`); they request tones and step the entity's pose
- * and TOD animation on moodTimer / TOD-frame thresholds.
+ * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
+ * NN (include/Entity.h): rows 82 to 96, and Entity__MoodCue93 is row 107's
+ * handler too (same `handler` word, different data words), named for its
+ * lower row. An Entity whose moodIndex selects the row installs it as its
+ * SoundCueSet callback, so ServiceSoundCueSet calls it once per tick with
+ * the Entity and its cue set. A handler requests tones by filling the
+ * set's slots (a VAB program of the cue's sound object, or SOUND_CUE_STOP),
+ * moves, turns and scales the entity (or the player, its `peer`) on
+ * moodTimer, the ticks since startSoundCue, on the cue set's own `tick`, or
+ * on todFrame, the frame of its TOD animation, and sends the dream an
+ * EntityEffect through notifyParents. Entity__MoodCue91 and
+ * Entity__MoodCue92 skip their TOD animation ahead to frame 24 by stepping
+ * applyTodFrame, which returns the next frame's pointer.
  *
- * The other two, `SetCueTones7_7_7` and `SetCueTones18_3_3`, are private
- * helpers of Entity__MoodCue85/86 that take only the SoundCueSet and write
- * a fixed three-voice tone request into it.
+ * SetCueTones7_7_7 and SetCueTones18_3_3 are not rows: they write a fixed
+ * three-voice request into the set, unattenuated (programs 7, 7, 7 at
+ * octave -2, and 18, 3, 3), for Entity__MoodCue85 and
+ * Entity__MoodCue86. Entity__MoodCue82 and Entity__MoodCue89 write the
+ * 18, 3 request inline.
  *
- * Entity derives from TodActor (code_55dd4.h), whose TOD fields and slots
- * it inherits at the same offsets: this round renamed the two only this unit
- * touches (`todFramePtr` +0x88, `applyTodFrame` +0x134) and proposed the
- * shared ones (setTod/playTod/stopTod, todIndex/todFrame, companion2 --
- * now Actor's `ticker` -- and moodDuration -> todFrameCount) in
- * Entity__MoodCue93.md; the head applied them by type scope at merge.
+ * The literals are left unnamed where they are one handler's tuning: tick
+ * counts, distances in world units, TOD frame numbers, VAB program numbers,
+ * and the `state` values other than 0 and ENTITY_STATE_DONE, which are each
+ * handler's own phases. The motion templates (ROTATION_*, SCALE_*,
+ * TRANSLATE_*) are named by value and declared once in include/Entity.h.
  */
 #include "common.h"
 #include "Entity.h"
 #include "DreamSys.h"
 
-/* Forward declarations: both are defined later in this file (in ROM
- * order), but Entity__MoodCue85 and Entity__MoodCue86 call them before their own
- * definitions appear -- same convention as Entity_d.c's own forward calls. */
+/* Defined after Entity__MoodCue86, which calls them. */
 void SetCueTones7_7_7(SoundCueSet *out);
 void SetCueTones18_3_3(SoundCueSet *out);
 
