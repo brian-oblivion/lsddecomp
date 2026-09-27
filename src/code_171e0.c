@@ -279,7 +279,7 @@ s32 GetActiveDataSourceUseVSyncCallback(void) {
     }
 }
 
-extern s32 D_8008A850;
+extern s32 gFileTableRegistered;
 extern void SetFileTable(void *arg0);
 extern s32 GetFileTableCount(void);
 extern void SetFileTableCount(s32 arg0);
@@ -289,7 +289,7 @@ s32 RegisterFileTableEntries(void *arg0, s32 arg1) {
     s32 idx;
 
     if (gActiveDataSource == DATASOURCE_CD) {
-        D_8008A850 = 1;
+        gFileTableRegistered = 1;
         SetFileTable(arg0);
         idx = GetFileTableCount();
         SetFileTableCount(idx + arg1);
