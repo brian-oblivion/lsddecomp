@@ -14,7 +14,7 @@ never attempted before this round.
 Stashes `self` (arg1) and two more scalar args (arg2, arg3) into `.sbss`
 globals `gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport`, then runs a fixed 2-iteration
 loop calling `self->methods->slot80(self, gStyleEffectModelIds[i])` and feeding the
-result plus `&D_8008AB94` (a 1-word `.sdata` constant, address-only, never
+result plus `&gStyleEffectClutPos` (a 1-word `.sdata` constant, address-only, never
 loaded) to library function `TmdModel__SetFirstPrimClut` (still `psyq_fa50.s`, unrenamed
 Psy-Q object; called with an unused return value). `arg0` (the function's
 first parameter) is never read anywhere in the body -- it is discarded, the
@@ -26,7 +26,7 @@ extern s32 gStyleEffectTmd;
 extern s32 gStyleEffectTim;
 extern s32 gStyleEffectViewport;
 extern s32 gStyleEffectModelIds[3];
-extern s32 D_8008AB94;
+extern s32 gStyleEffectClutPos;
 
 extern void TmdModel__SetFirstPrimClut(void *arg0, void *arg1);
 
@@ -40,7 +40,7 @@ void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     i = 0;
     do {
         ret = self->methods->slot80(self, gStyleEffectModelIds[i]);
-        TmdModel__SetFirstPrimClut(ret, &D_8008AB94);
+        TmdModel__SetFirstPrimClut(ret, &gStyleEffectClutPos);
         i++;
     } while (i < 2);
 }
@@ -97,7 +97,7 @@ method: its one caller, StyleBuildEffectSlots, passes the variant (unused),
 ObjM's DREAMER.TMD resource (a LinkResource, cast to Actor), ETC.TIM and the
 viewport, and it only stores them for StyleEffect's methods and prepares
 the two models the TMD's +0x080 slot (LinkResource's getModel) returns for
-gStyleEffectModelIds[0..1] (TmdModel__SetFirstPrimClut with D_8008AB94). The stored
+gStyleEffectModelIds[0..1] (TmdModel__SetFirstPrimClut with gStyleEffectClutPos). The stored
 globals were renamed with it (one rename.py run each): D_8008ACA4 ->
 gStyleEffectTmd, D_8008ACA8 -> gStyleEffectTim, D_8008ACAC ->
 gStyleEffectViewport, D_8008AB98 -> gStyleEffectModelIds. PROPOSED (not

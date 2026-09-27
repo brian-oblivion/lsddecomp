@@ -102,7 +102,7 @@ extern Actor *gStyleEffectTmd;
 extern void *gStyleEffectTim;
 extern void *gStyleEffectViewport;
 extern s32 gStyleEffectModelIds[3];
-extern s32 D_8008AB94;
+extern s32 gStyleEffectClutPos;
 
 extern void TmdModel__SetFirstPrimClut(void *arg0, void *arg1);
 
@@ -116,7 +116,7 @@ void SetStyleEffectSources(s32 unused, Actor *self, s32 arg2, s32 arg3) {
     i = 0;
     do {
         ret = (void *)self->methods->setBackClip(self, gStyleEffectModelIds[i]);
-        TmdModel__SetFirstPrimClut(ret, &D_8008AB94);
+        TmdModel__SetFirstPrimClut(ret, &gStyleEffectClutPos);
         i++;
     } while (i < 2);
 }

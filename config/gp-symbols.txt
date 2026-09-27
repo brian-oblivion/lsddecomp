@@ -59,7 +59,6 @@ D_8008AB80
 D_8008AB84
 D_8008AB8C
 D_8008AB90
-D_8008AB94
 D_8008ABA8
 D_8008ABFC
 D_8008AC04
@@ -163,6 +162,7 @@ gStyleDecorSizeH
 gStyleDecorSizeW
 gStyleDecorVariant
 gStyleEffectBaseViewY
+gStyleEffectClutPos
 gStyleEffectModelIds
 gStyleEffectSlotCount
 gStyleEffectTim
