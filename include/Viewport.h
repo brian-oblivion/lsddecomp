@@ -43,9 +43,10 @@
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
  * position where SceneNode's attachToParent slot takes a LongVec3 offset;
  * the ctor and Viewport__SetFadeBox pass gFadeBoxAttachPos (-100, -100) through the
- * inherited slot with a pointer cast. unk44 and unk48 multiply to each
- * buffer's packet area (InitOt; defaults 2000 and 64); which is the count
- * and which the size is not shown. drawNode (Viewport__DrawNode) reads its
+ * inherited slot with a pointer cast. maxPackets and packetSize multiply
+ * to each buffer's packet area (InitOt; defaults 2000 and 64); which is the
+ * count and which the size comes from Sony's PACKETMAX * size idiom and the
+ * values callers pass, not from the code. drawNode (Viewport__DrawNode) reads its
  * node through ViewportDraw.c's own DrawNode view, so it is not prototyped
  * here.
  *
@@ -101,11 +102,11 @@ struct ViewportRefView {
     /* +0x040 */ void (*initDefaults)(Self *self);                  /* Viewport__InitDefaults; NodeGuardedViewport: NodeGuardedViewport__InitDefaults, empty */ \
     /* +0x044 */ void (*setScreenSize)(Self *self, ViewportSize *size); /* Viewport__SetScreenSize */ \
     /* +0x048 */ void (*setOtLength)(Self *self, s32 length);      /* Viewport__SetOtLength */       \
-    /* +0x04C */ void (*setUnk44)(Self *self, s32 value);          /* Viewport__SetUnk44, before InitOt only */ \
-    /* +0x050 */ void (*setUnk48)(Self *self, s32 value);          /* Viewport__SetUnk48, before InitOt only */ \
+    /* +0x04C */ void (*setUnk44)(Self *self, s32 value);          /* Viewport__SetMaxPackets, before InitOt only */ \
+    /* +0x050 */ void (*setUnk48)(Self *self, s32 value);          /* Viewport__SetPacketSize, before InitOt only */ \
     /* +0x054 */ void (*setProjection)(Self *self, s32 h);         /* Viewport__SetProjection */     \
-    /* +0x058 */ void (*slot58)(void);                             /* Viewport__func_8003EA6C, empty */        \
-    /* +0x05C */ void (*slot5C)(void);                             /* Viewport__func_8003EA74, empty */        \
+    /* +0x058 */ void (*slot58)(void);                             /* Viewport__NoOpSlot58, empty */        \
+    /* +0x05C */ void (*slot5C)(void);                             /* Viewport__NoOpSlot5C, empty */        \
     /* +0x060 */ void (*setLightMode)(Self *self, s32 mode);       /* Viewport__SetLightMode */      \
     /* +0x064 */ void (*setClearColor)(Self *self, ViewportRgb *color); /* Viewport__SetClearColor */ \
     /* +0x068 */ void (*setFarColor)(Self *self, ViewportRgb *color);   /* Viewport__SetFarColor */ \
@@ -115,8 +116,8 @@ struct ViewportRefView {
     /* +0x078 */ void (*setViewPoint)(Self *self, LongVec3 *vp);  /* Viewport__SetViewPoint */      \
     /* +0x07C */ void (*setViewRef)(Self *self, LongVec3 *vr);    /* Viewport__SetViewRef */        \
     /* +0x080 */ void (*setTwist)(Self *self, Ratio16 *twist); /* Viewport__SetTwist */       \
-    /* +0x084 */ void (*slot84)(void);                             /* Viewport__func_8003ECC0, empty */        \
-    /* +0x088 */ void (*slot88)(void);                             /* Viewport__func_8003ECC8, empty */        \
+    /* +0x084 */ void (*slot84)(void);                             /* Viewport__NoOpSlot84, empty */        \
+    /* +0x088 */ void (*slot88)(void);                             /* Viewport__NoOpSlot88, empty */        \
     /* +0x08C */ void (*initOt)(Self *self);                       /* Viewport__InitOt */            \
     /* +0x090 */ void (*deinitOt)(Self *self);                     /* Viewport__DeinitOt */          \
     /* +0x094 */ void (*onNotifyTag5)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag5: onNotify's class-5 (FrameClock) case */ \
@@ -126,7 +127,7 @@ struct ViewportRefView {
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
     /* +0x0A8 */ void (*setFadeBox)(Self *self, SceneNode *handle); /* Viewport__SetFadeBox */  \
     /* +0x0AC */ SceneNode *(*getFadeBox)(Self *self);          /* Viewport__GetFadeBox */      \
-    /* +0x0B0 */ void (*setUnkB4)(Self *self, s32 value);          /* Viewport__SetUnkB4 */          \
+    /* +0x0B0 */ void (*setUnkB4)(Self *self, s32 value);          /* Viewport__SetExtraSwap */          \
     /* +0x0B4 */ void (*setDrawEnabled)(Self *self, s32 on)        /* Viewport__SetDrawEnabled */
 /* clang-format on */
 
@@ -139,8 +140,8 @@ struct ViewportRefView {
     /* +0x034 */ ViewportSize screenSize;                                                          \
     /* +0x03C */ s32 otLength;            /* GsOT length: 1 << otLength tags; drawNode's priority range */ \
     /* +0x040 */ s32 projH;               /* GsSetProjection's h; drawNode's sprite projection */  \
-    /* +0x044 */ s32 unk44;               /* unk44 * unk48: each buffer's packet area */           \
-    /* +0x048 */ s32 unk48;                                                                        \
+    /* +0x044 */ s32 maxPackets;          /* maxPackets * packetSize: each buffer's packet area */  \
+    /* +0x048 */ s32 packetSize;          /* bytes per packet (see the banner) */                  \
     /* +0x04C */ s32 nearZ;               /* GsSetNearClip; drawNode's sprite near limit */        \
     /* +0x050 */ s32 farZ;                /* zDiv = (farZ - nearZ) / (1 << otLength) + 1 */        \
     /* +0x054 */ s32 lightMode;           /* GsSetLightMode; 1 or 3 also sets the fog */           \
@@ -154,13 +155,13 @@ struct ViewportRefView {
     /* +0x078 */ GsOT *ot[2];             /* InitOt's two GsOT headers */                          \
     /* +0x080 */ GsOT_TAG *otTags[2];     /* each header's org: its tag array */                   \
     /* +0x088 */ PACKET *workBase[2];     /* each half's packet area: GsSetWorkBase */             \
-    /* +0x090 */ s32 unk90;               /* counts class-5 notifications (OnNotifyTag5) */        \
+    /* +0x090 */ s32 clockEventCount;     /* counts FrameClock notifications (OnNotifyTag5) */     \
     /* +0x094 */ u8 pad094[0x098 - 0x094];                                                         \
     /* +0x098 */ s32 zDiv;                /* Update: the depth per OT tag; drawNode's sprite z */  \
     /* +0x09C */ u8 pad09C[0x0AC - 0x09C];                                                         \
     /* +0x0AC */ SceneNode *sceneRoot;   /* the ctor's New_SceneNode; Update draws it; finalize releases it */ \
     /* +0x0B0 */ SceneNode *fadeBox;   /* the ctor's New_FadeBox, attached under sceneRoot */ \
-    /* +0x0B4 */ s32 unkB4;               /* Flip: nonzero swaps once more on buffer 0 */          \
+    /* +0x0B4 */ s32 extraSwap;           /* Flip: nonzero swaps before and after drawing buffer 0 */ \
     /* +0x0B8 */ s32 drawEnabled          /* Flip: 0 skips the clear and draw; default 1 */
 /* clang-format on */
 
@@ -186,11 +187,11 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event);
 void Viewport__InitDefaults(Viewport *self);
 void Viewport__SetScreenSize(Viewport *self, ViewportSize *size);
 void Viewport__SetOtLength(Viewport *self, s32 length);
-void Viewport__SetUnk44(Viewport *self, s32 value);
-void Viewport__SetUnk48(Viewport *self, s32 value);
+void Viewport__SetMaxPackets(Viewport *self, s32 value);
+void Viewport__SetPacketSize(Viewport *self, s32 value);
 void Viewport__SetProjection(Viewport *self, s32 h);
-void Viewport__func_8003EA6C(void);
-void Viewport__func_8003EA74(void);
+void Viewport__NoOpSlot58(void);
+void Viewport__NoOpSlot5C(void);
 void Viewport__SetLightMode(Viewport *self, s32 mode);
 void Viewport__SetClearColor(Viewport *self, ViewportRgb *color);
 void Viewport__SetFarColor(Viewport *self, ViewportRgb *color);
@@ -201,8 +202,8 @@ void Viewport__DetachViewChild(Viewport *self);
 void Viewport__SetViewPoint(Viewport *self, LongVec3 *vp);
 void Viewport__SetViewRef(Viewport *self, LongVec3 *vr);
 void Viewport__SetTwist(Viewport *self, Ratio16 *twist);
-void Viewport__func_8003ECC0(void);
-void Viewport__func_8003ECC8(void);
+void Viewport__NoOpSlot84(void);
+void Viewport__NoOpSlot88(void);
 void Viewport__InitOt(Viewport *self);
 void Viewport__DeinitOt(Viewport *self);
 void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event);
@@ -211,7 +212,7 @@ void Viewport__Update(Viewport *self);
 void Viewport__Flip(Viewport *self);
 void Viewport__SetFadeBox(Viewport *self, SceneNode *handle);
 SceneNode *Viewport__GetFadeBox(Viewport *self);
-void Viewport__SetUnkB4(Viewport *self, s32 value);
+void Viewport__SetExtraSwap(Viewport *self, s32 value);
 void Viewport__SetDrawEnabled(Viewport *self, s32 on);
 
 Viewport *New_Viewport(void);            /* BMemPMgrAlloc(0xBC), then ctor */

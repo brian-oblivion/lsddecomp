@@ -1,14 +1,16 @@
-# Viewport__func_8003ECC8 — MATCHED
+# Viewport__NoOpSlot88 — MATCHED
+
+> Renamed from `Viewport__func_8003ECC8` on 2026-09-27 (tools/rename.py). Address 0x8003ecc8.
 
 > Renamed from `func_8003ECC8` on 2026-09-27 (tools/rename.py). Address 0x8003ecc8.
 
 Unit: `code_2cc8c_d`. Round 73, runner charlie (report written retroactively;
-same shape as `Viewport__func_8003EA6C`/`Viewport__func_8003EA74`/`Viewport__func_8003ECC0`).
+same shape as `Viewport__NoOpSlot58`/`Viewport__NoOpSlot5C`/`Viewport__NoOpSlot84`).
 
 ## Signature
 
 ```c
-void Viewport__func_8003ECC8(void);
+void Viewport__NoOpSlot88(void);
 ```
 
 Not a `gViewportMethods` vtable slot occupant, not a method (no `self`), no caller
@@ -20,7 +22,7 @@ Nothing: `jr $ra; nop`.
 
 ## Naming
 
-Kept `Viewport__func_8003ECC8`. No evidence of any kind.
+Kept `Viewport__NoOpSlot88`. No evidence of any kind.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
@@ -32,3 +34,10 @@ Occupant of Viewport's +0x088 (`slot88` in `include/Viewport.h`; also in gNodeGu
 ## Naming
 
 Renamed from `func_8003ECC8` with `tools/rename.py`: tier C, `Class__func_xxxxx`, occupant of gViewportMethods +0x088 (and gNodeGuardedViewportMethods'). Empty body, no C caller of the slot.
+
+
+## Track 7 (round 100, echo, polish pass)
+
+## Naming
+
+Renamed from `Viewport__func_8003ECC8` with `tools/rename.py`: tier A. The body is empty (`jr $ra; nop`), and an empty occupant's mechanics are its purpose, so the name says it does nothing and which slot of gViewportMethods (+0x088) holds it. The form follows the project's other empty occupants (`NodeGuardedViewport__NoOpSlotB8`, `MoviePlayer__NoOpSlot5C`, `StreamTask__NoOpSlot88`). An empty body says nothing about the slot's arguments (DECOMPILATION_LEARNINGS), so the prototype keeps `(void)`. The slot keeps its offset name `slot88`: nothing calls it.

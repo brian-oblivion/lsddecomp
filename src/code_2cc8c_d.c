@@ -13,8 +13,8 @@
  * drawNode in ViewportDraw.c. In table order:
  *  - onNotify and its two per-sender handlers: a FrameClock event runs
  *    update, the DrawSystem's VSync event runs flip;
- *  - initDefaults and the field setters (screen size, OT length, the two
- *    packet-area factors, which only take before initOt, projection, light
+ *  - initDefaults and the field setters (screen size, OT length, packet
+ *    count and size, which only take before initOt, projection, light
  *    mode, clear and far colours, fog near); four slots hold empty bodies;
  *  - attachViewChild/detachViewChild and the setters of the GsRVIEW2 that
  *    GsSetRefView2 takes (viewpoint, reference point, twist);
@@ -35,17 +35,17 @@
  */
 
 /* Forwards to the base onNotify, then dispatches on the sender's class-id
- * nibble: 5 (a FrameClock) to onNotifyTag5, 1 (the DrawSystem) to
- * onNotifyTag1, anything else nowhere. */
+ * nibble: a FrameClock to onNotifyTag5, the DrawSystem to onNotifyTag1,
+ * anything else nowhere. */
 void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
     s32 tag;
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
 
-    tag = sender->methods->header & 0xF;
-    if (tag == 5) {
+    tag = sender->methods->header & CLASS_ID_ROOT_MASK;
+    if (tag == FRAMECLOCK_CLASS_ID) {
         self->methods->onNotifyTag5(self, sender, event);
-    } else if (tag == 1) {
+    } else if (tag == DRAWSYSTEM_CLASS_ID) {
         self->methods->onNotifyTag1(self, sender, event);
     }
 }
@@ -57,9 +57,20 @@ extern ViewportRgb gDefaultViewportColor;
  * address computation between the two copies; retail loads it twice. */
 extern ViewportRgb gDefaultViewportColorAlias __asm__("gDefaultViewportColor");
 
+/* InitDefaults' values. The OT has 1 << VIEWPORT_DEFAULT_OT_LENGTH (8192)
+ * tags; with the near and far defaults Update's zDiv comes out 8. The packet
+ * size is also TaskCore's reset value for what it passes to setPacketSize. */
+#define VIEWPORT_DEFAULT_OT_LENGTH 13
+#define VIEWPORT_DEFAULT_MAX_PACKETS 2000
+#define VIEWPORT_DEFAULT_PACKET_SIZE 64
+#define VIEWPORT_DEFAULT_PROJ_H 256 /* GsSetProjection's h */
+#define VIEWPORT_DEFAULT_NEAR_Z 10
+#define VIEWPORT_DEFAULT_FAR_Z 65536
+#define VIEWPORT_DEFAULT_FOG_NEAR 20000
+
 /* Every field's default; both colours start black (gDefaultViewportColor). */
 void Viewport__InitDefaults(Viewport *self) {
-    self->unk90 = 0;
+    self->clockEventCount = 0;
     self->otReady = 0;
     /* MATCHING: without it both loads hoist above the two zero stores. */
     __asm__("");
@@ -67,17 +78,17 @@ void Viewport__InitDefaults(Viewport *self) {
     self->screenSize.height = gDefaultViewportHeight;
     /* MATCHING: without it both stores sink below the constant stores. */
     __asm__("");
-    self->otLength = 13;
-    self->unk44 = 2000;
-    self->unk48 = 64;
-    self->projH = 256;
-    self->nearZ = 10;
-    self->farZ = 65536;
-    self->lightMode = 0;
-    self->fogNear = 20000;
+    self->otLength = VIEWPORT_DEFAULT_OT_LENGTH;
+    self->maxPackets = VIEWPORT_DEFAULT_MAX_PACKETS;
+    self->packetSize = VIEWPORT_DEFAULT_PACKET_SIZE;
+    self->projH = VIEWPORT_DEFAULT_PROJ_H;
+    self->nearZ = VIEWPORT_DEFAULT_NEAR_Z;
+    self->farZ = VIEWPORT_DEFAULT_FAR_Z;
+    self->lightMode = GsLMODE_NORMAL;
+    self->fogNear = VIEWPORT_DEFAULT_FOG_NEAR;
     self->farColor = gDefaultViewportColor;
     self->clearColor = gDefaultViewportColorAlias;
-    self->unkB4 = 0;
+    self->extraSwap = 0;
     self->drawEnabled = 1;
 }
 
@@ -89,17 +100,17 @@ void Viewport__SetOtLength(Viewport *self, s32 length) {
     self->otLength = length;
 }
 
-/* Takes only before InitOt: unk44 is one factor of each packet area. */
-void Viewport__SetUnk44(Viewport *self, s32 value) {
+/* Takes only before InitOt, which sizes the packet areas from it. */
+void Viewport__SetMaxPackets(Viewport *self, s32 maxPackets) {
     if (self->otReady == 0) {
-        self->unk44 = value;
+        self->maxPackets = maxPackets;
     }
 }
 
-/* The same guard, for the other factor, unk48. */
-void Viewport__SetUnk48(Viewport *self, s32 value) {
+/* The same guard, for the packet size. */
+void Viewport__SetPacketSize(Viewport *self, s32 size) {
     if (self->otReady == 0) {
-        self->unk48 = value;
+        self->packetSize = size;
     }
 }
 
@@ -107,9 +118,9 @@ void Viewport__SetProjection(Viewport *self, s32 h) {
     self->projH = h;
 }
 
-void Viewport__func_8003EA6C(void) {}
+void Viewport__NoOpSlot58(void) {}
 
-void Viewport__func_8003EA74(void) {}
+void Viewport__NoOpSlot5C(void) {}
 
 void Viewport__SetLightMode(Viewport *self, s32 mode) {
     self->lightMode = mode;
@@ -179,12 +190,12 @@ void Viewport__SetTwist(Viewport *self, Ratio16 *twist) {
     }
 }
 
-void Viewport__func_8003ECC0(void) {}
+void Viewport__NoOpSlot84(void) {}
 
-void Viewport__func_8003ECC8(void) {}
+void Viewport__NoOpSlot88(void) {}
 
 /* One-time allocation of the two ordering tables. Each half of the buffer
- * is a GsOT header, its 1 << otLength four-byte tags, then unk48 * unk44
+ * is a GsOT header, its 1 << otLength tags, then packetSize * maxPackets
  * bytes of packet area. */
 void Viewport__InitOt(Viewport *self) {
     s32 size;
@@ -197,7 +208,7 @@ void Viewport__InitOt(Viewport *self) {
         return;
     }
 
-    size = (4 << self->otLength) + (self->unk48 * self->unk44 + hdrSize);
+    size = (sizeof(GsOT_TAG) << self->otLength) + (self->packetSize * self->maxPackets + hdrSize);
 
     buf = (s32)BMemPMgrAlloc(size * 2);
     if (buf == 0) {
@@ -206,7 +217,7 @@ void Viewport__InitOt(Viewport *self) {
 
     self->ot[0] = (GsOT *)buf;
     self->otTags[0] = (GsOT_TAG *)(buf + sizeof(GsOT));
-    self->workBase[0] = (PACKET *)self->otTags[0] + (4 << self->otLength);
+    self->workBase[0] = (PACKET *)self->otTags[0] + (sizeof(GsOT_TAG) << self->otLength);
 
     self->ot[1] = (GsOT *)((PACKET *)self->ot[0] + size);
     self->otTags[1] = (GsOT_TAG *)((PACKET *)self->otTags[0] + size);
@@ -234,16 +245,17 @@ void Viewport__DeinitOt(Viewport *self) {
     }
 }
 
-/* A FrameClock event: counts every one in unk90, and runs update on a tick
- * whether the clock is running or paused (not on FRAMECLOCK_EVENT_FLAG14). */
+/* A FrameClock event: counts every one in clockEventCount, and runs update
+ * on a tick whether the clock is running or paused (not on
+ * FRAMECLOCK_EVENT_FLAG14). */
 void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event) {
-    self->unk90 = self->unk90 + 1;
+    self->clockEventCount = self->clockEventCount + 1;
     if (event == FRAMECLOCK_EVENT_RUNNING || event == FRAMECLOCK_EVENT_PAUSED) {
         self->methods->update(self);
     }
 }
 
-/* A DrawSystem event: its per-VSync event (2) runs flip. */
+/* A DrawSystem event: its per-VSync event runs flip. */
 void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event) {
     if (event == DRAWSYSTEM_EVENT_VSYNC) {
         self->methods->flip(self);
@@ -252,7 +264,7 @@ void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event) {
 
 /* Per-frame update, only once Viewport__InitOt has succeeded: draws the
  * view node if it has a parent, sets the projection, near clip and light
- * mode (and the fog for light modes 1 and 3), sets the reference view and
+ * mode (and the fog, in both fog modes), sets the reference view and
  * marks its super coordinate for recompute, recomputes zDiv, sets this
  * half's packet area and clears its OT, then draws sceneRoot and the root
  * of the view node's parent chain. */
@@ -272,7 +284,7 @@ void Viewport__Update(Viewport *self) {
     GsSetNearClip(self->nearZ);
     GsSetLightMode(self->lightMode);
 
-    if (self->lightMode == GsLMODE_FOG || self->lightMode == 3) {
+    if (self->lightMode == GsLMODE_FOG || self->lightMode == (GsLMODE_LOFF | GsLMODE_FOG)) {
         SetFarColor((u8)self->farColor.r, (u8)self->farColor.g, (u8)self->farColor.b);
         SetFogNear(self->fogNear, self->projH);
     }
@@ -297,9 +309,10 @@ void Viewport__Update(Viewport *self) {
 }
 
 /* Takes otIndex from the DrawSystem's getActiveBuffer; when drawing is
- * enabled, resets the GPU, swaps (once more on buffer 0 when unkB4 is set),
- * sorts the clear into this half's OT and draws it (and swaps again on
- * buffer 0 with unkB4); then flips otIndex to the other half. */
+ * enabled, resets the GPU, swaps, sorts the clear into this half's OT and
+ * draws it, with one more swap before the clear and one after the draw on
+ * buffer 0 when extraSwap is set; then flips otIndex to the other
+ * half. */
 void Viewport__Flip(Viewport *self) {
     s32 idx;
 
@@ -315,7 +328,7 @@ void Viewport__Flip(Viewport *self) {
     ResetGraph(1);
     self->drawSystem->methods->swapBuffers(self->drawSystem);
 
-    if (self->unkB4 != 0) {
+    if (self->extraSwap != 0) {
         if (self->otIndex == 0) {
             self->drawSystem->methods->swapBuffers(self->drawSystem);
         }
@@ -327,7 +340,7 @@ void Viewport__Flip(Viewport *self) {
     idx = self->otIndex;
     GsDrawOt(self->ot[idx]);
 
-    if (self->unkB4 != 0 && self->otIndex == 0) {
+    if (self->extraSwap != 0 && self->otIndex == 0) {
         self->drawSystem->methods->swapBuffers(self->drawSystem);
     }
 
@@ -359,8 +372,8 @@ SceneNode *Viewport__GetFadeBox(Viewport *self) {
     return self->fadeBox;
 }
 
-void Viewport__SetUnkB4(Viewport *self, s32 value) {
-    self->unkB4 = value;
+void Viewport__SetExtraSwap(Viewport *self, s32 on) {
+    self->extraSwap = on;
 }
 
 void Viewport__SetDrawEnabled(Viewport *self, s32 on) {

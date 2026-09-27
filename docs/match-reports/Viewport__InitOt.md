@@ -322,7 +322,7 @@ void Viewport__InitOt(Unk18Obj *self);
 ## What it does
 
 One-time allocation/init, guarded by `self->unk70` (the same latch
-`Viewport__SetUnk44`/`Viewport__SetUnk48` check, this round): allocates one buffer
+`Viewport__SetMaxPackets`/`Viewport__SetPacketSize` check, this round): allocates one buffer
 sized to fit two internal records plus a `4 << self->unk3C`-sized payload
 each, carves it into `unk78`/`unk80`/`unk88` (bases) and
 `unk7C`/`unk84`/`unk8C` (bases + size), writes a 2-word header into each of
@@ -746,3 +746,10 @@ s32 address the allocation arithmetic is written in):
     GsClearOt(0, 0, self->ot[0]);
     GsClearOt(0, 0, self->ot[1]);
 ```
+
+
+## Track 7 (round 100, echo, polish pass)
+
+## Constants
+
+`4 << otLength` -> `sizeof(GsOT_TAG) << otLength` (both uses): the tag array's byte size. Byte-identical although the expression is now unsigned. Fields `unk44`/`unk48` are now `maxPackets`/`packetSize`.
