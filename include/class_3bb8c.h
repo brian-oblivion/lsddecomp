@@ -148,7 +148,7 @@ extern void *D_8008AA14;
 
 /* TaskObjF's init `namePrefix` (TitleMenu__BeginCardAccess): the ROM image
  * points it at the "BISLPS-01556" string in D_80011434. */
-extern void *D_8008A9D0;
+extern void *sCardFilePrefix;
 
 /* TaskObjF's init `nameSuffixes` (TitleMenu__BeginCardAccess): 16 string
  * pointers, D_8008AA0C down to D_8008A9D4, then NULL. Address only. */

@@ -95,7 +95,7 @@ the round-77 broadcast.
 - **`unkAC` -> `saveCtrl`, tier B.** The `New_TaskObjF`-constructed
   sub-object (see `TitleMenu__BeginCardAccess`) that this function
   guards both releases on, and whose `slot6C` dispatch carries
-  `D_8008A9D0` ("BISLPS-01556", Sony's memcard save-header game-ID
+  `sCardFilePrefix` ("BISLPS-01556", Sony's memcard save-header game-ID
   string). Named for its role driving the memcard-save sequence this
   unit's own functions establish
   (`TitleMenu__BeginCardAccess`/`TitleMenu__EndCardAccess`/

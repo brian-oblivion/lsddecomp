@@ -24,7 +24,6 @@ D_8008A994
 D_8008A99C
 D_8008A9A4
 D_8008A9AC
-D_8008A9D0
 D_8008A9D4
 D_8008A9D8
 D_8008A9DC
@@ -206,6 +205,7 @@ gVabVolumeInited
 gWBgmActive
 gpDinamicLinkPenalty
 gpNavChallengesComplete
+sCardFilePrefix
 sCardPathPrefix
 sCdDriveInited
 sDivClipHeight
