@@ -1,24 +1,29 @@
 /*
- * code_39094 -- two independent groups of game code:
+ * code_39094 -- the LbdFile class, and the getters over the game's table of
+ * file names.
  *
- * 1. LbdFile (include/LbdFile.h): the loader for one stage map chunk,
- *    STGnn\Mnnn.LBD. LbdFile__LoadHeader streams the file's first 0xB358
- *    bytes into the object's fixed buffer; when that read completes
- *    (LbdFile__AdvanceLoadState) LbdFile__LoadDataBlock reads the optional
- *    data block the header locates into a second allocation, unless
- *    LbdFile__SetAutoLoadData turned that off.
- * 2. Free functions over gRecordTable, a table of 0x230+ fixed 0x1C-byte
- *    records (Rec1C) whose first bytes are a file path (the sound banks
- *    SND\*.VH/VB; then per stage its TEXx.TIX, BGx.SEQ and Mnnn.LBD files;
- *    then the FILM .STR and IMG .TIM files): random-or-forced
- *    pickers (SeedAndRandom, SetPickOverrides/gForcedSoundBank/
- *    gForcedStageBgm), per-stage record-group accessors indexed by
- *    gStageFirstRecord and, for GetStageMapChunkRecordXY, by StageGrid.h's cell
- *    columns, and a family of "stream channel" lookups (GetAsmkMovie,
- *    PickOpeningMovie, GetEndingMovie, GetSpecialDayOrEventRecord,
- *    GetSpecialDayMovieSpan) whose shapes match their call sites in
- *    code_1677c.c one for one. The records' other fields and the channels'
- *    in-game meaning are not established.
+ * LbdFile (include/LbdFile.h, which documents the class): New_LbdFile to
+ * LbdFile__SetAutoLoadData and GetLbdFileMethods, the loader for one stage
+ * map chunk, STGnn\Mnnn.LBD.
+ *
+ * gRecordTable is an array of 0x1C-byte records (Rec1C), each a file path
+ * padded with zeros; class_39e08.c's RegisterRecordTableFiles hands them to
+ * the CD driver. In order:
+ *  - the seven sound banks' SND\name.VH/VB pairs and SND\SE.VH/VB;
+ *  - each stage's files, from gStageFirstRecord[stage]: its four textures
+ *    (TEXA..TEXD.TIX), five BGM sequences (BGA..BGE.SEQ) and map chunks
+ *    (Mnnn.LBD, laid out as StageGrid.h's grid);
+ *  - from RECORD_TABLE_COUNT, the movies (ETC\OPENINGA..G.STR,
+ *    ETC\ENDING.STR, FILM\EVENTn.STR), then six records per special day
+ *    (FILM\SPDAYnnA/B.STR, IMG1\SPDAYnnC..F.TIM).
+ * The stage getters return a record, used as a path: PickStageBgm's goes to
+ * the WBgm's setSeq, PickStageTexture's to New_TimBlockSrc, and a map
+ * chunk's to an LbdFile. The movie getters also hand back a movie id, the
+ * movie's index in gMovieFrameCounts, whose value GetMovieFrameCount gives
+ * code_1677c.c's StreamTasks as the MoviePlayer's frame count.
+ *
+ * The random pickers draw through SeedAndRandom; SetPickOverrides forces
+ * PickSoundBank's and PickStageBgm's choice (1-based, 0 for random).
  */
 #include "common.h"
 #include "LbdFile.h"
@@ -74,8 +79,7 @@ enum MovieId {
  * last. What the frames are for is not established. */
 #define MOVIE_SPAN_GAP_FRAMES 10
 
-/* One 0x1C-byte record of the table GetRecordTable returns (gRecordTable,
- * 0x230 records); only its size is known here. */
+/* One gRecordTable record: a file path, zero-padded to 0x1C bytes. */
 typedef struct Rec1C {
     u8 data[0x1C];
 } Rec1C;
@@ -125,7 +129,8 @@ void LbdFile__AdvanceLoadState(LbdFile *self) {
             self->loadState = LBDFILE_LOAD_IDLE;
             self->headerReady = 1;
             if (self->autoLoadData != 0) {
-                ((LbdFileLoadDataBlockNoArgFn)self->methods->loadDataBlock)(); /* retail passes no argument */
+                /* MATCHING: called with no argument; retail leaves $a0 unset */
+                ((LbdFileLoadDataBlockNoArgFn)self->methods->loadDataBlock)();
             }
         }
     } else if (self->loadState == LBDFILE_LOAD_DATA) {
@@ -175,7 +180,8 @@ s32 LbdFile__LoadDataBlock(LbdFile *self) {
     if (self->loadState != LBDFILE_LOAD_IDLE) {
         return 0;
     }
-    ((LbdFileReleaseDataBlockNoArgFn)self->methods->releaseDataBlock)(); /* retail passes no argument */
+    /* MATCHING: called with no argument; retail leaves $a0 unset */
+    ((LbdFileReleaseDataBlockNoArgFn)self->methods->releaseDataBlock)();
     size = ((LbdFileHeader *)self->buffer)->dataSize;
     self->dataBuffer = BMemPMgrAlloc(size);
     if (self->dataBuffer == NULL) {
@@ -218,6 +224,7 @@ char *GetDefaultDataDirectory(void) {
     return gDefaultDataDirectory;
 }
 
+/* rand(), after srand(seed) when seed is nonzero. */
 s32 SeedAndRandom(s32 seed, s32 unused) {
     if (seed != 0) {
         srand(seed);
@@ -225,6 +232,8 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
     return rand();
 }
 
+/* Forces the sound bank and stage BGM the pickers return (1-based, 0 for
+ * random); a negative argument leaves that one as it was. */
 void SetPickOverrides(s32 soundBank, s32 stageBgm) {
     if (soundBank >= 0) {
         gForcedSoundBank = soundBank;
@@ -245,6 +254,7 @@ void *GetSoundBankPaths(void) {
     return gSoundBankPaths;
 }
 
+/* One of the SND\name paths WBgm opens as its VAB, forced or random. */
 s32 PickSoundBank(s32 unused) {
     u32 r = (u32)SeedAndRandom(0, unused) % SOUND_BANK_COUNT;
     s32 *table = GetSoundBankPaths();
@@ -275,6 +285,8 @@ Rec1C *GetStageTextureRecords(s32 stage) {
     return GetStageRecords(stage);
 }
 
+/* A random texture record among the first one to four of the stage's,
+ * one more every DAYS_PER_TEXTURE days. */
 Rec1C *PickStageTexture(s32 stage, s32 unused, s32 day) {
     s32 textureCount = ((day - 1) % (STAGE_TEXTURE_COUNT * DAYS_PER_TEXTURE)) / DAYS_PER_TEXTURE + 1;
     s32 r = SeedAndRandom(0, unused) % textureCount;
@@ -285,6 +297,8 @@ Rec1C *GetStageBgmRecords(s32 stage) {
     return &GetStageRecords(stage)[STAGE_RECORD_BGM];
 }
 
+/* A random or forced BGM record. Stage 9 never plays BGC.SEQ: a random
+ * pick of it (2) becomes BGD, and a forced 3 becomes 4. */
 Rec1C *PickStageBgm(s32 stage, s32 unused) {
     u32 r = (u32)SeedAndRandom(0, unused) % STAGE_BGM_COUNT;
     Rec1C *rec;
@@ -308,6 +322,7 @@ Rec1C *GetStageMapChunkRecord(s32 stage, s32 chunk) {
     return &GetStageMapChunkRecords(stage)[chunk];
 }
 
+/* The chunk at column x, row y of the stage's grid. */
 Rec1C *GetStageMapChunkRecordXY(s32 stage, s32 x, s32 y) {
     return GetStageMapChunkRecord(stage, x + GetStageGridDimensions(stage)->columns * y);
 }
@@ -376,12 +391,15 @@ Rec1C *GetSpecialDayRecords(s32 *movieIdOut, s32 day) {
     return &rec[day * SPECIAL_DAY_RECORD_COUNT];
 }
 
-/* two s16 halves passed by value in one register */
+/* DreamSys's getCinematic pair, passed by value in one register: a special
+ * day and one of its records, or (group negative) an event movie. */
 typedef struct RecPick {
     s16 group;
     s16 sub;
 } RecPick;
 
+/* A special day's record or an event movie; *movieIdOut is -1 for a
+ * special day's TIM images. */
 Rec1C *GetSpecialDayOrEventRecord(s32 *movieIdOut, RecPick pick) {
     s32 firstMovieId;
     Rec1C *rec;
@@ -399,6 +417,9 @@ s32 GetMovieFrameCount(s32 movieId) {
     return gMovieFrameCounts[movieId];
 }
 
+/* The first movie of special day `day`; *frameTotal is the frame count of
+ * the movies of dayCount special days from it, MOVIE_SPAN_GAP_FRAMES
+ * between each. */
 Rec1C *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount) {
     s32 firstMovieId;
     s32 movieId;
