@@ -33,23 +33,23 @@ extern void *BMemPMgrAlloc(s32 size);
 extern s32 gCdStreamAudioMixSet;
 extern char gCdStreamVersionSuffix[]; /* ";1" */
 
-CdStream *New_CdStream(s32 speed, s32 fps, s32 arg3) {
+CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
     CdStream *obj = BMemPMgrAlloc(0x5C);
 
     if (obj != NULL) {
-        Get_vtable_CdStream()->ctor(obj, speed, fps, arg3);
+        Get_vtable_CdStream()->ctor(obj, cdSpeed, fps, reserved);
         return obj;
     }
     return NULL;
 }
 
-void CdStream__CdStream(CdStream *self, u32 speed, s32 fps, s32 arg3) {
+void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_CdStream();
-    self->speed = speed;
+    self->cdSpeed = cdSpeed;
     self->muted = 0;
-    self->bytesPerFrame = (((speed < 4) ? 300 : 150) / fps / 2) * 2054;
-    self->unk3C = arg3;
+    self->bytesPerFrame = (((cdSpeed < 4) ? 300 : 150) / fps / 2) * 2054;
+    self->reserved = reserved;
     self->ring = NULL;
     self->onStreamEnd = NULL;
     self->onFrameReady = NULL;
@@ -152,7 +152,7 @@ void CdStream__StartRead(CdStream *self, u32 startFrame, s32 frameCount) {
 
     if (self->state == 1 && gActiveCdStream == self) {
         mode = 0x140;
-        if (self->speed < 4) {
+        if (self->cdSpeed < 4) {
             mode = 0x1C0;
         }
         if (frameCount != 0) {
