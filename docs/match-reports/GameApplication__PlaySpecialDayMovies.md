@@ -75,7 +75,7 @@ field's own address.**
 `include/GameApplication.h`: added `StreamTaskMethods.slot6C` and `.slot12C` (new
 slots, both `(void *self, s32 a1)`), retyped `slot44`'s 3rd parameter from
 `const char *path` to plain `s32 arg2` -- confirmed generic by this call
-site passing a computed count where `GameApplication__LoadIntroLogoSequence` passed a string
+site passing a computed count where `GameApplication__ShowIntroLogos` passed a string
 pointer and `GameApplication__PlayOpeningMovie` passed another plain count; the field is a
 raw 32-bit value whose interpretation is call-site-specific, not
 uniformly a string. Declared `GetSpecialDayMovieSpan` (day/count helper,

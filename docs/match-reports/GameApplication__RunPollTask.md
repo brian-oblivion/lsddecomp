@@ -55,11 +55,11 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, s32 extra) {
 
 Matched first attempt -- the "delay slot after a `jalr` captures the
 *preceding* call's return value, not the one about to run" idiom (first
-found the hard way in `GameApplication__LoadIntroLogoSequence`) was already the expected read here.
+found the hard way in `GameApplication__ShowIntroLogos`) was already the expected read here.
 
 ## Proposed learning
 
-None beyond what `GameApplication__LoadIntroLogoSequence`'s report already recorded; this function is
+None beyond what `GameApplication__ShowIntroLogos`'s report already recorded; this function is
 a clean instance of the same idiom with no new residue.
 
 ## HEAD BROADCAST cross-check (this round's two levers)

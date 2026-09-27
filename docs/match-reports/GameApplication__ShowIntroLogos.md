@@ -1,4 +1,6 @@
-# GameApplication__LoadIntroLogoSequence
+# GameApplication__ShowIntroLogos
+
+> Renamed from `GameApplication__LoadIntroLogoSequence` on 2026-09-27 (tools/rename.py). Address 0x80026170.
 
 > Renamed from `Class6D3C8__LoadIntroLogoSequence` on 2026-09-26 (tools/rename.py). Address 0x80026170.
 
@@ -49,7 +51,7 @@ jal  GameApplication__StartLoaderTask(self, sLogoPathOsd)                       
 ```
 
 ```c
-void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
+void GameApplication__ShowIntroLogos(GameApplication *self) {
     const char *streamName;
     s32 typeCode;
     s32 typeLookup;
@@ -120,7 +122,7 @@ register, a different axis).
 
 ## Naming
 
-**`GameApplication__LoadIntroLogoSequence` -- tier B.** Mechanics established
+**`GameApplication__ShowIntroLogos` -- tier B.** Mechanics established
 from the body and its string constants: gated by `arg->unk0C`, registers a
 loader task for `"ETC\ASMKLOGO.TIM"`, then a stream task for whatever
 `GetAsmkMovie` resolves (`"ETC\ASMK.STR"` per the header comment), then a

@@ -17,7 +17,7 @@ type code via `GetEndingMovie` (a new library helper with the same
 "write-to-`*out`, return-a-separate-value" shape as
 `GetAsmkMovie`/`PickOpeningMovie`/`GetSpecialDayMovieSpan`), looks it up via
 `GetMovieFrameCount`, initializes the task with it, then starts it -- the same
-overall shape as `GameApplication__LoadIntroLogoSequence`/`GameApplication__PlayOpeningMovie`, with a `slot12C` call
+overall shape as `GameApplication__ShowIntroLogos`/`GameApplication__PlayOpeningMovie`, with a `slot12C` call
 added (matching `GameApplication__PlaySpecialDayMovies`'s use of that slot).
 
 ## Final C
@@ -48,9 +48,9 @@ across --
   `outerValue` is a PRECEDING call's return (`GetEndingMovie`, captured via
   the delay slot of the `GetMovieFrameCount` `jal` right after it) and
   `typeLookup` is the REAL 4th argument (the delay slot of `slot44`'s own
-  `jalr`, per the idiom `GameApplication__LoadIntroLogoSequence`'s report first documented);
+  `jalr`, per the idiom `GameApplication__ShowIntroLogos`'s report first documented);
 - declaring `typeCode`/`outerValue`/`typeLookup` before `task` (the
-  register-allocation-by-declaration-order lesson from `GameApplication__LoadIntroLogoSequence`),
+  register-allocation-by-declaration-order lesson from `GameApplication__ShowIntroLogos`),
   though here it turned out not to matter -- the natural declaration order
   already put `task` last relative to its own first use, so no reordering
   was needed this time.
@@ -59,7 +59,7 @@ across --
 
 None beyond what this unit's earlier reports already established; this
 function is a clean fourth instance of the "StreamTask init" shape
-(`GameApplication__LoadIntroLogoSequence`, `GameApplication__PlayOpeningMovie`, `GameApplication__PlaySpecialDayMovies`, now this one), each
+(`GameApplication__ShowIntroLogos`, `GameApplication__PlayOpeningMovie`, `GameApplication__PlaySpecialDayMovies`, now this one), each
 gated by a different `GameApplicationConfig` field and differing only in
 which library helper derives the type code and whether extra slots
 (`slot12C`) are involved.

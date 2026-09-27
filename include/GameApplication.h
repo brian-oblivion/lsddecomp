@@ -88,7 +88,7 @@ GameApplication *New_GameApplication(GameApplicationConfig *args);
 void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *args);
 void GameApplication__SeedRandom(GameApplication *self);
 void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem, struct Pad *pad);
-void GameApplication__LoadIntroLogoSequence(GameApplication *self);
+void GameApplication__ShowIntroLogos(GameApplication *self);
 void GameApplication__StartLoaderTask(GameApplication *self, const char *path);
 s32 GameApplication__LoaderTaskDoneCallback(void);
 void GameApplication__PlayOpeningMovie(GameApplication *self);

@@ -30,7 +30,7 @@ extern void SetDataDirectory(char *dir);    /* code_171e0.c */
 
 extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
                                                        the last value its internal dispatch loop got --
-                                                       GameApplication__LoadIntroLogoSequence/GameApplication__PlayOpeningMovie discard it, but
+                                                       GameApplication__ShowIntroLogos/GameApplication__PlayOpeningMovie discard it, but
                                                        GameApplication__PlayCinematic keeps it */
 extern const char *GetAsmkMovie(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkMoviePath */
 extern s32 GetMovieFrameCount(s32 index); /* psyq_memset.s: signed-halfword lookup into gMovieFrameCounts[index] */
@@ -145,7 +145,7 @@ void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem,
  * "loader" task for "ETC\ASMKLOGO.TIM" (GameApplication__StartLoaderTask), then a separate
  * "stream" task for whatever type code GetAsmkMovie hands back
  * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
-void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
+void GameApplication__ShowIntroLogos(GameApplication *self) {
     const char *streamName;
     s32 typeCode;
     s32 typeLookup;
@@ -188,7 +188,7 @@ s32 GameApplication__LoaderTaskDoneCallback(void) {
 }
 
 /* Optional stream-task init block, gated by self->config->playStreams (the same
- * shape as GameApplication__LoadIntroLogoSequence's self->config->showIntroLogos gate, minus the two
+ * shape as GameApplication__ShowIntroLogos's self->config->showIntroLogos gate, minus the two
  * GameApplication__StartLoaderTask loader-task calls, and using PickOpeningMovie instead of
  * GetAsmkMovie to derive the type code). */
 void GameApplication__PlayOpeningMovie(GameApplication *self) {
@@ -389,7 +389,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
  * GameApplication__PlayOpeningMovie/GameApplication__PlaySpecialDayMovies). Builds a StreamTask, clears its skipOnConfirm,
  * derives a type code via GetEndingMovie, looks it up via GetMovieFrameCount,
  * initializes the task with it, then starts it -- the same shape as
- * GameApplication__LoadIntroLogoSequence/GameApplication__PlayOpeningMovie, but with setSkipOnConfirm(0) added and GetEndingMovie
+ * GameApplication__ShowIntroLogos/GameApplication__PlayOpeningMovie, but with setSkipOnConfirm(0) added and GetEndingMovie
  * in place of GetAsmkMovie/PickOpeningMovie. */
 void GameApplication__PlayEndingMovie(GameApplication *self) {
     StreamTask *task;

@@ -12,15 +12,15 @@
 
 `GameApplicationMethods` slot `+0x054`. Gated by `self->arg->unk08 != 0` (a
 second boolean/pointer gate on the ctor argument, sibling to
-`GameApplication__LoadIntroLogoSequence`'s `unk0C` gate): builds a `StreamTask`, derives a type code
+`GameApplication__ShowIntroLogos`'s `unk0C` gate): builds a `StreamTask`, derives a type code
 via `PickOpeningMovie` (a day/week-style calculation, unrelated unit,
 `psyq_memset.s`), looks it up via `GetMovieFrameCount`, and initializes+starts
-the task the same way `GameApplication__LoadIntroLogoSequence` does -- minus that function's two
+the task the same way `GameApplication__ShowIntroLogos` does -- minus that function's two
 `GameApplication__StartLoaderTask` loader-task registrations.
 
 ## Derivation
 
-Structurally identical to the second half of `GameApplication__LoadIntroLogoSequence` (already
+Structurally identical to the second half of `GameApplication__ShowIntroLogos` (already
 matched), with `PickOpeningMovie(&typeCode, 0)` in place of
 `GetAsmkMovie(&typeCode)`:
 
@@ -42,7 +42,7 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
 }
 ```
 
-Matched first attempt, entirely on the strength of `GameApplication__LoadIntroLogoSequence`'s
+Matched first attempt, entirely on the strength of `GameApplication__ShowIntroLogos`'s
 already-solved register-allocation-by-declaration-order lesson (declared
 `derivedValue`/`typeCode` before `task`, mirroring that function's fix) and
 its "the delay slot after `jalr` is the real 4th argument, not a scratch
@@ -53,7 +53,7 @@ argument from the start).
 
 `include/GameApplication.h`: split `GameApplicationConfig`'s `+0x04..+0x0B` padding
 to expose `+0x08` (`unk08`, this function's gate) as its own field,
-matching the existing `+0x0C` (`unk0C`, `GameApplication__LoadIntroLogoSequence`'s gate). Declared
+matching the existing `+0x0C` (`unk0C`, `GameApplication__ShowIntroLogos`'s gate). Declared
 `PickOpeningMovie` (day/week-style helper, `psyq_memset.s`, same "write an
 index to *out, return a related but different value" shape as
 `GetAsmkMovie`).

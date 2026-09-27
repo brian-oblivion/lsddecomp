@@ -54,7 +54,7 @@ void GameApplication__SeedRandom(void) {
 
 `SeedAndRandom` (in `psyq_memset.s`, still `asm`) is called with `(day, 0)`
 — second argument's purpose unknown, always a literal 0 at every call in
-this unit's family (see `GameApplication__LoadIntroLogoSequence`/`GameApplication__PlayOpeningMovie` etc., all of which
+this unit's family (see `GameApplication__ShowIntroLogos`/`GameApplication__PlayOpeningMovie` etc., all of which
 pass 0/0/0 into the sibling helper `SetActiveDataSourceDriverMode`, a related pattern this
 runner did not decompile).
 

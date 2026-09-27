@@ -98,7 +98,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
    (`groupId` assigned from `SetActiveDataSourceDriverMode`'s return, called after
    discarding `GetSpecialDayOrEventRecord`'s) -- swapping which call's return feeds
    `groupId`, and discarding `SetActiveDataSourceDriverMode`'s (matching its established
-   "called for side effect, return unused" role in `GameApplication__LoadIntroLogoSequence` and
+   "called for side effect, return unused" role in `GameApplication__ShowIntroLogos` and
    `GameApplication__PlayOpeningMovie`), closed the last two words.
 
 ## New struct/header knowledge
@@ -106,7 +106,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
 `include/GameApplication.h`: `SetActiveDataSourceDriverMode`'s extern retyped from `void` to
 `s32` (it does return a meaningful value -- whatever its internal dispatch
 loop last produced -- confirmed here even though this call site, like
-`GameApplication__LoadIntroLogoSequence`/`GameApplication__PlayOpeningMovie`, discards it). Added `GetSpecialDayOrEventRecord`
+`GameApplication__ShowIntroLogos`/`GameApplication__PlayOpeningMovie`, discards it). Added `GetSpecialDayOrEventRecord`
 (psyq_memset.s: resolves a packed `{bank,entry}` `CinematicCall` to a
 channel index via an out-param, **and** returns a second, separate `s32`
 kept by this function -- easy to miss since most callers of "write to
