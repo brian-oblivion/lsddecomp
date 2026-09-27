@@ -47,15 +47,11 @@ void BoxFill__SetColor(BoxFill *self, s32 overwrite, u8 *rgb) {
     BoxFill__ApplyColor(self, self->color, rgb, overwrite);
 }
 
-typedef struct {
-    s8 r, g, b;
-} RGB80040790;
-
 void BoxFill__ApplyColor(BoxFill *self, u8 *dst, u8 *src, s32 overwrite) {
     u8 *d;
     d = dst;
     if (overwrite) {
-        *(RGB80040790 *)d = *(RGB80040790 *)src;
+        *(BoxFillRgb *)d = *(BoxFillRgb *)src;
     } else {
         d[0] += src[0];
         d[1] += src[1];
