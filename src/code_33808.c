@@ -30,6 +30,7 @@
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
+#include <libgs.h>
 #include <libpress.h>
 #include "BasicClass.h"
 #include "SceneNode.h"
@@ -463,15 +464,10 @@ s32 LinkResource__BuildModels(LinkResource *self) {
     return 0;
 }
 
-/* Sony's LIBGS.H prototype, spelled here until <libgs.h> can be included:
- * TimImage.h, TileMap.h and TileAtlas.h still define their own GsIMAGE,
- * GsMAP and GsCELL. */
-void GsMapModelingData(u_long *p);
-
 /* +0x078: GsMapModelingData over the TMD in the buffer (from its flags
  * word, past the id). */
 void LinkResource__MapModel(LinkResource *self) {
-    GsMapModelingData(&((TmdFile *)self->buffer)->flags);
+    GsMapModelingData((unsigned long *)&((TmdFile *)self->buffer)->flags);
 }
 
 /* +0x07C: the TMD's object `index`. */

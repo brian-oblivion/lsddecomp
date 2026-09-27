@@ -72,3 +72,7 @@ Later the same round (alpha, third class): TileAtlas unified; the `atlas` parame
 | `arg1` | `source` | C | as New_TileMap's |
 
 MATCHING line on `s32 unused[8]`: it gives retail's 0x40-byte frame, which holds nothing.
+
+## Round 95 (alpha, track 6: Sony headers)
+
+include/TileMap.h's banner no longer carries the name's history: the class was named TileMap in round 83 (from TileMap__BuildMap's GsMAP), unified in round 88. The header's local GsMAP is gone; the type is <libgs.h>'s (field-for-field the same: cellw, cellh, ncellw, ncellh, base, index), so both includers take Sony's headers first. Byte-identical.

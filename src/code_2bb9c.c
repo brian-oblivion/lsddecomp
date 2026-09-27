@@ -30,12 +30,12 @@
  * `New_TimImage` was renamed in track 4 (round 88).
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "FileResource.h"
 #include "DrawSystem.h"
 #include "TimImage.h"
-
-/* LIBGS.H: void GsGetTimInfo(unsigned long *im, GsIMAGE *tim); */
-void GsGetTimInfo(u32 *im, GsIMAGE *tim);
 
 /* An s16 point. */
 typedef struct DrawPoint {
@@ -89,13 +89,13 @@ void TimImage__Upload(TimImage *self) {
         rect.y = self->tim.py;
         rect.w = self->tim.pw;
         rect.h = self->tim.ph;
-        draw->methods->loadImage(draw, &rect, self->tim.pixel);
+        draw->methods->loadImage(draw, &rect, (u32 *)self->tim.pixel);
         if ((self->tim.pmode >> 3) & 1) {
             rect.x = self->tim.cx;
             rect.y = self->tim.cy;
             rect.w = self->tim.cw;
             rect.h = self->tim.ch;
-            draw->methods->loadImage(draw, &rect, self->tim.clut);
+            draw->methods->loadImage(draw, &rect, (u32 *)self->tim.clut);
         }
     }
 }
@@ -129,7 +129,7 @@ void TimImage__func_8003B5E4(TimImage *self) {
 
 /* TimImage +0x09C: describe the TIM held in the buffer. */
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim) {
-    GsGetTimInfo((u32 *)self->buffer + 1, tim);
+    GsGetTimInfo((unsigned long *)self->buffer + 1, tim);
 }
 
 /* The class's table getter (called by New_TimImage and TimImage__TimImage). */

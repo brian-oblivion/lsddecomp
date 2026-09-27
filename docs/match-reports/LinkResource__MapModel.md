@@ -59,3 +59,7 @@ Byte-identical.
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | local `GsMapModelingData(u32 *)` | Sony's spelling, `u_long *` | A | <libgs.h> cannot be included yet (TimImage.h, TileMap.h, TileAtlas.h define their own GsIMAGE/GsMAP/GsCELL), so the prototype stays local |
+
+## Round 95 (alpha, track 6: Sony headers)
+
+The unit-local GsMapModelingData prototype (`u_long *`, spelled locally while TimImage.h, TileMap.h and TileAtlas.h re-declared GsIMAGE, GsMAP and GsCELL) is deleted: code_33808.c includes <libgs.h>, whose prototype takes `unsigned long *`, so the call casts `(unsigned long *)`. Byte-identical.

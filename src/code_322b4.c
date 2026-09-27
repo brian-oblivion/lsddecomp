@@ -42,6 +42,9 @@
  * one function occupies the same slot in both.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "CharSprite.h"
 #include "LightRig.h"
 #include "FlatLightObj.h"
@@ -218,7 +221,7 @@ void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, voi
 
 /* gSpriteMethods slot +0x040 (reset): bind the texture and cell, rebuild the GsSPRITE. */
 void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
-    self->image = &((TimImage *)texture)->tim;
+    self->image = (struct GsIMAGE *)&((TimImage *)texture)->tim;
     self->rect = *rect;
     InitGsSprite(&self->sprite, abr, rect, self->image);
     self->unk58 = 0;
@@ -226,9 +229,14 @@ void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
 
 /* Fill a GsSPRITE from a texture image and a cell: colour mode and tpage
  * from the image, size and u,v from the cell, the pivot at its centre,
- * neutral colour, scale 1.0 and no rotation. */
+ * neutral colour, scale 1.0 and no rotation. `image` is <libgs.h>'s GsIMAGE
+ * (a TimImage's `tim`); include/Sprite.h still spells it by the tag `struct
+ * GsIMAGE`, which Sony's anonymous typedef never completes, so this body and
+ * Sprite__Reset cast until Sprite.h can take <libgs.h> (code_2cc8c_d.c, one
+ * of its includers, cannot yet). */
 void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, struct GsIMAGE *image) {
-    s32 mode = image->pmode & 3;
+    GsIMAGE *tim = (GsIMAGE *)image;
+    s32 mode = tim->pmode & 3;
     s32 grey = 0x80;
 
     sprite->attribute = mode << 24;
@@ -238,11 +246,11 @@ void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, struct GsIMAGE *i
     sprite->h = rect->h;
     sprite->mx = sprite->w >> 1;
     sprite->my = sprite->h >> 1;
-    sprite->tpage = GetTPage(mode, abr, image->px, image->py);
+    sprite->tpage = GetTPage(mode, abr, tim->px, tim->py);
     sprite->u = rect->u;
     sprite->v = rect->v;
-    sprite->cx = image->cx;
-    sprite->cy = image->cy;
+    sprite->cx = tim->cx;
+    sprite->cy = tim->cy;
     sprite->rgb.b = grey;
     sprite->rgb.g = grey;
     sprite->rgb.r = grey;

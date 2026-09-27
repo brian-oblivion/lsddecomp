@@ -20,6 +20,9 @@
  * report for its evidence.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "class_3bb8c.h"
 #include "ScreenSprite.h"
 #include "TextEntry.h"

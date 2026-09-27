@@ -68,3 +68,7 @@ Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a FileResource
 | `arg1` | `source` | C | as New_TileMap's |
 
 MATCHING line on `s32 unused[8]`: retail's 0x40-byte frame.
+
+## Round 95 (alpha, track 6: Sony headers)
+
+include/TileAtlas.h's banner no longer carries the name's history: the class was named TileAtlas in round 83 (from TileAtlas__BuildCells's 300 GsCELLs over VRAM), unified in round 88. The header's local GsCELL is gone; the type is <libgs.h>'s (field-for-field the same: u, v, cba, flag, tpage), so both includers (code_33808.c, code_2c054.c) take common.h, <libgte.h>, <libgpu.h>, <libgs.h> first. Byte-identical.

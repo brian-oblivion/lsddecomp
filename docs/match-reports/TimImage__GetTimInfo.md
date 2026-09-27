@@ -42,3 +42,7 @@ extern FileResourceMethods gTimImageMethods;
   already spelled `getTimInfo` in the vtable declaration before this pass;
   a one-line wrapper around Sony's `GsGetTimInfo` on `buffer + 4` (past the
   TIM id word) -- mechanics are the purpose.
+
+## Round 95 (alpha, track 6: Sony headers)
+
+include/TimImage.h's local GsIMAGE is gone; `tim` is <libgs.h>'s (pmode, px, py, pw, ph, pixel, cx, cy, cw, ch, clut: same layout and names). The unit-local GsGetTimInfo prototype is deleted for <libgs.h>'s, which takes `unsigned long *`, so the cast is now `(unsigned long *)self->buffer + 1` (u_long is unsigned int in include/types.h and would warn). Byte-identical.

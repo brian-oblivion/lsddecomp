@@ -25,3 +25,7 @@ TimImage is unified (`include/TimImage.h`, which now holds GsIMAGE).
 includes TimImage.h; `self->image = (struct GsIMAGE *)((u8 *)texture +
 0x2C)` is now `&((TimImage *)texture)->tim` (`texture` stays `void *`, as
 Sprite's slot types it). Same `addiu 0x2C`; image byte-identical.
+
+## Round 95 (alpha, track 6: Sony headers)
+
+TimImage::tim is now <libgs.h>'s anonymous GsIMAGE, while include/Sprite.h still types +0x048 `image` as the tag `struct GsIMAGE *` (Sony's typedef has no tag, so it is never completed). The assignment casts `(struct GsIMAGE *)` until Sprite.h can say `GsIMAGE *`, which needs all its includers on <libgs.h>; code_2cc8c_d.c cannot take it yet (its local GsClearOt/DrawSync/... prototypes, the ViewportOt job). Byte-identical.

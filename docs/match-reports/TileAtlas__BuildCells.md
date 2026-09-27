@@ -105,3 +105,7 @@ Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a FileResource
 | `0x3F`, `0x100` | `TPAGE_WIDTH - 1` (64), `TPAGE_HEIGHT` (256) | A | a texture page is 64 x 256 in VRAM: u restarts at each page boundary |
 | `16` (tpage += 16) | `TPAGE_LOWER` (0x10) | A | bit 4 of a tpage word is the page-y bit (pages from VRAM y 256); hex, a bit |
 | `GetTPage` prototype | <libgpu.h> | A | local copy deleted |
+
+## Round 95 (alpha, track 6: Sony headers)
+
+`cells` is <libgs.h>'s GsCELL (the header's local copy, same layout and field names, deleted). No accessor changed. Byte-identical.
