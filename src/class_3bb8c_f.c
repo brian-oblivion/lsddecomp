@@ -189,7 +189,7 @@ typedef struct McSaveHeader {
     IconFrame frame2;
 } McSaveHeader;
 
-extern const char D_80011530[]; /* rodata string "File not create in WriteFile\n" */
+extern const char sFileNotCreatedMsg[]; /* rodata string "File not create in WriteFile\n" */
 extern s32 write(s32 handle, void *buf,
                  s32 size); /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
 extern void printf(const char *fmt); /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
@@ -208,7 +208,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
     openMode = ((((u32)size + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = open(path, openMode);
     if (fileHandle == -1) {
-        printf(D_80011530);
+        printf(sFileNotCreatedMsg);
         return 0;
     }
     close(fileHandle);

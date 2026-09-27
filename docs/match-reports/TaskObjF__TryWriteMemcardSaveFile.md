@@ -59,7 +59,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, u8 a3,
     openMode = ((((u32)arg7 + 0x21FF) >> 13) << 16) | 0x200;
     fileHandle = open(path, openMode);
     if (fileHandle == -1) {
-        printf(D_80011530);
+        printf(sFileNotCreatedMsg);
         return 0;
     }
     close(fileHandle);
@@ -187,7 +187,7 @@ is ALREADY MATCHED -- no parameter type here was changed in a way that
 touches that caller's own compiled bytes, see the header-discipline note
 below). Reads as a **"WriteFile" memory-card/CD streaming write** (the
 error string this function logs on failure is literally `"File not create
-in WriteFile\n"`, confirmed in rodata at `D_80011530`):
+in WriteFile\n"`, confirmed in rodata at `sFileNotCreatedMsg`):
 
 1. Builds a device path via `BuildMemcardPath(pathBuf, self->cardSlot, (char
    *)a1)` (already-matched sibling; `a1` is really a `char *` suffix
@@ -298,7 +298,7 @@ the copy as a generic runtime-alignment-checked memcpy loop instead"*.
 Both idioms transferred to this function unchanged, on the first attempt,
 for all five copy regions.
 
-Also new: `extern const char D_80011530[];` (the rodata error string --
+Also new: `extern const char sFileNotCreatedMsg[];` (the rodata error string --
 referenced, not retyped, per this round's broadcast) and two
 project-external prototypes local to this call site's own shape (neither
 declared elsewhere in the project): `extern s32 func_80013488(s32 handle,
@@ -328,7 +328,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
     fileHandle = open(path, openMode);
     flagCopy = a3;
     if (fileHandle == -1) {
-        printf(D_80011530);
+        printf(sFileNotCreatedMsg);
         return 0;
     }
     close(fileHandle);

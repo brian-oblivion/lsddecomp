@@ -2967,3 +2967,4 @@ gObjMViewPoint = 0x8008715C;
 gObjMViewRefPoint = 0x80087168;
 gObjMProjectionBias = 0x8008AB34;
 gCardEventSpecs = 0x80086E78;
+sFileNotCreatedMsg = 0x80011530;
