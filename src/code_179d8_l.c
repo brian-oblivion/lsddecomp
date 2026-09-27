@@ -1,27 +1,21 @@
 /*
- * code_179d8_l -- the SPU sound-effect voice manager (Sony's `libsnd/
- * vmanager`): voice-steal allocation (`SpuVmAlloc`), key-on setup
- * (`SpuVmKeyOnNow`, `SpuVmDoAllocate`), noise-voice setup (`vmNoiseOn`,
- * `vmNoiseOn2`), note/pitch conversion (`note2pitch`, `note2pitch2`,
- * `SePitchBend`) and volume fade-in/out (`SeAutoVol`). 9 of these 12
- * functions were identified round 74 (track 2) as Sony's own `libsnd/
- * vmanager` source by shape/fingerprint match against the disc-3.3 SDK --
- * they carry Sony's real names, not game-style guesses, and this unit
- * builds them as game C only because retail's copy diverges from the SDK
- * reference build (see each function's own `## Naming` section). The
- * exception, `ServiceSoundCueSet`, dispatches through a `VabStreamObj`
- * (the SPU/VAB streaming backend, `code_179d8_e.c`) via its
- * `gVabStreamObjMethods` vtable and is this unit's own game-style name,
- * confirmed tier A against `DreamSys`'s `cueServiceActive` field.
- * `func_8002E2F8`/`func_8002E300` are two unreferenced two-word stubs
- * (splat-emitted empty bodies; no known caller or table attachment).
+ * code_179d8_l -- the front of libsnd's voice manager (Sony's
+ * `libsnd/vmanager`), plus one game function ahead of it.
  *
- * `code_179d8_l`/`code_179d8_m` split what was one uncarved 24-function
- * remainder (carved round 24, 2026-09-08); the split is a staffing cut,
- * not a density one. Owns no jump table and no rodata attach (checked at
- * carve time). See `docs/PROGRESS.md` and individual match reports for
- * carve/blocker history -- all four toolchain blockers this unit once
- * screened against are RESOLVED project-wide (CLAUDE.md).
+ * ServiceSoundCueSet (game code) runs one tick of a SoundCueSet
+ * (include/SoundCueSet.h): it resets the set's three cue slots, lets the
+ * set's callback fill them, then stops, retunes and replays each slot's tone
+ * through the VabStreamObj's method table (include/VabStreamObj.h), scaled
+ * down by the set's attenuation.
+ *
+ * The rest is Sony's, under Sony's names: picking a voice to steal
+ * (SpuVmAlloc), keying a tone on (SpuVmKeyOnNow, SpuVmDoAllocate), switching
+ * a voice to the noise generator (vmNoiseOn, vmNoiseOn2), turning a note
+ * into an SPU pitch (note2pitch, note2pitch2, SePitchBend) and starting a
+ * volume ramp (SeAutoVol). They read the current VAB through <libsnd.h>'s
+ * VabHdr and VagAtr (_svm_vh, _svm_tn), the voice tables in
+ * include/SvmData.h and the sequence records in include/SsScore.h.
+ * func_8002E2F8 and func_8002E300 are empty and have no known caller.
  */
 #include "common.h"
 #include <libsnd.h>

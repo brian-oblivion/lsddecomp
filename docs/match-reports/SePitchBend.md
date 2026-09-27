@@ -643,3 +643,7 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 `src/` now reads `(u8)_svm_voice[c].unk10`, `(u8)_svm_voice[c].unk14` and `(u16)_svm_voice[c].unk0C` (value casts at the site; the header keeps +0x0C/+0x10/+0x14 `s16`, what most accessors read). Byte-exact. Measured: the address-cast spelling `*(u8 *)&_svm_voice[c].unk10` is NOT equivalent here -- it grows the frame 0x20 -> 0x28 with every other word equal (104/112); spelling +0x0C as `*(u16 *)&...unk0C` on top of that drops to 29/110.
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). `src/` keeps the halfword-array cast `((u16 *)_svm_sreg_buf)[off + 2]` (the idx*8 split-scaled-index idiom) and `_svm_sreg_dirty`. Byte-exact.
+
+## Types (round 98, alpha)
+
+This unit's `D8008E978Entry` is now `<libsnd.h>`'s `VagAtr` and `ObjE970` is `VabHdr` (unk4 -> `center`, unk5 -> `shift`, unk12 -> `pbmin`, unk13 -> `pbmax`, ObjE970.unk18 -> `mvol`); preserved bodies above keep the old spellings. See SpuVmAlloc.md, "Unit banner history".

@@ -168,3 +168,7 @@ as `libsnd/vmanager note2pitch2`, fingerprint EXACT masked 1.00 vs the
 disc-3.3 reference (position between `libc2/strncmp` and `libsnd/vm_prog`
 agrees). Sony symbol; this pass does not rename it further. Matched,
 64/64.
+
+## Types (round 98, alpha)
+
+This unit's `D8008E978Entry` is now `<libsnd.h>`'s `VagAtr` and `ObjE970` is `VabHdr` (unk4 -> `center`, unk5 -> `shift`, unk12 -> `pbmin`, unk13 -> `pbmax`, ObjE970.unk18 -> `mvol`); preserved bodies above keep the old spellings. See SpuVmAlloc.md, "Unit banner history".
