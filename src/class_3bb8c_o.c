@@ -253,14 +253,14 @@ void Actor__AddTranslation(Actor *self, LongVec3 *delta) {
  * is a whole-Vec3 copy. */
 void Actor__UpdateTranslation(Actor *self, s32 set, LongVec3 *v) {
     Actor *t = self;
-    SceneNodeSub14 *u = t->coord2;
+    GsCOORDINATE2 *u = t->coord2;
 
     if (set) {
-        *(LongVec3 *)&u->tx = *v;
+        *(LongVec3 *)u->coord.t = *v;
     } else {
-        u->tx += v->x;
-        u->ty += v->y;
-        u->tz += v->z;
+        u->coord.t[0] += v->x;
+        u->coord.t[1] += v->y;
+        u->coord.t[2] += v->z;
     }
     t->coord2->flg = 0;
 }

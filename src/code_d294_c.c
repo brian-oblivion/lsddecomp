@@ -33,7 +33,7 @@ void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src) {
 /* Turns an offset given in the object's own local frame into a world
  * position: rotate `src` by the object's orientation (slot84, un-negated
  * angles, same as SceneNode__RotateLocalVector above) and add the object's
- * accumulated world translation. That translation is `unk14->unk38`, which
+ * accumulated world translation. That translation is `coord2->workm.t`, which
  * is GsCOORDINATE2.workm.t -- the composed world matrix's own translation
  * (+0x24 workm, +0x14 into MATRIX = +0x38). SceneNode__RaycastVertical is the function
  * that maintains it, by summing coord.t down the owner chain.
@@ -44,18 +44,18 @@ void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src) {
  * resulting NULL is still dereferenced, exactly as retail does. */
 void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 unused) {
     u8 buf[0x20];
-    s32 *table;
+    long *table;
 
     self->methods->getRotMatrix(self, buf, 0);
     ApplyMatrixToLVArray(dst, src, 1, buf);
 
-    table = self->parent != 0 ? self->coord2->unk38 : 0;
+    table = self->parent != 0 ? self->coord2->workm.t : 0;
     dst[0] = dst[0] + table[0];
 
-    table = self->parent != 0 ? self->coord2->unk38 : 0;
+    table = self->parent != 0 ? self->coord2->workm.t : 0;
     dst[1] = dst[1] + table[1];
 
-    table = self->parent != 0 ? self->coord2->unk38 : 0;
+    table = self->parent != 0 ? self->coord2->workm.t : 0;
     dst[2] = dst[2] + table[2];
 }
 
@@ -71,14 +71,14 @@ void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 u
  * (the compiler sinks the constant store into the delay slot itself).
  * See docs/match-reports/SceneNode__GetRotationDegrees.md. */
 void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
-    SceneNodeSub44 *src;
+    GsCOORD2PARAM *src;
 
     src = self->coord2->param;
-    out[0].num = src->rotate.x * 45 >> 9;
+    out[0].num = src->rotate.vx * 45 >> 9;
     out[0].den = 1;
-    out[1].num = src->rotate.y * 45 >> 9;
+    out[1].num = src->rotate.vy * 45 >> 9;
     out[1].den = 1;
-    out[2].num = src->rotate.z * 45 >> 9;
+    out[2].num = src->rotate.vz * 45 >> 9;
     out[2].den = 1;
 }
 
@@ -111,10 +111,9 @@ void SceneNode__UnlinkModel(SceneNode *self) {
 
 extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
 
-/* First it maintains the object's world
- * translation: `unk14->unk38` is GsCOORDINATE2.workm.t, and the guarded
- * block rewrites it as this object's own coord.t plus every owner's
- * coord.t, walking the `self->unkC` owner list. Then it takes the target
+/* First it maintains the object's world translation, `coord2->workm.t`:
+ * the guarded block rewrites it as this object's own coord.t plus every
+ * owner's coord.t, walking the `parent` chain. Then it takes the target
  * point `arg2` relative to that world translation, rotates the delta into
  * the object's own frame through slotA4 (SceneNode__ComposeAndApplyRotation, the
  * inverse-chain matrix), and probes `TmdModel__RaycastFaces` twice -- Y minus 0x400
@@ -148,35 +147,36 @@ extern void SubVec3S16(s32 *dest, s16 *from, s16 *to);
  *    slots), and that placement is what puts the shared `v0 = 0` block
  *    after the success tail instead of before it.
  *
- * `(u8 *)node + 0x38 != NULL` is retail's own check, not a typo for
- * `node != NULL`: the disassembly forms the sum first and tests THAT. */
+ * `node->workm.t != NULL` is retail's own check, not a typo for
+ * `node != NULL`: the disassembly forms &workm.t (node + 0x38) first and
+ * tests THAT. */
 s32 SceneNode__RaycastVertical(SceneNode *self, s32 *arg1, s32 *arg2) {
-    s32 *table;
+    long *table;
     s16 buf18[4];
     s16 delta[4];
     s16 buf28[4];
     s16 buf30[4];
-    SceneNodeSub14 *node;
+    GsCOORDINATE2 *node;
     SceneNode *cur;
 
     if (self->model != NULL) {
         if ((s32)self->attribute < 0 && self->parent != NULL) {
             node = self->coord2;
-            if ((u8 *)node + 0x38 != NULL) {
-                *(LongVec3 *)node->unk38 = *(LongVec3 *)&node->tx;
+            if (node->workm.t != NULL) {
+                *(LongVec3 *)node->workm.t = *(LongVec3 *)node->coord.t;
 
                 cur = self->parent;
                 if (cur != NULL) {
                     do {
-                        ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->x =
-                            ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->x +
-                            cur->coord2->tx;
-                        ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->y =
-                            ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->y +
-                            cur->coord2->ty;
-                        ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z =
-                            ((LongVec3 *)(self->parent != 0 ? self->coord2->unk38 : (s32 *)0))->z +
-                            cur->coord2->tz;
+                        ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->x =
+                            ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->x +
+                            cur->coord2->coord.t[0];
+                        ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->y =
+                            ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->y +
+                            cur->coord2->coord.t[1];
+                        ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->z =
+                            ((LongVec3 *)(self->parent != 0 ? self->coord2->workm.t : (long *)0))->z +
+                            cur->coord2->coord.t[2];
 
                         cur = cur->parent;
                     } while (cur != NULL);
@@ -184,7 +184,7 @@ s32 SceneNode__RaycastVertical(SceneNode *self, s32 *arg1, s32 *arg2) {
             }
         }
 
-        table = self->parent != 0 ? self->coord2->unk38 : 0;
+        table = self->parent != 0 ? self->coord2->workm.t : 0;
         delta[0] = (u16)arg2[0] - (u16)table[0];
         delta[1] = (u16)arg2[1] - (u16)table[1];
         delta[2] = (u16)arg2[2] - (u16)table[2];
@@ -235,14 +235,14 @@ void SubVec3S16(s32 *dest, s16 *from, s16 *to) {
  * That is the mechanism behind the argument-swap correlation Entity.h
  * records; see docs/match-reports/SceneNode__FaceTarget.md. */
 void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 arg2, s32 arg3, void *arg4) {
-    s32 *pos;
-    s32 *table;
+    long *pos;
+    long *table;
     s32 dx;
     s32 dz;
     Ratio16 out[3];
 
-    pos = &self->coord2->tx;
-    table = target->parent != 0 ? target->coord2->unk38 : 0;
+    pos = self->coord2->coord.t;
+    table = target->parent != 0 ? target->coord2->workm.t : 0;
 
     if (table[0] != pos[0]) {
         dx = table[0] - pos[0];

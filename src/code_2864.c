@@ -21,9 +21,9 @@
  * order in the OT is children before parent.
  *
  * Types are Sony's (libgte.h, libgs.h) and the classes' own. SceneNode's
- * coord2 is the parked SceneNodeSub14 view of GsCOORDINATE2, the subclasses
- * spell their GsBG/GsBOXF/GsSPRITE field by field: hence the casts to
- * Sony's types at the libgs calls. The OT is Viewport's own GsOT.
+ * coord2 is Sony's GsCOORDINATE2; the subclasses spell their
+ * GsBG/GsBOXF/GsSPRITE field by field: hence the casts to Sony's types at
+ * the libgs calls. The OT is Viewport's own GsOT.
  */
 #include "common.h"
 #include <libgte.h>
@@ -77,7 +77,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         return;
     }
 
-    c = (GsCOORDINATE2 *)node->coord2;
+    c = node->coord2;
     if (c->flg == 0) {
         m = &c->coord.m[0][0];
         sc = (u32 *)&c->param->scale; /* MATCHING: read unsigned (srl) */
@@ -133,7 +133,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         }
         GsSortBoxFill((GsBOXF *)&b->boxAttribute, self->ot[self->otIndex], b->pri);
     } else if ((tag & 0xFF) != 0x44) {
-        GsGetLws((GsCOORDINATE2 *)node->coord2, lw, ls);
+        GsGetLws(node->coord2, lw, ls);
         GsSetLightMatrix(lw);
         GsSetLsMatrix(ls);
         if (node->tmd != 0) {
@@ -154,12 +154,12 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         SVECTOR scr; /* never used; reserves retail's 8 unused frame bytes */
         Sprite *n;
 
-        GsGetLs((GsCOORDINATE2 *)node->coord2, ls);
+        GsGetLs(node->coord2, ls);
         if (ls->t[2] < 1 || ls->t[2] > 0xFFFF) {
             return;
         }
         if (node->parent->parent != NULL) {
-            ApplyMatrixToLVArray(&pos, &node->coord2->tx, 1, ls);
+            ApplyMatrixToLVArray(&pos, node->coord2->coord.t, 1, ls);
             pos.vx += lsBuf.t[0];
             pos.vy += lsBuf.t[1];
             pos.vz += lsBuf.t[2];

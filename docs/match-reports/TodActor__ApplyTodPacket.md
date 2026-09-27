@@ -1124,3 +1124,7 @@ VECTOR trans}), same offsets and same use. The local type is deleted and the
 body reads `&param->rotate.vx`, `&param->scale.vx`, `&param->trans.vx` and
 `trans.vx/vy/vz` (the scale/trans cursors are `long *`, VECTOR's member type);
 code_55dd4.c now includes <libgte.h>, <libgpu.h>, <libgs.h>. Byte-identical.
+
+## Round 97 (alpha): Sony's GsCOORDINATE2
+
+SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.

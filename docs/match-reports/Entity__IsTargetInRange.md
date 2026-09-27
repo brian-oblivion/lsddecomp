@@ -189,3 +189,7 @@ it. The function now carries no `__asm__`.
 ## Track 7 (round 94, delta)
 
 The +/-0x200 height window is now decimal 512 (a distance). The two ifs and `goto fail` carry `/* MATCHING */`: measured this round, both `if (a || b) return 0;` followed by `if (dist < range) return 1; return 0;` and the same with `return dist < range;` turn the whole-image SHA1 red.
+
+## Round 97 (alpha): Sony's GsCOORDINATE2
+
+SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.

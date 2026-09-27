@@ -28,6 +28,9 @@
  * TRANSLATE_*) are named by value and declared once in include/Entity.h.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "Entity.h"
 #include "DreamSys.h"
 

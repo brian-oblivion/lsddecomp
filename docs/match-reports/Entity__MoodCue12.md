@@ -128,3 +128,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Track 7 (round 94, delta)
 
 Locals `result` -> `dist` (the distanceToPeer result) and `oldFC` -> `timer` (moodTimer before this handler's own increment), both tier A. `notifyParents(this, 0xC)` is `ENTITY_EFFECT_END_DREAM`. A comment says phase 12 counts moodTimer here as well as in Entity__TickSoundCue, so it advances two per tick. Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs and `state` phases (hex remains only for masks). Byte-identical (whole image green).
+
+## Round 97 (alpha): Sony's GsCOORDINATE2
+
+SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.

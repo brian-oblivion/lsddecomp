@@ -30,6 +30,9 @@
  * handler's own phases (same convention as Entity_d/Entity_e).
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "Entity.h"
 #include "DreamSys.h"
 
@@ -220,7 +223,7 @@ void Entity__MoodCue30(Entity *this) {
                 this->state = 13;
             }
         } else if (this->state == 13) {
-            this->methods->setTranslation(this, (LongVec3 *)&((DreamSys *)this->peer)->coord2->tx);
+            this->methods->setTranslation(this, (LongVec3 *)((DreamSys *)this->peer)->coord2->coord.t);
             this->methods->addTranslation(this, TRANSLATE_Y_MINUS1500_Z_PLUS1024);
         }
     }

@@ -262,7 +262,7 @@ void Entity__MoodCue74(Entity *this, SoundCueSet *out) {
         ((DreamSys *)this->peer)
             ->viewport->methods->setClearColor(((DreamSys *)this->peer)->viewport, &sMoodCue74ClearColor);
         this->state = rand() % 3;
-        if (((DreamSys *)this->peer)->coord2->tz < 610) {
+        if (((DreamSys *)this->peer)->coord2->coord.t[2] < 610) {
             this->state = 0;
         }
     }

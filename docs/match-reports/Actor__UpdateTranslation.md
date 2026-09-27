@@ -97,3 +97,7 @@ function needs; the two one-line callers get the more specific
 ## Track 4 (2026-09-25, round 82, delta)
 
 Renamed from `BaseObjO__UpdateVec14`. The body behind +0x0B8/+0x0BC: sets or adds coord2->coord.t (tx/ty/tz of SceneNodeSub14; the set path is a whole-Vec3 copy through a LongVec3 cast, as the old Vec3 member was), then clears coord2->flg so the coordinate is recomputed. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Round 97 (alpha): Sony's GsCOORDINATE2
+
+SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.

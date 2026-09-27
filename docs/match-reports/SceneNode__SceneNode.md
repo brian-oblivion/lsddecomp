@@ -172,3 +172,7 @@ The header's banner was rewritten as documentation in round 95; the comments it 
  * are declared once, in include/TmdModel.h, which code_d294_b.c and
  * code_d294_c.c include themselves (track 4, round 87). */
 ```
+
+## Round 97 (alpha): Sony's types substituted
+
+SceneNode.h now uses Sony's types for all three: S16Quad_d294 -> SVECTOR (x/y/z/w -> vx/vy/vz/pad), SceneNodeSub44 -> GsCOORD2PARAM (scaleX/Y/Z -> scale.vx/vy/vz; rotate), SceneNodeSub14 -> GsCOORDINATE2 (pad04 -> coord.m, tx/ty/tz -> coord.t[0..2], workm bytes + unk38 -> workm.m + workm.t; flg is unsigned long now, compared only against 0). Each layout was re-checked against include/psyq/libgte.h and libgs.h before its struct was deleted; the table above stands. Every includer of SceneNode.h takes <libgte.h>, <libgpu.h>, <libgs.h> after common.h. Zero bytes.

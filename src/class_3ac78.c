@@ -21,6 +21,9 @@
  * placeholder name, like SceneNode__NoOpSlot5C in code_d294_b.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "StageMap.h"
 #include "VabStreamObj.h"
 #include "LightRig.h"
@@ -334,7 +337,7 @@ void StageMap__ApplyToSenderFootprint(StageMap *self, SceneNode *sender, s32 com
     s32 savedRectCount;
 
     if (sender->parent != NULL) {
-        pos = (SplitLongVec3 *)sender->coord2->unk38;
+        pos = (SplitLongVec3 *)sender->coord2->workm.t;
     } else {
         pos = NULL;
     }

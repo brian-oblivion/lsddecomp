@@ -118,3 +118,7 @@ Round 71 (alpha). `func_8001CEB4` -> `SceneNode__UpdateRotation`, **tier A**. Ta
 For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
 
 - `SceneNodeSub44.vec` -> `rotate` (tier A): GsCOORD2PARAM.rotate (SVECTOR at +0x10), which UpdateRotation writes in 4096-per-turn units. Accessors: code_d294, code_d294_b, code_d294_c.
+
+## Round 97 (alpha): Sony's SVECTOR
+
+GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/SceneNode.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.

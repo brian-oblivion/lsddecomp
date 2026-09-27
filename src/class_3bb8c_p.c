@@ -110,7 +110,7 @@ s32 Actor__FindNearbyLink(Actor *self) {
     LongVec3 offset;
 
     if (self->grid != NULL) {
-        void *pos = &self->coord2->tx;
+        void *pos = self->coord2->coord.t;
 
         if (self->grid->methods->computeFootprintDescriptor(self->grid, &desc, pos) == 0) {
             s32 count = Actor__BuildLinkQueries(self, queries, slots, &desc, 1);

@@ -165,8 +165,8 @@ void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 event) {
     goto shared_tail;
 
 handle_neg2:
-    if (this->grid->methods->findSlotForPosition(this->grid, (LongVec3 *)&this->coord2->tx)->loader->headerReady !=
-        2)
+    if (this->grid->methods->findSlotForPosition(this->grid, (LongVec3 *)this->coord2->coord.t)
+            ->loader->headerReady != 2)
         goto neg2_mismatch;
 
 shared_tail:
@@ -414,7 +414,7 @@ extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 dist, s32 *reference, s32 tolerance) {
     s32 worldPos[3];
     s32 height;
-    s32 *worldTrans;
+    long *worldTrans;
     s32 *offsetZ;
 
     offsetZ = &gProjectOffsetZ;
@@ -424,7 +424,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 dist, s32 *re
     height = InterpolateKeyframeValue((void *)&this->viewport->refView.vp,
                                       (void *)&this->viewport->refView.vr, dist);
 
-    worldTrans = this->parent != 0 ? this->coord2->unk38 : 0;
+    worldTrans = this->parent != 0 ? this->coord2->workm.t : 0;
     worldPos[1] = height + worldTrans[1];
 
     if (out != NULL) {
@@ -733,7 +733,8 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 command) {
             !this->methods->tryTunnelLink(this, pos)) {
             this->methods->saveLinkSnapshot(this);
             MOVE_COMMAND_DISPATCH[command](this, delta, (void *)(this->staircaseMoveGate < 1));
-            if (this->currentStage == 0 && this->coord2->ty < -2000 && this->coord2->tx >= -499) {
+            if (this->currentStage == 0 && this->coord2->coord.t[1] < -2000 &&
+                this->coord2->coord.t[0] >= -499) {
                 this->methods->onGridCellLinkCommand(this, this, 4);
             }
         }
@@ -1453,14 +1454,14 @@ void DreamSys__ResetFlashbackList(DreamSys *this) {
 }
 
 void DreamSys__SaveLinkSnapshot(DreamSys *this) {
-    SceneNodeSub14 *p = this->coord2;
+    GsCOORDINATE2 *p = this->coord2;
 
     this->coord2Snapshot = *p;
     this->coord2ParamSnapshot = *p->param;
 }
 
 void DreamSys__RestoreLinkSnapshot(DreamSys *this) {
-    SceneNodeSub14 *p = this->coord2;
+    GsCOORDINATE2 *p = this->coord2;
 
     *p = this->coord2Snapshot;
     *p->param = this->coord2ParamSnapshot;
