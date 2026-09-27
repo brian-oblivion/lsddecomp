@@ -113,3 +113,10 @@ three specific states (`7`, `0xB`, `0xF`) increments a per-object counter
 counter reaches 6 -- read as a per-call (per-frame) wait/delay gate ahead
 of a state change, hence "Tick". Which real-world delay this counts down
 (and why exactly 6) is not established.
+
+## Track 7 (2026-09-27, round 95)
+
+Local `newVal` -> `count`; the states are FORMATTING/SAVING/LOADING and
+their actions FORMAT/WRITE/READ (`enum TaskObjFState`). 6 stays a literal
+(a tick count, decimal). The derivation above keeps one line: `MATCHING:
+old and count apart, and one call per branch`. Image byte-identical.

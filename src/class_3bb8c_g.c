@@ -1,23 +1,19 @@
 /*
- * class_3bb8c_g -- TaskObjF methods (include/TaskObjF.h), slots +0x07C..
- * +0x0B0 of gTaskObjFMethods (class_3bb8c_f holds +0x064..+0x078), the
- * table getter, plus one standalone helper (StampSaveTitleFileLetter) reused
- * by class_3bb8c_m's memcard save writer.
+ * class_3bb8c_g -- TaskObjF's state machine (include/TaskObjF.h): slots
+ * +0x07C..+0x0B0 of gTaskObjFMethods and the table getter, plus
+ * StampSaveTitleFileLetter, which writes a save file's letter into its
+ * title.
  *
- * TaskObjF runs a `state` machine: SetState notifies the parent, swaps the
- * card icon and runs the entry action of the new state (format, write, read,
- * or open a widget); AdvanceState and ForceIdleFromState answer the input
- * source's events, TickStateDelay the tick source's. The two widgets are
- * lazily attached in mirrored pairs: `textEntry` (a TextEntry, to edit the
- * title) and `itemList` (a ItemList, to choose among the existing files),
- * driven through the slots +0x044..+0x050 both classes put at the same
- * offsets; their results come back through OnTextEntryResult and
- * OnItemListResult. `cardIcon` is a ScreenSprite of a CARD\*.TIM message,
- * made by LoadCardIcon and released by ReleaseCardIcon.
- *
- * Every function in the unit is matched C. What each numeric `state` code
- * means in game terms is not established. See each function's own match
- * report for its evidence.
+ * setState (enum TaskObjFState) notifies the parent, swaps the message icon
+ * (a ScreenSprite of CARD\<name>.TIM: loadCardIcon, releaseCardIcon) and
+ * runs the new state's entry action: format, write or read the card, or
+ * attach the title editor (a TextEntry) or the file chooser (an ItemList).
+ * A circle press on the Pad reaches advanceState (retry, format, go on) and
+ * a cross press forceIdleFromState (abort); the tick source counts down
+ * FORMATTING, SAVING and LOADING before their action runs. The two widgets
+ * are made on first use, driven through the slots +0x044..+0x050 both
+ * classes put at the same offsets, and report back through
+ * onTextEntryResult and onItemListResult.
  */
 #include "common.h"
 #include <libgte.h>
@@ -32,6 +28,8 @@
 #include "TaskObjF.h"
 #include "Pad.h"
 
+/* MATCHING: `methods` is cached, and the cases are in retail's code order
+ * (the entry actions before the widgets). */
 void TaskObjF__SetState(TaskObjF *self, s32 state) {
     TaskObjFMethods *methods = self->methods;
     s32 ok;
@@ -89,15 +87,15 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
     }
 }
 
-/* 0x11 (17) entries, indexed by `arg1` (range-checked `< 0x11` below);
- * mostly `char *` string pointers into rodata, a few raw literal words at
- * indices never reached from this call site. `asm/data/76DC8.data.s`. */
+/* The message icon's name per state, CARD\<name>.TIM ("NOCONECT" ..
+ * "LOADERR" for states 2..16). Entries 0 and 1 are not names; no setState
+ * call passes 0 or 1. */
 extern char *gCardIconNames[TASKOBJF_STATE_EDIT_TITLE];
 extern const char gCardPathPrefix[]; /* "CARD\\" */
 extern const char gCardPathSuffix[]; /* ".TIM" */
-/* 3 words, `New_ScreenSprite`'s rect: a SpriteRect {0, 0, 160, 120}. */
+/* {0, 0, 160, 120} */
 extern SpriteRect gCardIconRect;
-/* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
+/* (-70, -60), percent of half the screen from the centre */
 extern ScreenSpritePos gCardIconPos;
 
 void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
@@ -107,6 +105,8 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     TimImage *tim;
     ScreenSprite *icon;
 
+    /* MATCHING: `path` and `icon` keep the buffer and the sprite in saved
+     * registers across the calls. */
     if (index >= ARRAY_COUNT(gCardIconNames)) {
         return;
     }
@@ -168,6 +168,7 @@ void TaskObjF__AdvanceState(TaskObjF *self) {
                 strcat(self->fileName, self->foundSuffixes[self->selectedIndex]);
                 strcpy(self->title, self->titles[self->selectedIndex]);
             }
+            /* MATCHING: an if chain; a switch tests LOAD first. */
             if (self->opMode == TASKOBJF_OP_SAVE) {
                 methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
                                    self->iconFrames, self->iconImage, self->data, self->dataSize);
@@ -206,6 +207,9 @@ void TaskObjF__ForceIdleFromState(TaskObjF *self) {
     }
 }
 
+/* Waits until `waitCounter` (zeroed by setState) passes 6, then runs the
+ * state's action. MATCHING: `old` and `count` apart, and one call per
+ * branch. */
 void TaskObjF__TickStateDelay(TaskObjF *self) {
     s32 old;
     s32 count;
@@ -317,10 +321,10 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
     return &gTaskObjFMethods;
 }
 
-/* The save title is full-width (2-byte SJIS) characters. TitleMenu's
- * (D_8008AA18 points at it, 0x8001149C) starts as "LSD   Day001", all
- * full-width: "LSD" (0..2), the letter field (3..5), "Day" (6..8), the day
- * number (9..11), then padding. */
+/* The save title is full-width (2-byte SJIS) characters. TitleMenu's (the
+ * buffer D_8008AA18 points at) starts as "LSD   Day001", all full-width:
+ * "LSD" (0..2), the letter field (3..5), "Day" (6..8), the day number
+ * (9..11), then padding. */
 #define SAVE_TITLE_LETTER_FIELD 3
 #define SAVE_TITLE_LETTER 4
 #define SAVE_TITLE_PADDING 12
@@ -331,20 +335,11 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
  * the first digit of NN. */
 #define SAVE_FILE_NAME_NUMBER 13
 
-/* Sony's, from libc2 (round 45's own local view -- this unit's first use). */
+/* Sony's (libc2). A leading 0 makes it parse octal. */
 extern s32 atoi(char *s);
 
-/* VALUE-of `%gp_rel`, round 45's own local view -- a fixed rodata template
- * (ROM image still-uncarved, `asm/data/1C34.rodata.s` region) this
- * function copies raw byte ranges out of; also read by
- * `class_3bb8c_d.c`'s own (differently-typed) local view. */
-
-/* Struct-copy helper types for round 45's StampSaveTitleFileLetter, all deliberately
- * all-`s8` (alignment 1) per this round's FormatNumberIntoBuffer lever: retail
- * copies these ranges as one unaligned `lwl`/`lwr` word chunk per 4 bytes,
- * with any non-multiple-of-4 remainder as INDIVIDUAL byte loads/stores,
- * never merged into a halfword -- alignment 2 would let GCC trust a
- * halfword move retail does not have. */
+/* MATCHING: all-s8 (alignment 1), so a copy is lwl/lwr words plus single
+ * bytes; alignment 2 would merge a two-byte tail into a halfword. */
 typedef struct {
     s8 raw[6];
 } Buf6_3bb8c_g;
@@ -359,14 +354,14 @@ typedef struct {
 
 extern Pair2_3bb8c_g *gSaveTitleGlyphs;
 
-/* Signature is `include/class_3bb8c.h`'s ALREADY-shared
- * `extern s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1);` (class_3bb8c_m's own
- * caller, TaskObjF__WriteMemcardSaveFile), matched exactly -- this unit's own definition
- * must agree with that declaration since both are visible in this
- * translation unit. Cast to `u8 *` internally; retail's own register
- * content at exit (`$v0` left holding a pointer into the `gSaveTitleGlyphs`
- * template in every path) confirms the real return type is a pointer,
- * loosely read as `s32` by the caller that never dereferences it. */
+/* Writes a save file's letter into the full-width `title`: the letter
+ * field becomes a space, the letter for the file name's -NN (a for -01 ..
+ * o for -15) and a space, followed by "Day", and a space goes after the day
+ * number. With no file name it only blanks the letter field. -08 and -09
+ * are parsed from their second digit, which atoi would otherwise read as
+ * octal. Returns a pointer into gSaveTitleGlyphs that no caller reads.
+ * The s32 parameters are include/class_3bb8c.h's prototype. MATCHING:
+ * `glyphs` is the return value, not a second read of the global. */
 s32 StampSaveTitleFileLetter(s32 titleAddr, s32 fileNameAddr) {
     Pair2_3bb8c_g *title = (Pair2_3bb8c_g *)titleAddr;
     char *fileName = (char *)fileNameAddr;

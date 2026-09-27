@@ -141,3 +141,12 @@ already fires from the opposite direction (after choosing a NEW state).
 Named for the mechanics (moves the state machine forward from wherever it
 currently is); which real transition each of the four case groups performs
 in game terms is not established.
+
+## Track 7 (2026-09-27, round 95)
+
+Cases are `enum TaskObjFState`, `opMode` tests `enum TaskObjFOpMode`,
+playSound indices written `0 << 4` and `1 << 4` (program << 4 | tone, as
+DreamSys writes `9 << 4`). Not named: tone 1 << 4 also plays when an
+ItemList or TextEntry closes either way (their forwardToTarget(0x10)), so a
+purpose name ("cancel") would be wrong. The residue above keeps one line:
+`MATCHING: an if chain; a switch tests LOAD first`. Image byte-identical.

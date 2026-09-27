@@ -161,3 +161,29 @@ ChildObj86ED0 *New_TimImage(char *)` is deleted. `handle` is `TimImage *`:
 +0x078 (FileResource's `void *slot78`, occupant TimImage__Upload) is called
 through `TimImageUploadFn`, +0x004 is TimImage's inherited `release`.
 Image byte-identical.
+
+## Track 7 (2026-09-27, round 95)
+
+`D_80086EC4` -> `gCardIconRect` (declared `SpriteRect`, its three words
+{0, 0, 160, 120}; the `(SpriteRect *)` cast went) and `D_8008AA94` ->
+`gCardIconPos` (declared `ScreenSpritePos`, (-70, -60)), both tier A, by what
+they hold (tools/rename.py). Locals: `arg1` -> `index`, the array `path` ->
+`pathBuf` (size written 32), `buf` -> `path`, `handle` -> `tim`, `newVal`
+-> `icon`. The guard `index >= 0x11` is `ARRAY_COUNT(gCardIconNames)`, the
+extern now sized `[TASKOBJF_STATE_EDIT_TITLE]` (one name per message
+state). The residue section above keeps one line: `MATCHING: path and icon
+keep the buffer and the sprite in saved registers`.
+
+Comments moved out of the source (verbatim):
+
+- on `gCardIconNames`: "0x11 (17) entries, indexed by `arg1`
+  (range-checked `< 0x11` below); mostly `char *` string pointers into
+  rodata, a few raw literal words at indices never reached from this call
+  site. `asm/data/76DC8.data.s`." Entries 0 and 1 are the words 0x100 and
+  0x2000; 2, 9 and 13 point into rodata (0x80011524, 0x80011518,
+  0x8001150C), the rest into sdata.
+- on `gCardIconRect`: "3 words, `New_ScreenSprite`'s rect: a SpriteRect
+  {0, 0, 160, 120}."
+- on `gCardIconPos`: "opaque block, the fresh `cardIcon`'s own `slot4C`
+  arg2, address-only here." (slot +0x04C is attachToParent; ScreenSprite's
+  override hands it to setPosition.)

@@ -55,3 +55,12 @@ in this unit transition to as their own "give up" outcome, so `0x17` reads
 as an idle/reset target rather than an ordinary destination. Kept tier B:
 the "idle" reading is consistent across several call sites but never
 confirmed against anything outside this unit's own numbers.
+
+## Track 7 (2026-09-27, round 95)
+
+Cases are `enum TaskObjFState` (CARD_CHANGED, UNFORMATTED_SAVE,
+SAVE_OVERWRITE_WARNING, LOAD_WARNING) and the target ABORTED, the tone
+`1 << 4`. The name is kept: the function aborts rather than going idle
+directly (setState(ABORTED) is what returns the machine to IDLE), so a
+sharper name would be `TaskObjF__AbortFromState`; proposed, not applied
+this pass. Image byte-identical.

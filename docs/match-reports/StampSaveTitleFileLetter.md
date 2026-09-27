@@ -122,3 +122,67 @@ sibling `D_8008AA18`/`DecodeFullWidthSjis` context nearby in
 `class_3bb8c_d.c`) is not established, so this is named for the
 mechanism (template copy) plus its one known call context rather than a
 specific claim about pixel vs. text content.
+
+## Track 7 (2026-09-27, round 95)
+
+Renamed from `CopyMemcardIconTemplate` (tools/rename.py), and its data
+`gMemcardIconTemplate` -> `gSaveTitleGlyphs`. Nothing in the body is an
+icon: measured from the executable, the pointer at 0x8008AAC4 points at
+0x80011550, the full-width SJIS string "a".."o" (15 letters, 2 bytes each)
+followed at glyph 15 by three full-width spaces and "Day". TitleMenu's
+save title (D_8008AA18 -> 0x8001149C) starts as full-width "LSD   Day001",
+and the file names are namePrefix "BISLPS-01556" + "-01".."-15"
+(D_80086D6C). So the body writes characters 3..8 as "   Day", character
+12 as a space, and character 4 as the letter for the file's number; with a
+NULL file name it blanks characters 3..5. The `'8'` test exists because
+Sony's atoi (libc2/atoi.o, read from lib/) takes a leading 0 as octal, so
+"08"/"09" are parsed from their second digit.
+
+**Naming**, tier B: `StampSaveTitleFileLetter` (evidence above; the
+mechanics are certain, that the letter identifies the file on the card
+screen is not shown by a consumer). `gSaveTitleGlyphs`, tier A, by what it
+holds.
+
+Locals: `arg0`/`arg1` -> `titleAddr`/`fileNameAddr`, `self` -> `title`
+(now `Pair2_3bb8c_g *`, one full-width character per element, so the raw
+byte offsets 0x18/0x6/0x8 are indices 12/3/4), `src` -> `fileName`
+(`char *`), `t0` -> `numberPos`, `idx` -> `letter`, `p` -> `glyph`, `q` ->
+`glyphs`; `gSaveTitleGlyphs` declared `Pair2_3bb8c_g *` (offset 0x1E is
+glyph 15). The positions are unit-local `#define`s: SAVE_TITLE_LETTER_FIELD
+3, SAVE_TITLE_LETTER 4, SAVE_TITLE_PADDING 12, SAVE_TITLE_GLYPH_SPACES 15,
+SAVE_FILE_NAME_NUMBER 13. Image byte-identical at every step.
+
+The signature stays `s32 (s32, s32)`: it is include/class_3bb8c.h's
+prototype, which class_3bb8c_d.c and class_3bb8c_f.c call with casts.
+Proposed: `s32 StampSaveTitleFileLetter(char *title, char *fileName)` there,
+dropping the four casts.
+
+Comments moved out of the source (verbatim):
+
+- on the local `atoi` extern: "Sony's, from libc2 (round 45's own local
+  view -- this unit's first use)."
+- on `gSaveTitleGlyphs`: "VALUE-of `%gp_rel`, round 45's own local view --
+  a fixed rodata template (ROM image still-uncarved,
+  `asm/data/1C34.rodata.s` region) this function copies raw byte ranges out
+  of; also read by `class_3bb8c_d.c`'s own (differently-typed) local view."
+  (Round 95: no other unit declares it now.)
+- on the three copy types: "Struct-copy helper types for round 45's
+  StampSaveTitleFileLetter, all deliberately all-`s8` (alignment 1) per
+  this round's FormatNumberIntoBuffer lever: retail copies these ranges as
+  one unaligned `lwl`/`lwr` word chunk per 4 bytes, with any
+  non-multiple-of-4 remainder as INDIVIDUAL byte loads/stores, never merged
+  into a halfword -- alignment 2 would let GCC trust a halfword move retail
+  does not have." It keeps one line in the source (`MATCHING: all-s8 ...`).
+- above the definition: "Signature is `include/class_3bb8c.h`'s
+  ALREADY-shared `extern s32 StampSaveTitleFileLetter(s32 arg0, s32
+  arg1);` (class_3bb8c_m's own caller, TaskObjF__WriteMemcardSaveFile),
+  matched exactly -- this unit's own definition must agree with that
+  declaration since both are visible in this translation unit. Cast to `u8
+  *` internally; retail's own register content at exit (`$v0` left holding
+  a pointer into the `gSaveTitleGlyphs` template in every path) confirms
+  the real return type is a pointer, loosely read as `s32` by the caller
+  that never dereferences it." The block-scoped `glyphs` that residue
+  needed keeps one line (`MATCHING: glyphs is the return value`).
+
+The `## Naming` section above (tier B, "template copy") is superseded by
+this one.

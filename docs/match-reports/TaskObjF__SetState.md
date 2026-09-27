@@ -177,3 +177,25 @@ requested values, then either commits `self->unk28` or tears the object
 down and resets to 0), but which real-world states `0x11`-`0x17` and the
 switch's case values name is not established -- the numeric state codes
 are kept as literals rather than invented enum names.
+
+## Track 7 (2026-09-27, round 95)
+
+Parameter `arg1` -> `state`, `ret` -> `ok`. The state codes are now
+`enum TaskObjFState` and `opMode` `enum TaskObjFOpMode` (both
+`include/TaskObjF.h`, added this round). The states are no longer
+anonymous: `loadCardIcon(self, state)` draws `CARD\<gCardIconNames[state]>.TIM`,
+and the table's strings name every message state (measured from the
+executable: 2 NOCONECT, 3 ERROR, 4 CHANGE, 5 UNFORM1, 6 UNFORM2, 7 FORMING,
+8 FORMERR, 9 SAVEEMPT, 10 SAVEWAR, 11 SAVING, 12 SAVEERR, 13 NOTFOUND,
+14 LOADWAR, 15 LOADING, 16 LOADERR). 17..21 are named for the entry
+action this function runs (attachTextEntry, attachItemList, formatCard,
+writeMemcardSaveFile, readMemcardFile), 22/23 DONE/ABORTED by what reaches
+them (success of write/read; cancel, error acknowledgement, re-entering
+the current state). The two residues above keep one line in the source:
+`MATCHING: methods is cached, and the cases are in retail's code order`.
+Image byte-identical.
+
+The unit banner this pass replaced ended: "Every function in the unit is
+matched C. What each numeric `state` code means in game terms is not
+established. See each function's own match report for its evidence." The
+second sentence is what the icon table now answers.
