@@ -34,7 +34,7 @@ extern u8 gSoundBankPaths[];
 extern u8 gRecordTable[];
 extern char *gSoundEffectDirPtr;  /* -> "SND\\SE" */
 extern const char sAsmkStreamPath[];
-extern s16 gStreamTypeToGroupTable[];
+extern s16 gMovieFrameCounts[];
 
 /* slot +0x088 of gLbdFileMethods */
 void LbdFile__SetAutoLoadData(DataSrc39094 *self, s32 value) {

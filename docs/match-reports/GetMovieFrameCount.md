@@ -9,7 +9,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot.
-- **What:** `return gStreamTypeToGroupTable[index];` over `extern s16 gStreamTypeToGroupTable[]` (sll/addu/lh through `$at`, the resolved addiu_at construct).
+- **What:** `return gMovieFrameCounts[index];` over `extern s16 gMovieFrameCounts[]` (sll/addu/lh through `$at`, the resolved addiu_at construct).
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -17,7 +17,7 @@ the first build; whole-image SHA1 green.
 
 ```c
 s32 GetMovieFrameCount(s32 index) {
-    return gStreamTypeToGroupTable[index];
+    return gMovieFrameCounts[index];
 }
 ```
 

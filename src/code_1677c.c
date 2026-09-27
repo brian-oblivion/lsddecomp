@@ -33,7 +33,7 @@ extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0,
                                                        GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask discard it, but
                                                        GameApplication__StartCinematicStream keeps it */
 extern const char *GetAsmkMovie(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkStreamPath */
-extern s32 GetMovieFrameCount(s32 index); /* psyq_memset.s: signed-halfword lookup into gStreamTypeToGroupTable[index] */
+extern s32 GetMovieFrameCount(s32 index); /* psyq_memset.s: signed-halfword lookup into gMovieFrameCounts[index] */
 extern s32 PickOpeningMovie(s32 *out, s32 param2); /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
 
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */

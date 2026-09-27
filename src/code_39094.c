@@ -152,7 +152,7 @@ extern u8 gSoundBankPaths[];
 extern u8 gRecordTable[];
 extern char *gSoundEffectDirPtr; /* -> "SND\\SE" */
 extern const char sAsmkStreamPath[];
-extern s16 gStreamTypeToGroupTable[];
+extern s16 gMovieFrameCounts[];
 extern s16 gStageFirstRecord[];
 
 /* slot +0x088 of gLbdFileMethods */
@@ -346,7 +346,7 @@ Rec1C *GetSpecialDayOrEventRecord(s32 *countOut, RecPick pick) {
 }
 
 s32 GetMovieFrameCount(s32 index) {
-    return gStreamTypeToGroupTable[index];
+    return gMovieFrameCounts[index];
 }
 
 Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
@@ -359,7 +359,7 @@ Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
     start = count;
     len += start;
     for (i = start; i < len; i++) {
-        *total += gStreamTypeToGroupTable[i] + 10;
+        *total += gMovieFrameCounts[i] + 10;
     }
     *total -= 10;
     return rec;
