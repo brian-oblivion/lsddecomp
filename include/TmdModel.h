@@ -6,7 +6,7 @@
 /*
  * TmdModel -- one object of a TMD model file (class id 0x9, method table
  * gTmdModelMethods): a BasicClass subclass with no subclasses of its own.
- * Methods in src/code_fa50.c.
+ * Methods in src/TmdModel.c.
  *
  * The object is built on ONE entry of a TMD's object table (New_TmdModel's
  * argument; LinkResource__BuildModels, code_33808, builds one per entry of a

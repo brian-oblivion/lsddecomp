@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001F50C` on 2026-09-25 (tools/rename.py). Address 0x8001f50c.
 
-Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner charlie (matching slot). Unit `src/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table; called from SceneNode (code_d294_b.c) as `TmdModel__GetBoundsBuffer(model, i)` (`tools/classtable.py gTmdModelMethods`).
 - **What:** ignores both arguments and returns `gTmdModelBoundsBuf` (the buffer `TmdModel__UpdateBoundsBuffer` fills through `TmdModel__ComputeBounds`)

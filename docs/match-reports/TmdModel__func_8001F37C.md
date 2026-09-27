@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001F37C` on 2026-09-25 (tools/rename.py). Address 0x8001f37c.
 
-Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner charlie (matching slot). Unit `src/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** slot +0x04C of gTmdModelMethods (`tools/classtable.py gTmdModelMethods`).
 - **What:** empty method (`jr $ra; nop`)

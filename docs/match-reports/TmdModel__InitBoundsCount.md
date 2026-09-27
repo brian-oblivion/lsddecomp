@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001F394` on 2026-09-25 (tools/rename.py). Address 0x8001f394.
 
-Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner charlie (matching slot). Unit `src/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table; called at the tail of `TmdModel__TmdModel` (slot +0x008, the constructor) (`tools/classtable.py gTmdModelMethods`).
 - **What:** `gTmdModelBoundsCount = 1;` (`ori v0,1; sw %gp_rel`)

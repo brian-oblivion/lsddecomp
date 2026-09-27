@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001F4E4` on 2026-09-25 (tools/rename.py). Address 0x8001f4e4.
 
-Round 82, runner charlie (matching slot). Unit `src/code_fa50.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner charlie (matching slot). Unit `src/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table (`tools/classtable.py gTmdModelMethods`).
 - **What:** `TmdModel__ComputeBounds(self, gTmdModelBoundsBuf)`: forwards its own a0 and passes the static buffer

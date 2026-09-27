@@ -65,7 +65,7 @@ s32 LinkResource__BuildModels(DataSrc33808 *self) {
 
 ## Notes
 
-Second build (the first did not compile: `Rec6F13C` is defined later in the unit, so the local buffer view uses `u8 recs[1][0x1C]`). Byte-exact at once with the unwinding loop in the shape TodSet__BuildTods established this session -- `while (i != 0) { i--; objs--; release(*objs); }` -- which also yields retail's post-loop `addiu s1,s1,4` fix-up so the array base reaches BMemPMgrFree. The early `if (objs == NULL) return 1;` was fine here. New_TmdModel (code_fa50.c) is prototyped locally with void * return; slot78 is cast at the call site.
+Second build (the first did not compile: `Rec6F13C` is defined later in the unit, so the local buffer view uses `u8 recs[1][0x1C]`). Byte-exact at once with the unwinding loop in the shape TodSet__BuildTods established this session -- `while (i != 0) { i--; objs--; release(*objs); }` -- which also yields retail's post-loop `addiu s1,s1,4` fix-up so the array base reaches BMemPMgrFree. The early `if (objs == NULL) return 1;` was fine here. New_TmdModel (TmdModel.c) is prototyped locally with void * return; slot78 is cast at the call site.
 
 ## Naming
 

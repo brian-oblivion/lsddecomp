@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001F2B0` on 2026-09-25 (tools/rename.py). Address 0x8001f2b0.
 
-Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/code_fa50.c`. Fresh ground, no prior attempt.
+Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/TmdModel.c`. Fresh ground, no prior attempt.
 
 - **What:** the constructor of class gTmdModelMethods (its slot +0x008): base ctor through `Get_vtable_BasicClass()->ctor`, install the method table, `object = arg`, `data = (u8 *)arg - 0xC`, then `TmdModel__InitBoundsCount(self)` (sets the flag `gTmdModelBoundsCount = 1`).
 - **Result:** byte-exact; 25/25 words, whole-image SHA1 green. Second build.

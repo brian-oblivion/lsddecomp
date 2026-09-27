@@ -1,5 +1,5 @@
 /*
- * code_fa50 -- the TmdModel class (include/TmdModel.h; method table
+ * TmdModel.c -- the TmdModel class (include/TmdModel.h; method table
  * gTmdModelMethods, class tag 9): one object of a TMD file (the "model"
  * SceneNode__LinkModel, src/code_d294_c.c, links into a GsDOBJ2). Its
  * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
@@ -18,6 +18,13 @@
  * TmdModel__AddFirstPrimClut and TmdModel__SetFirstPrimClut, move or set the
  * CLUT id of the model's first primitive (TMD_P_TF3's clut) from a VRAM
  * position; SetStyleEffectSources (class_3bb8c_o.c) calls the second.
+ *
+ * File edges: this is one whole original file. It lies between two placed
+ * Sony objects, libgte/ratan before and libgs/gs_105 after, so both edges
+ * are measured file edges; tools/tuboundary.py finds no rodata crossing and
+ * no forced boundary inside it (the forced interval that starts at
+ * TmdModel__NextPrimitive's jtbl_80010354 is closed by the gs_105 edge).
+ * Content settles the rest: every function is TmdModel's or serves it.
  *
  * Tiers and match evidence for every function are in each function's own
  * docs/match-reports/ file; the unit's own history is in New_TmdModel's.

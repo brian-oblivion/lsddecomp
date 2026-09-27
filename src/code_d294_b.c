@@ -75,7 +75,7 @@ void SceneNode__GetRotMatrix(SceneNode *self, s32 a1, s32 a2) {
  * a1 passed through as SceneNode__TransformAndNotifyParents's own a2. */
 void SceneNode__NotifyWithHull(SceneNode *self, s32 a1) {
     /* Sized to reproduce retail's own frame (0x58): SceneNode__GetModelHull's own
-     * target (TmdModel__GetHull, code_fa50) writes a TmdHull
+     * target (TmdModel__GetHull, TmdModel) writes a TmdHull
      * (include/TmdModel.h: a count word and eight 6-byte corners, 0x34
      * bytes) into its `dest`, so the true destination struct is bigger than
      * the 8 bytes a count and one corner would reserve. */
@@ -99,7 +99,7 @@ void SceneNode__NotifyWithHull(SceneNode *self, s32 a1) {
 
 /* Forwards self->model (the TmdModel, held as `void *` in SceneNode.h) and
  * its own 2nd argument straight through to TmdModel__GetHull, untouched.
- * TmdModel__GetHull (code_fa50) is void, so this wrapper is void too. */
+ * TmdModel__GetHull (TmdModel) is void, so this wrapper is void too. */
 void SceneNode__GetModelHull(SceneNode *self, void *dest) {
     TmdModel__GetHull(self->model, dest);
 }
