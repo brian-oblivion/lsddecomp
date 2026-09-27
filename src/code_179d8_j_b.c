@@ -1,67 +1,33 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * code_179d8_j_b -- five functions of Sony's libsnd voice manager
+ * (vmanager), carried as C: SpuVmSetVol, SsUtKeyOn, SsUtKeyOff, SsUtKeyOnV
+ * and SsUtKeyOffV. Retail's vmanager is a build no SDK disc carries, so it
+ * never placed as an object; progress.py counts these functions as library
+ * by address, and they keep Sony's names and <libsnd.h>'s prototypes. The
+ * linked objects libsnd/vm_prog.o and libsnd/ut_pb.o sit immediately before
+ * and after this file.
  *
- * code_179d8_j_b -- the MIDDLE third of the old code_179d8_j slice, after
- * round 34 (2026-09-12) linked TWO Sony objects into what used to be one unit.
- * Now 0x21180..0x221B4 (vram 0x80030980..0x800319B4), five functions
- * (SpuVmSetVol .. SsUtKeyOffV).
+ *   SpuVmSetVol  rescales every voice one sequence plays on a given VAB and
+ *                program: voice level x the VAB's, the program's and the
+ *                tone's volumes x the sequence's L/R volume (SsScore),
+ *                panned by the tone, the program and the caller, into the
+ *                voices' shadow volume registers (_svm_sreg_buf), marked
+ *                dirty.
+ *   SsUtKeyOn    Sony's utility key-on: stages the program's and tone's
+ *                attributes (_svm_pg, _svm_tn) in the vmanager's scratch
+ *                globals, allocates a voice, fills its _svm_voice record and
+ *                keys it on (vmNoiseOn for a noise tone, vag 0xFF).
+ *   SsUtKeyOff   keys off the voice SsUtKeyOn returned, if the voice still
+ *                holds the same VAB/program/tone/note: a noise voice clears
+ *                the SPU's noise-mode enable, any other sets its bit in the
+ *                pending key-off mask and drops the pending key-offs from
+ *                the key-on mask.
+ *   SsUtKeyOnV   SsUtKeyOn on a caller-chosen voice.
+ *   SsUtKeyOffV  keys off a voice unconditionally.
  *
- * WHY THIS UNIT EXISTS, IN TWO STEPS, BOTH IN ROUND 34.
- *   1. `libsnd/vm_prog.o` (Psy-Q 3.6 -- the only disc carrying the module)
- *      covers 0x20FF0..0x21180: SpuVmSetProgVol, SpuVmGetProgVol,
- *      SpuVmSetProgPan, SpuVmGetProgPan, all four previously MATCHED as C.
- *      That split the old code_179d8_j into [c][o][c] and created this file.
- *   2. `libsnd/ut_pb.o` (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244:
- *      `SsUtPitchBend`, which was `func_800319B4`, also previously MATCHED.
- *      That split THIS file again into [c][o][c], and everything from
- *      SsUtChangePitch on moved to `src/code_179d8_j_c.c`.
- * Reclassifying five matched functions out of the game count across the two
- * steps is the correction CLAUDE.md asks for, not a regression; their C is
- * DELETED, not commented out.
- *
- * `D_8008EA22`'S OWN COMMENT WAS WRONG AND IS CORRECTED HERE (round 36): it
- * used to claim `SsUtPitchBend` and the deleted `SpuVmGetSeqRVol` were its
- * only readers in this family, and dropped the extern on that basis. That
- * was never true of this file's own two remaining stalls -- SsUtKeyOn
- * and SsUtKeyOnV both WRITE it (`D_8008EA22 = 0x21;`) -- it just went
- * unnoticed because both were still INCLUDE_ASM and nothing failed to
- * link. Declared again below.
- *
- * NO RODATA ATTACH IS OWNED BY ANY UNIT IN THIS FAMILY, and that is measured,
- * not assumed: the old code_179d8_mid_c monolith contains zero `jtbl_` and
- * zero `.word .L` across its whole extent, and the splat yaml's rodata slot
- * list names none of `code_179d8_j`, `_j_b` or `_j_c`.  Unlike round 33's
- * libsnd_ssinit_libapi_counter there was nothing to move, and a link failure of the form
- * `undefined reference to '.L8003....'` would mean something else.
- *
- * DECLARATIONS: this file carries its own copy of what its functions use,
- * split out of the old shared block.  Keep it that way -- do NOT create a
- * shared code_179d8*.h.  The sibling slices are staffed independently and a
- * shared header is what makes their merges collide; see
- * `python3 tools/headercontention.py`.  Several externs below are read only by
- * functions still carried as INCLUDE_ASM (the `SsUtKeyOn` scratch globals
- * in particular); they are knowledge about those functions, not dead code, and
- * were re-homed here deliberately rather than dropped.
- *
- * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
- * re-implementing the greps and never for `addiu_at` (resolved round 21).
- * `nearmiss.py` runs `tools/sdkstalls.py` for you, and round 34 is why that
- * matters here: all five functions the two splits gave back to Sony were on
- * the old unit's carve-time WORKABLE list, screened clean on every blocker,
- * and were unmatchable by construction.
- *
- * Expect this slice to span more than one class; identify each with
- * tools/classtable.py rather than assuming the unit has one.  Keep every
- * function in strict ROM-address order.
+ * The four SsUt functions take the _snd_ev_flag lock and return -1 while
+ * it is held. SpuVmSetVol, SsUtKeyOn and SsUtKeyOnV are carried as INCLUDE_ASM
+ * with their best readable body under NON_MATCHING.
  */
 
 #include "common.h"
