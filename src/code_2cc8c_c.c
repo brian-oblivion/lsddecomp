@@ -40,7 +40,7 @@ TaskCoreMethods *Get_vtable_TaskCore(void) {
  * and the rect TaskCore__OnInit clears (code_2c054.h). */
 extern DrawRect gDefaultStreamTaskInitData;
 
-void *GetDefaultStreamTaskInitData(void) {
+DrawRect *GetDefaultStreamTaskInitData(void) {
     return &gDefaultStreamTaskInitData;
 }
 

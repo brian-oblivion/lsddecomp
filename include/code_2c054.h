@@ -15,8 +15,8 @@
  * include/TaskCore.h.
  */
 
-/* Defined in code_2cc8c_c.c (returning void *): &gDefaultStreamTaskInitData. */
-extern StreamTaskInitData *GetDefaultStreamTaskInitData(void);
+/* Defined in code_2cc8c_c.c: &gDefaultStreamTaskInitData. */
+extern DrawRect *GetDefaultStreamTaskInitData(void);
 
 /* resetCounters' colours for setColors, three RGB triples back to back:
  * baseColor {0, 0, 0}, the clear colour {0, 0, 0}, the third {128, 128, 128}. */
