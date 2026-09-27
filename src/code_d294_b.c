@@ -144,7 +144,7 @@ void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event) {
 
 /* Range-checks `other` against `self` (each axis of position difference
  * must fit in +/-0x4000), then hands off to three vtable slots
- * (+0xA4 = SceneNode__ComposeAndApplyRotation, +0xA8 = SceneNode__CheckBoundsOverlap, +0xAC = SceneNode__ClassifyAgainstPlanes)
+ * (+0xA4 = SceneNode__ComposeAndApplyRotation, +0xA8 = SceneNode__CheckBoundsOverlap, +0xAC = SceneNode__RaycastHullAgainstFaces)
  * with the resulting Vec3S16 difference, before registering `other` into
  * self->linkTarget and notifying it via its own +0x038 slot. */
 void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
@@ -332,7 +332,7 @@ s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *arg1, TmdVec3 *d) {
  * `p`, `v` and `hi` as pointers. */
 extern s32 gHitHeightGate;
 
-s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *diff, TmdHull *list) {
+s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *outFlag, TmdVec3 *diff, TmdHull *list) {
     TmdVec3 mid[2];
     TmdVec3 *p;
     TmdVec3 *hi;

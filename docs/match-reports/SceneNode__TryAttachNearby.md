@@ -131,7 +131,7 @@ void SceneNode__TryAttachNearby(SceneNodeObj *self, GenericObj_d294 *other) {
 Range-checks `other` against `self` (each axis of position difference must
 fit in `+/-0x4000`), then hands off to three vtable slots — `+0xA4`
 (`SceneNode__ComposeAndApplyRotation`, already matched this round), `+0xA8` (`SceneNode__CheckBoundsOverlap`,
-still queued), `+0xAC` (`SceneNode__ClassifyAgainstPlanes`, the documented `gp_rel` blocker) —
+still queued), `+0xAC` (`SceneNode__RaycastHullAgainstFaces`, the documented `gp_rel` blocker) —
 with the resulting `Vec3S16` difference, before registering `other` into
 `self->unk28` and notifying it via its own `+0x038` slot.
 
@@ -155,7 +155,7 @@ with the resulting `Vec3S16` difference, before registering `other` into
   direct `jal`), `+0xA8` (`slotA8`, `s32 (*)(SceneNodeObj*, void*,
   Vec3S16_d294*)`, occupant `SceneNode__CheckBoundsOverlap`), `+0xAC` (`slotAC`, `s32
   (*)(SceneNodeObj*, void*, Vec3S16_d294*, void*)`, occupant
-  `SceneNode__ClassifyAgainstPlanes` — the documented blocker, NOT decompiled here, only its
+  `SceneNode__RaycastHullAgainstFaces` — the documented blocker, NOT decompiled here, only its
   call-site shape is typed).
 - **`self->unk28` retyped** from `s32` to `GenericObj_d294 *` (existing
   declaration change — see round summary). Checked the other write site
@@ -651,7 +651,7 @@ against `self` (each axis of position difference must fit `+/-0x4000`,
 via the two now-renamed geometry helpers' sibling checks), then hands
 off to `SceneNode__ComposeAndApplyRotation` (slot `+0x0A4`),
 `SceneNode__CheckBoundsOverlap` (slot `+0x0A8`), and
-`SceneNode__ClassifyAgainstPlanes`/proposed `SceneNode__ClassifyAgainstPlanes` (slot
+`SceneNode__RaycastHullAgainstFaces`/proposed `SceneNode__RaycastHullAgainstFaces` (slot
 `+0x0AC`) in turn, only registering `other` into `self->unk28` and
 notifying it (`other->methods->slot38`) if ALL three pass. "TryAttachNearby"
 describes the measured gate-then-link mechanics; the game-level meaning
@@ -682,7 +682,7 @@ renames/proposals:
 | `+0x0A0` | `slotA0` | `tryAttachNearby` | `SceneNode__TryAttachNearby` (proposed `SceneNode__TryAttachNearby`, this function) |
 | `+0x0A4` | `slotA4` | `composeAndApplyRotation` | `SceneNode__ComposeAndApplyRotation` |
 | `+0x0A8` | `slotA8` | `checkBoundsOverlap` | `SceneNode__CheckBoundsOverlap` |
-| `+0x0AC` | `slotAC` | `classifyAgainstPlanes` | `SceneNode__ClassifyAgainstPlanes` (proposed `SceneNode__ClassifyAgainstPlanes`) |
+| `+0x0AC` | `slotAC` | `classifyAgainstPlanes` | `SceneNode__RaycastHullAgainstFaces` (proposed `SceneNode__RaycastHullAgainstFaces`) |
 
 Apply by type scope (edit `SceneNodeMethods`'s own definition in
 `include/code_d294.h`, rebuild, fix exactly the accessors the compiler

@@ -528,7 +528,7 @@ back into `src/code_d294_b.c` verbatim, confirmed `SceneNode__TryAttachNearby`
 errors.** `build/lsdde.map` confirms `SceneNode__CheckBoundsOverlap` itself lands at the
 correct retail address `0x8001da28` (so the earlier frame-size fix still
 holds and this function's own window is trustworthy) — but the NEXT
-function, `SceneNode__ClassifyAgainstPlanes`, lands at `0x8001dda0` where retail has it at
+function, `SceneNode__RaycastHullAgainstFaces`, lands at `0x8001dda0` where retail has it at
 `0x8001DDF4`, a **0x54-byte / 21-word deficit**. That is this function's
 own true LENGTH residue: 222 words built vs 243 retail.
 
@@ -837,7 +837,7 @@ operand order, so a min whose default is loaded first is spelled `f > v`.
 
 Both placeholders in include/code_d294.h are deleted. `Sixteen6_d294` (six
 s16s) was only ever a view of a `TmdModel__GetBoundsBuffer` record, which is a
-`TmdBox`; `SceneNode__ClassifyAgainstPlanes` now holds its `plane` as `TmdBox *`
+`TmdBox`; `SceneNode__RaycastHullAgainstFaces` now holds its `plane` as `TmdBox *`
 with no casts. `CornerList_d294` (a count, then corner[0] with the rest after
 it) is include/TmdModel.h's `TmdHull`, which is what
 `SceneNode__TryAttachNearby` passes as this function's `corners`: the body

@@ -7,7 +7,7 @@ Round 54 (bravo, track 3). `code_d294_b`.
 ## What it does
 
 Slot `+0x0B0` occupant (`tools/classtable.py gSceneNodeMethods`), between the
-documented `SceneNode__ClassifyAgainstPlanes` (slot `+0x0AC`) and `SceneNode__NotifyTaggedParents` (the
+documented `SceneNode__RaycastHullAgainstFaces` (slot `+0x0AC`) and `SceneNode__NotifyTaggedParents` (the
 table's own last slot, `+0x0B4`) -- no caller in this project dispatches
 through it by name or by a documented vtable comment. Whole body is
 `{}` (`jr $ra; nop`, confirmed via `objdump` on the built object) --

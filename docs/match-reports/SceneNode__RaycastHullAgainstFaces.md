@@ -1,4 +1,6 @@
-# SceneNode__ClassifyAgainstPlanes -- MATCHED (round 76, bravo: 199/199, whole image green; was 29/199 length-exact)
+# SceneNode__RaycastHullAgainstFaces -- MATCHED (round 76, bravo: 199/199, whole image green; was 29/199 length-exact)
+
+> Renamed from `SceneNode__ClassifyAgainstPlanes` on 2026-09-27 (tools/rename.py). Address 0x8001ddf4.
 
 > Renamed from `Class6B5CC__ClassifyAgainstPlanes` on 2026-09-26 (tools/rename.py). Address 0x8001ddf4.
 
@@ -97,7 +99,7 @@ resolved below.
 
 ## What round 45 handed this round
 
-Signature `s32 SceneNode__ClassifyAgainstPlanes(SceneNodeObj *self, s32 *outFlag, Vec3S16_d294
+Signature `s32 SceneNode__RaycastHullAgainstFaces(SceneNodeObj *self, s32 *outFlag, Vec3S16_d294
 *diff, void *list)`, with Part 1 (a fixed 2-row box-midpoint average into a
 local `Vec3S16_d294 mid[2]`) and Part 2 (a `count1`-driven loop over
 `TmdModel__GetBoundsBuffer` planes, gated by `ClipSegmentToBox`/`TmdModel__RaycastFaces`, setting
@@ -108,7 +110,7 @@ precise relationship between the middle `k` loop ... and the inner fixed-4
 
 ## Part 3, resolved
 
-Re-read `asm/nonmatchings/code_d294_b/SceneNode__ClassifyAgainstPlanes.s` lines 197-268
+Re-read `asm/nonmatchings/code_d294_b/SceneNode__RaycastHullAgainstFaces.s` lines 197-268
 (`.L8001DFD0` through `.L8001E0B4`) instruction-by-instruction:
 
 - The innermost loop runs `m = 0..3` (4 passes, unconditional), but the
@@ -236,7 +238,7 @@ register permutation with no tool support for exploring it directly.
 extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 gHitHeightGate;
 
-s32 SceneNode__ClassifyAgainstPlanes(SceneNodeObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
+s32 SceneNode__RaycastHullAgainstFaces(SceneNodeObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
     Vec3S16_d294 mid[2];
     s16 *loPtr;
     s16 *hiPtr;
@@ -349,7 +351,7 @@ further into the diff before that's settled.
 
 ## Naming (round 54, bravo, track 3)
 
-**Not renamed -- PROPOSED only.** Proposed name: `SceneNode__ClassifyAgainstPlanes`
+**Not renamed -- PROPOSED only.** Proposed name: `SceneNode__RaycastHullAgainstFaces`
 (tier B). STALL, still `INCLUDE_ASM`; not attempted for a match this
 round (naming pass only, and this is the documented `gp_rel`-history
 blocker's successor -- see CLAUDE.md's "Open toolchain blockers" table,
@@ -380,7 +382,7 @@ own `#if 0` wrapper removed; every sibling confirmed still wrapped via
 
 **The round-46 title's own framing -- "register identity: `self` lands in
 $s4 here, $s5 in retail" -- undersells the residue.** Reading
-`asm/nonmatchings/code_d294_b/SceneNode__ClassifyAgainstPlanes.s` against
+`asm/nonmatchings/code_d294_b/SceneNode__RaycastHullAgainstFaces.s` against
 the built object's own disassembly line by line (not just the funcdiff word
 count) for the FIRST loop (the 2-row box-midpoint average, this report's own
 "Part 1") shows retail does not index through `mid[row].x/.y/.z` at all.
@@ -496,7 +498,7 @@ against `nm -S`/`funcdiff.py` -- not adopted on the permuter's own score:**
 scorer, but none of the safe-to-adopt candidates moved the real oracle's
 score, and the one candidate that DID look promising by score was
 semantically unsound and was not adopted.** The scaffold is left in place
-(`permuter-work/SceneNode__ClassifyAgainstPlanes/`, gitignored) for whoever
+(`permuter-work/SceneNode__RaycastHullAgainstFaces/`, gitignored) for whoever
 picks this up next, with all three candidates' diffs preserved under
 `output-*/diff.txt` and this report's read of each one, so the next attempt
 does not have to re-derive which are safe.
