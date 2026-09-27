@@ -51,3 +51,16 @@ Round 71 (alpha). `func_8001CE30` -> `SceneNode__Reset`, **tier B**. Table slot 
 GsCOORDINATE2 *base)`. The call is `GsInitCoordinate2(NULL, (GsCOORDINATE2
 *)self->coord2)`: the cast stands until SceneNode.h's SceneNodeSub14 (which
 is GsCOORDINATE2 offset for offset) becomes Sony's type. Byte-identical.
+
+
+## Round 95 (bravo): moved from include/code_d294.h
+
+The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
+
+```c
+/* ROTATION_ZERO/SCALE_ONE (rodata): two 3-entry, 0xC-byte tables in the shape
+ * RatioToFixed12 reads (see above) -- SceneNode__Reset's own literal `data`
+ * arguments to slot +0x044/+0x048. Declared as opaque byte blobs since
+ * nothing this unit's chosen functions read out of them directly (only
+ * their address is taken and forwarded). */
+```

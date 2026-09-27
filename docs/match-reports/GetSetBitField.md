@@ -198,3 +198,27 @@ residue, before spending a permuter budget on it.
   IDENTIFICATION note in include/code_d294.h pins as `GsDOBJ2.attribute`.
 - The mask is built by a loop rather than `(1 << width) - 1`; that is
   retail's own source shape and the name does not assert otherwise.
+
+
+## Round 95 (bravo): moved from include/code_d294.h
+
+The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
+
+```c
+/* GetSetBitField (round 54 correction: this banner was STALE -- it is
+ * now carved and MATCHED in src/code_d294_c.c, not code_d294_b): a
+ * generic packed-bitfield accessor. Given a word pointer, a bit SHIFT, a
+ * bit WIDTH and a VALUE, it clears WIDTH bits at bit-offset SHIFT in *word,
+ * ORs in (value << shift), and returns the PREVIOUS contents of that
+ * bitfield (shifted back down to bit 0). MEASURED from its own disassembly
+ * (asm/code_d294_b.s @ GetSetBitField): a `while` loop builds `(1 << width)
+ * - 1` one bit at a time (i.e. computes a WIDTH-bit mask, not a
+ * `(1<<width)-1` closed form -- retail's own source apparently spelled it
+ * as the loop), then shifts that mask into position, clears/sets, and
+ * shifts the old value back down. Five of this unit's own functions
+ * (SceneNode__SetDisplay/D374/D3A0/D3CC/D3F8) are thin wrappers around this,
+ * always over `&self->unk10`, at five non-overlapping bit positions
+ * (shift 3 width 3, shift 6 width 1, shift 28 width 2, shift 30 width 1,
+ * shift 31 width 1) -- i.e. self->unk10 is a packed flags/small-fields
+ * register and these five functions are its per-field setters. */
+```

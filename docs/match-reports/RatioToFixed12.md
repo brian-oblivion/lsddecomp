@@ -65,3 +65,25 @@ shows the same two-`div`-block disassembly pattern.
   left to track 4: `Ratio16` is also used by `src/DreamSys.c` and
   named in `include/code_2cc8c.h`, outside this runner's unit.
 - Signature kept as `void *pair`, as the shared header already declares it.
+
+
+## Round 95 (bravo): moved from include/code_d294.h
+
+The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
+
+```c
+/* RatioToFixed12 (round 54 correction: this banner was STALE -- it is
+ * now carved and MATCHED in src/code_d294_c.c, not code_d294_b, and the
+ * nop_mflo_mfhi toolchain flag it was once blocked on is RESOLVED per
+ * CLAUDE.md's "Open toolchain blockers" table; see
+ * docs/match-reports/RatioToFixed12.md for the current history): reads
+ * a `Ratio16` at the
+ * given pointer and returns a 20.12 fixed-point value (`whole << 12 |
+ * frac`'s own division-derived low bits) -- read off its own
+ * disassembly (a `div` by the pair's own two fields, not decompiled
+ * here). `SceneNode__UpdateScale`/`SceneNode__UpdateRotation` (both matched, this unit) apply
+ * it three times in a row, at offsets +0x0/+0x4/+0x8 of their own 3rd
+ * argument. Declared here with a `void *` argument since this unit's
+ * chosen functions only ever pass the pointer through, never dereference
+ * the pair themselves. */
+```
