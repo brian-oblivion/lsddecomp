@@ -51,9 +51,9 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
         D_8008D9A3[chan].unk0 = 0;
         D_8008D98C[chan].unk0 = 0;
         _svm_voice[chan].unk0 = 0;
-        D_80090C60 = mask0 | D_80090C60;
+        _svm_okof1 = mask0 | _svm_okof1;
         D_80090C64 |= mask1;
-        D_8008E228 &= ~D_80090C60;
+        D_8008E228 &= ~_svm_okof1;
         _svm_okon2 &= ~D_80090C64;
     }
     _snd_ev_flag = 0;
@@ -155,7 +155,7 @@ remaining residue a commutative-operand-order swap on one `or` instruction
 (`or a0,a1,a0` retail vs `or a0,a0,a1` built) -- textbook "redundant
 commutative operand order" residue per MATCHING-GUIDE. Manually swapping
 the C expression to `D_80090C64 = mask1 | D_80090C64;` (matching the sibling
-fix that DID work for the other mask/global pair, `D_80090C60`) instead
+fix that DID work for the other mask/global pair, `_svm_okof1`) instead
 **regressed the WHOLE function** to garbage (register renaming from the
 very first instruction, `t1` at the top shifting to a different register)
 -- a strong signal this was the wrong lever entirely, not a partial fix,
@@ -184,7 +184,7 @@ the type-width fix. Well under the 30-attempt cap.
 **A permuter-found "zero" is not always an expression reshape -- it can be
 a plain local-variable TYPE change** (here, `u32` -> `u16` on one of two
 otherwise-symmetric mask locals). Manual attempts fixated on operand ORDER
-(matching the sibling fix that worked for `mask0`/`D_80090C60`) and every
+(matching the sibling fix that worked for `mask0`/`_svm_okof1`) and every
 one of those regressed the whole function; the actual fix left the
 expression form (`|=`) untouched and narrowed the type instead. Worth
 widening the axes considered for a stubborn single-`or`-operand residue:

@@ -167,7 +167,7 @@ extern u16 D_8008EA22;
 extern u8 D_8008EA20;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
-extern u16 D_80090C60;
+extern u16 _svm_okof1;
 extern u16 D_80090C64;
 extern u16 _svm_orev1;
 extern u16 _svm_orev2;
@@ -276,7 +276,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
 
     D_8008E228 = lowBit | D_8008E228;
     _svm_okon2 = highBit | _svm_okon2;
-    D_80090C60 = D_80090C60 & ~D_8008E228;
+    _svm_okof1 = _svm_okof1 & ~D_8008E228;
     D_80090C64 = D_80090C64 & ~_svm_okon2;
 }
 #else
@@ -294,7 +294,7 @@ extern VagAtr *_svm_tn;
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 
 /* The blend-cascade globals
- * (D_8008EA16/17/19/1A/11/20/22, D_8008E8C0, D_8008E228/22C, D_80090C60/64,
+ * (D_8008EA16/17/19/1A/11/20/22, D_8008E8C0, D_8008E228/22C, _svm_okof1/64,
  * _svm_orev1/234, _svm_sreg_dirty/98C/9A3) are already declared above, before
  * SpuVmKeyOnNow (ROM-earlier, same shapes) -- reused here, not redeclared. */
 extern u8 D_8008EA0E;
@@ -350,7 +350,7 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     _svm_voice[(u8)a3].unk02 = 0;
     D_8008E228 = lowBit | D_8008E228;
     _svm_okon2 = highBit | _svm_okon2;
-    D_80090C60 = D_80090C60 & ~D_8008E228;
+    _svm_okof1 = _svm_okof1 & ~D_8008E228;
     D_80090C64 = D_80090C64 & ~_svm_okon2;
     D_8006DAD4->noiseOn[0] = lowBit;
     D_8006DAD4->noiseOn[1] = highBit;

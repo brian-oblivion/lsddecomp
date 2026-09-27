@@ -53,7 +53,7 @@ the 16-byte-stride `_svm_sreg_buf`/`D_8008D7F2` tables, OR `3` into
 `lowBit`/`highBit` by `chan<16`, reset the whole `D_8008D9A3` 52-byte-stride
 table's low bit for every live voice (`D_8008E9D0` of them) then mark this
 channel's own slot `2`, OR the enable bits into `D_8008E228`/`_svm_okon2`
-and AND-NOT them out of `D_80090C60`/`D_80090C64`, conditionally OR/AND-NOT
+and AND-NOT them out of `_svm_okof1`/`D_80090C64`, conditionally OR/AND-NOT
 them into a second enable pair (`_svm_orev1`/`_svm_orev2`, gated on
 `D_8008EA20 & 4` -- new globals, not touched by `vmNoiseOn2`), and
 finally write the bits to the SPU key-on registers via `D_8006DAD4`. Also
@@ -125,7 +125,7 @@ extern u8 D_8008D9A3[];
 extern u8 D_8008E9D0;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
-extern u16 D_80090C60;
+extern u16 _svm_okof1;
 extern u16 D_80090C64;
 extern u16 _svm_orev1;   /* new -- second enable/mask pair, gated on D_8008EA20 & 4 */
 extern u16 _svm_orev2;   /* new */
@@ -171,7 +171,7 @@ extern u8 D_8008D9A3[];
 extern u8 D_8008E9D0;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
-extern u16 D_80090C60;
+extern u16 _svm_okof1;
 extern u16 D_80090C64;
 extern u16 _svm_orev1;
 extern u16 _svm_orev2;
@@ -268,14 +268,14 @@ void vmNoiseOn(s32 a0) {
 
     e228 = D_8008E228;
     e22c = _svm_okon2;
-    c60 = D_80090C60;
+    c60 = _svm_okof1;
     e228 = lowBit | e228;
     e22c = highBit | e22c;
     D_8008E228 = e228;
     c60 = c60 & ~e228;
     _svm_okon2 = e22c;
     c64 = D_80090C64;
-    D_80090C60 = c60;
+    _svm_okof1 = c60;
     c64 = c64 & ~e22c;
     D_80090C64 = c64;
 

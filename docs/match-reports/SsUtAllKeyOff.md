@@ -85,8 +85,8 @@ is that only the signed spelling produces the pair at all.
 Retail interleaves load / compute / store tightly for the SPU key-on pair:
 
 ```
-lhu v1,D_80090C60 ; lhu a0,D_80090C64 ; ... ; lhu v0,D_8008E228
-or v1,a3,v1 ; sh v1,D_80090C60 ; nor v1,zero,v1 ; and v0,v0,v1 ; sh v0,D_8008E228
+lhu v1,_svm_okof1 ; lhu a0,D_80090C64 ; ... ; lhu v0,D_8008E228
+or v1,a3,v1 ; sh v1,_svm_okof1 ; nor v1,zero,v1 ; and v0,v0,v1 ; sh v0,D_8008E228
 lhu v0,_svm_okon2 ; or a0,a2,a0 ; sh a0,D_80090C64 ; nor a0 ; and ; sh
 ```
 
@@ -205,10 +205,10 @@ extern u8 D_8008E9D0;
 extern volatile u16 *D_8006DAD4;
 
 /* PS1 SPU voice key-on/off pair, split low/high across two 16-bit halves
- * (voices 0-15 / 16-31) -- D_80090C60/64 are the hardware-mirrored "just
+ * (voices 0-15 / 16-31) -- _svm_okof1/64 are the hardware-mirrored "just
  * keyed on" mask, D_8008E228/22C a software mask this function clears the
  * same bit from (a "no longer fading out" bookkeeping flag). */
-extern u16 D_80090C60;
+extern u16 _svm_okof1;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
@@ -259,10 +259,10 @@ void SsUtAllKeyOff(void)
         D_8008D98C[bitpos & 0xFFFF].unk0 = 0;
         _svm_voice[bitpos & 0xFFFF].unk0 = 0;
 
-        hw0 = D_80090C60;
+        hw0 = _svm_okof1;
         hw1 = D_80090C64;
         hw0 = bitLo | hw0;
-        D_80090C60 = hw0;
+        _svm_okof1 = hw0;
         D_8008E228 = D_8008E228 & ~hw0;
         hw1 = bitHi | hw1;
         D_80090C64 = hw1;
@@ -308,12 +308,12 @@ instruction-for-instruction identical to retail.
 | + `volatile u16 *D_8006DAD4` | **98/131** |
 | + `hw0`/`hw1` locals, masks still direct RMW | **103/131**, 10/10 |
 | swap `bitLo`/`bitHi` declaration order | byte-identical |
-| split `D_80090C60 = hw0 = ...` into two statements | byte-identical |
+| split `_svm_okof1 = hw0 = ...` into two statements | byte-identical |
 | `while (i < N) { ... i++; }` | byte-identical to the `for` form |
 | `for (;cond;)` + explicit `i++`, two positions | byte-identical |
 | `__asm__("")` after the if/else | byte-identical |
 | `do { ... } while (i < N)` with a guard | **4/131**, skeleton 125 — far worse |
-| hw locals + `~D_80090C60` (global) in the `nor` | 98/131 |
+| hw locals + `~_svm_okof1` (global) in the `nor` | 98/131 |
 | `hw1` local only, `hw0` direct | 100/131 |
 | mask locals read at point of use | byte-identical to 103 |
 | `__asm__("")` before the hw reads | 84/131 |

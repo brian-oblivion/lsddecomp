@@ -51,10 +51,10 @@ void SpuVmSeqKeyOff(s32 p0)
             D_8008D9A3[bankIdx].unk0 = 0;
             D_8008D98C[bankIdx].unk0 = 0;
             _svm_voice[bankIdx].unk0 = 0;
-            old60 = D_80090C60;
+            old60 = _svm_okof1;
             old64 = D_80090C64;
             old60 = loBit | old60;
-            D_80090C60 = old60;
+            _svm_okof1 = old60;
             D_8008E228 = D_8008E228 & ~old60;
             old64 = hiBit | old64;
             D_80090C64 = old64;
@@ -68,7 +68,7 @@ void SpuVmSeqKeyOff(s32 p0)
 
 Needs this unit's shared `_snd_ev_flag`-adjacent globals declared near the
 top of `code_179d8_j.c` (`D_8008EA26`, `D_8008E9D0`, `D_8008D996`/`D_8008D9A3`/
-`_svm_voice`/`D_8008D98C`, `D_80090C60`/`D_80090C64`, `D_8008E228`/`_svm_okon2`).
+`_svm_voice`/`D_8008D98C`, `_svm_okof1`/`D_80090C64`, `D_8008E228`/`_svm_okon2`).
 
 ## One CLOSED finding: masking the induction variable is what enables strength reduction to match
 
@@ -237,7 +237,7 @@ round 23 already showed backfires.
 **Rebuild-before-trusting-the-score, third time.** Spliced the preserved
 body into `src/code_179d8_j.c` (with this unit's own local reduced-view
 declarations for `D_8008E9D0`, `D_8008D996`/`D_8008D9A3`/`_svm_voice`/
-`D_8008D98C`, `D_8008EA26`, `D_80090C60`/`D_80090C64`, `D_8008E228`/
+`D_8008D98C`, `D_8008EA26`, `_svm_okof1`/`D_80090C64`, `D_8008E228`/
 `_svm_okon2`, copied from `libsnd_vm_vol_ut_key_ut_keyv.c`'s equivalents per this
 project's per-unit reduced-local-view convention) and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `funcdiff.py` shows **45/85
@@ -373,7 +373,7 @@ loop-carried copy of the induction variable.
  * the same names/types -- keep them local to the unit, not in a header */
 extern u8 D_8008E9D0;
 extern volatile u16 D_8008EA26;
-extern u16 D_80090C60;
+extern u16 _svm_okof1;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
@@ -423,10 +423,10 @@ void SpuVmSeqKeyOff(s32 p0)
             D_8008D9A3[bankIdx].unk0 = 0;
             D_8008D98C[bankIdx].unk0 = 0;
             _svm_voice[bankIdx].unk0 = 0;
-            old60 = D_80090C60;
+            old60 = _svm_okof1;
             old64 = D_80090C64;
             old60 = loBit | old60;
-            D_80090C60 = old60;
+            _svm_okof1 = old60;
             D_8008E228 = D_8008E228 & ~old60;
             old64 = hiBit | old64;
             D_80090C64 = old64;
@@ -474,7 +474,7 @@ void SpuVmSeqKeyOff(s32 p0)
   steerable.**
 - **`SsUtKeyOff`'s matched tail idiom does NOT transfer here.** Writing
   the tail exactly as that already-matched sibling does
-  (`D_80090C60 = loBit | D_80090C60; D_8008E228 &= ~D_80090C60; ...`, with
+  (`_svm_okof1 = loBit | _svm_okof1; D_8008E228 &= ~_svm_okof1; ...`, with
   its documented `u32`/`u16` mask type asymmetry) REGRESSES to 47/85. The
   explicit `old60`/`old64` locals are load-bearing here. This is a fourth
   instance of this unit's standing caution that a sibling's idiom needs
@@ -660,10 +660,10 @@ void SpuVmSeqKeyOff(s32 p0)
             D_8008D9A3[bankIdx].unk0 = 0;
             D_8008D98C[bankIdx].unk0 = 0;
             _svm_voice[bankIdx].unk0 = 0;
-            old60 = D_80090C60;
+            old60 = _svm_okof1;
             old64 = D_80090C64;
             old60 = loBit | old60;
-            D_80090C60 = old60;
+            _svm_okof1 = old60;
             D_8008E228 = D_8008E228 & ~old60;
             old64 = hiBit | old64;
             D_80090C64 = old64;
@@ -786,8 +786,8 @@ What moves the tail is not ORDER, it is which sub-expression gets a name:
    it the two instruction streams align one-for-one for the whole function.
    Applying it to only one of the two chains is worse than both (71 and 70).
 2. **Write the `or` as a direct global read-modify-write.**
-   `D_80090C60 = loBit | D_80090C60;` gives retail's `or v1,a2,v1`;
-   `old60 = D_80090C60; ... old60 = loBit | old60;` gives `or v1,v1,a2`,
+   `_svm_okof1 = loBit | _svm_okof1;` gives retail's `or v1,a2,v1`;
+   `old60 = _svm_okof1; ... old60 = loBit | old60;` gives `or v1,v1,a2`,
    the operands the other way round. **72/85 -> 73/85.** Round 56 recorded
    "GCC canonicalises commutative operands" from the observation that writing
    `old60 | loBit` instead of `loBit | old60` changes nothing. That is true of
@@ -796,8 +796,8 @@ What moves the tail is not ORDER, it is which sub-expression gets a name:
    `rs`; when the destination is the global's own fresh temp, it does not.
 
 ```c
-            D_80090C60 = loBit | D_80090C60;
-            old60 = ~D_80090C60;
+            _svm_okof1 = loBit | _svm_okof1;
+            old60 = ~_svm_okof1;
             D_8008E228 = D_8008E228 & old60;
             D_80090C64 = hiBit | D_80090C64;
             old64 = ~D_80090C64;
@@ -816,7 +816,7 @@ local is what distinguishes them, and it is load-bearing.
  * the same names/types -- keep them local to the unit, not in a header */
 extern u8 D_8008E9D0;
 extern volatile u16 D_8008EA26;
-extern u16 D_80090C60;
+extern u16 _svm_okof1;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
@@ -867,8 +867,8 @@ void SpuVmSeqKeyOff(s32 p0)
             D_8008D9A3[bankIdx].unk0 = 0;
             D_8008D98C[bankIdx].unk0 = 0;
             _svm_voice[bankIdx].unk0 = 0;
-            D_80090C60 = loBit | D_80090C60;
-            old60 = ~D_80090C60;
+            _svm_okof1 = loBit | _svm_okof1;
+            old60 = ~_svm_okof1;
             D_8008E228 = D_8008E228 & old60;
             D_80090C64 = hiBit | D_80090C64;
             old64 = ~D_80090C64;
@@ -896,8 +896,8 @@ streams one-for-one from 0x20EB4 to the end.
 2. **WHICH of `D_80090C64` and `D_8008E228` is hoisted into the second early
    load slot -- 2 words directly, 8 more downstream, 10 words in total.**
    Both streams hoist exactly two loads above the `D_8008D98C`/`_svm_voice`
-   zero-stores. Retail hoists `D_80090C60` and `D_80090C64` and loads
-   `D_8008E228` late at 0x20F88; the build hoists `D_80090C60` and
+   zero-stores. Retail hoists `_svm_okof1` and `D_80090C64` and loads
+   `D_8008E228` late at 0x20F88; the build hoists `_svm_okof1` and
    `D_8008E228` and loads `D_80090C64` late at the same 0x20F88. The eight
    `$v0`/`$v1`/`$a0` differences through 0x20F9C-0x20FC0 are all downstream of
    that one choice -- whichever value lands in the early slot gets `$a0`.
@@ -925,7 +925,7 @@ streams one-for-one from 0x20EB4 to the end.
   round-32 donor-register-pressure finding.
 - **Reversing the two tail pairs** (C64/E22C chain written before C60/E228):
   45/85.
-- **Folding the `or` into the read** (`old60 = D_80090C60 | loBit;` as one
+- **Folding the `or` into the read** (`old60 = _svm_okof1 | loBit;` as one
   statement, then store): 61/85.
 - **Reusing `bankIdx` as the `D_8008E228` read's temp:** 28/85, by far the
   worst variant measured -- it collides with `bankIdx`'s own live range through

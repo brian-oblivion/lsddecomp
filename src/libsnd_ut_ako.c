@@ -56,10 +56,10 @@ extern u8 D_8008E9D0;
 extern volatile u16 *D_8006DAD4;
 
 /* PS1 SPU voice key-on/off pair, split low/high across two 16-bit halves
- * (voices 0-15 / 16-31) -- D_80090C60/64 are the hardware-mirrored "just
+ * (voices 0-15 / 16-31) -- _svm_okof1/64 are the hardware-mirrored "just
  * keyed on" mask, D_8008E228/22C a software mask this function clears the
  * same bit from (a "no longer fading out" bookkeeping flag). */
-extern u16 D_80090C60;
+extern u16 _svm_okof1;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
@@ -119,10 +119,10 @@ void SsUtAllKeyOff(void)
         _svm_voice[bitpos & 0xFFFF].unk04 = 0;
         _svm_voice[bitpos & 0xFFFF].unk00 = 0;
 
-        hw0 = D_80090C60;
+        hw0 = _svm_okof1;
         hw1 = D_80090C64;
         hw0 = bitLo | hw0;
-        D_80090C60 = hw0;
+        _svm_okof1 = hw0;
         D_8008E228 = D_8008E228 & ~hw0;
         hw1 = bitHi | hw1;
         D_80090C64 = hw1;
