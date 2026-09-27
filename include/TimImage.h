@@ -42,7 +42,7 @@ struct TimImageMethods {
     FILERESOURCE_SLOTS(TimImage, (TimImage * self, char *name));
     /* +0x078 is FileResource's slot78; this table's occupant is
      * TimImage__Upload (TimImageUploadFn). */
-    /* +0x07C..+0x094: empty bodies (TimImage__func_8003B5AC..5DC); no C
+    /* +0x07C..+0x094: empty bodies (TimImage__NoOpSlot7C..5DC); no C
      * caller names them. */
     /* +0x07C */ void (*slot7C)(void);
     /* +0x080 */ void (*slot80)(void);
@@ -71,7 +71,7 @@ TimImage *New_TimImage(char *name);
 void TimImage__TimImage(TimImage *self, char *name);
 void TimImage__Finalize(TimImage *self);
 void TimImage__Upload(TimImage *self);
-void TimImage__func_8003B5AC(void);
+void TimImage__NoOpSlot7C(void);
 void TimImage__func_8003B5B4(void);
 void TimImage__func_8003B5BC(void);
 void TimImage__func_8003B5C4(void);
