@@ -23,3 +23,9 @@ function and inspects `$v0`.
 ### Proposed learning
 
 None new.
+
+## Round 97 types pass (echo)
+
+Parameters renamed `p0..p2` -> `vabId, prog, note` (forwarded to
+`SpuVmKeyOff`'s matching slots); `0x21` -> `SPUVM_SE_SEQ` (see
+SpuVmSeKeyOn.md). Byte-exact unchanged.
