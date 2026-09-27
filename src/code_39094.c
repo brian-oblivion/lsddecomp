@@ -235,7 +235,7 @@ Rec1C *GetStageBgmRecords(s32 index) {
     return &GetStageRecords(index)[4];
 }
 
-Rec1C *PickVariant(s32 index, s32 arg1) {
+Rec1C *PickStageBgm(s32 index, s32 arg1) {
     u32 r = (u32)SeedAndRandom(0, arg1) % 5; /* arg1 only forwarded, like PickStageTexture's */
     Rec1C *rec;
     if (index == 9) {

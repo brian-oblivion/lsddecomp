@@ -69,12 +69,12 @@ void ObjM__DetachTarget(ObjM *self) {
     GetTimedTaskMethods()->deinit((TimedTask *)self);
 }
 
-/* Defined elsewhere, no header: src/code_39094.c (PickVariant and
+/* Defined elsewhere, no header: src/code_39094.c (PickStageBgm and
  * PickStageTexture return a Rec1C *, a 0x1C-byte record handed on here as a
  * name), src/code_d294_c.c (GetSetHitHeightGate sets the flag
  * SceneNode__ClassifyAgainstPlanes tests) and class_3bb8c_m
  * (RegisterStyleConfig, which keeps `sceneRefs` as gStyleSceneRefs). */
-extern s32 PickVariant(s32 stage, s32 unused);
+extern s32 PickStageBgm(s32 stage, s32 unused);
 extern s32 PickStageTexture(s32 stage, s32 unused, s32 day);
 extern s32 GetSetHitHeightGate(s32 value);
 extern s32 RegisterStyleConfig(void *grid, s32 stage, s32 *sceneRefs, s32 day, s32 arg4);
@@ -101,7 +101,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
 
     vp->methods->detachViewChild(vp);
     self->timBlockPending = 1;
-    record = PickVariant(self->stage, 0);
+    record = PickStageBgm(self->stage, 0);
     self->bgm->methods->setSeq(self->bgm, (char *)record);
 
     day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);

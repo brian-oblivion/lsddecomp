@@ -1,4 +1,6 @@
-# PickVariant -- MATCHED (46/46 words)
+# PickStageBgm -- MATCHED (46/46 words)
+
+> Renamed from `PickVariant` on 2026-09-27 (tools/rename.py). Address 0x80048f84.
 
 > Renamed from `func_80048F84` on 2026-09-25 (tools/rename.py). Address 0x80048f84.
 
@@ -15,7 +17,7 @@ override is set, else `&rec[r]`.
 ## Source
 
 ```c
-Rec1C *PickVariant(s32 index, s32 arg1) {
+Rec1C *PickStageBgm(s32 index, s32 arg1) {
     u32 r = (u32)SeedAndRandom(0, arg1) % 5;  /* arg1 only forwarded, like PickStageTexture's */
     Rec1C *rec;
     if (index == 9) {
@@ -43,19 +45,19 @@ Rec1C *PickVariant(s32 index, s32 arg1) {
 
 ## Arity (round 82, alpha, track 3 externcheck)
 
-Matched first as `PickVariant(s32 index)` passing an uninitialised local as
+Matched first as `PickStageBgm(s32 index)` passing an uninitialised local as
 SeedAndRandom's second argument (cc1: ``'unused' might be used
 uninitialized``). The body never writes `$a1` before the `jal SeedAndRandom`,
-so the register SeedAndRandom receives is PickVariant's own incoming `$a1`,
+so the register SeedAndRandom receives is PickStageBgm's own incoming `$a1`,
 and its only caller (ObjM__InitStyleAndWorld, class_3bb8c_l.c) loads it
 explicitly (`move a1,zero` at the jal). That is the forwarding idiom:
-PickVariant takes a second parameter and forwards it, exactly as
+PickStageBgm takes a second parameter and forwards it, exactly as
 PickStageTexture does with its `arg1`. Rewritten with the parameter;
 byte-identical (whole-image SHA1 green), the warning is gone, and the
 caller's 2-parameter extern now agrees with the definition.
 
 ## Naming
 
-- **Name:** `PickVariant`
+- **Name:** `PickStageBgm`
 - **Tier:** A
 - **Evidence:** leaf picker: 1-of-5 random-or-forced pick (gForcedStageBgm) from GetStageBgmRecords(index), with an index==9 special case.
