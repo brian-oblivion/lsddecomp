@@ -77,3 +77,36 @@ the two now have different types:
   distance limit, as Entity__GetProximityRatio does for Entity.
 
 Locals `kind` became `tick`. Zero bytes.
+
+## Track 7 (2026-09-27, round 96, charlie)
+
+The unit banner of `src/class_3bb8c_r.c` was rewritten to say what the file
+holds (and now names IsStyleVariantEven). The old one, verbatim:
+
+```c
+/*
+ * class_3bb8c_r -- 0x46288..0x46D20 (vram 0x80055A88..0x80056520), the tail
+ * of the `class_3bb8c_n` remainder (carved round 17). All 21 functions are
+ * MATCHED. Two unrelated classes share the slice, cut at ROM addresses
+ * rather than at a class boundary (tools/classtable.py, round 17):
+ *
+ *  - StyleCue00..StyleCue13, the complete 14-slot table `gStyleCueCallbacks`,
+ *    and their helper ComputeStyleCueFalloff. They are SoundCueSet
+ *    callbacks (include/SoundCueSet.h): TryStartStyleCue (class_3bb8c_n.c)
+ *    starts a style-cue slot's embedded set with the claimed record's cue
+ *    index as the tag and that row of the table as the callback, as
+ *    Entity does with gEntityMoodHandlerTable's MoodCueNN handlers. Each
+ *    tick a callback sets the set's attenuation from the slot's distance
+ *    (ComputeStyleCueFalloff) and, on the ticks its pattern selects,
+ *    requests programs on the three voices; most restart the pattern by setting
+ *    `tick` to -1 once it passes a limit.
+ *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style
+ *    layer keeps at an offset from its target: this unit supplies its slot
+ *    occupants (StyleEffect__StyleEffect/__Finalize/__SetParams/__Update)
+ *    and the `New_StyleEffect` allocator; its per-kind work is in
+ *    class_3bb8c_s.c and class_3bb8c_o.c.
+ *
+ * Named round 73 (charlie); tiers and evidence in each function's match
+ * report.
+ */
+```

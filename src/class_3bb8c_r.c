@@ -1,27 +1,24 @@
 /*
- * class_3bb8c_r -- 0x46288..0x46D20 (vram 0x80055A88..0x80056520), the tail
- * of the `class_3bb8c_n` remainder (carved round 17). All 21 functions are
- * MATCHED. Two unrelated classes share the slice, cut at ROM addresses
- * rather than at a class boundary (tools/classtable.py, round 17):
+ * class_3bb8c_r -- the style layer's sound cues and StyleEffect's lifecycle.
+ * Two unrelated groups share this file, with one predicate between them:
  *
- *  - StyleCue00..StyleCue13, the complete 14-slot table `gStyleCueCallbacks`,
- *    and their helper ComputeStyleCueFalloff. They are SoundCueSet
- *    callbacks (include/SoundCueSet.h): TryStartStyleCue (class_3bb8c_n.c)
- *    starts a style-cue slot's embedded set with the claimed record's cue
- *    index as the tag and that row of the table as the callback, as
- *    Entity does with gEntityMoodHandlerTable's MoodCueNN handlers. Each
- *    tick a callback sets the set's attenuation from the slot's distance
+ *  - StyleCue00..StyleCue13, the 14 rows of gStyleCueCallbacks, and their
+ *    helper ComputeStyleCueFalloff. Each is a SoundCueSet callback
+ *    (include/SoundCueSet.h): TryStartStyleCue (class_3bb8c_n.c) starts a
+ *    style-cue slot's embedded set with the claimed cue record's index as the
+ *    tag and that row of the table as the callback, as Entity does with its
+ *    Entity__MoodCueNN handlers. Every tick a callback sets the set's
+ *    attenuation from the slot's distance to the target
  *    (ComputeStyleCueFalloff) and, on the ticks its pattern selects,
- *    requests programs on the three voices; most restart the pattern by setting
- *    `tick` to -1 once it passes a limit.
- *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style
- *    layer keeps at an offset from its target: this unit supplies its slot
- *    occupants (StyleEffect__StyleEffect/__Finalize/__SetParams/__Update)
- *    and the `New_StyleEffect` allocator; its per-kind work is in
- *    class_3bb8c_s.c and class_3bb8c_o.c.
- *
- * Named round 73 (charlie); tiers and evidence in each function's match
- * report.
+ *    requests VAB programs on the three voices; most restart the pattern by
+ *    setting `tick` to -1 once it passes a limit.
+ *  - IsStyleVariantEven: whether the variant PickStyleFallbackConfig chose
+ *    (gStyleVariant, class_3bb8c_n.c) is even.
+ *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style layer
+ *    keeps at an offset from its target: its ctor, finalize, reset
+ *    (StyleEffect__SetParams) and update slot occupants, and the
+ *    New_StyleEffect allocator. The per-kind work is in class_3bb8c_s.c and
+ *    class_3bb8c_o.c.
  */
 #include "common.h"
 #include <libgte.h>
@@ -59,11 +56,7 @@ struct StyleCueParam {
     SoundCueSet cueSet; /* +0x014 */
 };
 
-/* ComputeStyleCueFalloff's own ROM address (0x8005627C) is AFTER all 14 slot
- * occupants below (it sits right before the blocked IsStyleVariantEven), so
- * its definition lives in that position further down this file to keep
- * strict ROM-address order -- forward-declared here since every occupant
- * calls it. */
+/* Every callback calls this first; it is defined after them, in ROM order. */
 s32 ComputeStyleCueFalloff(StyleCueParam *ctx);
 
 void StyleCue00(StyleCueParam *ctx, SoundCueSet *set) {
@@ -280,9 +273,9 @@ void StyleCue13(StyleCueParam *ctx, SoundCueSet *set) {
     }
 }
 
-/* A 15-entry table indexed with the NEGATIVE of `ctx->entry->countSign`
- * (`gStyleCueDistanceTable - tag*4`, i.e. `gStyleCueDistanceTable[-tag]` for `tag` in [-14, 0]).
- * `asm/data/76DC8.data.s` confirms exactly 15 words at this address. */
+/* One range per cue record (15), indexed by the record's cue index: the
+ * negative of `countSign` while a slot has the record claimed. IsStyleCueNear
+ * tests the slot's distance against the same row. */
 extern s32 gStyleCueDistanceTable[];
 
 s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
@@ -335,8 +328,7 @@ fail:
     return NULL;
 }
 
-/* The base finalize is SceneNode__Finalize, which returns nothing: the old
- * view's `return base->dtor(self)` forwarded a $v0 no one sets. */
+/* Actor's finalize (SceneNode__Finalize) returns nothing, so neither does this. */
 void StyleEffect__Finalize(StyleEffect *self) {
     StyleEffect__ReleaseByKind(self);
     GetActorMethods()->finalize((Actor *)self);
@@ -347,8 +339,7 @@ void StyleEffect__SetParams(StyleEffect *self, StyleEffectParams *params) {
     self->tick = 0;
 }
 
-/* `pos` arrives from StyleUpdateEffectSlots and is forwarded untouched in
- * $a1 (retail's jal at 0x80056508 sets no $a1). */
+/* `pos` arrives from StyleUpdateEffectSlots and is forwarded untouched. */
 void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
     self->tick = self->tick + 1;
     StyleEffect__UpdateByKind(self, pos);

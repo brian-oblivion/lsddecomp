@@ -118,3 +118,18 @@ Locals `kind` became `tick`. Zero bytes.
   result is the target's distance counted in steps: 0 at the slot, 10 at the
   edge of the range (SoundCueSet.h: attenuation 10 leaves only `vol % 10`).
   Zero bytes (a local's name is not in the object).
+
+Two comments in `src/class_3bb8c_r.c` lost their history (it is in the
+Derivation above) and now read as documentation. What they said, verbatim:
+
+```c
+/* ComputeStyleCueFalloff's own ROM address (0x8005627C) is AFTER all 14 slot
+ * occupants below (it sits right before the blocked IsStyleVariantEven), so
+ * its definition lives in that position further down this file to keep
+ * strict ROM-address order -- forward-declared here since every occupant
+ * calls it. */
+
+/* A 15-entry table indexed with the NEGATIVE of `ctx->entry->countSign`
+ * (`gStyleCueDistanceTable - tag*4`, i.e. `gStyleCueDistanceTable[-tag]` for `tag` in [-14, 0]).
+ * `asm/data/76DC8.data.s` confirms exactly 15 words at this address. */
+```
