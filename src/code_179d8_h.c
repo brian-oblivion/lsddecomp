@@ -80,6 +80,7 @@
  * rather than inheriting any verdict here.
  */
 #include "common.h"
+#include <libcd.h>
 #include "CdDriver.h"
 /* FileResource and its table come from include/FileResource.h, through code_171e0.h. */
 #include "code_171e0.h"
@@ -93,28 +94,11 @@
  * in gCdDriverMethods; FileResource__LoadFile calls it on its success path
  * too, so the give-up paths below close the file). */
 
-/* func_8002B640's own stat-like output buffer (OpenCdFile's local
- * `sp+0x10`). Only the two fields OpenCdFile itself copies out are
- * named; the buffer runs up to sp+0x28, where OpenCdFile's own path
- * string buffer starts, so it's at least 0x18 bytes -- the rest is
- * unestablished. */
-typedef struct StatBuf179D8H {
-    CdLoc16 pos; /* was unk0 -- copied into CdDriver::pos */
-    u32 size;    /* was unk4 -- copied into CdDriver::size */
-    u8 pad8[0x18 - 0x8];
-} StatBuf179D8H;
-
-/* CdSearchFile (was func_8002B640): Sony's, lib/libcd/iso9660.o since round 34 -- declared
- * LOCAL here, per-call-site typed.
- *
- * This comment used to read "still uncarved in its own unit (libcd_bios,
- * BLOCKED addiu_at there)", and both halves had gone stale: libcd_bios has
- * been a carved C unit since round 17, and `addiu_at` was RESOLVED in round
- * 21 (maspsx `--addiu-at`; docs/research/addiu-at-blocker.md), which leaves
- * func_8002B640 blocker-clean and assignable (re-screened with
- * `python3 tools/nearmiss.py`, 2026-09-08).  And THAT went stale in round
- * 34: it is Sony's CdSearchFile, linked from the object, never matchable. */
-extern s32 CdSearchFile(StatBuf179D8H *statBuf, char *path); /* lib/libcd/iso9660.o (round 34) */
+/* OpenCdFile's `sp+0x10` buffer is Sony's CdlFILE (<libcd.h>): the 0x18
+ * bytes between it and the path buffer at sp+0x28 are exactly CdlFILE's
+ * pos (4) + size (4) + name[16], and CdSearchFile -- Sony's, lib/libcd/
+ * iso9660.o since round 34 -- fills it. It was this unit's own
+ * StatBuf179D8H until round 97. */
 extern void printf(const char *fmt, void *arg1);
 extern char gCdFileNotFoundFmt[];
 
@@ -149,7 +133,7 @@ void NoOp2(void) {}
  * docs/match-reports/OpenCdFile.md. */
 void OpenCdFile(CdDriver *self, char *suffix) {
     s32 i;
-    StatBuf179D8H statBuf;
+    CdlFILE statBuf;
     char path[0x40];
 
     i = 0;
@@ -163,7 +147,8 @@ void OpenCdFile(CdDriver *self, char *suffix) {
             printf(gCdFileNotFoundFmt, path);
             return;
         }
-        self->pos = statBuf.pos;
+        /* CdLoc16 is the project's spelling of CdlLOC's four bytes (FileResource.h). */
+        self->pos = *(CdLoc16 *)&statBuf.pos;
         self->size = statBuf.size;
         self->isOpen = 1;
     }
@@ -196,13 +181,6 @@ s32 GetCdFileSize(CdDriver *self) {
 
 void NoOp3(void) {}
 
-/* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) -- this
- * unit's own per-call-site typing for ReadCdFile's calls, kept local. */
-extern void CdControl(s32 arg0, CdLoc16 *buf, s32 arg2);
-extern s32 CdSync(s32 arg0, void *buf);
-extern s32 CdRead(s32 arg0, void *arg1, s32 arg2);
-extern s32 CdReadSync(s32 arg0, s32 arg1);
-
 /* MATCHED round 74 (charlie). Two of its three loops are label + goto
  * (the seek retry and the CdSync wait); only the CdReadSync wait is a
  * do-while. The loop kind is readable from the back-edge: a do-while's
@@ -214,12 +192,12 @@ s32 ReadCdFile(CdDriver *self, char *arg1, s32 arg2) {
     s32 hi;
     s32 status;
     char scratch[0x800];
-    char buf[0x10];
+    u_char buf[0x10];
 
     if (self->isOpen != 0) {
     retry:
         hi = (u32)arg2 >> 11;
-        CdControl(2, &self->pos, 0);
+        CdControl(CdlSetloc, (u_char *)&self->pos, 0);
     sync:
         status = CdSync(0, buf);
         if (status == 0) {
@@ -229,7 +207,7 @@ s32 ReadCdFile(CdDriver *self, char *arg1, s32 arg2) {
             goto retry;
         }
         if (hi != 0) {
-            CdRead(hi, arg1, 0x80);
+            CdRead(hi, (u_long *)arg1, CdlModeSpeed);
             do {
                 status = CdReadSync(0, 0);
             } while (status > 0);
