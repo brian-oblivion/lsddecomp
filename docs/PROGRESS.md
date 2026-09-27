@@ -25,7 +25,9 @@ stale, prose elsewhere is not.
   history-headed sections stay as written, except preserved `#if 0` bodies,
   which stalesyms keeps live; there are 13 such bodies in history sections.
   A prose line already naming NEW stays as written ("X became NEW",
-  unitfile's missing guard). Everything else goes current. §3 now says to
+  unitfile's missing guard), and so does rename.py's own `> Renamed from`
+  note (1482 reports). The dry-run sweep showed that a replayed renametype
+  took those notes for leftovers. Everything else goes current. §3 now says to
   write history under a heading naming history and never to restore a
   rewritten name by hand. Tested on synthetic text, and with a real
   `unitfile.py rename` in a scratch worktree.

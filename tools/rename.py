@@ -92,16 +92,21 @@ def frozen_spans(text):
     return [(s, e) for s, e in out if s < e]
 
 
+# the provenance note step 4 below writes; it names OLD by design
+RENAMED_NOTE = "> Renamed from `"
+
+
 def sub_prose(rx, new, text, path, keep_lines=()):
-    """rx.sub(new) line by line in PROSE, leaving a report's frozen history
-    and any line that already names NEW (it is ABOUT the rename: "X became
-    NEW", rounds 71 and 97)."""
+    """rx.sub(new) line by line in PROSE, leaving a report's frozen history,
+    a `> Renamed from` note, and any line that already names NEW (it is
+    ABOUT the rename: "X became NEW", rounds 71 and 97)."""
     nx = re.compile(rf"(?<![A-Za-z0-9_]){re.escape(new)}(?![A-Za-z0-9_])")
     frozen = frozen_spans(text) if Path(path).parent.name == "match-reports" else []
     out, pos = [], 0
     for line in text.split("\n"):
         at, pos = pos, pos + len(line) + 1
-        keep = nx.search(line) or line in keep_lines or any(s <= at < e for s, e in frozen)
+        keep = (nx.search(line) or line in keep_lines or line.startswith(RENAMED_NOTE)
+                or any(s <= at < e for s, e in frozen))
         out.append(line if keep else rx.sub(new, line))
     return "\n".join(out)
 
@@ -397,7 +402,7 @@ def main():
             frozen = frozen_spans(text) if p.parent.name == "match-reports" else []
             for i, line in enumerate(text.split("\n"), 1):
                 at, pos = pos, pos + len(line) + 1
-                if any(s <= at < e for s, e in frozen):
+                if line.startswith(RENAMED_NOTE) or any(s <= at < e for s, e in frozen):
                     out.append(line)
                 elif pat.search(line) and newpat.search(line):
                     print(f"  note: {rel}:{i} names both {old} and {new}; left as written, edit by hand if needed")
