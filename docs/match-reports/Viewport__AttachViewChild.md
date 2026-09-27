@@ -114,3 +114,18 @@ it), so this unit does not own it per track 3's ownership rule.
 ## Track 4 (2026-09-25, round 85, bravo)
 
 Renamed from `Unk18Obj__AttachViewChild`. Slot +0x070 `attachViewChild(self, node, vp, vr, twist)`: the tier-B "view" reading is now settled, since &self+0x014 is the argument of GsSetRefView2, i.e. a GsRVIEW2 (`refView`), and the three setters write its vp, vr and rz. The default twist D_8008A8F4 is a Ratio16 {0, 1}. TaskCore__OnInit passes a zero LongVec3 (D_8006E86C) as both points. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+
+## Sony's headers (round 95, alpha, polish pass)
+
+src/code_2cc8c_d.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSetRefView2((GsRVIEW2 *)&self->refView)`: `ViewportRefView` is Sony's GsRVIEW2 under a local name (include/Viewport.h).
+
+The comments that sat on the deleted prototypes, moved here verbatim:
+
+```c
+/* GsSetRefView2 is Sony's (`libgs/gs_131.o`, linked from the SDK object).
+   Declared LOCALLY rather than in include/code_2cc8c.h, which six units
+   include: the real `LIBGS.H` prototype for this name will collide there.
+   This is only the shape THIS unit's call sites use -- the real one takes a
+   GsRVIEW2*. */
+extern void GsSetRefView2(void *arg0);
+```

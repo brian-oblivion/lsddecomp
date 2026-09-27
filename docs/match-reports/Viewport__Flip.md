@@ -99,3 +99,29 @@ exactly, and is simpler than the first attempt besides.
 ## Track 4 (2026-09-25, round 85, bravo)
 
 Renamed from `Unk18Obj__Flip`. Slot +0x0A4 `flip`. `unkC` is `drawSystem` (the class-1 child, gDrawSystemMethods), whose +0x054 (DrawSystem__GetActiveBuffer) gives otIndex and +0x050 (DrawSystem__SwapBuffers) swaps; reached through code_2cc8c.h's GenericObj view with a cast, since DrawSystem has no header. `unkB8` is `drawEnabled`; the OT reads are `ot[idx]`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+
+## Sony's headers (round 95, alpha, polish pass)
+
+src/code_2cc8c_d.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSortClear(..., (GsOT *)self->ot[idx])` and `GsDrawOt((GsOT *)self->ot[idx])`.
+
+The comments that sat on the deleted prototypes, moved here verbatim:
+
+```c
+/* Sony's `GsDrawOt` (libgs/gs_111, linked from the SDK object since round
+ * 34; was func_8003FBF4, and was declared in include/code_2cc8c.h until this
+ * round). Local for the same collision reason as the three above. Sony's own
+ * argument is a `GsOT *`; this call site passes the same otIndex-indexed slot
+ * it hands GsClearOt, as a plain word, and is left that way.
+ * gs_111 and gs_112 are byte-identical objects defining GsDrawOt and
+ * GsDrawOtIO at this one address -- gs_111/GsDrawOt is what the build links. */
+extern void GsDrawOt(ViewportOt *ot);
+
+/* Sony's `GsSortClear` (libgs/gs_001, fingerprint exact vs the disc corpus,
+ * not yet linked from an SDK object). Local for the same collision reason as
+ * the three above: LIBGS.H's own prototype is `void GsSortClear(u_char r,
+ * u_char g, u_char b, GsOT *ot);`. This call site reads self->clearColor's own
+ * three bytes UNSIGNED (same "writer reads signed, this reader reads
+ * unsigned" situation as farColor/Viewport__Update) and passes the fourth as a
+ * plain word, same as GsClearOt/GsDrawOt above. */
+extern void GsSortClear(u8 a0, u8 a1, u8 a2, ViewportOt *ot);
+```

@@ -1,4 +1,7 @@
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_2cc8c.h"
 #include "Viewport.h"
 
@@ -118,13 +121,6 @@ void Viewport__SetFogNear(Viewport *self, s32 fogNear) {
     self->fogNear = fogNear;
 }
 
-/* GsSetRefView2 is Sony's (`libgs/gs_131.o`, linked from the SDK object).
-   Declared LOCALLY rather than in include/code_2cc8c.h, which six units
-   include: the real `LIBGS.H` prototype for this name will collide there.
-   This is only the shape THIS unit's call sites use -- the real one takes a
-   GsRVIEW2*. */
-extern void GsSetRefView2(void *arg0);
-
 /* One-time init, skipped once a view node is set: adds `node` as a child
  * (addChild caches it as viewNode), sets the viewpoint, reference point and
  * twist (D_8008A8F4 when `twist` is NULL), then hands refView to
@@ -140,7 +136,7 @@ void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, L
     m->setViewPoint(self, vp);
     m->setViewRef(self, vr);
     m->setTwist(self, twist != NULL ? twist : &D_8008A8F4);
-    GsSetRefView2(&self->refView);
+    GsSetRefView2((GsRVIEW2 *)&self->refView);
 }
 
 /* Teardown counterpart to Viewport__AttachViewChild: removes the view node
@@ -187,21 +183,6 @@ void func_8003ECC8(void) {}
  * bytes of packet area. The header size is a LOCAL on purpose: written as a
  * literal, fold() reassociates the constant to the outside of the sum and
  * the final addu/addiu pair swaps (round 71). */
-extern void GsClearOt(s32 a0, s32 a1, ViewportOt *ot);
-/* Two more, identified in round 78 (FINISHING-PLAN track 2) and moved here
- * from include/code_2cc8c.h. Both prototypes are LIBGS.H's own; PACKET is
- * LIBGS.H's `typedef unsigned char PACKET`.
- *   GsSetNearClip   libgs/gs_101   was func_8003FB0C
- *   GsSetWorkBase   libgs/gs_124   was func_8003FBE4
- * And one identified in round 79, also LIBGS.H's own prototype:
- *   GsSetProjection libgs/gs_106   was Unk18Obj__SetGeomScreen (its argument
- *                                  is the projection distance h, which this
- *                                  unit also passes as SetFogNear's h) */
-extern void GsSetNearClip(long clip_near);
-extern void GsSetWorkBase(unsigned char *outpacketp);
-extern void GsSetProjection(long h);
-extern void *BMemPMgrAlloc(s32 size);
-
 void Viewport__InitOt(Viewport *self) {
     s32 size;
     s32 buf;
@@ -232,20 +213,12 @@ void Viewport__InitOt(Viewport *self) {
     self->ot[1]->length = self->otLength;
     self->ot[1]->org = self->otTags[1];
 
-    GsClearOt(0, 0, self->ot[0]);
-    GsClearOt(0, 0, self->ot[1]);
+    GsClearOt(0, 0, (GsOT *)self->ot[0]);
+    GsClearOt(0, 0, (GsOT *)self->ot[1]);
 
     self->otReady = 1;
     self->otIndex = 0;
 }
-
-/* Sony's `DrawSync` (libgpu/sys, fingerprint exact vs the disc corpus, not
- * yet linked from an SDK object). LOCAL to this unit, not code_2cc8c.h --
- * see the note on ResetGraph/GsClearOt above: a second declaration of this
- * name in a header six units include is exactly where LIBGPU.H's own
- * prototype (`extern int DrawSync(int mode);`) will one day collide. This
- * call site passes a literal 0 and ignores the return. */
-extern void DrawSync(s32 mode);
 
 /* Teardown counterpart to Viewport__InitOt's init. */
 void Viewport__DeinitOt(Viewport *self) {
@@ -276,31 +249,6 @@ void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event) {
  * marks its super coordinate for recompute, recomputes zDiv, sets this
  * half's packet area and clears its OT, then draws sceneRoot and the root
  * of the view node's parent chain. */
-/* Psy-Q's GTE far-colour register writer (libgte/reg03, linked from Sony's
- * own SDK object). LOCAL to this unit, not code_2cc8c.h -- see the note on
- * SetGeomScreen below. This call site reads self->farColor's own three bytes
- * UNSIGNED (`lbu`, not `lb`) even though Viewport__SetFarColor writes them as signed
- * bytes; the disagreement is kept as a local cast rather than a retype of the
- * field. Sony's own argument type is `long` for each. */
-extern void SetFarColor(u8 a0, u8 a1, u8 a2);
-
-/* Three more of Sony's, linked from the SDK objects since round 34 and
- * declared LOCALLY for the same reason as GsSetRefView2 above: they used to
- * sit in include/code_2cc8c.h as `func_8003Fxxx`, and under their real names
- * a header six units include is exactly where LIBGS.H's own prototypes will
- * one day collide. These are only the shapes THIS unit's call sites use.
- *   GsSetLightMode  libgs/gs_108   was func_8003FC70
- *   SetFogNear      libgte/fog_01  was func_8003FD4C
- *   GsClearOt       libgs/gs_113   was func_8003FC18
- * GsClearOt's real third argument is a `GsOT *` (its first two are Sony's
- * `offset` and `point`). This call site already passed it as a plain word, so
- * it is left that way -- the shape the header carried before round 14 retyped
- * it to a `TexPageDesc *`, which was code_2cc8c_e.c's reading of that same
- * GsOT. */
-extern void GsSetLightMode(s32 a0);
-extern void SetFogNear(s32 a0, s32 a1);
-extern void GsClearOt(s32 a0, s32 a1, ViewportOt *ot);
-
 void Viewport__Update(Viewport *self) {
     s32 idx;
     SceneNode *root;
@@ -323,7 +271,7 @@ void Viewport__Update(Viewport *self) {
         SetFogNear(self->fogNear, self->projH);
     }
 
-    GsSetRefView2(&self->refView);
+    GsSetRefView2((GsRVIEW2 *)&self->refView);
     self->refView.super->flg = 0;
 
     self->zDiv = (u32)(self->farZ - self->nearZ) / (u32)(1 << self->otLength) + 1;
@@ -332,7 +280,7 @@ void Viewport__Update(Viewport *self) {
     GsSetWorkBase((unsigned char *)self->workBase[idx]);
 
     idx = self->otIndex;
-    GsClearOt(0, 0, self->ot[idx]);
+    GsClearOt(0, 0, (GsOT *)self->ot[idx]);
 
     self->methods->drawNode(self, self->sceneRoot);
 
@@ -341,24 +289,6 @@ void Viewport__Update(Viewport *self) {
         self->methods->drawNode(self, root);
     }
 }
-
-/* Sony's `GsDrawOt` (libgs/gs_111, linked from the SDK object since round
- * 34; was func_8003FBF4, and was declared in include/code_2cc8c.h until this
- * round). Local for the same collision reason as the three above. Sony's own
- * argument is a `GsOT *`; this call site passes the same otIndex-indexed slot
- * it hands GsClearOt, as a plain word, and is left that way.
- * gs_111 and gs_112 are byte-identical objects defining GsDrawOt and
- * GsDrawOtIO at this one address -- gs_111/GsDrawOt is what the build links. */
-extern void GsDrawOt(ViewportOt *ot);
-
-/* Sony's `GsSortClear` (libgs/gs_001, fingerprint exact vs the disc corpus,
- * not yet linked from an SDK object). Local for the same collision reason as
- * the three above: LIBGS.H's own prototype is `void GsSortClear(u_char r,
- * u_char g, u_char b, GsOT *ot);`. This call site reads self->clearColor's own
- * three bytes UNSIGNED (same "writer reads signed, this reader reads
- * unsigned" situation as farColor/Viewport__Update) and passes the fourth as a
- * plain word, same as GsClearOt/GsDrawOt above. */
-extern void GsSortClear(u8 a0, u8 a1, u8 a2, ViewportOt *ot);
 
 /* Takes otIndex from the DrawSystem's getActiveBuffer (+0x054); when drawing
  * is enabled, resets the GPU, swaps (+0x050; once more on buffer 0 when
@@ -388,10 +318,10 @@ void Viewport__Flip(Viewport *self) {
 
     idx = self->otIndex;
     rawBytes = (u8 *)&self->clearColor;
-    GsSortClear(rawBytes[0], rawBytes[1], rawBytes[2], self->ot[idx]);
+    GsSortClear(rawBytes[0], rawBytes[1], rawBytes[2], (GsOT *)self->ot[idx]);
 
     idx = self->otIndex;
-    GsDrawOt(self->ot[idx]);
+    GsDrawOt((GsOT *)self->ot[idx]);
 
     if (self->unkB4 != 0 && self->otIndex == 0) {
         self->drawSystem->methods->swapBuffers(self->drawSystem);
@@ -446,20 +376,6 @@ SceneNode *GetRootNode(SceneNode *node) {
     }
     return node;
 }
-
-/* Psy-Q's GTE far-colour and geometric-screen-distance register writers
- * (libgte/reg03, linked from Sony's own SDK object). Declared LOCAL to this
- * unit rather than in code_2cc8c.h, which nine units include, since they
- * belong to another translation unit (CLAUDE.md's header-contention rule).
- * Both take `long` as LIBGTE.H declares them.
- *
- * GsSetProjection below is Sony's libgs/gs_106 (round 79, FINISHING-PLAN
- * track 2: an 18-way EXACT tie that position settles -- it is the last word
- * before the placed libgs run, zero gap to gs_131, and gs_106 is the only
- * libgs module among the ties -- and LIBGS.H's `GsSetProjection(long h)`
- * agrees with its call site). It is kept here as matched C because no object
- * places it; progress.py counts it as library via its `identified` line. */
-extern void SetGeomScreen(long h);
 
 void GsSetProjection(long h) {
     SetGeomScreen(h);
