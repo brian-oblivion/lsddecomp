@@ -2,6 +2,8 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <kernel.h>
+#include <sys/file.h>
 #include "BasicClass.h"
 #include "class_3bb8c.h"
 #include "TaskObjF.h"
@@ -49,7 +51,6 @@ extern char *BuildMemcardPath(void *dest, s32 cardSlot, char *suffix);
  * plain lw at increasing offsets), never gp-relative, so unaffected by the
  * project's gp_rel blocker. */
 extern s32 gCardEventSpecs[4];
-extern s32 OpenEvent(s32 desc, s32 spec, s32 mode, s32 (*handler)(void));
 
 /* Literal "TEMP" (asm/data/7B12C.sdata.s) -- the throwaway suffix
  * TaskObjF__ProbeCardFreeSpace passes as BuildMemcardPath's 3rd argument to
@@ -131,29 +132,23 @@ void TaskObjF__SetCardSlot(TaskObjF *self, s32 cardSlot) {
     self->cardHandle = cardSlot << 4;
 }
 
-extern void EnterCriticalSection(void);
-extern void ExitCriticalSection(void);
-
 s32 TaskObjF__OpenEvents(TaskObjF *self) {
     s32 i;
 
     EnterCriticalSection();
     i = 0;
     do {
-        self->events[i] = OpenEvent(0xF4000001, gCardEventSpecs[i], 0x2000, NULL);
+        self->events[i] = OpenEvent(SwCARD, gCardEventSpecs[i], EvMdNOINTR, NULL);
         i++;
-    } while (i < 4);
+    } while (i < ARRAY_COUNT(self->events));
     ExitCriticalSection();
     TaskObjF__EnableEvents(self);
     return 1;
 }
 
-/* Psy-Q's CloseEvent (libapi), passed as TaskObjF__ForEachEvent's callback. */
-extern s32 CloseEvent(s32 event);
-
 s32 TaskObjF__CloseEvents(TaskObjF *self) {
     TaskObjF__DisableEvents(self);
-    TaskObjF__ForEachEvent(self, CloseEvent, 1);
+    TaskObjF__ForEachEvent(self, (s32 (*)(s32))CloseEvent, 1);
     return 1;
 }
 
@@ -162,7 +157,7 @@ s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 
     s32 firstChanged;
     s32 result;
 
-    retries = 10;
+    retries = MEMCARD_RETRIES;
     *cardChanged = 0;
     result = TaskObjF__CardInfoAndLoadStatus(self, error, &firstChanged, formatted);
     while (result == 0 || *error != 0 || *formatted == 0) {
@@ -181,9 +176,6 @@ s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *error, s32 *cardChanged
     }
 }
 
-extern s32 _card_info(s32 chan);
-extern s32 _card_clear(s32 chan);
-
 s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *error, s32 *cardChanged) {
     s32 status;
     s32 answer;
@@ -194,19 +186,17 @@ s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *error, s32 *cardChanged) {
     while (_card_info(self->cardHandle) == 0)
         ;
     answer = TaskObjF__WaitForReadyEvent(self);
-    if (answer == 0x100) {
+    if (answer == EvSpTIMOUT) {
         status = 0;
-    } else if (answer == 0x8000) {
+    } else if (answer == EvSpERROR) {
         status = 0;
         *error = 1;
-    } else if (answer == 0x2000) {
+    } else if (answer == EvSpNEW) {
         *cardChanged = 1;
         _card_clear(self->cardHandle);
     }
     return status;
 }
-
-extern s32 _card_load(s32 chan);
 
 s32 TaskObjF__CardLoadStatus(TaskObjF *self, s32 *error, s32 *formatted) {
     s32 status;
@@ -218,28 +208,23 @@ s32 TaskObjF__CardLoadStatus(TaskObjF *self, s32 *error, s32 *formatted) {
     while (_card_load(self->cardHandle) == 0)
         ;
     answer = TaskObjF__WaitForReadyEvent(self);
-    if (answer == 0x100) {
+    if (answer == EvSpTIMOUT) {
         status = 0;
-    } else if (answer == 0x8000) {
+    } else if (answer == EvSpERROR) {
         status = 0;
         *error = 1;
-    } else if (answer == 0x2000) {
+    } else if (answer == EvSpNEW) {
         *formatted = 0;
     }
     return status;
 }
-
-/* The PS-X BIOS format(), which takes a device name. gMcDevicePath0/1 are
- * the "bu00:"/"bu10:" templates include/class_3bb8c.h declares (track 4b,
- * round 85: this unit had its own `s32` view for this address-only use). */
-extern s32 format(char *fs);
 
 s32 TaskObjF__FormatCard(TaskObjF *self) {
     s32 retries;
     s32 result;
     McDevicePath *path;
 
-    retries = 10;
+    retries = MEMCARD_RETRIES;
     do {
         path = self->cardSlot != 0 ? &gMcDevicePath1 : &gMcDevicePath0;
         result = format((char *)path);
@@ -266,24 +251,20 @@ s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destTitle, char *suffix) {
     return result;
 }
 
-extern s32 open(char *path, s32 mode);
-extern s32 read(s32 handle, void *buf, s32 size);
-extern s32 close(s32 handle);
-
 s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destTitle, char *suffix) {
-    s32 pathBuf[8];
+    char pathBuf[32];
     char *path;
     s32 handle;
     void *header;
 
     path = BuildMemcardPath(pathBuf, self->cardSlot, suffix);
-    handle = open(path, 1);
+    handle = open(path, O_RDONLY);
     if (handle == -1) {
         return 0;
     }
     if (destTitle != NULL) {
-        header = BMemPMgrAlloc(0x80);
-        read(handle, header, 0x80);
+        header = BMemPMgrAlloc(MEMCARD_SECTOR_SIZE);
+        read(handle, header, MEMCARD_SECTOR_SIZE);
         strcpy(destTitle, (char *)header + 4);
         BMemPMgrFree(header);
     }
@@ -306,7 +287,7 @@ char *TaskObjF__FindUnusedMemcardName(TaskObjF *self, char *buf, char *prefix, c
 s32 TaskObjF__CollectExistingMemcardFiles(TaskObjF *self, char **destTitles, char **outSuffixes,
                                           char *prefix, char **suffixes) {
     s32 count;
-    char name[0x20];
+    char name[32];
 
     count = 0;
     while (*suffixes != NULL) {
@@ -327,24 +308,22 @@ s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 iconFrames, s32 size) {
     s32 retries;
     s32 result;
 
-    retries = 10;
+    retries = MEMCARD_RETRIES;
     do {
         result = TaskObjF__ProbeCardFreeSpace(self, iconFrames, size);
     } while (result == 0 && retries-- != 0);
     return result;
 }
 
-extern s32 delete (void *path);
-
 s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
-    s32 pathBuf[8];
+    char pathBuf[32];
     char *path;
     s32 handle;
     s32 blocks;
 
-    blocks = (u32)(size + 0x21FF) >> 13;
+    blocks = (u32)(size + MEMCARD_SAVE_HEADER_SIZE + MEMCARD_BLOCK_SIZE - 1) >> MEMCARD_BLOCK_SHIFT;
     path = BuildMemcardPath(pathBuf, self->cardSlot, sMcTempFileSuffix);
-    handle = open(path, (blocks << 16) | 0x200);
+    handle = open(path, MEMCARD_OPEN_BLOCKS(blocks) | O_CREAT);
     if (handle == -1) {
         return 0;
     }
