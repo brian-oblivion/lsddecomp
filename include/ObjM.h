@@ -21,7 +21,7 @@
  * `BasicClass *` types and ObjM's methods cast them (no code).
  *
  * What its methods do, measured:
- *  - init (ObjM__AttachTarget) registers ObjM__OnRegistrantEvent as the
+ *  - init (ObjM__AttachTarget) registers ObjM__GetGridRecord as the
  *    StageMap's callback, keeps the DreamSys and adds it as a child;
  *    onInit (ObjM__InitStyleAndWorld) builds `timBlockSrc`
  *    (New_TimBlockSrc of the day's variant) and `styleConfig`
@@ -141,7 +141,7 @@ void ObjM__Finalize(ObjM *self);
 void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event);
 void ObjM__NoOpSlot40(void);
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, struct DreamSys *dreamSys);
-void ObjM__OnRegistrantEvent(ObjM *self, s32 code, s32 arg2, s32 arg3);
+void ObjM__GetGridRecord(ObjM *self, s32 code, s32 arg2, s32 arg3);
 void ObjM__DetachTarget(ObjM *self);
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, struct StyleConfig *style, s32 arg3);
 void ObjM__TeardownStyle(ObjM *self);

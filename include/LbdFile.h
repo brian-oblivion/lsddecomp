@@ -9,7 +9,7 @@
  * gLbdFileMethods, parent FileResource; methods in src/code_39094.c; no
  * subclasses). The files it is handed are the gRecordTable records
  * GetGridRecordAt(stage, chunk) returns: StageMap__ComputeChunkLoadEntry takes
- * each entry's name from the grid's callback, ObjM__OnRegistrantEvent, whose
+ * each entry's name from the grid's callback, ObjM__GetGridRecord, whose
  * tail call leaves that record in $v0, and the record's first bytes are the
  * path ("STG00\M000.LBD" is record 9 of stage 0's group).
  *

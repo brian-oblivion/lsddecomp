@@ -33,16 +33,16 @@ void ObjM__NoOpSlot40(void) {}
 
 /* init. `args` is the building DayTask's init args: args->unkC is its
  * StageMap (IntermediateBase__Init keeps it as unk14), whose callback
- * becomes ObjM__OnRegistrantEvent. */
+ * becomes ObjM__GetGridRecord. */
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dreamSys) {
     ((StageMap *)args->lightRig)
-        ->methods->setCallback((StageMap *)args->lightRig, (ChunkFileFn)ObjM__OnRegistrantEvent, self);
+        ->methods->setCallback((StageMap *)args->lightRig, (ChunkFileFn)ObjM__GetGridRecord, self);
     self->dreamSys = dreamSys;
     GetTimedTaskMethods()->init((TimedTask *)self, args, 1);
     self->methods->addChild(self, (BasicClass *)dreamSys);
 }
 
-void ObjM__OnRegistrantEvent(ObjM *self, s32 code, s32 arg2, s32 arg3) {
+void ObjM__GetGridRecord(ObjM *self, s32 code, s32 arg2, s32 arg3) {
     if (code >= 0) {
         GetGridRecordAt(self->stage, code);
     } else {

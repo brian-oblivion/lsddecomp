@@ -17,7 +17,7 @@ slot `+0x44`, then calls its own `slot10`.
 
 ```c
 void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2) {
-    arg1->unkC->methods->slotC8(arg1->unkC, ObjM__OnRegistrantEvent, self);
+    arg1->unkC->methods->slotC8(arg1->unkC, ObjM__GetGridRecord, self);
     self->unk3C = (DreamSysObj_3bb8c_l *)arg2;
     GetTimedTaskMethods()->slot44(self, arg1, 1);
     self->methods->slot10(self, arg2);
@@ -26,7 +26,7 @@ void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2
 
 ## Notes
 
-- `ObjM__OnRegistrantEvent` (this unit, ROM order right after this function) is
+- `ObjM__GetGridRecord` (this unit, ROM order right after this function) is
   registered here as a callback — needed a forward declaration in the
   header since it's referenced before its own definition.
 - The struct field layout work for `Obj87034_3bb8c_l` done here (methods
@@ -37,7 +37,7 @@ void ObjM__AttachTarget(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *arg1, s32 arg2
   instead of 0xC. Every subsequent field in the struct was silently
   8 bytes too low until fixed — visible immediately as an 8-byte-off field
   offset in `ObjM__AttachTarget`'s own diff (`0x3c` vs `0x34`) and in
-  `ObjM__OnRegistrantEvent`'s (`0x38` vs `0x30`).
+  `ObjM__GetGridRecord`'s (`0x38` vs `0x30`).
 
 ### Proposed learning
 
@@ -56,7 +56,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_80052DE8` | `ObjM__AttachTarget` | B | see below |
 
-**Evidence.** vtable slot +0x044 of `gObjMMethods` (`ObjM`, confirmed via classtable.py's ctor/dtor slots). Registers `ObjM__OnRegistrantEvent` as a callback with `arg1->unkC` (a "registrant" object), stores `arg2` into `self->target`, forwards to the shared base accessor's own slot `+0x44`, then dispatches self's own `AddChild` (slot10). Mechanics -- subscribe + link a target + add a child -- are clear; the in-game reason is not.
+**Evidence.** vtable slot +0x044 of `gObjMMethods` (`ObjM`, confirmed via classtable.py's ctor/dtor slots). Registers `ObjM__GetGridRecord` as a callback with `arg1->unkC` (a "registrant" object), stores `arg2` into `self->target`, forwards to the shared base accessor's own slot `+0x44`, then dispatches self's own `AddChild` (slot10). Mechanics -- subscribe + link a target + add a child -- are clear; the in-game reason is not.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
