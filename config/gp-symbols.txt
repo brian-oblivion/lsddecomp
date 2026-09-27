@@ -52,7 +52,6 @@ D_8008AB80
 D_8008AB84
 D_8008AB8C
 D_8008AB90
-D_8008ABFC
 D_8008AC04
 D_8008AC08
 D_8008AC68
@@ -108,6 +107,7 @@ gDivPolygon3
 gDivPolygon4
 gDrawSystem
 gDreamAuxStage
+gDreamAuxStageMap
 gDreamAuxWorld
 gEntityFadeBoxDefaultOffset
 gEntityFadeBoxDefaultSize

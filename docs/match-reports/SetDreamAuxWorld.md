@@ -22,7 +22,7 @@ The initializer for this unit's five `%gp_rel` globals plus a one-shot
 ```c
 extern void *New_Entity(void *arg0, void *arg1, void *arg2);
 extern s32 gDreamAuxStage;
-extern s32 D_8008ABFC;
+extern s32 gDreamAuxStageMap;
 extern s32 gDreamAuxWorld;
 extern s32 D_8008AC04;
 extern s32 D_8008AC08;
@@ -35,7 +35,7 @@ void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
     u32 i;
 
     gDreamAuxStage = a0;
-    D_8008ABFC = a1;
+    gDreamAuxStageMap = a1;
     gDreamAuxWorld = a2;
     D_8008AC04 = a3;
     D_8008AC08 = a4;

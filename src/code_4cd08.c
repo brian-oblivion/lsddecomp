@@ -48,7 +48,7 @@ void TickDreamAuxSlots(void) {
 }
 
 extern s32 gDreamAuxStage;
-extern StageMap *D_8008ABFC; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
+extern StageMap *gDreamAuxStageMap; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
 extern DreamSys *gDreamAuxWorld; /* the player DreamSys: class_3bb8c_l passes its `target` */
 extern s32 D_8008AC04;
 extern s32 D_8008AC08;
@@ -60,7 +60,7 @@ void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4) {
     u32 i;
 
     gDreamAuxStage = a0;
-    D_8008ABFC = (StageMap *)a1;
+    gDreamAuxStageMap = (StageMap *)a1;
     gDreamAuxWorld = world;
     D_8008AC04 = a3;
     D_8008AC08 = a4;
@@ -412,11 +412,11 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry) {
         coords.recordVal0 = rec->val0;
         coords.pos = gDreamAuxPosTable[rec->posIndex];
 
-        D_8008ABFC->methods->computeCellOffsets(D_8008ABFC, outBuf, &coords);
+        gDreamAuxStageMap->methods->computeCellOffsets(gDreamAuxStageMap, outBuf, &coords);
         entity->methods->updateRotation(entity, 1, D_80088F18 + rec->val2 * 12);
         ((TodActorAttachToParentFn)entity->methods->attachToParent)(
-            (TodActor *)entity, (TodActor *)gDreamAuxWorld, (void *)D_8008AC08, (void *)D_8008ABFC,
-            outBuf);
+            (TodActor *)entity, (TodActor *)gDreamAuxWorld, (void *)D_8008AC08,
+            (void *)gDreamAuxStageMap, outBuf);
         return false;
     }
     return true;
@@ -430,7 +430,7 @@ void DespawnDreamAuxEntity(DreamAuxSlot *a0) {
         SceneNode__LocalOffsetToWorldPos((SceneNode *)gDreamAuxWorld, localPos, a0->pos, 0);
         ((TodActorAttachToParentFn)a0->entity->methods->attachToParent)(
             (TodActor *)a0->entity, (TodActor *)gDreamAuxWorld, (void *)D_8008AC08,
-            (void *)D_8008ABFC, localPos);
+            (void *)gDreamAuxStageMap, localPos);
         SceneNode__FaceTarget((SceneNode *)a0->entity, (SceneNode *)gDreamAuxWorld, 1, 0, 0);
     }
 }

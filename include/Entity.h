@@ -136,7 +136,7 @@ extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
 
 /* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C)
  * is the grid manager, StageMap (include/StageMap.h; code_4cd08 passes
- * D_8008ABFC). Entity_b/_e/_g call its startScaleRamp (+0x138). */
+ * gDreamAuxStageMap). Entity_b/_e/_g call its startScaleRamp (+0x138). */
 
 /* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
  * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what

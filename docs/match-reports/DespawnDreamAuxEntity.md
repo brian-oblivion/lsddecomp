@@ -29,7 +29,7 @@ void DespawnDreamAuxEntity(DreamAuxSlot *a0)
 
         ((DreamAuxObjFn14)a0->entity->vtable[0x14])(a0->entity);
         SceneNode__LocalOffsetToWorldPos((void *)gDreamAuxWorld, localPos, a0->pos, 0);
-        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, gDreamAuxWorld, D_8008AC08, (void *)D_8008ABFC, localPos);
+        ((DreamAuxObjFn13)a0->entity->vtable[0x13])(a0->entity, gDreamAuxWorld, D_8008AC08, (void *)gDreamAuxStageMap, localPos);
         SceneNode__FaceTarget(a0->entity, (void *)gDreamAuxWorld, 1, 0, 0);
     }
 }
