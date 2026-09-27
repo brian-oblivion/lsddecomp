@@ -389,7 +389,7 @@ s32 GetOpenVabCount(void) {
 
 extern s32 gSsTicksPerSecond;
 
-s32 func_8002CC28(void) {
+s32 GetSsTicksPerSecond(void) {
     return gSsTicksPerSecond;
 }
 

@@ -36,7 +36,7 @@ extern void *BMemPMgrAlloc(s32 size);
 extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 
-extern s32 func_8002CC28(void);
+extern s32 GetSsTicksPerSecond(void);
 
 extern u8 gSsSizeTableBuf[];
 
@@ -157,7 +157,7 @@ void WBgm__SetVol(WBgm *self, s16 left, s16 right) {
 }
 
 void WBgm__Crescendo(WBgm *self, s16 vol, s32 scale) {
-    SsSeqSetCrescendo(self->seqId, vol, func_8002CC28() * scale);
+    SsSeqSetCrescendo(self->seqId, vol, GetSsTicksPerSecond() * scale);
 }
 
 void WBgm__SetSeq(WBgm *self, char *seqPath) {

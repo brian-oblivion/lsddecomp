@@ -108,7 +108,7 @@ extern void printf(const char *fmt);
 extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 WBgmMethods *Get_vtable_WBgm(void);
 
-extern s32 func_8002CC28(void);
+extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;

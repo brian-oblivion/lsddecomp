@@ -6,7 +6,7 @@ Round 81, runner echo. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x058 (resolved with `tools/classtable.py gWBgmMethods`).
-- **What:** crescendo: `SsSeqSetCrescendo(self->seqId, vol, func_8002CC28() * scale)`.
+- **What:** crescendo: `SsSeqSetCrescendo(self->seqId, vol, GetSsTicksPerSecond() * scale)`.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 0
   insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`). No levers were needed.
@@ -14,13 +14,13 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 ## Naming
 
-`WBgm__Crescendo`, tier A. vtable slot `crescendo`; body is exactly SsSeqSetCrescendo, scaled by func_8002CC28()'s return.
+`WBgm__Crescendo`, tier A. vtable slot `crescendo`; body is exactly SsSeqSetCrescendo, scaled by GetSsTicksPerSecond()'s return.
 
 ## Source
 
 ```c
 void WBgm__Crescendo(WBgm *self, s16 vol, s32 scale) {
-    SsSeqSetCrescendo(self->seqId, vol, func_8002CC28() * scale);
+    SsSeqSetCrescendo(self->seqId, vol, GetSsTicksPerSecond() * scale);
 }
 ```
 
@@ -62,7 +62,7 @@ extern void SsSeqSetVol(short, short, short);
 extern void SsSeqSetCrescendo(short, short, long);
 extern void SsSeqClose(short);
 
-extern s32 func_8002CC28(void);
+extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
