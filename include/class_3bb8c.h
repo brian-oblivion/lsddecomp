@@ -142,7 +142,7 @@ extern char *gSaveTitle;
 /* The buffer FormatNumberIntoBuffer formats the day into
  * (FormatFullWidthNumber) before copying it into gSaveTitle's title. The
  * ROM image points it at the "7654321" string D_8008AA1C. */
-extern void *D_8008AA24;
+extern void *sDayDigits;
 
 /* 19 full-width spaces, the tail TitleMenu__CreateSaveTitle copies over
  * gSaveTitle's on a new game (the ROM image points it just past

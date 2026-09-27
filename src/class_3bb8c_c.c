@@ -172,9 +172,9 @@ void CheckSaveScoreFlag(TitleMenu *self, TaskCoreTarget *target) {
  * This unit's own local view keeps it `void *`. */
 extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
 
-/* Formats the day as three full-width digits in D_8008AA24's buffer and
+/* Formats the day as three full-width digits in sDayDigits's buffer and
  * copies them into the save title's day number, characters 9..11. */
 void FormatNumberIntoBuffer(s32 arg0) {
-    FormatFullWidthNumber(D_8008AA24, arg0, 3, 0);
-    *(FullWidthChars3 *)((s8 *)gSaveTitle + 0x12) = *(FullWidthChars3 *)D_8008AA24;
+    FormatFullWidthNumber(sDayDigits, arg0, 3, 0);
+    *(FullWidthChars3 *)((s8 *)gSaveTitle + 0x12) = *(FullWidthChars3 *)sDayDigits;
 }

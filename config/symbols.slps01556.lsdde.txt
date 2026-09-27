@@ -3145,3 +3145,4 @@ gFadeBoxBlackColors = 0x8006EAA8;
 gBoxFillDefaultColor = 0x8008A924;
 sTitleMenuTarget = 0x80086D44;
 sTitleMenuSoundBankPath = 0x800114DC;
+sDayDigits = 0x8008AA24;
