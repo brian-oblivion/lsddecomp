@@ -19,6 +19,9 @@
  *    (include/class_3bb8c.h), a GsCOORDINATE2 view with halfword reads.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "class_3bb8c.h"
 #include "PlacementGrid.h"
 #include "LinkResource.h"
@@ -387,8 +390,6 @@ typedef struct BE54LoadReq {
     u8 pad4[0xC];
 } BE54LoadReq;
 
-extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
-
 void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *entry) {
     LbdFileHeader *info;
     LbdFileHeader *info2;
@@ -451,7 +452,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *entry) {
             }
             (*slot)->model = (void *)idxVal;
             (*slot)->tmd = ((LinkResEntry *)(*slot)->model)->unk10;
-            GsLinkObject4(((LinkResEntry *)(*slot)->model)->unk10, &(*slot)->attribute, 0);
+            GsLinkObject4(((LinkResEntry *)(*slot)->model)->unk10, (GsDOBJ2 *)&(*slot)->attribute, 0);
             gpu = (*slot)->coord2;
             /* Keeps the outBuf.x/.y/.z stack loads below the load of
              * (*slot)->coord2; without it GCC hoists all three above it. */
