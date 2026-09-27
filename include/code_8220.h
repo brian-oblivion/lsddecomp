@@ -25,6 +25,28 @@ struct BMemBlockHdr {
     /* +0x008 */ BMemBlockHdr *next;
 };
 
+/* sizeAndFlags. A block's size counts its header word and its footer; the
+ * flags are the block's own state and its lower neighbour's. */
+#define BMEM_SIZE_MASK 0x0FFFFFFF
+#define BMEM_FLAG_MASK 0xF0000000
+#define BMEM_FREE 0x40000000      /* this block is on the free list */
+#define BMEM_PREV_FREE 0x80000000 /* the block below this one is free */
+
+/* Block layout: the header word, then the payload BMemPMgrAlloc returns. A
+ * free block's last word, its footer, points back at its header, which is how
+ * BMemPMgrFree finds a free lower neighbour to merge with. A block is at least
+ * BMEM_MIN_BLOCK bytes: a header word and a payload that can hold the two
+ * free-list links and the footer. */
+#define BMEM_HEADER_SIZE 4
+#define BMEM_MIN_PAYLOAD 12
+#define BMEM_MIN_BLOCK 16
+#define BMEM_BLOCK_SIZE(b) ((b)->sizeAndFlags & BMEM_SIZE_MASK)
+#define BMEM_NEXT_BLOCK(b) ((BMemBlockHdr *)((u8 *)(b) + BMEM_BLOCK_SIZE(b)))
+#define BMEM_FOOTER(b) (*(BMemBlockHdr **)((u8 *)(b) + BMEM_BLOCK_SIZE(b) - 4))
+#define BMEM_PREV_FOOTER(b) (*(BMemBlockHdr **)((u8 *)(b) - 4))
+#define BMEM_PAYLOAD(b) ((void *)((u8 *)(b) + BMEM_HEADER_SIZE))
+#define BMEM_HEADER_OF(payload) ((BMemBlockHdr *)((u8 *)(payload) - BMEM_HEADER_SIZE))
+
 /*
  * BMemPMgr -- a pool's header, at the start of the one malloc'd area that
  * also holds its blocks. The blocks begin at `firstBlock` and are walked by
@@ -41,6 +63,14 @@ struct BMemPMgr {
     /* +0x00C */ BMemBlockHdr *freeListHead;
     /* +0x010 */ s32 initialized; /* set to 1 by SetupBMemPMgrFreeList; no reader */
 };
+
+/* The malloc'd area is this header, poolSize bytes of blocks, then a
+ * zero-size sentinel block word that stops BMemPMgrFree's merge with the block
+ * above. BMEMPMGR_HEADER_SIZE is where firstBlock starts; the struct above
+ * names only the fields the code touches. */
+#define BMEMPMGR_HEADER_SIZE 28
+#define BMEMPMGR_SENTINEL_SIZE 4
+#define BMEMPMGR_MIN_POOL_SIZE 1024
 
 /* The generic pool allocator/free pair, established already by
  * include/DreamSys.h, include/Entity.h etc. --

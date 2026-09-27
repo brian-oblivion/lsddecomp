@@ -42,12 +42,12 @@ extern void printf(const char *fmt, void *arg1, s32 arg2);
 void *BMemPMgrInit(s32 poolSize) {
     BMemPMgr *pool;
 
-    if ((u32)poolSize < 0x400) {
-        poolSize = 0x400;
+    if ((u32)poolSize < BMEMPMGR_MIN_POOL_SIZE) {
+        poolSize = BMEMPMGR_MIN_POOL_SIZE;
     }
-    pool = malloc(poolSize + 0x20);
+    pool = malloc(BMEMPMGR_HEADER_SIZE + poolSize + BMEMPMGR_SENTINEL_SIZE);
     if (pool != NULL) {
-        pool->firstBlock = (u8 *)pool + 0x1C;
+        pool->firstBlock = (u8 *)pool + BMEMPMGR_HEADER_SIZE;
         pool->poolSize = poolSize;
         SetupBMemPMgrFreeList(pool);
     } else {
@@ -67,7 +67,7 @@ void FreeMem(void *ptr) {
 void SetupBMemPMgrFreeList(BMemPMgr *pool) {
     BMemPMgr *mgr;
     BMemBlockHdr *header;
-    u8 *end;
+    BMemBlockHdr *sentinel;
 
     mgr = gDefaultBMemPMgr;
     if (mgr == NULL) {
@@ -77,24 +77,24 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool) {
     header = mgr->firstBlock;
     mgr->freeListTail = header;
     mgr->freeListHead = header;
-    header->sizeAndFlags = mgr->poolSize | 0x40000000;
+    header->sizeAndFlags = mgr->poolSize | BMEM_FREE;
     mgr->freeListTail->prev = NULL;
     mgr->freeListHead->next = NULL;
-    end = (u8 *)header + (header->sizeAndFlags & 0xFFFFFFF);
-    *(BMemBlockHdr **)(end - 4) = header;
-    *(u32 *)end = 0x80000000;
+    sentinel = BMEM_NEXT_BLOCK(header);
+    BMEM_PREV_FOOTER(sentinel) = header;
+    sentinel->sizeAndFlags = BMEM_PREV_FREE;
 }
 
 /* clang-format off */
 void *BMemPMgrAlloc(size, pool)
     s32 size;
-    void *pool;
+    BMemPMgr *pool;
 {
     /* clang-format on */
     BMemPMgr *mgr;
     BMemBlockHdr *cursor;
-    BMemBlockHdr *result;
-    BMemBlockHdr *remainder;
+    void *result;
+    BMemBlockHdr *nextBlock;
     BMemBlockHdr *unused;
     u32 blockSize;
     u32 padded;
@@ -110,19 +110,19 @@ void *BMemPMgrAlloc(size, pool)
             padded = size + 4;
             size = padded - (size & 0x3);
         }
-        if ((u32)size < 0xC) {
-            size = 0xC;
+        if ((u32)size < BMEM_MIN_PAYLOAD) {
+            size = BMEM_MIN_PAYLOAD;
         }
         cursor = mgr->freeListTail;
-        size += 4;
+        size += BMEM_HEADER_SIZE;
         while (cursor != NULL) {
-            blockSize = cursor->sizeAndFlags & 0xFFFFFFF;
+            blockSize = BMEM_BLOCK_SIZE(cursor);
             if (blockSize >= (u32)size) {
-                cursor->sizeAndFlags &= 0xBFFFFFFF;
-                result = (BMemBlockHdr *)((u8 *)cursor + 4);
-                if (blockSize < (u32)size + 0x10) {
-                    remainder = (BMemBlockHdr *)((u8 *)cursor + (cursor->sizeAndFlags & 0xFFFFFFF));
-                    remainder->sizeAndFlags &= 0x7FFFFFFF;
+                cursor->sizeAndFlags &= ~BMEM_FREE;
+                result = BMEM_PAYLOAD(cursor);
+                if (blockSize < (u32)size + BMEM_MIN_BLOCK) {
+                    nextBlock = BMEM_NEXT_BLOCK(cursor);
+                    nextBlock->sizeAndFlags &= ~BMEM_PREV_FREE;
                     {
                         BMemBlockHdr *n = cursor->next;
                         BMemBlockHdr *p = cursor->prev;
@@ -145,31 +145,30 @@ void *BMemPMgrAlloc(size, pool)
                         }
                     }
                 } else {
-                    cursor->sizeAndFlags = (cursor->sizeAndFlags & 0xF0000000) | (u32)size;
-                    remainder = (BMemBlockHdr *)((u8 *)cursor + (cursor->sizeAndFlags & 0xFFFFFFF));
-                    remainder->sizeAndFlags = (blockSize - (u32)size) | 0x40000000;
-                    remainder->prev = cursor->prev;
-                    remainder->next = cursor->next;
+                    cursor->sizeAndFlags = (cursor->sizeAndFlags & BMEM_FLAG_MASK) | (u32)size;
+                    nextBlock = BMEM_NEXT_BLOCK(cursor);
+                    nextBlock->sizeAndFlags = (blockSize - (u32)size) | BMEM_FREE;
+                    nextBlock->prev = cursor->prev;
+                    nextBlock->next = cursor->next;
                     {
                         BMemBlockHdr *p = cursor->prev;
 
                         if (p != NULL) {
-                            p->next = remainder;
+                            p->next = nextBlock;
                         } else {
-                            mgr->freeListHead = remainder;
+                            mgr->freeListHead = nextBlock;
                         }
                     }
                     {
                         BMemBlockHdr *n = cursor->next;
 
                         if (n != NULL) {
-                            n->prev = remainder;
+                            n->prev = nextBlock;
                         } else {
-                            mgr->freeListTail = remainder;
+                            mgr->freeListTail = nextBlock;
                         }
                     }
-                    *(BMemBlockHdr **)((u8 *)remainder + (remainder->sizeAndFlags & 0xFFFFFFF) - 4) =
-                        remainder;
+                    BMEM_FOOTER(nextBlock) = nextBlock;
                 }
                 break;
             }
@@ -183,7 +182,7 @@ void *BMemPMgrAlloc(size, pool)
 /* clang-format off */
 void *BMemPMgrFree(ptr, pool)
     void *ptr;
-    void *pool;
+    BMemPMgr *pool;
 {
     /* clang-format on */
     BMemPMgr *mgr;
@@ -197,15 +196,15 @@ void *BMemPMgrFree(ptr, pool)
         mgr = pool;
     }
     if (ptr != NULL) {
-        header = (BMemBlockHdr *)((u8 *)ptr - 4);
-        next = (BMemBlockHdr *)((u8 *)header + (header->sizeAndFlags & 0xFFFFFFF));
-        nextFree = next->sizeAndFlags & 0x40000000;
-        if ((s32)header->sizeAndFlags < 0) {
-            u32 freedSize = header->sizeAndFlags & 0xFFFFFFF;
+        header = BMEM_HEADER_OF(ptr);
+        next = BMEM_NEXT_BLOCK(header);
+        nextFree = next->sizeAndFlags & BMEM_FREE;
+        if (header->sizeAndFlags & BMEM_PREV_FREE) {
+            u32 freedSize = BMEM_BLOCK_SIZE(header);
 
-            header = *(BMemBlockHdr **)((u8 *)ptr - 8);
-            header->sizeAndFlags = (header->sizeAndFlags & 0xF0000000) |
-                                   (freedSize + (header->sizeAndFlags & 0xFFFFFFF));
+            header = BMEM_PREV_FOOTER(header);
+            header->sizeAndFlags =
+                (header->sizeAndFlags & BMEM_FLAG_MASK) | (freedSize + BMEM_BLOCK_SIZE(header));
             {
                 BMemBlockHdr *n = header->next;
                 BMemBlockHdr *p = header->prev;
@@ -228,10 +227,10 @@ void *BMemPMgrFree(ptr, pool)
             }
         }
         if (nextFree) {
-            u32 nextSize = next->sizeAndFlags & 0xFFFFFFF;
+            u32 nextSize = BMEM_BLOCK_SIZE(next);
 
-            header->sizeAndFlags = (header->sizeAndFlags & 0xF0000000) |
-                                   (nextSize + (header->sizeAndFlags & 0xFFFFFFF));
+            header->sizeAndFlags =
+                (header->sizeAndFlags & BMEM_FLAG_MASK) | (nextSize + BMEM_BLOCK_SIZE(header));
             {
                 BMemBlockHdr *n = next->next;
                 BMemBlockHdr *p = next->prev;
@@ -258,7 +257,7 @@ void *BMemPMgrFree(ptr, pool)
                     mgr->freeListTail = p;
                 }
             }
-            next = (BMemBlockHdr *)((u8 *)header + (header->sizeAndFlags & 0xFFFFFFF));
+            next = BMEM_NEXT_BLOCK(header);
         }
         header->prev = mgr->freeListTail;
         mgr->freeListTail = header;
@@ -268,9 +267,9 @@ void *BMemPMgrFree(ptr, pool)
         } else {
             mgr->freeListHead = header;
         }
-        *(BMemBlockHdr **)((u8 *)next - 4) = header;
-        header->sizeAndFlags |= 0x40000000;
-        next->sizeAndFlags |= 0x80000000;
+        BMEM_PREV_FOOTER(next) = header;
+        header->sizeAndFlags |= BMEM_FREE;
+        next->sizeAndFlags |= BMEM_PREV_FREE;
     }
     SetBMemPMgrBusy(0);
     return NULL;
@@ -352,7 +351,7 @@ s32 PushBasicClassListNode(BasicClassListNode **head, BasicClass *value) {
     BasicClassListNode *node;
     BasicClassListNode *oldHead;
 
-    node = BMemPMgrAlloc(0x8);
+    node = BMemPMgrAlloc(sizeof(BasicClassListNode));
     if (node != NULL) {
         oldHead = *head;
         node->value = value;
