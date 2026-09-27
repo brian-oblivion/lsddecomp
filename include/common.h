@@ -19,6 +19,10 @@
  * Exact for multiples of 45 degrees; a constant expression to cc1. */
 #define ANGLE_DEG(deg) ((deg) * 4096 / 360)
 
+/* 20.12 fixed point: libgte's ONE is 1 << FIX12_SHIFT, so `n << FIX12_SHIFT`
+ * is the integer n as a fixed-point value. */
+#define FIX12_SHIFT 12
+
 typedef union MoodGraphPoint {
     s16 value;
 

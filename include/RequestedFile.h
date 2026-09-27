@@ -33,6 +33,10 @@
 typedef struct RequestedFile RequestedFile;
 typedef struct RequestedFileMethods RequestedFileMethods;
 
+/* The ctor's stack copy of the name it hands requestLoadFile: 32 bytes,
+ * NUL included (strcpy, unchecked). */
+#define REQUESTEDFILE_NAME_SIZE 32
+
 struct RequestedFileMethods {
     FILERESOURCE_SLOTS(RequestedFile, (RequestedFile * self, char *name));
 };

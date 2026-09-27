@@ -69,9 +69,12 @@ extern void *BMemPMgrAlloc(s32 size);
 
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
+/* A 0..255 colour channel to GsSetAmbient's 0..ONE scale (255 << 4 is 4080). */
+#define AMBIENT_TO_FIX12_SHIFT 4
+
 /* Allocate and construct a CharSprite (0xAC bytes): one character cell. */
 CharSprite *New_CharSprite(void *texture, u8 cell) {
-    CharSprite *obj = BMemPMgrAlloc(0xAC);
+    CharSprite *obj = BMemPMgrAlloc(sizeof(CharSprite));
 
     if (obj != NULL) {
         GetCharSpriteMethods()->ctor(obj, texture, cell);
@@ -85,7 +88,7 @@ CharSprite *New_CharSprite(void *texture, u8 cell) {
 void CharSprite__CharSprite(CharSprite *self, void *texture, u8 cell) {
     SpriteRect cellRect;
 
-    GetCellRect(&cellRect, 0x20);
+    GetCellRect(&cellRect, ' ');
     GetScreenSpriteMethods()->ctor((ScreenSprite *)self, texture, &cellRect, 0);
     self->methods = GetCharSpriteMethods();
     ((CharSpriteResetFn)self->methods->reset)(self, cell);
@@ -122,13 +125,13 @@ CharSpriteMethods *GetCharSpriteMethods(void) {
 void GetCellRect(SpriteRect *dst, u32 cell) {
     *dst = gCharSpriteCellRect;
     cell &= 0xFF;
-    dst->u += (cell & 0x1F) * 8;
-    dst->v += (cell >> 5) * 8;
+    dst->u += (cell % CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE;
+    dst->v += (cell / CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE;
 }
 
 /* Allocate and construct a ScreenSprite (0xA8 bytes). */
 ScreenSprite *New_ScreenSprite(void *texture, SpriteRect *rect, s32 resetWord) {
-    ScreenSprite *obj = BMemPMgrAlloc(0xA8);
+    ScreenSprite *obj = BMemPMgrAlloc(sizeof(ScreenSprite));
 
     if (obj != NULL) {
         GetScreenSpriteMethods()->ctor(obj, texture, rect, resetWord);
@@ -170,20 +173,20 @@ void ScreenSprite__SetPosition(ScreenSprite *self, ScreenSpritePos *pos) {
 void ScreenSprite__SetPivotAnchor(ScreenSprite *self, u32 anchor) {
     if (self->parent != NULL) {
         switch (anchor) {
-            case 0:
+            case SCREENSPRITE_ANCHOR_CENTRE:
                 self->sprite.mx = self->sprite.w >> 1;
                 self->sprite.my = self->sprite.h >> 1;
                 break;
-            case 1:
+            case SCREENSPRITE_ANCHOR_LEFT:
                 self->sprite.mx = 0;
                 break;
-            case 2:
+            case SCREENSPRITE_ANCHOR_RIGHT:
                 self->sprite.mx = self->sprite.w;
                 break;
-            case 3:
+            case SCREENSPRITE_ANCHOR_TOP:
                 self->sprite.my = 0;
                 break;
-            case 4:
+            case SCREENSPRITE_ANCHOR_BOTTOM:
                 self->sprite.my = self->sprite.h;
                 break;
         }
@@ -197,7 +200,7 @@ ScreenSpriteMethods *GetScreenSpriteMethods(void) {
 
 /* Allocate and construct a Sprite (0xA0 bytes). */
 Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *resetArg, s32 resetWord) {
-    Sprite *obj = BMemPMgrAlloc(0xA0);
+    Sprite *obj = BMemPMgrAlloc(sizeof(Sprite));
 
     if (obj != NULL) {
         GetSpriteMethods()->ctor(obj, texture, abr, rect, resetArg, resetWord);
@@ -235,10 +238,10 @@ void Sprite__Reset(Sprite *self, void *texture, s32 abr, SpriteRect *rect) {
  * from the image, size and u,v from the cell, the pivot at its centre,
  * neutral colour, scale 1.0 and no rotation. `tim` is a TimImage's GsIMAGE. */
 void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, GsIMAGE *tim) {
-    s32 mode = tim->pmode & 3;
-    s32 grey = 0x80;
+    s32 mode = tim->pmode & 0x3;
+    s32 grey = SPRITE_RGB_NEUTRAL;
 
-    sprite->attribute = mode << 24;
+    sprite->attribute = mode << SPRITE_ATTR_MODE_SHIFT;
     sprite->x = 0;
     sprite->y = 0;
     sprite->w = rect->w;
@@ -254,8 +257,8 @@ void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, GsIMAGE *tim) {
     sprite->rgb.g = grey;
     sprite->rgb.r = grey;
     sprite->rotate = 0;
-    sprite->scalex = 0x1000;
-    sprite->scaley = 0x1000;
+    sprite->scalex = ONE;
+    sprite->scaley = ONE;
 }
 
 /* gSpriteMethods slot +0x044 (updateRotation): table[2] as a fraction of
@@ -263,7 +266,8 @@ void InitGsSprite(SpriteGs *sprite, s32 abr, SpriteRect *rect, GsIMAGE *tim) {
 void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table) {
     s32 angle;
 
-    angle = ((table[2].num / table[2].den) << 12) + ((table[2].num % table[2].den) << 12) / table[2].den;
+    angle = ((table[2].num / table[2].den) << FIX12_SHIFT) +
+            ((table[2].num % table[2].den) << FIX12_SHIFT) / table[2].den;
     if (set) {
         self->sprite.rotate = angle;
     } else {
@@ -273,17 +277,17 @@ void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table) {
 
 /* Sprite classes slot +0x060: display on/off (attribute bit 31, inverted). */
 s32 Sprite__SetDisplay(Sprite *self, s32 on) {
-    return GetSetBitField(&self->sprite.attribute, 0x1F, 1, on == 0) == 0;
+    return GetSetBitField(&self->sprite.attribute, SPRITE_ATTR_DOFF_SHIFT, 1, on == 0) == 0;
 }
 
 /* Sprite classes slot +0x064: attribute bit 30. */
 s32 Sprite__SetSemiTrans(Sprite *self, s32 on) {
-    return GetSetBitField(&self->sprite.attribute, 0x1E, 1, on != 0);
+    return GetSetBitField(&self->sprite.attribute, SPRITE_ATTR_ALON_SHIFT, 1, on != 0);
 }
 
 /* Sprite classes slot +0x068: attribute bits 28..29. */
 s32 Sprite__SetSemiTransRate(Sprite *self, s32 rate) {
-    return GetSetBitField(&self->sprite.attribute, 0x1C, 2, rate);
+    return GetSetBitField(&self->sprite.attribute, SPRITE_ATTR_RATE_SHIFT, 2, rate);
 }
 
 /* gTextRowMethods and gCharSpriteMethods slot +0x098 (update): empty override. */
@@ -302,7 +306,7 @@ SpriteMethods *GetSpriteMethods(void) {
 
 /* Allocate and construct a RequestedFile (0x30 bytes). */
 RequestedFile *New_RequestedFile(char *name) {
-    RequestedFile *obj = BMemPMgrAlloc(0x30);
+    RequestedFile *obj = BMemPMgrAlloc(sizeof(RequestedFile));
 
     if (obj != NULL) {
         GetRequestedFileMethods()->ctor(obj, name);
@@ -315,7 +319,7 @@ RequestedFile *New_RequestedFile(char *name) {
  * the table, clear `loaded`, and pass a stack copy of the name to
  * requestLoadFile (+0x06C). */
 void RequestedFile__RequestedFile(RequestedFile *self, char *name) {
-    char nameCopy[32];
+    char nameCopy[REQUESTEDFILE_NAME_SIZE];
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetRequestedFileMethods();
@@ -346,7 +350,7 @@ RequestedFileMethods *GetRequestedFileMethods(void) {
 
 /* Allocate and construct a FrameClock (0x1C bytes). */
 FrameClock *New_FrameClock(void) {
-    FrameClock *obj = BMemPMgrAlloc(0x1C);
+    FrameClock *obj = BMemPMgrAlloc(sizeof(FrameClock));
 
     if (obj != NULL) {
         Get_vtable_FrameClock()->ctor(obj);
@@ -404,12 +408,12 @@ void FrameClock__Tick(FrameClock *self) {
     s32 event;
 
     if (self->flag14 != 0) {
-        event = 4;
+        event = FRAMECLOCK_EVENT_FLAG14;
     } else if (self->paused != 0) {
-        event = 3;
+        event = FRAMECLOCK_EVENT_PAUSED;
     } else {
         self->frameCount++;
-        event = 2;
+        event = FRAMECLOCK_EVENT_RUNNING;
     }
     self->methods->notifyParents(self, event);
 }
@@ -446,7 +450,7 @@ FrameClockMethods *Get_vtable_FrameClock(void) {
 
 /* Allocate and construct a LightRig (0x54 bytes). */
 LightRig *New_LightRig(void) {
-    LightRig *obj = BMemPMgrAlloc(0x54);
+    LightRig *obj = BMemPMgrAlloc(sizeof(LightRig));
 
     if (obj != NULL) {
         GetLightRigMethods()->ctor(obj);
@@ -463,7 +467,7 @@ void LightRig__LightRig(LightRig *self) {
 
     GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetLightRigMethods();
-    for (i = 0, light = self->lights; i < 3; i++, light++) {
+    for (i = 0, light = self->lights; i < ARRAY_COUNT(self->lights); i++, light++) {
         *light = (BasicClass *)New_FlatLightObj(i);
         self->methods->addChild(self, *light);
     }
@@ -476,7 +480,7 @@ void LightRig__Finalize(LightRig *self) {
     s32 i;
     BasicClass *light;
 
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->lights); i++) {
         light = self->methods->getLight(self, i);
         light->methods->release(light);
     }
@@ -508,7 +512,9 @@ void LightRig__SetAmbientColor(LightRig *self, LightRigRgb *rgb, s32 swap) {
     } else {
         self->ambient = *rgb;
     }
-    GsSetAmbient((u8)self->ambient.r << 4, (u8)self->ambient.g << 4, (u8)self->ambient.b << 4);
+    GsSetAmbient((u8)self->ambient.r << AMBIENT_TO_FIX12_SHIFT,
+                 (u8)self->ambient.g << AMBIENT_TO_FIX12_SHIFT,
+                 (u8)self->ambient.b << AMBIENT_TO_FIX12_SHIFT);
 }
 
 /* Returns the LightRig method table. */

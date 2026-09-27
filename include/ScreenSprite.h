@@ -47,6 +47,16 @@ struct ScreenSpritePos {
     s32 y;
 };
 
+/* setPivotAnchor's argument: where (mx, my) moves on the sprite's cell.
+ * LEFT/RIGHT move mx only, TOP/BOTTOM my only; any other value does nothing. */
+enum ScreenSpriteAnchor {
+    SCREENSPRITE_ANCHOR_CENTRE = 0, /* (w / 2, h / 2) */
+    SCREENSPRITE_ANCHOR_LEFT = 1,   /* mx = 0 */
+    SCREENSPRITE_ANCHOR_RIGHT = 2,  /* mx = w */
+    SCREENSPRITE_ANCHOR_TOP = 3,    /* my = 0 */
+    SCREENSPRITE_ANCHOR_BOTTOM = 4  /* my = h */
+};
+
 /* Sprite's slots, then this class's own. `tools/classtable.py
  * gScreenSpriteMethods --vs gSpriteMethods` lists the overrides of the
  * inherited ones (ScreenSprite__ScreenSprite, ScreenSprite__Reset,

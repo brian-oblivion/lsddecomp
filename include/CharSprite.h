@@ -40,6 +40,12 @@
 typedef struct CharSprite CharSprite;
 typedef struct CharSpriteMethods CharSpriteMethods;
 
+/* The font texture's layout, as GetCellRect reads it: cells of
+ * CHARSPRITE_CELL_SIZE square, CHARSPRITE_GRID_COLUMNS to a row, cell n at
+ * column n % columns, row n / columns, from gCharSpriteCellRect. */
+#define CHARSPRITE_GRID_COLUMNS 32
+#define CHARSPRITE_CELL_SIZE 8
+
 /* ScreenSprite's slots, then this class's own. `tools/classtable.py
  * gCharSpriteMethods --vs gScreenSpriteMethods` lists the overrides of the
  * inherited ones (CharSprite__CharSprite, CharSprite__Reset). */
