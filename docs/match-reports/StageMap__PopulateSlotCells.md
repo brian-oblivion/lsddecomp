@@ -947,3 +947,25 @@ moves out of GraphicsResources.c) would retire all three; field renames
 (GraphicsResources.c `ResourceSourceArgs`, include/code_4cd08.h
 `DreamAuxLoadReq`, include/code_171e0.h `Vec3_171e0`) are the same family
 at 0x0C and are left to that job.
+
+## Track 6 (round 96, delta, second job): ResourceSourceRequest unified
+
+The proposal above, applied. `ResourceSource` moved from
+src/GraphicsResources.c to include/FileResource.h (the parent of the five
+ctors that take it), and one `ResourceSourceRequest` sits beside it:
+
+```c
+typedef struct ResourceSourceRequest {
+    /* +0x00 */ ResourceSource src;
+    /* +0x08 */ u8 pad8[0x10 - 0x8];
+} ResourceSourceRequest;
+```
+
+The descriptor is embedded rather than spelled as two loose words, so the
+callers pass `&req.src` with no cast; measured byte-exact at all three call
+sites. This unit's local view retired onto it (the local is now `req`, the
+body writes `req.src.buffer`); the `MATCHING` line on the 0x10 size moved to
+the header's type. include/class_39e08.h `LoadRequest` (DayTask__DayTask)
+and src/code_1677c.c `LoadModelRequest` (GameApplication__GameApplication)
+retired onto the same type; their `type`/`path` accessors became
+`src.buffer`/`src.name`, the only ones the compiler listed.
