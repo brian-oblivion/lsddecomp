@@ -42,19 +42,19 @@
  * because its own 3rd parameter arrives in $a2 and is forwarded unchanged
  * (round 75; this was an `arity-ok` K&R declaration until then, on the
  * reading that TaskObjF__OpenAndReadMemcardFile made a 2-argument call). */
-extern void *BuildMemcardPath(void *dest, s32 selector, void *suffix);
+extern char *BuildMemcardPath(void *dest, s32 cardSlot, char *suffix);
 
 /* PSX thread-table constant walked by TaskObjF__OpenEvents (4 entries, one per
  * OpenTh-style thread it starts). Address-only-derived walk (lui/addiu then
  * plain lw at increasing offsets), never gp-relative, so unaffected by the
  * project's gp_rel blocker. */
 extern s32 gCardEventSpecs[4];
-extern s32 OpenEvent(s32 arg0, s32 arg1, s32 arg2, s32 arg3);
+extern s32 OpenEvent(s32 desc, s32 spec, s32 mode, s32 (*handler)(void));
 
 /* Literal "TEMP" (asm/data/7B12C.sdata.s) -- the throwaway suffix
  * TaskObjF__ProbeCardFreeSpace passes as BuildMemcardPath's 3rd argument to
  * build a placeholder file name when probing free space. */
-extern s32 sMcTempFileSuffix;
+extern char sMcTempFileSuffix[];
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
@@ -74,44 +74,44 @@ void TaskObjF__Finalize(TaskObjF *self) {
 }
 
 void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
-    s32 tag;
+    s32 classId;
 
     if (child == NULL) {
         return;
     }
     Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
-    tag = child->methods->header;
-    if ((tag & 0xF) == 2) {
+    classId = child->methods->header;
+    if ((classId & 0xF) == 2) {
         self->inputSource = child;
         return;
     }
-    if ((tag & 0xF) == 5) {
+    if ((classId & 0xF) == 5) {
         self->tickSource = child;
         return;
     }
-    if ((tag & 0xFF) == 0x10) {
+    if ((classId & 0xFF) == 0x10) {
         self->textEntry = (struct TextEntry *)child;
         return;
     }
-    if ((tag & 0xFF) == 0x20) {
+    if ((classId & 0xFF) == 0x20) {
         self->itemList = (struct ItemList *)child;
     }
 }
 
 void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child) {
-    s32 tag;
+    s32 classId;
 
     if (child == NULL) {
         return;
     }
-    tag = child->methods->header;
-    if ((tag & 0xF) == 2) {
+    classId = child->methods->header;
+    if ((classId & 0xF) == 2) {
         self->inputSource = NULL;
-    } else if ((tag & 0xF) == 5) {
+    } else if ((classId & 0xF) == 5) {
         self->tickSource = NULL;
-    } else if ((tag & 0xFF) == 0x10) {
+    } else if ((classId & 0xFF) == 0x10) {
         self->textEntry = NULL;
-    } else if ((tag & 0xFF) == 0x20) {
+    } else if ((classId & 0xFF) == 0x20) {
         self->itemList = NULL;
     }
     Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
@@ -126,9 +126,9 @@ void TaskObjF__RemoveAllChildren(TaskObjF *self) {
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
-void TaskObjF__SetCardSlot(TaskObjF *self, s32 val) {
-    self->cardSlot = val;
-    self->cardHandle = val << 4;
+void TaskObjF__SetCardSlot(TaskObjF *self, s32 cardSlot) {
+    self->cardSlot = cardSlot;
+    self->cardHandle = cardSlot << 4;
 }
 
 extern void EnterCriticalSection(void);
@@ -136,15 +136,12 @@ extern void ExitCriticalSection(void);
 
 s32 TaskObjF__OpenEvents(TaskObjF *self) {
     s32 i;
-    TaskObjF *cur;
 
     EnterCriticalSection();
     i = 0;
-    cur = self;
     do {
-        cur->events[0] = OpenEvent(0xF4000001, gCardEventSpecs[i], 0x2000, 0);
+        self->events[i] = OpenEvent(0xF4000001, gCardEventSpecs[i], 0x2000, NULL);
         i++;
-        cur = (TaskObjF *)((u8 *)cur + 4);
     } while (i < 4);
     ExitCriticalSection();
     TaskObjF__EnableEvents(self);
@@ -160,74 +157,74 @@ s32 TaskObjF__CloseEvents(TaskObjF *self) {
     return 1;
 }
 
-s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *p1, s32 *p2, s32 *p3) {
+s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 *formatted) {
     s32 retries;
-    s32 localFlag;
+    s32 firstChanged;
     s32 result;
 
     retries = 10;
-    *p2 = 0;
-    result = TaskObjF__CardInfoAndLoadStatus(self, p1, &localFlag, p3);
-    while (result == 0 || *p1 != 0 || *p3 == 0) {
-        result = TaskObjF__CardInfoAndLoadStatus(self, p1, p2, p3);
+    *cardChanged = 0;
+    result = TaskObjF__CardInfoAndLoadStatus(self, error, &firstChanged, formatted);
+    while (result == 0 || *error != 0 || *formatted == 0) {
+        result = TaskObjF__CardInfoAndLoadStatus(self, error, cardChanged, formatted);
         if (retries-- == 0) {
             break;
         }
     }
-    *p2 = *p2 | localFlag;
+    *cardChanged = *cardChanged | firstChanged;
     return result;
 }
 
-s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *p1, s32 *p2, s32 *p3) {
-    if (TaskObjF__CardInfoStatus(self, p1, p2) != 0) {
-        TaskObjF__CardLoadStatus(self, p1, p3);
+s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 *formatted) {
+    if (TaskObjF__CardInfoStatus(self, error, cardChanged) != 0) {
+        TaskObjF__CardLoadStatus(self, error, formatted);
     }
 }
 
-extern s32 _card_info(s32 arg0);
-extern s32 _card_clear(s32 arg0);
+extern s32 _card_info(s32 chan);
+extern s32 _card_clear(s32 chan);
 
-s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *p1, s32 *p2) {
+s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *error, s32 *cardChanged) {
     s32 status;
-    s32 code;
+    s32 answer;
 
     status = 1;
-    *p2 = *p1 = 0;
+    *cardChanged = *error = 0;
     TaskObjF__TestEvents(self);
     while (_card_info(self->cardHandle) == 0)
         ;
-    code = TaskObjF__WaitForReadyEvent(self);
-    if (code == 0x100) {
+    answer = TaskObjF__WaitForReadyEvent(self);
+    if (answer == 0x100) {
         status = 0;
-    } else if (code == 0x8000) {
+    } else if (answer == 0x8000) {
         status = 0;
-        *p1 = 1;
-    } else if (code == 0x2000) {
-        *p2 = 1;
+        *error = 1;
+    } else if (answer == 0x2000) {
+        *cardChanged = 1;
         _card_clear(self->cardHandle);
     }
     return status;
 }
 
-extern s32 _card_load(s32 arg0);
+extern s32 _card_load(s32 chan);
 
-s32 TaskObjF__CardLoadStatus(TaskObjF *self, s32 *p1, s32 *p2) {
+s32 TaskObjF__CardLoadStatus(TaskObjF *self, s32 *error, s32 *formatted) {
     s32 status;
-    s32 code;
+    s32 answer;
 
     status = 1;
-    *p2 = (*p1 = 0, status);
+    *formatted = (*error = 0, status);
     TaskObjF__TestEvents(self);
     while (_card_load(self->cardHandle) == 0)
         ;
-    code = TaskObjF__WaitForReadyEvent(self);
-    if (code == 0x100) {
+    answer = TaskObjF__WaitForReadyEvent(self);
+    if (answer == 0x100) {
         status = 0;
-    } else if (code == 0x8000) {
+    } else if (answer == 0x8000) {
         status = 0;
-        *p1 = 1;
-    } else if (code == 0x2000) {
-        *p2 = 0;
+        *error = 1;
+    } else if (answer == 0x2000) {
+        *formatted = 0;
     }
     return status;
 }
@@ -255,7 +252,7 @@ s32 TaskObjF__FormatCard(TaskObjF *self) {
  * BuildMemcardPath's 3rd argument. Round 75 corrected the earlier reading
  * that TaskObjF__OpenAndReadMemcardFile never used it: it never TOUCHES $a2, because the value
  * is already where the call wants it. */
-s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destBuf, char *suffix) {
+s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destTitle, char *suffix) {
     s32 retries;
     s32 result;
 
@@ -264,90 +261,90 @@ s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destBuf, char *suffix) {
         return 0;
     }
     do {
-        result = TaskObjF__OpenAndReadMemcardFile(self, destBuf, suffix);
+        result = TaskObjF__OpenAndReadMemcardFile(self, destTitle, suffix);
     } while (result == 0 && retries-- != 0);
     return result;
 }
 
-extern s32 open(void *arg0, s32 arg1);
-extern s32 read(s32 arg0, void *arg1, s32 arg2);
-extern s32 close(s32 arg0);
+extern s32 open(char *path, s32 mode);
+extern s32 read(s32 handle, void *buf, s32 size);
+extern s32 close(s32 handle);
 
-s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destBuf, char *suffix) {
+s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destTitle, char *suffix) {
     s32 pathBuf[8];
-    void *path;
+    char *path;
     s32 handle;
-    void *buf;
+    void *header;
 
     path = BuildMemcardPath(pathBuf, self->cardSlot, suffix);
     handle = open(path, 1);
     if (handle == -1) {
         return 0;
     }
-    if (destBuf != NULL) {
-        buf = BMemPMgrAlloc(0x80);
-        read(handle, buf, 0x80);
-        strcpy(destBuf, (char *)buf + 4);
-        BMemPMgrFree(buf);
+    if (destTitle != NULL) {
+        header = BMemPMgrAlloc(0x80);
+        read(handle, header, 0x80);
+        strcpy(destTitle, (char *)header + 4);
+        BMemPMgrFree(header);
     }
     close(handle);
     return 1;
 }
 
-char *TaskObjF__FindUnusedMemcardName(TaskObjF *self, char *buf, char *middle, char **entries) {
-    while (*entries != NULL) {
-        strcpy(buf, middle);
-        strcat(buf, *entries);
+char *TaskObjF__FindUnusedMemcardName(TaskObjF *self, char *buf, char *prefix, char **suffixes) {
+    while (*suffixes != NULL) {
+        strcpy(buf, prefix);
+        strcat(buf, *suffixes);
         if (self->methods->probeMemcardFile(self, 0, buf) == 0) {
             return buf;
         }
-        entries++;
+        suffixes++;
     }
     return NULL;
 }
 
-s32 TaskObjF__CollectExistingMemcardFiles(TaskObjF *self, char **destBufs, char **outArr,
-                                          char *middle, char **entries) {
+s32 TaskObjF__CollectExistingMemcardFiles(TaskObjF *self, char **destTitles, char **outSuffixes,
+                                          char *prefix, char **suffixes) {
     s32 count;
-    char buf[0x20];
+    char name[0x20];
 
     count = 0;
-    while (*entries != NULL) {
-        strcpy(buf, middle);
-        strcat(buf, *entries);
-        if (self->methods->probeMemcardFile(self, *destBufs, buf) != 0) {
+    while (*suffixes != NULL) {
+        strcpy(name, prefix);
+        strcat(name, *suffixes);
+        if (self->methods->probeMemcardFile(self, *destTitles, name) != 0) {
             count++;
-            *outArr = *entries;
-            destBufs++;
-            outArr++;
+            *outSuffixes = *suffixes;
+            destTitles++;
+            outSuffixes++;
         }
-        entries++;
+        suffixes++;
     }
     return count;
 }
 
-s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 id, s32 sizeArg) {
+s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 iconFrames, s32 size) {
     s32 retries;
     s32 result;
 
     retries = 10;
     do {
-        result = TaskObjF__ProbeCardFreeSpace(self, id, sizeArg);
+        result = TaskObjF__ProbeCardFreeSpace(self, iconFrames, size);
     } while (result == 0 && retries-- != 0);
     return result;
 }
 
-extern s32 delete (void *arg0);
+extern s32 delete (void *path);
 
-s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 id, s32 sizeArg) {
+s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
     s32 pathBuf[8];
-    void *path;
+    char *path;
     s32 handle;
-    s32 sectors;
+    s32 blocks;
 
-    sectors = (u32)(sizeArg + 0x21FF) >> 13;
-    path = BuildMemcardPath(pathBuf, self->cardSlot, &sMcTempFileSuffix);
-    handle = open(path, (sectors << 16) | 0x200);
+    blocks = (u32)(size + 0x21FF) >> 13;
+    path = BuildMemcardPath(pathBuf, self->cardSlot, sMcTempFileSuffix);
+    handle = open(path, (blocks << 16) | 0x200);
     if (handle == -1) {
         return 0;
     }

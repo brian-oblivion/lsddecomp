@@ -63,8 +63,8 @@ struct TaskObjFMethods {
     /* +0x040 */ void (*setCardSlot)(TaskObjF *self, s32 cardSlot); /* TaskObjF__SetCardSlot; the ctor's last call */
     /* +0x044 */ s32 (*openEvents)(TaskObjF *self);  /* TaskObjF__OpenEvents */
     /* +0x048 */ s32 (*closeEvents)(TaskObjF *self); /* TaskObjF__CloseEvents */
-    /* +0x04C */ s32 (*checkCardStatus)(TaskObjF *self, s32 *outA, s32 *outB,
-                                        s32 *outC); /* TaskObjF__CheckCardStatus; Validate reads the three */
+    /* +0x04C */ s32 (*checkCardStatus)(TaskObjF *self, s32 *error, s32 *cardChanged,
+                                        s32 *formatted); /* TaskObjF__CheckCardStatus; Validate reads the three */
     /* +0x050 */ s32 (*formatCard)(TaskObjF *self); /* TaskObjF__FormatCard; setState(0x13) */
     /* +0x054 */ s32 (*probeMemcardFile)(TaskObjF *self, char *destTitle,
                                          char *suffix); /* TaskObjF__ProbeMemcardFile: nonzero when the file opens */
@@ -221,18 +221,18 @@ void TaskObjF__RemoveAllChildren(TaskObjF *self);
 void TaskObjF__SetCardSlot(TaskObjF *self, s32 cardSlot);
 s32 TaskObjF__OpenEvents(TaskObjF *self);
 s32 TaskObjF__CloseEvents(TaskObjF *self);
-s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *p1, s32 *p2, s32 *p3);
-s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *p1, s32 *p2, s32 *p3);
-s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *p1, s32 *p2);
-s32 TaskObjF__CardLoadStatus(TaskObjF *self, s32 *p1, s32 *p2);
+s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 *formatted);
+s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 *formatted);
+s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *error, s32 *cardChanged);
+s32 TaskObjF__CardLoadStatus(TaskObjF *self, s32 *error, s32 *formatted);
 s32 TaskObjF__FormatCard(TaskObjF *self);
-s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destBuf, char *suffix);
-s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destBuf, char *suffix);
-char *TaskObjF__FindUnusedMemcardName(TaskObjF *self, char *buf, char *middle, char **entries);
-s32 TaskObjF__CollectExistingMemcardFiles(TaskObjF *self, char **destBufs, char **outArr,
-                                          char *middle, char **entries);
-s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 id, s32 sizeArg);
-s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 id, s32 sizeArg);
+s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destTitle, char *suffix);
+s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destTitle, char *suffix);
+char *TaskObjF__FindUnusedMemcardName(TaskObjF *self, char *buf, char *prefix, char **suffixes);
+s32 TaskObjF__CollectExistingMemcardFiles(TaskObjF *self, char **destTitles, char **outSuffixes,
+                                          char *prefix, char **suffixes);
+s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 iconFrames, s32 size);
+s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size);
 s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
 s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize);
 s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, char a3,
