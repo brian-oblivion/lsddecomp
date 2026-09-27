@@ -57,3 +57,21 @@ This is the opposite of MATCHING-GUIDE's usual "write early exits as
 guard clauses" advice for LARGE bodies -- for a body this small, retail
 apparently kept the natural `if`/`else` and it is the SOURCE's actual
 shape, not something GCC restructured.
+
+## Round 97 (bravo, track 6): EntryDAD4 retired onto SpuRegs
+
+`EntryDAD4` (the unit's local view of `D_8006DAD4` as an array of 0x10-byte
+entries, fields `unk0`/`unk2`) is the SPU voice register block: libsnd
+vmanager's first .data word points at 0x1F801C00, and code_179d8_m.c's
+SpuVmInit had already typed it `SpuRegs *` with a 24 x 0x10 `voice[]` array
+at +0. `unk0`/`unk2` are `volL`/`volR`. The type moved to include/SvmData.h.
+
+Measured: `D_8006DAD4->voice[idx].volL` is 19/22 -- the two address `addu`s
+come out `addu v0,v0,v1` where retail has `addu v0,v1,v0` (3 words, same
+length). `(D_8006DAD4->voice + idx)->volL` is 22/22, byte-exact, and is the
+spelling in src/ with a MATCHING line. The old `D_8006DAD4[idx].unk0`
+(pointer indexed directly) matched for the same reason: GCC orders the addu
+operands differently for an ARRAY_REF of a struct member than for pointer
+arithmetic. SsUtGetVVol's `&D_8006DAD4->voice[idx]` is byte-exact either way.
+
+The return type is now `s16`, Sony's `short` from <libsnd.h>; zero bytes.

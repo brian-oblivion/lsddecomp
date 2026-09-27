@@ -153,3 +153,13 @@ with both (`cmp`), and `./build-and-verify.sh` stayed green both times. In the
 current source the order no longer depends on them (what changed since they
 were needed was not measured; the `SvmSreg` retype above is a candidate); lever 1 (the `dead[2]` frame idiom) was not touched. `SsUtChangeADSR`
 now carries no `__asm__`.
+
+## Round 97 (bravo, track 6)
+
+The definition now takes <libsnd.h>'s prototype: return type `s32` became `s16` (Sony's `short`). Zero bytes.
+The in-source comment on `dead` shrank to a MATCHING line; its content was:
+`dead` is never read and the write is unreachable; it exists to make GCC
+allocate retail's empty 8-byte frame, which puts the two stack-passed
+arguments at 0x18/0x1C($sp) instead of 0x10/0x14 -- the frame is the ONLY
+thing the idiom is for, and adding anything else on top of it breaks the
+scheduling.

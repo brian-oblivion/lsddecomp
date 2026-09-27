@@ -122,3 +122,9 @@ distinct lever from reordering the existing statements, and it is *not*
 covered by "tried three declaration/assignment orderings, all identical" --
 all three of round 21's reshapes kept the same per-field load-then-divide
 grouping and only moved surrounding pointer-rescue statements around it.
+
+## Round 97 (bravo, track 6)
+
+The definition now takes <libsnd.h>'s prototype: return type `s32` became `s16` (Sony's `short`). Zero bytes.
+The local `EntryDAD4 *e` became `SpuVoiceRegs *e = &D_8006DAD4->voice[idx]`
+(fields `volL`/`volR`); see SsUtGetDetVVol.md for the SpuRegs evidence.

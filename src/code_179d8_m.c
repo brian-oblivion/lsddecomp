@@ -10,8 +10,8 @@
  * tones are <libsnd.h>'s VabHdr/ProgAtr/VagAtr behind libsnd's _svm_vh,
  * _svm_pg and _svm_tn (pinned in config/psyq-objects.ld, spelled here by
  * their D_ addresses), a sequence is include/SsScore.h's record, and the
- * per-voice state is include/SvmData.h's _svm_voice/_svm_sreg_buf. SpuRegs,
- * below, is the SPU's own register block at 0x1F801C00.
+ * per-voice state is include/SvmData.h's _svm_voice/_svm_sreg_buf. D_8006DAD4
+ * points at the SPU's own register block, SvmData.h's SpuRegs.
  *
  *   - SpuVmInit: resets the voice manager: every voice, its shadow
  *     registers and the SPU voice registers, the reverb depth to 0x3FFF,
@@ -276,32 +276,8 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 
-/* The PS1 SPU's register block, 0x1F801C00: libsnd/vmanager.o's first
- * .data word, which D_8006DAD4 holds. Only the registers this unit touches
- * are named. Declared without volatile, the spelling this unit's matched
- * bodies were derived against (code_179d8_p reads it through a volatile
- * view). */
-typedef struct {
-    s16 volL;  /* +0x0 -- left volume */
-    s16 volR;  /* +0x2 -- right volume */
-    s16 pitch; /* +0x4 -- sample rate; 0x1000 plays at 44.1 kHz */
-    s16 addr;  /* +0x6 -- start address in sound RAM, in 8-byte units */
-    s16 adsr1; /* +0x8 */
-    s16 adsr2; /* +0xA */
-    u16 envx;  /* +0xC -- current envelope level; 0 once the voice has died */
-    u8 padE[0x10 - 0xE];
-} SpuVoiceRegs;
-
-typedef struct {
-    SpuVoiceRegs voice[24]; /* +0x000 */
-    u8 pad180[0x188 - 0x180];
-    u16 keyOn[2];  /* +0x188 -- voices 0-15, 16-23: a set bit keys the voice on */
-    u16 keyOff[2]; /* +0x18C -- a set bit releases the voice */
-    u8 pad190[0x194 - 0x190];
-    u16 noiseOn[2];  /* +0x194 -- a set bit plays the voice from the noise generator */
-    u16 reverbOn[2]; /* +0x198 -- a set bit sends the voice to the reverb */
-} SpuRegs;
-
+/* Declared without volatile, the spelling this unit's matched bodies were
+ * derived against. */
 extern SpuRegs *D_8006DAD4;
 
 /* MATCHING: `scratch` is one local reused for the clamp and for the

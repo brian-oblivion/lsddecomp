@@ -652,3 +652,89 @@ currently reproduce.
 ## Track 2 (round 86, 2026-09-26, alpha)
 
 This function is still `INCLUDE_ASM` and its C was not touched, but the per-field symbols this report uses (`D_8008D988`..`D_8008D9BA` at a 0x34 stride) are ONE Sony table: libsnd/vmanager.o's `_svm_voice` (0x8008D988, 24 x 0x34 = 0x4E0 bytes), typed in `include/SvmData.h` with fields by offset (`D_8008D98C` is `_svm_voice[i].unk04`, `D_8008D9A3` is `unk1B`, and so on: address minus 0x8008D988). The next attempt should write `_svm_voice[i].unkNN`: in every converted accessor (libsnd_vm_vol_ut_key_ut_keyv/j_c/l/m/p) the struct spelling compiled byte-identically to the separate symbols, and two NON_MATCHING bodies moved closer to retail. The other `D_` spellings in preserved bodies below still link (splat keeps them as auto-symbols).
+
+## Round 97 (bravo, track 6): the unit banner and comments, moved here
+
+code_179d8_j_c.c took <libsnd.h> and its banner was rewritten as documentation. The history it carried, verbatim:
+
+```c
+/*
+ * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
+ * every claim in this comment that a function is BLOCKED by `gp_rel`,
+ * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
+ * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
+ * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
+ * none of them.  Any "do NOT spend attempts on these" directive below is
+ * therefore RETRACTED: those functions are ordinary matching work, and most
+ * carry a mechanism-correct partial derivation already.  The rest of this
+ * comment still stands -- only the blocker verdicts are withdrawn.
+ * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ *
+ * code_179d8_j_c -- the TAIL of the old code_179d8_j slice, split off in round
+ * 34 (2026-09-12) when Sony's `libsnd/ut_pb.o` was linked into the middle of
+ * `libsnd_vm_vol_ut_key_ut_keyv`.  Now 0x22244..0x2273C (vram 0x80031A44..0x80031F3C), eight
+ * functions (SsUtChangePitch .. SsUtAutoPan).
+ *
+ * WHY THE SPLIT EXISTS.  `func_800319B4` is Sony's `SsUtPitchBend`
+ * (`libsnd/ut_pb`, Psy-Q 3.6 -- the only disc carrying the module; 0x90 text
+ * covering exactly that one function).  It had been MATCHED as C;
+ * reclassifying it out of the game count is the correction CLAUDE.md asks for,
+ * not a regression.  A placed object cannot live inside a `c` segment, so
+ * `libsnd_vm_vol_ut_key_ut_keyv` became [c][o][c] and this half needed its own name.
+ *
+ * This is the SECOND split of the same original slice in the same round --
+ * `libsnd/vm_prog` took 0x20FF0..0x21180 first, which is what created
+ * `libsnd_vm_vol_ut_key_ut_keyv`.  Hence the `_c` suffix: `_b` was already taken.  The
+ * precedent for a second-generation split name is the yaml's own note on
+ * `<unit>_b` / `<unit>_c`.
+ *
+ * NO RODATA ATTACH CAME WITH THIS HALF, and that is measured, not assumed: the
+ * old code_179d8_mid_c monolith contains zero `jtbl_` and zero `.word .L`
+ * across its whole extent, and the splat yaml's rodata slot list names none of
+ * `code_179d8_j`, `_j_b` or `_j_c`.  Unlike round 33's libsnd_ssinit_libapi_counter there
+ * was nothing to move, and a link failure of the form
+ * `undefined reference to '.L8003....'` would mean something else.
+ *
+ * DECLARATIONS: this file carries its own copy of what its functions use,
+ * split out of the old shared block.  Keep it that way -- do NOT create a
+ * shared code_179d8*.h.  The sibling slices are staffed independently and a
+ * shared header is what makes their merges collide; see
+ * `python3 tools/headercontention.py`.
+ *
+ * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
+ * re-implementing the greps and never for `addiu_at` (resolved round 21).
+ * `nearmiss.py` runs `tools/sdkstalls.py` for you.  SsUtChangePitch carries a
+ * HEAD SALVAGE body in its report (84/88 words, round 31) -- read the report
+ * before starting, it is not cold ground.
+ *
+ * Expect this slice to span more than one class; identify each with
+ * tools/classtable.py rather than assuming the unit has one.  Keep every
+ * function in strict ROM-address order.
+ */
+
+
+----
+/* ------------------------------------------------------------------------
+ * Cross-unit calls, typed per-call-site from the registers loaded before
+ * each `jal` -- none of these callees have an established prototype yet, so
+ * these are local guesses, not authoritative.  (This note used to add "several
+ * are themselves addiu-$at blocked in their own units"; that is stale as of
+ * round 21 and was removed rather than left to be believed.)  See CLAUDE.md's note on this.
+ * ------------------------------------------------------------------------ */
+/* SpuVmKeyOn (round 76, was StartNote) is Sony libsnd/vmanager INTERNAL --
+ * unlike SsUtKeyOn (code_179d8_e.c), it has no public prototype in
+ * LIBSND.H (grep confirms no `Vm`-prefixed extern anywhere in that
+ * header), so this stays the byte-exact local-guess signature rather
+ * than a header copy. */
+
+----
+/* STALL -- see docs/match-reports/SsUtChangePitch.md.  HEAD SALVAGE, round 31,
+ * confirmed round 32 (permuter, ~54k iterations, not closed). Round 36:
+ * rebuilt with SpuVmVSetUp's real name (was func_80032148 in the report's
+ * preserved body -- round 34's SDK conversion renamed the callee, and the
+ * report's body was never corrected). Measured 84/88 words, exact length,
+ * matching the prior figure exactly; a barrier between the D_8008EA26/
+ * D_8008EA22 stores (the one untested lever the report flagged) blows the
+ * function up drastically instead of fixing the swap -- see this round's
+ * report update. */
+```
