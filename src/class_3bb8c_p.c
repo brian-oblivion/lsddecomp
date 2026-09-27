@@ -121,28 +121,14 @@ typedef struct GridQuery {
  * of GridCell cells (each with its `nextInCell` chain) Actor__ScanGridWindow
  * walks. */
 
-/* Output buffer filled in by the grid's computeFootprintDescriptor (a
- * Descriptor10Ext, include/StageMap.h: queryCol/queryRow are base.b2/b3,
- * source is unk24; this view is 0x30 bytes, and the frame needs it) and read back by this unit's own Actor__BuildLinkQueries.
- * Only the three fields actually touched are named. `queryCol`/`queryRow`
- * feed straight into GridQuery::startCol/startRow (Actor__BuildLinkQueries,
- * matched round 75; round 57 naming pass). */
-typedef struct LinkQueryBuf {
-    u8 pad00[0x2];
-    s8 queryCol;
-    s8 queryRow;
-    u8 pad04[0x24 - 0x4];
-    ChunkSlot *source;
-    u8 pad28[0x30 - 0x28];
-} LinkQueryBuf;
-
 void *AcceptGridElem(void *arg0, void *arg1, void *arg2);
-s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, LinkQueryBuf *arg3, s32 arg4);
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, Descriptor10Ext *arg3,
+                            s32 arg4);
 void *Actor__ScanLinkCandidates(Actor *self, void *arg1, void *arg2, s32 count, GridQuery *arr1,
                                 ChunkSlot **arr2);
 
 s32 Actor__FindNearbyLink(Actor *self) {
-    LinkQueryBuf sp18;
+    Descriptor10Ext sp18;
     GridQuery sp48[3];
     /* No known field needs this gap; empirically required to reproduce
      * retail's exact stack layout for sp78/sp88 below (round 2026-09-04,
@@ -154,8 +140,7 @@ s32 Actor__FindNearbyLink(Actor *self) {
     if (self->grid != NULL) {
         void *pos = &self->coord2->tx;
 
-        if (self->grid->methods->computeFootprintDescriptor(self->grid, (Descriptor10Ext *)&sp18,
-                                                            pos) == 0) {
+        if (self->grid->methods->computeFootprintDescriptor(self->grid, &sp18, pos) == 0) {
             s32 count = Actor__BuildLinkQueries(self, sp48, sp78, &sp18, 1);
             void *result = Actor__ScanLinkCandidates(self, &sp88, pos, count, sp48, sp78);
 
@@ -172,9 +157,10 @@ s32 Actor__FindNearbyLink(Actor *self) {
     return 0;
 }
 
-s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, LinkQueryBuf *arg3, s32 arg4) {
-    s32 f2 = arg3->queryCol;
-    s32 f3 = arg3->queryRow;
+s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, Descriptor10Ext *arg3,
+                            s32 arg4) {
+    s32 f2 = arg3->base.b2;
+    s32 f3 = arg3->base.b3;
     s32 numCols;
     s32 numRows;
     s32 col;
@@ -197,7 +183,7 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, Link
         arr1[0].startRow = row;
         arr1[0].numCols = numRows;
         arr1[0].numRows = numRows;
-        src = arg3->source;
+        src = arg3->slot;
         arr2[0] = src;
         unk4C = self->grid;
         unk68 = unk4C->config;
@@ -240,7 +226,7 @@ s32 Actor__BuildLinkQueries(Actor *self, GridQuery *arr1, ChunkSlot **arr2, Link
     arr1[0].startRow = row;
     arr1[0].numCols = numCols;
     arr1[0].numRows = numRows;
-    arr2[0] = arg3->source;
+    arr2[0] = arg3->slot;
     return 1;
 }
 
