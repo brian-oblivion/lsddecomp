@@ -15,7 +15,7 @@ Stashes `self` (arg1) and two more scalar args (arg2, arg3) into `.sbss`
 globals `gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport`, then runs a fixed 2-iteration
 loop calling `self->methods->slot80(self, gStyleEffectModelIds[i])` and feeding the
 result plus `&D_8008AB94` (a 1-word `.sdata` constant, address-only, never
-loaded) to library function `SetTargetOffset` (still `psyq_fa50.s`, unrenamed
+loaded) to library function `TmdModel__SetFirstPrimClut` (still `psyq_fa50.s`, unrenamed
 Psy-Q object; called with an unused return value). `arg0` (the function's
 first parameter) is never read anywhere in the body -- it is discarded, the
 same as its caller (`StyleBuildEffectSlots`, unaddressed `class_3bb8c_n.s`) passes
@@ -28,7 +28,7 @@ extern s32 gStyleEffectViewport;
 extern s32 gStyleEffectModelIds[3];
 extern s32 D_8008AB94;
 
-extern void SetTargetOffset(void *arg0, void *arg1);
+extern void TmdModel__SetFirstPrimClut(void *arg0, void *arg1);
 
 void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     s32 i;
@@ -40,7 +40,7 @@ void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     i = 0;
     do {
         ret = self->methods->slot80(self, gStyleEffectModelIds[i]);
-        SetTargetOffset(ret, &D_8008AB94);
+        TmdModel__SetFirstPrimClut(ret, &D_8008AB94);
         i++;
     } while (i < 2);
 }
@@ -73,14 +73,14 @@ slot (return/argument shape) without derivation risk.
 confirmed by the `self->methods->slot80` dispatch), and the mechanics are
 fully described in this report (stash `self`/two scalars into three
 globals, then loop twice through the still-unresolved `slot80` occupant
-and an unrenamed Psy-Q object, `SetTargetOffset`), but nothing establishes
+and an unrenamed Psy-Q object, `TmdModel__SetFirstPrimClut`), but nothing establishes
 WHAT this accomplishes -- `arg0` is discarded by every known caller, and
 `class_3bb8c_s.c`'s own comment calls it merely "ctor-shaped" as a guess,
 not a finding. Kept the tier-C `Class__func_xxxxx` form.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Actor (it calls getSetUnk10Flag8, +0x080, through its table; the s32 result is cast to the void * SetTargetOffset takes). Still tier C. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Actor (it calls getSetUnk10Flag8, +0x080, through its table; the s32 result is cast to the void * TmdModel__SetFirstPrimClut takes). Still tier C. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4b (2026-09-25, round 85)
 
@@ -97,7 +97,7 @@ method: its one caller, StyleBuildEffectSlots, passes the variant (unused),
 ObjM's DREAMER.TMD resource (a LinkResource, cast to Actor), ETC.TIM and the
 viewport, and it only stores them for StyleEffect's methods and prepares
 the two models the TMD's +0x080 slot (LinkResource's getModel) returns for
-gStyleEffectModelIds[0..1] (SetTargetOffset with D_8008AB94). The stored
+gStyleEffectModelIds[0..1] (TmdModel__SetFirstPrimClut with D_8008AB94). The stored
 globals were renamed with it (one rename.py run each): D_8008ACA4 ->
 gStyleEffectTmd, D_8008ACA8 -> gStyleEffectTim, D_8008ACAC ->
 gStyleEffectViewport, D_8008AB98 -> gStyleEffectModelIds. PROPOSED (not

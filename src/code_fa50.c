@@ -13,9 +13,9 @@
  * collision helpers in code_d294_b.c/code_d294_c.c.
  *
  * RotateAndOffsetHullList takes a hull list, not a TmdModel, and is a free
- * function; the tail of the file (AccumulateTargetOffset, SetTargetOffset)
+ * function; the tail of the file (AccumulateTargetOffset, TmdModel__SetFirstPrimClut)
  * is NOT TmdModel either: a separate Outer_fa50/Inner_fa50/Target_fa50
- * pointer chain with no confirmed owning class, and SetTargetOffset's one
+ * pointer chain with no confirmed owning class, and TmdModel__SetFirstPrimClut's one
  * caller is class_3bb8c_o.c.
  *
  * Tiers and match evidence for every function are in each function's own
@@ -637,7 +637,7 @@ void AccumulateTargetOffset(TmdModel *self, s32 *xy) {
 }
 
 /* Points the first primitive's CLUT id at the CLUT at VRAM (xy[0], xy[1]). */
-void SetTargetOffset(TmdModel *self, s16 *xy) {
+void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy) {
     TMD_P_TF3 *t = (TMD_P_TF3 *)self->object->prims;
     s32 v;
 
