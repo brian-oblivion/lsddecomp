@@ -33,3 +33,10 @@ group; see `SceneNode__SetDisplay.md`).
 ## Naming
 
 Round 71 (alpha). `func_8001D374` -> `SceneNode__SetSemiTrans`, **tier A**. Table slot +0x064. Sets attribute bit 30, GsALON (semi-transparency on), to on != 0 and returns the old bit. class_3bb8c_s calls the slot setSemiTrans.
+
+Round 96 (alpha, track 6). The +0x064 slot is `setSemiTransOn`, not
+`setSemiTrans`: <libgpu.h> defines the function-like macro
+`setSemiTrans(p, abe)`, so `methods->setSemiTrans(self, 1)` expanded to Sony's
+macro (a parse error) in every caller that takes Sony's headers
+(class_3bb8c_m, class_3bb8c_s, code_2cc8c_e). Sony keeps Sony's names, so the
+slot moved; the method names do not collide and stay. Zero bytes.

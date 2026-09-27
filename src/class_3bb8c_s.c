@@ -285,7 +285,7 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
         m->setColor(child, arg);
     } else {
         child = self->sprites[1];
-        child->methods->setSemiTrans(child, 1);
+        child->methods->setSemiTransOn(child, 1);
         child->methods->setSemiTransRate(child, 0);
         child->methods->updateScale(child, 1, (parity != 0) ? gSpriteScaleLarge : gSpriteScaleSmall);
     }

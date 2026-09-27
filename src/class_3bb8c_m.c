@@ -321,7 +321,7 @@ void ApplyStyleDecorationIfSet(void) {
 
     if (gStyleDecorColor != 0) {
         gStyleDecorObj = (s32)New_BoxFill(&D_8008AB60, (void *)gStyleDecorColor, 0);
-        ((BoxFill *)gStyleDecorObj)->methods->setSemiTrans((BoxFill *)gStyleDecorObj, 1);
+        ((BoxFill *)gStyleDecorObj)->methods->setSemiTransOn((BoxFill *)gStyleDecorObj, 1);
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTransRate((BoxFill *)gStyleDecorObj, 0);
 
         tmp = ((FieldAC7CHolder *)gStyleSceneRefs)
