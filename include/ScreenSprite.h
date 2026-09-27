@@ -40,6 +40,11 @@ typedef struct ScreenSprite ScreenSprite;
 typedef struct ScreenSpriteMethods ScreenSpriteMethods;
 typedef struct ScreenSpritePos ScreenSpritePos;
 
+/* ScreenSprite's class id (gScreenSpriteMethods word +0x000). Three nibbles,
+ * so `(header & 0xFFF) == SCREENSPRITE_CLASS_ID` is its is-kind-of test
+ * (Viewport__DrawNode). */
+#define SCREENSPRITE_CLASS_ID 0x144
+
 /* A screen position: percent of half the screen width/height, from the
  * centre (Viewport__DrawNode). */
 struct ScreenSpritePos {

@@ -45,6 +45,12 @@ typedef struct SpriteRgb SpriteRgb;
 typedef struct SpriteRect SpriteRect;
 typedef struct SpriteGs SpriteGs;
 
+/* Sprite's class id (gSpriteMethods word +0x000). Two nibbles, so
+ * `(header & 0xFF) == SPRITE_CLASS_ID` is its is-kind-of test, true for
+ * every subclass too: ScreenSprite (0x144) and VariantSprite (0x1F44)
+ * (Viewport__DrawNode). */
+#define SPRITE_CLASS_ID 0x44
+
 /* A 3-byte colour. All-s8 members give it alignment 1, which is what makes
  * Sprite__SetColor's whole-struct copy compile to lb,lb,lb then sb,sb,sb
  * (DECOMPILATION_LEARNINGS, the 3-byte all-s8 struct idiom). */

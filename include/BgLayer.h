@@ -54,6 +54,11 @@ struct TileMap;
 typedef struct BgLayer BgLayer;
 typedef struct BgLayerMethods BgLayerMethods;
 
+/* BgLayer's class id (gBgLayerMethods word +0x000). Two nibbles, so
+ * `(header & 0xFF) == BGLAYER_CLASS_ID` is its is-kind-of test
+ * (Viewport__DrawNode). */
+#define BGLAYER_CLASS_ID 0x54
+
 /* GsBG's r, g, b. Signed: see the banner. */
 typedef struct BgLayerRgb {
     s8 r;
