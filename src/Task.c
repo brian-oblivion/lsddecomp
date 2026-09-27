@@ -8,7 +8,20 @@
  * tasks; this file holds its allocator, ctor, finalize, resetCounters, init
  * and the onInit/onDeinit hooks, which build and tear down the TileAtlas ->
  * TileMap -> BgLayer chain, clear the screen and configure the viewport. The
- * rest of TaskCore is in TaskViewport.c, TaskViewport.c and TaskViewport.c.
+ * rest of TaskCore is in TaskViewport.c, the task classes' second file.
+ *
+ * Edges (track 8, round 100, tools/tuboundary.py). The start edge is
+ * libgs/gs_122, a placed Sony object. The end edge, to TaskViewport.c, is
+ * not one: no rodata crossing, no forced boundary, and "probably one file
+ * with code_2c054" on single-user data (0x8006e86c >= 0x8006e730), with
+ * TaskCore's methods on both sides. The two are one file, and are not
+ * merged only because `unitfile.py merge` refuses: TaskViewport owns the
+ * `.rodata` line at 0x1890 (TaskCore's two jump tables) and this unit owns
+ * none, and the fix it names, renaming that yaml line by hand, is outside a
+ * files runner's rule. Parked for the head; TaskViewport.c's banner has the
+ * rest. Named Task because the merged file is the task classes'; not
+ * StreamTask or TaskCore, whose headers exist (this unit's header would
+ * move onto one).
  */
 #include "common.h"
 #include <libgte.h>

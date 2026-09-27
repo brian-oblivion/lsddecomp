@@ -10,15 +10,23 @@
 #include "TaskCore.h"
 #include "TextRow.h"
 
+/*
+ * src/TaskViewport.c's own declarations (it was include/code_2cc8c.h, the
+ * header of the whole code_2cc8c carve block, and code_2cc8c_e.c and
+ * code_2cc8c_f.c still include it). The classes are in their own headers:
+ * TaskCore.h, IntermediateBase.h, Viewport.h, BoxFill.h, FadeBox.h,
+ * TextRow.h.
+ */
+
 /* Forward typedefs, used by `extern` declarations further up this file
  * than their own struct bodies (round 14, code_2cc8c_e's own local views,
- * referenced by earlier TaskViewport call-site declarations). */
+ * referenced by earlier call-site declarations in TaskViewport.c). */
 typedef struct TexPageDesc TexPageDesc;
 
 /*
  * TaskCore (class id 0x130, gTaskCoreMethods) is declared once, in
- * include/TaskCore.h (track 4, round 84): TaskViewport.c, TaskViewport.c and
- * the first function of TaskViewport.c are its methods from +0x058 on. Its
+ * include/TaskCore.h (track 4, round 84): TaskViewport.c's sections 1 to 3
+ * are its methods from +0x058 on. Its
  * object used to be viewed here as `Obj86B60`, after the address of a
  * SUBCLASS table (gTitleMenuMethods); the views are gone.
  *
@@ -103,8 +111,8 @@ extern void *BMemPMgrFree(void *ptr);                   /* matching free/release
                                             the real return value, so this
                                             unit's shared view is retyped.
                                             Every existing call site in
-                                            this unit (TaskViewport.c,
-                                            TaskViewport.c) discards the
+                                            this unit (TaskViewport.c's
+                                            sections 2 and 4) discards the
                                             result too, so this is a
                                             zero-byte-cost retype -- full
                                             build reconfirmed green. */

@@ -1,17 +1,39 @@
-/* TaskViewport -- TaskCore's own methods from +0x058 to +0x0C0: the pad
- * dispatch and its five button handlers, the state machine (update and
- * setState), the frame bound, the sound call, the view callback and the
- * fade-in/fade-out pair. Each is the default for its slot in
- * gTaskCoreMethods, which StreamTask, TitleMenu and GraphRoom inherit or
- * override; include/TaskCore.h's banner describes the class and its states.
- * The slot and item-list methods that follow are in code_2cc8c_b.c.
+/*
+ * TaskViewport -- the second file of the task classes (src/Task.c is the
+ * first): TaskCore from +0x058 to its table getter, IntermediateBase whole,
+ * and Viewport except drawNode (src/ViewportDraw.c). In address order:
+ *  1. TaskCore's pad dispatch, state machine and fades, +0x058 to +0x0C0;
+ *  2. TaskCore's menu methods, +0x0C4 to +0x11C;
+ *  3. TaskCore's last method and table getter, IntermediateBase (TaskCore's
+ *     parent), then Viewport's allocator, ctor, finalize and child
+ *     overrides;
+ *  4. Viewport from onNotify (+0x038) to its table getter, GetRootNode, and
+ *     Sony's GsSetProjection.
+ * include/TaskCore.h, include/IntermediateBase.h and include/Viewport.h
+ * describe the classes; include/TaskViewport.h holds this file's own
+ * declarations (and still serves code_2cc8c_e/_f, carved from the same
+ * block).
  *
- * Input: while inputMode is not NONE, onPadEvent maps a press to a handler;
- * each handler plays the button tone (or moves a cursor) and reports what
- * happened as a state, which setState passes to the parents and then folds
- * back into ACTIVE. Fades: tickColorFade adds frameCounter * fadeRate to
- * baseColor and pushes the result to every slot widget and the BgLayer,
- * until it passes TASKCORE_FADE_FULL.
+ * Edges (track 8, round 100, tools/tuboundary.py). The four sections were
+ * the carve slices code_2cc8c, _b, _c and _d, merged on the evidence: no
+ * rodata crossing and no forced boundary in the region, and every inner
+ * edge "probably one file" on single-user data (0x8006e86c >= 0x8006e730
+ * for the first two edges, 0x8008a90c >= 0x8008a8f4 for the third). Content
+ * agrees: TaskCore runs into section 3's first two functions, Viewport from
+ * section 3 into section 4.
+ *  - The start edge, to src/Task.c, has the same evidence ("probably one
+ *    file with code_2c054", the same data) and the same class, TaskCore, so
+ *    the two are one file. They are NOT merged: `unitfile.py merge` refuses
+ *    because this unit owns the `.rodata` line at 0x1890 (the jump tables of
+ *    TaskCore__OnPadEvent and TaskCore__SetState) and Task owns none, and
+ *    the fix it names, renaming that yaml line by hand, is outside a files
+ *    runner's rule (yaml through unitfile.py only). Parked for the head.
+ *  - The end edge: GsSetProjection is Sony's (libgs/gs_106), carried as C
+ *    because no SDK object places it, so the game file really ended at
+ *    GetRootNode; no tool splits a unit, so it stays here.
+ * Not named Viewport or TaskCore: those are the classes' headers, and
+ * `unitfile.py rename --dry-run` refuses to move this unit's header onto
+ * include/Viewport.h.
  */
 
 #include "common.h"
@@ -26,6 +48,22 @@
 #include "Viewport.h"
 #include "LightRig.h"
 #include "FrameClock.h"
+
+/* Section 1. TaskCore's own methods from +0x058 to +0x0C0: the pad
+ * dispatch and its five button handlers, the state machine (update and
+ * setState), the frame bound, the sound call, the view callback and the
+ * fade-in/fade-out pair. Each is the default for its slot in
+ * gTaskCoreMethods, which StreamTask, TitleMenu and GraphRoom inherit or
+ * override; include/TaskCore.h's banner describes the class and its states.
+ * Section 2 follows with the slot and item-list methods.
+ *
+ * Input: while inputMode is not NONE, onPadEvent maps a press to a handler;
+ * each handler plays the button tone (or moves a cursor) and reports what
+ * happened as a state, which setState passes to the parents and then folds
+ * back into ACTIVE. Fades: tickColorFade adds frameCounter * fadeRate to
+ * baseColor and pushes the result to every slot widget and the BgLayer,
+ * until it passes TASKCORE_FADE_FULL.
+ */
 
 void TaskCore__OnPadEvent(TaskCore *self, BasicClass *sender, s32 event) {
     TaskCoreMethods *methods;
@@ -314,12 +352,11 @@ epilogue:
     return done;
 }
 
-/* ---- merged from code_2cc8c_b ---- */
-
 /*
- * TaskCore's menu methods, gTaskCoreMethods +0x0C4 to +0x11C (the class is
- * include/TaskCore.h): the fade-out tick, the sub handle, and a two-level
- * picker over the menu description in `target`, a TaskCoreTarget.
+ * Section 2. TaskCore's menu methods, gTaskCoreMethods +0x0C4 to +0x11C
+ * (the class is include/TaskCore.h): the fade-out tick, the sub handle, and
+ * a two-level picker over the menu description in `target`, a
+ * TaskCoreTarget.
  *
  * The first level is the slots. setTarget makes one TextRow per
  * target->names entry (slotElements); findNextFreeSlot/findPrevFreeSlot step,
@@ -842,9 +879,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
     self->methods->setState(self, TASKCORE_STATE_CURSOR_MOVED);
 }
 
-/* ---- merged from code_2cc8c_c ---- */
-
-/* code_2cc8c_c -- IntermediateBase's methods, the start of Viewport's, and
+/* Section 3. IntermediateBase's methods, the start of Viewport's, and
  * three accessors ahead of them.
  *
  * TaskCore__GetActiveSlotCount, Get_vtable_TaskCore and
@@ -860,10 +895,9 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
  * Last, Viewport (include/Viewport.h): New_Viewport, the ctor, finalize, and
  * the addChild/removeChild/removeAllChildren overrides, which cache a
  * DrawSystem child and a SceneNode child (the view node, whose coord2 the
- * reference view hangs from) by root class id. code_2cc8c_d.c holds the rest
+ * reference view hangs from) by root class id. Section 4 holds the rest
  * of Viewport's table.
  */
-
 
 s32 TaskCore__GetActiveSlotCount(TaskCore *self) {
     return self->slotCounts[self->activeSlot];
@@ -1091,12 +1125,10 @@ void Viewport__RemoveAllChildren(Viewport *self) {
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
-/* ---- merged from code_2cc8c_d ---- */
-
 /*
- * code_2cc8c_d -- Viewport's methods from onNotify (+0x038) to the end of
+ * Section 4. Viewport's methods from onNotify (+0x038) to the end of
  * gViewportMethods (include/Viewport.h, whose banner says what the class
- * is); the ctor, finalize and the child overrides are in TaskViewport.c,
+ * is); the ctor, finalize and the child overrides are in section 3,
  * drawNode in ViewportDraw.c. In table order:
  *  - onNotify and its two per-sender handlers: a FrameClock event runs
  *    update, the DrawSystem's VSync event runs flip;
