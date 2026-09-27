@@ -101,3 +101,7 @@ built with it (`cmp`), and `./build-and-verify.sh` stayed green. In the current
 source the early load of the `highlight` argument no longer depends on the
 barrier (the `s32 flag = highlight;` copy was already present when this was
 measured). The function now carries no `__asm__`.
+
+## Round 99 (delta, track 7)
+
+Local `elem` -> `row`, and the `s32 flag = highlight;` copy dropped: measured byte-identical without it (the early stack-argument load no longer depends on either the copy or the retired barrier). `cursor -= top` keeps a `MATCHING:` line.

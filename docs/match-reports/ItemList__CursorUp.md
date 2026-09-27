@@ -88,3 +88,7 @@ Round 75 (bravo, track 3). `func_800524F8` -> `ItemList__CursorUp`, **tier A**.
 Slot +0x084 (`tools/classtable.py gItemListMethods`). Decrements `cursorIndex`: inside the window via stepCursorInView(self, 0, 1), or at the top row by decrementing both `topIndex` and `cursorIndex` and redrawing. Rows are laid out 0xA apart in increasing y (ItemList__CreateRows), so a lower index is higher on screen. Dispatched by HandleInputCode on code 18.
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+
+## Round 99 (delta, track 7)
+
+Parameters `arg1`, `arg2`, `arg3` -> `unused1`, `unused2`, `forwarded` (also in include/ItemList.h's prototype): the first two are never read, the third is passed to stepCursorInView as a fourth word its occupant does not read (include/ItemList.h banner). The branch polarity and the newTop/newCursor locals keep a `MATCHING:` line.

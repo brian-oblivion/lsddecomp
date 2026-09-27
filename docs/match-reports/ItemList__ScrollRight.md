@@ -76,3 +76,7 @@ Round 75 (bravo, track 3). `func_80052430` -> `ItemList__ScrollRight`, **tier A*
 Slot +0x07C (`tools/classtable.py gItemListMethods`). If rows exist (`resource`) and column+26 < maxTextLen, increments `column` (the character offset into every item string) and redraws via refreshRows. Mechanics are the purpose. Dispatched by HandleInputCode on code 5.
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+
+## Round 99 (delta, track 7)
+
+Local `tmp` -> `current`; the double read keeps a `MATCHING:` line. `0x1A` -> `ITEMLIST_ROW_CHARS` (new, include/ItemList.h): scrolling stops once the row's 26 characters reach the longest item's end.

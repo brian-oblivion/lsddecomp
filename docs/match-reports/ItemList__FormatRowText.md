@@ -127,3 +127,29 @@ ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible r
 to the `s32 *texts` / `char *column` spelling above (whole-image SHA1
 green), so the pointer is on the side the ctor allocates and strcpys into,
 and CreateRows/RefreshRows pass `column` without a cast.
+
+## Round 99 (delta, track 7)
+
+Local `idx` -> `item`. `0x1B`/`0x1A` -> `ITEMLIST_ROW_CHARS` (new, include/ItemList.h: 26, the row width; `len >= 0x1B` is written `len > ITEMLIST_ROW_CHARS`), and the terminator `dest[ITEMLIST_ROW_CHARS] = '\0'`. The padding loop is now plain `for (i = len; i < ITEMLIST_ROW_CHARS; i++)`: measured byte-identical, so the `i = len; if (i < 0x1A) { for (; ...) }` split recorded under "Two residues" no longer carries residue 1 in the current source. Residue 2 (operand order `top + row`) still holds, measured: `row + top` breaks the image; it keeps a `MATCHING:` line.
+
+## History: the strlen/memcpy comment (moved from src/class_3bb8c_k.c, round 99)
+
+The unit now carries a two-line comment; the full text it replaced was:
+
+```c
+/* Psy-Q strlen and memcpy (libc2/strlen and libc2/memcpy, linked from
+ * Sony's own SDK objects). libc2's memcpy guards a NULL dest, copies `n`
+ * bytes a byte at a time and returns dest -- which is why this call site
+ * was read as strncpy-like before the object gave it its name.
+ * Both are declared LOCAL to this unit, not in a shared header, since
+ * these are cross-unit prototypes for functions this unit does not define
+ * (see CLAUDE.md's header-contention rule). strlen already has a
+ * differently-typed local declaration in class_3bb8c_j.c
+ * (`s32 strlen(void *arg0)`); this unit's own call site reads its
+ * argument as a byte pointer, so it is typed `char *` here instead --
+ * per-call-site typing of an undefined function's argument, same
+ * convention as DecodeFullWidthSjis (see include/class_3bb8c.h HEAD NOTE).
+ * memcpy's return type is `void *` to agree with include/psyq/memory.h's
+ * unprototyped declaration should this unit ever include it; the result
+ * is discarded at the one call site either way. */
+```

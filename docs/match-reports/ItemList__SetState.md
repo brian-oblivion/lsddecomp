@@ -116,3 +116,7 @@ class_3bb8c_k. For the head: the TYPE name `ItemList` is still an address
 name; `ListSelector` or similar would fit the reading above, but renaming it
 touches class_3bb8c_j's local `ItemList_3bb8c_j` and 20+ symbols, so it is
 left for a pass that owns both units.
+
+## Round 99 (delta, track 7)
+
+`state < 2` / `< 4` / `== 4` are `ITEMLIST_RESULT_CHOSEN`, `ITEMLIST_STATE_REPORT` (new in include/ItemList.h, value 4: the state that passes `result` to notifyParents; TickClosing enters it, as TextEntry's `TEXTENTRY_STATE_REPORT`). The gotos carry a `MATCHING:` line (see Notes).
