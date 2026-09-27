@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041B20` on 2026-09-25 (tools/rename.py). Address 0x80041b20.
 
-Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gCharSpriteMethods slot +0x008 (ctor) (`tools/classtable.py`).
 - **What:** Fills a stack `SpriteRect` with cell 0x20's rect (`GetCellRect(&r, 0x20)`: u 0, v 8, 8x8), runs the ScreenSprite ctor (`GetScreenSpriteMethods()` slot +0x008) with (self, texture, &r, NULL), installs `GetCharSpriteMethods()`'s table and calls its reset (+0x040, CharSprite__Reset) with the caller's cell. The cell is a `u8` parameter: retail narrows it with `andi a1,s2,0xFF` in the reset call's delay slot (the round's New_CharSprite lever, applied directly).

@@ -7,7 +7,7 @@
  * RequestedFile -- one whole file, requested from the active data-source
  * driver at construction, with a flag that says when it has arrived (class
  * id 0xB03, method table gRequestedFileMethods, parent FileResource; methods
- * in src/code_322b4.c; no subclasses).
+ * in src/Sprite.c; no subclasses).
  *
  * New_RequestedFile(name) allocates it and the ctor passes a 32-byte stack
  * copy of the name to requestLoadFile (+0x06C). On the CD driver with async

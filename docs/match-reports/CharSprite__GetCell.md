@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041C28` on 2026-09-25 (tools/rename.py). Address 0x80041c28.
 
-Round 82, runner alpha (second re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (second re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** gCharSpriteMethods slot +0x0C8 (`tools/classtable.py`).
 - **What:** Returns the byte at +0x0A8. Retail opens and closes a 0x10-byte frame around a single `lbu`.

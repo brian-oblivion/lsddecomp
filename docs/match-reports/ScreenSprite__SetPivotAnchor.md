@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041E58` on 2026-09-25 (tools/rename.py). Address 0x80041e58.
 
-Round 82, runner alpha (fifth slot on code_322b4). Unit `src/code_322b4.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/Sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gCharSpriteMethods and gScreenSpriteMethods slot +0x0C0 (`tools/classtable.py`).
 - **What:** When `parent` (+0x00C) is set, a five-case switch (owns jtbl_80011290) moves the GsSPRITE pivot: 0 = (w/2, h/2), 1 = mx 0, 2 = mx w, 3 = my 0, 4 = my h. Unsigned anchor (`sltiu`).

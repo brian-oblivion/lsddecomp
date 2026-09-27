@@ -6,7 +6,7 @@
 /*
  * ScreenSprite -- the sprite placed in screen space (class id 0x144, method
  * table gScreenSpriteMethods): Sprite's direct subclass, adding a screen
- * position and a pivot anchor. Methods in src/code_322b4.c. The name is for
+ * position and a pivot anchor. Methods in src/Sprite.c. The name is for
  * what the class does, and the evidence is this:
  *  - Viewport__DrawNode (code_2864.c) takes a separate path for
  *    `(tag & 0xFFF) == 0x144`, i.e. this class and everything below it: the

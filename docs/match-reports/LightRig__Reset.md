@@ -4,7 +4,7 @@
 
 > Renamed from `func_80042814` on 2026-09-25 (tools/rename.py). Address 0x80042814.
 
-Round 82, runner alpha (re-staffed slot). Unit `src/code_322b4.c`. Fresh
+Round 82, runner alpha (re-staffed slot). Unit `src/Sprite.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 - **Where:** gLightRigMethods slot +0x040 (reset, over SceneNode__Reset) (`tools/classtable.py`).

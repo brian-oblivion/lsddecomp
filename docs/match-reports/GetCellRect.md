@@ -2,7 +2,7 @@
 
 > Renamed from `func_80041C4C` on 2026-09-25 (tools/rename.py). Address 0x80041c4c.
 
-Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (third re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table (called by CharSprite__SetCell) (`tools/classtable.py`).
 - **What:** Copies the 12-byte record `gCharSpriteCellRect` = {u 0, v 0, w 8, h 8} into `*dst`, then adds `(cell & 0x1F) * 8` to u and `(cell >> 5) * 8` to v: an 8x8 cell in a 32-wide grid.

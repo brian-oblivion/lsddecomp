@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041BDC` on 2026-09-25 (tools/rename.py). Address 0x80041bdc.
 
-Round 82, runner alpha (third re-staffed slot of the round). Unit `src/code_322b4.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (third re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** gCharSpriteMethods slot +0x0C4 (`tools/classtable.py`).
 - **What:** Stores the `u8` cell index at +0x0A8, has `GetCellRect` fill a 12-byte `CellRect_322b4` local at sp+0x10, and copies its low bytes of `u`/`v` into the GsSPRITE u/v at +0x072/+0x073 (`lbu` of a `u16` field narrowed by the `u8` store).
