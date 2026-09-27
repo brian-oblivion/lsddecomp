@@ -32,13 +32,12 @@
  * Children are cached by their class-id nibble (AddChild/RemoveChild): 1 is
  * the DrawSystem (gDrawSystemMethods, id 0x1), 4 a SceneNode, the node the view is
  * attached to. Each is typed by its class (include/DrawSystem.h,
- * include/SceneNode.h); round 87 retired code_2cc8c.h's GenericObj view of
- * the DrawSystem.
+ * include/SceneNode.h).
  *
  * The ctor chains to BasicClass's first (Get_vtable_BasicClass()->ctor),
  * and gNodeGuardedViewportMethods's (0x17, include/NodeGuardedViewport.h) chains to this one,
  * so the id tree (0x0 -> 0x7 -> 0x17) is the ctor chain. NodeGuardedViewport expands
- * these macros (round 87).
+ * these macros.
  *
  * Not settled here: fadeBox holds a FadeBox (0x164, below gBoxFillMethods,
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
@@ -49,6 +48,10 @@
  * and which the size is not shown. drawNode (Viewport__DrawNode) reads its
  * node through code_2864.c's own DrawNode view, so it is not prototyped
  * here.
+ *
+ * The OT pair is Sony's (GsOT headers, GsOT_TAG arrays, PACKET areas), so an
+ * includer takes Sony's headers first (`common.h`, <libgte.h>, <libgpu.h>,
+ * <libgs.h>).
  *
  * The object is 0xBC bytes (New_Viewport).
  */
@@ -76,7 +79,12 @@ struct ViewportRgb {
     s8 b;
 };
 
-/* libgs GsRVIEW2, 0x20 bytes: the argument GsSetRefView2 takes. */
+/* libgs GsRVIEW2, 0x20 bytes, field for field: the argument GsSetRefView2
+ * takes. Kept local rather than Sony's GsRVIEW2 because the game uses vp and
+ * vr as whole vectors: setViewPoint/setViewRef copy each as one LongVec3
+ * (three field stores do not match), and DreamSys hands &vp/&vr to
+ * InterpolateKeyframeValue as its two points. Sony's flat vpx..vrz would put
+ * a LongVec3 cast at each copy to save the two at GsSetRefView2. */
 struct ViewportRefView {
     LongVec3 vp;           /* +0x000, viewpoint: setViewPoint */
     LongVec3 vr;           /* +0x00C, reference point: setViewRef */

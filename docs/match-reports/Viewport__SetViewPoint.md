@@ -54,3 +54,22 @@ void Viewport__SetViewPoint(Unk18Obj *self, Vec3_2cc8c *a1) {
 ## Track 4 (2026-09-25, round 85, bravo)
 
 Renamed from `Unk18Obj__SetViewPos`. Renamed for the GsRVIEW2 member it writes: `refView.vp`, the viewpoint (&self+0x014 is GsSetRefView2's argument). Slot +0x078 `setViewPoint`, parameter `LongVec3 *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+
+Round 96 (alpha, track 6): measured whether `refView` can be Sony's
+GsRVIEW2. With `GsRVIEW2 refView` and the copy written as three field stores
+
+```c
+        self->refView.vpx = vp->x;
+        self->refView.vpy = vp->y;
+        self->refView.vpz = vp->z;
+```
+
+this function and Viewport__SetViewRef each differ from word 0 (retail loads
+all three words before storing; the field form interleaves). The whole-struct
+copy through `*(LongVec3 *)&self->refView.vpx = *vp;` is byte-identical, as is
+the whole image with that spelling, an `(GsCOORDINATE2 *)` cast on
+AddChild's `super` store (SceneNode's coord2 is still the parked
+SceneNodeSub14 view) and DreamSys/class_3bb8c_n reading `vpy`/`vry`. That is
+three casts to save the two at GsSetRefView2, so ViewportRefView stays: Sony's
+layout, with vp and vr as the LongVec3s the game copies and interpolates.
+Revisit when SceneNodeSub14 becomes GsCOORDINATE2 (then it is two for two).

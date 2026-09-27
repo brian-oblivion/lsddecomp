@@ -29,8 +29,9 @@
  * Then the table getter, GetRootNode (update's helper) and Sony's
  * GsSetProjection.
  *
- * The (GsOT *) and (GsRVIEW2 *) casts stand until include/Viewport.h spells
- * ViewportOt and ViewportRefView as Sony's own types.
+ * refView is Viewport.h's ViewportRefView, GsRVIEW2's layout with vp and vr
+ * as vectors (its comment says why), hence the (GsRVIEW2 *) cast at
+ * GsSetRefView2.
  */
 
 /* Forwards to the base onNotify, then dispatches on the sender's class-id
