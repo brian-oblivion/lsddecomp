@@ -22,7 +22,7 @@ typedef struct {
 } FullWidthChars3;
 typedef struct {
     s8 raw[12];
-} Buf12_3bb8c_g;
+} FullWidthChars6;
 typedef struct {
     s8 a, b;
 } FullWidthChar;
@@ -39,7 +39,7 @@ s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1)
         t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
 
         *(FullWidthChar *)(self + 0x18) = *(FullWidthChar *)(gSaveTitleGlyphs + 0x1E);
-        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(gSaveTitleGlyphs + 0x1E);
+        *(FullWidthChars6 *)(self + 0x6) = *(FullWidthChars6 *)(gSaveTitleGlyphs + 0x1E);
 
         idx = atoi((char *)(src + t0)) - 1;
         p = gSaveTitleGlyphs + idx * 2;
@@ -70,7 +70,7 @@ individual loads/stores rather than a merged halfword.
   `gSaveTitleGlyphs[0x1E..0x20)` into `self[0x18..0x1A)`, and copying a 2-byte
   entry out of a `gSaveTitleGlyphs`-relative lookup table (indexed by
   `atoi(...)  - 1`, doubled) into `self[0x8..0xA)`.
-- `Buf12_3bb8c_g` (12 bytes, exactly 3 word chunks, no tail) — the `src !=
+- `FullWidthChars6` (12 bytes, exactly 3 word chunks, no tail) — the `src !=
   NULL` path's bulk copy `self[0x6..0x12) = gSaveTitleGlyphs[0x1E..0x2A)`.
 - `FullWidthChars3` (6 bytes, one word chunk + 2 tail bytes) — the `src ==
   NULL` path's shorter copy `self[0x6..0xC) = gSaveTitleGlyphs[0x1E..0x24)`,

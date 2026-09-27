@@ -346,7 +346,7 @@ typedef struct {
 
 typedef struct {
     s8 raw[12];
-} Buf12_3bb8c_g;
+} FullWidthChars6;
 
 typedef struct {
     s8 a, b;
@@ -373,8 +373,8 @@ s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
                                                                            : SAVE_FILE_NAME_NUMBER;
 
         title[SAVE_TITLE_PADDING] = gSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
-        *(Buf12_3bb8c_g *)&title[SAVE_TITLE_LETTER_FIELD] =
-            *(Buf12_3bb8c_g *)&gSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
+        *(FullWidthChars6 *)&title[SAVE_TITLE_LETTER_FIELD] =
+            *(FullWidthChars6 *)&gSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
 
         letter = atoi(fileName + numberPos) - 1;
         glyph = &gSaveTitleGlyphs[letter];
