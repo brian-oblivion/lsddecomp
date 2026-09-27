@@ -22,7 +22,7 @@
  *
  * Only the fields a unit including this header accesses are declared. Other
  * units still carry their own reduced views of the same record
- * (code_179d8_i/_j/_k's Entry90902E8, code_179d8_l's local SsScore); their
+ * (libsnd_decre/_j/_k's Entry90902E8, code_179d8_l's local SsScore); their
  * fields join this definition as those units move onto it.
  */
 typedef struct SsScore {

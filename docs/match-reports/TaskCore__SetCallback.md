@@ -39,7 +39,7 @@ context argument verbatim, no other logic. Corroborated by
 a callback+context pair invoked by `TaskCore__RefreshViewValue`, hence
 "view"; not a guess about what the callback itself does). Grep shows
 `unk9C`/`unkA0` textual hits in class_3bb8c_n.c/class_3bb8c_q.c/code_2c054.c/
-code_179d8_i.c (unrelated structs sharing the name), so proposal only.
+libsnd_decre.c (unrelated structs sharing the name), so proposal only.
 
 
 **Head disposition, round 78.** `unk9C`/`unkA0` -> `viewCallback`/`viewCallbackCtx` APPLIED (type scope, 3 + 2 accessors).

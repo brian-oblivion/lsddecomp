@@ -1,5 +1,5 @@
 /*
- * code_179d8_i -- Snd_decrescendo, libsnd's per-tick volume fade-out for one
+ * libsnd_decre -- Snd_decrescendo, libsnd's per-tick volume fade-out for one
  * sequence, the mirror of Snd_crescendo (libsnd_cres.c). Sony's code carried
  * as disassembly: the linked libsnd objects call it by this name
  * (config/psyq-objects.ld), and the libsnd/decre object that holds it on the
@@ -104,4 +104,4 @@ tailFinal:
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", Snd_decrescendo);
+INCLUDE_ASM("asm/nonmatchings/libsnd_decre", Snd_decrescendo);

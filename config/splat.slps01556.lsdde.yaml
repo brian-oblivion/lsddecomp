@@ -1038,7 +1038,7 @@ segments:
       - [0x23F38, o, libsnd/sscall]     # SsSeqCalledTbyT
       - [0x241AC, o, libsnd/pause]      # Snd_pause, Snd_nextpause
       - [0x242B0, o, libsnd/tempo]      # Snd_tempo
-      - [0x24490, c, code_179d8_i]
+      - [0x24490, c, libsnd_decre]
       # ROUND 34, second run in the same unit: `libsnd/replay` (Snd_replay) and
       # `libsnd/vs_vab` (SsVabClose, SsVabOpen) -- func_80033FB8, func_80034020
       # and func_800340B0, all three previously MATCHED as C.  This run sits in
