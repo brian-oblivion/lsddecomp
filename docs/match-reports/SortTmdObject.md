@@ -116,7 +116,7 @@ REVISITED, round 56: STALL, but the length gap is now fully accounted for -- the
 ### Why "names/types not relevant", stated before the findings so it is not read as a conclusion drawn to fit them
 
 The revisit rule's hypothesis is that round 50's score was evidence about what
-was known then rather than about the function, because `TmdRenderer` had not
+was known then rather than about the function, because `code_8220_b` had not
 yet passed track 3. Measured here, that is **not** what happened. Taking the
 three levers below one at a time:
 
@@ -1983,7 +1983,7 @@ Evidence the other way, which is why this is a question and not a verdict:
   Sony object" for the whole queue).
 - The splat layout puts this function inside a contiguous game run:
   `0x8220` `code_8220` (the BasicClass framework, unambiguously game code)
-  → `0x8A88` `TmdRenderer` → `0x9F74` `code_8220_c` → `psyq_rcpolyf3`. The
+  → `0x8A88` `code_8220_b` → `0x9F74` `code_8220_c` → `psyq_rcpolyf3`. The
   renderer sits directly between the game's own class framework and Sony's
   RCpoly primitives, which is what a game-written `GsSortObject4`
   replacement calling Sony's packers would look like.

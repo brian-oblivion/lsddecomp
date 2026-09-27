@@ -54,7 +54,7 @@ CLAUDE.md reproducer pipeline before writing to `src/`.
 
 ## Provenance
 
-round 12 (2026-09-03), runner charlie, unit TmdRenderer (fresh carve).
+round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
 Matched on the second construction (see above); first construction was
 functionally correct but byte-wrong in the delay slot, caught by comparing
 against the reproducer's disassembly rather than trusting "same address".

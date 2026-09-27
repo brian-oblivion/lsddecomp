@@ -2,7 +2,7 @@
 
 > Renamed from `func_800197C4` on 2026-09-24 (tools/rename.py). Address 0x800197c4.
 
-REVISITED, round 75: MATCHED; names/types used (return type `void *`, matching the caller's own `extern void *SubmitPolyF3(void *prim, void *ctx)` in `TmdRenderer.c`).
+REVISITED, round 75: MATCHED; names/types used (return type `void *`, matching the caller's own `extern void *SubmitPolyF3(void *prim, void *ctx)` in `code_8220_b.c`).
 
 ## ROUND 75 (bravo): MATCHED
 

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001A064` on 2026-09-24 (tools/rename.py). Address 0x8001a064.
 
-REVISITED, round 75: MATCHED; names/types used (return type `void *`, matching the caller's own `extern void *SubmitPolyGT4(void *prim, void *ctx)` in `TmdRenderer.c`).
+REVISITED, round 75: MATCHED; names/types used (return type `void *`, matching the caller's own `extern void *SubmitPolyGT4(void *prim, void *ctx)` in `code_8220_b.c`).
 
 ## ROUND 75 (bravo): MATCHED
 

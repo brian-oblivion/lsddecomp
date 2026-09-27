@@ -35,7 +35,7 @@ being passed, but the slot's own declared type stays generic.
 
 ## Provenance
 
-round 12 (2026-09-03), runner charlie, unit TmdRenderer (fresh carve).
+round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
 Matched first attempt — the `if (arg2 == 1)` shape and the always-allocated
 stack frame (needed because the true branch makes an indirect call) came
 straight off the disassembly.

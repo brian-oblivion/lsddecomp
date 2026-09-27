@@ -10,7 +10,7 @@ framework (`docs/research/class-framework.md`). Vtable is `gBasicClassMethods`
 gBasicClassMethods` — matches this unit's carve exactly: 13 of the 14 occupant
 functions are named `BasicClass__func_*`/`BasicClass__BasicClass` in this
 carve's own 20 functions (the 3 highest slots, `+0x030`/`+0x034`/`+0x038`,
-land in `TmdRenderer`, next round's carve).
+land in `code_8220_b`, next round's carve).
 
 It maintains two singly-linked lists of pool-allocated 8-byte nodes
 (`BasicClassListNode { next; BasicClass *value; }`, size confirmed by
@@ -32,7 +32,7 @@ The base constructor, dispatched through the class framework's own slot
 `+0x008` convention (docs/research/class-framework.md: "constructors are
 called through the method table, base-class constructors included").
 Fetches the class's own vtable via `Get_vtable_BasicClass` (a tiny getter, still
-`asm/TmdRenderer.s`, that just returns `&gBasicClassMethods`), stores it at
+`asm/code_8220_b.s`, that just returns `&gBasicClassMethods`), stores it at
 `self->methods`, and zeroes both lists.
 
 ## The C
@@ -52,7 +52,7 @@ First measured at 12/13 words, with the sole difference being the `jal`
 TARGET immediate for `Get_vtable_BasicClass` (a call, not a branch — the encoded
 absolute address itself differed). This is not a scheduling or codegen
 issue in this function at all: `Get_vtable_BasicClass` lives in the still-uncarved
-`TmdRenderer.s` tail, so its real link address depends on the total size of
+`code_8220_b.s` tail, so its real link address depends on the total size of
 everything before it, including `BasicClass__RemoveAllChildren` (this unit's
 hardest function, worked on afterward — see its own report). Once
 `BasicClass__RemoveAllChildren` reached its correct byte-exact size, this

@@ -27,7 +27,7 @@ void StoreSxyPolyFT3(void *dst)
 
 ## Provenance
 
-round 12 (2026-09-03), runner charlie, unit TmdRenderer (fresh carve).
+round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
 Matched first attempt (identical construction to `StoreSxyPolyG3`, verified
 independently against this function's own `.s`).
 

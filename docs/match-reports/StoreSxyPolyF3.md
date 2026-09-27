@@ -44,7 +44,7 @@ touching `src/`.
 
 ## Provenance
 
-round 12 (2026-09-03), runner charlie, unit TmdRenderer (fresh carve).
+round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
 Matched first attempt.
 
 ### Proposed learning
