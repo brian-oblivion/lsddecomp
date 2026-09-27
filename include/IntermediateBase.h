@@ -34,6 +34,13 @@ typedef struct IntermediateBase IntermediateBase;
 typedef struct IntermediateBaseMethods IntermediateBaseMethods;
 typedef struct IntermediateBaseInitArgs IntermediateBaseInitArgs;
 
+/* The two states IntermediateBase__SetState acts on itself; a subclass's
+ * own states sit above them (TaskCore.h's enum TaskCoreState). */
+enum IntermediateBaseState {
+    INTERMEDIATEBASE_STATE_START = 2, /* init's (mode 0); onState2 starts the DrawSystem */
+    INTERMEDIATEBASE_STATE_STOP = 3   /* onState3 stops the DrawSystem */
+};
+
 /* init's argument. The caller owns it; the object keeps the pointer at
  * +0x00C. DayTask__DayTask fills +0x008..+0x010 itself (New_FrameClock(),
  * New_StageMap(0, 1), New_NodeGuardedViewport()). */

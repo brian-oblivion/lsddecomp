@@ -47,6 +47,13 @@ typedef struct {
     s32 y;
 } SlotPos;
 
+/* The scrolled list's layout (RefreshSlotView, CommitElementScroll): item
+ * rows are SLOT_LIST_ROW_PITCH apart, and listView, the frame behind them,
+ * is SLOT_LIST_FRAME_WIDTH wide and SLOT_LIST_FRAME_ROW_HEIGHT tall a row. */
+#define SLOT_LIST_ROW_PITCH 10
+#define SLOT_LIST_FRAME_WIDTH 40
+#define SLOT_LIST_FRAME_ROW_HEIGHT 12
+
 /* The item-list record TaskCoreTarget::unk24[slot] points to, for a slot
  * that opens a scrolled list of items (TitleMenu's: D_80086CA8). */
 typedef struct SlotEntry {
@@ -69,7 +76,7 @@ typedef struct SrcDesc {
 } SrcDesc;
 
 s32 TaskCore__TickFadeColor(TaskCore *self) {
-    s32 level = 0x80 - (self->frameCounter * self->fadeRate);
+    s32 level = TASKCORE_FADE_FULL - (self->frameCounter * self->fadeRate);
     u8 color[3];
 
     color[0] = level;
@@ -77,7 +84,7 @@ s32 TaskCore__TickFadeColor(TaskCore *self) {
     color[2] = level;
     self->methods->broadcastToSlots(self, color);
     self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)color);
-    return (u8)level >= 0x81;
+    return (u8)level > TASKCORE_FADE_FULL;
 }
 
 void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle) {
@@ -113,7 +120,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *target) {
     while (*names++ != NULL) {
         count++;
     }
-    size = count * 4;
+    size = count * sizeof(void *);
     widget = BMemPMgrAlloc(size);
     self->slotElements = (BasicClass **)widget;
     self->itemCounts = BMemPMgrAlloc(size);
@@ -183,15 +190,15 @@ void TaskCore__ReleaseTarget(TaskCore *self) {
 
 void TaskCore__UpdateSlotElements(TaskCore *self, void *parent) {
     TextRow **widget;
-    u8 *position;
+    SlotPos *position;
     s32 i;
 
     if (self->target == NULL) {
         return;
     }
     widget = (TextRow **)self->slotElements;
-    position = self->target->externalRecords;
-    for (i = 0; i < self->slotCount; i++, widget++, position += 8) {
+    position = (SlotPos *)self->target->externalRecords;
+    for (i = 0; i < self->slotCount; i++, widget++, position++) {
         if (self->target->registrationSlots[i] == NULL) {
             TextRow *row = *widget;
 
@@ -300,9 +307,9 @@ void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, void *withSound) {
     nextWidget->methods->setColor(nextWidget, (SpriteRgb *)self->target->selectedColor);
     self->activeSlot = slot;
     if (withSound != NULL) {
-        self->methods->playSound(self, 0);
+        self->methods->playSound(self, TASKCORE_TONE_CURSOR);
     }
-    self->methods->setState(self, 9);
+    self->methods->setState(self, TASKCORE_STATE_CURSOR_MOVED);
 }
 
 s32 TaskCore__GetActiveSlot(TaskCore *self) {
@@ -321,7 +328,7 @@ void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *texture) {
     while (*names++ != NULL) {
         count++;
     }
-    item = BMemPMgrAlloc(count * 4);
+    item = BMemPMgrAlloc(count * sizeof(TextRow *));
     self->itemLists[slot] = (void *)item;
     self->slotCounts[slot] = ((SrcDesc *)desc)->savedCursor;
     self->itemCounts[slot] = count;
@@ -366,15 +373,15 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *parent, s32 show) {
     }
 
     pos = ((SlotEntry *)self->target->unk24[slot])->pos;
-    pos.y -= cursor * 10;
+    pos.y -= cursor * SLOT_LIST_ROW_PITCH;
 
     if (show != 0) {
         s32 size[2];
 
         ((BoxFillAttachToParentFn)((BoxFill *)self->listView)->methods->attachToParent)(
             (BoxFill *)self->listView, (SceneNode *)self->unk14, (BoxFillPos *)&pos);
-        size[0] = 0x28;
-        size[1] = count * 12;
+        size[0] = SLOT_LIST_FRAME_WIDTH;
+        size[1] = count * SLOT_LIST_FRAME_ROW_HEIGHT;
         ((BoxFill *)self->listView)->methods->setSize((BoxFill *)self->listView, size);
     } else {
         ((BoxFill *)self->listView)->methods->detachFromParent((BoxFill *)self->listView);
@@ -384,7 +391,7 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *parent, s32 show) {
     for (i = 0; i < count; i++) {
         (*item)->methods->attachToParent(*item, parent, (LongVec3 *)&pos);
         (*item)->methods->setDisplay(*item, show);
-        pos.y += 10;
+        pos.y += SLOT_LIST_ROW_PITCH;
         item++;
     }
 
@@ -410,7 +417,7 @@ void TaskCore__BeginElementScroll(TaskCore *self) {
     TextRow *item;
     SpriteRgb *cursorColor;
 
-    if (self->inputMode != 1) {
+    if (self->inputMode != TASKCORE_INPUT_CHOOSING_SLOT) {
         return;
     }
     slot = self->activeSlot;
@@ -418,8 +425,8 @@ void TaskCore__BeginElementScroll(TaskCore *self) {
     item = ((TextRow **)self->itemLists[slot])[self->slotCounts[slot]];
     cursorColor = &((SlotEntry *)self->target->unk24[slot])->cursorColor;
     item->methods->setColor(item, cursorColor);
-    self->inputMode = 2;
-    self->methods->setState(self, 14);
+    self->inputMode = TASKCORE_INPUT_SCROLLING;
+    self->methods->setState(self, TASKCORE_STATE_SCROLL_OPENED);
 }
 
 void TaskCore__CommitElementScroll(TaskCore *self) {
@@ -430,20 +437,20 @@ void TaskCore__CommitElementScroll(TaskCore *self) {
     s32 count;
     s32 i;
 
-    if (self->inputMode != 2) {
+    if (self->inputMode != TASKCORE_INPUT_SCROLLING) {
         return;
     }
     slot = self->activeSlot;
     cursor = self->slotCounts[slot];
     pos = ((SlotEntry *)self->target->unk24[slot])->pos;
-    pos.y -= cursor * 10;
+    pos.y -= cursor * SLOT_LIST_ROW_PITCH;
 
     item = (TextRow **)self->itemLists[slot];
     count = self->itemCounts[slot];
     for (i = 0; i < count; i++) {
         (*item)->methods->setDisplay(*item, 0);
         (*item)->methods->setPosition(*item, (ScreenSpritePos *)&pos);
-        pos.y += 10;
+        pos.y += SLOT_LIST_ROW_PITCH;
         item++;
     }
 
@@ -458,8 +465,8 @@ void TaskCore__CommitElementScroll(TaskCore *self) {
 
     ((BoxFill *)self->listView)->methods->detachFromParent((BoxFill *)self->listView);
 
-    self->inputMode = 1;
-    self->methods->setState(self, 0x10);
+    self->inputMode = TASKCORE_INPUT_CHOOSING_SLOT;
+    self->methods->setState(self, TASKCORE_STATE_SCROLL_COMMITTED);
 }
 
 void TaskCore__CancelElementScroll(TaskCore *self) {
@@ -470,7 +477,7 @@ void TaskCore__CancelElementScroll(TaskCore *self) {
     TextRow *savedItem;
     s32 saved;
 
-    if (self->inputMode != 2) {
+    if (self->inputMode != TASKCORE_INPUT_SCROLLING) {
         return;
     }
     slot = self->activeSlot;
@@ -483,8 +490,8 @@ void TaskCore__CancelElementScroll(TaskCore *self) {
     self->slotCounts[slot] = saved;
     savedItem = items[saved];
     savedItem->methods->setDisplay(savedItem, 1);
-    self->inputMode = 1;
-    self->methods->setState(self, 17);
+    self->inputMode = TASKCORE_INPUT_CHOOSING_SLOT;
+    self->methods->setState(self, TASKCORE_STATE_SCROLL_CANCELLED);
 }
 
 void TaskCore__AdvanceSlotCursor(TaskCore *self) {
@@ -527,7 +534,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
     nextItem->methods->setColor(nextItem, cursorColor);
     self->slotCounts[slot] = cursor;
     if (withSound != NULL) {
-        self->methods->playSound(self, 0);
+        self->methods->playSound(self, TASKCORE_TONE_CURSOR);
     }
-    self->methods->setState(self, 9);
+    self->methods->setState(self, TASKCORE_STATE_CURSOR_MOVED);
 }
