@@ -117,8 +117,8 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 acrossCells, s32
     self->methods->getTargetDescriptor(self, &desc, 0);
     cellCol = desc.base.b2;
     cellRow = desc.base.b3;
-    angle = param->rotate.y;
-    if (param->rotate.y < 0) {
+    angle = param->rotate.vy;
+    if (param->rotate.vy < 0) {
         angle += ONE;
     }
 

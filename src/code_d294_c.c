@@ -74,11 +74,11 @@ void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
     SceneNodeSub44 *src;
 
     src = self->coord2->param;
-    out[0].num = src->rotate.x * 45 >> 9;
+    out[0].num = src->rotate.vx * 45 >> 9;
     out[0].den = 1;
-    out[1].num = src->rotate.y * 45 >> 9;
+    out[1].num = src->rotate.vy * 45 >> 9;
     out[1].den = 1;
-    out[2].num = src->rotate.z * 45 >> 9;
+    out[2].num = src->rotate.vz * 45 >> 9;
     out[2].den = 1;
 }
 

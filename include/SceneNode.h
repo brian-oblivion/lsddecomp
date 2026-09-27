@@ -51,17 +51,6 @@ typedef struct SceneNode SceneNode;
 typedef struct SceneNodeMethods SceneNodeMethods;
 typedef struct SceneNodeSub14 SceneNodeSub14;
 typedef struct SceneNodeSub44 SceneNodeSub44;
-typedef struct S16Quad_d294 S16Quad_d294;
-
-/* libgte's SVECTOR (vx, vy, vz, pad). MATCHING: all-s16 members give it
- * alignment 2, which is what makes SceneNode__GetRotMatrix's whole-struct
- * copy compile to lwl/lwr. */
-struct S16Quad_d294 {
-    s16 x; /* +0x000 */
-    s16 y; /* +0x002 */
-    s16 z; /* +0x004 */
-    s16 w; /* +0x006 */
-};
 
 /* Three 32-bit components (Sony's "long vector" without VECTOR's pad word;
  * arrays of it have a 0xC stride): positions, offsets and translations. */
@@ -87,7 +76,7 @@ struct SceneNodeSub44 {
     s32 scaleY; /* +0x004, scale.vy */
     s32 scaleZ; /* +0x008, scale.vz */
     u8 padC[0x010 - 0x00C];
-    S16Quad_d294 rotate;     /* +0x010, 4096 per turn */
+    SVECTOR rotate;          /* +0x010, 4096 per turn */
     u8 pad18[0x028 - 0x018]; /* +0x018, trans (VECTOR); no accessor */
 };
 

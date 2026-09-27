@@ -45,25 +45,26 @@ s32 SceneNode__SetBackClip(SceneNode *self, s32 a1) {
     return GetSetBitField(&self->attribute, 8, 1, a1 == 0) == 0;
 }
 
-/* self->unk14->unk44 is a 0x28-byte heap block whose +0x10 holds an
- * S16Quad_d294 (SVECTOR's layout, include/SceneNode.h). a2 selects between negating x/y/z
- * into a local copy (the 4th short left uninitialised, exactly as retail's
- * own negate path never stores to it) or copying the quad verbatim, then
- * forwards the result -- plus a1, passed straight through -- to the PsyQ
- * helper RotMatrix. */
+/* coord2->param is a 0x28-byte GsCOORD2PARAM whose +0x10 holds the SVECTOR
+ * rotation. a2 selects between negating vx/vy/vz into a local copy (pad left
+ * uninitialised, exactly as retail's own negate path never stores to it) or
+ * copying the vector verbatim, then forwards the result -- plus a1, passed
+ * straight through -- to the PsyQ helper RotMatrix. MATCHING: SVECTOR's
+ * all-short members give it alignment 2, which is what makes the
+ * whole-struct copy compile to lwl/lwr. */
 void SceneNode__GetRotMatrix(SceneNode *self, s32 a1, s32 a2) {
-    S16Quad_d294 buf;
-    S16Quad_d294 *src = &self->coord2->param->rotate;
+    SVECTOR buf;
+    SVECTOR *src = &self->coord2->param->rotate;
 
     if (a2) {
-        buf.x = -src->x;
-        buf.y = -src->y;
-        buf.z = -src->z;
+        buf.vx = -src->vx;
+        buf.vy = -src->vy;
+        buf.vz = -src->vz;
     } else {
         buf = *src;
     }
-    /* Casts: S16Quad_d294 is SVECTOR's layout, and SceneNode.h types `out` as s32. */
-    RotMatrix((SVECTOR *)&buf, (MATRIX *)a1);
+    /* Cast: SceneNode.h types `out` as s32. */
+    RotMatrix(&buf, (MATRIX *)a1);
 }
 
 /* a1 gates a small range (2 <= a1 < 4). When self->model is set and

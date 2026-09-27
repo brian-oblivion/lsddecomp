@@ -336,3 +336,7 @@ identity vs. pair-swap) before reaching for an axis that closed a
   field, before the Sony identification existed.
 - No parameter retyped. The statement-order finding above (`.whole` before
   `.frac`) is unaffected by the rename.
+
+## Round 97 (alpha): Sony's SVECTOR
+
+GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/SceneNode.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.

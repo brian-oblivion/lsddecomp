@@ -969,3 +969,7 @@ the header's type. include/class_39e08.h `LoadRequest` (DayTask__DayTask)
 and src/code_1677c.c `LoadModelRequest` (GameApplication__GameApplication)
 retired onto the same type; their `type`/`path` accessors became
 `src.buffer`/`src.name`, the only ones the compiler listed.
+
+## Round 97 (alpha): Sony's SVECTOR
+
+GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/SceneNode.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.

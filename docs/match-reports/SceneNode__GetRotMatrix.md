@@ -116,3 +116,7 @@ slot-84 relationship above. Posted to the broadcast.
 MATRIX *m)`. The call casts `&buf` to `SVECTOR *` (S16Quad_d294 is SVECTOR's
 layout) and `a1` to `MATRIX *` (SceneNode.h prototypes the parameter as
 `s32 out`); both casts go when SceneNode.h takes Sony's types. Byte-identical.
+
+## Round 97 (alpha): Sony's SVECTOR
+
+S16Quad_d294 is deleted: SceneNode.h now takes Sony's SVECTOR (four shorts vx, vy, vz, pad; 8 bytes, alignment 2 -- the same layout and the same alignment, so the whole-struct copy still compiles to lwl/lwr). `buf` and `src` are SVECTOR, the negate path writes vx/vy/vz, and the `(SVECTOR *)` cast is gone; the `(MATRIX *)a1` cast stays until the prototype types `out`. Byte-identical.

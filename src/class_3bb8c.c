@@ -456,10 +456,10 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
             coord->ty = y;
             coord->tz = z;
             param = (*cell)->coord2->param;
-            param->rotate.x = 0;
+            param->rotate.vx = 0;
             rotY = rec.rotY;
-            param->rotate.z = 0;
-            param->rotate.y = rotY;
+            param->rotate.vz = 0;
+            param->rotate.vy = rotY;
             (*cell)->flags36 = rec.cellFlags;
             (*cell)->coord2->flg = 0;
             {

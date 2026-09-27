@@ -133,11 +133,11 @@ void SceneNode__UpdateRotation(SceneNode *self, s32 flag, void *data) {
     vals[1] /= 360;
     vals[2] /= 360;
     dst = self->coord2->param;
-    field = &dst->rotate.x;
+    field = &dst->rotate.vx;
     if (flag) {
-        dst->rotate.x = vals[0];
-        dst->rotate.y = vals[1];
-        dst->rotate.z = vals[2];
+        dst->rotate.vx = vals[0];
+        dst->rotate.vy = vals[1];
+        dst->rotate.vz = vals[2];
     } else {
         s32 i;
         s16 *cur;

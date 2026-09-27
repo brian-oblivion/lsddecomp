@@ -829,3 +829,7 @@ retail's compare).
   nine libgs objects); the unit includes `<libgpu.h>` and `<libgs.h>`, the
   local extern is gone. The old extern's comment called it bss; it is libgs
   data, the identity matrix.
+
+## Round 97 (alpha): Sony's SVECTOR
+
+GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/SceneNode.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
