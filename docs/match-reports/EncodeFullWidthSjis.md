@@ -506,3 +506,23 @@ fullwidth `'0'` (0x824F). For input byte 0x41 (`'A'`), it emits 0x82 and
 independent data points against the actual Shift-JIS table, not just
 "this looks like character encoding" -- tier A. `DecodeFullWidthSjis`
 (same unit) is confirmed as this function's exact inverse.
+
+## History moved from src/code_2cc8c_f.c (round 99, track 7, bravo)
+
+The comment above the function in the unit, verbatim until round 99, when the
+unit's comments were cut to what the code needs:
+
+```c
+/* EncodeFullWidthSjis -- MATCHED round 38 (31/31). Round 37 got structure and
+ * length exact via the two-cursor idiom (`d = dst; dst++; *d = x;`),
+ * leaving a pure 3-way register-identity residue. A permuter search
+ * (158 iterations, rc=0) closed it: copying the second byte's value
+ * into its own local (`trail`) before using it in the comparisons and
+ * arithmetic, instead of reusing `c` directly, changes GCC 2.6.3's
+ * register allocation to match retail's exactly. See
+ * docs/match-reports/EncodeFullWidthSjis.md. */
+```
+
+## Track 7 (round 99, bravo)
+
+The literals are unit-local `SJIS_*` defines (SJIS_LEAD_SYMBOL 0x81, SJIS_LEAD_ALNUM 0x82, SJIS_TRAIL_OFFSET 0x1F, SJIS_TRAIL_GAP 0x7F) and character constants (`'0'`, `' '`). `trail < 0x60` must be spelled `trail < SJIS_TRAIL_GAP - SJIS_TRAIL_OFFSET`: `trail + SJIS_TRAIL_OFFSET < SJIS_TRAIL_GAP`, the same test in arithmetic, is not folded by GCC 2.6.3 and differs at the second word (measured).

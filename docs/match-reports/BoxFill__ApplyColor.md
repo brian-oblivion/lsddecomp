@@ -97,3 +97,7 @@ Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport
 - **`BoxFillRgb`** (tier A, include/BoxFill.h): the local copy type, named for this function's address, is BoxFill's own colour record by use. `src` is setColor's `rgb` argument (BoxFill__SetColor forwards it with `dst = self->color`, the GsBOXF r, g, b at +0x064), and the same three bytes arrive through the ctor/Reset colour argument (New_BoxFill). GraphRoom's dot colours (class_3bb8c_t, round 97's `GraphPointColor`) are those arguments too, so the one type is defined once in BoxFill.h and both local views are retired onto it. Same shape and convention as `BgLayerRgb`/`ViewportRgb`: signed, three bytes, whole-struct copy = three lb/sb pairs.
 - Byte-identical: whole image green, 0 new typeviews warnings, nonmatching green.
 - **Proposed, not applied:** `BOXFILL_FIELDS`' `u8 color[3]` -> `BoxFillRgb color`, setColor's `void *rgb` and New_BoxFill/Reset's `void *color` -> `BoxFillRgb *`, and this function's `u8 *dst, u8 *src` -> `BoxFillRgb *`. The accumulate arm reads `src[0..2]` as bytes (`lbu` + add), so retyping `src` needs the arm rewritten through `.r/.g/.b` with an s8/u8 load check; callers outside this unit (TaskCore's listView, class_3bb8c_m/_n, FadeBox, code_2cc8c_b) pass their own buffer types and would each need a cast. Not measured this round.
+
+## Track 7 (round 99, bravo)
+
+The `d = dst` copy is gone; the body writes through `dst`. Byte-exact (26/26).

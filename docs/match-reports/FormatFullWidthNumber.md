@@ -564,3 +564,28 @@ sharing its dominant `self`-typed signature style) is unrelated to the
 ## Track 4 (2026-09-26, round 88, charlie)
 
 The first parameter was typed as the TextRow view `Obj6EAC0 *` and cast to `u8 *` for EncodeFullWidthSjis; it is the output buffer, so it is now `u8 *dst` with no cast (the view is gone: class 0x11144 is TextRow, include/TextRow.h). Image byte-identical.
+
+## History moved from src/code_2cc8c_f.c (round 99, track 7, bravo)
+
+The comment above the function in the unit, verbatim until round 99, when the
+unit's comments were cut to what the code needs:
+
+```c
+/* FormatFullWidthNumber -- MATCHED round 38 (56/56). Round 35 got structure and
+ * length exact (padded/text VLAs, strlen/itoa naming fixed post-SDK-object
+ * renaming) leaving a 4-value register-identity residue (fill/text
+ * swapped relative to retail). A permuter search (733 iterations, rc=0)
+ * closed it: declaration order text/fill/padded (not round 35's
+ * padded/text) PLUS splitting `fill = width - strlen(...)` into two
+ * statements (`fill = strlen(...); fill = width - fill;`) together
+ * reproduce retail's exact register assignment. Also fixed a stale
+ * prototype: the preserved body's forward declaration of EncodeFullWidthSjis
+ * as `(Obj6EAC0 *, char *)` predates that function's own round-38 match
+ * as `u8 *EncodeFullWidthSjis(u8 *, u8 *)`. Its first parameter was typed as
+ * the TextRow view `Obj6EAC0 *` and cast to `u8 *`; it is the output buffer
+ * (track 4, round 88: `u8 *dst`, no cast). See docs/match-reports/FormatFullWidthNumber.md. */
+```
+
+## Track 7 (round 99, bravo)
+
+The first value parameter `a1` is now `value`. The `(u8 *)` and `(unsigned char *)` casts that readability.py counts as rawoff are not offset arithmetic: they convert the `char` buffers to EncodeFullWidthSjis's `u8 *` and to Sony's `memset` prototype, and stay.

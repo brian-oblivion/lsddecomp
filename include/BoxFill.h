@@ -57,6 +57,14 @@ typedef struct BoxFillMethods BoxFillMethods;
 typedef struct SkipShort2 SkipShort2;
 typedef struct BoxFillPos BoxFillPos;
 
+/* Bit positions in `boxAttribute`, the GsBOXF attribute word, that the
+ * setDisplay/setSemiTransOn/setSemiTransRate overrides set through
+ * GetSetBitField: libgs's GsDOFF, GsALON and the 2-bit GsAZERO..GsATHREE
+ * rate, the same positions as SceneNode's GsDOBJ2 attribute. */
+#define BOXFILL_ATTR_RATE_SHIFT 28 /* semitransparency rate, 2 bits */
+#define BOXFILL_ATTR_ALON_SHIFT 30 /* GsALON: semitransparency on */
+#define BOXFILL_ATTR_DOFF_SHIFT 31 /* GsDOFF: display off */
+
 /* The ctor's (and Reset's) size argument: two words of which only the low
  * halfwords are read (lhu at +0x000 and +0x004), into boxW and boxH. The
  * callers pass s32 pairs of their own types (class_3bb8c_n's PairXY,
@@ -101,7 +109,7 @@ typedef struct BoxFillRgb {
     /* +0x0B8 */ void (*setColor)(Self *self, s32 overwrite, void *rgb);  /* BoxFill__SetColor: copy the 3 bytes, or add them when overwrite is 0 */ \
     /* +0x0BC */ void (*setPosition)(Self *self, BoxFillPos *pos);        /* BoxFill__SetPosition: only while attached */ \
     /* +0x0C0 */ void (*setSize)(Self *self, s32 *size);                  /* BoxFill__SetSize: {w, h} words, low halves; only while attached */ \
-    /* +0x0C4 */ void (*attachAbsolute)(Self *self, SceneNode *parent, BoxFillPos *pos, s32 arg3); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = arg3 */ \
+    /* +0x0C4 */ void (*attachAbsolute)(Self *self, SceneNode *parent, BoxFillPos *pos, s32 attachArg); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = attachArg */ \
     /* +0x0C8 */ void (*setPri)(Self *self, s32 pri);                     /* BoxFill__SetPri */          \
     /* +0x0CC */ s32 (*setMask)(Self *self, s32 bits)                     /* BoxFill__SetMask: mask = (1 << bits) - 1; Reset passes 13 */
 /* clang-format on */
@@ -153,7 +161,7 @@ void BoxFill__SetColor(BoxFill *self, s32 overwrite, u8 *rgb);
 void BoxFill__ApplyColor(BoxFill *self, u8 *dst, u8 *src, s32 overwrite);
 void BoxFill__SetPosition(BoxFill *self, BoxFillPos *pos);
 void BoxFill__SetSize(BoxFill *self, s32 *size);
-void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, s32 arg3);
+void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, s32 attachArg);
 void BoxFill__SetPri(BoxFill *self, s32 pri);
 s32 BoxFill__SetMask(BoxFill *self, s32 bits);
 
