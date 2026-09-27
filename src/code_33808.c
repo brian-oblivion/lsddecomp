@@ -26,6 +26,12 @@
  *  - MoviePlayer, CD-streamed and MDEC-decoded FMV (CdStream frames,
  *    DecDCTvlc, then DecDCTin/DecDCTout in 16-pixel strips uploaded as they
  *    finish), one movie at a time (gActiveMoviePlayer).
+ * The unit's own types: ResourceSource, the {buffer, file name} descriptor
+ * those ctors take (ResourceSourceArgs, the three-word local SetVec3 fills
+ * for it); UnprototypedCtorTable, the view the allocators call a ctor slot
+ * through when they test its result; TimBlockHeader (and its byte copy,
+ * TimBlockHeaderBytes), ModelDataHeader and SubBlockTable, the layouts of
+ * TimBlockSrc's, ModelData's and TodSet's / TriggerWorld's buffers.
  */
 #include "common.h"
 #include <libgte.h>
@@ -380,8 +386,10 @@ TimBlockSrcMethods *GetTimBlockSrcMethods(void) {
     return &gTimBlockSrcMethods;
 }
 
-/* A data source's construction descriptor: a buffer to adopt, or else a
- * file name to request. */
+/* The descriptor the LinkResource, Tod, TodSet, ModelData and TriggerWorld
+ * ctors take: a buffer to adopt, or else (buffer NULL) a file name to
+ * request. Callers in other units build their own larger locals and pass
+ * them cast to this. */
 typedef struct ResourceSource {
     /* +0x00 */ void *buffer;
     /* +0x04 */ char *name;
@@ -883,15 +891,17 @@ void ModelData__Load(ModelData *self) {
     ((s32 (*)())self->methods->processBuffer)(self);
 }
 
-/* A ResourceSource with a third word: SetVec3 also stores the name (NULL here)
- * and a 1 that no constructor here reads. */
+/* The three words SetVec3 stores (buffer, name, mode), passed on as a
+ * ResourceSource: the name is NULL here, and no constructor reads the mode
+ * (1). */
 typedef struct ResourceSourceArgs {
     /* +0x00 */ void *buffer;
     /* +0x04 */ u8 pad4[8];
 } ResourceSourceArgs;
 
-/* A ModelData's buffer: the LinkResource's TMD at `tmdOffset`, the TodSet's
- * data from +0x0C. */
+/* A ModelData's buffer (a .MOM file: InitDreamAux requests ETC\\SYMSPY.MOM
+ * through New_ModelData): the LinkResource's TMD at `tmdOffset`, the
+ * TodSet's data from +0x0C. */
 typedef struct ModelDataHeader {
     /* +0x00 */ u8 pad0[8];
     /* +0x08 */ s32 tmdOffset;
