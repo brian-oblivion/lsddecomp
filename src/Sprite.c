@@ -23,6 +23,21 @@
  *
  * LightRig (include/LightRig.h, 0x14): a SceneNode that owns three flat
  * lights and the ambient colour. StageMap inherits its getLight unchanged.
+ *
+ * What decided its edges (python3 tools/tuboundary.py): the placed object
+ * libc2/memmove precedes it ("start edge possible") and libgs/gs_110
+ * (GsSetAmbient) follows it, so there is nothing to merge with. Inside, 47
+ * of the 50 edges are "boundary possible" and the three around
+ * ScreenSprite's position and pivot methods "boundary unlikely (single-user
+ * data)". The "forced boundary lies in this stretch" notes are the
+ * jump-table pairs 0x800111dc / 0x80011290 (libc2/sprintf's table, then
+ * ScreenSprite__SetPivotAnchor's) and 0x80011290 / 0x8001140c; both
+ * intervals cross placed Sony objects, whose edges satisfy them, so they say
+ * nothing about a boundary inside this file. PARKED: the content would split
+ * it (the sprite classes, then RequestedFile, FrameClock and LightRig, which
+ * are not sprites), but a split is a new carve, not a merge or rename, so the
+ * file keeps its carve edges and is named for the class family that fills
+ * nearly half of it and heads it.
  */
 #include "common.h"
 #include <libgte.h>
