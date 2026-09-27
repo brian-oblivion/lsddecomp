@@ -6,7 +6,6 @@ D_8008A854
 D_8008A860
 D_8008A924
 D_8008A94C
-D_8008A954
 D_8008A958
 D_8008A960
 D_8008A970
@@ -98,6 +97,7 @@ gCdRequestQueue
 gCdSavedSeekParam
 gCdSeekParam
 gCdState
+gCdStreamVersionSuffix
 gCdTickStep
 gCdTimeoutCounter
 gCdUseVSyncCallback

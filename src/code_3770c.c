@@ -39,7 +39,7 @@ extern char *strcat(char *dest, char *src);
 
 void *func_800270B8(void); /* code_171e0.c: the data directory string */
 extern s32 D_8008A94C;
-extern char D_8008A954[]; /* ";1" */
+extern char gCdStreamVersionSuffix[]; /* ";1" */
 extern void StSetStream(u32 mode, u32 start_frame, u32 end_frame, void (*func1)(), void (*func2)());
 
 extern void *BMemPMgrAlloc(s32 size);
@@ -118,7 +118,7 @@ s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
         path[0] = '\\';
         strcpy(&path[1], func_800270B8());
         strcat(path, name);
-        strcat(path, D_8008A954);
+        strcat(path, gCdStreamVersionSuffix);
         while (CdSearchFile(&self->file, path) == 0) {
             if (n >= 0 && --tries < 0) {
                 return 1;

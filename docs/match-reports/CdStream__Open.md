@@ -31,7 +31,7 @@ ground, no prior attempt. Byte-exact on build 4; whole-image SHA1 green.
   here as `*(u32 *)&self->loc[4]`, left untyped in the shared local view
   because the ten earlier methods pass `loc` as a `u8 *`. Unit-local
   externs: `CdSearchFile`, `strcpy`/`strcat` (Sony libc2, linked),
-  `func_800270B8` (code_171e0.c), `D_8008A94C` (s32, sdata), `D_8008A954`
+  `func_800270B8` (code_171e0.c), `D_8008A94C` (s32, sdata), `gCdStreamVersionSuffix`
   (`char[]`, the rodata-style `";1"` in sdata, referenced as a symbol and
   never retyped). Added a prototype for `SetupCdStreamAudio`. Unit header comment
   updated: all 18 methods matched.
@@ -58,7 +58,7 @@ s32 CdStream__Open(CdStreamObj *self, char *name, s32 tries) {
         path[0] = '\\';
         strcpy(&path[1], func_800270B8());
         strcat(path, name);
-        strcat(path, D_8008A954);
+        strcat(path, gCdStreamVersionSuffix);
         while (CdSearchFile(self->loc, path) == 0) {
             if (n >= 0 && --tries < 0) {
                 return 1;
