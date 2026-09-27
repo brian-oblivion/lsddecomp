@@ -28,6 +28,9 @@
  * handler's own phases (same convention as Entity_c to Entity_g).
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "Entity.h"
 #include "DreamSys.h"
 #include "StageMap.h"

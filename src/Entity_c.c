@@ -30,6 +30,9 @@
  * handler's own phases (same convention as Entity_d/Entity_e).
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "Entity.h"
 #include "DreamSys.h"
 

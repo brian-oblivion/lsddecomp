@@ -7,6 +7,9 @@
  * The table getter is in src/code_171e0.c.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "GameApplication.h"
 #include "DreamSys.h"
 #include "LinkResource.h"

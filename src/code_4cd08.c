@@ -1,4 +1,7 @@
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "Entity.h"
 #include "code_4cd08.h"
 #include "SceneNode.h"

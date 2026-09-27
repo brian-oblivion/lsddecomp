@@ -28,6 +28,9 @@
  *    distance.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "Entity.h"
 #include "DreamSys.h"
 

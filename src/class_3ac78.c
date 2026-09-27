@@ -21,6 +21,9 @@
  * placeholder name, like SceneNode__NoOpSlot5C in code_d294_b.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "StageMap.h"
 #include "VabStreamObj.h"
 #include "LightRig.h"
