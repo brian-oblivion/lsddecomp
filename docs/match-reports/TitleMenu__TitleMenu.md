@@ -17,7 +17,7 @@ constructor chaining pattern already documented for
 handed to it by the base ctor chain (`self->unk48`), stores its own
 `dreamSys` argument, zeroes one field, makes two calls through `dreamSys`'s
 own vtable (storing one result, forwarding the other's return value to the
-still gp_rel-blocked `FormatNumberIntoBuffer`), then makes two more calls through
+still gp_rel-blocked `StampSaveTitleDay`), then makes two more calls through
 its own freshly-installed vtable.
 
 ## The C
@@ -36,7 +36,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, void *dreamSys)
     self->unkAC = 0;
     dream = dreamSys;
     self->unkBC = dream->methods->slot1B0(dream, &self->unkC0);
-    FormatNumberIntoBuffer(dream->methods->slot1A0(dream, 0));
+    StampSaveTitleDay(dream->methods->slot1A0(dream, 0));
     self->methods->slotD8(self, &sTitleMenuTarget);
     self->methods->slot40(self, dreamSys);
 }
@@ -91,7 +91,7 @@ presence anywhere in the project. Placed as one new block right before the
   need that header.
 - `sTitleMenuTarget`, `sTitleMenuSoundBankPath`: address-of-only placeholder `s32` globals
   (same convention as this file's existing `sDefaultTargetSpecs`).
-- `FormatNumberIntoBuffer` prototype: `extern void FormatNumberIntoBuffer(s32 arg0);` -- the
+- `StampSaveTitleDay` prototype: `extern void StampSaveTitleDay(s32 arg0);` -- the
   unit's own still-blocked (gp_rel) function; needed here only as a
   forward declaration so this function can call it. Return value unused at
   this call site, hence `void`.
@@ -101,7 +101,7 @@ presence anywhere in the project. Placed as one new block right before the
 Matched on the first attempt, no residue. Statement order in the C mirrors
 retail's instruction order exactly (including reading `self->unk48` before
 overwriting `self->methods`, and computing `dream->methods->slot1B0(...)`
-before the `FormatNumberIntoBuffer` forward, matching the retail read-then-store and
+before the `StampSaveTitleDay` forward, matching the retail read-then-store and
 call-then-call sequencing word-for-word).
 
 ## Proposed learning
@@ -165,7 +165,7 @@ data the class itself reads:
   UpdateFlashbackLock (called from RefreshMenu with `self->target`) writes
   registrationSlots[1];
 - the TextRow shows gSaveTitle's buffer, 0x8001149C, SJIS "LSD   Day001",
-  the memory-card save title; FormatNumberIntoBuffer writes the day at +0x12.
+  the memory-card save title; StampSaveTitleDay writes the day at +0x12.
 
 Method renames, each its own `rename.py` commit (tier B: mechanics named,
 from the body and the menu entry that reaches them):

@@ -65,7 +65,7 @@ new additive field in `include/class_3bb8c.h`, alongside the sibling's
 
 ### Proposed learning
 
-None beyond `FormatNumberIntoBuffer`'s this round — this pair matched cleanly once
+None beyond `StampSaveTitleDay`'s this round — this pair matched cleanly once
 the stale `gp_rel` verdicts were set aside; the only real content was
 identifying the shared `Obj86ED0` "countdown/flush" struct fields and the
 notify-on-flag-set tail shape common to both siblings.

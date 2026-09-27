@@ -62,7 +62,7 @@ shared header, so the definition here has to match it exactly
 is pointer arithmetic. Cast `arg0`/`arg1` to `u8 *` locally instead.
 
 **Three struct-copy shapes, all instances of this round's alignment lever**
-(`FormatNumberIntoBuffer`'s report): declare the copied range ALL-`s8` so its
+(`StampSaveTitleDay`'s report): declare the copied range ALL-`s8` so its
 alignment is 1, which is what makes GCC use the unaligned `lwl`/`lwr` word
 chunk(s) retail has, with any leftover non-multiple-of-4 bytes as
 individual loads/stores rather than a merged halfword.
@@ -74,7 +74,7 @@ individual loads/stores rather than a merged halfword.
   NULL` path's bulk copy `self[0x6..0x12) = gSaveTitleGlyphs[0x1E..0x2A)`.
 - `FullWidthChars3` (6 bytes, one word chunk + 2 tail bytes) — the `src ==
   NULL` path's shorter copy `self[0x6..0xC) = gSaveTitleGlyphs[0x1E..0x24)`,
-  identical shape to `FormatNumberIntoBuffer`'s own struct this round.
+  identical shape to `StampSaveTitleDay`'s own struct this round.
 
 **The one register-identity trap, closed on the third attempt:** the
 function's return value is a POINTER into the `gSaveTitleGlyphs` template
@@ -168,7 +168,7 @@ Comments moved out of the source (verbatim):
   (Round 95: no other unit declares it now.)
 - on the three copy types: "Struct-copy helper types for round 45's
   StampSaveTitleFileLetter, all deliberately all-`s8` (alignment 1) per
-  this round's FormatNumberIntoBuffer lever: retail copies these ranges as
+  this round's StampSaveTitleDay lever: retail copies these ranges as
   one unaligned `lwl`/`lwr` word chunk per 4 bytes, with any
   non-multiple-of-4 remainder as INDIVIDUAL byte loads/stores, never merged
   into a halfword -- alignment 2 would let GCC trust a halfword move retail
@@ -218,7 +218,7 @@ takes these types they move to the header that owns the save title
 **Update, same round (alpha, the Buf6_3bb8c_c job):** the second unit took
 them. `FullWidthChar`, `FullWidthChars3` and `FullWidthChars6` now live in
 `include/TitleMenu.h` (the save title is TitleMenu's buffer; see
-FormatNumberIntoBuffer.md's track 6 section), unchanged in layout, with the
+StampSaveTitleDay.md's track 6 section), unchanged in layout, with the
 `MATCHING:` line kept once there; class_3bb8c_g.c's local definitions are
 deleted and it includes TitleMenu.h. class_3bb8c_c's `Buf6_3bb8c_c` is
 retired for `FullWidthChars3`. Image byte-identical.

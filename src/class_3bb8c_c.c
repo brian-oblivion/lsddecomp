@@ -18,7 +18,7 @@
  * Two free functions serve TitleMenu: UpdateFlashbackLock (called from
  * TitleMenu__RefreshMenu) writes the menu's FLASHBACK lock,
  * registrationSlots[1], from two words of the save block; and
- * FormatNumberIntoBuffer (called from the ctor with the current day) writes
+ * StampSaveTitleDay (called from the ctor with the current day) writes
  * the day as three full-width digits into the save title, "LSD   Day001"
  * (FullWidthChars3, include/TitleMenu.h's type for the title's characters).
  *
@@ -149,7 +149,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     self->saveCtrl = 0;
     dream = dreamSys;
     self->saveBlock = dream->methods->getSaveBlock(dream, &self->saveBlockSize);
-    FormatNumberIntoBuffer(dream->methods->getCurrentDayAndYear(dream, 0));
+    StampSaveTitleDay(dream->methods->getCurrentDayAndYear(dream, 0));
     self->methods->setTarget(self, &sTitleMenuTarget);
     ((TitleMenuResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
@@ -174,7 +174,7 @@ extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
 
 /* Formats the day as three full-width digits in sDayDigits's buffer and
  * copies them into the save title's day number, characters 9..11. */
-void FormatNumberIntoBuffer(s32 arg0) {
+void StampSaveTitleDay(s32 arg0) {
     FormatFullWidthNumber(sDayDigits, arg0, 3, 0);
     *(FullWidthChars3 *)((s8 *)gSaveTitle + 0x12) = *(FullWidthChars3 *)sDayDigits;
 }

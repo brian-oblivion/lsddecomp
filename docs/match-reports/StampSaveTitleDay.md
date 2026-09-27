@@ -1,4 +1,6 @@
-# FormatNumberIntoBuffer — MATCHED (round 45, 22/22 words)
+# StampSaveTitleDay — MATCHED (round 45, 22/22 words)
+
+> Renamed from `FormatNumberIntoBuffer` on 2026-09-27 (tools/rename.py). Address 0x8004d6ac.
 
 > Renamed from `func_8004D6AC` on 2026-09-22 (tools/rename.py). Address 0x8004d6ac.
 
@@ -19,7 +21,7 @@ typedef struct {
     s8 a, b, c, d, e, f;
 } Buf6_3bb8c_c;
 
-void FormatNumberIntoBuffer(s32 arg0)
+void StampSaveTitleDay(s32 arg0)
 {
     FormatFullWidthNumber(sDayDigits, arg0, 3, 0);
     *(Buf6_3bb8c_c *)((s8 *)gSaveTitle + 0x12) = *(Buf6_3bb8c_c *)sDayDigits;
@@ -101,7 +103,7 @@ struct-copy question.
 
 ## Naming
 
-**FormatNumberIntoBuffer** -- tier B. Free function (called directly by
+**StampSaveTitleDay** -- tier B. Free function (called directly by
 `TitleMenu__TitleMenu`, not through any vtable), `VerbNoun`. Mechanics are
 fully evident: formats `arg0` via `FormatFullWidthNumber` into
 `sDayDigits`'s buffer, then copies 6 raw bytes of that buffer into

@@ -134,12 +134,12 @@ extern struct ScreenSpritePos sSaveTitleOffset;
  * SaveToCard empties on a new game; gSaveTitle at the full-width
  * "LSD   Day001" followed by 19 full-width spaces, which
  * TitleMenu__CreateSaveTitle reblanks from its 12th character on a new game
- * and FormatNumberIntoBuffer writes the day into.
+ * and StampSaveTitleDay writes the day into.
  */
 extern char *sSaveFileName;
 extern char *gSaveTitle;
 
-/* The buffer FormatNumberIntoBuffer formats the day into
+/* The buffer StampSaveTitleDay formats the day into
  * (FormatFullWidthNumber) before copying it into gSaveTitle's title. The
  * ROM image points it at the "7654321" string D_8008AA1C. */
 extern void *sDayDigits;
@@ -170,7 +170,7 @@ extern s32 sTaskObjFCount;
 
 /* Formats the current day into the save title (src/class_3bb8c_c.c);
  * TitleMenu__TitleMenu calls it with DreamSys's getCurrentDayAndYear. */
-extern void FormatNumberIntoBuffer(s32 arg0);
+extern void StampSaveTitleDay(s32 arg0);
 
 /*
  * The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock):

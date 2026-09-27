@@ -20,7 +20,7 @@
  * Construction, ctor(dreamSys): TaskCore's ctor with the menu, "ETC\ETCSE" and
  * no sound object; `sound`'s pitch offset set to -1; `saveCtrl` cleared;
  * `saveBlock`/`saveBlockSize` from DreamSys's getSaveBlock;
- * FormatNumberIntoBuffer writes the current day into the save title;
+ * StampSaveTitleDay writes the current day into the save title;
  * setTarget, then resetCounters (TitleMenu__Reset: the TITLE.TIM backdrop via
  * setSubHandle, frame bound 10, the flashback session cleared).
  *
@@ -102,7 +102,7 @@ struct TitleMenu {
 };
 
 /* One full-width (2-byte Shift-JIS) character of the save title, and runs of
- * 3 and 6 of them that are written into it whole: FormatNumberIntoBuffer's
+ * 3 and 6 of them that are written into it whole: StampSaveTitleDay's
  * day number (characters 9..11), StampSaveTitleFileLetter's letter field
  * (3..5) and letter field plus "Day" (3..8).
  * MATCHING: all-s8 (alignment 1), so a copy is lwl/lwr words plus single
