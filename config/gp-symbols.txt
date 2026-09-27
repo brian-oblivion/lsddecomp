@@ -52,10 +52,6 @@ D_8008AA74
 D_8008AA7C
 D_8008AA84
 D_8008AA8C
-D_8008AAC8
-D_8008AACC
-D_8008AAD4
-D_8008AADC
 D_8008AAE0
 D_8008AAF8
 D_8008AB14
@@ -185,6 +181,10 @@ gStyleSceneRefs
 gStyleStage
 gStyleTickCount
 gStyleVariant
+gTextEntryCursorPos
+gTextEntryPanelPos
+gTextEntryTextColor
+gTextEntryTextPos
 gTexturedFaceColor
 gTimBlockClutShift
 gTimClutRowShift

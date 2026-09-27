@@ -44,3 +44,9 @@ once the direct transliteration matched first try.
 ## Track 4 (2026-09-26, round 87)
 
 Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+Local `tag` -> `state`; the bounds are `TEXTENTRY_STATE_REPORT` and
+`TEXTENTRY_RESULT_ACCEPTED`, and the second tick calls
+`setState(TEXTENTRY_STATE_REPORT)`. Zero bytes changed.

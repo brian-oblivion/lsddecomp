@@ -19,11 +19,11 @@ extern const char sStrComInput[]; /* "COMINPUT" */
 extern const char sStrFontIcon[]; /* "FONTICON" */
 extern const char sCardPathPrefix[]; /* "CARD\\" */
 extern const char sTimExt[]; /* ".TIM" */
-extern s32 D_80086F7C; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
-extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
-extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only here */
-extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
-extern s32 D_8008AADC; /* opaque block, self->unk40's slot4C arg2, address-only here */
+extern s32 gTextEntryPanelRect; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
+extern s32 gTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
+extern s32 gTextEntryPanelPos; /* opaque block, self->unk48's slot4C arg2, address-only here */
+extern s32 gTextEntryTextPos; /* opaque block, self->unk44's slot4C arg2, address-only here */
+extern s32 gTextEntryCursorPos; /* opaque block, self->unk40's slot4C arg2, address-only here */
 
 void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
 {
@@ -45,18 +45,18 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
 
     handle1 = New_TimImage(BuildFileName(path, sStrComInput, dir, ext));
     handle1->methods->slot78(handle1);
-    self->unk48 = New_ScreenSprite(handle1, (void *)&D_80086F7C, 0);
+    self->unk48 = New_ScreenSprite(handle1, (void *)&gTextEntryPanelRect, 0);
     handle1->methods->release(handle1);
-    self->unk48->methods->slot4C(self->unk48, arg1, (void *)&D_8008AACC);
+    self->unk48->methods->slot4C(self->unk48, arg1, (void *)&gTextEntryPanelPos);
 
     handle2 = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
     handle2->methods->slot78(handle2);
     self->unk44 = New_TextRow(handle2, self->unk10, self->unk28);
     self->unk40 = (ChildObj86ED0 *)New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
-    self->unk44->methods->slot4C(self->unk44, arg1, (void *)&D_8008AAD4);
-    self->unk44->methods->slotB8(self->unk44, (void *)&D_8008AAC8);
-    self->unk40->methods->slot4C(self->unk40, arg1, (void *)&D_8008AADC);
+    self->unk44->methods->slot4C(self->unk44, arg1, (void *)&gTextEntryTextPos);
+    self->unk44->methods->slotB8(self->unk44, (void *)&gTextEntryTextColor);
+    self->unk40->methods->slot4C(self->unk40, arg1, (void *)&gTextEntryCursorPos);
 }
 ```
 
@@ -153,7 +153,7 @@ three-value swap was resolved by touching only the non-persistent one.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0)`: D_80086F7C is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position D_8008AACC = (-70, -60). Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&gTextEntryPanelRect, 0)`: gTextEntryPanelRect is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position gTextEntryPanelPos = (-70, -60). Image byte-identical.
 
 2026-09-26, round 86 (bravo): CharSprite (class 0x1144, formerly D_8006EC74) is unified in `include/CharSprite.h`. The local `extern ChildObj86ED0 *New_CharSprite(ChildObj86ED0 *, s32)` is gone; the unit includes the header and casts the result to `unk40`'s `ChildObj86ED0 *`, as it does for New_ScreenSprite. The 0x5F cell it asks for on FONTICON.TIM is '_', one of the facts behind the class name. Image byte-identical.
 
@@ -176,6 +176,31 @@ object behind them is the `New_TextRow` result, so TextEntry::textRow
 (+0x044, include/TextEntry.h) is `struct TextRow *`. The slots map onto
 TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 (position cast to `LongVec3 *`, as ScreenSprite's banner describes), +0x0B8
-`setColor` (`D_8008AAC8`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
+`setColor` (`gTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
 +0x0C4 `setCell`, called through `TextRowSetCellAtFn` because
 TextRow__SetCellAt takes the index too. Zero bytes changed.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+Renamed with `tools/rename.py`, tier A each (the call they are passed to
+says what they are):
+
+| old | new | evidence |
+| --- | --- | --- |
+| D_80086F7C | gTextEntryPanelRect | New_ScreenSprite's rect for COMINPUT.TIM: {0, 0, 224, 120} |
+| D_8008AAC8 | gTextEntryTextColor | the text row's setColor: (128, 128, 0) |
+| D_8008AACC | gTextEntryPanelPos | the panel's attachToParent position: (-70, -60) |
+| D_8008AAD4 | gTextEntryTextPos | the text row's attachToParent position: (-62, -15) |
+| D_8008AADC | gTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (class_3bb8c_j) reads its x |
+
+The externs are typed `SpriteRect`, `SpriteRgb` and `ScreenSpritePos`
+(TaskObjF's gCardIconRect/gCardIconPos are the precedent), so two casts
+are gone; the three positions still go through the LongVec3 slot with a
+cast. Locals `handle1`/`handle2` -> `panelTim`/`fontTim`, parameter
+`arg1` -> `parent`, `path[0x20]` -> `path[32]`, the cursor cell `0x5F` ->
+`'_'`. Zero bytes changed.
+
+Proposed (class_3bb8c_j's): D_8008AAE0 is the cursor position's y (-12),
+read by SetCursorPos; a name such as `gTextEntryCursorY`, or reading it as
+`gTextEntryCursorPos.y` once class_3bb8c_j types gTextEntryCursorPos as a
+ScreenSpritePos.

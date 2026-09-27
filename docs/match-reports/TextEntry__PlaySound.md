@@ -1,4 +1,6 @@
-# TextEntry__NotifyTarget -- MATCH (16/16 words)
+# TextEntry__PlaySound -- MATCH (16/16 words)
+
+> Renamed from `TextEntry__NotifyTarget` on 2026-09-27 (tools/rename.py). Address 0x8005161c.
 
 > Renamed from `Obj86ED0__NotifyTarget` on 2026-09-26 (tools/rename.py). Address 0x8005161c.
 
@@ -9,7 +11,7 @@ Unit `class_3bb8c_i`. Obj86ED0's own method: if `self->unk3C` (a
 field) is non-NULL, dispatch its own `slot80` on it.
 
 ```c
-void TextEntry__NotifyTarget(Obj86ED0 *self, s32 arg1)
+void TextEntry__PlaySound(Obj86ED0 *self, s32 arg1)
 {
     TargetObj86ED0 *target;
 
@@ -39,7 +41,7 @@ instead of the header's (incomplete) prior reading.
 
 Fixed `include/class_3bb8c.h`'s `TargetMethods86ED0::slot80` to
 `(TargetObj86ED0 *self, s32 arg1, s32 arg2, s32 arg3)`. `TargetObj86ED0` is
-local to this unit's slice (only `TextEntry__NotifyTarget` reaches it), so this is
+local to this unit's slice (only `TextEntry__PlaySound` reaches it), so this is
 safe to retype outright rather than additively.
 
 ### Proposed learning
@@ -53,7 +55,7 @@ than the call appears to set explicitly.
 
 ## Naming
 
-- `TextEntry__NotifyTarget` -- tier B. gTextEntryMethods +0x060 (classtable.py) -- this IS the `slot60` implementation dispatched by both TextEntry__HandleCommand (arg1=0x10) and class_3bb8c_j's TextEntry__SetCursorPos/TextEntry__SetCharAt (arg1=0). Forwards arg1 to the attached `target`'s own slot80(target, arg1, 0x60, 0x60) when target != NULL. Mechanics clear (pings the linked TargetObj86ED0 whenever the name cursor or character selection changes); the on-screen meaning of the two 0x60 literals is not established. Since `slot60` is referenced by both this unit and class_3bb8c_j, the SLOT NAME is left as `slot60` in the shared header (PROPOSED name below), even though the FUNCTION name is confidently renamed here (function renames are tree-wide, not subject to the field-ownership rule).
+- `TextEntry__PlaySound` -- tier B. gTextEntryMethods +0x060 (classtable.py) -- this IS the `slot60` implementation dispatched by both TextEntry__HandleCommand (arg1=0x10) and class_3bb8c_j's TextEntry__SetCursorPos/TextEntry__SetCharAt (arg1=0). Forwards arg1 to the attached `target`'s own slot80(target, arg1, 0x60, 0x60) when target != NULL. Mechanics clear (pings the linked TargetObj86ED0 whenever the name cursor or character selection changes); the on-screen meaning of the two 0x60 literals is not established. Since `slot60` is referenced by both this unit and class_3bb8c_j, the SLOT NAME is left as `slot60` in the shared header (PROPOSED name below), even though the FUNCTION name is confidently renamed here (function renames are tree-wide, not subject to the field-ownership rule).
 
 ## Track 4 (2026-09-26, round 87)
 
@@ -69,3 +71,22 @@ named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
 at volume 0x60. TextEntry::target and ItemList::target (+0x03C) and both
 attachTarget prototypes are `struct VabStreamObj *`, the casts at the call
 sites are gone, and `slot80` is `playTone`. Zero bytes changed.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+Renamed from `TextEntry__NotifyTarget` (`tools/rename.py`), tier A: a leaf
+whose mechanics are its purpose, the same body as `TaskObjF__PlaySound`
+(class_3bb8c_g): `target->methods->playTone(target, tone, 96, 96)` when a
+target is attached. The volumes are decimal now (96, TaskObjF's are 127);
+parameter `arg1` -> `tone`. HandleCommand's argument `0x10` is `1 << 4`.
+Zero bytes changed.
+
+### Proposed field names (round 98)
+
+- gTextEntryMethods +0x060 `notifyTarget` -> `playSound` (accessors: this
+  unit's HandleCommand, class_3bb8c_j's SetCursorPos/SetCharAt), so the
+  slot is named like its occupant; the prototype's `arg1` -> `tone`.
+- TextEntry +0x03C `target` -> `sound`, TaskObjF's name for the same
+  object (accessors: this unit's AttachTarget/DetachTarget/PlaySound only;
+  left because ItemList, the sibling with the identical layout, calls its
+  field `target` too, and the two should move together).

@@ -39,7 +39,7 @@ was right from the very first attempt.
 (`self->unk18`) and `$a3` (`1`), while `$a2` is never freshly loaded or
 `li`'d for the call -- it's still holding the just-computed incremented
 `unk1C` value from a few instructions earlier. Same "leftover register is
-actually a forwarded argument" shape as `TextEntry__NotifyTarget`'s `slot80` fix
+actually a forwarded argument" shape as `TextEntry__PlaySound`'s `slot80` fix
 earlier this round. The first attempt (correct store placement, but the
 call written as `self->methods->slotA8(self, self->unk18, 1)` against the
 stale 2-arg header) scored only 5/25, with a register swap AND a length
@@ -80,3 +80,7 @@ fixed it.
 Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 Renamed from Obj86ED0__AdvanceCharSelect: charIndex + 1, written through setCharAt while below charCount, else wrapped to 0 without writing. Tier B.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+Local `v` -> `next`. Zero bytes changed.

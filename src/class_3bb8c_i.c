@@ -1,45 +1,45 @@
 /*
- * class_3bb8c_i -- third carved slice of the class_3bb8c block, 20 functions,
- * carved round 14. All 20 are TextEntry methods (gTextEntryMethods,
- * `D_80086ED0`, 42 slots; `tools/classtable.py gTextEntryMethods`), declared
- * in include/TextEntry.h, whose banner has the evidence for the class name.
- * The other seven own methods (PrevChar .. SetCharAt, GetTextEntryMethods)
- * are class_3bb8c_j's. TextEntry edits a caller-owned string: it loads the
- * `CARD\COMINPUT.TIM`/`CARD\FONTICON.TIM` panel, text row and cursor
- * (LoadCardResources), keeps the caller's buffer (`textBuf`) and its own
- * working copy (`editBuf`, decoded/encoded with DecodeFullWidthSjis/
- * EncodeFullWidthSjis in mode 1), and routes a numeric command switch
- * (HandleCommand) to cursor moves, character stepping, commit (25) and
- * cancel (23).
+ * class_3bb8c_i -- TextEntry's methods from New_TextEntry to NextChar
+ * (include/TextEntry.h); PrevChar .. SetCharAt and GetTextEntryMethods are
+ * in class_3bb8c_j.c.
+ *
+ * A TextEntry edits a caller-owned string on screen. setText keeps the
+ * caller's buffer and copies it into its own `editBuf` (decoding full-width
+ * SJIS in TEXTENTRY_MODE_FULLWIDTH). loadCardResources makes the panel
+ * (CARD\COMINPUT.TIM), the text row and the '_' cursor (CARD\FONTICON.TIM).
+ * attachTarget adds a Pad and a FrameClock as children and keeps a
+ * VabStreamObj to play sounds on. onNotify sends the Pad's button events to
+ * handleCommand: left/right move the cursor, up/down step the character
+ * under it, L1/L2 reset it/every character, Select switches between acting
+ * on presses and on held buttons, circle writes the edit back and closes
+ * ACCEPTED, cross closes CANCELLED. It sends the FrameClock's ticks to
+ * tickState, which reports the result to the parents on the second tick
+ * after the close.
  */
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <strings.h>
 #include "class_3bb8c.h"
 #include "TextEntry.h"
 #include "CharSprite.h"
 #include "TextRow.h"
 #include "TimImage.h"
 #include "VabStreamObj.h"
+#include "Pad.h"
+#include "FrameClock.h"
 
-/* This project's own strcpy (matched elsewhere) -- TextEntry__SetText's own
- * caller, same local-declaration convention as class_3bb8c_e.c/others. */
-extern char *strcpy(char *dest, char *src);
-
-/* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- TextEntry__SetText's own
- * call. Translates each byte of `src` (a name string) into `dest` (folding a
- * couple of special-case byte ranges) and returns `dest`, same convention as
- * `strcpy`. Typed purely from this call site's own register usage. Declared
- * HERE, not in include/class_3bb8c.h: src/class_3bb8c_j.c types the same
- * (still undefined) function as `void (void *, void *)` from its own call
- * site, and two call-site typings of one function cannot share a header. */
+/* code_2cc8c_f.c's, which types both u8 *(u8 *dst, u8 *src); declared on
+ * TextEntry's char buffers. Decode turns full-width SJIS into one byte a
+ * character, Encode turns it back. */
 extern char *DecodeFullWidthSjis(char *dest, char *src);
+extern void EncodeFullWidthSjis(char *dest, char *src);
 
 TextEntry *New_TextEntry(char *text, s32 mode) {
     TextEntry *self;
 
-    self = BMemPMgrAlloc(0x4C);
+    self = BMemPMgrAlloc(sizeof(TextEntry));
     if (self != NULL) {
         GetTextEntryMethods()->ctor(self, text, mode);
         return self;
@@ -47,26 +47,20 @@ TextEntry *New_TextEntry(char *text, s32 mode) {
     return NULL;
 }
 
-/* Sony's, from libc2 (already declared above via class_3bb8c_j's own
- * convention -- but not yet in this unit; local view). */
-extern s32 strlen(char *s);
-
-/* VALUE-of `%gp_rel`, round 45's own local view -- same global as
- * class_3bb8c_j's `gNameCharTable` (a byte lookup table whose length this
- * function counts by hand rather than via `strlen`, since GCC 2.6.3 with
- * `-fno-builtin` never turns a `strlen` CALL into inline code -- the
- * inline loop below has to be literal source, not a call). */
+/* The characters nextChar/prevChar step through, NUL-terminated
+ * (class_3bb8c_j.c). */
 extern u8 *gNameCharTable;
 
-void TextEntry__TextEntry(TextEntry *self, char *arg1, s32 arg2) {
+void TextEntry__TextEntry(TextEntry *self, char *text, s32 mode) {
     u8 *p;
     s32 count;
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetTextEntryMethods();
-    self->textLen = strlen(arg1);
+    self->textLen = strlen(text);
     self->editBuf = BMemPMgrAlloc(self->textLen + 4);
 
+    /* MATCHING: counted inline; strlen(gNameCharTable) would be a call. */
     p = gNameCharTable;
     count = 0;
     while (*p != 0) {
@@ -76,12 +70,12 @@ void TextEntry__TextEntry(TextEntry *self, char *arg1, s32 arg2) {
     self->charCount = count;
 
     TextEntry__ClearChildRefs(self);
-    self->methods->setText(self, arg1, arg2);
+    self->methods->setText(self, text, mode);
 }
 
 void TextEntry__ClearChildRefs(TextEntry *self) {
-    self->childType2 = NULL;
-    self->childType5 = NULL;
+    self->inputSource = NULL;
+    self->tickSource = NULL;
     self->panelSprite = NULL;
 }
 
@@ -90,99 +84,90 @@ void TextEntry__Finalize(TextEntry *self) {
     Get_vtable_BasicClass()->finalize((BasicClass *)self);
 }
 
-void TextEntry__AddChild(TextEntry *self, void *arg1) {
-    s32 tag;
-    s32 mask;
+void TextEntry__AddChild(TextEntry *self, void *child) {
+    s32 kind;
 
-    if (arg1 != NULL) {
-        Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)arg1);
-        tag = **(s32 **)arg1;
-        mask = tag & 0xF;
-        if (mask == 2) {
-            self->childType2 = arg1;
-        } else if (mask == 5) {
-            self->childType5 = arg1;
+    if (child != NULL) {
+        Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)child);
+        kind = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
+        if (kind == PAD_CLASS_ID) {
+            self->inputSource = child;
+        } else if (kind == FRAMECLOCK_CLASS_ID) {
+            self->tickSource = child;
         }
     }
 }
 
-void TextEntry__RemoveChild(TextEntry *self, void *arg1) {
-    s32 tag;
-    s32 mask;
+void TextEntry__RemoveChild(TextEntry *self, void *child) {
+    s32 kind;
 
-    if (arg1 != NULL) {
-        tag = **(s32 **)arg1;
-        mask = tag & 0xF;
-        if (mask == 2) {
-            self->childType2 = NULL;
-        } else if (mask == 5) {
-            self->childType5 = NULL;
+    if (child != NULL) {
+        kind = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
+        if (kind == PAD_CLASS_ID) {
+            self->inputSource = NULL;
+        } else if (kind == FRAMECLOCK_CLASS_ID) {
+            self->tickSource = NULL;
         }
-        Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)arg1);
+        Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)child);
     }
 }
 
 void TextEntry__RemoveAllChildren(TextEntry *self) {
-    self->childType2 = NULL;
-    self->childType5 = NULL;
+    self->inputSource = NULL;
+    self->tickSource = NULL;
     self->panelSprite = NULL;
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
 
-void TextEntry__OnNotify(TextEntry *self, void *arg1, s32 arg2) {
-    s32 tag;
-    s32 mask;
+void TextEntry__OnNotify(TextEntry *self, void *sender, s32 event) {
+    s32 kind;
 
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, arg1, arg2);
+    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
 
-    tag = **(s32 **)arg1;
-    mask = tag & 0xF;
-    if (mask == 2) {
-        self->methods->handleCommand(self, arg1, arg2);
-    } else if (mask == 5) {
-        self->methods->tickState(self, arg1, arg2);
+    kind = ((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK;
+    if (kind == PAD_CLASS_ID) {
+        self->methods->handleCommand(self, sender, event);
+    } else if (kind == FRAMECLOCK_CLASS_ID) {
+        self->methods->tickState(self, sender, event);
     }
 }
 
-void TextEntry__SetText(TextEntry *self, char *arg1, s32 mode) {
+void TextEntry__SetText(TextEntry *self, char *text, s32 mode) {
     self->mode = mode;
-    self->textBuf = arg1;
+    self->textBuf = text;
     self->cursorIndex = 0;
     self->charIndex = 0;
-    if (mode == 1) {
-        DecodeFullWidthSjis(self->editBuf, arg1);
+    if (mode == TEXTENTRY_MODE_FULLWIDTH) {
+        DecodeFullWidthSjis(self->editBuf, text);
         self->textLen /= 2;
     } else {
-        strcpy(self->editBuf, arg1);
+        strcpy(self->editBuf, text);
     }
 }
 
-/*
- * TextEntry__LoadCardResources's own helpers/data -- builds two "CARD\\<name>.TIM"
- * paths (BuildFileName, code_171e0.c), loads each through New_TimImage, and
- * makes panelSprite (New_ScreenSprite), textRow (New_TextRow) and
- * cursorSprite (New_CharSprite) from the loaded handles.
- */
-extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
+/* LoadCardResources' data. BuildFileName (code_171e0.c) writes dir, name
+ * and ext into dest and returns it. Positions are percent of half the
+ * screen from the centre (include/ScreenSprite.h). */
+extern char *BuildFileName(char *dest, const char *name, const char *dir, const char *ext);
 
-extern const char sStrComInput[];    /* "COMINPUT" */
-extern const char sStrFontIcon[];    /* "FONTICON" */
-extern const char sCardPathPrefix[]; /* "CARD\\" */
-extern const char sTimExt[];         /* ".TIM" */
-extern s32 D_80086F7C; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 224, 120} */
-extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
-extern s32 D_8008AACC; /* panelSprite's attachToParent position, address-only here */
-extern s32 D_8008AAD4; /* textRow's slot4C position, address-only here */
-extern s32 D_8008AADC; /* cursorSprite's attachToParent position; class_3bb8c_j reads its x */
+extern const char sStrComInput[];          /* "COMINPUT" */
+extern const char sStrFontIcon[];          /* "FONTICON" */
+extern const char sCardPathPrefix[];       /* "CARD\\" */
+extern const char sTimExt[];               /* ".TIM" */
+extern SpriteRect gTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0, 0) */
+extern SpriteRgb gTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
+extern ScreenSpritePos gTextEntryPanelPos; /* (-70, -60) */
+extern ScreenSpritePos gTextEntryTextPos;  /* (-62, -15) */
+extern ScreenSpritePos gTextEntryCursorPos; /* (-62, -12), y at D_8008AAE0: SetCursorPos adds pos * 7 to x */
 
-void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
-    char path[0x20];
+void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
+    char path[32];
     const char *dir;
     const char *ext;
-    TimImage *handle1;
-    TimImage *handle2;
+    TimImage *panelTim;
+    TimImage *fontTim;
 
-    if (arg1 == NULL) {
+    if (parent == NULL) {
         return;
     }
     if (self->panelSprite != NULL) {
@@ -192,22 +177,23 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
     dir = sCardPathPrefix;
     ext = sTimExt;
 
-    handle1 = New_TimImage(BuildFileName(path, sStrComInput, dir, ext));
-    ((TimImageUploadFn)handle1->methods->processBuffer)(handle1);
-    self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&D_80086F7C, 0);
-    handle1->methods->release(handle1);
-    self->panelSprite->methods->attachToParent(self->panelSprite, (SceneNode *)arg1,
-                                               (LongVec3 *)&D_8008AACC);
+    panelTim = New_TimImage(BuildFileName(path, sStrComInput, dir, ext));
+    ((TimImageUploadFn)panelTim->methods->processBuffer)(panelTim);
+    self->panelSprite = New_ScreenSprite(panelTim, &gTextEntryPanelRect, 0);
+    panelTim->methods->release(panelTim);
+    self->panelSprite->methods->attachToParent(self->panelSprite, (SceneNode *)parent,
+                                               (LongVec3 *)&gTextEntryPanelPos);
 
-    handle2 = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
-    ((TimImageUploadFn)handle2->methods->processBuffer)(handle2);
-    self->textRow = New_TextRow(handle2, self->textLen, self->editBuf);
-    self->cursorSprite = New_CharSprite(handle2, 0x5F);
-    handle2->methods->release(handle2);
-    self->textRow->methods->attachToParent(self->textRow, (SceneNode *)arg1, (LongVec3 *)&D_8008AAD4);
-    self->textRow->methods->setColor(self->textRow, (SpriteRgb *)&D_8008AAC8);
-    self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)arg1,
-                                                (LongVec3 *)&D_8008AADC);
+    fontTim = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
+    ((TimImageUploadFn)fontTim->methods->processBuffer)(fontTim);
+    self->textRow = New_TextRow(fontTim, self->textLen, self->editBuf);
+    self->cursorSprite = New_CharSprite(fontTim, '_');
+    fontTim->methods->release(fontTim);
+    self->textRow->methods->attachToParent(self->textRow, (SceneNode *)parent,
+                                           (LongVec3 *)&gTextEntryTextPos);
+    self->textRow->methods->setColor(self->textRow, &gTextEntryTextColor);
+    self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)parent,
+                                                (LongVec3 *)&gTextEntryCursorPos);
 }
 
 void TextEntry__ReleaseCardResources(TextEntry *self) {
@@ -218,161 +204,156 @@ void TextEntry__ReleaseCardResources(TextEntry *self) {
     }
 }
 
-void TextEntry__AttachTarget(TextEntry *self, void *arg1, void *arg2, VabStreamObj *arg3) {
-    self->methods->addChild(self, arg1);
-    self->methods->addChild(self, arg2);
-    self->target = arg3;
+void TextEntry__AttachTarget(TextEntry *self, void *inputSource, void *tickSource, VabStreamObj *target) {
+    self->methods->addChild(self, inputSource);
+    self->methods->addChild(self, tickSource);
+    self->target = target;
     self->closeState = 0;
     self->altCommands = 0;
 }
 
 void TextEntry__DetachTarget(TextEntry *self) {
-    self->methods->removeChild(self, self->childType2);
-    self->methods->removeChild(self, self->childType5);
+    self->methods->removeChild(self, self->inputSource);
+    self->methods->removeChild(self, self->tickSource);
     self->target = NULL;
 }
 
-void TextEntry__SetState(TextEntry *self, s32 arg1) {
+void TextEntry__SetState(TextEntry *self, s32 state) {
     self->closeTickCount = 0;
-    if (arg1 < 2) {
+    if (state < TEXTENTRY_RESULT_ACCEPTED) {
         return;
     }
-    switch (arg1) {
-        case 2:
-        case 3:
-            self->methods->removeChild(self, self->childType2);
+    switch (state) {
+        case TEXTENTRY_RESULT_ACCEPTED:
+        case TEXTENTRY_RESULT_CANCELLED:
+            self->methods->removeChild(self, self->inputSource);
             self->methods->releaseCardResources(self);
-            self->closeState = arg1;
+            self->closeState = state;
             break;
-        case 4:
+        case TEXTENTRY_STATE_REPORT:
             self->methods->notifyParents(self, self->closeState);
             break;
     }
 }
 
 void TextEntry__TickState(TextEntry *self) {
-    s32 tag;
+    s32 state;
     s32 old;
 
-    tag = self->closeState;
-    if (tag >= 4) {
+    state = self->closeState;
+    if (state >= TEXTENTRY_STATE_REPORT) {
         return;
     }
-    if (tag < 2) {
+    if (state < TEXTENTRY_RESULT_ACCEPTED) {
         return;
     }
     old = self->closeTickCount;
     self->closeTickCount = old + 1;
     if (old != 0) {
-        self->methods->setState(self, 4);
+        self->methods->setState(self, TEXTENTRY_STATE_REPORT);
     }
 }
 
-/* TextEntry__HandleCommand's own name-copy helper -- uncarved elsewhere (`code_2cc8c_f`,
- * still `INCLUDE_ASM`), typed purely from this call site's own register
- * usage: `a0`/`a1` are `self->textBuf`/`self->editBuf` (both `char *`, the same
- * pair `strcpy` is fed in the other arm), return value unused. Same
- * declare-locally convention as `DecodeFullWidthSjis` above (a different unit
- * types this same-shaped function with a different signature from its own
- * call site). */
-extern void EncodeFullWidthSjis(char *dest, char *src);
-
-void TextEntry__HandleCommand(TextEntry *self, void *arg1, s32 arg2) {
-    switch (arg2) {
+/* With altCommands clear the arrows act on presses, with it set on held
+ * buttons. MATCHING: the arms are in retail's code order, default first,
+ * and the down press jumps into the held down's call rather than making
+ * its own. */
+void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command) {
+    switch (command) {
         default:
             return;
-        case 25:
-            if (self->mode == 1) {
+        case PAD_EVENT_PRESSED + PAD_BUTTON_RRIGHT:
+            if (self->mode == TEXTENTRY_MODE_FULLWIDTH) {
                 EncodeFullWidthSjis(self->textBuf, self->editBuf);
             } else {
                 strcpy(self->textBuf, self->editBuf);
             }
-            self->methods->notifyTarget(self, 0x10);
-            self->methods->setState(self, 2);
+            self->methods->notifyTarget(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->setState(self, TEXTENTRY_RESULT_ACCEPTED);
             return;
-        case 23:
-            self->methods->notifyTarget(self, 0x10);
-            self->methods->setState(self, 3);
+        case PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN:
+            self->methods->notifyTarget(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->setState(self, TEXTENTRY_RESULT_CANCELLED);
             return;
-        case 32:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_L2:
             self->methods->resetAllChars(self);
             return;
-        case 31:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_L1:
             self->methods->resetChar(self);
             return;
-        case 28:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_SELECT:
             self->methods->toggleAltCommands(self);
             return;
-        case 21:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LRIGHT:
             if (self->altCommands != 0) {
                 return;
             }
             self->methods->moveCursorRight(self);
             return;
-        case 5:
+        case PAD_EVENT_HELD + PAD_BUTTON_LRIGHT:
             if (self->altCommands == 0) {
                 return;
             }
             self->methods->moveCursorRight(self);
             return;
-        case 20:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LLEFT:
             if (self->altCommands != 0) {
                 return;
             }
             self->methods->moveCursorLeft(self);
             return;
-        case 4:
+        case PAD_EVENT_HELD + PAD_BUTTON_LLEFT:
             if (self->altCommands == 0) {
                 return;
             }
             self->methods->moveCursorLeft(self);
             return;
-        case 18:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LUP:
             if (self->altCommands != 0) {
                 return;
             }
             self->methods->nextChar(self);
             return;
-        case 2:
+        case PAD_EVENT_HELD + PAD_BUTTON_LUP:
             if (self->altCommands == 0) {
                 return;
             }
             self->methods->nextChar(self);
             return;
-        case 19:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LDOWN:
             if (self->altCommands == 0) {
-                goto slot94Call;
+                goto callPrevChar;
             }
             return;
-        case 3:
+        case PAD_EVENT_HELD + PAD_BUTTON_LDOWN:
             if (self->altCommands == 0) {
                 return;
             }
-        slot94Call:
+        callPrevChar:
             self->methods->prevChar(self);
             return;
     }
 }
 
-void TextEntry__NotifyTarget(TextEntry *self, s32 arg1) {
+void TextEntry__PlaySound(TextEntry *self, s32 tone) {
     VabStreamObj *target;
 
     target = self->target;
     if (target != NULL) {
-        target->methods->playTone(target, arg1, 0x60, 0x60);
+        target->methods->playTone(target, tone, 96, 96);
     }
 }
 
 void TextEntry__MoveCursorRight(TextEntry *self) {
     s32 old;
-    s32 v;
+    s32 next;
 
     if (self->panelSprite != NULL) {
         old = self->cursorIndex;
-        v = old + 1;
-        self->cursorIndex = v;
-        if (v < self->textLen) {
-            self->methods->setCursorPos(self, v, 1);
+        next = old + 1;
+        self->cursorIndex = next;
+        if (next < self->textLen) {
+            self->methods->setCursorPos(self, next, 1);
         } else {
             self->cursorIndex = old;
         }
@@ -381,14 +362,14 @@ void TextEntry__MoveCursorRight(TextEntry *self) {
 
 void TextEntry__MoveCursorLeft(TextEntry *self) {
     s32 old;
-    s32 v;
+    s32 next;
 
     if (self->panelSprite != NULL) {
         old = self->cursorIndex;
-        v = old - 1;
-        self->cursorIndex = v;
-        if (v >= 0) {
-            self->methods->setCursorPos(self, v, 1);
+        next = old - 1;
+        self->cursorIndex = next;
+        if (next >= 0) {
+            self->methods->setCursorPos(self, next, 1);
         } else {
             self->cursorIndex = old;
         }
@@ -396,13 +377,13 @@ void TextEntry__MoveCursorLeft(TextEntry *self) {
 }
 
 void TextEntry__NextChar(TextEntry *self) {
-    s32 v;
+    s32 next;
 
     if (self->panelSprite != NULL) {
-        v = self->charIndex + 1;
-        self->charIndex = v;
-        if (v < self->charCount) {
-            self->methods->setCharAt(self, self->cursorIndex, v, 1);
+        next = self->charIndex + 1;
+        self->charIndex = next;
+        if (next < self->charCount) {
+            self->methods->setCharAt(self, self->cursorIndex, next, 1);
         } else {
             self->charIndex = 0;
         }

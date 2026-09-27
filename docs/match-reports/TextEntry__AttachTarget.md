@@ -10,7 +10,7 @@ Unit `class_3bb8c_i`, carved round 14.
 addChild` (the class's OWN overridden addChild, `TextEntry__AddChild`, reached
 through `self->methods` rather than the explicit base-table call this
 time), stashes a third pointer verbatim into `unk3C` (typed `TargetObj86ED0
-*`, the same opaque type `TextEntry__NotifyTarget` dispatches through), and resets
+*`, the same opaque type `TextEntry__PlaySound` dispatches through), and resets
 two counters.
 
 ```c
@@ -47,3 +47,9 @@ named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
 at volume 0x60. TextEntry::target and ItemList::target (+0x03C) and both
 attachTarget prototypes are `struct VabStreamObj *`, the casts at the call
 sites are gone, and `slot80` is `playTone`. Zero bytes changed.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+Parameters `arg1`/`arg2`/`arg3` -> `inputSource`/`tickSource`/`target`:
+the first two are the Pad and the FrameClock addChild files into the
+fields of those names. Zero bytes changed.
