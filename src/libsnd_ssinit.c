@@ -1,92 +1,46 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * libsnd_ssinit -- the head of Sony's libsnd/ssinit module, carried as C
+ * because no SDK disc carries the build retail linked.
  *
- * libsnd_ssinit -- window [200..219] of the original 274-function code_179d8
- * monolith, now 0x22A1C..0x22BA8 (vram 0x8003221C..0x800323A8).
+ * _SsInit is the sound-system init: it resets the interrupt callbacks,
+ * brings up the SPU cold (SpuInit) or hot (SpuInitHot), writes the
+ * templates D_8006DC5C (into all 24 voice register blocks) and D_8006DC6C
+ * (into the control block), starts the voice manager for 24 voices
+ * (SpuVmInit), clears the mark-callback table and resets libsnd's globals. SsInit and
+ * SsInitHot are its two one-line entry points, _SsInit(0) and _SsInit(1).
  *
- * ROUND 33: this slice lost TWO functions to Sony and was split in half.
- *   - func_80032148, its old FIRST function, is `SpuVmVSetUp`
- *     (`libsnd/vm_vsu.o`, Psy-Q 3.3), linked from the object.
- *   - func_800323A8 (120w) is `SsSetTableSize` (`libsnd/sstable.o`, Psy-Q
- *     3.5), linked from the object. It sat in the MIDDLE, so the slice became
- *     [c libsnd_ssinit][o sstable][c libsnd_ssinit_libapi_counter] and everything from
- *     SsSetTickMode on now lives in `src/libsnd_ssinit_libapi_counter.c`.
- * Neither was ever matchable as C; both stall reports are kept, re-titled
- * CONVERTED. This unit is now three functions: _SsInit and its two
- * one-line callers.
+ * Which object (nm over sdk/work/<disc>/elf/libsnd): on the 3.0 and 3.3
+ * discs one ssinit.o holds, in this order, _SsInit, SsInit, SsInitHot,
+ * SsSetTableSize, SsSetTickMode, _SsStart, SsStart, SsStart2, SsEnd,
+ * SsQuit, _SsTrapIntrVSync and _SsSeqCalledTbyT_1per2 -- retail's order
+ * exactly. 3.5 and 3.6 split it into ssinit.o, ssinit_c.o, ssinit_h.o,
+ * sstable.o, sstick.o, ssend.o and ssquit.o, and their _SsInit (58 words)
+ * and SsInit (12 words) are not retail's (83 and 8 words). Retail links
+ * SsSetTableSize from the 3.5 sstable.o in the middle of the module, so
+ * libsnd/ssinit is two files here: this one, and the libsnd/ssinit half of
+ * src/libsnd_ssinit_libapi_counter.c after the sstable object.
  *
- * THE 0x14D8 RODATA ATTACH IS NO LONGER OURS. It belongs to SsSetTickMode
- * (jtbl_80010CD8), which went to libsnd_ssinit_libapi_counter, and the yaml attach moved
- * with it. Do not move it back.
+ * What decided its edges (python3 tools/tuboundary.py --unit): the placed
+ * object libsnd/vm_vsu precedes it ("start edge possible") and the placed
+ * object libsnd/sstable follows it; inside, both edges are "boundary
+ * possible". No merge is possible: the neighbouring C unit is on the other
+ * side of the sstable object.
  *
- * Carved round 16 by blocker DENSITY (see libcd_bios's header for the
- * full window census). This window screened 16/20 clean.
+ * Data: _snd_openflag and _snd_ev_flag are pinned by name in
+ * config/psyq-objects.ld. D_8006DC5C/D_8006DC6C are read only by _SsInit,
+ * a Sony function, so they keep their placeholder names. D_80090368 is
+ * libsnd's mark-callback table (SsMarkCallbackProc [32][16], <libsnd.h>'s
+ * type), which SsSetMarkCallback fills and ContNrpn1 calls through.
  *
- * STALE CLAIM REMOVED, round 23 (2026-09-07): this comment listed
- * func_80032148, SsSetTickMode, StartRCnt and StopRCnt as blocked,
- * "all addiu_at". **`addiu_at` was resolved in round 21** (maspsx
- * `--addiu-at`; docs/research/addiu-at-blocker.md), and round 23 MATCHED
- * StartRCnt and StopRCnt byte-exact and took the other two to
- * 48/53 and ~90/96 with characterised non-toolchain residues. (The 48/53 was
- * func_80032148 -- round 32 then found it is Sony's, so that effort was spent
- * on library code; see docs/match-reports/func_80032148.md.) Nothing in
- * this window is toolchain-blocked. The two live blockers are `gp_rel` and
- * `nop_mflo_mfhi`; screen with `python3 tools/nearmiss.py`, never by
- * re-implementing the greps, and never for `addiu_at`.
- *
- * Round 23's runner bravo spotted this line as stale and correctly did not
- * edit it (parallel-mode rules); the head fixed it at consolidation.
- *
- * Note _SsSeqCalledTbyT_1per2/SetRCnt: this window holds what look like Psy-Q root
- * counter routines linked into game text rather than into a psyq_* segment.
- * They are ordinary work, but do not generalise a finding from them to the
- * game's own code.
- *
- * This slice was cut at ROM-address boundaries, so it has no reason to
- * align with class boundaries -- expect it to span more than one class,
- * and identify each with tools/classtable.py rather than assuming one.
- *
- * Declarations: keep anything that encodes THIS unit's reading of a class
- * next to the code, in this file. Do not create a shared code_179d8*.h --
- * the sibling slices are staffed independently and a shared header is what
- * makes their merges collide.
- *
- * ROUND 78 (track 3 naming pass): this unit has no class (not in
- * `classtable.py --scan`) -- it is Sony's sound-system init, reconstructed
- * as C rather than linked as an object, matching the `libsnd/vm_vsu` and
- * `libsnd/sstable` objects placed immediately before and after it.
- * `_SsInit` is already Sony-identified and MATCHED (round 63); leave it.
- * `SsInit`/`SsInitHot` (its arg=0/arg=1 wrappers) are Sony's too: the
- * head identified them under track 2 (EXACT fingerprint, the ssinit slot
- * position, and the `_SsInit(0)`/`_SsInit(1)` bodies), and `_SsInit`'s
- * mode!=0 arm calls Sony's `SpuInitHot` (libspu_s_ih), identified the
- * same way. All three count as library.
- *
- * `_SsInit`'s data: `_snd_openflag`/`_snd_ev_flag` are Sony-pinned in
- * `config/psyq-objects.ld` and carry those names (the head applied them
- * with `rename.py` in round 78). The two SPU
- * register-init templates `D_8006DC5C`/`D_8006DC6C` are read only by
- * `_SsInit` itself (a Sony function), so per the "field only Sony functions
- * read" rule they are left unnamed rather than given game names.
- * `D_80090368` is Sony's mark-callback table (`SsMarkCallbackProc [32][16]`,
- * <libsnd.h>'s type; the table SsSetMarkCallback fills and ContNrpn1 calls
- * through), which `_SsInit` clears.
+ * The jump table at rodata 0x14D8 is SsSetTickMode's and is attached to
+ * libsnd_ssinit_libapi_counter in the yaml, not to this unit.
  */
 #include "common.h"
 #include <libetc.h>
 #include <libsnd.h>
 #include <libspu.h>
 
-extern void SpuInitHot(void); /* Sony libspu/s_ih, track 2 identification, round 78 (not in this SDK's LIBSPU.H) */
+extern void SpuInitHot(void); /* Sony libspu/s_ih; not in this SDK's LIBSPU.H */
 extern void SpuVmInit(s32 arg0);
 extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
@@ -108,9 +62,8 @@ extern SsMarkCallbackProc D_80090368[0x20][16];
  * Sound-system init.  Reached only through SsInit (arg0 = 0) and
  * SsInitHot (arg0 = 1) below.
  *
- * DO NOT "TIDY" THE LOOP VARIABLES -- the pairing is byte-load-bearing
- * (round 63).  Retail reuses exactly two counter pseudos across all three
- * loops and SWAPS their outer/inner roles in the last one: `i` is the outer
+ * DO NOT "TIDY" THE LOOP VARIABLES -- the pairing is byte-load-bearing.
+ * Retail reuses exactly two counter pseudos across all three loops and SWAPS their outer/inner roles in the last one: `i` is the outer
  * counter of loops 1-2 and the INNER counter of loop 3, `j` the inner counter
  * of loop 1 and the OUTER counter of loop 3.  Writing loop 3 as
  * `for (i ...) for (j ...)` costs 35 words to register renames; splitting
