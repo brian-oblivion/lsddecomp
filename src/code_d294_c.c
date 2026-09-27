@@ -14,6 +14,19 @@
 #include "code_d294.h"
 #include "TmdModel.h"
 
+/* How far RaycastVertical's probe ray reaches from its origin, up (-y) and
+ * then down (+y), in the model's own units. */
+#define RAYCAST_PROBE_LENGTH 1024
+
+/* CalcBoxOutcode's bits: per axis, MAX when the point is past the box's
+ * maximum and MIN when it is before its minimum. */
+#define OUTCODE_Y_MIN 0x01
+#define OUTCODE_Y_MAX 0x02
+#define OUTCODE_X_MIN 0x04
+#define OUTCODE_X_MAX 0x08
+#define OUTCODE_Z_MIN 0x10
+#define OUTCODE_Z_MAX 0x20
+
 /* Rotates a 3-element s16 vector, given in the object's own local frame,
  * by the object's own orientation, widening it into `dst`. `slot84`
  * (SceneNode__GetRotMatrix, code_d294_b) builds that rotation with RotMatrix from
@@ -192,14 +205,14 @@ s32 SceneNode__RaycastVertical(SceneNode *self, s32 *offset, s32 *target) {
         self->methods->composeAndApplyRotation(self, 0, &origin, &end, 1);
 
         end.vx = origin.vx;
-        end.vy = (u16)origin.vy - 0x400;
+        end.vy = (u16)origin.vy - RAYCAST_PROBE_LENGTH;
         end.vz = origin.vz;
         if (TmdModel__RaycastFaces(self->model, &best, (TmdVec3 *)&hit, NULL, (TmdVec3 *)&origin,
                                    (TmdVec3 *)&end)) {
             SubVec3S16(offset, &origin.vx, &hit.vx);
             return 1;
         }
-        end.vy = (u16)origin.vy + 0x400;
+        end.vy = (u16)origin.vy + RAYCAST_PROBE_LENGTH;
         if (TmdModel__RaycastFaces(self->model, &best, (TmdVec3 *)&hit, NULL, (TmdVec3 *)&origin,
                                    (TmdVec3 *)&end)) {
             SubVec3S16(offset, &origin.vx, &hit.vx);
@@ -263,8 +276,8 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 zeroPitch, s3
         out[0].num = ratan2(1, dx);
     }
 
-    out[0].num = (out[0].num + 0x400) * 360 / 4096;
-    out[1].num = out[1].num * 360 / 4096;
+    out[0].num = (out[0].num + ONE / 4) * 360 / ONE;
+    out[1].num = out[1].num * 360 / ONE;
 
     out[2].num = 0;
     out[2].den = 1;
@@ -274,7 +287,7 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 zeroPitch, s3
         out[0].num = 0;
     }
     if (noHalfTurn == 0) {
-        out[1].num = out[1].num + 0xB4;
+        out[1].num = out[1].num + 180;
     }
 
     self->methods->updateRotation(self, 1, out);
@@ -297,8 +310,8 @@ s32 RatioToFixed12(void *pair) {
     p = (Ratio16 *)pair;
     whole = p->num / p->den;
     rem = p->num % p->den;
-    frac = (rem << 12) / p->den;
-    return (whole << 12) + frac;
+    frac = rem * ONE / p->den;
+    return whole * ONE + frac;
 }
 
 /* Cohen-Sutherland style outcode: one bit pair per axis, high bit set when
@@ -311,19 +324,19 @@ s32 CalcBoxOutcode(TmdBox *box, TmdVec3 *point) {
 
     flags = 0;
     if (box->max.x < point->x) {
-        flags = 8;
+        flags = OUTCODE_X_MAX;
     } else if (point->x < box->min.x) {
-        flags = 4;
+        flags = OUTCODE_X_MIN;
     }
     if (box->max.y < point->y) {
-        flags |= 2;
+        flags |= OUTCODE_Y_MAX;
     } else if (point->y < box->min.y) {
-        flags |= 1;
+        flags |= OUTCODE_Y_MIN;
     }
     if (box->max.z < point->z) {
-        flags |= 0x20;
+        flags |= OUTCODE_Z_MAX;
     } else if (point->z < box->min.z) {
-        flags |= 0x10;
+        flags |= OUTCODE_Z_MIN;
     }
     return flags;
 }
