@@ -25,9 +25,11 @@
  * pair, and sprite.rotate directly.
  *
  * Lifecycle.
- *   ctor(variant, arg2, texture)  Sprite's ctor with texture, abr 0, the
- *                  variant's cell and arg2; this table; unkA4 cleared; then
- *                  the reset slot with the variant (below).
+ *   ctor(variant, resetArg, texture)  Sprite's ctor with texture, abr 0,
+ *                  the variant's cell and resetArg (which Sprite's ctor hands
+ *                  on to Sprite__Reset, which does not read it; the one
+ *                  caller passes 0); this table; unkA4 cleared; then the
+ *                  reset slot with the variant (below).
  *   +0x040 reset   VariantSprite__SetVariantClut: records `variant` and sets
  *                  sprite.cx/cy from the variant's CLUT row, replacing the
  *                  CLUT Sprite's reset took from the texture.
@@ -72,7 +74,8 @@ typedef struct VariantSpriteMethods VariantSpriteMethods;
 /* clang-format on */
 
 struct VariantSpriteMethods {
-    VARIANTSPRITE_SLOTS(VariantSprite, (VariantSprite * self, s32 variant, void *arg2, void *texture));
+    VARIANTSPRITE_SLOTS(VariantSprite,
+                        (VariantSprite * self, s32 variant, void *resetArg, void *texture));
 };
 
 struct VariantSprite {
@@ -86,8 +89,8 @@ extern VariantSpriteMethods gVariantSpriteMethods;
 extern VariantSpriteMethods *GetVariantSpriteMethods(void); /* returns &gVariantSpriteMethods */
 
 /* The class's own methods, in address order. */
-VariantSprite *New_VariantSprite(s32 variant, void *arg2, void *texture);
-void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *arg2, void *texture);
+VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture);
+void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetArg, void *texture);
 void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant);
 void VariantSprite__UpdateScale(VariantSprite *self, s32 set, s16 *ratios);
 void VariantSprite__Update(VariantSprite *self, void *sender, s32 event);

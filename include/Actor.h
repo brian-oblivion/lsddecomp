@@ -22,7 +22,7 @@
  * coord2->coord.t and mark the coordinate for recompute; addLocalTranslation
  * (+0x0C0) rotates a local s16 vector by the object's orientation first.
  * moveLocalZ/X/Y (+0x0C4/+0x0C8/+0x0CC) put `val` into one component of the
- * s16 vector at D_8008ABA4 (x at ABA4, y at ABA6, z at ABA8), apply it through
+ * s16 vector at gActorLocalMove (x at ABA4, y at ABA6, z at ABA8), apply it through
  * addLocalTranslation, clear the component, keep `val` in lastOffsetValue
  * and, when `notify` is non-NULL, call notifyIfUnk20Active with 6, 7 or 8
  * (Actor__MoveAlongLocalAxis). The override of that slot, Actor__NotifyMove,
@@ -110,7 +110,7 @@ void Actor__AddTranslation(Actor *self, LongVec3 *delta);
 void Actor__UpdateTranslation(Actor *self, s32 set, LongVec3 *v);
 void Actor__AddLocalTranslation(Actor *self, s16 *local);
 void Actor__MoveLocalZ(Actor *self, s32 val, void *notify);
-void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, volatile s32 event);
+void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, s32 event);
 void Actor__MoveLocalX(Actor *self, s32 val, void *notify);
 void Actor__MoveLocalY(Actor *self, s32 val, void *notify);
 void Actor__MoveLocalZOrFindLink(Actor *self, s32 val, void *notify);

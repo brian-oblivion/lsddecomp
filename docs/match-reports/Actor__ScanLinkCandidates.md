@@ -103,3 +103,26 @@ the loop, only the body-statement form can separate them -- the
 ## Track 4 (2026-09-25, round 82, delta)
 
 Renamed from `DreamSys__ScanLinkCandidates`. Helper of Actor__FindNearbyLink. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 96, bravo)
+
+Comments quoted below are verbatim as the file stood before this round's
+comment pass, i.e. with this round's renames already applied (the
+`LinkQueryBuf` one as it stood before step 2).
+
+- `arr1 = (GridQuery *)((u8 *)arr1 + 0xC)` became `queries++`
+  (byte-identical, 49/49). Parameters `arg1`/`arg2`/`arr1`/`arr2` ->
+  `offset`/`pos`/`queries`/`slots` (AcceptGridElem's and
+  SceneNode__RaycastVertical's roles), local `elem` -> `slot`.
+- The `i++` placement keeps one `/* MATCHING: */` line.
+
+The function comment, verbatim:
+
+```c
+/* Walks `count` entries of `arr1` (a `GridQuery[]`, stride 0xC) paired
+ * element-for-element with `arr2` (a `ChunkSlot *[]`, stride 4),
+ * skipping any entry whose element's loader does not have `headerReady`
+ * set, and calling `Actor__ScanGridWindow` on the rest; returns the first
+ * non-NULL result, or NULL if every entry was skipped or came back empty
+ * (round 2026-09-04). */
+```

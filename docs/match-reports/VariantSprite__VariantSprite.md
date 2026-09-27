@@ -130,3 +130,21 @@ decision); those lines were left as the tool wrote them.
 The ctor keeps the Class__Class form. `unkA4` (+0x0A4), which it zeroes,
 keeps its placeholder: nothing else reads or writes it, so no name says
 more than "zeroed by the ctor".
+
+## Track 7 (2026-09-27, round 96, bravo)
+
+Comments quoted below are verbatim as the file stood before this round's
+comment pass, i.e. with this round's renames already applied (the
+`LinkQueryBuf` one as it stood before step 2).
+
+- Parameter `arg2` -> `resetArg` (see New_VariantSprite's report).
+
+The function comment, reworded; the old one, verbatim:
+
+```c
+/* The base-class ctor, Sprite__Sprite, through GetSpriteMethods(), with
+ * `self` upcast; then this class's table, and its reset slot
+ * (VariantSprite__SetVariantClut) with the variant, through VariantSpriteResetFn.
+ * The retail ctor ends in that call without setting $v0: it returns
+ * nothing. */
+```

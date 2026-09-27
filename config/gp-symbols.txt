@@ -74,7 +74,6 @@ D_8008AB84
 D_8008AB8C
 D_8008AB90
 D_8008AB94
-D_8008ABA4
 D_8008ABA8
 D_8008ABAC
 D_8008ABB4
@@ -97,6 +96,7 @@ STAIRCASE_OFFSET_3
 gActiveCdStream
 gActiveDataSource
 gActiveMoviePlayer
+gActorLocalMove
 gBMemPMgrBusy
 gBgLayerDefaultColor
 gCardIconPos

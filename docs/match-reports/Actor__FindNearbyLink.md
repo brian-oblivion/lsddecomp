@@ -150,3 +150,31 @@ for another.
 ## Track 4 (2026-09-25, round 82, delta)
 
 Renamed from `DreamSys__FindNearbyLink`. Reached only from Actor__MoveOrFindNearbyLink (base slots +0x0D0/+0x0D4), so the method is Actor's. Accessors now: grid (+0x04C, the StageMap child; cast to DreamSys.h's DreamSysUnk4CObj view for queryLinkAtPos), &coord2->tx, linkTarget, addTranslation, notifyIfUnk20Active (-1 found, -2 not). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 96, bravo)
+
+Comments quoted below are verbatim as the file stood before this round's
+comment pass, i.e. with this round's renames already applied (the
+`LinkQueryBuf` one as it stood before step 2).
+
+- Locals: `sp18` -> `desc` (a `Descriptor10Ext` now, StageMap.h, so the
+  `(Descriptor10Ext *)` cast at computeFootprintDescriptor goes; the old
+  0x30-byte `LinkQueryBuf` view is retired, and dropping its 4 trailing
+  bytes is byte-identical, measured), `sp48` -> `queries`, `sp78` ->
+  `slots`, `sp88` -> `offset` (SceneNode__RaycastVertical's output, the
+  hit less the ray's start, then addTranslation'd).
+- `pad48Tail[8]` is still needed (without it, 55/71). `GridQuery
+  queries[4]` in its place also matches (0x24 + 8 rounds to the same 0x30),
+  but BuildLinkQueries fills at most 3, so the pad stays and keeps one
+  `/* MATCHING: */` line.
+- Proposed: the notifyWithHull events -1/-2 (linked / not linked) and
+  MoveAlongLocalAxis's 6/7/8 as one enum in Actor.h (head; class_3bb8c_o
+  would change too).
+
+The pad's comment, verbatim:
+
+```c
+    /* No known field needs this gap; empirically required to reproduce
+     * retail's exact stack layout for slots/offset below (round 2026-09-04,
+     * see this function's match report). */
+```

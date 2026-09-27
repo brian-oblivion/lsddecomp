@@ -3003,3 +3003,4 @@ gSaveTitle = 0x8008AA18;
 sSaveTitleColorChannel = 0x8008AA28;
 sSaveTitleColorFrame = 0x8008AA2C;
 sTaskObjFCount = 0x8008AA30;
+gActorLocalMove = 0x8008ABA4;
