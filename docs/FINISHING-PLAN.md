@@ -20,7 +20,8 @@ the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
 Plan revision: 33 (2026-09-27, round 95's premium head: a Sony-collision
-header job's edit set includes the units that include it).
+header job's edit set includes the units that include it; the polish
+runner stays on Opus).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -58,7 +59,7 @@ debt behind 6 to 8.
 | --- | --- | --- |
 | **head** | Opus | **premium** only when the round itself will WRITE a new procedure or tool or change a RULE in a doc, or must adjudicate a HARD RULE tension or a toolchain lead, or `plan.py` lists a setup item (tracks 6 and 7). Escalated gaps are NOT a reason for the next round's head to be premium: the operator hands them to a premium session BETWEEN rounds, which revises this plan and the tools, and the next round runs on Opus again. An Opus head executes what is written and escalates every gap in its report instead of writing procedure (round 50 onward). MAINTAINING a doc within its existing rules (distilling entries to the archive to meet a budget, fixing a stale figure) is not a plan change: the head does it, or spawns a Sonnet for it, when `plan.py` warns. |
 | **types runner** (track 6) | Opus | never lower: a class name propagates into every unit that sees it |
-| **polish runner** (track 7) | Opus | **Sonnet** once the head has reviewed two Opus-polished units and sent none back (`plan.py set-model --role polish_runner --model sonnet`); back to Opus if a Sonnet unit is sent back |
+| **polish runner** (track 7) | Opus | never lower: Sonnet passes were accepted 1 of 5 (rounds 92, 94), Opus 16 of 16, and each one sent back cost an Opus redo (revision 33) |
 | **files runner** (track 8) | Opus | never lower |
 | **close-out runner** (track 9) | Opus | |
 | **mechanical runner** (track 6 table renames, reopened track 2 or 1b, report hygiene) | Sonnet | never higher |
