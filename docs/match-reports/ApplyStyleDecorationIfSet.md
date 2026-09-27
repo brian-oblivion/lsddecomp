@@ -13,7 +13,7 @@ object via `New_BoxFill(&D_8008AB60, gStyleDecorColor, 0)` (already known
 elsewhere as returning `ClassEAC0Obj *` from `include/code_2cc8c.h`, a header
 this unit doesn't own -- see below), stashes it in `gStyleDecorObj`, and
 dispatches three method calls on it (`slot64(obj,1)`, `slot68(obj,0)`,
-`slot4C(obj,tmp,&D_8008AB58)`) plus one call on a completely different
+`slot4C(obj,tmp,&sStyleDecorBoxPos)`) plus one call on a completely different
 object reached through `gStyleSceneRefs->unkC` (`slotAC(sub)`, whose return
 feeds the `slot4C` call's middle argument).
 
@@ -51,7 +51,7 @@ typedef struct FieldAC7CHolder {
 
 extern s32 gStyleDecorObj;
 extern s32 D_8008AB60;
-extern s32 D_8008AB58;
+extern s32 sStyleDecorBoxPos;
 extern LocalM4D0Obj *New_BoxFill(void *a0, void *a1, s32 a2);
 
 void ApplyStyleDecorationIfSet(void) {
@@ -65,7 +65,7 @@ void ApplyStyleDecorationIfSet(void) {
         tmp = ((FieldAC7CHolder *) gStyleSceneRefs)->unkC->methods->slotAC(
                 ((FieldAC7CHolder *) gStyleSceneRefs)->unkC);
 
-        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot4C((LocalM4D0Obj *) gStyleDecorObj, tmp, &D_8008AB58);
+        ((LocalM4D0Obj *) gStyleDecorObj)->methods->slot4C((LocalM4D0Obj *) gStyleDecorObj, tmp, &sStyleDecorBoxPos);
     }
 }
 ```

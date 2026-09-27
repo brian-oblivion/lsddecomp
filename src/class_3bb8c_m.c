@@ -313,7 +313,7 @@ typedef struct StyleSceneRefs {
 
 extern s32 gStyleDecorObj;
 extern s32 D_8008AB60;
-extern s32 D_8008AB58;
+extern s32 sStyleDecorBoxPos;
 
 void ApplyStyleDecorationIfSet(void) {
     SceneNode *fadeBox;
@@ -327,6 +327,6 @@ void ApplyStyleDecorationIfSet(void) {
                       ->viewport->methods->getFadeBox(((StyleSceneRefs *)gStyleSceneRefs)->viewport);
 
         ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorObj)->methods->attachToParent)(
-            (BoxFill *)gStyleDecorObj, fadeBox, (BoxFillPos *)&D_8008AB58);
+            (BoxFill *)gStyleDecorObj, fadeBox, (BoxFillPos *)&sStyleDecorBoxPos);
     }
 }
