@@ -207,3 +207,8 @@ to apply by type scope:
   class_3bb8c_d.c (TitleMenu__Reset), class_3bb8c_t.c (GraphRoom__Reset).
   Viewport's own `unk44`/`unk48` and `setUnk44`/`setUnk48` would follow as
   `packetCount`/`packetSize`.
+
+
+## Track 6 (2026-09-27, round 99, runner bravo)
+
+`gDefaultStreamTaskInitData` is renamed `gDefaultMovieFrame` (tier B, see GetDefaultMovieFrame.md): the rect this function clears when there is no sub handle is the frame StreamTask builds its MoviePlayer with. That the clear is FOR the movie area is not established; the name records where else the rect goes.

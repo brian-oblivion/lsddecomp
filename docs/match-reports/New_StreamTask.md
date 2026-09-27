@@ -71,3 +71,8 @@ StreamTaskObj's table now expands TASKCORE_SLOTS (include/TaskCore.h, round 84):
 ## Track 4 (2026-09-26, round 87)
 
 Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). The 0xDC-byte allocator.
+
+
+## Track 6 (2026-09-27, round 99, runner bravo)
+
+The fifth parameter is a `DrawRect *` (DrawSystem.h); `StreamTaskInitData`, its local spelling, is deleted (StreamTask__StreamTask.md). Byte-identical.

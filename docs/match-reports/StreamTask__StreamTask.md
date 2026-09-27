@@ -118,3 +118,8 @@ Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, i
 ## Track 4 (2026-09-26, round 89)
 
 The player is a MoviePlayer (`include/MoviePlayer.h`); code_2c054.h's StreamTaskUnkB4Obj view is gone and code_2c054.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The allocation is `New_MoviePlayer((DrawRect *)GetDefaultMovieFrame(), 0, 0)`: the ctor's frame rectangle (a pointer cast, no code). Byte-identical.
+
+
+## Track 6 (2026-09-27, round 99, runner bravo)
+
+`StreamTaskInitData` was a local spelling of DrawSystem.h's `DrawRect` (the same three words, and `gDefaultMovieFrame`, the fallback, was already `extern DrawRect` in both units that name it); it is deleted. `initData` (+0x0A8), the fifth parameter and `GetDefaultMovieFrame()` are `DrawRect`, so the allocation is `New_MoviePlayer(GetDefaultMovieFrame(), 0, 0)` with no cast. The struct copy is unchanged (both types are 12 bytes, 4-aligned). Byte-identical; `typeviews.py --warnings` 0 new. The getter and the data were renamed this round from `GetDefaultStreamTaskInitData`/`gDefaultStreamTaskInitData` (see GetDefaultMovieFrame.md).

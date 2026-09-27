@@ -39,3 +39,13 @@ runner alpha). Tier A: pure leaf getter, returns `&gDefaultMovieFrame`
 in `include/code_2c054.h` and used there (`code_2c054.c`) as the fallback
 default when a caller supplies no init data -- "Default" is the confirmed
 mechanic (a fixed fallback constant), not a guess.
+
+
+## Track 6 (2026-09-27, round 99, runner bravo)
+
+Returns `DrawRect *` now (was `void *` here and a `StreamTaskInitData *` prototype in code_2c054.h; the local type is deleted, StreamTask__StreamTask.md). The C above is the round-12 match; the live body is `return &gDefaultMovieFrame;` over `extern DrawRect gDefaultMovieFrame;`. Byte-identical.
+
+Names, through `tools/rename.py`:
+
+- `gDefaultStreamTaskInitData` -> **`gDefaultMovieFrame`**, tier B. The data at 0x8006E854 is `{x 640, y 0, w 320, h 240}`. Measured uses: StreamTask__StreamTask passes it as New_MoviePlayer's `frame` (MoviePlayer::frame, the rect `play` clears and `drawStrip` walks); it is StreamTask's `initData` default; TaskCore__OnInit clears it when a task has no sub handle. "Movie frame" names the player's use; "Default" is StreamTask's fallback. Why TaskCore clears it is not established.
+- `GetDefaultStreamTaskInitData` -> **`GetDefaultMovieFrame`**, tier A: a leaf getter named for what it returns. (rename.py rewrote the earlier Naming section's identifiers in place; its history reads "renamed from func_8003DFCC, round 55" to the name that function had then, GetDefaultStreamTaskInitData.)
