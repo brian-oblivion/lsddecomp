@@ -359,7 +359,7 @@ into fresh registers at entry (`move $a3,$a0` / `move $t0,$a1`) and never
 touches the originals again -- superficially the identical "retail spends
 a register this build will not spend" shape. That report's **attempt 2**
 tried exactly the fix that worked here, explicit local copies
-(`FadeBoxObj *obj = self; SkipShort2 *src = a1;` used throughout), and
+(`FadeBoxObj *obj = self; BoxFillSize *src = a1;` used throughout), and
 records: *"no change at all -- GCC still keeps the values in `$a0`/`$a1`"*.
 
 The discriminator is mutation, and it is mechanical:

@@ -185,13 +185,13 @@ void *FadeBox__GetColor(FadeBox *self) {
 
 /* MATCHING: both position pairs are copied as whole structs; the block
  * copy is what moves `self` and `size` out of their incoming registers. */
-void FadeBox__PushPosition(FadeBox *self, SkipShort2 *size, BoxFillPos *pos) {
+void FadeBox__PushPosition(FadeBox *self, BoxFillSize *size, BoxFillPos *pos) {
     if (self->parent != 0) {
         self->savedW = self->boxW;
         self->savedH = self->boxH;
         *(BoxFillPos *)&self->savedPosX = *(BoxFillPos *)&self->posX;
-        self->boxW = size->x;
-        self->boxH = size->y;
+        self->boxW = size->w;
+        self->boxH = size->h;
         *(BoxFillPos *)&self->posX = *pos;
     }
 }
@@ -230,13 +230,13 @@ BoxFill *New_BoxFill(void *size, void *color, s32 pri) {
     return NULL;
 }
 
-void BoxFill__BoxFill(BoxFill *self, SkipShort2 *size, void *color, s32 pri) {
+void BoxFill__BoxFill(BoxFill *self, BoxFillSize *size, void *color, s32 pri) {
     GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetBoxFillMethods();
     ((BoxFillResetFn)self->methods->reset)(self, size, color, pri);
 }
 
-void BoxFill__Reset(BoxFill *self, SkipShort2 *size, void *color, s32 pri) {
+void BoxFill__Reset(BoxFill *self, BoxFillSize *size, void *color, s32 pri) {
     BoxFillMethods *methods;
 
     self->pri = pri;
@@ -245,8 +245,8 @@ void BoxFill__Reset(BoxFill *self, SkipShort2 *size, void *color, s32 pri) {
     self->boxAttribute = 0;
     self->boxX = 0;
     self->boxY = 0;
-    self->boxW = size->x;
-    self->boxH = size->y;
+    self->boxW = size->w;
+    self->boxH = size->h;
     methods = self->methods;
     if (color == NULL) {
         color = D_8008A924;

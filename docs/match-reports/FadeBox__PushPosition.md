@@ -2,7 +2,7 @@
 
 > Renamed from `Class6E99C__PushPosition` on 2026-09-26 (tools/rename.py). Address 0x8004042c.
 
-REVISITED, round 73: MATCHED 25/25 (whole-image SHA1 green); names/types not relevant (the existing `SkipShort2 *a1` / `BoxFillPos *a2` signature was kept; retyping `a1` as `BoxFillPos *` measured byte-identical)
+REVISITED, round 73: MATCHED 25/25 (whole-image SHA1 green); names/types not relevant (the existing `BoxFillSize *a1` / `BoxFillPos *a2` signature was kept; retyping `a1` as `BoxFillPos *` measured byte-identical)
 
 ## Round 73 (runner bravo): MATCHED -- the "redundant move" is a block-move CLOBBER
 
@@ -41,12 +41,12 @@ green).
 
 Builds this round: 1 (preserved body) + 1 (retype `a1` to `BoxFillPos *`,
 inert, 22/25) + 1 (stash as struct copy: 25/25) + 2 cleanups (no
-barriers; `a1` back to `SkipShort2 *`), all 25/25 after the lever.
+barriers; `a1` back to `BoxFillSize *`), all 25/25 after the lever.
 
 ### Matched body
 
 ```c
-void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, BoxFillPos *a2) {
+void FadeBox__PushPosition(FadeBoxObj *self, BoxFillSize *a1, BoxFillPos *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -197,7 +197,7 @@ function's own `lhu` (zero-extending) when WIDENING them into the now-`s32`
 
 ```c
 #if 0
-void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, BoxFillPos *a2) {
+void FadeBox__PushPosition(FadeBoxObj *self, BoxFillSize *a1, BoxFillPos *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -237,7 +237,7 @@ instructions, only the register NUMBER differs.
 ### Attempts at the register-identity part (2)
 
 1. Base body above: `$a0`/`$a1` throughout, not `$a3`/`$t0`.
-2. Explicit local copies (`FadeBoxObj *obj = self; SkipShort2 *src =
+2. Explicit local copies (`FadeBoxObj *obj = self; BoxFillSize *src =
    a1;`, then use `obj`/`src` throughout): no change at all -- GCC still
    keeps the values in `$a0`/`$a1`.
 
@@ -319,7 +319,7 @@ changed.
 
 ```c
 #if 0
-void FadeBox__PushPosition(FadeBoxObj *self, SkipShort2 *a1, BoxFillPos *a2) {
+void FadeBox__PushPosition(FadeBoxObj *self, BoxFillSize *a1, BoxFillPos *a2) {
     if (self->unkC != 0) {
         self->unk88 = self->unk60;
         self->unk8C = self->unk62;
@@ -356,7 +356,7 @@ structurally forced to appear early because the guard condition
 so nothing in the C forces an early copy of it, yet retail makes one
 anyway. This is the project's documented "redundant move" residue class
 (see `BoxFill__ApplyColor.md`, `Entity__MoodCue81.md`, MATCHING-GUIDE): tried an
-explicit `SkipShort2 *src = a1;` local declared before the `if` and used in
+explicit `BoxFillSize *src = a1;` local declared before the `if` and used in
 place of `a1` for both dereferences -- GCC 2.6.3 copy-propagates it away
 with NO instruction emitted, score unchanged at 210, matching how this
 class has resisted the same lever every other time it has been tried in
@@ -405,7 +405,7 @@ whole-function register-bank swap the original report misdiagnosed.
    (`*(BoxFillPos*)&self->unk50 = *a2;`): 210 -- fixed the pair's own
    batching AND `self`'s register identity throughout the function, as one
    change. Current best.
-5. Explicit `SkipShort2 *src = a1;` local (attempt 4's body, `a1->x`/`a1->y`
+5. Explicit `BoxFillSize *src = a1;` local (attempt 4's body, `a1->x`/`a1->y`
    replaced with `src->x`/`src->y`): no change (210) -- copy-propagated
    away, same as the original report's attempt 2 on the OLD body.
 6. Swapped block order (struct-copy pair before the `a1` pair, attempt
@@ -418,7 +418,7 @@ whole-function register-bank swap the original report misdiagnosed.
    idiomatic C.
 8. Manually applied that exact trick to `a1` directly (`if (self) { src =
    a1; } else { src = a1; }`, then `src->x`/`src->y`): no change, 210.
-9. (Same round) re-confirmed attempt 5's plain `SkipShort2 *src = a1;`
+9. (Same round) re-confirmed attempt 5's plain `BoxFillSize *src = a1;`
    gives the identical 210 as the direct-`a1` form -- the local is fully
    copy-propagated away either way.
 
@@ -469,10 +469,10 @@ agree: PERMUTER-EXHAUSTED stands.
 **Two more manual attempts on the missing `move $t0,$a1`, both
 negative:**
 
-1. Built a real `SkipShort2 tmp = *a1;` whole-struct read (mirroring
+1. Built a real `BoxFillSize tmp = *a1;` whole-struct read (mirroring
    the lever that fixed `self`'s own register identity elsewhere in
    this function), then `self->unk60 = tmp.x; self->unk62 = tmp.y;`.
-   This does NOT parallel the `a2`/`BoxFillPos` case: `SkipShort2` has a
+   This does NOT parallel the `a2`/`BoxFillPos` case: `BoxFillSize` has a
    real gap between `x` (+0x000) and `y` (+0x004), so it is not a
    plain 4-byte contiguous struct the way `BoxFillPos` is. GCC 2.6.3
    lowers the unaligned/gapped struct copy via a real stack temporary
@@ -550,3 +550,15 @@ is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
 already says what the body does. renametype.py rewrote the old class name in
 this report's earlier history too (known, pending an operator decision).
 
+
+## Track 6 (round 99, alpha)
+
+`SkipShort2` (`s16 x; u8 pad2[2]; s16 y;`, named for its layout) is now
+`BoxFillSize` (`tools/renametype.py SkipShort2 BoxFillSize --any-stem`), and
+its fields are what every caller passes: two words, `s32 w; s32 h;`. Storing
+an s32 field into the u16 `boxW`/`boxH` still reads only the low halfword
+(`lhu` at +0x000/+0x004): measured byte-exact with the whole image, so the
+halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
+became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
+BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
+its caller in code_2cc8c_b passes an `s32 size[2]`).
