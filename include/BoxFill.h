@@ -101,7 +101,7 @@ typedef struct BoxFillRgb {
     /* +0x0B8 */ void (*setColor)(Self *self, s32 overwrite, void *rgb);  /* BoxFill__SetColor: copy the 3 bytes, or add them when overwrite is 0 */ \
     /* +0x0BC */ void (*setPosition)(Self *self, BoxFillPos *pos);        /* BoxFill__SetPosition: only while attached */ \
     /* +0x0C0 */ void (*setSize)(Self *self, s32 *size);                  /* BoxFill__SetSize: {w, h} words, low halves; only while attached */ \
-    /* +0x0C4 */ void (*attachAbsolute)(Self *self, SceneNode *parent, BoxFillPos *pos, s32 arg3); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = arg3 */ \
+    /* +0x0C4 */ void (*attachAbsolute)(Self *self, SceneNode *parent, BoxFillPos *pos, s32 attachArg); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = attachArg */ \
     /* +0x0C8 */ void (*setPri)(Self *self, s32 pri);                     /* BoxFill__SetPri */          \
     /* +0x0CC */ s32 (*setMask)(Self *self, s32 bits)                     /* BoxFill__SetMask: mask = (1 << bits) - 1; Reset passes 13 */
 /* clang-format on */
@@ -153,7 +153,7 @@ void BoxFill__SetColor(BoxFill *self, s32 overwrite, u8 *rgb);
 void BoxFill__ApplyColor(BoxFill *self, u8 *dst, u8 *src, s32 overwrite);
 void BoxFill__SetPosition(BoxFill *self, BoxFillPos *pos);
 void BoxFill__SetSize(BoxFill *self, s32 *size);
-void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, s32 arg3);
+void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, s32 attachArg);
 void BoxFill__SetPri(BoxFill *self, s32 pri);
 s32 BoxFill__SetMask(BoxFill *self, s32 bits);
 

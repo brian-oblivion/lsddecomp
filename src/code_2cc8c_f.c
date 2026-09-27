@@ -48,14 +48,12 @@ void BoxFill__SetColor(BoxFill *self, s32 overwrite, u8 *rgb) {
 }
 
 void BoxFill__ApplyColor(BoxFill *self, u8 *dst, u8 *src, s32 overwrite) {
-    u8 *d;
-    d = dst;
     if (overwrite) {
-        *(BoxFillRgb *)d = *(BoxFillRgb *)src;
+        *(BoxFillRgb *)dst = *(BoxFillRgb *)src;
     } else {
-        d[0] += src[0];
-        d[1] += src[1];
-        d[2] += src[2];
+        dst[0] += src[0];
+        dst[1] += src[1];
+        dst[2] += src[2];
     }
 }
 
@@ -75,19 +73,17 @@ void BoxFill__SetSize(BoxFill *self, s32 *size) {
 /* +0x04C is called with FOUR arguments through an unprototyped pointer: its
  * occupant reads three, and the fourth is this function's own a3, already in
  * $a3 (BoxFill.h's banner). */
-void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, s32 arg3) {
+void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, s32 attachArg) {
     void (*fn)();
-    BoxFill *q;
 
-    q = self;
-    fn = (void (*)())q->methods->attachToParent;
+    fn = (void (*)())self->methods->attachToParent;
     /* The do/while(0) wrapper is a no-op scoping device, load-bearing for
      * delay-slot scheduling only -- see the match report. Without it GCC
      * swaps the prologue's $ra/$s1 callee-save STORE ORDER. */
     do {
-        fn(q, parent, pos, arg3);
-        q->relative = 0;
-        q->unk4C = arg3;
+        fn(self, parent, pos, attachArg);
+        self->relative = 0;
+        self->unk4C = attachArg;
     } while (0);
 }
 
@@ -219,17 +215,14 @@ void TextRow__SetColor(TextRow *self, SpriteRgb *rgb) {
     CharSprite **elemp = self->cells + self->firstVisible;
     s32 i = self->firstVisible;
     s32 bound = i;
-    s32 count = i + self->visibleCount;
-    if (i < count) {
+    if (i < bound + self->visibleCount) {
         do {
             CharSprite *elem = *elemp;
-            s32 ab;
             elemp++;
-            ab = self->visibleCount;
             elem->methods->setColor(elem, rgb);
             i++;
             bound = self->firstVisible;
-        } while (i < (bound + self->visibleCount));
+        } while (i < bound + self->visibleCount);
     }
 }
 
@@ -382,12 +375,12 @@ extern void *memset(unsigned char *dst, unsigned char c, int n);
 extern int strlen(char *s);
 extern char *itoa(int n);
 
-void FormatFullWidthNumber(u8 *dst, s32 a1, s32 width, s32 unpadded) {
+void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded) {
     char text[width + 1];
     s32 fill;
     char padded[width + 1];
 
-    fill = strlen(strcpy(text, itoa(a1)));
+    fill = strlen(strcpy(text, itoa(value)));
     fill = width - fill;
     if (unpadded == 0) {
         memset((unsigned char *)padded, '0', width);
