@@ -163,3 +163,32 @@ The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of t
 ## Track 4 (2026-09-26, round 88, alpha)
 
 bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj casts are gone, and the two calls are by slot name, `attachToParent(bgLayer, (SceneNode *)unk14, NULL)` (+0x04C, SceneNode's; returns SceneNode *, discarded, where the view said void) and `setColor(bgLayer, 1, (BgLayerRgb *)baseColor)` (+0x0B8). Byte-identical.
+
+## Track 7 (2026-09-27, round 99, alpha)
+
+- `TaskTextObj`/`TaskTextMethods`, this unit's local view of
+  `initArgs->drawSystem`, is retired: its only slot, `+0x078 slot78`, is
+  `DrawSystem::clearImage(self, color, rect)` (include/DrawSystem.h), which
+  TitleMenu__OnDeinit already calls through `DrawSystem *`. The calls now cast
+  to `DrawSystem *`; byte-identical. The two clears are therefore: the
+  default movie frame (`&gDefaultStreamTaskInitData`, a DrawRect
+  {640, 0, 320, 240}) to baseColor when there is no sub handle, then the whole
+  screen (NULL rect) to baseColor.
+- `unk28` -> `otLength` (tier A: onInit passes it to the viewport's
+  setOtLength) and `unk30` -> `packetSize` (tier B, see TaskCore__Reset).
+  Accessor set from the compiler's error list: this unit only.
+- `D_8006E86C` -> `sTaskCoreViewOrigin` (tier A: a zero LongVec3 passed as
+  both attachViewChild's viewpoint and reference point; only this unit
+  reaches it).
+
+### History moved from include/code_2c054.h
+
+- Round 2 (this function's match): the slot's third parameter was widened
+  from `s32` to a pointer, because TaskCore__OnDeinit's call passes a literal
+  0 (valid for either) but this function's passes
+  `&gDefaultStreamTaskInitData`, a real address. `gDefaultStreamTaskInitData`
+  and `sTaskCoreViewOrigin` were reached only by address and typed as a byte
+  array and a LongVec3.
+- The viewport's local view here (`StreamTaskUnk18Obj`) was merged into
+  include/Viewport.h in round 85; StreamTask::player's (`StreamTaskUnkB4Obj`)
+  into include/MoviePlayer.h in round 89.

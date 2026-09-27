@@ -23,7 +23,7 @@
  *
  * init/deinit (IntermediateBase's) call onInit/onDeinit: onInit hangs the
  * slot widgets and the BgLayer under +0x014, sets the colours, configures
- * the viewport (its +0x048/+0x04C/+0x050 take unk28/unk2C/unk30) and opens
+ * the viewport (its +0x048/+0x04C/+0x050 take otLength/unk2C/packetSize) and opens
  * its OT; onDeinit closes it. TaskCore__Init returns `result`.
  *
  * The state machine (setState, update). IntermediateBase's update counts
@@ -191,9 +191,9 @@ struct TaskCoreTarget {
 /* clang-format off */
 #define TASKCORE_FIELDS(Methods)                                                                   \
     INTERMEDIATEBASE_FIELDS(Methods);                                                              \
-    /* +0x028 */ s32 unk28;             /* reset: 3; onInit: the viewport's +0x048 (Viewport__SetOtLength) */ \
+    /* +0x028 */ s32 otLength;          /* reset: 3; onInit: the viewport's setOtLength (+0x048) */ \
     /* +0x02C */ s32 unk2C;             /* reset: 0x12C (GraphRoom 0x190); onInit: viewport +0x04C (SetUnk44) */ \
-    /* +0x030 */ s32 unk30;             /* reset: 0x40; onInit: viewport +0x050 (SetUnk48) */      \
+    /* +0x030 */ s32 packetSize;        /* reset: 64; onInit: viewport +0x050 (SetUnk48), a factor of the packet area */      \
     /* +0x034 */ s32 unk34;             /* reset: 1; nonzero: onDeinit hands unk93 to initArgs->unk0's +0x078 */ \
     /* +0x038 */ s32 result;            /* TaskCore__Init returns it; onInit 0, setState(6) 1 */   \
     /* +0x03C */ s32 inputMode;         /* 0 none, 1 choosing a slot, 2 scrolling its items; onPadEvent needs nonzero */ \

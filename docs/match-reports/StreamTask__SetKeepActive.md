@@ -71,3 +71,10 @@ run of five identical-shape setters at consecutive table slots
 ## Track 4 (2026-09-26, round 87)
 
 Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Own slot +0x124. unkC4 is MoviePlayer__Play's third argument (stored at the player's +0x054); left unnamed until MoviePlayer's class is.
+
+## Track 7 (2026-09-27, round 99, alpha)
+
+Renamed from `StreamTask__SetUnkC4` (tier A): it stores its argument in
+`keepActive` (was `unkC4`), which StreamTask__OnInit passes as
+MoviePlayer__Play's `keepActive` argument (MoviePlayer::keepActive, +0x054).
+The slot `+0x124` is `setKeepActive`. No caller in the image dispatches it.

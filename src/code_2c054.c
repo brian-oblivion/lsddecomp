@@ -41,7 +41,7 @@ void StreamTask__Finalize(StreamTask *self) {
 
 void StreamTask__Reset(StreamTask *self) {
     self->loopCount = -1;
-    self->unkC4 = 0;
+    self->keepActive = 0;
     self->skipOnConfirm = 1;
     self->unkD0 = 0;
     self->abortBeforeFade = 1;
@@ -62,7 +62,7 @@ void StreamTask__OnInit(StreamTask *self) {
     self->playDone = 0;
     self->player->methods->setAutoPlay(self->player, self->autoPlay);
     if (self->player->methods->play(self->player, (char *)self->streamName, self->streamGroup,
-                                    self->unkC4, self->loopCount) != 0) {
+                                    self->keepActive, self->loopCount) != 0) {
         self->methods->setFrameBound(self, 0);
     }
 }
@@ -138,7 +138,7 @@ void StreamTask__RefreshViewValue(StreamTask *self) {
 }
 
 void StreamTask__SetKeepActive(StreamTask *self, s32 value) {
-    self->unkC4 = value;
+    self->keepActive = value;
 }
 
 void StreamTask__SetLoopCount(StreamTask *self, s32 count) {
@@ -218,9 +218,9 @@ void TaskCore__Reset(TaskCore *self) {
     methods->setFadeCallbackEnabled(self, 1);
     methods->setFadeOutCallbackEnabled(self, 1);
     self->fadeRate = 9;
-    self->unk28 = 3;
+    self->otLength = 3;
     self->unk2C = 0x12C;
-    self->unk30 = 0x40;
+    self->packetSize = 0x40;
     self->viewCallback = NULL;
     self->viewCallbackCtx = NULL;
     self->unk34 = 1;
@@ -232,9 +232,8 @@ s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
     return self->result;
 }
 
-/* initArgs->unk0 is reached through this unit's TaskTextObj view, the
- * viewport as a Viewport (include/Viewport.h), both `BasicClass *` in
- * TaskCore.h; bgLayer is a BgLayer (include/BgLayer.h). */
+/* initArgs->drawSystem and the viewport are `BasicClass *` fields; they are
+ * cast to their classes, DrawSystem and Viewport. */
 void TaskCore__OnInit(TaskCore *self) {
     Viewport *viewport;
     ViewportMethods *core;
@@ -248,15 +247,15 @@ void TaskCore__OnInit(TaskCore *self) {
         self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)self->baseColor);
     }
     if (self->subHandle == 0) {
-        ((TaskTextObj *)self->initArgs->drawSystem)
-            ->methods->slot78((TaskTextObj *)self->initArgs->drawSystem, self->baseColor,
-                              gDefaultStreamTaskInitData);
+        ((DrawSystem *)self->initArgs->drawSystem)
+            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor,
+                                  &gDefaultStreamTaskInitData);
     }
-    ((TaskTextObj *)self->initArgs->drawSystem)
-        ->methods->slot78((TaskTextObj *)self->initArgs->drawSystem, self->baseColor, 0);
-    core->setOtLength(viewport, self->unk28);
+    ((DrawSystem *)self->initArgs->drawSystem)
+        ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor, NULL);
+    core->setOtLength(viewport, self->otLength);
     core->setUnk44(viewport, self->unk2C);
-    core->setUnk48(viewport, self->unk30);
+    core->setUnk48(viewport, self->packetSize);
     core->attachViewChild(viewport, self->unk14, &sTaskCoreViewOrigin, &sTaskCoreViewOrigin, 0);
     core->initOt(viewport);
     self->result = 0;
@@ -268,7 +267,7 @@ void TaskCore__OnDeinit(TaskCore *self) {
     viewport->methods->detachViewChild(viewport);
     self->bgLayer->methods->detachFromParent(self->bgLayer);
     if (self->unk34 != 0) {
-        ((TaskTextObj *)self->initArgs->drawSystem)
-            ->methods->slot78((TaskTextObj *)self->initArgs->drawSystem, self->unk93, 0);
+        ((DrawSystem *)self->initArgs->drawSystem)
+            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->unk93, NULL);
     }
 }

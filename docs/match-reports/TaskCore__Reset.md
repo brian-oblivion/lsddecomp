@@ -78,3 +78,28 @@ this codebase.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from TaskCoreObj__Reset (tools/rename.py): the class prefix. Occupant of +0x040 (IntermediateBase's `resetCounters`, the ctor's last call). Keeps "Reset" rather than the slot's name: it sets eight defaults and makes four slot calls and does not up-call. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 99, alpha)
+
+- `D_8006E860` -> `sTaskCoreDefaultColors` (tier A): nine bytes of .data,
+  three RGB triples {0, 0, 0}, {0, 0, 0}, {128, 128, 128}, passed to setColors
+  as base, clear and the third colour; only this unit reaches it.
+- `unk28` -> `otLength` (tier A): onInit hands it to the viewport's
+  setOtLength.
+- `unk30` -> `packetSize` (tier B): onInit hands it to the viewport's
+  `setUnk48`, and Viewport__InitOt sizes each buffer's packet area as
+  `unk44 * unk48`. Every writer of the `unk48` side passes 64 (Viewport's ctor,
+  this function), while the `unk44` side varies with the screen (2000
+  Viewport's default, 1200 DreamSys, 300 here, 400 TitleMenu and GraphRoom),
+  which reads as a packet count times a fixed packet size. The Viewport banner
+  leaves which is which open; this name is the reading above, not a
+  measurement.
+- `unk2C` (-> `packetCount`) and `unk34` (-> `clearOnDeinit`) have accessors
+  in class_3bb8c_d.c / class_3bb8c_t.c: proposed, not renamed.
+
+### History moved from include/code_2c054.h
+
+The colour table was first declared as "a rodata table reached only by
+ADDRESS (`lui`/`addiu`, no `lw`/`sw` here), passed as three pointers 3 bytes
+apart, never decoded further, so typed as a plain byte array". It is in
+.data (asm/data/5E140.data.s), not rodata.

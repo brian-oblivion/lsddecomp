@@ -114,3 +114,16 @@ The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of t
 ## Track 4 (2026-09-26, round 88, alpha)
 
 bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj cast is gone and +0x050 is called as `detachFromParent` (SceneNode's; returns SceneNode *, discarded, where the view said void). Byte-identical.
+
+## Track 7 (2026-09-27, round 99, alpha)
+
+- The `+0x078` call is `DrawSystem::clearImage(drawSystem, unk93, NULL)`,
+  the whole screen cleared to `unk93` while `unk34` is set; the local
+  `TaskTextObj` view is retired for include/DrawSystem.h's type
+  (TaskCore__OnInit's report). Byte-identical.
+- `unk34` and `unk93` are also accessed by class_3bb8c_d.c (TitleMenu__Reset,
+  TitleMenu__OnDeinit) and code_2cc8c.c, so they are proposed, not renamed:
+  `unk93` -> `clearColor` (setColors' second triple, `clear` there; both this
+  function and TitleMenu__OnDeinit clear the screen to it), `unk34` ->
+  `clearOnDeinit` (reset 1, TitleMenu 0; this function clears only while it is
+  set).
