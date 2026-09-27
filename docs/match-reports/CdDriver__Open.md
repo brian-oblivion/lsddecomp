@@ -269,3 +269,19 @@ blocking CdControl/CdSync/CdRead spin on the spot. So the word selects
 `SetActiveDataSourceDriverMode(syncDriver == 0, 1, 1)`; every other caller
 passes 0. Tier B: the mechanics are the bodies', why the game wants the
 queued blocking mode is not established.
+
+### History (moved from code_179d8_s.c, round 100)
+
+Until round 100 the unit spelled Sony's libcd itself: its own prototypes for
+CdControl, CdIntToPos, CdPosToInt, CdRead, CdReadSync, CdSearchFile and
+CdSync, a local `CdFileInfo` view of CdlFILE (only `pos`/`size` typed), and
+`CD_CMD_SETLOC 2`, `CD_MODE_DOUBLE_SPEED 0x80`, `CD_SYNC_DISK_ERROR 5` for
+CdlSetloc, CdlModeSpeed and CdlDiskError. It now includes `<libcd.h>`;
+`statBuf` is a CdlFILE, and since `self->pos` is still FileResource.h's
+CdLoc16 the copy is `*(CdLoc16 *)&statBuf.pos` (the same 2-aligned struct
+move as before, byte-identical). A comment block "CdDriver, its table and its
+methods are include/CdDriver.h's (track 4, round 88)" was dropped from the
+unit: the banner now says it, and the Track 4 paragraph above has the
+history. `arg2`/`arg3` are now `param0`/`param1`, the queue node fields they
+are stored in. Item 4's `temp` is today's `size`; its `MATCHING:` line is in
+the source.

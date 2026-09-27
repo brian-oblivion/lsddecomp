@@ -248,3 +248,21 @@ base-class LoadFile. Not renamed here (out of unit).
 
 
 Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__LoadFile` -> `CdDriver__LoadFile` by rename.py. The arg-less FileResource__LoadFile call goes through the LoadFileNoArgsFn cast (no code) now that FileResource.h's prototype is in scope.
+
+## History (moved from code_179d8_s.c, round 100)
+
+The comment on `LoadFileNoArgsFn` read, before track 7's pass:
+
+> FileResource__LoadFile (include/FileResource.h) takes (self, name) and
+> reads both, but CdDriver__LoadFile passes NEITHER -- retail's jal at
+> 0x80027834 has a bare nop delay slot and leaves its own incoming $a0/$a1 in
+> place. The call goes through this typedef (a cast of a function address, no
+> code); it was a conflicting local `extern void FileResource__LoadFile(void)`
+> until round 88.
+
+The source now carries one `MATCHING:` line for it, and one each for the
+`goto retry` (item 4 above) and the twice-spelled `entry->size` (item 3).
+The inner `{ ... }` block that wrapped the body after the `entry == NULL`
+return since round 47 was removed in round 100 (charlie): byte-identical.
+The `(u8 *)gCdSeekParam + 0x14` CdlSetloc argument became
+`(u_char *)&gCdSeekParam->pos`, Sony's `CdControl` parameter type.

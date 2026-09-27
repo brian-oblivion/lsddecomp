@@ -234,3 +234,11 @@ For the head to apply by type scope (out of unit):
 
 
 Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__RunRequestQueue` -> `CdDriver__RunRequestQueue` by rename.py. The +0x070 call passes `self` through the StopServiceSelfFn cast (FileResource's stopService slot takes no arguments; retail loads $a0): without it 150/151 words.
+
+## History (moved from code_179d8_s.c, round 100)
+
+The unit banner ended: "RunRequestQueue's two switches own this unit's only
+jump tables, jtbl_80010810/jtbl_80010828 (carved round 47)." The
+`volatile` re-reads (the table above, lever #4) now carry a `MATCHING:` line
+in the source. The CD_FLAG_* bits it ORs moved from code_179d8_s.c to
+include/CdDriver.h in round 100, beside the clients that poll them.
