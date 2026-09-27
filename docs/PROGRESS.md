@@ -6,6 +6,80 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-27 — round 99: twelve units polished, two regions named, two flagged types, two tool fixes (premium head)
+
+Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 16
+jobs, all Opus, none sent back. Gate 0 green.
+
+- **Track 7, twelve units marked** (five samples each): code_179d8_h,
+  code_322b4, code_55dd4, class_3bb8c_k, class_3bb8c_o, code_3770c,
+  code_2cc8c_f, class_39e08, code_2c054, code_179d8_l, code_2864, code_171e0.
+  Shared names that landed: `CD_SECTOR_SHIFT`/`CD_PATH_SIZE`/
+  `CD_SEARCH_ATTEMPTS` (CdDriver.h), `FIX12_SHIFT` (common.h),
+  `SPRITE_ATTR_*_SHIFT` and `BOXFILL_ATTR_*_SHIFT` (libgs's GsSPRITE/GsBOXF
+  bits), `enum ActorMoveEvent`, `enum CdStreamState`, `DayTaskPhase`/
+  `DayTaskResult`, and class ids for StageMap, FadeBox, DreamSys, GridCell,
+  ObjM, BgLayer, BoxFill, Sprite and ScreenSprite. code_3770c now takes
+  `<libcd.h>`/`<libspu.h>`, so 6 to 5 files re-declare a Sony name.
+- **Sony by identification (echo, code_179d8_l):** six vmanager variables
+  took Sony's names from `sonydata.py`'s aligner, and `func_8002E2F8`/`_E300`
+  are `SsUtVibrateOn`/`Off`. They were identified by position (the KeyOnCheck
+  precedent): vmanager.o on 3.3 and 3.5 lays out SePitchBend, two 8-byte
+  stubs, then SeAutoVol, and retail has exactly those gaps. Game functions go
+  from 1448 to 1446 and library from 241 to 243. `_svm_sreg` takes 3.6's
+  global name for a word 3.5 keeps static; the bytes compare equal.
+- **Track 8:** code_322b4 is `Sprite.c`. It is parked unsplit, because content
+  would split the sprites from RequestedFile/FrameClock/LightRig, and no tool
+  splits a unit. code_3770c is `CdStream.c`. Both have Sony objects on both
+  edges.
+- **Track 6 reopened by two head flags and closed.** `SkipShort2` is
+  `BoxFillSize`, two `s32` words: the halfword-and-pad layout was never needed
+  to match (measured). `StreamTaskInitData` is gone for DrawSystem.h's
+  `DrawRect`, the same 12 bytes, {640, 0, 320, 240}. The global is
+  `gDefaultMovieFrame`, tier B.
+- **Track 4 reopened once:** alpha's pass typed `gDefaultStreamTaskInitData`
+  as `DrawRect` in one unit, so the head retired code_2cc8c_c's `u8[]` view.
+- **Head applied, zero bytes:** the new class ids and `ACTOR_EVENT_MOVED_*`
+  in units no runner held; PollStatusObj on `DAYTASK_RESULT_*`;
+  `func_80048CF0` is `GetDefaultDataDirectory` (tier A getter of "CDI\\") and
+  `D_8008A960` is `gDefaultDataDirectory`; the data-directory prototypes take
+  `char *`; stale comments in MoviePlayer.h, CdStream.h, TitleMenu.h and
+  TmdRenderer.c fixed.
+- **Tool fixes:**
+  - `readability.py`'s m2c pattern took `speed`/`spec`/`space` for stack
+    slots, since m2c writes them in uppercase hex; those three were the only
+    hits it drops.
+  - `rename.py`'s Sony-data check sized a pin by the largest size any disc
+    gives. `dc_cr` is 8 bytes on 3.0 and 4 on the placed 3.3 build, so it
+    refused `D_8008E228`. It now uses the placed object's disc. Over all 138
+    D_ addresses, three verdicts change, all to correct: `D_8008E228`,
+    `D_8008E248`, `D_80090C18`. All three are renameable now, and
+    `D_8008E228` is `_svm_okon1` by echo's evidence.
+- **Measured** (`plan.py`, against round 98's entry): track 7 units 31 to 43
+  of 67, func_ 27 to 21, D_ 61 to 23, unk 157 to 149, slot 15 to 10, magic
+  1148 to 1015, rawoff 83 to 69, m2c 87 to 29 (the pattern fix accounts for
+  part of that), history 171 to 117. Track 8 regions 16 to 18 of 34.
+  Typeviews 64 to 61: alpha's code_2c054 pass fixed three, and the baseline
+  was rewritten in that commit. 0 new at every merge.
+- **Deferred proposals** (in the reports):
+  - IntermediateBase `unk10` frameClock and `unk14` lightRig. Charlie and
+    alpha both read them this way, but round 98's ObjM caveat stands.
+  - TaskCore's `unk2C`/`unk34`/`unk93`, and Viewport's `unk44`/`unk48` as
+    packetCount/packetSize (tier B).
+  - BoxFill `unk4C` attachArg.
+  - `slotE8` onLinkSettled (tier B).
+  - Retype PairXY, `sListViewSize`, `gGraphPointSize` and `sStyleDecorBoxSize`
+    as `BoxFillSize`.
+  - `SubObjE` retired for DrawSystem.
+  - `FileResource.pos` as `CdlLOC`, and CdStream's `file` as `CdlFILE`.
+  - A `_svm_cur` struct type.
+  - `VAB_TONE_BITS`/`VAB_TONES_PER_PROG` into VabStreamObj.h.
+  - Nibble-mask names beside `CLASS_ID_ROOT_MASK`.
+  - A FileResource seek-mode enum, and a DreamSys endDay enum.
+  - `D_8008E228` -> `_svm_okon1`.
+
+---
+
 ## 2026-09-27 — premium session: plan revision 37 (rounds 94, 97 and 98 escalations)
 
 - **The oracle's `(tree: <path>)` suffix (revision 36): confirmed.** It is
