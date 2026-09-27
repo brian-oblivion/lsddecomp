@@ -258,24 +258,52 @@ def sony_data_owner(addr):
     ld = ROOT / "config/psyq-objects.ld"
     if not ld.exists():
         return None
-    pins = {}
-    for m in re.finditer(r"^(\w+) = (0x[0-9A-Fa-f]{8});", ld.read_text(), re.M):
+    pins, owner = {}, {}
+    for m in re.finditer(r"^(\w+) = (0x[0-9A-Fa-f]{8});(?:\s*/\*\s*(\S+)\s*\*/)?",
+                         ld.read_text(), re.M):
         pins.setdefault(int(m.group(2), 16), m.group(1))
+        if m.group(3):
+            owner[m.group(1)] = m.group(3)
     if addr in pins:
         return pins[addr], addr, 0
     near = [(a, n) for a, n in pins.items() if a < addr <= a + 0x2000]
     if not near:
         return None
+    # A symbol's size differs between SDK builds (libpress/vlc2's dc_cr is 8
+    # bytes on 3.0 and 4 on 3.3, the build retail links), so a pin whose owning
+    # object is placed takes its size from that object on the disc
+    # config/psyq-objects.txt places it from; any other takes the largest size
+    # any disc gives (round 99: the maximum refused D_8008E228, the word after
+    # dc_cr, as inside it).
+    placed = {}
+    manifest = ROOT / "config/psyq-objects.txt"
+    if manifest.exists():
+        for line in manifest.read_text().splitlines():
+            parts = line.split("#", 1)[0].split()
+            if len(parts) == 3:
+                placed[parts[1]] = parts[0]
     nm = ROOT / "tools/binutils/bin/mipsel-linux-gnu-nm"
     names = {n for _, n in near}
-    sizes = {}
-    for o in (ROOT / "sdk/work").glob("*/elf/**/*.o"):
+
+    def nm_sizes(o, want):
         out = subprocess.run([str(nm), "-S", "--defined-only", str(o)],
                              capture_output=True, text=True).stdout
         for line in out.splitlines():
             parts = line.split()
-            if len(parts) == 4 and parts[3] in names:
-                sizes[parts[3]] = max(sizes.get(parts[3], 0), int(parts[1], 16))
+            if len(parts) == 4 and parts[3] in want:
+                yield parts[3], int(parts[1], 16)
+
+    sizes, exact = {}, set()
+    for n in names:
+        disc = placed.get(owner.get(n, ""))
+        o = ROOT / "sdk/work" / str(disc) / "elf" / f"{owner.get(n, '')}.o"
+        if disc and o.exists():
+            for sym, size in nm_sizes(o, {n}):
+                sizes[sym] = size
+                exact.add(sym)
+    for o in (ROOT / "sdk/work").glob("*/elf/**/*.o"):
+        for sym, size in nm_sizes(o, names - exact):
+            sizes[sym] = max(sizes.get(sym, 0), size)
     for a, n in sorted(near, reverse=True):
         if addr < a + sizes.get(n, 0):
             return n, a, sizes[n]
