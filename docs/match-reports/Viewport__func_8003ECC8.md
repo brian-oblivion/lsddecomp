@@ -3,7 +3,7 @@
 > Renamed from `func_8003ECC8` on 2026-09-27 (tools/rename.py). Address 0x8003ecc8.
 
 Unit: `code_2cc8c_d`. Round 73, runner charlie (report written retroactively;
-same shape as `Viewport__NoOpSlot58`/`Viewport__NoOpSlot5C`/`Viewport__func_8003ECC0`).
+same shape as `Viewport__NoOpSlot58`/`Viewport__NoOpSlot5C`/`Viewport__NoOpSlot84`).
 
 ## Signature
 
