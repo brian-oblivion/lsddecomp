@@ -21,13 +21,13 @@
  * i.e. local -> parent, not the inverse. `dst` is a bare 3-word vector:
  * class_3bb8c_o's own call site (Actor__AddLocalTranslation) passes a local `Vec3O`. */
 void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src) {
-    u8 buf[0x20];
+    MATRIX rot;
 
-    self->methods->getRotMatrix(self, buf, 0);
+    self->methods->getRotMatrix(self, &rot, 0);
     dst->x = src[0];
     dst->y = src[1];
     dst->z = src[2];
-    ApplyMatrixToLVArray(dst, dst, 1, buf);
+    ApplyMatrixToLVArray(dst, dst, 1, &rot);
 }
 
 /* Turns an offset given in the object's own local frame into a world
@@ -43,11 +43,11 @@ void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src) {
  * test and the address computation three times. When `unkC` is NULL the
  * resulting NULL is still dereferenced, exactly as retail does. */
 void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 unused) {
-    u8 buf[0x20];
+    MATRIX rot;
     long *table;
 
-    self->methods->getRotMatrix(self, buf, 0);
-    ApplyMatrixToLVArray(dst, src, 1, buf);
+    self->methods->getRotMatrix(self, &rot, 0);
+    ApplyMatrixToLVArray(dst, src, 1, &rot);
 
     table = self->parent != 0 ? self->coord2->workm.t : 0;
     dst[0] = dst[0] + table[0];
@@ -350,7 +350,7 @@ u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value) {
     return old;
 }
 
-extern void ApplyMatrixSV(void *m, void *v0, void *v1);
+extern SVECTOR *ApplyMatrixSV(MATRIX *m, SVECTOR *v0, SVECTOR *v1);
 
 /* `dst[i] = m * src[i]` for `count` elements of 6 bytes each, via Sony's
  * ApplyMatrixSV (`v1 = m * v0`, SVECTOR in and out). NOTE the parameter
@@ -368,17 +368,17 @@ extern void ApplyMatrixSV(void *m, void *v0, void *v1);
  * the right READING too: ApplyMatrixSV consumes SVECTORs, so the 6 bytes
  * are three s16 components, not the "32-bit value + trailing s16" the
  * former local `Rec6_d294` typedef guessed. Byte-identical either way. */
-void ApplyMatrixToSVArray(void *dst, void *src, s32 count, void *m) {
-    u8 *end;
+void ApplyMatrixToSVArray(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m) {
+    TmdVec3 *end;
 
-    end = (u8 *)dst + count * 6;
-    while ((u8 *)dst < end) {
+    end = dst + count;
+    while (dst < end) {
         TmdVec3 buf;
 
-        buf = *(TmdVec3 *)src;
-        ApplyMatrixSV(m, &buf, dst);
-        src = (u8 *)src + 6;
-        dst = (u8 *)dst + 6;
+        buf = *src;
+        ApplyMatrixSV(m, (SVECTOR *)&buf, (SVECTOR *)dst);
+        src++;
+        dst++;
     }
 }
 
@@ -395,13 +395,13 @@ void ApplyMatrixToSVArray(void *dst, void *src, s32 count, void *m) {
  * frame. Full derivation in docs/match-reports/ApplyMatrixToLVArray.md;
  * this is also why that call goes through an unprototyped function type. */
 void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m) {
-    u8 *end;
+    LongVec3 *end;
 
-    end = (u8 *)dst + count * 0xC;
-    while ((u8 *)dst < end) {
+    end = (LongVec3 *)dst + count;
+    while ((LongVec3 *)dst < end) {
         ApplyMatrixLV(m, src, dst);
-        dst = (u8 *)dst + 0xC;
-        src = (u8 *)src + 0xC;
+        dst = (LongVec3 *)dst + 1;
+        src = (LongVec3 *)src + 1;
     }
     if (0) {
         /* Cast to an unprototyped function type: libgte.h's prototype
