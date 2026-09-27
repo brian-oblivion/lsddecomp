@@ -62,11 +62,7 @@ tools/setup-worktree.sh alpha     # -> ../<checkout>-wt-alpha, branch runner/alp
    ```
 
    Contention is a function of what runners PUT in a shared header, not how
-   many share it. Three runners edited one header in round 16 with zero
-   conflicts because every edit was an additive pad split with the total
-   preserved, and no cross-unit prototype went into the shared header. Round
-   15 put five runners on one header without those rules and six of seven
-   merges conflicted (archive §"Collision rules" 1).
+   many share it (rounds 15 and 16, archive §"Collision rules" 1).
 
    The three things to tell runners sharing a header: header edits strictly
    ADDITIVE; a prototype for a function ANOTHER unit defines, or an `extern`
@@ -83,9 +79,8 @@ tools/setup-worktree.sh alpha     # -> ../<checkout>-wt-alpha, branch runner/alp
    the other runner first. The extern-review job touches many units and runs
    alone or merges last. Phase 2 renames replay instead (FINISHING-PLAN §3).
 
-   At merge time, expect two runners' views of one struct to be complementary
-   and union them; unify a field that got two type names; then re-verify
-   every match from both runners individually, not just the whole-image SHA1.
+   At merge, union two runners' complementary views of one struct, unify a
+   field given two type names, and re-verify each runner's matches singly.
 
 2. **A preserved body is INLINED in the match report as literal source, with
    every declaration it needs, positioned where it would compile.** Not a

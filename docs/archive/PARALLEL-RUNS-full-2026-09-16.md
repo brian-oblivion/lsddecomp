@@ -2986,3 +2986,17 @@ the real-build signature was obtained was inferred from length; the head's
 sweep of the 12 such reports found most decided on check 2 alone, which this
 does not touch. Re-run check 3 with the funcdiff line before citing one.
 
+
+
+## Distilled from PARALLEL-RUNS.md §2.1, 2026-09-27 (round 97)
+
+Contention is a function of what runners PUT in a shared header, not how
+many share it. Three runners edited one header in round 16 with zero
+conflicts because every edit was an additive pad split with the total
+preserved, and no cross-unit prototype went into the shared header. Round
+15 put five runners on one header without those rules and six of seven
+merges conflicted.
+
+At merge time, expect two runners' views of one struct to be complementary
+and union them; unify a field that got two type names; then re-verify
+every match from both runners individually, not just the whole-image SHA1.
