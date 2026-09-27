@@ -65,6 +65,10 @@ typedef struct BoxFillPos BoxFillPos;
 #define BOXFILL_ATTR_ALON_SHIFT 30 /* GsALON: semitransparency on */
 #define BOXFILL_ATTR_DOFF_SHIFT 31 /* GsDOFF: display off */
 
+/* setSemiTransRate's argument: libgs's GsAZERO..GsATHREE rate (GsAONE adds
+ * the box to what is behind it, GsATWO subtracts it), unshifted. */
+#define BOXFILL_SEMITRANS_RATE(gsRate) ((gsRate) >> BOXFILL_ATTR_RATE_SHIFT)
+
 /* BoxFill's class id (gBoxFillMethods word +0x000). Two nibbles, so
  * `(header & 0xFF) == BOXFILL_CLASS_ID` is its is-kind-of test, true for
  * FadeBox (0x164) too (Viewport__DrawNode). */

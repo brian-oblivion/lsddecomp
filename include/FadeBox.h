@@ -61,6 +61,32 @@ typedef struct FadeBoxMethods FadeBoxMethods;
  * (ObjM__OnNotify). */
 #define FADEBOX_CLASS_ID 0x164
 
+/* A channel mask's bits: which of BoxFill's colour bytes update steps
+ * (4 = color[0], r; 2 = g; 1 = b), and the entry of gFadeBoxMaskColors the
+ * fade starts or ends at. configure stores a mask of 0 as
+ * FADEBOX_CHANNELS_ALL, 0xF rather than 7 so that stop and getColor can tell
+ * it from mask 7 (white) and use black. */
+#define FADEBOX_CHANNEL_B 0x1
+#define FADEBOX_CHANNEL_G 0x2
+#define FADEBOX_CHANNEL_R 0x4
+#define FADEBOX_CHANNELS_ALL 0xF
+
+/* Reset's per-tick step; configure sets ticksLeft to FADEBOX_RAMP / step,
+ * the ticks one colour byte's full range takes at that step. */
+#define FADEBOX_DEFAULT_STEP 10
+#define FADEBOX_RAMP 256
+
+/* `state`: which start function ran; stop returns it to idle. */
+enum FadeBoxState {
+    FADEBOX_STATE_IDLE = 0,
+    FADEBOX_STATE_FADING_DOWN = 1,
+    FADEBOX_STATE_FADING_UP = 2
+};
+
+/* `mode` (configure's third argument): the one value update tests. With it
+ * the colour holds while ticksLeft counts down; every caller passes 0. */
+enum FadeBoxMode { FADEBOX_MODE_HOLD = 9 };
+
 /* What stop notifies its parents with (ObjM__OnFadeNotify). */
 enum FadeBoxEvent { FADEBOX_EVENT_FADE_DOWN_DONE = 5, FADEBOX_EVENT_FADE_UP_DONE = 6 };
 
@@ -90,8 +116,8 @@ struct FadeBox {
     /* +0x070 */ s32 defaultChannels; /* the ctor's mask (Reset); configure uses it when passed a negative mask */
     /* +0x074 */ s32 step; /* per-tick channel delta: 10 from Reset, setStep; negated by startFadeDown */
     /* +0x078 */ s32 channels; /* the mask configure stored (0 as 0xF): which bytes update steps, which colour getColor returns */
-    /* +0x07C */ s32 mode; /* configure's third argument; update does not step the colour while it is 9 */
-    /* +0x080 */ s32 ticksLeft; /* configure: 0x100 / step; update counts it down and stops at 0 */
+    /* +0x07C */ s32 mode; /* configure's third argument; update does not step the colour while it is FADEBOX_MODE_HOLD */
+    /* +0x080 */ s32 ticksLeft; /* configure: FADEBOX_RAMP / step; update counts it down and stops at 0 */
     /* +0x084 */ s32 maskPerTick; /* configure: BoxFill's mask / ticksLeft; no reader */
     /* +0x088 */ s32 savedW;      /* pushPosition's copy of boxW, restored by popPosition */
     /* +0x08C */ s32 savedH;      /* ... of boxH */
