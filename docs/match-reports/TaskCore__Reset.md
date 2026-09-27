@@ -15,7 +15,7 @@ then eight literal field stores.
 void TaskCore__Reset(StreamTaskObj *self) {
     StreamTaskObjMethods *methods = self->methods;
     methods->slot6C(self, -1);
-    methods->slotA4(self, &D_8006E860[0], &D_8006E860[3], &D_8006E860[6]);
+    methods->slotA4(self, &sTaskCoreDefaultColors[0], &sTaskCoreDefaultColors[3], &sTaskCoreDefaultColors[6]);
     methods->slot9C(self, 1);
     methods->slotA0(self, 1);
     self->unk84 = 9;
@@ -45,9 +45,9 @@ void TaskCore__Reset(StreamTaskObj *self) {
   results), confirmed to exist via `tools/classtable.py gStreamTaskMethods`:
   `+0x09C = TaskCore__SetFadeCallbackEnabled`, `+0x0A0 = TaskCore__SetFadeOutCallbackEnabled`,
   `+0x0A4 = TaskCore__SetColors` (all extern, other units).
-- `slotA4`'s three pointer arguments are `&D_8006E860[0]`, `&D_8006E860[3]`,
-  `&D_8006E860[6]` — a `lui`/`addiu` to the symbol with offsets added, never
-  dereferenced here, so `D_8006E860` is declared as a plain `extern u8[]`
+- `slotA4`'s three pointer arguments are `&sTaskCoreDefaultColors[0]`, `&sTaskCoreDefaultColors[3]`,
+  `&sTaskCoreDefaultColors[6]` — a `lui`/`addiu` to the symbol with offsets added, never
+  dereferenced here, so `sTaskCoreDefaultColors` is declared as a plain `extern u8[]`
   with unknown real element shape.
 - Eight new `s32` fields carved out of what was padding: `unk28`, `unk2C`,
   `unk30`, `unk3C`, `unk84`, `unk9C`, `unkA0`, plus `unk34` (a field already
@@ -78,3 +78,28 @@ this codebase.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from TaskCoreObj__Reset (tools/rename.py): the class prefix. Occupant of +0x040 (IntermediateBase's `resetCounters`, the ctor's last call). Keeps "Reset" rather than the slot's name: it sets eight defaults and makes four slot calls and does not up-call. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 99, alpha)
+
+- `D_8006E860` -> `sTaskCoreDefaultColors` (tier A): nine bytes of .data,
+  three RGB triples {0, 0, 0}, {0, 0, 0}, {128, 128, 128}, passed to setColors
+  as base, clear and the third colour; only this unit reaches it.
+- `unk28` -> `otLength` (tier A): onInit hands it to the viewport's
+  setOtLength.
+- `unk30` -> `packetSize` (tier B): onInit hands it to the viewport's
+  `setUnk48`, and Viewport__InitOt sizes each buffer's packet area as
+  `unk44 * unk48`. Every writer of the `unk48` side passes 64 (Viewport's ctor,
+  this function), while the `unk44` side varies with the screen (2000
+  Viewport's default, 1200 DreamSys, 300 here, 400 TitleMenu and GraphRoom),
+  which reads as a packet count times a fixed packet size. The Viewport banner
+  leaves which is which open; this name is the reading above, not a
+  measurement.
+- `unk2C` (-> `packetCount`) and `unk34` (-> `clearOnDeinit`) have accessors
+  in class_3bb8c_d.c / class_3bb8c_t.c: proposed, not renamed.
+
+### History moved from include/code_2c054.h
+
+The colour table was first declared as "a rodata table reached only by
+ADDRESS (`lui`/`addiu`, no `lw`/`sw` here), passed as three pointers 3 bytes
+apart, never decoded further, so typed as a plain byte array". It is in
+.data (asm/data/5E140.data.s), not rodata.

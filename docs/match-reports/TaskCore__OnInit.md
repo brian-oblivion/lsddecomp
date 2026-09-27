@@ -47,7 +47,7 @@ void TaskCore__OnInit(StreamTaskObj *self) {
     core->slot48(unk18, self->unk28);
     core->slot4C(unk18, self->unk2C);
     core->slot50(unk18, self->unk30);
-    core->slot70(unk18, self->unk14, D_8006E86C, D_8006E86C, 0);
+    core->slot70(unk18, self->unk14, sTaskCoreViewOrigin, sTaskCoreViewOrigin, 0);
     core->slot8C(unk18);
     self->unk38 = 0;
 }
@@ -106,7 +106,7 @@ on any of those four, so there is no counter-evidence to act on there.
   `u8 *flag`: `TaskCore__OnDeinit`'s call passes literal `0` (valid for either
   type, unchanged bytes there), this function's own call passes
   `gDefaultStreamTaskInitData`, a real rodata address.
-- Two new rodata externs, address-only: `gDefaultStreamTaskInitData`, and `D_8006E86C`
+- Two new rodata externs, address-only: `gDefaultStreamTaskInitData`, and `sTaskCoreViewOrigin`
   (passed **twice, same address**, as `TaskCoreObjMethods::slot70`'s 3rd
   AND 4th arguments -- an odd but unambiguous call-site fact, left
   unexplained).
@@ -158,8 +158,52 @@ Renamed from TaskCoreObj__func_8003C238 (tools/rename.py). Occupant of +0x04C (`
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of the local StreamTaskUnk18Obj view, and its slots are called by name: +0x048 setOtLength (unk28), +0x04C setUnk44 (unk2C), +0x050 setUnk48 (unk30), +0x070 attachViewChild (unk14, &D_8006E86C twice, NULL twist), +0x08C initOt. D_8006E86C is a zero LongVec3. Byte-identical.
+The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of the local StreamTaskUnk18Obj view, and its slots are called by name: +0x048 setOtLength (unk28), +0x04C setUnk44 (unk2C), +0x050 setUnk48 (unk30), +0x070 attachViewChild (unk14, &sTaskCoreViewOrigin twice, NULL twist), +0x08C initOt. sTaskCoreViewOrigin is a zero LongVec3. Byte-identical.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
 bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj casts are gone, and the two calls are by slot name, `attachToParent(bgLayer, (SceneNode *)unk14, NULL)` (+0x04C, SceneNode's; returns SceneNode *, discarded, where the view said void) and `setColor(bgLayer, 1, (BgLayerRgb *)baseColor)` (+0x0B8). Byte-identical.
+
+## Track 7 (2026-09-27, round 99, alpha)
+
+- `TaskTextObj`/`TaskTextMethods`, this unit's local view of
+  `initArgs->drawSystem`, is retired: its only slot, `+0x078 slot78`, is
+  `DrawSystem::clearImage(self, color, rect)` (include/DrawSystem.h), which
+  TitleMenu__OnDeinit already calls through `DrawSystem *`. The calls now cast
+  to `DrawSystem *`; byte-identical. The two clears are therefore: the
+  default movie frame (`&gDefaultStreamTaskInitData`, a DrawRect
+  {640, 0, 320, 240}) to baseColor when there is no sub handle, then the whole
+  screen (NULL rect) to baseColor.
+- `unk28` -> `otLength` (tier A: onInit passes it to the viewport's
+  setOtLength) and `unk30` -> `packetSize` (tier B, see TaskCore__Reset).
+  Accessor set from the compiler's error list: this unit only.
+- `D_8006E86C` -> `sTaskCoreViewOrigin` (tier A: a zero LongVec3 passed as
+  both attachViewChild's viewpoint and reference point; only this unit
+  reaches it).
+
+### History moved from include/code_2c054.h
+
+- Round 2 (this function's match): the slot's third parameter was widened
+  from `s32` to a pointer, because TaskCore__OnDeinit's call passes a literal
+  0 (valid for either) but this function's passes
+  `&gDefaultStreamTaskInitData`, a real address. `gDefaultStreamTaskInitData`
+  and `sTaskCoreViewOrigin` were reached only by address and typed as a byte
+  array and a LongVec3.
+- The viewport's local view here (`StreamTaskUnk18Obj`) was merged into
+  include/Viewport.h in round 85; StreamTask::player's (`StreamTaskUnkB4Obj`)
+  into include/MoviePlayer.h in round 89.
+
+## Proposed field names
+
+Accessors outside code_2c054 (the compiler's error list), so for the head
+to apply by type scope:
+
+- IntermediateBase `+0x014 unk14` -> `lightRig`: its own comment says it is
+  `initArgs->lightRig` or init's `New_LightRig()`; this function hangs the
+  BgLayer and the slot widgets under it and attaches the view to it.
+  Accessors: code_2c054.c, class_3bb8c_d.c, class_3bb8c_l.c, class_3bb8c_m.c.
+- TaskCore `+0x02C unk2C` -> `packetCount` (tier B, TaskCore__Reset's
+  report): handed to the viewport's `setUnk44`. Accessors: code_2c054.c,
+  class_3bb8c_d.c (TitleMenu__Reset), class_3bb8c_t.c (GraphRoom__Reset).
+  Viewport's own `unk44`/`unk48` and `setUnk44`/`setUnk48` would follow as
+  `packetCount`/`packetSize`.

@@ -29,7 +29,7 @@
  *                         streamName 0, resetCounters.
  *   +0x00C finalize       StreamTask__Finalize: releases the player, then
  *                         TaskCore's.
- *   +0x040 resetCounters  StreamTask__Reset: loopCount -1, unkC4 0,
+ *   +0x040 resetCounters  StreamTask__Reset: loopCount -1, keepActive 0,
  *                         skipOnConfirm 1, unkD0 0, abortBeforeFade 1. No
  *                         up-call to TaskCore__Reset.
  *   +0x044 init           StreamTask__Init(args, streamName, streamGroup,
@@ -37,7 +37,7 @@
  *                         init(args, 0). See StreamTaskInitFn below.
  *   +0x04C onInit         StreamTask__OnInit: TaskCore's, playDone 0, the
  *                         player's setAutoPlay(autoPlay) and Play(streamName,
- *                         streamGroup, unkC4, loopCount); a nonzero Play is
+ *                         streamGroup, keepActive, loopCount); a nonzero Play is
  *                         setFrameBound(0).
  *   +0x05C update         StreamTask__Update: TaskCore's; until playDone,
  *                         playDone = the player's Advance, and done while
@@ -76,6 +76,20 @@ typedef struct StreamTask StreamTask;
 typedef struct StreamTaskMethods StreamTaskMethods;
 typedef struct StreamTaskInitData StreamTaskInitData;
 
+/* StreamTask's own state, past TaskCore's (enum TaskCoreState): onPadConfirm
+ * sets it when skipOnConfirm is on, and setState answers it with
+ * refreshViewValue, which aborts the player at once or fades out first. */
+enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
+
+/* `result` after a confirm press skipped the stream (TaskCore's timeout
+ * sets 1). */
+#define STREAMTASK_RESULT_SKIPPED 2
+
+/* setFrameBound's unit in this override: bound * 15 frames, where
+ * TaskCore's is TASKCORE_FRAMES_PER_SECOND (20). Read as seconds of 15-frame
+ * movie time, as TaskCore's bound is seconds; no caller's value shows it. */
+#define STREAMTASK_FRAMES_PER_SECOND 15
+
 /* Three words: the ctor's optional fifth (stack) argument, else
  * GetDefaultStreamTaskInitData()'s default (&gDefaultStreamTaskInitData,
  * which TaskCore__OnInit also passes). Copied whole into `initData`
@@ -93,7 +107,7 @@ struct StreamTaskInitData {
 struct StreamTaskMethods {
     TASKCORE_SLOTS(StreamTask, (StreamTask * self, TaskCoreTarget *target, char *soundBankPath,
                                 BasicClass *sound, StreamTaskInitData *initData));
-    /* +0x124 */ void (*setUnkC4)(StreamTask *self, s32 value);     /* StreamTask__SetUnkC4 */
+    /* +0x124 */ void (*setKeepActive)(StreamTask *self, s32 keepActive); /* StreamTask__SetKeepActive */
     /* +0x128 */ void (*setLoopCount)(StreamTask *self, s32 count); /* StreamTask__SetLoopCount */
     /* +0x12C */ void (*setSkipOnConfirm)(StreamTask *self, s32 enable); /* StreamTask__SetSkipOnConfirm; code_1677c passes 0 */
     /* +0x130 */ void (*setUnkD0)(StreamTask *self, s32 value); /* StreamTask__SetUnkD0 */
@@ -109,7 +123,7 @@ struct StreamTask {
     /* +0x0B8 */ s32 streamName;  /* Init's; the player's Play name. ctor: 0 */
     /* +0x0BC */ s32 streamGroup; /* Init's (GetStreamGroupForType, or -1); Play's second argument */
     /* +0x0C0 */ s32 autoPlay; /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to MarkPlaying at once */
-    /* +0x0C4 */ s32 unkC4;    /* setUnkC4; reset 0; Play's third argument (the player's +0x054) */
+    /* +0x0C4 */ s32 keepActive; /* setKeepActive; reset 0; Play's keepActive (MoviePlayer::keepActive, +0x054) */
     /* +0x0C8 */ s32 loopCount; /* setLoopCount; reset -1; Play's fourth argument, the player's `loops` (MoviePlayer__Advance) */
     /* +0x0CC */ s32 skipOnConfirm; /* setSkipOnConfirm; reset 1; OnPadConfirm: nonzero ends the task with result 2 */
     /* +0x0D0 */ s32 unkD0; /* setUnkD0; reset 0; no method of this class reads it */
@@ -142,7 +156,7 @@ void StreamTask__OnPadNext(StreamTask *self);
 void StreamTask__NoOpSlot88(void);
 void StreamTask__NoOpSlot8C(void);
 void StreamTask__RefreshViewValue(StreamTask *self);
-void StreamTask__SetUnkC4(StreamTask *self, s32 value);
+void StreamTask__SetKeepActive(StreamTask *self, s32 keepActive);
 void StreamTask__SetLoopCount(StreamTask *self, s32 count);
 void StreamTask__SetSkipOnConfirm(StreamTask *self, s32 enable);
 void StreamTask__SetUnkD0(StreamTask *self, s32 value);

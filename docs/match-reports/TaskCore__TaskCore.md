@@ -162,3 +162,11 @@ TaskCore::bgLayer (+0x078) is `struct BgLayer *` (include/BgLayer.h, was `BasicC
 Later the same round (alpha, second class): TileMap unified (`include/TileMap.h`): TaskCore::tileMap is `struct TileMap *` (was `BasicClass *`), and the local `tmp` that holds the TileAtlas and then the TileMap is `void *` (was `StreamTaskUnkB4Obj *`), so the three casts on the tileAtlas/tileMap/New_BgLayer lines are gone. Byte-identical.
 
 Later the same round (alpha, third class): TileAtlas unified (`include/TileAtlas.h`): TaskCore::tileAtlas (+0x080) is `struct TileAtlas *` (was `BasicClass *`), and New_TileAtlas is declared by include/TileAtlas.h (include/code_2c054.h's `StreamTaskUnkB4Obj *` view is deleted). `tmp` stays `void *` (it is reused for the TileMap). Byte-identical.
+
+## Track 7 (2026-09-27, round 99, alpha)
+
+Locals: the one `void *tmp` that held the TileAtlas and then the TileMap is
+now two typed locals, `atlas` (`struct TileAtlas *`) and `tileMap`
+(`struct TileMap *`), and `core` (the TaskCoreMethods) is `methods`.
+Byte-identical: the result of each call is still stored and passed on from
+a local, which is what the match needed; one local reused for both was not.

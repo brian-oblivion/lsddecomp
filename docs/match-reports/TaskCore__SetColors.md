@@ -139,7 +139,7 @@ a signed 3-byte `s8` triple -- not Sony's `CVECTOR` (4 bytes, `u_char`); and
 `baseColor`, the first of the three, is what `TaskCore__OnInit`
 (`code_2c054.c`) hands to `BgLayer`'s `setColor` as a `BgLayerRgb *`, and
 `TaskCore__TickColorFade` hands it the faded copy of it the same way. `unk93`/`unk96` are filled from the same rodata table
-(`D_8006E860`, three records 3 bytes apart) and `unk93` goes to the same
+(`sTaskCoreDefaultColors`, three records 3 bytes apart) and `unk93` goes to the same
 TaskTextObj slot78 as `baseColor`, so one record type covers all three.
 Byte-identical: whole image green, 0 new warnings, nonmatching green.
 
@@ -155,7 +155,7 @@ Parameters `a1..a3` -> `base`, `clear`, `color96` (slot and prototype in
 TaskCore.h too). `unk93` is the colour TaskCore__OnDeinit (when unk34 is
 set) and TitleMenu__OnDeinit clear the screen to; its accessors are in
 code_2c054 and class_3bb8c_d, so the name (`clearColor`) is a proposal.
-`unk96` has no reader anywhere (Reset sets it to 128 grey from D_8006E860);
+`unk96` has no reader anywhere (Reset sets it to 128 grey from sTaskCoreDefaultColors);
 kept. Retyping all three to BgLayerRgb (delta's round-98 lead) would drop
 these casts but changes code_2c054's accessors: proposed. The casts carry a
 MATCHING line. Byte-identical.

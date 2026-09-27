@@ -1,8 +1,21 @@
+/*
+ * StreamTask, whole, and the first seven methods of its parent TaskCore.
+ *
+ * StreamTask (include/StreamTask.h) plays one movie stream through a
+ * MoviePlayer inside TaskCore's fade and state machine: its allocator, ctor,
+ * every override, its five setters and its table getter are all here.
+ * TaskCore (include/TaskCore.h) is the base of the game's menu and screen
+ * tasks; this file holds its allocator, ctor, finalize, resetCounters, init
+ * and the onInit/onDeinit hooks, which build and tear down the TileAtlas ->
+ * TileMap -> BgLayer chain, clear the screen and configure the viewport. The
+ * rest of TaskCore is in code_2cc8c.c, code_2cc8c_b.c and code_2cc8c_c.c.
+ */
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
 #include "code_2c054.h"
+#include "BMemPMgr.h"
 #include "VabStreamObj.h"
 #include "BgLayer.h"
 #include "TileMap.h"
@@ -12,7 +25,7 @@ StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicCla
                            StreamTaskInitData *initData) {
     StreamTask *self;
 
-    self = BMemPMgrAlloc(0xDC);
+    self = BMemPMgrAlloc(sizeof(StreamTask));
     if (self != NULL) {
         Get_vtable_StreamTask()->ctor(self, target, soundBankPath, sound, initData);
         return self;
@@ -41,7 +54,7 @@ void StreamTask__Finalize(StreamTask *self) {
 
 void StreamTask__Reset(StreamTask *self) {
     self->loopCount = -1;
-    self->unkC4 = 0;
+    self->keepActive = 0;
     self->skipOnConfirm = 1;
     self->unkD0 = 0;
     self->abortBeforeFade = 1;
@@ -62,7 +75,7 @@ void StreamTask__OnInit(StreamTask *self) {
     self->playDone = 0;
     self->player->methods->setAutoPlay(self->player, self->autoPlay);
     if (self->player->methods->play(self->player, (char *)self->streamName, self->streamGroup,
-                                    self->unkC4, self->loopCount) != 0) {
+                                    self->keepActive, self->loopCount) != 0) {
         self->methods->setFrameBound(self, 0);
     }
 }
@@ -79,24 +92,24 @@ void StreamTask__Update(StreamTask *self, BasicClass *sender, s32 event) {
     if (self->fadingOut != 0) {
         return;
     }
-    self->methods->setState(self, 7);
+    self->methods->setState(self, TASKCORE_STATE_FADE_OUT);
 }
 
 void StreamTask__SetState(StreamTask *self, s32 state) {
     Get_vtable_TaskCore()->setState((TaskCore *)self, state);
     switch (state) {
-        case 5:
+        case TASKCORE_STATE_ACTIVE:
             self->fadingOut = 0;
             break;
-        case 7:
+        case TASKCORE_STATE_FADE_OUT:
             self->fadingOut = 1;
             break;
-        case 8:
+        case TASKCORE_STATE_FADED_OUT:
             if (self->abortBeforeFade == 0) {
                 self->player->methods->abort(self->player);
             }
             break;
-        case 0x12:
+        case STREAMTASK_STATE_SKIPPED:
             self->methods->refreshViewValue(self);
             break;
     }
@@ -105,15 +118,15 @@ void StreamTask__SetState(StreamTask *self, s32 state) {
 void StreamTask__SetFrameBound(StreamTask *self, s32 bound) {
     self->frameBound = bound;
     if (bound >= 0) {
-        self->frameBound = bound * 15;
+        self->frameBound = bound * STREAMTASK_FRAMES_PER_SECOND;
     }
 }
 
 void StreamTask__OnPadConfirm(StreamTask *self) {
     Get_vtable_TaskCore()->onPadConfirm((TaskCore *)self);
     if (self->skipOnConfirm != 0) {
-        self->result = 2;
-        self->methods->setState(self, 0x12);
+        self->result = STREAMTASK_RESULT_SKIPPED;
+        self->methods->setState(self, STREAMTASK_STATE_SKIPPED);
     }
 }
 
@@ -133,12 +146,12 @@ void StreamTask__RefreshViewValue(StreamTask *self) {
     if (self->abortBeforeFade != 0) {
         self->player->methods->abort(self->player);
     } else {
-        self->methods->setState(self, 7);
+        self->methods->setState(self, TASKCORE_STATE_FADE_OUT);
     }
 }
 
-void StreamTask__SetUnkC4(StreamTask *self, s32 value) {
-    self->unkC4 = value;
+void StreamTask__SetKeepActive(StreamTask *self, s32 keepActive) {
+    self->keepActive = keepActive;
 }
 
 void StreamTask__SetLoopCount(StreamTask *self, s32 count) {
@@ -161,11 +174,10 @@ StreamTaskMethods *Get_vtable_StreamTask(void) {
     return &gStreamTaskMethods;
 }
 
-/* The TaskCore allocator: 0xA4 bytes, constructed through its own ctor. */
 TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound) {
     TaskCore *self;
 
-    self = BMemPMgrAlloc(0xA4);
+    self = BMemPMgrAlloc(sizeof(TaskCore));
     if (self != NULL) {
         Get_vtable_TaskCore()->ctor(self, target, soundBankPath, sound);
         return self;
@@ -174,25 +186,27 @@ TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *
 }
 
 void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound) {
-    void *tmp; /* the TileAtlas, then the TileMap built over it */
-    TaskCoreMethods *core;
+    struct TileAtlas *atlas;
+    struct TileMap *tileMap;
+    TaskCoreMethods *methods;
 
     Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
-    core = Get_vtable_TaskCore();
-    self->methods = core;
-    core->setTarget(self, target);
-    if (soundBankPath != 0) {
+    /* MATCHING: one Get_vtable_TaskCore() call; a second one for setTarget adds a jal. */
+    methods = Get_vtable_TaskCore();
+    self->methods = methods;
+    methods->setTarget(self, target);
+    if (soundBankPath != NULL) {
         self->sound = (BasicClass *)New_VabStreamObj(soundBankPath);
     } else {
         self->sound = sound;
     }
     self->soundBankPath = soundBankPath;
-    self->methods->setSubHandle(self, 0, 0);
-    tmp = New_TileAtlas(0);
-    self->tileAtlas = tmp;
-    tmp = New_TileMap(0, tmp);
-    self->tileMap = tmp;
-    self->bgLayer = New_BgLayer(tmp, 1);
+    self->methods->setSubHandle(self, NULL, NULL);
+    atlas = New_TileAtlas(0);
+    self->tileAtlas = atlas;
+    tileMap = New_TileMap(0, atlas);
+    self->tileMap = tileMap;
+    self->bgLayer = New_BgLayer(tileMap, 1);
     self->methods->resetCounters(self);
 }
 
@@ -200,10 +214,10 @@ void TaskCore__Finalize(TaskCore *self) {
     self->bgLayer->methods->release(self->bgLayer);
     self->tileMap->methods->release(self->tileMap);
     self->tileAtlas->methods->release(self->tileAtlas);
-    if (self->soundBankPath != 0) {
+    if (self->soundBankPath != NULL) {
         self->sound->methods->release(self->sound);
     }
-    if (self->subHandlePath != 0) {
+    if (self->subHandlePath != NULL) {
         self->subHandle->methods->release(self->subHandle);
     }
     self->methods->releaseTarget(self);
@@ -211,19 +225,21 @@ void TaskCore__Finalize(TaskCore *self) {
 }
 
 void TaskCore__Reset(TaskCore *self) {
+    /* MATCHING: self->methods reloaded after each call is a word longer. */
     TaskCoreMethods *methods = self->methods;
     methods->setFrameBound(self, -1);
-    methods->setColors(self, &D_8006E860[0], &D_8006E860[3], &D_8006E860[6]);
+    methods->setColors(self, sTaskCoreDefaultColors[0], sTaskCoreDefaultColors[1],
+                       sTaskCoreDefaultColors[2]);
     methods->setFadeCallbackEnabled(self, 1);
     methods->setFadeOutCallbackEnabled(self, 1);
     self->fadeRate = 9;
-    self->unk28 = 3;
-    self->unk2C = 0x12C;
-    self->unk30 = 0x40;
+    self->otLength = 3;
+    self->unk2C = 300;
+    self->packetSize = 64;
     self->viewCallback = NULL;
     self->viewCallbackCtx = NULL;
     self->unk34 = 1;
-    self->inputMode = 0;
+    self->inputMode = TASKCORE_INPUT_NONE;
 }
 
 s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
@@ -231,43 +247,50 @@ s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
     return self->result;
 }
 
-/* initArgs->unk0 is reached through this unit's TaskTextObj view, the
- * viewport as a Viewport (include/Viewport.h), both `BasicClass *` in
- * TaskCore.h; bgLayer is a BgLayer (include/BgLayer.h). */
+/* Hangs the slot widgets and the BgLayer under the light rig (unk14), sets the
+ * fade-in colour, clears the default movie frame (no sub handle) and then the
+ * screen to baseColor, and configures and opens the viewport's OT.
+ * initArgs->drawSystem and the viewport are `BasicClass *` fields, cast to
+ * their classes, DrawSystem and Viewport. */
 void TaskCore__OnInit(TaskCore *self) {
     Viewport *viewport;
-    ViewportMethods *core;
+    ViewportMethods *viewportMethods;
 
+    /* MATCHING: retail loads both before the first call and keeps them to the end. */
     viewport = (Viewport *)self->viewport;
-    core = viewport->methods;
+    viewportMethods = viewport->methods;
     self->methods->updateSlotElements(self, self->unk14);
     self->bgLayer->methods->attachToParent(self->bgLayer, (SceneNode *)self->unk14, NULL);
-    if (self->fadeInCallback != 0) {
+    if (self->fadeInCallback != NULL) {
         self->methods->broadcastToSlots(self, self->baseColor);
         self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)self->baseColor);
     }
-    if (self->subHandle == 0) {
-        ((TaskTextObj *)self->initArgs->drawSystem)
-            ->methods->slot78((TaskTextObj *)self->initArgs->drawSystem, self->baseColor,
-                              gDefaultStreamTaskInitData);
+    if (self->subHandle == NULL) {
+        ((DrawSystem *)self->initArgs->drawSystem)
+            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor,
+                                  &gDefaultStreamTaskInitData);
     }
-    ((TaskTextObj *)self->initArgs->drawSystem)
-        ->methods->slot78((TaskTextObj *)self->initArgs->drawSystem, self->baseColor, 0);
-    core->setOtLength(viewport, self->unk28);
-    core->setUnk44(viewport, self->unk2C);
-    core->setUnk48(viewport, self->unk30);
-    core->attachViewChild(viewport, self->unk14, &D_8006E86C, &D_8006E86C, 0);
-    core->initOt(viewport);
+    ((DrawSystem *)self->initArgs->drawSystem)
+        ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor, NULL);
+    viewportMethods->setOtLength(viewport, self->otLength);
+    viewportMethods->setUnk44(viewport, self->unk2C);
+    viewportMethods->setUnk48(viewport, self->packetSize);
+    viewportMethods->attachViewChild(viewport, self->unk14, &sTaskCoreViewOrigin,
+                                     &sTaskCoreViewOrigin, NULL);
+    viewportMethods->initOt(viewport);
     self->result = 0;
 }
 
+/* Closes the viewport's OT, detaches the view and the BgLayer, and clears the
+ * screen to unk93 while unk34 is set. */
 void TaskCore__OnDeinit(TaskCore *self) {
+    /* MATCHING: without the local, self->viewport is reloaded and the frame shrinks. */
     Viewport *viewport = (Viewport *)self->viewport;
     viewport->methods->deinitOt(viewport);
     viewport->methods->detachViewChild(viewport);
     self->bgLayer->methods->detachFromParent(self->bgLayer);
     if (self->unk34 != 0) {
-        ((TaskTextObj *)self->initArgs->drawSystem)
-            ->methods->slot78((TaskTextObj *)self->initArgs->drawSystem, self->unk93, 0);
+        ((DrawSystem *)self->initArgs->drawSystem)
+            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->unk93, NULL);
     }
 }
