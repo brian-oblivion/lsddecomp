@@ -13,7 +13,7 @@
  * the method table type it needs (FileResourceMethods) is declared. */
 
 
-/* A 3-word vector-like object, written wholesale by SetVec3. Only the
+/* A 3-word vector-like object, written wholesale by ResourceRequest__Set. Only the
  * first three words are touched; nothing here says whether a further field
  * follows. */
 typedef struct ResourceRequest {

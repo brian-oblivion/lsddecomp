@@ -21,7 +21,7 @@ void InitDreamAux(void) {
         }
     }
 
-    SetVec3(&req, 0, gMomPathSymSpy, 1);
+    ResourceRequest__Set(&req, 0, gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
         gDreamAuxSlots[i].obj = New_ModelData((struct ResourceSource *)&req);

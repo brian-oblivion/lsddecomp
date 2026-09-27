@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Build step (gTodSetMethods's setFlag override): SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset and allocate a gTodMethods source (New_Tod) over it, storing the object over the offset word. On a NULL, walk back releasing (slot +0x004) every one already built and return 1; otherwise 0.
+Build step (gTodSetMethods's setFlag override): ResourceRequest__Set fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset and allocate a gTodMethods source (New_Tod) over it, storing the object over the offset word. On a NULL, walk back releasing (slot +0x004) every one already built and return 1; otherwise 0.
 
 Table slot (`tools/classtable.py`): gTodSetMethods +0x064.
 
@@ -31,7 +31,7 @@ s32 TodSet__BuildTods(DataSrc33808 *self) {
     s32 i;
     s32 n;
 
-    SetVec3(&req, 0, 0, 1);
+    ResourceRequest__Set(&req, 0, 0, 1);
     buf = self->buffer;
     i = 0;
     n = buf->count;

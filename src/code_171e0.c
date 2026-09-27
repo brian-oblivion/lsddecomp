@@ -17,7 +17,7 @@
  * to the CD driver's own functions when it is active, and to an SPU/VAB-
  * side fallback otherwise.
  *
- * GetGameApplicationMethods, SetVec3 and BuildFileName are unrelated utilities
+ * GetGameApplicationMethods, ResourceRequest__Set and BuildFileName are unrelated utilities
  * that happen to live in this segment; func_800270AC/func_800270B8 (a
  * getter/setter pair for D_8008A854) are left unnamed -- see their reports.
  */
@@ -123,7 +123,7 @@ void *GetActiveDataSourceMethods(void) {
     }
 }
 
-ResourceRequest *SetVec3(ResourceRequest *this, s32 x, s32 y, s32 z) {
+ResourceRequest *ResourceRequest__Set(ResourceRequest *this, s32 x, s32 y, s32 z) {
     this->x = x;
     this->y = y;
     this->z = z;

@@ -1,4 +1,6 @@
-# SetVec3
+# ResourceRequest__Set
+
+> Renamed from `SetVec3` on 2026-09-27 (tools/rename.py). Address 0x80026ce8.
 
 > Renamed from `func_80026CE8` on 2026-09-18 (tools/rename.py). Address 0x80026ce8.
 
@@ -36,7 +38,7 @@ typedef struct ResourceRequest {
     s32 z;
 } ResourceRequest;
 
-ResourceRequest *SetVec3(ResourceRequest *this, s32 x, s32 y, s32 z) {
+ResourceRequest *ResourceRequest__Set(ResourceRequest *this, s32 x, s32 y, s32 z) {
     this->x = x;
     this->y = y;
     this->z = z;
@@ -61,7 +63,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80026CE8` | `SetVec3` | A |
+| `func_80026CE8` | `ResourceRequest__Set` | A |
 
 **Evidence.** Writes `x`/`y`/`z` into a `ResourceRequest` and returns the pointer
 -- a pure "set and return this" setter. Mechanics are its purpose.

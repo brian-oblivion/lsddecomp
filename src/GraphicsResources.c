@@ -27,7 +27,7 @@
  *    DecDCTvlc, then DecDCTin/DecDCTout in 16-pixel strips uploaded as they
  *    finish), one movie at a time (gActiveMoviePlayer).
  * The unit's own types: ResourceSource, the {buffer, file name} descriptor
- * those ctors take (ResourceSourceArgs, the three-word local SetVec3 fills
+ * those ctors take (ResourceSourceArgs, the three-word local ResourceRequest__Set fills
  * for it); UnprototypedCtorTable, the view the allocators call a ctor slot
  * through when they test its result; TimBlockHeader (and its byte copy,
  * TimBlockHeaderBytes), ModelDataHeader and SubBlockTable, the layouts of
@@ -904,7 +904,7 @@ void ModelData__Load(ModelData *self) {
     ((s32 (*)())self->methods->processBuffer)(self);
 }
 
-/* The three words SetVec3 stores (buffer, name, mode), passed on as a
+/* The three words ResourceRequest__Set stores (buffer, name, mode), passed on as a
  * ResourceSource: the name is NULL here, and no constructor reads the mode
  * (1). */
 typedef struct ResourceSourceArgs {
@@ -922,7 +922,7 @@ typedef struct ModelDataHeader {
 } ModelDataHeader;
 
 /* code_171e0.c: stores its three words into *req, returns req. */
-extern ResourceSourceArgs *SetVec3(ResourceSourceArgs *req, void *buffer, char *name, s32 mode);
+extern ResourceSourceArgs *ResourceRequest__Set(ResourceSourceArgs *req, void *buffer, char *name, s32 mode);
 
 /* +0x078: when it owns them, build the LinkResource and the TodSet over
  * the buffer; 1, with both released, when either fails. */
@@ -930,7 +930,7 @@ s32 ModelData__BuildResources(ModelData *self) {
     ResourceSourceArgs req;
 
     if (self->ownsResources != 0) {
-        SetVec3(&req, (u8 *)self->buffer + ((ModelDataHeader *)self->buffer)->tmdOffset, 0, 1);
+        ResourceRequest__Set(&req, (u8 *)self->buffer + ((ModelDataHeader *)self->buffer)->tmdOffset, 0, 1);
         self->linkResource = New_LinkResource((ResourceSource *)&req);
         if (self->linkResource != NULL) {
             req.buffer = ((ModelDataHeader *)self->buffer)->tods;
@@ -1023,7 +1023,7 @@ s32 TriggerWorld__BuildResources(TriggerWorld *self) {
     s32 i;
     s32 n;
 
-    SetVec3(&req, 0, 0, 1);
+    ResourceRequest__Set(&req, 0, 0, 1);
     buf = self->buffer;
     i = 0;
     n = buf->count;
@@ -1275,7 +1275,7 @@ s32 TodSet__BuildTods(TodSet *self) {
     s32 i;
     s32 n;
 
-    SetVec3(&req, 0, 0, 1);
+    ResourceRequest__Set(&req, 0, 0, 1);
     buf = self->buffer;
     i = 0;
     n = buf->count;
