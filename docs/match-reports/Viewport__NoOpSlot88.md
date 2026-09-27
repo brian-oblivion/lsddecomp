@@ -1,4 +1,6 @@
-# Viewport__func_8003ECC8 — MATCHED
+# Viewport__NoOpSlot88 — MATCHED
+
+> Renamed from `Viewport__func_8003ECC8` on 2026-09-27 (tools/rename.py). Address 0x8003ecc8.
 
 > Renamed from `func_8003ECC8` on 2026-09-27 (tools/rename.py). Address 0x8003ecc8.
 
@@ -8,7 +10,7 @@ same shape as `Viewport__NoOpSlot58`/`Viewport__NoOpSlot5C`/`Viewport__NoOpSlot8
 ## Signature
 
 ```c
-void Viewport__func_8003ECC8(void);
+void Viewport__NoOpSlot88(void);
 ```
 
 Not a `gViewportMethods` vtable slot occupant, not a method (no `self`), no caller
@@ -20,7 +22,7 @@ Nothing: `jr $ra; nop`.
 
 ## Naming
 
-Kept `Viewport__func_8003ECC8`. No evidence of any kind.
+Kept `Viewport__NoOpSlot88`. No evidence of any kind.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 

@@ -181,7 +181,7 @@ void Viewport__SetTwist(Viewport *self, Ratio16 *twist) {
 
 void Viewport__NoOpSlot84(void) {}
 
-void Viewport__func_8003ECC8(void) {}
+void Viewport__NoOpSlot88(void) {}
 
 /* One-time allocation of the two ordering tables. Each half of the buffer
  * is a GsOT header, its 1 << otLength four-byte tags, then unk48 * unk44
