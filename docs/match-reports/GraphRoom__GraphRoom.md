@@ -80,5 +80,5 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 ## Track 7 (2026-09-27, round 97, delta)
 
-- **Naming: `D_8001176C` -> `sGraphSoundBankPath`** (tier A): the rodata string `"ETC\ETCSE"`, passed as TaskCore's ctor's `soundBankPath` (include/TaskCore.h). This ctor is its only user; `s` for data only this unit reads, like `sTitleTimPath`. TitleMenu's ctor passes its own copy of the same string (`D_800114DC`, class_3bb8c.h).
+- **Naming: `D_8001176C` -> `sGraphSoundBankPath`** (tier A): the rodata string `"ETC\ETCSE"`, passed as TaskCore's ctor's `soundBankPath` (include/TaskCore.h). This ctor is its only user; `s` for data only this unit reads, like `sTitleTimPath`. TitleMenu's ctor passes its own copy of the same string (`sTitleMenuSoundBankPath`, class_3bb8c.h).
 - The pointer zeros (TaskCore ctor's `target` and `sound`, `setTarget`'s target) are written `NULL`. Zero bytes changed.

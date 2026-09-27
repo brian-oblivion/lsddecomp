@@ -106,7 +106,7 @@ extern TaskCoreTarget sTitleMenuTarget;
 
 /* "ETC\ETCSE", TitleMenu__TitleMenu's soundBankPath for TaskCore's ctor
  * (the ctor casts away the const for its `char *`). */
-extern const char D_800114DC[];
+extern const char sTitleMenuSoundBankPath[];
 
 /* "ETC\TITLE.TIM", TitleMenu__Reset's path for setSubHandle. */
 extern const char sTitleTimPath[];

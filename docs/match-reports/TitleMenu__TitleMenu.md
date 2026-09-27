@@ -28,7 +28,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, void *dreamSys)
     DreamSysView_3bb8c_c *dream;
     TitleMenuUnk48Obj *obj;
 
-    Get_vtable_TaskCore()->slot08(self, &sTitleMenuTarget, &D_800114DC, 0);
+    Get_vtable_TaskCore()->slot08(self, &sTitleMenuTarget, &sTitleMenuSoundBankPath, 0);
     self->methods = GetTitleMenuMethods();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);
@@ -89,7 +89,7 @@ presence anywhere in the project. Placed as one new block right before the
   since each translation unit in this project gets its own extern
   prototype for a given external symbol and this unit does not otherwise
   need that header.
-- `sTitleMenuTarget`, `D_800114DC`: address-of-only placeholder `s32` globals
+- `sTitleMenuTarget`, `sTitleMenuSoundBankPath`: address-of-only placeholder `s32` globals
   (same convention as this file's existing `sDefaultTargetSpecs`).
 - `FormatNumberIntoBuffer` prototype: `extern void FormatNumberIntoBuffer(s32 arg0);` -- the
   unit's own still-blocked (gp_rel) function; needed here only as a

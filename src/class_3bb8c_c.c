@@ -141,7 +141,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     DreamSys *dream;
     VabStreamObj *sound;
 
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, &sTitleMenuTarget, (char *)D_800114DC, 0);
+    Get_vtable_TaskCore()->ctor((TaskCore *)self, &sTitleMenuTarget, (char *)sTitleMenuSoundBankPath, 0);
     self->methods = GetTitleMenuMethods();
     sound = (VabStreamObj *)self->sound;
     sound->methods->setPitchOffset(sound, -1);
