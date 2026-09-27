@@ -42,3 +42,13 @@ No new struct or vtable-slot knowledge.
   forwards `SceneNodeMethods::slot18` straight into it, while
   `SceneNode__AddChild` -- the +0x010 slot -- is what forwards into
   `SceneNode__LinkModel`.
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* Clears exactly the two fields SceneNode__LinkModel sets: the GsDOBJ2's
+ * tmd pointer (+0x18) and the source object (+0x20). No GS call -- the
+ * pairing with LinkModel is by construction, not by a Sony API. */
+```

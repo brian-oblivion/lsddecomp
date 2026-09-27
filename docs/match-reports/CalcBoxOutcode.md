@@ -84,3 +84,17 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * `$v0` unmasked (the mask is the CALLER's job, per ClipSegmentToBox's own
  * repeated `andi ...,0xFF` every time it re-reads a stored result). */
 ```
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+The six bits are unit-local `OUTCODE_{X,Y,Z}_{MIN,MAX}` defines in code_d294_c.c (no other unit tests an individual bit; ClipSegmentToBox only tests the whole outcode and `r1 & r2`): byte-identical.
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* Cohen-Sutherland style outcode: one bit pair per axis, high bit set when
+ * the point is past the box maximum and low bit when it is before the
+ * minimum (x -> 8/4, y -> 2/1, z -> 0x20/0x10). Returned unmasked; callers
+ * do their own `andi ..., 0xFF`. The first axis assigns rather than ORs
+ * only because `flags` is provably 0 there. */
+```

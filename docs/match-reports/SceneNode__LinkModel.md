@@ -125,3 +125,23 @@ TMD base as an address) and `&self->attribute` to `GsDOBJ2 *` (SceneNode.h
 spells the embedded GsDOBJ2 as four separate fields; embedding Sony's struct
 there is proposed, not done: SceneNode.h has many includers).
 Byte-identical.
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+The re-read of `self->model` keeps a one-line `MATCHING:` note in the source.
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* Attaches model data to the object and hands it to the GS. `&self->attribute`
+ * is the GsDOBJ2 embedded in every SceneNode instance (attribute at +0x10,
+ * coord2 at +0x14, tmd at +0x18), and Sony's GsLinkObject4(tmd_base, objp,
+ * n) links object `n` of a TMD to it. `model` is a TmdModel
+ * (include/TmdModel.h): its `data->objects` is the object table past the
+ * 0xC-byte TMD header, and its `object` pointer is what GsDOBJ2.tmd gets.
+ * `self->model` keeps the TmdModel.
+ *
+ * Retail RE-READS `self->model` for the call's first argument instead of
+ * reusing the `model` register it stored one statement earlier; writing it
+ * through the field is what matches. */
+```

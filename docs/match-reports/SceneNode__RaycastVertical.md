@@ -817,3 +817,55 @@ A SceneNode method `(self, out, target)`: refreshes coord2's workm.t as coord.t 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+Locals and parameters named for their roles, all byte-identical: `arg1` -> `offset` (out, s32 x3), `arg2` -> `target` (in, a world position), `buf18` -> `origin`, `delta` -> `end` (it first holds `target` less the world position, the input composeAndApplyRotation rotates into `origin`), `buf28` -> `hit`, all three now `SVECTOR` instead of `s16[4]`; `buf30` -> `s32 best` (TmdModel__RaycastFaces's nearest-distance out; the frame is unchanged, measured), `table` -> `worldPos`. The probe offset `0x400` is `RAYCAST_PROBE_LENGTH` (1024), a distance along y in model units: the old comment's reading of it as "-90 and +90 degrees in BAM" was wrong, since it is added to a coordinate, not an angle.
+
+The GsDOFF guard is now `(self->attribute & GsDOFF)` (libgs.h's `1<<31`), byte-identical to the `(s32)self->attribute < 0` it replaces: GCC folds the sign-bit mask into the same `bltz`. The round-19 note that the cast was needed was about a `u32 < 0` comparison, which is constant-false; the mask test is not.
+
+Field names in the old comment, against include/SceneNode.h: `unk10` is `attribute`, `unkC` is `parent`, `unk20` is `model`, `unk14->unk38` is `coord2->workm.t`.
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* First it maintains the object's world translation, `coord2->workm.t`:
+ * the guarded block rewrites it as this object's own coord.t plus every
+ * owner's coord.t, walking the `parent` chain. Then it takes the target
+ * point `arg2` relative to that world translation, rotates the delta into
+ * the object's own frame through slotA4 (SceneNode__ComposeAndApplyRotation, the
+ * inverse-chain matrix), and probes `TmdModel__RaycastFaces` twice -- Y minus 0x400
+ * and, on failure, Y plus 0x400, i.e. -90 and +90 degrees in BAM. On
+ * success `arg1` receives `buf28 - buf18` and the function returns 1.
+ *
+ * Four source shapes here are load-bearing; each was measured against the
+ * oracle and the report records what the alternatives scored.
+ *
+ *  - `(s32)self->unk10 < 0`: `unk10` is a `u32` bitfield word, so without
+ *    the cast the comparison is constant-false and GCC deletes the whole
+ *    guarded block silently (round 19).
+ *  - The backup copy is ONE `LongVec3` struct assignment, not three
+ *    scalar ones. Both spell lw/lw/lw + sw/sw/sw, but only the struct copy
+ *    puts `node` in retail's $a3; the scalar form gives it $a1. That was
+ *    the last residue, open since round 44.
+ *  - The `self->unkC != 0 ? ... : 0` ternary is written out TWICE per axis
+ *    -- once for the store, once for the load -- because retail evaluates
+ *    it twice (the diamond blocks it from CSE). Caching it in a variable
+ *    costs two instructions per axis. It is also cast to `LongVec3 *` and
+ *    reached by FIELD, not indexed as `[i]`: `(cond ? p : NULL)[i]`
+ *    distributes the index into both arms, which turns the NULL arm into
+ *    the literal `i*4` and folds `0x38 + i*4` into one addiu, where retail
+ *    keeps a constant 0x38 base and puts the axis in the load/store
+ *    displacement.
+ *  - The success body is written out twice, once per probe, with the bare
+ *    `return 0` last and the null-`unk20` guard as an enclosing
+ *    `if (self->model != NULL)` rather than an early return. jump.c
+ *    cross-jumps the two copies into the single `jal SubVec3S16` retail
+ *    has (the giveaway is `move a0,s5` appearing in BOTH probe delay
+ *    slots), and that placement is what puts the shared `v0 = 0` block
+ *    after the success tail instead of before it.
+ *
+ * `node->workm.t != NULL` is retail's own check, not a typo for
+ * `node != NULL`: the disassembly forms &workm.t (node + 0x38) first and
+ * tests THAT. */
+```

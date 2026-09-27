@@ -340,3 +340,23 @@ identity vs. pair-swap) before reaching for an axis that closed a
 ## Round 97 (alpha): Sony's SVECTOR
 
 GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/SceneNode.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+The old comment's `unk14->unk44->vec` is `coord2->param->rotate` (GsCOORD2PARAM.rotate, SVECTOR). The num-before-den order keeps a one-line `MATCHING:` note in the source; the derivation stays in this report.
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* Reads the object's three Euler angles -- GsCOORD2PARAM.rotate, i.e.
+ * `unk14->unk44->vec`, in PSX-native 4096-per-turn units -- and writes them
+ * as a 3-entry ratio table in DEGREES: `whole = angle * 45 >> 9`, which is
+ * exactly `angle * 360 / 4096`, with `frac` (the denominator RatioToFixed12
+ * divides by, below) a constant 1. The same {degrees, 1} shape
+ * SceneNode__FaceTarget builds and updateRotation consumes.
+ *
+ * Statement order is load-bearing and counter-intuitive: `.num` is
+ * written BEFORE `.den` even though retail EMITS the `den` store first
+ * (the compiler sinks the constant store into the delay slot itself).
+ * See docs/match-reports/SceneNode__GetRotationDegrees.md. */
+```

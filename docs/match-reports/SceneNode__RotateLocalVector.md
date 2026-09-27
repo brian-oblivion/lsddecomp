@@ -85,3 +85,18 @@ larger, partially-opaque) extent.
   `Actor__AddLocalTranslation` -- the one external call site -- passes the address of a
   bare 3-word local (`Vec3O buf`). The old typing matched by offset
   coincidence with `GsCOORD2PARAM.scale`. Byte-identical after the retype.
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+The `u8 buf[0x20]` rotation buffer is now `MATRIX rot` (0x20 bytes, the type getRotMatrix fills): byte-identical.
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* Rotates a 3-element s16 vector, given in the object's own local frame,
+ * by the object's own orientation, widening it into `dst`. `slot84`
+ * (SceneNode__GetRotMatrix, code_d294_b) builds that rotation with RotMatrix from
+ * GsCOORD2PARAM.rotate; its `0` argument selects the un-negated angles,
+ * i.e. local -> parent, not the inverse. `dst` is a bare 3-word vector:
+ * class_3bb8c_o's own call site (Actor__AddLocalTranslation) passes a local `Vec3O`. */
+```

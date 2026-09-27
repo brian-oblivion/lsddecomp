@@ -222,3 +222,18 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * shift 31 width 1) -- i.e. self->unk10 is a packed flags/small-fields
  * register and these five functions are its per-field setters. */
 ```
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+The mask loop keeps a one-line `MATCHING:` note in the source.
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* Packed-bitfield accessor: replaces the `width` bits at bit `shift` of
+ * `*word` with `value` and RETURNS the previous contents of that field,
+ * shifted down to bit 0. The mask is built one bit at a time by a loop
+ * rather than as `(1 << width) - 1`; that loop is retail's own shape, not
+ * an artefact. Thirteen thin per-field setters across code_d294.c,
+ * code_d294_b.c and code_2cc8c_f.c are wrappers around this. */
+```

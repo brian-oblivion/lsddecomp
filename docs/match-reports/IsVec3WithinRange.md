@@ -72,3 +72,17 @@ retail's literal shape over the "cleaner" idiomatic form.
   so naming one "actual" and the other "expected" would assert a direction
   the code does not have. The explicit pointer walks in the `for`
   increment clause are load-bearing (see the derivation above) and unchanged.
+
+## Round 98 (echo): track 7, moved from src/code_d294_c.c
+
+The pointer-bump placement keeps a one-line `MATCHING:` note in the source.
+
+The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
+
+```c
+/* 1 when every component of `b` lies within +/- `range` of the matching
+ * component of `a`, 0 as soon as one does not. The three pointer walks live
+ * in the `for`'s own increment clause on purpose: indexing lets GCC pick
+ * its own strength-reduction order and puts the wrong bump in the branch
+ * delay slot. */
+```
