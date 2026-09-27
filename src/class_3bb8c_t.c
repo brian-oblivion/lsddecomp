@@ -153,14 +153,14 @@ typedef struct GraphPointColor {
 
 extern u8 D_8008ABAC;
 extern u8 D_8008ABB4;
-extern GraphPointColor D_8008ABB8;
+extern GraphPointColor gGraphPointBaseColor;
 
 void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     GraphPointColor rgb;
     s32 i;
 
     self->points[0] = New_BoxFill(&D_8008ABAC, &D_8008ABB4, 0);
-    rgb = D_8008ABB8;
+    rgb = gGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 

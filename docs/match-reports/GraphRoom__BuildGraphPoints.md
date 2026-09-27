@@ -28,7 +28,7 @@ Builds a 100-entry array of allocated `D_80087AACEntry` objects
 (`self->unk_0xA8[0..99]`), each constructed via `New_BoxFill` (already
 matched, `code_2cc8c_e.c`) with a colour-like 3-byte argument: entry 0
 gets the constant `D_8008ABB4` directly; entries 1-99 get successive
-values of a mutable local copy of `D_8008ABB8` (also 3 bytes), decremented
+values of a mutable local copy of `gGraphPointBaseColor` (also 3 bytes), decremented
 by 0x14 for the first 6 loop iterations and by 1 thereafter. Finally
 allocates a 4-byte scratch buffer into `self->unk_0x240`.
 
@@ -47,7 +47,7 @@ typedef struct GraphPointColor {
 } GraphPointColor;
 extern u8 D_8008ABAC;
 extern u8 D_8008ABB4;
-extern GraphPointColor D_8008ABB8;
+extern GraphPointColor gGraphPointBaseColor;
 extern D_80087AACEntry *New_BoxFill(void *a0, void *a1, s32 a2);
 
 void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
@@ -55,7 +55,7 @@ void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
     s32 i;
 
     self->unk_0xA8[0] = New_BoxFill(&D_8008ABAC, &D_8008ABB4, 0);
-    rgb = D_8008ABB8;
+    rgb = gGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
@@ -166,7 +166,7 @@ void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
     s32 i;
 
     self->unk_0xA8[0] = New_BoxFill(D_8008ABAC, &D_8008ABB4, 0);
-    rgb = D_8008ABB8;
+    rgb = gGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
