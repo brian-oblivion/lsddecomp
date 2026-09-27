@@ -1,8 +1,10 @@
-# func_8002E300 -- MATCHED (2/2 words, splat-generated)
+# SsUtVibrateOff -- MATCHED (2/2 words, splat-generated)
+
+> Renamed from `func_8002E300` on 2026-09-27 (tools/rename.py). Address 0x8002e300.
 
 Unit: `src/code_179d8_l.c`. Address `0x8002E300`.
 
-Trivially matched: the empty C body (`void func_8002E300(void) {}`) compiles
+Trivially matched: the empty C body (`void SsUtVibrateOff(void) {}`) compiles
 to retail's own `jr $ra; nop` -- splat emitted this body itself when the
 unit was carved (round 24, 2026-09-08). Not decompilation work.
 

@@ -15,7 +15,7 @@
  * volume ramp (SeAutoVol). They read the current VAB through <libsnd.h>'s
  * VabHdr and VagAtr (_svm_vh, _svm_tn), the voice tables in
  * include/SvmData.h and the sequence records in include/SsScore.h.
- * SsUtVibrateOn and func_8002E300 are empty and have no known caller.
+ * SsUtVibrateOn and SsUtVibrateOff are empty and have no known caller.
  */
 #include "common.h"
 #include <libsnd.h>
@@ -466,7 +466,7 @@ void SePitchBend(s32 chan, s32 bend) {
 
 void SsUtVibrateOn(short vc, short vibW, short vibT) {}
 
-void func_8002E300(void) {}
+void SsUtVibrateOff(short vc) {}
 
 /* Matched round 73 -- docs/match-reports/SeAutoVol.md. Same body as
  * SeAutoPan (code_179d8_m), over _svm_voice +0x1C..+0x26 instead of
