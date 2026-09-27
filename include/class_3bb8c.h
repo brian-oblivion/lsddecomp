@@ -252,7 +252,7 @@ typedef struct StyleConfig {
     s32 fogNear; /* +0x01C, EnterStyleSession: the viewport's setFogNear; a D_8008730C value */
 } StyleConfig;
 
-/* ObjM__OnRegistrantEvent's grid lookups (src/code_39094.c): a
+/* ObjM__GetGridRecord's grid lookups (src/code_39094.c): a
  * non-negative code is a linear cell index (GetGridRecordAt(index, code)),
  * a negative one sends x/y to GetGridRecordXY. */
 extern s32 GetGridRecordAt(s32 index, s32 sub);

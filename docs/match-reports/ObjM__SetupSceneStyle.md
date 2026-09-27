@@ -24,8 +24,8 @@ struct UnkCObj_3bb8c_l {
 
 extern void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 extern void *GetStageGridDimensions(s32 index);
-extern s32 D_8008AB34;
-extern s32 D_8008710C;
+extern s32 gObjMProjectionBias;
+extern s32 gObjMAcceptedClassIds;
 
 void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
@@ -38,9 +38,9 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
 
     obj = *(UnkCObj_3bb8c_l **)self->unkC;
     val = *obj->methods->slot7C(obj, 0);
-    unk18->methods->slot54(unk18, val / 2 * 5 / 3 + D_8008AB34);
+    unk18->methods->slot54(unk18, val / 2 * 5 / 3 + gObjMProjectionBias);
 
-    unk18->methods->slot70(unk18, self->unk3C, &D_8008715C, &D_80087168, 0);
+    unk18->methods->slot70(unk18, self->unk3C, &gObjMViewPoint, &gObjMViewRefPoint, 0);
 
     SetDreamAuxWorld((s32)self->unk38, (s32)self->unk14, (s32)self->unk3C, self->unk34, self->unk10);
 
@@ -52,7 +52,7 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     unk14->methods->slotE0(unk14, GetStageGridDimensions((s32)self->unk38));
     self->unk3C->methods->slot4C(self->unk3C, unk14);
     unk14->methods->slotDC(unk14, self->unk48);
-    unk14->methods->slotCC(unk14, &D_8008710C);
+    unk14->methods->slotCC(unk14, &gObjMAcceptedClassIds);
 }
 ```
 
@@ -154,3 +154,36 @@ the TimBlockSrc fades to clearColor), `unk18` -> `farColor` (setFarColor
 otherwise), `unk1C` -> `fogNear` (setFogNear). Tier B for `colorMode`, whose
 two tested values are read by different methods for different choices.
 Zero bytes changed.
+
+## Round 95 (track 7, echo)
+
+The unit-local view `UnkCObj_3bb8c_l` / `UnkCObjMethods_3bb8c_l` was deleted:
+it was the DrawSystem (IntermediateBaseInitArgs::drawSystem) seen through
++0x07C, which include/DrawSystem.h has as `getDims(self, DrawRect *out)`
+returning `ScreenDims *`. The body now reads
+`drawSystem->methods->getDims(drawSystem, NULL)->w`, byte-identical. Its
+comment, moved here:
+
+> initArgs->unk0 as SetupSceneStyle reads it: its +0x07C returns a pointer
+> to one word (class_39e08.h's SubObjE is the same call from
+> DayTask__OnInit).
+
+Proposed for the head: class_39e08.h's `SubObjE` is the same DrawSystem
+call and can go the same way.
+
+Comment history moved from the unit's externs:
+
+> code_4cd08.c's (MATCHED round 43); no header declares it. `world` is the
+> DreamSys it installs as gDreamAuxWorld (track 4, round 88).
+
+> GetStageGridDimensions comes from include/StageGrid.h, through DreamSys.h.
+
+> The StageMap's accepted tags (setAcceptedTags), an opaque .data block
+> (asm/data/76DC8.data.s) reached by address.
+
+SetDreamAuxWorld's local prototype takes its parameter names from what the
+definition does with them (stage, grid, world, sound, clock).
+`gObjMViewPoint`, `gObjMViewRefPoint` and `gObjMAcceptedClassIds` are typed
+(LongVec3, s32[]), dropping their casts. `/* GsFOG */` on EnterStyleSession's
+setLightMode(vp, 1): SceneNode__SetLightMode writes a 3-bit field at bit 3
+of the GsDOBJ2 attribute, where 1 is libgs's GsFOG (1<<3).

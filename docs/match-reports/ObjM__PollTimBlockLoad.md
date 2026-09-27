@@ -69,12 +69,12 @@ its `unknown_functions_0x..` padding arrays there).
    0x14 — one word of missing `u8 pad[...]`. Visible as a wrong field
    offset AND a register-role swap in the diff (retail: `v0`=field value,
    `v1`=literal 2; mine: reversed), both symptoms of the same root cause.
-2. **Branch polarity / body-placement, same class as `ObjM__OnRegistrantEvent`'s
+2. **Branch polarity / body-placement, same class as `ObjM__GetGridRecord`'s
    residue.** The natural `if (sel == 2) { a1 = unkC; } else { a1 = unk18;
    }` compiles with the wrong body at the wrong branch target. Writing the
    negated form `if (sel != 2) { a1 = unk18; } else { a1 = unkC; }`
    reproduces retail's `beq`/target layout exactly — see
-   `ObjM__OnRegistrantEvent`'s report for the general rule.
+   `ObjM__GetGridRecord`'s report for the general rule.
 3. **A load hoisted out of the `if`/`else`, not visible from the
    disassembly's literal instruction order until diffed against a body
    that DOESN'T hoist it.** Retail loads `other->methods` into a register
@@ -120,3 +120,10 @@ the TimBlockSrc fades to clearColor), `unk18` -> `farColor` (setFarColor
 otherwise), `unk1C` -> `fogNear` (setFogNear). Tier B for `colorMode`, whose
 two tested values are read by different methods for different choices.
 Zero bytes changed.
+
+## Round 95 (track 7, echo)
+
+Locals `ret` -> `timer`, `sel` -> `colorMode`; the failure path's `0x1E`
+is 30 (seconds, getSetDreamTimeLimit's unit per DreamSys.h's
+DREAM_TICKS_PER_SECOND). colorMode's values (1, 2) stay literals:
+StyleConfig belongs to include/class_3bb8c.h, proposed there as an enum.

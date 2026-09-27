@@ -1,4 +1,6 @@
-# ObjM__OnRegistrantEvent
+# ObjM__GetGridRecord
+
+> Renamed from `ObjM__OnRegistrantEvent` on 2026-09-27 (tools/rename.py). Address 0x80052e7c.
 
 > Renamed from `func_80052E7C` on 2026-09-24 (tools/rename.py). Address 0x80052e7c.
 
@@ -12,7 +14,7 @@ on `code` to one of two still-uncarved helpers (`asm/psyq_memset.s`, despite
 the filename these are not Psy-Q library code).
 
 ```c
-void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
+void ObjM__GetGridRecord(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     if (code >= 0) {
         GetGridRecordAt(self->unk38, code);
     } else {
@@ -47,7 +49,7 @@ void ObjM__OnRegistrantEvent(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg
 
 ### Proposed learning
 
-Confirms (third instance, after `ObjM__OnRegistrantEvent`'s own sibling case in
+Confirms (third instance, after `ObjM__GetGridRecord`'s own sibling case in
 `ObjM__PollTimBlockLoad` and one more below) that GCC 2.6.3's `if`/`else` codegen
 convention is completely mechanical: `NOT(written condition)` is always the
 compiled test, and the `if`-body always lands at the fallthrough. When a
@@ -61,7 +63,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier | evidence |
 | --- | --- | --- | --- |
-| `func_80052E7C` | `ObjM__OnRegistrantEvent` | B | see below |
+| `func_80052E7C` | `ObjM__GetGridRecord` | B | see below |
 
 **Evidence.** The callback address-taken by `ObjM__AttachTarget` and handed to the registrant's `slotC8`. Matches `RegistrantMethods_3bb8c_l::slotC8`'s callback shape exactly. Dispatches on the sign of `code` to one of two still-uncarved helpers (`asm/psyq_memset.s`); their own purpose is unknown, so this stays tier B.
 
@@ -76,3 +78,21 @@ GetGridRecordAt/GetGridRecordXY were declared K&R (unprototyped) and called
 with one argument until round 82's externcheck pass. OnRegistrantEvent's
 `code >= 0` branch leaves its incoming `code` in $a1 at the jal, so `code`
 is the second argument; the forwarded form is byte-identical.
+
+## Round 95 (track 7, echo)
+
+Renamed from `ObjM__OnRegistrantEvent` (`tools/rename.py`). Tier A: the
+body is a lookup leaf, and its one use is as the StageMap's chunkFileFn
+(ObjM__AttachTarget's setCallback; StageMap.h: ComputeChunkLoadEntry calls
+`chunkFileFn(ctx, value, 0, 0)` and keeps the result as the entry's file
+record). The name mirrors the two functions it forwards to,
+GetGridRecordAt and GetGridRecordXY. "Registrant event" described nothing
+the body does. Parameters: `code, arg2, arg3` -> `cell, x, y` (GetGridRecordAt's
+`sub` is a linear cell index; GetGridRecordXY takes x, y). ObjM.h's
+prototype follows.
+
+The body stays `void`: class_3bb8c.h declares GetGridRecordXY `void`
+although code_39094.c defines it returning `Rec1C *`, so the record is
+returned only because it is still in $v0. Proposed for the head: that
+prototype returns `Rec1C *` (or `void *`), after which this body can
+`return` both calls.

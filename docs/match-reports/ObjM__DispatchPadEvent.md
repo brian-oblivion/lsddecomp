@@ -74,7 +74,7 @@ Three source forms were tried before this one matched, in order:
    0x17) { if (eventId == 0xC) ...; else return; } else ...`). This fixed
    the comparison ORDER but every individual `==` test came out with the
    wrong branch polarity (body at fallthrough instead of target, same
-   class of residue as `ObjM__OnRegistrantEvent`/`ObjM__PollTimBlockLoad`) AND, worse, GCC
+   class of residue as `ObjM__GetGridRecord`/`ObjM__PollTimBlockLoad`) AND, worse, GCC
    inlined each case body at its own comparison site instead of placing
    all four bodies out-of-line after the full compare chain the way
    retail does. Scored the same 11/38, different residue shape.
@@ -123,3 +123,25 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 ## Track 4 (2026-09-26, round 89, echo)
 
 Renamed from `ObjM__DispatchEvent` (rename.py): it occupies IntermediateBase's `onPadEvent` (+0x058, onNotify's Pad case), so the codes are pad codes: 0x21 slot74 (TogglePause), 0xC updateCloseReadyFlag, 0x2C clearCloseReadyFlag, 0x16 closeAndNotifyD; only while `inSession`. Tier B (which buttons the codes are is not established).
+
+## Round 95 (track 7, echo)
+
+The four codes are named from include/Pad.h, where this round added
+(additively) `PAD_EVENT_HELD/PRESSED/RELEASED` (0x02/0x12/0x22, Pad__DispatchEvents'
+edge bases) and `enum PadButton` (sButtonMasks' indices; Pad__LoadButtonTable
+copies the fixed table D_80010764, whose words are libetc's masks PADLup,
+PADLdown, PADLleft, PADLright, PADRup, PADRdown, PADRleft, PADRright, PADi,
+PADj, PADk, PADl, PADm, PADn, PADo, PADh in that order):
+
+| code | spelled | slot |
+| --- | --- | --- |
+| 0x16 | PAD_EVENT_PRESSED + PAD_BUTTON_RUP (triangle) | closeAndNotifyD |
+| 0x0C | PAD_EVENT_HELD + PAD_BUTTON_SELECT | updateCloseReadyFlag |
+| 0x21 | PAD_EVENT_PRESSED + PAD_BUTTON_START | togglePause |
+| 0x2C | PAD_EVENT_RELEASED + PAD_BUTTON_SELECT | clearCloseReadyFlag |
+
+`code < 0x17` is spelled `code <= PAD_EVENT_PRESSED + PAD_BUTTON_RUP`
+(same slti). The goto labels are named for the slot each reaches (were
+`case_c8`, `case_c0`, `case_74`, `case_c4`, the slot offsets). A
+`/* MATCHING: */` line keeps the goto form from being tidied into a switch
+(see above). All byte-identical.

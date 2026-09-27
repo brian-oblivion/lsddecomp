@@ -17,7 +17,7 @@
  * Lifecycle. The game makes one, at boot (DayTask__DayTask, via
  * New_StageMap(NULL, 1)). ObjM configures it for its stage: setConfig
  * with the stage's StageGridDimensions (GetStageGridDimensions),
- * setCallback with ObjM__OnRegistrantEvent (a chunk index -> that chunk's
+ * setCallback with ObjM__GetGridRecord (a chunk index -> that chunk's
  * file record, GetGridRecordAt), setGridSpan, setAcceptedTags,
  * setChildParams, setBounds, and enables it.
  * DreamSys__SpawnAtLink hands it the target (setTargetAndLoadChunks);

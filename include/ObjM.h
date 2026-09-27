@@ -21,7 +21,7 @@
  * `BasicClass *` types and ObjM's methods cast them (no code).
  *
  * What its methods do, measured:
- *  - init (ObjM__AttachTarget) registers ObjM__OnRegistrantEvent as the
+ *  - init (ObjM__AttachTarget) registers ObjM__GetGridRecord as the
  *    StageMap's callback, keeps the DreamSys and adds it as a child;
  *    onInit (ObjM__InitStyleAndWorld) builds `timBlockSrc`
  *    (New_TimBlockSrc of the day's variant) and `styleConfig`
@@ -94,7 +94,7 @@ struct ObjMMethods {
     /* +0x0B0 */ void (*onFadeNotify)(ObjM *self, struct FadeBox *sender,
                                       s32 event); /* ObjM__OnFadeNotify: onNotify's 0x164 sender; 5 fade down done, 6 up */
     /* +0x0B4 */ void (*onStageMapNotify)(ObjM *self, BasicClass *sender,
-                                            s32 event); /* ObjM__OnStageMapNotify: onNotify's 0x114 sender */
+                                          s32 event); /* ObjM__OnStageMapNotify: onNotify's 0x114 sender */
     /* +0x0B8 */ s32 (*checkAuxTrigger)(ObjM *self); /* ObjM__CheckAuxTrigger: OnStageMapNotify's event 7 */
     /* +0x0BC */ void (*slotBC)(void);               /* ObjM__NoOpSlotBC, empty; never called */
     /* +0x0C0 */ void (*updateCloseReadyFlag)(ObjM *self); /* ObjM__UpdateCloseReadyFlag: DispatchPadEvent's 0xC */
@@ -107,12 +107,12 @@ struct ObjMMethods {
 
 struct ObjM {
     TIMEDTASK_FIELDS(ObjMMethods);
-    /* +0x038 */ s32 stage; /* the ctor's; DayTask__StartObjM's stage. PickVariant, GetGridRecordAt, GetStageGridDimensions, D_80087118[stage], EnterState4 */
+    /* +0x038 */ s32 stage; /* the ctor's; DayTask__StartObjM's stage. PickVariant, GetGridRecordAt, GetStageGridDimensions, gStagePendingExtras[stage], EnterState4 */
     /* +0x03C */ struct DreamSys *dreamSys; /* init's third argument (AttachTarget); a child. Every DreamSys slot ObjM calls */
-    /* +0x040 */ s32 unk40; /* InitStyleAndWorld: 0x10; the DreamSys's resetLinkState's arg2 */
-    /* +0x044 */ s32 unk44; /* InitStyleAndWorld: 2 or 3; resetLinkState's arg1 */
+    /* +0x040 */ s32 tickPeriod; /* InitStyleAndWorld: 16; the DreamSys's resetLinkState's tickPeriod (EnterStyleSession) */
+    /* +0x044 */ s32 moveMode; /* InitStyleAndWorld: 2 or 3; resetLinkState's moveMode, a MOVE_MODE_SPEEDS index (EnterStyleSession) */
     /* +0x048 */ s32 gridSpan; /* onInit's arg1, 0 meaning 0xA000; the StageMap's setGridSpan (SetupSceneStyle) */
-    /* +0x04C */ s32 unk4C;                               /* onInit's arg3; no reader */
+    /* +0x04C */ s32 unk4C;                       /* onInit's arg3; no reader */
     /* +0x050 */ struct StyleConfig *styleConfig; /* RegisterStyleConfig's result, or onInit's arg2 */
     /* +0x054 */ struct WBgm *bgm; /* the ctor's (DayTask's bgm): setSeq, stop, pause, resume */
     /* +0x058 */ struct TimBlockSrc *timBlockSrc; /* InitStyleAndWorld's New_TimBlockSrc; PollTimBlockLoad releases it */
@@ -141,7 +141,7 @@ void ObjM__Finalize(ObjM *self);
 void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event);
 void ObjM__NoOpSlot40(void);
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, struct DreamSys *dreamSys);
-void ObjM__OnRegistrantEvent(ObjM *self, s32 code, s32 arg2, s32 arg3);
+void ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y);
 void ObjM__DetachTarget(ObjM *self);
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, struct StyleConfig *style, s32 arg3);
 void ObjM__TeardownStyle(ObjM *self);

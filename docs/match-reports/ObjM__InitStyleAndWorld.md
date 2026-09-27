@@ -22,10 +22,10 @@ extern s32 New_TimBlockSrc(s32 arg0);
 extern void func_8001EF60(s32 arg0);
 extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
 
-extern s32 D_8008715C;
-extern s32 D_80087168;
-extern s32 D_80087118[];
-extern s32 D_80087150;
+extern s32 gObjMViewPoint;
+extern s32 gObjMViewRefPoint;
+extern s32 gStagePendingExtras[];
+extern s32 gStage0Bounds;
 
 void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2, s32 arg3) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
@@ -41,7 +41,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
     ret1 = PickDailyVariant(self->unk38, 0, ret1);
     self->unk58 = (Obj87034_3bb8c_l *) New_TimBlockSrc(ret1);
 
-    unk18->methods->slot70(unk18, self->unk3C, &D_8008715C, &D_80087168, 0);
+    unk18->methods->slot70(unk18, self->unk3C, &gObjMViewPoint, &gObjMViewRefPoint, 0);
 
     self->unk78 = unk18;
     ret1 = self->unk3C->methods->slot1A0(self->unk3C, 0);
@@ -72,7 +72,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
         self->unk40 = 0x10;
         self->unk44 = 2;
         flag = 1;
-        self->unk14->methods->slot134(self->unk14, &D_80087150);
+        self->unk14->methods->slot134(self->unk14, &gStage0Bounds);
     }
 
     self->unk48 = arg1;
@@ -81,7 +81,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
     }
     func_8001EF60(flag);
 
-    self->unk3C->methods->slotEC(self->unk3C, D_80087118[(s32) self->unk38]);
+    self->unk3C->methods->slotEC(self->unk3C, gStagePendingExtras[(s32) self->unk38]);
     self->unk20 = 5;
 }
 ```
@@ -89,10 +89,10 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
 Cross-unit helpers (`PickVariant`, `PickDailyVariant`, `New_TimBlockSrc`,
 `func_8001EF60`, `RegisterStyleConfig`) have no established prototypes anywhere
 else in the project (all still `INCLUDE_ASM` in their own units), so they
-are declared locally per CLAUDE.md's rule. `D_8008715C`/`D_80087168` are
+are declared locally per CLAUDE.md's rule. `gObjMViewPoint`/`gObjMViewRefPoint` are
 referenced only by address (never loaded), so their real type is unknown;
-`D_80087118` is a plain word array indexed by `self->unk38`;
-`D_80087150` is likewise referenced only by address.
+`gStagePendingExtras` is a plain word array indexed by `self->unk38`;
+`gStage0Bounds` is likewise referenced only by address.
 
 ## Three levers, in the order that closed the gap (138 -> 137 words)
 
@@ -224,3 +224,36 @@ the TimBlockSrc fades to clearColor), `unk18` -> `farColor` (setFarColor
 otherwise), `unk1C` -> `fogNear` (setFogNear). Tier B for `colorMode`, whose
 two tested values are read by different methods for different choices.
 Zero bytes changed.
+
+## Round 95 (track 7, echo)
+
+Two comments in the body were cut to `/* MATCHING: */` lines; their full
+text, moved here:
+
+> Retail reloads self->stage here even though the outer `if` just read it
+> and nothing wrote it in between -- a volatile-qualified POINTER TYPE at
+> the read site (not a volatile object) forces the reload without changing
+> the field's own declared type, the same idiom code_179d8_m.c documents
+> for D_8008EA26's `*(u8 *)&sym`, used here in the opposite direction
+> (forcing a reload instead of permitting a fold).
+
+> Order-only: without this barrier the scheduler moves `three`'s `li` past
+> the `self->unk40` store; removing it does not change which register holds
+> which value.
+
+Naming, all zero bytes:
+- `ObjM::unk40` -> `tickPeriod`, `unk44` -> `moveMode` (include/ObjM.h;
+  the compiler's accessor list after the rename was this unit only).
+  Evidence: EnterStyleSession passes them to the DreamSys's resetLinkState,
+  and DreamSys__ResetLinkState's own parameters are `(moveMode,
+  tickPeriod)`: getSetMoveMode(moveMode), setTickPeriod(tickPeriod). moveMode
+  2/3 index MOVE_MODE_SPEEDS {0, 24, 64, 128, 384}. Tier A (mechanics).
+- local `ret1` split into `record` (PickVariant / PickDailyVariant results)
+  and `day` (getCurrentDayAndYear); the split compiled identically.
+- `0x10` -> 16, `0xA000` -> `DEFAULT_GRID_SPAN` (40960, unit-local; the value
+  of gDefaultGridSpan, what StageMap starts with; StageMap::gridHalfCells is
+  gridSpan >> 12 = 10).
+- `arg3` / `unk4C` kept: stored, never read, and IntermediateBase__Init
+  passes 0, so nothing names it.
+- `flag` kept: it goes to func_8001EF60, whose global's meaning is not
+  established (code_d294_c.c's tier-C note).
