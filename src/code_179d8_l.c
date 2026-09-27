@@ -24,6 +24,8 @@
  * screened against are RESOLVED project-wide (CLAUDE.md).
  */
 #include "common.h"
+#include <libsnd.h>
+#include "SsScore.h"
 #include "SvmData.h"
 #include "VabStreamObj.h"
 #include "SoundCueSet.h"
@@ -161,18 +163,6 @@ s32 SpuVmAlloc(void) {
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmAlloc);
 #endif
 
-/* Shared with vmNoiseOn below (same two-level entry table, same
- * blend-cascade shape); declared once here since SpuVmKeyOnNow is
- * ROM-earlier, reused there rather than redeclared. */
-typedef struct {
-    u8 pad0[0x74];
-    u16 unk74;
-    u16 unk76;
-    u8 pad78[0xAC - 0x78];
-} SsScore;
-
-extern SsScore *_ss_score[];
-
 extern u8 D_8008EA16;
 extern u8 D_8008EA19;
 extern u8 D_8008EA17;
@@ -198,14 +188,9 @@ extern u16 D_8008E234;
  * class (docs/match-reports/SpuVmKeyOnNow.md). Hand-derived, plus one
  * permuter hoist (round 65: pan1sq/16383 computed before pan2sq), reviewed
  * as a pure reordering and kept. */
-/* Object holding a per-note "priority"-ish scale byte at +0x18; only field
- * this function needs. */
-typedef struct {
-    u8 pad0[0x18];
-    u8 unk18; /* +0x18 */
-} ObjE970;
-
-extern ObjE970 *_svm_vh;
+/* libsnd's _svm_vh (pinned at this address): the header of the VAB bank
+ * the voice manager is playing from. */
+extern VabHdr *_svm_vh;
 
 extern u8 D_8008EA10;
 /* NOT volatile, and declared as an incomplete ARRAY on purpose: the array
@@ -228,7 +213,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     s32 lowBit;
     s32 highBit;
 
-    prio = _svm_vh->unk18 * 0x3FFF;
+    prio = _svm_vh->mvol * 0x3FFF;
     lvl0 = D_8008EA10 * prio / 16129;
     lvl1 = (u32)lvl0 * D_8008EA16 * D_8008EA19 / 16129;
 
@@ -307,34 +292,20 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmKeyOnNow);
 extern u8 D_8008EA13;
 extern u8 D_8008EA18;
 
-/* Shared with note2pitch2 below (same base pointer, same table); this
- * function needs the +0x10/+0x12 halfwords too, so the struct is declared
- * once here (ROM-address order: SpuVmDoAllocate precedes note2pitch2) and
- * reused there rather than redeclared -- see docs/match-reports/SpuVmDoAllocate.md. */
-typedef struct {
-    u8 unk0[4];
-    u8 unk4;
-    u8 unk5;
-    u8 unk6[6];
-    u8 unk12;
-    u8 unk13;
-    u8 pad14[2];
-    u16 unk16; /* +0x10 */
-    u16 unk18; /* +0x12 */
-    u8 pad20[0x20 - 20];
-} D8008E978Entry;
-
-extern D8008E978Entry *_svm_tn;
+/* libsnd's _svm_tn (pinned at this address): the current VAB's tone
+ * attributes, 16 per program; SpuVmDoAllocate, note2pitch2 and SePitchBend
+ * index it by program * 16 + tone. */
+extern VagAtr *_svm_tn;
 
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 
-/* SsScore, _ss_score and the blend-cascade globals
+/* The blend-cascade globals
  * (D_8008EA16/17/19/1A/11/20/22, D_8008E8C0, D_8008E228/22C, D_80090C60/64,
  * D_8008E230/234, _svm_sreg_dirty/98C/9A3) are already declared above, before
  * SpuVmKeyOnNow (ROM-earlier, same shapes) -- reused here, not redeclared. */
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
-extern u16 *D_8006DAD4;
+extern SpuRegs *D_8006DAD4;
 extern u8 D_8008E9D0;
 
 /* STALL -- see docs/match-reports/vmNoiseOn.md. Best body reached
@@ -387,8 +358,8 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     D_8008E22C = highBit | D_8008E22C;
     D_80090C60 = D_80090C60 & ~D_8008E228;
     D_80090C64 = D_80090C64 & ~D_8008E22C;
-    D_8006DAD4[0xCA] = lowBit;
-    D_8006DAD4[0xCB] = highBit;
+    D_8006DAD4->noiseOn[0] = lowBit;
+    D_8006DAD4->noiseOn[1] = highBit;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn2);
@@ -429,7 +400,7 @@ s32 note2pitch2(s32 a0, s32 a1) {
     s32 origA0;
     s32 idx;
     s32 tblIdx;
-    D8008E978Entry *e;
+    VagAtr *e;
     s32 v0;
     s32 div8;
     u8 a2;
@@ -442,7 +413,7 @@ s32 note2pitch2(s32 a0, s32 a1) {
     origA0 = a0;
     idx = D_8008EA18 + (D_8008EA13 << 4);
     e = &_svm_tn[idx];
-    v0 = (u16)a1 + e->unk5;
+    v0 = (u16)a1 + e->shift;
     div8 = v0 / 8;
     a3 = div8;
     a2 = 0;
@@ -450,7 +421,7 @@ s32 note2pitch2(s32 a0, s32 a1) {
         a2 = 1;
         a3 = div8 - 16;
     }
-    diff = (s16)(a2 + (origA0 + 0x3C - e->unk4));
+    diff = (s16)(a2 + (origA0 + 0x3C - e->center));
     q12 = diff / 12;
     rem12 = diff - q12 * 12;
     tblIdx = rem12 * 16;
@@ -486,11 +457,11 @@ void SePitchBend(s32 chan, s32 bend) {
         idx = D_8008EA18 + (*p << 4);
         b = bend;
         if (b >= 0) {
-            prod = b * _svm_tn[idx].unk13;
+            prod = b * _svm_tn[idx].pbmax;
             note = (u16)_svm_voice[(chan & 0xFF)].unk0C + prod / 127;
             fine = prod % 127;
         } else {
-            q = (b * _svm_tn[idx].unk12) / 127;
+            q = (b * _svm_tn[idx].pbmin) / 127;
             note = (u16)_svm_voice[(chan & 0xFF)].unk0C + q - 1;
             fine = q + 127;
         }
