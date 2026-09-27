@@ -239,4 +239,4 @@ CdlLOC's four bytes under another name, so the copy is spelled
 `entries->pos = *(CdLoc16 *)&info.pos;`. Byte-exact: the access type (and so
 the 2-byte-aligned `lwl`/`lwr` copy) is unchanged. Proposed at the head:
 replace `CdLoc16` with `CdlLOC` in include/FileResource.h once its includers
-can take `<libcd.h>` (code_179d8_r/_s, code_3770c still re-declare libcd).
+can take `<libcd.h>` (code_179d8_r/_s, CdStream still re-declare libcd).

@@ -7,7 +7,7 @@
  * CdStream -- one streamed CD file (an FMV's sectors) read through Sony's
  * libcd streaming library (StSetRing/StSetStream/StGetNext/StFreeRing), class
  * id 0x40, method table gCdStreamMethods, a direct BasicClass subclass.
- * Methods in src/code_3770c.c. The one holder is MoviePlayer (gMoviePlayerMethods,
+ * Methods in src/CdStream.c. The one holder is MoviePlayer (gMoviePlayerMethods,
  * src/GraphicsResources.c), whose ctor builds one with New_CdStream(cdSpeed, MOVIE_FPS, 0)
  * into its +0x060 and drives it through the slots below.
  *
@@ -24,7 +24,7 @@
  *
  * The callback words (+0x048, +0x04C, +0x054) are cleared by the ctor and
  * written nowhere else: New_CdStream's one caller is MoviePlayer's ctor and
- * gActiveCdStream is read only in code_3770c, so the object reaches no other
+ * gActiveCdStream is read only in CdStream, so the object reaches no other
  * code, and MoviePlayer only calls slots. It hands its callback to slot
  * +0x07C instead, whose occupant is empty.
  *
@@ -123,7 +123,7 @@ void CdStream__UnsetRing(CdStream *self);
 void CdStream__ClearRing(CdStream *self);
 void CdStream__NoOpSlot7C(CdStream *self);
 
-/* Not slots: code_3770c's helpers. */
+/* Not slots: CdStream's helpers. */
 s32 SetupCdStreamAudio(CdStream *self);       /* open: the CD audio mix (SpuSetCommonAttr) */
 void OnCdSeekComplete(u8 status, u8 *result); /* seek's CdSyncCallback */
 void CdStream__ReleaseFrame(CdStream *self, u32 *base, u32 frame); /* onFrameReady, then freeRing */

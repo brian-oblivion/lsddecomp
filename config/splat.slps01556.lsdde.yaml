@@ -1350,7 +1350,7 @@ segments:
       # psyq_memset chunk C: libpress, the MDEC variable-length decoder.
       - [0x36DB8, o, libpress/vlc]     # MDEC_vlc_brk, MDEC_vlc
       - [0x3711C, o, libpress/vlc2]    # MDEC_vlc2, ivlc_dct_dc_size
-      - [0x3770c, c, code_3770c]       # game code (revision 18; was psyq_3770c)
+      - [0x3770c, c, CdStream]       # game code (revision 18; was psyq_3770c)
       # psyq_memset chunk D: the libcd streaming/BIOS-command core. Eight of
       # these objects carry an identical, unreferenced 0x10-byte .data; only
       # c_003's is placeable, and the other eight are left out of the yaml on

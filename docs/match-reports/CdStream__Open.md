@@ -4,7 +4,7 @@
 
 > Renamed from `func_80047114` on 2026-09-25 (tools/rename.py). Address 0x80047114.
 
-Round 82, runner delta (second session). Unit `src/code_3770c.c`. Fresh
+Round 82, runner delta (second session). Unit `src/CdStream.c`. Fresh
 ground, no prior attempt. Byte-exact on build 4; whole-image SHA1 green.
 
 - **Where:** slot +0x044 of gCdStreamMethods (open a stream file by name).

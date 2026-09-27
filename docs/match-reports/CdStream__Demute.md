@@ -4,7 +4,7 @@
 
 > Renamed from `func_80047638` on 2026-09-25 (tools/rename.py). Address 0x80047638.
 
-Round 82, runner delta. Unit `src/code_3770c.c` (carved from psyq_3770c in
+Round 82, runner delta. Unit `src/CdStream.c` (carved from psyq_3770c in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build of the real body; whole-image SHA1 green.
 
