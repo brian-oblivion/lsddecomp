@@ -44,8 +44,8 @@
  * (`TaskObjF__TryReadMemcardFile` is already MATCHED and stays MATCHED): a pointer
  * return value lives in `$v0` either way, so the implicit-int reading
  * never produced different code, only a diagnostic. */
-s32 WaitForReadyEvent(s32 *arr, s32 count);
-char *BuildMemcardPath(McDevicePath *dest, s32 selector, char *suffix);
+s32 WaitForReadyEvent(s32 *events, s32 count);
+char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix);
 
 /* PSX BIOS file trampolines, linked from Sony's own objects since round 34
  * (libapi/a50,a52,a51,a54,a69 -- one 0x10-byte object per stub). These used
@@ -128,16 +128,16 @@ typedef struct McSaveHeader {
 } McSaveHeader;
 
 s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
-    s32 count;
+    s32 retries;
     s32 result;
 
-    count = 10;
+    retries = 10;
     do {
         result = TaskObjF__TryReadMemcardFile(self, suffix, outBuf, outSize);
         if (result != 0) {
             break;
         }
-    } while (count-- != 0);
+    } while (retries-- != 0);
     return result;
 }
 
@@ -145,39 +145,40 @@ s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32
     char pathBuf[0x20];
     char *path;
     s32 handle;
-    McSaveHeader *hdr;
+    McSaveHeader *header;
     s32 seekPos;
-    u8 raw;
+    u8 iconFlag;
 
     path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, suffix);
     handle = open(path, 1);
     if (handle == -1) {
         return 0;
     }
-    hdr = BMemPMgrAlloc(0x80);
-    read(handle, hdr, 0x80);
-    raw = hdr->iconDisplayFlag;
-    seekPos = (raw << 7) - 0x780;
-    BMemPMgrFree(hdr);
+    header = BMemPMgrAlloc(0x80);
+    read(handle, header, 0x80);
+    iconFlag = header->iconDisplayFlag;
+    seekPos = (iconFlag << 7) - 0x780;
+    BMemPMgrFree(header);
     lseek(handle, seekPos, 0);
     read(handle, outBuf, outSize);
     close(handle);
     return 1;
 }
 
-s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, char a3,
+s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, char iconFrames,
                                    struct TimImage *icon, void *data, s32 size) {
-    s32 count;
+    s32 retries;
     s32 result;
 
-    count = 10;
+    retries = 10;
     CopyMemcardIconTemplate((s32)title, (s32)fileName);
     do {
-        result = TaskObjF__TryWriteMemcardSaveFile(self, fileName, title, a3 & 0xFF, icon, data, size);
+        result = TaskObjF__TryWriteMemcardSaveFile(self, fileName, title, iconFrames & 0xFF, icon,
+                                                   data, size);
         if (result != 0) {
             break;
         }
-    } while (count-- != 0);
+    } while (retries-- != 0);
     if (result == 0) {
         CopyMemcardIconTemplate((s32)title, 0);
     }
@@ -194,14 +195,14 @@ extern s32 write(s32 handle, void *buf,
                  s32 size); /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
 extern void printf(const char *fmt); /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
 
-s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 a3,
+s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 iconFrames,
                                       struct TimImage *icon, void *data, s32 size) {
     char pathBuf[0x20];
     char *path;
     s32 fileHandle;
     s32 openMode;
-    McIconSource *src;
-    McSaveHeader *req;
+    McIconSource *iconSrc;
+    McSaveHeader *header;
 
     path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, fileName);
     delete (path);
@@ -216,34 +217,34 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *titl
     if (fileHandle == -1) {
         return 0;
     }
-    src = (McIconSource *)icon->buffer;
-    req = (McSaveHeader *)BMemPMgrAlloc(0x200);
-    req->magic0 = 'S';
-    req->magic1 = 'C';
-    req->iconDisplayFlag = a3 + 0x10;
-    req->blockCount = ((u32)size + 0x1FFF) >> 13;
-    strcpy(req->title, title);
-    req->palette[0] = src->palette[0];
-    req->palette[1] = src->palette[1];
-    req->frame0 = src->frame0;
-    req->frame1 = src->frame1;
-    req->frame2 = src->frame2;
-    write(fileHandle, req, (a3 << 7) + 0x80);
-    BMemPMgrFree(req);
+    iconSrc = (McIconSource *)icon->buffer;
+    header = (McSaveHeader *)BMemPMgrAlloc(0x200);
+    header->magic0 = 'S';
+    header->magic1 = 'C';
+    header->iconDisplayFlag = iconFrames + 0x10;
+    header->blockCount = ((u32)size + 0x1FFF) >> 13;
+    strcpy(header->title, title);
+    header->palette[0] = iconSrc->palette[0];
+    header->palette[1] = iconSrc->palette[1];
+    header->frame0 = iconSrc->frame0;
+    header->frame1 = iconSrc->frame1;
+    header->frame2 = iconSrc->frame2;
+    write(fileHandle, header, (iconFrames << 7) + 0x80);
+    BMemPMgrFree(header);
     write(fileHandle, data, (((u32)size + 0x7F) >> 7) << 7);
     close(fileHandle);
     return 1;
 }
 
-char *BuildMemcardPath(McDevicePath *dest, s32 selector, char *suffix) {
-    McDevicePath *src;
+char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix) {
+    McDevicePath *device;
 
-    if (selector) {
-        src = &gMcDevicePath1;
+    if (cardSlot) {
+        device = &gMcDevicePath1;
     } else {
-        src = &gMcDevicePath0;
+        device = &gMcDevicePath0;
     }
-    *dest = *src;
+    *dest = *device;
     strcat((char *)dest, suffix);
     return (char *)dest;
 }
@@ -280,11 +281,11 @@ s32 TaskObjF__TestEvents(TaskObjF *self) {
 extern void EnterCriticalSection(void);
 extern void ExitCriticalSection(void);
 
-s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag) {
+s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 critical) {
     s32 i;
     s32 result;
 
-    if (flag) {
+    if (critical) {
         EnterCriticalSection();
     }
     for (i = 0; i < 4; i++) {
@@ -293,7 +294,7 @@ s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 flag) {
             break;
         }
     }
-    if (flag) {
+    if (critical) {
         ExitCriticalSection();
     }
     return result;
@@ -303,12 +304,12 @@ s32 TaskObjF__WaitForReadyEvent(TaskObjF *self) {
     return WaitForReadyEvent(self->events, 4);
 }
 
-s32 WaitForReadyEvent(s32 *arr, s32 count) {
+s32 WaitForReadyEvent(s32 *events, s32 count) {
     s32 i;
 
     for (;;) {
         for (i = 0; i < count; i++) {
-            if (TestEvent(arr[i]) != 0) {
+            if (TestEvent(events[i]) != 0) {
                 return gCardEventSpecs[i];
             }
         }
@@ -337,8 +338,8 @@ void TaskObjF__Deinit(TaskObjF *self) {
 }
 
 void TaskObjF__BeginLoad(TaskObjF *self, char *fileName, char *title, void *data, s32 size) {
-    s32 result;
-    s32 code;
+    s32 found;
+    s32 state;
 
     self->fileName = fileName;
     self->title = title;
@@ -348,21 +349,21 @@ void TaskObjF__BeginLoad(TaskObjF *self, char *fileName, char *title, void *data
     if (TaskObjF__Validate(self)) {
         TaskObjF__FreeBuffers(self);
         TaskObjF__AllocBuffers(self);
-        result = self->methods->collectExistingMemcardFiles(self, self->titles, self->foundSuffixes,
-                                                            self->namePrefix, self->nameSuffixes);
-        self->bufCount = result;
-        if (result != 0) {
+        found = self->methods->collectExistingMemcardFiles(self, self->titles, self->foundSuffixes,
+                                                           self->namePrefix, self->nameSuffixes);
+        self->bufCount = found;
+        if (found != 0) {
             TaskObjF__FreeUnusedBuffers(self);
             if (self->state == 0xE) {
-                code = 0xF;
+                state = 0xF;
             } else {
-                code = 0x12;
+                state = 0x12;
             }
         } else {
-            code = 0xD;
+            state = 0xD;
             self->bufCount = 0xF;
         }
-        self->methods->setState(self, code);
+        self->methods->setState(self, state);
     }
 }
 
@@ -406,8 +407,8 @@ void TaskObjF__FreeBuffers(TaskObjF *self) {
  * own setState call, which GCC cross-jumps down to one shared `jalr`. */
 void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleEditPos,
                          u8 iconFrames, struct TimImage *icon, void *data, s32 size) {
-    s32 code;
-    TaskObjFMethods *m;
+    s32 state;
+    TaskObjFMethods *methods;
 
     self->fileName = fileName;
     self->title = title;
@@ -419,84 +420,84 @@ void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleE
     self->dataSize = size;
     if (TaskObjF__Validate(self)) {
         if (self->methods->probeMemcardFile(self, 0, fileName) != 0) {
-            code = 0xA;
-            if (self->state == code) {
-                code = 0x11;
+            state = 0xA;
+            if (self->state == state) {
+                state = 0x11;
             } else if (self->state == 0x11) {
-                code = 0xB;
+                state = 0xB;
             }
-            self->methods->setState(self, code);
+            self->methods->setState(self, state);
         } else if (!self->methods->checkCardSpace(self, iconFrames, size)) {
             self->methods->setState(self, 9);
         } else {
-            m = self->methods;
-            code = 0x11;
-            if (self->state == code) {
-                code = 0xB;
+            methods = self->methods;
+            state = 0x11;
+            if (self->state == state) {
+                state = 0xB;
             }
-            m->setState(self, code);
+            methods->setState(self, state);
         }
     }
 }
 
 s32 TaskObjF__Validate(TaskObjF *self) {
-    s32 buf10;
-    s32 buf14;
-    s32 buf18;
-    s32 slot4CRet;
-    s32 code;
+    s32 error;
+    s32 cardChanged;
+    s32 formatted;
+    s32 responded;
+    s32 state;
 
     self->methods->openEvents(self);
-    slot4CRet = self->methods->checkCardStatus(self, &buf10, &buf14, &buf18);
+    responded = self->methods->checkCardStatus(self, &error, &cardChanged, &formatted);
     self->methods->closeEvents(self);
 
-    if (slot4CRet != 0) {
-        if (buf14 == 0 && buf18 != 0) {
+    if (responded != 0) {
+        if (cardChanged == 0 && formatted != 0) {
             return 1;
         }
     }
 
-    if (slot4CRet == 0) {
-        code = 2;
-    } else if (buf10 != 0) {
-        code = 3;
-    } else if (buf14 != 0) {
-        code = 4;
-    } else if (buf18 != 0) {
+    if (responded == 0) {
+        state = 2;
+    } else if (error != 0) {
+        state = 3;
+    } else if (cardChanged != 0) {
+        state = 4;
+    } else if (formatted != 0) {
         goto dispatch;
     } else if (self->opMode == 1) {
-        code = 5;
+        state = 5;
     } else {
-        code = 6;
+        state = 6;
     }
 
 dispatch:
-    self->methods->setState(self, code);
+    self->methods->setState(self, state);
     return 0;
 }
 
-void TaskObjF__OnNotify(TaskObjF *self, void *arg1, s32 arg2) {
+void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
     TaskObjFMethods *methods;
-    BasicClassMethods *bm;
+    BasicClassMethods *base;
     s32 tag;
-    s32 mask;
+    s32 kind;
 
     methods = self->methods;
-    bm = Get_vtable_BasicClass();
-    bm->onNotify((BasicClass *)self, arg1, arg2);
+    base = Get_vtable_BasicClass();
+    base->onNotify((BasicClass *)self, sender, event);
 
-    tag = ((BasicClass *)arg1)->methods->header;
-    mask = tag & 0xF;
-    if (mask == 2) {
-        methods->onInputEvent(self, arg1, arg2);
-    } else if (mask == 5) {
-        methods->tickStateDelay(self, arg1, arg2);
+    tag = ((BasicClass *)sender)->methods->header;
+    kind = tag & 0xF;
+    if (kind == 2) {
+        methods->onInputEvent(self, sender, event);
+    } else if (kind == 5) {
+        methods->tickStateDelay(self, sender, event);
     } else {
-        mask = tag & 0xFF;
-        if (mask == 0x10) {
-            methods->onTextEntryResult(self, arg1, arg2);
-        } else if (mask == 0x20) {
-            methods->onItemListResult(self, arg1, arg2);
+        kind = tag & 0xFF;
+        if (kind == 0x10) {
+            methods->onTextEntryResult(self, sender, event);
+        } else if (kind == 0x20) {
+            methods->onItemListResult(self, sender, event);
         }
     }
 }

@@ -1,12 +1,15 @@
 DreamSys: warning: control reaches end of non-void function
 Entity_g: warning: passing arg 4 of `Entity__GetOrCreateFadeBox' makes pointer from integer without a cast
+TmdModel: warning: `p' might be used uninitialized in this function
+TmdModel: warning: `size' might be used uninitialized in this function
+TmdModel: warning: unused variable `unused'
 class_3ac78: warning: unused variable `unused'
 class_3bb8c: warning: control reaches end of non-void function
 class_3bb8c_b: warning: `flag' might be used uninitialized in this function
 class_3bb8c_b: warning: `junk' might be used uninitialized in this function
 class_3bb8c_b: warning: `offset' might be used uninitialized in this function
 class_3bb8c_e: warning: control reaches end of non-void function
-class_3bb8c_f: warning: `code' might be used uninitialized in this function
+class_3bb8c_f: warning: `state' might be used uninitialized in this function
 class_3bb8c_f: warning: implicit declaration of function `strcpy'
 class_3bb8c_g: warning: implicit declaration of function `strcpy'
 class_3bb8c_g: warning: passing arg 2 of `strcat' discards `const' from pointer target type
@@ -66,7 +69,4 @@ code_33808: warning: unused variable `unused'
 code_55dd4: warning: unused variable `unused'
 code_d294_b: warning: unused variable `pad'
 code_d294_b: warning: unused variable `unused'
-TmdModel: warning: `p' might be used uninitialized in this function
-TmdModel: warning: `size' might be used uninitialized in this function
-TmdModel: warning: unused variable `unused'
 libcd_bios: warning: passing arg 2 of `CD_cw' makes integer from pointer without a cast
