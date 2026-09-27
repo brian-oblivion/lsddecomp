@@ -188,7 +188,7 @@ void StageMap__BuildFootprintRects(StageMap *self) {
     if (span >= 0x15) {
         over = span - 0x14;
         slot->width = width - over;
-        count = StageMap__SplitFootprintSlot(self, slot, 0, quadrant, col, row, width, height);
+        count = StageMap__SplitFootprintRect(self, slot, 0, quadrant, col, row, width, height);
         count += 1;
         slot = &self->rects.e[count];
         slot->slotIndex = self->methods->findSlotIndexByNeighbour(self, quadrant + 1);
@@ -198,13 +198,13 @@ void StageMap__BuildFootprintRects(StageMap *self) {
         slot->height = self->rects.e[0].height;
     } else {
         slot->width = width;
-        count = StageMap__SplitFootprintSlot(self, slot, 0, quadrant, col, row, width, height);
+        count = StageMap__SplitFootprintRect(self, slot, 0, quadrant, col, row, width, height);
     }
     count += 1;
     self->rectCount = count;
 }
 
-s32 StageMap__SplitFootprintSlot(StageMap *self, CellRect *slot, s32 count, s32 baseIdx, s32 col,
+s32 StageMap__SplitFootprintRect(StageMap *self, CellRect *slot, s32 count, s32 baseIdx, s32 col,
                                  s32 row, s32 width, s32 height) {
     s32 overflow;
     s32 span;

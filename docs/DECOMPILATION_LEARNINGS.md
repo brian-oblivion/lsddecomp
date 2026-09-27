@@ -138,7 +138,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   same result")
 - **`do { ... } while (0)` is a REAL RTL construct to 2.6.3, not a no-op brace block.** The loop
   pass runs over it, so it can change code a plain `{ }` in the identical place does not, and that
-  bare-brace control IS the discriminator. Its effect is not fixed: scheduling on `StageMap__SplitFootprintSlot`,
+  bare-brace control IS the discriminator. Its effect is not fixed: scheduling on `StageMap__SplitFootprintRect`,
   global register allocation on `Snd_decrescendo`. (a round 58, bravo + charlie)
 - **A one-instruction `else` arm leaves NO BLOCK**: reorg steals it into the branch's own delay slot
   and the branch targets the outer join, so "retail assigns this in a delay slot, mine assigns it
@@ -162,7 +162,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   increment's, deciding which setup lands around an intervening `jalr`. (round 82, code_322b4)
 - **One store retail shows at a join may be the SAME store written in both arms**: GCC merges the
   identical stores into the join block, and the label that merge creates stops a following reload
-  from hoisting above it. `StageMap__SplitFootprintSlot` 97/97; the barriers and `do{}while(0)` it had carried were
+  from hoisting above it. `StageMap__SplitFootprintRect` 97/97; the barriers and `do{}while(0)` it had carried were
   compensating for that missing label. (round 71)
 - **A stall whose compiled LENGTH differs from retail is a control-flow defect until shown
   otherwise, whatever its title calls it.** `ItemList__ItemList`, filed "register rotation, 6/107" since
@@ -598,7 +598,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (`s + (p + 0x14)` -> `(s + p) + 0x14`), so no spelling containing the literal reaches retail's
   grouping. A local `hdr = 0x14` survives it and cse turns it back into an immediate (`Viewport__InitOt`,
   73/73 after 14 groupings and ~89k permuter iterations); splitting `(w + 20) - span` into two
-  statements closed `StageMap__SplitFootprintSlot`. (round 71) The same goes for a multiply and a byte constant: retail's `li; mult` right after storing that constant is the multiply BY THE STORED FIELD (a literal `* 15` strength-reduces to `sll`/`subu`, one word short; round 82, code_33808), and `li 0x80` feeding `s8` stores is `s32 grey = 0x80;` (the literal folds to `li -0x80`; `InitGsSprite`, round 82).
+  statements closed `StageMap__SplitFootprintRect`. (round 71) The same goes for a multiply and a byte constant: retail's `li; mult` right after storing that constant is the multiply BY THE STORED FIELD (a literal `* 15` strength-reduces to `sll`/`subu`, one word short; round 82, code_33808), and `li 0x80` feeding `s8` stores is `s32 grey = 0x80;` (the literal folds to `li -0x80`; `InitGsSprite`, round 82).
 - **A flat table indexed `&T[r*C]` then `[c]` wants a named row-pointer local, `T (*tbl)[C] = ...;
   tbl[r][c]`**: the local puts the table-address load before the index arithmetic; the inline
   cast does not. Closed `CalcDreamColor` 28/35. (round 73)

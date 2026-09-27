@@ -331,7 +331,7 @@ neutral one.
 
 Assigned as one of three functions in a round-53 Sonnet calibration slot for
 the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `IsPointOutOfBounds`
-and `StageMap__SplitFootprintSlot`. This report's disposition (round 18: "bounded search
+and `StageMap__SplitFootprintRect`. This report's disposition (round 18: "bounded search
 exhausted its time budget with no improvement, NOT permuter-exhausted") is
 the reason it was picked over the plan's higher-ranked but
 levers-measurably-spent `code_2cc8c_e` job.
@@ -456,7 +456,7 @@ The first half (the `goto` ladder selecting one of the four
 | # | second-half shape | result |
 | --- | --- | --- |
 | s0 | the report's recorded best body: default-then-overwrite, field access in both places | **17/28, length changes (drift)** |
-| s1 | s0 with a `do { … break; … } while (0)` around it (round 58's new lever from `StageMap__SplitFootprintSlot`) | **17/28, drift** — byte-identical to s0 |
+| s1 | s0 with a `do { … break; … } while (0)` around it (round 58's new lever from `StageMap__SplitFootprintRect`) | **17/28, drift** — byte-identical to s0 |
 | s2 | explicit `if`/`else` with `val`, but the field access still written in both arms | **10/28, drift** — worse than s0 |
 | s3 | explicit `if`/`else` **plus** the cached `scale` local | **28/28, exact, whole image green** |
 
@@ -511,7 +511,7 @@ additive.** Each alone measured as a regression (17/28 and 10/28 against a
 17/28 baseline); together they were byte-exact on the first build. When two
 axes are both suspected, try the product before concluding either is inert.
 
-`do { } while (0)`, round 58's new lever from `StageMap__SplitFootprintSlot`, was tried
+`do { } while (0)`, round 58's new lever from `StageMap__SplitFootprintRect`, was tried
 here (s1) and is **byte-identical to s0** — a clean negative that helps
 scope it: it moves scheduling and delay-slot placement, and does not touch
 how cc1 expands a statement into `mult` + `mflo`.

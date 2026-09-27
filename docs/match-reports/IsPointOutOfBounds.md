@@ -212,7 +212,7 @@ block live after any checkout.
 > function needs a scaffold with more real surrounding-file context before
 > it can be trusted, which is head-scale work, not a bounded runner
 > attempt -- consistent with three other functions in this unit
-> (`StageMap__SplitFootprintSlot`, `StageMap__ComputeFootprintDescriptor`, `StageMap__ApplyChunkLoads`, `StageMap__BuildFootprintRects`)
+> (`StageMap__SplitFootprintRect`, `StageMap__ComputeFootprintDescriptor`, `StageMap__ApplyChunkLoads`, `StageMap__BuildFootprintRects`)
 > reaching the identical verdict this round and last.
 >
 > ### Proposed learning
@@ -628,7 +628,7 @@ least for this specific nested-ternary spelling.
 
 ---
 
-## Round 58 (bravo) — round 46's Gate 3 verdict is VOID (same unit error as `StageMap__SplitFootprintSlot`), which RE-VALIDATES round 18's 71,363-iteration search as a genuine negative; four fresh source shapes, all inert at 2/27
+## Round 58 (bravo) — round 46's Gate 3 verdict is VOID (same unit error as `StageMap__SplitFootprintRect`), which RE-VALIDATES round 18's 71,363-iteration search as a genuine negative; four fresh source shapes, all inert at 2/27
 
 Rebuilt Shape A (the round-19 `goto` body) from a clean `INCLUDE_ASM`
 baseline first, per Gate 1b: **2/27, exact length, zero outside-range drift**
@@ -645,7 +645,7 @@ Round 46's entry above says, of a freshly built scaffold:
 > launched.**
 
 **That comparison is invalid, and in the same specific way round 58 found on
-`StageMap__SplitFootprintSlot`: `funcdiff.py` does not report insertion or deletion counts
+`StageMap__SplitFootprintRect`: `funcdiff.py` does not report insertion or deletion counts
 at all.** The "real build shows 0/0" half was never measured — it was
 inferred from "2/27, exact length, no outside-range drift". Equal length does
 not mean zero insertions and zero deletions; it means they **cancel**. This
@@ -728,7 +728,7 @@ that the source itself carries a value live across the entire body. Attempts
 | 11 | shape 10 plus both the `result` variable and the `bounds` alias | **2/27, inert** |
 
 Shapes 10 and 11 are round 58's own new lever, the one that moved
-`StageMap__SplitFootprintSlot` from 55/97 to 62/97 (a `do { } while (0)` is a real loop to
+`StageMap__SplitFootprintRect` from 55/97 to 62/97 (a `do { } while (0)` is a real loop to
 GCC 2.6.3's loop pass where a plain brace block is nothing). **It does not
 apply here**, which is the useful half of the negative: that lever addresses
 scheduling and delay-slot placement, and this function's residue is a
@@ -746,7 +746,7 @@ file context" item round 46 raised can be closed.
 
 **Gate 3 check 3 is a check on BYTES, and comparing two tools' summary
 numbers is not it.** Three separate rounds across two functions (19 and 33 on
-`StageMap__SplitFootprintSlot`, 46 here) read a permuter `--debug` structural summary against
+`StageMap__SplitFootprintRect`, 46 here) read a permuter `--debug` structural summary against
 a figure they believed `funcdiff.py` had reported, concluded the scaffold was
 unfaithful, and stopped. `funcdiff.py` reports exactly three things: words
 equal at the same offset, bytes differing outside the function's range, and

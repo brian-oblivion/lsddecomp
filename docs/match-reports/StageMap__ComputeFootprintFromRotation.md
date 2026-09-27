@@ -167,7 +167,7 @@ its base pointer is loaded) before filing a register-class residue.
 ---
 
 
-**Unit:** class_3bb8c_b · **Status:** STALL — register-class/frame-size gap (same class as `StageMap__SplitFootprintSlot`)
+**Unit:** class_3bb8c_b · **Status:** STALL — register-class/frame-size gap (same class as `StageMap__SplitFootprintRect`)
 
 > **ROUND 34 UPDATE.** Re-derived from scratch (shallow attempt history per
 > this round's brief: only 2 hand attempts and a round-18 review with no new
@@ -308,7 +308,7 @@ PLUS `$fp` — confirmed by
 → 9, one past the "8 means no spare register" saturation point CLAUDE.md's
 `TaskCore__RefreshSlotView` lesson describes). Every C shape tried compiles to a
 `-0x90` frame using only `$s0`-`$s7` (8 registers, no `$fp` spill) — one
-whole register short, the SAME symptom `StageMap__SplitFootprintSlot`'s own report
+whole register short, the SAME symptom `StageMap__SplitFootprintRect`'s own report
 documents in this same header/unit ("retail's frame... saves EIGHT
 callee-saved registers... every C shape tried compiles to a frame of
 `-0x30`... saving at most six").
@@ -334,7 +334,7 @@ few wrong instructions.
    a *timing* residue in Entity_d, did not reach for the *count* residue
    here.
 
-Given `StageMap__SplitFootprintSlot`'s own report already tried (and exhausted, within
+Given `StageMap__SplitFootprintRect`'s own report already tried (and exhausted, within
 that round's budget) the two most obvious levers for a missing-register
 gap — reassigning a pointer in place vs. introducing a second named
 variable for it — and BOTH still collapsed onto fewer registers than
@@ -464,7 +464,7 @@ shared:
 **A value whose live range never crosses a function call can still be the
 one retail promotes into a callee-saved register, and this is a distinct
 mechanism from every other register-count residue documented so far**
-(`StageMap__SplitFootprintSlot`'s "give each value its own named local", `StageMap__BuildFootprintRects`'s
+(`StageMap__SplitFootprintRect`'s "give each value its own named local", `StageMap__BuildFootprintRects`'s
 pure permutation). Naming the value separately does not force the
 promotion — cc1 CSEs a call-free single-use pointer expression back into
 the call site regardless of source spelling (confirmed identical output
@@ -673,10 +673,10 @@ Notes on the derivation, for whoever revisits this:
   callee-saved `$s` registers, forcing a `$fp` spill) is the same residue
   CLASS regardless of which function in a unit exhibits it, and neither of
   the two "give it its own local" / "reassign in place" levers that failed
-  on `StageMap__SplitFootprintSlot` fixed it here either (a THIRD source-shape lever —
+  on `StageMap__SplitFootprintRect` fixed it here either (a THIRD source-shape lever —
   collapsing a call argument into the call expression — moved the score by
   one word, not by a register).** Two independent functions in the same
-  header (`StageMap__SplitFootprintSlot`, `StageMap__ComputeFootprintFromRotation`) and a THIRD in the same unit
+  header (`StageMap__SplitFootprintRect`, `StageMap__ComputeFootprintFromRotation`) and a THIRD in the same unit
   showing a related-but-distinct register-PERMUTATION residue
   (`StageMap__BuildFootprintRects`) suggests this header/class's functions are unusually
   prone to GCC 2.6.3 register-allocation sensitivity that resists the
@@ -688,7 +688,7 @@ Notes on the derivation, for whoever revisits this:
   outcome.** `StageMap__ComputeFootprintFromRotation` showed 9 saved registers before a single line
   of C was written; that number alone predicted (correctly) that this
   function would land in the same stall class as its already-documented
-  sibling `StageMap__SplitFootprintSlot`, and bounded the number of reshaping attempts
+  sibling `StageMap__SplitFootprintRect`, and bounded the number of reshaping attempts
   worth spending before treating it as a stall rather than a
   still-in-progress match.
 
@@ -711,7 +711,7 @@ every C shape tried saturates at 8) is structurally different from
 type-driven register cascade — and the "check parameter/local types before
 accepting a register-identity stall" lever this round established does
 not apply here. Not re-attempted further this round (lowest priority of
-the four escalated register-shaped stalls; `StageMap__SplitFootprintSlot`'s own report,
+the four escalated register-shaped stalls; `StageMap__SplitFootprintRect`'s own report,
 same class, already exhausted the two most obvious levers).
 
 ---
