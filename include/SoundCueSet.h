@@ -55,6 +55,9 @@ typedef struct SoundCueSlot {
 #define SOUND_CUE_NONE (-1) /* no request (ServiceSoundCueSet's reset value) */
 #define SOUND_CUE_STOP (-2) /* stop the slot's voice */
 
+/* SoundCueSet::attenuationSteps for a new cue (InitSoundCueSet). */
+#define SOUND_CUE_ATTENUATION_STEPS 10
+
 struct SoundCueSet {
     /* +0x00 */ s32 tag; /* the owner's tag while running (Entity: moodIndex + 1); 0 when stopped; serviced only while > 0 */
     /* +0x04 */ s32 tick;    /* zeroed by InitSoundCueSet, advanced after each service pass */

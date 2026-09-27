@@ -12,13 +12,13 @@
  * (GetActiveDataSourceMethods). Methods in src/code_179d8_e.c.
  *
  * Loading. The ctor copies the base path (`baseFilename`) and asks the
- * driver for "<base>.VH" (requestLoadFile, +0x06C), with the load state
- * (`unk2A`) set to 1. The driver calls setFlag (+0x064,
- * VabStreamObj__AdvanceLoadState) when a request completes. In state 1, with
- * CD_FLAG_LOAD_FILE_DONE (0x200) in `flags`, it opens the header
- * (SsVabOpenHead) and loads "<base>.VB" (loadFile, +0x058) in state 6. In
- * state 6 it transfers the body (SsVabTransBody) and calls slot78,
- * VabStreamObj__OnBodyReady. That waits on SsVabTransCompleted and then
+ * driver for "<base>.VH" (requestLoadFile, +0x06C), with `loadState` set to
+ * VABSTREAM_LOAD_HEADER. The driver calls setFlag (+0x064,
+ * VabStreamObj__AdvanceLoadState) when a request completes. In the header
+ * state, with CD_FLAG_LOAD_FILE_DONE (0x200) in `flags`, it opens the
+ * header (SsVabOpenHead) and loads "<base>.VB" (loadFile, +0x058) in
+ * VABSTREAM_LOAD_BODY. In that state it transfers the body (SsVabTransBody)
+ * and calls slot78, VabStreamObj__OnBodyReady. That waits on SsVabTransCompleted and then
  * runs loadVagAttrs (+0x07C), which caches the bank's VagAtr records per
  * program. +0x058 and +0x06C are NULL in the static table.
  * SetActiveDataSource fills them from the active driver
@@ -57,6 +57,15 @@ typedef struct VabStreamVabHdr {
     /* +0x16 */ u8 pad16[0x20 - 0x16];
 } VabStreamVabHdr;
 
+/* VabStreamObj's FileResource::loadState, advanced by
+ * VabStreamObj__AdvanceLoadState. The values are the game's own; nothing
+ * uses 2 to 5. */
+enum VabStreamLoadState {
+    VABSTREAM_LOAD_IDLE = 0,   /* nothing requested */
+    VABSTREAM_LOAD_HEADER = 1, /* waiting for "<base>.VH" */
+    VABSTREAM_LOAD_BODY = 6    /* waiting for "<base>.VB" */
+};
+
 /* slot78 is FileResource's `void *slot78` (NULL there). This class's occupant,
  * VabStreamObj__OnBodyReady, is called through this typedef. That takes no
  * code (FINISHING-PLAN track 4 step 6). */
@@ -79,7 +88,7 @@ struct VabStreamObjMethods {
 }; /* 39 slots, 0xA0 bytes */
 
 struct VabStreamObj {
-    FILERESOURCE_FIELDS(VabStreamObjMethods); /* buffer: the loaded .VH, then the .VB; unk2A is the load state: 0 idle, 1 header, 6 body */
+    FILERESOURCE_FIELDS(VabStreamObjMethods); /* buffer: the loaded .VH, then the .VB; loadState is a VabStreamLoadState */
     /* +0x02C */ VabStreamVabHdr vabHdr;       /* SsUtGetVabHdr */
     /* +0x04C */ VabStreamVagAtr *vagAttrPool; /* vabHdr.vs records */
     /* +0x050 */ VabStreamVagAtr **progVagTable; /* vabHdr.ts pointers into vagAttrPool, one per program */

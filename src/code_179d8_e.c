@@ -114,7 +114,7 @@ s32 GetVabUseVSyncCallback(void) {
 VabStreamObj *New_VabStreamObj(char *path) {
     VabStreamObj *self;
 
-    self = BMemPMgrAlloc(0x64);
+    self = BMemPMgrAlloc(sizeof(VabStreamObj));
     if (self != NULL) {
         GetVabStreamObjMethods()->ctor(self, path);
         return self;
@@ -144,6 +144,18 @@ extern char *strcpy(char *dest, char *src);
 extern const char gVabHeaderSuffix[];
 extern const char gVabBodySuffix[];
 
+/* The "<base>.VH"/"<base>.VB" path buffers the ctor and AdvanceLoadState
+ * build on the stack. */
+#define VAB_PATH_SIZE 32
+
+/* FileResource::flags bit the CD driver sets when a loadFile/requestLoadFile
+ * finishes (code_179d8_s.c's CD_FLAG_LOAD_FILE_DONE). */
+#define CD_FLAG_LOAD_FILE_DONE 0x200
+
+/* SsSetMVol's level for both channels, set once when the first bank's
+ * attributes are loaded (Sony's maximum is 127). */
+#define VAB_MASTER_VOLUME 120
+
 extern s32 gVabSizeTableInited;
 extern s32 gVabStreamInited;
 extern s32 gVabVolumeInited;
@@ -153,7 +165,7 @@ extern void *gPendingVabBuffer;
 
 void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
     void *buf;
-    char vhPath[0x20];
+    char vhPath[VAB_PATH_SIZE];
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetVabStreamObjMethods();
@@ -171,8 +183,8 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
         SsSetTableSize(GetSsSizeTableBuf(), 2, 1);
     }
     if (gVabStreamInited == 0) {
-        gSsTicksPerSecond = 0x3C;
-        SsSetTickMode(1);
+        gSsTicksPerSecond = 60;
+        SsSetTickMode(SS_TICK60);
         gVabStreamInited = 1;
     }
     gOpenVabCount++;
@@ -182,7 +194,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
             self->baseFilename = buf;
             strcpy(buf, path);
             BuildFileName(vhPath, buf, NULL, gVabHeaderSuffix);
-            self->loadState = 1;
+            self->loadState = VABSTREAM_LOAD_HEADER;
             self->methods->requestLoadFile(self, vhPath);
         }
     }
@@ -207,17 +219,17 @@ void VabStreamObj__Finalize(VabStreamObj *self) {
 }
 
 void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
-    char path[0x20];
+    char path[VAB_PATH_SIZE];
 
     switch (self->loadState) {
-        case 0:
+        case VABSTREAM_LOAD_IDLE:
             break;
-        case 1:
-            if (self->flags & 0x200) {
+        case VABSTREAM_LOAD_HEADER:
+            if (self->flags & CD_FLAG_LOAD_FILE_DONE) {
                 self->vabId = SsVabOpenHead(self->buffer, -1);
                 BuildFileName(path, self->baseFilename, NULL, gVabBodySuffix);
                 gPendingVabBuffer = self->buffer;
-                self->loadState = 6;
+                self->loadState = VABSTREAM_LOAD_BODY;
                 self->buffer = NULL;
                 self->methods->loadFile(self, path);
                 if (self->baseFilename != NULL) {
@@ -226,8 +238,8 @@ void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
                 }
             }
             break;
-        case 6:
-            if (self->flags & 0x200) {
+        case VABSTREAM_LOAD_BODY:
+            if (self->flags & CD_FLAG_LOAD_FILE_DONE) {
                 self->vabId = SsVabTransBody(self->buffer, self->vabId);
                 if (self->vabId != -1) {
                     self->bodyTransferPending = 1;
@@ -272,11 +284,11 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
     if (result == -1) {
         return;
     }
-    self->vagAttrPool = BMemPMgrAlloc(self->vabHdr.vs << 5);
+    self->vagAttrPool = BMemPMgrAlloc(self->vabHdr.vs * sizeof(VabStreamVagAtr));
     if (self->vagAttrPool == NULL) {
         return;
     }
-    self->progVagTable = BMemPMgrAlloc(self->vabHdr.ts << 2);
+    self->progVagTable = BMemPMgrAlloc(self->vabHdr.ts * sizeof(VabStreamVagAtr *));
     if (self->progVagTable == NULL) {
         return;
     }
@@ -297,10 +309,14 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
     }
     if (gVabVolumeInited == 0) {
         SsStart();
-        SsSetMVol(0x78, 0x78);
+        SsSetMVol(VAB_MASTER_VOLUME, VAB_MASTER_VOLUME);
         gVabVolumeInited = 1;
     }
 }
+
+/* PlayTone's packed index: program << VAB_TONE_BITS | tone. */
+#define VAB_TONE_BITS 4
+#define VAB_TONES_PER_PROG 16
 
 /* Resolve a packed program/tone index, look up its VagAtr and key it on.
  * `prog` is loaded BEFORE `lo` is computed on purpose: GCC 2.6.3's combine
@@ -315,9 +331,9 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol) {
     s16 result;
 
     if (index >= 0) {
-        hi = index >> 4;
+        hi = index >> VAB_TONE_BITS;
         prog = self->progVagTable[hi];
-        lo = index - hi * 16;
+        lo = index - hi * VAB_TONES_PER_PROG;
         entry = &prog[lo];
         result = SsUtKeyOn(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
                            entry->shift, (s16)vol, (s16)vol);
@@ -331,7 +347,7 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol) {
 
 /* The PS1 SPU's own hardware voice count -- the boundary VabStreamObj__StopVoice
  * checks `index` against. */
-#define SPU_VOICE_COUNT 0x18
+#define SPU_VOICE_COUNT 24
 
 s32 VabStreamObj__StopVoice(VabStreamObj *self, s32 voice) {
     if (voice < SPU_VOICE_COUNT) {
@@ -373,8 +389,12 @@ void VabStreamObj__NoOpSlot94(void) {}
 
 void VabStreamObj__NoOpSlot98(void) {}
 
+/* setPitchOffset's argument is an octave: 2 plays a tone at its centre
+ * note, each step away shifts it an octave. */
+#define SEMITONES_PER_OCTAVE 12
+
 void VabStreamObj__SetPitchOffset(VabStreamObj *self, s32 octave) {
-    self->pitchOffset = octave * 12 - 0x18;
+    self->pitchOffset = octave * SEMITONES_PER_OCTAVE - 2 * SEMITONES_PER_OCTAVE;
 }
 
 VabStreamObjMethods *GetVabStreamObjMethods(void) {
@@ -404,7 +424,7 @@ s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
     }
     slot = set->slots;
     sentinel = -1;
-    count = 2;
+    count = ARRAY_COUNT(set->slots) - 1;
     set->tag = tag;
     set->owner = owner;
     set->callback = callback;
@@ -414,7 +434,7 @@ s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
         slot++;
     } while (count >= 0);
     set->tick = 0;
-    set->attenuationSteps = 10;
+    set->attenuationSteps = SOUND_CUE_ATTENUATION_STEPS;
     return 1;
 }
 
@@ -423,7 +443,7 @@ void FlushSoundCueSet(VabStreamObj *self, SoundCueSet *set) {
     SoundCueSlot *slot;
 
     slot = set->slots;
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < ARRAY_COUNT(set->slots); i++) {
         if (slot->voice >= 0) {
             slot->voice = self->methods->stopVoice(self, slot->voice);
         }
