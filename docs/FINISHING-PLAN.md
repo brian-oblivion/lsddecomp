@@ -203,8 +203,8 @@ own, because none of its includers can take Sony's headers until it does
 (round 94: `ViewportOt` is Sony's anonymous `GsOT`, and `Viewport.h` could
 not include `<libgs.h>` past four such headers). Its edit set is the header
 and every unit including it, directly or through another header, since each
-takes Sony's headers in the same fix; headers with the same includers are
-one job (round 95). A flagged fix that needs
+takes Sony's headers in the same fix; headers sharing an includer are one
+job (round 95). A flagged fix that needs
 Sony's headers where those collisions sit is flagged `--after <files>`, and
 `plan.py` lists it as WAITING until each has left `tools/sonyheaders.py`.
 A class job's edit set is its header plus the units holding the class's own

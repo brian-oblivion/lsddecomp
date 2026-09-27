@@ -1180,14 +1180,19 @@ def jobs(d, n):
             # headers' own jobs ranked last).
             # Its edit set is the header AND every unit that includes it,
             # because each of those takes Sony's headers in the same fix; two
-            # headers with the same includers are one job (round 95: TileAtlas.h
-            # and TileMap.h, both included only by code_33808 and code_2c054,
-            # listed as two jobs whose edit sets said they did not overlap).
-            groups = {}
+            # headers sharing an includer are one job, since that unit cannot
+            # take <libgs.h> until both are fixed (round 95: TileAtlas.h,
+            # TileMap.h and TimImage.h all reach code_33808, and alpha could not
+            # land the first two green without the third).
+            groups = []   # [(set of includer units, [(header, names)])]
             for f, names in sorted(p2["_sony_left"].items()):
-                us = tuple(sony_includers(f))
-                groups.setdefault(us, []).append((f, names))
-            for us, fs in sorted(groups.items(), key=lambda kv: kv[1][0][0]):
+                us, fs = set(sony_includers(f)), [(f, names)]
+                for g in [g for g in groups if g[0] & us]:
+                    groups.remove(g)
+                    us |= g[0]
+                    fs = g[1] + fs
+                groups.append((us, sorted(fs)))
+            for us, fs in sorted(((sorted(u), f) for u, f in groups), key=lambda g: g[1][0][0]):
                 what = "; ".join(f"{f}: it re-declares {', '.join(names)}" for f, names in fs)
                 q6.append(("6", f"use Sony's own declarations in {what} "
                                 f"(FINISHING-PLAN track 6 step 4; tools/sonyheaders.py) "
