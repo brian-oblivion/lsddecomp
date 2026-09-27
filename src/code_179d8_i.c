@@ -74,7 +74,7 @@
 /* A 172 (0xAC)-byte record; _ss_score is an array of pointers to arrays of
  * these, indexed [screen][slot]-style by two signed 16-bit indices. This is
  * a reduced LOCAL view -- only the fields this unit's functions touch are
- * named. See code_179d8_f.c's own Entry90902E8 for a fuller layout of the
+ * named. See libsnd_cres.c's own Entry90902E8 for a fuller layout of the
  * same array; each unit keeps its own independent reading, per project
  * convention (multiple local views of one struct are expected here). */
 typedef struct {

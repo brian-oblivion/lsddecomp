@@ -112,7 +112,7 @@ typedef struct {
     u8 pad14[0x20 - 0x14];
 } Scratch_800357B0;
 
-/* Same 9-halfword ADSR-decode layout as code_179d8_f.c's independent,
+/* Same 9-halfword ADSR-decode layout as libsnd_cres.c's independent,
  * already-matched `UnkStruct80035F3C` (docs/match-reports/func_80035F3C.md)
  * -- a fresh LOCAL (uninitialized), filled by `_SsUtResolveADSR` from
  * `scratch.adsr1`/`adsr2` and consumed by `_SsUtBuildADSR`, never by the
@@ -656,7 +656,7 @@ retail allocates ~10 words of stack for that this reading's `DataEntryLocals`
 ANY of this report's per-block claims about `unk13==1`/`unk13==2` being the
 only residue. The likeliest candidate, given `Snd_setVabAttr.md`'s round-35
 finding that its own two by-value struct parameters (a `VagAtr` and
-`code_179d8_f.c`'s `UnkStruct80035F3C`) are ENTIRELY caller-marshaled with
+`libsnd_cres.c`'s `UnkStruct80035F3C`) are ENTIRELY caller-marshaled with
 no local frame space of their own, is that THIS function's own construction
 of those two by-value arguments (the `lwl`/`lwr`/`swl`/`swr` copy sequence
 already identified at its two `Snd_setVabAttr` call sites) needs MORE stack

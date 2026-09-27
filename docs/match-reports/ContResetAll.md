@@ -57,7 +57,7 @@
 ## What it is
 
 A per-channel/slot "reset voice" function: calls two already-matched
-zero-argument helpers from `code_179d8_f` (`func_80036044`,
+zero-argument helpers from `libsnd_cres` (`func_80036044`,
 `func_80036518`), then resets several fields of the active embedded state
 block (selected by the runtime byte offset `rec->unk12`, same idiom as
 `SetProgramChange`'s family) to fixed sentinel values, and finally calls the

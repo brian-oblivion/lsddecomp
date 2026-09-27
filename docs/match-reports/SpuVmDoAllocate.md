@@ -74,7 +74,7 @@ extern u8 _svm_sreg_dirty[];
 
 /* Same base pointer as this unit's own note2pitch2 (D8008E978Entry) --
  * extended here with the two halfwords at +0x10/+0x12 this function reads,
- * matching code_179d8_f.c's independent Rec32E978 view of the identical
+ * matching libsnd_cres.c's independent Rec32E978 view of the identical
  * offsets. If this function is picked back up, re-extend note2pitch2's
  * existing D8008E978Entry typedef in place (it is declared once, ahead of
  * both functions, in ROM order) rather than redeclaring it. */

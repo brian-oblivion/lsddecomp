@@ -1,5 +1,5 @@
 /*
- * code_179d8_f -- Snd_crescendo, libsnd's per-tick volume fade for one
+ * libsnd_cres -- Snd_crescendo, libsnd's per-tick volume fade for one
  * sequence. Sony's code carried as C: the linked libsnd objects call it by
  * this name (config/psyq-objects.ld), and the libsnd/cres object that holds
  * it on the 3.0 and 3.3 discs is a different build (0x474 and 0x57C bytes of

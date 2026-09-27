@@ -529,7 +529,7 @@ The carve record (round 24) and the blocker re-census (rounds 42 and 43), moved 
  * monolith, 0x24938..0x2673C (vram 0x80034138..0x80035F3C).  Carved round 24
  * (2026-09-08) out of what had been the `code_179d8_tail` asm remainder,
  * which this unit consumes WHOLE -- there is no remainder left on either
- * side (code_179d8_i in front, code_179d8_f behind).
+ * side (code_179d8_i in front, libsnd_cres behind).
  *
  * WHY IT WAS UNCARVED FOR SIX ROUNDS, AND WHY THAT VERDICT IS DEAD.
  * The splat comment on the old remainder read "17 of its 18 functions are

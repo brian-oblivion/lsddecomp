@@ -48,7 +48,7 @@ extern void SpuVmDamperOff(void);
 
 /* A 172 (0xAC)-byte record; _ss_score is an array of pointers to arrays of
  * these, indexed [channel][slot]-style, same array documented from
- * code_179d8_f/_i/_j's own independent local readings -- see those units'
+ * libsnd_cres/_i/_j's own independent local readings -- see those units'
  * Entry90902E8 for a different reduced view of the same object; each unit
  * keeps its own per project convention.
  *
@@ -968,9 +968,9 @@ void SetPitchBend(s16 a0, s16 a1) {
 
 /* Cross-unit calls, local guesses per project convention. SpuVmSeqKeyOff is
  * matched in code_179d8_j.c and already has this exact "(slot<<8)|channel"
- * single-argument reading in both code_179d8_f.c and code_179d8_i.c;
+ * single-argument reading in both libsnd_cres.c and code_179d8_i.c;
  * _SsSndNextSep is Sony's `libsnd/next`, linked from the SDK object since
- * round 34; this signature is the one code_179d8_f.c's matched C used
+ * round 34; this signature is the one libsnd_cres.c's matched C used
  * before the conversion. */
 extern s32 SpuVmSeqKeyOff(s32 a0);
 extern void _SsSndNextSep(s32 a0, s32 a1);
