@@ -137,34 +137,34 @@ TimImageMethods *GetTimImageMethods(void) {
     return &gTimImageMethods;
 }
 
-/* Rotates the VRAM rectangle r one column to the right, count times, through
- * the one-column scratch area at p: the last column goes to p, the rest moves
- * right by one, and p comes back as column 0 (three moveImage calls each). */
-void RotateVramRectRight(DrawRect *r, s32 count, DrawPoint *p) {
+/* Rotates the VRAM rectangle `area` one column to the right, count times, through
+ * the one-column scratch area at `scratch`: the last column goes there, the rest moves
+ * right by one, and the scratch column comes back as column 0 (three moveImage calls each). */
+void RotateVramRectRight(DrawRect *area, s32 count, DrawPoint *scratch) {
     DrawSystem *draw;
-    void (*fn)(DrawSystem *, DrawRect *, s32, s32);
+    void (*moveImage)(DrawSystem *, DrawRect *, s32, s32);
     DrawRect rect;
     s32 i;
 
     draw = GetDrawSystem();
-    fn = draw->methods->moveImage;
+    moveImage = draw->methods->moveImage;
     if (count != 0) {
         for (i = 0; i < count; i++) {
-            rect.x = r->x + r->w - 1;
-            rect.y = r->y;
+            rect.x = area->x + area->w - 1;
+            rect.y = area->y;
             rect.w = 1;
-            rect.h = r->h;
-            fn(draw, &rect, p->x, p->y);
-            rect.x = r->x;
-            rect.y = r->y;
-            rect.w = r->w - 1;
-            rect.h = r->h;
-            fn(draw, &rect, r->x + 1, r->y);
-            rect.x = p->x;
-            rect.y = p->y;
+            rect.h = area->h;
+            moveImage(draw, &rect, scratch->x, scratch->y);
+            rect.x = area->x;
+            rect.y = area->y;
+            rect.w = area->w - 1;
+            rect.h = area->h;
+            moveImage(draw, &rect, area->x + 1, area->y);
+            rect.x = scratch->x;
+            rect.y = scratch->y;
             rect.w = 1;
-            rect.h = r->h;
-            fn(draw, &rect, r->x, r->y);
+            rect.h = area->h;
+            moveImage(draw, &rect, area->x, area->y);
         }
     }
 }
