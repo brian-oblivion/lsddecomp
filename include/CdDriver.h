@@ -67,16 +67,16 @@ CdDriver *New_CdDriver(void);
 void CdDriver__CdDriver(CdDriver *self); /* +0x008 ctor */
 void CdDriver__Finalize(CdDriver *self); /* +0x00C finalize: cancelRequests, freeBuffer */
 void CdDriver__NoOpSlot40(void);         /* +0x040 slot40 */
-void CdDriver__Open(CdDriver *self, char *name, s32 arg2, s32 arg3); /* +0x044 open */
-void CdDriver__Close(CdDriver *self);                                /* +0x048 close */
-s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode);            /* +0x04C seek */
-void CdDriver__NoOpSlot50(void);                                     /* +0x050 slot50 */
-s32 CdDriver__Read(CdDriver *self, void *buf, u32 size);             /* +0x054 read: returns 0 */
-void CdDriver__LoadFile(CdDriver *self, char *name);                 /* +0x058 loadFile */
-void CdDriver__RunRequestQueue(void);                                /* +0x068 runRequestQueue */
-void CdDriver__RequestLoadFile(CdDriver *self, char *name);          /* +0x06C requestLoadFile */
-void CdDriver__StopService(void);                                    /* +0x070 stopService */
-void CdDriver__CancelRequests(CdDriver *self);                       /* +0x074 cancelRequests */
+void CdDriver__Open(CdDriver *self, char *name, s32 param0, s32 param1); /* +0x044 open */
+void CdDriver__Close(CdDriver *self);                                    /* +0x048 close */
+s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode);                /* +0x04C seek */
+void CdDriver__NoOpSlot50(void);                                         /* +0x050 slot50 */
+s32 CdDriver__Read(CdDriver *self, void *buf, u32 size);    /* +0x054 read: returns 0 */
+void CdDriver__LoadFile(CdDriver *self, char *name);        /* +0x058 loadFile */
+void CdDriver__RunRequestQueue(void);                       /* +0x068 runRequestQueue */
+void CdDriver__RequestLoadFile(CdDriver *self, char *name); /* +0x06C requestLoadFile */
+void CdDriver__StopService(void);                           /* +0x070 stopService */
+void CdDriver__CancelRequests(CdDriver *self);              /* +0x074 cancelRequests */
 
 /* One record of the file table: a name resolved once by ResolveFileEntries
  * (CdSearchFile on BuildCdFilePath(name)) and then reused as a seek target.

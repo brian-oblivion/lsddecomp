@@ -54,21 +54,21 @@ extern void LockCd(void);
  * method below and left literal), state is the first CD_STATE_*. */
 extern void StartCdOperation(s32 op, s32 state);
 extern void ResetCdStateMachine(void);
-extern void EnqueueCdRequest(CdDriver *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4);
+extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
 extern void UnlockCd(void);
 
-extern void *FindCdFileEntry(char *arg0);
-extern s32 FindCdFileIndex(char *arg0);
+extern void *FindCdFileEntry(char *name);
+extern s32 FindCdFileIndex(char *name);
 
-extern void OpenCdFile(CdDriver *self, char *suffix);
-extern char *BuildCdFilePath(char *dest, char *suffix);
+extern void OpenCdFile(CdDriver *self, char *name);
+extern char *BuildCdFilePath(char *dest, char *name);
 
-void CdDriver__Open(CdDriver *self, char *name, s32 arg2, s32 arg3) {
+void CdDriver__Open(CdDriver *self, char *name, s32 param0, s32 param1) {
     char path[0x40];
     CdlFILE statBuf;
-    CdFileEntry *rec;
+    CdFileEntry *entry;
     s32 size;
-    s32 v0;
+    s32 status;
 
     if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         OpenCdFile(self, name);
@@ -79,12 +79,12 @@ void CdDriver__Open(CdDriver *self, char *name, s32 arg2, s32 arg3) {
         if (gCdBusy == 0 && self->isOpen == 0) {
             StartCdOperation(1, CD_STATE_SETLOC);
             if (gCdAsyncEnabled != 0) {
-                rec = FindCdFileEntry(name);
-                gCdSeekParam = rec;
-                if (rec == NULL) {
+                entry = FindCdFileEntry(name);
+                gCdSeekParam = entry;
+                if (entry == NULL) {
                     return;
                 }
-                self->pos = rec->pos;
+                self->pos = entry->pos;
                 size = ((CdFileEntry *)gCdSeekParam)->size;
                 gCdTickStep = CD_TICK_STATE_MACHINE;
                 self->isOpen = 1;
@@ -98,15 +98,15 @@ void CdDriver__Open(CdDriver *self, char *name, s32 arg2, s32 arg3) {
                 do {
                     CdControl(CdlSetloc, (u_char *)&self->pos, 0);
                     do {
-                        v0 = CdSync(0, 0);
-                    } while (v0 == 0);
-                } while (v0 == CdlDiskError);
+                        status = CdSync(0, 0);
+                    } while (status == 0);
+                } while (status == CdlDiskError);
                 self->isOpen = 1;
                 ResetCdStateMachine();
             }
         }
     } else {
-        EnqueueCdRequest(self, FindCdFileIndex(name), CD_OP_OPEN, arg2, arg3);
+        EnqueueCdRequest(self, FindCdFileIndex(name), CD_OP_OPEN, param0, param1);
     }
     UnlockCd();
 }
@@ -134,7 +134,7 @@ extern CdlLOC gCdSeekLoc;
 extern s32 GetCdFileSize(CdDriver *self);
 
 s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
-    s32 v0;
+    s32 status;
     u32 sectors;
 
     if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
@@ -148,8 +148,7 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
             if ((offset & 0x7FF) != 0) {
                 sectors = sectors + 1;
             }
-            v0 = CdPosToInt((CdlLOC *)&self->pos);
-            CdIntToPos(v0 + sectors, &gCdSeekLoc);
+            CdIntToPos(CdPosToInt((CdlLOC *)&self->pos) + sectors, &gCdSeekLoc);
             if (mode == 0) {
                 if (gCdAsyncEnabled != 0) {
                     /* the state machine seeks to gCdSeekParam + 0x14 (a
@@ -160,9 +159,9 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
                     do {
                         CdControl(CdlSetloc, (u_char *)&gCdSeekLoc, 0);
                         do {
-                            v0 = CdSync(0, 0);
-                        } while (v0 == 0);
-                    } while (v0 == CdlDiskError);
+                            status = CdSync(0, 0);
+                        } while (status == 0);
+                    } while (status == CdlDiskError);
                     ResetCdStateMachine();
                 }
             } else {
@@ -183,11 +182,10 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
 
 void CdDriver__NoOpSlot50(void) {}
 
-extern void ReadCdFile(CdDriver *self, void *arg1, s32 arg2);
-extern void ResetCdStateMachine(void);
+extern s32 ReadCdFile(CdDriver *self, void *buf, s32 size);
 
 s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
-    s32 v1;
+    s32 status;
 
     if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         ReadCdFile(self, buf, size);
@@ -205,9 +203,9 @@ s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
             retry:
                 CdRead(size >> 11, buf, CdlModeSpeed);
                 do {
-                    v1 = CdReadSync(0, 0);
-                } while (v1 > 0);
-                if (v1 == -1) {
+                    status = CdReadSync(0, 0);
+                } while (status > 0);
+                if (status == -1) {
                     goto retry;
                 }
                 ResetCdStateMachine();
@@ -231,11 +229,11 @@ typedef void (*LoadFileNoArgsFn)(void);
 extern void *BMemPMgrAlloc(s32 size);
 
 void CdDriver__LoadFile(CdDriver *self, char *name) {
-    CdFileEntry *rec;
+    CdFileEntry *entry;
     s32 sectorCount;
     s32 readSize;
-    void *ret;
-    s32 v1;
+    void *buffer;
+    s32 status;
 
     if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         ((LoadFileNoArgsFn)FileResource__LoadFile)();
@@ -248,26 +246,26 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
         if (gCdBusy == 0 && (self->buffer == NULL || self->freeGuard != 0)) {
             StartCdOperation(4, CD_STATE_SETLOC);
             gCdSavedSeekParam = gCdSeekParam;
-            rec = FindCdFileEntry(name);
-            gCdSeekParam = rec;
-            if (rec == NULL) {
+            entry = FindCdFileEntry(name);
+            gCdSeekParam = entry;
+            if (entry == NULL) {
                 return;
             }
             {
-                sectorCount = rec->size >> 11;
+                sectorCount = entry->size >> 11;
                 gCdReadSectorCount = sectorCount;
-                if ((rec->size & 0x7FF) != 0) {
+                if ((entry->size & 0x7FF) != 0) {
                     gCdReadSectorCount = sectorCount + 1;
                 }
                 readSize = gCdReadSectorCount << 11;
                 if (self->buffer == NULL) {
-                    ret = BMemPMgrAlloc(readSize);
-                    if (ret == NULL) {
+                    buffer = BMemPMgrAlloc(readSize);
+                    if (buffer == NULL) {
                         self->methods->close(self);
                         return;
                     }
-                    gCdReadBuffer = ret;
-                    self->buffer = ret;
+                    gCdReadBuffer = buffer;
+                    self->buffer = buffer;
                 } else {
                     gCdReadBuffer = self->buffer;
                 }
@@ -279,14 +277,14 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
                     do {
                         CdControl(CdlSetloc, (u_char *)&gCdSeekParam->pos, 0);
                         do {
-                            v1 = CdSync(0, 0);
-                        } while (v1 == 0);
-                    } while (v1 == CdlDiskError);
+                            status = CdSync(0, 0);
+                        } while (status == 0);
+                    } while (status == CdlDiskError);
                     CdRead(gCdReadSectorCount, self->buffer, CdlModeSpeed);
                     do {
-                        v1 = CdReadSync(0, 0);
-                    } while (v1 > 0);
-                    if (v1 == -1) {
+                        status = CdReadSync(0, 0);
+                    } while (status > 0);
+                    if (status == -1) {
                         goto retry;
                     }
                     self->bufferSize = readSize;
