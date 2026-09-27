@@ -91,7 +91,7 @@ Not `LongVec3` (the words are a pointer, a string and a flag) and not Sony's
 Several unit-local views of this same descriptor remain, under other names:
 `ResourceSource` and `ResourceSourceArgs` (GraphicsResources.c),
 `DreamAuxLoadReq` (code_4cd08.h), `LoadRequest` (class_39e08.h),
-`LoadModelRequest` (code_1677c), `BE54LoadReq` (class_3bb8c.c). Some are
+`LoadModelRequest` (code_1677c), `ResourceSourceRequest` (class_3bb8c.c). Some are
 0x10-byte locals, where the stack slot size may be what matches, so merging
 them is a head decision (proposed below), not a rename.
 
@@ -100,7 +100,7 @@ them is a head decision (proposed below), not a rename.
 - One header for the descriptor (e.g. `include/ResourceSource.h`) holding a
   single definition, retiring `ResourceRequest`, GraphicsResources.c's
   `ResourceSource`/`ResourceSourceArgs`, `DreamAuxLoadReq`, `LoadRequest`,
-  `LoadModelRequest` and `BE54LoadReq`, with `ResourceRequest__Set`'s
+  `LoadModelRequest` and `ResourceSourceRequest`, with `ResourceRequest__Set`'s
   prototype there. Check each 0x10-byte local keeps its size.
 - `include/code_4cd08.h`'s comment above `DreamAuxLoadReq` still quotes the
   old body (`this->x=x; ...`) and calls the record "physically the same shape"

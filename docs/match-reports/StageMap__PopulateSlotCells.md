@@ -943,7 +943,7 @@ and `path` (its `name`) before `New_LinkResource`. One
 header owning ResourceSource (LinkResource.h, or FileResource.h, the
 common parent of the five ctors that take it, once ResourceSource itself
 moves out of GraphicsResources.c) would retire all three; field renames
-`type` -> `buffer`, `path` -> `name`. The three-word SetVec3 descriptors
+`type` -> `buffer`, `path` -> `name`. The three-word ResourceRequest__Set descriptors
 (GraphicsResources.c `ResourceSourceArgs`, include/code_4cd08.h
-`DreamAuxLoadReq`, include/code_171e0.h `Vec3_171e0`) are the same family
+`DreamAuxLoadReq`, include/code_171e0.h `ResourceRequest`) are the same family
 at 0x0C and are left to that job.
