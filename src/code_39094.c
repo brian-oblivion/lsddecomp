@@ -302,7 +302,7 @@ Rec1C *GetEndingMovie(s32 *countOut) {
     return rec;
 }
 
-Rec1C *GetStreamPool3(s32 *countOut) {
+Rec1C *GetEventMovieRecords(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 8;
     }
@@ -311,7 +311,7 @@ Rec1C *GetStreamPool3(s32 *countOut) {
 
 Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
     s32 count;
-    Rec1C *rec = GetStreamPool3(&count);
+    Rec1C *rec = GetEventMovieRecords(&count);
     if (countOut != NULL) {
         *countOut = sub + count;
     }

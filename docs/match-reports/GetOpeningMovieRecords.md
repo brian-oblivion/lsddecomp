@@ -11,7 +11,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-`if (out) *out = 0; return records + 0x230;` -- the end of GetRecordTable's 0x230-record table (0x3D40 = 0x230 * 0x1C). Siblings GetEndingMovieRecord/GetStreamPool3 are the same shape with counts 7 and 8 at records 0x237 and 0x238: a count plus a pointer to a sub-table that follows the main one.
+`if (out) *out = 0; return records + 0x230;` -- the end of GetRecordTable's 0x230-record table (0x3D40 = 0x230 * 0x1C). Siblings GetEndingMovieRecord/GetEventMovieRecords are the same shape with counts 7 and 8 at records 0x237 and 0x238: a count plus a pointer to a sub-table that follows the main one.
 
 ## Source
 

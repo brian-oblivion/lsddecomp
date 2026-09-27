@@ -9,7 +9,7 @@ out-of-range drift.
 
 ## What it does
 
-Record accessor: calls GetStreamPool3(&count) (writes 8, returns record 0x238), writes `sub + count` to `*countOut` when non-NULL, returns `&rec[sub]`.
+Record accessor: calls GetEventMovieRecords(&count) (writes 8, returns record 0x238), writes `sub + count` to `*countOut` when non-NULL, returns `&rec[sub]`.
 
 ## Source
 
@@ -19,7 +19,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 ```c
 Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
     s32 count;
-    Rec1C *rec = GetStreamPool3(&count);
+    Rec1C *rec = GetEventMovieRecords(&count);
     if (countOut != NULL) {
         *countOut = sub + count;
     }
@@ -44,4 +44,4 @@ Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
 
 - **Name:** `GetStreamPool3Channel`
 - **Tier:** B
-- **Evidence:** pure getter: index into GetStreamPool3(); no cross-unit caller found (only reached internally via ResolveCinematicChannel's negative-group fallback).
+- **Evidence:** pure getter: index into GetEventMovieRecords(); no cross-unit caller found (only reached internally via ResolveCinematicChannel's negative-group fallback).
