@@ -145,11 +145,10 @@ s32 GetCdState(void) {
     return gCdState;
 }
 
-/* gCdSyncQueueMode keeps its placeholder name: it is written only by
- * SetCdDriverMode's second argument and read back only here and in
- * code_179d8_s, where every read is `gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0`
- * -- i.e. "neither mode is on, take the plain synchronous path". Nothing
- * establishes what the second mode IS, so nothing here names it. */
+/* gCdSyncQueueMode is written only by SetCdDriverMode's second argument.
+ * With it set and gCdAsyncEnabled clear, the request methods
+ * (code_179d8_s.c) still queue each request but run it as a blocking spin
+ * when runRequestQueue dispatches it; with both clear they skip the queue. */
 
 s32 GetCdDriverMode(s32 *outMode2) {
     if (outMode2 != NULL) {
