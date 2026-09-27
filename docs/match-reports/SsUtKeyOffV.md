@@ -40,9 +40,9 @@ s32 SsUtKeyOffV(s16 idx)
     _svm_voice[chan].unk0 = 0;
     _snd_ev_flag = 0;
     _svm_okof1 = mask0 | _svm_okof1;
-    D_80090C64 |= mask1;
+    _svm_okof2 |= mask1;
     D_8008E228 &= ~_svm_okof1;
-    _svm_okon2 &= ~D_80090C64;
+    _svm_okon2 &= ~_svm_okof2;
     return 0;
 
 fail:
@@ -78,12 +78,12 @@ retail, and its `else` branch is this function's whole body. Dumping
 
 ```
 sb   zero, D_8008D9A3[chan]
-lhu  _svm_okof1 ; lhu D_80090C64
+lhu  _svm_okof1 ; lhu _svm_okof2
 sh   zero, D_8008D98C[chan] ; sh zero, _svm_voice[chan]
 lhu  D_8008E228
 or / sh _svm_okof1 / nor / and / sh D_8008E228
 lhu  _svm_okon2
-or / sh D_80090C64 / nor / and / sh _svm_okon2
+or / sh _svm_okof2 / nor / and / sh _svm_okon2
 sw   zero, _snd_ev_flag
 ```
 
@@ -229,7 +229,7 @@ Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Bounds-checks
 `idx` against 0x18 under a `_snd_ev_flag` reentrancy lock (same lock/idiom as
 `libsnd_decre.c`'s `func_80033738`), converts the channel into a 32-bit-wide
 `(loBit, hiBit)` bitmask pair, clears three per-channel fields, then ORs the
-new bits into two running masks (`_svm_okof1`/`D_80090C64`) and clears the
+new bits into two running masks (`_svm_okof1`/`_svm_okof2`) and clears the
 corresponding bits out of two "active" masks (`D_8008E228`/`_svm_okon2`).
 
 ## What it is (best-reached body, 51/73 words, whole-image SHA1 red)
@@ -262,7 +262,7 @@ s32 SsUtKeyOffV(s16 idx)
     D_8008D98C[bankIdx].unk0 = 0;
     _svm_voice[bankIdx].unk0 = 0;
     old60 = _svm_okof1;
-    old64 = D_80090C64;
+    old64 = _svm_okof2;
     e228 = D_8008E228;
     _snd_ev_flag = 0;
     old60 = loBit | old60;
@@ -270,7 +270,7 @@ s32 SsUtKeyOffV(s16 idx)
     D_8008E228 = e228 & ~old60;
     e22c = _svm_okon2;
     old64 = hiBit | old64;
-    D_80090C64 = old64;
+    _svm_okof2 = old64;
     _svm_okon2 = e22c & ~old64;
     return 0;
 
@@ -284,7 +284,7 @@ fail_locked:
 
 (Uses this unit's already-shared `_snd_ev_flag`, `Rec34Byte D_8008D9A3[]`,
 `Rec34Half _svm_voice[]`/`D_8008D98C[]`, and the scalar `_svm_okof1`,
-`D_80090C64`, `D_8008E228`, `_svm_okon2` globals declared near the top of
+`_svm_okof2`, `D_8008E228`, `_svm_okon2` globals declared near the top of
 `code_179d8_j.c`.)
 
 ## Two findings worth keeping regardless of the stall
@@ -459,9 +459,9 @@ Rebuilt the preserved body verbatim through the current pinned pipeline.
 Noticed that `SsUtKeyOff` -- an ALREADY-MATCHED sibling in this same
 unit whose `else` branch is the identical bit-mask/store idiom used here
 (same `D_8008D9A3`/`D_8008D98C`/`_svm_voice` clears, same
-`_svm_okof1`/`D_80090C64`/`D_8008E228`/`_svm_okon2` mask-update sequence)
+`_svm_okof1`/`_svm_okof2`/`D_8008E228`/`_svm_okon2` mask-update sequence)
 -- declares its two mask locals with ASYMMETRIC types: `u32 mask0` (the
-`_svm_okof1`-bound one) against `u16 mask1` (the `D_80090C64`-bound one),
+`_svm_okof1`-bound one) against `u16 mask1` (the `_svm_okof2`-bound one),
 not the matched pair of `u16`s this function's preserved body uses for
 `loBit`/`hiBit`. Since `SsUtKeyOff` reproduces retail byte-for-byte with
 that asymmetry, it looked like a promising, evidence-backed (not guessed)
@@ -475,7 +475,7 @@ places** (confirmed via `tools/funcdiff.py`'s diff line list, not just the
 raw count -- the exact same file offsets diverge in the exact same way).
 The type asymmetry that matters in `SsUtKeyOff` does NOT transfer here.
 The likely reason: in `SsUtKeyOff`, `1 << chan`/`1 << (chan-0x10)` are
-directly the VALUES eventually stored into `_svm_okof1`/`D_80090C64`
+directly the VALUES eventually stored into `_svm_okof1`/`_svm_okof2`
 without any intervening OR against a cached local of a specific width in
 the same way -- whereas here (per the CLOSED finding above) the -O2
 pipeline's own promotion/narrowing rules make the `u16`-vs-`u32` distinction

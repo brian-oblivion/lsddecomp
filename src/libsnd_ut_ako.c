@@ -60,7 +60,7 @@ extern volatile u16 *D_8006DAD4;
  * keyed on" mask, D_8008E228/22C a software mask this function clears the
  * same bit from (a "no longer fading out" bookkeeping flag). */
 extern u16 _svm_okof1;
-extern u16 D_80090C64;
+extern u16 _svm_okof2;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
 
@@ -120,12 +120,12 @@ void SsUtAllKeyOff(void)
         _svm_voice[bitpos & 0xFFFF].unk00 = 0;
 
         hw0 = _svm_okof1;
-        hw1 = D_80090C64;
+        hw1 = _svm_okof2;
         hw0 = bitLo | hw0;
         _svm_okof1 = hw0;
         D_8008E228 = D_8008E228 & ~hw0;
         hw1 = bitHi | hw1;
-        D_80090C64 = hw1;
+        _svm_okof2 = hw1;
         _svm_okon2 = _svm_okon2 & ~hw1;
     }
 }

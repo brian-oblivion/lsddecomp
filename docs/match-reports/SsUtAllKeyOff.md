@@ -85,9 +85,9 @@ is that only the signed spelling produces the pair at all.
 Retail interleaves load / compute / store tightly for the SPU key-on pair:
 
 ```
-lhu v1,_svm_okof1 ; lhu a0,D_80090C64 ; ... ; lhu v0,D_8008E228
+lhu v1,_svm_okof1 ; lhu a0,_svm_okof2 ; ... ; lhu v0,D_8008E228
 or v1,a3,v1 ; sh v1,_svm_okof1 ; nor v1,zero,v1 ; and v0,v0,v1 ; sh v0,D_8008E228
-lhu v0,_svm_okon2 ; or a0,a2,a0 ; sh a0,D_80090C64 ; nor a0 ; and ; sh
+lhu v0,_svm_okon2 ; or a0,a2,a0 ; sh a0,_svm_okof2 ; nor a0 ; and ; sh
 ```
 
 Caching all four globals in four locals (`hw0`/`hw1`/`mask0`/`mask1`, the
@@ -209,7 +209,7 @@ extern volatile u16 *D_8006DAD4;
  * keyed on" mask, D_8008E228/22C a software mask this function clears the
  * same bit from (a "no longer fading out" bookkeeping flag). */
 extern u16 _svm_okof1;
-extern u16 D_80090C64;
+extern u16 _svm_okof2;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
 ```
@@ -260,12 +260,12 @@ void SsUtAllKeyOff(void)
         _svm_voice[bitpos & 0xFFFF].unk0 = 0;
 
         hw0 = _svm_okof1;
-        hw1 = D_80090C64;
+        hw1 = _svm_okof2;
         hw0 = bitLo | hw0;
         _svm_okof1 = hw0;
         D_8008E228 = D_8008E228 & ~hw0;
         hw1 = bitHi | hw1;
-        D_80090C64 = hw1;
+        _svm_okof2 = hw1;
         _svm_okon2 = _svm_okon2 & ~hw1;
     }
 }
@@ -291,7 +291,7 @@ instruction-for-instruction identical to retail.
    increment in the clause, `for (i=0; i<N; )` with an explicit `i++` after the
    if/else, the same with `i++` at the body end, and a bare `__asm__("")`
    barrier after the if/else. Not source-reachable.
-3. **Hoisted-load choice swapped.** Retail hoists `lhu D_80090C64` into the
+3. **Hoisted-load choice swapped.** Retail hoists `lhu _svm_okof2` into the
    early slot and keeps `lhu D_8008E228` next to its use; the build does the
    opposite, and correspondingly sinks the `D_8008E228` store to the end. Four
    spellings of the tail were measured (below); none moves it.

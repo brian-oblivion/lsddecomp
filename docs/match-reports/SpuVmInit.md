@@ -345,7 +345,7 @@ extern u8 D_8008E9D0;
 extern s16 _svm_vab_count;
 extern u8 _svm_vab_used[];
 extern u16 _svm_okof1;
-extern u16 D_80090C64;
+extern u16 _svm_okof2;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
 
@@ -455,9 +455,9 @@ void SpuVmInit(s32 a0) {
         D_8008D98C[chan].unk0 = 0;
         _svm_voice[chan].unk0 = 0;
         _svm_okof1 |= lowMask;
-        D_80090C64 |= highMask;
+        _svm_okof2 |= highMask;
         D_8008E228 &= ~_svm_okof1;
-        _svm_okon2 &= ~D_80090C64;
+        _svm_okon2 &= ~_svm_okof2;
     }
 
     gMasterVolL = 0x3FFF;
@@ -727,7 +727,7 @@ base address `0x1F801C00`, per `vmNoiseOn2`'s own report in
 `gSpuRegs` once no live runner touches `libsnd_vm_vol_ut_key_ut_keyv`/`_l`/`_j`/`_j_c`/
 `_k`/`_p`. See the broadcast post from this round for the fuller list of
 globals this unit shares with that cluster (`D_8008EA26` -> `gSelectedVoice`,
-`D_8008E9D0` -> `gVoiceCount`, `_svm_okof1`/`D_80090C64` ->
+`D_8008E9D0` -> `gVoiceCount`, `_svm_okof1`/`_svm_okof2` ->
 `gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`, `D_8008E228`/`_svm_okon2` ->
 `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`, `_svm_sreg_dirty` -> `gVoiceFlags`,
 `D_8008D9A3` -> `gVoiceState`).

@@ -122,7 +122,7 @@ extern u8 D_8008E9D0;
  * paired with an "active mask" word that is cleared wherever the
  * channel mask bit is set. */
 extern u16 _svm_okof1;
-extern u16 D_80090C64;
+extern u16 _svm_okof2;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
 
@@ -367,9 +367,9 @@ s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
         _svm_voice[chan].unk04 = 0;
         _svm_voice[chan].unk00 = 0;
         _svm_okof1 = mask0 | _svm_okof1;
-        D_80090C64 |= mask1;
+        _svm_okof2 |= mask1;
         D_8008E228 &= ~_svm_okof1;
-        _svm_okon2 &= ~D_80090C64;
+        _svm_okon2 &= ~_svm_okof2;
     }
     _snd_ev_flag = 0;
     return 0;
@@ -510,9 +510,9 @@ s16 SsUtKeyOffV(s16 idx) {
     _svm_voice[chan].unk00 = 0;
     _snd_ev_flag = 0;
     _svm_okof1 = mask0 | _svm_okof1;
-    D_80090C64 |= mask1;
+    _svm_okof2 |= mask1;
     D_8008E228 &= ~_svm_okof1;
-    _svm_okon2 &= ~D_80090C64;
+    _svm_okon2 &= ~_svm_okof2;
     return 0;
 
 fail:

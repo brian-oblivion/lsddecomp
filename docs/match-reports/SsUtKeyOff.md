@@ -52,9 +52,9 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
         D_8008D98C[chan].unk0 = 0;
         _svm_voice[chan].unk0 = 0;
         _svm_okof1 = mask0 | _svm_okof1;
-        D_80090C64 |= mask1;
+        _svm_okof2 |= mask1;
         D_8008E228 &= ~_svm_okof1;
-        _svm_okon2 &= ~D_80090C64;
+        _svm_okon2 &= ~_svm_okof2;
     }
     _snd_ev_flag = 0;
     return 0;
@@ -154,7 +154,7 @@ After points 1-4 the function reached 134/135 words, with the single
 remaining residue a commutative-operand-order swap on one `or` instruction
 (`or a0,a1,a0` retail vs `or a0,a0,a1` built) -- textbook "redundant
 commutative operand order" residue per MATCHING-GUIDE. Manually swapping
-the C expression to `D_80090C64 = mask1 | D_80090C64;` (matching the sibling
+the C expression to `_svm_okof2 = mask1 | _svm_okof2;` (matching the sibling
 fix that DID work for the other mask/global pair, `_svm_okof1`) instead
 **regressed the WHOLE function** to garbage (register renaming from the
 very first instruction, `t1` at the top shifting to a different register)
@@ -164,7 +164,7 @@ resists source reordering. `tools/setup-permuter.sh` + a 90-second, ~2800-
 iteration `-j 6 --stack-diffs` search found a genuine ZERO
 (`output-0-1/score.txt` = `0`) whose diff was a SINGLE type change:
 `mask1` declared `unsigned short` (`u16`) instead of `u32`. Applying that
-(keeping the expression `D_80090C64 |= mask1;`, NOT swapping operand
+(keeping the expression `_svm_okof2 |= mask1;`, NOT swapping operand
 order) reached 135/135 and the whole-image SHA1 passed on the first
 verify. `mask0` stays `u32` -- only `mask1` needed the narrower type; this
 was almost certainly the actual source width (both fields are ultimately

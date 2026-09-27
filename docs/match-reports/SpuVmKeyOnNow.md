@@ -124,7 +124,7 @@ extern u8 D_8008D9A3[];
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
 extern u16 _svm_okof1;
-extern u16 D_80090C64;
+extern u16 _svm_okof2;
 extern u16 _svm_orev1;
 extern u16 _svm_orev2;
 
@@ -228,7 +228,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D_8008E228 |= lowBit;
     _svm_okof1 &= ~D_8008E228;
     _svm_okon2 |= highBit;
-    D_80090C64 &= ~_svm_okon2;
+    _svm_okof2 &= ~_svm_okon2;
 }
 ```
 
@@ -636,7 +636,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D_8008E228 = lowBit | D_8008E228;
     _svm_okon2 = highBit | _svm_okon2;
     _svm_okof1 = _svm_okof1 & ~D_8008E228;
-    D_80090C64 = D_80090C64 & ~_svm_okon2;
+    _svm_okof2 = _svm_okof2 & ~_svm_okon2;
 }
 #endif
 
@@ -843,7 +843,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     D_8008E228 = lowBit | D_8008E228;
     _svm_okon2 = highBit | _svm_okon2;
     _svm_okof1 = _svm_okof1 & ~D_8008E228;
-    D_80090C64 = D_80090C64 & ~_svm_okon2;
+    _svm_okof2 = _svm_okof2 & ~_svm_okon2;
 }
 #endif
 
