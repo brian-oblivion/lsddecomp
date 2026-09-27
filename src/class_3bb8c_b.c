@@ -19,6 +19,8 @@
  */
 #include "common.h"
 #include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "class_3bb8c.h"
 #include "LbdFile.h"
 #include "GridCell.h"
@@ -68,10 +70,6 @@ void StageMap__RefreshFootprint(StageMap *self) {
     StageMap__SetFootprintCellFlag(self, 1);
 }
 
-/* The template ComputeFootprintFromRotation copies before RotMatrix fills
- * its rotation part (bss). */
-extern MATRIX D_8008E98C;
-
 void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 arg1, s32 arg2) {
     SceneNodeSub44 *sub;
     Descriptor10Ext buf;
@@ -95,7 +93,7 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 arg1, s32 arg2) 
         angle += 0x1000;
     }
 
-    mat = D_8008E98C;
+    mat = GsIDMATRIX;
     mat.t[0] = 0;
     mat.t[1] = 0;
     mat.t[2] = self->gridSpan;
