@@ -26,9 +26,9 @@
  *  - MoviePlayer, CD-streamed and MDEC-decoded FMV (CdStream frames,
  *    DecDCTvlc, then DecDCTin/DecDCTout in 16-pixel strips uploaded as they
  *    finish), one movie at a time (gActiveMoviePlayer).
- * The unit's own types: ResourceSource, the {buffer, file name} descriptor
- * those ctors take (ResourceSourceArgs, the three-word local SetVec3 fills
- * for it); UnprototypedCtorTable, the view the allocators call a ctor slot
+ * The ctors take include/FileResource.h's ResourceSource. The unit's own
+ * types: ResourceSourceArgs, the three-word local SetVec3 fills for that
+ * descriptor; UnprototypedCtorTable, the view the allocators call a ctor slot
  * through when they test its result; TimBlockHeader (and its byte copy,
  * TimBlockHeaderBytes), ModelDataHeader and SubBlockTable, the layouts of
  * TimBlockSrc's, ModelData's and TodSet's / TriggerWorld's buffers.
@@ -398,15 +398,6 @@ void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
 TimBlockSrcMethods *GetTimBlockSrcMethods(void) {
     return &gTimBlockSrcMethods;
 }
-
-/* The descriptor the LinkResource, Tod, TodSet, ModelData and TriggerWorld
- * ctors take: a buffer to adopt, or else (buffer NULL) a file name to
- * request. Callers in other units build their own larger locals and pass
- * them cast to this. */
-typedef struct ResourceSource {
-    /* +0x00 */ void *buffer;
-    /* +0x04 */ char *name;
-} ResourceSource;
 
 /* Allocate and construct a LinkResource; NULL, the object freed, when the
  * ctor fails. */

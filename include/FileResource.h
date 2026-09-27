@@ -91,6 +91,14 @@ struct FileResource {
     FILERESOURCE_FIELDS(FileResourceMethods);
 };
 
+/* The descriptor the file-backed subclasses' ctors take (LinkResource, Tod,
+ * TodSet, ModelData, TriggerWorld): a buffer to adopt, or else (buffer
+ * NULL) a file name to request through requestLoadFile. */
+typedef struct ResourceSource {
+    /* +0x00 */ void *buffer;
+    /* +0x04 */ char *name;
+} ResourceSource;
+
 extern FileResourceMethods gFileResourceMethods;
 extern FileResourceMethods *GetFileResourceMethods(void);
 
