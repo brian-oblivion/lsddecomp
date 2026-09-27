@@ -46,7 +46,7 @@
 /* libsnd's _svm_vh (pinned at this address): the header of the VAB bank
  * currently selected. SetAutoVol/SetAutoPan scale by its master volume;
  * SpuVmKeyOn bounds the program number by its program count. */
-extern VabHdr *D_8008E970;
+extern VabHdr *_svm_vh;
 
 extern u8 D_8008EA10;
 extern u8 D_8008EA11;
@@ -101,7 +101,7 @@ void SetAutoVol(s16 voice) {
     acc = _svm_voice[v].unk24;
     D_8008EA10 = acc;
 
-    vol = D_8008E970->mvol * 0x3FFF;
+    vol = _svm_vh->mvol * 0x3FFF;
     q2 = (acc * vol) / 16129;
     q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;
 
@@ -209,7 +209,7 @@ void SetAutoPan(s16 voice) {
     acc = *(u8 *)&_svm_voice[v].unk30;
     D_8008EA11 = acc;
 
-    vol = D_8008E970->mvol * 0x3FFF;
+    vol = _svm_vh->mvol * 0x3FFF;
     q2 = (D_8008EA10 * vol) / 16129;
     q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;
 
@@ -784,7 +784,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
     D_8008EA17 = slot->mpan;
     D_8008EA0C = slot->tones;
 
-    if ((u32)D_8008EA13 >= D_8008E970->ps) {
+    if ((u32)D_8008EA13 >= _svm_vh->ps) {
         return -1;
     }
 

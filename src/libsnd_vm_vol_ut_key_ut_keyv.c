@@ -128,7 +128,7 @@ extern u16 D_8008E22C;
 
 /* libsnd vmanager's _svm_vh (pinned at this address): the current VAB's
  * header. */
-extern VabHdr *D_8008E970;
+extern VabHdr *_svm_vh;
 
 extern s16 D_8008E8C0;
 
@@ -172,7 +172,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 
                     lvl0 = _svm_voice[i].unk08 * (u16)a3 / 127;
                     prio = lvl0 * 0x3FFF;
-                    lvl1 = D_8008E970->mvol * prio / 16129;
+                    lvl1 = _svm_vh->mvol * prio / 16129;
 
                     if (e968FromD998 != e968FromT0) {
                         lvl1b = lvl1 * e968FromT0;

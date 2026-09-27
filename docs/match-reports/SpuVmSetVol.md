@@ -214,7 +214,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 
                     lvl0 = D_8008D990[i].unk0 * (u16)a3 / 127;
                     prio = lvl0 * 0x3FFF;
-                    lvl1 = D_8008E970->unk18 * prio / 16129;
+                    lvl1 = _svm_vh->unk18 * prio / 16129;
 
                     if (e968FromD998 != e968FromT0) {
                         lvl1b = lvl1 * e968FromT0;
@@ -446,7 +446,7 @@ typedef struct {
     u8 pad0[0x18];
     u8 unk18; /* +0x18 */
 } ObjE970;
-extern ObjE970 *D_8008E970;
+extern ObjE970 *_svm_vh;
 
 extern s16 D_8008E8C0;
 extern u8 _svm_sreg_buf[];
@@ -492,7 +492,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 
                     lvl0 = D_8008D990[i].unk0 * (u16)a3 / 127;
                     prio = lvl0 * 0x3FFF;
-                    lvl1 = D_8008E970->unk18 * prio / 16129;
+                    lvl1 = _svm_vh->unk18 * prio / 16129;
 
                     if (e968FromD998 != e968FromT0) {
                         lvl1b = lvl1 * e968FromT0;
@@ -761,7 +761,7 @@ signed 16-bit values). On a match:
   combination of pieces each individually already proven correct
   elsewhere: `D_8008D990[i].unk0 * (u16)a3 / 127` (signed, matches
   `SpuVmSetVol`'s sibling `SpuVmKeyOnNow`'s first-stage magic exactly,
-  reproducer-verified there), times `0x3FFF`, times `D_8008E970->unk18`,
+  reproducer-verified there), times `0x3FFF`, times `_svm_vh->unk18`,
   divided by `16129` (signed, same magic `0x82061029` as `SpuVmKeyOnNow`'s
   second stage) -- **this exact `*0x3FFF /16129` combination, with the
   SAME operand-order re-association hazard `SpuVmKeyOnNow`'s report
@@ -824,7 +824,7 @@ typedef struct {
     u8 pad0[0x18];
     u8 unk18; /* +0x18 */
 } ObjE970;
-extern ObjE970 *D_8008E970;
+extern ObjE970 *_svm_vh;
 
 extern s16 D_8008E8C0;
 extern u8 _svm_sreg_buf[];
@@ -873,7 +873,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 
                     lvl0 = D_8008D990[i].unk0 * (u16)a3 / 127;
                     prio = lvl0 * 0x3FFF;
-                    lvl1 = D_8008E970->unk18 * prio / 16129;
+                    lvl1 = _svm_vh->unk18 * prio / 16129;
 
                     if (e968FromD998 != e968FromT0) {
                         lvl1b = lvl1 * e968FromT0;

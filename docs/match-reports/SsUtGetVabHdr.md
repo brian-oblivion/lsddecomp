@@ -77,7 +77,7 @@ typedef struct {
 
 extern u8 D_8008EA2C[];
 extern VabHdr *D_8008E80C[];
-extern VabHdr *D_8008E970;
+extern VabHdr *_svm_vh;
 
 short SsUtGetVabHdr(short vabId, VabHdr *hdr)
 {
@@ -92,12 +92,12 @@ short SsUtGetVabHdr(short vabId, VabHdr *hdr)
     hdr->ver = vab->ver;
     hdr->ps = vab->ps;
     hdr->ts = vab->ts;
-    D_8008E970 = vab;
+    _svm_vh = vab;
     hdr->vs = vab->vs;
     hdr->mvol = vab->mvol;
-    hdr->pan = D_8008E970->pan;
-    hdr->attr1 = D_8008E970->attr1;
-    hdr->attr2 = D_8008E970->attr2;
+    hdr->pan = _svm_vh->pan;
+    hdr->attr1 = _svm_vh->attr1;
+    hdr->attr2 = _svm_vh->attr2;
     return 0;
 }
 ```
@@ -107,7 +107,7 @@ short SsUtGetVabHdr(short vabId, VabHdr *hdr)
 `D_8008E80C` is an array of `VabHdr*` (each slot 4 bytes, indexed
 `vabId*4`) — a per-slot loaded-VAB-header table shared with the sibling
 functions in this unit that also index `D_8008EA2C`/`D_80090BD4`-style
-tables by the same small id. `D_8008E970` is a one-deep "last-fetched VAB
+tables by the same small id. `_svm_vh` is a one-deep "last-fetched VAB
 header" cache: retail assigns it mid-copy (right after fetching `vs`) and
 then reads `pan`/`attr1`/`attr2` back **through the global** rather than
 keeping `vab` live in a register for those three fields, even though `vab`

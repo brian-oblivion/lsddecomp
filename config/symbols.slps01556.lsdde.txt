@@ -2985,3 +2985,4 @@ sScaleStepDownSlow = 0x800869B4;
 sScaleStepDownFast = 0x800869C0;
 sScaleOne = 0x800869CC;
 _svm_pg = 0x8008E968;
+_svm_vh = 0x8008E970;

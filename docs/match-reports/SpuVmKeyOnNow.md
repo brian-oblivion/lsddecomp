@@ -24,7 +24,7 @@ entry table, same three-stage `D_8008EA1A`/`17`/`11` blend cascade, same
 `D_8008E8C0`-gated clamp, same low/high enable-bit split) but a DIFFERENT
 source object and a DIFFERENT tail:
 
-- **Level source**: reads `D_8008E970->unk18` (a per-session "priority"-ish
+- **Level source**: reads `_svm_vh->unk18` (a per-session "priority"-ish
   byte, NOT the per-note `_ss_score` entry) and combines it with
   `D_8008EA10` through a SIGNED division by `16129` (`=127²`, confirmed
   against the SAME magic constant `0x82061029`/shift-13 the sibling unit's
@@ -134,7 +134,7 @@ typedef struct {
     u8 pad0[0x18];
     u8 unk18; /* +0x18 */
 } ObjE970;
-extern ObjE970 *D_8008E970;
+extern ObjE970 *_svm_vh;
 
 extern u8 D_8008EA10;
 extern volatile s16 D_8008EA26; /* SIGNED here -- see "What it computes". */
@@ -159,7 +159,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     s32 lowBit;
     s32 highBit;
 
-    prio = D_8008E970->unk18 * 0x3FFF;
+    prio = _svm_vh->unk18 * 0x3FFF;
     lvl0 = D_8008EA10 * prio / 16129;
     lvl1 = (u32)lvl0 * D_8008EA16 * D_8008EA19 / 16129;
 
@@ -277,17 +277,17 @@ the STACK FRAME ALLOCATION.
 Within the 30-attempt cap (9 real builds used):
 1. m2c-seeded skeleton (`tools/m2ctx.py code_179d8_l --sig 'void
    SpuVmKeyOnNow(s32 a0, s32 a1)' --run`) transcribed directly, entry-field-
-   first multiply order (`D_8008E970->unk18 * 0x3FFF * D_8008EA10 / 16129`):
+   first multiply order (`_svm_vh->unk18 * 0x3FFF * D_8008EA10 / 16129`):
    compiled, but the very FIRST instruction loaded `D_8008EA10` before
-   `D_8008E970`/`unk18` -- opposite of retail. **Root cause confirmed via
+   `_svm_vh`/`unk18` -- opposite of retail. **Root cause confirmed via
    GCC's own re-association, not a source-order artifact**: swapping the
-   C-level operand order (`D_8008EA10 * (D_8008E970->unk18 * 0x3FFF)`)
+   C-level operand order (`D_8008EA10 * (_svm_vh->unk18 * 0x3FFF)`)
    produced the IDENTICAL wrong load order, because GCC 2.6.3 re-associates
    a chain of multiplies to attach the constant-foldable `*0x3FFF` to
    whichever operand it prefers, REGARDLESS of source parenthesization, when
    both multiplies sit in one expression tree.
 2. Split the constant multiply into its own statement
-   (`prio = D_8008E970->unk18 * 0x3FFF; lvl0 = D_8008EA10 * prio / 16129;`):
+   (`prio = _svm_vh->unk18 * 0x3FFF; lvl0 = D_8008EA10 * prio / 16129;`):
    **fixed the load order** (confirmed via `objdump -dr` register-and-
    relocation comparison, not just visual diff) -- the statement boundary
    prevents GCC's re-association from reaching across it. This is the
@@ -542,7 +542,7 @@ typedef struct {
     u8 pad0[0x18];
     u8 unk18; /* +0x18 */
 } ObjE970;
-extern ObjE970 *D_8008E970;
+extern ObjE970 *_svm_vh;
 
 extern u8 D_8008EA10;
 /* NOT volatile, and declared as an incomplete ARRAY on purpose: the array
@@ -567,7 +567,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     s32 lowBit;
     s32 highBit;
 
-    prio = D_8008E970->unk18 * 0x3FFF;
+    prio = _svm_vh->unk18 * 0x3FFF;
     lvl0 = D_8008EA10 * prio / 16129;
     lvl1 = (u32)lvl0 * D_8008EA16 * D_8008EA19 / 16129;
 
@@ -772,7 +772,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     s32 lowBit;
     s32 highBit;
 
-    prio = D_8008E970->unk18 * 0x3FFF;
+    prio = _svm_vh->unk18 * 0x3FFF;
     tmp = D_8008EA10 * prio / 16129;
     lvl1 = (u32)tmp * D_8008EA16 * D_8008EA19 / 16129;
 
@@ -874,8 +874,8 @@ symbol; this pass does not rename it further. The function remains a STALL
 Left as `D_` per the tier rubric ("a wrong tier-A name is worse than a
 placeholder"); recorded here rather than guessed into a rename:
 
-- `D_8008E970` (the `ObjE970`/`unk18` "priority-ish scale byte" object) --
-  single use (`prio = D_8008E970->unk18 * 0x3FFF`). Could be a
+- `_svm_vh` (the `ObjE970`/`unk18` "priority-ish scale byte" object) --
+  single use (`prio = _svm_vh->unk18 * 0x3FFF`). Could be a
   currently-playing-note object, not established.
 - `D_8008EA10` -- multiplies `prio` before the two chained `/16129`
   divisions (`lvl0 = D_8008EA10 * prio / 16129`). Candidate "master

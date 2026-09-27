@@ -517,7 +517,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
     D_8008EA17 = slot->unk4;
     D_8008EA0C = slot->unk0;
 
-    if ((u32) D_8008EA13 >= D_8008E970->unk12) {
+    if ((u32) D_8008EA13 >= _svm_vh->unk12) {
         return -1;
     }
 
@@ -604,7 +604,7 @@ Note: `ObjE970` gained a `+0x12` `u16` field for this attempt (see
 "Struct/global knowledge" above) -- that extension is left in place in
 `src/` (outside the `#if 0`) since it does not affect any currently
 compiled function and the next attempt at this function, or at
-`SetAutoVol`/`SetAutoPan` (which also use `D_8008E970`), will need
+`SetAutoVol`/`SetAutoPan` (which also use `_svm_vh`), will need
 it again.
 
 ## Naming
@@ -624,14 +624,14 @@ velocity, pan-split pair, status).
 
 ## Proposed field names
 
-`D_8008E970`/`ObjE970` (already locally typed with `difficultyThreshold`/
+`_svm_vh`/`ObjE970` (already locally typed with `difficultyThreshold`/
 `masterVolume` field names this round) and `D_8008E978`/`Tbl32E978`
 (`bendCurveUp`/`bendCurveDown`, others still `unk0`..`unk7`/`unk16`) are
 declared in this unit but only used by functions still `INCLUDE_ASM`
 (SetAutoVol, SetAutoPan, SpuVmPBVoice, and this
 function) -- the field renames are live in `src/code_179d8_m.c` now (pure
 documentation, nothing compiled references them yet); the base symbols
-themselves (`D_8008E970`, `D_8008E978`) were not renamed since
+themselves (`_svm_vh`, `D_8008E978`) were not renamed since
 `D_8008E978` is shared with bravo's live `libsnd_vm_vol_ut_key_ut_keyv.c` this round
 (see broadcast).
 
@@ -650,7 +650,7 @@ established under different typedef names for the same symbols
 `Rec34ByteEdd4`; `D_8008D998` already `Rec34Half` where this body's own
 copy said `Rec34S16` -- same `unk0` field either way, so no access-site
 change needed) and renamed two field accesses to the names a later
-naming pass gave the same offsets: `D_8008E970->unk12` ->
+naming pass gave the same offsets: `_svm_vh->unk12` ->
 `->difficultyThreshold`, `entry->unkC`/`unkD` -> `->bendCurveUp`/
 `->bendCurveDown` (by OFFSET, not by the field's on-disk polarity --
 this function's usage doesn't depend on which direction the name

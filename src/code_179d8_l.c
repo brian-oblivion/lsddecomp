@@ -205,7 +205,7 @@ typedef struct {
     u8 unk18; /* +0x18 */
 } ObjE970;
 
-extern ObjE970 *D_8008E970;
+extern ObjE970 *_svm_vh;
 
 extern u8 D_8008EA10;
 /* NOT volatile, and declared as an incomplete ARRAY on purpose: the array
@@ -228,7 +228,7 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     s32 lowBit;
     s32 highBit;
 
-    prio = D_8008E970->unk18 * 0x3FFF;
+    prio = _svm_vh->unk18 * 0x3FFF;
     lvl0 = D_8008EA10 * prio / 16129;
     lvl1 = (u32)lvl0 * D_8008EA16 * D_8008EA19 / 16129;
 

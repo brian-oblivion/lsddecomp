@@ -290,7 +290,7 @@ this body needs (originally written for a standalone splice with their
 own flat externs) are declared LATER in the file, after `SeAutoPan`
 and `SetAutoPan`'s own stall bodies. Re-declaring them again here under
 the same names is a hard conflict (duplicate typedef names, and for
-`D_8008E970`/`_svm_sreg_buf`/`D_8008D7F2` a redeclaration of the same extern
+`_svm_vh`/`_svm_sreg_buf`/`D_8008D7F2` a redeclaration of the same extern
 symbol under an incompatible pointee type) -- not a new finding, but the
 concrete case the project's own "one extern symbol cannot carry two
 conflicting C types in one file" rule warns about, hitting a typedef this
@@ -298,7 +298,7 @@ time rather than a symbol.
 
 **Fix: moved the shared typedef block (`Rec34Half` and its
 `D_8008D9B0`.`D_8008D9BA` externs, `Rec34HalfU`, `Rec16D7F0` +
-`_svm_sreg_buf`/`D_8008D7F2`, `_svm_sreg_dirty`, `ObjE970` + `D_8008E970`, the six
+`_svm_sreg_buf`/`D_8008D7F2`, `_svm_sreg_dirty`, `ObjE970` + `_svm_vh`, the six
 `D_8008EA1*` scratch bytes, `D_8008E8C0`) from its old position (between
 `SeAutoPan` and `SetAutoPan`) up to right after `#include
 "common.h"`, adding this function's own `D_8008D9A4`/`A6`/`A8`/`AA`/`AC`/`AE`
@@ -411,7 +411,7 @@ tail-duplication fix, not from the padding move itself.
 **Housekeeping note on this splice**: this function sits FIRST in ROM
 order in the unit, so its shared record-family types (`Rec34Half` and
 `D_8008D9A4`/`A6`/`A8`/`AA`/`AC`/`AE`, `Rec34HalfU`, `Rec16D7F0` +
-`_svm_sreg_buf`/`D_8008D7F2`, `_svm_sreg_dirty`, `ObjE970` + `D_8008E970`, the six
+`_svm_sreg_buf`/`D_8008D7F2`, `_svm_sreg_dirty`, `ObjE970` + `_svm_vh`, the six
 `D_8008EA1*` scratch bytes, `D_8008E8C0`) had to be declared BEFORE this
 function rather than duplicated under function-local names — duplicating
 them (tried first, see the compile errors this produced) hits the
@@ -473,7 +473,7 @@ typedef struct {
     u8 pad[0x18];
     u8 unk18; /* +0x18 */
 } ObjE970;
-extern ObjE970 *D_8008E970;
+extern ObjE970 *_svm_vh;
 
 extern u8 D_8008EA10;
 extern u8 D_8008EA11;
@@ -562,7 +562,7 @@ void SetAutoVol(s16 a0) {
 
     accum = ((Rec34HalfU *) D_8008D9AC)[idxCopy].unk0;
     D_8008EA10 = (u8) accum;
-    tableval = D_8008E970->unk18;
+    tableval = _svm_vh->unk18;
 
     product1 = accum * (tableval * 0x3FFF);
     q1 = product1 / 16129;
@@ -639,7 +639,7 @@ it (moved up for exactly this reason); the duplicates were dropped. One
 real field-name update: the body's own local `ObjE970` (`unk18`) collided
 with the shared `ObjE970` the prelude already declares at the same offset
 under the name `masterVolume`; changed the access to
-`D_8008E970->masterVolume`, same offset, no behavior change. The body's
+`_svm_vh->masterVolume`, same offset, no behavior change. The body's
 own flat `extern s16 _svm_sreg_buf[]/D_8008D7F2[]` declarations were also
 dropped -- the shared prelude already declares both as `Rec16D7F0[]`, and
 the body already casts to `(s16 *)` before indexing, so no code change was
@@ -712,7 +712,7 @@ typedef struct {
     u8 pad[0x18];
     u8 masterVolume; /* +0x18 */
 } ObjE970;
-extern ObjE970 *D_8008E970;
+extern ObjE970 *_svm_vh;
 extern s16 _svm_sreg_buf[];   /* SPU voice-register shadow, 8 halfwords per voice */
 extern u8 _svm_sreg_dirty[];
 extern u8 D_8008EA10;
@@ -766,7 +766,7 @@ void SetAutoVol(s16 voice)
     acc = D_8008D9AC[v].unk0;
     D_8008EA10 = acc;
 
-    vol = D_8008E970->masterVolume * 0x3FFF;
+    vol = _svm_vh->masterVolume * 0x3FFF;
     q2 = (acc * vol) / 16129;
     q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;
 

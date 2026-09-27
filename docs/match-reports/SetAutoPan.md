@@ -180,7 +180,7 @@ obvious from context.
   > and useful: `code_179d8_j.c`'s `_svm_sreg_buf`/`D_8008D7F4` genuinely are
   > two independent arrays of that record shape, which is what makes this
   > family easy to misread in either direction.
-- `ObjE970` / `D_8008E970` (pointer variable, `lw`-loaded): only the byte
+- `ObjE970` / `_svm_vh` (pointer variable, `lw`-loaded): only the byte
   field at `+0x18` is read here.
 - `D_8008EA10`, `D_8008EA11`, `D_8008EA16`, `D_8008EA17`, `D_8008EA19`,
   `D_8008EA1A`: plain byte scratch globals feeding the percentage-chain
@@ -470,7 +470,7 @@ typedef struct {
     u8 pad[0x18];
     u8 unk18; /* +0x18 */
 } ObjE970;
-extern ObjE970 *D_8008E970;
+extern ObjE970 *_svm_vh;
 
 /* Scratch bytes for a chained percentage-of-percentage volume/pan
  * calculation -- both magic-multiply divisions in this function are
@@ -543,7 +543,7 @@ void SetAutoPan(s16 a0) {
 
     accumByte = *(u8 *) &D_8008D9B8[a0].unk0;
     D_8008EA11 = accumByte;
-    tableval = D_8008E970->unk18;
+    tableval = _svm_vh->unk18;
 
     product1 = D_8008EA10 * (tableval * 0x3FFF);
     q1 = product1 / 16129;
@@ -615,7 +615,7 @@ unit's shared prelude (moved up for `SetAutoVol`, first in ROM
 order) and were dropped here rather than re-typedef'd. One real field-name
 update: the body's own local `ObjE970` (`unk18`) collided with the shared
 `ObjE970` the prelude already declares with the same offset under the name
-`masterVolume`; the access was changed to `D_8008E970->masterVolume`, same
+`masterVolume`; the access was changed to `_svm_vh->masterVolume`, same
 offset, no behavior change. `./build-and-verify.sh` green (zero bytes
 changed) and `tools/check-nonmatching.sh code_179d8_m` green.
 
@@ -676,7 +676,7 @@ metric, out of 228; not funcdiff words), then anchored in-tree.
    u32 lost the signed rounding of the `/ 64`s (216 words).
 6. `acc = *(u8 *) &D_8008D9B8[v].unk0` into an `s32` (plain `lbu`);
    using the global `D_8008EA11` for the third test reloads it (230 words).
-7. Volume chain `vol = D_8008E970->masterVolume * 0x3FFF;
+7. Volume chain `vol = _svm_vh->masterVolume * 0x3FFF;
    q2 = (D_8008EA10 * vol) / 16129; q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;`
    -- `vol` as its own statement fixes the load order (`lw` ptr, `lbu +0x18`
    before `lbu D_8008EA10`), reusing `q2` for both quotients fixes the
@@ -771,7 +771,7 @@ typedef struct {
     u8 pad[0x18];
     u8 masterVolume; /* +0x18 */
 } ObjE970;
-extern ObjE970 *D_8008E970;
+extern ObjE970 *_svm_vh;
 extern s16 _svm_sreg_buf[];   /* SPU voice-register shadow, 8 halfwords per voice */
 extern u8 _svm_sreg_dirty[];
 extern u8 D_8008EA10;
@@ -825,7 +825,7 @@ void SetAutoPan(s16 voice)
     acc = *(u8 *) &D_8008D9B8[v].unk0;
     D_8008EA11 = acc;
 
-    vol = D_8008E970->masterVolume * 0x3FFF;
+    vol = _svm_vh->masterVolume * 0x3FFF;
     q2 = (D_8008EA10 * vol) / 16129;
     q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;
 
