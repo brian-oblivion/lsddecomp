@@ -4,7 +4,7 @@
 
 > Renamed from `func_80040664` on 2026-09-18 (tools/rename.py). Address 0x80040664.
 
-Unit `code_2cc8c_f`. `Obj6EAC0Methods::slot4C`'s own occupant (this is the
+Unit `code_2cc8c_e`. `Obj6EAC0Methods::slot4C`'s own occupant (this is the
 FUNCTION the vtable slot points to, not a caller of it -- the header's
 existing "IS BoxFill__AttachToParent" note on that slot already said as much before
 this round). Body: when `self->unkC == 0`, forwards to the shared

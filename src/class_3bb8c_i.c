@@ -30,7 +30,7 @@
 #include "Pad.h"
 #include "FrameClock.h"
 
-/* code_2cc8c_f.c's, which types both u8 *(u8 *dst, u8 *src); declared on
+/* code_2cc8c_e.c's, which types both u8 *(u8 *dst, u8 *src); declared on
  * TextEntry's char buffers. Decode turns full-width SJIS into one byte a
  * character, Encode turns it back. */
 extern char *DecodeFullWidthSjis(char *dest, char *src);

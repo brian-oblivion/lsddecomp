@@ -24,7 +24,7 @@ void FadeBox__Reset(FadeBoxObj *self, s32 a1) {
 ```
 
 `slot60`/`slot64` resolve to `BoxFill__SetDisplay`/`BoxFill__SetSemiTrans`
-(code_2cc8c_f, bravo's own functions), dispatched purely through the
+(code_2cc8c_e, bravo's own functions), dispatched purely through the
 vtable -- no extern needed.
 
 ## Two-arg slot, not four
@@ -44,8 +44,8 @@ occupant's own body, and 2 is also all the CALL SITE bothers to configure).
 (`+0x040`), dispatched by `FadeBox__FadeBox` immediately after
 installing `self->methods`. Named to match the architecturally identical
 slot in the same class hierarchy: `Obj6EAC0Methods::slot40` (bravo's own
-unrenamed slot name, `code_2cc8c_f`) is already
-named `TextRow__Reset` (round 54, `code_2cc8c_f`/this header),
+unrenamed slot name, `code_2cc8c_e`) is already
+named `TextRow__Reset` (round 54, `code_2cc8c_e`/this header),
 and `ClassEAC0Methods::finishConstruct` (this unit, `BoxFill__Reset`)
 occupies the SAME offset one level up the same chain, dispatched the same
 way (right after a ctor installs the vtable). Three independent occupants

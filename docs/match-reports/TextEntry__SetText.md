@@ -10,7 +10,7 @@ Unit `class_3bb8c_i`, carved round 14.
 
 `Obj86ED0`'s vtable slot 0x040. Stores its `mode` argument and name pointer,
 resets two counters, then either transliterates the name into the owned
-buffer (`DecodeFullWidthSjis`, an uncarved `code_2cc8c_f` helper -- byte-translate
+buffer (`DecodeFullWidthSjis`, an uncarved `code_2cc8c_e` helper -- byte-translate
 + return-dest, same convention as `strcpy`) and halves `unk10` (a plain
 signed `/2`, which this GCC compiles to the classic `srl`+`addu`+`sra`
 round-toward-zero sequence), or falls back to a straight `strcpy` when
@@ -72,10 +72,10 @@ plain strcpy; HandleCommand's circle arm encodes back in the same mode).
 local prototype. Zero bytes changed.
 
 Moved here from src/class_3bb8c_i.c (stale history; DecodeFullWidthSjis
-is matched in code_2cc8c_f.c since round 38, typed `u8 *(u8 *dst, u8
+is matched in code_2cc8c_e.c since round 38, typed `u8 *(u8 *dst, u8
 *src)`): "This project's own strcpy (matched elsewhere) -- TextEntry__SetText's
 own caller, same local-declaration convention as class_3bb8c_e.c/others."
-and "Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM --
+and "Uncarved helper, `code_2cc8c_e`, still INCLUDE_ASM --
 TextEntry__SetText's own call. Translates each byte of `src` (a name
 string) into `dest` (folding a couple of special-case byte ranges) and
 returns `dest`, same convention as `strcpy`. Typed purely from this call

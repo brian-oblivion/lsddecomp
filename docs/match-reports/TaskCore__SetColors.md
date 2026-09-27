@@ -88,7 +88,7 @@ idiom" and worth stating precisely:
   function's 3-byte struct lives in `Obj86B60` (unit `Task`,
   matched by a DIFFERENT runner in an EARLIER round before this round's
   fix) while `BoxFill__ApplyColor`'s matching 3-byte case lives in `Obj6EAC0`
-  (unit `code_2cc8c_f`) -- so the SAME struct shape closed in two
+  (unit `code_2cc8c_e`) -- so the SAME struct shape closed in two
   unrelated classes, and two DIFFERENT struct shapes closed within the
   same class family. The lever's success does not track any one
   struct's identity or any one class's field layout.
@@ -145,7 +145,7 @@ Byte-identical: whole image green, 0 new warnings, nonmatching green.
 
 Proposed, not applied (header edit, other units): `TaskCore.h`'s `baseColor`,
 `unk93`, `unk96` retyped from `u8[3]` to `BgLayerRgb`, which would drop the
-casts here and in `Task.c`. `code_2cc8c_f.c`'s `RGB80040790`
+casts here and in `Task.c`. `code_2cc8c_e.c`'s `RGB80040790`
 (`BoxFill__ApplyColor`) is the same shape (s8 r, g, b, struct-copied); a
 separate job.
 

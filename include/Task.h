@@ -16,14 +16,14 @@
 
 /*
  * Declarations shared by src/Task.c and the two units after it,
- * code_2cc8c_e.c (FadeBox, BoxFill's first methods) and code_2cc8c_f.c (the
+ * code_2cc8c_e.c (FadeBox, BoxFill's first methods) and code_2cc8c_e.c (the
  * rest of BoxFill, TextRow): the data and outside callees they reach that no
  * class header owns. The classes are in their own headers: StreamTask.h,
  * TaskCore.h, IntermediateBase.h, Viewport.h, BoxFill.h, FadeBox.h, TextRow.h.
  */
 
 /* The pool allocator's pair. BMemPMgrFree returns NULL (its body ends
- * `addu $v0, $zero, $zero`), and code_2cc8c_f's caller uses the result. */
+ * `addu $v0, $zero, $zero`), and code_2cc8c_e's caller uses the result. */
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 

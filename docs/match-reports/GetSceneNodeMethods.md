@@ -57,11 +57,11 @@ not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
 `src/code_d294.c`, `src/class_3bb8c_c.c`, `src/class_3bb8c_o.c`,
 `src/class_3bb8c_p.c`, `src/class_3ac78.c`, `src/code_2cc8c_e.c`,
-`src/code_2cc8c_f.c` (an ACTIVE runner's own unit this exact round),
+`src/code_2cc8c_e.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
 Renaming this symbol would edit every one of those files -- squarely
 out of this round's `code_d294_b`-only scope, and a live collision risk
-with this round's `code_2cc8c_f` runner. Posted to the broadcast in
+with this round's `code_2cc8c_e` runner. Posted to the broadcast in
 strong terms: this is the single highest-value rename in this unit
 (11 files reference the placeholder name) and the evidence for
 `GetSceneNodeMethods` is as solid as any tier-A name gets, but it

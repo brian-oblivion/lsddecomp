@@ -165,7 +165,7 @@ void CheckSaveScoreFlag(TitleMenu *self, TaskCoreTarget *target) {
     target->registrationSlots[1] = (void *)locked;
 }
 
-/* FormatFullWidthNumber is GAME code (matched round 38, src/code_2cc8c_f.c -- its
+/* FormatFullWidthNumber is GAME code (matched round 38, src/code_2cc8c_e.c -- its
  * own C definition, not a Sony object), which formats a1 as a zero-padded
  * `width`-digit decimal string into `self`, the output buffer (the
  * definition's `u8 *dst`; it was typed as a TextRow view until round 88).

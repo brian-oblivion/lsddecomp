@@ -10,7 +10,7 @@ renamed to `strlen`/`itoa`, so it could not link. Fixed and reconfirmed at
 account at the bottom of this file; the improved body there supersedes the
 one below for splicing purposes.**
 
-Unit: `src/code_2cc8c_f.c` · Size: 56 words · Round 23 (2026-09-07), head.
+Unit: `src/code_2cc8c_e.c` · Size: 56 words · Round 23 (2026-09-07), head.
 Blocker screen clean. **Supersedes the round-21 `REOPENED -- ASSIGNABLE`
 disposition and the round-13 "NOT ATTEMPTED, predicted register saturation"
 triage that preceded it.** The function has now been attempted; the body is
@@ -187,7 +187,7 @@ build, fewer, or none-on-both-sides (per the third outcome found on
 than re-reasoning from the existing table:
 
 ```sh
-grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/code_2cc8c_f/FormatFullWidthNumber.s | sort -u
+grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/code_2cc8c_e/FormatFullWidthNumber.s | sort -u
 # -> $fp, $s0, $s1, $s2, $s3, $s4, $s5   (7 registers)
 ```
 
@@ -212,7 +212,7 @@ retail lands where it does. No new lever found; not re-attempting.
 
 ## Round 35: the recorded 42/56 was never measured — a broken link, self-consistent on every static reading
 
-Runner delta, `code_2cc8c_f`. This round's brief specifically warns "BUILD
+Runner delta, `code_2cc8c_e`. This round's brief specifically warns "BUILD
 any inherited/preserved body ONCE before trusting its recorded score,"
 citing a round-33 case where a preserved body called a symbol that did not
 exist. This function is a second instance of exactly that.
@@ -221,8 +221,8 @@ Splicing the body preserved in this report (as of round 27's re-confirmation)
 back in and building gives:
 
 ```
-tools/binutils/bin/mipsel-linux-gnu-ld: src/code_2cc8c_f.c:(.text+0xa94): undefined reference to `func_800411A8'
-tools/binutils/bin/mipsel-linux-gnu-ld: src/code_2cc8c_f.c:(.text+0xaa8): undefined reference to `func_80013348'
+tools/binutils/bin/mipsel-linux-gnu-ld: src/code_2cc8c_e.c:(.text+0xa94): undefined reference to `func_800411A8'
+tools/binutils/bin/mipsel-linux-gnu-ld: src/code_2cc8c_e.c:(.text+0xaa8): undefined reference to `func_80013348'
 build exit=2
 ```
 
@@ -242,7 +242,7 @@ strlen = 0x80013348; // type:func  (Psy-Q, from the SDK object)
 itoa = 0x800411A8; // type:func  (Psy-Q libc2/itoa, from the SDK object)
 ```
 
-This function's own disassembly (`asm/nonmatchings/code_2cc8c_f/FormatFullWidthNumber.s`)
+This function's own disassembly (`asm/nonmatchings/code_2cc8c_e/FormatFullWidthNumber.s`)
 already shows the `jal` targets by these real names (`jal itoa`, `jal
 strcpy`, `jal strlen`, `jal memset`) — splat resolved them once the SDK
 object conversion work (the round-34 SDK rounds visible in git log) placed

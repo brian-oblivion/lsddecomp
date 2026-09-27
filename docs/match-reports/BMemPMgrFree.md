@@ -388,7 +388,7 @@ green.
 `BMemPMgrFree`, **tier A**: fully derived free-list release (round 46,
 99->107/107 permuter match) -- coalesces with the previous and following
 blocks and re-links the free list, the mirror of `BMemPMgrAlloc`. Called
-across the same wide set of units as `BMemPMgrAlloc` (`code_2cc8c_f`,
+across the same wide set of units as `BMemPMgrAlloc` (`code_2cc8c_e`,
 `code_55dd4`, `code_d294`, `TmdRenderer`, `main`, plus this unit's own
 `RemoveBasicClassListNode`), confirming the general-purpose pool pairing.
 

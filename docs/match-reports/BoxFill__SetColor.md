@@ -2,7 +2,7 @@
 
 > Renamed from `Obj6EAC0__SetColor` on 2026-09-25 (tools/rename.py). Address 0x8004076c.
 
-Unit: `src/code_2cc8c_f.c`. No prior report on file (oversight -- this is
+Unit: `src/code_2cc8c_e.c`. No prior report on file (oversight -- this is
 a genuine one-line wrapper, not a splat-generated trivial body).
 
 ```c

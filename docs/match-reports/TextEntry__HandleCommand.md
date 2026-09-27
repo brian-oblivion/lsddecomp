@@ -239,8 +239,8 @@ class_3bb8c_g/_t's spelling). The `slot94Call` label is `callPrevChar`.
 Parameters `arg1`/`arg2` -> `sender`/`command`.
 
 Moved here from the comment on `EncodeFullWidthSjis` (stale: it is matched
-in code_2cc8c_f.c since round 38): "TextEntry__HandleCommand's own
-name-copy helper -- uncarved elsewhere (`code_2cc8c_f`, still
+in code_2cc8c_e.c since round 38): "TextEntry__HandleCommand's own
+name-copy helper -- uncarved elsewhere (`code_2cc8c_e`, still
 `INCLUDE_ASM`), typed purely from this call site's own register usage:
 `a0`/`a1` are `self->textBuf`/`self->editBuf` (both `char *`, the same pair
 `strcpy` is fed in the other arm), return value unused. Same

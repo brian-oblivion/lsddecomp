@@ -1325,7 +1325,6 @@ segments:
       - [0x305B0, c, code_2cc8c_e]
       # code_2cc8c_f: #30..#59, 0x30E64..0x3197C (psyq_memset follows, so no
       # data tail). Zero blocked functions.
-      - [0x30E64, c, code_2cc8c_f]
       # psyq_memset chunk A: libc2 memory / formatted-output helpers.
       - [0x3197C, o, libc2/memset]     # memset
       - [0x319A8, o, libc2/itoa]       # itoa

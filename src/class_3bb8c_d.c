@@ -115,7 +115,7 @@ void TitleMenu__RefreshViewValue(TitleMenu *self) {
 extern char *strcpy(char *dest, char *src);
 extern s32 strlen(char *s);
 
-/* Decodes full-width SJIS into one byte a character (src/code_2cc8c_f.c);
+/* Decodes full-width SJIS into one byte a character (src/code_2cc8c_e.c);
  * nothing here reads its result. */
 extern void DecodeFullWidthSjis(void *dst, void *src);
 

@@ -166,7 +166,7 @@ renametype's rewrite of the class name):
  * FadeBox`: first FadeBox's (gFadeBoxMethods, 0x164, `New_FadeBox` to
  * `GetFadeBoxMethods`, include/FadeBox.h), then BoxFill's allocator,
  * ctor and Reset (0x64, include/BoxFill.h, a GsBOXF screen rectangle; the
- * rest of its methods open code_2cc8c_f).
+ * rest of its methods open code_2cc8c_e).
  *
  * FadeBox fades the box's colour: configure picks the channels (a
  * 4/2/1 = r/g/b mask) and a tick count, StartFadeDown/StartFadeUp set the
