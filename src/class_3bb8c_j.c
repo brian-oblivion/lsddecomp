@@ -16,6 +16,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <strings.h>
 #include "class_3bb8c.h"
 #include "TextEntry.h"
 #include "ItemList.h"
@@ -68,14 +69,14 @@ void TextEntry__ResetAllChars(TextEntry *self) {
 }
 
 void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
-    ScreenSpritePos local;
-    CharSprite *obj;
+    ScreenSpritePos screenPos;
+    CharSprite *cursor;
 
     if (self->panelSprite) {
-        local.y = gTextEntryCursorPos.y;
-        local.x = pos * 7 + gTextEntryCursorPos.x;
-        obj = self->cursorSprite;
-        obj->methods->setPosition(obj, &local);
+        screenPos.y = gTextEntryCursorPos.y;
+        screenPos.x = pos * 7 + gTextEntryCursorPos.x;
+        cursor = self->cursorSprite;
+        cursor->methods->setPosition(cursor, &screenPos);
         self->cursorIndex = pos;
         if (notify) {
             self->methods->playSound(self, 0);
@@ -88,12 +89,12 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
 extern u8 *gNameCharTable;
 
 void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
-    TextRow *obj;
+    TextRow *row;
 
     if (self->panelSprite) {
         self->editBuf[pos] = gNameCharTable[charIndex];
-        obj = self->textRow;
-        ((TextRowSetCellAtFn)obj->methods->setCell)(obj, gNameCharTable[charIndex], pos);
+        row = self->textRow;
+        ((TextRowSetCellAtFn)row->methods->setCell)(row, gNameCharTable[charIndex], pos);
         self->cursorIndex = pos;
         self->charIndex = charIndex;
         if (notify) {
@@ -115,8 +116,6 @@ TextEntryMethods *GetTextEntryMethods(void) {
  * BasicClass's method table and its getter are include/BasicClass.h's
  * (through class_3bb8c.h); the base-class calls below upcast `self`.
  */
-extern void *BMemPMgrAlloc(s32 size);
-extern void *BMemPMgrFree(void *ptr);
 
 ItemList *New_ItemList(char **items, s32 mode) {
     ItemList *self = BMemPMgrAlloc(0x54);
@@ -141,44 +140,42 @@ fail:
  * ternary, not an `if`: retail stores the old value back unconditionally
  * before the conditional store of len.
  */
-extern s32 strlen(void *arg0);
-extern void DecodeFullWidthSjis(void *dst, void *src);
-extern char *strcpy(char *dest, char *src);
+extern char *DecodeFullWidthSjis(char *dest, char *src);
 
 void ItemList__ItemList(ItemList *self, char **items, s32 mode) {
-    char **p;
+    char **item;
     s32 i;
     s32 len;
 
     i = 0;
-    p = items;
+    item = items;
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetItemListMethods();
 
-    while (*p++ != NULL) {
+    while (*item++ != NULL) {
         i++;
     }
 
     self->itemCount = i;
     self->texts = BMemPMgrAlloc(i * 4);
-    p = items;
+    item = items;
     self->textLens = BMemPMgrAlloc(self->itemCount * 4);
     self->maxTextLen = 0;
 
     for (i = 0; i < self->itemCount; i++) {
-        len = strlen(*p);
+        len = strlen(*item);
         if (mode == 1) {
             len /= 2;
         }
         self->textLens[i] = len;
         self->texts[i] = BMemPMgrAlloc(len + 4);
         if (mode == 1) {
-            DecodeFullWidthSjis(self->texts[i], *p);
+            DecodeFullWidthSjis(self->texts[i], *item);
         } else {
-            strcpy(self->texts[i], *p);
+            strcpy(self->texts[i], *item);
         }
         self->maxTextLen = (self->maxTextLen < len) ? len : self->maxTextLen;
-        p++;
+        item++;
     }
 
     self->mode = mode;
@@ -256,7 +253,7 @@ void ItemList__ResetView(ItemList *self) {
     self->cursorIndex = 0;
 }
 
-extern char *BuildFileName(char *dest, const char *arg1, const char *arg2, const char *arg3);
+extern char *BuildFileName(char *dest, const char *name, const char *dir, const char *ext);
 extern const char sStrSelect[];              /* "SELECT" */
 extern const char sItemListCardPathPrefix[]; /* "CARD\\" */
 extern const char sItemListTimExt[];         /* ".TIM" */
@@ -308,15 +305,16 @@ void ItemList__ReleaseResources(ItemList *self) {
 
 /* The first addChild passes all four words through (ItemListAddChildWideFn,
  * no code): see this function's report for the do/while. */
-void ItemList__AttachTarget(ItemList *self, void *child1, void *child2, struct VabStreamObj *target) {
-    ItemListAddChildWideFn fn;
+void ItemList__AttachTarget(ItemList *self, void *inputSource, void *tickSource,
+                            struct VabStreamObj *target) {
+    ItemListAddChildWideFn addChildWide;
     s32 zero;
 
     zero = 0;
-    fn = (ItemListAddChildWideFn)self->methods->addChild;
+    addChildWide = (ItemListAddChildWideFn)self->methods->addChild;
     do {
-        fn(self, child1, child2, target);
-        self->methods->addChild(self, child2);
+        addChildWide(self, inputSource, tickSource, target);
+        self->methods->addChild(self, tickSource);
         self->target = target;
         self->result = zero;
     } while (0);
