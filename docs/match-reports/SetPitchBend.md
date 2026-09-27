@@ -2,8 +2,8 @@
 
 > Renamed from `func_80035A7C` on 2026-09-23 (tools/rename.py). Address 0x80035a7c.
 
-`asm/nonmatchings/code_179d8_k/SetPitchBend.s`, vram `0x80035A7C`, unit
-`code_179d8_k`. Round 24, runner alpha (stall); round 25, runner alpha
+`asm/nonmatchings/libsnd_seqread/SetPitchBend.s`, vram `0x80035A7C`, unit
+`libsnd_seqread`. Round 24, runner alpha (stall); round 25, runner alpha
 (re-verified, additional axes tried, still stalled). Round 31, runner
 bravo (closed via decomp-permuter).
 

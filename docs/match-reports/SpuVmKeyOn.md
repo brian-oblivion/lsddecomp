@@ -9,7 +9,7 @@
 > satisfying the bar without a header prototype (see below). This stays an
 > `INCLUDE_ASM` STALL: it is Sony's code and leaves every matching queue,
 > it is only being named here. The three call sites
-> (`src/code_179d8_j.c`, `src/code_179d8_k.c`, `src/code_179d8_j_c.c`) keep
+> (`src/code_179d8_j.c`, `src/libsnd_seqread.c`, `src/code_179d8_j_c.c`) keep
 > their existing byte-exact local `extern` signatures rather than a
 > LIBSND.H copy: unlike `SsUtKeyOn`, `SpuVmKeyOn` is libsnd/vmanager
 > INTERNAL and has no public prototype in `include/psyq/libsnd.h` (grep
@@ -69,7 +69,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
 
 Before writing any C, `grep -rn SpuVmKeyOn src/*.c docs/match-reports/*.md`
 turned up this **exact** signature already guessed independently by
-`libsnd_decre.c`, `code_179d8_j.c` and `code_179d8_k.c` (each calls this
+`libsnd_decre.c`, `code_179d8_j.c` and `libsnd_seqread.c` (each calls this
 function and typed it from its own call site), plus two live call sites
 with concrete argument roles:
 
@@ -77,7 +77,7 @@ with concrete argument roles:
   SpuVmKeyOn(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);` -- `a0 ==
   0x21` is a real sentinel value this function itself branches on (see
   below).
-- `code_179d8_k.c`'s `NoteOn` (its own report, STALL):
+- `libsnd_seqread.c`'s `NoteOn` (its own report, STALL):
   `SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status)` where
   `packed = (a1<<8)|a0` is a `[screen | slot<<8]` pair into the SAME
   `_ss_score[][]` array this function itself indexes with `a0`. This
@@ -105,9 +105,9 @@ until you diff registers, not just word counts.
 - `Entry90902E8M` / `_ss_score[]`: the SAME 172(0xAC)-byte
   `[screen][slot]`-indexed record array `libsnd_decre/j/k.c` each already
   document with their own reduced view. This function only needs
-  `unk12` (a byte OFFSET, per `code_179d8_k.c`'s fuller struct) and reads
+  `unk12` (a byte OFFSET, per `libsnd_seqread.c`'s fuller struct) and reads
   a per-voice "speed" `s16` at `*(s16*)((u8*)rec + 0x4E + rec->unk12*2)` --
-  the SAME access shape `code_179d8_k.c`'s `NoteOn` already uses on
+  the SAME access shape `libsnd_seqread.c`'s `NoteOn` already uses on
   the identical field, corroborating both units' independent readings.
 - `Tbl32E978` (already declared for `SpuVmPBVoice`'s stall) needed
   EXTENDING, not a second conflicting type: this function additionally
@@ -435,7 +435,7 @@ extern SlotE968M *_svm_pg;
  * (slot in the high byte, screen in the low byte) -- same array
  * code_179d8_j.c/_k.c/_i.c already document, each with its own reduced
  * local view. This function only needs the `unk12` byte-offset field
- * (see code_179d8_k.c's fuller Entry90902E8 for what it points at:
+ * (see libsnd_seqread.c's fuller Entry90902E8 for what it points at:
  * `*(s16 *)((u8 *)rec + 0x4E + rec->unk12 * 2)` is a per-voice "speed"
  * table this function also reads, same access shape as that unit's own
  * NoteOn). */
@@ -472,7 +472,7 @@ extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
 /* Called as `SpuVmKeyOn(0x21, p0, p1, p2, outA, outB)` from
  * code_179d8_j.c's SpuVmSeKeyOn and as
  * `SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status)` from
- * code_179d8_k.c's NoteOn -- signature confirmed independently
+ * libsnd_seqread.c's NoteOn -- signature confirmed independently
  * by three sibling units' own extern guesses (libsnd_decre/_j/_k all
  * agree on this exact shape). `a0` is a packed [screen | slot<<8]
  * dispatch id into `_ss_score`; `a1`/`a2` are the "key" values
@@ -611,8 +611,8 @@ it again.
 
 **SpuVmKeyOn** (was `func_8002FAC4`) -- Tier A. Signature and role
 corroborated independently by three sibling units (`libsnd_decre.c`,
-`code_179d8_j.c`, `code_179d8_k.c`, per this report's own "Signature"
-section) before any body-level derivation: `code_179d8_k.c`'s
+`code_179d8_j.c`, `libsnd_seqread.c`, per this report's own "Signature"
+section) before any body-level derivation: `libsnd_seqread.c`'s
 `NoteOn` calls this in its nonzero-velocity branch and SpuVmKeyOff in
 its zero-velocity branch of the SAME MIDI-status-byte switch, and
 `code_179d8_j.c` wraps both with the same fixed leading identity constant
@@ -738,4 +738,4 @@ Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<li
 - `SlotE968M` -> `ProgAtr` (`_svm_pg`, 0x8008E968): `unk0`/`unk1`/`unk4` are `tones`/`mvol`/`mpan`.
 - `Tbl32E978` -> `VagAtr` (`_svm_tn`): `unk0`..`unk7` are prior, mode, vol, pan, center, shift, min, max; `unk16` is `vag`.
 - **Body correction.** The preserved body's note-range scan compared the note with `bendCurveUp`/`bendCurveDown`, i.e. +0xC/+0xD. Retail reads +0x6/+0x7 (`lbu $v0, 0x6($a0)` at 0x8002FC68 and `lbu $v0, 0x7($a0)` at 0x8002FC84), which are `VagAtr.min`/`max`; the scan now reads `entry->min`/`entry->max`. Measured by building the body live (`#if 1`, then reverted): 414 built words against retail's 387 both before and after the correction (the map puts SpuVmKeyOff at 0x8003013C either way), so the length residue is not this. The 402 figure in the NON_MATCHING header predates this measurement.
-- `Entry90902E8M` (`_ss_score`'s 0xAC-byte record) -> `include/SsScore.h`'s `SsScore`, which gains `unk12` (+0x12, the event's MIDI channel) and `unk4E[0x10]` (+0x4E, per-channel volume: controller 7 stores it and reset-all-controllers resets it to 0x7F in code_179d8_k). The speed read becomes `s6->unk4E[s6->unk12]`.
+- `Entry90902E8M` (`_ss_score`'s 0xAC-byte record) -> `include/SsScore.h`'s `SsScore`, which gains `unk12` (+0x12, the event's MIDI channel) and `unk4E[0x10]` (+0x4E, per-channel volume: controller 7 stores it and reset-all-controllers resets it to 0x7F in libsnd_seqread). The speed read becomes `s6->unk4E[s6->unk12]`.

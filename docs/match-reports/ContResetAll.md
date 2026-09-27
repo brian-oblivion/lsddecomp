@@ -45,14 +45,14 @@
 >   because order is exactly the axis the class rules out.
 >
 > **The tell that this unit's own matched functions already had the answer:**
-> three of alpha's matches in `code_179d8_k` use `(u8 *)rec + rec->unk12`
+> three of alpha's matches in `libsnd_seqread` use `(u8 *)rec + rec->unk12`
 > (base first) and match. The stall used the subscript form. When a function
 > disagrees with its own already-matched siblings' idiom, try the siblings'
 > idiom before accepting a class verdict.
 
 
-`asm/nonmatchings/code_179d8_k/ContResetAll.s`, vram `0x80034D90`, unit
-`code_179d8_k`. Round 24, runner alpha.
+`asm/nonmatchings/libsnd_seqread/ContResetAll.s`, vram `0x80034D90`, unit
+`libsnd_seqread`. Round 24, runner alpha.
 
 ## What it is
 

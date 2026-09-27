@@ -2,8 +2,8 @@
 
 > Renamed from `func_800350D8` on 2026-09-23 (tools/rename.py). Address 0x800350d8.
 
-`asm/nonmatchings/code_179d8_k/ContRpn1.s`, vram `0x800350D8`, unit
-`code_179d8_k`. Round 24, runner alpha. Sibling of `SetProgramChange` and
+`asm/nonmatchings/libsnd_seqread/ContRpn1.s`, vram `0x800350D8`, unit
+`libsnd_seqread`. Round 24, runner alpha. Sibling of `SetProgramChange` and
 `ContRpn2` -- same shape, different byte-field written and a
 retrigger counter incremented instead.
 

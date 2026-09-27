@@ -6,8 +6,8 @@
 
 > Renamed from `func_80034AEC` on 2026-09-23 (tools/rename.py). Address 0x80034aec.
 
-`asm/nonmatchings/code_179d8_k/ContPortaTime.s`, vram `0x80034AEC`, unit
-`code_179d8_k`. Round 25, runner alpha (stall). Round 31, runner bravo
+`asm/nonmatchings/libsnd_seqread/ContPortaTime.s`, vram `0x80034AEC`, unit
+`libsnd_seqread`. Round 25, runner alpha (stall). Round 31, runner bravo
 (closed).
 
 ## Round 31 update (runner bravo): closed via decomp-permuter, register-rescue class cracked

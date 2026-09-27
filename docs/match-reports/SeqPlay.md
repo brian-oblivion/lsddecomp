@@ -256,7 +256,7 @@ Checked this function's delay-slot filler against `ContNrpn2.md`'s
 round-31 finding that a "dead" delay-slot filler can actually be a hidden
 UNCONDITIONAL write the stalled C mis-scoped to one branch arm only.
 **Does not apply here**: `addu $a2,$v0,$zero` (disassembly line 34,
-`asm/nonmatchings/code_179d8_k/SeqPlay.s`) is a bare GPR-to-GPR
+`asm/nonmatchings/libsnd_seqread/SeqPlay.s`) is a bare GPR-to-GPR
 move with no memory effect. Unlike `ContNrpn2`'s `sb` store (which
 persists past the branch and is observable from other code paths or a
 later read of the same struct field), a register move that is never read

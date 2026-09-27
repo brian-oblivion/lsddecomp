@@ -55,7 +55,7 @@ extern s32 _snd_ev_flag;
 
 /* The mark callbacks SsSetMarkCallback installs, one per (access number,
  * sequence number); _SsInit clears them all.  Same table ContNrpn1
- * (code_179d8_k) calls through. */
+ * (libsnd_seqread) calls through. */
 extern SsMarkCallbackProc D_80090368[0x20][16];
 
 /*

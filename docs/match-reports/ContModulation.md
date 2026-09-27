@@ -6,8 +6,8 @@
 
 > Renamed from `func_800349B0` on 2026-09-23 (tools/rename.py). Address 0x800349b0.
 
-`asm/nonmatchings/code_179d8_k/ContModulation.s`, vram `0x800349B0`, unit
-`code_179d8_k`. Round 25, runner alpha (stall). Round 31, runner bravo
+`asm/nonmatchings/libsnd_seqread/ContModulation.s`, vram `0x800349B0`, unit
+`libsnd_seqread`. Round 25, runner alpha (stall). Round 31, runner bravo
 (closed).
 
 ## Round 31 update (runner bravo): closed, two independent fixes stacked

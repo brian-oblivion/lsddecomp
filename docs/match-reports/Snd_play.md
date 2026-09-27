@@ -33,3 +33,10 @@ Snd_play`: 11/11 words.
 None new -- reconfirms CLAUDE.md's existing note that a wrapper's own
 return type must be read from whether `$v0` gets post-processed after the
 call, not assumed void just because a frame is paid for.
+
+## File history
+
+Round 34 (2026-09-12) linked `libsnd/replay` and `libsnd/vs_vab` into the
+middle of the `libsnd_decre` slice, leaving Snd_play as the one-function unit
+`src/code_179d8_i_b.c`. Round 98 (track 8) renamed it `src/libsnd_play.c`
+for the Sony module it is (`libsnd/play.o`, 0x2C, the unit's exact size).

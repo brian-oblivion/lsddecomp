@@ -2,8 +2,8 @@
 
 > Renamed from `func_80035154` on 2026-09-23 (tools/rename.py). Address 0x80035154.
 
-`asm/nonmatchings/code_179d8_k/ContRpn2.s`, vram `0x80035154`, unit
-`code_179d8_k`. Round 24, runner alpha. Second sibling of `SetProgramChange`
+`asm/nonmatchings/libsnd_seqread/ContRpn2.s`, vram `0x80035154`, unit
+`libsnd_seqread`. Round 24, runner alpha. Second sibling of `SetProgramChange`
 and `ContRpn1` -- identical shape to `ContRpn1`, writes
 `unk14` instead of `unk13`.
 

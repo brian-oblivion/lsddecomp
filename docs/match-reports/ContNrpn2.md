@@ -2,8 +2,8 @@
 
 > Renamed from `func_80034F90` on 2026-09-23 (tools/rename.py). Address 0x80034f90.
 
-`asm/nonmatchings/code_179d8_k/ContNrpn2.s`, vram `0x80034F90`, unit
-`code_179d8_k`. Round 25, runner alpha (stall). Round 31, runner bravo
+`asm/nonmatchings/libsnd_seqread/ContNrpn2.s`, vram `0x80034F90`, unit
+`libsnd_seqread`. Round 25, runner alpha (stall). Round 31, runner bravo
 (closed).
 
 ## Round 31 update (runner bravo): the "delay-slot filler" WAS a missing statement, not a scheduling quirk

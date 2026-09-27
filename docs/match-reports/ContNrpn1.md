@@ -10,7 +10,7 @@
 and the whole image is byte-exact. A structured rewrite of the same body is
 also 77/77: `&&` in place of the nested `if`/`goto check`, an `if (kind ==
 0x28)` in place of `goto skip_call`, and `fn(ch, sl, a2)` without the
-redundant `& 0xFF`. That rewrite is the live C in `src/code_179d8_k.c`. Every
+redundant `& 0xFF`. That rewrite is the live C in `src/libsnd_seqread.c`. Every
 residue analysis below, the "slot used exactly once" fusion and the permuter
 and volatile levers, was measuring a body that called the callback with one
 argument too few. None of it is a compiler behaviour worth keeping as a
@@ -24,8 +24,8 @@ Verified: `./build-and-verify.sh` gives `OK: build matches retail`,
 
 > Renamed from `func_80034E5C` on 2026-09-23 (tools/rename.py). Address 0x80034e5c.
 
-`asm/nonmatchings/code_179d8_k/ContNrpn1.s`, vram `0x80034E5C`, unit
-`code_179d8_k`. Round 25, runner alpha. Round 31, runner bravo
+`asm/nonmatchings/libsnd_seqread/ContNrpn1.s`, vram `0x80034E5C`, unit
+`libsnd_seqread`. Round 25, runner alpha. Round 31, runner bravo
 (re-verified, permuter search negative, still stalled).
 
 ## Round 31 update (runner bravo): re-verified, decomp-permuter searched, no zero within budget

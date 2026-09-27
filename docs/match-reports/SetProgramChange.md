@@ -2,8 +2,8 @@
 
 > Renamed from `func_80034614` on 2026-09-23 (tools/rename.py). Address 0x80034614.
 
-`asm/nonmatchings/code_179d8_k/SetProgramChange.s`, vram `0x80034614`, unit
-`code_179d8_k`. Round 24, runner alpha.
+`asm/nonmatchings/libsnd_seqread/SetProgramChange.s`, vram `0x80034614`, unit
+`libsnd_seqread`. Round 24, runner alpha.
 
 ## What it is
 

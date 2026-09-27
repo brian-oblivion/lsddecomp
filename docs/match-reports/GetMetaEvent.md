@@ -7,7 +7,7 @@ miss, 20 words short). Kept for history; do not read the 20-word figure as
 current.
 
 **20 words SHORT: compiled length 193/213.** Measured directly from
-`build/src/code_179d8_k.c.o` (`objdump -d`, symbol-to-symbol distance),
+`build/src/libsnd_seqread.c.o` (`objdump -d`, symbol-to-symbol distance),
 not from `tools/funcdiff.py`, which cannot report a meaningful word-match
 figure once length drifts (confirmed: it printed "the build differs
 OUTSIDE this range too" at every intermediate attempt below).
@@ -425,7 +425,7 @@ function (not just the isolated reproducer), none closed it:**
 plateau, append the negative and stop").** The preserved body below is
 the 211/213 state (narrowed volatile only, `divisor` cached and reused,
 no cast/nesting/reordering) since that was the best measured and every
-further reshape either did nothing or regressed. `src/code_179d8_k.c` is
+further reshape either did nothing or regressed. `src/libsnd_seqread.c` is
 back to `INCLUDE_ASM` and the whole-image build is confirmed green.
 
 **Process note, not a code finding:** running `make extract` while this
@@ -599,7 +599,7 @@ context). Marking this residue **permuter-exhausted** per
 duplicate-arm forms reach zero and no idiomatic translation scores the
 same, mark the class permuter-exhausted in the report and move on").
 
-`src/code_179d8_k.c` restored to `INCLUDE_ASM`; whole-image build confirmed
+`src/libsnd_seqread.c` restored to `INCLUDE_ASM`; whole-image build confirmed
 green (`build-and-verify.sh` exit 0) before moving on.
 
 ### Round 35 lever checklist

@@ -8,7 +8,7 @@ The union of the two VagAtr views in `DataEntryLocals` (`Scratch_800357B0 s; Scr
 
 **REVISITED, round 69: STALL, improved (44/376 rebuilt -> 95/376, ins/del
 21/21 -> 6/6, frame exact) and promoted to `#ifdef NON_MATCHING` in
-`src/code_179d8_k.c`; names/types used** (the callee's real signature, a
+`src/libsnd_seqread.c`; names/types used** (the callee's real signature, a
 union in `DataEntryLocals`, a loop counter width).
 
 ## Round 69 (runner bravo): repaired, rebuilt, three levers
@@ -90,7 +90,7 @@ No permuter search.
 
 ### Best body (95/376, 380 words, frame exact) with every declaration it needs
 
-This is the same body now in `src/code_179d8_k.c` under `#ifdef
+This is the same body now in `src/libsnd_seqread.c` under `#ifdef
 NON_MATCHING`. It needs the unit's `Entry90902E8`, `_ss_score`,
 `ReadDeltaValue` and the `SsUtGetProgAtr`/`SsUtGetVagAtr`/`SsUtSetVagAtr`
 externs declared earlier in the unit.
@@ -499,7 +499,7 @@ combine:
 }
 ```
 
-Splicing this literal body back into `src/code_179d8_k.c` in place of the
+Splicing this literal body back into `src/libsnd_seqread.c` in place of the
 `INCLUDE_ASM`, together with the struct/prototype block above it, builds
 clean (`build exit=2`, zero compile-error grep hits) at 380/376 words.
 
@@ -521,7 +521,7 @@ instruction sequences, matching loop shapes).
 Retail computes a value into `$s5` in each of the `unk13==1` and
 `unk13==2` sub-branches (a masked/rounded `val*100` in one, a shifted
 `val*25` in the other) that is **never read anywhere in the function** --
-confirmed with `grep -n '\$s5' asm/nonmatchings/code_179d8_k/ContDataEntry.s`,
+confirmed with `grep -n '\$s5' asm/nonmatchings/libsnd_seqread/ContDataEntry.s`,
 which shows only the writes (`andi`/`sll`/`addu $s5,zero,zero`) and the
 final callee-save restore (`lw $s5, ...` in the epilogue, which is not a
 real use). Four things were tried, in order:
@@ -606,11 +606,11 @@ value never had, and the two are not the same lever.
 Re-verified this round's preserved body builds clean at the recorded score
 (`SsUtGetProgAtr`/`SsUtGetVagAtr`/`SsUtSetVagAtr` -- the round-34 SDK
 renames of `func_800334F0`/`func_80033260`/`func_80036230` this report
-originally used -- are already reflected in `src/code_179d8_k.c`'s preserved
+originally used -- are already reflected in `src/libsnd_seqread.c`'s preserved
 `#if 0` body). Rebuilding it in isolation reproduces exactly the same
 **380/376 compiled length** this report already recorded (confirmed via
 `mipsel-linux-gnu-objdump` symbol-to-symbol distance on
-`build/src/code_179d8_k.c.o`, not funcdiff's drifted word-match number) --
+`build/src/libsnd_seqread.c.o`, not funcdiff's drifted word-match number) --
 the SDK renames changed nothing about this function's own bytes, as
 expected, since they are just this unit's own local-view spelling of
 already-linked Sony symbols.
@@ -741,7 +741,7 @@ Round 35 flagged this as "not investigated further" and no round since
 
 Direct measurement, `python3 -c` on the disassembly's own `$sp`-relative
 literal offsets (every `0x??($sp)` operand in
-`asm/nonmatchings/code_179d8_k/ContDataEntry.s`, both loads/stores):
+`asm/nonmatchings/libsnd_seqread/ContDataEntry.s`, both loads/stores):
 **the highest offset any instruction in the WHOLE function ever
 addresses is `0x90` (144).** The register-save block occupies the frame's
 top 40 bytes (`0xE0`-`0x108`, confirmed via `objdump`: `s0`-`s8` (9 regs)
@@ -756,7 +756,7 @@ frame size onto an otherwise-undersized body").
 **Fix: added `u8 dead[40];` (declared with the other top-level locals, C89)
 guarded by the established `if (0) { dead[0] = 0; }` idiom.** Rebuilt:
 `addiu $sp,$sp,-0x108` -- **frame now byte-IDENTICAL to retail**, confirmed
-via `objdump -d build/src/code_179d8_k.c.o`. (40, not 80: the array itself
+via `objdump -d build/src/libsnd_seqread.c.o`. (40, not 80: the array itself
 only needs to inflate the total frame by the GAP between this build's
 already-224-byte frame and retail's 264, not by the full 80-byte
 unaddressed span retail happens to carry -- the other 40 bytes of retail's
@@ -830,7 +830,7 @@ per `tools/stalesyms.py`'s finding (relayed by the head) that this report's
 preserved body sat in a plain fenced code block with no `#if 0` markers --
 CLAUDE.md's mandated preservation form -- so it was not literally
 "positioned where it would compile" the way a copy-paste back into
-`src/code_179d8_k.c` needs. No change to the body itself, and see the
+`src/libsnd_seqread.c` needs. No change to the body itself, and see the
 round-49 note above: this body's `Snd_setVabAttr` call sites still use the
 now-stale 3-way (`u32`/`Blk1_800351D0`/`Blk2_800351D0`) argument slice and
 will need reshaping to the real `(Scratch_800357B0, AdsrFields)`
@@ -934,7 +934,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2)
 
 (Needs the same `Blk1_800351D0`/`Blk2_800351D0`/`DataEntryLocals`/
 `Scratch800351D0` typedefs and the local `Snd_setVabAttr` prototype already
-declared earlier in `src/code_179d8_k.c`, unchanged from before this
+declared earlier in `src/libsnd_seqread.c`, unchanged from before this
 round.)
 
 ### What is left (not investigated further this round -- flagged for next attempt)
@@ -990,7 +990,7 @@ report). Its REAL signature is `(s16 channel, s16 slot, s16 kind,
 Scratch_800357B0 scratch, AdsrFields resolved, s16 arg5, u8 arg6)` --
 a 0x20-byte scratch struct plus an 18-byte ADSR struct, both by value.
 This function's own forward declaration of it (just above this function's
-`#if 0` body in `src/code_179d8_k.c`) instead sliced the same 50 bytes as
+`#if 0` body in `src/libsnd_seqread.c`) instead sliced the same 50 bytes as
 `(u32 a3, Blk1_800351D0 blk1, Blk2_800351D0 blk2)` -- a different, never-
 confirmed guess. Once `Snd_setVabAttr` had a real definition, the two
 conflicted (`` conflicting types for `Snd_setVabAttr' ``), so the stale

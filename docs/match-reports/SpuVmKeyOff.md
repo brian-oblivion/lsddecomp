@@ -203,7 +203,7 @@ symbol or one like it.
 ## Naming
 
 **SpuVmKeyOff** (was `func_800300D0`) -- Tier A. Same evidence as SpuVmKeyOn:
-`code_179d8_k.c`'s `NoteOn` calls this in its zero-velocity branch
+`libsnd_seqread.c`'s `NoteOn` calls this in its zero-velocity branch
 (the MIDI note-off convention) and SpuVmKeyOn in the nonzero-velocity
 branch of the same switch; `code_179d8_j.c`'s `SpuVmSeKeyOff` wraps this
 with the same fixed leading identity constant `code_179d8_j.c`'s

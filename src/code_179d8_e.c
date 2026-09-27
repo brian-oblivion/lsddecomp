@@ -290,7 +290,7 @@ s32 VabStreamObj__OnBodyReady(VabStreamObj *self, s32 done) {
 /* This unit's own reduced view of Sony's `ProgAtr` (include/psyq/libsnd.h,
  * 16 bytes) -- only the one field VabStreamObj__LoadVagAttrs itself reads is
  * named, per the same local-struct convention used for VabHdrView above (and
- * matching code_179d8_k.c's own reduced `ProgAtr` reading). */
+ * matching libsnd_seqread.c's own reduced `ProgAtr` reading). */
 typedef struct ProgAtrView {
     u8 tones; /* +0x00, program's tone count, written by SsUtGetProgAtr */
     u8 pad1[0x10 - 0x1];

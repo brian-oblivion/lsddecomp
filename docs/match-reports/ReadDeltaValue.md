@@ -2,8 +2,8 @@
 
 > Renamed from `func_80035E80` on 2026-09-23 (tools/rename.py). Address 0x80035e80.
 
-`asm/nonmatchings/code_179d8_k/ReadDeltaValue.s`, vram `0x80035E80`, unit
-`code_179d8_k`. Carved round 24, closed round 25, runner alpha. This
+`asm/nonmatchings/libsnd_seqread/ReadDeltaValue.s`, vram `0x80035E80`, unit
+`libsnd_seqread`. Carved round 24, closed round 25, runner alpha. This
 unit's one frameless function -- it opens on `sll $a0,$a0,16` (leaf
 argument narrowing, not a caller-frame read), per the unit's own
 carve-time census.

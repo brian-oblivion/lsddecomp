@@ -7,7 +7,7 @@ type and a case-local's width -- no field or function renamed).
 
 Preserved body rebuilt first, exactly as the `#ifdef NON_MATCHING` block
 gave it: compiled length 195 words (`nm` distance 0x558 -> 0x864 in
-`build/src/code_179d8_k.c.o`), 5 SHORT, as the title said. funcdiff's
+`build/src/libsnd_seqread.c.o`), 5 SHORT, as the title said. funcdiff's
 first line on that build: `insertions 12 / deletions 12`, positional
 skeleton diffs 184, 13/200 raw (window drifted, 270851 bytes outside).
 
@@ -85,7 +85,7 @@ tool reading.
 ## What it does
 
 The unit's Control-Change dispatcher (`jtbl_80010CF0`, one of the three
-switch tables `code_179d8_k` owns). Reads one data byte from the event
+switch tables `libsnd_seqread` owns). Reads one data byte from the event
 stream (the CC *value*) via `rec->unk4`, then routes on `a2` -- the CC
 *number* -- through a dense `switch (0..121)` that GCC lowers to that
 jump table. The controller numbers with dedicated handling are exactly
@@ -174,7 +174,7 @@ difference that stands out, but it did not turn out to be steerable:
 
 **Reshapes tried, none of which changed the compiled size or the tail
 target by even one word** (all confirmed via
-`objdump -d build/src/code_179d8_k.c.o | grep -n '<func_'` distance, not
+`objdump -d build/src/libsnd_seqread.c.o | grep -n '<func_'` distance, not
 funcdiff, since the function-level drift makes funcdiff's number
 meaningless mid-experiment):
 
@@ -213,14 +213,14 @@ hypothesis, not a measurement.
 ## Body as reached (195/200 words -- 5 short, all in case 11 / one register)
 
 **Round 49 note (runner charlie): rewrapped in literal `#if 0`/`#endif`,
-and the two callee names below CORRECTED to match `src/code_179d8_k.c`'s
+and the two callee names below CORRECTED to match `src/libsnd_seqread.c`'s
 actual current preserved body**, per `tools/stalesyms.py`'s finding
 (relayed by the head) that this report's body sat in a plain fenced code
 block, unwrapped, and had drifted from the real source: round 34's SDK
 renaming retyped case 64's `func_80036518`/`func_800363FC` local guesses
 into the real `SpuVmDamperOff`/`SpuVmDamperOn` Psy-Q symbols, case 91's
 `func_80036118` into `SsUtSetReverbDepth`, and case 11's `func_800307F0`
-into `SpuVmSetProgVol` -- `src/code_179d8_k.c` itself already carries the
+into `SpuVmSetProgVol` -- `src/libsnd_seqread.c` itself already carries the
 corrected names (it was never broken there), only this report's copy was
 stale. No behavioral change; this is a documentation fix so the next
 resume starts from the real names instead of pre-round-34 guesses.
@@ -395,11 +395,11 @@ Two, both generalizing the GetSeqData block-order finding:
 ## ROUND 35 (runner alpha): re-verified, SKIPPED after re-confirming the round-32 permuter rejection with a clean seed
 
 Rebuilt this report's preserved body (using the current SDK-renamed callees
-already reflected in `src/code_179d8_k.c` -- `SpuVmSetProgVol`,
+already reflected in `src/libsnd_seqread.c` -- `SpuVmSetProgVol`,
 `SpuVmDamperOn`/`Off`, `SsUtSetReverbDepth`) to reconfirm the recorded score
 before spending any budget: clean build, **195 words** compiled
 (`mipsel-linux-gnu-objdump` symbol-to-symbol distance on
-`build/src/code_179d8_k.c.o`), matching this report's own "5 words short"
+`build/src/libsnd_seqread.c.o`), matching this report's own "5 words short"
 figure against retail's 200.
 
 Round 32 rejected a permuter scaffold for this function at the sanity-check
@@ -442,7 +442,7 @@ how round 32 happened to build its scaffold.
 deeply worked (rounds 24/31/32/33) and this round's own contribution is
 negative-but-informative: the permuter route is closed for this specific
 residue class regardless of scaffold quality, which future rounds can take
-as settled rather than re-litigating. `src/code_179d8_k.c` unchanged
+as settled rather than re-litigating. `src/libsnd_seqread.c` unchanged
 (still `INCLUDE_ASM`); no commit needed for this function beyond this
 report addendum.
 

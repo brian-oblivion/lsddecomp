@@ -149,7 +149,7 @@ this is ordinary C control flow, not an unrepresentable GTE/COP2 access.
 
 ```c
 /* New struct field, already applied to the shared Entry90902E8 definition
- * in src/code_179d8_k.c (not part of this #if 0 body -- listed here for
+ * in src/libsnd_seqread.c (not part of this #if 0 body -- listed here for
  * completeness of what this stall depends on):
  *
  *   u8 unk11;   +0x11: cached MIDI-style running-status byte (0xFF standing

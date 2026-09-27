@@ -5,7 +5,7 @@
 > **Round 97 (track 6, runner charlie): `VoiceState80090368` is gone.** It was
 > never a per-voice state struct: `D_80090368` is Sony's mark-callback table
 > (libsnd `_SsMarkCallback`), `SsMarkCallbackProc [32][16]` from
-> `include/psyq/libsnd.h` -- the same table `ContNrpn1` (code_179d8_k) calls
+> `include/psyq/libsnd.h` -- the same table `ContNrpn1` (libsnd_seqread) calls
 > through as `D_80090368[ch][sl]`. A row of 16 four-byte function pointers is
 > the 0x40-byte stride this report measured. The unit now declares it
 > `extern SsMarkCallbackProc D_80090368[0x20][16];` and loop 3 stores
