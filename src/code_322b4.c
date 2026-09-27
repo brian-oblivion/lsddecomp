@@ -206,8 +206,11 @@ Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg
     return NULL;
 }
 
-/* Sprite's reset as its ctor calls it: with all five ctor arguments (the
- * slot is SceneNode's, typed without them; Sprite.h, "Not settled"). */
+/* Sprite's reset (+0x040) as its ctor calls it: with all five ctor
+ * arguments, returning what the ctor returns. The slot is SceneNode's, typed
+ * without them (Sprite.h, "Not settled"), and Sprite__Reset reads the first
+ * three. Local, where CharSpriteResetFn and VariantSpriteResetFn sit in their
+ * headers, because only this ctor calls through it. */
 typedef void *(*SpriteResetFn)(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4,
                                s32 arg5);
 
