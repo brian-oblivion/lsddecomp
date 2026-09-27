@@ -68,7 +68,7 @@ void TaskCore__SetTarget(Obj86B60 *self, Unk4CObj *a1)
         } while (*list != NULL);
     }
 
-    self->unk68 = New_BoxFill(D_8008A8E8, D_8008A8F0, 0);
+    self->unk68 = New_BoxFill(sListViewSize, D_8008A8F0, 0);
     a1->unk4 = handle;
 }
 ```
@@ -100,7 +100,7 @@ New `Obj86B60Methods` slot: `+0x0F8 slotF8(self, void *a1, Unk74Obj *a2)`.
 New external: `New_BoxFill(void*, void*, s32) -> Unk68Obj*` (lives in the
 still-uncarved `code_2cc8c_d` segment, not this unit's function — declared
 `extern` for this unit's own local view of what it returns). Its two
-pointer args, `D_8008A8E8`/`D_8008A8F0`, are only ever address-taken here,
+pointer args, `sListViewSize`/`D_8008A8F0`, are only ever address-taken here,
 so they're typed minimally (`s32[2]`/`char[4]`) matching their observed
 byte layout in `asm/data/7B008.sdata.s`.
 
@@ -131,7 +131,7 @@ After those two fixes: 106/110, remaining 4 words were pure address-drift
 from the OTHER 4 still-`INCLUDE_ASM` functions in this unit at the time —
 resolved automatically once `TaskCore__ReleaseTarget` and `TaskCore__UpdateSlotElements` were also
 matched (they precede this address range... actually follow it; the drift
-was in the trailing `D_8008A8E8`/`New_BoxFill` references, downstream
+was in the trailing `sListViewSize`/`New_BoxFill` references, downstream
 data/code whose absolute addresses depend on total image size).
 
 ### Proposed learning

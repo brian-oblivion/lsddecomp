@@ -169,7 +169,7 @@ extern s32 strlen(char *s); /* Psy-Q libc2/strlen, linked from Sony's
  * TaskCore's `BasicClass *` to it. */
 
 /* New_BoxFill: include/BoxFill.h. */
-extern s32 D_8008A8E8[2];  /* address-taken only by this unit */
+extern s32 sListViewSize[2];  /* address-taken only by this unit */
 extern char D_8008A8F0[4]; /* address-taken only by this unit */
 
 /* New_FadeBox: include/FadeBox.h. */

@@ -125,7 +125,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1) {
         } while (*list != NULL);
     }
 
-    self->listView = New_BoxFill(D_8008A8E8, D_8008A8F0, 0);
+    self->listView = New_BoxFill(sListViewSize, D_8008A8F0, 0);
     a1->handle = (BasicClass *)handle;
 }
 
