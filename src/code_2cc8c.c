@@ -62,7 +62,7 @@ void TaskCore__OnPadEvent(TaskCore *self, BasicClass *sender, s32 event) {
                 methods->onPadNext(self);
                 break;
             case 0x21:
-                methods->onPad21(self);
+                methods->onPadStart(self);
                 break;
             case 0x17:
                 methods->onPadCancel(self);
@@ -234,7 +234,7 @@ void TaskCore__Tick(TaskCore *self) {
     idx = self->activeSlot;
     if (target->unk24[idx] != NULL) {
         self->methods->beginElementScroll(self);
-    } else if (idx == target->unkC) {
+    } else if (idx == target->exitSlot) {
         self->methods->refreshViewValue(self);
     }
 }

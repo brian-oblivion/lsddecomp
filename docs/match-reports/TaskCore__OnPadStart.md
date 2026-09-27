@@ -63,3 +63,18 @@ class-scoped form rather than guessing.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__func_8003C7F4 (tools/rename.py): the class prefix. Occupant of +0x074 (`onPad21`, onPadEvent's 0x21 case). Kept func_: its only effect past playSound(0x10) is setState(0xA), which sets state 5 and nothing else. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Naming (round 98, alpha, track 7)
+
+**Tier A**: `TaskCore__func_8003C7F4` -> `TaskCore__OnPadStart`, slot +0x074
+`onPad21` -> `onPadStart`. onPadEvent calls this slot on event 0x21, and
+include/Pad.h says what that event is: Pad__DispatchEvents sends
+`PAD_EVENT_PRESSED` (0x12) plus the button's index in sButtonMasks, and
+index 15 is `PAD_BUTTON_START` (PADstart). Its four siblings already carry
+their buttons' names (0x12 Lup, 0x13 Ldown, 0x17 cross, 0x19 circle), so
+this is the same form. The body is the Start press: with a target, it plays
+the button tone and sets state 0xA (TASKCORE_STATE_START_PRESSED), which
+TaskCore__SetState treats as a return to the active state and which parents
+see through notifyParents; TitleMenu__SetState acts on it (cancel, jump to
+the target's first slot, confirm). The slot's only accessor is
+TaskCore__OnPadEvent (compiler error list).

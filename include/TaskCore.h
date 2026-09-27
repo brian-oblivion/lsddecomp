@@ -39,7 +39,7 @@
  *
  * Input. onPadEvent (IntermediateBase's Pad case) is a switch on the event
  * while inputMode is nonzero: 0x12 onPadPrev, 0x13 onPadNext, 0x17
- * onPadCancel, 0x19 onPadConfirm, 0x21 onPad21. inputMode 1 moves between
+ * onPadCancel, 0x19 onPadConfirm, 0x21 onPadStart. inputMode 1 moves between
  * the target's slots (find{Next,Prev}FreeSlot, setActiveSlot), 2 scrolls
  * the active slot's item list (beginElementScroll from tick, then
  * {advance,retreat}SlotCursor and commit/cancel). Confirm, cancel and 0x21
@@ -81,8 +81,8 @@ typedef struct TaskCoreTarget TaskCoreTarget;
 struct TaskCoreTarget {
     /* +0x000 */ const char *path; /* non-NULL: setTarget loads `handle` from it (New_TimImage) and releaseTarget releases that */
     /* +0x004 */ BasicClass *handle; /* New_TimImage(path), or the caller's own when path is NULL; the slot widgets' first argument */
-    /* +0x008 */ s32 unk8; /* setState(5): setActiveSlot(unk8, 0) */
-    /* +0x00C */ s32 unkC; /* tick: confirming this slot runs refreshViewValue */
+    /* +0x008 */ s32 unk8;     /* setState(5): setActiveSlot(unk8, 0) */
+    /* +0x00C */ s32 exitSlot; /* tick: confirming this slot (one with no item list) runs refreshViewValue, which fades the menu out */
     /* +0x010 */ u8 unselectedColor[3]; /* broadcastToSlots at state 5; the colour a slot or item loses focus to */
     /* +0x013 */ u8 selectedColor[3]; /* setActiveSlot's colour for the new slot */
     /* +0x016 */ u8 pad16[2];
@@ -100,7 +100,7 @@ struct TaskCoreTarget {
     /* +0x074..+0x084: onPadEvent's cases. Called with self alone: $a1 still  \
      * holds the sender at that call, but no occupant in any of the four     \
      * tables reads it, and StreamTask's overrides up-call with self only. */ \
-    /* +0x074 */ void (*onPad21)(Self *self);      /* TaskCore__OnPadStart: onPadEvent's 0x21 */ \
+    /* +0x074 */ void (*onPadStart)(Self *self);   /* TaskCore__OnPadStart: onPadEvent's 0x21 */ \
     /* +0x078 */ void (*onPadConfirm)(Self *self); /* TaskCore__OnPadConfirm: 0x19 */ \
     /* +0x07C */ void (*onPadCancel)(Self *self);  /* TaskCore__OnPadCancel: 0x17 */ \
     /* +0x080 */ void (*onPadPrev)(Self *self);    /* TaskCore__OnPadPrev: 0x12 */ \
