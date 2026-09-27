@@ -977,3 +977,13 @@ GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/Sc
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## Track 6 (round 97, alpha): the request local is ResourceRequest
+
+`ResourceSourceRequest` is deleted. The local is now `ResourceRequest req;`
+(include/FileResource.h, 0x0C) with `mode` left unset; the body is
+unchanged (`req.src...` writes, `&req.src` to New_LinkResource). A plain
+`ResourceSource` (8 bytes) was measured to shrink this function's frame by
+8 and move every callee-save slot, and an unused pad local is dropped by
+cc1, so ResourceRequest is the smallest existing type that keeps the frame.
+Byte-exact. Table and details: ResourceRequest__Set.md, round 97 second job.

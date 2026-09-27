@@ -132,3 +132,27 @@ builds byte-exact, so its size does not tell the two apart. Retiring it onto
 outside this job's edit set. `TodActorDesc` (include/code_55dd4.h) now opens
 with a `ResourceSource src` but is not a ResourceRequest: see
 TodActor__AcquireModelData.md.
+
+### Track 6 (round 97, alpha, second job): ResourceSourceRequest retired
+
+`ResourceSourceRequest` is deleted from include/FileResource.h. Its three
+locals are now `ResourceRequest req;` with `mode` never written:
+
+| function | retail frame | words written | passed |
+| --- | --- | --- | --- |
+| StageMap__PopulateSlotCells | 0x80, req at sp+0x50 | `src.buffer` (sp+0x50) | `&req.src` to New_LinkResource |
+| DayTask__DayTask | 0x38, req at sp+0x10 | `src.buffer = NULL`, `src.name` (sp+0x10/0x14) | `&req.src` to New_LinkResource |
+| GameApplication__GameApplication | 0x30, req at sp+0x10 | `src.buffer = NULL`, `src.name` (sp+0x10/0x14) | `&req.src` to New_LinkResource |
+
+Plain `ResourceSource` was tried first in all three and fails every one
+the same way: the frame shrinks by 8 (0x80 -> 0x78, 0x38 -> 0x30,
+0x30 -> 0x28), moving every callee-save slot (132/150, 93/107 and 42/50
+words). So the local is more than 8 bytes, and ResourceRequest's 0x0C
+rounds to the same frame as the old 0x10. A separate unused pad local
+(`ResourceSource src; s32 pad[1];`) does not help: cc1 drops the unused
+array and the frame still shrinks by 8, so the only honest spelling that
+keeps the frame is an existing type of 9..16 bytes, and ResourceRequest is
+the one this descriptor already has. Each local carries a MATCHING line
+saying mode is unset and why the type is not ResourceSource. The
+ResourceRequest comment in FileResource.h now names the three hand-filled
+callers. Image byte-identical after every step.
