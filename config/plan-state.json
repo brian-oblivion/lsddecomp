@@ -1243,6 +1243,16 @@
           "note": "Reopened by the tree twice this round (polish passes typed a global in one unit): gTextEntryCursorPos -> one ScreenSpritePos in TextEntry.h (bravo, with TextEntry playSound/actOnHeld/toggleActOnHeld); gStyleCueSlots -> StyleCueSlot *[2] in class_3bb8c_m too (head).",
           "round": 98,
           "runners": 1
+        },
+        {
+          "attempts": 1,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 1,
+          "model": "opus",
+          "note": "Reopened once by the tree (a polish pass typed a global in one unit): gDefaultStreamTaskInitData is one DrawRect in code_2cc8c_c too (head).",
+          "round": 99,
+          "runners": 1
         }
       ],
       "status": "auto"
@@ -1378,6 +1388,16 @@
           "note": "Last four placeholder types; track 6 measures done. code_179d8_l onto Sony's VagAtr (D8008E978Entry) and VabHdr (ObjE970), SsScore.h, SpuRegs; RGB8003CB68 is BgLayerRgb; RGB80040790 and round 97's GraphPointColor are one BoxFillRgb in BoxFill.h; SpriteCtorReset_322b4 -> SpriteResetFn (the cast Sprite's ctor calls reset through).",
           "round": 98,
           "runners": 4
+        },
+        {
+          "attempts": 2,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 2,
+          "model": "opus",
+          "note": "Two head-flagged types, both done: SkipShort2 -> BoxFillSize (two s32 words; the halfword layout was never needed to match, measured), StreamTaskInitData retired for DrawSystem.h's DrawRect (gDefaultMovieFrame, GetDefaultMovieFrame tier A).",
+          "round": 99,
+          "runners": 2
         }
       ],
       "status": "auto",
@@ -1478,6 +1498,16 @@
           "note": "Nine units marked after five samples each: class_3bb8c_i (TextEntry on Pad events), code_2cc8c_c (IntermediateBase/Viewport through Pad and DrawSystem slots, CLASS_ID_ROOT_MASK, <CLASS>_CLASS_IDs), class_3bb8c_e (re-send of round 97's unbuilt pass: delete(path) for delete(pathBuf) was what shifted the image), class_3ac78 (StageMap front third, ACTOR_CLASS_ID), code_d294_c (SceneNode part 3, gHitHeightGate tier B), class_3bb8c_m (ObjMState, FadeBoxEvent, DreamSysMoveOverride, style setup), code_2cc8c (TaskCoreState tier B, TaskCoreInputMode, OnPadStart), code_179d8_e (VabStreamObj on <libsnd.h>), code_2cc8c_b (two-level slot picker, SlotEntry fields). Every runner OK named its own worktree (revision 36).",
           "round": 98,
           "runners": 9
+        },
+        {
+          "attempts": 12,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 12,
+          "model": "opus",
+          "note": "Twelve units marked after five samples each: code_179d8_h (CD driver's blocking file access; CD_SECTOR_SHIFT, CD_PATH_SIZE, CD_SEARCH_ATTEMPTS), code_322b4 (sprite classes; GsSPRITE attribute bits, ScreenSpriteAnchor, FIX12_SHIFT), code_55dd4 (TOD file/frame/packet structs), class_3bb8c_k (ItemList__PlaySound, Pad event names, STAGEMAP/FADEBOX/DREAMSYS_CLASS_ID), class_3bb8c_o (ActorMoveEvent, GRIDCELL_CLASS_ID), code_3770c (CdStream onto <libcd.h>/<libspu.h>, CdStreamState), code_2cc8c_f (full-width Shift-JIS helpers), class_39e08 (DayTaskPhase/Result, OBJM_CLASS_ID, RegisterRecordTableFiles tier B), code_2c054 (StreamTask keepActive, TaskTextObj retired for DrawSystem), code_179d8_l (vmanager's Sony data names; SsUtVibrateOn/Off identified by position, game 1448 -> 1446), code_2864 (Viewport__DrawNode; BGLAYER/BOXFILL/SPRITE/SCREENSPRITE_CLASS_ID), code_171e0 (Set/GetDataDirectory, gDataDirectory).",
+          "round": 99,
+          "runners": 12
         }
       ],
       "status": "auto",
@@ -1580,6 +1610,16 @@
           "note": "code_179d8_i_b..k -> libsnd_play.c (play.o, 0x2C on 3.0/3.3/3.5) + libsnd_seqread.c (3.3's seqread.o with one function 0x7C shorter); edge kept, separate objects in every build. Lead: play.o may be linkable as an o segment (3.3 match.txt AMBIGUOUS x4, resolved by the Snd_play pin).",
           "round": 98,
           "runners": 1
+        },
+        {
+          "attempts": 2,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 2,
+          "model": "opus",
+          "note": "code_322b4 -> Sprite.c (Sony objects both sides; content would split sprites from RequestedFile/FrameClock/LightRig, parked unsplit), code_3770c -> CdStream.c (one class; Sony objects both sides).",
+          "round": 99,
+          "runners": 2
         }
       ],
       "status": "auto"
