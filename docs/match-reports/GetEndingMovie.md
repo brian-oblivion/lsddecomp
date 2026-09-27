@@ -55,7 +55,7 @@ line carries `/* arity-ok: ... */`.
 
 - **Name:** `GetEndingMovie`
 - **Tier:** A
-- **Evidence:** wrapper of GetEndingMovieRecord that forwards the movie id; its caller (GameApplication__StartStreamTaskWithInit, slot +0x064) streams it.
+- **Evidence:** wrapper of GetEndingMovieRecord that forwards the movie id; its caller (GameApplication__PlayEndingMovie, slot +0x064) streams it.
 
 ## Naming history
 

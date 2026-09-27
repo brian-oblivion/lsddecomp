@@ -97,6 +97,6 @@ void GameApplication__StartGraphRoomStreamTask(GameApplication *self);
 void GameApplication__NoOpSlot5C(void);
 s32 GameApplication__PollStatusObj(GameApplication *self);
 void GameApplication__StartCinematicStream(GameApplication *self);
-void GameApplication__StartStreamTaskWithInit(GameApplication *self);
+void GameApplication__PlayEndingMovie(GameApplication *self);
 
 #endif

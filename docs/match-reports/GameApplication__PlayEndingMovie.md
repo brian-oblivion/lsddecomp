@@ -1,4 +1,6 @@
-# GameApplication__StartStreamTaskWithInit
+# GameApplication__PlayEndingMovie
+
+> Renamed from `GameApplication__StartStreamTaskWithInit` on 2026-09-27 (tools/rename.py). Address 0x80026900.
 
 > Renamed from `Class6D3C8__StartStreamTaskWithInit` on 2026-09-26 (tools/rename.py). Address 0x80026900.
 
@@ -21,7 +23,7 @@ added (matching `GameApplication__StartGraphRoomStreamTask`'s use of that slot).
 ## Final C
 
 ```c
-void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
+void GameApplication__PlayEndingMovie(GameApplication *self) {
     StreamTask *task;
     s32 typeCode;
     s32 outerValue;
@@ -70,7 +72,7 @@ which library helper derives the type code and whether extra slots
 
 ## Naming
 
-**`GameApplication__StartStreamTaskWithInit` -- tier B.** Mechanics: gated by
+**`GameApplication__PlayEndingMovie` -- tier B.** Mechanics: gated by
 `arg->unk08` (same gate as `GameApplication__PlayOpeningMovie`), builds a
 `StreamTask`, runs its `slot12C` (a step none of the other three
 StreamTask-launcher siblings besides `GameApplication__StartCinematicStream`

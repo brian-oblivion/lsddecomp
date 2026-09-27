@@ -391,7 +391,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
  * initializes the task with it, then starts it -- the same shape as
  * GameApplication__LoadIntroLogoSequence/GameApplication__PlayOpeningMovie, but with setSkipOnConfirm(0) added and GetEndingMovie
  * in place of GetAsmkMovie/PickOpeningMovie. */
-void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
+void GameApplication__PlayEndingMovie(GameApplication *self) {
     StreamTask *task;
     s32 typeCode;
     s32 outerValue;
