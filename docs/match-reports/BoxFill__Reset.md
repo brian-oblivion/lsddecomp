@@ -81,3 +81,11 @@ halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
 became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
 BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
 its caller in code_2cc8c_b passes an `s32 size[2]`).
+
+## Track 7 (round 100, charlie)
+
+### Naming
+
+- **`gBoxFillDefaultColor`** (was `D_8008A924`) -- tier A. An sdata word
+  `80 80 80 00`: the colour Reset passes to setColor when its `color`
+  argument is NULL, and its only reader. Named for that one use.

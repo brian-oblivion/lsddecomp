@@ -76,3 +76,19 @@ is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
 already says what the body does. renametype.py rewrote the old class name in
 this report's earlier history too (known, pending an operator decision).
 
+
+## Track 7 (round 100, charlie)
+
+### Naming
+
+- **`gFadeBoxMaskColors`** (was `D_8006EA90`) -- tier A. Eight 3-byte RGB
+  entries indexed by a FadeBox channel mask at a 3-byte stride (this ctor,
+  StartFadeDown, GetColor). Retail's bytes are the mask's own channels at
+  0xFF: entry 1 `00 00 FF` (b), 2 `00 FF 00` (g), 3 `00 FF FF`, 4 `FF 00 00`
+  (r), 5 `FF 00 FF`, 6 `FF FF 00`, 7 and 0 `FF FF FF`. The table IS the
+  mask-to-colour mapping, so the name is its mechanics.
+- **`gFadeBoxBlackColors`** (was `D_8006EAA8`) -- tier A. Directly after it,
+  24 zero bytes: the same eight-entry shape, every entry black. StartFadeUp
+  indexes it by mask; this ctor (mask 0), Stop and GetColor (mask 0xF) use
+  its first entry whole. Named for its contents and for being the black
+  twin of the mask table.
