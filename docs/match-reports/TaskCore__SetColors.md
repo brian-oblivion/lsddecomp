@@ -66,7 +66,7 @@ first try.
 Before this generalizes further than warranted: **all five of this
 round's whole-struct-assignment closures are within units descended from
 the same original `code_2cc8c` monolith** (`code_2cc8c`, `code_2cc8c_b`,
-`code_2cc8c_c`, `code_2cc8c_e`, `code_2cc8c_f` -- all carved from one
+`code_2cc8c`, `code_2cc8c_e`, `code_2cc8c_f` -- all carved from one
 segment across earlier rounds). I have not tried this lever, or seen it
 tried, anywhere outside that family (`Entity.c`, `DreamSys.c`,
 `class_3bb8c*.c`, etc.), so I cannot personally attest it holds there.

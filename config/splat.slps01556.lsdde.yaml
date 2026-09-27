@@ -1224,7 +1224,6 @@ segments:
       # the asm remainder, where the yaml already parks its rodata slot at
       # 0x1908. So nothing to attach and no hasm/.word disposition; that
       # decision lands on whoever carves past function 59.
-      - [0x2E7A0, c, code_2cc8c_c]
       # code_2cc8c_d: first slice of the 93-function code_2cc8c remainder,
       # 0x2F0B8..0x2FAAC, 33 functions. Carved round 13.
       #

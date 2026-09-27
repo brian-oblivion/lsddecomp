@@ -15,7 +15,7 @@
  * include/TaskCore.h.
  */
 
-/* Defined in code_2cc8c_c.c: &gDefaultMovieFrame. */
+/* Defined in code_2cc8c.c: &gDefaultMovieFrame. */
 extern DrawRect *GetDefaultMovieFrame(void);
 
 /* resetCounters' colours for setColors, three RGB triples back to back:

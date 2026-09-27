@@ -359,7 +359,7 @@ toolchain question, not a per-function one)?
 
 ## Naming
 
-`Unk18Obj__InitDefaults` -- tier A. Slot40 occupant, called once from `Viewport__Viewport`'s own constructor tail (`self->methods->slot40(self)`, `code_2cc8c_c.c`) immediately after the base ctor. Body is straight-line field initialization to constants. Mechanics (post-ctor default init) are the whole of its purpose.
+`Unk18Obj__InitDefaults` -- tier A. Slot40 occupant, called once from `Viewport__Viewport`'s own constructor tail (`self->methods->slot40(self)`, `code_2cc8c.c`) immediately after the base ctor. Body is straight-line field initialization to constants. Mechanics (post-ctor default init) are the whole of its purpose.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 

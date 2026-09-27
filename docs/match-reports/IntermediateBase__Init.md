@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E10C` on 2026-09-19 (tools/rename.py). Address 0x8003e10c.
 
-**Unit:** code_2cc8c_c · **Size:** 93 instructions
+**Unit:** code_2cc8c · **Size:** 93 instructions
 
 ## What it does
 
@@ -133,7 +133,7 @@ tells you which.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. 2 attempts (address
+round 13 (2026-09-03), runner alpha, unit code_2cc8c. 2 attempts (address
 drift on the first, closed on the second by hoisting `self->unk18` into a
 local at the position retail's own instruction schedule implied).
 

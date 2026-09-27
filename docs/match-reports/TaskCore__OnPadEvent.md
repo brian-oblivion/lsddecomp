@@ -118,7 +118,7 @@ is its first realised match.
 `gTaskCoreMethods` (the base table), `gTitleMenuMethods` and
 `gGraphRoomMethods` identically (unoverridden by either derived class --
 `tools/classtable.py gTaskCoreMethods`/`gTitleMenuMethods`/`gGraphRoomMethods`).
-`IntermediateBase__OnNotify` (code_2cc8c_c.c) dispatches an incoming `EventArg` whose
+`IntermediateBase__OnNotify` (code_2cc8c.c) dispatches an incoming `EventArg` whose
 `target->header & 0xF == 2` through `self->methods->slot58`, matching the
 already-established `onTag1Notify` (header==1, slot54) naming convention one
 slot up. Two independent pieces of evidence agree (the dispatcher's own

@@ -96,11 +96,11 @@ different lever (expression form, not declaration order).
 
 ## Naming
 
-`Unk18Obj__AttachViewChild` -- tier B. One-time init guarded by `self->unk10`: registers `a1` through the inherited `addChild` slot (which, per `Viewport__AddChild` in `code_2cc8c_c.c`, sets `self->unk10` itself when `a1`'s dynamic-class tag is 4), forwards `a2`/`a3` to `slot78`/`slot7C` (this unit's own `Viewport__SetViewPoint`/`Viewport__SetViewRef`), then hands `&self->unk14` to Sony's `GsSetRefView2`. "View" is inferred from that GsSetRefView2 hand-off, not proven for the field itself -- tier B, not A, per round 72's rule on asserting what data means.
+`Unk18Obj__AttachViewChild` -- tier B. One-time init guarded by `self->unk10`: registers `a1` through the inherited `addChild` slot (which, per `Viewport__AddChild` in `code_2cc8c.c`, sets `self->unk10` itself when `a1`'s dynamic-class tag is 4), forwards `a2`/`a3` to `slot78`/`slot7C` (this unit's own `Viewport__SetViewPoint`/`Viewport__SetViewRef`), then hands `&self->unk14` to Sony's `GsSetRefView2`. "View" is inferred from that GsSetRefView2 hand-off, not proven for the field itself -- tier B, not A, per round 72's rule on asserting what data means.
 
 ## Proposed field names
 
-Not applied -- `unk10` is shared with `code_2cc8c_c.c` (`Viewport__AddChild`/
+Not applied -- `unk10` is shared with `code_2cc8c.c` (`Viewport__AddChild`/
 `Viewport__RemoveChild`/`Viewport__Viewport`/`Viewport__Finalize` all touch
 it), so this unit does not own it per track 3's ownership rule.
 

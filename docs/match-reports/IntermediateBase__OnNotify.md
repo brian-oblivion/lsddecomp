@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E030` on 2026-09-19 (tools/rename.py). Address 0x8003e030.
 
-**Unit:** code_2cc8c_c · **Size:** 52 instructions
+**Unit:** code_2cc8c · **Size:** 52 instructions
 
 ## What it does
 
@@ -82,7 +82,7 @@ this function's own bytes.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the first
+round 13 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the first
 build.
 
 ## Naming
@@ -110,7 +110,7 @@ confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
   shared within the code_2cc8c family. Head applies by type scope (rename
   the field in `BasicClassMethodsCC8C`'s own definition,
   `include/code_2cc8c.h`, rebuild, fix the compiler-listed accessors in
-  both `code_2cc8c_c.c` and `code_2cc8c_d.c`, oracle).
+  both `code_2cc8c.c` and `code_2cc8c_d.c`, oracle).
 
 ## Track 4 (2026-09-25, round 82, charlie)
 

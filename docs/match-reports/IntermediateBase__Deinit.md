@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E280` on 2026-09-19 (tools/rename.py). Address 0x8003e280.
 
-**Unit:** code_2cc8c_c · **Size:** 102 instructions (largest in this
+**Unit:** code_2cc8c · **Size:** 102 instructions (largest in this
 round's queue)
 
 ## What it does
@@ -105,7 +105,7 @@ attempts here.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
+round 13 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the
 first build.
 
 ## Naming

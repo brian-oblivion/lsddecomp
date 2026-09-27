@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003DFA0` on 2026-09-19 (tools/rename.py). Address 0x8003dfa0.
 
-**Unit:** code_2cc8c_c · **Size:** 7 instructions
+**Unit:** code_2cc8c · **Size:** 7 instructions
 
 ## What it does
 
@@ -55,7 +55,7 @@ way.
 
 ## Provenance
 
-round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
+round 12 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the
 first build.
 
 ## Naming

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E7F4` on 2026-09-19 (tools/rename.py). Address 0x8003e7f4.
 
-**Unit:** code_2cc8c_c · **Size:** 32 instructions
+**Unit:** code_2cc8c · **Size:** 32 instructions
 
 ## What it does
 
@@ -53,7 +53,7 @@ together.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
+round 13 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the
 first build. Last function in this round's queue -- see `IntermediateBase__OnNotify.md`
 and `New_Viewport.md` for the two shared-table classtable dumps
 (`gIntermediateBaseMethods`, `gViewportMethods`) that resolved this and every other function in
@@ -76,7 +76,7 @@ tag-keyed cached reference, THEN forwards to
   also dispatches `self->methods->slot14(self, self->unk10)` on a
   `Unk18Obj *`, so this field is shared with that unit. Head applies by
   type scope (rename in `Unk18ObjMethods`'s own definition, fix the
-  compiler-listed accessors in both `code_2cc8c_c.c` and
+  compiler-listed accessors in both `code_2cc8c.c` and
   `code_2cc8c_d.c`, oracle).
 
 ## Track 4 (2026-09-25, round 85, bravo)

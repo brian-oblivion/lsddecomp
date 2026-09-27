@@ -18,7 +18,7 @@ typedef struct TexPageDesc TexPageDesc;
 /*
  * TaskCore (class id 0x130, gTaskCoreMethods) is declared once, in
  * include/TaskCore.h (track 4, round 84): code_2cc8c.c, code_2cc8c.c and
- * the first function of code_2cc8c_c.c are its methods from +0x058 on. Its
+ * the first function of code_2cc8c.c are its methods from +0x058 on. Its
  * object used to be viewed here as `Obj86B60`, after the address of a
  * SUBCLASS table (gTitleMenuMethods); the views are gone.
  *

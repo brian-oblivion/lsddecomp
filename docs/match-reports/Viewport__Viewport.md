@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E628` on 2026-09-19 (tools/rename.py). Address 0x8003e628.
 
-**Unit:** code_2cc8c_c · **Size:** 41 instructions
+**Unit:** code_2cc8c · **Size:** 41 instructions
 
 ## What it does
 
@@ -82,7 +82,7 @@ before the byte-level score did.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
+round 13 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the
 first build (after correctly re-reading the delay-slot ordering above).
 
 ## Naming

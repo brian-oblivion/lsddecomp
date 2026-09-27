@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E578` on 2026-09-19 (tools/rename.py). Address 0x8003e578.
 
-**Unit:** code_2cc8c_c · **Size:** 20 instructions
+**Unit:** code_2cc8c · **Size:** 20 instructions
 
 ## What it does
 
@@ -59,7 +59,7 @@ evidence no function *yet attempted* has dereferenced it.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
+round 13 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the
 first build.
 
 ## Naming

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E874` on 2026-09-19 (tools/rename.py). Address 0x8003e874.
 
-**Unit:** code_2cc8c_c · **Size:** 17 instructions
+**Unit:** code_2cc8c · **Size:** 17 instructions
 
 ## What it does
 
@@ -39,7 +39,7 @@ void Viewport__RemoveAllChildren(Obj86B60 *self)
 
 ## Provenance
 
-round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
+round 12 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the
 first build.
 
 ## Naming

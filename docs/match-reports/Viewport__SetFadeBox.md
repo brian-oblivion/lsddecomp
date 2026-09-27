@@ -70,7 +70,7 @@ old `pad000[0x04C]` span ahead of the already-typed `slot4C`.
 
 ## Proposed field names
 
-Not applied -- `unkB0`/`unkAC` are both shared with `code_2cc8c_c.c`
+Not applied -- `unkB0`/`unkAC` are both shared with `code_2cc8c.c`
 (`Viewport__Viewport` sets both, `Viewport__Finalize` releases `unkAC`), so
 outside this unit's ownership per track 3's rule.
 

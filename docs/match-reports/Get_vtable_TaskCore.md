@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003DFBC` on 2026-09-19 (tools/rename.py). Address 0x8003dfbc.
 
-**Unit:** code_2cc8c_c · **Size:** 4 instructions
+**Unit:** code_2cc8c · **Size:** 4 instructions
 
 ## What it does
 
@@ -25,7 +25,7 @@ void *Get_vtable_TaskCore(void)
 
 ## Provenance
 
-round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
+round 12 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the
 first build.
 
 ## Naming

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E770` on 2026-09-19 (tools/rename.py). Address 0x8003e770.
 
-**Unit:** code_2cc8c_c · **Size:** 33 instructions
+**Unit:** code_2cc8c · **Size:** 33 instructions
 
 ## What it does
 
@@ -77,7 +77,7 @@ a close cousin one level of indirection removed).
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
+round 13 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the
 first build.
 
 ## Naming
@@ -98,7 +98,7 @@ shape. Mirrored exactly by `Viewport__RemoveChild`.
   renamed directly: `code_2cc8c_d.c`'s `Viewport__AttachViewChild` also dispatches
   `m->slot10(self, a1)` on a `Unk18Obj *`, so this field is shared with
   that unit. Head applies by type scope (rename in `Unk18ObjMethods`'s own
-  definition, fix the compiler-listed accessors in both `code_2cc8c_c.c`
+  definition, fix the compiler-listed accessors in both `code_2cc8c.c`
   and `code_2cc8c_d.c`, oracle).
 
 ## Track 4 (2026-09-25, round 85, bravo)

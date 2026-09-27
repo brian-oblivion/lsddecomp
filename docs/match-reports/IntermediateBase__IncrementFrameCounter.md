@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E4A4` on 2026-09-19 (tools/rename.py). Address 0x8003e4a4.
 
-**Unit:** code_2cc8c_c · **Size:** 5 instructions
+**Unit:** code_2cc8c · **Size:** 5 instructions
 
 ## What it does
 
@@ -28,7 +28,7 @@ void IntermediateBase__IncrementFrameCounter(Obj86B60 *self)
 
 ## Provenance
 
-round 12 (2026-09-03), runner alpha, unit code_2cc8c_c. Matched on the
+round 12 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the
 first build.
 
 ## Naming
