@@ -117,6 +117,10 @@ extern s32 strlen(char *s);
  * independent-arities convention. */
 extern void DecodeFullWidthSjis(void *dst, void *src);
 
+/* gSaveTitle is 2-byte full-width characters; the characters from here on
+ * are padding after "LSD   Day001" (class_3bb8c_g.c's SAVE_TITLE_PADDING). */
+#define SAVE_TITLE_PADDING 12
+
 /* The setTarget override: `target` is the TaskCoreTarget the ctor passes
  * (&D_80086D44); only its `handle` is read, as the TextRow's texture. */
 void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
@@ -127,10 +131,10 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
         return;
     }
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
-        strcpy((char *)gSaveTitle + 0x18, (char *)sSaveTitleBlanks);
-        StampSaveTitleFileLetter((char *)gSaveTitle, NULL);
+        strcpy(gSaveTitle + SAVE_TITLE_PADDING * 2, sSaveTitleBlanks);
+        StampSaveTitleFileLetter(gSaveTitle, NULL);
     }
-    size = strlen((char *)gSaveTitle);
+    size = strlen(gSaveTitle);
     size = (size >> 1) + 4;
     buf = BMemPMgrAlloc(size);
     DecodeFullWidthSjis(buf, gSaveTitle);
@@ -223,7 +227,7 @@ void TitleMenu__BeginCardAccess(TitleMenu *self) {
         self->saveIcon = New_TimImage((char *)sSaveIconTimPath);
         self->saveCtrl = New_TaskObjF(1, 0);
     }
-    self->saveCtrl->methods->init(self->saveCtrl, sCardFilePrefix, (char **)&sSaveFileSuffixes,
+    self->saveCtrl->methods->init(self->saveCtrl, sCardFilePrefix, sSaveFileSuffixes,
                                   self->initArgs->pad, self->unk10, (struct SceneNode *)self->unk14,
                                   (struct VabStreamObj *)self->sound);
     self->methods->addChild(self, (BasicClass *)self->saveCtrl);
@@ -245,7 +249,7 @@ void TitleMenu__SaveToCard(TitleMenu *self) {
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf);
     self->methods->beginCardAccess(self);
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
-        *(u8 *)sSaveFileName = 0;
+        sSaveFileName[0] = '\0';
     }
     self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, gSaveTitle, 0xD, 3,
                                        self->saveIcon, self->saveBlock, self->saveBlockSize);
