@@ -161,7 +161,7 @@ DreamAuxTriggerEntry *RemapTriggerForDreamColor(DreamAuxTriggerEntry *trigger, s
         DreamSys *player = gDreamAuxWorld;
         s32 color = player->methods->getDreamColor(player);
 
-        if (color == stage) {
+        if (color == DREAM_COLOR_RED) {
             trigger += 5;
         }
     }
