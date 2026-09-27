@@ -1250,7 +1250,11 @@ def jobs(d, n):
                 q7.append(("7", f"HEAD (premium) setup {k}: {TRACK7_SETUP[k]} (FINISHING-PLAN track 7)", P))
         if all(t["7"]["setup"].values()):
             rdu = p2["_rd"]["units"]
-            for u in p2["_todo7"]:
+            # A unit a WAITING job waits on goes first: its Sony collisions
+            # are its polish pass's to fix (round 95: ViewportOt waited on
+            # code_2cc8c_d, whose pass ranked 22nd).
+            blockers = {Path(w).stem for _, ws in d.get("_waiting", []) for w in ws if w.startswith("src/")}
+            for u in sorted(p2["_todo7"], key=lambda u: u not in blockers):
                 m = rdu[u]
                 debt = ", ".join(f"{m[k]} {k}" for k in ("func_", "D_", "unk", "magic", "rawoff", "m2c", "history")
                                  if m[k])

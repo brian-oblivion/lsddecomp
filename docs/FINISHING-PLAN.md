@@ -206,7 +206,8 @@ and every unit including it, directly or through another header, since each
 takes Sony's headers in the same fix; headers sharing an includer are one
 job (round 95). A flagged fix that needs
 Sony's headers where those collisions sit is flagged `--after <files>`, and
-`plan.py` lists it as WAITING until each has left `tools/sonyheaders.py`.
+`plan.py` lists it as WAITING until each has left `tools/sonyheaders.py`,
+and ranks the polish pass of a unit it waits on first.
 A class job's edit set is its header plus the units holding the class's own
 methods (their banners and field accessors), so a polish pass on one of those
 units defers behind it (round 93: class_3bb8c behind StageMap's job).
