@@ -27,38 +27,26 @@
  * are interchangeable data sources behind one small dispatch layer.
  */
 #include "common.h"
+#include <libetc.h>
+#include <libcd.h>
 #include "CdDriver.h"
 #include "DrawSystem.h"
-
-/* CdDriver, its table and its methods are include/CdDriver.h's (track 4,
- * round 88): the per-call-site views this unit declared (Obj6D4E8_C80,
- * Obj6D4E8_D70, Obj6D4E8_282AC, and the table views Methods6D4E8_C80 /
- * Methods6D4E8_80EC) were that one class. */
-
-/* +0x04 of whatever object a still-uninitialized local $s2 points at on this
- * path -- see the CdDriver__RequestLoadFile report for why that local is
- * never assigned. Only the one field this store touches is typed, and the
- * object's identity is unknowable from here, so the name stays a
- * placeholder. */
-typedef struct UnkC80 UnkC80;
-
-struct UnkC80 {
-    u8 pad00[0x04];
-    /* +0x04 */ s32 unk04;
-};
 
 extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
 extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
 
 void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
-    UnkC80 *s2;
+    s32 *unassigned; /* never assigned: see the store below */
     s32 idx;
 
     LockCd();
 
     if (name != NULL) {
         if (gCdAsyncEnabled != 0) {
-            s2->unk04 = 1;
+            /* MATCHING: retail stores 1 through an unassigned callee-saved
+             * register (whatever the caller left in $s2), a bug in the
+             * original; which object it meant to reach is unknowable. */
+            unassigned[1] = 1;
             idx = FindCdFileIndex(name);
             EnqueueCdRequest(self, idx, CD_OP_LOAD_FILE, 0, 0);
         } else {
@@ -83,7 +71,6 @@ void CdDriver__StopService(void) {
     UnlockCd();
 }
 
-extern void CdFlush(void);
 extern void ResetCdStateMachine(void);             /* code_179d8_r: reset the state machine */
 extern void FreeCdRequestNode(CdRequestNode *req); /* code_179d8_r: unlink+free */
 
@@ -126,18 +113,6 @@ CdDriverMethods *GetCdDriverMethods(void) {
     return &gCdDriverMethods;
 }
 
-/* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) --
- * per-call-site typed for this unit, per the code_179d8_h.c convention.
- * The two constants are Psy-Q's own (include/psyq/libcd.h: CdlSetmode 0x0E,
- * CdlModeSpeed 0x80 = double speed); they are spelled locally rather than by
- * including LIBCD.H, because this unit's libcd declarations are deliberately
- * per-call-site and Sony's prototypes would conflict with them. */
-extern s32 CdSetDebug(s32 level);
-extern s32 CdControlB(u_char com, void *param, void *result);
-
-#define CD_CMD_SETMODE 0x0E
-#define CD_MODE_DOUBLE_SPEED 0x80
-
 extern s32 sCdDriveInited;
 
 void InitCdDrive(void) {
@@ -148,8 +123,8 @@ void InitCdDrive(void) {
     }
 
     CdSetDebug(0);
-    mode = CD_MODE_DOUBLE_SPEED;
-    while (CdControlB(CD_CMD_SETMODE, &mode, 0) == 0) {
+    mode = CdlModeSpeed;
+    while (CdControlB(CdlSetmode, &mode, 0) == 0) {
     }
     sCdDriveInited = 1;
 }
@@ -225,22 +200,7 @@ s32 GetFileTableCount(void) {
     return gFileTableCount;
 }
 
-/* CdSearchFile's output buffer, which is Sony's CdlFILE: pos, size, name[16]
- * = 0x18 bytes (include/psyq/libcd.h). The 0x18 was derived here
- * independently, from the span between this local's stack slot (sp+0x50) and
- * the next saved register (sp+0x68), and it is the same figure
- * code_179d8_h.c's OpenCdFile derived for the same Sony function. Only
- * the two fields this call site copies out are typed. */
-typedef struct CdFileInfo CdFileInfo;
-
-struct CdFileInfo {
-    CdLoc16 pos;
-    u32 size;
-    u8 pad8[0x18 - 0x8];
-};
-
-extern const char sFileNotFoundMsg[];                      /* "File not found. file = %s\n" */
-extern s32 CdSearchFile(CdFileInfo *fileInfo, char *path); /* libcd/iso9660.o */
+extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
 extern void printf(const char *fmt, void *arg1);
 extern char *BuildCdFilePath(char *dest, char *suffix); /* code_179d8_r */
 extern void InitCdDrive(void);
@@ -250,7 +210,7 @@ extern void InitCdDrive(void);
 s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
     CdFileEntry *end;
     char path[0x40];
-    CdFileInfo info;
+    CdlFILE info;
     s32 tries;
 
     end = entries + count;
@@ -269,7 +229,8 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
         printf(sFileNotFoundMsg, path);
 
     found:
-        entries->pos = info.pos;
+        /* CdLoc16 is the project's spelling of CdlLOC's four bytes (FileResource.h). */
+        entries->pos = *(CdLoc16 *)&info.pos;
         entries->size = info.size;
     }
 
@@ -297,7 +258,6 @@ extern s32 GetBMemPMgrBusy(void);             /* code_8220_b */
 extern void TickCdStateMachine(void);         /* code_179d8_r: state-machine step 1 */
 extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
 extern s32 gCdQueueEnabled;
-extern void VSyncCallback(void (*cb)(void));
 
 s32 ServiceCdDriver(void) {
     if (gCdLock != 0) {
@@ -347,7 +307,6 @@ void StartCdService(void) {
 
 extern s32 gCdCallbackInstalled;
 extern s32 gCdQueueEnabled;
-extern void VSyncCallback(void (*cb)(void));
 
 void StopCdServiceIfIdle(void) {
     LockCd();
@@ -371,36 +330,18 @@ void DisableCdQueue(void) {
     UnlockCd();
 }
 
-/* The same 0x24-byte queue node CdRequestNode above is a view of, from the
- * writing side: AllocCdRequestNode (code_179d8_r) allocates one and links it onto
- * gCdRequestQueue, and only the fields this call site writes are typed here
- * (padded to their offsets, per this unit's convention). `op` takes the
- * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into gFileTable (0
- * when the op does not name a file), and param0/param1 are the two per-op
- * arguments code_179d8_s passes through: a byte count and a flag for op 4, a
- * buffer and a size for op 5. */
-typedef struct CdRequest_282AC CdRequest_282AC;
+extern CdRequestNode *AllocCdRequestNode(void); /* code_179d8_r: alloc + link */
 
-struct CdRequest_282AC {
-    u8 pad00[0x08];
-    /* +0x08 */ s32 op;
-    /* +0x0C */ s32 owner;
-    /* +0x10 */ s32 fileIndex;
-    /* +0x14 */ s32 param0;
-    /* +0x18 */ s32 param1;
-};
-
-extern CdRequest_282AC *AllocCdRequestNode(void); /* code_179d8_r: alloc + link */
-
-/* The store order below is retail's own (+0x08, +0x14, +0x0C, +0x10, +0x18),
- * not ascending offset -- see the match report: this compiler keeps
- * statement order for these, so the statements are in retail's order. */
+/* Fills a node AllocCdRequestNode has already linked onto gCdRequestQueue,
+ * counts it against its owner and starts the service tick.
+ * MATCHING: the stores are in retail's order (+0x08, +0x14, +0x0C, +0x10,
+ * +0x18); this compiler keeps statement order. */
 void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1) {
-    CdRequest_282AC *entry = AllocCdRequestNode();
+    CdRequestNode *entry = AllocCdRequestNode();
 
     entry->op = op;
     entry->param0 = param0;
-    entry->owner = (s32)owner;
+    entry->owner = owner;
     entry->fileIndex = fileIndex;
     entry->param1 = param1;
 

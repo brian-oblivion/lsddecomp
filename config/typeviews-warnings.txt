@@ -38,7 +38,7 @@ code_179d8_m: warning: comparison between signed and unsigned
 code_179d8_q: src/code_179d8_q.c: At top level:
 code_179d8_q: warning: `LockCd' was previously implicitly declared to return `int'
 code_179d8_q: warning: `UnlockCd' was previously implicitly declared to return `int'
-code_179d8_q: warning: `s2' might be used uninitialized in this function
+code_179d8_q: warning: `unassigned' might be used uninitialized in this function
 code_179d8_q: warning: implicit declaration of function `LockCd'
 code_179d8_q: warning: implicit declaration of function `UnlockCd'
 code_179d8_q: warning: previous external decl of `LockCd'
