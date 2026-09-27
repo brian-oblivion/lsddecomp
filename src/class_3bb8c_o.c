@@ -50,7 +50,7 @@ typedef struct Vec3O {
 
 /* A rand()-indexed table of 6 Vec3-shaped entries, handed to each sprite's
  * updateScale. */
-extern Vec3O gLinkElemVec3Table[];
+extern Vec3O gStyleEffectJitterScales[];
 
 void StyleEffect__ReleaseSprites(StyleEffect *self) {
     ReleaseBasicClassArray((void **)self->sprites, 5);
@@ -67,7 +67,7 @@ void StyleEffect__RandomizeSprites(StyleEffect *self) {
     for (i = 0; i < 4; i++, p++) {
         u32 r = rand();
 
-        (*p)->methods->updateScale(*p, 1, &gLinkElemVec3Table[r % 6]);
+        (*p)->methods->updateScale(*p, 1, &gStyleEffectJitterScales[r % 6]);
         (*p)->sprite.rotate = (rand() % 360) << 12;
     }
 }
