@@ -310,7 +310,7 @@ merely a manual attempt list agreeing with itself.
 ## ROUND 20 (runner echo): tested the `GetRCnt` two-independently-live-locals lever -- regressed, negative
 
 Per the coordinator's cross-unit transferability question (does the lever
-that closed 5/7 residue words on `code_179d8_c`'s `GetRCnt` --
+that closed 5/7 residue words on `libsnd_ssinit`'s `GetRCnt` --
 splitting a combined `base = tableBase; entry = &base[idx];` into two
 independently-live locals instead of one combined expression -- transfer
 to `class_3ac78`), tested it against this function's own base+index
@@ -337,7 +337,7 @@ rephrasing. Reverted immediately; `git diff --stat` confirmed clean.
 
 **Transferability verdict for this function: negative.** This is the
 SECOND unit-specific negative for the lever (after `ResetRCnt` in
-`code_179d8_c` itself), and the failure mode is the same shape both
+`libsnd_ssinit` itself), and the failure mode is the same shape both
 times: introducing a new independently-live local costs register
 pressure this function's existing allocation doesn't have slack for, even
 though the underlying address computation LOOKS structurally identical

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80032388` on 2026-09-24 (tools/rename.py). Address 0x80032388.
 
-**Unit:** code_179d8_c · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
+**Unit:** libsnd_ssinit · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
 ## What it does
 
@@ -23,11 +23,11 @@ void SsInitHot(void)
 ```
 
 (shares the `extern void _SsInit(s32 arg0);` prototype declared
-above `SsInit` in `src/code_179d8_c.c`.)
+above `SsInit` in `src/libsnd_ssinit.c`.)
 
 ## Provenance
 
-round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
+round 16 (2026-09-04), runner delta, unit libsnd_ssinit (fresh carve).
 Matched first attempt, alongside `SsInit`.
 
 ## Naming (round 78, runner alpha)

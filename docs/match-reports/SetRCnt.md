@@ -1,6 +1,6 @@
 # SetRCnt
 
-**Unit:** code_179d8_c · **Size:** 40 instructions · **Status:** MATCHED (40/40 words)
+**Unit:** libsnd_ssinit · **Size:** 40 instructions · **Status:** MATCHED (40/40 words)
 
 Not a `psyq_*` segment function, but Sony's `SetRCnt` all the same: see
 "Identification (round 69, head)" at the end. It and its four neighbours are
@@ -153,7 +153,7 @@ Two are proposed for consolidation into DECOMPILATION_LEARNINGS.md:
 
 ## Provenance
 
-round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve).
+round 16 (2026-09-04), runner delta, unit libsnd_ssinit (fresh carve).
 Matched after ~4 attempts (signedness fix, branch-direction/guard-clause
 shape not needed here since it already matched, and the scheduling
 barrier).

@@ -412,7 +412,7 @@ operand orders produce the identical wrong register/operand assignment
 `class_3bb8c` instances as the same phenomenon.
 
 **This makes CalcDreamColor a sixth confirmed instance of the class, and
-the third unrelated unit** (after three in `code_179d8_c` and two in
+the third unrelated unit** (after three in `libsnd_ssinit` and two in
 `class_3bb8c`), independently found without knowing charlie's result in
 advance -- this report's own residue description ("both addus end up
 register-swapped relative to retail... reshapes... all four producing

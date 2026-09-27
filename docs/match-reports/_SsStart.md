@@ -4,7 +4,7 @@
 
 > Renamed from `func_80032708` on 2026-09-23 (tools/rename.py). Address 0x80032708.
 
-Unit `code_179d8_c`, carved round 16 (2026-09-04). **Attempted, restored
+Unit `libsnd_ssinit`, carved round 16 (2026-09-04). **Attempted, restored
 to `INCLUDE_ASM`.** Callee-saved register screen: 2 (`$s0`, `$s1`) --
 well under the deprioritisation band; not the blocker (see "Answering
 the head's question" below).
@@ -476,7 +476,7 @@ function.
 
 ## Provenance
 
-round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve,
+round 16 (2026-09-04), runner delta, unit libsnd_ssinit (fresh carve,
 second pass, head-directed follow-up on the big-three queue). ~4
 attempts (nested if/else baseline, switch conversion, one regression +
 revert); restored to `INCLUDE_ASM`.
@@ -502,7 +502,7 @@ round's time budget; not re-attempted, to avoid burning attempts without
 a concrete new idea. Still restored to `INCLUDE_ASM`, 65/164.
 
 round 41 (2026-09-14), runner delta, unit `libsnd_ssinit_libapi_counter` (renamed from
-`code_179d8_c` in round 33's SDK split). Re-verified the inherited
+`libsnd_ssinit` in round 33's SDK split). Re-verified the inherited
 65/164 body builds clean and matches this report's own figure. Tried the
 report's own named next step (case-body reorder to `5, 3, 2, 0, default`,
 with and without a paired local-declaration-order swap) -- both

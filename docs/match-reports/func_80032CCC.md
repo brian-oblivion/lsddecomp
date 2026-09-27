@@ -10,7 +10,7 @@
 > **Everything below is kept as the derivation it was, not as live guidance.**
 
 
-**Unit:** code_179d8_c · **Size:** 13 instructions · **Status:** MATCHED (13/13 words)
+**Unit:** libsnd_ssinit · **Size:** 13 instructions · **Status:** MATCHED (13/13 words)
 
 ## What it does
 
@@ -31,9 +31,9 @@ s16 func_80032CCC(void *a0, s16 a1, s32 a2)
 
 (shares the `extern s16 func_80032D34(void *a0, s16 a1, s32 a2, s32
 a3);` prototype declared above `func_80032C98` in
-`src/code_179d8_c.c`.)
+`src/libsnd_ssinit.c`.)
 
 ## Provenance
 
-round 16 (2026-09-04), runner delta, unit code_179d8_c (fresh carve,
+round 16 (2026-09-04), runner delta, unit libsnd_ssinit (fresh carve,
 second pass). Matched first attempt, alongside `func_80032C98`.

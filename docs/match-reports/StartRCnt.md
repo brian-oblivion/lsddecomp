@@ -4,7 +4,7 @@
 
 > Renamed from `func_80032BF0` on 2026-09-23 (tools/rename.py). Address 0x80032bf0.
 
-Unit: `code_179d8_c`. Round 23, runner bravo.
+Unit: `libsnd_ssinit`. Round 23, runner bravo.
 
 ## What it does
 

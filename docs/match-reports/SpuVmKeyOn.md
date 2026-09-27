@@ -262,7 +262,7 @@ caught because this body had apparently never actually been linked since
 it was written:
 
 1. **`func_80032148` does not exist under that name any more.** It is
-   Sony's own `SpuVmVSetUp` (`code_179d8_c.c`'s own header comment: "round
+   Sony's own `SpuVmVSetUp` (`libsnd_ssinit.c`'s own header comment: "round
    32 then found it is Sony's ... see docs/match-reports/func_80032148.md"),
    already declared and called with this exact signature
    (`s32 SpuVmVSetUp(s16 a0, s16 a1)`) by `SpuVmPitchBend` earlier in this
