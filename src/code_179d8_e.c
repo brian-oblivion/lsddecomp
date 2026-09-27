@@ -80,7 +80,7 @@ extern void SsUtAllKeyOff(s16 mode);
 /* Sony's `SsVabTransCompleted` (`libsnd/vs_vtc`) and `SsSetMute`
  * (`libsnd/scsmute`), linked from the SDK objects since round 34.  The two
  * signatures are this call site's own reading and disagree with the sibling
- * reading in code_179d8_i.c about the return types -- that is the project's
+ * reading in libsnd_decre.c about the return types -- that is the project's
  * independent-local-view convention, and it is exactly why a Psy-Q prototype
  * must never go into a header these units share. */
 extern void SsVabTransCompleted(s32 arg0);

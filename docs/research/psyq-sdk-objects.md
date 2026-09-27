@@ -348,7 +348,7 @@ back. Decisions and measurements made on the way:
 ## Round 34 (2026-09-12): the first data-bearing game-unit conversions, and a WEAK duplicate
 
 Head work while two runners converted the text-only game-unit runs
-(`libsnd` in `code_179d8_i/_j/_f`; the 13 BIOS trampolines, `strcat`, and
+(`libsnd` in `libsnd_decre/_j/_f`; the 13 BIOS trampolines, `strcat`, and
 the `libgs`/`libgte` objects in `code_2cc8c_e`).
 
 **`libc2/strcpy` + `libc2/strstr` + `libcd/sys`** (0x19378..0x19C78, crossing

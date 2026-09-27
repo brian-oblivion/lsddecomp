@@ -227,7 +227,7 @@ address drift.
 
 Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Bounds-checks
 `idx` against 0x18 under a `_snd_ev_flag` reentrancy lock (same lock/idiom as
-`code_179d8_i.c`'s `func_80033738`), converts the channel into a 32-bit-wide
+`libsnd_decre.c`'s `func_80033738`), converts the channel into a 32-bit-wide
 `(loBit, hiBit)` bitmask pair, clears three per-channel fields, then ORs the
 new bits into two running masks (`D_80090C60`/`D_80090C64`) and clears the
 corresponding bits out of two "active" masks (`D_8008E228`/`D_8008E22C`).

@@ -529,7 +529,7 @@ The carve record (round 24) and the blocker re-census (rounds 42 and 43), moved 
  * monolith, 0x24938..0x2673C (vram 0x80034138..0x80035F3C).  Carved round 24
  * (2026-09-08) out of what had been the `code_179d8_tail` asm remainder,
  * which this unit consumes WHOLE -- there is no remainder left on either
- * side (code_179d8_i in front, libsnd_cres behind).
+ * side (libsnd_decre in front, libsnd_cres behind).
  *
  * WHY IT WAS UNCARVED FOR SIX ROUNDS, AND WHY THAT VERDICT IS DEAD.
  * The splat comment on the old remainder read "17 of its 18 functions are
@@ -576,7 +576,7 @@ The carve record (round 24) and the blocker re-census (rounds 42 and 43), moved 
 
 code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
-libsnd_cres, code_179d8_i and code_179d8_j already use. The header gained
+libsnd_cres, libsnd_decre and code_179d8_j already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
 moved); field names stay offset-only (`unkNN`) as the header's convention for
 Sony-only fields, with each one's mechanics in its comment. The unit's

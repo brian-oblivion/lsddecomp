@@ -895,14 +895,14 @@ void SetPitchBend(s16 a0, s16 a1) {
 
 /* Cross-unit calls, local guesses per project convention. SpuVmSeqKeyOff is
  * matched in code_179d8_j.c and already has this exact "(slot<<8)|channel"
- * single-argument reading in both libsnd_cres.c and code_179d8_i.c;
+ * single-argument reading in both libsnd_cres.c and libsnd_decre.c;
  * _SsSndNextSep is Sony's `libsnd/next`, linked from the SDK object since
  * round 34; this signature is the one libsnd_cres.c's matched C used
  * before the conversion. */
 extern s32 SpuVmSeqKeyOff(s32 a0);
 extern void _SsSndNextSep(s32 a0, s32 a1);
 
-/* This unit's own reading of the same global code_179d8_i.c already reads
+/* This unit's own reading of the same global libsnd_decre.c already reads
  * as `VBLANK_MINUS` (a tick-rate/PPQN-style constant) -- independent local
  * view, per project convention. */
 extern u32 VBLANK_MINUS;

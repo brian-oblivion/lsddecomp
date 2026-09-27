@@ -47,10 +47,10 @@ each verified non-shifting by rebuilding with the function still
 end-of-track stop), `unk3C` (u8, compared against `0xFF`), `unk46` (s16,
 repeat-count limit), `unk48` (u16, repeat counter -- sign-checked via an
 explicit `(s16)` cast at its compare site, the same idiom
-`code_179d8_i.c` already established for its own `unk40`), `unk4A` (s16,
+`libsnd_decre.c` already established for its own `unk40`), `unk4A` (s16,
 the tempo-recompute scaling factor), `unk8C` (s32, the recomputed BPM),
 `unk90` (u32, playback-state flags -- the SAME field name and bit
-positions `code_179d8_i.c`'s independent local view already manipulates
+positions `libsnd_decre.c`'s independent local view already manipulates
 via `_ss_score[a0][a1].unk90 &= ~2;` / `&= ~0x100;`, corroborating both
 readings).
 
@@ -659,7 +659,7 @@ confirmed byte-exact.
 
 code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
-libsnd_cres, code_179d8_i and code_179d8_j already use. The header gained
+libsnd_cres, libsnd_decre and code_179d8_j already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
 moved); field names stay offset-only (`unkNN`) as the header's convention for
 Sony-only fields, with each one's mechanics in its comment. The unit's

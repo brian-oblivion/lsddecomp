@@ -5,13 +5,13 @@
 > already used was a hypothesis read off `include/psyq/libsnd.h`; the object
 > CONFIRMS it at the same address.
 >
-> It was the first of ELEVEN functions in the `code_179d8_i` PREFIX run
+> It was the first of ELEVEN functions in the `libsnd_decre` PREFIX run
 > (`0x2397C..0x24490`), ten `libsnd` objects that tile the range exactly. The
 > unit's `c` line simply moved to `0x24490`. Whole-image SHA1 green. Nothing
 > here is assignable.
 >
 > **The C this report derives was MATCHED and is now DELETED from
-> `src/code_179d8_i.c`.** That is the correction CLAUDE.md asks for, not a
+> `src/libsnd_decre.c`.** That is the correction CLAUDE.md asks for, not a
 > regression. Do not write C for it again.
 >
 > This report is the one place in the round where the prose had ALREADY
@@ -23,7 +23,7 @@
 >
 > **Everything below is kept as the derivation it was, not as live guidance.**
 
-Unit: `code_179d8_i`. Blocker screens clean.
+Unit: `libsnd_decre`. Blocker screens clean.
 
 ## This IS the Psy-Q SDK function, not a coincidental name
 

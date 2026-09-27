@@ -140,7 +140,7 @@ void ContModulation(s16 a0, s16 a1, u8 a2)
 ```
 
 `func_800334F0` is `func_800334F0(s16 a0, s16 a1, Entry8E968 *out)` per
-code_179d8_i.c's own reduced view (a 0x10-byte struct); this unit's own
+libsnd_decre.c's own reduced view (a 0x10-byte struct); this unit's own
 call site only needs to read `out->unk0` (the count), so the local view
 above only names that one field, per the project's own multiple-
 independent-local-views convention.
@@ -252,7 +252,7 @@ reverting.
 
 code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
-libsnd_cres, code_179d8_i and code_179d8_j already use. The header gained
+libsnd_cres, libsnd_decre and code_179d8_j already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
 moved); field names stay offset-only (`unkNN`) as the header's convention for
 Sony-only fields, with each one's mechanics in its comment. The unit's
