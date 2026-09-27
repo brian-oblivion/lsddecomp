@@ -3148,3 +3148,4 @@ gItemListPanelPos = 0x8008AAF8;
 sStrSelect = 0x8008AB14;
 sItemListStrFontIcon = 0x800116E4;
 sItemListCardPathPrefix = 0x8008AB1C;
+sItemListTimExt = 0x8008AB24;
