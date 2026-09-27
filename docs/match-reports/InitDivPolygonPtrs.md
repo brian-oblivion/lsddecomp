@@ -4,10 +4,10 @@
 
 > Renamed from `func_8001A224` on 2026-09-24 (tools/rename.py). Address 0x8001a224.
 
-Unit: `src/code_8220_b.c`. Immediately precedes `FlagLargePolyForDivide` in ROM
+Unit: `src/TmdRenderer.c`. Immediately precedes `FlagLargePolyForDivide` in ROM
 order — likely a helper it calls, though `FlagLargePolyForDivide` itself is not yet
 matched (queued next). `kind` is the same "primitive kind" code seen
-already in `code_8220_b` (`ProjectTriFace`/`ProjectQuadFace` pass `3`
+already in `TmdRenderer` (`ProjectTriFace`/`ProjectQuadFace` pass `3`
 triangle / `4` quad to `FlagLargePolyForDivide`): here it doubles as the LOOP COUNT
 too, since a triangle needs 3 slots written and a quad 4 — one register,
 two jobs, matching how compactly retail keeps live values.
@@ -41,7 +41,7 @@ void InitDivPolygonPtrs(void *arg0, void *arg1, s32 kind)
 Byte-exact on the first attempt. The loop is `while (kind-- > 0)` reached
 via a jump straight to the condition (the standard `for`/`while` lowering,
 same family as `ReleaseBasicClassArray`'s `if(count--)...while(count--)` in
-`code_8220_b`, but here with no outer guard since the test is at the loop's
+`TmdRenderer`, but here with no outer guard since the test is at the loop's
 natural entry point already). `arg1`'s value used for `src` is the
 UNMODIFIED parameter, computed before the `dst1` selection — the two never
 alias the same C expression, matching retail's use of the original `$a1`
@@ -53,7 +53,7 @@ for one purpose and a reassigned local pointer for the other.
 (`dst`, `table`); `kind` kept (dual-purpose primitive-kind/loop-count
 code, already documented in this report). **Tier B.** Mechanics are
 established (writes a running pointer through `table`'s own per-vertex
-records into two parallel arrays), matched by call site in code_8220_b:
+records into two parallel arrays), matched by call site in TmdRenderer:
 `InitDivPolygonPtrs(ctx + 0x88, gDivPolygon3, 3)` and
 `InitDivPolygonPtrs(ctx + 0x94, gDivPolygon4, 4)`, confirming
 `dst`/`table` and that this is a one-time setup of the render context's
@@ -92,5 +92,5 @@ void InitDivPolygonPtrs(RVECTOR **vtxPtrs, void *divp, s32 nverts) {
 
 `kind` -> `nverts` (it is only ever 3 or 4 and is the loop count),
 `dst`/`src`/`dst0`/`dst1` -> `vtxPtrs`/`rv`/`ctxPtr`/`crPtr`. Byte-identical.
-`divp` stays `void *` because code_8220_b passes both buffers through its
+`divp` stays `void *` because TmdRenderer passes both buffers through its
 own `void *` prototype.

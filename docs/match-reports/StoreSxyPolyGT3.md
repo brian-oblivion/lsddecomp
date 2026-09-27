@@ -2,7 +2,7 @@
 
 > Renamed from `func_80019710` on 2026-09-17 (tools/rename.py). Address 0x80019710.
 
-**Unit:** code_8220_b · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** TmdRenderer · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 Third distinct offset pattern in the GTE-store family (see
 `StoreSxyPolyF3.md` for the family overview and reproducer methodology):
@@ -23,7 +23,7 @@ void StoreSxyPolyGT3(void *dst)
 
 ## Provenance
 
-round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
+round 12 (2026-09-03), runner charlie, unit TmdRenderer (fresh carve).
 Matched first attempt; verified byte-exact in isolation via the CLAUDE.md
 reproducer pipeline before writing to `src/`.
 

@@ -1,5 +1,5 @@
 /*
- * code_8220_b -- the game's TMD renderer, after the end of BasicClass.
+ * TmdRenderer -- the game's TMD renderer, after the end of BasicClass.
  *
  * BasicClass (include/BasicClass.h; the rest of it is BMemPMgr.c): the list
  * helpers its methods use (FreeBasicClassList, GetNextBasicClass,

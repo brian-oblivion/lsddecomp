@@ -254,7 +254,7 @@ void UnlockCd(void) {
     gCdLock = 0;
 }
 
-extern s32 GetBMemPMgrBusy(void);             /* code_8220_b */
+extern s32 GetBMemPMgrBusy(void);             /* TmdRenderer */
 extern void TickCdStateMachine(void);         /* code_179d8_r: state-machine step 1 */
 extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
 extern s32 gCdQueueEnabled;

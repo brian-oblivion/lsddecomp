@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001A380` on 2026-09-24 (tools/rename.py). Address 0x8001a380.
 
-Unit `code_8220_b`. Reopened round 42 after the `gp_rel` blocker that stalled
+Unit `TmdRenderer`. Reopened round 42 after the `gp_rel` blocker that stalled
 it at carve time (round 13) was resolved (`--gp-symbols`, see
 `docs/research/gp-relative-blocker.md`). This report supersedes the round-13
 stub, which recorded no attempt and no score.
@@ -155,7 +155,7 @@ own extern comment already derived every field it writes). `hasUv1Codes`/
 which pass `1` plus the calling primitive's own `+0xE`/`+0x16` (FT3/FT4)
 or `+0xE`/`+0x1A` (GT3/GT4) fields -- POLY_FTn/GTn's CLUT and TPAGE words
 in the Psy-Q layout -- while F3/G3/F4/G4 pass `0, 0, 0` and leave the
-table's `+0xC`/`+0xE` untouched. `table`/`ctx` match code_8220_b's/this
+table's `+0xC`/`+0xE` untouched. `table`/`ctx` match TmdRenderer's/this
 unit's own established terms for these two objects (gDivPolygon3/
 Quad, and the per-face draw context).
 
@@ -187,7 +187,7 @@ Globals renamed with it:
 
 `D_80090C18`, the default `ndiv`, keeps its name: `rename.py` refuses it
 because `config/psyq-objects.ld` pins Sony's `dc_cb` (libpress/vlc2) at
-0x80090C14 with 8 bytes, which covers it. Its only writer is code_8220_b's
+0x80090C14 with 8 bytes, which covers it. Its only writer is TmdRenderer's
 SortTmdObject, from bits 9-11 of the drawn object's flags, so the word
 looks like game data; whether `dc_cb` really is 8 bytes is proposed to the
 head. Round 77 had left `D_8008A824`/`D_8008A828` as `D_` names for lack of
@@ -197,4 +197,4 @@ History moved from include/code_8220.h's old extern comment: this function
 was matched in round 44 once the gp_rel blocker that stalled it at carve
 time (round 13) was resolved, and the extern lived in the shared header only
 so that SubmitPolyF3, then still INCLUDE_ASM, could compile. The
-declaration is now a prototype in code_8220_b.c, the only unit that calls it.
+declaration is now a prototype in TmdRenderer.c, the only unit that calls it.

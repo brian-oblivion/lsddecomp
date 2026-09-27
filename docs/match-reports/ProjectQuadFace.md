@@ -2,7 +2,7 @@
 
 > Renamed from `func_800194A4` on 2026-09-17 (tools/rename.py). Address 0x800194a4.
 
-Unit: `src/code_8220_b.c`. Quad submission routine — the four-vertex sibling
+Unit: `src/TmdRenderer.c`. Quad submission routine — the four-vertex sibling
 of `ProjectTriFace` (triangle submission, same unit). Computes four vertex
 pointers (vs. three), transforms the first three as a triangle through
 `TransformAndCullPoly` (shared with `ProjectTriFace`), then does a SEPARATE single-

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80019D84` on 2026-09-24 (tools/rename.py). Address 0x80019d84.
 
-REVISITED, round 75: MATCHED; names/types used (return type `void *`, matching the caller's own `extern void *SubmitPolyFT4(void *prim, void *ctx)` in `code_8220_b.c`).
+REVISITED, round 75: MATCHED; names/types used (return type `void *`, matching the caller's own `extern void *SubmitPolyFT4(void *prim, void *ctx)` in `TmdRenderer.c`).
 
 ## ROUND 75 (bravo): MATCHED
 
@@ -28,7 +28,7 @@ last halfword of the primitive. The other arm falls into the epilogue after
 | preserved void body | 80/88 |
 | `void *`, `if (!= 0) { calls; stores; return RCpolyFT4(..); } splice; return arg0 + 0x28;` | **88/88** on the first build, whole image `OK: build matches retail` |
 
-**Callers checked:** `SortTmdObject` in `src/code_8220_b.c` (two call sites,
+**Callers checked:** `SortTmdObject` in `src/TmdRenderer.c` (two call sites,
 `prim = (u8 *)SubmitPolyFT4(prim, ctx);`), declared there as
 `extern void *SubmitPolyFT4(void *prim, void *ctx);`. The return type agrees.
 `RCpolyFT4` stays declared `void` in `include/code_8220.h` and is called
@@ -43,12 +43,12 @@ NON_MATCHING body promoted, round 65.
 ## ROUND 65 (charlie): NON_MATCHING body promoted
 
 Track 1b mechanical promotion. The standing `#if 0` snapshot in
-`src/code_8220_b.c` (family-shared register-identity residue, hand-derived
+`src/TmdRenderer.c` (family-shared register-identity residue, hand-derived
 per the round-13 HEAD PASS analysis — see `SubmitPolyF3.md`) is not a
 permuter candidate. Wrapped it in `#ifdef NON_MATCHING ... #else
 INCLUDE_ASM ... #endif` in place, no bytes changed. `./build-and-verify.sh`:
 `build exit=0`, `OK: build matches retail`. `tools/check-nonmatching.sh
-code_8220_b`: `OK`. No stale symbol references (`RCpolyFT4` is already the
+TmdRenderer`: `OK`. No stale symbol references (`RCpolyFT4` is already the
 current name).
 
 ## ROUND 48 (bravo): first REAL per-function permuter search — not closed, no new mechanism, third identical confirmation
@@ -80,7 +80,7 @@ the third identical outcome: the same two shapes are the only sub-260
 attractors, regardless of which sibling's own disassembly seeds the
 search. This is now strong evidence the attractor pair is a property of
 the RESIDUE CLASS itself (the `addPrim`-macro re-evaluation + duplicated
-OT-mask shape shared by all 8 `code_8220_b` RCpoly siblings), not an
+OT-mask shape shared by all 8 `TmdRenderer` RCpoly siblings), not an
 artifact of any one function's particular instruction stream. Reverted;
 `git diff --stat` empty.
 
@@ -113,14 +113,14 @@ as `SubmitPolyF3`; not re-attempted beyond this verification.
 > cross-reference quotes exactly that evidence. So a faithfully-attributed
 > sibling figure makes this function read as SEARCHED and spent, which is the
 > expensive direction of error (round 37 corrected the same screen once already,
-> when it measured vocabulary instead of runs). Six of the nine `code_8220_b`
+> when it measured vocabulary instead of runs). Six of the nine `TmdRenderer`
 > RCpoly siblings are in this position; one search covers the family.
 
 
 ## ROUND 40 (alpha): Job 1 rebuild-verify, third independent reproduction — 80/88, byte-identical
 
 Re-ran the Job-1 rebuild independently of round 36 and round 39 (bravo): the
-LIVE `#if 0` body in `src/code_8220_b.c` (round-36 symbol-corrected,
+LIVE `#if 0` body in `src/TmdRenderer.c` (round-36 symbol-corrected,
 `RCpolyFT4` not `func_8001BAB4`) toggled over `INCLUDE_ASM`, full oracle in
 isolation, reverted. `build exit=2`, zero compile-error/`undefined
 reference` hits.
@@ -140,7 +140,7 @@ wrapped in `#if 0`), ran the full oracle, reverted: **80/88, byte-identical
 diff to every prior round's report, no drift.**
 
 This round's assignment asked whether `include/gte.h` (new, round 38 --
-`code_8220_b`'s `TransformAndCullPoly` closed 58/58 by replacing a whole-function
+`TmdRenderer`'s `TransformAndCullPoly` closed 58/58 by replacing a whole-function
 `__asm__` with C over its macros) or the "hoist both values before either is
 consumed" lever moved this family. Both were tested concretely on the family
 ROOT case (`SubmitPolyF3.md`, "ROUND 39" section) rather than repeated
@@ -161,7 +161,7 @@ shared position.
 ## ROUND 36: symbol rename verified, rebuilt LIVE, MEASURED (confirms the figure below)
 
 Round 34's SDK-object conversion renamed this function's Psy-Q callee
-`func_8001BAB4` -> `RCpolyFT4` (a real `libgte` symbol). `src/code_8220_b.c`'s
+`func_8001BAB4` -> `RCpolyFT4` (a real `libgte` symbol). `src/TmdRenderer.c`'s
 preserved `#if 0` snapshot was updated to the new name in that same commit
 (`50fd52c`) but never rebuilt, so the `80/88` figure below was carried
 forward UNVERIFIED. This round swapped the snapshot in over the
@@ -173,7 +173,7 @@ against the linked SDK object, no `undefined reference`), and re-ran
 drift warning.** The rename did not disturb the residue.
 
 The corrected, LINKABLE snapshot (identical to what's live in
-`src/code_8220_b.c`):
+`src/TmdRenderer.c`):
 
 ```c
 #if 0
@@ -212,13 +212,13 @@ void SubmitPolyFT4(void *arg0, void *arg1) {
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", SubmitPolyFT4);
+INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyFT4);
 ```
 
 (`OtTag` and `RCpolyFT4`'s prototype come from `include/code_8220.h`,
 already included by the unit.)
 
-Unit: `src/code_8220_b.c`. Sixth sibling of the `SubmitPolyF3` OT-splice-
+Unit: `src/TmdRenderer.c`. Sixth sibling of the `SubmitPolyF3` OT-splice-
 or-calls family. Calls-branch shape combines `SubmitPolyFT3`'s
 `FillDivPolygonHeader(...,1,self->0xE,self->0x16)` argument pattern with
 `SubmitPolyG4`'s quad (4-record) output and `FillRVectors4` call; tail
@@ -341,7 +341,7 @@ re-confirming the four already recorded) against this refined rule rather
 than the raw one, though all four already measured are consistent with
 both readings and don't distinguish them.
 
-## RUNNER PASS, permuter round (alpha, code_8220_b): base confirmed, cross-reference only
+## RUNNER PASS, permuter round (alpha, TmdRenderer): base confirmed, cross-reference only
 
 Framing correction: HARD RULE 6 bans the asm/operand-constraint MECHANISM
 for register identity, not the outcome of a register differing -- see
@@ -353,7 +353,7 @@ family root: base = **260** (100 insertion + 100 deletion + 12x5 register
 diffs). Not independently full-searched this pass; time budget went to a
 deep single search on `SubmitPolyF3` (40000 iterations, floor held at
 260, two false leads found and falsified against the real oracle) plus
-reading `code_8220_b`'s `SortTmdObject` for `self`'s real type -- see that
+reading `TmdRenderer`'s `SortTmdObject` for `self`'s real type -- see that
 report's new section for the trace, and `SubmitPolyGT4.md` for the one
 sibling where the caller's own field writes independently confirm the
 size formula. Permuter scaffold left provisioned at
@@ -426,13 +426,13 @@ residue, not a second hidden instance of the ADDIU/ORI blind spot.
 ## Naming (round 77, alpha)
 
 `func_80019D84` -> `SubmitPolyFT4`, parameters (`arg0`, `arg1`) -> (`prim`, `ctx`). **Tier
-A.** code_8220_b's own comment (`src/code_8220_b.c`, the "eight submit
+A.** TmdRenderer's own comment (`src/TmdRenderer.c`, the "eight submit
 wrappers" block) already names this whole family collectively: each is a
 tail call to Sony's `RCpolyFT4` (unrenamed, RCpoly* polygon-subdivision
 family, `libgte`) or a direct OT splice, matching every sibling's shape.
 This function's own discriminator: the splice arm returns
 `prim + 0x28` = `sizeof(POLY_FT4)`, and the calls arm falls straight
-into `jal RCpolyFT4`. `prim`/`ctx` match the parameter names code_8220_b's
+into `jal RCpolyFT4`. `prim`/`ctx` match the parameter names TmdRenderer's
 own `extern void *SubmitPolyFT4(void *prim, void *ctx);` view already used.
 
 ## Round 91 polish (bravo)

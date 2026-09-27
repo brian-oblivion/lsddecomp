@@ -2,8 +2,8 @@
 
 > Renamed from `func_8001979C` on 2026-09-24 (tools/rename.py). Address 0x8001979c.
 
-Unit: `src/code_8220_b.c`. Same COP2-store-leaf class as `StoreSxyPolyFT4`
-(this unit) and `code_8220_b`'s `StoreSxyPolyF4`/`StoreSxyPolyG4` family —
+Unit: `src/TmdRenderer.c`. Same COP2-store-leaf class as `StoreSxyPolyFT4`
+(this unit) and `TmdRenderer`'s `StoreSxyPolyF4`/`StoreSxyPolyG4` family —
 `flag`-gated choice of which COP2 registers to write into `dst`.
 
 ## Final source

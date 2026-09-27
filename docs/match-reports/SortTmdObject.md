@@ -4,7 +4,7 @@
 
 REVISITED, round 76: MATCHED 954/954, whole image OK, 0 permuter iterations (about 45 cc1/whole-image builds); names/types not relevant
 
-The plain C is live in `src/code_8220_b.c` (no `#ifdef`, no `INCLUDE_ASM`).
+The plain C is live in `src/TmdRenderer.c` (no `#ifdef`, no `INCLUDE_ASM`).
 `./build-and-verify.sh` says `OK: build matches retail SLPS_015.56`, and
 `tools/check-nonmatching.sh` is green.
 
@@ -116,7 +116,7 @@ REVISITED, round 56: STALL, but the length gap is now fully accounted for -- the
 ### Why "names/types not relevant", stated before the findings so it is not read as a conclusion drawn to fit them
 
 The revisit rule's hypothesis is that round 50's score was evidence about what
-was known then rather than about the function, because `code_8220_b` had not
+was known then rather than about the function, because `TmdRenderer` had not
 yet passed track 3. Measured here, that is **not** what happened. Taking the
 three levers below one at a time:
 
@@ -1133,7 +1133,7 @@ mnemonic, confirmed with the reproducer" story for all three. Added as
 
 Round 45's report said "roughly nine ~37-word blocks" and asked whether they
 are unrolled named slots or loop iterations. Reading the full phase 3
-disassembly line by line (`asm/nonmatchings/code_8220_b/SortTmdObject.s`,
+disassembly line by line (`asm/nonmatchings/TmdRenderer/SortTmdObject.s`,
 roughly lines 148–940) settles it completely:
 
 - There are **13 distinct dispatch targets**, not 9 (one per PS1 GPU
@@ -1290,7 +1290,7 @@ against the current tree (with the `gte_llir`/`gte_ncds`/`gte_dpcs`/`gte_dpct`
 macros added to `include/gte.h` this round) and needs the forward
 declarations included below (they are NOT installed in the tree — only the
 `include/gte.h` macro additions are committed this round). Building on this
-means placing it back as the body of `SortTmdObject` in `src/code_8220_b.c`,
+means placing it back as the body of `SortTmdObject` in `src/TmdRenderer.c`,
 in the same ROM-order position, and continuing from "one extra saved
 register" above.
 
@@ -1964,7 +1964,7 @@ file, which is out of this round's scope.
 ## Naming (round 51, bravo) — NAME DELIBERATELY NOT CHANGED, and one of the two reasons is a head decision
 
 The track-3 naming pass renamed all 19 other definitions in
-`src/code_8220_b.c`. This one kept `SortTmdObject`. Two reasons, in order
+`src/TmdRenderer.c`. This one kept `SortTmdObject`. Two reasons, in order
 of weight.
 
 ### 1. Its only caller sits in an SDK segment, and that is a head call
@@ -1983,7 +1983,7 @@ Evidence the other way, which is why this is a question and not a verdict:
   Sony object" for the whole queue).
 - The splat layout puts this function inside a contiguous game run:
   `0x8220` `code_8220` (the BasicClass framework, unambiguously game code)
-  → `0x8A88` `code_8220_b` → `0x9F74` `code_8220_c` → `psyq_rcpolyf3`. The
+  → `0x8A88` `TmdRenderer` → `0x9F74` `code_8220_c` → `psyq_rcpolyf3`. The
   renderer sits directly between the game's own class framework and Sony's
   RCpoly primitives, which is what a game-written `GsSortObject4`
   replacement calling Sony's packers would look like.
@@ -2008,7 +2008,7 @@ this report's own round-50 case table, independently re-derived this round
 from the `(len, code)` pairs: it walks a model's face groups, dispatches on
 each group's tag to one of 13 cases, and per face calls `SetupPrimCode`,
 then `ProjectTriFace` or `ProjectQuadFace`, then one of the eight RCpoly*
-wrappers in `code_8220_b`. "Sort" is Psy-Q's verb for inserting into the
+wrappers in `TmdRenderer`. "Sort" is Psy-Q's verb for inserting into the
 ordering table and matches the `GsSort*` caller; "Faces" is what the
 per-group element lists are. Tier B rather than A because what `arg0` and
 `arg1` are as classes is still unestablished.
@@ -2054,7 +2054,7 @@ Byte-identical after every step; the three oracles green at each commit.
   attribute bit 30, writes `ndiv`/`HWD0`/`VWD0` into the scratch block and
   tests GsLIOFF/GsLIGNR/GsLMODE against GsLIGHT_MODE with a different ladder;
   it has none of this function's InitDivPolygonPtrs calls, TMD-type switch or
-  calls into code_8220_b. `psyq_sdk.py match` never placed it here, and the
+  calls into TmdRenderer. `psyq_sdk.py match` never placed it here, and the
   caller (`Viewport__DrawNode`, formerly in `psyq_2864`) is carved game code
   now. What the body does is evident from it alone: same four arguments as
   `GsSortObject4` (`GsDOBJ2 *`, `GsOT *`, shift, scratch), it reads the

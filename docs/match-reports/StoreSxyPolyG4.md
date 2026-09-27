@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001974C` on 2026-09-17 (tools/rename.py). Address 0x8001974c.
 
-**Unit:** code_8220_b · **Size:** 10 instructions · **Status:** MATCHED (10/10 words)
+**Unit:** TmdRenderer · **Size:** 10 instructions · **Status:** MATCHED (10/10 words)
 
 Sibling of `StoreSxyPolyF4` — same conditional shape (full 3-register store
 vs. single IR3 store), different offsets: full store uses the stride-8
@@ -34,7 +34,7 @@ void StoreSxyPolyG4(void *dst, s32 flag)
 
 ## Provenance
 
-round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
+round 12 (2026-09-03), runner charlie, unit TmdRenderer (fresh carve).
 Matched first attempt (same construction as `StoreSxyPolyF4`, applied with
 this function's own offsets and verified independently).
 

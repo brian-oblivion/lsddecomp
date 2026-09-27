@@ -93,14 +93,14 @@ extern void SetupBMemPMgrFreeList(BMemPMgr *pool);
 extern BMemPMgr *gDefaultBMemPMgr;
 
 /* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
- * work and back to 0 after (setter and getter in code_8220_b.c). Nothing in
+ * work and back to 0 after (setter and getter in TmdRenderer.c). Nothing in
  * either waits on it. */
 extern s32 gBMemPMgrBusy;
 extern void SetBMemPMgrBusy(s32 val);
 extern s32 GetBMemPMgrBusy(void);
 
 /* Global boolean flag read by SetupPrimCode, asm/data (bss/data, not yet
- * carved). Read by SetupPrimCode, written by SortTmdObject (both code_8220_b)
+ * carved). Read by SetupPrimCode, written by SortTmdObject (both TmdRenderer)
  * from bit 6 of the drawn object's flags word; SetupPrimCode ORs it into bit
  * 0x1 of the GPU command byte, which is the shade-texture bit Psy-Q's
  * SetShadeTex() sets. PROPOSED RENAME (round 51, tier B): gShadeTex.
@@ -108,7 +108,7 @@ extern s32 GetBMemPMgrBusy(void);
  * image", because it is bss past the image end -- so the head applies it. */
 extern s32 D_8008E248;
 
-/* GTE transform/clip/OT-bucket routine, this unit (code_8220_b; ordinary C
+/* GTE transform/clip/OT-bucket routine, this unit (TmdRenderer; ordinary C
  * over the include/gte.h macros -- see docs/match-reports/TransformAndCullPoly.md;
  * the .c holds its local struct views of both arguments). arg1 is the
  * per-object draw context (OT base +0x0, OT shift +0x4, culled-flag +0x78,
@@ -122,18 +122,18 @@ extern s32 D_8008E248;
  * definition in the .c file. */
 extern s32 TransformAndCullPoly(void *arg0, void *arg1);
 
-/* code_8220_b. Called by ProjectTriFace/ProjectQuadFace for a face that
+/* TmdRenderer. Called by ProjectTriFace/ProjectQuadFace for a face that
  * survived the cull: takes the screen bounding box of its `count` (3 or 4)
  * cached XYs and sets ctx+0x78, the flag that makes the SubmitPoly*
  * wrappers subdivide the face through RCpoly*, when the box is wider or
  * taller than 256 pixels. */
 extern void FlagLargePolyForDivide(void *ctx, s32 count);
 
-/* The two subdivision work buffers code_8220_b's SubmitPoly* wrappers hand
+/* The two subdivision work buffers TmdRenderer's SubmitPoly* wrappers hand
  * Sony's RCpoly* packers: a DIVPOLYGON3 and a DIVPOLYGON4 (libgte.h), laid
  * out back to back (0x218 bytes apart, sizeof(DIVPOLYGON3)). Declared as
- * bytes here because this header does not include <libgte.h>; code_8220_b
- * only takes their addresses (InitDivPolygonPtrs) and code_8220_b casts. */
+ * bytes here because this header does not include <libgte.h>; TmdRenderer
+ * only takes their addresses (InitDivPolygonPtrs) and TmdRenderer casts. */
 extern u8 gDivPolygon3[];
 extern u8 gDivPolygon4[];
 

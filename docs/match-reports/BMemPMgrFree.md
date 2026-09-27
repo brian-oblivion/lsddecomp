@@ -37,7 +37,7 @@ they were tested separately before either was trusted:**
 1. Retyping the shared `extern void SetBMemPMgrBusy(s32 val);` declaration in
    this file's copy to `extern volatile unsigned long long SetBMemPMgrBusy(s32
    val);` — a fabricated, incompatible prototype against the function's real
-   definition (`void SetBMemPMgrBusy(s32 val)` in `src/code_8220_b.c`). This
+   definition (`void SetBMemPMgrBusy(s32 val)` in `src/TmdRenderer.c`). This
    is exactly the class of scorer exploitation this round's instructions say
    to reject, so it was **not adopted and not even needed** — see below.
 2. In the second (coalesce-with-next) free-list unlink block, replacing
@@ -314,7 +314,7 @@ void *BMemPMgrFree(ptr, pool)
 - **`BMemPMgrAlloc`'s three levers generalize.** All three transferred to
   this sibling function with no modification needed beyond the obvious
   per-function field/variable renaming. Worth treating as the default
-  starting shape for any further `code_8220`/`code_8220_b` pool-management
+  starting shape for any further `code_8220`/`TmdRenderer` pool-management
   function, not something to re-derive.
 - **When reassigning a pointer variable to a NEW value derived from
   something OTHER than its own old value, capture any field of the OLD
@@ -389,7 +389,7 @@ green.
 99->107/107 permuter match) -- coalesces with the previous and following
 blocks and re-links the free list, the mirror of `BMemPMgrAlloc`. Called
 across the same wide set of units as `BMemPMgrAlloc` (`code_2cc8c_f`,
-`code_55dd4`, `code_d294`, `code_8220_b`, `main`, plus this unit's own
+`code_55dd4`, `code_d294`, `TmdRenderer`, `main`, plus this unit's own
 `RemoveBasicClassListNode`), confirming the general-purpose pool pairing.
 
 ## Polish (round 97, runner delta)

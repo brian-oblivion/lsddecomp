@@ -2,7 +2,7 @@
 
 > Renamed from `func_80018288` on 2026-09-17 (tools/rename.py). Address 0x80018288.
 
-Unit: `src/code_8220_b.c`. Signature (already in `include/code_8220.h`):
+Unit: `src/TmdRenderer.c`. Signature (already in `include/code_8220.h`):
 `void FreeBasicClassList(BasicClassListNode **head);` — free every node in a
 `BasicClassListNode` singly-linked list, without clearing `*head` itself.
 

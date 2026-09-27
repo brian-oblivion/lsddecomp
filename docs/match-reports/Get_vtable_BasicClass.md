@@ -2,7 +2,7 @@
 
 > Renamed from `func_80018390` on 2026-09-17 (tools/rename.py). Address 0x80018390.
 
-**Unit:** code_8220_b · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
+**Unit:** TmdRenderer · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
 ## What it does
 
@@ -38,7 +38,7 @@ declared fields.
 
 ## Provenance
 
-round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
+round 12 (2026-09-03), runner charlie, unit TmdRenderer (fresh carve).
 Matched first attempt — simple `lui`/`addiu` address-of, no ambiguity.
 
 ## Naming (round 51, bravo)

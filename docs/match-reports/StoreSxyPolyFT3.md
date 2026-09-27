@@ -2,7 +2,7 @@
 
 > Renamed from `func_800196FC` on 2026-09-17 (tools/rename.py). Address 0x800196fc.
 
-**Unit:** code_8220_b · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** TmdRenderer · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 Sibling of `StoreSxyPolyF3`/`StoreSxyPolyG3` (see `StoreSxyPolyF3.md` for the
 GTE-store family overview). Body is byte-identical to `StoreSxyPolyG3`'s —
@@ -27,7 +27,7 @@ void StoreSxyPolyFT3(void *dst)
 
 ## Provenance
 
-round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
+round 12 (2026-09-03), runner charlie, unit TmdRenderer (fresh carve).
 Matched first attempt (identical construction to `StoreSxyPolyG3`, verified
 independently against this function's own `.s`).
 

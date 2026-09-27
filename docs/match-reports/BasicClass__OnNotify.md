@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_18358` on 2026-09-17 (tools/rename.py). Address 0x80018358.
 
-**Unit:** code_8220_b · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
+**Unit:** TmdRenderer · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
 
 BasicClass vtable slot `+0x038` (`slot38` in `BasicClassMethods`). Called by
 `BasicClass__NotifyParents` (slot `+0x030`, `notifyParents`, still `INCLUDE_ASM`
@@ -35,7 +35,7 @@ being passed, but the slot's own declared type stays generic.
 
 ## Provenance
 
-round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
+round 12 (2026-09-03), runner charlie, unit TmdRenderer (fresh carve).
 Matched first attempt — the `if (arg2 == 1)` shape and the always-allocated
 stack frame (needed because the true branch makes an indirect call) came
 straight off the disassembly.

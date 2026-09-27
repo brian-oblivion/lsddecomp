@@ -34,13 +34,13 @@
 > **Why this rework matters more than one function.** The judgement in the
 > original write-up was that a whole-function `__asm__` was justified because
 > the body is straight-line and frameless. That is not the test. The test is
-> whether a C form EXISTS: `TransformAndCullPoly` in `code_8220_b` earns its inline
+> whether a C form EXISTS: `TransformAndCullPoly` in `TmdRenderer` earns its inline
 > asm because GTE `rtpt`/`nclip`/`cfc2` have no C spelling at all, and
 > CLAUDE.md HARD RULE 6's exception is scoped to exactly that. An unaligned
 > struct copy is merely awkward to TYPE, which is a different thing, and the
 > original text cited `TransformAndCullPoly` as precedent for it — so left standing
 > this would have become the precedent for transcribing any hard-to-type
-> function. Every other `__asm__` block remaining in `code_8220_b` is
+> function. Every other `__asm__` block remaining in `TmdRenderer` is
 > `swc2`-only and legitimate; this was the only avoidable one.
 >
 > **And "no C form exists" deserves the same standard as a toolchain lead:
@@ -49,7 +49,7 @@
 > force `lwl`/`lwr` at two non-adjacent offsets" — but that struct type was
 > not a guess, it was written down.
 
-Unit: `src/code_8220_b.c`. Copies three unaligned 8-byte fields
+Unit: `src/TmdRenderer.c`. Copies three unaligned 8-byte fields
 (`arg1[0]`/`[4]`/`[8]` -> `arg0[0]`/`[4]`/`[8]`, treating `arg0`/`arg1` as
 arrays of 3 pointers) and, for each of the three destinations, an unaligned
 4-byte field from a separate source pointer (`arg2`, `arg3`, `arg4`
@@ -73,7 +73,7 @@ as a clobber while also relying on it as an input.
  * lwl/lwr+swl/swr. No prologue/frame in retail (frameless leaf), and the
  * whole body is straight-line with no branches, so this is written as one
  * raw-register __asm__ block (same technique as TransformAndCullPoly in
- * code_8220_b, minus the noreorder bracket that function needed for its
+ * TmdRenderer, minus the noreorder bracket that function needed for its
  * internal branches -- none needed here). arg4 arrives on the stack per
  * the o32-ish calling convention (5th integer arg) and is read directly
  * from 0x10($sp) rather than through a C-level operand.
@@ -159,7 +159,7 @@ compiles to plain `lw`/`sw` instead). Since the whole function is
 straight-line with no branches (a frameless leaf — no
 `addiu $sp,$sp,-N` in retail, confirmed from the disassembly), the raw-
 register whole-block `__asm__` technique from `TransformAndCullPoly`
-(`code_8220_b`) applies directly and with less risk than reverse-engineering
+(`TmdRenderer`) applies directly and with less risk than reverse-engineering
 an unverifiable struct: byte-exact on the first attempt, no noreorder
 bracket needed since there are no branch/jump mnemonics to trigger maspsx's
 defensive nop insertion.

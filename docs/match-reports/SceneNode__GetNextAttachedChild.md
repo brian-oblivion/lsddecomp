@@ -13,7 +13,7 @@ target -- searches an intrusive list (starting from `self->unk4`, a
 BasicClass-owned field this unit reads directly) for the first entry whose
 vtable header tag is `4` AND whose own `+0x00C` field equals `self`, using
 the generic list-pop helper `GetNextBasicClass` (a DIFFERENT still-uncarved
-unit, `code_8220_b.s`) to advance. On a match, leaves `*entry` pointing at
+unit, `TmdRenderer.s`) to advance. On a match, leaves `*entry` pointing at
 it and returns. If the list runs out first, sets `*entry = NULL`.
 
 `entry` and `cursor` are the SAME two stack slots `SceneNode__DetachAttachedChildren` passes

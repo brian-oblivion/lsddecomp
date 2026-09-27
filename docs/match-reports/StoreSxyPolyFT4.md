@@ -2,8 +2,8 @@
 
 > Renamed from `func_80019774` on 2026-09-24 (tools/rename.py). Address 0x80019774.
 
-Unit: `src/code_8220_b.c` (carved round 13, third slice of `code_8220`).
-Same COP2-store-leaf class already established in `code_8220_b`
+Unit: `src/TmdRenderer.c` (carved round 13, third slice of `code_8220`).
+Same COP2-store-leaf class already established in `TmdRenderer`
 (`StoreSxyPolyF3`, `StoreSxyPolyF4`, etc. — see
 `docs/DECOMPILATION_LEARNINGS.md`'s GTE-store-leaf entries): a `flag`-gated
 choice of which COP2 data registers to write into `dst`, no plain-C form
@@ -32,7 +32,7 @@ void StoreSxyPolyFT4(void *dst, s32 flag)
 
 ## Notes
 
-Byte-exact on the first attempt — a direct transcription of `code_8220_b`'s
+Byte-exact on the first attempt — a direct transcription of `TmdRenderer`'s
 `StoreSxyPolyF4`/`StoreSxyPolyG4` pattern (`if (flag) { three swc2 at fixed
 offsets } else { one swc2 through dst+N }`) with this function's own offsets
 (`0x8`/`0x10`/`0x18` vs. else-branch `0x20`). No new residue, no new lever.
@@ -41,7 +41,7 @@ offsets } else { one swc2 through dst+N }`) with this function's own offsets
 
 `func_80019774` -> `StoreSxyPolyFT4`, parameter `flag` -> `storeFirst3`.
 **Tier A.** Sixth and final member of the StoreSxyPoly** family split
-across code_8220_b (StoreSxyPolyF3/G3/FT3/GT3/F4/G4) and this unit.
+across TmdRenderer (StoreSxyPolyF3/G3/FT3/GT3/F4/G4) and this unit.
 StoreSxyPolyG4.md already named this function's call-site discriminator
 when it named its own sibling: the POLY_FT4 cases in SortTmdObject
 (`len = 9`, `code = 0x2C`) pass this function; the POLY_GT4 cases

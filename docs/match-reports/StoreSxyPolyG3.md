@@ -2,7 +2,7 @@
 
 > Renamed from `func_800196E8` on 2026-09-17 (tools/rename.py). Address 0x800196e8.
 
-**Unit:** code_8220_b · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** TmdRenderer · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 Sibling of `StoreSxyPolyF3` (see that report for the GTE-store family
 overview and the reproducer methodology). This one and `StoreSxyPolyFT3`
@@ -37,7 +37,7 @@ caller lives in this unit.
 
 ## Provenance
 
-round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
+round 12 (2026-09-03), runner charlie, unit TmdRenderer (fresh carve).
 Matched first attempt; verified byte-exact in isolation via the CLAUDE.md
 reproducer pipeline before writing to `src/`.
 

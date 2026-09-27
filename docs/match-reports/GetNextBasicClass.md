@@ -2,7 +2,7 @@
 
 > Renamed from `func_800183A0` on 2026-09-17 (tools/rename.py). Address 0x800183a0.
 
-Unit: `src/code_8220_b.c`. Signature (already in `include/code_8220.h`):
+Unit: `src/TmdRenderer.c`. Signature (already in `include/code_8220.h`):
 `void GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor);` —
 pop `*cursor` into `*outValue` (or `NULL` if the cursor is exhausted), then
 advance `*cursor` to the popped node's `next`.

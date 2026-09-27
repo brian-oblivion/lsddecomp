@@ -2,7 +2,7 @@
 
 > Renamed from `func_80019724` on 2026-09-17 (tools/rename.py). Address 0x80019724.
 
-**Unit:** code_8220_b · **Size:** 10 instructions · **Status:** MATCHED (10/10 words)
+**Unit:** TmdRenderer · **Size:** 10 instructions · **Status:** MATCHED (10/10 words)
 
 Conditional variant of the GTE-store family (see `StoreSxyPolyF3.md` for the
 family overview). `flag` selects between a full 3-register store (same
@@ -54,7 +54,7 @@ CLAUDE.md reproducer pipeline before writing to `src/`.
 
 ## Provenance
 
-round 12 (2026-09-03), runner charlie, unit code_8220_b (fresh carve).
+round 12 (2026-09-03), runner charlie, unit TmdRenderer (fresh carve).
 Matched on the second construction (see above); first construction was
 functionally correct but byte-wrong in the delay slot, caught by comparing
 against the reproducer's disassembly rather than trusting "same address".

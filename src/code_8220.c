@@ -15,7 +15,7 @@
  *  - Eleven of BasicClass's methods (include/BasicClass.h), and
  *    PushBasicClassListNode/RemoveBasicClassListNode, the pool-backed list
  *    primitives its `children` and `parentRefs` lists share. The rest of its
- *    methods are in code_8220_b.c.
+ *    methods are in TmdRenderer.c.
  */
 
 /* Psy-Q printf, declared with the argument shape this call site passes:

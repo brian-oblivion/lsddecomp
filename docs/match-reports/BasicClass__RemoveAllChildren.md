@@ -11,7 +11,7 @@ winning shape is non-obvious and generalizes.
 
 ## What it does
 
-Iterates `self->children` via `GetNextBasicClass` (still `asm/code_8220_b.s`,
+Iterates `self->children` via `GetNextBasicClass` (still `asm/TmdRenderer.s`,
 not yet carved to C — see signature below), calling `removeChild` (slot
 `+0x014`, this unit's `BasicClass__RemoveChild`) on each extracted child
 until the list is exhausted.

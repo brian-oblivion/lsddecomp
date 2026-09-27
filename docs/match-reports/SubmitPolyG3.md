@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001989C` on 2026-09-24 (tools/rename.py). Address 0x8001989c.
 
-REVISITED, round 75: MATCHED; names/types used (return type `void *`, matching the caller's own `extern void *SubmitPolyG3(void *prim, void *ctx)` in `code_8220_b.c`).
+REVISITED, round 75: MATCHED; names/types used (return type `void *`, matching the caller's own `extern void *SubmitPolyG3(void *prim, void *ctx)` in `TmdRenderer.c`).
 
 ## ROUND 75 (bravo): MATCHED
 
@@ -33,7 +33,7 @@ needed once it exists**: neither survives into the committed body. That
 lever's "self/prim register swap sub-residue" was the same missing-`$v0`
 artefact seen from a different angle.
 
-**Callers checked:** `SortTmdObject` in `src/code_8220_b.c` (two call sites,
+**Callers checked:** `SortTmdObject` in `src/TmdRenderer.c` (two call sites,
 `prim = (u8 *)SubmitPolyG3(prim, ctx);`), declared there as
 `extern void *SubmitPolyG3(void *prim, void *ctx);`. The return type agrees.
 `RCpolyG3` stays declared `void` in `include/code_8220.h` and is called
@@ -70,7 +70,7 @@ Wrapped the function in `#ifdef NON_MATCHING ... #else INCLUDE_ASM
 ... #endif` in place (the `Vec2s16_98` typedef stays outside the ifdef,
 unconditional, as it already was). No bytes changed.
 `./build-and-verify.sh`: `build exit=0`, `OK: build matches retail`.
-`tools/check-nonmatching.sh code_8220_b`: `OK`. No stale symbol references
+`tools/check-nonmatching.sh TmdRenderer`: `OK`. No stale symbol references
 (`RCpolyG3` is already the current name).
 
 ## ROUND 48 (bravo): first REAL permuter search — CLOSED the self/prim-swap sub-residue (48/84 -> 76/84), the family-shared residue remains
@@ -78,7 +78,7 @@ unconditional, as it already was). No bytes changed.
 **This function had never had a real iteration-based permuter search** — only
 a single `--debug` type-axis hand test (base score 405/415 depending on
 struct typing). Round 48's family-wide sweep (see `SubmitPolyGT4.md` and the
-broadcast) covered the other 6 `code_8220_b` OT-mask siblings; this was the
+broadcast) covered the other 6 `TmdRenderer` OT-mask siblings; this was the
 last function in the unit's stall queue to get a real search of its own.
 
 **Check 3:** in-tree rebuild of the preserved body, full oracle: `build
@@ -118,7 +118,7 @@ if (*(s32 *)(prim + 0x78) == 0) {
     ...
 ```
 
-Applied to `src/code_8220_b.c` in place of `INCLUDE_ASM`, full oracle:
+Applied to `src/TmdRenderer.c` in place of `INCLUDE_ASM`, full oracle:
 `build exit=2`, zero compile-error hits, **76/84 words match, NO drift
 warning**. This is a genuine, verified improvement of **28 words** — it
 closes this function's OWN self/prim-swap residue outright. The remaining
@@ -164,7 +164,7 @@ overlaps retail bytes without being a real candidate).
 No zero reached. **Not permuter-exhausted — not closed in 156329
 iterations under load (rc=124).** But this search is NOT a pure negative:
 it produced a real, oracle-verified 28-word improvement, now the standing
-best body in `src/code_8220_b.c`'s `#if 0` block and below. The remaining
+best body in `src/TmdRenderer.c`'s `#if 0` block and below. The remaining
 residue is the family-shared one — see `SubmitPolyGT4.md`'s round 48
 entry for that residue class's own exhaustive characterization (6/6
 siblings searched this round, no fix found; treat this function's
@@ -223,7 +223,7 @@ void SubmitPolyG3(void *arg0, void *arg1) {
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", SubmitPolyG3);
+INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyG3);
 ```
 
 ### Proposed learning
@@ -248,7 +248,7 @@ value hoisting).
 ## ROUND 40 (alpha): Job 1 rebuild-verify, third independent reproduction — 48/84, byte-identical
 
 Re-ran the Job-1 rebuild independently of round 36 and round 39 (bravo): the
-LIVE `#if 0` body in `src/code_8220_b.c` (round-36 symbol-corrected,
+LIVE `#if 0` body in `src/TmdRenderer.c` (round-36 symbol-corrected,
 `RCpolyG3` not `func_8001AD54`) toggled over `INCLUDE_ASM`, full oracle in
 isolation, reverted. `build exit=2`, zero compile-error/`undefined
 reference` hits.
@@ -269,7 +269,7 @@ wrapped in `#if 0`), ran the full oracle, reverted: **48/84, byte-identical
 diff to every prior round's report, no drift.**
 
 This round's assignment asked whether `include/gte.h` (new, round 38 --
-`code_8220_b`'s `TransformAndCullPoly` closed 58/58 by replacing a whole-function
+`TmdRenderer`'s `TransformAndCullPoly` closed 58/58 by replacing a whole-function
 `__asm__` with C over its macros) or the "hoist both values before either is
 consumed" lever moved this family. Both were tested concretely on the family
 ROOT case (`SubmitPolyF3.md`, "ROUND 39" section) rather than repeated
@@ -291,7 +291,7 @@ shared position.
 
 Round 34's SDK-object conversion renamed this function's Psy-Q callee
 `func_8001AD54` -> `RCpolyG3` (a real `libgte` symbol, in
-`config/symbols.slps01556.lsdde.txt`). `src/code_8220_b.c`'s own preserved
+`config/symbols.slps01556.lsdde.txt`). `src/TmdRenderer.c`'s own preserved
 `#if 0` snapshot was updated to the new name as part of that same commit
 (`50fd52c`), but the body was never swapped back in and rebuilt — so the
 `48/84` figure below was carried forward UNVERIFIED against the renamed
@@ -307,7 +307,7 @@ The rename did not disturb the residue in any way — it only made the
 existing figure trustworthy instead of assumed.
 
 The corrected, LINKABLE snapshot (identical to what's live in
-`src/code_8220_b.c` right now, wrapped back in `#if 0`/`INCLUDE_ASM` per the
+`src/TmdRenderer.c` right now, wrapped back in `#if 0`/`INCLUDE_ASM` per the
 match-report convention):
 
 ```c
@@ -358,13 +358,13 @@ void SubmitPolyG3(void *arg0, void *arg1) {
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_8220_b", SubmitPolyG3);
+INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyG3);
 ```
 
 (`OtTag`, `PolyVtx`, `PolyUV4` and `RCpolyG3`'s prototype come from
 `include/code_8220.h`, already included by the unit.)
 
-Unit: `src/code_8220_b.c`. Third sibling of `SubmitPolyF3`/`SubmitPolyF4`
+Unit: `src/TmdRenderer.c`. Third sibling of `SubmitPolyF3`/`SubmitPolyF4`
 (this unit, both stalled) — same `prim->0x78`-gated OT-splice-or-calls
 shape, this time with MORE post-call work: after
 `FillDivPolygonHeader`(gp_rel-blocked)/`FillRVectors3` (matched), it copies a byte
@@ -648,13 +648,13 @@ residue, not a second hidden instance of the ADDIU/ORI blind spot.
 ## Naming (round 77, alpha)
 
 `func_8001989C` -> `SubmitPolyG3`, parameters (`arg0`, `arg1`) -> (`prim`, `ctx`). **Tier
-A.** code_8220_b's own comment (`src/code_8220_b.c`, the "eight submit
+A.** TmdRenderer's own comment (`src/TmdRenderer.c`, the "eight submit
 wrappers" block) already names this whole family collectively: each is a
 tail call to Sony's `RCpolyG3` (unrenamed, RCpoly* polygon-subdivision
 family, `libgte`) or a direct OT splice, matching every sibling's shape.
 This function's own discriminator: the splice arm returns
 `prim + 0x1c` = `sizeof(POLY_G3)`, and the calls arm falls straight
-into `jal RCpolyG3`. `prim`/`ctx` match the parameter names code_8220_b's
+into `jal RCpolyG3`. `prim`/`ctx` match the parameter names TmdRenderer's
 own `extern void *SubmitPolyG3(void *prim, void *ctx);` view already used.
 
 ## Round 91 polish (bravo)
