@@ -167,7 +167,7 @@ void TaskCore__PlaySound(TaskCore *self, s32 tone) {
     }
 }
 
-void TaskCore__func_8003C7F4(TaskCore *self) {
+void TaskCore__OnPadStart(TaskCore *self) {
     if (self->target != NULL) {
         self->methods->playSound(self, 0x10);
         self->methods->setState(self, 0xA);

@@ -77,7 +77,7 @@ the whole-image SHA1, which is the only thing that can see it.
 
 Slot occupants in the base table `gTitleMenuMethods`, from the jump table plus
 `tools/classtable.py`: `slot74` = `TaskCore__OnPadNext`, `slot78` = `TaskCore__OnPadPrev`,
-`slot7C` = `TaskCore__OnPadCancel`, `slot80` = `TaskCore__func_8003C7F4`,
+`slot7C` = `TaskCore__OnPadCancel`, `slot80` = `TaskCore__OnPadStart`,
 `slot84` = `TaskCore__OnPadConfirm`.
 
 ## The only residue, and it is a source-order fact

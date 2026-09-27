@@ -25,7 +25,7 @@ void TaskCore__Tick(Obj86B60 *self)
 ```
 
 The first function in the unit to DEREFERENCE `self->unk4C` rather than
-just null-check it (see `TaskCore__func_8003C7F4` and siblings) -- establishes real
+just null-check it (see `TaskCore__OnPadStart` and siblings) -- establishes real
 fields on its pointee, `Unk4CObj`: `+0x00C` (s32, compared directly against
 `self->unk58`) and `+0x024` (a `void **`, indexed by `self->unk58` and
 null-checked: `target->unk24[idx]`).

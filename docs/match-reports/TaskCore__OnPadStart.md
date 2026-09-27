@@ -1,4 +1,6 @@
-# TaskCore__func_8003C7F4 — MATCH (25/25 words)
+# TaskCore__OnPadStart — MATCH (25/25 words)
+
+> Renamed from `TaskCore__func_8003C7F4` on 2026-09-27 (tools/rename.py). Address 0x8003c7f4.
 
 > Renamed from `Obj86B60__func_8003C7F4` on 2026-09-25 (tools/rename.py). Address 0x8003c7f4.
 
@@ -9,7 +11,7 @@
 ## What it does
 
 ```c
-void TaskCore__func_8003C7F4(Obj86B60 *self, s32 a1)
+void TaskCore__OnPadStart(Obj86B60 *self, s32 a1)
 {
     if (self->unk4C != NULL) {
         self->methods->slot70(self, 0x10);
@@ -20,7 +22,7 @@ void TaskCore__func_8003C7F4(Obj86B60 *self, s32 a1)
 
 `self->unk4C` is used ONLY as a null/non-null gate here (never dereferenced)
 -- the first of five functions in this unit
-(`TaskCore__func_8003C7F4`/`TaskCore__OnPadConfirm`/`TaskCore__OnPadCancel`/`TaskCore__OnPadPrev`/
+(`TaskCore__OnPadStart`/`TaskCore__OnPadConfirm`/`TaskCore__OnPadCancel`/`TaskCore__OnPadPrev`/
 `TaskCore__OnPadNext`) that share this exact gate-then-forward shape, all reached
 from the same message dispatcher (`TaskCore__OnPadEvent`, STALL -- see its report)
 via consecutive vtable slots `+0x074`..`+0x084`. `slot70` IS this unit's own

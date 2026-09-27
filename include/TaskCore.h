@@ -100,7 +100,7 @@ struct TaskCoreTarget {
     /* +0x074..+0x084: onPadEvent's cases. Called with self alone: $a1 still  \
      * holds the sender at that call, but no occupant in any of the four     \
      * tables reads it, and StreamTask's overrides up-call with self only. */ \
-    /* +0x074 */ void (*onPad21)(Self *self);      /* TaskCore__func_8003C7F4: onPadEvent's 0x21 */ \
+    /* +0x074 */ void (*onPad21)(Self *self);      /* TaskCore__OnPadStart: onPadEvent's 0x21 */ \
     /* +0x078 */ void (*onPadConfirm)(Self *self); /* TaskCore__OnPadConfirm: 0x19 */ \
     /* +0x07C */ void (*onPadCancel)(Self *self);  /* TaskCore__OnPadCancel: 0x17 */ \
     /* +0x080 */ void (*onPadPrev)(Self *self);    /* TaskCore__OnPadPrev: 0x12 */ \
@@ -207,7 +207,7 @@ void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event);
 void TaskCore__SetState(TaskCore *self, s32 state);
 void TaskCore__SetFrameBound(TaskCore *self, s32 bound);
 void TaskCore__PlaySound(TaskCore *self, s32 tone);
-void TaskCore__func_8003C7F4(TaskCore *self);
+void TaskCore__OnPadStart(TaskCore *self);
 void TaskCore__OnPadConfirm(TaskCore *self);
 void TaskCore__OnPadCancel(TaskCore *self);
 void TaskCore__OnPadPrev(TaskCore *self);

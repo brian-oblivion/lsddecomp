@@ -24,7 +24,7 @@ void TaskCore__OnPadConfirm(Obj86B60 *self, s32 a1)
 }
 ```
 
-Same gate-then-forward family as `TaskCore__func_8003C7F4`, but the reason code passed
+Same gate-then-forward family as `TaskCore__OnPadStart`, but the reason code passed
 to `slot60` is picked between two literals based on `self->unk3C`.
 
 **First attempt had the two literals backwards (28/30, two words swapped)**
@@ -40,7 +40,7 @@ is the default vs. the override -- one attempt.
 
 ## Struct knowledge established
 
-Nothing new beyond `TaskCore__func_8003C7F4`'s `unk4C`/`unk3C`/`slot70`/`slot60`;
+Nothing new beyond `TaskCore__OnPadStart`'s `unk4C`/`unk3C`/`slot70`/`slot60`;
 confirms `unk3C == 1` is a real, meaningful state value (not just a
 `!= 0` gate as `TaskCore__OnPadEvent`, STALL, treats it).
 
