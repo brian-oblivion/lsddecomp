@@ -152,7 +152,7 @@ Read each named class's header first; its banner points to the units.
   (`src/code_179d8_o.c`, `_q.c`, `_s.c`: the CD request queue and file table)
   or `VabDriver`. `TimImage`, `TimArraySrc`, `TimBlockSrc`, `TileMap` and
   `TileAtlas` load and build textures.
-- **Movies.** `MoviePlayer` (`src/code_33808.c`) decodes MDEC FMV from a
+- **Movies.** `MoviePlayer` (`src/GraphicsResources.c`) decodes MDEC FMV from a
   `CdStream` (`src/code_3770c.c`, over libcd streaming).
 - **Sound.** `VabStreamObj` loads VAB banks, `WBgm` plays background music
   (`src/code_2a0e0.c`), and the other `src/code_179d8_*.c` units hold the
