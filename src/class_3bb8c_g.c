@@ -31,38 +31,38 @@
 #include "VabStreamObj.h"
 #include "TaskObjF.h"
 
-void TaskObjF__SetState(TaskObjF *self, s32 arg1) {
+void TaskObjF__SetState(TaskObjF *self, s32 state) {
     TaskObjFMethods *methods = self->methods;
-    s32 ret;
+    s32 ok;
     s32 i;
 
-    if (self->state == arg1) {
-        arg1 = 0x17;
+    if (self->state == state) {
+        state = 0x17;
     }
 
-    methods->notifyParents(self, arg1);
+    methods->notifyParents(self, state);
     methods->releaseCardIcon(self);
-    methods->loadCardIcon(self, arg1);
+    methods->loadCardIcon(self, state);
 
     self->waitCounter = 0;
-    switch (arg1) {
+    switch (state) {
         case 0x13:
-            arg1 = methods->formatCard(self) ? 0x11 : 8;
-            methods->setState(self, arg1);
+            state = methods->formatCard(self) ? 0x11 : 8;
+            methods->setState(self, state);
             break;
         case 0x14:
             if (self->fileName[0] == '\0') {
                 methods->findUnusedMemcardName(self, self->fileName, self->namePrefix, self->nameSuffixes);
             }
-            ret = methods->writeMemcardSaveFile(self, self->fileName, self->title, self->iconFrames,
-                                                self->iconImage, self->data, self->dataSize);
-            arg1 = ret ? 0x16 : 0xC;
-            methods->setState(self, arg1);
+            ok = methods->writeMemcardSaveFile(self, self->fileName, self->title, self->iconFrames,
+                                               self->iconImage, self->data, self->dataSize);
+            state = ok ? 0x16 : 0xC;
+            methods->setState(self, state);
             break;
         case 0x15:
-            ret = methods->readMemcardFile(self, self->fileName, self->data, self->dataSize);
-            arg1 = ret ? 0x16 : 0x10;
-            methods->setState(self, arg1);
+            ok = methods->readMemcardFile(self, self->fileName, self->data, self->dataSize);
+            state = ok ? 0x16 : 0x10;
+            methods->setState(self, state);
             break;
         case 0x11:
             methods->attachTextEntry(self);
@@ -72,7 +72,7 @@ void TaskObjF__SetState(TaskObjF *self, s32 arg1) {
             break;
     }
 
-    if ((u32)(arg1 - 0x16) < 2) {
+    if ((u32)(state - 0x16) < 2) {
         if (self->opMode == 1 && self->titles != NULL) {
             BMemPMgrFree(self->foundSuffixes);
             for (i = 0; i < self->bufCount; i++) {
@@ -84,7 +84,7 @@ void TaskObjF__SetState(TaskObjF *self, s32 arg1) {
         self->state = 0;
         self->opMode = 0;
     } else {
-        self->state = arg1;
+        self->state = state;
     }
 }
 
@@ -99,14 +99,14 @@ extern SpriteRect gCardIconRect;
 /* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
 extern ScreenSpritePos gCardIconPos;
 
-void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1) {
-    char path[0x20];
-    char *buf;
+void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
+    char pathBuf[0x20];
+    char *path;
     char *name;
-    TimImage *handle;
-    ScreenSprite *newVal;
+    TimImage *tim;
+    ScreenSprite *icon;
 
-    if (arg1 >= 0x11) {
+    if (index >= 0x11) {
         return;
     }
     if (self->spriteParent == 0) {
@@ -116,19 +116,19 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1) {
         return;
     }
 
-    buf = path;
-    name = gCardIconNames[arg1];
-    buf[0] = '\0';
-    strcat(buf, gCardPathPrefix);
-    strcat(buf, name);
-    strcat(buf, gCardPathSuffix);
+    path = pathBuf;
+    name = gCardIconNames[index];
+    path[0] = '\0';
+    strcat(path, gCardPathPrefix);
+    strcat(path, name);
+    strcat(path, gCardPathSuffix);
 
-    handle = New_TimImage(buf);
-    ((TimImageUploadFn)handle->methods->processBuffer)(handle);
-    newVal = New_ScreenSprite(handle, &gCardIconRect, 0);
-    self->cardIcon = newVal;
-    handle->methods->release(handle);
-    newVal->methods->attachToParent(newVal, self->spriteParent, (LongVec3 *)&gCardIconPos);
+    tim = New_TimImage(path);
+    ((TimImageUploadFn)tim->methods->processBuffer)(tim);
+    icon = New_ScreenSprite(tim, &gCardIconRect, 0);
+    self->cardIcon = icon;
+    tim->methods->release(tim);
+    icon->methods->attachToParent(icon, self->spriteParent, (LongVec3 *)&gCardIconPos);
 }
 
 void TaskObjF__ReleaseCardIcon(TaskObjF *self) {
@@ -137,19 +137,19 @@ void TaskObjF__ReleaseCardIcon(TaskObjF *self) {
     }
 }
 
-void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 arg2) {
+void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 event) {
     if (self->state != 0) {
-        if (arg2 == 0x19) {
+        if (event == 0x19) {
             self->methods->advanceState(self);
-        } else if (arg2 == 0x17) {
+        } else if (event == 0x17) {
             self->methods->forceIdleFromState(self);
         }
     }
 }
 
-void TaskObjF__PlaySound(TaskObjF *self, s32 arg1) {
+void TaskObjF__PlaySound(TaskObjF *self, s32 index) {
     if (self->sound != NULL) {
-        self->sound->methods->playTone(self->sound, arg1, 0x7F, 0x7F);
+        self->sound->methods->playTone(self->sound, index, 0x7F, 0x7F);
     }
 }
 
@@ -207,28 +207,28 @@ void TaskObjF__ForceIdleFromState(TaskObjF *self) {
 
 void TaskObjF__TickStateDelay(TaskObjF *self) {
     s32 old;
-    s32 newVal;
+    s32 count;
 
     if (self->state == 7) {
         old = self->waitCounter;
-        newVal = old + 1;
-        self->waitCounter = newVal;
+        count = old + 1;
+        self->waitCounter = count;
         if (old < 6) {
             return;
         }
         self->methods->setState(self, 0x13);
     } else if (self->state == 0xB) {
         old = self->waitCounter;
-        newVal = old + 1;
-        self->waitCounter = newVal;
+        count = old + 1;
+        self->waitCounter = count;
         if (old < 6) {
             return;
         }
         self->methods->setState(self, 0x14);
     } else if (self->state == 0xF) {
         old = self->waitCounter;
-        newVal = old + 1;
-        self->waitCounter = newVal;
+        count = old + 1;
+        self->waitCounter = count;
         if (old < 6) {
             return;
         }
@@ -260,8 +260,8 @@ void TaskObjF__DetachTextEntry(TaskObjF *self) {
     }
 }
 
-void TaskObjF__OnTextEntryResult(TaskObjF *self, void *arg1, s32 arg2) {
-    switch (arg2) {
+void TaskObjF__OnTextEntryResult(TaskObjF *self, void *sender, s32 result) {
+    switch (result) {
         case 2:
             self->methods->detachTextEntry(self);
             self->methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
@@ -298,10 +298,10 @@ void TaskObjF__DetachItemList(TaskObjF *self) {
     }
 }
 
-void TaskObjF__OnItemListResult(TaskObjF *self, ItemList *arg1, s32 arg2) {
-    switch (arg2) {
+void TaskObjF__OnItemListResult(TaskObjF *self, ItemList *list, s32 result) {
+    switch (result) {
         case 2:
-            self->selectedIndex = arg1->methods->getCursorIndex(arg1);
+            self->selectedIndex = list->methods->getCursorIndex(list);
             self->methods->detachItemList(self);
             self->methods->setState(self, 0xE);
             break;
@@ -352,27 +352,27 @@ extern Pair2_3bb8c_g *gSaveTitleGlyphs;
  * content at exit (`$v0` left holding a pointer into the `gSaveTitleGlyphs`
  * template in every path) confirms the real return type is a pointer,
  * loosely read as `s32` by the caller that never dereferences it. */
-s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1) {
-    Pair2_3bb8c_g *self = (Pair2_3bb8c_g *)arg0;
-    u8 *src = (u8 *)arg1;
-    s32 t0;
-    s32 idx;
-    Pair2_3bb8c_g *p;
+s32 StampSaveTitleFileLetter(s32 titleAddr, s32 fileNameAddr) {
+    Pair2_3bb8c_g *title = (Pair2_3bb8c_g *)titleAddr;
+    char *fileName = (char *)fileNameAddr;
+    s32 numberPos;
+    s32 letter;
+    Pair2_3bb8c_g *glyph;
 
-    if (src != NULL) {
-        t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
+    if (fileName != NULL) {
+        numberPos = ((u32)(fileName[0xE] - 0x38) < 2) ? 0xE : 0xD;
 
-        self[12] = gSaveTitleGlyphs[15];
-        *(Buf12_3bb8c_g *)&self[3] = *(Buf12_3bb8c_g *)&gSaveTitleGlyphs[15];
+        title[12] = gSaveTitleGlyphs[15];
+        *(Buf12_3bb8c_g *)&title[3] = *(Buf12_3bb8c_g *)&gSaveTitleGlyphs[15];
 
-        idx = atoi((char *)(src + t0)) - 1;
-        p = &gSaveTitleGlyphs[idx];
-        self[4] = *p;
-        return (s32)p;
+        letter = atoi(fileName + numberPos) - 1;
+        glyph = &gSaveTitleGlyphs[letter];
+        title[4] = *glyph;
+        return (s32)glyph;
     } else {
-        Pair2_3bb8c_g *q = gSaveTitleGlyphs;
+        Pair2_3bb8c_g *glyphs = gSaveTitleGlyphs;
 
-        *(Buf6_3bb8c_g *)&self[3] = *(Buf6_3bb8c_g *)&q[15];
-        return (s32)q;
+        *(Buf6_3bb8c_g *)&title[3] = *(Buf6_3bb8c_g *)&glyphs[15];
+        return (s32)glyphs;
     }
 }
