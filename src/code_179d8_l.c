@@ -166,7 +166,7 @@ extern s16 D_8008E8C0;
 extern u16 D_8008EA22;
 extern u8 D_8008EA20;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E230;
@@ -275,9 +275,9 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
     }
 
     D_8008E228 = lowBit | D_8008E228;
-    D_8008E22C = highBit | D_8008E22C;
+    _svm_okon2 = highBit | _svm_okon2;
     D_80090C60 = D_80090C60 & ~D_8008E228;
-    D_80090C64 = D_80090C64 & ~D_8008E22C;
+    D_80090C64 = D_80090C64 & ~_svm_okon2;
 }
 #else
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmKeyOnNow);
@@ -349,9 +349,9 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
 
     _svm_voice[(u8)a3].unk02 = 0;
     D_8008E228 = lowBit | D_8008E228;
-    D_8008E22C = highBit | D_8008E22C;
+    _svm_okon2 = highBit | _svm_okon2;
     D_80090C60 = D_80090C60 & ~D_8008E228;
-    D_80090C64 = D_80090C64 & ~D_8008E22C;
+    D_80090C64 = D_80090C64 & ~_svm_okon2;
     D_8006DAD4->noiseOn[0] = lowBit;
     D_8006DAD4->noiseOn[1] = highBit;
 }

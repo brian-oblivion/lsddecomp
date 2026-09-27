@@ -58,7 +58,7 @@ void SpuVmSeqKeyOff(s32 p0)
             D_8008E228 = D_8008E228 & ~old60;
             old64 = hiBit | old64;
             D_80090C64 = old64;
-            D_8008E22C = D_8008E22C & ~old64;
+            _svm_okon2 = _svm_okon2 & ~old64;
         }
         i++;
     } while ((u8) i < D_8008E9D0);
@@ -68,7 +68,7 @@ void SpuVmSeqKeyOff(s32 p0)
 
 Needs this unit's shared `_snd_ev_flag`-adjacent globals declared near the
 top of `code_179d8_j.c` (`D_8008EA26`, `D_8008E9D0`, `D_8008D996`/`D_8008D9A3`/
-`_svm_voice`/`D_8008D98C`, `D_80090C60`/`D_80090C64`, `D_8008E228`/`D_8008E22C`).
+`_svm_voice`/`D_8008D98C`, `D_80090C60`/`D_80090C64`, `D_8008E228`/`_svm_okon2`).
 
 ## One CLOSED finding: masking the induction variable is what enables strength reduction to match
 
@@ -238,7 +238,7 @@ round 23 already showed backfires.
 body into `src/code_179d8_j.c` (with this unit's own local reduced-view
 declarations for `D_8008E9D0`, `D_8008D996`/`D_8008D9A3`/`_svm_voice`/
 `D_8008D98C`, `D_8008EA26`, `D_80090C60`/`D_80090C64`, `D_8008E228`/
-`D_8008E22C`, copied from `libsnd_vm_vol_ut_key_ut_keyv.c`'s equivalents per this
+`_svm_okon2`, copied from `libsnd_vm_vol_ut_key_ut_keyv.c`'s equivalents per this
 project's per-unit reduced-local-view convention) and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `funcdiff.py` shows **45/85
 raw word-match with NO out-of-range drift warning** -- the compiled length
@@ -376,7 +376,7 @@ extern volatile u16 D_8008EA26;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 
 typedef struct {
     s16 unk0;
@@ -430,7 +430,7 @@ void SpuVmSeqKeyOff(s32 p0)
             D_8008E228 = D_8008E228 & ~old60;
             old64 = hiBit | old64;
             D_80090C64 = old64;
-            D_8008E22C = D_8008E22C & ~old64;
+            _svm_okon2 = _svm_okon2 & ~old64;
         }
         i++;
     } while ((u8) i < D_8008E9D0);
@@ -667,7 +667,7 @@ void SpuVmSeqKeyOff(s32 p0)
             D_8008E228 = D_8008E228 & ~old60;
             old64 = hiBit | old64;
             D_80090C64 = old64;
-            D_8008E22C = D_8008E22C & ~old64;
+            _svm_okon2 = _svm_okon2 & ~old64;
         }
         i++;
     } while ((u8) i < D_8008E9D0);
@@ -801,7 +801,7 @@ What moves the tail is not ORDER, it is which sub-expression gets a name:
             D_8008E228 = D_8008E228 & old60;
             D_80090C64 = hiBit | D_80090C64;
             old64 = ~D_80090C64;
-            D_8008E22C = D_8008E22C & old64;
+            _svm_okon2 = _svm_okon2 & old64;
 ```
 
 Note this is NOT `SsUtKeyOff`'s tail idiom, which round 56 measured at
@@ -819,7 +819,7 @@ extern volatile u16 D_8008EA26;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 
 typedef struct {
     s16 unk0;
@@ -872,7 +872,7 @@ void SpuVmSeqKeyOff(s32 p0)
             D_8008E228 = D_8008E228 & old60;
             D_80090C64 = hiBit | D_80090C64;
             old64 = ~D_80090C64;
-            D_8008E22C = D_8008E22C & old64;
+            _svm_okon2 = _svm_okon2 & old64;
         }
         i++;
     } while ((u8) i < D_8008E9D0);

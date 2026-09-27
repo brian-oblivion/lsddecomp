@@ -62,7 +62,7 @@ extern volatile u16 *D_8006DAD4;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 
 /* STALL -- see docs/match-reports/SsUtAllKeyOff.md.  Round 66 revisit:
  * best-derived body now compiles to EXACT LENGTH (was 9 words SHORT);
@@ -126,7 +126,7 @@ void SsUtAllKeyOff(void)
         D_8008E228 = D_8008E228 & ~hw0;
         hw1 = bitHi | hw1;
         D_80090C64 = hw1;
-        D_8008E22C = D_8008E22C & ~hw1;
+        _svm_okon2 = _svm_okon2 & ~hw1;
     }
 }
 #endif

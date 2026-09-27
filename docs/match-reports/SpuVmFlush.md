@@ -83,7 +83,7 @@ window:
    (`func_800375E8(0, 0xFFFFFF)` if `D_8008D9A3[i] == 2`, then zero it
    regardless).
 4. Two unconditional bitmask updates:
-   `D_8008E228 &= ~D_80090C60; D_8008E22C &= ~D_80090C64;`
+   `D_8008E228 &= ~D_80090C60; _svm_okon2 &= ~D_80090C64;`
 5. **Per-channel interpolation dispatch**, unconditional 0..0x17 loop:
    `SetAutoVol(i)` if `D_8008D9A4[i] != 0`, `SetAutoPan(i)` if
    `D_8008D9B0[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
@@ -99,7 +99,7 @@ window:
    different problem at the time), but is the established idiom project-
    wide and was kept removed on principle.
 7. Unconditional tail: read `D_80090C60`/`D_80090C64`/`D_8008E228`/
-   `D_8008E22C`/`D_8008E230`/`D_8008E234` into locals, zero the first four
+   `_svm_okon2`/`D_8008E230`/`D_8008E234` into locals, zero the first four
    globals, then store all six into fixed offsets of the SAME `D_8006DAD4`
    object phase 2 read as an array (`+0x18C`/`+0x18E`/`+0x188`/`+0x18A`/
    `+0x198`/`+0x19A` — a THIRD independent view of `D_8006DAD4`, alongside
@@ -539,7 +539,7 @@ void SpuVmFlush(void) {
     }
 
     D_8008E228 &= ~D_80090C60;
-    D_8008E22C &= ~D_80090C64;
+    _svm_okon2 &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
         if (D_8008D9A4[i].unk0 != 0) {
@@ -579,14 +579,14 @@ void SpuVmFlush(void) {
         u16 lowMask = D_80090C60;
         u16 highMask = D_80090C64;
         u16 lowActive = D_8008E228;
-        u16 highActive = D_8008E22C;
+        u16 highActive = _svm_okon2;
         s16 v230 = D_8008E230;
         s16 v234 = D_8008E234;
 
         D_80090C60 = 0;
         D_80090C64 = 0;
         D_8008E228 = 0;
-        D_8008E22C = 0;
+        _svm_okon2 = 0;
 
         *(u16 *) ((u8 *) rec + 0x18C) = lowMask;
         *(u16 *) ((u8 *) rec + 0x18E) = highMask;
@@ -625,7 +625,7 @@ extern u8 _svm_auto_kof_mode;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 extern s16 D_8008E230;
 extern s16 D_8008E234;
 extern s32 D_8008E258;
@@ -714,7 +714,7 @@ void SpuVmFlush(void) {
     }
 
     D_8008E228 &= ~D_80090C60;
-    D_8008E22C &= ~D_80090C64;
+    _svm_okon2 &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
         if (D_8008D9A4[i].unk0 != 0) {
@@ -754,14 +754,14 @@ void SpuVmFlush(void) {
         u16 lowMask = D_80090C60;
         u16 highMask = D_80090C64;
         u16 lowActive = D_8008E228;
-        u16 highActive = D_8008E22C;
+        u16 highActive = _svm_okon2;
         s16 v230 = D_8008E230;
         s16 v234 = D_8008E234;
 
         D_80090C60 = 0;
         D_80090C64 = 0;
         D_8008E228 = 0;
-        D_8008E22C = 0;
+        _svm_okon2 = 0;
 
         *(u16 *) ((u8 *) rec + 0x18C) = lowMask;
         *(u16 *) ((u8 *) rec + 0x18E) = highMask;
@@ -814,7 +814,7 @@ here -- proposing for the head to apply once no runner is live on
 - `D_80090C60`/`D_80090C64` -> `gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`
   (OR'd with a per-voice bit when releasing a voice, split low/high 16
   across the 0..0x1F channel space).
-- `D_8008E228`/`D_8008E22C` -> `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`
+- `D_8008E228`/`_svm_okon2` -> `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`
   (AND-NOT'd with the enable mask above -- the actual SPU key bitmask
   pair, per `vmNoiseOn2`'s report).
 - `_svm_sreg_dirty` -> `gVoiceFlags` (per-voice byte OR'd with 3 or 4 by

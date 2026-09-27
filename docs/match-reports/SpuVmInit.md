@@ -347,7 +347,7 @@ extern u8 _svm_vab_used[];
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 
 typedef struct {
     u8 pad[0x194];
@@ -457,13 +457,13 @@ void SpuVmInit(s32 a0) {
         D_80090C60 |= lowMask;
         D_80090C64 |= highMask;
         D_8008E228 &= ~D_80090C60;
-        D_8008E22C &= ~D_80090C64;
+        _svm_okon2 &= ~D_80090C64;
     }
 
     gMasterVolL = 0x3FFF;
     gMasterVolR = 0x3FFF;
     D_8008E228 = 0;
-    D_8008E22C = 0;
+    _svm_okon2 = 0;
     D_80090C60 = 0;
     D_8008E230 = 0;
     D_8008E234 = 0;
@@ -728,7 +728,7 @@ base address `0x1F801C00`, per `vmNoiseOn2`'s own report in
 `_k`/`_p`. See the broadcast post from this round for the fuller list of
 globals this unit shares with that cluster (`D_8008EA26` -> `gSelectedVoice`,
 `D_8008E9D0` -> `gVoiceCount`, `D_80090C60`/`D_80090C64` ->
-`gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`, `D_8008E228`/`D_8008E22C` ->
+`gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`, `D_8008E228`/`_svm_okon2` ->
 `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`, `_svm_sreg_dirty` -> `gVoiceFlags`,
 `D_8008D9A3` -> `gVoiceState`).
 

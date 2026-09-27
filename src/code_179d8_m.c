@@ -274,7 +274,7 @@ extern u8 _svm_vab_used[];
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 
 /* Declared without volatile, the spelling this unit's matched bodies were
  * derived against. */
@@ -371,13 +371,13 @@ void SpuVmInit(s32 a0) {
         D_80090C64 |= highMask;
         woff = D_80090C60;
         D_8008E228 &= ~woff;
-        D_8008E22C &= ~D_80090C64;
+        _svm_okon2 &= ~D_80090C64;
     }
 
     _svm_rattr.depth.left = 0x3FFF;
     _svm_rattr.depth.right = 0x3FFF;
     D_8008E228 = 0;
-    D_8008E22C = 0;
+    _svm_okon2 = 0;
     D_80090C60 = 0;
     D_8008E230 = 0;
     D_8008E234 = 0;
@@ -629,7 +629,7 @@ void SpuVmFlush(void) {
     }
 
     D_8008E228 &= ~D_80090C60;
-    D_8008E22C &= ~D_80090C64;
+    _svm_okon2 &= ~D_80090C64;
 
     for (i = 0; i < 0x18; i++) {
         if (_svm_voice[i].unk1C != 0) {
@@ -669,14 +669,14 @@ void SpuVmFlush(void) {
         u16 lowMask = D_80090C60;
         u16 highMask = D_80090C64;
         u16 lowActive = D_8008E228;
-        u16 highActive = D_8008E22C;
+        u16 highActive = _svm_okon2;
         s16 v230 = D_8008E230;
         s16 v234 = D_8008E234;
 
         D_80090C60 = 0;
         D_80090C64 = 0;
         D_8008E228 = 0;
-        D_8008E22C = 0;
+        _svm_okon2 = 0;
 
         rec->keyOff[0] = lowMask;
         rec->keyOff[1] = highMask;
@@ -851,7 +851,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SpuVmKeyOn);
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 
 u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 i;
@@ -896,7 +896,7 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
             D_80090C60 |= lowMask;
             D_80090C64 |= highMask;
             D_8008E228 &= ~D_80090C60;
-            D_8008E22C &= ~D_80090C64;
+            _svm_okon2 &= ~D_80090C64;
         }
         count++;
     }

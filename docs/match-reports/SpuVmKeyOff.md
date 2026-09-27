@@ -28,7 +28,7 @@ extern Rec34S16 _svm_voice[];
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 
 u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 i;
@@ -73,7 +73,7 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
             D_80090C60 |= lowMask;
             D_80090C64 |= highMask;
             D_8008E228 &= ~D_80090C60;
-            D_8008E22C &= ~D_80090C64;
+            _svm_okon2 &= ~D_80090C64;
         }
         count++;
     }
@@ -100,7 +100,7 @@ same 0x34-stride record family `code_179d8_j.c` documents as
   practice, but a fresh read, matching the project's documented idiom),
   then update the two 16-channel bitmask pairs `code_179d8_j.c` already
   documents (`D_80090C60`/`D_8008E228` for channels 0-15,
-  `D_80090C64`/`D_8008E22C` for channels 16-31): OR the appropriate mask
+  `D_80090C64`/`_svm_okon2` for channels 16-31): OR the appropriate mask
   into the "channel" word, then AND-NOT the freshly updated channel word
   into the "active" word. **Both pairs are touched unconditionally on
   every call** -- whichever mask doesn't apply to this channel's half is
@@ -160,7 +160,7 @@ reset.
 2. **A pure register-identity residue in the bitmask-update tail, fixed by
    INTERLEAVING two independent statement pairs rather than grouping
    them.** Grouped as `D_80090C60 |= lowMask; D_8008E228 &= ~D_80090C60;
-   D_80090C64 |= highMask; D_8008E22C &= ~D_80090C64;` (each OR immediately
+   D_80090C64 |= highMask; _svm_okon2 &= ~D_80090C64;` (each OR immediately
    followed by its own AND-NOT), the function matched everywhere EXCEPT a
    pure `$a1`/`$a2` register swap across ~12 words, both in the earlier
    mask-selection `if`/`else` and in the four bitmask-update instructions
@@ -173,7 +173,7 @@ reset.
    swapping which physical global each mask fed). What worked:
    INTERLEAVING the two ORs before either AND-NOT --
    `D_80090C60 |= lowMask; D_80090C64 |= highMask; D_8008E228 &=
-   ~D_80090C60; D_8008E22C &= ~D_80090C64;` -- closed the whole residue on
+   ~D_80090C60; _svm_okon2 &= ~D_80090C64;` -- closed the whole residue on
    the first try after the grouped form was ruled out.
 
 ### Proposed learning

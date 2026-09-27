@@ -42,7 +42,7 @@ s32 SsUtKeyOffV(s16 idx)
     D_80090C60 = mask0 | D_80090C60;
     D_80090C64 |= mask1;
     D_8008E228 &= ~D_80090C60;
-    D_8008E22C &= ~D_80090C64;
+    _svm_okon2 &= ~D_80090C64;
     return 0;
 
 fail:
@@ -82,8 +82,8 @@ lhu  D_80090C60 ; lhu D_80090C64
 sh   zero, D_8008D98C[chan] ; sh zero, _svm_voice[chan]
 lhu  D_8008E228
 or / sh D_80090C60 / nor / and / sh D_8008E228
-lhu  D_8008E22C
-or / sh D_80090C64 / nor / and / sh D_8008E22C
+lhu  _svm_okon2
+or / sh D_80090C64 / nor / and / sh _svm_okon2
 sw   zero, _snd_ev_flag
 ```
 
@@ -126,7 +126,7 @@ is why neither ever moved:
   described: the cached-locals build loads the four globals in the order
   **C60, E228, C64, E22C** (confirmed from the relocations) where retail loads
   **C60, C64, E228, E22C**, and it sinks the `D_8008E228` store six
-  instructions past retail's position, below the `D_8008E22C` load. Removing
+  instructions past retail's position, below the `_svm_okon2` load. Removing
   the locals restores both.
 
 ## Negatives confirmed this round (not stale -- re-measured on the current pipeline)
@@ -230,7 +230,7 @@ Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Bounds-checks
 `libsnd_decre.c`'s `func_80033738`), converts the channel into a 32-bit-wide
 `(loBit, hiBit)` bitmask pair, clears three per-channel fields, then ORs the
 new bits into two running masks (`D_80090C60`/`D_80090C64`) and clears the
-corresponding bits out of two "active" masks (`D_8008E228`/`D_8008E22C`).
+corresponding bits out of two "active" masks (`D_8008E228`/`_svm_okon2`).
 
 ## What it is (best-reached body, 51/73 words, whole-image SHA1 red)
 
@@ -268,10 +268,10 @@ s32 SsUtKeyOffV(s16 idx)
     old60 = loBit | old60;
     D_80090C60 = old60;
     D_8008E228 = e228 & ~old60;
-    e22c = D_8008E22C;
+    e22c = _svm_okon2;
     old64 = hiBit | old64;
     D_80090C64 = old64;
-    D_8008E22C = e22c & ~old64;
+    _svm_okon2 = e22c & ~old64;
     return 0;
 
 fail_unlock:
@@ -284,7 +284,7 @@ fail_locked:
 
 (Uses this unit's already-shared `_snd_ev_flag`, `Rec34Byte D_8008D9A3[]`,
 `Rec34Half _svm_voice[]`/`D_8008D98C[]`, and the scalar `D_80090C60`,
-`D_80090C64`, `D_8008E228`, `D_8008E22C` globals declared near the top of
+`D_80090C64`, `D_8008E228`, `_svm_okon2` globals declared near the top of
 `code_179d8_j.c`.)
 
 ## Two findings worth keeping regardless of the stall
@@ -354,14 +354,14 @@ rather than guessed from the funcdiff hex:
 - **The two mask-update sequences interleave differently.** Retail
   fully completes channel-60's `or`/store/`nor`/`and`/store sequence
   (including a freshly-computed `~newBits` complement) before starting
-  channel-64's (with `D_8008E22C`'s read deferred until *after*
+  channel-64's (with `_svm_okon2`'s read deferred until *after*
   `D_80090C60`'s store, not prefetched early like `D_8008E228`'s read
   is). This build's compiled output, despite the C statements appearing
   in that exact same order, computes both `or`s first, then interleaves
   the `nor`/`and`/store pairs across the two channels, reusing `$a0`/`$a1`
   across both halves in an order this project's toolchain-pinned
   pipeline chose independently of the C statement order. Tried: naming
-  `D_8008E228`bandwidth's and `D_8008E22C`'s reads as separate locals
+  `D_8008E228`bandwidth's and `_svm_okon2`'s reads as separate locals
   (`e228`, `e22c`) matching retail's own early/late fetch split --
   **zero effect**, byte-identical output to the direct-expression form
   (GCC already treats them equivalently); a bare `__asm__("")` barrier
@@ -388,7 +388,7 @@ the residue sideways or made it worse, never smaller.
   also perturbs the SECOND cluster, so the two clusters are not fully
   independent in how the register allocator responds to local pressure).
 - Second-half interleaving: named early/late locals for `D_8008E228`/
-  `D_8008E22C` mirroring retail's own fetch timing (no effect, byte-identical
+  `_svm_okon2` mirroring retail's own fetch timing (no effect, byte-identical
   to the unnamed form), a mid-sequence `__asm__("")` barrier (regressed to
   28/73).
 
@@ -459,7 +459,7 @@ Rebuilt the preserved body verbatim through the current pinned pipeline.
 Noticed that `SsUtKeyOff` -- an ALREADY-MATCHED sibling in this same
 unit whose `else` branch is the identical bit-mask/store idiom used here
 (same `D_8008D9A3`/`D_8008D98C`/`_svm_voice` clears, same
-`D_80090C60`/`D_80090C64`/`D_8008E228`/`D_8008E22C` mask-update sequence)
+`D_80090C60`/`D_80090C64`/`D_8008E228`/`_svm_okon2` mask-update sequence)
 -- declares its two mask locals with ASYMMETRIC types: `u32 mask0` (the
 `D_80090C60`-bound one) against `u16 mask1` (the `D_80090C64`-bound one),
 not the matched pair of `u16`s this function's preserved body uses for

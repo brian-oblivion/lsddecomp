@@ -124,7 +124,7 @@ extern u8 D_8008E9D0;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 
 /* libsnd vmanager's _svm_vh (pinned at this address): the current VAB's
  * header. */
@@ -369,7 +369,7 @@ s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
         D_80090C60 = mask0 | D_80090C60;
         D_80090C64 |= mask1;
         D_8008E228 &= ~D_80090C60;
-        D_8008E22C &= ~D_80090C64;
+        _svm_okon2 &= ~D_80090C64;
     }
     _snd_ev_flag = 0;
     return 0;
@@ -512,7 +512,7 @@ s16 SsUtKeyOffV(s16 idx) {
     D_80090C60 = mask0 | D_80090C60;
     D_80090C64 |= mask1;
     D_8008E228 &= ~D_80090C60;
-    D_8008E22C &= ~D_80090C64;
+    _svm_okon2 &= ~D_80090C64;
     return 0;
 
 fail:

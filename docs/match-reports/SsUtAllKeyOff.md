@@ -87,7 +87,7 @@ Retail interleaves load / compute / store tightly for the SPU key-on pair:
 ```
 lhu v1,D_80090C60 ; lhu a0,D_80090C64 ; ... ; lhu v0,D_8008E228
 or v1,a3,v1 ; sh v1,D_80090C60 ; nor v1,zero,v1 ; and v0,v0,v1 ; sh v0,D_8008E228
-lhu v0,D_8008E22C ; or a0,a2,a0 ; sh a0,D_80090C64 ; nor a0 ; and ; sh
+lhu v0,_svm_okon2 ; or a0,a2,a0 ; sh a0,D_80090C64 ; nor a0 ; and ; sh
 ```
 
 Caching all four globals in four locals (`hw0`/`hw1`/`mask0`/`mask1`, the
@@ -211,7 +211,7 @@ extern volatile u16 *D_8006DAD4;
 extern u16 D_80090C60;
 extern u16 D_80090C64;
 extern u16 D_8008E228;
-extern u16 D_8008E22C;
+extern u16 _svm_okon2;
 ```
 
 ```c
@@ -266,7 +266,7 @@ void SsUtAllKeyOff(void)
         D_8008E228 = D_8008E228 & ~hw0;
         hw1 = bitHi | hw1;
         D_80090C64 = hw1;
-        D_8008E22C = D_8008E22C & ~hw1;
+        _svm_okon2 = _svm_okon2 & ~hw1;
     }
 }
 #endif

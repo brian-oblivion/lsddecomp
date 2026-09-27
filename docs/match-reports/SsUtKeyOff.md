@@ -54,7 +54,7 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
         D_80090C60 = mask0 | D_80090C60;
         D_80090C64 |= mask1;
         D_8008E228 &= ~D_80090C60;
-        D_8008E22C &= ~D_80090C64;
+        _svm_okon2 &= ~D_80090C64;
     }
     _snd_ev_flag = 0;
     return 0;
