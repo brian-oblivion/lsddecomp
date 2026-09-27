@@ -10,7 +10,7 @@
  * comment still stands -- only the blocker verdicts are withdrawn.
  * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
  *
- * code_179d8_i_b -- the TAIL half of the old libsnd_decre slice, split off in
+ * libsnd_play -- the TAIL half of the old libsnd_decre slice, split off in
  * round 34 (2026-09-12) when Sony's `libsnd/replay.o` and `libsnd/vs_vab.o`
  * were linked into the middle of it. File 0x2490C..0x24938, vram
  * 0x8003410C..0x80034138: ONE function.
