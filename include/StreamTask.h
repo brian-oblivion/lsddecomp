@@ -25,8 +25,8 @@
  *
  * Overrides, each named for its slot:
  *   +0x008 ctor           StreamTask__StreamTask: TaskCore's ctor, this
- *                         table, initData copied from the fifth argument or
- *                         GetDefaultMovieFrame(), the player,
+ *                         table, initData (a DrawRect) copied from the
+ *                         fifth argument or GetDefaultMovieFrame(), the player,
  *                         streamName 0, resetCounters.
  *   +0x00C finalize       StreamTask__Finalize: releases the player, then
  *                         TaskCore's.
@@ -91,11 +91,11 @@ enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
 #define STREAMTASK_FRAMES_PER_SECOND 15
 
 /* `initData` is a DrawRect (include/DrawSystem.h): the ctor's optional fifth
- * (stack) argument, else GetDefaultMovieFrame()'s
- * &gDefaultMovieFrame, {x 640, y 0, w 320, h 240}, the same rect the
- * ctor hands New_MoviePlayer as the player's frame and TaskCore__OnInit
- * clears. Copied whole (retail loads all three words before storing any: a
- * struct assignment); no method of this class reads it back. */
+ * (stack) argument, else GetDefaultMovieFrame()'s &gDefaultMovieFrame,
+ * {x 640, y 0, w 320, h 240}, the rect the ctor also hands New_MoviePlayer
+ * as the player's frame and TaskCore__OnInit clears. Copied whole (retail
+ * loads all three words before storing any: a struct assignment); no method
+ * of this class reads it back. */
 
 /* The ctor takes FIVE parameters: New_StreamTask dispatches it with
  * $a0-$a3 plus a fifth stored to 0x10($sp), the o32 stack-argument slot
