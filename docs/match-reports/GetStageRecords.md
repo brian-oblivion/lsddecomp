@@ -1,4 +1,6 @@
-# GetRecordGroup -- MATCHED (21/21 words)
+# GetStageRecords -- MATCHED (21/21 words)
+
+> Renamed from `GetRecordGroup` on 2026-09-27 (tools/rename.py). Address 0x80048e2c.
 
 > Renamed from `func_80048E2C` on 2026-09-25 (tools/rename.py). Address 0x80048e2c.
 
@@ -17,7 +19,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetRecordGroup(s32 index) {
+Rec1C *GetStageRecords(s32 index) {
     return &((Rec1C *)GetRecordTable(NULL))[gStageFirstRecord[index]];
 }
 ```
@@ -37,6 +39,6 @@ Rec1C *GetRecordGroup(s32 index) {
 
 ## Naming
 
-- **Name:** `GetRecordGroup`
+- **Name:** `GetStageRecords`
 - **Tier:** A
 - **Evidence:** pure getter: &gRecordTable[gStageFirstRecord[index]]; a getter is tier A by the leaf-mechanics rule, purpose of the group itself not established.

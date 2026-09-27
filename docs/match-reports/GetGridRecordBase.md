@@ -9,16 +9,16 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-`GetRecordGroup(index) + 0xFC`, nine 0x1C-byte records past it.
+`GetStageRecords(index) + 0xFC`, nine 0x1C-byte records past it.
 
 ## Source
 
 ```c
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
-Rec1C *GetRecordGroup(s32 index);   /* INCLUDE_ASM in this unit */
+Rec1C *GetStageRecords(s32 index);   /* INCLUDE_ASM in this unit */
 
 Rec1C *GetGridRecordBase(s32 index) {
-    return &GetRecordGroup(index)[9];
+    return &GetStageRecords(index)[9];
 }
 ```
 
@@ -36,4 +36,4 @@ Rec1C *GetGridRecordBase(s32 index) {
 
 - **Name:** `GetGridRecordBase`
 - **Tier:** A
-- **Evidence:** pure getter: &GetRecordGroup(index)[9].
+- **Evidence:** pure getter: &GetStageRecords(index)[9].

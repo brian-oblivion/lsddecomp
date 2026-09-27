@@ -9,16 +9,16 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-Record index arithmetic: `GetRecordGroup(index) + 0x70` is four 0x1C-byte records past the record GetRecordGroup selects.
+Record index arithmetic: `GetStageRecords(index) + 0x70` is four 0x1C-byte records past the record GetStageRecords selects.
 
 ## Source
 
 ```c
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
-Rec1C *GetRecordGroup(s32 index);   /* INCLUDE_ASM in this unit */
+Rec1C *GetStageRecords(s32 index);   /* INCLUDE_ASM in this unit */
 
 Rec1C *GetVariantBlock(s32 index) {
-    return &GetRecordGroup(index)[4];
+    return &GetStageRecords(index)[4];
 }
 ```
 
@@ -36,4 +36,4 @@ Rec1C *GetVariantBlock(s32 index) {
 
 - **Name:** `GetVariantBlock`
 - **Tier:** A
-- **Evidence:** pure getter: &GetRecordGroup(index)[4].
+- **Evidence:** pure getter: &GetStageRecords(index)[4].

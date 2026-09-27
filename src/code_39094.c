@@ -217,12 +217,12 @@ char *GetSoundEffectDir(void) {
     return *GetSoundEffectDirRef();
 }
 
-Rec1C *GetRecordGroup(s32 index) {
+Rec1C *GetStageRecords(s32 index) {
     return &((Rec1C *)GetRecordTable(NULL))[gStageFirstRecord[index]];
 }
 
 Rec1C *GetRecordGroupAlias(s32 index) {
-    return GetRecordGroup(index);
+    return GetStageRecords(index);
 }
 
 Rec1C *PickDailyVariant(s32 index, s32 arg1, s32 day) {
@@ -232,7 +232,7 @@ Rec1C *PickDailyVariant(s32 index, s32 arg1, s32 day) {
 }
 
 Rec1C *GetVariantBlock(s32 index) {
-    return &GetRecordGroup(index)[4];
+    return &GetStageRecords(index)[4];
 }
 
 Rec1C *PickVariant(s32 index, s32 arg1) {
@@ -251,7 +251,7 @@ Rec1C *PickVariant(s32 index, s32 arg1) {
 }
 
 Rec1C *GetGridRecordBase(s32 index) {
-    return &GetRecordGroup(index)[9];
+    return &GetStageRecords(index)[9];
 }
 
 Rec1C *GetGridRecordAt(s32 index, s32 sub) {
