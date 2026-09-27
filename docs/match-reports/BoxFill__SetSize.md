@@ -64,4 +64,4 @@ Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport
 
 ## Track 7 (round 99, bravo)
 
-The size argument is read as `((SkipShort2 *)size)->x` / `->y` instead of `((u16 *)size)[0]` / `((u16 *)&size[1])[0]`. Byte-exact; the slot keeps `s32 *size`.
+The size argument is read as `((BoxFillSize *)size)->x` / `->y` instead of `((u16 *)size)[0]` / `((u16 *)&size[1])[0]`. Byte-exact; the slot keeps `s32 *size`.

@@ -65,8 +65,8 @@ void BoxFill__SetPosition(BoxFill *self, BoxFillPos *pos) {
 
 void BoxFill__SetSize(BoxFill *self, s32 *size) {
     if (self->parent != NULL) {
-        self->boxW = ((SkipShort2 *)size)->x;
-        self->boxH = ((SkipShort2 *)size)->y;
+        self->boxW = ((BoxFillSize *)size)->x;
+        self->boxH = ((BoxFillSize *)size)->y;
     }
 }
 

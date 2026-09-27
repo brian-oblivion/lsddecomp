@@ -10,7 +10,7 @@ same "call the further-base ctor first, reset methods, redispatch finishConstruc
 chain `FadeBox__FadeBox` uses one level up:
 
 ```c
-void BoxFill__BoxFill(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void BoxFill__BoxFill(ClassEAC0Obj *self, BoxFillSize *a1, void *a2, s32 a3) {
     GetSceneNodeMethods()->ctor(self);
     self->methods = GetBoxFillMethods();
     self->methods->finishConstruct(self, a1, a2, a3);

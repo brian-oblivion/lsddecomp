@@ -54,7 +54,7 @@
 
 typedef struct BoxFill BoxFill;
 typedef struct BoxFillMethods BoxFillMethods;
-typedef struct SkipShort2 SkipShort2;
+typedef struct BoxFillSize BoxFillSize;
 typedef struct BoxFillPos BoxFillPos;
 
 /* Bit positions in `boxAttribute`, the GsBOXF attribute word, that the
@@ -70,7 +70,7 @@ typedef struct BoxFillPos BoxFillPos;
  * callers pass s32 pairs of their own types (class_3bb8c_n's PairXY,
  * sListViewSize[2]), so New_BoxFill and the ctor slot take `void *` and the
  * occupants read it as this. */
-struct SkipShort2 {
+struct BoxFillSize {
     s16 x; /* +0x000, the width */
     u8 pad2[0x004 - 0x002];
     s16 y; /* +0x004, the height */
@@ -145,14 +145,14 @@ extern BoxFillMethods *GetBoxFillMethods(void); /* returns &gBoxFillMethods */
 
 /* +0x040's and +0x04C's occupants, as a caller reaching them through the
  * inherited slots casts them (see the banner). */
-typedef void (*BoxFillResetFn)(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
+typedef void (*BoxFillResetFn)(BoxFill *self, BoxFillSize *size, void *color, s32 pri);
 typedef void (*BoxFillAttachToParentFn)(BoxFill *self, SceneNode *parent, BoxFillPos *pos);
 
 /* The class's own methods, in ROM order (code_2cc8c_e, then code_2cc8c_f).
  * A subclass reaches the base ones through GetBoxFillMethods() and upcasts. */
 BoxFill *New_BoxFill(void *size, void *color, s32 pri);
-void BoxFill__BoxFill(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
-void BoxFill__Reset(BoxFill *self, SkipShort2 *size, void *color, s32 pri);
+void BoxFill__BoxFill(BoxFill *self, BoxFillSize *size, void *color, s32 pri);
+void BoxFill__Reset(BoxFill *self, BoxFillSize *size, void *color, s32 pri);
 void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, BoxFillPos *pos);
 s32 BoxFill__SetDisplay(BoxFill *self, s32 on);
 s32 BoxFill__SetSemiTrans(BoxFill *self, s32 on);

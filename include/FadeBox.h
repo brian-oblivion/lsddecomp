@@ -78,7 +78,7 @@ struct FadeBoxMethods {
                                   s32 arg3); /* FadeBox__Configure: returns the mask it stored */
     /* +0x0E0 */ void (*stop)(FadeBox *self, BasicClass *source); /* FadeBox__Stop */
     /* +0x0E4 */ void *(*getColor)(FadeBox *self); /* FadeBox__GetColor: the mask's table entry */
-    /* +0x0E8 */ void (*pushPosition)(FadeBox *self, SkipShort2 *size,
+    /* +0x0E8 */ void (*pushPosition)(FadeBox *self, BoxFillSize *size,
                                       BoxFillPos *pos); /* FadeBox__PushPosition: only while attached */
     /* +0x0EC */ void (*popPosition)(FadeBox *self); /* FadeBox__PopPosition */
     /* +0x0F0 */ void (*setDivisorMode)(FadeBox *self, s32 altMode, s32 divisor); /* FadeBox__SetDivisorMode */
@@ -118,7 +118,7 @@ void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 a
 s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3);
 void FadeBox__Stop(FadeBox *self, BasicClass *source);
 void *FadeBox__GetColor(FadeBox *self);
-void FadeBox__PushPosition(FadeBox *self, SkipShort2 *size, BoxFillPos *pos);
+void FadeBox__PushPosition(FadeBox *self, BoxFillSize *size, BoxFillPos *pos);
 void FadeBox__PopPosition(FadeBox *self);
 void FadeBox__SetDivisorMode(FadeBox *self, s32 altMode, s32 divisor);
 

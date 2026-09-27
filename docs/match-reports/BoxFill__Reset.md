@@ -8,7 +8,7 @@ Unit `code_2cc8c_e`, carved round 14. `ClassEAC0Methods::finishConstruct` (`+0x0
 dispatched by the class's own ctor (`BoxFill__BoxFill`).
 
 ```c
-void BoxFill__Reset(ClassEAC0Obj *self, SkipShort2 *a1, void *a2, s32 a3) {
+void BoxFill__Reset(ClassEAC0Obj *self, BoxFillSize *a1, void *a2, s32 a3) {
     ClassEAC0Methods *methods;
 
     self->unk44 = a3;
