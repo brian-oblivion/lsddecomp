@@ -1,11 +1,13 @@
-# func_8002C478 -- MATCHED (2/2 words)
+# GetVabUseVSyncCallback -- MATCHED (2/2 words)
+
+> Renamed from `func_8002C478` on 2026-09-27 (tools/rename.py). Address 0x8002c478.
 
 Unit: `code_179d8_e`. Runner: echo, round 17.
 
 ## Result
 
 ```c
-s32 func_8002C478(void) {
+s32 GetVabUseVSyncCallback(void) {
     return 0;
 }
 ```
@@ -32,7 +34,7 @@ that name through its later rename to `GetVabDriverMethods`, but the
 CLAIM itself was never right. `code_171e0.c`'s actual source (read in full
 this round, not just the one `.s` file) shows `func_80026FE8`'s caller
 context is: `if (gActiveDataSource == 0x13) return GetCdUseVSyncCallback(); else
-return func_8002C478();` -- this function is the `else` arm alongside
+return GetVabUseVSyncCallback();` -- this function is the `else` arm alongside
 `GetCdUseVSyncCallback` (still unnamed), not `func_8002C438`/`GetVabDriverMethods`
 (that one is `func_80026CAC`'s own accessor pair, a different dispatcher
 entirely). See the unit header comment and this unit's `GetVabDriverMode`/
@@ -40,7 +42,7 @@ entirely). See the unit header comment and this unit's `GetVabDriverMode`/
 
 ## Naming
 
-Kept `func_8002C478`, tier C. It's the same generic driver-mode-interface
+Kept `GetVabUseVSyncCallback`, tier C. It's the same generic driver-mode-interface
 family as `GetVabDriverMode`/`SetVabDriverMode` (this backend's own
 implementation of whatever `func_80026FE8` needs when
 `gActiveDataSource != 0x13`), but its own counterpart `GetCdUseVSyncCallback` is

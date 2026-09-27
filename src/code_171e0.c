@@ -269,13 +269,13 @@ s32 GetActiveDataSourceDriverMode(void) {
 }
 
 extern s32 GetCdUseVSyncCallback(void);
-extern s32 func_8002C478(void);
+extern s32 GetVabUseVSyncCallback(void);
 
 s32 GetActiveDataSourceUseVSyncCallback(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdUseVSyncCallback();
     } else {
-        return func_8002C478();
+        return GetVabUseVSyncCallback();
     }
 }
 

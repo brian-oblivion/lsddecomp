@@ -53,12 +53,12 @@
  * door onto whichever data source `gActiveDataSource` currently selects, not
  * something owned by `VabStreamObj` itself.
  *
- * `func_8002C478` and `GetVabDriverMode`/`SetVabDriverMode` are this
+ * `GetVabUseVSyncCallback` and `GetVabDriverMode`/`SetVabDriverMode` are this
  * backend's own implementations of the same generic driver-mode interface
  * `code_171e0.c` dispatches on `gActiveDataSource` -- confirmed round 52 by
  * that unit's own substitution (`func_80026FAC`/`func_80026F34`/
  * `func_80026FE8` call `GetCdDriverMode`/`SetCdDriverMode`/`GetCdUseVSyncCallback`
- * when `gActiveDataSource == 0x13`, else these).  `func_8002C478` itself
+ * when `gActiveDataSource == 0x13`, else these).  `GetVabUseVSyncCallback` itself
  * stays unnamed: its only paired counterpart, `GetCdUseVSyncCallback`, is still
  * unnamed too, so there's nothing to name it AS a stand-in for.
  */
@@ -107,7 +107,7 @@ s32 SetVabDriverMode(s32 a, s32 b) {
     return 1;
 }
 
-s32 func_8002C478(void) {
+s32 GetVabUseVSyncCallback(void) {
     return 0;
 }
 
