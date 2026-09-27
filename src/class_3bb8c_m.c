@@ -58,9 +58,9 @@ extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
 
 /* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
-extern char sPauseText[];   /* "Pause" (asm/data/7B008.sdata.s) */
-extern s32 sPauseTextPos;   /* two words: the position */
-extern s32 sPauseTextColor; /* one word: the colour */
+extern char sPauseText[];             /* "Pause" */
+extern ScreenSpritePos sPauseTextPos; /* (-20, -50) */
+extern SpriteRgb sPauseTextColor;     /* red: (255, 0, 0) */
 
 void ObjM__EnterState7(ObjM *self) {
     s32 val;
@@ -177,10 +177,10 @@ void ObjM__CloseAndNotifyC(ObjM *self) {
 void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 state = self->pauseSetupStep;
     if (state == 0) {
-        self->pauseText = New_TextRow(self->etcTim, 5, &sPauseText[0]);
+        self->pauseText = New_TextRow(self->etcTim, 5, sPauseText);
         self->pauseText->methods->attachToParent(self->pauseText, (SceneNode *)self->unk14,
                                                  (LongVec3 *)&sPauseTextPos);
-        self->pauseText->methods->setColor(self->pauseText, (SpriteRgb *)&sPauseTextColor);
+        self->pauseText->methods->setColor(self->pauseText, &sPauseTextColor);
         self->pauseSetupStep = state + 1;
         return;
     }
@@ -309,14 +309,14 @@ typedef struct StyleSceneRefs {
 } StyleSceneRefs;
 
 extern s32 gStyleDecorObj;
-extern s32 sStyleDecorBoxSize;
-extern s32 sStyleDecorBoxPos;
+extern s32 sStyleDecorBoxSize[2];    /* 320 x 240, the screen */
+extern BoxFillPos sStyleDecorBoxPos; /* (-100, -100), as Viewport's own fade box */
 
 void ApplyStyleDecorationIfSet(void) {
     SceneNode *fadeBox;
 
     if (gStyleDecorColor != 0) {
-        gStyleDecorObj = (s32)New_BoxFill(&sStyleDecorBoxSize, (void *)gStyleDecorColor, 0);
+        gStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (BoxFillRgb *)gStyleDecorColor, 0);
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTransOn((BoxFill *)gStyleDecorObj, 1);
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTransRate((BoxFill *)gStyleDecorObj, 0);
 
@@ -324,6 +324,6 @@ void ApplyStyleDecorationIfSet(void) {
                       ->viewport->methods->getFadeBox(((StyleSceneRefs *)gStyleSceneRefs)->viewport);
 
         ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorObj)->methods->attachToParent)(
-            (BoxFill *)gStyleDecorObj, fadeBox, (BoxFillPos *)&sStyleDecorBoxPos);
+            (BoxFill *)gStyleDecorObj, fadeBox, &sStyleDecorBoxPos);
     }
 }
