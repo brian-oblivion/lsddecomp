@@ -22,12 +22,15 @@
  *
  * Only the fields a unit including this header accesses are declared. Other
  * units still carry their own reduced views of the same record
- * (code_179d8_f/_i/_k's Entry90902E8, code_179d8_l's SsScore,
- * code_179d8_m's Entry90902E8M); their fields join this definition as those
- * units move onto it.
+ * (code_179d8_f/_i/_k's Entry90902E8, code_179d8_l's SsScore); their
+ * fields join this definition as those units move onto it.
  */
 typedef struct SsScore {
-    u8 pad0[0x74];
+    u8 pad0[0x12];
+    u8 unk12; /* +0x12 -- the MIDI channel of the event being played: SpuVmKeyOn indexes unk4E by it */
+    u8 pad13[0x4E - 0x13];
+    s16 unk4E[0x10]; /* +0x4E -- per-channel volume, one per MIDI channel: SpuVmKeyOn divides a note's velocity * 127 by it */
+    u8 pad6E[0x74 - 0x6E];
     u16 unk74; /* +0x74 -- left volume: SpuVmSetSeqVol stores its voll (clamped to 0x7F); SpuVmSetVol scales a voice's left level by it / 127 */
     u16 unk76; /* +0x76 -- right volume: SpuVmSetSeqVol stores its volr (clamped to 0x7F); SpuVmSetVol scales the right level by it / 127 */
     u8 pad78[0xAC - 0x78];
