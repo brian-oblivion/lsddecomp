@@ -20,12 +20,16 @@
  * onObjMNotify). NoOpSlotBC is empty. What the state codes mean in the
  * game is not established.
  *
- * A separate, unrelated cluster of free functions (RegisterStyleConfig /
- * ApplyStyleConfig / FillStyleFromConfig / ApplyStyleDecorationIfSet) reads
- * and writes a small set of `.sdata`/`.sbss` globals to configure a
- * `StyleM` colour/config descriptor (struct defined below, own comment) --
- * unrelated to the ObjM/DreamSys machinery above beyond living in the same
- * carved address range.
+ * Then four free functions (RegisterStyleConfig / ApplyStyleConfig /
+ * FillStyleFromConfig / ApplyStyleDecorationIfSet) that read and write a
+ * small set of `.sdata`/`.sbss` style globals and fill a `StyleM`
+ * colour/config descriptor (struct defined below, own comment). They are
+ * not ObjM methods, but ObjM is their client: ObjM__InitStyleAndWorld
+ * (class_3bb8c_l) calls RegisterStyleConfig and keeps its result as
+ * ObjM::styleConfig, and the `sceneRefs` it passes, kept as
+ * gStyleSceneRefs, points at ObjM's +0x06C block (StyleSceneRefs, below;
+ * ApplyStyleDecorationIfSet attaches its BoxFill to that block's
+ * viewport's fade box).
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.
@@ -295,42 +299,34 @@ void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
 /* gStyleDecorObj is a BoxFill (include/BoxFill.h), kept in an s32 global
  * (track 4b's to retype). */
 
-/* gStyleSceneRefs's own local reading here: only its +0xC field (a "self"
- * pointer into a THIRD object, dispatched only through +0xAC) is ever
- * touched by this function. */
-typedef struct LocalSubObj LocalSubObj;
-typedef struct LocalSubMethods LocalSubMethods;
-
-struct LocalSubMethods {
-    u8 pad00[0xAC];
-    s32 (*slotAC)(LocalSubObj *self); /* +0x0AC */
-};
-
-struct LocalSubObj {
-    LocalSubMethods *methods;
-};
-
-typedef struct FieldAC7CHolder {
-    u8 pad0[0xC];
-    LocalSubObj *unkC;
-} FieldAC7CHolder;
+/* What gStyleSceneRefs points at: ObjM's +0x06C..+0x07B block
+ * (ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
+ * keeps it; include/ObjM.h). The same view as class_3bb8c_n.c's, field for
+ * field; this unit reads only +0x00C, ObjM::cachedViewport, whose +0x0AC slot
+ * is Viewport's getFadeBox. */
+typedef struct StyleSceneRefs {
+    void *sound;        /* +0x000, ObjM::ctorSound */
+    void *dreamerTmd;   /* +0x004, ObjM::dreamerTmd */
+    void *etcTim;       /* +0x008, ObjM::etcTim */
+    Viewport *viewport; /* +0x00C, ObjM::cachedViewport */
+} StyleSceneRefs;
 
 extern s32 gStyleDecorObj;
 extern s32 D_8008AB60;
 extern s32 D_8008AB58;
 
 void ApplyStyleDecorationIfSet(void) {
-    s32 tmp;
+    SceneNode *fadeBox;
 
     if (gStyleDecorColor != 0) {
         gStyleDecorObj = (s32)New_BoxFill(&D_8008AB60, (void *)gStyleDecorColor, 0);
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTransOn((BoxFill *)gStyleDecorObj, 1);
         ((BoxFill *)gStyleDecorObj)->methods->setSemiTransRate((BoxFill *)gStyleDecorObj, 0);
 
-        tmp = ((FieldAC7CHolder *)gStyleSceneRefs)
-                  ->unkC->methods->slotAC(((FieldAC7CHolder *)gStyleSceneRefs)->unkC);
+        fadeBox = ((StyleSceneRefs *)gStyleSceneRefs)
+                      ->viewport->methods->getFadeBox(((StyleSceneRefs *)gStyleSceneRefs)->viewport);
 
         ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorObj)->methods->attachToParent)(
-            (BoxFill *)gStyleDecorObj, (SceneNode *)tmp, (BoxFillPos *)&D_8008AB58);
+            (BoxFill *)gStyleDecorObj, fadeBox, (BoxFillPos *)&D_8008AB58);
     }
 }
