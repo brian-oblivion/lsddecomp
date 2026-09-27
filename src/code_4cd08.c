@@ -341,10 +341,11 @@ success:
     return true;
 }
 
-/* Compares gDreamAuxWorld's getDreamColor (DreamSys +0x200) against a per-idx signed byte from D_80088D16. */
+/* Whether the player's dream colour is SPECIAL_COLORS' entry for trigger
+ * condition `idx` (10..17). */
 bool IsCurrentDreamColor(s32 idx) {
     DreamSys *w = gDreamAuxWorld;
-    s32 val = D_80088D16[idx];
+    s32 val = SPECIAL_COLORS[idx - 10];
     s32 result = w->methods->getDreamColor(w);
 
     return val == result;

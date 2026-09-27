@@ -75,11 +75,6 @@ typedef struct DreamAuxTriggerEntry {
 extern s8 gDreamAuxTriggerCounts[];
 extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[];
 
-/* A small signed-byte lookup table read by IsCurrentDreamColor, indexed by its
- * `idx` parameter. Layout beyond "one signed byte per entry" is not known
- * from this unit alone. */
-extern s8 D_80088D16[];
-
 /* "ETC\\SYMSPY.MOM" / "ETC\\SYMDOG.MOM" -- MOM = this game's audio-stream
  * format (per lsddecomp naming elsewhere in the project). Defined in
  * code_4cd08.c, right before InitDreamAux which is their only reader. */
