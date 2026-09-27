@@ -19,9 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 35 (2026-09-27, round 97's premium head: a flag names the
-units its fix edits beyond the defining file, `flag-type --units`, and they
-join the job's edit set).
+Plan revision: 36 (2026-09-27, round 97's premium head: every runner
+prompt starts each command `cd <path> &&`, and the oracle's `OK:` line names
+its tree; revision 35 the same round, `flag-type --units`).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -368,6 +368,11 @@ Archived with their tracks (§3).
 > `python3 tools/externcheck.py` clean when you finish. One commit per
 > function. This touches many units: it runs ALONE in its round or the head
 > merges it last. Report a table: function, what was wrong, what you did.
+>
+> **Your shell's working directory resets between commands:** start EVERY
+> command with `cd <path> &&`, and trust the oracle's `OK:` line only if it
+> ends `(tree: <path>)` (round 97: a runner built the main checkout and
+> reported four commits byte-exact that never compiled).
 
 ### 4.7 Close-out runner prompt (track 9; Opus; head fills in `<>`)
 
@@ -383,6 +388,11 @@ Archived with their tracks (§3).
 > never push; never edit other docs, the ledger or the symbols file except
 > through the rename tools. Final summary: what you changed, what you
 > measured, and anything you could not settle.
+>
+> **Your shell's working directory resets between commands:** start EVERY
+> command with `cd <path> &&`, and trust the oracle's `OK:` line only if it
+> ends `(tree: <path>)` (round 97: a runner built the main checkout and
+> reported four commits byte-exact that never compiled).
 
 ### 4.8 Types runner prompt (track 6; Opus; head fills in `<>`)
 
@@ -395,6 +405,11 @@ Archived with their tracks (§3).
 > through `tools/rename.py`, `tools/renametype.py` (always `--dry-run` first)
 > or the compiler's accessor list. Other runners this round: `<jobs>`; post on
 > the broadcast before editing a header outside your job. After every edit:
+>
+> **Your shell's working directory resets between commands:** start EVERY
+> command with `cd <path> &&`, and trust the oracle's `OK:` line only if it
+> ends `(tree: <path>)` (round 97: a runner built the main checkout and
+> reported four commits byte-exact that never compiled).
 >
 > ```sh
 > ./build-and-verify.sh > /tmp/<name>_b.log 2>&1; echo "build exit=$?"; \
@@ -434,6 +449,11 @@ Archived with their tracks (§3).
 > broadcast before each function. `git status --porcelain` empty when you
 > report; never push; never edit shared docs, the yaml or the ledger.
 >
+> **Your shell's working directory resets between commands:** start EVERY
+> command with `cd <path> &&`, and trust the oracle's `OK:` line only if it
+> ends `(tree: <path>)` (round 97: a runner built the main checkout and
+> reported four commits byte-exact that never compiled).
+>
 > Final summary: `readability.py --unit <unit>` before and after; a table of
 > every name and constant you introduced (old, new, tier, evidence); the unit
 > banner you wrote; what you moved from comments into which reports; every
@@ -453,6 +473,11 @@ Archived with their tracks (§3).
 > headers and their yaml lines through `unitfile.py`. The three oracles after
 > every step; one commit per tool run, the command as its message's first
 > line. `git status --porcelain` empty when you report; never push.
+>
+> **Your shell's working directory resets between commands:** start EVERY
+> command with `cd <path> &&`, and trust the oracle's `OK:` line only if it
+> ends `(tree: <path>)` (round 97: a runner built the main checkout and
+> reported four commits byte-exact that never compiled).
 >
 > Final summary: per region, the files before and after, the evidence that
 > decided each edge (quote `tuboundary.py`), what content decided, and

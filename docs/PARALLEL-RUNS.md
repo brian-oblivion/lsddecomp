@@ -116,6 +116,10 @@ tools/setup-worktree.sh alpha     # -> ../<checkout>-wt-alpha, branch runner/alp
    owns.
 
 7. **A worktree isolates FILES, not the process table, `/tmp`, or ports.**
+   - Nor the shell: an agent's working directory resets to the main checkout
+     between tool calls, so a bare `./build-and-verify.sh` builds MAIN. Every
+     runner command starts `cd <worktree> &&`, and the oracle's `OK:` line
+     names the tree it built (round 97: four unbuilt commits read green).
    - Never `pkill -f <tool name>`; it kills every runner's search. Kill by a
      PID you captured, or scope to your own worktree path.
    - Log paths carry the runner name: `/tmp/<name>_b.log`, never `/tmp/b.log`.
@@ -419,6 +423,11 @@ with the largest queue.
 > docs/DECOMPILATION_LEARNINGS.md, then work the following functions from
 > `src/<unit>.c` ONLY, in this order: `<list, cheapest first, with each one's
 > recorded title figure and what a good negative looks like>`.
+>
+> **Your shell's working directory resets between commands:** start EVERY
+> command with `cd <path> &&`, and trust the oracle's `OK:` line only if it
+> ends `(tree: <path>)` (round 97: a runner built the main checkout and
+> reported four commits byte-exact that never compiled).
 >
 > **Budget.** At most `<K, default 3>` functions this session. Stop a function
 > when 30 consecutive builds have not improved its best funcdiff score, or when

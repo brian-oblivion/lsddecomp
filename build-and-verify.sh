@@ -21,4 +21,7 @@ fi
 
 make all
 
-echo "OK: build matches retail SLPS_015.56"
+# Name the tree: a runner whose shell resets its cwd between tool calls runs
+# ./build-and-verify.sh in the MAIN checkout and reads main's green as its own
+# (round 97: four unbuilt commits in a worktree, every one reported byte-exact).
+echo "OK: build matches retail SLPS_015.56 (tree: $(pwd))"
