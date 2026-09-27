@@ -208,7 +208,7 @@ void ItemList__AddChild(ItemList *self, void *child) {
 
     if (child) {
         Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)child);
-        tag = **(s32 **)child & 0xF;
+        tag = ((BasicClass *)child)->methods->header & 0xF;
         if (tag == 2) {
             self->inputSource = child;
         } else if (tag == 5) {
@@ -221,7 +221,7 @@ void ItemList__RemoveChild(ItemList *self, void *child) {
     s32 tag;
 
     if (child) {
-        tag = **(s32 **)child & 0xF;
+        tag = ((BasicClass *)child)->methods->header & 0xF;
         if (tag == 2) {
             self->inputSource = NULL;
         } else if (tag == 5) {
@@ -242,7 +242,7 @@ void ItemList__OnNotify(ItemList *self, void *sender, s32 event) {
     s32 tag;
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
-    tag = **(s32 **)sender & 0xF;
+    tag = ((BasicClass *)sender)->methods->header & 0xF;
     if (tag == 2) {
         self->methods->handleInputCode(self, sender, event);
     } else if (tag == 5) {
