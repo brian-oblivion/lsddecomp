@@ -41,7 +41,7 @@ typedef struct {
 } DreamAuxPos6;
 
 extern DreamAuxPos6 gDreamAuxPosTable[];
-extern u8 D_80088F18[];
+extern u8 gDreamAuxSpawnRotations[];
 
 typedef void (*DreamAuxObjFn11)(DreamAuxObj *self, s32 arg1, void *arg2);
 typedef void (*DreamAuxObjFn3A)(DreamAuxObj *self, void *arg1, void *arg2);
@@ -67,7 +67,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 
         obj = (DreamAuxObj *)gDreamAuxStageMap;
         ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
-        ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, D_80088F18 + rec->val2 * 12);
+        ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, gDreamAuxSpawnRotations + rec->val2 * 12);
         ((DreamAuxObjFn13)entity->vtable[0x13])(entity, gDreamAuxWorld, gDreamAuxFrameClock, (void *)gDreamAuxStageMap, outBuf);
         return false;
     }

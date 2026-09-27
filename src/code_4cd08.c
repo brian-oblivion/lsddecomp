@@ -364,7 +364,7 @@ bool MatchesDreamAuxProgression(s32 a0, s32 a1) {
 }
 
 /* A 4-byte record indexed by `entry` (this function's own last parameter):
- * a u16 followed by two signed bytes. `val2` indexes D_80088F18 (stride
+ * a u16 followed by two signed bytes. `val2` indexes gDreamAuxSpawnRotations (stride
  * 0xC, element type undiscovered -- only its address is ever taken here)
  * and `posIndex` indexes gDreamAuxPosTable (stride 6, see DreamAuxPos6
  * below; named round 63 -- confirmed by this struct's only reader). */
@@ -391,7 +391,7 @@ typedef struct {
 } DreamAuxPos6;
 
 extern DreamAuxPos6 gDreamAuxPosTable[];
-extern u8 D_80088F18[];
+extern u8 gDreamAuxSpawnRotations[];
 
 bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry) {
     Entity *entity = New_Entity(kind, out, (void *)gDreamAuxSound);
@@ -413,7 +413,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry) {
         coords.pos = gDreamAuxPosTable[rec->posIndex];
 
         gDreamAuxStageMap->methods->computeCellOffsets(gDreamAuxStageMap, outBuf, &coords);
-        entity->methods->updateRotation(entity, 1, D_80088F18 + rec->val2 * 12);
+        entity->methods->updateRotation(entity, 1, gDreamAuxSpawnRotations + rec->val2 * 12);
         ((TodActorAttachToParentFn)entity->methods->attachToParent)(
             (TodActor *)entity, (TodActor *)gDreamAuxWorld, (void *)gDreamAuxFrameClock,
             (void *)gDreamAuxStageMap, outBuf);
