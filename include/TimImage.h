@@ -74,7 +74,7 @@ void TimImage__Upload(TimImage *self);
 void TimImage__NoOpSlot7C(void);
 void TimImage__NoOpSlot80(void);
 void TimImage__NoOpSlot84(void);
-void TimImage__func_8003B5C4(void);
+void TimImage__NoOpSlot88(void);
 void TimImage__func_8003B5CC(void);
 void TimImage__func_8003B5D4(void);
 void TimImage__func_8003B5DC(void);
