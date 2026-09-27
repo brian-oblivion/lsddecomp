@@ -1,43 +1,25 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * libsnd_ut_ako -- Sony's libsnd/ut_ako module, carried as disassembly
+ * because no SDK disc carries the build retail linked.
  *
- * libsnd_ut_ako -- SsUtAllKeyOff, 0x2273C..0x22948 (vram 0x80031F3C..
- * 0x80032148).  A single 131-word function.  Carved round 26 (2026-09-09)
- * out of what had been the `code_179d8_mid_d` remainder; renamed on carve
- * because "mid_d" named a leftover and the leftover is now fully consumed.
+ * SsUtAllKeyOff resets every voice the voice manager owns (D_8008E9D0 of
+ * them): its _svm_voice record (include/SvmData.h), its SPU voice
+ * registers (D_8006DAD4 points at them, 0x1F801C00, eight halfwords per
+ * voice), and its bit in the key-off masks. It keeps Sony's name and
+ * <libsnd.h>'s prototype.
  *
- * Blocker census at carve time, four screens: BLOCKER-CLEAN -- zero gp_rel,
- * zero forward nop_mflo_mfhi, zero `jr $t2` trampolines, zero `jtbl_`, zero
- * `alabel`.  The body is FRAMELESS (no `addiu $sp, $sp, -N` anywhere), which
- * is worth knowing before you write C for it.
+ * Which object (nm over sdk/work/<disc>/elf/libsnd): ut_ako.o on the 3.6
+ * disc, with this one function as its only text symbol; on 3.0, 3.3 and
+ * 3.5 it is the last function of vmanager.o. 3.6's text is 0x138 bytes
+ * against retail's 0x20C, so it cannot be linked.
  *
- * It had been parked for several rounds as "addiu-$at blocked"; `addiu_at`
- * was resolved in round 21 and was its only obstruction.
+ * What decided its edges (python3 tools/tuboundary.py --unit): the unit
+ * before it, libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c, ends on
+ * ut_autop's SsUtAutoPan ("start edge possible"; a Sony module edge by
+ * content, so not merged), and the placed object libsnd/vm_vsu follows it.
  *
- * Owns NO jump table, so no rodata sub-slot is attached.  It does reference
- * plain rodata/data SYMBOLS -- reference them as symbols, never re-type a
- * string literal (splat has already emitted those bytes; a literal emits a
- * second copy and shifts the whole image).
- *
- * READ THIS BEFORE STARTING: SsUtAllKeyOff touches the same global family as
- * `code_179d8_m` -- libsnd's _svm_voice table (include/SvmData.h) and
- * D_8006DAD4.  The "split scaled index" entry in
- * docs/DECOMPILATION_LEARNINGS.md (a mask on the PRODUCT means a halfword
- * array indexed by a truncated `idx*8`, NOT a struct array indexed by a cast
- * index) was derived on exactly those globals, together with its
- * loop-versus-non-loop refinement.  It is very likely to apply here.
- *
- * This unit's extern declarations stay LOCAL to this file, except Sony's
- * _svm_voice, whose one type is include/SvmData.h (round 86, track 2).
+ * This file's declarations stay local, except Sony's _svm_voice, whose one
+ * type is include/SvmData.h.
  */
 #include "common.h"
 #include "SvmData.h"
