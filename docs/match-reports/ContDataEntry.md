@@ -1013,3 +1013,19 @@ never named that way from this function's side -- worth checking with
 `tools/asm-differ` before re-deriving `blk1`/`blk2`'s "unconstrained"
 internal field breakdown from scratch.
 the function off to "look for a missing local" without ever doing so.
+
+## Round 97 types pass (echo)
+
+code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
+the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
+libsnd_cres, code_179d8_i and code_179d8_j already use. The header gained
+this unit's fields by splitting padding (no offset, size or existing type
+moved); field names stay offset-only (`unkNN`) as the header's convention for
+Sony-only fields, with each one's mechanics in its comment. The unit's
+`(u8 *)rec + unk12 + 0x17/0x2C` and `(s16 *)((u8 *)rec + 0x4E + ch * 2)`
+arithmetic became the header's per-channel arrays `unk17[16]` (pan),
+`unk2C[16]` (program) and `unk4E[16]` (volume): `unk12` is the event's MIDI
+channel (GetSeqData stores a status byte's low nibble), not a byte offset to
+an "embedded state block" as the old local comment read it. Byte-exact
+unchanged; the NON_MATCHING object is identical too (objdump of
+`build/nonmatching/src/code_179d8_k.c.o` before/after).
