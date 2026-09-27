@@ -1,4 +1,6 @@
-# GameApplication__PollStatusObj
+# GameApplication__RunDayTask
+
+> Renamed from `GameApplication__PollStatusObj` on 2026-09-27 (tools/rename.py). Address 0x80026698.
 
 > Renamed from `Class6D3C8__PollStatusObj` on 2026-09-26 (tools/rename.py). Address 0x80026698.
 
@@ -95,7 +97,7 @@ out-param.
 
 ```c
 #if 0
-s32 GameApplication__PollStatusObj(GameApplication *self) {
+s32 GameApplication__RunDayTask(GameApplication *self) {
     s32 status;
     StatusObj *obj;
     s32 outVal;
@@ -245,7 +247,7 @@ switched on," and only the former gets the free reuse.
 
 ## Naming
 
-**`GameApplication__PollStatusObj` -- tier B.** Mechanics: builds a `StatusObj`
+**`GameApplication__RunDayTask` -- tier B.** Mechanics: builds a `StatusObj`
 (`New_DayTask`), reads one status code off it (`slot44`), tears it down
 (`slot4`), reacts to two of the codes (2 -> `GameApplication__PlayCinematic`,
 3 -> latch `self->unk24`), then separately queries the owned `DreamSys`'s

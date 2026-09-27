@@ -20,7 +20,7 @@
  * +0x014 object, then calls setState(2) and deinit, which undoes all of it
  * and releases whatever init created itself. Callers construct an object,
  * call init and use what it RETURNS (GameApplication__RunPollTask,
- * GameApplication__PollStatusObj); the subclass overrides return a result field
+ * GameApplication__RunDayTask); the subclass overrides return a result field
  * (TimedTask__Init: +0x028 result; TaskCore__Init: +0x038 result).
  *
  * onNotify splits by the SENDER's root class nibble, as SceneNode's does:

@@ -10,7 +10,7 @@
 
 ## What it does
 
-Called by `GameApplication__PollStatusObj` when its `StatusObj` slot44 result is `2` (per
+Called by `GameApplication__RunDayTask` when its `StatusObj` slot44 result is `2` (per
 that function's still-stalled derivation). Reads `DreamSys`'s current
 cinematic slot (`GetCinematic`), packs its two 16-bit fields and resolves
 them to a channel index (`GetSpecialDayOrEventRecord`, which also returns a second,

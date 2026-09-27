@@ -301,7 +301,7 @@ void GameApplication__NoOpSlot5C(void) {}
  * owned DreamSys a question and reports whether its answer was 1.
  *
  * Two things here were long-standing misreadings, both worth keeping written
- * down (docs/match-reports/GameApplication__PollStatusObj.md):
+ * down (docs/match-reports/GameApplication__RunDayTask.md):
  *
  *  - `case 3` stores 1, NOT 3. Retail's `li $v0, 0x1` sits in the delay slot
  *    of the case-3 branch, so it executes before the jump is taken and $v0
@@ -316,7 +316,7 @@ void GameApplication__NoOpSlot5C(void) {}
  *    back out of the disassembly as `(u32)(check ^ 1) < 1`. That transcription
  *    is arithmetically right and cost two instructions; the plain `== 1` is
  *    what the source said. */
-s32 GameApplication__PollStatusObj(GameApplication *self) {
+s32 GameApplication__RunDayTask(GameApplication *self) {
     s32 status;
     DayTask *obj;
     s32 outVal;

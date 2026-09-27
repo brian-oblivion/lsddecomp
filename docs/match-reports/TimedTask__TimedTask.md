@@ -147,7 +147,7 @@ path and DayTask's own sound, so only DayTask's copy releases it.
 PlaySound is TaskCore__PlaySound's shape with 0x7F, 0x7F. ObjM calls the
 same object's +0x088/+0x08C, VabStreamObj's Mute/Unmute.
 `tools/classtable.py` stops at the last non-NULL slot, which is why it shows
-the 0x80-byte table as ending at +0x070. GameApplication__PollStatusObj switches
+the 0x80-byte table as ending at +0x070. GameApplication__RunDayTask switches
 on init's return through DayTask; 2 and 3 are DayTask's own codes.
 
 Proposed, not applied (accessors outside this job's units):

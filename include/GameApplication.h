@@ -95,7 +95,7 @@ void GameApplication__PlayOpeningMovie(GameApplication *self);
 s32 GameApplication__RunTitleMenu(GameApplication *self);
 void GameApplication__PlaySpecialDayMovies(GameApplication *self);
 void GameApplication__NoOpSlot5C(void);
-s32 GameApplication__PollStatusObj(GameApplication *self);
+s32 GameApplication__RunDayTask(GameApplication *self);
 void GameApplication__PlayCinematic(GameApplication *self);
 void GameApplication__PlayEndingMovie(GameApplication *self);
 

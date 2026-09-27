@@ -68,7 +68,7 @@ updated with what survived and what did not.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from New_Obj865C8. Parameters retyped from (Obj0C *, DreamSys *, s32) to (IntermediateBaseInitArgs *, DreamSys *, s32): Obj0C was a view of IntermediateBaseInitArgs (the ctor stores it at +0x00C, IntermediateBase's initArgs, and fills its +0x008/+0x00C/+0x010), and the one caller, GameApplication__PollStatusObj, already passed IntermediateBaseInitArgs *. Byte-identical.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from New_Obj865C8. Parameters retyped from (Obj0C *, DreamSys *, s32) to (IntermediateBaseInitArgs *, DreamSys *, s32): Obj0C was a view of IntermediateBaseInitArgs (the ctor stores it at +0x00C, IntermediateBase's initArgs, and fills its +0x008/+0x00C/+0x010), and the one caller, GameApplication__RunDayTask, already passed IntermediateBaseInitArgs *. Byte-identical.
 
 ## Naming (track 7, round 99, charlie)
 

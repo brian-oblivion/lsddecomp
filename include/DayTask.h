@@ -12,7 +12,7 @@
  * src/class_39e08.c, New_DayTask through GetDayTaskMethods.
  *
  * Who creates it. Application__RunMainLoop (src/code_2b78c.c) calls
- * GameApplication__PollStatusObj (src/code_1677c.c) when the GraphRoom poll
+ * GameApplication__RunDayTask (src/code_1677c.c) when the GraphRoom poll
  * returns 2, and that builds one with New_DayTask(the application's
  * IntermediateBaseInitArgs, its DreamSys, config->unk04), runs its init to
  * completion and releases it. init's return is TimedTask::result:
@@ -71,7 +71,7 @@ enum DayTaskPhase {
 };
 
 /* TimedTask::result as a DayTask sets it: what its init returns to
- * GameApplication__PollStatusObj. */
+ * GameApplication__RunDayTask. */
 enum DayTaskResult {
     DAYTASK_RESULT_ENDED = 1,     /* ObjM's TIME_UP, endDay(0) returned 0, no cinematic entry */
     DAYTASK_RESULT_CINEMATIC = 2, /* as ENDED with a cinematic entry, or startDay refused the day;
