@@ -67,10 +67,10 @@ extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 ar
 /* Data reached by address: the viewport's view point and view reference
  * (attachViewChild), the StageMap's bounds; and gStagePendingExtras, one
  * setPendingExtra value per stage. */
-extern s32 gObjMViewPoint;
-extern s32 gObjMViewRefPoint;
+extern LongVec3 gObjMViewPoint;
+extern LongVec3 gObjMViewRefPoint;
 extern s32 gStagePendingExtras[];
-extern s32 gStage0Bounds;
+extern CellBounds gStage0Bounds;
 
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 arg3) {
@@ -87,8 +87,8 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
     ret1 = PickDailyVariant(self->stage, 0, ret1);
     self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc(ret1);
 
-    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (LongVec3 *)&gObjMViewPoint,
-                                 (LongVec3 *)&gObjMViewRefPoint, 0);
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
+                                 &gObjMViewRefPoint, 0);
 
     self->cachedViewport = vp;
     ret1 = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
@@ -111,26 +111,26 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
          * D_8008EA26's `*(u8 *)&sym`, used here in the opposite
          * direction (forcing a reload instead of permitting a fold). */
         stage = *(s32 volatile *)&self->stage;
-        self->unk40 = 0x10;
+        self->tickPeriod = 0x10;
         three = 3;
         /* Order-only: without this barrier the scheduler moves `three`'s
-         * `li` past the `self->unk40` store; removing it does not change
+         * `li` past the `self->tickPeriod` store; removing it does not change
          * which register holds which value. */
         __asm__("");
         flag = (stage == 5);
         if (stage == 6) {
             flag = 1;
         }
-        self->unk44 = three;
+        self->moveMode = three;
         if (stage == three) {
             flag = 1;
         }
         ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, 0);
     } else {
-        self->unk40 = 0x10;
-        self->unk44 = 2;
+        self->tickPeriod = 0x10;
+        self->moveMode = 2;
         flag = 1;
-        ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, (CellBounds *)&gStage0Bounds);
+        ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, &gStage0Bounds);
     }
 
     self->gridSpan = gridSpan;
@@ -265,21 +265,6 @@ void ObjM__TogglePause(ObjM *self) {
 
 void ObjM__NoOpSlot7C(void) {}
 
-/* initArgs->unk0 as SetupSceneStyle reads it: its +0x07C returns a
- * pointer to one word (class_39e08.h's SubObjE is the same call from
- * DayTask__OnInit). */
-typedef struct UnkCObj_3bb8c_l UnkCObj_3bb8c_l;
-typedef struct UnkCObjMethods_3bb8c_l UnkCObjMethods_3bb8c_l;
-
-struct UnkCObjMethods_3bb8c_l {
-    u8 pad000[0x07C];
-    s32 *(*slot7C)(UnkCObj_3bb8c_l *self, s32 arg1); /* +0x07C */
-};
-
-struct UnkCObj_3bb8c_l {
-    UnkCObjMethods_3bb8c_l *methods; /* +0x000 */
-};
-
 /* code_4cd08.c's (MATCHED round 43); no header declares it. `world` is the
  * DreamSys it installs as gDreamAuxWorld (track 4, round 88). */
 extern void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4);
@@ -292,23 +277,23 @@ extern s32 gObjMProjectionBias;
 
 /* The StageMap's accepted tags (setAcceptedTags), an opaque .data block
  * (asm/data/76DC8.data.s) reached by address. */
-extern s32 gObjMAcceptedClassIds;
+extern s32 gObjMAcceptedClassIds[];
 
 void ObjM__SetupSceneStyle(ObjM *self) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
     StyleConfig *style = self->styleConfig;
-    UnkCObj_3bb8c_l *obj;
-    s32 val;
+    DrawSystem *drawSystem;
+    s32 width;
     StageMap *rig;
 
     vp->methods->detachViewChild(vp);
 
-    obj = (UnkCObj_3bb8c_l *)self->initArgs->drawSystem;
-    val = *obj->methods->slot7C(obj, 0);
-    vp->methods->setProjection(vp, val / 2 * 5 / 3 + gObjMProjectionBias);
+    drawSystem = (DrawSystem *)self->initArgs->drawSystem;
+    width = drawSystem->methods->getDims(drawSystem, NULL)->w;
+    vp->methods->setProjection(vp, width / 2 * 5 / 3 + gObjMProjectionBias);
 
-    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (LongVec3 *)&gObjMViewPoint,
-                                 (LongVec3 *)&gObjMViewRefPoint, 0);
+    vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
+                                 &gObjMViewRefPoint, 0);
 
     SetDreamAuxWorld(self->stage, (s32)self->unk14, self->dreamSys, (s32)self->sound, (s32)self->unk10);
 
@@ -320,7 +305,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     rig->methods->setConfig(rig, GetStageGridDimensions(self->stage));
     ((DreamSysAttachToParentFn)self->dreamSys->methods->attachToParent)(self->dreamSys, rig);
     rig->methods->setGridSpan(rig, self->gridSpan);
-    rig->methods->setAcceptedTags(rig, &gObjMAcceptedClassIds);
+    rig->methods->setAcceptedTags(rig, gObjMAcceptedClassIds);
 }
 
 void ObjM__ExitSceneStyle(ObjM *self) {
@@ -343,7 +328,7 @@ void ObjM__EnterStyleSession(ObjM *self) {
     void *a1;
 
     self->inSession = 1;
-    self->dreamSys->methods->resetLinkState(self->dreamSys, self->unk44, self->unk40);
+    self->dreamSys->methods->resetLinkState(self->dreamSys, self->moveMode, self->tickPeriod);
     ((StageMap *)self->unk14)->methods->enable((StageMap *)self->unk14);
 
     vp = (NodeGuardedViewport *)self->viewport;
