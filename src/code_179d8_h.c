@@ -94,11 +94,6 @@
  * in gCdDriverMethods; FileResource__LoadFile calls it on its success path
  * too, so the give-up paths below close the file). */
 
-/* OpenCdFile's `sp+0x10` buffer is Sony's CdlFILE (<libcd.h>): the 0x18
- * bytes between it and the path buffer at sp+0x28 are exactly CdlFILE's
- * pos (4) + size (4) + name[16], and CdSearchFile -- Sony's, lib/libcd/
- * iso9660.o since round 34 -- fills it. It was this unit's own
- * StatBuf179D8H until round 97. */
 extern void printf(const char *fmt, void *arg1);
 extern char gCdFileNotFoundFmt[];
 
