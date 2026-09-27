@@ -74,11 +74,11 @@ extern const char *GetSpecialDayOrEventRecord(s32 *movieIdOut, s32 packedPick);
  * "control reaches end of non-void function" here, and the warning is
  * correct about the C -- the bytes are what say the original had it too.
  * See docs/match-reports/New_GameApplication.md for the full derivation. */
-GameApplication *New_GameApplication(GameApplicationConfig *arg) {
+GameApplication *New_GameApplication(GameApplicationConfig *config) {
     GameApplication *self = BMemPMgrAlloc(sizeof(GameApplication));
 
-    if (self != 0) {
-        GetGameApplicationMethods()->ctor(self, arg);
+    if (self != NULL) {
+        GetGameApplicationMethods()->ctor(self, config);
         return self;
     }
 }
@@ -88,24 +88,24 @@ GameApplication *New_GameApplication(GameApplicationConfig *arg) {
  * stores the ctor argument, loads the "ETC\DREAME5.TMD" model, builds this
  * object's owned DreamSys from it, dispatches one DreamSys init call, then
  * runs this class's own slot40 (GameApplication__SeedRandom) once. */
-void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *arg) {
+void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *config) {
     /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
      * frame by 8. */
     ResourceRequest req;
 
-    GetApplicationMethods()->ctor((Application *)self, arg->dataSource);
+    GetApplicationMethods()->ctor((Application *)self, config->dataSource);
     self->methods = GetGameApplicationMethods();
-    self->config = arg;
+    self->config = config;
     SetDataDirectory(GetDefaultDataDirectory());
     req.src.buffer = NULL;
     req.src.name = sModelPathDreamE5;
     self->dreamSys = New_DreamSys(New_LinkResource(&req.src), 0, 0);
     self->skipGraphRoomPoll = 0;
-    self->dreamSys->methods->slot228(self->dreamSys, arg->unk14);
+    self->dreamSys->methods->slot228(self->dreamSys, config->unk14);
     ((GameApplicationSeedRandomFn)self->methods->setScreenDims)(self);
 }
 
-extern void SeedAndRandom(s32 day, s32 unused);
+extern s32 SeedAndRandom(s32 seed, s32 unused);
 
 /* Seeds the C library's random generator from the scratchpad word at
  * 0x1F800000 (the PS-X data-cache-as-RAM region) reduced mod 365; the
@@ -162,7 +162,7 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     task->methods->release(task);
 }
 
-extern s32 RegisterRecordTableFiles(s32 a0);
+extern s32 RegisterRecordTableFiles(s32 all);
 
 s32 GameApplication__RegisterFilesCallback(void) {
     return RegisterRecordTableFiles(0);
@@ -198,7 +198,7 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
  * on whether that final status was below 1. */
 s32 GameApplication__RunTitleMenu(GameApplication *self) {
     s32 status;
-    s32 pollDone;
+    s32 graphResult; /* MATCHING: set after the GraphRoom check, it holds its 2 in a saved register */
 
     if (self->config->pollGraphRoom != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
@@ -214,11 +214,11 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
             }
         }
 
-        pollDone = TITLEMENU_RESULT_GRAPH;
+        graphResult = TITLEMENU_RESULT_GRAPH;
     retry:
         status = GameApplication__RunTask((NewTaskFn)New_TitleMenu, self->dreamSys,
                                           (IntermediateBaseInitArgs *)self->aux);
-        if (status == pollDone) {
+        if (status == graphResult) {
             GameApplication__RunTask((NewTaskFn)New_GraphRoom, self->dreamSys,
                                      (IntermediateBaseInitArgs *)self->aux);
             goto retry;
@@ -299,15 +299,15 @@ void GameApplication__NoOpSlot5C(void) {}
  *    what the source said. */
 s32 GameApplication__RunDayTask(GameApplication *self) {
     s32 status;
-    DayTask *obj;
-    s32 outVal;
-    s32 check;
+    DayTask *dayTask;
+    s32 year;
+    s32 day;
     s32 result;
 
-    obj = New_DayTask((IntermediateBaseInitArgs *)self->aux, self->dreamSys,
-                      self->config->dayTaskSyncDriver);
-    status = ((DayTaskInitFn)obj->methods->init)(obj);
-    obj->methods->release(obj);
+    dayTask = New_DayTask((IntermediateBaseInitArgs *)self->aux, self->dreamSys,
+                          self->config->dayTaskSyncDriver);
+    status = ((DayTaskInitFn)dayTask->methods->init)(dayTask);
+    dayTask->methods->release(dayTask);
 
     switch (status) {
         case DAYTASK_RESULT_CINEMATIC:
@@ -318,10 +318,10 @@ s32 GameApplication__RunDayTask(GameApplication *self) {
             break;
     }
 
-    check = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, &outVal);
+    day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, &year);
     result = 0;
-    if (outVal != 0) {
-        result = (check == 1);
+    if (year != 0) {
+        result = (day == 1);
     }
     return result;
 }
