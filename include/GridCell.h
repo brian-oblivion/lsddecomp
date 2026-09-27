@@ -49,6 +49,11 @@
 typedef struct GridCell GridCell;
 typedef struct GridCellMethods GridCellMethods;
 
+/* GridCell's class id (gGridCellMethods word +0x000). Two nibbles, so
+ * `(u8)header == GRIDCELL_CLASS_ID` is its is-kind-of test
+ * (Actor__DispatchLinkCommand). */
+#define GRIDCELL_CLASS_ID 0x24
+
 /* SceneNode's slots, then this class's own. The overrides of inherited
  * slots are the ctor, reset and dispatchLinkCommand (see the banner). The
  * ctor returns nothing, but the slot keeps SceneNode's `void *` ctor type:

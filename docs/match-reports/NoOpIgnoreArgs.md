@@ -50,3 +50,40 @@ the dead arguments its callers pass. An earlier head attempt at
 `LinkOwnerObj__NoOp` was withdrawn: the prefix asserts a methodhood the bare
 `void(void)` signature denies, which is bravo's own argument above and it is
 correct.
+
+## Unit history: class_3bb8c_o's old banner (moved here in track 7, round 99, alpha)
+
+This is the first function of `src/class_3bb8c_o.c`, so the unit's own
+history lives in its report. The banner the file carried until round 99,
+verbatim; the file now has a banner that says what it holds.
+
+```text
+class_3bb8c_o -- functions 54..73 of the 113-function `class_3bb8c_n`
+remainder, 0x475F0..0x47CC4 (vram 0x80056DF0..0x800574C4). Carved round 17
+(2026-09-04); `class_3bb8c_n` keeps its name for the 54 functions in front
+of this slice and `class_3bb8c_q` is the 19-function tail behind
+`class_3bb8c_p`. All 20 functions matched, byte-exact; zero INCLUDE_ASM
+stalls, zero NON_MATCHING bodies. Owns no switch jump table.
+
+Named round 52 (runner bravo). SPANS TWO CLASSES, cut at a ROM address,
+not a class boundary (`tools/classtable.py`, confirmed round 17/52):
+
+ - StyleEffect's sprite-array helpers (`NoOpIgnoreArgs`,
+   `StyleEffect__ReleaseSprites[B]`, `StyleEffect__RandomizeSprites`,
+   `StyleEffect__SpawnPlainSprites`; include/StyleEffect.h). Two more of
+   its pieces sit inside the Actor group by ROM address: its table getter
+   `GetStyleEffectMethods`, and `SetStyleEffectSources`, which stores the
+   TMD resource, TIM image and viewport its methods read.
+ - `Actor` (`GetStyleEffectMethods` onward; include/Actor.h, unified round
+   82): the base class of `DreamSys`, `TodActor` and `StyleEffect`.
+   `Actor__Actor` is the BASE's own constructor: `TodActor__TodActor`
+   calls it to chain to the base first, then overwrites `self->methods`
+   with its own table. `GetStyleEffectMethods` is the StyleEffect
+   subclass's table getter (named round 73), placed here by ROM address.
+```
+
+## Track 7 (round 99, alpha)
+
+Name unchanged, tier A. The body gained a one-line comment: it is
+STYLE_EFFECT_SPRITES' per-frame step in StyleEffect__UpdateByKind, whose
+`(self, pos)` it does not read.

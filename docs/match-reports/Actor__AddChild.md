@@ -86,3 +86,7 @@ half, right after it in ROM order.
 ## Track 4 (2026-09-25, round 82, delta)
 
 Renamed from `BaseObjO__LinkCompanion`. Override of +0x010 (addChild), named for its slot: chains SceneNode's addChild, then records the child as `grid` when its class id & 0xFFF is 0x114 (StageMap, the grid manager) or as `ticker` when id & 0xF is 5 (FrameClock). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 99, alpha)
+
+Local tag -> classId; the FrameClock test is `(classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID` (include/BasicClass.h, include/FrameClock.h). The StageMap test keeps `(classId & 0xFFF) == 0x114`: delta adds STAGEMAP_CLASS_ID to include/StageMap.h this round, and using it here is proposed for after the merge.

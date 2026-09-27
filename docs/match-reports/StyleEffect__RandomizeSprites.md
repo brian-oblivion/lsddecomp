@@ -15,7 +15,7 @@ random "angle" field.
 
 ```c
 extern s32 rand(void);
-extern Vec3O gLinkElemVec3Table[];
+extern Vec3O gStyleEffectJitterScales[];
 
 void StyleEffect__RandomizeSprites(LinkOwnerObj *this) {
     LinkElemObj **p = &this->arr84[1];
@@ -24,7 +24,7 @@ void StyleEffect__RandomizeSprites(LinkOwnerObj *this) {
     for (i = 0; i < 4; i++, p++) {
         u32 r = rand();
 
-        (*p)->methods->slot48(*p, 1, &gLinkElemVec3Table[r % 6]);
+        (*p)->methods->slot48(*p, 1, &gStyleEffectJitterScales[r % 6]);
         (*p)->unk84 = (rand() % 360) << 12;
     }
 }
@@ -53,16 +53,16 @@ void StyleEffect__RandomizeSprites(LinkOwnerObj *this) {
   because the intermediate result of the modulo is stored into a variable
   the compiler can prove non-negative here (an implicit consequence of
   `rand()`'s int return combined with the `u32` index expression
-  `gLinkElemVec3Table[r % 6]` requiring an unsigned index) -- written as
+  `gStyleEffectJitterScales[r % 6]` requiring an unsigned index) -- written as
   `u32 r = rand(); ... r % 6 ...`, not `(unsigned)rand() % 6` inline, to
   land the intermediate in the right register lifetime. The second `%360`
   is a genuinely signed division (retail's sign-fix `sra`/`subu` chain is
   present), so it stays `rand() % 360` on the plain `s32`-returning
   `rand()` with no cast.
-- **`gLinkElemVec3Table` is a 6-entry, 12-byte-stride rodata table**
+- **`gStyleEffectJitterScales` is a 6-entry, 12-byte-stride rodata table**
   (`asm/data/76DC8.data.s`, `0x8008788C`..`0x800878D0`, 18 words = 6 * 3),
   confirmed from the disassembly directly rather than guessed; declared
-  `extern Vec3O gLinkElemVec3Table[];`. `LinkElemMethods::slot48`'s third argument
+  `extern Vec3O gStyleEffectJitterScales[];`. `LinkElemMethods::slot48`'s third argument
   is a pointer into this table.
 - **`(rand() % 360) << 12`** is a plain degrees -> Q19.12-ish fixed-point
   conversion; no idiom needed beyond writing the arithmetic directly.
@@ -88,7 +88,7 @@ this and nothing more speculative.
 
 ## Global naming
 
-**`gLinkElemVec3Table` (was `D_8008788C`) -- tier B.** A rand()-indexed
+**`gStyleEffectJitterScales` (was `D_8008788C`) -- tier B.** A rand()-indexed
 table of 6 `Vec3O`-shaped rodata entries, used only by this unit, passed to
 each link element's own `slot48`. Named for its structure and access
 pattern (a global table of `Vec3` entries feeding `LinkElemObj`), not for
@@ -138,3 +138,7 @@ another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 
 View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
+
+## Track 7 (round 99, alpha)
+
+`python3 tools/rename.py gLinkElemVec3Table gStyleEffectJitterScales`, **tier A**: six entries of three Ratio16 (the old local view was an s32 Vec3O, same 12-byte stride): {1/16, 7/1, 1/1}, {7/1, 1/16, 1/1}, then the same with 3 and with 2, so each one shapes a sprite into a thin streak along y or along x; this function, its only accessor, hands a rand()-picked one to each jittering sprite's updateScale (VariantSprite__UpdateScale reads x and y). It is declared `Ratio16 [6][3]` now and the index bound is ARRAY_COUNT of it; the loop bound is ARRAY_COUNT(self->sprites) - 1 (sprites[1..4]); the rotation is `(rand() % 360) * ONE` (GsSPRITE.rotate is 4096ths of a degree; the same sll 12). rand() comes from Sony's <rand.h>. Locals p/r -> sprite/pick.

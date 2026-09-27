@@ -51,6 +51,18 @@ struct StageMap;
  * (TodActor, 0x234): StageMap__DispatchLinkCommand. */
 #define ACTOR_CLASS_ID 0x34
 
+/* The events an Actor's moves send through notifyWithHull
+ * (Actor__MoveAlongLocalAxis: moveLocalZ/X/Y), and the range
+ * Actor__NotifyMove handles: for the three moves it sweeps the model's hull
+ * by lastOffsetValue before passing it on, for ACTOR_EVENT_UNSWEPT it passes
+ * the hull as it is. No sender of 5 is in the tree. */
+enum ActorMoveEvent {
+    ACTOR_EVENT_UNSWEPT = 5,
+    ACTOR_EVENT_MOVED_Z = 6,
+    ACTOR_EVENT_MOVED_X = 7,
+    ACTOR_EVENT_MOVED_Y = 8
+};
+
 /* Occupants in gActorMethods named at each slot; `tools/classtable.py
  * <subclass table> --vs gActorMethods` lists a subclass's overrides. The
  * inherited slots keep SceneNode's names; this class overrides +0x008,
@@ -101,7 +113,7 @@ extern ActorMethods *GetActorMethods(void); /* returns &gActorMethods */
 /* The class's own methods, in ROM order (class_3bb8c_o, then class_3bb8c_p),
  * then its non-slot helpers. A subclass reaches the base ones through
  * GetActorMethods() and upcasts. */
-void SetStyleEffectSources(s32 unused, Actor *self, s32 arg2, s32 arg3);
+void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport);
 void *New_Actor(void);
 Actor *Actor__Actor(Actor *self);
 void Actor__AddChild(Actor *self, BasicClass *child);
