@@ -12,7 +12,7 @@
 
 Registers a "loader" task for a named resource: allocates a `LoaderTask`
 (`New_TaskCore`, a `New_X`-shaped allocator in uncarved `Task`, 0xA4
-bytes), gives it a completion callback (`GameApplication__LoaderTaskDoneCallback`, already matched in
+bytes), gives it a completion callback (`GameApplication__RegisterFilesCallback`, already matched in
 this unit) and a context pointer (`self`), then sets its remaining
 parameters (`path`, `self->unk1C`) and starts it. Called twice by
 `GameApplication__ShowIntroLogos` (already matched, same unit), once for
@@ -22,11 +22,11 @@ parameters (`path`, `self->unk1C`) and starts it. Called twice by
 
 ```
 jal  New_TaskCore(0, 0, 0)             ; -> s0 = task
-lui  $a1, %hi(GameApplication__LoaderTaskDoneCallback)
-addiu $a1, $a1, %lo(GameApplication__LoaderTaskDoneCallback)
+lui  $a1, %hi(GameApplication__RegisterFilesCallback)
+addiu $a1, $a1, %lo(GameApplication__RegisterFilesCallback)
 lw   $v0, 0x0($s0)                       ; task->methods
 lw   $v0, 0x98($v0)                       ; slot98
-jalr $v0                                    ; task->methods->slot98(task, &GameApplication__LoaderTaskDoneCallback, self)
+jalr $v0                                    ; task->methods->slot98(task, &GameApplication__RegisterFilesCallback, self)
  a2 = s1 (self)
 lw   $v0, 0x0($s0)
 lw   $v0, 0x6C($v0)                          ; slot6C
@@ -52,7 +52,7 @@ jalr $v0                                                    ; task->methods->slo
 void GameApplication__ShowImage(GameApplication *self, const char *path) {
     LoaderTask *task = New_TaskCore(0, 0, 0);
 
-    task->methods->slot98(task, GameApplication__LoaderTaskDoneCallback, self);
+    task->methods->slot98(task, GameApplication__RegisterFilesCallback, self);
     task->methods->slot6C(task, 0);
     task->methods->slotD4(task, path, 0);
     task->methods->slot44(task, self->unk1C, 0);
@@ -62,7 +62,7 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
 
 Matched first attempt: the caller (`GameApplication__ShowIntroLogos`) had already forced a
 careful read of this exact vtable-call idiom (task->methods reloaded fresh
-before every dispatch), and `GameApplication__LoaderTaskDoneCallback`'s signature (`s32 (void)`)
+before every dispatch), and `GameApplication__RegisterFilesCallback`'s signature (`s32 (void)`)
 happened to be exactly the type `slot98`'s callback parameter needed, so no
 cast was required.
 
@@ -72,7 +72,7 @@ cast was required.
 behind `New_TaskCore`, distinct from `StreamTaskMethods` used by
 `GameApplication__ShowIntroLogos` -- different allocator, different signatures at the same
 slot offsets) and the `New_TaskCore` extern. Forward-declared
-`GameApplication__LoaderTaskDoneCallback` (defined later in this same file/ROM order) so it can be
+`GameApplication__RegisterFilesCallback` (defined later in this same file/ROM order) so it can be
 passed as `slot98`'s callback argument.
 
 ## Proposed learning
@@ -96,7 +96,7 @@ offset against an already-typed sibling class.
 
 **`GameApplication__ShowImage` -- tier A.** Pure leaf helper, mechanics ARE
 the purpose: allocates a `LoaderTask` (`New_TaskCore`), registers a
-completion callback and context (`slot98`, `GameApplication__LoaderTaskDoneCallback`,
+completion callback and context (`slot98`, `GameApplication__RegisterFilesCallback`,
 `self`), sets its remaining parameters (path, `self->unk1C`) via `slot6C`/
 `slotD4`/`slot44`, and starts it (`start`, this unit's renamed
 `LoaderTaskMethods.start`). Called twice from

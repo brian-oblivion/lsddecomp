@@ -165,7 +165,7 @@ void GameApplication__ShowIntroLogos(GameApplication *self) {
 }
 
 /* Registers a "loader" task for the given resource path: allocates the
- * task, gives it a completion callback (GameApplication__LoaderTaskDoneCallback) and context
+ * task, gives it a completion callback (GameApplication__RegisterFilesCallback) and context
  * (self), then sets its remaining parameters (path, the parent's aux as its init args) and
  * starts it. */
 void GameApplication__ShowImage(GameApplication *self, const char *path) {
@@ -174,7 +174,7 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     /* setCallback's occupant stores a void (*)(void *ctx); this callback
      * takes nothing and returns RegisterRecordTableFiles's value, which
      * TaskCore__RefreshViewValue ignores. */
-    task->methods->setCallback(task, (void (*)(void *))GameApplication__LoaderTaskDoneCallback, self);
+    task->methods->setCallback(task, (void (*)(void *))GameApplication__RegisterFilesCallback, self);
     task->methods->setFrameBound(task, 0);
     task->methods->setSubHandle(task, path, 0);
     task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, 0);
@@ -183,7 +183,7 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
 
 extern s32 RegisterRecordTableFiles(s32 a0);
 
-s32 GameApplication__LoaderTaskDoneCallback(void) {
+s32 GameApplication__RegisterFilesCallback(void) {
     return RegisterRecordTableFiles(0);
 }
 

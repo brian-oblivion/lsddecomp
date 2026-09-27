@@ -128,7 +128,7 @@ table's files with the CD driver: on its first call all of them when `all`
 is set (and it then counts itself as two calls), else the first half; on its
 second call the rest; later calls register nothing. The mechanics are
 certain; why the table is registered in halves (DayTask's ctor passes 1,
-GameApplication__LoaderTaskDoneCallback 0) is not, hence B.
+GameApplication__RegisterFilesCallback 0) is not, hence B.
 
 - `D_8008A978` -> `sRecordRegisterCalls` (tier A: a call counter, read and
   written only here).

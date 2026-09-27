@@ -90,7 +90,7 @@ void GameApplication__SeedRandom(GameApplication *self);
 void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem, struct Pad *pad);
 void GameApplication__ShowIntroLogos(GameApplication *self);
 void GameApplication__ShowImage(GameApplication *self, const char *path);
-s32 GameApplication__LoaderTaskDoneCallback(void);
+s32 GameApplication__RegisterFilesCallback(void);
 void GameApplication__PlayOpeningMovie(GameApplication *self);
 s32 GameApplication__PollGraphRoomStatus(GameApplication *self);
 void GameApplication__PlaySpecialDayMovies(GameApplication *self);
