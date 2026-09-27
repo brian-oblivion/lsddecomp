@@ -1,4 +1,6 @@
-# func_8003EA6C — MATCHED
+# Viewport__func_8003EA6C — MATCHED
+
+> Renamed from `func_8003EA6C` on 2026-09-27 (tools/rename.py). Address 0x8003ea6c.
 
 Unit: `code_2cc8c_d`. Round 73, runner charlie (report written retroactively;
 the function itself was already byte-exact under `INCLUDE_ASM` before this
@@ -8,7 +10,7 @@ without any hand-written C being required).
 ## Signature
 
 ```c
-void func_8003EA6C(void);
+void Viewport__func_8003EA6C(void);
 ```
 
 Not a `gViewportMethods` vtable slot occupant (`tools/classtable.py gViewportMethods`
@@ -23,7 +25,7 @@ verbatim here -- "not every matched function was work."
 
 ## Naming
 
-Kept `func_8003EA6C`. No evidence of any kind: no `self` parameter to tie it
+Kept `Viewport__func_8003EA6C`. No evidence of any kind: no `self` parameter to tie it
 to `Unk18Obj` or any other class, no caller, no vtable slot. Tier-C's
 `Class__func_xxxxx` form does not apply because no class is established.
 Nothing to propose.

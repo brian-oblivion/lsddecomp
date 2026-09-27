@@ -104,7 +104,7 @@ struct ViewportOt {
     /* +0x04C */ void (*setUnk44)(Self *self, s32 value);          /* Viewport__SetUnk44, before InitOt only */ \
     /* +0x050 */ void (*setUnk48)(Self *self, s32 value);          /* Viewport__SetUnk48, before InitOt only */ \
     /* +0x054 */ void (*setProjection)(Self *self, s32 h);         /* Viewport__SetProjection */     \
-    /* +0x058 */ void (*slot58)(void);                             /* func_8003EA6C, empty */        \
+    /* +0x058 */ void (*slot58)(void);                             /* Viewport__func_8003EA6C, empty */        \
     /* +0x05C */ void (*slot5C)(void);                             /* func_8003EA74, empty */        \
     /* +0x060 */ void (*setLightMode)(Self *self, s32 mode);       /* Viewport__SetLightMode */      \
     /* +0x064 */ void (*setClearColor)(Self *self, ViewportRgb *color); /* Viewport__SetClearColor */ \
@@ -189,7 +189,7 @@ void Viewport__SetOtLength(Viewport *self, s32 length);
 void Viewport__SetUnk44(Viewport *self, s32 value);
 void Viewport__SetUnk48(Viewport *self, s32 value);
 void Viewport__SetProjection(Viewport *self, s32 h);
-void func_8003EA6C(void);
+void Viewport__func_8003EA6C(void);
 void func_8003EA74(void);
 void Viewport__SetLightMode(Viewport *self, s32 mode);
 void Viewport__SetClearColor(Viewport *self, ViewportRgb *color);
