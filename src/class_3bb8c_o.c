@@ -81,16 +81,6 @@ void StyleEffect__ReleaseSpritesB(StyleEffect *self) {
  * shared base of DreamSys, TodActor and StyleEffect.
  * ------------------------------------------------------------------ */
 
-/* Actor__NotifyMove's model-data buffer, filled by readUnk20Data and handed
- * to RotateAndOffsetHullList and transformAndNotifyParents. Retail's frame needs it to
- * be 0x38 bytes (sp+0x10 .. sp+0x47, the saved registers from sp+0x48); a
- * smaller buffer shifts everything after the function. Its layout is not
- * established here. */
-typedef struct Buf38O {
-    TmdHull hull;
-    u8 pad34[4];
-} Buf38O;
-
 /* StyleEffect's getter (include/StyleEffect.h), placed here by ROM address. */
 StyleEffectMethods *GetStyleEffectMethods(void) {
     return &gStyleEffectMethods;
@@ -196,10 +186,10 @@ void Actor__NotifyMove(Actor *self, s32 event) {
      * separate `slti`s). */
     if (event <= ACTOR_EVENT_MOVED_Y) {
         if (event >= ACTOR_EVENT_UNSWEPT) {
-            Buf38O hullBuf;
+            TmdHull hull;
 
             if (self->model != NULL && TmdModel__GetBoundsCount(self->model)) {
-                self->methods->getModelHull(self, &hullBuf);
+                self->methods->getModelHull(self, &hull);
                 if (event != ACTOR_EVENT_UNSWEPT) {
                     s16 offset = self->lastOffsetValue;
                     s32 alongX = (event == ACTOR_EVENT_MOVED_X);
@@ -216,9 +206,9 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                 backward:
                     delta = offset - self->pendingExtra;
                 offsetHull:
-                    RotateAndOffsetHullList(&hullBuf.hull, alongX, forward, delta);
+                    RotateAndOffsetHullList(&hull, alongX, forward, delta);
                 }
-                self->methods->transformAndNotifyParents(self, &hullBuf.hull, event);
+                self->methods->transformAndNotifyParents(self, &hull, event);
                 /* The link target's class byte: an Actor gets slotE8. */
                 if (self->linkTarget != NULL) {
                     if ((u8)self->linkTarget->methods->header == ACTOR_CLASS_ID) {
