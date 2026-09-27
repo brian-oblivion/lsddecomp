@@ -17,8 +17,10 @@
  * to the CD driver's own functions when it is active, and to an SPU/VAB-
  * side fallback otherwise.
  *
- * GetGameApplicationMethods, ResourceRequest__Set and BuildFileName are unrelated utilities
- * that happen to live in this segment; func_800270AC/func_800270B8 (a
+ * ResourceRequest__Set fills the {buffer, name, mode} descriptor the
+ * resource classes' ctors take (include/code_171e0.h's ResourceRequest).
+ * GetGameApplicationMethods and BuildFileName are unrelated utilities that
+ * happen to live in this segment; func_800270AC/func_800270B8 (a
  * getter/setter pair for D_8008A854) are left unnamed -- see their reports.
  */
 #include "common.h"

@@ -8,9 +8,10 @@
 
 ## What it does
 
-Writes three words (`x`, `y`, `z`) into the first 12 bytes of its first
-argument and returns that pointer. A `Vec3`-style "set and return this"
-setter.
+Fills a `ResourceRequest` (`include/code_171e0.h`) -- `buffer`, `name`,
+`mode` -- and returns the pointer. That is the descriptor the LinkResource,
+Tod, TodSet, ModelData and TriggerWorld ctors take (GraphicsResources.c's
+`ResourceSource` declares only its first two words).
 
 ## Derivation
 
@@ -33,15 +34,15 @@ what settles it):
 
 ```c
 typedef struct ResourceRequest {
-    s32 x;
-    s32 y;
-    s32 z;
+    /* +0x00 */ void *buffer;
+    /* +0x04 */ char *name;
+    /* +0x08 */ s32 mode;
 } ResourceRequest;
 
-ResourceRequest *ResourceRequest__Set(ResourceRequest *this, s32 x, s32 y, s32 z) {
-    this->x = x;
-    this->y = y;
-    this->z = z;
+ResourceRequest *ResourceRequest__Set(ResourceRequest *this, void *buffer, char *name, s32 mode) {
+    this->buffer = buffer;
+    this->name = name;
+    this->mode = mode;
     return this;
 }
 ```
@@ -65,5 +66,45 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80026CE8` | `ResourceRequest__Set` | A |
 
-**Evidence.** Writes `x`/`y`/`z` into a `ResourceRequest` and returns the pointer
--- a pure "set and return this" setter. Mechanics are its purpose.
+**Evidence.** Stores three words into its first argument and returns the
+pointer -- a pure "set and return this" setter. Mechanics are its purpose.
+
+### Track 6 (round 96, alpha)
+
+| was | now | tier |
+| --- | --- | --- |
+| `Vec3_171e0 {s32 x, y, z}` | `ResourceRequest {void *buffer; char *name; s32 mode}` | A (type), B (`mode`) |
+| `SetVec3` | `ResourceRequest__Set` | A |
+
+**Evidence.** Not a vector. All four callers in retail (the only `jal`s to
+0x80026CE8) fill it as a ctor descriptor and pass it cast to `ResourceSource`:
+`ModelData__BuildResources` (TMD offset in the buffer, name 0, 1) and then
+`New_LinkResource`/`New_TodSet`; `TriggerWorld__BuildResources` and
+`TodSet__BuildTods` (0, 0, 1, then the buffer per sub-block) into
+`New_ModelData`/`New_Tod`; `InitDreamAux` (0, "ETC\\SYMSPY.MOM", 1) into
+`New_ModelData`. Every ctor reads `buffer` (adopt it) and, when that is NULL,
+`name` (request the file). Nobody reads word +0x08, and every caller passes 1;
+`mode` follows the name two callers' own views already use, and is tier B.
+Not `LongVec3` (the words are a pointer, a string and a flag) and not Sony's
+`VECTOR` (no fourth word is touched).
+
+Several unit-local views of this same descriptor remain, under other names:
+`ResourceSource` and `ResourceSourceArgs` (GraphicsResources.c),
+`DreamAuxLoadReq` (code_4cd08.h), `LoadRequest` (class_39e08.h),
+`LoadModelRequest` (code_1677c), `BE54LoadReq` (class_3bb8c.c). Some are
+0x10-byte locals, where the stack slot size may be what matches, so merging
+them is a head decision (proposed below), not a rename.
+
+## Proposed (not applied: outside this job's edit set)
+
+- One header for the descriptor (e.g. `include/ResourceSource.h`) holding a
+  single definition, retiring `ResourceRequest`, GraphicsResources.c's
+  `ResourceSource`/`ResourceSourceArgs`, `DreamAuxLoadReq`, `LoadRequest`,
+  `LoadModelRequest` and `BE54LoadReq`, with `ResourceRequest__Set`'s
+  prototype there. Check each 0x10-byte local keeps its size.
+- `include/code_4cd08.h`'s comment above `DreamAuxLoadReq` still quotes the
+  old body (`this->x=x; ...`) and calls the record "physically the same shape"
+  as the vector; it now reads as the same descriptor as `ResourceRequest`.
+- `ResourceRequest__Set`'s prototype is not in `include/code_171e0.h`: three
+  units declare their own (typed to their local view), and code_4cd08.h's
+  would conflict with it in any file including both.
