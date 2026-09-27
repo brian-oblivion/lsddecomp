@@ -192,3 +192,18 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj casts are g
 - The viewport's local view here (`StreamTaskUnk18Obj`) was merged into
   include/Viewport.h in round 85; StreamTask::player's (`StreamTaskUnkB4Obj`)
   into include/MoviePlayer.h in round 89.
+
+## Proposed field names
+
+Accessors outside code_2c054 (the compiler's error list), so for the head
+to apply by type scope:
+
+- IntermediateBase `+0x014 unk14` -> `lightRig`: its own comment says it is
+  `initArgs->lightRig` or init's `New_LightRig()`; this function hangs the
+  BgLayer and the slot widgets under it and attaches the view to it.
+  Accessors: code_2c054.c, class_3bb8c_d.c, class_3bb8c_l.c, class_3bb8c_m.c.
+- TaskCore `+0x02C unk2C` -> `packetCount` (tier B, TaskCore__Reset's
+  report): handed to the viewport's `setUnk44`. Accessors: code_2c054.c,
+  class_3bb8c_d.c (TitleMenu__Reset), class_3bb8c_t.c (GraphRoom__Reset).
+  Viewport's own `unk44`/`unk48` and `setUnk44`/`setUnk48` would follow as
+  `packetCount`/`packetSize`.
