@@ -28,13 +28,16 @@ extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource
 extern char *GetDefaultDataDirectory(void); /* GameFiles.c: "CDI\\" */
 extern void SetDataDirectory(char *dir);    /* code_171e0.c */
 
-extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
-                                                       the last value its internal dispatch loop got --
-                                                       GameApplication__ShowIntroLogos/GameApplication__PlayOpeningMovie discard it, but
-                                                       GameApplication__PlayCinematic keeps it */
-extern const char *GetAsmkMovie(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkMoviePath */
-extern s32 GetMovieFrameCount(s32 index); /* psyq_memset.s: signed-halfword lookup into gMovieFrameCounts[index] */
-extern s32 PickOpeningMovie(s32 *out, s32 param2); /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
+/* code_171e0.c: waits until the data source's driver takes the mode; every
+ * task here starts with (0, 0, 0). */
+extern void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
+
+/* GameFiles.c's movie getters. Each returns a movie's path (a gRecordTable
+ * record, or "ETC\ASMK.STR") and writes its movie id, which
+ * GetMovieFrameCount turns into the frame count a StreamTask plays. */
+extern const char *GetAsmkMovie(s32 *movieIdOut);
+extern const char *PickOpeningMovie(s32 *movieIdOut, s32 unused);
+extern s32 GetMovieFrameCount(s32 movieId);
 
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char sLogoPathOsd[];  /* "ETC\OSDLOGO.TIM" */
@@ -47,16 +50,14 @@ typedef IntermediateBase *(*NewTaskFn)(struct DreamSys *dreamSys);
 s32 GameApplication__RunTask(NewTaskFn newTask, struct DreamSys *dreamSys,
                              IntermediateBaseInitArgs *initArgs);
 
-extern s32 GetSpecialDayMovieSpan(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
-/* GameFiles.c: same "write to *out, return a separate value" shape as
- * GetAsmkMovie/PickOpeningMovie/GetSpecialDayMovieSpan. */
-extern s32 GetEndingMovie(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
-extern s32 GetSpecialDayOrEventRecord(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
-    {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
-    to *out (-1 if unresolved); the packing must zero-extend both halves before combining
-    (retail loads them with lhu, not lh) since the result is bitwise-composed, not a value read
-    back as a signed 32-bit number. Also returns its own (separate) s32 value, kept by
-    GameApplication__PlayCinematic. */
+/* The first movie of special day `day`, and the frames of dayCount days'
+ * movies from it. */
+extern const char *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount);
+extern const char *GetEndingMovie(s32 *movieIdOut, s32 unused); /* arity-ok: the definition takes movieIdOut alone; retail's call still sets $a1 = 0 */
+/* A special day's record or an event movie, for DreamSys's getCinematic
+ * pair packed into one word (bank low, entry high, each zero-extended);
+ * *movieIdOut is -1 for a record that is a TIM image. */
+extern const char *GetSpecialDayOrEventRecord(s32 *movieIdOut, s32 packedPick);
 
 /* The `New_X` allocator for the class whose method table is gGameApplicationMethods:
  * allocates a 0x2C-byte instance and, on success, runs the class's own
@@ -125,19 +126,19 @@ void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem,
  * "stream" task for whatever type code GetAsmkMovie hands back
  * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
 void GameApplication__ShowIntroLogos(GameApplication *self) {
-    const char *streamName;
-    s32 typeCode;
-    s32 typeLookup;
+    const char *moviePath;
+    s32 movieId;
+    s32 frameCount;
     StreamTask *task;
 
     if (self->config->showIntroLogos != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         GameApplication__ShowImage(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
-        streamName = GetAsmkMovie(&typeCode);
-        typeLookup = GetMovieFrameCount(typeCode);
+        moviePath = GetAsmkMovie(&movieId);
+        frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
-                                                streamName, typeLookup, 1);
+                                                (s32)moviePath, frameCount, 1);
         task->methods->release(task);
         GameApplication__ShowImage(self, sLogoPathOsd);
     }
@@ -171,18 +172,18 @@ s32 GameApplication__RegisterFilesCallback(void) {
  * GameApplication__ShowImage loader-task calls, and using PickOpeningMovie instead of
  * GetAsmkMovie to derive the type code). */
 void GameApplication__PlayOpeningMovie(GameApplication *self) {
-    s32 derivedValue;
-    s32 typeCode;
-    s32 typeLookup;
+    const char *moviePath;
+    s32 movieId;
+    s32 frameCount;
     StreamTask *task;
 
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        derivedValue = PickOpeningMovie(&typeCode, 0);
-        typeLookup = GetMovieFrameCount(typeCode);
+        moviePath = PickOpeningMovie(&movieId, 0);
+        frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
-                                                derivedValue, typeLookup, 1);
+                                                (s32)moviePath, frameCount, 1);
         task->methods->release(task);
     }
 }
@@ -250,19 +251,19 @@ void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     /* MATCHING: the frame keeps 12 bytes here, frameTotal in the last 4. */
     struct {
         u8 pad00[8];
-        u32 frameTotal;
+        s32 frameTotal;
     } buf;
 
-    s32 extra;
+    const char *moviePath;
 
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        extra = GetSpecialDayMovieSpan(&buf.frameTotal, 0, 10);
-        task->methods->setFrameBound(task, buf.frameTotal / 15);
+        moviePath = GetSpecialDayMovieSpan(&buf.frameTotal, 0, 10);
+        task->methods->setFrameBound(task, (u32)buf.frameTotal / STREAMTASK_FRAMES_PER_SECOND);
         task->methods->setSkipOnConfirm(task, 0);
-        ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux, extra,
-                                                -1, 1);
+        ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
+                                                (s32)moviePath, -1, 1);
         task->methods->release(task);
     }
 }
@@ -336,30 +337,30 @@ void GameApplication__PlayCinematic(GameApplication *self) {
     struct {
         s32 movieId;
         u8 pad04[8];
-    } chanBuf;
+    } idBuf;
 
-    s32 groupId;
-    s32 lookup;
+    const char *path;
+    s32 frameCount;
     TaskCore *task;
 
     cc = self->dreamSys->methods->getCinematic(self->dreamSys);
-    groupId = GetSpecialDayOrEventRecord(&chanBuf.movieId, (u16)cc.bank | ((u32)(u16)cc.entry << 16));
+    path = GetSpecialDayOrEventRecord(&idBuf.movieId, (u16)cc.bank | ((u32)(u16)cc.entry << 16));
     SetActiveDataSourceDriverMode(0, 0, 0);
 
-    if (chanBuf.movieId != -1) {
+    if (idBuf.movieId != -1) {
         if (self->config->playStreams != 0) {
             StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
             streamTask->methods->setSkipOnConfirm(streamTask, 0);
-            lookup = GetMovieFrameCount(chanBuf.movieId);
+            frameCount = GetMovieFrameCount(idBuf.movieId);
             ((StreamTaskInitFn)streamTask->methods->init)(
-                streamTask, (IntermediateBaseInitArgs *)self->aux, groupId, lookup, 1);
+                streamTask, (IntermediateBaseInitArgs *)self->aux, (s32)path, frameCount, 1);
             streamTask->methods->release(streamTask);
         }
     } else {
         task = New_TaskCore(0, 0, 0);
         task->methods->setFrameBound(task, 10);
-        task->methods->setSubHandle(task, groupId, 0);
+        task->methods->setSubHandle(task, path, 0);
         task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, 0);
         task->methods->release(task);
     }
@@ -373,18 +374,18 @@ void GameApplication__PlayCinematic(GameApplication *self) {
  * in place of GetAsmkMovie/PickOpeningMovie. */
 void GameApplication__PlayEndingMovie(GameApplication *self) {
     StreamTask *task;
-    s32 typeCode;
-    s32 outerValue;
-    s32 typeLookup;
+    s32 movieId;
+    const char *moviePath;
+    s32 frameCount;
 
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         task->methods->setSkipOnConfirm(task, 0);
-        outerValue = GetEndingMovie(&typeCode, 0);
-        typeLookup = GetMovieFrameCount(typeCode);
+        moviePath = GetEndingMovie(&movieId, 0);
+        frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
-                                                outerValue, typeLookup, 1);
+                                                (s32)moviePath, frameCount, 1);
         task->methods->release(task);
     }
 }
