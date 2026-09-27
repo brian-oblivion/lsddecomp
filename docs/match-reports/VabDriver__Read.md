@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002C408` on 2026-09-26 (tools/rename.py). Address 0x8002c408.
 
-Unit: `code_179d8_d`. Runner: echo, round 17.
+Unit: `PlacementGridVabSound`. Runner: echo, round 17.
 
 ## Result
 
@@ -19,7 +19,7 @@ Byte-exact, 2/2 words.
 Trivial leaf: `jr $ra; addu $v0,$zero,$zero`. This is `gVabDriverMethods`'s vtable
 slot +0x054 (confirmed with `tools/classtable.py gVabDriverMethods`), a class table
 that `tools/classtable.py --scan` recognises -- see the corrected header
-comment in `src/code_179d8_d.c` for why this unit IS class-framework code,
+comment in `src/PlacementGridVabSound.c` for why this unit IS class-framework code,
 contrary to the assignment's inherited "not class-framework" note (that
 finding belongs to the sibling slices' different neighbourhood, not this
 one).
@@ -31,10 +31,10 @@ chosen for simplicity.
 
 ### Proposed learning
 
-`code_179d8_d`'s globals (`gVabDriverMethods`, `gVabStreamObjMethods`) ARE class-framework
+`PlacementGridVabSound`'s globals (`gVabDriverMethods`, `gVabStreamObjMethods`) ARE class-framework
 tables -- `tools/classtable.py --scan` hits both (29 and 39 slots). The
 "code_179d8 is not class-framework code" finding from round 16 is
-neighbourhood-scoped (libcd_bios's SIO globals, code_179d8_d's driver
+neighbourhood-scoped (libcd_bios's SIO globals, PlacementGridVabSound's driver
 globals), not monolith-wide, and should not be inherited by every future
 slice of this monolith without re-checking `classtable.py --scan` against
 that slice's own globals.
@@ -44,7 +44,7 @@ that slice's own globals.
 Kept `func_8002C408`, tier C (superseded 2026-09-26, Track 4 below). The CLASS is now established (round 52:
 `gVabDriverMethods`, the generic driver-interface base class
 `VabStreamObj` chains its own ctor/close through when
-`gActiveDataSource == 0x23` -- see `src/code_179d8_d.c`'s unit header
+`gActiveDataSource == 0x23` -- see `src/PlacementGridVabSound.c`'s unit header
 comment), but this SLOT's own purpose within that interface is not: the
 body is `return 0;` and nothing in this unit calls the slot directly (only
 the vtable data references it). No positive evidence for what a caller

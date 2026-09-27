@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002CBF4` on 2026-09-18 (tools/rename.py). Address 0x8002cbf4.
 
-Unit: `code_179d8_d`. Runner: echo, round 17.
+Unit: `PlacementGridVabSound`. Runner: echo, round 17.
 
 ## Result
 

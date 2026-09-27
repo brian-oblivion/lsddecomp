@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002C3D0` on 2026-09-26 (tools/rename.py). Address 0x8002c3d0.
 
-**Unit:** code_179d8_d · **Size:** 4 instructions (0x10 bytes) ·
+**Unit:** PlacementGridVabSound · **Size:** 4 instructions (0x10 bytes) ·
 **Status: MATCHED 4/4**, whole-image SHA1 green.
 
 ## Role
@@ -27,9 +27,9 @@ bytes, not a claim about the original source's intent.
 ## Naming (round 77, charlie -- track 3, no rename)
 
 `tools/classtable.py 0x8006D9BC` confirms this is the `+0x040` slot of
-`gVabDriverMethods` (29-slot FileResource-derived table, `code_179d8_d.c`,
-the SPU/VAB driver base class) -- physically carved into code_179d8_d.c by
-ROM address, semantically owned by that other unit. `code_179d8_d.c`'s own
+`gVabDriverMethods` (29-slot FileResource-derived table, `PlacementGridVabSound.c`,
+the SPU/VAB driver base class) -- physically carved into PlacementGridVabSound.c by
+ROM address, semantically owned by that other unit. `PlacementGridVabSound.c`'s own
 `VabDriverMethods` struct comment leaves this and its four siblings
 (`VabDriver__Open`/`VabDriver__Close`/`VabDriver__Seek`/`VabDriver__NoOpSlot50`) entirely opaque -- `u8 pad000[0x054]`
 covers +0x000..+0x054 with no per-slot field even at the struct level, and

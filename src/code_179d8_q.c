@@ -23,7 +23,7 @@
  *
  * code_171e0.c reaches all of this through wrappers gated on
  * `gActiveDataSource == 0x13`, this class's header word; the other value that gate
- * takes, 0x23, selects the SPU/VAB streamer in code_179d8_d.c. So the two
+ * takes, 0x23, selects the SPU/VAB streamer in PlacementGridVabSound.c. So the two
  * are interchangeable data sources behind one small dispatch layer.
  */
 #include "common.h"

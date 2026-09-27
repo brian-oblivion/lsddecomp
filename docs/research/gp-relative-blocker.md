@@ -214,7 +214,7 @@ true for twenty rounds and is now false.
 
 The `gp_rel` load in the live queue also concentrates, which matters for
 judging what a fix would return: `code_171e0` (14), `DreamSys` (13),
-`code_4cd08` (8) and `code_179d8_d` (8) hold over half of it between them.
+`code_4cd08` (8) and `PlacementGridVabSound` (8) hold over half of it between them.
 `code_171e0` is 14 of its 27 queued functions and `code_4cd08` is 8 of 17 —
 two units a fix would roughly halve on its own.
 

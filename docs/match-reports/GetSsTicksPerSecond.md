@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002CC28` on 2026-09-27 (tools/rename.py). Address 0x8002cc28.
 
-Unit `code_179d8_d`. Previously filed as a `gp_rel` stall (round 17); reopened
+Unit `PlacementGridVabSound`. Previously filed as a `gp_rel` stall (round 17); reopened
 round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi` resolved that blocker for the
 whole project (see `docs/research/gp-relative-blocker.md`, "RESOLVED").
 

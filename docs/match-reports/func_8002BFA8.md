@@ -6,7 +6,7 @@
 > `src/` and the game-code count shrank by it -- the correction CLAUDE.md asks
 > for, not a regression. The run `libcd/iso9660` + `libc2/strcmp` +
 > `libc2/strncmp` tiles 0x1BE40..0x1C92C and crosses the libcd_bios /
-> code_179d8_d boundary; both units trimmed. Whole-image SHA1 green. Nothing
+> PlacementGridVabSound boundary; both units trimmed. Whole-image SHA1 green. Nothing
 > here is assignable and there is no stall left to work. The text below is the
 > pre-conversion record.
 
@@ -14,7 +14,7 @@
 
 # func_8002BFA8
 
-**Unit:** code_179d8_d · **Size:** 27 instructions (0x6C bytes) ·
+**Unit:** PlacementGridVabSound · **Size:** 27 instructions (0x6C bytes) ·
 **Status: MATCHED 27/27**, whole-image SHA1 green.
 
 ## Role
@@ -40,7 +40,7 @@ s32 func_8002BFA8(void *p0, void *p1, void *p2)
 `func_800292F4`, `func_80028DF0`, `func_80029274`, `func_80029254` are
 all defined in `libcd_bios`, not this unit, and all four are still
 `INCLUDE_ASM` there (no established signature anywhere). Declared LOCAL
-to `code_179d8_d.c`, typed purely from this call site's own register
+to `PlacementGridVabSound.c`, typed purely from this call site's own register
 usage, per the project's cross-unit-prototype rule and this round's
 "no shared `code_179d8*.h`" rule for the sibling slices.
 

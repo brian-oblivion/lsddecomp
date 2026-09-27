@@ -35,7 +35,7 @@ matching CLAUDE.md's `SetActiveDataSourceDriverMode` prediction area for this un
 accessor-family shape.
 
 `SetVabDriverMode` is independently defined elsewhere
-(`src/code_179d8_d.c`: `s32 SetVabDriverMode(s32 a, s32 b) { gVabDriverMode=a; gVabDriverModeArg=b; return 1; }`)
+(`src/PlacementGridVabSound.c`: `s32 SetVabDriverMode(s32 a, s32 b) { gVabDriverMode=a; gVabDriverModeArg=b; return 1; }`)
 taking only **2** parameters, not 3. This unit's own local extern declares it
 with 3 (matching the call site's actual register usage: `a0`,`a1`,`a2` are
 all loaded before the `jalr`, since the alternate target `SetCdDriverMode` may
@@ -95,7 +95,7 @@ a 3-argument setter with a retry loop.
 **Evidence.** The typedef's only use is this function's local `fn`, and it
 has exactly two occupants, one per branch of `gActiveDataSource ==
 DATASOURCE_CD`: `SetCdDriverMode` (CD driver, `code_179d8_q.c`, 3 args) and
-`SetVabDriverMode` (SPU/VAB driver, `code_179d8_d.c`, 2 args, ignores the
+`SetVabDriverMode` (SPU/VAB driver, `PlacementGridVabSound.c`, 2 args, ignores the
 third). Both occupants agree on what they do -- set the selected data
 source's driver mode, returning 0 while not yet accepted, which the caller
 polls. The name says that and nothing about why; the placeholder was the

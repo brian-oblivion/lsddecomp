@@ -30,10 +30,10 @@ code_1677c: warning: control reaches end of non-void function
 code_1677c: warning: passing arg 2 makes pointer from integer without a cast
 code_1677c: warning: passing arg 3 makes integer from pointer without a cast
 code_171e0: warning: assignment from incompatible pointer type
-code_179d8_d: warning: unused variable `unused'
-code_179d8_d: warning: unused variable `unused'
-code_179d8_d: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
-code_179d8_d: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
+PlacementGridVabSound: warning: unused variable `unused'
+PlacementGridVabSound: warning: unused variable `unused'
+PlacementGridVabSound: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
+PlacementGridVabSound: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 code_179d8_h: warning: unused variable `scratch'
 libsnd_vmanager: warning: comparison between signed and unsigned
 code_179d8_q: src/code_179d8_q.c: At top level:

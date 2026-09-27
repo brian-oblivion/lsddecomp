@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C638` on 2026-09-18 (tools/rename.py). Address 0x8002c638.
 
-Unit `code_179d8_d`. Previously filed as a `gp_rel` stall (round 17, never
+Unit `PlacementGridVabSound`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
 resolved that blocker project-wide. Confirmed against `gVabStreamObjMethods`'s own
 rodata (`asm/data/5E140.data.s`) as that table's own `+0x0C` slot -- this is
@@ -43,7 +43,7 @@ frees the three per-object allocations (`vagAttrPool`'s VagAtr pool,
 `progVagTable`'s pointer array, `baseFilename`'s filename copy) and chains
 to the base class's own
 `+0x0C` slot (`func_80026CAC()->slot0C`), the same base-chain pattern
-`code_179d8_d.c` already established for a sibling table. The final call's
+`PlacementGridVabSound.c` already established for a sibling table. The final call's
 return type is a bare tail call with nothing after it -- genuinely
 ambiguous between `void` and `s32`, defaulted to `s32` per CLAUDE.md's rule.
 
@@ -98,7 +98,7 @@ as s32. That is FileResource's view, left as it was.
 
 Track 4, 2026-09-26 (round 88, CdDriver). `DriverBaseMethods` is gone:
 `GetActiveDataSourceMethods` returns gCdDriverMethods or gVabDriverMethods,
-both FILERESOURCE_SLOTS tables, so code_179d8_d.c declares it
+both FILERESOURCE_SLOTS tables, so PlacementGridVabSound.c declares it
 `FileResourceMethods *` like every other caller, and the chained call is
 `GetActiveDataSourceMethods()->finalize((FileResource *)self)` (void, as the
 slot is). Byte-identical.

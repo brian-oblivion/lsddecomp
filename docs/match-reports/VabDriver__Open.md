@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002C3E0` on 2026-09-26 (tools/rename.py). Address 0x8002c3e0.
 
-**Unit:** code_179d8_d · **Size:** 4 instructions (0x10 bytes) ·
+**Unit:** PlacementGridVabSound · **Size:** 4 instructions (0x10 bytes) ·
 **Status: MATCHED 4/4**, whole-image SHA1 green. Identical shape to
 `VabDriver__NoOpSlot40` immediately preceding it (this unit, matched the same
 round) -- same 0x40-byte reserved-and-unused stack frame.
@@ -17,7 +17,7 @@ void VabDriver__Open(void)
 ## Naming (round 77, charlie -- track 3, no rename)
 
 Same finding as `VabDriver__NoOpSlot40`'s report: `+0x044` slot of
-`gVabDriverMethods` (code_179d8_d.c), left opaque even at that unit's own
+`gVabDriverMethods` (PlacementGridVabSound.c), left opaque even at that unit's own
 struct-comment level. Kept `func_`, not renamed.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `func_8002C3E0` -> `VabDriver__Open`

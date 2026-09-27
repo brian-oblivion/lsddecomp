@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002C438` on 2026-09-18 (tools/rename.py). Address 0x8002c438.
 
-Unit: `code_179d8_d`. Runner: echo, round 17.
+Unit: `PlacementGridVabSound`. Runner: echo, round 17.
 
 ## Result
 
@@ -22,7 +22,7 @@ Byte-exact, 4/4 words (`lui`/`addiu` computing `&gVabDriverMethods`, then `jr`/`
 
 The "get methods table" accessor for the `gVabDriverMethods` class -- same idiom as
 `GetVabStreamObjMethods` (this unit) returning `&gVabStreamObjMethods`, and `GetPlacementGridMethods` in
-the sibling `code_179d8_d.c` returning `&gPlacementGridMethods`. Confirmed void-argument
+the sibling `PlacementGridVabSound.c` returning `&gPlacementGridMethods`. Confirmed void-argument
 by checking its two call sites (`code_171e0/func_80026CAC.s`,
 `code_171e0/func_80026FE8.s`): both `jal GetVabDriverMethods` with no argument
 register set up beforehand.

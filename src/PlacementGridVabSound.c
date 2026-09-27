@@ -1,5 +1,5 @@
 /*
- * code_179d8_d -- PlacementGrid (include/PlacementGrid.h), the model
+ * PlacementGridVabSound -- PlacementGrid (include/PlacementGrid.h), the model
  * placements of one map chunk's 20 x 20 cells: its allocator, ctor,
  * finalize, read-done flag, the processBuffer occupant that turns one
  * placement record per call into a CellPlacement and its model, and the

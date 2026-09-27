@@ -26,7 +26,7 @@ beq $v1, $v0(0x13), .L8002700C   # equal -> GetCdUseVSyncCallback
 ```
 
 `GetVabUseVSyncCallback` is independently confirmed non-void elsewhere in the repo:
-`src/code_179d8_d.c` has `s32 GetVabUseVSyncCallback(void) { return 0; }`. This is
+`src/PlacementGridVabSound.c` has `s32 GetVabUseVSyncCallback(void) { return 0; }`. This is
 the direct positive evidence CLAUDE.md asks for -- the else-arm really does
 return `s32`, so the whole function (and, by the same shape, its two
 siblings `GetActiveDataSourceMethods`/`GetActiveDataSourceDriverMode`) is correctly typed non-void, not
