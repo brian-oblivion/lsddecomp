@@ -292,7 +292,7 @@ extern s32 D_8008AB34;
 
 /* The StageMap's accepted tags (setAcceptedTags), an opaque .data block
  * (asm/data/76DC8.data.s) reached by address. */
-extern s32 D_8008710C;
+extern s32 gObjMAcceptedClassIds;
 
 void ObjM__SetupSceneStyle(ObjM *self) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
@@ -320,7 +320,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     rig->methods->setConfig(rig, GetStageGridDimensions(self->stage));
     ((DreamSysAttachToParentFn)self->dreamSys->methods->attachToParent)(self->dreamSys, rig);
     rig->methods->setGridSpan(rig, self->gridSpan);
-    rig->methods->setAcceptedTags(rig, &D_8008710C);
+    rig->methods->setAcceptedTags(rig, &gObjMAcceptedClassIds);
 }
 
 void ObjM__ExitSceneStyle(ObjM *self) {

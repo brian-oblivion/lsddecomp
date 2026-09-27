@@ -25,7 +25,7 @@ struct UnkCObj_3bb8c_l {
 extern void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 extern void *GetStageGridDimensions(s32 index);
 extern s32 D_8008AB34;
-extern s32 D_8008710C;
+extern s32 gObjMAcceptedClassIds;
 
 void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
@@ -52,7 +52,7 @@ void ObjM__SetupSceneStyle(Obj87034_3bb8c_l *self) {
     unk14->methods->slotE0(unk14, GetStageGridDimensions((s32)self->unk38));
     self->unk3C->methods->slot4C(self->unk3C, unk14);
     unk14->methods->slotDC(unk14, self->unk48);
-    unk14->methods->slotCC(unk14, &D_8008710C);
+    unk14->methods->slotCC(unk14, &gObjMAcceptedClassIds);
 }
 ```
 
