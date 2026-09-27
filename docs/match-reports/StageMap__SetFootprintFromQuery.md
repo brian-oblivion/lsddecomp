@@ -5,16 +5,16 @@
 > Renamed from `func_8004CC74` on 2026-09-24 (tools/rename.py). Address 0x8004cc74.
 
 Fills a stack-local query buffer via a vtable call, seeds
-`self->unk88`/`self->slots8C[0]` from it via `StageMap__InitFootprintSlot`, then
+`self->unk88`/`self->slots8C[0]` from it via `StageMap__InitFootprintRect`, then
 conditionally adds up to two more `slots8C` entries (via two more
-`StageMap__InitFootprintSlot` calls) gated on a bounding-box test (`IsPointOutOfBounds`,
+`StageMap__InitFootprintRect` calls) gated on a bounding-box test (`IsPointOutOfBounds`,
 the excluded stall) and a range comparison against
 `self->unk68->count`.
 
 ## The "uninitialized local" register
 
-`StageMap__InitFootprintSlot`'s second parameter (established this round as dead/unused
-within `StageMap__InitFootprintSlot` itself — see its report) is passed a value here
+`StageMap__InitFootprintRect`'s second parameter (established this round as dead/unused
+within `StageMap__InitFootprintRect` itself — see its report) is passed a value here
 that this function's own body **never assigns**. GCC allocates a
 callee-saved register (`$s1`) for it (it must survive across the
 intervening calls), saves/restores it in the prologue/epilogue like any
@@ -22,7 +22,7 @@ other local, and simply never writes it — because nothing downstream
 ever reads it. This reproduces as a genuinely uninitialized C local:
 
 ```c
-s32 junk;   /* never assigned; StageMap__InitFootprintSlot never reads its 2nd arg */
+s32 junk;   /* never assigned; StageMap__InitFootprintRect never reads its 2nd arg */
 ```
 
 Passing an uninitialized value into a parameter the callee provably never
@@ -55,7 +55,7 @@ extern s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point);
 /* Forward declaration: defined later in this file (in ROM order, after
  * IsPointOutOfBounds), but StageMap__SetFootprintFromQuery calls it before its own definition
  * appears. */
-extern s32 StageMap__InitFootprintSlot(Obj866E8 *self, s32 unused, s32 key, s32 arg3);
+extern s32 StageMap__InitFootprintRect(Obj866E8 *self, s32 unused, s32 key, s32 arg3);
 
 void StageMap__SetFootprintFromQuery(Obj866E8 *self) {
     s32 junk;
@@ -63,14 +63,14 @@ void StageMap__SetFootprintFromQuery(Obj866E8 *self) {
 
     self->methods->slot10C(self, &buf, 0);
     self->unk88 = 0;
-    self->unk88 = StageMap__InitFootprintSlot(self, junk, 0, buf.count);
+    self->unk88 = StageMap__InitFootprintRect(self, junk, 0, buf.count);
     if (IsPointOutOfBounds(self->unk1DC, buf.point) != 0) {
         if (buf.count + 1 < self->unk68->count) {
-            self->unk88 = StageMap__InitFootprintSlot(self, junk, self->unk88, buf.count + 1);
+            self->unk88 = StageMap__InitFootprintRect(self, junk, self->unk88, buf.count + 1);
         }
     }
     if (buf.count - 1 >= 0) {
-        self->unk88 = StageMap__InitFootprintSlot(self, junk, self->unk88, buf.count - 1);
+        self->unk88 = StageMap__InitFootprintRect(self, junk, self->unk88, buf.count - 1);
     }
 }
 ```
@@ -88,7 +88,7 @@ struct-field reference reproduces naturally.
 **An unused parameter in a callee can show up in a caller as a
 genuinely-uninitialized local, allocated to a callee-saved register
 purely because it must survive across calls.** This is the caller-side
-mirror of `StageMap__InitFootprintSlot`'s own "dead parameter" finding from earlier
+mirror of `StageMap__InitFootprintRect`'s own "dead parameter" finding from earlier
 this round — worth checking together whenever one function's parameter
 is proven dead: its callers may need an uninitialized local, not a
 real value, at that argument position.
@@ -98,7 +98,7 @@ real value, at that argument position.
 **Tier B.** Not a vtable slot. The `self->unk68->unk4 != 0` sibling of
 `StageMap__ComputeFootprintFromRotation` under `RefreshFootprint`'s
 dispatch: fills a query buffer via `slot10C`, seeds `self->gridSlots[0]`
-via `StageMap__InitFootprintSlot`, then conditionally adds up to two
+via `StageMap__InitFootprintRect`, then conditionally adds up to two
 more slots gated by a bounding-box test (`IsPointOutOfBounds`) and a
 range check. Named to parallel class_3ac78's
 `StageMap__SetFootprintFromCell`/`StageMap__SetFootprintRect` pair for

@@ -14,7 +14,7 @@ pointer grid (row stride 20 cells, `slot->h4`/`h6` the starting column/row,
 31 of `EntryChildObj::unk10` for every cell in the rectangle AND every
 node in that cell's `unk38` singly-linked chain.
 
-`self->slots8C` and `self->unk88` are the SAME memory `StageMap__InitFootprintSlot`
+`self->slots8C` and `self->unk88` are the SAME memory `StageMap__InitFootprintRect`
 (matched earlier this round, a different unit's function) writes via a
 coarser `Unk54Struct` whole-block-copy view — this function establishes
 the finer-grained field layout from the READ side.
@@ -29,7 +29,7 @@ the finer-grained field layout from the READ side.
   a hard ceiling, not an inferred one.
 - New type **`CellRect`** (0xC bytes): `elemIdx` (`s32`, +0x0),
   `h4`/`h6`/`h8`/`hA` (`s16` each, +0x4/+0x6/+0x8/+0xA). This is a
-  DIFFERENT, more granular view of the same memory `StageMap__InitFootprintSlot`
+  DIFFERENT, more granular view of the same memory `StageMap__InitFootprintRect`
   addresses as a flat `Unk54Struct` (3x `s32`) — kept as two independent
   views per the project's established convention (a whole-struct copy
   doesn't care about the internal layout it copies, so the coarser

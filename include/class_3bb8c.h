@@ -36,7 +36,7 @@ typedef struct SplitCoord2 SplitCoord2;
 
 /* ---- StageMap ---------------------------------------------------- */
 
-/* The rectangle StageMap__InitFootprintSlot copies into rects[key] before
+/* The rectangle StageMap__InitFootprintRect copies into rects[key] before
  * setting its element: no element (-1), the whole 20 x 20 cells from (0, 0). */
 extern CellRect gFullSlotRect;
 

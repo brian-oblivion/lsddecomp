@@ -1,4 +1,6 @@
-# StageMap__InitFootprintSlot — MATCHED (32/32 words)
+# StageMap__InitFootprintRect — MATCHED (32/32 words)
+
+> Renamed from `StageMap__InitFootprintSlot` on 2026-09-27 (tools/rename.py). Address 0x8004cda4.
 
 > Renamed from `Class866E8__InitFootprintSlot` on 2026-09-26 (tools/rename.py). Address 0x8004cda4.
 
@@ -37,7 +39,7 @@ function itself discards it).
 ## Final C
 
 ```c
-s32 StageMap__InitFootprintSlot(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
+s32 StageMap__InitFootprintRect(Obj866E8 *self, s32 unused, s32 key, s32 arg3) {
     Unk54Struct *slot;
 
     slot = (Unk54Struct *) ((u8 *) self + 0x8C + key * sizeof(Unk54Struct));

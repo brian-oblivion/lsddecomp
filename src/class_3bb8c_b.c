@@ -266,15 +266,15 @@ void StageMap__SetFootprintFromQuery(StageMap *self) {
 
     self->methods->getTargetDescriptor(self, &buf, 0);
     self->rectCount = 0;
-    self->rectCount = StageMap__InitFootprintSlot(self, junk, 0, buf.chunkIndex);
+    self->rectCount = StageMap__InitFootprintRect(self, junk, 0, buf.chunkIndex);
     if (IsPointOutOfBounds(self->bounds, &buf.base.b2) != 0) {
         if (buf.chunkIndex + 1 < self->config->rows) {
             self->rectCount =
-                StageMap__InitFootprintSlot(self, junk, self->rectCount, buf.chunkIndex + 1);
+                StageMap__InitFootprintRect(self, junk, self->rectCount, buf.chunkIndex + 1);
         }
     }
     if (buf.chunkIndex - 1 >= 0) {
-        self->rectCount = StageMap__InitFootprintSlot(self, junk, self->rectCount, buf.chunkIndex - 1);
+        self->rectCount = StageMap__InitFootprintRect(self, junk, self->rectCount, buf.chunkIndex - 1);
     }
 }
 
@@ -292,7 +292,7 @@ s32 IsPointOutOfBounds(CellBounds *bounds, s8 *point) {
     return 1;
 }
 
-s32 StageMap__InitFootprintSlot(StageMap *self, s32 unused, s32 key, s32 arg3) {
+s32 StageMap__InitFootprintRect(StageMap *self, s32 unused, s32 key, s32 arg3) {
     CellRect *slot;
 
     slot = &self->rects.e[key];

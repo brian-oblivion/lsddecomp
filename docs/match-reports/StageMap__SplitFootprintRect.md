@@ -242,7 +242,7 @@ STALL (best 8/92 words; frame size off by 8 bytes)
 The biggest attempted this round (97 words) and the one that resisted
 byte-exactness. An 8-parameter function that populates one or two
 `CellRect` entries (the same type established this round from
-`StageMap__SetFootprintVisible`/`StageMap__InitFootprintSlot`), advancing and returning `self->unk88`
+`StageMap__SetFootprintVisible`/`StageMap__InitFootprintRect`), advancing and returning `self->unk88`
 (the slot count) as it goes.
 
 ## What the function does (control flow and semantics, not in doubt)
