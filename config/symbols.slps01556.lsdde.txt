@@ -2991,3 +2991,4 @@ _svm_damper = 0x8008E84C;
 kMaxPrograms = 0x8008E938;
 _svm_vab_used = 0x8008EA2C;
 _svm_vab_count = 0x80090BD0;
+gActorLocalMove = 0x8008ABA4;

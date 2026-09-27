@@ -8,7 +8,7 @@
  *  - The local-axis moves (Actor__MoveLocalX/Y, the shared
  *    Actor__MoveAlongLocalAxis, and Actor__MoveLocalZOrFindLink /
  *    MoveLocalXOrFindLink through Actor__MoveOrFindNearbyLink): write one
- *    component of the local move vector D_8008ABA4, apply it through
+ *    component of the local move vector gActorLocalMove, apply it through
  *    addLocalTranslation, clear it, and fall back to a grid-based
  *    nearby-link search (Actor__FindNearbyLink, Actor__BuildLinkQueries,
  *    Actor__ScanLinkCandidates, Actor__ScanGridWindow, AcceptGridElem) when
@@ -40,21 +40,21 @@
 
 /* Two-element s16 array -- Actor__MoveLocalX and Actor__MoveLocalY each write one
  * element (index 0 and 1 respectively) via a plain `sh` through a pointer
- * computed as %hi/%lo of `D_8008ABA4 + 2*index`, so splat's single-word
+ * computed as %hi/%lo of `gActorLocalMove + 2*index`, so splat's single-word
  * dlabel is really this 2-element array, not a lone s32 (round 2026-09-04).
  * Not referenced anywhere else in the repo (checked with grep), so this is
  * this unit's own reading -- kept local rather than added to a shared
  * header. It is the x and y of Actor's local move vector: the z is the next
  * halfword, D_8008ABA8, which class_3bb8c_o's Actor__MoveLocalZ writes, and
  * SceneNode__RotateLocalVector reads src[0..2]. */
-extern s16 D_8008ABA4[2];
+extern s16 gActorLocalMove[2];
 
 void Actor__MoveLocalX(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &D_8008ABA4[0], val, notify, 7);
+    Actor__MoveAlongLocalAxis(self, &gActorLocalMove[0], val, notify, 7);
 }
 
 void Actor__MoveLocalY(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &D_8008ABA4[1], val, notify, 8);
+    Actor__MoveAlongLocalAxis(self, &gActorLocalMove[1], val, notify, 8);
 }
 
 /* `count` is `volatile` so it stays a stack reference reloaded at its one use
@@ -76,7 +76,7 @@ void Actor__MoveAlongLocalAxis(Actor *self, s16 *axis, s32 val, void *notify, vo
     s16 val16 = (s16)val;
     *axis = val16;
     self->lastOffsetValue = val16;
-    self->methods->addLocalTranslation(self, &D_8008ABA4[0]);
+    self->methods->addLocalTranslation(self, &gActorLocalMove[0]);
     *axis = 0;
     if (notify != NULL) {
         self->methods->notifyWithHull(self, event);
