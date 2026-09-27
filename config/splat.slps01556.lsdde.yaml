@@ -83,7 +83,7 @@ segments:
       - [0xA68, o, libgte/geo, .rdata]
       - [0xA8C, rodata]   # code_8220
       - [0xABC, rodata]   # psyq_GsLinkObject4 (D_800102BC, jtbl_800102DC)
-      # jtbl_80010354 is code_fa50's switch table: `.L` labels local to its
+      # jtbl_80010354 is TmdModel.c's switch table: `.L` labels local to its
       # function's own `.s`, so the sub-slot is ATTACHED (Gate 2). 0x80 bytes.
       - [0xB54, .rodata, TmdModel]
       - [0xBD4, rodata]   # 0xEBC..0xF25 is libetc/intr's .rdata, SHADOWED (see the manifest)
