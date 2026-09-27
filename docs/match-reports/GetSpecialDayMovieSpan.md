@@ -1,4 +1,6 @@
-# GetGraphRoomStreamChannel -- MATCHED (39/39 words)
+# GetSpecialDayMovieSpan -- MATCHED (39/39 words)
+
+> Renamed from `GetGraphRoomStreamChannel` on 2026-09-27 (tools/rename.py). Address 0x800493e4.
 
 > Renamed from `func_800493E4` on 2026-09-25 (tools/rename.py). Address 0x800493e4.
 
@@ -16,7 +18,7 @@ a 10-unit gap between entries), returns `rec`.
 Declarations: `Rec1C` and `extern s16 gMovieFrameCounts[];` in `src/code_39094.c`.
 
 ```c
-Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
+Rec1C *GetSpecialDayMovieSpan(s32 *total, s32 n, s32 len) {
     s32 count;
     s32 i;
     s32 start;
@@ -56,6 +58,6 @@ extends (`len += start`) rather than a fresh `end`.
 
 ## Naming
 
-- **Name:** `GetGraphRoomStreamChannel`
+- **Name:** `GetSpecialDayMovieSpan`
 - **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
 - **Evidence:** its one caller, GameApplication__StartGraphRoomStreamTask, uses the returned record and *total (divided by 15) as the StreamTask's channel and ring size; matches exactly.

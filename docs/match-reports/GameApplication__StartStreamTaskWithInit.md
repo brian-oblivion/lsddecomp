@@ -13,7 +13,7 @@ Gated by `self->arg->unk08` (the same gate `GameApplication__StartWeeklyStreamTa
 `GameApplication__StartGraphRoomStreamTask` use). Builds a `StreamTask`, runs its `slot12C`, derives a
 type code via `GetEndingMovie` (a new library helper with the same
 "write-to-`*out`, return-a-separate-value" shape as
-`GetAsmkMovie`/`PickOpeningMovie`/`GetGraphRoomStreamChannel`), looks it up via
+`GetAsmkMovie`/`PickOpeningMovie`/`GetSpecialDayMovieSpan`), looks it up via
 `GetMovieFrameCount`, initializes the task with it, then starts it -- the same
 overall shape as `GameApplication__LoadIntroLogoSequence`/`GameApplication__StartWeeklyStreamTask`, with a `slot12C` call
 added (matching `GameApplication__StartGraphRoomStreamTask`'s use of that slot).

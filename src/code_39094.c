@@ -16,7 +16,7 @@
  *    gStageFirstRecord and, for GetStageMapChunkRecordXY, by StageGrid.h's cell
  *    columns, and a family of "stream channel" lookups (GetAsmkMovie,
  *    PickOpeningMovie, GetEndingMovie, GetSpecialDayOrEventRecord,
- *    GetGraphRoomStreamChannel) whose shapes match their call sites in
+ *    GetSpecialDayMovieSpan) whose shapes match their call sites in
  *    code_1677c.c one for one. The records' other fields and the channels'
  *    in-game meaning are not established.
  */
@@ -349,7 +349,7 @@ s32 GetMovieFrameCount(s32 index) {
     return gMovieFrameCounts[index];
 }
 
-Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
+Rec1C *GetSpecialDayMovieSpan(s32 *total, s32 n, s32 len) {
     s32 count;
     s32 i;
     s32 start;

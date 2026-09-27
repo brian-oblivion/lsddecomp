@@ -68,9 +68,9 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
  * New_GraphRoom is include/GraphRoom.h's and New_TitleMenu
  * include/TitleMenu.h's, each cast to PollTaskCtor. */
 
-extern s32 GetGraphRoomStreamChannel(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
+extern s32 GetSpecialDayMovieSpan(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
 /* code_39094.c: same "write to *out, return a separate value" shape as
- * GetAsmkMovie/PickOpeningMovie/GetGraphRoomStreamChannel. */
+ * GetAsmkMovie/PickOpeningMovie/GetSpecialDayMovieSpan. */
 extern s32 GetEndingMovie(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
 extern s32 GetSpecialDayOrEventRecord(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
     {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
@@ -262,7 +262,7 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
 
 /* Called by GameApplication__PollGraphRoomStatus when its first PollTask reports "2". Gated by
  * self->config->playStreams (same gate as GameApplication__StartWeeklyStreamTask). Builds a StreamTask,
- * derives a count via GetGraphRoomStreamChannel, sets the task's frame bound
+ * derives a count via GetSpecialDayMovieSpan, sets the task's frame bound
  * to that count / 15 and clears skipOnConfirm, then runs its init (stream
  * group -1, unlike the other call sites) and releases it. */
 void GameApplication__StartGraphRoomStreamTask(GameApplication *self) {
@@ -279,7 +279,7 @@ void GameApplication__StartGraphRoomStreamTask(GameApplication *self) {
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        extra = GetGraphRoomStreamChannel(&buf.count, 0, 10);
+        extra = GetSpecialDayMovieSpan(&buf.count, 0, 10);
         task->methods->setFrameBound(task, buf.count / 15);
         task->methods->setSkipOnConfirm(task, 0);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux, extra,
