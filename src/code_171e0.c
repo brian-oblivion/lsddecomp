@@ -18,7 +18,7 @@
  * side fallback otherwise.
  *
  * ResourceRequest__Set fills the {buffer, name, mode} descriptor the
- * resource classes' ctors take (include/code_171e0.h's ResourceRequest).
+ * resource classes' ctors take (include/FileResource.h's ResourceRequest).
  * GetGameApplicationMethods and BuildFileName are unrelated utilities that
  * happen to live in this segment; func_800270AC/func_800270B8 (a
  * getter/setter pair for D_8008A854) are left unnamed -- see their reports.
@@ -126,8 +126,8 @@ void *GetActiveDataSourceMethods(void) {
 }
 
 ResourceRequest *ResourceRequest__Set(ResourceRequest *this, void *buffer, char *name, s32 mode) {
-    this->buffer = buffer;
-    this->name = name;
+    this->src.buffer = buffer;
+    this->src.name = name;
     this->mode = mode;
     return this;
 }
