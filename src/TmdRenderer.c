@@ -116,8 +116,7 @@ s32 GetBMemPMgrBusy(void) {
  * byte's shade-texture bit 0x1 (Psy-Q's SetShadeTex); it keeps its address
  * name because it is bss past the image end, where rename.py cannot reach
  * (the proposed name is in SetupPrimCode.md). D_80090C18 is the default ndiv
- * from bits 9-11; it keeps its address name because config/psyq-objects.ld's
- * `dc_cb` pin covers the address (see its report). */
+ * from bits 9-11. */
 extern s32 D_8008E248;              /* GsLOFF */
 extern s32 D_80090C18;              /* GsDIV1..5: subdivision level */
 extern s32 gSortUseGlobalLightMode; /* GsLLMOD */
