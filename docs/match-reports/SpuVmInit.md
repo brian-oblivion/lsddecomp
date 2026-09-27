@@ -297,7 +297,7 @@ extern void SpuVmFlush(void);
 
 extern u8 gSpuMallocArea[];
 extern s16 D_8008E9FC;
-extern s16 D_8008E84C;
+extern s16 _svm_damper;
 extern s16 gMasterVolL;
 extern s16 gMasterVolR;
 extern s16 D_8008E230;
@@ -361,7 +361,7 @@ void SpuVmInit(s32 a0) {
 
     _spu_setInTransfer(0);
     D_8008E9FC = 0;
-    D_8008E84C = 0;
+    _svm_damper = 0;
     SpuInitMalloc(0x20, gSpuMallocArea);
 
     for (i = 0; (u16) i < 0xC0; i++) {

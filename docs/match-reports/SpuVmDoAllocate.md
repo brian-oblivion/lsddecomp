@@ -38,7 +38,7 @@ No arguments, no return value. It:
    `((s16) D_8008EA24 - 1) / 2`, based on `D_8008EA24 & 1`, and stores the
    result into `D_8008D7F6[D_8008EA28]`.
 5. Sets flag bit `0x8` in `_svm_sreg_dirty[D_8008EA26]`.
-6. Copies two more fields (`+0x10`, `+0x12`, the second plus `D_8008E84C`)
+6. Copies two more fields (`+0x10`, `+0x12`, the second plus `_svm_damper`)
    out of the SAME 0x20-stride `_svm_tn` table `note2pitch2` already
    established in this unit, into `D_8008D7F8[D_8008EA28]` /
    `D_8008D7FA[D_8008EA28]`.
@@ -94,7 +94,7 @@ extern D8008E978Entry *_svm_tn;
 
 extern s16 D_8008D7F8[];
 extern s16 D_8008D7FA[];
-extern s16 D_8008E84C;
+extern s16 _svm_damper;
 ```
 
 **`D_8008EA28` and `D_8008EA26` are 2 bytes apart in the linked image, and
@@ -165,7 +165,7 @@ void SpuVmDoAllocate(void)
     D_8008D7F8[D_8008EA28] = _svm_tn[idx].unk16;
 
     idx = D_8008EA18 + (D_8008EA13 << 4);
-    D_8008D7FA[D_8008EA28] = _svm_tn[idx].unk18 + D_8008E84C;
+    D_8008D7FA[D_8008EA28] = _svm_tn[idx].unk18 + _svm_damper;
     __asm__("");
 
     chan = D_8008EA26;
@@ -451,7 +451,7 @@ extern D8008E978Entry *_svm_tn;
 
 extern s16 D_8008D7F8[];
 extern s16 D_8008D7FA[];
-extern s16 D_8008E84C;
+extern s16 _svm_damper;
 
 void SpuVmDoAllocate(void)
 {
@@ -495,7 +495,7 @@ void SpuVmDoAllocate(void)
     D_8008D7F8[D_8008EA28] = _svm_tn[idx].unk16;
 
     idx = D_8008EA18 + (D_8008EA13 << 4);
-    D_8008D7FA[D_8008EA28] = _svm_tn[idx].unk18 + D_8008E84C;
+    D_8008D7FA[D_8008EA28] = _svm_tn[idx].unk18 + _svm_damper;
     __asm__("");
 
     chan = D_8008EA26;

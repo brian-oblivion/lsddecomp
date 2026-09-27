@@ -259,7 +259,7 @@ extern void SpuVmFlush(void);
 extern char D_8008DEB0[]; /* Sony's _ss_spu_vm_rec + 8 (libsnd/vmanager.o bss; symbols file) */
 
 extern s16 D_8008E9FC;
-extern s16 D_8008E84C;
+extern s16 _svm_damper;
 extern s16 D_8008E230;
 extern s16 D_8008E234;
 
@@ -312,7 +312,7 @@ void SpuVmInit(s32 a0) {
 
     _spu_setInTransfer(0);
     D_8008E9FC = 0;
-    D_8008E84C = 0;
+    _svm_damper = 0;
     SpuInitMalloc(0x20, D_8008DEB0);
 
     for (i = 0; (u16)i < 0xC0; i++) {
