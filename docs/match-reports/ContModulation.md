@@ -140,7 +140,7 @@ void ContModulation(s16 a0, s16 a1, u8 a2)
 ```
 
 `func_800334F0` is `func_800334F0(s16 a0, s16 a1, Entry8E968 *out)` per
-libsnd_decre.c's own reduced view (a 0x10-byte struct); this unit's own
+code_179d8_i.c's own reduced view (a 0x10-byte struct); this unit's own
 call site only needs to read `out->unk0` (the count), so the local view
 above only names that one field, per the project's own multiple-
 independent-local-views convention.

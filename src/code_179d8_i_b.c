@@ -10,7 +10,7 @@
  * comment still stands -- only the blocker verdicts are withdrawn.
  * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
  *
- * code_179d8_i_b -- the TAIL half of the old libsnd_decre slice, split off in
+ * code_179d8_i_b -- the TAIL half of the old code_179d8_i slice, split off in
  * round 34 (2026-09-12) when Sony's `libsnd/replay.o` and `libsnd/vs_vab.o`
  * were linked into the middle of it. File 0x2490C..0x24938, vram
  * 0x8003410C..0x80034138: ONE function.
@@ -21,14 +21,14 @@
  * reclassifying them out of the game count is the correction CLAUDE.md asks
  * for, not a regression. A placed object cannot live inside a `c` segment, so
  * the slice had to become [c][o][o][c] and the second `c` needed its own name.
- * The first half kept `libsnd_decre` and is now Snd_decrescendo alone.
+ * The first half kept `code_179d8_i` and is now Snd_decrescendo alone.
  *
  * A ONE-FUNCTION UNIT IS FINE and has precedent (`libcard_card`, and
  * `libspu_s_ih` earlier in this same round).
  *
  * NO RODATA ATTACH CAME WITH THIS HALF, and that is measured, not assumed:
- * libsnd_decre owned zero `jtbl_` references and the splat yaml's rodata slot
- * list names no `.rodata, libsnd_decre` line at all -- both of the old
+ * code_179d8_i owned zero `jtbl_` references and the splat yaml's rodata slot
+ * list names no `.rodata, code_179d8_i` line at all -- both of the old
  * code_179d8_tail's jump tables went to code_179d8_k. So unlike round 33's
  * libsnd_ssinit_libapi_counter there was nothing to move, and a link failure of the form
  * `undefined reference to '.L8003....'` would mean something else.

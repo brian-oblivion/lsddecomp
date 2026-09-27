@@ -65,7 +65,7 @@ extern u16 *D_8006DAD4;
 
 /* Reentrancy lock, same identifier/type as the sibling reading in
  * Sony's `SsSeqCalledTbyT` (`libsnd/sscall`, linked since round 34; it was
- * libsnd_decre.c's matched func_80033738) -- "if already busy, return/skip;
+ * code_179d8_i.c's matched func_80033738) -- "if already busy, return/skip;
  * set; ...; clear before returning" guarding a per-channel operation. */
 extern s32 _snd_ev_flag;
 
@@ -113,7 +113,7 @@ extern void SpuVmKeyOnNow(s32 a0, u16 a1);
 extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 
 /* Loop bound for a small table of active "objects" (screen/slot
- * pairs); see libsnd_decre.c's D_80090B68/6C for the sibling reading of
+ * pairs); see code_179d8_i.c's D_80090B68/6C for the sibling reading of
  * an analogous count. */
 extern u8 D_8008E9D0;
 

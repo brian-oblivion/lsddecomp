@@ -30,7 +30,7 @@
  *
  * THE `SlotE968` LOCAL VIEW LEFT WITH THEM.  Those four accessors were this
  * file's only readers of `_svm_pg`, so the typedef and the extern went with
- * the deletion rather than being kept as dead declarations.  libsnd_decre.c
+ * the deletion rather than being kept as dead declarations.  code_179d8_i.c
  * kept its own independent reading of the same table under a different name
  * (`Entry8E968`), per the project's multiple-local-views convention -- that is
  * where to look if you need the layout again.
@@ -85,11 +85,11 @@ extern u16 D_8008EA22;
 /* A 172 (0xAC)-byte record; _ss_score is an array of pointers to arrays of
  * these, indexed [screen][slot]-style by a packed argument (slot in the
  * high byte, screen in the low byte) -- see Sony's `Snd_pause`
- * (`libsnd/pause`, linked since round 34; it was libsnd_decre.c's matched
+ * (`libsnd/pause`, linked since round 34; it was code_179d8_i.c's matched
  * func_800339AC), which builds exactly this packing before calling into
  * this unit's SpuVmSeqKeyOff. Reduced local view: only the two leading s16
  * fields this unit's own accessors touch are named. See libsnd_cres.c /
- * libsnd_decre.c's own Entry90902E8 for a fuller layout of the same array;
+ * code_179d8_i.c's own Entry90902E8 for a fuller layout of the same array;
  * each unit keeps its own independent reading, per project convention. */
 typedef struct {
     u8 pad0[0x74];

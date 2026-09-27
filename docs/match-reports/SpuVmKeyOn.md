@@ -69,7 +69,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
 
 Before writing any C, `grep -rn SpuVmKeyOn src/*.c docs/match-reports/*.md`
 turned up this **exact** signature already guessed independently by
-`libsnd_decre.c`, `code_179d8_j.c` and `code_179d8_k.c` (each calls this
+`code_179d8_i.c`, `code_179d8_j.c` and `code_179d8_k.c` (each calls this
 function and typed it from its own call site), plus two live call sites
 with concrete argument roles:
 
@@ -103,7 +103,7 @@ until you diff registers, not just word counts.
   own local view, same shape, used here as `&_svm_pg[a2]` (a2 = this
   function's own s16 parameter, NOT a channel id from `func_80032148`).
 - `Entry90902E8M` / `_ss_score[]`: the SAME 172(0xAC)-byte
-  `[screen][slot]`-indexed record array `libsnd_decre/j/k.c` each already
+  `[screen][slot]`-indexed record array `code_179d8_i/j/k.c` each already
   document with their own reduced view. This function only needs
   `unk12` (a byte OFFSET, per `code_179d8_k.c`'s fuller struct) and reads
   a per-voice "speed" `s16` at `*(s16*)((u8*)rec + 0x4E + rec->unk12*2)` --
@@ -473,7 +473,7 @@ extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
  * code_179d8_j.c's SpuVmSeKeyOn and as
  * `SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status)` from
  * code_179d8_k.c's NoteOn -- signature confirmed independently
- * by three sibling units' own extern guesses (libsnd_decre/_j/_k all
+ * by three sibling units' own extern guesses (code_179d8_i/_j/_k all
  * agree on this exact shape). `a0` is a packed [screen | slot<<8]
  * dispatch id into `_ss_score`; `a1`/`a2` are the "key" values
  * `SpuVmKeyOff`'s own three-field match loop checks; `a4`/`a5` are
@@ -610,7 +610,7 @@ it again.
 ## Naming
 
 **SpuVmKeyOn** (was `func_8002FAC4`) -- Tier A. Signature and role
-corroborated independently by three sibling units (`libsnd_decre.c`,
+corroborated independently by three sibling units (`code_179d8_i.c`,
 `code_179d8_j.c`, `code_179d8_k.c`, per this report's own "Signature"
 section) before any body-level derivation: `code_179d8_k.c`'s
 `NoteOn` calls this in its nonzero-velocity branch and SpuVmKeyOff in

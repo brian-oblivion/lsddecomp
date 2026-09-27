@@ -47,10 +47,10 @@ each verified non-shifting by rebuilding with the function still
 end-of-track stop), `unk3C` (u8, compared against `0xFF`), `unk46` (s16,
 repeat-count limit), `unk48` (u16, repeat counter -- sign-checked via an
 explicit `(s16)` cast at its compare site, the same idiom
-`libsnd_decre.c` already established for its own `unk40`), `unk4A` (s16,
+`code_179d8_i.c` already established for its own `unk40`), `unk4A` (s16,
 the tempo-recompute scaling factor), `unk8C` (s32, the recomputed BPM),
 `unk90` (u32, playback-state flags -- the SAME field name and bit
-positions `libsnd_decre.c`'s independent local view already manipulates
+positions `code_179d8_i.c`'s independent local view already manipulates
 via `_ss_score[a0][a1].unk90 &= ~2;` / `&= ~0x100;`, corroborating both
 readings).
 

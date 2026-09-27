@@ -5,7 +5,7 @@
 Unit `code_179d8_j`, round 22 (2026-09-06). Not a class method. Sibling of
 `SpuVmGetSeqRVol` and `SpuVmGetSeqVol` -- all three index the same
 `_ss_score[screen][slot]` array already established in `libsnd_cres.c` /
-`libsnd_decre.c` (an array of pointers to 172 (0xAC)-byte records), reading
+`code_179d8_i.c` (an array of pointers to 172 (0xAC)-byte records), reading
 the two leading `s16` fields at `+0x74`/`+0x76` this unit hadn't named yet.
 
 ## Shape
@@ -13,7 +13,7 @@ the two leading `s16` fields at `+0x74`/`+0x76` this unit hadn't named yet.
 Single `s32` parameter packs two indices: the low byte is the outer
 `screen` index (`_ss_score[screen]`, a table of pointers), the high byte
 (`(p0 & 0xFF00) >> 8`) is the inner `slot` index into that screen's record
-array. Confirmed against `libsnd_decre.c`'s `func_800339AC`, which builds
+array. Confirmed against `code_179d8_i.c`'s `func_800339AC`, which builds
 exactly this packing (`(sa1 << 8) | sa0`) before calling into this unit.
 Side effect: `D_8008EA22` (already `extern`'d in this file, used by
 `func_800319B4`) is set to the `screen` value.
@@ -56,11 +56,11 @@ not committed) before applying here.
 ```c
 /* A 172 (0xAC)-byte record; _ss_score is an array of pointers to arrays of
  * these, indexed [screen][slot]-style by a packed argument (slot in the
- * high byte, screen in the low byte) -- see libsnd_decre.c's own
+ * high byte, screen in the low byte) -- see code_179d8_i.c's own
  * func_800339AC, which builds exactly this packing before calling into
  * this unit's SpuVmSeqKeyOff. Reduced local view: only the two leading s16
  * fields this unit's own accessors touch are named. See libsnd_cres.c /
- * libsnd_decre.c's own Entry90902E8 for a fuller layout of the same array;
+ * code_179d8_i.c's own Entry90902E8 for a fuller layout of the same array;
  * each unit keeps its own independent reading, per project convention. */
 typedef struct {
     u8 pad0[0x74];

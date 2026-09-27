@@ -17,7 +17,7 @@ Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Scans
 `D_8008D996[0..D_8008E9D0)` for an entry equal to `(s16) p0`; on a match,
 runs this unit's "clear channel bits" tail (the same block as
 `SsUtKeyOffV`, see that function's report) keyed by the loop index. Called
-from `libsnd_decre.c`'s `func_800339AC` as
+from `code_179d8_i.c`'s `func_800339AC` as
 `SpuVmSeqKeyOff((sa1 << 8) | sa0)`.
 
 ## What it is (best-reached body, 45/85 words, correct length, no drift)

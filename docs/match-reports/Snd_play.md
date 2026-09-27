@@ -2,8 +2,8 @@
 
 > Renamed from `func_8003410C` on 2026-09-23 (tools/rename.py). Address 0x8003410c.
 
-`asm/nonmatchings/libsnd_decre/Snd_play.s`, vram `0x8003410C`, unit
-`libsnd_decre` (round 21, 2026-09-06).
+`asm/nonmatchings/code_179d8_i/Snd_play.s`, vram `0x8003410C`, unit
+`code_179d8_i` (round 21, 2026-09-06).
 
 ## Summary
 

@@ -210,7 +210,7 @@ non-source-derivable, not new problems requiring new investigation.
 treated as evidence about the TOOLCHAIN/CONTEXT-SENSITIVE MECHANISM, not
 about that one function** -- worth checking whether OTHER already-matched
 or still-stalled functions in this unit (or sibling units with the same
-busy-lock-guard idiom, e.g. `libsnd_decre.c`'s own reentrancy-guarded
+busy-lock-guard idiom, e.g. `code_179d8_i.c`'s own reentrancy-guarded
 functions per this file's header comments) show the same polarity
 inconsistency, since it may be a corpus-wide pattern worth a dedicated
 census rather than a per-function surprise each time it's hit.
