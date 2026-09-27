@@ -37,7 +37,7 @@ void ObjM__GetGridRecord(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
   the branch TARGET. To match a specific target/fallthrough placement,
   solve for the written `C` that makes `NOT(C)` equal the actual machine
   test, don't guess from the semantics alone.
-- `GetStageMapChunkRecord(index, sub)` (now matched, code_39094.c) reads both `$a0`
+- `GetStageMapChunkRecord(index, sub)` (now matched, GameFiles.c) reads both `$a0`
   and `$a1`, and this function writes nothing to `$a1` before the jal, so
   the value the callee uses as `sub` is `code`. Until round 82 this call was
   written with one argument against a K&R declaration, reading `code` as a
@@ -92,7 +92,7 @@ the body does. Parameters: `code, arg2, arg3` -> `cell, x, y` (GetStageMapChunkR
 prototype follows.
 
 The body stays `void`: class_3bb8c.h declares GetStageMapChunkRecordXY `void`
-although code_39094.c defines it returning `FilePathRecord *`, so the record is
+although GameFiles.c defines it returning `FilePathRecord *`, so the record is
 returned only because it is still in $v0. Proposed for the head: that
 prototype returns `FilePathRecord *` (or `void *`), after which this body can
 `return` both calls.

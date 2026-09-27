@@ -4,7 +4,7 @@
 
 > Renamed from `func_80048EA0` on 2026-09-25 (tools/rename.py). Address 0x80048ea0.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `code_39094`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
 Byte-exact on the first build; whole-image SHA1 green, funcdiff 48/48.
 
 ## What it does

@@ -124,7 +124,7 @@ extern u8 gSsSizeTableBuf[];
 
 The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
 
-Parameters retyped `(s32 vabArg, s32 seqArg, s32 autoPlay)` -> `(char *vabPath, char *seqPath, s32 autoPlay)`. Caller checked: the only one is `DayTask__DayTask` (src/class_39e08.c), `New_WBgm(PickSoundBank(0), 0, 1)`; PickSoundBank (src/code_39094.c) returns a word of gSoundBankPaths, and all seven words point at VAB path strings ("SND\\AMBIENT", "SND\\CARTOON", "SND\\ELECTRO", "SND\\ETHNOVA", "SND\\HUMAN", "SND\\LOVELY", "SND\\STANDERD"; asm/data/1B84.rodata.s), and the path reaches New_VabStreamObj(char *) through setVab. That call site now casts `(char *)` on the word and `(SubObjG *)` on the result, and `include/class_39e08.h`'s local `extern SubObjG *New_WBgm(s32, s32, s32)` view is deleted.
+Parameters retyped `(s32 vabArg, s32 seqArg, s32 autoPlay)` -> `(char *vabPath, char *seqPath, s32 autoPlay)`. Caller checked: the only one is `DayTask__DayTask` (src/class_39e08.c), `New_WBgm(PickSoundBank(0), 0, 1)`; PickSoundBank (src/GameFiles.c) returns a word of gSoundBankPaths, and all seven words point at VAB path strings ("SND\\AMBIENT", "SND\\CARTOON", "SND\\ELECTRO", "SND\\ETHNOVA", "SND\\HUMAN", "SND\\LOVELY", "SND\\STANDERD"; asm/data/1B84.rodata.s), and the path reaches New_VabStreamObj(char *) through setVab. That call site now casts `(char *)` on the word and `(SubObjG *)` on the result, and `include/class_39e08.h`'s local `extern SubObjG *New_WBgm(s32, s32, s32)` view is deleted.
 
 ## Proposed field names
 

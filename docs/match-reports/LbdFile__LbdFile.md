@@ -6,7 +6,7 @@
 
 > Renamed from `func_800488E4` on 2026-09-25 (tools/rename.py). Address 0x800488e4.
 
-Round 82, runner echo (second echo session), 2026-09-25. Unit `code_39094`.
+Round 82, runner echo (second echo session), 2026-09-25. Unit `GameFiles`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
 retail SLPS_015.56`), funcdiff 31/31, 0 insertions / 0 deletions, no
 out-of-range drift.
@@ -17,7 +17,7 @@ Slot +0x008 (ctor) of gLbdFileMethods: runs the active data source's ctor on sel
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/code_39094.c`
+Declarations it needs are the local views at the top of `src/GameFiles.c`
 (`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
@@ -88,13 +88,13 @@ name follows the siblings named for the format they load (TimImage, Tod,
 VabStreamObj). What the header block's two regions and the data block hold
 beyond what their consumers do with them is not established here.
 
-The unit banner of `src/code_39094.c` was rewritten as documentation in
+The unit banner of `src/GameFiles.c` was rewritten as documentation in
 the same pass; its history is kept here verbatim (with the class tokens as
 renamed):
 
 ```
 /*
- * code_39094 -- GAME code carved from psyq_39094 on 2026-09-25 (FINISHING-PLAN
+ * GameFiles -- GAME code carved from psyq_39094 on 2026-09-25 (FINISHING-PLAN
  * revision 18). 0x39094..0x39C80 (vram 0x80048894..0x80049480). It was counted
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
@@ -122,7 +122,7 @@ renamed):
 
 ## Proposed field names
 
-Not applied: every accessor outside `src/code_39094.c` is in StageMap's
+Not applied: every accessor outside `src/GameFiles.c` is in StageMap's
 units (class_3bb8c.c, class_3bb8c_b.c), outside this job. For the head to
 apply by type scope.
 
@@ -132,7 +132,7 @@ apply by type scope.
   no chunk is held (this ctor, LbdFile__ReleaseHeader; ResetElementCells
   tests `>= 0`); StageMap__SplitChunkIndex splits it into column
   (`% divisor`) and row (`/ divisor`); StageMap__FindSlotIndexByChunk
-  finds the element holding a given chunk by it. Accessors: code_39094.c
+  finds the element holding a given chunk by it. Accessors: GameFiles.c
   (LbdFile__LbdFile, LbdFile__ReleaseHeader), class_3bb8c.c
   (ApplyRateEntries, ResetElementCells, ComputeFootprintDescriptor,
   GetLastTargetRateSplit), class_3bb8c_b.c (FindElemIndexByUnk30).
@@ -140,7 +140,7 @@ apply by type scope.
   element's index, BuildRateEntries copies each element's `key` in, and
   FindElemByUnk32 / UpdateFootprintTracking / class_3bb8c_p read it back to
   find an element. Accessors: class_3ac78.c, class_3bb8c.c, class_3bb8c_b.c,
-  class_3bb8c_p.c (none in code_39094.c; the ctor zeroes it).
+  class_3bb8c_p.c (none in GameFiles.c; the ctor zeroes it).
 - `LbdFileHeader.gridOffset` / `gridSize` (+0x04 / +0x08) ->
   `placementsOffset` / `placementsSize`. StageMap__PopulateSlotCells
   points the element's PlacementGrid (a 20x20 grid of placement records) at

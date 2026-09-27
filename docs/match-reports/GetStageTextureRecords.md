@@ -4,7 +4,7 @@
 
 > Renamed from `func_80048E80` on 2026-09-25 (tools/rename.py). Address 0x80048e80.
 
-Round 81, runner echo. Unit `src/code_39094.c` (carved from psyq_39094 in
+Round 81, runner echo. Unit `src/GameFiles.c` (carved from psyq_39094 in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 

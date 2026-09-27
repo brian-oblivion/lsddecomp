@@ -4,7 +4,7 @@
 
 > Renamed from `func_80049240` on 2026-09-25 (tools/rename.py). Address 0x80049240.
 
-Round 82, runner echo, 2026-09-25. Unit `code_39094` (carved revision 18).
+Round 82, runner echo, 2026-09-25. Unit `GameFiles` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
 (`./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`), funcdiff
 12/12, 0 insertions / 0 deletions, no out-of-range drift. No levers needed.

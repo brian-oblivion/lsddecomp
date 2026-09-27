@@ -4,7 +4,7 @@
 
 > Renamed from `func_80049334` on 2026-09-25 (tools/rename.py). Address 0x80049334.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `code_39094`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
 Byte-exact on the third build; whole-image SHA1 green, funcdiff 37/37,
 0 insertions / 0 deletions.
 
@@ -18,7 +18,7 @@ Non-negative `group`: `rec = GetSpecialDayRecords(&count, group)`, writes
 
 ## Source
 
-Declarations: `FilePathRecord` at the top of `src/code_39094.c`, plus:
+Declarations: `FilePathRecord` at the top of `src/GameFiles.c`, plus:
 
 ```c
 typedef struct RecPick {

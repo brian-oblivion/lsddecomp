@@ -1,5 +1,5 @@
 /*
- * code_39094 -- the LbdFile class, and the getters over the game's table of
+ * GameFiles -- the LbdFile class, and the getters over the game's table of
  * file names.
  *
  * LbdFile (include/LbdFile.h, which documents the class): New_LbdFile to

@@ -25,7 +25,7 @@ extern void *BMemPMgrAlloc(s32 size);
 
 extern const char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
 
-extern char *GetDefaultDataDirectory(void); /* code_39094.c: "CDI\\" */
+extern char *GetDefaultDataDirectory(void); /* GameFiles.c: "CDI\\" */
 extern void SetDataDirectory(char *dir);    /* code_171e0.c */
 
 extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
@@ -69,7 +69,7 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
  * include/TitleMenu.h's, each cast to PollTaskCtor. */
 
 extern s32 GetSpecialDayMovieSpan(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
-/* code_39094.c: same "write to *out, return a separate value" shape as
+/* GameFiles.c: same "write to *out, return a separate value" shape as
  * GetAsmkMovie/PickOpeningMovie/GetSpecialDayMovieSpan. */
 extern s32 GetEndingMovie(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
 extern s32 GetSpecialDayOrEventRecord(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
