@@ -168,7 +168,7 @@ s32 TodActor__AcquireModelData(TodActor *self, TodActorDesc *other) {
         self->modelData = other->modelData;
         self->ownsModelData = 0;
     } else {
-        self->modelData = New_ModelData((struct ResourceSource *)other);
+        self->modelData = New_ModelData(&other->src);
         self->ownsModelData = 1;
     }
     if (self->modelData == NULL) {
