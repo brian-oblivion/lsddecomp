@@ -69,8 +69,8 @@ tail-call a function and neither sets an explicit constant. Three functions
 in this unit share this exact shape --  `GetActiveDataSourceMethods` (mode `0x23`),
 `GetActiveDataSourceDriverMode` and `GetActiveDataSourceUseVSyncCallback` (both mode `0x13`, different callees).
 Per CLAUDE.md's caution, a byte match here proves nothing about void-ness on
-its own, but `func_8002C478` (the `GetActiveDataSourceUseVSyncCallback` else-arm) is independently
-confirmed non-void (`s32 func_8002C478(void) { return 0; }` in
+its own, but `GetVabUseVSyncCallback` (the `GetActiveDataSourceUseVSyncCallback` else-arm) is independently
+confirmed non-void (`s32 GetVabUseVSyncCallback(void) { return 0; }` in
 `code_179d8_e.c`), so treating all three as `s32`/`void *`-returning tail
 calls is not a guess -- it is the only reading consistent with a callee whose
 real return type is already known.

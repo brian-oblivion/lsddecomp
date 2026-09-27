@@ -18,15 +18,15 @@ Same `if`/`else` tail-call shape as `GetActiveDataSourceMethods`/`GetActiveDataS
 
 ```
 beq $v1, $v0(0x13), .L8002700C   # equal -> GetCdUseVSyncCallback
-  jal func_8002C478                # fallthrough (not equal)
+  jal GetVabUseVSyncCallback                # fallthrough (not equal)
   j .L80027014
 .L8002700C:
   jal GetCdUseVSyncCallback
 .L80027014:
 ```
 
-`func_8002C478` is independently confirmed non-void elsewhere in the repo:
-`src/code_179d8_e.c` has `s32 func_8002C478(void) { return 0; }`. This is
+`GetVabUseVSyncCallback` is independently confirmed non-void elsewhere in the repo:
+`src/code_179d8_e.c` has `s32 GetVabUseVSyncCallback(void) { return 0; }`. This is
 the direct positive evidence CLAUDE.md asks for -- the else-arm really does
 return `s32`, so the whole function (and, by the same shape, its two
 siblings `GetActiveDataSourceMethods`/`GetActiveDataSourceDriverMode`) is correctly typed non-void, not
@@ -37,13 +37,13 @@ merely defaulted to it. `GetCdUseVSyncCallback` is still uncarved
 
 ```c
 extern s32 GetCdUseVSyncCallback(void);
-extern s32 func_8002C478(void);
+extern s32 GetVabUseVSyncCallback(void);
 
 s32 GetActiveDataSourceUseVSyncCallback(void) {
     if (gActiveDataSource == 0x13) {
         return GetCdUseVSyncCallback();
     } else {
-        return func_8002C478();
+        return GetVabUseVSyncCallback();
     }
 }
 ```
@@ -52,7 +52,7 @@ s32 GetActiveDataSourceUseVSyncCallback(void) {
 
 See `GetActiveDataSourceMethods.md`. This is the instance that upgrades the family's
 non-void typing from "CLAUDE.md-default assumption" to "independently
-confirmed": `func_8002C478`'s real definition elsewhere in the tree already
+confirmed": `GetVabUseVSyncCallback`'s real definition elsewhere in the tree already
 declares `s32`.
 
 ## Naming
@@ -65,6 +65,6 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 **Evidence.** Forwards to `GetCdUseVSyncCallback` (itself just `return
 gCdUseVSyncCallback;`, an already-named global) when the CD driver is
-active, else `func_8002C478` (always `0`). The "VSync callback" framing
+active, else `GetVabUseVSyncCallback` (always `0`). The "VSync callback" framing
 comes directly from that already-established global's name, generalised to
 whichever source is active.

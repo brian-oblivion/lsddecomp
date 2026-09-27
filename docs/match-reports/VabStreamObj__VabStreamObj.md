@@ -64,7 +64,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
         SsSetTableSize(GetSsSizeTableBuf(), 2, 1);
     }
     if (gVabStreamInited == 0) {
-        D_8008A8CC = 0x3C;
+        gSsTicksPerSecond = 0x3C;
         SsSetTickMode(1);
         gVabStreamInited = 1;
     }
@@ -162,3 +162,10 @@ slots this ctor calls now carry their inherited FileResource names:
 in retail". That is true of the static table only: SetActiveDataSource binds
 the active driver's `loadFile`/`requestLoadFile` there
 (`GetVabStreamObjMethods` is in `gDataSourceClientGetters`).
+
+## Round 98 (charlie, track 7)
+
+`SsSetTickMode(SS_TICK60)` (was `1`), `gSsTicksPerSecond = 60` (was
+`D_8008A8CC = 0x3C`; see GetSsTicksPerSecond.md), `loadState =
+VABSTREAM_LOAD_HEADER`, `char vhPath[VAB_PATH_SIZE]`. `New_VabStreamObj`
+allocates `sizeof(VabStreamObj)` (0x64). Byte-exact.

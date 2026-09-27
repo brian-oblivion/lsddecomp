@@ -1,90 +1,66 @@
 /*
- * code_179d8_e -- the SPU/VAB sound-streaming backend (`gActiveDataSource ==
- * 0x23`, confirmed round 52 against alpha's own naming of that global in
- * code_171e0.c) and its small mood/context-tagged sound-cue queue.
+ * The VAB sound backend: the VabDriver data source's empty slots and mode
+ * accessors, the VabStreamObj class (one sound bank, loaded through the
+ * active data source and played through libsnd), and the SoundCueSet
+ * start/flush pair.
  *
- * functions 120..148 of the original 274-function code_179d8 monolith,
- * 0x1CC08..0x1D508 (vram 0x8002C408..0x8002CD08).  Carved round 17
- * (2026-09-04) out of what the yaml called `code_179d8_mid_b`; the remainder
- * behind it is now `code_179d8_mid_c`.
+ * VabDriver (include/VabDriver.h, class id 0x23 = DATASOURCE_SPU) is the
+ * data source code_171e0.c selects when it is not reading the CD; the CD
+ * driver (include/CdDriver.h, 0x13) is the other. Its Read, LoadFile,
+ * RunRequestQueue, RequestLoadFile, StopService and CancelRequests slots do
+ * nothing. GetVabDriverMode, SetVabDriverMode and GetVabUseVSyncCallback
+ * answer the queries code_171e0.c's GetActiveDataSource* functions forward
+ * to the CD driver's GetCdDriverMode, SetCdDriverMode and
+ * GetCdUseVSyncCallback: they keep the two mode words and report no VSync
+ * callback.
  *
- * Owns NO switch jump table -- zero `jtbl_` references anywhere in the slice
- * -- so no rodata sub-slot is attached to this unit.
+ * VabStreamObj (include/VabStreamObj.h, 0xA03) is a FileResource subclass
+ * whose ctor and finalize chain to the active driver's. The header's banner
+ * describes the load sequence and the slots. The first bank constructed
+ * initialises libsnd (SsInit, the score size table, a 60 Hz tick); the first
+ * whose attributes load starts it (SsStart, the master volume). Finalizing
+ * the last open bank (gOpenVabCount) while no WBgm plays ends it.
  *
- * CLASS FRAMEWORK (established round 17, sharpened round 43 and round 52).
- * `tools/classtable.py --scan` hits two real class tables in this unit's own
- * globals: `gVabDriverMethods` (29 slots, header word 0x00000023) and
- * `gVabStreamObjMethods` (39 slots, header word 0x00000A03).  They share the
- * same BasicClass tail (slots +0x10..+0x38) -- two classes off the same
- * base, not one subclassing the other.
- *
- * `gVabDriverMethods`'s header word (0x23) is not a coincidence: it is
- * exactly the value `code_171e0.c`'s `gActiveDataSource` compares against to
- * select this backend (the other value, 0x13, selects the CD-ROM read
- * driver, `gVabDriverMethods`'s sibling `gCdDriverMethods` in `code_179d8_q.c`).
- * `code_171e0.c`'s own `GetActiveDataSourceMethods` returns `GetVabDriverMethods()` (this
- * unit) exactly when `gActiveDataSource == 0x23`, and `VabStreamObj`'s own
- * constructor/close (below) chain their base-class calls through that
- * accessor's return.  ROUND 87 CORRECTION (track 4): that does not make
- * gVabDriverMethods VabStreamObj's base.  Both are FileResource subclasses
- * (ids 0x23 and 0xA03, parent 0x3); VabStreamObj chains to whichever driver
- * is active, as every data source does.  VabDriver is now declared once, in
- * `include/VabDriver.h`: its ctor/dtor (`code_179d8_d.c`) and the eleven
- * interface slots it overrides, six of them defined in this unit
- * (`VabDriver__Read`/`LoadFile`/`RunRequestQueue`/`RequestLoadFile`/
- * `StopService`/`CancelRequests`), are all empty no-ops.
- *
- * `gVabStreamObjMethods` is the real work. It is the class VabStreamObj,
- * declared once in `include/VabStreamObj.h` since round 87 (track 4). That
- * header's banner describes the load sequence and the slots. Two older
- * readings here were wrong. `VabStreamObj__AdvanceLoadState` (was `Update`)
- * is not a per-frame poll: it is the setFlag slot, and the CD driver calls
- * it when a request completes. The "null in retail" slots +0x58 and +0x6C
- * (loadFile, requestLoadFile) are filled from the active driver by
- * SetActiveDataSource.
- *
- * `InitSoundCueSet`/`FlushSoundCueSet` are unrelated free functions (NOT
- * `gVabStreamObjMethods` vtable slots -- checked, absent from its slot list)
- * operating on the 3-voice `SoundCueSet` (include/SoundCueSet.h) that `Entity`/`DreamSys`/
- * `class_3bb8c_n` embed and tag with their own context (round 52: Entity.c
- * passes `this->moodIndex + 1` as the tag).  `FlushSoundCueSet` dispatches
- * each populated slot's stored index through the ACTIVE stream object's own
- * `VabStreamObj__StopVoice` slot, so the queue is a backend-agnostic front
- * door onto whichever data source `gActiveDataSource` currently selects, not
- * something owned by `VabStreamObj` itself.
- *
- * `func_8002C478` and `GetVabDriverMode`/`SetVabDriverMode` are this
- * backend's own implementations of the same generic driver-mode interface
- * `code_171e0.c` dispatches on `gActiveDataSource` -- confirmed round 52 by
- * that unit's own substitution (`func_80026FAC`/`func_80026F34`/
- * `func_80026FE8` call `GetCdDriverMode`/`SetCdDriverMode`/`GetCdUseVSyncCallback`
- * when `gActiveDataSource == 0x13`, else these).  `func_8002C478` itself
- * stays unnamed: its only paired counterpart, `GetCdUseVSyncCallback`, is still
- * unnamed too, so there's nothing to name it AS a stand-in for.
+ * InitSoundCueSet and FlushSoundCueSet (include/SoundCueSet.h) are free
+ * functions, not methods: they take the sound object first, and Flush stops
+ * the cue's voices through its stopVoice slot.
  */
 #include "common.h"
+#include <libsnd.h>
 #include "VabDriver.h"
 #include "VabStreamObj.h"
 #include "SoundCueSet.h"
 
-/* Cross-unit calls into the still-uncarved code_179d8_tail monolith --
- * declared LOCAL to this unit, per-call-site typed, since none of them have
- * an established prototype anywhere yet. */
+/* Defined in other units. */
 extern void *BMemPMgrAlloc(s32 size);
-/* Sony libsnd, prototypes copied from LIBSND.H (plan revision 15; round 74
- * found the SsUtKeyOn and SsUtAllKeyOff lines disagreeing with it). */
-extern s16 SsUtKeyOn(s16 vabId, s16 prog, s16 tone, s16 note, s16 fine, s16 voll, s16 volr);
-extern s16 SsUtAutoVol(s16 vc, s16 start_vol, s16 end_vol, s16 delta_time);
-extern s16 SsUtKeyOffV(s16 voice);
-extern void SsUtAllKeyOff(s16 mode);
-/* Sony's `SsVabTransCompleted` (`libsnd/vs_vtc`) and `SsSetMute`
- * (`libsnd/scsmute`), linked from the SDK objects since round 34.  The two
- * signatures are this call site's own reading and disagree with the sibling
- * reading in libsnd_decre.c about the return types -- that is the project's
- * independent-local-view convention, and it is exactly why a Psy-Q prototype
- * must never go into a header these units share. */
-extern void SsVabTransCompleted(s32 arg0);
-extern s32 SsSetMute(s32 arg0);
+extern void *BMemPMgrFree(void *ptr);
+extern char *BuildFileName(char *dest, char *name, char *dir, char *ext);
+extern s32 strlen(char *s);
+extern char *strcpy(char *dest, char *src);
+extern char *GetSsSizeTableBuf(void);
+extern s32 IsWBgmActive(void);
+/* The active driver's table (code_171e0.c): gVabDriverMethods or
+ * gCdDriverMethods, both FileResource tables. */
+extern FileResourceMethods *GetActiveDataSourceMethods(void);
+
+/* ".VH" and ".VB", in .sdata. */
+extern const char gVabHeaderSuffix[];
+extern const char gVabBodySuffix[];
+
+/* SetVabDriverMode's two words, read back by GetVabDriverMode. */
+extern s32 gVabDriverMode;
+extern s32 gVabDriverModeArg;
+
+/* libsnd set-up, done once and undone when the last bank closes: SsInit and
+ * the size table; the tick mode; SsStart and the master volume. */
+extern s32 gVabSizeTableInited;
+extern s32 gVabStreamInited;
+extern s32 gVabVolumeInited;
+extern s32 gOpenVabCount;     /* VabStreamObjs constructed and not yet finalized */
+extern s32 gSsTicksPerSecond; /* the SsSetTickMode rate, for callers timing in ticks */
+/* The .VH buffer, kept from the header state until LoadVagAttrs takes it
+ * back as the object's buffer. */
+extern void *gPendingVabBuffer;
 
 s32 VabDriver__Read(void) {
     return 0;
@@ -104,30 +80,27 @@ VabDriverMethods *GetVabDriverMethods(void) {
     return &gVabDriverMethods;
 }
 
-extern s32 gVabDriverMode;
-extern s32 gVabDriverModeArg;
-
-s32 GetVabDriverMode(s32 *arg0) {
-    if (arg0 != NULL) {
-        *arg0 = gVabDriverModeArg;
+s32 GetVabDriverMode(s32 *outMode2) {
+    if (outMode2 != NULL) {
+        *outMode2 = gVabDriverModeArg;
     }
     return gVabDriverMode;
 }
 
-s32 SetVabDriverMode(s32 a, s32 b) {
-    gVabDriverMode = a;
-    gVabDriverModeArg = b;
+s32 SetVabDriverMode(s32 async, s32 mode2) {
+    gVabDriverMode = async;
+    gVabDriverModeArg = mode2;
     return 1;
 }
 
-s32 func_8002C478(void) {
+s32 GetVabUseVSyncCallback(void) {
     return 0;
 }
 
 VabStreamObj *New_VabStreamObj(char *path) {
     VabStreamObj *self;
 
-    self = BMemPMgrAlloc(0x64);
+    self = BMemPMgrAlloc(sizeof(VabStreamObj));
     if (self != NULL) {
         GetVabStreamObjMethods()->ctor(self, path);
         return self;
@@ -135,56 +108,21 @@ VabStreamObj *New_VabStreamObj(char *path) {
     return NULL;
 }
 
-/* GetActiveDataSourceMethods (code_171e0.c) returns gVabDriverMethods when
- * gActiveDataSource is DATASOURCE_SPU and gCdDriverMethods otherwise; both
- * are FILERESOURCE_SLOTS tables, so it is typed FileResourceMethods * as in
- * every other unit that calls it. VabStreamObj's ctor and finalize chain
- * through its +0x008 ctor and +0x00C finalize (round 88; this unit's own
- * DriverBaseMethods view, slot08/slot0C, until then). */
-extern FileResourceMethods *GetActiveDataSourceMethods(void);
+/* The "<base>.VH"/"<base>.VB" path buffers the ctor and AdvanceLoadState
+ * build on the stack. */
+#define VAB_PATH_SIZE 32
 
-/* Sony's own VAB streaming calls (include/psyq/libsnd.h), declared locally
- * per this project's convention of not sharing Psy-Q prototypes across
- * units (see the SsVabTransCompleted/SsSetMute comment above). */
-extern void SsVabClose(s16 vabId);
-extern s16 SsVabOpenHead(u8 *addr, s16 arg1);
-extern s16 SsVabTransBody(u8 *addr, s16 vabId);
-extern s16 SsUtGetVabHdr(s16 vabId, void *out);
-extern s16 SsUtGetProgAtr(s16 vabId, s16 prog, void *out);
-extern s16 SsUtGetVagAtr(s16 vabId, s16 prog, s16 tone, void *out);
-extern void SsSetMVol(s16 a0, s16 a1);
-extern void SsSetTableSize(char *a0, s16 a1, s16 a2);
+/* FileResource::flags bit the CD driver sets when a loadFile/requestLoadFile
+ * finishes (code_179d8_s.c's CD_FLAG_LOAD_FILE_DONE). */
+#define CD_FLAG_LOAD_FILE_DONE 0x200
 
-/* Psy-Q LIBSND.H: extern void SsInit (void); -- track 2 identification,
- * round 78 (was func_80032368, declared s32; the one call discards it). */
-extern void SsInit(void);
-/* Uncarved code_179d8_tail helpers this cluster calls. */
-extern char *GetSsSizeTableBuf(void);
-extern s32 IsWBgmActive(void);
-extern void SsEnd(void);
-extern void SsQuit(void);
-extern void SsSetTickMode(s32 a0);
-extern void SsStart(void);
-extern void *BMemPMgrFree(void *ptr);
-extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
-extern s32 strlen(char *s);
-extern char *strcpy(char *dest, char *src);
-
-/* ".VH"/".VB" -- already emitted by splat in .sdata, referenced not
- * retyped (a literal here would duplicate the bytes and shift the image). */
-extern const char gVabHeaderSuffix[];
-extern const char gVabBodySuffix[];
-
-extern s32 gVabSizeTableInited;
-extern s32 gVabStreamInited;
-extern s32 gVabVolumeInited;
-extern s32 gOpenVabCount;
-extern s32 D_8008A8CC;
-extern void *gPendingVabBuffer;
+/* SsSetMVol's level for both channels, set once when the first bank's
+ * attributes are loaded (Sony's maximum is 127). */
+#define VAB_MASTER_VOLUME 120
 
 void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
     void *buf;
-    char vhPath[0x20];
+    char vhPath[VAB_PATH_SIZE];
 
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetVabStreamObjMethods();
@@ -199,11 +137,11 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
     if (gVabSizeTableInited == 0) {
         SsInit();
         gVabSizeTableInited = 1;
-        SsSetTableSize(GetSsSizeTableBuf(), 2, 1);
+        SsSetTableSize(GetSsSizeTableBuf(), 2, 1); /* two scores of one track */
     }
     if (gVabStreamInited == 0) {
-        D_8008A8CC = 0x3C;
-        SsSetTickMode(1);
+        gSsTicksPerSecond = 60; /* SS_TICK60 */
+        SsSetTickMode(SS_TICK60);
         gVabStreamInited = 1;
     }
     gOpenVabCount++;
@@ -213,7 +151,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
             self->baseFilename = buf;
             strcpy(buf, path);
             BuildFileName(vhPath, buf, NULL, gVabHeaderSuffix);
-            self->loadState = 1;
+            self->loadState = VABSTREAM_LOAD_HEADER;
             self->methods->requestLoadFile(self, vhPath);
         }
     }
@@ -238,17 +176,17 @@ void VabStreamObj__Finalize(VabStreamObj *self) {
 }
 
 void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
-    char path[0x20];
+    char path[VAB_PATH_SIZE];
 
     switch (self->loadState) {
-        case 0:
+        case VABSTREAM_LOAD_IDLE:
             break;
-        case 1:
-            if (self->flags & 0x200) {
+        case VABSTREAM_LOAD_HEADER:
+            if (self->flags & CD_FLAG_LOAD_FILE_DONE) {
                 self->vabId = SsVabOpenHead(self->buffer, -1);
                 BuildFileName(path, self->baseFilename, NULL, gVabBodySuffix);
                 gPendingVabBuffer = self->buffer;
-                self->loadState = 6;
+                self->loadState = VABSTREAM_LOAD_BODY;
                 self->buffer = NULL;
                 self->methods->loadFile(self, path);
                 if (self->baseFilename != NULL) {
@@ -257,8 +195,8 @@ void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
                 }
             }
             break;
-        case 6:
-            if (self->flags & 0x200) {
+        case VABSTREAM_LOAD_BODY:
+            if (self->flags & CD_FLAG_LOAD_FILE_DONE) {
                 self->vabId = SsVabTransBody(self->buffer, self->vabId);
                 if (self->vabId != -1) {
                     self->bodyTransferPending = 1;
@@ -287,17 +225,8 @@ s32 VabStreamObj__OnBodyReady(VabStreamObj *self, s32 done) {
     return result;
 }
 
-/* This unit's own reduced view of Sony's `ProgAtr` (include/psyq/libsnd.h,
- * 16 bytes) -- only the one field VabStreamObj__LoadVagAttrs itself reads is
- * named, per the same local-struct convention used for VabHdrView above (and
- * matching libsnd_seqread.c's own reduced `ProgAtr` reading). */
-typedef struct ProgAtrView {
-    u8 tones; /* +0x00, program's tone count, written by SsUtGetProgAtr */
-    u8 pad1[0x10 - 0x1];
-} ProgAtrView;
-
 void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
-    ProgAtrView prog;
+    ProgAtr prog;
     VabStreamVagAtr *pool;
     s32 i;
     s32 j;
@@ -308,15 +237,15 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
     }
     self->methods->freeBuffer(self);
     self->buffer = gPendingVabBuffer;
-    result = SsUtGetVabHdr(self->vabId, &self->vabHdr);
+    result = SsUtGetVabHdr(self->vabId, (VabHdr *)&self->vabHdr);
     if (result == -1) {
         return;
     }
-    self->vagAttrPool = BMemPMgrAlloc(self->vabHdr.vs << 5);
+    self->vagAttrPool = BMemPMgrAlloc(self->vabHdr.vs * sizeof(VabStreamVagAtr));
     if (self->vagAttrPool == NULL) {
         return;
     }
-    self->progVagTable = BMemPMgrAlloc(self->vabHdr.ts << 2);
+    self->progVagTable = BMemPMgrAlloc(self->vabHdr.ts * sizeof(VabStreamVagAtr *));
     if (self->progVagTable == NULL) {
         return;
     }
@@ -328,7 +257,7 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
             return;
         }
         for (j = 0; j < prog.tones; j++) {
-            result = SsUtGetVagAtr(self->vabId, i, j, pool);
+            result = SsUtGetVagAtr(self->vabId, i, j, (VagAtr *)pool);
             if (result == -1) {
                 return;
             }
@@ -337,30 +266,32 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
     }
     if (gVabVolumeInited == 0) {
         SsStart();
-        SsSetMVol(0x78, 0x78);
+        SsSetMVol(VAB_MASTER_VOLUME, VAB_MASTER_VOLUME);
         gVabVolumeInited = 1;
     }
 }
 
-/* Resolve a packed program/tone index, look up its VagAtr and key it on.
- * `prog` is loaded BEFORE `lo` is computed on purpose: GCC 2.6.3's combine
- * folds `index - (index >> 4) * 16` into `index & 0xF` whenever `hi`'s
- * FIRST use is the multiply (flow.c links a set only to its next use), and
- * retail kept the unfolded sll+subu (docs/match-reports/VabStreamObj__PlayTone.md). */
+/* PlayTone's packed index: program << VAB_TONE_BITS | tone. */
+#define VAB_TONE_BITS 4
+#define VAB_TONES_PER_PROG 16
+
+/* Key on the tone a packed index names, at vol, and ramp it to endVol.
+ * Returns the voice, or -1. */
 s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol) {
-    s32 hi;
-    s32 lo;
+    s32 program;
+    s32 tone;
     VabStreamVagAtr *entry;
-    VabStreamVagAtr *prog;
+    VabStreamVagAtr *row;
     s16 result;
 
     if (index >= 0) {
-        hi = index >> 4;
-        prog = self->progVagTable[hi];
-        lo = index - hi * 16;
-        entry = &prog[lo];
-        result = SsUtKeyOn(self->vabId, (s16)hi, (s16)lo, (s16)(entry->center + self->pitchOffset),
-                           entry->shift, (s16)vol, (s16)vol);
+        program = index >> VAB_TONE_BITS;
+        /* MATCHING: row is loaded before tone, or tone folds to index & 0xF. */
+        row = self->progVagTable[program];
+        tone = index - program * VAB_TONES_PER_PROG;
+        entry = &row[tone];
+        result = SsUtKeyOn(self->vabId, (s16)program, (s16)tone,
+                           (s16)(entry->center + self->pitchOffset), entry->shift, (s16)vol, (s16)vol);
         if (result >= 0) {
             SsUtAutoVol(result, (s16)vol, (s16)endVol, 2);
             return result;
@@ -369,9 +300,9 @@ s32 VabStreamObj__PlayTone(VabStreamObj *self, s32 index, s32 vol, s32 endVol) {
     return -1;
 }
 
-/* The PS1 SPU's own hardware voice count -- the boundary VabStreamObj__StopVoice
- * checks `index` against. */
-#define SPU_VOICE_COUNT 0x18
+/* The SPU's voice count: StopVoice keys off every voice for a voice number
+ * past the last. */
+#define SPU_VOICE_COUNT 24
 
 s32 VabStreamObj__StopVoice(VabStreamObj *self, s32 voice) {
     if (voice < SPU_VOICE_COUNT) {
@@ -395,14 +326,16 @@ s32 VabStreamObj__Mute(VabStreamObj *self) {
 }
 
 s32 VabStreamObj__Unmute(VabStreamObj *self) {
-    s32 flag;
+    s32 result;
 
-    flag = self->muted;
-    if (flag != 0) {
-        flag = SsSetMute(0);
+    result = self->muted;
+    if (result != 0) {
+        /* MATCHING: retail returns what SsSetMute leaves in $v0 (SpuSetMute's
+         * result); <libsnd.h> declares it void, so the call is cast. */
+        result = ((s32 (*)(char))SsSetMute)(0);
         self->muted = 0;
     }
-    return flag;
+    return result;
 }
 
 void VabStreamObj__NoOpSlot90(void) {}
@@ -411,24 +344,24 @@ void VabStreamObj__NoOpSlot94(void) {}
 
 void VabStreamObj__NoOpSlot98(void) {}
 
+/* setPitchOffset's argument is an octave: 2 plays a tone at its centre
+ * note, each step away shifts it an octave. */
+#define SEMITONES_PER_OCTAVE 12
+
 void VabStreamObj__SetPitchOffset(VabStreamObj *self, s32 octave) {
-    self->pitchOffset = octave * 12 - 0x18;
+    self->pitchOffset = octave * SEMITONES_PER_OCTAVE - 2 * SEMITONES_PER_OCTAVE;
 }
 
 VabStreamObjMethods *GetVabStreamObjMethods(void) {
     return &gVabStreamObjMethods;
 }
 
-extern s32 gOpenVabCount;
-
 s32 GetOpenVabCount(void) {
     return gOpenVabCount;
 }
 
-extern s32 D_8008A8CC;
-
-s32 func_8002CC28(void) {
-    return D_8008A8CC;
+s32 GetSsTicksPerSecond(void) {
+    return gSsTicksPerSecond;
 }
 
 s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
@@ -442,7 +375,7 @@ s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
     }
     slot = set->slots;
     sentinel = -1;
-    count = 2;
+    count = ARRAY_COUNT(set->slots) - 1;
     set->tag = tag;
     set->owner = owner;
     set->callback = callback;
@@ -452,7 +385,7 @@ s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
         slot++;
     } while (count >= 0);
     set->tick = 0;
-    set->attenuationSteps = 10;
+    set->attenuationSteps = SOUND_CUE_ATTENUATION_STEPS;
     return 1;
 }
 
@@ -461,7 +394,7 @@ void FlushSoundCueSet(VabStreamObj *self, SoundCueSet *set) {
     SoundCueSlot *slot;
 
     slot = set->slots;
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < ARRAY_COUNT(set->slots); i++) {
         if (slot->voice >= 0) {
             slot->voice = self->methods->stopVoice(self, slot->voice);
         }

@@ -65,7 +65,7 @@ extern void SsSeqSetVol(short, short, short);
 extern void SsSeqSetCrescendo(short, short, long);
 extern void SsSeqClose(short);
 
-extern s32 func_8002CC28(void);
+extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;

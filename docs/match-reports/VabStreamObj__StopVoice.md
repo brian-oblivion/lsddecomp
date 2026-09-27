@@ -74,3 +74,7 @@ fallback for anything else. Tier B, not A: `SsUtKeyOffV`/`SsUtAllKeyOff`
 are both still uncarved and unnamed, so the exact stop mechanism (per-voice
 key-off vs. something else) isn't independently confirmed from this unit
 alone.
+
+## Round 98 (charlie, track 7)
+
+`SPU_VOICE_COUNT` is written 24 (was `0x18`). Byte-exact.

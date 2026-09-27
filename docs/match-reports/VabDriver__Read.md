@@ -64,3 +64,106 @@ when the SPU/VAB source is active every `methods->read(...)` in the game
 reaches this body. The purpose evidence the tier-C verdict above lacked is
 the slot's, not the body's: the body does nothing, which is what the VAB
 driver does for that interface call. Unified into `include/VabDriver.h`.
+
+## Unit banner history (moved from src/code_179d8_e.c, round 98, charlie, track 7)
+
+The unit's banner and its declaration comments were rewritten as
+documentation in round 98. What they recorded is kept here, verbatim.
+(`GetVabUseVSyncCallback` in the last paragraph was `func_8002C478` when it
+was written; rename.py rewrote the token, and the paragraph's objection is
+answered in `GetVabUseVSyncCallback.md`, round 98.)
+
+```
+/*
+ * code_179d8_e -- the SPU/VAB sound-streaming backend (`gActiveDataSource ==
+ * 0x23`, confirmed round 52 against alpha's own naming of that global in
+ * code_171e0.c) and its small mood/context-tagged sound-cue queue.
+ *
+ * functions 120..148 of the original 274-function code_179d8 monolith,
+ * 0x1CC08..0x1D508 (vram 0x8002C408..0x8002CD08).  Carved round 17
+ * (2026-09-04) out of what the yaml called `code_179d8_mid_b`; the remainder
+ * behind it is now `code_179d8_mid_c`.
+ *
+ * Owns NO switch jump table -- zero `jtbl_` references anywhere in the slice
+ * -- so no rodata sub-slot is attached to this unit.
+ *
+ * CLASS FRAMEWORK (established round 17, sharpened round 43 and round 52).
+ * `tools/classtable.py --scan` hits two real class tables in this unit's own
+ * globals: `gVabDriverMethods` (29 slots, header word 0x00000023) and
+ * `gVabStreamObjMethods` (39 slots, header word 0x00000A03).  They share the
+ * same BasicClass tail (slots +0x10..+0x38) -- two classes off the same
+ * base, not one subclassing the other.
+ *
+ * `gVabDriverMethods`'s header word (0x23) is not a coincidence: it is
+ * exactly the value `code_171e0.c`'s `gActiveDataSource` compares against to
+ * select this backend (the other value, 0x13, selects the CD-ROM read
+ * driver, `gVabDriverMethods`'s sibling `gCdDriverMethods` in `code_179d8_q.c`).
+ * `code_171e0.c`'s own `GetActiveDataSourceMethods` returns `GetVabDriverMethods()` (this
+ * unit) exactly when `gActiveDataSource == 0x23`, and `VabStreamObj`'s own
+ * constructor/close (below) chain their base-class calls through that
+ * accessor's return.  ROUND 87 CORRECTION (track 4): that does not make
+ * gVabDriverMethods VabStreamObj's base.  Both are FileResource subclasses
+ * (ids 0x23 and 0xA03, parent 0x3); VabStreamObj chains to whichever driver
+ * is active, as every data source does.  VabDriver is now declared once, in
+ * `include/VabDriver.h`: its ctor/dtor (`code_179d8_d.c`) and the eleven
+ * interface slots it overrides, six of them defined in this unit
+ * (`VabDriver__Read`/`LoadFile`/`RunRequestQueue`/`RequestLoadFile`/
+ * `StopService`/`CancelRequests`), are all empty no-ops.
+ *
+ * `gVabStreamObjMethods` is the real work. It is the class VabStreamObj,
+ * declared once in `include/VabStreamObj.h` since round 87 (track 4). That
+ * header's banner describes the load sequence and the slots. Two older
+ * readings here were wrong. `VabStreamObj__AdvanceLoadState` (was `Update`)
+ * is not a per-frame poll: it is the setFlag slot, and the CD driver calls
+ * it when a request completes. The "null in retail" slots +0x58 and +0x6C
+ * (loadFile, requestLoadFile) are filled from the active driver by
+ * SetActiveDataSource.
+ *
+ * `InitSoundCueSet`/`FlushSoundCueSet` are unrelated free functions (NOT
+ * `gVabStreamObjMethods` vtable slots -- checked, absent from its slot list)
+ * operating on the 3-voice `SoundCueSet` (include/SoundCueSet.h) that `Entity`/`DreamSys`/
+ * `class_3bb8c_n` embed and tag with their own context (round 52: Entity.c
+ * passes `this->moodIndex + 1` as the tag).  `FlushSoundCueSet` dispatches
+ * each populated slot's stored index through the ACTIVE stream object's own
+ * `VabStreamObj__StopVoice` slot, so the queue is a backend-agnostic front
+ * door onto whichever data source `gActiveDataSource` currently selects, not
+ * something owned by `VabStreamObj` itself.
+ *
+ * `GetVabUseVSyncCallback` and `GetVabDriverMode`/`SetVabDriverMode` are this
+ * backend's own implementations of the same generic driver-mode interface
+ * `code_171e0.c` dispatches on `gActiveDataSource` -- confirmed round 52 by
+ * that unit's own substitution (`func_80026FAC`/`func_80026F34`/
+ * `func_80026FE8` call `GetCdDriverMode`/`SetCdDriverMode`/`GetCdUseVSyncCallback`
+ * when `gActiveDataSource == 0x13`, else these).  `GetVabUseVSyncCallback` itself
+ * stays unnamed: its only paired counterpart, `GetCdUseVSyncCallback`, is still
+ * unnamed too, so there's nothing to name it AS a stand-in for.
+ */
+```
+
+Declaration comments removed in the same pass (the unit now takes Sony's
+prototypes from `<libsnd.h>`, and the `code_179d8_tail` it names no longer
+exists under that name):
+
+- Above `BMemPMgrAlloc`: "Cross-unit calls into the still-uncarved
+  code_179d8_tail monolith -- declared LOCAL to this unit, per-call-site
+  typed, since none of them have an established prototype anywhere yet."
+- Above the libsnd key-on prototypes: "Sony libsnd, prototypes copied from
+  LIBSND.H (plan revision 15; round 74 found the SsUtKeyOn and SsUtAllKeyOff
+  lines disagreeing with it)."
+- Above `SsVabTransCompleted`/`SsSetMute`: both linked from the SDK objects
+  since round 34 (`libsnd/vs_vtc`, `libsnd/scsmute`); the unit declared them
+  `void (s32)` and `s32 (s32)`, disagreeing with libsnd_decre.c's reading,
+  under the independent-local-view convention of the time. Round 98 replaced
+  both with Sony's (`short (short)`, `void (char)`); see
+  `VabStreamObj__Unmute.md` for the one call site that reads `SsSetMute`'s
+  `$v0`.
+- Above `SsInit`: track 2 identification, round 78 (was `func_80032368`,
+  declared `s32`; the one call discards it).
+- Above `GetActiveDataSourceMethods`: VabStreamObj's ctor and finalize chain
+  through the table's +0x008 ctor and +0x00C finalize since round 88; until
+  then this unit used its own `DriverBaseMethods` view, `slot08`/`slot0C`.
+- Above `gVabHeaderSuffix`/`gVabBodySuffix`: ".VH"/".VB" are already emitted
+  by splat in .sdata, so they are referenced, not retyped (a literal would
+  duplicate the bytes and shift the image).
+- `ProgAtrView` (a 16-byte local view of Sony's `ProgAtr` naming only
+  `tones`) was deleted; `VabStreamObj__LoadVagAttrs` uses Sony's `ProgAtr`.

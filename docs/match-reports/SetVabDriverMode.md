@@ -58,3 +58,10 @@ this function to a `DataSourceSetDriverModeFn` variable used exactly where it as
 Sony's `SetCdDriverMode` on the other branch of `gActiveDataSource == 0x13`
 -- a genuine drop-in substitute for a named "set driver mode" call, for
 this backend's own state pair.
+
+## Round 98 (charlie, track 7): parameters
+
+`(a, b)` -> `(async, mode2)`, after the CD driver's
+`SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)`: code_171e0.c's
+`SetActiveDataSourceDriverMode` calls one or the other with the same three
+words, and this one ignores the third.

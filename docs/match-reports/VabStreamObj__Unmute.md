@@ -41,3 +41,16 @@ track identified it -- never back-filled into this report until round 52.)
 Renamed `func_8002CB9C` -> `VabStreamObj__Unmute`, tier A. Confirmed
 `gVabStreamObjMethods`'s own +0x08C slot; mirror of `VabStreamObj__Mute`
 (unmute-if-muted via `SsSetMute(0)`) -- same tier-A leaf reasoning.
+
+## Round 98 (charlie, track 7): Sony's `SsSetMute` prototype
+
+The unit now takes `<libsnd.h>`, where `SsSetMute` is `void SsSetMute(char)`.
+Retail still returns its `$v0`: `lib/libsnd/scsmute.o` ends in a `jal
+SpuSetMute` with nothing after it, so `$v0` is SpuSetMute's result. The body
+keeps the shape above and spells the call
+`result = ((s32 (*)(char))SsSetMute)(0);` under a `MATCHING` line; byte-exact.
+The other spelling measured, `if (self->muted) { SsSetMute(0); self->muted
+= 0; }` with no `return`, is also byte-exact but adds a
+`control reaches end of non-void function` warning to `typeviews.py
+--warnings`, so it was not kept. The local was renamed `flag` -> `result`
+(it holds the return value, not a flag, on the unmute path).
