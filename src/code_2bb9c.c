@@ -104,7 +104,7 @@ void TimImage__Upload(TimImage *self) {
 void TimImage__NoOpSlot7C(void) {}
 
 /* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5B4(void) {}
+void TimImage__NoOpSlot80(void) {}
 
 /* TimImage slot (tools/classtable.py); empty body. */
 void TimImage__func_8003B5BC(void) {}
