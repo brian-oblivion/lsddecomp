@@ -62,7 +62,7 @@ extern LongVec3 gVec3Zero;
 extern char *strcpy(char *dst, char *src);
 
 /* The cell origin GetCellRect copies: {0, 0, 8, 8}. */
-extern SpriteRect D_8006ED40;
+extern SpriteRect gCharSpriteCellRect;
 
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 extern void *BMemPMgrAlloc(s32 size);
@@ -118,9 +118,9 @@ CharSpriteMethods *GetCharSpriteMethods(void) {
     return &gCharSpriteMethods;
 }
 
-/* Cell index -> 8x8 rect in a 32-wide grid, offset from D_8006ED40. */
+/* Cell index -> 8x8 rect in a 32-wide grid, offset from gCharSpriteCellRect. */
 void GetCellRect(SpriteRect *dst, u32 cell) {
-    *dst = D_8006ED40;
+    *dst = gCharSpriteCellRect;
     cell &= 0xFF;
     dst->u += (cell & 0x1F) * 8;
     dst->v += (cell >> 5) * 8;

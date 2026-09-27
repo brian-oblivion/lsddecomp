@@ -11,7 +11,7 @@
  * evidence is this:
  *  - setCell (+0x0C4) stores the byte in `cellIndex` and points the
  *    GsSPRITE's u,v at its cell through GetCellRect: column `cell & 0x1F`,
- *    row `cell >> 5`, 8x8 each, from the D_8006ED40 origin. 256 codes in a
+ *    row `cell >> 5`, 8x8 each, from the gCharSpriteCellRect origin. 256 codes in a
  *    32-wide grid is the ASCII layout.
  *  - The ctor sizes the sprite from cell 0x20, ASCII space, before it
  *    selects the caller's cell.
