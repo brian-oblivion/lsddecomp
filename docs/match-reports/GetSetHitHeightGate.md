@@ -1,4 +1,6 @@
-# func_8001EF60 -- MATCHED 4/4 words
+# GetSetHitHeightGate -- MATCHED 4/4 words
+
+> Renamed from `func_8001EF60` on 2026-09-27 (tools/rename.py). Address 0x8001ef60.
 
 Unit `code_d294_c`, carved round 13. Reopened round 42 as `gp_rel`-blocked
 (the blocker is RESOLVED, see CLAUDE.md); the stub above was never actually
@@ -12,7 +14,7 @@ the old one.
 ```c
 extern s32 gHitHeightGate;
 
-s32 func_8001EF60(s32 value) {
+s32 GetSetHitHeightGate(s32 value) {
     s32 old;
 
     old = gHitHeightGate;
@@ -38,7 +40,7 @@ pattern held for a 3rd, unrelated unit.
 
 ## Naming (round 50, charlie -- FINISHING-PLAN track 3)
 
-- **KEPT as `func_8001EF60`. Tier C.** And `gHitHeightGate` keeps its
+- **KEPT as `GetSetHitHeightGate`. Tier C.** And `gHitHeightGate` keeps its
   placeholder too. What IS known:
   - Mechanically it is a get-and-set of the global `gHitHeightGate`: read the
     old value, store the new one, return the old. That is the shape this

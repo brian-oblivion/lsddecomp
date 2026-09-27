@@ -440,7 +440,7 @@ extern s32 gHitHeightGate;
  * class_3bb8c_l.c's ObjM__InitStyleAndWorld, which passes a flag derived from a
  * stage/mode value of 3, 5 or 6. Two call sites, neither naming the thing.
  * gHitHeightGate keeps its placeholder name for the same reason. */
-s32 func_8001EF60(s32 value) {
+s32 GetSetHitHeightGate(s32 value) {
     s32 old;
 
     old = gHitHeightGate;
