@@ -1295,7 +1295,8 @@
         "S16Quad_d294": "IS Sony's SVECTOR by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
         "SceneNodeSub14": "IS Sony's GsCOORDINATE2 by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
         "SceneNodeSub44": "IS Sony's GsCOORD2PARAM by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
-        "SkipShort2": "named for its layout (a short, then a skipped halfword): it is BoxFill's size argument, two words whose low halves are boxW/boxH (round 99, bravo's code_2cc8c_f pass) (2026-09-27)"
+        "SkipShort2": "named for its layout (a short, then a skipped halfword): it is BoxFill's size argument, two words whose low halves are boxW/boxH (round 99, bravo's code_2cc8c_f pass) (2026-09-27)",
+        "StreamTaskInitData": "a local spelling of DrawSystem.h's DrawRect: the same three words ({640, 0, 320, 240}, s16 x/y + s32 w/h), and the ctor already casts it to DrawRect * for New_MoviePlayer (round 99, alpha's code_2c054 pass) (2026-09-27)"
       },
       "parked": {},
       "reason": "",
@@ -1382,7 +1383,11 @@
         }
       ],
       "status": "auto",
-      "units": {}
+      "units": {
+        "StreamTaskInitData": [
+          "code_2c054"
+        ]
+      }
     },
     "7": {
       "checklist": {
