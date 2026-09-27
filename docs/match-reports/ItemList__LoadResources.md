@@ -18,7 +18,7 @@ extern ItemListHandle_3bb8c_j *New_ScreenSprite(ItemListHandle_3bb8c_j *arg0, vo
 extern s32 D_8008AB14;
 extern s32 D_8008AB1C;
 extern s32 D_8008AB24;
-extern s32 D_80087028;
+extern s32 gItemListPanelRect;
 extern s32 D_8008AAF8;
 extern s32 D_800116E4;
 
@@ -36,7 +36,7 @@ void ItemList__LoadResources(ItemList_3bb8c_j *self, void *arg1)
 
     h = New_TimImage(BuildFileName(local, &D_8008AB14, &D_8008AB1C, &D_8008AB24));
     h->methods->slot78(h);
-    self->unk50 = New_ScreenSprite(h, &D_80087028, 0);
+    self->unk50 = New_ScreenSprite(h, &gItemListPanelRect, 0);
     h->methods->slot4(h);
     self->unk50->methods->slot4C(self->unk50, arg1, &D_8008AAF8);
 
@@ -304,7 +304,7 @@ cross-unit sibling with the same call skeleton first.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (ItemListHandle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&D_80087028, 0)`: D_80087028 is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position D_8008AAF8 = (-100, -60). Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (ItemListHandle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&gItemListPanelRect, 0)`: gItemListPanelRect is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position D_8008AAF8 = (-100, -60). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88)
 
