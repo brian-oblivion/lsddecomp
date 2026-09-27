@@ -392,3 +392,15 @@ this report's earlier history too (known, pending an operator decision).
 The field this method writes at +0x084 is now `maskPerTick` (was `unk84`):
 `BoxFill::mask / ticksLeft`, stored and never read by any code.
 
+
+## Track 7 (round 100, charlie)
+
+### Naming
+
+- **`FadeBox::mode`** (+0x07C, was `unk7C`) -- tier B. Written by this
+  function from its third argument, zeroed by Reset, read only by Update,
+  which skips the colour step while it is 9 (the tick countdown and the stop
+  still run, so 9 holds the colour for the fade's length). Every caller in
+  the tree passes 0 (Entity_d/_f/_g, class_3bb8c_l, and ObjM__StartFadeUp's
+  `fadeMode`, whose own callers all pass 0), so no other value is observed;
+  "mode" says only that it selects a variant.

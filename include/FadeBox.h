@@ -90,7 +90,7 @@ struct FadeBox {
     /* +0x070 */ s32 defaultChannels; /* the ctor's mask (Reset); configure uses it when passed a negative mask */
     /* +0x074 */ s32 step; /* per-tick channel delta: 10 from Reset, setStep; negated by startFadeDown */
     /* +0x078 */ s32 channels; /* the mask configure stored (0 as 0xF): which bytes update steps, which colour getColor returns */
-    /* +0x07C */ s32 unk7C;     /* configure's third argument; update does not step while it is 9 */
+    /* +0x07C */ s32 mode; /* configure's third argument; update does not step the colour while it is 9 */
     /* +0x080 */ s32 ticksLeft; /* configure: 0x100 / step; update counts it down and stops at 0 */
     /* +0x084 */ s32 maskPerTick; /* configure: BoxFill's mask / ticksLeft; no reader */
     /* +0x088 */ s32 savedW;      /* pushPosition's copy of boxW, restored by popPosition */

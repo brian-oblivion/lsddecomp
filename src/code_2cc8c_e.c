@@ -43,7 +43,7 @@ void FadeBox__Reset(FadeBox *self, s32 channels) {
     self->state = 0;
     self->step = 0xA;
     self->channels = 0;
-    self->unk7C = 0;
+    self->mode = 0;
     self->methods->setDisplay(self, 0);
     self->methods->setSemiTransOn(self, 0);
     self->altMode = 0;
@@ -58,7 +58,7 @@ void FadeBox__Update(FadeBox *self, void *sender, s32 event) {
     old = self->ticksLeft;
     self->ticksLeft = old - 1;
     if (old > 0) {
-        if (self->unk7C == 9) {
+        if (self->mode == 9) {
             return;
         }
         if (self->channels & 4) {
@@ -129,7 +129,7 @@ s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3
         self->channels = 0xF;
     }
     q1 = 0x100 / self->step;
-    self->unk7C = arg3;
+    self->mode = arg3;
     self->ticksLeft = q1;
     if (self->altMode != 0) {
         q2 = q1 / self->divisor;
