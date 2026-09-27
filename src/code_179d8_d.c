@@ -1,12 +1,15 @@
 /*
- * code_179d8_d -- PlacementGrid's methods (include/PlacementGrid.h: one
- * grid element's 20 x 20 cells of model placements), then the first seven
- * of VabDriver's empty driver methods (include/VabDriver.h; the rest, and
- * its getter, are in code_179d8_e.c), with ReturnZero, a free-standing
- * `return 0` with no caller, between them.
+ * code_179d8_d -- PlacementGrid (include/PlacementGrid.h), the model
+ * placements of one map chunk's 20 x 20 cells: its allocator, ctor,
+ * finalize, read-done flag, the processBuffer occupant that turns one
+ * placement record per call into a CellPlacement and its model, and the
+ * table getter. Then ReturnZero, which nothing calls or points at, and the
+ * first seven of VabDriver's empty driver methods (include/VabDriver.h;
+ * the rest, and its getter, are in code_179d8_e.c).
  *
- * Declarations that encode this unit's reading of its callees stay in this
- * file; the code_179d8_* slices share no header.
+ * The prototypes for FileResource's active-driver getter and the pool
+ * allocator, and the cast for LinkResource's getModel, are this unit's
+ * reading of its callees and stay in this file.
  */
 #include "common.h"
 #include <libgte.h>
@@ -71,6 +74,10 @@ void PlacementGrid__SetFlag(PlacementGrid *self) {
     GetActiveDataSourceMethods()->setFlag((FileResource *)self);
 }
 
+/* Fill `placement` from cell `cell`'s first record, or, when
+ * placement->next is set, from the record it points at, and return the
+ * record's model from linkResource. -1: the record is empty; 0: `cell` is
+ * past the lattice, the caller's end of the walk. */
 s32 PlacementGrid__ResolveEntry(PlacementGrid *self, CellPlacement *placement, s32 cell) {
     PlacementGridRecord *rec;
     LinkResource *link;
@@ -119,10 +126,12 @@ void VabDriver__VabDriver(void) {}
 void VabDriver__Destroy(void) {}
 
 void VabDriver__NoOpSlot40(void) {
+    /* MATCHING: retail reserves a 64-byte frame it never touches. */
     char unused[64];
 }
 
 void VabDriver__Open(void) {
+    /* MATCHING: the same unused 64-byte frame. */
     char unused[64];
 }
 
