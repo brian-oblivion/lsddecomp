@@ -1,7 +1,7 @@
 /*
  * class_3bb8c_g -- TaskObjF methods (include/TaskObjF.h), slots +0x07C..
  * +0x0B0 of gTaskObjFMethods (class_3bb8c_f holds +0x064..+0x078), the
- * table getter, plus one standalone helper (CopyMemcardIconTemplate) reused
+ * table getter, plus one standalone helper (StampSaveTitleFileLetter) reused
  * by class_3bb8c_m's memcard save writer.
  *
  * TaskObjF runs a `state` machine: SetState notifies the parent, swaps the
@@ -325,7 +325,7 @@ extern s32 atoi(char *s);
  * `class_3bb8c_d.c`'s own (differently-typed) local view. */
 extern u8 *gSaveTitleGlyphs;
 
-/* Struct-copy helper types for round 45's CopyMemcardIconTemplate, all deliberately
+/* Struct-copy helper types for round 45's StampSaveTitleFileLetter, all deliberately
  * all-`s8` (alignment 1) per this round's FormatNumberIntoBuffer lever: retail
  * copies these ranges as one unaligned `lwl`/`lwr` word chunk per 4 bytes,
  * with any non-multiple-of-4 remainder as INDIVIDUAL byte loads/stores,
@@ -344,14 +344,14 @@ typedef struct {
 } Pair2_3bb8c_g;
 
 /* Signature is `include/class_3bb8c.h`'s ALREADY-shared
- * `extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1);` (class_3bb8c_m's own
+ * `extern s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1);` (class_3bb8c_m's own
  * caller, TaskObjF__WriteMemcardSaveFile), matched exactly -- this unit's own definition
  * must agree with that declaration since both are visible in this
  * translation unit. Cast to `u8 *` internally; retail's own register
  * content at exit (`$v0` left holding a pointer into the `gSaveTitleGlyphs`
  * template in every path) confirms the real return type is a pointer,
  * loosely read as `s32` by the caller that never dereferences it. */
-s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1) {
+s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1) {
     u8 *self = (u8 *)arg0;
     u8 *src = (u8 *)arg1;
     s32 t0;

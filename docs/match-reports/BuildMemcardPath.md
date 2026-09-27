@@ -108,7 +108,7 @@ generic enough that a future include/psyq prototype (measured 2026-09-12:
 none of the shipped headers declares them, only comments and O_* macros)
 would collide in whichever including unit pulled both in; the two callers
 also disagree about the first argument's type. Each caller (class_3bb8c_e.c,
-class_3bb8c_f.c) carries its own `extern`. CopyMemcardIconTemplate stayed:
+class_3bb8c_f.c) carries its own `extern`. StampSaveTitleFileLetter stayed:
 game code, src/class_3bb8c_g.c, matched round 45 (60/60 words; was
 gp_rel-blocked, resolved round 42). `DeviceName866E8` is `McDevicePath`
 (round 94); its comment's pointer to "the same idiom documented for

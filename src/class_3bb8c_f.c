@@ -105,7 +105,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, 
     s32 result;
 
     count = 10;
-    CopyMemcardIconTemplate((s32)title, (s32)fileName);
+    StampSaveTitleFileLetter((s32)title, (s32)fileName);
     do {
         result = TaskObjF__TryWriteMemcardSaveFile(self, fileName, title, a3 & 0xFF, icon, data, size);
         if (result != 0) {
@@ -113,7 +113,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, 
         }
     } while (count-- != 0);
     if (result == 0) {
-        CopyMemcardIconTemplate((s32)title, 0);
+        StampSaveTitleFileLetter((s32)title, 0);
     }
     return result;
 }

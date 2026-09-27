@@ -33,7 +33,7 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, Arg1DB18_3bb8c_d *arg1)
     }
     if (self->unkA4->methods->slot1AC(self->unkA4)) {
         strcpy((char *)D_8008AA18 + 0x18, (char *)D_8008AA14);
-        CopyMemcardIconTemplate((s32)D_8008AA18, 0);
+        StampSaveTitleFileLetter((s32)D_8008AA18, 0);
     }
     size = strlen((char *)D_8008AA18);
     size = (size >> 1) + 4;
@@ -58,8 +58,8 @@ SLPS_015.56`.
 - `self->unkA4->methods->slot1AC(self->unkA4)` -- the SAME slot this
   round's `TitleMenu__SaveToCard` established, reused verbatim.
 - Inside that gate: `strcpy((char *)D_8008AA18 + 0x18, (char *)D_8008AA14)`
-  then `CopyMemcardIconTemplate(D_8008AA18, 0)` -- `CopyMemcardIconTemplate` is the
-  already-canonical `extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1);`
+  then `StampSaveTitleFileLetter(D_8008AA18, 0)` -- `StampSaveTitleFileLetter` is the
+  already-canonical `extern s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1);`
   (`include/class_3bb8c.h`); `D_8008AA18` (`void *`) converts to its `s32`
   parameter with an explicit cast (a value pass, not dereferenced, so the
   representation is unchanged).
