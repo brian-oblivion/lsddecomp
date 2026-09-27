@@ -16,7 +16,7 @@ void GraphRoom__TickHighlight(D_80087AACObj *self);
 ## Body
 
 ```c
-extern s32 D_8008ABBC;
+extern s32 gGraphPointHighlightColor;
 
 void GraphRoom__TickHighlight(D_80087AACObj *self) {
     if (self->unk_0x238 != 0) {
@@ -24,7 +24,7 @@ void GraphRoom__TickHighlight(D_80087AACObj *self) {
             if (self->unk_0x23C < 4) {
                 if ((self->unk_0x1C % 24) == 0) {
                     s8 idx = self->unk_0x240[self->unk_0x23C];
-                    self->unk_0xA8[idx]->methods->slotB8(self->unk_0xA8[idx], 1, &D_8008ABBC);
+                    self->unk_0xA8[idx]->methods->slotB8(self->unk_0xA8[idx], 1, &gGraphPointHighlightColor);
                     self->unk_0x23C += 1;
                 }
             }
@@ -76,7 +76,7 @@ ScoreDayLog match" (in-game trigger cadence not independently confirmed).
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `highlight` (+0x0B8) is setColor(1, &D_8008ABBC): the highlight is a colour overwrite. Zero bytes.
+points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `highlight` (+0x0B8) is setColor(1, &gGraphPointHighlightColor): the highlight is a colour overwrite. Zero bytes.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__TickHighlight` -> `GraphRoom__TickHighlight`
 

@@ -326,7 +326,7 @@ fail:
     return 0;
 }
 
-extern s32 D_8008ABBC;
+extern s32 gGraphPointHighlightColor;
 
 void GraphRoom__TickHighlight(GraphRoom *self) {
     if (self->scored != 0) {
@@ -334,7 +334,7 @@ void GraphRoom__TickHighlight(GraphRoom *self) {
             if (self->highlightCount < 4) {
                 if (((u32)self->frameCounter % 24) == 0) {
                     s8 idx = self->matchedDayIndices[self->highlightCount];
-                    self->points[idx]->methods->setColor(self->points[idx], 1, &D_8008ABBC);
+                    self->points[idx]->methods->setColor(self->points[idx], 1, &gGraphPointHighlightColor);
                     self->highlightCount += 1;
                 }
             }
