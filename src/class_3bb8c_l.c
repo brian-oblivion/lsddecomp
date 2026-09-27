@@ -55,12 +55,12 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
 
 /* The StageMap's chunkFileFn: a chunk's file record, by linear cell index,
  * or by x/y when the index is negative. The record is left as the return
- * value for the StageMap (GetGridRecordXY is declared void). */
+ * value for the StageMap (GetStageMapChunkRecordXY is declared void). */
 void ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
     if (cell >= 0) {
         GetStageMapChunkRecord(self->stage, cell);
     } else {
-        GetGridRecordXY(self->stage, x, y);
+        GetStageMapChunkRecordXY(self->stage, x, y);
     }
 }
 

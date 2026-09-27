@@ -13,7 +13,7 @@
  *    then the FILM .STR and IMG .TIM files): random-or-forced
  *    pickers (SeedAndRandom, SetPickOverrides/gForcedSoundBank/
  *    gForcedStageBgm), per-stage record-group accessors indexed by
- *    gStageFirstRecord and, for GetGridRecordXY, by StageGrid.h's cell
+ *    gStageFirstRecord and, for GetStageMapChunkRecordXY, by StageGrid.h's cell
  *    columns, and a family of "stream channel" lookups (GetIntroStreamName,
  *    PickWeeklyStreamChannel, GetStreamChannelInit, ResolveCinematicChannel,
  *    GetGraphRoomStreamChannel) whose shapes match their call sites in
@@ -258,7 +258,7 @@ Rec1C *GetStageMapChunkRecord(s32 index, s32 sub) {
     return &GetStageMapChunkRecords(index)[sub];
 }
 
-Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
+Rec1C *GetStageMapChunkRecordXY(s32 index, s32 x, s32 y) {
     return GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y);
 }
 

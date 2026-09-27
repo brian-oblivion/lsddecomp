@@ -18,7 +18,7 @@ void ObjM__GetGridRecord(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
     if (code >= 0) {
         GetStageMapChunkRecord(self->unk38, code);
     } else {
-        GetGridRecordXY(self->unk38, arg2, arg3);
+        GetStageMapChunkRecordXY(self->unk38, arg2, arg3);
     }
 }
 ```
@@ -45,7 +45,7 @@ void ObjM__GetGridRecord(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
   explicit -- `GetStageMapChunkRecord(self->unk38, code)` against a full prototype
   in `include/class_3bb8c.h` -- byte-identical, and it reads as what the
   dispatch means: a non-negative code is a linear cell index, a negative one
-  hands x/y to GetGridRecordXY.
+  hands x/y to GetStageMapChunkRecordXY.
 
 ### Proposed learning
 
@@ -86,12 +86,12 @@ body is a lookup leaf, and its one use is as the StageMap's chunkFileFn
 (ObjM__AttachTarget's setCallback; StageMap.h: ComputeChunkLoadEntry calls
 `chunkFileFn(ctx, value, 0, 0)` and keeps the result as the entry's file
 record). The name mirrors the two functions it forwards to,
-GetStageMapChunkRecord and GetGridRecordXY. "Registrant event" described nothing
+GetStageMapChunkRecord and GetStageMapChunkRecordXY. "Registrant event" described nothing
 the body does. Parameters: `code, arg2, arg3` -> `cell, x, y` (GetStageMapChunkRecord's
-`sub` is a linear cell index; GetGridRecordXY takes x, y). ObjM.h's
+`sub` is a linear cell index; GetStageMapChunkRecordXY takes x, y). ObjM.h's
 prototype follows.
 
-The body stays `void`: class_3bb8c.h declares GetGridRecordXY `void`
+The body stays `void`: class_3bb8c.h declares GetStageMapChunkRecordXY `void`
 although code_39094.c defines it returning `Rec1C *`, so the record is
 returned only because it is still in $v0. Proposed for the head: that
 prototype returns `Rec1C *` (or `void *`), after which this body can

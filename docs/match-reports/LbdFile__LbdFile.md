@@ -77,7 +77,7 @@ stage's map chunks, STGnn\Mnnn.LBD: StageMap__ApplyChunkLoads calls
 loadHeader (+0x078) with each rate entry's `ptr0`, which
 StageMap__ComputeChunkLoadEntry takes from the grid's callback, and that
 callback is ObjM__GetGridRecord (ObjM__AttachTarget installs it), whose
-tail call GetStageMapChunkRecord(stage, chunk) / GetGridRecordXY leaves
+tail call GetStageMapChunkRecord(stage, chunk) / GetStageMapChunkRecordXY leaves
 `&group[9 + chunk]` of gRecordTable in $v0. gRecordTable's 0x1C-byte records
 begin with a path, and record 9 of every stage group is its M000.LBD
 (stage 0: gStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
@@ -111,7 +111,7 @@ renamed):
  * 2. Free functions over gRecordTable, a table of 0x230+ fixed 0x1C-byte
  *    records (Rec1C): random-or-forced pickers (SeedAndRandom,
  *    SetPickOverrides/gForcedSoundBank/gForcedStageBgm), record-group
- *    accessors indexed by gStageFirstRecord and, for GetGridRecordXY, by
+ *    accessors indexed by gStageFirstRecord and, for GetStageMapChunkRecordXY, by
  *    StageGrid.h's cell columns, and a family of "stream channel" lookups
  *    (GetIntroStreamName, PickWeeklyStreamChannel, GetStreamChannelInit,
  *    ResolveCinematicChannel, GetGraphRoomStreamChannel) whose shapes match

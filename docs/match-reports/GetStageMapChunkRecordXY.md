@@ -1,4 +1,6 @@
-# GetGridRecordXY -- MATCHED (23/23 words)
+# GetStageMapChunkRecordXY -- MATCHED (23/23 words)
+
+> Renamed from `GetGridRecordXY` on 2026-09-27 (tools/rename.py). Address 0x80049098.
 
 > Renamed from `func_80049098` on 2026-09-25 (tools/rename.py). Address 0x80049098.
 
@@ -17,7 +19,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
+Rec1C *GetStageMapChunkRecordXY(s32 index, s32 x, s32 y) {
     return GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y);
 }
 ```
@@ -37,6 +39,6 @@ Rec1C *GetGridRecordXY(s32 index, s32 x, s32 y) {
 
 ## Naming
 
-- **Name:** `GetGridRecordXY`
+- **Name:** `GetStageMapChunkRecordXY`
 - **Tier:** B
 - **Evidence:** calls GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y) -- the strongest evidence in this family that the record group is addressed as a 2-D grid over StageGrid.h's own dimensions.
