@@ -107,7 +107,7 @@ void Viewport__SetProjection(Viewport *self, s32 h) {
     self->projH = h;
 }
 
-void Viewport__func_8003EA6C(void) {}
+void Viewport__NoOpSlot58(void) {}
 
 void Viewport__func_8003EA74(void) {}
 
