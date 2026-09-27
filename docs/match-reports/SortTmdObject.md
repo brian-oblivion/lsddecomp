@@ -499,7 +499,7 @@ position.
 
 ```c
 #if 0
-/* Globals this renderer publishes for SetupPrimCode and the code_8220_b
+/* Globals this renderer publishes for SetupPrimCode and the code_8220_c
  * submit wrappers to read back. D_8008E248 is already in code_8220.h; the
  * other four are this unit's own view and stay local per CLAUDE.md's
  * cross-unit-declaration rule. */
@@ -515,7 +515,7 @@ extern void StoreSxyPolyFT4(void *dst, s32 storeFirst3);
 extern void StoreSxyPolyGT4(void *dst, s32 storeFirst3);
 
 /*
- * The eight submit wrappers in code_8220_b, which are still INCLUDE_ASM there
+ * The eight submit wrappers in code_8220_c, which are still INCLUDE_ASM there
  * and declared `void`. That is provably a placeholder: every one of them is a
  * tail call whose last instruction before its epilogue is `jal RCpolyXX` with
  * no intervening store to $v0, so Sony's return value falls straight out --
@@ -1198,11 +1198,11 @@ values above, immediately before it) recurs identically at the top of
 every one of the 13 cases — this is the already-matched flag-byte packer
 this same unit closed earlier.
 
-### Secondary finding: the eight submit wrappers are NOT void — code_8220_b.c's stub is stale
+### Secondary finding: the eight submit wrappers are NOT void — code_8220_c.c's stub is stale
 
 `SubmitPolyF3`/`SubmitPolyG3`/`SubmitPolyFT3`/`SubmitPolyF4`/
 `SubmitPolyG4`/`SubmitPolyFT4`/`SubmitPolyGT3`/`SubmitPolyGT4` are all
-still `INCLUDE_ASM` in `src/code_8220_b.c`, and each one's own (unmatched,
+still `INCLUDE_ASM` in `src/code_8220_c.c`, and each one's own (unmatched,
 `#if 0`-preserved) C stub currently declares itself `void`. That is provably
 stale: every one of the eight falls straight from `jal RCpolyXX` into its
 own epilogue with **no intervening store to `$v0`** (checked
@@ -1213,7 +1213,7 @@ relies on exactly that value (`self = SubmitPolyF3(self, prim);`, advancing
 the packet-buffer write cursor every submit), so this file declares its own
 `void *`-returning prototypes for all eight per CLAUDE.md's cross-unit
 local-view exception, rather than importing the stale `void` ones. This is
-worth fixing in `code_8220_b.c` itself when those functions are next worked,
+worth fixing in `code_8220_c.c` itself when those functions are next worked,
 but it is out of scope for this round (that file is untouched by this
 session).
 
@@ -1317,7 +1317,7 @@ extern void StoreSxyPolyFT4(void *dst, s32 flag);
 extern void StoreSxyPolyGT4(void *dst, s32 flag);
 
 /*
- * These eight are still INCLUDE_ASM in code_8220_b.c, declared void there.
+ * These eight are still INCLUDE_ASM in code_8220_c.c, declared void there.
  * That is an unverified placeholder, not a fact about retail: each one's
  * own tail falls straight into its epilogue immediately after `jal
  * RCpolyXX`, with no intervening store to $v0 -- see SubmitPolyF3.s --
@@ -1956,7 +1956,7 @@ lines), and only then start reading the per-case bodies. This would have
 saved the time spent producing the (currently untrustworthy) 44/954 number
 above.
 
-**The "eight submit wrappers return `void`" prototype in `code_8220_b.c`
+**The "eight submit wrappers return `void`" prototype in `code_8220_c.c`
 is stale and should be corrected when those functions are next worked** —
 see the secondary finding above. Flagging here rather than editing that
 file, which is out of this round's scope.
@@ -1983,7 +1983,7 @@ Evidence the other way, which is why this is a question and not a verdict:
   Sony object" for the whole queue).
 - The splat layout puts this function inside a contiguous game run:
   `0x8220` `code_8220` (the BasicClass framework, unambiguously game code)
-  → `0x8A88` `code_8220_b` → `0x9F74` `code_8220_b` → `psyq_rcpolyf3`. The
+  → `0x8A88` `code_8220_b` → `0x9F74` `code_8220_c` → `psyq_rcpolyf3`. The
   renderer sits directly between the game's own class framework and Sony's
   RCpoly primitives, which is what a game-written `GsSortObject4`
   replacement calling Sony's packers would look like.
@@ -2088,7 +2088,7 @@ Byte-identical after every step; the three oracles green at each commit.
   `obj->coord2->super->workm` and the three columns of `obj->coord2->workm`.
 - Every scratchpad offset is a field of the unit-local `PolyDrawCtx`
   (`+0x88`/`+0x94` are `RVECTOR *` into the DIVPOLYGON3/4 tables, `+0xA4`
-  `SVECTOR *[4]`, `+0x78` the subdivide flag, agreeing with code_8220_b).
+  `SVECTOR *[4]`, `+0x78` the subdivide flag, agreeing with code_8220_c).
 - Each case names its packet (`TMD_P_F3` ... `TMD_P_TNG4`) through a per-case
   `PKT` macro, `(type *)(elem - offsetof(type, member))`, because `elem` has
   to stay parked on the member retail parks it on; list-relative colour reads
