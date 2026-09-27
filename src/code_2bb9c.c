@@ -113,7 +113,7 @@ void TimImage__NoOpSlot84(void) {}
 void TimImage__NoOpSlot88(void) {}
 
 /* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5CC(void) {}
+void TimImage__NoOpSlot8C(void) {}
 
 /* TimImage slot (tools/classtable.py); empty body. */
 void TimImage__func_8003B5D4(void) {}
