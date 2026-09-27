@@ -144,7 +144,7 @@ void DrawSystem__RunLoop(DrawSystem *self) {
         if (self->callback != NULL) {
             self->callback();
         }
-        self->methods->notifyParents(self, 2);
+        self->methods->notifyParents(self, DRAWSYSTEM_EVENT_VSYNC);
     }
 }
 

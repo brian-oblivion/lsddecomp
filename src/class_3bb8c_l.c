@@ -162,7 +162,7 @@ void ObjM__TeardownStyle(ObjM *self) {
 }
 
 void ObjM__OnTag1Notify(ObjM *self, void *sender, s32 event) {
-    if (event == 2) {
+    if (event == DRAWSYSTEM_EVENT_VSYNC) {
         ObjM__PollTimBlockLoad(self, self->timBlockSrc);
     }
 }

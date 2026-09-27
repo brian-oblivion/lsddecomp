@@ -686,7 +686,7 @@ struct DreamSysMethods {
     /* +0x0F0 */ s32 (*getSetFlashbackSession)(DreamSys *self, DreamColors *out,
                                                s32 value); /* DreamSys__GetSetFlashbackSession: value < 0 writes the day's colour to *out */
     /* +0x0F4 */ void (*setMoveOverride)(DreamSys *self, s32 value); /* DreamSys__SetMoveOverride */
-    /* +0x0F8 */ void (*resetLinkState)(DreamSys *self, s32 arg1, s32 arg2); /* DreamSys__ResetLinkState */
+    /* +0x0F8 */ void (*resetLinkState)(DreamSys *self, s32 moveMode, s32 tickPeriod); /* DreamSys__ResetLinkState */
     /* +0x0FC */ void (*blockMovement)(DreamSys *self); /* DreamSys__BlockMovement: movementBlocked = 1 */
     /* +0x100 */ s32 (*getLinkCommandFlag)(DreamSys *self); /* DreamSys__GetLinkCommandFlag */
     /* +0x104 */ s32 (*getSetDreamTimeLimit)(DreamSys *self, s32 time); /* DreamSys__GetSetDreamTimeLimit */
@@ -1095,7 +1095,7 @@ void DreamSys__DispatchInstanceEffect(DreamSys *this, void *arg1, s32 arg2);
 void DreamSys__NoOpSlotE8Default(void);
 s32 DreamSys__GetSetFlashbackSession(DreamSys *this, DreamColors *out, s32 value);
 void DreamSys__SetMoveOverride(DreamSys *this, s32 value);
-void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2);
+void DreamSys__ResetLinkState(DreamSys *this, s32 moveMode, s32 tickPeriod);
 void DreamSys__BlockMovement(DreamSys *this);
 s32 DreamSys__GetLinkCommandFlag(DreamSys *this);
 s32 DreamSys__GetDreamTimerScaled(DreamSys *this);
