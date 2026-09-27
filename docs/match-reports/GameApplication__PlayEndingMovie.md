@@ -75,7 +75,7 @@ which library helper derives the type code and whether extra slots
 **`GameApplication__PlayEndingMovie` -- tier B.** Mechanics: gated by
 `arg->unk08` (same gate as `GameApplication__PlayOpeningMovie`), builds a
 `StreamTask`, runs its `slot12C` (a step none of the other three
-StreamTask-launcher siblings besides `GameApplication__StartCinematicStream`
+StreamTask-launcher siblings besides `GameApplication__PlayCinematic`
 perform), derives a type code via `GetEndingMovie`, looks it up, configures
 and starts the task. "WithInit" names the one mechanical difference from
 its closest sibling `GameApplication__PlayOpeningMovie` (the extra
@@ -84,4 +84,4 @@ stronger, purpose-based name is supported yet.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__StartCinematicStream for the bytes that settled the return type). Byte-identical.
+GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.

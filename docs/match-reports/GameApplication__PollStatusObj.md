@@ -85,7 +85,7 @@ without reaching it. The fix came from re-reading four instructions of retail.
 New_X shape, 0x50 bytes), dispatches `slot44(obj)` (return kept) then
 `slot4(obj)` (return discarded -- via the same "delay slot after `jalr`
 captures the *preceding* call's return" idiom `GameApplication__RunPollTask` uses), and
-switches on that status: `2` runs `GameApplication__StartCinematicStream`, `3` latches
+switches on that status: `2` runs `GameApplication__PlayCinematic`, `3` latches
 `self->unk24`. Then queries the `DreamSys` status slot again
 (`DreamSys__GetCurrentDayAndYear`, the same slot `GameApplication__PollGraphRoomStatus` uses) with an out-parameter
 this time, and derives a 0/1 result from both the call's return and the
@@ -108,7 +108,7 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
 
     switch (status) {
     case 2:
-        GameApplication__StartCinematicStream(self);
+        GameApplication__PlayCinematic(self);
         break;
     case 3:
         self->unk24 = 3;
@@ -126,7 +126,7 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
 ```
 
 This needs `GameApplication.h`'s `StatusObj`/`StatusObjMethods` (already
-committed) and the `GameApplication__StartCinematicStream` forward declaration (already committed).
+committed) and the `GameApplication__PlayCinematic` forward declaration (already committed).
 
 ## Derivation and the levers that got this from 1/57 to 53/57
 
@@ -247,7 +247,7 @@ switched on," and only the former gets the free reuse.
 
 **`GameApplication__PollStatusObj` -- tier B.** Mechanics: builds a `StatusObj`
 (`New_DayTask`), reads one status code off it (`slot44`), tears it down
-(`slot4`), reacts to two of the codes (2 -> `GameApplication__StartCinematicStream`,
+(`slot4`), reacts to two of the codes (2 -> `GameApplication__PlayCinematic`,
 3 -> latch `self->unk24`), then separately queries the owned `DreamSys`'s
 day/year status and derives a 0/1 result. Named for the StatusObj query
 mechanic, matching this unit's `GameApplication__PollGraphRoomStatus` naming

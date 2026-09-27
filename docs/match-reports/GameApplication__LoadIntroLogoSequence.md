@@ -132,4 +132,4 @@ inference from the filenames but not confirmed by any code in this unit).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__StartCinematicStream for the bytes that settled the return type). Byte-identical.
+GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.

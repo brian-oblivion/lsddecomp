@@ -96,7 +96,7 @@ s32 GameApplication__PollGraphRoomStatus(GameApplication *self);
 void GameApplication__PlaySpecialDayMovies(GameApplication *self);
 void GameApplication__NoOpSlot5C(void);
 s32 GameApplication__PollStatusObj(GameApplication *self);
-void GameApplication__StartCinematicStream(GameApplication *self);
+void GameApplication__PlayCinematic(GameApplication *self);
 void GameApplication__PlayEndingMovie(GameApplication *self);
 
 #endif

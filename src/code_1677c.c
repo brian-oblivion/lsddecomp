@@ -31,7 +31,7 @@ extern void SetDataDirectory(char *dir);    /* code_171e0.c */
 extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
                                                        the last value its internal dispatch loop got --
                                                        GameApplication__LoadIntroLogoSequence/GameApplication__PlayOpeningMovie discard it, but
-                                                       GameApplication__StartCinematicStream keeps it */
+                                                       GameApplication__PlayCinematic keeps it */
 extern const char *GetAsmkMovie(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkMoviePath */
 extern s32 GetMovieFrameCount(s32 index); /* psyq_memset.s: signed-halfword lookup into gMovieFrameCounts[index] */
 extern s32 PickOpeningMovie(s32 *out, s32 param2); /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
@@ -77,7 +77,7 @@ extern s32 GetSpecialDayOrEventRecord(s32 *out, s32 packedBankEntry); /* psyq_me
     to *out (-1 if unresolved); the packing must zero-extend both halves before combining
     (retail loads them with lhu, not lh) since the result is bitwise-composed, not a value read
     back as a signed 32-bit number. Also returns its own (separate) s32 value, kept by
-    GameApplication__StartCinematicStream. */
+    GameApplication__PlayCinematic. */
 
 /* The `New_X` allocator for the class whose method table is gGameApplicationMethods:
  * allocates a 0x2C-byte instance and, on success, runs the class's own
@@ -292,7 +292,7 @@ void GameApplication__NoOpSlot5C(void) {}
 
 /* Builds a DayTask (include/DayTask.h), runs its init with self
  * alone (DayTask__Init takes nothing else, hence DayTaskInitFn) and
- * releases it; init's return, TimedTask::result, is a status code: 2 runs GameApplication__StartCinematicStream, 3 latches self->skipGraphRoomPoll.
+ * releases it; init's return, TimedTask::result, is a status code: 2 runs GameApplication__PlayCinematic, 3 latches self->skipGraphRoomPoll.
  * Then queries the DreamSys status slot again (as GameApplication__PollGraphRoomStatus does),
  * this time passing an out-param, and derives a 0/1 result from both the
  * call's return and the out-param. */
@@ -329,7 +329,7 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
 
     switch (status) {
         case DAYTASK_RESULT_CINEMATIC:
-            GameApplication__StartCinematicStream(self);
+            GameApplication__PlayCinematic(self);
             break;
         case DAYTASK_RESULT_CLOSED:
             self->skipGraphRoomPoll = 1;
@@ -349,7 +349,7 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
  * "no cinematic" path; otherwise, if self->config->playStreams gates it, starts a
  * StreamTask on the resolved channel. Either branch finishes by starting
  * whichever task it built; if neither branch runs, nothing happens. */
-void GameApplication__StartCinematicStream(GameApplication *self) {
+void GameApplication__PlayCinematic(GameApplication *self) {
     CinematicCall cc;
 
     struct {

@@ -1,4 +1,6 @@
-# GameApplication__StartCinematicStream
+# GameApplication__PlayCinematic
+
+> Renamed from `GameApplication__StartCinematicStream` on 2026-09-27 (tools/rename.py). Address 0x8002677c.
 
 > Renamed from `Class6D3C8__StartCinematicStream` on 2026-09-26 (tools/rename.py). Address 0x8002677c.
 
@@ -21,7 +23,7 @@ resolved but the gate was off, nothing else happens.
 ## Final C
 
 ```c
-void GameApplication__StartCinematicStream(GameApplication *self) {
+void GameApplication__PlayCinematic(GameApplication *self) {
     CinematicCall cc;
     struct {
         s32 chan;
@@ -136,7 +138,7 @@ second call's own delay slot opportunistically claims it.
 
 ## Naming
 
-**`GameApplication__StartCinematicStream` -- tier B.** Mechanics: reads the owned
+**`GameApplication__PlayCinematic` -- tier B.** Mechanics: reads the owned
 `DreamSys`'s current cinematic slot (`vt->GetCinematic`, an already-named
 vtable accessor), resolves it to a channel index; if resolution fails (-1),
 starts a `LoaderTask` on a fixed "no cinematic" fallback path; otherwise, if
