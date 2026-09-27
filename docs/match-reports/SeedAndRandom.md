@@ -30,7 +30,7 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
 - GetRecordTable (already matched) returns gRecordTable and writes 0x230 to
   `*out`; every `+0x70`/`+0xFC`/`+0x3D40`/`+0x3E04`/`+0x3E20` offset in this
   unit is a whole number of 0x1C-byte records into that table, so the unit
-  types the table as `Rec1C` (size only). The record's fields are unknown.
+  types the table as `FilePathRecord` (size only). The record's fields are unknown.
 - Callers in other units still declare their own prototypes (`s32` returns in
   class_39e08.h / class_3bb8c.h); those are independent declarations and were
   not touched.

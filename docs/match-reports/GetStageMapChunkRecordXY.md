@@ -16,10 +16,10 @@ Grid-cell record: `GetStageMapChunkRecord(index, x + GetStageGridDimensions(inde
 ## Source
 
 Declarations it needs are the local views at the top of `src/code_39094.c`
-(`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
+(`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetStageMapChunkRecordXY(s32 index, s32 x, s32 y) {
+FilePathRecord *GetStageMapChunkRecordXY(s32 index, s32 x, s32 y) {
     return GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y);
 }
 ```

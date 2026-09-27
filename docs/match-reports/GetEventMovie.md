@@ -16,12 +16,12 @@ Record accessor: calls GetEventMovieRecords(&count) (writes 8, returns record 0x
 ## Source
 
 Declarations it needs are the local views at the top of `src/code_39094.c`
-(`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
+(`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetEventMovie(s32 *countOut, s32 sub) {
+FilePathRecord *GetEventMovie(s32 *countOut, s32 sub) {
     s32 count;
-    Rec1C *rec = GetEventMovieRecords(&count);
+    FilePathRecord *rec = GetEventMovieRecords(&count);
     if (countOut != NULL) {
         *countOut = sub + count;
     }

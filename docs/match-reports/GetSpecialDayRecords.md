@@ -16,11 +16,11 @@ Record accessor: base is record 0x23E (byte +0x3EC8) of GetRecordTable's table, 
 ## Source
 
 Declarations it needs are the local views at the top of `src/code_39094.c`
-(`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
+(`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetSpecialDayRecords(s32 *countOut, s32 n) {
-    Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[0x23E];
+FilePathRecord *GetSpecialDayRecords(s32 *countOut, s32 n) {
+    FilePathRecord *rec = &((FilePathRecord *)GetRecordTable(NULL))[0x23E];
     if (countOut != NULL) {
         *countOut = n * 2 + 0xE;
     }

@@ -16,11 +16,11 @@ Record lookup: `gStageFirstRecord` is an s16 table of record indices; returns `&
 ## Source
 
 Declarations it needs are the local views at the top of `src/code_39094.c`
-(`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
+(`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetStageRecords(s32 index) {
-    return &((Rec1C *)GetRecordTable(NULL))[gStageFirstRecord[index]];
+FilePathRecord *GetStageRecords(s32 index) {
+    return &((FilePathRecord *)GetRecordTable(NULL))[gStageFirstRecord[index]];
 }
 ```
 

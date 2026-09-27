@@ -18,7 +18,7 @@ gLbdFileMethods method: calls its own `freeBuffer` (slot +0x05C, FileResource in
 ## Source
 
 Declarations it needs are the local views at the top of `src/code_39094.c`
-(`DataSrc39094`, `DataSrc39094Methods`, `Rec1C`) and `include/FileResource.h`.
+(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
 void LbdFile__ReleaseHeader(DataSrc39094 *self) {

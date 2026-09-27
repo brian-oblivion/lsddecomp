@@ -17,9 +17,9 @@ override is set, else `&rec[r]`.
 ## Source
 
 ```c
-Rec1C *PickStageBgm(s32 index, s32 arg1) {
+FilePathRecord *PickStageBgm(s32 index, s32 arg1) {
     u32 r = (u32)SeedAndRandom(0, arg1) % 5;  /* arg1 only forwarded, like PickStageTexture's */
-    Rec1C *rec;
+    FilePathRecord *rec;
     if (index == 9) {
         if (r == 2) {
             r = 3;

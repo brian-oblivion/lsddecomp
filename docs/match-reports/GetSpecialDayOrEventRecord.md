@@ -18,7 +18,7 @@ Non-negative `group`: `rec = GetSpecialDayRecords(&count, group)`, writes
 
 ## Source
 
-Declarations: `Rec1C` at the top of `src/code_39094.c`, plus:
+Declarations: `FilePathRecord` at the top of `src/code_39094.c`, plus:
 
 ```c
 typedef struct RecPick {
@@ -26,9 +26,9 @@ typedef struct RecPick {
     s16 sub;
 } RecPick;
 
-Rec1C *GetSpecialDayOrEventRecord(s32 *countOut, RecPick pick) {
+FilePathRecord *GetSpecialDayOrEventRecord(s32 *countOut, RecPick pick) {
     s32 count;
-    Rec1C *rec;
+    FilePathRecord *rec;
     if (pick.group >= 0) {
         rec = GetSpecialDayRecords(&count, pick.group);
         if (countOut != NULL) {

@@ -18,7 +18,7 @@ Allocator for the gLbdFileMethods object: BMemPMgrAlloc(0x3C), and when non-NULL
 ## Source
 
 Declarations it needs are the local views at the top of `src/code_39094.c`
-(`DataSrc39094`, `DataSrc39094Methods`, `Rec1C`) and `include/FileResource.h`.
+(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
 /* allocator: new gLbdFileMethods object */

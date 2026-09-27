@@ -16,12 +16,12 @@ Record accessor: calls GetEndingMovieRecord(&count) (which writes 7 and returns 
 ## Source
 
 Declarations it needs are the local views at the top of `src/code_39094.c`
-(`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
+(`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetEndingMovie(s32 *countOut) {
+FilePathRecord *GetEndingMovie(s32 *countOut) {
     s32 count;
-    Rec1C *rec = GetEndingMovieRecord(&count);
+    FilePathRecord *rec = GetEndingMovieRecord(&count);
     if (countOut != NULL) {
         *countOut = count;
     }

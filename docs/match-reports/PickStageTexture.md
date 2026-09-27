@@ -16,7 +16,7 @@ days of a 40-day cycle) at random from the group `GetStageTextureRecords(index)`
 ## Source
 
 ```c
-Rec1C *PickStageTexture(s32 index, s32 arg1, s32 day) {
+FilePathRecord *PickStageTexture(s32 index, s32 arg1, s32 day) {
     s32 n = ((day - 1) % 40) / 10 + 1;
     s32 r = SeedAndRandom(0, arg1) % n;
     return &GetStageTextureRecords(index)[r];

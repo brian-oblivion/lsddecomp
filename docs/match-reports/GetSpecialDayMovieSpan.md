@@ -15,14 +15,14 @@ a 10-unit gap between entries), returns `rec`.
 
 ## Source
 
-Declarations: `Rec1C` and `extern s16 gMovieFrameCounts[];` in `src/code_39094.c`.
+Declarations: `FilePathRecord` and `extern s16 gMovieFrameCounts[];` in `src/code_39094.c`.
 
 ```c
-Rec1C *GetSpecialDayMovieSpan(s32 *total, s32 n, s32 len) {
+FilePathRecord *GetSpecialDayMovieSpan(s32 *total, s32 n, s32 len) {
     s32 count;
     s32 i;
     s32 start;
-    Rec1C *rec = GetSpecialDayRecords(&count, n);
+    FilePathRecord *rec = GetSpecialDayRecords(&count, n);
     len *= 2;
     *total = 0;
     start = count;

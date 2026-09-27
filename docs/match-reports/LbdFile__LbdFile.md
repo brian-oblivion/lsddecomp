@@ -18,7 +18,7 @@ Slot +0x008 (ctor) of gLbdFileMethods: runs the active data source's ctor on sel
 ## Source
 
 Declarations it needs are the local views at the top of `src/code_39094.c`
-(`DataSrc39094`, `DataSrc39094Methods`, `Rec1C`) and `include/FileResource.h`.
+(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
 /* slot +0x008 of gLbdFileMethods (ctor) */
@@ -109,7 +109,7 @@ renamed):
  *    dataBuffer), started automatically unless LbdFile__SetAutoLoadData
  *    turned that off.
  * 2. Free functions over gRecordTable, a table of 0x230+ fixed 0x1C-byte
- *    records (Rec1C): random-or-forced pickers (SeedAndRandom,
+ *    records (FilePathRecord): random-or-forced pickers (SeedAndRandom,
  *    SetPickOverrides/gForcedSoundBank/gForcedStageBgm), record-group
  *    accessors indexed by gStageFirstRecord and, for GetStageMapChunkRecordXY, by
  *    StageGrid.h's cell columns, and a family of "stream channel" lookups

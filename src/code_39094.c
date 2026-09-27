@@ -6,7 +6,7 @@
  * LbdFile__SetAutoLoadData and GetLbdFileMethods, the loader for one stage
  * map chunk, STGnn\Mnnn.LBD.
  *
- * gRecordTable is an array of 0x1C-byte records (Rec1C), each a file path
+ * gRecordTable is an array of 0x1C-byte records (FilePathRecord), each a file path
  * padded with zeros; class_39e08.c's RegisterRecordTableFiles hands them to
  * the CD driver. In order:
  *  - the seven sound banks' SND\name.VH/VB pairs and SND\SE.VH/VB;
@@ -76,9 +76,9 @@ enum MovieId {
 #define MOVIE_SPAN_GAP_FRAMES 10
 
 /* One gRecordTable record: a file path, zero-padded to 0x1C bytes. */
-typedef struct Rec1C {
+typedef struct FilePathRecord {
     u8 data[0x1C];
-} Rec1C;
+} FilePathRecord;
 
 extern int rand(void);
 extern void srand(unsigned int seed);
@@ -273,31 +273,31 @@ char *GetSoundEffectDir(void) {
     return *GetSoundEffectDirRef();
 }
 
-Rec1C *GetStageRecords(s32 stage) {
-    return &((Rec1C *)GetRecordTable(NULL))[gStageFirstRecord[stage]];
+FilePathRecord *GetStageRecords(s32 stage) {
+    return &((FilePathRecord *)GetRecordTable(NULL))[gStageFirstRecord[stage]];
 }
 
-Rec1C *GetStageTextureRecords(s32 stage) {
+FilePathRecord *GetStageTextureRecords(s32 stage) {
     return GetStageRecords(stage);
 }
 
 /* A random texture record among the first one to four of the stage's,
  * one more every DAYS_PER_TEXTURE days. */
-Rec1C *PickStageTexture(s32 stage, s32 unused, s32 day) {
+FilePathRecord *PickStageTexture(s32 stage, s32 unused, s32 day) {
     s32 textureCount = ((day - 1) % (STAGE_TEXTURE_COUNT * DAYS_PER_TEXTURE)) / DAYS_PER_TEXTURE + 1;
     s32 r = SeedAndRandom(0, unused) % textureCount;
     return &GetStageTextureRecords(stage)[r];
 }
 
-Rec1C *GetStageBgmRecords(s32 stage) {
+FilePathRecord *GetStageBgmRecords(s32 stage) {
     return &GetStageRecords(stage)[STAGE_RECORD_BGM];
 }
 
 /* A random or forced BGM record. Stage 9 never plays BGC.SEQ: a random
  * pick of it (2) becomes BGD, and a forced 3 becomes 4. */
-Rec1C *PickStageBgm(s32 stage, s32 unused) {
+FilePathRecord *PickStageBgm(s32 stage, s32 unused) {
     u32 r = (u32)SeedAndRandom(0, unused) % STAGE_BGM_COUNT;
-    Rec1C *rec;
+    FilePathRecord *rec;
     if (stage == 9) {
         if (r == 2) {
             r = 3;
@@ -310,16 +310,16 @@ Rec1C *PickStageBgm(s32 stage, s32 unused) {
     return &rec[gForcedStageBgm != 0 ? gForcedStageBgm - 1 : r];
 }
 
-Rec1C *GetStageMapChunkRecords(s32 stage) {
+FilePathRecord *GetStageMapChunkRecords(s32 stage) {
     return &GetStageRecords(stage)[STAGE_RECORD_MAP_CHUNKS];
 }
 
-Rec1C *GetStageMapChunkRecord(s32 stage, s32 chunk) {
+FilePathRecord *GetStageMapChunkRecord(s32 stage, s32 chunk) {
     return &GetStageMapChunkRecords(stage)[chunk];
 }
 
 /* The chunk at column x, row y of the stage's grid. */
-Rec1C *GetStageMapChunkRecordXY(s32 stage, s32 x, s32 y) {
+FilePathRecord *GetStageMapChunkRecordXY(s32 stage, s32 x, s32 y) {
     return GetStageMapChunkRecord(stage, x + GetStageGridDimensions(stage)->columns * y);
 }
 
@@ -330,57 +330,57 @@ const char *GetAsmkMovie(s32 *movieIdOut) {
     return sAsmkMoviePath;
 }
 
-Rec1C *GetOpeningMovieRecords(s32 *movieIdOut) {
+FilePathRecord *GetOpeningMovieRecords(s32 *movieIdOut) {
     if (movieIdOut != NULL) {
         *movieIdOut = MOVIE_OPENING_FIRST;
     }
-    return &((Rec1C *)GetRecordTable(NULL))[RECORD_OPENING_MOVIES];
+    return &((FilePathRecord *)GetRecordTable(NULL))[RECORD_OPENING_MOVIES];
 }
 
-Rec1C *PickOpeningMovie(s32 *movieIdOut, s32 unused) {
+FilePathRecord *PickOpeningMovie(s32 *movieIdOut, s32 unused) {
     u32 r = (u32)SeedAndRandom(0, unused) % OPENING_MOVIE_COUNT;
     s32 firstMovieId;
-    Rec1C *rec = GetOpeningMovieRecords(&firstMovieId);
+    FilePathRecord *rec = GetOpeningMovieRecords(&firstMovieId);
     if (movieIdOut != NULL) {
         *movieIdOut = r + firstMovieId;
     }
     return &rec[r];
 }
 
-Rec1C *GetEndingMovieRecord(s32 *movieIdOut) {
+FilePathRecord *GetEndingMovieRecord(s32 *movieIdOut) {
     if (movieIdOut != NULL) {
         *movieIdOut = MOVIE_ENDING;
     }
-    return &((Rec1C *)GetRecordTable(NULL))[RECORD_ENDING_MOVIE];
+    return &((FilePathRecord *)GetRecordTable(NULL))[RECORD_ENDING_MOVIE];
 }
 
-Rec1C *GetEndingMovie(s32 *movieIdOut) {
+FilePathRecord *GetEndingMovie(s32 *movieIdOut) {
     s32 movieId;
-    Rec1C *rec = GetEndingMovieRecord(&movieId);
+    FilePathRecord *rec = GetEndingMovieRecord(&movieId);
     if (movieIdOut != NULL) {
         *movieIdOut = movieId;
     }
     return rec;
 }
 
-Rec1C *GetEventMovieRecords(s32 *movieIdOut) {
+FilePathRecord *GetEventMovieRecords(s32 *movieIdOut) {
     if (movieIdOut != NULL) {
         *movieIdOut = MOVIE_EVENT_FIRST;
     }
-    return &((Rec1C *)GetRecordTable(NULL))[RECORD_EVENT_MOVIES];
+    return &((FilePathRecord *)GetRecordTable(NULL))[RECORD_EVENT_MOVIES];
 }
 
-Rec1C *GetEventMovie(s32 *movieIdOut, s32 event) {
+FilePathRecord *GetEventMovie(s32 *movieIdOut, s32 event) {
     s32 firstMovieId;
-    Rec1C *rec = GetEventMovieRecords(&firstMovieId);
+    FilePathRecord *rec = GetEventMovieRecords(&firstMovieId);
     if (movieIdOut != NULL) {
         *movieIdOut = event + firstMovieId;
     }
     return &rec[event];
 }
 
-Rec1C *GetSpecialDayRecords(s32 *movieIdOut, s32 day) {
-    Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[RECORD_SPECIAL_DAYS];
+FilePathRecord *GetSpecialDayRecords(s32 *movieIdOut, s32 day) {
+    FilePathRecord *rec = &((FilePathRecord *)GetRecordTable(NULL))[RECORD_SPECIAL_DAYS];
     if (movieIdOut != NULL) {
         *movieIdOut = day * SPECIAL_DAY_MOVIE_COUNT + MOVIE_SPECIAL_DAY_FIRST;
     }
@@ -396,9 +396,9 @@ typedef struct RecPick {
 
 /* A special day's record or an event movie; *movieIdOut is -1 for a
  * special day's TIM images. */
-Rec1C *GetSpecialDayOrEventRecord(s32 *movieIdOut, RecPick pick) {
+FilePathRecord *GetSpecialDayOrEventRecord(s32 *movieIdOut, RecPick pick) {
     s32 firstMovieId;
-    Rec1C *rec;
+    FilePathRecord *rec;
     if (pick.group >= 0) {
         rec = GetSpecialDayRecords(&firstMovieId, pick.group);
         if (movieIdOut != NULL) {
@@ -416,11 +416,11 @@ s32 GetMovieFrameCount(s32 movieId) {
 /* The first movie of special day `day`; *frameTotal is the frame count of
  * the movies of dayCount special days from it, MOVIE_SPAN_GAP_FRAMES
  * between each. */
-Rec1C *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount) {
+FilePathRecord *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount) {
     s32 firstMovieId;
     s32 movieId;
     s32 start;
-    Rec1C *rec = GetSpecialDayRecords(&firstMovieId, day);
+    FilePathRecord *rec = GetSpecialDayRecords(&firstMovieId, day);
     dayCount *= SPECIAL_DAY_MOVIE_COUNT; /* MATCHING: one variable; becomes the end movie id */
     *frameTotal = 0;
     start = firstMovieId;

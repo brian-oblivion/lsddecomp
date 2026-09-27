@@ -16,13 +16,13 @@ Random pick within the record block at 0x230: `r = (u32)SeedAndRandom(0, ?) % 7`
 
 ## Source
 
-Declarations: the local views at the top of `src/code_39094.c` (`Rec1C`).
+Declarations: the local views at the top of `src/code_39094.c` (`FilePathRecord`).
 
 ```c
-Rec1C *PickOpeningMovie(s32 *countOut, s32 arg1) {
+FilePathRecord *PickOpeningMovie(s32 *countOut, s32 arg1) {
     u32 r = (u32)SeedAndRandom(0, arg1) % 7;  /* arg1 only forwarded, like PickStageTexture's */
     s32 count;
-    Rec1C *rec = GetOpeningMovieRecords(&count);
+    FilePathRecord *rec = GetOpeningMovieRecords(&count);
     if (countOut != NULL) {
         *countOut = r + count;
     }
