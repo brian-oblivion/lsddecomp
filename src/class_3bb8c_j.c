@@ -159,9 +159,9 @@ void ItemList__ItemList(ItemList *self, char **items, s32 mode) {
     }
 
     self->itemCount = i;
-    self->texts = BMemPMgrAlloc(i * sizeof(char *));
+    self->texts = BMemPMgrAlloc(i * sizeof(*self->texts));
     item = items;
-    self->textLens = BMemPMgrAlloc(self->itemCount * sizeof(s32));
+    self->textLens = BMemPMgrAlloc(self->itemCount * sizeof(*self->textLens));
     self->maxTextLen = 0;
 
     for (i = 0; i < self->itemCount; i++) {
@@ -255,6 +255,9 @@ void ItemList__ResetView(ItemList *self) {
     self->cursorIndex = 0;
 }
 
+/* loadResources' path buffer, BuildFileName's dest: "CARD\\" + name + ".TIM". */
+#define CARD_TIM_PATH_SIZE 32
+
 extern char *BuildFileName(char *dest, const char *name, const char *dir, const char *ext);
 extern const char sStrSelect[];              /* "SELECT" */
 extern const char sItemListCardPathPrefix[]; /* "CARD\\" */
@@ -270,7 +273,7 @@ extern const char sItemListStrFontIcon[]; /* "FONTICON" */
  * $s0-$s2). Same shape as class_3bb8c_i's TextEntry__LoadCardResources.
  */
 void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
-    char path[32];
+    char path[CARD_TIM_PATH_SIZE];
     const char *dir;
     const char *ext;
     TimImage *handle1;
