@@ -92,7 +92,7 @@ enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
 
 /* `initData` is a DrawRect (include/DrawSystem.h): the ctor's optional fifth
  * (stack) argument, else GetDefaultStreamTaskInitData()'s
- * &gDefaultStreamTaskInitData, {x 640, y 0, w 320, h 240}, the same rect the
+ * &gDefaultMovieFrame, {x 640, y 0, w 320, h 240}, the same rect the
  * ctor hands New_MoviePlayer as the player's frame and TaskCore__OnInit
  * clears. Copied whole (retail loads all three words before storing any: a
  * struct assignment); no method of this class reads it back. */

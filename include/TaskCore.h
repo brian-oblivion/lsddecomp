@@ -210,7 +210,7 @@ struct TaskCoreTarget {
     /* +0x068 */ BasicClass *listView;  /* New_BoxFill: the frame around the scrolled list */    \
     /* +0x06C */ u8 pad06C[4];                                                                     \
     /* +0x070 */ const char *subHandlePath; /* setSubHandle's path; nonzero: the handle is owned */ \
-    /* +0x074 */ BasicClass *subHandle; /* New_TimImage(subHandlePath), or the caller's; NULL: onInit also passes baseColor with gDefaultStreamTaskInitData */ \
+    /* +0x074 */ BasicClass *subHandle; /* New_TimImage(subHandlePath), or the caller's; NULL: onInit also passes baseColor with gDefaultMovieFrame */ \
     /* +0x078 */ struct BgLayer *bgLayer; /* New_BgLayer(tileMap, 1); include/BgLayer.h (tag only here) */ \
     /* +0x07C */ struct TileMap *tileMap; /* New_TileMap(0, tileAtlas); include/TileMap.h (tag only here) */ \
     /* +0x080 */ struct TileAtlas *tileAtlas; /* New_TileAtlas(0); include/TileAtlas.h (tag only here) */ \

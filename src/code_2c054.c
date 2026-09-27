@@ -268,7 +268,7 @@ void TaskCore__OnInit(TaskCore *self) {
     if (self->subHandle == NULL) {
         ((DrawSystem *)self->initArgs->drawSystem)
             ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor,
-                                  &gDefaultStreamTaskInitData);
+                                  &gDefaultMovieFrame);
     }
     ((DrawSystem *)self->initArgs->drawSystem)
         ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor, NULL);

@@ -15,7 +15,7 @@
  * include/TaskCore.h.
  */
 
-/* Defined in code_2cc8c_c.c: &gDefaultStreamTaskInitData. */
+/* Defined in code_2cc8c_c.c: &gDefaultMovieFrame. */
 extern DrawRect *GetDefaultStreamTaskInitData(void);
 
 /* resetCounters' colours for setColors, three RGB triples back to back:
@@ -26,7 +26,7 @@ extern u8 sTaskCoreDefaultColors[3][3];
  * it to baseColor when the task has no sub handle. The same three words are
  * StreamTask's default initData and its MoviePlayer's frame, through
  * GetDefaultStreamTaskInitData. */
-extern DrawRect gDefaultStreamTaskInitData;
+extern DrawRect gDefaultMovieFrame;
 
 /* {0, 0, 0}: TaskCore__OnInit attaches the view with it as both the
  * viewpoint and the reference point. */

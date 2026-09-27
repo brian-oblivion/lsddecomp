@@ -38,10 +38,10 @@ TaskCoreMethods *Get_vtable_TaskCore(void) {
 
 /* The default movie frame, {640, 0, 320, 240}: StreamTask's default initData
  * and the rect TaskCore__OnInit clears (code_2c054.h). */
-extern DrawRect gDefaultStreamTaskInitData;
+extern DrawRect gDefaultMovieFrame;
 
 DrawRect *GetDefaultStreamTaskInitData(void) {
-    return &gDefaultStreamTaskInitData;
+    return &gDefaultMovieFrame;
 }
 
 void IntermediateBase__IntermediateBase(IntermediateBase *self) {
