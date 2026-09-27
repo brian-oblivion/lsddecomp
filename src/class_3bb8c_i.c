@@ -22,6 +22,8 @@
 #include "TextRow.h"
 #include "TimImage.h"
 #include "VabStreamObj.h"
+#include "Pad.h"
+#include "FrameClock.h"
 
 /* This project's own strcpy (matched elsewhere) -- TextEntry__SetText's own
  * caller, same local-declaration convention as class_3bb8c_e.c/others. */
@@ -39,7 +41,7 @@ extern char *DecodeFullWidthSjis(char *dest, char *src);
 TextEntry *New_TextEntry(char *text, s32 mode) {
     TextEntry *self;
 
-    self = BMemPMgrAlloc(0x4C);
+    self = BMemPMgrAlloc(sizeof(TextEntry));
     if (self != NULL) {
         GetTextEntryMethods()->ctor(self, text, mode);
         return self;
@@ -96,9 +98,9 @@ void TextEntry__AddChild(TextEntry *self, void *child) {
     if (child != NULL) {
         Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)child);
         kind = ((BasicClass *)child)->methods->header & 0xF;
-        if (kind == 2) {
+        if (kind == PAD_CLASS_ID) {
             self->inputSource = child;
-        } else if (kind == 5) {
+        } else if (kind == FRAMECLOCK_CLASS_ID) {
             self->tickSource = child;
         }
     }
@@ -109,9 +111,9 @@ void TextEntry__RemoveChild(TextEntry *self, void *child) {
 
     if (child != NULL) {
         kind = ((BasicClass *)child)->methods->header & 0xF;
-        if (kind == 2) {
+        if (kind == PAD_CLASS_ID) {
             self->inputSource = NULL;
-        } else if (kind == 5) {
+        } else if (kind == FRAMECLOCK_CLASS_ID) {
             self->tickSource = NULL;
         }
         Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)child);
@@ -131,9 +133,9 @@ void TextEntry__OnNotify(TextEntry *self, void *sender, s32 event) {
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
 
     kind = ((BasicClass *)sender)->methods->header & 0xF;
-    if (kind == 2) {
+    if (kind == PAD_CLASS_ID) {
         self->methods->handleCommand(self, sender, event);
-    } else if (kind == 5) {
+    } else if (kind == FRAMECLOCK_CLASS_ID) {
         self->methods->tickState(self, sender, event);
     }
 }
@@ -143,7 +145,7 @@ void TextEntry__SetText(TextEntry *self, char *text, s32 mode) {
     self->textBuf = text;
     self->cursorIndex = 0;
     self->charIndex = 0;
-    if (mode == 1) {
+    if (mode == TEXTENTRY_MODE_FULLWIDTH) {
         DecodeFullWidthSjis(self->editBuf, text);
         self->textLen /= 2;
     } else {
@@ -196,7 +198,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     fontTim = New_TimImage(BuildFileName(path, sStrFontIcon, dir, ext));
     ((TimImageUploadFn)fontTim->methods->processBuffer)(fontTim);
     self->textRow = New_TextRow(fontTim, self->textLen, self->editBuf);
-    self->cursorSprite = New_CharSprite(fontTim, 0x5F);
+    self->cursorSprite = New_CharSprite(fontTim, '_');
     fontTim->methods->release(fontTim);
     self->textRow->methods->attachToParent(self->textRow, (SceneNode *)parent,
                                            (LongVec3 *)&gTextEntryTextPos);
@@ -229,17 +231,17 @@ void TextEntry__DetachTarget(TextEntry *self) {
 
 void TextEntry__SetState(TextEntry *self, s32 state) {
     self->closeTickCount = 0;
-    if (state < 2) {
+    if (state < TEXTENTRY_RESULT_ACCEPTED) {
         return;
     }
     switch (state) {
-        case 2:
-        case 3:
+        case TEXTENTRY_RESULT_ACCEPTED:
+        case TEXTENTRY_RESULT_CANCELLED:
             self->methods->removeChild(self, self->inputSource);
             self->methods->releaseCardResources(self);
             self->closeState = state;
             break;
-        case 4:
+        case TEXTENTRY_STATE_REPORT:
             self->methods->notifyParents(self, self->closeState);
             break;
     }
@@ -250,16 +252,16 @@ void TextEntry__TickState(TextEntry *self) {
     s32 old;
 
     state = self->closeState;
-    if (state >= 4) {
+    if (state >= TEXTENTRY_STATE_REPORT) {
         return;
     }
-    if (state < 2) {
+    if (state < TEXTENTRY_RESULT_ACCEPTED) {
         return;
     }
     old = self->closeTickCount;
     self->closeTickCount = old + 1;
     if (old != 0) {
-        self->methods->setState(self, 4);
+        self->methods->setState(self, TEXTENTRY_STATE_REPORT);
     }
 }
 
@@ -276,74 +278,74 @@ void TextEntry__HandleCommand(TextEntry *self, void *sender, s32 command) {
     switch (command) {
         default:
             return;
-        case 25:
-            if (self->mode == 1) {
+        case PAD_EVENT_PRESSED + PAD_BUTTON_RRIGHT:
+            if (self->mode == TEXTENTRY_MODE_FULLWIDTH) {
                 EncodeFullWidthSjis(self->textBuf, self->editBuf);
             } else {
                 strcpy(self->textBuf, self->editBuf);
             }
-            self->methods->notifyTarget(self, 0x10);
-            self->methods->setState(self, 2);
+            self->methods->notifyTarget(self, 1 << 4);
+            self->methods->setState(self, TEXTENTRY_RESULT_ACCEPTED);
             return;
-        case 23:
-            self->methods->notifyTarget(self, 0x10);
-            self->methods->setState(self, 3);
+        case PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN:
+            self->methods->notifyTarget(self, 1 << 4);
+            self->methods->setState(self, TEXTENTRY_RESULT_CANCELLED);
             return;
-        case 32:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_L2:
             self->methods->resetAllChars(self);
             return;
-        case 31:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_L1:
             self->methods->resetChar(self);
             return;
-        case 28:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_SELECT:
             self->methods->toggleAltCommands(self);
             return;
-        case 21:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LRIGHT:
             if (self->altCommands != 0) {
                 return;
             }
             self->methods->moveCursorRight(self);
             return;
-        case 5:
+        case PAD_EVENT_HELD + PAD_BUTTON_LRIGHT:
             if (self->altCommands == 0) {
                 return;
             }
             self->methods->moveCursorRight(self);
             return;
-        case 20:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LLEFT:
             if (self->altCommands != 0) {
                 return;
             }
             self->methods->moveCursorLeft(self);
             return;
-        case 4:
+        case PAD_EVENT_HELD + PAD_BUTTON_LLEFT:
             if (self->altCommands == 0) {
                 return;
             }
             self->methods->moveCursorLeft(self);
             return;
-        case 18:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LUP:
             if (self->altCommands != 0) {
                 return;
             }
             self->methods->nextChar(self);
             return;
-        case 2:
+        case PAD_EVENT_HELD + PAD_BUTTON_LUP:
             if (self->altCommands == 0) {
                 return;
             }
             self->methods->nextChar(self);
             return;
-        case 19:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LDOWN:
             if (self->altCommands == 0) {
-                goto slot94Call;
+                goto callPrevChar;
             }
             return;
-        case 3:
+        case PAD_EVENT_HELD + PAD_BUTTON_LDOWN:
             if (self->altCommands == 0) {
                 return;
             }
-        slot94Call:
+        callPrevChar:
             self->methods->prevChar(self);
             return;
     }
@@ -354,7 +356,7 @@ void TextEntry__PlaySound(TextEntry *self, s32 tone) {
 
     target = self->target;
     if (target != NULL) {
-        target->methods->playTone(target, tone, 0x60, 0x60);
+        target->methods->playTone(target, tone, 96, 96);
     }
 }
 

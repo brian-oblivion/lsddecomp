@@ -42,9 +42,20 @@ struct TextRow;
 typedef struct TextEntry TextEntry;
 typedef struct TextEntryMethods TextEntryMethods;
 
-/* The result a closing TextEntry passes to notifyParents: command 25 writes
- * `editBuf` back into `textBuf` first, command 23 does not. */
+/* setText's `mode`: how the caller's string is stored. In FULLWIDTH it is
+ * full-width SJIS, two bytes a character, and `editBuf` holds it decoded to
+ * one byte a character (DecodeFullWidthSjis; EncodeFullWidthSjis writes it
+ * back). PLAIN copies it with strcpy both ways. */
+enum TextEntryMode { TEXTENTRY_MODE_PLAIN = 0, TEXTENTRY_MODE_FULLWIDTH = 1 };
+
+/* The result a closing TextEntry passes to notifyParents: a circle press
+ * writes `editBuf` back into `textBuf` first, a cross press does not.
+ * setState(result) closes; `closeState` keeps the result. */
 enum TextEntryResult { TEXTENTRY_RESULT_ACCEPTED = 2, TEXTENTRY_RESULT_CANCELLED = 3 };
+
+/* setState's last state: notify the parents with `closeState`. tickState
+ * enters it on the second tick after a close. */
+#define TEXTENTRY_STATE_REPORT 4
 
 /* BasicClass's slots (overrides: +0x008 TextEntry__TextEntry, +0x00C
  * Finalize, +0x010 AddChild, +0x014 RemoveChild, +0x018 RemoveAllChildren,
