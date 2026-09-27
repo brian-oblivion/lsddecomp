@@ -58,3 +58,37 @@ independently.
 ## Track 6 (round 91, echo): named `SceneNode__SetLightDim`, tier A
 
 `GetSetBitField(&self->attribute, 0, 3, value)`: GsDOBJ2.attribute bits 0-2 are libgs.h's GsLDIM0..GsLDIM7 (light dimming). Was `GetSetUnk10Field0`. Slot +0x074 renamed `setLightDim` (no accessor). The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+
+## Round 100 (delta): track 7
+
+Parameter `a1` -> `value`. Shift 0 -> `ATTR_LDIM_SHIFT` (unit-local, beside
+code_d294.c's `ATTR_*_SHIFT`; GsLDIM0..7 are bits 0-2 of GsDOBJ2.attribute,
+include/psyq/libgs.h). The width 3 stays a literal, as in code_d294.c.
+
+The file's own banner, before this pass, is kept below with this function's
+comment (this is the unit's first function).
+
+### History: the unit banner before this pass, verbatim
+
+```c
+/*
+ * code_d294_b -- SceneNode (include/SceneNode.h), part 2 of 3: slots +0x074
+ * to +0x0B4. The last four attribute setters; GetRotMatrix; the hull
+ * notification chain (NotifyWithHull fills the model's TmdHull through
+ * GetModelHull and hands it to TransformAndNotifyParents); the empty
+ * onPadEvent/update defaults; DispatchLinkCommand and the proximity test it
+ * runs (TryAttachNearby, with ComposeAndApplyRotation, CheckBoundsOverlap
+ * and ClassifyAgainstPlanes); NotifyTaggedParents; the table getter; and
+ * the free segment-against-box clippers the bounds tests use
+ * (ClipSegmentToBox, BisectSegmentToBox).
+ */
+```
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Sibling of SceneNode__SetDisplay/D374/D3A0/D3CC/D3F8 (code_d294.c): a thin
+ * wrapper around GetSetBitField over &self->unk10, shift 0 width 3. Raw
+ * pass-through value and raw pass-through result -- same shape as
+ * SceneNode__SetSemiTrans/D3A0/D3F8 (no `== 0` on either side). */
+```

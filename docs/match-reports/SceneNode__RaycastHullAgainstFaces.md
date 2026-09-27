@@ -1,4 +1,6 @@
-# SceneNode__ClassifyAgainstPlanes -- MATCHED (round 76, bravo: 199/199, whole image green; was 29/199 length-exact)
+# SceneNode__RaycastHullAgainstFaces -- MATCHED (round 76, bravo: 199/199, whole image green; was 29/199 length-exact)
+
+> Renamed from `SceneNode__ClassifyAgainstPlanes` on 2026-09-27 (tools/rename.py). Address 0x8001ddf4.
 
 > Renamed from `Class6B5CC__ClassifyAgainstPlanes` on 2026-09-26 (tools/rename.py). Address 0x8001ddf4.
 
@@ -97,7 +99,7 @@ resolved below.
 
 ## What round 45 handed this round
 
-Signature `s32 SceneNode__ClassifyAgainstPlanes(SceneNodeObj *self, s32 *outFlag, Vec3S16_d294
+Signature `s32 SceneNode__RaycastHullAgainstFaces(SceneNodeObj *self, s32 *outFlag, Vec3S16_d294
 *diff, void *list)`, with Part 1 (a fixed 2-row box-midpoint average into a
 local `Vec3S16_d294 mid[2]`) and Part 2 (a `count1`-driven loop over
 `TmdModel__GetBoundsBuffer` planes, gated by `ClipSegmentToBox`/`TmdModel__RaycastFaces`, setting
@@ -108,7 +110,7 @@ precise relationship between the middle `k` loop ... and the inner fixed-4
 
 ## Part 3, resolved
 
-Re-read `asm/nonmatchings/code_d294_b/SceneNode__ClassifyAgainstPlanes.s` lines 197-268
+Re-read `asm/nonmatchings/code_d294_b/SceneNode__RaycastHullAgainstFaces.s` lines 197-268
 (`.L8001DFD0` through `.L8001E0B4`) instruction-by-instruction:
 
 - The innermost loop runs `m = 0..3` (4 passes, unconditional), but the
@@ -236,7 +238,7 @@ register permutation with no tool support for exploring it directly.
 extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
 extern s32 gHitHeightGate;
 
-s32 SceneNode__ClassifyAgainstPlanes(SceneNodeObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
+s32 SceneNode__RaycastHullAgainstFaces(SceneNodeObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
     Vec3S16_d294 mid[2];
     s16 *loPtr;
     s16 *hiPtr;
@@ -349,7 +351,7 @@ further into the diff before that's settled.
 
 ## Naming (round 54, bravo, track 3)
 
-**Not renamed -- PROPOSED only.** Proposed name: `SceneNode__ClassifyAgainstPlanes`
+**Not renamed -- PROPOSED only.** Proposed name: `SceneNode__RaycastHullAgainstFaces`
 (tier B). STALL, still `INCLUDE_ASM`; not attempted for a match this
 round (naming pass only, and this is the documented `gp_rel`-history
 blocker's successor -- see CLAUDE.md's "Open toolchain blockers" table,
@@ -380,7 +382,7 @@ own `#if 0` wrapper removed; every sibling confirmed still wrapped via
 
 **The round-46 title's own framing -- "register identity: `self` lands in
 $s4 here, $s5 in retail" -- undersells the residue.** Reading
-`asm/nonmatchings/code_d294_b/SceneNode__ClassifyAgainstPlanes.s` against
+`asm/nonmatchings/code_d294_b/SceneNode__RaycastHullAgainstFaces.s` against
 the built object's own disassembly line by line (not just the funcdiff word
 count) for the FIRST loop (the 2-row box-midpoint average, this report's own
 "Part 1") shows retail does not index through `mid[row].x/.y/.z` at all.
@@ -435,7 +437,7 @@ function:** scaffold built clean (`tools/setup-permuter.sh`, seed = the
 round-46 preserved body verbatim). `--debug --stack-diffs`: base score
 **3056** (136 stack-difference points, 60 register-difference points, 7
 reorderings, **11 insertions, 11 deletions**) -- unlike
-`SceneNode__NotifyTaggedParents`'s clean 0/0 insertion/deletion signature
+`SceneNode__AddToActorParents`'s clean 0/0 insertion/deletion signature
 (a pure register-shuffle wall), this scaffold shows REAL structural
 insertions/deletions, consistent with the Part-1-loop-shape finding above:
 there is genuine room for a source-level fix, not just a register swap.
@@ -496,7 +498,7 @@ against `nm -S`/`funcdiff.py` -- not adopted on the permuter's own score:**
 scorer, but none of the safe-to-adopt candidates moved the real oracle's
 score, and the one candidate that DID look promising by score was
 semantically unsound and was not adopted.** The scaffold is left in place
-(`permuter-work/SceneNode__ClassifyAgainstPlanes/`, gitignored) for whoever
+(`permuter-work/SceneNode__RaycastHullAgainstFaces/`, gitignored) for whoever
 picks this up next, with all three candidates' diffs preserved under
 `output-*/diff.txt` and this report's read of each one, so the next attempt
 does not have to re-derive which are safe.
@@ -564,3 +566,43 @@ NON_MATCHING body promoted, round 69
 ## Track 6 (round 91, echo)
 
 AttachCornerList_d294b is TmdModel.h's TmdHull and Vec3S16_d294 is TmdVec3. Byte-identical.
+
+## Round 100 (delta): track 7
+
+Renamed `SceneNode__ClassifyAgainstPlanes` -> `SceneNode__RaycastHullAgainstFaces`
+(tier B), slot +0x0AC `classifyAgainstPlanes` -> `raycastHullAgainstFaces`.
+Evidence, from the body: the "planes" it walks are TmdModel__GetBoundsBuffer's
+records, which are TmdBoxes (min and max corners), not planes; each is used
+only as a gate (ClipSegmentToBox), and the test that sets the bits is
+TmdModel__RaycastFaces, a segment cast against every face of the model. The
+segments are the hull's centre line (face centre to face centre) and, per
+box, the two edges joining corners 1 and 2 of its first face to the second.
+What the game uses a hit for is not established (tier B).
+
+Parameters: `outFlag` -> `hullHits` (bit k per hull box, or 1 for a
+centre-line hit), `diff` -> `hitPoint` (it is RaycastFaces's `hitOut`: the
+caller's delta is overwritten with the hit point), `list` -> `hull`; the
+prototype and slot follow. Locals: `mid` -> `center`, `p` -> `c`, `hi` ->
+`opposite`, `v` -> `corner`, `count1` -> `boundsCount`, `plane` -> `bounds`,
+`cnt2` -> `hullCount`, `m` -> `j`, `bigConst` -> `nearest`, `outWord` ->
+`height`. Constants: `0x7FFFFFFF` -> `DIST_NONE` (added to TmdModel.h,
+token-identical to TmdModel.c's own define, which cpp accepts; RaycastFaces
+sets `*best = DIST_NONE` itself, so the caller's store is redundant but
+retail's), `>= 0x201` -> `> HIT_HEIGHT_THRESHOLD` 512 (unit-local), the
+corner strides 4 -> `HULL_FACE_CORNERS` (TmdModel.h). The redundant
+`(TmdVec3 *)` casts on TmdVec3 pointers are gone. `u8 pad[0x18]` -> `[24]`.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Tests the corner list against every model plane. Part 1 averages two
+ * diagonal corner pairs into mid[0]/mid[1] and tests that segment against
+ * each plane, setting bit i of self->hitMask on a hit; any hit returns at once.
+ * Otherwise every 8-corner box k in `list` has its two vertical edges
+ * (corner m against corner m+4, m = 1, 2) tested against every plane, and a
+ * hit sets plane bit i in self->hitMask and box bit k in *outFlag. `hit` is
+ * written only as 0, but retail still tests it. Round 76. Byte levers:
+ * the gHitHeightGate gate is two arms that each set the bit, so loop.c sees two
+ * equal constant-1 loads (savings 2) and hoists the 1 into $s1; Part 1 walks
+ * `p`, `v` and `hi` as pointers. */
+```

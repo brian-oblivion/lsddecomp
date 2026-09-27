@@ -125,7 +125,7 @@ slot register flow through retail's own asm.
 
 Two related but distinguishable problems, found in this order:
 
-### 1. Register identity: a clean 3-way rotation, same class as `SceneNode__NotifyTaggedParents`
+### 1. Register identity: a clean 3-way rotation, same class as `SceneNode__AddToActorParents`
 
 Retail: `out`→`$s3`, `box`→`$s4` (both match this attempt already), but
 `p1`→`$s1`, `p2`→`$s2`, `r1`→`$s0`. This attempt: `p1`→`$s0`, `p2`→`$s1`,
@@ -137,7 +137,7 @@ instruction-by-instruction diff, not just the summary count.
 
 **This resisted every reshaping lever that worked elsewhere this round**:
 - Extracting `p1`/`p2` into freshly-assigned local aliases (the
-  `SceneNode__NotifyTaggedParents`/`SceneNode__ComposeAndApplyRotation` lever) — tried both "alias assigned before
+  `SceneNode__AddToActorParents`/`SceneNode__ComposeAndApplyRotation` lever) — tried both "alias assigned before
   the first `CalcBoxOutcode` call" and (implicitly, since they're already
   direct parameter references) "used as-is" — no combination moved the
   mapping.
@@ -153,13 +153,13 @@ instruction-by-instruction diff, not just the summary count.
   progress, per this project's "branch targets outrank everything else in
   triage" rule.
 
-**Working theory, not yet actionable:** in `SceneNode__NotifyTaggedParents`, retail put the
+**Working theory, not yet actionable:** in `SceneNode__AddToActorParents`, retail put the
 PARAMETER used most often (`node`) in the lowest register (`$s0`) and a
 brand-new LOCAL (`tag`) in the middle. Here, retail puts a brand-new LOCAL
 (`r1`) in the lowest register (`$s0`) and both PARAMETERS in the higher
 ones. These two data points are not consistent with a single rule ("locals
-get priority" fits this function but contradicts `SceneNode__NotifyTaggedParents`; "most-
-referenced value gets priority" fits `SceneNode__NotifyTaggedParents` but is unclear here
+get priority" fits this function but contradicts `SceneNode__AddToActorParents`; "most-
+referenced value gets priority" fits `SceneNode__AddToActorParents` but is unclear here
 since `r1` and `p1`/`p2` all have comparable reference counts). This reads
 as genuine per-function idiosyncrasy in GCC 2.6.3's old register allocator,
 not a discoverable general rule — consistent with
@@ -198,12 +198,12 @@ issue #1, not an independent defect — worth re-checking automatically once
 
 **No existing declaration was modified for this function** — only new
 externs/prototypes were added. (Earlier in this session, work on
-`SceneNode__NotifyTaggedParents` DID modify an existing declaration — see that report and
+`SceneNode__AddToActorParents` DID modify an existing declaration — see that report and
 this round's summary for the `GenericMethods_d294` padding fix.)
 
 ## Proposed learning
 
-Promote `ClipSegmentToBox` and `SceneNode__NotifyTaggedParents` in the round's consolidation as
+Promote `ClipSegmentToBox` and `SceneNode__AddToActorParents` in the round's consolidation as
 **confirmed instances of the same open question**: this project has now
 seen two functions, in the same unit, both `INCLUDE_ASM`-worthy near
 matches, both blocked by a register-to-value mapping that's provably
@@ -593,3 +593,29 @@ Cohen-Sutherland-style line-segment-vs-AABB clip, using `CalcBoxOutcode`
 segment straddles the box. The algorithm shape is unambiguous from the
 body alone -- this is the textbook mechanism, not a guess about game
 purpose. Purely local to this unit + its header.
+
+## Round 100 (delta): track 7
+
+Locals `r1`/`r2` -> `code1`/`code2`. Returns 0..3 -> `enum ClipResult`
+(`CLIP_MISS`, `CLIP_INSIDE`, `CLIP_P1_INSIDE`, `CLIP_P2_INSIDE`, added to
+include/code_d294.h beside the prototype, whose comment already stated the
+four cases).
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Round 41: MATCHED, 118/118, byte-exact. Round 20 got the CFG (a
+ * tail-merge/shared-block dispatch, see the git history for the full
+ * derivation) and the register mapping exactly right, leaving one
+ * standalone residue: an extra `move v1,v0` before the SECOND recursive
+ * call's result test, where retail tests $v0 directly. Closed by a
+ * first-ever permuter search (`docs/match-reports/ClipSegmentToBox.md`,
+ * "Round 41"): the tautological trailing `if (mid.y) return 0; else
+ * return 0;` below is not meaningful control flow -- both arms return 0,
+ * exactly like the plain `return 0;` it replaces -- but it changes
+ * register pressure enough at the tail of the function that GCC 2.6.3
+ * drops the otherwise-unavoidable `move v1,v0` and tests $v0 directly,
+ * matching retail exactly. Kept because it is what's needed for
+ * byte-exactness, not because it means anything; see the report for the
+ * hand-lever history this replaced. */
+```

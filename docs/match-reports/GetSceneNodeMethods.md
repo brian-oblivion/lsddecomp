@@ -158,3 +158,14 @@ src/class_3ac78.c. The one- and two-argument calls in class_3bb8c_c.c and
 class_3ac78.c now pass nothing, because round 59 measured those arguments as
 zero-cost. The raw `+ 0x38`/`+ 0x88` offset calls in class_3ac78.c are now
 `onNotify`/`notifyIfUnk20Active` slot calls. Byte-identical.
+
+## Round 100 (delta): track 7
+
+No names changed; comment rewritten.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* This unit's own no-argument vtable getter -- see the extended note on
+ * gSceneNodeMethods in include/code_d294.h and the file banner up top. */
+```

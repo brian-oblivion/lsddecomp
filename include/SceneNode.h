@@ -105,9 +105,9 @@ struct Ratio16 {
     /* +0x0A0 */ void (*tryAttachNearby)(Self *self); /* SceneNode__TryAttachNearby; its 2nd parameter arrives as the caller's untouched $a1 */ \
     /* +0x0A4 */ void (*composeAndApplyRotation)(Self *self, void *vec, void *dst, void *src, s32 count); /* SceneNode__ComposeAndApplyRotation */ \
     /* +0x0A8 */ s32 (*checkBoundsOverlap)(Self *self, void *corners, TmdVec3 *delta); /* SceneNode__CheckBoundsOverlap */ \
-    /* +0x0AC */ s32 (*classifyAgainstPlanes)(Self *self, void *outFlag, TmdVec3 *delta, void *corners); /* SceneNode__ClassifyAgainstPlanes */ \
+    /* +0x0AC */ s32 (*raycastHullAgainstFaces)(Self *self, void *hullHits, TmdVec3 *hitPoint, void *hull); /* SceneNode__RaycastHullAgainstFaces */ \
     /* +0x0B0 */ void (*slotB0)(void); /* SceneNode__NoOpSlotB0; never called */ \
-    /* +0x0B4 */ void (*notifyTaggedParents)(Self *self, void *node) /* SceneNode__NotifyTaggedParents */
+    /* +0x0B4 */ void (*addToActorParents)(Self *self, void *node) /* SceneNode__AddToActorParents */
 /* clang-format on */
 
 /* clang-format off */
@@ -121,7 +121,7 @@ struct Ratio16 {
     /* +0x020 */ void *model; /* the TmdModel child LinkModel linked; NULL when none */ \
     /* +0x024 */ s32 tick; /* zeroed by Reset; gStyleEffectMethods's update increments it */ \
     /* +0x028 */ SceneNode *linkTarget; /* dispatchLinkCommand's event-4 sender; TryAttachNearby's hit */ \
-    /* +0x02C */ s32 hitMask; /* ClassifyAgainstPlanes: one bit per plane (own) or corner group (the other's) */ \
+    /* +0x02C */ s32 hitMask; /* RaycastHullAgainstFaces: one bit per model bounds box (own) or hull box (the other's) */ \
     /* +0x030 */ TmdHull *notifyVerts; /* TransformAndNotifyParents's hull, set only while the parents are notified */ \
     /* +0x034 */ u16 unk34; /* zeroed by GridCell's ctor */ \
     /* +0x036 */ u16 flags36; /* bit 0x80 tested by StageMap's NotifyGridCell; zeroed by GridCell's ctor */ \
@@ -167,7 +167,7 @@ u32 SceneNode__SetLightDim(SceneNode *self, u32 value);
 s32 SceneNode__SetUseZ(SceneNode *self, s32 on);
 u32 SceneNode__SetSubdivision(SceneNode *self, u32 value);
 s32 SceneNode__SetBackClip(SceneNode *self, s32 on);
-void SceneNode__GetRotMatrix(SceneNode *self, s32 out, s32 invert);
+void SceneNode__GetRotMatrix(SceneNode *self, MATRIX *out, s32 invert);
 void SceneNode__NotifyWithHull(SceneNode *self, s32 event);
 void SceneNode__GetModelHull(SceneNode *self, void *dest);
 void SceneNode__TransformAndNotifyParents(SceneNode *self, TmdHull *verts, s32 event);
@@ -177,9 +177,9 @@ void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event);
 void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other);
 void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *vec, void *dst, void *src, s32 count);
 s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta);
-s32 SceneNode__ClassifyAgainstPlanes(SceneNode *self, s32 *outFlag, TmdVec3 *delta, TmdHull *corners);
+s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *hullHits, TmdVec3 *hitPoint, TmdHull *hull);
 void SceneNode__NoOpSlotB0(void);
-void SceneNode__NotifyTaggedParents(SceneNode *self, void *node);
+void SceneNode__AddToActorParents(SceneNode *self, void *node);
 
 void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src);
 /* `unused`: both callers pass 0 and the body never reads it. */

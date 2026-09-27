@@ -72,7 +72,7 @@ void ObjM__DetachTarget(ObjM *self) {
 /* Defined elsewhere, no header: src/code_39094.c (PickVariant and
  * PickDailyVariant return a Rec1C *, a 0x1C-byte record handed on here as a
  * name), src/code_d294_c.c (GetSetHitHeightGate sets the flag
- * SceneNode__ClassifyAgainstPlanes tests) and class_3bb8c_m
+ * SceneNode__RaycastHullAgainstFaces tests) and class_3bb8c_m
  * (RegisterStyleConfig, which keeps `sceneRefs` as gStyleSceneRefs). */
 extern s32 PickVariant(s32 stage, s32 unused);
 extern s32 PickDailyVariant(s32 stage, s32 unused, s32 day);

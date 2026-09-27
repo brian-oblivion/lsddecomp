@@ -7,7 +7,7 @@ Round 54 (bravo, track 3). `code_d294_b`.
 ## What it does
 
 Slot `+0x0B0` occupant (`tools/classtable.py gSceneNodeMethods`), between the
-documented `SceneNode__ClassifyAgainstPlanes` (slot `+0x0AC`) and `SceneNode__NotifyTaggedParents` (the
+documented `SceneNode__RaycastHullAgainstFaces` (slot `+0x0AC`) and `SceneNode__AddToActorParents` (the
 table's own last slot, `+0x0B4`) -- no caller in this project dispatches
 through it by name or by a documented vtable comment. Whole body is
 `{}` (`jr $ra; nop`, confirmed via `objdump` on the built object) --
@@ -31,3 +31,8 @@ recorded here.
 ## Track 6 (round 91, echo): named `SceneNode__NoOpSlotB0`, tier C
 
 Empty. Slot +0x0B0 has no caller; Actor and its subclasses null it. `NoOpSlotNN` precedent. Was `func_8001E49C`. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+
+## Round 100 (delta): track 7
+
+No names changed. Given a one-line comment (slot +0x0B0: empty, and nothing
+calls it); it had none before.

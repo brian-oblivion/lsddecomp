@@ -131,7 +131,7 @@ void SceneNode__TryAttachNearby(SceneNodeObj *self, GenericObj_d294 *other) {
 Range-checks `other` against `self` (each axis of position difference must
 fit in `+/-0x4000`), then hands off to three vtable slots — `+0xA4`
 (`SceneNode__ComposeAndApplyRotation`, already matched this round), `+0xA8` (`SceneNode__CheckBoundsOverlap`,
-still queued), `+0xAC` (`SceneNode__ClassifyAgainstPlanes`, the documented `gp_rel` blocker) —
+still queued), `+0xAC` (`SceneNode__RaycastHullAgainstFaces`, the documented `gp_rel` blocker) —
 with the resulting `Vec3S16` difference, before registering `other` into
 `self->unk28` and notifying it via its own `+0x038` slot.
 
@@ -155,7 +155,7 @@ with the resulting `Vec3S16` difference, before registering `other` into
   direct `jal`), `+0xA8` (`slotA8`, `s32 (*)(SceneNodeObj*, void*,
   Vec3S16_d294*)`, occupant `SceneNode__CheckBoundsOverlap`), `+0xAC` (`slotAC`, `s32
   (*)(SceneNodeObj*, void*, Vec3S16_d294*, void*)`, occupant
-  `SceneNode__ClassifyAgainstPlanes` — the documented blocker, NOT decompiled here, only its
+  `SceneNode__RaycastHullAgainstFaces` — the documented blocker, NOT decompiled here, only its
   call-site shape is typed).
 - **`self->unk28` retyped** from `s32` to `GenericObj_d294 *` (existing
   declaration change — see round summary). Checked the other write site
@@ -164,7 +164,7 @@ with the resulting `Vec3S16` difference, before registering `other` into
   error) and rebuilt the WHOLE image to confirm `SceneNode__DispatchLinkCommand` (already
   matched) is still byte-exact before proceeding — this is the exact
   scenario CLAUDE.md's vtable-retype warning describes, and it came up
-  again this round (see `SceneNode__NotifyTaggedParents`'s report for the other instance,
+  again this round (see `SceneNode__AddToActorParents`'s report for the other instance,
   a genuine struct-layout bug rather than a retype).
 
 ## What got the structure this close (in order — each one was real
@@ -520,7 +520,7 @@ before crediting the whole diff.
 ## Round 41 (bravo): did not reach as primary work; one confirmation check only
 
 This function was item 4 of this round's ordered work list ("hardest,
-reach only if the others land"). Items 1-3 (`SceneNode__NotifyTaggedParents`,
+reach only if the others land"). Items 1-3 (`SceneNode__AddToActorParents`,
 `ClipSegmentToBox`, `SceneNode__CheckBoundsOverlap`) consumed the round's attempt budget
 first, per the assignment's own ordering, so this function got only a
 single confirmation check, not a fresh attempt cycle.
@@ -651,7 +651,7 @@ against `self` (each axis of position difference must fit `+/-0x4000`,
 via the two now-renamed geometry helpers' sibling checks), then hands
 off to `SceneNode__ComposeAndApplyRotation` (slot `+0x0A4`),
 `SceneNode__CheckBoundsOverlap` (slot `+0x0A8`), and
-`SceneNode__ClassifyAgainstPlanes`/proposed `SceneNode__ClassifyAgainstPlanes` (slot
+`SceneNode__RaycastHullAgainstFaces`/proposed `SceneNode__RaycastHullAgainstFaces` (slot
 `+0x0AC`) in turn, only registering `other` into `self->unk28` and
 notifying it (`other->methods->slot38`) if ALL three pass. "TryAttachNearby"
 describes the measured gate-then-link mechanics; the game-level meaning
@@ -682,7 +682,7 @@ renames/proposals:
 | `+0x0A0` | `slotA0` | `tryAttachNearby` | `SceneNode__TryAttachNearby` (proposed `SceneNode__TryAttachNearby`, this function) |
 | `+0x0A4` | `slotA4` | `composeAndApplyRotation` | `SceneNode__ComposeAndApplyRotation` |
 | `+0x0A8` | `slotA8` | `checkBoundsOverlap` | `SceneNode__CheckBoundsOverlap` |
-| `+0x0AC` | `slotAC` | `classifyAgainstPlanes` | `SceneNode__ClassifyAgainstPlanes` (proposed `SceneNode__ClassifyAgainstPlanes`) |
+| `+0x0AC` | `slotAC` | `classifyAgainstPlanes` | `SceneNode__RaycastHullAgainstFaces` (proposed `SceneNode__RaycastHullAgainstFaces`) |
 
 Apply by type scope (edit `SceneNodeMethods`'s own definition in
 `include/code_d294.h`, rebuild, fix exactly the accessors the compiler
@@ -988,3 +988,32 @@ The local corner list AttachCornerList_d294b and `other->notifyVerts`'s GenericC
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## Round 100 (delta): track 7
+
+Locals: `posA`/`posB` -> `otherPos`/`selfPos`, `diffRaw` -> `offset`, `diff`
+-> `delta`, `abs` -> `mag`, `list` -> `hull`, `countList` -> `otherHull`.
+`u8 unused[0x20]` -> `MATRIX unused` (the same 32 bytes at the same place,
+byte-identical; the round-76 note above suggests it may have been an unused
+MATRIX, which is not established, and the MATCHING comment says only that
+it is never read). `0x4001` -> `ATTACH_AXIS_RANGE` 16384, the tests written
+`<= ATTACH_AXIS_RANGE` and `> ATTACH_AXIS_RANGE` (cc1 canonicalizes both to
+the same `slti 0x4001`). `* 8` -> `* HULL_BOX_CORNERS`. The slot it calls at
++0x0AC is `raycastHullAgainstFaces` (was `classifyAgainstPlanes`).
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* The corner list this function builds and hands to +0xA8/+0xAC is one
+ * TmdHull local: the count header and the eight corners together. */
+
+/* Range-checks `other` against `self` (each axis of position difference
+ * must fit in +/-0x4000), then hands off to three vtable slots
+ * (+0xA4 = SceneNode__ComposeAndApplyRotation, +0xA8 = SceneNode__CheckBoundsOverlap, +0xAC = SceneNode__ClassifyAgainstPlanes)
+ * with the resulting Vec3S16 difference, before registering `other` into
+ * self->linkTarget and notifying it via its own +0x038 slot. */
+
+/* sp+0x30, never referenced; reserves retail's slot */
+```
+
+(The first block sat between DispatchLinkCommand and this function.)

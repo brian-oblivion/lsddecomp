@@ -103,3 +103,18 @@ when the sender's class nibble is 4. Event 4 stores the sender in
 `other` in the same field and then sends `other` event 4 with itself as the
 sender, so the link is recorded on both objects. The int-to-pointer store
 warning went away with the retype, and the bytes are identical.
+
+## Round 100 (delta): track 7
+
+No names changed. The case values 2, 3, 4 stay literals: 4 is the answer
+TryAttachNearby sends, but 2 and 3 have no established meaning, and naming
+one of the three alone would read as if the others were unknown for a
+different reason.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* a2 selects one of three behaviors: 2 or 3 dispatches through the vtable
+ * (self->methods->slotA0), exactly 4 stores a1 into self->linkTarget, and
+ * anything else (< 2 or > 4) is a no-op. */
+```

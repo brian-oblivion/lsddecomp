@@ -144,3 +144,25 @@ typedef struct BoundsBox_d294 {
     TmdVec3 hi;
 } BoundsBox_d294;
 ```
+
+## Round 100 (delta): track 7
+
+Locals `buf0`/`buf1`/`flags` -> `insideBuf`/`outsideBuf`/`outcode`. The six
+bit values -> `OUTCODE_*`, added to include/code_d294.h token-identical to
+code_d294_c.c's copy (CalcBoxOutcode's bits); proposed that the head delete
+code_d294_c.c's copy.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Bisects the segment [near, far] against `box` until the midpoint exactly
+ * equals one endpoint, writing the running midpoint into `out` every
+ * iteration (the caller's real result is whatever `*out` holds when this
+ * returns). Each iteration computes an outcode (`flags`, matching the
+ * project's already-confirmed `u8`-flags idiom -- an explicit `andi
+ * $v0,$v1,0xFF` re-mask appears in retail wherever `flags` is read back)
+ * from `box` against the midpoint; a non-zero outcode means the midpoint
+ * overshot, so it becomes the new `far`, otherwise it becomes the new
+ * `near` -- each written into one of two ping-pong stack buffers so the
+ * OTHER endpoint's storage is never disturbed. */
+```

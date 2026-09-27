@@ -361,7 +361,7 @@ s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b) {
 extern s32 gHitHeightGate;
 
 /* Sets gHitHeightGate and returns its old value. While it is non-zero,
- * SceneNode__ClassifyAgainstPlanes's segment test accepts only a hit whose
+ * SceneNode__RaycastHullAgainstFaces's segment test accepts only a hit whose
  * height (TmdModel__RaycastFaces: above the face box's minimum y) is at least
  * 513, which its edge tests always require. ObjM__InitStyleAndWorld sets it
  * for stage 0 and stages 3, 5 and 6. */

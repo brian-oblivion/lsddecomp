@@ -1,4 +1,6 @@
-# SceneNode__NotifyTaggedParents — MATCHED (round 76, bravo: 54/54 on the first build of the new shape, whole image green; was 48/54 length-exact)
+# SceneNode__AddToActorParents — MATCHED (round 76, bravo: 54/54 on the first build of the new shape, whole image green; was 48/54 length-exact)
+
+> Renamed from `SceneNode__NotifyTaggedParents` on 2026-09-27 (tools/rename.py). Address 0x8001e4a4.
 
 > Renamed from `Class6B5CC__NotifyTaggedParents` on 2026-09-26 (tools/rename.py). Address 0x8001e4a4.
 
@@ -79,11 +81,11 @@ loop kind decides what loop.c does, in both directions.
 ## Signature (as attempted)
 
 ```c
-void SceneNode__NotifyTaggedParents(SceneNodeObj *self, void *node);
+void SceneNode__AddToActorParents(SceneNodeObj *self, void *node);
 ```
 
 Confirmed from the disassembly's own register roles, not guessed: `a0`
-(SceneNode__NotifyTaggedParents's 1st param) is forwarded, unmodified, as the 2nd argument to
+(SceneNode__AddToActorParents's 1st param) is forwarded, unmodified, as the 2nd argument to
 the final dispatch call (`entry->methods->slot10(entry, self)`) — a "self"
 role. `a1` (2nd param) is what gets walked via `BasicClass__GetNextParentRef` —
 the "node" being scanned for tag-4 parents.
@@ -98,7 +100,7 @@ whole list (there can be more than one qualifying entry) rather than
 stopping at the first match.
 
 ```c
-void SceneNode__NotifyTaggedParents(SceneNodeObj *self, void *node) {
+void SceneNode__AddToActorParents(SceneNodeObj *self, void *node) {
     SceneNodeObj *s;
     void *n;
     GenericObj_d294 *entry;
@@ -245,7 +247,7 @@ whether the function itself matched)
   the padding fix is the load-bearing part).
 - New extern `BasicClass__GetNextParentRef(void *self, GenericObj_d294 **outParent,
   void **cursor)`.
-- Prototype `void SceneNode__NotifyTaggedParents(SceneNodeObj *self, void *node);` left in
+- Prototype `void SceneNode__AddToActorParents(SceneNodeObj *self, void *node);` left in
   place even though the function is back to `INCLUDE_ASM` — harmless (no
   caller references it yet), and saves the next attempt from re-deriving
   the signature.
@@ -396,7 +398,7 @@ written for.
 
 ```c
 #if 0
-void SceneNode__NotifyTaggedParents(SceneNodeObj *self, void *node) {
+void SceneNode__AddToActorParents(SceneNodeObj *self, void *node) {
     SceneNodeObj *s;
     void *n;
     GenericObj_d294 *entry;
@@ -448,7 +450,7 @@ This was this function's **first-ever permuter search** -- one of the
 round's identified never-searched near-misses, despite already carrying
 three prior rounds of hand-lever attempts.
 
-`tools/setup-permuter.sh SceneNode__NotifyTaggedParents <seed>` scaffolded cleanly (seed:
+`tools/setup-permuter.sh SceneNode__AddToActorParents <seed>` scaffolded cleanly (seed:
 the round-19 48/54 body, `#include "code_d294.h"` for the project's own
 struct/extern declarations rather than re-declaring them locally, since
 this unit already shares that header). `--debug --stack-diffs` sanity
@@ -460,13 +462,13 @@ of "every instruction otherwise identical, just one register-pair
 swapped").
 
 Ran the bounded search: `timeout 900 ... permuter.py -j 6 --stop-on-zero
---best-only --stack-diffs permuter-work/SceneNode__NotifyTaggedParents`, rc captured on
+--best-only --stack-diffs permuter-work/SceneNode__AddToActorParents`, rc captured on
 the very next command. **rc=124** (900-second bound fired; nothing
 external killed it). **73118 iterations** -- the highest iteration count
 of any search this round, consistent with this being the smallest/fastest
 function to recompile of the three searched. **No candidate ever beat the
 base score of 38** -- confirmed two ways: the raw score log's minimum
-value across the entire run is 38, and `permuter-work/SceneNode__NotifyTaggedParents/`
+value across the entire run is 38, and `permuter-work/SceneNode__AddToActorParents/`
 contains no `output-*` directories at all (the permuter only creates one
 when `--best-only` finds something strictly better than the running
 best). This is the same "no candidate ever improved on the seed" signature
@@ -531,7 +533,7 @@ matches this report's own figures with no contamination.
   the loop's masked-comparison line, then again at the dispatch
   eligibility check, then again at the `slot10` call), is not a source-level
   redundancy needing a manual fix -- reading retail's own disassembly
-  (`asm/nonmatchings/code_d294_b/SceneNode__NotifyTaggedParents.s`) shows GCC 2.6.3
+  (`asm/nonmatchings/code_d294_b/SceneNode__AddToActorParents.s`) shows GCC 2.6.3
   ALREADY reuses the SAME register (`$a1`) across the eligibility check
   (`lbu $v1,0x0($a1)`, `0x8001E530`) and the `slot10` load
   (`lw $v0,0x10($a1)`, `0x8001E540`) with no re-fetch of `entry->methods`
@@ -585,7 +587,7 @@ the body by hand to confirm.
 **Not renamed -- PROPOSED only, and NOT attempted for a match this
 round** (this unit's assignment explicitly excludes matching this
 function -- it is a live `INCLUDE_ASM` stall handled by a different
-track; naming only). Proposed name: `SceneNode__NotifyTaggedParents`
+track; naming only). Proposed name: `SceneNode__AddToActorParents`
 (tier B). Walks `node`'s parent-ref list (via the already-matched
 `BasicClass__GetNextParentRef`, `BMemPMgr`) looking for entries whose
 header's low nibble is `4`; for each such entry whose header's FULL low
@@ -597,7 +599,7 @@ the game-level meaning of tag `4`/`0x34` and what the `+0x010`
 dispatch actually does to `entry` is not established. This is also the
 class's own table-slot BOUNDARY -- `code_d294_c.c`'s own file banner
 already documents "`tools/classtable.py gSceneNodeMethods` stops at
-SceneNode__NotifyTaggedParents" -- i.e. it is `SceneNodeMethods`'s LAST slot
+SceneNode__AddToActorParents" -- i.e. it is `SceneNodeMethods`'s LAST slot
 (`+0x0B4`), not evidence of anything about this function's own
 purpose beyond position. Held back from an actual rename because this
 symbol is referenced (in a comment) from `src/code_d294_c.c:13` -- a
@@ -606,7 +608,7 @@ observation. Posted to the broadcast.
 
 (Later renamed for real in round 54's own second head commit, "apply
 bravo's eight held-back cross-unit function renames" -- the function is
-`SceneNode__NotifyTaggedParents` in `src/` as of round 55.)
+`SceneNode__AddToActorParents` in `src/` as of round 55.)
 
 ## Round 55 (charlie): REVISITED (round 55) -- confirmed unchanged, 48/54
 
@@ -670,3 +672,29 @@ symbol list cost nothing, re-deriving blind would have cost a full attempt
 cycle for a function whose inputs provably did not change.
 
 NON_MATCHING body promoted, round 69
+
+## Round 100 (delta): track 7
+
+Renamed `SceneNode__NotifyTaggedParents` -> `SceneNode__AddToActorParents`
+(tier B), slot +0x0B4 `notifyTaggedParents` -> `addToActorParents`. Evidence,
+from the body: it walks `node`'s parent refs and, for each whose class id's
+low byte is 0x34 (ACTOR_CLASS_ID, include/Actor.h: Actor and every class
+below it), calls that parent's addChild (+0x010) with self. It notifies
+nothing. Nothing calls the slot in C, so why a node joins another's Actor
+parents is not established (tier B).
+
+`*(u8 *)entry->methods == 0x34` -> `(u8)entry->methods->header ==
+ACTOR_CLASS_ID` (byte-identical: cc1 narrows the load to the same lbu), and
+`& 0xF) == 4` -> `& CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID`. Local
+`entry` -> `parent`.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Walks node's parent refs. For each run it finds the next entry whose class
+ * kind (low nibble of its method table's first word) is 4. If that entry's
+ * tag byte is also 0x34, it calls the entry's +0x010 slot with self. Round 76:
+ * the two nested do/while loops are real loops for loop.c, which hoists the
+ * literal 4 into $s1. The goto form of earlier rounds had no loop notes, so
+ * it needed a named `tag` and could not get retail's register order. */
+```

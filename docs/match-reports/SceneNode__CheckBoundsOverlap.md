@@ -528,7 +528,7 @@ back into `src/code_d294_b.c` verbatim, confirmed `SceneNode__TryAttachNearby`
 errors.** `build/lsdde.map` confirms `SceneNode__CheckBoundsOverlap` itself lands at the
 correct retail address `0x8001da28` (so the earlier frame-size fix still
 holds and this function's own window is trustworthy) — but the NEXT
-function, `SceneNode__ClassifyAgainstPlanes`, lands at `0x8001dda0` where retail has it at
+function, `SceneNode__RaycastHullAgainstFaces`, lands at `0x8001dda0` where retail has it at
 `0x8001DDF4`, a **0x54-byte / 21-word deficit**. That is this function's
 own true LENGTH residue: 222 words built vs 243 retail.
 
@@ -837,7 +837,7 @@ operand order, so a min whose default is loaded first is spelled `f > v`.
 
 Both placeholders in include/code_d294.h are deleted. `Sixteen6_d294` (six
 s16s) was only ever a view of a `TmdModel__GetBoundsBuffer` record, which is a
-`TmdBox`; `SceneNode__ClassifyAgainstPlanes` now holds its `plane` as `TmdBox *`
+`TmdBox`; `SceneNode__RaycastHullAgainstFaces` now holds its `plane` as `TmdBox *`
 with no casts. `CornerList_d294` (a count, then corner[0] with the rest after
 it) is include/TmdModel.h's `TmdHull`, which is what
 `SceneNode__TryAttachNearby` passes as this function's `corners`: the body
@@ -874,4 +874,22 @@ struct CornerList_d294 {
     s32 count;   /* +0x000 */
     TmdVec3 hdr; /* +0x004, corner[0]; corner[1..] follow at +0x00A */
 };
+```
+
+## Round 100 (delta): track 7
+
+Parameters `arg1`/`d` -> `corners`/`delta`. Locals: `list` -> `hull`, `v`/`end`
+-> `corner`/`cornerEnd`, `mm` -> `hullBox`, `b` -> `grow`, `p`/`end2`/`n` ->
+`bounds`/`boundsEnd`/`boundsCount`, `box` -> `modelBox`, `ret` -> `overlap`.
+`* 8` -> `* HULL_BOX_CORNERS`.
+
+### History: the comments in src/code_d294_b.c before this pass, verbatim
+
+```c
+/* Offsets arg1's corner list by `d` and grows a box `mm` over the moved
+ * corners, grows a second box `box` over the model's own bounds records
+ * (TmdModel__GetBoundsBuffer's array), and returns 1 if the two boxes overlap on all
+ * three axes. Each running min/max is a ternary stored back unconditionally
+ * (retail stores every field every iteration), and the source compares
+ * with `>` for a min so the slt operands load in retail's order. */
 ```

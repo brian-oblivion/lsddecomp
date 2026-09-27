@@ -268,7 +268,7 @@ after this round's two attempts).
 ### Proposed learning
 
 **The split-combined-expression axis is not a universal register-pair-
-swap fix -- it helped `SceneNode__NotifyTaggedParents`'s swap (this same round, one word)
+swap fix -- it helped `SceneNode__AddToActorParents`'s swap (this same round, one word)
 and `GetSetBitField`'s swap (round 18, full close), but made THIS
 function's whole-function swap measurably worse.** Three data points now
 exist for this axis across two different residue shapes (a 2-value pair

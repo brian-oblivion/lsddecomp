@@ -44,6 +44,22 @@ extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
  * only p2 is, writing the boundary crossing to `out` when non-NULL.
  * BisectSegmentToBox finds that crossing by halving from the inside point
  * `near` towards the outside point `far`. */
+enum ClipResult {
+    CLIP_MISS = 0,      /* the segment misses the box */
+    CLIP_INSIDE = 1,    /* both ends are inside */
+    CLIP_P1_INSIDE = 2, /* only p1 is inside */
+    CLIP_P2_INSIDE = 3  /* only p2 is inside */
+};
+
+/* CalcBoxOutcode's bits: per axis, MAX when the point is past the box's
+ * maximum and MIN when it is before its minimum. */
+#define OUTCODE_Y_MIN 0x01
+#define OUTCODE_Y_MAX 0x02
+#define OUTCODE_X_MIN 0x04
+#define OUTCODE_X_MAX 0x08
+#define OUTCODE_Z_MIN 0x10
+#define OUTCODE_Z_MAX 0x20
+
 void BisectSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *near, TmdVec3 *far);
 extern s32 CalcBoxOutcode(TmdBox *box, TmdVec3 *point);
 s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2);
