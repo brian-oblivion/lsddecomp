@@ -26,6 +26,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <rand.h>
 #include "Actor.h"
 #include "TmdModel.h"
 #include "StyleEffect.h"
@@ -42,15 +43,11 @@ void NoOpIgnoreArgs(void) {}
  * ------------------------------------------------------------------ */
 
 extern void ReleaseBasicClassArray(void **array, s32 count);
-extern s32 rand(void);
 
-typedef struct Vec3O {
-    s32 x, y, z;
-} Vec3O;
-
-/* A rand()-indexed table of 6 Vec3-shaped entries, handed to each sprite's
- * updateScale. */
-extern Vec3O gStyleEffectJitterScales[];
+/* Six scale tables, each three Ratio16s (x, y, z), for the jittering
+ * sprites: a thin streak along y or along x, {1/16, 7/1}, {7/1, 1/16}, then
+ * the same with 3 and 2; z is 1/1. VariantSprite__UpdateScale reads x and y. */
+extern Ratio16 gStyleEffectJitterScales[6][3];
 
 void StyleEffect__ReleaseSprites(StyleEffect *self) {
     ReleaseBasicClassArray((void **)self->sprites, 5);
@@ -67,7 +64,7 @@ void StyleEffect__RandomizeSprites(StyleEffect *self) {
     for (i = 0; i < 4; i++, p++) {
         u32 r = rand();
 
-        (*p)->methods->updateScale(*p, 1, &gStyleEffectJitterScales[r % 6]);
+        (*p)->methods->updateScale(*p, 1, gStyleEffectJitterScales[r % 6]);
         (*p)->sprite.rotate = (rand() % 360) << 12;
     }
 }
@@ -87,7 +84,8 @@ void StyleEffect__ReleaseSpritesB(StyleEffect *self) {
  * smaller buffer shifts everything after the function. Its layout is not
  * established here. */
 typedef struct Buf38O {
-    u8 raw[0x38];
+    TmdHull hull;
+    u8 pad34[4];
 } Buf38O;
 
 /* StyleEffect's getter (include/StyleEffect.h), placed here by ROM address. */
@@ -102,21 +100,21 @@ extern Actor *gStyleEffectTmd;
 extern void *gStyleEffectTim;
 extern void *gStyleEffectViewport;
 extern s32 gStyleEffectModelIds[3];
-extern s32 gStyleEffectClutPos;
+extern s16 gStyleEffectClutPos[2];
 
-extern void TmdModel__SetFirstPrimClut(void *arg0, void *arg1);
+extern void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy);
 
 void SetStyleEffectSources(s32 unused, Actor *self, s32 arg2, s32 arg3) {
     s32 i;
-    void *ret;
+    TmdModel *ret;
 
     gStyleEffectTmd = self;
     gStyleEffectTim = (void *)arg2;
     gStyleEffectViewport = (void *)arg3;
     i = 0;
     do {
-        ret = (void *)self->methods->setBackClip(self, gStyleEffectModelIds[i]);
-        TmdModel__SetFirstPrimClut(ret, &gStyleEffectClutPos);
+        ret = (TmdModel *)self->methods->setBackClip(self, gStyleEffectModelIds[i]);
+        TmdModel__SetFirstPrimClut(ret, gStyleEffectClutPos);
         i++;
     } while (i < 2);
 }
@@ -185,7 +183,7 @@ void Actor__Reset(Actor *self) {
     self->pendingExtra = 0;
 }
 
-extern void RotateAndOffsetHullList(Buf38O *out, s32 arg1, s32 arg2, s32 arg3);
+extern void RotateAndOffsetHullList(TmdHull *hull, s32 turn, s32 back, s32 delta);
 
 void Actor__NotifyMove(Actor *self, s32 event) {
     GetSceneNodeMethods()->notifyWithHull((SceneNode *)self, event);
@@ -215,12 +213,12 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                 negative:
                     adjusted = h - self->pendingExtra;
                 joinAdjust:
-                    RotateAndOffsetHullList(&buf, isSeven, nonneg, adjusted);
+                    RotateAndOffsetHullList(&buf.hull, isSeven, nonneg, adjusted);
                 }
-                self->methods->transformAndNotifyParents(self, (TmdHull *)&buf, event);
+                self->methods->transformAndNotifyParents(self, &buf.hull, event);
                 /* The link target's class byte: an Actor gets slotE8. */
                 if (self->linkTarget != NULL) {
-                    if (*(u8 *)self->linkTarget->methods == 0x34) {
+                    if ((u8)self->linkTarget->methods->header == 0x34) {
                         ((Actor *)self->linkTarget)->methods->slotE8((Actor *)self->linkTarget);
                     }
                 }
@@ -233,9 +231,9 @@ void Actor__NotifyMove(Actor *self, s32 event) {
  * called with self alone in C terms, but they read the sender and event
  * this function received: $a1/$a2 are never touched before the call. */
 void Actor__DispatchLinkCommand(Actor *self, BasicClass *sender, s32 event) {
-    if (*(u8 *)sender->methods == 0x34) {
+    if ((u8)sender->methods->header == 0x34) {
         self->methods->onActorLinkCommand(self, sender, event);
-    } else if (*(u8 *)sender->methods == 0x24) {
+    } else if ((u8)sender->methods->header == 0x24) {
         self->methods->onGridCellLinkCommand(self, sender, event);
     }
 }
