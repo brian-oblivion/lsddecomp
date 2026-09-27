@@ -1500,6 +1500,16 @@
           "note": "Twelve units marked after five samples each: code_179d8_h (CD driver's blocking file access; CD_SECTOR_SHIFT, CD_PATH_SIZE, CD_SEARCH_ATTEMPTS), code_322b4 (sprite classes; GsSPRITE attribute bits, ScreenSpriteAnchor, FIX12_SHIFT), code_55dd4 (TOD file/frame/packet structs), class_3bb8c_k (ItemList__PlaySound, Pad event names, STAGEMAP/FADEBOX/DREAMSYS_CLASS_ID), class_3bb8c_o (ActorMoveEvent, GRIDCELL_CLASS_ID), code_3770c (CdStream onto <libcd.h>/<libspu.h>, CdStreamState), code_2cc8c_f (full-width Shift-JIS helpers), class_39e08 (DayTaskPhase/Result, OBJM_CLASS_ID, RegisterRecordTableFiles tier B), code_2c054 (StreamTask keepActive, TaskTextObj retired for DrawSystem), code_179d8_l (vmanager's Sony data names; SsUtVibrateOn/Off identified by position, game 1448 -> 1446), code_2864 (Viewport__DrawNode; BGLAYER/BOXFILL/SPRITE/SCREENSPRITE_CLASS_ID), code_171e0 (Set/GetDataDirectory, gDataDirectory).",
           "round": 99,
           "runners": 12
+        },
+        {
+          "attempts": 11,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 11,
+          "model": "opus",
+          "note": "Eleven units marked after five samples each: code_2cc8c_d (Viewport maxPackets/packetSize/extraSwap, GsLMODE_*, NoOpSlots), code_179d8_s (CdDriver onto <libcd.h>, CD_OPERATION_*/CD_STATE_*, gCdSyncQueueMode), code_d294_b (RaycastHullAgainstFaces, AddToActorParents, ClipResult/OUTCODE_*), code_39094 (the file-path table: sound banks, stage records, movies, read from retail), code_4cd08 (dream aux entities: triggers, day parity, spawn rotations), code_179d8_d (PlacementGrid geometry, ReturnZero), code_2cc8c_e (FadeBox colour tables and channel masks), class_3bb8c_c (TitleMenu save-title day, UpdateFlashbackLock), class_3bb8c_j (ItemList panel data, ITEMLIST_MODE_FULLWIDTH), code_2bb9c (TimImage empty slots, TIM_PMODE_CLUT_BIT), code_1677c (GameApplication hooks: ShowIntroLogos, PlayOpeningMovie, RunTitleMenu, RunDayTask, PlayEndingMovie). Head applied proposals across units: CD_FLAG_* into FileResource.h, Viewport and Application slots, SetDreamAuxWorld typed, BoxFill attachArg.",
+          "round": 100,
+          "runners": 11
         }
       ],
       "status": "auto",
@@ -1617,6 +1627,16 @@
           "note": "code_322b4 -> Sprite.c (Sony objects both sides; content would split sprites from RequestedFile/FrameClock/LightRig, parked unsplit), code_3770c -> CdStream.c (one class; Sony objects both sides).",
           "round": 99,
           "runners": 2
+        },
+        {
+          "attempts": 4,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 4,
+          "model": "opus",
+          "note": "Four files jobs, six regions: code_2864 -> ViewportDraw; code_39094 -> GameFiles (LbdFile plus the path getters, split parked); code_2c054..code_2cc8c_d -> Task (five slices, one file on single-user data; the head moved the 0x1890 rodata line and folded TaskViewport.h into Task.h); code_179d8_d..j -> PlacementGridVabSound + libsnd_vmanager (vmanager.o spans l/m/j on every disc), code_2cc8c_e..f -> ScreenWidgets.",
+          "round": 100,
+          "runners": 4
         }
       ],
       "status": "auto"
