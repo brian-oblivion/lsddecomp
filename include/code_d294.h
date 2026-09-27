@@ -64,44 +64,6 @@
  * reach these blocks. A later pass can do it with the offsets above.
  * ========================================================================= */
 
-/* Round 13 (BisectSegmentToBox): an axis-aligned bounding box, low corner then
- * high corner -- MEASURED from BisectSegmentToBox's own field offsets
- * (+0x0/+0x2/+0x4 = lo.x/y/z, +0x6/+0x8/+0xA = hi.x/y/z). */
-typedef struct BoundsBox_d294 {
-    TmdVec3 lo;
-    TmdVec3 hi;
-} BoundsBox_d294;
-
-/* Round 13 (SceneNode__CheckBoundsOverlap): a 12-byte, all-s16, 6-field record -- MEASURED,
- * same all-s16-struct-copy idiom as TmdVec3 (whole-value assignment
- * compiles to unaligned lwl/lwr). Used as TmdModel__GetBoundsBuffer's own return-array
- * element type and as this function's own second running-tracker. Round 73
- * (the match): the pairing is NOT scrambled -- TmdModel__GetBoundsBuffer's records are
- * BoundsBox_d294 boxes (f0..f2 = lo, f3..f5 = hi), the matched body reads
- * them through that type, and its tail is an ordinary per-axis AABB overlap
- * (docs/match-reports/SceneNode__CheckBoundsOverlap.md). This view is kept
- * only for any remaining accessor; track 4 folds it into BoundsBox_d294. */
-typedef struct Sixteen6_d294 {
-    s16 f0;
-    s16 f1;
-    s16 f2;
-    s16 f3;
-    s16 f4;
-    s16 f5;
-} Sixteen6_d294;
-
-/* Round 13 (SceneNode__CheckBoundsOverlap): `arg1`'s own struct -- a count followed by the
- * FIRST corner (`hdr`), with `count*8 - 1` more TmdVec3 corners
- * immediately after (stride 6, walked by raw pointer arithmetic since a
- * C89 flexible array member isn't available). MEASURED: `count*48` is the
- * byte span from `&hdr` to the array's end, i.e. 8 corners per `count`. */
-typedef struct CornerList_d294 CornerList_d294;
-
-struct CornerList_d294 {
-    s32 count;   /* +0x000 */
-    TmdVec3 hdr; /* +0x004, corner[0]; corner[1..] follow at +0x00A */
-};
-
 extern void *BMemPMgrAlloc(s32 size);
 extern void BMemPMgrFree(void *arg);
 
@@ -185,7 +147,7 @@ void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
  * register and these five functions are its per-field setters. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
-void BisectSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *near, TmdVec3 *far);
+void BisectSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *near, TmdVec3 *far);
 
 /* CalcBoxOutcode (round 54 correction: this banner was STALE -- it is
  * now carved and MATCHED in src/code_d294_c.c):
@@ -195,9 +157,9 @@ void BisectSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *near, TmdVec
  * primitive both functions build on. Returns the accumulated flags in
  * `$v0` unmasked (the mask is the CALLER's job, per ClipSegmentToBox's own
  * repeated `andi ...,0xFF` every time it re-reads a stored result). */
-extern s32 CalcBoxOutcode(BoundsBox_d294 *box, TmdVec3 *point);
+extern s32 CalcBoxOutcode(TmdBox *box, TmdVec3 *point);
 
-s32 ClipSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *p1, TmdVec3 *p2);
+s32 ClipSegmentToBox(TmdVec3 *out, TmdBox *box, TmdVec3 *p1, TmdVec3 *p2);
 
 /* SceneNode__FaceTarget (prototype in include/SceneNode.h; round 14, this unit -- the SAME external symbol
  * Entity_b/c/d/e.c call via their own separate `Entity.h` declaration,

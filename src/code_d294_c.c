@@ -305,23 +305,23 @@ s32 RatioToFixed12(void *pair) {
  * minimum (x -> 8/4, y -> 2/1, z -> 0x20/0x10). Returned unmasked; callers
  * do their own `andi ..., 0xFF`. The first axis assigns rather than ORs
  * only because `flags` is provably 0 there. */
-s32 CalcBoxOutcode(BoundsBox_d294 *box, TmdVec3 *point) {
+s32 CalcBoxOutcode(TmdBox *box, TmdVec3 *point) {
     s32 flags;
 
     flags = 0;
-    if (box->hi.x < point->x) {
+    if (box->max.x < point->x) {
         flags = 8;
-    } else if (point->x < box->lo.x) {
+    } else if (point->x < box->min.x) {
         flags = 4;
     }
-    if (box->hi.y < point->y) {
+    if (box->max.y < point->y) {
         flags |= 2;
-    } else if (point->y < box->lo.y) {
+    } else if (point->y < box->min.y) {
         flags |= 1;
     }
-    if (box->hi.z < point->z) {
+    if (box->max.z < point->z) {
         flags |= 0x20;
-    } else if (point->z < box->lo.z) {
+    } else if (point->z < box->min.z) {
         flags |= 0x10;
     }
     return flags;
