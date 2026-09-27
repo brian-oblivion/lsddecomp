@@ -29,13 +29,27 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <libetc.h>
 #include "BasicClass.h"
 #include "SceneNode.h"
+#include "GridCell.h"
 #include "BgLayer.h"
 #include "BoxFill.h"
 #include "Sprite.h"
 #include "ScreenSprite.h"
 #include "Viewport.h"
+
+/* The bits of avsz3's OTZ that one OT spans: SortTmdObject files a face at
+ * otBase[otz >> (OTZ_BITS - otLength)], so 1 << otLength tags cover OTZ
+ * 0..(1 << 14) - 1; Sony's samples pass GsSortObject4 the same
+ * 14 - OT_LENGTH. */
+#define OTZ_BITS 14
+
+/* A world-space sprite whose projected x or y is further than this from the
+ * screen centre, on either side, is placed at +SPRITE_POS_LIMIT on that
+ * axis: past the right or bottom edge even of a 640x480 display, whose
+ * half-size is 320x240. */
+#define SPRITE_POS_LIMIT 512
 
 /* code_d294_c.c (include/code_d294.h) */
 extern void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
@@ -73,7 +87,7 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     dirty = 0;
     ls = &lsBuf;
     lw = &lwBuf;
-    if ((u8)node->methods->header == 0x24 && (s32)node->attribute < 0) {
+    if ((u8)node->methods->header == GRIDCELL_CLASS_ID && (s32)node->attribute < 0) {
         return;
     }
 
@@ -85,11 +99,11 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
         end = &coord2->coord.m[3][0];
         RotMatrix(&coord2->param->rotate, &coord2->coord);
         while (elem < end) {
-            *elem = (*elem * *scale++) >> 12;
+            *elem = (*elem * *scale++) >> FIX12_SHIFT;
             elem++;
-            *elem = (*elem * *scale++) >> 12;
+            *elem = (*elem * *scale++) >> FIX12_SHIFT;
             elem++;
-            *elem = (*elem * *scale++) >> 12;
+            *elem = (*elem * *scale++) >> FIX12_SHIFT;
             elem++;
             scale -= 3;
         }
@@ -102,7 +116,8 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
                 cursor = node->children;
             }
             GetNextBasicClass((BasicClass **)&child, &cursor);
-            if (child != NULL && (child->methods->header & 0xF) == 4 && child->parent == node) {
+            if (child != NULL && (child->methods->header & CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID &&
+                child->parent == node) {
                 break;
             }
             if (cursor == NULL) {
@@ -119,10 +134,10 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
     } while (cursor != NULL);
 
     classId = node->methods->header;
-    if ((classId & 0xFF) == 0x54) {
+    if ((classId & 0xFF) == BGLAYER_CLASS_ID) {
         GsSortBg((GsBG *)&((BgLayer *)node)->bgAttribute, self->ot[self->otIndex],
                  (1 << self->otLength) - 1);
-    } else if ((classId & 0xFF) == 0x64) {
+    } else if ((classId & 0xFF) == BOXFILL_CLASS_ID) {
         BoxFill *box = (BoxFill *)node;
         if (box->relative) {
             box->boxX = ((self->screenSize.width >> 1) * box->posX) / 100;
@@ -132,15 +147,15 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             box->boxY = box->posY;
         }
         GsSortBoxFill((GsBOXF *)&box->boxAttribute, self->ot[self->otIndex], box->pri);
-    } else if ((classId & 0xFF) != 0x44) {
+    } else if ((classId & 0xFF) != SPRITE_CLASS_ID) {
         GsGetLws(node->coord2, lw, ls);
         GsSetLightMatrix(lw);
         GsSetLsMatrix(ls);
         if (node->tmd != 0) {
-            SortTmdObject((GsDOBJ2 *)&node->attribute, self->ot[self->otIndex], 14 - self->otLength,
-                          (void *)0x1F800000);
+            SortTmdObject((GsDOBJ2 *)&node->attribute, self->ot[self->otIndex],
+                          OTZ_BITS - self->otLength, getScratchAddr(0));
         }
-    } else if ((classId & 0xFFF) == 0x144) {
+    } else if ((classId & 0xFFF) == SCREENSPRITE_CLASS_ID) {
         ScreenSprite *screenSprite = (ScreenSprite *)node;
         GsSPRITE *gsSprite = (GsSPRITE *)&screenSprite->sprite;
         s32 *screen = &self->screenSize.width;
@@ -177,15 +192,15 @@ void Viewport__DrawNode(Viewport *self, SceneNode *node) {
             pos.vy = (pos.vy * self->projH) / pos.vz;
             pos.vz = (pos.vz - self->nearZ) / self->zDiv;
             worldSprite = (Sprite *)node;
-            if ((pos.vx < 0 ? ~pos.vx + 1 : pos.vx) <= 0x200) {
+            if ((pos.vx < 0 ? ~pos.vx + 1 : pos.vx) <= SPRITE_POS_LIMIT) {
                 worldSprite->sprite.x = pos.vx;
             } else {
-                worldSprite->sprite.x = 0x200;
+                worldSprite->sprite.x = SPRITE_POS_LIMIT;
             }
-            if ((pos.vy < 0 ? ~pos.vy + 1 : pos.vy) <= 0x200) {
+            if ((pos.vy < 0 ? ~pos.vy + 1 : pos.vy) <= SPRITE_POS_LIMIT) {
                 worldSprite->sprite.y = pos.vy;
             } else {
-                worldSprite->sprite.y = 0x200;
+                worldSprite->sprite.y = SPRITE_POS_LIMIT;
             }
             GsSortSprite((GsSPRITE *)&worldSprite->sprite, self->ot[self->otIndex], pos.vz);
         }

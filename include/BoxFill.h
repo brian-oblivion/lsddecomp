@@ -65,6 +65,11 @@ typedef struct BoxFillPos BoxFillPos;
 #define BOXFILL_ATTR_ALON_SHIFT 30 /* GsALON: semitransparency on */
 #define BOXFILL_ATTR_DOFF_SHIFT 31 /* GsDOFF: display off */
 
+/* BoxFill's class id (gBoxFillMethods word +0x000). Two nibbles, so
+ * `(header & 0xFF) == BOXFILL_CLASS_ID` is its is-kind-of test, true for
+ * FadeBox (0x164) too (Viewport__DrawNode). */
+#define BOXFILL_CLASS_ID 0x64
+
 /* The ctor's (and Reset's) size argument: two words of which only the low
  * halfwords are read (lhu at +0x000 and +0x004), into boxW and boxH. The
  * callers pass s32 pairs of their own types (class_3bb8c_n's PairXY,
