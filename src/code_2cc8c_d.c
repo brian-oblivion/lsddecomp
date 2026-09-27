@@ -61,7 +61,7 @@ extern ViewportRgb gDefaultViewportColorAlias __asm__("gDefaultViewportColor");
  * tags; with the near and far defaults Update's zDiv comes out 8. The packet
  * size is also TaskCore's reset value for what it passes to setPacketSize. */
 #define VIEWPORT_DEFAULT_OT_LENGTH 13
-#define VIEWPORT_DEFAULT_PACKET_COUNT 2000
+#define VIEWPORT_DEFAULT_MAX_PACKETS 2000
 #define VIEWPORT_DEFAULT_PACKET_SIZE 64
 #define VIEWPORT_DEFAULT_PROJ_H 256 /* GsSetProjection's h */
 #define VIEWPORT_DEFAULT_NEAR_Z 10
@@ -79,7 +79,7 @@ void Viewport__InitDefaults(Viewport *self) {
     /* MATCHING: without it both stores sink below the constant stores. */
     __asm__("");
     self->otLength = VIEWPORT_DEFAULT_OT_LENGTH;
-    self->packetCount = VIEWPORT_DEFAULT_PACKET_COUNT;
+    self->maxPackets = VIEWPORT_DEFAULT_MAX_PACKETS;
     self->packetSize = VIEWPORT_DEFAULT_PACKET_SIZE;
     self->projH = VIEWPORT_DEFAULT_PROJ_H;
     self->nearZ = VIEWPORT_DEFAULT_NEAR_Z;
@@ -88,7 +88,7 @@ void Viewport__InitDefaults(Viewport *self) {
     self->fogNear = VIEWPORT_DEFAULT_FOG_NEAR;
     self->farColor = gDefaultViewportColor;
     self->clearColor = gDefaultViewportColorAlias;
-    self->extraSwapOnBuffer0 = 0;
+    self->extraSwap = 0;
     self->drawEnabled = 1;
 }
 
@@ -101,9 +101,9 @@ void Viewport__SetOtLength(Viewport *self, s32 length) {
 }
 
 /* Takes only before InitOt, which sizes the packet areas from it. */
-void Viewport__SetMaxPackets(Viewport *self, s32 count) {
+void Viewport__SetMaxPackets(Viewport *self, s32 maxPackets) {
     if (self->otReady == 0) {
-        self->packetCount = count;
+        self->maxPackets = maxPackets;
     }
 }
 
@@ -195,7 +195,7 @@ void Viewport__NoOpSlot84(void) {}
 void Viewport__NoOpSlot88(void) {}
 
 /* One-time allocation of the two ordering tables. Each half of the buffer
- * is a GsOT header, its 1 << otLength tags, then packetSize * packetCount
+ * is a GsOT header, its 1 << otLength tags, then packetSize * maxPackets
  * bytes of packet area. */
 void Viewport__InitOt(Viewport *self) {
     s32 size;
@@ -208,7 +208,7 @@ void Viewport__InitOt(Viewport *self) {
         return;
     }
 
-    size = (sizeof(GsOT_TAG) << self->otLength) + (self->packetSize * self->packetCount + hdrSize);
+    size = (sizeof(GsOT_TAG) << self->otLength) + (self->packetSize * self->maxPackets + hdrSize);
 
     buf = (s32)BMemPMgrAlloc(size * 2);
     if (buf == 0) {
@@ -311,7 +311,7 @@ void Viewport__Update(Viewport *self) {
 /* Takes otIndex from the DrawSystem's getActiveBuffer; when drawing is
  * enabled, resets the GPU, swaps, sorts the clear into this half's OT and
  * draws it, with one more swap before the clear and one after the draw on
- * buffer 0 when extraSwapOnBuffer0 is set; then flips otIndex to the other
+ * buffer 0 when extraSwap is set; then flips otIndex to the other
  * half. */
 void Viewport__Flip(Viewport *self) {
     s32 idx;
@@ -328,7 +328,7 @@ void Viewport__Flip(Viewport *self) {
     ResetGraph(1);
     self->drawSystem->methods->swapBuffers(self->drawSystem);
 
-    if (self->extraSwapOnBuffer0 != 0) {
+    if (self->extraSwap != 0) {
         if (self->otIndex == 0) {
             self->drawSystem->methods->swapBuffers(self->drawSystem);
         }
@@ -340,7 +340,7 @@ void Viewport__Flip(Viewport *self) {
     idx = self->otIndex;
     GsDrawOt(self->ot[idx]);
 
-    if (self->extraSwapOnBuffer0 != 0 && self->otIndex == 0) {
+    if (self->extraSwap != 0 && self->otIndex == 0) {
         self->drawSystem->methods->swapBuffers(self->drawSystem);
     }
 
@@ -373,7 +373,7 @@ SceneNode *Viewport__GetFadeBox(Viewport *self) {
 }
 
 void Viewport__SetExtraSwap(Viewport *self, s32 on) {
-    self->extraSwapOnBuffer0 = on;
+    self->extraSwap = on;
 }
 
 void Viewport__SetDrawEnabled(Viewport *self, s32 on) {

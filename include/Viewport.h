@@ -43,10 +43,10 @@
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
  * position where SceneNode's attachToParent slot takes a LongVec3 offset;
  * the ctor and Viewport__SetFadeBox pass gFadeBoxAttachPos (-100, -100) through the
- * inherited slot with a pointer cast. packetCount and packetSize multiply
+ * inherited slot with a pointer cast. maxPackets and packetSize multiply
  * to each buffer's packet area (InitOt; defaults 2000 and 64); which is the
- * count and which the size is Sony's PACKETMAX * size idiom and the values
- * callers pass, not the code. drawNode (Viewport__DrawNode) reads its
+ * count and which the size comes from Sony's PACKETMAX * size idiom and the
+ * values callers pass, not from the code. drawNode (Viewport__DrawNode) reads its
  * node through code_2864.c's own DrawNode view, so it is not prototyped
  * here.
  *
@@ -140,7 +140,7 @@ struct ViewportRefView {
     /* +0x034 */ ViewportSize screenSize;                                                          \
     /* +0x03C */ s32 otLength;            /* GsOT length: 1 << otLength tags; drawNode's priority range */ \
     /* +0x040 */ s32 projH;               /* GsSetProjection's h; drawNode's sprite projection */  \
-    /* +0x044 */ s32 packetCount;         /* packetCount * packetSize: each buffer's packet area */ \
+    /* +0x044 */ s32 maxPackets;          /* maxPackets * packetSize: each buffer's packet area */  \
     /* +0x048 */ s32 packetSize;          /* bytes per packet (see the banner) */                  \
     /* +0x04C */ s32 nearZ;               /* GsSetNearClip; drawNode's sprite near limit */        \
     /* +0x050 */ s32 farZ;                /* zDiv = (farZ - nearZ) / (1 << otLength) + 1 */        \
@@ -161,7 +161,7 @@ struct ViewportRefView {
     /* +0x09C */ u8 pad09C[0x0AC - 0x09C];                                                         \
     /* +0x0AC */ SceneNode *sceneRoot;   /* the ctor's New_SceneNode; Update draws it; finalize releases it */ \
     /* +0x0B0 */ SceneNode *fadeBox;   /* the ctor's New_FadeBox, attached under sceneRoot */ \
-    /* +0x0B4 */ s32 extraSwapOnBuffer0;  /* Flip: nonzero swaps before and after drawing buffer 0 */ \
+    /* +0x0B4 */ s32 extraSwap;           /* Flip: nonzero swaps before and after drawing buffer 0 */ \
     /* +0x0B8 */ s32 drawEnabled          /* Flip: 0 skips the clear and draw; default 1 */
 /* clang-format on */
 
