@@ -35,6 +35,7 @@
 #include "Viewport.h"
 #include "LightRig.h"
 #include "FrameClock.h"
+#include "Pad.h"
 
 s32 TaskCore__GetActiveSlotCount(TaskCore *self) {
     return self->slotCounts[self->activeSlot];
@@ -52,24 +53,6 @@ extern u8 gDefaultStreamTaskInitData[];
 void *GetDefaultStreamTaskInitData(void) {
     return gDefaultStreamTaskInitData;
 }
-
-/* One local reading of the objects IntermediateBase calls outside
- * BasicClass's slots: initArgs->unk0 (+0x048 in onState2, +0x04C in
- * onState3), initArgs->unk4 (+0x044, +0x048 in onTag1Notify) and unk10
- * (+0x044 in onTag1Notify). Their classes are not established; every call
- * passes the object alone. */
-typedef struct IntermediateBaseLinked IntermediateBaseLinked;
-
-typedef struct IntermediateBaseLinkedMethods {
-    u8 pad000[0x044];
-    void (*slot44)(IntermediateBaseLinked *self); /* +0x044 */
-    void (*slot48)(IntermediateBaseLinked *self); /* +0x048 */
-    void (*slot4C)(IntermediateBaseLinked *self); /* +0x04C */
-} IntermediateBaseLinkedMethods;
-
-struct IntermediateBaseLinked {
-    IntermediateBaseLinkedMethods *methods; /* +0x000 */
-};
 
 void IntermediateBase__IntermediateBase(IntermediateBase *self) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
@@ -159,13 +142,13 @@ void IntermediateBase__Deinit(IntermediateBase *self) {
 }
 
 void IntermediateBase__OnTag1Notify(IntermediateBase *self, BasicClass *sender, s32 event) {
-    IntermediateBaseLinked *obj4;
+    Pad *pad;
 
     if (event == 2) {
         ((FrameClock *)self->unk10)->methods->tick((FrameClock *)self->unk10);
-        obj4 = (IntermediateBaseLinked *)self->initArgs->pad;
-        obj4->methods->slot44(obj4);
-        obj4->methods->slot48(obj4);
+        pad = (Pad *)self->initArgs->pad;
+        pad->methods->updateMasks(pad);
+        pad->methods->dispatchEvents(pad);
     }
 }
 
@@ -196,18 +179,18 @@ void IntermediateBase__SetState(IntermediateBase *self, s32 state) {
 }
 
 void IntermediateBase__OnState2(IntermediateBase *self) {
-    IntermediateBaseLinked *obj0;
+    DrawSystem *drawSystem;
 
     self->frameCounter = 0;
-    obj0 = (IntermediateBaseLinked *)self->initArgs->drawSystem;
-    obj0->methods->slot48(obj0);
+    drawSystem = (DrawSystem *)self->initArgs->drawSystem;
+    drawSystem->methods->start(drawSystem);
 }
 
 void IntermediateBase__OnState3(IntermediateBase *self) {
-    IntermediateBaseLinked *obj0;
+    DrawSystem *drawSystem;
 
-    obj0 = (IntermediateBaseLinked *)self->initArgs->drawSystem;
-    obj0->methods->slot4C(obj0);
+    drawSystem = (DrawSystem *)self->initArgs->drawSystem;
+    drawSystem->methods->stop(drawSystem);
     self->frameCounter = 0;
 }
 
