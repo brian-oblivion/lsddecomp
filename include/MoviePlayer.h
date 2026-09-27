@@ -10,7 +10,7 @@
  * method table gMoviePlayerMethods, a direct BasicClass subclass). Methods in
  * src/GraphicsResources.c; the object is 0x6C bytes (New_MoviePlayer). The one
  * holder is StreamTask (`player`, include/StreamTask.h, src/code_2c054.c),
- * which builds it with New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0)
+ * which builds it with New_MoviePlayer(GetDefaultMovieFrame(), 0, 0)
  * and calls +0x06C setAutoPlay, +0x040 play, +0x048 advance, +0x04C abort
  * and +0x004 release.
  *

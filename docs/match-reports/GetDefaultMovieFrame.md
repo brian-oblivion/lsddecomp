@@ -1,4 +1,6 @@
-# GetDefaultStreamTaskInitData — MATCH (4/4 words)
+# GetDefaultMovieFrame — MATCH (4/4 words)
+
+> Renamed from `GetDefaultStreamTaskInitData` on 2026-09-27 (tools/rename.py). Address 0x8003dfcc.
 
 > Renamed from `func_8003DFCC` on 2026-09-19 (tools/rename.py). Address 0x8003dfcc.
 
@@ -9,7 +11,7 @@
 A tiny getter: returns the address of the static table `gDefaultMovieFrame`, a
 3-word struct per `include/code_2c054.h`'s own `StreamTaskInitData` local
 view (that unit's `StreamTask__StreamTask` uses it as the 5th/stack argument to a
-constructor call, and `GetDefaultStreamTaskInitData()`'s return value feeds the same
+constructor call, and `GetDefaultMovieFrame()`'s return value feeds the same
 3-word copy). This unit never dereferences it, only returns its address,
 so it is declared here as an opaque `u8[]`.
 
@@ -18,7 +20,7 @@ so it is declared here as an opaque `u8[]`.
 ```c
 extern u8 gDefaultMovieFrame[];
 
-void *GetDefaultStreamTaskInitData(void)
+void *GetDefaultMovieFrame(void)
 {
     return gDefaultMovieFrame;
 }
@@ -31,7 +33,7 @@ first build.
 
 ## Naming
 
-**GetDefaultStreamTaskInitData** (renamed from `func_8003DFCC`, round 55,
+**GetDefaultMovieFrame** (renamed from `func_8003DFCC`, round 55,
 runner alpha). Tier A: pure leaf getter, returns `&gDefaultMovieFrame`
 (formerly `D_8006E854`), already declared `StreamTaskInitData *func_8003DFCC(void)`
 in `include/code_2c054.h` and used there (`code_2c054.c`) as the fallback

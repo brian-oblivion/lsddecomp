@@ -26,7 +26,7 @@
  * Overrides, each named for its slot:
  *   +0x008 ctor           StreamTask__StreamTask: TaskCore's ctor, this
  *                         table, initData copied from the fifth argument or
- *                         GetDefaultStreamTaskInitData(), the player,
+ *                         GetDefaultMovieFrame(), the player,
  *                         streamName 0, resetCounters.
  *   +0x00C finalize       StreamTask__Finalize: releases the player, then
  *                         TaskCore's.
@@ -91,7 +91,7 @@ enum StreamTaskState { STREAMTASK_STATE_SKIPPED = 18 };
 #define STREAMTASK_FRAMES_PER_SECOND 15
 
 /* `initData` is a DrawRect (include/DrawSystem.h): the ctor's optional fifth
- * (stack) argument, else GetDefaultStreamTaskInitData()'s
+ * (stack) argument, else GetDefaultMovieFrame()'s
  * &gDefaultMovieFrame, {x 640, y 0, w 320, h 240}, the same rect the
  * ctor hands New_MoviePlayer as the player's frame and TaskCore__OnInit
  * clears. Copied whole (retail loads all three words before storing any: a
@@ -115,7 +115,7 @@ struct StreamTask {
     TASKCORE_FIELDS(StreamTaskMethods);
     /* +0x0A4 */ s32 playDone; /* OnInit: 0; Update: the player's Advance until nonzero */
     /* +0x0A8 */ DrawRect initData; /* the ctor's fifth argument or the default */
-    /* +0x0B4 */ struct MoviePlayer *player; /* New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0); finalize releases it */
+    /* +0x0B4 */ struct MoviePlayer *player; /* New_MoviePlayer(GetDefaultMovieFrame(), 0, 0); finalize releases it */
     /* +0x0B8 */ s32 streamName;  /* Init's; the player's Play name. ctor: 0 */
     /* +0x0BC */ s32 streamGroup; /* Init's (GetStreamGroupForType, or -1); Play's second argument */
     /* +0x0C0 */ s32 autoPlay; /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to MarkPlaying at once */

@@ -40,9 +40,9 @@ void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soun
     if (initData != NULL) {
         self->initData = *initData;
     } else {
-        self->initData = *GetDefaultStreamTaskInitData();
+        self->initData = *GetDefaultMovieFrame();
     }
-    self->player = New_MoviePlayer(GetDefaultStreamTaskInitData(), 0, 0);
+    self->player = New_MoviePlayer(GetDefaultMovieFrame(), 0, 0);
     self->streamName = 0;
     self->methods->resetCounters(self);
 }
