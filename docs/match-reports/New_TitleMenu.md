@@ -16,7 +16,7 @@ own `dreamSys` argument.
 
 Also externally visible as a `PollTaskCtor` callback -- `include/GameApplication.h`
 (a different unit) already declares this exact symbol,
-`extern PollTask *New_TitleMenu(void *dreamSys);`, used by `GameApplication__PollGraphRoomStatus`
+`extern PollTask *New_TitleMenu(void *dreamSys);`, used by `GameApplication__RunTitleMenu`
 as `GameApplication__RunPollTask`'s `ctor` argument. That declaration's return/param
 naming is kept as-is there (independent local view); this unit's own
 `dreamSys` parameter name/type was chosen to match it.
@@ -65,4 +65,4 @@ are unique symbols, tree-wide by construction, so that call site now reads
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Its parameter is now `struct DreamSys *dreamSys` (the ctor's; GameApplication__PollGraphRoomStatus passes self->dreamSys). code_1677c's local `PollTask *` extern is gone; it casts to PollTaskCtor as for New_GraphRoom. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Its parameter is now `struct DreamSys *dreamSys` (the ctor's; GameApplication__RunTitleMenu passes self->dreamSys). code_1677c's local `PollTask *` extern is gone; it casts to PollTaskCtor as for New_GraphRoom. Byte-identical (whole image green, 0 new warnings, nonmatching green).

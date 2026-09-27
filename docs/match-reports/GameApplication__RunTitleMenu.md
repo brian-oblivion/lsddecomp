@@ -1,4 +1,6 @@
-# GameApplication__PollGraphRoomStatus
+# GameApplication__RunTitleMenu
+
+> Renamed from `GameApplication__PollGraphRoomStatus` on 2026-09-27 (tools/rename.py). Address 0x80026410.
 
 > Renamed from `Class6D3C8__PollGraphRoomStatus` on 2026-09-26 (tools/rename.py). Address 0x80026410.
 
@@ -21,7 +23,7 @@ whether that final status was below `1` (unsigned).
 ## Final C
 
 ```c
-s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
+s32 GameApplication__RunTitleMenu(GameApplication *self) {
     s32 status;
     s32 pollDone;
 
@@ -139,7 +141,7 @@ sequential code, not an early return.
 
 ## Naming
 
-**`GameApplication__PollGraphRoomStatus` -- tier B.** Mechanics: gated by
+**`GameApplication__RunTitleMenu` -- tier B.** Mechanics: gated by
 `arg->unk10`, checks the owned `DreamSys`'s own status accessor, then loops
 `GameApplication__RunPollTask(New_TitleMenu, ...)`, restarting
 `GameApplication__RunPollTask(New_GraphRoom, ...)` on every "2" report, until

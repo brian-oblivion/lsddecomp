@@ -12,7 +12,7 @@
  * src/class_3bb8c_c.c holds the allocator and ctor, src/class_3bb8c_d.c every
  * other method and the getter.
  *
- * Who makes one: GameApplication__PollGraphRoomStatus (src/code_1677c.c) runs
+ * Who makes one: GameApplication__RunTitleMenu (src/code_1677c.c) runs
  * it with GameApplication__RunPollTask(New_TitleMenu, dreamSys, ...) after the
  * day's GraphRoom; while it returns 2 (GRAPH) it runs GraphRoom again and then
  * the menu again.
@@ -130,7 +130,7 @@ enum TitleMenuEntry {
     TITLEMENU_SHAKE = 5
 };
 
-/* TitleMenu's `result` for GRAPH: GameApplication__PollGraphRoomStatus runs
+/* TitleMenu's `result` for GRAPH: GameApplication__RunTitleMenu runs
  * GraphRoom again, then the menu again, while the menu returns it. */
 #define TITLEMENU_RESULT_GRAPH 2
 

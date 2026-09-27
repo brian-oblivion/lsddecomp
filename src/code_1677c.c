@@ -58,7 +58,7 @@ typedef struct PollTask {
 typedef PollTask *(*PollTaskCtor)(void *arg);
 
 /* This unit's own function, defined later in ROM order (forward declared
- * for GameApplication__PollGraphRoomStatus, which comes first). Constructs a PollTask via the
+ * for GameApplication__RunTitleMenu, which comes first). Constructs a PollTask via the
  * caller-supplied `ctor`, dispatches slot44(task, initArgs, 0) and slot4(task)
  * on it, and returns slot44's result. */
 s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseInitArgs *initArgs);
@@ -215,7 +215,7 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
  * restarting the first PollTask each time it reports "2", until it
  * reports anything else; clears self->skipGraphRoomPoll and returns 0 or 2 depending
  * on whether that final status was below 1. */
-s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
+s32 GameApplication__RunTitleMenu(GameApplication *self) {
     s32 status;
     s32 pollDone;
 
@@ -260,7 +260,7 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
     return result;
 }
 
-/* Called by GameApplication__PollGraphRoomStatus when its first PollTask reports "2". Gated by
+/* Called by GameApplication__RunTitleMenu when its first PollTask reports "2". Gated by
  * self->config->playStreams (same gate as GameApplication__PlayOpeningMovie). Builds a StreamTask,
  * derives a count via GetSpecialDayMovieSpan, sets the task's frame bound
  * to that count / 15 and clears skipOnConfirm, then runs its init (stream
@@ -293,7 +293,7 @@ void GameApplication__NoOpSlot5C(void) {}
 /* Builds a DayTask (include/DayTask.h), runs its init with self
  * alone (DayTask__Init takes nothing else, hence DayTaskInitFn) and
  * releases it; init's return, TimedTask::result, is a status code: 2 runs GameApplication__PlayCinematic, 3 latches self->skipGraphRoomPoll.
- * Then queries the DreamSys status slot again (as GameApplication__PollGraphRoomStatus does),
+ * Then queries the DreamSys status slot again (as GameApplication__RunTitleMenu does),
  * this time passing an out-param, and derives a 0/1 result from both the
  * call's return and the out-param. */
 /* Builds a DayTask for this instance's current state, reads one status

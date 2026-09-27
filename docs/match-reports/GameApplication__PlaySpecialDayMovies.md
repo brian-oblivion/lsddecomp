@@ -10,7 +10,7 @@
 
 ## What it does
 
-Called by `GameApplication__PollGraphRoomStatus` (matched earlier) when its first `PollTask`
+Called by `GameApplication__RunTitleMenu` (matched earlier) when its first `PollTask`
 reports `2`. Gated by `self->arg->unk08 != 0` (the same gate
 `GameApplication__PlayOpeningMovie` uses). Builds a `StreamTask`, derives a count via
 `GetSpecialDayMovieSpan`, initializes the task with that count divided by 15 and a
@@ -111,7 +111,7 @@ second local is involved.
 initializes the task from `count/15` and a fixed sub-slot, dispatches a
 5-argument `configure` (`a3 = -1`, unlike every other StreamTask launcher in
 this unit), then starts it. Named for its one and only caller:
-`GameApplication__PollGraphRoomStatus` invokes it exactly when its first
+`GameApplication__RunTitleMenu` invokes it exactly when its first
 `GraphRoom`-named PollTask (`New_GraphRoom`) reports status "2" -- the
 same "GraphRoom" vocabulary as that report's naming, not a guess (evidence:
 the call-site gate, not the function body alone, which by itself doesn't

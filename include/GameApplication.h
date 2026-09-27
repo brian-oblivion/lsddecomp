@@ -92,7 +92,7 @@ void GameApplication__ShowIntroLogos(GameApplication *self);
 void GameApplication__ShowImage(GameApplication *self, const char *path);
 s32 GameApplication__RegisterFilesCallback(void);
 void GameApplication__PlayOpeningMovie(GameApplication *self);
-s32 GameApplication__PollGraphRoomStatus(GameApplication *self);
+s32 GameApplication__RunTitleMenu(GameApplication *self);
 void GameApplication__PlaySpecialDayMovies(GameApplication *self);
 void GameApplication__NoOpSlot5C(void);
 s32 GameApplication__PollStatusObj(GameApplication *self);

@@ -158,7 +158,7 @@ data the class itself reads:
 - tick's cases agree with that order: 1 (FLASHBACK) opens a flashback session
   (DreamSys getSetFlashbackSession(0, 1)), 2 (SAVE) calls saveCtrl's
   beginSave, 3 (LOAD) its beginLoad, 4 (GRAPH) returns 2, and
-  GameApplication__PollGraphRoomStatus runs GraphRoom again on a 2;
+  GameApplication__RunTitleMenu runs GraphRoom again on a 2;
 - refreshViewValue stores slotCounts[5] (SHAKE, the one slot with an item
   list, unk24[5] = D_80086CA8) through getSetScreenShake;
 - registrationSlots D_80086CDC = {0, 1, 0, ...}: FLASHBACK starts locked, and

@@ -235,7 +235,7 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
  * currentYear, currentDay, moodPreviousDays[365] (include/DreamSys.h). The
  * round-24 reading of this record ("a separate day-log object, not
  * DreamSys") predates knowing who passes the ctor's argument:
- * GameApplication__PollGraphRoomStatus passes its dreamSys.
+ * GameApplication__RunTitleMenu passes its dreamSys.
  *
  * +0x467 is DreamSys +0x5DF, the last byte of DreamSys's
  * unknown_values_0x5d8[8]: ScoreDayLog fails once it is set and sets it on

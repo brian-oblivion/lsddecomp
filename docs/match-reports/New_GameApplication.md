@@ -134,7 +134,7 @@ Five attempts spent, all at 23/24 or worse (never better):
    construct: ...`) — 15/24, WORSE: this shape doesn't merge the two exits
    into one epilogue at all (grows by 2 words, matching the general
    "early return with a separate epilogue" trap documented for
-   `GameApplication__PollGraphRoomStatus`).
+   `GameApplication__RunTitleMenu`).
 3. **Bare `__asm__("")` as the very first statement of the function**
    (before the `malloc` call) — the one position broadcast #2 said closed
    an unrelated function's residue, and the existing report here had only

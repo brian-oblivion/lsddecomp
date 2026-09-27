@@ -87,7 +87,7 @@ New_X shape, 0x50 bytes), dispatches `slot44(obj)` (return kept) then
 captures the *preceding* call's return" idiom `GameApplication__RunPollTask` uses), and
 switches on that status: `2` runs `GameApplication__PlayCinematic`, `3` latches
 `self->unk24`. Then queries the `DreamSys` status slot again
-(`DreamSys__GetCurrentDayAndYear`, the same slot `GameApplication__PollGraphRoomStatus` uses) with an out-parameter
+(`DreamSys__GetCurrentDayAndYear`, the same slot `GameApplication__RunTitleMenu` uses) with an out-parameter
 this time, and derives a 0/1 result from both the call's return and the
 out-param.
 
@@ -187,7 +187,7 @@ allocation, in three layers:
    lowering materializes an unused default-arm constant (`1`) in the
    `beq`'s delay slot even though nothing ever reads it (same "unused
    value in a delay slot" idiom documented elsewhere in this unit, e.g.
-   `GameApplication__PollGraphRoomStatus`'s `pollDone`). No `switch`/`if` reshaping reproduced it;
+   `GameApplication__RunTitleMenu`'s `pollDone`). No `switch`/`if` reshaping reproduced it;
    adding an explicit `case 1: break;` regressed badly (27/57, GCC grew the
    whole switch, presumably crossing a density threshold into a different
    lowering strategy).
@@ -250,7 +250,7 @@ switched on," and only the former gets the free reuse.
 (`slot4`), reacts to two of the codes (2 -> `GameApplication__PlayCinematic`,
 3 -> latch `self->unk24`), then separately queries the owned `DreamSys`'s
 day/year status and derives a 0/1 result. Named for the StatusObj query
-mechanic, matching this unit's `GameApplication__PollGraphRoomStatus` naming
+mechanic, matching this unit's `GameApplication__RunTitleMenu` naming
 shape (both are "poll an object for a status code and react to it"), since
 what the two status-code values actually MEAN in the game is not
 established from this body alone.
