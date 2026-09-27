@@ -18,7 +18,7 @@ recorded:
    (insertions) + 2×100=200 (deletions). NOT 0/0 — real insertions/deletions,
    in principle reachable by source mutation.
 3. **Scaffold-vs-in-tree agreement.** Rebuilt the 99/107 seed body live in
-   `src/code_8220.c`, confirmed `funcdiff.py` reproduces the round-45 99/107
+   `src/BMemPMgr.c`, confirmed `funcdiff.py` reproduces the round-45 99/107
    figure exactly with zero out-of-range drift. Then objdumped the
    permuter's `base.o` and diffed it mnemonic-by-mnemonic against
    `build/lsdde.elf`'s linked disassembly for this function: **identical
@@ -37,7 +37,7 @@ they were tested separately before either was trusted:**
 1. Retyping the shared `extern void SetBMemPMgrBusy(s32 val);` declaration in
    this file's copy to `extern volatile unsigned long long SetBMemPMgrBusy(s32
    val);` — a fabricated, incompatible prototype against the function's real
-   definition (`void SetBMemPMgrBusy(s32 val)` in `src/code_8220_b.c`). This
+   definition (`void SetBMemPMgrBusy(s32 val)` in `src/TmdRenderer.c`). This
    is exactly the class of scorer exploitation this round's instructions say
    to reject, so it was **not adopted and not even needed** — see below.
 2. In the second (coalesce-with-next) free-list unlink block, replacing
@@ -69,7 +69,7 @@ why the dead variable is repurposed, since the idiom is unusual on its own
 and was found by search rather than derivation. Whole-image oracle re-run
 after the comment addition: still `OK: build matches retail`.
 
-**Unit:** `code_8220` — with this function's match, `code_8220` has exactly
+**Unit:** `BMemPMgr` — with this function's match, `BMemPMgr` has exactly
 one remaining `INCLUDE_ASM` (`BMemPMgrAlloc`, see its own report).
 
 ### Proposed learning
@@ -92,7 +92,7 @@ timing right and only the register is wrong.
 
 
 
-**Unit:** `code_8220` · **Size:** 107 words, EXACT. **Status:** STALL after
+**Unit:** `BMemPMgr` · **Size:** 107 words, EXACT. **Status:** STALL after
 ~10 attempts, restored to `INCLUDE_ASM`. Best raw score 99/107 words (92.5%);
 `tools/asm-differ/diff.py BMemPMgrFree` (realigned) confirms zero drift and
 the first real difference at file offset `0x85BC` / vram `0x80017DBC`.
@@ -115,7 +115,7 @@ This function needed exactly the same three structural levers as its sibling
 reusable project-wide, not one-off:
 
 1. **K&R old-style definition** for the dead second `pool` parameter,
-   against the same unspecified-parameter declaration in `code_8220.h`
+   against the same unspecified-parameter declaration in `BMemPMgr.h`
    (`extern void *BMemPMgrFree();`, already in place from `BMemPMgrAlloc`'s
    round).
 2. **Reuse an existing pointer's register instead of a fresh local** where
@@ -314,7 +314,7 @@ void *BMemPMgrFree(ptr, pool)
 - **`BMemPMgrAlloc`'s three levers generalize.** All three transferred to
   this sibling function with no modification needed beyond the obvious
   per-function field/variable renaming. Worth treating as the default
-  starting shape for any further `code_8220`/`code_8220_b` pool-management
+  starting shape for any further `BMemPMgr`/`TmdRenderer` pool-management
   function, not something to re-derive.
 - **When reassigning a pointer variable to a NEW value derived from
   something OTHER than its own old value, capture any field of the OLD
@@ -364,9 +364,9 @@ site passes one argument, and retail emits only `$a0` for it — e.g.
 This is the dead-argument idiom in its ordinary direction: the callee reads a
 register the caller happens to leave loaded.
 
-**Why `include/code_8220.h`'s unprototyped pair must stay unprototyped.** Round
+**Why `include/BMemPMgr.h`'s unprototyped pair must stay unprototyped.** Round
 45 established this and it re-measures correct. Both functions are DEFINED in
-`src/code_8220.c` with old-style (K&R identifier-list) parameter lists, which is
+`src/BMemPMgr.c` with old-style (K&R identifier-list) parameter lists, which is
 the only way to expose the second parameter to their own bodies without
 contradicting either the ~15 external single-argument prototypes or this same
 unit's own later one-argument call sites (`PushBasicClassListNode`'s
@@ -380,7 +380,7 @@ their own call sites correctly, and one describes the definition's translation
 unit correctly. Converging them would break one side or the other.
 
 **Declaration sites changed:** none (no arity anywhere changed).
-`/* arity-ok: ... */` added to the two lines in `include/code_8220.h`. Oracle
+`/* arity-ok: ... */` added to the two lines in `include/BMemPMgr.h`. Oracle
 green.
 
 ## Naming (round 74)
@@ -389,7 +389,7 @@ green.
 99->107/107 permuter match) -- coalesces with the previous and following
 blocks and re-links the free list, the mirror of `BMemPMgrAlloc`. Called
 across the same wide set of units as `BMemPMgrAlloc` (`code_2cc8c_f`,
-`code_55dd4`, `code_d294`, `code_8220_b`, `main`, plus this unit's own
+`code_55dd4`, `code_d294`, `TmdRenderer`, `main`, plus this unit's own
 `RemoveBasicClassListNode`), confirming the general-purpose pool pairing.
 
 ## Polish (round 97, runner delta)
@@ -412,7 +412,7 @@ Zero bytes changed; whole-image SHA1 green after each step.
 - Fields: `freeListStart`/`freeListEnd` -> `freeListTail`/`freeListHead`
   (evidence in BMemPMgrAlloc.md, "Polish").
 
-The constants are defined, with their evidence, in `include/code_8220.h`:
+The constants are defined, with their evidence, in `include/BMemPMgr.h`:
 `BMEM_SIZE_MASK` 0x0FFFFFFF and `BMEM_FLAG_MASK` 0xF0000000 split
 `sizeAndFlags`; `BMEM_FREE` 0x40000000 is set on every block put on the free
 list (SetupBMemPMgrFreeList, BMemPMgrFree, the split remainder) and cleared

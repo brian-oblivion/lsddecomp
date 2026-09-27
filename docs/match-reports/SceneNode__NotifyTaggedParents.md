@@ -91,7 +91,7 @@ the "node" being scanned for tag-4 parents.
 ## What it does
 
 Walks `node`'s parent-ref list (via `BasicClass__GetNextParentRef`, already
-matched in `code_8220`) looking for entries whose header's low nibble is 4.
+matched in `BMemPMgr`) looking for entries whose header's low nibble is 4.
 For each such entry whose header's FULL low byte is also `0x34`, dispatches
 the entry's own `+0x010` vtable slot as `(entry, self)`. Keeps scanning the
 whole list (there can be more than one qualifying entry) rather than
@@ -232,7 +232,7 @@ whether the function itself matched)
   a retype, just an ordinary new-field insertion with a forgotten pad, and
   it still broke a sibling unit silently until the full-image oracle was
   re-run. See Proposed learning below.
-- `BasicClass__GetNextParentRef` (already matched, `src/code_8220.c`) is called
+- `BasicClass__GetNextParentRef` (already matched, `src/BMemPMgr.c`) is called
   directly here (not through a vtable) — same "verbatim inherited BasicClass
   method, called by symbol" pattern already established for
   `BasicClass__Release` etc. Declared locally with this unit's own
@@ -587,7 +587,7 @@ round** (this unit's assignment explicitly excludes matching this
 function -- it is a live `INCLUDE_ASM` stall handled by a different
 track; naming only). Proposed name: `SceneNode__NotifyTaggedParents`
 (tier B). Walks `node`'s parent-ref list (via the already-matched
-`BasicClass__GetNextParentRef`, `code_8220`) looking for entries whose
+`BasicClass__GetNextParentRef`, `BMemPMgr`) looking for entries whose
 header's low nibble is `4`; for each such entry whose header's FULL low
 byte is also `0x34`, dispatches the entry's own `+0x010` vtable slot as
 `(entry, self)`, continuing to scan the WHOLE list rather than stopping

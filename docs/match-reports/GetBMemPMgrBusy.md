@@ -2,7 +2,7 @@
 
 > Renamed from `func_80018458` on 2026-09-17 (tools/rename.py). Address 0x80018458.
 
-**Unit:** `code_8220_b` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
+**Unit:** `TmdRenderer` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
 
 ## Verdict correction
 
@@ -22,7 +22,7 @@ s32 GetBMemPMgrBusy(void)
 
 Same global as `SetBMemPMgrBusy` (this unit, matched alongside this one this
 round) — the pool allocator/free critical-section flag. Declaration shared
-via `include/code_8220.h`.
+via `include/BMemPMgr.h`.
 
 ## Provenance
 

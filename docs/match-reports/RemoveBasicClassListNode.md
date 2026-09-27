@@ -2,7 +2,7 @@
 
 > Renamed from `func_80018208` on 2026-09-24 (tools/rename.py). Address 0x80018208.
 
-**Unit:** code_8220 · **Size:** 32 instructions · **Status:** MATCHED (32/32 words)
+**Unit:** BMemPMgr · **Size:** 32 instructions · **Status:** MATCHED (32/32 words)
 
 The `BasicClassListNode` list find-unlink-free primitive, used by both of
 BasicClass's lists (`children` via `BasicClass__RemoveChild`, `parentRefs`

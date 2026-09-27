@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001844C` on 2026-09-17 (tools/rename.py). Address 0x8001844c.
 
-**Unit:** `code_8220_b` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
+**Unit:** `TmdRenderer` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
 
 ## Verdict correction
 
@@ -21,11 +21,11 @@ void SetBMemPMgrBusy(s32 val)
 ```
 
 `gBMemPMgrBusy` is a pool allocator/free critical-section flag: this unit's
-`BMemPMgrAlloc`/`BMemPMgrFree` (in `code_8220.c`, still `INCLUDE_ASM` this
+`BMemPMgrAlloc`/`BMemPMgrFree` (in `BMemPMgr.c`, still `INCLUDE_ASM` this
 round) bracket their free-list walk with `SetBMemPMgrBusy(1)` on entry and
 `SetBMemPMgrBusy(0)` on exit, per those functions' own (stale-verdict, still
 undecoded) match reports. Declared `extern s32 gBMemPMgrBusy;` in
-`include/code_8220.h` since both `code_8220.c` and `code_8220_b.c` read/
+`include/BMemPMgr.h` since both `BMemPMgr.c` and `TmdRenderer.c` read/
 write it.
 
 ## Provenance
@@ -50,10 +50,10 @@ measured, but nothing establishes what the flag is called in the original
 source. Three independent pieces of evidence, two of them new this round:
 
 1. `BMemPMgrAlloc` and `BMemPMgrFree` (the pool allocator's alloc/free
-   pair, `code_8220.c`, still `INCLUDE_ASM`) bracket their free-list walk
+   pair, `BMemPMgr.c`, still `INCLUDE_ASM`) bracket their free-list walk
    with `SetBMemPMgrBusy(1)` on entry and `SetBMemPMgrBusy(0)` on exit --
    visible as two `jal func_8001844C` in
-   `asm/nonmatchings/code_8220/BMemPMgrAlloc.s`.
+   `asm/nonmatchings/BMemPMgr/BMemPMgrAlloc.s`.
 2. **New this round:** `func_800280EC` in `src/code_179d8_q.c` reads it
    through the getter and BAILS OUT -- `if (GetBMemPMgrBusy() != 0) return
    0;` -- before doing `VSyncCallback` work. So the flag is read by

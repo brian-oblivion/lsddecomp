@@ -19,7 +19,7 @@
 #include "GameApplication.h"
 #include "class_16334.h"
 
-/* Local, opaque: nothing here dereferences a BMemPMgr (code_8220.h), it
+/* Local, opaque: nothing here dereferences a BMemPMgr (BMemPMgr.h), it
  * only passes the pointer through. */
 typedef struct BMemPMgr BMemPMgr;
 
@@ -27,16 +27,16 @@ typedef struct BMemPMgr BMemPMgr;
  * One `s32` argument observed at this, its only call site. */
 extern void SetMem(s32 mode);
 
-/* BMemPMgrInit is fully matched in code_8220.c as a single-argument
+/* BMemPMgrInit is fully matched in BMemPMgr.c as a single-argument
  * function (`s32 poolSize`, see docs/match-reports/BMemPMgrInit.md,
  * 31/31 words). THIS call site pushes a second, dead argument (0) that the
  * matched body never reads -- an unspecified-parameter declaration lets the
  * call carry it without contradicting the real prototype, the same idiom
- * code_8220.h already uses for BMemPMgrAlloc/BMemPMgrFree. */
+ * BMemPMgr.h already uses for BMemPMgrAlloc/BMemPMgrFree. */
 extern void *BMemPMgrInit(); /* arity-ok: the dead 2nd argument IS byte-load-bearing here -- retail emits `move a1,zero` in the jal's delay slot at 0x80011900 */
 
 /* SetDefaultBMemPMgr(BMemPMgr *pool) -- one-line `gDefaultBMemPMgr = pool;`, matched
- * in code_8220.c but not yet declared in code_8220.h (no carved caller
+ * in BMemPMgr.c but not yet declared in BMemPMgr.h (no carved caller
  * existed until now). */
 extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 

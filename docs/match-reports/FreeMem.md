@@ -2,7 +2,7 @@
 
 > Renamed from `func_80017AA8` on 2026-09-24 (tools/rename.py). Address 0x80017aa8.
 
-**Unit:** code_8220 · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
+**Unit:** BMemPMgr · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
 ## Verdict correction (round 74)
 

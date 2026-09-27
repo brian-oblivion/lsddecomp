@@ -226,13 +226,13 @@ Gate 3, all three checks run 2026-09-19, on body A:
    Differences 96. Net `-2` insns, which is the real tree's `200 vs 202`.
 3. **agreement — run the BYTES way, per bravo's round-58 correction.**
    `objdump -d` of `permuter-work/Snd_decrescendo/base.o` against
-   `build/src/code_179d8_i.c.o` built from the same body: 201 disassembly
+   `build/src/libsnd_decre.c.o` built from the same body: 201 disassembly
    lines each, `diff` **EMPTY** — not even branch targets differ, because
    here the function is the whole object's `.text`. **AGREE.**
 
    ```sh
    OD=tools/binutils/bin/mipsel-linux-gnu-objdump
-   for o in build/src/code_179d8_i.c.o permuter-work/Snd_decrescendo/base.o; do
+   for o in build/src/libsnd_decre.c.o permuter-work/Snd_decrescendo/base.o; do
        $OD -d $o | sed -n '/<Snd_decrescendo>:/,/^$/p' | sed 's/^ *[0-9a-f]*:\t//'
    done   # ... diff the two
    ```
@@ -271,7 +271,7 @@ search, not a repeat of this one.
 
 Both need `SsScore` from `include/SsScore.h` (`unk40` is **`s16`** there,
 as these bodies require) and these declarations, all already present in
-`src/code_179d8_i.c`:
+`src/libsnd_decre.c`:
 
 ```c
 extern s32 SpuVmSetSeqVol(s16 a0, u16 a1, u16 a2, s32 a3);
@@ -281,7 +281,7 @@ extern s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2);
 
 ### Body A — 200/202 words, 21/202, `regs=6/0`. THE ONE TO BUILD ON.
 
-Live in `src/code_179d8_i.c` inside `#if 0`. Block-for-block and
+Live in `src/libsnd_decre.c` inside `#if 0`. Block-for-block and
 instruction-for-instruction retail; the only differences are the three-way
 callee-saved permutation and the 8-byte `vars` gap.
 

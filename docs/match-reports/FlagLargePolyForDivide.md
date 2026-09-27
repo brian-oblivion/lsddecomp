@@ -66,7 +66,7 @@ NON_MATCHING body promoted, round 65.
 ## ROUND 65 (charlie): NON_MATCHING body promoted
 
 Track 1b mechanical promotion. This function had no standing `#if 0` block
-in `src/code_8220_c.c` (noted in rounds 39/44 — it was only ever flipped in
+in `src/TmdRenderer.c` (noted in rounds 39/44 — it was only ever flipped in
 live temporarily for reproduction). Took the "Best body reached (53/70
 words)" snapshot below verbatim and placed it, wrapped in
 `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif`, in the unit at its
@@ -78,7 +78,7 @@ in the same translation unit — cosmetic only, no semantic change. Six
 structurally distinct hand attempts plus an 8600+-iteration permuter search
 (both on file below) make this hand-derived, not a permuter candidate.
 `./build-and-verify.sh`: `build exit=0`, `OK: build matches retail`.
-`tools/check-nonmatching.sh code_8220_c`: `OK`. No stale symbol references
+`tools/check-nonmatching.sh TmdRenderer`: `OK`. No stale symbol references
 (this function calls no Psy-Q SDK function).
 
 ## ROUND 48 (bravo): search provenance checked (this function DOES have its own real search, unlike 6 siblings), no new search staffed
@@ -144,7 +144,7 @@ before spending the 900s on it.
 
 Inserted this report's own "Best body reached" snapshot live (over
 `INCLUDE_ASM`, since this function has no standing `#if 0` block in
-`src/code_8220_c.c`), ran the full oracle in isolation, reverted: `build
+`src/TmdRenderer.c`), ran the full oracle in isolation, reverted: `build
 exit=2`, zero compile-error hits, **53/70 words, identical diff to every
 prior round** (first diff word 16, `retail=22004010 built=2b10c500`).
 `git status --porcelain` empty after revert. (`funcdiff.py` printed its
@@ -163,7 +163,7 @@ this round at their recorded figures (see `SubmitPolyF3.md` and siblings).
 
 Rebuilt this function's preserved body (the report's own "Best body reached"
 snapshot, inserted live over `INCLUDE_ASM` since this function has no
-standing `#if 0` block in `src/code_8220_c.c` — it was never left live
+standing `#if 0` block in `src/TmdRenderer.c` — it was never left live
 there) and ran the full oracle in isolation: `build exit=2`, zero
 compile-error/`undefined reference` hits.
 
@@ -214,7 +214,7 @@ for it; the array only stacks a second reservation on top. Confirmed that
 finding still holds by checking the built object before touching anything:
 
 ```
-$ tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/code_8220_c.c.o \
+$ tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/TmdRenderer.c.o \
     | awk '/<FlagLargePolyForDivide>:/,/^$/' | grep 'addiu.*sp,sp'
 addiu   sp,sp,-32
 ```
@@ -229,7 +229,7 @@ adjustment itself (moved into a branch's delay slot), not a register
 identity choice and not a missing/misordered pair of VALUE computations —
 see "Residue" below, unchanged this round. No new attempt made.
 
-Unit: `src/code_8220_c.c`. `void FlagLargePolyForDivide(void *arg0, s32 count)` —
+Unit: `src/TmdRenderer.c`. `void FlagLargePolyForDivide(void *arg0, s32 count)` —
 computes `arg0`'s 2D bounding box over `count` vertices: seeds min/max
 (fields `+0x70`/`+0x72`/`+0x74`/`+0x76`, X/Y min/max as `s16`) from a
 2-`s16` value at `+0x60`, walks `count` vertices starting at `+0x64`
@@ -237,7 +237,7 @@ computes `arg0`'s 2D bounding box over `count` vertices: seeds min/max
 sets `arg0->0x78` (the same "culled" flag `TransformAndCullPoly`/`SubmitPolyF3`
 use, this unit) to `1` if either axis's span is `>= 0x101`. This is the
 `code = 3`/`code = 4` callee `ProjectTriFace`/`ProjectQuadFace`
-(`code_8220_b`, matched round 13) call at the end of triangle/quad
+(`TmdRenderer`, matched round 13) call at the end of triangle/quad
 submission.
 
 ## Best body reached (53/70 words — everything past the header matches)
@@ -304,7 +304,7 @@ at word 0 where a normal prologue would put it. My best body puts it at
 word 0 (an ordinary immediate prologue), which shifts every following
 instruction earlier by exactly one slot until word 17, where the SAME
 instruction reappears in mine and the two streams re-align (confirmed:
-`grep -n '($sp)' asm/nonmatchings/code_8220_c/FlagLargePolyForDivide.s` returns
+`grep -n '($sp)' asm/nonmatchings/TmdRenderer/FlagLargePolyForDivide.s` returns
 NOTHING — this function never reads or writes through `$sp` anywhere, in
 EITHER version; the reserved 0x20 bytes are never used for storage in
 retail either). This is a placement-only difference in an instruction with
@@ -393,7 +393,7 @@ identical diff both times) across the two search runs, reproducible, not a
 fluke on the permuter's own metric.
 
 **Oracle-verified, and it is FALSE.** Swapped the rewritten `end` expression
-into `src/code_8220_c.c` in place of the preserved body, ran the real
+into `src/TmdRenderer.c` in place of the preserved body, ran the real
 oracle: `build-and-verify.sh` reports `build exit=2` (the whole-image
 verification step fails -- SHA1 does not match), and `funcdiff.py
 FlagLargePolyForDivide` reports **52/70**, one word WORSE than this report's

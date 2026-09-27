@@ -1,7 +1,7 @@
 /*
- * code_8220_b -- the end of BasicClass, then the game's TMD renderer.
+ * TmdRenderer -- the game's TMD renderer, after the end of BasicClass.
  *
- * BasicClass (include/BasicClass.h; the rest of it is code_8220.c): the list
+ * BasicClass (include/BasicClass.h; the rest of it is BMemPMgr.c): the list
  * helpers its methods use (FreeBasicClassList, GetNextBasicClass,
  * ReleaseBasicClassArray), its table getter, the notification pair
  * NotifyParents / OnNotify with the empty slot between them, and the pool
@@ -10,19 +10,35 @@
  * The renderer: SortTmdObject, the game's replacement for Sony's
  * GsSortObject4, turns a GsDOBJ2's TMD object into GPU primitives. Per face,
  * SetupPrimCode finishes the primitive's command byte, ProjectTriFace or
- * ProjectQuadFace transforms and culls it through TransformAndCullPoly and
- * writes its screen coordinates with one of the StoreSxyPoly* leaves, and a
- * submit wrapper in code_8220_c links it into the OT, through Sony's RCpoly*
- * subdivision when TransformAndCullPoly or FlagLargePolyForDivide flags the
- * face. All GTE work goes through include/gte.h's gte_* macros (Sony's
- * names; never <inline.h>).
+ * ProjectQuadFace transforms and culls it through TransformAndCullPoly,
+ * writes its screen coordinates with one of the StoreSxyPoly* leaves and
+ * takes its screen box (FlagLargePolyForDivide), and a SubmitPoly* wrapper
+ * puts the finished primitive into the ordering table: straight into its OT
+ * slot with addPrim when the box fits, otherwise (too large on screen, or a
+ * saturated screen Z) copied into one of the two DIVPOLYGON work buffers
+ * and handed to Sony's RCpoly* packer, which subdivides it. The file ends
+ * with the helpers that fill a DIVPOLYGON's header and its RVECTOR vertex
+ * records, and the ndiv override setter. All GTE work goes through
+ * include/gte.h's gte_* macros (Sony's names; never <inline.h>).
+ *
+ * What decided its edges (python3 tools/tuboundary.py --unit): the binary
+ * forces no edge anywhere from BMemPMgr.c through this file ("boundary
+ * possible" throughout). The soft signal calls every edge inside the
+ * renderer "boundary unlikely (single-user data)", the old carve edge
+ * between StoreSxyPolyG4 and StoreSxyPolyFT4 included (gTexturedFaceColor
+ * and sDivClipWidth are read on both sides), so the two carve slices were
+ * merged into this file. PARKED: the content says the original file
+ * boundary is between GetBMemPMgrBusy and SortTmdObject (the one edge the
+ * soft signal does not flag), which would put the BasicClass tail above
+ * with BMemPMgr.c; moving it is a split, which no tool does, so it stays
+ * here.
  */
 
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "code_8220.h"
+#include "BMemPMgr.h"
 #include "gte.h"
 
 void FreeBasicClassList(BasicClassListNode **head) {
@@ -94,9 +110,15 @@ s32 GetBMemPMgrBusy(void) {
 }
 
 /* The drawn object's attribute bits, as SortTmdObject publishes them for
- * SetupPrimCode and the code_8220_c submit wrappers (D_8008E248, GsLOFF, is
- * declared in code_8220.h). Sony's GsSortObject4 keeps the same four fields
- * in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. */
+ * SetupPrimCode and the submit wrappers. Sony's GsSortObject4 keeps the same
+ * four fields in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. D_8008E248 is bit 6 of
+ * the object's flags word, which SetupPrimCode ORs into the GPU command
+ * byte's shade-texture bit 0x1 (Psy-Q's SetShadeTex); it keeps its address
+ * name because it is bss past the image end, where rename.py cannot reach
+ * (the proposed name is in SetupPrimCode.md). D_80090C18 is the default ndiv
+ * from bits 9-11; it keeps its address name because config/psyq-objects.ld's
+ * `dc_cb` pin covers the address (see its report). */
+extern s32 D_8008E248;              /* GsLOFF */
 extern s32 D_80090C18;              /* GsDIV1..5: subdivision level */
 extern s32 gSortUseGlobalLightMode; /* GsLLMOD */
 extern s32 gSortLightMode;          /* GsFOG | GsMATE */
@@ -109,13 +131,8 @@ typedef struct {
 
 /*
  * The per-object draw context SortTmdObject builds in the PS1 scratchpad
- * (its caller passes 0x1F800000) and hands to every function below and to
- * the code_8220_c submit wrappers. Only the fields this unit touches are
- * named; +0x070..+0x077 are the screen bounding box FlagLargePolyForDivide
- * keeps.
- *
- * MATCHING: the three SXY words are separate fields, not an array, for
- * gte_stsxy3()'s three independently computed addresses.
+ * (its caller passes 0x1F800000) and hands to every function below. Only
+ * the fields this file touches are named.
  */
 typedef struct PolyDrawCtx {
     /* +0x000 */ GsOT_TAG *otBase;  /* the GsOT's org */
@@ -137,12 +154,10 @@ typedef struct PolyDrawCtx {
     u8 pad037[0x038 - 0x037];
     /* +0x038 */ MATRIX savedRotMatrix;
     u8 pad058[0x05C - 0x058];
-    /* +0x05C */ s32 flag; /* GTE FLAG */
-    /* +0x060 */ s32 sxy0;
-    /* +0x064 */ s32 sxy1;
-    /* +0x068 */ s32 sxy2;
-    /* +0x06C */ s32 sxy3; /* a quad's fourth vertex */
-    u8 pad070[0x078 - 0x070];
+    /* +0x05C */ s32 flag;        /* GTE FLAG */
+    /* +0x060 */ DVECTOR sxy[4];  /* the face's screen XYs; [3] only for a quad */
+    /* +0x070 */ DVECTOR bboxMin; /* FlagLargePolyForDivide's screen box */
+    /* +0x074 */ DVECTOR bboxMax;
     /* +0x078 */ s32 divide; /* set when the face must go through RCpoly* subdivision */
     u8 pad07C[0x088 - 0x07C];
     /* +0x088 */ RVECTOR *divVtx3[3]; /* gDivPolygon3's r0..r2 */
@@ -195,23 +210,34 @@ typedef struct TmdGroupHeader {
 /* clang-format on */
 extern Rgb8 gTexturedFaceColor;
 
-extern void InitDivPolygonPtrs(void *dst, void *table, s32 count);
-extern void StoreSxyPolyFT4(void *dst, s32 storeFirst3);
-extern void StoreSxyPolyGT4(void *dst, s32 storeFirst3);
+/* The two subdivision work buffers the SubmitPoly* wrappers hand Sony's
+ * RCpoly* packers, a DIVPOLYGON3 and a DIVPOLYGON4 back to back (0x218
+ * bytes apart, sizeof(DIVPOLYGON3)). Declared as bytes: InitDivPolygonPtrs
+ * takes their addresses and the wrappers cast. */
+extern u8 gDivPolygon3[];
+extern u8 gDivPolygon4[];
 
-/* The eight submit wrappers in code_8220_c. Each links the finished
- * primitive into the OT (directly, or through its RCpoly* subdivider) and
- * returns the packet cursor past what it wrote. */
-extern void *SubmitPolyF3(void *prim, void *ctx);
-extern void *SubmitPolyG3(void *prim, void *ctx);
-extern void *SubmitPolyFT3(void *prim, void *ctx);
-extern void *SubmitPolyF4(void *prim, void *ctx);
-extern void *SubmitPolyG4(void *prim, void *ctx);
-extern void *SubmitPolyFT4(void *prim, void *ctx);
-extern void *SubmitPolyGT3(void *prim, void *ctx);
-extern void *SubmitPolyGT4(void *prim, void *ctx);
+/* Defined at the bottom of this file, after SortTmdObject and
+ * ProjectQuadFace, which call them. The submit wrappers and the two
+ * four-vertex XY stores are declared without parameters: each takes its own
+ * POLY_* type, while SortTmdObject's packet cursor is a u8 * and
+ * ProjectQuadFace's callback takes a void *. The submit wrappers link the
+ * finished primitive into the OT (directly, or through its RCpoly*
+ * subdivider) and return the packet cursor past what they wrote. */
+void InitDivPolygonPtrs(RVECTOR **vtxPtrs, void *divp, s32 nverts);
+void StoreSxyPolyFT4();
+void StoreSxyPolyGT4();
+void *SubmitPolyF3();
+void *SubmitPolyG3();
+void *SubmitPolyFT3();
+void *SubmitPolyF4();
+void *SubmitPolyG4();
+void *SubmitPolyFT4();
+void *SubmitPolyGT3();
+void *SubmitPolyGT4();
 
-/* Defined below SortTmdObject, which calls them. */
+/* Defined below SortTmdObject, which calls them (and ProjectTriFace and
+ * ProjectQuadFace, which call the last two). */
 void SetupPrimCode(void *prim, PolyDrawCtx *ctx);
 s32 ProjectTriFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, void (*storeSxy)(void *));
 s32 ProjectQuadFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, u16 idx3,
@@ -222,6 +248,8 @@ void StoreSxyPolyFT3(void *dst);
 void StoreSxyPolyGT3(void *dst);
 void StoreSxyPolyF4(void *dst, s32 storeFirst3);
 void StoreSxyPolyG4(void *dst, s32 storeFirst3);
+s32 TransformAndCullPoly(void *prim, void *ctx);
+void FlagLargePolyForDivide(void *ctx, s32 count);
 
 /*
  * The game's own GsSortObject4 (same arguments): emit every surviving face of
@@ -827,7 +855,7 @@ s32 ProjectQuadFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, 
 
     storeSxy(prim, 0);
 
-    gte_stsxy2(&ctx->sxy3);
+    gte_stsxy2(&ctx->sxy[3]);
 
     FlagLargePolyForDivide(ctx, 4);
     return 0;
@@ -867,14 +895,15 @@ s32 TransformAndCullPoly(void *primIn, void *ctxIn) {
     }
     gte_avsz3();
     gte_stotz(&ctx->otz);
-    gte_stsxy3(&ctx->sxy0, &ctx->sxy1, &ctx->sxy2);
+    gte_stsxy3(&ctx->sxy[0], &ctx->sxy[1], &ctx->sxy[2]);
     ctx->otSlot = &ctx->otBase[ctx->otz >> ctx->otShift];
     return 0;
 }
 
 /* The screen-XY store callbacks ProjectTri/QuadFace invoke, one per
  * primitive type: each writes the GTE's SXY FIFO into that POLY_xx's own
- * vertex fields (StoreSxyPolyFT4 and StoreSxyPolyGT4 are in code_8220_c).
+ * vertex fields (StoreSxyPolyFT4 and StoreSxyPolyGT4 are with the submit
+ * wrappers below).
  * POLY_F3: xy0/xy1/xy2 at +0x8/+0xC/+0x10. */
 void StoreSxyPolyF3(void *dst) {
     gte_stsxy3_f3(dst);
@@ -922,5 +951,360 @@ void StoreSxyPolyG4(void *dst, s32 storeFirst3) {
         gte_stsxy3_g4(dst);
     } else {
         gte_stsxy2(xy3);
+    }
+}
+
+/* The widest or tallest screen extent, in pixels, a face may have and still
+ * be linked into the OT as one primitive; FlagLargePolyForDivide sends
+ * anything larger through Sony's RCpoly* subdivision. 256 is also the width
+ * of one texture page. */
+#define MAX_UNDIVIDED_SPAN 256
+
+/* Sony's prototypes, copied from libgte.h, where they sit commented out
+ * because that header does not include libgpu.h's POLY_* types. */
+extern u_long *RCpolyF3(POLY_F3 *s, DIVPOLYGON3 *divp);
+extern u_long *RCpolyF4(POLY_F4 *s, DIVPOLYGON4 *divp);
+extern u_long *RCpolyFT3(POLY_FT3 *s, DIVPOLYGON3 *divp);
+extern u_long *RCpolyFT4(POLY_FT4 *s, DIVPOLYGON4 *divp);
+extern u_long *RCpolyG3(POLY_G3 *s, DIVPOLYGON3 *divp);
+extern u_long *RCpolyG4(POLY_G4 *s, DIVPOLYGON4 *divp);
+extern u_long *RCpolyGT3(POLY_GT3 *s, DIVPOLYGON3 *divp);
+extern u_long *RCpolyGT4(POLY_GT4 *s, DIVPOLYGON4 *divp);
+
+void FillDivPolygonHeader(void *divp, PolyDrawCtx *ctx, CVECTOR *rgbc, s32 textured, u_short clut,
+                          u_short tpage);
+void FillRVectors3(RVECTOR **dst, SVECTOR **src, DVECTOR *sxy0, DVECTOR *sxy1, DVECTOR *sxy2);
+void FillRVectors4(RVECTOR **dst, SVECTOR **src, DVECTOR *sxy0, DVECTOR *sxy1, DVECTOR *sxy2,
+                   DVECTOR *sxy3);
+
+/* ProjectQuadFace's storeSxy callback for a POLY_FT4: with storeFirst3, the
+ * GTE's three screen XYs go to x0y0..x2y2; without it, the one just
+ * transformed for the fourth vertex goes to x3y3. */
+void StoreSxyPolyFT4(POLY_FT4 *prim, s32 storeFirst3) {
+    if (storeFirst3) {
+        gte_stsxy3_ft4(prim);
+    } else {
+        gte_stsxy2(&prim->x3);
+    }
+}
+
+/* The same for a POLY_GT4. */
+void StoreSxyPolyGT4(POLY_GT4 *prim, s32 storeFirst3) {
+    if (storeFirst3) {
+        gte_stsxy3_gt4(prim);
+    } else {
+        gte_stsxy2(&prim->x3);
+    }
+}
+
+/*
+ * Link `prim` into the OT, or subdivide it, and return the next free packet
+ * address: prim + 1 after addPrim, or whatever RCpolyF3 returns.
+ *
+ * The eight wrappers differ only in which DIVPOLYGON they use and in how much
+ * of the primitive goes into the RVECTORs besides model vertex and screen XY
+ * (FillRVectors3/4): colour per vertex for Gouraud, UV per vertex and the
+ * CLUT/TPAGE pair for textured.
+ *
+ * MATCHING: the divide arm must come first and return; with the addPrim arm
+ * first the blocks swap.
+ */
+void *SubmitPolyF3(POLY_F3 *prim, PolyDrawCtx *ctx) {
+    if (ctx->divide != 0) {
+        FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
+        FillRVectors3(ctx->divVtx3, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
+                      (DVECTOR *)&prim->x2);
+        return RCpolyF3(prim, (DIVPOLYGON3 *)gDivPolygon3);
+    }
+    addPrim(ctx->otSlot, prim);
+    return (u_long *)(prim + 1);
+}
+
+void *SubmitPolyG3(POLY_G3 *prim, PolyDrawCtx *ctx) {
+    if (ctx->divide != 0) {
+        FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
+        FillRVectors3(ctx->divVtx3, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
+                      (DVECTOR *)&prim->x2);
+
+        ctx->divVtx3[0]->pad = prim->pad1;
+        ctx->divVtx3[1]->pad = prim->pad1;
+        ctx->divVtx3[2]->pad = prim->pad2;
+
+        ctx->divVtx3[0]->c = *(CVECTOR *)&prim->r0;
+        ctx->divVtx3[1]->c = *(CVECTOR *)&prim->r1;
+        ctx->divVtx3[2]->c = *(CVECTOR *)&prim->r2;
+
+        return RCpolyG3(prim, (DIVPOLYGON3 *)gDivPolygon3);
+    }
+    addPrim(ctx->otSlot, prim);
+    return (u_long *)(prim + 1);
+}
+
+void *SubmitPolyFT3(POLY_FT3 *prim, PolyDrawCtx *ctx) {
+    if (ctx->divide != 0) {
+        FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 1, prim->clut, prim->tpage);
+        FillRVectors3(ctx->divVtx3, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
+                      (DVECTOR *)&prim->x2);
+
+        ctx->divVtx3[0]->pad = prim->pad1;
+        ctx->divVtx3[1]->pad = prim->pad1;
+        ctx->divVtx3[2]->pad = prim->pad1;
+        *(u_short *)ctx->divVtx3[0]->uv = *(u_short *)&prim->u0;
+        *(u_short *)ctx->divVtx3[1]->uv = *(u_short *)&prim->u1;
+        *(u_short *)ctx->divVtx3[2]->uv = *(u_short *)&prim->u2;
+
+        return RCpolyFT3(prim, (DIVPOLYGON3 *)gDivPolygon3);
+    }
+    addPrim(ctx->otSlot, prim);
+    return (u_long *)(prim + 1);
+}
+
+void *SubmitPolyF4(POLY_F4 *prim, PolyDrawCtx *ctx) {
+    if (ctx->divide != 0) {
+        FillDivPolygonHeader(gDivPolygon4, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
+        FillRVectors4(ctx->divVtx4, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
+                      (DVECTOR *)&prim->x2, (DVECTOR *)&prim->x3);
+        return RCpolyF4(prim, (DIVPOLYGON4 *)gDivPolygon4);
+    }
+    addPrim(ctx->otSlot, prim);
+    return (u_long *)(prim + 1);
+}
+
+void *SubmitPolyG4(POLY_G4 *prim, PolyDrawCtx *ctx) {
+    if (ctx->divide != 0) {
+        FillDivPolygonHeader(gDivPolygon4, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
+        FillRVectors4(ctx->divVtx4, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
+                      (DVECTOR *)&prim->x2, (DVECTOR *)&prim->x3);
+
+        ctx->divVtx4[0]->pad = prim->pad1;
+        ctx->divVtx4[1]->pad = prim->pad1;
+        ctx->divVtx4[2]->pad = prim->pad2;
+        ctx->divVtx4[3]->pad = prim->pad3;
+
+        ctx->divVtx4[0]->c = *(CVECTOR *)&prim->r0;
+        ctx->divVtx4[1]->c = *(CVECTOR *)&prim->r1;
+        ctx->divVtx4[2]->c = *(CVECTOR *)&prim->r2;
+        ctx->divVtx4[3]->c = *(CVECTOR *)&prim->r3;
+
+        return RCpolyG4(prim, (DIVPOLYGON4 *)gDivPolygon4);
+    }
+    addPrim(ctx->otSlot, prim);
+    return (u_long *)(prim + 1);
+}
+
+void *SubmitPolyFT4(POLY_FT4 *prim, PolyDrawCtx *ctx) {
+    if (ctx->divide != 0) {
+        FillDivPolygonHeader(gDivPolygon4, ctx, (CVECTOR *)&prim->r0, 1, prim->clut, prim->tpage);
+        FillRVectors4(ctx->divVtx4, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
+                      (DVECTOR *)&prim->x2, (DVECTOR *)&prim->x3);
+
+        ctx->divVtx4[0]->pad = prim->pad1;
+        ctx->divVtx4[1]->pad = prim->pad1;
+        ctx->divVtx4[2]->pad = prim->pad1;
+        ctx->divVtx4[3]->pad = prim->pad1;
+        *(u_short *)ctx->divVtx4[0]->uv = *(u_short *)&prim->u0;
+        *(u_short *)ctx->divVtx4[1]->uv = *(u_short *)&prim->u1;
+        *(u_short *)ctx->divVtx4[2]->uv = *(u_short *)&prim->u2;
+        *(u_short *)ctx->divVtx4[3]->uv = *(u_short *)&prim->u3;
+
+        return RCpolyFT4(prim, (DIVPOLYGON4 *)gDivPolygon4);
+    }
+    addPrim(ctx->otSlot, prim);
+    return (u_long *)(prim + 1);
+}
+
+void *SubmitPolyGT3(POLY_GT3 *prim, PolyDrawCtx *ctx) {
+    if (ctx->divide != 0) {
+        FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 1, prim->clut, prim->tpage);
+        FillRVectors3(ctx->divVtx3, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
+                      (DVECTOR *)&prim->x2);
+
+        ctx->divVtx3[0]->pad = prim->pad2;
+        ctx->divVtx3[1]->pad = prim->pad2;
+        ctx->divVtx3[2]->pad = prim->pad2;
+
+        ctx->divVtx3[0]->c = *(CVECTOR *)&prim->r0;
+        ctx->divVtx3[1]->c = *(CVECTOR *)&prim->r1;
+        ctx->divVtx3[2]->c = *(CVECTOR *)&prim->r2;
+
+        *(u_short *)ctx->divVtx3[0]->uv = *(u_short *)&prim->u0;
+        *(u_short *)ctx->divVtx3[1]->uv = *(u_short *)&prim->u1;
+        *(u_short *)ctx->divVtx3[2]->uv = *(u_short *)&prim->u2;
+
+        return RCpolyGT3(prim, (DIVPOLYGON3 *)gDivPolygon3);
+    }
+    addPrim(ctx->otSlot, prim);
+    return (u_long *)(prim + 1);
+}
+
+void *SubmitPolyGT4(POLY_GT4 *prim, PolyDrawCtx *ctx) {
+    if (ctx->divide != 0) {
+        FillDivPolygonHeader(gDivPolygon4, ctx, (CVECTOR *)&prim->r0, 1, prim->clut, prim->tpage);
+        FillRVectors4(ctx->divVtx4, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
+                      (DVECTOR *)&prim->x2, (DVECTOR *)&prim->x3);
+
+        ctx->divVtx4[0]->pad = prim->pad2;
+        ctx->divVtx4[1]->pad = prim->pad2;
+        ctx->divVtx4[2]->pad = prim->pad3;
+        ctx->divVtx4[3]->pad = prim->pad3;
+
+        ctx->divVtx4[0]->c = *(CVECTOR *)&prim->r0;
+        ctx->divVtx4[1]->c = *(CVECTOR *)&prim->r1;
+        ctx->divVtx4[2]->c = *(CVECTOR *)&prim->r2;
+        ctx->divVtx4[3]->c = *(CVECTOR *)&prim->r3;
+
+        *(u_short *)ctx->divVtx4[0]->uv = *(u_short *)&prim->u0;
+        *(u_short *)ctx->divVtx4[1]->uv = *(u_short *)&prim->u1;
+        *(u_short *)ctx->divVtx4[2]->uv = *(u_short *)&prim->u2;
+        *(u_short *)ctx->divVtx4[3]->uv = *(u_short *)&prim->u3;
+
+        return RCpolyGT4(prim, (DIVPOLYGON4 *)gDivPolygon4);
+    }
+    addPrim(ctx->otSlot, prim);
+    return (u_long *)(prim + 1);
+}
+
+/*
+ * Point a draw context's RVECTOR list (`vtxPtrs`, its divVtx3 or divVtx4)
+ * and the DIVPOLYGON's own first recursion level (cr[0].r0...) at that
+ * DIVPOLYGON's vertex records r0, r1, ... `nverts` is 3 for a DIVPOLYGON3,
+ * 4 for a DIVPOLYGON4; SortTmdObject calls it for both, once per object.
+ */
+void InitDivPolygonPtrs(RVECTOR **vtxPtrs, void *divp, s32 nverts) {
+    RVECTOR *rv = &((DIVPOLYGON3 *)divp)->r0;
+    RVECTOR **ctxPtr = vtxPtrs;
+    RVECTOR **crPtr =
+        (nverts == 4) ? &((DIVPOLYGON4 *)divp)->cr[0].r0 : &((DIVPOLYGON3 *)divp)->cr[0].r0;
+
+    while (nverts-- > 0) {
+        *crPtr = rv;
+        *ctxPtr = rv;
+        rv++;
+        crPtr++;
+        ctxPtr++;
+    }
+}
+
+/*
+ * Take the screen bounding box of the face's cached XYs into bboxMin/bboxMax
+ * and set `divide` when it is wider or taller than MAX_UNDIVIDED_SPAN.
+ * `count` is the vertex count, 3 or 4. The loop stops one vertex short:
+ * the last vertex never enters the box (retail's behaviour).
+ */
+void FlagLargePolyForDivide(void *ctxIn, s32 count) {
+    PolyDrawCtx *ctx = ctxIn;
+    short *xp, *yp, *end;
+
+    ctx->bboxMax = ctx->sxy[0];
+    ctx->bboxMin = ctx->bboxMax;
+
+    xp = &ctx->sxy[1].vx;
+    /* MATCHING: this is &ctx->sxy[count - 1].vx, but that spelling folds the
+     * 0x5C into the index before adding ctx, and retail adds ctx first. */
+    end = (short *)((u8 *)ctx + count * sizeof(DVECTOR) + 0x5C);
+
+    /* MATCHING: a guarded do/while with yp set inside the guard. Setting yp
+     * before the test moves the frame setup out of the branch delay slot. */
+    if (xp < end) {
+        yp = &ctx->sxy[1].vy;
+        do {
+            if (*xp < ctx->bboxMin.vx) {
+                ctx->bboxMin.vx = *xp;
+            }
+            if (*yp < ctx->bboxMin.vy) {
+                ctx->bboxMin.vy = *yp;
+            }
+            if (ctx->bboxMax.vx < *xp) {
+                ctx->bboxMax.vx = *xp;
+            }
+            if (ctx->bboxMax.vy < *yp) {
+                ctx->bboxMax.vy = *yp;
+            }
+            xp += 2;
+            yp += 2;
+        } while (xp < end);
+    }
+
+    if (ctx->bboxMax.vx - ctx->bboxMin.vx > MAX_UNDIVIDED_SPAN) {
+        ctx->divide = 1;
+    }
+    if (ctx->bboxMax.vy - ctx->bboxMin.vy > MAX_UNDIVIDED_SPAN) {
+        ctx->divide = 1;
+    }
+}
+
+/* The clip area every DIVPOLYGON gets: 320 x 240, the screen. */
+extern s32 sDivClipWidth;
+extern s32 sDivClipHeight;
+
+/* SetNdivOverride's: when set, sNdivOverride replaces D_80090C18. */
+extern s32 sNdivOverrideSet;
+extern s32 sNdivOverride;
+
+/*
+ * Fill the header of a DIVPOLYGON3 or DIVPOLYGON4 (the two share it):
+ * ndiv, the clip area, the primitive's colour word and the face's OT entry,
+ * and for a textured primitive its CLUT and TPAGE.
+ */
+void FillDivPolygonHeader(void *divpIn, PolyDrawCtx *ctx, CVECTOR *rgbc, s32 textured, u_short clut,
+                          u_short tpage) {
+    DIVPOLYGON3 *divp = divpIn;
+    s32 ndiv;
+    s32 pih;
+    s32 piv;
+
+    /* MATCHING: one store of a temp after the if/else, and the clip area read
+     * after it; a ternary or a store per arm costs a word. */
+    if (sNdivOverrideSet) {
+        ndiv = sNdivOverride;
+    } else {
+        ndiv = D_80090C18;
+    }
+    pih = sDivClipWidth;
+    piv = sDivClipHeight;
+
+    divp->ndiv = ndiv;
+    divp->pih = pih;
+    divp->piv = piv;
+
+    if (textured != 0) {
+        divp->clut = clut;
+        divp->tpage = tpage;
+    }
+
+    divp->rgbc = *rgbc;
+    divp->ot = (u_long *)ctx->otSlot; /* DIVPOLYGON keeps it as a u_long * */
+}
+
+/*
+ * Give three RVECTORs their model-space vertex and screen XY.
+ *
+ * MATCHING: whole-struct assignments. SVECTOR and DVECTOR have only short
+ * members, so their alignment is 2 and GCC copies them with lwl/lwr,
+ * swl/swr, as retail does.
+ */
+void FillRVectors3(RVECTOR **dst, SVECTOR **src, DVECTOR *sxy0, DVECTOR *sxy1, DVECTOR *sxy2) {
+    dst[0]->v = *src[0];
+    dst[1]->v = *src[1];
+    dst[2]->v = *src[2];
+    dst[0]->sxy = *sxy0;
+    dst[1]->sxy = *sxy1;
+    dst[2]->sxy = *sxy2;
+}
+
+/* The same for four. */
+void FillRVectors4(RVECTOR **dst, SVECTOR **src, DVECTOR *sxy0, DVECTOR *sxy1, DVECTOR *sxy2,
+                   DVECTOR *sxy3) {
+    FillRVectors3(dst, src, sxy0, sxy1, sxy2);
+    dst[3]->v = *src[3];
+    dst[3]->sxy = *sxy3;
+}
+
+/* Make FillDivPolygonHeader use `ndiv` instead of each object's default,
+ * or (enable == 0) go back to the default. Nothing in the image calls it. */
+void SetNdivOverride(s32 enable, s32 ndiv) {
+    sNdivOverrideSet = enable;
+    if (enable) {
+        sNdivOverride = ndiv;
     }
 }

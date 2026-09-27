@@ -2,13 +2,13 @@
 
 > Renamed from `func_80018390` on 2026-09-17 (tools/rename.py). Address 0x80018390.
 
-**Unit:** code_8220_b · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
+**Unit:** TmdRenderer · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
 ## What it does
 
 Returns the address of `gBasicClassMethods`, BasicClass's own 14-slot method table
 (`BASICCLASS_METHODS` per `docs/research/class-framework.md`). Called from
-`BasicClass__BasicClass` (`code_8220.c`) to install the base vtable on a
+`BasicClass__BasicClass` (`BMemPMgr.c`) to install the base vtable on a
 freshly-constructed `BasicClass`.
 
 ## The C

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80017A9C` on 2026-09-24 (tools/rename.py). Address 0x80017a9c.
 
-**Unit:** `code_8220` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
+**Unit:** `BMemPMgr` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
 
 ## Verdict correction
 
@@ -23,7 +23,7 @@ void SetDefaultBMemPMgr(BMemPMgr *pool)
 
 `gDefaultBMemPMgr` is the global "current default pool" pointer, the same global
 `SetupBMemPMgrFreeList`, `BMemPMgrAlloc` and `BMemPMgrFree` (this unit) all read.
-Declared `extern BMemPMgr *gDefaultBMemPMgr;` in `include/code_8220.h`, next to
+Declared `extern BMemPMgr *gDefaultBMemPMgr;` in `include/BMemPMgr.h`, next to
 `SetupBMemPMgrFreeList`'s own doc comment which already named this global. Not
 called from any carved C yet — nothing in this unit or its siblings
 invokes it, so whoever establishes the game's one default pool at startup

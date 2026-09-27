@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_1813c` on 2026-09-24 (tools/rename.py). Address 0x8001813c.
 
-**Unit:** code_8220 · **Size:** 12 instructions · **Status:** MATCHED (12/12 words)
+**Unit:** BMemPMgr · **Size:** 12 instructions · **Status:** MATCHED (12/12 words)
 
 BasicClass vtable slot `+0x028` (`clearParentRefs`) — see
 `BasicClass__BasicClass.md` for the class's overall design, and

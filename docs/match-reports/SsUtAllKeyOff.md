@@ -2,7 +2,7 @@
 
 > Renamed from `func_80031F3C` on 2026-09-24 (tools/rename.py). Address 0x80031f3c.
 
-`code_179d8_p`, vram `0x80031F3C`, file offset `0x2273C`, 131 instructions
+`libsnd_ut_ako`, vram `0x80031F3C`, file offset `0x2273C`, 131 instructions
 (0x20C bytes). Frameless. Only function in the unit.
 
 **Round 66 supersedes the round 26/31 title.** That title read *"best compiled
@@ -334,7 +334,7 @@ both objects with relocations masked:
 ```sh
 sh permuter-work/SsUtAllKeyOff/compile.sh permuter-work/SsUtAllKeyOff/base.c -o /tmp/scaf.o
 tools/binutils/bin/mipsel-linux-gnu-objdump -d /tmp/scaf.o
-tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/code_179d8_p.c.o
+tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/libsnd_ut_ako.c.o
 ```
 
 The two disassemblies are **identical, 132 lines each**. The scaffold compiles
@@ -382,3 +382,53 @@ catch.
 The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 stride, and the twelve game names over +0x1C..+0x33 that earlier rounds gave `D_8008D9A4`..`D_8008D9BA`) are ONE Sony table: libsnd/vmanager.o (disc 3.5) bss puts `_svm_voice` at +0x198 of the block anchored at 0x8008D7F0, so `_svm_voice` = 0x8008D988, 24 voices x 0x34 = 0x4E0 bytes, ending exactly at `_svm_envx_ptr`. The symbols file now carries `_svm_voice` (size:0x4E0); the record type is `include/SvmData.h` (fields by offset only, Sony's rule). Field map: +0x00 `unk00` (was `D_8008D988`), +0x02 `unk02` (`D_8008D98A`), +0x04 `unk04` (`D_8008D98C`), +0x06 `unk06` (`D_8008D98E`), +0x08 `unk08` (`D_8008D990`), +0x0A `unk0A` (`D_8008D992`), +0x0C `unk0C` (`D_8008D994`), +0x0E `unk0E` (`D_8008D996`), +0x10 `unk10` (`D_8008D998`), +0x12 `unk12` (`D_8008D99A`), +0x14 `unk14` (`D_8008D99C`), +0x16 `unk16` (`D_8008D99E`), +0x18 `unk18` (`D_8008D9A0`), +0x1B `unk1B` (`D_8008D9A3`), +0x1C..+0x26 `unk1C`..`unk26` (the SeAutoVol/SetAutoVol ramp: active, step, interval, countdown, accum, limit; `D_8008D9A4`..`D_8008D9AE`), +0x28..+0x32 `unk28`..`unk32` (the SeAutoPan/SetAutoPan ramp, same order; `D_8008D9B0`..`D_8008D9BA`). Preserved bodies in this report keep the per-address `D_` spellings, which still link (`D_8008D988` itself now reads `_svm_voice` above) (splat keeps them as auto-symbols, since the table lies past the global segment's vram range and splat does not fold them into `_svm_voice`).
 
 The preserved `#if 0` body in `src/` now stores `_svm_voice[i].unkNN`. Compiled live as a probe it scores 103/131, ins/del 10/10 -- exactly the round-66 best: the struct spelling neither helps nor hurts this stall.
+
+## History: the unit banner (moved round 97, track 8)
+
+When the unit became `src/libsnd_ut_ako.c` its banner was rewritten as
+documentation. The history it carried, verbatim (it was then
+`code_179d8_p`):
+
+```c
+/*
+ * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
+ * every claim in this comment that a function is BLOCKED by `gp_rel`,
+ * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
+ * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
+ * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
+ * none of them.  Any "do NOT spend attempts on these" directive below is
+ * therefore RETRACTED: those functions are ordinary matching work, and most
+ * carry a mechanism-correct partial derivation already.  The rest of this
+ * comment still stands -- only the blocker verdicts are withdrawn.
+ * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ *
+ * code_179d8_p -- SsUtAllKeyOff, 0x2273C..0x22948 (vram 0x80031F3C..
+ * 0x80032148).  A single 131-word function.  Carved round 26 (2026-09-09)
+ * out of what had been the `code_179d8_mid_d` remainder; renamed on carve
+ * because "mid_d" named a leftover and the leftover is now fully consumed.
+ *
+ * Blocker census at carve time, four screens: BLOCKER-CLEAN -- zero gp_rel,
+ * zero forward nop_mflo_mfhi, zero `jr $t2` trampolines, zero `jtbl_`, zero
+ * `alabel`.  The body is FRAMELESS (no `addiu $sp, $sp, -N` anywhere), which
+ * is worth knowing before you write C for it.
+ *
+ * It had been parked for several rounds as "addiu-$at blocked"; `addiu_at`
+ * was resolved in round 21 and was its only obstruction.
+ *
+ * Owns NO jump table, so no rodata sub-slot is attached.  It does reference
+ * plain rodata/data SYMBOLS -- reference them as symbols, never re-type a
+ * string literal (splat has already emitted those bytes; a literal emits a
+ * second copy and shifts the whole image).
+ *
+ * READ THIS BEFORE STARTING: SsUtAllKeyOff touches the same global family as
+ * `code_179d8_m` -- libsnd's _svm_voice table (include/SvmData.h) and
+ * D_8006DAD4.  The "split scaled index" entry in
+ * docs/DECOMPILATION_LEARNINGS.md (a mask on the PRODUCT means a halfword
+ * array indexed by a truncated `idx*8`, NOT a struct array indexed by a cast
+ * index) was derived on exactly those globals, together with its
+ * loop-versus-non-loop refinement.  It is very likely to apply here.
+ *
+ * This unit's extern declarations stay LOCAL to this file, except Sony's
+ * _svm_voice, whose one type is include/SvmData.h (round 86, track 2).
+ */
+```

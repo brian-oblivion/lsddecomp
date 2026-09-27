@@ -1,6 +1,6 @@
 # BasicClass__func_18350 — MATCHED (2/2 words), NAME DELIBERATELY NOT CHANGED
 
-**Unit:** `code_8220_b` · **Status:** matched since round 12; splat generated
+**Unit:** `TmdRenderer` · **Status:** matched since round 12; splat generated
 the body itself (`jr $ra; nop`). This report was created in round 51 by the
 naming pass, because a function that was looked at and left with a
 placeholder name needs the reason written down as much as a renamed one

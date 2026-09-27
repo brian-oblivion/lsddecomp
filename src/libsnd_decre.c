@@ -1,14 +1,22 @@
 /*
- * code_179d8_i -- Snd_decrescendo, libsnd's per-tick volume fade-out for one
- * sequence, the mirror of Snd_crescendo (libsnd_cres.c). Sony's code carried
- * as disassembly: the linked libsnd objects call it by this name
- * (config/psyq-objects.ld), and the libsnd/decre object that holds it on the
- * 3.0 and 3.3 discs is a different build (0x474 and 0x4B0 bytes of text
- * against retail's 0x328; 3.5/3.6 rename it _SsSndDecrescendo), so it cannot
- * be linked. Its record is Sony's _ss_score entry, include/SsScore.h.
+ * libsnd_decre -- Sony's libsnd/decre module, carried as disassembly
+ * because no SDK disc carries the build retail linked.
  *
- * The unit's edges are Sony objects on both sides: libsnd/tempo before it,
- * libsnd/replay after it.
+ * Snd_decrescendo is libsnd's per-tick volume fade-out for one sequence,
+ * the mirror of Snd_crescendo (libsnd_cres.c): the linked libsnd objects
+ * call it by this name (config/psyq-objects.ld). Its record is Sony's
+ * _ss_score entry, include/SsScore.h.
+ *
+ * Which object (nm over sdk/work/<disc>/elf/libsnd): decre.o on 3.0, 3.3
+ * and 3.5, decres.o on 3.6, with this one function as its only text
+ * symbol -- Snd_decrescendo on 3.0 and 3.3, renamed _SsSndDecrescendo on
+ * 3.5 and 3.6. None is retail's build: its text is 0x474 (3.0), 0x4B0
+ * (3.3) and 0x2AC (3.5, 3.6) bytes against retail's 0x328, so it cannot be
+ * linked.
+ *
+ * What decided its edges (python3 tools/tuboundary.py --unit): the placed
+ * object libsnd/tempo precedes it ("start edge possible") and the placed
+ * object libsnd/replay follows it, so there is nothing to merge with.
  */
 
 #include "common.h"
@@ -104,4 +112,4 @@ tailFinal:
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/code_179d8_i", Snd_decrescendo);
+INCLUDE_ASM("asm/nonmatchings/libsnd_decre", Snd_decrescendo);

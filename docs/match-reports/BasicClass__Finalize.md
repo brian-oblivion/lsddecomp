@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_17f2c` on 2026-09-24 (tools/rename.py). Address 0x80017f2c.
 
-**Unit:** code_8220 · **Size:** 27 instructions · **Status:** MATCHED (27/27 words)
+**Unit:** BMemPMgr · **Size:** 27 instructions · **Status:** MATCHED (27/27 words)
 
 BasicClass vtable slot `+0x00C` — see `BasicClass__BasicClass.md` for the
 class's overall design.
@@ -16,7 +16,7 @@ order:
 
 - `+0x030` (`notifyParents`, `self, 1`) — a subclass-specific hook. The base
   occupant, `BasicClass__NotifyParents`, is out of this round's carved slice
-  (`code_8220_b`), so its own behaviour is unconfirmed here; only that this
+  (`TmdRenderer`), so its own behaviour is unconfirmed here; only that this
   function calls it with a literal `1` second argument.
 - `+0x018` (`removeAllChildren`, `self`) — this unit's own
   `BasicClass__RemoveAllChildren` (own report): walks and detaches every entry in
@@ -68,5 +68,5 @@ comment. Called by `BasicClass__Release` before freeing `self`.
 
 `notifyParents(self, 1)` -> `BASICCLASS_EVENT_FINALIZED`, a new enum in
 `include/BasicClass.h`. Evidence: the base `BasicClass__OnNotify`
-(`code_8220_b.c`) acts on event 1 and only 1, by removing the sender from its
+(`TmdRenderer.c`) acts on event 1 and only 1, by removing the sender from its
 children, and this function, the base finalizer, is its sender. Byte-identical.

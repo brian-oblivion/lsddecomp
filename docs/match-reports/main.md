@@ -42,7 +42,7 @@ extern void __main(void);
  * One `s32` argument observed at this, its only call site. */
 extern void SetMem(s32 mode);
 
-/* BMemPMgrInit is fully matched in code_8220.c as a single-argument
+/* BMemPMgrInit is fully matched in BMemPMgr.c as a single-argument
  * function (`s32 poolSize`, see docs/match-reports/BMemPMgrInit.md,
  * 31/31 words). THIS call site pushes a second, dead argument (0) that the
  * matched body never reads -- an unspecified-parameter declaration lets the
@@ -169,7 +169,7 @@ this is a documentation sync only.)
     `main`. Mechanics are clear (it stages the newly created heap
     pointer); whether any still-uncarved code elsewhere also reads this
     exact global (as opposed to `gDefaultBMemPMgr`, a different address,
-    `code_8220.c`) is not established, hence tier B rather than A.
+    `BMemPMgr.c`) is not established, hence tier B rather than A.
   - `D_8008AC20` -> `gGameApplication`, tier B. The one instance of `GameApplication`
     the game constructs, matching this header's own stated convention of
     keeping the class's identity tied to its vtable address until a
@@ -215,7 +215,7 @@ by any carved C before this) is retyped from `void *` to `void
    regardless -- `addu $a1,$zero,$zero` right after the `jal`. An
    unspecified-parameter (`void *BMemPMgrInit();`) local declaration lets
    the call push two arguments without contradicting the real, ANSI,
-   single-argument definition seen from `code_8220.c`'s own translation
+   single-argument definition seen from `BMemPMgr.c`'s own translation
    unit -- the exact idiom `code_8220.h` already documents for
    `BMemPMgrAlloc`/`BMemPMgrFree`. First guess (passing only
    `BMemPMgrInit(0x166C00)`) simply omitted the dead `$a1` instruction and

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80018288` on 2026-09-17 (tools/rename.py). Address 0x80018288.
 
-Unit: `src/code_8220_b.c`. Signature (already in `include/code_8220.h`):
+Unit: `src/TmdRenderer.c`. Signature (already in `include/code_8220.h`):
 `void FreeBasicClassList(BasicClassListNode **head);` — free every node in a
 `BasicClassListNode` singly-linked list, without clearing `*head` itself.
 
@@ -60,7 +60,7 @@ Confirmed once (`FreeBasicClassList`, 6/17 -> 17/17 words).
 mechanics are its purpose.
 
 Evidence: the body frees every node of a `BasicClassListNode` chain through
-the pool allocator and nothing else. Its two callers in `code_8220.c` are
+the pool allocator and nothing else. Its two callers in `BMemPMgr.c` are
 `BasicClass__RemoveAllChildren` (removeAllChildren) and `BasicClass__ClearParentRefs`
 (clearParentRefs), and both do `FreeBasicClassList(&self->list);
 self->list = NULL;` -- i.e. the caller, not this function, clears the head

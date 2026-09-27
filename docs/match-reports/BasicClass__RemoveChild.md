@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_17ff0` on 2026-09-24 (tools/rename.py). Address 0x80017ff0.
 
-**Unit:** code_8220 · **Size:** 20 instructions · **Status:** MATCHED (20/20 words)
+**Unit:** BMemPMgr · **Size:** 20 instructions · **Status:** MATCHED (20/20 words)
 
 BasicClass vtable slot `+0x014` (`removeChild`) — see
 `BasicClass__BasicClass.md` for the class's overall design, and

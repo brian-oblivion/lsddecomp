@@ -64,7 +64,7 @@ Evidence for each type from the callee/caller bytes, not from guessing:
 - **`SpuVmSetSeqVol(s16, u16, u16, s32)`**: retail masks both XY arguments
   `andi 0xFFFF` at the call; the callee (`code_179d8_j`, still
   `INCLUDE_ASM`) stores them with `sh` and re-reads with `lhu` +
-  `sltiu 0x80`, i.e. unsigned. `code_179d8_i.c` already carried
+  `sltiu 0x80`, i.e. unsigned. `libsnd_decre.c` already carried
   `(s16 a0, u16 a1, u16 a2, s32 a3)`.
 - **`u16 sp10/sp12`**: retail reads them with `lhu` and compares
   `(x + 1) < 0x80` / `(x - unk42) < 0x80` with `slti` on the int-promoted

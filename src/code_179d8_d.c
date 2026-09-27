@@ -17,7 +17,7 @@
  * PlacementGrid's ctor, finalize and setFlag reach their parent's. */
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
-/* The pool allocator (include/class_16334.h, include/code_8220.h, neither
+/* The pool allocator (include/class_16334.h, include/BMemPMgr.h, neither
  * included here). */
 extern void *BMemPMgrAlloc(s32 size);
 

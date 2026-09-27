@@ -381,7 +381,7 @@ segments:
       # standalone rodata object resolves it by symbol. (PARALLEL-RUNS.md
       # Gate 2 previously listed 0xA8C as a text-pointer slot needing
       # attachment; that was wrong, and the carve links green without it.)
-      - [0x8220, c, code_8220]
+      - [0x8220, c, BMemPMgr]
       # code_8220_b: second 20-function slice, 0x8A88..0x9F74.
       # 0x9F74 (func_80019774) is a real boundary -- func_8001974C is a
       # 10-word frameless leaf that ends in its own `jr $ra; nop`, and
@@ -398,7 +398,7 @@ segments:
       # ONE OUTLIER TO KNOW ABOUT: func_80018464 is 954 words, by far the
       # largest function in any carved unit. It is not blocked, but it is
       # not cold-runner ground either -- budget it separately.
-      - [0x8A88, c, code_8220_b]
+      - [0x8A88, c, TmdRenderer]
       # code_8220_c: third and FINAL slice of the code_8220 block,
       # 0x9F74..0xAD64 (the next segment is psyq_rcpolyf3), 16 functions.
       # Carved round 13. Gate 2 checks, all run before the carve and all
@@ -410,7 +410,6 @@ segments:
       # on a segment boundary, so there is no data tail to declare.
       # Blocker profile: 14 of 16 functions clean, only func_8001A380
       # (4 hits) and func_8001A54C (2 hits) are gp_rel-blocked.
-      - [0x9F74, c, code_8220_c]
       # Psy-Q library code LINKED FROM THE SDK'S OWN OBJECTS (type `o`): the
       # bytes come from lib/<lib>/<module>.o, which tools/setup.sh converts
       # from the user's Psy-Q disc with psyq-obj-parser. tools/match_obj.py
@@ -917,7 +916,7 @@ segments:
       # above, which is what the `_c` suffix records.  Text-only; still no
       # rodata attach anywhere in this family.
       - [0x221B4, o, libsnd/ut_pb]      # SsUtPitchBend
-      - [0x22244, c, code_179d8_j_c]
+      - [0x22244, c, libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop]
       # code_179d8_mid_d: the one function left between the code_179d8_j
       # carve above and code_179d8_c below -- func_80031F3C (131w).  A carve
       # remainder, not a unit.
@@ -947,7 +946,7 @@ segments:
       # and D_8006DAD4), so the "split scaled index" idiom and its
       # loop-versus-non-loop refinement in DECOMPILATION_LEARNINGS are
       # likely to apply directly.  Read that entry before starting.
-      - [0x2273C, c, code_179d8_p]
+      - [0x2273C, c, libsnd_ut_ako]
       # code_179d8_c: window [200..219], 0x22948..0x23500 (20 functions).
       # ROUND 33: func_80032148 (53w), the first function of this slice, is
       # Sony's `libsnd/vm_vsu` and is linked from the object.  Text-only, and
@@ -1039,7 +1038,7 @@ segments:
       - [0x23F38, o, libsnd/sscall]     # SsSeqCalledTbyT
       - [0x241AC, o, libsnd/pause]      # Snd_pause, Snd_nextpause
       - [0x242B0, o, libsnd/tempo]      # Snd_tempo
-      - [0x24490, c, code_179d8_i]
+      - [0x24490, c, libsnd_decre]
       # ROUND 34, second run in the same unit: `libsnd/replay` (Snd_replay) and
       # `libsnd/vs_vab` (SsVabClose, SsVabOpen) -- func_80033FB8, func_80034020
       # and func_800340B0, all three previously MATCHED as C.  This run sits in

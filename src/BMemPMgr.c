@@ -1,12 +1,10 @@
-#include "common.h"
-#include "code_8220.h"
-#include <malloc.h>
-
-/* Two things that share this file:
+/*
+ * BMemPMgr -- the game's pool allocator and the first half of BasicClass,
+ * two things that share this file:
  *
  *  - The BMemPMgr pool allocator, the game's general-purpose allocator.
  *    BMemPMgrInit mallocs one area, a BMemPMgr header followed by the pool's
- *    blocks (the layout is in code_8220.h), and SetupBMemPMgrFreeList makes
+ *    blocks (the layout is in BMemPMgr.h), and SetupBMemPMgrFreeList makes
  *    the whole pool one free block. BMemPMgrAlloc and BMemPMgrFree split and
  *    merge blocks on the pool's free list. SetupBMemPMgrFreeList,
  *    BMemPMgrAlloc and BMemPMgrFree work on gDefaultBMemPMgr
@@ -15,8 +13,23 @@
  *  - Eleven of BasicClass's methods (include/BasicClass.h), and
  *    PushBasicClassListNode/RemoveBasicClassListNode, the pool-backed list
  *    primitives its `children` and `parentRefs` lists share. The rest of its
- *    methods are in code_8220_b.c.
+ *    methods are at the head of TmdRenderer.c.
+ *
+ * What decided its edges (python3 tools/tuboundary.py --unit): the placed
+ * object libgte/smp_00 precedes it ("start edge possible"), and every edge
+ * inside it and on to TmdRenderer.c is "boundary possible": the binary
+ * neither proves nor forbids a file boundary. The content says the original
+ * file runs on past this one's end, through the BasicClass tail and the pool
+ * allocator's busy-flag accessors, to the renderer's first function
+ * SortTmdObject; that tail is parked in TmdRenderer.c (see its banner),
+ * because moving it is a split, which no tool does. Named for the
+ * allocator: BasicClass.c would collide with the class's header,
+ * include/BasicClass.h, and the rest of the class is in the other file.
  */
+
+#include "common.h"
+#include "BMemPMgr.h"
+#include <malloc.h>
 
 /* Psy-Q printf, declared with the argument shape this call site passes:
  * it is variadic, and each unit that calls it declares its own. */
@@ -78,7 +91,7 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool) {
  * free block that replaces it on the list. Returns the payload, or NULL.
  *
  * Defined K&R so the body can read the second argument that callers never
- * pass (code_8220.h, at the declaration). */
+ * pass (BMemPMgr.h, at the declaration). */
 /* clang-format off */
 void *BMemPMgrAlloc(size, pool)
     s32 size;

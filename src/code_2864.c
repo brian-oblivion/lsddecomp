@@ -12,7 +12,7 @@
  * ScreenSprite (its GsSPRITE placed from `screenPos`), any other 0x44 a
  * Sprite projected from its GsCOORDINATE2's world position, and anything
  * else the node's own GsDOBJ2 (+0x010) sorted by SortTmdObject
- * (code_8220_b.c), the game's replacement for GsSortObject4. A GridCell
+ * (TmdRenderer.c), the game's replacement for GsSortObject4. A GridCell
  * (0x24) whose GsDOFF bit is set is skipped outright.
  *
  * Before drawing, a node whose coord2 is dirty (flg == 0) rebuilds its matrix
@@ -39,7 +39,7 @@
 
 /* code_d294_c.c (include/code_d294.h) */
 extern void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
-/* code_8220_b.c */
+/* TmdRenderer.c */
 extern void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch);
 
 /*

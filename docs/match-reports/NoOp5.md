@@ -2,7 +2,7 @@
 
 > Renamed from `func_80017EA8` on 2026-09-27 (tools/rename.py). Address 0x80017ea8.
 
-**Unit:** code_8220 · **Size:** 1 instruction (`jr $ra`; splat pads the
+**Unit:** BMemPMgr · **Size:** 1 instruction (`jr $ra`; splat pads the
 delay slot) · **Status:** MATCHED (trivial; splat-generated, not decomp work)
 
 ## What it does
@@ -49,7 +49,7 @@ leaf functions; it earns no name here.
 
 ## Provenance
 
-Present in `src/code_8220.c` since the unit's initial carve (no report
+Present in `src/BMemPMgr.c` since the unit's initial carve (no report
 previously filed — the FINISHING-PLAN note that a trivial `jr $ra; nop`
 body is often not real decomp work applies here). round 74 (2026-09-24),
 runner alpha: wrote this report as part of the unit's track-3 naming

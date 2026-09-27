@@ -68,7 +68,7 @@ extern void CdFlush(void);
  * calls) before giving up and retrying the command from state 1. */
 #define CD_WAIT_TIMEOUT 0x259
 
-/* Psy-Q pool allocator, code_8220.c. */
+/* Psy-Q pool allocator, BMemPMgr.c. */
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
