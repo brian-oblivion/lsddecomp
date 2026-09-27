@@ -114,7 +114,7 @@ extern const char sTitleTimPath[];
 /* "CARD\FILEICN1.TIM", TitleMenu__BeginCardAccess's path for New_TimImage.
  * A string splat already emitted as a symbol: a literal would emit a
  * second copy. */
-extern const char D_800114F8[];
+extern const char sSaveIconTimPath[];
 
 /* The two 320 x 240 display buffers, stacked in VRAM at y 0 and y 240:
  * TitleMenu__OnDeinit clears each with the DrawSystem's clearImage. */

@@ -18,7 +18,7 @@ extern GenericReleaseObj_3bb8c_d *New_TimImage(const char *path);
 void TitleMenu__BeginCardAccess(TitleMenu *self)
 {
     if (self->unkAC == NULL) {
-        self->iconHandle = New_TimImage(D_800114F8);
+        self->iconHandle = New_TimImage(sSaveIconTimPath);
         self->unkAC = New_TaskObjF((void *)1, NULL);
     }
     self->unkAC->methods->slot6C(self->unkAC, D_8008A9D0, &D_80086D6C,
@@ -39,11 +39,11 @@ SLPS_015.56`.
 - Lazy-init guard: `if (self->unkAC == NULL) { ... }`, the mirror image of
   `TitleMenu__Finalize`'s destructor guard on the same two fields
   (`iconHandle`/`unkAC`).
-- `New_TimImage(D_800114F8)` -- `New_TimImage` is already matched
+- `New_TimImage(sSaveIconTimPath)` -- `New_TimImage` is already matched
   project-wide under many independent local arities/return types (see
   e.g. `src/class_3bb8c_g.c`, `src/class_3bb8c_i.c`); this unit's own view
   returns exactly what it is stored into, `GenericReleaseObj_3bb8c_d *`.
-  `D_800114F8` is a real dlabel string, `"CARD\FILEICN1.TIM"`
+  `sSaveIconTimPath` is a real dlabel string, `"CARD\FILEICN1.TIM"`
   (`asm/data/1C34.rodata.s`) -- referenced by symbol per CLAUDE.md's rule
   against re-writing an already-emitted string literal.
 - `New_TaskObjF((void *)1, NULL)` -- the already-matched New_X allocator
@@ -79,7 +79,7 @@ SLPS_015.56`.
   before `slot70`, splitting the existing `pad008[0x070-0x008]` gap into
   `pad008[0x06C-0x008]` + the new slot (0x06C-0x070, exactly 4 bytes, no
   remainder).
-- New externs: `D_800114F8` (`const char[]`, a real string dlabel),
+- New externs: `sSaveIconTimPath` (`const char[]`, a real string dlabel),
   `D_8008A9D0` (`void *`, VALUE-of `%gp_rel`), `D_80086D6C` (`s32`,
   address-of placeholder for a real 16-entry pointer table).
 - `src/class_3bb8c_d.c`: local extern for `New_TimImage` (own arity/
@@ -100,7 +100,7 @@ blocker itself was the only thing stopping them.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DF64` -> `TitleMenu__BeginCardAccess`. **Tier B**: Lazy-inits `self->iconHandle` (`New_TimImage(D_800114F8)`, a real dlabel "CARD\\FILEICN1.TIM") and `self->unkAC` (`New_TaskObjF`), then dispatches `unkAC`'s `slot6C` with `D_8008A9D0` (VALUE-of, holds "BISLPS-01556" -- Sony's memcard save-header game-ID convention) plus filename-related fields. Named from the game-ID string as the strongest evidence this is the start of a memory-card save operation; the exact protocol is not established.
+Renamed `func_8004DF64` -> `TitleMenu__BeginCardAccess`. **Tier B**: Lazy-inits `self->iconHandle` (`New_TimImage(sSaveIconTimPath)`, a real dlabel "CARD\\FILEICN1.TIM") and `self->unkAC` (`New_TaskObjF`), then dispatches `unkAC`'s `slot6C` with `D_8008A9D0` (VALUE-of, holds "BISLPS-01556" -- Sony's memcard save-header game-ID convention) plus filename-related fields. Named from the game-ID string as the strongest evidence this is the start of a memory-card save operation; the exact protocol is not established.
 
 ## Track 4 (2026-09-26, round 88)
 

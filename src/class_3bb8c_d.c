@@ -220,7 +220,7 @@ void TitleMenu__RefreshMenu(TitleMenu *self) {
 
 void TitleMenu__BeginCardAccess(TitleMenu *self) {
     if (self->saveCtrl == NULL) {
-        self->saveIcon = New_TimImage((char *)D_800114F8);
+        self->saveIcon = New_TimImage((char *)sSaveIconTimPath);
         self->saveCtrl = New_TaskObjF(1, 0);
     }
     self->saveCtrl->methods->init(self->saveCtrl, D_8008A9D0, (char **)&D_80086D6C,
