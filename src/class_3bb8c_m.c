@@ -51,10 +51,14 @@
 #include "WBgm.h"
 #include "VabStreamObj.h"
 
-/* ObjM__CheckAuxTrigger's one external call, src/code_4cd08.c (MATCHED; its
- * definition reads the second argument as `s16 *`). The third argument is
- * the DreamSys's getCurrentDayAndYear result. */
-extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
+/* StageMap__SplitChunkIndex's output: the chunk's column and row. */
+typedef struct ChunkCoord {
+    u8 column;
+    u8 row;
+} ChunkCoord;
+
+/* src/code_4cd08.c; it reads `coord` as one s16 trigger key. */
+extern s32 TryDreamAuxTrigger(s32 data, ChunkCoord *coord, s32 day);
 
 /* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
@@ -130,18 +134,21 @@ void ObjM__OnStageMapNotify(ObjM *self, BasicClass *sender, s32 event) {
     }
 }
 
+/* The StageMap's last event slot's data block goes to TryDreamAuxTrigger
+ * with the slot's chunk coordinates and the day; the block is released
+ * unless that returns an object, which the slot keeps as heldObj. */
 s32 ObjM__CheckAuxTrigger(ObjM *self) {
-    s32 out;
-    s32 result;
-    ChunkSlot *elem =
-        ((StageMap *)self->unk14)->methods->getLastEventSlotChunk((StageMap *)self->unk14, (u8 *)&out);
-    void *thing = (void *)self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    result = TryDreamAuxTrigger((s32)elem->loader->dataBuffer, &out, thing);
-    elem->heldObj = (BasicClass *)result;
-    if (result != 0) {
+    ChunkCoord coord;
+    s32 held;
+    ChunkSlot *slot =
+        ((StageMap *)self->unk14)->methods->getLastEventSlotChunk((StageMap *)self->unk14, &coord.column);
+    s32 day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
+    held = TryDreamAuxTrigger((s32)slot->loader->dataBuffer, &coord, day);
+    slot->heldObj = (BasicClass *)held;
+    if (held != 0) {
         return 0;
     }
-    elem->loader->methods->releaseDataBlock(elem->loader);
+    slot->loader->methods->releaseDataBlock(slot->loader);
     return 1;
 }
 
