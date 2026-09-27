@@ -91,7 +91,7 @@ first build (after correctly re-reading the delay-slot ordering above).
 alpha). Tier A: the `Class__Class` constructor convention (matching
 `BasicClass__BasicClass`) -- confirmed as `Unk18ObjMethods::ctor`'s
 occupant (called by `New_Viewport` via `GetViewportMethods()->ctor(self)`,
-`GetViewportMethods` being this class's own vtable getter, code_2cc8c_d.c).
+`GetViewportMethods` being this class's own vtable getter, code_2cc8c.c).
 Chains `Get_vtable_BasicClass()->ctor` first, then installs its own vtable
 and sets up `self->unkAC`/`self->unkB0` -- the standard base-then-derived
 construction shape.

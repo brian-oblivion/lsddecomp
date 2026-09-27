@@ -97,7 +97,7 @@ dynamic class tag -- the textbook "override calls base first, then does its
 own work" shape for a virtual method whose base identity is independently
 confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
 `onNotify` in this unit's `## Proposed field names` (shared with
-`code_2cc8c_d.c`'s own `Viewport__OnNotify`).
+`code_2cc8c.c`'s own `Viewport__OnNotify`).
 
 ## Proposed field names
 
@@ -105,7 +105,7 @@ confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
   matches `include/code_8220.h`'s own canonical, already-named
   `BasicClassMethods::slot38` = `onNotify` exactly (`IS BasicClass__OnNotify`,
   TmdRenderer, per this header's own comment). NOT renamed directly:
-  `code_2cc8c_d.c`'s `Viewport__OnNotify` also calls
+  `code_2cc8c.c`'s `Viewport__OnNotify` also calls
   `Get_vtable_BasicClass()->slot38(self, arg1, arg2)`, so this field is
   shared within the code_2cc8c family. Head applies by type scope (rename
   the field in `BasicClassMethodsCC8C`'s own definition,

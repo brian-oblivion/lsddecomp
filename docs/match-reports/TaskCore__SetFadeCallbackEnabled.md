@@ -94,7 +94,7 @@ Tier B: in this unit's own evidence the only value ever stored here besides
 NULL is `self->methods->slotB0` (`TaskCore__TickColorFade`), and
 `TaskCore__TickFadeCallback` is its sole invoker. Grep shows `unk88` textual
 hits in code_2c054.c/code_179d8_{k,f}.c/code_2cc8c_{d,e}.c/Entity_f.c
-(several genuinely this same shared Obj86B60 struct, per code_2cc8c_d/e), so
+(several genuinely this same shared Obj86B60 struct, per code_2cc8c/e), so
 proposal only -- the head should apply via type scope on `Obj86B60`, not a
 whole-tree replace.
 

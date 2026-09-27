@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003F04C` on 2026-09-23 (tools/rename.py). Address 0x8003f04c.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. 87/87 words, full match (2
+Unit: `code_2cc8c`. Round 14, runner delta. 87/87 words, full match (2
 real attempts).
 
 ## Signature
@@ -102,7 +102,7 @@ Renamed from `Unk18Obj__Flip`. Slot +0x0A4 `flip`. `unkC` is `drawSystem` (the c
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/code_2cc8c_d.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSortClear(..., (GsOT *)self->ot[idx])` and `GsDrawOt((GsOT *)self->ot[idx])`.
+src/code_2cc8c.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSortClear(..., (GsOT *)self->ot[idx])` and `GsDrawOt((GsOT *)self->ot[idx])`.
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 

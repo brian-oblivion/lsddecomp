@@ -98,7 +98,7 @@ evidence available at the time.
 New `Obj86B60Methods` slot: `+0x0F8 slotF8(self, void *a1, Unk74Obj *a2)`.
 
 New external: `New_BoxFill(void*, void*, s32) -> Unk68Obj*` (lives in the
-still-uncarved `code_2cc8c_d` segment, not this unit's function — declared
+still-uncarved `code_2cc8c` segment, not this unit's function — declared
 `extern` for this unit's own local view of what it returns). Its two
 pointer args, `sListViewSize`/`sListViewColor`, are only ever address-taken here,
 so they're typed minimally (`s32[2]`/`char[4]`) matching their observed

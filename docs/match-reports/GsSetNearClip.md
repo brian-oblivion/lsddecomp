@@ -47,7 +47,7 @@ declared `void *` since nothing dereferences it here.
 > `include/code_2cc8c.h`'s prototype and `src/code_2cc8c_d.c`'s one call
 > site (`GsSetNearClip(self->unk4C);`, inside `Viewport__Update`) were updated
 > by `rename.py` tree-wide, automatically. No `Unk18Obj` field was touched
-> or proposed by this pass: `self->unk4C` belongs to `code_2cc8c_d.c`'s own
+> or proposed by this pass: `self->unk4C` belongs to `code_2cc8c.c`'s own
 > unit (PARALLEL-RUNS.md collision rule 1), and the value it holds is a
 > plain `s32` reused three lines later in `Viewport__Update` in an ordinary
 > size/count calculation (`(self->unk50 - self->unk4C) / (1 <<

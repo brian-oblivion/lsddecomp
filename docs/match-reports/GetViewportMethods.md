@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003F24C` on 2026-09-23 (tools/rename.py). Address 0x8003f24c.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. 4/4 words, full match.
+Unit: `code_2cc8c`. Round 14, runner delta. 4/4 words, full match.
 
 ## Signature
 
@@ -27,7 +27,7 @@ Unk18ObjMethods *GetViewportMethods(void) {
 This symbol was already declared `extern` in `include/code_2cc8c.h` from
 round 13 (alpha), with a comment saying it "lives in a still-uncarved
 remainder... not this unit's function to write." Round 14's carve of
-`code_2cc8c_d` brought it in, so it's matched here now — updated the
+`code_2cc8c` brought it in, so it's matched here now — updated the
 comment accordingly rather than leaving the stale "external" note.
 
 ## Header changes

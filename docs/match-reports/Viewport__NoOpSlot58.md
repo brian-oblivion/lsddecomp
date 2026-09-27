@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EA6C` on 2026-09-27 (tools/rename.py). Address 0x8003ea6c.
 
-Unit: `code_2cc8c_d`. Round 73, runner charlie (report written retroactively;
+Unit: `code_2cc8c`. Round 73, runner charlie (report written retroactively;
 the function itself was already byte-exact under `INCLUDE_ASM` before this
 round -- an empty body, `jr $ra; nop`, that splat's own extraction produced
 without any hand-written C being required).

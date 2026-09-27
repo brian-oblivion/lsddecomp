@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EEC0` on 2026-09-23 (tools/rename.py). Address 0x8003eec0.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. 99/99 words, full match (4
+Unit: `code_2cc8c`. Round 14, runner delta. 99/99 words, full match (4
 real attempts).
 
 ## Signature
@@ -215,7 +215,7 @@ Renamed from `Unk18Obj__Update`. Slot +0x09C `update` (NodeGuardedViewport's ove
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/code_2cc8c_d.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSetRefView2((GsRVIEW2 *)&self->refView)` and `GsClearOt(0, 0, (GsOT *)self->ot[idx])`. SetFarColor now takes LIBGTE.H's `long`s; the call still reads the bytes through a `u8 *`, so they zero-extend exactly as the old `u8` prototype made them.
+src/code_2cc8c.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSetRefView2((GsRVIEW2 *)&self->refView)` and `GsClearOt(0, 0, (GsOT *)self->ot[idx])`. SetFarColor now takes LIBGTE.H's `long`s; the call still reads the bytes through a `u8 *`, so they zero-extend exactly as the old `u8` prototype made them.
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 

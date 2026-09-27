@@ -58,7 +58,7 @@ game sets one.
 `Obj86B60::unk40` (s32, +0x040) -> `frameBound`, matching the function name
 above. Grep shows `unk40` textual hits in many unrelated units
 (class_39e08.c, code_171e0.c, class_3bb8c_*.c, code_2c054.c, code_179d8_*.c,
-code_2cc8c_d.c) so this is a PROPOSAL, not a direct rename -- only a
+code_2cc8c.c) so this is a PROPOSAL, not a direct rename -- only a
 definition-only rename + rebuild can tell which are this same struct.
 
 

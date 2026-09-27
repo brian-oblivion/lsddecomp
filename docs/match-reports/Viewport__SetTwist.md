@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EC2C` on 2026-09-23 (tools/rename.py). Address 0x8003ec2c.
 
-Unit `code_2cc8c_d`, carved round 13. Reopened round 42 as
+Unit `code_2cc8c`, carved round 13. Reopened round 42 as
 `nop_mflo_mfhi`-blocked (the blocker is RESOLVED, see CLAUDE.md); the stub
 above was never actually attempted until now.
 

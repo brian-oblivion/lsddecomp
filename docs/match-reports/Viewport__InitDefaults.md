@@ -7,7 +7,7 @@
 ## ROUND 49 (runner delta): MATCHED -- the asm-label alias defeats the address CSE, then a second independent scheduling residue is exposed and closed by two bare barriers
 
 Re-verified the inherited stall first: spliced the round-46 body
-(unchanged) into `src/code_2cc8c_d.c` in isolation (both of this
+(unchanged) into `src/code_2cc8c.c` in isolation (both of this
 runner's units confirmed at their starting `INCLUDE_ASM` counts first)
 and rebuilt -- **0/41 raw, `WARNING: differs OUTSIDE this range too**,
 reproducing this report's own documented figure exactly. Not stale.
@@ -156,7 +156,7 @@ schedule too -- re-measure after the length fix before declaring victory.
 
 ## ROUND 46 (runner delta): drift-checked fresh (consistent), one new lever tried and rejected -- `volatile` on just the READ side regresses even worse than `volatile` on the declaration
 
-Re-spliced the round-44 body (unchanged) into `src/code_2cc8c_d.c` in
+Re-spliced the round-44 body (unchanged) into `src/code_2cc8c.c` in
 isolation and rebuilt: **0/41 raw, `WARNING: differs OUTSIDE this range
 too (176860 bytes)`** -- reproduces this report's own documented figure
 exactly (the raw 0/41 is the known-misleading window-alignment artifact
@@ -213,7 +213,7 @@ narrows (rather than contradicts) the existing round-44 finding that
 worseness is a property of volatile-qualifying an AGGREGATE access in
 this compiler, not of WHERE in the source the qualifier is spelled.
 
-Unit `code_2cc8c_d`, carved round 13. Reopened round 42 as `gp_rel`-blocked
+Unit `code_2cc8c`, carved round 13. Reopened round 42 as `gp_rel`-blocked
 (the blocker is RESOLVED, see CLAUDE.md); the stub above was never actually
 attempted until round 44.
 
@@ -415,4 +415,4 @@ Constants in decimal (otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, fa
 
 ## Constants
 
-The defaults became unit-local `#define`s in code_2cc8c_d.c (only InitDefaults uses them): `VIEWPORT_DEFAULT_OT_LENGTH` 13 (8192 tags), `VIEWPORT_DEFAULT_MAX_PACKETS` 2000, `VIEWPORT_DEFAULT_PACKET_SIZE` 64, `VIEWPORT_DEFAULT_PROJ_H` 256, `VIEWPORT_DEFAULT_NEAR_Z` 10, `VIEWPORT_DEFAULT_FAR_Z` 65536, `VIEWPORT_DEFAULT_FOG_NEAR` 20000; `lightMode = 0` -> `GsLMODE_NORMAL` (libgs.h). Fields `unk44`/`unk48`/`unk90`/`unkB4` are now `maxPackets`/`packetSize`/`clockEventCount`/`extraSwap`.
+The defaults became unit-local `#define`s in code_2cc8c.c (only InitDefaults uses them): `VIEWPORT_DEFAULT_OT_LENGTH` 13 (8192 tags), `VIEWPORT_DEFAULT_MAX_PACKETS` 2000, `VIEWPORT_DEFAULT_PACKET_SIZE` 64, `VIEWPORT_DEFAULT_PROJ_H` 256, `VIEWPORT_DEFAULT_NEAR_Z` 10, `VIEWPORT_DEFAULT_FAR_Z` 65536, `VIEWPORT_DEFAULT_FOG_NEAR` 20000; `lightMode = 0` -> `GsLMODE_NORMAL` (libgs.h). Fields `unk44`/`unk48`/`unk90`/`unkB4` are now `maxPackets`/`packetSize`/`clockEventCount`/`extraSwap`.

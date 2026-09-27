@@ -52,7 +52,7 @@ buffer being two GsOT headers plus tags plus packet area, and with both
 halves being handed to `GsClearOt`. Left as an `s32` field layout (no
 struct edit this round).
 
-### Matched body (as committed in `src/code_2cc8c_d.c`)
+### Matched body (as committed in `src/code_2cc8c.c`)
 
 ```c
 extern void GsClearOt(s32 a0, s32 a1, s32 a2);
@@ -186,7 +186,7 @@ even though neither run is "exhaustive" in any formal sense.
 
 ## ROUND 46 (runner delta): drift-checked fresh, no new lever -- DELIBERATE SKIP, plus a self-caught cross-contamination scare worth recording
 
-Re-spliced the round-36 body (with `GsClearOt`) into `src/code_2cc8c_d.c`
+Re-spliced the round-36 body (with `GsClearOt`) into `src/code_2cc8c.c`
 and rebuilt. **First attempt showed a spurious `WARNING: differs OUTSIDE
 this range too (22 bytes)`** that had nothing to do with this function --
 `cmp -l build/SLPS_015.56 disk/SLPS_015.56` plus
@@ -305,7 +305,7 @@ tell which one was actually run.** This one hid a 55-word difference under
 "no change either way" for four rounds, and the next reader inherits it as a
 closed axis. When an attempt has two spellings, record two rows.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. Best score: 71/73 words
+Unit: `code_2cc8c`. Round 14, runner delta. Best score: 71/73 words
 in-range, build clean at that score. ~14 real attempts, all on the SAME
 2-word residue. Restored to `INCLUDE_ASM` per project rule.
 
@@ -490,7 +490,7 @@ actually been rebuilt in its current form since that rename — the 71/73
 figure was correct but unverified against the current tree.
 
 **Rebuilt with the corrected name.** `extern void GsClearOt(s32, s32, s32);`
-already existed in `src/code_2cc8c_d.c` (added when round 34 retyped this
+already existed in `src/code_2cc8c.c` (added when round 34 retyped this
 unit's other Sony calls), just declared after this function's own call
 sites; added a second, identical declaration ahead of `Viewport__InitOt`
 itself (same pattern this unit already uses for its other local externs)
@@ -676,7 +676,7 @@ Renamed from `Unk18Obj__InitOt`. Slot +0x08C `initOt`. Its carving names the fie
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/code_2cc8c_d.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsClearOt(0, 0, (GsOT *)self->ot[0])` and `[1]`: `ViewportOt` is Sony's GsOT under a local name (include/Viewport.h).
+src/code_2cc8c.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsClearOt(0, 0, (GsOT *)self->ot[0])` and `[1]`: `ViewportOt` is Sony's GsOT under a local name (include/Viewport.h).
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003EA48` on 2026-09-23 (tools/rename.py). Address 0x8003ea48.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. 7/7 words, full match.
+Unit: `code_2cc8c`. Round 14, runner delta. 7/7 words, full match.
 
 ## Signature
 
@@ -51,7 +51,7 @@ Viewport's `unk48` -> `packetSize`, slot `setUnk48` -> `setPacketSize`, this fun
 
 ## Naming
 
-Renamed from `Viewport__SetUnk48` with `tools/rename.py`: tier B, the other half of `Viewport__SetMaxPackets`'s evidence (see that report). The field is now `packetSize` (include/Viewport.h; every accessor is in code_2cc8c_d.c). Parameter `value` -> `size`.
+Renamed from `Viewport__SetUnk48` with `tools/rename.py`: tier B, the other half of `Viewport__SetMaxPackets`'s evidence (see that report). The field is now `packetSize` (include/Viewport.h; every accessor is in code_2cc8c.c). Parameter `value` -> `size`.
 
 ## Proposed field names
 

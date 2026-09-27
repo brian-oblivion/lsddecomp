@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EE40` on 2026-09-23 (tools/rename.py). Address 0x8003ee40.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. 18/18 words, full match.
+Unit: `code_2cc8c`. Round 14, runner delta. 18/18 words, full match.
 
 ## Signature
 
@@ -64,4 +64,4 @@ Viewport's `unk90` -> `clockEventCount` (tier A: this function increments it on 
 
 ## Track 7 (round 100, echo, polish pass)
 
-Round 95's proposal applied: `unk90` -> `clockEventCount` (include/Viewport.h; the accessors are this function and InitDefaults, both in code_2cc8c_d.c).
+Round 95's proposal applied: `unk90` -> `clockEventCount` (include/Viewport.h; the accessors are this function and InitDefaults, both in code_2cc8c.c).

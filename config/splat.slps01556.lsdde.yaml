@@ -1244,7 +1244,6 @@ segments:
       # docs/research/addiu-at-blocker.md turning into a queued one). Both
       # carry stub reports. Nothing in the slice demands 5+ callee-saved
       # registers.
-      - [0x2F0B8, c, code_2cc8c_d]
       # code_2cc8c_e: the remaining 60 functions, 0x2FAAC.. -- left UNCARVED
       # deliberately, so whoever carves it screens it themselves.
       #

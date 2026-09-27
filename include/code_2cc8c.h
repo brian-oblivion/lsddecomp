@@ -12,7 +12,7 @@
 
 /* Forward typedefs, used by `extern` declarations further up this file
  * than their own struct bodies (round 14, code_2cc8c_e's own local views,
- * referenced by earlier code_2cc8c_d call-site declarations). */
+ * referenced by earlier code_2cc8c call-site declarations). */
 typedef struct TexPageDesc TexPageDesc;
 
 /*
@@ -104,7 +104,7 @@ extern void *BMemPMgrFree(void *ptr);                   /* matching free/release
                                             unit's shared view is retyped.
                                             Every existing call site in
                                             this unit (code_2cc8c.c,
-                                            code_2cc8c_d.c) discards the
+                                            code_2cc8c.c) discards the
                                             result too, so this is a
                                             zero-byte-cost retype -- full
                                             build reconfirmed green. */
@@ -130,14 +130,14 @@ extern Ratio16 gDefaultViewTwist; /* {0, 1}: Viewport__AttachViewChild's twist
    Sony name in a header six units include is the `conflicting types` failure
    that CLAUDE.md and the SDK guide both warn about, and it would surface in a
    unit that never touched this line. Its one caller, Viewport__AttachViewChild, now
-   declares it locally in src/code_2cc8c_d.c with that call site's own shape. */
+   declares it locally in src/code_2cc8c.c with that call site's own shape. */
 
 /* func_8003FC18 is NO LONGER DECLARED HERE, round 34 -- exactly the
    GsSetRefView2 case above. It is Sony's `GsClearOt` (`libgs/gs_113.o`,
    linked from the SDK object), and a second declaration of that name in a
    header six units include is the `conflicting types` failure CLAUDE.md and
    the SDK guide both warn about. Its callers declare it locally under Sony's
-   name, with their own call sites' shapes, in src/code_2cc8c_d.c.
+   name, with their own call sites' shapes, in src/code_2cc8c.c.
    The `TexPageDesc *` view that used to hang off this prototype was
    code_2cc8c_e.c's reading of a Psy-Q `GsOT`; the struct stays in this header
    because other code uses it, and no byte depends on the naming. */
@@ -149,7 +149,7 @@ extern Ratio16 gDefaultViewTwist; /* {0, 1}: Viewport__AttachViewChild's twist
    DrawSync(int mode);`), and a second declaration of that name in a header
    six units include is the `conflicting types` failure CLAUDE.md and the SDK
    guide both warn about. Its one caller, Viewport__DeinitOt, now declares it
-   locally in src/code_2cc8c_d.c with that call site's own shape. */
+   locally in src/code_2cc8c.c with that call site's own shape. */
 
 /* The following are called only from Viewport__Update (this unit). They are
    plain `void *` global setters (this call site happens to pass an
@@ -166,11 +166,11 @@ extern Ratio16 gDefaultViewTwist; /* {0, 1}: Viewport__AttachViewChild's twist
    step by hand.
    Their two former neighbours, func_8003FC70 and func_8003FD4C, are gone from
    here: they are Sony's `GsSetLightMode` (libgs/gs_108) and `SetFogNear`
-   (libgte/fog_01), declared locally in src/code_2cc8c_d.c under those names
+   (libgte/fog_01), declared locally in src/code_2cc8c.c under those names
    for the same collision reason as GsSetRefView2 and GsClearOt above. */
 /* ROUND 78: the two setters that used to be declared here are Sony's too --
    GsSetNearClip (libgs/gs_101) and GsSetWorkBase (libgs/gs_124) -- and are
-   now declared locally in src/code_2cc8c_d.c from LIBGS.H, like the pair
+   now declared locally in src/code_2cc8c.c from LIBGS.H, like the pair
    above. */
 
 /* ResetGraph (asm/psyq_10ee0.s, PsyQ library, LIBGPU.H's own
@@ -187,20 +187,20 @@ extern s32 ResetGraph(s32 mode);
    u_char b, GsOT *ot);`), and a second declaration of that name in a header
    six units include is the `conflicting types` failure CLAUDE.md and the SDK
    guide both warn about. Its one caller, Viewport__Flip, now declares it
-   locally in src/code_2cc8c_d.c with that call site's own shape (self->unk58's
+   locally in src/code_2cc8c.c with that call site's own shape (self->unk58's
    three bytes read unsigned, same "writer reads signed, this reader reads
    unsigned" situation as unk5B/Viewport__Update, plus one more word). */
 
 /* func_8003FBF4 is NO LONGER DECLARED HERE, round 34. It is Sony's
    `GsDrawOt` (`libgs/gs_111.o`, linked from the SDK object) -- same
    collision reason as GsSetRefView2/GsClearOt above. Its one caller,
-   Viewport__Flip, declares it locally in src/code_2cc8c_d.c with that call
+   Viewport__Flip, declares it locally in src/code_2cc8c.c with that call
    site's own shape. */
 
 /* GsSetProjection is NO LONGER DECLARED HERE, round 79. It was
    `Unk18Obj__SetGeomScreen`, typed as a method; it is Sony's (libgs/gs_106,
    identified at merge from position and LIBGS.H's prototype) and its one
-   caller, Viewport__Update in src/code_2cc8c_d.c, declares it
+   caller, Viewport__Update in src/code_2cc8c.c, declares it
    locally with LIBGS.H's own shape. */
 
 /* New_FrameClock: include/FrameClock.h. */

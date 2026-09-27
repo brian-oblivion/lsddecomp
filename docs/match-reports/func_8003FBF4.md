@@ -13,7 +13,7 @@
 > Its declaration left `include/code_2cc8c.h` (six units) in the same step
 > rather than being renamed in place -- under Sony's name in a shared header
 > it is the `conflicting types` failure against LIBGS.H that round 33 flagged
-> for GsSetRefView2. The caller, `src/code_2cc8c_d.c`, declares it locally
+> for GsSetRefView2. The caller, `src/code_2cc8c.c`, declares it locally
 > under the Sony name with its own call site's shape.
 >
 > **Everything below is kept as the derivation it was, not as live guidance.**
@@ -41,7 +41,7 @@ independent local view per this project's convention.
 
 ## Existing-declaration retype
 
-`code_2cc8c_d.c`'s `Viewport__Flip` already forward-declared this function
+`code_2cc8c.c`'s `Viewport__Flip` already forward-declared this function
 (`extern void func_8003FBF4(s32 a0);`) before this unit was carved. Retyped
 the header declaration to `extern void func_8003FBF4(FadeBoxObj *self);`
 to match the real signature -- ABI-identical (both a plain word register),

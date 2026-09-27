@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003EAC4` on 2026-09-23 (tools/rename.py). Address 0x8003eac4.
 
-Unit: `code_2cc8c_d`. Round 14, runner delta. 2/2 words, full match.
+Unit: `code_2cc8c`. Round 14, runner delta. 2/2 words, full match.
 
 ## Signature
 
