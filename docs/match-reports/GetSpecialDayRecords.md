@@ -1,4 +1,6 @@
-# GetCinematicBank -- MATCHED (25/25 words)
+# GetSpecialDayRecords -- MATCHED (25/25 words)
+
+> Renamed from `GetCinematicBank` on 2026-09-27 (tools/rename.py). Address 0x800492d0.
 
 > Renamed from `func_800492D0` on 2026-09-25 (tools/rename.py). Address 0x800492d0.
 
@@ -17,7 +19,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
+Rec1C *GetSpecialDayRecords(s32 *countOut, s32 n) {
     Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[0x23E];
     if (countOut != NULL) {
         *countOut = n * 2 + 0xE;
@@ -41,6 +43,6 @@ Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
 
 ## Naming
 
-- **Name:** `GetCinematicBank`
+- **Name:** `GetSpecialDayRecords`
 - **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
 - **Evidence:** used by both ResolveCinematicChannel (bank/entry resolve) and GetGraphRoomStreamChannel with a bank id `n`; base 0x23E, stride 6 records, matches both callers' own naming.

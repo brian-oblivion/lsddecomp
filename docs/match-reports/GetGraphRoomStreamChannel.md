@@ -7,7 +7,7 @@ Byte-exact on build 12; whole-image SHA1 green, funcdiff 39/39.
 
 ## What it does
 
-`rec = GetCinematicBank(&count, n)`; sums `gStreamTypeToGroupTable[i] + 10` (s16 table) over
+`rec = GetSpecialDayRecords(&count, n)`; sums `gStreamTypeToGroupTable[i] + 10` (s16 table) over
 `i` in `[count, count + len*2)` into `*total`, subtracts 10 (so: widths plus
 a 10-unit gap between entries), returns `rec`.
 
@@ -20,7 +20,7 @@ Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
     s32 count;
     s32 i;
     s32 start;
-    Rec1C *rec = GetCinematicBank(&count, n);
+    Rec1C *rec = GetSpecialDayRecords(&count, n);
     len *= 2;
     *total = 0;
     start = count;

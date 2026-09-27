@@ -10,7 +10,7 @@ Byte-exact on the third build; whole-image SHA1 green, funcdiff 37/37,
 
 Takes a 4-byte struct of two s16 BY VALUE in `$a1` (retail spills `$a1` to
 its home slot 0x24(sp) and reads the halves back with `lh 0x24` / `lh 0x26`).
-Non-negative `group`: `rec = GetCinematicBank(&count, group)`, writes
+Non-negative `group`: `rec = GetSpecialDayRecords(&count, group)`, writes
 `sub + count` if `(u16)sub < 2` else -1, returns `&rec[sub]`. Negative
 `group`: tail to `GetEventMovie(countOut, sub)`.
 
@@ -28,7 +28,7 @@ Rec1C *ResolveCinematicChannel(s32 *countOut, RecPick pick) {
     s32 count;
     Rec1C *rec;
     if (pick.group >= 0) {
-        rec = GetCinematicBank(&count, pick.group);
+        rec = GetSpecialDayRecords(&count, pick.group);
         if (countOut != NULL) {
             *countOut = ((u16)pick.sub < 2) ? pick.sub + count : -1;
         }

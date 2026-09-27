@@ -318,7 +318,7 @@ Rec1C *GetEventMovie(s32 *countOut, s32 sub) {
     return &rec[sub];
 }
 
-Rec1C *GetCinematicBank(s32 *countOut, s32 n) {
+Rec1C *GetSpecialDayRecords(s32 *countOut, s32 n) {
     Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[0x23E];
     if (countOut != NULL) {
         *countOut = n * 2 + 0xE;
@@ -336,7 +336,7 @@ Rec1C *ResolveCinematicChannel(s32 *countOut, RecPick pick) {
     s32 count;
     Rec1C *rec;
     if (pick.group >= 0) {
-        rec = GetCinematicBank(&count, pick.group);
+        rec = GetSpecialDayRecords(&count, pick.group);
         if (countOut != NULL) {
             *countOut = ((u16)pick.sub < 2) ? pick.sub + count : -1;
         }
@@ -353,7 +353,7 @@ Rec1C *GetGraphRoomStreamChannel(s32 *total, s32 n, s32 len) {
     s32 count;
     s32 i;
     s32 start;
-    Rec1C *rec = GetCinematicBank(&count, n);
+    Rec1C *rec = GetSpecialDayRecords(&count, n);
     len *= 2;
     *total = 0;
     start = count;
