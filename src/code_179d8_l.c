@@ -26,21 +26,21 @@
 
 void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
     s32 i;
-    SoundCueSlot *e;
+    SoundCueSlot *slot;
     s32 vol;
     s32 endVol;
     s32 toneIndex;
 
     if (set->tag > 0) {
         i = 0;
-        e = &set->slots[0];
+        slot = &set->slots[0];
         do {
             i++;
-            e->program = -1;
-            e->octave = 0;
-            e->vol = 0x7F;
-            e->endVol = 0x40;
-            e++;
+            slot->program = -1;
+            slot->octave = 0;
+            slot->vol = 0x7F;
+            slot->endVol = 0x40;
+            slot++;
         } while (i < 3);
 
         set->attenuation = 0;
@@ -49,23 +49,23 @@ void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
         }
 
         if (set->attenuation >= 0) {
-            e = &set->slots[0];
+            slot = &set->slots[0];
             i = 0;
             do {
-                if (e->program >= 0) {
-                    if (e->voice >= 0) {
-                        sound->methods->stopVoice(sound, e->voice);
+                if (slot->program >= 0) {
+                    if (slot->voice >= 0) {
+                        sound->methods->stopVoice(sound, slot->voice);
                     }
-                    sound->methods->setPitchOffset(sound, e->octave);
-                    toneIndex = e->program * 16;
-                    vol = e->vol - (e->vol / set->attenuationSteps) * set->attenuation;
-                    endVol = e->endVol - (e->endVol / set->attenuationSteps) * set->attenuation;
-                    e->voice = sound->methods->playTone(sound, toneIndex, vol, endVol);
-                } else if (e->program == -2 && e->voice >= 0) {
-                    sound->methods->stopVoice(sound, e->voice);
+                    sound->methods->setPitchOffset(sound, slot->octave);
+                    toneIndex = slot->program * 16;
+                    vol = slot->vol - (slot->vol / set->attenuationSteps) * set->attenuation;
+                    endVol = slot->endVol - (slot->endVol / set->attenuationSteps) * set->attenuation;
+                    slot->voice = sound->methods->playTone(sound, toneIndex, vol, endVol);
+                } else if (slot->program == -2 && slot->voice >= 0) {
+                    sound->methods->stopVoice(sound, slot->voice);
                 }
                 i++;
-                e++;
+                slot++;
             } while (i < 3);
         }
         set->tick++;
@@ -193,69 +193,69 @@ extern u8 D_8008EA10;
  * from ordinary CSE invalidation by the stores between them. */
 extern s16 D_8008EA26[];
 
-void SpuVmKeyOnNow(s32 a0, s32 a1) {
-    SsScore *e;
-    s32 prio;
-    s32 lvl0;
-    u32 lvl1;
-    u32 pan1;
-    u32 pan2;
-    u32 pan1sq;
-    u32 pan2sq;
-    s16 pan1out;
-    s32 chanIdx;
+void SpuVmKeyOnNow(s32 unused, s32 pitch) {
+    SsScore *score;
+    s32 masterVol;
+    s32 toneVol;
+    u32 vol;
+    u32 volL;
+    u32 volR;
+    u32 volLSq;
+    u32 volRSq;
+    s16 outL;
+    s32 sregIndex;
     s32 lowBit;
     s32 highBit;
 
-    prio = _svm_vh->mvol * 0x3FFF;
-    lvl0 = D_8008EA10 * prio / 16129;
-    lvl1 = (u32)lvl0 * D_8008EA16 * D_8008EA19 / 16129;
+    masterVol = _svm_vh->mvol * 0x3FFF;
+    toneVol = D_8008EA10 * masterVol / 16129;
+    vol = (u32)toneVol * D_8008EA16 * D_8008EA19 / 16129;
 
-    chanIdx = D_8008EA26[0] * 8;
+    sregIndex = D_8008EA26[0] * 8;
 
-    e = &_ss_score[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
-    pan1 = lvl1;
-    pan2 = lvl1;
+    score = &_ss_score[D_8008EA22 & 0xFF][D_8008EA22 >> 8];
+    volL = vol;
+    volR = vol;
     if ((s16)D_8008EA22 != 0x21) {
-        pan1 = lvl1 * e->unk74 / 127;
-        pan2 = lvl1 * e->unk76 / 127;
+        volL = vol * score->unk74 / 127;
+        volR = vol * score->unk76 / 127;
     }
 
     if ((u8)D_8008EA1A < 0x40) {
-        pan2 = (pan2 * D_8008EA1A) / 63;
+        volR = (volR * D_8008EA1A) / 63;
     } else {
-        pan1 = (pan1 * (0x7F - D_8008EA1A)) / 63;
+        volL = (volL * (0x7F - D_8008EA1A)) / 63;
     }
 
     if ((u8)D_8008EA17 < 0x40) {
-        pan2 = (pan2 * D_8008EA17) / 63;
+        volR = (volR * D_8008EA17) / 63;
     } else {
-        pan1 = (pan1 * (0x7F - D_8008EA17)) / 63;
+        volL = (volL * (0x7F - D_8008EA17)) / 63;
     }
 
     if ((u8)D_8008EA11 < 0x40) {
-        pan2 = (D_8008EA11 * pan2) / 63;
+        volR = (D_8008EA11 * volR) / 63;
     } else {
-        pan1 = (pan1 * (0x7F - D_8008EA11)) / 63;
+        volL = (volL * (0x7F - D_8008EA11)) / 63;
     }
 
     if (_svm_stereo_mono == 1) {
-        if (pan1 < pan2) {
-            pan1 = pan2;
+        if (volL < volR) {
+            volL = volR;
         } else {
-            pan2 = pan1;
+            volR = volL;
         }
     }
-    pan1sq = pan1 * pan1;
-    pan1out = (s16)(pan1sq / 16383);
-    pan2sq = pan2 * pan2;
+    volLSq = volL * volL;
+    outL = (s16)(volLSq / 16383);
+    volRSq = volR * volR;
 
-    ((s16 *)_svm_sreg_buf)[(u16)chanIdx + 2] = (s16)a1;
-    ((s16 *)_svm_sreg_buf)[(u16)chanIdx] = pan1out;
-    ((s16 *)_svm_sreg_buf)[(u16)chanIdx + 1] = (s16)(pan2sq / 16383);
+    ((s16 *)_svm_sreg_buf)[(u16)sregIndex + 2] = (s16)pitch;
+    ((s16 *)_svm_sreg_buf)[(u16)sregIndex] = outL;
+    ((s16 *)_svm_sreg_buf)[(u16)sregIndex + 1] = (s16)(volRSq / 16383);
 
     _svm_sreg_dirty[D_8008EA26[0]] |= 7;
-    _svm_voice[D_8008EA26[0]].unk04 = (s16)a1;
+    _svm_voice[D_8008EA26[0]].unk04 = (s16)pitch;
     _svm_voice[D_8008EA26[0]].unk1B = 1;
 
     if (D_8008EA26[0] < 0x10) {
@@ -313,31 +313,31 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn);
  * (docs/match-reports/vmNoiseOn2.md). Hand-derived. The byte-shaped
  * body's order-only __asm__("") barrier is omitted here; it is in the report. */
 
-void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
-    s32 a3;
-    s32 v1;
+void vmNoiseOn2(s32 voice, s32 volL, s32 volR) {
+    s32 voiceArg;
+    s32 dirty;
     s32 lowBit;
     s32 highBit;
     s32 i;
     s32 n;
 
-    a3 = a0;
-    a0 = (u8)a0;
-    _svm_sreg_buf[a0].unk2 = a2;
-    v1 = _svm_sreg_dirty[a0];
-    _svm_sreg_buf[a0].unk0 = a1;
-    v1 |= 3;
-    _svm_sreg_dirty[a0] = v1;
-    if ((u32)a0 < 16) {
-        lowBit = 1 << a0;
+    voiceArg = voice;
+    voice = (u8)voice;
+    _svm_sreg_buf[voice].unk2 = volR;
+    dirty = _svm_sreg_dirty[voice];
+    _svm_sreg_buf[voice].unk0 = volL;
+    dirty |= 3;
+    _svm_sreg_dirty[voice] = dirty;
+    if ((u32)voice < 16) {
+        lowBit = 1 << voice;
         highBit = 0;
     } else {
         lowBit = 0;
-        highBit = 1 << (a0 - 16);
+        highBit = 1 << (voice - 16);
     }
 
     n = spuVmMaxVoice;
-    _svm_voice[(u8)a3].unk04 = 10;
+    _svm_voice[(u8)voiceArg].unk04 = 10;
     if (n != 0) {
         i = 0;
         do {
@@ -345,9 +345,9 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
             i++;
         } while ((u16)i < spuVmMaxVoice);
     }
-    _svm_voice[(u8)a3].unk1B = 2;
+    _svm_voice[(u8)voiceArg].unk1B = 2;
 
-    _svm_voice[(u8)a3].unk02 = 0;
+    _svm_voice[(u8)voiceArg].unk02 = 0;
     D_8008E228 = lowBit | D_8008E228;
     _svm_okon2 = highBit | _svm_okon2;
     _svm_okof1 = _svm_okof1 & ~D_8008E228;
@@ -365,101 +365,100 @@ extern u8 D_8008EA1D;
 extern u16 D_8006DAD8[];
 
 s32 note2pitch(void) {
-    s32 a0;
-    s32 q12;
-    s16 rem12;
-    u8 a2;
-    u16 v1;
+    s32 semitones;
+    s32 octave;
+    s16 semitone;
+    u8 step;
+    u16 pitch;
 
-    a0 = (s16)(D_8008EA0E + 0x3C - D_8008EA1C);
-    q12 = a0 / 12;
-    a2 = D_8008EA1D >> 3;
-    rem12 = a0 - q12 * 12;
-    if (a2 >= 16) {
-        a2 = 15;
+    semitones = (s16)(D_8008EA0E + 0x3C - D_8008EA1C);
+    octave = semitones / 12;
+    step = D_8008EA1D >> 3;
+    semitone = semitones - octave * 12;
+    if (step >= 16) {
+        step = 15;
     }
-    v1 = D_8006DAD8[a2 + rem12 * 16];
-    if ((s16)(q12 - 5) > 0) {
-        v1 <<= (s16)(q12 - 5);
-    } else if ((s16)(q12 - 5) < 0) {
-        v1 = (u16)v1 >> -(s16)(q12 - 5);
+    pitch = D_8006DAD8[step + semitone * 16];
+    if ((s16)(octave - 5) > 0) {
+        pitch <<= (s16)(octave - 5);
+    } else if ((s16)(octave - 5) < 0) {
+        pitch = (u16)pitch >> -(s16)(octave - 5);
     }
-    return v1;
+    return pitch;
 }
 
 extern u8 D_8008EA13;
 extern u8 D_8008EA18;
 
-s32 note2pitch2(s32 a0, s32 a1) {
-    s32 origA0;
-    s32 idx;
-    s32 tblIdx;
-    VagAtr *e;
-    s32 v0;
-    s32 div8;
-    u8 a2;
-    s16 a3;
-    s32 diff;
-    s32 q12;
-    s16 rem12;
-    u16 v1;
+s32 note2pitch2(s32 note, s32 fine) {
+    s32 toneIndex;
+    s32 tableIndex;
+    VagAtr *tone;
+    s32 fineTotal;
+    s32 steps;
+    u8 carry;
+    s16 step;
+    s32 semitones;
+    s32 octave;
+    s16 semitone;
+    u16 pitch;
 
-    origA0 = a0;
-    idx = D_8008EA18 + (D_8008EA13 << 4);
-    e = &_svm_tn[idx];
-    v0 = (u16)a1 + e->shift;
-    div8 = v0 / 8;
-    a3 = div8;
-    a2 = 0;
-    if (div8 >= 16) {
-        a2 = 1;
-        a3 = div8 - 16;
+    toneIndex = D_8008EA18 + (D_8008EA13 << 4);
+    tone = &_svm_tn[toneIndex];
+    fineTotal = (u16)fine + tone->shift;
+    steps = fineTotal / 8;
+    step = steps;
+    carry = 0;
+    if (steps >= 16) {
+        carry = 1;
+        step = steps - 16;
     }
-    diff = (s16)(a2 + (origA0 + 0x3C - e->center));
-    q12 = diff / 12;
-    rem12 = diff - q12 * 12;
-    tblIdx = rem12 * 16;
-    tblIdx = tblIdx + a3;
-    v1 = D_8006DAD8[tblIdx];
-    if ((s16)(q12 - 5) > 0) {
-        v1 <<= (s16)(q12 - 5);
-    } else if ((s16)(q12 - 5) < 0) {
-        v1 = (u16)v1 >> -(s16)(q12 - 5);
+    semitones = (s16)(carry + (note + 0x3C - tone->center));
+    octave = semitones / 12;
+    semitone = semitones - octave * 12;
+    tableIndex = semitone * 16;
+    tableIndex = tableIndex + step;
+    pitch = D_8006DAD8[tableIndex];
+    if ((s16)(octave - 5) > 0) {
+        pitch <<= (s16)(octave - 5);
+    } else if ((s16)(octave - 5) < 0) {
+        pitch = (u16)pitch >> -(s16)(octave - 5);
     }
-    return v1;
+    return pitch;
 }
 
 /* Matched round 73 -- docs/match-reports/SePitchBend.md. */
 extern s16 D_8008EA26[];
 
 void SePitchBend(s32 chan, s32 bend) {
-    s32 off;
+    s32 sregIndex;
     s32 prod;
     s32 q;
     s32 note;
     s32 fine;
-    s16 b;
-    s32 idx;
-    u8 *p;
+    s16 amount;
+    s32 toneIndex;
+    u8 *curProg;
 
-    off = (chan & 0xFF) * 8;
+    sregIndex = (chan & 0xFF) * 8;
     if ((u32)(chan & 0xFF) < 24) {
-        p = &D_8008EA13;
-        *p = (u8)_svm_voice[(chan & 0xFF)].unk10;
+        /* MATCHING: the direct D_8008EA13 spelling does not match. */
+        curProg = &D_8008EA13;
+        *curProg = (u8)_svm_voice[(chan & 0xFF)].unk10;
         D_8008EA18 = (u8)_svm_voice[(chan & 0xFF)].unk14;
         D_8008EA26[0] = (u8)chan;
-        idx = D_8008EA18 + (*p << 4);
-        b = bend;
-        if (b >= 0) {
-            prod = b * _svm_tn[idx].pbmax;
+        toneIndex = D_8008EA18 + (*curProg << 4);
+        amount = bend;
+        if (amount >= 0) {
+            prod = amount * _svm_tn[toneIndex].pbmax;
             note = (u16)_svm_voice[(chan & 0xFF)].unk0C + prod / 127;
             fine = prod % 127;
         } else {
-            q = (b * _svm_tn[idx].pbmin) / 127;
+            q = (amount * _svm_tn[toneIndex].pbmin) / 127;
             note = (u16)_svm_voice[(chan & 0xFF)].unk0C + q - 1;
             fine = q + 127;
         }
-        ((u16 *)_svm_sreg_buf)[off + 2] = note2pitch2((u16)note, (u16)fine);
+        ((u16 *)_svm_sreg_buf)[sregIndex + 2] = note2pitch2((u16)note, (u16)fine);
         _svm_sreg_dirty[(chan & 0xFF)] |= 4;
     }
 }
