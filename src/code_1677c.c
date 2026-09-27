@@ -34,7 +34,7 @@ extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0,
                                                        GameApplication__StartCinematicStream keeps it */
 extern const char *GetAsmkMovie(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkStreamPath */
 extern s32 GetStreamGroupForType(s32 index); /* psyq_memset.s: signed-halfword lookup into gStreamTypeToGroupTable[index] */
-extern s32 PickWeeklyStreamChannel(s32 *out, s32 param2); /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
+extern s32 PickOpeningMovie(s32 *out, s32 param2); /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
 
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char sLogoPathOsd[];  /* "ETC\OSDLOGO.TIM" */
@@ -70,7 +70,7 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
 
 extern s32 GetGraphRoomStreamChannel(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
 /* code_39094.c: same "write to *out, return a separate value" shape as
- * GetAsmkMovie/PickWeeklyStreamChannel/GetGraphRoomStreamChannel. */
+ * GetAsmkMovie/PickOpeningMovie/GetGraphRoomStreamChannel. */
 extern s32 GetStreamChannelInit(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
 extern s32 ResolveCinematicChannel(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
     {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
@@ -189,7 +189,7 @@ s32 GameApplication__LoaderTaskDoneCallback(void) {
 
 /* Optional stream-task init block, gated by self->config->playStreams (the same
  * shape as GameApplication__LoadIntroLogoSequence's self->config->showIntroLogos gate, minus the two
- * GameApplication__StartLoaderTask loader-task calls, and using PickWeeklyStreamChannel instead of
+ * GameApplication__StartLoaderTask loader-task calls, and using PickOpeningMovie instead of
  * GetAsmkMovie to derive the type code). */
 void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
     s32 derivedValue;
@@ -200,7 +200,7 @@ void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        derivedValue = PickWeeklyStreamChannel(&typeCode, 0);
+        derivedValue = PickOpeningMovie(&typeCode, 0);
         typeLookup = GetStreamGroupForType(typeCode);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 derivedValue, typeLookup, 1);
@@ -390,7 +390,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
  * derives a type code via GetStreamChannelInit, looks it up via GetStreamGroupForType,
  * initializes the task with it, then starts it -- the same shape as
  * GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask, but with setSkipOnConfirm(0) added and GetStreamChannelInit
- * in place of GetAsmkMovie/PickWeeklyStreamChannel. */
+ * in place of GetAsmkMovie/PickOpeningMovie. */
 void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
     StreamTask *task;
     s32 typeCode;

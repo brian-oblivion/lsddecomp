@@ -15,7 +15,7 @@
  *    gForcedStageBgm), per-stage record-group accessors indexed by
  *    gStageFirstRecord and, for GetStageMapChunkRecordXY, by StageGrid.h's cell
  *    columns, and a family of "stream channel" lookups (GetAsmkMovie,
- *    PickWeeklyStreamChannel, GetStreamChannelInit, ResolveCinematicChannel,
+ *    PickOpeningMovie, GetStreamChannelInit, ResolveCinematicChannel,
  *    GetGraphRoomStreamChannel) whose shapes match their call sites in
  *    code_1677c.c one for one. The records' other fields and the channels'
  *    in-game meaning are not established.
@@ -276,7 +276,7 @@ Rec1C *GetOpeningMovieRecords(s32 *countOut) {
     return &((Rec1C *)GetRecordTable(NULL))[0x230];
 }
 
-Rec1C *PickWeeklyStreamChannel(s32 *countOut, s32 arg1) {
+Rec1C *PickOpeningMovie(s32 *countOut, s32 arg1) {
     u32 r = (u32)SeedAndRandom(0, arg1) % 7; /* arg1 only forwarded, like PickStageTexture's */
     s32 count;
     Rec1C *rec = GetOpeningMovieRecords(&count);

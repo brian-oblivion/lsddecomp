@@ -41,4 +41,4 @@ Rec1C *GetOpeningMovieRecords(s32 *countOut) {
 
 - **Name:** `GetOpeningMovieRecords`
 - **Tier:** B
-- **Evidence:** pure getter: &gRecordTable[0x230], count 0; only used internally by PickWeeklyStreamChannel.
+- **Evidence:** pure getter: &gRecordTable[0x230], count 0; only used internally by PickOpeningMovie.

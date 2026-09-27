@@ -78,7 +78,7 @@ pointer and `GameApplication__StartWeeklyStreamTask` passed another plain count;
 raw 32-bit value whose interpretation is call-site-specific, not
 uniformly a string. Declared `GetGraphRoomStreamChannel` (day/count helper,
 `psyq_memset.s`, same "write to *out, return a separate value" shape as
-`GetAsmkMovie`/`PickWeeklyStreamChannel`).
+`GetAsmkMovie`/`PickOpeningMovie`).
 
 ## Proposed learning
 

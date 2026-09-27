@@ -23,7 +23,7 @@
  *                  startWeeklyStreamTask and the pollGraphRoomStatus loop.
  * The hooks, in the order runMainLoop calls them:
  *   +0x050 loadIntroLogoSequence  the ASMK logo, the ASMK stream, the OSD logo
- *   +0x054 startWeeklyStreamTask  the stream PickWeeklyStreamChannel picks
+ *   +0x054 startWeeklyStreamTask  the stream PickOpeningMovie picks
  *   +0x058 pollGraphRoomStatus    runs GraphRoom and TitleMenu against the
  *                                 DreamSys; returns 0, 1 or 2 to the loop
  *   +0x05C slot5C                 empty (GameApplication__NoOpSlot5C)
