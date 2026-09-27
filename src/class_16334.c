@@ -1,24 +1,24 @@
 #include "common.h"
 #include "class_16334.h"
 
-Pad *New_Pad(void *arg1, s32 port) {
+Pad *New_Pad(s32 mode, s32 port) {
     Pad *self;
 
     self = BMemPMgrAlloc(0x20);
     if (self == NULL) {
         goto fail;
     }
-    Get_vtable_Pad()->ctor(self, arg1, port);
+    Get_vtable_Pad()->ctor(self, mode, port);
     return self;
 fail:
     return NULL;
 }
 
-void Pad__Pad(Pad *self, void *arg1, s32 port) {
+void Pad__Pad(Pad *self, s32 mode, s32 port) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = Get_vtable_Pad();
     if (sPadRefCount++ == 0) {
-        PadInit(arg1);
+        PadInit(mode);
     }
     self->methods->init(self, port);
 }

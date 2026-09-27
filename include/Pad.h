@@ -22,7 +22,7 @@ typedef struct Pad Pad;
 typedef struct PadMethods PadMethods;
 
 struct PadMethods {
-    BASICCLASS_SLOTS(Pad, (Pad * self, void *arg1, s32 port));
+    BASICCLASS_SLOTS(Pad, (Pad * self, s32 mode, s32 port));
     /* +0x040 */ void (*init)(Pad *self, s32 port); /* Pad__Init */
     /* +0x044 */ u32 (*updateMasks)(Pad *self); /* Pad__UpdateMasks: returns the new held mask */
     /* +0x048 */ void (*dispatchEvents)(Pad *self); /* Pad__DispatchEvents */
@@ -44,8 +44,8 @@ struct Pad {
 extern PadMethods gPadMethods;
 extern PadMethods *Get_vtable_Pad(void);
 
-Pad *New_Pad(void *arg1, s32 port);
-void Pad__Pad(Pad *self, void *arg1, s32 port);
+Pad *New_Pad(s32 mode, s32 port);
+void Pad__Pad(Pad *self, s32 mode, s32 port);
 void Pad__Finalize(Pad *self);
 void Pad__Init(Pad *self, s32 port);
 u32 Pad__UpdateMasks(Pad *self);

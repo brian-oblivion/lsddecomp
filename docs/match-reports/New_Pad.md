@@ -118,3 +118,12 @@ through `BMemPMgrAlloc`, then calls the class's own ctor slot through
 (see `include/class_16334.h`'s header comment, confirmed by the direct
 `PadInit`/`PadRead`/`PadStop` calls in `Pad__Pad`/`Pad__Finalize`/
 `Pad__UpdateMasks`). Only caller: `src/main.c`'s `New_Pad(0, 0)`.
+
+## Round 95 (delta): Sony's declarations
+
+`include/class_16334.h` now takes `PadInit`/`PadRead`/`PadStop` from Sony's
+`<libetc.h>` instead of local prototypes (`PadInit(void *)` became Sony's
+`PadInit(int mode)`). The ctor's first parameter forwards straight to
+`PadInit`, so `New_Pad`, `Pad__Pad` and the Pad ctor slot now take
+`s32 mode` where the body above says `void *arg1`. Byte-identical; whole-image
+SHA1 unchanged.
