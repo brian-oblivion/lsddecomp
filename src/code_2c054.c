@@ -137,8 +137,8 @@ void StreamTask__RefreshViewValue(StreamTask *self) {
     }
 }
 
-void StreamTask__SetKeepActive(StreamTask *self, s32 value) {
-    self->keepActive = value;
+void StreamTask__SetKeepActive(StreamTask *self, s32 keepActive) {
+    self->keepActive = keepActive;
 }
 
 void StreamTask__SetLoopCount(StreamTask *self, s32 count) {
@@ -174,13 +174,14 @@ TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *
 }
 
 void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound) {
-    void *tmp; /* the TileAtlas, then the TileMap built over it */
-    TaskCoreMethods *core;
+    struct TileAtlas *atlas;
+    struct TileMap *tileMap;
+    TaskCoreMethods *methods;
 
     Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
-    core = Get_vtable_TaskCore();
-    self->methods = core;
-    core->setTarget(self, target);
+    methods = Get_vtable_TaskCore();
+    self->methods = methods;
+    methods->setTarget(self, target);
     if (soundBankPath != 0) {
         self->sound = (BasicClass *)New_VabStreamObj(soundBankPath);
     } else {
@@ -188,11 +189,11 @@ void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankP
     }
     self->soundBankPath = soundBankPath;
     self->methods->setSubHandle(self, 0, 0);
-    tmp = New_TileAtlas(0);
-    self->tileAtlas = tmp;
-    tmp = New_TileMap(0, tmp);
-    self->tileMap = tmp;
-    self->bgLayer = New_BgLayer(tmp, 1);
+    atlas = New_TileAtlas(0);
+    self->tileAtlas = atlas;
+    tileMap = New_TileMap(0, atlas);
+    self->tileMap = tileMap;
+    self->bgLayer = New_BgLayer(tileMap, 1);
     self->methods->resetCounters(self);
 }
 
@@ -236,10 +237,10 @@ s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
  * cast to their classes, DrawSystem and Viewport. */
 void TaskCore__OnInit(TaskCore *self) {
     Viewport *viewport;
-    ViewportMethods *core;
+    ViewportMethods *viewportMethods;
 
     viewport = (Viewport *)self->viewport;
-    core = viewport->methods;
+    viewportMethods = viewport->methods;
     self->methods->updateSlotElements(self, self->unk14);
     self->bgLayer->methods->attachToParent(self->bgLayer, (SceneNode *)self->unk14, NULL);
     if (self->fadeInCallback != 0) {
@@ -253,11 +254,12 @@ void TaskCore__OnInit(TaskCore *self) {
     }
     ((DrawSystem *)self->initArgs->drawSystem)
         ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor, NULL);
-    core->setOtLength(viewport, self->otLength);
-    core->setUnk44(viewport, self->unk2C);
-    core->setUnk48(viewport, self->packetSize);
-    core->attachViewChild(viewport, self->unk14, &sTaskCoreViewOrigin, &sTaskCoreViewOrigin, 0);
-    core->initOt(viewport);
+    viewportMethods->setOtLength(viewport, self->otLength);
+    viewportMethods->setUnk44(viewport, self->unk2C);
+    viewportMethods->setUnk48(viewport, self->packetSize);
+    viewportMethods->attachViewChild(viewport, self->unk14, &sTaskCoreViewOrigin,
+                                     &sTaskCoreViewOrigin, 0);
+    viewportMethods->initOt(viewport);
     self->result = 0;
 }
 

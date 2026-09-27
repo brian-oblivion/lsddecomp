@@ -142,7 +142,7 @@ void StreamTask__OnPadNext(StreamTask *self);
 void StreamTask__NoOpSlot88(void);
 void StreamTask__NoOpSlot8C(void);
 void StreamTask__RefreshViewValue(StreamTask *self);
-void StreamTask__SetKeepActive(StreamTask *self, s32 value);
+void StreamTask__SetKeepActive(StreamTask *self, s32 keepActive);
 void StreamTask__SetLoopCount(StreamTask *self, s32 count);
 void StreamTask__SetSkipOnConfirm(StreamTask *self, s32 enable);
 void StreamTask__SetUnkD0(StreamTask *self, s32 value);
