@@ -123,10 +123,10 @@ void *GetActiveDataSourceMethods(void) {
     }
 }
 
-ResourceRequest *ResourceRequest__Set(ResourceRequest *this, s32 x, s32 y, s32 z) {
-    this->x = x;
-    this->y = y;
-    this->z = z;
+ResourceRequest *ResourceRequest__Set(ResourceRequest *this, void *buffer, char *name, s32 mode) {
+    this->buffer = buffer;
+    this->name = name;
+    this->mode = mode;
     return this;
 }
 
