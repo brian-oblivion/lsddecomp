@@ -256,7 +256,7 @@ Checked this function's delay-slot filler against `ContNrpn2.md`'s
 round-31 finding that a "dead" delay-slot filler can actually be a hidden
 UNCONDITIONAL write the stalled C mis-scoped to one branch arm only.
 **Does not apply here**: `addu $a2,$v0,$zero` (disassembly line 34,
-`asm/nonmatchings/code_179d8_k/SeqPlay.s`) is a bare GPR-to-GPR
+`asm/nonmatchings/libsnd_seqread/SeqPlay.s`) is a bare GPR-to-GPR
 move with no memory effect. Unlike `ContNrpn2`'s `sb` store (which
 persists past the branch and is observable from other code paths or a
 later read of the same struct field), a register move that is never read
@@ -508,7 +508,7 @@ suspicious retype/widen candidates.
 
 **NON_MATCHING body promoted, round 66** (runner charlie).
 
-## Former unit banner of src/code_179d8_k.c (moved verbatim, round 94)
+## Former unit banner of src/libsnd_seqread.c (moved verbatim, round 94)
 
 The carve record (round 24) and the blocker re-census (rounds 42 and 43), moved here when the banner was rewritten as documentation.
 
@@ -525,7 +525,7 @@ The carve record (round 24) and the blocker re-census (rounds 42 and 43), moved 
  * comment still stands -- only the blocker verdicts are withdrawn.
  * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
  *
- * code_179d8_k -- functions 238..255 of the original 274-function code_179d8
+ * libsnd_seqread -- functions 238..255 of the original 274-function code_179d8
  * monolith, 0x24938..0x2673C (vram 0x80034138..0x80035F3C).  Carved round 24
  * (2026-09-08) out of what had been the `code_179d8_tail` asm remainder,
  * which this unit consumes WHOLE -- there is no remainder left on either
@@ -574,7 +574,7 @@ The carve record (round 24) and the blocker re-census (rounds 42 and 43), moved 
 
 ## Round 97 types pass (echo)
 
-code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
+libsnd_seqread's local `Entry90902E8` view retired onto `include/SsScore.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
 libsnd_cres, libsnd_decre and code_179d8_j already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
@@ -586,4 +586,4 @@ arithmetic became the header's per-channel arrays `unk17[16]` (pan),
 channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
-`build/nonmatching/src/code_179d8_k.c.o` before/after).
+`build/nonmatching/src/libsnd_seqread.c.o` before/after).

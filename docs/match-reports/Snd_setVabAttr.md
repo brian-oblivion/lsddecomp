@@ -45,7 +45,7 @@ valid) control-flow decode but is superseded on every other point.
 
 `ContDataEntry.md`'s "`Blk1`/`Blk2` by-value pair" reading turned out to be
 one struct too many. Reading this function's OWN disassembly directly
-(`asm/nonmatchings/code_179d8_k/Snd_setVabAttr.s`) rather than inferring from
+(`asm/nonmatchings/libsnd_seqread/Snd_setVabAttr.s`) rather than inferring from
 the caller:
 
 - The incoming 4th parameter's first word lands at `sp+0x3C` (register `$a3`'s
@@ -198,7 +198,7 @@ used or considered.
 reports **163/179 words match**, length exact (no out-of-range drift
 warning). Compiled length cross-checked directly via
 `mipsel-linux-gnu-objdump` symbol-to-symbol distance
-(`build/src/code_179d8_k.c.o`, `Snd_setVabAttr`..`SetPitchBend` = `0x2CC` =
+(`build/src/libsnd_seqread.c.o`, `Snd_setVabAttr`..`SetPitchBend` = `0x2CC` =
 179 words, matching retail's own `nonmatching Snd_setVabAttr, 0x2CC` header).
 
 ## Body as reached (163/179, length exact, register-identity residue only)
@@ -506,7 +506,7 @@ local entirely:
 
 Every other case, the outer/inner switch structure, and all ten cross-unit
 calls are unchanged from round 35's body above (still current in
-`src/code_179d8_k.c` as the preserved `#if 0` near-miss).
+`src/libsnd_seqread.c` as the preserved `#if 0` near-miss).
 
 ## Verification
 
@@ -549,7 +549,7 @@ register-color swap.
 of the `channel` parameter in the body replaced by `ch` (signature
 unchanged).** Rebuilt and measured against the real oracle:
 **161/179 -- ten words WORSE than the 171/179 baseline**, not neutral.
-Reverted immediately (`git checkout -- src/code_179d8_k.c`,
+Reverted immediately (`git checkout -- src/libsnd_seqread.c`,
 `build-and-verify.sh` reconfirmed byte-exact with `INCLUDE_ASM` in place).
 
 **Why this negative is informative rather than just a miss:** it bounds
@@ -601,7 +601,7 @@ new_var;`) declared INSIDE the `case 4: ... case 14:` compound block,
 assigned right after the `_SsUtResolveADSR` call (`new_var = channel;`),
 and read back in place of `channel` at that same block's closing
 `SsUtSetVagAtr(channel, slot, kind, &scratch);` call (now `SsUtSetVagAtr
-(new_var, slot, kind, &scratch);`). Translated into `src/code_179d8_k.c`
+(new_var, slot, kind, &scratch);`). Translated into `src/libsnd_seqread.c`
 verbatim and rebuilt through the full pipeline:
 
 ```c

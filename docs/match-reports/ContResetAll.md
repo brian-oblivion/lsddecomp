@@ -45,14 +45,14 @@
 >   because order is exactly the axis the class rules out.
 >
 > **The tell that this unit's own matched functions already had the answer:**
-> three of alpha's matches in `code_179d8_k` use `(u8 *)rec + rec->unk12`
+> three of alpha's matches in `libsnd_seqread` use `(u8 *)rec + rec->unk12`
 > (base first) and match. The stall used the subscript form. When a function
 > disagrees with its own already-matched siblings' idiom, try the siblings'
 > idiom before accepting a class verdict.
 
 
-`asm/nonmatchings/code_179d8_k/ContResetAll.s`, vram `0x80034D90`, unit
-`code_179d8_k`. Round 24, runner alpha.
+`asm/nonmatchings/libsnd_seqread/ContResetAll.s`, vram `0x80034D90`, unit
+`libsnd_seqread`. Round 24, runner alpha.
 
 ## What it is
 
@@ -120,7 +120,7 @@ ContResetAll`: 49/51 words match, compiled length exact.
 
 ## Round 97 types pass (echo)
 
-code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
+libsnd_seqread's local `Entry90902E8` view retired onto `include/SsScore.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
 libsnd_cres, libsnd_decre and code_179d8_j already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
@@ -132,4 +132,4 @@ arithmetic became the header's per-channel arrays `unk17[16]` (pan),
 channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
-`build/nonmatching/src/code_179d8_k.c.o` before/after).
+`build/nonmatching/src/libsnd_seqread.c.o` before/after).

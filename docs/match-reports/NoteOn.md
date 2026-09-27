@@ -2,8 +2,8 @@
 
 > Renamed from `func_800344FC` on 2026-09-23 (tools/rename.py). Address 0x800344fc.
 
-`asm/nonmatchings/code_179d8_k/NoteOn.s`, vram `0x800344FC`, unit
-`code_179d8_k`. Round 24, runner alpha. Continuation past this unit's
+`asm/nonmatchings/libsnd_seqread/NoteOn.s`, vram `0x800344FC`, unit
+`libsnd_seqread`. Round 24, runner alpha. Continuation past this unit's
 assigned six functions. Round 31, runner bravo (re-verified, still
 stalled).
 
@@ -173,7 +173,7 @@ void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3)
 }
 ```
 
-Current best body (round 32, 61/70 -- this is what `src/code_179d8_k.c`
+Current best body (round 32, 61/70 -- this is what `src/libsnd_seqread.c`
 actually preserves in `#if 0` now):
 
 ```c
@@ -359,7 +359,7 @@ assigned as its own statement right after `speed = a3;`, used at both
 `packed` sites in place of `a0`.** Rebuilt and measured: **61/70,
 byte-identical to both the baseline and round 39's combined-form
 attempt** -- no change in either direction. Reverted (`git checkout --
-src/code_179d8_k.c`), `build-and-verify.sh` reconfirmed byte-exact.
+src/libsnd_seqread.c`), `build-and-verify.sh` reconfirmed byte-exact.
 
 Combined with the `Snd_setVabAttr` round-46 result (same split-lever
 experiment, there actively REGRESSIVE), this function's result shows the
@@ -400,7 +400,7 @@ exit via the 600s timeout.** ~91000+ iterations. One output directory
 `do { return; } while (0);` instead of a bare `return;`. This LOOKS like
 pure syntactic noise (semantically identical to a bare `return`), and the
 report almost dismissed it as such without checking -- but the real
-oracle disagrees: dropped into `src/code_179d8_k.c` and rebuilt,
+oracle disagrees: dropped into `src/libsnd_seqread.c` and rebuilt,
 **`funcdiff.py` reports 62/70, one MORE real word than the 61/70 baseline,
 with `build-and-verify.sh` showing zero drift outside this function's own
 range.** `asm-differ` confirms the residue shrank from 9 words to 8: the
@@ -413,7 +413,7 @@ a0-copy rotation and one `$a3`/`$t0` site remain, down from three
 distinct rotations).
 
 **Kept as the new best (62/70).** `INCLUDE_ASM` restored; this body (with
-the `do { return; } while (0);` wrapper) is what `src/code_179d8_k.c`
+the `do { return; } while (0);` wrapper) is what `src/libsnd_seqread.c`
 preserves in `#if 0` now.
 
 ### Proposed learning
@@ -555,7 +555,7 @@ guaranteeing they will move.
 
 ## Round 97 types pass (echo)
 
-code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
+libsnd_seqread's local `Entry90902E8` view retired onto `include/SsScore.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
 libsnd_cres, libsnd_decre and code_179d8_j already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
@@ -567,7 +567,7 @@ arithmetic became the header's per-channel arrays `unk17[16]` (pan),
 channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
-`build/nonmatching/src/code_179d8_k.c.o` before/after).
+`build/nonmatching/src/libsnd_seqread.c.o` before/after).
 
 `unk74`, settled: the old local view called it a "nonzero-gated dispatch
 enable flag". It is the sequence's left volume (`SpuVmSetSeqVol` stores voll

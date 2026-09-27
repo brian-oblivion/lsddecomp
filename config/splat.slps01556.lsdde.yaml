@@ -141,7 +141,7 @@ segments:
       # none of the split dance that 0x1908 needs.  Its words are `.L`
       # labels local to those two functions' own `.s` files, so leaving it
       # standalone fails the link with `undefined reference to '.L800346..'`.
-      - [0x14F0, .rodata, code_179d8_k]
+      - [0x14F0, .rodata, libsnd_seqread]
       # 0x1764..0x1890 was one plain slot serving psyq_SpuSetMute. Its first
       # 0x40 bytes are EXACTLY jtbl_80010F64 + jtbl_80010F84, the two switch
       # tables of libspu/s_sca's SpuSetCommonAttr: relocated words, so `place`
@@ -1084,7 +1084,7 @@ segments:
       #
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
-      - [0x24938, c, code_179d8_k]
+      - [0x24938, c, libsnd_seqread]
       # code_179d8_f: functions 256..273 of the original, 0x2673C..0x272C8
       # (18 functions).  Census 2026-09-04, three-grep screen per function:
       # 16/18 clean, the two blocked are func_80036230 and func_80036528,

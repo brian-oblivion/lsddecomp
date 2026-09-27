@@ -6,8 +6,8 @@
 
 > Renamed from `func_800349B0` on 2026-09-23 (tools/rename.py). Address 0x800349b0.
 
-`asm/nonmatchings/code_179d8_k/ContModulation.s`, vram `0x800349B0`, unit
-`code_179d8_k`. Round 25, runner alpha (stall). Round 31, runner bravo
+`asm/nonmatchings/libsnd_seqread/ContModulation.s`, vram `0x800349B0`, unit
+`libsnd_seqread`. Round 25, runner alpha (stall). Round 31, runner bravo
 (closed).
 
 ## Round 31 update (runner bravo): closed, two independent fixes stacked
@@ -250,7 +250,7 @@ reverting.
 
 ## Round 97 types pass (echo)
 
-code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
+libsnd_seqread's local `Entry90902E8` view retired onto `include/SsScore.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
 libsnd_cres, libsnd_decre and code_179d8_j already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
@@ -262,4 +262,4 @@ arithmetic became the header's per-channel arrays `unk17[16]` (pan),
 channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
-`build/nonmatching/src/code_179d8_k.c.o` before/after).
+`build/nonmatching/src/libsnd_seqread.c.o` before/after).

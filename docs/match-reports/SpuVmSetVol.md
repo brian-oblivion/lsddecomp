@@ -7,7 +7,7 @@
 > `_svm_pg` (0x8008E968), `_svm_vh` (0x8008E970), `_svm_tn` (0x8008E978), a
 > field inside `_svm_cur` (0x8008EA22 = `_svm_cur`+0x16) and `_ss_score`
 > (0x800902E8). Its only call is `SpuVmVSetUp`, and its only caller is the
-> code_179d8_k sequencer, which also calls `SpuVmKeyOn`. Position: right after
+> libsnd_seqread sequencer, which also calls `SpuVmKeyOn`. Position: right after
 > placed `libsnd/vm_prog` (3.6), followed in this unit by Sony's `SsUtKeyOn`
 > and `SsUtKeyOnV`. `sdkname.py` finds no fingerprint (best shape 0.51
 > `SpuVmSetVol`, below the 0.90 lead bar), so the track 2 two-evidence rule is

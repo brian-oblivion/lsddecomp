@@ -1,5 +1,5 @@
 /*
- * code_179d8_k -- Sony libsnd `seqread`: the SEQ event interpreter.
+ * libsnd_seqread -- Sony libsnd `seqread`: the SEQ event interpreter.
  *
  * Every function here is Sony's. Retail links libsnd 3.3's seqread with one
  * function changed (_SsSetControlChange), so the object never placed and the
@@ -222,7 +222,7 @@ void GetSeqData(s16 a0, s16 a1) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", GetSeqData);
+INCLUDE_ASM("asm/nonmatchings/libsnd_seqread", GetSeqData);
 #endif
 
 #ifdef NON_MATCHING
@@ -259,7 +259,7 @@ void NoteOn(s16 a0, s16 a1, s32 a2, s32 a3) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", NoteOn);
+INCLUDE_ASM("asm/nonmatchings/libsnd_seqread", NoteOn);
 #endif
 
 void SetProgramChange(s16 a0, s16 a1, u8 a2) {
@@ -712,7 +712,7 @@ void ContDataEntry(s16 a0, s16 a1, u8 a2) {
     rec->unk88 = ReadDeltaValue(ch, slot);
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", ContDataEntry);
+INCLUDE_ASM("asm/nonmatchings/libsnd_seqread", ContDataEntry);
 #endif
 
 /* STALL (round 39, up from round 35's 163/179): 171/179 words match, zero
@@ -913,7 +913,7 @@ extern u32 VBLANK_MINUS;
  * silently ignored:
  *
  * STALL -- see docs/match-reports/GetMetaEvent.md. 2 words SHORT
- * (211/213, compiled length measured off build/src/code_179d8_k.c.o since
+ * (211/213, compiled length measured off build/src/libsnd_seqread.c.o since
  * funcdiff's word-match number is not trustworthy once length drifts).
  * First real diff at word 56 (`tools/funcdiff.py GetMetaEvent`), a
  * register-identity symptom: retail re-reads `rec->unk4A` fresh (a plain
@@ -1035,7 +1035,7 @@ void GetMetaEvent(s16 a0, s16 a1, u8 a2) {
     }
 }
 #else
-INCLUDE_ASM("asm/nonmatchings/code_179d8_k", GetMetaEvent);
+INCLUDE_ASM("asm/nonmatchings/libsnd_seqread", GetMetaEvent);
 #endif
 
 /* MATCHED -- see docs/match-reports/ReadDeltaValue.md. The `goto combine`
