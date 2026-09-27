@@ -3040,3 +3040,4 @@ gCharSpriteCellRect = 0x8006ED40;
 gStyleEffectClutPos = 0x8008AB94;
 gActorLocalMoveZ = 0x8008ABA8;
 sTaskCoreDefaultColors = 0x8006E860;
+sTaskCoreViewOrigin = 0x8006E86C;

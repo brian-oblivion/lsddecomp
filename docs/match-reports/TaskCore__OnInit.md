@@ -47,7 +47,7 @@ void TaskCore__OnInit(StreamTaskObj *self) {
     core->slot48(unk18, self->unk28);
     core->slot4C(unk18, self->unk2C);
     core->slot50(unk18, self->unk30);
-    core->slot70(unk18, self->unk14, D_8006E86C, D_8006E86C, 0);
+    core->slot70(unk18, self->unk14, sTaskCoreViewOrigin, sTaskCoreViewOrigin, 0);
     core->slot8C(unk18);
     self->unk38 = 0;
 }
@@ -106,7 +106,7 @@ on any of those four, so there is no counter-evidence to act on there.
   `u8 *flag`: `TaskCore__OnDeinit`'s call passes literal `0` (valid for either
   type, unchanged bytes there), this function's own call passes
   `gDefaultStreamTaskInitData`, a real rodata address.
-- Two new rodata externs, address-only: `gDefaultStreamTaskInitData`, and `D_8006E86C`
+- Two new rodata externs, address-only: `gDefaultStreamTaskInitData`, and `sTaskCoreViewOrigin`
   (passed **twice, same address**, as `TaskCoreObjMethods::slot70`'s 3rd
   AND 4th arguments -- an odd but unambiguous call-site fact, left
   unexplained).
@@ -158,7 +158,7 @@ Renamed from TaskCoreObj__func_8003C238 (tools/rename.py). Occupant of +0x04C (`
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of the local StreamTaskUnk18Obj view, and its slots are called by name: +0x048 setOtLength (unk28), +0x04C setUnk44 (unk2C), +0x050 setUnk48 (unk30), +0x070 attachViewChild (unk14, &D_8006E86C twice, NULL twist), +0x08C initOt. D_8006E86C is a zero LongVec3. Byte-identical.
+The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of the local StreamTaskUnk18Obj view, and its slots are called by name: +0x048 setOtLength (unk28), +0x04C setUnk44 (unk2C), +0x050 setUnk48 (unk30), +0x070 attachViewChild (unk14, &sTaskCoreViewOrigin twice, NULL twist), +0x08C initOt. sTaskCoreViewOrigin is a zero LongVec3. Byte-identical.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 

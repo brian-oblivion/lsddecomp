@@ -257,7 +257,7 @@ void TaskCore__OnInit(TaskCore *self) {
     core->setOtLength(viewport, self->unk28);
     core->setUnk44(viewport, self->unk2C);
     core->setUnk48(viewport, self->unk30);
-    core->attachViewChild(viewport, self->unk14, &D_8006E86C, &D_8006E86C, 0);
+    core->attachViewChild(viewport, self->unk14, &sTaskCoreViewOrigin, &sTaskCoreViewOrigin, 0);
     core->initOt(viewport);
     self->result = 0;
 }
