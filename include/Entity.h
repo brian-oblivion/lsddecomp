@@ -21,7 +21,7 @@
  * The mood row. New_Entity's first argument is `moodIndex`, which selects a
  * 16-byte row of gEntityMoodTable and of the parallel byte tables below.
  * Every tick, update (+0x098) runs updateActivationState (activate when the
- * row's detachKind condition holds), updateDeactivationState, the sound-cue
+ * row's activateKind condition holds), updateDeactivationState, the sound-cue
  * start/stop pair and updateTargetProximity, then TodActor's update.
  *
  * The peer is the player. attachToParent's (self, peer, companion, parent,
@@ -157,8 +157,8 @@ extern s32 gEntityFadeBoxDefaultOffset[2];
 struct EntityMoodRow {
     u8 pad00[0x02];
     s8 unlockKind; /* +0x02, Entity__GetUnlockEffect: times 1000 is the unlock score; 1 to 9: Entity__Reset turns fog on; -9 to -1: Entity__IsNearTarget moves the tested point by it times 1024 in y */
-    s8 detachKind; /* +0x03, read by Entity__UpdateActivationState; 0: Entity__AttachToParent activates at once */
-    u8 linkKind;    /* +0x04, read by Entity__UpdateDeactivationState (unsigned load) */
+    s8 activateKind; /* +0x03, read by Entity__UpdateActivationState; 0: Entity__AttachToParent activates at once */
+    u8 deactivateKind; /* +0x04, read by Entity__UpdateDeactivationState (unsigned load) */
     s8 activeRange; /* +0x05, Entity__IsNearTarget's distance for the activation and deactivation range tests; 0: no range test */
     s8 proximityRange; /* +0x06, read by Entity__UpdateTargetProximity: magnitude (after abs) is Entity__IsNearTarget's distance arg for raising targetReached via setTargetReached; a NEGATIVE value also makes the entity face its target every tick */
     s8 linkStage; /* +0x07, Entity__GetLinkStage and Entity__NotifyLinkStage (gEntityLinkStageTable) */

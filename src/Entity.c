@@ -113,7 +113,7 @@ void Entity__AttachToParent(Entity *this, TodActor *peer, void *companion, struc
     ((TodActorAttachToParentFn)GetTodActorMethods()->attachToParent)((TodActor *)this, peer,
                                                                      companion, parent, offset);
     this->grid = parent;
-    if (gEntityMoodTable[this->moodIndex].detachKind != 0) {
+    if (gEntityMoodTable[this->moodIndex].activateKind != 0) {
         return;
     }
     this->methods->activate(this);
@@ -303,19 +303,19 @@ s32 Entity__UpdateActivationState(Entity *this) {
     if (this->active == 0 && this->state != 1) {
         row = &gEntityMoodTable[this->moodIndex];
         doActivate = 0;
-        if (row->detachKind != 0) {
-            if (row->detachKind == 4) {
+        if (row->activateKind != 0) {
+            if (row->activateKind == 4) {
                 goto randCheck;
             }
             if (row->activeRange != 0) {
                 if (Entity__IsNearTarget(this, &this->coord2->tx, row->activeRange,
                                          row->nearTolerance) != 0) {
-                    if (row->detachKind == 1) {
+                    if (row->activateKind == 1) {
                         doActivate = 1;
-                    } else if (row->detachKind == 3) {
+                    } else if (row->activateKind == 3) {
                         goto randCheck;
                     }
-                } else if (row->detachKind == 2) {
+                } else if (row->activateKind == 2) {
                     doActivate = 1;
                 }
             }
@@ -345,19 +345,19 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
         row = &gEntityMoodTable[this->moodIndex];
         doDeactivate = 0;
         Entity__NotifyIfTargetInRange(this, 0);
-        if (row->linkKind != 0 && row->linkKind != 3) {
-            if (row->linkKind >= 10) {
+        if (row->deactivateKind != 0 && row->deactivateKind != 3) {
+            if (row->deactivateKind >= 10) {
                 tick = this->tick;
-                if ((tick ^ (row->linkKind * 15)) == 0) {
+                if ((tick ^ (row->deactivateKind * 15)) == 0) {
                     doDeactivate = 1;
                 }
             } else if (row->activeRange != 0) {
                 near = Entity__IsNearTarget(this, &this->coord2->tx, row->activeRange, row->nearTolerance);
                 if (near != 0) {
-                    if (row->linkKind == 1) {
+                    if (row->deactivateKind == 1) {
                         doDeactivate = 1;
                     }
-                } else if (row->linkKind == 2) {
+                } else if (row->deactivateKind == 2) {
                     doDeactivate = 1;
                 }
             }
