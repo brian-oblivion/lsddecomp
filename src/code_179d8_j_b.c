@@ -1,104 +1,55 @@
 /*
- * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
- * every claim in this comment that a function is BLOCKED by `gp_rel`,
- * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
- * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
- * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
- * none of them.  Any "do NOT spend attempts on these" directive below is
- * therefore RETRACTED: those functions are ordinary matching work, and most
- * carry a mechanism-correct partial derivation already.  The rest of this
- * comment still stands -- only the blocker verdicts are withdrawn.
- * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ * code_179d8_j_b -- five functions of Sony's libsnd voice manager
+ * (vmanager), carried as C: SpuVmSetVol, SsUtKeyOn, SsUtKeyOff, SsUtKeyOnV
+ * and SsUtKeyOffV. Retail's vmanager is a build no SDK disc carries, so it
+ * never placed as an object; progress.py counts these functions as library
+ * by address, and they keep Sony's names and <libsnd.h>'s prototypes. The
+ * linked objects libsnd/vm_prog.o and libsnd/ut_pb.o sit immediately before
+ * and after this file.
  *
- * code_179d8_j_b -- the MIDDLE third of the old code_179d8_j slice, after
- * round 34 (2026-09-12) linked TWO Sony objects into what used to be one unit.
- * Now 0x21180..0x221B4 (vram 0x80030980..0x800319B4), five functions
- * (SpuVmSetVol .. SsUtKeyOffV).
+ *   SpuVmSetVol  rescales every voice one sequence plays on a given VAB and
+ *                program: voice level x the VAB's, the program's and the
+ *                tone's volumes x the sequence's L/R volume (SsScore),
+ *                panned by the tone, the program and the caller, into the
+ *                voices' shadow volume registers (_svm_sreg_buf), marked
+ *                dirty.
+ *   SsUtKeyOn    Sony's utility key-on: stages the program's and tone's
+ *                attributes (_svm_pg, _svm_tn) in the vmanager's scratch
+ *                globals, allocates a voice, fills its _svm_voice record and
+ *                keys it on (vmNoiseOn for a noise tone, vag 0xFF).
+ *   SsUtKeyOff   keys off the voice SsUtKeyOn returned, if the voice still
+ *                holds the same VAB/program/tone/note: a noise voice clears
+ *                the SPU's noise-mode enable, any other sets its bit in the
+ *                pending key-off mask and drops the pending key-offs from
+ *                the key-on mask.
+ *   SsUtKeyOnV   SsUtKeyOn on a caller-chosen voice.
+ *   SsUtKeyOffV  keys off a voice unconditionally.
  *
- * WHY THIS UNIT EXISTS, IN TWO STEPS, BOTH IN ROUND 34.
- *   1. `libsnd/vm_prog.o` (Psy-Q 3.6 -- the only disc carrying the module)
- *      covers 0x20FF0..0x21180: SpuVmSetProgVol, SpuVmGetProgVol,
- *      SpuVmSetProgPan, SpuVmGetProgPan, all four previously MATCHED as C.
- *      That split the old code_179d8_j into [c][o][c] and created this file.
- *   2. `libsnd/ut_pb.o` (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244:
- *      `SsUtPitchBend`, which was `func_800319B4`, also previously MATCHED.
- *      That split THIS file again into [c][o][c], and everything from
- *      SsUtChangePitch on moved to `src/code_179d8_j_c.c`.
- * Reclassifying five matched functions out of the game count across the two
- * steps is the correction CLAUDE.md asks for, not a regression; their C is
- * DELETED, not commented out.
- *
- * `D_8008EA22`'S OWN COMMENT WAS WRONG AND IS CORRECTED HERE (round 36): it
- * used to claim `SsUtPitchBend` and the deleted `SpuVmGetSeqRVol` were its
- * only readers in this family, and dropped the extern on that basis. That
- * was never true of this file's own two remaining stalls -- SsUtKeyOn
- * and SsUtKeyOnV both WRITE it (`D_8008EA22 = 0x21;`) -- it just went
- * unnoticed because both were still INCLUDE_ASM and nothing failed to
- * link. Declared again below.
- *
- * NO RODATA ATTACH IS OWNED BY ANY UNIT IN THIS FAMILY, and that is measured,
- * not assumed: the old code_179d8_mid_c monolith contains zero `jtbl_` and
- * zero `.word .L` across its whole extent, and the splat yaml's rodata slot
- * list names none of `code_179d8_j`, `_j_b` or `_j_c`.  Unlike round 33's
- * libsnd_ssinit_libapi_counter there was nothing to move, and a link failure of the form
- * `undefined reference to '.L8003....'` would mean something else.
- *
- * DECLARATIONS: this file carries its own copy of what its functions use,
- * split out of the old shared block.  Keep it that way -- do NOT create a
- * shared code_179d8*.h.  The sibling slices are staffed independently and a
- * shared header is what makes their merges collide; see
- * `python3 tools/headercontention.py`.  Several externs below are read only by
- * functions still carried as INCLUDE_ASM (the `SsUtKeyOn` scratch globals
- * in particular); they are knowledge about those functions, not dead code, and
- * were re-homed here deliberately rather than dropped.
- *
- * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
- * re-implementing the greps and never for `addiu_at` (resolved round 21).
- * `nearmiss.py` runs `tools/sdkstalls.py` for you, and round 34 is why that
- * matters here: all five functions the two splits gave back to Sony were on
- * the old unit's carve-time WORKABLE list, screened clean on every blocker,
- * and were unmatchable by construction.
- *
- * Expect this slice to span more than one class; identify each with
- * tools/classtable.py rather than assuming the unit has one.  Keep every
- * function in strict ROM-address order.
+ * The four SsUt functions take the _snd_ev_flag lock and return -1 while
+ * it is held. SpuVmSetVol, SsUtKeyOn and SsUtKeyOnV are carried as INCLUDE_ASM
+ * with their best readable body under NON_MATCHING.
  */
 
 #include "common.h"
+#include <libsnd.h>
+#include "SsScore.h"
 #include "SvmData.h"
 
-/* 0x20-byte-stride record indexed by `D_8008EA18 + D_8008EA13*16`
- * (SsUtKeyOn's own computed index, not a channel id). Every field
- * this unit's own accessor touches is named; offsets are exact (read
- * from SsUtKeyOn's own lbu/lhu immediates), field names are not. */
-typedef struct {
-    u8 unk0; /* +0x0 */
-    u8 unk1; /* +0x1 */
-    u8 unk2; /* +0x2 */
-    u8 unk3; /* +0x3 */
-    u8 unk4; /* +0x4 */
-    u8 unk5; /* +0x5 */
-    u8 unk6; /* +0x6 */
-    u8 unk7; /* +0x7 */
-    u8 pad8[0x16 - 0x8];
-    u16 unk16; /* +0x16 */
-    u8 pad18[0x20 - 0x18];
-} RecordE978;
+/* libsnd vmanager's _svm_tn (pinned at this address): the current VAB's
+ * tone table, 16 VagAtr per program, indexed prog * 16 + tone. */
+extern VagAtr *D_8008E978;
 
-extern RecordE978 *D_8008E978;
+/* Holds the base of the SPU register block, 0x1F801C00, indexed in
+ * halfwords as code_179d8_p.c's SsUtAllKeyOff indexes it.
+ * MATCHING: not volatile here; volatile moves SsUtKeyOff's second store out
+ * of its branch delay slot. */
+extern u16 *D_8006DAD4;
 
-/* Base pointer for a table of 0x10-byte entries, indexed by a 0..0x17
- * id.  Only the two leading s16 fields this unit's own accessors touch
- * are named. */
-typedef struct EntryDAD4 {
-    s16 unk0; /* +0x0 */
-    s16 unk2; /* +0x2 */
-    s16 unk4; /* +0x4 -- read by SsUtKeyOff, entry index 25 only */
-    s16 unk6; /* +0x6 -- read by SsUtKeyOff, entry index 25 only */
-    u8 pad8[0x10 - 0x8];
-} EntryDAD4;
-
-extern EntryDAD4 *D_8006DAD4;
+/* The SPU's noise-mode enable register pair (NON, 0x1F801D94/0x1F801D96:
+ * one bit per voice, voices 0-15 then 16-23), as halfword indices from
+ * that base. */
+#define SPU_NOISE_ON_LO (0x194 / 2)
+#define SPU_NOISE_ON_HI (0x196 / 2)
 
 /* Reentrancy lock, same identifier/type as the sibling reading in
  * Sony's `SsSeqCalledTbyT` (`libsnd/sscall`, linked since round 34; it was
@@ -114,23 +65,9 @@ extern volatile u16 D_8008EA26;
 extern volatile u8 D_8008EA18;
 extern u16 D_8008EA22;
 
-/* Base pointer for a table of 0x10-byte slots, indexed by the same <0x18
- * channel space SsUtKeyOn validates via SpuVmVSetUp. This unit's own
- * reduced view: only the fields SsUtKeyOn itself touches are named.
- * The sibling accessors that used to share this typedef (SpuVmSetProgVol
- * and friends, code_179d8_j.c's old `SlotE968`) are Sony's own object as
- * of round 34's split and never touched offset 0; SsUtKeyOn does, so
- * this unit's own copy of the type names it (see func_80030864.md, the
- * matched sibling's report, for the +0x1/+0x4 fields' provenance). */
-typedef struct SlotE968 {
-    u8 unk0; /* +0x0 */
-    u8 unk1; /* +0x1 */
-    u8 pad2[0x4 - 0x2];
-    u8 unk4; /* +0x4 */
-    u8 pad5[0x10 - 0x5];
-} SlotE968;
-
-extern SlotE968 *D_8008E968;
+/* libsnd vmanager's _svm_pg (pinned at this address): the current VAB's
+ * program table, indexed by program number. */
+extern ProgAtr *D_8008E968;
 
 /* SsUtKeyOn's own scratch globals -- a "start channel" setup
  * routine that stages its parameters and a couple of table lookups
@@ -177,25 +114,9 @@ extern u16 D_80090C64;
 extern u16 D_8008E228;
 extern u16 D_8008E22C;
 
-/* Shared with vmNoiseOn/SpuVmKeyOnNow in code_179d8_l.c (same
- * two-level entry table, same blend-cascade shape); this unit's own
- * reduced view, per the project's per-unit-local-view convention --
- * only the two fields SpuVmSetVol itself touches are named. */
-typedef struct {
-    u8 pad0[0x74];
-    u16 unk74;
-    u16 unk76;
-    u8 pad78[0xAC - 0x78];
-} D800902E8Entry;
-
-extern D800902E8Entry *_ss_score[];
-
-typedef struct {
-    u8 pad0[0x18];
-    u8 unk18; /* +0x18 */
-} ObjE970;
-
-extern ObjE970 *D_8008E970;
+/* libsnd vmanager's _svm_vh (pinned at this address): the current VAB's
+ * header. */
+extern VabHdr *D_8008E970;
 
 extern s16 D_8008E8C0;
 
@@ -206,7 +127,7 @@ extern s16 D_8008E8C0;
  * `D_8008E978[_svm_voice[i].unk14]` address plus two loop-invariant
  * hoists (docs/match-reports/SpuVmSetVol.md). Hand-derived. */
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
-    D800902E8Entry *e;
+    SsScore *e;
     u8 i;
     s32 result;
     u32 pan1;
@@ -223,8 +144,8 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
             if (_svm_voice[i].unk0E == (s16)a0) {
                 s32 t0 = _svm_voice[i].unk12;
                 if (t0 == (s16)a2 && _svm_voice[i].unk16 == (s16)a1) {
-                    u8 e968FromD998 = D_8008E968[_svm_voice[i].unk10].unk1;
-                    u8 e968FromT0 = D_8008E968[t0].unk1;
+                    u8 e968FromD998 = D_8008E968[_svm_voice[i].unk10].mvol;
+                    u8 e968FromT0 = D_8008E968[t0].mvol;
                     s32 lvl0;
                     s32 prio;
                     s32 lvl1;
@@ -239,7 +160,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
 
                     lvl0 = _svm_voice[i].unk08 * (u16)a3 / 127;
                     prio = lvl0 * 0x3FFF;
-                    lvl1 = D_8008E970->unk18 * prio / 16129;
+                    lvl1 = D_8008E970->mvol * prio / 16129;
 
                     if (e968FromD998 != e968FromT0) {
                         lvl1b = lvl1 * e968FromT0;
@@ -247,21 +168,21 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         lvl1b = lvl1 * e968FromD998;
                     }
 
-                    e978c = D_8008E978[_svm_voice[i].unk14].unk2;
+                    e978c = D_8008E978[_svm_voice[i].unk14].vol;
                     lvl1c = lvl1b * e978c;
                     lvl2 = lvl1c / 16129;
 
                     pan1 = (lvl2 * e->unk74) / 127;
                     pan2 = (lvl2 * e->unk76) / 127;
 
-                    e978d = D_8008E978[_svm_voice[i].unk14].unk3;
+                    e978d = D_8008E978[_svm_voice[i].unk14].pan;
                     if (e978d < 0x40) {
                         pan2 = (pan2 * e978d) / 63;
                     } else {
                         pan1 = (pan1 * (0x7F - e978d)) / 63;
                     }
 
-                    e968d = D_8008E968[_svm_voice[i].unk10].unk4;
+                    e968d = D_8008E968[_svm_voice[i].unk10].mpan;
                     if (e968d < 0x40) {
                         pan2 = (pan2 * e968d) / 63;
                     } else {
@@ -306,9 +227,9 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SpuVmSetVol);
  * busy-lock guard's branch polarity, with the rest not re-characterised
  * since `--nop-at-expansion` closed the old length gap
  * (docs/match-reports/SsUtKeyOn.md). Hand-derived. */
-s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6) {
-    SlotE968 *slot;
-    RecordE978 *rec;
+s16 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
+    ProgAtr *slot;
+    VagAtr *rec;
     s32 result;
     u16 note;
     u8 pending18;
@@ -336,21 +257,21 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6) {
     }
 
     slot = D_8008E968;
-    D_8008EA16 = slot[p1].unk1;
-    D_8008EA17 = slot[p1].unk4;
-    D_8008EA0C = slot[p1].unk0;
+    D_8008EA16 = slot[p1].mvol;
+    D_8008EA17 = slot[p1].mpan;
+    D_8008EA0C = slot[p1].tones;
 
     rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
-    D_8008EA1B = rec->unk0;
-    note = rec->unk16;
+    D_8008EA1B = rec->prior;
+    note = rec->vag;
     D_8008EA24 = note;
-    D_8008EA19 = rec->unk2;
-    D_8008EA1A = rec->unk3;
-    D_8008EA1C = rec->unk4;
-    D_8008EA1D = rec->unk5;
-    D_8008EA20 = rec->unk1;
-    D_8008EA1E = rec->unk6;
-    D_8008EA1F = rec->unk7;
+    D_8008EA19 = rec->vol;
+    D_8008EA1A = rec->pan;
+    D_8008EA1C = rec->center;
+    D_8008EA1D = rec->shift;
+    D_8008EA20 = rec->mode;
+    D_8008EA1E = rec->min;
+    D_8008EA1F = rec->max;
 
     if ((s16)note == 0) {
         goto fail;
@@ -384,7 +305,7 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6) {
     if ((s16)D_8008EA24 == 0xFF) {
         vmNoiseOn((u8)result);
     } else {
-        s32 ret = note2pitch2((u16)p3, p4);
+        s32 ret = note2pitch2((u16)p3, (u16)p4);
         SpuVmKeyOnNow(1, (u16)ret);
     }
     _snd_ev_flag = 0;
@@ -399,7 +320,7 @@ fail_nolock:
 INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOn);
 #endif
 
-s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
+s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
     u16 chan;
     u32 mask0;
     u16 mask1;
@@ -418,8 +339,8 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
     if (_svm_voice[idx].unk00 == 0xFF) {
         _svm_voice[(u8)idx].unk1B = 0;
         _svm_voice[(u8)idx].unk04 = 0;
-        D_8006DAD4[25].unk4 = 0;
-        D_8006DAD4[25].unk6 = 0;
+        D_8006DAD4[SPU_NOISE_ON_LO] = 0;
+        D_8006DAD4[SPU_NOISE_ON_HI] = 0;
     } else {
         D_8008EA26 = idx;
         chan = D_8008EA26;
@@ -453,8 +374,8 @@ fail_nolock:
  * flip; the 5-word gap is not re-characterised since
  * `--nop-at-expansion` closed 11 of the old 16
  * (docs/match-reports/SsUtKeyOnV.md). Hand-derived. */
-s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6) {
-    RecordE978 *rec;
+s16 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
+    VagAtr *rec;
     u16 note;
     u8 pending18;
 
@@ -483,21 +404,21 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6) 
         D_8008EA11 = 0x7F - ((p5 << 6) / p6);
     }
 
-    D_8008EA16 = D_8008E968[p1].unk1;
-    D_8008EA17 = D_8008E968[p1].unk4;
-    D_8008EA0C = D_8008E968[p1].unk0;
+    D_8008EA16 = D_8008E968[p1].mvol;
+    D_8008EA17 = D_8008E968[p1].mpan;
+    D_8008EA0C = D_8008E968[p1].tones;
 
     rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
-    D_8008EA1B = rec->unk0;
-    note = rec->unk16;
+    D_8008EA1B = rec->prior;
+    note = rec->vag;
     D_8008EA24 = note;
-    D_8008EA19 = rec->unk2;
-    D_8008EA1A = rec->unk3;
-    D_8008EA1C = rec->unk4;
-    D_8008EA1D = rec->unk5;
-    D_8008EA20 = rec->unk1;
-    D_8008EA1E = rec->unk6;
-    D_8008EA1F = rec->unk7;
+    D_8008EA19 = rec->vol;
+    D_8008EA1A = rec->pan;
+    D_8008EA1C = rec->center;
+    D_8008EA1D = rec->shift;
+    D_8008EA20 = rec->mode;
+    D_8008EA1E = rec->min;
+    D_8008EA1F = rec->max;
 
     if ((s16)note == 0) {
         goto fail;
@@ -526,7 +447,7 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6) 
     if ((s16)D_8008EA24 == 0xFF) {
         vmNoiseOn((u8)idx);
     } else {
-        s32 ret = note2pitch2(p3, p4);
+        s32 ret = note2pitch2((u16)p3, (u16)p4);
         SpuVmKeyOnNow(1, (u16)ret);
     }
     _snd_ev_flag = 0;
@@ -551,7 +472,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_j_b", SsUtKeyOnV);
  * released BEFORE the mask block rather than after it (retail's
  * `sw zero, _snd_ev_flag` sits at 0x80031950, between the D_8008E228 load and
  * the first `or`). See docs/match-reports/SsUtKeyOffV.md. */
-s32 SsUtKeyOffV(s16 idx) {
+s16 SsUtKeyOffV(s16 idx) {
     u16 chan;
     u32 mask0;
     u16 mask1;

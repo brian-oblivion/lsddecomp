@@ -173,14 +173,14 @@ it is *downstream* of the shape difference above, not the thing to attack.
 ## Best-derived body (315/324 words, 10/324 raw, ins 76 / del 76; preserved for the next attempt)
 
 Declarations used, all of them already present in `src/code_179d8_j_b.c`
-before this round (`Rec34D994`, `SlotE968`, `RecordE978`, `D800902E8Entry`,
+before this round (`Rec34D994`, `SlotE968`, `RecordE978`, `SsScore`,
 `ObjE970`, `D_8008E9D0`, `D_8008EA22`, `D_8008E8C0`, `_svm_sreg_buf`,
 `_svm_sreg_dirty`, `SpuVmVSetUp`).
 
 ```c
 #if 0
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
-    D800902E8Entry *e;
+    SsScore *e;
     u8 i;
     s32 result;
     u32 pan1;
@@ -439,8 +439,8 @@ typedef struct {
     u16 unk74;
     u16 unk76;
     u8 pad78[0xAC - 0x78];
-} D800902E8Entry;
-extern D800902E8Entry *_ss_score[];
+} SsScore;
+extern SsScore *_ss_score[];
 
 typedef struct {
     u8 pad0[0x18];
@@ -458,7 +458,7 @@ extern Rec34D994 D_8008D990[];   /* added round 45, in this unit's existing Rec3
 
 ```c
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
-    D800902E8Entry *e;
+    SsScore *e;
     s32 i;
     s32 result;
     u32 pan1;
@@ -671,7 +671,7 @@ oracle, no scaffold used):
     regressed hard to 343/324. Reverted -- matches `vmNoiseOn`'s own
     finding that `volatile` on `pan1`/`pan2`-equivalent values ("regressed
     sharply, to 340/311") is the wrong direction on this shape too.
-13. **`D800902E8Entry * volatile e`** (the entry pointer, function-scope):
+13. **`SsScore * volatile e`** (the entry pointer, function-scope):
     regressed to 327/324. Reverted.
 
 None of steps 6, 7, 11, 12, 13 improved on step 8's 324/324; the
@@ -754,7 +754,7 @@ signed 16-bit values). On a match:
 - Calls `SpuVmVSetUp((s16)a1, (s16)a2)` and writes `D_8008EA22 = (u16)a0`
   (write-only here, matching this unit's existing `D_8008EA22` comment
   about which functions write it).
-- Looks up a `D800902E8Entry` via the SAME two-level `_ss_score[lowbyte]
+- Looks up a `SsScore` via the SAME two-level `_ss_score[lowbyte]
   [highbyte]` indexing `vmNoiseOn`/`SpuVmKeyOnNow` already established
   (declared locally here, not shared, per this project's convention).
 - Computes a base level through a THREE-STAGE division chain that is a new
@@ -817,8 +817,8 @@ typedef struct {
     u16 unk74;
     u16 unk76;
     u8 pad78[0xAC - 0x78];
-} D800902E8Entry;
-extern D800902E8Entry *_ss_score[];
+} SsScore;
+extern SsScore *_ss_score[];
 
 typedef struct {
     u8 pad0[0x18];
@@ -836,7 +836,7 @@ extern Rec34D994 D_8008D990[];   /* added to this unit's existing Rec34D994 bloc
 
 ```c
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
-    D800902E8Entry *e;
+    SsScore *e;
     s32 i;
     s32 t0;
     u8 e968FromD998;
@@ -1117,3 +1117,102 @@ The per-field symbols this report names (`D_8008D988`..`D_8008D9BA` at a 0x34 st
 The NON_MATCHING body now reads `_svm_voice[i].unk0E/unk12/unk16/unk10/unk08/unk14`; normalized disassembly identical.
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). The NON_MATCHING body now stores `_svm_sreg_buf[i].unk0/unk2` in place of `*(u16 *)(D_8008D7F0 + off16)` / `+ 2`; the `off16` local is gone and the normalized disassembly is identical.
+
+## Naming (round 95, track 6, delta)
+
+The unit's placeholder types, as this function reads them:
+
+- `D800902E8Entry` -> **`SsScore`** (tier A for WHAT it is, offsets-only
+  fields), now `include/SsScore.h`. The record behind Sony's `_ss_score`
+  (pinned in `config/psyq-objects.ld`), reached as
+  `_ss_score[access][seq]`; its 0xAC size is `<libsnd.h>`'s `SS_SEQ_TABSIZ`,
+  the per-sequence size of the table `SsSetTableSize` hands libsnd. No Sony
+  typedef exists (no libsnd internal header ships on any SDK disc), so the
+  name is derived from Sony's variable, as `SvmVoice` is from `_svm_voice`.
+  Fields stay offset-named (Sony-only data). +0x74/+0x76 are the sequence's
+  left/right volume: Sony's `SpuVmSetSeqVol` (code_179d8_j, INCLUDE_ASM)
+  stores its voll/volr there, each clamped to 0x7F, and this function scales
+  a voice's two levels by them / 127.
+- `ObjE970` -> Sony's **`VabHdr`**: `D_8008E970` is vmanager's `_svm_vh`
+  (pinned at 0x8008E970); the one field read, +0x18 u8, is `VabHdr.mvol`.
+- `SlotE968` -> Sony's **`ProgAtr`**: `D_8008E968` is `_svm_pg`; stride 0x10;
+  +0x1 `mvol`, +0x4 `mpan` (and SsUtKeyOn's +0x0 `tones`).
+- `RecordE978` -> Sony's **`VagAtr`**: `D_8008E978` is `_svm_tn`; stride 0x20,
+  indexed prog * 16 + tone; +0x2 `vol`, +0x3 `pan` here (SsUtKeyOn reads
+  +0x0..+0x7 and +0x16 `vag`, all agreeing).
+
+Measured with the NON_MATCHING body before and after: same length (315/324)
+and same instruction sequence.
+
+## Unit banner history (moved from src/code_179d8_j_b.c, round 95)
+
+The unit banner was rewritten as documentation in round 95. The history it
+carried, verbatim:
+
+```
+/*
+ * ROUND 42 CORRECTION (2026-09-15) -- READ BEFORE ANY "BLOCKED" LINE BELOW:
+ * every claim in this comment that a function is BLOCKED by `gp_rel`,
+ * `nop_mflo_mfhi` or `addiu_at` is STALE.  All three constructs are RESOLVED
+ * by pinned maspsx flags (CLAUDE.md, "Open toolchain blockers");
+ * `tools/nearmiss.py` reports them tagged (RESOLVED-not-a-blocker) and counts
+ * none of them.  Any "do NOT spend attempts on these" directive below is
+ * therefore RETRACTED: those functions are ordinary matching work, and most
+ * carry a mechanism-correct partial derivation already.  The rest of this
+ * comment still stands -- only the blocker verdicts are withdrawn.
+ * Screen: `python3 tools/nearmiss.py`, round 43 (2026-09-15).
+ *
+ * code_179d8_j_b -- the MIDDLE third of the old code_179d8_j slice, after
+ * round 34 (2026-09-12) linked TWO Sony objects into what used to be one unit.
+ * Now 0x21180..0x221B4 (vram 0x80030980..0x800319B4), five functions
+ * (SpuVmSetVol .. SsUtKeyOffV).
+ *
+ * WHY THIS UNIT EXISTS, IN TWO STEPS, BOTH IN ROUND 34.
+ *   1. `libsnd/vm_prog.o` (Psy-Q 3.6 -- the only disc carrying the module)
+ *      covers 0x20FF0..0x21180: SpuVmSetProgVol, SpuVmGetProgVol,
+ *      SpuVmSetProgPan, SpuVmGetProgPan, all four previously MATCHED as C.
+ *      That split the old code_179d8_j into [c][o][c] and created this file.
+ *   2. `libsnd/ut_pb.o` (Psy-Q 3.6 only, 0x90) covers 0x221B4..0x22244:
+ *      `SsUtPitchBend`, which was `func_800319B4`, also previously MATCHED.
+ *      That split THIS file again into [c][o][c], and everything from
+ *      SsUtChangePitch on moved to `src/code_179d8_j_c.c`.
+ * Reclassifying five matched functions out of the game count across the two
+ * steps is the correction CLAUDE.md asks for, not a regression; their C is
+ * DELETED, not commented out.
+ *
+ * `D_8008EA22`'S OWN COMMENT WAS WRONG AND IS CORRECTED HERE (round 36): it
+ * used to claim `SsUtPitchBend` and the deleted `SpuVmGetSeqRVol` were its
+ * only readers in this family, and dropped the extern on that basis. That
+ * was never true of this file's own two remaining stalls -- SsUtKeyOn
+ * and SsUtKeyOnV both WRITE it (`D_8008EA22 = 0x21;`) -- it just went
+ * unnoticed because both were still INCLUDE_ASM and nothing failed to
+ * link. Declared again below.
+ *
+ * NO RODATA ATTACH IS OWNED BY ANY UNIT IN THIS FAMILY, and that is measured,
+ * not assumed: the old code_179d8_mid_c monolith contains zero `jtbl_` and
+ * zero `.word .L` across its whole extent, and the splat yaml's rodata slot
+ * list names none of `code_179d8_j`, `_j_b` or `_j_c`.  Unlike round 33's
+ * libsnd_ssinit_libapi_counter there was nothing to move, and a link failure of the form
+ * `undefined reference to '.L8003....'` would mean something else.
+ *
+ * DECLARATIONS: this file carries its own copy of what its functions use,
+ * split out of the old shared block.  Keep it that way -- do NOT create a
+ * shared code_179d8*.h.  The sibling slices are staffed independently and a
+ * shared header is what makes their merges collide; see
+ * `python3 tools/headercontention.py`.  Several externs below are read only by
+ * functions still carried as INCLUDE_ASM (the `SsUtKeyOn` scratch globals
+ * in particular); they are knowledge about those functions, not dead code, and
+ * were re-homed here deliberately rather than dropped.
+ *
+ * BLOCKER PROFILE: screen with `python3 tools/nearmiss.py`, never by
+ * re-implementing the greps and never for `addiu_at` (resolved round 21).
+ * `nearmiss.py` runs `tools/sdkstalls.py` for you, and round 34 is why that
+ * matters here: all five functions the two splits gave back to Sony were on
+ * the old unit's carve-time WORKABLE list, screened clean on every blocker,
+ * and were unmatchable by construction.
+ *
+ * Expect this slice to span more than one class; identify each with
+ * tools/classtable.py rather than assuming the unit has one.  Keep every
+ * function in strict ROM-address order.
+ */
+```

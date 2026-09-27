@@ -107,8 +107,8 @@ typedef struct {
     u16 unk74;
     u16 unk76;
     u8 pad78[0xAC - 0x78];
-} D800902E8Entry;
-extern D800902E8Entry *_ss_score[];
+} SsScore;
+extern SsScore *_ss_score[];
 
 extern u8 D_8008EA16;
 extern u8 D_8008EA19;
@@ -147,7 +147,7 @@ extern s16 D_8008D7F4[];
 
 ```c
 void SpuVmKeyOnNow(s32 a0, s32 a1) {
-    D800902E8Entry *e;
+    SsScore *e;
     s32 prio;
     s32 lvl0;
     u32 lvl1;
@@ -555,7 +555,7 @@ extern s16 D_8008EA26[];
 extern s16 D_8008D7F4[];
 
 void SpuVmKeyOnNow(s32 a0, s32 a1) {
-    D800902E8Entry *e;
+    SsScore *e;
     s32 prio;
     s32 lvl0;
     u32 lvl1;
@@ -760,7 +760,7 @@ array, NOT volatile).
 
 #if 0
 void SpuVmKeyOnNow(s32 a0, s32 a1) {
-    D800902E8Entry *e;
+    SsScore *e;
     s32 prio;
     s32 tmp;
     u32 lvl1;
