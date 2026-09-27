@@ -12,9 +12,9 @@
  * what its own methods do, and the evidence is this:
  *  - setText (the ctor forwards to it) keeps the caller's buffer in `textBuf`
  *    and copies it into its own `editBuf` (mode 1 decodes full-width SJIS
- *    and halves `textLen`, DecodeFullWidthSjis); command 25 writes `editBuf`
+ *    and halves `textLen`, DecodeFullWidthSjis); a circle press writes `editBuf`
  *    back into `textBuf` (EncodeFullWidthSjis in mode 1) and closes with
- *    state 2, command 23 closes with state 3 without writing.
+ *    state 2, a cross press closes with state 3 without writing.
  *  - moveCursorRight/Left step `cursorIndex` inside [0, textLen) and move the
  *    cursor sprite (setCursorPos: x = index * 7 from gTextEntryCursorPos).
  *  - nextChar/prevChar step `charIndex` through gNameCharTable, whose length
@@ -93,14 +93,14 @@ struct TextEntry {
     /* +0x014 */ s32 charCount; /* ctor: length of gNameCharTable; nextChar's bound, prevChar's wrap value */
     /* +0x018 */ s32 cursorIndex; /* setText zeroes; moveCursorRight/Left, setCursorPos, setCharAt */
     /* +0x01C */ s32 charIndex; /* setText zeroes; index into gNameCharTable: nextChar/prevChar/resetChar, setCharAt */
-    /* +0x020 */ s32 altCommands; /* toggleAltCommands flips it; handleCommand's arrow cases act on 21/20/18/19 when 0, on 5/4/2/3 when set */
-    /* +0x024 */ char *textBuf; /* setText: the caller's buffer; command 25 writes editBuf back into it */
+    /* +0x020 */ s32 altCommands; /* toggleAltCommands flips it; handleCommand's arrow cases act on Pad presses when 0, on held buttons when set */
+    /* +0x024 */ char *textBuf; /* setText: the caller's buffer; a circle press (handleCommand) writes editBuf back into it */
     /* +0x028 */ char *editBuf; /* ctor allocates textLen + 4, finalize frees; setText copies into it, setCharAt writes it */
     /* +0x02C */ s32 closeState; /* setState: 2 or 3; setState(4) notifies parents with it */
     /* +0x030 */ s32 closeTickCount; /* setState zeroes; tickState counts, and calls setState(4) on the second tick */
     /* +0x034 */ void *inputSource; /* addChild/removeChild: the child of class PAD_CLASS_ID (a Pad); onNotify sends its events to handleCommand */
     /* +0x038 */ void *tickSource; /* ... of class FRAMECLOCK_CLASS_ID (a FrameClock); onNotify sends its events to tickState */
-    /* +0x03C */ struct VabStreamObj *target; /* attachTarget; notifyTarget plays tone arg1 on it (playTone, volume 0x60, 0x60) */
+    /* +0x03C */ struct VabStreamObj *target; /* attachTarget; TextEntry__PlaySound plays a tone on it (playTone, volume 96, 96) */
     /* +0x040 */ CharSprite *cursorSprite; /* loadCardResources: New_CharSprite(FONTICON, '_'); setCursorPos moves it to x = pos * 7 */
     /* +0x044 */ struct TextRow *textRow; /* a TextRow (include/TextRow.h): loadCardResources: New_TextRow(FONTICON, textLen, editBuf); setCharAt sets a cell (+0x0C4) */
     /* +0x048 */ ScreenSprite *panelSprite; /* loadCardResources: New_ScreenSprite(COMINPUT, 224x120); non-NULL gates every editing method */
