@@ -104,8 +104,7 @@ second local is involved.
   content (magic constant, stack offset), never a branch target, so there
   was never a CFG question to resolve.
 
-## Naming
-
+## Naming history (before round 100)
 **`GameApplication__PlaySpecialDayMovies` -- tier B.** Mechanics: gated by
 `arg->unk08`, builds a `StreamTask`, derives a count via `GetSpecialDayMovieSpan`,
 initializes the task from `count/15` and a fixed sub-slot, dispatches a
@@ -120,3 +119,25 @@ mention GraphRoom).
 ## Track 4 (2026-09-25, round 84, alpha)
 
 GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__PlaySpecialDayMovies` -- tier B** (renamed from `GameApplication__StartGraphRoomStreamTask` with tools/rename.py). Evidence: streams GetSpecialDayMovieSpan(&frameTotal, 0, 10)'s record, FILM\SPDAY01A.STR (special day 0's first movie), with player frame count -1 and a frame bound of frameTotal, the total frames of the first ten special days' movies (setFrameBound(frameTotal / STREAMTASK_FRAMES_PER_SECOND), StreamTask's bound being bound * 15 frames). Its caller is RunTitleMenu when the GraphRoom scored. Tier B: whether the player really runs through all twenty movies in one stream, and what "scored" means in the game, are not established.
+
+Body changes, all byte-identical: buf {u32 unk00, unk04, count} -> {u8 pad00[8]; s32 frameTotal} (MATCHING: 12 bytes, the read word last); `extra` -> moviePath; the divide keeps its unsigned cast ((u32)frameTotal: retail's 0x88888889 multiply is unsigned); 15 -> STREAMTASK_FRAMES_PER_SECOND.
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Called by GameApplication__PollGraphRoomStatus when its first PollTask reports "2". Gated by
+ * self->config->playStreams (same gate as GameApplication__StartWeeklyStreamTask). Builds a StreamTask,
+ * derives a count via GetSpecialDayMovieSpan, sets the task's frame bound
+ * to that count / 15 and clears skipOnConfirm, then runs its init (stream
+ * group -1, unlike the other call sites) and releases it. */
+
+extern s32 GetSpecialDayMovieSpan(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: writes a derived count to *out, returns a separate derived value */
+```

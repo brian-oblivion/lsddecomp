@@ -50,8 +50,7 @@ this is a clean instance of it: the callee's own use of `$v0` as a real
 result (a loop-exit condition) is what tips the type call, not the wrapper's
 bytes.
 
-## Naming
-
+## Naming history (before round 100)
 **`GameApplication__RegisterFilesCallback` -- tier A.** Pure leaf: `return
 RegisterRecordTableFiles(0);`, mechanics ARE the purpose (a forwarding wrapper). Named
 from its one use, `GameApplication__ShowImage`'s `task->methods->slot98(task,
@@ -60,3 +59,12 @@ completion callback and a context pointer on a `LoaderTask`, so this
 function's role (not its ultimate game purpose, which depends on the
 uncarved `RegisterRecordTableFiles`) is exactly "the callback a LoaderTask runs on
 completion".
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__RegisterFilesCallback` -- tier A** (renamed from `GameApplication__LoaderTaskDoneCallback` with tools/rename.py). Evidence: the body is RegisterRecordTableFiles(0) (class_39e08.c, registers gRecordTable's files with the CD driver); its one use is ShowImage's setCallback, the TaskCore's view callback, which refreshViewValue calls as the image ends.
+
+Body changes, all byte-identical: RegisterRecordTableFiles's extern parameter a0 -> all, as class_39e08.h declares it.
+

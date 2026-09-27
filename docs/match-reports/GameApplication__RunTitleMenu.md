@@ -139,8 +139,7 @@ sequential code, not an early return.
   where the compiler's own analysis would create it, rather than forcing it
   by hand — is exactly what closed this residue too.
 
-## Naming
-
+## Naming history (before round 100)
 **`GameApplication__RunTitleMenu` -- tier B.** Mechanics: gated by
 `arg->unk10`, checks the owned `DreamSys`'s own status accessor, then loops
 `GameApplication__RunTask(New_TitleMenu, ...)`, restarting
@@ -152,3 +151,25 @@ real vocabulary, not a guess -- but `New_TitleMenu`'s own class is still
 unnamed, and this function's ultimate purpose (what "graph room" readiness
 gates) is not established here. The name describes the poll/retry mechanics
 around the one named PollTask class involved.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__RunTitleMenu` -- tier B** (renamed from `GameApplication__PollGraphRoomStatus` with tools/rename.py). Evidence: nothing is polled: it runs the day's GraphRoom (unless day 1 or skipGraphRoomPoll), PlaySpecialDayMovies when GraphRoom scored, then the TitleMenu, and GraphRoom again each time the menu returns TITLEMENU_RESULT_GRAPH; its return tells Application__RunMainLoop to run a day (GAMEAPPLICATION_LOOP_DAY, the menu's result 0) or go back to the opening movie. Tier B: the name leads with the menu, and the GraphRoom prelude is part of the hook too.
+
+Body changes, all byte-identical: pollDone -> graphResult (MATCHING: it must stay a named local set after the GraphRoom check, see the derivation); literals 2 -> GRAPHROOM_RESULT_SCORED, TITLEMENU_RESULT_GRAPH, GAMEAPPLICATION_LOOP_DAY.
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Gated by self->config->pollGraphRoom. Checks the DreamSys's own status slot
+ * (+0x1A0); if it isn't already "1" and self->skipGraphRoomPoll hasn't latched, kicks
+ * off one PollTask (New_GraphRoom) and, if THAT reports "2", runs
+ * GameApplication__StartGraphRoomStreamTask. Then polls a second PollTask (New_TitleMenu) in a loop,
+ * restarting the first PollTask each time it reports "2", until it
+ * reports anything else; clears self->skipGraphRoomPoll and returns 0 or 2 depending
+ * on whether that final status was below 1. */
+```

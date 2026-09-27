@@ -70,8 +70,7 @@ a clean instance of the same idiom with no new residue.
   branches at all.
 - **hand-hoisted loop invariant lever:** not applicable -- no loop.
 
-## Naming
-
+## Naming history (before round 100)
 **`GameApplication__RunTask` -- tier A.** Pure leaf helper, mechanics ARE the
 purpose: constructs a `PollTask` via the caller-supplied `ctor`, dispatches
 `slot44(task, extra, 0)` and `slot4(task)` on it (fire-and-forget teardown),
@@ -80,3 +79,40 @@ returns `slot44`'s result. Generic across both call sites
 `GameApplication__RunTitleMenu`), so it is named for what it mechanically
 does (build, query, dispose a PollTask) rather than for either specific
 caller.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__RunTask` -- tier A** (renamed from `GameApplication__RunPollTask` with tools/rename.py). Evidence: mechanics are the purpose: newTask(dreamSys), init(initArgs, 0) (IntermediateBase's mode 0 runs the task to its end), release, return init's result. Callers pass New_GraphRoom and New_TitleMenu.
+
+Body changes, all byte-identical: the unit-local PollTask/PollTaskMethods view (slot4 = BasicClass's release, slot44 = IntermediateBase's init) is retired: the task is an IntermediateBase (include/IntermediateBase.h, unified) and the allocator type is NewTaskFn, IntermediateBase *(*)(struct DreamSys *). Parameters ctor/void *dreamSys -> newTask/struct DreamSys *dreamSys. Byte-identical.
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Constructs a PollTask via the caller-supplied `ctor`, dispatches
+ * slot44(task, initArgs, 0) and slot4(task) on it (fire-and-forget), and
+ * returns slot44's result. */
+
+/* The PollTasks GameApplication__RunPollTask runs (New_GraphRoom, New_TitleMenu)
+ * are TaskCore-family classes; this is this unit's own minimal view of
+ * them: +0x004 is BasicClass's release, +0x044 IntermediateBase's init.
+ * Constructed directly by a caller-supplied function pointer
+ * (GameApplication__RunPollTask's own a0) rather than a New_X-style allocator. */
+typedef struct PollTaskMethods { ... slot4 at +0x004, slot44 at +0x044 ... } PollTaskMethods;
+typedef struct PollTask { PollTaskMethods *methods; } PollTask;
+typedef PollTask *(*PollTaskCtor)(void *arg);
+
+/* This unit's own function, defined later in ROM order (forward declared
+ * for GameApplication__PollGraphRoomStatus, which comes first). Constructs a PollTask via the
+ * caller-supplied `ctor`, dispatches slot44(task, initArgs, 0) and slot4(task)
+ * on it, and returns slot44's result. */
+
+/* PollTask constructors (not this unit's to write). Called directly (not
+ * through any vtable) as GameApplication__RunPollTask's `ctor` argument.
+ * New_GraphRoom is include/GraphRoom.h's and New_TitleMenu
+ * include/TitleMenu.h's, each cast to PollTaskCtor. */
+```

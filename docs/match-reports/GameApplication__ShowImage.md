@@ -92,8 +92,7 @@ offset against an already-typed sibling class.
   straight-line code.
 - **hand-hoisted loop invariant lever:** not applicable -- no loop.
 
-## Naming
-
+## Naming history (before round 100)
 **`GameApplication__ShowImage` -- tier A.** Pure leaf helper, mechanics ARE
 the purpose: allocates a `LoaderTask` (`New_TaskCore`), registers a
 completion callback and context (`slot98`, `GameApplication__RegisterFilesCallback`,
@@ -107,3 +106,20 @@ a given resource path) rather than either specific asset.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 The task these functions build with New_TaskCore is a plain TaskCore (include/TaskCore.h, track 4 round 84); GameApplication.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__ShowImage` -- tier A** (renamed from `GameApplication__StartLoaderTask` with tools/rename.py). Evidence: a TaskCore given setSubHandle(path, NULL) makes its sub-handle New_TimImage(path) (TaskCore.h, subHandle) and shows it; both callers pass a logo .TIM (ShowIntroLogos), and PlayCinematic builds the same task for a special day's TIM. There is no LoaderTask class (TaskCore.h, round 84).
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Registers a "loader" task for the given resource path: allocates the
+ * task, gives it a completion callback (GameApplication__LoaderTaskDoneCallback) and context
+ * (self), then sets its remaining parameters (path, the parent's aux as its init args) and
+ * starts it. */
+```

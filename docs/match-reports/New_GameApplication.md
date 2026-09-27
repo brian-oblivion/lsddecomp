@@ -170,3 +170,28 @@ that would be a cosmetic-only rename with no new evidence behind it, and
 picking it up is better left to whoever names `GameApplication` itself formally
 (this runner did not establish a game-purpose name for the class, only its
 `ClassXXXXX`-by-table-address identity).
+
+## Track 7 polish (round 100, echo)
+
+Body changes, all byte-identical: 0x2C -> sizeof(GameApplication); parameter arg -> config; `self != 0` -> NULL. The long comment on the fall-off-the-end NULL path is now one MATCHING line; its full text is below, and the derivation above.
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* The `New_X` allocator for the class whose method table is gGameApplicationMethods:
+ * allocates a 0x2C-byte instance and, on success, runs the class's own
+ * constructor through slot +0x008 of the table GetGameApplicationMethods() returns.
+ *
+ * The null path deliberately falls off the end rather than returning a
+ * value. That is not an oversight in the transcription -- it is what
+ * retail does, and it is the ONLY form that matches. `BMemPMgrAlloc`
+ * already left the null in $v0, so the original source never had to
+ * restate it; every spelling that returns explicitly on that path
+ * (`return 0`, `return self`, an early return, a goto to a shared exit)
+ * costs an extra instruction that retail does not have. GCC 2.6.3 warns
+ * "control reaches end of non-void function" here, and the warning is
+ * correct about the C -- the bytes are what say the original had it too.
+ * See docs/match-reports/New_GameApplication.md for the full derivation. */
+```

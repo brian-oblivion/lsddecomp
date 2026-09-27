@@ -108,3 +108,17 @@ ctor calls it once through the cast type, after installing this class's table.
 Application's own ctor called the slot earlier under Application's table, so
 the default screen size is still set. The function comment above the body in
 code_1677c.c still says "advances the day cursor": that is track 7's to fix.
+
+## Track 7 polish (round 100, echo)
+
+Body changes, all byte-identical: *(s32 *)0x1F800000 % 365 -> *(s32 *)getScratchAddr(0) % DAYS_PER_YEAR (libetc.h's macro; DreamSys.h); the SeedAndRandom extern returns s32, as defined (GameFiles.c).
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Seeds the C library's random generator from the scratchpad word at
+ * 0x1F800000 (the PS-X data-cache-as-RAM region) reduced mod 365; the
+ * random value SeedAndRandom returns is discarded. */
+```

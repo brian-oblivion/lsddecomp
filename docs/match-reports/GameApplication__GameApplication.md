@@ -230,3 +230,21 @@ unchanged (`req.src...` writes, `&req.src` to New_LinkResource). A plain
 8 and move every callee-save slot, and an unused pad local is dropped by
 cc1, so ResourceRequest is the smallest existing type that keeps the frame.
 Byte-exact. Table and details: ResourceRequest__Set.md, round 97 second job.
+
+## Track 7 polish (round 100, echo)
+
+Body changes, all byte-identical: parameter arg -> config; the DREAME5 path extern is `char []` so the `(char *)` cast is gone (ResourceSource's name is char *).
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Constructs a GameApplication instance: runs the intermediate base class's own
+ * constructor (through its ctor slot), installs this class's own vtable,
+ * stores the ctor argument, loads the "ETC\DREAME5.TMD" model, builds this
+ * object's owned DreamSys from it, dispatches one DreamSys init call, then
+ * runs this class's own slot40 (GameApplication__SeedRandom) once. */
+
+extern const char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
+```

@@ -245,8 +245,7 @@ switched on," and only the former gets the free reuse.
   choices, consistent with the delay-slot-scheduling class of residue, not
   a wrong-shape stall.
 
-## Naming
-
+## Naming history (before round 100)
 **`GameApplication__RunDayTask` -- tier B.** Mechanics: builds a `StatusObj`
 (`New_DayTask`), reads one status code off it (`slot44`), tears it down
 (`slot4`), reacts to two of the codes (2 -> `GameApplication__PlayCinematic`,
@@ -270,3 +269,44 @@ the override (a pointer cast, no code). The status code is TimedTask's
 `result`: 2 and 3 are values `DayTask__OnObjMNotify` sets when the ObjM
 it built ends the day (`endDay` returned 0 with a cinematic entry: 2;
 `endDay` failed, or events 0xC/0xD: 3). Byte-identical.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__RunDayTask` -- tier A** (renamed from `GameApplication__PollStatusObj` with tools/rename.py). Evidence: builds one DayTask (New_DayTask), runs its init to the end and releases it; "StatusObj" was an older name of the DayTask class. It then returns (year != 0 && day == 1) from DreamSys's getCurrentDayAndYear, i.e. a year has gone by, which makes Application__RunMainLoop run +0x064, PlayEndingMovie.
+
+Body changes, all byte-identical: obj/outVal/check -> dayTask/year/day; GameApplicationConfig.unk04 -> dayTaskSyncDriver (DayTask's ctor parameter syncDriver).
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Builds a DayTask (include/DayTask.h), runs its init with self
+ * alone (DayTask__Init takes nothing else, hence DayTaskInitFn) and
+ * releases it; init's return, TimedTask::result, is a status code: 2 runs GameApplication__StartCinematicStream, 3 latches self->skipGraphRoomPoll.
+ * Then queries the DreamSys status slot again (as GameApplication__PollGraphRoomStatus does),
+ * this time passing an out-param, and derives a 0/1 result from both the
+ * call's return and the out-param. */
+/* Builds a DayTask for this instance's current state, reads one status
+ * code off it, tears it down, and reacts to two of the codes. Then asks the
+ * owned DreamSys a question and reports whether its answer was 1.
+ *
+ * Two things here were long-standing misreadings, both worth keeping written
+ * down (docs/match-reports/GameApplication__PollStatusObj.md):
+ *
+ *  - `case 3` stores 1, NOT 3. Retail's `li $v0, 0x1` sits in the delay slot
+ *    of the case-3 branch, so it executes before the jump is taken and $v0
+ *    holds 1 -- not the 3 it held for the comparison -- by the time the
+ *    store runs. Reading the store as `unk24 = 3` (the discriminant) was
+ *    what produced the old 53/57 and the "the compiler materialises an
+ *    unused default-arm constant" theory attached to it. There is no unused
+ *    constant: `li $v0, 0x1` is the value being stored, hoisted into a delay
+ *    slot on the only path that needs it.
+ *  - `result = (check == 1)` is the whole comparison. GCC 2.6.3 lowers an
+ *    equality test against a small constant to `xori` + `sltiu`, which reads
+ *    back out of the disassembly as `(u32)(check ^ 1) < 1`. That transcription
+ *    is arithmetically right and cost two instructions; the plain `== 1` is
+ *    what the source said. */
+```

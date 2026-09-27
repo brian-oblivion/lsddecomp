@@ -42,3 +42,8 @@ unknown purpose. No carved caller currently dispatches this slot on a
 ./build-and-verify.sh   # build exit=0, OK: build matches retail
 .venv/bin/python3 tools/funcdiff.py GameApplication__NoOpSlot5C   # 2/2
 ```
+
+## Track 7 polish (round 100, echo)
+
+Body changes, all byte-identical: comment only.
+

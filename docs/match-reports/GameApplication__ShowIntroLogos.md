@@ -120,8 +120,7 @@ register, a different axis).
 - **hand-hoisted loop invariant lever:** not applicable — no loop in this
   function.
 
-## Naming
-
+## Naming history (before round 100)
 **`GameApplication__ShowIntroLogos` -- tier B.** Mechanics established
 from the body and its string constants: gated by `arg->unk0C`, registers a
 loader task for `"ETC\ASMKLOGO.TIM"`, then a stream task for whatever
@@ -135,3 +134,25 @@ inference from the filenames but not confirmed by any code in this unit).
 ## Track 4 (2026-09-25, round 84, alpha)
 
 GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__ShowIntroLogos` -- tier A** (renamed from `GameApplication__LoadIntroLogoSequence` with tools/rename.py). Evidence: gated by config->showIntroLogos, the body shows ETC\ASMKLOGO.TIM (ShowImage), streams ETC\ASMK.STR (GetAsmkMovie, MOVIE_ASMK) and shows ETC\OSDLOGO.TIM; nothing is loaded for later use, so "Load" and "Sequence" said less than "Show".
+
+Body changes, all byte-identical: locals streamName/typeCode/typeLookup -> moviePath/movieId/frameCount.
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Optional stream-load block, gated by self->config->showIntroLogos: registers a
+ * "loader" task for "ETC\ASMKLOGO.TIM" (GameApplication__StartLoaderTask), then a separate
+ * "stream" task for whatever type code GetAsmkMovie hands back
+ * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
+
+extern const char *GetAsmkMovie(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkMoviePath */
+extern s32 GetMovieFrameCount(s32 index); /* psyq_memset.s: signed-halfword lookup into gMovieFrameCounts[index] */
+```

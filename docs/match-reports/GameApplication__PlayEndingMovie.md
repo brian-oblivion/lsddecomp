@@ -70,8 +70,7 @@ which library helper derives the type code and whether extra slots
   the whole body, void function, no early exit.
 - **hand-hoisted loop invariant lever:** not applicable -- no loop.
 
-## Naming
-
+## Naming history (before round 100)
 **`GameApplication__PlayEndingMovie` -- tier B.** Mechanics: gated by
 `arg->unk08` (same gate as `GameApplication__PlayOpeningMovie`), builds a
 `StreamTask`, runs its `slot12C` (a step none of the other three
@@ -85,3 +84,28 @@ stronger, purpose-based name is supported yet.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__PlayEndingMovie` -- tier A** (renamed from `GameApplication__StartStreamTaskWithInit` with tools/rename.py). Evidence: streams GetEndingMovie's record, ETC\ENDING.STR (RECORD_ENDING_MOVIE, MOVIE_ENDING), with no skip on confirm; hook +0x064, which Application__RunMainLoop runs only when RunDayTask reports that a year has gone by.
+
+Body changes, all byte-identical: typeCode/outerValue/typeLookup -> movieId/moviePath/frameCount; GetEndingMovie's extern returns const char * and keeps its arity-ok note, shortened (the full one is in the history section).
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* GameApplicationMethods slot +0x064. Gated by self->config->playStreams (same gate as
+ * GameApplication__StartWeeklyStreamTask/GameApplication__StartGraphRoomStreamTask). Builds a StreamTask, clears its skipOnConfirm,
+ * derives a type code via GetEndingMovie, looks it up via GetMovieFrameCount,
+ * initializes the task with it, then starts it -- the same shape as
+ * GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask, but with setSkipOnConfirm(0) added and GetEndingMovie
+ * in place of GetAsmkMovie/PickOpeningMovie. */
+
+/* GameFiles.c: same "write to *out, return a separate value" shape as
+ * GetAsmkMovie/PickOpeningMovie/GetSpecialDayMovieSpan. */
+extern s32 GetEndingMovie(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
+```

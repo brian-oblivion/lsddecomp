@@ -136,8 +136,7 @@ second call's own delay slot opportunistically claims it.
   fixed (lever 2), confirming the remaining residues at each stage were
   register/stack-layout content, not CFG mistakes.
 
-## Naming
-
+## Naming history (before round 100)
 **`GameApplication__PlayCinematic` -- tier B.** Mechanics: reads the owned
 `DreamSys`'s current cinematic slot (`vt->GetCinematic`, an already-named
 vtable accessor), resolves it to a channel index; if resolution fails (-1),
@@ -153,3 +152,34 @@ shared by this unit's other four StreamTask launchers.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 The task these functions build with New_TaskCore is a plain TaskCore (include/TaskCore.h, track 4 round 84); GameApplication.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__PlayCinematic` -- tier B** (renamed from `GameApplication__StartCinematicStream` with tools/rename.py). Evidence: resolves DreamSys's getCinematic pair with GetSpecialDayOrEventRecord: a movie (movie id != -1) is streamed, gated by config->playStreams, with no skip on confirm; a special day's TIM image (movie id -1) is shown by a TaskCore for 10 seconds (setFrameBound(10), TASKCORE_FRAMES_PER_SECOND). Tier B: "cinematic" is DreamSys's slot name, and what the pair selects in the game is not established (GetSpecialDayOrEventRecord.md).
+
+Body changes, all byte-identical: chanBuf {s32 chan; u32 unk04, unk08} -> idBuf {s32 movieId; u8 pad04[8]} (MATCHING: 12 bytes, the read word first); groupId/lookup -> path/frameCount; GetSpecialDayOrEventRecord's extern returns const char * (the record, used as a path by both branches). The old reading ("channel index", a "no cinematic" fallback path, SetActiveDataSourceDriverMode's return "kept") is in the history section below: the value kept across SetActiveDataSourceDriverMode is GetSpecialDayOrEventRecord's return, and SetActiveDataSourceDriverMode returns void (code_171e0.c).
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Reads DreamSys's current cinematic slot, resolves it to a channel index
+ * (GetSpecialDayOrEventRecord); if that fails (-1), starts a LoaderTask on the fixed
+ * "no cinematic" path; otherwise, if self->config->playStreams gates it, starts a
+ * StreamTask on the resolved channel. Either branch finishes by starting
+ * whichever task it built; if neither branch runs, nothing happens. */
+
+extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
+                                                       the last value its internal dispatch loop got --
+                                                       GameApplication__ShowIntroLogos/GameApplication__PlayOpeningMovie discard it, but
+                                                       GameApplication__PlayCinematic keeps it */
+extern s32 GetSpecialDayOrEventRecord(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
+    {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
+    to *out (-1 if unresolved); the packing must zero-extend both halves before combining
+    (retail loads them with lhu, not lh) since the result is bitwise-composed, not a value read
+    back as a signed 32-bit number. Also returns its own (separate) s32 value, kept by
+    GameApplication__PlayCinematic. */
+```

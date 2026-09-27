@@ -75,8 +75,7 @@ for the same shape before re-deriving from scratch.
   exit.
 - **hand-hoisted loop invariant lever:** not applicable -- no loop.
 
-## Naming
-
+## Naming history (before round 100)
 **`GameApplication__PlayOpeningMovie` -- tier B.** Mechanics: gated by
 `arg->unk08`, builds a `StreamTask`, derives its type code via
 `PickOpeningMovie` -- documented in this unit's header as "day/week-style
@@ -89,3 +88,24 @@ shape as its three siblings in this unit).
 ## Track 4 (2026-09-25, round 84, alpha)
 
 GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__PlayOpeningMovie` -- tier A** (renamed from `GameApplication__StartWeeklyStreamTask` with tools/rename.py). Evidence: streams PickOpeningMovie's record, one of ETC\OPENINGA..G.STR at random (PickOpeningMovie.md: rand() % 7, not a day of the week, which is where "Weekly" came from); hook +0x054, which Application__RunMainLoop runs each time the title menu times out.
+
+Body changes, all byte-identical: locals derivedValue/typeCode/typeLookup -> moviePath/movieId/frameCount; PickOpeningMovie's extern returns const char *.
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Optional stream-task init block, gated by self->config->playStreams (the same
+ * shape as GameApplication__LoadIntroLogoSequence's self->config->showIntroLogos gate, minus the two
+ * GameApplication__StartLoaderTask loader-task calls, and using PickOpeningMovie instead of
+ * GetAsmkMovie to derive the type code). */
+
+extern s32 PickOpeningMovie(s32 *out, s32 param2); /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
+```
