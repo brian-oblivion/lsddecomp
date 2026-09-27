@@ -966,3 +966,32 @@ job (track 6), across this unit, `code_179d8_m.c` and
 `libsnd_vm_vol_ut_key_ut_keyv.c`, and the `D_8008EA26[]` incomplete-array
 declaration is load-bearing here (see the round 65 section), so the typed
 spelling has to be measured, not assumed. Proposed to the head.
+
+## History moved from the source (round 99, echo, track 7)
+
+Three comments left `src/code_179d8_l.c` for this report:
+
+- Ahead of the `#ifdef`, a stale STALL line from before round 65: "Best
+  body reached (332/316 built words, 16 words LONG; 33/316 raw word-match,
+  drift-affected) preserved there in #if 0". The live figures are the
+  NON_MATCHING comment's.
+- The NON_MATCHING comment's detail: 201/316 raw word-match, funcdiff
+  insertions/deletions 46/46, the frame residue as `addiu sp,sp,-8` against
+  retail's `-0x10`. The body is hand-derived plus one permuter hoist (round
+  65: `pan1sq / 16383` computed before `pan2sq`), reviewed as a pure
+  reordering and kept.
+- On `D_8008EA26[]`: "NOT volatile, and declared as an incomplete ARRAY on
+  purpose: the array spelling is what makes GCC 2.6.3 materialise the
+  address once into a GPR and spend one word per read, which is retail.
+  Retail's five reloads come from ordinary CSE invalidation by the stores
+  between them." The source keeps a one-line MATCHING note pointing here.
+
+The globals this body reads were declared in three scattered groups (one
+comment explained that a later group "reused" an earlier one). They are now
+one block at the top of the file, `_svm_cur`'s bytes with their offsets and
+the other vmanager globals under Sony's names; the NON_MATCHING object's
+disassembly, relocations included, is identical before and after. The
+locals now say what they hold (`pan1`/`pan2` -> `volL`/`volR`, `prio` ->
+`masterVol`, `lvl0`/`lvl1` -> `toneVol`/`vol`, `chanIdx` -> `sregIndex`,
+the unread first parameter `unused`, the second `pitch`); the preserved
+bodies above keep the old spellings.

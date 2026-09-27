@@ -719,3 +719,10 @@ objects and made the same word a global, `_svm_sreg` in `vm_f.o` (value
 1.00 against ours. Tier: Sony's name (3.6's spelling of the same variable).
 The type stays `SvmData.h`'s `SpuRegs *`; this body's writes are
 `_svm_sreg->noiseOn[0]` / `[1]`.
+
+## History moved from the source (round 99, echo, track 7)
+
+The NON_MATCHING comment said the residue was "the a0/a3 role-swap
+register-identity class (this unit's documented class)" and that the body
+was hand-derived; the parameters are now `voice`, `volL`, `volR` and the
+copy `voiceArg` (`a3` in the preserved bodies above), `v1` is `dirty`.

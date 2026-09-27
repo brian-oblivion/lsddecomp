@@ -618,3 +618,14 @@ dispatches are `tools/classtable.py gVabStreamObjMethods`'
 include/VabStreamObj.h since round 87 (track 4). The parameters and locals
 were renamed with the fields (a0/a1 to sound/set, note/rem1/rem2 to
 toneIndex/vol/endVol).
+
+## Round 99 (echo, track 7): constants
+
+`-1`/`-2` are SoundCueSet.h's `SOUND_CUE_NONE`/`SOUND_CUE_STOP`; the reset
+volumes are the new `SOUND_CUE_DEFAULT_VOL` (127, libsnd's full volume) and
+`SOUND_CUE_DEFAULT_END_VOL` (64), whose meaning is `VabStreamObj__PlayTone`'s:
+it keys the tone at `vol` and hands `endVol` to `SsUtAutoVol` as the ramp's
+end. The loop bound is `ARRAY_COUNT(set->slots)`, the tone index `program *
+VAB_TONES_PER_PROG`, defined token-identically to `code_179d8_e.c`'s (the
+move of both `VAB_*` defines into `VabStreamObj.h` is proposed to the head).
+`e` is `slot`. Byte-identical.

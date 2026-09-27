@@ -11,11 +11,14 @@
  * The rest is Sony's, under Sony's names: picking a voice to steal
  * (SpuVmAlloc), keying a tone on (SpuVmKeyOnNow, SpuVmDoAllocate), switching
  * a voice to the noise generator (vmNoiseOn, vmNoiseOn2), turning a note
- * into an SPU pitch (note2pitch, note2pitch2, SePitchBend) and starting a
- * volume ramp (SeAutoVol). They read the current VAB through <libsnd.h>'s
- * VabHdr and VagAtr (_svm_vh, _svm_tn), the voice tables in
- * include/SvmData.h and the sequence records in include/SsScore.h.
- * SsUtVibrateOn and SsUtVibrateOff are empty and have no known caller.
+ * into an SPU pitch (note2pitch, note2pitch2, SePitchBend), two empty
+ * LIBSND.H entry points (SsUtVibrateOn, SsUtVibrateOff) and starting a
+ * volume ramp (SeAutoVol). They work on the key-on request in _svm_cur, the
+ * current VAB through <libsnd.h>'s VabHdr and VagAtr (_svm_vh, _svm_tn), the
+ * voice tables in include/SvmData.h and the sequence records in
+ * include/SsScore.h. A key-on or key-off is not written to the SPU here: it
+ * is collected in the _svm_okon/_svm_okof masks, which SpuVmFlush
+ * (code_179d8_m.c) writes out.
  */
 #include "common.h"
 #include <libsnd.h>
@@ -28,6 +31,50 @@
 /* Tones per VAB program: playTone's index is program * 16 + tone
  * (token-identical to code_179d8_e.c's, which owns PlayTone). */
 #define VAB_TONES_PER_PROG 16
+
+/*
+ * libsnd's _svm_cur (pinned in config/psyq-objects.ld, 0x20 bytes): the
+ * key-on request the voice manager is working on, which the key-on paths
+ * (SpuVmKeyOn, SsUtKeyOn, SsUtKeyOnV) fill before they call in here. Sony's struct type is not on any
+ * SDK disc, so each byte this file reads is its own extern, named by
+ * address; beside each, its offset in _svm_cur and what the code here does
+ * with it. The three pans cut the right channel below 64 and the left one
+ * above.
+ */
+extern u8 D_8008EA0E; /* +0x02: the note to key */
+extern u8 D_8008EA10; /* +0x04: volume, scaled by the VAB's mvol */
+extern u8 D_8008EA11; /* +0x05: third pan */
+extern u8 D_8008EA13; /* +0x07: program */
+extern u8 D_8008EA16; /* +0x0A: first volume factor, out of 127 */
+extern u8 D_8008EA17; /* +0x0B: second pan */
+extern u8 D_8008EA18; /* +0x0C: tone within the program */
+extern u8 D_8008EA19; /* +0x0D: second volume factor, out of 127 */
+extern u8 D_8008EA1A; /* +0x0E: first pan */
+extern u8 D_8008EA1B; /* +0x0F: priority, which SpuVmAlloc compares */
+extern u8 D_8008EA1C; /* +0x10: the tone's centre note */
+extern u8 D_8008EA1D; /* +0x11: the tone's fine tune, 8 per pitch-table step */
+extern u8 D_8008EA20; /* +0x14: mode bits; bit 2 sends the voice to reverb */
+extern u16 D_8008EA22; /* +0x16: _ss_score index, low byte then high byte; 33 from SsUtKeyOn/SsUtKeyOnV: no score */
+/* MATCHING: an incomplete array, neither scalar nor volatile (SpuVmKeyOnNow.md). */
+extern s16 D_8008EA26[]; /* +0x1A: the voice being keyed */
+
+/* The rest of libsnd/vmanager's globals this file reads, under Sony's names
+ * where a disc gives one (the voice tables are in SvmData.h). The key masks
+ * are two halfwords each, voices 0-15 then 16-23. */
+extern VabHdr *_svm_vh;      /* the header of the VAB being played */
+extern VagAtr *_svm_tn;      /* that VAB's tone attributes, 16 per program */
+extern u8 spuVmMaxVoice;     /* voices the allocator may hand out */
+extern s16 _svm_stereo_mono; /* 1: mono, both channels at the louder volume */
+extern u16 D_8008E228;       /* Sony's _svm_okon1: voices 0-15 to key on at the next flush */
+extern u16 _svm_okon2;
+extern u16 _svm_okof1; /* voices to key off at the next flush */
+extern u16 _svm_okof2;
+extern u16 _svm_orev1; /* voices sent to reverb */
+extern u16 _svm_orev2;
+extern SpuRegs *_svm_sreg; /* the SPU's register block */
+/* vmanager's static pitch table: 12 semitones x 16 fine steps, the SPU
+ * pitch of each at octave 5. */
+extern u16 D_8006DAD8[];
 
 void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
     s32 i;
@@ -77,15 +124,9 @@ void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
     }
 }
 
-
 #ifdef NON_MATCHING
-/* NON_MATCHING: 167/167 words, length exact (74/167 raw word-match; funcdiff
- * insertions/deletions 16/16). Residue: a systematic register rotation
- * (t3/t0/a2/a3 family) running through nearly the whole function, visible
- * from the very first instruction (docs/match-reports/SpuVmAlloc.md).
- * Hand-derived. */
-extern u8 spuVmMaxVoice;
-extern u8 D_8008EA1B;
+/* NON_MATCHING: 167/167 words, length exact; the residue is a register
+ * rotation through the whole function (docs/match-reports/SpuVmAlloc.md). */
 
 s32 SpuVmAlloc(void) {
     s32 chosen;
@@ -161,42 +202,12 @@ s32 SpuVmAlloc(void) {
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmAlloc);
 #endif
 
-extern u8 D_8008EA16;
-extern u8 D_8008EA19;
-extern u8 D_8008EA17;
-extern u8 D_8008EA11;
-extern u8 D_8008EA1A;
-extern s16 _svm_stereo_mono;
-extern u16 D_8008EA22;
-extern u8 D_8008EA20;
-extern u16 D_8008E228;
-extern u16 _svm_okon2;
-extern u16 _svm_okof1;
-extern u16 _svm_okof2;
-extern u16 _svm_orev1;
-extern u16 _svm_orev2;
-
-/* STALL -- see docs/match-reports/SpuVmKeyOnNow.md. Best body reached
- * (332/316 built words, 16 words LONG; 33/316 raw word-match, drift-
- * affected) preserved there in #if 0. */
 #ifdef NON_MATCHING
-/* NON_MATCHING: 316/316 words, length exact (201/316 raw word-match; funcdiff
- * insertions/deletions 46/46). Residue: frame SIZE only -- addiu sp,sp,-8
- * against retail's -0x10 -- plus this unit's documented register-identity
- * class (docs/match-reports/SpuVmKeyOnNow.md). Hand-derived, plus one
- * permuter hoist (round 65: pan1sq/16383 computed before pan2sq), reviewed
- * as a pure reordering and kept. */
-/* libsnd's _svm_vh (pinned at this address): the header of the VAB bank
- * the voice manager is playing from. */
-extern VabHdr *_svm_vh;
-
-extern u8 D_8008EA10;
-/* NOT volatile, and declared as an incomplete ARRAY on purpose: the array
- * spelling is what makes GCC 2.6.3 materialise the address once into a GPR
- * and spend one word per read, which is retail. Retail's five reloads come
- * from ordinary CSE invalidation by the stores between them. */
-extern s16 D_8008EA26[];
-
+/* NON_MATCHING: 316/316 words, length exact; the residue is the frame size
+ * (8 bytes against retail's 16) and this unit's register-identity class
+ * (docs/match-reports/SpuVmKeyOnNow.md). */
+/* Sets the voice's volumes from _svm_cur's volumes and pans, and its pitch,
+ * then marks it to be keyed on (and to or from reverb) at the next flush. */
 void SpuVmKeyOnNow(s32 unused, s32 pitch) {
     SsScore *score;
     s32 masterVol;
@@ -287,35 +298,22 @@ void SpuVmKeyOnNow(s32 unused, s32 pitch) {
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmKeyOnNow);
 #endif
 
-extern u8 D_8008EA13;
-extern u8 D_8008EA18;
-
-/* libsnd's _svm_tn (pinned at this address): the current VAB's tone
- * attributes, 16 per program; SpuVmDoAllocate, note2pitch2 and SePitchBend
- * index it by program * 16 + tone. */
-extern VagAtr *_svm_tn;
-
+/* Not yet C: the best body (142/143 words) is in
+ * docs/match-reports/SpuVmDoAllocate.md. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 
-/* The blend-cascade globals
- * (D_8008EA16/17/19/1A/11/20/22, _svm_stereo_mono, D_8008E228/22C, _svm_okof1/64,
- * _svm_orev1/234, _svm_sreg_dirty/98C/9A3) are already declared above, before
- * SpuVmKeyOnNow (ROM-earlier, same shapes) -- reused here, not redeclared. */
-extern u8 D_8008EA0E;
-extern u8 D_8008EA1C;
-extern SpuRegs *_svm_sreg;
-extern u8 spuVmMaxVoice;
-
-/* STALL -- see docs/match-reports/vmNoiseOn.md. Best body reached
- * (309/311 built words, 2 words SHORT) preserved there in #if 0. */
+/* Not yet C: the best body (309/311 words) is in
+ * docs/match-reports/vmNoiseOn.md. */
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn);
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 107/112 words, 5 words short. Residue: the a0/a3 role-swap
- * register-identity class (this unit's documented class) plus an 8-byte
- * frame retail allocates that this shape doesn't reach
- * (docs/match-reports/vmNoiseOn2.md). Hand-derived. The byte-shaped
- * body's order-only __asm__("") barrier is omitted here; it is in the report. */
+/* NON_MATCHING: 107/112 words, 5 short; the residue is a register role swap
+ * between the voice argument and its copy, and an 8-byte frame retail
+ * allocates (docs/match-reports/vmNoiseOn2.md, which also has the order-only
+ * __asm__("") barrier this copy omits). */
+/* Switches the voice to the noise generator at volumes volL/volR and keys it
+ * on. It becomes the only noise voice: any other is marked off (state 2 & 1),
+ * and the SPU's noise mask gets this voice's bit alone. */
 
 void vmNoiseOn2(s32 voice, s32 volL, s32 volR) {
     s32 voiceArg;
@@ -363,11 +361,8 @@ void vmNoiseOn2(s32 voice, s32 volL, s32 volR) {
 INCLUDE_ASM("asm/nonmatchings/code_179d8_l", vmNoiseOn2);
 #endif
 
-extern u8 D_8008EA0E;
-extern u8 D_8008EA1C;
-extern u8 D_8008EA1D;
-extern u16 D_8006DAD8[];
-
+/* The SPU pitch of _svm_cur's note on its tone: semitones from the centre
+ * note, looked up at octave 5 and shifted to the note's octave. */
 s32 note2pitch(void) {
     s32 semitones;
     s32 octave;
@@ -391,9 +386,9 @@ s32 note2pitch(void) {
     return pitch;
 }
 
-extern u8 D_8008EA13;
-extern u8 D_8008EA18;
-
+/* note2pitch for an explicit note and fine tune, on _svm_cur's tone: the
+ * fine tune plus the tone's shift is in 8ths of a table step, carrying into
+ * the next semitone past 16 steps. */
 s32 note2pitch2(s32 note, s32 fine) {
     s32 toneIndex;
     s32 tableIndex;
@@ -431,9 +426,8 @@ s32 note2pitch2(s32 note, s32 fine) {
     return pitch;
 }
 
-/* Matched round 73 -- docs/match-reports/SePitchBend.md. */
-extern s16 D_8008EA26[];
-
+/* Bends a keyed voice by `bend` (signed, 127 = the tone's full pbmax
+ * semitones up; below 0, its pbmin down) and retunes it. */
 void SePitchBend(s32 chan, s32 bend) {
     s32 sregIndex;
     s32 prod;
@@ -471,10 +465,9 @@ void SsUtVibrateOn(short vc, short vibW, short vibT) {}
 
 void SsUtVibrateOff(short vc) {}
 
-/* Matched round 73 -- docs/match-reports/SeAutoVol.md. Same body as
- * SeAutoPan (code_179d8_m), over _svm_voice +0x1C..+0x26 instead of
- * +0x28..+0x32. */
-
+/* Starts a volume ramp on a voice from `from` to `to` over `duration`
+ * ticks, which SetAutoVol steps. Same body as SeAutoPan (code_179d8_m.c),
+ * over _svm_voice +0x1C..+0x26 instead of +0x28..+0x32. */
 void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     s16 q;
 

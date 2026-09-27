@@ -1133,3 +1133,13 @@ keep the old spelling.
 `D_8008EA1B` stays: it is `_svm_cur+0xF` (the key-on priority), inside the
 pinned `_svm_cur`, so `rename.py` refuses it. See `SpuVmKeyOnNow.md`,
 round 99 naming.
+
+## History moved from the source (round 99, echo, track 7)
+
+The `#ifdef NON_MATCHING` comment in `src/code_179d8_l.c` carried the
+measurement detail, now only here: 167/167 words, length exact, 74/167 raw
+word-match, funcdiff insertions/deletions 16/16; the rotation is the
+t3/t0/a2/a3 family and is visible from the very first instruction. The body
+was hand-derived. The block's local `extern void SpuSetNoiseVoice(s32, s32)`
+gave way to `<libspu.h>`, and its `(0, 0xFFFFFF)` to `(SPU_OFF, SPU_ALLCH)`;
+the NON_MATCHING object's disassembly is identical before and after.
