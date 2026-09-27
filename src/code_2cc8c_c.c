@@ -234,7 +234,7 @@ void Viewport__Viewport(Viewport *self) {
     self->drawSystem = 0;
     self->viewNode = 0;
     self->sceneRoot = New_SceneNode();
-    obj = (SceneNode *)New_FadeBox(D_8008A90C, 0, 0);
+    obj = (SceneNode *)New_FadeBox(gViewportFadeBoxSize, 0, 0);
     self->fadeBox = obj;
     obj->methods->attachToParent(obj, self->sceneRoot, (LongVec3 *)gFadeBoxAttachPos);
     self->methods->initDefaults(self);

@@ -30,7 +30,7 @@ void Viewport__Viewport(Unk18Obj *self)
     self->unkC = 0;
     self->unk10 = 0;
     self->unkAC = New_SceneNode();
-    obj = New_FadeBox(D_8008A90C, 0, 0);
+    obj = New_FadeBox(gViewportFadeBoxSize, 0, 0);
     self->unkB0 = obj;
     obj->methods->slot4C(obj, self->unkAC, gFadeBoxAttachPos);
     self->methods->slot40(self);
@@ -72,7 +72,7 @@ before the byte-level score did.
 - `New_SceneNode`: local view added, returning `void *` (this unit never
   dereferences it) -- `include/code_d294.h`'s own view types it
   `SceneNodeObj *`, unaffected since it's a separate header.
-- `D_8008A90C`/`gFadeBoxAttachPos`: two new address-taken-only globals.
+- `gViewportFadeBoxSize`/`gFadeBoxAttachPos`: two new address-taken-only globals.
 
 ## Head-broadcast levers (round 13): applicability check
 
