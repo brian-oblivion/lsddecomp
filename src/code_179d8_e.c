@@ -148,7 +148,7 @@ extern s32 gVabSizeTableInited;
 extern s32 gVabStreamInited;
 extern s32 gVabVolumeInited;
 extern s32 gOpenVabCount;
-extern s32 D_8008A8CC;
+extern s32 gSsTicksPerSecond;
 extern void *gPendingVabBuffer;
 
 void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
@@ -171,7 +171,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
         SsSetTableSize(GetSsSizeTableBuf(), 2, 1);
     }
     if (gVabStreamInited == 0) {
-        D_8008A8CC = 0x3C;
+        gSsTicksPerSecond = 0x3C;
         SsSetTickMode(1);
         gVabStreamInited = 1;
     }
@@ -387,10 +387,10 @@ s32 GetOpenVabCount(void) {
     return gOpenVabCount;
 }
 
-extern s32 D_8008A8CC;
+extern s32 gSsTicksPerSecond;
 
 s32 func_8002CC28(void) {
-    return D_8008A8CC;
+    return gSsTicksPerSecond;
 }
 
 s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,

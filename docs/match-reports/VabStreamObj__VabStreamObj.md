@@ -64,7 +64,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
         SsSetTableSize(GetSsSizeTableBuf(), 2, 1);
     }
     if (gVabStreamInited == 0) {
-        D_8008A8CC = 0x3C;
+        gSsTicksPerSecond = 0x3C;
         SsSetTickMode(1);
         gVabStreamInited = 1;
     }
