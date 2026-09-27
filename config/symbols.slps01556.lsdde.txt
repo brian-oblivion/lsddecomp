@@ -3039,3 +3039,4 @@ sListViewColor = 0x8008A8F0;
 gCharSpriteCellRect = 0x8006ED40;
 RegisterRecordTableFiles = 0x8004A070; // type:func
 sRecordRegisterCalls = 0x8008A978;
+sRecordFirstBatchCount = 0x8008A97C;

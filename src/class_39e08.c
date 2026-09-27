@@ -225,7 +225,7 @@ extern void *GetRecordTable(s32 *out);
 extern s32 RegisterFileTableEntries(void *arg0, s32 arg1);
 
 extern s32 sRecordRegisterCalls;
-extern s32 D_8008A97C;
+extern s32 sRecordFirstBatchCount;
 
 s32 RegisterRecordTableFiles(s32 arg0) {
     s32 local;
@@ -243,11 +243,11 @@ s32 RegisterRecordTableFiles(s32 arg0) {
                 sRecordRegisterCalls = prev + 2;
             } else {
                 local = local / 2;
-                D_8008A97C = local;
+                sRecordFirstBatchCount = local;
             }
             break;
         case 2:
-            local = local - D_8008A97C;
+            local = local - sRecordFirstBatchCount;
             break;
         default:
             local = 0;

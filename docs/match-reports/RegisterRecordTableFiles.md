@@ -20,7 +20,7 @@ extern void *GetRecordTable(s32 *out);
 extern s32 RegisterFileTableEntries(void *arg0, s32 arg1);
 
 extern s32 sRecordRegisterCalls;
-extern s32 D_8008A97C;
+extern s32 sRecordFirstBatchCount;
 
 s32 RegisterRecordTableFiles(s32 arg0)
 {
@@ -39,11 +39,11 @@ s32 RegisterRecordTableFiles(s32 arg0)
             sRecordRegisterCalls = prev + 2;
         } else {
             local = local / 2;
-            D_8008A97C = local;
+            sRecordFirstBatchCount = local;
         }
         break;
     case 2:
-        local = local - D_8008A97C;
+        local = local - sRecordFirstBatchCount;
         break;
     default:
         local = 0;
@@ -102,7 +102,7 @@ discarded) and once from `code_1677c.c` as `RegisterRecordTableFiles(0)` (also
 discarded). It is not a class method (no `self` parameter, not reachable
 through any vtable slot in either the 33-slot or 28-slot table this unit
 resolved), and its own body -- a two-call-deep counter over
-`sRecordRegisterCalls`/`D_8008A97C` feeding a loop on `RegisterFileTableEntries` --
+`sRecordRegisterCalls`/`sRecordFirstBatchCount` feeding a loop on `RegisterFileTableEntries` --
 does not establish what it is registering. Per CLAUDE.md, "a wrong tier-A
 name is worse than `func_`"; this stays `RegisterRecordTableFiles` rather than assert
 a guess.
