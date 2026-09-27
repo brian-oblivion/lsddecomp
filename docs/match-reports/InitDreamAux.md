@@ -67,7 +67,7 @@ audio-stream-request object:
 1. For `i` in `0..13`: `gDreamAuxGroupRecords[i]` is a pointer to an array of
    `gDreamAuxGroupCounts[i]` (signed count) 8-byte records; clear byte 0 (offset `0x0`,
    named `flag`) of each.
-2. Build a request (`SetVec3`, already matched elsewhere in
+2. Build a request (`ResourceRequest__Set`, already matched elsewhere in
    `code_171e0.c` as a plain 3-word field setter) with `flag=0`,
    `name="ETC\\SYMSPY.MOM"`, `mode=1`.
 3. A `for (i = 0; i < 1; i++)` loop (see the "loop that only runs once" note
@@ -102,7 +102,7 @@ void InitDreamAux(void)
         }
     }
 
-    SetVec3(&req, 0, gMomPathSymSpy, 1);
+    ResourceRequest__Set(&req, 0, gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
         gDreamAuxSlots[i].obj = New_ModelData((struct ResourceSource *)&req);
@@ -113,7 +113,7 @@ void InitDreamAux(void)
 
 Needs (from `include/code_4cd08.h`, added this round):
 `DreamAuxLoadReq`, `DreamAuxGroupRecord`, `gDreamAuxGroupCounts`, `gDreamAuxGroupRecords`,
-`DreamAuxSlot`, `gDreamAuxSlots`, `SetVec3`, `New_ModelData`.
+`DreamAuxSlot`, `gDreamAuxSlots`, `ResourceRequest__Set`, `New_ModelData`.
 
 ## The residue, precisely
 
@@ -137,7 +137,7 @@ sw    v0, %lo(gDreamAuxSlots)(at)   ; <-- %lo folded into the store's own
 
 Both compute the identical target address; mine is one instruction shorter.
 This is the ONLY residue in the function -- the two preceding loops, the
-`SetVec3` call, and the loop-control shape of the final loop (see
+`ResourceRequest__Set` call, and the loop-control shape of the final loop (see
 `TickDreamAuxSlots`'s report for why `for (i=0;i<1;i++)` is the right shape, not
 decompiler noise) are all byte-exact already (confirmed via `asm-differ`,
 which shows the first ~46 instructions matching before this one diverges).

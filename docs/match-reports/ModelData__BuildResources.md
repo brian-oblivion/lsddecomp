@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-When +0x34 is set: fills a 3-word stack request with SetVec3(&req, buffer + buffer[+8], 0, 1) and constructs a LinkResource (gLinkResourceMethods) object from it (New_LinkResource) into +0x2C; if that succeeded, points req.buffer at buffer + 0x0C and constructs a gTodSetMethods object (New_TodSet) into +0x30; returns 0 when both exist. On either failure it calls its own +0x07C (ModelData__ReleaseResources, which releases what was built) and returns 1. With +0x34 clear, returns 0.
+When +0x34 is set: fills a 3-word stack request with ResourceRequest__Set(&req, buffer + buffer[+8], 0, 1) and constructs a LinkResource (gLinkResourceMethods) object from it (New_LinkResource) into +0x2C; if that succeeded, points req.buffer at buffer + 0x0C and constructs a gTodSetMethods object (New_TodSet) into +0x30; returns 0 when both exist. On either failure it calls its own +0x07C (ModelData__ReleaseResources, which releases what was built) and returns 1. With +0x34 clear, returns 0.
 
 Table slot (`tools/classtable.py`): gModelDataMethods +0x078 (called by ModelData__Load, its setFlag override).
 
@@ -38,7 +38,7 @@ s32 ModelData__BuildResources(ModelData *self) {
     ResourceSourceArgs req;
 
     if (self->ownsResources != 0) {
-        SetVec3(&req, (u8 *)self->buffer + ((ModelDataHeader *)self->buffer)->offset, 0, 1);
+        ResourceRequest__Set(&req, (u8 *)self->buffer + ((ModelDataHeader *)self->buffer)->offset, 0, 1);
         self->linkResource = New_LinkResource((s32)&req);
         if (self->linkResource != NULL) {
             req.buffer = (u8 *)self->buffer + 0xC;
@@ -57,12 +57,12 @@ s32 ModelData__BuildResources(ModelData *self) {
 
 ## Notes
 
-First build. The redundant `sw zero, 0x30` on the second failure is an explicit `self->unk30 = NULL;` in the source. The request is the same { buffer, name/0, mode } descriptor that gTodMethods's ctor (Tod__Tod) reads; SetVec3 (code_171e0) is declared unprototyped here since each unit carries its own reading of it. The allocators take `s32` in this unit, so the request address is cast.
+First build. The redundant `sw zero, 0x30` on the second failure is an explicit `self->unk30 = NULL;` in the source. The request is the same { buffer, name/0, mode } descriptor that gTodMethods's ctor (Tod__Tod) reads; ResourceRequest__Set (code_171e0) is declared unprototyped here since each unit carries its own reading of it. The allocators take `s32` in this unit, so the request address is cast.
 
 ## Naming
 
 - **ModelData__BuildResources**, tier A. Slot +0x078: builds the LinkResource (tmd) and TodSet (tods) sub-objects over the buffer's two sub-blocks.
-- **ResourceSourceArgs** (type, was `Req44858`), tier B (round 95, bravo, track 6). The 12-byte local SetVec3 fills with (buffer, name, mode) and that is passed cast to `ResourceSource *` to New_LinkResource, New_TodSet (here), New_ModelData (TriggerWorld__BuildResources) and New_Tod (TodSet__BuildTods). Only `buffer` is written directly; the name and mode words are written only by SetVec3 and never read by a ctor, so they stay padding. include/code_4cd08.h's `DreamAuxLoadReq` is the same three words in the same role (InitDreamAux: SetVec3 then New_ModelData) but names word 0 `flag`; unifying the two is proposed, not applied (another unit's header).
+- **ResourceSourceArgs** (type, was `Req44858`), tier B (round 95, bravo, track 6). The 12-byte local ResourceRequest__Set fills with (buffer, name, mode) and that is passed cast to `ResourceSource *` to New_LinkResource, New_TodSet (here), New_ModelData (TriggerWorld__BuildResources) and New_Tod (TodSet__BuildTods). Only `buffer` is written directly; the name and mode words are written only by ResourceRequest__Set and never read by a ctor, so they stay padding. include/code_4cd08.h's `DreamAuxLoadReq` is the same three words in the same role (InitDreamAux: ResourceRequest__Set then New_ModelData) but names word 0 `flag`; unifying the two is proposed, not applied (another unit's header).
 - **ModelDataHeader** (type, was `Buf44858`), tier A (round 95, bravo, track 6). ModelData's buffer as this body reads it: the word at +0x08 is the offset of the TMD New_LinkResource is built over, and +0x0C is where New_TodSet's data starts. Words +0x00 and +0x04 are read by no code (padding). The buffer is a .MOM file by the one file-name caller (InitDreamAux: `ETC\SYMSPY.MOM`), but the name is the class's so it claims no more than the code.
 
 ## Track 4
@@ -81,4 +81,4 @@ New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct R
 | --- | --- | --- | --- |
 | `ModelDataHeader.offset` | `tmdOffset` | A | the sub-block New_LinkResource is built over, which LinkResource__BuildModels reads as a TmdFile |
 | `(u8 *)buffer + 0xC` | `ModelDataHeader.tods` | A | New_TodSet's buffer |
-| `ResourceSourceArgs.unk4`, `unk8` | `pad4[8]` | A | no code here reads them; SetVec3 writes the name (NULL) and a 1 there. Its prototype's parameters are now `(buffer, name, mode)`, as include/code_4cd08.h reads the same call |
+| `ResourceSourceArgs.unk4`, `unk8` | `pad4[8]` | A | no code here reads them; ResourceRequest__Set writes the name (NULL) and a 1 there. Its prototype's parameters are now `(buffer, name, mode)`, as include/code_4cd08.h reads the same call |

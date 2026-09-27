@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Build step: SetVec3 fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset, allocate a gModelDataMethods source through New_ModelData and store it over the offset word itself (entries[i]), counting successes at +0x38. On an allocation failure call its own +0x07C (TriggerWorld__ReleaseResources, which releases the ones built and zeroes the count) and return 1; otherwise 0. The sibling of gModelDataMethods's ModelData__BuildResources.
+Build step: ResourceRequest__Set fills a three-word request {buffer, 0, 1}; for each of the buffer's `count` offsets, point the request at buffer+offset, allocate a gModelDataMethods source through New_ModelData and store it over the offset word itself (entries[i]), counting successes at +0x38. On an allocation failure call its own +0x07C (TriggerWorld__ReleaseResources, which releases the ones built and zeroes the count) and return 1; otherwise 0. The sibling of gModelDataMethods's ModelData__BuildResources.
 
 Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x078.
 
@@ -34,7 +34,7 @@ s32 TriggerWorld__BuildResources(DataSrc33808 *self) {
     s32 i;
     s32 n;
 
-    SetVec3(&req, 0, 0, 1);
+    ResourceRequest__Set(&req, 0, 0, 1);
     buf = self->buffer;
     i = 0;
     n = buf->count;
