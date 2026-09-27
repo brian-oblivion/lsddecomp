@@ -110,13 +110,16 @@ s32 GetBMemPMgrBusy(void) {
 }
 
 /* The drawn object's attribute bits, as SortTmdObject publishes them for
- * SetupPrimCode and the submit wrappers (D_8008E248, GsLOFF, is
- * declared in BMemPMgr.h). Sony's GsSortObject4 keeps the same four fields
- * in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. */
-/* GsDIV1..5, the object's default ndiv, from bits 9-11 of its flags. It
- * keeps its address-style name because config/psyq-objects.ld's `dc_cb` pin
- * covers the address; see the report. */
-extern s32 D_80090C18;
+ * SetupPrimCode and the submit wrappers. Sony's GsSortObject4 keeps the same
+ * four fields in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. D_8008E248 is bit 6 of
+ * the object's flags word, which SetupPrimCode ORs into the GPU command
+ * byte's shade-texture bit 0x1 (Psy-Q's SetShadeTex); it keeps its address
+ * name because it is bss past the image end, where rename.py cannot reach
+ * (the proposed name is in SetupPrimCode.md). D_80090C18 is the default ndiv
+ * from bits 9-11; it keeps its address name because config/psyq-objects.ld's
+ * `dc_cb` pin covers the address (see its report). */
+extern s32 D_8008E248;              /* GsLOFF */
+extern s32 D_80090C18;              /* GsDIV1..5: subdivision level */
 extern s32 gSortUseGlobalLightMode; /* GsLLMOD */
 extern s32 gSortLightMode;          /* GsFOG | GsMATE */
 
@@ -207,6 +210,13 @@ typedef struct TmdGroupHeader {
 /* clang-format on */
 extern Rgb8 gTexturedFaceColor;
 
+/* The two subdivision work buffers the SubmitPoly* wrappers hand Sony's
+ * RCpoly* packers, a DIVPOLYGON3 and a DIVPOLYGON4 back to back (0x218
+ * bytes apart, sizeof(DIVPOLYGON3)). Declared as bytes: InitDivPolygonPtrs
+ * takes their addresses and the wrappers cast. */
+extern u8 gDivPolygon3[];
+extern u8 gDivPolygon4[];
+
 /* Defined at the bottom of this file, after SortTmdObject and
  * ProjectQuadFace, which call them. The submit wrappers and the two
  * four-vertex XY stores are declared without parameters: each takes its own
@@ -226,7 +236,8 @@ void *SubmitPolyFT4();
 void *SubmitPolyGT3();
 void *SubmitPolyGT4();
 
-/* Defined below SortTmdObject, which calls them. */
+/* Defined below SortTmdObject, which calls them (and ProjectTriFace and
+ * ProjectQuadFace, which call the last two). */
 void SetupPrimCode(void *prim, PolyDrawCtx *ctx);
 s32 ProjectTriFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, void (*storeSxy)(void *));
 s32 ProjectQuadFace(void *prim, PolyDrawCtx *ctx, u16 idx0, u16 idx1, u16 idx2, u16 idx3,
@@ -237,6 +248,8 @@ void StoreSxyPolyFT3(void *dst);
 void StoreSxyPolyGT3(void *dst);
 void StoreSxyPolyF4(void *dst, s32 storeFirst3);
 void StoreSxyPolyG4(void *dst, s32 storeFirst3);
+s32 TransformAndCullPoly(void *prim, void *ctx);
+void FlagLargePolyForDivide(void *ctx, s32 count);
 
 /*
  * The game's own GsSortObject4 (same arguments): emit every surviving face of

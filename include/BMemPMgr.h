@@ -3,10 +3,10 @@
 
 #include "common.h"
 
-/* The BasicClass type, its method table and its list primitives are
- * include/BasicClass.h (FINISHING-PLAN track 4: one header per class).
- * This header keeps the rest of the BMemPMgr units' declarations: the
- * pool allocator, the prim-setup and GTE helpers. */
+/* The BMemPMgr pool allocator, src/BMemPMgr.c (its busy-flag accessors are
+ * in src/TmdRenderer.c). BasicClass, whose child and parent lists are
+ * allocated from the pool, is include/BasicClass.h; both files that include
+ * this header use it. */
 #include "BasicClass.h"
 
 /*
@@ -98,43 +98,5 @@ extern BMemPMgr *gDefaultBMemPMgr;
 extern s32 gBMemPMgrBusy;
 extern void SetBMemPMgrBusy(s32 val);
 extern s32 GetBMemPMgrBusy(void);
-
-/* Global boolean flag read by SetupPrimCode, asm/data (bss/data, not yet
- * carved). Read by SetupPrimCode, written by SortTmdObject (both TmdRenderer)
- * from bit 6 of the drawn object's flags word; SetupPrimCode ORs it into bit
- * 0x1 of the GPU command byte, which is the shade-texture bit Psy-Q's
- * SetShadeTex() sets. PROPOSED RENAME (round 51, tier B): gShadeTex.
- * tools/rename.py cannot do it -- "resolves to 0x8008e248, outside the
- * image", because it is bss past the image end -- so the head applies it. */
-extern s32 D_8008E248;
-
-/* GTE transform/clip/OT-bucket routine, this unit (TmdRenderer; ordinary C
- * over the include/gte.h macros -- see docs/match-reports/TransformAndCullPoly.md;
- * the .c holds its local struct views of both arguments). arg1 is the
- * per-object draw context (OT base +0x0, OT shift +0x4, culled-flag +0x78,
- * SXY0-2 cache +0x60/0x64/0x68, computed OT bucket pointer +0x30, ...);
- * arg0 is the Psy-Q GPU primitive being filled in, and its only touched
- * field is the P_TAG length byte at +0x3, re-stamped from the copy
- * SetupPrimCode cached at arg1->0x14. Returns 0 on success (OT bucket
- * computed and stored), 1 if the primitive was culled/degenerate. Declared
- * here because its two callers in this unit (ProjectTriFace,
- * ProjectQuadFace) are earlier in ROM order and so precede its own
- * definition in the .c file. */
-extern s32 TransformAndCullPoly(void *arg0, void *arg1);
-
-/* TmdRenderer. Called by ProjectTriFace/ProjectQuadFace for a face that
- * survived the cull: takes the screen bounding box of its `count` (3 or 4)
- * cached XYs and sets ctx+0x78, the flag that makes the SubmitPoly*
- * wrappers subdivide the face through RCpoly*, when the box is wider or
- * taller than 256 pixels. */
-extern void FlagLargePolyForDivide(void *ctx, s32 count);
-
-/* The two subdivision work buffers TmdRenderer's SubmitPoly* wrappers hand
- * Sony's RCpoly* packers: a DIVPOLYGON3 and a DIVPOLYGON4 (libgte.h), laid
- * out back to back (0x218 bytes apart, sizeof(DIVPOLYGON3)). Declared as
- * bytes here because this header does not include <libgte.h>; TmdRenderer
- * only takes their addresses (InitDivPolygonPtrs) and TmdRenderer casts. */
-extern u8 gDivPolygon3[];
-extern u8 gDivPolygon4[];
 
 #endif
