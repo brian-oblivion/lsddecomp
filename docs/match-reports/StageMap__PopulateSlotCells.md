@@ -294,7 +294,7 @@ one real call site, `StageMap__OnNotifyTag1`'s `self->methods->slot104(self, e)`
    call its self-only teardown slot (`vtbl[1]`, i.e. `+0x004`).
 4. Reload `info` (fresh read of `hdr->field10`, NOT cached -- retail
    genuinely re-derives it). Build a 0x10-byte load-request local
-   (`BE54LoadReq`, only `field0` written = `info + info->unk4 +
+   (`ResourceSourceRequest`, only `field0` written = `info + info->unk4 +
    info->unk8`) and call `New_LinkResource(&req)`, storing the result into
    `target->unk2C`. Zero the "found" flag in the loop's outBuf.
 5. Loop forever: `idxVal = target->methods->slot78(target, &outBuf, i)`.
@@ -417,12 +417,12 @@ typedef struct BE54OutBuf {
     u8 pad38[0x8];               /* trailing bytes never read/written by this function */
 } BE54OutBuf;
 
-typedef struct BE54LoadReq {
+typedef struct ResourceSourceRequest {
     s32 field0;
     u8 pad4[0xC];
-} BE54LoadReq;
+} ResourceSourceRequest;
 
-extern LinkResource *New_LinkResource(BE54LoadReq *req);
+extern LinkResource *New_LinkResource(ResourceSourceRequest *req);
 extern void GsLinkObject4(s32 tmd, void *objp, s32 n);
 
 void StageMap__PopulateSlotCells(Obj866E8 *self, Elem *entry) {
@@ -444,7 +444,7 @@ void StageMap__PopulateSlotCells(Obj866E8 *self, Elem *entry) {
     s32 off1;
     s32 off2;
     BE54OutBuf outBuf;
-    BE54LoadReq req;
+    ResourceSourceRequest req;
 
     hdr = entry->unk4;
     target = entry->unk8;
@@ -529,7 +529,7 @@ fixes, worth recording since each is a small, generalizable lever:
 
 1. **A stack-local outBuf's true size includes bytes it never reads.**
    `BE54OutBuf`'s last USED field (`found`, at `+0x034`) is not the
-   struct's true end -- retail's next local (`BE54LoadReq`) sits 8 bytes
+   struct's true end -- retail's next local (`ResourceSourceRequest`) sits 8 bytes
    further out (`$sp+0x50`, not `$sp+0x48`). Padding the struct to `0x38`
    (adding an unread `pad38[0x8]`) fixed the whole function's frame size
    from `0x78` to the correct `0x80` in one change. **A local scratch
@@ -886,7 +886,7 @@ Sony's `GsLinkObject4`. The comment that stood on it, moved here: *"PlacementGri
 non-0/non-(-1) return value (what LinkResource__GetModel returns): a TmdModel
 (include/TmdModel.h), read only for its +0x010, TmdModel's `object`. A view of
 TmdModel, left for that class (round 89, LinkResource's unification did not
-retype it)."* `BE54LoadReq.field0` is `buffer` (tier A: it is the first word of
+retype it)."* `ResourceSourceRequest.field0` is `buffer` (tier A: it is the first word of
 New_LinkResource's descriptor, GraphicsResources.c's `ResourceSource { void *buffer; char
 *name; }`, and holds the address of the chunk header's model block). The type
 keeps its placeholder name (track 6); its 0x10 size is kept, not measured as
@@ -915,3 +915,35 @@ Measured and left: walking `cells` by index instead of byte offset (`&slot->cell
 ```
 
 The barrier's two-line comment became `/* MATCHING: keeps the rec.x/.y/.z loads below the coord2 load */` (evidence in "asm sites" above).
+
+## Track 6 (2026-09-27, round 96, delta)
+
+`BE54LoadReq` -> `ResourceSourceRequest` (tier A). It is the descriptor the
+body passes to `New_LinkResource`, cast to that ctor's `struct
+ResourceSource` (src/GraphicsResources.c: `{ void *buffer; char *name; }`,
+a buffer to adopt, or with `buffer` NULL a file name to request), and the
+body sets only `buffer`, to the chunk header's model block
+(`header + placementsOffset + placementsSize`). The name follows
+include/LinkResource.h's banner ("the callers outside GraphicsResources
+build it in their own 0x10-byte request types").
+
+Its 0x10 size is load-bearing, measured this round: giving it
+ResourceSource's own 8 bytes (`buffer`, `name`) builds the frame at 0x78
+instead of 0x80 and the function at 132/150. So it cannot be replaced by
+ResourceSource itself; the body keeps a `MATCHING` line on the type. The
+unread +0x04..+0x0F stays padding (no code reads or writes it).
+
+**Proposed (head, not applied: outside this job's edit set).** The same
+0x10-byte record is declared twice more, with ResourceSource's fields under
+other names: include/class_39e08.h `LoadRequest` and src/code_1677c.c
+`LoadModelRequest`, both `{ s32 type; const char *path; s32 unk08; s32
+unk0C; }`, whose callers write `type = 0` (ResourceSource's NULL `buffer`)
+and `path` (its `name`) before `New_LinkResource`. One
+`ResourceSourceRequest { void *buffer; char *name; u8 pad8[8]; }` in the
+header owning ResourceSource (LinkResource.h, or FileResource.h, the
+common parent of the five ctors that take it, once ResourceSource itself
+moves out of GraphicsResources.c) would retire all three; field renames
+`type` -> `buffer`, `path` -> `name`. The three-word SetVec3 descriptors
+(GraphicsResources.c `ResourceSourceArgs`, include/code_4cd08.h
+`DreamAuxLoadReq`, include/code_171e0.h `Vec3_171e0`) are the same family
+at 0x0C and are left to that job.
