@@ -42,11 +42,11 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
     self->methods->addChild(self, (BasicClass *)dreamSys);
 }
 
-void ObjM__GetGridRecord(ObjM *self, s32 code, s32 arg2, s32 arg3) {
-    if (code >= 0) {
-        GetGridRecordAt(self->stage, code);
+void ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
+    if (cell >= 0) {
+        GetGridRecordAt(self->stage, cell);
     } else {
-        GetGridRecordXY(self->stage, arg2, arg3);
+        GetGridRecordXY(self->stage, x, y);
     }
 }
 
@@ -59,10 +59,10 @@ void ObjM__DetachTarget(ObjM *self) {
  * `Rec1C *(s32 index, ...)`, read here as the value handed on),
  * src/code_d294_c.c (func_8001EF60) and class_3bb8c_m (RegisterStyleConfig,
  * whose third argument is kept as gStyleSceneRefs). */
-extern s32 PickVariant(s32 index, s32 arg1);
-extern s32 PickDailyVariant(s32 index, s32 arg1, s32 day);
-extern void func_8001EF60(s32 arg0);
-extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
+extern s32 PickVariant(s32 stage, s32 unused);
+extern s32 PickDailyVariant(s32 stage, s32 unused, s32 day);
+extern s32 func_8001EF60(s32 value);
+extern s32 RegisterStyleConfig(void *grid, s32 stage, s32 *sceneRefs, s32 day, s32 arg4);
 
 /* Data reached by address: the viewport's view point and view reference
  * (attachViewChild), the StageMap's bounds; and gStagePendingExtras, one
@@ -75,25 +75,26 @@ extern CellBounds gStage0Bounds;
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 arg3) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
-    s32 ret1;
+    s32 record;
+    s32 day;
     s32 flag;
 
     vp->methods->detachViewChild(vp);
     self->timBlockPending = 1;
-    ret1 = PickVariant(self->stage, 0);
-    self->bgm->methods->setSeq(self->bgm, (char *)ret1);
+    record = PickVariant(self->stage, 0);
+    self->bgm->methods->setSeq(self->bgm, (char *)record);
 
-    ret1 = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    ret1 = PickDailyVariant(self->stage, 0, ret1);
-    self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc(ret1);
+    day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
+    record = PickDailyVariant(self->stage, 0, day);
+    self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc(record);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
                                  &gObjMViewRefPoint, 0);
 
     self->cachedViewport = vp;
-    ret1 = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
+    day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     self->styleConfig =
-        (StyleConfig *)RegisterStyleConfig(self->unk14, self->stage, (s32 *)&self->ctorSound, ret1, 0);
+        (StyleConfig *)RegisterStyleConfig(self->unk14, self->stage, (s32 *)&self->ctorSound, day, 0);
     if (style != 0) {
         self->styleConfig = style;
     }
@@ -162,8 +163,8 @@ void ObjM__OnTag1Notify(ObjM *self, void *sender, s32 event) {
  * up (a failure also adds 0x1E to the DreamSys's time limit). With nothing
  * pending and the StageMap idle, the style session starts. */
 void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
-    s32 ret;
-    s32 sel;
+    s32 timer;
+    s32 colorMode;
     TimBlockSrcColor *color;
     TimBlockSrcMethods *m;
 
@@ -172,12 +173,12 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
             src->methods->release(src);
             self->timBlockPending = 0;
             self->methods->setupSceneStyle(self);
-            ret = self->dreamSys->methods->getDreamTimerScaled(self->dreamSys);
-            self->dreamSys->methods->getSetDreamTimeLimit(self->dreamSys, ret + 0x1E);
+            timer = self->dreamSys->methods->getDreamTimerScaled(self->dreamSys);
+            self->dreamSys->methods->getSetDreamTimeLimit(self->dreamSys, timer + 0x1E);
         } else if (src->loaded != 0) {
-            sel = self->styleConfig->colorMode;
+            colorMode = self->styleConfig->colorMode;
             m = src->methods;
-            if (sel != 2) {
+            if (colorMode != 2) {
                 color = self->styleConfig->farColor;
             } else {
                 color = self->styleConfig->clearColor;
@@ -206,31 +207,31 @@ void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code) {
         return;
     }
     if (code == 0x16) {
-        goto case_c8;
+        goto closeAndNotify;
     }
     if (code < 0x17) {
         if (code == 0xC) {
-            goto case_c0;
+            goto updateCloseReady;
         }
         return;
     }
     if (code == 0x21) {
-        goto case_74;
+        goto togglePause;
     }
     if (code == 0x2C) {
-        goto case_c4;
+        goto clearCloseReady;
     }
     return;
-case_74:
+togglePause:
     fn = m->togglePause;
     goto call;
-case_c0:
+updateCloseReady:
     fn = m->updateCloseReadyFlag;
     goto call;
-case_c8:
+closeAndNotify:
     fn = m->closeAndNotifyD;
     goto call;
-case_c4:
+clearCloseReady:
     fn = m->clearCloseReadyFlag;
 call:
     fn(self);
@@ -322,10 +323,10 @@ void ObjM__EnterStyleSession(ObjM *self) {
     NodeGuardedViewport *vp;
     FadeBox *fade;
     StyleConfig *style;
-    s32 local10;
-    s32 ret;
-    s32 a2;
-    void *a1;
+    DreamColors flashColor;
+    s32 flashback;
+    s32 channels;
+    void *farColor;
 
     self->inSession = 1;
     self->dreamSys->methods->resetLinkState(self->dreamSys, self->moveMode, self->tickPeriod);
@@ -338,26 +339,26 @@ void ObjM__EnterStyleSession(ObjM *self) {
     vp->methods->setFogNear(vp, style->fogNear);
     m = vp->methods;
     if (style->colorMode != 1) {
-        a1 = style->farColor;
+        farColor = style->farColor;
     } else {
-        a1 = style->clearColor;
+        farColor = style->clearColor;
     }
-    m->setFarColor(vp, a1);
+    m->setFarColor(vp, farColor);
     vp->methods->setUnkB4(vp, 0);
     vp->methods->setDrawEnabled(vp, 1);
 
     fade = (FadeBox *)vp->methods->getFadeBox(vp);
     self->methods->addChild(self, (BasicClass *)fade);
 
-    ret = self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, (DreamColors *)&local10, -1);
-    fade->methods->setDivisorMode(fade, ret, (ret != 0) ? 3 : 0);
+    flashback = self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &flashColor, -1);
+    fade->methods->setDivisorMode(fade, flashback, (flashback != 0) ? 3 : 0);
     m2 = fade->methods;
-    if (ret == 0) {
-        a2 = -1;
+    if (flashback == 0) {
+        channels = -1;
     } else {
-        a2 = local10;
+        channels = flashColor;
     }
-    m2->startFadeDown(fade, self->unk10, a2, 0);
+    m2->startFadeDown(fade, self->unk10, channels, 0);
 }
 
 void ObjM__TickStyle(ObjM *self) {
@@ -401,33 +402,33 @@ void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code) {
 }
 
 void ObjM__EnterState4(ObjM *self) {
-    s32 local18;
-    s32 span;
+    DreamColors color;
+    s32 phase;
     s32 t;
-    s32 arg3;
+    s32 step;
 
     self->state = 4;
-    if (self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, (DreamColors *)&local18, -1) == 0) {
-        span = (self->frameCounter + self->stage) & 3;
-        t = span;
+    if (self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &color, -1) == 0) {
+        phase = (self->frameCounter + self->stage) & 3;
+        t = phase;
         if (t == 0) {
             self->methods->notifyParents(self, 4);
             return;
         }
-        arg3 = 0xA;
+        step = 0xA;
         switch (t) {
             case 1:
-                local18 = 0;
+                color = 0;
                 break;
             case 2:
-                local18 = 4;
+                color = 4;
                 break;
             case 3:
-                local18 = 7;
-                arg3 = 5;
+                color = 7;
+                step = 5;
                 break;
         }
-        ObjM__StartFadeUp(self, local18, 0, arg3, 1);
+        ObjM__StartFadeUp(self, color, 0, step, 1);
         return;
     }
     ObjM__StartFadeUp(self, 0, 0, 5, 1);
