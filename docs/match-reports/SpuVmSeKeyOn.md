@@ -60,3 +60,47 @@ of the `div`/`break 6`/`break 7` sequence needed.
 None beyond what's already written down; this one just confirmed the
 existing "unused 4th register argument" and "runtime `/` reproduces the
 safe-division expansion" idioms transfer cleanly to a fresh function.
+
+## Round 97 types pass (echo)
+
+Sony's function (libsnd/vmanager); the function name is Sony's and was not
+touched. Parameters renamed from m2c's `p0..p5` to `vabId, prog, note,
+unused, volL, volR` and the locals `outA/outB` to `vol/pan`: the three leading
+arguments are forwarded unchanged to `SpuVmKeyOn`'s VAB/program/note slots,
+the fourth is never read, and the last two are reduced to one volume (the
+larger) and a pan of 64 when equal, `volR*64/volL` (< 64, left) when left is
+louder and `127 - volL*64/volR` (> 64, right) when right is louder. `0x40`
+and `0x7F` became decimal `64`/`127` (volume/pan values). `0x21` became
+`SPUVM_SE_SEQ`, local to the unit: both SE key functions pass it as
+`SpuVmKeyOn`/`SpuVmKeyOff`'s first (sequence) argument, and the SE paths in
+`libsnd_vm_vol_ut_key_ut_keyv.c` store the same value in `D_8008EA22` and
+`_svm_voice[].unk0E`. Byte-exact unchanged.
+
+## Unit banner history (moved from src/code_179d8_j.c, round 97)
+
+The unit's banner carried this history; it moved here when the banner was
+rewritten as documentation.
+
+- Carved round 21 (2026-09-06) out of the middle of the old
+  `code_179d8_mid_c` by blocker density: the front quarter of functions
+  173..198 of the original `code_179d8` monolith, 0x20ADC..0x20FF0.
+- Round 34 (2026-09-12): the slice was cut in two by the linked
+  `libsnd/vm_prog.o` (Psy-Q 3.6) at 0x20FF0..0x21180, whose four functions
+  (`SpuVmSetProgVol`, `SpuVmGetProgVol`, `SpuVmSetProgPan`,
+  `SpuVmGetProgPan`, previously matched as `func_800307F0`, `func_80030864`,
+  `func_800308B8`, `func_8003092C`) had their C deleted; everything from
+  `SpuVmSetVol` on moved to `src/libsnd_vm_vol_ut_key_ut_keyv.c`. The
+  `SlotE968` local view of `_svm_pg` left with them (those four were its only
+  readers). All four had screened clean on every blocker, the lesson being
+  that `nearmiss.py`/`sdkstalls.py` must run before any WORKABLE list is
+  believed.
+- The old monolith has no `jtbl_` and no `.word .L`, so no unit of this
+  family owns a rodata attach.
+- Round 42/43: the banner's "BLOCKED" verdicts (`gp_rel`, `nop_mflo_mfhi`,
+  `addiu_at`) were retracted; all three constructs are resolved maspsx flags.
+- Round 79: `KeyOnCheck` identified as vmanager's internal hook; the unit
+  holds no game code.
+- Round 97: the local `Entry90902E8` view (only `+0x74`/`+0x76` named, as
+  `s16`) retired onto `include/SsScore.h`; the unused externs `SpuVmVSetUp`,
+  `SpuVmPBVoice`, `SeAutoVol`, `SeAutoPan` (no call in any of the unit's C or
+  asm) were dropped.

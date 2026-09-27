@@ -44,3 +44,17 @@ and asm-differ shows the `_ss_score[(u8) p0]` table load (`lui/addiu/addu at`,
 `lw v1,0(at)`) sunk from before the `sh a0,-0x15de(at)` store to `D_8008EA22`
 down to after the whole index multiply chain. Retail loads first, then stores.
 Instruction order.
+
+## Round 97 types pass (echo)
+
+The local `Entry90902E8` view retired onto `include/SsScore.h` (same
+0xAC-byte `_ss_score` record; this unit only reads `+0x74`/`+0x76`, the
+sequence's left/right volume that `SpuVmSetSeqVol` stores). The header
+declares those two fields `u16`, as `SpuVmSetSeqVol`'s `lhu` reloads and the
+other SsScore.h users need. `SpuVmGetSeqVol` stores them straight into `s16`
+outputs (retail `lhu`, unchanged); `SpuVmGetSeqLVol`/`SpuVmGetSeqRVol` return
+them sign-extended (retail `lh`), so their returns carry an `(s16)` cast
+marked MATCHING rather than a change to the shared field type. Parameters
+renamed `p0` -> `seqSepNo` (the packed access/sequence number), `out1/out2`
+-> `volL/volR`, locals `tbl` -> `seqs`, `channel` -> `access`, `recIdx` ->
+`seq`. Byte-exact unchanged.
