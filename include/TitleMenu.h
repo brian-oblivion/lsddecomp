@@ -61,7 +61,7 @@
  * Accessors that read an inherited field at another type than TaskCore's:
  * the ctor casts `sound` to VabStreamObj; onDeinit casts initArgs->drawSystem
  * to DrawSystem to call its clearImage (TaskCore__OnDeinit makes the same call
- * through code_2c054.h's TaskTextObj); beginCardAccess
+ * through DrawSystem as well); beginCardAccess
  * adds `saveCtrl` as a child, upcast to BasicClass.
  *
  * The object is 0xC4 bytes (New_TitleMenu's allocation).

@@ -328,10 +328,10 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
     obj->methods->release(obj);
 
     switch (status) {
-        case 2:
+        case DAYTASK_RESULT_CINEMATIC:
             GameApplication__StartCinematicStream(self);
             break;
-        case 3:
+        case DAYTASK_RESULT_CLOSED:
             self->skipGraphRoomPoll = 1;
             break;
     }
