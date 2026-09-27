@@ -94,16 +94,16 @@ VabDriverMethods *GetVabDriverMethods(void) {
 extern s32 gVabDriverMode;
 extern s32 gVabDriverModeArg;
 
-s32 GetVabDriverMode(s32 *arg0) {
-    if (arg0 != NULL) {
-        *arg0 = gVabDriverModeArg;
+s32 GetVabDriverMode(s32 *outMode2) {
+    if (outMode2 != NULL) {
+        *outMode2 = gVabDriverModeArg;
     }
     return gVabDriverMode;
 }
 
-s32 SetVabDriverMode(s32 a, s32 b) {
-    gVabDriverMode = a;
-    gVabDriverModeArg = b;
+s32 SetVabDriverMode(s32 async, s32 mode2) {
+    gVabDriverMode = async;
+    gVabDriverModeArg = mode2;
     return 1;
 }
 
@@ -135,7 +135,7 @@ extern FileResourceMethods *GetActiveDataSourceMethods(void);
 extern char *GetSsSizeTableBuf(void);
 extern s32 IsWBgmActive(void);
 extern void *BMemPMgrFree(void *ptr);
-extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
+extern char *BuildFileName(char *dest, char *name, char *dir, char *ext);
 extern s32 strlen(char *s);
 extern char *strcpy(char *dest, char *src);
 
