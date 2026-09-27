@@ -35,7 +35,7 @@ reshaping needed.
 - `TitleMenu::unkA4` **retyped** from `void *` to `DreamSysView_3bb8c_c *`
   -- this is the first function to dereference it through its own vtable
   (`slotF0`) rather than only forwarding it opaquely (as
-  `TitleMenu__TitleMenu`/`FormatNumberIntoBuffer`, both already matched in
+  `TitleMenu__TitleMenu`/`StampSaveTitleDay`, both already matched in
   `class_3bb8c_c.c`, do). Same size (4 bytes), so no layout change; the
   existing assignment `self->unkA4 = dreamSys;` in `TitleMenu__TitleMenu` (where
   `dreamSys` is a `void *` parameter) still compiles under ordinary C
@@ -49,7 +49,7 @@ reshaping needed.
   `TitleMenuMethods::slotF0` (see `TitleMenu__SetState`'s report) -- same
   offset number, two unrelated tables, no conflict.
 - New `extern s32 sTitleTimPath;` (address-of only, placeholder type, same
-  convention as the neighbouring `D_80086D44`/`D_800114DC`).
+  convention as the neighbouring `sTitleMenuTarget`/`sTitleMenuSoundBankPath`).
 
 ### Proposed learning
 

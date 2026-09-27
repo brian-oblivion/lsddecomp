@@ -17,7 +17,7 @@ constructor chaining pattern already documented for
 handed to it by the base ctor chain (`self->unk48`), stores its own
 `dreamSys` argument, zeroes one field, makes two calls through `dreamSys`'s
 own vtable (storing one result, forwarding the other's return value to the
-still gp_rel-blocked `FormatNumberIntoBuffer`), then makes two more calls through
+still gp_rel-blocked `StampSaveTitleDay`), then makes two more calls through
 its own freshly-installed vtable.
 
 ## The C
@@ -28,7 +28,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, void *dreamSys)
     DreamSysView_3bb8c_c *dream;
     TitleMenuUnk48Obj *obj;
 
-    Get_vtable_TaskCore()->slot08(self, &D_80086D44, &D_800114DC, 0);
+    Get_vtable_TaskCore()->slot08(self, &sTitleMenuTarget, &sTitleMenuSoundBankPath, 0);
     self->methods = GetTitleMenuMethods();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);
@@ -36,8 +36,8 @@ void TitleMenu__TitleMenu(TitleMenu *self, void *dreamSys)
     self->unkAC = 0;
     dream = dreamSys;
     self->unkBC = dream->methods->slot1B0(dream, &self->unkC0);
-    FormatNumberIntoBuffer(dream->methods->slot1A0(dream, 0));
-    self->methods->slotD8(self, &D_80086D44);
+    StampSaveTitleDay(dream->methods->slot1A0(dream, 0));
+    self->methods->slotD8(self, &sTitleMenuTarget);
     self->methods->slot40(self, dreamSys);
 }
 ```
@@ -46,8 +46,8 @@ void TitleMenu__TitleMenu(TitleMenu *self, void *dreamSys)
 
 All new declarations -- this class (`TitleMenu`) had no prior C-level
 presence anywhere in the project. Placed as one new block right before the
-`Ctx678_3bb8c_c`/`CheckSaveScoreFlag` section, since ROM order puts
-`New_TitleMenu`/`TitleMenu__TitleMenu` right before `CheckSaveScoreFlag`.
+`Ctx678_3bb8c_c`/`UpdateFlashbackLock` section, since ROM order puts
+`New_TitleMenu`/`TitleMenu__TitleMenu` right before `UpdateFlashbackLock`.
 
 - `TitleMenu`/`TitleMenuMethods`: `ctor` (+0x008, this function),
   `slot40` (+0x040, this function's own last call), `slotD8` (+0x0D8, this
@@ -89,9 +89,9 @@ presence anywhere in the project. Placed as one new block right before the
   since each translation unit in this project gets its own extern
   prototype for a given external symbol and this unit does not otherwise
   need that header.
-- `D_80086D44`, `D_800114DC`: address-of-only placeholder `s32` globals
+- `sTitleMenuTarget`, `sTitleMenuSoundBankPath`: address-of-only placeholder `s32` globals
   (same convention as this file's existing `sDefaultTargetSpecs`).
-- `FormatNumberIntoBuffer` prototype: `extern void FormatNumberIntoBuffer(s32 arg0);` -- the
+- `StampSaveTitleDay` prototype: `extern void StampSaveTitleDay(s32 arg0);` -- the
   unit's own still-blocked (gp_rel) function; needed here only as a
   forward declaration so this function can call it. Return value unused at
   this call site, hence `void`.
@@ -101,7 +101,7 @@ presence anywhere in the project. Placed as one new block right before the
 Matched on the first attempt, no residue. Statement order in the C mirrors
 retail's instruction order exactly (including reading `self->unk48` before
 overwriting `self->methods`, and computing `dream->methods->slot1B0(...)`
-before the `FormatNumberIntoBuffer` forward, matching the retail read-then-store and
+before the `StampSaveTitleDay` forward, matching the retail read-then-store and
 call-then-call sequencing word-for-word).
 
 ## Proposed learning
@@ -144,7 +144,7 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The body now reads at TaskCore's names: `unk48` is TaskCore's `sound`, called at +0x09C through VabStreamObj (setPitchOffset, as GraphRoom's ctor does); `slotD8` is setTarget, with D_80086D44 retyped TaskCoreTarget; `onConstruct` (+0x040) is resetCounters, called through TitleMenuResetCallFn because the call passes dreamSys and the slot (and TitleMenu__Reset) take self alone; `unkBC`/`unkC0` are `saveBlock` (`s32 *`, getSaveBlock's result, no cast now) and `saveBlockSize`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The body now reads at TaskCore's names: `unk48` is TaskCore's `sound`, called at +0x09C through VabStreamObj (setPitchOffset, as GraphRoom's ctor does); `slotD8` is setTarget, with sTitleMenuTarget retyped TaskCoreTarget; `onConstruct` (+0x040) is resetCounters, called through TitleMenuResetCallFn because the call passes dreamSys and the slot (and TitleMenu__Reset) take self alone; `unkBC`/`unkC0` are `saveBlock` (`s32 *`, getSaveBlock's result, no cast now) and `saveBlockSize`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 6 (2026-09-26, round 93, delta): the class is TitleMenu
 
@@ -152,7 +152,7 @@ TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus
 address, gClass86B60Methods at 0x80086B60). Tier A for the class name, from
 data the class itself reads:
 
-- its TaskCoreTarget, D_80086D44, has `names` = D_80086CF8 = "START",
+- its TaskCoreTarget, sTitleMenuTarget, has `names` = D_80086CF8 = "START",
   "FLASHBACK", "SAVE", "LOAD", "GRAPH", "SHAKE" (asm/data/7B12C.sdata.s,
   1C34.rodata.s), and TitleMenu__Reset sets the backdrop to "ETC\TITLE.TIM";
 - tick's cases agree with that order: 1 (FLASHBACK) opens a flashback session
@@ -162,10 +162,10 @@ data the class itself reads:
 - refreshViewValue stores slotCounts[5] (SHAKE, the one slot with an item
   list, unk24[5] = D_80086CA8) through getSetScreenShake;
 - registrationSlots D_80086CDC = {0, 1, 0, ...}: FLASHBACK starts locked, and
-  CheckSaveScoreFlag (called from RefreshMenu with `self->target`) writes
+  UpdateFlashbackLock (called from RefreshMenu with `self->target`) writes
   registrationSlots[1];
 - the TextRow shows gSaveTitle's buffer, 0x8001149C, SJIS "LSD   Day001",
-  the memory-card save title; FormatNumberIntoBuffer writes the day at +0x12.
+  the memory-card save title; StampSaveTitleDay writes the day at +0x12.
 
 Method renames, each its own `rename.py` commit (tier B: mechanics named,
 from the body and the menu entry that reaches them):
@@ -211,3 +211,21 @@ comments now say only what the data is. Moved here:
   include/X.h (round 87/88/89, track 4)" for NodeGuardedViewport, GridCell,
   TitleMenu, TaskObjF, ItemList, TextEntry, ObjM and gObjMMethods are
   replaced by the unit-to-class table in the header's banner.
+
+## Naming (round 100, track 7)
+
+- `sTitleMenuTarget` (was `D_80086D44`), tier A: the TaskCoreTarget this
+  ctor passes both to TaskCore's ctor and to setTarget, TitleMenu's menu
+  description. `s`: only this unit's code reads it.
+- `sTitleMenuSoundBankPath` (was `D_800114DC`), tier A: "ETC\ETCSE", the
+  `soundBankPath` TaskCore's ctor makes `sound` from; same form as
+  GraphRoom's `sGraphSoundBankPath`.
+
+## Track 7 (round 100)
+
+The local `DreamSys *dream = dreamSys;` alias is gone and the two DreamSys
+calls go through `dreamSys` directly: `struct DreamSys *` and `DreamSys *`
+are one type, and the image is byte-identical. The null `sound` argument,
+the `saveCtrl` clear and getCurrentDayAndYear's `outYear` are `NULL`;
+setPitchOffset(-1) is commented (octave -1: pitchOffset = -1 * 12 - 24 =
+-36 semitones, VabStreamObj.h).

@@ -23,7 +23,7 @@
  * What is here, in that order: StageMap's lookup tables and SplitCoord2,
  * the view of a slot's origin its methods read; TitleMenu's data (menu
  * description, paths, the save title's buffers, the colour cycle) and
- * DreamSaveBlock, the save-block view CheckSaveScoreFlag reads; TaskObjF's
+ * DreamSaveBlock, the save-block view UpdateFlashbackLock reads; TaskObjF's
  * event table, the memory-card device names (McDevicePath) and helpers;
  * ObjM's StyleConfig record and the helpers its methods call.
  *
@@ -101,12 +101,12 @@ extern void *BMemPMgrAlloc(s32 size);
 /* ---- TitleMenu --------------------------------------------------- */
 
 /* TitleMenu's menu description, a TaskCoreTarget: TitleMenu__TitleMenu
- * passes &D_80086D44 as TaskCore's ctor's `target` and again to setTarget. */
-extern TaskCoreTarget D_80086D44;
+ * passes &sTitleMenuTarget as TaskCore's ctor's `target` and again to setTarget. */
+extern TaskCoreTarget sTitleMenuTarget;
 
 /* "ETC\ETCSE", TitleMenu__TitleMenu's soundBankPath for TaskCore's ctor
  * (the ctor casts away the const for its `char *`). */
-extern const char D_800114DC[];
+extern const char sTitleMenuSoundBankPath[];
 
 /* "ETC\TITLE.TIM", TitleMenu__Reset's path for setSubHandle. */
 extern const char sTitleTimPath[];
@@ -134,15 +134,15 @@ extern struct ScreenSpritePos sSaveTitleOffset;
  * SaveToCard empties on a new game; gSaveTitle at the full-width
  * "LSD   Day001" followed by 19 full-width spaces, which
  * TitleMenu__CreateSaveTitle reblanks from its 12th character on a new game
- * and FormatNumberIntoBuffer writes the day into.
+ * and StampSaveTitleDay writes the day into.
  */
 extern char *sSaveFileName;
 extern char *gSaveTitle;
 
-/* The buffer FormatNumberIntoBuffer formats the day into
+/* The buffer StampSaveTitleDay formats the day into
  * (FormatFullWidthNumber) before copying it into gSaveTitle's title. The
  * ROM image points it at the "7654321" string D_8008AA1C. */
-extern void *D_8008AA24;
+extern void *sDayDigits;
 
 /* 19 full-width spaces, the tail TitleMenu__CreateSaveTitle copies over
  * gSaveTitle's on a new game (the ROM image points it just past
@@ -170,12 +170,12 @@ extern s32 sTaskObjFCount;
 
 /* Formats the current day into the save title (src/class_3bb8c_c.c);
  * TitleMenu__TitleMenu calls it with DreamSys's getCurrentDayAndYear. */
-extern void FormatNumberIntoBuffer(s32 arg0);
+extern void StampSaveTitleDay(s32 day);
 
 /*
  * The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock):
  * DreamSys from `saveMagic` (+0x178) on, so each field here is the DreamSys
- * field (include/DreamSys.h) 0x178 bytes further in. CheckSaveScoreFlag
+ * field (include/DreamSys.h) 0x178 bytes further in. UpdateFlashbackLock
  * reads the two below.
  */
 typedef struct DreamSaveBlock {

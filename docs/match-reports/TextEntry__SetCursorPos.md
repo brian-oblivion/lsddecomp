@@ -83,7 +83,7 @@ units and never collide.
 
 ### Proposed learning
 
-None beyond what `FormatNumberIntoBuffer`'s report already covers this round; this
+None beyond what `StampSaveTitleDay`'s report already covers this round; this
 one matched cleanly on the first attempt once the stub's stale `gp_rel`
 verdict was set aside.
 

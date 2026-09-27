@@ -1,4 +1,6 @@
-# FormatNumberIntoBuffer — MATCHED (round 45, 22/22 words)
+# StampSaveTitleDay — MATCHED (round 45, 22/22 words)
+
+> Renamed from `FormatNumberIntoBuffer` on 2026-09-27 (tools/rename.py). Address 0x8004d6ac.
 
 > Renamed from `func_8004D6AC` on 2026-09-22 (tools/rename.py). Address 0x8004d6ac.
 
@@ -19,22 +21,22 @@ typedef struct {
     s8 a, b, c, d, e, f;
 } Buf6_3bb8c_c;
 
-void FormatNumberIntoBuffer(s32 arg0)
+void StampSaveTitleDay(s32 arg0)
 {
-    FormatFullWidthNumber(D_8008AA24, arg0, 3, 0);
-    *(Buf6_3bb8c_c *)((s8 *)gSaveTitle + 0x12) = *(Buf6_3bb8c_c *)D_8008AA24;
+    FormatFullWidthNumber(sDayDigits, arg0, 3, 0);
+    *(Buf6_3bb8c_c *)((s8 *)gSaveTitle + 0x12) = *(Buf6_3bb8c_c *)sDayDigits;
 }
 ```
 
 `FormatFullWidthNumber` (matched round 38, `src/code_2cc8c_f.c`) formats `arg0` as a
 zero-padded 3-digit decimal string into the buffer pointed to by
-`D_8008AA24`. This unit keeps `FormatFullWidthNumber`'s `self` parameter opaque
+`sDayDigits`. This unit keeps `FormatFullWidthNumber`'s `self` parameter opaque
 (`void *`) rather than pulling in `Obj6EAC0` from `Task.h`, since
 nothing here touches its fields — just a pass-through pointer, per the
 project's independent-local-view convention.
 
-`D_8008AA24` is a new declaration in `include/class_3bb8c.h`
-(`extern void *D_8008AA24;`), added additively next to the existing
+`sDayDigits` is a new declaration in `include/class_3bb8c.h`
+(`extern void *sDayDigits;`), added additively next to the existing
 `sSaveFileName`/`gSaveTitle` VALUE-of `%gp_rel` globals — same pattern: the ROM
 image initializes it to a rodata placeholder (`D_8008AA1C`, the "7654321"
 string in `asm/data/7B12C.sdata.s`) but the runtime value is a writable
@@ -101,12 +103,12 @@ struct-copy question.
 
 ## Naming
 
-**FormatNumberIntoBuffer** -- tier B. Free function (called directly by
+**StampSaveTitleDay** -- tier B. Free function (called directly by
 `TitleMenu__TitleMenu`, not through any vtable), `VerbNoun`. Mechanics are
 fully evident: formats `arg0` via `FormatFullWidthNumber` into
-`D_8008AA24`'s buffer, then copies 6 raw bytes of that buffer into
+`sDayDigits`'s buffer, then copies 6 raw bytes of that buffer into
 `gSaveTitle`'s buffer at `+0x12`. Purpose is explicitly NOT established --
-the header's own comments on `gSaveTitle`/`D_8008AA24` document both as
+the header's own comments on `gSaveTitle`/`sDayDigits` document both as
 "writable-buffer placeholders" whose real runtime role is outside this
 unit's own carved ground (a nearby string, "CARD\FILEICN1.TIM", and the
 disc's own product-code string sit in the same rodata block, which is
@@ -114,7 +116,7 @@ disc's own product-code string sit in the same rodata block, which is
 that is exactly the kind of purpose-guess the naming rule forbids without
 a function that actually establishes it). Named for the one certain
 mechanic -- format a number, copy it into another buffer -- and nothing
-more. `D_8008AA24`/`gSaveTitle` themselves are left unrenamed for the same
+more. `sDayDigits`/`gSaveTitle` themselves are left unrenamed for the same
 reason.
 
 ## Track 6 (2026-09-27, round 96)
@@ -136,10 +138,10 @@ above; the header keeps the one `MATCHING:` line. Image byte-identical.
 
 Left for track 7 (this unit's polish): the raw `(s8 *)gSaveTitle + 0x12`
 (could read `&((FullWidthChar *)gSaveTitle)[9]`) and the
-`gSaveTitle`/`D_8008AA24` names.
+`gSaveTitle`/`sDayDigits` names.
 
 Comment moved out of the source (verbatim), on the old local type:
-"The 6-byte value formatted into D_8008AA24's buffer by FormatFullWidthNumber
+"The 6-byte value formatted into sDayDigits's buffer by FormatFullWidthNumber
 above, copied whole into gSaveTitle's buffer at +0x12 as ONE struct
 assignment. All-`s8` fields (alignment 1, not 2 or 4) is what makes
 retail's block-move split this way: the leading 4 bytes go via the
@@ -148,3 +150,34 @@ idiom as Vec2s16, FlagLargePolyForDivide), but the trailing 2 bytes can no
 longer be proven 2-byte aligned, so there is no safe halfword move for
 them and the compiler falls back to two individual signed-byte
 loads/stores."
+
+## Naming (round 100, track 7)
+
+- **StampSaveTitleDay** (was `FormatNumberIntoBuffer`), tier A: the one
+  caller, TitleMenu__TitleMenu, passes DreamSys's getCurrentDayAndYear, and
+  the body writes it as FullWidthChars3 at characters 9..11 of the save
+  title, the "001" of "LSD   Day001" (layout measured round 95,
+  StampSaveTitleFileLetter.md). The name pairs with StampSaveTitleFileLetter,
+  the other writer of the same title. Its parameter `arg0` is `day`.
+- **sDayDigits** (was `D_8008AA24`), tier A: the buffer
+  FormatFullWidthNumber writes the day's three digits into before they are
+  copied to the title. Only this unit reads it. Its ROM value points at the
+  "7654321" string D_8008AA1C.
+
+Constants: `SAVE_TITLE_DAY` (9) and `SAVE_TITLE_DAY_DIGITS` (3),
+unit-local, on class_3bb8c_g.c's `SAVE_TITLE_*` model; the store is
+`*(FullWidthChars3 *)&((FullWidthChar *)gSaveTitle)[SAVE_TITLE_DAY]`, as
+StampSaveTitleFileLetter indexes its `FullWidthChar *title`, in place of
+`(s8 *)gSaveTitle + 0x12`. Byte-identical.
+
+## History: the FormatFullWidthNumber extern's comment (moved round 100)
+
+The local extern now takes the definition's parameters,
+`(u8 *dst, s32 value, s32 width, s32 unpadded)`. Its comment as it stood,
+verbatim:
+
+> FormatFullWidthNumber is GAME code (matched round 38, src/code_2cc8c_f.c --
+> its own C definition, not a Sony object), which formats a1 as a zero-padded
+> `width`-digit decimal string into `self`, the output buffer (the
+> definition's `u8 *dst`; it was typed as a TextRow view until round 88).
+> This unit's own local view keeps it `void *`.

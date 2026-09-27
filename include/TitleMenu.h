@@ -6,7 +6,7 @@
 /*
  * TitleMenu -- the menu over ETC\TITLE.TIM that the game returns to between
  * days: START, FLASHBACK, SAVE, LOAD, GRAPH and SHAKE (the six `names` of its
- * TaskCoreTarget, D_80086D44), with the memory-card save title ("LSD   Day001")
+ * TaskCoreTarget, sTitleMenuTarget), with the memory-card save title ("LSD   Day001")
  * shown as a TextRow. A TaskCore (class id 0x1F130, table gTitleMenuMethods;
  * fourteen overrides and six slots of its own); no class derives from it.
  * src/class_3bb8c_c.c holds the allocator and ctor, src/class_3bb8c_d.c every
@@ -20,7 +20,7 @@
  * Construction, ctor(dreamSys): TaskCore's ctor with the menu, "ETC\ETCSE" and
  * no sound object; `sound`'s pitch offset set to -1; `saveCtrl` cleared;
  * `saveBlock`/`saveBlockSize` from DreamSys's getSaveBlock;
- * FormatNumberIntoBuffer writes the current day into the save title;
+ * StampSaveTitleDay writes the current day into the save title;
  * setTarget, then resetCounters (TitleMenu__Reset: the TITLE.TIM backdrop via
  * setSubHandle, frame bound 10, the flashback session cleared).
  *
@@ -33,7 +33,7 @@
  *  - 2 SAVE runs saveToCard, 3 LOAD loadFromCard.
  *  - 5 SHAKE is the one entry with an item list (the target's unk24[5]).
  *  - FLASHBACK starts locked (registrationSlots[1] = 1); refreshMenu clears
- *    the lock through CheckSaveScoreFlag when the save block allows it.
+ *    the lock through UpdateFlashbackLock when the save block allows it.
  * setState(5), the menu becoming active, runs refreshMenu: the save title's
  * text reloaded, FLASHBACK's lock recomputed, the widgets re-attached and
  * SHAKE's cursor set from DreamSys. setState(0xA) cancels, reselects the
@@ -102,7 +102,7 @@ struct TitleMenu {
 };
 
 /* One full-width (2-byte Shift-JIS) character of the save title, and runs of
- * 3 and 6 of them that are written into it whole: FormatNumberIntoBuffer's
+ * 3 and 6 of them that are written into it whole: StampSaveTitleDay's
  * day number (characters 9..11), StampSaveTitleFileLetter's letter field
  * (3..5) and letter field plus "Day" (3..8).
  * MATCHING: all-s8 (alignment 1), so a copy is lwl/lwr words plus single

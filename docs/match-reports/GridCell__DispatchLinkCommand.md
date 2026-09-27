@@ -85,3 +85,13 @@ void GridCell__DispatchLinkCommand(GridCell *self, BasicClass *sender, s32 event
 
 `GenericTagInst_3bb8c_c`/`GenericTagMethods_3bb8c_c` are deleted: the
 sender is a BasicClass and the byte is read as Actor's override reads it.
+
+## Track 7 (round 100)
+
+`*(u8 *)sender->methods == 0x34` is `(u8)sender->methods->header ==
+ACTOR_CLASS_ID` (include/Actor.h, now included by the unit), the spelling
+StageMap__DispatchLinkCommand and Actor__DispatchLinkCommand already use.
+Byte-identical: GCC reads only the low byte either way. The function
+comment was rewritten; as it stood, verbatim: "Only the low byte of the
+sender's class id is read: 0x34 is an Actor (Actor__DispatchLinkCommand
+makes the same test the other way round)."

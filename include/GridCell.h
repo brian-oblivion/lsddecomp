@@ -70,6 +70,10 @@ typedef struct GridCellMethods GridCellMethods;
     SCENENODE_FIELDS(Methods) /* no own fields; the object is 0x3C bytes (New_GridCell), see the banner */
 /* clang-format on */
 
+/* The object's size, New_GridCell's allocation: sizeof(GridCell) overstates
+ * it by SceneNode's trailing pad (see the banner). */
+#define GRIDCELL_SIZE 60
+
 /* flags36 (a placement record's cellFlags, PopulateSlotCells): the cell
  * takes the commands StageMap hands the cells under a sender's footprint
  * (NotifyGridCell skips a cell without it). DreamSys__NotifyLinkAttempt

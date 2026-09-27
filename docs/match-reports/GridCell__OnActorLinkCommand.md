@@ -316,3 +316,22 @@ void GridCell__OnActorLinkCommand(GridCell *self, void *sender, s32 event)
     ((void (*)(GridCell *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
 }
 ```
+
+## Track 7 (round 100)
+
+The early-return and `do { } while (0)` shape above is replaced by the nested
+test Actor__OnActorLinkCommand (src/class_3bb8c_p.c) matched with,
+byte-identical here too:
+
+```c
+    if (event < 9) {
+        if (event >= 5) { /* MATCHING: nested, as && folds to one unsigned test */
+            ((void (*)(GridCell *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
+        }
+    }
+```
+
+The literals 5 and 9 stay: include/Actor.h's `ActorMoveEvent` names 5..8 as
+the events an Actor's moves send through notifyWithHull, but that the link
+commands this receives use the same numbering is not shown by any body here,
+and Actor__OnActorLinkCommand leaves them as literals too.

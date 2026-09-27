@@ -116,7 +116,7 @@ enum TaskCoreInputMode {
 #define TASKCORE_FRAMES_PER_SECOND 20
 
 /* The menu description setTarget builds its slot widgets from (the ctor's
- * first argument; TitleMenu passes &D_80086D44). One slot per `names`
+ * first argument; TitleMenu passes &sTitleMenuTarget). One slot per `names`
  * entry. */
 struct TaskCoreTarget {
     /* +0x000 */ const char *path; /* non-NULL: setTarget loads `handle` from it (New_TimImage) and releaseTarget releases that */
