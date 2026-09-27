@@ -68,27 +68,27 @@ extern SpriteRgb sPauseTextColor;     /* red: (255, 0, 0) */
 
 void ObjM__EnterState7(ObjM *self) {
     DreamColors color;
-    self->state = 7;
+    self->state = OBJM_STATE_LINK_FLASHBACK;
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &color, -1);
     ObjM__StartFadeUp(self, color, 0, 5, 1);
     self->dreamSys->methods->blockMovement(self->dreamSys);
 }
 
 void ObjM__EnterState8(ObjM *self) {
-    self->state = 8;
-    ObjM__StartFadeUp(self, 0, 0, 6, 1);
-    self->dreamSys->methods->setMoveOverride(self->dreamSys, 1);
+    self->state = OBJM_STATE_LINK_TUNNEL;
+    ObjM__StartFadeUp(self, DREAM_COLOR_BLACK, 0, 6, 1);
+    self->dreamSys->methods->setMoveOverride(self->dreamSys, MOVE_OVERRIDE_FORCED);
 }
 
 void ObjM__EnterStateA(ObjM *self) {
-    self->state = 0xA;
-    ObjM__StartFadeUp(self, 0, 0, 6, 1);
-    self->dreamSys->methods->selectCallback98(self->dreamSys, 2);
-    self->dreamSys->methods->setMoveOverride(self->dreamSys, 2);
+    self->state = OBJM_STATE_LINK_STAGE_TIMER;
+    ObjM__StartFadeUp(self, DREAM_COLOR_BLACK, 0, 6, 1);
+    self->dreamSys->methods->selectCallback98(self->dreamSys, MOVE_CALLBACK_TICK_DRIFT);
+    self->dreamSys->methods->setMoveOverride(self->dreamSys, MOVE_OVERRIDE_HELD);
 }
 
 void ObjM__NotifyParentsCodeB(ObjM *self) {
-    self->methods->notifyParents(self, 0xB);
+    self->methods->notifyParents(self, OBJM_NOTIFY_LINK_TELEPORT);
 }
 
 /* The viewport (IntermediateBase::viewport, a NodeGuardedViewport) hands out its fade
@@ -108,20 +108,22 @@ void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 fadeMode, s32 step, s32 add
 void ObjM__OnFadeNotify(ObjM *self, FadeBox *sender, s32 event) {
     void *color;
     switch (event) {
-        case 5:
+        case FADEBOX_EVENT_FADE_DOWN_DONE:
             self->methods->removeChild(self, (BasicClass *)sender);
-            self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
-            self->state = 0;
+            self->dreamSys->methods->setMoveOverride(self->dreamSys, MOVE_OVERRIDE_NONE);
+            self->state = OBJM_STATE_IDLE;
             break;
-        case 6:
+        case FADEBOX_EVENT_FADE_UP_DONE:
             self->methods->removeChild(self, (BasicClass *)sender);
             color = sender->methods->getColor(sender);
             ((NodeGuardedViewport *)self->viewport)
                 ->methods->setClearColor((NodeGuardedViewport *)self->viewport, (ViewportRgb *)color);
-            if (self->state != 5 && self->state != 8 && self->state == 0xA) {
+            /* MATCHING: the two dead `!=` tests are retail's compares. */
+            if (self->state != OBJM_STATE_LINK_DYNAMIC && self->state != OBJM_STATE_LINK_TUNNEL &&
+                self->state == OBJM_STATE_LINK_STAGE_TIMER) {
                 self->dreamSys->methods->stopDrift(self->dreamSys, 1);
-                self->dreamSys->methods->setMoveOverride(self->dreamSys, 0);
-                self->state = 4;
+                self->dreamSys->methods->setMoveOverride(self->dreamSys, MOVE_OVERRIDE_NONE);
+                self->state = OBJM_STATE_TIME_UP;
             }
             self->methods->notifyParents(self, self->state);
             break;
@@ -129,7 +131,7 @@ void ObjM__OnFadeNotify(ObjM *self, FadeBox *sender, s32 event) {
 }
 
 void ObjM__OnStageMapNotify(ObjM *self, BasicClass *sender, s32 event) {
-    if (event == 7) {
+    if (event == STAGEMAP_EVENT_SLOT_DATA_READY) {
         self->methods->checkAuxTrigger(self);
     }
 }
@@ -155,7 +157,7 @@ s32 ObjM__CheckAuxTrigger(ObjM *self) {
 void ObjM__NoOpSlotBC(void) {}
 
 void ObjM__UpdateCloseReadyFlag(ObjM *self) {
-    if (self->pauseSetupStep != 0 && self->state == 0) {
+    if (self->pauseSetupStep != 0 && self->state == OBJM_STATE_IDLE) {
         self->closeReady = 1;
     }
 }
@@ -167,14 +169,14 @@ void ObjM__ClearCloseReadyFlag(ObjM *self) {
 void ObjM__CloseAndNotifyD(ObjM *self) {
     if (self->closeReady) {
         self->methods->teardownPauseOverlay(self);
-        self->methods->notifyParents(self, 0xD);
+        self->methods->notifyParents(self, OBJM_NOTIFY_CLOSE_NEW_GAME);
     }
 }
 
 void ObjM__CloseAndNotifyC(ObjM *self) {
     if (self->closeReady) {
         self->methods->teardownPauseOverlay(self);
-        self->methods->notifyParents(self, 0xC);
+        self->methods->notifyParents(self, OBJM_NOTIFY_CLOSE);
     }
 }
 

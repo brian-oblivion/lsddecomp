@@ -56,6 +56,9 @@
 typedef struct FadeBox FadeBox;
 typedef struct FadeBoxMethods FadeBoxMethods;
 
+/* What stop notifies its parents with (ObjM__OnFadeNotify). */
+enum FadeBoxEvent { FADEBOX_EVENT_FADE_DOWN_DONE = 5, FADEBOX_EVENT_FADE_UP_DONE = 6 };
+
 /* BoxFill's slots (overrides: +0x008 FadeBox__FadeBox, +0x040
  * FadeBox__Reset, +0x098 FadeBox__Update; `tools/classtable.py
  * gFadeBoxMethods --vs gBoxFillMethods`), then this class's own. */

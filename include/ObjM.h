@@ -71,6 +71,27 @@ struct FadeBox;
 struct TextRow;
 struct StyleConfig; /* styleConfig's view, include/class_3bb8c.h */
 
+/* IntermediateBase::state as ObjM sets it, which is also the code it
+ * notifies its parent with (DayTask__OnObjMNotify). A link state is the
+ * DreamSys code that started it less 6 (ObjM__OnDreamSysNotify); IDLE is
+ * the only state in which DreamSys codes are acted on, and a fade down
+ * returns to it. TELEPORT, CLOSE and CLOSE_NEW_GAME are notified without
+ * being kept. DayTask ends the day on TIME_UP (endDay(0)) and on the two
+ * closes (endDay(1), and endDay(2), which starts a new game), starts the
+ * next ObjM on the link states, and ignores TELEPORT. */
+enum ObjMState {
+    OBJM_STATE_IDLE = 0,
+    OBJM_STATE_TIME_UP = 4,
+    OBJM_STATE_LINK_DYNAMIC = 5,
+    OBJM_STATE_LINK_WALL = 6,
+    OBJM_STATE_LINK_FLASHBACK = 7,
+    OBJM_STATE_LINK_TUNNEL = 8,
+    OBJM_STATE_LINK_STAGE_TIMER = 10,
+    OBJM_NOTIFY_LINK_TELEPORT = 11,
+    OBJM_NOTIFY_CLOSE = 12,
+    OBJM_NOTIFY_CLOSE_NEW_GAME = 13
+};
+
 /* Overridden: ctor, finalize, onNotify, resetCounters (NoOpSlot40), init
  * (AttachTarget), deinit (DetachTarget), onInit (InitStyleAndWorld),
  * onDeinit (TeardownStyle), onTag1Notify, onPadEvent (DispatchPadEvent),
