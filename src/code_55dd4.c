@@ -22,7 +22,7 @@
 #include <libgs.h>
 #include "code_55dd4.h"
 
-void *New_TodActor(void *arg1, void *arg2) {
+void *New_TodActor(void *desc, void *sound) {
     TodActor *self;
     TodActorMethods *vt;
 
@@ -31,14 +31,14 @@ void *New_TodActor(void *arg1, void *arg2) {
         return NULL;
     }
     vt = GetTodActorMethods();
-    if (vt->ctor(self, arg1, arg2) != NULL) {
+    if (vt->ctor(self, desc, sound) != NULL) {
         return self;
     }
     BMemPMgrFree(self);
     return NULL;
 }
 
-TodActor *TodActor__TodActor(TodActor *self, void *arg1, void *arg2) {
+TodActor *TodActor__TodActor(TodActor *self, void *desc, void *sound) {
     ActorMethods *base;
 
     base = GetActorMethods();
@@ -46,12 +46,12 @@ TodActor *TodActor__TodActor(TodActor *self, void *arg1, void *arg2) {
         return NULL;
     }
     self->methods = GetTodActorMethods();
-    self->sound = arg2;
+    self->sound = sound;
     self->modelData = NULL;
     self->mainPart = NULL;
     self->parts = NULL;
     self->peer = 0;
-    if (self->methods->setupModelData(self, arg1) != 0) {
+    if (self->methods->setupModelData(self, desc) != 0) {
         base = GetActorMethods();
         base->finalize((Actor *)self);
         return NULL;
@@ -66,12 +66,12 @@ void TodActor__Finalize(TodActor *self) {
     GetActorMethods()->finalize((Actor *)self);
 }
 
-void TodActor__OnNotify(TodActor *self, TagCheckArg *arg1, s32 arg2) {
+void TodActor__OnNotify(TodActor *self, TagCheckArg *sender, s32 event) {
     ActorMethods *base;
 
     base = GetActorMethods();
-    base->onNotify((Actor *)self, arg1, arg2);
-    if (arg1->methods->header == MODEL_DATA_CLASS_HEADER && arg2 == 1 && self->ownsModelData == 0) {
+    base->onNotify((Actor *)self, sender, event);
+    if (sender->methods->header == MODEL_DATA_CLASS_HEADER && event == 1 && self->ownsModelData == 0) {
         self->methods->release(self);
     }
 }
@@ -92,16 +92,17 @@ void TodActor__Reset(TodActor *self) {
     }
 }
 
-void TodActor__AttachToParent(TodActor *self, TodActor *other, void *arg2, void *arg3, void *arg4) {
+void TodActor__AttachToParent(TodActor *self, TodActor *peer, void *companion, void *parent,
+                              void *offset) {
     ActorMethods *base;
 
     if (self->parent == 0) {
         base = GetActorMethods();
-        base->attachToParent((Actor *)self, arg3, arg4);
-        if (arg2 != NULL && self->ticker == NULL) {
-            self->methods->addChild(self, arg2);
+        base->attachToParent((Actor *)self, parent, offset);
+        if (companion != NULL && self->ticker == NULL) {
+            self->methods->addChild(self, companion);
         }
-        self->methods->linkPeer(self, other);
+        self->methods->linkPeer(self, peer);
     }
 }
 
@@ -115,33 +116,33 @@ void TodActor__DetachFromParent(TodActor *self) {
     }
 }
 
-void TodActor__SetDisplay(TodActor *self, void *arg) {
+void TodActor__SetDisplay(TodActor *self, void *on) {
     Actor **p;
     s32 i;
 
     p = self->parts;
     for (i = 0; i < self->partCount; p++) {
         i++;
-        (*p)->methods->setDisplay(*p, (s32)arg);
+        (*p)->methods->setDisplay(*p, (s32)on);
     }
 }
 
-void TodActor__SetLightMode(TodActor *self, void *arg) {
+void TodActor__SetLightMode(TodActor *self, void *mode) {
     Actor **p;
     s32 i;
 
     p = self->parts;
     for (i = 0; i < self->partCount; i++, p++) {
-        (*p)->methods->setLightMode(*p, (u32)arg);
+        (*p)->methods->setLightMode(*p, (u32)mode);
     }
-    GetActorMethods()->setLightMode((Actor *)self, (u32)arg);
+    GetActorMethods()->setLightMode((Actor *)self, (u32)mode);
 }
 
-void TodActor__Update(TodActor *self, void *arg1, s32 val) {
-    if (val == 2) {
+void TodActor__Update(TodActor *self, void *sender, s32 event) {
+    if (event == 2) {
         self->methods->tick(self);
     }
-    if (val == 4) {
+    if (event == 4) {
         self->methods->release(self);
     }
 }
@@ -150,11 +151,11 @@ void TodActor__SetMainPartNotifies(TodActor *self, s32 on) {
     self->mainPartNotifies = on;
 }
 
-s32 TodActor__SetupModelData(TodActor *self, void *arg1) {
+s32 TodActor__SetupModelData(TodActor *self, void *desc) {
     if (self->modelData != NULL) {
         return 0;
     }
-    return TodActor__AcquireModelData(self, arg1);
+    return TodActor__AcquireModelData(self, desc);
 }
 
 void TodActor__TeardownModelData(TodActor *self) {
@@ -163,12 +164,12 @@ void TodActor__TeardownModelData(TodActor *self) {
     }
 }
 
-s32 TodActor__AcquireModelData(TodActor *self, TodActorDesc *other) {
-    if (other->modelData != NULL) {
-        self->modelData = other->modelData;
+s32 TodActor__AcquireModelData(TodActor *self, TodActorDesc *desc) {
+    if (desc->modelData != NULL) {
+        self->modelData = desc->modelData;
         self->ownsModelData = 0;
     } else {
-        self->modelData = New_ModelData(&other->src);
+        self->modelData = New_ModelData(&desc->src);
         self->ownsModelData = 1;
     }
     if (self->modelData == NULL) {
@@ -181,29 +182,29 @@ fail:
 }
 
 void TodActor__ReleaseModelData(TodActor *self) {
-    ModelData *result;
+    ModelData *next;
 
     self->methods->teardownParts(self);
     if (self->ownsModelData != 0) {
-        result = self->modelData->methods->release(self->modelData);
+        next = self->modelData->methods->release(self->modelData);
     } else {
-        result = NULL;
+        next = NULL;
     }
-    self->modelData = result;
+    self->modelData = next;
 }
 
-s32 TodActor__FindPartIndex(TodActor *self, s32 value) {
-    u8 *arr;
+s32 TodActor__FindPartIndex(TodActor *self, s32 id) {
+    u8 *ids;
     s32 count;
     s32 i;
-    u8 target;
+    u8 wanted;
     u8 unused[8];
 
     if (self->partIds == NULL) {
         return -1;
     }
-    arr = self->partIds;
-    /* Keeps arr's register copy above the self->partCount load; without it
+    ids = self->partIds;
+    /* Keeps ids's register copy above the self->partCount load; without it
      * GCC moves the copy into the delay slot of the count <= 0 branch. */
     __asm__("");
     count = self->partCount;
@@ -211,13 +212,13 @@ s32 TodActor__FindPartIndex(TodActor *self, s32 value) {
         return -1;
     }
     i = 0;
-    target = (u8)value;
+    wanted = (u8)id;
     do {
-        if (*arr == target) {
+        if (*ids == wanted) {
             return i;
         }
         i++;
-        arr++;
+        ids++;
     } while (i < count);
     return -1;
 }
@@ -236,12 +237,12 @@ void TodActor__TeardownParts(TodActor *self) {
 }
 
 s32 TodActor__CreateParts(TodActor *self) {
-    s32 buf[4];
+    s32 tmdId[4];
     s32 count;
     s32 i;
     Actor **p;
 
-    count = self->modelData->methods->scanPackets(self->modelData, 0, (s32)buf) & 0xFF;
+    count = self->modelData->methods->scanPackets(self->modelData, 0, (s32)tmdId) & 0xFF;
     self->parts = BMemPMgrAlloc(count * 4);
     if (self->parts == NULL) {
         goto alloc_fail;
@@ -250,7 +251,7 @@ s32 TodActor__CreateParts(TodActor *self) {
     if (self->partIds == NULL) {
         goto alloc_fail;
     }
-    self->modelData->methods->scanPackets(self->modelData, (s32)self->partIds, (s32)buf);
+    self->modelData->methods->scanPackets(self->modelData, (s32)self->partIds, (s32)tmdId);
 
     p = self->parts;
     i = 0;
@@ -264,7 +265,7 @@ s32 TodActor__CreateParts(TodActor *self) {
             i++;
         } while (i < count);
     }
-    self->mainPart = self->parts[buf[0]];
+    self->mainPart = self->parts[tmdId[0]];
     return 0;
 
 alloc_fail:
@@ -306,8 +307,8 @@ void TodActor__Tick(TodActor *self) {
     self->coord2->flg = 0;
 }
 
-void TodActor__SelectTickCallback(TodActor *self, s32 value) {
-    switch ((u8)value) {
+void TodActor__SelectTickCallback(TodActor *self, s32 which) {
+    switch ((u8)which) {
         case TICK_CALLBACK_A:
             self->tickCallback = self->methods->tickCallbackA;
             break;
@@ -365,63 +366,63 @@ void TodActor__StopTod(TodActor *self) {
     self->todPlaying = 0;
 }
 
-void *TodActor__ApplyTodFrame(TodActor *self, void *hdr, void *extra) {
+void *TodActor__ApplyTodFrame(TodActor *self, void *frame, void *extra) {
     s32 count;
     u32 i;
 
-    count = ((TodFrame *)hdr)->packetCount;
-    hdr = ((TodFrame *)hdr)->packets;
+    count = ((TodFrame *)frame)->packetCount;
+    frame = ((TodFrame *)frame)->packets;
     for (i = 0; i < count;) {
         i++;
-        hdr = self->methods->applyTodPacket(self, hdr, extra);
+        frame = self->methods->applyTodPacket(self, frame, extra);
     }
-    return hdr;
+    return frame;
 }
 
-void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
+void *TodActor__ApplyTodPacket(TodActor *self, void *packet, void *extra) {
     TodPacketHeader head;
     s32 *data;
-    s32 idx;
-    Actor *elem;
+    s32 partIndex;
+    Actor *part;
     GsCOORDINATE2 *coord;
     GsCOORD2PARAM *param;
     s32 i;
 
-    data = self->modelData->methods->decodePacketWord(self->modelData, (s32)acc,
+    data = self->modelData->methods->decodePacketWord(self->modelData, (s32)packet,
                                                       (s32)&head.objectId, (s32)&head.type,
                                                       (s32)&head.flag, (s32)&head.length);
-    idx = TodActor__FindPartIndex(self, head.objectId);
-    if (idx < 0) {
+    partIndex = TodActor__FindPartIndex(self, head.objectId);
+    if (partIndex < 0) {
         goto end;
     }
-    elem = self->parts[idx];
-    coord = elem->coord2;
+    part = self->parts[partIndex];
+    coord = part->coord2;
     coord->flg = 0;
     param = coord->param;
 
     switch (head.type) {
         case TOD_PACKET_ATTRIBUTE:
-            elem->attribute = (elem->attribute & data[0]) | data[1];
+            part->attribute = (part->attribute & data[0]) | data[1];
             break;
         case TOD_PACKET_COORDINATE: {
             if (head.flag & TOD_COORD_DIFFERENTIAL) {
                 if (head.flag & TOD_COORD_ROTATE) {
-                    s16 *p16 = &param->rotate.vx;
+                    s16 *rot = &param->rotate.vx;
 
-                    for (i = 0; i < 3; i++, p16++) {
-                        s16 tmp;
+                    for (i = 0; i < 3; i++, rot++) {
+                        s16 angle;
 
-                        tmp = *p16 + data[i] / 360;
-                        *p16 = tmp;
-                        *p16 = tmp % 4096;
+                        angle = *rot + data[i] / 360;
+                        *rot = angle;
+                        *rot = angle % 4096;
                     }
                     data += 3;
                 }
                 if (head.flag & TOD_COORD_SCALE) {
-                    long *p32 = &param->scale.vx;
+                    long *scale = &param->scale.vx;
 
-                    for (i = 0; i < 3; i++, p32++) {
-                        *p32 = (((s16 *)data)[i] * *p32) / 4096;
+                    for (i = 0; i < 3; i++, scale++) {
+                        *scale = (((s16 *)data)[i] * *scale) / 4096;
                     }
                     data += 2;
                 }
@@ -429,26 +430,26 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
                     goto end;
                 }
                 {
-                    long *p32 = &param->trans.vx;
+                    long *trans = &param->trans.vx;
 
-                    for (i = 0; i < 3; i++, p32++) {
-                        *p32 += data[i];
+                    for (i = 0; i < 3; i++, trans++) {
+                        *trans += data[i];
                     }
                 }
             } else {
                 if (head.flag & TOD_COORD_ROTATE) {
-                    s16 *p16 = &param->rotate.vx;
+                    s16 *rot = &param->rotate.vx;
 
-                    for (i = 0; i < 3; i++, p16++) {
-                        *p16 = data[i] / 360;
+                    for (i = 0; i < 3; i++, rot++) {
+                        *rot = data[i] / 360;
                     }
                     data += 3;
                 }
                 if (head.flag & TOD_COORD_SCALE) {
-                    long *p32 = &param->scale.vx;
+                    long *scale = &param->scale.vx;
 
-                    for (i = 0; i < 3; i++, p32++) {
-                        *p32 = ((s16 *)data)[i];
+                    for (i = 0; i < 3; i++, scale++) {
+                        *scale = ((s16 *)data)[i];
                     }
                     data += 2;
                 }
@@ -456,61 +457,61 @@ void *TodActor__ApplyTodPacket(TodActor *self, void *acc, void *extra) {
                     goto end;
                 }
                 {
-                    long *p32 = &param->trans.vx;
+                    long *trans = &param->trans.vx;
 
-                    for (i = 0; i < 3; i++, p32++) {
-                        *p32 = data[i];
+                    for (i = 0; i < 3; i++, trans++) {
+                        *trans = data[i];
                     }
                 }
             }
             {
-                GsCOORDINATE2 *coordB;
-                s32 v1, v2, v3;
+                GsCOORDINATE2 *partCoord;
+                s32 x, y, z;
 
-                coordB = elem->coord2;
-                v1 = param->trans.vx;
-                v2 = param->trans.vy;
-                v3 = param->trans.vz;
-                coordB->coord.t[0] = v1;
-                coordB->coord.t[1] = v2;
-                coordB->coord.t[2] = v3;
-                /* Keeps the coordB->coord.t[2] store ahead of the break's jump, leaving retail's
+                partCoord = part->coord2;
+                x = param->trans.vx;
+                y = param->trans.vy;
+                z = param->trans.vz;
+                partCoord->coord.t[0] = x;
+                partCoord->coord.t[1] = y;
+                partCoord->coord.t[2] = z;
+                /* Keeps the partCoord->coord.t[2] store ahead of the break's jump, leaving retail's
              * nop in its delay slot; without it GCC moves the store into the slot. */
                 __asm__("");
             }
             break;
         }
         case TOD_PACKET_MODEL_ID: {
-            u16 count;
+            u16 modelId;
 
-            count = *(u16 *)data;
-            if (count != 0 && elem->model == NULL) {
-                s32 v;
+            modelId = *(u16 *)data;
+            if (modelId != 0 && part->model == NULL) {
+                struct TmdModel *model;
 
-                v = (s32)self->modelData->linkResource->methods->getModel(
-                    self->modelData->linkResource, count - 1);
-                SceneNode__LinkModel((SceneNode *)elem, (void *)v);
+                model = self->modelData->linkResource->methods->getModel(self->modelData->linkResource,
+                                                                         modelId - 1);
+                SceneNode__LinkModel((SceneNode *)part, model);
             }
             break;
         }
         case TOD_PACKET_PARENT: {
-            s32 v1;
+            s32 parentId;
 
-            v1 = data[0];
-            if (v1 == 0 || v1 == 0xFFFF) {
-                elem->methods->attachToParent(elem, (SceneNode *)self, NULL);
+            parentId = data[0];
+            if (parentId == 0 || parentId == 0xFFFF) {
+                part->methods->attachToParent(part, (SceneNode *)self, NULL);
             } else {
-                s32 idx2;
+                s32 parentIndex;
 
-                idx2 = TodActor__FindPartIndex(self, *(u8 *)data);
-                elem->methods->attachToParent(elem, (SceneNode *)self->parts[idx2], NULL);
+                parentIndex = TodActor__FindPartIndex(self, *(u8 *)data);
+                part->methods->attachToParent(part, (SceneNode *)self->parts[parentIndex], NULL);
             }
             break;
         }
     }
 
 end:
-    return (u8 *)acc + head.length * 4;
+    return (u32 *)packet + head.length;
 }
 
 void TodActor__LinkPeer(TodActor *self, TodActor *other) {
