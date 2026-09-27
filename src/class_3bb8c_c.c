@@ -31,6 +31,7 @@
 #include "class_3bb8c.h"
 #include "DreamSys.h"
 #include "SceneNode.h"
+#include "Actor.h"
 #include "Viewport.h"
 #include "NodeGuardedViewport.h"
 #include "GridCell.h"
@@ -98,7 +99,7 @@ void GridCell__Reset(void) {}
 /* Only the low byte of the sender's class id is read: 0x34 is an Actor
  * (Actor__DispatchLinkCommand makes the same test the other way round). */
 void GridCell__DispatchLinkCommand(GridCell *self, BasicClass *sender, s32 event) {
-    if (*(u8 *)sender->methods == 0x34) {
+    if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
         self->methods->onActorLinkCommand(self, sender, event);
     }
 }
@@ -172,9 +173,13 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target) {
  * This unit's own local view keeps it `void *`. */
 extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
 
+/* The save title's day number, full-width characters 9..11 of
+ * "LSD   Day001" (class_3bb8c_g.c's layout of the title). */
+#define SAVE_TITLE_DAY 9
+
 /* Formats the day as three full-width digits in sDayDigits's buffer and
  * copies them into the save title's day number, characters 9..11. */
 void StampSaveTitleDay(s32 arg0) {
     FormatFullWidthNumber(sDayDigits, arg0, 3, 0);
-    *(FullWidthChars3 *)((s8 *)gSaveTitle + 0x12) = *(FullWidthChars3 *)sDayDigits;
+    *(FullWidthChars3 *)&((FullWidthChar *)gSaveTitle)[SAVE_TITLE_DAY] = *(FullWidthChars3 *)sDayDigits;
 }
