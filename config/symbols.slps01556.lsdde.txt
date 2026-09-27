@@ -3045,3 +3045,4 @@ _svm_okof2 = 0x80090C64;
 _svm_stereo_mono = 0x8008E8C0;
 spuVmMaxVoice = 0x8008E9D0;
 _svm_sreg = 0x8006DAD4;
+SsUtVibrateOn = 0x8002E2F8; // type:func

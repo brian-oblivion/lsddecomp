@@ -15,7 +15,7 @@
  * volume ramp (SeAutoVol). They read the current VAB through <libsnd.h>'s
  * VabHdr and VagAtr (_svm_vh, _svm_tn), the voice tables in
  * include/SvmData.h and the sequence records in include/SsScore.h.
- * func_8002E2F8 and func_8002E300 are empty and have no known caller.
+ * SsUtVibrateOn and func_8002E300 are empty and have no known caller.
  */
 #include "common.h"
 #include <libsnd.h>
@@ -464,7 +464,7 @@ void SePitchBend(s32 chan, s32 bend) {
     }
 }
 
-void func_8002E2F8(void) {}
+void SsUtVibrateOn(short vc, short vibW, short vibT) {}
 
 void func_8002E300(void) {}
 
