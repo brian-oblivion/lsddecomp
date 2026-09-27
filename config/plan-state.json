@@ -1283,7 +1283,6 @@
       "flagged": {
         "DrawNode": "code_2864's local view of the scene node Viewport.h's drawNode slot types as SceneNode * (echo, round 94) (2026-09-26)",
         "EntityMoodHandlerArg": "it is SoundCueSet (Entity.h's own comment; code_179d8_e.c and code_179d8_l.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)",
-        "ResourceRequest": "the 0x0C member of FileResource.h's ResourceSource family: make it { ResourceSource src; s32 mode; } in the header owning it and retire the other 0x0C views onto it (GraphicsResources.c ResourceSourceArgs, code_4cd08.h DreamAuxLoadReq and its stale ResourceRequest__Set comment, code_55dd4.c TodActorDesc's leading words if they are the same record), dropping the (ResourceSource *) casts where the bytes agree (delta and alpha, round 96) (2026-09-27)",
         "ResourceSourceRequest": "a 0x10 view whose callers (StageMap__PopulateSlotCells, DayTask__DayTask, GameApplication__GameApplication) write only src.buffer and never call ResourceRequest__Set; alpha measured round 97 that its 0x10 size is not load-bearing (pad cut to 4: image still matches), so retype each local as plain ResourceSource (or ResourceRequest if a mode word is shown) and delete the typedef and its MATCHING line, byte-exact (2026-09-27)",
         "S16Quad_d294": "IS Sony's SVECTOR by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
         "SceneNodeSub14": "IS Sony's GsCOORDINATE2 by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
@@ -1355,12 +1354,6 @@
       ],
       "status": "auto",
       "units": {
-        "ResourceRequest": [
-          "code_171e0",
-          "include/code_4cd08.h",
-          "GraphicsResources",
-          "code_55dd4"
-        ],
         "ResourceSourceRequest": [
           "class_3bb8c",
           "class_39e08",
