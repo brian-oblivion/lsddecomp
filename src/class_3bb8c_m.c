@@ -20,12 +20,16 @@
  * onObjMNotify). NoOpSlotBC is empty. What the state codes mean in the
  * game is not established.
  *
- * A separate, unrelated cluster of free functions (RegisterStyleConfig /
- * ApplyStyleConfig / FillStyleFromConfig / ApplyStyleDecorationIfSet) reads
- * and writes a small set of `.sdata`/`.sbss` globals to configure a
- * `StyleM` colour/config descriptor (struct defined below, own comment) --
- * unrelated to the ObjM/DreamSys machinery above beyond living in the same
- * carved address range.
+ * Then four free functions (RegisterStyleConfig / ApplyStyleConfig /
+ * FillStyleFromConfig / ApplyStyleDecorationIfSet) that read and write a
+ * small set of `.sdata`/`.sbss` style globals and fill a `StyleM`
+ * colour/config descriptor (struct defined below, own comment). They are
+ * not ObjM methods, but ObjM is their client: ObjM__InitStyleAndWorld
+ * (class_3bb8c_l) calls RegisterStyleConfig and keeps its result as
+ * ObjM::styleConfig, and the `sceneRefs` it passes, kept as
+ * gStyleSceneRefs, points at ObjM's +0x06C block (StyleSceneRefs, below;
+ * ApplyStyleDecorationIfSet attaches its BoxFill to that block's
+ * viewport's fade box).
  *
  * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
  * Header edits must be strictly ADDITIVE.
