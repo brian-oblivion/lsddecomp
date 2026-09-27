@@ -1,3 +1,15 @@
+/*
+ * StreamTask, whole, and the first seven methods of its parent TaskCore.
+ *
+ * StreamTask (include/StreamTask.h) plays one movie stream through a
+ * MoviePlayer inside TaskCore's fade and state machine: its allocator, ctor,
+ * every override, its five setters and its table getter are all here.
+ * TaskCore (include/TaskCore.h) is the base of the game's menu and screen
+ * tasks; this file holds its allocator, ctor, finalize, resetCounters, init
+ * and the onInit/onDeinit hooks, which build and tear down the TileAtlas ->
+ * TileMap -> BgLayer chain, clear the screen and configure the viewport. The
+ * rest of TaskCore is in code_2cc8c.c, code_2cc8c_b.c and code_2cc8c_c.c.
+ */
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
@@ -162,7 +174,6 @@ StreamTaskMethods *Get_vtable_StreamTask(void) {
     return &gStreamTaskMethods;
 }
 
-/* The TaskCore allocator: 0xA4 bytes, constructed through its own ctor. */
 TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound) {
     TaskCore *self;
 
@@ -180,6 +191,7 @@ void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankP
     TaskCoreMethods *methods;
 
     Get_vtable_IntermediateBase()->ctor((IntermediateBase *)self);
+    /* MATCHING: one Get_vtable_TaskCore() call; a second one for setTarget adds a jal. */
     methods = Get_vtable_TaskCore();
     self->methods = methods;
     methods->setTarget(self, target);
@@ -213,6 +225,7 @@ void TaskCore__Finalize(TaskCore *self) {
 }
 
 void TaskCore__Reset(TaskCore *self) {
+    /* MATCHING: self->methods reloaded after each call is a word longer. */
     TaskCoreMethods *methods = self->methods;
     methods->setFrameBound(self, -1);
     methods->setColors(self, sTaskCoreDefaultColors[0], sTaskCoreDefaultColors[1],
@@ -234,12 +247,16 @@ s32 TaskCore__Init(TaskCore *self, IntermediateBaseInitArgs *args, s32 mode) {
     return self->result;
 }
 
-/* initArgs->drawSystem and the viewport are `BasicClass *` fields; they are
- * cast to their classes, DrawSystem and Viewport. */
+/* Hangs the slot widgets and the BgLayer under the light rig (unk14), sets the
+ * fade-in colour, clears the default movie frame (no sub handle) and then the
+ * screen to baseColor, and configures and opens the viewport's OT.
+ * initArgs->drawSystem and the viewport are `BasicClass *` fields, cast to
+ * their classes, DrawSystem and Viewport. */
 void TaskCore__OnInit(TaskCore *self) {
     Viewport *viewport;
     ViewportMethods *viewportMethods;
 
+    /* MATCHING: retail loads both before the first call and keeps them to the end. */
     viewport = (Viewport *)self->viewport;
     viewportMethods = viewport->methods;
     self->methods->updateSlotElements(self, self->unk14);
@@ -264,7 +281,10 @@ void TaskCore__OnInit(TaskCore *self) {
     self->result = 0;
 }
 
+/* Closes the viewport's OT, detaches the view and the BgLayer, and clears the
+ * screen to unk93 while unk34 is set. */
 void TaskCore__OnDeinit(TaskCore *self) {
+    /* MATCHING: without the local, self->viewport is reloaded and the frame shrinks. */
     Viewport *viewport = (Viewport *)self->viewport;
     viewport->methods->deinitOt(viewport);
     viewport->methods->detachViewChild(viewport);
