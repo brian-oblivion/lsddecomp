@@ -67,10 +67,10 @@ extern ScreenSpritePos sPauseTextPos; /* (-20, -50) */
 extern SpriteRgb sPauseTextColor;     /* red: (255, 0, 0) */
 
 void ObjM__EnterState7(ObjM *self) {
-    s32 val;
+    DreamColors color;
     self->state = 7;
-    self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, (DreamColors *)&val, -1);
-    ObjM__StartFadeUp(self, val, 0, 5, 1);
+    self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &color, -1);
+    ObjM__StartFadeUp(self, color, 0, 5, 1);
     self->dreamSys->methods->blockMovement(self->dreamSys);
 }
 
@@ -93,7 +93,7 @@ void ObjM__NotifyParentsCodeB(ObjM *self) {
 
 /* The viewport (IntermediateBase::viewport, a NodeGuardedViewport) hands out its fade
  * box (getFadeBox, Viewport's New_FadeBox). */
-void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChild) {
+void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 fadeMode, s32 step, s32 addChild) {
     FadeBox *fade = (FadeBox *)((NodeGuardedViewport *)self->viewport)
                         ->methods->getFadeBox((NodeGuardedViewport *)self->viewport);
     if (step != 0) {
@@ -102,7 +102,7 @@ void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChil
     if (addChild != 0) {
         self->methods->addChild(self, (BasicClass *)fade);
     }
-    fade->methods->startFadeUp(fade, self->unk10, channels, arg2);
+    fade->methods->startFadeUp(fade, self->unk10, channels, fadeMode);
 }
 
 void ObjM__OnFadeNotify(ObjM *self, FadeBox *sender, s32 event) {
@@ -182,17 +182,17 @@ void ObjM__CloseAndNotifyC(ObjM *self) {
  * fourth call after it hides the viewport and pauses the FrameClock, the
  * WBgm and the VabStreamObj (IntermediateBase::unk10, bgm, TimedTask::sound). */
 void ObjM__AdvancePauseSetup(ObjM *self) {
-    s32 state = self->pauseSetupStep;
-    if (state == 0) {
+    s32 step = self->pauseSetupStep;
+    if (step == 0) {
         self->pauseText = New_TextRow(self->etcTim, 5, sPauseText);
         self->pauseText->methods->attachToParent(self->pauseText, (SceneNode *)self->unk14,
                                                  (LongVec3 *)&sPauseTextPos);
         self->pauseText->methods->setColor(self->pauseText, &sPauseTextColor);
-        self->pauseSetupStep = state + 1;
+        self->pauseSetupStep = step + 1;
         return;
     }
-    self->pauseSetupStep = state + 1;
-    if (state != 4) {
+    self->pauseSetupStep = step + 1;
+    if (step != 4) {
         return;
     }
     ((NodeGuardedViewport *)self->viewport)->methods->setDrawEnabled((NodeGuardedViewport *)self->viewport, 0);

@@ -163,7 +163,7 @@ void ObjM__EnterState7(ObjM *self);
 void ObjM__EnterState8(ObjM *self);
 void ObjM__EnterStateA(ObjM *self);
 void ObjM__NotifyParentsCodeB(ObjM *self);
-void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 arg2, s32 step, s32 addChild);
+void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 fadeMode, s32 step, s32 addChild);
 void ObjM__OnFadeNotify(ObjM *self, struct FadeBox *sender, s32 event);
 void ObjM__OnStageMapNotify(ObjM *self, BasicClass *sender, s32 event);
 s32 ObjM__CheckAuxTrigger(ObjM *self);
