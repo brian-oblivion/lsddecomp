@@ -208,15 +208,15 @@ Sprite *New_Sprite(void *texture, s32 abr, SpriteRect *rect, void *arg3, s32 arg
 
 /* Sprite's reset as its ctor calls it: with all five ctor arguments (the
  * slot is SceneNode's, typed without them; Sprite.h, "Not settled"). */
-typedef void *(*SpriteCtorReset_322b4)(Sprite *self, void *texture, s32 abr, SpriteRect *rect,
-                                       void *arg4, s32 arg5);
+typedef void *(*SpriteResetFn)(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4,
+                               s32 arg5);
 
 /* gSpriteMethods slot +0x008 (ctor): the SceneNode ctor, install the table,
  * and hand every argument to reset. */
 void *Sprite__Sprite(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5) {
     GetSceneNodeMethods()->ctor((SceneNode *)self);
     self->methods = GetSpriteMethods();
-    return ((SpriteCtorReset_322b4)self->methods->reset)(self, texture, abr, rect, arg4, arg5);
+    return ((SpriteResetFn)self->methods->reset)(self, texture, abr, rect, arg4, arg5);
 }
 
 /* gSpriteMethods slot +0x040 (reset): bind the texture and cell, rebuild the GsSPRITE. */
