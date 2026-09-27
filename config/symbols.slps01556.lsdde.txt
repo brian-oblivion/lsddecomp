@@ -2966,3 +2966,4 @@ gStage0Bounds = 0x80087150;
 gObjMViewPoint = 0x8008715C;
 gObjMViewRefPoint = 0x80087168;
 gObjMProjectionBias = 0x8008AB34;
+gCardIconRect = 0x80086EC4;
