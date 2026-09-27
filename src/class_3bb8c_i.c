@@ -165,15 +165,15 @@ void TextEntry__SetText(TextEntry *self, char *arg1, s32 mode) {
  */
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 
-extern const char sStrComInput[];    /* "COMINPUT" */
-extern const char sStrFontIcon[];    /* "FONTICON" */
-extern const char sCardPathPrefix[]; /* "CARD\\" */
-extern const char sTimExt[];         /* ".TIM" */
-extern s32 gTextEntryPanelRect; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 224, 120} */
-extern s32 gTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
-extern s32 gTextEntryPanelPos; /* panelSprite's attachToParent position, address-only here */
-extern s32 gTextEntryTextPos; /* textRow's slot4C position, address-only here */
-extern s32 gTextEntryCursorPos; /* cursorSprite's attachToParent position; class_3bb8c_j reads its x */
+extern const char sStrComInput[];          /* "COMINPUT" */
+extern const char sStrFontIcon[];          /* "FONTICON" */
+extern const char sCardPathPrefix[];       /* "CARD\\" */
+extern const char sTimExt[];               /* ".TIM" */
+extern SpriteRect gTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0, 0) */
+extern SpriteRgb gTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
+extern ScreenSpritePos gTextEntryPanelPos; /* (-70, -60) */
+extern ScreenSpritePos gTextEntryTextPos;  /* (-62, -15) */
+extern ScreenSpritePos gTextEntryCursorPos; /* (-62, -12), y at D_8008AAE0: SetCursorPos adds pos * 7 to x */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
     char path[0x20];
@@ -194,7 +194,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
 
     handle1 = New_TimImage(BuildFileName(path, sStrComInput, dir, ext));
     ((TimImageUploadFn)handle1->methods->processBuffer)(handle1);
-    self->panelSprite = New_ScreenSprite(handle1, (SpriteRect *)&gTextEntryPanelRect, 0);
+    self->panelSprite = New_ScreenSprite(handle1, &gTextEntryPanelRect, 0);
     handle1->methods->release(handle1);
     self->panelSprite->methods->attachToParent(self->panelSprite, (SceneNode *)arg1,
                                                (LongVec3 *)&gTextEntryPanelPos);
@@ -204,8 +204,9 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
     self->textRow = New_TextRow(handle2, self->textLen, self->editBuf);
     self->cursorSprite = New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
-    self->textRow->methods->attachToParent(self->textRow, (SceneNode *)arg1, (LongVec3 *)&gTextEntryTextPos);
-    self->textRow->methods->setColor(self->textRow, (SpriteRgb *)&gTextEntryTextColor);
+    self->textRow->methods->attachToParent(self->textRow, (SceneNode *)arg1,
+                                           (LongVec3 *)&gTextEntryTextPos);
+    self->textRow->methods->setColor(self->textRow, &gTextEntryTextColor);
     self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)arg1,
                                                 (LongVec3 *)&gTextEntryCursorPos);
 }
