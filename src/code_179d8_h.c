@@ -19,7 +19,7 @@
  * code_171e0.c's GetActiveDataSourceUseVSyncCallback.
  *
  * Nothing in the executable calls the install/destroy pair or NoOp2, NoOp3
- * and NoOp4 (no jal to them and no word holding their address).
+ * and NoOp4 (no jal, stored pointer or built address reaches them).
  */
 #include "common.h"
 #include <libcd.h>

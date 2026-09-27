@@ -46,5 +46,5 @@ equal to its address (a scan of every aligned word of `disk/SLPS_015.56`'s
 image for both encodings), so it has no caller and sits in no table. The
 round 64 note that it is "referenced only from the still-uncarved
 `code_179d8` remainder" no longer holds; it is unreferenced, at least by
-`jal` or stored pointer (an address built with `lui`/`addiu` was not
-scanned).
+`jal`, stored pointer, or `lui`/`addiu`/`ori` address build (no `addiu`
+or `ori` anywhere in the image carries its address's low half).
