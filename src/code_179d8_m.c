@@ -65,30 +65,10 @@
 #include <libspu.h>
 #include "SvmData.h"
 
-/* Round 48 (echo): testing charlie's ContDataEntry frame-padding lever on
- * this function's frame gap (0x10 built vs retail's 0x18, 8 bytes; retail
- * saves ZERO callee-saved registers and addresses NOTHING via $sp beyond
- * the prologue/epilogue immediate itself, confirmed via grep -- textbook
- * pure-padding shape). See docs/match-reports/SetAutoVol.md for the
- * full derivation this body is otherwise unchanged from.
- *
- * This function sits FIRST in ROM order in this unit, so the shared
- * record-family types its sibling stalls also use (ObjE970, the volume/pan scratch bytes, D_8008E8C0) are
- * defined HERE instead of duplicated -- their old definitions further
- * down this file (originally written for SetAutoPan's isolated splice)
- * are removed; the plain externs that used to accompany them there are
- * left in place and now just reference these same, earlier-defined types
- * (a harmless duplicate extern declaration, not a redefinition). Same
- * "move the shared prelude up, do not duplicate" fix round 37 already
- * used here; declaration order carries no code. */
-typedef struct {
-    u8 pad[0x12];
-    u16 difficultyThreshold; /* +0x12 -- compared unsigned against D_8008EA13, per SpuVmKeyOn's report */
-    u8 pad14[0x18 - 0x14];
-    u8 masterVolume; /* +0x18 -- scaled by 0x3FFF into the stereo-level product in SetAutoVol/SetAutoPan */
-} ObjE970;
-
-extern ObjE970 *D_8008E970;
+/* libsnd's _svm_vh (pinned at this address): the header of the VAB bank
+ * currently selected. SetAutoVol/SetAutoPan scale by its master volume;
+ * SpuVmKeyOn bounds the program number by its program count. */
+extern VabHdr *D_8008E970;
 
 extern u8 D_8008EA10;
 extern u8 D_8008EA11;
@@ -143,7 +123,7 @@ void SetAutoVol(s16 voice) {
     acc = _svm_voice[v].unk24;
     D_8008EA10 = acc;
 
-    vol = D_8008E970->masterVolume * 0x3FFF;
+    vol = D_8008E970->mvol * 0x3FFF;
     q2 = (acc * vol) / 16129;
     q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;
 
@@ -251,7 +231,7 @@ void SetAutoPan(s16 voice) {
     acc = *(u8 *)&_svm_voice[v].unk30;
     D_8008EA11 = acc;
 
-    vol = D_8008E970->masterVolume * 0x3FFF;
+    vol = D_8008E970->mvol * 0x3FFF;
     q2 = (D_8008EA10 * vol) / 16129;
     q2 = (q2 * D_8008EA16 * D_8008EA19) / 16129u;
 
@@ -513,7 +493,9 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
     }
 }
 
-/* Debug/selected-difficulty byte, read fresh each call. */
+/* _svm_cur + 7: the current program number. A VAB gives each program 16
+ * tone slots, so it indexes _svm_tn in steps of 16, and SpuVmKeyOn
+ * refuses one at or past _svm_vh->ps. */
 extern u8 D_8008EA13;
 
 /* Pointer to a 0x20-byte-stride table. Originally only the two
@@ -873,7 +855,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
     D_8008EA17 = slot->unk4;
     D_8008EA0C = slot->unk0;
 
-    if ((u32)D_8008EA13 >= D_8008E970->difficultyThreshold) {
+    if ((u32)D_8008EA13 >= D_8008E970->ps) {
         return -1;
     }
 
