@@ -56,7 +56,7 @@ struct IntermediateBaseInitArgs {
 #define INTERMEDIATEBASE_SLOTS(Self, CtorParams)                                                   \
     BASICCLASS_SLOTS(Self, CtorParams);                                                            \
     /* +0x040 */ void (*resetCounters)(Self *self);          /* IntermediateBase__ResetCounters; the ctor's last call */ \
-    /* +0x044 */ s32 (*init)(Self *self, IntermediateBaseInitArgs *args, s32 mode); /* IntermediateBase__Init; s32: RunPollTask/PollStatusObj use the result */ \
+    /* +0x044 */ s32 (*init)(Self *self, IntermediateBaseInitArgs *args, s32 mode); /* IntermediateBase__Init; s32: RunTask/RunDayTask use the result */ \
     /* +0x048 */ void (*deinit)(Self *self);                 /* IntermediateBase__Deinit */      \
     /* +0x04C */ void (*onInit)(Self *self, s32 arg1, s32 arg2, s32 arg3); /* NULL; init calls it (0, 0, 0) after adding the children */ \
     /* +0x050 */ void (*onDeinit)(Self *self);               /* NULL; deinit's first call */     \

@@ -17,11 +17,11 @@
  * IntermediateBaseInitArgs, its DreamSys, config->unk04), runs its init to
  * completion and releases it. init's return is TimedTask::result:
  *   1 or 2 -- ObjM's event 4 and endDay(0) returned 0: 2 when the
- *             DreamSys's getCinematic then has an entry (PollStatusObj
+ *             DreamSys's getCinematic then has an entry (RunDayTask
  *             plays it), else 1; also 2 when startDay refused the day
  *             (returned < 0; a special day, by DreamSys's reading);
  *   3      -- event 4 in a flashback session (endDay returned nonzero), or
- *             ObjM's close codes 0xC/0xD; PollStatusObj then sets
+ *             ObjM's close codes 0xC/0xD; RunDayTask then sets
  *             skipGraphRoomPoll.
  *
  * Lifecycle, by phase (`phase`):
@@ -47,7 +47,7 @@
  *    `result` and setState(3).
  *
  * Two overrides take fewer arguments than their slots and the slots keep
- * IntermediateBase's types: init (DayTask__Init, self only; PollStatusObj
+ * IntermediateBase's types: init (DayTask__Init, self only; RunDayTask
  * calls it through DayTaskInitFn) and onInit (DayTask__OnInit, self only;
  * IntermediateBase__Init calls it with (0, 0, 0)).
  */
@@ -75,8 +75,8 @@ enum DayTaskPhase {
 enum DayTaskResult {
     DAYTASK_RESULT_ENDED = 1,     /* ObjM's TIME_UP, endDay(0) returned 0, no cinematic entry */
     DAYTASK_RESULT_CINEMATIC = 2, /* as ENDED with a cinematic entry, or startDay refused the day;
-                                     PollStatusObj starts the cinematic stream */
-    DAYTASK_RESULT_CLOSED = 3     /* TIME_UP with endDay nonzero, or an ObjM close; PollStatusObj
+                                     RunDayTask starts the cinematic stream */
+    DAYTASK_RESULT_CLOSED = 3     /* TIME_UP with endDay nonzero, or an ObjM close; RunDayTask
                                      sets skipGraphRoomPoll */
 };
 

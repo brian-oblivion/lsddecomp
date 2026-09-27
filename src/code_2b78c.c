@@ -60,18 +60,18 @@ void Application__RunMainLoop(Application *self) {
     s32 status;
 
     if (self->initialized) {
-        self->methods->loadIntroLogoSequence(self);
+        self->methods->showIntroLogos(self);
         for (;;) {
-            self->methods->startWeeklyStreamTask(self);
+            self->methods->playOpeningMovie(self);
             for (;;) {
-                status = self->methods->pollGraphRoomStatus(self);
+                status = self->methods->runTitleMenu(self);
                 if (status == 1) {
                     self->methods->slot5C(self);
                     continue;
                 }
                 if (status == 2) {
-                    if (self->methods->pollStatusObj(self)) {
-                        self->methods->startStreamTaskWithInit(self);
+                    if (self->methods->runDayTask(self)) {
+                        self->methods->playEndingMovie(self);
                     }
                 }
                 if (status == 0) {

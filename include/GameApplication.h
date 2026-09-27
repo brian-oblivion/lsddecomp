@@ -19,20 +19,20 @@
  *                  (New_LinkResource), config->unk14 handed to it, and the RNG
  *                  seeded (setScreenDims's occupant, below).
  *   initSystems    Application's, unless already initialized.
- *   runMainLoop    Application's: once loadIntroLogoSequence, then forever
- *                  startWeeklyStreamTask and the pollGraphRoomStatus loop.
+ *   runMainLoop    Application's: once showIntroLogos, then forever
+ *                  playOpeningMovie and the runTitleMenu loop.
  * The hooks, in the order runMainLoop calls them:
- *   +0x050 loadIntroLogoSequence  ShowIntroLogos: the ASMK logo, the ASMK
+ *   +0x050 showIntroLogos  ShowIntroLogos: the ASMK logo, the ASMK
  *                                 movie, the OSD logo
- *   +0x054 startWeeklyStreamTask  PlayOpeningMovie: an opening movie
- *   +0x058 pollGraphRoomStatus    RunTitleMenu: GraphRoom and TitleMenu against
+ *   +0x054 playOpeningMovie  PlayOpeningMovie: an opening movie
+ *   +0x058 runTitleMenu    RunTitleMenu: GraphRoom and TitleMenu against
  *                                 the DreamSys; returns 0 or 2 to the loop
  *                                 (enum GameApplicationLoopStatus)
  *   +0x05C slot5C                 empty (GameApplication__NoOpSlot5C)
- *   +0x060 pollStatusObj          RunDayTask: one DayTask (include/DayTask.h),
+ *   +0x060 runDayTask          RunDayTask: one DayTask (include/DayTask.h),
  *                                 then maybe the current cinematic;
  *                                 nonzero (a year gone by) runs +0x064
- *   +0x064 startStreamTaskWithInit  PlayEndingMovie: ETC\ENDING.STR
+ *   +0x064 playEndingMovie  PlayEndingMovie: ETC\ENDING.STR
  * Every task these start is given the parent's `aux` as its
  * IntermediateBaseInitArgs, and every movie but the intro's is gated by
  * config->playStreams.
