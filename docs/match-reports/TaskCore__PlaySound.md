@@ -60,3 +60,7 @@ byte-identical with the s32 slot, because the call is this void function's
 last statement and nothing reads `$v0`. `TaskCore::sound` stays
 `BasicClass *`: it is TaskCore's field, and it can also hold the ctor's own
 `sound` argument.
+
+## Track 7 (round 98, alpha)
+
+PlayTone's `0x60, 0x60` (vol, endVol) -> TASKCORE_TONE_VOLUME (96). Tones are TASKCORE_TONE_CURSOR 0x00 / TASKCORE_TONE_BUTTON 0x10, PlayTone indices (program << 4 | tone), include/TaskCore.h. Byte-identical.

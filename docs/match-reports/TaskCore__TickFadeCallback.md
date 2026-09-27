@@ -68,3 +68,7 @@ state 5 itself is not established.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__TickFadeCallback (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 98, alpha)
+
+`result` -> `done`; setState(5) -> TASKCORE_STATE_ACTIVE. Byte-identical.

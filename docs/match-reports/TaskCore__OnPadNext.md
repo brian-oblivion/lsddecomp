@@ -53,3 +53,7 @@ above. Tier C for the same reason.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__func_8003C9B0 (tools/rename.py). Occupant of +0x084 (`onPadNext`, 0x13): findNextFreeSlot or advanceSlotCursor. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (round 98, alpha)
+
+inputMode tests read TASKCORE_INPUT_CHOOSING_SLOT / TASKCORE_INPUT_SCROLLING; the single `handler` call site (the residue above) carries a MATCHING line. Byte-identical.

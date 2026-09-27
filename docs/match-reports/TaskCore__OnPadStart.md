@@ -78,3 +78,7 @@ TaskCore__SetState treats as a return to the active state and which parents
 see through notifyParents; TitleMenu__SetState acts on it (cancel, jump to
 the target's first slot, confirm). The slot's only accessor is
 TaskCore__OnPadEvent (compiler error list).
+
+## Track 7 (round 98, alpha)
+
+Constants: TASKCORE_TONE_BUTTON, TASKCORE_STATE_START_PRESSED (include/TaskCore.h). Byte-identical.

@@ -112,6 +112,11 @@ enum TaskCoreInputMode {
  * tickFadeColor counts down from it and is done when it wraps below 0. */
 #define TASKCORE_FADE_FULL 128
 
+/* setFrameBound's unit: DrawSystem__Init sets vsyncCount 3, so the game
+ * draws 60 / 3 = 20 frames a second and frameCounter counts them;
+ * setFrameBound(bound) is `bound` seconds. (StreamTask's override uses 15.) */
+#define TASKCORE_FRAMES_PER_SECOND 20
+
 /* The menu description setTarget builds its slot widgets from (the ctor's
  * first argument; TitleMenu passes &D_80086D44). One slot per `names`
  * entry. */
@@ -132,7 +137,7 @@ struct TaskCoreTarget {
 /* clang-format off */
 #define TASKCORE_SLOTS(Self, CtorParams)                                                           \
     INTERMEDIATEBASE_SLOTS(Self, CtorParams);                                                      \
-    /* +0x06C */ void (*setFrameBound)(Self *self, s32 bound);   /* TaskCore__SetFrameBound: frameBound = bound * 20 (negative: kept) */ \
+    /* +0x06C */ void (*setFrameBound)(Self *self, s32 bound);   /* TaskCore__SetFrameBound: frameBound = bound seconds of frames (negative: kept, no bound) */ \
     /* +0x070 */ void (*playSound)(Self *self, s32 tone);        /* TaskCore__PlaySound */         \
     /* +0x074..+0x084: onPadEvent's cases. Called with self alone: $a1 still  \
      * holds the sender at that call, but no occupant in any of the four     \

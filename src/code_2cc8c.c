@@ -130,7 +130,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
 void TaskCore__SetFrameBound(TaskCore *self, s32 bound) {
     self->frameBound = bound;
     if (bound >= 0) {
-        self->frameBound = bound * 20;
+        self->frameBound = bound * TASKCORE_FRAMES_PER_SECOND;
     }
 }
 
