@@ -254,3 +254,18 @@ nothing names the second mode.
 
 
 Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Open` -> `CdDriver__Open` by rename.py.
+
+### Round 100 (charlie, track 7): `D_8008A860` -> `gCdSyncQueueMode`, tier B
+
+The paragraph above predates this rename (the tool rewrote the name in it).
+What the five methods' bodies show, read together: the mode word only ever
+matters when `gCdAsyncEnabled` is 0. Both 0: each method forwards straight
+to code_179d8_h's blocking call and never touches the queue. `gCdAsyncEnabled`
+0 and this word nonzero: the call is enqueued like an async one, and when
+`CdDriver__RunRequestQueue` dispatches it back the method runs it as a
+blocking CdControl/CdSync/CdRead spin on the spot. So the word selects
+"synchronous, but through the request queue". Its one nonzero writer is
+`SetCdDriverMode(async, 1, 1)` reached from class_39e08 through
+`SetActiveDataSourceDriverMode(syncDriver == 0, 1, 1)`; every other caller
+passes 0. Tier B: the mechanics are the bodies', why the game wants the
+queued blocking mode is not established.
