@@ -13,8 +13,8 @@
  * drawNode in code_2864.c. In table order:
  *  - onNotify and its two per-sender handlers: a FrameClock event runs
  *    update, the DrawSystem's VSync event runs flip;
- *  - initDefaults and the field setters (screen size, OT length, the two
- *    packet-area factors, which only take before initOt, projection, light
+ *  - initDefaults and the field setters (screen size, OT length, packet
+ *    count and size, which only take before initOt, projection, light
  *    mode, clear and far colours, fog near); four slots hold empty bodies;
  *  - attachViewChild/detachViewChild and the setters of the GsRVIEW2 that
  *    GsSetRefView2 takes (viewpoint, reference point, twist);
@@ -35,8 +35,8 @@
  */
 
 /* Forwards to the base onNotify, then dispatches on the sender's class-id
- * nibble: 5 (a FrameClock) to onNotifyTag5, 1 (the DrawSystem) to
- * onNotifyTag1, anything else nowhere. */
+ * nibble: a FrameClock to onNotifyTag5, the DrawSystem to onNotifyTag1,
+ * anything else nowhere. */
 void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
     s32 tag;
 
@@ -100,14 +100,14 @@ void Viewport__SetOtLength(Viewport *self, s32 length) {
     self->otLength = length;
 }
 
-/* Takes only before InitOt: packetCount is one factor of each packet area. */
+/* Takes only before InitOt, which sizes the packet areas from it. */
 void Viewport__SetPacketCount(Viewport *self, s32 count) {
     if (self->otReady == 0) {
         self->packetCount = count;
     }
 }
 
-/* The same guard, for the other factor, packetSize. */
+/* The same guard, for the packet size. */
 void Viewport__SetPacketSize(Viewport *self, s32 size) {
     if (self->otReady == 0) {
         self->packetSize = size;
@@ -195,7 +195,7 @@ void Viewport__NoOpSlot84(void) {}
 void Viewport__NoOpSlot88(void) {}
 
 /* One-time allocation of the two ordering tables. Each half of the buffer
- * is a GsOT header, its 1 << otLength four-byte tags, then packetSize * packetCount
+ * is a GsOT header, its 1 << otLength tags, then packetSize * packetCount
  * bytes of packet area. */
 void Viewport__InitOt(Viewport *self) {
     s32 size;
@@ -245,8 +245,9 @@ void Viewport__DeinitOt(Viewport *self) {
     }
 }
 
-/* A FrameClock event: counts every one in clockEventCount, and runs update on a tick
- * whether the clock is running or paused (not on FRAMECLOCK_EVENT_FLAG14). */
+/* A FrameClock event: counts every one in clockEventCount, and runs update
+ * on a tick whether the clock is running or paused (not on
+ * FRAMECLOCK_EVENT_FLAG14). */
 void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event) {
     self->clockEventCount = self->clockEventCount + 1;
     if (event == FRAMECLOCK_EVENT_RUNNING || event == FRAMECLOCK_EVENT_PAUSED) {
@@ -254,7 +255,7 @@ void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event) {
     }
 }
 
-/* A DrawSystem event: its per-VSync event (2) runs flip. */
+/* A DrawSystem event: its per-VSync event runs flip. */
 void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event) {
     if (event == DRAWSYSTEM_EVENT_VSYNC) {
         self->methods->flip(self);
@@ -263,7 +264,7 @@ void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event) {
 
 /* Per-frame update, only once Viewport__InitOt has succeeded: draws the
  * view node if it has a parent, sets the projection, near clip and light
- * mode (and the fog for light modes 1 and 3), sets the reference view and
+ * mode (and the fog, in both fog modes), sets the reference view and
  * marks its super coordinate for recompute, recomputes zDiv, sets this
  * half's packet area and clears its OT, then draws sceneRoot and the root
  * of the view node's parent chain. */
@@ -308,9 +309,10 @@ void Viewport__Update(Viewport *self) {
 }
 
 /* Takes otIndex from the DrawSystem's getActiveBuffer; when drawing is
- * enabled, resets the GPU, swaps (once more on buffer 0 when extraSwapOnBuffer0 is set),
- * sorts the clear into this half's OT and draws it (and swaps again on
- * buffer 0 with extraSwapOnBuffer0); then flips otIndex to the other half. */
+ * enabled, resets the GPU, swaps, sorts the clear into this half's OT and
+ * draws it, with one more swap before the clear and one after the draw on
+ * buffer 0 when extraSwapOnBuffer0 is set; then flips otIndex to the other
+ * half. */
 void Viewport__Flip(Viewport *self) {
     s32 idx;
 
