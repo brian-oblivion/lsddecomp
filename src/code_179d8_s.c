@@ -91,7 +91,7 @@ void CdDriver__Open(CdDriver *self, char *name, s32 param0, s32 param1) {
                     CdControl(CdlSetloc, (u_char *)&self->pos, 0);
                     do {
                         status = CdSync(0, 0);
-                    } while (status == 0);
+                    } while (status == CdlNoIntr);
                 } while (status == CdlDiskError);
                 self->isOpen = 1;
                 ResetCdStateMachine();
@@ -152,7 +152,7 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
                         CdControl(CdlSetloc, (u_char *)&gCdSeekLoc, 0);
                         do {
                             status = CdSync(0, 0);
-                        } while (status == 0);
+                        } while (status == CdlNoIntr);
                     } while (status == CdlDiskError);
                     ResetCdStateMachine();
                 }
@@ -270,7 +270,7 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
                     CdControl(CdlSetloc, (u_char *)&gCdSeekParam->pos, 0);
                     do {
                         status = CdSync(0, 0);
-                    } while (status == 0);
+                    } while (status == CdlNoIntr);
                 } while (status == CdlDiskError);
                 CdRead(gCdReadSectorCount, self->buffer, CdlModeSpeed);
                 do {
