@@ -80,8 +80,8 @@ void TextEntry__TextEntry(TextEntry *self, char *arg1, s32 arg2) {
 }
 
 void TextEntry__ClearChildRefs(TextEntry *self) {
-    self->childType2 = NULL;
-    self->childType5 = NULL;
+    self->inputSource = NULL;
+    self->tickSource = NULL;
     self->panelSprite = NULL;
 }
 
@@ -96,12 +96,12 @@ void TextEntry__AddChild(TextEntry *self, void *arg1) {
 
     if (arg1 != NULL) {
         Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)arg1);
-        tag = **(s32 **)arg1;
+        tag = ((BasicClass *)arg1)->methods->header;
         mask = tag & 0xF;
         if (mask == 2) {
-            self->childType2 = arg1;
+            self->inputSource = arg1;
         } else if (mask == 5) {
-            self->childType5 = arg1;
+            self->tickSource = arg1;
         }
     }
 }
@@ -111,20 +111,20 @@ void TextEntry__RemoveChild(TextEntry *self, void *arg1) {
     s32 mask;
 
     if (arg1 != NULL) {
-        tag = **(s32 **)arg1;
+        tag = ((BasicClass *)arg1)->methods->header;
         mask = tag & 0xF;
         if (mask == 2) {
-            self->childType2 = NULL;
+            self->inputSource = NULL;
         } else if (mask == 5) {
-            self->childType5 = NULL;
+            self->tickSource = NULL;
         }
         Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)arg1);
     }
 }
 
 void TextEntry__RemoveAllChildren(TextEntry *self) {
-    self->childType2 = NULL;
-    self->childType5 = NULL;
+    self->inputSource = NULL;
+    self->tickSource = NULL;
     self->panelSprite = NULL;
     Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
 }
@@ -135,7 +135,7 @@ void TextEntry__OnNotify(TextEntry *self, void *arg1, s32 arg2) {
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, arg1, arg2);
 
-    tag = **(s32 **)arg1;
+    tag = ((BasicClass *)arg1)->methods->header;
     mask = tag & 0xF;
     if (mask == 2) {
         self->methods->handleCommand(self, arg1, arg2);
@@ -228,8 +228,8 @@ void TextEntry__AttachTarget(TextEntry *self, void *arg1, void *arg2, VabStreamO
 }
 
 void TextEntry__DetachTarget(TextEntry *self) {
-    self->methods->removeChild(self, self->childType2);
-    self->methods->removeChild(self, self->childType5);
+    self->methods->removeChild(self, self->inputSource);
+    self->methods->removeChild(self, self->tickSource);
     self->target = NULL;
 }
 
@@ -241,7 +241,7 @@ void TextEntry__SetState(TextEntry *self, s32 arg1) {
     switch (arg1) {
         case 2:
         case 3:
-            self->methods->removeChild(self, self->childType2);
+            self->methods->removeChild(self, self->inputSource);
             self->methods->releaseCardResources(self);
             self->closeState = arg1;
             break;

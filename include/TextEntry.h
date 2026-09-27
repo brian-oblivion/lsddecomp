@@ -87,8 +87,8 @@ struct TextEntry {
     /* +0x028 */ char *editBuf; /* ctor allocates textLen + 4, finalize frees; setText copies into it, setCharAt writes it */
     /* +0x02C */ s32 closeState; /* setState: 2 or 3; setState(4) notifies parents with it */
     /* +0x030 */ s32 closeTickCount; /* setState zeroes; tickState counts, and calls setState(4) on the second tick */
-    /* +0x034 */ void *childType2; /* addChild/removeChild: the child whose class id's low nibble is 2 */
-    /* +0x038 */ void *childType5; /* ... whose low nibble is 5 */
+    /* +0x034 */ void *inputSource; /* addChild/removeChild: the child of class PAD_CLASS_ID (a Pad); onNotify sends its events to handleCommand */
+    /* +0x038 */ void *tickSource; /* ... of class FRAMECLOCK_CLASS_ID (a FrameClock); onNotify sends its events to tickState */
     /* +0x03C */ struct VabStreamObj *target; /* attachTarget; notifyTarget plays tone arg1 on it (playTone, volume 0x60, 0x60) */
     /* +0x040 */ CharSprite *cursorSprite; /* loadCardResources: New_CharSprite(FONTICON, '_'); setCursorPos moves it to x = pos * 7 */
     /* +0x044 */ struct TextRow *textRow; /* a TextRow (include/TextRow.h): loadCardResources: New_TextRow(FONTICON, textLen, editBuf); setCharAt sets a cell (+0x0C4) */
