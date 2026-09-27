@@ -208,3 +208,19 @@ code outside this unit).
 ## Track 4 (2026-09-25, round 85, charlie)
 
 Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetChar`. That name came from gTextRowMethods's class, whose SetText/SetChildChar hand a character to each CHILD's +0x0C4, but those children are CharSprite cells, not BoxFills, so it described another class's slot. The body: attachToParent(self, parent, pos) through the inherited +0x04C slot (with a fourth argument, through an unprototyped pointer, kept for the bytes), then `relative` = 0 (DrawNode then reads posX/posY as pixels, not percent of half the screen) and unk4C = the fourth argument. GraphRoom__PopulateGraphPoints is its caller, with (parent, &point, 0). Tier B: the mechanics are that; what unk4C is for is not shown (no reader).
+
+## History moved from src/code_2cc8c_f.c (round 99, track 7, bravo)
+
+The in-body comment, verbatim until round 99, when it became a one-line
+`MATCHING:` note (the comment above the function, on the four-argument call,
+stays in the unit):
+
+```c
+    /* The do/while(0) wrapper is a no-op scoping device, load-bearing for
+     * delay-slot scheduling only -- see the match report. Without it GCC
+     * swaps the prologue's $ra/$s1 callee-save STORE ORDER. */
+```
+
+## Track 7 (round 99, bravo)
+
+The fourth parameter `arg3` is now `attachArg` (here, in BoxFill.h's prototype and in the +0x0C4 slot; names only). The `q = self` copy is gone: the body uses `self` directly, byte-exact. The do/while(0) stays: removed, the build differs at 0x80040860 (`sw $ra` / `sw $s1` swapped, retail `1800bfaf`, built `1400b1af`), measured this round; it now carries a one-line `MATCHING:` comment. The field it writes, `unk4C`, is also written by BoxFill__Reset in code_2cc8c_e, so its name is proposed, not applied: `attachArg` (the fourth argument stored; no reader anywhere, and both call sites, in GraphRoom (class_3bb8c_t), pass 0).

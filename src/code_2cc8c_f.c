@@ -1,21 +1,21 @@
 /*
- * code_2cc8c_f -- two classes and three free functions.
+ * code_2cc8c_f -- the rest of BoxFill, all of TextRow, and three full-width
+ * Shift-JIS string helpers.
  *
- * BoxFill (class id 0x64, gBoxFillMethods, include/BoxFill.h), the
- * functions from BoxFill__AttachToParent to GetBoxFillMethods: a GsBOXF
- * screen rectangle's attach, attribute bits, colour, position, size,
- * priority and mask (its allocator, ctor and Reset close code_2cc8c_e).
+ * BoxFill (include/BoxFill.h), BoxFill__AttachToParent to GetBoxFillMethods:
+ * a flat-coloured GsBOXF screen rectangle's attach, attribute bits, colour,
+ * position, size, priority and mask. Its allocator, ctor and Reset are the
+ * last functions of code_2cc8c_e.
  *
- * TextRow (class id 0x11144, gTextRowMethods, include/TextRow.h; below
- * CharSprite, NOT below BoxFill), from New_TextRow to GetTextRowMethods: a
- * row of CharSprite character cells.
+ * TextRow (include/TextRow.h), New_TextRow to GetTextRowMethods: a row of
+ * CharSprite character cells showing a string. It derives from CharSprite,
+ * not from BoxFill; the two classes only sit next to each other.
+ * TextRow__NoOpGetCell and TextRow__NoOpSlotD0 are empty method-table
+ * occupants.
  *
- * Then `DecodeFullWidthSjis`/`EncodeFullWidthSjis`/`FormatFullWidthNumber`,
- * confirmed by their OWN callers elsewhere to take a plain buffer.
- *
- * All non-trivial functions are MATCHED; zero live INCLUDE_ASM, zero
- * NON_MATCHING bodies. `TextRow__NoOpGetCell`/`TextRow__NoOpSlotD0` are
- * splat-generated `jr $ra; nop` occupants.
+ * Then DecodeFullWidthSjis, EncodeFullWidthSjis and FormatFullWidthNumber:
+ * free functions over plain byte buffers, converting printable ASCII to and
+ * from two-byte full-width Shift-JIS.
  */
 #include "common.h"
 #include <libgte.h>
@@ -77,9 +77,7 @@ void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, 
     void (*fn)();
 
     fn = (void (*)())self->methods->attachToParent;
-    /* The do/while(0) wrapper is a no-op scoping device, load-bearing for
-     * delay-slot scheduling only -- see the match report. Without it GCC
-     * swaps the prologue's $ra/$s1 callee-save STORE ORDER. */
+    /* MATCHING: without the do/while(0), GCC swaps the prologue's $ra/$s1 stores. */
     do {
         fn(self, parent, pos, attachArg);
         self->relative = 0;
@@ -289,12 +287,10 @@ TextRowMethods *GetTextRowMethods(void) {
 #define SJIS_TRAIL_GAP 0x7F    /* the trail value Shift-JIS skips */
 #define SJIS_TRAIL_SPACE 0x40 /* the full-width space 0x8140's trail: ' ' + SJIS_TRAIL_OFFSET + 1 */
 
-/* DecodeFullWidthSjis -- MATCHED round 38 (24/24). A permuter search (208
- * iterations, rc=0) closed the last residue: retail materializes the
- * 0x40 comparison constant into its own register BEFORE copying `dst`
- * into `d`, and GCC 2.6.3 only reproduces that emission order when the
- * constant is named by a separate local assigned first. See
- * docs/match-reports/DecodeFullWidthSjis.md. */
+/* Full-width Shift-JIS back to ASCII: drops each lead byte and maps the trail
+ * back. Returns the address of the NUL it writes.
+ * MATCHING: `special` holds SJIS_TRAIL_SPACE so the constant is loaded before
+ * `d` is copied from `dst`; `d` and `dst` are two cursors over one buffer. */
 u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 special;
@@ -324,14 +320,10 @@ u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
     return dst;
 }
 
-/* EncodeFullWidthSjis -- MATCHED round 38 (31/31). Round 37 got structure and
- * length exact via the two-cursor idiom (`d = dst; dst++; *d = x;`),
- * leaving a pure 3-way register-identity residue. A permuter search
- * (158 iterations, rc=0) closed it: copying the second byte's value
- * into its own local (`trail`) before using it in the comparisons and
- * arithmetic, instead of reusing `c` directly, changes GCC 2.6.3's
- * register allocation to match retail's exactly. See
- * docs/match-reports/EncodeFullWidthSjis.md. */
+/* ASCII to full-width Shift-JIS, two bytes a character. Returns the address
+ * of the NUL it writes.
+ * MATCHING: the `d = dst; dst++;` cursor pairs and the `trail` copy of `c`
+ * give retail's register assignment. */
 u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
     u8 *d;
     u32 c;
@@ -367,19 +359,10 @@ u8 *EncodeFullWidthSjis(u8 *dst, u8 *src) {
     return dst;
 }
 
-/* FormatFullWidthNumber -- MATCHED round 38 (56/56). Round 35 got structure and
- * length exact (padded/text VLAs, strlen/itoa naming fixed post-SDK-object
- * renaming) leaving a 4-value register-identity residue (fill/text
- * swapped relative to retail). A permuter search (733 iterations, rc=0)
- * closed it: declaration order text/fill/padded (not round 35's
- * padded/text) PLUS splitting `fill = width - strlen(...)` into two
- * statements (`fill = strlen(...); fill = width - fill;`) together
- * reproduce retail's exact register assignment. Also fixed a stale
- * prototype: the preserved body's forward declaration of EncodeFullWidthSjis
- * as `(Obj6EAC0 *, char *)` predates that function's own round-38 match
- * as `u8 *EncodeFullWidthSjis(u8 *, u8 *)`. Its first parameter was typed as
- * the TextRow view `Obj6EAC0 *` and cast to `u8 *`; it is the output buffer
- * (track 4, round 88: `u8 *dst`, no cast). See docs/match-reports/FormatFullWidthNumber.md. */
+/* Writes `value` in decimal, as full-width Shift-JIS, into `dst`: padded on
+ * the left with '0' to `width` digits, or as it is when `unpadded` is set.
+ * MATCHING: the declaration order text/fill/padded and `fill` computed in two
+ * statements give retail's register assignment. */
 extern char *strcpy(char *dst, char *src);
 extern void *memset(unsigned char *dst, unsigned char c, int n);
 extern int strlen(char *s);

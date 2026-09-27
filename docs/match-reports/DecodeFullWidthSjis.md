@@ -607,3 +607,21 @@ every declaration was a call-site typing; class_3bb8c_i read it as
 byte-exact, because the return type of an INCLUDE_ASM callee only affects the
 caller's codegen. Two call-site typings of one undefined function are the
 case that must stay unit-local.
+
+## History moved from src/code_2cc8c_f.c (round 99, track 7, bravo)
+
+The comment above the function in the unit, verbatim until round 99, when the
+unit's comments were cut to what the code needs:
+
+```c
+/* DecodeFullWidthSjis -- MATCHED round 38 (24/24). A permuter search (208
+ * iterations, rc=0) closed the last residue: retail materializes the
+ * 0x40 comparison constant into its own register BEFORE copying `dst`
+ * into `d`, and GCC 2.6.3 only reproduces that emission order when the
+ * constant is named by a separate local assigned first. See
+ * docs/match-reports/DecodeFullWidthSjis.md. */
+```
+
+## Track 7 (round 99, bravo)
+
+The literals are unit-local `SJIS_*` defines (SJIS_TRAIL_SPACE 0x40, SJIS_TRAIL_GAP 0x7F, SJIS_TRAIL_OFFSET 0x1F); `c < 0x80` is spelled `c <= SJIS_TRAIL_GAP`, byte-exact.
