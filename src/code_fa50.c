@@ -40,12 +40,6 @@ typedef struct Corners_fa50 {
     TmdVec3 face[2][4];
 } Corners_fa50;
 
-/* A counted list of boxes' corners (TmdHull is the one-box case). */
-typedef struct HullList_fa50 {
-    s32 count;             /* +0x000 */
-    Corners_fa50 boxes[1]; /* +0x004 */
-} HullList_fa50;
-
 /* A segment: start and direction (end - start). */
 typedef struct Ray_fa50 {
     TmdVec3 org; /* +0x000 */
@@ -200,13 +194,13 @@ void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
     out->count = 1; /* MATCHING: the literal, not b.count, which is reloaded */
 }
 
-void RotateAndOffsetHullList(HullList_fa50 *h, s32 turn, s32 back, s32 delta) {
+void RotateAndOffsetHullList(TmdHull *h, s32 turn, s32 back, s32 delta) {
     Corners_fa50 tmp;
     Corners_fa50 *c;
     s32 i;
 
     for (i = 0; i < h->count; i++) {
-        c = &h->boxes[i];
+        c = &((Corners_fa50 *)h->v)[i]; /* v[] as count boxes of eight corners */
         if (turn != 0) {
             tmp = *c;
             c->face[0][3] = tmp.face[0][0];

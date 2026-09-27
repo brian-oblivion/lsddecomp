@@ -94,3 +94,17 @@ TmdModel__GetHull's v[0..3] min-z face and v[4..7] max-z face). Parameter
 `d` -> `delta` (added to x or z of one face). `turn` and `back` kept: they
 already say what they select. A `MATCHING:` line marks the per-branch `k`
 (build 5 above). The types themselves are track 6's. Byte-identical.
+
+## Naming (track 6, round 95)
+
+2026-09-27, delta: `HullList_fa50` (`s32 count; Corners_fa50 boxes[1];`) is
+deleted and the parameter is `include/TmdModel.h`'s `TmdHull`. Same layout
+(0x34 bytes: the count, then 48 bytes of corners) and the same object: the
+one caller, `Actor__NotifyMove` (class_3bb8c_o.c), fills its buffer through
+`getModelHull` (TmdModel__GetHull writes a `TmdHull`) and hands the same
+buffer on as `(TmdHull *)&buf`; TmdHull's own comment already calls it a
+counted list of boxes' corners. Box `i` is `&((corners type *)h->v)[i]`, the
+`v[8]` array viewed as groups of eight: byte-identical to `&h->boxes[i]`
+(the address is `h + 4 + i * 48` either way). The two-faces-of-four corner
+type stays, because the rotation permutes faces (build 2 above: the flat
+`v[k + 4]` form costs a word per loop).
