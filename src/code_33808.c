@@ -137,11 +137,11 @@ typedef struct Hdr43200 {
 
 /* The same header, read: a block count, then the blocks' file offsets and
  * their sizes. */
-typedef struct Buf434DC {
+typedef struct TimBlockHeader {
     /* +0x00 */ u32 count;
     /* +0x04 */ u32 offsets[4];
     /* +0x14 */ u32 sizes[4];
-} Buf434DC;
+} TimBlockHeader;
 
 extern s16 gTimBlockClutShift;
 
@@ -219,7 +219,8 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
                 BMemPMgrFree(self->sector);
                 max = FindMaxTimBlockSize((FileResource *)self);
-                self->blocks = BMemPMgrAlloc(((Buf434DC *)self->buffer)->count * sizeof(*self->blocks));
+                self->blocks =
+                    BMemPMgrAlloc(((TimBlockHeader *)self->buffer)->count * sizeof(*self->blocks));
                 if (self->blocks == NULL) {
                     goto fail;
                 }
@@ -228,7 +229,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                     goto fail;
                 }
                 self->sectorSize = max;
-                self->methods->seek(self, ((Buf434DC *)self->buffer)->offsets[0], 0);
+                self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[0], 0);
                 self->methods->read(self, self->sector, max);
                 self->loadState = TIMBLOCK_LOAD_BLOCK;
             }
@@ -245,8 +246,8 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 (*p)->methods->setFlag(*p);
                 ((TimArraySrcUploadFn)(*p)->methods->processBuffer)(*p);
                 self->blockCount = n;
-                if (n < ((Buf434DC *)self->buffer)->count) {
-                    self->methods->seek(self, ((Buf434DC *)self->buffer)->offsets[n], 0);
+                if (n < ((TimBlockHeader *)self->buffer)->count) {
+                    self->methods->seek(self, ((TimBlockHeader *)self->buffer)->offsets[n], 0);
                     self->methods->read(self, self->sector, self->sectorSize);
                     self->loadState = TIMBLOCK_LOAD_BLOCK;
                 } else {
@@ -268,7 +269,7 @@ out:
 }
 
 u32 FindMaxTimBlockSize(FileResource *self) {
-    Buf434DC *buf = self->buffer;
+    TimBlockHeader *buf = self->buffer;
     u32 i;
     u32 max = 0;
 

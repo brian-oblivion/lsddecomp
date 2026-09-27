@@ -23,14 +23,14 @@ fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/code_33808.c`.
 
 ```c
 /* The largest of the buffer's `count` words from +0x14. */
-typedef struct Buf434DC {
+typedef struct TimBlockHeader {
     /* +0x00 */ u32 count;
     /* +0x04 */ u8 pad4[0x10];
     /* +0x14 */ u32 vals[1];
-} Buf434DC;
+} TimBlockHeader;
 
 u32 FindMaxTimBlockSize(FileResource *self) {
-    Buf434DC *buf = self->buffer;
+    TimBlockHeader *buf = self->buffer;
     u32 i;
     u32 max = 0;
 
@@ -62,4 +62,4 @@ u32 FindMaxTimBlockSize(FileResource *self) {
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `MaxOfBufferWords` | `FindMaxTimBlockSize` (rename.py) | A | a pure leaf: the largest of the header's `count` words from +0x14, which are the block sizes (see TimBlockSrc__AdvanceLoadState's row); its one caller sizes the block buffer with it |
-| `Buf434DC` `pad4[0x10]`, `vals[1]` | `offsets[4]`, `sizes[4]` | A | as above |
+| `TimBlockHeader` `pad4[0x10]`, `vals[1]` | `offsets[4]`, `sizes[4]` | A | as above |
