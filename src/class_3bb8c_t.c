@@ -29,7 +29,7 @@
  * `dreamSys`'s GetSaveBlock returns) -- each day's two signed bytes become
  * an `{x, y}` point handed to a point's `attachAbsolute`. `ScoreDayLog`
  * separately scans that same ring for four fixed mood targets
- * (`D_80087BD4`) and records, per target, the dot index it last matched at;
+ * (`gGraphScoreMoods`) and records, per target, the dot index it last matched at;
  * `TickHighlight` later highlights the matching point. Together this is
  * the in-game graph screen that plots mood history as coloured dots.
  * Round 87 correction: the ring IS DreamSys's `moodPreviousDays` -- the
@@ -259,16 +259,16 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
 /* Four halfword targets, 0x01FF/0x0101/0x0000/0xFD00 -- exactly the i < 4
  * bound below, which is why the loop count is the table's length and not a
  * coincidence. */
-extern s16 D_80087BD4[4];
+extern s16 gGraphScoreMoods[4];
 
 /* Round 41 (2026-09-14): matched from a permuter-found lead. `p` and `days`
- * are LOCAL pointer caches of D_80087BD4 and log->moodPreviousDays respectively -- not
+ * are LOCAL pointer caches of gGraphScoreMoods and log->moodPreviousDays respectively -- not
  * because retail's semantics need them (both globals are re-derivable
  * without a temporary), but because caching them THIS WAY is what makes
- * cc1 2.6.3 stop strength-reducing D_80087BD4[i] into a pointer induction
+ * cc1 2.6.3 stop strength-reducing gGraphScoreMoods[i] into a pointer induction
  * variable hoisted across the outer loop (see the match report for the
- * full derivation). The `else { p = D_80087BD4; }` branch below and the
- * `p = (days = D_80087BD4);` chained assignment are BOTH semantically
+ * full derivation). The `else { p = gGraphScoreMoods; }` branch below and the
+ * `p = (days = gGraphScoreMoods);` chained assignment are BOTH semantically
  * inert -- p is unconditionally overwritten with the same value either
  * way -- but removing either one measurably regresses the codegen (round
  * 41 confirmed both empirically, byte-exact with them, off by dozens of
@@ -303,9 +303,9 @@ s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
             if (idx < 0) {
                 idx = 0x16C;
             } else {
-                p = D_80087BD4;
+                p = gGraphScoreMoods;
             }
-            p = (days = D_80087BD4);
+            p = (days = gGraphScoreMoods);
             days = log->moodPreviousDays;
             if (p[i] == days[idx]) {
                 self->matchedDayIndices[i] = j;

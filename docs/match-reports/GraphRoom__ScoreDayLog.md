@@ -16,7 +16,7 @@ byte-exactness after every cut.
 ## The function
 
 A backwards scan of a 365-entry day ring, run once for each of the four
-halfword targets in `D_80087BD4`, recording for each target the most recent
+halfword targets in `gGraphScoreMoods`, recording for each target the most recent
 day at which it occurred. Bails returning 0 the first time a target is not
 found at all; on success marks the log scored, resets the object's cursor and
 returns 1. (Unchanged from round 24's derivation -- see that history for the
@@ -24,7 +24,7 @@ day-log struct and the table's provenance, both still live in-source.)
 
 ## Root cause, now fully characterised
 
-Round 24 established the residue as: retail forms `&D_80087BD4[i]` **inside
+Round 24 established the residue as: retail forms `&gGraphScoreMoods[i]` **inside
 the inner loop**, every iteration, as cc1's indexed-global pseudo-op, with
 `$t3 = i * 2` recomputed once per OUTER iteration by an `sll`; the build
 instead hoisted the address into an induction variable pointer bumped by 2
@@ -34,7 +34,7 @@ the score at exactly 15/56, an admittedly clean negative on that axis.
 
 **The lever that worked was never the access expression -- it was
 defeating cc1's decision to treat the address as invariant at all.** cc1
-2.6.3's old loop optimizer will strength-reduce `D_80087BD4[i]` into a
+2.6.3's old loop optimizer will strength-reduce `gGraphScoreMoods[i]` into a
 pointer induction variable hoisted clear out of the loop nest once it
 recognises the expression as a linear function of an enclosing loop's
 basic induction variable, REGARDLESS of how the array indexing is spelled
@@ -46,16 +46,16 @@ applied in sequence (each verified against the WHOLE-IMAGE oracle, not
 just the per-function score, since every one of these was found via a
 scaffold and needed re-validation against `build-and-verify.sh`):
 
-1. **Cache `D_80087BD4` into a local `s16 *p` and re-derive it inside the
-   inner loop.** `p = D_80087BD4;` as the first statement of the inner
+1. **Cache `gGraphScoreMoods` into a local `s16 *p` and re-derive it inside the
+   inner loop.** `p = gGraphScoreMoods;` as the first statement of the inner
    loop body (instead of indexing the global directly) took the length
    from 1-word-short to EXACT and the raw score from 15/56 to 45/56. This
    alone stopped cc1 from hoisting the address computation out past the
    OUTER loop -- it still hoisted it to once-per-outer-iteration, but no
    longer folded it into a whole-function-lifetime pointer.
 2. **Duplicate that assignment across both arms of the `idx` wraparound
-   `if`.** Splitting `p = D_80087BD4;` into
-   `if (idx<0) { idx=0x16C; p=D_80087BD4; } else { p=D_80087BD4; }` --
+   `if`.** Splitting `p = gGraphScoreMoods;` into
+   `if (idx<0) { idx=0x16C; p=gGraphScoreMoods; } else { p=gGraphScoreMoods; }` --
    semantically a no-op, since both arms assign the identical value -- took
    the score to 48/56 and made the entire tail of the function
    (0x48e2c onward) byte-identical to retail. The remaining residue was a
@@ -64,13 +64,13 @@ scaffold and needed re-validation against `build-and-verify.sh`):
 3. **Add a second local cache `s16 *days` for `log->days`, chained off the
    first.** The final permuter hit (score 0) additionally cached
    `log->days` into a same-shaped local, written as
-   `p = (days = D_80087BD4); days = log->days;` right after the `if/else`.
+   `p = (days = gGraphScoreMoods); days = log->days;` right after the `if/else`.
    That specific SHAPE -- a chained assignment through `days` before
    overwriting it with the other pointer -- is what flips the one
    remaining wrong instruction (`addu v0,a1,v0` vs `addu v0,v0,a1`, the
    `log->days[idx]` base-plus-offset operand order) to match. This is
    round 23's `&arr[i+j]` vs `arr+i+j` operand-order class, and it responded
-   to the SAME local-pointer-caching lever as the D_80087BD4 residue, not
+   to the SAME local-pointer-caching lever as the gGraphScoreMoods residue, not
    to any rewrite of the access expression itself (an explicit
    `*(s16*)((u8*)log+0x18+idx*2)` was tried standalone in round 24 and
    again here; both times it left this instruction unchanged).
@@ -79,14 +79,14 @@ scaffold and needed re-validation against `build-and-verify.sh`):
 anyway, which is unusual enough to be worth stating plainly.** With `p`
 unconditionally overwritten immediately after the `if/else`, that whole
 branch computes nothing the program observes -- and the same is true of the
-inner `days = D_80087BD4` half of the chained assignment, since `days` is
+inner `days = gGraphScoreMoods` half of the chained assignment, since `days` is
 overwritten by `log->days` on the very next line. Both were tried removed,
 independently, after the byte-exact candidate was found:
 
 | removed | result |
 | --- | --- |
-| the `else { p = D_80087BD4; }` branch (reverting to unconditional `p = D_80087BD4;` before the `if`) | regresses to 15/56, 1 word short -- this is the round-24 shape again |
-| the chained form, i.e. `p = D_80087BD4; days = log->days;` instead of `p = (days = D_80087BD4); days = log->days;` | regresses to 11/56, length wrong by ~95KB (whole-image drift) |
+| the `else { p = gGraphScoreMoods; }` branch (reverting to unconditional `p = gGraphScoreMoods;` before the `if`) | regresses to 15/56, 1 word short -- this is the round-24 shape again |
+| the chained form, i.e. `p = gGraphScoreMoods; days = log->days;` instead of `p = (days = gGraphScoreMoods); days = log->days;` | regresses to 11/56, length wrong by ~95KB (whole-image drift) |
 
 Both are now commented in-source as **do not simplify without
 re-verifying** (`src/class_3bb8c_t.c`, directly above the function). This
@@ -106,20 +106,20 @@ mutating already-irrelevant statement shapes, not part of the real fix.
 
 ## Final matched body (56/56, byte-exact)
 
-Live in `src/class_3bb8c_t.c`, immediately following the `D_80087BD4`
+Live in `src/class_3bb8c_t.c`, immediately following the `gGraphScoreMoods`
 declaration:
 
 ```c
-extern s16 D_80087BD4[4];
+extern s16 gGraphScoreMoods[4];
 
 /* Round 41 (2026-09-14): matched from a permuter-found lead. `p` and `days`
- * are LOCAL pointer caches of D_80087BD4 and log->days respectively -- not
+ * are LOCAL pointer caches of gGraphScoreMoods and log->days respectively -- not
  * because retail's semantics need them (both globals are re-derivable
  * without a temporary), but because caching them THIS WAY is what makes
- * cc1 2.6.3 stop strength-reducing D_80087BD4[i] into a pointer induction
+ * cc1 2.6.3 stop strength-reducing gGraphScoreMoods[i] into a pointer induction
  * variable hoisted across the outer loop (see the match report for the
- * full derivation). The `else { p = D_80087BD4; }` branch below and the
- * `p = (days = D_80087BD4);` chained assignment are BOTH semantically
+ * full derivation). The `else { p = gGraphScoreMoods; }` branch below and the
+ * `p = (days = gGraphScoreMoods);` chained assignment are BOTH semantically
  * inert -- p is unconditionally overwritten with the same value either
  * way -- but removing either one measurably regresses the codegen (round
  * 41 confirmed both empirically, byte-exact with them, off by dozens of
@@ -155,9 +155,9 @@ s32 GraphRoom__ScoreDayLog(D_80087AACObj *self, D_80087AACUnkA4Result *log)
             if (idx < 0) {
                 idx = 0x16C;
             } else {
-                p = D_80087BD4;
+                p = gGraphScoreMoods;
             }
-            p = (days = D_80087BD4);
+            p = (days = gGraphScoreMoods);
             days = log->days;
             if (p[i] == days[idx]) {
                 self->unk_0x240[i] = j;
@@ -208,7 +208,7 @@ SLPS_015.56` -- the whole-image SHA1, not just the per-function score.
 access that retail does not," the lever is not the array-indexing
 *expression* -- it is whatever makes the *value assigned to a local
 pointer* look non-invariant to cc1's old loop optimizer.** Three
-independent reshapes of `D_80087BD4[i]`'s own spelling (sized/unsized
+independent reshapes of `gGraphScoreMoods[i]`'s own spelling (sized/unsized
 bound, explicit byte offset) were a clean negative in round 24 precisely
 because they don't touch what the optimizer keys on. What worked was: (1)
 introduce a local pointer cache and re-assign it inside the loop rather
@@ -230,7 +230,7 @@ byte count.
 **`GraphRoom__ScoreDayLog`** -- tier B (name carried over verbatim from
 its round-41 provenance, `func_800585B4` -> `GraphRoom__ScoreDayLog` via
 `tools/rename.py` this round). Scans the day-log's 365-entry ring for four
-fixed day-type targets (`D_80087BD4`) and records, per target, the most
+fixed day-type targets (`gGraphScoreMoods`) and records, per target, the most
 recent matching day index into `matchedDayIndices` -- exactly "scoring"
 the log against those four targets, feeding `GraphRoom__TickHighlight`.
 
