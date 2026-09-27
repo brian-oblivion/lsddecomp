@@ -58,6 +58,11 @@ struct VabStreamObj;
 typedef struct ItemList ItemList;
 typedef struct ItemListMethods ItemListMethods;
 
+/* The ctor's `mode`, kept in `mode`: 1 means every item string is full-width
+ * SJIS (the ctor halves its length and decodes it with DecodeFullWidthSjis),
+ * anything else is copied as it is. TaskObjF passes 1. */
+enum ItemListMode { ITEMLIST_MODE_PLAIN = 0, ITEMLIST_MODE_FULLWIDTH = 1 };
+
 /* `result` when closing (handleInputCode): command 25 closes with the item
  * under the cursor chosen (getCursorIndex), command 23 without one. */
 enum ItemListResult { ITEMLIST_RESULT_CHOSEN = 2, ITEMLIST_RESULT_CANCELLED = 3 };

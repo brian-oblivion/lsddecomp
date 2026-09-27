@@ -23,6 +23,8 @@
 #include "ScreenSprite.h"
 #include "TimImage.h"
 #include "TextRow.h"
+#include "Pad.h"
+#include "FrameClock.h"
 
 void TextEntry__PrevChar(TextEntry *self) {
     s32 count;
@@ -74,7 +76,7 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
 
     if (self->panelSprite) {
         screenPos.y = gTextEntryCursorPos.y;
-        screenPos.x = pos * 7 + gTextEntryCursorPos.x;
+        screenPos.x = pos * TEXTROW_DEFAULT_PITCH + gTextEntryCursorPos.x;
         cursor = self->cursorSprite;
         cursor->methods->setPosition(cursor, &screenPos);
         self->cursorIndex = pos;
@@ -118,7 +120,7 @@ TextEntryMethods *GetTextEntryMethods(void) {
  */
 
 ItemList *New_ItemList(char **items, s32 mode) {
-    ItemList *self = BMemPMgrAlloc(0x54);
+    ItemList *self = BMemPMgrAlloc(sizeof(ItemList));
 
     if (self == NULL) {
         goto fail;
@@ -157,19 +159,19 @@ void ItemList__ItemList(ItemList *self, char **items, s32 mode) {
     }
 
     self->itemCount = i;
-    self->texts = BMemPMgrAlloc(i * 4);
+    self->texts = BMemPMgrAlloc(i * sizeof(char *));
     item = items;
-    self->textLens = BMemPMgrAlloc(self->itemCount * 4);
+    self->textLens = BMemPMgrAlloc(self->itemCount * sizeof(s32));
     self->maxTextLen = 0;
 
     for (i = 0; i < self->itemCount; i++) {
         len = strlen(*item);
-        if (mode == 1) {
+        if (mode == ITEMLIST_MODE_FULLWIDTH) {
             len /= 2;
         }
         self->textLens[i] = len;
         self->texts[i] = BMemPMgrAlloc(len + 4);
-        if (mode == 1) {
+        if (mode == ITEMLIST_MODE_FULLWIDTH) {
             DecodeFullWidthSjis(self->texts[i], *item);
         } else {
             strcpy(self->texts[i], *item);
@@ -205,10 +207,10 @@ void ItemList__AddChild(ItemList *self, void *child) {
 
     if (child) {
         Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)child);
-        tag = ((BasicClass *)child)->methods->header & 0xF;
-        if (tag == 2) {
+        tag = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
+        if (tag == PAD_CLASS_ID) {
             self->inputSource = child;
-        } else if (tag == 5) {
+        } else if (tag == FRAMECLOCK_CLASS_ID) {
             self->tickSource = child;
         }
     }
@@ -218,10 +220,10 @@ void ItemList__RemoveChild(ItemList *self, void *child) {
     s32 tag;
 
     if (child) {
-        tag = ((BasicClass *)child)->methods->header & 0xF;
-        if (tag == 2) {
+        tag = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
+        if (tag == PAD_CLASS_ID) {
             self->inputSource = NULL;
-        } else if (tag == 5) {
+        } else if (tag == FRAMECLOCK_CLASS_ID) {
             self->tickSource = NULL;
         }
         Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)child);
@@ -239,10 +241,10 @@ void ItemList__OnNotify(ItemList *self, void *sender, s32 event) {
     s32 tag;
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
-    tag = ((BasicClass *)sender)->methods->header & 0xF;
-    if (tag == 2) {
+    tag = ((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK;
+    if (tag == PAD_CLASS_ID) {
         self->methods->handleInputCode(self, sender, event);
-    } else if (tag == 5) {
+    } else if (tag == FRAMECLOCK_CLASS_ID) {
         self->methods->tickClosing(self, sender, event);
     }
 }
@@ -268,7 +270,7 @@ extern const char sItemListStrFontIcon[]; /* "FONTICON" */
  * $s0-$s2). Same shape as class_3bb8c_i's TextEntry__LoadCardResources.
  */
 void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
-    char path[0x20];
+    char path[32];
     const char *dir;
     const char *ext;
     TimImage *handle1;
