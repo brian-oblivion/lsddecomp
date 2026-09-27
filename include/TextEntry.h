@@ -109,6 +109,10 @@ struct TextEntry {
 extern TextEntryMethods gTextEntryMethods;
 extern TextEntryMethods *GetTextEntryMethods(void); /* returns &gTextEntryMethods */
 
+/* The cursor sprite's position at index 0, (-62, -12): loadCardResources
+ * attaches the cursor there, setCursorPos moves it to x + index * 7, y. */
+extern ScreenSpritePos gTextEntryCursorPos;
+
 /* The class's own methods, in address order. */
 TextEntry *New_TextEntry(char *text, s32 mode);
 void TextEntry__TextEntry(TextEntry *self, char *text, s32 mode);

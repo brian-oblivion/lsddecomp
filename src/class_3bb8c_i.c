@@ -158,7 +158,6 @@ extern SpriteRect gTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0
 extern SpriteRgb gTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
 extern ScreenSpritePos gTextEntryPanelPos; /* (-70, -60) */
 extern ScreenSpritePos gTextEntryTextPos;  /* (-62, -15) */
-extern ScreenSpritePos gTextEntryCursorPos; /* (-62, -12), y at D_8008AAE0: SetCursorPos adds pos * 7 to x */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     char path[32];

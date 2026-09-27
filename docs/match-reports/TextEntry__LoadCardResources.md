@@ -204,3 +204,10 @@ Proposed (class_3bb8c_j's): D_8008AAE0 is the cursor position's y (-12),
 read by SetCursorPos; a name such as `gTextEntryCursorY`, or reading it as
 `gTextEntryCursorPos.y` once class_3bb8c_j types gTextEntryCursorPos as a
 ScreenSpritePos.
+
+## Round 98: gTextEntryCursorPos unified (track 4b)
+
+The local `extern ScreenSpritePos gTextEntryCursorPos` moved to
+include/TextEntry.h, the only declaration; class_3bb8c_j's `s32` view and its
+`D_8008AAE0` (the y) now read `gTextEntryCursorPos.x`/`.y`, byte-exact. The
+proposal above is applied.
