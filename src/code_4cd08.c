@@ -20,14 +20,14 @@ void InitDreamAux(void) {
 
     for (i = 0; i < 14; i++) {
         for (j = 0; j < gDreamAuxGroupCounts[i]; j++) {
-            gDreamAuxGroupRecords[i][j].flag = 0;
+            gDreamAuxGroupRecords[i][j].triggered = 0;
         }
     }
 
     ResourceRequest__Set(&req, 0, (char *)gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        gDreamAuxSlots[i].obj = New_ModelData(&req.src);
+        gDreamAuxSlots[i].model = New_ModelData(&req.src);
         req.src.name = (char *)gMomPathSymDog;
     }
 }
@@ -37,11 +37,10 @@ void ReleaseDreamAuxModels(void) {
     u32 done;
 
     for (done = 0; done < 1; done++) {
-        DreamAuxObj *obj = slot->obj;
+        ModelData *model = slot->model;
 
-        if (obj != NULL) {
-            DreamAuxTickFn tick = (DreamAuxTickFn)obj->vtable[1];
-            slot->obj = tick(obj);
+        if (model != NULL) {
+            slot->model = model->methods->release(model);
         }
         slot++;
     }
@@ -50,8 +49,8 @@ void ReleaseDreamAuxModels(void) {
 extern s32 gDreamAuxStage;
 extern StageMap *gDreamAuxStageMap; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
 extern DreamSys *gDreamAuxWorld; /* the player DreamSys: class_3bb8c_l passes its `target` */
-extern s32 gDreamAuxSound;
-extern s32 gDreamAuxFrameClock;
+extern struct VabStreamObj *gDreamAuxSound;
+extern struct FrameClock *gDreamAuxFrameClock;
 
 void SetTeleportsEnabled(s32 triggerType);
 
@@ -62,13 +61,13 @@ void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4) {
     gDreamAuxStage = a0;
     gDreamAuxStageMap = (StageMap *)a1;
     gDreamAuxWorld = world;
-    gDreamAuxSound = a3;
-    gDreamAuxFrameClock = a4;
+    gDreamAuxSound = (struct VabStreamObj *)a3;
+    gDreamAuxFrameClock = (struct FrameClock *)a4;
 
     for (i = 0; i < 1; i++) {
         s32 buf[4];
-        buf[3] = (s32)slot->obj;
-        slot->entity = New_Entity(i + 0x62, buf, (void *)gDreamAuxSound);
+        buf[3] = (s32)slot->model;
+        slot->entity = New_Entity(i + 0x62, buf, gDreamAuxSound);
         slot++;
     }
     SetTeleportsEnabled(a0);
@@ -108,11 +107,10 @@ void ReleaseDreamAuxEntities(void) {
     slot = gDreamAuxSlots2;
 
     for (; done < 1; done++) {
-        DreamAuxObj *obj = slot->obj;
+        Entity *entity = (Entity *)slot->model;
 
-        if (obj != NULL) {
-            DreamAuxTickFn tick = (DreamAuxTickFn)obj->vtable[1];
-            slot->obj = tick(obj);
+        if (entity != NULL) {
+            slot->model = entity->methods->release(entity);
         }
         slot++;
     }
@@ -120,17 +118,17 @@ void ReleaseDreamAuxEntities(void) {
 
 extern s32 rand(void);
 
-s32 LookupDreamAuxTrigger(s16 *a0);
-bool CheckTriggerDayParity(s32 coordParity, s8 *entry);
-s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2);
+DreamAuxTriggerEntry *LookupDreamAuxTrigger(s16 *a0);
+bool CheckTriggerDayParity(s32 coordParity, DreamAuxTriggerEntry *entry);
+TriggerWorld *FireDreamAuxTriggerEntries(s32 a0, DreamAuxTriggerEntry *a1, s32 a2);
 void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *a0);
 
 s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2) {
-    s32 record = LookupDreamAuxTrigger(a1);
+    DreamAuxTriggerEntry *record = LookupDreamAuxTrigger(a1);
 
-    if (record != 0) {
-        if (CheckTriggerDayParity(a2, (s8 *)record)) {
-            return FireDreamAuxTriggerEntries(a2, (s8 *)record, a0);
+    if (record != NULL) {
+        if (CheckTriggerDayParity(a2, record)) {
+            return (s32)FireDreamAuxTriggerEntries(a2, record, a0);
         }
         if (gDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
             PlaceDreamAuxEntityByPlayer(gDreamAuxSlots);
@@ -139,9 +137,9 @@ s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2) {
     return 0;
 }
 
-s32 RemapTriggerForDreamColor(s32 a0, s32 a1);
+DreamAuxTriggerEntry *RemapTriggerForDreamColor(DreamAuxTriggerEntry *a0, s32 a1);
 
-s32 LookupDreamAuxTrigger(s16 *a0) {
+DreamAuxTriggerEntry *LookupDreamAuxTrigger(s16 *a0) {
     s32 idx = gDreamAuxStage;
     s32 count = gDreamAuxTriggerCounts[idx];
     DreamAuxTriggerEntry *entry = gDreamAuxTriggerEntries[idx];
@@ -149,14 +147,14 @@ s32 LookupDreamAuxTrigger(s16 *a0) {
 
     for (i = 0; i < count; i++) {
         if (*a0 == entry->key) {
-            return RemapTriggerForDreamColor((s32)entry, i);
+            return RemapTriggerForDreamColor(entry, i);
         }
         entry++;
     }
-    return 0;
+    return NULL;
 }
 
-s32 RemapTriggerForDreamColor(s32 a0, s32 a1) {
+DreamAuxTriggerEntry *RemapTriggerForDreamColor(DreamAuxTriggerEntry *a0, s32 a1) {
     s32 val = gDreamAuxStage;
 
     if (val == 4 && a1 == 0x10) {
@@ -164,7 +162,7 @@ s32 RemapTriggerForDreamColor(s32 a0, s32 a1) {
         s32 result = w->methods->getDreamColor(w);
 
         if (result == val) {
-            a0 += 0x1E;
+            a0 += 5;
         }
     }
     return a0;
@@ -176,29 +174,32 @@ s32 RemapTriggerForDreamColor(s32 a0, s32 a1) {
  * one byte is not yet known here, so it is addressed by byte offset rather
  * than through a named struct. A parity byte of 0 means "no side constraint",
  * hence the early `true`. */
-bool CheckTriggerDayParity(s32 coordParity, s8 *entry) {
+bool CheckTriggerDayParity(s32 coordParity, DreamAuxTriggerEntry *entry) {
     bool result = true;
 
-    if (entry[2] != 0) {
+    if (entry->dayParity != 0) {
         coordParity = coordParity % 2 + 1;
-        result = entry[2] != coordParity;
+        result = entry->dayParity != coordParity;
     }
     return result;
 }
 
-bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world);
+bool ProcessDreamAuxTriggerRecord(s32 value, DreamAuxTriggerEntry *ctx, TriggerRecord *record,
+                                  TriggerWorld *world);
 
-s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2) {
-    s32 ctxArg[4];
+TriggerWorld *FireDreamAuxTriggerEntries(s32 a0, DreamAuxTriggerEntry *a1, s32 a2) {
+    /* MATCHING: only src.buffer is set, but a bare ResourceSource shrinks
+     * the frame by 8. */
+    ResourceRequest req;
     TriggerWorld *world;
 
-    ctxArg[0] = a2;
-    world = New_TriggerWorld((struct ResourceSource *)ctxArg);
+    req.src.buffer = (void *)a2;
+    world = New_TriggerWorld(&req.src);
 
     if (world != NULL) {
-        DreamAuxGroupRecord *base = gDreamAuxGroupRecords[gDreamAuxStage];
-        s8 *p = a1 + 3;
-        s8 *end = a1 + 6;
+        TriggerRecord *base = gDreamAuxGroupRecords[gDreamAuxStage];
+        s8 *p = a1->recordIndices;
+        s8 *end = a1->recordIndices + 3;
 
         while (p < end) {
             s8 entry = *p;
@@ -206,15 +207,16 @@ s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2) {
             if (entry == -1) {
                 break;
             }
-            ProcessDreamAuxTriggerRecord(a0, a1, (TriggerRecord *)((u8 *)base + entry * 8), world);
+            ProcessDreamAuxTriggerRecord(a0, a1, &base[entry], world);
             p++;
         }
-        return (s32)world;
+        return world;
     }
-    return 0;
+    return NULL;
 }
 
-bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, TriggerWorld *world) {
+bool ProcessDreamAuxTriggerRecord(s32 value, DreamAuxTriggerEntry *ctx, TriggerRecord *record,
+                                  TriggerWorld *world) {
     s8 *p;
     s8 *end;
     void *callResult;
@@ -224,11 +226,11 @@ bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, T
         goto fail;
     }
 
-    EnableTeleportsForKind(record->kind);
+    EnableTeleportsForKind(record->moodIndex);
 
-    p = record->entries;
-    end = record->entries + 4;
-    callResult = world->methods->getModelData(world, record->parity);
+    p = record->spawnIndices;
+    end = record->spawnIndices + 4;
+    callResult = world->methods->getModelData(world, record->modelIndex);
     scratch[3] = (s32)callResult;
 
     if (callResult == NULL) {
@@ -239,15 +241,15 @@ bool ProcessDreamAuxTriggerRecord(s32 value, void *ctx, TriggerRecord *record, T
         if (*p == -1) {
             break;
         }
-        if (SpawnDreamAuxTriggerEntity(record->kind, scratch, ctx, (u8)*p)) {
+        if (SpawnDreamAuxTriggerEntity(record->moodIndex, scratch, ctx, (u8)*p)) {
             return true;
         }
         p++;
     }
 
 skip:
-    if (record->kind == 2) {
-        return ProcessDreamAuxTriggerRecord(value, ctx, record + 1, world);
+    if (record->moodIndex == 2) {
+        return ProcessDreamAuxTriggerRecord(value, ctx, record + 7, world);
     }
 
 fail:
@@ -267,7 +269,7 @@ fail:
  */
 
 bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record) {
-    s8 sel = record->sel;
+    s8 sel = record->condition;
     s32 idx;
 
     if (sel == 1) {
@@ -370,9 +372,9 @@ bool IsDayInPeriodPhase(s32 a0, s32 a1) {
  * and `posIndex` indexes gDreamAuxPosTable (stride 6, see DreamAuxPos6
  * below; named round 63 -- confirmed by this struct's only reader). */
 typedef struct {
-    u16 val0;
-    s8 val2;
-    s8 posIndex;
+    u16 cell;
+    s8 rotationIndex;
+    s8 offsetIndex;
 } DreamAuxSpawnInfo;
 
 extern DreamAuxSpawnInfo gDreamAuxSpawnInfo[];
@@ -392,31 +394,31 @@ typedef struct {
 } DreamAuxPos6;
 
 extern DreamAuxPos6 gDreamAuxPosTable[];
-extern u8 gDreamAuxSpawnRotations[];
+extern Ratio16 gDreamAuxSpawnRotations[][3];
 
-bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry) {
-    Entity *entity = New_Entity(kind, out, (void *)gDreamAuxSound);
+bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, DreamAuxTriggerEntry *trigger, s32 entry) {
+    Entity *entity = New_Entity(kind, out, gDreamAuxSound);
 
     if (entity != NULL) {
         DreamAuxSpawnInfo *rec;
 
         struct {
-            u16 ctxVal;
-            u16 recordVal0;
-            DreamAuxPos6 pos;
+            u16 chunk;
+            u16 cell;
+            DreamAuxPos6 offset;
         } coords;
 
         s32 outBuf[4];
 
-        coords.ctxVal = *(u16 *)ctx;
+        coords.chunk = trigger->key;
         rec = &gDreamAuxSpawnInfo[entry];
-        coords.recordVal0 = rec->val0;
-        coords.pos = gDreamAuxPosTable[rec->posIndex];
+        coords.cell = rec->cell;
+        coords.offset = gDreamAuxPosTable[rec->offsetIndex];
 
         gDreamAuxStageMap->methods->computeCellOffsets(gDreamAuxStageMap, outBuf, &coords);
-        entity->methods->updateRotation(entity, 1, gDreamAuxSpawnRotations + rec->val2 * 12);
+        entity->methods->updateRotation(entity, 1, gDreamAuxSpawnRotations[rec->rotationIndex]);
         ((TodActorAttachToParentFn)entity->methods->attachToParent)(
-            (TodActor *)entity, (TodActor *)gDreamAuxWorld, (void *)gDreamAuxFrameClock,
+            (TodActor *)entity, (TodActor *)gDreamAuxWorld, gDreamAuxFrameClock,
             (void *)gDreamAuxStageMap, outBuf);
         return false;
     }
@@ -430,7 +432,7 @@ void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *a0) {
         a0->entity->methods->detachFromParent(a0->entity);
         SceneNode__LocalOffsetToWorldPos((SceneNode *)gDreamAuxWorld, localPos, a0->pos, 0);
         ((TodActorAttachToParentFn)a0->entity->methods->attachToParent)(
-            (TodActor *)a0->entity, (TodActor *)gDreamAuxWorld, (void *)gDreamAuxFrameClock,
+            (TodActor *)a0->entity, (TodActor *)gDreamAuxWorld, gDreamAuxFrameClock,
             (void *)gDreamAuxStageMap, localPos);
         SceneNode__FaceTarget((SceneNode *)a0->entity, (SceneNode *)gDreamAuxWorld, 1, 0, 0);
     }

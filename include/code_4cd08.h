@@ -19,16 +19,6 @@
  * the shared context every other function in the unit reads.
  */
 
-/* An object whose method table pointer sits at offset 0 (every object in
- * this game's class framework, per CLAUDE.md's "Writing a class method").
- * Only slot 1 (offset 0x4 in the table) is known here: a "tick" method that
- * takes the object and returns a (possibly new/updated) object pointer. */
-typedef struct DreamAuxObj {
-    void **vtable;
-} DreamAuxObj;
-
-typedef DreamAuxObj *(*DreamAuxTickFn)(DreamAuxObj *self);
-
 /* A slot in the 0x80088D28 / 0x80088D2C families: one live-object pointer
  * (ticked once per call by calling obj->vtable[1](obj) and storing the
  * result back into the same slot); an Entity at +0x4 (include/Entity.h)
@@ -40,25 +30,13 @@ typedef DreamAuxObj *(*DreamAuxTickFn)(DreamAuxObj *self);
  * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
  * confirmed by SetDreamAuxWorld's walk over gDreamAuxSlots. */
 typedef struct DreamAuxSlot {
-    void *obj;
+    struct ModelData *model;
     struct Entity *entity;
     s32 pos[3];
 } DreamAuxSlot;
 
-extern DreamAuxSlot gDreamAuxSlots[14];
-extern DreamAuxSlot gDreamAuxSlots2[14];
-
-/* A tiny fixed-size record family read by InitDreamAux: 14 (0xE) parallel
- * groups, gDreamAuxGroupCounts[i] a signed count and gDreamAuxGroupRecords[i] a pointer to an
- * array of count 8-byte records whose first byte InitDreamAux clears. The
- * record's remaining 7 bytes are not accessed here. */
-typedef struct DreamAuxGroupRecord {
-    s8 flag;
-    u8 pad1[7];
-} DreamAuxGroupRecord;
-
-extern s8 gDreamAuxGroupCounts[];
-extern DreamAuxGroupRecord *gDreamAuxGroupRecords[];
+extern DreamAuxSlot gDreamAuxSlots[1];
+extern DreamAuxSlot gDreamAuxSlots2[1];
 
 /* A second parallel-group family, same "count + pointer to array" shape as
  * DreamAuxGroupRecord above but a different stride and a different index
@@ -69,7 +47,8 @@ extern DreamAuxGroupRecord *gDreamAuxGroupRecords[];
  * from this unit alone. */
 typedef struct DreamAuxTriggerEntry {
     s16 key;
-    u8 unk2[4];
+    s8 dayParity;
+    s8 recordIndices[3];
 } DreamAuxTriggerEntry;
 
 extern s8 gDreamAuxTriggerCounts[];
@@ -105,12 +84,14 @@ extern const char gMomPathSymDog[];
  * Everything else is undiscovered padding. */
 typedef struct TriggerRecord {
     s8 triggered;
-    s8 sel;
-    s8 parity;
-    u8 kind;
-    s8 entries[4];
-    u8 unk8[0x30];
+    s8 condition;
+    s8 modelIndex;
+    u8 moodIndex;
+    s8 spawnIndices[4];
 } TriggerRecord;
+
+extern s8 gDreamAuxGroupCounts[];
+extern TriggerRecord *gDreamAuxGroupRecords[];
 
 /* ProcessDreamAuxTriggerRecord's `world` is a TriggerWorld (gTriggerWorldMethods,
  * include/TriggerWorld.h; FireDreamAuxTriggerEntries gets it from
@@ -133,7 +114,7 @@ extern bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record);
  * gp-relative blocker was resolved, see docs/research/gp-relative-blocker.md)
  * and never reads `out` -- it only forwards it untouched to `New_Entity`'s
  * 2nd argument; its own outgoing buffer is a separate local `outBuf[4]`. */
-extern bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry);
+extern bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, DreamAuxTriggerEntry *trigger, s32 entry);
 extern void EnableTeleportsForKind(s32 kind);
 extern bool IsStyleVariantEven(void);
 extern bool IsCurrentDreamColor(s32 idx);
