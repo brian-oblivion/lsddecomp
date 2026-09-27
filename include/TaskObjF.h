@@ -13,7 +13,7 @@
  * the two operations (+0x064..+0x078, +0x038) in src/class_3bb8c_f.c, the
  * state machine (+0x07C..+0x0B0) in src/class_3bb8c_g.c.
  *
- *  - The ctor runs InitCARD/StartCARD/_bu_init once per boot (D_8008AA30)
+ *  - The ctor runs InitCARD/StartCARD/_bu_init once per boot (sTaskObjFCount)
  *    and setCardSlot(cardSlot); +0x040..+0x068 wrap the PS-X memory-card
  *    BIOS: events (OpenEvent x4), _card_info/_card_load, format, and
  *    open/read/write/delete on "bu00:"/"bu10:" paths (BuildMemcardPath).

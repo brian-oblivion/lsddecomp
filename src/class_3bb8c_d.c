@@ -299,8 +299,8 @@ void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
 
     Get_vtable_BasicClass()->ctor((BasicClass *)self);
     self->methods = GetTaskObjFMethods();
-    count = D_8008AA30;
-    D_8008AA30 = count + 1;
+    count = sTaskObjFCount;
+    sTaskObjFCount = count + 1;
     if (count == 0) {
         InitCARD(padEnable);
         StartCARD();

@@ -163,7 +163,7 @@ extern s32 sSaveTitleColorFrame;
 
 /* TaskObjF__TaskObjF's construction count: InitCARD/StartCARD/_bu_init run
  * only on the first construction, when it was 0 before the increment. */
-extern s32 D_8008AA30;
+extern s32 sTaskObjFCount;
 
 /* Formats the current day into the save title (src/class_3bb8c_c.c);
  * TitleMenu__TitleMenu calls it with DreamSys's getCurrentDayAndYear. */
