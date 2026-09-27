@@ -20,7 +20,7 @@ extern const char sStrFontIcon[]; /* "FONTICON" */
 extern const char sCardPathPrefix[]; /* "CARD\\" */
 extern const char sTimExt[]; /* ".TIM" */
 extern s32 gTextEntryPanelRect; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
-extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
+extern s32 gTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
 extern s32 D_8008AACC; /* opaque block, self->unk48's slot4C arg2, address-only here */
 extern s32 D_8008AAD4; /* opaque block, self->unk44's slot4C arg2, address-only here */
 extern s32 D_8008AADC; /* opaque block, self->unk40's slot4C arg2, address-only here */
@@ -55,7 +55,7 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
     self->unk40 = (ChildObj86ED0 *)New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
     self->unk44->methods->slot4C(self->unk44, arg1, (void *)&D_8008AAD4);
-    self->unk44->methods->slotB8(self->unk44, (void *)&D_8008AAC8);
+    self->unk44->methods->slotB8(self->unk44, (void *)&gTextEntryTextColor);
     self->unk40->methods->slot4C(self->unk40, arg1, (void *)&D_8008AADC);
 }
 ```
@@ -176,6 +176,6 @@ object behind them is the `New_TextRow` result, so TextEntry::textRow
 (+0x044, include/TextEntry.h) is `struct TextRow *`. The slots map onto
 TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 (position cast to `LongVec3 *`, as ScreenSprite's banner describes), +0x0B8
-`setColor` (`D_8008AAC8`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
+`setColor` (`gTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
 +0x0C4 `setCell`, called through `TextRowSetCellAtFn` because
 TextRow__SetCellAt takes the index too. Zero bytes changed.

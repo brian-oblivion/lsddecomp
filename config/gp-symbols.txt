@@ -53,7 +53,6 @@ D_8008AA74
 D_8008AA7C
 D_8008AA84
 D_8008AA8C
-D_8008AAC8
 D_8008AACC
 D_8008AAD4
 D_8008AADC
@@ -186,6 +185,7 @@ gStyleSceneRefs
 gStyleStage
 gStyleTickCount
 gStyleVariant
+gTextEntryTextColor
 gTexturedFaceColor
 gTimBlockClutShift
 gTimClutRowShift

@@ -170,7 +170,7 @@ extern const char sStrFontIcon[];    /* "FONTICON" */
 extern const char sCardPathPrefix[]; /* "CARD\\" */
 extern const char sTimExt[];         /* ".TIM" */
 extern s32 gTextEntryPanelRect; /* 3 words, New_ScreenSprite's rect: a SpriteRect {0, 0, 224, 120} */
-extern s32 D_8008AAC8; /* opaque block, slotB8's arg1, address-only here */
+extern s32 gTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
 extern s32 D_8008AACC; /* panelSprite's attachToParent position, address-only here */
 extern s32 D_8008AAD4; /* textRow's slot4C position, address-only here */
 extern s32 D_8008AADC; /* cursorSprite's attachToParent position; class_3bb8c_j reads its x */
@@ -205,7 +205,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
     self->cursorSprite = New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
     self->textRow->methods->attachToParent(self->textRow, (SceneNode *)arg1, (LongVec3 *)&D_8008AAD4);
-    self->textRow->methods->setColor(self->textRow, (SpriteRgb *)&D_8008AAC8);
+    self->textRow->methods->setColor(self->textRow, (SpriteRgb *)&gTextEntryTextColor);
     self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)arg1,
                                                 (LongVec3 *)&D_8008AADC);
 }

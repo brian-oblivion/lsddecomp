@@ -3014,3 +3014,4 @@ gGraphPointNewestColor = 0x8008ABB4;
 gGraphPointHighlightColor = 0x8008ABBC;
 gGraphScoreMoods = 0x80087BD4;
 gTextEntryPanelRect = 0x80086F7C;
+gTextEntryTextColor = 0x8008AAC8;
