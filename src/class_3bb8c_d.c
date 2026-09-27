@@ -149,7 +149,7 @@ void TitleMenu__DestroySaveTitle(TitleMenu *self) {
 void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
     Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
     self->saveTitle->methods->attachToParent(self->saveTitle, (SceneNode *)parent,
-                                             (LongVec3 *)&D_8008A9B4);
+                                             (LongVec3 *)&sSaveTitleOffset);
 }
 
 /* MATCHED round 75 (was STALL round 43) -- see

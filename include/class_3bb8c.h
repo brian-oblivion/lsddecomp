@@ -122,7 +122,7 @@ extern DrawRect sDisplayBufferRects[2];
 
 /* TitleMenu__AttachSaveTitle's offset for the name field's attachToParent
  * (TextRow +0x04C), passed as a LongVec3 (the words are -4, -23, ...). */
-extern s32 D_8008A9B4;
+extern s32 sSaveTitleOffset;
 
 /*
  * The save file's name and title buffers, read by value (%gp_rel) and

@@ -2988,3 +2988,4 @@ sTitleTimPath = 0x800114E8;
 sSaveIconTimPath = 0x800114F8;
 sSaveFileSuffixes = 0x80086D6C;
 sDisplayBufferRects = 0x80086DAC;
+sSaveTitleOffset = 0x8008A9B4;
