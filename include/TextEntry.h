@@ -16,7 +16,7 @@
  *    back into `textBuf` (EncodeFullWidthSjis in mode 1) and closes with
  *    state 2, command 23 closes with state 3 without writing.
  *  - moveCursorRight/Left step `cursorIndex` inside [0, textLen) and move the
- *    cursor sprite (setCursorPos: x = index * 7 from D_8008AADC).
+ *    cursor sprite (setCursorPos: x = index * 7 from gTextEntryCursorPos).
  *  - nextChar/prevChar step `charIndex` through gNameCharTable, whose length
  *    the ctor counts into `charCount`, and setCharAt writes that byte into
  *    `editBuf` at the cursor and into the text row. resetChar/resetAllChars

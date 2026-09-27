@@ -67,7 +67,7 @@ void TextEntry__ResetAllChars(TextEntry *self) {
     }
 }
 
-extern s32 D_8008AADC; /* VALUE-of here: the cursor's x at position 0 (class_3bb8c_i takes its address) */
+extern s32 gTextEntryCursorPos; /* VALUE-of here: the cursor's x at position 0 (class_3bb8c_i takes its address) */
 extern s32 D_8008AAE0; /* VALUE-of, TextEntry__SetCursorPos only: the cursor's y */
 
 void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
@@ -76,7 +76,7 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
 
     if (self->panelSprite) {
         local.y = D_8008AAE0;
-        local.x = pos * 7 + D_8008AADC;
+        local.x = pos * 7 + gTextEntryCursorPos;
         obj = self->cursorSprite;
         obj->methods->setPosition(obj, &local);
         self->cursorIndex = pos;

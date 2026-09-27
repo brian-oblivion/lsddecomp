@@ -173,7 +173,7 @@ extern s32 gTextEntryPanelRect; /* 3 words, New_ScreenSprite's rect: a SpriteRec
 extern s32 gTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
 extern s32 gTextEntryPanelPos; /* panelSprite's attachToParent position, address-only here */
 extern s32 gTextEntryTextPos; /* textRow's slot4C position, address-only here */
-extern s32 D_8008AADC; /* cursorSprite's attachToParent position; class_3bb8c_j reads its x */
+extern s32 gTextEntryCursorPos; /* cursorSprite's attachToParent position; class_3bb8c_j reads its x */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
     char path[0x20];
@@ -207,7 +207,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *arg1) {
     self->textRow->methods->attachToParent(self->textRow, (SceneNode *)arg1, (LongVec3 *)&gTextEntryTextPos);
     self->textRow->methods->setColor(self->textRow, (SpriteRgb *)&gTextEntryTextColor);
     self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)arg1,
-                                                (LongVec3 *)&D_8008AADC);
+                                                (LongVec3 *)&gTextEntryCursorPos);
 }
 
 void TextEntry__ReleaseCardResources(TextEntry *self) {
