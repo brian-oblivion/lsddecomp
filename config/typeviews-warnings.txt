@@ -8,6 +8,11 @@ GraphicsResources: warning: unused variable `unused'
 GraphicsResources: warning: unused variable `unused'
 GraphicsResources: warning: unused variable `unused'
 GraphicsResources: warning: unused variable `unused'
+PlacementGridVabSound: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
+PlacementGridVabSound: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
+PlacementGridVabSound: warning: unused variable `unused'
+PlacementGridVabSound: warning: unused variable `unused'
+ScreenWidgets: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
 Sprite: warning: unused variable `pad'
 Task: warning: assignment from incompatible pointer type
 Task: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
@@ -30,12 +35,7 @@ class_3bb8c_p: warning: unused variable `pad48Tail'
 class_3bb8c_s: warning: implicit declaration of function `rand'
 code_1677c: warning: control reaches end of non-void function
 code_171e0: warning: assignment from incompatible pointer type
-PlacementGridVabSound: warning: unused variable `unused'
-PlacementGridVabSound: warning: unused variable `unused'
-PlacementGridVabSound: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
-PlacementGridVabSound: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 code_179d8_h: warning: unused variable `scratch'
-libsnd_vmanager: warning: comparison between signed and unsigned
 code_179d8_q: src/code_179d8_q.c: At top level:
 code_179d8_q: warning: `LockCd' was previously implicitly declared to return `int'
 code_179d8_q: warning: `UnlockCd' was previously implicitly declared to return `int'
@@ -50,12 +50,10 @@ code_179d8_q: warning: type mismatch with previous external decl
 code_179d8_q: warning: type mismatch with previous external decl
 code_179d8_q: warning: type mismatch with previous implicit declaration
 code_179d8_q: warning: type mismatch with previous implicit declaration
-Task: warning: assignment from incompatible pointer type
-Task: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
-ScreenWidgets: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
 code_55dd4: warning: unused variable `unused'
 code_d294_b: warning: unused variable `pad'
 code_d294_b: warning: unused variable `unused'
 libcd_bios: warning: passing arg 2 of `CD_cw' makes integer from pointer without a cast
 libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'
 libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'
+libsnd_vmanager: warning: comparison between signed and unsigned
