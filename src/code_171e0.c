@@ -66,25 +66,25 @@ void FileResource__Finalize(FileResource *this) {
 }
 
 void FileResource__LoadFile(FileResource *this, char *name) {
-    s32 savedPendingGeneration;
+    s32 savedIsOpen;
     s32 size;
-    void *newRes;
+    void *buffer;
 
     if (this->buffer != NULL) {
         return;
     }
-    savedPendingGeneration = this->isOpen;
+    savedIsOpen = this->isOpen;
     this->isOpen = 0;
     this->methods->open(this, name, 1, 0);
     size = this->methods->seek(this, 0, 2);
-    newRes = BMemPMgrAlloc(size);
-    if (newRes != NULL) {
+    buffer = BMemPMgrAlloc(size);
+    if (buffer != NULL) {
         this->methods->seek(this, 0, 0);
-        this->methods->read(this, newRes, size);
+        this->methods->read(this, buffer, size);
         this->methods->close(this);
-        this->buffer = newRes;
+        this->buffer = buffer;
         this->bufferSize = size;
-        this->isOpen = savedPendingGeneration;
+        this->isOpen = savedIsOpen;
     } else {
         BMemPMgrFree(NULL);
         this->methods->close(this);
@@ -136,15 +136,15 @@ ResourceRequest *ResourceRequest__Set(ResourceRequest *this, void *buffer, char 
  * (CopyDataSourceSlots) into FileResource's own table and into the table of
  * every registered client. The label+goto loop is retail's layout (jump into a
  * bottom test); every while/for spelling tried came out top-tested. */
-void SetActiveDataSource(s32 arg0) {
+void SetActiveDataSource(s32 source) {
     FileResourceMethods *src;
     FileResourceMethods *methods;
     void *(*getMethods)(void);
     void *(**entry)(void);
 
     entry = gDataSourceClientGetters;
-    gActiveDataSource = arg0;
-    if (arg0 == DATASOURCE_CD) {
+    gActiveDataSource = source;
+    if (source == DATASOURCE_CD) {
         src = (FileResourceMethods *)GetCdDriverMethods();
     } else {
         src = (FileResourceMethods *)GetVabDriverMethods();
@@ -243,10 +243,10 @@ typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
  * a function-pointer VALUE assignment emits no argument-count-dependent
  * code, just an address load -- and produces only a benign "incompatible
  * pointer type" warning at the `fn = SetVabDriverMode;` line below. */
-extern s32 SetVabDriverMode(s32 a, s32 b);
-extern s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2);
+extern s32 SetVabDriverMode(s32 async, s32 mode2);
+extern s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
 
-void SetActiveDataSourceDriverMode(s32 arg0, s32 arg1, s32 arg2) {
+void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     DataSourceSetDriverModeFn fn;
 
     fn = SetVabDriverMode;
@@ -254,7 +254,7 @@ void SetActiveDataSourceDriverMode(s32 arg0, s32 arg1, s32 arg2) {
         fn = SetCdDriverMode;
     }
     do {
-    } while (fn(arg0, arg1, arg2) == 0);
+    } while (fn(async, mode2, useVSyncCallback) == 0);
 }
 
 extern s32 GetCdDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2) and the body reads $a0 (`beqz a0` at 0x80027EF8), but GetActiveDataSourceDriverMode's tail call sets nothing -- retail's jal at 0x80026FD0 has a nop delay slot */
@@ -285,36 +285,36 @@ extern s32 GetFileTableCount(void);
 extern void SetFileTableCount(s32 count);
 extern s32 ResolveFileEntries(CdFileEntry *entries, s32 count);
 
-s32 RegisterFileTableEntries(CdFileEntry *arg0, s32 arg1) {
-    s32 idx;
+s32 RegisterFileTableEntries(CdFileEntry *table, s32 count) {
+    s32 first;
 
     if (gActiveDataSource == DATASOURCE_CD) {
         gFileTableRegistered = 1;
-        SetFileTable(arg0);
-        idx = GetFileTableCount();
-        SetFileTableCount(idx + arg1);
-        return ResolveFileEntries(&arg0[idx], arg1);
+        SetFileTable(table);
+        first = GetFileTableCount();
+        SetFileTableCount(first + count);
+        return ResolveFileEntries(&table[first], count);
     }
     return 1;
 }
 
-extern void *gDataDirectory;
+extern char *gDataDirectory;
 
-void SetDataDirectory(void *value) {
-    gDataDirectory = value;
+void SetDataDirectory(char *dir) {
+    gDataDirectory = dir;
 }
 
-void *GetDataDirectory(void) {
+char *GetDataDirectory(void) {
     return gDataDirectory;
 }
 
-char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3) {
+char *BuildFileName(char *dest, char *name, char *dir, char *ext) {
     dest[0] = '\0';
-    if (arg2 != NULL) {
-        strcat(dest, arg2);
+    if (dir != NULL) {
+        strcat(dest, dir);
     }
-    strcat(dest, arg1);
-    strcat(dest, arg3);
+    strcat(dest, name);
+    strcat(dest, ext);
     return dest;
 }
 
