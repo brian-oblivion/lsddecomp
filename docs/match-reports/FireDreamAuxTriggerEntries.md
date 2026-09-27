@@ -105,10 +105,10 @@ first build, but the STACK FRAME size was wrong twice:
 Two entries, both reinforcing patterns already on file rather than new
 mechanisms:
 
-- Confirms the round-43 `DespawnDreamAuxEntity`/`SetDreamAuxWorld` observation that a
+- Confirms the round-43 `PlaceDreamAuxEntityByPlayer`/`SetDreamAuxWorld` observation that a
   scratch buffer handed to an external call can be WIDER than what the
   caller itself writes -- a THIRD instance in this same unit
-  (`SetDreamAuxWorld`'s `New_Entity` buffer, `DespawnDreamAuxEntity`'s implicit
+  (`SetDreamAuxWorld`'s `New_Entity` buffer, `PlaceDreamAuxEntityByPlayer`'s implicit
   `localPos`, now `FireDreamAuxTriggerEntries`'s `ctxArg[4]`). When a local's frame
   footprint comes up short by a clean multiple of 4 bytes with every
   instruction otherwise matching, suspect an under-sized scratch buffer

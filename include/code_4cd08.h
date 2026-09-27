@@ -10,7 +10,7 @@
  * `value` (CheckDreamAuxTriggerCondition) and a coordinate parity
  * (CheckTriggerParity), that on success spawns or despawns an Entity into
  * one of two 14-slot object-tracking families (SpawnDreamAuxTriggerEntity /
- * DespawnDreamAuxEntity, backed by gDreamAuxSlots / gDreamAuxSlots2) and can
+ * PlaceDreamAuxEntityByPlayer, backed by gDreamAuxSlots / gDreamAuxSlots2) and can
  * gate the game's teleport flag (EnableTeleportsForKind, SetTeleportsEnabled
  * in DreamSys.c). InitDreamAux/ReleaseDreamAuxModels/ReleaseDreamAuxEntities are the
  * construct/tick/destruct hooks a caller in class_39e08.c and
@@ -32,10 +32,10 @@ typedef DreamAuxObj *(*DreamAuxTickFn)(DreamAuxObj *self);
 /* A slot in the 0x80088D28 / 0x80088D2C families: one live-object pointer
  * (ticked once per call by calling obj->vtable[1](obj) and storing the
  * result back into the same slot); an Entity at +0x4 (include/Entity.h)
- * that SetDreamAuxWorld makes with New_Entity and DespawnDreamAuxEntity
+ * that SetDreamAuxWorld makes with New_Entity and PlaceDreamAuxEntityByPlayer
  * detaches and re-attaches (detachFromParent, attachToParent with the
  * player gDreamAuxWorld as the peer);
- * and a 3-word position vector at +0x8 that DespawnDreamAuxEntity passes as
+ * and a 3-word position vector at +0x8 that PlaceDreamAuxEntityByPlayer passes as
  * `SceneNode__LocalOffsetToWorldPos`'s `src` (that function's own signature, `code_d294.h`,
  * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
  * confirmed by SetDreamAuxWorld's walk over gDreamAuxSlots. */

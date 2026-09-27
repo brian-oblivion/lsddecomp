@@ -123,7 +123,7 @@ extern s32 rand(void);
 s32 LookupDreamAuxTrigger(s16 *a0);
 bool CheckTriggerParity(s32 coordParity, s8 *entry);
 s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2);
-void DespawnDreamAuxEntity(DreamAuxSlot *a0);
+void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *a0);
 
 s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2) {
     s32 record = LookupDreamAuxTrigger(a1);
@@ -133,7 +133,7 @@ s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2) {
             return FireDreamAuxTriggerEntries(a2, (s8 *)record, a0);
         }
         if (gDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
-            DespawnDreamAuxEntity(gDreamAuxSlots);
+            PlaceDreamAuxEntityByPlayer(gDreamAuxSlots);
         }
     }
     return 0;
@@ -422,7 +422,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry) {
     return true;
 }
 
-void DespawnDreamAuxEntity(DreamAuxSlot *a0) {
+void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *a0) {
     if (a0->entity != NULL) {
         s32 localPos[3];
 

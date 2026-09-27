@@ -1,4 +1,6 @@
-# DespawnDreamAuxEntity
+# PlaceDreamAuxEntityByPlayer
+
+> Renamed from `DespawnDreamAuxEntity` on 2026-09-27 (tools/rename.py). Address 0x8005cf34.
 
 > Renamed from `func_8005CF34` on 2026-09-21 (tools/rename.py). Address 0x8005cf34.
 
@@ -22,7 +24,7 @@ globals to vtable slot 0x13, then call `SceneNode__FaceTarget` on it.
 extern void SceneNode__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
 extern void SceneNode__FaceTarget(void *self, void *target, s32 arg2, s32 arg3, void *arg4);
 
-void DespawnDreamAuxEntity(DreamAuxSlot *a0)
+void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *a0)
 {
     if (a0->entity != NULL) {
         s32 localPos[3];
@@ -68,7 +70,7 @@ alias (`s32, s32, void *, void *`) rather than importing Entity.h's.
 ## Derivation notes
 
 One attempt short of byte-exact, one fix, and it is the SAME shape as the
-`DespawnDreamAuxEntity`-adjacent learning already on file for `LookupDreamAuxTrigger`
+`PlaceDreamAuxEntityByPlayer`-adjacent learning already on file for `LookupDreamAuxTrigger`
 (narrow value kept live too long) but the opposite direction:
 
 - **First pass (5/42, one word too long):** cached `a0->entity` into a local
@@ -96,7 +98,7 @@ a cached local at all.
 
 ## Naming
 
-**DespawnDreamAuxEntity** — tier B. Given a `DreamAuxSlot *`, if its `entity`
+**PlaceDreamAuxEntityByPlayer** — tier B. Given a `DreamAuxSlot *`, if its `entity`
 is live: ticks its vtable slot 0x14, computes a world-space position from
 the slot's stored `pos` via `SceneNode__LocalOffsetToWorldPos`, dispatches
 that position through vtable slot 0x13, then calls

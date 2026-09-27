@@ -16,7 +16,7 @@ attempted -- the stub carried no derivation. Round 43 derived and matched it.
 Look up a table entry via `LookupDreamAuxTrigger`; if found, check a parity
 condition via `CheckTriggerParity` and either dispatch into `FireDreamAuxTriggerEntries`
 (returning its result) or -- on a small random/parity chance -- spawn via
-`DespawnDreamAuxEntity`:
+`PlaceDreamAuxEntityByPlayer`:
 
 ```c
 extern s32 rand(void);
@@ -24,7 +24,7 @@ extern s32 rand(void);
 s32 LookupDreamAuxTrigger(s16 *a0);
 bool CheckTriggerParity(s32 coordParity, s8 *entry);
 s32 FireDreamAuxTriggerEntries(s32 a0, s32 a1, s32 a2);
-void DespawnDreamAuxEntity(DreamAuxSlot *a0);
+void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *a0);
 
 s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
 {
@@ -35,7 +35,7 @@ s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
             return FireDreamAuxTriggerEntries(a2, record, a0);
         }
         if (gDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
-            DespawnDreamAuxEntity(gDreamAuxSlots);
+            PlaceDreamAuxEntityByPlayer(gDreamAuxSlots);
         }
     }
     return 0;
@@ -108,7 +108,7 @@ the extra `sra` count and final `sll` shift, not off the constant.
 Looks up a trigger record by key (`LookupDreamAuxTrigger`); on a hit, either
 dispatches it (`FireDreamAuxTriggerEntries`, whose result it returns) or, on
 a small random/parity chance, silently despawns instead
-(`DespawnDreamAuxEntity`); returns 0 on a miss or on the despawn branch.
+(`PlaceDreamAuxEntityByPlayer`); returns 0 on a miss or on the despawn branch.
 "Try" reflects the function's own fallible, silently-returning-0 shape; the
 broader game meaning of the (value, key, parity) triple it is handed is not
 established from this unit alone, hence B not A.
