@@ -6,6 +6,80 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-27 — round 100: eleven units polished, five regions become six files, and the head finishes two parked edits (premium head)
+
+Premium head (Opus 5.5), cap 5, two waves with slots refilled as runners
+reported: 15 jobs, all Opus, none sent back. Gate 0 green.
+
+- **Track 7, eleven units marked** (five samples each, the data-backed ones
+  read from retail): code_2cc8c_d, code_179d8_s, code_d294_b, code_39094,
+  code_4cd08, code_179d8_d, code_2cc8c_e, class_3bb8c_c, class_3bb8c_j,
+  code_2bb9c, code_1677c. What landed:
+  - code_39094's "weekly group" and "stream pool" names were a misreading:
+    gRecordTable is the game's table of file paths (records 0..15 SND\,
+    16.. each stage's TIX/SEQ/LBD, 560.. the movies, 574.. the special
+    days), and the "stream type to group" table is each movie's frame
+    count. code_1677c's hooks follow: ShowIntroLogos, PlayOpeningMovie,
+    RunTitleMenu, RunDayTask, PlayEndingMovie.
+  - code_179d8_s takes `<libcd.h>` (5 to 4 files re-declare a Sony name),
+    with `CD_OPERATION_*`/`CD_STATE_*` in CdDriver.h.
+  - Viewport's `maxPackets`/`packetSize`/`extraSwap`/`clockEventCount`
+    (round 95's proposals), SceneNode's `raycastHullAgainstFaces` and
+    `addToActorParents`, FadeBox's colour tables and channel masks,
+    `gDreamAuxSpawnRotations` (yaw 0/-90/90/180), `ReturnZero`.
+- **Track 8, four jobs, five regions:** code_2864 is `ViewportDraw.c`;
+  code_39094 is `GameFiles.c` (LbdFile and the path getters, the content
+  split parked); code_2c054..code_2cc8c_d are one file, `Task.c`, on
+  single-user data at every edge; code_179d8_d+e are
+  `PlacementGridVabSound.c` and l+m+j are `libsnd_vmanager.c` (vmanager.o
+  spans all three on every disc; e|l kept because ServiceSoundCueSet heads
+  l); code_2cc8c_e+f are `ScreenWidgets.c` (split before TextRow parked).
+  Units 80 to 75.
+- **Head edits at merge, zero bytes:**
+  - `unitfile.py merge code_2c054 code_2cc8c` refused ("owns rodata and
+    code_2c054 does not"), and the fix it names is a hand yaml edit a files
+    runner may not make; echo asked, the head renamed the 0x1890 `.rodata`
+    line to Task and ran the merge. TaskViewport.h (was code_2cc8c.h) is
+    folded into Task.h, its dead TexPageDesc/HeaderObj/EventArg dropped and
+    its history moved verbatim to Viewport__Flip.md.
+  - `CD_FLAG_*` live once, in FileResource.h (three local copies gone;
+    charlie's first proposal to delete two of them was wrong, since those
+    units never saw CdDriver.h, and the head measured that before moving
+    them). `Rec1C` is `FilePathRecord` (`renametype.py --any-stem`, since
+    readability.py does not see a size-named type). Viewport's and
+    Application's slots are named for their occupants; SetDreamAuxWorld
+    takes typed pointers; BoxFill +0x04C is `attachArg`; OUTCODE_*/DIST_NONE
+    duplicates gone; ItemList's attachTarget parameters named.
+  - Typeviews 61 to 59: two Task warnings went with echo's IntermediateBase
+    change; baseline rewritten in its own commit.
+  - README's code map: the new files, and "day-of-week movie" (the same
+    misreading) replaced.
+- **Measured** (`plan.py`, against round 99's entry): track 7 units 43 of 67
+  to 48 of 61 (merges shrink the denominator), func_ 21 to 8, D_ 23 to 4,
+  unk 149 to 128, slot 10 to 8, magic 1015 to 921, rawoff 69 to 64, m2c 29
+  to 8, history 117 to 103. Track 8 regions 18 to 23 of 34. 0 new typeviews
+  warnings at every merge.
+- **Deferred proposals** (in the reports):
+  - StreamTask `streamGroup` is `frameCount` and `streamName` a
+    `const char *` (removes five casts in code_1677c).
+  - `gDreamAuxWorld` as the player; `gDreamAuxGroupRecords` as trigger
+    records; TodActorDesc into TodActor.h; TryDreamAuxTrigger's `ChunkCoord *`
+    against `s16 *`; RotateVramRectRight's `DrawRect *` against `DrawPoint *`.
+  - `PickSoundBank`'s table is `char *[7]`; a name for `gRecordTable`;
+    `sDayDigits` as `FullWidthChar *`; the colour tables as `u8 [8][3]`.
+  - `ATTR_*_SHIFT` into code_d294.h; a two-nibble class-id mask name;
+    `FADEBOX_CHANNEL_*` at the Entity callers; one CARD_TIM_PATH_SIZE.
+  - `CdLoc16` to `CdlLOC` once code_179d8_r takes `<libcd.h>`.
+  - GRIDCELL_SIZE is 60 while sizeof(GridCell) is 0x44: the struct
+    overstates the object.
+- **For the operator (plan changes, proposed, not made):** see the round
+  report: plan.py bundles independent regions into one files job;
+  unitfile.py's rodata-owner refusal needs a head every time; unitfile.py
+  merge leaves the absorbed unit's header to fold by hand; readability.py
+  misses size-named types such as `Rec1C`.
+
+---
+
 ## 2026-09-27 — round 99: twelve units polished, two regions named, two flagged types, two tool fixes (premium head)
 
 Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 16
