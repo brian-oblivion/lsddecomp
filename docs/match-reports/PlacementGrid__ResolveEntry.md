@@ -879,3 +879,23 @@ select. Named for where it goes; what the bits mean in the map is not
 established. `CellPlacement.unk2E` -> `cellFlags` is PROPOSED, not applied:
 its reader is in class_3bb8c.c. `unk1` / `unk2C` stay: written here, read
 nowhere.
+
+## Track 7 (round 100, delta)
+
+Zero-byte rewrite of the live body, whole image green:
+
+- `(PlacementGridRecord *)(cell * 12 + 8 + (u8 *)self->buffer)` is
+  `&((PlacementGridBuffer *)self->buffer)->cells[cell]`, a unit-local view
+  of the buffer (8 unread bytes, then `STAGE_SLOT_LATTICE_CELLS` 12-byte
+  records). 76/76 on the first build. The chained-record access,
+  `(u8 *)self->buffer + placement->next`, stays a byte offset: `next` is a
+  byte offset stored in the file.
+- Constants from `include/StageMap.h`, whose grid geometry this is: 0x190
+  is `STAGE_SLOT_LATTICE_CELLS`, 20 is `STAGE_CHUNK_CELLS`, `<< 11` is
+  `<< STAGE_CELL_SHIFT`, `+ 0x400` is `+ STAGE_CELL_SIZE / 2` (the cell's
+  centre). `rotY << 10` is `rotY * ANGLE_DEG(90)`: GsCOORD2PARAM's rotate
+  is 4096 to the turn, so the record holds quarter turns.
+- `CellPlacement.unk2C` / `PlacementGridRecord.unk1` keep their names: the
+  byte is copied and nothing reads the copy (StageMap__PopulateSlotCells
+  reads x, y, z, rotY, cellFlags, chained and next), so there is no
+  behaviour to name it by.

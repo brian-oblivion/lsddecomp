@@ -3139,3 +3139,4 @@ gDreamAuxStageMap = 0x8008ABFC;
 gDreamAuxSound = 0x8008AC04;
 gDreamAuxFrameClock = 0x8008AC08;
 gDreamAuxSpawnRotations = 0x80088F18;
+ReturnZero = 0x8002C3B8; // type:func
