@@ -8,6 +8,9 @@
  */
 
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_d294.h"
 #include "TmdModel.h"
 
@@ -93,7 +96,9 @@ void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out) {
 void SceneNode__LinkModel(SceneNode *self, void *model) {
     self->model = model;
     self->tmd = (s32)((TmdModel *)model)->object;
-    GsLinkObject4(((TmdModel *)self->model)->data->objects, &self->attribute, 0);
+    /* Casts: Sony types tmd_base as an address (`unsigned long`), and
+     * SceneNode.h spells the embedded GsDOBJ2 as four separate fields. */
+    GsLinkObject4((u_long)((TmdModel *)self->model)->data->objects, (GsDOBJ2 *)&self->attribute, 0);
 }
 
 /* Clears exactly the two fields SceneNode__LinkModel sets: the GsDOBJ2's
@@ -388,8 +393,7 @@ void ApplyMatrixToSVArray(void *dst, void *src, s32 count, void *m) {
  * argument count during RTL expansion, before dead-branch elimination, so
  * the 6-argument call in the unreachable branch is what produces retail's
  * frame. Full derivation in docs/match-reports/ApplyMatrixToLVArray.md;
- * this is also why `ApplyMatrixLV` is declared unprototyped in
- * include/code_d294.h. */
+ * this is also why that call goes through an unprototyped function type. */
 void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m) {
     u8 *end;
 
@@ -400,7 +404,9 @@ void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m) {
         src = (u8 *)src + 0xC;
     }
     if (0) {
-        ApplyMatrixLV(m, src, dst, 0, 0, 0);
+        /* Cast to an unprototyped function type: libgte.h's prototype
+         * rejects six arguments, and only the count matters here. */
+        ((void (*)())ApplyMatrixLV)(m, src, dst, 0, 0, 0);
     }
 }
 

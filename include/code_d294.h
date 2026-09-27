@@ -129,24 +129,11 @@ extern s32 RatioToFixed12(void *pair);
 extern u8 ROTATION_ZERO[0xC];
 extern u8 SCALE_ONE[0xC];
 
-/* GsInitCoordinate2 (Psy-Q libgs/matrix, linked from Sony's object, not game
- * code): SceneNode__Reset's call; declared with the shape it needs. */
-extern void GsInitCoordinate2(s32 arg0, void *dest);
-
-
 /* The model SceneNode keeps at +0x020 is a TmdModel (code_fa50). Its
  * methods -- TmdModel__GetHull, TmdModel__GetBoundsCount,
  * TmdModel__UpdateBoundsBuffer/GetBoundsBuffer, TmdModel__RaycastFaces --
  * are declared once, in include/TmdModel.h, which code_d294_b.c and
  * code_d294_c.c include themselves (track 4, round 87). */
-
-/* GsLinkObject4 (psyq_GsLinkObject4.s, Psy-Q library, not game code; symbol
- * address per config/symbols.slps01556.lsdde.txt, 0x8001EF70 -- the first
- * function of that segment, immediately after code_d294_c's own tail).
- * SceneNode__LinkModel (code_d294_c) calls it as
- * `GsLinkObject4((u8 *)other->unkC + 0xC, &self->unk10, 0)`; declared only
- * with the opaque `void *`/`s32` shape that call site needs. */
-extern void GsLinkObject4(void *arg0, void *arg1, s32 arg2);
 
 /* ApplyMatrixToSVArray (src/code_d294_c.c; MATCHED round 19, echo -- see
  * docs/match-reports/ApplyMatrixToSVArray.md): `dst[i] = m * src[i]` for
@@ -161,26 +148,6 @@ extern void GsLinkObject4(void *arg0, void *arg1, s32 arg2);
  * parameters (names only) to say which is which. Declared with the opaque
  * shape its callers need. */
 extern void ApplyMatrixToSVArray(void *dst, void *src, s32 count, void *m);
-
-/* ApplyMatrixLV (still uncarved, a different/earlier segment): called once
- * per iteration by ApplyMatrixToLVArray below as `(fixed, b, a)`; not decompiled
- * here, declared only with the opaque shape that call site needs.
- *
- * DELIBERATELY UNPROTOTYPED (round 19, echo -- see
- * docs/match-reports/ApplyMatrixToLVArray.md's "MATCHED" section for the full
- * derivation): ApplyMatrixToLVArray's own outgoing-argument stack reservation is
- * 24 bytes (six words), not the 16-byte/three-word minimum its one LIVE
- * call site needs. An isolated reproducer under the pinned toolchain
- * confirmed retail's exact bytes -- frame size, live call site, AND the
- * unreachable-code source shape -- only when `ApplyMatrixLV` is called
- * BOTH with 3 live arguments (this unit's real call, inside the loop) AND
- * with 6 arguments inside a `if (0) { ... }` dead branch elsewhere in the
- * SAME function (GCC 2.6.3 sizes the outgoing-arg area from every call
- * expression's arg count during RTL expansion, before the dead branch is
- * eliminated -- so the frame remembers an arg count the emitted code
- * never uses). A K&R/unprototyped declaration is required for this: an
- * ANSI prototype would make the mismatched-arity calls a compile error. */
-extern void ApplyMatrixLV(); /* arity-ok: deliberately unprototyped (round 19, see above); the real callee takes 3 (include/class_3bb8c.h), the 6-argument `if (0)` call here only sizes the outgoing-arg area */
 
 /* ApplyMatrixToLVArray (this unit, round 14; MATCHED round 19, echo -- see
  * docs/match-reports/ApplyMatrixToLVArray.md): a paired-array iteration sibling
@@ -218,24 +185,6 @@ void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
  * register and these five functions are its per-field setters. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
-/* RotMatrix (Psy-Q libgte/fgo_01, linked from Sony's object, not game
- * code): takes an
- * s16-quad-shaped pointer (this call site's own S16Quad_d294) and a 2nd
- * argument this unit's own caller passes straight through, unexamined.
- * $v0 is never read after this call site's own `jal`, so declared void
- * here -- other units may see a different arity/return, same per-call-site
- * precedent as GetSceneNodeMethods above. */
-extern void RotMatrix(S16Quad_d294 *vec, s32 a1);
-
-/* MulMatrix2 (Psy-Q libgte/mtx, linked from Sony's object, not game
- * code): loads its
- * own arg0 into GTE control regs 0-4 via `ctc2` (5 words, the packed
- * MATRIX rotation part) then combines it with arg1 -- a matrix-compose
- * primitive (PsyQ's `CompMatrix` family). SceneNode__ComposeAndApplyRotation (round 13, this
- * unit) calls it as `MulMatrix2(buf2, buf1)`, both 0x20-byte opaque
- * local buffers; declared only with that shape. */
-extern void MulMatrix2(void *arg0, void *arg1);
-
 void BisectSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *near, TmdVec3 *far);
 
 /* CalcBoxOutcode (round 54 correction: this banner was STALE -- it is
@@ -249,15 +198,6 @@ void BisectSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *near, TmdVec
 extern s32 CalcBoxOutcode(BoundsBox_d294 *box, TmdVec3 *point);
 
 s32 ClipSegmentToBox(TmdVec3 *out, BoundsBox_d294 *box, TmdVec3 *p1, TmdVec3 *p2);
-
-/* ratan2 (Psy-Q library, not game code; symbol address per
- * config/symbols.slps01556.lsdde.txt, 0x8001F0C8): arctangent of
- * (dy, dx) in PSX-native 4096-per-circle BAM units, matching every other
- * angle representation this unit's own functions already use (see
- * `Ratio16` above and `SceneNode__GetRotationDegrees`'s degree conversion). Real
- * argument order confirmed from SceneNode__FaceTarget's own two call sites,
- * below. */
-extern s32 ratan2(s32 dy, s32 dx);
 
 /* SceneNode__FaceTarget (prototype in include/SceneNode.h; round 14, this unit -- the SAME external symbol
  * Entity_b/c/d/e.c call via their own separate `Entity.h` declaration,

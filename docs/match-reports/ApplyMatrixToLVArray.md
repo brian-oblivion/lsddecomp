@@ -428,3 +428,12 @@ source-level answer.
   section above and is the reason `ApplyMatrixLV` is declared unprototyped.
   A reader deleting it as dead code breaks the match, so the unit now says
   so at the site as well as here.
+
+## Round 95 (bravo): Sony's declarations
+
+`include/code_d294.h` no longer declares `ApplyMatrixLV` unprototyped; the
+three SceneNode units take libgte.h's prototype, `VECTOR *ApplyMatrixLV(MATRIX
+*, VECTOR *, VECTOR *)`. The six-argument call in the `if (0)` branch, which
+only sizes the outgoing-argument area, now goes through a cast to an
+unprototyped function type, `((void (*)())ApplyMatrixLV)(m, src, dst, 0, 0,
+0)`. The frame is still 24 bytes; whole-image SHA1 unchanged.

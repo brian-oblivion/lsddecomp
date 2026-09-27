@@ -44,3 +44,10 @@ independently by `SceneNode__UpdateScale`'s own disassembly reading three
 ## Naming
 
 Round 71 (alpha). `func_8001CE30` -> `SceneNode__Reset`, **tier B**. Table slot +0x040, called last by the ctor. Zeroes `tick` and the GsDOBJ2 attribute, GsInitCoordinate2(0, coord2) (no parent), sets rotation to ROTATION_ZERO ({0/1}x3) and scale to SCALE_ONE ({1/1}x3), flg = 1. Mechanics are a full reset to an identity transform; tier B because what the game uses a re-run of slot +0x040 for is not established here. Subclass overrides of this slot are named FinishConstruct / Reset / InitDefaults / InitState in other units, all consistent.
+
+## Round 95 (bravo): Sony's declarations
+
+`GsInitCoordinate2` now comes from `<libgs.h>`, `(GsCOORDINATE2 *super,
+GsCOORDINATE2 *base)`. The call is `GsInitCoordinate2(NULL, (GsCOORDINATE2
+*)self->coord2)`: the cast stands until SceneNode.h's SceneNodeSub14 (which
+is GsCOORDINATE2 offset for offset) becomes Sony's type. Byte-identical.

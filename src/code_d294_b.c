@@ -11,6 +11,9 @@
  */
 
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "code_d294.h"
 #include "TmdModel.h"
 
@@ -59,7 +62,8 @@ void SceneNode__GetRotMatrix(SceneNode *self, s32 a1, s32 a2) {
     } else {
         buf = *src;
     }
-    RotMatrix(&buf, a1);
+    /* Casts: S16Quad_d294 is SVECTOR's layout, and SceneNode.h types `out` as s32. */
+    RotMatrix((SVECTOR *)&buf, (MATRIX *)a1);
 }
 
 /* a1 gates a small range (2 <= a1 < 4). When self->model is set and
@@ -233,24 +237,24 @@ z_done:
  * twice: once for (arg2, arg3, count), once more for (arg1, arg1, 1) when
  * arg1 is non-NULL. */
 void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *arg1, void *arg2, void *arg3, s32 count) {
-    u8 buf2[0x20];
-    u8 buf1[0x20];
+    MATRIX buf2;
+    MATRIX buf1;
     SceneNode *node;
 
-    self->methods->getRotMatrix(self, buf1, 1);
+    self->methods->getRotMatrix(self, &buf1, 1);
 
     node = self->parent;
     if (node != NULL) {
         do {
-            node->methods->getRotMatrix(node, buf2, 1);
-            MulMatrix2(buf2, buf1);
+            node->methods->getRotMatrix(node, &buf2, 1);
+            MulMatrix2(&buf2, &buf1);
             node = node->parent;
         } while (node != NULL);
     }
 
-    ApplyMatrixToSVArray(arg2, arg3, count, buf1);
+    ApplyMatrixToSVArray(arg2, arg3, count, &buf1);
     if (arg1 != NULL) {
-        ApplyMatrixToSVArray(arg1, arg1, 1, buf1);
+        ApplyMatrixToSVArray(arg1, arg1, 1, &buf1);
     }
 }
 

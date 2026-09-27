@@ -116,3 +116,12 @@ void SceneNode__LinkModel(SceneNode *self, void *model) {
 `tmdFile + 0xC`. The `void *model` parameter and SceneNode's `void *model`
 field (+0x020) are SceneNode's to retype (`struct TmdModel *`); proposed,
 not done here.
+
+## Round 95 (bravo): Sony's declarations
+
+`GsLinkObject4` now comes from `<libgs.h>`: `(unsigned long tmd_base, GsDOBJ2
+*objp, int n)`. The call casts `data->objects` to `u_long` (Sony types the
+TMD base as an address) and `&self->attribute` to `GsDOBJ2 *` (SceneNode.h
+spells the embedded GsDOBJ2 as four separate fields; embedding Sony's struct
+there is proposed, not done: SceneNode.h has many includers).
+Byte-identical.

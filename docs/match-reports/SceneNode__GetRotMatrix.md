@@ -109,3 +109,10 @@ established from this function's own body. Held back from an actual
 rename because this symbol is referenced (in a comment) from
 `src/code_d294_c.c:27` -- a different unit -- discussing exactly the
 slot-84 relationship above. Posted to the broadcast.
+
+## Round 95 (bravo): Sony's declarations
+
+`RotMatrix` now comes from `<libgte.h>`, `MATRIX *RotMatrix(SVECTOR *r,
+MATRIX *m)`. The call casts `&buf` to `SVECTOR *` (S16Quad_d294 is SVECTOR's
+layout) and `a1` to `MATRIX *` (SceneNode.h prototypes the parameter as
+`s32 out`); both casts go when SceneNode.h takes Sony's types. Byte-identical.
