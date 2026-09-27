@@ -429,3 +429,14 @@ against the real function) -- not a permuter candidate. `./build-and-verify.sh`
 stayed green (no bytes changed) and `tools/check-nonmatching.sh` passed.
 
 NON_MATCHING body promoted, round 73.
+
+## Round 98 (charlie, track 7)
+
+The source comment explaining the load order ("`prog` is loaded BEFORE `lo`
+is computed on purpose: GCC 2.6.3's combine folds `index - (index >> 4) * 16`
+into `index & 0xF` whenever `hi`'s FIRST use is the multiply (flow.c links a
+set only to its next use), and retail kept the unfolded sll+subu") moved
+here; the body keeps a one-line `MATCHING` comment. The shift and multiply
+are spelled `VAB_TONE_BITS` (4) and `VAB_TONES_PER_PROG` (16). Byte-exact.
+Locals renamed for their roles: `hi` -> `program`, `lo` -> `tone`,
+`prog` -> `row` (the program's VagAtr row in `progVagTable`).

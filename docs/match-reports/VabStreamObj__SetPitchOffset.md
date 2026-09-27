@@ -37,3 +37,8 @@ octave-to-semitone-offset conversion, `arg1` an octave index. Tier B: the
 arithmetic and its consumer are concrete, but nothing in this unit confirms
 `arg1` really means "octave" rather than some other unit that happens to
 use the same multiplier.
+
+## Round 98 (charlie, track 7)
+
+Spelled `octave * SEMITONES_PER_OCTAVE - 2 * SEMITONES_PER_OCTAVE` (was
+`octave * 12 - 0x18`): octave 2 plays a tone at its centre note. Byte-exact.

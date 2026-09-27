@@ -162,3 +162,9 @@ shared prototype: Entity.h, DreamSys.c and class_3bb8c_n.c declare them
 with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.
+
+## Round 98 (charlie, track 7)
+
+`attenuationSteps = SOUND_CUE_ATTENUATION_STEPS` (10, now in
+include/SoundCueSet.h) and `count = ARRAY_COUNT(set->slots) - 1` (was 2).
+Byte-exact.

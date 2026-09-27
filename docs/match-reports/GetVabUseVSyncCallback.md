@@ -49,3 +49,15 @@ implementation of whatever `func_80026FE8` needs when
 still unnamed, so there's no established purpose to name this AS a
 stand-in for -- naming it "GetVabDriverState" or similar would assert
 purpose from a body that's just `return 0;`.
+
+### Round 98 (charlie, track 7): `func_8002C478` -> `GetVabUseVSyncCallback`, tier A
+
+The objection above ("its own counterpart is still unnamed") no longer
+holds: the counterpart is `GetCdUseVSyncCallback` (code_179d8_h.c, returns
+`gCdUseVSyncCallback`), and the one caller, code_171e0.c's
+`GetActiveDataSourceUseVSyncCallback`, calls it when `gActiveDataSource` is
+DATASOURCE_CD and this function otherwise. This is the VAB driver's answer
+to the same query, and the answer is a constant 0: the VAB backend never
+uses a VSync callback. Named on the `GetVab*`/`GetCd*` pattern
+`GetVabDriverMode`/`GetCdDriverMode` already follow; a leaf returning a
+constant, tier A.

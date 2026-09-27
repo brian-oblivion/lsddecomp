@@ -134,3 +134,7 @@ shared prototype: Entity.h, DreamSys.c and class_3bb8c_n.c declare them
 with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.
+
+## Round 98 (charlie, track 7)
+
+The loop bound is `ARRAY_COUNT(set->slots)` (was 3). Byte-exact.

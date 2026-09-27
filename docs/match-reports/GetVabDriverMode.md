@@ -97,3 +97,9 @@ not have.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/code_171e0.c:231`. Oracle green.
+
+## Round 98 (charlie, track 7): parameter
+
+`arg0` -> `outMode2`, after the CD driver's `GetCdDriverMode(s32 *outMode2)`
+(code_179d8_q.c): code_171e0.c's `GetActiveDataSourceDriverMode` forwards to
+one or the other, so they answer the same query.

@@ -122,3 +122,10 @@ true of the static table. `SetActiveDataSource` copies the active driver's
 interface slots into every table `gDataSourceClientGetters` lists
 (`include/FileResource.h`), and `GetVabStreamObjMethods` is on that list
 (gFileResourceMethods +0x098). At run time these calls reach the driver.
+
+## Round 98 (charlie, track 7)
+
+The states are `enum VabStreamLoadState` (include/VabStreamObj.h:
+`VABSTREAM_LOAD_IDLE` 0, `_HEADER` 1, `_BODY` 6) and the flag is
+`CD_FLAG_LOAD_FILE_DONE` (0x200, the bit code_179d8_s.c's CD driver sets
+when a load finishes); the path buffer is `VAB_PATH_SIZE` (32). Byte-exact.

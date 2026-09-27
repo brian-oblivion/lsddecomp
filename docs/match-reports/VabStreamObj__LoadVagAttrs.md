@@ -134,3 +134,12 @@ unambiguous sequence of Sony VAB attribute-table fetches
 (`SsUtGetVabHdr`/`SsUtGetProgAtr`/`SsUtGetVagAtr`) building exactly the two
 per-object tables (`vagAttrPool`, `progVagTable`) those calls fill --
 mechanics ARE the purpose here.
+
+## Round 98 (charlie, track 7)
+
+Sony's `ProgAtr` replaces the local `ProgAtrView`; `SsUtGetVabHdr` and
+`SsUtGetVagAtr` now carry `<libsnd.h>`'s prototypes, so the call sites cast
+VabStreamObj.h's reduced views: `(VabHdr *)&self->vabHdr`, `(VagAtr *)pool`.
+The two allocations are spelled `vs * sizeof(VabStreamVagAtr)` and
+`ts * sizeof(VabStreamVagAtr *)` (were `<< 5`, `<< 2`), and the master
+volume `VAB_MASTER_VOLUME` (120, was `0x78`). Byte-exact.

@@ -44,3 +44,15 @@ call), and this function is its only reader. That establishes WHEN it's
 set and that nothing else in this unit touches it, but not what `0x3C`
 configures -- `SsSetTickMode` is still unnamed/uncarved, so there's no
 positive evidence to name either the function or the global from.
+
+### Round 98 (charlie, track 7): `func_8002CC28` -> `GetSsTicksPerSecond`, `D_8008A8CC` -> `gSsTicksPerSecond`
+
+Tier A for both. The tier-C note above predates the SDK linking:
+`SsSetTickMode` is Sony's (`libsnd`, `<libsnd.h>`), and the call beside the
+store is `SsSetTickMode(SS_TICK60)` -- 1 is `SS_TICK60`, sixty sequencer
+ticks a second. The store `gSsTicksPerSecond = 60` (was `0x3C`) is that
+rate, set in the same one-time guard, and this getter is its only reader.
+The one caller, `WBgm__Crescendo` (code_2a0e0.c), passes
+`GetSsTicksPerSecond() * scale` as `SsSeqSetCrescendo`'s duration, which
+Sony counts in ticks: `scale` is seconds. The value is the tick rate by
+its set site and its use; the getter is a leaf (tier A by definition).
