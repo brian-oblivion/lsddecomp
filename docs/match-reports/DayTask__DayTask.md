@@ -60,9 +60,9 @@ addu  $a1, $zero, $zero
 jal   New_WBgm
  ori  $a2, $zero, 0x1               ; New_WBgm(PickWeeklyGroup(0), 0, 1)
 ori   $a0, $zero, 0x1
-jal   func_8004A070
+jal   RegisterRecordTableFiles
  sw   $v0, 0x40($s1)                 ; self->unk40 = New_WBgm(...)
-sltiu $a0, $s4, 0x1                   ; a0 = (unsigned)(arg3 < 1)   -- func_8004A070(1)'s own return discarded
+sltiu $a0, $s4, 0x1                   ; a0 = (unsigned)(arg3 < 1)   -- RegisterRecordTableFiles(1)'s own return discarded
 ori   $a1, $zero, 0x1
 jal   SetActiveDataSourceDriverMode
  ori  $a2, $zero, 0x1                   ; SetActiveDataSourceDriverMode(arg3<1u, 1, 1), discarded
@@ -118,7 +118,7 @@ void DayTask__DayTask(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     self->unk48 = New_LinkResource(&req);
     tmp = PickWeeklyGroup(0);
     self->unk40 = New_WBgm(tmp, 0, 1);
-    func_8004A070(1);
+    RegisterRecordTableFiles(1);
     SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
     self->unk0C = arg1;
     arg1->unk10 = New_NodeGuardedViewport();
@@ -209,7 +209,7 @@ needed anywhere in this 107-word function.
   ("ETC\DREAMER.TMD"), both `const char[]`.
 - Nine new function externs, several deliberately re-declared locally with
   a DIFFERENT (but ABI-compatible) type than an existing declaration
-  elsewhere in the project (`New_LinkResource`, `func_8004A070`,
+  elsewhere in the project (`New_LinkResource`, `RegisterRecordTableFiles`,
   `SetActiveDataSourceDriverMode`, `New_StageMap`) — all four already have an extern
   somewhere else (`GameApplication.h` or `code_1677c.c`); this unit keeps its
   own local view rather than cross-including, per established policy. The

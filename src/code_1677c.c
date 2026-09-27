@@ -172,7 +172,7 @@ void GameApplication__StartLoaderTask(GameApplication *self, const char *path) {
     TaskCore *task = New_TaskCore(0, 0, 0);
 
     /* setCallback's occupant stores a void (*)(void *ctx); this callback
-     * takes nothing and returns func_8004A070's value, which
+     * takes nothing and returns RegisterRecordTableFiles's value, which
      * TaskCore__RefreshViewValue ignores. */
     task->methods->setCallback(task, (void (*)(void *))GameApplication__LoaderTaskDoneCallback, self);
     task->methods->setFrameBound(task, 0);
@@ -181,10 +181,10 @@ void GameApplication__StartLoaderTask(GameApplication *self, const char *path) {
     task->methods->release(task);
 }
 
-extern s32 func_8004A070(s32 a0);
+extern s32 RegisterRecordTableFiles(s32 a0);
 
 s32 GameApplication__LoaderTaskDoneCallback(void) {
-    return func_8004A070(0);
+    return RegisterRecordTableFiles(0);
 }
 
 /* Optional stream-task init block, gated by self->config->playStreams (the same

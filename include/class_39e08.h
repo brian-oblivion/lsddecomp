@@ -14,7 +14,7 @@
  *    functions, TimedTask__PlaySound and GetTimedTaskMethods, open
  *    class_3ac78. NoOpSlot58, CheckTimeout, SetState and SetTimeout are
  *    TimedTask's own methods that DayTask inherits unchanged.
- * plus func_8004A070, called once from DayTask's ctor and once from
+ * plus RegisterRecordTableFiles, called once from DayTask's ctor and once from
  * code_1677c: it manages a pair of file-scope globals (D_8008A978/
  * D_8008A97C) and loops on RegisterFileTableEntries; nothing pins down
  * what it registers.
@@ -67,9 +67,9 @@ extern const char D_800113F8[];
  * forwarded as `New_WBgm`'s own 1st argument (include/WBgm.h). */
 extern s32 PickWeeklyGroup(s32 arg1);
 
-/* Also declared in code_1677c.c as `extern s32 func_8004A070(s32 a0)`.
+/* Also declared in code_1677c.c as `extern s32 RegisterRecordTableFiles(s32 a0)`.
  * Return value discarded at this call site. */
-extern s32 func_8004A070(s32 arg1);
+extern s32 RegisterRecordTableFiles(s32 arg1);
 
 /* Also declared in src/code_1677c.c with this exact signature. Return
  * value discarded at this call site. */

@@ -8,14 +8,14 @@
 
 ## What it does
 
-One-line forwarding wrapper: `return func_8004A070(0);`
+One-line forwarding wrapper: `return RegisterRecordTableFiles(0);`
 
 ## Derivation
 
 ```
 addiu $sp, $sp, -0x18
 sw    $ra, 0x10($sp)
-jal   func_8004A070
+jal   RegisterRecordTableFiles
  addu $a0, $zero, $zero
 lw    $ra, 0x10($sp)
 addiu $sp, $sp, 0x18
@@ -28,16 +28,16 @@ callee's return value passes straight through in the register. Per
 CLAUDE.md ("the byte match tells you NOTHING about the return type" for a
 one-line tail-call wrapper), the *bytes* alone don't distinguish `void
 GameApplication__LoaderTaskDoneCallback(void)` from a value-returning one. Positive evidence that
-`func_8004A070` itself returns a value: its own body (`asm/class_39e08.s`,
-around `func_8004A070`) ends with `beqz $v0, .L8004A104` gating the loop
+`RegisterRecordTableFiles` itself returns a value: its own body (`asm/class_39e08.s`,
+around `RegisterRecordTableFiles`) ends with `beqz $v0, .L8004A104` gating the loop
 exit on `$v0`, i.e. it's actively computed and meaningful, not incidentally
 left in the register. Written to forward it:
 
 ```c
-extern s32 func_8004A070(s32 a0);
+extern s32 RegisterRecordTableFiles(s32 a0);
 
 s32 GameApplication__LoaderTaskDoneCallback(void) {
-    return func_8004A070(0);
+    return RegisterRecordTableFiles(0);
 }
 ```
 
@@ -51,10 +51,10 @@ bytes.
 ## Naming
 
 **`GameApplication__LoaderTaskDoneCallback` -- tier A.** Pure leaf: `return
-func_8004A070(0);`, mechanics ARE the purpose (a forwarding wrapper). Named
+RegisterRecordTableFiles(0);`, mechanics ARE the purpose (a forwarding wrapper). Named
 from its one use, `GameApplication__StartLoaderTask`'s `task->methods->slot98(task,
 GameApplication__LoaderTaskDoneCallback, self)` call -- `slot98` registers a
 completion callback and a context pointer on a `LoaderTask`, so this
 function's role (not its ultimate game purpose, which depends on the
-uncarved `func_8004A070`) is exactly "the callback a LoaderTask runs on
+uncarved `RegisterRecordTableFiles`) is exactly "the callback a LoaderTask runs on
 completion".

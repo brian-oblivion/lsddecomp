@@ -47,7 +47,7 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     self->dreamerTmd = New_LinkResource(&req.src);
     tmp = PickWeeklyGroup(0);
     self->bgm = New_WBgm((char *)tmp, NULL, 1);
-    func_8004A070(1);
+    RegisterRecordTableFiles(1);
     SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
     self->initArgs = initArgs;
     initArgs->viewport = (BasicClass *)New_NodeGuardedViewport();
@@ -227,7 +227,7 @@ extern s32 RegisterFileTableEntries(void *arg0, s32 arg1);
 extern s32 D_8008A978;
 extern s32 D_8008A97C;
 
-s32 func_8004A070(s32 arg0) {
+s32 RegisterRecordTableFiles(s32 arg0) {
     s32 local;
     void *obj;
     s32 prev;

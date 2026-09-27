@@ -1,4 +1,6 @@
-# func_8004A070 — MATCHED (round 45, 48/48 words)
+# RegisterRecordTableFiles — MATCHED (round 45, 48/48 words)
+
+> Renamed from `func_8004A070` on 2026-09-27 (tools/rename.py). Address 0x8004a070.
 
 **Unit:** class_39e08 · **Size:** 48 words (0xC0 bytes)
 
@@ -20,7 +22,7 @@ extern s32 RegisterFileTableEntries(void *arg0, s32 arg1);
 extern s32 D_8008A978;
 extern s32 D_8008A97C;
 
-s32 func_8004A070(s32 arg0)
+s32 RegisterRecordTableFiles(s32 arg0)
 {
     s32 local;
     void *obj;
@@ -60,9 +62,9 @@ s32 func_8004A070(s32 arg0)
 SDK-owned functions.
 
 The return type had to be `s32`, not `void`: `include/class_39e08.h`
-already carries `extern s32 func_8004A070(s32 arg1);` (this unit's own
+already carries `extern s32 RegisterRecordTableFiles(s32 arg1);` (this unit's own
 prior local view, noting "already declared elsewhere as `extern s32
-func_8004A070(s32 a0)`"), and the definition here must match it exactly or
+RegisterRecordTableFiles(s32 a0)`"), and the definition here must match it exactly or
 `cc1` rejects it as `conflicting types`. Retail's own asm supports this: at
 `jr $ra` the last thing written to `$v0` is the final (non-zero) return
 value of the tail `RegisterFileTableEntries` call — genuinely live register content,
@@ -94,13 +96,13 @@ else.
 
 ## Naming
 
-`func_8004A070` -- left unrenamed (round 73, alpha, track-3 pass). Called
-once from `DayTask__DayTask`'s ctor as `func_8004A070(1)` (return
-discarded) and once from `code_1677c.c` as `func_8004A070(0)` (also
+`RegisterRecordTableFiles` -- left unrenamed (round 73, alpha, track-3 pass). Called
+once from `DayTask__DayTask`'s ctor as `RegisterRecordTableFiles(1)` (return
+discarded) and once from `code_1677c.c` as `RegisterRecordTableFiles(0)` (also
 discarded). It is not a class method (no `self` parameter, not reachable
 through any vtable slot in either the 33-slot or 28-slot table this unit
 resolved), and its own body -- a two-call-deep counter over
 `D_8008A978`/`D_8008A97C` feeding a loop on `RegisterFileTableEntries` --
 does not establish what it is registering. Per CLAUDE.md, "a wrong tier-A
-name is worse than `func_`"; this stays `func_8004A070` rather than assert
+name is worse than `func_`"; this stays `RegisterRecordTableFiles` rather than assert
 a guess.
