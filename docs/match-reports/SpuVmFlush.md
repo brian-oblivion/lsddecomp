@@ -83,7 +83,7 @@ window:
    (`func_800375E8(0, 0xFFFFFF)` if `D_8008D9A3[i] == 2`, then zero it
    regardless).
 4. Two unconditional bitmask updates:
-   `D_8008E228 &= ~_svm_okof1; _svm_okon2 &= ~_svm_okof2;`
+   `_svm_okon1 &= ~_svm_okof1; _svm_okon2 &= ~_svm_okof2;`
 5. **Per-channel interpolation dispatch**, unconditional 0..0x17 loop:
    `SetAutoVol(i)` if `D_8008D9A4[i] != 0`, `SetAutoPan(i)` if
    `D_8008D9B0[i] != 0` (both still `INCLUDE_ASM` themselves — see their own
@@ -98,7 +98,7 @@ window:
    `u8 flags` local changed nothing measurably here (this function had a
    different problem at the time), but is the established idiom project-
    wide and was kept removed on principle.
-7. Unconditional tail: read `_svm_okof1`/`_svm_okof2`/`D_8008E228`/
+7. Unconditional tail: read `_svm_okof1`/`_svm_okof2`/`_svm_okon1`/
    `_svm_okon2`/`_svm_orev1`/`_svm_orev2` into locals, zero the first four
    globals, then store all six into fixed offsets of the SAME `_svm_sreg`
    object phase 2 read as an array (`+0x18C`/`+0x18E`/`+0x188`/`+0x18A`/
@@ -538,7 +538,7 @@ void SpuVmFlush(void) {
         }
     }
 
-    D_8008E228 &= ~_svm_okof1;
+    _svm_okon1 &= ~_svm_okof1;
     _svm_okon2 &= ~_svm_okof2;
 
     for (i = 0; i < 0x18; i++) {
@@ -578,14 +578,14 @@ void SpuVmFlush(void) {
         SpuRegs *rec = _svm_sreg;
         u16 lowMask = _svm_okof1;
         u16 highMask = _svm_okof2;
-        u16 lowActive = D_8008E228;
+        u16 lowActive = _svm_okon1;
         u16 highActive = _svm_okon2;
         s16 v230 = _svm_orev1;
         s16 v234 = _svm_orev2;
 
         _svm_okof1 = 0;
         _svm_okof2 = 0;
-        D_8008E228 = 0;
+        _svm_okon1 = 0;
         _svm_okon2 = 0;
 
         *(u16 *) ((u8 *) rec + 0x18C) = lowMask;
@@ -624,7 +624,7 @@ extern u8 _svm_auto_kof_mode;
 
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
-extern u16 D_8008E228;
+extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 extern s16 _svm_orev1;
 extern s16 _svm_orev2;
@@ -713,7 +713,7 @@ void SpuVmFlush(void) {
         }
     }
 
-    D_8008E228 &= ~_svm_okof1;
+    _svm_okon1 &= ~_svm_okof1;
     _svm_okon2 &= ~_svm_okof2;
 
     for (i = 0; i < 0x18; i++) {
@@ -753,14 +753,14 @@ void SpuVmFlush(void) {
         SpuRegs *rec = _svm_sreg;
         u16 lowMask = _svm_okof1;
         u16 highMask = _svm_okof2;
-        u16 lowActive = D_8008E228;
+        u16 lowActive = _svm_okon1;
         u16 highActive = _svm_okon2;
         s16 v230 = _svm_orev1;
         s16 v234 = _svm_orev2;
 
         _svm_okof1 = 0;
         _svm_okof2 = 0;
-        D_8008E228 = 0;
+        _svm_okon1 = 0;
         _svm_okon2 = 0;
 
         *(u16 *) ((u8 *) rec + 0x18C) = lowMask;
@@ -814,7 +814,7 @@ here -- proposing for the head to apply once no runner is live on
 - `_svm_okof1`/`_svm_okof2` -> `gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`
   (OR'd with a per-voice bit when releasing a voice, split low/high 16
   across the 0..0x1F channel space).
-- `D_8008E228`/`_svm_okon2` -> `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`
+- `_svm_okon1`/`_svm_okon2` -> `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`
   (AND-NOT'd with the enable mask above -- the actual SPU key bitmask
   pair, per `vmNoiseOn2`'s report).
 - `_svm_sreg_dirty` -> `gVoiceFlags` (per-voice byte OR'd with 3 or 4 by
@@ -839,7 +839,7 @@ declarations (the `_svm_envx_hist*` pair, `Rec34HalfU2`,
 `SetAutoPan` externs, `D_8008D7F6`) are new to the unit and were kept
 local to this function's `#ifdef` block, per CLAUDE.md's rule against
 adding to a shared header; everything else it touches (`D_8008D9A3`,
-`_svm_sreg`, `_svm_sreg_dirty`, `_svm_okof1`/`64`, `D_8008E228`/`22C`,
+`_svm_sreg`, `_svm_sreg_dirty`, `_svm_okof1`/`64`, `_svm_okon1`/`22C`,
 `_svm_orev1`/`234`, `_svm_sreg_buf`, `D_8008D7F4`, `spuVmMaxVoice`,
 `_svm_auto_kof_mode`, `D_8008D9A4`, `D_8008D9B0`) was
 already declared earlier in the unit and needed no change.
@@ -868,4 +868,4 @@ because splat names only addresses some asm references. Byte-identical.
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `_svm_sreg`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from _svm_okof1/64), `keyOn[0..1]` (+0x188, from D_8008E228/22C) and `reverbOn[0..1]` (+0x198, from _svm_orev1/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `Rec34HalfU2` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.
+Round 96 (charlie, track 6) moved `src/code_179d8_m.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `_svm_sreg`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from _svm_okof1/64), `keyOn[0..1]` (+0x188, from _svm_okon1/22C) and `reverbOn[0..1]` (+0x198, from _svm_orev1/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `Rec34HalfU2` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.

@@ -52,7 +52,7 @@ the 16-byte-stride `_svm_sreg_buf`/`D_8008D7F2` tables, OR `3` into
 `_svm_sreg_dirty[chan]`, compute a 32-bit voice-enable bit split across
 `lowBit`/`highBit` by `chan<16`, reset the whole `D_8008D9A3` 52-byte-stride
 table's low bit for every live voice (`spuVmMaxVoice` of them) then mark this
-channel's own slot `2`, OR the enable bits into `D_8008E228`/`_svm_okon2`
+channel's own slot `2`, OR the enable bits into `_svm_okon1`/`_svm_okon2`
 and AND-NOT them out of `_svm_okof1`/`_svm_okof2`, conditionally OR/AND-NOT
 them into a second enable pair (`_svm_orev1`/`_svm_orev2`, gated on
 `D_8008EA20 & 4` -- new globals, not touched by `vmNoiseOn2`), and
@@ -123,7 +123,7 @@ extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 extern u8 spuVmMaxVoice;
-extern u16 D_8008E228;
+extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
@@ -169,7 +169,7 @@ extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 extern u8 spuVmMaxVoice;
-extern u16 D_8008E228;
+extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
@@ -266,12 +266,12 @@ void vmNoiseOn(s32 a0) {
     idx52 = (u8)chanRaw * 52;
     *(u8 *)(D_8008D9A3 + idx52) = 2;
 
-    e228 = D_8008E228;
+    e228 = _svm_okon1;
     e22c = _svm_okon2;
     c60 = _svm_okof1;
     e228 = lowBit | e228;
     e22c = highBit | e22c;
-    D_8008E228 = e228;
+    _svm_okon1 = e228;
     c60 = c60 & ~e228;
     _svm_okon2 = e22c;
     c64 = _svm_okof2;
@@ -421,7 +421,7 @@ Deletions:                     51  (100)
 and deletions near 50 each (out of ~155 instructions) describe a function
 roughly HALF structurally different, not a 2-word-short near-miss. The
 isolated scaffold's own `--debug` dump shows large blocks of the function's
-TAIL (the `D_8008E228`/`22C`/`80090C60`/`64`/`8008E230`/`234` enable-bit
+TAIL (the `_svm_okon1`/`22C`/`80090C60`/`64`/`8008E230`/`234` enable-bit
 section) diverging in ways the real in-unit build does not -- confirmed by
 rebuilding the exact same 309/311 body in `src/code_179d8_l.c` and reading
 `tools/asm-differ/diff.py vmNoiseOn` directly: the realigned diff shows

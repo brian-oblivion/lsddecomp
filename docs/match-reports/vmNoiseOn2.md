@@ -32,7 +32,7 @@ channel's own 52-byte-stride slot gets three fields set (`D_8008D98C+2`←10
 read as `D_8008D98C` base itself rather than a sub-field — not fully
 resolved, see below], `D_8008D9A3+0`←2, `D_8008D98A+0`←0); and finally the
 computed `lowBit`/`highBit` (a 32-bit voice-enable mask split across two
-16-bit halves by whether `chan<16`) get OR'd into `D_8008E228`/`_svm_okon2`
+16-bit halves by whether `chan<16`) get OR'd into `_svm_okon1`/`_svm_okon2`
 and AND-NOT'd into `_svm_okof1`/`_svm_okof2` (an enable/mute pair), then
 written to the two SPU key-on registers.
 
@@ -48,7 +48,7 @@ extern u8 D_8008D98A[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 
-extern u16 D_8008E228;
+extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
@@ -98,13 +98,13 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     idx52 = (u8)a3 * 52;
     *(u8 *)(D_8008D9A3 + idx52) = 2;
 
-    e228 = D_8008E228;
+    e228 = _svm_okon1;
     e22c = _svm_okon2;
     *(u16 *)(D_8008D98A + idx52) = 0;
     c60 = _svm_okof1;
     e228 = lowBit | e228;
     e22c = highBit | e22c;
-    D_8008E228 = e228;
+    _svm_okon1 = e228;
     c60 = c60 & ~e228;
     _svm_okon2 = e22c;
     c64 = _svm_okof2;
@@ -230,7 +230,7 @@ the compiled body doesn't (retail preserves the raw channel in `$a3` and
 narrows `$a0` in place; the compiled body does the reverse), plus a
 missing `addiu sp,sp,-8`/`+8` frame retail allocates (residue 4 from the
 original report) and several downstream register-choice differences in
-the tail (`D_8008E228`/`_svm_okon2`/`_svm_okof1`/`_svm_okof2` update
+the tail (`_svm_okon1`/`_svm_okon2`/`_svm_okof1`/`_svm_okof2` update
 sequence) that read as cascading consequences of the same root register
 allocation difference rather than independent residues — the tail's LOAD/
 OP/STORE statement order in the preserved C already matches retail's
@@ -256,7 +256,7 @@ extern u8 D_8008D98A[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
 
-extern u16 D_8008E228;
+extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
@@ -306,13 +306,13 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     idx52 = (u8)a3 * 52;
     *(u8 *)(D_8008D9A3 + idx52) = 2;
 
-    e228 = D_8008E228;
+    e228 = _svm_okon1;
     e22c = _svm_okon2;
     *(u16 *)(D_8008D98A + idx52) = 0;
     c60 = _svm_okof1;
     e228 = lowBit | e228;
     e22c = highBit | e22c;
-    D_8008E228 = e228;
+    _svm_okon1 = e228;
     c60 = c60 & ~e228;
     _svm_okon2 = e22c;
     c64 = _svm_okof2;
@@ -410,7 +410,7 @@ worktree this round -- see the process-hygiene note below). Zero
 
 **The best candidate is a negative result once verified directly.** Its
 only structural change from the seed: wrapping the tail's
-`e22c = highBit | e22c; D_8008E228 = e228; c60 = c60 & ~e228;` triple in a
+`e22c = highBit | e22c; _svm_okon1 = e228; c60 = c60 & ~e228;` triple in a
 `do { ... } while (0);` block. Spliced into the real unit and rebuilt:
 **still 108/112 (0x1b0), no length change** -- the isolated scaffold's
 score improvement (3100 -> 1800) did not translate, consistent with this
@@ -497,9 +497,9 @@ C — by changing the local count at the END of it.
 Two sub-levers inside that rewrite, both independently measured:
 
 - **Operand order is observable.** Retail emits `or v1,t0,v1`
-  (`lowBit | D_8008E228`). `D_8008E228 |= lowBit;` emits `or v1,v1,t0` —
+  (`lowBit | _svm_okon1`). `_svm_okon1 |= lowBit;` emits `or v1,v1,t0` —
   same semantics, different word. The matching spelling is
-  `D_8008E228 = lowBit | D_8008E228;`.
+  `_svm_okon1 = lowBit | _svm_okon1;`.
 - **Statement order of the four global updates is the LOAD order, not the
   store order.** Retail loads `E228, E22C, C60, C64`; the inherited body's
   order `E228, C60, E22C, C64` produced exactly that load order and was
@@ -588,7 +588,7 @@ spending the session's one search where it can bite.
 
 Needs, in addition to the unit's existing declarations before
 `SpuVmKeyOnNow` and `vmNoiseOn` (`_svm_sreg_buf`, `D_8008D7F2`,
-`_svm_sreg_dirty`, `D_8008D98C`, `D_8008D9A3`, `D_8008E228`, `_svm_okon2`,
+`_svm_sreg_dirty`, `D_8008D98C`, `D_8008D9A3`, `_svm_okon1`, `_svm_okon2`,
 `_svm_okof1`, `_svm_okof2`, `spuVmMaxVoice`, `_svm_sreg`), one extra:
 
 #if 0
@@ -637,9 +637,9 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     *(u8 *)(D_8008D9A3 + idx52) = 2;
 
     *(u16 *)(D_8008D98A + idx52) = 0;
-    D_8008E228 = lowBit | D_8008E228;
+    _svm_okon1 = lowBit | _svm_okon1;
     _svm_okon2 = highBit | _svm_okon2;
-    _svm_okof1 = _svm_okof1 & ~D_8008E228;
+    _svm_okof1 = _svm_okof1 & ~_svm_okon1;
     _svm_okof2 = _svm_okof2 & ~_svm_okon2;
     _svm_sreg[0xCA] = lowBit;
     _svm_sreg[0xCB] = highBit;

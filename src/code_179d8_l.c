@@ -65,7 +65,7 @@ extern VabHdr *_svm_vh;      /* the header of the VAB being played */
 extern VagAtr *_svm_tn;      /* that VAB's tone attributes, 16 per program */
 extern u8 spuVmMaxVoice;     /* voices the allocator may hand out */
 extern s16 _svm_stereo_mono; /* 1: mono, both channels at the louder volume */
-extern u16 D_8008E228;       /* Sony's _svm_okon1: voices 0-15 to key on at the next flush */
+extern u16 _svm_okon1;       /* Sony's _svm_okon1: voices 0-15 to key on at the next flush */
 extern u16 _svm_okon2;
 extern u16 _svm_okof1; /* voices to key off at the next flush */
 extern u16 _svm_okof2;
@@ -289,9 +289,9 @@ void SpuVmKeyOnNow(s32 unused, s32 pitch) {
         _svm_orev2 = _svm_orev2 & ~highBit;
     }
 
-    D_8008E228 = lowBit | D_8008E228;
+    _svm_okon1 = lowBit | _svm_okon1;
     _svm_okon2 = highBit | _svm_okon2;
-    _svm_okof1 = _svm_okof1 & ~D_8008E228;
+    _svm_okof1 = _svm_okof1 & ~_svm_okon1;
     _svm_okof2 = _svm_okof2 & ~_svm_okon2;
 }
 #else
@@ -350,9 +350,9 @@ void vmNoiseOn2(s32 voice, s32 volL, s32 volR) {
     _svm_voice[(u8)voiceArg].unk1B = 2;
 
     _svm_voice[(u8)voiceArg].unk02 = 0;
-    D_8008E228 = lowBit | D_8008E228;
+    _svm_okon1 = lowBit | _svm_okon1;
     _svm_okon2 = highBit | _svm_okon2;
-    _svm_okof1 = _svm_okof1 & ~D_8008E228;
+    _svm_okof1 = _svm_okof1 & ~_svm_okon1;
     _svm_okof2 = _svm_okof2 & ~_svm_okon2;
     _svm_sreg->noiseOn[0] = lowBit;
     _svm_sreg->noiseOn[1] = highBit;

@@ -123,7 +123,7 @@ extern u8 spuVmMaxVoice;
  * channel mask bit is set. */
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
-extern u16 D_8008E228;
+extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 
 /* libsnd vmanager's _svm_vh (pinned at this address): the current VAB's
@@ -368,7 +368,7 @@ s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
         _svm_voice[chan].unk00 = 0;
         _svm_okof1 = mask0 | _svm_okof1;
         _svm_okof2 |= mask1;
-        D_8008E228 &= ~_svm_okof1;
+        _svm_okon1 &= ~_svm_okof1;
         _svm_okon2 &= ~_svm_okof2;
     }
     _snd_ev_flag = 0;
@@ -482,7 +482,7 @@ INCLUDE_ASM("asm/nonmatchings/libsnd_vm_vol_ut_key_ut_keyv", SsUtKeyOnV);
  * unreachable register-identity stall; the caching was the whole residue.
  * The only structural difference from the sibling is that the lock is
  * released BEFORE the mask block rather than after it (retail's
- * `sw zero, _snd_ev_flag` sits at 0x80031950, between the D_8008E228 load and
+ * `sw zero, _snd_ev_flag` sits at 0x80031950, between the _svm_okon1 load and
  * the first `or`). See docs/match-reports/SsUtKeyOffV.md. */
 s16 SsUtKeyOffV(s16 idx) {
     u16 chan;
@@ -511,7 +511,7 @@ s16 SsUtKeyOffV(s16 idx) {
     _snd_ev_flag = 0;
     _svm_okof1 = mask0 | _svm_okof1;
     _svm_okof2 |= mask1;
-    D_8008E228 &= ~_svm_okof1;
+    _svm_okon1 &= ~_svm_okof1;
     _svm_okon2 &= ~_svm_okof2;
     return 0;
 

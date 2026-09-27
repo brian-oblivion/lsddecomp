@@ -806,7 +806,7 @@ loop-plus-nested-branches function, not in any individual construct.
 ## Struct/global model
 
 All of `Rec34D994`, `SlotE968`, `RecordE978`, `spuVmMaxVoice`, `D_8008EA22`,
-`_svm_okof1`/`64`, `D_8008E228`/`22C` were ALREADY declared in this unit
+`_svm_okof1`/`64`, `_svm_okon1`/`22C` were ALREADY declared in this unit
 (`src/libsnd_vm_vol_ut_key_ut_keyv.c`) before this round, for `SsUtKeyOn`'s existing
 stall. Added this round, following `vmNoiseOn`/`SpuVmKeyOnNow`'s
 already-proven declarations verbatim:

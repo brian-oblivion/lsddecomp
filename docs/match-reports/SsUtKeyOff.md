@@ -53,7 +53,7 @@ s32 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4)
         _svm_voice[chan].unk0 = 0;
         _svm_okof1 = mask0 | _svm_okof1;
         _svm_okof2 |= mask1;
-        D_8008E228 &= ~_svm_okof1;
+        _svm_okon1 &= ~_svm_okof1;
         _svm_okon2 &= ~_svm_okof2;
     }
     _snd_ev_flag = 0;

@@ -55,7 +55,7 @@ void SpuVmSeqKeyOff(s32 p0)
             old64 = _svm_okof2;
             old60 = loBit | old60;
             _svm_okof1 = old60;
-            D_8008E228 = D_8008E228 & ~old60;
+            _svm_okon1 = _svm_okon1 & ~old60;
             old64 = hiBit | old64;
             _svm_okof2 = old64;
             _svm_okon2 = _svm_okon2 & ~old64;
@@ -68,7 +68,7 @@ void SpuVmSeqKeyOff(s32 p0)
 
 Needs this unit's shared `_snd_ev_flag`-adjacent globals declared near the
 top of `code_179d8_j.c` (`D_8008EA26`, `spuVmMaxVoice`, `D_8008D996`/`D_8008D9A3`/
-`_svm_voice`/`D_8008D98C`, `_svm_okof1`/`_svm_okof2`, `D_8008E228`/`_svm_okon2`).
+`_svm_voice`/`D_8008D98C`, `_svm_okof1`/`_svm_okof2`, `_svm_okon1`/`_svm_okon2`).
 
 ## One CLOSED finding: masking the induction variable is what enables strength reduction to match
 
@@ -237,7 +237,7 @@ round 23 already showed backfires.
 **Rebuild-before-trusting-the-score, third time.** Spliced the preserved
 body into `src/code_179d8_j.c` (with this unit's own local reduced-view
 declarations for `spuVmMaxVoice`, `D_8008D996`/`D_8008D9A3`/`_svm_voice`/
-`D_8008D98C`, `D_8008EA26`, `_svm_okof1`/`_svm_okof2`, `D_8008E228`/
+`D_8008D98C`, `D_8008EA26`, `_svm_okof1`/`_svm_okof2`, `_svm_okon1`/
 `_svm_okon2`, copied from `libsnd_vm_vol_ut_key_ut_keyv.c`'s equivalents per this
 project's per-unit reduced-local-view convention) and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `funcdiff.py` shows **45/85
@@ -375,7 +375,7 @@ extern u8 spuVmMaxVoice;
 extern volatile u16 D_8008EA26;
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
-extern u16 D_8008E228;
+extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 
 typedef struct {
@@ -427,7 +427,7 @@ void SpuVmSeqKeyOff(s32 p0)
             old64 = _svm_okof2;
             old60 = loBit | old60;
             _svm_okof1 = old60;
-            D_8008E228 = D_8008E228 & ~old60;
+            _svm_okon1 = _svm_okon1 & ~old60;
             old64 = hiBit | old64;
             _svm_okof2 = old64;
             _svm_okon2 = _svm_okon2 & ~old64;
@@ -460,9 +460,9 @@ void SpuVmSeqKeyOff(s32 p0)
    operand order (1 word)** -- unchanged from this report's earlier rounds.
 4. **Tail load/store scheduling (about 9 words).** Retail hoists the
    `_svm_okof2` load into the early slot at 0x80030760 and loads
-   `D_8008E228` lazily at 0x80030788, then finishes the C60/E228 pair before
+   `_svm_okon1` lazily at 0x80030788, then finishes the C60/E228 pair before
    starting the C64/E22C pair. The build swaps the two hoisted loads and
-   sinks the `D_8008E228` store past the whole C64/E22C chain.
+   sinks the `_svm_okon1` store past the whole C64/E22C chain.
 
 ### Axes tried this round and REJECTED (all measured, all with the lever-1+2 body as the base)
 
@@ -474,7 +474,7 @@ void SpuVmSeqKeyOff(s32 p0)
   steerable.**
 - **`SsUtKeyOff`'s matched tail idiom does NOT transfer here.** Writing
   the tail exactly as that already-matched sibling does
-  (`_svm_okof1 = loBit | _svm_okof1; D_8008E228 &= ~_svm_okof1; ...`, with
+  (`_svm_okof1 = loBit | _svm_okof1; _svm_okon1 &= ~_svm_okof1; ...`, with
   its documented `u32`/`u16` mask type asymmetry) REGRESSES to 47/85. The
   explicit `old60`/`old64` locals are load-bearing here. This is a fourth
   instance of this unit's standing caution that a sibling's idiom needs
@@ -555,7 +555,7 @@ columns, not just the offset it reports.
   shows the same four residue classes listed above, in the same places, as
   the in-tree `asm-differ` run: same `move a3,zero` rotation at word 4, same
   `v0`/`v1` swap through the multiply, same missing rematerialised `andi`
-  before the `sh`, same `a1`/`a2` mask swap, same `_svm_okof2`/`D_8008E228`
+  before the `sh`, same `a1`/`a2` mask swap, same `_svm_okof2`/`_svm_okon1`
   load swap. No scaffold artifact.
 
 **Verdict: SEARCH -- run, and it PAID. See the outcome section below.**
@@ -610,7 +610,7 @@ pre-lever form) -- the value has to pass through a VARIABLE.
 **A genuine measurement conflict, recorded rather than resolved.** The
 permuter's own 270-scoring form (reusing `old60`) scores **57/85** raw --
 THREE WORDS WORSE than the `chanVal` form's 60/85 -- while being
-structurally closer: it also fixes the tail's `D_8008E228` store deferral,
+structurally closer: it also fixes the tail's `_svm_okon1` store deferral,
 leaving the whole remaining residue as a single consistent register
 PERMUTATION across the function (`i` in `a2` vs retail's `a3`;
 `loBit`/`hiBit` in `a1`/`a3` vs `a2`/`a1`; the tail pair in `a0`/`v1` vs
@@ -664,7 +664,7 @@ void SpuVmSeqKeyOff(s32 p0)
             old64 = _svm_okof2;
             old60 = loBit | old60;
             _svm_okof1 = old60;
-            D_8008E228 = D_8008E228 & ~old60;
+            _svm_okon1 = _svm_okon1 & ~old60;
             old64 = hiBit | old64;
             _svm_okof2 = old64;
             _svm_okon2 = _svm_okon2 & ~old64;
@@ -773,15 +773,15 @@ conclusion is correct and it is still correct** -- round 57 re-ran the same
 axis on the new base and reproduced it exactly (fully sequential
 C60->E228 then C64->E22C; both `or`s computed before either store; `or`
 operands written the other way round; the compound `&=` form; an explicit
-named local for the `D_8008E228` read -- **all five byte-identical at 69/85**).
+named local for the `_svm_okon1` read -- **all five byte-identical at 69/85**).
 
 What moves the tail is not ORDER, it is which sub-expression gets a name:
 
-1. **Give the complement its own statement.** `D_8008E228 = D_8008E228 & ~old60;`
-   and `old60 = ~old60; D_8008E228 = D_8008E228 & old60;` are not the same
+1. **Give the complement its own statement.** `_svm_okon1 = _svm_okon1 & ~old60;`
+   and `old60 = ~old60; _svm_okon1 = _svm_okon1 & old60;` are not the same
    program to GCC 2.6.3: the second reproduces retail's
    `nor v1,zero,v1` / `and` / `sh` with the E228 store in retail's position,
-   the first sinks the `D_8008E228` store past the entire C64/E22C chain.
+   the first sinks the `_svm_okon1` store past the entire C64/E22C chain.
    **69/85 -> 72/85, and it removes the last insertion/deletion pair** -- after
    it the two instruction streams align one-for-one for the whole function.
    Applying it to only one of the two chains is worse than both (71 and 70).
@@ -798,7 +798,7 @@ What moves the tail is not ORDER, it is which sub-expression gets a name:
 ```c
             _svm_okof1 = loBit | _svm_okof1;
             old60 = ~_svm_okof1;
-            D_8008E228 = D_8008E228 & old60;
+            _svm_okon1 = _svm_okon1 & old60;
             _svm_okof2 = hiBit | _svm_okof2;
             old64 = ~_svm_okof2;
             _svm_okon2 = _svm_okon2 & old64;
@@ -818,7 +818,7 @@ extern u8 spuVmMaxVoice;
 extern volatile u16 D_8008EA26;
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
-extern u16 D_8008E228;
+extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 
 typedef struct {
@@ -869,7 +869,7 @@ void SpuVmSeqKeyOff(s32 p0)
             _svm_voice[bankIdx].unk0 = 0;
             _svm_okof1 = loBit | _svm_okof1;
             old60 = ~_svm_okof1;
-            D_8008E228 = D_8008E228 & old60;
+            _svm_okon1 = _svm_okon1 & old60;
             _svm_okof2 = hiBit | _svm_okof2;
             old64 = ~_svm_okof2;
             _svm_okon2 = _svm_okon2 & old64;
@@ -893,12 +893,12 @@ streams one-for-one from 0x20EB4 to the end.
    whichever instruction the scheduler put first in the fall-through block, and
    the scheduler prefers the `sll` because it heads a two-instruction chain
    (`sll` -> `sra t1`) where the `move` heads none.
-2. **WHICH of `_svm_okof2` and `D_8008E228` is hoisted into the second early
+2. **WHICH of `_svm_okof2` and `_svm_okon1` is hoisted into the second early
    load slot -- 2 words directly, 8 more downstream, 10 words in total.**
    Both streams hoist exactly two loads above the `D_8008D98C`/`_svm_voice`
    zero-stores. Retail hoists `_svm_okof1` and `_svm_okof2` and loads
-   `D_8008E228` late at 0x20F88; the build hoists `_svm_okof1` and
-   `D_8008E228` and loads `_svm_okof2` late at the same 0x20F88. The eight
+   `_svm_okon1` late at 0x20F88; the build hoists `_svm_okof1` and
+   `_svm_okon1` and loads `_svm_okof2` late at the same 0x20F88. The eight
    `$v0`/`$v1`/`$a0` differences through 0x20F9C-0x20FC0 are all downstream of
    that one choice -- whichever value lands in the early slot gets `$a0`.
    Note retail's own read order (C60, C64, E228) is not its USE order
@@ -915,7 +915,7 @@ streams one-for-one from 0x20EB4 to the end.
   **Residue 2 is not reachable by moving the read.**
 - **`__asm__("")` barriers, six placements, every one a regression:** before
   the zero-stores (72, i.e. neutral-to-worse), after them (63), between the
-  reads and the RMW block (63), before the `D_8008E228` statement with C64
+  reads and the RMW block (63), before the `_svm_okon1` statement with C64
   preloaded (58), before it without (59), and two preheader placements that
   changed the length outright (funcdiff refused the score). Round 56 found the
   same for its three tail placements; this is now nine measured placements
@@ -927,7 +927,7 @@ streams one-for-one from 0x20EB4 to the end.
   45/85.
 - **Folding the `or` into the read** (`old60 = _svm_okof1 | loBit;` as one
   statement, then store): 61/85.
-- **Reusing `bankIdx` as the `D_8008E228` read's temp:** 28/85, by far the
+- **Reusing `bankIdx` as the `_svm_okon1` read's temp:** 28/85, by far the
   worst variant measured -- it collides with `bankIdx`'s own live range through
   the three zero-stores' index.
 - **All six preheader statement orderings re-measured on the new base:**

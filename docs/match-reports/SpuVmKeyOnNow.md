@@ -75,7 +75,7 @@ source object and a DIFFERENT tail:
   unit's header.
 - **The write order in the enable-bit tail is REVERSED from `vmNoiseOn`**:
   this function updates the `D_8008EA20`-gated `_svm_orev1`/`234` pair
-  FIRST, then `D_8008E228`/`22C`/`80090C60`/`64` SECOND -- the opposite
+  FIRST, then `_svm_okon1`/`22C`/`80090C60`/`64` SECOND -- the opposite
   order from D8E0. Confirmed structurally correct by m2c's own independent
   decode; not treated as an error.
 
@@ -121,7 +121,7 @@ extern u8 D_8008EA20;
 extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
-extern u16 D_8008E228;
+extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
@@ -225,8 +225,8 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
         _svm_orev2 &= ~highBit;
     }
 
-    D_8008E228 |= lowBit;
-    _svm_okof1 &= ~D_8008E228;
+    _svm_okon1 |= lowBit;
+    _svm_okof1 &= ~_svm_okon1;
     _svm_okon2 |= highBit;
     _svm_okof2 &= ~_svm_okon2;
 }
@@ -633,9 +633,9 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
         _svm_orev2 = _svm_orev2 & ~highBit;
     }
 
-    D_8008E228 = lowBit | D_8008E228;
+    _svm_okon1 = lowBit | _svm_okon1;
     _svm_okon2 = highBit | _svm_okon2;
-    _svm_okof1 = _svm_okof1 & ~D_8008E228;
+    _svm_okof1 = _svm_okof1 & ~_svm_okon1;
     _svm_okof2 = _svm_okof2 & ~_svm_okon2;
 }
 #endif
@@ -840,9 +840,9 @@ void SpuVmKeyOnNow(s32 a0, s32 a1) {
         _svm_orev2 = _svm_orev2 & ~highBit;
     }
 
-    D_8008E228 = lowBit | D_8008E228;
+    _svm_okon1 = lowBit | _svm_okon1;
     _svm_okon2 = highBit | _svm_okon2;
-    _svm_okof1 = _svm_okof1 & ~D_8008E228;
+    _svm_okof1 = _svm_okof1 & ~_svm_okon1;
     _svm_okof2 = _svm_okof2 & ~_svm_okon2;
 }
 #endif

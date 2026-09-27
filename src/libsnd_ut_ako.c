@@ -57,11 +57,11 @@ extern volatile u16 *_svm_sreg;
 
 /* PS1 SPU voice key-on/off pair, split low/high across two 16-bit halves
  * (voices 0-15 / 16-31) -- _svm_okof1/64 are the hardware-mirrored "just
- * keyed on" mask, D_8008E228/22C a software mask this function clears the
+ * keyed on" mask, _svm_okon1/22C a software mask this function clears the
  * same bit from (a "no longer fading out" bookkeeping flag). */
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
-extern u16 D_8008E228;
+extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 
 /* STALL -- see docs/match-reports/SsUtAllKeyOff.md.  Round 66 revisit:
@@ -123,7 +123,7 @@ void SsUtAllKeyOff(void)
         hw1 = _svm_okof2;
         hw0 = bitLo | hw0;
         _svm_okof1 = hw0;
-        D_8008E228 = D_8008E228 & ~hw0;
+        _svm_okon1 = _svm_okon1 & ~hw0;
         hw1 = bitHi | hw1;
         _svm_okof2 = hw1;
         _svm_okon2 = _svm_okon2 & ~hw1;

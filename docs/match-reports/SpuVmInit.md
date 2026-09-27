@@ -346,7 +346,7 @@ extern s16 _svm_vab_count;
 extern u8 _svm_vab_used[];
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
-extern u16 D_8008E228;
+extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 
 typedef struct {
@@ -456,13 +456,13 @@ void SpuVmInit(s32 a0) {
         _svm_voice[chan].unk0 = 0;
         _svm_okof1 |= lowMask;
         _svm_okof2 |= highMask;
-        D_8008E228 &= ~_svm_okof1;
+        _svm_okon1 &= ~_svm_okof1;
         _svm_okon2 &= ~_svm_okof2;
     }
 
     gMasterVolL = 0x3FFF;
     gMasterVolR = 0x3FFF;
-    D_8008E228 = 0;
+    _svm_okon1 = 0;
     _svm_okon2 = 0;
     _svm_okof1 = 0;
     _svm_orev1 = 0;
@@ -628,7 +628,7 @@ substitutions, all using ONE permuter-inserted `int new_var;`:
    `[woff + 0] = 0;` for the `_svm_sreg` zero-store -- hoists the identical
    arithmetic value into a temp, computed one statement earlier, textually
    ahead of the intervening `+2`/`+4` stores.
-3. `woff = _svm_okof1; D_8008E228 &= ~woff;` -- reuses the (by-then-dead)
+3. `woff = _svm_okof1; _svm_okon1 &= ~woff;` -- reuses the (by-then-dead)
    per-iteration `woff` local as a scratch for `_svm_okof1`'s value before
    the AND-NOT, rather than reading the global twice.
 
@@ -728,7 +728,7 @@ base address `0x1F801C00`, per `vmNoiseOn2`'s own report in
 `_k`/`_p`. See the broadcast post from this round for the fuller list of
 globals this unit shares with that cluster (`D_8008EA26` -> `gSelectedVoice`,
 `spuVmMaxVoice` -> `gVoiceCount`, `_svm_okof1`/`_svm_okof2` ->
-`gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`, `D_8008E228`/`_svm_okon2` ->
+`gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`, `_svm_okon1`/`_svm_okon2` ->
 `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`, `_svm_sreg_dirty` -> `gVoiceFlags`,
 `D_8008D9A3` -> `gVoiceState`).
 
