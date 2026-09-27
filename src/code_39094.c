@@ -24,6 +24,56 @@
 #include "LbdFile.h"
 #include "StageGrid.h"
 
+/* FileResource::flags: the driver's read into the buffer has completed
+ * (setFlag). Same value and spelling as GraphicsResources.c's. */
+#define CD_FLAG_READ_DONE 0x080
+
+/* gRecordTable's record indices. The first RECORD_TABLE_COUNT are the
+ * sound banks (SND\*.VH/VB) and then each stage's files; the movie records
+ * follow. */
+enum RecordIndex {
+    RECORD_TABLE_COUNT = 560,    /* GetRecordTable's count */
+    RECORD_OPENING_MOVIES = 560, /* ETC\OPENINGA.STR .. ETC\OPENINGG.STR */
+    RECORD_ENDING_MOVIE = 567,   /* ETC\ENDING.STR */
+    RECORD_EVENT_MOVIES = 568,   /* FILM\EVENT1.STR .. FILM\EVENT6.STR */
+    RECORD_SPECIAL_DAYS = 574    /* SPECIAL_DAY_RECORD_COUNT per special day */
+};
+
+/* A stage's records, from gStageFirstRecord[stage]: TEXA..TEXD.TIX, then
+ * BGA..BGE.SEQ, then its Mnnn.LBD map chunks. */
+#define STAGE_TEXTURE_COUNT 4
+#define STAGE_BGM_COUNT 5
+#define STAGE_RECORD_BGM STAGE_TEXTURE_COUNT
+#define STAGE_RECORD_MAP_CHUNKS (STAGE_TEXTURE_COUNT + STAGE_BGM_COUNT)
+
+/* PickStageTexture: one more of a stage's textures is in the pick every
+ * DAYS_PER_TEXTURE days, repeating every STAGE_TEXTURE_COUNT of those. */
+#define DAYS_PER_TEXTURE 10
+
+/* The seven gSoundBankPaths entries, SND\AMBIENT .. SND\STANDERD. */
+#define SOUND_BANK_COUNT 7
+
+/* Movie ids: a movie record's index in gMovieFrameCounts, handed back
+ * through the movie getters' movieIdOut. */
+enum MovieId {
+    MOVIE_OPENING_FIRST = 0,      /* OPENING_MOVIE_COUNT, A to G */
+    MOVIE_ENDING = 7,             /* ETC\ENDING.STR */
+    MOVIE_EVENT_FIRST = 8,        /* FILM\EVENTn.STR is MOVIE_EVENT_FIRST + n - 1 */
+    MOVIE_SPECIAL_DAY_FIRST = 14, /* SPECIAL_DAY_MOVIE_COUNT per special day */
+    MOVIE_ASMK = 49               /* ETC\ASMK.STR */
+};
+
+#define OPENING_MOVIE_COUNT 7
+
+/* Each special day's six records: FILM\SPDAYnnA/B.STR (its two movies),
+ * then IMG1\SPDAYnnC..F.TIM. Special day 0 is SPDAY01. */
+#define SPECIAL_DAY_RECORD_COUNT 6
+#define SPECIAL_DAY_MOVIE_COUNT 2
+
+/* GetSpecialDayMovieSpan adds this to every movie's frame count but the
+ * last. What the frames are for is not established. */
+#define MOVIE_SPAN_GAP_FRAMES 10
+
 /* One 0x1C-byte record of the table GetRecordTable returns (gRecordTable,
  * 0x230 records); only its size is known here. */
 typedef struct Rec1C {
@@ -38,7 +88,7 @@ extern void *BMemPMgrAlloc(s32 size);
 
 /* allocator: new LbdFile object */
 LbdFile *New_LbdFile(void) {
-    LbdFile *obj = BMemPMgrAlloc(0x3C);
+    LbdFile *obj = BMemPMgrAlloc(sizeof(LbdFile));
     if (obj != NULL) {
         GetLbdFileMethods()->ctor(obj);
         return obj;
@@ -56,9 +106,9 @@ void LbdFile__LbdFile(LbdFile *self) {
     self->elemKey = 0;
     self->dataBuffer = NULL;
     self->autoLoadData = 1;
-    self->buffer = BMemPMgrAlloc(0xB358);
+    self->buffer = BMemPMgrAlloc(LBDFILE_HEADER_BLOCK_SIZE);
     if (self->buffer != NULL) {
-        self->bufferSize = 0xB358;
+        self->bufferSize = LBDFILE_HEADER_BLOCK_SIZE;
     }
 }
 
@@ -70,18 +120,18 @@ void LbdFile__Finalize(LbdFile *self) {
 
 /* slot +0x064 of gLbdFileMethods (setFlag) */
 void LbdFile__AdvanceLoadState(LbdFile *self) {
-    if (self->loadState == 9) {
-        if (self->flags & 0x80) {
-            self->loadState = 0;
+    if (self->loadState == LBDFILE_LOAD_HEADER) {
+        if (self->flags & CD_FLAG_READ_DONE) {
+            self->loadState = LBDFILE_LOAD_IDLE;
             self->headerReady = 1;
             if (self->autoLoadData != 0) {
                 ((LbdFileLoadDataBlockNoArgFn)self->methods->loadDataBlock)(); /* retail passes no argument */
             }
         }
-    } else if (self->loadState == 10) {
-        if (self->flags & 0x80) {
+    } else if (self->loadState == LBDFILE_LOAD_DATA) {
+        if (self->flags & CD_FLAG_READ_DONE) {
             self->dataReady = 1;
-            self->loadState = 0;
+            self->loadState = LBDFILE_LOAD_IDLE;
         }
     }
     GetActiveDataSourceMethods()->setFlag((FileResource *)self);
@@ -92,21 +142,21 @@ void LbdFile__CancelRequests(LbdFile *self) {
     GetActiveDataSourceMethods()->cancelRequests((FileResource *)self);
     self->headerReady = 0;
     self->dataReady = 0;
-    self->loadState = 0;
+    self->loadState = LBDFILE_LOAD_IDLE;
 }
 
 /* slot +0x078 of gLbdFileMethods: start streaming a file into the buffer */
 void LbdFile__LoadHeader(LbdFile *self, char *name) {
     if (self->buffer != NULL && name != NULL) {
-        if (self->loadState == 0) {
+        if (self->loadState == LBDFILE_LOAD_IDLE) {
             self->headerReady = 0;
         } else {
             self->methods->cancelRequests(self);
         }
-        self->loadState = 9;
+        self->loadState = LBDFILE_LOAD_HEADER;
         self->methods->close(self);
         self->methods->open(self, name, 1, 0);
-        self->methods->read(self, self->buffer, 0xB358);
+        self->methods->read(self, self->buffer, LBDFILE_HEADER_BLOCK_SIZE);
     }
 }
 
@@ -122,7 +172,7 @@ s32 LbdFile__LoadDataBlock(LbdFile *self) {
     if (((LbdFileHeader *)self->buffer)->hasData == 0) {
         return 0;
     }
-    if (self->loadState != 0) {
+    if (self->loadState != LBDFILE_LOAD_IDLE) {
         return 0;
     }
     ((LbdFileReleaseDataBlockNoArgFn)self->methods->releaseDataBlock)(); /* retail passes no argument */
@@ -131,7 +181,7 @@ s32 LbdFile__LoadDataBlock(LbdFile *self) {
     if (self->dataBuffer == NULL) {
         return 0;
     }
-    self->loadState = 10;
+    self->loadState = LBDFILE_LOAD_DATA;
     self->methods->seek(self, ((LbdFileHeader *)self->buffer)->dataOffset, 0);
     self->methods->read(self, self->dataBuffer, size);
     return 1;
@@ -186,7 +236,7 @@ void SetPickOverrides(s32 soundBank, s32 stageBgm) {
 
 void *GetRecordTable(s32 *countOut) {
     if (countOut != NULL) {
-        *countOut = 0x230;
+        *countOut = RECORD_TABLE_COUNT;
     }
     return gRecordTable;
 }
@@ -196,7 +246,7 @@ void *GetSoundBankPaths(void) {
 }
 
 s32 PickSoundBank(s32 unused) {
-    u32 r = (u32)SeedAndRandom(0, unused) % 7;
+    u32 r = (u32)SeedAndRandom(0, unused) % SOUND_BANK_COUNT;
     s32 *table = GetSoundBankPaths();
     s32 *entry;
     s32 index;
@@ -226,17 +276,17 @@ Rec1C *GetStageTextureRecords(s32 stage) {
 }
 
 Rec1C *PickStageTexture(s32 stage, s32 unused, s32 day) {
-    s32 textureCount = ((day - 1) % 40) / 10 + 1;
+    s32 textureCount = ((day - 1) % (STAGE_TEXTURE_COUNT * DAYS_PER_TEXTURE)) / DAYS_PER_TEXTURE + 1;
     s32 r = SeedAndRandom(0, unused) % textureCount;
     return &GetStageTextureRecords(stage)[r];
 }
 
 Rec1C *GetStageBgmRecords(s32 stage) {
-    return &GetStageRecords(stage)[4];
+    return &GetStageRecords(stage)[STAGE_RECORD_BGM];
 }
 
 Rec1C *PickStageBgm(s32 stage, s32 unused) {
-    u32 r = (u32)SeedAndRandom(0, unused) % 5;
+    u32 r = (u32)SeedAndRandom(0, unused) % STAGE_BGM_COUNT;
     Rec1C *rec;
     if (stage == 9) {
         if (r == 2) {
@@ -251,7 +301,7 @@ Rec1C *PickStageBgm(s32 stage, s32 unused) {
 }
 
 Rec1C *GetStageMapChunkRecords(s32 stage) {
-    return &GetStageRecords(stage)[9];
+    return &GetStageRecords(stage)[STAGE_RECORD_MAP_CHUNKS];
 }
 
 Rec1C *GetStageMapChunkRecord(s32 stage, s32 chunk) {
@@ -264,20 +314,20 @@ Rec1C *GetStageMapChunkRecordXY(s32 stage, s32 x, s32 y) {
 
 const char *GetAsmkMovie(s32 *movieIdOut) {
     if (movieIdOut != NULL) {
-        *movieIdOut = 0x31;
+        *movieIdOut = MOVIE_ASMK;
     }
     return sAsmkMoviePath;
 }
 
 Rec1C *GetOpeningMovieRecords(s32 *movieIdOut) {
     if (movieIdOut != NULL) {
-        *movieIdOut = 0;
+        *movieIdOut = MOVIE_OPENING_FIRST;
     }
-    return &((Rec1C *)GetRecordTable(NULL))[0x230];
+    return &((Rec1C *)GetRecordTable(NULL))[RECORD_OPENING_MOVIES];
 }
 
 Rec1C *PickOpeningMovie(s32 *movieIdOut, s32 unused) {
-    u32 r = (u32)SeedAndRandom(0, unused) % 7;
+    u32 r = (u32)SeedAndRandom(0, unused) % OPENING_MOVIE_COUNT;
     s32 firstMovieId;
     Rec1C *rec = GetOpeningMovieRecords(&firstMovieId);
     if (movieIdOut != NULL) {
@@ -288,9 +338,9 @@ Rec1C *PickOpeningMovie(s32 *movieIdOut, s32 unused) {
 
 Rec1C *GetEndingMovieRecord(s32 *movieIdOut) {
     if (movieIdOut != NULL) {
-        *movieIdOut = 7;
+        *movieIdOut = MOVIE_ENDING;
     }
-    return &((Rec1C *)GetRecordTable(NULL))[0x237];
+    return &((Rec1C *)GetRecordTable(NULL))[RECORD_ENDING_MOVIE];
 }
 
 Rec1C *GetEndingMovie(s32 *movieIdOut) {
@@ -304,9 +354,9 @@ Rec1C *GetEndingMovie(s32 *movieIdOut) {
 
 Rec1C *GetEventMovieRecords(s32 *movieIdOut) {
     if (movieIdOut != NULL) {
-        *movieIdOut = 8;
+        *movieIdOut = MOVIE_EVENT_FIRST;
     }
-    return &((Rec1C *)GetRecordTable(NULL))[0x238];
+    return &((Rec1C *)GetRecordTable(NULL))[RECORD_EVENT_MOVIES];
 }
 
 Rec1C *GetEventMovie(s32 *movieIdOut, s32 event) {
@@ -319,11 +369,11 @@ Rec1C *GetEventMovie(s32 *movieIdOut, s32 event) {
 }
 
 Rec1C *GetSpecialDayRecords(s32 *movieIdOut, s32 day) {
-    Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[0x23E];
+    Rec1C *rec = &((Rec1C *)GetRecordTable(NULL))[RECORD_SPECIAL_DAYS];
     if (movieIdOut != NULL) {
-        *movieIdOut = day * 2 + 0xE;
+        *movieIdOut = day * SPECIAL_DAY_MOVIE_COUNT + MOVIE_SPECIAL_DAY_FIRST;
     }
-    return &rec[day * 6];
+    return &rec[day * SPECIAL_DAY_RECORD_COUNT];
 }
 
 /* two s16 halves passed by value in one register */
@@ -338,7 +388,7 @@ Rec1C *GetSpecialDayOrEventRecord(s32 *movieIdOut, RecPick pick) {
     if (pick.group >= 0) {
         rec = GetSpecialDayRecords(&firstMovieId, pick.group);
         if (movieIdOut != NULL) {
-            *movieIdOut = ((u16)pick.sub < 2) ? pick.sub + firstMovieId : -1;
+            *movieIdOut = ((u16)pick.sub < SPECIAL_DAY_MOVIE_COUNT) ? pick.sub + firstMovieId : -1;
         }
         return &rec[pick.sub];
     }
@@ -354,13 +404,13 @@ Rec1C *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount) {
     s32 movieId;
     s32 start;
     Rec1C *rec = GetSpecialDayRecords(&firstMovieId, day);
-    dayCount *= 2; /* MATCHING: one variable; becomes the end movie id */
+    dayCount *= SPECIAL_DAY_MOVIE_COUNT; /* MATCHING: one variable; becomes the end movie id */
     *frameTotal = 0;
     start = firstMovieId;
     dayCount += start;
     for (movieId = start; movieId < dayCount; movieId++) {
-        *frameTotal += gMovieFrameCounts[movieId] + 10;
+        *frameTotal += gMovieFrameCounts[movieId] + MOVIE_SPAN_GAP_FRAMES;
     }
-    *frameTotal -= 10;
+    *frameTotal -= MOVIE_SPAN_GAP_FRAMES;
     return rec;
 }

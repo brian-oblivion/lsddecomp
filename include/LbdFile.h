@@ -55,6 +55,17 @@ typedef struct LbdFileMethods LbdFileMethods;
  * placements into the slot's cells (1 is "read, not yet consumed"). */
 #define LBDFILE_HEADER_CONSUMED 2
 
+/* LbdFile's steps in FileResource's loadState. */
+enum LbdFileLoadState {
+    LBDFILE_LOAD_IDLE = 0,   /* nothing pending */
+    LBDFILE_LOAD_HEADER = 9, /* loadHeader's read into `buffer` is pending */
+    LBDFILE_LOAD_DATA = 10   /* loadDataBlock's read into `dataBuffer` is pending */
+};
+
+/* The header block: loadHeader's read size and the ctor's `buffer`
+ * allocation (0xB358). */
+#define LBDFILE_HEADER_BLOCK_SIZE 45912
+
 /* The start of the header block loadHeader reads into `buffer`. */
 typedef struct LbdFileHeader {
     /* +0x00 */ u8 pad0[0x2];
