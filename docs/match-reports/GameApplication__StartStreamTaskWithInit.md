@@ -9,13 +9,13 @@
 ## What it does
 
 `GameApplicationMethods` slot `+0x064`, the last function in this unit's queue.
-Gated by `self->arg->unk08` (the same gate `GameApplication__StartWeeklyStreamTask` and
+Gated by `self->arg->unk08` (the same gate `GameApplication__PlayOpeningMovie` and
 `GameApplication__StartGraphRoomStreamTask` use). Builds a `StreamTask`, runs its `slot12C`, derives a
 type code via `GetEndingMovie` (a new library helper with the same
 "write-to-`*out`, return-a-separate-value" shape as
 `GetAsmkMovie`/`PickOpeningMovie`/`GetSpecialDayMovieSpan`), looks it up via
 `GetMovieFrameCount`, initializes the task with it, then starts it -- the same
-overall shape as `GameApplication__LoadIntroLogoSequence`/`GameApplication__StartWeeklyStreamTask`, with a `slot12C` call
+overall shape as `GameApplication__LoadIntroLogoSequence`/`GameApplication__PlayOpeningMovie`, with a `slot12C` call
 added (matching `GameApplication__StartGraphRoomStreamTask`'s use of that slot).
 
 ## Final C
@@ -57,7 +57,7 @@ across --
 
 None beyond what this unit's earlier reports already established; this
 function is a clean fourth instance of the "StreamTask init" shape
-(`GameApplication__LoadIntroLogoSequence`, `GameApplication__StartWeeklyStreamTask`, `GameApplication__StartGraphRoomStreamTask`, now this one), each
+(`GameApplication__LoadIntroLogoSequence`, `GameApplication__PlayOpeningMovie`, `GameApplication__StartGraphRoomStreamTask`, now this one), each
 gated by a different `GameApplicationConfig` field and differing only in
 which library helper derives the type code and whether extra slots
 (`slot12C`) are involved.
@@ -71,12 +71,12 @@ which library helper derives the type code and whether extra slots
 ## Naming
 
 **`GameApplication__StartStreamTaskWithInit` -- tier B.** Mechanics: gated by
-`arg->unk08` (same gate as `GameApplication__StartWeeklyStreamTask`), builds a
+`arg->unk08` (same gate as `GameApplication__PlayOpeningMovie`), builds a
 `StreamTask`, runs its `slot12C` (a step none of the other three
 StreamTask-launcher siblings besides `GameApplication__StartCinematicStream`
 perform), derives a type code via `GetEndingMovie`, looks it up, configures
 and starts the task. "WithInit" names the one mechanical difference from
-its closest sibling `GameApplication__StartWeeklyStreamTask` (the extra
+its closest sibling `GameApplication__PlayOpeningMovie` (the extra
 `slot12C` call); `GetEndingMovie`'s own meaning is not established, so no
 stronger, purpose-based name is supported yet.
 

@@ -50,7 +50,7 @@ the warning is gone and the extern agrees with the definition.
 
 - **Name:** `PickOpeningMovie`
 - **Tier:** A
-- **Evidence:** random one of the seven GetOpeningMovieRecords (`% OPENING_MOVIE_COUNT`), with its movie id; its caller (GameApplication__StartWeeklyStreamTask) streams it. The pick is `rand() % 7` with no seed, not a day of the week.
+- **Evidence:** random one of the seven GetOpeningMovieRecords (`% OPENING_MOVIE_COUNT`), with its movie id; its caller (GameApplication__PlayOpeningMovie) streams it. The pick is `rand() % 7` with no seed, not a day of the week.
 
 ## Naming history
 

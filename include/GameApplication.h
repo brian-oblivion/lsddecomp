@@ -91,7 +91,7 @@ void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem,
 void GameApplication__LoadIntroLogoSequence(GameApplication *self);
 void GameApplication__StartLoaderTask(GameApplication *self, const char *path);
 s32 GameApplication__LoaderTaskDoneCallback(void);
-void GameApplication__StartWeeklyStreamTask(GameApplication *self);
+void GameApplication__PlayOpeningMovie(GameApplication *self);
 s32 GameApplication__PollGraphRoomStatus(GameApplication *self);
 void GameApplication__StartGraphRoomStreamTask(GameApplication *self);
 void GameApplication__NoOpSlot5C(void);

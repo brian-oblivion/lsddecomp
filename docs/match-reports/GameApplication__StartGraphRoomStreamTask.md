@@ -10,7 +10,7 @@
 
 Called by `GameApplication__PollGraphRoomStatus` (matched earlier) when its first `PollTask`
 reports `2`. Gated by `self->arg->unk08 != 0` (the same gate
-`GameApplication__StartWeeklyStreamTask` uses). Builds a `StreamTask`, derives a count via
+`GameApplication__PlayOpeningMovie` uses). Builds a `StreamTask`, derives a count via
 `GetSpecialDayMovieSpan`, initializes the task with that count divided by 15 and a
 fixed sub-slot, then a 5-argument `slot44` call (`a3 = -1`, unlike this
 unit's other `slot44` call sites which pass a computed lookup), then starts
@@ -74,7 +74,7 @@ field's own address.**
 slots, both `(void *self, s32 a1)`), retyped `slot44`'s 3rd parameter from
 `const char *path` to plain `s32 arg2` -- confirmed generic by this call
 site passing a computed count where `GameApplication__LoadIntroLogoSequence` passed a string
-pointer and `GameApplication__StartWeeklyStreamTask` passed another plain count; the field is a
+pointer and `GameApplication__PlayOpeningMovie` passed another plain count; the field is a
 raw 32-bit value whose interpretation is call-site-specific, not
 uniformly a string. Declared `GetSpecialDayMovieSpan` (day/count helper,
 `psyq_memset.s`, same "write to *out, return a separate value" shape as

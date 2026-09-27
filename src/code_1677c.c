@@ -30,7 +30,7 @@ extern void SetDataDirectory(char *dir);    /* code_171e0.c */
 
 extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
                                                        the last value its internal dispatch loop got --
-                                                       GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask discard it, but
+                                                       GameApplication__LoadIntroLogoSequence/GameApplication__PlayOpeningMovie discard it, but
                                                        GameApplication__StartCinematicStream keeps it */
 extern const char *GetAsmkMovie(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkMoviePath */
 extern s32 GetMovieFrameCount(s32 index); /* psyq_memset.s: signed-halfword lookup into gMovieFrameCounts[index] */
@@ -191,7 +191,7 @@ s32 GameApplication__LoaderTaskDoneCallback(void) {
  * shape as GameApplication__LoadIntroLogoSequence's self->config->showIntroLogos gate, minus the two
  * GameApplication__StartLoaderTask loader-task calls, and using PickOpeningMovie instead of
  * GetAsmkMovie to derive the type code). */
-void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
+void GameApplication__PlayOpeningMovie(GameApplication *self) {
     s32 derivedValue;
     s32 typeCode;
     s32 typeLookup;
@@ -261,7 +261,7 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
 }
 
 /* Called by GameApplication__PollGraphRoomStatus when its first PollTask reports "2". Gated by
- * self->config->playStreams (same gate as GameApplication__StartWeeklyStreamTask). Builds a StreamTask,
+ * self->config->playStreams (same gate as GameApplication__PlayOpeningMovie). Builds a StreamTask,
  * derives a count via GetSpecialDayMovieSpan, sets the task's frame bound
  * to that count / 15 and clears skipOnConfirm, then runs its init (stream
  * group -1, unlike the other call sites) and releases it. */
@@ -386,10 +386,10 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
 }
 
 /* GameApplicationMethods slot +0x064. Gated by self->config->playStreams (same gate as
- * GameApplication__StartWeeklyStreamTask/GameApplication__StartGraphRoomStreamTask). Builds a StreamTask, clears its skipOnConfirm,
+ * GameApplication__PlayOpeningMovie/GameApplication__StartGraphRoomStreamTask). Builds a StreamTask, clears its skipOnConfirm,
  * derives a type code via GetEndingMovie, looks it up via GetMovieFrameCount,
  * initializes the task with it, then starts it -- the same shape as
- * GameApplication__LoadIntroLogoSequence/GameApplication__StartWeeklyStreamTask, but with setSkipOnConfirm(0) added and GetEndingMovie
+ * GameApplication__LoadIntroLogoSequence/GameApplication__PlayOpeningMovie, but with setSkipOnConfirm(0) added and GetEndingMovie
  * in place of GetAsmkMovie/PickOpeningMovie. */
 void GameApplication__StartStreamTaskWithInit(GameApplication *self) {
     StreamTask *task;

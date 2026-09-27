@@ -10,7 +10,7 @@
 
 `GameApplicationMethods` slot `+0x058`. Gated by `self->arg->unk10 != 0` (a third
 sibling gate on the ctor argument, alongside `GameApplication__LoadIntroLogoSequence`'s `unk0C` and
-`GameApplication__StartWeeklyStreamTask`'s `unk08`). Checks the owned `DreamSys`'s own status slot
+`GameApplication__PlayOpeningMovie`'s `unk08`). Checks the owned `DreamSys`'s own status slot
 (`+0x1A0`); if it isn't already `1` and `self->unk24` hasn't latched, kicks
 off one `PollTask` (`New_GraphRoom`) and, if *that* reports `2`, runs
 `GameApplication__StartGraphRoomStreamTask`. Then polls a second `PollTask` (`New_TitleMenu`) in a loop,

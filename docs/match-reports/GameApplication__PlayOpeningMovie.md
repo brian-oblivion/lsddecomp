@@ -1,4 +1,6 @@
-# GameApplication__StartWeeklyStreamTask
+# GameApplication__PlayOpeningMovie
+
+> Renamed from `GameApplication__StartWeeklyStreamTask` on 2026-09-27 (tools/rename.py). Address 0x80026348.
 
 > Renamed from `Class6D3C8__StartWeeklyStreamTask` on 2026-09-26 (tools/rename.py). Address 0x80026348.
 
@@ -23,7 +25,7 @@ matched), with `PickOpeningMovie(&typeCode, 0)` in place of
 `GetAsmkMovie(&typeCode)`:
 
 ```c
-void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
+void GameApplication__PlayOpeningMovie(GameApplication *self) {
     s32 derivedValue;
     s32 typeCode;
     s32 typeLookup;
@@ -75,7 +77,7 @@ for the same shape before re-deriving from scratch.
 
 ## Naming
 
-**`GameApplication__StartWeeklyStreamTask` -- tier B.** Mechanics: gated by
+**`GameApplication__PlayOpeningMovie` -- tier B.** Mechanics: gated by
 `arg->unk08`, builds a `StreamTask`, derives its type code via
 `PickOpeningMovie` -- documented in this unit's header as "day/week-style
 calculation (divides SeedAndRandom's result by 7)" -- looks it up, then
