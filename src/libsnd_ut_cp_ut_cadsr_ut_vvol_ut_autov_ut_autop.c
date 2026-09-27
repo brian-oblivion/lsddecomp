@@ -1,7 +1,27 @@
 /*
- * libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop -- libsnd vmanager's per-voice utility calls, Sony's code
- * (tools/progress.py counts every function here as library, so each keeps
- * Sony's name and <libsnd.h>'s prototype):
+ * libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop -- eight of Sony's libsnd
+ * per-voice utility calls, carried as C because no SDK disc carries the
+ * build retail linked. tools/progress.py counts every function here as
+ * library, so each keeps Sony's name and <libsnd.h>'s prototype.
+ *
+ * Which objects (nm over sdk/work/<disc>/elf/libsnd): on the 3.0, 3.3 and
+ * 3.5 discs all eight sit in one object, vmanager.o; on the 3.6 disc they
+ * are five, in retail's order: ut_cp.o (SsUtChangePitch), ut_cadsr.o
+ * (SsUtChangeADSR), ut_vvol.o (SsUtGetDetVVol, SsUtSetDetVVol, SsUtGetVVol,
+ * SsUtSetVVol), ut_autov.o (SsUtAutoVol) and ut_autop.o (SsUtAutoPan). The
+ * file is named for those five because retail's libsnd is the split build:
+ * the 3.6-only libsnd/ut_pb object is linked right before it. None of the
+ * five is retail's build (3.6's text is 0x140, 0xD8, 0x1DC, 0x64 and 0x64
+ * bytes against retail's 0x160, 0xF4, 0x1FC, 0x54 and 0x54), so none can
+ * be linked.
+ *
+ * What decided its edges (python3 tools/tuboundary.py --unit): the placed
+ * object libsnd/ut_pb precedes it ("start edge possible"); every edge
+ * inside it is "boundary possible". Its neighbour libsnd_ut_ako.c
+ * (SsUtAllKeyOff) is not merged into it: that is 3.6's next module,
+ * ut_ako.o. PARKED: the content says five files (the 3.6 module edges),
+ * but that split is a new carve, not a merge or rename, so the file keeps
+ * its carve edges and is named for all five modules.
  *
  *   - SsUtChangePitch: re-pitches a keyed-on voice (still assembly).
  *   - SsUtChangeADSR: if the voice still plays the given vab/program/note,
