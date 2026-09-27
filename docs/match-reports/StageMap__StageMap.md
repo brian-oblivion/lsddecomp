@@ -325,7 +325,7 @@ The three units' banners were rewritten as documentation (track 6). What they ca
  *
  * Every function in the unit is matched C; the last three stalls
  * (StageMap__UnloadAllSlots, StageMap__SetFootprintRect and
- * StageMap__DispatchToRectCells) were matched in round 71. func_8004B324 keeps its placeholder name
+ * StageMap__DispatchToRectCells) were matched in round 71. StageMap__NoOpSlotD8 keeps its placeholder name
  * deliberately -- it is an empty vtable stub with no established purpose, the
  * same case as SceneNode__NoOpSlot5C in code_d294_b.
  */

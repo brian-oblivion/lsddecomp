@@ -294,7 +294,7 @@ struct StageMapMethods {
     /* +0x0D0 */ void (*forwardAcceptedCommand)(StageMap *self, void *sender,
                                                 s32 command); /* StageMap__ForwardAcceptedCommand */
     /* +0x0D4 */ Descriptor10 *(*getCurrentCellKey)(StageMap *self, void *arg1); /* StageMap__GetCurrentCellKey (reads only self; see the banner) */
-    /* +0x0D8 */ void (*slotD8)(void); /* func_8004B324, empty; never called */
+    /* +0x0D8 */ void (*slotD8)(void); /* StageMap__NoOpSlotD8, empty; never called */
     /* +0x0DC */ void (*setGridSpan)(StageMap *self, s32 span); /* StageMap__SetGridSpan */
     /* +0x0E0 */ void (*setConfig)(StageMap *self, StageGridDimensions *config); /* StageMap__SetConfig */
     /* +0x0E4 */ s32 (*setTargetAndLoadChunks)(StageMap *self, void *outPos, SceneNode *target,
@@ -398,7 +398,7 @@ void StageMap__SetFootprintRect(StageMap *self, Descriptor10Ext *desc, s32 span)
 void StageMap__DispatchToRectCells(StageMap *self, SceneNode *sender, s32 command);
 void NotifyGridCell(struct GridCell *cell, SceneNode *sender, s32 command);
 Descriptor10 *StageMap__GetCurrentCellKey(StageMap *self);
-void func_8004B324(void);
+void StageMap__NoOpSlotD8(void);
 void StageMap__SetGridSpan(StageMap *self, s32 span);
 void StageMap__SetConfig(StageMap *self, StageGridDimensions *config);
 s32 StageMap__SetTargetAndLoadChunks(StageMap *self, void *outPos, SceneNode *target, Descriptor10 *cell);

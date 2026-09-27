@@ -17,7 +17,7 @@
  * SetFootprintRect), and DispatchToRectCells hands the command to every cell
  * in it and every cell chained behind each (NotifyGridCell).
  *
- * func_8004B324 is the empty +0x0D8 stub; nothing calls it, so it keeps its
+ * StageMap__NoOpSlotD8 is the empty +0x0D8 stub; nothing calls it, so it keeps its
  * placeholder name, like SceneNode__NoOpSlot5C in code_d294_b.
  */
 #include "common.h"
@@ -469,7 +469,7 @@ Descriptor10 *StageMap__GetCurrentCellKey(StageMap *self) {
     return &self->curCell;
 }
 
-void func_8004B324(void) {}
+void StageMap__NoOpSlotD8(void) {}
 
 void StageMap__SetGridSpan(StageMap *self, s32 span) {
     self->gridSpan = span;
