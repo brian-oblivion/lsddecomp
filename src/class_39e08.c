@@ -39,7 +39,7 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     GetTimedTaskMethods()->ctor((TimedTask *)self, (char *)GetSoundEffectDir(0), 0);
     self->methods = GetDayTaskMethods();
     InitDreamAux();
-    self->etcTim = New_TimImage((char *)D_800113EC);
+    self->etcTim = New_TimImage((char *)sEtcTimPath);
     ((TimImageUploadFn)self->etcTim->methods->processBuffer)(self->etcTim);
     self->etcTim->methods->freeBuffer(self->etcTim);
     req.src.buffer = NULL;

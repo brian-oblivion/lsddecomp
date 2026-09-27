@@ -29,8 +29,8 @@ jal   GetDayTaskMethods
  nop
 jal   InitDreamAux
  sw   $v0, 0x0($s1)            ; self->methods = GetDayTaskMethods() (== &gDayTaskMethods)
-lui   $a0, %hi(D_800113EC)
-addiu $a0, $a0, %lo(D_800113EC)
+lui   $a0, %hi(sEtcTimPath)
+addiu $a0, $a0, %lo(sEtcTimPath)
 jal   New_TimImage
  nop
 sw    $v0, 0x44($s1)           ; self->unk44 = New_TimImage("ETC\ETC.TIM")
@@ -110,7 +110,7 @@ void DayTask__DayTask(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     GetTimedTaskMethods()->ctor(self, GetSoundEffectDir(0), 0);
     self->methods = GetDayTaskMethods();
     InitDreamAux();
-    self->unk44 = New_TimImage(D_800113EC);
+    self->unk44 = New_TimImage(sEtcTimPath);
     self->unk44->methods->slot78(self->unk44);
     self->unk44->methods->slot5C(self->unk44);
     req.type = 0;
@@ -205,7 +205,7 @@ needed anywhere in this 107-word function.
   convention. Declared 0x10 bytes (4 fields) even though only the first two
   are written, per that report's own hard-won lesson ("local struct SIZE
   matters, not shape").
-- New rodata externs `D_800113EC` ("ETC\ETC.TIM") and `D_800113F8`
+- New rodata externs `sEtcTimPath` ("ETC\ETC.TIM") and `D_800113F8`
   ("ETC\DREAMER.TMD"), both `const char[]`.
 - Nine new function externs, several deliberately re-declared locally with
   a DIFFERENT (but ABI-compatible) type than an existing declaration

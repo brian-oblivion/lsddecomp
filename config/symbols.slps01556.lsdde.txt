@@ -3042,3 +3042,4 @@ sRecordRegisterCalls = 0x8008A978;
 sRecordFirstBatchCount = 0x8008A97C;
 sDayViewPoint = 0x80086650;
 sDayViewRef = 0x8008665C;
+sEtcTimPath = 0x800113EC;
