@@ -58,9 +58,9 @@ extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
 
 /* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
-extern char sPauseText[]; /* "Pause" (asm/data/7B008.sdata.s) */
-extern s32 sPauseTextPos;    /* two words: the position */
-extern s32 sPauseTextColor;    /* one word: the colour */
+extern char sPauseText[];   /* "Pause" (asm/data/7B008.sdata.s) */
+extern s32 sPauseTextPos;   /* two words: the position */
+extern s32 sPauseTextColor; /* one word: the colour */
 
 void ObjM__EnterState7(ObjM *self) {
     s32 val;
@@ -209,8 +209,6 @@ ObjMMethods *GetObjMMethods(void) {
     return &gObjMMethods;
 }
 
-struct StyleM;
-
 extern s32 gStyleGrid;
 extern s32 gStyleStage;
 extern s32 gStyleTickCount;
@@ -218,82 +216,81 @@ extern s32 gStyleDay;
 extern s32 sStyleUnreadArg;
 extern s32 gStyleSceneRefs;
 extern s32 gStyleVariant;
-extern s32 D_8008ACA0;
+extern void *gStyleCueSlots[2];
 
 extern void *ApplyStyleConfig(void);
 
-s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
-    s32 *p;
+s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadArg) {
+    void **slot;
     s32 i;
 
     if (gStyleGrid == 0) {
-        i = 1;
-        p = &D_8008ACA0;
-        gStyleGrid = a0;
-        gStyleStage = a1;
-        gStyleSceneRefs = a2;
+        i = ARRAY_COUNT(gStyleCueSlots) - 1;
+        slot = &gStyleCueSlots[ARRAY_COUNT(gStyleCueSlots) - 1];
+        gStyleGrid = grid;
+        gStyleStage = stage;
+        gStyleSceneRefs = sceneRefs;
         gStyleVariant = -1;
-        gStyleDay = a3;
-        sStyleUnreadArg = arg4;
+        gStyleDay = day;
+        sStyleUnreadArg = unreadArg;
         gStyleTickCount = 0;
         do {
-            *p = 0;
+            *slot = 0;
             i--;
-            p--;
+            slot--;
         } while (i >= 0);
-        return ApplyStyleConfig();
+        return (s32)ApplyStyleConfig();
     }
     return 0;
 }
 
-extern s32 sStyleConfig;
-extern s8 *sStyleStageConfigs[];
-extern s8 *PickStyleFallbackConfig(void);
-extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
+/* A stage's style config: four signed bytes, from sStyleStageConfigs or
+ * PickStyleFallbackConfig (class_3bb8c_n), which FillStyleFromConfig turns
+ * into sStyleConfig's last four words. */
+typedef struct StyleStageConfig {
+    s8 colorMode; /* StyleConfig::colorMode */
+    s8 fogLevel; /* sStyleFogNears index; STYLE_DECOR_FOG_LEVEL and up also build the decoration box */
+    s8 farColorIndex; /* gStylePalette index: StyleConfig::farColor, and the decoration box's colour */
+    s8 clearColorIndex; /* gStylePalette index: StyleConfig::clearColor */
+} StyleStageConfig;
+
+/* The fog levels whose config also gets a decoration box (ApplyStyleConfig):
+ * this one and denser, sStyleFogNears' last two (fogNear 4096 and 2048). */
+#define STYLE_DECOR_FOG_LEVEL 4
+
+extern StyleConfig sStyleConfig;
+extern StyleStageConfig *sStyleStageConfigs[];
+extern StyleStageConfig *PickStyleFallbackConfig(void);
+extern void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg);
 extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColor;
 
+/* The stage's fixed config, or with none PickStyleFallbackConfig's, into
+ * sStyleConfig. */
 void *ApplyStyleConfig(void) {
-    s8 *cfg = sStyleStageConfigs[gStyleStage];
+    StyleStageConfig *cfg = sStyleStageConfigs[gStyleStage];
 
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
     }
-    FillStyleFromConfig((struct StyleM *)&sStyleConfig, cfg);
-    if (cfg[1] >= 4) {
-        gStyleDecorColor = gStylePalette[cfg[2]];
+    FillStyleFromConfig(&sStyleConfig, cfg);
+    if (cfg->fogLevel >= STYLE_DECOR_FOG_LEVEL) {
+        gStyleDecorColor = gStylePalette[cfg->farColorIndex];
     }
     return &sStyleConfig;
 }
 
-/* FillStyleFromConfig's destination (sStyleConfig, via ApplyStyleConfig) is
- * not an ObjM: it is the record ObjM keeps as `styleConfig`, which
- * include/class_3bb8c.h views as StyleConfig (its +0x00C/+0x018
- * colours and +0x01C fog value agree with the fields below). The two views
- * stay separate here: the record is not a class, and merging them is a
- * global's type (track 4b).
- *
- * gStylePalette is a table of 24 three-byte entries (0x48 bytes; the first four
- * are 00/00/00, 40/40/40, 80/80/80, FF/FF/FF -- a greyscale ramp, so RGB
- * triples). Indexing it as `u8[][3]` is what produces retail's `i*2 + i + base`
- * stride-3 address arithmetic. sStyleFogNears is six words, 0x6800 down to 0x0800. */
-struct StyleM {
-    u8 pad000[0x00C];
-    const u8 *unkC; /* +0x00C, a gStylePalette entry */
-    u8 pad010[0x014 - 0x010];
-    s32 unk14;       /* +0x014, cfg[0] sign-extended */
-    const u8 *unk18; /* +0x018, a gStylePalette entry */
-    s32 unk1C;       /* +0x01C, a sStyleFogNears value */
-};
-
-extern u8 gStylePalette[][3];
+/* gStylePalette is 24 RGB triples (a greyscale ramp first: 0, 64, 128, 255).
+ * MATCHING: indexed as `u8[][3]`, for retail's `i*2 + i + base` stride-3
+ * address arithmetic. sStyleFogNears is six fogNear distances, 26624 down to
+ * 2048. */
 extern s32 sStyleFogNears[];
 
-void FillStyleFromConfig(struct StyleM *style, s8 *cfg) {
-    style->unkC = gStylePalette[cfg[3]];
-    style->unk18 = gStylePalette[cfg[2]];
-    style->unk1C = sStyleFogNears[cfg[1]];
-    style->unk14 = cfg[0];
+void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg) {
+    style->clearColor = gStylePalette[cfg->clearColorIndex];
+    style->farColor = gStylePalette[cfg->farColorIndex];
+    style->fogNear = sStyleFogNears[cfg->fogLevel];
+    style->colorMode = cfg->colorMode;
 }
 
 /* gStyleDecorObj is a BoxFill (include/BoxFill.h), kept in an s32 global

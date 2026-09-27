@@ -1,5 +1,13 @@
 DreamSys: warning: control reaches end of non-void function
 Entity_g: warning: passing arg 4 of `Entity__GetOrCreateFadeBox' makes pointer from integer without a cast
+GraphicsResources: warning: `sx' might be used uninitialized in this function
+GraphicsResources: warning: `sy' might be used uninitialized in this function
+GraphicsResources: warning: control reaches end of non-void function
+GraphicsResources: warning: control reaches end of non-void function
+GraphicsResources: warning: unused variable `unused'
+GraphicsResources: warning: unused variable `unused'
+GraphicsResources: warning: unused variable `unused'
+GraphicsResources: warning: unused variable `unused'
 TmdModel: warning: `p' might be used uninitialized in this function
 TmdModel: warning: `size' might be used uninitialized in this function
 TmdModel: warning: unused variable `unused'
@@ -20,7 +28,6 @@ class_3bb8c_i: warning: passing arg 3 of `BuildFileName' discards `const' from p
 class_3bb8c_i: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 class_3bb8c_i: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 class_3bb8c_k: warning: unused variable `unused'
-class_3bb8c_m: warning: return makes integer from pointer without a cast
 class_3bb8c_p: warning: unused variable `pad48Tail'
 class_3bb8c_s: warning: implicit declaration of function `rand'
 code_1677c: warning: control reaches end of non-void function
@@ -32,8 +39,6 @@ code_179d8_d: warning: unused variable `buf'
 code_179d8_e: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 code_179d8_e: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 code_179d8_h: warning: unused variable `scratch'
-libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'
-libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'
 code_179d8_m: warning: comparison between signed and unsigned
 code_179d8_q: src/code_179d8_q.c: At top level:
 code_179d8_q: warning: `LockCd' was previously implicitly declared to return `int'
@@ -57,15 +62,9 @@ code_2cc8c_b: warning: assignment from incompatible pointer type
 code_2cc8c_b: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
 code_2cc8c_f: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
 code_322b4: warning: unused variable `pad'
-GraphicsResources: warning: `sx' might be used uninitialized in this function
-GraphicsResources: warning: `sy' might be used uninitialized in this function
-GraphicsResources: warning: control reaches end of non-void function
-GraphicsResources: warning: control reaches end of non-void function
-GraphicsResources: warning: unused variable `unused'
-GraphicsResources: warning: unused variable `unused'
-GraphicsResources: warning: unused variable `unused'
-GraphicsResources: warning: unused variable `unused'
 code_55dd4: warning: unused variable `unused'
 code_d294_b: warning: unused variable `pad'
 code_d294_b: warning: unused variable `unused'
 libcd_bios: warning: passing arg 2 of `CD_cw' makes integer from pointer without a cast
+libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'
+libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'
