@@ -16,7 +16,7 @@ out-of-range drift.
 
 ```c
 extern u16 D_8008EA26;
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern u8 D_8008EA1B;
 
 extern s32 SpuVmAlloc(s32 a0);
@@ -28,7 +28,7 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
     D_8008EA1B = 0x7F;
     v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
-    if (v0 < D_8008E9D0) {
+    if (v0 < spuVmMaxVoice) {
         vmNoiseOn2(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
     }
 }
@@ -43,8 +43,8 @@ Straight-line leaf, one conditional call:
    `INCLUDE_ASM` there), mask the result to a byte, store it into
    `D_8008EA26` (a 16-bit store -- the value is always 0..0xFF here, so the
    upper byte written is always 0).
-3. Compare that masked value against `D_8008E9D0` (loop-bound/threshold byte,
-   documented in `code_179d8_j.c`). If it is `< D_8008E9D0`, call
+3. Compare that masked value against `spuVmMaxVoice` (loop-bound/threshold byte,
+   documented in `code_179d8_j.c`). If it is `< spuVmMaxVoice`, call
    `vmNoiseOn2` (also owned by `code_179d8_l`) with five arguments: the
    LOW BYTE re-read from `D_8008EA26` (register `$a0`), this function's own
    two arguments narrowed to `u16` (`$a1`, `$a2`), the constant `0x80FF`

@@ -27,7 +27,7 @@ s32 SpuVmPitchBend(s16 a0, s16 a1, s16 a2, u16 a3) {
     func_80032148(a1, a2);
     D_8008EA22 = a0;
     sum = 0;
-    for (i = 0; i < D_8008E9D0; i++) {
+    for (i = 0; i < spuVmMaxVoice; i++) {
         sum += SpuVmPBVoice(i, a0, a1, a2, a3);
     }
     return sum;
@@ -40,7 +40,7 @@ Set up (call `func_80032148(a1, a2)` for its side effect, return value
 discarded; stash `a0` into the "currently selected channel" scratch global
 `D_8008EA22`, same idiom as `SpuVmNoiseOn`'s `D_8008EA26` but write-only
 here), then sum `SpuVmPBVoice(i, a0, a1, a2, a3)` over
-`i = 0 .. D_8008E9D0-1`, returning the accumulated total.
+`i = 0 .. spuVmMaxVoice-1`, returning the accumulated total.
 
 ## CORRECTION (round 24, second pass): `SpuVmPBVoice`'s 2nd parameter is `s16`, not `s32`
 
@@ -145,7 +145,7 @@ track 2 names those functions and moves them out of tracks 1/1b/3.
 
 **SpuVmPitchBend** (was `func_8002F610`) -- Tier B. Calls
 Sony's `SpuVmVSetUp` once, then runs `SpuVmPBVoice` over every
-voice (`0..D_8008E9D0`) with the same identity/depth arguments, summing
+voice (`0..spuVmMaxVoice`) with the same identity/depth arguments, summing
 its 0/1 return into a count. The uncertain part is `SpuVmVSetUp`'s own
 role (an SDK function, not renamed here) -- named for what THIS function
 visibly does (batch-apply a bend, report how many voices it affected),

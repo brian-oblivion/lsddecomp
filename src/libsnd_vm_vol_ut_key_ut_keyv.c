@@ -115,7 +115,7 @@ extern s32 SpuVmVSetUp(s16 a0, s16 a1);
 /* Loop bound for a small table of active "objects" (screen/slot
  * pairs); see libsnd_decre.c's D_80090B68/6C for the sibling reading of
  * an analogous count. */
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 /* A pair of 16-bit bitmasks split across a 0..0x1F channel space
  * (low 16 channels in the first word, next 16 in the second), each
@@ -150,7 +150,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     SpuVmVSetUp((s16)a1, (s16)a2);
     D_8008EA22 = (u16)a0;
 
-    if (D_8008E9D0 != 0) {
+    if (spuVmMaxVoice != 0) {
         i = 0;
         do {
             if (_svm_voice[i].unk0E == (s16)a0) {
@@ -226,7 +226,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                 }
             }
             i++;
-        } while (i < D_8008E9D0);
+        } while (i < spuVmMaxVoice);
     }
     return result;
 }
@@ -289,7 +289,7 @@ s16 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
         goto fail;
     }
     result = (s32)(u8)SpuVmAlloc();
-    if ((u8)result == D_8008E9D0) {
+    if ((u8)result == spuVmMaxVoice) {
         goto fail;
     }
     __asm__("");

@@ -79,7 +79,7 @@ void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
  * (t3/t0/a2/a3 family) running through nearly the whole function, visible
  * from the very first instruction (docs/match-reports/SpuVmAlloc.md).
  * Hand-derived. */
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 
@@ -102,7 +102,7 @@ s32 SpuVmAlloc(void) {
     bestIdx = 0x63;
     threshold = D_8008EA1B;
 
-    for (idx = 0; (u8)idx < D_8008E9D0; idx++) {
+    for (idx = 0; (u8)idx < spuVmMaxVoice; idx++) {
         if (_svm_voice[(u8)idx].unk1B != 0 || _svm_voice[(u8)idx].unk06 != 0) {
             pri = _svm_voice[(u8)idx].unk18;
             if (pri < (s32)(u16)threshold) {
@@ -134,11 +134,11 @@ s32 SpuVmAlloc(void) {
         if ((u8)found != 0) {
             chosen = bestIdx;
         } else {
-            chosen = D_8008E9D0;
+            chosen = spuVmMaxVoice;
         }
     }
 
-    count = D_8008E9D0;
+    count = spuVmMaxVoice;
     if ((u8)chosen < count) {
         if (count != 0) {
             for (idx = 0; (u8)idx < count; idx++) {
@@ -300,7 +300,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_l", SpuVmDoAllocate);
 extern u8 D_8008EA0E;
 extern u8 D_8008EA1C;
 extern SpuRegs *D_8006DAD4;
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 /* STALL -- see docs/match-reports/vmNoiseOn.md. Best body reached
  * (309/311 built words, 2 words SHORT) preserved there in #if 0. */
@@ -336,14 +336,14 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
         highBit = 1 << (a0 - 16);
     }
 
-    n = D_8008E9D0;
+    n = spuVmMaxVoice;
     _svm_voice[(u8)a3].unk04 = 10;
     if (n != 0) {
         i = 0;
         do {
             _svm_voice[(u16)i].unk1B = _svm_voice[(u16)i].unk1B & 1;
             i++;
-        } while ((u16)i < D_8008E9D0);
+        } while ((u16)i < spuVmMaxVoice);
     }
     _svm_voice[(u8)a3].unk1B = 2;
 

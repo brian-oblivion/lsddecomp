@@ -561,7 +561,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
 
                 chan = SpuVmAlloc(0) & 0xFF;
                 D_8008EA26 = chan;
-                if (chan < D_8008E9D0) {
+                if (chan < spuVmMaxVoice) {
                     D_8008D9A3[chan].unk0 = 1;
                     D_8008D98A[D_8008EA26].unk0 = 0;
                     D_8008D996[D_8008EA26].unk0 = (s16) a0;

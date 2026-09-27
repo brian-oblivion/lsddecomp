@@ -65,7 +65,7 @@ window:
 1. **Ring-buffer bookkeeping.** `_svm_envx_ptr` is a rotating index (`(x+1)
    & 0xF`), stored back immediately; `_svm_envx_hist[ringIdx]` (an `s32[16]`
    array) is the new ring slot, zeroed.
-2. **Per-channel "ready" snapshot**, guarded by `D_8008E9D0 > 0`: for each
+2. **Per-channel "ready" snapshot**, guarded by `spuVmMaxVoice > 0`: for each
    channel `i`, copy `D_8006DAD4[i].unkC` (a NEW field on the already
    `+0x194`/`+0x196`-known `D_8006DAD4` object, read here as part of an
    independent 0x10-byte-stride array view — see struct notes below) into
@@ -356,7 +356,7 @@ real, localized residue right after the frame/prologue: this build's
 before the `beqz`, where retail uses a single `blez a0,...` directly on the
 freshly-`lbu`-loaded (already zero-extended) value, with no re-mask.
 Changing the local's declared type from `u8 count` to `s32 count` (still
-correctly holding a `D_8008E9D0` value, 0-255) drops the spurious mask and
+correctly holding a `spuVmMaxVoice` value, 0-255) drops the spurious mask and
 reproduces retail's `blez` exactly, at the exact same address (`0x1ff50`
 both sides). **Raw word-match jumped 54/241 -> 93/241.** Built length moved
 to **236/241 (5 words short, one word SHORTER** than before this fix,
@@ -500,7 +500,7 @@ void SpuVmFlush(void) {
     ringIdx = (_svm_envx_ptr + 1) & 0xF;
     _svm_envx_ptr = ringIdx;
     slot = &_svm_envx_hist[ringIdx];
-    count = D_8008E9D0;
+    count = spuVmMaxVoice;
     *slot = 0;
 
     if (count > 0) {
@@ -526,7 +526,7 @@ void SpuVmFlush(void) {
             mask &= _svm_envx_hist[j];
         }
 
-        for (i = 0; i < D_8008E9D0; i++) {
+        for (i = 0; i < spuVmMaxVoice; i++) {
             s32 bit = 1 << i;
 
             if (mask & bit) {
@@ -675,7 +675,7 @@ void SpuVmFlush(void) {
     ringIdx = (_svm_envx_ptr + 1) & 0xF;
     _svm_envx_ptr = ringIdx;
     slot = &_svm_envx_hist[ringIdx];
-    count = D_8008E9D0;
+    count = spuVmMaxVoice;
     *slot = 0;
 
     if (count > 0) {
@@ -701,7 +701,7 @@ void SpuVmFlush(void) {
             mask &= _svm_envx_hist[j];
         }
 
-        for (i = 0; i < D_8008E9D0; i++) {
+        for (i = 0; i < spuVmMaxVoice; i++) {
             s32 bit = 1 << i;
 
             if (mask & bit) {
@@ -808,7 +808,7 @@ here -- proposing for the head to apply once no runner is live on
 - `D_8008EA26` -> `gSelectedVoice` ("currently selected channel" scratch,
   already documented `volatile`, read back via a plain `u8 *` cast --
   see SpuVmKeyOff's own report for why that specific cast matters).
-- `D_8008E9D0` -> `gVoiceCount` ("loop bound for a small table of active
+- `spuVmMaxVoice` -> `gVoiceCount` ("loop bound for a small table of active
   objects", consistently the upper bound of every per-voice loop in this
   unit and its siblings).
 - `_svm_okof1`/`_svm_okof2` -> `gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`
@@ -840,7 +840,7 @@ declarations (the `_svm_envx_hist*` pair, `Rec34HalfU2`,
 local to this function's `#ifdef` block, per CLAUDE.md's rule against
 adding to a shared header; everything else it touches (`D_8008D9A3`,
 `D_8006DAD4`, `_svm_sreg_dirty`, `_svm_okof1`/`64`, `D_8008E228`/`22C`,
-`_svm_orev1`/`234`, `_svm_sreg_buf`, `D_8008D7F4`, `D_8008E9D0`,
+`_svm_orev1`/`234`, `_svm_sreg_buf`, `D_8008D7F4`, `spuVmMaxVoice`,
 `_svm_auto_kof_mode`, `D_8008D9A4`, `D_8008D9B0`) was
 already declared earlier in the unit and needed no change.
 `./build-and-verify.sh` green (zero bytes changed) and

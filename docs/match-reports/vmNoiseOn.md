@@ -51,7 +51,7 @@ global flag (`_svm_stereo_mono == 1`) is set. The rest is the tail this unit's
 the 16-byte-stride `_svm_sreg_buf`/`D_8008D7F2` tables, OR `3` into
 `_svm_sreg_dirty[chan]`, compute a 32-bit voice-enable bit split across
 `lowBit`/`highBit` by `chan<16`, reset the whole `D_8008D9A3` 52-byte-stride
-table's low bit for every live voice (`D_8008E9D0` of them) then mark this
+table's low bit for every live voice (`spuVmMaxVoice` of them) then mark this
 channel's own slot `2`, OR the enable bits into `D_8008E228`/`_svm_okon2`
 and AND-NOT them out of `_svm_okof1`/`_svm_okof2`, conditionally OR/AND-NOT
 them into a second enable pair (`_svm_orev1`/`_svm_orev2`, gated on
@@ -122,7 +122,7 @@ extern u8 D_8008D7F2[];
 extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
 extern u16 _svm_okof1;
@@ -168,7 +168,7 @@ extern u8 D_8008D7F2[];
 extern u8 _svm_sreg_dirty[];
 extern u8 D_8008D98C[];
 extern u8 D_8008D9A3[];
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern u16 D_8008E228;
 extern u16 _svm_okon2;
 extern u16 _svm_okof1;
@@ -255,13 +255,13 @@ void vmNoiseOn(s32 a0) {
 
     idx52 = (u8)chanRaw * 52;
     *(u16 *)(D_8008D98C + idx52) = 10;
-    if (D_8008E9D0 != 0) {
+    if (spuVmMaxVoice != 0) {
         i = 0;
         do {
             idx52 = i * 52;
             *(u8 *)(D_8008D9A3 + idx52) = *(u8 *)(D_8008D9A3 + idx52) & 1;
             i++;
-        } while (i < D_8008E9D0);
+        } while (i < spuVmMaxVoice);
     }
     idx52 = (u8)chanRaw * 52;
     *(u8 *)(D_8008D9A3 + idx52) = 2;
@@ -348,7 +348,7 @@ Within the 30-attempt cap (roughly 12 real builds used):
 6. The "narrow-cast defeats loop-strength-reduction" idiom (already
    validated in this unit for `vmNoiseOn2`/`SpuVmAlloc`) applied to
    this function's OWN `D_8008D9A3`-clearing loop (`idx52 = (s16)i * 52`,
-   `while ((s16)i < D_8008E9D0)`): **regressed hard**, to 320/311 -- this
+   `while ((s16)i < spuVmMaxVoice)`): **regressed hard**, to 320/311 -- this
    loop is NOT the same shape as `vmNoiseOn2`'s (retail already recomputes
    the shift-add fresh per iteration WITHOUT any narrowing cast needed here,
    confirmed by re-reading the raw `.s`: `sll v1,a1,0x10`/`sra v1,v1,0x10` in
@@ -369,7 +369,7 @@ Within the 30-attempt cap (roughly 12 real builds used):
 ### Proposed learnings
 
 - **The unit's own established "narrow-cast defeats strength-reduction"
-  idiom is NOT a blanket fix for every `D_8008E9D0`-bounded loop over
+  idiom is NOT a blanket fix for every `spuVmMaxVoice`-bounded loop over
   52-byte-stride tables in this unit** -- it fixed `vmNoiseOn2`'s loop
   (10-word swing) but actively regressed this function's structurally
   similar-looking loop by 25 words. The two loops differ in whether the

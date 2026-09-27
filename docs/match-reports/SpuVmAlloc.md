@@ -7,7 +7,7 @@ Round 26, runner delta.
 
 ## What it is
 
-A voice-steal candidate scan over `D_8008E9D0` live channels (0x34-byte-stride
+A voice-steal candidate scan over `spuVmMaxVoice` live channels (0x34-byte-stride
 per-channel records): find a fully-free channel (both an "in use" flag byte
 and a u16 both zero) and take it immediately; otherwise track the channel
 with the lowest 3-level priority key (primary `s16`, tie-broken by lowest
@@ -54,7 +54,7 @@ typedef struct {
 } Rec34D988;
 extern Rec34D988 _svm_voice[];
 
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 ```
@@ -90,7 +90,7 @@ s32 SpuVmAlloc(void)
     bestIdx = 0x63;
     threshold = D_8008EA1B;
 
-    for (idx = 0; idx < D_8008E9D0; idx++) {
+    for (idx = 0; idx < spuVmMaxVoice; idx++) {
         if (D_8008D9A3[(u8) idx].unk0 != 0) {
             goto evalPriority;
         }
@@ -127,11 +127,11 @@ s32 SpuVmAlloc(void)
         if ((u8) found != 0) {
             chosen = bestIdx;
         } else {
-            chosen = D_8008E9D0;
+            chosen = spuVmMaxVoice;
         }
     }
 
-    count = D_8008E9D0;
+    count = spuVmMaxVoice;
     if ((u8) chosen < count) {
         if (count != 0) {
             for (idx = 0; idx < count; idx++) {
@@ -161,7 +161,7 @@ Starting point was a naive transcription using a signed `s32 idx` and plain
 `for`/`if`/`&&` — that compiled to **157/167** words. Four fixes moved it to
 163, each addressing a DIFFERENT axis (not a repeated guess on one):
 
-1. **Loop-counter signedness.** `for (idx = 0; idx < D_8008E9D0; idx++)`
+1. **Loop-counter signedness.** `for (idx = 0; idx < spuVmMaxVoice; idx++)`
    with `idx` declared `s32` produces a `blez`-based pretest (`idx<count`
    treated as signed) where retail has a plain `beqz` (unsigned `count==0`
    reduction). Declaring `idx` as `u32` fixed the pretest instruction
@@ -367,7 +367,7 @@ typedef struct {
 } Rec34D988;
 extern Rec34D988 _svm_voice[];
 
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1); /* Psy-Q libspu/s_snv, linked object -- was
                                                 * wrongly named func_800375E8 in the
@@ -393,7 +393,7 @@ s32 SpuVmAlloc(void)
     bestIdx = 0x63;
     threshold = D_8008EA1B;
 
-    for (idx = 0; idx < D_8008E9D0; idx++) {
+    for (idx = 0; idx < spuVmMaxVoice; idx++) {
         if (D_8008D9A3[(u8) idx].unk0 != 0) {
             goto evalPriority;
         }
@@ -431,11 +431,11 @@ s32 SpuVmAlloc(void)
         if ((u8) found != 0) {
             chosen = bestIdx;
         } else {
-            chosen = D_8008E9D0;
+            chosen = spuVmMaxVoice;
         }
     }
 
-    count = D_8008E9D0;
+    count = spuVmMaxVoice;
     if ((u8) chosen < count) {
         if (count != 0) {
             for (idx = 0; idx < count; idx++) {
@@ -622,7 +622,7 @@ typedef struct {
 } Rec34D988;
 extern Rec34D988 _svm_voice[];
 
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern u8 D_8008EA1B;
 extern void SpuSetNoiseVoice(s32 a0, s32 a1);
 
@@ -648,7 +648,7 @@ s32 SpuVmAlloc(void)
     newVar = 1;
     threshold = D_8008EA1B;
 
-    for (idx = 0; idx < D_8008E9D0; idx++) {
+    for (idx = 0; idx < spuVmMaxVoice; idx++) {
         if (D_8008D9A3[(u8) idx].unk0 != 0) {
             goto evalPriority;
         }
@@ -688,11 +688,11 @@ s32 SpuVmAlloc(void)
         if ((u8) found != 0) {
             chosen = bestIdx;
         } else {
-            chosen = D_8008E9D0;
+            chosen = spuVmMaxVoice;
         }
     }
 
-    count = D_8008E9D0;
+    count = spuVmMaxVoice;
     if ((u8) chosen < count) {
         if (count != 0) {
             for (idx = 0; idx < count; idx++) {
@@ -823,7 +823,7 @@ oracle:
   this round acted on.
 
 *(Incidental, worth knowing for anyone else splicing this body back: the
-unit's own later `extern u8 D_8008D9A3[];` and `extern u8 D_8008E9D0;` —
+unit's own later `extern u8 D_8008D9A3[];` and `extern u8 spuVmMaxVoice;` —
 which exist for `SpuVmKeyOnNow`'s and `vmNoiseOn2`'s preserved bodies —
 CONFLICT with this function's `Rec34Flag`-typed view and must be commented
 out while it is live. The first build attempt failed on exactly that, and
@@ -876,7 +876,7 @@ before anything else.
    `andi $v0,$a3,0xff` then `sltu` — i.e. `(u8)idx < N`, not `idx < N`.
    The body indexes every table with `(u8)idx` already; the CONDITION had
    been left unmasked in both loops. Writing
-   `for (idx = 0; (u8) idx < D_8008E9D0; idx++)` and the same in the trailing
+   `for (idx = 0; (u8) idx < spuVmMaxVoice; idx++)` and the same in the trailing
    counter loop restores the two `andi`s — and, because a masked compare
    needs the value in a register the delay slot can carry, it also puts the
    loop-tail `andi` back where retail has it. **165 -> 167 (exact again, this
@@ -964,7 +964,7 @@ s32 SpuVmAlloc(void)
     bestIdx = 0x63;
     threshold = D_8008EA1B;
 
-    for (idx = 0; (u8) idx < D_8008E9D0; idx++) {
+    for (idx = 0; (u8) idx < spuVmMaxVoice; idx++) {
         if (D_8008D9A3[(u8) idx].unk0 != 0) {
             goto evalPriority;
         }
@@ -1003,11 +1003,11 @@ s32 SpuVmAlloc(void)
         if ((u8) found != 0) {
             chosen = bestIdx;
         } else {
-            chosen = D_8008E9D0;
+            chosen = spuVmMaxVoice;
         }
     }
 
-    count = D_8008E9D0;
+    count = spuVmMaxVoice;
     if ((u8) chosen < count) {
         if (count != 0) {
             p988 = _svm_voice;
@@ -1085,7 +1085,7 @@ preserving:
   original `goto` pair, and the free-channel case is now the explicit `else`.
 - **The `Rec34*`-typed struct declarations were replaced with plain pointer
   arithmetic on `u8[]`.** `src/code_179d8_l.c` already declares
-  `D_8008D9A3` and `D_8008E9D0` (plain `u8[]`/`u8`) for `vmNoiseOn2`'s and
+  `D_8008D9A3` and `spuVmMaxVoice` (plain `u8[]`/`u8`) for `vmNoiseOn2`'s and
   `SpuVmKeyOnNow`'s own preserved bodies, later in the SAME file; a
   struct-typed re-declaration of `D_8008D9A3` here would be a `conflicting
   types` error under `-DNON_MATCHING`, which compiles the whole unit at

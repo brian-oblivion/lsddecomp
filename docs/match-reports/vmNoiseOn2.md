@@ -25,7 +25,7 @@ function writes to `+0x194`/`+0x196` from it — the SPU key-on-low/key-on-high
 registers. `a0` is the voice-channel number (0-31, masked to a byte), `a1`
 and `a2` are per-voice values written into two 16-byte-stride parameter
 tables (`_svm_sreg_buf`, `D_8008D7F2`); `_svm_sreg_dirty[chan]` is a per-voice flag
-byte OR'd with `3`; a loop over all `D_8008E9D0` (a voice count) entries of a
+byte OR'd with `3`; a loop over all `spuVmMaxVoice` (a voice count) entries of a
 52-byte-stride array at `D_8008D9A3` masks each entry's low bit; the target
 channel's own 52-byte-stride slot gets three fields set (`D_8008D98C+2`←10
 [before the loop, if the earlier `sll v0,a0,4` load offset arithmetic is
@@ -42,7 +42,7 @@ written to the two SPU key-on registers.
 extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
 extern u8 _svm_sreg_dirty[];
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 extern u8 D_8008D98A[];
 extern u8 D_8008D98C[];
@@ -87,13 +87,13 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
 
     idx52 = (u8)a3 * 52;
     *(u16 *)(D_8008D98C + idx52) = 10;
-    if (D_8008E9D0 != 0) {
+    if (spuVmMaxVoice != 0) {
         i = 0;
         do {
             li = i * 52;
             *(u8 *)(D_8008D9A3 + li) = *(u8 *)(D_8008D9A3 + li) & 1;
             i++;
-        } while ((u16)i < D_8008E9D0);
+        } while ((u16)i < spuVmMaxVoice);
     }
     idx52 = (u8)a3 * 52;
     *(u8 *)(D_8008D9A3 + idx52) = 2;
@@ -142,7 +142,7 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
    store by GCC 2.6.3's scheduler even with no aliasing justification; a
    scheduling barrier is the documented-permitted fix (order-only, not
    register-identity) per CLAUDE.md's test.
-3. **A 14-word length gap, isolated to the `D_8008E9D0`-bounded loop over
+3. **A 14-word length gap, isolated to the `spuVmMaxVoice`-bounded loop over
    `D_8008D9A3`.** `tools/asm-differ/diff.py` shows retail recomputing the
    full 5-instruction `i*52` shift-add sequence (`sll,addu,sll,addu,sll`)
    on EVERY iteration, while the natural `do { li = i*52; ...; i++; }
@@ -214,7 +214,7 @@ with the `(u8)` cast, one instruction differed in MASK WIDTH — retail's
 loop-condition/index-use sequence masks with `0xffff` (`andi v1,a1,0xffff`)
 at a specific point the `(u8)`-cast version instead masked with `0xff`.
 Changing the cast in the multiply from `(u8)i` to `(u16)i` (the loop bound
-comparison `while ((u16)i < D_8008E9D0)` already used `u16`; the multiply
+comparison `while ((u16)i < spuVmMaxVoice)` already used `u16`; the multiply
 itself had not) reproduced the `0xffff` mask exactly, with the compiled
 length unchanged (still 108/112 — a byte-correctness fix, not a
 word-count one). **Lesson: when applying the "narrow-cast defeats strength
@@ -250,7 +250,7 @@ stall, not a new independent residue.
 extern u8 _svm_sreg_buf[];
 extern u8 D_8008D7F2[];
 extern u8 _svm_sreg_dirty[];
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 extern u8 D_8008D98A[];
 extern u8 D_8008D98C[];
@@ -295,13 +295,13 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
 
     idx52 = (u8)a3 * 52;
     *(u16 *)(D_8008D98C + idx52) = 10;
-    if (D_8008E9D0 != 0) {
+    if (spuVmMaxVoice != 0) {
         i = 0;
         do {
             li = (u16)i * 52;
             *(u8 *)(D_8008D9A3 + li) = *(u8 *)(D_8008D9A3 + li) & 1;
             i++;
-        } while ((u16)i < D_8008E9D0);
+        } while ((u16)i < spuVmMaxVoice);
     }
     idx52 = (u8)a3 * 52;
     *(u8 *)(D_8008D9A3 + idx52) = 2;
@@ -506,11 +506,11 @@ Two sub-levers inside that rewrite, both independently measured:
   wrong. Reordering to `E228, E22C, C60, C64` closed the rest of the tail.
   (Stores stay in source order in both, so only the loads discriminate.)
 
-**3. A third, smaller one: the `D_8008E9D0` guard read.** Retail loads
-`D_8008E9D0` *before* the `D_8008D98C[idx52] = 10` store, which fills the
+**3. A third, smaller one: the `spuVmMaxVoice` guard read.** Retail loads
+`spuVmMaxVoice` *before* the `D_8008D98C[idx52] = 10` store, which fills the
 load-delay slot with the `li v0,0xa`. The inherited body read it inline in
 the `if`, so maspsx inserted a `nop`. Reading it into a local first
-(`n = D_8008E9D0;` above the store, `if (n != 0)`) removes the `nop` and
+(`n = spuVmMaxVoice;` above the store, `if (n != 0)`) removes the `nop` and
 reproduces retail's order — this is why the body is 107 words, not 108: it
 lost a word it should never have had. The loop's own condition still re-reads
 the global each iteration (retail does too), so this is a guard-only hoist.
@@ -541,7 +541,7 @@ That is exactly the 5-word gap: `move` + `addiu sp,-8` + duplicated
 | delete the four tail temps, direct global expressions | **POSITIVE** — whole tail exact, +fixed `t0`/`a2` upstream |
 | `lowBit \| D_X` vs `D_X \|= lowBit` | **POSITIVE** — operand order |
 | reorder the four global updates to retail's load order | **POSITIVE** |
-| hoist the `D_8008E9D0` guard read into a local | **POSITIVE** — drops a spurious `nop` |
+| hoist the `spuVmMaxVoice` guard read into a local | **POSITIVE** — drops a spurious `nop` |
 | separate masked local (`ch = (u8)a0`) instead of reassigning the parameter | inert — identical 1835, same swap. Re-confirms round 26 on the NEW body |
 | masked local typed `u32` / `u16` / `s32` | all three inert on the swap and on the score |
 | removing the existing `__asm__("")` barrier | **NEGATIVE** — 1835 -> 2520. The barrier is still load-bearing |
@@ -589,7 +589,7 @@ spending the session's one search where it can bite.
 Needs, in addition to the unit's existing declarations before
 `SpuVmKeyOnNow` and `vmNoiseOn` (`_svm_sreg_buf`, `D_8008D7F2`,
 `_svm_sreg_dirty`, `D_8008D98C`, `D_8008D9A3`, `D_8008E228`, `_svm_okon2`,
-`_svm_okof1`, `_svm_okof2`, `D_8008E9D0`, `D_8006DAD4`), one extra:
+`_svm_okof1`, `_svm_okof2`, `spuVmMaxVoice`, `D_8006DAD4`), one extra:
 
 #if 0
 extern u8 D_8008D98A[];
@@ -623,7 +623,7 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
     }
 
     idx52 = (u8)a3 * 52;
-    n = D_8008E9D0;
+    n = spuVmMaxVoice;
     *(u16 *)(D_8008D98C + idx52) = 10;
     if (n != 0) {
         i = 0;
@@ -631,7 +631,7 @@ void vmNoiseOn2(s32 a0, s32 a1, s32 a2) {
             li = (u16)i * 52;
             *(u8 *)(D_8008D9A3 + li) = *(u8 *)(D_8008D9A3 + li) & 1;
             i++;
-        } while ((u16)i < D_8008E9D0);
+        } while ((u16)i < spuVmMaxVoice);
     }
     idx52 = (u8)a3 * 52;
     *(u8 *)(D_8008D9A3 + idx52) = 2;

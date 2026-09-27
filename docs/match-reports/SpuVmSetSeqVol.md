@@ -67,7 +67,7 @@ s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
     t0v = (u16) p2 * 0x81;
 
     if ((s16) p3 == 1) {
-        for (i = 0; i < D_8008E9D0; i++) {
+        for (i = 0; i < spuVmMaxVoice; i++) {
             if (D_8008D996[(u8) i].unk0 == key) {
                 _svm_sreg_buf[i].unk0 = t1v;
                 _svm_sreg_buf[i].unk2 = t0v;
@@ -84,7 +84,7 @@ s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
 ```
 
 Reuses `Entry90902E8` (this unit's top-of-file typedef), and the
-shared globals/typedefs `D_8008EA22`, `D_8008E9D0`, `D_8008D996`
+shared globals/typedefs `D_8008EA22`, `spuVmMaxVoice`, `D_8008D996`
 (`Rec34D994`), `_svm_sreg_buf` (`Rec16D7F0`), `_svm_sreg_dirty`.
 
 ## One CLOSED finding
@@ -288,7 +288,7 @@ placement will transfer.
 
 **Rebuild-before-trusting-the-score, third time.** Spliced the preserved
 body into `src/code_179d8_j.c` (local reduced-view declarations for
-`D_8008E9D0`, `D_8008D996`, `_svm_sreg_buf`, `_svm_sreg_dirty`, reusing this file's
+`spuVmMaxVoice`, `D_8008D996`, `_svm_sreg_buf`, `_svm_sreg_dirty`, reusing this file's
 own already-declared `Entry90902E8`/`D_8008EA22`) and ran the real oracle:
 `build exit=2`, no compile-error grep hits, `funcdiff.py` reproduces
 **21/96 raw word-match with the expected out-of-range drift warning**.
@@ -354,13 +354,13 @@ loop's counter is a **`s16`**:
     ...
     /* 20D54 */  sll   $v0, $v0, 16
     /* 20D60 */  sra   $v0, $v0, 16
-    /* 20D64 */  slt   $v0, $v0, $v1       ; SIGNED compare against D_8008E9D0
+    /* 20D64 */  slt   $v0, $v0, $v1       ; SIGNED compare against spuVmMaxVoice
 ```
 
 `sll 16`/`sra 16` is a sign-extension, and `slt` is the SIGNED compare -- a
 `(u8)`-masked counter gives `andi 0xff` and `sltu`, which is exactly what
 `SpuVmSeqKeyOff` has four hundred bytes later and what this function does
-NOT. With `s16 i` and a plain `for (i = 0; i < D_8008E9D0; i++)`, GCC 2.6.3's
+NOT. With `s16 i` and a plain `for (i = 0; i < spuVmMaxVoice; i++)`, GCC 2.6.3's
 loop inversion emits retail's guard (`lbu`/`beqz`) and loop test verbatim.
 
 That one correction plus six levers took the function from **5 words short /
@@ -405,7 +405,7 @@ The whole remaining residue is a single register-identity difference.
    access with a single base and a `2(...)` displacement. Two pointers fix
    the two-base shape -- **and WHERE they are declared decides where the
    preheader ends up**: assigned before the `for`, the `lui`/`addiu` pair is
-   emitted BEFORE the `D_8008E9D0 != 0` guard; declared inside the loop body
+   emitted BEFORE the `spuVmMaxVoice != 0` guard; declared inside the loop body
    (or inside the `if`), loop-invariant motion hoists it into the preheader
    AFTER the guard, which is retail. That placement alone is worth 1085 ->
    610 permuter units. This is the same pointer-hoist lever round 56 found on
@@ -431,7 +431,7 @@ delay slot for the `sh a2,0x76` the way retail has it, and it moved 610 ->
 ```c
 #if 0
 /* ---- SpuVmSetSeqVol local reduced view (round 56) ---- */
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 /* 0x34-byte-stride channel-configuration record; only the leading s16 this
  * function reads is named (same family as libsnd_vm_vol_ut_key_ut_keyv.c's Rec34D994). */
@@ -483,7 +483,7 @@ s32 SpuVmSetSeqVol(s32 p0, s16 p1, s16 p2, s16 p3)
     t0v = (u16) p2 * 0x81;
 
     if ((s16) p3 == 1) {
-        for (i = 0; i < D_8008E9D0; i++) {
+        for (i = 0; i < spuVmMaxVoice; i++) {
             if (D_8008D996[i].unk0 == key) {
                 s16 off;
 

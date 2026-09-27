@@ -35,7 +35,7 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 count;
 
     count = 0;
-    for (i = 0; i < D_8008E9D0; i++) {
+    for (i = 0; i < spuVmMaxVoice; i++) {
         if (D_8008D994[i].unk0 != a3) {
             continue;
         }
@@ -83,7 +83,7 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
 
 ## Shape
 
-Scan every record `i` in `[0, D_8008E9D0)` for one whose four key fields
+Scan every record `i` in `[0, spuVmMaxVoice)` for one whose four key fields
 (`D_8008D994`, `D_8008D99A`, `D_8008D996`, `D_8008D99E` -- s16 fields of the
 same 0x34-stride record family `code_179d8_j.c` documents as
 `Rec34D994`, redeclared here as a local `Rec34S16`) match the caller's

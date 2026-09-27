@@ -268,7 +268,7 @@ extern u8 _svm_auto_kof_mode;
 extern s16 kMaxPrograms;
 
 extern volatile u16 D_8008EA26;
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern s16 _svm_vab_count;
 extern u8 _svm_vab_used[];
 extern u16 _svm_okof1;
@@ -308,12 +308,12 @@ void SpuVmInit(s32 a0) {
     a0 = (u8)a0;
     scratch = a0;
     if ((u32)a0 >= 0x18) {
-        D_8008E9D0 = 0x18;
+        spuVmMaxVoice = 0x18;
     } else {
-        D_8008E9D0 = scratch;
+        spuVmMaxVoice = scratch;
     }
 
-    for (i = 0; (u16)i < D_8008E9D0; i++) {
+    for (i = 0; (u16)i < spuVmMaxVoice; i++) {
         u16 woff;
         u16 chan;
         u16 lowMask;
@@ -406,7 +406,7 @@ extern volatile u16 D_8008EA26;
 /* Loop bound / threshold, read fresh each call -- same symbol
  * code_179d8_j.c documents as "loop bound for a small table of active
  * objects". */
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 /* Flag byte forced on unconditionally at entry. */
 extern u8 D_8008EA1B;
 
@@ -419,7 +419,7 @@ void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
     D_8008EA1B = 0x7F;
     v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
-    if (v0 < D_8008E9D0) {
+    if (v0 < spuVmMaxVoice) {
         vmNoiseOn2(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, a2 & 0xFFFF, a3 & 0xFFFF);
     }
 }
@@ -427,7 +427,7 @@ void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
 void SpuVmNoiseOff(void) {
     s16 i;
 
-    for (i = 0; i < D_8008E9D0; i++) {
+    for (i = 0; i < spuVmMaxVoice; i++) {
         if (_svm_voice[i].unk1B == 2) {
             _svm_voice[(u8)i].unk1B = 0;
             _svm_voice[(u8)i].unk04 = 0;
@@ -443,7 +443,7 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
     D_8008EA1B = 0x7F;
     v0 = SpuVmAlloc(0xFF) & 0xFF;
     D_8008EA26 = v0;
-    if (v0 < D_8008E9D0) {
+    if (v0 < spuVmMaxVoice) {
         vmNoiseOn2(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
     }
 }
@@ -541,7 +541,7 @@ s32 SpuVmPitchBend(s16 a0, s16 a1, s16 a2, u16 a3) {
     SpuVmVSetUp(a1, a2);
     D_8008EA22 = a0;
     sum = 0;
-    for (i = 0; i < D_8008E9D0; i++) {
+    for (i = 0; i < spuVmMaxVoice; i++) {
         sum += SpuVmPBVoice(i, a0, a1, a2, a3);
     }
     return sum;
@@ -590,7 +590,7 @@ void SpuVmFlush(void) {
     ringIdx = (_svm_envx_ptr + 1) & 0xF;
     _svm_envx_ptr = ringIdx;
     slot = &_svm_envx_hist[ringIdx];
-    count = D_8008E9D0;
+    count = spuVmMaxVoice;
     *slot = 0;
 
     if (count > 0) {
@@ -616,7 +616,7 @@ void SpuVmFlush(void) {
             mask &= _svm_envx_hist[j];
         }
 
-        for (i = 0; i < D_8008E9D0; i++) {
+        for (i = 0; i < spuVmMaxVoice; i++) {
             s32 bit = 1 << i;
 
             if (mask & bit) {
@@ -804,7 +804,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
 
                 chan = SpuVmAlloc(0) & 0xFF;
                 D_8008EA26 = chan;
-                if (chan < D_8008E9D0) {
+                if (chan < spuVmMaxVoice) {
                     _svm_voice[chan].unk1B = 1;
                     _svm_voice[D_8008EA26].unk02 = 0;
                     _svm_voice[D_8008EA26].unk0E = (s16)a0;
@@ -858,7 +858,7 @@ u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
     u8 count;
 
     count = 0;
-    for (i = 0; i < D_8008E9D0; i++) {
+    for (i = 0; i < spuVmMaxVoice; i++) {
         if (_svm_voice[i].unk0C != a3) {
             continue;
         }

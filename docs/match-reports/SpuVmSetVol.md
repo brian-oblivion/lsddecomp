@@ -174,7 +174,7 @@ it is *downstream* of the shape difference above, not the thing to attack.
 
 Declarations used, all of them already present in `src/libsnd_vm_vol_ut_key_ut_keyv.c`
 before this round (`Rec34D994`, `SlotE968`, `RecordE978`, `SsScore`,
-`ObjE970`, `D_8008E9D0`, `D_8008EA22`, `_svm_stereo_mono`, `_svm_sreg_buf`,
+`ObjE970`, `spuVmMaxVoice`, `D_8008EA22`, `_svm_stereo_mono`, `_svm_sreg_buf`,
 `_svm_sreg_dirty`, `SpuVmVSetUp`).
 
 ```c
@@ -191,7 +191,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     SpuVmVSetUp((s16)a1, (s16)a2);
     D_8008EA22 = (u16)a0;
 
-    if (D_8008E9D0 != 0) {
+    if (spuVmMaxVoice != 0) {
         i = 0;
         do {
             if (D_8008D996[i].unk0 == (s16)a0) {
@@ -269,7 +269,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                 }
             }
             i++;
-        } while (i < D_8008E9D0);
+        } while (i < spuVmMaxVoice);
     }
     return result;
 }
@@ -292,7 +292,7 @@ are all already right.
    drift, **ins 101 / del 101**. Every figure reproduced; verdict falsified.
 2. Same body with all seven `volatile` qualifiers removed (= round 45's
    computation): 292/324 words confirmed, 3/324 raw, **ins 85 / del 85**.
-3. `u8 i` with `while (i < D_8008E9D0)`: 315/324, 10/324 raw, **ins 76 / del 76**.
+3. `u8 i` with `while (i < spuVmMaxVoice)`: 315/324, 10/324 raw, **ins 76 / del 76**.
    The round's single largest improvement, and the only one so far that moves
    the honest metric.
 4. `(a0 & 0xFF00) >> 8` for the entry high byte: word-for-word match on those
@@ -469,7 +469,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     SpuVmVSetUp((s16)a1, (s16)a2);
     D_8008EA22 = (u16)a0;
 
-    if (D_8008E9D0 != 0) {
+    if (spuVmMaxVoice != 0) {
         i = 0;
         do {
             if (D_8008D996[i].unk0 == (s16)a0) {
@@ -547,7 +547,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                 }
             }
             i++;
-        } while ((u8)i < D_8008E9D0);
+        } while ((u8)i < spuVmMaxVoice);
     }
     return result;
 }
@@ -745,7 +745,7 @@ Unit: `src/libsnd_vm_vol_ut_key_ut_keyv.c`. Size: 324 words (0x510 bytes), file 
 
 The largest function in this unit, and the most elaborate member of the
 SPU-voice-level family this project has now derived three times over. Scans
-a fixed-count table (`D_8008E9D0` entries, 0x34-byte-stride `Rec34D994`
+a fixed-count table (`spuVmMaxVoice` entries, 0x34-byte-stride `Rec34D994`
 records already declared in this unit -- `D_8008D996`/`98`/`9A`/`9C`/`9E`)
 for the entry whose `D_8008D996[i]`/`D_8008D99A[i]`/`D_8008D99E[i]` fields
 match the function's three ID-ish parameters (`a0`, `a2`, `a1`, compared as
@@ -805,7 +805,7 @@ loop-plus-nested-branches function, not in any individual construct.
 
 ## Struct/global model
 
-All of `Rec34D994`, `SlotE968`, `RecordE978`, `D_8008E9D0`, `D_8008EA22`,
+All of `Rec34D994`, `SlotE968`, `RecordE978`, `spuVmMaxVoice`, `D_8008EA22`,
 `_svm_okof1`/`64`, `D_8008E228`/`22C` were ALREADY declared in this unit
 (`src/libsnd_vm_vol_ut_key_ut_keyv.c`) before this round, for `SsUtKeyOn`'s existing
 stall. Added this round, following `vmNoiseOn`/`SpuVmKeyOnNow`'s
@@ -862,7 +862,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     SpuVmVSetUp((s16)a1, (s16)a2);
     D_8008EA22 = (u16)a0;
 
-    if (D_8008E9D0 != 0) {
+    if (spuVmMaxVoice != 0) {
         i = 0;
         do {
             if (D_8008D996[i].unk0 == (s16)a0) {
@@ -928,7 +928,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                 }
             }
             i++;
-        } while ((u8)i < D_8008E9D0);
+        } while ((u8)i < spuVmMaxVoice);
     }
     return result;
 }

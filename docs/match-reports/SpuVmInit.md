@@ -125,8 +125,8 @@ selection lever, not a cosmetic one.
 ## A second real bug, found and fixed along the way: a redundant outer guard
 
 The unit's very first pass on this function additionally carried a
-DUPLICATE branch: an outer `if (D_8008E9D0 != 0) { for (i = 0; i <
-D_8008E9D0; i++) ... }` compiles that redundant guard as a SEPARATE `beqz`
+DUPLICATE branch: an outer `if (spuVmMaxVoice != 0) { for (i = 0; i <
+spuVmMaxVoice; i++) ... }` compiles that redundant guard as a SEPARATE `beqz`
 immediately followed by the `for` loop's own entry check on the identical
 condition — two branches testing the same thing, back to back, where
 retail has only one. **Removing the outer `if` and keeping only the `for`
@@ -140,12 +140,12 @@ loop's own comparison serve as the guard.
 
 After both fixes above, exactly one construct remains wrong — and only in
 which PHYSICAL REGISTER holds a value, not in shape, count, or control
-flow. The MIN clamp (`D_8008E9D0 = min((u8) a0, 0x18)`):
+flow. The MIN clamp (`spuVmMaxVoice = min((u8) a0, 0x18)`):
 
 ```
 retail:  andi a0,s0,0xff / sltiu v0,a0,0x18 / bnez v0,L(store a0) / ...
-         ori v0,zero,0x18 / lui at / sb v0,D_8008E9D0(at) / j L2 / nop
-       L: lui at / sb a0,D_8008E9D0(at)
+         ori v0,zero,0x18 / lui at / sb v0,spuVmMaxVoice(at) / j L2 / nop
+       L: lui at / sb a0,spuVmMaxVoice(at)
        L2: [reload for the loop-guard check]
 
 mine:    andi s0,s0,0xff / sltiu v0,s0,0x18 / bnez v0,L(store s0) / ...
@@ -168,7 +168,7 @@ not shift the allocator's choice.
 
 ### Axes tried for the min-clamp construct, in order
 
-1. **Bare ternary** `D_8008E9D0 = ((u8)a0<0x18) ? (u8)a0 : 0x18;` — confirmed
+1. **Bare ternary** `spuVmMaxVoice = ((u8)a0<0x18) ? (u8)a0 : 0x18;` — confirmed
    via an ISOLATED reproducer through the pinned pipeline (not just in the
    full function) that this ALWAYS lowers to a "store speculatively, then
    fix up if wrong" shape (unconditional store, reload, compare,
@@ -227,8 +227,8 @@ not shift the allocator's choice.
     placement (confirmed it does not fix this — recorded so the next
     attempt does not re-spend a try here).
 
-Combination #6 (`a0 = (u8) a0; if ((u32) a0 >= 0x18) { D_8008E9D0 = 0x18; }
-else { D_8008E9D0 = a0; }`) is the best reached: EXACT 270-word length,
+Combination #6 (`a0 = (u8) a0; if ((u32) a0 >= 0x18) { spuVmMaxVoice = 0x18; }
+else { spuVmMaxVoice = a0; }`) is the best reached: EXACT 270-word length,
 267/270 raw match, and the residual is purely which register (`a0` vs
 `s0`) the allocator chose for a value that is otherwise computed, compared,
 and stored identically to retail.
@@ -341,7 +341,7 @@ extern Rec34Byte D_8008D9A3[];
 extern Rec34Half D_8008D9A4[];
 
 extern volatile u16 D_8008EA26;
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern s16 _svm_vab_count;
 extern u8 _svm_vab_used[];
 extern u16 _svm_okof1;
@@ -380,12 +380,12 @@ void SpuVmInit(s32 a0) {
 
     a0 = (u8) a0;
     if ((u32) a0 >= 0x18) {
-        D_8008E9D0 = 0x18;
+        spuVmMaxVoice = 0x18;
     } else {
-        D_8008E9D0 = a0;
+        spuVmMaxVoice = a0;
     }
 
-    for (i = 0; (u16) i < D_8008E9D0; i++) {
+    for (i = 0; (u16) i < spuVmMaxVoice; i++) {
         u16 woff;
         u16 chan;
         u16 lowMask;
@@ -619,8 +619,8 @@ entirely and should not be graded on the same rubric.
 `permuter-work/SpuVmInit/output-0-1/diff.txt` shows three related
 substitutions, all using ONE permuter-inserted `int new_var;`:
 
-1. `a0 = (u8) a0; new_var = a0; ... D_8008E9D0 = new_var;` in place of
-   `D_8008E9D0 = a0;` on the else-arm of the min-clamp -- this is exactly
+1. `a0 = (u8) a0; new_var = a0; ... spuVmMaxVoice = new_var;` in place of
+   `spuVmMaxVoice = a0;` on the else-arm of the min-clamp -- this is exactly
    this report's own **axis 4** ("named local instead of reassigning the
    parameter"), which axis 4's isolated testing found WORSE (an extra
    spurious `move`) when tried ALONE.
@@ -727,7 +727,7 @@ base address `0x1F801C00`, per `vmNoiseOn2`'s own report in
 `gSpuRegs` once no live runner touches `libsnd_vm_vol_ut_key_ut_keyv`/`_l`/`_j`/`_j_c`/
 `_k`/`_p`. See the broadcast post from this round for the fuller list of
 globals this unit shares with that cluster (`D_8008EA26` -> `gSelectedVoice`,
-`D_8008E9D0` -> `gVoiceCount`, `_svm_okof1`/`_svm_okof2` ->
+`spuVmMaxVoice` -> `gVoiceCount`, `_svm_okof1`/`_svm_okof2` ->
 `gVoiceEnableMaskLo`/`gVoiceEnableMaskHi`, `D_8008E228`/`_svm_okon2` ->
 `gVoiceActiveMaskLo`/`gVoiceActiveMaskHi`, `_svm_sreg_dirty` -> `gVoiceFlags`,
 `D_8008D9A3` -> `gVoiceState`).

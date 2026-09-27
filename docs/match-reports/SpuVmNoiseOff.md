@@ -37,7 +37,7 @@ extern SpuRegs *D_8006DAD4;
 void SpuVmNoiseOff(void) {
     s16 i;
 
-    for (i = 0; i < D_8008E9D0; i++) {
+    for (i = 0; i < spuVmMaxVoice; i++) {
         if (D_8008D9A3[i].unk0 == 2) {
             D_8008D9A3[(u8) i].unk0 = 0;
             D_8008D98C[(u8) i].unk0 = 0;
@@ -50,8 +50,8 @@ void SpuVmNoiseOff(void) {
 
 ## Shape
 
-Frameless leaf, no arguments. `for (i = 0; i < D_8008E9D0; i++)` sweeps a
-table of `D_8008E9D0` "channel" slots; any slot in state `2` gets reset:
+Frameless leaf, no arguments. `for (i = 0; i < spuVmMaxVoice; i++)` sweeps a
+table of `spuVmMaxVoice` "channel" slots; any slot in state `2` gets reset:
 its own state byte and a companion halfword cleared, plus two halfword
 fields on a separate "current object" cleared unconditionally inside the
 same `if`.

@@ -14,7 +14,7 @@ the improvement moved the residue's START, it did not just improve the
 raw count.)
 
 Unit `code_179d8_j`, round 23 (2026-09-07). Not a class method. Scans
-`D_8008D996[0..D_8008E9D0)` for an entry equal to `(s16) p0`; on a match,
+`D_8008D996[0..spuVmMaxVoice)` for an entry equal to `(s16) p0`; on a match,
 runs this unit's "clear channel bits" tail (the same block as
 `SsUtKeyOffV`, see that function's report) keyed by the loop index. Called
 from `libsnd_decre.c`'s `func_800339AC` as
@@ -29,7 +29,7 @@ void SpuVmSeqKeyOff(s32 p0)
     s32 key;
     u32 i;
 
-    if (D_8008E9D0 == 0)
+    if (spuVmMaxVoice == 0)
         return;
     key = (s16) p0;
     i = 0;
@@ -61,13 +61,13 @@ void SpuVmSeqKeyOff(s32 p0)
             _svm_okon2 = _svm_okon2 & ~old64;
         }
         i++;
-    } while ((u8) i < D_8008E9D0);
+    } while ((u8) i < spuVmMaxVoice);
 }
 #endif
 ```
 
 Needs this unit's shared `_snd_ev_flag`-adjacent globals declared near the
-top of `code_179d8_j.c` (`D_8008EA26`, `D_8008E9D0`, `D_8008D996`/`D_8008D9A3`/
+top of `code_179d8_j.c` (`D_8008EA26`, `spuVmMaxVoice`, `D_8008D996`/`D_8008D9A3`/
 `_svm_voice`/`D_8008D98C`, `_svm_okof1`/`_svm_okof2`, `D_8008E228`/`_svm_okon2`).
 
 ## One CLOSED finding: masking the induction variable is what enables strength reduction to match
@@ -89,7 +89,7 @@ exactly**, because the byte truncation breaks GCC 2.6.3's biv/giv linearity
 proof (the compiler can no longer show `addr = base + i*52` is a pure
 linear function of the iteration count once the index passes through a
 narrowing cast). This is a second confirmed instance of "the loop's exit
-test masks the counter to a byte" (`(u8) i < D_8008E9D0`, already known from
+test masks the counter to a byte" (`(u8) i < spuVmMaxVoice`, already known from
 this unit's other loop-bearing functions) but the NEW finding is that the
 *array-indexing expression itself* needs the same mask, independently of
 the exit test's mask, to reproduce retail's actual codegen -- the two masks
@@ -98,7 +98,7 @@ numerically redundant (i never exceeds 0xFF while the loop runs).
 
 ## A second CLOSED finding: compute the key AFTER the zero-count guard, not before
 
-Retail's very first substantive instruction (after the `D_8008E9D0`
+Retail's very first substantive instruction (after the `spuVmMaxVoice`
 load/test) is the `beqz` guard itself; the `sll`/`sra` pair that computes
 `key = (s16) p0` is scheduled AFTER that guard, only on the path where the
 loop will actually run. Declaring `key` and initializing it in the SAME
@@ -108,7 +108,7 @@ hoists that computation to the very first instruction of the function,
 one full word before retail's own `lbu`/`beqz` sequence even starts, and
 this measured as a genuine word-0 divergence (41/85, first real diff at
 word 0). Splitting the declaration from the initialization and moving the
-assignment to AFTER `if (D_8008E9D0 == 0) return;` reproduces retail's
+assignment to AFTER `if (spuVmMaxVoice == 0) return;` reproduces retail's
 placement exactly and moved the residue's start from word 0 to word 4 (and
 the raw count from 41/85 to 45/85). This is the same-shaped lesson as
 `SpuVmSetSeqVol`'s report (a value that COULD be computed early, matching
@@ -153,7 +153,7 @@ this same unit.
   spurious dead 8-byte frame) -- reverted.
 - `key`'s computation site: combined declaration+init before the guard
   (41/85, first real diff at word 0) vs. split declaration/assignment
-  with the assignment moved after the `D_8008E9D0 == 0` guard (45/85,
+  with the assignment moved after the `spuVmMaxVoice == 0` guard (45/85,
   first real diff at word 4) -- **closed**, see above.
 
 **Untested axis:** whether the `D_8008EA26` address-hoisting failure and
@@ -236,7 +236,7 @@ round 23 already showed backfires.
 
 **Rebuild-before-trusting-the-score, third time.** Spliced the preserved
 body into `src/code_179d8_j.c` (with this unit's own local reduced-view
-declarations for `D_8008E9D0`, `D_8008D996`/`D_8008D9A3`/`_svm_voice`/
+declarations for `spuVmMaxVoice`, `D_8008D996`/`D_8008D9A3`/`_svm_voice`/
 `D_8008D98C`, `D_8008EA26`, `_svm_okof1`/`_svm_okof2`, `D_8008E228`/
 `_svm_okon2`, copied from `libsnd_vm_vol_ut_key_ut_keyv.c`'s equivalents per this
 project's per-unit reduced-local-view convention) and ran the real oracle:
@@ -371,7 +371,7 @@ loop-carried copy of the induction variable.
 #if 0
 /* file-local reduced view, all already present in libsnd_vm_vol_ut_key_ut_keyv.c under
  * the same names/types -- keep them local to the unit, not in a header */
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern volatile u16 D_8008EA26;
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
@@ -399,7 +399,7 @@ void SpuVmSeqKeyOff(s32 p0)
     u16 *chanPtr;
     u32 idx;
 
-    if (D_8008E9D0 == 0)
+    if (spuVmMaxVoice == 0)
         return;
     i = 0;
     key = (s16) p0;
@@ -433,7 +433,7 @@ void SpuVmSeqKeyOff(s32 p0)
             _svm_okon2 = _svm_okon2 & ~old64;
         }
         i++;
-    } while ((u8) i < D_8008E9D0);
+    } while ((u8) i < spuVmMaxVoice);
 }
 #endif
 ```
@@ -485,7 +485,7 @@ void SpuVmSeqKeyOff(s32 p0)
   `key = ...`, `chanPtr = ...`): `i`, `key`, `chanPtr` is the unique best;
   every other ordering loses 1-3 words. In particular putting `chanPtr`
   first costs 3.
-- **`for (i = 0; (u8) i < D_8008E9D0; i++)` in place of the explicit guard
+- **`for (i = 0; (u8) i < spuVmMaxVoice; i++)` in place of the explicit guard
   plus `do`/`while`: sharply worse** -- it reintroduces an 8-byte stack
   frame (`addiu sp,sp,-8`) and drops to 1945 permuter units. Round 23
   recorded this axis as "no effect"; with the round-56 body it is a clear
@@ -634,7 +634,7 @@ void SpuVmSeqKeyOff(s32 p0)
     u16 *chanPtr;
     u32 idx;
 
-    if (D_8008E9D0 == 0)
+    if (spuVmMaxVoice == 0)
         return;
     i = 0;
     key = (s16) p0;
@@ -670,7 +670,7 @@ void SpuVmSeqKeyOff(s32 p0)
             _svm_okon2 = _svm_okon2 & ~old64;
         }
         i++;
-    } while ((u8) i < D_8008E9D0);
+    } while ((u8) i < spuVmMaxVoice);
 }
 #endif
 ```
@@ -814,7 +814,7 @@ local is what distinguishes them, and it is load-bearing.
 #if 0
 /* file-local reduced view, all already present in libsnd_vm_vol_ut_key_ut_keyv.c under
  * the same names/types -- keep them local to the unit, not in a header */
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 extern volatile u16 D_8008EA26;
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
@@ -842,7 +842,7 @@ void SpuVmSeqKeyOff(s32 p0)
     u16 *chanPtr;
     u32 idx;
 
-    if (D_8008E9D0 == 0)
+    if (spuVmMaxVoice == 0)
         return;
     i = 0;
     key = (s16) p0;
@@ -875,7 +875,7 @@ void SpuVmSeqKeyOff(s32 p0)
             _svm_okon2 = _svm_okon2 & old64;
         }
         i++;
-    } while ((u8) i < D_8008E9D0);
+    } while ((u8) i < spuVmMaxVoice);
 }
 #endif
 ```

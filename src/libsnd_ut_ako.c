@@ -2,7 +2,7 @@
  * libsnd_ut_ako -- Sony's libsnd/ut_ako module, carried as disassembly
  * because no SDK disc carries the build retail linked.
  *
- * SsUtAllKeyOff resets every voice the voice manager owns (D_8008E9D0 of
+ * SsUtAllKeyOff resets every voice the voice manager owns (spuVmMaxVoice of
  * them): its _svm_voice record (include/SvmData.h), its SPU voice
  * registers (D_8006DAD4 points at them, 0x1F801C00, eight halfwords per
  * voice), and its bit in the key-off masks. It keeps Sony's name and
@@ -33,7 +33,7 @@
 extern volatile u16 D_8008EA26;
 
 /* "Loop bound / threshold" -- code_179d8_m.c's own comment on this symbol. */
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 /*
  * This function's OWN reading of D_8006DAD4: a POINTER VARIABLE (loaded with
@@ -86,7 +86,7 @@ void SsUtAllKeyOff(void)
     u16 hw0;
     u16 hw1;
 
-    for (i = 0; i < D_8008E9D0; i++) {
+    for (i = 0; i < spuVmMaxVoice; i++) {
         woff = i * 8;
         _svm_voice[i].unk02 = 0x18;
         _svm_voice[i].unk00 = 0xFF;

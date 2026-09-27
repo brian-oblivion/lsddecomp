@@ -182,7 +182,7 @@ extern Rec34U8 D_8008D9A3[];
 extern volatile u16 D_8008EA26;
 
 /* "Loop bound / threshold" -- code_179d8_m.c's own comment on this symbol. */
-extern u8 D_8008E9D0;
+extern u8 spuVmMaxVoice;
 
 /*
  * This function's OWN reading of D_8006DAD4: a POINTER VARIABLE (loaded with
@@ -226,7 +226,7 @@ void SsUtAllKeyOff(void)
     u16 hw0;
     u16 hw1;
 
-    for (i = 0; i < D_8008E9D0; i++) {
+    for (i = 0; i < spuVmMaxVoice; i++) {
         woff = i * 8;
         D_8008D98A[i].unk0 = 0x18;
         _svm_voice[i].unk0 = 0xFF;
