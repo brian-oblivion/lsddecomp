@@ -91,7 +91,7 @@ void ItemList__HandleInputCode(ItemList *self, void *source, s32 code) {
     }
 }
 
-void ItemList__ForwardToTarget(ItemList *self, s32 code) {
+void ItemList__PlaySound(ItemList *self, s32 code) {
     struct VabStreamObj *target = self->target;
 
     if (target != NULL) {

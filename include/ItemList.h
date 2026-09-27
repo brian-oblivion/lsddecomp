@@ -78,7 +78,7 @@ struct ItemListMethods {
     /* +0x058 */ void (*tickClosing)(ItemList *self, void *sender,
                                      s32 event); /* ItemList__TickClosing (reads only self; see the banner) */
     /* +0x05C */ void (*handleInputCode)(ItemList *self, void *source, s32 code); /* ItemList__HandleInputCode */
-    /* +0x060 */ void (*forwardToTarget)(ItemList *self, s32 code); /* ItemList__ForwardToTarget */
+    /* +0x060 */ void (*forwardToTarget)(ItemList *self, s32 code); /* ItemList__PlaySound */
     /* +0x064 */ void *slot64[6];                                   /* NULL */
     /* +0x07C */ void (*scrollRight)(ItemList *self);               /* ItemList__ScrollRight */
     /* +0x080 */ void (*scrollLeft)(ItemList *self);                /* ItemList__ScrollLeft */
@@ -144,7 +144,7 @@ void ItemList__DetachTarget(ItemList *self);
 void ItemList__SetState(ItemList *self, s32 state);
 void ItemList__TickClosing(ItemList *self);
 void ItemList__HandleInputCode(ItemList *self, void *source, s32 code);
-void ItemList__ForwardToTarget(ItemList *self, s32 code);
+void ItemList__PlaySound(ItemList *self, s32 code);
 void ItemList__ScrollRight(ItemList *self);
 void ItemList__ScrollLeft(ItemList *self);
 void ItemList__CursorUp(ItemList *self, s32 unused1, s32 unused2, s32 forwarded);
