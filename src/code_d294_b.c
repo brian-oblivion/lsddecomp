@@ -556,7 +556,7 @@ void SceneNode__NoOpSlotB0(void) {}
  * the two nested do/while loops are real loops for loop.c, which hoists the
  * literal 4 into $s1. The goto form of earlier rounds had no loop notes, so
  * it needed a named `tag` and could not get retail's register order. */
-void SceneNode__NotifyTaggedParents(SceneNode *self, void *node) {
+void SceneNode__AddToActorParents(SceneNode *self, void *node) {
     SceneNode *entry;
     void *cursor;
 

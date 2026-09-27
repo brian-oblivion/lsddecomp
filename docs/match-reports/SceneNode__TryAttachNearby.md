@@ -164,7 +164,7 @@ with the resulting `Vec3S16` difference, before registering `other` into
   error) and rebuilt the WHOLE image to confirm `SceneNode__DispatchLinkCommand` (already
   matched) is still byte-exact before proceeding — this is the exact
   scenario CLAUDE.md's vtable-retype warning describes, and it came up
-  again this round (see `SceneNode__NotifyTaggedParents`'s report for the other instance,
+  again this round (see `SceneNode__AddToActorParents`'s report for the other instance,
   a genuine struct-layout bug rather than a retype).
 
 ## What got the structure this close (in order — each one was real
@@ -520,7 +520,7 @@ before crediting the whole diff.
 ## Round 41 (bravo): did not reach as primary work; one confirmation check only
 
 This function was item 4 of this round's ordered work list ("hardest,
-reach only if the others land"). Items 1-3 (`SceneNode__NotifyTaggedParents`,
+reach only if the others land"). Items 1-3 (`SceneNode__AddToActorParents`,
 `ClipSegmentToBox`, `SceneNode__CheckBoundsOverlap`) consumed the round's attempt budget
 first, per the assignment's own ordering, so this function got only a
 single confirmation check, not a fresh attempt cycle.

@@ -126,7 +126,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   and a bigger frame, every loop carrying a second induction variable, closed at 954/954 once all
   13 inner loops were `label: ...; if (--n != 0) goto label;` (`SortTmdObject`, round 76).
   The MIRROR: a constant retail hoists into `$sN` before a loop (`li s1,4`) needs a `do/while`, since
-  loop.c cannot see a goto loop (`SceneNode__NotifyTaggedParents`, 48/54 -> 54/54 first build).
+  loop.c cannot see a goto loop (`SceneNode__AddToActorParents`, 48/54 -> 54/54 first build).
 - **A redundant guard is NOT dead code — 2.6.3 compiles it literally.** GCC does not dedupe an
   explicit `if` against a loop's implicit entry test (where retail has ONE check, `guard + do-while`
   says so), and a provably-dead `x != 5 && x != 8 && x == 0xA` chain is byte-exact while its

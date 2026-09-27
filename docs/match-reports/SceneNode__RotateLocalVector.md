@@ -78,7 +78,7 @@ larger, partially-opaque) extent.
 - **Method prefix `SceneNode__`:** the first parameter is a
   `SceneNodeObj *` and the body dispatches through its method table. The
   function is NOT itself a vtable slot (`tools/classtable.py gSceneNodeMethods`
-  ends at `SceneNode__NotifyTaggedParents`); the prefix records the receiver, matching
+  ends at `SceneNode__AddToActorParents`); the prefix records the receiver, matching
   `BasicClass__*` and `DreamSys__*` already in the symbols file.
 - **Parameter `dst` retyped `SceneNodeSub44 *` -> `LongVec3 *`.** Evidence:
   only three words at +0/+4/+8 are ever written, and `class_3bb8c_o`'s

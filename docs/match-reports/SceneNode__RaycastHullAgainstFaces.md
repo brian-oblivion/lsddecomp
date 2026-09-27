@@ -437,7 +437,7 @@ function:** scaffold built clean (`tools/setup-permuter.sh`, seed = the
 round-46 preserved body verbatim). `--debug --stack-diffs`: base score
 **3056** (136 stack-difference points, 60 register-difference points, 7
 reorderings, **11 insertions, 11 deletions**) -- unlike
-`SceneNode__NotifyTaggedParents`'s clean 0/0 insertion/deletion signature
+`SceneNode__AddToActorParents`'s clean 0/0 insertion/deletion signature
 (a pure register-shuffle wall), this scaffold shows REAL structural
 insertions/deletions, consistent with the Part-1-loop-shape finding above:
 there is genuine room for a source-level fix, not just a register swap.

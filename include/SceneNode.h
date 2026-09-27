@@ -107,7 +107,7 @@ struct Ratio16 {
     /* +0x0A8 */ s32 (*checkBoundsOverlap)(Self *self, void *corners, TmdVec3 *delta); /* SceneNode__CheckBoundsOverlap */ \
     /* +0x0AC */ s32 (*classifyAgainstPlanes)(Self *self, void *outFlag, TmdVec3 *delta, void *corners); /* SceneNode__RaycastHullAgainstFaces */ \
     /* +0x0B0 */ void (*slotB0)(void); /* SceneNode__NoOpSlotB0; never called */ \
-    /* +0x0B4 */ void (*notifyTaggedParents)(Self *self, void *node) /* SceneNode__NotifyTaggedParents */
+    /* +0x0B4 */ void (*notifyTaggedParents)(Self *self, void *node) /* SceneNode__AddToActorParents */
 /* clang-format on */
 
 /* clang-format off */
@@ -179,7 +179,7 @@ void SceneNode__ComposeAndApplyRotation(SceneNode *self, void *vec, void *dst, v
 s32 SceneNode__CheckBoundsOverlap(SceneNode *self, void *corners, TmdVec3 *delta);
 s32 SceneNode__RaycastHullAgainstFaces(SceneNode *self, s32 *outFlag, TmdVec3 *delta, TmdHull *corners);
 void SceneNode__NoOpSlotB0(void);
-void SceneNode__NotifyTaggedParents(SceneNode *self, void *node);
+void SceneNode__AddToActorParents(SceneNode *self, void *node);
 
 void SceneNode__RotateLocalVector(SceneNode *self, LongVec3 *dst, s16 *src);
 /* `unused`: both callers pass 0 and the body never reads it. */
