@@ -2990,3 +2990,4 @@ sSaveFileSuffixes = 0x80086D6C;
 sDisplayBufferRects = 0x80086DAC;
 sSaveTitleOffset = 0x8008A9B4;
 sCardFilePrefix = 0x8008A9D0;
+sSaveFileName = 0x8008AA10;

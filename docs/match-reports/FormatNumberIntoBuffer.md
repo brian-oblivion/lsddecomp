@@ -35,7 +35,7 @@ project's independent-local-view convention.
 
 `D_8008AA24` is a new declaration in `include/class_3bb8c.h`
 (`extern void *D_8008AA24;`), added additively next to the existing
-`D_8008AA10`/`D_8008AA18` VALUE-of `%gp_rel` globals — same pattern: the ROM
+`sSaveFileName`/`D_8008AA18` VALUE-of `%gp_rel` globals — same pattern: the ROM
 image initializes it to a rodata placeholder (`D_8008AA1C`, the "7654321"
 string in `asm/data/7B12C.sdata.s`) but the runtime value is a writable
 buffer that `FormatFullWidthNumber` formats into.

@@ -21,9 +21,9 @@ void TitleMenu__SaveToCard(TitleMenu *self)
     self->unkA4->methods->slot19C(self->unkA4, &buf);
     self->methods->slot128(self);
     if (self->unkA4->methods->slot1AC(self->unkA4)) {
-        *(u8 *)D_8008AA10 = 0;
+        *(u8 *)sSaveFileName = 0;
     }
-    self->unkAC->methods->slot78(self->unkAC, D_8008AA10, D_8008AA18, 0xD, 3,
+    self->unkAC->methods->slot78(self->unkAC, sSaveFileName, D_8008AA18, 0xD, 3,
                                   self->iconHandle, self->unkBC, self->unkC0);
 }
 ```
@@ -48,13 +48,13 @@ SLPS_015.56`.
   slot. Return type `s32`: the caller's own `beqz $v0` tests it directly,
   so a `void` return would be observably wrong.
 - The nonzero-return branch writes a single zero byte through
-  `D_8008AA10` (`*(u8 *)D_8008AA10 = 0;`) -- the same `void *` global
+  `sSaveFileName` (`*(u8 *)sSaveFileName = 0;`) -- the same `void *` global
   `TitleMenu__LoadFromCard` (this round) established as holding a precomputed
   pointer into unowned rodata (a `%gp_rel` load of the global's own
   VALUE, reloaded here with an identical `lw`).
 - The final call, `self->unkAC->methods->slot78(...)`, is an 8-argument
   dispatch (four in registers, four on the stack at `0x10`-`0x1C($sp)`):
-  `self->unkAC`, `D_8008AA10`, `D_8008AA18`, the literal `0xD`, the
+  `self->unkAC`, `sSaveFileName`, `D_8008AA18`, the literal `0xD`, the
   literal `3`, `self->iconHandle`, `self->unkBC`, `self->unkC0`. The offset
   (+0x078) falls immediately after this round's `TitleMenu__LoadFromCard`-derived
   `slot74` (+0x074, 4 bytes) with no gap, so it was appended there.
@@ -78,13 +78,13 @@ No existing declaration was retyped or resized.
 
 None beyond what round 43's earlier two reports (`TitleMenu__LoadFromCard`,
 `TaskObjF__TaskObjF`) already recorded for this unit -- this function's own
-derivation was routine once those two slots (`slot128`, `D_8008AA10`)
+derivation was routine once those two slots (`slot128`, `sSaveFileName`)
 were on file, and it re-confirmed `slot74`'s exact byte offset by landing
 its own new slot immediately after it.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E0E4` -> `TitleMenu__SaveToCard`. **Tier B, lower confidence**: Refreshes the view (same idiom as `TitleMenu__RefreshViewValue`), calls `slot128`, conditionally clears `D_8008AA10` behind the same `self->unkA4->methods->slot1AC()` gate `TitleMenu__CreateSaveTitle` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `TitleMenu__Tick`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
+Renamed `func_8004E0E4` -> `TitleMenu__SaveToCard`. **Tier B, lower confidence**: Refreshes the view (same idiom as `TitleMenu__RefreshViewValue`), calls `slot128`, conditionally clears `sSaveFileName` behind the same `self->unkA4->methods->slot1AC()` gate `TitleMenu__CreateSaveTitle` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `TitleMenu__Tick`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
 
 ## Proposed field names
 

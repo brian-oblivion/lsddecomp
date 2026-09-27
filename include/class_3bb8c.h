@@ -134,7 +134,7 @@ extern s32 sSaveTitleOffset;
  * it, so at run time D_8008AA18 holds a writable buffer; nothing in these
  * units sets it.
  */
-extern void *D_8008AA10;
+extern void *sSaveFileName;
 extern void *D_8008AA18;
 
 /* The buffer FormatNumberIntoBuffer formats the day into
@@ -143,7 +143,7 @@ extern void *D_8008AA18;
 extern void *D_8008AA24;
 
 /* TitleMenu__CreateSaveTitle's strcpy source for the save title. The ROM
- * image holds 0x80011474, just past D_8008AA10's "BISLPS-01556xxx" string. */
+ * image holds 0x80011474, just past sSaveFileName's "BISLPS-01556xxx" string. */
 extern void *D_8008AA14;
 
 /* TaskObjF's init `namePrefix` (TitleMenu__BeginCardAccess): the ROM image

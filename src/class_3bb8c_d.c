@@ -245,15 +245,15 @@ void TitleMenu__SaveToCard(TitleMenu *self) {
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &buf);
     self->methods->beginCardAccess(self);
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
-        *(u8 *)D_8008AA10 = 0;
+        *(u8 *)sSaveFileName = 0;
     }
-    self->saveCtrl->methods->beginSave(self->saveCtrl, D_8008AA10, D_8008AA18, 0xD, 3,
+    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, D_8008AA18, 0xD, 3,
                                        self->saveIcon, self->saveBlock, self->saveBlockSize);
 }
 
 void TitleMenu__LoadFromCard(TitleMenu *self) {
     self->methods->beginCardAccess(self);
-    self->saveCtrl->methods->beginLoad(self->saveCtrl, D_8008AA10, D_8008AA18, self->saveBlock,
+    self->saveCtrl->methods->beginLoad(self->saveCtrl, sSaveFileName, D_8008AA18, self->saveBlock,
                                        self->saveBlockSize);
 }
 

@@ -105,8 +105,8 @@ SLPS_015.56`.
   the SAME real class those units call `Unk64Elem`/`FieldM7C`, consistent
   with `New_TextRow`'s return value landing there.
 - New extern `D_8008AA14` (`void *`, VALUE-of `%gp_rel`, same pattern as
-  `D_8008AA10`/`D_8008AA18`).
-- Expanded comment on `D_8008AA18`/`D_8008AA10`: this function proves
+  `sSaveFileName`/`D_8008AA18`).
+- Expanded comment on `D_8008AA18`/`sSaveFileName`: this function proves
   `D_8008AA18`'s RUNTIME value must be a writable buffer (it is both a
   `strcpy` destination and a `strlen` argument here), which cannot be the
   ROM image's own `.rodata` initial value -- nothing in this unit
