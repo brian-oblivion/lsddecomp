@@ -140,3 +140,21 @@ in this session; the reproducers themselves were scratch files under
 ## Track 4 (2026-09-26, round 89, echo)
 
 The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Holders now typed: pauseText (+0x07C, TextRow: attachToParent, setColor), etcTim (+0x074, New_TextRow's font), viewport (NodeGuardedViewport setDrawEnabled), unk10 (FrameClock pause), bgm (WBgm pause), sound (VabStreamObj mute).
+
+## Track 7 (2026-09-27, round 98, delta)
+
+Names, tier A (the literals' only reader is this function, and their
+contents are what setColor/attachToParent/New_TextRow take):
+
+| old | new | evidence |
+| --- | --- | --- |
+| `D_8008AB44` | `sPauseText` | the `.asciz "Pause"`, New_TextRow's text |
+| `D_8008AB38` | `sPauseTextPos` | two words (-20, -50), attachToParent's position; now declared `ScreenSpritePos` (TextRow's attach reads one) |
+| `D_8008AB40` | `sPauseTextColor` | bytes FF 00 00, setColor's SpriteRgb; now declared `SpriteRgb`, no cast |
+
+The local `state` is `step` (it is pauseSetupStep). The `5` passed to
+New_TextRow stays a literal: it is the text's length, which the comment
+on `sPauseText` shows. All through `tools/rename.py`, zero bytes.
+
+Moved from the source comment: sPauseText's definition is in
+asm/data/7B12C.sdata.s (the comment said 7B008, which was wrong).

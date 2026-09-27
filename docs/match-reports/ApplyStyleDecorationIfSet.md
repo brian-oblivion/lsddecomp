@@ -155,3 +155,15 @@ Not applied (outside the edit set): hoisting `StyleSceneRefs` into one
 shared header (ObjM.h, beside the block it views) and dropping both unit
 copies; retyping the `gStyleSceneRefs` global from `s32` to
 `StyleSceneRefs *` (track 4b, it would remove every cast in _m and _n).
+
+## Track 7 (2026-09-27, round 98, delta)
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_8008AB58` | `sStyleDecorBoxPos` | A | (-100, -100), the box's attachToParent position; now declared `BoxFillPos`, no cast (Viewport places its own fade box there) |
+| `D_8008AB60` | `sStyleDecorBoxSize` | A | (320, 240), New_BoxFill's size pair; now `s32[2]` |
+
+The colour goes in as `(BoxFillRgb *)gStyleDecorColor` (BoxFill.h's
+record, this round) instead of `(void *)`. Zero bytes. The comment "(track
+4b's to retype)" on gStyleDecorObj is gone; the declaration says it holds
+a BoxFill *.

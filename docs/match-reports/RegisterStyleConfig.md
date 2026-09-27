@@ -85,3 +85,21 @@ produce, and the difference changes the instruction count.
 ## Naming
 
 **RegisterStyleConfig** -- tier B. Free function (VerbNoun, unrelated to the `ObjM`/`DreamSys` cluster above): a register-once guard over a `.sdata` flag word (`gStyleGrid`), stashing five style-config arguments into `.sbss` globals and zeroing two more before tail-calling `ApplyStyleConfig`. Mechanically well understood from the disassembly; "style" describes the data it touches (color/config table consumed by `FillStyleFromConfig`/`StyleM`), not a confirmed game concept.
+
+## Track 7 (2026-09-27, round 98, delta)
+
+- The zeroing loop no longer reaches `gStyleCueSlots` through
+  `D_8008ACA0`, which is only splat's label for the SECOND of its two
+  slots: `extern void *gStyleCueSlots[2]` and
+  `slot = &gStyleCueSlots[ARRAY_COUNT(gStyleCueSlots) - 1]` link to the
+  same address, and the loop shape (the lever above) is kept. Byte-exact.
+- Parameters `a0..a3, arg4` are `grid, stage, sceneRefs, day, unreadArg`
+  (ObjM__InitStyleAndWorld passes the StageMap, its stage, &ctorSound and
+  the day; class_3bb8c_l's prototype names the first four the same way).
+- `D_8008AC78` is `sStyleUnreadArg` (tools/rename.py), tier B: this
+  function stores its fifth argument there, and nothing in the image
+  reads it (no reference in any `asm/` file or `src/` unit, measured).
+  The one caller passes 0.
+- The result is cast, `(s32)ApplyStyleConfig()`; that removed the
+  unit's "return makes integer from pointer" warning (typeviews baseline
+  rewritten in the same commit).

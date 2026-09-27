@@ -91,3 +91,19 @@ before anything more invasive.
 ## Naming
 
 **ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`sStyleStageConfigs[gStyleStage]`), falling back to the uncarved `PickStyleFallbackConfig` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.
+
+## Track 7 (2026-09-27, round 98, delta)
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| `D_800873EC` | `sStyleStageConfigs` | A | indexed by gStyleStage; NULL entries fall back to PickStyleFallbackConfig |
+| `D_80087424` | `sStyleConfig` | A | the StyleConfig record this returns and ObjM keeps as `styleConfig`; now declared `StyleConfig` |
+| `cfg[1] >= 4` | `cfg->fogLevel >= STYLE_DECOR_FOG_LEVEL` | B | the byte indexes sStyleFogNears; 4 and 5 are its two nearest distances (4096, 2048) |
+
+The config pointer is a unit-local `StyleStageConfig` (four `s8`:
+colorMode, fogLevel, farColorIndex, clearColorIndex -- what
+FillStyleFromConfig stores each byte as). Zero bytes.
+
+Proposal: `gStyleKind2AltColor` (0x80087430, class_3bb8c_n) is
+`sStyleConfig + 0x00C`, i.e. `sStyleConfig.clearColor`: its "alternate
+colour" is the current config's clear colour.

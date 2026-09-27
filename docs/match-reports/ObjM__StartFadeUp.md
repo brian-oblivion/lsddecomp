@@ -58,3 +58,10 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 ## Track 4 (2026-09-26, round 89, echo)
 
 Renamed from `ObjM__ForwardToSubChild` (rename.py). The "sub child" is the viewport's fade box: IntermediateBase::viewport (+0x018) is the NodeGuardedViewport of the building DayTask's init args, its +0x0AC is Viewport's getSubHandle, whose object is Viewport's New_FadeBox; +0x0D0 and +0x0D8 on it are FadeBox's setStep and startFadeUp, the source being IntermediateBase::unk10 (the FrameClock). So: set the fade step (when nonzero), add the box as a child (when asked, so its 5/6 notifications reach ObjM__OnFadeNotify), start a fade up with the given channels. Tier A for the mechanics. Parameters named (channels, arg2, step, addChild).
+
+## Track 7 (2026-09-27, round 98, delta)
+
+The third parameter, `arg2`, is now `fadeMode` (here and in ObjM.h's
+prototype): it goes to FadeBox's startFadeUp and on to configure, which
+stores it in FadeBox::unk7C; FadeBox__Update does not step the colour
+while it is 9. Every caller passes 0. Tier B (mechanics). Zero bytes.

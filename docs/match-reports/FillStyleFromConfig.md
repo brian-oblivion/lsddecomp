@@ -92,3 +92,19 @@ Two things follow, and the second is the general one:
 ## Naming
 
 **FillStyleFromConfig** -- tier A. Pure field-fill: copies four bytes of `cfg` into the four fields of a `StyleM` (two directly as colour-table lookups, one as a `sStyleFogNears` table lookup, one as a plain sign-extended byte). No branching, deterministic, mechanics are the entire function -- tier A.
+
+## Track 7 (2026-09-27, round 98, delta)
+
+The local `struct StyleM` view (unkC/unk14/unk18/unk1C) is retired onto
+include/class_3bb8c.h's `StyleConfig`, whose clearColor/colorMode/
+farColor/fogNear are the same four words; `cfg` is a `StyleStageConfig`
+(four named bytes, not `s8 *` indexing). `D_8008730C` is
+`sStyleFogNears` (tools/rename.py), tier A: six fogNear distances, 26624
+down to 2048, indexed by the config's fog level, stored as
+StyleConfig::fogNear. Byte-exact on the first build.
+
+Moved from the source comment above the old struct: "FillStyleFromConfig's
+destination (D_80087424, via ApplyStyleConfig) is not an ObjM: it is the
+record ObjM keeps as `styleConfig`, which include/class_3bb8c.h views as
+StyleConfig. The two views stay separate here: the record is not a class,
+and merging them is a global's type (track 4b)." They are now one view.

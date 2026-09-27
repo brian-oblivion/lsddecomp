@@ -1,38 +1,39 @@
 /*
- * class_3bb8c_m -- seventh carved slice of the class_3bb8c block
- * (0x44518..0x44F14, vram 0x80053D18..0x80054714), 20 functions, ALL 20
- * MATCHED (0 INCLUDE_ASM, 0 NON_MATCHING). Carved round 15; all four former
- * toolchain-blocker functions matched round 23/44, once `addiu_at` and
- * `gp_rel` were resolved project-wide (CLAUDE.md, "Open toolchain
- * blockers"). This unit owns no switch jump table.
+ * class_3bb8c_m -- ObjM's methods from +0x0A0 to the end of its table
+ * (gObjMMethods, include/ObjM.h) and its getter, then the style layer's
+ * setup: the four free functions that pick the stage's scene style.
  *
- * ObjM's methods from +0x0A0 to the end of its table (gObjMMethods,
- * include/ObjM.h; track 4, round 89 unified the class_3bb8c_k/_l/_m views
- * there), and its getter: EnterState7/8/A and NotifyParentsCodeB (the
- * DreamSys codes 0xE..0x11, which set IntermediateBase::state and start a
- * fade), StartFadeUp (the viewport's FadeBox fade box), the fade box's
- * and the StageMap's notification handlers (OnFadeNotify: 5 fade down
- * done, 6 fade up done; OnStageMapNotify: 7 runs CheckAuxTrigger), and
- * the "Pause" overlay: AdvancePauseSetup builds the TextRow and, four
- * calls later, pauses the FrameClock, the WBgm and the VabStreamObj and
- * hides the viewport; TeardownPauseOverlay undoes it; the close-ready flag
- * and CloseAndNotifyC/D report 0xC/0xD to the parent (DayTask's
- * onObjMNotify). NoOpSlotBC is empty. What the state codes mean in the
- * game is not established.
+ * ObjM, in ROM order:
+ *  - EnterState7/8/A and NotifyParentsCodeB, the DreamSys link codes
+ *    ObjM__OnDreamSysNotify hands on (flashback, tunnel, stage timer,
+ *    teleport): each sets IntermediateBase::state (enum ObjMState) and
+ *    fades up through StartFadeUp, or notifies its parent at once.
+ *  - StartFadeUp: the viewport's fade box (a FadeBox), optionally added as
+ *    a child, fades up in the given channels.
+ *  - OnFadeNotify: fade down done returns ObjM to IDLE; fade up done sets
+ *    the viewport's clear colour to the fade's and notifies the state (a
+ *    stage-timer link turns into TIME_UP first). OnStageMapNotify runs
+ *    CheckAuxTrigger when a slot's data block is ready.
+ *  - The pause overlay: AdvancePauseSetup builds the "Pause" TextRow and,
+ *    four calls later, hides the viewport and pauses the FrameClock, the
+ *    WBgm and the VabStreamObj; TeardownPauseOverlay undoes it. While it is
+ *    up and ObjM is IDLE, the close-ready flag arms CloseAndNotifyC/D,
+ *    which tear it down and notify a close (DayTask ends the day).
+ *    NoOpSlotBC is empty.
  *
- * Then four free functions (RegisterStyleConfig / ApplyStyleConfig /
- * FillStyleFromConfig / ApplyStyleDecorationIfSet) that read and write a
- * small set of `.sdata`/`.sbss` style globals and fill a `StyleM`
- * colour/config descriptor (struct defined below, own comment). They are
- * not ObjM methods, but ObjM is their client: ObjM__InitStyleAndWorld
- * (class_3bb8c_l) calls RegisterStyleConfig and keeps its result as
- * ObjM::styleConfig, and the `sceneRefs` it passes, kept as
- * gStyleSceneRefs, points at ObjM's +0x06C block (StyleSceneRefs, below;
- * ApplyStyleDecorationIfSet attaches its BoxFill to that block's
- * viewport's fade box).
+ * The style setup is not ObjM's, but ObjM is its client:
+ * ObjM__InitStyleAndWorld (class_3bb8c_l) calls RegisterStyleConfig once
+ * per scene and keeps the result, sStyleConfig, as ObjM::styleConfig.
+ * RegisterStyleConfig stores the scene (grid, stage, ObjM's scene
+ * references, day) in the gStyle globals class_3bb8c_n reads;
+ * ApplyStyleConfig takes the stage's four-byte StyleStageConfig, or
+ * PickStyleFallbackConfig's, and FillStyleFromConfig turns it into
+ * StyleConfig colours and a fog distance. ApplyStyleDecorationIfSet builds
+ * the decoration box, a full-screen semi-transparent BoxFill under the
+ * viewport's fade box, when the config asked for one.
  *
- * include/class_3bb8c.h is SHARED with every other class_3bb8c_* slice.
- * Header edits must be strictly ADDITIVE.
+ * What the ObjM states and the style configs stand for in the game is not
+ * established; the names describe mechanics.
  */
 #include "common.h"
 #include <libgte.h>
@@ -91,8 +92,9 @@ void ObjM__NotifyParentsCodeB(ObjM *self) {
     self->methods->notifyParents(self, OBJM_NOTIFY_LINK_TELEPORT);
 }
 
-/* The viewport (IntermediateBase::viewport, a NodeGuardedViewport) hands out its fade
- * box (getFadeBox, Viewport's New_FadeBox). */
+/* The fade box is the viewport's (IntermediateBase::viewport, a
+ * NodeGuardedViewport: getFadeBox); IntermediateBase::unk10, the FrameClock,
+ * drives it. A zero step keeps the box's own. */
 void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 fadeMode, s32 step, s32 addChild) {
     FadeBox *fade = (FadeBox *)((NodeGuardedViewport *)self->viewport)
                         ->methods->getFadeBox((NodeGuardedViewport *)self->viewport);
@@ -180,9 +182,10 @@ void ObjM__CloseAndNotifyC(ObjM *self) {
     }
 }
 
-/* The pause: step 0 builds the "Pause" TextRow under the StageMap; the
- * fourth call after it hides the viewport and pauses the FrameClock, the
- * WBgm and the VabStreamObj (IntermediateBase::unk10, bgm, TimedTask::sound). */
+/* Called each update while the overlay is up. Step 0 builds the "Pause"
+ * TextRow under the StageMap; the fourth call after it hides the viewport
+ * and pauses the FrameClock, the WBgm and the VabStreamObj
+ * (IntermediateBase::unk10, bgm, TimedTask::sound). */
 void ObjM__AdvancePauseSetup(ObjM *self) {
     s32 step = self->pauseSetupStep;
     if (step == 0) {
@@ -223,7 +226,7 @@ extern s32 gStyleStage;
 extern s32 gStyleTickCount;
 extern s32 gStyleDay;
 extern s32 sStyleUnreadArg;
-extern s32 gStyleSceneRefs;
+extern s32 gStyleSceneRefs; /* a StyleSceneRefs * (below) */
 extern s32 gStyleVariant;
 extern void *gStyleCueSlots[2];
 
@@ -253,9 +256,10 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
     return 0;
 }
 
-/* A stage's style config: four signed bytes, from sStyleStageConfigs or
- * PickStyleFallbackConfig (class_3bb8c_n), which FillStyleFromConfig turns
- * into sStyleConfig's last four words. */
+/* A stage's style config: four signed bytes, from sStyleStageConfigs (NULL
+ * for a stage without a fixed one) or PickStyleFallbackConfig
+ * (class_3bb8c_n), which FillStyleFromConfig turns into sStyleConfig's last
+ * four words. */
 typedef struct StyleStageConfig {
     s8 colorMode; /* StyleConfig::colorMode */
     s8 fogLevel; /* sStyleFogNears index; STYLE_DECOR_FOG_LEVEL and up also build the decoration box */
@@ -264,7 +268,7 @@ typedef struct StyleStageConfig {
 } StyleStageConfig;
 
 /* The fog levels whose config also gets a decoration box (ApplyStyleConfig):
- * this one and denser, sStyleFogNears' last two (fogNear 4096 and 2048). */
+ * this one and up, sStyleFogNears' two nearest (fogNear 4096 and 2048). */
 #define STYLE_DECOR_FOG_LEVEL 4
 
 extern StyleConfig sStyleConfig;
@@ -275,7 +279,8 @@ extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColor;
 
 /* The stage's fixed config, or with none PickStyleFallbackConfig's, into
- * sStyleConfig. */
+ * sStyleConfig, whose first three words (the StageMap's light settings)
+ * are fixed. */
 void *ApplyStyleConfig(void) {
     StyleStageConfig *cfg = sStyleStageConfigs[gStyleStage];
 
@@ -302,14 +307,10 @@ void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg) {
     style->colorMode = cfg->colorMode;
 }
 
-/* gStyleDecorObj is a BoxFill (include/BoxFill.h), kept in an s32 global
- * (track 4b's to retype). */
-
 /* What gStyleSceneRefs points at: ObjM's +0x06C..+0x07B block
  * (ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
  * keeps it; include/ObjM.h). The same view as class_3bb8c_n.c's, field for
- * field; this unit reads only +0x00C, ObjM::cachedViewport, whose +0x0AC slot
- * is Viewport's getFadeBox. */
+ * field; this unit reads only the viewport. */
 typedef struct StyleSceneRefs {
     void *sound;        /* +0x000, ObjM::ctorSound */
     void *dreamerTmd;   /* +0x004, ObjM::dreamerTmd */
@@ -317,7 +318,7 @@ typedef struct StyleSceneRefs {
     Viewport *viewport; /* +0x00C, ObjM::cachedViewport */
 } StyleSceneRefs;
 
-extern s32 gStyleDecorObj;
+extern s32 gStyleDecorObj;           /* a BoxFill *; class_3bb8c_n.c declares it s32 too */
 extern s32 sStyleDecorBoxSize[2];    /* 320 x 240, the screen */
 extern BoxFillPos sStyleDecorBoxPos; /* (-100, -100), as Viewport's own fade box */
 
