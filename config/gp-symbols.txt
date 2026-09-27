@@ -8,7 +8,6 @@ D_8008A860
 D_8008A8CC
 D_8008A8E8
 D_8008A8F0
-D_8008A900
 D_8008A904
 D_8008A90C
 D_8008A924
@@ -136,6 +135,7 @@ gDefaultGridSpan
 gDefaultScreenDims
 gDefaultViewTwist
 gDefaultViewportColor
+gDefaultViewportHeight
 gDefaultViewportWidth
 gDivPolygon3
 gDivPolygon4
