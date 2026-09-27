@@ -40,7 +40,7 @@ TextEntry +0x034/+0x038 `childType2`/`childType5` -> `inputSource`/
 renamed in the definition). They are the children of class 2 and 5, which
 are Pad and FrameClock (`typeviews.py --tree`), and ItemList and TaskObjF
 already call the same pair `inputSource`/`tickSource`. The kind test reads
-`((BasicClass *)child)->methods->header & 0xF` and compares with
+`((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK` (main's define in include/BasicClass.h, added verbatim) and compares with
 `PAD_CLASS_ID`/`FRAMECLOCK_CLASS_ID` (new in include/Pad.h and
 include/FrameClock.h, TASKOBJF_CLASS_ID's form) instead of
 `**(s32 **)child`. Zero bytes changed.

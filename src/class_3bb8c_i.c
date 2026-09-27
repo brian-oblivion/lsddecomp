@@ -89,7 +89,7 @@ void TextEntry__AddChild(TextEntry *self, void *child) {
 
     if (child != NULL) {
         Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)child);
-        kind = ((BasicClass *)child)->methods->header & 0xF;
+        kind = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
         if (kind == PAD_CLASS_ID) {
             self->inputSource = child;
         } else if (kind == FRAMECLOCK_CLASS_ID) {
@@ -102,7 +102,7 @@ void TextEntry__RemoveChild(TextEntry *self, void *child) {
     s32 kind;
 
     if (child != NULL) {
-        kind = ((BasicClass *)child)->methods->header & 0xF;
+        kind = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
         if (kind == PAD_CLASS_ID) {
             self->inputSource = NULL;
         } else if (kind == FRAMECLOCK_CLASS_ID) {
@@ -124,7 +124,7 @@ void TextEntry__OnNotify(TextEntry *self, void *sender, s32 event) {
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
 
-    kind = ((BasicClass *)sender)->methods->header & 0xF;
+    kind = ((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK;
     if (kind == PAD_CLASS_ID) {
         self->methods->handleCommand(self, sender, event);
     } else if (kind == FRAMECLOCK_CLASS_ID) {
