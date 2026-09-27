@@ -116,3 +116,14 @@ Renamed `func_` -> `Obj86B60__CreateSlotElements`. **Tier B**: Builds `self->ite
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__CreateSlotElements (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+`SrcDesc` moved from `include/code_2cc8c.h` into `src/code_2cc8c_b.c` (only
+this function uses it). Its fields: `unk4` -> `savedCursor` (+0x004, the
+same word `SlotEntry::savedCursor` is: this function seeds the slot's item
+cursor from it and CommitElementScroll writes it back), `unk18` ->
+`itemNames` (+0x018, the NULL-terminated name list, one New_TextRow each).
+The header comment it carried called it "an unrelated source list
+descriptor"; it is the same TaskCoreTarget::unk24[] record `SlotEntry`
+reads (TitleMenu's `D_80086CA8`: +0x018 is `D_80086C9C`, two strings).

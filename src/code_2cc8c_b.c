@@ -34,17 +34,39 @@
  * pair for `self->target` (a TaskCoreTarget, include/TaskCore.h).
  */
 
-/* SlotEntry's +0x10/+0x14 word pair, read as ONE 8-byte struct. Retail
- * copies it with a whole-struct assignment (lw/lw into two fresh
- * temporaries, sw/sw, then a RELOAD of .y before adjusting it) -- see
- * docs/match-reports/TaskCore__CommitElementScroll.md, round 75. Local view: the shared
- * header still spells the pair as two s32 fields. */
+/* Psy-Q libc2's strlen, linked from Sony's object. */
+extern s32 strlen(char *s);
+
+/* New_BoxFill's size and colour for listView: (320, 240), (32, 32, 64). */
+extern s32 sListViewSize[2];
+extern BoxFillRgb sListViewColor;
+
+/* A screen position, x then y. */
 typedef struct {
     s32 x;
     s32 y;
 } SlotPos;
 
-#define SLOT_POS(target) (*(SlotPos *)&(target)->unk10)
+/* The item-list record TaskCoreTarget::unk24[slot] points to, for a slot
+ * that opens a scrolled list of items (TitleMenu's: D_80086CA8). */
+typedef struct SlotEntry {
+    u8 pad000[0x004];
+    s32 savedCursor;       /* +0x004 the committed item cursor */
+    SpriteRgb cursorColor; /* +0x008 the colour of the item under the cursor while scrolling */
+    u8 pad00B[0x010 - 0x00B];
+    /* +0x010 where the cursor's row is drawn; the list starts savedCursor rows
+     * above. MATCHING: a struct, so the copy is lw/lw, sw/sw, then a reload of
+     * .y (CommitElementScroll); two s32 fields compile differently. */
+    SlotPos pos;
+} SlotEntry;
+
+/* The same record as createSlotElements reads it. */
+typedef struct SrcDesc {
+    u8 pad000[0x004];
+    s32 savedCursor; /* +0x004 the item cursor the list opens at */
+    u8 pad008[0x018 - 0x008];
+    char **itemNames; /* +0x018 NULL-terminated; one New_TextRow per name */
+} SrcDesc;
 
 s32 TaskCore__TickFadeColor(TaskCore *self) {
     s32 c = 0x80 - (self->frameCounter * self->fadeRate);
@@ -125,7 +147,7 @@ void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *a1) {
         } while (*list != NULL);
     }
 
-    self->listView = New_BoxFill(sListViewSize, sListViewColor, 0);
+    self->listView = New_BoxFill(sListViewSize, &sListViewColor, 0);
     a1->handle = (BasicClass *)handle;
 }
 
@@ -293,7 +315,7 @@ void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *a2) {
     s32 count;
     TextRow **buf;
 
-    list = ((SrcDesc *)desc)->unk18;
+    list = ((SrcDesc *)desc)->itemNames;
     idx = self->activeSlot;
     count = 0;
     while (*list++ != NULL) {
@@ -301,10 +323,10 @@ void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *a2) {
     }
     buf = BMemPMgrAlloc(count * 4);
     self->itemLists[idx] = (void *)buf;
-    self->slotCounts[idx] = ((SrcDesc *)desc)->unk4;
+    self->slotCounts[idx] = ((SrcDesc *)desc)->savedCursor;
     self->itemCounts[idx] = count;
 
-    list = ((SrcDesc *)desc)->unk18;
+    list = ((SrcDesc *)desc)->itemNames;
     if (*list != NULL) {
         do {
             s32 len = strlen(*list);
@@ -343,7 +365,7 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *a1, s32 a2) {
         arr++;
     }
 
-    pos = SLOT_POS((SlotEntry *)self->target->unk24[idx]);
+    pos = ((SlotEntry *)self->target->unk24[idx])->pos;
     pos.y -= counter * 10;
 
     if (a2 != 0) {
@@ -386,7 +408,7 @@ void TaskCore__BroadcastToSlotElements(TaskCore *self, void *a1) {
 void TaskCore__BeginElementScroll(TaskCore *self) {
     s32 idx;
     TextRow *elem;
-    u8 *buf;
+    SpriteRgb *cursorColor;
 
     if (self->inputMode != 1) {
         return;
@@ -394,8 +416,8 @@ void TaskCore__BeginElementScroll(TaskCore *self) {
     idx = self->activeSlot;
     self->methods->refreshSlotView(self, self->unk14, 1);
     elem = ((TextRow **)self->itemLists[idx])[self->slotCounts[idx]];
-    buf = (u8 *)self->target->unk24[idx] + 8;
-    elem->methods->setColor(elem, (SpriteRgb *)buf);
+    cursorColor = &((SlotEntry *)self->target->unk24[idx])->cursorColor;
+    elem->methods->setColor(elem, cursorColor);
     self->inputMode = 2;
     self->methods->setState(self, 14);
 }
@@ -413,7 +435,7 @@ void TaskCore__CommitElementScroll(TaskCore *self) {
     }
     idx = self->activeSlot;
     counter = self->slotCounts[idx];
-    pos = SLOT_POS((SlotEntry *)self->target->unk24[idx]);
+    pos = ((SlotEntry *)self->target->unk24[idx])->pos;
     pos.y -= counter * 10;
 
     arr = (TextRow **)self->itemLists[idx];
@@ -457,7 +479,7 @@ void TaskCore__CancelElementScroll(TaskCore *self) {
     arr = (TextRow **)self->itemLists[idx];
     elem1 = arr[counter];
     elem1->methods->setColor(elem1, (SpriteRgb *)self->target->unselectedColor);
-    newVal = ((s32 *)self->target->unk24[idx])[1];
+    newVal = ((SlotEntry *)self->target->unk24[idx])->savedCursor;
     self->slotCounts[idx] = newVal;
     elem2 = arr[newVal];
     elem2->methods->setDisplay(elem2, 1);
@@ -493,7 +515,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 a1, void *a2) {
     TextRow **arr;
     TextRow *elem1;
     TextRow *elem2;
-    u8 *buf;
+    SpriteRgb *cursorColor;
 
     idx = self->activeSlot;
     counter = self->slotCounts[idx];
@@ -501,8 +523,8 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 a1, void *a2) {
     elem1 = arr[counter];
     elem2 = arr[a1];
     elem1->methods->setColor(elem1, (SpriteRgb *)self->target->unselectedColor);
-    buf = (u8 *)self->target->unk24[idx] + 8;
-    elem2->methods->setColor(elem2, (SpriteRgb *)buf);
+    cursorColor = &((SlotEntry *)self->target->unk24[idx])->cursorColor;
+    elem2->methods->setColor(elem2, cursorColor);
     self->slotCounts[idx] = a1;
     if (a2 != NULL) {
         self->methods->playSound(self, 0);

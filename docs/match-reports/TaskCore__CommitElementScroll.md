@@ -667,3 +667,24 @@ Renamed from Obj86B60__CommitElementScroll (tools/rename.py): the class prefix. 
 ## Track 4 (2026-09-25, round 85, charlie)
 
 listView is a BoxFill (include/BoxFill.h); the `Unk68Obj` slot50 call is detachFromParent. Zero bytes.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+`SlotEntry` and `SrcDesc` moved out of `include/code_2cc8c.h` into
+`src/code_2cc8c_b.c` (only this unit uses them). `SlotEntry`'s `unk10`/`unk14`
+pair is now a `SlotPos pos` field, so the `SLOT_POS()` macro and its
+`*(SlotPos *)&target->unk10` cast are gone; the source still reads
+`pos = entry->pos;`, the same whole-struct copy round 75 found, byte-exact.
+The field carries one `MATCHING:` line saying so.
+
+History that lived in the header's comments on `SlotEntry` (moved here, not
+deleted): it was derived in round 12 from this function and
+`TaskCore__RefreshSlotView`, cross-checked against
+`TaskCore__CancelElementScroll`'s `((s32 *)self->unk4C->unk24[idx])[1]` read
+at the same +0x004; round 78 renamed it from `Unk24Elem` and `unk4` to
+`savedCursor` (tier B). Round 12 left the `(u8 *)...unk24[idx] + 8` buffer in
+BeginElementScroll/SetSlotCursor as a raw cast; round 98 names it
+`cursorColor` (+0x008, a `SpriteRgb`), and CancelElementScroll's `[1]` read is
+now `->savedCursor`. Retail data for the one record the game has,
+TitleMenu's `D_80086CA8`: savedCursor 0, cursorColor (128, 128, 0), pos
+(53, 57), item names `D_80086C9C` (two strings).
