@@ -73,18 +73,17 @@
  * tone table, 16 VagAtr per program, indexed prog * 16 + tone. */
 extern VagAtr *D_8008E978;
 
-/* Base pointer for a table of 0x10-byte entries, indexed by a 0..0x17
- * id.  Only the two leading s16 fields this unit's own accessors touch
- * are named. */
-typedef struct EntryDAD4 {
-    s16 unk0; /* +0x0 */
-    s16 unk2; /* +0x2 */
-    s16 unk4; /* +0x4 -- read by SsUtKeyOff, entry index 25 only */
-    s16 unk6; /* +0x6 -- read by SsUtKeyOff, entry index 25 only */
-    u8 pad8[0x10 - 0x8];
-} EntryDAD4;
+/* Holds the base of the SPU register block, 0x1F801C00, indexed in
+ * halfwords as code_179d8_p.c's SsUtAllKeyOff indexes it.
+ * MATCHING: not volatile here; volatile moves SsUtKeyOff's second store out
+ * of its branch delay slot. */
+extern u16 *D_8006DAD4;
 
-extern EntryDAD4 *D_8006DAD4;
+/* The SPU's noise-mode enable register pair (NON, 0x1F801D94/0x1F801D96:
+ * one bit per voice, voices 0-15 then 16-23), as halfword indices from
+ * that base. */
+#define SPU_NOISE_ON_LO (0x194 / 2)
+#define SPU_NOISE_ON_HI (0x196 / 2)
 
 /* Reentrancy lock, same identifier/type as the sibling reading in
  * Sony's `SsSeqCalledTbyT` (`libsnd/sscall`, linked since round 34; it was
@@ -374,8 +373,8 @@ s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
     if (_svm_voice[idx].unk00 == 0xFF) {
         _svm_voice[(u8)idx].unk1B = 0;
         _svm_voice[(u8)idx].unk04 = 0;
-        D_8006DAD4[25].unk4 = 0;
-        D_8006DAD4[25].unk6 = 0;
+        D_8006DAD4[SPU_NOISE_ON_LO] = 0;
+        D_8006DAD4[SPU_NOISE_ON_HI] = 0;
     } else {
         D_8008EA26 = idx;
         chan = D_8008EA26;
