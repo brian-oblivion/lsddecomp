@@ -36,9 +36,9 @@ typedef struct TypedBox_fa50 {
 
 /* The eight corners of a box as two faces of four (TmdHull's v[0..3] and
  * v[4..7]: the min-z face, then the max-z face). */
-typedef struct Corners_fa50 {
+typedef struct BoxCorners {
     TmdVec3 face[2][4];
-} Corners_fa50;
+} BoxCorners;
 
 /* A segment: start and direction (end - start). */
 typedef struct Ray_fa50 {
@@ -195,12 +195,12 @@ void TmdModel__GetHull(TmdModel *self, TmdHull *out) {
 }
 
 void RotateAndOffsetHullList(TmdHull *h, s32 turn, s32 back, s32 delta) {
-    Corners_fa50 tmp;
-    Corners_fa50 *c;
+    BoxCorners tmp;
+    BoxCorners *c;
     s32 i;
 
     for (i = 0; i < h->count; i++) {
-        c = &((Corners_fa50 *)h->v)[i]; /* v[] as count boxes of eight corners */
+        c = &((BoxCorners *)h->v)[i]; /* v[] as count boxes of eight corners */
         if (turn != 0) {
             tmp = *c;
             c->face[0][3] = tmp.face[0][0];
