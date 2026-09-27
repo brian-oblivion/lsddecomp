@@ -31,7 +31,7 @@ typedef struct SubObjE SubObjE;
 
 typedef struct SubObjEMethods {
     u8 pad00[0x7C];
-    struct ViewportSize *(*slot7C)(SubObjE *self, s32 arg1);
+    struct ViewportSize *(*getDims)(SubObjE *self, s32 out); /* DrawSystem__GetDims; its out is NULL here */
 } SubObjEMethods;
 
 struct SubObjE {

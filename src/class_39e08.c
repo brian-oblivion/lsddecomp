@@ -56,7 +56,7 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     self->dreamSys = dreamSys;
     self->methods->addChild(self, (BasicClass *)dreamSys);
     dreamSys->methods->setSoundObj(dreamSys, (s32)self->sound);
-    dreamSys->methods->slot114(dreamSys, (s32)self->etcTim);
+    dreamSys->methods->setEtcTim(dreamSys, (s32)self->etcTim);
     self->methods->resetCounters(self);
 }
 
@@ -120,7 +120,7 @@ void DayTask__OnInit(DayTask *self) {
 
     obj = (SubObjE *)self->initArgs->drawSystem;
     vp = (Viewport *)self->viewport;
-    size = obj->methods->slot7C(obj, 0);
+    size = obj->methods->getDims(obj, 0);
     vp->methods->setScreenSize(vp, size);
     ret = vp->methods->getFadeBox(vp);
     ret->methods->setDisplay(ret, 1);
