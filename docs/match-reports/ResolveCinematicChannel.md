@@ -12,7 +12,7 @@ Takes a 4-byte struct of two s16 BY VALUE in `$a1` (retail spills `$a1` to
 its home slot 0x24(sp) and reads the halves back with `lh 0x24` / `lh 0x26`).
 Non-negative `group`: `rec = GetCinematicBank(&count, group)`, writes
 `sub + count` if `(u16)sub < 2` else -1, returns `&rec[sub]`. Negative
-`group`: tail to `GetStreamPool3Channel(countOut, sub)`.
+`group`: tail to `GetEventMovie(countOut, sub)`.
 
 ## Source
 
@@ -34,13 +34,13 @@ Rec1C *ResolveCinematicChannel(s32 *countOut, RecPick pick) {
         }
         return &rec[pick.sub];
     }
-    return GetStreamPool3Channel(countOut, pick.sub);
+    return GetEventMovie(countOut, pick.sub);
 }
 ```
 
 ## Levers (3 builds)
 
-1. `if (group < 0) return GetStreamPool3Channel(...);` first: blocks inverted (retail
+1. `if (group < 0) return GetEventMovie(...);` first: blocks inverted (retail
    branches `bltz` to the tail call at the end), 6/37.
 2. Positive case first: 32/37, `$v0`/`$v1` swapped in the `sub + count` /
    `-1` value.

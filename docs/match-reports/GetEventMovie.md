@@ -1,4 +1,6 @@
-# GetStreamPool3Channel -- MATCHED (24/24 words)
+# GetEventMovie -- MATCHED (24/24 words)
+
+> Renamed from `GetStreamPool3Channel` on 2026-09-27 (tools/rename.py). Address 0x80049270.
 
 > Renamed from `func_80049270` on 2026-09-25 (tools/rename.py). Address 0x80049270.
 
@@ -17,7 +19,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
+Rec1C *GetEventMovie(s32 *countOut, s32 sub) {
     s32 count;
     Rec1C *rec = GetEventMovieRecords(&count);
     if (countOut != NULL) {
@@ -42,6 +44,6 @@ Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
 
 ## Naming
 
-- **Name:** `GetStreamPool3Channel`
+- **Name:** `GetEventMovie`
 - **Tier:** B
 - **Evidence:** pure getter: index into GetEventMovieRecords(); no cross-unit caller found (only reached internally via ResolveCinematicChannel's negative-group fallback).

@@ -309,7 +309,7 @@ Rec1C *GetEventMovieRecords(s32 *countOut) {
     return &((Rec1C *)GetRecordTable(NULL))[0x238];
 }
 
-Rec1C *GetStreamPool3Channel(s32 *countOut, s32 sub) {
+Rec1C *GetEventMovie(s32 *countOut, s32 sub) {
     s32 count;
     Rec1C *rec = GetEventMovieRecords(&count);
     if (countOut != NULL) {
@@ -342,7 +342,7 @@ Rec1C *ResolveCinematicChannel(s32 *countOut, RecPick pick) {
         }
         return &rec[pick.sub];
     }
-    return GetStreamPool3Channel(countOut, pick.sub);
+    return GetEventMovie(countOut, pick.sub);
 }
 
 s32 GetStreamGroupForType(s32 index) {

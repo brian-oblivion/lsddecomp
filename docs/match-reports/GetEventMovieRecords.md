@@ -41,4 +41,4 @@ Rec1C *GetEventMovieRecords(s32 *countOut) {
 
 - **Name:** `GetEventMovieRecords`
 - **Tier:** B
-- **Evidence:** pure getter: &gRecordTable[0x238], count 8; no cross-unit caller found for it or GetStreamPool3Channel, named for the mechanics it has.
+- **Evidence:** pure getter: &gRecordTable[0x238], count 8; no cross-unit caller found for it or GetEventMovie, named for the mechanics it has.
