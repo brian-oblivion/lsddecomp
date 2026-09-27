@@ -2,7 +2,7 @@
 
 > Renamed from `VabStreamObj__func_2cbe4` on 2026-09-26 (tools/rename.py). Address 0x8002cbe4.
 
-Unit: `code_179d8_e`. Report written round 52 (naming pass) -- no report
+Unit: `code_179d8_d`. Report written round 52 (naming pass) -- no report
 before; matched (empty `void` body, `jr $ra; nop`) as part of the unit's
 original round-17 pass, renamed this round from `func_8002CBE4`. See
 `VabStreamObj__NoOpSlot90.md` for the shared context.

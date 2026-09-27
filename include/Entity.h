@@ -304,7 +304,7 @@ extern Ratio16 SCALE_THIRTY_SECOND[];
 extern Ratio16 SCALE_X3[];
 
 /* Functions of other units Entity calls directly. The SoundCueSet functions
- * are defined in code_179d8_e/l as (VabStreamObj *, SoundCueSet *); these
+ * are defined in code_179d8_d/l as (VabStreamObj *, SoundCueSet *); these
  * declarations take TodActor's `arg2` untyped, and their results are
  * unused. */
 extern void *BMemPMgrAlloc(s32 size);

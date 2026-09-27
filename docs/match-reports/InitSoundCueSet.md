@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002CC34` on 2026-09-18 (tools/rename.py). Address 0x8002cc34.
 
-Unit: `code_179d8_e`. Runner: echo, round 17.
+Unit: `code_179d8_d`. Runner: echo, round 17.
 
 ## Result
 
@@ -118,7 +118,7 @@ a name beyond "some default/config word").
 ## Track 6 (2026-09-26, round 92, alpha): one SoundCueSet
 
 `include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
-`SoundCueSlot`. It replaced three views: code_179d8_e.c's (named
+`SoundCueSlot`. It replaced three views: code_179d8_d.c's (named
 `tag`/`owner`/`callback`/`slots[].index` only), code_179d8_l.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
 include/Entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the

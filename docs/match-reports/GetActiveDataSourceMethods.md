@@ -36,7 +36,7 @@ inverted-condition idiom GCC sometimes uses) -- confirmed by matching, first
 try, with the straightforward `if`/`else` written in source order.
 
 `GetVabDriverMethods` is confirmed elsewhere in the repo
-(`src/code_179d8_e.c`: `TableD9BC *GetVabDriverMethods(void) { return &gVabDriverMethods; }`)
+(`src/code_179d8_d.c`: `TableD9BC *GetVabDriverMethods(void) { return &gVabDriverMethods; }`)
 to return a pointer, not void -- direct positive evidence this whole function
 is non-void per CLAUDE.md's tail-call caution. `GetCdDriverMethods` is still
 uncarved (`asm/code_179d8.s`) but is declared elsewhere in the repo
@@ -71,7 +71,7 @@ in this unit share this exact shape --  `GetActiveDataSourceMethods` (mode `0x23
 Per CLAUDE.md's caution, a byte match here proves nothing about void-ness on
 its own, but `GetVabUseVSyncCallback` (the `GetActiveDataSourceUseVSyncCallback` else-arm) is independently
 confirmed non-void (`s32 GetVabUseVSyncCallback(void) { return 0; }` in
-`code_179d8_e.c`), so treating all three as `s32`/`void *`-returning tail
+`code_179d8_d.c`), so treating all three as `s32`/`void *`-returning tail
 calls is not a guess -- it is the only reading consistent with a callee whose
 real return type is already known.
 

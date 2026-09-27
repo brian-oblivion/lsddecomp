@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002C824` on 2026-09-18 (tools/rename.py). Address 0x8002c824.
 
-Unit: `code_179d8_e`. Runner: echo, round 17.
+Unit: `code_179d8_d`. Runner: echo, round 17.
 
 ## Result
 

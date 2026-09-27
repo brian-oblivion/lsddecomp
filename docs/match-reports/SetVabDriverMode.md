@@ -6,7 +6,7 @@
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- two stores to `gVabDriverMode`/`gVabDriverModeArg` and `return 1`. The C is in `src/code_179d8_e.c`. Everything below is the
+> the live tests -- two stores to `gVabDriverMode`/`gVabDriverModeArg` and `return 1`. The C is in `src/code_179d8_d.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
@@ -20,12 +20,12 @@
 
 # SetVabDriverMode -- STALL (gp-relative blocker, not attempted)
 
-Unit `code_179d8_e`, carved round 17 (2026-09-04). **Not attempted.**
+Unit `code_179d8_d`, carved round 17 (2026-09-04). **Not attempted.**
 
 ## Classification
 
 ```sh
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_e/SetVabDriverMode.s
+grep -n 'gp_rel' asm/nonmatchings/code_179d8_d/SetVabDriverMode.s
 ```
 
 Hit:

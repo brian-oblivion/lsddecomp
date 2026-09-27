@@ -7,7 +7,7 @@
 ## What it does
 
 Lazily-flavoured "start" call: initializes a slot table via `InitSoundCueSet`
-(matched in `code_179d8_e.c`), passing that unit's own `this->unk58`, the
+(matched in `code_179d8_d.c`), passing that unit's own `this->unk58`, the
 address of `this->unk9C` as the object to init, `this->moodIndex + 1` as
 `arg2`, `this` itself as `arg3`, and the current mood row's dispatch-handler
 function pointer (`gEntityMoodHandlerTable[this->moodIndex].handler`, first word of the
@@ -39,7 +39,7 @@ Byte-exact on the first attempt, whole-image build verified.
 
 ## Notes
 
-`InitSoundCueSet`'s own match report (in `code_179d8_e.c`) already established
+`InitSoundCueSet`'s own match report (in `code_179d8_d.c`) already established
 its real signature; DreamSys.c's own extern (`InitSoundCueSet(s32, void *,
 s32, DreamSys *, void *)`) is the same function called with a different
 unit's own local `arg3` type -- per project convention, this file's own
@@ -77,7 +77,7 @@ shape.
 ## Naming
 
 **Tier B.** Renamed from `func_8005DAFC` this round (tools/rename.py).
-Calls the already-matched, already-named `InitSoundCueSet` (code_179d8_e.c)
+Calls the already-matched, already-named `InitSoundCueSet` (code_179d8_d.c)
 on the `(this->soundCueChannel, &this->soundCueSet)` pair (both renamed
 this round), then two self-only slot calls, then resets `this->unkFC` and
 sets `this->unkF8 = 1`. Pairs with `Entity__StopSoundCue`.
@@ -111,4 +111,4 @@ symbols, own lui/addiu) ... not sub-fields of the gEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.
 
-- Step 2: the local EntityMoodHandlerRow view (a handler word padded to 16 bytes, over gEntityMoodHandlerTable) is deleted: the handler is EntityMoodRow::handler (+0x0C, SoundCueCallbackFn). The local InitSoundCueSet extern now spells code_179d8_e.c's definition (VabStreamObj *, SoundCueSet *, SoundCueCallbackFn, s32 return); byte-identical.
+- Step 2: the local EntityMoodHandlerRow view (a handler word padded to 16 bytes, over gEntityMoodHandlerTable) is deleted: the handler is EntityMoodRow::handler (+0x0C, SoundCueCallbackFn). The local InitSoundCueSet extern now spells code_179d8_d.c's definition (VabStreamObj *, SoundCueSet *, SoundCueCallbackFn, s32 return); byte-identical.

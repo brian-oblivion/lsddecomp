@@ -27,9 +27,9 @@ bytes, not a claim about the original source's intent.
 ## Naming (round 77, charlie -- track 3, no rename)
 
 `tools/classtable.py 0x8006D9BC` confirms this is the `+0x040` slot of
-`gVabDriverMethods` (29-slot FileResource-derived table, `code_179d8_e.c`,
+`gVabDriverMethods` (29-slot FileResource-derived table, `code_179d8_d.c`,
 the SPU/VAB driver base class) -- physically carved into code_179d8_d.c by
-ROM address, semantically owned by that other unit. `code_179d8_e.c`'s own
+ROM address, semantically owned by that other unit. `code_179d8_d.c`'s own
 `VabDriverMethods` struct comment leaves this and its four siblings
 (`VabDriver__Open`/`VabDriver__Close`/`VabDriver__Seek`/`VabDriver__NoOpSlot50`) entirely opaque -- `u8 pad000[0x054]`
 covers +0x000..+0x054 with no per-slot field even at the struct level, and

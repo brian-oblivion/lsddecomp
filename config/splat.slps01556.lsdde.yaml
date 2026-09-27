@@ -802,7 +802,6 @@ segments:
       # are 2-instruction `jr $ra; nop` leaves splat generates itself, so
       # the real queue is ~11 bodies.  Owns NO switch jump table (zero
       # `jtbl_` references in the slice), so no rodata attach.
-      - [0x1CC08, c, code_179d8_e]
       # code_179d8_l: FRONT half of what was the `code_179d8_mid_c`
       # remainder -- functions 149..160 of the original,
       # 0x1D508..0x1ECD8 (12 functions, func_8002CD08 .. func_8002E308).

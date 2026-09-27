@@ -17,7 +17,7 @@ void VabDriver__Open(void)
 ## Naming (round 77, charlie -- track 3, no rename)
 
 Same finding as `VabDriver__NoOpSlot40`'s report: `+0x044` slot of
-`gVabDriverMethods` (code_179d8_e.c), left opaque even at that unit's own
+`gVabDriverMethods` (code_179d8_d.c), left opaque even at that unit's own
 struct-comment level. Kept `func_`, not renamed.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `func_8002C3E0` -> `VabDriver__Open`

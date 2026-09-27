@@ -29,7 +29,7 @@
 #include "SoundCueSet.h"
 
 /* Tones per VAB program: playTone's index is program * 16 + tone
- * (token-identical to code_179d8_e.c's, which owns PlayTone). */
+ * (token-identical to code_179d8_d.c's, which owns PlayTone). */
 #define VAB_TONES_PER_PROG 16
 
 /*

@@ -806,7 +806,6 @@
         "code_1677c": "2026-09-24",
         "code_171e0": "2026-09-18",
         "code_179d8_d": "2026-09-24",
-        "code_179d8_e": "2026-09-18",
         "code_179d8_h": "2026-09-21",
         "code_179d8_j": "2026-09-25",
         "code_179d8_l": "2026-09-24",
@@ -1297,7 +1296,7 @@
       },
       "flagged": {
         "DrawNode": "ViewportDraw's local view of the scene node Viewport.h's drawNode slot types as SceneNode * (echo, round 94) (2026-09-26)",
-        "EntityMoodHandlerArg": "it is SoundCueSet (Entity.h's own comment; code_179d8_e.c and code_179d8_l.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)",
+        "EntityMoodHandlerArg": "it is SoundCueSet (Entity.h's own comment; code_179d8_d.c and code_179d8_l.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)",
         "S16Quad_d294": "IS Sony's SVECTOR by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
         "SceneNodeSub14": "IS Sony's GsCOORDINATE2 by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
         "SceneNodeSub44": "IS Sony's GsCOORD2PARAM by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)"
@@ -1544,7 +1543,6 @@
         "class_3bb8c_t": "2026-09-27",
         "code_171e0": "2026-09-27",
         "code_179d8_d": "2026-09-27",
-        "code_179d8_e": "2026-09-27",
         "code_179d8_h": "2026-09-27",
         "code_179d8_l": "2026-09-27",
         "code_179d8_s": "2026-09-27",

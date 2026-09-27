@@ -7,7 +7,7 @@
  * functions that operate on it are free functions taking the sound object
  * (a VabStreamObj, include/VabStreamObj.h) first.
  *
- *  - InitSoundCueSet (code_179d8_e.c) starts the cue, unless one is already
+ *  - InitSoundCueSet (code_179d8_d.c) starts the cue, unless one is already
  *    running (tag != 0): it stores the owner's tag, owner and callback,
  *    frees every slot's voice (-1), zeroes the tick and sets
  *    attenuationSteps to 10. Returns 1 when it started the cue.
@@ -20,7 +20,7 @@
  *    each volume reduced by (vol / attenuationSteps) * attenuation, keeping
  *    the returned voice; program -2 stops the slot's voice instead. Last it
  *    advances tick.
- *  - FlushSoundCueSet (code_179d8_e.c) stops every slot's voice and clears
+ *  - FlushSoundCueSet (code_179d8_d.c) stops every slot's voice and clears
  *    tag, so the set may be started again.
  *
  * The callback therefore writes a slot's program (and optionally octave

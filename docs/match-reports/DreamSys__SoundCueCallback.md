@@ -289,7 +289,7 @@ Renamed from `func_8005A1F4`.
 Named for where its ADDRESS goes, which is the only thing that
 identifies it: `DreamSys__SelectCallback98`'s mode-2 case passes
 `this->vt->DreamSys__SoundCueCallback` as `InitSoundCueSet`'s fifth argument, and
-that function (src/code_179d8_e.c, matched) stores it in `SoundCueSet::callback`.
+that function (src/code_179d8_d.c, matched) stores it in `SoundCueSet::callback`.
 Nothing in any carved unit calls it, so its own parameter struct stays local and
 opaque: the body only picks one of two field pairs to write 9 and -1 into,
 depending on whether `arg1->value` is a multiple of 20.

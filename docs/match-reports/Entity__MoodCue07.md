@@ -112,7 +112,7 @@ Reading the body with the proposed `SoundCueSet` field names: `unk4` = tick (0 o
 
 ## Proposed field names
 
-`EntityMoodHandlerArg` is Entity.h's local view of `SoundCueSet` (src/code_179d8_e.c). `ServiceSoundCueSet` hands the set itself to the callback, and every offset below lines up with that struct. Evidence comes from `ServiceSoundCueSet`'s body (asm/nonmatchings/code_179d8_l/ServiceSoundCueSet.s). Each tick it writes -1/0/0x7F/0x40 into each voice slot's +0x4/+0x8/+0xC/+0x10 (stride 0x14 from +0x18) and zeroes set+0x10. Then it calls the callback. If set+0x10 >= 0, for each slot whose request is >= 0 it stops the old voice (channel vt+0x84, `VabStreamObj__StopVoice`), calls `VabStreamObj__SetPitchOffset` (vt+0x9C) with slot+0x8, and plays `VabStreamObj__PlayTone` (vt+0x80) with `request << 4` and two volumes, each reduced by `vol / set->unk14(=10) * set+0x10`. A request of -2 stops the voice. Finally it increments set+0x4. The compiler lists accessors of every one of these fields in Entity_b through Entity_g, so they are proposals only:
+`EntityMoodHandlerArg` is Entity.h's local view of `SoundCueSet` (src/code_179d8_d.c). `ServiceSoundCueSet` hands the set itself to the callback, and every offset below lines up with that struct. Evidence comes from `ServiceSoundCueSet`'s body (asm/nonmatchings/code_179d8_l/ServiceSoundCueSet.s). Each tick it writes -1/0/0x7F/0x40 into each voice slot's +0x4/+0x8/+0xC/+0x10 (stride 0x14 from +0x18) and zeroes set+0x10. Then it calls the callback. If set+0x10 >= 0, for each slot whose request is >= 0 it stops the old voice (channel vt+0x84, `VabStreamObj__StopVoice`), calls `VabStreamObj__SetPitchOffset` (vt+0x9C) with slot+0x8, and plays `VabStreamObj__PlayTone` (vt+0x80) with `request << 4` and two volumes, each reduced by `vol / set->unk14(=10) * set+0x10`. A request of -2 stops the voice. Finally it increments set+0x4. The compiler lists accessors of every one of these fields in Entity_b through Entity_g, so they are proposals only:
 
 | field | proposed | tier | evidence |
 | --- | --- | --- | --- |
@@ -130,7 +130,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Track 6 (2026-09-26, round 92, alpha): one SoundCueSet
 
 `include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
-`SoundCueSlot`. It replaced three views: code_179d8_e.c's (named
+`SoundCueSlot`. It replaced three views: code_179d8_d.c's (named
 `tag`/`owner`/`callback`/`slots[].index` only), code_179d8_l.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
 include/Entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
