@@ -48,3 +48,16 @@ extern FileResourceMethods gTimImageMethods;
   cross-unit caller reaches this slot directly (`TimImage` is always seen as
   an opaque handle typed per call site elsewhere in the project), so what
   the flag gates is unestablished -- `Class__func_xxxxx`.
+
+## Naming (track 7, round 100, delta)
+
+Renamed `TimImage__func_8003B5E4` -> `TimImage__SetFlag48` with `tools/rename.py`
+(the tier-C line above predates it). **Tier A**: a pure leaf setter,
+`self->flag48 = 1` (`ori $v0,$zero,1; jr $ra; sw $v0,0x48($a0)`), named as
+`FrameClock__SetFlag14` is for the same shape. The field +0x048 is renamed
+`unk48` -> `flag48` and the table slot +0x098 `slot98` -> `setFlag48` in
+`include/TimImage.h`; the compiler's accessor set for both was this unit only
+(the ctor, which clears it, and this setter). No reader of TimImage +0x048 is
+found in `src/` (the eleven TimImage.h includers and GraphicsResources.c's
+TimArraySrc, which builds TimImages), and no C calls +0x098, so what the flag
+gates is not established: the field name says only that it is a flag.

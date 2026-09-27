@@ -1,33 +1,19 @@
 /*
- * code_2bb9c -- GAME code carved from psyq_2bb9c on 2026-09-25 (FINISHING-PLAN
- * revision 18). 0x2BB9C..0x2BF70 (vram 0x8003B39C..0x8003B770). It was counted
- * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
- * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint).
+ * TimImage: the game's TIM-image loader, a FileResource data source (class id
+ * 0x103, table gTimImageMethods, include/TimImage.h), plus one free VRAM
+ * helper.
  *
- * What it holds: TimImage, a FileResource (data-source) subclass -- 12 of its
- * own methods (table `gTimImageMethods`, id 0x103), plus the class's own
- * alloc-then-ctor helper (`New_TimImage`, "new TimImage(name)") and table
- * getter (`GetTimImageMethods`). Every call site project-wide that reaches
- * TimImage does so by building "CARD\\<name>.TIM" or another `.TIM` path and
- * handing it to `New_TimImage`, then calling the returned handle's slot78
- * (`TimImage__Upload`) and usually slot5C (`FileResource__FreeBuffer`) --
- * TimImage is the game's TIM-image loader: `buffer` (inherited from
- * FileResource) holds the raw file, `TimImage__GetTimInfo` describes it with
- * Sony's `GsGetTimInfo`, and `TimImage__Upload` uploads the pixel block and,
- * when present, the CLUT to the draw singleton (DrawSystem, `include/DrawSystem.h`)
- * through its loadImage slot.
+ * Every caller builds a ".TIM" path and hands it to New_TimImage (the ctor
+ * requests the file into `buffer`), then calls the handle's upload slot
+ * (TimImage__Upload, +0x078) and usually FileResource__FreeBuffer (+0x05C).
+ * TimImage__GetTimInfo describes the file with Sony's GsGetTimInfo; Upload
+ * sends its pixel block and, when the TIM carries one, its CLUT to the draw
+ * singleton (include/DrawSystem.h) through the loadImage slot. The slots at
+ * +0x07C..+0x094 are empty, and +0x098 only sets flag48, which no code reads.
  *
- * Also holds `RotateVramRectRight`, not a TimImage method (`classtable.py
- * D_8006E558` lists it nowhere): a free function that circularly scrolls a
- * VRAM rectangle right by one column at a time through the draw singleton's
- * `moveImage` slot, called from `class_3bb8c_n.c`'s `StyleScrollVramStrips`.
- *
- * Fully matched in round 81 (runner echo). Naming pass round 81 (runner
- * bravo): every function and the class table named; see each function's
- * report `## Naming` for tier and evidence. `RotateVramRectRight` kept its
- * `func_` name (proposed `ScrollImageRight`, recorded in its report);
- * `New_TimImage` was renamed in track 4 (round 88).
+ * RotateVramRectRight is not a TimImage method (no method table lists it): it
+ * circularly scrolls a VRAM rectangle right, one column at a time, through the
+ * draw singleton's moveImage slot, for class_3bb8c_n.c's StyleScrollVramStrips.
  */
 #include "common.h"
 #include <libgte.h>
@@ -100,34 +86,33 @@ void TimImage__Upload(TimImage *self) {
     }
 }
 
-/* TimImage slot (tools/classtable.py); empty body. */
+/* TimImage +0x07C: empty. */
 void TimImage__NoOpSlot7C(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
+/* TimImage +0x080: empty. */
 void TimImage__NoOpSlot80(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
+/* TimImage +0x084: empty. */
 void TimImage__NoOpSlot84(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
+/* TimImage +0x088: empty. */
 void TimImage__NoOpSlot88(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
+/* TimImage +0x08C: empty. */
 void TimImage__NoOpSlot8C(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
+/* TimImage +0x090: empty. */
 void TimImage__NoOpSlot90(void) {}
 
-/* TimImage slot (tools/classtable.py); empty body. */
+/* TimImage +0x094: empty. */
 void TimImage__NoOpSlot94(void) {}
 
-/* TimImage +0x098: sets unk48 to 1; unk48's purpose beyond that flag is
- * unestablished (no caller reads it outside the ctor/this setter). */
+/* TimImage +0x098: sets flag48 (the ctor clears it); no code reads it. */
 void TimImage__SetFlag48(TimImage *self) {
     self->flag48 = 1;
 }
 
-/* TimImage +0x09C: describe the TIM held in the buffer. */
+/* TimImage +0x09C: describe the TIM held in the buffer (past its id word). */
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim) {
     GsGetTimInfo((unsigned long *)self->buffer + 1, tim);
 }

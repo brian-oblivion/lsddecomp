@@ -47,3 +47,15 @@ extern FileResourceMethods gTimImageMethods;
   purpose is unknown -- `Class__func_xxxxx` per the tier-C convention for a
   method whose class is known but mechanics are not (an empty slot has no
   mechanics to describe).
+
+## Naming (track 7, round 100, delta)
+
+Renamed `TimImage__func_8003B5AC` -> `TimImage__NoOpSlot7C` with `tools/rename.py`
+(the tier-C lines above predate it and name the old form). **Tier A**: a pure
+leaf whose mechanics are its purpose -- the body is `jr $ra; nop`, it does
+nothing -- named by the project's empty-slot convention
+(`CdDriver__NoOpSlot40`, `VabStreamObj__NoOpSlot90`, `Viewport__NoOpSlot58`,
+`StreamTask__NoOpSlot88`): the class and the table offset it fills
+(gTimImageMethods +0x07C, `tools/classtable.py gTimImageMethods`). What the
+slot is for in the class tree is not established; no C calls it. The table
+field stays `slot7C`, as the other empty slots' fields do (`include/CdStream.h`).
