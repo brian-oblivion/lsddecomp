@@ -1,4 +1,6 @@
-# PickWeeklyGroup -- MATCHED (33/33 words)
+# PickSoundBank -- MATCHED (33/33 words)
+
+> Renamed from `PickWeeklyGroup` on 2026-09-27 (tools/rename.py). Address 0x80048d74.
 
 > Renamed from `func_80048D74` on 2026-09-25 (tools/rename.py). Address 0x80048d74.
 
@@ -17,7 +19,7 @@ Declarations it needs are the local views at the top of `src/code_39094.c`
 (`D_80081940Obj`, `D_80081940Methods`, `Rec1C`) and `include/FileResource.h`.
 
 ```c
-s32 PickWeeklyGroup(s32 arg) {
+s32 PickSoundBank(s32 arg) {
     u32 r = (u32)SeedAndRandom(0, arg) % 7;
     s32 *table = GetSoundBankPaths();
     s32 *entry;
@@ -61,13 +63,13 @@ shift.
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickWeeklyGroup passes one in `$a1`, as code_1677c's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as code_1677c's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
   (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
 
 ## Naming
 
-- **Name:** `PickWeeklyGroup`
+- **Name:** `PickSoundBank`
 - **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
 - **Evidence:** leaf picker: forced-or-random index into GetSoundBankPaths(), gated by gForcedWeeklyGroup; a picker is tier A by the leaf-mechanics rule.

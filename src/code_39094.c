@@ -195,7 +195,7 @@ void *GetSoundBankPaths(void) {
     return gSoundBankPaths;
 }
 
-s32 PickWeeklyGroup(s32 arg) {
+s32 PickSoundBank(s32 arg) {
     u32 r = (u32)SeedAndRandom(0, arg) % 7;
     s32 *table = GetSoundBankPaths();
     s32 *entry;

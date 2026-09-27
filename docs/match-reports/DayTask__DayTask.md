@@ -53,12 +53,12 @@ sw    $zero, 0x10($sp)          ; req.type = 0
 jal   New_LinkResource
  sw   $v0, 0x14($sp)             ; req.path = "ETC\DREAMER.TMD"
 addu  $a0, $zero, $zero
-jal   PickWeeklyGroup
+jal   PickSoundBank
  sw   $v0, 0x48($s1)              ; self->unk48 = New_LinkResource(&req)
 addu  $a0, $v0, $zero
 addu  $a1, $zero, $zero
 jal   New_WBgm
- ori  $a2, $zero, 0x1               ; New_WBgm(PickWeeklyGroup(0), 0, 1)
+ ori  $a2, $zero, 0x1               ; New_WBgm(PickSoundBank(0), 0, 1)
 ori   $a0, $zero, 0x1
 jal   RegisterRecordTableFiles
  sw   $v0, 0x40($s1)                 ; self->unk40 = New_WBgm(...)
@@ -116,7 +116,7 @@ void DayTask__DayTask(Obj865C8 *self, Obj0C *arg1, SubObjD *arg2, s32 arg3) {
     req.type = 0;
     req.path = sDreamerTmdPath;
     self->unk48 = New_LinkResource(&req);
-    tmp = PickWeeklyGroup(0);
+    tmp = PickSoundBank(0);
     self->unk40 = New_WBgm(tmp, 0, 1);
     RegisterRecordTableFiles(1);
     SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
@@ -214,7 +214,7 @@ needed anywhere in this 107-word function.
   somewhere else (`GameApplication.h` or `code_1677c.c`); this unit keeps its
   own local view rather than cross-including, per established policy. The
   other five (`GetSoundEffectDir`, `InitDreamAux`, `New_TimImage`,
-  `PickWeeklyGroup`, `New_WBgm`, `New_NodeGuardedViewport`, `New_FrameClock`) are
+  `PickSoundBank`, `New_WBgm`, `New_NodeGuardedViewport`, `New_FrameClock`) are
   new to the project entirely (the first is a genuine one-off; the rest
   come from uncarved Psy-Q segments or `class_3bb8c`).
 
@@ -372,8 +372,8 @@ header declares. Text the header carried until round 99, kept here:
   `GameApplication::config->unk04`, whose meaning is not established.
   `(u32)syncDriver < 1` was m2c's spelling of `== 0`; the plain form is
   byte-identical (verified).
-- Local `tmp` -> `vabPath`: PickWeeklyGroup's word is a VAB path, and it is
-  New_WBgm's `vabPath`. Kept `s32`, as PickWeeklyGroup returns it.
+- Local `tmp` -> `vabPath`: PickSoundBank's word is a VAB path, and it is
+  New_WBgm's `vabPath`. Kept `s32`, as PickSoundBank returns it.
 - `D_800113EC` -> `sEtcTimPath` ("ETC\\ETC.TIM") and `D_800113F8` ->
   `sDreamerTmdPath` ("ETC\\DREAMER.TMD") (tier A: the rodata strings
   themselves, in `asm/data/1B84.rodata.s`, loaded into `etcTim` and

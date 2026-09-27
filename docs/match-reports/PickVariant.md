@@ -37,7 +37,7 @@ Rec1C *PickVariant(s32 index, s32 arg1) {
    full index computation).
 2. MATCH: the ternary index. Retail computes `x*7` per branch and shares the
    final `sll 2; addu` after the join: that is ONE index expression with a
-   conditional operand (contrast PickWeeklyGroup, where retail keeps separate
+   conditional operand (contrast PickSoundBank, where retail keeps separate
    `sll`s per branch and needs per-branch pointers). Read which instructions
    sit after the join to choose between the two shapes.
 
