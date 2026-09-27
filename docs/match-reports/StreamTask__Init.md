@@ -17,7 +17,7 @@ passing `self` and its own first argument, hardcoding the third argument to
 **This function's signature was independently cross-checked and confirmed
 against `include/GameApplication.h`.** That header already documents
 `StreamTaskMethods::slot44` (established from a *different* unit's call
-sites, `GameApplication__LoadIntroLogoSequence`/`GameApplication__PlayOpeningMovie`/`GameApplication__StartGraphRoomStreamTask` in `code_1677c`) as
+sites, `GameApplication__LoadIntroLogoSequence`/`GameApplication__PlayOpeningMovie`/`GameApplication__PlaySpecialDayMovies` in `code_1677c`) as
 `void (*slot44)(void *self, s32 a1, s32 arg2, s32 typeLookup, s32 flag)` --
 five arguments, the fifth spilled to the stack, exactly matching what this
 function's own disassembly reads at entry (`lw $v0, 0x30($sp)`, the 5th

@@ -1,4 +1,6 @@
-# GameApplication__StartGraphRoomStreamTask
+# GameApplication__PlaySpecialDayMovies
+
+> Renamed from `GameApplication__StartGraphRoomStreamTask` on 2026-09-27 (tools/rename.py). Address 0x8002658c.
 
 > Renamed from `Class6D3C8__StartGraphRoomStreamTask` on 2026-09-26 (tools/rename.py). Address 0x8002658c.
 
@@ -19,7 +21,7 @@ it.
 ## Final C
 
 ```c
-void GameApplication__StartGraphRoomStreamTask(GameApplication *self) {
+void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     StreamTask *task;
     struct {
         u32 unk00;
@@ -104,7 +106,7 @@ second local is involved.
 
 ## Naming
 
-**`GameApplication__StartGraphRoomStreamTask` -- tier B.** Mechanics: gated by
+**`GameApplication__PlaySpecialDayMovies` -- tier B.** Mechanics: gated by
 `arg->unk08`, builds a `StreamTask`, derives a count via `GetSpecialDayMovieSpan`,
 initializes the task from `count/15` and a fixed sub-slot, dispatches a
 5-argument `configure` (`a3 = -1`, unlike every other StreamTask launcher in

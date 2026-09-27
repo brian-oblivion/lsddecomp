@@ -12,13 +12,13 @@
 
 `GameApplicationMethods` slot `+0x064`, the last function in this unit's queue.
 Gated by `self->arg->unk08` (the same gate `GameApplication__PlayOpeningMovie` and
-`GameApplication__StartGraphRoomStreamTask` use). Builds a `StreamTask`, runs its `slot12C`, derives a
+`GameApplication__PlaySpecialDayMovies` use). Builds a `StreamTask`, runs its `slot12C`, derives a
 type code via `GetEndingMovie` (a new library helper with the same
 "write-to-`*out`, return-a-separate-value" shape as
 `GetAsmkMovie`/`PickOpeningMovie`/`GetSpecialDayMovieSpan`), looks it up via
 `GetMovieFrameCount`, initializes the task with it, then starts it -- the same
 overall shape as `GameApplication__LoadIntroLogoSequence`/`GameApplication__PlayOpeningMovie`, with a `slot12C` call
-added (matching `GameApplication__StartGraphRoomStreamTask`'s use of that slot).
+added (matching `GameApplication__PlaySpecialDayMovies`'s use of that slot).
 
 ## Final C
 
@@ -59,7 +59,7 @@ across --
 
 None beyond what this unit's earlier reports already established; this
 function is a clean fourth instance of the "StreamTask init" shape
-(`GameApplication__LoadIntroLogoSequence`, `GameApplication__PlayOpeningMovie`, `GameApplication__StartGraphRoomStreamTask`, now this one), each
+(`GameApplication__LoadIntroLogoSequence`, `GameApplication__PlayOpeningMovie`, `GameApplication__PlaySpecialDayMovies`, now this one), each
 gated by a different `GameApplicationConfig` field and differing only in
 which library helper derives the type code and whether extra slots
 (`slot12C`) are involved.

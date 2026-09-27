@@ -77,7 +77,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
 
 3. **Two structurally-identical 8-byte-shortfall locals, both from the
    "partially-used out-param" idiom already seen in `GameApplication__GameApplication` and
-   `GameApplication__StartGraphRoomStreamTask`.** `CinematicCall cc` (a real return value, needs no
+   `GameApplication__PlaySpecialDayMovies`.** `CinematicCall cc` (a real return value, needs no
    padding of its own) sits fine as a standalone local, but combining it
    into ONE struct with the separate `chan` out-param broke the
    struct-return codegen entirely (GCC materialized `GetCinematic`'s hidden

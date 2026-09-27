@@ -13,7 +13,7 @@ sibling gate on the ctor argument, alongside `GameApplication__LoadIntroLogoSequ
 `GameApplication__PlayOpeningMovie`'s `unk08`). Checks the owned `DreamSys`'s own status slot
 (`+0x1A0`); if it isn't already `1` and `self->unk24` hasn't latched, kicks
 off one `PollTask` (`New_GraphRoom`) and, if *that* reports `2`, runs
-`GameApplication__StartGraphRoomStreamTask`. Then polls a second `PollTask` (`New_TitleMenu`) in a loop,
+`GameApplication__PlaySpecialDayMovies`. Then polls a second `PollTask` (`New_TitleMenu`) in a loop,
 restarting the first `PollTask` each time it reports `2`, until it reports
 anything else; clears `self->unk24` and returns `0` or `2` depending on
 whether that final status was below `1` (unsigned).
@@ -33,7 +33,7 @@ s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
             if (self->unk24 == 0) {
                 status = GameApplication__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
                 if (status == 2) {
-                    GameApplication__StartGraphRoomStreamTask(self);
+                    GameApplication__PlaySpecialDayMovies(self);
                 }
             }
         }

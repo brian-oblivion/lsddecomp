@@ -211,7 +211,7 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
 /* Gated by self->config->pollGraphRoom. Checks the DreamSys's own status slot
  * (+0x1A0); if it isn't already "1" and self->skipGraphRoomPoll hasn't latched, kicks
  * off one PollTask (New_GraphRoom) and, if THAT reports "2", runs
- * GameApplication__StartGraphRoomStreamTask. Then polls a second PollTask (New_TitleMenu) in a loop,
+ * GameApplication__PlaySpecialDayMovies. Then polls a second PollTask (New_TitleMenu) in a loop,
  * restarting the first PollTask each time it reports "2", until it
  * reports anything else; clears self->skipGraphRoomPoll and returns 0 or 2 depending
  * on whether that final status was below 1. */
@@ -228,7 +228,7 @@ s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
                 status = GameApplication__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
                                                       (IntermediateBaseInitArgs *)self->aux);
                 if (status == 2) {
-                    GameApplication__StartGraphRoomStreamTask(self);
+                    GameApplication__PlaySpecialDayMovies(self);
                 }
             }
         }
@@ -265,7 +265,7 @@ s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, Intermediate
  * derives a count via GetSpecialDayMovieSpan, sets the task's frame bound
  * to that count / 15 and clears skipOnConfirm, then runs its init (stream
  * group -1, unlike the other call sites) and releases it. */
-void GameApplication__StartGraphRoomStreamTask(GameApplication *self) {
+void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     StreamTask *task;
 
     struct {
@@ -386,7 +386,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
 }
 
 /* GameApplicationMethods slot +0x064. Gated by self->config->playStreams (same gate as
- * GameApplication__PlayOpeningMovie/GameApplication__StartGraphRoomStreamTask). Builds a StreamTask, clears its skipOnConfirm,
+ * GameApplication__PlayOpeningMovie/GameApplication__PlaySpecialDayMovies). Builds a StreamTask, clears its skipOnConfirm,
  * derives a type code via GetEndingMovie, looks it up via GetMovieFrameCount,
  * initializes the task with it, then starts it -- the same shape as
  * GameApplication__LoadIntroLogoSequence/GameApplication__PlayOpeningMovie, but with setSkipOnConfirm(0) added and GetEndingMovie
