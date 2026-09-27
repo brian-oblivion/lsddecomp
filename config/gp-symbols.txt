@@ -8,7 +8,6 @@ D_8008A860
 D_8008A8CC
 D_8008A8E8
 D_8008A8F0
-D_8008A8F8
 D_8008A8FC
 D_8008A900
 D_8008A904
@@ -137,6 +136,7 @@ gDefaultBMemPMgr
 gDefaultGridSpan
 gDefaultScreenDims
 gDefaultViewTwist
+gDefaultViewportColor
 gDivPolygon3
 gDivPolygon4
 gDrawSystem

@@ -16,7 +16,7 @@ reproducing this report's own documented figure exactly. Not stale.
 
 The standing open question (rounds 44/46) was whether GCC 2.6.3's CSE of
 a pure symbol address across two whole-struct copies is defeatable from
-C89 at all. It is. Retail computes `D_8008A8F8`'s address (a `lui %hi`/
+C89 at all. It is. Retail computes `gDefaultViewportColor`'s address (a `lui %hi`/
 `addiu %lo` pair) INDEPENDENTLY for each of the two copies; our compiler
 computes it once and reuses the register, because both reads are
 syntactically the same declared symbol and GCC's local CSE recognizes
@@ -26,19 +26,19 @@ Declaring a SECOND extern name for the SAME linker symbol via GCC's
 `__asm__("name")` alternate-name extension --
 
 ```c
-extern SByte3_d294 D_8008A8F8;
-extern SByte3_d294 D_8008A8F8_b __asm__("D_8008A8F8");
+extern SByte3_d294 gDefaultViewportColor;
+extern SByte3_d294 D_8008A8F8_b __asm__("gDefaultViewportColor");
 ```
 
 -- and reading the second copy through `D_8008A8F8_b` instead of
-`D_8008A8F8` again gives the two accesses textually distinct symbols, so
+`gDefaultViewportColor` again gives the two accesses textually distinct symbols, so
 CSE never fires: two independent `la`/`lui`+`addiu` pairs are emitted,
 matching retail exactly. This is not a new idiom for the project --
 `code_179d8_m.c` already uses `__asm__("D_8008D988")`-style aliasing for
 array reinterpretation -- but it had not been applied to defeat an
 address CSE before. Verified first in isolation through the pinned
 pipeline (`tools/gcc263/cpp | cc1`) on a 6-line reproducer: the aliased
-read produces a second `la $6,D_8008A8F8`, confirmed byte-for-byte
+read produces a second `la $6,gDefaultViewportColor`, confirmed byte-for-byte
 against retail's own two `lui`/`addiu` pairs once assembled in the real
 function.
 
@@ -100,8 +100,8 @@ happen early vs. late), never which register holds a value.
 ```c
 extern s32 D_8008A8FC;
 extern s32 D_8008A900;
-extern SByte3_d294 D_8008A8F8;
-extern SByte3_d294 D_8008A8F8_b __asm__("D_8008A8F8");
+extern SByte3_d294 gDefaultViewportColor;
+extern SByte3_d294 D_8008A8F8_b __asm__("gDefaultViewportColor");
 
 void Viewport__InitDefaults(Unk18Obj *self) {
     self->unk90 = 0;
@@ -118,7 +118,7 @@ void Viewport__InitDefaults(Unk18Obj *self) {
     self->unk50 = 0x10000;
     self->unk54 = 0;
     self->unk60 = 0x4E20;
-    self->unk5B = D_8008A8F8;
+    self->unk5B = gDefaultViewportColor;
     self->unk58 = D_8008A8F8_b;
     self->unkB4 = 0;
     self->unkB8 = 1;
@@ -164,14 +164,14 @@ of the 2-word CSE'd shortfall, not a new regression). Not stale.
 
 **New lever, not in the existing attempt list:** attempt 3 (already on
 file) qualifies the GLOBAL's own declaration as `extern volatile
-SByte3_d294 D_8008A8F8;`, forcing every access to it through a
+SByte3_d294 gDefaultViewportColor;`, forcing every access to it through a
 conservative, always-observable-side-effect path. This round instead
 qualified `volatile` only at the two READ *sites*, leaving the
 declaration itself plain:
 
 ```c
-self->unk5B = *(volatile SByte3_d294 *)&D_8008A8F8;
-self->unk58 = *(volatile SByte3_d294 *)&D_8008A8F8;
+self->unk5B = *(volatile SByte3_d294 *)&gDefaultViewportColor;
+self->unk58 = *(volatile SByte3_d294 *)&gDefaultViewportColor;
 ```
 
 This tests a genuinely different hypothesis than attempt 3: does the
@@ -232,7 +232,7 @@ is a pure codegen residue.
 ```c
 extern s32 D_8008A8FC;
 extern s32 D_8008A900;
-extern SByte3_d294 D_8008A8F8;
+extern SByte3_d294 gDefaultViewportColor;
 
 void Viewport__InitDefaults(Unk18Obj *self) {
     self->unk90 = 0;
@@ -247,8 +247,8 @@ void Viewport__InitDefaults(Unk18Obj *self) {
     self->unk50 = 0x10000;
     self->unk54 = 0;
     self->unk60 = 0x4E20;
-    self->unk5B = D_8008A8F8;
-    self->unk58 = D_8008A8F8;
+    self->unk5B = gDefaultViewportColor;
+    self->unk58 = gDefaultViewportColor;
     self->unkB4 = 0;
     self->unkB8 = 1;
 }
@@ -256,7 +256,7 @@ void Viewport__InitDefaults(Unk18Obj *self) {
 
 `D_8008A8FC`/`D_8008A900` are plain `.sdata` words (already in
 `config/gp-symbols.txt`, ordinary `%gp_rel` accesses, no issue).
-`D_8008A8F8` is a 4-byte all-zero `.sdata` region, read as a whole
+`gDefaultViewportColor` is a 4-byte all-zero `.sdata` region, read as a whole
 `SByte3_d294` struct (3 signed bytes) via its ADDRESS -- retail computes
 that address with an ABSOLUTE `lui`/`addiu` (not `%gp_rel`), consistent
 with CLAUDE.md's rule that `la` of an sdata symbol stays absolute even
@@ -264,10 +264,10 @@ though loads/stores of it go through `$gp`.
 
 ## The residue
 
-Retail copies the same 3-byte struct from `D_8008A8F8` TWICE (once to
+Retail copies the same 3-byte struct from `gDefaultViewportColor` TWICE (once to
 `self->unk5B`, once to `self->unk58`), and computes the struct's address
 via `lui`/`addiu` **independently each time** -- two separate 2-instruction
-`lui %hi(D_8008A8F8)` / `addiu %lo(D_8008A8F8)` sequences, back to back
+`lui %hi(gDefaultViewportColor)` / `addiu %lo(gDefaultViewportColor)` sequences, back to back
 with nothing in between. My build's GCC 2.6.3 CSEs this: it computes the
 address ONCE and reuses the same register for both copies, coming out
 **2 words (8 bytes) shorter** than retail. The rest of the function
@@ -295,26 +295,26 @@ even though nearly every instruction downstream is present, just shifted.
    clobber only forces MEMORY operations not to be reordered/cached across
    it; a pure address CONSTANT (no memory read involved in computing it)
    isn't affected, so it can't stop this specific CSE.
-3. `extern volatile SByte3_d294 D_8008A8F8;` -- markedly WORSE: forces a
+3. `extern volatile SByte3_d294 gDefaultViewportColor;` -- markedly WORSE: forces a
    completely different, more conservative codegen shape with its own
    stack frame (`addiu sp,sp,-8`) and a saved `$s0`, ~44 instructions.
    Volatile makes the compiler treat every access as an observable side
    effect, which stops the CSE but at a much higher cost that doesn't
    remotely resemble retail either.
-4. Per-field byte assignments (`self->unk5B.b0 = D_8008A8F8.b0;` etc.,
+4. Per-field byte assignments (`self->unk5B.b0 = gDefaultViewportColor.b0;` etc.,
    6 statements instead of 2 whole-struct copies) -- WORSE and in a new
    way: GCC emits `lbu` (zero-extending) loads for the per-field version
    instead of retail's `lb` (sign-extending), since the compiler can prove
    the sign bits are dead when each byte flows straight into another `s8`
    field. Confirms the whole-struct-assignment shape (attempt 1) is the
    right one; per-field access diverges further, not closer.
-5. A chained assignment, `self->unk58 = (self->unk5B = D_8008A8F8);`,
+5. A chained assignment, `self->unk58 = (self->unk5B = gDefaultViewportColor);`,
    suggested by a bounded permuter search (below) -- compiles to reading
    the SECOND copy from `self->unk5B` (i.e. `self`+0x5B) rather than
    re-reading the global, confirmed by disassembly (`lb v0,0x5b(a0)` etc.,
-   no second `lui %hi(D_8008A8F8)` at all). Semantically valid (both
+   no second `lui %hi(gDefaultViewportColor)` at all). Semantically valid (both
    sides are zero either way) but structurally wrong: retail's two
-   identical `lui %hi(D_8008A8F8)` pairs prove it re-reads the GLOBAL
+   identical `lui %hi(gDefaultViewportColor)` pairs prove it re-reads the GLOBAL
    both times, not `self`. Real in-range word match: 7/41, worse than
    attempt 1.
 
@@ -382,10 +382,10 @@ Round 89 (runner delta, track 5 `asm-sites`), three sites, all kept:
   two loaded values moving to `v1`/`a1` because `v0` is then reused by the
   constants. The primary change is instruction order.
 - **The asm-label alias** `extern ViewportRgb D_8008A8F8_b
-  __asm__("D_8008A8F8");` -- already justified at the site by the block
+  __asm__("gDefaultViewportColor");` -- already justified at the site by the block
   comment above it (a second textual name defeats GCC's CSE of the two
-  `D_8008A8F8` address computations). Re-measured by spelling the second
-  copy `self->clearColor = D_8008A8F8;`: image red (the function came out two
+  `gDefaultViewportColor` address computations). Re-measured by spelling the second
+  copy `self->clearColor = gDefaultViewportColor;`: image red (the function came out two
   words shorter, 39 against 41, `funcdiff` 17/39, and the whole image after it
   drifted). So the alias is load-bearing; which instructions went missing was
   not itemised. Kept.

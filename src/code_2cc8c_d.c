@@ -35,10 +35,10 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
 }
 
 /* MATCHED round 49. Two levers were needed, see docs/match-reports/Viewport__InitDefaults.md:
- * (1) retail reloads the address of `D_8008A8F8` INDEPENDENTLY for each of
+ * (1) retail reloads the address of `gDefaultViewportColor` INDEPENDENTLY for each of
  * the two whole-struct copies (two separate lui/addiu pairs); GCC 2.6.3
  * otherwise CSEs that into one shared computation. Declaring a second
- * extern name aliased to the same symbol via `__asm__("D_8008A8F8")` (the
+ * extern name aliased to the same symbol via `__asm__("gDefaultViewportColor")` (the
  * same alternate-name idiom `code_179d8_m.c` already uses) gives the
  * second copy a textually distinct symbol, defeating the CSE without
  * `volatile`'s much worse codegen. (2) Two bare `__asm__("")` scheduling
@@ -47,8 +47,8 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
  * defer them to just before the byte copies. */
 extern s32 D_8008A8FC;
 extern s32 D_8008A900;
-extern ViewportRgb D_8008A8F8;
-extern ViewportRgb D_8008A8F8_b __asm__("D_8008A8F8");
+extern ViewportRgb gDefaultViewportColor;
+extern ViewportRgb D_8008A8F8_b __asm__("gDefaultViewportColor");
 
 void Viewport__InitDefaults(Viewport *self) {
     self->unk90 = 0;
@@ -69,7 +69,7 @@ void Viewport__InitDefaults(Viewport *self) {
     self->farZ = 0x10000;
     self->lightMode = 0;
     self->fogNear = 0x4E20;
-    self->farColor = D_8008A8F8;
+    self->farColor = gDefaultViewportColor;
     self->clearColor = D_8008A8F8_b;
     self->unkB4 = 0;
     self->drawEnabled = 1;
