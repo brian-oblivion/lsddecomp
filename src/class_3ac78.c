@@ -198,7 +198,7 @@ void StageMap__Finalize(StageMap *self) {
 void StageMap__OnNotify(StageMap *self, BasicClass *sender, s32 command) {
     GetSceneNodeMethods()->onNotify((SceneNode *)self, sender, command);
 
-    if ((sender->methods->header & 0xF) == 1) {
+    if ((sender->methods->header & CLASS_ID_ROOT_MASK) == DRAWSYSTEM_CLASS_ID) {
         self->methods->onNotifyTag1(self, sender, command);
     }
 }
