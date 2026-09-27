@@ -44,7 +44,7 @@ already established elsewhere (`TmdRenderer.c`) as
 `void ReleaseBasicClassArray(BasicClass **array, s32 count)` -- a release-all-N loop.
 Kept generic `void **` here rather than pulling in `BasicClass` from
 `code_8220.h`, matching this project's existing looser per-unit reading of
-the same symbol (`code_2cc8c.h`'s `void ReleaseBasicClassArray(void *a0, void *a1)`).
+the same symbol (`TaskViewport.h`'s `void ReleaseBasicClassArray(void *a0, void *a1)`).
 
 `this` is NOT the same class as `BaseObjO` (the shared intermediate base
 class the rest of this unit implements, see the file banner) -- `+0x84`

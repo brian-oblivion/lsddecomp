@@ -102,6 +102,6 @@ slot +0x050 and does not call the base).
 
 ## Proposed field names
 
-TaskCore's `unk93` (include/TaskCore.h; code_2c054.c and code_2cc8c.c
+TaskCore's `unk93` (include/TaskCore.h; code_2c054.c and TaskViewport.c
 access it) -> `clearColor`: both TaskCore__OnDeinit and this override
 pass it as the colour to the DrawSystem's clear.

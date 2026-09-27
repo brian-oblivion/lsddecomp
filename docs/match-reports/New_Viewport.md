@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E5D8` on 2026-09-19 (tools/rename.py). Address 0x8003e5d8.
 
-**Unit:** code_2cc8c · **Size:** 20 instructions
+**Unit:** TaskViewport · **Size:** 20 instructions
 
 ## What it does
 
@@ -49,7 +49,7 @@ the byte match confirms the reading.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the
+round 13 (2026-09-03), runner alpha, unit TaskViewport. Matched on the
 first build.
 
 ## Naming

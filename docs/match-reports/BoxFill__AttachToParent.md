@@ -9,7 +9,7 @@ FUNCTION the vtable slot points to, not a caller of it -- the header's
 existing "IS BoxFill__AttachToParent" note on that slot already said as much before
 this round). Body: when `self->unkC == 0`, forwards to the shared
 "default handler" table's own `slot4C` (`GetSceneNodeMethods()`, already typed
-in `include/code_2cc8c.h` as `D6B5CCGetterMethodsCC8C`, with a `slot4C`
+in `include/TaskViewport.h` as `D6B5CCGetterMethodsCC8C`, with a `slot4C`
 member at the exact offset/arity this call site needs -- no header changes
 were necessary), then dispatches `self->methods->slotBC(self, a2)` --
 `slotBC` was likewise already typed (`void *a1`, "a 2-word struct

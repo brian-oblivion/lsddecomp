@@ -4,11 +4,11 @@
 
 > Renamed from `func_8003DA10` on 2026-09-24 (tools/rename.py). Address 0x8003da10.
 
-**Unit:** code_2cc8c · **Size:** 49 words · **Result:** byte-exact, first attempt
+**Unit:** TaskViewport · **Size:** 49 words · **Result:** byte-exact, first attempt
 
 ## What it does
 
-`Obj86B60Methods::slot108` (already recorded in `code_2cc8c.h`). Only acts
+`Obj86B60Methods::slot108` (already recorded in `TaskViewport.h`). Only acts
 when `self->unk3C == 1`: notifies a new slot (`slot100`), looks up an
 element from a computed doubly-indexed pointer array, hands it an 8-byte-
 offset buffer pointer through its own `+0x0B8` slot, then advances
@@ -37,7 +37,7 @@ void TaskCore__BeginElementScroll(Obj86B60 *self)
 
 ## Header additions
 
-`include/code_2cc8c.h`:
+`include/TaskViewport.h`:
 
 - New field `unk14` on `Obj86B60` (`s32`, carved from existing padding
   `0x004`-`0x01C`) — forwarded as an opaque word to `slot100`, never
@@ -66,7 +66,7 @@ No violation found here.
 None — matched on the first attempt. The `self->unk4C->unk24[idx] + 8`
 pointer arithmetic was cast to `u8 *` locally at the point of use rather
 than retyping the shared field `Unk4CObj::unk24` (still `void **`, used
-elsewhere in the sibling unit `code_2cc8c.c`'s already-matched
+elsewhere in the sibling unit `TaskViewport.c`'s already-matched
 `TaskCore__Tick` as a pure null-check) — avoids a shared-header type change
 for a computation this unit alone needs.
 
@@ -76,7 +76,7 @@ Renamed `func_` -> `Obj86B60__BeginElementScroll`. **Tier B**: Gated on `self->u
 
 ## Proposed field names
 
-Not renamed here -- `self->unk3C` is CROSS-UNIT (`code_2cc8c.c`'s
+Not renamed here -- `self->unk3C` is CROSS-UNIT (`TaskViewport.c`'s
 `TaskCore__OnPadConfirm`/`TaskCore__OnPadCancel`/`TaskCore__OnPadPrev`/`TaskCore__OnPadNext` all gate on
 it too, plus the STALL `TaskCore__OnPadEvent`/`TaskCore__SetState`), not attempted as a
 compiler-verified rename this round. Proposing for the head to apply at

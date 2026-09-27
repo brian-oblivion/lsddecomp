@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003D5CC` on 2026-09-24 (tools/rename.py). Address 0x8003d5cc.
 
-**Unit:** code_2cc8c · **Size:** 66 words · **Result:** byte-exact
+**Unit:** TaskViewport · **Size:** 66 words · **Result:** byte-exact
 
 ## What it does
 
@@ -53,7 +53,7 @@ void TaskCore__CreateSlotElements(Obj86B60 *self, SrcDesc *a1, void *a2)
 
 ## Header additions
 
-`include/code_2cc8c.h`:
+`include/TaskViewport.h`:
 
 - New type `SrcDesc` for the 2nd parameter — a descriptor unrelated to
   `Obj86B60`'s own class hierarchy (no method-table dispatch anywhere in
@@ -76,7 +76,7 @@ No existing declaration's type or offset changed.
 First attempt used a plain pre-test `while (*list != NULL) { count++;
 list++; }` for the counting loop and compiled 2 WORDS LONGER than retail
 (68 vs. retail's 66) — confirmed directly with `objdump -d
-build/src/code_2cc8c.c.o` (the "outside this range" warning was six
+build/src/TaskViewport.c.o` (the "outside this range" warning was six
 figures because the size mismatch shifted everything after this function
 in the whole linked image, not because of anything genuinely wrong
 elsewhere).
@@ -119,7 +119,7 @@ Renamed from Obj86B60__CreateSlotElements (tools/rename.py): the class prefix. O
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
-`SrcDesc` moved from `include/code_2cc8c.h` into `src/code_2cc8c_b.c` (only
+`SrcDesc` moved from `include/TaskViewport.h` into `src/code_2cc8c_b.c` (only
 this function uses it). Its fields: `unk4` -> `savedCursor` (+0x004, the
 same word `SlotEntry::savedCursor` is: this function seeds the slot's item
 cursor from it and CommitElementScroll writes it back), `unk18` ->

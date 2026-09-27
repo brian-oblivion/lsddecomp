@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EEC0` on 2026-09-23 (tools/rename.py). Address 0x8003eec0.
 
-Unit: `code_2cc8c`. Round 14, runner delta. 99/99 words, full match (4
+Unit: `TaskViewport`. Round 14, runner delta. 99/99 words, full match (4
 real attempts).
 
 ## Signature
@@ -119,7 +119,7 @@ learning below.
 
 ## Header changes
 
-`include/code_2cc8c.h`:
+`include/TaskViewport.h`:
 - `GenericObj` gains `unkC` (`+0x00C`, `void *`) plus the corrective
   `pad010` gap.
 - `Unk18Obj` gains `unk4C`/`unk50` (both `s32`, splitting the old
@@ -159,7 +159,7 @@ between two named fields).
 ## Proposed field names
 
 Not applied -- these fields are exclusive to this unit (confirmed: grepped
-every other unit that includes `code_2cc8c.h`, none touch `Unk18Obj`), so
+every other unit that includes `TaskViewport.h`, none touch `Unk18Obj`), so
 by the letter of track 3's rule they COULD be renamed here; left as
 proposals instead because their own evidence is materially weaker than the
 six fields this round did rename (`lightMode`/`clearColor`/`farColor`/
@@ -215,13 +215,13 @@ Renamed from `Unk18Obj__Update`. Slot +0x09C `update` (NodeGuardedViewport's ove
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/code_2cc8c.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSetRefView2((GsRVIEW2 *)&self->refView)` and `GsClearOt(0, 0, (GsOT *)self->ot[idx])`. SetFarColor now takes LIBGTE.H's `long`s; the call still reads the bytes through a `u8 *`, so they zero-extend exactly as the old `u8` prototype made them.
+src/TaskViewport.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSetRefView2((GsRVIEW2 *)&self->refView)` and `GsClearOt(0, 0, (GsOT *)self->ot[idx])`. SetFarColor now takes LIBGTE.H's `long`s; the call still reads the bytes through a `u8 *`, so they zero-extend exactly as the old `u8` prototype made them.
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 
 ```c
 /* Psy-Q's GTE far-colour register writer (libgte/reg03, linked from Sony's
- * own SDK object). LOCAL to this unit, not code_2cc8c.h -- see the note on
+ * own SDK object). LOCAL to this unit, not TaskViewport.h -- see the note on
  * SetGeomScreen below. This call site reads self->farColor's own three bytes
  * UNSIGNED (`lbu`, not `lb`) even though Viewport__SetFarColor writes them as signed
  * bytes; the disagreement is kept as a local cast rather than a retype of the
@@ -230,7 +230,7 @@ extern void SetFarColor(u8 a0, u8 a1, u8 a2);
 
 /* Three more of Sony's, linked from the SDK objects since round 34 and
  * declared LOCALLY for the same reason as GsSetRefView2 above: they used to
- * sit in include/code_2cc8c.h as `func_8003Fxxx`, and under their real names
+ * sit in include/TaskViewport.h as `func_8003Fxxx`, and under their real names
  * a header six units include is exactly where LIBGS.H's own prototypes will
  * one day collide. These are only the shapes THIS unit's call sites use.
  *   GsSetLightMode  libgs/gs_108   was func_8003FC70

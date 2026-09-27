@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C7B4` on 2026-09-24 (tools/rename.py). Address 0x8003c7b4.
 
-**Unit:** code_2cc8c · **Size:** 16 instructions
+**Unit:** TaskViewport · **Size:** 16 instructions
 
 ## What it does
 
@@ -35,7 +35,7 @@ forwarded from the caller unchanged.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit code_2cc8c.
+round 2026-09-02, runner echo, unit TaskViewport.
 
 ## Naming (round 78, delta)
 
@@ -52,7 +52,7 @@ Renamed from Obj86B60__ForwardToChild (tools/rename.py). Occupant of +0x070 (`pl
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
-`include/code_2cc8c.h`'s `Unk48Obj`/`Unk48ObjMethods` view is deleted.
+`include/TaskViewport.h`'s `Unk48Obj`/`Unk48ObjMethods` view is deleted.
 `sound` is now cast to `VabStreamObj *` (`include/VabStreamObj.h`), and the
 call is `playTone`. The view had typed the slot `void`, but the occupant
 `VabStreamObj__PlayTone` returns the voice. The whole image stays

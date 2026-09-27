@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EA64` on 2026-09-23 (tools/rename.py). Address 0x8003ea64.
 
-Unit: `code_2cc8c`. Round 14, runner delta. 2/2 words, full match.
+Unit: `TaskViewport`. Round 14, runner delta. 2/2 words, full match.
 
 ## Signature
 
@@ -26,7 +26,7 @@ void Viewport__SetProjection(Unk18Obj *self, s32 a1) {
 
 ## Header changes
 
-`include/code_2cc8c.h`: `Unk18Obj` gains `unk40` (`+0x040`).
+`include/TaskViewport.h`: `Unk18Obj` gains `unk40` (`+0x040`).
 
 ## Naming
 

@@ -23,7 +23,7 @@ the PRECEDING call's return" idiom, and it is what motivated retyping
 
 ## Existing declaration retyped
 
-`include/code_2cc8c.h`'s `BMemPMgrFree` was declared `void
+`include/TaskViewport.h`'s `BMemPMgrFree` was declared `void
 BMemPMgrFree(void *ptr)`, following `code_171e0.h`/`Entity.h`'s
 typing. Its own (still-`INCLUDE_ASM`) disassembly
 (`asm/nonmatchings/BMemPMgr/BMemPMgrFree.s`) ends with an explicit
@@ -31,7 +31,7 @@ typing. Its own (still-`INCLUDE_ASM`) disassembly
 function is the first in this unit to actually USE that return value
 (`self->unkB4 = BMemPMgrFree(self->unkB4)`). Retyped to
 `void *BMemPMgrFree(void *ptr)`. Every other call site in this unit
-(`code_2cc8c.c`, `code_2cc8c_d.c`) discards the result as a bare
+(`TaskViewport.c`, `code_2cc8c_d.c`) discards the result as a bare
 statement, so the retype changes no compiled bytes there; confirmed by
 a full green `build-and-verify.sh`.
 

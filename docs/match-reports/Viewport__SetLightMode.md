@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003EA7C` on 2026-09-23 (tools/rename.py). Address 0x8003ea7c.
 
-Unit: `code_2cc8c`. Round 14, runner delta. 2/2 words, full match.
+Unit: `TaskViewport`. Round 14, runner delta. 2/2 words, full match.
 
 ## Signature
 
@@ -28,7 +28,7 @@ void Viewport__SetLightMode(Unk18Obj *self, s32 a1) {
 
 ## Header changes
 
-`include/code_2cc8c.h`: `Unk18Obj` gains `unk54` (`+0x054`).
+`include/TaskViewport.h`: `Unk18Obj` gains `unk54` (`+0x054`).
 
 ## Naming
 

@@ -1,5 +1,5 @@
-#ifndef CODE_2CC8C_H
-#define CODE_2CC8C_H
+#ifndef TASKVIEWPORT_H
+#define TASKVIEWPORT_H
 
 #include "common.h"
 #include "BasicClass.h"
@@ -12,13 +12,13 @@
 
 /* Forward typedefs, used by `extern` declarations further up this file
  * than their own struct bodies (round 14, code_2cc8c_e's own local views,
- * referenced by earlier code_2cc8c call-site declarations). */
+ * referenced by earlier TaskViewport call-site declarations). */
 typedef struct TexPageDesc TexPageDesc;
 
 /*
  * TaskCore (class id 0x130, gTaskCoreMethods) is declared once, in
- * include/TaskCore.h (track 4, round 84): code_2cc8c.c, code_2cc8c.c and
- * the first function of code_2cc8c.c are its methods from +0x058 on. Its
+ * include/TaskCore.h (track 4, round 84): TaskViewport.c, TaskViewport.c and
+ * the first function of TaskViewport.c are its methods from +0x058 on. Its
  * object used to be viewed here as `Obj86B60`, after the address of a
  * SUBCLASS table (gTitleMenuMethods); the views are gone.
  *
@@ -28,15 +28,15 @@ typedef struct TexPageDesc TexPageDesc;
  * VabStreamObj, is cast to include/VabStreamObj.h's type; `bgLayer` is a
  * BgLayer, include/BgLayer.h since round 88 (its `Unk78Obj` view is gone);
  * `subHandle` and TaskCoreTarget's `handle` are TimImages, include/TimImage.h,
- * cast at code_2cc8c's accessors; the slot and item widgets are TextRows,
+ * cast at TaskViewport's accessors; the slot and item widgets are TextRows,
  * include/TextRow.h; `listView` is a BoxFill, include/BoxFill.h). The
- * record TaskCoreTarget::unk24[] points to is code_2cc8c.c's `SlotEntry`.
+ * record TaskCoreTarget::unk24[] points to is TaskViewport.c's `SlotEntry`.
  */
 typedef struct HeaderObj HeaderObj;
 typedef struct EventArg EventArg;
 
 /*
- * FOR THE NEXT RUNNER (code_2cc8c, same 153-function block, same class
+ * FOR THE NEXT RUNNER (TaskViewport, same 153-function block, same class
  * framework): a note on how much to trust `Unk48Obj`/`Unk4CObj`/`Unk78Obj`
  * below, since all three are minimal placeholder types and it matters
  * which part of that is "confirmed small" vs. "not yet looked at".
@@ -50,7 +50,7 @@ typedef struct EventArg EventArg;
  *   object with its own real fields beyond offset 0, this unit's
  *   functions simply never touch them. Treat every `padNNN` here as "ends
  *   here only because our evidence ends here", and extend/narrow it the
- *   moment a function in `code_2cc8c` (or any other unit) reads inside
+ *   moment a function in `TaskViewport` (or any other unit) reads inside
  *   one of these ranges.
  * - **Offset 0 being a method-table pointer IS confirmed for two of the
  *   three** (`Unk48Obj`, `Unk78Obj`) -- each is dereferenced through the
@@ -103,8 +103,8 @@ extern void *BMemPMgrFree(void *ptr);                   /* matching free/release
                                             the real return value, so this
                                             unit's shared view is retyped.
                                             Every existing call site in
-                                            this unit (code_2cc8c.c,
-                                            code_2cc8c.c) discards the
+                                            this unit (TaskViewport.c,
+                                            TaskViewport.c) discards the
                                             result too, so this is a
                                             zero-byte-cost retype -- full
                                             build reconfirmed green. */
@@ -130,14 +130,14 @@ extern Ratio16 gDefaultViewTwist; /* {0, 1}: Viewport__AttachViewChild's twist
    Sony name in a header six units include is the `conflicting types` failure
    that CLAUDE.md and the SDK guide both warn about, and it would surface in a
    unit that never touched this line. Its one caller, Viewport__AttachViewChild, now
-   declares it locally in src/code_2cc8c.c with that call site's own shape. */
+   declares it locally in src/TaskViewport.c with that call site's own shape. */
 
 /* func_8003FC18 is NO LONGER DECLARED HERE, round 34 -- exactly the
    GsSetRefView2 case above. It is Sony's `GsClearOt` (`libgs/gs_113.o`,
    linked from the SDK object), and a second declaration of that name in a
    header six units include is the `conflicting types` failure CLAUDE.md and
    the SDK guide both warn about. Its callers declare it locally under Sony's
-   name, with their own call sites' shapes, in src/code_2cc8c.c.
+   name, with their own call sites' shapes, in src/TaskViewport.c.
    The `TexPageDesc *` view that used to hang off this prototype was
    code_2cc8c_e.c's reading of a Psy-Q `GsOT`; the struct stays in this header
    because other code uses it, and no byte depends on the naming. */
@@ -149,7 +149,7 @@ extern Ratio16 gDefaultViewTwist; /* {0, 1}: Viewport__AttachViewChild's twist
    DrawSync(int mode);`), and a second declaration of that name in a header
    six units include is the `conflicting types` failure CLAUDE.md and the SDK
    guide both warn about. Its one caller, Viewport__DeinitOt, now declares it
-   locally in src/code_2cc8c.c with that call site's own shape. */
+   locally in src/TaskViewport.c with that call site's own shape. */
 
 /* The following are called only from Viewport__Update (this unit). They are
    plain `void *` global setters (this call site happens to pass an
@@ -166,11 +166,11 @@ extern Ratio16 gDefaultViewTwist; /* {0, 1}: Viewport__AttachViewChild's twist
    step by hand.
    Their two former neighbours, func_8003FC70 and func_8003FD4C, are gone from
    here: they are Sony's `GsSetLightMode` (libgs/gs_108) and `SetFogNear`
-   (libgte/fog_01), declared locally in src/code_2cc8c.c under those names
+   (libgte/fog_01), declared locally in src/TaskViewport.c under those names
    for the same collision reason as GsSetRefView2 and GsClearOt above. */
 /* ROUND 78: the two setters that used to be declared here are Sony's too --
    GsSetNearClip (libgs/gs_101) and GsSetWorkBase (libgs/gs_124) -- and are
-   now declared locally in src/code_2cc8c.c from LIBGS.H, like the pair
+   now declared locally in src/TaskViewport.c from LIBGS.H, like the pair
    above. */
 
 /* ResetGraph (asm/psyq_10ee0.s, PsyQ library, LIBGPU.H's own
@@ -187,20 +187,20 @@ extern s32 ResetGraph(s32 mode);
    u_char b, GsOT *ot);`), and a second declaration of that name in a header
    six units include is the `conflicting types` failure CLAUDE.md and the SDK
    guide both warn about. Its one caller, Viewport__Flip, now declares it
-   locally in src/code_2cc8c.c with that call site's own shape (self->unk58's
+   locally in src/TaskViewport.c with that call site's own shape (self->unk58's
    three bytes read unsigned, same "writer reads signed, this reader reads
    unsigned" situation as unk5B/Viewport__Update, plus one more word). */
 
 /* func_8003FBF4 is NO LONGER DECLARED HERE, round 34. It is Sony's
    `GsDrawOt` (`libgs/gs_111.o`, linked from the SDK object) -- same
    collision reason as GsSetRefView2/GsClearOt above. Its one caller,
-   Viewport__Flip, declares it locally in src/code_2cc8c.c with that call
+   Viewport__Flip, declares it locally in src/TaskViewport.c with that call
    site's own shape. */
 
 /* GsSetProjection is NO LONGER DECLARED HERE, round 79. It was
    `Unk18Obj__SetGeomScreen`, typed as a method; it is Sony's (libgs/gs_106,
    identified at merge from position and LIBGS.H's prototype) and its one
-   caller, Viewport__Update in src/code_2cc8c.c, declares it
+   caller, Viewport__Update in src/TaskViewport.c, declares it
    locally with LIBGS.H's own shape. */
 
 /* New_FrameClock: include/FrameClock.h. */

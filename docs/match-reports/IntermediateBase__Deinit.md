@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E280` on 2026-09-19 (tools/rename.py). Address 0x8003e280.
 
-**Unit:** code_2cc8c · **Size:** 102 instructions (largest in this
+**Unit:** TaskViewport · **Size:** 102 instructions (largest in this
 round's queue)
 
 ## What it does
@@ -105,7 +105,7 @@ attempts here.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the
+round 13 (2026-09-03), runner alpha, unit TaskViewport. Matched on the
 first build.
 
 ## Naming
@@ -115,7 +115,7 @@ alpha). Tier A: exact mirror of `IntermediateBase__Init` -- removes the children
 `Init` added (`removeChild`), then releases (`Unk14ObjMethods::release`/
 `Unk10ObjMethods::release`, both renamed this round, and
 `Unk18ObjMethods::release` (also renamed this round, exclusive --
-code_2cc8c.c never dispatches this exact slot on a Unk18Obj*)) each of the three helper
+TaskViewport.c never dispatches this exact slot on a Unk18Obj*)) each of the three helper
 objects `Init` may have default-constructed, but ONLY the ones whose
 current value still differs from the caller-supplied `initArgs` field --
 i.e. only the ones this object actually owns. `Obj86B60Methods::deinit`

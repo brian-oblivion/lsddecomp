@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003DFDC` on 2026-09-19 (tools/rename.py). Address 0x8003dfdc.
 
-**Unit:** code_2cc8c · **Size:** 21 instructions
+**Unit:** TaskViewport · **Size:** 21 instructions
 
 ## What it does
 
@@ -48,7 +48,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit code_2cc8c. Matched on the first
+round 13 (2026-09-03), runner alpha, unit TaskViewport. Matched on the first
 build. Classtable dump of `gIntermediateBaseMethods` (26 slots) resolved this and six
 sibling queue functions' exact slot identities in one pass; see
 `IntermediateBase__OnNotify.md` for the full table.
@@ -59,7 +59,7 @@ sibling queue functions' exact slot identities in one pass; see
 runner alpha). Tier A: `include/code_2c054.h` independently documents
 `D_8006E878+0x008 = func_8003DFDC` -- i.e. this function IS the `ctor` slot
 occupant of the shared "IntermediateBase" ancestor table (named identically,
-independently, in `include/code_2cc8c.h`, `include/code_2c054.h` and
+independently, in `include/TaskViewport.h`, `include/code_2c054.h` and
 `include/class_39e08.h`, per this project's own established convention for
 that class). Named `Class__Class` per the constructor convention, matching
 the already-established `BasicClass__BasicClass` precedent at the

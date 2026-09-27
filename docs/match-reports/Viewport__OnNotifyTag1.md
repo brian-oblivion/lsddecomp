@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EE88` on 2026-09-23 (tools/rename.py). Address 0x8003ee88.
 
-Unit: `code_2cc8c`. Round 14, runner delta. 14/14 words, full match.
+Unit: `TaskViewport`. Round 14, runner delta. 14/14 words, full match.
 
 ## Signature
 
@@ -27,7 +27,7 @@ void Viewport__OnNotifyTag1(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
 
 ## Header changes
 
-`include/code_2cc8c.h`: `Unk18ObjMethods` gains `slotA4` (`+0x0A4`,
+`include/TaskViewport.h`: `Unk18ObjMethods` gains `slotA4` (`+0x0A4`,
 `void (*)(Unk18Obj*)`), splitting the pad between `slot9C` and the
 already-typed `slotA8`.
 

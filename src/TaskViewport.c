@@ -1,4 +1,4 @@
-/* code_2cc8c -- TaskCore's own methods from +0x058 to +0x0C0: the pad
+/* TaskViewport -- TaskCore's own methods from +0x058 to +0x0C0: the pad
  * dispatch and its five button handlers, the state machine (update and
  * setState), the frame bound, the sound call, the view callback and the
  * fade-in/fade-out pair. Each is the default for its slot in
@@ -18,7 +18,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "code_2cc8c.h"
+#include "TaskViewport.h"
 #include "VabStreamObj.h"
 #include "BgLayer.h"
 #include "Pad.h"
@@ -1096,7 +1096,7 @@ void Viewport__RemoveAllChildren(Viewport *self) {
 /*
  * code_2cc8c_d -- Viewport's methods from onNotify (+0x038) to the end of
  * gViewportMethods (include/Viewport.h, whose banner says what the class
- * is); the ctor, finalize and the child overrides are in code_2cc8c.c,
+ * is); the ctor, finalize and the child overrides are in TaskViewport.c,
  * drawNode in ViewportDraw.c. In table order:
  *  - onNotify and its two per-sender handlers: a FrameClock event runs
  *    update, the DrawSystem's VSync event runs flip;

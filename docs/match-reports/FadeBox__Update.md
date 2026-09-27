@@ -61,7 +61,7 @@ with a non-trivial body on BOTH sides rather than a bare early return.
 - `self->unk64`/`unk65`/`unk66` are three independent `u8` counters, each
   incremented by the LOW BYTE of `self->step` (a full `s32` elsewhere)
   gated by a separate bit of the `unk78` flags word -- named
-  `FadeBoxObj::unk64`/`unk65`/`unk66` in `include/code_2cc8c.h`.
+  `FadeBoxObj::unk64`/`unk65`/`unk66` in `include/TaskViewport.h`.
 
 ## Naming (round 61, track 3)
 

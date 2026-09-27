@@ -27,7 +27,7 @@ void BoxFill__SetPosition(Obj6EAC0 *self, BoxFillPos *a1) {
 }
 ```
 
-`BoxFillPos` (`include/code_2cc8c.h`) is the existing two-`s32`-record
+`BoxFillPos` (`include/TaskViewport.h`) is the existing two-`s32`-record
 type introduced for `FadeBox__PushPosition`'s own `a2` argument; `self->unk50`/
 `unk54` are already documented there as "first/second word of a 2-word
 struct copied from their own `a1` argument", so this is the same shape,
@@ -122,7 +122,7 @@ A ScreenSpritePos is always a percentage of half the screen from the centre;
 a BoxFillPos is that only while `relative` is set, and pixels after
 `attachAbsolute` (GraphRoom's dots, class_3bb8c_t, pass
 `dx * 10 - 5`-style pixel offsets). TaskCore__RefreshSlotView
-(code_2cc8c.c) passes one local SlotPos to both a BoxFill and its
+(TaskViewport.c) passes one local SlotPos to both a BoxFill and its
 TextRows, so a single `ScreenPos` in SceneNode.h is a reasonable proposal
 for the head; it cannot be done through `renametype.py` (the new name
 already exists) and would touch ScreenSprite.h and SceneNode.h, outside

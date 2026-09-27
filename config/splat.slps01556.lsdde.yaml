@@ -165,7 +165,7 @@ segments:
       # its references the other way. That remainder is renamed by each
       # carve of this block (code_2cc8c_b -> code_2cc8c_c in round 11), so
       # the owning function is named here rather than the segment.
-      - [0x1890, .rodata, code_2cc8c]
+      - [0x1890, .rodata, TaskViewport]
       # 0x1908 holds jtbl_80011108, func_8003FB1C's jump table. ATTACHED to
       # code_2cc8c_e in round 14 when that segment was carved: its words are
       # `.L` labels LOCAL to func_8003FB1C's own .s file, which a standalone
@@ -1197,7 +1197,7 @@ segments:
       # (3%) hit the gp_rel / addiu-$at blockers -- the lowest density of
       # any uncarved segment, which is why this block was picked over the
       # larger code_179d8 (43% blocked).
-      - [0x2cc8c, c, code_2cc8c]
+      - [0x2cc8c, c, TaskViewport]
       # code_2cc8c_b: second 20-function slice, 0x2D548..0x2E7A0.
       # 0x2E7A0 (func_8003DFA0) is a real boundary -- func_8003DE9C closes
       # `jr $ra; nop` + endlabel, and func_8003DFA0 opens by loading through

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003F04C` on 2026-09-23 (tools/rename.py). Address 0x8003f04c.
 
-Unit: `code_2cc8c`. Round 14, runner delta. 87/87 words, full match (2
+Unit: `TaskViewport`. Round 14, runner delta. 87/87 words, full match (2
 real attempts).
 
 ## Signature
@@ -81,7 +81,7 @@ exactly, and is simpler than the first attempt besides.
 
 ## Header changes
 
-`include/code_2cc8c.h`:
+`include/TaskViewport.h`:
 - `GenericObjMethods` gains `slot50` (`void`, return unused) and `slot54`
   (`s32`, return stored into `self->unk74`) — real occupants unknown
   (`self->unkC`'s dynamic class isn't otherwise identified in this unit).
@@ -98,17 +98,17 @@ exactly, and is simpler than the first attempt besides.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__Flip`. Slot +0x0A4 `flip`. `unkC` is `drawSystem` (the class-1 child, gDrawSystemMethods), whose +0x054 (DrawSystem__GetActiveBuffer) gives otIndex and +0x050 (DrawSystem__SwapBuffers) swaps; reached through code_2cc8c.h's GenericObj view with a cast, since DrawSystem has no header. `unkB8` is `drawEnabled`; the OT reads are `ot[idx]`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__Flip`. Slot +0x0A4 `flip`. `unkC` is `drawSystem` (the class-1 child, gDrawSystemMethods), whose +0x054 (DrawSystem__GetActiveBuffer) gives otIndex and +0x050 (DrawSystem__SwapBuffers) swaps; reached through TaskViewport.h's GenericObj view with a cast, since DrawSystem has no header. `unkB8` is `drawEnabled`; the OT reads are `ot[idx]`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/code_2cc8c.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSortClear(..., (GsOT *)self->ot[idx])` and `GsDrawOt((GsOT *)self->ot[idx])`.
+src/TaskViewport.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSortClear(..., (GsOT *)self->ot[idx])` and `GsDrawOt((GsOT *)self->ot[idx])`.
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 
 ```c
 /* Sony's `GsDrawOt` (libgs/gs_111, linked from the SDK object since round
- * 34; was func_8003FBF4, and was declared in include/code_2cc8c.h until this
+ * 34; was func_8003FBF4, and was declared in include/TaskViewport.h until this
  * round). Local for the same collision reason as the three above. Sony's own
  * argument is a `GsOT *`; this call site passes the same otIndex-indexed slot
  * it hands GsClearOt, as a plain word, and is left that way.

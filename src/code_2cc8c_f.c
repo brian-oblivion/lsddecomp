@@ -21,7 +21,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "code_2cc8c.h"
+#include "TaskViewport.h"
 #include "TextRow.h"
 
 void BoxFill__AttachToParent(BoxFill *self, SceneNode *parent, BoxFillPos *pos) {

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C794` on 2026-09-24 (tools/rename.py). Address 0x8003c794.
 
-**Unit:** code_2cc8c · **Size:** 8 instructions
+**Unit:** TaskViewport · **Size:** 8 instructions
 
 ## What it does
 
@@ -36,8 +36,8 @@ read (compared against `unk1C`) by `TaskCore__Update`.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit code_2cc8c (first function of the unit,
-established `include/code_2cc8c.h` and the `Obj86B60` struct name from the
+round 2026-09-02, runner echo, unit TaskViewport (first function of the unit,
+established `include/TaskViewport.h` and the `Obj86B60` struct name from the
 class's base method table gTitleMenuMethods).
 
 ## Naming (round 78, delta)
@@ -58,7 +58,7 @@ game sets one.
 `Obj86B60::unk40` (s32, +0x040) -> `frameBound`, matching the function name
 above. Grep shows `unk40` textual hits in many unrelated units
 (class_39e08.c, code_171e0.c, class_3bb8c_*.c, code_2c054.c, code_179d8_*.c,
-code_2cc8c.c) so this is a PROPOSAL, not a direct rename -- only a
+TaskViewport.c) so this is a PROPOSAL, not a direct rename -- only a
 definition-only rename + rebuild can tell which are this same struct.
 
 

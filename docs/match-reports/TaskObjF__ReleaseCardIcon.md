@@ -82,7 +82,7 @@ applied to a return value instead of a parameter.
 `self->unk70`'s own generic per-step "advance" slot and stores the
 result back (the same `self->field = self->field->methods->slot4(...)`
 shape recurring across many unrelated classes in this project, e.g.
-`class_39e08.c`, `code_2cc8c.c`, `code_55dd4.c` -- read here as an
+`class_39e08.c`, `TaskViewport.c`, `code_55dd4.c` -- read here as an
 ordinary per-frame/per-step tick of the loaded card icon object). What
 "advancing" the icon actually changes on screen is not established.
 
