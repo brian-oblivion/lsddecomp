@@ -129,3 +129,22 @@ unrelated units, so proposal only.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__SetColors (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 6 (2026-09-27, round 98, delta)
+
+The local copy type `RGB8003CB68` (named for this function's address, not a
+global) is retired for `BgLayerRgb` (`include/BgLayer.h`, already included by
+the unit). Evidence: the copy compiles to `lb`/`sb` per byte, so the record is
+a signed 3-byte `s8` triple -- not Sony's `CVECTOR` (4 bytes, `u_char`); and
+`baseColor`, the first of the three, is what `TaskCore__OnInit`
+(`code_2c054.c`) hands to `BgLayer`'s `setColor` as a `BgLayerRgb *`, and
+`TaskCore__TickColorFade` hands it the faded copy of it the same way. `unk93`/`unk96` are filled from the same rodata table
+(`D_8006E860`, three records 3 bytes apart) and `unk93` goes to the same
+TaskTextObj slot78 as `baseColor`, so one record type covers all three.
+Byte-identical: whole image green, 0 new warnings, nonmatching green.
+
+Proposed, not applied (header edit, other units): `TaskCore.h`'s `baseColor`,
+`unk93`, `unk96` retyped from `u8[3]` to `BgLayerRgb`, which would drop the
+casts here and in `code_2c054.c`. `code_2cc8c_f.c`'s `RGB80040790`
+(`BoxFill__ApplyColor`) is the same shape (s8 r, g, b, struct-copied); a
+separate job.
