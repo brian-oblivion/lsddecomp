@@ -104,7 +104,7 @@ extern TriggerRecord *gDreamAuxGroupRecords[];
  * class_3bb8c_l hands SetDreamAuxWorld its DreamSys `target`. code_4cd08.c
  * declares it; the DreamAuxWorld view that stood here is gone. */
 
-extern bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record);
+extern bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record);
 /* `out` is a 4-word (0x10-byte) caller stack scratch buffer, reused across
  * every call in ProcessDreamAuxTriggerRecord's loop. Its LAST word is pre-populated by the
  * caller with the return value of the TriggerWorld getModelData (+0x088) call before
@@ -114,10 +114,11 @@ extern bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record);
  * gp-relative blocker was resolved, see docs/research/gp-relative-blocker.md)
  * and never reads `out` -- it only forwards it untouched to `New_Entity`'s
  * 2nd argument; its own outgoing buffer is a separate local `outBuf[4]`. */
-extern bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, DreamAuxTriggerEntry *trigger, s32 entry);
-extern void EnableTeleportsForKind(s32 kind);
+extern bool SpawnDreamAuxTriggerEntity(s32 moodIndex, void *desc, DreamAuxTriggerEntry *trigger,
+                                       s32 spawnIndex);
+extern void EnableTeleportsForKind(s32 moodIndex);
 extern bool IsStyleVariantEven(void);
-extern bool IsCurrentDreamColor(s32 idx);
-extern bool IsDayInPeriodPhase(s32 a0, s32 a1);
+extern bool IsCurrentDreamColor(s32 condition);
+extern bool IsDayInPeriodPhase(s32 day, s32 phase);
 
 #endif
