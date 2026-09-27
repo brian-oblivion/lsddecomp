@@ -123,7 +123,7 @@ void Viewport__SetFogNear(Viewport *self, s32 fogNear) {
 
 /* One-time init, skipped once a view node is set: adds `node` as a child
  * (addChild caches it as viewNode), sets the viewpoint, reference point and
- * twist (D_8008A8F4 when `twist` is NULL), then hands refView to
+ * twist (gDefaultViewTwist when `twist` is NULL), then hands refView to
  * GsSetRefView2. */
 void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr,
                                Ratio16 *twist) {
@@ -135,7 +135,7 @@ void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, L
     m->addChild(self, node);
     m->setViewPoint(self, vp);
     m->setViewRef(self, vr);
-    m->setTwist(self, twist != NULL ? twist : &D_8008A8F4);
+    m->setTwist(self, twist != NULL ? twist : &gDefaultViewTwist);
     GsSetRefView2((GsRVIEW2 *)&self->refView);
 }
 
