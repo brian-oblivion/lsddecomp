@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003FF44` on 2026-09-20 (tools/rename.py). Address 0x8003ff44.
 
-Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::update` (`+0x098`).
+Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::update` (`+0x098`).
 
 ```c
 void FadeBox__Update(FadeBoxObj *self, void *a1, s32 a2) {

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80040490` on 2026-09-20 (tools/rename.py). Address 0x80040490.
 
-Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::popPosition` (`+0x0EC`).
+Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::popPosition` (`+0x0EC`).
 
 ```c
 void FadeBox__PopPosition(FadeBoxObj *self) {

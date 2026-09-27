@@ -7,7 +7,7 @@
 #include "TextRow.h"
 
 /*
- * code_2cc8c_e -- the screen fade, and the first methods of the box it draws.
+ * ScreenWidgets -- the screen fade, and the first methods of the box it draws.
  *
  * FadeBox (include/FadeBox.h), New_FadeBox to GetFadeBoxMethods: a BoxFill
  * whose colour steps once per FrameClock tick away from a channel mask's
@@ -270,7 +270,7 @@ void BoxFill__Reset(BoxFill *self, BoxFillSize *size, void *color, s32 pri) {
  * BoxFill (include/BoxFill.h), BoxFill__AttachToParent to GetBoxFillMethods:
  * a flat-coloured GsBOXF screen rectangle's attach, attribute bits, colour,
  * position, size, priority and mask. Its allocator, ctor and Reset are the
- * last functions of code_2cc8c_e.
+ * last functions of ScreenWidgets.
  *
  * TextRow (include/TextRow.h), New_TextRow to GetTextRowMethods: a row of
  * CharSprite character cells showing a string. It derives from CharSprite,

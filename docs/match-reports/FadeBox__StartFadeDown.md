@@ -168,7 +168,7 @@ boundary).
 > a finding about `setup-permuter.sh`'s own behaviour, which is a property
 > of the TOOL and not of whose code it was pointed at.
 
-Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::startFadeToIndex` (`+0x0D4`).
+Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::startFadeToIndex` (`+0x0D4`).
 
 **Correction to an earlier version of this report**, which claimed a full
 35/35 match under the stale-build window described in `New_FadeBox.md`
@@ -246,7 +246,7 @@ class rather than two coincidences; see that function's own report.
 
 NON_MATCHING body promoted, round 59. The exact preserved body above (29/35
 words, length exact, instruction-scheduling residue on the `li $a1,1`
-materialization) is now live in `src/code_2cc8c_e.c` under `#ifdef
+materialization) is now live in `src/ScreenWidgets.c` under `#ifdef
 NON_MATCHING`, with the verified build still taking the `#else INCLUDE_ASM`
 branch. `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
 

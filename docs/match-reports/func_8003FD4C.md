@@ -3,7 +3,7 @@
 > **ROUND 34 (2026-09-12), runner bravo. THIS FUNCTION IS NOW LINKED FROM
 > SONY'S OWN OBJECT `libgte/fog_01.o` (Psy-Q 3.3) AND IS NAMED `SetFogNear`.**
 > The object's text covers exactly it. It was part of the five-object run
-> 0x303F4..0x305B0 inside `code_2cc8c_e`; that unit is now split three ways
+> 0x303F4..0x305B0 inside `ScreenWidgets`; that unit is now split three ways
 > and this function is no longer in it.
 >
 > **This RECLASSIFIES a matched function out of the game-code count, which is
@@ -21,7 +21,7 @@
 _Previously: func_8003FD4C -- MATCH (25/25 words)_
 
 
-Unit `code_2cc8c_e`, carved round 14.
+Unit `ScreenWidgets`, carved round 14.
 
 ```c
 void func_8003FD4C(s32 a0, s32 a1) {

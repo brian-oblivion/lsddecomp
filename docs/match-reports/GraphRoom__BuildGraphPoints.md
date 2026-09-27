@@ -26,7 +26,7 @@ round's final summary for the disposition of `GraphRoom__PopulateGraphPoints`.
 
 Builds a 100-entry array of allocated `D_80087AACEntry` objects
 (`self->unk_0xA8[0..99]`), each constructed via `New_BoxFill` (already
-matched, `code_2cc8c_e.c`) with a colour-like 3-byte argument: entry 0
+matched, `ScreenWidgets.c`) with a colour-like 3-byte argument: entry 0
 gets the constant `gGraphPointNewestColor` directly; entries 1-99 get successive
 values of a mutable local copy of `gGraphPointBaseColor` (also 3 bytes), decremented
 by 0x14 for the first 6 loop iterations and by 1 thereafter. Finally
@@ -221,4 +221,4 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 ## Track 6 (2026-09-27, round 98, delta): `GraphPointColor` -> `BoxFillRgb`
 
-The local `GraphPointColor` (round 97) is retired onto include/BoxFill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (code_2cc8c_e's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `gGraphPointNewestColor`, `gGraphPointBaseColor`, `gGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.
+The local `GraphPointColor` (round 97) is retired onto include/BoxFill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (ScreenWidgets's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `gGraphPointNewestColor`, `gGraphPointBaseColor`, `gGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_800408BC` on 2026-09-18 (tools/rename.py). Address 0x800408bc.
 
-Unit: `src/code_2cc8c_e.c`. First attempt.
+Unit: `src/ScreenWidgets.c`. First attempt.
 
 ```c
 Obj6EAC0Methods *GetBoxFillMethods(void) {

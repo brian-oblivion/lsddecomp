@@ -2,7 +2,7 @@
 
 > **ROUND 33 (2026-09-12), head. THIS FUNCTION IS NOW LINKED FROM SONY'S OWN
 > OBJECT `libgs/gs_131.o` (Psy-Q 3.3) AND IS NAMED `GsSetRefView2`.**
-> `src/code_2cc8c_e.c` now starts at 0x3030C / GsSetNearClip. Whole-image
+> `src/ScreenWidgets.c` now starts at 0x3030C / GsSetNearClip. Whole-image
 > SHA1 green. Nothing here is assignable and there is no stall left to work.
 >
 > **Everything below is kept as the derivation it was, not as live guidance.**
@@ -26,7 +26,7 @@
 > and still useful when the object is placed. Only the premise that it is
 > game code is retracted.
 
-Unit `code_2cc8c_e`, carved round 14. **Not attempted**, and it is the worst
+Unit `ScreenWidgets`, carved round 14. **Not attempted**, and it is the worst
 function in this segment on two independent screens.
 
 ## Classification
@@ -34,9 +34,9 @@ function in this segment on two independent screens.
 Two problems, either of which alone would be enough:
 
 ```sh
-grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/code_2cc8c_e/func_8003F2AC.s \
+grep -A2 -nE '\b(mflo|mfhi)\b' asm/nonmatchings/ScreenWidgets/func_8003F2AC.s \
   | grep -E '\b(mult|multu|div|divu)\b'          # -> hit
-grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/code_2cc8c_e/func_8003F2AC.s \
+grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/ScreenWidgets/func_8003F2AC.s \
   | sort -u | wc -l                              # -> 6
 ```
 
@@ -51,7 +51,7 @@ grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/code_2cc8c_e/func_8003F2AC.s \
    expected to land in the register-allocation stall class.
 
 At 242 instructions it is also the largest body in the segment. Round 13
-measured all three of these facts at the time `code_2cc8c_e` was left uncarved
+measured all three of these facts at the time `ScreenWidgets` was left uncarved
 and recorded them in the splat yaml specifically so that no round would lead a
 runner with it. This report is that warning in the place `progress.py` reads.
 

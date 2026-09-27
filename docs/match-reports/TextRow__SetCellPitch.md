@@ -4,7 +4,7 @@
 
 > Renamed from `func_80040FA8` on 2026-09-18 (tools/rename.py). Address 0x80040fa8.
 
-Unit: `src/code_2cc8c_e.c`. Trivial setter, first attempt.
+Unit: `src/ScreenWidgets.c`. Trivial setter, first attempt.
 
 ```c
 void TextRow__SetCellPitch(Obj6EAC0 *self, s32 a1) {
@@ -36,4 +36,4 @@ spacing distance, confirmed by those two callers (this same unit).
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__SetChildPitch`: +0x0D4, own slot `setCellPitch`; stores `cellPitch` (+0x0B0), which reset sets to 7 and the layout slots add to x between cells. Image byte-identical; the current source is src/code_2cc8c_e.c.
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__SetChildPitch`: +0x0D4, own slot `setCellPitch`; stores `cellPitch` (+0x0B0), which reset sets to 7 and the layout slots add to x between cells. Image byte-identical; the current source is src/ScreenWidgets.c.

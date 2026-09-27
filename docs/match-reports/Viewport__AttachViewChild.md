@@ -77,7 +77,7 @@ void Viewport__AttachViewChild(Unk18Obj *self, void *a1, void *a2, void *a3, voi
   report) and `Viewport__SetTwist` (the documented `gp_rel` blocker, not
   decompiled).
 - New externs `gDefaultViewTwist` (`asm/data/7B008.sdata.s`, address-only) and
-  `func_8003F2AC` (`asm/code_2cc8c_e.s`, the next uncarved slice).
+  `func_8003F2AC` (`asm/ScreenWidgets.s`, the next uncarved slice).
 
 ## Proposed learning
 

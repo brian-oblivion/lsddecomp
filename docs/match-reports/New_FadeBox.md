@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003FDB0` on 2026-09-20 (tools/rename.py). Address 0x8003fdb0.
 
-Unit `code_2cc8c_e`, carved round 14.
+Unit `ScreenWidgets`, carved round 14.
 
 > **UPDATE (targeted permuter pass, round 17).** MATCHED, no permuter
 > needed. `docs/research/epilogue-merge-residue.md` (updated 2026-09-02,
@@ -67,7 +67,7 @@ position ABOVE that type's own forward declaration -- a parse error in
 `Task.c` (a DIFFERENT unit) that made `make` skip the final link
 entirely, leaving `build/SLPS_015.56` stale. `funcdiff.py`'s own
 STALE-BUILD guard did not catch it because the STALE object here was
-`Task.c.o`, not `code_2cc8c_e.c.o` -- this unit's own object kept
+`Task.c.o`, not `ScreenWidgets.c.o` -- this unit's own object kept
 rebuilding fine, so nothing about the guard's usual signal (source newer
 than binary) looked wrong; the binary just never reached the final link
 step at all. Caught only by cross-checking EVERY function's LINKED
@@ -121,7 +121,7 @@ the round-20 working names (`FadeBoxObj`, `FadeBox__GetMethods`, ...): those
 lines name types and functions that were then `Class6E99C...` (known,
 pending an operator decision; not hand-reverted).
 
-### The unit banner and function comments, moved from src/code_2cc8c_e.c
+### The unit banner and function comments, moved from src/ScreenWidgets.c
 
 The banner now says what the file holds. Its history, and the long form of
 three comments now reduced to one `MATCHING:` line each, verbatim (with
@@ -140,11 +140,11 @@ renametype's rewrite of the class name):
  *   [o libgs/gs_108]   GsSetLightMode         was func_8003FC70, matched C
  *   [o libgte/fgo_00]  TransposeMatrix        was func_8003FCFC, a 20w stall
  *   [o libgte/fog_01]  SetFogNear             was func_8003FD4C, matched C
- *   [c code_2cc8c_e]   New_FadeBox onward   <- this file
+ *   [c ScreenWidgets]   New_FadeBox onward   <- this file
  *
  * THIS FILE KEEPS THE NAME deliberately: it holds the unit's remaining
  * INCLUDE_ASM stubs and its class, so every
- * `INCLUDE_ASM("asm/nonmatchings/code_2cc8c_e", ...)` path below and every
+ * `INCLUDE_ASM("asm/nonmatchings/ScreenWidgets", ...)` path below and every
  * match report naming this unit stays valid. Only the two one-function heads
  * needed new names.
  *
@@ -166,7 +166,7 @@ renametype's rewrite of the class name):
  * FadeBox`: first FadeBox's (gFadeBoxMethods, 0x164, `New_FadeBox` to
  * `GetFadeBoxMethods`, include/FadeBox.h), then BoxFill's allocator,
  * ctor and Reset (0x64, include/BoxFill.h, a GsBOXF screen rectangle; the
- * rest of its methods open code_2cc8c_e).
+ * rest of its methods open ScreenWidgets).
  *
  * FadeBox fades the box's colour: configure picks the channels (a
  * 4/2/1 = r/g/b mask) and a tick count, StartFadeDown/StartFadeUp set the

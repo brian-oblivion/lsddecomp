@@ -2,7 +2,7 @@
 
 > Renamed from `func_80040FC0` on 2026-09-18 (tools/rename.py). Address 0x80040fc0.
 
-Unit: `src/code_2cc8c_e.c`. Blocker screen clean. No `self`/vtable
+Unit: `src/ScreenWidgets.c`. Blocker screen clean. No `self`/vtable
 involvement -- a standalone byte-transcoding string function (likely a
 half/full-width character remap; see the sibling `EncodeFullWidthSjis` for
 the inverse direction).
@@ -199,7 +199,7 @@ u8 *DecodeFullWidthSjis(u8 *dst, u8 *src) {
 
 ## Round 35 confirmation: reconfirmed, two new reshapes tried, both regressed sharply
 
-Runner delta, `code_2cc8c_e`, off the head's fresh-ground list (24 words, best
+Runner delta, `ScreenWidgets`, off the head's fresh-ground list (24 words, best
 15/24, zero permuter history at the time).
 
 Rebuilt the round-27 preserved body first (per this round's "build any
@@ -353,7 +353,7 @@ compiler.
 **The idiom is NOT "name a second variable and GCC keeps a second
 register". It requires both variables to be independently MUTATED.**
 
-`FadeBox__PushPosition` (`code_2cc8c_e`) is the measured boundary, and it was
+`FadeBox__PushPosition` (`ScreenWidgets`) is the measured boundary, and it was
 already on record before this round: retail copies BOTH its parameters
 into fresh registers at entry (`move $a3,$a0` / `move $t0,$a1`) and never
 touches the originals again -- superficially the identical "retail spends
@@ -431,7 +431,7 @@ searched, so there is no negative to record.
 ### Correction: stale cross-references to `BoxFill__ApplyColor` and class membership
 
 Before searching, checked `BoxFill__ApplyColor`'s MATCHED C in this same unit
-(`src/code_2cc8c_e.c`) per the head's instruction, to see whether it already
+(`src/ScreenWidgets.c`) per the head's instruction, to see whether it already
 spells the `d = dst; dst++; *d = x;` two-pointer idiom this report's
 round-37 section credits with solving the class. It does not, and the
 reason is structural, not a counter-example to the idiom:
