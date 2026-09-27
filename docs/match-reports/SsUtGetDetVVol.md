@@ -2,7 +2,7 @@
 
 > Renamed from `func_80031C98` on 2026-09-23 (tools/rename.py). Address 0x80031c98.
 
-Unit `code_179d8_j`, round 21 (2026-09-06). Not a class method
+Unit `code_179d8_l`, round 21 (2026-09-06). Not a class method
 (`_svm_sreg` is a plain global pointer variable, no `classtable.py`
 hit). This is the "raw getter" half of a pair with `SsUtGetVVol`
 (same table, same bounds, `SsUtGetVVol` divides each field by 129

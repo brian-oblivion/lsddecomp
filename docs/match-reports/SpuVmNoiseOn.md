@@ -44,7 +44,7 @@ Straight-line leaf, one conditional call:
    `D_8008EA26` (a 16-bit store -- the value is always 0..0xFF here, so the
    upper byte written is always 0).
 3. Compare that masked value against `spuVmMaxVoice` (loop-bound/threshold byte,
-   documented in `code_179d8_j.c`). If it is `< spuVmMaxVoice`, call
+   documented in `code_179d8_l.c`). If it is `< spuVmMaxVoice`, call
    `vmNoiseOn2` (also owned by `code_179d8_l`) with five arguments: the
    LOW BYTE re-read from `D_8008EA26` (register `$a0`), this function's own
    two arguments narrowed to `u16` (`$a1`, `$a2`), the constant `0x80FF`

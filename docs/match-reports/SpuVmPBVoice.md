@@ -119,7 +119,7 @@ own score (77/138 before and after), so it is recorded as a correction to
   the score from 1/138 to 38/138 in one edit. Padded to `0x20 - 0xE` bytes
   after `unkD` to get the right stride.
 - `Rec16D7F4` / `D_8008D7F4[]`: same 0x10-byte-stride record family
-  `code_179d8_j.c` already documents as `Rec16D7F0` (its own
+  `code_179d8_l.c` already documents as `Rec16D7F0` (its own
   `_svm_sreg_buf`/`D_8008D7F4` pair) -- local view, `s16 unk0`.
 - `_svm_sreg_dirty[]`: plain byte-stride flags array (no per-record multiply in
   its own addressing, unlike every 0x34/0x10-stride array above).
@@ -276,7 +276,7 @@ typedef struct {
 } Tbl32E978;
 extern Tbl32E978 *_svm_tn;
 
-/* Same 0x10-byte-stride record family code_179d8_j.c documents as
+/* Same 0x10-byte-stride record family code_179d8_l.c documents as
  * Rec16D7F0 (that unit's _svm_sreg_buf/D_8008D7F4 pair); local view. */
 typedef struct {
     s16 unk0; /* +0x0 */

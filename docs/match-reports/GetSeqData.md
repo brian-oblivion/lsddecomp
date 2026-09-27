@@ -437,7 +437,7 @@ much smaller (one call, one block) swap.
 
 code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
-libsnd_cres, libsnd_decre and code_179d8_j already use. The header gained
+libsnd_cres, libsnd_decre and code_179d8_l already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
 moved); field names stay offset-only (`unkNN`) as the header's convention for
 Sony-only fields, with each one's mechanics in its comment. The unit's

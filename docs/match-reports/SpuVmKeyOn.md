@@ -9,7 +9,7 @@
 > satisfying the bar without a header prototype (see below). This stays an
 > `INCLUDE_ASM` STALL: it is Sony's code and leaves every matching queue,
 > it is only being named here. The three call sites
-> (`src/code_179d8_j.c`, `src/libsnd_seqread.c`, `src/code_179d8_j_c.c`) keep
+> (`src/code_179d8_l.c`, `src/libsnd_seqread.c`, `src/code_179d8_j_c.c`) keep
 > their existing byte-exact local `extern` signatures rather than a
 > LIBSND.H copy: unlike `SsUtKeyOn`, `SpuVmKeyOn` is libsnd/vmanager
 > INTERNAL and has no public prototype in `include/psyq/libsnd.h` (grep
@@ -69,11 +69,11 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
 
 Before writing any C, `grep -rn SpuVmKeyOn src/*.c docs/match-reports/*.md`
 turned up this **exact** signature already guessed independently by
-`libsnd_decre.c`, `code_179d8_j.c` and `libsnd_seqread.c` (each calls this
+`libsnd_decre.c`, `code_179d8_l.c` and `libsnd_seqread.c` (each calls this
 function and typed it from its own call site), plus two live call sites
 with concrete argument roles:
 
-- `code_179d8_j.c`'s `SpuVmSeKeyOn` (matched): `return
+- `code_179d8_l.c`'s `SpuVmSeKeyOn` (matched): `return
   SpuVmKeyOn(0x21, (s16) p0, (s16) p1, (u16) p2, outA, outB);` -- `a0 ==
   0x21` is a real sentinel value this function itself branches on (see
   below).
@@ -98,7 +98,7 @@ until you diff registers, not just word counts.
 
 ## Struct/global knowledge derived this round
 
-- `SlotE968M` / `_svm_pg`: the SAME 0x10-stride table `code_179d8_j.c`
+- `SlotE968M` / `_svm_pg`: the SAME 0x10-stride table `code_179d8_l.c`
   already documents as `SlotE968` (`unk0`/`unk1`/`unk4`) -- this function's
   own local view, same shape, used here as `&_svm_pg[a2]` (a2 = this
   function's own s16 parameter, NOT a channel id from `func_80032148`).
@@ -124,7 +124,7 @@ until you diff registers, not just word counts.
   `D_8008EA24` cluster this unit had not needed yet: `D_8008EA0C`,
   `D_8008EA0D`, `D_8008EA0E`, `D_8008EA0F`, `D_8008EA1C`..`D_8008EA20`,
   `D_8008EA24`. All plain `u8`/`u16` scratch, all already declared with
-  identical types in `code_179d8_j.c`'s own header block for the sibling
+  identical types in `code_179d8_l.c`'s own header block for the sibling
   `SsUtKeyOn` -- this was the single biggest time-saver this round
   (see "Where this came from" below).
 
@@ -132,7 +132,7 @@ until you diff registers, not just word counts.
 
 Before deriving anything by hand, `grep -rn SpuVmKeyOn src/*.c` found
 this function's signature independently triple-corroborated (above), and
-`code_179d8_j.c`'s header comment for its OWN (still-`INCLUDE_ASM`)
+`code_179d8_l.c`'s header comment for its OWN (still-`INCLUDE_ASM`)
 `SsUtKeyOn` already named the exact same globals this function
 touches (`D_8008EA0C` through `D_8008EA20`, `D_8008EA24`) as "a `start
 channel` setup routine that stages its parameters and a couple of table
@@ -418,7 +418,7 @@ found.**
 
 #if 0
 /* Base pointer for a table of 0x10-byte slots, same shape as
- * code_179d8_j.c's own SlotE968 local view of the same _svm_pg
+ * code_179d8_l.c's own SlotE968 local view of the same _svm_pg
  * global -- only the three byte fields this function touches are
  * named, per this project's reduced-local-view convention. */
 typedef struct {
@@ -433,7 +433,7 @@ extern SlotE968M *_svm_pg;
 /* A 172 (0xAC)-byte record; _ss_score is an array of pointers to
  * arrays of these, indexed [screen][slot]-style by a packed argument
  * (slot in the high byte, screen in the low byte) -- same array
- * code_179d8_j.c/_k.c/_i.c already document, each with its own reduced
+ * code_179d8_l.c/_k.c/_i.c already document, each with its own reduced
  * local view. This function only needs the `unk12` byte-offset field
  * (see libsnd_seqread.c's fuller Entry90902E8 for what it points at:
  * `*(s16 *)((u8 *)rec + 0x4E + rec->unk12 * 2)` is a per-voice "speed"
@@ -470,7 +470,7 @@ extern void SpuVmKeyOnNow(s32 a0, u16 a1);
 extern u8 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
 
 /* Called as `SpuVmKeyOn(0x21, p0, p1, p2, outA, outB)` from
- * code_179d8_j.c's SpuVmSeKeyOn and as
+ * code_179d8_l.c's SpuVmSeKeyOn and as
  * `SpuVmKeyOn(packed, note, vol, (u8)a3, (u16)divided, status)` from
  * libsnd_seqread.c's NoteOn -- signature confirmed independently
  * by three sibling units' own extern guesses (libsnd_decre/_j/_k all
@@ -611,11 +611,11 @@ it again.
 
 **SpuVmKeyOn** (was `func_8002FAC4`) -- Tier A. Signature and role
 corroborated independently by three sibling units (`libsnd_decre.c`,
-`code_179d8_j.c`, `libsnd_seqread.c`, per this report's own "Signature"
+`code_179d8_l.c`, `libsnd_seqread.c`, per this report's own "Signature"
 section) before any body-level derivation: `libsnd_seqread.c`'s
 `NoteOn` calls this in its nonzero-velocity branch and SpuVmKeyOff in
 its zero-velocity branch of the SAME MIDI-status-byte switch, and
-`code_179d8_j.c` wraps both with the same fixed leading identity constant
+`code_179d8_l.c` wraps both with the same fixed leading identity constant
 (`0x21`) -- a clean NoteOn/NoteOff symmetry, which is the primary evidence
 for "Note" rather than the more mechanical "RegisterActiveChannel" this
 report's own prose used while deriving it. Registers a new active-voice

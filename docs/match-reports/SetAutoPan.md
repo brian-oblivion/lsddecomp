@@ -136,11 +136,11 @@ obvious from context.
   reinterpreted through a cast (`((Rec34HalfU *) D_8008D9B2)[a0].unk0`)
   rather than redeclared, same rule as everywhere else in this file.
 - `Rec16D7F0` / `_svm_sreg_buf[]`, `D_8008D7F2[]`: the SAME 0x10-byte-stride
-  record family `code_179d8_j.c` documents as `Rec16D7F0`.
+  record family `code_179d8_l.c` documents as `Rec16D7F0`.
 
   > **HEAD ADJUDICATION, round 24: this bullet's "important correction" is
   > WITHDRAWN. `_svm_sreg_buf`/`D_8008D7F2` remain the two FIELDS of one
-  > 0x10-stride record, as `code_179d8_j.c`'s `Rec16D7F0` models them.**
+  > 0x10-stride record, as `code_179d8_l.c`'s `Rec16D7F0` models them.**
   >
   > The observation was accurate and the inference from it was not. What the
   > disassembly shows here (measured again by the head at lines 230-239 of
@@ -177,7 +177,7 @@ obvious from context.
   > independent arrays would have to coincide in both stride and index.
   >
   > Kept rather than deleted because the OTHER half of the bullet is right
-  > and useful: `code_179d8_j.c`'s `_svm_sreg_buf`/`D_8008D7F4` genuinely are
+  > and useful: `code_179d8_l.c`'s `_svm_sreg_buf`/`D_8008D7F4` genuinely are
   > two independent arrays of that record shape, which is what makes this
   > family easy to misread in either direction.
 - `ObjE970` / `_svm_vh` (pointer variable, `lw`-loaded): only the byte
@@ -450,7 +450,7 @@ typedef struct {
     u8 pad2[0x34 - 0x2];
 } Rec34HalfU;
 
-/* Same 0x10-byte-stride record family code_179d8_j.c documents as
+/* Same 0x10-byte-stride record family code_179d8_l.c documents as
  * Rec16D7F0 (that unit's own _svm_sreg_buf/D_8008D7F4 pair); local view.
  * _svm_sreg_buf and D_8008D7F2 here are TWO INDEPENDENT arrays of this
  * shape (each gets its own %hi/%lo pair in the disassembly), not one

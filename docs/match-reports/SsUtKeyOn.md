@@ -7,7 +7,7 @@
 arithmetic accounting of the gap"; names/types not relevant (the residue is
 below cc1 and no source shape reaches it).**
 
-> **Unit corrected:** this report's original header said `code_179d8_j`.
+> **Unit corrected:** this report's original header said `code_179d8_l`.
 > That unit was re-carved in round 34 and this function now lives in
 > **`src/libsnd_vm_vol_ut_key_ut_keyv.c`**. The `asm/nonmatchings/` path is
 > `libsnd_vm_vol_ut_key_ut_keyv/SsUtKeyOn.s`.
@@ -200,7 +200,7 @@ would have sunk a correct escalation.
 # SsUtKeyOn -- STALL (11 words short as of round 36: 241 built / 252 retail, a best-effort reproduction of round 31's 240/252; raw word-match 36/252; the three round-26 residues -- busy-lock branch polarity, missing field-copy nops, `result`'s register handling -- persist, and are treated as exhausted this round -- see round-36 addendum)
 
 Unit `src/libsnd_vm_vol_ut_key_ut_keyv.c` (CORRECTED round 62 -- this line said
-`code_179d8_j`, the pre-round-34 unit name), round 26 (2026-09-09). Not a class method. A "start
+`code_179d8_l`, the pre-round-34 unit name), round 26 (2026-09-09). Not a class method. A "start
 channel" setup routine: validates `(p0,p1)` via `func_80032148`, computes a
 volume pan pair (same formula as this unit's already-matched
 `SpuVmSeKeyOn`), copies two small lookup-table records into a block of
@@ -708,7 +708,7 @@ is the whole story.
 
 Round 34's SDK-object conversion linked `libsnd/vm_vsu.o` and renamed this
 function's callee from `func_80032148` to `SpuVmVSetUp`, AND split the old
-`code_179d8_j` monolith so that this function's own unit (now
+`code_179d8_l` monolith so that this function's own unit (now
 `libsnd_vm_vol_ut_key_ut_keyv.c`) no longer carried three declarations its own preserved
 body needs:
 
@@ -720,7 +720,7 @@ body needs:
   (`D_8008EA22 = 0x21;`). The file's own header comment made this claim;
   it is corrected in this round's edit (see `src/libsnd_vm_vol_ut_key_ut_keyv.c`'s header).
 - The `SlotE968` typedef and `_svm_pg` extern, which round 34 removed
-  from the OLD `code_179d8_j.c` (now the front unit) because that unit's own
+  from the OLD `code_179d8_l.c` (now the front unit) because that unit's own
   four functions using it had all become Sony's `libsnd/vm_prog.o` -- but
   this function (still a stall, still in this family) also uses it, and
   the removal note said nothing about that.

@@ -56,7 +56,7 @@ readings).
 
 Cross-unit prototypes added (local guesses, kept in this .c only):
 `SpuVmSeqKeyOff(s32)` and `func_80036410(s32, s32)`, both already matched
-elsewhere (`code_179d8_j.c` and `libsnd_cres.c` respectively) with
+elsewhere (`code_179d8_l.c` and `libsnd_cres.c` respectively) with
 exactly these signatures and this file's own established
 "`(slot<<8)|channel`" packed-argument idiom for the former.
 
@@ -659,7 +659,7 @@ confirmed byte-exact.
 
 code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
-libsnd_cres, libsnd_decre and code_179d8_j already use. The header gained
+libsnd_cres, libsnd_decre and code_179d8_l already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
 moved); field names stay offset-only (`unkNN`) as the header's convention for
 Sony-only fields, with each one's mechanics in its comment. The unit's

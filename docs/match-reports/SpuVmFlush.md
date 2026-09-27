@@ -473,7 +473,7 @@ typedef struct {
 /* _svm_sreg, already declared above as `SpuRegs *` (one struct, fields
  * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
  * per-channel records here -- another independent local view of the
- * same pointed-to object (see also code_179d8_j.c's own array-of-0x10
+ * same pointed-to object (see also code_179d8_l.c's own array-of-0x10
  * reading of a sibling symbol). */
 typedef struct {
     s16 unk0; /* +0x0 */
@@ -653,7 +653,7 @@ typedef struct {
 /* _svm_sreg, already declared above as `SpuRegs *` (one struct, fields
  * at +0x194/+0x196), is ALSO the base of an array of 0x10-byte
  * per-channel records here -- another independent local view of the
- * same pointed-to object (see also code_179d8_j.c's own array-of-0x10
+ * same pointed-to object (see also code_179d8_l.c's own array-of-0x10
  * reading of a sibling symbol). */
 typedef struct {
     s16 unk0; /* +0x0 */

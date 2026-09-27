@@ -62,7 +62,7 @@ Evidence for each type from the callee/caller bytes, not from guessing:
   `s3`. Round 25 tried several restructurings of the index expressions and none
   could move it, because the cause was the declaration.
 - **`SpuVmSetSeqVol(s16, u16, u16, s32)`**: retail masks both XY arguments
-  `andi 0xFFFF` at the call; the callee (`code_179d8_j`, still
+  `andi 0xFFFF` at the call; the callee (`code_179d8_l`, still
   `INCLUDE_ASM`) stores them with `sh` and re-reads with `lhu` +
   `sltiu 0x80`, i.e. unsigned. `libsnd_decre.c` already carried
   `(s16 a0, u16 a1, u16 a2, s32 a3)`.
@@ -134,7 +134,7 @@ uses `SsScore` from `include/SsScore.h`, the record behind libsnd's
 on any disc). The type is Sony's because only Sony functions read it: this
 function is library code by the `config/psyq-objects.ld` pin, and the other
 readers are libsnd (`Snd_setvol_data`/`Snd_SetCres` in the linked
-`libsnd/vol`, `SpuVmGetSeqVol`/`SpuVmSetSeqVol` in `code_179d8_j`).
+`libsnd/vol`, `SpuVmGetSeqVol`/`SpuVmSetSeqVol` in `code_179d8_l`).
 `tools/sonydata.py` reports no game-named Sony data. The fields keep their
 offset names, per that header's rule; the fields this function reads
 (`unk3E`, `unk40`, `unk42`, `unk78`, `unk7A`, `unk90`, `unk98`) were added to

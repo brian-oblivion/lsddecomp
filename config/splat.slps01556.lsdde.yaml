@@ -903,7 +903,6 @@ segments:
       # family owns one and the rodata slot list above names none of them.
       # This is the one respect in which the split differs from round 33's
       # code_179d8_c_b, which DID have to carry its attach across.
-      - [0x20ADC, c, code_179d8_j]
       - [0x20FF0, o, libsnd/vm_prog]    # SpuVmSet/GetProgVol, SpuVmSet/GetProgPan
       - [0x21180, c, libsnd_vm_vol_ut_key_ut_keyv]
       # ROUND 34, SECOND split of the same original slice: `libsnd/ut_pb`

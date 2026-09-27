@@ -2,7 +2,7 @@
 
 Matched as C by splat itself (`void KeyOnCheck(void) {}`, a `jr $ra; nop`
 leaf); it was never matching work. Formerly `func_800303FC`, the one game-
-counted definition left in `code_179d8_j`.
+counted definition left in `code_179d8_l`.
 
 ## Identification (FINISHING-PLAN track 2)
 

@@ -484,7 +484,7 @@ extern u8 D_8008EA1A;
 
 extern s16 _svm_stereo_mono;
 
-/* Same 0x10-byte-stride record family code_179d8_j.c documents as
+/* Same 0x10-byte-stride record family code_179d8_l.c documents as
  * Rec16D7F0 -- accessed here through a flat `s16 *` halfword-indexed
  * cast (the `woff` idiom below), so only a plain extern is needed. */
 extern s16 _svm_sreg_buf[];

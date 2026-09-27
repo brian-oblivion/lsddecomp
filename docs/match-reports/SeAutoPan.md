@@ -64,7 +64,7 @@ through a table. `code_179d8_l`'s runner (charlie, this round) is deriving
 the same opening shape from the sibling side; this confirms it.
 
 `D_8008D9B0`..`D_8008D9BA` are six 2-bytes-apart symbols in the SAME
-0x34-byte-stride channel-configuration record family `code_179d8_j.c`
+0x34-byte-stride channel-configuration record family `code_179d8_l.c`
 documents (`Rec34D994`, `Rec34Byte`) -- this unit's own local
 `Rec34Half` type (already declared for `SpuVmNoiseOff`'s `D_8008D98C`,
 hoisted above this function since it is the earlier ROM-order user).
