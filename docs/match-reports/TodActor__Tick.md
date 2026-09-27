@@ -96,3 +96,8 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 The frame-wrap reload reads `TODSET_TOD(self->modelData->todSet,
 self->todIndex)->buffer + 8` in place of the `GroupObj` cast chain (see
 TodActor__SetTod). Byte-identical.
+
+## Track 7 (round 99, bravo): readable spelling, byte-identical
+
+The frame pointer is `((TodHeader *)tod->buffer)->frames` and `TODSET_TOD` reads
+the unit's `TodSetBuffer` view (`tods[i]` at +0x8), no byte offsets.

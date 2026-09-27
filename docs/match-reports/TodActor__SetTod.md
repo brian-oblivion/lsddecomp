@@ -278,3 +278,8 @@ its buffer's counted offset table, from +0x8, with the Tod it built there. The
 expression is now `TODSET_TOD(set, i)` (include/code_55dd4.h), and `EntryObj2`,
 the TOD data's header with the frame count at +0x4, is `TodHeader`. Same
 address arithmetic, byte-identical.
+
+## Track 7 (round 99, bravo): readable spelling, byte-identical
+
+As TodActor__Tick: `TodHeader.frames` and the `TodSetBuffer` view replace the
+`+ 8` offsets.

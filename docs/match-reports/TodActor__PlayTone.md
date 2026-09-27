@@ -72,3 +72,8 @@ field to InitSoundCueSet/ServiceSoundCueSet/FlushSoundCueSet as their sound
 object, a VabStreamObj by SoundCueSet.h -- so this plays tone `index` on the
 actor's sound bank with vol = endVol = 0x6E. The forwarded parameter is typed
 `s32 index` accordingly; byte-identical. Nothing in C dispatches the slot.
+
+## Track 7 (round 99, bravo)
+
+`0x6E` is `TODACTOR_TONE_VOLUME` (110), passed as both vol and endVol of
+VabStreamObj's playTone.

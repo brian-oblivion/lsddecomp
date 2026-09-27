@@ -81,3 +81,7 @@ Round 75 (charlie), track 3.
 ## Track 4 (2026-09-25, round 85, alpha)
 
 Renamed from `TodActor__OnClass6EF50Notify`. Override of +0x098, SceneNode's `update` (the slot SceneNode__OnNotify routes a class-5 FrameClock sender's events to), named for its slot as Entity's override of the same slot (Entity__Update) already is: code 2 runs tick (+0x108), code 4 release. The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`. Any source block above is the pre-unification spelling; the live body in `src/code_55dd4.c` takes the unified types and slot names, byte-identical.
+
+## Track 7 (round 99, bravo)
+
+`sender`, `event`; events 2 and 4 are `FRAMECLOCK_EVENT_RUNNING` and `FRAMECLOCK_EVENT_FLAG14` (include/FrameClock.h, whose banner names this release on event 4): the ticker is the FrameClock this object keeps as Actor.ticker. Byte-identical.
