@@ -9,7 +9,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-Same shape as GetWeeklyStreamPool: `*out = 7`, returns record 0x237 (offset 0x3E04). Positive constant stored through a pointer compiles as `ori $v0,$zero,7` + `sw` in the guarded block, as expected.
+Same shape as GetOpeningMovieRecords: `*out = 7`, returns record 0x237 (offset 0x3E04). Positive constant stored through a pointer compiles as `ori $v0,$zero,7` + `sw` in the guarded block, as expected.
 
 ## Source
 

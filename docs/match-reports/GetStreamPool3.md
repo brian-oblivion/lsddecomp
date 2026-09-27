@@ -9,7 +9,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-Same shape as GetWeeklyStreamPool: `*out = 8`, returns record 0x238 (offset 0x3E20).
+Same shape as GetOpeningMovieRecords: `*out = 8`, returns record 0x238 (offset 0x3E20).
 
 ## Source
 

@@ -269,7 +269,7 @@ const char *GetAsmkMovie(s32 *typeCodeOut) {
     return sAsmkStreamPath;
 }
 
-Rec1C *GetWeeklyStreamPool(s32 *countOut) {
+Rec1C *GetOpeningMovieRecords(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 0;
     }
@@ -279,7 +279,7 @@ Rec1C *GetWeeklyStreamPool(s32 *countOut) {
 Rec1C *PickWeeklyStreamChannel(s32 *countOut, s32 arg1) {
     u32 r = (u32)SeedAndRandom(0, arg1) % 7; /* arg1 only forwarded, like PickStageTexture's */
     s32 count;
-    Rec1C *rec = GetWeeklyStreamPool(&count);
+    Rec1C *rec = GetOpeningMovieRecords(&count);
     if (countOut != NULL) {
         *countOut = r + count;
     }

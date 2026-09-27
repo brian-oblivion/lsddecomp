@@ -9,7 +9,7 @@ Byte-exact on the first build; whole-image SHA1 green, funcdiff 36/36,
 ## What it does
 
 Random pick within the record block at 0x230: `r = (u32)SeedAndRandom(0, ?) % 7`,
-`rec = GetWeeklyStreamPool(&count)` (the record at index 0x230, count 0); writes
+`rec = GetOpeningMovieRecords(&count)` (the record at index 0x230, count 0); writes
 `r + count` through the optional out pointer and returns `&rec[r]`.
 
 ## Source
@@ -20,7 +20,7 @@ Declarations: the local views at the top of `src/code_39094.c` (`Rec1C`).
 Rec1C *PickWeeklyStreamChannel(s32 *countOut, s32 arg1) {
     u32 r = (u32)SeedAndRandom(0, arg1) % 7;  /* arg1 only forwarded, like PickStageTexture's */
     s32 count;
-    Rec1C *rec = GetWeeklyStreamPool(&count);
+    Rec1C *rec = GetOpeningMovieRecords(&count);
     if (countOut != NULL) {
         *countOut = r + count;
     }

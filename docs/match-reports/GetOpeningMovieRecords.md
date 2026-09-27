@@ -1,4 +1,6 @@
-# GetWeeklyStreamPool -- MATCHED (11/11 words)
+# GetOpeningMovieRecords -- MATCHED (11/11 words)
+
+> Renamed from `GetWeeklyStreamPool` on 2026-09-27 (tools/rename.py). Address 0x80049110.
 
 > Renamed from `func_80049110` on 2026-09-25 (tools/rename.py). Address 0x80049110.
 
@@ -17,7 +19,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
 void *GetRecordTable(s32 *out);   /* defined earlier in this unit */
 
-Rec1C *GetWeeklyStreamPool(s32 *countOut) {
+Rec1C *GetOpeningMovieRecords(s32 *countOut) {
     if (countOut != NULL) {
         *countOut = 0;
     }
@@ -37,6 +39,6 @@ Rec1C *GetWeeklyStreamPool(s32 *countOut) {
 
 ## Naming
 
-- **Name:** `GetWeeklyStreamPool`
+- **Name:** `GetOpeningMovieRecords`
 - **Tier:** B
 - **Evidence:** pure getter: &gRecordTable[0x230], count 0; only used internally by PickWeeklyStreamChannel.
