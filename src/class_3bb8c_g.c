@@ -9,7 +9,7 @@
  * runs the new state's entry action: format, write or read the card, or
  * attach the title editor (a TextEntry) or the file chooser (an ItemList).
  * A circle press on the Pad reaches advanceState (retry, format, go on) and
- * a cross press forceIdleFromState (abort); the tick source counts down
+ * a cross press abortFromState (abort); the tick source counts down
  * FORMATTING, SAVING and LOADING before their action runs. The two widgets
  * are made on first use, driven through the slots +0x044..+0x050 both
  * classes put at the same offsets, and report back through
@@ -143,7 +143,7 @@ void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 event) {
         if (event == PAD_EVENT_PRESSED + PAD_BUTTON_RRIGHT) {
             self->methods->advanceState(self);
         } else if (event == PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN) {
-            self->methods->forceIdleFromState(self);
+            self->methods->abortFromState(self);
         }
     }
 }

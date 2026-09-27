@@ -96,7 +96,7 @@ struct TaskObjFMethods {
                                       s32 event); /* TaskObjF__OnInputEvent (reads self and event) */
     /* +0x08C */ void (*playSound)(TaskObjF *self, s32 index); /* TaskObjF__PlaySound */
     /* +0x090 */ void (*advanceState)(TaskObjF *self); /* TaskObjF__AdvanceState; onInputEvent's 0x19 */
-    /* +0x094 */ void (*forceIdleFromState)(TaskObjF *self); /* TaskObjF__AbortFromState; onInputEvent's 0x17 */
+    /* +0x094 */ void (*abortFromState)(TaskObjF *self); /* TaskObjF__AbortFromState; onInputEvent's 0x17 */
     /* +0x098 */ void (*tickStateDelay)(TaskObjF *self, void *sender,
                                         s32 event); /* TaskObjF__TickStateDelay (reads only self; see the banner) */
     /* +0x09C */ void (*attachTextEntry)(TaskObjF *self); /* TaskObjF__AttachTextEntry; setState(0x11) */
