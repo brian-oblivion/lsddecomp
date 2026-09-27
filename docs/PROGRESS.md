@@ -6,6 +6,61 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-27 — round 98: track 6 done, nine units polished, and the tree-named oracle held (premium head, plan revision 36)
+
+Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 15
+jobs, all Opus, none sent back. Gate 0 green. Run straight after round 97
+at the operator's request.
+
+- **Track 6 measures done** after four jobs: code_179d8_l onto Sony's
+  `VagAtr` (`D8008E978Entry`: center/shift, pbmin/pbmax by layout and use)
+  and `VabHdr` (`ObjE970`), SsScore.h and `SpuRegs`; `RGB8003CB68` is
+  BgLayer.h's `BgLayerRgb`; `RGB80040790` and round 97's `GraphPointColor`
+  are one `BoxFillRgb` in BoxFill.h (both are BoxFill's colour argument);
+  `SpriteCtorReset_322b4` is `SpriteResetFn`, the cast Sprite's ctor calls
+  its reset slot through (SceneNode's slot has no arguments; "Not settled").
+- **Track 4 reopened twice and closed:** polish passes typed a global in one
+  unit. `gTextEntryCursorPos` is one `ScreenSpritePos` in TextEntry.h (with
+  TextEntry's `playSound`, `actOnHeld`, `toggleActOnHeld`); the head gave
+  `gStyleCueSlots` class_3bb8c_n's `StyleCueSlot *[2]` in class_3bb8c_m.
+- **Track 7, nine units marked** (five samples each): class_3bb8c_i,
+  code_2cc8c_c, class_3bb8c_e, class_3ac78, code_d294_c, class_3bb8c_m,
+  code_2cc8c, code_179d8_e, code_2cc8c_b. Shared names that landed:
+  `CLASS_ID_ROOT_MASK` and `<CLASS>_CLASS_ID` for DrawSystem, Pad, SceneNode,
+  FrameClock and Actor (read off each table's word +0x000); `enum
+  TaskCoreState` (tier B) and `TaskCoreInputMode`; `enum ObjMState`,
+  `FadeBoxEvent`, `DreamSysMoveOverride`; `VabStreamLoadState`. The
+  class_3bb8c_e re-send found what shifted round 97's unbuilt image by one
+  change at a time: `delete(path)` for `delete(pathBuf)`, the same address,
+  different code (now a MATCHING line).
+- **Track 8:** code_179d8_i_b..k as `libsnd_play.c` + `libsnd_seqread.c`
+  (retail's seqread is 3.3's with one function 0x7C shorter, measured).
+- **Revision 36 held:** every runner's report quoted an `OK:` naming its own
+  worktree, and none reported a build the head could not reproduce.
+- **Measured** (`plan.py`, against round 97's entry): placeholder type
+  names 4 to 0; files re-declaring a Sony name 7 to 6; track 7 units 22 to
+  31 of 67, func_ 32 to 27, D_ 84 to 61, unk 165 to 157, slot 19 to 15,
+  magic 1283 to 1148, rawoff 98 to 83, m2c 116 to 87, history 234 to 171;
+  track 8 regions 15 to 16 of 34. Typeviews 71 to 64 (runners fixed seven,
+  baseline rewritten in their commits), 0 new at every merge.
+- **Deferred proposals** (in the reports): IntermediateBase `unk10`/`unk14`
+  -- echo read them as frameClock/lightRig (Init's New_FrameClock and
+  New_LightRig) but delta found ObjM keeping its StageMap in `unk14`, so a
+  shared name needs every subclass checked first; TaskCoreTarget `unk8`
+  (initialSlot), `unk24` (slotLists), `externalRecords` (slotPositions);
+  TaskCore `unk93` (clearColor) and `baseColor`/`unk93`/`unk96` as
+  `BgLayerRgb`; `SrcDesc` into `SlotEntry` in TaskCore.h; ObjM's
+  `enterState4..A` slots named for their links; the style globals
+  (`gStyleDecorObj`, `gStyleSceneRefs`, StyleSceneRefs, StyleStageConfig)
+  into one header; `TEXTENTRY_CLASS_ID`/`ITEMLIST_CLASS_ID`,
+  `MEMCARD_PATH_SIZE`, McSaveHeader into TaskObjF.h; VabStreamObj.h onto
+  Sony's `VabHdr`/`VagAtr`; the `CD_FLAG_*` bits into one header;
+  `New_TimImage(const char *)`; code_2864's own `ApplyMatrixToLVArray`
+  extern; StageMap's `setChildParams` typed. SDK lead: `libsnd/play.o` may
+  link as an `o` segment (charlie).
+
+---
+
 ## 2026-09-27 — round 97: SceneNode on Sony's coordinate types, one _ss_score record, five libsnd files named, and a runner that built the wrong tree (premium head, plan revisions 35 and 36)
 
 Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 18
