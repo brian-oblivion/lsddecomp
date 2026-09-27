@@ -1,42 +1,22 @@
 /*
- * class_3bb8c_t -- functions 96..112 of the 113-function `class_3bb8c_n`
- * remainder, 0x48738..0x48F74 (vram 0x80057F38..0x80058774).  Carved
- * MID-round 17 (2026-09-04) to re-staff a runner whose own unit was
- * exhausted.  This is the LAST slice of the class_3bb8c block.
+ * class_3bb8c_t -- the graph room, and the tail of VariantSprite.
  *
- * EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS.  It is cut at ROM
- * addresses, not class boundaries.  Identify each with tools/classtable.py.
- * It holds two classes:
+ * - VariantSprite (include/VariantSprite.h): four empty methods and the
+ *   table getter. Its ctor is in class_3bb8c_p, two more methods in
+ *   class_3bb8c_q.
+ * - GraphRoom (include/GraphRoom.h, whose banner has the slots and fields),
+ *   a TaskCore subclass, whole: allocator, ctor, every override, ScoreDayLog
+ *   and the getter.
  *
- * - Four empty leaves plus the table getter (VariantSprite__Update,
- *   VariantSprite__NoOpSlotBC/C0/C4, GetVariantSpriteMethods) of the
- *   unrelated VariantSprite (include/VariantSprite.h; its ctor is in
- *   `class_3bb8c_p`, two more methods in `class_3bb8c_q`).
- * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
- *   73 slots), a TaskCore subclass, unified in include/GraphRoom.h (track 4,
- *   round 87; the header's banner has the slots, fields and evidence).
- *   This unit owns the entire class: allocator, ctor, every override,
- *   ScoreDayLog and the getter.
- *
- * `GraphRoom`'s identity (round 75, track 3 naming pass; tier B -- the
- * MECHANICS below are certain, the in-game name is a strong but unconfirmed
- * read): `GraphRoom__Reset` sets the literal texture string
- * `"ETC\HGRAPH.TIM"` as the sub-handle. The class owns a 100-entry array of
- * small coloured `New_BoxFill` point objects (`points`) built by
- * `BuildGraphPoints` and positioned by `PopulateGraphPoints` from a
- * backwards walk of the DreamSys's 365-entry mood ring
- * (`DreamSaveBlock::moodPreviousDays`, reached through the save block
- * `dreamSys`'s GetSaveBlock returns) -- each day's two signed bytes become
- * an `{x, y}` point handed to a point's `attachAbsolute`. `ScoreDayLog`
- * separately scans that same ring for four fixed mood targets
- * (`D_80087BD4`) and records, per target, the dot index it last matched at;
- * `TickHighlight` later highlights the matching point. Together this is
- * the in-game graph screen that plots mood history as coloured dots.
- * Round 87 correction: the ring IS DreamSys's `moodPreviousDays` -- the
- * ctor's argument is GameApplication's dreamSys, and the record's offsets are
- * DreamSys's fields relative to saveMagic (see DreamSaveBlock below). The
- * earlier "not DreamSys, the offsets don't line up" compared them against
- * the start of DreamSys rather than the save block.
+ * GraphRoom loads "ETC\HGRAPH.TIM" and plots up to 100 days of the
+ * DreamSys's mood ring (moodPreviousDays, read from the save block
+ * DreamSys__GetSaveBlock returns), newest first, as 10-pixel BoxFill dots:
+ * a day's two signed mood bytes, times 10, are its dot's centre, the upper
+ * axis pointing up the screen. The newest dot is red and blinks while
+ * inputMode is 1; the others fade from white. ScoreDayLog checks, once per
+ * save, that four fixed moods (gGraphScoreMoods) all appear among the
+ * plotted days, and TickHighlight then turns each one's dot green, one
+ * every 24 frames once frameCounter passes 30.
  */
 #include "common.h"
 #include <libgte.h>
@@ -49,6 +29,17 @@
 #include "VabStreamObj.h"
 
 extern void *BMemPMgrAlloc(s32 size);
+
+/* gGraphScoreMoods' length: ScoreDayLog's targets, one matchedDayIndices
+ * byte and one highlight each. */
+#define GRAPH_SCORE_MOOD_COUNT 4
+
+/* A plotted dot's side, gGraphPointSize's {10, 10}: PopulateGraphPoints
+ * subtracts half of it so each dot is centred on its mood. */
+#define GRAPH_POINT_SIZE 10
+
+/* Screen pixels per step of a mood axis (PopulateGraphPoints). */
+#define GRAPH_PIXELS_PER_MOOD 10
 
 /* VariantSprite's (include/VariantSprite.h) four empty leaves, `jr $ra; nop`
  * (splat matched them itself), and its table getter. VariantSprite__Update is
@@ -67,33 +58,27 @@ VariantSpriteMethods *GetVariantSpriteMethods(void) {
     return &gVariantSpriteMethods;
 }
 
-/* GraphRoom's object, table and methods: include/GraphRoom.h (track 4,
- * round 87). The base implementations are reached through
- * Get_vtable_TaskCore() with `self` upcast. */
+/* GraphRoom's object, table and methods: include/GraphRoom.h. The base
+ * implementations are reached through Get_vtable_TaskCore() with `self`
+ * upcast. */
 
-/* What DreamSys__GetSaveBlock (the DreamSys's +0x1B0) returns: &saveMagic,
- * the 0x700-byte save block. This record reads it from there; the offsets
- * are DreamSys's own fields relative to saveMagic (DreamSys +0x178):
- * currentYear, currentDay, moodPreviousDays[365] (include/DreamSys.h). The
- * round-24 reading of this record ("a separate day-log object, not
- * DreamSys") predates knowing who passes the ctor's argument:
- * GameApplication__PollGraphRoomStatus passes its dreamSys.
- *
- * +0x467 is DreamSys +0x5DF, the last byte of DreamSys's
- * unknown_values_0x5d8[8]: ScoreDayLog fails once it is set and sets it on
- * success, so the graph's highlight runs once per save. */
+/* What DreamSys__GetSaveBlock (DreamSys +0x1B0) returns: &saveMagic, the
+ * 0x700-byte save block, viewed from there. The fields are DreamSys's own
+ * (include/DreamSys.h), each at its DreamSys offset less saveMagic's
+ * +0x178; graphScored is DreamSys +0x5DF, the last byte of
+ * unknown_values_0x5d8[8]. */
 typedef struct DreamSaveBlock {
     u8 pad00[0x4];
     /* +0x004 */ s32 currentYear; /* nonzero: the ring is full, plot all 100 days */
     /* +0x008 */ s32 currentDay;  /* days logged this year; the ring's write cursor */
     u8 pad0C[0x18 - 0xC];
-    /* +0x018 */ s16 moodPreviousDays[365]; /* walked backwards from currentDay - 1 */
+    /* +0x018 */ MoodGraphPoint moodPreviousDays[DAYS_PER_YEAR]; /* walked backwards from currentDay - 1 */
     u8 pad2F2[0x467 - 0x2F2];
     /* +0x467 */ s8 graphScored; /* set once ScoreDayLog's scan has succeeded */
 } DreamSaveBlock;
 
 GraphRoom *New_GraphRoom(struct DreamSys *dreamSys) {
-    GraphRoom *obj = BMemPMgrAlloc(0x244);
+    GraphRoom *obj = BMemPMgrAlloc(sizeof(GraphRoom));
     if (obj != NULL) {
         GetGraphRoomMethods()->ctor(obj, dreamSys);
         return obj;
@@ -101,24 +86,24 @@ GraphRoom *New_GraphRoom(struct DreamSys *dreamSys) {
     return NULL;
 }
 
-extern char D_8001176C[];
+extern char sGraphSoundBankPath[];
 
 void GraphRoom__GraphRoom(GraphRoom *self, struct DreamSys *dreamSys) {
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, 0, D_8001176C, 0);
+    Get_vtable_TaskCore()->ctor((TaskCore *)self, NULL, sGraphSoundBankPath, NULL);
     self->methods = GetGraphRoomMethods();
     ((VabStreamObj *)self->sound)->methods->setPitchOffset((VabStreamObj *)self->sound, -1); /* TaskCore::sound is a VabStreamObj */
     self->dreamSys = dreamSys;
-    self->methods->setTarget(self, 0);
+    self->methods->setTarget(self, NULL);
     ((GraphRoomResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
 
-extern char D_80011778[];
+extern char sGraphTimPath[];
 
 void GraphRoom__Reset(GraphRoom *self) {
     self->fadeRate = 5;
-    self->unk2C = 0x190;
-    self->methods->setSubHandle(self, D_80011778, 0);
-    self->methods->setFrameBound(self, 0xA);
+    self->unk2C = 400;
+    self->methods->setSubHandle(self, sGraphTimPath, NULL);
+    self->methods->setFrameBound(self, 10);
 }
 
 void GraphRoom__Update(GraphRoom *self, BasicClass *sender, s32 event) {
@@ -135,7 +120,7 @@ void GraphRoom__Update(GraphRoom *self, BasicClass *sender, s32 event) {
 
 void GraphRoom__OnPadConfirm(GraphRoom *self) {
     if (self->scored == 0) {
-        self->methods->playSound(self, 0x10);
+        self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
         self->methods->refreshViewValue(self);
     }
 }
@@ -151,29 +136,29 @@ typedef struct GraphPointColor {
     s8 b;
 } GraphPointColor;
 
-extern u8 D_8008ABAC;
-extern u8 D_8008ABB4;
+extern s32 gGraphPointSize[2];
+extern GraphPointColor gGraphPointNewestColor;
 extern GraphPointColor gGraphPointBaseColor;
 
 void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     GraphPointColor rgb;
     s32 i;
 
-    self->points[0] = New_BoxFill(&D_8008ABAC, &D_8008ABB4, 0);
+    self->points[0] = New_BoxFill(gGraphPointSize, &gGraphPointNewestColor, 0);
     rgb = gGraphPointBaseColor;
-    for (i = 1; i < 100; i++) {
-        s32 dec;
+    for (i = 1; i < ARRAY_COUNT(self->points); i++) {
+        s32 step;
 
-        self->points[i] = New_BoxFill(&D_8008ABAC, &rgb, 0);
-        dec = 1;
+        self->points[i] = New_BoxFill(gGraphPointSize, &rgb, 0);
+        step = 1;
         if (i < 7) {
-            dec = 0x14;
+            step = 20;
         }
-        rgb.r -= dec;
-        rgb.g -= dec;
-        rgb.b -= dec;
+        rgb.r -= step;
+        rgb.g -= step;
+        rgb.b -= step;
     }
-    self->matchedDayIndices = BMemPMgrAlloc(4);
+    self->matchedDayIndices = BMemPMgrAlloc(GRAPH_SCORE_MOOD_COUNT * sizeof(s8));
 }
 
 extern void BMemPMgrFree(void *arg);
@@ -182,7 +167,7 @@ void GraphRoom__ReleaseGraphPoints(GraphRoom *self) {
     s32 i;
 
     BMemPMgrFree(self->matchedDayIndices);
-    for (i = 0; i < 100; i++) {
+    for (i = 0; i < ARRAY_COUNT(self->points); i++) {
         self->points[i]->methods->release(self->points[i]);
     }
     Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
@@ -198,89 +183,76 @@ s32 GraphRoom__Init(GraphRoom *self, IntermediateBaseInitArgs *args, s32 mode) {
     return result;
 }
 
-/* A 2-word {x, y}-shaped point, matching what this unit's own GraphRoom__PopulateGraphPoints
- * passes to BoxFill's attachAbsolute (round 19). */
-typedef struct Point2 {
-    s32 x, y;
-} Point2;
-
 void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
-    DreamSaveBlock *result;
+    DreamSaveBlock *save;
     s32 count;
     s32 i;
-    s32 idx;
-    s32 flag;
-    Point2 point;
-    Point2 firstPoint;
+    s32 day;
+    s32 haveNewest;
+    BoxFillPos point;
+    BoxFillPos firstPoint;
 
     Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
-    result = (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
-    self->scored = GraphRoom__ScoreDayLog(self, result);
+    save = (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
+    self->scored = GraphRoom__ScoreDayLog(self, save);
 
-    flag = 0;
-    if (result->currentYear != 0) {
-        count = 100;
+    haveNewest = 0;
+    if (save->currentYear != 0) {
+        count = ARRAY_COUNT(self->points);
     } else {
-        count = result->currentDay;
-        if (count >= 0x65) {
-            count = 100;
+        count = save->currentDay;
+        if (count > ARRAY_COUNT(self->points)) {
+            count = ARRAY_COUNT(self->points);
         }
     }
 
-    idx = result->currentDay - 1;
-    for (i = 0; i < count; i++, idx--) {
-        s8 *p;
+    day = save->currentDay - 1;
+    for (i = 0; i < count; i++, day--) {
         s8 dx, dy;
         s32 ndy;
 
-        if (idx < 0) {
-            idx = 0x16C;
+        if (day < 0) {
+            day = DAYS_PER_YEAR - 1;
         }
-        p = (s8 *)((u8 *)result + idx * 2);
-        dx = p[0x18];
-        point.x = dx * 10 - 5;
-        dy = p[0x19];
+        /* MATCHING: indexed twice; through a `MoodGraphPoint *` to the day,
+         * cc1 adds the array's +0x018 to the pointer first. */
+        dx = save->moodPreviousDays[day].axis.dynamic;
+        point.x = dx * GRAPH_PIXELS_PER_MOOD - GRAPH_POINT_SIZE / 2;
+        dy = save->moodPreviousDays[day].axis.upper;
         ndy = -dy;
-        point.y = ndy * 10 - 5;
+        point.y = ndy * GRAPH_PIXELS_PER_MOOD - GRAPH_POINT_SIZE / 2;
 
         if (i == 0) {
             firstPoint = point;
-            flag = 1;
+            haveNewest = 1;
         } else {
-            self->points[i]->methods->attachAbsolute(self->points[i], parent, (BoxFillPos *)&point, 0);
+            self->points[i]->methods->attachAbsolute(self->points[i], parent, &point, 0);
         }
     }
 
-    if (flag) {
-        self->points[0]->methods->attachAbsolute(self->points[0], parent, (BoxFillPos *)&firstPoint, 0);
+    if (haveNewest) {
+        self->points[0]->methods->attachAbsolute(self->points[0], parent, &firstPoint, 0);
     }
 }
 
-/* Four halfword targets, 0x01FF/0x0101/0x0000/0xFD00 -- exactly the i < 4
- * bound below, which is why the loop count is the table's length and not a
- * coincidence. */
-extern s16 D_80087BD4[4];
+/* The four moods ScoreDayLog looks for, as (dynamic, upper): (-1, 1),
+ * (1, 1), (0, 0), (0, -3). */
+extern MoodGraphPoint gGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
 
-/* Round 41 (2026-09-14): matched from a permuter-found lead. `p` and `days`
- * are LOCAL pointer caches of D_80087BD4 and log->moodPreviousDays respectively -- not
- * because retail's semantics need them (both globals are re-derivable
- * without a temporary), but because caching them THIS WAY is what makes
- * cc1 2.6.3 stop strength-reducing D_80087BD4[i] into a pointer induction
- * variable hoisted across the outer loop (see the match report for the
- * full derivation). The `else { p = D_80087BD4; }` branch below and the
- * `p = (days = D_80087BD4);` chained assignment are BOTH semantically
- * inert -- p is unconditionally overwritten with the same value either
- * way -- but removing either one measurably regresses the codegen (round
- * 41 confirmed both empirically, byte-exact with them, off by dozens of
- * words without). Do not "simplify" this without re-running
- * ./build-and-verify.sh. */
+/* Whether every gGraphScoreMoods entry appears among the plotted days (the
+ * window PopulateGraphPoints walks, newest first), recording in
+ * matchedDayIndices the oldest dot holding each. Fails at once when
+ * graphScored is set, and sets it on success.
+ * MATCHING: the `targets`/`days` caches, the dead else branch and the
+ * chained assignment are all inert; without any one, cc1 strength-reduces
+ * gGraphScoreMoods[i] into a pointer hoisted across the outer loop. */
 s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     u32 i;
-    s16 *days;
-    s32 j;
-    s16 *p;
-    s32 idx;
-    s32 found;
+    MoodGraphPoint *days;
+    s32 dot;
+    MoodGraphPoint *targets;
+    s32 day;
+    s32 matches;
     s32 limit;
 
     if (log->graphScored != 0) {
@@ -288,32 +260,32 @@ s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     }
 
     if (log->currentYear != 0) {
-        limit = 100;
+        limit = ARRAY_COUNT(self->points);
     } else {
         limit = log->currentDay;
-        if (limit > 100) {
-            limit = 100;
+        if (limit > ARRAY_COUNT(self->points)) {
+            limit = ARRAY_COUNT(self->points);
         }
     }
 
-    for (i = 0; i < 4; i++) {
-        found = 0;
-        idx = log->currentDay - 1;
-        for (j = 0; j < limit; j++) {
-            if (idx < 0) {
-                idx = 0x16C;
+    for (i = 0; i < GRAPH_SCORE_MOOD_COUNT; i++) {
+        matches = 0;
+        day = log->currentDay - 1;
+        for (dot = 0; dot < limit; dot++) {
+            if (day < 0) {
+                day = DAYS_PER_YEAR - 1;
             } else {
-                p = D_80087BD4;
+                targets = gGraphScoreMoods;
             }
-            p = (days = D_80087BD4);
+            targets = (days = gGraphScoreMoods);
             days = log->moodPreviousDays;
-            if (p[i] == days[idx]) {
-                self->matchedDayIndices[i] = j;
-                found++;
+            if (targets[i].value == days[day].value) {
+                self->matchedDayIndices[i] = dot;
+                matches++;
             }
-            idx--;
+            day--;
         }
-        if (found == 0) {
+        if (matches == 0) {
             goto fail;
         }
     }
@@ -326,15 +298,15 @@ fail:
     return 0;
 }
 
-extern s32 D_8008ABBC;
+extern GraphPointColor gGraphPointHighlightColor;
 
 void GraphRoom__TickHighlight(GraphRoom *self) {
     if (self->scored != 0) {
-        if ((u32)self->frameCounter >= 0x1F) {
-            if (self->highlightCount < 4) {
+        if ((u32)self->frameCounter >= 31) {
+            if (self->highlightCount < GRAPH_SCORE_MOOD_COUNT) {
                 if (((u32)self->frameCounter % 24) == 0) {
-                    s8 idx = self->matchedDayIndices[self->highlightCount];
-                    self->points[idx]->methods->setColor(self->points[idx], 1, &D_8008ABBC);
+                    s8 dot = self->matchedDayIndices[self->highlightCount];
+                    self->points[dot]->methods->setColor(self->points[dot], 1, &gGraphPointHighlightColor);
                     self->highlightCount += 1;
                 }
             }

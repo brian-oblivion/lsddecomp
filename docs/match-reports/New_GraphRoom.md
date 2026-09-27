@@ -58,3 +58,52 @@ comment for the class-identity evidence (loads "ETC\HGRAPH.TIM", builds
 ## Track 4 (2026-09-26, round 87, alpha): renamed `New_GraphRoomObj` -> `New_GraphRoom`
 
 The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Now returns `GraphRoom *` and takes `struct DreamSys *`: its one caller, GameApplication__PollGraphRoomStatus (src/code_1677c.c), passes `self->dreamSys` through GameApplication__RunPollTask, and casts New_GraphRoom to PollTaskCtor there; include/GameApplication.h's own `extern PollTask *New_GraphRoom(void *)` is deleted.
+
+## Track 7 (2026-09-27, round 97, delta): the unit banner, moved here
+
+The unit banner of `src/class_3bb8c_t.c` was rewritten to say what the file holds. Its history, verbatim as it stood before the pass (the class-identity reading and the round-87 correction are this class's, so they live with its allocator):
+
+```c
+/*
+ * class_3bb8c_t -- functions 96..112 of the 113-function `class_3bb8c_n`
+ * remainder, 0x48738..0x48F74 (vram 0x80057F38..0x80058774).  Carved
+ * MID-round 17 (2026-09-04) to re-staff a runner whose own unit was
+ * exhausted.  This is the LAST slice of the class_3bb8c block.
+ *
+ * EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS.  It is cut at ROM
+ * addresses, not class boundaries.  Identify each with tools/classtable.py.
+ * It holds two classes:
+ *
+ * - Four empty leaves plus the table getter (VariantSprite__Update,
+ *   VariantSprite__NoOpSlotBC/C0/C4, GetVariantSpriteMethods) of the
+ *   unrelated VariantSprite (include/VariantSprite.h; its ctor is in
+ *   `class_3bb8c_p`, two more methods in `class_3bb8c_q`).
+ * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
+ *   73 slots), a TaskCore subclass, unified in include/GraphRoom.h (track 4,
+ *   round 87; the header's banner has the slots, fields and evidence).
+ *   This unit owns the entire class: allocator, ctor, every override,
+ *   ScoreDayLog and the getter.
+ *
+ * `GraphRoom`'s identity (round 75, track 3 naming pass; tier B -- the
+ * MECHANICS below are certain, the in-game name is a strong but unconfirmed
+ * read): `GraphRoom__Reset` sets the literal texture string
+ * `"ETC\HGRAPH.TIM"` as the sub-handle. The class owns a 100-entry array of
+ * small coloured `New_BoxFill` point objects (`points`) built by
+ * `BuildGraphPoints` and positioned by `PopulateGraphPoints` from a
+ * backwards walk of the DreamSys's 365-entry mood ring
+ * (`DreamSaveBlock::moodPreviousDays`, reached through the save block
+ * `dreamSys`'s GetSaveBlock returns) -- each day's two signed bytes become
+ * an `{x, y}` point handed to a point's `attachAbsolute`. `ScoreDayLog`
+ * separately scans that same ring for four fixed mood targets
+ * (`gGraphScoreMoods`) and records, per target, the dot index it last matched at;
+ * `TickHighlight` later highlights the matching point. Together this is
+ * the in-game graph screen that plots mood history as coloured dots.
+ * Round 87 correction: the ring IS DreamSys's `moodPreviousDays` -- the
+ * ctor's argument is GameApplication's dreamSys, and the record's offsets are
+ * DreamSys's fields relative to saveMagic (see DreamSaveBlock below). The
+ * earlier "not DreamSys, the offsets don't line up" compared them against
+ * the start of DreamSys rather than the save block.
+ */
+```
+
+Unchanged in the pass: this function's body, except `BMemPMgrAlloc(0x244)` is `BMemPMgrAlloc(sizeof(GraphRoom))` (the struct is 0x244 bytes; zero bytes changed).
