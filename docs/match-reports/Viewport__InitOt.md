@@ -322,7 +322,7 @@ void Viewport__InitOt(Unk18Obj *self);
 ## What it does
 
 One-time allocation/init, guarded by `self->unk70` (the same latch
-`Viewport__SetPacketCount`/`Viewport__SetPacketSize` check, this round): allocates one buffer
+`Viewport__SetMaxPackets`/`Viewport__SetPacketSize` check, this round): allocates one buffer
 sized to fit two internal records plus a `4 << self->unk3C`-sized payload
 each, carves it into `unk78`/`unk80`/`unk88` (bases) and
 `unk7C`/`unk84`/`unk8C` (bases + size), writes a 2-word header into each of

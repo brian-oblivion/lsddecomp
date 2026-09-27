@@ -101,7 +101,7 @@ void Viewport__SetOtLength(Viewport *self, s32 length) {
 }
 
 /* Takes only before InitOt, which sizes the packet areas from it. */
-void Viewport__SetPacketCount(Viewport *self, s32 count) {
+void Viewport__SetMaxPackets(Viewport *self, s32 count) {
     if (self->otReady == 0) {
         self->packetCount = count;
     }

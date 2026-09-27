@@ -171,7 +171,7 @@ a future pass (or track 4) with more time to cross-check every call site.
 
 - `unk3C` -> `otLenShift` (tier B): `4 << unk3C` is the OT tag-array byte
   size at both allocation sites in `Viewport__InitOt`, i.e. `unk3C` is
-  log2(OT entry count). Also gates `Viewport__SetPacketCount`/`Viewport__SetPacketSize`
+  log2(OT entry count). Also gates `Viewport__SetMaxPackets`/`Viewport__SetPacketSize`
   indirectly via `otReady`, and feeds `Viewport__Update`'s own
   `unk98 = (unk50-unk4C)/(1<<unk3C)+1` -- consistent with "a shift/step
   size", but the exact unit (bytes? OT slots? something else) is not

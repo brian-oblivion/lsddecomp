@@ -27,7 +27,7 @@ void Viewport__SetOtLength(Unk18Obj *self, s32 a1) {
 ## Header changes
 
 `include/code_2cc8c.h`: `Unk18Obj` gains `s32 unk3C` at `+0x03C` (splits the
-`pad034[0x0AC-0x034]` span). See `Viewport__SetPacketCount`'s report for the sibling
+`pad034[0x0AC-0x034]` span). See `Viewport__SetMaxPackets`'s report for the sibling
 setters carved from the same span in one pass.
 
 ## Naming
