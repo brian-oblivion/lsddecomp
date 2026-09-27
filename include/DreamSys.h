@@ -52,6 +52,11 @@
 typedef struct DreamSys DreamSys;
 typedef struct DreamSysMethods DreamSysMethods;
 
+/* DreamSys's class id (gDreamSysMethods word +0x000). Four nibbles, so
+ * `(header & 0xFFFF) == DREAMSYS_CLASS_ID` tests for it or a class below it
+ * (ObjM__OnNotify). */
+#define DREAMSYS_CLASS_ID 0x1F34
+
 /* The codes a DreamSys sends its parents through notifyParents (ObjM__OnDreamSysNotify
  * switches on them). Each link code is also what ExecuteLink leaves in
  * Actor::state while that link is pending; DREAMSYS_NO_LINK is the idle

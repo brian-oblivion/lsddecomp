@@ -62,6 +62,14 @@ typedef struct ItemListMethods ItemListMethods;
  * under the cursor chosen (getCursorIndex), command 23 without one. */
 enum ItemListResult { ITEMLIST_RESULT_CHOSEN = 2, ITEMLIST_RESULT_CANCELLED = 3 };
 
+/* setState's last state: notify the parents with `result`. tickClosing
+ * enters it on the second tick after a close. */
+#define ITEMLIST_STATE_REPORT 4
+
+/* The characters one row shows: New_TextRow's width, and FormatRowText pads
+ * or cuts every item's text at `column` to it. */
+#define ITEMLIST_ROW_CHARS 26
+
 /* BasicClass's slots (overrides: +0x008 ItemList__ItemList, +0x00C
  * Finalize, +0x010 AddChild, +0x014 RemoveChild, +0x018 RemoveAllChildren,
  * +0x038 OnNotify; `tools/classtable.py gItemListMethods --vs gBasicClassMethods`),

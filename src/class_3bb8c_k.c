@@ -25,16 +25,19 @@
 #include "ItemList.h"
 #include "ObjM.h"
 #include "VabStreamObj.h"
+#include "Pad.h"
+#include "FadeBox.h"
+#include "DreamSys.h"
 
 void ItemList__SetState(ItemList *self, s32 state) {
     self->closeTicks = 0;
-    if (state < 2) {
+    if (state < ITEMLIST_RESULT_CHOSEN) {
         goto end;
     }
-    if (state < 4) {
+    if (state < ITEMLIST_STATE_REPORT) {
         goto case_lt4;
     }
-    if (state == 4) {
+    if (state == ITEMLIST_STATE_REPORT) {
         goto case_eq4;
     }
     goto end;
@@ -52,10 +55,10 @@ end:
 void ItemList__TickClosing(ItemList *self) {
     s32 prevTicks;
 
-    if (self->result >= 4) {
+    if (self->result >= ITEMLIST_STATE_REPORT) {
         return;
     }
-    if (self->result < 2) {
+    if (self->result < ITEMLIST_RESULT_CHOSEN) {
         return;
     }
     prevTicks = self->closeTicks;
@@ -63,29 +66,29 @@ void ItemList__TickClosing(ItemList *self) {
     if (prevTicks == 0) {
         return;
     }
-    self->methods->setState(self, 4);
+    self->methods->setState(self, ITEMLIST_STATE_REPORT);
 }
 
 void ItemList__HandleInputCode(ItemList *self, void *source, s32 code) {
     switch (code) {
-        case 25:
-            self->methods->playSound(self, 0x10);
-            self->methods->setState(self, 2);
+        case PAD_EVENT_PRESSED + PAD_BUTTON_RRIGHT:
+            self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->setState(self, ITEMLIST_RESULT_CHOSEN);
             break;
-        case 23:
-            self->methods->playSound(self, 0x10);
-            self->methods->setState(self, 3);
+        case PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN:
+            self->methods->playSound(self, 1 << 4); /* VAB program 1, tone 0 */
+            self->methods->setState(self, ITEMLIST_RESULT_CANCELLED);
             break;
-        case 5:
+        case PAD_EVENT_HELD + PAD_BUTTON_LRIGHT:
             self->methods->scrollRight(self);
             break;
-        case 4:
+        case PAD_EVENT_HELD + PAD_BUTTON_LLEFT:
             self->methods->scrollLeft(self);
             break;
-        case 18:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LUP:
             self->methods->cursorUp(self);
             break;
-        case 19:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_LDOWN:
             self->methods->cursorDown(self);
             break;
     }
@@ -109,7 +112,7 @@ void ItemList__ScrollRight(ItemList *self) {
     }
     current = self->column;
     column = current;
-    if (column + 0x1A >= self->maxTextLen) {
+    if (column + ITEMLIST_ROW_CHARS >= self->maxTextLen) {
         return;
     }
     methods = self->methods;
@@ -183,9 +186,12 @@ void ItemList__CursorDown(ItemList *self, s32 unused1, s32 unused2, s32 forwarde
 extern s32 gItemListRowOriginX;
 extern s32 gItemListRowOriginY;
 
+/* The y step from one row to the next (createRows). */
+#define ITEMLIST_ROW_SPACING 10
+
 void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32 top, s32 column,
                           s32 cursor) {
-    char buf[0x20];
+    char buf[32];
     ScreenSpritePos pos;
     TextRow **row;
     s32 count;
@@ -199,16 +205,16 @@ void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32
     pos.y = gItemListRowOriginY;
     count = self->itemCount;
     row = &self->rows[0];
-    if (count >= 5) {
-        count = 4;
+    if (count > ARRAY_COUNT(self->rows)) {
+        count = ARRAY_COUNT(self->rows);
     }
 
     for (i = 0; i < count; i++) {
         ItemList__FormatRowText(self, buf, i, top, column);
-        *row = New_TextRow(font, 0x1A, buf);
+        *row = New_TextRow(font, ITEMLIST_ROW_CHARS, buf);
         (*row)->methods->attachToParent(*row, parent, (LongVec3 *)&pos);
         (*row)->methods->setColor(*row, &gItemListRowColor);
-        pos.y += 0xA;
+        pos.y += ITEMLIST_ROW_SPACING;
         row++;
     }
 
@@ -225,8 +231,8 @@ void ItemList__ReleaseRows(ItemList *self) {
     }
     count = self->itemCount;
     i = 0;
-    if (count >= 5) {
-        count = 4;
+    if (count > ARRAY_COUNT(self->rows)) {
+        count = ARRAY_COUNT(self->rows);
     }
     if (count <= 0) {
         return;
@@ -259,7 +265,7 @@ extern void *memcpy(char *dest, char *src, s32 n);
 void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 notify) {
     s32 count;
     s32 i;
-    char buf[0x20];
+    char buf[32];
     TextRow **row;
 
     if (!self->panelSprite) {
@@ -267,8 +273,8 @@ void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 
     }
     count = self->itemCount;
     row = &self->rows[0];
-    if (count >= 5) {
-        count = 4;
+    if (count > ARRAY_COUNT(self->rows)) {
+        count = ARRAY_COUNT(self->rows);
     }
     for (i = 0; i < count; i++) {
         ItemList__FormatRowText(self, buf, i, top, column);
@@ -287,17 +293,17 @@ char *ItemList__FormatRowText(ItemList *self, char *dest, s32 row, s32 top, s32 
     s32 i;
 
     len = strlen(self->texts[item] + column);
-    if (len >= 0x1B) {
-        len = 0x1A;
+    if (len > ITEMLIST_ROW_CHARS) {
+        len = ITEMLIST_ROW_CHARS;
     }
     memcpy(dest, self->texts[item] + column, len);
     i = len;
-    if (i < 0x1A) {
-        for (; i < 0x1A; i++) {
+    if (i < ITEMLIST_ROW_CHARS) {
+        for (; i < ITEMLIST_ROW_CHARS; i++) {
             dest[i] = ' ';
         }
     }
-    dest[0x1A] = 0;
+    dest[ITEMLIST_ROW_CHARS] = '\0';
     return dest;
 }
 
@@ -351,7 +357,7 @@ ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim,
     ObjM *self;
     ObjMMethods *methods;
 
-    self = BMemPMgrAlloc(0x88);
+    self = BMemPMgrAlloc(sizeof(ObjM));
     if (self != NULL) {
         methods = GetObjMMethods();
         methods->ctor(self, sound, bgm, etcTim, dreamerTmd, stage);
@@ -386,11 +392,11 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
 
     GetTimedTaskMethods()->onNotify((TimedTask *)self, sender, event);
     tag = sender->methods->header;
-    if ((tag & 0xFFF) == 0x114) {
+    if ((tag & 0xFFF) == STAGEMAP_CLASS_ID) {
         self->methods->onStageMapNotify(self, sender, event);
-    } else if ((tag & 0xFFF) == 0x164) {
+    } else if ((tag & 0xFFF) == FADEBOX_CLASS_ID) {
         self->methods->onFadeNotify(self, (struct FadeBox *)sender, event);
-    } else if ((tag & 0xFFFF) == 0x1F34) {
+    } else if ((tag & 0xFFFF) == DREAMSYS_CLASS_ID) {
         self->methods->onDreamSysNotify(self, sender, event);
     }
 }

@@ -99,6 +99,11 @@ typedef struct StageMap StageMap;
 typedef struct StageMapMethods StageMapMethods;
 typedef struct ChunkSlot ChunkSlot;
 
+/* StageMap's class id (gStageMapMethods word +0x000). Three nibbles, so
+ * `(header & 0xFFF) == STAGEMAP_CLASS_ID` tests for it or a class below it
+ * (ObjM__OnNotify). */
+#define STAGEMAP_CLASS_ID 0x114
+
 /* The grid's geometry, in world units. A cell is STAGE_CELL_SIZE square:
  * ComputeFootprintDescriptor shifts a position's offset from its slot's
  * origin right by STAGE_CELL_SHIFT for the cell column/row. A chunk is
