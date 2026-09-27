@@ -1,4 +1,6 @@
-# GameApplication__StartWeeklyStreamTask
+# GameApplication__PlayOpeningMovie
+
+> Renamed from `GameApplication__StartWeeklyStreamTask` on 2026-09-27 (tools/rename.py). Address 0x80026348.
 
 > Renamed from `Class6D3C8__StartWeeklyStreamTask` on 2026-09-26 (tools/rename.py). Address 0x80026348.
 
@@ -10,20 +12,20 @@
 
 `GameApplicationMethods` slot `+0x054`. Gated by `self->arg->unk08 != 0` (a
 second boolean/pointer gate on the ctor argument, sibling to
-`GameApplication__LoadIntroLogoSequence`'s `unk0C` gate): builds a `StreamTask`, derives a type code
+`GameApplication__ShowIntroLogos`'s `unk0C` gate): builds a `StreamTask`, derives a type code
 via `PickOpeningMovie` (a day/week-style calculation, unrelated unit,
 `psyq_memset.s`), looks it up via `GetMovieFrameCount`, and initializes+starts
-the task the same way `GameApplication__LoadIntroLogoSequence` does -- minus that function's two
-`GameApplication__StartLoaderTask` loader-task registrations.
+the task the same way `GameApplication__ShowIntroLogos` does -- minus that function's two
+`GameApplication__ShowImage` loader-task registrations.
 
 ## Derivation
 
-Structurally identical to the second half of `GameApplication__LoadIntroLogoSequence` (already
+Structurally identical to the second half of `GameApplication__ShowIntroLogos` (already
 matched), with `PickOpeningMovie(&typeCode, 0)` in place of
 `GetAsmkMovie(&typeCode)`:
 
 ```c
-void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
+void GameApplication__PlayOpeningMovie(GameApplication *self) {
     s32 derivedValue;
     s32 typeCode;
     s32 typeLookup;
@@ -40,7 +42,7 @@ void GameApplication__StartWeeklyStreamTask(GameApplication *self) {
 }
 ```
 
-Matched first attempt, entirely on the strength of `GameApplication__LoadIntroLogoSequence`'s
+Matched first attempt, entirely on the strength of `GameApplication__ShowIntroLogos`'s
 already-solved register-allocation-by-declaration-order lesson (declared
 `derivedValue`/`typeCode` before `task`, mirroring that function's fix) and
 its "the delay slot after `jalr` is the real 4th argument, not a scratch
@@ -51,7 +53,7 @@ argument from the start).
 
 `include/GameApplication.h`: split `GameApplicationConfig`'s `+0x04..+0x0B` padding
 to expose `+0x08` (`unk08`, this function's gate) as its own field,
-matching the existing `+0x0C` (`unk0C`, `GameApplication__LoadIntroLogoSequence`'s gate). Declared
+matching the existing `+0x0C` (`unk0C`, `GameApplication__ShowIntroLogos`'s gate). Declared
 `PickOpeningMovie` (day/week-style helper, `psyq_memset.s`, same "write an
 index to *out, return a related but different value" shape as
 `GetAsmkMovie`).
@@ -73,9 +75,8 @@ for the same shape before re-deriving from scratch.
   exit.
 - **hand-hoisted loop invariant lever:** not applicable -- no loop.
 
-## Naming
-
-**`GameApplication__StartWeeklyStreamTask` -- tier B.** Mechanics: gated by
+## Naming history (before round 100)
+**`GameApplication__PlayOpeningMovie` -- tier B.** Mechanics: gated by
 `arg->unk08`, builds a `StreamTask`, derives its type code via
 `PickOpeningMovie` -- documented in this unit's header as "day/week-style
 calculation (divides SeedAndRandom's result by 7)" -- looks it up, then
@@ -86,4 +87,25 @@ shape as its three siblings in this unit).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__StartCinematicStream for the bytes that settled the return type). Byte-identical.
+GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__PlayOpeningMovie` -- tier A** (renamed from `GameApplication__StartWeeklyStreamTask` with tools/rename.py). Evidence: streams PickOpeningMovie's record, one of ETC\OPENINGA..G.STR at random (PickOpeningMovie.md: rand() % 7, not a day of the week, which is where "Weekly" came from); hook +0x054, which Application__RunMainLoop runs each time the title menu times out.
+
+Body changes, all byte-identical: locals derivedValue/typeCode/typeLookup -> moviePath/movieId/frameCount; PickOpeningMovie's extern returns const char *.
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Optional stream-task init block, gated by self->config->playStreams (the same
+ * shape as GameApplication__LoadIntroLogoSequence's self->config->showIntroLogos gate, minus the two
+ * GameApplication__StartLoaderTask loader-task calls, and using PickOpeningMovie instead of
+ * GetAsmkMovie to derive the type code). */
+
+extern s32 PickOpeningMovie(s32 *out, s32 param2); /* psyq_memset.s: day/week-style calculation (divides SeedAndRandom's result by 7); writes a related index to *out if non-NULL, returns a separate derived value */
+```

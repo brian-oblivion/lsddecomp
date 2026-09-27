@@ -1,4 +1,6 @@
-# GameApplication__PollStatusObj
+# GameApplication__RunDayTask
+
+> Renamed from `GameApplication__PollStatusObj` on 2026-09-27 (tools/rename.py). Address 0x80026698.
 
 > Renamed from `Class6D3C8__PollStatusObj` on 2026-09-26 (tools/rename.py). Address 0x80026698.
 
@@ -84,10 +86,10 @@ without reaching it. The fix came from re-reading four instructions of retail.
 `GameApplicationMethods` slot `+0x060`. Builds a `StatusObj` (`New_DayTask`,
 New_X shape, 0x50 bytes), dispatches `slot44(obj)` (return kept) then
 `slot4(obj)` (return discarded -- via the same "delay slot after `jalr`
-captures the *preceding* call's return" idiom `GameApplication__RunPollTask` uses), and
-switches on that status: `2` runs `GameApplication__StartCinematicStream`, `3` latches
+captures the *preceding* call's return" idiom `GameApplication__RunTask` uses), and
+switches on that status: `2` runs `GameApplication__PlayCinematic`, `3` latches
 `self->unk24`. Then queries the `DreamSys` status slot again
-(`DreamSys__GetCurrentDayAndYear`, the same slot `GameApplication__PollGraphRoomStatus` uses) with an out-parameter
+(`DreamSys__GetCurrentDayAndYear`, the same slot `GameApplication__RunTitleMenu` uses) with an out-parameter
 this time, and derives a 0/1 result from both the call's return and the
 out-param.
 
@@ -95,7 +97,7 @@ out-param.
 
 ```c
 #if 0
-s32 GameApplication__PollStatusObj(GameApplication *self) {
+s32 GameApplication__RunDayTask(GameApplication *self) {
     s32 status;
     StatusObj *obj;
     s32 outVal;
@@ -108,7 +110,7 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
 
     switch (status) {
     case 2:
-        GameApplication__StartCinematicStream(self);
+        GameApplication__PlayCinematic(self);
         break;
     case 3:
         self->unk24 = 3;
@@ -126,7 +128,7 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
 ```
 
 This needs `GameApplication.h`'s `StatusObj`/`StatusObjMethods` (already
-committed) and the `GameApplication__StartCinematicStream` forward declaration (already committed).
+committed) and the `GameApplication__PlayCinematic` forward declaration (already committed).
 
 ## Derivation and the levers that got this from 1/57 to 53/57
 
@@ -187,7 +189,7 @@ allocation, in three layers:
    lowering materializes an unused default-arm constant (`1`) in the
    `beq`'s delay slot even though nothing ever reads it (same "unused
    value in a delay slot" idiom documented elsewhere in this unit, e.g.
-   `GameApplication__PollGraphRoomStatus`'s `pollDone`). No `switch`/`if` reshaping reproduced it;
+   `GameApplication__RunTitleMenu`'s `pollDone`). No `switch`/`if` reshaping reproduced it;
    adding an explicit `case 1: break;` regressed badly (27/57, GCC grew the
    whole switch, presumably crossing a density threshold into a different
    lowering strategy).
@@ -243,14 +245,13 @@ switched on," and only the former gets the free reuse.
   choices, consistent with the delay-slot-scheduling class of residue, not
   a wrong-shape stall.
 
-## Naming
-
-**`GameApplication__PollStatusObj` -- tier B.** Mechanics: builds a `StatusObj`
+## Naming history (before round 100)
+**`GameApplication__RunDayTask` -- tier B.** Mechanics: builds a `StatusObj`
 (`New_DayTask`), reads one status code off it (`slot44`), tears it down
-(`slot4`), reacts to two of the codes (2 -> `GameApplication__StartCinematicStream`,
+(`slot4`), reacts to two of the codes (2 -> `GameApplication__PlayCinematic`,
 3 -> latch `self->unk24`), then separately queries the owned `DreamSys`'s
 day/year status and derives a 0/1 result. Named for the StatusObj query
-mechanic, matching this unit's `GameApplication__PollGraphRoomStatus` naming
+mechanic, matching this unit's `GameApplication__RunTitleMenu` naming
 shape (both are "poll an object for a status code and react to it"), since
 what the two status-code values actually MEAN in the game is not
 established from this body alone.
@@ -268,3 +269,44 @@ the override (a pointer cast, no code). The status code is TimedTask's
 `result`: 2 and 3 are values `DayTask__OnObjMNotify` sets when the ObjM
 it built ends the day (`endDay` returned 0 with a cinematic entry: 2;
 `endDay` failed, or events 0xC/0xD: 3). Byte-identical.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__RunDayTask` -- tier A** (renamed from `GameApplication__PollStatusObj` with tools/rename.py). Evidence: builds one DayTask (New_DayTask), runs its init to the end and releases it; "StatusObj" was an older name of the DayTask class. It then returns (year != 0 && day == 1) from DreamSys's getCurrentDayAndYear, i.e. a year has gone by, which makes Application__RunMainLoop run +0x064, PlayEndingMovie.
+
+Body changes, all byte-identical: obj/outVal/check -> dayTask/year/day; GameApplicationConfig.unk04 -> dayTaskSyncDriver (DayTask's ctor parameter syncDriver).
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Builds a DayTask (include/DayTask.h), runs its init with self
+ * alone (DayTask__Init takes nothing else, hence DayTaskInitFn) and
+ * releases it; init's return, TimedTask::result, is a status code: 2 runs GameApplication__StartCinematicStream, 3 latches self->skipGraphRoomPoll.
+ * Then queries the DreamSys status slot again (as GameApplication__PollGraphRoomStatus does),
+ * this time passing an out-param, and derives a 0/1 result from both the
+ * call's return and the out-param. */
+/* Builds a DayTask for this instance's current state, reads one status
+ * code off it, tears it down, and reacts to two of the codes. Then asks the
+ * owned DreamSys a question and reports whether its answer was 1.
+ *
+ * Two things here were long-standing misreadings, both worth keeping written
+ * down (docs/match-reports/GameApplication__PollStatusObj.md):
+ *
+ *  - `case 3` stores 1, NOT 3. Retail's `li $v0, 0x1` sits in the delay slot
+ *    of the case-3 branch, so it executes before the jump is taken and $v0
+ *    holds 1 -- not the 3 it held for the comparison -- by the time the
+ *    store runs. Reading the store as `unk24 = 3` (the discriminant) was
+ *    what produced the old 53/57 and the "the compiler materialises an
+ *    unused default-arm constant" theory attached to it. There is no unused
+ *    constant: `li $v0, 0x1` is the value being stored, hoisted into a delay
+ *    slot on the only path that needs it.
+ *  - `result = (check == 1)` is the whole comparison. GCC 2.6.3 lowers an
+ *    equality test against a small constant to `xori` + `sltiu`, which reads
+ *    back out of the disassembly as `(u32)(check ^ 1) < 1`. That transcription
+ *    is arithmetically right and cost two instructions; the plain `== 1` is
+ *    what the source said. */
+```

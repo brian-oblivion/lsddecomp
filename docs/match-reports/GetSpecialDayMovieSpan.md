@@ -60,7 +60,7 @@ extends (`len += start`) rather than a fresh `end`.
 
 - **Name:** `GetSpecialDayMovieSpan`
 - **Tier:** B
-- **Evidence:** returns special day `day`'s first movie and writes the sum of (frame count + 10) over the 2 * dayCount movies from it, minus 10. Its caller (GameApplication__StartGraphRoomStreamTask, (0, 10)) streams it with frameBound = total / 15, so the span covers SPDAY01A..SPDAY10B. Why 10 frames per movie is not established.
+- **Evidence:** returns special day `day`'s first movie and writes the sum of (frame count + 10) over the 2 * dayCount movies from it, minus 10. Its caller (GameApplication__PlaySpecialDayMovies, (0, 10)) streams it with frameBound = total / 15, so the span covers SPDAY01A..SPDAY10B. Why 10 frames per movie is not established.
 
 ## Naming history
 

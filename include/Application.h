@@ -54,7 +54,7 @@ struct Pad; /* initSystems's pad: main()'s New_Pad(0, 0) */
     /* +0x058 */ s32 (*pollGraphRoomStatus)(Self *self);        /* 0 ends the inner loop, 1 and 2 dispatch */ \
     /* +0x05C */ void (*slot5C)(Self *self);                    /* on status 1; GameApplication__NoOpSlot5C */ \
     /* +0x060 */ s32 (*pollStatusObj)(Self *self);              /* on status 2; nonzero runs +0x064 */ \
-    /* +0x064 */ void (*startStreamTaskWithInit)(Self *self)    /* GameApplication__StartStreamTaskWithInit */
+    /* +0x064 */ void (*startStreamTaskWithInit)(Self *self)    /* GameApplication__PlayEndingMovie */
 /* clang-format on */
 
 /* clang-format off */

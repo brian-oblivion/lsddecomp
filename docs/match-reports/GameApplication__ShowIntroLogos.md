@@ -1,4 +1,6 @@
-# GameApplication__LoadIntroLogoSequence
+# GameApplication__ShowIntroLogos
+
+> Renamed from `GameApplication__LoadIntroLogoSequence` on 2026-09-27 (tools/rename.py). Address 0x80026170.
 
 > Renamed from `Class6D3C8__LoadIntroLogoSequence` on 2026-09-26 (tools/rename.py). Address 0x80026170.
 
@@ -10,7 +12,7 @@
 
 `GameApplicationMethods` slot `+0x050`. Gated entirely by `self->arg->unk0C != 0`
 (the ctor argument's `+0x0C` field, opaque until this function): registers a
-"loader" task for `"ETC\ASMKLOGO.TIM"` (`GameApplication__StartLoaderTask`), then builds a
+"loader" task for `"ETC\ASMKLOGO.TIM"` (`GameApplication__ShowImage`), then builds a
 separate "stream" task, initializes it with a filename
 (`"ETC\ASMK.STR"`) and a type/format code looked up from a table, starts it,
 then registers a second loader task for `"ETC\OSDLOGO.TIM"`.
@@ -23,7 +25,7 @@ lw   $v0, 0xC($v0)            ; v0 = arg->unk0C
 beqz $v0, .L80026238            ; whole body gated on this
  ...
 jal  SetActiveDataSourceDriverMode(0, 0, 0)
-jal  GameApplication__StartLoaderTask(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
+jal  GameApplication__ShowImage(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
 jal  New_StreamTask(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
 addiu $a0, $sp, 0x18
 jal  GetAsmkMovie                          ; writes 0x31 to local, returns &sAsmkMoviePath
@@ -45,11 +47,11 @@ lw   $v0, 0x0($s1)                                          ; reload task->metho
 lw   $v0, 0x4($v0)                                           ; slot4
 jalr $v0
  (delay: a0 = s1 = task)
-jal  GameApplication__StartLoaderTask(self, sLogoPathOsd)                          ; "ETC\OSDLOGO.TIM"
+jal  GameApplication__ShowImage(self, sLogoPathOsd)                          ; "ETC\OSDLOGO.TIM"
 ```
 
 ```c
-void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
+void GameApplication__ShowIntroLogos(GameApplication *self) {
     const char *streamName;
     s32 typeCode;
     s32 typeLookup;
@@ -57,13 +59,13 @@ void GameApplication__LoadIntroLogoSequence(GameApplication *self) {
 
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        GameApplication__StartLoaderTask(self, sLogoPathAsmk);
+        GameApplication__ShowImage(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
         streamName = GetAsmkMovie(&typeCode);
         typeLookup = GetMovieFrameCount(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->slot4(task);
-        GameApplication__StartLoaderTask(self, sLogoPathOsd);
+        GameApplication__ShowImage(self, sLogoPathOsd);
     }
 }
 ```
@@ -118,9 +120,8 @@ register, a different axis).
 - **hand-hoisted loop invariant lever:** not applicable — no loop in this
   function.
 
-## Naming
-
-**`GameApplication__LoadIntroLogoSequence` -- tier B.** Mechanics established
+## Naming history (before round 100)
+**`GameApplication__ShowIntroLogos` -- tier B.** Mechanics established
 from the body and its string constants: gated by `arg->unk0C`, registers a
 loader task for `"ETC\ASMKLOGO.TIM"`, then a stream task for whatever
 `GetAsmkMovie` resolves (`"ETC\ASMK.STR"` per the header comment), then a
@@ -132,4 +133,26 @@ inference from the filenames but not confirmed by any code in this unit).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__StartCinematicStream for the bytes that settled the return type). Byte-identical.
+GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__ShowIntroLogos` -- tier A** (renamed from `GameApplication__LoadIntroLogoSequence` with tools/rename.py). Evidence: gated by config->showIntroLogos, the body shows ETC\ASMKLOGO.TIM (ShowImage), streams ETC\ASMK.STR (GetAsmkMovie, MOVIE_ASMK) and shows ETC\OSDLOGO.TIM; nothing is loaded for later use, so "Load" and "Sequence" said less than "Show".
+
+Body changes, all byte-identical: locals streamName/typeCode/typeLookup -> moviePath/movieId/frameCount.
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Optional stream-load block, gated by self->config->showIntroLogos: registers a
+ * "loader" task for "ETC\ASMKLOGO.TIM" (GameApplication__StartLoaderTask), then a separate
+ * "stream" task for whatever type code GetAsmkMovie hands back
+ * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
+
+extern const char *GetAsmkMovie(s32 *typeCodeOut); /* psyq_memset.s: writes 0x31 to *typeCodeOut if non-NULL, always returns &sAsmkMoviePath */
+extern s32 GetMovieFrameCount(s32 index); /* psyq_memset.s: signed-halfword lookup into gMovieFrameCounts[index] */
+```

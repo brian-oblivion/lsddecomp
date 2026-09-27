@@ -22,17 +22,20 @@
  *   runMainLoop    Application's: once loadIntroLogoSequence, then forever
  *                  startWeeklyStreamTask and the pollGraphRoomStatus loop.
  * The hooks, in the order runMainLoop calls them:
- *   +0x050 loadIntroLogoSequence  the ASMK logo, the ASMK stream, the OSD logo
- *   +0x054 startWeeklyStreamTask  the stream PickOpeningMovie picks
- *   +0x058 pollGraphRoomStatus    runs GraphRoom and TitleMenu against the
- *                                 DreamSys; returns 0, 1 or 2 to the loop
+ *   +0x050 loadIntroLogoSequence  ShowIntroLogos: the ASMK logo, the ASMK
+ *                                 movie, the OSD logo
+ *   +0x054 startWeeklyStreamTask  PlayOpeningMovie: an opening movie
+ *   +0x058 pollGraphRoomStatus    RunTitleMenu: GraphRoom and TitleMenu against
+ *                                 the DreamSys; returns 0 or 2 to the loop
+ *                                 (enum GameApplicationLoopStatus)
  *   +0x05C slot5C                 empty (GameApplication__NoOpSlot5C)
- *   +0x060 pollStatusObj          runs one DayTask (include/DayTask.h)
- *                                 and may start the current cinematic's stream;
- *                                 nonzero runs +0x064
- *   +0x064 startStreamTaskWithInit  the stream GetEndingMovie names
+ *   +0x060 pollStatusObj          RunDayTask: one DayTask (include/DayTask.h),
+ *                                 then maybe the current cinematic;
+ *                                 nonzero (a year gone by) runs +0x064
+ *   +0x064 startStreamTaskWithInit  PlayEndingMovie: ETC\ENDING.STR
  * Every task these start is given the parent's `aux` as its
- * IntermediateBaseInitArgs, and every stream is gated by config->playStreams.
+ * IntermediateBaseInitArgs, and every movie but the intro's is gated by
+ * config->playStreams.
  *
  * Slots are Application's, flat (APPLICATION_SLOTS). Two overrides take a
  * different parameter list from the slot they fill, so the slot keeps the
@@ -54,12 +57,12 @@ typedef struct GameApplicationMethods GameApplicationMethods;
  * gate below is read `!= 0` by the methods it names. */
 typedef struct GameApplicationConfig {
     /* +0x00 */ s32 dataSource; /* Application's ctor argument (0x13 = the CD driver's class id) */
-    /* +0x04 */ s32 unk04;      /* New_DayTask's 3rd argument, in PollStatusObj: that ctor
-                            * passes (unk04 == 0) to SetActiveDataSourceDriverMode */
-    /* +0x08 */ s32 playStreams; /* gates every StreamTask: StartWeeklyStreamTask, StartGraphRoomStreamTask,
-                                     * StartCinematicStream's stream branch, StartStreamTaskWithInit */
-    /* +0x0C */ s32 showIntroLogos; /* gates LoadIntroLogoSequence */
-    /* +0x10 */ s32 pollGraphRoom;  /* gates PollGraphRoomStatus (0: it returns 2 at once) */
+    /* +0x04 */ s32 dayTaskSyncDriver; /* New_DayTask's syncDriver, in RunDayTask: that ctor
+                            * passes (syncDriver == 0) to SetActiveDataSourceDriverMode */
+    /* +0x08 */ s32 playStreams; /* gates every movie after the intro: PlayOpeningMovie, PlaySpecialDayMovies,
+                                     * PlayCinematic's movie branch, PlayEndingMovie */
+    /* +0x0C */ s32 showIntroLogos; /* gates ShowIntroLogos */
+    /* +0x10 */ s32 pollGraphRoom;  /* gates RunTitleMenu (0: it returns 2 at once) */
     /* +0x14 */ s32 unk14; /* the ctor passes it to the DreamSys's slot228 (DreamSys__func_5ba20),
                             * which stores a value >= 0 at DreamSys +0x924 */
 } GameApplicationConfig;
@@ -71,9 +74,17 @@ struct GameApplicationMethods {
 struct GameApplication {
     APPLICATION_FIELDS(GameApplicationMethods);
     /* +0x020 */ GameApplicationConfig *config; /* the ctor's argument */
-    /* +0x024 */ s32 skipGraphRoomPoll; /* ctor clears; PollStatusObj sets it on status 3; PollGraphRoomStatus
-                                                * skips its New_GraphRoom poll while set, then clears it */
+    /* +0x024 */ s32 skipGraphRoomPoll; /* ctor clears; RunDayTask sets it on DAYTASK_RESULT_CLOSED;
+                                         * RunTitleMenu skips its first GraphRoom while set, then clears it */
     /* +0x028 */ struct DreamSys *dreamSys; /* the ctor's New_DreamSys() */
+};
+
+/* What RunTitleMenu (+0x058) returns to Application__RunMainLoop: 0 goes
+ * back to +0x054, the opening movie; 2 runs +0x060, a day, then the menu
+ * again. (1, +0x05C and the menu again, is never returned.) */
+enum GameApplicationLoopStatus {
+    GAMEAPPLICATION_LOOP_OPENING = 0, /* TitleMenu's result was nonzero (TaskCore's timeout is 1) */
+    GAMEAPPLICATION_LOOP_DAY = 2 /* TitleMenu's result 0, or no menu (config->pollGraphRoom 0) */
 };
 
 /* The two overrides whose parameter lists differ from their slots'. */
@@ -88,15 +99,15 @@ GameApplication *New_GameApplication(GameApplicationConfig *args);
 void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *args);
 void GameApplication__SeedRandom(GameApplication *self);
 void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem, struct Pad *pad);
-void GameApplication__LoadIntroLogoSequence(GameApplication *self);
-void GameApplication__StartLoaderTask(GameApplication *self, const char *path);
-s32 GameApplication__LoaderTaskDoneCallback(void);
-void GameApplication__StartWeeklyStreamTask(GameApplication *self);
-s32 GameApplication__PollGraphRoomStatus(GameApplication *self);
-void GameApplication__StartGraphRoomStreamTask(GameApplication *self);
+void GameApplication__ShowIntroLogos(GameApplication *self);
+void GameApplication__ShowImage(GameApplication *self, const char *path);
+s32 GameApplication__RegisterFilesCallback(void);
+void GameApplication__PlayOpeningMovie(GameApplication *self);
+s32 GameApplication__RunTitleMenu(GameApplication *self);
+void GameApplication__PlaySpecialDayMovies(GameApplication *self);
 void GameApplication__NoOpSlot5C(void);
-s32 GameApplication__PollStatusObj(GameApplication *self);
-void GameApplication__StartCinematicStream(GameApplication *self);
-void GameApplication__StartStreamTaskWithInit(GameApplication *self);
+s32 GameApplication__RunDayTask(GameApplication *self);
+void GameApplication__PlayCinematic(GameApplication *self);
+void GameApplication__PlayEndingMovie(GameApplication *self);
 
 #endif

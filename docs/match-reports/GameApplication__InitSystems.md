@@ -134,3 +134,16 @@ initialized latch, and the tier-B mechanism name gives way to the slot name
 under FINISHING-PLAN track 4 step 6. The override takes three parameters
 where the slot takes four (the caller in `main` passes three), so the slot
 keeps the inherited type and `main` casts to `GameApplicationInitSystemsFn`.
+
+## Track 7 polish (round 100, echo)
+
+Body changes, all byte-identical: comment only.
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* initSystems (+0x044): runs Application's own initSystems unless the parent's
+ * `initialized` latch is already set. */
+```

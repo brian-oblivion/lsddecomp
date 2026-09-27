@@ -58,7 +58,7 @@ the value's register swapped (v0/v1) -> one assignment of a ternary.
 
 - **Name:** `GetSpecialDayOrEventRecord`
 - **Tier:** B
-- **Evidence:** for group >= 0, record `sub` of GetSpecialDayRecords(group) with its movie id, or -1 for the TIM records (sub >= 2); else GetEventMovie(sub). Mechanics from the body and the record paths; the caller (GameApplication__StartCinematicStream) streams a movie id and loads a -1 as an image, which agrees. What DreamSys's getCinematic pair selects in the game is not established.
+- **Evidence:** for group >= 0, record `sub` of GetSpecialDayRecords(group) with its movie id, or -1 for the TIM records (sub >= 2); else GetEventMovie(sub). Mechanics from the body and the record paths; the caller (GameApplication__PlayCinematic) streams a movie id and loads a -1 as an image, which agrees. What DreamSys's getCinematic pair selects in the game is not established.
 
 ## Naming history
 

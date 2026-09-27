@@ -1,4 +1,6 @@
-# GameApplication__StartCinematicStream
+# GameApplication__PlayCinematic
+
+> Renamed from `GameApplication__StartCinematicStream` on 2026-09-27 (tools/rename.py). Address 0x8002677c.
 
 > Renamed from `Class6D3C8__StartCinematicStream` on 2026-09-26 (tools/rename.py). Address 0x8002677c.
 
@@ -8,7 +10,7 @@
 
 ## What it does
 
-Called by `GameApplication__PollStatusObj` when its `StatusObj` slot44 result is `2` (per
+Called by `GameApplication__RunDayTask` when its `StatusObj` slot44 result is `2` (per
 that function's still-stalled derivation). Reads `DreamSys`'s current
 cinematic slot (`GetCinematic`), packs its two 16-bit fields and resolves
 them to a channel index (`GetSpecialDayOrEventRecord`, which also returns a second,
@@ -21,7 +23,7 @@ resolved but the gate was off, nothing else happens.
 ## Final C
 
 ```c
-void GameApplication__StartCinematicStream(GameApplication *self) {
+void GameApplication__PlayCinematic(GameApplication *self) {
     CinematicCall cc;
     struct {
         s32 chan;
@@ -77,7 +79,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
 
 3. **Two structurally-identical 8-byte-shortfall locals, both from the
    "partially-used out-param" idiom already seen in `GameApplication__GameApplication` and
-   `GameApplication__StartGraphRoomStreamTask`.** `CinematicCall cc` (a real return value, needs no
+   `GameApplication__PlaySpecialDayMovies`.** `CinematicCall cc` (a real return value, needs no
    padding of its own) sits fine as a standalone local, but combining it
    into ONE struct with the separate `chan` out-param broke the
    struct-return codegen entirely (GCC materialized `GetCinematic`'s hidden
@@ -96,15 +98,15 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
    (`groupId` assigned from `SetActiveDataSourceDriverMode`'s return, called after
    discarding `GetSpecialDayOrEventRecord`'s) -- swapping which call's return feeds
    `groupId`, and discarding `SetActiveDataSourceDriverMode`'s (matching its established
-   "called for side effect, return unused" role in `GameApplication__LoadIntroLogoSequence` and
-   `GameApplication__StartWeeklyStreamTask`), closed the last two words.
+   "called for side effect, return unused" role in `GameApplication__ShowIntroLogos` and
+   `GameApplication__PlayOpeningMovie`), closed the last two words.
 
 ## New struct/header knowledge
 
 `include/GameApplication.h`: `SetActiveDataSourceDriverMode`'s extern retyped from `void` to
 `s32` (it does return a meaningful value -- whatever its internal dispatch
 loop last produced -- confirmed here even though this call site, like
-`GameApplication__LoadIntroLogoSequence`/`GameApplication__StartWeeklyStreamTask`, discards it). Added `GetSpecialDayOrEventRecord`
+`GameApplication__ShowIntroLogos`/`GameApplication__PlayOpeningMovie`, discards it). Added `GetSpecialDayOrEventRecord`
 (psyq_memset.s: resolves a packed `{bank,entry}` `CinematicCall` to a
 channel index via an out-param, **and** returns a second, separate `s32`
 kept by this function -- easy to miss since most callers of "write to
@@ -134,9 +136,8 @@ second call's own delay slot opportunistically claims it.
   fixed (lever 2), confirming the remaining residues at each stage were
   register/stack-layout content, not CFG mistakes.
 
-## Naming
-
-**`GameApplication__StartCinematicStream` -- tier B.** Mechanics: reads the owned
+## Naming history (before round 100)
+**`GameApplication__PlayCinematic` -- tier B.** Mechanics: reads the owned
 `DreamSys`'s current cinematic slot (`vt->GetCinematic`, an already-named
 vtable accessor), resolves it to a channel index; if resolution fails (-1),
 starts a `LoaderTask` on a fixed "no cinematic" fallback path; otherwise, if
@@ -151,3 +152,34 @@ shared by this unit's other four StreamTask launchers.
 ## Track 4 (2026-09-25, round 84, alpha)
 
 The task these functions build with New_TaskCore is a plain TaskCore (include/TaskCore.h, track 4 round 84); GameApplication.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__PlayCinematic` -- tier B** (renamed from `GameApplication__StartCinematicStream` with tools/rename.py). Evidence: resolves DreamSys's getCinematic pair with GetSpecialDayOrEventRecord: a movie (movie id != -1) is streamed, gated by config->playStreams, with no skip on confirm; a special day's TIM image (movie id -1) is shown by a TaskCore for 10 seconds (setFrameBound(10), TASKCORE_FRAMES_PER_SECOND). Tier B: "cinematic" is DreamSys's slot name, and what the pair selects in the game is not established (GetSpecialDayOrEventRecord.md).
+
+Body changes, all byte-identical: chanBuf {s32 chan; u32 unk04, unk08} -> idBuf {s32 movieId; u8 pad04[8]} (MATCHING: 12 bytes, the read word first); groupId/lookup -> path/frameCount; GetSpecialDayOrEventRecord's extern returns const char * (the record, used as a path by both branches). The old reading ("channel index", a "no cinematic" fallback path, SetActiveDataSourceDriverMode's return "kept") is in the history section below: the value kept across SetActiveDataSourceDriverMode is GetSpecialDayOrEventRecord's return, and SetActiveDataSourceDriverMode returns void (code_171e0.c).
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Reads DreamSys's current cinematic slot, resolves it to a channel index
+ * (GetSpecialDayOrEventRecord); if that fails (-1), starts a LoaderTask on the fixed
+ * "no cinematic" path; otherwise, if self->config->playStreams gates it, starts a
+ * StreamTask on the resolved channel. Either branch finishes by starting
+ * whichever task it built; if neither branch runs, nothing happens. */
+
+extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
+                                                       the last value its internal dispatch loop got --
+                                                       GameApplication__ShowIntroLogos/GameApplication__PlayOpeningMovie discard it, but
+                                                       GameApplication__PlayCinematic keeps it */
+extern s32 GetSpecialDayOrEventRecord(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
+    {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
+    to *out (-1 if unresolved); the packing must zero-extend both halves before combining
+    (retail loads them with lhu, not lh) since the result is bitwise-composed, not a value read
+    back as a signed 32-bit number. Also returns its own (separate) s32 value, kept by
+    GameApplication__PlayCinematic. */
+```

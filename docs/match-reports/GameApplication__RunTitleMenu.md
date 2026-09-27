@@ -1,4 +1,6 @@
-# GameApplication__PollGraphRoomStatus
+# GameApplication__RunTitleMenu
+
+> Renamed from `GameApplication__PollGraphRoomStatus` on 2026-09-27 (tools/rename.py). Address 0x80026410.
 
 > Renamed from `Class6D3C8__PollGraphRoomStatus` on 2026-09-26 (tools/rename.py). Address 0x80026410.
 
@@ -9,11 +11,11 @@
 ## What it does
 
 `GameApplicationMethods` slot `+0x058`. Gated by `self->arg->unk10 != 0` (a third
-sibling gate on the ctor argument, alongside `GameApplication__LoadIntroLogoSequence`'s `unk0C` and
-`GameApplication__StartWeeklyStreamTask`'s `unk08`). Checks the owned `DreamSys`'s own status slot
+sibling gate on the ctor argument, alongside `GameApplication__ShowIntroLogos`'s `unk0C` and
+`GameApplication__PlayOpeningMovie`'s `unk08`). Checks the owned `DreamSys`'s own status slot
 (`+0x1A0`); if it isn't already `1` and `self->unk24` hasn't latched, kicks
 off one `PollTask` (`New_GraphRoom`) and, if *that* reports `2`, runs
-`GameApplication__StartGraphRoomStreamTask`. Then polls a second `PollTask` (`New_TitleMenu`) in a loop,
+`GameApplication__PlaySpecialDayMovies`. Then polls a second `PollTask` (`New_TitleMenu`) in a loop,
 restarting the first `PollTask` each time it reports `2`, until it reports
 anything else; clears `self->unk24` and returns `0` or `2` depending on
 whether that final status was below `1` (unsigned).
@@ -21,7 +23,7 @@ whether that final status was below `1` (unsigned).
 ## Final C
 
 ```c
-s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
+s32 GameApplication__RunTitleMenu(GameApplication *self) {
     s32 status;
     s32 pollDone;
 
@@ -31,18 +33,18 @@ s32 GameApplication__PollGraphRoomStatus(GameApplication *self) {
         status = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->unk24 == 0) {
-                status = GameApplication__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
+                status = GameApplication__RunTask(New_GraphRoom, self->dreamSys, self->unk1C);
                 if (status == 2) {
-                    GameApplication__StartGraphRoomStreamTask(self);
+                    GameApplication__PlaySpecialDayMovies(self);
                 }
             }
         }
 
         pollDone = 2;
     retry:
-        status = GameApplication__RunPollTask(New_TitleMenu, self->dreamSys, self->unk1C);
+        status = GameApplication__RunTask(New_TitleMenu, self->dreamSys, self->unk1C);
         if (status == pollDone) {
-            GameApplication__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
+            GameApplication__RunTask(New_GraphRoom, self->dreamSys, self->unk1C);
             goto retry;
         }
 
@@ -137,12 +139,11 @@ sequential code, not an early return.
   where the compiler's own analysis would create it, rather than forcing it
   by hand — is exactly what closed this residue too.
 
-## Naming
-
-**`GameApplication__PollGraphRoomStatus` -- tier B.** Mechanics: gated by
+## Naming history (before round 100)
+**`GameApplication__RunTitleMenu` -- tier B.** Mechanics: gated by
 `arg->unk10`, checks the owned `DreamSys`'s own status accessor, then loops
-`GameApplication__RunPollTask(New_TitleMenu, ...)`, restarting
-`GameApplication__RunPollTask(New_GraphRoom, ...)` on every "2" report, until
+`GameApplication__RunTask(New_TitleMenu, ...)`, restarting
+`GameApplication__RunTask(New_GraphRoom, ...)` on every "2" report, until
 the second poll task reports something else. `New_GraphRoom` is an
 established, evidence-backed name from another unit
 (`src/class_3bb8c_t.c:315`, `GraphRoom__GraphRoom`), so "GraphRoom" is
@@ -150,3 +151,25 @@ real vocabulary, not a guess -- but `New_TitleMenu`'s own class is still
 unnamed, and this function's ultimate purpose (what "graph room" readiness
 gates) is not established here. The name describes the poll/retry mechanics
 around the one named PollTask class involved.
+
+## Track 7 polish (round 100, echo)
+
+### Naming
+
+**`GameApplication__RunTitleMenu` -- tier B** (renamed from `GameApplication__PollGraphRoomStatus` with tools/rename.py). Evidence: nothing is polled: it runs the day's GraphRoom (unless day 1 or skipGraphRoomPoll), PlaySpecialDayMovies when GraphRoom scored, then the TitleMenu, and GraphRoom again each time the menu returns TITLEMENU_RESULT_GRAPH; its return tells Application__RunMainLoop to run a day (GAMEAPPLICATION_LOOP_DAY, the menu's result 0) or go back to the opening movie. Tier B: the name leads with the menu, and the GraphRoom prelude is part of the hook too.
+
+Body changes, all byte-identical: pollDone -> graphResult (MATCHING: it must stay a named local set after the GraphRoom check, see the derivation); literals 2 -> GRAPHROOM_RESULT_SCORED, TITLEMENU_RESULT_GRAPH, GAMEAPPLICATION_LOOP_DAY.
+
+### History: code_1677c.c comments before the round-100 polish
+
+Moved here from the source, verbatim (names as they stood then, where the tools had not already rewritten them).
+
+```c
+/* Gated by self->config->pollGraphRoom. Checks the DreamSys's own status slot
+ * (+0x1A0); if it isn't already "1" and self->skipGraphRoomPoll hasn't latched, kicks
+ * off one PollTask (New_GraphRoom) and, if THAT reports "2", runs
+ * GameApplication__StartGraphRoomStreamTask. Then polls a second PollTask (New_TitleMenu) in a loop,
+ * restarting the first PollTask each time it reports "2", until it
+ * reports anything else; clears self->skipGraphRoomPoll and returns 0 or 2 depending
+ * on whether that final status was below 1. */
+```

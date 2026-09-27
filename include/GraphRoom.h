@@ -15,8 +15,8 @@
  * the DreamSys's 365-day mood ring. What it is in the game (the graph
  * screen) is that reading; the mechanics below are measured.
  *
- * Who makes one: GameApplication__PollGraphRoomStatus (src/code_1677c.c), through
- * GameApplication__RunPollTask(New_GraphRoom, self->dreamSys, ...), so the ctor's
+ * Who makes one: GameApplication__RunTitleMenu (src/code_1677c.c), through
+ * GameApplication__RunTask(New_GraphRoom, self->dreamSys, ...), so the ctor's
  * one argument, kept at +0x0A4, is the game's DreamSys. Its +0x1B0 is
  * DreamSys__GetSaveBlock, which returns &saveMagic; this unit reads that
  * block through its own record (DreamSaveBlock in class_3bb8c_t.c: +0x004
@@ -88,6 +88,10 @@ typedef void (*GraphRoomResetCallFn)(GraphRoom *self, struct DreamSys *dreamSys)
 
 extern GraphRoomMethods gGraphRoomMethods;
 extern GraphRoomMethods *GetGraphRoomMethods(void); /* returns &gGraphRoomMethods */
+
+/* GraphRoom__Init's result when `scored` is set; GameApplication__RunTitleMenu
+ * then plays GameApplication__PlaySpecialDayMovies. */
+#define GRAPHROOM_RESULT_SCORED 2
 
 /* The class's own methods, in ROM order (class_3bb8c_t). */
 GraphRoom *New_GraphRoom(struct DreamSys *dreamSys);

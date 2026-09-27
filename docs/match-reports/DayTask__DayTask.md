@@ -291,7 +291,7 @@ Tier B. Evidence, all from this class's own bodies and its one caller:
 - between the two it runs ObjM children, replacing one with a fresh ObjM on
   `getCurrentStage` (phase 3) on ObjM's events 5..8 and 0xA;
 - `result` (init's return) encodes how the day ended, and its one caller
-  (GameApplication__PollStatusObj, reached from Application__RunMainLoop on
+  (GameApplication__RunDayTask, reached from Application__RunMainLoop on
   GraphRoom status 2) acts on it: 2 plays the cinematic, 3 sets
   skipGraphRoomPoll.
 

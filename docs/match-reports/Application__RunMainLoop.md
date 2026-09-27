@@ -86,4 +86,4 @@ slots classtable.py prints); they are named for the subclass's occupants
 (`loadIntroLogoSequence`, `startWeeklyStreamTask`, `pollGraphRoomStatus`,
 `slot5C` for the no-op, `pollStatusObj`, `startStreamTaskWithInit`). +0x060
 stays `s32`: this body tests its return, and the occupant,
-GameApplication__PollStatusObj, returns `s32`. Bytes unchanged.
+GameApplication__RunDayTask, returns `s32`. Bytes unchanged.
