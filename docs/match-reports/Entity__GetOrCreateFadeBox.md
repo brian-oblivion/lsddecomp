@@ -16,7 +16,7 @@ through it: `slot50(sub)`, `slot4C(sub, this, arg2-or-default)`,
 allocation failed.
 
 `name` defaults to `gEntityFadeBoxDefaultSize` (`{320, 240}`) and `arg2` defaults to
-`gEntityDefaultOffset` (`{-100, -100}`) when the caller passes NULL — both plain
+`gEntityFadeBoxDefaultOffset` (`{-100, -100}`) when the caller passes NULL — both plain
 2-word data buffers, not strings, in `asm/data/7B3F8.sdata.s`.
 
 ## Derivation
@@ -57,7 +57,7 @@ Unk100Obj *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void
     m = sub->methods;
     dispatchArg2 = arg2;
     if (dispatchArg2 == NULL) {
-        dispatchArg2 = gEntityDefaultOffset;
+        dispatchArg2 = gEntityFadeBoxDefaultOffset;
     }
     m->slot4C(sub, this, dispatchArg2);
     sub->methods->slotD0(sub, arg3);
@@ -88,7 +88,7 @@ the way the "obviously equivalent" nested-if reads.**
    directly next time rather than "cleaning it up" first.
 3. The dispatch tail still needed two more fixes after that: `arg2`'s
    NULL-default was written by reassigning the *parameter itself*
-   (`if (arg2 == NULL) arg2 = gEntityDefaultOffset;`), and that block-reused `$s2`
+   (`if (arg2 == NULL) arg2 = gEntityFadeBoxDefaultOffset;`), and that block-reused `$s2`
    for both the check and the final value — but retail computes the checked
    value into `$a2` (a temp, distinct from the parameter's home register)
    and leaves `$s2` alone. Introducing a separate `dispatchArg2` local fixed

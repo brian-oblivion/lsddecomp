@@ -77,7 +77,7 @@ FadeBox *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void *
     m = sub->methods;
     dispatchArg2 = arg2;
     if (dispatchArg2 == NULL) {
-        dispatchArg2 = gEntityDefaultOffset;
+        dispatchArg2 = gEntityFadeBoxDefaultOffset;
     }
     m->attachToParent(sub, (SceneNode *)this, dispatchArg2);
     sub->methods->setStep(sub, (s32)arg3);

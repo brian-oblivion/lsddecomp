@@ -140,7 +140,7 @@ gDivPolygon4
 gDrawSystem
 gDreamAuxStage
 gDreamAuxWorld
-gEntityDefaultOffset
+gEntityFadeBoxDefaultOffset
 gEntityFadeBoxDefaultSize
 gFadeBoxAttachPos
 gFileTable

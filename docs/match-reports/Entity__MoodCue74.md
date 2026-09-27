@@ -63,7 +63,7 @@ void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
     (immediately after `slot130`) -- called as `slot134(unk94, 1, 1)`,
     return discarded, same caveat.
 - `sMoodCue74ClearColor` (a single-word data table at `asm/data/7B3F8.sdata.s`,
-  immediately after the already-known `gEntityFadeBoxDefaultSize`/`gEntityDefaultOffset`) gets its
+  immediately after the already-known `gEntityFadeBoxDefaultSize`/`gEntityFadeBoxDefaultOffset`) gets its
   own per-unit `extern u8 sMoodCue74ClearColor[];` in `Entity_e.c`, same convention
   as this file's other opaque data-table externs.
 
@@ -115,7 +115,7 @@ opcode's low bits differ, so this is easy to misdiagnose as "close enough."
 
 Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 74 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
 
-**`sMoodCue74ClearColor` left unnamed this round.** Already documented (this report's own body, pre-rename) as a single-word data table adjacent to `gEntityFadeBoxDefaultSize`/`gEntityDefaultOffset`, not a rotation/scale/translate-style {num,den} or s32-triple table, and passed to `Unk5CObj::slot64` whose own purpose is unestablished -- no evident value to name it from.
+**`sMoodCue74ClearColor` left unnamed this round.** Already documented (this report's own body, pre-rename) as a single-word data table adjacent to `gEntityFadeBoxDefaultSize`/`gEntityFadeBoxDefaultOffset`, not a rotation/scale/translate-style {num,den} or s32-triple table, and passed to `Unk5CObj::slot64` whose own purpose is unestablished -- no evident value to name it from.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
