@@ -323,7 +323,7 @@ extern s32 atoi(char *s);
  * (ROM image still-uncarved, `asm/data/1C34.rodata.s` region) this
  * function copies raw byte ranges out of; also read by
  * `class_3bb8c_d.c`'s own (differently-typed) local view. */
-extern u8 *gMemcardIconTemplate;
+extern u8 *gSaveTitleGlyphs;
 
 /* Struct-copy helper types for round 45's CopyMemcardIconTemplate, all deliberately
  * all-`s8` (alignment 1) per this round's FormatNumberIntoBuffer lever: retail
@@ -348,7 +348,7 @@ typedef struct {
  * caller, TaskObjF__WriteMemcardSaveFile), matched exactly -- this unit's own definition
  * must agree with that declaration since both are visible in this
  * translation unit. Cast to `u8 *` internally; retail's own register
- * content at exit (`$v0` left holding a pointer into the `gMemcardIconTemplate`
+ * content at exit (`$v0` left holding a pointer into the `gSaveTitleGlyphs`
  * template in every path) confirms the real return type is a pointer,
  * loosely read as `s32` by the caller that never dereferences it. */
 s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1) {
@@ -361,15 +361,15 @@ s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1) {
     if (src != NULL) {
         t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
 
-        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(gMemcardIconTemplate + 0x1E);
-        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(gMemcardIconTemplate + 0x1E);
+        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(gSaveTitleGlyphs + 0x1E);
+        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(gSaveTitleGlyphs + 0x1E);
 
         idx = atoi((char *)(src + t0)) - 1;
-        p = gMemcardIconTemplate + idx * 2;
+        p = gSaveTitleGlyphs + idx * 2;
         *(Pair2_3bb8c_g *)(self + 0x8) = *(Pair2_3bb8c_g *)p;
         return (s32)p;
     } else {
-        u8 *q = gMemcardIconTemplate;
+        u8 *q = gSaveTitleGlyphs;
 
         *(Buf6_3bb8c_g *)(self + 0x6) = *(Buf6_3bb8c_g *)(q + 0x1E);
         return (s32)q;

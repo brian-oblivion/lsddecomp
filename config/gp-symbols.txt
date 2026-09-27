@@ -160,13 +160,13 @@ gLinkTriggerIndex
 gMcDevicePath0
 gMcDevicePath1
 gMdecInitialized
-gMemcardIconTemplate
 gMovieClearColor
 gMoviePollCounter
 gNameCharTable
 gObjMProjectionBias
 gOpenVabCount
 gPendingVabBuffer
+gSaveTitleGlyphs
 gSoundEffectDirPtr
 gStartupBMemPMgr
 gStyleClearColor
