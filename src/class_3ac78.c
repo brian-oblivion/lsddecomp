@@ -366,7 +366,7 @@ void StageMap__SetFootprintFromCell(StageMap *self, Descriptor10Ext *desc, s32 s
     self->footprintWidth = span;
     self->footprintHeight = span;
     self->footprintRow = t;
-    StageMap__BuildFootprintSlots(self);
+    StageMap__BuildFootprintRects(self);
 }
 
 /* Clamp a span x span footprint centred on desc's cell to the 20 x 20 grid:

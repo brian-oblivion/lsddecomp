@@ -1,4 +1,6 @@
-# StageMap__BuildFootprintSlots -- MATCHED 109/109, round 75 (echo)
+# StageMap__BuildFootprintRects -- MATCHED 109/109, round 75 (echo)
+
+> Renamed from `StageMap__BuildFootprintSlots` on 2026-09-27 (tools/rename.py). Address 0x8004c93c.
 
 > Renamed from `Class866E8__BuildFootprintSlots` on 2026-09-26 (tools/rename.py). Address 0x8004c93c.
 
@@ -52,7 +54,7 @@ Six builds total. No permuter.
 ## Matched body
 
 ```c
-void StageMap__BuildFootprintSlots(Obj866E8 *self) {
+void StageMap__BuildFootprintRects(Obj866E8 *self) {
     s32 flag;
     s32 h4;
     s32 width;
@@ -175,7 +177,7 @@ prototype identical to that function's definition.
 > `TaskObjF__WriteMemcardSaveFile`.
 >
 > **Permuter scaffold rebuilt from scratch** (`tools/setup-permuter.sh
-> StageMap__BuildFootprintSlots <seed>`, seed = this report's own 45/109 body verbatim,
+> StageMap__BuildFootprintRects <seed>`, seed = this report's own 45/109 body verbatim,
 > plus a forward declaration for the not-yet-matched sibling
 > `StageMap__SplitFootprintSlot`). `--debug --stack-diffs`: **base score 2153 -- 8
 > insertions, 8 deletions, 4 reorderings, 61 register differences.** The
@@ -211,7 +213,7 @@ prototype identical to that function's definition.
 > three additions (`quadrant`, `flag`, `span`) complete the set of locals
 > with a provable value range in this function. All five are now
 > individually tested and negative; nothing narrower remains to try here.
-> **A fourth function (`StageMap__BuildFootprintSlots`, joining `StageMap__SplitFootprintSlot`,
+> **A fourth function (`StageMap__BuildFootprintRects`, joining `StageMap__SplitFootprintSlot`,
 > `StageMap__ComputeFootprintDescriptor`, `StageMap__ApplyChunkLoads`) now confirms the same scaffold-mismatch
 > class in this one unit** -- worth flagging as a property of this specific
 > header/class's functions (heavy `Obj866E8` self-pointer traffic, deep
@@ -229,7 +231,7 @@ prototype identical to that function's definition.
 > **delay slot**, so the increment executes on BOTH paths whenever `h6 < 0`.
 >
 > **The delay-slot reading is confirmed** — `asm/nonmatchings/class_3bb8c_b/
-> StageMap__BuildFootprintSlots.s` lines 32-33, verified by the head. The source inference
+> StageMap__BuildFootprintRects.s` lines 32-33, verified by the head. The source inference
 > does not follow, and both spellings of it measure WORSE than the 45/109
 > baseline:
 >
@@ -381,7 +383,7 @@ prototype identical to that function's definition.
 
 ## What it does
 
-`void StageMap__BuildFootprintSlots(Obj866E8 *self)`. Computes a "quadrant" index and a
+`void StageMap__BuildFootprintRects(Obj866E8 *self)`. Computes a "quadrant" index and a
 clamped `(h4, h6)` sub-cell offset from `self->unk7C`/`self->unk7E`
 (each signed, clamped into `[0, 0x14)` with a `-0xA`/`+0xA` secondary split
 when both axes are negative), fills `self->slots8C[0]` via
@@ -465,12 +467,12 @@ Requires `StageMap__SplitFootprintSlot`'s forward extern (already declared with 
 exact signature elsewhere in this unit, see
 `docs/match-reports/StageMap__SplitFootprintSlot.md`) if spliced back in — add
 `extern s32 StageMap__SplitFootprintSlot(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8);`
-before it (this function is defined AFTER `StageMap__BuildFootprintSlots` in ROM order in
+before it (this function is defined AFTER `StageMap__BuildFootprintRects` in ROM order in
 `src/class_3bb8c_b.c`).
 
 ```c
 #if 0
-void StageMap__BuildFootprintSlots(Obj866E8 *self) {
+void StageMap__BuildFootprintRects(Obj866E8 *self) {
     s32 flag;
     s32 h4;
     s32 width;
@@ -616,7 +618,7 @@ OTHER single value in the function (e.g. `flag`, `quadrant`, or `span`
 individually) the way `TaskObjF__WriteMemcardSaveFile` narrowed exactly one parameter and
 nothing else.
 
-**Permuter scaffold prepared (`permuter-work/StageMap__BuildFootprintSlots`, plain seed,
+**Permuter scaffold prepared (`permuter-work/StageMap__BuildFootprintRects`, plain seed,
 no PERM macros -- default randomization already covers type mutations,
 which is what actually found `TaskObjF__WriteMemcardSaveFile`'s fix) but the bounded search
 was NEVER LAUNCHED this round** -- wind-down landed first. `--debug` base
@@ -636,7 +638,7 @@ number.**
 for the next round on this unit: launch
 `PATH=$PWD/permuter-work/bin:$PATH timeout 600 .venv/bin/python3
 tools/decomp-permuter/permuter.py -j 6 --stop-on-zero --best-only
-permuter-work/StageMap__BuildFootprintSlots` (scaffold already provisioned, no setup
+permuter-work/StageMap__BuildFootprintRects` (scaffold already provisioned, no setup
 needed) and, independently, try narrowing `flag` and `quadrant` (both
 provably 2-3 valued) one at a time rather than `h4`/`h6` wholesale.
 

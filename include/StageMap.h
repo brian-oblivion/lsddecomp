@@ -423,7 +423,7 @@ s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key);
 s32 StageMap__FindSlotIndexByChunk(StageMap *self, s32 key);
 void StageMap__RefreshFootprint(StageMap *self);
 void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 width, s32 height);
-void StageMap__BuildFootprintSlots(StageMap *self);
+void StageMap__BuildFootprintRects(StageMap *self);
 s32 StageMap__SplitFootprintSlot(StageMap *self, CellRect *slot, s32 count, s32 baseIdx, s32 col,
                                  s32 row, s32 width, s32 height);
 void StageMap__SetFootprintFromQuery(StageMap *self);

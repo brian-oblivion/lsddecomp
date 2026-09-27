@@ -133,18 +133,18 @@ void StageMap__ComputeFootprintFromRotation(StageMap *self, s32 arg1, s32 arg2) 
     } else {
         self->footprintRow = (u16)self->footprintRow + offset;
     }
-    StageMap__BuildFootprintSlots(self);
+    StageMap__BuildFootprintRects(self);
 }
 
 /* Matched round 75. Three source-shape levers closed what was filed since
  * round 19 as a whole-function register rotation
- * (docs/match-reports/StageMap__BuildFootprintSlots.md): ONE slot pointer reused for the
+ * (docs/match-reports/StageMap__BuildFootprintRects.md): ONE slot pointer reused for the
  * second slot (no separate slot1), assigned once at the join after the
  * row<0 test (reorg fills the bgez delay slot from it and deletes the
  * redundant copy on the other path -- no barrier, no duplicate); the
  * clipped remainder in its own local `over` rather than `span -= 0x14`;
  * and `count += 1` as a statement in each arm plus at the join. */
-void StageMap__BuildFootprintSlots(StageMap *self) {
+void StageMap__BuildFootprintRects(StageMap *self) {
     s32 flag;
     s32 col;
     s32 width;

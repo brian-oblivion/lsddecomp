@@ -68,7 +68,7 @@ together in the same statement.
 **Tier B.** Not a vtable slot. Writes the constant `Unk54Struct` template
 `gFullSlotRect` into a `self->gridSlots[]`-shaped entry, then overwrites its
 `elemIdx` word via `slot124`. Called by both
-`StageMap__BuildFootprintSlots`'s sibling paths and
+`StageMap__BuildFootprintRects`'s sibling paths and
 `StageMap__SetFootprintFromQuery`, always to seed a fresh slot -- hence
 "init", not "set" (it does not preserve any prior content of the slot).
 

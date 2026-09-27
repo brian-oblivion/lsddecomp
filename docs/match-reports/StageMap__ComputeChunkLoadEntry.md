@@ -132,7 +132,7 @@ were all already correct; the stall was one variable too many).
 > real build's own residue shape exactly -- i.e. check 3 was already run
 > and PASSED, independently, both times. This function's negative is NOT
 > one of the five family members round 46 found voided (`StageMap__ApplyChunkLoads`,
-> `StageMap__ComputeFootprintDescriptor`, `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintSlots`, `IsPointOutOfBounds` --
+> `StageMap__ComputeFootprintDescriptor`, `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintRects`, `IsPointOutOfBounds` --
 > all confirmed scaffold-MISMATCHED); `StageMap__ComputeChunkLoadEntry`'s scaffold has twice
 > been confirmed to AGREE with the real build. The ~184,000-iteration
 > negative stands as evidence, not as a voided measurement.

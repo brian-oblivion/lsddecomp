@@ -86,7 +86,7 @@ The in-tree definition is this body with `s32 angle` changed to `u16 angle`.
 #if 0
 /* needs: common.h, class_3bb8c.h (Obj866E8, Unk6C14SubObj, CC74QueryBuf,
  * QueryTemplate866E8, D_8008E98C, RotMatrix, ApplyMatrixLV), plus
- * extern void StageMap__BuildFootprintSlots(Obj866E8 *self); */
+ * extern void StageMap__BuildFootprintRects(Obj866E8 *self); */
 void StageMap__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
     CC74QueryBuf buf;
@@ -148,7 +148,7 @@ void StageMap__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) 
     } else {
         self->unk7E = (u16)self->unk7E + offset;
     }
-    StageMap__BuildFootprintSlots(self);
+    StageMap__BuildFootprintRects(self);
 }
 #endif
 ```
@@ -292,7 +292,7 @@ selecting one of two near-symmetric branches that write
 "do nothing extra" third path) converge on a shared clamp of a
 descriptor-derived value against `±self->unk78`, added into either
 `unk7C` or `unk7E` depending on which branch fired, before tail-calling
-`StageMap__BuildFootprintSlots(self)` (this unit's OTHER round-13 register-identity stall,
+`StageMap__BuildFootprintRects(self)` (this unit's OTHER round-13 register-identity stall,
 see its own report).
 
 ## Where it stands
@@ -352,7 +352,7 @@ names, not the old `func_800160B0`/`func_80015618` placeholders).
 
 ```c
 #if 0
-extern void StageMap__BuildFootprintSlots(Obj866E8 *self);
+extern void StageMap__BuildFootprintRects(Obj866E8 *self);
 
 void StageMap__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
@@ -454,7 +454,7 @@ shared:
     } else {
         self->unk7E = (u16)self->unk7E + s3;
     }
-    StageMap__BuildFootprintSlots(self);
+    StageMap__BuildFootprintRects(self);
 }
 #endif
 ```
@@ -464,7 +464,7 @@ shared:
 **A value whose live range never crosses a function call can still be the
 one retail promotes into a callee-saved register, and this is a distinct
 mechanism from every other register-count residue documented so far**
-(`StageMap__SplitFootprintSlot`'s "give each value its own named local", `StageMap__BuildFootprintSlots`'s
+(`StageMap__SplitFootprintSlot`'s "give each value its own named local", `StageMap__BuildFootprintRects`'s
 pure permutation). Naming the value separately does not force the
 promotion — cc1 CSEs a call-free single-use pointer expression back into
 the call site regardless of source spelling (confirmed identical output
@@ -502,7 +502,7 @@ Reaches 60/165 in-range (address drift past that point, per the register
 gap above). Needs no additional header declarations beyond what is already
 committed (`Unk6C14SubObj`, `QueryTemplate866E8`, `D_8008E98C`,
 `func_800160B0`, `func_80015618`, all added this round — see below — plus
-`StageMap__BuildFootprintSlots`'s existing extern, needed as a forward declaration since it
+`StageMap__BuildFootprintRects`'s existing extern, needed as a forward declaration since it
 is defined AFTER this function in ROM order).
 
 ```c
@@ -519,7 +519,7 @@ is defined AFTER this function in ROM order).
 > discusses the rename is fine and is deliberately not marked.
 
 #if 0
-extern void StageMap__BuildFootprintSlots(Obj866E8 *self);
+extern void StageMap__BuildFootprintRects(Obj866E8 *self);
 
 void StageMap__ComputeFootprintFromRotation(Obj866E8 *self, s32 arg1, s32 arg2) {
     Unk6C14SubObj *sub;
@@ -620,7 +620,7 @@ shared:
     } else {
         self->unk7E += s3;
     }
-    StageMap__BuildFootprintSlots(self);
+    StageMap__BuildFootprintRects(self);
 }
 #endif
 ```
@@ -663,7 +663,7 @@ Notes on the derivation, for whoever revisits this:
   `pad74[0x78-0x74]`, now a plain `s32` filling that exact 4-byte gap).
 - Comment-only additions to `Obj866E8Methods::slot10C` (new caller noted)
   and to the EXISTING `Obj866E8::unk7C`/`unk7E`/`unk80`/`unk84` field
-  comments (all four already added this round for `StageMap__BuildFootprintSlots` — now
+  comments (all four already added this round for `StageMap__BuildFootprintRects` — now
   noted as ALSO written directly by this function). No type or name
   changed on any of the four.
 
@@ -678,7 +678,7 @@ Notes on the derivation, for whoever revisits this:
   one word, not by a register).** Two independent functions in the same
   header (`StageMap__SplitFootprintSlot`, `StageMap__ComputeFootprintFromRotation`) and a THIRD in the same unit
   showing a related-but-distinct register-PERMUTATION residue
-  (`StageMap__BuildFootprintSlots`) suggests this header/class's functions are unusually
+  (`StageMap__BuildFootprintRects`) suggests this header/class's functions are unusually
   prone to GCC 2.6.3 register-allocation sensitivity that resists the
   usual small reshaping levers — worth flagging to whoever next works this
   header (`IsPointOutOfBounds`/`StageMap__StartScaleRamp`, already-documented stalls, are

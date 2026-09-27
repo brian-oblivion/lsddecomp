@@ -153,7 +153,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > is no inherited "permuter tried, negative" to revert to UNKNOWN, because
 > none was ever recorded as trustworthy in the first place. Family count
 > now stands at 5 confirmed mismatches (`StageMap__ApplyChunkLoads`, `StageMap__ComputeFootprintDescriptor`,
-> `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintSlots`, `IsPointOutOfBounds`).
+> `StageMap__SplitFootprintSlot`, `StageMap__BuildFootprintRects`, `IsPointOutOfBounds`).
 >
 > Checked the 12th lever (hoist a field pair used on every path into
 > locals PER `if`) against both residue classes: does not apply to either.
