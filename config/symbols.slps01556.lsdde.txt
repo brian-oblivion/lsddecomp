@@ -2963,3 +2963,4 @@ SCALE_TWO_FIFTHS = 0x80089E44;
 Viewport__func_8003EA6C = 0x8003EA6C; // type:func
 Viewport__func_8003EA74 = 0x8003EA74; // type:func
 Viewport__func_8003ECC0 = 0x8003ECC0; // type:func
+Viewport__func_8003ECC8 = 0x8003ECC8; // type:func

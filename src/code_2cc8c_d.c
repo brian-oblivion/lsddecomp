@@ -175,7 +175,7 @@ void Viewport__SetTwist(Viewport *self, Ratio16 *twist) {
 
 void Viewport__func_8003ECC0(void) {}
 
-void func_8003ECC8(void) {}
+void Viewport__func_8003ECC8(void) {}
 
 /* One-time allocation of this object's two ordering tables (see
  * docs/match-reports/Viewport__InitOt.md). Each half of the buffer is a
