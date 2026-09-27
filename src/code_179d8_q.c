@@ -27,6 +27,8 @@
  * are interchangeable data sources behind one small dispatch layer.
  */
 #include "common.h"
+#include <libetc.h>
+#include <libcd.h>
 #include "CdDriver.h"
 #include "DrawSystem.h"
 
@@ -83,7 +85,6 @@ void CdDriver__StopService(void) {
     UnlockCd();
 }
 
-extern void CdFlush(void);
 extern void ResetCdStateMachine(void);             /* code_179d8_r: reset the state machine */
 extern void FreeCdRequestNode(CdRequestNode *req); /* code_179d8_r: unlink+free */
 
@@ -126,18 +127,6 @@ CdDriverMethods *GetCdDriverMethods(void) {
     return &gCdDriverMethods;
 }
 
-/* libcd/sys entry points (lib/libcd/sys.o, linked since round 34) --
- * per-call-site typed for this unit, per the code_179d8_h.c convention.
- * The two constants are Psy-Q's own (include/psyq/libcd.h: CdlSetmode 0x0E,
- * CdlModeSpeed 0x80 = double speed); they are spelled locally rather than by
- * including LIBCD.H, because this unit's libcd declarations are deliberately
- * per-call-site and Sony's prototypes would conflict with them. */
-extern s32 CdSetDebug(s32 level);
-extern s32 CdControlB(u_char com, void *param, void *result);
-
-#define CD_CMD_SETMODE 0x0E
-#define CD_MODE_DOUBLE_SPEED 0x80
-
 extern s32 sCdDriveInited;
 
 void InitCdDrive(void) {
@@ -148,8 +137,8 @@ void InitCdDrive(void) {
     }
 
     CdSetDebug(0);
-    mode = CD_MODE_DOUBLE_SPEED;
-    while (CdControlB(CD_CMD_SETMODE, &mode, 0) == 0) {
+    mode = CdlModeSpeed;
+    while (CdControlB(CdlSetmode, &mode, 0) == 0) {
     }
     sCdDriveInited = 1;
 }
@@ -225,22 +214,7 @@ s32 GetFileTableCount(void) {
     return gFileTableCount;
 }
 
-/* CdSearchFile's output buffer, which is Sony's CdlFILE: pos, size, name[16]
- * = 0x18 bytes (include/psyq/libcd.h). The 0x18 was derived here
- * independently, from the span between this local's stack slot (sp+0x50) and
- * the next saved register (sp+0x68), and it is the same figure
- * code_179d8_h.c's OpenCdFile derived for the same Sony function. Only
- * the two fields this call site copies out are typed. */
-typedef struct CdFileInfo CdFileInfo;
-
-struct CdFileInfo {
-    CdLoc16 pos;
-    u32 size;
-    u8 pad8[0x18 - 0x8];
-};
-
-extern const char sFileNotFoundMsg[];                      /* "File not found. file = %s\n" */
-extern s32 CdSearchFile(CdFileInfo *fileInfo, char *path); /* libcd/iso9660.o */
+extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
 extern void printf(const char *fmt, void *arg1);
 extern char *BuildCdFilePath(char *dest, char *suffix); /* code_179d8_r */
 extern void InitCdDrive(void);
@@ -250,7 +224,7 @@ extern void InitCdDrive(void);
 s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
     CdFileEntry *end;
     char path[0x40];
-    CdFileInfo info;
+    CdlFILE info;
     s32 tries;
 
     end = entries + count;
@@ -269,7 +243,8 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
         printf(sFileNotFoundMsg, path);
 
     found:
-        entries->pos = info.pos;
+        /* CdLoc16 is the project's spelling of CdlLOC's four bytes (FileResource.h). */
+        entries->pos = *(CdLoc16 *)&info.pos;
         entries->size = info.size;
     }
 
@@ -297,7 +272,6 @@ extern s32 GetBMemPMgrBusy(void);             /* code_8220_b */
 extern void TickCdStateMachine(void);         /* code_179d8_r: state-machine step 1 */
 extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
 extern s32 gCdQueueEnabled;
-extern void VSyncCallback(void (*cb)(void));
 
 s32 ServiceCdDriver(void) {
     if (gCdLock != 0) {
@@ -347,7 +321,6 @@ void StartCdService(void) {
 
 extern s32 gCdCallbackInstalled;
 extern s32 gCdQueueEnabled;
-extern void VSyncCallback(void (*cb)(void));
 
 void StopCdServiceIfIdle(void) {
     LockCd();

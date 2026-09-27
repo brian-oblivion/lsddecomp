@@ -95,3 +95,9 @@ must therefore finish with `python3 tools/gpsyms.py` and one more
 `./build-and-verify.sh` before committing -- the green build in between is
 real, but the committed tree would otherwise fail `gpsyms.py --check` for the
 next person. Measured this round across 12 sdata renames.
+
+## Round 96 (track 6, echo)
+
+The unit takes `<libcd.h>`: `CdSetDebug`/`CdControlB` are Sony's prototypes
+and the local `CD_CMD_SETMODE`/`CD_MODE_DOUBLE_SPEED` are Sony's own
+`CdlSetmode` (0x0E) and `CdlModeSpeed` (0x80). Byte-exact.

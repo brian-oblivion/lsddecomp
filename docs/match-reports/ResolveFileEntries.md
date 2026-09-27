@@ -223,3 +223,20 @@ which is the procedure working in the direction where it can work.
 | code_179d8_s | `Rec80028448` | `unk18` | `size` | A | same record; `CdDriver__LoadFile` divides it by 0x800 to get a sector count |
 | code_179d8_s | `StatBuf80027` | `unk0`/`unk4` | `pos`/`size` | A | it is `CdlFILE`; see above |
 | code_179d8_h | `StatBuf179D8H` | `unk0`/`unk4` | `pos`/`size` | A | same Sony struct, same call |
+
+## Round 96 (track 6, echo): the local is Sony's `CdlFILE`
+
+The unit now includes `<libetc.h>` and `<libcd.h>`, so the local view
+`CdFileInfo` (pos, size, pad to 0x18) is gone and `info` is Sony's `CdlFILE`,
+and `CdSearchFile` is Sony's prototype (`CdlFILE *CdSearchFile(CdlFILE *,
+char *)`). The deleted comment's evidence, kept here: the 0x18 size was derived
+independently from the span between this local's stack slot (sp+0x50) and the
+next saved register (sp+0x68), the same figure code_179d8_h.c's OpenCdFile
+derived for the same Sony function, and it is `sizeof(CdlFILE)`.
+
+`CdFileEntry.pos` is still the project's `CdLoc16` (two `s16`), which is
+CdlLOC's four bytes under another name, so the copy is spelled
+`entries->pos = *(CdLoc16 *)&info.pos;`. Byte-exact: the access type (and so
+the 2-byte-aligned `lwl`/`lwr` copy) is unchanged. Proposed at the head:
+replace `CdLoc16` with `CdlLOC` in include/FileResource.h once its includers
+can take `<libcd.h>` (code_179d8_r/_s, code_3770c still re-declare libcd).
