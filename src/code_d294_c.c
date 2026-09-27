@@ -14,7 +14,7 @@
  * CalcBoxOutcode (ClipSegmentToBox's outcodes), GetSetBitField (behind the
  * attribute setters), ApplyMatrixToSVArray and ApplyMatrixToLVArray (a matrix
  * over an array of vectors), IsVec3WithinRange, and GetSetHitHeightGate (the
- * switch ClassifyAgainstPlanes reads).
+ * switch RaycastHullAgainstFaces reads).
  */
 
 #include "common.h"
@@ -27,15 +27,6 @@
 /* How far RaycastVertical's ray reaches from its origin, first along -y and
  * then along +y, in the model's own units. */
 #define RAYCAST_PROBE_LENGTH 1024
-
-/* CalcBoxOutcode's bits: per axis, MAX when the point is past the box's
- * maximum and MIN when it is before its minimum. */
-#define OUTCODE_Y_MIN 0x01
-#define OUTCODE_Y_MAX 0x02
-#define OUTCODE_X_MIN 0x04
-#define OUTCODE_X_MAX 0x08
-#define OUTCODE_Z_MIN 0x10
-#define OUTCODE_Z_MAX 0x20
 
 /* dst = `src`, three s16s in the node's own frame, rotated by the node's
  * rotation and widened to s32: the same offset in the parent's frame.

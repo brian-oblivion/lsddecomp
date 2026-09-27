@@ -62,9 +62,6 @@ typedef struct Ray {
  * changes what CSE keeps live across the branches. */
 #define ABS_fa50(x) ((x) < 0 ? ~(x) + 1 : (x))
 
-/* TmdModel__RaycastFaces: *best before any face is hit (the largest s32). */
-#define DIST_NONE 0x7FFFFFFF
-
 /* One face's result in TmdModel__RaycastFaces: the segment's line meets the
  * plane but not between origin and end (t < 0, or farther than end), meets
  * it there, or is parallel to it (dir . normal is 0). */
