@@ -2966,3 +2966,4 @@ Viewport__func_8003ECC0 = 0x8003ECC0; // type:func
 Viewport__func_8003ECC8 = 0x8003ECC8; // type:func
 gDefaultViewTwist = 0x8008A8F4;
 gDefaultViewportColor = 0x8008A8F8;
+gDefaultViewportWidth = 0x8008A8FC;

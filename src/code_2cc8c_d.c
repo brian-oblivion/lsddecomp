@@ -45,7 +45,7 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
  * barriers pin the two independent zero-inits and the two global-loaded
  * stores to retail's own early positions instead of letting the scheduler
  * defer them to just before the byte copies. */
-extern s32 D_8008A8FC;
+extern s32 gDefaultViewportWidth;
 extern s32 D_8008A900;
 extern ViewportRgb gDefaultViewportColor;
 extern ViewportRgb D_8008A8F8_b __asm__("gDefaultViewportColor");
@@ -53,10 +53,10 @@ extern ViewportRgb D_8008A8F8_b __asm__("gDefaultViewportColor");
 void Viewport__InitDefaults(Viewport *self) {
     self->unk90 = 0;
     self->otReady = 0;
-    /* Keeps the D_8008A8FC / D_8008A900 loads below the unk90 and otReady
+    /* Keeps the gDefaultViewportWidth / D_8008A900 loads below the unk90 and otReady
      * zero stores; without it GCC hoists both loads to the top. */
     __asm__("");
-    self->screenSize.width = D_8008A8FC;
+    self->screenSize.width = gDefaultViewportWidth;
     self->screenSize.height = D_8008A900;
     /* Keeps the two screenSize stores directly after their loads; without
      * it they sink below the otLength..fogNear constant stores. */
