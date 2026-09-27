@@ -7,7 +7,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot.
-- **What:** table getter: returns `gWeeklyGroupTable`.
+- **What:** table getter: returns `gSoundBankPaths`.
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -15,7 +15,7 @@ the first build; whole-image SHA1 green.
 
 ```c
 void *GetWeeklyGroupTable(void) {
-    return gWeeklyGroupTable;
+    return gSoundBankPaths;
 }
 ```
 
@@ -23,4 +23,4 @@ void *GetWeeklyGroupTable(void) {
 
 - **Name:** `GetWeeklyGroupTable`
 - **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** table getter: returns gWeeklyGroupTable.
+- **Evidence:** table getter: returns gSoundBankPaths.

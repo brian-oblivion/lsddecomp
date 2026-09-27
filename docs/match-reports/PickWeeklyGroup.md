@@ -9,7 +9,7 @@ out-of-range drift.
 
 ## What it does
 
-Weekly table pick: `r = (u32)SeedAndRandom(0, arg) % 7` (unsigned: retail's multu/mfhi magic 0x24924925), `table = GetWeeklyGroupTable()` (gWeeklyGroupTable, words); returns `table[gForcedWeeklyGroup - 1]` when the override global gForcedWeeklyGroup is set, else `table[r]`.
+Weekly table pick: `r = (u32)SeedAndRandom(0, arg) % 7` (unsigned: retail's multu/mfhi magic 0x24924925), `table = GetWeeklyGroupTable()` (gSoundBankPaths, words); returns `table[gForcedWeeklyGroup - 1]` when the override global gForcedWeeklyGroup is set, else `table[r]`.
 
 ## Source
 

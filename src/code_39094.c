@@ -148,7 +148,7 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
 extern char *gDefaultDataDirectory; /* "CDI\\" (sdata) */
 extern s32 gForcedWeeklyGroup;
 extern s32 gForcedVariant;
-extern u8 gWeeklyGroupTable[];
+extern u8 gSoundBankPaths[];
 extern u8 gRecordTable[];
 extern char *gSoundEffectDirPtr; /* -> "SND\\SE" */
 extern const char sAsmkStreamPath[];
@@ -192,7 +192,7 @@ void *GetRecordTable(s32 *out) {
 }
 
 void *GetWeeklyGroupTable(void) {
-    return gWeeklyGroupTable;
+    return gSoundBankPaths;
 }
 
 s32 PickWeeklyGroup(s32 arg) {
