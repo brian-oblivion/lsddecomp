@@ -1,23 +1,19 @@
 /*
- * class_3bb8c_g -- TaskObjF methods (include/TaskObjF.h), slots +0x07C..
- * +0x0B0 of gTaskObjFMethods (class_3bb8c_f holds +0x064..+0x078), the
- * table getter, plus one standalone helper (CopyMemcardIconTemplate) reused
- * by class_3bb8c_m's memcard save writer.
+ * class_3bb8c_g -- TaskObjF's state machine (include/TaskObjF.h): slots
+ * +0x07C..+0x0B0 of gTaskObjFMethods and the table getter, plus
+ * StampSaveTitleFileLetter, which writes a save file's letter into its
+ * title.
  *
- * TaskObjF runs a `state` machine: SetState notifies the parent, swaps the
- * card icon and runs the entry action of the new state (format, write, read,
- * or open a widget); AdvanceState and ForceIdleFromState answer the input
- * source's events, TickStateDelay the tick source's. The two widgets are
- * lazily attached in mirrored pairs: `textEntry` (a TextEntry, to edit the
- * title) and `itemList` (a ItemList, to choose among the existing files),
- * driven through the slots +0x044..+0x050 both classes put at the same
- * offsets; their results come back through OnTextEntryResult and
- * OnItemListResult. `cardIcon` is a ScreenSprite of a CARD\*.TIM message,
- * made by LoadCardIcon and released by ReleaseCardIcon.
- *
- * Every function in the unit is matched C. What each numeric `state` code
- * means in game terms is not established. See each function's own match
- * report for its evidence.
+ * setState (enum TaskObjFState) notifies the parent, swaps the message icon
+ * (a ScreenSprite of CARD\<name>.TIM: loadCardIcon, releaseCardIcon) and
+ * runs the new state's entry action: format, write or read the card, or
+ * attach the title editor (a TextEntry) or the file chooser (an ItemList).
+ * A circle press on the Pad reaches advanceState (retry, format, go on) and
+ * a cross press forceIdleFromState (abort); the tick source counts down
+ * FORMATTING, SAVING and LOADING before their action runs. The two widgets
+ * are made on first use, driven through the slots +0x044..+0x050 both
+ * classes put at the same offsets, and report back through
+ * onTextEntryResult and onItemListResult.
  */
 #include "common.h"
 #include <libgte.h>
@@ -30,50 +26,53 @@
 #include "TimImage.h"
 #include "VabStreamObj.h"
 #include "TaskObjF.h"
+#include "Pad.h"
 
-void TaskObjF__SetState(TaskObjF *self, s32 arg1) {
+/* MATCHING: `methods` is cached, and the cases are in retail's code order
+ * (the entry actions before the widgets). */
+void TaskObjF__SetState(TaskObjF *self, s32 state) {
     TaskObjFMethods *methods = self->methods;
-    s32 ret;
+    s32 ok;
     s32 i;
 
-    if (self->state == arg1) {
-        arg1 = 0x17;
+    if (self->state == state) {
+        state = TASKOBJF_STATE_ABORTED;
     }
 
-    methods->notifyParents(self, arg1);
+    methods->notifyParents(self, state);
     methods->releaseCardIcon(self);
-    methods->loadCardIcon(self, arg1);
+    methods->loadCardIcon(self, state);
 
     self->waitCounter = 0;
-    switch (arg1) {
-        case 0x13:
-            arg1 = methods->formatCard(self) ? 0x11 : 8;
-            methods->setState(self, arg1);
+    switch (state) {
+        case TASKOBJF_STATE_FORMAT:
+            state = methods->formatCard(self) ? TASKOBJF_STATE_EDIT_TITLE : TASKOBJF_STATE_FORMAT_ERROR;
+            methods->setState(self, state);
             break;
-        case 0x14:
-            if (*(u8 *)self->fileName == 0) {
+        case TASKOBJF_STATE_WRITE:
+            if (self->fileName[0] == '\0') {
                 methods->findUnusedMemcardName(self, self->fileName, self->namePrefix, self->nameSuffixes);
             }
-            ret = methods->writeMemcardSaveFile(self, self->fileName, self->title, self->iconFrames,
-                                                self->iconImage, self->data, self->dataSize);
-            arg1 = ret ? 0x16 : 0xC;
-            methods->setState(self, arg1);
+            ok = methods->writeMemcardSaveFile(self, self->fileName, self->title, self->iconFrames,
+                                               self->iconImage, self->data, self->dataSize);
+            state = ok ? TASKOBJF_STATE_DONE : TASKOBJF_STATE_SAVE_ERROR;
+            methods->setState(self, state);
             break;
-        case 0x15:
-            ret = methods->readMemcardFile(self, self->fileName, self->data, self->dataSize);
-            arg1 = ret ? 0x16 : 0x10;
-            methods->setState(self, arg1);
+        case TASKOBJF_STATE_READ:
+            ok = methods->readMemcardFile(self, self->fileName, self->data, self->dataSize);
+            state = ok ? TASKOBJF_STATE_DONE : TASKOBJF_STATE_LOAD_ERROR;
+            methods->setState(self, state);
             break;
-        case 0x11:
+        case TASKOBJF_STATE_EDIT_TITLE:
             methods->attachTextEntry(self);
             break;
-        case 0x12:
+        case TASKOBJF_STATE_CHOOSE_FILE:
             methods->attachItemList(self);
             break;
     }
 
-    if ((u32)(arg1 - 0x16) < 2) {
-        if (self->opMode == 1 && self->titles != NULL) {
+    if ((u32)(state - TASKOBJF_STATE_DONE) < 2) { /* DONE or ABORTED */
+        if (self->opMode == TASKOBJF_OP_LOAD && self->titles != NULL) {
             BMemPMgrFree(self->foundSuffixes);
             for (i = 0; i < self->bufCount; i++) {
                 BMemPMgrFree(self->titles[i]);
@@ -81,32 +80,34 @@ void TaskObjF__SetState(TaskObjF *self, s32 arg1) {
             BMemPMgrFree(self->titles);
             self->titles = NULL;
         }
-        self->state = 0;
-        self->opMode = 0;
+        self->state = TASKOBJF_STATE_IDLE;
+        self->opMode = TASKOBJF_OP_NONE;
     } else {
-        self->state = arg1;
+        self->state = state;
     }
 }
 
-/* 0x11 (17) entries, indexed by `arg1` (range-checked `< 0x11` below);
- * mostly `char *` string pointers into rodata, a few raw literal words at
- * indices never reached from this call site. `asm/data/76DC8.data.s`. */
-extern char *gCardIconNames[];
+/* The message icon's name per state, CARD\<name>.TIM ("NOCONECT" ..
+ * "LOADERR" for states 2..16). Entries 0 and 1 are not names; no setState
+ * call passes 0 or 1. */
+extern char *gCardIconNames[TASKOBJF_STATE_EDIT_TITLE];
 extern const char gCardPathPrefix[]; /* "CARD\\" */
 extern const char gCardPathSuffix[]; /* ".TIM" */
-/* 3 words, `New_ScreenSprite`'s rect: a SpriteRect {0, 0, 160, 120}. */
-extern s32 D_80086EC4;
-/* opaque block, the fresh `cardIcon`'s own `slot4C` arg2, address-only here. */
-extern s32 D_8008AA94;
+/* {0, 0, 160, 120} */
+extern SpriteRect gCardIconRect;
+/* (-70, -60), percent of half the screen from the centre */
+extern ScreenSpritePos gCardIconPos;
 
-void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1) {
-    char path[0x20];
-    char *buf;
+void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
+    char pathBuf[32];
+    char *path;
     char *name;
-    TimImage *handle;
-    ScreenSprite *newVal;
+    TimImage *tim;
+    ScreenSprite *icon;
 
-    if (arg1 >= 0x11) {
+    /* MATCHING: `path` and `icon` keep the buffer and the sprite in saved
+     * registers across the calls. */
+    if (index >= ARRAY_COUNT(gCardIconNames)) {
         return;
     }
     if (self->spriteParent == 0) {
@@ -116,19 +117,19 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 arg1) {
         return;
     }
 
-    buf = path;
-    name = gCardIconNames[arg1];
-    buf[0] = '\0';
-    strcat(buf, gCardPathPrefix);
-    strcat(buf, name);
-    strcat(buf, gCardPathSuffix);
+    path = pathBuf;
+    name = gCardIconNames[index];
+    path[0] = '\0';
+    strcat(path, gCardPathPrefix);
+    strcat(path, name);
+    strcat(path, gCardPathSuffix);
 
-    handle = New_TimImage(buf);
-    ((TimImageUploadFn)handle->methods->processBuffer)(handle);
-    newVal = New_ScreenSprite(handle, (SpriteRect *)&D_80086EC4, 0);
-    self->cardIcon = newVal;
-    handle->methods->release(handle);
-    newVal->methods->attachToParent(newVal, self->spriteParent, (LongVec3 *)&D_8008AA94);
+    tim = New_TimImage(path);
+    ((TimImageUploadFn)tim->methods->processBuffer)(tim);
+    icon = New_ScreenSprite(tim, &gCardIconRect, 0);
+    self->cardIcon = icon;
+    tim->methods->release(tim);
+    icon->methods->attachToParent(icon, self->spriteParent, (LongVec3 *)&gCardIconPos);
 }
 
 void TaskObjF__ReleaseCardIcon(TaskObjF *self) {
@@ -137,19 +138,19 @@ void TaskObjF__ReleaseCardIcon(TaskObjF *self) {
     }
 }
 
-void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 arg2) {
-    if (self->state != 0) {
-        if (arg2 == 0x19) {
+void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 event) {
+    if (self->state != TASKOBJF_STATE_IDLE) {
+        if (event == PAD_EVENT_PRESSED + PAD_BUTTON_RRIGHT) {
             self->methods->advanceState(self);
-        } else if (arg2 == 0x17) {
+        } else if (event == PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN) {
             self->methods->forceIdleFromState(self);
         }
     }
 }
 
-void TaskObjF__PlaySound(TaskObjF *self, s32 arg1) {
+void TaskObjF__PlaySound(TaskObjF *self, s32 index) {
     if (self->sound != NULL) {
-        self->sound->methods->playTone(self->sound, arg1, 0x7F, 0x7F);
+        self->sound->methods->playTone(self->sound, index, 127, 127);
     }
 }
 
@@ -157,89 +158,93 @@ void TaskObjF__AdvanceState(TaskObjF *self) {
     TaskObjFMethods *methods = self->methods;
 
     switch (self->state) {
-        case 2:
-        case 4:
-        case 0xA:
-        case 0xE:
-            methods->playSound(self, 0);
-            if (self->state == 0xE) {
+        case TASKOBJF_STATE_NO_CARD:
+        case TASKOBJF_STATE_CARD_CHANGED:
+        case TASKOBJF_STATE_SAVE_OVERWRITE_WARNING:
+        case TASKOBJF_STATE_LOAD_WARNING:
+            methods->playSound(self, 0 << 4);
+            if (self->state == TASKOBJF_STATE_LOAD_WARNING) {
                 strcpy(self->fileName, self->namePrefix);
                 strcat(self->fileName, self->foundSuffixes[self->selectedIndex]);
                 strcpy(self->title, self->titles[self->selectedIndex]);
             }
-            if (self->opMode == 2) {
+            /* MATCHING: an if chain; a switch tests LOAD first. */
+            if (self->opMode == TASKOBJF_OP_SAVE) {
                 methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
                                    self->iconFrames, self->iconImage, self->data, self->dataSize);
-            } else if (self->opMode == 1) {
+            } else if (self->opMode == TASKOBJF_OP_LOAD) {
                 methods->beginLoad(self, self->fileName, self->title, self->data, self->dataSize);
             }
             break;
-        case 6:
-            methods->playSound(self, 0);
-            methods->setState(self, 7);
+        case TASKOBJF_STATE_UNFORMATTED_SAVE:
+            methods->playSound(self, 0 << 4);
+            methods->setState(self, TASKOBJF_STATE_FORMATTING);
             break;
-        case 3:
-        case 5:
-        case 8:
-        case 9:
-        case 0xC:
-        case 0xD:
-        case 0x10:
-            methods->playSound(self, 0x10);
-            methods->setState(self, 0x17);
+        case TASKOBJF_STATE_CARD_ERROR:
+        case TASKOBJF_STATE_UNFORMATTED_LOAD:
+        case TASKOBJF_STATE_FORMAT_ERROR:
+        case TASKOBJF_STATE_SAVE_NO_SPACE:
+        case TASKOBJF_STATE_SAVE_ERROR:
+        case TASKOBJF_STATE_LOAD_NOT_FOUND:
+        case TASKOBJF_STATE_LOAD_ERROR:
+            methods->playSound(self, 1 << 4);
+            methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
     }
 }
 
 void TaskObjF__ForceIdleFromState(TaskObjF *self) {
     switch (self->state) {
-        case 4:
-        case 6:
-        case 0xA:
-        case 0xE:
-            self->methods->playSound(self, 0x10);
-            self->methods->setState(self, 0x17);
+        case TASKOBJF_STATE_CARD_CHANGED:
+        case TASKOBJF_STATE_UNFORMATTED_SAVE:
+        case TASKOBJF_STATE_SAVE_OVERWRITE_WARNING:
+        case TASKOBJF_STATE_LOAD_WARNING:
+            self->methods->playSound(self, 1 << 4);
+            self->methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
         default:
             break;
     }
 }
 
+/* Waits until `waitCounter` (zeroed by setState) passes 6, then runs the
+ * state's action. MATCHING: `old` and `count` apart, and one call per
+ * branch. */
 void TaskObjF__TickStateDelay(TaskObjF *self) {
     s32 old;
-    s32 newVal;
+    s32 count;
 
-    if (self->state == 7) {
+    if (self->state == TASKOBJF_STATE_FORMATTING) {
         old = self->waitCounter;
-        newVal = old + 1;
-        self->waitCounter = newVal;
+        count = old + 1;
+        self->waitCounter = count;
         if (old < 6) {
             return;
         }
-        self->methods->setState(self, 0x13);
-    } else if (self->state == 0xB) {
+        self->methods->setState(self, TASKOBJF_STATE_FORMAT);
+    } else if (self->state == TASKOBJF_STATE_SAVING) {
         old = self->waitCounter;
-        newVal = old + 1;
-        self->waitCounter = newVal;
+        count = old + 1;
+        self->waitCounter = count;
         if (old < 6) {
             return;
         }
-        self->methods->setState(self, 0x14);
-    } else if (self->state == 0xF) {
+        self->methods->setState(self, TASKOBJF_STATE_WRITE);
+    } else if (self->state == TASKOBJF_STATE_LOADING) {
         old = self->waitCounter;
-        newVal = old + 1;
-        self->waitCounter = newVal;
+        count = old + 1;
+        self->waitCounter = count;
         if (old < 6) {
             return;
         }
-        self->methods->setState(self, 0x15);
+        self->methods->setState(self, TASKOBJF_STATE_READ);
     }
 }
 
 void TaskObjF__AttachTextEntry(TaskObjF *self) {
     if (self->spriteParent != 0 && self->inputSource != 0) {
         if (self->textEntry == NULL) {
-            self->textEntry = New_TextEntry((self->titleEditPos << 1) + self->title, 1);
+            self->textEntry = New_TextEntry(&self->title[self->titleEditPos * 2], 1);
             self->ownsWidget = 1;
         }
         self->methods->addChild(self, (BasicClass *)self->textEntry);
@@ -260,16 +265,16 @@ void TaskObjF__DetachTextEntry(TaskObjF *self) {
     }
 }
 
-void TaskObjF__OnTextEntryResult(TaskObjF *self, void *arg1, s32 arg2) {
-    switch (arg2) {
-        case 2:
+void TaskObjF__OnTextEntryResult(TaskObjF *self, void *sender, s32 result) {
+    switch (result) {
+        case TEXTENTRY_RESULT_ACCEPTED:
             self->methods->detachTextEntry(self);
             self->methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
                                      self->iconFrames, self->iconImage, self->data, self->dataSize);
             break;
-        case 3:
+        case TEXTENTRY_RESULT_CANCELLED:
             self->methods->detachTextEntry(self);
-            self->methods->setState(self, 0x17);
+            self->methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
     }
 }
@@ -298,16 +303,16 @@ void TaskObjF__DetachItemList(TaskObjF *self) {
     }
 }
 
-void TaskObjF__OnItemListResult(TaskObjF *self, ItemList *arg1, s32 arg2) {
-    switch (arg2) {
-        case 2:
-            self->selectedIndex = arg1->methods->getCursorIndex(arg1);
+void TaskObjF__OnItemListResult(TaskObjF *self, ItemList *list, s32 result) {
+    switch (result) {
+        case ITEMLIST_RESULT_CHOSEN:
+            self->selectedIndex = list->methods->getCursorIndex(list);
             self->methods->detachItemList(self);
-            self->methods->setState(self, 0xE);
+            self->methods->setState(self, TASKOBJF_STATE_LOAD_WARNING);
             break;
-        case 3:
+        case ITEMLIST_RESULT_CANCELLED:
             self->methods->detachItemList(self);
-            self->methods->setState(self, 0x17);
+            self->methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
     }
 }
@@ -316,21 +321,25 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
     return &gTaskObjFMethods;
 }
 
-/* Sony's, from libc2 (round 45's own local view -- this unit's first use). */
+/* The save title is full-width (2-byte SJIS) characters. TitleMenu's (the
+ * buffer D_8008AA18 points at) starts as "LSD   Day001", all full-width:
+ * "LSD" (0..2), the letter field (3..5), "Day" (6..8), the day number
+ * (9..11), then padding. */
+#define SAVE_TITLE_LETTER_FIELD 3
+#define SAVE_TITLE_LETTER 4
+#define SAVE_TITLE_PADDING 12
+/* gSaveTitleGlyphs: the full-width letters a..o (0..14), one per save file
+ * -01..-15, then three full-width spaces and "Day" (15..20). */
+#define SAVE_TITLE_GLYPH_SPACES 15
+/* A save file name is namePrefix ("BISLPS-01556", 12 characters) + "-NN";
+ * the first digit of NN. */
+#define SAVE_FILE_NAME_NUMBER 13
+
+/* Sony's (libc2). A leading 0 makes it parse octal. */
 extern s32 atoi(char *s);
 
-/* VALUE-of `%gp_rel`, round 45's own local view -- a fixed rodata template
- * (ROM image still-uncarved, `asm/data/1C34.rodata.s` region) this
- * function copies raw byte ranges out of; also read by
- * `class_3bb8c_d.c`'s own (differently-typed) local view. */
-extern u8 *gMemcardIconTemplate;
-
-/* Struct-copy helper types for round 45's CopyMemcardIconTemplate, all deliberately
- * all-`s8` (alignment 1) per this round's FormatNumberIntoBuffer lever: retail
- * copies these ranges as one unaligned `lwl`/`lwr` word chunk per 4 bytes,
- * with any non-multiple-of-4 remainder as INDIVIDUAL byte loads/stores,
- * never merged into a halfword -- alignment 2 would let GCC trust a
- * halfword move retail does not have. */
+/* MATCHING: all-s8 (alignment 1), so a copy is lwl/lwr words plus single
+ * bytes; alignment 2 would merge a two-byte tail into a halfword. */
 typedef struct {
     s8 raw[6];
 } Buf6_3bb8c_g;
@@ -343,35 +352,40 @@ typedef struct {
     s8 a, b;
 } Pair2_3bb8c_g;
 
-/* Signature is `include/class_3bb8c.h`'s ALREADY-shared
- * `extern s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1);` (class_3bb8c_m's own
- * caller, TaskObjF__WriteMemcardSaveFile), matched exactly -- this unit's own definition
- * must agree with that declaration since both are visible in this
- * translation unit. Cast to `u8 *` internally; retail's own register
- * content at exit (`$v0` left holding a pointer into the `gMemcardIconTemplate`
- * template in every path) confirms the real return type is a pointer,
- * loosely read as `s32` by the caller that never dereferences it. */
-s32 CopyMemcardIconTemplate(s32 arg0, s32 arg1) {
-    u8 *self = (u8 *)arg0;
-    u8 *src = (u8 *)arg1;
-    s32 t0;
-    s32 idx;
-    u8 *p;
+extern Pair2_3bb8c_g *gSaveTitleGlyphs;
 
-    if (src != NULL) {
-        t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
+/* Writes a save file's letter into the full-width `title`: the letter
+ * field becomes a space, the letter for the file name's -NN (a for -01 ..
+ * o for -15) and a space, followed by "Day", and a space goes after the day
+ * number. With no file name it only blanks the letter field. -08 and -09
+ * are parsed from their second digit, which atoi would otherwise read as
+ * octal. Returns a pointer into gSaveTitleGlyphs that no caller reads.
+ * The s32 parameters are include/class_3bb8c.h's prototype. MATCHING:
+ * `glyphs` is the return value, not a second read of the global. */
+s32 StampSaveTitleFileLetter(s32 titleAddr, s32 fileNameAddr) {
+    Pair2_3bb8c_g *title = (Pair2_3bb8c_g *)titleAddr;
+    char *fileName = (char *)fileNameAddr;
+    s32 numberPos;
+    s32 letter;
+    Pair2_3bb8c_g *glyph;
 
-        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(gMemcardIconTemplate + 0x1E);
-        *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(gMemcardIconTemplate + 0x1E);
+    if (fileName != NULL) {
+        numberPos = ((u32)(fileName[SAVE_FILE_NAME_NUMBER + 1] - '8') < 2) ? SAVE_FILE_NAME_NUMBER + 1
+                                                                           : SAVE_FILE_NAME_NUMBER;
 
-        idx = atoi((char *)(src + t0)) - 1;
-        p = gMemcardIconTemplate + idx * 2;
-        *(Pair2_3bb8c_g *)(self + 0x8) = *(Pair2_3bb8c_g *)p;
-        return (s32)p;
+        title[SAVE_TITLE_PADDING] = gSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
+        *(Buf12_3bb8c_g *)&title[SAVE_TITLE_LETTER_FIELD] =
+            *(Buf12_3bb8c_g *)&gSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
+
+        letter = atoi(fileName + numberPos) - 1;
+        glyph = &gSaveTitleGlyphs[letter];
+        title[SAVE_TITLE_LETTER] = *glyph;
+        return (s32)glyph;
     } else {
-        u8 *q = gMemcardIconTemplate;
+        Pair2_3bb8c_g *glyphs = gSaveTitleGlyphs;
 
-        *(Buf6_3bb8c_g *)(self + 0x6) = *(Buf6_3bb8c_g *)(q + 0x1E);
-        return (s32)q;
+        *(Buf6_3bb8c_g *)&title[SAVE_TITLE_LETTER_FIELD] =
+            *(Buf6_3bb8c_g *)&glyphs[SAVE_TITLE_GLYPH_SPACES];
+        return (s32)glyphs;
     }
 }

@@ -116,7 +116,7 @@ target or argument value:**
 ### Proposed learning
 
 Two variants of a pattern this round's other reports already touched on
-(`CopyMemcardIconTemplate`, `ItemList__CreateRows`): **when a struct field is read more
+(`StampSaveTitleFileLetter`, `ItemList__CreateRows`): **when a struct field is read more
 than once across a function, especially after any intervening call, cache
 it in a local matching retail's own apparent register lifetime** — the
 tell is a whole-function register-count mismatch (one fewer/more `s`-reg

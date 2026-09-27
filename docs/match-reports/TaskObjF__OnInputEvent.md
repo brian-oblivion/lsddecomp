@@ -53,3 +53,11 @@ not established.
 ## Track 4 (2026-09-26, round 89)
 
 Renamed from `TaskObjF__OnNotify` so that name could go to the +0x038 override. Slot +0x088, which TaskObjF__OnNotify (+0x038) calls for a sender whose class id has low nibble 2 (the child TaskObjF__AddChild keeps in `inputSource`, +0x060). Events 0x19 and 0x17 from it run advanceState and forceIdleFromState.
+
+## Track 7 (2026-09-27, round 95)
+
+Parameter `arg2` -> `event`. 0x19 and 0x17 are `PAD_EVENT_PRESSED +
+PAD_BUTTON_RRIGHT` and `PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN` (include/Pad.h:
+0x12 + 7, 0x12 + 5): the sender is the class-id-2 child, a Pad, so circle
+pressed runs advanceState and cross pressed forceIdleFromState. `state != 0`
+is `TASKOBJF_STATE_IDLE`. Image byte-identical.

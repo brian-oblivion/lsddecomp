@@ -113,7 +113,7 @@ register the whole way through (every `sN` shifted up or down by one, not
 a scattered mismatch), and the function takes the address of a local array
 at more than one call site, try reordering that array's declaration
 relative to other locals before suspecting anything else — this is now the
-SECOND such attribution trap this round (`CopyMemcardIconTemplate`'s report has the
+SECOND such attribution trap this round (`StampSaveTitleFileLetter`'s report has the
 sibling case: a function-WIDE shared local, not a declaration-order issue,
 but the same family of "an unrelated-looking local variable decision
 shifts register allocation across the whole function").
