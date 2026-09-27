@@ -139,3 +139,7 @@ could not have supported by itself.
 ## Track 2 (round 86, 2026-09-26, alpha)
 
 **_svm_sreg_buf / _svm_sreg_dirty (same round).** `D_8008D7F0` (0x180 bytes, 24 voices x 0x10, halfwords at +0x0..+0xA spelled `D_8008D7F0`..`D_8008D7FA` by splat) is Sony's `_svm_sreg_buf` and `D_8008D970` (24 bytes) is `_svm_sreg_dirty`: libsnd/vmanager.o bss +0x000 and +0x180, anchored at 0x8008D7F0. Both are in the symbols file; the record type is `SvmSreg` in `include/SvmData.h` (fields by offset). `src/` spelling only: `_svm_sreg_buf[idx].unk0/unk2` and `_svm_sreg_dirty[idx]`. Byte-exact.
+
+## Round 97 (bravo, track 6)
+
+The definition now takes <libsnd.h>'s prototype: return type `s32` became `s16` (Sony's `short`). Zero bytes.

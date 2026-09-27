@@ -26,3 +26,7 @@ second attempt.
 ### Proposed learning
 
 None beyond `SsUtGetDetVVol.md`'s branch-polarity note.
+
+## Round 97 (bravo, track 6)
+
+The definition now takes <libsnd.h>'s prototype: return type `s32` became `s16` (Sony's `short`). Zero bytes.

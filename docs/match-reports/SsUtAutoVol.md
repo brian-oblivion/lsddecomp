@@ -36,3 +36,7 @@ guard-clause form. See that report for the general note.
 
 None beyond `SsUtGetDetVVol.md`'s branch-polarity note, which this
 confirms a second time in the same unit.
+
+## Round 97 (bravo, track 6)
+
+The definition now takes <libsnd.h>'s prototype: return type `s32` became `s16` (Sony's `short`). Zero bytes.
