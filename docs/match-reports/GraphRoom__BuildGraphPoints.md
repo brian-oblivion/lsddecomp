@@ -205,3 +205,10 @@ The points are New_BoxFill boxes (include/BoxFill.h): size &D_8008ABAC, colour &
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__BuildGraphPoints` -> `GraphRoom__BuildGraphPoints`
 
 The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Occupies +0x0D8, TaskCore's `setTarget`, and keeps its own name (step 6: the body sets no target, it builds the 100 BoxFill dots and matchedDayIndices). The ctor reaches it as setTarget(self, NULL).
+
+## Track 6 (2026-09-27, round 97, delta): `D_8008ABB8Color` -> `GraphPointColor`, `D_8008ABB8` -> `gGraphPointBaseColor`
+
+- **`GraphPointColor`** (tier A for what it is): the colour argument this function hands `New_BoxFill`; `BoxFill__SetColor` copies its three bytes into the box's `GsBOXF` r, g, b (`include/BoxFill.h`, `color[3]`), which confirms round 19's "plausible RGB reading" of the field names. It is the only user of the type (`grep -rn` over `src/`, no other view).
+- **Not Sony's `CVECTOR`**: `CVECTOR` is `u_char r, g, b, cd`, four bytes. Retail copies the global into the local with three `lb`/`sb` pairs (signed, three bytes), so a four-byte unsigned struct would not compile to it. Kept as its own `s8` triple, like `BgLayerRgb`/`ViewportRgb`.
+- **`gGraphPointBaseColor`** (tier A): 4 bytes of sdata `FF FF FF 00`, white. This function is its only reader: points 1..99 start from a copy of it and darken by 0x14 per point for the first six, then by 1. (Point 0 takes `D_8008ABB4`, `FF 00 00`, red -- left unnamed, outside the job.)
+- The type's comment moved round 19's history here and says what the type is; zero bytes changed.

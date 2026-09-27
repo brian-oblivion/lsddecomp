@@ -140,11 +140,11 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
     }
 }
 
-/* A 3-byte colour-ish triple, read/written strictly byte-for-byte in
- * DECLARATION order (round 19, verified against retail byte-for-byte --
- * the natural sequential order is what matches, no reordering needed).
- * Field names are a plausible RGB reading of a colour-cycling table
- * builder, not confirmed evidence; see this function's own match report. */
+/* A graph point's colour, New_BoxFill's colour argument: BoxFill__SetColor
+ * copies the three bytes into the box's GsBOXF r, g, b. Not Sony's CVECTOR,
+ * which is four bytes and unsigned.
+ * MATCHING: signed, and exactly three bytes -- the whole-struct copy is three
+ * lb/sb pairs. */
 typedef struct GraphPointColor {
     s8 r;
     s8 g;
