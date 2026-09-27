@@ -10,6 +10,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <libetc.h>
 #include "GameApplication.h"
 #include "DreamSys.h"
 #include "LinkResource.h"
@@ -74,7 +75,7 @@ extern const char *GetSpecialDayOrEventRecord(s32 *movieIdOut, s32 packedPick);
  * correct about the C -- the bytes are what say the original had it too.
  * See docs/match-reports/New_GameApplication.md for the full derivation. */
 GameApplication *New_GameApplication(GameApplicationConfig *arg) {
-    GameApplication *self = BMemPMgrAlloc(0x2C);
+    GameApplication *self = BMemPMgrAlloc(sizeof(GameApplication));
 
     if (self != 0) {
         GetGameApplicationMethods()->ctor(self, arg);
@@ -110,7 +111,7 @@ extern void SeedAndRandom(s32 day, s32 unused);
  * 0x1F800000 (the PS-X data-cache-as-RAM region) reduced mod 365; the
  * random value SeedAndRandom returns is discarded. */
 void GameApplication__SeedRandom(GameApplication *self) {
-    SeedAndRandom(*(s32 *)0x1F800000 % 365, 0);
+    SeedAndRandom(*(s32 *)getScratchAddr(0) % DAYS_PER_YEAR, 0);
 }
 
 /* initSystems (+0x044): runs Application's own initSystems unless the parent's
@@ -207,13 +208,13 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
             if (self->skipGraphRoomPoll == 0) {
                 status = GameApplication__RunTask((NewTaskFn)New_GraphRoom, self->dreamSys,
                                                   (IntermediateBaseInitArgs *)self->aux);
-                if (status == 2) {
+                if (status == GRAPHROOM_RESULT_SCORED) {
                     GameApplication__PlaySpecialDayMovies(self);
                 }
             }
         }
 
-        pollDone = 2;
+        pollDone = TITLEMENU_RESULT_GRAPH;
     retry:
         status = GameApplication__RunTask((NewTaskFn)New_TitleMenu, self->dreamSys,
                                           (IntermediateBaseInitArgs *)self->aux);
@@ -226,7 +227,7 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
         self->skipGraphRoomPoll = 0;
         return ((u32)status < 1) << 1;
     }
-    return 2;
+    return GAMEAPPLICATION_LOOP_DAY;
 }
 
 /* Builds a task with newTask(dreamSys), runs its init to the end (mode 0),

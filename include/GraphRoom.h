@@ -89,6 +89,10 @@ typedef void (*GraphRoomResetCallFn)(GraphRoom *self, struct DreamSys *dreamSys)
 extern GraphRoomMethods gGraphRoomMethods;
 extern GraphRoomMethods *GetGraphRoomMethods(void); /* returns &gGraphRoomMethods */
 
+/* GraphRoom__Init's result when `scored` is set; GameApplication__RunTitleMenu
+ * then plays GameApplication__PlaySpecialDayMovies. */
+#define GRAPHROOM_RESULT_SCORED 2
+
 /* The class's own methods, in ROM order (class_3bb8c_t). */
 GraphRoom *New_GraphRoom(struct DreamSys *dreamSys);
 void GraphRoom__GraphRoom(GraphRoom *self, struct DreamSys *dreamSys);
