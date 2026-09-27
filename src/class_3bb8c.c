@@ -5,9 +5,7 @@
  * chunk into its slot's cells, and the queries that turn a position back
  * into a slot and cell. class_3ac78.c holds the methods before these and
  * class_3bb8c_b.c those after; the class's data tables are declared in
- * include/class_3bb8c.h. The unit's one type of its own is
- * ResourceSourceRequest, the descriptor PopulateSlotCells builds for
- * New_LinkResource.
+ * include/class_3bb8c.h.
  *
  *  - SetTargetAndLoadChunks, ComputeCellOffsets, ComputeCellWorldOffsets:
  *    a cell descriptor to a world position and the chunk it lies in.
@@ -373,17 +371,6 @@ void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 command) {
     }
 }
 
-/* The descriptor PopulateSlotCells hands New_LinkResource, cast to its
- * ResourceSource (GraphicsResources.c: a buffer to adopt, else a file name
- * to request). Only the buffer is set: the model block that follows the
- * chunk header's placements. The name and the last two words are never
- * written.
- * MATCHING: 0x10 bytes, not ResourceSource's 8 (8 makes the frame 0x78). */
-typedef struct ResourceSourceRequest {
-    /* +0x00 */ void *buffer;
-    /* +0x04 */ u8 pad4[0x10 - 0x4];
-} ResourceSourceRequest;
-
 /* Links a loaded chunk into its slot: points the slot's PlacementGrid at the
  * header's placement records, replaces its LinkResource with one over the
  * header's model block, then resolves record after record until the grid
@@ -415,7 +402,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     s32 cellOff;
     s32 overflowOff;
     CellPlacement rec;
-    ResourceSourceRequest src;
+    ResourceSourceRequest req;
 
     loader = slot->loader;
     grid = slot->placements;
@@ -427,8 +414,8 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
         oldResource->methods->release(oldResource);
     }
     header2 = loader->buffer;
-    src.buffer = (u8 *)header2 + header2->placementsOffset + header2->placementsSize;
-    grid->linkResource = New_LinkResource((struct ResourceSource *)&src);
+    req.src.buffer = (u8 *)header2 + header2->placementsOffset + header2->placementsSize;
+    grid->linkResource = New_LinkResource(&req.src);
     rec.next = 0;
 
     i = 0;
