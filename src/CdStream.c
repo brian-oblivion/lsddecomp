@@ -46,7 +46,7 @@
 /* Defined in other units: GetDataDirectory (code_171e0.c) returns the data
  * directory's name; strcpy and strcat are Sony's libc2; BMemPMgrAlloc is the
  * game's heap allocator. */
-void *GetDataDirectory(void);
+char *GetDataDirectory(void);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 extern void *BMemPMgrAlloc(s32 size);

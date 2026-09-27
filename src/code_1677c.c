@@ -25,8 +25,8 @@ extern void *BMemPMgrAlloc(s32 size);
 
 extern const char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD", asm/data/FA4.rodata.s */
 
-extern s32 GetDefaultDataDirectory(void);          /* reads a small-data global, unnamed so far */
-extern void SetDataDirectory(s32 value); /* stores its arg to a small-data global */
+extern char *GetDefaultDataDirectory(void); /* code_39094.c: "CDI\\" */
+extern void SetDataDirectory(char *dir);    /* code_171e0.c */
 
 extern s32 SetActiveDataSourceDriverMode(s32 a0, s32 a1, s32 a2); /* code_171e0, still INCLUDE_ASM there; returns
                                                        the last value its internal dispatch loop got --

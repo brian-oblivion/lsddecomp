@@ -145,7 +145,7 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
     }
 }
 
-extern s32 gDefaultDataDirectory;
+extern char *gDefaultDataDirectory; /* "CDI\\" (sdata) */
 extern s32 gForcedWeeklyGroup;
 extern s32 gForcedVariant;
 extern u8 gWeeklyGroupTable[];
@@ -164,7 +164,7 @@ LbdFileMethods *GetLbdFileMethods(void) {
     return &gLbdFileMethods;
 }
 
-s32 GetDefaultDataDirectory(void) {
+char *GetDefaultDataDirectory(void) {
     return gDefaultDataDirectory;
 }
 

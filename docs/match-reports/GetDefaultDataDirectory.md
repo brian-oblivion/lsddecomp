@@ -29,3 +29,14 @@ deliberately left unnamed by that unit -- "a getter/setter pair for gDataDirecto
 small-data global at GameApplication construction time. There is nothing here to
 name the getter FOR, so `Get<Something>` would be a guess, not evidence.
 `gDefaultDataDirectory` itself is left unrenamed for the same reason.
+
+## Naming (round 99, head, track 7)
+
+`func_80048CF0` -> `GetDefaultDataDirectory`, tier A (a getter): it returns
+`gDefaultDataDirectory` (was `D_8008A960`), an sdata word initialised to the
+address of the sdata string `"CDI\\"` (`D_8008A958`). Its one caller,
+GameApplication's ctor, passes it straight to `SetDataDirectory`
+(code_171e0.c), which installs the directory BuildCdFilePath and
+CdStream__Open put between the root `\` and a file name. Retyped `char *`
+here, in code_1677c.c's externs, and in CdStream.c's `GetDataDirectory`
+prototype; zero bytes. Proposed by charlie's code_171e0 pass.
