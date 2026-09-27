@@ -43,7 +43,7 @@
  * Not settled here: fadeBox holds a FadeBox (0x164, below gBoxFillMethods,
  * 0x64), whose +0x04C override (BoxFill__AttachToParent) takes a two-word screen
  * position where SceneNode's attachToParent slot takes a LongVec3 offset;
- * the ctor and Viewport__SetFadeBox pass D_8008A904 (-100, -100) through the
+ * the ctor and Viewport__SetFadeBox pass gFadeBoxAttachPos (-100, -100) through the
  * inherited slot with a pointer cast. unk44 and unk48 multiply to each
  * buffer's packet area (InitOt; defaults 2000 and 64); which is the count
  * and which the size is not shown. drawNode (Viewport__DrawNode) reads its

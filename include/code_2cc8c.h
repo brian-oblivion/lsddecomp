@@ -176,7 +176,7 @@ extern char D_8008A8F0[4]; /* address-taken only by this unit */
 /* New_SceneNode: include/SceneNode.h (it was a local Unk18AcObj view). */
 extern u8 D_8008A90C[];           /* address-taken only by this unit: (320, 240), the
                             size Viewport's ctor passes New_FadeBox */
-extern u8 D_8008A904[];           /* address-taken only by this unit: (-100, -100), the
+extern u8 gFadeBoxAttachPos[];    /* address-taken only by this unit: (-100, -100), the
                             screen position Viewport's ctor and SetSubHandle
                             attach the sub handle at (include/Viewport.h) */
 extern Ratio16 gDefaultViewTwist; /* {0, 1}: Viewport__AttachViewChild's twist

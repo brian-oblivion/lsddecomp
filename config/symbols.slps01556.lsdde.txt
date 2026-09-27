@@ -2968,3 +2968,4 @@ gDefaultViewTwist = 0x8008A8F4;
 gDefaultViewportColor = 0x8008A8F8;
 gDefaultViewportWidth = 0x8008A8FC;
 gDefaultViewportHeight = 0x8008A900;
+gFadeBoxAttachPos = 0x8008A904;
