@@ -140,3 +140,5 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 - Step 3: locals doDetach, dist, scaled -> doDeactivate, near, tick.
 
 - Step 2: EntityMoodRow::linkKind -> deactivateKind (tier A): it selects the condition under which this body calls deactivate; nothing links. Only Entity.c reads it.
+
+- Step 4: deactivateKind 0/1/2/3/10 -> enum EntityDeactivateKind (NONE/NEAR/FAR/NONE_ALT/TIMED, Entity.h). `(scaled ^ (deactivateKind * 15)) == 0` with its `scaled = this->tick` local -> `this->tick == deactivateKind * 15`, byte-identical: the XOR was m2c's spelling of the compare, not a matching lever (the Attempt log's residue 1 was about ASSIGNING the boolean, which this does not do).

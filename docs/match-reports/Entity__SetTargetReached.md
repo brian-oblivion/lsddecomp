@@ -77,3 +77,5 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Polish (round 96, bravo, track 7)
 
 - Step 3: parameter arg1 -> reached (the slot's own parameter name).
+
+- Step 4: notifyParents(9) -> ENTITY_EFFECT_LOG_MOOD (the enum's own comment already named this sender).

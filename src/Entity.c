@@ -30,7 +30,7 @@
 Entity *New_Entity(s32 moodIndex, void *desc, void *sound) {
     Entity *obj;
 
-    obj = BMemPMgrAlloc(0x108);
+    obj = BMemPMgrAlloc(sizeof(Entity));
     if (obj == NULL) {
         return NULL;
     }
@@ -98,10 +98,10 @@ void Entity__Reset(Entity *this) {
     s32 kind;
 
     kind = (u8)gEntityMoodTable[this->moodIndex].unlockKind;
-    if ((u32)(kind - 1) < 9) {
-        this->methods->setLightMode(this, 1);
+    if (kind >= 1 && kind <= 9) {
+        this->methods->setLightMode(this, 1); /* fog on (GsFOG) */
     }
-    this->methods->selectTickCallback(this, 0x42);
+    this->methods->selectTickCallback(this, TICK_CALLBACK_B);
     this->methods->deactivate(this);
 }
 
@@ -146,7 +146,7 @@ void Entity__NotifyLinkStage(Entity *this, void *sender, s32 event) {
     s32 linkStage;
 
     linkStage = gEntityMoodTable[this->moodIndex].linkStage;
-    if ((u32)(event - 2) < 7) {
+    if (event >= 2 && event <= 8) {
         if (linkStage <= 0) {
             return;
         }
@@ -158,12 +158,12 @@ void Entity__NotifyLinkStage(Entity *this, void *sender, s32 event) {
     if (linkStage <= 0) {
         return;
     }
-    if (linkStage != 0x7F) {
-        event = 0xA;
+    if (linkStage != ENTITY_LINK_STAGE_END_DREAM) {
+        event = ENTITY_EFFECT_LINK_STAGE;
     } else if (gEntityMoodTable[this->moodIndex].eventVideo != 0) {
-        event = 0xB;
+        event = ENTITY_EFFECT_EVENT_VIDEO;
     } else {
-        event = 0xC;
+        event = ENTITY_EFFECT_END_DREAM;
     }
     this->methods->notifyParents(this, event);
 }
@@ -186,17 +186,17 @@ s32 Entity__IsNearTarget(Entity *this, void *pos, s32 range, s32 tolerance) {
 
     point = *(LongVec3 *)pos;
     kind = (u8)gEntityMoodTable[this->moodIndex].unlockKind;
-    if ((u32)((kind + 9) & 0xFF) < 9) {
+    if ((s8)kind >= -9 && (s8)kind < 0) {
         point.y += (s8)kind * 1024;
     }
     if (tolerance < 0) {
-        tolerance = 0x800 / (~tolerance + 1);
+        tolerance = ENTITY_RANGE_UNIT / (~tolerance + 1);
     } else {
-        tolerance <<= 11;
+        tolerance <<= ENTITY_RANGE_SHIFT;
     }
     return ((DreamSys *)this->peer)
-        ->methods->projectPointAtDistance((DreamSys *)this->peer, 0, range << 11, (s32 *)&point,
-                                          tolerance);
+        ->methods->projectPointAtDistance((DreamSys *)this->peer, 0, range << ENTITY_RANGE_SHIFT,
+                                          (s32 *)&point, tolerance);
 }
 
 s32 Entity__DistanceToPeer(Entity *this, TodActor *peer) {
@@ -228,7 +228,7 @@ s32 Entity__GetProximityRatio(Entity *this) {
         }
     } while (0);
     result = this->methods->distanceToPeer(this, this->peer);
-    threshold = gEntityMoodTable[this->moodIndex].proximityThreshold << 11;
+    threshold = gEntityMoodTable[this->moodIndex].proximityThreshold << ENTITY_RANGE_SHIFT;
     if (threshold < result) {
         return -1;
     }
@@ -271,7 +271,7 @@ void Entity__Deactivate(Entity *this) {
 
 void Entity__SetTargetReached(Entity *this, s32 reached) {
     if (reached != 0) {
-        this->methods->notifyParents(this, 9);
+        this->methods->notifyParents(this, ENTITY_EFFECT_LOG_MOOD);
     }
     this->targetReached = reached;
 }
@@ -300,22 +300,22 @@ s32 Entity__UpdateActivationState(Entity *this) {
     EntityMoodRow *row;
     s32 doActivate;
 
-    if (this->active == 0 && this->state != 1) {
+    if (this->active == 0 && this->state != ENTITY_STATE_DONE) {
         row = &gEntityMoodTable[this->moodIndex];
         doActivate = 0;
-        if (row->activateKind != 0) {
-            if (row->activateKind == 4) {
+        if (row->activateKind != ENTITY_ACTIVATE_AT_ATTACH) {
+            if (row->activateKind == ENTITY_ACTIVATE_RANDOM) {
                 goto randCheck;
             }
             if (row->activeRange != 0) {
                 if (Entity__IsNearTarget(this, &this->coord2->tx, row->activeRange,
                                          row->nearTolerance) != 0) {
-                    if (row->activateKind == 1) {
+                    if (row->activateKind == ENTITY_ACTIVATE_NEAR) {
                         doActivate = 1;
-                    } else if (row->activateKind == 3) {
+                    } else if (row->activateKind == ENTITY_ACTIVATE_NEAR_RANDOM) {
                         goto randCheck;
                     }
-                } else if (row->activateKind == 2) {
+                } else if (row->activateKind == ENTITY_ACTIVATE_FAR) {
                     doActivate = 1;
                 }
             }
@@ -339,25 +339,24 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
     EntityMoodRow *row;
     s32 doDeactivate;
     s32 near;
-    s32 tick;
 
     if (this->active != 0) {
         row = &gEntityMoodTable[this->moodIndex];
         doDeactivate = 0;
         Entity__NotifyIfTargetInRange(this, 0);
-        if (row->deactivateKind != 0 && row->deactivateKind != 3) {
-            if (row->deactivateKind >= 10) {
-                tick = this->tick;
-                if ((tick ^ (row->deactivateKind * 15)) == 0) {
+        if (row->deactivateKind != ENTITY_DEACTIVATE_NONE &&
+            row->deactivateKind != ENTITY_DEACTIVATE_NONE_ALT) {
+            if (row->deactivateKind >= ENTITY_DEACTIVATE_TIMED) {
+                if (this->tick == row->deactivateKind * 15) {
                     doDeactivate = 1;
                 }
             } else if (row->activeRange != 0) {
                 near = Entity__IsNearTarget(this, &this->coord2->tx, row->activeRange, row->nearTolerance);
                 if (near != 0) {
-                    if (row->deactivateKind == 1) {
+                    if (row->deactivateKind == ENTITY_DEACTIVATE_NEAR) {
                         doDeactivate = 1;
                     }
-                } else if (row->deactivateKind == 2) {
+                } else if (row->deactivateKind == ENTITY_DEACTIVATE_FAR) {
                     doDeactivate = 1;
                 }
             }

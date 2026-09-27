@@ -97,3 +97,5 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Polish (round 96, bravo, track 7)
 
 - Step 3: parameter arg2 -> sound: it is TodActor's ctor's second argument, the sound bank TodActor keeps in `sound` (TodActor.h). Also in Entity.h's prototype and ctor slot.
+
+- Step 4: BMemPMgrAlloc(0x108) -> sizeof(Entity) (Entity is 0x108 bytes; byte-identical).

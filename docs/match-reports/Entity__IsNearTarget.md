@@ -143,3 +143,5 @@ wrong: GCC spells a constant-offset field of a global array as
 - Step 2: IsNearTarget's local EntityVec3 (three s32s) is SceneNode.h's LongVec3; the local type is deleted.
 
 - Step 3: parameters arg2, arg3 -> range, tolerance (DreamSys__ProjectPointAtDistance's dist and tolerance, each scaled by ENTITY_RANGE_UNIT); local -> point.
+
+- Step 4: `<< 11` and 0x800 -> ENTITY_RANGE_SHIFT / ENTITY_RANGE_UNIT (2048, Entity.h); `(u32)((kind + 9) & 0xFF) < 9` -> `(s8)kind >= -9 && (s8)kind < 0`, byte-identical. The y step 1024 stays a literal: nothing shows it is half a range unit rather than a distance of its own.

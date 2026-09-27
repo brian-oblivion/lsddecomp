@@ -150,3 +150,5 @@ wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.
 
 - Step 3: parameters arg1, arg2 -> sender, event. The effect code reuses `event` (see above: a separate local compiles differently); the body now says so with a MATCHING line.
+
+- Step 4: 0x7F -> ENTITY_LINK_STAGE_END_DREAM (127), 0xA/0xB/0xC -> the existing ENTITY_EFFECT_LINK_STAGE/EVENT_VIDEO/END_DREAM; `(u32)(event - 2) < 7` -> `event >= 2 && event <= 8`, byte-identical. The events 2..8 and 4 stay literal: no link-command event is named anywhere in the project yet.

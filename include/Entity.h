@@ -164,10 +164,46 @@ struct EntityMoodRow {
     s8 linkStage; /* +0x07, Entity__GetLinkStage and Entity__NotifyLinkStage (gEntityLinkStageTable) */
     s8 eventVideo; /* +0x08, Entity__GetEventVideo and Entity__NotifyLinkStage (gEntityEventVideoTable) */
     s8 nearTolerance; /* +0x09, Entity__IsNearTarget's tolerance for every range test on this row (activation, deactivation, proximity, cue start/stop) */
-    s8 proximityThreshold; /* +0x0A, Entity__GetProximityRatio's range */
+    s8 proximityThreshold; /* +0x0A, Entity__GetProximityRatio's range, in ENTITY_RANGE_UNITs */
     s8 cueRange; /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop and Entity__AttachToParent: 0 = the cue starts at attach (when the entity activated there) and never on range; magnitude (after abs) is Entity__IsNearTarget's distance arg for starting the sound cue; a NEGATIVE value also stops it again once the target leaves that range. SEPARATE field from proximityRange (+0x06) */
     SoundCueCallbackFn handler; /* +0x0C, the Entity__MoodCueNN Entity__StartSoundCue installs (symbol gEntityMoodHandlerTable, 0x80089EB0) */
 };
+
+/* activateKind: when Entity__UpdateActivationState activates an inactive
+ * Entity (never while its state is ENTITY_STATE_DONE). "Near" is
+ * Entity__IsNearTarget on the row's activeRange and nearTolerance; the
+ * random ones pass on one tick in 128. */
+enum EntityActivateKind {
+    ENTITY_ACTIVATE_AT_ATTACH = 0,   /* Entity__AttachToParent activates it at once */
+    ENTITY_ACTIVATE_NEAR = 1,        /* while near */
+    ENTITY_ACTIVATE_FAR = 2,         /* while not near */
+    ENTITY_ACTIVATE_NEAR_RANDOM = 3, /* at random while near */
+    ENTITY_ACTIVATE_RANDOM = 4       /* at random */
+};
+
+/* deactivateKind: when Entity__UpdateDeactivationState deactivates an active
+ * Entity. 0 and 3 make no test; 1 and 2 test as activateKind does; from
+ * ENTITY_DEACTIVATE_TIMED up, it deactivates on the tick that equals
+ * deactivateKind * 15. */
+enum EntityDeactivateKind {
+    ENTITY_DEACTIVATE_NONE = 0,
+    ENTITY_DEACTIVATE_NEAR = 1,
+    ENTITY_DEACTIVATE_FAR = 2,
+    ENTITY_DEACTIVATE_NONE_ALT = 3, /* no test either: what sets it apart from 0 is not in Entity code */
+    ENTITY_DEACTIVATE_TIMED = 10
+};
+
+/* A linkStage of 127 ends the dream instead of linking: Entity__NotifyLinkStage
+ * sends ENTITY_EFFECT_EVENT_VIDEO when the row has an eventVideo, else
+ * ENTITY_EFFECT_END_DREAM. Other positive values send
+ * ENTITY_EFFECT_LINK_STAGE; 0 and below send nothing there. */
+#define ENTITY_LINK_STAGE_END_DREAM 127
+
+/* The unit of the mood row's ranges and tolerances, in world units: what
+ * Entity__IsNearTarget and Entity__GetProximityRatio scale them by (the
+ * grid's cell size, STAGE_CELL_SIZE in StageMap.h, has the same value). */
+#define ENTITY_RANGE_SHIFT 11
+#define ENTITY_RANGE_UNIT (1 << ENTITY_RANGE_SHIFT)
 
 extern EntityMoodRow gEntityMoodTable[];
 extern s8 gEntityLinkStageTable[];  /* the linkStage column (Entity_b) */
