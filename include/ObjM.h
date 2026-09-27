@@ -61,6 +61,11 @@
 typedef struct ObjM ObjM;
 typedef struct ObjMMethods ObjMMethods;
 
+/* ObjM's class id (gObjMMethods word +0x000). Five nibbles, so
+ * `(header & 0xFFFFF) == OBJM_CLASS_ID` tests for it or a class below it
+ * (DayTask__OnNotify). */
+#define OBJM_CLASS_ID 0x2F230
+
 struct DreamSys;
 struct WBgm;
 struct TimBlockSrc;

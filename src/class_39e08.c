@@ -22,7 +22,7 @@ extern LongVec3 sDayViewRef;
 DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 syncDriver) {
     DayTask *self;
 
-    self = BMemPMgrAlloc(0x50);
+    self = BMemPMgrAlloc(sizeof(DayTask));
     if (self != NULL) {
         GetDayTaskMethods()->ctor(self, initArgs, dreamSys, syncDriver);
         return self;
@@ -84,15 +84,15 @@ void DayTask__OnNotify(DayTask *self, BasicClass *sender, s32 event) {
 
     GetTimedTaskMethods()->onNotify((TimedTask *)self, sender, event);
     tag = sender->methods->header;
-    if ((tag & 0xFFFF) == 0x1F34) {
+    if ((tag & 0xFFFF) == DREAMSYS_CLASS_ID) {
         self->methods->onDreamSysNotify(self, sender, event);
-    } else if ((tag & 0xFFFFF) == 0x2F230) {
+    } else if ((tag & 0xFFFFF) == OBJM_CLASS_ID) {
         self->methods->onObjMNotify(self, sender, event);
     }
 }
 
 void DayTask__ResetPhase(DayTask *self) {
-    self->phase = 0;
+    self->phase = DAYTASK_PHASE_IDLE;
 }
 
 s32 DayTask__Init(DayTask *self) {
@@ -125,10 +125,10 @@ void DayTask__OnInit(DayTask *self) {
     vp->methods->setScreenSize(vp, size);
     fadeBox = vp->methods->getFadeBox(vp);
     fadeBox->methods->setDisplay(fadeBox, 1);
-    vp->methods->setUnk44(vp, 0x4B0);
+    vp->methods->setUnk44(vp, 1200);
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sDayViewPoint, &sDayViewRef, 0);
     vp->methods->initOt(vp);
-    self->phase = 1;
+    self->phase = DAYTASK_PHASE_READY;
 }
 
 void DayTask__OnDeinit(DayTask *self) {
@@ -142,21 +142,21 @@ void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event) {
     s32 result;
 
     GetTimedTaskMethods()->onTag1Notify((TimedTask *)self, sender, event);
-    if (event == 2 && self->phase != event) {
+    if (event == DRAWSYSTEM_EVENT_VSYNC && self->phase != DAYTASK_PHASE_RUNNING) {
         switch (self->phase) {
-            case 1:
+            case DAYTASK_PHASE_READY:
                 result = self->dreamSys->methods->startDay(self->dreamSys);
                 if (result < 0) {
                     self->dreamSys->methods->endDay(self->dreamSys, 0);
-                    self->result = event;
-                    self->methods->setState(self, 3);
+                    self->result = DAYTASK_RESULT_CINEMATIC;
+                    self->methods->setState(self, INTERMEDIATEBASE_STATE_STOP);
                     return;
                 }
                 DayTask__StartObjM(self, result);
                 break;
-            case 2:
+            case DAYTASK_PHASE_RUNNING:
                 break;
-            case 3:
+            case DAYTASK_PHASE_REPLACE_OBJM:
                 self->objM->methods->deinit(self->objM);
                 self->objM->methods->release(self->objM);
                 result = self->dreamSys->methods->getCurrentStage(self->dreamSys);
@@ -170,7 +170,7 @@ void DayTask__StartObjM(DayTask *self, s32 stage) {
     self->objM = New_ObjM(self->sound, self->bgm, self->etcTim, self->dreamerTmd, stage);
     self->methods->addChild(self, (BasicClass *)self->objM);
     self->objM->methods->init(self->objM, self->initArgs, (s32)self->dreamSys);
-    self->phase = 2;
+    self->phase = DAYTASK_PHASE_RUNNING;
 }
 
 void DayTask__OnState4(void) {}
@@ -182,32 +182,32 @@ void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event) {
     s32 result;
 
     switch (event) {
-        case 4:
+        case OBJM_STATE_TIME_UP:
             self->objM->methods->deinit(self->objM);
             self->objM->methods->release(self->objM);
             result = self->dreamSys->methods->endDay(self->dreamSys, 0);
             if (result == 0) {
                 cinematic = self->dreamSys->methods->getCinematic(self->dreamSys);
-                self->result = cinematic.entry < 0 ? 1 : 2;
+                self->result = cinematic.entry < 0 ? DAYTASK_RESULT_ENDED : DAYTASK_RESULT_CINEMATIC;
             } else {
-                self->result = 3;
+                self->result = DAYTASK_RESULT_CLOSED;
             }
-            self->methods->setState(self, 3);
+            self->methods->setState(self, INTERMEDIATEBASE_STATE_STOP);
             break;
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 0xA:
-            self->phase = 3;
+        case OBJM_STATE_LINK_DYNAMIC:
+        case OBJM_STATE_LINK_WALL:
+        case OBJM_STATE_LINK_FLASHBACK:
+        case OBJM_STATE_LINK_TUNNEL:
+        case OBJM_STATE_LINK_STAGE_TIMER:
+            self->phase = DAYTASK_PHASE_REPLACE_OBJM;
             break;
-        case 0xC:
-        case 0xD:
+        case OBJM_NOTIFY_CLOSE:
+        case OBJM_NOTIFY_CLOSE_NEW_GAME:
             self->objM->methods->deinit(self->objM);
             self->objM->methods->release(self->objM);
-            self->dreamSys->methods->endDay(self->dreamSys, event != 0xC ? 2 : 1);
-            self->result = 3;
-            self->methods->setState(self, 3);
+            self->dreamSys->methods->endDay(self->dreamSys, event != OBJM_NOTIFY_CLOSE ? 2 : 1);
+            self->result = DAYTASK_RESULT_CLOSED;
+            self->methods->setState(self, INTERMEDIATEBASE_STATE_STOP);
             break;
     }
 }
@@ -263,7 +263,7 @@ s32 RegisterRecordTableFiles(s32 all) {
 TimedTask *New_TimedTask(char *soundBankPath, BasicClass *sound) {
     TimedTask *self;
 
-    self = BMemPMgrAlloc(0x38);
+    self = BMemPMgrAlloc(sizeof(TimedTask));
     if (self != NULL) {
         GetTimedTaskMethods()->ctor(self, soundBankPath, sound);
         return self;
@@ -309,18 +309,18 @@ void TimedTask__NoOpSlot58(void) {}
 void TimedTask__CheckTimeout(TimedTask *self, BasicClass *sender, s32 event) {
     Get_vtable_IntermediateBase()->update((IntermediateBase *)self, sender, event);
     if ((u32)self->frameCounter > (u32)self->timeoutFrames) {
-        self->methods->setState(self, 4);
+        self->methods->setState(self, TIMEDTASK_STATE_TIMED_OUT);
     }
 }
 
 void TimedTask__SetState(TimedTask *self, s32 state) {
     Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, state);
-    if (state == 4) {
-        self->result = 1;
+    if (state == TIMEDTASK_STATE_TIMED_OUT) {
+        self->result = TIMEDTASK_RESULT_TIMED_OUT;
         self->methods->onState4(self);
     }
 }
 
 void TimedTask__SetTimeout(TimedTask *self, s32 timeout) {
-    self->timeoutFrames = (timeout < 0) ? timeout : timeout * 20;
+    self->timeoutFrames = (timeout < 0) ? timeout : timeout * TIMEDTASK_TIMEOUT_UNIT_FRAMES;
 }
