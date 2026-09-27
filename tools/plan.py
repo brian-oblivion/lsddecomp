@@ -17,7 +17,7 @@ and on which model.
     python3 tools/plan.py check --item <id> [--undo]              # checklists: track 5, 6/7 setup, track 9
     python3 tools/plan.py set-model --role naming_runner|match_runner|polish_runner --model sonnet|opus
     python3 tools/plan.py mark-unit --unit <unit> --track 7 [--undo]   # track 7 polish pass done
-    python3 tools/plan.py flag-type --name <Type> --reason "..." [--after f1,f2] [--undo]   # track 6: a name the patterns miss
+    python3 tools/plan.py flag-type --name <Type> --reason "..." [--after f1,f2] [--units u1,u2] [--undo]   # track 6: a name the patterns miss
     python3 tools/plan.py park-type --name <Type> --reason "..." [--undo]   # track 6: kept, with the reason
     python3 tools/plan.py regions              # track 8: every region of game units, evidence and state
 
@@ -853,6 +853,7 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
               "history": rd["totals"]["history"] + rd["totals"]["header_history"]},
         "_class_jobs": class_jobs, "_homes": homes, "_types": types, "_todo7": todo7,
         "_after": {n: fs for n, fs in t6.get("after", {}).items() if n in flagged},
+        "_units": {n: us for n, us in t6.get("units", {}).items() if n in flagged},
         "_rd": rd, "_regions": region_rows, "_sony": sony, "_sony_left": sony_left,
     }
 
@@ -1244,8 +1245,13 @@ def jobs(d, n):
                 if waits_on(names):
                     d["_waiting"].append((f"name {', '.join(sorted(names))} in {f}", waits_on(names)))
                     continue
+                # A flag's fix can reach units other than the file defining the
+                # type (`flag-type --units`); they join the edit set so a job
+                # holding them defers it (round 97: ResourceRequest's views in
+                # GraphicsResources.c and code_55dd4.c, both SceneNode.h's job).
+                extra = sorted({x for n in names for x in p2["_units"].get(n, [])} - {u})
                 q6.append(("6", f"name {len(names)} placeholder type(s) defined in {f}: {', '.join(sorted(names))}"
-                                f" ({why}){sony_note(f)} (units: {u})", MODELS["types_runner"]))
+                                f" ({why}){sony_note(f)} (units: {','.join([u] + extra)})", MODELS["types_runner"]))
             # A class whose own name is fine but whose TABLE is D_/ALLCAPS is one
             # rename.py each: batched into one mechanical job, not a runner per table.
             tables = [j for j in p2["_class_jobs"] if not j["ph_name"]]
@@ -1604,6 +1610,8 @@ def main():
         if cmd == "flag-type":
             ft.add_argument("--after", default="", help="comma-separated files whose Sony-name collisions "
                             "(tools/sonyheaders.py) must clear before this job is staffed")
+            ft.add_argument("--units", default="", help="comma-separated units (src/ stems or include/ "
+                            "paths) the fix also edits beyond the defining file; they join the job's edit set")
     s = sub.add_parser("set-track")
     s.add_argument("--track", required=True)
     s.add_argument("--status", required=True, choices=["open", "parked", "done", "auto"])
@@ -1675,6 +1683,11 @@ def main():
             after.pop(a.name, None)
             if not a.undo:
                 after[a.name] = [f.strip() for f in a.after.split(",") if f.strip()]
+        units = st["tracks"]["6"].setdefault("units", {})
+        if a.cmd == "flag-type" and (a.undo or a.units):
+            units.pop(a.name, None)
+            if not a.undo:
+                units[a.name] = [f.strip() for f in a.units.split(",") if f.strip()]
         save_state(st)
         print(f"track 6: {a.name} {'un' if a.undo else ''}{key}")
         return

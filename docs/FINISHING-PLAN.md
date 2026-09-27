@@ -19,9 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 34 (2026-09-27, round 96's premium head: a ready flagged
-`--after` header takes a Sony-collision header's edit set and joins its
-job).
+Plan revision: 35 (2026-09-27, round 97's premium head: a flag names the
+units its fix edits beyond the defining file, `flag-type --units`, and they
+join the job's edit set).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -200,6 +200,9 @@ one per other file that defines placeholder types. The head adds a name the
 patterns cannot see (an opaque one such as `ObjM`, or a local view of a type
 another file defines) with `plan.py flag-type`; its file's job then ranks
 first, since other jobs' debt usually waits on it (round 92: SoundCueSet).
+A flag whose fix also edits other units (retiring their views of the type)
+names them with `--units`, and they join the job's edit set, so it defers
+behind a job holding them (round 97: ResourceRequest behind SceneNode.h's).
 Ahead even of that, a header that re-declares a Sony name gets a job of its
 own, because none of its includers can take Sony's headers until it does
 (round 94: `ViewportOt` is Sony's anonymous `GsOT`, and `Viewport.h` could

@@ -1352,7 +1352,15 @@
           "runners": 10
         }
       ],
-      "status": "auto"
+      "status": "auto",
+      "units": {
+        "ResourceRequest": [
+          "code_171e0",
+          "include/code_4cd08.h",
+          "GraphicsResources",
+          "code_55dd4"
+        ]
+      }
     },
     "7": {
       "checklist": {
