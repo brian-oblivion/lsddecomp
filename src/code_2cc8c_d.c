@@ -42,10 +42,10 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
 
     Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
 
-    tag = sender->methods->header & 0xF;
-    if (tag == 5) {
+    tag = sender->methods->header & CLASS_ID_ROOT_MASK;
+    if (tag == FRAMECLOCK_CLASS_ID) {
         self->methods->onNotifyTag5(self, sender, event);
-    } else if (tag == 1) {
+    } else if (tag == DRAWSYSTEM_CLASS_ID) {
         self->methods->onNotifyTag1(self, sender, event);
     }
 }
@@ -57,6 +57,17 @@ extern ViewportRgb gDefaultViewportColor;
  * address computation between the two copies; retail loads it twice. */
 extern ViewportRgb gDefaultViewportColorAlias __asm__("gDefaultViewportColor");
 
+/* InitDefaults' values. The OT has 1 << VIEWPORT_DEFAULT_OT_LENGTH (8192)
+ * tags; with the near and far defaults Update's zDiv comes out 8. The packet
+ * size is also TaskCore's reset value for what it passes to setPacketSize. */
+#define VIEWPORT_DEFAULT_OT_LENGTH 13
+#define VIEWPORT_DEFAULT_PACKET_COUNT 2000
+#define VIEWPORT_DEFAULT_PACKET_SIZE 64
+#define VIEWPORT_DEFAULT_PROJ_H 256 /* GsSetProjection's h */
+#define VIEWPORT_DEFAULT_NEAR_Z 10
+#define VIEWPORT_DEFAULT_FAR_Z 65536
+#define VIEWPORT_DEFAULT_FOG_NEAR 20000
+
 /* Every field's default; both colours start black (gDefaultViewportColor). */
 void Viewport__InitDefaults(Viewport *self) {
     self->clockEventCount = 0;
@@ -67,14 +78,14 @@ void Viewport__InitDefaults(Viewport *self) {
     self->screenSize.height = gDefaultViewportHeight;
     /* MATCHING: without it both stores sink below the constant stores. */
     __asm__("");
-    self->otLength = 13;
-    self->packetCount = 2000;
-    self->packetSize = 64;
-    self->projH = 256;
-    self->nearZ = 10;
-    self->farZ = 65536;
-    self->lightMode = 0;
-    self->fogNear = 20000;
+    self->otLength = VIEWPORT_DEFAULT_OT_LENGTH;
+    self->packetCount = VIEWPORT_DEFAULT_PACKET_COUNT;
+    self->packetSize = VIEWPORT_DEFAULT_PACKET_SIZE;
+    self->projH = VIEWPORT_DEFAULT_PROJ_H;
+    self->nearZ = VIEWPORT_DEFAULT_NEAR_Z;
+    self->farZ = VIEWPORT_DEFAULT_FAR_Z;
+    self->lightMode = GsLMODE_NORMAL;
+    self->fogNear = VIEWPORT_DEFAULT_FOG_NEAR;
     self->farColor = gDefaultViewportColor;
     self->clearColor = gDefaultViewportColorAlias;
     self->extraSwapOnBuffer0 = 0;
@@ -197,7 +208,7 @@ void Viewport__InitOt(Viewport *self) {
         return;
     }
 
-    size = (4 << self->otLength) + (self->packetSize * self->packetCount + hdrSize);
+    size = (sizeof(GsOT_TAG) << self->otLength) + (self->packetSize * self->packetCount + hdrSize);
 
     buf = (s32)BMemPMgrAlloc(size * 2);
     if (buf == 0) {
@@ -206,7 +217,7 @@ void Viewport__InitOt(Viewport *self) {
 
     self->ot[0] = (GsOT *)buf;
     self->otTags[0] = (GsOT_TAG *)(buf + sizeof(GsOT));
-    self->workBase[0] = (PACKET *)self->otTags[0] + (4 << self->otLength);
+    self->workBase[0] = (PACKET *)self->otTags[0] + (sizeof(GsOT_TAG) << self->otLength);
 
     self->ot[1] = (GsOT *)((PACKET *)self->ot[0] + size);
     self->otTags[1] = (GsOT_TAG *)((PACKET *)self->otTags[0] + size);
@@ -272,7 +283,7 @@ void Viewport__Update(Viewport *self) {
     GsSetNearClip(self->nearZ);
     GsSetLightMode(self->lightMode);
 
-    if (self->lightMode == GsLMODE_FOG || self->lightMode == 3) {
+    if (self->lightMode == GsLMODE_FOG || self->lightMode == (GsLMODE_LOFF | GsLMODE_FOG)) {
         SetFarColor((u8)self->farColor.r, (u8)self->farColor.g, (u8)self->farColor.b);
         SetFogNear(self->fogNear, self->projH);
     }
