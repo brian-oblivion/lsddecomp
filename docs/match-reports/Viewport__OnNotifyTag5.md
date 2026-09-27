@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EE40` on 2026-09-23 (tools/rename.py). Address 0x8003ee40.
 
-Unit: `TaskViewport`. Round 14, runner delta. 18/18 words, full match.
+Unit: `Task`. Round 14, runner delta. 18/18 words, full match.
 
 ## Signature
 
@@ -38,7 +38,7 @@ what retail's own disassembly shows, not a general rule either way.
 
 ## Header changes
 
-`include/TaskViewport.h`:
+`include/Task.h`:
 - `Unk18Obj` gains `unk90` (`+0x090`, `s32`).
 - `Unk18ObjMethods` gains `slot9C` (`+0x09C`, `void (*)(Unk18Obj*)`),
   splitting the `pad09C` span added alongside `slot94`/`slot98` earlier
@@ -64,4 +64,4 @@ Viewport's `unk90` -> `clockEventCount` (tier A: this function increments it on 
 
 ## Track 7 (round 100, echo, polish pass)
 
-Round 95's proposal applied: `unk90` -> `clockEventCount` (include/Viewport.h; the accessors are this function and InitDefaults, both in TaskViewport.c).
+Round 95's proposal applied: `unk90` -> `clockEventCount` (include/Viewport.h; the accessors are this function and InitDefaults, both in Task.c).

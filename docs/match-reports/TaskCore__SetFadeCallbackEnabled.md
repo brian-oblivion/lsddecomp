@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CAF8` on 2026-09-24 (tools/rename.py). Address 0x8003caf8.
 
-**Unit:** TaskViewport · **Size:** 14 instructions
+**Unit:** Task · **Size:** 14 instructions
 
 ## What it does
 
@@ -74,7 +74,7 @@ whole function reuses across a `switch`.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit TaskViewport. 3 attempts.
+round 2026-09-02, runner echo, unit Task. 3 attempts.
 
 ## Naming (round 78, delta)
 
@@ -94,7 +94,7 @@ Tier B: in this unit's own evidence the only value ever stored here besides
 NULL is `self->methods->slotB0` (`TaskCore__TickColorFade`), and
 `TaskCore__TickFadeCallback` is its sole invoker. Grep shows `unk88` textual
 hits in Task.c/code_179d8_{k,f}.c/code_2cc8c_{d,e}.c/Entity_f.c
-(several genuinely this same shared Obj86B60 struct, per TaskViewport/e), so
+(several genuinely this same shared Obj86B60 struct, per Task/e), so
 proposal only -- the head should apply via type scope on `Obj86B60`, not a
 whole-tree replace.
 

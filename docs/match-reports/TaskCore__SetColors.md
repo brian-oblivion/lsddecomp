@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CB68` on 2026-09-24 (tools/rename.py). Address 0x8003cb68.
 
-**Unit:** TaskViewport · **Size:** 20 instructions
+**Unit:** Task · **Size:** 20 instructions
 
 ## Round 19: closed with the untried "struct-typed argument" axis
 
@@ -65,8 +65,8 @@ first try.
 
 Before this generalizes further than warranted: **all five of this
 round's whole-struct-assignment closures are within units descended from
-the same original `TaskViewport` monolith** (`TaskViewport`, `code_2cc8c_b`,
-`TaskViewport`, `code_2cc8c_e`, `code_2cc8c_f` -- all carved from one
+the same original `Task` monolith** (`Task`, `code_2cc8c_b`,
+`Task`, `code_2cc8c_e`, `code_2cc8c_f` -- all carved from one
 segment across earlier rounds). I have not tried this lever, or seen it
 tried, anywhere outside that family (`Entity.c`, `DreamSys.c`,
 `class_3bb8c*.c`, etc.), so I cannot personally attest it holds there.
@@ -85,7 +85,7 @@ idiom" and worth stating precisely:
   adjustment.
 - **Two genuinely independent class/vtable families.** `BoxFillPos` copies
   live in `Obj6EAC0`/`FadeBoxObj` (units `code_2cc8c_e`/`_f`); THIS
-  function's 3-byte struct lives in `Obj86B60` (unit `TaskViewport`,
+  function's 3-byte struct lives in `Obj86B60` (unit `Task`,
   matched by a DIFFERENT runner in an EARLIER round before this round's
   fix) while `BoxFill__ApplyColor`'s matching 3-byte case lives in `Obj6EAC0`
   (unit `code_2cc8c_f`) -- so the SAME struct shape closed in two
@@ -101,7 +101,7 @@ but the supporting evidence is still entirely within one segment's
 descendant units. Treat it as: safe to try broadly as a lever (cheap,
 mechanistic, not tied to a specific field layout), NOT yet safe to
 promote to "closes any two-or-more-statement scalar copy in this
-codebase" without a confirmation outside the `TaskViewport` family. Round
+codebase" without a confirmation outside the `Task` family. Round
 18's over-promotion of the type/declaration-order lever on one success is
 the cautionary precedent this is deliberately not repeating.
 

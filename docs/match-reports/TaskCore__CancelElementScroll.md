@@ -4,11 +4,11 @@
 
 > Renamed from `func_8003DCAC` on 2026-09-24 (tools/rename.py). Address 0x8003dcac.
 
-**Unit:** TaskViewport · **Size:** 71 words · **Result:** byte-exact, first attempt
+**Unit:** Task · **Size:** 71 words · **Result:** byte-exact, first attempt
 
 ## What it does
 
-`Obj86B60Methods::slot110` (already recorded in `TaskViewport.h`). The
+`Obj86B60Methods::slot110` (already recorded in `Task.h`). The
 state-2 counterpart to `TaskCore__BeginElementScroll`'s state-1 handler: notifies
 `slot100` (with `a2=0` this time, vs `TaskCore__BeginElementScroll`'s `a2=1`), dispatches
 the CURRENT ring element through its `+0x0B8` slot with the same
@@ -49,7 +49,7 @@ void TaskCore__CancelElementScroll(Obj86B60 *self)
 
 ## Header addition
 
-`include/TaskViewport.h`: new slot `slot60` on `Unk64ElemMethods`
+`include/Task.h`: new slot `slot60` on `Unk64ElemMethods`
 (`void (*)(Unk64Elem *, s32)`), carved from what had been the leading
 padding before `slotB8`. No existing declaration changed.
 

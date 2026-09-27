@@ -34,7 +34,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 | `func_800406E4` | (kept `func_800406E4` at track 3; `BoxFill__SetDisplay` since round 85, see Track 4) | C |
 
 **What is known.** A thin wrapper around `GetSetBitField(&self->flags,
-shift, width, value)` (see `include/TaskViewport.h`'s own comment on
+shift, width, value)` (see `include/Task.h`'s own comment on
 `flags`, renamed from `unk58` this round), the SAME generic
 packed-bitfield-word accessor `code_d294.c`'s own sibling functions
 (`SceneNode__SetDisplay`/`D374`/`D3A0`) wrap -- and those, the FIRST instances

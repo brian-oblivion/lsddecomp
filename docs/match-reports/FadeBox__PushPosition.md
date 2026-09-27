@@ -58,7 +58,7 @@ void FadeBox__PushPosition(FadeBoxObj *self, BoxFillSize *a1, BoxFillPos *a2) {
 }
 ```
 
-Everything used is already declared in `include/TaskViewport.h`; no header
+Everything used is already declared in `include/Task.h`; no header
 or struct change.
 
 ### Proposed learning
@@ -126,7 +126,7 @@ Unit `code_2cc8c_e`, carved round 14. `FadeBoxMethods::pushPosition` (`+0x0E8`).
 25/25 match under the stale-build window described in `New_FadeBox.md`.
 Re-verified genuinely fresh, this function has a real residue -- but the
 investigation also found and fixed a genuine FIELD-WIDTH bug in
-`include/TaskViewport.h` along the way (see "Field width correction" below),
+`include/Task.h` along the way (see "Field width correction" below),
 which is the one part of this report NOT superseded by the correction.
 
 **Second correction (round 19, runner alpha): the "ONE word remaining"
@@ -561,4 +561,4 @@ an s32 field into the u16 `boxW`/`boxH` still reads only the low halfword
 halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
 became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
 BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
-its caller in TaskViewport passes an `s32 size[2]`).
+its caller in Task passes an `s32 size[2]`).

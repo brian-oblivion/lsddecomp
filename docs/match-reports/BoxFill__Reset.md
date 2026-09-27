@@ -38,7 +38,7 @@ version of this report read `self->methods` inline at the call and claimed
 deferred it past the `a2` check instead, where retail loads it right after
 storing `unk62`. Hoisting it into a named local restores retail's early
 load. Worth noting as a SHARED-FIELD side effect: a field TYPE change in
-`include/TaskViewport.h` regressed an unrelated, already-matched function's
+`include/Task.h` regressed an unrelated, already-matched function's
 SCHEDULING (not its correctness) purely by changing surrounding register
 pressure -- a milder cousin of the project's documented "any struct edit
 is potentially non-local" caution, this time via codegen shape rather than
@@ -80,7 +80,7 @@ an s32 field into the u16 `boxW`/`boxH` still reads only the low halfword
 halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
 became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
 BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
-its caller in TaskViewport passes an `s32 size[2]`).
+its caller in Task passes an `s32 size[2]`).
 
 ## Track 7 (round 100, charlie)
 

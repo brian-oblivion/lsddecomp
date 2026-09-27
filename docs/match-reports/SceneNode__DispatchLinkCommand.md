@@ -90,7 +90,7 @@ shortcut that skips the proximity/bounds checks. Tier B: mechanics
 (the three-way dispatch) are certain from the disassembly-verified
 `switch`; which caller uses which `a2` value and why is not established
 from this function alone. Held back from an actual rename because this
-symbol is referenced (in a comment) from `include/TaskViewport.h:752` --
+symbol is referenced (in a comment) from `include/Task.h:752` --
 a different unit's own header, discussing the same-shaped `switch`
 residue as cross-unit precedent. Posted to the broadcast.
 

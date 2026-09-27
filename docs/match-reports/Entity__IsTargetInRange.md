@@ -137,7 +137,7 @@ identical 5-word residue: `this->unk94`'s value in `$v0`/`$a1` one register
 off from retail's `$a1`/`$a2` chain. A corpus census of the shape "an
 argument register vacated into a callee-saved register, then reused within 3
 instructions as a fresh load's destination" found 6 hits in 4 files
-(`Entity_c.s`, `class_3bb8c.s`, `TaskViewport.s`, and this function), three of
+(`Entity_c.s`, `class_3bb8c.s`, `Task.s`, and this function), three of
 them in still-uncarved segments — noted at the time as a poor permuter
 target on rarity grounds. That count was measuring the wrong shape (the
 census pattern doesn't describe "value kept live in place because it's a

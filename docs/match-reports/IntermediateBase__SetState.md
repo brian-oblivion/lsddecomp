@@ -92,7 +92,7 @@ This function had never been permuter-searched (per this round's own
 assignment brief). Ran all three mandated checks first.
 
 **1. Correctness / drift:** the preserved body (byte-identical to the one
-already on file) was spliced into `src/TaskViewport.c` in isolation
+already on file) was spliced into `src/Task.c` in isolation
 (every other INCLUDE_ASM across all four of this runner's units
 confirmed still wrapped) and rebuilt through the full oracle. Reproduces
 **exactly 21/32, no outside-range drift** -- matches this report's own
@@ -305,7 +305,7 @@ compile errors in a fresh build.
 ## Blocker screen (mandatory, round 13 head broadcast)
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo' asm/nonmatchings/TaskViewport/IntermediateBase__SetState.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo' asm/nonmatchings/Task/IntermediateBase__SetState.s
 ```
 
 No hits. NOT toolchain-blocked -- this is a genuine register-identity
@@ -428,7 +428,7 @@ specific queued function, for a reason not visible from the C source shape.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit TaskViewport. 5 attempts,
+round 13 (2026-09-03), runner alpha, unit Task. 5 attempts,
 `INCLUDE_ASM` left in place (never removed from the built source).
 
 ## Naming (round 55, runner alpha)
@@ -451,7 +451,7 @@ stalls the byte match.
 ## NON_MATCHING body promoted, round 62
 
 Placed the round-46 best-reached body (the `__asm__("" ::: "memory")`
-barrier variant, 23/32, zero drift) in `src/TaskViewport.c` under
+barrier variant, 23/32, zero drift) in `src/Task.c` under
 `#ifdef NON_MATCHING`/`#else INCLUDE_ASM`, per track 1b. Confirmed
 hand-derived from this report before promoting: round 46's own text
 tried the permuter's tempting sub-baseline candidate (`output-58-1`)
@@ -476,7 +476,7 @@ The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/c
 
 Round 89 (runner delta, track 5 `asm-sites`): the `__asm__("" ::: "memory")`
 after `methods = self->methods;` is **retired**. Measured by deleting it alone
-and rebuilding: `build/src/TaskViewport.c.o` came out byte-identical to the
+and rebuilding: `build/src/Task.c.o` came out byte-identical to the
 object built with it (`cmp`), and `./build-and-verify.sh` stayed green. The
 "without the barrier, `lw s2,0(s1)` lands late" observation above no longer
 holds for the current source (what changed since was not measured). The

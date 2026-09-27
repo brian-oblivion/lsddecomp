@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003D050` on 2026-09-24 (tools/rename.py). Address 0x8003d050.
 
-**Unit:** TaskViewport · round 12 straggler.
+**Unit:** Task · round 12 straggler.
 
 ## What it does
 
@@ -91,7 +91,7 @@ Renamed from Obj86B60__ReleaseTarget (tools/rename.py): the class prefix. Occupa
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`) and `include/TaskViewport.h`'s
+TimImage is unified (`include/TimImage.h`) and `include/Task.h`'s
 `Unk74Obj`/`Unk74ObjMethods` view of it is deleted, together with that
 header's local `extern` of New_TimImage. The handle is cast to
 `TimImage *` (TaskCore.h still types the field `BasicClass *`); its slots are

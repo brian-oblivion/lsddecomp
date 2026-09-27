@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E030` on 2026-09-19 (tools/rename.py). Address 0x8003e030.
 
-**Unit:** TaskViewport · **Size:** 52 instructions
+**Unit:** Task · **Size:** 52 instructions
 
 ## What it does
 
@@ -48,7 +48,7 @@ void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
   `IntermediateBase__Init`), `slot40` (`IntermediateBase__ResetCounters`, `IntermediateBase__IntermediateBase`), `slot48`
   (`IntermediateBase__Deinit`, `IntermediateBase__Init`), `slot4C` (external `TaskCore__OnInit`,
   `IntermediateBase__Init`), `slot54` (`IntermediateBase__OnTag1Notify`), `slot58` (external
-  `TaskCore__OnPadEvent`, STALL in unit `TaskViewport` -- its own report confirms
+  `TaskCore__OnPadEvent`, STALL in unit `Task` -- its own report confirms
   signature `(Obj86B60 *, s32 a1, s32 a2)`; this call site's `a1` is
   genuinely `EventArg *`, an independent local view of the same shared
   slot, not a conflict), `slot5C` (`TaskCore__Update`, already matched
@@ -82,14 +82,14 @@ this function's own bytes.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit TaskViewport. Matched on the first
+round 13 (2026-09-03), runner alpha, unit Task. Matched on the first
 build.
 
 ## Naming
 
 **IntermediateBase__OnNotify** (renamed from `func_8003E030`, round 55, runner
 alpha). Tier A: forwards to `Get_vtable_BasicClass()->slot38` first (that
-slot IS `BasicClass__OnNotify` per `include/TaskViewport.h`'s own
+slot IS `BasicClass__OnNotify` per `include/Task.h`'s own
 `BasicClassMethodsCC8C` struct, offset-verified against
 `include/code_8220.h`'s canonical, already-named `BasicClassMethods::slot38`
 = `onNotify`), then adds its own dispatch on the incoming `EventArg`'s
@@ -97,7 +97,7 @@ dynamic class tag -- the textbook "override calls base first, then does its
 own work" shape for a virtual method whose base identity is independently
 confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
 `onNotify` in this unit's `## Proposed field names` (shared with
-`TaskViewport.c`'s own `Viewport__OnNotify`).
+`Task.c`'s own `Viewport__OnNotify`).
 
 ## Proposed field names
 
@@ -105,12 +105,12 @@ confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
   matches `include/code_8220.h`'s own canonical, already-named
   `BasicClassMethods::slot38` = `onNotify` exactly (`IS BasicClass__OnNotify`,
   TmdRenderer, per this header's own comment). NOT renamed directly:
-  `TaskViewport.c`'s `Viewport__OnNotify` also calls
+  `Task.c`'s `Viewport__OnNotify` also calls
   `Get_vtable_BasicClass()->slot38(self, arg1, arg2)`, so this field is
-  shared within the TaskViewport family. Head applies by type scope (rename
+  shared within the Task family. Head applies by type scope (rename
   the field in `BasicClassMethodsCC8C`'s own definition,
-  `include/TaskViewport.h`, rebuild, fix the compiler-listed accessors in
-  both `TaskViewport.c` and `code_2cc8c_d.c`, oracle).
+  `include/Task.h`, rebuild, fix the compiler-listed accessors in
+  both `Task.c` and `code_2cc8c_d.c`, oracle).
 
 ## Track 4 (2026-09-25, round 82, charlie)
 

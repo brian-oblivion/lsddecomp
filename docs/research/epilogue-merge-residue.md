@@ -140,7 +140,7 @@ PY
 | --- | --- |
 | carved, queued now | **5** — `New_DayTask`, `New_TimedTask` (class_39e08); `New_StageMap` (class_3ac78); `New_StreamTask`, `New_TaskCore` (Task) |
 | `class_3bb8c` (uncarved) | 11 |
-| `TaskViewport` (uncarved) | 4 |
+| `Task` (uncarved) | 4 |
 | `code_179d8` (uncarved) | 3 |
 | `code_d294` (uncarved) | 1 |
 
@@ -189,7 +189,7 @@ without a new idea.
 
 The census below counts 24 corpus-wide. Five are closed and one is the open
 sub-shape, leaving **18 in still-uncarved segments** (`class_3bb8c` 11,
-`TaskViewport` 4, `code_179d8` 3, `code_d294` 1). Each should be a near-free
+`Task` 4, `code_179d8` 3, `code_d294` 1). Each should be a near-free
 match the moment its segment is carved, provided it screens as the
 `move $v0, $zero` shape. That makes those four segments materially more
 attractive as carve targets than their raw function counts suggest.

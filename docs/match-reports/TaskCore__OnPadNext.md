@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C9B0` on 2026-09-24 (tools/rename.py). Address 0x8003c9b0.
 
-**Unit:** TaskViewport · **Size:** 27 instructions
+**Unit:** Task · **Size:** 27 instructions
 
 ## What it does
 
@@ -40,7 +40,7 @@ local variable, not inlined per-branch calls) directly.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit TaskViewport. 1 attempt.
+round 2026-09-02, runner echo, unit Task. 1 attempt.
 
 ## Naming (round 78, delta)
 

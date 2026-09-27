@@ -34,7 +34,7 @@ this read as scheduling for 59 rounds and why ~94,000 permuter iterations
 could not find it (a permuter never changes a function's parameter list or
 a call's arity).
 
-The shared `FadeBoxMethods::configure` slot (`include/TaskViewport.h`) is
+The shared `FadeBoxMethods::configure` slot (`include/Task.h`) is
 NOT retyped: the call goes through a file-local
 `typedef s32 (*Configure6E99CFn)(FadeBoxObj *, s32, s32, s32)` cast, per
 3f's "prefer a LOCAL function-pointer view over retyping a shared slot". A

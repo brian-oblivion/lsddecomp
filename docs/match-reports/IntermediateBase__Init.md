@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E10C` on 2026-09-19 (tools/rename.py). Address 0x8003e10c.
 
-**Unit:** TaskViewport · **Size:** 93 instructions
+**Unit:** Task · **Size:** 93 instructions
 
 ## What it does
 
@@ -133,7 +133,7 @@ tells you which.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit TaskViewport. 2 attempts (address
+round 13 (2026-09-03), runner alpha, unit Task. 2 attempts (address
 drift on the first, closed on the second by hoisting `self->unk18` into a
 local at the position retail's own instruction schedule implied).
 
@@ -156,7 +156,7 @@ The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/c
 
 ## Track 4 (2026-09-26, round 86, delta)
 
-Class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; its NULL-args fallback is `self->unk14 = (BasicClass *)New_LightRig();`, the allocator's prototype now coming from include/LightRig.h (was `void *New_LightRig(void)` in include/TaskViewport.h). `unk14` stays IntermediateBase's `BasicClass *`; a pointer cast emits no code; image byte-identical.
+Class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; its NULL-args fallback is `self->unk14 = (BasicClass *)New_LightRig();`, the allocator's prototype now coming from include/LightRig.h (was `void *New_LightRig(void)` in include/Task.h). `unk14` stays IntermediateBase's `BasicClass *`; a pointer cast emits no code; image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 

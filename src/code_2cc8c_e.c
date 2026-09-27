@@ -3,7 +3,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "FrameClock.h"
-#include "TaskViewport.h"
+#include "Task.h"
 
 /*
  * code_2cc8c_e -- the screen fade, and the first methods of the box it draws.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EC2C` on 2026-09-23 (tools/rename.py). Address 0x8003ec2c.
 
-Unit `TaskViewport`, carved round 13. Reopened round 42 as
+Unit `Task`, carved round 13. Reopened round 42 as
 `nop_mflo_mfhi`-blocked (the blocker is RESOLVED, see CLAUDE.md); the stub
 above was never actually attempted until now.
 
@@ -39,7 +39,7 @@ adjacent halfwords.
 
 ## Header change
 
-`include/TaskViewport.h`: `Unk18Obj`'s `pad2C[4]` retyped to `s32 unk2C`
+`include/Task.h`: `Unk18Obj`'s `pad2C[4]` retyped to `s32 unk2C`
 (same offset, same size -- no other field moves). Verified safe: this is
 the FIRST function in the project to touch `+0x02C` of `Unk18Obj`, so there
 is no sibling already-matched function reading/writing that offset to

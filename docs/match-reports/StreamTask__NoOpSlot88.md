@@ -23,7 +23,7 @@ still needed a name.
 override; the mechanics ARE the whole purpose (do nothing when this slot is
 dispatched). Matches the `Class__NoOpSlotNN` convention already established
 in this codebase for the identical shape (`DreamSys.h`'s
-`DreamSys__NoOpSlotE8Default`/`Actor__NoOpSlotD8`, `TaskViewport.h`'s
+`DreamSys__NoOpSlotE8Default`/`Actor__NoOpSlotD8`, `Task.h`'s
 `TextRow__NoOpGetCell`/`TextRow__NoOpSlotD0`).
 
 ## Track 4 (2026-09-26, round 87)

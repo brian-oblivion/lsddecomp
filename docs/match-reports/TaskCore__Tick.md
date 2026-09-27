@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CA1C` on 2026-09-24 (tools/rename.py). Address 0x8003ca1c.
 
-**Unit:** TaskViewport · **Size:** 30 instructions
+**Unit:** Task · **Size:** 30 instructions
 
 ## What it does
 
@@ -69,7 +69,7 @@ not a subtraction) before trusting it.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit TaskViewport. 2 attempts.
+round 2026-09-02, runner echo, unit Task. 2 attempts.
 
 ## Naming (round 78, delta)
 

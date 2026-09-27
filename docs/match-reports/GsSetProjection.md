@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003F28C` on 2026-09-23 (tools/rename.py). Address 0x8003f28c.
 
-Unit: `TaskViewport`. Round 14, runner delta. 8/8 words, full match.
+Unit: `Task`. Round 14, runner delta. 8/8 words, full match.
 
 ## Signature
 
@@ -27,7 +27,7 @@ void GsSetProjection(Unk18Obj *self) {
 
 ## Header changes
 
-`include/TaskViewport.h`: new extern `func_80024B90(Unk18Obj *self)` (PsyQ
+`include/Task.h`: new extern `func_80024B90(Unk18Obj *self)` (PsyQ
 library, `asm/psyq_GsLinkObject4.s`, not decompiled in this project).
 
 ## Naming
@@ -73,19 +73,19 @@ was the misread. No class table holds 0x8003F28C, unlike every other
 as the callee; the body calls libgte's `SetGeomScreen`.
 
 Renamed with `tools/rename.py`, retyped to LIBGS.H's shape (`long h`), and its
-prototype moved out of `include/TaskViewport.h` into `src/code_2cc8c_d.c`,
+prototype moved out of `include/Task.h` into `src/code_2cc8c_d.c`,
 following round 78's `GsSetNearClip` precedent. Byte-identical.
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/TaskViewport.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: none: the definition already had LIBGS.H's shape; `SetGeomScreen` now comes from `<libgte.h>`.
+src/Task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: none: the definition already had LIBGS.H's shape; `SetGeomScreen` now comes from `<libgte.h>`.
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 
 ```c
 /* Psy-Q's GTE far-colour and geometric-screen-distance register writers
  * (libgte/reg03, linked from Sony's own SDK object). Declared LOCAL to this
- * unit rather than in TaskViewport.h, which nine units include, since they
+ * unit rather than in Task.h, which nine units include, since they
  * belong to another translation unit (CLAUDE.md's header-contention rule).
  * Both take `long` as LIBGTE.H declares them.
  *

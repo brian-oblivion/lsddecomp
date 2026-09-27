@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003C7F4` on 2026-09-24 (tools/rename.py). Address 0x8003c7f4.
 
-**Unit:** TaskViewport · **Size:** 25 instructions
+**Unit:** Task · **Size:** 25 instructions
 
 ## What it does
 
@@ -45,14 +45,14 @@ signature even where their own bodies also never read `a1`.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit TaskViewport.
+round 2026-09-02, runner echo, unit Task.
 
 ## Naming (round 78, delta)
 
 **Tier C** (`Class__func_xxxxx` -- class established via slot occupancy,
 purpose not). `func_8003C7F4` -> `Obj86B60__func_8003C7F4`. One of the five
 message handlers `TaskCore__OnPadEvent` dispatches to (message code 0x21,
-slot74 -- see `include/TaskViewport.h`'s round-78 correction of this slot's
+slot74 -- see `include/Task.h`'s round-78 correction of this slot's
 occupant, which was previously listed reversed). Body: when `self->unk4C` is
 set, calls `slot70(self, 0x10)` then `slot60(self, 0xA)` -- a conditional
 child-forward followed by a state transition. Same shape as the other four

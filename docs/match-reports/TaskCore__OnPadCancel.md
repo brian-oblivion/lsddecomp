@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C8D0` on 2026-09-24 (tools/rename.py). Address 0x8003c8d0.
 
-**Unit:** TaskViewport · **Size:** 29 instructions
+**Unit:** Task · **Size:** 29 instructions
 
 ## What it does
 
@@ -25,7 +25,7 @@ directly). Reason code `0x11` is a fixed literal, no branch needed.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit TaskViewport. 1 attempt.
+round 2026-09-02, runner echo, unit Task. 1 attempt.
 
 ## Naming (round 78, delta)
 

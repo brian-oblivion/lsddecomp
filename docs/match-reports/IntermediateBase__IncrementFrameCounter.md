@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E4A4` on 2026-09-19 (tools/rename.py). Address 0x8003e4a4.
 
-**Unit:** TaskViewport · **Size:** 5 instructions
+**Unit:** Task · **Size:** 5 instructions
 
 ## What it does
 
@@ -28,7 +28,7 @@ void IntermediateBase__IncrementFrameCounter(Obj86B60 *self)
 
 ## Provenance
 
-round 12 (2026-09-03), runner alpha, unit TaskViewport. Matched on the
+round 12 (2026-09-03), runner alpha, unit Task. Matched on the
 first build.
 
 ## Naming
@@ -38,9 +38,9 @@ runner alpha). Tier A: a pure leaf increment (`self->unk1C++`) -- tier A by
 the same "mechanics ARE the purpose" rule as a getter/clamp/list-push.
 "FrameCounter" reuses the already-established cross-function reading of
 `unk1C` ("a running count/frame value multiplied against unk84",
-`TaskCore__TickColorFade`, TaskViewport.c) rather than inventing a new one; `unk1C`
+`TaskCore__TickColorFade`, Task.c) rather than inventing a new one; `unk1C`
 itself is PROPOSED for rename to `frameCounter` in this unit's
-`## Proposed field names` (shared with TaskViewport.c).
+`## Proposed field names` (shared with Task.c).
 
 ## Proposed field names
 
@@ -48,12 +48,12 @@ itself is PROPOSED for rename to `frameCounter` in this unit's
   three independent sources: incremented here unconditionally
   (`IntermediateBase__IncrementFrameCounter`), zeroed on state-reset paths
   (`IntermediateBase__ResetCounters`, `IntermediateBase__OnState2`,
-  `IntermediateBase__OnState3`, and `TaskCore__SetState` in `TaskViewport.c` on
+  `IntermediateBase__OnState3`, and `TaskCore__SetState` in `Task.c` on
   several message codes), and consumed as a multiplier in `TaskCore__TickColorFade`
-  (TaskViewport.c) against `unk84` -- consistent with a per-instance
+  (Task.c) against `unk84` -- consistent with a per-instance
   frame/tick counter. What in-game effect the resulting product drives is
   NOT established, hence tier B. NOT renamed directly: shared with
-  `TaskViewport.c` (`TaskCore__SetState`, `TaskCore__TickColorFade`, and likely
+  `Task.c` (`TaskCore__SetState`, `TaskCore__TickColorFade`, and likely
   `TaskCore__SetFadeRate`/`TaskCore__TickFadeCallback`'s own callers of `self->unk1C`). Head
   applies by type scope.
 

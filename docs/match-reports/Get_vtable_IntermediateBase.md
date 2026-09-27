@@ -2,16 +2,16 @@
 
 > Renamed from `func_8003E5C8` on 2026-09-19 (tools/rename.py). Address 0x8003e5c8.
 
-**Unit:** TaskViewport · **Size:** 4 instructions
+**Unit:** Task · **Size:** 4 instructions
 
 ## What it does
 
 A tiny getter: returns `&gIntermediateBaseMethods`, the "IntermediateBase" shared utility
 class's own table. Already declared as an `extern` in
-`include/TaskViewport.h` (added by whoever carved the original `TaskViewport.c`
+`include/Task.h` (added by whoever carved the original `Task.c`
 unit, back when this function itself was still raw asm in the
 then-uncarved remainder of the segment) -- this round carves it into
-`TaskViewport.c`, so this is simply that existing prototype's definition.
+`Task.c`, so this is simply that existing prototype's definition.
 Same static table as `Task.h`'s `TaskUtilMethods` and
 `class_39e08.h`'s own `IntermediateBaseMethods` views (each unit keeps its
 own independent local view per this project's established convention).
@@ -27,17 +27,17 @@ IntermediateBaseMethods *Get_vtable_IntermediateBase(void)
 
 ## Header note
 
-`include/TaskViewport.h` already declared
+`include/Task.h` already declared
 `extern IntermediateBaseMethods *Get_vtable_IntermediateBase(void);` with a comment
-saying "still raw asm elsewhere in the still-uncarved TaskViewport portion
+saying "still raw asm elsewhere in the still-uncarved Task portion
 of this segment -- not this unit's function to write". That comment is now
-stale (this round carved it into `TaskViewport.c`) and was updated in place
+stale (this round carved it into `Task.c`) and was updated in place
 -- flagged in this unit's final summary as a change to an existing
 declaration's comment (not its type/signature).
 
 ## Provenance
 
-round 12 (2026-09-03), runner alpha, unit TaskViewport. Matched on the
+round 12 (2026-09-03), runner alpha, unit Task. Matched on the
 first build.
 
 ## Naming

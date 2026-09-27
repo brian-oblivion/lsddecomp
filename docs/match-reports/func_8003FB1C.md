@@ -110,7 +110,7 @@ translation vector on a copied identity matrix.
 
 Neither declaration was moved. `code_2cc8c_e` does not include
 `class_3bb8c.h`, so there is no collision, and the matrix view lives in
-`src/code_2cc8c_e.c` rather than in the six-unit `TaskViewport.h`. This is the
+`src/code_2cc8c_e.c` rather than in the six-unit `Task.h`. This is the
 multiple-independent-local-views convention working as intended: the
 cross-reference belongs in a report, not in a shared header.
 

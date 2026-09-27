@@ -29,7 +29,7 @@ void FormatNumberIntoBuffer(s32 arg0)
 `FormatFullWidthNumber` (matched round 38, `src/code_2cc8c_f.c`) formats `arg0` as a
 zero-padded 3-digit decimal string into the buffer pointed to by
 `D_8008AA24`. This unit keeps `FormatFullWidthNumber`'s `self` parameter opaque
-(`void *`) rather than pulling in `Obj6EAC0` from `TaskViewport.h`, since
+(`void *`) rather than pulling in `Obj6EAC0` from `Task.h`, since
 nothing here touches its fields — just a pass-through pointer, per the
 project's independent-local-view convention.
 

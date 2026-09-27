@@ -775,7 +775,7 @@ jr    v0
 
 ### How this was found, and the cheaper route
 
-Round 10's head found two `jtbl_*` hits while carving `TaskViewport`, reasoned
+Round 10's head found two `jtbl_*` hits while carving `Task`, reasoned
 they were false positives, edited CLAUDE.md's screening grep to exclude them,
 audited the corpus and "recovered" three functions, and broadcast the
 correction to five live runners — one of which had already been handed two of

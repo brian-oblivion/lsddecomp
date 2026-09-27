@@ -8,7 +8,7 @@
 
 > Renamed from `func_8003F23C` on 2026-09-23 (tools/rename.py). Address 0x8003f23c.
 
-Unit: `TaskViewport`. Round 14, runner delta. 2/2 words, full match.
+Unit: `Task`. Round 14, runner delta. 2/2 words, full match.
 
 ## Signature
 
@@ -30,7 +30,7 @@ void Viewport__SetExtraSwap(Unk18Obj *self, s32 a1) {
 
 ## Header changes
 
-`include/TaskViewport.h`: `Unk18Obj` gains `unkB4` (`+0x0B4`), after the
+`include/Task.h`: `Unk18Obj` gains `unkB4` (`+0x0B4`), after the
 existing `unkB0` field.
 
 ## Naming
@@ -50,7 +50,7 @@ Viewport's `unkB4` -> `extraSwap`, slot `setUnkB4` -> `setExtraSwap`, this funct
 
 ## Naming
 
-Renamed `Viewport__SetUnkB4` -> `Viewport__SetExtraSwapOnBuffer0` -> `Viewport__SetExtraSwap` with `tools/rename.py` (the second run takes round 95's proposal above): tier B. The field is now `extraSwap` (include/Viewport.h; every accessor is in TaskViewport.c): while it is set, Flip calls the DrawSystem's swapBuffers once more before the clear and once more after the draw on buffer 0. What that is for is not shown; the only caller in C (class_3bb8c_l.c) passes 0, as InitDefaults does. Parameter `value` -> `on`.
+Renamed `Viewport__SetUnkB4` -> `Viewport__SetExtraSwapOnBuffer0` -> `Viewport__SetExtraSwap` with `tools/rename.py` (the second run takes round 95's proposal above): tier B. The field is now `extraSwap` (include/Viewport.h; every accessor is in Task.c): while it is set, Flip calls the DrawSystem's swapBuffers once more before the clear and once more after the draw on buffer 0. What that is for is not shown; the only caller in C (class_3bb8c_l.c) passes 0, as InitDefaults does. Parameter `value` -> `on`.
 
 ## Proposed field names
 

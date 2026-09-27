@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003ECC0` on 2026-09-27 (tools/rename.py). Address 0x8003ecc0.
 
-Unit: `TaskViewport`. Round 73, runner charlie (report written retroactively;
+Unit: `Task`. Round 73, runner charlie (report written retroactively;
 same shape as `Viewport__NoOpSlot58`/`Viewport__NoOpSlot5C`).
 
 ## Signature

@@ -2,20 +2,44 @@
 #define TASK_H
 
 #include "common.h"
+#include "BasicClass.h"
+#include "SceneNode.h"
+#include "BoxFill.h"
+#include "FadeBox.h"
+#include "IntermediateBase.h"
 #include "TaskCore.h"
 #include "StreamTask.h"
 #include "Viewport.h"
 #include "MoviePlayer.h"
 #include "DrawSystem.h"
+#include "TextRow.h"
 
 /*
- * Task's own declarations: the data, and the one outside accessor,
- * that StreamTask's and TaskCore's methods here reach and no other unit
- * does. The classes themselves are in include/StreamTask.h and
- * include/TaskCore.h.
+ * Declarations shared by src/Task.c and the two units after it,
+ * code_2cc8c_e.c (FadeBox, BoxFill's first methods) and code_2cc8c_f.c (the
+ * rest of BoxFill, TextRow): the data and outside callees they reach that no
+ * class header owns. The classes are in their own headers: StreamTask.h,
+ * TaskCore.h, IntermediateBase.h, Viewport.h, BoxFill.h, FadeBox.h, TextRow.h.
  */
 
-/* Defined in TaskViewport.c: &gDefaultMovieFrame. */
+/* The pool allocator's pair. BMemPMgrFree returns NULL (its body ends
+ * `addu $v0, $zero, $zero`), and code_2cc8c_f's caller uses the result. */
+extern void *BMemPMgrAlloc(s32 size);
+extern void *BMemPMgrFree(void *ptr);
+
+/* Releases each element of a BasicClass array (TaskCore's slot elements,
+ * TextRow's children). */
+extern void ReleaseBasicClassArray(void *array, void *count);
+
+/* The packed-bitfield accessor SceneNode's attribute setters use
+ * (code_d294_c.c), reached here by BoxFill's over `&self->boxAttribute`. */
+extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
+
+/* LIBGPU.H's `int ResetGraph(int)`, declared with the project's types;
+ * Viewport__Flip calls it with 1 and ignores the result. */
+extern s32 ResetGraph(s32 mode);
+
+/* Defined in Task.c: &gDefaultMovieFrame. */
 extern DrawRect *GetDefaultMovieFrame(void);
 
 /* resetCounters' colours for setColors, three RGB triples back to back:
@@ -31,5 +55,22 @@ extern DrawRect gDefaultMovieFrame;
 /* {0, 0, 0}: TaskCore__OnInit attaches the view with it as both the
  * viewpoint and the reference point. */
 extern LongVec3 sTaskCoreViewOrigin;
+
+/* Viewport's ctor data: gViewportFadeBoxSize is the (320, 240) it passes
+ * New_FadeBox; gFadeBoxAttachPos the (-100, -100) screen position the ctor
+ * and SetSubHandle attach the sub handle at; gDefaultViewTwist ({0, 1}) is
+ * Viewport__AttachViewChild's twist when its own is NULL. */
+extern u8 gViewportFadeBoxSize[];
+extern u8 gFadeBoxAttachPos[];
+extern Ratio16 gDefaultViewTwist;
+
+/* FadeBox's colour tables, eight RGB entries each, indexed at a 3-byte
+ * stride by a channel mask: gFadeBoxMaskColors holds each mask's own
+ * channels at 0xFF (0 and 7 white), gFadeBoxBlackColors is all black.
+ * gBoxFillDefaultColor ({128, 128, 128}) is BoxFill__Reset's colour when it
+ * is given none. */
+extern u8 gFadeBoxMaskColors[];
+extern u8 gFadeBoxBlackColors[];
+extern u8 gBoxFillDefaultColor[3];
 
 #endif

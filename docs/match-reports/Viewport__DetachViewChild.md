@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EB84` on 2026-09-23 (tools/rename.py). Address 0x8003eb84.
 
-Unit: `TaskViewport`. Round 14, runner delta. 16/16 words, full match.
+Unit: `Task`. Round 14, runner delta. 16/16 words, full match.
 
 ## Signature
 

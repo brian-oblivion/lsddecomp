@@ -28,7 +28,7 @@ Unit `code_2cc8c_e`, carved round 14.
 > **One incidental fix needed along the way**: the preserved body's
 > `GetBoxFillMethods()->ctor(...)` no longer compiles as written --
 > `GetBoxFillMethods`'s declared return type is `Obj6EAC0Methods *` (per
-> `include/TaskViewport.h`), which has no field literally named `ctor` (its
+> `include/Task.h`), which has no field literally named `ctor` (its
 > ctor-shaped slot is `slot08`, still unidentified as this unit's own). The
 > header's own `ClassEAC0Methods` type (used identically by
 > `FadeBox__FadeBox`, a few lines above this function in the same file) DOES

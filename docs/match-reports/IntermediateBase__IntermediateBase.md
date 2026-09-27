@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003DFDC` on 2026-09-19 (tools/rename.py). Address 0x8003dfdc.
 
-**Unit:** TaskViewport · **Size:** 21 instructions
+**Unit:** Task · **Size:** 21 instructions
 
 ## What it does
 
@@ -48,7 +48,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit TaskViewport. Matched on the first
+round 13 (2026-09-03), runner alpha, unit Task. Matched on the first
 build. Classtable dump of `gIntermediateBaseMethods` (26 slots) resolved this and six
 sibling queue functions' exact slot identities in one pass; see
 `IntermediateBase__OnNotify.md` for the full table.

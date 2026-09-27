@@ -28,7 +28,7 @@ Sprite's slot types it). Same `addiu 0x2C`; image byte-identical.
 
 ## Round 95 (alpha, track 6: Sony headers)
 
-TimImage::tim is now <libgs.h>'s anonymous GsIMAGE, while include/Sprite.h still types +0x048 `image` as the tag `struct GsIMAGE *` (Sony's typedef has no tag, so it is never completed). The assignment casts `(struct GsIMAGE *)` until Sprite.h can say `GsIMAGE *`, which needs all its includers on <libgs.h>; TaskViewport.c cannot take it yet (its local GsClearOt/DrawSync/... prototypes, the ViewportOt job). Byte-identical.
+TimImage::tim is now <libgs.h>'s anonymous GsIMAGE, while include/Sprite.h still types +0x048 `image` as the tag `struct GsIMAGE *` (Sony's typedef has no tag, so it is never completed). The assignment casts `(struct GsIMAGE *)` until Sprite.h can say `GsIMAGE *`, which needs all its includers on <libgs.h>; Task.c cannot take it yet (its local GsClearOt/DrawSync/... prototypes, the ViewportOt job). Byte-identical.
 
 Round 96 (alpha, track 6). include/Sprite.h types +0x048 `image` as Sony's
 `GsIMAGE *` and its includers take Sony's headers (`common.h`, <libgte.h>,

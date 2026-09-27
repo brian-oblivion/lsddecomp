@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003F24C` on 2026-09-23 (tools/rename.py). Address 0x8003f24c.
 
-Unit: `TaskViewport`. Round 14, runner delta. 4/4 words, full match.
+Unit: `Task`. Round 14, runner delta. 4/4 words, full match.
 
 ## Signature
 
@@ -24,15 +24,15 @@ Unk18ObjMethods *GetViewportMethods(void) {
 
 ## Context
 
-This symbol was already declared `extern` in `include/TaskViewport.h` from
+This symbol was already declared `extern` in `include/Task.h` from
 round 13 (alpha), with a comment saying it "lives in a still-uncarved
 remainder... not this unit's function to write." Round 14's carve of
-`TaskViewport` brought it in, so it's matched here now — updated the
+`Task` brought it in, so it's matched here now — updated the
 comment accordingly rather than leaving the stale "external" note.
 
 ## Header changes
 
-`include/TaskViewport.h`: added `extern Unk18ObjMethods gViewportMethods;` (the
+`include/Task.h`: added `extern Unk18ObjMethods gViewportMethods;` (the
 table itself, `tools/classtable.py gViewportMethods`, needed so this definition
 can return `&gViewportMethods`) and updated the `GetViewportMethods` extern's own
 comment to reflect it is now matched, not external.

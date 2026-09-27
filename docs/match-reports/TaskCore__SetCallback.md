@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CAEC` on 2026-09-24 (tools/rename.py). Address 0x8003caec.
 
-**Unit:** TaskViewport · **Size:** 3 instructions
+**Unit:** Task · **Size:** 3 instructions
 
 ## What it does
 
@@ -22,7 +22,7 @@ A pure setter, establishing `Obj86B60::unk9C`/`unkA0` as an
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit TaskViewport. 1 attempt.
+round 2026-09-02, runner echo, unit Task. 1 attempt.
 
 ## Naming (round 78, delta)
 

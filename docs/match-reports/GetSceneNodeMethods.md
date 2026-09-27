@@ -58,7 +58,7 @@ length -- see this unit's own header banner and `include/class_3bb8c.h`):
 `src/code_d294.c`, `src/class_3bb8c_c.c`, `src/class_3bb8c_o.c`,
 `src/class_3bb8c_p.c`, `src/class_3ac78.c`, `src/code_2cc8c_e.c`,
 `src/code_2cc8c_f.c` (an ACTIVE runner's own unit this exact round),
-`include/class_3bb8c.h`, `include/TaskViewport.h`, `include/DreamSys.h`.
+`include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
 Renaming this symbol would edit every one of those files -- squarely
 out of this round's `code_d294_b`-only scope, and a live collision risk
 with this round's `code_2cc8c_f` runner. Posted to the broadcast in
@@ -153,7 +153,7 @@ One declaration is left: `extern SceneNodeMethods *GetSceneNodeMethods(void);`
 in `include/SceneNode.h`. The deleted local return-type views were
 `BaseCtorTableB_3bb8c_c` (include/class_3bb8c.h), `FixedBaseTable`
 (src/class_3bb8c_o.c), `SceneNodeBaseTable` (src/class_3bb8c_p.c),
-`D6B5CCGetterMethodsCC8C` (include/TaskViewport.h) and the untyped `void *` in
+`D6B5CCGetterMethodsCC8C` (include/Task.h) and the untyped `void *` in
 src/class_3ac78.c. The one- and two-argument calls in class_3bb8c_c.c and
 class_3ac78.c now pass nothing, because round 59 measured those arguments as
 zero-cost. The raw `+ 0x38`/`+ 0x88` offset calls in class_3ac78.c are now

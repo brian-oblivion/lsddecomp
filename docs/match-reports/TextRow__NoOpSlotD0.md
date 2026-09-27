@@ -10,7 +10,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 
 **Evidence.** An empty function body (`{ }`), splat-generated (`jr $ra;
 nop`). `slotD0` is derived-only -- the base table has no occupant for it
-at all (see `include/TaskViewport.h`'s `Obj6EAC0Methods` comment) -- so this
+at all (see `include/Task.h`'s `Obj6EAC0Methods` comment) -- so this
 is a reserved/unused slot filled with a do-nothing stub rather than an
 override of a real base behaviour, unlike `TextRow__NoOpGetCell`
 (`slotC8`, which DOES override a real base setter). Kept the slot number

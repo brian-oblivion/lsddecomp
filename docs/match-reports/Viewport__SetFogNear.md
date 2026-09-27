@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003EAC4` on 2026-09-23 (tools/rename.py). Address 0x8003eac4.
 
-Unit: `TaskViewport`. Round 14, runner delta. 2/2 words, full match.
+Unit: `Task`. Round 14, runner delta. 2/2 words, full match.
 
 ## Signature
 
@@ -29,7 +29,7 @@ void Viewport__SetFogNear(Unk18Obj *self, s32 a1) {
 
 ## Header changes
 
-`include/TaskViewport.h`: `Unk18Obj` gains `unk60` (`+0x060`).
+`include/Task.h`: `Unk18Obj` gains `unk60` (`+0x060`).
 
 ## Naming
 

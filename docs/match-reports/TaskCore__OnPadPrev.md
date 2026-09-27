@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C944` on 2026-09-24 (tools/rename.py). Address 0x8003c944.
 
-**Unit:** TaskViewport · **Size:** 27 instructions
+**Unit:** Task · **Size:** 27 instructions
 
 ## What it does
 
@@ -92,7 +92,7 @@ address drift on the very first attempt here.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit TaskViewport. 2 attempts.
+round 2026-09-02, runner echo, unit Task. 2 attempts.
 
 ## Naming (round 78, delta)
 

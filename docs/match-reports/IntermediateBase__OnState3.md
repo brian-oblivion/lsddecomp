@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E578` on 2026-09-19 (tools/rename.py). Address 0x8003e578.
 
-**Unit:** TaskViewport · **Size:** 20 instructions
+**Unit:** Task · **Size:** 20 instructions
 
 ## What it does
 
@@ -59,7 +59,7 @@ evidence no function *yet attempted* has dereferenced it.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit TaskViewport. Matched on the
+round 13 (2026-09-03), runner alpha, unit Task. Matched on the
 first build.
 
 ## Naming
