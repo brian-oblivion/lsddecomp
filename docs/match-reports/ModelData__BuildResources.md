@@ -82,3 +82,11 @@ New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct R
 | `ModelDataHeader.offset` | `tmdOffset` | A | the sub-block New_LinkResource is built over, which LinkResource__BuildModels reads as a TmdFile |
 | `(u8 *)buffer + 0xC` | `ModelDataHeader.tods` | A | New_TodSet's buffer |
 | `ResourceSourceArgs.unk4`, `unk8` | `pad4[8]` | A | no code here reads them; ResourceRequest__Set writes the name (NULL) and a 1 there. Its prototype's parameters are now `(buffer, name, mode)`, as include/code_4cd08.h reads the same call |
+
+### Track 6 (round 97, alpha)
+
+The request local is now include/FileResource.h's `ResourceRequest`
+(`{ ResourceSource src; s32 mode; }`), and ResourceRequest__Set's prototype
+comes from that header. The unit's own view of the record and its local
+extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`, and
+`(ResourceSource *)&req` becomes `&req.src`. Byte-identical.
