@@ -15,7 +15,7 @@
  * and +0x004 release.
  *
  * The pipeline, measured from the methods:
- *   - the ctor builds a CdStream (New_CdStream(speed, 15, 0)) at `stream`
+ *   - the ctor builds a CdStream (New_CdStream(cdSpeed, MOVIE_FPS, 0)) at `stream`
  *     and hands it the 0x12000-byte `ring` (CdStream setRing);
  *   - pullFrame takes the next frame's sectors from the stream
  *     (getNextFrame), flips `frameIndex` and VLC-decodes them into
