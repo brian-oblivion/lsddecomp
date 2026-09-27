@@ -78,10 +78,10 @@ struct ItemListMethods {
     /* +0x058 */ void (*tickClosing)(ItemList *self, void *sender,
                                      s32 event); /* ItemList__TickClosing (reads only self; see the banner) */
     /* +0x05C */ void (*handleInputCode)(ItemList *self, void *source, s32 code); /* ItemList__HandleInputCode */
-    /* +0x060 */ void (*forwardToTarget)(ItemList *self, s32 code); /* ItemList__PlaySound */
-    /* +0x064 */ void *slot64[6];                                   /* NULL */
-    /* +0x07C */ void (*scrollRight)(ItemList *self);               /* ItemList__ScrollRight */
-    /* +0x080 */ void (*scrollLeft)(ItemList *self);                /* ItemList__ScrollLeft */
+    /* +0x060 */ void (*playSound)(ItemList *self, s32 tone); /* ItemList__PlaySound */
+    /* +0x064 */ void *slot64[6];                             /* NULL */
+    /* +0x07C */ void (*scrollRight)(ItemList *self);         /* ItemList__ScrollRight */
+    /* +0x080 */ void (*scrollLeft)(ItemList *self);          /* ItemList__ScrollLeft */
     /* +0x084 */ void (*cursorUp)(ItemList *self);   /* ItemList__CursorUp (see the banner) */
     /* +0x088 */ void (*cursorDown)(ItemList *self); /* ItemList__CursorDown (see the banner) */
     /* +0x08C */ void (*createRows)(ItemList *self, struct SceneNode *parent, struct TimImage *font,
@@ -108,7 +108,7 @@ struct ItemList {
     /* +0x030 */ s32 closeTicks;    /* tickClosing's call counter; setState zeroes */
     /* +0x034 */ void *inputSource; /* addChild/removeChild: the child whose class id's low nibble is 2; onNotify sends its events to handleInputCode */
     /* +0x038 */ void *tickSource; /* ... whose low nibble is 5; onNotify sends its events to tickClosing */
-    /* +0x03C */ struct VabStreamObj *target; /* attachTarget; forwardToTarget plays tone `code` on it (playTone, volume 0x60, 0x60) */
+    /* +0x03C */ struct VabStreamObj *target; /* attachTarget; ItemList__PlaySound plays a tone on it (playTone, volume 96, 96) */
     /* +0x040 */ struct TextRow *rows[4]; /* createRows: New_TextRow(font, 26, ...); index = item - topIndex */
     /* +0x050 */ struct ScreenSprite *panelSprite; /* loadResources: New_ScreenSprite(SELECT); non-NULL gates every list method */
 };
@@ -144,7 +144,7 @@ void ItemList__DetachTarget(ItemList *self);
 void ItemList__SetState(ItemList *self, s32 state);
 void ItemList__TickClosing(ItemList *self);
 void ItemList__HandleInputCode(ItemList *self, void *source, s32 code);
-void ItemList__PlaySound(ItemList *self, s32 code);
+void ItemList__PlaySound(ItemList *self, s32 tone);
 void ItemList__ScrollRight(ItemList *self);
 void ItemList__ScrollLeft(ItemList *self);
 void ItemList__CursorUp(ItemList *self, s32 unused1, s32 unused2, s32 forwarded);

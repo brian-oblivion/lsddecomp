@@ -1,7 +1,7 @@
 /*
  * class_3bb8c_k -- the second half of ItemList, and the start of ObjM.
  *  - ItemList (include/ItemList.h), the list of strings the player picks one
- *    from: setState, tickClosing, handleInputCode and forwardToTarget, the
+ *    from: setState, tickClosing, handleInputCode and playSound, the
  *    cursor and scroll methods, the four visible rows (createRows,
  *    releaseRows, refreshRows, and the non-virtual helpers FormatRowText and
  *    SetView), stepCursorInView, getCursorIndex and the table getter
@@ -69,11 +69,11 @@ void ItemList__TickClosing(ItemList *self) {
 void ItemList__HandleInputCode(ItemList *self, void *source, s32 code) {
     switch (code) {
         case 25:
-            self->methods->forwardToTarget(self, 0x10);
+            self->methods->playSound(self, 0x10);
             self->methods->setState(self, 2);
             break;
         case 23:
-            self->methods->forwardToTarget(self, 0x10);
+            self->methods->playSound(self, 0x10);
             self->methods->setState(self, 3);
             break;
         case 5:
@@ -91,11 +91,11 @@ void ItemList__HandleInputCode(ItemList *self, void *source, s32 code) {
     }
 }
 
-void ItemList__PlaySound(ItemList *self, s32 code) {
+void ItemList__PlaySound(ItemList *self, s32 tone) {
     struct VabStreamObj *target = self->target;
 
     if (target != NULL) {
-        target->methods->playTone(target, code, 0x60, 0x60);
+        target->methods->playTone(target, tone, 96, 96);
     }
 }
 
@@ -277,7 +277,7 @@ void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 
     }
     ItemList__SetView(self, top, column, cursor, 0);
     if (notify) {
-        self->methods->forwardToTarget(self, 0);
+        self->methods->playSound(self, 0);
     }
 }
 
@@ -334,7 +334,7 @@ void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
     }
     (*row)->methods->setColor(*row, &gItemListCursorColor);
     if (notify) {
-        self->methods->forwardToTarget(self, 0);
+        self->methods->playSound(self, 0);
     }
 }
 

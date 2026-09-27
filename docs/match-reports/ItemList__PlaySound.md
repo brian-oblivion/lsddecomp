@@ -43,6 +43,8 @@ Slot +0x060 (`tools/classtable.py gItemListMethods`). If `target` (+0x03C) is se
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
 
+Round 99 (delta, track 7): `ItemList__ForwardToTarget` -> `ItemList__PlaySound`, **tier A**, and the slot `forwardToTarget` -> `playSound`, the parameter `code` -> `tone`. The body IS its purpose: it plays tone `tone` on the VabStreamObj `target` through `playTone(index, vol, endVol)`, whose index is program << 4 | tone (include/VabStreamObj.h). TextEntry, ItemList's sibling, holds the same body at the same slot +0x060 as `TextEntry__PlaySound(self, tone)` with the same volumes (96, 96), so the two now share one name. The callers pass `1 << 4` (VAB program 1, tone 0) before closing and 0 on every cursor move and redraw.
+
 ## Round 94 (track 6, charlie): the target is a VabStreamObj
 
 `TargetObj86ED0`/`TargetMethods86ED0` (include/class_3bb8c.h) are deleted.
