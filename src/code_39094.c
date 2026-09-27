@@ -15,7 +15,7 @@
  *    gForcedStageBgm), per-stage record-group accessors indexed by
  *    gStageFirstRecord and, for GetStageMapChunkRecordXY, by StageGrid.h's cell
  *    columns, and a family of "stream channel" lookups (GetAsmkMovie,
- *    PickOpeningMovie, GetEndingMovie, ResolveCinematicChannel,
+ *    PickOpeningMovie, GetEndingMovie, GetSpecialDayOrEventRecord,
  *    GetGraphRoomStreamChannel) whose shapes match their call sites in
  *    code_1677c.c one for one. The records' other fields and the channels'
  *    in-game meaning are not established.
@@ -332,7 +332,7 @@ typedef struct RecPick {
     s16 sub;
 } RecPick;
 
-Rec1C *ResolveCinematicChannel(s32 *countOut, RecPick pick) {
+Rec1C *GetSpecialDayOrEventRecord(s32 *countOut, RecPick pick) {
     s32 count;
     Rec1C *rec;
     if (pick.group >= 0) {

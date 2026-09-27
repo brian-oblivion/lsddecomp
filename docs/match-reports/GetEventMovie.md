@@ -46,4 +46,4 @@ Rec1C *GetEventMovie(s32 *countOut, s32 sub) {
 
 - **Name:** `GetEventMovie`
 - **Tier:** B
-- **Evidence:** pure getter: index into GetEventMovieRecords(); no cross-unit caller found (only reached internally via ResolveCinematicChannel's negative-group fallback).
+- **Evidence:** pure getter: index into GetEventMovieRecords(); no cross-unit caller found (only reached internally via GetSpecialDayOrEventRecord's negative-group fallback).

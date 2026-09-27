@@ -1,4 +1,6 @@
-# ResolveCinematicChannel -- MATCHED (37/37 words)
+# GetSpecialDayOrEventRecord -- MATCHED (37/37 words)
+
+> Renamed from `ResolveCinematicChannel` on 2026-09-27 (tools/rename.py). Address 0x80049334.
 
 > Renamed from `func_80049334` on 2026-09-25 (tools/rename.py). Address 0x80049334.
 
@@ -24,7 +26,7 @@ typedef struct RecPick {
     s16 sub;
 } RecPick;
 
-Rec1C *ResolveCinematicChannel(s32 *countOut, RecPick pick) {
+Rec1C *GetSpecialDayOrEventRecord(s32 *countOut, RecPick pick) {
     s32 count;
     Rec1C *rec;
     if (pick.group >= 0) {
@@ -54,6 +56,6 @@ the value's register swapped (v0/v1) -> one assignment of a ternary.
 
 ## Naming
 
-- **Name:** `ResolveCinematicChannel`
+- **Name:** `GetSpecialDayOrEventRecord`
 - **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
 - **Evidence:** its one caller, GameApplication__StartCinematicStream, uses the return value as the cinematic's stream group id, resolved from the DreamSys's own bank/entry pick; matches exactly.

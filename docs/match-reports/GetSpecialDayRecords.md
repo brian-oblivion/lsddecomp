@@ -45,4 +45,4 @@ Rec1C *GetSpecialDayRecords(s32 *countOut, s32 n) {
 
 - **Name:** `GetSpecialDayRecords`
 - **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
-- **Evidence:** used by both ResolveCinematicChannel (bank/entry resolve) and GetGraphRoomStreamChannel with a bank id `n`; base 0x23E, stride 6 records, matches both callers' own naming.
+- **Evidence:** used by both GetSpecialDayOrEventRecord (bank/entry resolve) and GetGraphRoomStreamChannel with a bank id `n`; base 0x23E, stride 6 records, matches both callers' own naming.

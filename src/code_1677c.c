@@ -72,7 +72,7 @@ extern s32 GetGraphRoomStreamChannel(s32 *out, s32 a1, s32 a2); /* psyq_memset.s
 /* code_39094.c: same "write to *out, return a separate value" shape as
  * GetAsmkMovie/PickOpeningMovie/GetGraphRoomStreamChannel. */
 extern s32 GetEndingMovie(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
-extern s32 ResolveCinematicChannel(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
+extern s32 GetSpecialDayOrEventRecord(s32 *out, s32 packedBankEntry); /* psyq_memset.s: resolves a packed
     {bank; entry} CinematicCall (low 16 bits = bank, high 16 = entry) to a channel index written
     to *out (-1 if unresolved); the packing must zero-extend both halves before combining
     (retail loads them with lhu, not lh) since the result is bitwise-composed, not a value read
@@ -345,7 +345,7 @@ s32 GameApplication__PollStatusObj(GameApplication *self) {
 }
 
 /* Reads DreamSys's current cinematic slot, resolves it to a channel index
- * (ResolveCinematicChannel); if that fails (-1), starts a LoaderTask on the fixed
+ * (GetSpecialDayOrEventRecord); if that fails (-1), starts a LoaderTask on the fixed
  * "no cinematic" path; otherwise, if self->config->playStreams gates it, starts a
  * StreamTask on the resolved channel. Either branch finishes by starting
  * whichever task it built; if neither branch runs, nothing happens. */
@@ -363,7 +363,7 @@ void GameApplication__StartCinematicStream(GameApplication *self) {
     TaskCore *task;
 
     cc = self->dreamSys->methods->getCinematic(self->dreamSys);
-    groupId = ResolveCinematicChannel(&chanBuf.chan, (u16)cc.bank | ((u32)(u16)cc.entry << 16));
+    groupId = GetSpecialDayOrEventRecord(&chanBuf.chan, (u16)cc.bank | ((u32)(u16)cc.entry << 16));
     SetActiveDataSourceDriverMode(0, 0, 0);
 
     if (chanBuf.chan != -1) {
