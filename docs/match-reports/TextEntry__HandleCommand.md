@@ -254,3 +254,19 @@ call site)."
   AttachTarget/HandleCommand, class_3bb8c_j's ToggleAltCommands); slot
   +0x098 `toggleAltCommands` and `TextEntry__ToggleActOnHeld` would follow
   (`toggleActOnHeld`). Evidence: the table above.
+
+## Round 98: proposals applied
+
+- slot +0x060 `notifyTarget` -> `playSound` (prototype `arg1` -> `tone`):
+  its occupant is TextEntry__PlaySound, `playTone(target, tone, 96, 96)` on
+  the attached VabStreamObj; this body calls it with `1 << 4` on accept and
+  cancel, SetCursorPos/SetCharAt with 0.
+- field +0x020 `altCommands` -> `actOnHeld`: every arrow case below runs on
+  PAD_EVENT_PRESSED when it is 0 and on PAD_EVENT_HELD when it is set;
+  AttachTarget zeroes it.
+- slot +0x098 `toggleAltCommands` -> `toggleActOnHeld`, occupant renamed by
+  rename.py to TextEntry__ToggleActOnHeld (`actOnHeld ^= 1`); SELECT's press
+  calls it.
+
+Accessors were the compiler's error list (class_3bb8c_i, class_3bb8c_j);
+zero bytes changed.
