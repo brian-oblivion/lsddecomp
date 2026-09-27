@@ -32,11 +32,6 @@
 #include "CdDriver.h"
 #include "DrawSystem.h"
 
-/* CdDriver, its table and its methods are include/CdDriver.h's (track 4,
- * round 88): the per-call-site views this unit declared (Obj6D4E8_C80,
- * Obj6D4E8_D70, Obj6D4E8_282AC, and the table views Methods6D4E8_C80 /
- * Methods6D4E8_80EC) were that one class. */
-
 extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
 extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
 
