@@ -1329,6 +1329,16 @@
           "note": "Premium head, cap 5, rolling slots. Types (all Opus, three names sampled each): Class865C8 -> DayTask (B; one DreamSys startDay/endDay pair per day, init's result drives PollStatusObj's cinematic/graph-room branch), code_179d8_k onto libsnd's ProgAtr/VagAtr/SsMarkCallbackProc (AdsrFields, DataEntryLocals; Sony's three-argument callback closed ContNrpn1 77/77, library C), class_3bb8c.h's 13 (MATRIX, DrawSystem, TextRow, VabStreamObj, TitleMenu, TaskCoreTarget views retired; DreamSaveBlock B, McDevicePath, SplitCoord2, StyleConfig B), code_2864's eight all Sony's libgte/libgs types (+ GsBG). ViewportOt -> GsOT NOT done: Viewport.h cannot include <libgs.h> past TimImage.h/TileMap.h/TileAtlas.h/code_2cc8c_d.c's Sony re-declarations; plan revision 32 ranks those first and flags ViewportOt --after them. Head: D_800902E8 -> _ss_score, EntityMoodRow nearTolerance, flag DrawNode.",
           "round": 94,
           "runners": 5
+        },
+        {
+          "attempts": 7,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 7,
+          "model": "opus",
+          "note": "Premium head, cap 5, rolling slots; three names sampled per job. Sony headers: class_16334.h onto <libetc.h> (Pad ctor's arg1 -> s32 mode, Sony's PadInit), TileAtlas.h/TileMap.h/TimImage.h onto GsCELL/GsMAP/GsIMAGE in one job (code_33808 includes all three; plan revision 33 groups headers sharing an includer), code_d294.h onto libgte/libgs (its three types -> TmdBox/TmdHull). Types: code_2864's DrawNode view retired for SceneNode and its subclasses (BgLayer 0x54, BoxFill 0x64, ScreenSprite 0x144, Sprite 0x44), code_fa50's eight (TmdModel/TmdObject/TMD_P_TF3/TmdHull; BoxCorners, BoxList, Ray, VectorOrBox), code_33808's seven (ResourceSource, ModelDataHeader, TimBlockHeader, ...), code_179d8_j_b onto libsnd (VagAtr/ProgAtr/VabHdr; new include/SsScore.h for _ss_score's 0xAC record). Sprite.h's struct GsIMAGE tag left for its own job (sonyheaders.py now lists tag spellings).",
+          "round": 95,
+          "runners": 7
         }
       ],
       "status": "auto"
@@ -1388,6 +1398,16 @@
           "note": "Opus polish, all accepted after sampling five each: Entity_b (EntityEffect/DREAM_COLOR_PINK/SOUND_CUE_STOP reuse, 3421..3541 window, nearTolerance proposal applied by head), Entity_g re-send (D_ 5 -> 0, ROTATION_ZPLUS4 was a misdecode, now ROTATION_YAW_PLUS4), code_fa50 re-send (magic 97 -> 18: libgs GPU_COM_*, TMD_P_* sizeof, GsTMDFlagGRD; unit history restored to New_TmdModel.md).",
           "round": 94,
           "runners": 3
+        },
+        {
+          "attempts": 6,
+          "calibration": true,
+          "date": "2026-09-27",
+          "matches": 6,
+          "model": "opus",
+          "note": "Opus polish, all six accepted after five samples each: Entity_f (existing enums only), class_3bb8c (STAGE_* geometry, ChunkNeighbour, StageMapEvent; Sony GsLinkObject4), class_3bb8c_l (PadButton/PAD_EVENT_* from libetc's mask order, gObjM* data), code_2cc8c_d (onto Sony's headers, the last blocker of ViewportOt; FrameClockEvent), class_3bb8c_g and class_3bb8c_f (both added TaskObjFState despite the head's ruling; charlie's kept, echo's dropped at merge). Head: DRAWSYSTEM_EVENT_VSYNC at three sites, StampSaveTitleFileLetter char* prototype, TaskObjF__AbortFromState.",
+          "round": 95,
+          "runners": 6
         }
       ],
       "status": "auto",
@@ -1423,6 +1443,16 @@
           "note": "Opus head (not premium), cap 5, 2 Opus files runners on the only two ready jobs. alpha: code_179d8_b+n+g merged on rodata proof -> libcd_bios; code_179d8_c_b -> libsnd_ssinit_libapi_counter (content splits it between _SsSeqCalledTbyT_1per2 and SetRCnt, a new carve unitfile.py cannot make and the binary does not force: PARKED, reason in banner); code_179d8_f_b -> libspu_s_ih; code_2cc8c_e0 -> libgs_gs_101. bravo: code_2cc8c_e1 -> libgs_gs_124; class_3bb8c_v -> libcard_card_clear, which the head renamed libcard_card (round 74 identified the object, libcard/card@3.3, by shape; the banner said unknown). Head: func_8002B3E4 -> CD_set_test_parmnum (alpha's proposal; round 79's tie settled by position in the merged file); stale banner/yaml comments fixed. All steps byte-identical, typeviews 0 new, nonmatching green. Track 8 now 0 ready: every remaining region waits on track 6/7, which wait on the premium setup items.",
           "round": 90,
           "runners": 2
+        },
+        {
+          "attempts": 1,
+          "calibration": false,
+          "date": "2026-09-27",
+          "matches": 1,
+          "model": "opus",
+          "note": "code_fa50 -> TmdModel.c: both edges are placed Sony objects (libgte/ratan, libgs/gs_105), no rodata crossing inside, one class's methods.",
+          "round": 95,
+          "runners": 1
         }
       ],
       "status": "auto"
