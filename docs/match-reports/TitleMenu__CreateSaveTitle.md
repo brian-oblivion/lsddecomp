@@ -32,7 +32,7 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, Arg1DB18_3bb8c_d *arg1)
         return;
     }
     if (self->unkA4->methods->slot1AC(self->unkA4)) {
-        strcpy((char *)D_8008AA18 + 0x18, (char *)D_8008AA14);
+        strcpy((char *)D_8008AA18 + 0x18, (char *)sSaveTitleBlanks);
         StampSaveTitleFileLetter((s32)D_8008AA18, 0);
     }
     size = strlen((char *)D_8008AA18);
@@ -57,7 +57,7 @@ SLPS_015.56`.
   `beqz $s3` gate at function entry.
 - `self->unkA4->methods->slot1AC(self->unkA4)` -- the SAME slot this
   round's `TitleMenu__SaveToCard` established, reused verbatim.
-- Inside that gate: `strcpy((char *)D_8008AA18 + 0x18, (char *)D_8008AA14)`
+- Inside that gate: `strcpy((char *)D_8008AA18 + 0x18, (char *)sSaveTitleBlanks)`
   then `StampSaveTitleFileLetter(D_8008AA18, 0)` -- `StampSaveTitleFileLetter` is the
   already-canonical `extern s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1);`
   (`include/class_3bb8c.h`); `D_8008AA18` (`void *`) converts to its `s32`
@@ -104,7 +104,7 @@ SLPS_015.56`.
   (slot4/slot4C/slotB8 at 0x004/0x04C/0x0B8) -- suggestive that `nameField` is
   the SAME real class those units call `Unk64Elem`/`FieldM7C`, consistent
   with `New_TextRow`'s return value landing there.
-- New extern `D_8008AA14` (`void *`, VALUE-of `%gp_rel`, same pattern as
+- New extern `sSaveTitleBlanks` (`void *`, VALUE-of `%gp_rel`, same pattern as
   `sSaveFileName`/`D_8008AA18`).
 - Expanded comment on `D_8008AA18`/`sSaveFileName`: this function proves
   `D_8008AA18`'s RUNTIME value must be a writable buffer (it is both a

@@ -144,7 +144,7 @@ extern void *D_8008AA24;
 
 /* TitleMenu__CreateSaveTitle's strcpy source for the save title. The ROM
  * image holds 0x80011474, just past sSaveFileName's "BISLPS-01556xxx" string. */
-extern void *D_8008AA14;
+extern void *sSaveTitleBlanks;
 
 /* TaskObjF's init `namePrefix` (TitleMenu__BeginCardAccess): the ROM image
  * points it at the "BISLPS-01556" string in D_80011434. */
