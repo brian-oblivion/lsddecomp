@@ -93,7 +93,7 @@ struct StreamTaskInitData {
 struct StreamTaskMethods {
     TASKCORE_SLOTS(StreamTask, (StreamTask * self, TaskCoreTarget *target, char *soundBankPath,
                                 BasicClass *sound, StreamTaskInitData *initData));
-    /* +0x124 */ void (*setUnkC4)(StreamTask *self, s32 value);     /* StreamTask__SetUnkC4 */
+    /* +0x124 */ void (*setUnkC4)(StreamTask *self, s32 value);     /* StreamTask__SetKeepActive */
     /* +0x128 */ void (*setLoopCount)(StreamTask *self, s32 count); /* StreamTask__SetLoopCount */
     /* +0x12C */ void (*setSkipOnConfirm)(StreamTask *self, s32 enable); /* StreamTask__SetSkipOnConfirm; code_1677c passes 0 */
     /* +0x130 */ void (*setUnkD0)(StreamTask *self, s32 value); /* StreamTask__SetUnkD0 */
@@ -142,7 +142,7 @@ void StreamTask__OnPadNext(StreamTask *self);
 void StreamTask__NoOpSlot88(void);
 void StreamTask__NoOpSlot8C(void);
 void StreamTask__RefreshViewValue(StreamTask *self);
-void StreamTask__SetUnkC4(StreamTask *self, s32 value);
+void StreamTask__SetKeepActive(StreamTask *self, s32 value);
 void StreamTask__SetLoopCount(StreamTask *self, s32 count);
 void StreamTask__SetSkipOnConfirm(StreamTask *self, s32 enable);
 void StreamTask__SetUnkD0(StreamTask *self, s32 value);

@@ -137,7 +137,7 @@ void StreamTask__RefreshViewValue(StreamTask *self) {
     }
 }
 
-void StreamTask__SetUnkC4(StreamTask *self, s32 value) {
+void StreamTask__SetKeepActive(StreamTask *self, s32 value) {
     self->unkC4 = value;
 }
 

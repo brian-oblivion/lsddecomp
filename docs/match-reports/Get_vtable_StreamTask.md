@@ -17,7 +17,7 @@ methods pointer at object offset 0, respectively.
 
 `gStreamTaskMethods` (`tools/classtable.py gStreamTaskMethods`, 77 slots) is this unit's
 biggest single piece of context this round: five of its slots
-(`+0x124`..`+0x134`) are the plain setters `StreamTask__SetUnkC4`.."`7C`", and
+(`+0x124`..`+0x134`) are the plain setters `StreamTask__SetKeepActive`.."`7C`", and
 several more (`+0x00C`, `+0x040`, `+0x044`, `+0x080`, `+0x084`) are other
 functions matched in this same batch (`StreamTask__Finalize`, `StreamTask__Reset`,
 `StreamTask__Init`, `StreamTask__OnPadPrev`, `StreamTask__OnPadNext`) -- see their own reports.

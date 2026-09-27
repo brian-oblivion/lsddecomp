@@ -8,7 +8,7 @@
 
 ## What it does
 
-Resets the five fields the `StreamTask__SetUnkC4`.."`7C`" setters (see that
+Resets the five fields the `StreamTask__SetKeepActive`.."`7C`" setters (see that
 report) write individually: `self->unkC4=0; unkC8=-1; unkCC=1; unkD0=0;
 unkD4=1;`. Slot `+0x040` of `gStreamTaskMethods` (`Get_vtable_StreamTask`'s report), so
 presumably an "init"/"reset" method for this `StreamTaskObj` class.
@@ -48,7 +48,7 @@ with the setters' report).
 
 ## Proposed learning
 
-None new beyond `StreamTask__SetUnkC4`'s.
+None new beyond `StreamTask__SetKeepActive`'s.
 
 ## Naming
 

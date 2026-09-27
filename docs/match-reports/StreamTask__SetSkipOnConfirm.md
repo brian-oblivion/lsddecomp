@@ -9,7 +9,7 @@
 ## What it does
 
 Plain setter: `self->unkCC = value;`. Third of the run of five described in
-`StreamTask__SetUnkC4`'s report (same class, table slot `+0x12C`); see that report
+`StreamTask__SetKeepActive`'s report (same class, table slot `+0x12C`); see that report
 for the shared context.
 
 ## Derivation
@@ -29,16 +29,16 @@ Matched first attempt.
 
 ## New struct/header knowledge
 
-See `StreamTask__SetUnkC4`'s report — same header, `include/code_2c054.h`.
+See `StreamTask__SetKeepActive`'s report — same header, `include/code_2c054.h`.
 
 ## Proposed learning
 
-None beyond `StreamTask__SetUnkC4`'s.
+None beyond `StreamTask__SetKeepActive`'s.
 
 ## Naming
 
 **StreamTask__SetSkipOnConfirm** -- tier A. Plain setter, third of the run of
-five described in `StreamTask__SetUnkC4`'s report; same convention.
+five described in `StreamTask__SetKeepActive`'s report; same convention.
 
 ## Track 4 (2026-09-26, round 87)
 

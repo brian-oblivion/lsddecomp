@@ -1,4 +1,6 @@
-# StreamTask__SetUnkC4
+# StreamTask__SetKeepActive
+
+> Renamed from `StreamTask__SetUnkC4` on 2026-09-27 (tools/rename.py). Address 0x8003be5c.
 
 > Renamed from `StreamTaskObj__SetUnkC4` on 2026-09-26 (tools/rename.py). Address 0x8003be5c.
 
@@ -9,7 +11,7 @@
 ## What it does
 
 A plain setter: `self->unkC4 = value;`. One of a run of five consecutive
-9-line, 2-instruction `.s` bodies (`StreamTask__SetUnkC4`/`64`/`6C`/`74`/`7C`) that
+9-line, 2-instruction `.s` bodies (`StreamTask__SetKeepActive`/`64`/`6C`/`74`/`7C`) that
 turned out to be ordinary field setters, not BIOS trampolines or anything
 toolchain-blocked (checked first per the runner brief: no `jr $t2`, no
 `gp_rel`, no `addiu $at,$at,%lo`).
@@ -32,7 +34,7 @@ jr   $ra
 ```
 
 ```c
-void StreamTask__SetUnkC4(StreamTaskObj *self, s32 a1) {
+void StreamTask__SetKeepActive(StreamTaskObj *self, s32 a1) {
     self->unkC4 = a1;
 }
 ```
@@ -61,7 +63,7 @@ cheaply (all five sit in five consecutive table slots).
 
 ## Naming
 
-**StreamTask__SetUnkC4** -- tier A. Plain single-field setter (one of a
+**StreamTask__SetKeepActive** -- tier A. Plain single-field setter (one of a
 run of five identical-shape setters at consecutive table slots
 `+0x124`..`+0x134`); `Class__SetUnkNN` convention, same precedent as
 `StreamTask__SetFrameBound`.
