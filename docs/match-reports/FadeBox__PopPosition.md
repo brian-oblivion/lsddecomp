@@ -76,3 +76,7 @@ is in New_FadeBox.md's Track 6 section. The method's own name was kept: it
 already says what the body does. renametype.py rewrote the old class name in
 this report's earlier history too (known, pending an operator decision).
 
+
+## Track 7 (round 100, charlie)
+
+- Locals `t0`/`t1` -> `x`/`y`: the saved position being restored.

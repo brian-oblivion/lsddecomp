@@ -2,20 +2,26 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include "FrameClock.h"
 #include "TaskViewport.h"
 
 /*
- * code_2cc8c_e -- FadeBox's methods (include/FadeBox.h: a BoxFill whose
- * colour ramps a step per update, the screen fade), New_FadeBox to
- * GetFadeBoxMethods, then BoxFill's allocator, ctor and Reset
- * (include/BoxFill.h: a GsBOXF screen rectangle; the rest of its methods
- * open code_2cc8c_f.c).
+ * code_2cc8c_e -- the screen fade, and the first methods of the box it draws.
+ *
+ * FadeBox (include/FadeBox.h), New_FadeBox to GetFadeBoxMethods: a BoxFill
+ * whose colour steps once per FrameClock tick away from a channel mask's
+ * colour (gFadeBoxMaskColors) or up from black (gFadeBoxBlackColors), with
+ * semi-transparency on, and notifies its parents when the ramp runs out.
+ * Viewport's fadeBox and Entity's are the two users.
+ *
+ * Then BoxFill's allocator, ctor and Reset (include/BoxFill.h: a GsBOXF
+ * screen rectangle); the rest of BoxFill's methods open code_2cc8c_f.c.
  */
 
 FadeBox *New_FadeBox(void *size, s32 channels, s32 pri) {
     FadeBox *self;
 
-    self = BMemPMgrAlloc(0xA0);
+    self = BMemPMgrAlloc(sizeof(FadeBox));
     if (self != NULL) {
         GetFadeBoxMethods()->ctor(self, size, channels, pri);
         return self;
@@ -29,9 +35,9 @@ void FadeBox__FadeBox(FadeBox *self, void *size, s32 channels, s32 pri) {
 
     base = GetBoxFillMethods();
     if (channels != 0) {
-        color = &D_8006EA90[channels * 3];
+        color = &gFadeBoxMaskColors[channels * 3];
     } else {
-        color = D_8006EAA8;
+        color = gFadeBoxBlackColors;
     }
     base->ctor((BoxFill *)self, size, color, pri);
     self->methods = GetFadeBoxMethods();
@@ -40,34 +46,34 @@ void FadeBox__FadeBox(FadeBox *self, void *size, s32 channels, s32 pri) {
 
 void FadeBox__Reset(FadeBox *self, s32 channels) {
     self->defaultChannels = channels;
-    self->state = 0;
-    self->step = 0xA;
+    self->state = FADEBOX_STATE_IDLE;
+    self->step = FADEBOX_DEFAULT_STEP;
     self->channels = 0;
-    self->unk7C = 0;
+    self->mode = 0;
     self->methods->setDisplay(self, 0);
     self->methods->setSemiTransOn(self, 0);
     self->altMode = 0;
 }
 
 void FadeBox__Update(FadeBox *self, void *sender, s32 event) {
-    s32 old;
+    s32 ticks;
 
-    if (event != 2) {
+    if (event != FRAMECLOCK_EVENT_RUNNING) {
         return;
     }
-    old = self->ticksLeft;
-    self->ticksLeft = old - 1;
-    if (old > 0) {
-        if (self->unk7C == 9) {
+    ticks = self->ticksLeft;
+    self->ticksLeft = ticks - 1;
+    if (ticks > 0) {
+        if (self->mode == FADEBOX_MODE_HOLD) {
             return;
         }
-        if (self->channels & 4) {
+        if (self->channels & FADEBOX_CHANNEL_R) {
             self->color[0] += (u8)self->step;
         }
-        if (self->channels & 2) {
+        if (self->channels & FADEBOX_CHANNEL_G) {
             self->color[1] += (u8)self->step;
         }
-        if (self->channels & 1) {
+        if (self->channels & FADEBOX_CHANNEL_B) {
             self->color[2] += (u8)self->step;
         }
     } else {
@@ -81,35 +87,35 @@ void FadeBox__SetStep(FadeBox *self, s32 step) {
 
 /* MATCHING: both StartFade functions pass their own arguments on to
  * configure; a `(self)`-only call reorders the instructions. */
-void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 arg3) {
-    s32 idx;
+void FadeBox__StartFadeDown(FadeBox *self, BasicClass *source, s32 channels, s32 mode) {
+    s32 mask;
 
-    if (self->state != 0) {
+    if (self->state != FADEBOX_STATE_IDLE) {
         return;
     }
-    idx = self->methods->configure(self, source, channels, arg3);
-    self->methods->setColor(self, 1, &D_8006EA90[idx * 3]);
-    self->state = 1;
+    mask = self->methods->configure(self, source, channels, mode);
+    self->methods->setColor(self, 1, &gFadeBoxMaskColors[mask * 3]);
+    self->state = FADEBOX_STATE_FADING_DOWN;
     self->step = -self->step;
 }
 
-void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 arg3) {
-    if (self->state != 0) {
+void FadeBox__StartFadeUp(FadeBox *self, BasicClass *source, s32 channels, s32 mode) {
+    if (self->state != FADEBOX_STATE_IDLE) {
         return;
     }
-    channels = self->methods->configure(self, source, channels, arg3);
+    channels = self->methods->configure(self, source, channels, mode);
     if (self->altMode != 0) {
         self->ticksLeft--;
     } else {
-        self->methods->setColor(self, 1, &D_8006EAA8[channels * 3]);
+        self->methods->setColor(self, 1, &gFadeBoxBlackColors[channels * 3]);
     }
-    self->state = 2;
+    self->state = FADEBOX_STATE_FADING_UP;
 }
 
-s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3) {
+s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 mode) {
     FadeBoxMethods *methods;
     s32 rate;
-    s32 q1, q2;
+    s32 ticks, cut;
 
     methods = self->methods;
     if (channels < 0) {
@@ -117,27 +123,26 @@ s32 FadeBox__Configure(FadeBox *self, BasicClass *source, s32 channels, s32 arg3
     } else {
         self->defaultChannels = channels;
     }
-    rate = 1;
+    rate = BOXFILL_SEMITRANS_RATE(GsAONE);
     if (channels != 0) {
         self->channels = channels;
     } else {
-        rate = 2;
-        self->channels = 0xF;
+        rate = BOXFILL_SEMITRANS_RATE(GsATWO);
+        self->channels = FADEBOX_CHANNELS_ALL;
     }
+    /* MATCHING: retail stores the mask twice; one store drops four instructions. */
     self->channels = channels;
     if (channels == 0) {
-        self->channels = 0xF;
+        self->channels = FADEBOX_CHANNELS_ALL;
     }
-    q1 = 0x100 / self->step;
-    self->unk7C = arg3;
-    self->ticksLeft = q1;
+    ticks = FADEBOX_RAMP / self->step;
+    self->mode = mode;
+    self->ticksLeft = ticks;
     if (self->altMode != 0) {
-        q2 = q1 / self->divisor;
-        self->ticksLeft = q1 - (s16)q2;
+        cut = ticks / self->divisor;
+        self->ticksLeft = ticks - cut;
     }
-    q2 = self->mask;
-    q2 = q2 / self->ticksLeft;
-    self->maskPerTick = q2;
+    self->maskPerTick = self->mask / self->ticksLeft;
     methods->addChild(self, source);
     methods->setSemiTransOn(self, 1);
     methods->setSemiTransRate(self, rate);
@@ -150,20 +155,20 @@ void FadeBox__Stop(FadeBox *self, BasicClass *source) {
     s32 event;
 
     methods = self->methods;
-    if (self->state == 0) {
+    if (self->state == FADEBOX_STATE_IDLE) {
         return;
     }
-    if (self->state == 1) {
-        event = 5;
+    if (self->state == FADEBOX_STATE_FADING_DOWN) {
+        event = FADEBOX_EVENT_FADE_DOWN_DONE;
         if (self->altMode == 0) {
             methods->setDisplay(self, 0);
             methods->setSemiTransOn(self, 0);
         }
     } else {
-        event = 6;
+        event = FADEBOX_EVENT_FADE_UP_DONE;
         if (self->altMode != 0) {
-            if (self->channels == 0xF) {
-                methods->setColor(self, 1, D_8006EAA8);
+            if (self->channels == FADEBOX_CHANNELS_ALL) {
+                methods->setColor(self, 1, gFadeBoxBlackColors);
             }
             methods->setSemiTransOn(self, 0);
         }
@@ -172,15 +177,15 @@ void FadeBox__Stop(FadeBox *self, BasicClass *source) {
     if (self->step < 0) {
         self->step = -self->step;
     }
-    self->state = 0;
+    self->state = FADEBOX_STATE_IDLE;
     methods->notifyParents(self, event);
 }
 
 void *FadeBox__GetColor(FadeBox *self) {
-    if (self->channels == 0xF) {
-        return D_8006EAA8;
+    if (self->channels == FADEBOX_CHANNELS_ALL) {
+        return gFadeBoxBlackColors;
     }
-    return &D_8006EA90[self->channels * 3];
+    return &gFadeBoxMaskColors[self->channels * 3];
 }
 
 /* MATCHING: both position pairs are copied as whole structs; the block
@@ -197,12 +202,12 @@ void FadeBox__PushPosition(FadeBox *self, BoxFillSize *size, BoxFillPos *pos) {
 }
 
 void FadeBox__PopPosition(FadeBox *self) {
-    s32 t0, t1;
+    s32 x, y;
 
-    t0 = self->savedPosX;
-    t1 = self->savedPosY;
-    self->posX = t0;
-    self->posY = t1;
+    x = self->savedPosX;
+    y = self->savedPosY;
+    self->posX = x;
+    self->posY = y;
     /* MATCHING: without it GCC hoists the savedW/savedH loads above the
      * posX/posY stores. */
     __asm__("");
@@ -222,7 +227,7 @@ FadeBoxMethods *GetFadeBoxMethods(void) {
 BoxFill *New_BoxFill(void *size, void *color, s32 pri) {
     BoxFill *self;
 
-    self = BMemPMgrAlloc(0x6C);
+    self = BMemPMgrAlloc(sizeof(BoxFill));
     if (self != NULL) {
         GetBoxFillMethods()->ctor(self, size, color, pri);
         return self;
@@ -249,8 +254,8 @@ void BoxFill__Reset(BoxFill *self, BoxFillSize *size, void *color, s32 pri) {
     self->boxH = size->h;
     methods = self->methods;
     if (color == NULL) {
-        color = D_8008A924;
+        color = gBoxFillDefaultColor;
     }
     methods->setColor(self, 1, color);
-    self->methods->setMask(self, 0xD);
+    self->methods->setMask(self, 13);
 }

@@ -46,3 +46,11 @@ halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
 became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
 BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
 its caller in TaskViewport passes an `s32 size[2]`).
+
+## Track 7 (round 100, charlie)
+
+### History moved from include/BoxFill.h
+
+The banner's note that FadeBox was "unified in include/FadeBox.h, round 87"
+now lives here: FadeBox, BoxFill's one subclass, got its single header in
+round 87 (track 4). The banner keeps the pointer to the header.

@@ -29,7 +29,7 @@
  * Ctor chain: BoxFill__BoxFill calls GetSceneNodeMethods()->ctor first, so
  * the id parent (0x4) is the ctor-chain parent. One class derives from it,
  * FadeBox (gFadeBoxMethods, 0x164, a colour fade over the box; unified in
- * include/FadeBox.h, round 87), whose ctor calls this one's first
+ * include/FadeBox.h), whose ctor calls this one's first
  * (FadeBox__FadeBox: GetBoxFillMethods()->ctor).
  *
  * Overrides whose parameter list differs from the inherited slot keep the
@@ -64,6 +64,10 @@ typedef struct BoxFillPos BoxFillPos;
 #define BOXFILL_ATTR_RATE_SHIFT 28 /* semitransparency rate, 2 bits */
 #define BOXFILL_ATTR_ALON_SHIFT 30 /* GsALON: semitransparency on */
 #define BOXFILL_ATTR_DOFF_SHIFT 31 /* GsDOFF: display off */
+
+/* setSemiTransRate's argument: libgs's GsAZERO..GsATHREE rate (GsAONE adds
+ * the box to what is behind it, GsATWO subtracts it), unshifted. */
+#define BOXFILL_SEMITRANS_RATE(gsRate) ((gsRate) >> BOXFILL_ATTR_RATE_SHIFT)
 
 /* BoxFill's class id (gBoxFillMethods word +0x000). Two nibbles, so
  * `(header & 0xFF) == BOXFILL_CLASS_ID` is its is-kind-of test, true for
@@ -133,7 +137,7 @@ typedef struct BoxFillRgb {
     /* +0x05E */ s16 boxY;         /* GsBOXF.y */                                                  \
     /* +0x060 */ u16 boxW;         /* GsBOXF.w: Reset and setSize (FadeBox reads it lhu) */    \
     /* +0x062 */ u16 boxH;         /* GsBOXF.h */                                                  \
-    /* +0x064 */ u8 color[3];      /* GsBOXF.r, g, b: setColor (Reset's default D_8008A924) */     \
+    /* +0x064 */ u8 color[3];      /* GsBOXF.r, g, b: setColor (Reset's default gBoxFillDefaultColor) */     \
     /* +0x067 */ u8 pad67;                                                                         \
     /* +0x068 */ s32 mask          /* setMask. The object is 0x6C bytes (New_BoxFill) */
 /* clang-format on */
