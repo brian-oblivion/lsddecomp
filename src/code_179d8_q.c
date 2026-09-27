@@ -37,30 +37,21 @@
  * Obj6D4E8_D70, Obj6D4E8_282AC, and the table views Methods6D4E8_C80 /
  * Methods6D4E8_80EC) were that one class. */
 
-/* +0x04 of whatever object a still-uninitialized local $s2 points at on this
- * path -- see the CdDriver__RequestLoadFile report for why that local is
- * never assigned. Only the one field this store touches is typed, and the
- * object's identity is unknowable from here, so the name stays a
- * placeholder. */
-typedef struct UnkC80 UnkC80;
-
-struct UnkC80 {
-    u8 pad00[0x04];
-    /* +0x04 */ s32 unk04;
-};
-
 extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
 extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
 
 void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
-    UnkC80 *s2;
+    s32 *unassigned; /* never assigned: see the store below */
     s32 idx;
 
     LockCd();
 
     if (name != NULL) {
         if (gCdAsyncEnabled != 0) {
-            s2->unk04 = 1;
+            /* MATCHING: retail stores 1 through an unassigned callee-saved
+             * register (whatever the caller left in $s2), a bug in the
+             * original; which object it meant to reach is unknowable. */
+            unassigned[1] = 1;
             idx = FindCdFileIndex(name);
             EnqueueCdRequest(self, idx, CD_OP_LOAD_FILE, 0, 0);
         } else {

@@ -226,3 +226,20 @@ views; proposing rather than renaming, since those units are not mine:
 
 
 Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__RequestLoadFile` -> `CdDriver__RequestLoadFile` by rename.py.
+
+## Round 96 (track 6, echo): `UnkC80` removed
+
+`UnkC80` existed only to type the one store through the never-assigned `$s2`
+(above). No object identity is recoverable from a register the function never
+writes, so no struct name could say what it is; a name would claim an object
+nobody has shown exists. The local is now `s32 *unassigned` and the store
+`unassigned[1] = 1;` (+0x04, the same `sw $v0, 0x4($s2)`), with a one-line
+MATCHING comment. Byte-exact; cc1 still allocates `$s2`. The `might be used
+uninitialized` warning renamed with the local (`s2` -> `unassigned`), so
+`config/typeviews-warnings.txt` was rewritten with `--baseline` in the same
+commit.
+
+Open hypothesis, not applied: `CdRequestNode` has an `s32` at +0x04 (`unk4`,
+zeroed at allocation, nonzero ORs the owner's flags bit 0), so the original may
+have meant `node->unk4 = 1` on the node EnqueueCdRequest is about to allocate.
+Nothing in this function reaches such a node, so it stays a hypothesis.
