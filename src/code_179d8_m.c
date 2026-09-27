@@ -729,7 +729,7 @@ INCLUDE_ASM("asm/nonmatchings/code_179d8_m", SpuVmFlush);
  * D_8008EA24 base pointer instead. */
 /* libsnd's _svm_pg (pinned at this address): the current VAB's program
  * attributes. */
-extern ProgAtr *D_8008E968;
+extern ProgAtr *_svm_pg;
 
 extern u8 D_8008EA0C;
 extern u8 D_8008EA0E;
@@ -774,7 +774,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
         return -1;
     }
 
-    slot = &D_8008E968[a2];
+    slot = &_svm_pg[a2];
     D_8008EA22 = (s16)a0;
     D_8008EA0E = (u8)a3;
     D_8008EA0F = 0;

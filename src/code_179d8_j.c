@@ -29,7 +29,7 @@
  * SpuVmSetVol on moved to `src/libsnd_vm_vol_ut_key_ut_keyv.c`.
  *
  * THE `SlotE968` LOCAL VIEW LEFT WITH THEM.  Those four accessors were this
- * file's only readers of `D_8008E968`, so the typedef and the extern went with
+ * file's only readers of `_svm_pg`, so the typedef and the extern went with
  * the deletion rather than being kept as dead declarations.  code_179d8_i.c
  * kept its own independent reading of the same table under a different name
  * (`Entry8E968`), per the project's multiple-local-views convention -- that is

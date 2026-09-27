@@ -288,9 +288,9 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
         D_8008EA11 = 0x7F - ((p5 << 6) / p6);
     }
 
-    D_8008EA16 = D_8008E968[p1].unk1;
-    D_8008EA17 = D_8008E968[p1].unk4;
-    D_8008EA0C = D_8008E968[p1].unk0;
+    D_8008EA16 = _svm_pg[p1].unk1;
+    D_8008EA17 = _svm_pg[p1].unk4;
+    D_8008EA0C = _svm_pg[p1].unk0;
 
     rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->unk0;
@@ -523,7 +523,7 @@ one" check)
   to a dedicated far label, full if/else inversion. All three produced
   byte-identical output to each other for this specific branch -- a
   genuinely exhausted axis.
-- Struct-pointer caching vs. per-access re-indexing (`D_8008E968[p1].x`
+- Struct-pointer caching vs. per-access re-indexing (`_svm_pg[p1].x`
   written three separate times) for the `SlotE968` block: no effect on
   the missing-nop residue either way.
 - `volatile`-qualifying the struct POINTER TARGETS (`slot`, `rec`): zero
@@ -719,7 +719,7 @@ body needs:
   for this file's own two remaining stalls, which both WRITE it
   (`D_8008EA22 = 0x21;`). The file's own header comment made this claim;
   it is corrected in this round's edit (see `src/libsnd_vm_vol_ut_key_ut_keyv.c`'s header).
-- The `SlotE968` typedef and `D_8008E968` extern, which round 34 removed
+- The `SlotE968` typedef and `_svm_pg` extern, which round 34 removed
   from the OLD `code_179d8_j.c` (now the front unit) because that unit's own
   four functions using it had all become Sony's `libsnd/vm_prog.o` -- but
   this function (still a stall, still in this family) also uses it, and
@@ -761,7 +761,7 @@ STALL.
 Positioned where it would compile: replacing the `INCLUDE_ASM` for
 `SsUtKeyOn` in `src/libsnd_vm_vol_ut_key_ut_keyv.c`, after `SpuVmSetVol`'s own
 `INCLUDE_ASM` line. Requires (all now present in that file, added this
-round): `extern u16 D_8008EA22;` and the `SlotE968`/`D_8008E968`
+round): `extern u16 D_8008EA22;` and the `SlotE968`/`_svm_pg`
 declarations shown below, alongside the file's existing `RecordE978`,
 `Rec34D994`/`Rec34Byte`/`Rec34Half` families and callee externs.
 
@@ -773,7 +773,7 @@ typedef struct SlotE968 {
     u8 unk4; /* +0x4 */
     u8 pad5[0x10 - 0x5];
 } SlotE968;
-extern SlotE968 *D_8008E968;
+extern SlotE968 *_svm_pg;
 
 s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
 {
@@ -805,7 +805,7 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
         D_8008EA11 = 0x7F - ((p5 << 6) / p6);
     }
 
-    slot = D_8008E968;
+    slot = _svm_pg;
     D_8008EA16 = slot[p1].unk1;
     D_8008EA17 = slot[p1].unk4;
     D_8008EA0C = slot[p1].unk0;
@@ -969,7 +969,7 @@ s32 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, u16 p4, s16 p5, s16 p6)
         D_8008EA11 = 0x7F - ((p5 << 6) / p6);
     }
 
-    slot = D_8008E968;
+    slot = _svm_pg;
     D_8008EA16 = slot[p1].unk1;
     D_8008EA17 = slot[p1].unk4;
     D_8008EA0C = slot[p1].unk0;
@@ -1069,7 +1069,7 @@ addendum (and the head's recovery entry above) both describe it as
 restored, but it was not actually present in the committed file -- this
 function's preserved body cannot compile without it, and the round-36
 gap-check apparently checked the OTHER two declarations (`D_8008EA22`,
-`SlotE968`/`D_8008E968`) but not this one. Fixed once, shared with
+`SlotE968`/`_svm_pg`) but not this one. Fixed once, shared with
 `SsUtKeyOnV`'s identical dependency.
 
 ### Proposed learning
@@ -1139,7 +1139,7 @@ The NON_MATCHING body now stores `_svm_voice[(u8) result].unkNN`; normalized dis
   after: length and instruction sequence unchanged (252/252).
 - `SlotE968` -> Sony's `ProgAtr` (`tones`/`mvol`/`mpan` at +0/+1/+4) and
   `RecordE978` -> Sony's `VagAtr` (`prior mode vol pan center shift min max`
-  at +0..+7, `vag` at +0x16): `D_8008E968`/`D_8008E978` are vmanager's
+  at +0..+7, `vag` at +0x16): `_svm_pg`/`D_8008E978` are vmanager's
   `_svm_pg`/`_svm_tn`, pinned at those addresses. Every staged field's
   offset and width agrees with Sony's layout, and the vag == 0 (no tone) and
   vag == 0xFF (noise) tests read as Sony's field meanings. See SpuVmSetVol.md's Naming for the full evidence.

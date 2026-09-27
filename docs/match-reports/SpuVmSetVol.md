@@ -124,7 +124,7 @@ addressing (below) = the 9-word shortfall, near enough.
 
 **The sibling case proves our body's SHAPE is right and the difference is a
 compiler decision, not a missing construct.** The structurally identical
-`D_8008E968[D_8008D998[i].unk0]` pair -- `.unk1` early, `.unk4` before the
+`_svm_pg[D_8008D998[i].unk0]` pair -- `.unk1` early, `.unk4` before the
 second blend -- is re-derived in full by BOTH compilers: retail 0x80030CB4..
 0x80030CEC is 15 words and our build's is 15 words, instruction for
 instruction. The only difference between the two cases is that the `.unk4`
@@ -197,8 +197,8 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
             if (D_8008D996[i].unk0 == (s16)a0) {
                 s32 t0 = D_8008D99A[i].unk0;
                 if (t0 == (s16)a2 && D_8008D99E[i].unk0 == (s16)a1) {
-                    u8 e968FromD998 = D_8008E968[D_8008D998[i].unk0].unk1;
-                    u8 e968FromT0 = D_8008E968[t0].unk1;
+                    u8 e968FromD998 = _svm_pg[D_8008D998[i].unk0].unk1;
+                    u8 e968FromT0 = _svm_pg[t0].unk1;
                     s32 lvl0;
                     s32 prio;
                     s32 lvl1;
@@ -236,7 +236,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         pan1 = (pan1 * (0x7F - e978d)) / 63;
                     }
 
-                    e968d = D_8008E968[D_8008D998[i].unk0].unk4;
+                    e968d = _svm_pg[D_8008D998[i].unk0].unk4;
                     if (e968d < 0x40) {
                         pan2 = (pan2 * e968d) / 63;
                     } else {
@@ -339,7 +339,7 @@ worth carrying:
 **Restored to `INCLUDE_ASM`**; whole-image oracle green. The revisit is spent.
 The function is better characterised than it has ever been and the next
 attempt has exactly one place to go: the `D_8008E978[D_8008D99C[i].unk0]`
-CSE, worth 14 words, with a proven-correct sibling (the `D_8008E968`/`.unk4`
+CSE, worth 14 words, with a proven-correct sibling (the `_svm_pg`/`.unk4`
 chain) matching instruction-for-instruction two blocks later as the control.
 Do **not** re-sweep `volatile`, and do not re-open the register-identity
 reading.
@@ -475,8 +475,8 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
             if (D_8008D996[i].unk0 == (s16)a0) {
                 s32 t0 = D_8008D99A[i].unk0;
                 if (t0 == (s16)a2 && D_8008D99E[i].unk0 == (s16)a1) {
-                    u8 e968FromD998 = D_8008E968[D_8008D998[i].unk0].unk1;
-                    u8 e968FromT0 = D_8008E968[t0].unk1;
+                    u8 e968FromD998 = _svm_pg[D_8008D998[i].unk0].unk1;
+                    u8 e968FromT0 = _svm_pg[t0].unk1;
                     volatile s32 lvl0;
                     volatile s32 prio;
                     volatile s32 lvl1;
@@ -514,7 +514,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         pan1 = (pan1 * (0x7F - e978d)) / 63;
                     }
 
-                    e968d = D_8008E968[D_8008D998[i].unk0].unk4;
+                    e968d = _svm_pg[D_8008D998[i].unk0].unk4;
                     if (e968d < 0x40) {
                         pan2 = (pan2 * e968d) / 63;
                     } else {
@@ -868,8 +868,8 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
             if (D_8008D996[i].unk0 == (s16)a0) {
                 t0 = D_8008D99A[i].unk0;
                 if (t0 == (s16)a2 && D_8008D99E[i].unk0 == (s16)a1) {
-                    e968FromD998 = D_8008E968[D_8008D998[i].unk0].unk1;
-                    e968FromT0 = D_8008E968[t0].unk1;
+                    e968FromD998 = _svm_pg[D_8008D998[i].unk0].unk1;
+                    e968FromT0 = _svm_pg[t0].unk1;
 
                     lvl0 = D_8008D990[i].unk0 * (u16)a3 / 127;
                     prio = lvl0 * 0x3FFF;
@@ -895,7 +895,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         pan1 = (pan1 * (0x7F - e978d)) / 63;
                     }
 
-                    e968d = D_8008E968[D_8008D998[i].unk0].unk4;
+                    e968d = _svm_pg[D_8008D998[i].unk0].unk4;
                     if (e968d < 0x40) {
                         pan2 = (pan2 * e968d) / 63;
                     } else {

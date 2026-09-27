@@ -64,9 +64,9 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
         D_8008EA11 = 0x7F - ((p5 << 6) / p6);
     }
 
-    D_8008EA16 = D_8008E968[p1].unk1;
-    D_8008EA17 = D_8008E968[p1].unk4;
-    D_8008EA0C = D_8008E968[p1].unk0;
+    D_8008EA16 = _svm_pg[p1].unk1;
+    D_8008EA17 = _svm_pg[p1].unk4;
+    D_8008EA0C = _svm_pg[p1].unk0;
 
     rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->unk0;
@@ -239,7 +239,7 @@ see that report). Restored to `INCLUDE_ASM`; still a STALL.
 Same rename as `SsUtKeyOn` (`func_80032148` -> `SpuVmVSetUp`, round
 34's `libsnd/vm_vsu.o` conversion) and the same three declaration gaps
 round 34's carve left in `src/libsnd_vm_vol_ut_key_ut_keyv.c` (`SpuVmVSetUp` itself,
-`D_8008EA22`, the `SlotE968`/`D_8008E968` pair) -- see `SsUtKeyOn.md`'s
+`D_8008EA22`, the `SlotE968`/`_svm_pg` pair) -- see `SsUtKeyOn.md`'s
 round-36 addendum for the full derivation; adding them once in this shared
 file fixed both functions' preserved bodies.
 
@@ -265,7 +265,7 @@ STALL.
 
 Positioned where it would compile: replacing the `INCLUDE_ASM` for
 `SsUtKeyOnV` in `src/libsnd_vm_vol_ut_key_ut_keyv.c`, between `SsUtKeyOff` and
-`SsUtKeyOffV`. Needs the same `SlotE968`/`D_8008E968`/`D_8008EA22`
+`SsUtKeyOffV`. Needs the same `SlotE968`/`_svm_pg`/`D_8008EA22`
 declarations as `SsUtKeyOn`'s corrected body (see that report), all
 now present in the shared file.
 
@@ -301,9 +301,9 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
         D_8008EA11 = 0x7F - ((p5 << 6) / p6);
     }
 
-    D_8008EA16 = D_8008E968[p1].unk1;
-    D_8008EA17 = D_8008E968[p1].unk4;
-    D_8008EA0C = D_8008E968[p1].unk0;
+    D_8008EA16 = _svm_pg[p1].unk1;
+    D_8008EA17 = _svm_pg[p1].unk4;
+    D_8008EA0C = _svm_pg[p1].unk0;
 
     rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->unk0;
@@ -443,9 +443,9 @@ s32 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, u16 p3, u16 p4, s16 p5, s16 p6)
         D_8008EA11 = 0x7F - ((p5 << 6) / p6);
     }
 
-    D_8008EA16 = D_8008E968[p1].unk1;
-    D_8008EA17 = D_8008E968[p1].unk4;
-    D_8008EA0C = D_8008E968[p1].unk0;
+    D_8008EA16 = _svm_pg[p1].unk1;
+    D_8008EA17 = _svm_pg[p1].unk4;
+    D_8008EA0C = _svm_pg[p1].unk0;
 
     rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->unk0;

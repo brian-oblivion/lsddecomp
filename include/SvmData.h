@@ -51,7 +51,7 @@ typedef struct SvmVoice {
     u8 pad0B;
     s16 unk0C; /* +0x0C -- key-on argument; SePitchBend adds the bend to it and passes it to note2pitch2 */
     s16 unk0E; /* +0x0E -- 0x21 after SsUtKeyOn/SsUtKeyOnV, 0xFF when free */
-    s16 unk10; /* +0x10 -- index into D_8008E968 (read as a byte by SePitchBend) */
+    s16 unk10; /* +0x10 -- index into _svm_pg (read as a byte by SePitchBend) */
     s16 unk12; /* +0x12 -- compared against a key-off argument */
     s16 unk14; /* +0x14 -- index into D_8008E978 (read as a byte by SePitchBend), 0xFF when free */
     s16 unk16; /* +0x16 -- compared against a key-off argument */

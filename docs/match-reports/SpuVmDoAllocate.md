@@ -34,7 +34,7 @@ No arguments, no return value. It:
    across all 16 words of the `_svm_envx_hist` array — a "clear this channel's
    bit everywhere" sweep.
 4. Picks one of two adjacent `u16` fields (`+0xC` or `+0xE`) of a
-   0x10-stride table `D_8008E968`, indexed by
+   0x10-stride table `_svm_pg`, indexed by
    `((s16) D_8008EA24 - 1) / 2`, based on `D_8008EA24 & 1`, and stores the
    result into `D_8008D7F6[D_8008EA28]`.
 5. Sets flag bit `0x8` in `_svm_sreg_dirty[D_8008EA26]`.
@@ -67,7 +67,7 @@ typedef struct {
     u16 unkC; /* +0xC */
     u16 unkE; /* +0xE */
 } D8008E968RecCE;
-extern D8008E968RecCE *D_8008E968;
+extern D8008E968RecCE *_svm_pg;
 
 extern s16 D_8008D7F6[];
 extern u8 _svm_sreg_dirty[];
@@ -150,11 +150,11 @@ void SpuVmDoAllocate(void)
 
     if (D_8008EA24 & 1) {
         divRes = ((s16) D_8008EA24 - 1) / 2;
-        val = D_8008E968[divRes].unkC;
+        val = _svm_pg[divRes].unkC;
         D_8008D7F6[D_8008EA28] = val;
     } else {
         divRes = ((s16) D_8008EA24 - 1) / 2;
-        val = D_8008E968[divRes].unkE;
+        val = _svm_pg[divRes].unkE;
         D_8008D7F6[D_8008EA28] = val;
     }
 
@@ -423,7 +423,7 @@ typedef struct {
     u16 unkC; /* +0xC */
     u16 unkE; /* +0xE */
 } D8008E968RecCE;
-extern D8008E968RecCE *D_8008E968;
+extern D8008E968RecCE *_svm_pg;
 
 extern s16 D_8008D7F6[];
 extern u8 _svm_sreg_dirty[];
@@ -480,11 +480,11 @@ void SpuVmDoAllocate(void)
 
     if ((s16)(D_8008EA24 & 1) > 0) {
         divRes = ((s16) D_8008EA24 - 1) / 2;
-        val = D_8008E968[divRes].unkC;
+        val = _svm_pg[divRes].unkC;
         D_8008D7F6[D_8008EA28] = val;
     } else {
         divRes = ((s16) D_8008EA24 - 1) / 2;
-        val = D_8008E968[divRes].unkE;
+        val = _svm_pg[divRes].unkE;
         D_8008D7F6[D_8008EA28] = val;
     }
 

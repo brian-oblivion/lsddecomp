@@ -79,7 +79,7 @@ extern u16 D_8008EA22;
 
 /* libsnd vmanager's _svm_pg (pinned at this address): the current VAB's
  * program table, indexed by program number. */
-extern ProgAtr *D_8008E968;
+extern ProgAtr *_svm_pg;
 
 /* SsUtKeyOn's own scratch globals -- a "start channel" setup
  * routine that stages its parameters and a couple of table lookups
@@ -156,8 +156,8 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
             if (_svm_voice[i].unk0E == (s16)a0) {
                 s32 t0 = _svm_voice[i].unk12;
                 if (t0 == (s16)a2 && _svm_voice[i].unk16 == (s16)a1) {
-                    u8 e968FromD998 = D_8008E968[_svm_voice[i].unk10].mvol;
-                    u8 e968FromT0 = D_8008E968[t0].mvol;
+                    u8 e968FromD998 = _svm_pg[_svm_voice[i].unk10].mvol;
+                    u8 e968FromT0 = _svm_pg[t0].mvol;
                     s32 lvl0;
                     s32 prio;
                     s32 lvl1;
@@ -194,7 +194,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         pan1 = (pan1 * (0x7F - e978d)) / 63;
                     }
 
-                    e968d = D_8008E968[_svm_voice[i].unk10].mpan;
+                    e968d = _svm_pg[_svm_voice[i].unk10].mpan;
                     if (e968d < 0x40) {
                         pan2 = (pan2 * e968d) / 63;
                     } else {
@@ -268,7 +268,7 @@ s16 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
         D_8008EA11 = 0x7F - ((p5 << 6) / p6);
     }
 
-    slot = D_8008E968;
+    slot = _svm_pg;
     D_8008EA16 = slot[p1].mvol;
     D_8008EA17 = slot[p1].mpan;
     D_8008EA0C = slot[p1].tones;
@@ -416,9 +416,9 @@ s16 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) 
         D_8008EA11 = 0x7F - ((p5 << 6) / p6);
     }
 
-    D_8008EA16 = D_8008E968[p1].mvol;
-    D_8008EA17 = D_8008E968[p1].mpan;
-    D_8008EA0C = D_8008E968[p1].tones;
+    D_8008EA16 = _svm_pg[p1].mvol;
+    D_8008EA17 = _svm_pg[p1].mpan;
+    D_8008EA0C = _svm_pg[p1].tones;
 
     rec = &D_8008E978[D_8008EA18 + D_8008EA13 * 16];
     D_8008EA1B = rec->prior;

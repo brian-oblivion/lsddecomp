@@ -98,9 +98,9 @@ until you diff registers, not just word counts.
 
 ## Struct/global knowledge derived this round
 
-- `SlotE968M` / `D_8008E968`: the SAME 0x10-stride table `code_179d8_j.c`
+- `SlotE968M` / `_svm_pg`: the SAME 0x10-stride table `code_179d8_j.c`
   already documents as `SlotE968` (`unk0`/`unk1`/`unk4`) -- this function's
-  own local view, same shape, used here as `&D_8008E968[a2]` (a2 = this
+  own local view, same shape, used here as `&_svm_pg[a2]` (a2 = this
   function's own s16 parameter, NOT a channel id from `func_80032148`).
 - `Entry90902E8M` / `_ss_score[]`: the SAME 172(0xAC)-byte
   `[screen][slot]`-indexed record array `code_179d8_i/j/k.c` each already
@@ -418,7 +418,7 @@ found.**
 
 #if 0
 /* Base pointer for a table of 0x10-byte slots, same shape as
- * code_179d8_j.c's own SlotE968 local view of the same D_8008E968
+ * code_179d8_j.c's own SlotE968 local view of the same _svm_pg
  * global -- only the three byte fields this function touches are
  * named, per this project's reduced-local-view convention. */
 typedef struct {
@@ -428,7 +428,7 @@ typedef struct {
     u8 unk4; /* +0x4 */
     u8 pad5[0x10 - 0x5];
 } SlotE968M;
-extern SlotE968M *D_8008E968;
+extern SlotE968M *_svm_pg;
 
 /* A 172 (0xAC)-byte record; _ss_score is an array of pointers to
  * arrays of these, indexed [screen][slot]-style by a packed argument
@@ -507,7 +507,7 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5)
         return -1;
     }
 
-    slot = &D_8008E968[a2];
+    slot = &_svm_pg[a2];
     D_8008EA22 = (s16) a0;
     D_8008EA0E = (u8) a3;
     D_8008EA0F = 0;
