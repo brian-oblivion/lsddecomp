@@ -141,6 +141,11 @@ struct TaskObjF {
     /* +0x080 */ s32 selectedIndex; /* onItemListResult: the list's getCursorIndex */
 };
 
+/* TaskObjF's class id (gTaskObjFMethods word +0x000). A single nibble, so
+ * `(header & 0xF) == TASKOBJF_CLASS_ID` is its is-kind-of test
+ * (TitleMenu__OnNotify). */
+#define TASKOBJF_CLASS_ID 0xB
+
 /* TaskObjF::opMode: the operation beginLoad or beginSave started. */
 enum TaskObjFOpMode {
     TASKOBJF_OP_NONE = 0, /* init, and the terminal states */

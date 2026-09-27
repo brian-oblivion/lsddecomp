@@ -32,16 +32,16 @@ void TitleMenu__Finalize(TitleMenu *self) {
 
 void TitleMenu__OnNotify(TitleMenu *self, BasicClass *sender, s32 event) {
     Get_vtable_TaskCore()->onNotify((TaskCore *)self, sender, event);
-    if ((sender->methods->header & 0xF) == 0xB) {
+    if ((sender->methods->header & 0xF) == TASKOBJF_CLASS_ID) {
         self->methods->onCardEvent(self, sender, event);
     }
 }
 
 void TitleMenu__Reset(TitleMenu *self) {
     self->unk34 = 0;
-    self->unk2C = 0x190;
+    self->unk2C = 400;
     self->methods->setSubHandle(self, sTitleTimPath, 0);
-    self->methods->setFrameBound(self, 0xA);
+    self->methods->setFrameBound(self, 10);
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 0);
 }
 
@@ -75,19 +75,19 @@ void TitleMenu__Tick(TitleMenu *self) {
 
     Get_vtable_TaskCore()->tick((TaskCore *)self);
     switch (self->activeSlot) {
-        case 1:
+        case TITLEMENU_FLASHBACK:
             self->result = 0;
             self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 1);
             fn = self->methods->refreshViewValue;
             break;
-        case 2:
+        case TITLEMENU_SAVE:
             fn = self->methods->saveToCard;
             break;
-        case 3:
+        case TITLEMENU_LOAD:
             fn = self->methods->loadFromCard;
             break;
-        case 4:
-            self->result = 2;
+        case TITLEMENU_GRAPH:
+            self->result = TITLEMENU_RESULT_GRAPH;
             fn = self->methods->refreshViewValue;
             break;
         default:
@@ -100,7 +100,7 @@ void TitleMenu__RefreshViewValue(TitleMenu *self) {
     s32 shake;
 
     Get_vtable_TaskCore()->refreshViewValue((TaskCore *)self);
-    shake = self->slotCounts[5];
+    shake = self->slotCounts[TITLEMENU_SHAKE];
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
 
@@ -120,6 +120,9 @@ extern void DecodeFullWidthSjis(void *dst, void *src);
 /* gSaveTitle is 2-byte full-width characters; the characters from here on
  * are padding after "LSD   Day001" (class_3bb8c_g.c's SAVE_TITLE_PADDING). */
 #define SAVE_TITLE_PADDING 12
+/* beginSave's titleEditPos: the player's text goes in from the character
+ * after the padding's first space. */
+#define SAVE_TITLE_EDIT_POS 13
 
 /* The setTarget override: `target` is the TaskCoreTarget the ctor passes
  * (&D_80086D44); only its `handle` is read, as the TextRow's texture. */
@@ -156,6 +159,12 @@ void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
                                              (LongVec3 *)&sSaveTitleOffset);
 }
 
+/* The save title's colour cycle: a lit channel's level (or what it adds),
+ * the frames of each cycle that light red, and the cycle's length. */
+#define SAVE_TITLE_LIT 128
+#define SAVE_TITLE_RED_FRAMES 128
+#define SAVE_TITLE_CYCLE_FRAMES 257
+
 /* MATCHED round 75 (was STALL round 43) -- see
  * docs/match-reports/TitleMenu__CycleSaveTitleColor.md. `base` is taken BEFORE the first call
  * (so it crosses a call and gets $s1), `buf = *color` is one struct copy
@@ -171,20 +180,20 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
         channels[0] = 0;
         channels[1] = 0;
         channels[2] = 0;
-        channels[sSaveTitleColorChannel] = 0x80;
+        channels[sSaveTitleColorChannel] = SAVE_TITLE_LIT;
     } else {
         rgb = *color;
-        if (sSaveTitleColorFrame < 0x80) {
-            channels[0] += 0x80;
+        if (sSaveTitleColorFrame < SAVE_TITLE_RED_FRAMES) {
+            channels[0] += SAVE_TITLE_LIT;
         } else {
-            channels[sSaveTitleColorChannel] += 0x80;
+            channels[sSaveTitleColorChannel] += SAVE_TITLE_LIT;
         }
     }
     if (++sSaveTitleColorChannel >= 3) {
         sSaveTitleColorChannel = 0;
     }
     sSaveTitleColorFrame++;
-    if (sSaveTitleColorFrame >= 0x101) {
+    if (sSaveTitleColorFrame >= SAVE_TITLE_CYCLE_FRAMES) {
         sSaveTitleColorFrame = 0;
     }
     self->saveTitle->methods->setColor(self->saveTitle, &rgb);
@@ -214,7 +223,7 @@ void TitleMenu__RefreshMenu(TitleMenu *self) {
     CheckSaveScoreFlag(self, self->target, self->dreamSys);
     self->methods->updateSlotElements(self, self->unk14);
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
-    self->activeSlot = 5;
+    self->activeSlot = TITLEMENU_SHAKE;
     self->methods->setState(self, 0xB);
     self->methods->setSlotCursor(self, shake, 1);
     self->methods->setState(self, 0xF);
@@ -245,14 +254,14 @@ void TitleMenu__EndCardAccess(TitleMenu *self) {
 void TitleMenu__SaveToCard(TitleMenu *self) {
     s32 shake;
 
-    shake = self->slotCounts[5];
+    shake = self->slotCounts[TITLEMENU_SHAKE];
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
     self->methods->beginCardAccess(self);
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
         sSaveFileName[0] = '\0';
     }
-    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, gSaveTitle, 0xD, 3,
-                                       self->saveIcon, self->saveBlock, self->saveBlockSize);
+    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, gSaveTitle, SAVE_TITLE_EDIT_POS,
+                                       3, self->saveIcon, self->saveBlock, self->saveBlockSize);
 }
 
 void TitleMenu__LoadFromCard(TitleMenu *self) {
@@ -262,12 +271,12 @@ void TitleMenu__LoadFromCard(TitleMenu *self) {
 }
 
 void TitleMenu__OnCardEvent(TitleMenu *self, BasicClass *sender, s32 event) {
-    if (event < 0x18) {
-        if (event >= 0x16) {
+    if (event <= TASKOBJF_STATE_ABORTED) {
+        if (event >= TASKOBJF_STATE_DONE) {
             self->methods->endCardAccess(self);
-            if (event == 0x16) {
+            if (event == TASKOBJF_STATE_DONE) {
                 self->dreamSys->methods->clearNewGameFlag(self->dreamSys);
-                self->methods->refreshMenu(self, 0x16);
+                self->methods->refreshMenu(self, TASKOBJF_STATE_DONE);
             }
         }
     }
@@ -280,7 +289,7 @@ TitleMenuMethods *GetTitleMenuMethods(void) {
 TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot) {
     TaskObjF *self;
 
-    self = BMemPMgrAlloc(0x84);
+    self = BMemPMgrAlloc(sizeof(TaskObjF));
     if (self == NULL) {
         goto fail;
     }

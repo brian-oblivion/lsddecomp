@@ -101,6 +101,21 @@ struct TitleMenu {
     /* +0x0C0 */ s32 saveBlockSize; /* the ctor: getSaveBlock's *outSize (0x700); the object is 0xC4 bytes */
 };
 
+/* TitleMenu::activeSlot and the index into slotCounts: the six entries,
+ * in the order of the target's `names` (see the banner). */
+enum TitleMenuEntry {
+    TITLEMENU_START = 0,
+    TITLEMENU_FLASHBACK = 1,
+    TITLEMENU_SAVE = 2,
+    TITLEMENU_LOAD = 3,
+    TITLEMENU_GRAPH = 4,
+    TITLEMENU_SHAKE = 5
+};
+
+/* TitleMenu's `result` for GRAPH: GameApplication__PollGraphRoomStatus runs
+ * GraphRoom again, then the menu again, while the menu returns it. */
+#define TITLEMENU_RESULT_GRAPH 2
+
 /* The ctor's resetCounters call, as the retail bytes make it: the slot is
  * (self), the call also passes dreamSys (see the banner). No code. */
 typedef void (*TitleMenuResetCallFn)(TitleMenu *self, struct DreamSys *dreamSys);
