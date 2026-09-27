@@ -228,12 +228,14 @@ extern s32 gStyleDay;
 extern s32 sStyleUnreadArg;
 extern s32 gStyleSceneRefs; /* a StyleSceneRefs * (below) */
 extern s32 gStyleVariant;
-extern void *gStyleCueSlots[2];
+/* class_3bb8c_n.c defines StyleCueSlot; this unit only clears the slots. */
+typedef struct StyleCueSlot StyleCueSlot;
+extern StyleCueSlot *gStyleCueSlots[2];
 
 extern void *ApplyStyleConfig(void);
 
 s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadArg) {
-    void **slot;
+    StyleCueSlot **slot;
     s32 i;
 
     if (gStyleGrid == 0) {
