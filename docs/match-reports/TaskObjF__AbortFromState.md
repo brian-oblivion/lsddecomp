@@ -1,16 +1,18 @@
-# TaskObjF__ForceIdleFromState -- MATCH
+# TaskObjF__AbortFromState -- MATCH
+
+> Renamed from `TaskObjF__ForceIdleFromState` on 2026-09-27 (tools/rename.py). Address 0x800501f0.
 
 > Renamed from `Class86E00_3bb8c_g__ForceIdleFromState` on 2026-09-23 (tools/rename.py). Address 0x800501f0.
 
 > Renamed from `func_800501F0` on 2026-09-23 (tools/rename.py). Address 0x800501f0.
 
 Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py TaskObjF__ForceIdleFromState`: 36/36 words match.
+SHA1 matches retail. `funcdiff.py TaskObjF__AbortFromState`: 36/36 words match.
 
 ## Source
 
 ```c
-void TaskObjF__ForceIdleFromState(Class86E00_3bb8c_g *self)
+void TaskObjF__AbortFromState(Class86E00_3bb8c_g *self)
 {
     switch (self->unk28) {
     case 4:
@@ -46,7 +48,7 @@ None new.
 
 ## Naming
 
-`TaskObjF__ForceIdleFromState` (was `func_800501F0`), tier B:
+`TaskObjF__AbortFromState` (was `func_800501F0`), tier B:
 for the sparse state set `{4, 6, 0xA, 0xE}` unconditionally resets
 (`slot8C(self, 0x10)`) and transitions to state `0x17` -- the same literal
 `0x17` that `TaskObjF__SetState` also falls back to when the

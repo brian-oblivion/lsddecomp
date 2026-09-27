@@ -70,7 +70,7 @@ it because it's included in the function's line range in the `.s` file.
 
 Every case body's shared tail (`slot8C(self, N); [slot7C(self, M);]`)
 matches the SAME `self->methods->slot8C`/`slot7C` shared-tail idiom
-already established by `TaskObjF__ForceIdleFromState`/`TaskObjF__TickStateDelay`/`TaskObjF__OnTextEntryResult`/
+already established by `TaskObjF__AbortFromState`/`TaskObjF__TickStateDelay`/`TaskObjF__OnTextEntryResult`/
 `TaskObjF__OnItemListResult` elsewhere in this unit (`slot7C`'s header comment already
 documents it as a common tail for exactly this reason).
 

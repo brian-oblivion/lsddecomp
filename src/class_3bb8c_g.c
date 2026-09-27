@@ -193,7 +193,7 @@ void TaskObjF__AdvanceState(TaskObjF *self) {
     }
 }
 
-void TaskObjF__ForceIdleFromState(TaskObjF *self) {
+void TaskObjF__AbortFromState(TaskObjF *self) {
     switch (self->state) {
         case TASKOBJF_STATE_CARD_CHANGED:
         case TASKOBJF_STATE_UNFORMATTED_SAVE:

@@ -74,7 +74,7 @@ completely different offset immediately after a comparison chain, try the
 `TaskObjF__OnTextEntryResult` (was `func_800504D0`), tier B: dispatches
 on a small externally-supplied code (`arg2` in `{2, 3}`, `arg1` unread) into
 `slotA0` plus either the full `slot78` transition or a `slot7C(self, 0x17)`
-("force idle", per `TaskObjF__ForceIdleFromState`'s own naming
+("force idle", per `TaskObjF__AbortFromState`'s own naming
 evidence) -- read as an external caller telling this object to act (2:
 proceed / 3: cancel), though nothing in the body itself says who calls it
 or what the two codes represent in the game.
