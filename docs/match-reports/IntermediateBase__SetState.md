@@ -481,3 +481,18 @@ object built with it (`cmp`), and `./build-and-verify.sh` stayed green. The
 "without the barrier, `lw s2,0(s1)` lands late" observation above no longer
 holds for the current source (what changed since was not measured). The
 function now carries no `__asm__`.
+
+## Track 7 (round 98, echo)
+
+The source comment above this function, which carried this report's
+history, is now one `MATCHING:` line (one call through a slot picked per
+arm; two direct calls give self a sixth reference and swap $s0/$s1). The
+comment it replaced, verbatim:
+
+```c
+/* Matched round 72: the two state-dependent calls are ONE call through a
+ * slot picked per arm (self then has 5 refs, not 6, so global-alloc ranks
+ * state above it: state -> $s0, self -> $s1).  The `__asm__("" ::: "memory")`
+ * it carried after the methods load was retired in round 89: removing it
+ * left the object byte-identical. */
+```

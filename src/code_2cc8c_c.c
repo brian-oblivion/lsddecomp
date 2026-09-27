@@ -1,30 +1,21 @@
-/* code_2cc8c_c -- third slice of the 0x2CC8C block (0x8003DFA0..0x8003E874,
- * 19 functions plus one stall), continuing directly from code_2cc8c_b.
+/* code_2cc8c_c -- IntermediateBase's methods, the start of Viewport's, and
+ * three accessors ahead of them.
  *
- * After TaskCore's TaskCore__GetActiveSlotCount and the two getters come
- * IntermediateBase's own methods, the ctor through OnState3 and its getter
- * Get_vtable_IntermediateBase (class id 0x30, gIntermediateBaseMethods, the
- * parent of TaskCore and TimedTask). The class is declared once, in
- * include/IntermediateBase.h, whose banner says what it does (track 4,
- * round 82); these functions take `IntermediateBase *self`.
+ * TaskCore__GetActiveSlotCount, Get_vtable_TaskCore and
+ * GetDefaultStreamTaskInitData come first: one TaskCore method and two plain
+ * accessors for data used far more widely (code_2c054.c, class_3bb8c_t.c).
  *
- * The remaining functions are Viewport's (class id 0x7, gViewportMethods,
- * include/Viewport.h; track 4, round 85): New_Viewport, the ctor, finalize
- * and the addChild/removeChild/removeAllChildren overrides, which cache a
- * child by its class-id nibble. code_2cc8c_d.c holds the rest of its table. `Get_vtable_TaskCore`/`GetDefaultStreamTaskInitData`
- * are plain accessors for tables SHARED far more widely (code_2c054.c,
- * class_3bb8c_t.c) that simply happen to live in this unit's address range.
+ * Then IntermediateBase (include/IntermediateBase.h, whose banner says what
+ * the class does): the ctor, onNotify's split by the sender's root class,
+ * the counters, init and deinit, the VSync handler that ticks the frame
+ * clock and polls the pad, setState with its two state hooks (which start
+ * and stop the DrawSystem), and the table getter.
  *
- * Round 55 (runner alpha): full track-3 naming pass. Every definition named;
- * see each function's own match report for the `## Naming` evidence.
- * Unk18Obj (now Viewport, include/Viewport.h) and until round 84 the
- * TaskCore view Obj86B60 (now include/TaskCore.h) were
- * SHARED with one or more of code_2cc8c.c, code_2cc8c_b.c and
- * code_2cc8c_d.c (same classes, split by address range across sibling
- * units), so most field/slot renames on those particular structs are
- * PROPOSALS in this round's report, not direct edits -- only the
- * fields/slots this unit's own functions touch AND no sibling reaches were
- * renamed here.
+ * Last, Viewport (include/Viewport.h): New_Viewport, the ctor, finalize, and
+ * the addChild/removeChild/removeAllChildren overrides, which cache a
+ * DrawSystem child and a SceneNode child (the view node, whose coord2 the
+ * reference view hangs from) by root class id. code_2cc8c_d.c holds the rest
+ * of Viewport's table.
  */
 
 #include "common.h"
@@ -156,11 +147,8 @@ void IntermediateBase__IncrementFrameCounter(IntermediateBase *self) {
     self->frameCounter++;
 }
 
-/* Matched round 72: the two state-dependent calls are ONE call through a
- * slot picked per arm (self then has 5 refs, not 6, so global-alloc ranks
- * state above it: state -> $s0, self -> $s1).  The `__asm__("" ::: "memory")`
- * it carried after the methods load was retired in round 89: removing it
- * left the object byte-identical. */
+/* MATCHING: the two state hooks are ONE call through a slot picked per arm;
+ * two direct calls give self a sixth reference and swap $s0/$s1. */
 void IntermediateBase__SetState(IntermediateBase *self, s32 state) {
     IntermediateBaseMethods *methods;
     void (*fn)(IntermediateBase *);

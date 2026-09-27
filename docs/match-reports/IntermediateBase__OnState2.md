@@ -87,3 +87,33 @@ established, hence tier B; the name records the confirmed mechanic
 ## Track 4 (2026-09-25, round 82, charlie)
 
 The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyTargetReset. It occupies +0x064, which IntermediateBase__SetState runs on state 2, so the slot is `onState2` and so is this occupant. "Target" was the Obj86B60UnkC view's name for initArgs +0x000, the same field IntermediateBase__OnState3 reaches (which was called "Child"): both clear frameCounter and call that object, this one at its +0x048. Tier B.
+
+## Track 7 (round 98, echo)
+
+initArgs->drawSystem is the DrawSystem, so the call is its +0x048
+`start` (DrawSystem__Start, include/DrawSystem.h), not the unit-local
+`slot48`. Local `obj0` -> `drawSystem`. Byte-identical.
+
+The unit-local view these calls went through was removed; it read, verbatim
+(the only history in it is the "not established" claim, which Pad.h and
+DrawSystem.h have since settled):
+
+```c
+/* One local reading of the objects IntermediateBase calls outside
+ * BasicClass's slots: initArgs->unk0 (+0x048 in onState2, +0x04C in
+ * onState3), initArgs->unk4 (+0x044, +0x048 in onTag1Notify) and unk10
+ * (+0x044 in onTag1Notify). Their classes are not established; every call
+ * passes the object alone. */
+typedef struct IntermediateBaseLinked IntermediateBaseLinked;
+
+typedef struct IntermediateBaseLinkedMethods {
+    u8 pad000[0x044];
+    void (*slot44)(IntermediateBaseLinked *self); /* +0x044 */
+    void (*slot48)(IntermediateBaseLinked *self); /* +0x048 */
+    void (*slot4C)(IntermediateBaseLinked *self); /* +0x04C */
+} IntermediateBaseLinkedMethods;
+
+struct IntermediateBaseLinked {
+    IntermediateBaseLinkedMethods *methods; /* +0x000 */
+};
+```

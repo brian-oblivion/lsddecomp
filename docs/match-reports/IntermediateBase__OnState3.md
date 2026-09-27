@@ -76,3 +76,33 @@ remains unestablished (tier B).
 ## Track 4 (2026-09-25, round 82, charlie)
 
 The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyChildReset. It occupies +0x068, which IntermediateBase__SetState runs on state 3: slot `onState3`, occupant named for it. It calls initArgs->unk0 at +0x04C and clears frameCounter; IntermediateBase__OnState2 does the same with +0x048 on the same object. Tier B.
+
+## Track 7 (round 98, echo)
+
+initArgs->drawSystem is the DrawSystem, so the call is its +0x04C
+`stop` (DrawSystem__Stop, include/DrawSystem.h), not the unit-local
+`slot4C`. Local `obj0` -> `drawSystem`. Byte-identical.
+
+The unit-local view these calls went through was removed; it read, verbatim
+(the only history in it is the "not established" claim, which Pad.h and
+DrawSystem.h have since settled):
+
+```c
+/* One local reading of the objects IntermediateBase calls outside
+ * BasicClass's slots: initArgs->unk0 (+0x048 in onState2, +0x04C in
+ * onState3), initArgs->unk4 (+0x044, +0x048 in onTag1Notify) and unk10
+ * (+0x044 in onTag1Notify). Their classes are not established; every call
+ * passes the object alone. */
+typedef struct IntermediateBaseLinked IntermediateBaseLinked;
+
+typedef struct IntermediateBaseLinkedMethods {
+    u8 pad000[0x044];
+    void (*slot44)(IntermediateBaseLinked *self); /* +0x044 */
+    void (*slot48)(IntermediateBaseLinked *self); /* +0x048 */
+    void (*slot4C)(IntermediateBaseLinked *self); /* +0x04C */
+} IntermediateBaseLinkedMethods;
+
+struct IntermediateBaseLinked {
+    IntermediateBaseLinkedMethods *methods; /* +0x000 */
+};
+```

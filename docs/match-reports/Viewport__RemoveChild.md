@@ -82,3 +82,10 @@ tag-keyed cached reference, THEN forwards to
 ## Track 4 (2026-09-25, round 85, bravo)
 
 Renamed from `Unk18Obj__RemoveChild`. The +0x014 removeChild override; clears the caches AddChild fills (`refView.super`, `viewNode`, `drawSystem`). The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+
+## Track 7 (round 98, echo)
+
+Local `header` -> `rootClass`, masked with `CLASS_ID_ROOT_MASK` (0xF,
+BasicClass.h); the cases are `SCENENODE_CLASS_ID` (4, gSceneNodeMethods,
+SceneNode.h) and `DRAWSYSTEM_CLASS_ID` (1, DrawSystem.h), the classes of the
+two fields it fills. Pointer stores of 0 are spelled NULL. Byte-identical.
