@@ -65,11 +65,11 @@ extern void func_8001EF60(s32 arg0);
 extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 arg4);
 
 /* Data reached by address: the viewport's view point and view reference
- * (attachViewChild), the StageMap's bounds; and D_80087118, one
+ * (attachViewChild), the StageMap's bounds; and gStagePendingExtras, one
  * setPendingExtra value per stage. */
 extern s32 D_8008715C;
 extern s32 D_80087168;
-extern s32 D_80087118[];
+extern s32 gStagePendingExtras[];
 extern s32 D_80087150;
 
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
@@ -139,7 +139,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
     }
     func_8001EF60(flag);
 
-    self->dreamSys->methods->setPendingExtra(self->dreamSys, D_80087118[self->stage]);
+    self->dreamSys->methods->setPendingExtra(self->dreamSys, gStagePendingExtras[self->stage]);
     self->state = 5;
 }
 

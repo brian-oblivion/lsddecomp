@@ -24,7 +24,7 @@ extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 ar
 
 extern s32 D_8008715C;
 extern s32 D_80087168;
-extern s32 D_80087118[];
+extern s32 gStagePendingExtras[];
 extern s32 D_80087150;
 
 void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2, s32 arg3) {
@@ -81,7 +81,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
     }
     func_8001EF60(flag);
 
-    self->unk3C->methods->slotEC(self->unk3C, D_80087118[(s32) self->unk38]);
+    self->unk3C->methods->slotEC(self->unk3C, gStagePendingExtras[(s32) self->unk38]);
     self->unk20 = 5;
 }
 ```
@@ -91,7 +91,7 @@ Cross-unit helpers (`PickVariant`, `PickDailyVariant`, `New_TimBlockSrc`,
 else in the project (all still `INCLUDE_ASM` in their own units), so they
 are declared locally per CLAUDE.md's rule. `D_8008715C`/`D_80087168` are
 referenced only by address (never loaded), so their real type is unknown;
-`D_80087118` is a plain word array indexed by `self->unk38`;
+`gStagePendingExtras` is a plain word array indexed by `self->unk38`;
 `D_80087150` is likewise referenced only by address.
 
 ## Three levers, in the order that closed the gap (138 -> 137 words)
