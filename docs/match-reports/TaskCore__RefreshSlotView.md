@@ -778,3 +778,7 @@ Renamed from Obj86B60__RefreshSlotView (tools/rename.py): the class prefix. Occu
 ## Track 4 (2026-09-25, round 85, charlie)
 
 listView is a BoxFill (include/BoxFill.h); the deleted `Unk68Obj` view's slots are BoxFill's: slot4C = attachToParent (cast to BoxFillAttachToParentFn, arguments cast), slotC0 = setSize({0x28, count * 12}), slot50 = detachFromParent. Zero bytes.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+The layout literals are unit-local constants: SLOT_LIST_ROW_PITCH 10 (item rows' spacing, also CommitElementScroll's), SLOT_LIST_FRAME_WIDTH 40 and SLOT_LIST_FRAME_ROW_HEIGHT 12 (listView's setSize: 40 by count * 12, BoxFill.h's banner reads the same). `pos` is now `entry->pos` (SlotEntry::pos, see CommitElementScroll's report). Locals: a1 -> parent, a2 -> show, idx -> slot, arr -> item, counter -> cursor, buf -> size, target -> entry.

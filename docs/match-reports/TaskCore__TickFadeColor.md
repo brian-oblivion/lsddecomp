@@ -89,3 +89,7 @@ Renamed from Obj86B60__TickFadeColor (tools/rename.py): the class prefix. Occupa
 ## Track 4 (2026-09-26, round 88, alpha)
 
 bgLayer is a `BgLayer *` (include/BgLayer.h): the `Unk78Obj` view is gone and +0x0B8 is called as `setColor(bgLayer, 1, (BgLayerRgb *)buf)`. Byte-identical.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+`0x80 - frameCounter * fadeRate` and `(u8)c >= 0x81` are now `TASKCORE_FADE_FULL - ...` and `(u8)level > TASKCORE_FADE_FULL` (TaskCore.h, alpha's constant: 128, the colour that draws a texture at its own brightness). `>= 129` and `> 128` compile to the same sltiu, byte-exact. c -> level, buf -> color.

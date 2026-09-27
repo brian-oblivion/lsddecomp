@@ -78,3 +78,7 @@ Renamed `func_` -> `Obj86B60__CancelElementScroll`. **Tier B**: Also gated on `s
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__CancelElementScroll (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+`((s32 *)target->unk24[idx])[1]` is `((SlotEntry *)...)->savedCursor`, the same lw 4. setState(17) -> TASKCORE_STATE_SCROLL_CANCELLED, inputMode 1/2 -> TASKCORE_INPUT_CHOOSING_SLOT/SCROLLING (TaskCore.h, alpha's enums).

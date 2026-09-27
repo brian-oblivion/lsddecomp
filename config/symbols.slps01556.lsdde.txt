@@ -3034,3 +3034,5 @@ sStyleUnreadArg = 0x8008AC78;
 GetVabUseVSyncCallback = 0x8002C478; // type:func
 gSsTicksPerSecond = 0x8008A8CC;
 GetSsTicksPerSecond = 0x8002CC28; // type:func
+sListViewSize = 0x8008A8E8;
+sListViewColor = 0x8008A8F0;

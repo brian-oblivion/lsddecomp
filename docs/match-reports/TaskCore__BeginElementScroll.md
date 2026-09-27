@@ -97,3 +97,7 @@ merge:
 ## Track 4 (2026-09-25, round 84, alpha)
 
 Renamed from Obj86B60__BeginElementScroll (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+`(u8 *)target->unk24[idx] + 8` is `&((SlotEntry *)...)->cursorColor` (SlotEntry +0x008, a SpriteRgb; TitleMenu's is (128, 128, 0)). setState(14) -> TASKCORE_STATE_SCROLL_OPENED.

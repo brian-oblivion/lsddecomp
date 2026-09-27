@@ -60,7 +60,7 @@ typedef struct BoxFillPos BoxFillPos;
 /* The ctor's (and Reset's) size argument: two words of which only the low
  * halfwords are read (lhu at +0x000 and +0x004), into boxW and boxH. The
  * callers pass s32 pairs of their own types (class_3bb8c_n's PairXY,
- * D_8008A8E8[2]), so New_BoxFill and the ctor slot take `void *` and the
+ * sListViewSize[2]), so New_BoxFill and the ctor slot take `void *` and the
  * occupants read it as this. */
 struct SkipShort2 {
     s16 x; /* +0x000, the width */

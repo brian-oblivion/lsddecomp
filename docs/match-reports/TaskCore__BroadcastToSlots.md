@@ -137,3 +137,7 @@ came out one word shorter and everything after drifted), `funcdiff` 39/56, and
 asm-differ shows `addiu s1,s1,1` (`i++`) moved from before
 `lw v0,0x50(s0)` (the `self->slotCount` reload for the loop test) into that
 load's delay slot, replacing the `nop` retail keeps there. Instruction order.
+
+## Track 7 (2026-09-27, round 98, bravo)
+
+The comment on the loop's `__asm__("")` is now one line, `/* MATCHING: without it GCC moves i++ into the slotCount load's delay slot. */`; the derivation stays above. Locals: origIdx -> savedSlot, arr -> widget, elem -> row, a1 -> color.

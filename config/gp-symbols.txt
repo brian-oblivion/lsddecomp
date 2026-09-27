@@ -6,6 +6,7 @@ D_8008A854
 D_8008A860
 D_8008A8E8
 D_8008A8F0
+D_8008A8CC
 D_8008A924
 D_8008A94C
 D_8008A954
@@ -199,6 +200,8 @@ sCardPathPrefix
 sCdDriveInited
 sDivClipHeight
 sDivClipWidth
+sListViewColor
+sListViewSize
 sMcTempFileSuffix
 sMoodCue74ClearColor
 sMoodCue78TransitionDone

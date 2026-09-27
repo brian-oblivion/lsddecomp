@@ -29,10 +29,9 @@ typedef struct TexPageDesc TexPageDesc;
  * BgLayer, include/BgLayer.h since round 88 (its `Unk78Obj` view is gone);
  * `subHandle` and TaskCoreTarget's `handle` are TimImages, include/TimImage.h,
  * cast at code_2cc8c_b's accessors; the slot and item widgets are TextRows,
- * include/TextRow.h; `listView` is a BoxFill, include/BoxFill.h). `SlotEntry` and
- * `SrcDesc` are two readings of one TaskCoreTarget::unk24[] record.
+ * include/TextRow.h; `listView` is a BoxFill, include/BoxFill.h). The
+ * record TaskCoreTarget::unk24[] points to is code_2cc8c_b.c's `SlotEntry`.
  */
-typedef struct SrcDesc SrcDesc;
 typedef struct HeaderObj HeaderObj;
 typedef struct EventArg EventArg;
 
@@ -86,37 +85,6 @@ struct EventArg {
     HeaderObj *target; /* +0x000 */
 };
 
-
-/*
- * The pointee of TaskCoreTarget::unk24[idx] (round 12, from TaskCore__CommitElementScroll and
- * TaskCore__RefreshSlotView, cross-checked against already-matched TaskCore__CancelElementScroll's own
- * `((s32 *)self->unk4C->unk24[idx])[1]` read at the same +0x004 offset).
- * Only the three offsets these functions actually touch are modelled;
- * TaskCore__CancelElementScroll/TaskCore__SetSlotCursor's own `(u8 *)...unk24[idx] + 8` buffer usage
- * is left as a raw cast in those (already-matched) functions rather than
- * retrofitted onto this type, per this project's convention of not
- * editing matched functions to adopt a later, more specific type.
- */
-/* Renamed from Unk24Elem, round 78 -- tier B, exclusive to this unit (only
- * code_2cc8c_b.c casts to this type; see this struct's own comment above
- * for the cross-unit `target->unk24[idx]` reads that stay untyped). */
-typedef struct SlotEntry SlotEntry;
-
-struct SlotEntry {
-    u8 pad000[0x004];
-    s32 savedCursor; /* +0x004, renamed from unk4, round 78 -- the
-                    slot's own persisted ring-cursor value: SET here by
-                    TaskCore__CommitElementScroll, READ back as `newVal` by the
-                    already-matched TaskCore__CancelElementScroll */
-    u8 pad008[0x010 - 0x008];
-    s32 unk10; /* +0x010 */
-    s32 unk14; /* +0x014, combined with unk10 and a per-slot counter into
-                    a 2-word stack buffer (`{unk10, unk14 - counter*10}`)
-                    passed by address to a TextRow setPosition call, then
-                    incremented by 10 per loop iteration -- see
-                    TaskCore__CommitElementScroll/TaskCore__RefreshSlotView */
-};
-
 extern void *BMemPMgrAlloc(s32 size);                   /* allocator, confirmed across many
                                             units */
 extern void *BMemPMgrFree(void *ptr);                   /* matching free/release. Its own
@@ -145,32 +113,6 @@ extern void ReleaseBasicClassArray(void *a0, void *a1); /* not yet seen elsewher
                                                     TaskCore__ReleaseSlotElements's own call
                                                     site only */
 
-/*
- * TaskCore__CreateSlotElements's 2nd parameter -- an unrelated "source list" descriptor,
- * NOT a TaskCore or any class in this unit's own hierarchy (no method
- * table dereference anywhere in that function). Only the two fields it
- * touches are modelled.
- */
-struct SrcDesc {
-    u8 pad000[0x004];
-    s32 unk4; /* +0x004, becomes self->unk60[idx] */
-    u8 pad008[0x018 - 0x008];
-    char **unk18; /* +0x018, NULL-terminated array of C strings -- each
-                      element is passed to strlen (already typed
-                      `s32 strlen(char *s)` in code_171e0.h) and to
-                      New_TextRow */
-};
-
-extern s32 strlen(char *s); /* Psy-Q libc2/strlen, linked from Sony's
-                                        own object; local view here */
-
-
-/* listView (+0x068) is a BoxFill (include/BoxFill.h): the accessors cast
- * TaskCore's `BasicClass *` to it. */
-
-/* New_BoxFill: include/BoxFill.h. */
-extern s32 D_8008A8E8[2];  /* address-taken only by this unit */
-extern char D_8008A8F0[4]; /* address-taken only by this unit */
 
 /* New_FadeBox: include/FadeBox.h. */
 /* New_SceneNode: include/SceneNode.h (it was a local Unk18AcObj view). */
