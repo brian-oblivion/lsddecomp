@@ -51,6 +51,18 @@ struct StageMap;
  * (TodActor, 0x234): StageMap__DispatchLinkCommand. */
 #define ACTOR_CLASS_ID 0x34
 
+/* The events an Actor's moves send through notifyWithHull
+ * (Actor__MoveAlongLocalAxis: moveLocalZ/X/Y), and the range
+ * Actor__NotifyMove handles: for the three moves it sweeps the model's hull
+ * by lastOffsetValue before passing it on, for ACTOR_EVENT_UNSWEPT it passes
+ * the hull as it is. No sender of 5 is in the tree. */
+enum ActorMoveEvent {
+    ACTOR_EVENT_UNSWEPT = 5,
+    ACTOR_EVENT_MOVED_Z = 6,
+    ACTOR_EVENT_MOVED_X = 7,
+    ACTOR_EVENT_MOVED_Y = 8
+};
+
 /* Occupants in gActorMethods named at each slot; `tools/classtable.py
  * <subclass table> --vs gActorMethods` lists a subclass's overrides. The
  * inherited slots keep SceneNode's names; this class overrides +0x008,

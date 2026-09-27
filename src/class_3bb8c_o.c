@@ -30,6 +30,8 @@
 #include "Actor.h"
 #include "TmdModel.h"
 #include "StyleEffect.h"
+#include "FrameClock.h"
+#include "GridCell.h"
 
 void NoOpIgnoreArgs(void) {}
 
@@ -50,7 +52,7 @@ extern void ReleaseBasicClassArray(void **array, s32 count);
 extern Ratio16 gStyleEffectJitterScales[6][3];
 
 void StyleEffect__ReleaseSprites(StyleEffect *self) {
-    ReleaseBasicClassArray((void **)self->sprites, 5);
+    ReleaseBasicClassArray((void **)self->sprites, ARRAY_COUNT(self->sprites));
 }
 
 void StyleEffect__SpawnPlainSprites(StyleEffect *self) {
@@ -61,16 +63,17 @@ void StyleEffect__RandomizeSprites(StyleEffect *self) {
     VariantSprite **sprite = &self->sprites[1];
     s32 i;
 
-    for (i = 0; i < 4; i++, sprite++) {
+    for (i = 0; i < ARRAY_COUNT(self->sprites) - 1; i++, sprite++) {
         u32 pick = rand();
 
-        (*sprite)->methods->updateScale(*sprite, 1, gStyleEffectJitterScales[pick % 6]);
-        (*sprite)->sprite.rotate = (rand() % 360) << 12;
+        (*sprite)->methods->updateScale(
+            *sprite, 1, gStyleEffectJitterScales[pick % ARRAY_COUNT(gStyleEffectJitterScales)]);
+        (*sprite)->sprite.rotate = (rand() % 360) * ONE; /* 4096ths of a degree */
     }
 }
 
 void StyleEffect__ReleaseSpritesB(StyleEffect *self) {
-    ReleaseBasicClassArray((void **)self->sprites, 5);
+    ReleaseBasicClassArray((void **)self->sprites, ARRAY_COUNT(self->sprites));
 }
 
 /* ------------------------------------------------------------------ *
@@ -123,7 +126,7 @@ extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
 void *New_Actor(void) {
-    Actor *self = BMemPMgrAlloc(0x58);
+    Actor *self = BMemPMgrAlloc(sizeof(Actor));
 
     if (self != NULL) {
         if (GetActorMethods()->ctor(self) != NULL) {
@@ -156,7 +159,7 @@ void Actor__AddChild(Actor *self, BasicClass *child) {
     classId = child->methods->header;
     if ((classId & 0xFFF) == 0x114) {
         self->grid = (struct StageMap *)child;
-    } else if ((classId & 0xF) == 5) {
+    } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->ticker = child;
     }
 }
@@ -166,7 +169,7 @@ void Actor__RemoveChild(Actor *self, BasicClass *child) {
 
     if ((classId & 0xFFF) == 0x114) {
         self->grid = NULL;
-    } else if ((classId & 0xF) == 5) {
+    } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->ticker = NULL;
     }
     GetSceneNodeMethods()->removeChild((SceneNode *)self, child);
@@ -179,7 +182,7 @@ void Actor__RemoveAllChildren(Actor *self) {
 }
 
 void Actor__Reset(Actor *self) {
-    self->lastOffsetValue = 0x12C;
+    self->lastOffsetValue = 300;
     self->pendingExtra = 0;
 }
 
@@ -191,15 +194,15 @@ void Actor__NotifyMove(Actor *self, s32 event) {
      * range test -- the combined form optimizes into a single unsigned
      * `(event-5) < 4` comparison, which is not what retail does (two
      * separate `slti`s). */
-    if (event < 9) {
-        if (event >= 5) {
+    if (event <= ACTOR_EVENT_MOVED_Y) {
+        if (event >= ACTOR_EVENT_UNSWEPT) {
             Buf38O hullBuf;
 
             if (self->model != NULL && TmdModel__GetBoundsCount(self->model)) {
                 self->methods->getModelHull(self, &hullBuf);
-                if (event != 5) {
+                if (event != ACTOR_EVENT_UNSWEPT) {
                     s16 offset = self->lastOffsetValue;
-                    s32 alongX = (event == 7);
+                    s32 alongX = (event == ACTOR_EVENT_MOVED_X);
                     s32 forward = (offset >= 0);
                     s32 delta;
 
@@ -218,7 +221,7 @@ void Actor__NotifyMove(Actor *self, s32 event) {
                 self->methods->transformAndNotifyParents(self, &hullBuf.hull, event);
                 /* The link target's class byte: an Actor gets slotE8. */
                 if (self->linkTarget != NULL) {
-                    if ((u8)self->linkTarget->methods->header == 0x34) {
+                    if ((u8)self->linkTarget->methods->header == ACTOR_CLASS_ID) {
                         ((Actor *)self->linkTarget)->methods->slotE8((Actor *)self->linkTarget);
                     }
                 }
@@ -231,9 +234,9 @@ void Actor__NotifyMove(Actor *self, s32 event) {
  * called with self alone in C terms, but they read the sender and event
  * this function received: $a1/$a2 are never touched before the call. */
 void Actor__DispatchLinkCommand(Actor *self, BasicClass *sender, s32 event) {
-    if ((u8)sender->methods->header == 0x34) {
+    if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
         self->methods->onActorLinkCommand(self, sender, event);
-    } else if ((u8)sender->methods->header == 0x24) {
+    } else if ((u8)sender->methods->header == GRIDCELL_CLASS_ID) {
         self->methods->onGridCellLinkCommand(self, sender, event);
     }
 }
@@ -274,5 +277,5 @@ void Actor__AddLocalTranslation(Actor *self, s16 *local) {
 extern s16 gActorLocalMoveZ;
 
 void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &gActorLocalMoveZ, val, notify, 6);
+    Actor__MoveAlongLocalAxis(self, &gActorLocalMoveZ, val, notify, ACTOR_EVENT_MOVED_Z);
 }
