@@ -83,3 +83,51 @@ What it does, in the unit's current field names: State machine on `moodState` 0/
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Track 7 (2026-09-27, round 95, bravo)
+
+### Constants
+
+- `notifyParents(this, 0xA)` is `ENTITY_EFFECT_LINK_STAGE` (enum EntityEffect, include/Entity.h: DreamSys__InstanceEffectsOnJournal's case 10 links to the stage `getLinkStage` names; Entity_g spells the same call this way)
+- `state` 0xB/0xC are this handler's own phases, now 11/12; `moveLocalZ(-0x5000)` is -20480, `distanceToPeer < 0x200` is 512.
+- Every other literal went to decimal (tick counts, TOD frames, distances, VAB programs; no masks): they are this handler's tuning, named by nothing else.
+
+### Unit history moved from the Entity_f.c banner
+
+The banner was rewritten as documentation of what the file holds. The history it carried, verbatim (the unit's range, how the row mapping was read from retail, and round 93's TodActor field and slot renames, detailed in `Entity__MoodCue93.md`), and the old forward-declaration comment:
+
+```c
+/* Entity_f -- one of the Entity class's split units (Entity_c..Entity_g
+ * hold its 97-function remainder after Entity/Entity_b), 0x800634A8..
+ * 0x80064618, fully matched.
+ *
+ * 15 of the 17 functions are `gEntityMoodHandlerTable` callbacks
+ * (Entity.h), `Entity__MoodCueNN` for the row whose `handler` word holds
+ * their address: rows 82-96, consecutive and in address order here, read
+ * from disk/SLPS_015.56 (base 0x80089EB0, stride 0x10). `Entity__MoodCue93`
+ * also occupies row 107, named for its lower row as in Entity_c/_e/_g.
+ * ServiceSoundCueSet calls each once per tick with the entity's SoundCueSet
+ * (`SoundCueSet`); they request tones and step the entity's pose
+ * and TOD animation on moodTimer / TOD-frame thresholds.
+ *
+ * The other two, `SetCueTones7_7_7` and `SetCueTones18_3_3`, are private
+ * helpers of Entity__MoodCue85/86 that take only the SoundCueSet and write
+ * a fixed three-voice tone request into it.
+ *
+ * Entity derives from TodActor (code_55dd4.h), whose TOD fields and slots
+ * it inherits at the same offsets: this round renamed the two only this unit
+ * touches (`todFramePtr` +0x88, `applyTodFrame` +0x134) and proposed the
+ * shared ones (setTod/playTod/stopTod, todIndex/todFrame, companion2 --
+ * now Actor's `ticker` -- and moodDuration -> todFrameCount) in
+ * Entity__MoodCue93.md; the head applied them by type scope at merge.
+ */
+#include "common.h"
+#include "Entity.h"
+#include "DreamSys.h"
+
+/* Forward declarations: both are defined later in this file (in ROM
+ * order), but Entity__MoodCue85 and Entity__MoodCue86 call them before their own
+ * definitions appear -- same convention as Entity_d.c's own forward calls. */
+void SetCueTones7_7_7(SoundCueSet *out);
+void SetCueTones18_3_3(SoundCueSet *out);
+```
