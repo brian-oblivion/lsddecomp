@@ -21,7 +21,7 @@
  * The mood row. New_Entity's first argument is `moodIndex`, which selects a
  * 16-byte row of gEntityMoodTable and of the parallel byte tables below.
  * Every tick, update (+0x098) runs updateActivationState (activate when the
- * row's detachKind condition holds), updateDeactivationState, the sound-cue
+ * row's activateKind condition holds), updateDeactivationState, the sound-cue
  * start/stop pair and updateTargetProximity, then TodActor's update.
  *
  * The peer is the player. attachToParent's (self, peer, companion, parent,
@@ -37,7 +37,7 @@
  * Actor's `grid` field (+0x04C).
  *
  * Sound cues. startSoundCue calls InitSoundCueSet on `soundCueSet` with
- * TodActor's `arg2` (the ctor's third argument; code_4cd08 passes
+ * TodActor's `sound` (the ctor's third argument; code_4cd08 passes
  * D_8008AC04) as the sound object, itself as the owner and the mood row's
  * handler as the callback, and selects tick callback 'B' in reset
  * (Entity__TickSoundCue, +0x11C), which services the set once per tick. So a
@@ -70,7 +70,7 @@ typedef struct EntityMoodRow EntityMoodRow;
  * Entity__TickSoundCue; `tools/classtable.py gEntityMethods --vs
  * gTodActorMethods`), then this class's own. */
 struct EntityMethods {
-    TODACTOR_SLOTS(Entity, (Entity * self, s32 moodIndex, void *desc, void *arg2));
+    TODACTOR_SLOTS(Entity, (Entity * self, s32 moodIndex, void *desc, void *sound));
     /* +0x144 */ s32 (*distanceToPeer)(Entity *self, TodActor *peer); /* Entity__DistanceToPeer: |dx| + |dz| from coord2's translation to peer's world position */
     /* +0x148 */ s32 (*getProximityRatio)(Entity *self); /* Entity__GetProximityRatio: -1 when no peer or out of range */
     /* +0x14C */ EntityMoodRow *(*getMoodEffect)(Entity *self); /* Entity__GetMoodEffect: &gEntityMoodTable[moodIndex] */
@@ -138,52 +138,81 @@ extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
  * is the grid manager, StageMap (include/StageMap.h; code_4cd08 passes
  * D_8008ABFC). Entity_b/_e/_g call its startScaleRamp (+0x138). */
 
-/* Default arguments Entity__GetOrCreateFadeBox substitutes when its own
- * `name`/`arg2` parameters are NULL -- both plain 2-word buffers
- * (asm/data/7B3F8.sdata.s): {0x140, 0xF0} (320, 240) and {-100, -100}, the
- * size and offset Viewport gives its FadeBox (FadeBox.h). */
-extern s32 gEntityDefaultPos[2];
-extern s32 gEntityDefaultOffset[2];
+/* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
+ * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what
+ * Viewport gives its FadeBox (FadeBox.h). */
+extern s32 gEntityFadeBoxDefaultSize[2];
+extern s32 gEntityFadeBoxDefaultOffset[2];
 
-/* The mood-indexed table lookups. `gEntityMoodTable` is a real struct array (16
- * bytes/entry, `this->moodIndex` selects the row) -- Entity__UpdateActivationState reads
- * its +0x3 (signed) and Entity__UpdateDeactivationState its +0x4 (UNSIGNED) as two DIFFERENT
- * small-enum fields, not the same byte reinterpreted; both also read +0x5
- * (signed) and +0x9 (signed). `gEntityUnlockKindTable`/`gEntityLinkStageTable`/`gEntityEventVideoTable` are
- * SEPARATE global arrays (own base symbols, own `lui`/`addiu`), each also
- * 16-byte/entry and independently `this->moodIndex`-indexed -- despite the
- * base addresses' proximity, they are not sub-fields of the gEntityMoodTable row.
- * Table element types past what's listed here are `s8` (signed byte loads),
- * not `char`, despite `-funsigned-char` making plain `char` unsigned project-
- * wide -- these tables are explicitly `lb`, not `lbu`, in every user seen so
- * far (contrast `linkKind`, `gEntityUnlockKindTable`, both `lbu`/`lb`-mixed by design,
- * not by the project's usual char convention). */
+/* One row of the mood table (16 bytes): New_Entity's moodIndex selects it, and
+ * every per-mood setting of an Entity is a column of it. Signed columns are
+ * `s8` (`lb`); plain `char` would be unsigned here (-funsigned-char).
+ *
+ * gEntityLinkStageTable and gEntityEventVideoTable are two of its columns
+ * seen as flat arrays (the row base + 7 and + 8, indexed moodIndex * 16):
+ * GCC spells a constant-offset field of a global array as `%hi`/`%lo(sym +
+ * off)`, which splat labels as a symbol of its own. Entity_b still reads them
+ * that way; the field spelling compiles to the same bytes. */
 struct EntityMoodRow {
-    u8 pad00[0x03];
-    s8 detachKind;     /* +0x03, read by Entity__UpdateActivationState */
-    u8 linkKind;       /* +0x04, read by Entity__UpdateDeactivationState (unsigned load) */
-    s8 unk5;           /* +0x05 */
-    s8 proximityRange; /* +0x06, read by Entity__UpdateTargetProximity only (compiler-checked, round 71): magnitude (after abs) is Entity__IsNearTarget's distance arg for raising targetReached via setTargetReached; a NEGATIVE value also makes the entity face its target every tick */
-    u8 pad07[0x02];
+    u8 pad00[0x02];
+    s8 unlockKind; /* +0x02, Entity__GetUnlockEffect: times 1000 is the unlock score; 1 to 9: Entity__Reset turns fog on; -9 to -1: Entity__IsNearTarget moves the tested point by it times 1024 in y */
+    s8 activateKind; /* +0x03, read by Entity__UpdateActivationState; 0: Entity__AttachToParent activates at once */
+    u8 deactivateKind; /* +0x04, read by Entity__UpdateDeactivationState (unsigned load) */
+    s8 activeRange; /* +0x05, Entity__IsNearTarget's distance for the activation and deactivation range tests; 0: no range test */
+    s8 proximityRange; /* +0x06, read by Entity__UpdateTargetProximity: magnitude (after abs) is Entity__IsNearTarget's distance arg for raising targetReached via setTargetReached; a NEGATIVE value also makes the entity face its target every tick */
+    s8 linkStage; /* +0x07, Entity__GetLinkStage and Entity__NotifyLinkStage (gEntityLinkStageTable) */
+    s8 eventVideo; /* +0x08, Entity__GetEventVideo and Entity__NotifyLinkStage (gEntityEventVideoTable) */
     s8 nearTolerance; /* +0x09, Entity__IsNearTarget's tolerance for every range test on this row (activation, deactivation, proximity, cue start/stop) */
-    u8 pad0A[0x01];
-    s8 cueRange; /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop only (compiler-checked, round 71): 0 = the cue never auto-starts; magnitude (after abs) is Entity__IsNearTarget's distance arg for starting the sound cue; a NEGATIVE value also stops it again once the target leaves that range. SEPARATE field from proximityRange (+0x06) */
-    u8 pad0C[0x04];
+    s8 proximityThreshold; /* +0x0A, Entity__GetProximityRatio's range, in ENTITY_RANGE_UNITs */
+    s8 cueRange; /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop and Entity__AttachToParent: 0 = the cue starts at attach (when the entity activated there) and never on range; magnitude (after abs) is Entity__IsNearTarget's distance arg for starting the sound cue; a NEGATIVE value also stops it again once the target leaves that range. SEPARATE field from proximityRange (+0x06) */
+    SoundCueCallbackFn handler; /* +0x0C, the Entity__MoodCueNN Entity__StartSoundCue installs (symbol gEntityMoodHandlerTable, 0x80089EB0) */
 };
 
+/* activateKind: when Entity__UpdateActivationState activates an inactive
+ * Entity (never while its state is ENTITY_STATE_DONE). "Near" is
+ * Entity__IsNearTarget on the row's activeRange and nearTolerance; the
+ * random ones pass on one tick in 128. */
+enum EntityActivateKind {
+    ENTITY_ACTIVATE_AT_ATTACH = 0,   /* Entity__AttachToParent activates it at once */
+    ENTITY_ACTIVATE_NEAR = 1,        /* while near */
+    ENTITY_ACTIVATE_FAR = 2,         /* while not near */
+    ENTITY_ACTIVATE_NEAR_RANDOM = 3, /* at random while near */
+    ENTITY_ACTIVATE_RANDOM = 4       /* at random */
+};
+
+/* deactivateKind: when Entity__UpdateDeactivationState deactivates an active
+ * Entity. 0 and 3 make no test; 1 and 2 test as activateKind does; from
+ * ENTITY_DEACTIVATE_TIMED up, it deactivates on the tick that equals
+ * deactivateKind * 15. */
+enum EntityDeactivateKind {
+    ENTITY_DEACTIVATE_NONE = 0,
+    ENTITY_DEACTIVATE_NEAR = 1,
+    ENTITY_DEACTIVATE_FAR = 2,
+    ENTITY_DEACTIVATE_NONE_ALT = 3, /* no test either: what sets it apart from 0 is not in Entity code */
+    ENTITY_DEACTIVATE_TIMED = 10
+};
+
+/* A linkStage of 127 ends the dream instead of linking: Entity__NotifyLinkStage
+ * sends ENTITY_EFFECT_EVENT_VIDEO when the row has an eventVideo, else
+ * ENTITY_EFFECT_END_DREAM. Other positive values send
+ * ENTITY_EFFECT_LINK_STAGE; 0 and below send nothing there. */
+#define ENTITY_LINK_STAGE_END_DREAM 127
+
+/* The unit of the mood row's ranges and tolerances, in world units: what
+ * Entity__IsNearTarget and Entity__GetProximityRatio scale them by (the
+ * grid's cell size, STAGE_CELL_SIZE in StageMap.h, has the same value). */
+#define ENTITY_RANGE_SHIFT 11
+#define ENTITY_RANGE_UNIT (1 << ENTITY_RANGE_SHIFT)
+
 extern EntityMoodRow gEntityMoodTable[];
-extern s8 gEntityUnlockKindTable[]; /* GetUnlockEffect */
-extern s8 D_80089EA7[]; /* read by Entity__AttachToParent, own base symbol immediately after gEntityUnlockKindTable, moodIndex*0x10-indexed like the rest of this family */
-extern s8 gEntityLinkStageTable[];          /* GetLinkStage */
-extern s8 gEntityEventVideoTable[];         /* GetEventVideo */
-extern s8 gEntityProximityThresholdTable[]; /* read by Entity__GetProximityRatio, own base symbol immediately before D_80089EAF, moodIndex*0x10-indexed like the rest of this family */
-extern s8 D_80089EAF[]; /* read by Entity__AttachToParent, own base symbol immediately after gEntityEventVideoTable, moodIndex*0x10-indexed like the rest of this family */
+extern s8 gEntityLinkStageTable[];  /* the linkStage column (Entity_b) */
+extern s8 gEntityEventVideoTable[]; /* the eventVideo column (Entity_b) */
 
 /* The class's own methods, in ROM order (Entity, then Entity_b). A caller
  * reaching the base ones goes through GetTodActorMethods() and upcasts. */
-Entity *New_Entity(s32 moodIndex, void *desc, void *arg2);
-Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *arg2);
-FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *name, void *arg2, void *arg3, s32 arg4);
+Entity *New_Entity(s32 moodIndex, void *desc, void *sound);
+Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *sound);
+FadeBox *Entity__GetOrCreateFadeBox(Entity *self, void *size, void *offset, void *step, s32 pri);
 void Entity__Finalize(Entity *self);
 void Entity__Reset(Entity *self);
 void Entity__AttachToParent(Entity *self, TodActor *peer, void *companion, struct StageMap *parent,
@@ -193,7 +222,7 @@ void Entity__Update(Entity *self, void *sender, s32 event);
 void Entity__NotifyLinkStage(Entity *self, void *sender, s32 event);
 void Entity__OnGridCellLinkCommand(Entity *self, void *sender, s32 event);
 void Entity__TickSoundCue(Entity *self);
-s32 Entity__IsNearTarget(Entity *self, void *pos, s32 arg2, s32 arg3);
+s32 Entity__IsNearTarget(Entity *self, void *pos, s32 range, s32 tolerance);
 s32 Entity__DistanceToPeer(Entity *self, TodActor *peer);
 s32 Entity__GetProximityRatio(Entity *self);
 EntityMoodRow *Entity__GetMoodEffect(Entity *self);

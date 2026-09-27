@@ -93,3 +93,15 @@ elsewhere in the codebase. Not renamed (already correct).
 First parameter retyped `void *` -> `s32 moodIndex` (Entity__Entity stores it in `moodIndex`; code_4cd08 passes `i + 0x62` and `kind` with `(void *)` casts, now dropped). code_4cd08's local `extern void *New_Entity` is deleted; it includes Entity.h.
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Polish (round 96, bravo, track 7)
+
+- Step 3: parameter arg2 -> sound: it is TodActor's ctor's second argument, the sound bank TodActor keeps in `sound` (TodActor.h). Also in Entity.h's prototype and ctor slot.
+
+- Step 4: BMemPMgrAlloc(0x108) -> sizeof(Entity) (Entity is 0x108 bytes; byte-identical).
+
+- Step 5: the unit banner of src/Entity.c was rewritten as documentation. The history it carried, kept here:
+  - "The Entity class -- fully matched, no INCLUDE_ASM left (round 56 was a track 3 naming pass, not matching work)."
+  - "This is the first 25 of a 142-function block split at Entity__UpdateTargetProximity; the rest (Entity_b through Entity_g, all sharing include/Entity.h) hold the mood-dispatch handler tables and the per-frame behaviour those handlers run."
+  - "Entity's own vtable is gEntityMethods (asm/data/79528.data.s), reached via Get_vtable_Entity (Entity_b.c); `tools/classtable.py gEntityMethods` is the ground truth for which function occupies which slot, including the several self-referential slots this unit's own functions dispatch back into (activate/deactivate/getProximityRatio/startSoundCue/stopSoundCue)."
+  - "The overrides of TodActor's slots are named for their slots (Entity__Finalize, Reset, AttachToParent, DetachFromParent, OnGridCellLinkCommand; track 4, round 88)."

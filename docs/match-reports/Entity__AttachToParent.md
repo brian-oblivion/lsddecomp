@@ -90,3 +90,19 @@ same `this->unk0C` gate.
 Renamed from `Entity__AttachUnk4C`: the occupant of +0x04C, whose parameters are TodActor's (self, peer, companion, parent, offset); it now takes them by those names and forwards them to TodActor's occupant without casts. The `parent` it keeps is stored in Actor's `grid` field (was `unk4C`). code_4cd08 is its C caller through the slot (peer gDreamAuxWorld, parent D_8008ABFC). The extra (activate unless D_80089EA7, then startSoundCue unless D_80089EAF) is in the header banner. Tier A: an override named for its slot (FINISHING-PLAN track 4 step 6).
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Polish (round 96, bravo, track 7)
+
+`D_80089EA7[moodIndex * 0x10]` and `D_80089EAF[moodIndex * 0x10]` are
+`gEntityMoodTable[moodIndex].detachKind` (+0x03) and `.cueRange` (+0x0B):
+0x80089EA7 and 0x80089EAF are gEntityMoodTable (0x80089EA4) + 3 and + 0xB,
+and the field spelling is byte-identical (whole image green). GCC emits a
+constant-offset field of a global array as `%hi`/`%lo(sym + off)`, which
+splat labels as its own `D_` symbol; that, not a separate array, is why each
+had its own `lui`/`addiu`. The two externs are gone from Entity.h. So the
+body reads: a row with no activation condition (detachKind 0) activates at
+attach, and one that also has no cue range (cueRange 0) starts its cue at
+attach. Entity.h's cueRange comment used to say "read by
+Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop only
+(compiler-checked, round 71): 0 = the cue never auto-starts"; the round-71
+check predates this reading, and the comment now names this reader too.

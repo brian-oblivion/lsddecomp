@@ -143,3 +143,17 @@ unrelated `unkF0` active/inactive toggle. Not renamed.
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Polish (round 96, bravo, track 7)
+
+- Step 2: The flat mood-row "tables" this body read are columns of gEntityMoodTable's
+16-byte row (their symbols are the row base 0x80089EA4 plus the column
+offset: gEntityUnlockKindTable +0x02, gEntityLinkStageTable +0x07,
+gEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
+gEntityMoodHandlerTable +0x0C), now EntityMoodRow fields; byte-identical.
+Entity.h's old claim that they were "SEPARATE global arrays (own base
+symbols, own lui/addiu) ... not sub-fields of the gEntityMoodTable row" was
+wrong: GCC spells a constant-offset field of a global array as
+%hi/%lo(sym + off), which splat labels as its own symbol.
+
+- Step 5: a function comment gives the encoding (n - 1 for positive, ~n for negative).

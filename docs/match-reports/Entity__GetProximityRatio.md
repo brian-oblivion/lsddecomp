@@ -195,3 +195,21 @@ shared prototype: Entity.h, DreamSys.c and class_3bb8c_n.c declare them
 with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.
+
+## Polish (round 96, bravo, track 7)
+
+- Step 2: The flat mood-row "tables" this body read are columns of gEntityMoodTable's
+16-byte row (their symbols are the row base 0x80089EA4 plus the column
+offset: gEntityUnlockKindTable +0x02, gEntityLinkStageTable +0x07,
+gEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
+gEntityMoodHandlerTable +0x0C), now EntityMoodRow fields; byte-identical.
+Entity.h's old claim that they were "SEPARATE global arrays (own base
+symbols, own lui/addiu) ... not sub-fields of the gEntityMoodTable row" was
+wrong: GCC spells a constant-offset field of a global array as
+%hi/%lo(sym + off), which splat labels as its own symbol.
+
+- Step 3: the local `self = this` copy is gone: without it the function is still 56/56 and the image byte-identical, so it was not load-bearing. The do/while(0) around the peer guard IS (without it 55/56, measured this round); it keeps a MATCHING line.
+
+- Step 4: `<< 11` -> ENTITY_RANGE_SHIFT.
+
+- Step 5: MATCHING lines added for the do/while(0) guard.

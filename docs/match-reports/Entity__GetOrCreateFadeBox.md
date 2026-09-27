@@ -15,8 +15,8 @@ through it: `slot50(sub)`, `slot4C(sub, this, arg2-or-default)`,
 `slotD0(sub, arg3)`. Returns the object (new or cached), or NULL if
 allocation failed.
 
-`name` defaults to `gEntityDefaultPos` (`{320, 240}`) and `arg2` defaults to
-`gEntityDefaultOffset` (`{-100, -100}`) when the caller passes NULL — both plain
+`name` defaults to `gEntityFadeBoxDefaultSize` (`{320, 240}`) and `arg2` defaults to
+`gEntityFadeBoxDefaultOffset` (`{-100, -100}`) when the caller passes NULL — both plain
 2-word data buffers, not strings, in `asm/data/7B3F8.sdata.s`.
 
 ## Derivation
@@ -43,7 +43,7 @@ Unk100Obj *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void
     cached = this->unk100;
     if (cached == NULL) {
         if (name == NULL) {
-            name = gEntityDefaultPos;
+            name = gEntityFadeBoxDefaultSize;
         }
         sub = New_FadeBox(name, 0, arg4);
         if (sub == NULL) {
@@ -57,7 +57,7 @@ Unk100Obj *Entity__GetOrCreateFadeBox(Entity *this, void *name, void *arg2, void
     m = sub->methods;
     dispatchArg2 = arg2;
     if (dispatchArg2 == NULL) {
-        dispatchArg2 = gEntityDefaultOffset;
+        dispatchArg2 = gEntityFadeBoxDefaultOffset;
     }
     m->slot4C(sub, this, dispatchArg2);
     sub->methods->slotD0(sub, arg3);
@@ -88,7 +88,7 @@ the way the "obviously equivalent" nested-if reads.**
    directly next time rather than "cleaning it up" first.
 3. The dispatch tail still needed two more fixes after that: `arg2`'s
    NULL-default was written by reassigning the *parameter itself*
-   (`if (arg2 == NULL) arg2 = gEntityDefaultOffset;`), and that block-reused `$s2`
+   (`if (arg2 == NULL) arg2 = gEntityFadeBoxDefaultOffset;`), and that block-reused `$s2`
    for both the check and the final value — but retail computes the checked
    value into `$a2` (a temp, distinct from the parameter's home register)
    and leaves `$s2` alone. Introducing a separate `dispatchArg2` local fixed
@@ -149,7 +149,7 @@ use the unified names: slot50 -> `detachFromParent`
 (BoxFill__AttachToParent, `this` upcast to `SceneNode *`), slotD0 ->
 `setStep` (FadeBox__SetStep; `arg3` passed `(s32)`, no code). What the
 arguments are, from the occupants: `name` is New_FadeBox's SIZE (read as
-two low halfwords into boxW/boxH; the default gEntityDefaultPos is
+two low halfwords into boxW/boxH; the default gEntityFadeBoxDefaultSize is
 {320, 240}), `arg2` is the attach position (BoxFill__AttachToParent's
 BoxFillPos; default {-100, -100}, the relative top-left, the same pair
 Viewport passes, gFadeBoxAttachPos) and `arg3` the fade step. The parameter names
@@ -159,3 +159,9 @@ echo's round-87 summary). Image byte-identical.
 ## Track 4 (2026-09-26, round 88, echo)
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/Entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Polish (round 96, bravo, track 7)
+
+- Step 3: parameters name, arg2, arg3, arg4 -> size, offset, step, pri (from what their receivers do with them: New_FadeBox's size and pri, BoxFill__AttachToParent's offset, FadeBox__SetStep's step); locals sub, m, dispatchArg2 -> box, boxMethods, attachOffset. The two defaults were renamed by tools/rename.py: gEntityDefaultPos -> gEntityFadeBoxDefaultSize (it is New_FadeBox's size, {320, 240}, not a position), gEntityDefaultOffset -> gEntityFadeBoxDefaultOffset. Tier A for both: the body substitutes each for its NULL argument.
+
+- Step 5: Entity.h's comment on the two defaults said they are "both plain 2-word buffers (asm/data/7B3F8.sdata.s): {0x140, 0xF0} (320, 240)"; the comment now gives the values in decimal and the data file location lives here. The body keeps one MATCHING line for its three load-bearing locals (see the attempt log above).
