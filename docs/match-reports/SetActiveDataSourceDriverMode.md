@@ -46,12 +46,12 @@ register, and the linker only checks the symbol name, not the prototype.
 ## Final body
 
 ```c
-typedef s32 (*Func80026F34Fn)(s32, s32, s32);
+typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
 extern s32 SetVabDriverMode(s32 arg0, s32 arg1, s32 arg2);
 extern s32 SetCdDriverMode(s32 arg0, s32 arg1, s32 arg2);
 
 void SetActiveDataSourceDriverMode(s32 arg0, s32 arg1, s32 arg2) {
-    Func80026F34Fn fn;
+    DataSourceSetDriverModeFn fn;
 
     fn = SetVabDriverMode;
     if (gActiveDataSource == 0x13) {
