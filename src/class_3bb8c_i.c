@@ -16,6 +16,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <strings.h>
 #include "class_3bb8c.h"
 #include "TextEntry.h"
 #include "CharSprite.h"
@@ -24,10 +25,6 @@
 #include "VabStreamObj.h"
 #include "Pad.h"
 #include "FrameClock.h"
-
-/* This project's own strcpy (matched elsewhere) -- TextEntry__SetText's own
- * caller, same local-declaration convention as class_3bb8c_e.c/others. */
-extern char *strcpy(char *dest, char *src);
 
 /* Uncarved helper, `code_2cc8c_f`, still INCLUDE_ASM -- TextEntry__SetText's own
  * call. Translates each byte of `src` (a name string) into `dest` (folding a
@@ -48,10 +45,6 @@ TextEntry *New_TextEntry(char *text, s32 mode) {
     }
     return NULL;
 }
-
-/* Sony's, from libc2 (already declared above via class_3bb8c_j's own
- * convention -- but not yet in this unit; local view). */
-extern s32 strlen(char *s);
 
 /* VALUE-of `%gp_rel`, round 45's own local view -- same global as
  * class_3bb8c_j's `gNameCharTable` (a byte lookup table whose length this
@@ -159,7 +152,7 @@ void TextEntry__SetText(TextEntry *self, char *text, s32 mode) {
  * makes panelSprite (New_ScreenSprite), textRow (New_TextRow) and
  * cursorSprite (New_CharSprite) from the loaded handles.
  */
-extern char *BuildFileName(char *dest, char *name, char *dir, char *ext);
+extern char *BuildFileName(char *dest, const char *name, const char *dir, const char *ext);
 
 extern const char sStrComInput[];          /* "COMINPUT" */
 extern const char sStrFontIcon[];          /* "FONTICON" */
