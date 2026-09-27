@@ -269,13 +269,14 @@ search, not a repeat of this one.
 
 ## Preserved bodies
 
-Both need `Entry90902E8` with `unk40` as **`s16`** (see the unit) and these
-three declarations, all already present in `src/code_179d8_i.c`:
+Both need `SsScore` from `include/SsScore.h` (`unk40` is **`s16`** there,
+as these bodies require) and these declarations, all already present in
+`src/code_179d8_i.c`:
 
 ```c
 extern s32 SpuVmSetSeqVol(s16 a0, u16 a1, u16 a2, s32 a3);
 extern s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2);
-extern Entry90902E8 *_ss_score[];
+#include "SsScore.h" /* SsScore, extern SsScore *_ss_score[] */
 ```
 
 ### Body A — 200/202 words, 21/202, `regs=6/0`. THE ONE TO BUILD ON.
@@ -288,9 +289,9 @@ callee-saved permutation and the 8-byte `vars` gap.
 #if 0
 void Snd_decrescendo(s16 a0, s16 a1)
 {
-    Entry90902E8 **row = &_ss_score[a0];
-    s32 off = a1 * sizeof(Entry90902E8);
-    Entry90902E8 *p = (Entry90902E8 *)((u8 *)*row + off);
+    SsScore **row = &_ss_score[a0];
+    s32 off = a1 * sizeof(SsScore);
+    SsScore *p = (SsScore *)((u8 *)*row + off);
     s32 c42 = p->unk42;
     s32 cnt = p->unk98 - 1;
     s16 pk;
@@ -350,7 +351,7 @@ clearHandler:
 
 negHandler:
     SpuVmSetSeqVol((s16)(a0 | (a1 << 8)), 0, 0, 0);
-    ((Entry90902E8 *)((u8 *)*row + off))->unk90 &= ~0x20;
+    ((SsScore *)((u8 *)*row + off))->unk90 &= ~0x20;
 
 tailCheck:
     if (p->unk98 == 0 || p->unk40 == 0) {
@@ -366,7 +367,7 @@ tailFinal:
 ### Body B — 201/202 words, 46/202, `regs=5/0`. Higher raw score, worse body.
 
 Body A with the one negHandler line changed back from
-`((Entry90902E8 *)((u8 *)*row + off))->unk90 &= ~0x20;` to
+`((SsScore *)((u8 *)*row + off))->unk90 &= ~0x20;` to
 `(*row)[a1].unk90 &= ~0x20;` — i.e. dropping the explicit `off` reuse. That
 costs the call-saved `off` register (`regs` falls to 5, away from retail's 6)
 and makes negHandler recompute the whole address instead of using retail's
@@ -378,9 +379,9 @@ so nobody re-derives it as a discovery.
 #if 0
 void Snd_decrescendo(s16 a0, s16 a1)
 {
-    Entry90902E8 **row = &_ss_score[a0];
-    s32 off = a1 * sizeof(Entry90902E8);
-    Entry90902E8 *p = (Entry90902E8 *)((u8 *)*row + off);
+    SsScore **row = &_ss_score[a0];
+    s32 off = a1 * sizeof(SsScore);
+    SsScore *p = (SsScore *)((u8 *)*row + off);
     s32 c42 = p->unk42;
     s32 cnt = p->unk98 - 1;
     s16 pk;
@@ -507,3 +508,144 @@ register-independent arithmetic. So: state the built body's length and the
 raw match as two separate figures, never one; and when a body's length is
 wrong, treat the raw word-match as a weak signal and compare word COUNT plus
 the instruction listing instead.
+
+## Round 97: the record is Sony's SsScore
+
+The unit's local `Entry90902E8` (a 0xAC-byte view of `_ss_score[a][s]`) is
+deleted; the unit includes `include/SsScore.h`. Evidence: Snd_decrescendo is
+Sony's (pinned in `config/psyq-objects.ld`), only libsnd reads `_ss_score`,
+and 0xAC is SS_SEQ_TABSIZ. Every offset the function's disassembly touches
+(`+0x3E` lh, `+0x40` lhu/sh read-modify-write and lh sign test, `+0x42` lh,
+`+0x78`/`+0x7A` by address, `+0x90` lw/sw, `+0x98` lw/sw) is already a
+field of SsScore with the same width, so SsScore.h did not change. The local
+view's `unk2B`, `unk44`, `unk4A`, `unk70`, `unk8C`, `unkA0` and
+`unkA4` had no reader in this function and were dropped, not moved. The
+`lhu` at `+0x40` is GCC's load for an `s16` read-modify-write, not
+evidence of `u16`; the preserved bodies were written against `s16`. The SDK
+check: `libsnd/decre` ships as `Snd_decrescendo` on 3.0 (text 0x474) and
+3.3 (0x4B0) and as `_SsSndDecrescendo` on 3.5/3.6 (0x2AC); retail's is 0x328,
+so none links. Zero bytes changed.
+
+## Unit history (moved from the code_179d8_i.c banner, round 97)
+
+```text
+/*
+ * code_179d8_i -- what is LEFT of functions 220..237 of the original
+ * code_179d8 monolith after round 34 gave fourteen of its sixteen functions
+ * back to Sony.  Now 0x24490..0x247B8 (vram 0x80033C90..0x80033FB8), a
+ * ONE-function unit holding Snd_decrescendo alone.
+ *
+ * ROUND 34 (2026-09-12): 0x2397C..0x24490 is TEN linked `libsnd` objects
+ * (all Psy-Q 3.3) covering ELEVEN functions, every one of which had been
+ * MATCHED as C:
+ *   0x8003317C SsUtGetVabHdr         libsnd/ut_gvh    (already carried Sony's name)
+ *   0x80033260 SsUtGetVagAtr         libsnd/ut_gva    (was func_80033260)
+ *   0x800334A0 SsSetMVol             libsnd/scsmvol
+ *   0x800334F0 SsUtGetProgAtr        libsnd/ut_gpa    (was func_800334F0)
+ *   0x800335FC SsVabTransBody        libsnd/vs_vtb
+ *   0x800336CC SsSetMute             libsnd/scsmute
+ *   0x8003370C SsVabTransCompleted   libsnd/vs_vtc
+ *   0x80033738 SsSeqCalledTbyT       libsnd/sscall    (157w)
+ *   0x800339AC Snd_pause             libsnd/pause
+ *   0x80033A4C Snd_nextpause         libsnd/pause
+ *   0x80033AB0 Snd_tempo             libsnd/tempo     (120w)
+ * Their C is DELETED, not commented out.  Reclassifying eleven matched
+ * functions out of the game count is the correction CLAUDE.md asks for, not a
+ * regression -- they were Sony library code the whole time.  Do not write C
+ * for any of them again; `python3 tools/sdkstalls.py` and
+ * `.venv/bin/python3 tools/psyq_sdk.py coverage` are the evidence.
+ *
+ * A pure PREFIX trim, so the unit kept its name and the `c` line simply moved
+ * to 0x24490.
+ *
+ * A SECOND RUN in the same round then took the other end.  `libsnd/replay` and
+ * `libsnd/vs_vab` (0x247B8..0x2490C) are `Snd_replay`, `SsVabClose` and
+ * `SsVabOpen` -- func_80033FB8, func_80034020 and func_800340B0, all three
+ * previously MATCHED as C and all three now deleted from here.  That run sat
+ * in the MIDDLE of what the prefix trim had left, so the slice became
+ * [c][o][o][c] and the tail half became the one-function unit
+ * `src/code_179d8_i_b.c` (Snd_play).  Nothing moved with it: this unit
+ * never owned a rodata attach.
+ *
+ * `libsnd/pause` is taken from the 3.3 disc ON PURPOSE: 3.5/3.6 split that
+ * module into `pause` (0xA0) + `npause` (0x64), which is the same two
+ * functions but does not tile as one object.  `runs` says the same thing as
+ * "libsnd/pause supersedes libsnd/npause".
+ *
+ * A STANDING NOTE THIS FILE CARRIED FOR SEVERAL ROUNDS IS NOW RESOLVED.  The
+ * func_80033260 comment said it could not be renamed to `SsUtGetVagAtr`
+ * because the name had no `= 0x8003....;` alias in
+ * config/symbols.slps01556.lsdde.txt, so INCLUDE_ASM'd callers in
+ * code_179d8_k.c and code_179d8_e.c carried a literal `jal func_80033260`,
+ * and "config/ is not this unit's to edit".  An SDK-object conversion edits
+ * exactly that file: Sony's names for all eleven are now in the symbols file
+ * and `make extract` rewrote every caller's `.s`.  The rename was mechanical.
+ *
+ * ROUND 33 CORRECTION, KEPT BECAUSE THE LESSON OUTLIVES ITS EXAMPLE.  This
+ * file's carve-time census certified func_80032D34 as "ordinary large fresh
+ * ground, not blocked" -- correctly, against both live blocker screens -- and
+ * it was Sony's `SsVabOpenHeadWithMode` all along; a 232-line derivation went
+ * into it.  A screen measures the obstruction it was built for and says
+ * nothing about the ones it was not, and a carve-time census recorded as a
+ * DIRECTIVE outlives the thing it was measured against.  Round 34 is the same
+ * finding at eleven times the scale: every function above passed every blocker
+ * screen and every one was unmatchable by construction.  Screen with
+ * `python3 tools/nearmiss.py` (which runs `sdkstalls.py` for you); do not
+ * trust a transcribed census, this comment included.
+ *
+ * Owns no rodata: zero `jtbl_` in its disassembly, and the yaml's rodata slot
+ * list names no `.rodata, code_179d8_i` line.  Both of the old
+ * code_179d8_tail's jump tables went to code_179d8_k.
+ *
+ * Keep every function in strict ROM-address order.
+ */
+
+#include "common.h"
+
+/* A 172 (0xAC)-byte record; _ss_score is an array of pointers to arrays of
+ * these, indexed [screen][slot]-style by two signed 16-bit indices. This is
+ * a reduced LOCAL view -- only the fields this unit's functions touch are
+ * named. See code_179d8_f.c's own Entry90902E8 for a fuller layout of the
+ * same array; each unit keeps its own independent reading, per project
+ * convention (multiple local views of one struct are expected here). */
+typedef struct {
+    u8 pad0[0x2B];
+    u8 unk2B;
+    u8 pad2C[0x3E - 0x2C];
+    s16 unk3E;
+    s16 unk40;
+    s16 unk42;
+    s16 unk44;
+    u8 pad46[0x4A - 0x46];
+    s16 unk4A;
+    u8 pad4C[0x70 - 0x4C];
+    s16 unk70;
+    u8 pad72[0x78 - 0x72];
+    s16 unk78;
+    s16 unk7A;
+    u8 pad7C[0x8C - 0x7C];
+    u32 unk8C;
+    s32 unk90;
+    u8 pad94[0x98 - 0x94];
+    s32 unk98;
+    u8 pad9C[0xA0 - 0x9C];
+    s32 unkA0;
+    u32 unkA4;
+    u8 padA8[0xAC - 0xA8];
+} Entry90902E8;
+
+extern Entry90902E8 *_ss_score[];
+
+/* unk3E, unk40, unk42, unk78, unk7A, unk98 added to Entry90902E8 above,
+ * in place of existing padding -- no existing field's offset changed.
+ * unk40 is loaded with `lhu` (declared u16) but sign-checked via an
+ * explicit `(s16)` cast at every comparison site -- matches retail's
+ * `sll 16`/`bltz` idiom for checking a 16-bit value's sign without a
+ * plain `lh`.
+ *
+ * STALL -- see docs/match-reports/Snd_decrescendo.md for the full
+ * algorithm derivation (correct, byte-verified block-by-block against
+ * the asm) and the best C body reached (18/202 words, first diff at
+ * word 1 -- the prologue's own `-0x40` vs `-0x38` frame size). The
+ * residue is register/stack allocation, not logic. */
+```
