@@ -126,7 +126,7 @@ struct ViewportRefView {
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
     /* +0x0A8 */ void (*setFadeBox)(Self *self, SceneNode *handle); /* Viewport__SetFadeBox */  \
     /* +0x0AC */ SceneNode *(*getFadeBox)(Self *self);          /* Viewport__GetFadeBox */      \
-    /* +0x0B0 */ void (*setUnkB4)(Self *self, s32 value);          /* Viewport__SetUnkB4 */          \
+    /* +0x0B0 */ void (*setUnkB4)(Self *self, s32 value);          /* Viewport__SetExtraSwapOnBuffer0 */          \
     /* +0x0B4 */ void (*setDrawEnabled)(Self *self, s32 on)        /* Viewport__SetDrawEnabled */
 /* clang-format on */
 
@@ -211,7 +211,7 @@ void Viewport__Update(Viewport *self);
 void Viewport__Flip(Viewport *self);
 void Viewport__SetFadeBox(Viewport *self, SceneNode *handle);
 SceneNode *Viewport__GetFadeBox(Viewport *self);
-void Viewport__SetUnkB4(Viewport *self, s32 value);
+void Viewport__SetExtraSwapOnBuffer0(Viewport *self, s32 value);
 void Viewport__SetDrawEnabled(Viewport *self, s32 on);
 
 Viewport *New_Viewport(void);            /* BMemPMgrAlloc(0xBC), then ctor */

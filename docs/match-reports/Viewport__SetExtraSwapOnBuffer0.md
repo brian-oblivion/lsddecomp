@@ -1,4 +1,6 @@
-# Viewport__SetUnkB4 — MATCHED
+# Viewport__SetExtraSwapOnBuffer0 — MATCHED
+
+> Renamed from `Viewport__SetUnkB4` on 2026-09-27 (tools/rename.py). Address 0x8003f23c.
 
 > Renamed from `Unk18Obj__SetUnkB4` on 2026-09-25 (tools/rename.py). Address 0x8003f23c.
 
@@ -9,7 +11,7 @@ Unit: `code_2cc8c_d`. Round 14, runner delta. 2/2 words, full match.
 ## Signature
 
 ```c
-void Viewport__SetUnkB4(Unk18Obj *self, s32 a1);
+void Viewport__SetExtraSwapOnBuffer0(Unk18Obj *self, s32 a1);
 ```
 
 `Unk18ObjMethods`'s own `+0x0B0` slot occupant.
@@ -19,7 +21,7 @@ void Viewport__SetUnkB4(Unk18Obj *self, s32 a1);
 One-instruction field setter.
 
 ```c
-void Viewport__SetUnkB4(Unk18Obj *self, s32 a1) {
+void Viewport__SetExtraSwapOnBuffer0(Unk18Obj *self, s32 a1) {
     self->unkB4 = a1;
 }
 ```

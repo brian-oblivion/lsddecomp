@@ -359,7 +359,7 @@ SceneNode *Viewport__GetFadeBox(Viewport *self) {
     return self->fadeBox;
 }
 
-void Viewport__SetUnkB4(Viewport *self, s32 value) {
+void Viewport__SetExtraSwapOnBuffer0(Viewport *self, s32 value) {
     self->unkB4 = value;
 }
 
