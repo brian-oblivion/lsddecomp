@@ -81,7 +81,7 @@ void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, 
     do {
         fn(self, parent, pos, attachArg);
         self->relative = 0;
-        self->unk4C = attachArg;
+        self->attachArg = attachArg;
     } while (0);
 }
 

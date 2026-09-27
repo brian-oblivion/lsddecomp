@@ -119,7 +119,7 @@ typedef struct BoxFillRgb {
     /* +0x0B8 */ void (*setColor)(Self *self, s32 overwrite, void *rgb);  /* BoxFill__SetColor: copy the 3 bytes, or add them when overwrite is 0 */ \
     /* +0x0BC */ void (*setPosition)(Self *self, BoxFillPos *pos);        /* BoxFill__SetPosition: only while attached */ \
     /* +0x0C0 */ void (*setSize)(Self *self, s32 *size);                  /* BoxFill__SetSize: {w, h} words, low halves; only while attached */ \
-    /* +0x0C4 */ void (*attachAbsolute)(Self *self, SceneNode *parent, BoxFillPos *pos, s32 attachArg); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, unk4C = attachArg */ \
+    /* +0x0C4 */ void (*attachAbsolute)(Self *self, SceneNode *parent, BoxFillPos *pos, s32 attachArg); /* BoxFill__AttachAbsolute: attachToParent, relative = 0, stores attachArg */ \
     /* +0x0C8 */ void (*setPri)(Self *self, s32 pri);                     /* BoxFill__SetPri */          \
     /* +0x0CC */ s32 (*setMask)(Self *self, s32 bits)                     /* BoxFill__SetMask: mask = (1 << bits) - 1; Reset passes 13 */
 /* clang-format on */
@@ -129,7 +129,7 @@ typedef struct BoxFillRgb {
     SCENENODE_FIELDS(Methods);                                                                    \
     /* +0x044 */ s32 pri;          /* setPri, the ctor's third argument; DrawNode's GsSortBoxFill pri (its low halfword) */ \
     /* +0x048 */ s32 relative;     /* 1 from Reset, 0 from attachAbsolute: DrawNode reads posX/posY as percent of half the screen while set */ \
-    /* +0x04C */ s32 unk4C;        /* zeroed by Reset; attachAbsolute's fourth argument; no reader */ \
+    /* +0x04C */ s32 attachArg;    /* zeroed by Reset; attachAbsolute's fourth argument; no reader */ \
     /* +0x050 */ s32 posX;         /* setPosition; DrawNode's source for boxX */                   \
     /* +0x054 */ s32 posY;         /* setPosition; DrawNode's source for boxY */                   \
     /* +0x058 */ u32 boxAttribute; /* GsBOXF.attribute: the setDisplay/setSemiTransOn/setSemiTransRate bits */ \

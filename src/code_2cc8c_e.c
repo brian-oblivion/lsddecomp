@@ -246,7 +246,7 @@ void BoxFill__Reset(BoxFill *self, BoxFillSize *size, void *color, s32 pri) {
 
     self->pri = pri;
     self->relative = 1;
-    self->unk4C = 0;
+    self->attachArg = 0;
     self->boxAttribute = 0;
     self->boxX = 0;
     self->boxY = 0;
