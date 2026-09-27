@@ -38,11 +38,11 @@
 extern s16 gActorLocalMove[2];
 
 void Actor__MoveLocalX(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &gActorLocalMove[0], val, notify, 7);
+    Actor__MoveAlongLocalAxis(self, &gActorLocalMove[0], val, notify, ACTOR_EVENT_MOVED_X);
 }
 
 void Actor__MoveLocalY(Actor *self, s32 val, void *notify) {
-    Actor__MoveAlongLocalAxis(self, &gActorLocalMove[1], val, notify, 8);
+    Actor__MoveAlongLocalAxis(self, &gActorLocalMove[1], val, notify, ACTOR_EVENT_MOVED_Y);
 }
 
 /* Moves the actor by `val` along one local axis (`axis` is that component of

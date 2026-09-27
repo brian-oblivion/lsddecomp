@@ -265,7 +265,7 @@ tick_only:
 
 void DreamSys__DispatchChunkChange(DreamSys *this, void *sender, s32 event) {
     GetActorMethods()->dispatchLinkCommand((Actor *)this, sender, event);
-    if ((((BasicClass *)sender)->methods->header & 0xFFF) == 0x114) {
+    if ((((BasicClass *)sender)->methods->header & 0xFFF) == STAGEMAP_CLASS_ID) {
         this->methods->processChunkChange(this, sender, event);
     }
 }

@@ -28,6 +28,7 @@
 #include "StyleEffect.h"
 #include "FrameClock.h"
 #include "GridCell.h"
+#include "StageMap.h"
 
 /* STYLE_EFFECT_SPRITES' per-frame step: nothing. Its caller passes
  * (self, pos), which it does not read. */
@@ -145,7 +146,7 @@ void Actor__AddChild(Actor *self, BasicClass *child) {
 
     GetSceneNodeMethods()->addChild((SceneNode *)self, child);
     classId = child->methods->header;
-    if ((classId & 0xFFF) == 0x114) {
+    if ((classId & 0xFFF) == STAGEMAP_CLASS_ID) {
         self->grid = (struct StageMap *)child;
     } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->ticker = child;
@@ -155,7 +156,7 @@ void Actor__AddChild(Actor *self, BasicClass *child) {
 void Actor__RemoveChild(Actor *self, BasicClass *child) {
     s32 classId = child->methods->header;
 
-    if ((classId & 0xFFF) == 0x114) {
+    if ((classId & 0xFFF) == STAGEMAP_CLASS_ID) {
         self->grid = NULL;
     } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
         self->ticker = NULL;
