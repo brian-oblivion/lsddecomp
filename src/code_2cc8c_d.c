@@ -97,7 +97,7 @@ void Viewport__SetPacketCount(Viewport *self, s32 value) {
 }
 
 /* The same guard, for the other factor, unk48. */
-void Viewport__SetUnk48(Viewport *self, s32 value) {
+void Viewport__SetPacketSize(Viewport *self, s32 value) {
     if (self->otReady == 0) {
         self->unk48 = value;
     }

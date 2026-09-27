@@ -102,7 +102,7 @@ struct ViewportRefView {
     /* +0x044 */ void (*setScreenSize)(Self *self, ViewportSize *size); /* Viewport__SetScreenSize */ \
     /* +0x048 */ void (*setOtLength)(Self *self, s32 length);      /* Viewport__SetOtLength */       \
     /* +0x04C */ void (*setUnk44)(Self *self, s32 value);          /* Viewport__SetPacketCount, before InitOt only */ \
-    /* +0x050 */ void (*setUnk48)(Self *self, s32 value);          /* Viewport__SetUnk48, before InitOt only */ \
+    /* +0x050 */ void (*setUnk48)(Self *self, s32 value);          /* Viewport__SetPacketSize, before InitOt only */ \
     /* +0x054 */ void (*setProjection)(Self *self, s32 h);         /* Viewport__SetProjection */     \
     /* +0x058 */ void (*slot58)(void);                             /* Viewport__NoOpSlot58, empty */        \
     /* +0x05C */ void (*slot5C)(void);                             /* Viewport__NoOpSlot5C, empty */        \
@@ -187,7 +187,7 @@ void Viewport__InitDefaults(Viewport *self);
 void Viewport__SetScreenSize(Viewport *self, ViewportSize *size);
 void Viewport__SetOtLength(Viewport *self, s32 length);
 void Viewport__SetPacketCount(Viewport *self, s32 value);
-void Viewport__SetUnk48(Viewport *self, s32 value);
+void Viewport__SetPacketSize(Viewport *self, s32 value);
 void Viewport__SetProjection(Viewport *self, s32 h);
 void Viewport__NoOpSlot58(void);
 void Viewport__NoOpSlot5C(void);

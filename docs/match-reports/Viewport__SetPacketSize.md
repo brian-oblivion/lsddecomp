@@ -1,4 +1,6 @@
-# Viewport__SetUnk48 — MATCHED
+# Viewport__SetPacketSize — MATCHED
+
+> Renamed from `Viewport__SetUnk48` on 2026-09-27 (tools/rename.py). Address 0x8003ea48.
 
 > Renamed from `Unk18Obj__SetUnk48` on 2026-09-25 (tools/rename.py). Address 0x8003ea48.
 
@@ -9,7 +11,7 @@ Unit: `code_2cc8c_d`. Round 14, runner delta. 7/7 words, full match.
 ## Signature
 
 ```c
-void Viewport__SetUnk48(Unk18Obj *self, s32 a1);
+void Viewport__SetPacketSize(Unk18Obj *self, s32 a1);
 ```
 
 `Unk18ObjMethods`'s own `+0x050` slot occupant.
@@ -20,7 +22,7 @@ Same guarded-setter shape as `Viewport__SetPacketCount`, writing `unk48` instead
 `unk44`, under the same `self->unk70` latch.
 
 ```c
-void Viewport__SetUnk48(Unk18Obj *self, s32 a1) {
+void Viewport__SetPacketSize(Unk18Obj *self, s32 a1) {
     if (self->unk70 == 0) {
         self->unk48 = a1;
     }
