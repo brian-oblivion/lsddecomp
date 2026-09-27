@@ -76,7 +76,6 @@ D_8008AAF8
 D_8008AB14
 D_8008AB1C
 D_8008AB24
-D_8008AB34
 D_8008AB38
 D_8008AB40
 D_8008AB44
@@ -165,6 +164,7 @@ gMemcardIconTemplate
 gMovieClearColor
 gMoviePollCounter
 gNameCharTable
+gObjMProjectionBias
 gOpenVabCount
 gPendingVabBuffer
 gSoundEffectDirPtr

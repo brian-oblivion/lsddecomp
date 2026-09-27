@@ -288,7 +288,7 @@ extern void SetDreamAuxWorld(s32 a0, s32 a1, DreamSys *world, s32 a3, s32 a4);
  * DreamSys.h. */
 
 /* A plain `s32` bias added to the projection distance (%gp_rel value). */
-extern s32 D_8008AB34;
+extern s32 gObjMProjectionBias;
 
 /* The StageMap's accepted tags (setAcceptedTags), an opaque .data block
  * (asm/data/76DC8.data.s) reached by address. */
@@ -305,7 +305,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
 
     obj = (UnkCObj_3bb8c_l *)self->initArgs->drawSystem;
     val = *obj->methods->slot7C(obj, 0);
-    vp->methods->setProjection(vp, val / 2 * 5 / 3 + D_8008AB34);
+    vp->methods->setProjection(vp, val / 2 * 5 / 3 + gObjMProjectionBias);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, (LongVec3 *)&gObjMViewPoint,
                                  (LongVec3 *)&gObjMViewRefPoint, 0);
