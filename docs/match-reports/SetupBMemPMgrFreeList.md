@@ -2,7 +2,7 @@
 
 > Renamed from `func_80017AC8` on 2026-09-24 (tools/rename.py). Address 0x80017ac8.
 
-**Unit:** `code_8220` · **Size:** 27 words · **Status:** MATCHED, 27/27 words, byte-exact.
+**Unit:** `BMemPMgr` · **Size:** 27 words · **Status:** MATCHED, 27/27 words, byte-exact.
 
 ## Verdict correction
 
@@ -50,7 +50,7 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool)
 }
 ```
 
-`BMemBlockHdr` (new, `include/code_8220.h`) is the pool's free-list node
+`BMemBlockHdr` (new, `include/BMemPMgr.h`) is the pool's free-list node
 shape: `sizeAndFlags` (28-bit size, top 4 bits flags — `0x40000000` =
 free) at +0x0, doubly-linked `prev`/`next` at +0x4/+0x8. `BMemPMgr` grew
 three fields this round to match what this function actually touches:
@@ -121,11 +121,11 @@ Zero bytes changed.
   block, written by BMemPMgrInit, not a free-list end);
   `freeListStart`/`freeListEnd` -> `freeListTail`/`freeListHead`; `unk10` ->
   `initialized`, tier B: this function writes 1 to it and no code reads it.
-- The `include/code_8220.h` comment that called this function
+- The `include/BMemPMgr.h` comment that called this function
   "gp_rel-blocked" is gone: that blocker was resolved (CLAUDE.md) and the
   function is matched.
 
-The constants are defined, with their evidence, in `include/code_8220.h`:
+The constants are defined, with their evidence, in `include/BMemPMgr.h`:
 `BMEM_SIZE_MASK` 0x0FFFFFFF and `BMEM_FLAG_MASK` 0xF0000000 split
 `sizeAndFlags`; `BMEM_FREE` 0x40000000 is set on every block put on the free
 list (SetupBMemPMgrFreeList, BMemPMgrFree, the split remainder) and cleared

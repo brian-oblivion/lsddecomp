@@ -1,11 +1,11 @@
-#ifndef CODE_8220_H
-#define CODE_8220_H
+#ifndef BMEMPMGR_H
+#define BMEMPMGR_H
 
 #include "common.h"
 
 /* The BasicClass type, its method table and its list primitives are
  * include/BasicClass.h (FINISHING-PLAN track 4: one header per class).
- * This header keeps the rest of the code_8220 units' declarations: the
+ * This header keeps the rest of the BMemPMgr units' declarations: the
  * pool allocator, the prim-setup and GTE helpers. */
 #include "BasicClass.h"
 
@@ -75,7 +75,7 @@ struct BMemPMgr {
 /* The pool allocator and its free. Both bodies read a second argument, a
  * fallback pool used only while gDefaultBMemPMgr is unset, that no caller
  * passes: every other unit declares its own one-argument prototype for its
- * own call sites. code_8220.c defines them K&R so their bodies can name the
+ * own call sites. BMemPMgr.c defines them K&R so their bodies can name the
  * second parameter while its own later one-argument calls still compile; an
  * unprototyped declaration here keeps the earlier ones compiling too. A full
  * prototype here breaks one side or the other. */

@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_17ff0` on 2026-09-24 (tools/rename.py). Address 0x80017ff0.
 
-**Unit:** code_8220 · **Size:** 20 instructions · **Status:** MATCHED (20/20 words)
+**Unit:** BMemPMgr · **Size:** 20 instructions · **Status:** MATCHED (20/20 words)
 
 BasicClass vtable slot `+0x014` (`removeChild`) — see
 `BasicClass__BasicClass.md` for the class's overall design, and
@@ -39,11 +39,11 @@ which cannot be a real, usable return value — no caller could rely on it.
 Confirmed void from the USE side too: this function calls it and never
 reads `$v0` afterward, and `BasicClass__RemoveAllChildren`'s own dispatch through
 `removeChild` (this function, at slot `+0x014`) likewise discards whatever
-comes back. See `include/code_8220.h` for the full declaration.
+comes back. See `include/BMemPMgr.h` for the full declaration.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve). One
+round 11 (2026-09-03), runner delta, unit BMemPMgr (fresh carve). One
 collateral-drift residue (1 word, the `jal RemoveBasicClassListNode` target address)
 resolved itself once `BasicClass__RemoveAllChildren` reached its correct size —
 see that function's own report; nothing needed changing here.
@@ -51,6 +51,6 @@ see that function's own report; nothing needed changing here.
 ## Naming (round 74)
 
 `BasicClass__RemoveChild`, **tier A**: matches vtable slot `+0x014`
-(`removeChild`), already documented in `code_8220.h`. Unlinks `child`
+(`removeChild`), already documented in `BMemPMgr.h`. Unlinks `child`
 from `self->children` and unconditionally removes the back-reference via
 the child's `removeParentRef` slot.

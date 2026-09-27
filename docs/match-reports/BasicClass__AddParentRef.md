@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_180fc` on 2026-09-24 (tools/rename.py). Address 0x800180fc.
 
-**Unit:** code_8220 · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
+**Unit:** BMemPMgr · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
 BasicClass vtable slot `+0x020` (`addParentRef`) — see
 `BasicClass__BasicClass.md` for the class's overall design, and
@@ -36,11 +36,11 @@ correct.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit code_8220, second pass. Matched
+round 11 (2026-09-03), runner delta, unit BMemPMgr, second pass. Matched
 first attempt.
 
 ## Naming (round 74)
 
 `BasicClass__AddParentRef`, **tier A**: matches vtable slot `+0x020`
-(`addParentRef`), already documented in `code_8220.h`. One-line tail
+(`addParentRef`), already documented in `BMemPMgr.h`. One-line tail
 call into `PushBasicClassListNode(&self->parentRefs, parent)`.

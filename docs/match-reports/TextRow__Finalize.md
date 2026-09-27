@@ -26,7 +26,7 @@ the PRECEDING call's return" idiom, and it is what motivated retyping
 `include/code_2cc8c.h`'s `BMemPMgrFree` was declared `void
 BMemPMgrFree(void *ptr)`, following `code_171e0.h`/`Entity.h`'s
 typing. Its own (still-`INCLUDE_ASM`) disassembly
-(`asm/nonmatchings/code_8220/BMemPMgrFree.s`) ends with an explicit
+(`asm/nonmatchings/BMemPMgr/BMemPMgrFree.s`) ends with an explicit
 `addu $v0, $zero, $zero` -- it genuinely returns `NULL`, and this
 function is the first in this unit to actually USE that return value
 (`self->unkB4 = BMemPMgrFree(self->unkB4)`). Retyped to

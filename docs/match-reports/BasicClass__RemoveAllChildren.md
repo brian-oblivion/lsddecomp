@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_18040` on 2026-09-24 (tools/rename.py). Address 0x80018040.
 
-**Unit:** code_8220 · **Size:** 31 instructions · **Status:** MATCHED (31/31 words)
+**Unit:** BMemPMgr · **Size:** 31 instructions · **Status:** MATCHED (31/31 words)
 
 BasicClass vtable slot `+0x018` (`removeAllChildren`) — see
 `BasicClass__BasicClass.md` for the class's overall design. This was the
@@ -146,14 +146,14 @@ concrete lever that exposes the merge to the compiler.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve). ~14
+round 11 (2026-09-03), runner delta, unit BMemPMgr (fresh carve). ~14
 build/measure iterations before landing on the final shape; well inside the
 30-attempt budget.
 
 ## Naming (round 74)
 
 `BasicClass__RemoveAllChildren`, **tier A**: matches vtable slot `+0x018`
-(`removeAllChildren`), already documented in `code_8220.h`. Iterates
+(`removeAllChildren`), already documented in `BMemPMgr.h`. Iterates
 `self->children` via `GetNextBasicClass`, dispatching `removeChild` on
 each until exhausted.
 

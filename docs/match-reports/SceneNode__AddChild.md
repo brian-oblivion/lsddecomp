@@ -37,7 +37,7 @@ code_d294. Matched on the first build. Established
 
 ## Naming
 
-Round 71 (alpha). `func_8001CC48` -> `SceneNode__AddChild`, **tier A**. Overrides BasicClass slot +0x010 `addChild` (include/code_8220.h). Forwards to the base first, then if the child's class tag is 9 (gTmdModelMethods) calls SceneNode__LinkModel on it. SceneNode__AttachToParent reaches this slot on the parent with `self` as the child.
+Round 71 (alpha). `func_8001CC48` -> `SceneNode__AddChild`, **tier A**. Overrides BasicClass slot +0x010 `addChild` (include/BMemPMgr.h). Forwards to the base first, then if the child's class tag is 9 (gTmdModelMethods) calls SceneNode__LinkModel on it. SceneNode__AttachToParent reaches this slot on the parent with `self` as the child.
 
 ## Proposed field names
 

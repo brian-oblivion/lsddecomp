@@ -1,8 +1,8 @@
 # BasicClass__BasicClass
 
-**Unit:** code_8220 · **Size:** 13 instructions · **Status:** MATCHED (13/13 words)
+**Unit:** BMemPMgr · **Size:** 13 instructions · **Status:** MATCHED (13/13 words)
 
-## The BasicClass design (established this round; full detail in `include/code_8220.h`'s doc comment)
+## The BasicClass design (established this round; full detail in `include/BMemPMgr.h`'s doc comment)
 
 `BasicClass` is the game's hand-rolled base class, root of the class
 framework (`docs/research/class-framework.md`). Vtable is `gBasicClassMethods`
@@ -70,4 +70,4 @@ match anyway and the order shown compiled correctly on the first attempt.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve).
+round 11 (2026-09-03), runner delta, unit BMemPMgr (fresh carve).

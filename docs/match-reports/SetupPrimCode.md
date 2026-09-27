@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001934C` on 2026-09-17 (tools/rename.py). Address 0x8001934c.
 
-Unit: `src/TmdRenderer.c`. Not previously declared in `include/code_8220.h`;
+Unit: `src/TmdRenderer.c`. Not previously declared in `include/BMemPMgr.h`;
 called only from the still-`INCLUDE_ASM` giant `SortTmdObject` (13 call
 sites), so its two arguments' real struct types are unknown outside this
 function's own body. Treated both as raw byte-offset accesses rather than
@@ -36,7 +36,7 @@ void SetupPrimCode(void *arg0, void *arg1)
 ```
 
 `D_8008E248` (a global `s32` flag, read-only from this function) is now
-declared `extern` in `include/code_8220.h`; no other symbol name evidence
+declared `extern` in `include/BMemPMgr.h`; no other symbol name evidence
 was available for it.
 
 ## Notes

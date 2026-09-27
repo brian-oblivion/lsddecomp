@@ -34,7 +34,7 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
 ## Header notes
 
 - Added `ctor` (+0x008) to this unit's local `BasicClassMethodsCC8C`, typed
-  `void (*ctor)(void *self)` from `include/code_8220.h`'s own authoritative
+  `void (*ctor)(void *self)` from `include/BMemPMgr.h`'s own authoritative
   `BasicClassMethods` (`BasicClass__BasicClass`, confirmed void-returning,
   already matched there).
 - Added `slot40` to `Obj86B60Methods` (`Obj86B60 *self`), the slot this

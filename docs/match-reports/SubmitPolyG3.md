@@ -36,7 +36,7 @@ artefact seen from a different angle.
 **Callers checked:** `SortTmdObject` in `src/TmdRenderer.c` (two call sites,
 `prim = (u8 *)SubmitPolyG3(prim, ctx);`), declared there as
 `extern void *SubmitPolyG3(void *prim, void *ctx);`. The return type agrees.
-`RCpolyG3` stays declared `void` in `include/code_8220.h` and is called
+`RCpolyG3` stays declared `void` in `include/BMemPMgr.h` and is called
 through the local cast.
 
 ### Proposed learning
@@ -362,7 +362,7 @@ INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyG3);
 ```
 
 (`OtTag`, `PolyVtx`, `PolyUV4` and `RCpolyG3`'s prototype come from
-`include/code_8220.h`, already included by the unit.)
+`include/BMemPMgr.h`, already included by the unit.)
 
 Unit: `src/TmdRenderer.c`. Third sibling of `SubmitPolyF3`/`SubmitPolyF4`
 (this unit, both stalled) — same `prim->0x78`-gated OT-splice-or-calls
@@ -533,7 +533,7 @@ which apply to this function too:
    re-reads it before the second store, because `addPrim(ot, p)` expands `ot`
    twice.
 
-`OtTag` is already declared in `include/code_8220.h`.
+`OtTag` is already declared in `include/BMemPMgr.h`.
 
 **So this function is not known to be unreachable, and the analogy that
 retired it no longer holds.** The residue's SHAPE was correctly identified as

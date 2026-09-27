@@ -484,7 +484,7 @@ residue, not a second hidden instance of the ADDIU/ORI blind spot.
 
 `func_8001A268` -> `FlagLargePolyForDivide`, parameter `arg0` -> `ctx`.
 **Tier A.** `ctx` is the same per-face draw context TransformAndCullPoly's
-own extern comment documents (code_8220.h): its SXY0-2 cache at
+own extern comment documents (BMemPMgr.h): its SXY0-2 cache at
 `+0x60/+0x64/+0x68` and its culled flag at `+0x78` are exactly the fields
 this function reads (`ctx+0x64`..`ctx+0x5C+count*4`) and writes
 (`ctx+0x78 = 1`). The name states the two things the body does: update the
@@ -515,7 +515,7 @@ starting from `sxy[1]`, so for a triangle only `sxy[0]`/`sxy[1]` enter the
 box and for a quad `sxy[0..2]`. That is retail's behaviour; nothing here
 changes it.
 
-History moved from include/code_8220.h's prototype comment (rewritten there
+History moved from include/BMemPMgr.h's prototype comment (rewritten there
 as documentation): `count` is the face's vertex count (3 or 4), not a
 primitive-kind code. An older "3 = triangle, 4 = quad" wording read the
 right numbers off the call sites for the wrong reason, corrected round 51;

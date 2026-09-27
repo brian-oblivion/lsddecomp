@@ -121,7 +121,7 @@ extern void *BMemPMgrAlloc(s32 size);                   /* allocator, confirmed 
                                             units */
 extern void *BMemPMgrFree(void *ptr);                   /* matching free/release. Its own
                                             disassembly (still INCLUDE_ASM,
-                                            asm/nonmatchings/code_8220/
+                                            asm/nonmatchings/BMemPMgr/
                                             BMemPMgrFree.s) ends with an
                                             explicit `addu $v0,$zero,$zero`
                                             -- it genuinely returns NULL,

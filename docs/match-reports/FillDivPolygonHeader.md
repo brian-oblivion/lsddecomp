@@ -149,7 +149,7 @@ ordinary register/scheduling residue, not a semantic error.
 
 `func_8001A380` -> `FillDivPolygonHeader`, parameters (`arg0..arg5`) ->
 (`table`, `ctx`, `uv`, `hasUv1Codes`, `uv1Clut`, `uv1TPage`). **Tier A**:
-pure header-populate leaf, same shape at all 8 call sites (code_8220.h's
+pure header-populate leaf, same shape at all 8 call sites (BMemPMgr.h's
 own extern comment already derived every field it writes). `hasUv1Codes`/
 `uv1Clut`/`uv1TPage`: tier B, evidenced by the FT3/GT3/FT4/GT4 call sites,
 which pass `1` plus the calling primitive's own `+0xE`/`+0x16` (FT3/FT4)
@@ -193,7 +193,7 @@ looks like game data; whether `dc_cb` really is 8 bytes is proposed to the
 head. Round 77 had left `D_8008A824`/`D_8008A828` as `D_` names for lack of
 a second accessor; the DIVPOLYGON layout is the evidence that was missing.
 
-History moved from include/code_8220.h's old extern comment: this function
+History moved from include/BMemPMgr.h's old extern comment: this function
 was matched in round 44 once the gp_rel blocker that stalled it at carve
 time (round 13) was resolved, and the extern lived in the shared header only
 so that SubmitPolyF3, then still INCLUDE_ASM, could compile. The

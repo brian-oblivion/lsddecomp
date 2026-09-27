@@ -2,7 +2,7 @@
 
 > Renamed from `func_800181AC` on 2026-09-24 (tools/rename.py). Address 0x800181ac.
 
-**Unit:** code_8220 · **Size:** 23 instructions · **Status:** MATCHED (23/23 words)
+**Unit:** BMemPMgr · **Size:** 23 instructions · **Status:** MATCHED (23/23 words)
 
 The `BasicClassListNode` list-push primitive, used by both of BasicClass's
 lists (`children` via `BasicClass__AddChild`, `parentRefs` via
@@ -60,7 +60,7 @@ attempt.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit code_8220, second pass. 2
+round 11 (2026-09-03), runner delta, unit BMemPMgr, second pass. 2
 attempts.
 
 ## Naming (round 74)

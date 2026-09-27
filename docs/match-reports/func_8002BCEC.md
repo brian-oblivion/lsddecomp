@@ -553,8 +553,8 @@ STALE SYMBOL NAME that no longer links.** Splicing the report's C exactly
 as written now fails at link time —
 `undefined reference to 'func_80012C20'` — because the Psy-Q `printf`
 object was linked in the interim (rounds 29-30's SDK-objects work; see
-`include/code_8220.h`'s own note that the old `func_80012C20` declarations
-"moved into src/code_8220.c when the SDK objects were linked"). Every other
+`include/BMemPMgr.h`'s own note that the old `func_80012C20` declarations
+"moved into src/BMemPMgr.c when the SDK objects were linked"). Every other
 unit that calls this function now declares it as `printf` directly (see
 `src/libcd_bios.c`, `src/code_179d8_h.c`, `src/class_3bb8c_f.c`,
 `src/code_2cc8c_e.c`, each with the argument shape their own call site

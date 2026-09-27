@@ -38,7 +38,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "code_8220.h"
+#include "BMemPMgr.h"
 #include "gte.h"
 
 void FreeBasicClassList(BasicClassListNode **head) {
@@ -111,7 +111,7 @@ s32 GetBMemPMgrBusy(void) {
 
 /* The drawn object's attribute bits, as SortTmdObject publishes them for
  * SetupPrimCode and the submit wrappers (D_8008E248, GsLOFF, is
- * declared in code_8220.h). Sony's GsSortObject4 keeps the same four fields
+ * declared in BMemPMgr.h). Sony's GsSortObject4 keeps the same four fields
  * in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. */
 /* GsDIV1..5, the object's default ndiv, from bits 9-11 of its flags. It
  * keeps its address-style name because config/psyq-objects.ld's `dc_cb` pin

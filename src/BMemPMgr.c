@@ -1,12 +1,12 @@
 #include "common.h"
-#include "code_8220.h"
+#include "BMemPMgr.h"
 #include <malloc.h>
 
 /* Two things that share this file:
  *
  *  - The BMemPMgr pool allocator, the game's general-purpose allocator.
  *    BMemPMgrInit mallocs one area, a BMemPMgr header followed by the pool's
- *    blocks (the layout is in code_8220.h), and SetupBMemPMgrFreeList makes
+ *    blocks (the layout is in BMemPMgr.h), and SetupBMemPMgrFreeList makes
  *    the whole pool one free block. BMemPMgrAlloc and BMemPMgrFree split and
  *    merge blocks on the pool's free list. SetupBMemPMgrFreeList,
  *    BMemPMgrAlloc and BMemPMgrFree work on gDefaultBMemPMgr
@@ -78,7 +78,7 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool) {
  * free block that replaces it on the list. Returns the payload, or NULL.
  *
  * Defined K&R so the body can read the second argument that callers never
- * pass (code_8220.h, at the declaration). */
+ * pass (BMemPMgr.h, at the declaration). */
 /* clang-format off */
 void *BMemPMgrAlloc(size, pool)
     s32 size;

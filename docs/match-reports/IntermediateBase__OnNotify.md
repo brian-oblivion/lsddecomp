@@ -10,7 +10,7 @@
 
 `gIntermediateBaseMethods+0x038` (the "IntermediateBase" table): forwards to the
 BasicClass-level slot38 (`BasicClass__OnNotify`, `TmdRenderer`, signature
-`(BasicClass *self, void *arg1, s32 arg2)` per `include/code_8220.h`), then
+`(BasicClass *self, void *arg1, s32 arg2)` per `include/BMemPMgr.h`), then
 reads `arg1->target->header & 0xF` and dispatches to one of
 `self->methods->slot54/58/5C` (all three called with `(self, arg1, arg2)`)
 for header values 1/2/5 respectively; any other value is a no-op.
@@ -91,7 +91,7 @@ build.
 alpha). Tier A: forwards to `Get_vtable_BasicClass()->slot38` first (that
 slot IS `BasicClass__OnNotify` per `include/code_2cc8c.h`'s own
 `BasicClassMethodsCC8C` struct, offset-verified against
-`include/code_8220.h`'s canonical, already-named `BasicClassMethods::slot38`
+`include/BMemPMgr.h`'s canonical, already-named `BasicClassMethods::slot38`
 = `onNotify`), then adds its own dispatch on the incoming `EventArg`'s
 dynamic class tag -- the textbook "override calls base first, then does its
 own work" shape for a virtual method whose base identity is independently
@@ -102,7 +102,7 @@ confirmed. `Get_vtable_BasicClass()->slot38` is PROPOSED for rename to
 ## Proposed field names
 
 - `BasicClassMethodsCC8C::slot38` -> `onNotify` (tier A). Offset `+0x038`
-  matches `include/code_8220.h`'s own canonical, already-named
+  matches `include/BMemPMgr.h`'s own canonical, already-named
   `BasicClassMethods::slot38` = `onNotify` exactly (`IS BasicClass__OnNotify`,
   TmdRenderer, per this header's own comment). NOT renamed directly:
   `code_2cc8c_d.c`'s `Viewport__OnNotify` also calls

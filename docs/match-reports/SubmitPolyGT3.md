@@ -35,7 +35,7 @@ copies (`lwl`/`lwr` + `swl`/`swr`) are kept unchanged from the old body.
 `prim = (u8 *)SubmitPolyGT3(prim, ctx);`), declared there as
 `extern void *SubmitPolyGT3(void *prim, void *ctx);`. No other reference in `src/`,
 `asm/` or `config/`. The return type agrees. `RCpolyGT3` stays declared `void` in
-`include/code_8220.h` and is called through the local cast.
+`include/BMemPMgr.h` and is called through the local cast.
 
 ## Earlier history
 
@@ -228,7 +228,7 @@ INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyGT3);
 ```
 
 (`OtTag`, `PolyVtx`, `PolyUV4` and `RCpolyGT3`'s prototype come from
-`include/code_8220.h`, already included by the unit.)
+`include/BMemPMgr.h`, already included by the unit.)
 
 Unit: `src/TmdRenderer.c`. Seventh sibling of the `SubmitPolyF3` OT-splice-
 or-calls family — Gouraud-triangle flavor combining `SubmitPolyFT3`'s
@@ -323,7 +323,7 @@ which apply to this function too:
    re-reads it before the second store, because `addPrim(ot, p)` expands `ot`
    twice.
 
-`OtTag` is already declared in `include/code_8220.h`.
+`OtTag` is already declared in `include/BMemPMgr.h`.
 
 **So this function is not known to be unreachable, and the analogy that
 retired it no longer holds.** The residue's SHAPE was correctly identified as

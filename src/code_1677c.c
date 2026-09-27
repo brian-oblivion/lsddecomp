@@ -19,7 +19,7 @@
 #include "TitleMenu.h"
 #include "DayTask.h"
 
-/* The game's allocator, in the uncarved code_8220 block. Returns void *
+/* The game's allocator, in the uncarved BMemPMgr block. Returns void *
  * rather than a typed pointer because every New_X in the game calls it. */
 extern void *BMemPMgrAlloc(s32 size);
 

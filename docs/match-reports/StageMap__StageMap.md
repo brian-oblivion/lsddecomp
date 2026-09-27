@@ -213,7 +213,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004A534` | `StageMap__StageMap` | A | Occupant of vtable slot `+0x008`, which `include/code_8220.h` establishes as `BasicClassMethods::ctor`, and which `New_StageMap` dispatches right after allocating. `Class__Class` is the constructor convention in FINISHING-PLAN.md track 3. |
+| `func_8004A534` | `StageMap__StageMap` | A | Occupant of vtable slot `+0x008`, which `include/BMemPMgr.h` establishes as `BasicClassMethods::ctor`, and which `New_StageMap` dispatches right after allocating. `Class__Class` is the constructor convention in FINISHING-PLAN.md track 3. |
 | `D_8008682C` | `gDefaultOrigin` | A | Its only use is this ctor's fallback when `arg1 == NULL`: `self->origin = gDefaultOrigin`. `asm/data/76DC8.data.s` shows the three words are all zero, so it is literally the default origin. |
 
 Field names this function established (all unit-local -- the compiler listed

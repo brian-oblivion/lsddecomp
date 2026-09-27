@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_180bc` on 2026-09-24 (tools/rename.py). Address 0x800180bc.
 
-**Unit:** code_8220 · **Size:** 16 instructions · **Status:** MATCHED (16/16 words)
+**Unit:** BMemPMgr · **Size:** 16 instructions · **Status:** MATCHED (16/16 words)
 
 BasicClass vtable slot `+0x01C` (`getNextChild`) — see
 `BasicClass__BasicClass.md` for the class's overall design.
@@ -45,11 +45,11 @@ sibling (`BasicClass__GetNextParentRef`) needed no reshaping at all.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit code_8220, second pass.
+round 11 (2026-09-03), runner delta, unit BMemPMgr, second pass.
 
 ## Naming (round 74)
 
 `BasicClass__GetNextChild`, **tier A**: matches vtable slot `+0x01C`
-(`getNextChild`), already documented in `code_8220.h`. Seeds `*cursor`
+(`getNextChild`), already documented in `BMemPMgr.h`. Seeds `*cursor`
 from `self->children` on the caller's first call, then pop-advances via
 `GetNextBasicClass`.

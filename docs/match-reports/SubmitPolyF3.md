@@ -18,7 +18,7 @@ filler `addiu $v0, $s1, 0x14`, which eight rounds of reports chased through
 field lists and one-past-end pointer arithmetic, is simply `$v0` = the return
 value: `return (u8 *)arg0 + 0x14` (0x14 = sizeof(POLY_F3): tag, rgb, three
 xy). The other arm tail-calls `RCpolyF3` and passes its `$v0` straight out.
-The lead had been written down in `include/code_8220.h` (round 50, above
+The lead had been written down in `include/BMemPMgr.h` (round 50, above
 `RCpolyF3`'s extern) and never tried. With `$v0` live out of the splice arm
 the `$a2`/`$a1` "register identity" residue disappears with no other change.
 It was never a register-choice problem.
@@ -351,7 +351,7 @@ INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyF3);
 ```
 
 (`OtTag`, `PolyVtx`, `PolyUV4` and `RCpolyF3`'s prototype come from
-`include/code_8220.h`, already included by the unit.)
+`include/BMemPMgr.h`, already included by the unit.)
 
 **Note on the historical sections below:** they predate the round-34
 rename and still read `func_8001A564` throughout (in prose and in embedded
@@ -1326,12 +1326,12 @@ Byte-identical on the first build, for all eight wrappers.
   inside a comment block because libgte.h does not include libgpu.h). The
   unit declares the eight prototypes itself, verbatim, so the
   `void *(*)(void *, void *)` casts round 75 needed are gone, and so is the
-  `void` extern in include/code_8220.h that carried round 50's
+  `void` extern in include/BMemPMgr.h that carried round 50's
   return-value lead (removed from the header with the other
   TmdRenderer-only declarations).
 - **The OT splice is libgpu's `addPrim(ot, p)`.** Round 13's head pass found
   the splice had to be a 24-bit bitfield read-modify-write (a local
-  `OtTag { u32 addr : 24; u32 len : 8; }` in include/code_8220.h, "the same
+  `OtTag { u32 addr : 24; u32 len : 8; }` in include/BMemPMgr.h, "the same
   shape as P_TAG"), with the OT expression re-evaluated rather than cached.
   `addPrim` is exactly that: `setaddr(p, getaddr(ot)), setaddr(ot, p)` over
   Sony's `P_TAG` bitfield, with `ot` expanded twice. `OtTag` is deleted.

@@ -184,7 +184,7 @@ not a semantic one.
 "primitive kind" tag -- that function walks `count` screen-XY pairs and
 computes their 2D bounding box (`docs/match-reports/FlagLargePolyForDivide.md`
 derives the body). The old "3 = triangle, 4 = quad" gloss in this report
-and in `include/code_8220.h` had the right numbers for the wrong reason
+and in `include/BMemPMgr.h` had the right numbers for the wrong reason
 and is corrected in both places.
 
 ## Round 91 polish (delta, track 7)

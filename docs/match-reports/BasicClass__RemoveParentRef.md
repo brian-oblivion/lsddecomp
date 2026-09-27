@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_1811c` on 2026-09-24 (tools/rename.py). Address 0x8001811c.
 
-**Unit:** code_8220 · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
+**Unit:** BMemPMgr · **Size:** 8 instructions · **Status:** MATCHED (8/8 words)
 
 BasicClass vtable slot `+0x024` (`removeParentRef`) — see
 `BasicClass__BasicClass.md` for the class's overall design, and
@@ -35,11 +35,11 @@ not a `return`, matched first attempt.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit code_8220, second pass. Matched
+round 11 (2026-09-03), runner delta, unit BMemPMgr, second pass. Matched
 first attempt.
 
 ## Naming (round 74)
 
 `BasicClass__RemoveParentRef`, **tier A**: matches vtable slot `+0x024`
-(`removeParentRef`), already documented in `code_8220.h`. One-line tail
+(`removeParentRef`), already documented in `BMemPMgr.h`. One-line tail
 call into `RemoveBasicClassListNode(&self->parentRefs, parent)`.

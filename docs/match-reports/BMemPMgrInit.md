@@ -1,6 +1,6 @@
 # BMemPMgrInit
 
-**Unit:** code_8220 · **Size:** 31 instructions · **Status:** MATCHED (31/31 words)
+**Unit:** BMemPMgr · **Size:** 31 instructions · **Status:** MATCHED (31/31 words)
 
 ## What it does
 
@@ -15,7 +15,7 @@ allocation failure, logs an error via the Psy-Q printf wrapper
 (`"bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n"`) and returns `NULL`.
 
 This confirms the unit's premise from the runner prompt: the format string
-IS this function's own diagnostic, and `code_8220` genuinely is a
+IS this function's own diagnostic, and `BMemPMgr` genuinely is a
 memory-pool-manager-plus-base-class block.
 
 ## The C
@@ -63,7 +63,7 @@ void *BMemPMgrInit(s32 poolSize)
    `BMemPMgrInit` clearly wants `SetupBMemPMgrFreeList` to know the pool size).
    That compiled to a real function, one word too long, with a spurious
    `move $a1,$s1` immediately before the `jal`. Checking `SetupBMemPMgrFreeList`'s
-   own disassembly (`asm/nonmatchings/code_8220/SetupBMemPMgrFreeList.s`) shows why:
+   own disassembly (`asm/nonmatchings/BMemPMgr/SetupBMemPMgrFreeList.s`) shows why:
    its own `$a1` is read as a *fallback* pool pointer (`bnez $a1,
    .L80017ADC; ori $v0,$zero,0x1; addu $a1,$a0,$zero` — defaults to `$a0`,
    i.e. self, when the global default pool `gDefaultBMemPMgr` is unset), and
@@ -118,7 +118,7 @@ returns the just-nulled pointer.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve, first
+round 11 (2026-09-03), runner delta, unit BMemPMgr (fresh carve, first
 function).
 
 ## Extern arity (round 59)
@@ -126,7 +126,7 @@ function).
 **Verdict: arity-ok idiom.** `src/main.c`'s unprototyped declaration stays.
 
 **Callee evidence** (`0x80017A20`): the body does `move s1,a0` and never touches
-`$a1` on any path — the definition in `src/code_8220.c`
+`$a1` on any path — the definition in `src/BMemPMgr.c`
 (`void *BMemPMgrInit(s32 poolSize)`) is right, one argument.
 
 **Why the extern must keep saying nothing.** `main` (src/main.c) calls
@@ -144,7 +144,7 @@ Replacing `extern void *BMemPMgrInit();` with the real one-parameter prototype
 would make that call a `too many arguments` compile error, and dropping the
 argument from the call site would delete `move a1,zero` and break the match.
 The unprototyped form is the only spelling that reproduces retail, and it is
-the same idiom `include/code_8220.h` uses for `BMemPMgrAlloc`/`BMemPMgrFree`.
+the same idiom `include/BMemPMgr.h` uses for `BMemPMgrAlloc`/`BMemPMgrFree`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/main.c:24`. Oracle green after the edit.

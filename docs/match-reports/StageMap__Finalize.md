@@ -346,7 +346,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004A7C0` | `StageMap__Finalize` | A | Occupant of vtable slot `+0x00C`. `include/code_8220.h` establishes that slot as `BasicClassMethods::finalize` (the virtual teardown), distinct from `+0x004` `release` (finalize, then free self). This body matches: it tears down every `elems[]` entry and tail-calls the base table's own `+0x00C`. This CORRECTS the inherited hypothesis -- the field and this report both called it `dtor`, which is `release`'s job, not this slot's. |
+| `func_8004A7C0` | `StageMap__Finalize` | A | Occupant of vtable slot `+0x00C`. `include/BMemPMgr.h` establishes that slot as `BasicClassMethods::finalize` (the virtual teardown), distinct from `+0x004` `release` (finalize, then free self). This body matches: it tears down every `elems[]` entry and tail-calls the base table's own `+0x00C`. This CORRECTS the inherited hypothesis -- the field and this report both called it `dtor`, which is `release`'s job, not this slot's. |
 
 Slot name changed in `include/class_3ac78.h` accordingly:
 `StageMapMethods::dtor` -> `finalize`.

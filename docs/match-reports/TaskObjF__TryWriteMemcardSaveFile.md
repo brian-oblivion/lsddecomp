@@ -303,7 +303,7 @@ referenced, not retyped, per this round's broadcast) and two
 project-external prototypes local to this call site's own shape (neither
 declared elsewhere in the project): `extern s32 func_80013488(s32 handle,
 void *buf, s32 size);` and `extern void func_80012C20(const char *fmt);`
-(this call site passes only the format string; `code_8220.h`'s existing
+(this call site passes only the format string; `BMemPMgr.h`'s existing
 3-arg view of the same symbol is a DIFFERENT call site's shape, per the
 per-unit local-view convention).
 
@@ -643,7 +643,7 @@ typedef struct McSaveHeader {
 extern const char sFileNotCreatedMsg[]; /* rodata string "File not create in WriteFile\n" */
 extern s32 write(s32 handle, void *buf,
                  s32 size); /* CD/streaming read-request submit; own local view, not yet declared elsewhere in this project */
-extern void printf(const char *fmt); /* own local view: this call site passes only the format string, no variadic args (code_8220.h's 3-arg view is a DIFFERENT call site's shape) */
+extern void printf(const char *fmt); /* own local view: this call site passes only the format string, no variadic args (BMemPMgr.h's 3-arg view is a DIFFERENT call site's shape) */
 ```
 
 The `write` comment ("CD/streaming read-request submit") was wrong: this is

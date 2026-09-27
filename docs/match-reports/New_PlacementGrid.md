@@ -50,7 +50,7 @@ this codebase generally, independent of whether the object is a
 class-framework instance.
 
 `BMemPMgrAlloc` (the pool allocator, already established in
-`include/class_16334.h`/`include/code_8220.h`) declared LOCAL to this file
+`include/class_16334.h`/`include/BMemPMgr.h`) declared LOCAL to this file
 since neither shared header is included here.
 
 ## Naming (round 77, charlie -- track 3)

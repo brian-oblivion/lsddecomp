@@ -6,7 +6,7 @@
 /*
  * BasicClass -- the root of the game's hand-rolled class framework
  * (docs/research/class-framework.md), class id 0x0, method table gBasicClassMethods.
- * Methods live in src/code_8220.c and src/TmdRenderer.c.
+ * Methods live in src/BMemPMgr.c and src/TmdRenderer.c.
  *
  * Every class derives from it: word +0x000 of each method table is a
  * hierarchical class id (each nibble above the lowest non-zero one is one more
@@ -116,7 +116,7 @@ struct BasicClass {
 extern BasicClassMethods gBasicClassMethods;           /* BasicClass's own method table */
 extern BasicClassMethods *Get_vtable_BasicClass(void); /* returns &gBasicClassMethods */
 
-/* BasicClass's methods: the occupants of its own table, code_8220 and
+/* BasicClass's methods: the occupants of its own table, BMemPMgr and
  * TmdRenderer. A subclass reaches them through Get_vtable_BasicClass(). */
 void *BasicClass__Release(BasicClass *self);
 void BasicClass__BasicClass(BasicClass *self);
@@ -133,7 +133,7 @@ void BasicClass__NotifyParents(BasicClass *self, s32 event);
 void BasicClass__func_18350(void);
 void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event);
 
-/* The list primitives, code_8220 and TmdRenderer. */
+/* The list primitives, BMemPMgr and TmdRenderer. */
 extern s32 PushBasicClassListNode(BasicClassListNode **head,
                                   BasicClass *value); /* allocate a node, prepend it to *head */
 extern void RemoveBasicClassListNode(BasicClassListNode **head,

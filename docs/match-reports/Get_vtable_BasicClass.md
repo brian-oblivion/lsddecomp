@@ -8,7 +8,7 @@
 
 Returns the address of `gBasicClassMethods`, BasicClass's own 14-slot method table
 (`BASICCLASS_METHODS` per `docs/research/class-framework.md`). Called from
-`BasicClass__BasicClass` (`code_8220.c`) to install the base vtable on a
+`BasicClass__BasicClass` (`BMemPMgr.c`) to install the base vtable on a
 freshly-constructed `BasicClass`.
 
 ## The C
@@ -22,7 +22,7 @@ BasicClassMethods *Get_vtable_BasicClass(void)
 
 `gBasicClassMethods` had no extern declaration anywhere in the tree yet (only prose
 references to it in `class_16334.h`, `code_171e0.h`, `code_55dd4.h`,
-`code_d294.h`, `GameApplication.h`). Added one to `include/code_8220.h`:
+`code_d294.h`, `GameApplication.h`). Added one to `include/BMemPMgr.h`:
 
 ```c
 extern BasicClassMethods gBasicClassMethods;

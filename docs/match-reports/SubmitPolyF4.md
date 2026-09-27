@@ -182,7 +182,7 @@ void SubmitPolyF4(void *arg0, void *arg1) {
 INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyF4);
 ```
 
-(`OtTag` and `RCpolyF4`'s prototype come from `include/code_8220.h`, already
+(`OtTag` and `RCpolyF4`'s prototype come from `include/BMemPMgr.h`, already
 included by the unit.)
 
 Unit: `src/TmdRenderer.c`. Quad-flavored sibling of `SubmitPolyF3` (this
@@ -282,7 +282,7 @@ which apply to this function too:
    re-reads it before the second store, because `addPrim(ot, p)` expands `ot`
    twice.
 
-`OtTag` is already declared in `include/code_8220.h`.
+`OtTag` is already declared in `include/BMemPMgr.h`.
 
 **So this function is not known to be unreachable, and the analogy that
 retired it no longer holds.** The residue's SHAPE was correctly identified as

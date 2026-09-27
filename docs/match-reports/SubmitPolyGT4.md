@@ -35,7 +35,7 @@ copies (`lwl`/`lwr` + `swl`/`swr`) are kept unchanged from the old body.
 `prim = (u8 *)SubmitPolyGT4(prim, ctx);`), declared there as
 `extern void *SubmitPolyGT4(void *prim, void *ctx);`. No other reference in `src/`,
 `asm/` or `config/`. The return type agrees. `RCpolyGT4` stays declared `void` in
-`include/code_8220.h` and is called through the local cast.
+`include/BMemPMgr.h` and is called through the local cast.
 
 ## Earlier history
 
@@ -277,7 +277,7 @@ void SubmitPolyGT4(void *arg0, void *arg1) {
 INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyGT4);
 ```
 
-(`OtTag` and `RCpolyGT4`'s prototype come from `include/code_8220.h`,
+(`OtTag` and `RCpolyGT4`'s prototype come from `include/BMemPMgr.h`,
 already included by the unit.)
 
 Unit: `src/TmdRenderer.c`. Eighth and final sibling of the
@@ -388,7 +388,7 @@ which apply to this function too:
    re-reads it before the second store, because `addPrim(ot, p)` expands `ot`
    twice.
 
-`OtTag` is already declared in `include/code_8220.h`.
+`OtTag` is already declared in `include/BMemPMgr.h`.
 
 **So this function is not known to be unreachable, and the analogy that
 retired it no longer holds.** The residue's SHAPE was correctly identified as

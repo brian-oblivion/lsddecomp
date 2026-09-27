@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_17f2c` on 2026-09-24 (tools/rename.py). Address 0x80017f2c.
 
-**Unit:** code_8220 · **Size:** 27 instructions · **Status:** MATCHED (27/27 words)
+**Unit:** BMemPMgr · **Size:** 27 instructions · **Status:** MATCHED (27/27 words)
 
 BasicClass vtable slot `+0x00C` — see `BasicClass__BasicClass.md` for the
 class's overall design.
@@ -56,12 +56,12 @@ caching `self->methods` first and then have to undo it.
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit code_8220 (fresh carve).
+round 11 (2026-09-03), runner delta, unit BMemPMgr (fresh carve).
 
 ## Naming (round 74)
 
 `BasicClass__Finalize`, **tier A**: matches vtable slot `+0x00C`
-(`finalize`), already documented in `code_8220.h`'s `BasicClassMethods`
+(`finalize`), already documented in `BMemPMgr.h`'s `BasicClassMethods`
 comment. Called by `BasicClass__Release` before freeing `self`.
 
 ## Polish (round 97, runner delta)

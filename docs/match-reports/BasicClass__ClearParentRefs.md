@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_1813c` on 2026-09-24 (tools/rename.py). Address 0x8001813c.
 
-**Unit:** code_8220 · **Size:** 12 instructions · **Status:** MATCHED (12/12 words)
+**Unit:** BMemPMgr · **Size:** 12 instructions · **Status:** MATCHED (12/12 words)
 
 BasicClass vtable slot `+0x028` (`clearParentRefs`) — see
 `BasicClass__BasicClass.md` for the class's overall design, and
@@ -30,12 +30,12 @@ void BasicClass__ClearParentRefs(BasicClass *self)
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit code_8220, second pass. Matched
+round 11 (2026-09-03), runner delta, unit BMemPMgr, second pass. Matched
 first attempt.
 
 ## Naming (round 74)
 
 `BasicClass__ClearParentRefs`, **tier A**: matches vtable slot `+0x028`
-(`clearParentRefs`), already documented in `code_8220.h`. Frees every
+(`clearParentRefs`), already documented in `BMemPMgr.h`. Frees every
 node in `self->parentRefs` via `FreeBasicClassList`, then clears the
 head pointer.

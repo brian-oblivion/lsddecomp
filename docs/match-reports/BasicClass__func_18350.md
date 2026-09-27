@@ -52,7 +52,7 @@ body supplies none by itself. A tier-A or even tier-B name here would be
 pure invention.
 
 There is a second consequence worth recording: the slot's declared
-signature in `include/code_8220.h` is `void (*slot34)(void)`, which is what
+signature in `include/BMemPMgr.h` is `void (*slot34)(void)`, which is what
 an empty base body PERMITS, not what anything was observed to pass. If a
 caller is ever found, expect that declaration to be wrong rather than
 confirmed. `grep -rn -- '->slot34\b\|\.slot34\b' src/` returns nothing, so

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80019774` on 2026-09-24 (tools/rename.py). Address 0x80019774.
 
-Unit: `src/code_8220_c.c` (carved round 13, third slice of `code_8220`).
+Unit: `src/code_8220_c.c` (carved round 13, third slice of `BMemPMgr`).
 Same COP2-store-leaf class already established in `TmdRenderer`
 (`StoreSxyPolyF3`, `StoreSxyPolyF4`, etc. — see
 `docs/DECOMPILATION_LEARNINGS.md`'s GTE-store-leaf entries): a `flag`-gated

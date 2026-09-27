@@ -2,7 +2,7 @@
 
 > Renamed from `func_80018208` on 2026-09-24 (tools/rename.py). Address 0x80018208.
 
-**Unit:** code_8220 · **Size:** 32 instructions · **Status:** MATCHED (32/32 words)
+**Unit:** BMemPMgr · **Size:** 32 instructions · **Status:** MATCHED (32/32 words)
 
 The `BasicClassListNode` list find-unlink-free primitive, used by both of
 BasicClass's lists (`children` via `BasicClass__RemoveChild`, `parentRefs`
@@ -61,7 +61,7 @@ diff was two SWAPPED words, not two wrong ones).
 
 ## Provenance
 
-round 11 (2026-09-03), runner delta, unit code_8220, second pass. 2
+round 11 (2026-09-03), runner delta, unit BMemPMgr, second pass. 2
 attempts.
 
 ## Naming (round 74)
