@@ -85,3 +85,40 @@ wrong tier-A/B guess here (e.g. asserting this is some kind of shared-vtable
 pointer cache) would be worse than the placeholder. Kept as
 `SetDataDirectory`/`GetDataDirectory`; write down what is known and revisit once
 `D_8006D4A8` or a caller is identified.
+
+## Naming (round 99, charlie, track 7)
+
+This supersedes the round-52 "not renamed" entry above. The rename tools
+rewrote the names in that section, so it now reads oddly: it describes the
+state before these renames.
+
+| was | now | tier |
+| --- | --- | --- |
+| `func_800270AC` | `SetDataDirectory` | A |
+| `func_800270B8` | `GetDataDirectory` | A |
+| `D_8008A854` | `gDataDirectory` | A |
+
+**Evidence.** Round 52 found no caller. There are three now, and they agree:
+
+- **Readers.** `BuildCdFilePath` (code_179d8_h) and `CdStream__Open`
+  (src/CdStream.c) both build `"\\" + GetDataDirectory() + name + ";1"` and
+  pass the result to the CD file lookup. So the value is the directory
+  part of an ISO9660 path, and it sits between the root `\` and the file
+  name.
+- **Writer.** `GameApplication__GameApplication` (code_1677c) calls
+  `SetDataDirectory(func_80048CF0())` once at startup. `func_80048CF0`
+  returns `D_8008A960`, whose retail initialiser is `&D_8008A958`, the
+  `.sdata` string `"CDI\\"`. That string ends in the separator, which is
+  what the readers need, because they put nothing between it and the name.
+- **Default.** `gDataDirectory`'s retail initialiser is `0x8006D4A8`. The
+  byte there is `0x00`, so the value is an empty string and paths resolve
+  from the disc root until the application installs `"CDI\\"`. That word is
+  also the last word of `gFileResourceMethods` as splat has that table
+  carved, which is what made round 52 suspicious. It is a `""` literal that
+  the table's carve swallowed, not a table slot.
+
+The pair is a plain setter and getter, which is tier A by definition, and
+the readers agree on what the value is for. `char *` is the true type. The
+unit's own declarations say `char *` since round 99. code_1677c still
+declares `SetDataDirectory(s32)` and CdStream.c declares
+`void *GetDataDirectory(void)`. Both are left to their owners and proposed.

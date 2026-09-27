@@ -113,3 +113,15 @@ the new entries' disc positions via `ResolveFileEntries`; otherwise a no-op
 returning `1`. Mechanics fully derived from the body and the callees'
 already-established names (`SetFileTable`/`GetFileTableCount`/
 `SetFileTableCount`/`ResolveFileEntries`).
+
+## Naming (round 99, charlie, track 7)
+
+| was | now | tier |
+| --- | --- | --- |
+| `D_8008A850` | `gFileTableRegistered` | B |
+
+**Evidence.** It is a `.sdata` word, zero in retail. This function's CD arm
+sets it to 1 before installing the table, and that is the only access in
+the image: `grep -rl D_8008A850 asm/` found only its definition and this
+function. The name says what the one write does. Nothing reads the flag,
+so what it was for is not known (tier B).

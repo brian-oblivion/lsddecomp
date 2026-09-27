@@ -56,3 +56,11 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 Not renamed -- see `SetDataDirectory.md` (its setter), which carries the full
 evidence and reasoning. Same `gDataDirectory` global, same absence of usage
 evidence, same conclusion.
+
+## Naming (round 99, charlie, track 7)
+
+Renamed `func_800270B8` -> `GetDataDirectory`, tier A. This supersedes the
+round-52 entry above, whose names the rename tools rewrote. The evidence
+(two readers, `BuildCdFilePath` and `CdStream__Open`, which both build
+`"\\" + dir + name + ";1"`, and the setter's single caller, which installs
+`"CDI\\"`) is in `SetDataDirectory.md`.
