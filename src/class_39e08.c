@@ -19,24 +19,25 @@
 extern LongVec3 sDayViewPoint;
 extern LongVec3 sDayViewRef;
 
-DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
+DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 syncDriver) {
     DayTask *self;
 
     self = BMemPMgrAlloc(0x50);
     if (self != NULL) {
-        GetDayTaskMethods()->ctor(self, initArgs, dreamSys, arg3);
+        GetDayTaskMethods()->ctor(self, initArgs, dreamSys, syncDriver);
         return self;
     }
     return NULL;
 }
 
-void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys, s32 arg3) {
+void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSys *dreamSys,
+                      s32 syncDriver) {
     /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
      * frame by 8. */
     ResourceRequest req;
-    s32 tmp;
+    s32 vabPath;
 
-    GetTimedTaskMethods()->ctor((TimedTask *)self, (char *)GetSoundEffectDir(0), 0);
+    GetTimedTaskMethods()->ctor((TimedTask *)self, GetSoundEffectDir(0), 0);
     self->methods = GetDayTaskMethods();
     InitDreamAux();
     self->etcTim = New_TimImage((char *)sEtcTimPath);
@@ -45,10 +46,10 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     req.src.buffer = NULL;
     req.src.name = (char *)sDreamerTmdPath;
     self->dreamerTmd = New_LinkResource(&req.src);
-    tmp = PickWeeklyGroup(0);
-    self->bgm = New_WBgm((char *)tmp, NULL, 1);
+    vabPath = PickWeeklyGroup(0);
+    self->bgm = New_WBgm((char *)vabPath, NULL, 1);
     RegisterRecordTableFiles(1);
-    SetActiveDataSourceDriverMode((u32)arg3 < 1, 1, 1);
+    SetActiveDataSourceDriverMode((u32)syncDriver < 1, 1, 1);
     self->initArgs = initArgs;
     initArgs->viewport = (BasicClass *)New_NodeGuardedViewport();
     initArgs->frameClock = (BasicClass *)New_FrameClock();
@@ -61,16 +62,16 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
 }
 
 void DayTask__Finalize(DayTask *self) {
-    IntermediateBaseInitArgs *o = self->initArgs;
-    BasicClass *g;
+    IntermediateBaseInitArgs *args = self->initArgs;
+    BasicClass *obj;
 
     self->methods->removeChild(self, (BasicClass *)self->dreamSys);
-    g = o->lightRig;
-    o->lightRig = g->methods->release(g);
-    g = o->frameClock;
-    o->frameClock = g->methods->release(g);
-    g = o->viewport;
-    o->viewport = g->methods->release(g);
+    obj = args->lightRig;
+    args->lightRig = obj->methods->release(obj);
+    obj = args->frameClock;
+    args->frameClock = obj->methods->release(obj);
+    obj = args->viewport;
+    args->viewport = obj->methods->release(obj);
     self->bgm->methods->release(self->bgm);
     self->dreamerTmd->methods->release(self->dreamerTmd);
     self->etcTim->methods->release(self->etcTim);
@@ -95,35 +96,35 @@ void DayTask__ResetPhase(DayTask *self) {
 }
 
 s32 DayTask__Init(DayTask *self) {
-    DreamSys *sub = self->dreamSys;
+    DreamSys *dreamSys = self->dreamSys;
 
-    sub->methods->addChild(sub, self->initArgs->pad);
-    sub->methods->addChild(sub, self->initArgs->frameClock);
-    sub->methods->setViewport(sub, (Viewport *)self->initArgs->viewport);
+    dreamSys->methods->addChild(dreamSys, self->initArgs->pad);
+    dreamSys->methods->addChild(dreamSys, self->initArgs->frameClock);
+    dreamSys->methods->setViewport(dreamSys, (Viewport *)self->initArgs->viewport);
     return GetTimedTaskMethods()->init((TimedTask *)self, self->initArgs, 0);
 }
 
 void DayTask__Deinit(DayTask *self) {
-    DreamSys *sub = self->dreamSys;
+    DreamSys *dreamSys = self->dreamSys;
 
     GetTimedTaskMethods()->deinit((TimedTask *)self);
-    sub->methods->setViewport(sub, 0);
-    sub->methods->removeChild(sub, self->initArgs->pad);
-    sub->methods->removeChild(sub, self->unk10);
+    dreamSys->methods->setViewport(dreamSys, 0);
+    dreamSys->methods->removeChild(dreamSys, self->initArgs->pad);
+    dreamSys->methods->removeChild(dreamSys, self->unk10);
 }
 
 void DayTask__OnInit(DayTask *self) {
-    SubObjE *obj;
+    SubObjE *drawSystem;
     Viewport *vp;
-    SceneNode *ret;
+    SceneNode *fadeBox;
     ViewportSize *size;
 
-    obj = (SubObjE *)self->initArgs->drawSystem;
+    drawSystem = (SubObjE *)self->initArgs->drawSystem;
     vp = (Viewport *)self->viewport;
-    size = obj->methods->getDims(obj, 0);
+    size = drawSystem->methods->getDims(drawSystem, 0);
     vp->methods->setScreenSize(vp, size);
-    ret = vp->methods->getFadeBox(vp);
-    ret->methods->setDisplay(ret, 1);
+    fadeBox = vp->methods->getFadeBox(vp);
+    fadeBox->methods->setDisplay(fadeBox, 1);
     vp->methods->setUnk44(vp, 0x4B0);
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &sDayViewPoint, &sDayViewRef, 0);
     vp->methods->initOt(vp);
@@ -177,7 +178,7 @@ void DayTask__OnState4(void) {}
 void DayTask__OnDreamSysNotify(void) {}
 
 void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event) {
-    CinematicCall pos;
+    CinematicCall cinematic;
     s32 result;
 
     switch (event) {
@@ -186,8 +187,8 @@ void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event) {
             self->objM->methods->release(self->objM);
             result = self->dreamSys->methods->endDay(self->dreamSys, 0);
             if (result == 0) {
-                pos = self->dreamSys->methods->getCinematic(self->dreamSys);
-                self->result = pos.entry < 0 ? 1 : 2;
+                cinematic = self->dreamSys->methods->getCinematic(self->dreamSys);
+                self->result = cinematic.entry < 0 ? 1 : 2;
             } else {
                 self->result = 3;
             }
@@ -222,39 +223,39 @@ DayTaskMethods *GetDayTaskMethods(void) {
  * write. Declared locally per CLAUDE.md's rule against writing C for
  * SDK-owned code. */
 extern void *GetRecordTable(s32 *out);
-extern s32 RegisterFileTableEntries(void *arg0, s32 arg1);
+extern s32 RegisterFileTableEntries(void *table, s32 count);
 
 extern s32 sRecordRegisterCalls;
 extern s32 sRecordFirstBatchCount;
 
-s32 RegisterRecordTableFiles(s32 arg0) {
-    s32 local;
-    void *obj;
+s32 RegisterRecordTableFiles(s32 all) {
+    s32 count;
+    void *table;
     s32 prev;
     s32 result;
 
-    obj = GetRecordTable(&local);
+    table = GetRecordTable(&count);
     prev = sRecordRegisterCalls;
     sRecordRegisterCalls = prev + 1;
 
     switch (prev + 1) {
         case 1:
-            if (arg0 != 0) {
+            if (all != 0) {
                 sRecordRegisterCalls = prev + 2;
             } else {
-                local = local / 2;
-                sRecordFirstBatchCount = local;
+                count = count / 2;
+                sRecordFirstBatchCount = count;
             }
             break;
         case 2:
-            local = local - sRecordFirstBatchCount;
+            count = count - sRecordFirstBatchCount;
             break;
         default:
-            local = 0;
+            count = 0;
             break;
     }
 
-    while ((result = RegisterFileTableEntries(obj, local)) == 0) {
+    while ((result = RegisterFileTableEntries(table, count)) == 0) {
     }
     return result;
 }

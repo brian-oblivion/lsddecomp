@@ -84,7 +84,7 @@ struct ObjM; /* include/ObjM.h */
 
 struct DayTaskMethods {
     DAYTASK_SLOTS(DayTask, (DayTask * self, IntermediateBaseInitArgs *initArgs,
-                            struct DreamSys *dreamSys, s32 arg3));
+                            struct DreamSys *dreamSys, s32 syncDriver));
 };
 
 struct DayTask {
@@ -99,9 +99,9 @@ typedef s32 (*DayTaskInitFn)(DayTask *self);
 
 /* The class's own methods, in address order. */
 DayTask *New_DayTask(IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys,
-                     s32 arg3); /* BMemPMgrAlloc(0x50), then ctor */
+                     s32 syncDriver); /* BMemPMgrAlloc(0x50), then ctor */
 void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, struct DreamSys *dreamSys,
-                      s32 arg3);
+                      s32 syncDriver);
 void DayTask__Finalize(DayTask *self);
 void DayTask__OnNotify(DayTask *self, BasicClass *sender, s32 event);
 void DayTask__ResetPhase(DayTask *self);

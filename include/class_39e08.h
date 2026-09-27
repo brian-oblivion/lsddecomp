@@ -50,7 +50,7 @@ extern void TickDreamAuxSlots(void);
 /* MATCHED, src/code_39094.c (`char *GetSoundEffectDir(void)`): returns the
  * "SND\\SE" directory string pointer; DayTask's ctor passes it as
  * TimedTask's soundBankPath. */
-extern s32 GetSoundEffectDir(s32 arg1); /* arity-ok: the definition takes no parameter and reads no argument register, but this dead argument IS byte-load-bearing -- retail emits `move a0,zero` at 0x800496A8 ahead of the jal at 0x800496B0 */
+extern char *GetSoundEffectDir(s32 unused); /* arity-ok: the definition takes no parameter and reads no argument register, but this dead argument IS byte-load-bearing -- retail emits `move a0,zero` at 0x800496A8 ahead of the jal at 0x800496B0 */
 
 /* Matched in code_4cd08.c (still called `InitDreamAux` there, STALLED at
  * 40/56 -- see docs/match-reports/InitDreamAux.md). Takes no arguments,
@@ -65,15 +65,15 @@ extern const char sDreamerTmdPath[];
 /* src/code_39094.c: one of the seven gWeeklyGroupTable words, each a VAB
  * path string ("SND\\AMBIENT" ... "SND\\STANDERD"). Its return value is
  * forwarded as `New_WBgm`'s own 1st argument (include/WBgm.h). */
-extern s32 PickWeeklyGroup(s32 arg1);
+extern s32 PickWeeklyGroup(s32 unused);
 
 /* Also declared in code_1677c.c as `extern s32 RegisterRecordTableFiles(s32 a0)`.
  * Return value discarded at this call site. */
-extern s32 RegisterRecordTableFiles(s32 arg1);
+extern s32 RegisterRecordTableFiles(s32 all);
 
 /* Also declared in src/code_1677c.c with this exact signature. Return
  * value discarded at this call site. */
-extern s32 SetActiveDataSourceDriverMode(s32 arg1, s32 arg2, s32 arg3);
+extern s32 SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
 
 /* New_StageMap is declared in include/StageMap.h. */
 
