@@ -58,6 +58,10 @@ struct VabStreamObj;
 typedef struct ItemList ItemList;
 typedef struct ItemListMethods ItemListMethods;
 
+/* `result` when closing (handleInputCode): command 25 closes with the item
+ * under the cursor chosen (getCursorIndex), command 23 without one. */
+enum ItemListResult { ITEMLIST_RESULT_CHOSEN = 2, ITEMLIST_RESULT_CANCELLED = 3 };
+
 /* BasicClass's slots (overrides: +0x008 ItemList__ItemList, +0x00C
  * Finalize, +0x010 AddChild, +0x014 RemoveChild, +0x018 RemoveAllChildren,
  * +0x038 OnNotify; `tools/classtable.py gItemListMethods --vs gBasicClassMethods`),

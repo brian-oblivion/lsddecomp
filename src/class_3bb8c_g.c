@@ -30,6 +30,7 @@
 #include "TimImage.h"
 #include "VabStreamObj.h"
 #include "TaskObjF.h"
+#include "Pad.h"
 
 void TaskObjF__SetState(TaskObjF *self, s32 state) {
     TaskObjFMethods *methods = self->methods;
@@ -37,7 +38,7 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
     s32 i;
 
     if (self->state == state) {
-        state = 0x17;
+        state = TASKOBJF_STATE_ABORTED;
     }
 
     methods->notifyParents(self, state);
@@ -46,34 +47,34 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
 
     self->waitCounter = 0;
     switch (state) {
-        case 0x13:
-            state = methods->formatCard(self) ? 0x11 : 8;
+        case TASKOBJF_STATE_FORMAT:
+            state = methods->formatCard(self) ? TASKOBJF_STATE_EDIT_TITLE : TASKOBJF_STATE_FORMAT_ERROR;
             methods->setState(self, state);
             break;
-        case 0x14:
+        case TASKOBJF_STATE_WRITE:
             if (self->fileName[0] == '\0') {
                 methods->findUnusedMemcardName(self, self->fileName, self->namePrefix, self->nameSuffixes);
             }
             ok = methods->writeMemcardSaveFile(self, self->fileName, self->title, self->iconFrames,
                                                self->iconImage, self->data, self->dataSize);
-            state = ok ? 0x16 : 0xC;
+            state = ok ? TASKOBJF_STATE_DONE : TASKOBJF_STATE_SAVE_ERROR;
             methods->setState(self, state);
             break;
-        case 0x15:
+        case TASKOBJF_STATE_READ:
             ok = methods->readMemcardFile(self, self->fileName, self->data, self->dataSize);
-            state = ok ? 0x16 : 0x10;
+            state = ok ? TASKOBJF_STATE_DONE : TASKOBJF_STATE_LOAD_ERROR;
             methods->setState(self, state);
             break;
-        case 0x11:
+        case TASKOBJF_STATE_EDIT_TITLE:
             methods->attachTextEntry(self);
             break;
-        case 0x12:
+        case TASKOBJF_STATE_CHOOSE_FILE:
             methods->attachItemList(self);
             break;
     }
 
-    if ((u32)(state - 0x16) < 2) {
-        if (self->opMode == 1 && self->titles != NULL) {
+    if ((u32)(state - TASKOBJF_STATE_DONE) < 2) { /* DONE or ABORTED */
+        if (self->opMode == TASKOBJF_OP_LOAD && self->titles != NULL) {
             BMemPMgrFree(self->foundSuffixes);
             for (i = 0; i < self->bufCount; i++) {
                 BMemPMgrFree(self->titles[i]);
@@ -81,8 +82,8 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
             BMemPMgrFree(self->titles);
             self->titles = NULL;
         }
-        self->state = 0;
-        self->opMode = 0;
+        self->state = TASKOBJF_STATE_IDLE;
+        self->opMode = TASKOBJF_OP_NONE;
     } else {
         self->state = state;
     }
@@ -91,7 +92,7 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
 /* 0x11 (17) entries, indexed by `arg1` (range-checked `< 0x11` below);
  * mostly `char *` string pointers into rodata, a few raw literal words at
  * indices never reached from this call site. `asm/data/76DC8.data.s`. */
-extern char *gCardIconNames[];
+extern char *gCardIconNames[TASKOBJF_STATE_EDIT_TITLE];
 extern const char gCardPathPrefix[]; /* "CARD\\" */
 extern const char gCardPathSuffix[]; /* ".TIM" */
 /* 3 words, `New_ScreenSprite`'s rect: a SpriteRect {0, 0, 160, 120}. */
@@ -100,13 +101,13 @@ extern SpriteRect gCardIconRect;
 extern ScreenSpritePos gCardIconPos;
 
 void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
-    char pathBuf[0x20];
+    char pathBuf[32];
     char *path;
     char *name;
     TimImage *tim;
     ScreenSprite *icon;
 
-    if (index >= 0x11) {
+    if (index >= ARRAY_COUNT(gCardIconNames)) {
         return;
     }
     if (self->spriteParent == 0) {
@@ -138,10 +139,10 @@ void TaskObjF__ReleaseCardIcon(TaskObjF *self) {
 }
 
 void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 event) {
-    if (self->state != 0) {
-        if (event == 0x19) {
+    if (self->state != TASKOBJF_STATE_IDLE) {
+        if (event == PAD_EVENT_PRESSED + PAD_BUTTON_RRIGHT) {
             self->methods->advanceState(self);
-        } else if (event == 0x17) {
+        } else if (event == PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN) {
             self->methods->forceIdleFromState(self);
         }
     }
@@ -149,7 +150,7 @@ void TaskObjF__OnInputEvent(TaskObjF *self, void *sender, s32 event) {
 
 void TaskObjF__PlaySound(TaskObjF *self, s32 index) {
     if (self->sound != NULL) {
-        self->sound->methods->playTone(self->sound, index, 0x7F, 0x7F);
+        self->sound->methods->playTone(self->sound, index, 127, 127);
     }
 }
 
@@ -157,48 +158,48 @@ void TaskObjF__AdvanceState(TaskObjF *self) {
     TaskObjFMethods *methods = self->methods;
 
     switch (self->state) {
-        case 2:
-        case 4:
-        case 0xA:
-        case 0xE:
-            methods->playSound(self, 0);
-            if (self->state == 0xE) {
+        case TASKOBJF_STATE_NO_CARD:
+        case TASKOBJF_STATE_CARD_CHANGED:
+        case TASKOBJF_STATE_SAVE_OVERWRITE_WARNING:
+        case TASKOBJF_STATE_LOAD_WARNING:
+            methods->playSound(self, 0 << 4);
+            if (self->state == TASKOBJF_STATE_LOAD_WARNING) {
                 strcpy(self->fileName, self->namePrefix);
                 strcat(self->fileName, self->foundSuffixes[self->selectedIndex]);
                 strcpy(self->title, self->titles[self->selectedIndex]);
             }
-            if (self->opMode == 2) {
+            if (self->opMode == TASKOBJF_OP_SAVE) {
                 methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
                                    self->iconFrames, self->iconImage, self->data, self->dataSize);
-            } else if (self->opMode == 1) {
+            } else if (self->opMode == TASKOBJF_OP_LOAD) {
                 methods->beginLoad(self, self->fileName, self->title, self->data, self->dataSize);
             }
             break;
-        case 6:
-            methods->playSound(self, 0);
-            methods->setState(self, 7);
+        case TASKOBJF_STATE_UNFORMATTED_SAVE:
+            methods->playSound(self, 0 << 4);
+            methods->setState(self, TASKOBJF_STATE_FORMATTING);
             break;
-        case 3:
-        case 5:
-        case 8:
-        case 9:
-        case 0xC:
-        case 0xD:
-        case 0x10:
-            methods->playSound(self, 0x10);
-            methods->setState(self, 0x17);
+        case TASKOBJF_STATE_CARD_ERROR:
+        case TASKOBJF_STATE_UNFORMATTED_LOAD:
+        case TASKOBJF_STATE_FORMAT_ERROR:
+        case TASKOBJF_STATE_SAVE_NO_SPACE:
+        case TASKOBJF_STATE_SAVE_ERROR:
+        case TASKOBJF_STATE_NO_SAVE_FOUND:
+        case TASKOBJF_STATE_LOAD_ERROR:
+            methods->playSound(self, 1 << 4);
+            methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
     }
 }
 
 void TaskObjF__ForceIdleFromState(TaskObjF *self) {
     switch (self->state) {
-        case 4:
-        case 6:
-        case 0xA:
-        case 0xE:
-            self->methods->playSound(self, 0x10);
-            self->methods->setState(self, 0x17);
+        case TASKOBJF_STATE_CARD_CHANGED:
+        case TASKOBJF_STATE_UNFORMATTED_SAVE:
+        case TASKOBJF_STATE_SAVE_OVERWRITE_WARNING:
+        case TASKOBJF_STATE_LOAD_WARNING:
+            self->methods->playSound(self, 1 << 4);
+            self->methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
         default:
             break;
@@ -209,30 +210,30 @@ void TaskObjF__TickStateDelay(TaskObjF *self) {
     s32 old;
     s32 count;
 
-    if (self->state == 7) {
+    if (self->state == TASKOBJF_STATE_FORMATTING) {
         old = self->waitCounter;
         count = old + 1;
         self->waitCounter = count;
         if (old < 6) {
             return;
         }
-        self->methods->setState(self, 0x13);
-    } else if (self->state == 0xB) {
+        self->methods->setState(self, TASKOBJF_STATE_FORMAT);
+    } else if (self->state == TASKOBJF_STATE_SAVING) {
         old = self->waitCounter;
         count = old + 1;
         self->waitCounter = count;
         if (old < 6) {
             return;
         }
-        self->methods->setState(self, 0x14);
-    } else if (self->state == 0xF) {
+        self->methods->setState(self, TASKOBJF_STATE_WRITE);
+    } else if (self->state == TASKOBJF_STATE_LOADING) {
         old = self->waitCounter;
         count = old + 1;
         self->waitCounter = count;
         if (old < 6) {
             return;
         }
-        self->methods->setState(self, 0x15);
+        self->methods->setState(self, TASKOBJF_STATE_READ);
     }
 }
 
@@ -262,14 +263,14 @@ void TaskObjF__DetachTextEntry(TaskObjF *self) {
 
 void TaskObjF__OnTextEntryResult(TaskObjF *self, void *sender, s32 result) {
     switch (result) {
-        case 2:
+        case TEXTENTRY_RESULT_ACCEPTED:
             self->methods->detachTextEntry(self);
             self->methods->beginSave(self, self->fileName, self->title, self->titleEditPos,
                                      self->iconFrames, self->iconImage, self->data, self->dataSize);
             break;
-        case 3:
+        case TEXTENTRY_RESULT_CANCELLED:
             self->methods->detachTextEntry(self);
-            self->methods->setState(self, 0x17);
+            self->methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
     }
 }
@@ -300,14 +301,14 @@ void TaskObjF__DetachItemList(TaskObjF *self) {
 
 void TaskObjF__OnItemListResult(TaskObjF *self, ItemList *list, s32 result) {
     switch (result) {
-        case 2:
+        case ITEMLIST_RESULT_CHOSEN:
             self->selectedIndex = list->methods->getCursorIndex(list);
             self->methods->detachItemList(self);
-            self->methods->setState(self, 0xE);
+            self->methods->setState(self, TASKOBJF_STATE_LOAD_WARNING);
             break;
-        case 3:
+        case ITEMLIST_RESULT_CANCELLED:
             self->methods->detachItemList(self);
-            self->methods->setState(self, 0x17);
+            self->methods->setState(self, TASKOBJF_STATE_ABORTED);
             break;
     }
 }
@@ -315,6 +316,20 @@ void TaskObjF__OnItemListResult(TaskObjF *self, ItemList *list, s32 result) {
 TaskObjFMethods *GetTaskObjFMethods(void) {
     return &gTaskObjFMethods;
 }
+
+/* The save title is full-width (2-byte SJIS) characters. TitleMenu's
+ * (D_8008AA18 points at it, 0x8001149C) starts as "LSD   Day001", all
+ * full-width: "LSD" (0..2), the letter field (3..5), "Day" (6..8), the day
+ * number (9..11), then padding. */
+#define SAVE_TITLE_LETTER_FIELD 3
+#define SAVE_TITLE_LETTER 4
+#define SAVE_TITLE_PADDING 12
+/* gSaveTitleGlyphs: the full-width letters a..o (0..14), one per save file
+ * -01..-15, then three full-width spaces and "Day" (15..20). */
+#define SAVE_TITLE_GLYPH_SPACES 15
+/* A save file name is namePrefix ("BISLPS-01556", 12 characters) + "-NN";
+ * the first digit of NN. */
+#define SAVE_FILE_NAME_NUMBER 13
 
 /* Sony's, from libc2 (round 45's own local view -- this unit's first use). */
 extern s32 atoi(char *s);
@@ -360,19 +375,22 @@ s32 StampSaveTitleFileLetter(s32 titleAddr, s32 fileNameAddr) {
     Pair2_3bb8c_g *glyph;
 
     if (fileName != NULL) {
-        numberPos = ((u32)(fileName[0xE] - 0x38) < 2) ? 0xE : 0xD;
+        numberPos = ((u32)(fileName[SAVE_FILE_NAME_NUMBER + 1] - '8') < 2) ? SAVE_FILE_NAME_NUMBER + 1
+                                                                           : SAVE_FILE_NAME_NUMBER;
 
-        title[12] = gSaveTitleGlyphs[15];
-        *(Buf12_3bb8c_g *)&title[3] = *(Buf12_3bb8c_g *)&gSaveTitleGlyphs[15];
+        title[SAVE_TITLE_PADDING] = gSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
+        *(Buf12_3bb8c_g *)&title[SAVE_TITLE_LETTER_FIELD] =
+            *(Buf12_3bb8c_g *)&gSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
 
         letter = atoi(fileName + numberPos) - 1;
         glyph = &gSaveTitleGlyphs[letter];
-        title[4] = *glyph;
+        title[SAVE_TITLE_LETTER] = *glyph;
         return (s32)glyph;
     } else {
         Pair2_3bb8c_g *glyphs = gSaveTitleGlyphs;
 
-        *(Buf6_3bb8c_g *)&title[3] = *(Buf6_3bb8c_g *)&glyphs[15];
+        *(Buf6_3bb8c_g *)&title[SAVE_TITLE_LETTER_FIELD] =
+            *(Buf6_3bb8c_g *)&glyphs[SAVE_TITLE_GLYPH_SPACES];
         return (s32)glyphs;
     }
 }

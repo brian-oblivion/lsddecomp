@@ -42,6 +42,10 @@ struct TextRow;
 typedef struct TextEntry TextEntry;
 typedef struct TextEntryMethods TextEntryMethods;
 
+/* The result a closing TextEntry passes to notifyParents: command 25 writes
+ * `editBuf` back into `textBuf` first, command 23 does not. */
+enum TextEntryResult { TEXTENTRY_RESULT_ACCEPTED = 2, TEXTENTRY_RESULT_CANCELLED = 3 };
+
 /* BasicClass's slots (overrides: +0x008 TextEntry__TextEntry, +0x00C
  * Finalize, +0x010 AddChild, +0x014 RemoveChild, +0x018 RemoveAllChildren,
  * +0x038 OnNotify; `tools/classtable.py gTextEntryMethods --vs gBasicClassMethods`),

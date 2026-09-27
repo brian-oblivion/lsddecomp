@@ -54,6 +54,52 @@ struct SceneNode;
 typedef struct TaskObjF TaskObjF;
 typedef struct TaskObjFMethods TaskObjFMethods;
 
+/* `opMode`: which operation the state machine is running. */
+enum TaskObjFOpMode {
+    TASKOBJF_OP_NONE = 0,
+    TASKOBJF_OP_LOAD = 1, /* beginLoad */
+    TASKOBJF_OP_SAVE = 2  /* beginSave */
+};
+
+/* `state`'s codes (setState). 2..16 each show a message: loadCardIcon draws
+ * CARD\<gCardIconNames[state]>.TIM, and the member names follow those file
+ * names (NOCONECT, ERROR, CHANGE, UNFORM1, UNFORM2, FORMING, FORMERR,
+ * SAVEEMPT, SAVEWAR, SAVING, SAVEERR, NOTFOUND, LOADWAR, LOADING, LOADERR).
+ * Validate sets 2..6 from checkCardStatus; beginSave sets SAVE_NO_SPACE
+ * when checkCardSpace fails and SAVE_OVERWRITE_WARNING when the file
+ * already opens; beginLoad sets NO_SAVE_FOUND when collectExistingMemcardFiles
+ * finds none. FORMATTING, SAVING and LOADING wait (tickStateDelay) and then
+ * run FORMAT, WRITE and READ, which setState runs on entry and which end in
+ * DONE or the matching *_ERROR. EDIT_TITLE and CHOOSE_FILE attach the
+ * TextEntry and the ItemList. DONE and ABORTED are terminal: setState frees
+ * the load buffers and returns to IDLE; setting the current state again
+ * becomes ABORTED. No code sets 1. */
+enum TaskObjFState {
+    TASKOBJF_STATE_IDLE = 0,
+    TASKOBJF_STATE_NO_CARD = 2,                 /* NOCONECT: checkCardStatus failed */
+    TASKOBJF_STATE_CARD_ERROR = 3,              /* ERROR */
+    TASKOBJF_STATE_CARD_CHANGED = 4,            /* CHANGE */
+    TASKOBJF_STATE_UNFORMATTED_LOAD = 5,        /* UNFORM1: opMode 1 */
+    TASKOBJF_STATE_UNFORMATTED_SAVE = 6,        /* UNFORM2: opMode 2; confirm formats */
+    TASKOBJF_STATE_FORMATTING = 7,              /* FORMING */
+    TASKOBJF_STATE_FORMAT_ERROR = 8,            /* FORMERR */
+    TASKOBJF_STATE_SAVE_NO_SPACE = 9,           /* SAVEEMPT */
+    TASKOBJF_STATE_SAVE_OVERWRITE_WARNING = 10, /* SAVEWAR */
+    TASKOBJF_STATE_SAVING = 11,                 /* SAVING */
+    TASKOBJF_STATE_SAVE_ERROR = 12,             /* SAVEERR */
+    TASKOBJF_STATE_NO_SAVE_FOUND = 13,          /* NOTFOUND */
+    TASKOBJF_STATE_LOAD_WARNING = 14,           /* LOADWAR: a file was chosen */
+    TASKOBJF_STATE_LOADING = 15,                /* LOADING */
+    TASKOBJF_STATE_LOAD_ERROR = 16,             /* LOADERR */
+    TASKOBJF_STATE_EDIT_TITLE = 17,             /* attachTextEntry */
+    TASKOBJF_STATE_CHOOSE_FILE = 18,            /* attachItemList */
+    TASKOBJF_STATE_FORMAT = 19,                 /* formatCard */
+    TASKOBJF_STATE_WRITE = 20,                  /* writeMemcardSaveFile */
+    TASKOBJF_STATE_READ = 21,                   /* readMemcardFile */
+    TASKOBJF_STATE_DONE = 22,
+    TASKOBJF_STATE_ABORTED = 23
+};
+
 /* BasicClass's slots (overrides: +0x008 TaskObjF__TaskObjF, +0x00C Finalize,
  * +0x010 AddChild, +0x014 RemoveChild, +0x018 RemoveAllChildren, +0x038
  * OnNotify; `tools/classtable.py gTaskObjFMethods --vs gBasicClassMethods`), then
