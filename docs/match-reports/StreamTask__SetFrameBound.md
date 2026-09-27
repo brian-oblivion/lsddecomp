@@ -11,7 +11,7 @@
 Sets `self->unk40 = a1`, then, only when `a1 >= 0`, overwrites it with
 `a1 * 15`. Textbook instance of the project's already-confirmed "default
 value, then conditionally overwritten by an `if` with no `else`" idiom
-(`docs/DECOMPILATION_LEARNINGS.md`, `CheckTriggerParity`): 2.6.3 slides the
+(`docs/DECOMPILATION_LEARNINGS.md`, `CheckTriggerDayParity`): 2.6.3 slides the
 unconditional store into the guarding branch's delay slot for free.
 
 ## Derivation

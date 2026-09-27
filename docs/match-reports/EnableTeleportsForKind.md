@@ -87,7 +87,7 @@ conditions differ, silently dropping one comparison, when both blocks'
 like "a branch just vanished, replaced by an unconditional jump, right where
 two sibling blocks share a call", don't reach for `||` or nested `if/else`
 first — write the literal jump graph with `goto` instead. This is the second
-function in this unit (after `CheckTriggerParity`) where the byte-exact shape
+function in this unit (after `CheckTriggerDayParity`) where the byte-exact shape
 depended on avoiding an optimization the compiler is eager to apply to more
 "natural" C — worth trying `goto` earlier on this unit's branch-heavy leaves.
 

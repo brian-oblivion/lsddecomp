@@ -121,7 +121,7 @@ void ReleaseDreamAuxEntities(void) {
 extern s32 rand(void);
 
 s32 LookupDreamAuxTrigger(s16 *a0);
-bool CheckTriggerParity(s32 coordParity, s8 *entry);
+bool CheckTriggerDayParity(s32 coordParity, s8 *entry);
 s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2);
 void PlaceDreamAuxEntityByPlayer(DreamAuxSlot *a0);
 
@@ -129,7 +129,7 @@ s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2) {
     s32 record = LookupDreamAuxTrigger(a1);
 
     if (record != 0) {
-        if (CheckTriggerParity(a2, (s8 *)record)) {
+        if (CheckTriggerDayParity(a2, (s8 *)record)) {
             return FireDreamAuxTriggerEntries(a2, (s8 *)record, a0);
         }
         if (gDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
@@ -176,7 +176,7 @@ s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1) {
  * one byte is not yet known here, so it is addressed by byte offset rather
  * than through a named struct. A parity byte of 0 means "no side constraint",
  * hence the early `true`. */
-bool CheckTriggerParity(s32 coordParity, s8 *entry) {
+bool CheckTriggerDayParity(s32 coordParity, s8 *entry) {
     bool result = true;
 
     if (entry[2] != 0) {

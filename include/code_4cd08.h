@@ -8,7 +8,7 @@
  * slot (its switch jump tables) and manages a small "trigger record" system:
  * a table of 8-byte TriggerRecord entries, each gating on a caller-supplied
  * `value` (CheckDreamAuxTriggerCondition) and a coordinate parity
- * (CheckTriggerParity), that on success spawns or despawns an Entity into
+ * (CheckTriggerDayParity), that on success spawns or despawns an Entity into
  * one of two 14-slot object-tracking families (SpawnDreamAuxTriggerEntity /
  * PlaceDreamAuxEntityByPlayer, backed by gDreamAuxSlots / gDreamAuxSlots2) and can
  * gate the game's teleport flag (EnableTeleportsForKind, SetTeleportsEnabled
@@ -99,7 +99,7 @@ extern const char gMomPathSymDog[];
  *    yet named the same as `kind` below -- may or may not be the same
  *    logical field; not proven either way).
  *  - offset 0x2 (`parity`): compared against a caller-supplied coordinate
- *    parity by CheckTriggerParity's `entry` parameter -- same struct, most
+ *    parity by CheckTriggerDayParity's `entry` parameter -- same struct, most
  *    likely, given the shared 8-byte-ish record shape in this unit, but
  *    that function takes a raw `s8 *` and was matched without this type.
  *  - offset 0x3 (`kind`): read by ProcessDreamAuxTriggerRecord for EnableTeleportsForKind and

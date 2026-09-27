@@ -1,4 +1,6 @@
-# CheckTriggerParity
+# CheckTriggerDayParity
+
+> Renamed from `CheckTriggerParity` on 2026-09-27 (tools/rename.py). Address 0x8005c9a4.
 
 > Renamed from `func_8005C9A4` on 2026-09-21 (tools/rename.py). Address 0x8005c9a4.
 
@@ -11,7 +13,7 @@ byte at offset `0x2` is zero (no constraint), otherwise `true` iff that byte
 disagrees with `coordParity`'s own parity (`coordParity % 2 + 1`, computed
 with C's round-toward-zero `%`, not `& 1` — see below).
 
-Called from `TryDreamAuxTrigger` as `CheckTriggerParity(thirdParam, candidateRecord)`
+Called from `TryDreamAuxTrigger` as `CheckTriggerDayParity(thirdParam, candidateRecord)`
 where `candidateRecord` comes from `LookupDreamAuxTrigger`, one of this unit's
 stage-table lookups (6-byte-stride records, same size as `StageSpawn` /
 `StaticLinkTrigger` in `include/DreamSys.h`, but the field this function reads
@@ -48,7 +50,7 @@ the arithmetic shift, so the remainder keeps the dividend's sign) — confirms
 the source used `%`, not `& 1`, matching CLAUDE.md's residue list.
 
 ```c
-bool CheckTriggerParity(s32 coordParity, s8 *entry)
+bool CheckTriggerDayParity(s32 coordParity, s8 *entry)
 {
     bool result = true;
 
@@ -89,7 +91,7 @@ shape before anything more exotic.
 
 ## Naming
 
-**CheckTriggerParity** — tier A. A pure predicate over `entry`'s side/parity
+**CheckTriggerDayParity** — tier A. A pure predicate over `entry`'s side/parity
 byte at offset `0x2` and a caller-supplied `coordParity`: true when the byte
 is 0 (no constraint) or when it disagrees with `coordParity`'s own parity.
 The mechanics (a parity comparison) ARE the name, tier A by the pure-leaf
