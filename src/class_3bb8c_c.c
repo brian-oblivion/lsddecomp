@@ -108,15 +108,11 @@ void GridCell__DispatchLinkCommand(GridCell *self, BasicClass *sender, s32 event
  * passes the sender and event too, as Actor__OnActorLinkCommand does. */
 void GridCell__OnActorLinkCommand(GridCell *self, void *sender, s32 event) {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
-    if (event >= 9) {
-        return;
-    }
-    do {
-        if (event < 5) {
-            return;
+    if (event < 9) {
+        if (event >= 5) { /* MATCHING: nested, as && folds to one unsigned test */
+            ((void (*)(GridCell *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
         }
-    } while (0);
-    ((void (*)(GridCell *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
+    }
 }
 
 void *GridCell__ReturnSelf(GridCell *self) {
@@ -139,7 +135,6 @@ TitleMenu *New_TitleMenu(struct DreamSys *dreamSys) {
 }
 
 void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
-    DreamSys *dream;
     VabStreamObj *sound;
 
     Get_vtable_TaskCore()->ctor((TaskCore *)self, &sTitleMenuTarget, (char *)sTitleMenuSoundBankPath, 0);
@@ -148,9 +143,8 @@ void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     sound->methods->setPitchOffset(sound, -1);
     self->dreamSys = dreamSys;
     self->saveCtrl = 0;
-    dream = dreamSys;
-    self->saveBlock = dream->methods->getSaveBlock(dream, &self->saveBlockSize);
-    StampSaveTitleDay(dream->methods->getCurrentDayAndYear(dream, 0));
+    self->saveBlock = dreamSys->methods->getSaveBlock(dreamSys, &self->saveBlockSize);
+    StampSaveTitleDay(dreamSys->methods->getCurrentDayAndYear(dreamSys, 0));
     self->methods->setTarget(self, &sTitleMenuTarget);
     ((TitleMenuResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
@@ -166,12 +160,9 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target) {
     target->registrationSlots[1] = (void *)locked;
 }
 
-/* FormatFullWidthNumber is GAME code (matched round 38, src/code_2cc8c_f.c -- its
- * own C definition, not a Sony object), which formats a1 as a zero-padded
- * `width`-digit decimal string into `self`, the output buffer (the
- * definition's `u8 *dst`; it was typed as a TextRow view until round 88).
- * This unit's own local view keeps it `void *`. */
-extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
+/* src/code_2cc8c_f.c: `value` as `width` full-width decimal digits into dst,
+ * zero-padded unless `unpadded`. */
+extern void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded);
 
 /* The save title's day number, full-width characters 9..11 of
  * "LSD   Day001" (class_3bb8c_g.c's layout of the title). */
@@ -179,7 +170,7 @@ extern void FormatFullWidthNumber(void *self, s32 a1, s32 width, s32 unpadded);
 
 /* Formats the day as three full-width digits in sDayDigits's buffer and
  * copies them into the save title's day number, characters 9..11. */
-void StampSaveTitleDay(s32 arg0) {
-    FormatFullWidthNumber(sDayDigits, arg0, 3, 0);
+void StampSaveTitleDay(s32 day) {
+    FormatFullWidthNumber(sDayDigits, day, 3, 0);
     *(FullWidthChars3 *)&((FullWidthChar *)gSaveTitle)[SAVE_TITLE_DAY] = *(FullWidthChars3 *)sDayDigits;
 }

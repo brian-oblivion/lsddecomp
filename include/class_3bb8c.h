@@ -170,7 +170,7 @@ extern s32 sTaskObjFCount;
 
 /* Formats the current day into the save title (src/class_3bb8c_c.c);
  * TitleMenu__TitleMenu calls it with DreamSys's getCurrentDayAndYear. */
-extern void StampSaveTitleDay(s32 arg0);
+extern void StampSaveTitleDay(s32 day);
 
 /*
  * The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock):
