@@ -1,6 +1,6 @@
 /*
- * GraphicsResources -- the FileResource data sources that turn loaded files into
- * graphics objects, the tile-map background layer, and the FMV player.
+ * GraphicsResources -- the FileResource data sources that turn loaded files
+ * into graphics objects, the tile-map background layer, and the FMV player.
  *
  * FileResource subclasses, each reached through one of
  * gFileResourceMethods's table getters: an allocator (New_<Class>), a ctor
@@ -32,6 +32,19 @@
  * through when they test its result; TimBlockHeader (and its byte copy,
  * TimBlockHeaderBytes), ModelDataHeader and SubBlockTable, the layouts of
  * TimBlockSrc's, ModelData's and TodSet's / TriggerWorld's buffers.
+ *
+ * What decided its edges (python3 tools/tuboundary.py): the placed object
+ * libgs/gs_107 precedes it ("start edge possible") and Sony's libpress
+ * (psyq_36654, from DecDCTReset) follows it ("start edge possible"), so
+ * there is nothing to merge with. Inside, all 96 edges are "boundary
+ * possible". The "forced boundary lies in this stretch" note on each of
+ * them is the jump-table pair 0x80011290 / 0x8001140c, whose interval runs
+ * from code_322b4 to class_39e08 across many placed Sony objects, so it
+ * says nothing about this file. PARKED: the content would split it (eleven
+ * classes; BgLayer and MoviePlayer are not FileResources, and BgLayer sits
+ * between Tod and ModelData), but a split is a new carve, not a merge or
+ * rename, so the file keeps its carve edges and is named for what its
+ * classes do together: graphics data loaded from files, and what draws it.
  */
 #include "common.h"
 #include <libgte.h>
