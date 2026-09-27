@@ -350,9 +350,9 @@ typedef struct {
 
 typedef struct {
     s8 a, b;
-} Pair2_3bb8c_g;
+} FullWidthChar;
 
-extern Pair2_3bb8c_g *gSaveTitleGlyphs;
+extern FullWidthChar *gSaveTitleGlyphs;
 
 /* Writes a save file's letter into the full-width `title`: the letter
  * field becomes a space, the letter for the file name's -NN (a for -01 ..
@@ -363,10 +363,10 @@ extern Pair2_3bb8c_g *gSaveTitleGlyphs;
  * MATCHING:
  * `glyphs` is the return value, not a second read of the global. */
 s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
-    Pair2_3bb8c_g *title = (Pair2_3bb8c_g *)titleText;
+    FullWidthChar *title = (FullWidthChar *)titleText;
     s32 numberPos;
     s32 letter;
-    Pair2_3bb8c_g *glyph;
+    FullWidthChar *glyph;
 
     if (fileName != NULL) {
         numberPos = ((u32)(fileName[SAVE_FILE_NAME_NUMBER + 1] - '8') < 2) ? SAVE_FILE_NAME_NUMBER + 1
@@ -381,7 +381,7 @@ s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
         title[SAVE_TITLE_LETTER] = *glyph;
         return (s32)glyph;
     } else {
-        Pair2_3bb8c_g *glyphs = gSaveTitleGlyphs;
+        FullWidthChar *glyphs = gSaveTitleGlyphs;
 
         *(Buf6_3bb8c_g *)&title[SAVE_TITLE_LETTER_FIELD] =
             *(Buf6_3bb8c_g *)&glyphs[SAVE_TITLE_GLYPH_SPACES];

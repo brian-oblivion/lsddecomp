@@ -25,7 +25,7 @@ typedef struct {
 } Buf12_3bb8c_g;
 typedef struct {
     s8 a, b;
-} Pair2_3bb8c_g;
+} FullWidthChar;
 
 s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1)
 {
@@ -38,12 +38,12 @@ s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1)
     if (src != NULL) {
         t0 = ((u32)(src[0xE] - 0x38) < 2) ? 0xE : 0xD;
 
-        *(Pair2_3bb8c_g *)(self + 0x18) = *(Pair2_3bb8c_g *)(gSaveTitleGlyphs + 0x1E);
+        *(FullWidthChar *)(self + 0x18) = *(FullWidthChar *)(gSaveTitleGlyphs + 0x1E);
         *(Buf12_3bb8c_g *)(self + 0x6) = *(Buf12_3bb8c_g *)(gSaveTitleGlyphs + 0x1E);
 
         idx = atoi((char *)(src + t0)) - 1;
         p = gSaveTitleGlyphs + idx * 2;
-        *(Pair2_3bb8c_g *)(self + 0x8) = *(Pair2_3bb8c_g *)p;
+        *(FullWidthChar *)(self + 0x8) = *(FullWidthChar *)p;
         return (s32)p;
     } else {
         u8 *q = gSaveTitleGlyphs;
@@ -66,7 +66,7 @@ is pointer arithmetic. Cast `arg0`/`arg1` to `u8 *` locally instead.
 alignment is 1, which is what makes GCC use the unaligned `lwl`/`lwr` word
 chunk(s) retail has, with any leftover non-multiple-of-4 bytes as
 individual loads/stores rather than a merged halfword.
-- `Pair2_3bb8c_g` (2 bytes) — used twice: copying the raw 2-byte prefix
+- `FullWidthChar` (2 bytes) — used twice: copying the raw 2-byte prefix
   `gSaveTitleGlyphs[0x1E..0x20)` into `self[0x18..0x1A)`, and copying a 2-byte
   entry out of a `gSaveTitleGlyphs`-relative lookup table (indexed by
   `atoi(...)  - 1`, doubled) into `self[0x8..0xA)`.
@@ -144,10 +144,10 @@ screen is not shown by a consumer). `gSaveTitleGlyphs`, tier A, by what it
 holds.
 
 Locals: `arg0`/`arg1` -> `titleAddr`/`fileNameAddr`, `self` -> `title`
-(now `Pair2_3bb8c_g *`, one full-width character per element, so the raw
+(now `FullWidthChar *`, one full-width character per element, so the raw
 byte offsets 0x18/0x6/0x8 are indices 12/3/4), `src` -> `fileName`
 (`char *`), `t0` -> `numberPos`, `idx` -> `letter`, `p` -> `glyph`, `q` ->
-`glyphs`; `gSaveTitleGlyphs` declared `Pair2_3bb8c_g *` (offset 0x1E is
+`glyphs`; `gSaveTitleGlyphs` declared `FullWidthChar *` (offset 0x1E is
 glyph 15). The positions are unit-local `#define`s: SAVE_TITLE_LETTER_FIELD
 3, SAVE_TITLE_LETTER 4, SAVE_TITLE_PADDING 12, SAVE_TITLE_GLYPH_SPACES 15,
 SAVE_FILE_NAME_NUMBER 13. Image byte-identical at every step.
