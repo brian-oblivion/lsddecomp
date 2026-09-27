@@ -142,7 +142,7 @@ void GameApplication__InitSystems(GameApplication *self, DrawSystem *drawSystem,
 }
 
 /* Optional stream-load block, gated by self->config->showIntroLogos: registers a
- * "loader" task for "ETC\ASMKLOGO.TIM" (GameApplication__StartLoaderTask), then a separate
+ * "loader" task for "ETC\ASMKLOGO.TIM" (GameApplication__ShowImage), then a separate
  * "stream" task for whatever type code GetAsmkMovie hands back
  * ("ETC\ASMK.STR"), then a second loader task for "ETC\OSDLOGO.TIM". */
 void GameApplication__ShowIntroLogos(GameApplication *self) {
@@ -153,14 +153,14 @@ void GameApplication__ShowIntroLogos(GameApplication *self) {
 
     if (self->config->showIntroLogos != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        GameApplication__StartLoaderTask(self, sLogoPathAsmk);
+        GameApplication__ShowImage(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
         streamName = GetAsmkMovie(&typeCode);
         typeLookup = GetMovieFrameCount(typeCode);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 streamName, typeLookup, 1);
         task->methods->release(task);
-        GameApplication__StartLoaderTask(self, sLogoPathOsd);
+        GameApplication__ShowImage(self, sLogoPathOsd);
     }
 }
 
@@ -168,7 +168,7 @@ void GameApplication__ShowIntroLogos(GameApplication *self) {
  * task, gives it a completion callback (GameApplication__LoaderTaskDoneCallback) and context
  * (self), then sets its remaining parameters (path, the parent's aux as its init args) and
  * starts it. */
-void GameApplication__StartLoaderTask(GameApplication *self, const char *path) {
+void GameApplication__ShowImage(GameApplication *self, const char *path) {
     TaskCore *task = New_TaskCore(0, 0, 0);
 
     /* setCallback's occupant stores a void (*)(void *ctx); this callback
@@ -189,7 +189,7 @@ s32 GameApplication__LoaderTaskDoneCallback(void) {
 
 /* Optional stream-task init block, gated by self->config->playStreams (the same
  * shape as GameApplication__ShowIntroLogos's self->config->showIntroLogos gate, minus the two
- * GameApplication__StartLoaderTask loader-task calls, and using PickOpeningMovie instead of
+ * GameApplication__ShowImage loader-task calls, and using PickOpeningMovie instead of
  * GetAsmkMovie to derive the type code). */
 void GameApplication__PlayOpeningMovie(GameApplication *self) {
     s32 derivedValue;

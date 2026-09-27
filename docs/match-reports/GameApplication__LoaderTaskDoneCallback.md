@@ -52,7 +52,7 @@ bytes.
 
 **`GameApplication__LoaderTaskDoneCallback` -- tier A.** Pure leaf: `return
 RegisterRecordTableFiles(0);`, mechanics ARE the purpose (a forwarding wrapper). Named
-from its one use, `GameApplication__StartLoaderTask`'s `task->methods->slot98(task,
+from its one use, `GameApplication__ShowImage`'s `task->methods->slot98(task,
 GameApplication__LoaderTaskDoneCallback, self)` call -- `slot98` registers a
 completion callback and a context pointer on a `LoaderTask`, so this
 function's role (not its ultimate game purpose, which depends on the

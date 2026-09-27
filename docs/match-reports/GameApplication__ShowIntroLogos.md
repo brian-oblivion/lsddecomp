@@ -12,7 +12,7 @@
 
 `GameApplicationMethods` slot `+0x050`. Gated entirely by `self->arg->unk0C != 0`
 (the ctor argument's `+0x0C` field, opaque until this function): registers a
-"loader" task for `"ETC\ASMKLOGO.TIM"` (`GameApplication__StartLoaderTask`), then builds a
+"loader" task for `"ETC\ASMKLOGO.TIM"` (`GameApplication__ShowImage`), then builds a
 separate "stream" task, initializes it with a filename
 (`"ETC\ASMK.STR"`) and a type/format code looked up from a table, starts it,
 then registers a second loader task for `"ETC\OSDLOGO.TIM"`.
@@ -25,7 +25,7 @@ lw   $v0, 0xC($v0)            ; v0 = arg->unk0C
 beqz $v0, .L80026238            ; whole body gated on this
  ...
 jal  SetActiveDataSourceDriverMode(0, 0, 0)
-jal  GameApplication__StartLoaderTask(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
+jal  GameApplication__ShowImage(self, sLogoPathAsmk)     ; "ETC\ASMKLOGO.TIM"
 jal  New_StreamTask(0, 0, 0, 0)            ; -> s1 = task (New_X shape, 0xDC bytes)
 addiu $a0, $sp, 0x18
 jal  GetAsmkMovie                          ; writes 0x31 to local, returns &sAsmkMoviePath
@@ -47,7 +47,7 @@ lw   $v0, 0x0($s1)                                          ; reload task->metho
 lw   $v0, 0x4($v0)                                           ; slot4
 jalr $v0
  (delay: a0 = s1 = task)
-jal  GameApplication__StartLoaderTask(self, sLogoPathOsd)                          ; "ETC\OSDLOGO.TIM"
+jal  GameApplication__ShowImage(self, sLogoPathOsd)                          ; "ETC\OSDLOGO.TIM"
 ```
 
 ```c
@@ -59,13 +59,13 @@ void GameApplication__ShowIntroLogos(GameApplication *self) {
 
     if (self->arg->unk0C != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
-        GameApplication__StartLoaderTask(self, sLogoPathAsmk);
+        GameApplication__ShowImage(self, sLogoPathAsmk);
         task = New_StreamTask(0, 0, 0, 0);
         streamName = GetAsmkMovie(&typeCode);
         typeLookup = GetMovieFrameCount(typeCode);
         task->methods->slot44(task, self->unk1C, streamName, typeLookup, 1);
         task->methods->slot4(task);
-        GameApplication__StartLoaderTask(self, sLogoPathOsd);
+        GameApplication__ShowImage(self, sLogoPathOsd);
     }
 }
 ```

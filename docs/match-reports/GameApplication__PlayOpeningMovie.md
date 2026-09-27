@@ -16,7 +16,7 @@ second boolean/pointer gate on the ctor argument, sibling to
 via `PickOpeningMovie` (a day/week-style calculation, unrelated unit,
 `psyq_memset.s`), looks it up via `GetMovieFrameCount`, and initializes+starts
 the task the same way `GameApplication__ShowIntroLogos` does -- minus that function's two
-`GameApplication__StartLoaderTask` loader-task registrations.
+`GameApplication__ShowImage` loader-task registrations.
 
 ## Derivation
 

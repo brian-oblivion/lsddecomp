@@ -1,4 +1,6 @@
-# GameApplication__StartLoaderTask
+# GameApplication__ShowImage
+
+> Renamed from `GameApplication__StartLoaderTask` on 2026-09-27 (tools/rename.py). Address 0x80026254.
 
 > Renamed from `Class6D3C8__StartLoaderTask` on 2026-09-26 (tools/rename.py). Address 0x80026254.
 
@@ -47,7 +49,7 @@ jalr $v0                                                    ; task->methods->slo
 ```
 
 ```c
-void GameApplication__StartLoaderTask(GameApplication *self, const char *path) {
+void GameApplication__ShowImage(GameApplication *self, const char *path) {
     LoaderTask *task = New_TaskCore(0, 0, 0);
 
     task->methods->slot98(task, GameApplication__LoaderTaskDoneCallback, self);
@@ -92,7 +94,7 @@ offset against an already-typed sibling class.
 
 ## Naming
 
-**`GameApplication__StartLoaderTask` -- tier A.** Pure leaf helper, mechanics ARE
+**`GameApplication__ShowImage` -- tier A.** Pure leaf helper, mechanics ARE
 the purpose: allocates a `LoaderTask` (`New_TaskCore`), registers a
 completion callback and context (`slot98`, `GameApplication__LoaderTaskDoneCallback`,
 `self`), sets its remaining parameters (path, `self->unk1C`) via `slot6C`/
