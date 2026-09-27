@@ -62,7 +62,6 @@ D_8008AAF8
 D_8008AB14
 D_8008AB1C
 D_8008AB24
-D_8008AB40
 D_8008AB58
 D_8008AB60
 D_8008AB78
@@ -210,6 +209,7 @@ sNdivOverride
 sNdivOverrideSet
 sPadRefCount
 sPauseText
+sPauseTextColor
 sPauseTextPos
 sSaveFileName
 sSaveTitleBlanks

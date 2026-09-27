@@ -26,7 +26,7 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
     if (state == 0) {
         self->unk7C = New_TextRow(self->unk74, 5, &sPauseText[0]);
         self->unk7C->methods->slot4C(self->unk7C, self->unk14, &sPauseTextPos);
-        self->unk7C->methods->slotB8(self->unk7C, &D_8008AB40);
+        self->unk7C->methods->slotB8(self->unk7C, &sPauseTextColor);
         self->unk80 = state + 1;
         return;
     }
@@ -42,7 +42,7 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
 ```
 
 `sPauseText` is the string `"Pause"` (`asm/data/7B008.sdata.s`); the two
-other literal-address arguments (`sPauseTextPos`, `D_8008AB40`) are small
+other literal-address arguments (`sPauseTextPos`, `sPauseTextColor`) are small
 opaque blocks, address-only in this unit.
 
 ## The residue: the function is `void`, not `s32` -- found by the permuter after 18 failed manual reshapes

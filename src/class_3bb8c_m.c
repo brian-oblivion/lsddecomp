@@ -60,7 +60,7 @@ extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
 extern char sPauseText[]; /* "Pause" (asm/data/7B008.sdata.s) */
 extern s32 sPauseTextPos;    /* two words: the position */
-extern s32 D_8008AB40;    /* one word: the colour */
+extern s32 sPauseTextColor;    /* one word: the colour */
 
 void ObjM__EnterState7(ObjM *self) {
     s32 val;
@@ -180,7 +180,7 @@ void ObjM__AdvancePauseSetup(ObjM *self) {
         self->pauseText = New_TextRow(self->etcTim, 5, &sPauseText[0]);
         self->pauseText->methods->attachToParent(self->pauseText, (SceneNode *)self->unk14,
                                                  (LongVec3 *)&sPauseTextPos);
-        self->pauseText->methods->setColor(self->pauseText, (SpriteRgb *)&D_8008AB40);
+        self->pauseText->methods->setColor(self->pauseText, (SpriteRgb *)&sPauseTextColor);
         self->pauseSetupStep = state + 1;
         return;
     }

@@ -3015,3 +3015,4 @@ gGraphPointHighlightColor = 0x8008ABBC;
 gGraphScoreMoods = 0x80087BD4;
 sPauseText = 0x8008AB44;
 sPauseTextPos = 0x8008AB38;
+sPauseTextColor = 0x8008AB40;
