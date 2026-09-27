@@ -75,7 +75,7 @@ typedef struct DreamAuxTriggerEntry {
 extern s8 gDreamAuxTriggerCounts[];
 extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[];
 
-/* A small signed-byte lookup table read by CheckDreamAuxWorldState, indexed by its
+/* A small signed-byte lookup table read by IsCurrentDreamColor, indexed by its
  * `idx` parameter. Layout beyond "one signed byte per entry" is not known
  * from this unit alone. */
 extern s8 D_80088D16[];
@@ -141,7 +141,7 @@ extern bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record);
 extern bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry);
 extern void EnableTeleportsForKind(s32 kind);
 extern bool IsStyleVariantEven(void);
-extern bool CheckDreamAuxWorldState(s32 idx);
+extern bool IsCurrentDreamColor(s32 idx);
 extern bool MatchesDreamAuxProgression(s32 a0, s32 a1);
 
 #endif

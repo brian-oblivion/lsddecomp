@@ -329,7 +329,7 @@ have_idx:
             break;
         default:
             if (idx >= 10) {
-                if (!CheckDreamAuxWorldState(idx)) {
+                if (!IsCurrentDreamColor(idx)) {
                     return false;
                 }
             }
@@ -342,7 +342,7 @@ success:
 }
 
 /* Compares gDreamAuxWorld's getDreamColor (DreamSys +0x200) against a per-idx signed byte from D_80088D16. */
-bool CheckDreamAuxWorldState(s32 idx) {
+bool IsCurrentDreamColor(s32 idx) {
     DreamSys *w = gDreamAuxWorld;
     s32 val = D_80088D16[idx];
     s32 result = w->methods->getDreamColor(w);

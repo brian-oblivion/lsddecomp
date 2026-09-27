@@ -125,7 +125,7 @@
 >
 > Restoring round 23's exact preserved body and building it gave **108/100
 > words -- 8 WORDS TOO LONG**, not 99/100 (confirmed via `nm` on the linked
-> ELF: `CheckDreamAuxWorldState` landed at `+0x1B0` from this function's start, not
+> ELF: `IsCurrentDreamColor` landed at `+0x1B0` from this function's start, not
 > retail's `+0x190`). Round 23 never re-derived this number from a build; it
 > inherited round 13's asm-differ read and treated the dispatch fix as the
 > whole story.
@@ -202,7 +202,7 @@
 >
 > **Translated to real C and re-verified against the actual oracle, this
 > REGRESSES: 98/100 (2 words short), not an improvement** -- confirmed via
-> `nm` (`CheckDreamAuxWorldState` moved to `+0x188`, not `+0x190`). This is exactly the
+> `nm` (`IsCurrentDreamColor` moved to `+0x188`, not `+0x190`). This is exactly the
 > documented caution that a permuter score is not the project's oracle
 > (MATCHING-GUIDE.md's "Permuter" section): the permuter's own weighted
 > penalty improved (fewer visible mismatched instructions in ITS diff) while
@@ -379,7 +379,7 @@ see `## Naming` below) is nonzero, else `idx = -sel`. Dispatches on
 - 19: succeed iff `value` is odd.
 - default (indices 8-17, and anything outside the table's `idx` range of
   roughly `[2, 22)`): succeed unconditionally if `idx < 10`; otherwise
-  delegate to `CheckDreamAuxWorldState(idx)`.
+  delegate to `IsCurrentDreamColor(idx)`.
 
 On any success path, `record->triggered` is set to `1` before returning `true`.
 
@@ -456,7 +456,7 @@ have_idx:
         break;
     default:
         if (idx >= 10) {
-            if (!CheckDreamAuxWorldState(idx)) {
+            if (!IsCurrentDreamColor(idx)) {
                 return false;
             }
         }
@@ -547,7 +547,7 @@ have_idx:
         break;
     default:
         if (idx >= 10) {
-            if (!CheckDreamAuxWorldState(idx)) {
+            if (!IsCurrentDreamColor(idx)) {
                 return false;
             }
         }
@@ -560,9 +560,9 @@ success:
 }
 ```
 
-Needs `TriggerRecord`, `MatchesDreamAuxProgression`, `IsStyleVariantEven`, `CheckDreamAuxWorldState` from
+Needs `TriggerRecord`, `MatchesDreamAuxProgression`, `IsStyleVariantEven`, `IsCurrentDreamColor` from
 `include/code_4cd08.h` (already added this round -- `MatchesDreamAuxProgression` is
-matched, see its own report; `IsStyleVariantEven`/`CheckDreamAuxWorldState` are still
+matched, see its own report; `IsStyleVariantEven`/`IsCurrentDreamColor` are still
 `INCLUDE_ASM` elsewhere in this unit and off-limits this round, gp-relative-
 blocked per `docs/research/gp-relative-blocker.md`).
 

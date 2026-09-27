@@ -36,7 +36,7 @@ s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
 
 `a0 + 0x1E` (30) only happens when the unit is in state 4 (`gDreamAuxStage == 4`),
 the caller passes `0x10` as `a1`, and a re-check of the same vtable-0x80
-predicate used by `CheckDreamAuxWorldState` still reports state 4. Otherwise `a0` is
+predicate used by `IsCurrentDreamColor` still reports state 4. Otherwise `a0` is
 returned unchanged. `val` is read once into a local and reused both for the
 initial `== 4` test and the post-call re-check (`result == val`), matching
 retail's single `lw $s1, %gp_rel(gDreamAuxStage)($gp)` cached across the call --
@@ -45,7 +45,7 @@ re-reading the global a second time in C, or comparing against the literal
 tested since the cached-local reading matched on the first build.
 
 `TriggerWorldFn80` (vtable slot 0x80, self-only, `s32` return) was promoted
-from a function-local typedef in `CheckDreamAuxWorldState`'s first draft to a shared
+from a function-local typedef in `IsCurrentDreamColor`'s first draft to a shared
 typedef in `include/code_4cd08.h`, since this function needed the identical
 one immediately after -- two independent call sites is the point past which
 sharing beats duplicating for a same-unit type. `TriggerWorldFn` (the
@@ -54,7 +54,7 @@ to each other in the header with a comment distinguishing slot/arity.
 
 ## Proposed learning
 
-None new -- this is a straight application of `CheckDreamAuxWorldState`'s
+None new -- this is a straight application of `IsCurrentDreamColor`'s
 newly-derived `TriggerWorldFn80` idiom, and it matched on the first build.
 Worth noting as a *process* point rather than a technical one: solving the
 smaller sibling first and immediately re-using its vtable-slot typedef paid

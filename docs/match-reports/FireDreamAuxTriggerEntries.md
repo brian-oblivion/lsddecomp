@@ -64,7 +64,7 @@ a small 8-byte slot to a function that privately treats it as a much larger
 struct, which is safe here only because the recursive (`kind == 2`) arm of
 `ProcessDreamAuxTriggerRecord` is never taken for these particular records. This is the
 same kind of cross-type reinterpretation CLAUDE.md documents for
-`CheckDreamAuxWorldState`/`AdjustDreamAuxTriggerOffset`'s shared `gDreamAuxWorld` global, just at a
+`IsCurrentDreamColor`/`AdjustDreamAuxTriggerOffset`'s shared `gDreamAuxWorld` global, just at a
 struct-pointer level instead of a scalar.
 
 `New_TriggerWorld` is a new symbol, not owned by this unit and not previously

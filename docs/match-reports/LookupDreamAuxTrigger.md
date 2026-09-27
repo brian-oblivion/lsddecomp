@@ -15,7 +15,7 @@ Round 43 derived and matched it fresh.
 ## What it does
 
 A linear search over one of 14 parallel groups (selected by `gDreamAuxStage`,
-the same index this unit also uses in `AdjustDreamAuxTriggerOffset`/`CheckDreamAuxWorldState`) for
+the same index this unit also uses in `AdjustDreamAuxTriggerOffset`/`IsCurrentDreamColor`) for
 an entry whose 2-byte `key` matches `*a0`, dispatching the match (or its
 absence) into `AdjustDreamAuxTriggerOffset`:
 
@@ -67,7 +67,7 @@ One attempt short of byte-exact, one fix:
   Byte-exact immediately after.
 
 This is a different mechanism from the `lbu`-vs-`lb` sign-extend idiom
-documented for `CheckDreamAuxWorldState` earlier this round (that one was about load
+documented for `IsCurrentDreamColor` earlier this round (that one was about load
 INSTRUCTION CHOICE; here the load instruction was already `lb` in both
 versions -- the difference was an extra copy into the register a
 longer-lived variable needed to occupy). Both point the same direction

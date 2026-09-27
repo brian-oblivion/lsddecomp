@@ -1,4 +1,6 @@
-# CheckDreamAuxWorldState
+# IsCurrentDreamColor
+
+> Renamed from `CheckDreamAuxWorldState` on 2026-09-27 (tools/rename.py). Address 0x8005cd58.
 
 > Renamed from `func_8005CD58` on 2026-09-21 (tools/rename.py). Address 0x8005cd58.
 
@@ -23,7 +25,7 @@ result against a per-`idx` signed byte from a small lookup table
 ```c
 typedef s32 (*TriggerWorldFn80)(TriggerWorld *self);
 
-bool CheckDreamAuxWorldState(s32 idx)
+bool IsCurrentDreamColor(s32 idx)
 {
     TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
     s32 val = D_80088D16[idx];
@@ -90,7 +92,7 @@ before treating a residue like this as a deeper stall.
 
 ## Naming
 
-**CheckDreamAuxWorldState** — tier A. A pure predicate: calls
+**IsCurrentDreamColor** — tier A. A pure predicate: calls
 `gDreamAuxWorld`'s vtable slot 0x80 (self-only) and compares the result
 against a per-`idx` entry of `D_80088D16`. The mechanics (query the world,
 compare) ARE the name; tier A by the pure-leaf rule even though what the
