@@ -191,13 +191,13 @@ void *GetRecordTable(s32 *out) {
     return gRecordTable;
 }
 
-void *GetWeeklyGroupTable(void) {
+void *GetSoundBankPaths(void) {
     return gSoundBankPaths;
 }
 
 s32 PickWeeklyGroup(s32 arg) {
     u32 r = (u32)SeedAndRandom(0, arg) % 7;
-    s32 *table = GetWeeklyGroupTable();
+    s32 *table = GetSoundBankPaths();
     s32 *entry;
     s32 index;
     if (gForcedWeeklyGroup != 0) {

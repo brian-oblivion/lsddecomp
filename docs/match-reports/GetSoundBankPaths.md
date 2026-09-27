@@ -1,4 +1,6 @@
-# GetWeeklyGroupTable -- MATCHED (4/4 words), round 81
+# GetSoundBankPaths -- MATCHED (4/4 words), round 81
+
+> Renamed from `GetWeeklyGroupTable` on 2026-09-27 (tools/rename.py). Address 0x80048d64.
 
 > Renamed from `func_80048D64` on 2026-09-25 (tools/rename.py). Address 0x80048d64.
 
@@ -14,13 +16,13 @@ the first build; whole-image SHA1 green.
 ## Source
 
 ```c
-void *GetWeeklyGroupTable(void) {
+void *GetSoundBankPaths(void) {
     return gSoundBankPaths;
 }
 ```
 
 ## Naming
 
-- **Name:** `GetWeeklyGroupTable`
+- **Name:** `GetSoundBankPaths`
 - **Tier:** B (head review, round 82: was A. The mechanics are this body's; the purpose word comes from the callers' inherited names in code_1677c.c / GameApplication.h, which are themselves hypotheses, so the name is consistent but not established)
 - **Evidence:** table getter: returns gSoundBankPaths.
