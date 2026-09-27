@@ -6,6 +6,44 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-27 — premium session: plan revision 37 (rounds 94, 97 and 98 escalations)
+
+- **The oracle's `(tree: <path>)` suffix (revision 36): confirmed.** It is
+  the last `echo`, after `make all`, and `check.sha1` is untouched. The
+  script `cd`s to its own directory first, so the path is the tree it
+  actually built. Nothing in `tools/`, `.claude/` or the Makefile parses the
+  line (grep); callers read the exit code.
+- **History prose: one rule, in all four rename paths.** Revision 28 froze
+  only `unitfile.py`'s report sections under a "history" heading. The
+  damage kept landing elsewhere: renametype in round 94 (four reports),
+  replay and unitfile in round 97, where charlie's six restore commits
+  touched up to 37 files each. Some of those restores put retired unit
+  names back into live `src/` comments. Telling history from current prose
+  sentence by sentence is not mechanical, so the rule moves to where the
+  text lives. `rename.frozen_spans`/`sub_prose` are now shared by
+  rename.py, renametype.py, unitfile.py and replay.py. A report's
+  history-headed sections stay as written, except preserved `#if 0` bodies,
+  which stalesyms keeps live; there are 13 such bodies in history sections.
+  A prose line already naming NEW stays as written ("X became NEW",
+  unitfile's missing guard). Everything else goes current. §3 now says to
+  write history under a heading naming history and never to restore a
+  rewritten name by hand. Tested on synthetic text, and with a real
+  `unitfile.py rename` in a scratch worktree.
+- **replay.py stages what it rewrote (round 94).** One `rewrite()` replaces
+  its three paths. It keeps round 91's `own_lines` guard, now on the unit
+  path too, which had lacked it. Dry-run over every merge since revision 28:
+  two legacy lines, plus round 94's hand-restored `Unk14Obj` lines. Nobody
+  replays those ranges again, so they stay.
+- **Polish-runner model (round 94): already settled** by revision 33, which
+  made it Opus with "never lower", stricter than the sticky rule proposed.
+- **`libsnd/play.o`: accepted in principle, not scheduled here.**
+  `libsnd_play.c` is the whole object (0x2C), and the `Snd_play` pin settles
+  the four-way AMBIGUOUS match. CLAUDE.md already says never to carry C for
+  code a Sony object owns. Linking it is SDK-OBJECTS-GUIDE runner work,
+  left to the operator's call.
+
+---
+
 ## 2026-09-27 — round 98: track 6 done, nine units polished, and the tree-named oracle held (premium head, plan revision 36)
 
 Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 15

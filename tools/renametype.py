@@ -25,8 +25,9 @@ WHAT IT DOES, in order:
      the symbols file, the report file names and rename.py's Sony guards all
      apply exactly as for a single rename;
   3. rewrites the remaining tokens (types, macros, guards) as whole tokens in
-     code and in the docs rename.py rewrites (not PROGRESS.md, not the
-     archive, not the rule docs, which it lists);
+     code and in the docs rename.py rewrites, as rename.py does (not
+     PROGRESS.md, the archive, the rule docs it lists, a report's history
+     sections, or a prose line already naming the new token);
   4. `git mv include/OLD.h include/NEW.h` when that header exists;
   5. rewrites the ledger (config/plan-state.json, through plan.py) and the
      warnings baseline (config/typeviews-warnings.txt);
@@ -150,7 +151,7 @@ def main():
         text = p.read_text(errors="replace")
         out = text
         for rx, rep in pats:
-            out = rx.sub(rep, out)
+            out = rx.sub(rep, out) if rename.is_code(p) else rename.sub_prose(rx, rep, out, p)
         if out != text:
             p.write_text(out)
             touched.append(rel)

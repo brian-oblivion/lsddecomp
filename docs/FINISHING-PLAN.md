@@ -19,9 +19,8 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 36 (2026-09-27, round 97's premium head: every runner
-prompt starts each command `cd <path> &&`, and the oracle's `OK:` line names
-its tree; revision 35 the same round, `flag-type --units`).
+Plan revision: 37 (2026-09-27, premium session after round 98: the
+rename tools share one history rule, and replay stages its edits).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -169,7 +168,9 @@ no unit declares its own view of it; `plan.py classes` lists a STRAY VIEW.
   what the file holds; a function comment says what a reader needs and the
   code does not show. Project history (round numbers, who found what, a
   derivation, retail addresses) belongs in the match report: move it there,
-  do not delete it. A construct that exists only because it matches keeps
+  do not delete it, under a heading naming history. The rename tools leave
+  those sections, and a line already naming the new name, as written, and
+  keep every other name current: never restore one by hand. A construct that exists only because it matches keeps
   one line, `/* MATCHING: <what would break> */`, so nobody tidies it away.
 - **Style** (after track 7's setup): `clang-format -i` on every file you
   touched, before its commit.

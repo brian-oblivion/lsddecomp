@@ -16,7 +16,8 @@ file). This tool re-applies each command's TOKEN REWRITE, main's then the
 branch's, each in its own order, to those leftovers, over the files the
 original tool rewrites; during a merge it first rebuilds the ledger by a
 three-way JSON merge (a hand-resolved ledger is replaced); then `make extract` and
-`./build-and-verify.sh`.
+`./build-and-verify.sh`. What it rewrote is staged (round 94: a merge commit
+missed replay's unstaged edits).
 
 At a conflict: take main's side of each hunk that differs only by a rename,
 run this, then the oracle. A rename changes zero bytes; red means a hunk was
@@ -56,17 +57,17 @@ def commands(rng):
 
 
 def mapping(kind, a, b):
-    """(token map, unitfile semantics?) of one command, from what is LEFT."""
+    """The token map of one command, from what is LEFT."""
     if kind == "rename":
-        return {a: b}, False
+        return {a: b}
     if kind == "renametype":
         found, lower_rx, upper_rx = renametype.occurrences(a, a.upper())
         return {t: (lower_rx.sub(b, t) if lower_rx.search(t) else upper_rx.sub(b.upper(), t))
-                for t in found}, False
+                for t in found}
     if kind == "unitfile rename":
         new = unitfile.unit_stem(b)
-        return {a: new, f"{a.upper()}_H": f"{new.upper()}_H"}, True
-    return {b: a}, True              # unitfile merge A B: B's name became A
+        return {a: new, f"{a.upper()}_H": f"{new.upper()}_H"}
+    return {b: a}              # unitfile merge A B: B's name became A
 
 
 _TIP_LINES = {}
@@ -89,38 +90,33 @@ def own_lines(tip, p):
     return _TIP_LINES[key]
 
 
-def leftovers(m, unit, tip=None):
-    rxs = [re.compile(rf"(?<![A-Za-z0-9_]){re.escape(o)}(?![A-Za-z0-9_])") for o in m]
+def rewrite(m, tip, dry):
+    """Re-apply one command's token map as its own tool would: code whole,
+    prose by rename.sub_prose (a report's history sections and a line
+    already naming NEW stay as written), and never a line the side that ran
+    the command left as it is (own_lines). Returns [(path, line)] changed,
+    writing unless dry."""
+    rxs = [(re.compile(rf"(?<![A-Za-z0-9_]){re.escape(o)}(?![A-Za-z0-9_])"), n)
+           for o, n in sorted(m.items(), key=lambda kv: -len(kv[0]))]
     hits = []
     for p in [q for q in rename.text_files() if q.exists()] + [unitfile.WARNINGS]:
         text = p.read_text(errors="replace")
-        keep = unitfile.history_spans(text) if unit and p.parent.name == "match-reports" else []
+        if not any(rx.search(text) for rx, _ in rxs):
+            continue
         mine = own_lines(tip, p)
-        lines = text.split("\n")
-        for rx in rxs:
-            for x in rx.finditer(text):
-                n = text.count(chr(10), 0, x.start())
-                if not any(s <= x.start() < e for s, e in keep) and lines[n] not in mine:
-                    hits.append(f"{p.relative_to(ROOT)}:{n + 1}")
+        out = text
+        for rx, n in rxs:
+            if rename.is_code(p):
+                out = "\n".join(l if l in mine else rx.sub(n, l) for l in out.split("\n"))
+            else:
+                out = rename.sub_prose(rx, n, out, p, keep_lines=mine)
+        if out != text:
+            a, b = text.split("\n"), out.split("\n")
+            rel = p.relative_to(ROOT).as_posix()
+            hits += [(rel, i + 1) for i in range(len(a)) if a[i] != b[i]]
+            if not dry:
+                p.write_text(out)
     return hits
-
-
-def rewrite_symbols(m, tip=None):
-    """rename.py's rewrite: code whole, prose line by line, leaving a line that
-    already names NEW (it is ABOUT the rename, round 71) and a line the side
-    that ran the command left as it is (own_lines)."""
-    for p in [q for q in rename.text_files() if q.exists()] + [unitfile.WARNINGS]:
-        t = p.read_text(errors="replace")
-        o = t
-        prose = not p.relative_to(ROOT).as_posix().startswith(("src/", "include/", "config/"))
-        mine = own_lines(tip, p)
-        for old, new in sorted(m.items(), key=lambda kv: -len(kv[0])):
-            rx = re.compile(rf"(?<![A-Za-z0-9_]){re.escape(old)}(?![A-Za-z0-9_])")
-            nx = re.compile(rf"(?<![A-Za-z0-9_]){re.escape(new)}(?![A-Za-z0-9_])")
-            o = "\n".join(l if (prose and nx.search(l)) or l in mine else rx.sub(new, l)
-                          for l in o.split("\n"))
-        if o != t:
-            p.write_text(o)
 
 
 def merge3(b, o, t, path, clashes):
@@ -182,19 +178,20 @@ def main():
     # Each command runs with the tip of the side that ran it (`A..B`: B).
     cmds = [(c, r.split("..")[-1]) for r in rngs for c in commands(r)]
     print(f"replay {' '.join(rngs)}: {len(cmds)} rename command(s)")
-    total = 0
+    total, touched = 0, set()
     for (kind, x, y), tip in cmds:
-        m, unit = mapping(kind, x, y)
-        hits = leftovers(m, unit, tip) if m else []
+        m = mapping(kind, x, y)
+        hits = rewrite(m, tip, a.dry_run) if m else []
         total += len(hits)
-        print(f"  {kind} {x} {y}: {len(hits)} leftover(s)" + "".join(f"\n      {h}" for h in hits[:12]))
-        if hits and not a.dry_run:
-            if unit:
-                unitfile.rewrite_tokens(m)
-            else:
-                rewrite_symbols(m, tip)
+        touched |= {h for h, _ in hits}
+        print(f"  {kind} {x} {y}: {len(hits)} leftover(s)" + "".join(f"\n      {h}:{n}" for h, n in hits[:12]))
         if m and not a.dry_run:
             plan.ledger_rename(m, drop_duplicates=kind == "unitfile merge")
+    if not a.dry_run:
+        # staged, so the merge commit holds them (round 94: the first merge
+        # commit held the pre-replay ObjM.h)
+        subprocess.run(["git", "add", "--", plan.STATE.relative_to(ROOT).as_posix(), *sorted(touched)],
+                       cwd=ROOT, check=True)
     if a.dry_run or not total:
         print("nothing to rewrite" if not total else "dry run: nothing changed")
         return 0

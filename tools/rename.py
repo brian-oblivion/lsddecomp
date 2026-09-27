@@ -60,6 +60,56 @@ SYMLINE = re.compile(r"^(\w+)\s*=\s*(0x[0-9A-Fa-f]+)\s*;(.*)$")
 VRAM_LO, VRAM_HI = 0x80010000, 0x80200000
 
 
+HEADING = re.compile(r"^(#+)\s")
+HISTORY = re.compile(r"histor", re.I)
+IF0 = re.compile(r"^#if 0\b.*?^#endif\b", re.M | re.S)
+
+
+def frozen_spans(text):
+    """[(start, end)] character spans of a match report's history sections,
+    which every rename tool leaves as written: a heading naming history ("##
+    File history", "## Earlier history") down to the next heading of its
+    level or above. They record the names in use when written; a rename made
+    them quote commands never run and name retired types (rounds 90, 94, 97).
+    A preserved `#if 0` body inside one stays live (tools/stalesyms.py)."""
+    spans, start, level, pos = [], None, 0, 0
+    for line in text.split("\n"):
+        m = HEADING.match(line)
+        if m and start is not None and len(m.group(1)) <= level:
+            spans.append((start, pos))
+            start = None
+        if m and start is None and HISTORY.search(line):
+            start, level = pos, len(m.group(1))
+        pos += len(line) + 1
+    if start is not None:
+        spans.append((start, len(text)))
+    out = []
+    for s, e in spans:
+        for b in IF0.finditer(text, s, e):
+            out.append((s, b.start()))
+            s = b.end()
+        out.append((s, e))
+    return [(s, e) for s, e in out if s < e]
+
+
+def sub_prose(rx, new, text, path, keep_lines=()):
+    """rx.sub(new) line by line in PROSE, leaving a report's frozen history
+    and any line that already names NEW (it is ABOUT the rename: "X became
+    NEW", rounds 71 and 97)."""
+    nx = re.compile(rf"(?<![A-Za-z0-9_]){re.escape(new)}(?![A-Za-z0-9_])")
+    frozen = frozen_spans(text) if Path(path).parent.name == "match-reports" else []
+    out, pos = [], 0
+    for line in text.split("\n"):
+        at, pos = pos, pos + len(line) + 1
+        keep = nx.search(line) or line in keep_lines or any(s <= at < e for s, e in frozen)
+        out.append(line if keep else rx.sub(new, line))
+    return "\n".join(out)
+
+
+def is_code(path):
+    return Path(path).resolve().relative_to(ROOT).as_posix().startswith(("src/", "include/", "config/"))
+
+
 def text_files():
     """Every file a symbol name may appear in, excluding generated and archive."""
     out = []
@@ -343,9 +393,13 @@ def main():
             # Prose: a line that already names NEW is ABOUT the rename ("X is
             # libcd's getintr"), and rewriting it reads "getintr, libcd's
             # getintr" (round 71, twice). Leave it and say where.
-            out = []
+            out, pos = [], 0
+            frozen = frozen_spans(text) if p.parent.name == "match-reports" else []
             for i, line in enumerate(text.split("\n"), 1):
-                if pat.search(line) and newpat.search(line):
+                at, pos = pos, pos + len(line) + 1
+                if any(s <= at < e for s, e in frozen):
+                    out.append(line)
+                elif pat.search(line) and newpat.search(line):
                     print(f"  note: {rel}:{i} names both {old} and {new}; left as written, edit by hand if needed")
                     out.append(line)
                 else:
