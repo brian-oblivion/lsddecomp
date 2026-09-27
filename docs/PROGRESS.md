@@ -6,6 +6,74 @@ stale, prose elsewhere is not.
 
 ---
 
+## 2026-09-27 — round 96: sixteen jobs, no Sony re-declaring header left, SceneNode's Sony types unparked (premium head, plan revision 34)
+
+Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 16
+jobs, all Opus, none sent back. Gate 0 green.
+
+- **Track 6, ten jobs** (three names sampled each). Sprite.h and Viewport.h
+  as ONE job (revision 34) onto Sony's `GsIMAGE`, `GsOT`, `GsOT_TAG` and
+  `PACKET`; `ViewportOt` deleted; SceneNode's +0x064 slot is `setSemiTransOn`,
+  because `<libgpu.h>` defines a `setSemiTrans(p, abe)` macro, and
+  `ViewportRefView`/`SpriteGs` stay local (Sony's types cost more casts than
+  they save; measured). code_179d8_m onto libsnd/libspu (`VabHdr`, `VagAtr`,
+  `ProgAtr`, `SsScore`; `ObjDAD4` is `SpuRegs`, the SPU register block; the
+  preserved `SpuVmKeyOn` body read the note range from the wrong offsets).
+  code_179d8_q onto libetc/libcd (`CdlFILE`, `CdlSetmode`/`CdlModeSpeed`;
+  `CdRequest_282AC` is `CdRequestNode`; `UnkC80` removed, since it typed a
+  store through a register the function never writes). `BoxFillPos`;
+  `FullWidthChar`/`FullWidthChars3`/`FullWidthChars6` in TitleMenu.h for the
+  save title (class_3bb8c_g and _c). One descriptor family:
+  `Vec3_171e0` is `ResourceRequest` (`SetVec3` is `ResourceRequest__Set`),
+  and `ResourceSource` plus one `ResourceSourceRequest` now sit in
+  FileResource.h, retiring `LoadRequest`, `LoadModelRequest` and
+  `BE54LoadReq` (a job the head flagged mid-round from delta's finding).
+  `FieldAC7CHolder` is class_3bb8c_n's `StyleSceneRefs` view.
+- **Track 7, five units marked** (five samples each): class_3bb8c_b
+  (`ANGLE_DEG` in common.h, `GsIDMATRIX`), Entity (the "separate" mood
+  tables are columns of `gEntityMoodTable`'s row: splat labels each
+  `%lo(sym+off)`), class_3bb8c_r, class_3bb8c_d (`TitleMenuEntry`,
+  `TASKOBJF_CLASS_ID`), class_3bb8c_p (`gActorLocalMove`).
+- **Track 8, two regions:** code_179d8_j_b to
+  `libsnd_vm_vol_ut_key_ut_keyv.c` (3.6's three objects, checked with nm),
+  code_33808 to `GraphicsResources.c`; both parked unsplit, reasons in the
+  banners.
+- **Head:** seven libsnd `D_` globals to the names `psyq-objects.ld` pins
+  (`_svm_pg`/`_vh`/`_tn`/`_damper`, `kMaxPrograms`, `_svm_vab_used`,
+  `_svm_vab_count`). Merges: two rename-only conflicts (main's side, then
+  replay), three symbols-file and one TitleMenu.h conflict of two appended
+  blocks (both kept), and delta's GraphicsResources.c banner against a
+  rename. Sony-re-declaring headers reached 0, so SceneNode.h's parked
+  `SceneNodeSub14`/`Sub44`/`S16Quad_d294` met their own unpark condition
+  and are flagged `--after` (GsCOORDINATE2, GsCOORD2PARAM, SVECTOR).
+- **Plan revision 34 (premium, tools):** (1) a ready flagged `--after`
+  header takes a Sony-collision header's edit set (the header plus every
+  includer) and joins a collision job it shares an includer with:
+  ViewportOt's job had listed Viewport.h alone while its fix added the same
+  Sony `#include` block to code_2864 and code_2cc8c_d as Sprite.h's; (2) a
+  flag wins over a pattern's reason for the same name, or an unparked
+  placeholder never reached that path (SceneNode.h's three listed the
+  header alone).
+- **Measured** (`plan.py`, against round 95's entry): placeholder type
+  names 24 to 11; files re-declaring a Sony name 14 to 10 (headers 1 to 0);
+  track 7 units 16 to 21 of 68, D_ 116 to 93, unk 192 to 185, magic 1407 to
+  1333, m2c 166 to 125, history 386 to 342; track 8 regions 8 to 10 of 34.
+  Typeviews 71, 0 new at every merge.
+- **Deferred proposals** (in the reports): `ResourceRequest` as `{
+  ResourceSource src; s32 mode; }` with the other 0x0C views (flagged);
+  `gActorLocalMove` is `s16[3]` and class_3bb8c_o's `D_8008ABA8` its z
+  (bravo); an Actor event enum (6/7/8, -1/-2) and a TaskCore state enum
+  (bravo, echo); TaskCore `unk34`/`unk93`, `TaskCoreTarget::unk8`,
+  IntermediateBase `unk10`/`unk14` (echo); `StyleSceneRefs` into ObjM.h with
+  `gStyleSceneRefs` typed (charlie); `CdLoc16` to Sony's `CdlLOC` once
+  code_179d8_r/_s and code_3770c take libcd (echo); `D_8006DAD4`'s other
+  views onto `SpuRegs`, code_179d8_l's `ObjE970` onto `VabHdr` (charlie);
+  Entity_b's two mood-table columns and `gEntityMoodHandlerTable` banner
+  wording (bravo); rename `SceneNode__SetSemiTrans` and its two siblings to
+  `*SetSemiTransOn` (alpha).
+
+---
+
 ## 2026-09-27 — round 95: eight Sony-collision files cleared, six units polished, first region renamed (premium head, plan revision 33)
 
 Premium head (Opus 5.5), cap 5, slots refilled as runners reported: 14
