@@ -63,6 +63,7 @@
  * unnamed too, so there's nothing to name it AS a stand-in for.
  */
 #include "common.h"
+#include <libsnd.h>
 #include "VabDriver.h"
 #include "VabStreamObj.h"
 #include "SoundCueSet.h"
@@ -71,20 +72,6 @@
  * declared LOCAL to this unit, per-call-site typed, since none of them have
  * an established prototype anywhere yet. */
 extern void *BMemPMgrAlloc(s32 size);
-/* Sony libsnd, prototypes copied from LIBSND.H (plan revision 15; round 74
- * found the SsUtKeyOn and SsUtAllKeyOff lines disagreeing with it). */
-extern s16 SsUtKeyOn(s16 vabId, s16 prog, s16 tone, s16 note, s16 fine, s16 voll, s16 volr);
-extern s16 SsUtAutoVol(s16 vc, s16 start_vol, s16 end_vol, s16 delta_time);
-extern s16 SsUtKeyOffV(s16 voice);
-extern void SsUtAllKeyOff(s16 mode);
-/* Sony's `SsVabTransCompleted` (`libsnd/vs_vtc`) and `SsSetMute`
- * (`libsnd/scsmute`), linked from the SDK objects since round 34.  The two
- * signatures are this call site's own reading and disagree with the sibling
- * reading in libsnd_decre.c about the return types -- that is the project's
- * independent-local-view convention, and it is exactly why a Psy-Q prototype
- * must never go into a header these units share. */
-extern void SsVabTransCompleted(s32 arg0);
-extern s32 SsSetMute(s32 arg0);
 
 s32 VabDriver__Read(void) {
     return 0;
@@ -143,28 +130,10 @@ VabStreamObj *New_VabStreamObj(char *path) {
  * DriverBaseMethods view, slot08/slot0C, until then). */
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
-/* Sony's own VAB streaming calls (include/psyq/libsnd.h), declared locally
- * per this project's convention of not sharing Psy-Q prototypes across
- * units (see the SsVabTransCompleted/SsSetMute comment above). */
-extern void SsVabClose(s16 vabId);
-extern s16 SsVabOpenHead(u8 *addr, s16 arg1);
-extern s16 SsVabTransBody(u8 *addr, s16 vabId);
-extern s16 SsUtGetVabHdr(s16 vabId, void *out);
-extern s16 SsUtGetProgAtr(s16 vabId, s16 prog, void *out);
-extern s16 SsUtGetVagAtr(s16 vabId, s16 prog, s16 tone, void *out);
-extern void SsSetMVol(s16 a0, s16 a1);
-extern void SsSetTableSize(char *a0, s16 a1, s16 a2);
 
-/* Psy-Q LIBSND.H: extern void SsInit (void); -- track 2 identification,
- * round 78 (was func_80032368, declared s32; the one call discards it). */
-extern void SsInit(void);
 /* Uncarved code_179d8_tail helpers this cluster calls. */
 extern char *GetSsSizeTableBuf(void);
 extern s32 IsWBgmActive(void);
-extern void SsEnd(void);
-extern void SsQuit(void);
-extern void SsSetTickMode(s32 a0);
-extern void SsStart(void);
 extern void *BMemPMgrFree(void *ptr);
 extern char *BuildFileName(char *dest, char *arg1, char *arg2, char *arg3);
 extern s32 strlen(char *s);
@@ -287,17 +256,8 @@ s32 VabStreamObj__OnBodyReady(VabStreamObj *self, s32 done) {
     return result;
 }
 
-/* This unit's own reduced view of Sony's `ProgAtr` (include/psyq/libsnd.h,
- * 16 bytes) -- only the one field VabStreamObj__LoadVagAttrs itself reads is
- * named, per the same local-struct convention used for VabHdrView above (and
- * matching libsnd_seqread.c's own reduced `ProgAtr` reading). */
-typedef struct ProgAtrView {
-    u8 tones; /* +0x00, program's tone count, written by SsUtGetProgAtr */
-    u8 pad1[0x10 - 0x1];
-} ProgAtrView;
-
 void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
-    ProgAtrView prog;
+    ProgAtr prog;
     VabStreamVagAtr *pool;
     s32 i;
     s32 j;
@@ -308,7 +268,7 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
     }
     self->methods->freeBuffer(self);
     self->buffer = gPendingVabBuffer;
-    result = SsUtGetVabHdr(self->vabId, &self->vabHdr);
+    result = SsUtGetVabHdr(self->vabId, (VabHdr *)&self->vabHdr);
     if (result == -1) {
         return;
     }
@@ -328,7 +288,7 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
             return;
         }
         for (j = 0; j < prog.tones; j++) {
-            result = SsUtGetVagAtr(self->vabId, i, j, pool);
+            result = SsUtGetVagAtr(self->vabId, i, j, (VagAtr *)pool);
             if (result == -1) {
                 return;
             }
@@ -395,14 +355,16 @@ s32 VabStreamObj__Mute(VabStreamObj *self) {
 }
 
 s32 VabStreamObj__Unmute(VabStreamObj *self) {
-    s32 flag;
+    s32 result;
 
-    flag = self->muted;
-    if (flag != 0) {
-        flag = SsSetMute(0);
+    result = self->muted;
+    if (result != 0) {
+        /* MATCHING: retail returns what SsSetMute leaves in $v0 (SpuSetMute's
+         * result); <libsnd.h> declares it void, so the call is cast. */
+        result = ((s32 (*)(char))SsSetMute)(0);
         self->muted = 0;
     }
-    return flag;
+    return result;
 }
 
 void VabStreamObj__NoOpSlot90(void) {}
