@@ -74,7 +74,6 @@ D_8008ABFC
 D_8008AC04
 D_8008AC08
 D_8008AC68
-D_8008AC78
 D_8008ACA0
 LINK_ANGLE_180
 SAVE_MAGIC
@@ -216,5 +215,6 @@ sSaveTitleColorFrame
 sSaveTitleOffset
 sStyleDecorBoxPos
 sStyleDecorBoxSize
+sStyleUnreadArg
 sTaskObjFCount
 sTimExt

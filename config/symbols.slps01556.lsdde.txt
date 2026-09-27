@@ -3021,3 +3021,4 @@ sStyleDecorBoxSize = 0x8008AB60;
 sStyleStageConfigs = 0x800873EC;
 sStyleConfig = 0x80087424;
 sStyleFogNears = 0x8008730C;
+sStyleUnreadArg = 0x8008AC78;
