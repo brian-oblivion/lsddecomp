@@ -114,3 +114,7 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ResetElementCells` -> `StageMap__ClearSlotCells` (`python3 tools/rename.py StageMap__ResetElementCells StageMap__ClearSlotCells`, tier B): when the slot holds a chunk: releases the LbdFile header and clears every cell's model/tmd with GsDOFF set.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameter `entry` -> `slot`. Constants: 0x19A -> `STAGE_SLOT_CELLS` (410: the 20 x 20 lattice plus 10 overflow cells), 0x80000000 -> Sony's `GsDOFF`.

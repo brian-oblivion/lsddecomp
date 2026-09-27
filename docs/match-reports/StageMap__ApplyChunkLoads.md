@@ -653,3 +653,20 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ApplyRateEntries` -> `StageMap__ApplyChunkLoads` (`python3 tools/rename.py StageMap__ApplyRateEntries StageMap__ApplyChunkLoads`, tier B): per entry: event 6 to the slot, clear its cells, then start the entry's LbdFile load (chunkIndex, loadPending) or cancel the slot's load; then count the pending loads.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameters and locals, tier A: `arr1` -> `entry` (the walked parameter), `sp` -> `tail` (the ChunkLoadEntryTail view), `e` -> `slot`. Constant: 6 -> `STAGEMAP_EVENT_SLOT_RELEASE`. The walker shape keeps a two-line `MATCHING` note in the function comment.
+
+The comment that stood above the function in `src/class_3bb8c.c`, moved here verbatim (its local names are the pre-track-7 ones):
+
+```c
+/* MATCH, round 73 (bravo): 105/105. Retail's `+4` walker is a
+ * strength-reduced giv of the walked PARAMETER, not a second user
+ * pointer: its init (`addiu s3,a1,4`) sits in the loop preheader after
+ * the count guard and reads $a1, which is what loop.c emits when the biv
+ * is `arr1` itself (initial value = the incoming argument register).
+ * `sp` is therefore assigned from `arr1` inside the body and `arr1` is
+ * advanced directly; the old `ep = arr1` copy is what swapped s3/s4.
+ * See docs/match-reports/StageMap__ApplyChunkLoads.md. */
+```

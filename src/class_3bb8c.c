@@ -1,22 +1,30 @@
 /*
- * class_3bb8c -- the middle third of StageMap (include/StageMap.h): chunk
- * loading and the position-to-cell math. class_3bb8c_b.c holds the rest;
- * both units share include/class_3bb8c.h, which holds the class's data
- * tables.
+ * class_3bb8c -- the middle of StageMap's methods (include/StageMap.h, whose
+ * banner describes the class): placing a cell descriptor in the world,
+ * loading the seven chunk slots around a centre chunk, linking a loaded
+ * chunk into its slot's cells, and the queries that turn a position back
+ * into a slot and cell. class_3ac78.c holds the methods before these and
+ * class_3bb8c_b.c those after; the class's data tables are declared in
+ * include/class_3bb8c.h.
  *
  *  - SetTargetAndLoadChunks, ComputeCellOffsets, ComputeCellWorldOffsets:
  *    a cell descriptor to a world position and the chunk it lies in.
  *  - Enable/Disable, UpdateFootprintTracking: the per-tick tracking of the
- *    target (see the class banner).
+ *    target.
  *  - LoadChunksAround, ComputeNeighbourMask, ComputeChunkLoadEntry,
- *    ApplyChunkLoads, CountPendingLoads, OnNotifyTag1: loading the chunks
- *    around a centre chunk into the slots, and finishing each load.
+ *    ApplyChunkLoads, CountPendingLoads: moving the slots around a centre
+ *    chunk and starting (or cancelling) each slot's LbdFile load.
+ *  - OnNotifyTag1: on the DrawSystem's per-VSync notification, finishing
+ *    the loads that have completed.
  *  - PopulateSlotCells / ClearSlotCells: linking a loaded chunk's
  *    placements and models into its slot's cells, and clearing them.
  *  - GetTargetDescriptor, ComputeFootprintDescriptor, SplitChunkIndex,
  *    GetLastEventSlotChunk, FindSlotByNeighbour, FindSlotForPosition:
- *    queries. A slot's position is read through SplitCoord2
- *    (include/class_3bb8c.h), a GsCOORDINATE2 view with halfword reads.
+ *    queries. A slot's position is its cellParent's GsCOORDINATE2, read
+ *    through SplitCoord2 (include/class_3bb8c.h).
+ *
+ * Positions are in world units: a cell is STAGE_CELL_SIZE square, a chunk
+ * STAGE_CHUNK_SIZE (include/StageMap.h).
  */
 #include "common.h"
 #include <libgte.h>
@@ -48,15 +56,11 @@ s32 StageMap__ComputeCellOffsets(StageMap *self, void *outPos, void *cell) {
     return ComputeCellWorldOffsets(outPos, chunkCentre, self->config, &self->origin, cell);
 }
 
-/* MATCH, round 40 (bravo): permuter-found zero, first-ever search on this
- * function (1838 iterations, rc=0). The lead: hoist the shared `0x400`
- * constant used by BOTH `arg0[0]`/`arg0[2]`'s tail addend into a named
- * local, declared between the `outBuf[1]` and `outBuf[2]` assignment
- * statements -- the exact position retail's own constant-load sits,
- * confirmed by the score dropping straight to 0. Every prior round's
- * attempts targeted the outBuf[0]/outBuf[2] STORE-vs-LOAD scheduling
- * directly and never touched this constant; the permuter found a
- * completely different axis. See docs/match-reports/ComputeCellWorldOffsets.md. */
+/* A cell descriptor to world positions: writes the chunk's centre to
+ * chunkPos and the cell point (cell column/row plus the offset inside the
+ * cell, measured from the cell's centre) to outPos, and returns the chunk's
+ * index (0 in a vertical grid). The grid is centred on `origin`; odd rows sit
+ * half a chunk to -x. */
 s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dims, LongVec3 *origin,
                             Descriptor10 *cell) {
     s32 row;
@@ -82,7 +86,7 @@ s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dim
         chunkPos[0] = x - STAGE_CHUNK_SIZE / 2;
     }
     chunkPos[1] = origin->y;
-    halfCell = STAGE_CELL_SIZE / 2;
+    halfCell = STAGE_CELL_SIZE / 2; /* MATCHING: a local, set here, places retail's constant load */
     chunkPos[2] = z + row * STAGE_CHUNK_SIZE;
     outPos[0] = (cell->b2 << STAGE_CELL_SHIFT) + chunkPos[0] + (cell->h4 + halfCell);
     outPos[1] = cell->h6 + chunkPos[1];
@@ -101,7 +105,11 @@ void StageMap__Disable(StageMap *self) {
     self->enabled = 0;
 }
 
-/* StageMap__UpdateFootprintTracking -- see docs/match-reports/StageMap__UpdateFootprintTracking.md. */
+/* The per-tick tracking: re-reads the target's descriptor; in a flat grid,
+ * reloads the slots the target's slot selects (sFootprintResultRemap) around
+ * its chunk; moves the drawn window; notifies the parents when the chunk
+ * changed. Returns the selected spec's index (0 for the centre slot, which
+ * changes nothing). */
 s32 StageMap__UpdateFootprintTracking(StageMap *self) {
     Descriptor10Ext desc;
     ChunkSlot *slot;
@@ -134,19 +142,10 @@ s32 StageMap__UpdateFootprintTracking(StageMap *self) {
     return specIndex;
 }
 
-/* MATCH, round 63 (delta): closed a 137/140 stall that had stood since round
- * 40 across four re-verifications, ten inert structural variants and a
- * 37,155-iteration permuter search -- see docs/match-reports/StageMap__LoadChunksAround.md.
- * The 3-word residue was a genuine pure register-identity difference (funcdiff
- * ins 0 / del 0, no asm-differ markers): retail held the second loop's element
- * pointer in $a2, the build in $v0. The fix was to DELETE a local -- the
- * second loop reuses `e`, the same variable the first loop walks, instead of a
- * separate `e2`. Nothing else in the body changed.
- * That axis is exactly the one a permuter cannot reach: it mutates a body, it
- * does not merge two of its locals into one. Same lever as StageMap__ComputeChunkLoadEntry this
- * round.
- * The `__asm__("")` barrier this body used to carry before `u14 = ...` is gone:
- * with `e` merged it is no longer needed, verified by whole-image rebuild. */
+/* Moves each slot `specs` marks for loading to the centre position plus
+ * its neighbour key's offset (a vertical grid: to its layer), builds a
+ * ChunkLoadEntry for it, gives every slot its new key, then starts the
+ * loads (applyChunkLoads). */
 void StageMap__LoadChunksAround(StageMap *self, s32 centreChunk, LongVec3 *centrePos,
                                 ChunkSlotSpec *specs) {
     s32 columns;
@@ -188,7 +187,7 @@ void StageMap__LoadChunksAround(StageMap *self, s32 centreChunk, LongVec3 *centr
         }
 
         for (i = 0; i < ARRAY_COUNT(self->slots); i++) {
-            slot = &self->slots[i];
+            slot = &self->slots[i]; /* MATCHING: the first loop's `slot`; a second local swaps a register */
             slot->loader->elemKey = slot->neighbour;
         }
 
@@ -239,19 +238,11 @@ s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 chunk, s32 oddRow) {
     }
 }
 
-/* MATCH, round 63 (delta): closed a 58/63 stall that had stood since round
- * 27 across five re-verifications and ~330,000 permuter iterations -- see
- * docs/match-reports/StageMap__ComputeChunkLoadEntry.md. The 5-word residue really was pure
- * register identity (funcdiff ins 0 / del 0, no asm-differ markers), and the
- * fix was FEWER variables, not more: retail carries the multiply result AND
- * the running sum AND both branch addends in ONE local (`sum`, retail's
- * $v1), with the `val +` hoisted out of every branch into a single
- * `value = val + sum;` after the if/else (retail's $v0). Round 32 tried the
- * opposite -- splitting `fieldVal`/`sum` out of `value` -- and measured it
- * inert; the permuter then searched around that same split for 330k
- * iterations without ever reaching the merged shape.
- * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
- * image. It was inherited with the near-miss body and is verified here. */
+/* Fills `out` for the slot taking neighbour key `neighbour` of centreChunk:
+ * the neighbour's chunk index and the chunk's file record from the
+ * callback, or a NULL file when that neighbour lies off the grid. Returns 1
+ * for a file, 0 for none. chunkIndex is written as a whole word (see
+ * ChunkLoadEntry). MATCHING: one `step` local carries every addend. */
 s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 columns, s32 oddRow,
                                     s32 centreChunk, s32 onGridMask, s32 neighbour) {
     s32 bit = sNeighbourBits[neighbour];
@@ -284,7 +275,7 @@ s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 col
     }
 
     out->file = self->chunkFileFn(self->chunkFileCtx, *(s32 *)((u8 *)out + 4), 0, 0);
-    do {
+    do { /* MATCHING: removing it drifts the image */
     } while (0);
     result = 1;
     goto storeKey;
@@ -297,14 +288,11 @@ storeKey:
     return result;
 }
 
-/* MATCH, round 73 (bravo): 105/105. Retail's `+4` walker is a
- * strength-reduced giv of the walked PARAMETER, not a second user
- * pointer: its init (`addiu s3,a1,4`) sits in the loop preheader after
- * the count guard and reads $a1, which is what loop.c emits when the biv
- * is `arr1` itself (initial value = the incoming argument register).
- * `sp` is therefore assigned from `arr1` inside the body and `arr1` is
- * advanced directly; the old `ep = arr1` copy is what swapped s3/s4.
- * See docs/match-reports/StageMap__ApplyChunkLoads.md. */
+/* Starts each entry's load in the slot holding its neighbour key (after
+ * clearing the cells of a chunk already linked there), or cancels the slot's
+ * load for a NULL file; then counts the slots left pending.
+ * MATCHING: `tail` is taken from `entry` inside the loop and `entry` itself
+ * advances; a copy of the parameter swaps two saved registers. */
 void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entry, s32 count) {
     s32 i;
     ChunkSlot *slot;
@@ -383,20 +371,25 @@ void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 command) {
     }
 }
 
-/* MATCH, round 73 (bravo): 150/150. The 142/150 residue carried since
- * round 40 (`info` in $a1 where retail has $v0) was ONE `info` local
- * assigned on both sides of the slot4 call. Two locals (`info`, `info2`)
- * make each block-local, so local-alloc ties each to its addu result.
- * See docs/match-reports/StageMap__PopulateSlotCells.md. */
-/* StageMap__PopulateSlotCells (populateSlotCells, +0x104) -- own local view of the
- * records reached only from here. Kept in this .c, not class_3bb8c.h: none
- * of the 11 sibling units sharing that header touch these. */
+/* New_LinkResource's descriptor (code_33808.c's Src6F240) as
+ * PopulateSlotCells builds it: only the buffer is set. */
 
 typedef struct BE54LoadReq {
     void *buffer; /* +0x000, New_LinkResource's descriptor's buffer (code_33808.c's Src6F240) */
     u8 pad4[0x10 - 0x4];
 } BE54LoadReq;
 
+/* Links a loaded chunk into its slot: points the slot's PlacementGrid at the
+ * header's placement records, replaces its LinkResource with one over the
+ * header's model block, then resolves record after record until the grid
+ * returns 0. A record with no model (-1) hides its lattice cell; one with a
+ * model links it into the next lattice cell (a chained record: the next
+ * overflow cell), sets the cell's position, y rotation and flags, and hides
+ * it until the drawn window shows it. While a record has `next` set, the
+ * cell's nextInCell is the overflow cell the following record takes.
+ * MATCHING: `header` and `header2` are two locals (one changes the
+ * allocation), and the cells are walked by byte offset (an index changes the
+ * code). */
 void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
     LbdFileHeader *header;
     LbdFileHeader *header2;
@@ -462,8 +455,7 @@ void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot) {
             GsLinkObject4((u_long)((TmdModel *)(*cell)->model)->object,
                           (GsDOBJ2 *)&(*cell)->attribute, 0);
             coord = (*cell)->coord2;
-            /* Keeps the rec.x/.y/.z stack loads below the load of
-             * (*cell)->coord2; without it GCC hoists all three above it. */
+            /* MATCHING: keeps the rec.x/.y/.z loads below the coord2 load */
             __asm__("");
             x = rec.x;
             y = rec.y;
@@ -524,20 +516,12 @@ Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *des
     return &self->targetCell.base;
 }
 
-/* MATCH, round 63 (delta): closed a six-round stall (72/106 since round 19)
- * with three source-shape corrections, none of them register pinning -- see
- * docs/match-reports/StageMap__ComputeFootprintDescriptor.md.
- *   1. `b2`/`b3` are s32 locals RE-READ from `out->base.b2`/`b3` after the
- *      byte stores. An s8 field shifted directly in the expression compiles
- *      to `lbu` + `sll 0x18` + `sra 0xd`; assigning it to an s32 local first
- *      folds the sign extension into retail's `lb` + `sll 0xb`.
- *   2. The 0x400 sits INSIDE the subtracted group -- `x - (y + (b<<11) +
- *      0x400)`. GCC reassociates that to retail's `addiu a0,a0,-0x400`.
- *      Writing `(x - 0x400) - (...)` instead narrows the constant to HImode
- *      and emits `li 0xfc00` + `addu`.
- *   3. `out->unk24 = e;` is the LAST statement of the block. Every earlier
- *      placement schedules its `sw` too early; only trailing it after the
- *      h8 store reproduces retail's order. */
+/* The descriptor of world position `pos`: the slot holding it, that slot's
+ * chunk index and column/row, the chunk's centre, the position relative to
+ * it, and the cell column/row and the offset from the cell's centre. Returns
+ * 0, or 1 when no slot holds the position.
+ * MATCHING: cellCol/cellRow re-read the stored bytes, the half cell sits
+ * inside the subtracted group, and `out->slot` is stored last. */
 s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *pos) {
     ChunkSlot *slot;
     SplitCoord2 *chunkOrigin;
@@ -610,15 +594,9 @@ ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 neighbour) {
     }
 }
 
-/* MATCH, round 73 (bravo): 70/70. The last word was the operand order
- * of the second bounds `addu`. At expand time a MEM operand of a
- * commutative `+` is placed second whatever the source order, while a
- * named variable keeps its source position; retail's `field + tol` order
- * therefore needs the field in a named local at the add. Assigning `w`
- * INSIDE the upper-bound test keeps the `arg1` load ahead of the field
- * load, as retail schedules it (a `w = ...;` statement before the `if`
- * fixes the add but swaps those two loads). See
- * docs/match-reports/StageMap__FindSlotForPosition.md. */
+/* The slot whose chunk holds `pos` in x and z (in a vertical grid, also
+ * the layer holding y), or NULL.
+ * MATCHING: `edge` is assigned inside each upper-bound test. */
 ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
     s32 i;
     s32 span;

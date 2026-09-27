@@ -81,3 +81,7 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__GetLastTargetRateSplit` -> `StageMap__GetLastEventSlotChunk` (`python3 tools/rename.py StageMap__GetLastTargetRateSplit StageMap__GetLastEventSlotChunk`, tier A): a getter: writes `lastEventSlot`'s chunk column/row and returns that slot.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Nothing renamed (`out` is its role).

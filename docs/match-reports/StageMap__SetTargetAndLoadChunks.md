@@ -124,3 +124,7 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__SetTargetAndBuildRates` -> `StageMap__SetTargetAndLoadChunks` (`python3 tools/rename.py StageMap__SetTargetAndBuildRates StageMap__SetTargetAndLoadChunks`, tier B): records the target and its cell descriptor, derives the centre chunk and position (ComputeCellWorldOffsets) and loads around it with every slot marked (sDefaultTargetSpecs).
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameters and locals, tier A from the body and the slot declaration (`setTargetAndLoadChunks(self, outPos, target, cell)`): `arg1` -> `outPos` (ComputeCellWorldOffsets writes the cell point there), `arg2` -> `target` (stored in `self->target`), `arg3` -> `cell` (the Descriptor10 copied into `targetCell.base`), `stackBuf` -> `chunkCentre` (ComputeCellWorldOffsets leaves the chunk centre in it; passed to loadChunksAround as its centre position), `ret` -> `chunkIndex` (ComputeCellWorldOffsets' return value).

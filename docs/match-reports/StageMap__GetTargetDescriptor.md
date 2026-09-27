@@ -94,3 +94,7 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameters and locals, tier A: `arg1` -> `desc`, `out` -> `outPos` (the slot declaration's name), `v1` -> `pos` (the target's coord2 translation).

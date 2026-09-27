@@ -108,3 +108,7 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__CountFlaggedElements` -> `StageMap__CountPendingLoads` (`python3 tools/rename.py StageMap__CountFlaggedElements StageMap__CountPendingLoads`, tier A): a counter leaf: slots with `loadPending` set.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+The loop bound 7 -> `ARRAY_COUNT(self->slots)`. Nothing else renamed (`count`, `i` are roles already).

@@ -108,3 +108,11 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameters and locals: `arg1` -> `sender`, `mode` -> `command` (OnNotify's command, tier A), `e` -> `slot`, `curMode` -> `pending` (`loadsPending`'s value).
+
+Constants: 2 -> `DRAWSYSTEM_EVENT_VSYNC` (include/DrawSystem.h, new): OnNotify calls this method for a sender whose class id's low nibble is 1, DrawSystem's family (class id 0x1), and DrawSystem__RunLoop (src/code_10ee0.c) calls `notifyParents(self, 2)` once per VSync pass; DrawSystem.h's banner says StageMap adds it as a child. 7 -> `STAGEMAP_EVENT_SLOT_DATA_READY`, `headerReady = 2` -> `LBDFILE_HEADER_CONSUMED` (include/LbdFile.h, new; its banner already said "marks the header consumed (headerReady 2)"), loop bound -> `ARRAY_COUNT(self->slots)`.
+
+Not renamed: the method name. Viewport has the same `OnNotifyTag1` for its DrawSystem case (src/code_2cc8c_d.c), so it is a convention across two classes; proposed to the head as one rename of both (e.g. `OnDrawSystemNotify`) rather than breaking the pair here.

@@ -769,3 +769,27 @@ cellParent->coord2, a GsCOORDINATE2 with tx/tz as word-or-halfword unions.
 Its fields are named for the GsCOORDINATE2 words they overlay: `unk18` ->
 `tx` (coord.t[0]), `unk1C` -> `ty`, `unk20` -> `tz`; `unk0` (flg) had no
 accessor through this view and is padding. Zero bytes changed.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameters and locals, tier A: `val` -> `centreChunk`, `arg2` -> `centrePos`, `arg3` -> `specs` (the slot declaration's `specs`), `divisor` -> `columns`, `flag` -> `oddRow` (`(centreChunk / columns) & 1`), `savedResult` -> `onGridMask` (ComputeNeighbourMask's result), `e` -> `slot`, `u14` -> `origin` (the slot's cellParent coord2 as SplitCoord2), `tbl` -> `offset` (the sNeighbourOffsets entry), `stackBuf` -> `loads`.
+
+Constants: the key loop runs to `CHUNK_NEIGHBOUR_COUNT` (enum ChunkNeighbour), the slot loop to `ARRAY_COUNT(self->slots)`, `loads` is `[CHUNK_NEIGHBOUR_COUNT]`, 0x5000 -> `STAGE_CHUNK_SIZE / 2`. The reuse of `slot` in the second loop keeps a one-line `/* MATCHING */`.
+
+The comment that stood above the function in `src/class_3bb8c.c`, moved here verbatim (its local names are the pre-track-7 ones):
+
+```c
+/* MATCH, round 63 (delta): closed a 137/140 stall that had stood since round
+ * 40 across four re-verifications, ten inert structural variants and a
+ * 37,155-iteration permuter search -- see docs/match-reports/StageMap__LoadChunksAround.md.
+ * The 3-word residue was a genuine pure register-identity difference (funcdiff
+ * ins 0 / del 0, no asm-differ markers): retail held the second loop's element
+ * pointer in $a2, the build in $v0. The fix was to DELETE a local -- the
+ * second loop reuses `e`, the same variable the first loop walks, instead of a
+ * separate `e2`. Nothing else in the body changed.
+ * That axis is exactly the one a permuter cannot reach: it mutates a body, it
+ * does not merge two of its locals into one. Same lever as StageMap__ComputeChunkLoadEntry this
+ * round.
+ * The `__asm__("")` barrier this body used to carry before `u14 = ...` is gone:
+ * with `e` merged it is no longer needed, verified by whole-image rebuild. */
+```

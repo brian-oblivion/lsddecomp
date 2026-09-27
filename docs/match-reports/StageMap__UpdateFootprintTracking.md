@@ -210,3 +210,7 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 3-word placeholder). renametype.py also rewrote the old names inside
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Locals, tier A: `buf` -> `desc` (the Descriptor10Ext getTargetDescriptor fills), `e` -> `slot`, `key` -> `neighbour` (the slot loader's `elemKey`, a neighbour key), `result` -> `specIndex` (sFootprintResultRemap's byte, the index into sFootprintResultPtrTable and the return value), `oldRaw` -> `oldChunk` (the old descriptor's b0/b1, chunk column/row, read as one u16). Constant: 5 -> `STAGEMAP_EVENT_CHUNK_CHANGED` (enum StageMapEvent, include/StageMap.h). The one-line pointer comment (`/* StageMap__UpdateFootprintTracking -- see docs/match-reports/... */`) became a comment saying what the function does.

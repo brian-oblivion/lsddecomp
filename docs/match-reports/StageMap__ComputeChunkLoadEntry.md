@@ -604,3 +604,27 @@ earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
 This function: `StageMap__ComputeRateEntry` -> `StageMap__ComputeChunkLoadEntry` (`python3 tools/rename.py StageMap__ComputeRateEntry StageMap__ComputeChunkLoadEntry`, tier B): fills one ChunkLoadEntry: the neighbour's chunk index (centre + `rowDelta * columns` + the column step for the row parity; centre + key in a vertical grid) and its file record from `chunkFileFn`, or a NULL file when the mask excludes it.
+
+## Track 7 (2026-09-27, round 95, charlie)
+
+Parameters and locals, tier A: `arg1` -> `out`, `divisor` -> `columns`, `flag` -> `oddRow`, `val` -> `centreChunk`, `savedResult` -> `onGridMask`, `key` -> `neighbour`, `mask` -> `bit` (sNeighbourBits[neighbour]), `entry` -> `delta` (the sChunkNeighbourDeltas entry), `value` -> `chunk`, `sum` -> `step` (the merged local the match depends on; now marked `/* MATCHING */`).
+
+Left: the two `*(s32 *)((u8 *)out + 4)` writes. ChunkLoadEntry declares `chunkIndex` s16 plus a pad; retyping it `s32` (dropping `pad6`) and writing `out->chunkIndex` builds byte-identical (measured this round, then reverted: include/StageMap.h is shared and the change is not additive). Proposed to the head. The `do {} while (0);` keeps a one-line `/* MATCHING */`.
+
+The comment that stood above the function in `src/class_3bb8c.c`, moved here verbatim (its local names are the pre-track-7 ones):
+
+```c
+/* MATCH, round 63 (delta): closed a 58/63 stall that had stood since round
+ * 27 across five re-verifications and ~330,000 permuter iterations -- see
+ * docs/match-reports/StageMap__ComputeChunkLoadEntry.md. The 5-word residue really was pure
+ * register identity (funcdiff ins 0 / del 0, no asm-differ markers), and the
+ * fix was FEWER variables, not more: retail carries the multiply result AND
+ * the running sum AND both branch addends in ONE local (`sum`, retail's
+ * $v1), with the `val +` hoisted out of every branch into a single
+ * `value = val + sum;` after the if/else (retail's $v0). Round 32 tried the
+ * opposite -- splitting `fieldVal`/`sum` out of `value` -- and measured it
+ * inert; the permuter then searched around that same split for 330k
+ * iterations without ever reaching the merged shape.
+ * The `do {} while (0);` below is LOAD-BEARING: removing it drifts the
+ * image. It was inherited with the near-miss body and is verified here. */
+```
