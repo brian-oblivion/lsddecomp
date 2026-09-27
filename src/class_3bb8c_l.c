@@ -70,7 +70,7 @@ extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 ar
 extern s32 D_8008715C;
 extern s32 D_80087168;
 extern s32 gStagePendingExtras[];
-extern s32 D_80087150;
+extern s32 gStage0Bounds;
 
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 arg3) {
@@ -130,7 +130,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
         self->unk40 = 0x10;
         self->unk44 = 2;
         flag = 1;
-        ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, (CellBounds *)&D_80087150);
+        ((StageMap *)self->unk14)->methods->setBounds((StageMap *)self->unk14, (CellBounds *)&gStage0Bounds);
     }
 
     self->gridSpan = gridSpan;
