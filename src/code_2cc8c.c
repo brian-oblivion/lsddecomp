@@ -48,26 +48,27 @@
 #include "code_2cc8c.h"
 #include "VabStreamObj.h"
 #include "BgLayer.h"
+#include "Pad.h"
 
 void TaskCore__OnPadEvent(TaskCore *self, BasicClass *sender, s32 event) {
     TaskCoreMethods *methods;
 
     methods = self->methods;
-    if (self->inputMode != 0) {
+    if (self->inputMode != TASKCORE_INPUT_NONE) {
         switch (event) {
-            case 0x12:
+            case PAD_EVENT_PRESSED + PAD_BUTTON_LUP:
                 methods->onPadPrev(self);
                 break;
-            case 0x13:
+            case PAD_EVENT_PRESSED + PAD_BUTTON_LDOWN:
                 methods->onPadNext(self);
                 break;
-            case 0x21:
+            case PAD_EVENT_PRESSED + PAD_BUTTON_START:
                 methods->onPadStart(self);
                 break;
-            case 0x17:
+            case PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN:
                 methods->onPadCancel(self);
                 break;
-            case 0x19:
+            case PAD_EVENT_PRESSED + PAD_BUTTON_RRIGHT:
                 methods->onPadConfirm(self);
                 break;
         }
@@ -79,26 +80,26 @@ void TaskCore__Update(TaskCore *self, BasicClass *sender, s32 event) {
 
     methods = self->methods;
     Get_vtable_IntermediateBase()->update((IntermediateBase *)self, sender, event);
-    if (self->inputMode != 0) {
-        u32 bound;
+    if (self->inputMode != TASKCORE_INPUT_NONE) {
+        u32 frames;
 
-        bound = self->frameCounter;
-        if ((u32)self->frameBound < bound) {
-            methods->setState(self, 6);
+        frames = self->frameCounter;
+        if ((u32)self->frameBound < frames) {
+            methods->setState(self, TASKCORE_STATE_TIMED_OUT);
         }
     }
     switch (self->state) {
-        case 2:
-            methods->setState(self, 4);
+        case INTERMEDIATEBASE_STATE_START:
+            methods->setState(self, TASKCORE_STATE_FADE_IN);
             break;
-        case 4:
+        case TASKCORE_STATE_FADE_IN:
             methods->tickFadeCallback(self);
             break;
-        case 7:
+        case TASKCORE_STATE_FADE_OUT:
             methods->tickFadeOutCallback(self);
             break;
-        case 8:
-            methods->setState(self, 3);
+        case TASKCORE_STATE_FADED_OUT:
+            methods->setState(self, INTERMEDIATEBASE_STATE_STOP);
             break;
     }
 }
@@ -109,41 +110,41 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
     methods = self->methods;
     Get_vtable_IntermediateBase()->setState((IntermediateBase *)self, state);
     switch (state) {
-        case 5:
+        case TASKCORE_STATE_ACTIVE:
             methods->broadcastToSlots(self, self->target->unselectedColor);
             methods->setActiveSlot(self, self->target->unk8, 0);
             self->frameCounter = 0;
-            self->inputMode = 1;
+            self->inputMode = TASKCORE_INPUT_CHOOSING_SLOT;
             break;
-        case 6:
+        case TASKCORE_STATE_TIMED_OUT:
             self->result = 1;
             methods->refreshViewValue(self);
             break;
-        case 4:
-        case 7:
+        case TASKCORE_STATE_FADE_IN:
+        case TASKCORE_STATE_FADE_OUT:
             self->frameCounter = 0;
-            self->inputMode = 0;
+            self->inputMode = TASKCORE_INPUT_NONE;
             break;
-        case 8:
+        case TASKCORE_STATE_FADED_OUT:
             self->frameCounter = 0;
             break;
-        case 9:
-        case 0xA:
-        case 0xB:
-        case 0xE:
-        case 0xF:
-        case 0x10:
-        case 0x11:
-            self->state = 5;
+        case TASKCORE_STATE_CURSOR_MOVED:
+        case TASKCORE_STATE_START_PRESSED:
+        case TASKCORE_STATE_SLOT_CONFIRMED:
+        case TASKCORE_STATE_SCROLL_OPENED:
+        case TASKCORE_STATE_ITEM_CONFIRMED:
+        case TASKCORE_STATE_SCROLL_COMMITTED:
+        case TASKCORE_STATE_SCROLL_CANCELLED:
+            self->state = TASKCORE_STATE_ACTIVE;
             self->frameCounter = 0;
             switch (state) {
-                case 0xB:
+                case TASKCORE_STATE_SLOT_CONFIRMED:
                     methods->tick(self);
                     break;
-                case 0xF:
+                case TASKCORE_STATE_ITEM_CONFIRMED:
                     methods->commitElementScroll(self);
                     break;
-                case 0x11:
+                case TASKCORE_STATE_SCROLL_CANCELLED:
                     methods->cancelElementScroll(self);
                     break;
             }
@@ -163,34 +164,34 @@ void TaskCore__PlaySound(TaskCore *self, s32 tone) {
 
     sound = (VabStreamObj *)self->sound;
     if (sound != NULL) {
-        sound->methods->playTone(sound, tone, 0x60, 0x60);
+        sound->methods->playTone(sound, tone, TASKCORE_TONE_VOLUME, TASKCORE_TONE_VOLUME);
     }
 }
 
 void TaskCore__OnPadStart(TaskCore *self) {
     if (self->target != NULL) {
-        self->methods->playSound(self, 0x10);
-        self->methods->setState(self, 0xA);
+        self->methods->playSound(self, TASKCORE_TONE_BUTTON);
+        self->methods->setState(self, TASKCORE_STATE_START_PRESSED);
     }
 }
 
 void TaskCore__OnPadConfirm(TaskCore *self) {
-    s32 reason;
+    s32 state;
 
     if (self->target != NULL) {
-        self->methods->playSound(self, 0x10);
-        reason = 0xF;
-        if (self->inputMode == 1) {
-            reason = 0xB;
+        self->methods->playSound(self, TASKCORE_TONE_BUTTON);
+        state = TASKCORE_STATE_ITEM_CONFIRMED;
+        if (self->inputMode == TASKCORE_INPUT_CHOOSING_SLOT) {
+            state = TASKCORE_STATE_SLOT_CONFIRMED;
         }
-        self->methods->setState(self, reason);
+        self->methods->setState(self, state);
     }
 }
 
 void TaskCore__OnPadCancel(TaskCore *self) {
-    if (self->target != NULL && self->inputMode != 1) {
-        self->methods->playSound(self, 0x10);
-        self->methods->setState(self, 0x11);
+    if (self->target != NULL && self->inputMode != TASKCORE_INPUT_CHOOSING_SLOT) {
+        self->methods->playSound(self, TASKCORE_TONE_BUTTON);
+        self->methods->setState(self, TASKCORE_STATE_SCROLL_CANCELLED);
     }
 }
 
@@ -200,9 +201,9 @@ void TaskCore__OnPadPrev(TaskCore *self) {
     if (self->target == NULL) {
         return;
     }
-    if (self->inputMode == 1) {
+    if (self->inputMode == TASKCORE_INPUT_CHOOSING_SLOT) {
         handler = self->methods->findPrevFreeSlot;
-    } else if (self->inputMode == 2) {
+    } else if (self->inputMode == TASKCORE_INPUT_SCROLLING) {
         handler = self->methods->retreatSlotCursor;
     } else {
         return;
@@ -216,9 +217,9 @@ void TaskCore__OnPadNext(TaskCore *self) {
     if (self->target == NULL) {
         return;
     }
-    if (self->inputMode == 1) {
+    if (self->inputMode == TASKCORE_INPUT_CHOOSING_SLOT) {
         handler = self->methods->findNextFreeSlot;
-    } else if (self->inputMode == 2) {
+    } else if (self->inputMode == TASKCORE_INPUT_SCROLLING) {
         handler = self->methods->advanceSlotCursor;
     } else {
         return;
@@ -243,7 +244,7 @@ void TaskCore__RefreshViewValue(TaskCore *self) {
     if (self->viewCallback != NULL) {
         self->viewCallback(self->viewCallbackCtx);
     }
-    self->methods->setState(self, 7);
+    self->methods->setState(self, TASKCORE_STATE_FADE_OUT);
 }
 
 void TaskCore__SetCallback(TaskCore *self, void (*callback)(void *ctx), void *ctx) {
@@ -299,7 +300,7 @@ s32 TaskCore__TickFadeCallback(TaskCore *self) {
         result = self->fadeInCallback(self);
     }
     if (result != 0) {
-        self->methods->setState(self, 5);
+        self->methods->setState(self, TASKCORE_STATE_ACTIVE);
     }
     return result;
 }
@@ -314,7 +315,7 @@ s32 TaskCore__TickColorFade(TaskCore *self) {
     buffer[2] = prod + self->baseColor[2];
     self->methods->broadcastToSlots(self, buffer);
     self->bgLayer->methods->setColor(self->bgLayer, 1, (BgLayerRgb *)buffer);
-    return (u8)prod >= 0x81;
+    return (u8)prod > TASKCORE_FADE_FULL;
 }
 
 s32 TaskCore__TickFadeOutCallback(TaskCore *self) {
@@ -327,7 +328,7 @@ s32 TaskCore__TickFadeOutCallback(TaskCore *self) {
             goto epilogue;
         }
     }
-    self->methods->setState(self, 8);
+    self->methods->setState(self, TASKCORE_STATE_FADED_OUT);
 epilogue:
     return result;
 }

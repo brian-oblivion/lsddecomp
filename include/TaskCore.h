@@ -75,6 +75,43 @@ typedef struct TaskCore TaskCore;
 typedef struct TaskCoreMethods TaskCoreMethods;
 typedef struct TaskCoreTarget TaskCoreTarget;
 
+/* TaskCore's states, above IntermediateBase's START/STOP. setState passes
+ * each to the parents (notifyParents) before acting on it, so the codes from
+ * CURSOR_MOVED on are also events a parent reacts to (TitleMenu__SetState's
+ * START_PRESSED); every one of them returns the menu to ACTIVE. */
+enum TaskCoreState {
+    TASKCORE_STATE_FADE_IN = 4, /* update from START: tickFadeCallback until the fade-in is done */
+    TASKCORE_STATE_ACTIVE = 5,  /* the target's unk8 slot selected, inputMode CHOOSING_SLOT */
+    TASKCORE_STATE_TIMED_OUT = 6, /* update: frameCounter passed frameBound; result 1, refreshViewValue */
+    TASKCORE_STATE_FADE_OUT = 7, /* refreshViewValue: tickFadeOutCallback until the fade-out is done */
+    TASKCORE_STATE_FADED_OUT = 8,       /* update goes on to IntermediateBase's STOP */
+    TASKCORE_STATE_CURSOR_MOVED = 9,    /* setActiveSlot, setSlotCursor */
+    TASKCORE_STATE_START_PRESSED = 10,  /* onPadStart */
+    TASKCORE_STATE_SLOT_CONFIRMED = 11, /* onPadConfirm while choosing a slot: runs tick */
+    TASKCORE_STATE_SCROLL_OPENED = 14,  /* beginElementScroll */
+    TASKCORE_STATE_ITEM_CONFIRMED = 15, /* onPadConfirm while scrolling: runs commitElementScroll */
+    TASKCORE_STATE_SCROLL_COMMITTED = 16, /* commitElementScroll */
+    TASKCORE_STATE_SCROLL_CANCELLED =
+        17 /* onPadCancel while scrolling, then cancelElementScroll: runs cancelElementScroll */
+};
+
+/* inputMode: what the pad events move. */
+enum TaskCoreInputMode {
+    TASKCORE_INPUT_NONE = 0,          /* fading: onPadEvent ignores the pad */
+    TASKCORE_INPUT_CHOOSING_SLOT = 1, /* Up/Down move between the target's slots */
+    TASKCORE_INPUT_SCROLLING = 2      /* Up/Down move the active slot's item cursor */
+};
+
+/* playSound's tones: VabStreamObj__PlayTone indices, program << 4 | tone. */
+#define TASKCORE_TONE_CURSOR 0x00 /* setActiveSlot, setSlotCursor: the cursor moved */
+#define TASKCORE_TONE_BUTTON 0x10 /* onPadStart, onPadConfirm, onPadCancel */
+#define TASKCORE_TONE_VOLUME 96   /* playSound's PlayTone vol and endVol */
+
+/* The fades' end point: a GsBG/sprite colour of 128 draws the texture at its
+ * own brightness. tickColorFade counts up from baseColor and is done past it,
+ * tickFadeColor counts down from it and is done when it wraps below 0. */
+#define TASKCORE_FADE_FULL 128
+
 /* The menu description setTarget builds its slot widgets from (the ctor's
  * first argument; TitleMenu passes &D_80086D44). One slot per `names`
  * entry. */
