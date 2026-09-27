@@ -109,3 +109,14 @@ the two now have different types:
   distance limit, as Entity__GetProximityRatio does for Entity.
 
 Locals `kind` became `tick`. Zero bytes.
+
+## Track 7 (2026-09-27, round 96, charlie)
+
+- Every literal is decimal (VAB program numbers, volumes and tick counts are
+  counts, not masks). None is named: a program number's sound is not
+  established, and a name like `PROGRAM_30` would only restate it. Zero bytes.
+- The `tick == 3` arm writes `program = 3` rather than `program = tick`:
+  byte-exact (33/33 and the whole image, measured this round). GCC stores
+  the register already holding the compared tick either way; what the
+  Derivation's point 2 measured was a fresh `set->tick` field read, which
+  still costs the reload, not a literal.

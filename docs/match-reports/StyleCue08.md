@@ -60,3 +60,9 @@ the two now have different types:
   distance limit, as Entity__GetProximityRatio does for Entity.
 
 Locals `kind` became `tick`. Zero bytes.
+
+## Track 7 (2026-09-27, round 96, charlie)
+
+- Every literal is decimal (VAB program numbers, volumes and tick counts are
+  counts, not masks). None is named: a program number's sound is not
+  established, and a name like `PROGRAM_30` would only restate it. Zero bytes.

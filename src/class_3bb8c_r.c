@@ -91,9 +91,9 @@ void StyleCue01(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     tick = set->tick;
     if (tick == 0) {
-        set->slots[0].program = 0x18;
+        set->slots[0].program = 24;
         set->slots[0].octave = -2;
-    } else if (tick >= 0x401) {
+    } else if (tick >= 1025) {
         set->tick = -1;
     }
 }
@@ -104,7 +104,7 @@ void StyleCue02(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     tick = set->tick;
     if (tick == 0) {
-        set->slots[0].program = 0xC;
+        set->slots[0].program = 12;
         set->slots[0].octave = 2;
     } else if (tick >= 5) {
         set->tick = -1;
@@ -114,57 +114,57 @@ void StyleCue02(StyleCueParam *ctx, SoundCueSet *set) {
 void StyleCue03(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick % 20 == 0) {
-        set->slots[0].program = 0x1E;
-        set->slots[0].vol = 0x20;
+        set->slots[0].program = 30;
+        set->slots[0].vol = 32;
         set->slots[0].octave = 0;
-        set->slots[0].endVol = 0xA;
+        set->slots[0].endVol = 10;
     }
     if (set->tick % 400 == 0) {
-        set->slots[1].program = 0x1E;
+        set->slots[1].program = 30;
         set->slots[1].octave = 0;
     }
     set->slots[2].program = 6;
-    set->slots[2].vol = 0x20;
+    set->slots[2].vol = 32;
     set->slots[2].octave = 0;
-    set->slots[2].endVol = 0xA;
+    set->slots[2].endVol = 10;
 }
 
 void StyleCue04(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick % 3 == 0) {
-        set->slots[0].program = 0x1E;
+        set->slots[0].program = 30;
         set->slots[0].octave = 0;
     }
     if (set->tick % 5 == 0) {
-        set->slots[1].program = 0x1E;
+        set->slots[1].program = 30;
         set->slots[1].octave = 0;
-        set->slots[1].vol = 0x18;
-        set->slots[1].endVol = 0x18;
+        set->slots[1].vol = 24;
+        set->slots[1].endVol = 24;
     }
     if (set->tick % 7 == 0) {
-        set->slots[0].program = 0x1E;
+        set->slots[0].program = 30;
         set->slots[0].octave = 0;
     }
     set->slots[2].program = 6;
     set->slots[2].octave = 1;
-    set->slots[2].vol = 0x2A;
-    set->slots[2].endVol = 0xA;
+    set->slots[2].vol = 42;
+    set->slots[2].endVol = 10;
 }
 
 void StyleCue05(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick == 0) {
-        set->slots[0].program = 0x1E;
+        set->slots[0].program = 30;
         set->slots[0].octave = -1;
-    } else if (set->tick < 0x32 && set->tick % 5 == 4) {
-        set->slots[1].program = 0x1E;
+    } else if (set->tick < 50 && set->tick % 5 == 4) {
+        set->slots[1].program = 30;
         set->slots[1].octave = 0;
         set->slots[1].vol = set->slots[1].vol - set->tick * 2;
         set->slots[1].endVol = set->slots[1].vol;
-    } else if ((u32)(set->tick - 0x65) < 9) {
-        set->slots[2].program = 0xD;
+    } else if (set->tick >= 101 && set->tick < 110) {
+        set->slots[2].program = 13;
         set->slots[2].octave = 1;
-    } else if (set->tick >= 0xC9) {
+    } else if (set->tick >= 201) {
         set->tick = -1;
     }
 }
@@ -177,7 +177,7 @@ void StyleCue06(StyleCueParam *ctx, SoundCueSet *set) {
     if (tick == 0) {
         set->slots[0].program = 7;
         set->slots[0].octave = 2;
-    } else if (tick >= 0x1B) {
+    } else if (tick >= 27) {
         set->tick = -1;
     }
 }
@@ -188,14 +188,14 @@ void StyleCue07(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     tick = set->tick;
     if (tick == 0) {
-        set->slots[0].program = 0x14;
+        set->slots[0].program = 20;
         set->slots[0].octave = 1;
     } else if (tick == 3) {
         set->slots[0].octave = 2;
-        set->slots[0].vol = 0x18;
-        set->slots[0].program = tick;
-        set->slots[0].endVol = 0x14;
-    } else if (tick >= 0x33) {
+        set->slots[0].vol = 24;
+        set->slots[0].program = 3;
+        set->slots[0].endVol = 20;
+    } else if (tick >= 51) {
         set->tick = -1;
     }
 }
@@ -205,8 +205,8 @@ void StyleCue08(StyleCueParam *ctx, SoundCueSet *set) {
     if (set->tick % 20 == 0) {
         set->slots[0].program = 9;
         set->slots[0].octave = 0;
-        set->slots[0].vol = 0x40;
-        set->slots[0].endVol = 0x40;
+        set->slots[0].vol = 64;
+        set->slots[0].endVol = 64;
     }
 }
 
@@ -238,10 +238,10 @@ void StyleCue11(StyleCueParam *ctx, SoundCueSet *set) {
     StyleCue10(ctx, set);
     rem = set->tick % 70;
     if (rem == 50) {
-        set->slots[2].program = 0x14;
+        set->slots[2].program = 20;
         set->slots[2].octave = 1;
-    } else if ((u32)(rem - 54) < 5) {
-        set->slots[2].program = 0xD;
+    } else if (rem >= 54 && rem < 59) {
+        set->slots[2].program = 13;
         set->slots[2].octave = 1;
     } else if (rem == 61) {
         set->slots[2].program = 9;
@@ -255,19 +255,19 @@ void StyleCue12(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     tick = set->tick;
     if (tick == 0) {
-        set->slots[0].program = 0x14;
+        set->slots[0].program = 20;
         set->slots[0].octave = -2;
-        set->slots[1].program = 0x14;
+        set->slots[1].program = 20;
         set->slots[1].octave = -2;
     } else if (tick == 4) {
-        set->slots[1].program = 0x14;
+        set->slots[1].program = 20;
         set->slots[1].octave = -2;
-    } else if (tick == 0x14) {
-        set->slots[0].program = 0x10;
+    } else if (tick == 20) {
+        set->slots[0].program = 16;
         set->slots[0].octave = -2;
-        set->slots[1].program = 0x12;
+        set->slots[1].program = 18;
         set->slots[1].octave = -2;
-    } else if (tick >= 0xC9) {
+    } else if (tick >= 201) {
         set->tick = -1;
     }
 }
@@ -275,7 +275,7 @@ void StyleCue12(StyleCueParam *ctx, SoundCueSet *set) {
 void StyleCue13(StyleCueParam *ctx, SoundCueSet *set) {
     set->attenuation = ComputeStyleCueFalloff(ctx);
     if (set->tick == 0) {
-        set->slots[0].program = 0x18;
+        set->slots[0].program = 24;
         set->slots[0].octave = 0;
     }
 }
@@ -307,7 +307,7 @@ extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
 StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *parent, LongVec3 *pos) {
-    StyleEffect *self = BMemPMgrAlloc(0x98);
+    StyleEffect *self = BMemPMgrAlloc(sizeof(StyleEffect));
 
     if (self != NULL) {
         if (GetStyleEffectMethods()->ctor(self, kind, params, parent, pos) != NULL) {
