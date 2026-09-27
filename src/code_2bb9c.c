@@ -107,7 +107,7 @@ void TimImage__NoOpSlot7C(void) {}
 void TimImage__NoOpSlot80(void) {}
 
 /* TimImage slot (tools/classtable.py); empty body. */
-void TimImage__func_8003B5BC(void) {}
+void TimImage__NoOpSlot84(void) {}
 
 /* TimImage slot (tools/classtable.py); empty body. */
 void TimImage__func_8003B5C4(void) {}
