@@ -1,4 +1,6 @@
-# GetGridRecordBase -- MATCHED (9/9 words)
+# GetStageMapChunkRecords -- MATCHED (9/9 words)
+
+> Renamed from `GetGridRecordBase` on 2026-09-27 (tools/rename.py). Address 0x8004903c.
 
 > Renamed from `func_8004903C` on 2026-09-25 (tools/rename.py). Address 0x8004903c.
 
@@ -17,7 +19,7 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
 Rec1C *GetStageRecords(s32 index);   /* INCLUDE_ASM in this unit */
 
-Rec1C *GetGridRecordBase(s32 index) {
+Rec1C *GetStageMapChunkRecords(s32 index) {
     return &GetStageRecords(index)[9];
 }
 ```
@@ -34,6 +36,6 @@ Rec1C *GetGridRecordBase(s32 index) {
 
 ## Naming
 
-- **Name:** `GetGridRecordBase`
+- **Name:** `GetStageMapChunkRecords`
 - **Tier:** A
 - **Evidence:** pure getter: &GetStageRecords(index)[9].

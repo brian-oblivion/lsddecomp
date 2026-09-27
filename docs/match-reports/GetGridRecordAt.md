@@ -9,16 +9,16 @@ Byte-exact on the FIRST build; whole-image SHA1 green
 
 ## What it does
 
-`&GetGridRecordBase(index)[sub]`: the `sll 3 / subu / sll 2` is the x28 multiply of a 0x1C-byte record index. `sub` is kept in `$s0` across the call and `index` passes through untouched in `$a0`.
+`&GetStageMapChunkRecords(index)[sub]`: the `sll 3 / subu / sll 2` is the x28 multiply of a 0x1C-byte record index. `sub` is kept in `$s0` across the call and `index` passes through untouched in `$a0`.
 
 ## Source
 
 ```c
 typedef struct Rec1C { u8 data[0x1C]; } Rec1C;
-Rec1C *GetGridRecordBase(s32 index);
+Rec1C *GetStageMapChunkRecords(s32 index);
 
 Rec1C *GetGridRecordAt(s32 index, s32 sub) {
-    return &GetGridRecordBase(index)[sub];
+    return &GetStageMapChunkRecords(index)[sub];
 }
 ```
 
@@ -36,4 +36,4 @@ Rec1C *GetGridRecordAt(s32 index, s32 sub) {
 
 - **Name:** `GetGridRecordAt`
 - **Tier:** A
-- **Evidence:** pure getter: &GetGridRecordBase(index)[sub].
+- **Evidence:** pure getter: &GetStageMapChunkRecords(index)[sub].
