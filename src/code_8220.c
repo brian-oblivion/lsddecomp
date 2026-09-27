@@ -51,7 +51,7 @@ void *BMemPMgrInit(s32 poolSize) {
         pool->poolSize = poolSize;
         SetupBMemPMgrFreeList(pool);
     } else {
-        printf(D_8001028C, NULL, poolSize);
+        printf(sBMemPMgrInitFailFmt, NULL, poolSize);
     }
     return pool;
 }

@@ -11,7 +11,7 @@ initializes the pool header (`freeListHead = pool + 0x1C`, `poolSize`) and
 hands off to `SetupBMemPMgrFreeList` (gp_rel-blocked, see its own report) to build
 the initial single free block covering the rest of the allocation. On
 allocation failure, logs an error via the Psy-Q printf wrapper
-(`func_80012C20`) using the rodata format string at `D_8001028C`
+(`func_80012C20`) using the rodata format string at `sBMemPMgrInitFailFmt`
 (`"bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n"`) and returns `NULL`.
 
 This confirms the unit's premise from the runner prompt: the format string
@@ -34,11 +34,20 @@ void *BMemPMgrInit(s32 poolSize)
         pool->poolSize = poolSize;
         SetupBMemPMgrFreeList(pool);
     } else {
-        func_80012C20(D_8001028C, NULL, poolSize);
+        func_80012C20(sBMemPMgrInitFailFmt, NULL, poolSize);
     }
     return pool;
 }
 ```
+
+## Naming (round 97)
+
+- `D_8001028C` -> `sBMemPMgrInitFailFmt`, tier A (`tools/rename.py`,
+  runner delta). The rodata string is
+  `"bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n"`, and its one reader is
+  this function's malloc-failed branch. `s` prefix: unit-static data, read
+  by no other unit (precedent `sStrComInput`; `gCdFileNotFoundFmt` is the
+  same shape of name for a string another unit shares).
 
 ## Three levers, each confirmed by objdump before moving to the next
 

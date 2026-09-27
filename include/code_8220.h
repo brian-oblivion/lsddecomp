@@ -105,7 +105,7 @@ extern s32 GetBMemPMgrBusy(void);
 
 /* The "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n" format string,
  * asm/data/A8C.rodata.s. */
-extern const char D_8001028C[];
+extern const char sBMemPMgrInitFailFmt[];
 
 /* Global boolean flag read by SetupPrimCode, asm/data (bss/data, not yet
  * carved). Read by SetupPrimCode, written by SortTmdObject (both code_8220_b)
