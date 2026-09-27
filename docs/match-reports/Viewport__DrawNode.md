@@ -187,7 +187,6 @@ as one `/* MATCHING: */` line at each construct; the measurements behind
 them are "Levers" above):
 
 ```c
-
 /*
  * Draw `node` into self's current ordering table, after first drawing every
  * child whose class-id low nibble is 4 and whose parent is `node`.
@@ -198,9 +197,10 @@ them are "Levers" above):
  *  - `pos` and the unused `scr` live in the world-space-sprite block: that
  *    puts them ABOVE child/cursor in the frame, and `scr` is the 8 bytes of
  *    frame retail reserves and never touches.
- *  - `box`/`screenSprite` are separate copies of `node` (retail's move a3/a1/a0,s2);
+ *  - `b`/`n` are separate copies of `node` (retail's move a3/a1/a0,s2);
  *    the ratio ternaries are one store each (the second copy of the store
  *    is the delay-slot filler's); `~v + 1` is retail's nor/addiu negate.
+ */
 ```
 
 The extern's comment was `/* code_d294_c.c (include/code_d294.h) */`, and `scr`'s was `/* never used; reserves retail's 8 unused frame bytes */`.
