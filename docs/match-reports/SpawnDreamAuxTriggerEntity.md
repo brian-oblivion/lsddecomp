@@ -172,3 +172,40 @@ rename, confirmed confined to this unit by rebuild).
 The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are the typed slots updateRotation and attachToParent (through TodActorAttachToParentFn: peer gDreamAuxWorld, companion gDreamAuxFrameClock, parent gDreamAuxStageMap, offset outBuf), same bytes. DreamAuxObjFn11/13 deleted.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+Parameters kind/out/ctx/entry -> moodIndex/desc/trigger/spawnIndex (`ctx` is
+the chunk's DreamAuxTriggerEntry; `*(u16 *)ctx` is `trigger->key`; reading it
+through the s16 field is byte-identical). The local cell descriptor
+is StageMap.h's Descriptor10 as computeCellOffsets reads it: `chunk` (the
+chunk's column/row), `cell` (DreamAuxSpawnInfo.cell, was val0), `offset`
+(gDreamAuxPosTable[offsetIndex], was posIndex). D_80088F18 was renamed
+gDreamAuxSpawnRotations (tools/rename.py, tier A): four Ratio16 triples,
+yaw 0, -90, +90, 180, typed Ratio16[][3] and indexed by rotationIndex (was
+val2) instead of `+ val2 * 12`. outBuf -> worldPos. Byte-identical.
+
+The comments, as they stood:
+
+```c
+/* `out` is a 4-word (0x10-byte) caller stack scratch buffer, reused across
+ * every call in ProcessDreamAuxTriggerRecord's loop. Its LAST word is pre-populated by the
+ * caller with the return value of the TriggerWorld getModelData (+0x088) call before
+ * the loop starts (`scratch[3] = (s32)callResult;` in ProcessDreamAuxTriggerRecord) --
+ * confirmed load-bearing: the match was 19/69 without it, 69/69 with it, no
+ * other change. SpawnDreamAuxTriggerEntity itself MATCHED round 43 (once the
+ * gp-relative blocker was resolved, see docs/research/gp-relative-blocker.md)
+ * and never reads `out` -- it only forwards it untouched to `New_Entity`'s
+ * 2nd argument; its own outgoing buffer is a separate local `outBuf[4]`. */
+
+/* A 4-byte record indexed by `entry` (this function's own last parameter):
+ * a u16 followed by two signed bytes. `val2` indexes D_80088F18 (stride
+ * 0xC, element type undiscovered -- only its address is ever taken here)
+ * and `posIndex` indexes gDreamAuxPosTable (stride 6, see DreamAuxPos6
+ * below; named round 63 -- confirmed by this struct's only reader). */
+
+/* A 6-byte position record: a 4-byte (x,y) pair copied as ONE unaligned
+ * whole-struct assignment (the idiom CLAUDE.md documents: an all-s8/s16
+ * struct at alignment 2 compiles a whole-struct copy to lwl/lwr), plus a
+ * separate z half-word. Indexed by DreamAuxSpawnInfo.posIndex. */
+```

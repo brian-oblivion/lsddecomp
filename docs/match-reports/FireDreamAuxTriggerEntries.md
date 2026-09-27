@@ -139,3 +139,12 @@ takes the ctor's descriptor (`struct ResourceSource *`: {buffer, name}), so the
 call casts the stack array whose first word is the buffer:
 `New_TriggerWorld((struct ResourceSource *)ctxArg)`. A pointer cast, no code; bytes
 unchanged.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+Parameters a0/a1/a2 -> day/trigger/data; returns TriggerWorld *. The
+descriptor is a ResourceRequest (`req.src.buffer = data`): a bare
+ResourceSource shrinks the frame by 8 (measured this round), so it keeps a
+MATCHING line. The records are `&records[index]` of TriggerRecord (8-byte,
+the same records InitDreamAux clears) instead of a `(u8 *)base + entry * 8`
+cast, and the index list is trigger->recordIndices. Byte-identical.

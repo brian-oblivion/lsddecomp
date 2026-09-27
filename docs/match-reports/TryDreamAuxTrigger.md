@@ -112,3 +112,11 @@ a small random/parity chance, silently despawns instead
 "Try" reflects the function's own fallible, silently-returning-0 shape; the
 broader game meaning of the (value, key, parity) triple it is handed is not
 established from this unit alone, hence B not A.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+Parameters from the caller (ObjM__CheckAuxTrigger, class_3bb8c_m.c): a0 ->
+`data` (the chunk's loaded data block), a1 -> `chunkKey` (a ChunkCoord read
+as one s16), a2 -> `day` (DreamSys getCurrentDayAndYear); `record` ->
+`trigger`, typed DreamAuxTriggerEntry *. `rand() % 12` stays a literal (a 1
+in 12 chance). Byte-identical.

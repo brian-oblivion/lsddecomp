@@ -775,3 +775,28 @@ game-level meaning of `sel`'s cases is not established from this unit alone,
 hence B not A. Renamed `record->unk0` to `triggered` in the struct
 definition as part of this pass (see the commit renaming struct fields);
 every accessor was confined to this unit, confirmed by rebuild.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+`value` -> `day`, `sel` -> `condition`, `idx` -> `id`. The ids are
+enum TriggerCondition (include/code_4cd08.h), and `switch (idx - 2)` with
+cases 0..19 is `switch (id)` with the enum's cases: GCC subtracts the lowest
+case itself, byte-identical. Two MATCHING lines stand for the derivation
+below and above: the `id = condition; goto have_idx;` arm placed before
+`negate:`, and `~condition + 1` (nor + addiu, where -condition is one negu).
+
+The function comment, as it stood:
+
+```c
+/* CheckDreamAuxTriggerCondition -- MATCHED round 25.  The last word came from BASIC-BLOCK
+ * ORDER, not from the expression shapes.  Retail lays the `sel >= 0` arm
+ * out BETWEEN the `return false` path and the `~sel + 1` tail, so it needs
+ * an explicit `j` over the join; the obvious spelling
+ * (`if (sel < 0) { ...; idx = ~sel + 1; goto have_idx; } idx = sel;`) lets
+ * the `sel >= 0` arm fall through into the join instead and is one word
+ * short forever.  Writing the inner test as `if (triggered == 0) goto negate;
+ * return false;`, with the `idx = sel; goto have_idx;` block placed
+ * textually BEFORE the `negate:` label, reproduces retail's block order
+ * exactly.  See docs/match-reports/CheckDreamAuxTriggerCondition.md.
+ */
+```

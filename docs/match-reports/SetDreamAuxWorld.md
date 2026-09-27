@@ -129,3 +129,23 @@ it is stored in, gDreamAuxWorld, `s32` -> `DreamSys *` (code_4cd08.c). Its
 only caller, ObjM__SetupSceneStyle (class_3bb8c_l), passes its DreamSys
 `target`; code_4cd08 calls +0x200 of its table (getDreamColor) and passes
 it as Entity's peer. Byte-identical.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+Parameters named from the caller (ObjM__SetupSceneStyle, class_3bb8c_l.c,
+whose own declaration already says `stage, grid, world, sound, clock`, and
+ObjM.h: unk14 the StageMap, unk10 the FrameClock, TimedTask's sound the
+VabStreamObj): a0..a4 -> stage, stageMap, world, sound, frameClock. The
+globals it installs were renamed with tools/rename.py: D_8008ABFC ->
+gDreamAuxStageMap (tier A), D_8008AC04 -> gDreamAuxSound (tier A, New_Entity's
+`sound`), D_8008AC08 -> gDreamAuxFrameClock (tier A, TodActor's attachToParent
+`companion`), and typed `struct VabStreamObj *` / `struct FrameClock *`. The
+entity's mood row is DREAM_AUX_FIRST_MOOD + i (98); `buf` -> `desc`
+(New_Entity's descriptor, ModelData in word +0x00C). Byte-identical.
+
+The extern comments, as they stood:
+
+```c
+extern StageMap *D_8008ABFC; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
+extern DreamSys *gDreamAuxWorld; /* the player DreamSys: class_3bb8c_l passes its `target` */
+```

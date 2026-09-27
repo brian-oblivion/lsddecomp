@@ -93,3 +93,15 @@ does not support. Tier stays A; only the noun changed.
 The `/ 30` is suggestive of a day-to-period conversion given this project's
 `DreamSys__AdvanceDay`, but nothing in this unit establishes it, so the name
 does not encode it.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+## Naming (round 100)
+
+**IsDayInPeriodPhase** (was MatchesDreamAuxProgression) -- tier B.
+`(day - 1) / 30 + 1` is the day's 30-day period counted from 1 (day is
+DreamSys's 1-based current day), and the loop accepts phase, phase + 3,
+phase + 6 and phase + 9: every third period of twelve. Its caller passes
+phase 1..3 (conditions 2..4). 30 is DREAM_PERIOD_DAYS. Tier B: the
+mechanics are exact, the periods' meaning in the game is not established.
+a0/a1/target -> day/phase/period. Byte-identical.

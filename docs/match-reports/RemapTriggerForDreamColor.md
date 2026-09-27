@@ -81,3 +81,18 @@ unchanged). The name `TriggerWorld` now belongs to the class gTriggerWorldMethod
 (include/TriggerWorld.h), whose table is 0x8C bytes: this call loads byte
 +0x200 of its object's table (`lw v0,512(v0)`), so gDreamAuxWorld is not a
 TriggerWorld. Its real class is unresolved. Bytes unchanged.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+## Naming (round 100)
+
+**RemapTriggerForDreamColor** (was AdjustDreamAuxTriggerOffset) -- tier B.
+The `+0x1E` is five 6-byte DreamAuxTriggerEntries, so on stage 4 the chunk
+trigger at index 16 is replaced by index 21 when the player's dream colour
+(DreamSys getDreamColor, slot +0x200) is DREAM_COLOR_RED (4). The retry
+check "still reports state 4" above was the colour compared against the
+cached stage, which happens to be 4 too: `color == DREAM_COLOR_RED` is
+byte-identical (tested this round), so the enum is the spelling. Tier B: the
+mechanics are exact; why that one trigger has a red variant is not known.
+Parameters a0/a1 -> trigger/index, locals val/w/result -> stage/player/color;
+the function takes and returns DreamAuxTriggerEntry *. Byte-identical.

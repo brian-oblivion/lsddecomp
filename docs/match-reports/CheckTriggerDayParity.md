@@ -100,3 +100,24 @@ since this predicate reads a byte offset shared with `TriggerRecord.parity`
 without being proven to be the same field (see the header's own caveat on
 `TriggerRecord`'s offset-0x2 comment) -- "Trigger" alone reflects that
 looser confidence.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+## Naming (round 100)
+
+**CheckTriggerDayParity** (was CheckTriggerParity) -- tier A. Its first
+argument is the day (TryDreamAuxTrigger's `day`, DreamSys
+getCurrentDayAndYear), not a coordinate: dayParity 0 passes every day, 1 odd
+days, 2 even days. It takes DreamAuxTriggerEntry * (field `dayParity`, was
+`entry[2]`). Byte-identical.
+
+The function comment, as it stood:
+
+```c
+/* True when `entry`'s side/parity byte (offset 0x2) disagrees with
+ * `coordParity`'s own parity. `entry` is a candidate spawn/link record from
+ * one of this unit's stage tables (see LookupDreamAuxTrigger); its layout beyond this
+ * one byte is not yet known here, so it is addressed by byte offset rather
+ * than through a named struct. A parity byte of 0 means "no side constraint",
+ * hence the early `true`. */
+```

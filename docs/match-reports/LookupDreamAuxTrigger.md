@@ -94,3 +94,22 @@ issue.
 `*a0`, dispatching the match (or its absence) into
 `RemapTriggerForDreamColor`. The search IS the function's purpose, so tier
 A applies even though it delegates the on-hit adjustment to a sibling.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+Returns `DreamAuxTriggerEntry *` (was the entry smuggled as s32); a0 ->
+`chunkKey`, idx -> `stage`, entry -> `trigger`. DreamAuxTriggerEntry's other
+four bytes are named: `dayParity` (CheckTriggerDayParity's byte 2) and
+`recordIndices[3]` (FireDreamAuxTriggerEntries' bytes 3..5). Byte-identical.
+
+The header comment, as it stood:
+
+```c
+/* A second parallel-group family, same "count + pointer to array" shape as
+ * DreamAuxGroupRecord above but a different stride and a different index
+ * space: 14 (0xE) groups selected by `gDreamAuxStage` (not a loop index),
+ * gDreamAuxTriggerCounts[i] a signed count, gDreamAuxTriggerEntries[i] a pointer to an array of
+ * count 6-byte records whose first 2 bytes (`key`, read with `lh`) are the
+ * only field LookupDreamAuxTrigger accesses. The remaining 4 bytes are undiscovered
+ * from this unit alone. */
+```

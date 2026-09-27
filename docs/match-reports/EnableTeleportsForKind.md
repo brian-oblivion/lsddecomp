@@ -102,3 +102,10 @@ renamed the formerly-`triggerType` parameter to `kind` to match the caller's
 actual argument and this unit's own `TriggerRecord.kind` field. Tier B, not
 A, because WHY these four values enable teleports (as opposed to some other
 game-meaningful grouping) is not established from this unit alone.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+Parameter `kind` -> `moodIndex`: ProcessDreamAuxTriggerRecord passes the
+record's moodIndex, the same byte it passes New_Entity as its mood row. The
+literals are written decimal (78, 79, 11, 56, 93): they are mood-row
+indices. Left unnamed: nothing shows what those rows are. Byte-identical.

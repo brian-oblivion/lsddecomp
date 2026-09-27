@@ -115,3 +115,16 @@ not read directly off any single instruction.
 `a0->entity` is now `Entity *` and its raw `vtable[0x14]`/`vtable[0x13]` calls are detachFromParent and attachToParent (through TodActorAttachToParentFn), same bytes. DreamAuxObjFn13/14 deleted.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+## Naming (round 100)
+
+**PlaceDreamAuxEntityByPlayer** (was DespawnDreamAuxEntity) -- tier A. It
+despawns nothing: it detaches the slot's entity, converts the slot's `pos`
+(an offset from the player, {0, -200, 8000} in the image) to a world
+position with SceneNode__LocalOffsetToWorldPos, re-attaches the entity there
+and turns it to face the player (SceneNode__FaceTarget, zeroPitch 1).
+TryDreamAuxTrigger calls it when a chunk trigger's day parity rules the day
+out. a0 -> slot, localPos -> worldPos (it is the world position the
+conversion writes). Byte-identical.

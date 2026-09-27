@@ -107,3 +107,31 @@ unchanged). The name `TriggerWorld` now belongs to the class gTriggerWorldMethod
 (include/TriggerWorld.h), whose table is 0x8C bytes: this call loads byte
 +0x200 of its object's table (`lw v0,512(v0)`), so gDreamAuxWorld is not a
 TriggerWorld. Its real class is unresolved. Bytes unchanged.
+
+## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+
+## Naming (round 100)
+
+**IsCurrentDreamColor** (was CheckDreamAuxWorldState) -- tier A, a leaf.
+It returns whether the player's getDreamColor (DreamSys +0x200) equals a
+signed byte at D_80088D16 + idx. D_80088D16 is splat's split of SPECIAL_DAYS'
+last 10 bytes, and its only caller passes ids 10..17, so the bytes read are
+SPECIAL_COLORS[0..7] (0x80088D20; DreamSys.h, previously with no reader):
+`SPECIAL_COLORS[condition - TRIGGER_COND_DREAM_COLOR_FIRST]` is
+byte-identical and the D_80088D16 extern is gone. Locals idx/w/val/result ->
+condition/player/color/current.
+
+The comments, as they stood:
+
+```c
+/* Compares gDreamAuxWorld's getDreamColor (DreamSys +0x200) against a per-idx signed byte from D_80088D16. */
+
+/* A small signed-byte lookup table read by CheckDreamAuxWorldState, indexed by its
+ * `idx` parameter. Layout beyond "one signed byte per entry" is not known
+ * from this unit alone. */
+
+/* gDreamAuxWorld is the player DreamSys (include/DreamSys.h, track 4
+ * round 88): the +0x200 its table is called at is getDreamColor, and
+ * class_3bb8c_l hands SetDreamAuxWorld its DreamSys `target`. code_4cd08.c
+ * declares it; the DreamAuxWorld view that stood here is gone. */
+```
