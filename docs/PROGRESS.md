@@ -76,7 +76,7 @@ jobs, all Opus, none sent back. Gate 0 green.
   - `VAB_TONE_BITS`/`VAB_TONES_PER_PROG` into VabStreamObj.h.
   - Nibble-mask names beside `CLASS_ID_ROOT_MASK`.
   - A FileResource seek-mode enum, and a DreamSys endDay enum.
-  - `D_8008E228` -> `_svm_okon1`.
+  - (`D_8008E228` -> `_svm_okon1` was applied by the head after the fix.)
 
 ---
 
