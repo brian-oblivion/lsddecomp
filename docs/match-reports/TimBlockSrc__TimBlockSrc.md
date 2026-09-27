@@ -112,7 +112,7 @@ Occupant of +0x008. Fields now named: +0x2C `blockCount`, +0x30 `blocks`, +0x38 
 | --- | --- | --- | --- |
 | `0x1E0` | `CLUT_FADE_Y` (480) | A | the ramps' clutY base here, FadeClutRow's src.y base, and TimArraySrc__BuildImages' CLUT-row origin: the VRAM row the fade CLUTs start at |
 | `0x100` | `CLUT_COLORS` (256) | A | the width of each ramp's CLUT RECT; FadeClutRow reads and writes rows of that many 16-bit colours |
-| `0x24` | `sizeof(Hdr43200)` | A | the header buffer's allocation and bufferSize, the size AdvanceLoadState copies |
+| `0x24` | `sizeof(TimBlockHeaderBytes)` | A | the header buffer's allocation and bufferSize, the size AdvanceLoadState copies |
 | `0x800` | `CD_SECTOR_SIZE` (2048) | A | the first read of the file, whose first 36 bytes are the header |
 | `9` | `TIMBLOCK_LOAD_HEADER` | A | set before the header-sector read; AdvanceLoadState's branch for it parses the header |
 | `4` | `ARRAY_COUNT(self->entries)` | A | the loop fills `entries[4]` |

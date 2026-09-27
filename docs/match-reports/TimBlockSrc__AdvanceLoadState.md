@@ -31,9 +31,9 @@ top of / earlier in `src/code_33808.c`.
  * read the next block -- or, after the last, free the sector buffer, mark
  * +0x3C done and run the active driver's setFlag. An allocation failure
  * sets +0x80. */
-typedef struct Hdr43200 {
+typedef struct TimBlockHeaderBytes {
     u8 bytes[0x24];
-} Hdr43200;
+} TimBlockHeaderBytes;
 
 extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
@@ -49,7 +49,7 @@ void TimBlockSrc__AdvanceLoadState(Obj43068 *self) {
     switch (self->unk2A) {
         case 9:
             if (self->flags & 0x80) {
-                *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
+                *(TimBlockHeaderBytes *)self->buffer = *(TimBlockHeaderBytes *)self->sector;
                 BMemPMgrFree(self->sector);
                 max = FindMaxTimBlockSize((FileResource *)self);
                 self->unk30 = (s32)BMemPMgrAlloc(*(u32 *)self->buffer * 4);
@@ -103,7 +103,7 @@ out:
 
 ## Notes
 
-Second build (the first was already 183/183; the second only added local Lock/UnlockActiveDataSource prototypes, which the unit declares further down, to avoid implicit declarations). The shape: a two-case `switch (self->unk2A)` (retail `beq 9; beq 10; j <out>`), `goto fail` for both allocation failures with the `fail:` block (`unk80 = 1`) after the switch and a `goto out` over it; cc1 cross-jumps the two identical `read(...); unk2A = 10;` tails into retail's shared `L80043460`. The header copy is a struct assignment through a `u8 bytes[0x24]` view (`Hdr43200`, alignment 1), which is what produces retail's runtime-aligned block move (`or; andi 3; beqz` choosing a lw/sw loop or a lwl/lwr loop, 0x20 bytes, then one 4-byte tail). Uses the `Obj43068` view TimBlockSrc__TimBlockSrc introduced.
+Second build (the first was already 183/183; the second only added local Lock/UnlockActiveDataSource prototypes, which the unit declares further down, to avoid implicit declarations). The shape: a two-case `switch (self->unk2A)` (retail `beq 9; beq 10; j <out>`), `goto fail` for both allocation failures with the `fail:` block (`unk80 = 1`) after the switch and a `goto out` over it; cc1 cross-jumps the two identical `read(...); unk2A = 10;` tails into retail's shared `L80043460`. The header copy is a struct assignment through a `u8 bytes[0x24]` view (`TimBlockHeaderBytes`, alignment 1), which is what produces retail's runtime-aligned block move (`or; andi 3; beqz` choosing a lw/sw loop or a lwl/lwr loop, 0x20 bytes, then one 4-byte tail). Uses the `Obj43068` view TimBlockSrc__TimBlockSrc introduced.
 
 ## Naming
 
@@ -128,4 +128,4 @@ TimArraySrc unified (include/TimArraySrc.h): TimBlockSrc's `blocks` is now `stru
 | `((u32 *)buffer)[0]`, `[1]`, `[n + 1]` | `TimBlockHeader` `count`, `offsets[0]`, `offsets[n]` | A | the header's words from +0x04 are what each block read seeks to; the words from +0x14 (FindMaxTimBlockSize) size the buffer every block is read into, so they are the sizes |
 | `* 4` | `* sizeof(*self->blocks)` | A | the TimArraySrc pointer array |
 
-MATCHING line kept on the header copy: `Hdr43200` is a byte array so the copy is byte-aligned, which is what gives retail's runtime alignment test (`or; andi 3; beqz`) choosing a word or an lwl/lwr loop.
+MATCHING line kept on the header copy: `TimBlockHeaderBytes` is a byte array so the copy is byte-aligned, which is what gives retail's runtime alignment test (`or; andi 3; beqz`) choosing a word or an lwl/lwr loop.

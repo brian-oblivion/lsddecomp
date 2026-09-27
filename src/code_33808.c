@@ -131,9 +131,9 @@ void *New_TimBlockSrc(s32 name) {
 }
 
 /* A TIM-block file's header, as copied. */
-typedef struct Hdr43200 {
+typedef struct TimBlockHeaderBytes {
     u8 bytes[36];
-} Hdr43200;
+} TimBlockHeaderBytes;
 
 /* The same header, read: a block count, then the blocks' file offsets and
  * their sizes. */
@@ -176,11 +176,11 @@ void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name) {
         e->clutW = CLUT_COLORS;
         e->clutH = 1;
     }
-    hdr = BMemPMgrAlloc(sizeof(Hdr43200));
+    hdr = BMemPMgrAlloc(sizeof(TimBlockHeaderBytes));
     if (hdr != NULL) {
         self->sector = BMemPMgrAlloc(CD_SECTOR_SIZE);
         if (self->sector != NULL) {
-            self->bufferSize = sizeof(Hdr43200);
+            self->bufferSize = sizeof(TimBlockHeaderBytes);
             self->buffer = hdr;
             self->loadState = TIMBLOCK_LOAD_HEADER;
             self->failed = 0;
@@ -216,7 +216,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
         case TIMBLOCK_LOAD_HEADER:
             if (self->flags & CD_FLAG_READ_DONE) {
                 /* MATCHING: a byte-aligned struct copy; a word-aligned one loses retail's runtime alignment test */
-                *(Hdr43200 *)self->buffer = *(Hdr43200 *)self->sector;
+                *(TimBlockHeaderBytes *)self->buffer = *(TimBlockHeaderBytes *)self->sector;
                 BMemPMgrFree(self->sector);
                 max = FindMaxTimBlockSize((FileResource *)self);
                 self->blocks =
