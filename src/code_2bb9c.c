@@ -50,7 +50,7 @@ extern FileResourceMethods *GetActiveDataSourceMethods(void);
 TimImage *New_TimImage(char *name) {
     TimImage *self;
 
-    self = BMemPMgrAlloc(0x50);
+    self = BMemPMgrAlloc(sizeof(TimImage));
     if (self != NULL) {
         GetTimImageMethods()->ctor(self, name);
         return self;
@@ -90,7 +90,7 @@ void TimImage__Upload(TimImage *self) {
         rect.w = self->tim.pw;
         rect.h = self->tim.ph;
         draw->methods->loadImage(draw, &rect, (u32 *)self->tim.pixel);
-        if ((self->tim.pmode >> 3) & 1) {
+        if ((self->tim.pmode >> TIM_PMODE_CLUT_BIT) & 1) {
             rect.x = self->tim.cx;
             rect.y = self->tim.cy;
             rect.w = self->tim.cw;

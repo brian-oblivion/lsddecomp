@@ -64,6 +64,10 @@ struct TimImage {
 
 typedef void (*TimImageUploadFn)(TimImage *self);
 
+/* GsIMAGE.pmode is the TIM file's flag word: the low bits the pixel mode, bit 3
+ * (CF) set when the file carries a CLUT (TimImage__Upload uploads it then). */
+#define TIM_PMODE_CLUT_BIT 3
+
 extern TimImageMethods gTimImageMethods;
 extern TimImageMethods *GetTimImageMethods(void);
 
