@@ -115,5 +115,5 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 The descriptor type `UnkArg1Obj` -> `TodActorDesc` (`tools/renametype.py
 UnkArg1Obj TodActorDesc --any-stem`). Tier B: only its +0x00C (a ModelData to
 borrow) is read here; when that is NULL the whole descriptor goes to
-New_ModelData as code_33808.c's ResourceSource ({buffer, name}). Its +0x000..+0x00B
+New_ModelData as GraphicsResources.c's ResourceSource ({buffer, name}). Its +0x000..+0x00B
 stay padding in this view.

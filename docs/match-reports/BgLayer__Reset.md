@@ -2,7 +2,7 @@
 
 > Renamed from `func_80044294` on 2026-09-25 (tools/rename.py). Address 0x80044294.
 
-Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
+Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 59/59 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gBgLayerMethods +0x040 (the SceneNode `reset
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/code_33808.c`.
+top of / earlier in `src/GraphicsResources.c`.
 
 ```c
 /* gBgLayerMethods +0x040: reset -- lay out the GsBG at +0x044 over a map

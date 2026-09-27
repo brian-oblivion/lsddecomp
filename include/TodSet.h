@@ -6,7 +6,7 @@
 /*
  * TodSet -- a Tod subclass (class id 0x14F03, method table gTodSetMethods) over
  * a buffer holding several TOD animations: a counted offset table, one Tod
- * per entry, then the packet data. Methods in src/code_33808.c; no
+ * per entry, then the packet data. Methods in src/GraphicsResources.c; no
  * subclasses. Its parent is its id parent: TodSet__TodSet's first call is
  * GetTodMethods()->ctor.
  *
@@ -32,8 +32,8 @@
  *
  * The ctor returns self or NULL (New_TodSet tests it), but TOD_SLOTS
  * declares +0x008 returning void, as Tod's own ctor does; the allocator
- * reaches it through code_33808.c's unprototyped UnprototypedCtorTable view, as every
- * allocator in that unit does. The descriptor is code_33808.c's ResourceSource;
+ * reaches it through GraphicsResources.c's unprototyped UnprototypedCtorTable view, as every
+ * allocator in that unit does. The descriptor is GraphicsResources.c's ResourceSource;
  * only the tag is declared here, as include/Tod.h does.
  */
 

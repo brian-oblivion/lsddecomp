@@ -7,7 +7,7 @@
  * LinkResource -- a FileResource data source (class id 0xD03, method table
  * gLinkResourceMethods) over one loaded TMD file: it builds one TmdModel
  * (include/TmdModel.h) per object of the TMD and hands them out by index.
- * Methods in src/code_33808.c; no subclasses.
+ * Methods in src/GraphicsResources.c; no subclasses.
  *
  * The name is round 20's, from class_3bb8c.c's local view of the object
  * StageMap__PopulateSlotCells stores in a PlacementGrid's `linkResource`;
@@ -33,14 +33,14 @@
  * differ from them in two places, and the callers cast:
  *   +0x008 ctor: LinkResource__LinkResource returns self, or NULL when the
  *          buffer it adopted fails to build (New_LinkResource tests it,
- *          through code_33808.c's unprototyped UnprototypedCtorTable view).
+ *          through GraphicsResources.c's unprototyped UnprototypedCtorTable view).
  *   +0x064 setFlag: LinkResource__BuildModels(self), s32: 1 when an
  *          allocation fails, else 0 after the active driver's setFlag.
  *   +0x078 slot78 (NULL in FileResource): LinkResource__MapModel(self).
  *
- * The ctor's descriptor is code_33808.c's ResourceSource ({buffer to adopt, file
+ * The ctor's descriptor is GraphicsResources.c's ResourceSource ({buffer to adopt, file
  * name to request}); only the tag is declared here. The callers outside
- * code_33808 build it in their own 0x10-byte request types and cast.
+ * GraphicsResources build it in their own 0x10-byte request types and cast.
  */
 
 struct ResourceSource;

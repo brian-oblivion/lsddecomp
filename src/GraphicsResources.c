@@ -1,5 +1,5 @@
 /*
- * code_33808 -- the FileResource data sources that turn loaded files into
+ * GraphicsResources -- the FileResource data sources that turn loaded files into
  * graphics objects, the tile-map background layer, and the FMV player.
  *
  * FileResource subclasses, each reached through one of

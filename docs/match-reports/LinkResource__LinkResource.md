@@ -2,7 +2,7 @@
 
 > Renamed from `func_800438B0` on 2026-09-25 (tools/rename.py). Address 0x800438b0.
 
-Round 82, runner echo (code_33808 session, echo #8), 2026-09-25. Unit `code_33808`.
+Round 82, runner echo (GraphicsResources session, echo #8), 2026-09-25. Unit `GraphicsResources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 41/41 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gLinkResourceMethods +0x008.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/code_33808.c`.
+`src/GraphicsResources.c`.
 
 ```c
 typedef struct ResourceSource {
@@ -68,7 +68,7 @@ ResourceSource moved up the file to precede this function (no layout change); To
 
 - **LinkResource__LinkResource**, tier B (head review, round 83: was A). Constructor of the class external code already names LinkResource.
   Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (class_3bb8c.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
-- **ResourceSource** (type, was `Src6F240`), tier A (round 95, bravo, track 6). This ctor, and Tod's, TodSet's, ModelData's and TriggerWorld's, read `src->buffer` and adopt it when non-NULL, else call `requestLoadFile(self, src->name)`: a buffer to adopt, or a file to request. Named for that mechanism, not for any one class, since five ctors share it. Callers in class_39e08.c, code_1677c.c, class_3bb8c.c, code_4cd08.c and code_55dd4.c pass larger locals of their own cast to it (their stack sizes matter), so it stays defined in src/code_33808.c; the five class headers forward-declare it.
+- **ResourceSource** (type, was `Src6F240`), tier A (round 95, bravo, track 6). This ctor, and Tod's, TodSet's, ModelData's and TriggerWorld's, read `src->buffer` and adopt it when non-NULL, else call `requestLoadFile(self, src->name)`: a buffer to adopt, or a file to request. Named for that mechanism, not for any one class, since five ctors share it. Callers in class_39e08.c, code_1677c.c, class_3bb8c.c, code_4cd08.c and code_55dd4.c pass larger locals of their own cast to it (their stack sizes matter), so it stays defined in src/GraphicsResources.c; the five class headers forward-declare it.
 
 ## Track 4
 

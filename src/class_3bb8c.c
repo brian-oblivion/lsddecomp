@@ -371,11 +371,11 @@ void StageMap__OnNotifyTag1(StageMap *self, void *sender, s32 command) {
     }
 }
 
-/* New_LinkResource's descriptor (code_33808.c's ResourceSource) as
+/* New_LinkResource's descriptor (GraphicsResources.c's ResourceSource) as
  * PopulateSlotCells builds it: only the buffer is set. */
 
 typedef struct BE54LoadReq {
-    void *buffer; /* +0x000, New_LinkResource's descriptor's buffer (code_33808.c's ResourceSource) */
+    void *buffer; /* +0x000, New_LinkResource's descriptor's buffer (GraphicsResources.c's ResourceSource) */
     u8 pad4[0x10 - 0x4];
 } BE54LoadReq;
 

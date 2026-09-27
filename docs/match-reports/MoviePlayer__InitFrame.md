@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004564C` on 2026-09-25 (tools/rename.py). Address 0x8004564c.
 
-Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
+Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 68/68 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): not in any method table (called by the gMovi
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/code_33808.c`.
+top of / earlier in `src/GraphicsResources.c`.
 
 ```c
 /* Set up the MDEC player's frame: keep `external` at +0x0C and, unless the
@@ -90,7 +90,7 @@ Second build. The first build was byte-identical except the frame (0x20 against 
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/code_33808.c` are gone; Obj4564C and Frame4564C are gone: Frame4564C was DrawSystem.h's DrawRect, `cur` is `stripRect` and `frame` stays `frame`. The `--merge` CONFLICT at +0x02C (DrawRect here, all-s16 Rect45BC8 in DrawStrip) is settled by this function's `sw` of w = 16 and the 12-byte whole-struct copy: DrawRect. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/GraphicsResources.c` are gone; Obj4564C and Frame4564C are gone: Frame4564C was DrawSystem.h's DrawRect, `cur` is `stripRect` and `frame` stays `frame`. The `--merge` CONFLICT at +0x02C (DrawRect here, all-s16 Rect45BC8 in DrawStrip) is settled by this function's `sw` of w = 16 and the 12-byte whole-struct copy: DrawRect. Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 

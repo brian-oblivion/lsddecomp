@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043200` on 2026-09-25 (tools/rename.py). Address 0x80043200.
 
-Round 82, runner echo (code_33808 session, echo #9), 2026-09-25. Unit `code_33808`.
+Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 183/183 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x064 (setFlag override
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/code_33808.c`.
+top of / earlier in `src/GraphicsResources.c`.
 
 ```c
 /* gTimBlockSrcMethods +0x064: the loader's state machine, under the data-source
@@ -113,7 +113,7 @@ Second build (the first was already 183/183; the second only added local Lock/Un
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of FileResource's `setFlag` slot (+0x064); keeps its name because the body is the whole loader state machine, not a flag set. Correction to the prose above: the 0x24-byte header is a count, four file offsets (+0x04) and four sizes (+0x14, what FindMaxTimBlockSize maximises), not eight offsets. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/code_33808.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of FileResource's `setFlag` slot (+0x064); keeps its name because the body is the whole loader state machine, not a flag set. Correction to the prose above: the 0x24-byte header is a count, four file offsets (+0x04) and four sizes (+0x14, what FindMaxTimBlockSize maximises), not eight offsets. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
