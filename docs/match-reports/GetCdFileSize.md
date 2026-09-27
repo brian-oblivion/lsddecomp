@@ -133,3 +133,11 @@ reasoning.
   but that is now a SPECIFIC claim to verify, not just an offset match --
   flagged here rather than resolved, per the park-rule spirit for anything
   short of direct evidence. Not applied to `code_171e0.h` (out of unit).
+
+## Naming (round 99, echo, track 7)
+
+`>> 11`/`<< 11` -> `CD_SECTOR_SHIFT` (`include/CdDriver.h`, 2048-byte
+sectors). The result is always one sector more than the whole sectors in
+`size`, even when `size` is already a multiple of 2048; `CdDriver__Seek`'s
+async path rounds up only when `size & 0x7FF` is nonzero. The source says so
+in the function's comment.
