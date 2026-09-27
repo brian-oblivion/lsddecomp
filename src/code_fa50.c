@@ -41,10 +41,10 @@ typedef struct BoxCorners {
 } BoxCorners;
 
 /* A segment: start and direction (end - start). */
-typedef struct Ray_fa50 {
+typedef struct Ray {
     TmdVec3 org; /* +0x000 */
     TmdVec3 dir; /* +0x006 */
-} Ray_fa50;
+} Ray;
 
 /* A TMD packet's mode byte is its GPU command code (<libgs.h>'s GPU_COM_*),
  * plus this bit for a semi-transparent face (libgpu's setSemiTrans bit). */
@@ -257,7 +257,7 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
                            TmdVec3 *end) {
     TmdVec3 tri[4];
     VECTOR plane;
-    Ray_fa50 ray;
+    Ray ray;
     TmdVec3 hit;
     s32 nverts;
     u32 count;

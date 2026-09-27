@@ -15,7 +15,7 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
   6. removing the spare VECTORs: frame 0x168. `s32 dist[1]` went into a register (an extra `s7` save, size changed).
   7. **`s32 dist[2]`** (8 bytes, 4-byte aligned, so BLKmode, so memory): 486/486.
 - **Frame, measured:** the 0x38 bytes above the locals (0x104..0x13F in retail) are dead reload slots. The six box-field pointers have `sp+K` equivalences, and each of the loop's six compares plus the `nverts - 1` bound adds 8 bytes to `vars=` in cc1's `.frame` comment (delete them one at a time and it shrinks by 8 each time), with no access ever made to them. Do not fill that gap with locals.
-- **Types:** new `Ray_fa50`, `Vec4_fa50` (LIBGTE `VECTOR`, local), `VecBox_fa50`, the `ABS_fa50` macro, local prototypes for `OuterProduct0`/`Square0`/`SquareRoot0` (Sony libgte, called and not written) and for `TmdModel__NextPrimitive` (defined after this function). All in this unit.
+- **Types:** new `Ray`, `Vec4_fa50` (LIBGTE `VECTOR`, local), `VecBox_fa50`, the `ABS_fa50` macro, local prototypes for `OuterProduct0`/`Square0`/`SquareRoot0` (Sony libgte, called and not written) and for `TmdModel__NextPrimitive` (defined after this function). All in this unit.
 
 ## Source
 
@@ -23,7 +23,7 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/cod
 typedef struct Vec3_fa50 { s16 x, y, z; } Vec3_fa50;
 typedef struct SVec_fa50 { s16 x, y, z, pad; } SVec_fa50;
 typedef struct Box_fa50 { Vec3_fa50 min; Vec3_fa50 max; } Box_fa50;
-typedef struct Ray_fa50 { Vec3_fa50 org; Vec3_fa50 dir; } Ray_fa50;
+typedef struct Ray { Vec3_fa50 org; Vec3_fa50 dir; } Ray;
 typedef struct Vec4_fa50 { s32 vx, vy, vz, pad; } Vec4_fa50;
 typedef union VecBox_fa50 { Vec4_fa50 v; Box_fa50 b; } VecBox_fa50;
 #define ABS_fa50(x) ((x) < 0 ? ~(x) + 1 : (x))
@@ -35,7 +35,7 @@ extern s32 SquareRoot0(s32 a);
 s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, Vec3_fa50 *hitOut, s32 *height, Vec3_fa50 *origin, Vec3_fa50 *end) {
     Vec3_fa50 tri[4];
     Vec4_fa50 plane;
-    Ray_fa50 ray;
+    Ray ray;
     Vec3_fa50 hit;
     s32 nverts;
     u32 count;
