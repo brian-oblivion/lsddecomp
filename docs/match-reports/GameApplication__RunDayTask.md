@@ -86,7 +86,7 @@ without reaching it. The fix came from re-reading four instructions of retail.
 `GameApplicationMethods` slot `+0x060`. Builds a `StatusObj` (`New_DayTask`,
 New_X shape, 0x50 bytes), dispatches `slot44(obj)` (return kept) then
 `slot4(obj)` (return discarded -- via the same "delay slot after `jalr`
-captures the *preceding* call's return" idiom `GameApplication__RunPollTask` uses), and
+captures the *preceding* call's return" idiom `GameApplication__RunTask` uses), and
 switches on that status: `2` runs `GameApplication__PlayCinematic`, `3` latches
 `self->unk24`. Then queries the `DreamSys` status slot again
 (`DreamSys__GetCurrentDayAndYear`, the same slot `GameApplication__RunTitleMenu` uses) with an out-parameter

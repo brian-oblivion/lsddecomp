@@ -1,4 +1,6 @@
-# GameApplication__RunPollTask
+# GameApplication__RunTask
+
+> Renamed from `GameApplication__RunPollTask` on 2026-09-27 (tools/rename.py). Address 0x80026518.
 
 > Renamed from `Class6D3C8__RunPollTask` on 2026-09-26 (tools/rename.py). Address 0x80026518.
 
@@ -44,7 +46,7 @@ addu $v0, $s0, $zero                              ; return that saved value
 ```
 
 ```c
-s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, s32 extra) {
+s32 GameApplication__RunTask(PollTaskCtor ctor, void *dreamSys, s32 extra) {
     PollTask *task = ctor(dreamSys);
     s32 result = task->methods->slot44(task, extra, 0);
 
@@ -70,7 +72,7 @@ a clean instance of the same idiom with no new residue.
 
 ## Naming
 
-**`GameApplication__RunPollTask` -- tier A.** Pure leaf helper, mechanics ARE the
+**`GameApplication__RunTask` -- tier A.** Pure leaf helper, mechanics ARE the
 purpose: constructs a `PollTask` via the caller-supplied `ctor`, dispatches
 `slot44(task, extra, 0)` and `slot4(task)` on it (fire-and-forget teardown),
 returns `slot44`'s result. Generic across both call sites

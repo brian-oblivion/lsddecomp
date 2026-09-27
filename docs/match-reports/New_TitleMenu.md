@@ -17,7 +17,7 @@ own `dreamSys` argument.
 Also externally visible as a `PollTaskCtor` callback -- `include/GameApplication.h`
 (a different unit) already declares this exact symbol,
 `extern PollTask *New_TitleMenu(void *dreamSys);`, used by `GameApplication__RunTitleMenu`
-as `GameApplication__RunPollTask`'s `ctor` argument. That declaration's return/param
+as `GameApplication__RunTask`'s `ctor` argument. That declaration's return/param
 naming is kept as-is there (independent local view); this unit's own
 `dreamSys` parameter name/type was chosen to match it.
 

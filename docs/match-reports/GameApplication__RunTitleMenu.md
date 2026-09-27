@@ -33,7 +33,7 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
         status = self->dreamSys->vt->DreamSys__GetCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->unk24 == 0) {
-                status = GameApplication__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
+                status = GameApplication__RunTask(New_GraphRoom, self->dreamSys, self->unk1C);
                 if (status == 2) {
                     GameApplication__PlaySpecialDayMovies(self);
                 }
@@ -42,9 +42,9 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
 
         pollDone = 2;
     retry:
-        status = GameApplication__RunPollTask(New_TitleMenu, self->dreamSys, self->unk1C);
+        status = GameApplication__RunTask(New_TitleMenu, self->dreamSys, self->unk1C);
         if (status == pollDone) {
-            GameApplication__RunPollTask(New_GraphRoom, self->dreamSys, self->unk1C);
+            GameApplication__RunTask(New_GraphRoom, self->dreamSys, self->unk1C);
             goto retry;
         }
 
@@ -143,8 +143,8 @@ sequential code, not an early return.
 
 **`GameApplication__RunTitleMenu` -- tier B.** Mechanics: gated by
 `arg->unk10`, checks the owned `DreamSys`'s own status accessor, then loops
-`GameApplication__RunPollTask(New_TitleMenu, ...)`, restarting
-`GameApplication__RunPollTask(New_GraphRoom, ...)` on every "2" report, until
+`GameApplication__RunTask(New_TitleMenu, ...)`, restarting
+`GameApplication__RunTask(New_GraphRoom, ...)` on every "2" report, until
 the second poll task reports something else. `New_GraphRoom` is an
 established, evidence-backed name from another unit
 (`src/class_3bb8c_t.c:315`, `GraphRoom__GraphRoom`), so "GraphRoom" is

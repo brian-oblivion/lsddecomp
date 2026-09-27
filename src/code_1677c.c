@@ -39,11 +39,11 @@ extern s32 PickOpeningMovie(s32 *out, s32 param2); /* psyq_memset.s: day/week-st
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char sLogoPathOsd[];  /* "ETC\OSDLOGO.TIM" */
 
-/* The PollTasks GameApplication__RunPollTask runs (New_GraphRoom, New_TitleMenu)
+/* The PollTasks GameApplication__RunTask runs (New_GraphRoom, New_TitleMenu)
  * are TaskCore-family classes; this is this unit's own minimal view of
  * them: +0x004 is BasicClass's release, +0x044 IntermediateBase's init.
  * Constructed directly by a caller-supplied function pointer
- * (GameApplication__RunPollTask's own a0) rather than a New_X-style allocator. */
+ * (GameApplication__RunTask's own a0) rather than a New_X-style allocator. */
 typedef struct PollTaskMethods {
     s32 header;                                                              /* +0x000 */
     void (*slot4)(void *self);                                               /* +0x004 */
@@ -61,10 +61,10 @@ typedef PollTask *(*PollTaskCtor)(void *arg);
  * for GameApplication__RunTitleMenu, which comes first). Constructs a PollTask via the
  * caller-supplied `ctor`, dispatches slot44(task, initArgs, 0) and slot4(task)
  * on it, and returns slot44's result. */
-s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseInitArgs *initArgs);
+s32 GameApplication__RunTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseInitArgs *initArgs);
 
 /* PollTask constructors (not this unit's to write). Called directly (not
- * through any vtable) as GameApplication__RunPollTask's `ctor` argument.
+ * through any vtable) as GameApplication__RunTask's `ctor` argument.
  * New_GraphRoom is include/GraphRoom.h's and New_TitleMenu
  * include/TitleMenu.h's, each cast to PollTaskCtor. */
 
@@ -225,7 +225,7 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
         status = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
         if (status != 1) {
             if (self->skipGraphRoomPoll == 0) {
-                status = GameApplication__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
+                status = GameApplication__RunTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
                                                       (IntermediateBaseInitArgs *)self->aux);
                 if (status == 2) {
                     GameApplication__PlaySpecialDayMovies(self);
@@ -235,10 +235,10 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
 
         pollDone = 2;
     retry:
-        status = GameApplication__RunPollTask((PollTaskCtor)New_TitleMenu, self->dreamSys,
+        status = GameApplication__RunTask((PollTaskCtor)New_TitleMenu, self->dreamSys,
                                               (IntermediateBaseInitArgs *)self->aux);
         if (status == pollDone) {
-            GameApplication__RunPollTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
+            GameApplication__RunTask((PollTaskCtor)New_GraphRoom, self->dreamSys,
                                          (IntermediateBaseInitArgs *)self->aux);
             goto retry;
         }
@@ -252,7 +252,7 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
 /* Constructs a PollTask via the caller-supplied `ctor`, dispatches
  * slot44(task, initArgs, 0) and slot4(task) on it (fire-and-forget), and
  * returns slot44's result. */
-s32 GameApplication__RunPollTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseInitArgs *initArgs) {
+s32 GameApplication__RunTask(PollTaskCtor ctor, void *dreamSys, IntermediateBaseInitArgs *initArgs) {
     PollTask *task = ctor(dreamSys);
     s32 result = task->methods->slot44(task, initArgs, 0);
 
