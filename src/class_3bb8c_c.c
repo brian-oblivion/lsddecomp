@@ -41,7 +41,7 @@
 NodeGuardedViewport *New_NodeGuardedViewport(void) {
     NodeGuardedViewport *self;
 
-    self = BMemPMgrAlloc(0xDC);
+    self = BMemPMgrAlloc(sizeof(NodeGuardedViewport));
     if (self != NULL) {
         GetNodeGuardedViewportMethods()->ctor(self);
         return self;
@@ -78,7 +78,7 @@ NodeGuardedViewportMethods *GetNodeGuardedViewportMethods(void) {
 GridCell *New_GridCell(void) {
     GridCell *self;
 
-    self = BMemPMgrAlloc(0x3C);
+    self = BMemPMgrAlloc(GRIDCELL_SIZE);
     if (self != NULL) {
         GetGridCellMethods()->ctor(self);
         return self;
@@ -126,7 +126,7 @@ GridCellMethods *GetGridCellMethods(void) {
 TitleMenu *New_TitleMenu(struct DreamSys *dreamSys) {
     TitleMenu *self;
 
-    self = BMemPMgrAlloc(0xC4);
+    self = BMemPMgrAlloc(sizeof(TitleMenu));
     if (self != NULL) {
         GetTitleMenuMethods()->ctor(self, dreamSys);
         return self;
@@ -137,27 +137,31 @@ TitleMenu *New_TitleMenu(struct DreamSys *dreamSys) {
 void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     VabStreamObj *sound;
 
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, &sTitleMenuTarget, (char *)sTitleMenuSoundBankPath, 0);
+    Get_vtable_TaskCore()->ctor((TaskCore *)self, &sTitleMenuTarget,
+                                (char *)sTitleMenuSoundBankPath, NULL);
     self->methods = GetTitleMenuMethods();
     sound = (VabStreamObj *)self->sound;
-    sound->methods->setPitchOffset(sound, -1);
+    sound->methods->setPitchOffset(sound, -1); /* 36 semitones down */
     self->dreamSys = dreamSys;
-    self->saveCtrl = 0;
+    self->saveCtrl = NULL;
     self->saveBlock = dreamSys->methods->getSaveBlock(dreamSys, &self->saveBlockSize);
-    StampSaveTitleDay(dreamSys->methods->getCurrentDayAndYear(dreamSys, 0));
+    StampSaveTitleDay(dreamSys->methods->getCurrentDayAndYear(dreamSys, NULL));
     self->methods->setTarget(self, &sTitleMenuTarget);
     ((TitleMenuResetCallFn)self->methods->resetCounters)(self, dreamSys);
 }
+
+/* The total flashback unlock score FLASHBACK needs to be past. */
+#define FLASHBACK_UNLOCK_SCORE 9999999
 
 void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target) {
     DreamSaveBlock *save = (DreamSaveBlock *)self->saveBlock;
     s32 locked = 1;
 
-    if (save->totalFlasbackUnlockScore > 9999999) {
+    if (save->totalFlasbackUnlockScore > FLASHBACK_UNLOCK_SCORE) {
         locked = (save->amountFlashbacksAvailable == 0);
     }
     /* A NULL entry is a slot the cursor can stop on; slot 1 is FLASHBACK. */
-    target->registrationSlots[1] = (void *)locked;
+    target->registrationSlots[TITLEMENU_FLASHBACK] = (void *)locked;
 }
 
 /* src/code_2cc8c_f.c: `value` as `width` full-width decimal digits into dst,
@@ -167,10 +171,11 @@ extern void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded);
 /* The save title's day number, full-width characters 9..11 of
  * "LSD   Day001" (class_3bb8c_g.c's layout of the title). */
 #define SAVE_TITLE_DAY 9
+#define SAVE_TITLE_DAY_DIGITS 3
 
 /* Formats the day as three full-width digits in sDayDigits's buffer and
  * copies them into the save title's day number, characters 9..11. */
 void StampSaveTitleDay(s32 day) {
-    FormatFullWidthNumber(sDayDigits, day, 3, 0);
+    FormatFullWidthNumber(sDayDigits, day, SAVE_TITLE_DAY_DIGITS, 0);
     *(FullWidthChars3 *)&((FullWidthChar *)gSaveTitle)[SAVE_TITLE_DAY] = *(FullWidthChars3 *)sDayDigits;
 }
