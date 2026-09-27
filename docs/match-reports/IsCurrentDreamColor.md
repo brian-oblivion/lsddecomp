@@ -73,7 +73,7 @@ the point of use here rather than declared as a pointer at file scope, since
 `SetDreamAuxWorld` treats the same global as a generic `s32` parameter store.
 `TriggerWorldFn80` started as a local typedef distinct from `TriggerWorldFn`
 (vtable slot 0x22, different arity) and was promoted into
-`include/code_4cd08.h` once `AdjustDreamAuxTriggerOffset` (matched immediately after, same
+`include/code_4cd08.h` once `RemapTriggerForDreamColor` (matched immediately after, same
 round) turned out to need the identical alias -- see that function's report.
 `D_80088D16` (a small `s8[]` lookup table, layout otherwise unknown) is now
 declared in `include/code_4cd08.h` alongside this unit's other module-owned

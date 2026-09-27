@@ -1,4 +1,6 @@
-# AdjustDreamAuxTriggerOffset
+# RemapTriggerForDreamColor
+
+> Renamed from `AdjustDreamAuxTriggerOffset` on 2026-09-27 (tools/rename.py). Address 0x8005c930.
 
 > Renamed from `func_8005C930` on 2026-09-21 (tools/rename.py). Address 0x8005c930.
 
@@ -18,7 +20,7 @@ dispatch idiom.
 ## What it does
 
 ```c
-s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1)
+s32 RemapTriggerForDreamColor(s32 a0, s32 a1)
 {
     s32 val = gDreamAuxStage;
 
@@ -62,7 +64,7 @@ off completely here -- zero iteration needed on the second function.
 
 ## Naming
 
-**AdjustDreamAuxTriggerOffset** — tier B. Adds `0x1E` (30) to its `a0`
+**RemapTriggerForDreamColor** — tier B. Adds `0x1E` (30) to its `a0`
 (really an entry pointer smuggled through as `s32`, per
 `LookupDreamAuxTrigger`) when the unit is in state 4 AND `a1 == 0x10` AND a
 re-check of the world's vtable-0x80 predicate still reports state 4;

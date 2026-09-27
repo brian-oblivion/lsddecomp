@@ -139,7 +139,7 @@ s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2) {
     return 0;
 }
 
-s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1);
+s32 RemapTriggerForDreamColor(s32 a0, s32 a1);
 
 s32 LookupDreamAuxTrigger(s16 *a0) {
     s32 idx = gDreamAuxStage;
@@ -149,14 +149,14 @@ s32 LookupDreamAuxTrigger(s16 *a0) {
 
     for (i = 0; i < count; i++) {
         if (*a0 == entry->key) {
-            return AdjustDreamAuxTriggerOffset((s32)entry, i);
+            return RemapTriggerForDreamColor((s32)entry, i);
         }
         entry++;
     }
     return 0;
 }
 
-s32 AdjustDreamAuxTriggerOffset(s32 a0, s32 a1) {
+s32 RemapTriggerForDreamColor(s32 a0, s32 a1) {
     s32 val = gDreamAuxStage;
 
     if (val == 4 && a1 == 0x10) {
