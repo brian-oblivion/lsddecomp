@@ -46,4 +46,4 @@ First build. Slot +0x064 is `void setFlag(Self *)` in the unified macro, but thi
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `void *TodSet__TodSet(TodSet *self, struct Src6F240 *src)` (include/TodSet.h). The parent call goes through the typed base table, `GetTodMethods()->ctor((Tod *)self, src)`, instead of Ctor33808 (Tod__Tod returns nothing, so the void slot fits it). `*arg != 0` is now `src->buffer != NULL`: it is the same first word, the buffer Tod__Tod adopts. The +0x064 call keeps its cast: the inherited slot is `void setFlag`, the occupant TodSet__BuildTods returns s32. Bytes unchanged.
+Now `void *TodSet__TodSet(TodSet *self, struct ResourceSource *src)` (include/TodSet.h). The parent call goes through the typed base table, `GetTodMethods()->ctor((Tod *)self, src)`, instead of Ctor33808 (Tod__Tod returns nothing, so the void slot fits it). `*arg != 0` is now `src->buffer != NULL`: it is the same first word, the buffer Tod__Tod adopts. The +0x064 call keeps its cast: the inherited slot is `void setFlag`, the occupant TodSet__BuildTods returns s32. Bytes unchanged.

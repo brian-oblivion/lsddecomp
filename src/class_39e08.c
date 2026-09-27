@@ -42,7 +42,7 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     self->etcTim->methods->freeBuffer(self->etcTim);
     req.type = 0;
     req.path = D_800113F8;
-    self->dreamerTmd = New_LinkResource((struct Src6F240 *)&req);
+    self->dreamerTmd = New_LinkResource((struct ResourceSource *)&req);
     tmp = PickWeeklyGroup(0);
     self->bgm = New_WBgm((char *)tmp, NULL, 1);
     func_8004A070(1);

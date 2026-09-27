@@ -63,7 +63,7 @@ Fourth build. The first shape, `for (p--; i != 0; i--, p--) release(*p);`, measu
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-Touched by Tod's unification (charlie): the call is now `*p = (DataSrc33808 *)New_Tod((Src6F240 *)&req);`, because New_Tod is prototyped `Tod *New_Tod(Src6F240 *)` in include/Tod.h. Two pointer casts, no code; this function's own views (TodSet's) are unchanged. Bytes unchanged.
+Touched by Tod's unification (charlie): the call is now `*p = (DataSrc33808 *)New_Tod((ResourceSource *)&req);`, because New_Tod is prototyped `Tod *New_Tod(ResourceSource *)` in include/Tod.h. Two pointer casts, no code; this function's own views (TodSet's) are unchanged. Bytes unchanged.
 
 ## Track 4 (2026-09-26, round 88, delta)
 

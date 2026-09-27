@@ -21,15 +21,15 @@ fields +0x2C..+0x38), `Ctor33808` and `CountedBuf33808` sit at the top of
 `src/code_33808.c`.
 
 ```c
-typedef struct Src6F240 {
+typedef struct ResourceSource {
     /* +0x00 */ void *buffer;
     /* +0x04 */ char *name;
-} Src6F240;
+} ResourceSource;
 
 /* gLinkResourceMethods +0x008: constructor -- the active driver's, then this table;
  * with a descriptor, adopt its buffer (size 0) and run its own +0x064, whose
  * nonzero result fails the construction (NULL), or else request its file. */
-void *LinkResource__LinkResource(DataSrc33808 *self, Src6F240 *src) {
+void *LinkResource__LinkResource(DataSrc33808 *self, ResourceSource *src) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetLinkResourceMethods();
     if (src != NULL) {
@@ -62,7 +62,7 @@ Matched on build 7. **Lever: a `goto fail` to a `return NULL` placed AFTER the f
 | `return r ? NULL : self;` | 38/41: branchless |
 | `if (r) goto fail;` ... `return self; fail: return NULL;` | **41/41** |
 
-Src6F240 moved up the file to precede this function (no layout change); Tod__Tod uses it unchanged.
+ResourceSource moved up the file to precede this function (no layout change); Tod__Tod uses it unchanged.
 
 ## Naming
 
@@ -77,5 +77,5 @@ unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 `Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
 `self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
 read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
-`Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
+`ResourceSource *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.

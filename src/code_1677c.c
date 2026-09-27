@@ -123,7 +123,7 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
     func_800270AC(func_80048CF0());
     req.type = 0;
     req.path = sModelPathDreamE5;
-    self->dreamSys = New_DreamSys(New_LinkResource((struct Src6F240 *)&req), 0, 0);
+    self->dreamSys = New_DreamSys(New_LinkResource((struct ResourceSource *)&req), 0, 0);
     self->skipGraphRoomPoll = 0;
     self->dreamSys->methods->slot228(self->dreamSys, arg->unk14);
     ((GameApplicationSeedRandomFn)self->methods->setScreenDims)(self);

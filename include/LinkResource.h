@@ -38,12 +38,12 @@
  *          allocation fails, else 0 after the active driver's setFlag.
  *   +0x078 slot78 (NULL in FileResource): LinkResource__MapModel(self).
  *
- * The ctor's descriptor is code_33808.c's Src6F240 ({buffer to adopt, file
+ * The ctor's descriptor is code_33808.c's ResourceSource ({buffer to adopt, file
  * name to request}); only the tag is declared here. The callers outside
  * code_33808 build it in their own 0x10-byte request types and cast.
  */
 
-struct Src6F240;
+struct ResourceSource;
 struct TmdModel;
 struct TmdObject;
 
@@ -51,7 +51,7 @@ typedef struct LinkResource LinkResource;
 typedef struct LinkResourceMethods LinkResourceMethods;
 
 struct LinkResourceMethods {
-    FILERESOURCE_SLOTS(LinkResource, (LinkResource * self, struct Src6F240 *src));
+    FILERESOURCE_SLOTS(LinkResource, (LinkResource * self, struct ResourceSource *src));
     /* +0x07C */ struct TmdObject *(*getTmdObject)(LinkResource *self, s32 index); /* LinkResource__GetTmdObject */
     /* +0x080 */ struct TmdModel *(*getModel)(LinkResource *self, s32 index); /* LinkResource__GetModel */
     /* +0x084 */ void (*slot84)(void); /* LinkResource__NoOp */
@@ -70,8 +70,8 @@ typedef void (*LinkResourceMapModelFn)(LinkResource *self);
 extern LinkResourceMethods gLinkResourceMethods;
 extern LinkResourceMethods *GetLinkResourceMethods(void);
 
-LinkResource *New_LinkResource(struct Src6F240 *src);
-void *LinkResource__LinkResource(LinkResource *self, struct Src6F240 *src);
+LinkResource *New_LinkResource(struct ResourceSource *src);
+void *LinkResource__LinkResource(LinkResource *self, struct ResourceSource *src);
 void LinkResource__Finalize(LinkResource *self);
 s32 LinkResource__BuildModels(LinkResource *self);
 void LinkResource__MapModel(LinkResource *self);

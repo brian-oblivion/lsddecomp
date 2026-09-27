@@ -24,7 +24,7 @@ void InitDreamAux(void) {
     SetVec3(&req, 0, gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        gDreamAuxSlots[i].obj = New_ModelData((struct Src6F240 *)&req);
+        gDreamAuxSlots[i].obj = New_ModelData((struct ResourceSource *)&req);
         req.name = gMomPathSymDog;
     }
 }
@@ -190,7 +190,7 @@ s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2) {
     TriggerWorld *world;
 
     ctxArg[0] = a2;
-    world = New_TriggerWorld((struct Src6F240 *)ctxArg);
+    world = New_TriggerWorld((struct ResourceSource *)ctxArg);
 
     if (world != NULL) {
         DreamAuxGroupRecord *base = gDreamAuxGroupRecords[gDreamAuxStage];
@@ -412,8 +412,8 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry) {
         D_8008ABFC->methods->computeCellOffsets(D_8008ABFC, outBuf, &coords);
         entity->methods->updateRotation(entity, 1, D_80088F18 + rec->val2 * 12);
         ((TodActorAttachToParentFn)entity->methods->attachToParent)(
-            (TodActor *)entity, (TodActor *)gDreamAuxWorld, (void *)D_8008AC08,
-            (void *)D_8008ABFC, outBuf);
+            (TodActor *)entity, (TodActor *)gDreamAuxWorld, (void *)D_8008AC08, (void *)D_8008ABFC,
+            outBuf);
         return false;
     }
     return true;

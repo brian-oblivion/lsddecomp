@@ -36,12 +36,12 @@
  * does; the allocators reach the ctor through code_33808.c's unprototyped
  * Ctor33808 view instead.
  *
- * The ctor's descriptor is code_33808.c's Src6F240 ({buffer to adopt, file
+ * The ctor's descriptor is code_33808.c's ResourceSource ({buffer to adopt, file
  * name to request}); only the tag is declared here, so that any header may
  * repeat the declaration.
  */
 
-struct Src6F240;
+struct ResourceSource;
 
 typedef struct ModelData ModelData;
 typedef struct ModelDataMethods ModelDataMethods;
@@ -66,7 +66,7 @@ typedef struct ModelDataMethods ModelDataMethods;
 /* clang-format on */
 
 struct ModelDataMethods {
-    MODELDATA_SLOTS(ModelData, (ModelData * self, struct Src6F240 *src, s32 owns));
+    MODELDATA_SLOTS(ModelData, (ModelData * self, struct ResourceSource *src, s32 owns));
 };
 
 struct ModelData {
@@ -76,8 +76,8 @@ struct ModelData {
 extern ModelDataMethods gModelDataMethods;
 extern ModelDataMethods *GetModelDataMethods(void);
 
-ModelData *New_ModelData(struct Src6F240 *src);
-void *ModelData__ModelData(ModelData *self, struct Src6F240 *src, s32 owns);
+ModelData *New_ModelData(struct ResourceSource *src);
+void *ModelData__ModelData(ModelData *self, struct ResourceSource *src, s32 owns);
 void ModelData__Finalize(ModelData *self);
 void ModelData__Load(ModelData *self);
 s32 ModelData__BuildResources(ModelData *self);

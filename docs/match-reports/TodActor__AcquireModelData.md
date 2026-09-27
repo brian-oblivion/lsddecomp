@@ -104,7 +104,7 @@ Round 75 (charlie), track 3.
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. code_55dd4.c includes it, and include/code_55dd4.h's local `extern Unk5CObj *New_ModelData(TodActorDesc *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct Src6F240 *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to TodActor and is left for that class's unification. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. code_55dd4.c includes it, and include/code_55dd4.h's local `extern Unk5CObj *New_ModelData(TodActorDesc *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct ResourceSource *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to TodActor and is left for that class's unification. Image byte-identical.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
@@ -115,5 +115,5 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 The descriptor type `UnkArg1Obj` -> `TodActorDesc` (`tools/renametype.py
 UnkArg1Obj TodActorDesc --any-stem`). Tier B: only its +0x00C (a ModelData to
 borrow) is read here; when that is NULL the whole descriptor goes to
-New_ModelData as code_33808.c's Src6F240 ({buffer, name}). Its +0x000..+0x00B
+New_ModelData as code_33808.c's ResourceSource ({buffer, name}). Its +0x000..+0x00B
 stay padding in this view.

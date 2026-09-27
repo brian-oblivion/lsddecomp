@@ -42,7 +42,7 @@ s32 TriggerWorld__BuildResources(DataSrc33808 *self) {
     self->unk38 = 0;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = (s32)New_ModelData((Src6F240 *)&req);
+        *p = (s32)New_ModelData((ResourceSource *)&req);
         if (*p == 0) {
             goto fail;
         }
@@ -66,7 +66,7 @@ First build. The loop pointer walks `buf->entries` while the offset is re-read t
 
 ## Track 4
 
-2026-09-25, round 84 (delta): Its parent ModelData (gModelDataMethods) is unified in `include/ModelData.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((Src6F240 *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
+2026-09-25, round 84 (delta): Its parent ModelData (gModelDataMethods) is unified in `include/ModelData.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((ResourceSource *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

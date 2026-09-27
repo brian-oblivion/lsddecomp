@@ -47,4 +47,4 @@ First build; the same shape as TodSet__TodSet (gTodSetMethods's ctor). The alloc
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Now `void *TriggerWorld__TriggerWorld(TriggerWorld *self, struct Src6F240 *src)`: the `s32 *arg` was ModelData's descriptor, so `*arg != 0` reads `src->buffer != NULL`. The parent ctor is still called through Ctor33808 (it takes a third argument, 0, that the void-typed slot has no room for) and +0x064 through an `s32 (*)()` cast (setFlag is void; TriggerWorld__Load returns nothing, but the ctor tests $v0, as retail does). Bytes unchanged.
+Now `void *TriggerWorld__TriggerWorld(TriggerWorld *self, struct ResourceSource *src)`: the `s32 *arg` was ModelData's descriptor, so `*arg != 0` reads `src->buffer != NULL`. The parent ctor is still called through Ctor33808 (it takes a third argument, 0, that the void-typed slot has no room for) and +0x064 through an `s32 (*)()` cast (setFlag is void; TriggerWorld__Load returns nothing, but the ctor tests $v0, as retail does). Bytes unchanged.

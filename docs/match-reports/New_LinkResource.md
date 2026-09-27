@@ -55,7 +55,7 @@ unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 `Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
 `self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
 read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
-`Src6F240 *`, and the getter returns `&gLinkResourceMethods`.
+`ResourceSource *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.
 
 ## Round 93 polish (charlie, track 7)

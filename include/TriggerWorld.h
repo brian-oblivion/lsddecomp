@@ -41,17 +41,17 @@
  * MODELDATA_SLOTS declares +0x008 returning void, as FileResource's own ctor
  * does; the allocator reaches it through code_33808.c's unprototyped
  * Ctor33808 view, as every allocator in that unit does. The descriptor is
- * code_33808.c's Src6F240 ({buffer to adopt, file name to request}); only the
+ * code_33808.c's ResourceSource ({buffer to adopt, file name to request}); only the
  * tag is declared here, as include/ModelData.h does.
  */
 
-struct Src6F240;
+struct ResourceSource;
 
 typedef struct TriggerWorld TriggerWorld;
 typedef struct TriggerWorldMethods TriggerWorldMethods;
 
 struct TriggerWorldMethods {
-    MODELDATA_SLOTS(TriggerWorld, (TriggerWorld * self, struct Src6F240 *src));
+    MODELDATA_SLOTS(TriggerWorld, (TriggerWorld * self, struct ResourceSource *src));
     /* +0x088 */ ModelData *(*getModelData)(TriggerWorld *self, u32 index); /* TriggerWorld__GetModelData */
 };
 
@@ -63,8 +63,8 @@ struct TriggerWorld {
 extern TriggerWorldMethods gTriggerWorldMethods;
 extern TriggerWorldMethods *GetTriggerWorldMethods(void);
 
-TriggerWorld *New_TriggerWorld(struct Src6F240 *src);
-void *TriggerWorld__TriggerWorld(TriggerWorld *self, struct Src6F240 *src);
+TriggerWorld *New_TriggerWorld(struct ResourceSource *src);
+void *TriggerWorld__TriggerWorld(TriggerWorld *self, struct ResourceSource *src);
 void TriggerWorld__Finalize(TriggerWorld *self);
 void TriggerWorld__Load(TriggerWorld *self);
 s32 TriggerWorld__BuildResources(TriggerWorld *self);

@@ -381,14 +381,14 @@ TimBlockSrcMethods *GetTimBlockSrcMethods(void) {
 
 /* A data source's construction descriptor: a buffer to adopt, or else a
  * file name to request. */
-typedef struct Src6F240 {
+typedef struct ResourceSource {
     /* +0x00 */ void *buffer;
     /* +0x04 */ char *name;
-} Src6F240;
+} ResourceSource;
 
 /* Allocate and construct a LinkResource; NULL, the object freed, when the
  * ctor fails. */
-LinkResource *New_LinkResource(Src6F240 *src) {
+LinkResource *New_LinkResource(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(LinkResource));
 
     if (obj != NULL) {
@@ -402,7 +402,7 @@ LinkResource *New_LinkResource(Src6F240 *src) {
 
 /* ctor (+0x008): adopt the descriptor's buffer and build the models (NULL
  * when that fails), or request its file. */
-void *LinkResource__LinkResource(LinkResource *self, Src6F240 *src) {
+void *LinkResource__LinkResource(LinkResource *self, ResourceSource *src) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetLinkResourceMethods();
     if (src != NULL) {
@@ -574,7 +574,7 @@ TimArraySrcMethods *GetTimArraySrcMethods(void) {
 }
 
 /* Allocate and construct a Tod. */
-Tod *New_Tod(Src6F240 *src) {
+Tod *New_Tod(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(Tod));
 
     if (obj != NULL) {
@@ -585,7 +585,7 @@ Tod *New_Tod(Src6F240 *src) {
 }
 
 /* ctor (+0x008): adopt the descriptor's buffer, or request its file. */
-void Tod__Tod(Tod *self, Src6F240 *src) {
+void Tod__Tod(Tod *self, ResourceSource *src) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetTodMethods();
     if (src->buffer != NULL) {
@@ -838,7 +838,7 @@ BgLayerMethods *GetBgLayerMethods(void) {
 
 /* Allocate and construct a ModelData that owns its LinkResource and TodSet;
  * NULL, the object freed, when the ctor fails. */
-ModelData *New_ModelData(Src6F240 *src) {
+ModelData *New_ModelData(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(ModelData));
 
     if (obj != NULL) {
@@ -852,7 +852,7 @@ ModelData *New_ModelData(Src6F240 *src) {
 
 /* ctor (+0x008): adopt the descriptor's buffer and load it (NULL when that
  * fails), or request its file. */
-void *ModelData__ModelData(ModelData *self, Src6F240 *src, s32 owns) {
+void *ModelData__ModelData(ModelData *self, ResourceSource *src, s32 owns) {
     GetActiveDataSourceMethods()->ctor((FileResource *)self);
     self->methods = GetModelDataMethods();
     self->ownsResources = owns;
@@ -882,7 +882,7 @@ void ModelData__Load(ModelData *self) {
     ((s32 (*)())self->methods->processBuffer)(self);
 }
 
-/* A Src6F240 with a third word: SetVec3 also stores the name (NULL here)
+/* A ResourceSource with a third word: SetVec3 also stores the name (NULL here)
  * and a 1 that no constructor here reads. */
 typedef struct Req44858 {
     /* +0x00 */ void *buffer;
@@ -907,10 +907,10 @@ s32 ModelData__BuildResources(ModelData *self) {
 
     if (self->ownsResources != 0) {
         SetVec3(&req, (u8 *)self->buffer + ((Buf44858 *)self->buffer)->tmdOffset, 0, 1);
-        self->linkResource = New_LinkResource((Src6F240 *)&req);
+        self->linkResource = New_LinkResource((ResourceSource *)&req);
         if (self->linkResource != NULL) {
             req.buffer = ((Buf44858 *)self->buffer)->tods;
-            self->todSet = (FileResource *)New_TodSet((Src6F240 *)&req);
+            self->todSet = (FileResource *)New_TodSet((ResourceSource *)&req);
             if (self->todSet != NULL) {
                 return 0;
             }
@@ -954,7 +954,7 @@ ModelDataMethods *GetModelDataMethods(void) {
 
 /* Allocate and construct a TriggerWorld; NULL, the object freed, when the
  * ctor fails. */
-TriggerWorld *New_TriggerWorld(Src6F240 *src) {
+TriggerWorld *New_TriggerWorld(ResourceSource *src) {
     TriggerWorld *obj = BMemPMgrAlloc(sizeof(TriggerWorld));
 
     if (obj != NULL) {
@@ -968,7 +968,7 @@ TriggerWorld *New_TriggerWorld(Src6F240 *src) {
 
 /* ctor (+0x008): ModelData's, not owning; with an adopted buffer, build the
  * ModelData array (NULL when that fails). */
-void *TriggerWorld__TriggerWorld(TriggerWorld *self, Src6F240 *src) {
+void *TriggerWorld__TriggerWorld(TriggerWorld *self, ResourceSource *src) {
     ((Ctor33808 *)GetModelDataMethods())->ctor(self, src, 0);
     self->methods = GetTriggerWorldMethods();
     if (src->buffer != NULL) {
@@ -1007,7 +1007,7 @@ s32 TriggerWorld__BuildResources(TriggerWorld *self) {
     self->modelDataCount = 0;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = (s32)New_ModelData((Src6F240 *)&req);
+        *p = (s32)New_ModelData((ResourceSource *)&req);
         if (*p == 0) {
             goto fail;
         }
@@ -1210,7 +1210,7 @@ TileAtlasMethods *GetTileAtlasMethods(void) {
 
 /* Allocate and construct a TodSet; NULL, the object freed, when the ctor
  * fails. */
-TodSet *New_TodSet(Src6F240 *src) {
+TodSet *New_TodSet(ResourceSource *src) {
     void *obj = BMemPMgrAlloc(sizeof(TodSet));
 
     if (obj != NULL) {
@@ -1224,7 +1224,7 @@ TodSet *New_TodSet(Src6F240 *src) {
 
 /* ctor (+0x008): Tod's; with an adopted buffer, build the Tods (NULL when
  * that fails). */
-void *TodSet__TodSet(TodSet *self, Src6F240 *src) {
+void *TodSet__TodSet(TodSet *self, ResourceSource *src) {
     GetTodMethods()->ctor((Tod *)self, src);
     self->methods = GetTodSetMethods();
     if (src->buffer != NULL) {
@@ -1259,7 +1259,7 @@ s32 TodSet__BuildTods(TodSet *self) {
     p = (Tod **)buf->entries;
     for (; i < n; i++) {
         req.buffer = (u8 *)self->buffer + ((CountedBuf33808 *)self->buffer)->entries[i];
-        *p = New_Tod((Src6F240 *)&req);
+        *p = New_Tod((ResourceSource *)&req);
         if (*p == NULL) {
             while (i != 0) {
                 i--;
