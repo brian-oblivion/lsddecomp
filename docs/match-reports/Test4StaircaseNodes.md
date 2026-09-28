@@ -5,7 +5,7 @@
 ## What it does
 
 A guarded variant of the `GetStaticSpawn`-wrapper family (see
-`TestForStaticLink`, `Test4TunnelLinks`): only calls through when `arg2 ==
+`TestForStaticLink`, `TestForTunnelLinks`): only calls through when `arg2 ==
 0`, forcing `stage` to the literal `0` and `flag` to `0` (not `1`, unlike
 the other two wrappers) regardless of its own third argument. Returns `-1`
 directly when `arg2 != 0`.

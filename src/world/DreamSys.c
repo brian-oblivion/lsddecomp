@@ -74,7 +74,7 @@ extern void ServiceSoundCueSet(s32 arg0, void *arg1);
 
 /* Defined further down, in ROM order, and called before that. */
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
-s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
+s32 TestForTunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 void DreamSys__FlipMoveCommand(DreamSys *this);
 
 DreamSys *New_DreamSys(LinkResource *modelSource, s32 soundObj, s32 viewport) {
@@ -978,7 +978,7 @@ bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
 
     if (this->state != DREAMSYS_NO_LINK)
         return false;
-    result = Test4TunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
+    result = TestForTunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
     if (result < 0)
         return false;
     SceneNode__GetRotationDegrees((SceneNode *)this, (Ratio16 *)rotation);
@@ -1551,7 +1551,7 @@ s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s3
                           sStagePermalinkTriggers, sStagePermalinkSpawns, 1);
 }
 
-s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
+s32 TestForTunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
     return GetStaticSpawn(target, currentPos, stage, sTunnelTriggersCount, sTunnelTriggers,
                           sTunnelSpawns, 1);
 }

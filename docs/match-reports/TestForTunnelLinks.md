@@ -1,4 +1,6 @@
-# Test4TunnelLinks
+# TestForTunnelLinks
+
+> Renamed from `Test4TunnelLinks` on 2026-09-28 (tools/rename.py). Address 0x8005bcf8.
 
 **Unit:** DreamSys · **Size:** 17 instructions · **Status:** MATCHED (17/17 words)
 
@@ -12,7 +14,7 @@ different table triple (tunnel links instead of permalinks).
 ## The C
 
 ```c
-s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
+s32 TestForTunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
 {
 	return GetStaticSpawn(target, currentPos, stage, sTunnelTriggersCount,
 	                       sTunnelTriggers, sTunnelSpawns, 1);

@@ -144,7 +144,7 @@ round 43, runner ALPHA, unit DreamSys.
 
 ## Naming
 
-- **Tier B.** Same family shape as the already-named TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/Test4InstantTeleporters (a PlayerSpawnPoint-in, stage-out test used by DreamSys__TryStageTimerLink), but unlike its siblings it does not consult a trigger table -- it applies stage/position/timer-parity rules directly and always produces a spawn via GetRandomSpawnFromStage when they hold.
+- **Tier B.** Same family shape as the already-named TestForStaticLink/TestForTunnelLinks/Test4StaircaseNodes/Test4InstantTeleporters (a PlayerSpawnPoint-in, stage-out test used by DreamSys__TryStageTimerLink), but unlike its siblings it does not consult a trigger table -- it applies stage/position/timer-parity rules directly and always produces a spawn via GetRandomSpawnFromStage when they hold.
 
 ## History (moved from include/DreamSys.h, round 102)
 

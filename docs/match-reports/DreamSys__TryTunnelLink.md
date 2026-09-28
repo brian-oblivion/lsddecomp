@@ -15,8 +15,8 @@ success) but with two extra steps folded in between the link test and
 buffer, then a call into `DreamSys__CheckTunnelHeading` (in-unit, still `INCLUDE_ASM`,
 blocked) that consumes that buffer and gates the rest of the function.
 
-`Test4TunnelLinks` is already a matched, real C function in this unit
-(`s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint
+`TestForTunnelLinks` is already a matched, real C function in this unit
+(`s32 TestForTunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint
 *currentPos, s32 stage)`) -- this function calls it with exactly that
 signature.
 
@@ -37,7 +37,7 @@ bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 
 	if (this->unknwon_int_0x44 != 0)
 		return false;
-	result = Test4TunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
+	result = TestForTunnelLinks(&this->linkCoordinates, currentPos, this->currentStage);
 	if (result < 0)
 		return false;
 	SceneNode__GetRotationDegrees(this, local);
@@ -89,7 +89,7 @@ u32 unknown_functions_0x1d8[2];
   spill at `sp+0x10..sp+0x20`. A 4-word array reproduces that frame size
   exactly; nothing in this function reads its fields individually, so its
   internal layout is unconfirmed and irrelevant to this match.
-- `a1` (`currentPos`) is never reloaded before the `Test4TunnelLinks` call
+- `a1` (`currentPos`) is never reloaded before the `TestForTunnelLinks` call
   -- it is the function's own second parameter, passed straight through,
   exactly like `DreamSys__StaticWallLink`'s call to `TestForStaticLink`.
 
@@ -106,4 +106,4 @@ round 2026-09-02, runner ALPHA, unit DreamSys.
 
 ## Naming
 
-- **Tier B.** `bool(DreamSys*, PlayerSpawnPoint*)`; wraps Test4TunnelLinks and calls ExecuteLink (type 0xD) on success. One of a 4-member family (with TryStageTimerLink/TryInstantTeleportLink/TryStaircaseLink) the header's own pre-existing comment already called "three link tests", called in sequence from DreamSys__ApplyMoveCommand; also called directly from DreamSys__WallLink's own static-link path.
+- **Tier B.** `bool(DreamSys*, PlayerSpawnPoint*)`; wraps TestForTunnelLinks and calls ExecuteLink (type 0xD) on success. One of a 4-member family (with TryStageTimerLink/TryInstantTeleportLink/TryStaircaseLink) the header's own pre-existing comment already called "three link tests", called in sequence from DreamSys__ApplyMoveCommand; also called directly from DreamSys__WallLink's own static-link path.

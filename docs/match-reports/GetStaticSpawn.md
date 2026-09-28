@@ -11,7 +11,7 @@ Filed round 2026-08-30-a as BLOCKED on `gp_rel` (6 references, the first to
 ## What it does
 
 The shared "static link" lookup used by
-`TestForStaticLink`/`Test4TunnelLinks`/`Test4StaircaseNodes`/
+`TestForStaticLink`/`TestForTunnelLinks`/`Test4StaircaseNodes`/
 `Test4InstantTeleporters` (all already matched or forwarding wrappers):
 scans `triggers[stage][0..triggerLens[stage])` for an entry whose `chunk`
 matches `currentPos->chunk` and whose `tile` either matches

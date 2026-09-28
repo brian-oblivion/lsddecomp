@@ -785,7 +785,7 @@ extern s32 rand(void);
 
 extern s8 sSpecialColors[];
 
-/* Shared by TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/
+/* Shared by TestForStaticLink/TestForTunnelLinks/Test4StaircaseNodes/
    Test4InstantTeleporters, each of which forwards its own three args
    straight through and appends a fixed trailing quadruple (length table,
    trigger table, spawn table, literal 1); every call site tests the result
@@ -813,7 +813,7 @@ extern s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2);
 
 /* Called by DreamSys__TryStaircaseLink as (&this->linkCoordinates,
    currentPos, this->currentStage) -- same forwarding shape as
-   Test4TunnelLinks/TestForStaticLink above. Defined after its caller. */
+   TestForTunnelLinks/TestForStaticLink above. Defined after its caller. */
 extern s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2);
 
 /* Called by DreamSys__TryStaircaseLink as (&this->exitRotation, &this->enterRotation, &local) --
@@ -821,7 +821,7 @@ extern s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *curre
    `this` fields), so the same signature. Defined after its caller. */
 extern s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2);
 
-/* Same (target, currentPos, stage) forwarding shape as Test4TunnelLinks
+/* Same (target, currentPos, stage) forwarding shape as TestForTunnelLinks
    above -- called by DreamSys__TryInstantTeleportLink as
    (&this->linkCoordinates, currentPos, this->currentStage), result tested
    with `bltz`. Defined after its caller. */
@@ -832,7 +832,7 @@ extern s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *c
    stage-type argument. Defined after its caller. */
 extern s32 GetTeleportTimeBonus(void);
 
-/* Table triple for Test4TunnelLinks, same roles as the
+/* Table triple for TestForTunnelLinks, same roles as the
    STAGE_PERMALINK_* triple above but for tunnel links specifically. */
 extern s8 sTunnelTriggersCount[];
 extern StaticLinkTrigger *sTunnelTriggers[];

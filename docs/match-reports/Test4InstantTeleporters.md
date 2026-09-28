@@ -13,7 +13,7 @@ first attempt, layout was not).
 
 `if (gInstantTeleportersEnabled == 0) return -1; else return GetStaticSpawn(target,
 currentPos, stage, sTeleportTriggersCount, sTeleportTriggers, sTeleportSpawns, 0);` -- same
-forwarding shape as `TestForStaticLink`/`Test4TunnelLinks`/
+forwarding shape as `TestForStaticLink`/`TestForTunnelLinks`/
 `Test4StaircaseNodes` a few hundred lines above/below in this unit, using a
 dedicated table triple (`sTeleportTriggersCount`/`sTeleportTriggers`/`sTeleportSpawns`) and trailing
 flag `0` instead of `1`.
@@ -85,7 +85,7 @@ block (placed last), fall through when zero to set `result = -1` and jump
 to the shared tail. Byte-exact.
 
 Added the table triple as new externs (same pattern as the two existing
-triples for `Test4TunnelLinks`/`Test4StaircaseNodes`):
+triples for `TestForTunnelLinks`/`Test4StaircaseNodes`):
 
 ```c
 extern s8 sTeleportTriggersCount[];
