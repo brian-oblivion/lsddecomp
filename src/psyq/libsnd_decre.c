@@ -112,4 +112,4 @@ tailFinal:
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/libsnd_decre", Snd_decrescendo);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_decre", Snd_decrescendo);
