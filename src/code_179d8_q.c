@@ -228,8 +228,7 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
         printf(sFileNotFoundMsg, path);
 
     found:
-        /* CdLoc16 is the project's spelling of CdlLOC's four bytes (FileResource.h). */
-        entries->pos = *(CdLoc16 *)&info.pos;
+        entries->pos = info.pos;
         entries->size = info.size;
     }
 

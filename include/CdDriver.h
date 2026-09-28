@@ -84,7 +84,7 @@ void CdDriver__CancelRequests(CdDriver *self);              /* +0x074 cancelRequ
  * stride; the state machines seek to `pos` of the entry gCdSeekParam holds. */
 typedef struct CdFileEntry {
     /* +0x00 */ char name[0x14];
-    /* +0x14 */ CdLoc16 pos;
+    /* +0x14 */ CdlLOC pos;
     /* +0x18 */ u32 size;
 } CdFileEntry; /* size 0x1C */
 

@@ -1,6 +1,7 @@
 #ifndef FILERESOURCE_H
 #define FILERESOURCE_H
 
+#include <libcd.h>
 #include "BasicClass.h"
 
 /*
@@ -31,19 +32,9 @@
  * whichever driver is active. The slot names are the CD driver's occupants.
  */
 
-/* A disc position: Psy-Q's CdlLOC (minute, second, sector, track) by
- * layout and by use (CdControl's setloc argument, CdSearchFile's output,
- * CdPosToInt's input). The halves are never read apart. Declared here
- * rather than taken from <libcd.h> only because two CD units
- * (code_179d8_r/s) still declare the Cd* functions their own way and
- * would collide with Sony's prototypes; the whole-struct copies compile to
- * the same lwl/lwr + swl/swr with Sony's 1-aligned CdlLOC. It lives in this
- * header because the CD driver's methods run on every client object, so the
- * open file's position and size are fields of the base. */
-typedef struct CdLoc16 {
-    s16 unk0;
-    s16 unk2;
-} CdLoc16;
+/* `pos` is a disc position, Sony's CdlLOC (<libcd.h>, included above):
+ * the CD driver's methods run on every client object, so the open file's
+ * position and size are fields of the base. */
 
 typedef struct FileResource FileResource;
 typedef struct FileResourceMethods FileResourceMethods;
@@ -74,7 +65,7 @@ typedef struct FileResourceMethods FileResourceMethods;
     /* +0x00C */ s32 isOpen;          /* cleared while LoadFile runs, then restored */             \
     /* +0x010 */ void *buffer;        /* LoadFile's allocation, NULL when none */                  \
     /* +0x014 */ s32 bufferSize;                                                                   \
-    /* +0x018 */ CdLoc16 pos;      /* the open file's disc position: the CD driver's Open sets it, */ \
+    /* +0x018 */ CdlLOC pos;      /* the open file's disc position: the CD driver's Open sets it, */ \
     /* +0x01C */ u32 size;         /* its byte size; Seek and ReadCdFile seek from pos (CdDriver.h) */ \
     /* +0x020 */ u16 freeGuard;       /* nonzero: FreeBuffer keeps the buffer */                   \
     /* +0x022 */ u16 pendingRequests;                                                              \

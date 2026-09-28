@@ -204,3 +204,5 @@ CdRead's 0x80, `CD_SYNC_POLL` for CdSync/CdReadSync's mode 1,
   including LIBCD.H because the unit's libcd declarations were deliberately
   per-call-site. (`include/psyq/libcd.h` does define `CdlSetloc 0x02`.)
 - `CD_WAIT_TIMEOUT` was `0x259`, "~601 service-pump calls".
+
+Applied by the round 101 head: `CdLoc16` is gone; `FileResource::pos` and `CdFileEntry::pos` are Sony's `CdlLOC` (FileResource.h includes `<libcd.h>`), the three `*(CdLoc16 *)&` casts and one `(CdlLOC *)` cast dropped; zero bytes.

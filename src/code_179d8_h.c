@@ -73,8 +73,7 @@ void OpenCdFile(CdDriver *self, char *name) {
             printf(gCdFileNotFoundFmt, path);
             return;
         }
-        /* CdLoc16 is the project's spelling of CdlLOC's four bytes (FileResource.h). */
-        self->pos = *(CdLoc16 *)&file.pos;
+        self->pos = file.pos;
         self->size = file.size;
         self->isOpen = 1;
     }
@@ -125,7 +124,7 @@ s32 ReadCdFile(CdDriver *self, void *buf, s32 size) {
     if (self->isOpen != 0) {
     retry:
         sectors = (u32)size >> CD_SECTOR_SHIFT;
-        CdControl(CdlSetloc, (u_char *)&self->pos, 0); /* pos is CdLoc16, Sony's CdlLOC by layout */
+        CdControl(CdlSetloc, (u_char *)&self->pos, 0);
     sync:
         status = CdSync(0, syncResult);
         if (status == CdlNoIntr) {

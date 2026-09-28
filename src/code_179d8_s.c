@@ -35,9 +35,8 @@
 #include <libcd.h>
 #include "CdDriver.h"
 
-/* `pos` (self->pos, CdFileEntry::pos) is FileResource.h's CdLoc16, which is
- * Sony's CdlLOC by layout; the casts to CdlLOC / u_char * below go away when
- * that header can take <libcd.h> and use CdlLOC itself. */
+/* `pos` (self->pos, CdFileEntry::pos) is Sony's CdlLOC; CdControl takes it
+ * as the u_char * parameter bytes, hence those casts. */
 
 
 extern void CloseCdFile(CdDriver *self);
@@ -85,7 +84,7 @@ void CdDriver__Open(CdDriver *self, char *name, s32 param0, s32 param1) {
                 BuildCdFilePath(path, name);
                 do {
                 } while (CdSearchFile(&statBuf, path) == NULL);
-                self->pos = *(CdLoc16 *)&statBuf.pos;
+                self->pos = statBuf.pos;
                 self->size = statBuf.size;
                 do {
                     CdControl(CdlSetloc, (u_char *)&self->pos, 0);
@@ -140,7 +139,7 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
             if ((offset & (CD_SECTOR_SIZE - 1)) != 0) {
                 sectors = sectors + 1;
             }
-            CdIntToPos(CdPosToInt((CdlLOC *)&self->pos) + sectors, &gCdSeekLoc);
+            CdIntToPos(CdPosToInt(&self->pos) + sectors, &gCdSeekLoc);
             if (mode == 0) {
                 if (gCdAsyncEnabled != 0) {
                     /* the state machine seeks to &gCdSeekParam->pos: aim it
