@@ -210,7 +210,7 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse);
  * prototype, because StyleEffect__UpdateByKind passes a second argument it
  * does not read.
  */
-void StyleEffect__DriftModelChildren();
+void StyleEffect__DriftModelChildren(); /* arity-ok: callers pass a second, unread argument */
 
 /**
  * @brief Releases the two model children, if the layout made any.
@@ -225,7 +225,7 @@ void StyleEffect__ReleaseModelChildren(StyleEffect *self);
  * sprites[2] is hidden. Declared without a prototype, because
  * StyleEffect__InitByKind passes a second argument it does not read.
  */
-void StyleEffect__BuildRandomSprites();
+void StyleEffect__BuildRandomSprites(); /* arity-ok: callers pass a second, unread argument */
 
 /**
  * @brief Creates the five sprites, attached to the effect at no offset, in
@@ -248,7 +248,7 @@ void StyleEffect__ReleaseSprites(StyleEffect *self);
  * sprites of variant 0 at their default scale. Declared without a prototype,
  * because StyleEffect__InitByKind passes a second argument it does not read.
  */
-void StyleEffect__SpawnPlainSprites();
+void StyleEffect__SpawnPlainSprites(); /* arity-ok: callers pass a second, unread argument */
 
 /**
  * @brief STYLE_EFFECT_JITTER_SPRITES' per-frame step, on a StyleEffect
@@ -257,7 +257,7 @@ void StyleEffect__SpawnPlainSprites();
  * without a prototype, because StyleEffect__UpdateByKind passes a second
  * argument it does not read.
  */
-void StyleEffect__RandomizeSprites();
+void StyleEffect__RandomizeSprites(); /* arity-ok: callers pass a second, unread argument */
 
 /**
  * @brief STYLE_EFFECT_JITTER_SPRITES' release: the five sprites.
