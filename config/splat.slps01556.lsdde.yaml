@@ -1181,7 +1181,7 @@ segments:
       - [0x2b660, o, libsnd/sspause]     # Snd_SetPauseMode, SsSeqPause, SsSepPause
       # Gap: 0x2B78C..0x2BA1C. Called "the game's own libsnd build" until
       # revision 18: game code, carved as a C unit.
-      - [0x2b78c, c, Application]
+      - [0x2b78c, c, app/Application]
       # Chunk E: the block's last two runs.
       - [0x2ba1c, o, libgs/gs_104]       # GsInit3D
       - [0x2ba94, o, libcd/event]        # CdInit, def_cbsync, def_cbready, def_cbread
