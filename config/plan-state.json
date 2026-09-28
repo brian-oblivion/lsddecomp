@@ -970,7 +970,7 @@
         "gLbdFileMethods": {
           "class": "LbdFile",
           "date": "2026-09-26",
-          "header": "include/LbdFile.h"
+          "header": "include/lbd_file.h"
         },
         "gLightRigMethods": {
           "class": "LightRig",

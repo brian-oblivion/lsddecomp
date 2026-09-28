@@ -2,7 +2,7 @@
  * game_files -- the LbdFile class, and the getters over the game's table of
  * file names.
  *
- * LbdFile (include/LbdFile.h, which documents the class): New_LbdFile to
+ * LbdFile (include/lbd_file.h, which documents the class): New_LbdFile to
  * LbdFile__SetAutoLoadData and GetLbdFileMethods, the loader for one stage
  * map chunk, STGnn\Mnnn.LBD.
  *
@@ -26,7 +26,7 @@
  * PickSoundBank's and PickStageBgm's choice (1-based, 0 for random).
  */
 #include "common.h"
-#include "LbdFile.h"
+#include "lbd_file.h"
 #include "stage_grid.h"
 #include "bmem_pmgr.h"
 #include "game_files.h"

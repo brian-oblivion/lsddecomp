@@ -59,7 +59,7 @@ void LbdFile__LbdFile(DataSrc39094 *self) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__DataSrc39094` -> `LbdFile__LbdFile` with `rename.py`: the +0x008 ctor occupant, named for the class. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `DataSrc39094__DataSrc39094` -> `LbdFile__LbdFile` with `rename.py`: the +0x008 ctor occupant, named for the class. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/lbd_file.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)
@@ -67,7 +67,7 @@ Renamed `DataSrc39094__DataSrc39094` -> `LbdFile__LbdFile` with `rename.py`: the
 Renamed with `python3 tools/renametype.py Class81940 LbdFile` (the whole
 class family: object, table `gClass81940Methods` -> `gLbdFileMethods`,
 getter, constructors, methods, the header `include/Class81940.h` ->
-`include/LbdFile.h` and its typedefs). The tool rewrote every
+`include/lbd_file.h` and its typedefs). The tool rewrote every
 `Class81940` token in these reports too, so the Track 4 section above now
 says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.
@@ -101,7 +101,7 @@ renamed):
  * those, and no Sony fingerprint). All 38 functions matched round 82 (three
  * echo sessions); named round 82 (bravo). Two independent groups of code:
  *
- * 1. LbdFile (method table gLbdFileMethods; include/LbdFile.h): a
+ * 1. LbdFile (method table gLbdFileMethods; include/lbd_file.h): a
  *    FileResource data source that streams a header block into its own 0xB358
  *    buffer (state 9, LbdFile__LoadHeader), then, once the read completes
  *    (LbdFile__AdvanceLoadState), an optional data block the header

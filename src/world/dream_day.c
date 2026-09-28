@@ -49,7 +49,7 @@
 #include "TimedTask.h"
 #include "draw_system.h"
 #include "PlacementGrid.h"
-#include "LbdFile.h"
+#include "lbd_file.h"
 #include "grid_cell.h"
 #include "flat_light_obj.h"
 #include "bmem_pmgr.h"

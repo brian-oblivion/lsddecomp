@@ -80,7 +80,7 @@ local view when another caller passes arguments.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__LoadDataBlock` -> `LbdFile__LoadDataBlock` with `rename.py` (class rename only; +0x080). Its no-argument call of +0x084 is kept through `LbdFileReleaseDataBlockNoArgFn` (include/LbdFile.h). The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `DataSrc39094__LoadDataBlock` -> `LbdFile__LoadDataBlock` with `rename.py` (class rename only; +0x080). Its no-argument call of +0x084 is kept through `LbdFileReleaseDataBlockNoArgFn` (include/lbd_file.h). The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/lbd_file.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)
@@ -88,7 +88,7 @@ Renamed `DataSrc39094__LoadDataBlock` -> `LbdFile__LoadDataBlock` with `rename.p
 Renamed with `python3 tools/renametype.py Class81940 LbdFile` (the whole
 class family: object, table `gClass81940Methods` -> `gLbdFileMethods`,
 getter, constructors, methods, the header `include/Class81940.h` ->
-`include/LbdFile.h` and its typedefs). The tool rewrote every
+`include/lbd_file.h` and its typedefs). The tool rewrote every
 `Class81940` token in these reports too, so the Track 4 section above now
 says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.

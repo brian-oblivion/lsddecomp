@@ -38,7 +38,7 @@ FilePathRecord *GetStageMapChunkRecord(s32 index, s32 sub) {
 
 - **Name:** `GetStageMapChunkRecord`
 - **Tier:** A
-- **Evidence:** record `chunk` of GetStageMapChunkRecords: STGnn\Mnnn.LBD, which StageMap hands an LbdFile (include/LbdFile.h).
+- **Evidence:** record `chunk` of GetStageMapChunkRecords: STGnn\Mnnn.LBD, which StageMap hands an LbdFile (include/lbd_file.h).
 
 ## Naming history
 

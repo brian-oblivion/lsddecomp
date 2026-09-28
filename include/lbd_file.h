@@ -1,5 +1,5 @@
-#ifndef LBDFILE_H
-#define LBDFILE_H
+#ifndef LBD_FILE_H
+#define LBD_FILE_H
 
 #include "file_resource.h"
 

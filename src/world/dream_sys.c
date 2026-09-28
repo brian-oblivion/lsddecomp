@@ -41,7 +41,7 @@
 #include "frame_clock.h"
 #include "LinkResource.h"
 #include "StageMap.h"
-#include "LbdFile.h"
+#include "lbd_file.h"
 #include "VabStreamObj.h"
 #include "Viewport.h"
 #include "bmem_pmgr.h"

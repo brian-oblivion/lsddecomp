@@ -115,6 +115,6 @@ an operator decision; not hand-reverted).
 
 Parameters and locals: `arg1` -> `sender`, `mode` -> `command` (OnNotify's command, tier A), `e` -> `slot`, `curMode` -> `pending` (`loadsPending`'s value).
 
-Constants: 2 -> `DRAWSYSTEM_EVENT_VSYNC` (include/draw_system.h, new): OnNotify calls this method for a sender whose class id's low nibble is 1, DrawSystem's family (class id 0x1), and DrawSystem__RunLoop (src/code_10ee0.c) calls `notifyParents(self, 2)` once per VSync pass; draw_system.h's banner says StageMap adds it as a child. 7 -> `STAGEMAP_EVENT_SLOT_DATA_READY`, `headerReady = 2` -> `LBDFILE_HEADER_CONSUMED` (include/LbdFile.h, new; its banner already said "marks the header consumed (headerReady 2)"), loop bound -> `ARRAY_COUNT(self->slots)`.
+Constants: 2 -> `DRAWSYSTEM_EVENT_VSYNC` (include/draw_system.h, new): OnNotify calls this method for a sender whose class id's low nibble is 1, DrawSystem's family (class id 0x1), and DrawSystem__RunLoop (src/code_10ee0.c) calls `notifyParents(self, 2)` once per VSync pass; draw_system.h's banner says StageMap adds it as a child. 7 -> `STAGEMAP_EVENT_SLOT_DATA_READY`, `headerReady = 2` -> `LBDFILE_HEADER_CONSUMED` (include/lbd_file.h, new; its banner already said "marks the header consumed (headerReady 2)"), loop bound -> `ARRAY_COUNT(self->slots)`.
 
 Not renamed: the method name. Viewport has the same `OnNotifyTag1` for its DrawSystem case (src/app/task.c), so it is a convention across two classes; proposed to the head as one rename of both (e.g. `OnDrawSystemNotify`) rather than breaking the pair here.

@@ -330,7 +330,7 @@ typedef struct CellBounds {
 struct ChunkSlot {
     /* +0x000 */ u16 loadPending; /* 1 while its load is pending (ApplyChunkLoads; OnDrawSystemEvent clears it) */
     /* +0x002 */ u16 neighbour; /* the ctor: its index; LoadChunksAround: the spec's neighbour, copied on into loader->elemKey */
-    /* +0x004 */ struct LbdFile *loader; /* New_LbdFile(): the slot's chunk file (include/LbdFile.h) */
+    /* +0x004 */ struct LbdFile *loader; /* New_LbdFile(): the slot's chunk file (include/lbd_file.h) */
     /* +0x008 */ struct PlacementGrid *placements; /* New_PlacementGrid(0): its placement records (include/PlacementGrid.h) */
     /* +0x00C */ struct GridCell *cellParent; /* New_GridCell(), attached to the StageMap at `origin`; every cell's parent */
     /* +0x010 */ struct GridCell **cells; /* BMemPMgrAlloc(0x668): 410 New_GridCell() cells, row stride 20 */

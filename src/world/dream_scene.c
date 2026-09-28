@@ -42,7 +42,7 @@
 #include "NodeGuardedViewport.h"
 #include "TimBlockSrc.h"
 #include "wbgm.h"
-#include "LbdFile.h"
+#include "lbd_file.h"
 #include "box_fill.h"
 #include "frame_clock.h"
 #include "actor.h"

@@ -3,7 +3,7 @@
 
 /*
  * The getters over the game's table of file names, src/cd/game_files.c (the
- * LbdFile class it also holds is include/LbdFile.h). A record is one
+ * LbdFile class it also holds is include/lbd_file.h). A record is one
  * sRecordTable entry, a CdFileEntry (include/cd_driver.h) whose name is a
  * zero-padded path: RegisterRecordTableFiles hands the table to the CD
  * driver as its file table, which fills in each entry's position and size.
