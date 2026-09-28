@@ -5,11 +5,6 @@
  * bring-up, and the shared task argument block), a no-op slot, the
  * never-returning main loop that drives the subclass's hooks by
  * runTitleMenu's ApplicationLoopStatus, and the table getter.
- *
- * Its edges are Sony's objects on both sides (libsnd/sspause before,
- * libgs/gs_104 after), so the file is the whole region; tools/tuboundary.py
- * (round 101) finds no rodata inside it that joins or splits anything, and
- * its seven functions are one class's.
  */
 #include "common.h"
 #include "Application.h"
