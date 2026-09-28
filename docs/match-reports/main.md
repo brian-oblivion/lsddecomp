@@ -50,7 +50,7 @@ extern void SetMem(s32 mode);
  * code_8220.h already uses for BMemPMgrAlloc/BMemPMgrFree. */
 extern void *BMemPMgrInit();
 
-/* SetDefaultBMemPMgr(BMemPMgr *pool) -- one-line `gDefaultBMemPMgr = pool;`, matched
+/* SetDefaultBMemPMgr(BMemPMgr *pool) -- one-line `sDefaultBMemPMgr = pool;`, matched
  * in code_8220.c but not yet declared in code_8220.h (no carved caller
  * existed until now). */
 extern void SetDefaultBMemPMgr(BMemPMgr *pool);
@@ -168,7 +168,7 @@ this is a documentation sync only.)
     `SetDefaultBMemPMgr(...)` call -- set once, read once, both in
     `main`. Mechanics are clear (it stages the newly created heap
     pointer); whether any still-uncarved code elsewhere also reads this
-    exact global (as opposed to `gDefaultBMemPMgr`, a different address,
+    exact global (as opposed to `sDefaultBMemPMgr`, a different address,
     `BMemPMgr.c`) is not established, hence tier B rather than A.
   - `D_8008AC20` -> `gGameApplication`, tier B. The one instance of `GameApplication`
     the game constructs, matching this header's own stated convention of
@@ -351,7 +351,7 @@ The `arity-ok` line's retail evidence: the dead second argument of
 | --- | --- | --- | --- |
 | local `obj` | `drawSystem` | A | it holds `New_DrawSystem()`'s return and is passed as `initSystems`'s `DrawSystem *drawSystem` |
 | `2` (SetMem) | `CONSOLE_RAM_MB` | A | Psy-Q libapi's `SetMem(n)` takes the RAM size in megabytes, 2 on a retail console, 8 on a development board |
-| `0x166C00` | `DEFAULT_POOL_SIZE` = `(1435 * 1024)` | A | `BMemPMgrInit(s32 poolSize)` (src/app/BMemPMgr.c) stores it as `pool->poolSize`; the pool is installed by `SetDefaultBMemPMgr`, whose only caller is `main`, as the `gDefaultBMemPMgr` every `BMemPMgrAlloc` uses |
+| `0x166C00` | `DEFAULT_POOL_SIZE` = `(1435 * 1024)` | A | `BMemPMgrInit(s32 poolSize)` (src/app/BMemPMgr.c) stores it as `pool->poolSize`; the pool is installed by `SetDefaultBMemPMgr`, whose only caller is `main`, as the `sDefaultBMemPMgr` every `BMemPMgrAlloc` uses |
 
 `New_Pad(0, 0)` keeps its literals with a comment: they are `PadInit`'s mode
 and the port, and a name would restate them.

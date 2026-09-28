@@ -1834,7 +1834,7 @@ BMemPMgrAlloc = 0x80017B34; // type:func
 BMemPMgrFree = 0x80017CFC; // type:func
 PushBasicClassListNode = 0x800181AC; // type:func
 RemoveBasicClassListNode = 0x80018208; // type:func
-gDefaultBMemPMgr = 0x8008A818;
+sDefaultBMemPMgr = 0x8008A818;
 // identified: shape 0.98 vs libsnd/vmanager SpuVmAlloc (159w vs our 167w,
 // disc 3.3), position between libc2/strncmp and libsnd/vm_prog (libsnd
 // neighborhood). Superseded game-style func_8002CF18. Round 74 (bravo, track 2).

@@ -73,7 +73,7 @@ struct BMemPMgr {
 #define BMEMPMGR_MIN_POOL_SIZE 1024
 
 /* The pool allocator and its free. Both bodies read a second argument, a
- * fallback pool used only while gDefaultBMemPMgr is unset, that no caller
+ * fallback pool used only while sDefaultBMemPMgr is unset, that no caller
  * passes: every other unit declares its own one-argument prototype for its
  * own call sites. BMemPMgr.c defines them K&R so their bodies can name the
  * second parameter while its own later one-argument calls still compile; an
@@ -83,14 +83,14 @@ extern void *BMemPMgrAlloc(); /* arity-ok: the body reads $a1 as the fallback po
 extern void *BMemPMgrFree(); /* arity-ok: same as BMemPMgrAlloc (BMemPMgrFree.md, "Extern arity") */
 
 /* Makes the whole pool one free block. One argument: the body also reads a
- * fallback pool from $a1 while gDefaultBMemPMgr is unset, but BMemPMgrInit,
+ * fallback pool from $a1 while sDefaultBMemPMgr is unset, but BMemPMgrInit,
  * its only caller, never loads $a1, and a second parameter here would make it
  * load one. */
 extern void SetupBMemPMgrFreeList(BMemPMgr *pool);
 
 /* The pool SetupBMemPMgrFreeList, BMemPMgrAlloc and BMemPMgrFree work on;
  * set by SetDefaultBMemPMgr (main.c, right after BMemPMgrInit). */
-extern BMemPMgr *gDefaultBMemPMgr;
+extern BMemPMgr *sDefaultBMemPMgr;
 
 /* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
  * work and back to 0 after (setter and getter in TmdRenderer.c). Nothing in

@@ -7,7 +7,7 @@
  *    blocks (the layout is in BMemPMgr.h), and SetupBMemPMgrFreeList makes
  *    the whole pool one free block. BMemPMgrAlloc and BMemPMgrFree split and
  *    merge blocks on the pool's free list. SetupBMemPMgrFreeList,
- *    BMemPMgrAlloc and BMemPMgrFree work on gDefaultBMemPMgr
+ *    BMemPMgrAlloc and BMemPMgrFree work on sDefaultBMemPMgr
  *    (SetDefaultBMemPMgr) and fall back to their pool argument only while
  *    no default is set.
  *  - Eleven of BasicClass's methods (include/BasicClass.h), and
@@ -46,7 +46,7 @@ void *BMemPMgrInit(s32 poolSize) {
 }
 
 void SetDefaultBMemPMgr(BMemPMgr *pool) {
-    gDefaultBMemPMgr = pool;
+    sDefaultBMemPMgr = pool;
 }
 
 void FreeMem(void *ptr) {
@@ -58,7 +58,7 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool) {
     BMemBlockHdr *header;
     BMemBlockHdr *sentinel;
 
-    mgr = gDefaultBMemPMgr;
+    mgr = sDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -97,7 +97,7 @@ void *BMemPMgrAlloc(size, pool)
 
     SetBMemPMgrBusy(1);
     result = NULL;
-    mgr = gDefaultBMemPMgr;
+    mgr = sDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
@@ -194,7 +194,7 @@ void *BMemPMgrFree(ptr, pool)
     u32 nextFree;
 
     SetBMemPMgrBusy(1);
-    mgr = gDefaultBMemPMgr;
+    mgr = sDefaultBMemPMgr;
     if (mgr == NULL) {
         mgr = pool;
     }
