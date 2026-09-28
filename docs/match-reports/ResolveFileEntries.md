@@ -240,3 +240,11 @@ CdlLOC's four bytes under another name, so the copy is spelled
 the 2-byte-aligned `lwl`/`lwr` copy) is unchanged. Proposed at the head:
 replace `CdLoc16` with `CdlLOC` in include/FileResource.h once its includers
 can take `<libcd.h>` (code_179d8_r/_s, CdStream still re-declare libcd).
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+The unit-local `#define CD_SEARCH_RETRIES 0x65` is gone: CdDriver.h already
+defines `CD_SEARCH_ATTEMPTS 101`, the same value, for OpenCdFile's retry
+count. `path[0x40]` is `path[CD_PATH_SIZE]` (CdDriver.h, BuildCdFilePath's
+buffer). printf is now declared variadic, `(const char *fmt, ...)`,
+instead of `(const char *fmt, void *arg1)`; byte-exact.

@@ -142,3 +142,8 @@ Tier A.
 
 **Slot name.** `Methods6D4E8_80EC.slot68` -> `runRequestQueue`, named for the
 method `classtable.py` resolves it to, per track 3's vtable-slot rule.
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+`gCdTickStep`'s `1`/`2` are spelled `CD_TICK_STATE_MACHINE` /
+`CD_TICK_LOAD_FILE` (CdDriver.h); `VSyncCallback(0)` is `VSyncCallback(NULL)`.

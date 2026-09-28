@@ -243,3 +243,34 @@ Open hypothesis, not applied: `CdRequestNode` has an `s32` at +0x04 (`unk4`,
 zeroed at allocation, nonzero ORs the owner's flags bit 0), so the original may
 have meant `node->unk4 = 1` on the node EnqueueCdRequest is about to allocate.
 Nothing in this function reaches such a node, so it stays a hypothesis.
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+The store's comment was cut to one `MATCHING:` line; the full text was:
+
+```c
+            /* MATCHING: retail stores 1 through an unassigned callee-saved
+             * register (whatever the caller left in $s2), a bug in the
+             * original; which object it meant to reach is unknowable. */
+```
+
+and the local's `/* never assigned: see the store below */` became
+`/* never assigned */`.
+
+The local `idx` is now `fileIndex` (FindCdFileIndex's result, passed as
+EnqueueCdRequest's `fileIndex`). `self->flags |= 4` is
+`CD_FLAG_NONE_PENDING` (FileResource.h): the synchronous load is done and
+`pendingRequests` is 0, the same condition RunRequestQueue sets it on.
+
+**The build warnings.** code_179d8_q.c's compile printed 13 warnings
+(`implicit declaration of function 'LockCd'`, `type mismatch with previous
+external decl`, `'LockCd' was previously implicitly declared to return
+'int'`, the same for `UnlockCd`). This function was the first to call
+LockCd/UnlockCd, and their `extern void ...(void)` declarations sat after
+it, so cc1 declared them `int ()` implicitly at the call and then saw the
+real declaration disagree. The fix is the correct declaration before the
+first use, local to the unit (the functions are the unit's own): all
+externs now sit in one block above the first function. Byte-exact; the
+typeviews baseline lost the 13 warnings. The one warning left in the unit,
+`'unassigned' might be used uninitialized`, is the retail bug above and
+is meant.

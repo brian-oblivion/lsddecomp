@@ -111,3 +111,13 @@ code_179d8_q declared (Obj6D4E8_C80, Obj6D4E8_D70, Obj6D4E8_282AC, and the
 table views Methods6D4E8_C80 / Methods6D4E8_80EC) were that one class. Round
 96 removed the unit's last two local views: CdRequest_282AC (the writing-side
 view of CdRequestNode) and UnkC80 (CdDriver__RequestLoadFile's report).
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+The unit carried this comment above the getter; it is derivation (the
+"Why `lui`/`addiu`" section above), so it moved here verbatim:
+
+```c
+/* The class's own table getter (include/CdDriver.h) -- an address-of, not
+ * gp_rel: gCdDriverMethods lives in .data, not .sdata. */
+```

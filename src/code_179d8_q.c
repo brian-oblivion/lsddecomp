@@ -1,30 +1,37 @@
 /*
- * code_179d8_q -- the CD-ROM read driver.
+ * The CD driver's module level: the three request methods that are not
+ * per-request (requestLoadFile, stopService, cancelRequests), the queue's
+ * front end, the driver mode, the file table and the service tick. The
+ * class, the queue's types and the shared module state are
+ * include/CdDriver.h's; the constructor is in code_179d8_o.c, the other
+ * request methods in code_179d8_s.c, the state machines and the queue's
+ * nodes in code_179d8_r.c, the blocking file calls in code_179d8_h.c.
  *
- * This unit is the module-level half of the class whose method table is
- * gCdDriverMethods (header word 0x13; the object itself and its read/seek/close
- * methods are code_179d8_s, its constructor code_179d8_o). It owns four
- * things, all of them singleton state in .sdata:
+ *   - The driver mode. SetCdDriverMode sets gCdAsyncEnabled (requests are
+ *     queued and run in the background), gCdSyncQueueMode (queued, but each
+ *     run as a blocking spin) and gCdUseVSyncCallback (ServiceCdDriver is
+ *     installed with VSyncCallback; otherwise it becomes the DrawSystem
+ *     singleton's callback). It refuses while gCdBusy. InitCdDrive puts the
+ *     drive in double speed once; the Is/Get functions read the state
+ *     machine's flags back.
+ *   - The queue's front end. EnqueueCdRequest fills a node
+ *     AllocCdRequestNode has linked, counts it in its owner's
+ *     pendingRequests and calls StartCdService. CdDriver__CancelRequests
+ *     frees every node an owner has queued, first stopping the drive
+ *     (CdFlush, ResetCdStateMachine) if that owner's request is running.
+ *   - The service tick. ServiceCdDriver steps the state machine gCdTickStep
+ *     names and then runs the queue (runRequestQueue) while sCdQueueEnabled;
+ *     StartCdService installs it and enables the queue, StopCdServiceIfIdle
+ *     removes it once no state machine runs, DisableCdQueue only stops the
+ *     queue. The tick does nothing while sCdLock is set (LockCd/UnlockCd)
+ *     or while the BMemPMgr allocator is busy.
+ *   - The file table. SetFileTable / SetFileTableCount install a
+ *     CdFileEntry array; ResolveFileEntries fills each entry's disc position
+ *     and size with CdSearchFile, CD_SEARCH_ATTEMPTS tries per name.
  *
- *   - the file table: an array of 0x1C-byte CdFileEntry records (name, disc
- *     position, size) at gFileTable/gFileTableCount, whose positions
- *     ResolveFileEntries fills in with CdSearchFile;
- *   - the driver mode: gCdAsyncEnabled and gCdUseVSyncCallback, set through
- *     SetCdDriverMode, which decide whether a request is queued and serviced
- *     in the background or performed by a blocking CdSync spin;
- *   - the request queue's front door: EnqueueCdRequest appends a node to the
- *     gCdRequestQueue list (code_179d8_r owns the list itself) and starts the
- *     service;
- *   - the service pump: ServiceCdDriver, installed as a VSyncCallback (or as
- *     the DrawSystem singleton's callback, its setCallback slot +0x084), which ticks
- *     code_179d8_r's CD state machine and drains the request queue, plus
- *     LockCd/UnlockCd, the latch that keeps that tick out of a half-updated
- *     queue.
- *
- * GameApplicationFileResource.c reaches all of this through wrappers gated on
- * `gActiveDataSource == 0x13`, this class's header word; the other value that gate
- * takes, 0x23, selects the SPU/VAB streamer in PlacementGridVabSound.c. So the two
- * are interchangeable data sources behind one small dispatch layer.
+ * The game reaches all of it through GameApplicationFileResource.c's
+ * wrappers while the active data source is this class's id, DATASOURCE_CD
+ * (0x13); the other source is the SPU/VAB driver, DATASOURCE_SPU (0x23).
  */
 #include "common.h"
 #include <libetc.h>
@@ -66,16 +73,14 @@ extern s32 sCdCallbackInstalled; /* StartCdService has run, StopCdServiceIfIdle 
 extern s32 sCdQueueEnabled;      /* ServiceCdDriver runs the request queue */
 
 void CdDriver__RequestLoadFile(CdDriver *self, char *name) {
-    s32 *unassigned; /* never assigned: see the store below */
+    s32 *unassigned; /* never assigned */
     s32 fileIndex;
 
     LockCd();
 
     if (name != NULL) {
         if (gCdAsyncEnabled != 0) {
-            /* MATCHING: retail stores 1 through an unassigned callee-saved
-             * register (whatever the caller left in $s2), a bug in the
-             * original; which object it meant to reach is unknowable. */
+            /* MATCHING: retail's bug, a store through the caller's $s2 */
             unassigned[1] = 1;
             fileIndex = FindCdFileIndex(name);
             EnqueueCdRequest(self, fileIndex, CD_OP_LOAD_FILE, 0, 0);
@@ -130,8 +135,6 @@ void CdDriver__CancelRequests(CdDriver *self) {
     UnlockCd();
 }
 
-/* The class's own table getter (include/CdDriver.h) -- an address-of, not
- * gp_rel: gCdDriverMethods lives in .data, not .sdata. */
 CdDriverMethods *GetCdDriverMethods(void) {
     return &gCdDriverMethods;
 }
@@ -326,12 +329,11 @@ void DisableCdQueue(void) {
 }
 
 /* Fills a node AllocCdRequestNode has already linked onto gCdRequestQueue,
- * counts it against its owner and starts the service tick.
- * MATCHING: the stores are in retail's order (+0x08, +0x14, +0x0C, +0x10,
- * +0x18); this compiler keeps statement order. */
+ * counts it against its owner and starts the service tick. */
 void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1) {
     CdRequestNode *node = AllocCdRequestNode();
 
+    /* MATCHING: retail's store order; cc1 keeps statement order here */
     node->op = op;
     node->param0 = param0;
     node->owner = owner;

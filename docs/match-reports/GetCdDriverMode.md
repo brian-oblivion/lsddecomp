@@ -97,3 +97,7 @@ not have. Same shape as `GetVabDriverMode` two lines down.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
 added to `src/GameApplicationFileResource.c:230`. Oracle green.
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+Parameter `outMode2` -> `outSyncQueueMode`: it receives `gCdSyncQueueMode`.

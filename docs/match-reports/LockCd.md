@@ -55,3 +55,10 @@ callback, not a mutex: nothing spins or blocks on it.
 
 `code_179d8_r`'s header comment had already called this pair lock/unlock;
 this rename records it in the symbols.
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+`gCdLock` -> `sCdLock` (`tools/rename.py`): only this unit accesses it
+(LockCd, UnlockCd, ServiceCdDriver's read), so it is unit-static data,
+`sName` by the conventions, like `sCdDriveInited` beside it. Tier A: a
+flag the two setters write and the tick reads.

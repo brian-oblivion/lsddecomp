@@ -71,3 +71,9 @@ The conditional is half the function, so the name carries it -- calling this
 step to tick" selector (1 or 2), written by `code_179d8_s` and cleared by
 that unit's reset, so it belongs to whichever unit's naming pass takes
 `code_179d8_r`. Proposed there: `gCdStep`.
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+`gCdTickStep == 0` is spelled `CD_TICK_NONE`, added to include/CdDriver.h
+next to CD_TICK_STATE_MACHINE / CD_TICK_LOAD_FILE: no state machine is
+ticking (ResetCdStateMachine's value).

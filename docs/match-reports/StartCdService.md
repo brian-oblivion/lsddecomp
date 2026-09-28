@@ -69,3 +69,13 @@ one-shot flag is what stops it doing it twice.
 `sCdCallbackInstalled` is written 1 exactly where the callback is registered
 and 0 exactly where `StopCdServiceIfIdle` clears it, and is read nowhere
 else. Tier A.
+
+## Track 7 (round 101, echo): comments moved here, and names
+
+`gCdCallbackInstalled` -> `sCdCallbackInstalled` and `gCdQueueEnabled` ->
+`sCdQueueEnabled` (`tools/rename.py`): only code_179d8_q accesses either
+(StartCdService, StopCdServiceIfIdle, DisableCdQueue, ServiceCdDriver), so
+they are unit-static data, `sName`. The meanings stand as named: the
+first is set once the tick is installed and cleared when
+StopCdServiceIfIdle removes it; the second gates ServiceCdDriver's
+runRequestQueue call.
