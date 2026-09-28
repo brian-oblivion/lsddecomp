@@ -404,7 +404,8 @@
     "12": {
       "checklist": {
         "apidoc-setup": true,
-        "area-graphics-core": true
+        "area-graphics-core": true,
+        "area-graphics-res": true
       },
       "reason": "",
       "status": "auto"
