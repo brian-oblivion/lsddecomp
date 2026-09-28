@@ -1,5 +1,5 @@
-#ifndef NODEGUARDEDVIEWPORT_H
-#define NODEGUARDEDVIEWPORT_H
+#ifndef NODE_GUARDED_VIEWPORT_H
+#define NODE_GUARDED_VIEWPORT_H
 
 #include "Viewport.h"
 

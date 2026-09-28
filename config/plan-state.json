@@ -995,7 +995,7 @@
         "gNodeGuardedViewportMethods": {
           "class": "NodeGuardedViewport",
           "date": "2026-09-26",
-          "header": "include/NodeGuardedViewport.h"
+          "header": "include/node_guarded_viewport.h"
         },
         "gNullDriverMethods": {
           "class": "NullDriver",

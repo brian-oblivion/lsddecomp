@@ -36,7 +36,7 @@
 #include <libgs.h>
 #include "dream_day.h"
 #include "VabStreamObj.h"
-#include "NodeGuardedViewport.h"
+#include "node_guarded_viewport.h"
 #include "StageMap.h"
 #include "wbgm.h"
 #include "tim_image.h"

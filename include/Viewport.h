@@ -34,7 +34,7 @@
  * include/scene_node.h).
  *
  * The ctor chains to BasicClass's first (GetBasicClassMethods()->ctor),
- * and gNodeGuardedViewportMethods's (0x17, include/NodeGuardedViewport.h) chains to this one,
+ * and gNodeGuardedViewportMethods's (0x17, include/node_guarded_viewport.h) chains to this one,
  * so the id tree (0x0 -> 0x7 -> 0x17) is the ctor chain. NodeGuardedViewport expands
  * these macros.
  *

@@ -3,7 +3,7 @@
  * TitleMenu and TaskObjF, led in by the constructors and table methods of
  * two small classes, NodeGuardedViewport and GridCell.
  *
- * NodeGuardedViewport (include/NodeGuardedViewport.h) is a Viewport whose
+ * NodeGuardedViewport (include/node_guarded_viewport.h) is a Viewport whose
  * update skips the frame while no view node is attached or the ordering
  * table is not ready; its seven table methods, New_ and the table getter are
  * all here. GridCell (include/grid_cell.h, a SceneNode) is one cell of
@@ -39,7 +39,7 @@
 #include "scene_node.h"
 #include "actor.h"
 #include "Viewport.h"
-#include "NodeGuardedViewport.h"
+#include "node_guarded_viewport.h"
 #include "grid_cell.h"
 #include "TitleMenu.h"
 #include "VabStreamObj.h"
