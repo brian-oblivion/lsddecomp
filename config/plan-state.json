@@ -960,7 +960,7 @@
         "gIntermediateBaseMethods": {
           "class": "IntermediateBase",
           "date": "2026-09-25",
-          "header": "include/IntermediateBase.h"
+          "header": "include/intermediate_base.h"
         },
         "gItemListMethods": {
           "class": "ItemList",

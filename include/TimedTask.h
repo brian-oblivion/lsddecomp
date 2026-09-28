@@ -1,7 +1,7 @@
 #ifndef TIMEDTASK_H
 #define TIMEDTASK_H
 
-#include "IntermediateBase.h"
+#include "intermediate_base.h"
 
 /*
  * TimedTask -- class id 0x230, method table gTimedTaskMethods. An

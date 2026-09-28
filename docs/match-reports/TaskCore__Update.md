@@ -169,4 +169,4 @@ Renamed from Obj86B60__OnTag5Notify (tools/rename.py). Occupant of +0x05C (`upda
 The block local `bound` (it holds frameCounter, not the bound) is now
 `frames`, with a MATCHING line for the load order the residue above is
 about. States read as INTERMEDIATEBASE_STATE_START/STOP and
-TASKCORE_STATE_* (include/IntermediateBase.h, include/TaskCore.h). Byte-identical.
+TASKCORE_STATE_* (include/intermediate_base.h, include/TaskCore.h). Byte-identical.

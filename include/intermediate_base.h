@@ -1,5 +1,5 @@
-#ifndef INTERMEDIATEBASE_H
-#define INTERMEDIATEBASE_H
+#ifndef INTERMEDIATE_BASE_H
+#define INTERMEDIATE_BASE_H
 
 #include "basic_class.h"
 

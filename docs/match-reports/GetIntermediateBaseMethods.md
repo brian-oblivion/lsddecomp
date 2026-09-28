@@ -54,4 +54,4 @@ accessor's table is genuinely shared across unrelated class hierarchies.
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The getter, returning `IntermediateBaseMethods *`. Its three local declarations (TaskViewport.h, dream_day.h, task.h's TaskUtilMethods) are gone; include/IntermediateBase.h declares it.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/intermediate_base.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The getter, returning `IntermediateBaseMethods *`. Its three local declarations (TaskViewport.h, dream_day.h, task.h's TaskUtilMethods) are gone; include/intermediate_base.h declares it.

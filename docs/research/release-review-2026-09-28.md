@@ -236,7 +236,7 @@ reads them, so nothing names them).
   pointers at `tools/` commands and `docs/` files; "(no code)" jargon (8).
 - Stale names inside header prose: StageMap.h's `buildRateEntries`
   (`loadChunksAround`), `ChunkSlotSpec::key`, `LbdFile::ownerKey`; entity.h's
-  merged-unit names ("(Entity, then Entity)"); IntermediateBase.h's
+  merged-unit names ("(Entity, then Entity)"); intermediate_base.h's
   `args->unk0..unkC`; NullDriver.h and task.h name one file twice; cd_driver.h
   "that unit still spells them as literals"; basic_class.h "all 59 method
   tables" (60).

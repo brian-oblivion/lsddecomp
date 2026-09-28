@@ -72,7 +72,7 @@ unit).
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The ctor (+0x008). `self->methods = GetIntermediateBaseMethods()` needs no cast now.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/intermediate_base.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The ctor (+0x008). `self->methods = GetIntermediateBaseMethods()` needs no cast now.
 
 ## Unit banner history (round 98, echo, track 7)
 

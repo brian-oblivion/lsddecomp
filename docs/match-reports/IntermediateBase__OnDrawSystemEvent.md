@@ -87,7 +87,7 @@ object; what event code 2 represents in the game is not established
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__OnTag1Notify (class prefix). Occupies +0x054, slot `onTag1Notify`: OnNotify's case for a sender of root class 1 (gDrawSystemMethods). Parameters are (sender, event). The calls on unk10 and initArgs->unk4 use one local view in task.c (IntermediateBaseLinked); their classes are not established.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/intermediate_base.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__OnTag1Notify (class prefix). Occupies +0x054, slot `onTag1Notify`: OnNotify's case for a sender of root class 1 (gDrawSystemMethods). Parameters are (sender, event). The calls on unk10 and initArgs->unk4 use one local view in task.c (IntermediateBaseLinked); their classes are not established.
 
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 
@@ -96,7 +96,7 @@ The `self->unk10` call is FrameClock's +0x044 `tick` (include/frame_clock.h): th
 ## Track 7 (round 98, echo)
 
 The object at initArgs->pad is a Pad (Application__InitSystems passes the
-Pad; include/IntermediateBase.h names the field for it), so the two calls
+Pad; include/intermediate_base.h names the field for it), so the two calls
 are Pad's +0x044 `updateMasks` and +0x048 `dispatchEvents`
 (include/pad.h), not the unit-local `slot44`/`slot48`. The event test is
 draw_system.h's `DRAWSYSTEM_EVENT_VSYNC` (2): this is onNotify's DrawSystem

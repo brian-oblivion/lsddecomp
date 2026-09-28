@@ -3,7 +3,7 @@
 
 #include "basic_class.h"
 #include "draw_system.h"
-#include "IntermediateBase.h"
+#include "intermediate_base.h"
 
 /*
  * Application -- the program's application shell: it brings up the console's
@@ -24,7 +24,7 @@
  *   runMainLoop       once initialized, never returns: the six hooks at
  *                     +0x050..+0x064 below, in the order their comments give.
  *
- * `aux` is the IntermediateBaseInitArgs (include/IntermediateBase.h) every
+ * `aux` is the IntermediateBaseInitArgs (include/intermediate_base.h) every
  * task the subclass starts is given: {drawSystem, pad, NULL, NULL, NULL}; the
  * NULLs make each task's IntermediateBase__Init create its own FrameClock,
  * LightRig and Viewport.

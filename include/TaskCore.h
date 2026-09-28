@@ -1,7 +1,7 @@
 #ifndef TASKCORE_H
 #define TASKCORE_H
 
-#include "IntermediateBase.h"
+#include "intermediate_base.h"
 
 /*
  * TaskCore -- class id 0x130, method table gTaskCoreMethods: the

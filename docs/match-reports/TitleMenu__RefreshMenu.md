@@ -173,6 +173,6 @@ callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the
 
 ## Proposed field names
 
-IntermediateBase's `unk14` (include/IntermediateBase.h, many accessors)
+IntermediateBase's `unk14` (include/intermediate_base.h, many accessors)
 -> `lightRig`: initArgs' `lightRig`, or init's own New_LightRig(); also
 passed as TaskObjF's sprite parent. `unk10` -> `frameClock`, likewise.

@@ -79,5 +79,5 @@ The local view of the DrawSystem singleton quoted above is gone; the unit takes 
 
 `BMemPMgrAlloc(0x14)` is now `BMemPMgrAlloc(sizeof(IntermediateBaseInitArgs))`:
 the block is `self->aux`, typed `IntermediateBaseInitArgs *`, and that struct
-(include/IntermediateBase.h) is five pointers, 0x14 bytes, every one of which
+(include/intermediate_base.h) is five pointers, 0x14 bytes, every one of which
 this body writes. Byte-identical. The Final C above is the pre-track-7 text.

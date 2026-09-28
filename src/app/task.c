@@ -9,7 +9,7 @@
  *    TileMap -> BgLayer chain, clear the screen and configure the viewport;
  *    then, in sections 1 to 3 below, its pad dispatch, state machine, fades
  *    and menu methods up to its table getter;
- *  - IntermediateBase (include/IntermediateBase.h), TaskCore's parent, whole;
+ *  - IntermediateBase (include/intermediate_base.h), TaskCore's parent, whole;
  *  - Viewport (include/Viewport.h), except drawNode (viewport_draw.c): its
  *    allocator to its table getter, then GetRootNode;
  *  - Sony's GsSetProjection (libgs/gs_106), carried as C because no SDK
@@ -1153,7 +1153,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, s32 withSound) {
  * GetDefaultMovieFrame come first: one TaskCore method and two plain
  * accessors for data used far more widely (task.c, dream_scene.c).
  *
- * Then IntermediateBase (include/IntermediateBase.h, whose banner says what
+ * Then IntermediateBase (include/intermediate_base.h, whose banner says what
  * the class does): the ctor, onNotify's split by the sender's root class,
  * the counters, init and deinit, the VSync handler that ticks the frame
  * clock and polls the pad, setState with its two state hooks (which start
