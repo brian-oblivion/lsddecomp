@@ -9,7 +9,7 @@
  * ctor-chain parent. Every method is in src/world/dream_sys.c. One instance, made
  * by GameApplication__GameApplication (src/app/game_shell.c, New_DreamSys) and kept in
  * GameApplication::dreamSys; the same object is GraphRoom::dreamSys, the
- * `target` dream_scene hands SetDreamAuxWorld (dream_aux's
+ * `target` dream_scene.c hands SetDreamAuxWorld (dream_aux.c's
  * sDreamAuxWorld), and the `peer` every Entity links to.
  *
  * It owns the dream clock (SceneNode's `tick`, advanced by
@@ -589,7 +589,7 @@ struct DreamSysMethods {
 typedef DreamSys *(*DreamSysResetRetFn)(DreamSys *self);
 
 /* attachToParent (+0x04C) as its occupant, DreamSys__SpawnAtLink, takes it:
- * (self, parent), no offset. ObjM__SetupSceneStyle (dream_scene) calls it
+ * (self, parent), no offset. ObjM__SetupSceneStyle (dream_scene.c) calls it
  * through this cast. */
 typedef void (*DreamSysAttachToParentFn)(DreamSys *self, void *parent);
 

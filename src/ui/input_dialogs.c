@@ -1,5 +1,5 @@
 /*
- * input_dialogs -- two classes, in ROM order: TextEntry whole, then the
+ * input_dialogs.c -- two classes, in ROM order: TextEntry whole, then the
  * first half of ItemList (its allocator to detachTarget). ItemList's list
  * methods and its getter follow in dream_scene.c.
  *
@@ -629,7 +629,7 @@ extern char sItemListStrFontIcon[];       /* "FONTICON" */
  * Loads CARD\SELECT.TIM as the panel sprite, placed at sItemListPanelPos
  * under `parent`, and has createRows build the rows from CARD\FONTICON.TIM.
  * Does nothing without a parent or when already loaded. The same shape as
- * TextEntry__LoadCardResources (input_dialogs).
+ * TextEntry__LoadCardResources (input_dialogs.c).
  */
 void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
     char path[CARD_TIM_PATH_SIZE];

@@ -18,7 +18,7 @@
  * table's own word, counting them at +0x038; TriggerWorld__ReleaseResources
  * (+0x07C) releases that array (ReleaseBasicClassArray); and
  * TriggerWorld__GetModelData (+0x088) returns entry `index`, 0 out of range.
- * Its one outside user, dream_aux's FireDreamAuxTriggerEntries, builds one
+ * Its one outside user, dream_aux.c's FireDreamAuxTriggerEntries, builds one
  * over a trigger group's buffer, and ProcessDreamAuxTriggerRecord passes
  * getModelData(record->parity) on as New_Entity's descriptor word +0x00C,
  * which TodActor__AcquireModelData borrows as the entity's ModelData.

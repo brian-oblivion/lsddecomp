@@ -1,4 +1,4 @@
-/* stage_grid: each stage's grid of map chunks, and the two-way lookup between
+/* stage_grid.c: each stage's grid of map chunks, and the two-way lookup between
  * a mood-graph value and the grid cell (stage + chunk) that owns it.
  *
  * Each of the STAGE_COUNT stages divides into a `columns` x `rows` grid of

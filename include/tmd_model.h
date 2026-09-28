@@ -9,7 +9,7 @@
  * Methods in src/graphics/tmd_model.c.
  *
  * The object is built on ONE entry of a TMD's object table (New_TmdModel's
- * argument; LinkResource__BuildModels, graphics_resources, builds one per entry of a
+ * argument; LinkResource__BuildModels, graphics_resources.c, builds one per entry of a
  * loaded TMD). `data` is that entry minus 0xC, i.e. the file header when the
  * entry is the first one; GetObject indexes the table from there and
  * MapModelingData hands `&data->flags` to GsMapModelingData. SceneNode's

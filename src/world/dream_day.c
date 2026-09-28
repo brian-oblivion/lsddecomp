@@ -1,5 +1,5 @@
 /*
- * dream_day -- the dream day's task and the stage map it builds: DayTask,
+ * dream_day.c -- the dream day's task and the stage map it builds: DayTask,
  * RegisterRecordTableFiles, TimedTask (DayTask's parent, and ObjM's) and
  * StageMap, in that ROM order.
  *

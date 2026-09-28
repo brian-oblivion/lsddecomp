@@ -133,7 +133,7 @@ extern FadeBoxMethods *GetFadeBoxMethods(void); /* returns &gFadeBoxMethods */
 /* +0x040's occupant, as the ctor calls it through the inherited slot. */
 typedef void (*FadeBoxResetFn)(FadeBox *self, s32 channels);
 
-/* The class's own methods, in ROM order (screen_widgets). */
+/* The class's own methods, in ROM order (screen_widgets.c). */
 FadeBox *New_FadeBox(void *size, s32 channels, s32 pri);
 void FadeBox__FadeBox(FadeBox *self, void *size, s32 channels, s32 pri);
 void FadeBox__Reset(FadeBox *self, s32 channels);

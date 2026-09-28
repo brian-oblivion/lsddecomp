@@ -52,7 +52,7 @@
  * The +0x06C..+0x07B words are read as one block from outside:
  * ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
  * keeps it in sStyleSceneRefs, and ApplyStyleDecorationIfSet
- * (dream_scene) calls +0x0AC on that block's +0x00C, cachedViewport
+ * (dream_scene.c) calls +0x0AC on that block's +0x00C, cachedViewport
  * (Viewport's getFadeBox). The fields are kept flat.
  */
 
@@ -76,7 +76,7 @@ struct TextRow;
 /* ObjM::styleConfig's pointee: the day's scene style, a
  * plain record. RegisterStyleConfig returns sStyleConfig after
  * FillStyleFromConfig fills its last four words from the stage's config
- * bytes (dream_scene, whose local StyleM views the same words), or
+ * bytes (dream_scene.c, whose local StyleM views the same words), or
  * InitStyleAndWorld's caller supplies one. ObjM__SetupSceneStyle hands the
  * first three to the StageMap's lights, ObjM__EnterStyleSession the rest to
  * the viewport, ObjM__PollTimBlockLoad a colour to the TimBlockSrc. */
@@ -162,7 +162,7 @@ struct ObjM {
     /* +0x064 */ s32 loadsComplete; /* the ctor zeroes it; PollTimBlockLoad sets 1 once the TIM block and the StageMap's chunk loads are done, before enterStyleSession; no reader */
     /* +0x068 */ s32 inSession; /* the ctor zeroes it; EnterStyleSession sets it; gates update, onPadEvent, enterStyleSession */
     /* +0x06C */ BasicClass *ctorSound; /* the ctor's sound again (also TimedTask::sound); &ctorSound is RegisterStyleConfig's arg2 (see the banner) */
-    /* +0x070 */ struct LinkResource *dreamerTmd; /* the ctor's (DayTask's "ETC\DREAMER.TMD"); read through sStyleSceneRefs (dream_scene) */
+    /* +0x070 */ struct LinkResource *dreamerTmd; /* the ctor's (DayTask's "ETC\DREAMER.TMD"); read through sStyleSceneRefs (dream_scene.c) */
     /* +0x074 */ struct TimImage *etcTim; /* the ctor's (DayTask's "ETC\ETC.TIM"); AdvancePauseSetup's New_TextRow font */
     /* +0x078 */ struct NodeGuardedViewport *cachedViewport; /* InitStyleAndWorld: IntermediateBase::viewport */
     /* +0x07C */ struct TextRow *pauseText; /* AdvancePauseSetup's New_TextRow(etcTim, 5, "Pause"); TeardownPauseOverlay releases it */

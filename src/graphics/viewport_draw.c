@@ -1,5 +1,5 @@
 /*
- * viewport_draw -- Viewport__DrawNode: draws one SceneNode into the Viewport's
+ * viewport_draw.c -- Viewport__DrawNode: draws one SceneNode into the Viewport's
  * current ordering table, after first drawing each of its SceneNode children
  * the same way.
  *

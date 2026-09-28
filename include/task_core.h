@@ -47,7 +47,7 @@
  * StreamTask (include/stream_task.h) expands these macros; its
  * +0x044 override StreamTask__Init takes (args, streamName, streamGroup,
  * autoPlay) where IntermediateBase's init takes (args, mode): the table
- * keeps the inherited slot and game_shell's callers cast to
+ * keeps the inherited slot and game_shell.c's callers cast to
  * StreamTaskInitFn. TitleMenu (include/title_menu.h) expands
  * these macros too; its ctor's resetCounters call passes dreamSys and casts
  * the slot to TitleMenuResetCallFn, as GraphRoom's does. GraphRoom

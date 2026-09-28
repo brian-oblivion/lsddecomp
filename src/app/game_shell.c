@@ -1,5 +1,5 @@
 /*
- * game_shell -- two classes, in ROM order: GameApplication,
+ * game_shell.c -- two classes, in ROM order: GameApplication,
  * the game's Application, and FileResource, the base of everything loaded
  * from a file, with the active-data-source layer and the data directory.
  *

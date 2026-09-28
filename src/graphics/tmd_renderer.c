@@ -1,5 +1,5 @@
 /*
- * tmd_renderer -- the game's TMD renderer.
+ * tmd_renderer.c -- the game's TMD renderer.
  *
  * SortTmdObject, the game's replacement for Sony's
  * GsSortObject4, turns a GsDOBJ2's TMD object into GPU primitives. Per face,

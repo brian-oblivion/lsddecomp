@@ -24,7 +24,7 @@
  *    result 2, 23 with result 3; setState(4) then passes `result` to
  *    notifyParents, and the parent reads the chosen item with getCursorIndex.
  *
- * Lifecycle. Its one maker is TaskObjF__AttachItemList (title_menu):
+ * Lifecycle. Its one maker is TaskObjF__AttachItemList (title_menu.c):
  * New_ItemList(titles, 1), addChild, loadResources, attachTarget(input
  * source, tick source, sound); TaskObjF__DetachItemList undoes it
  * (detachTarget, releaseResources, release). TaskObjF's onItemListResult

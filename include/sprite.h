@@ -13,7 +13,7 @@
  * classes derive from it (`typeviews.py --tree`): ScreenSprite (0x144, the
  * screen-space sprite, include/screen_sprite.h), CharSprite (0x1144, one 8x8
  * font character, include/char_sprite.h), TextRow (0x11144) and gVariantSpriteMethods (0x1F44,
- * dream_scene/q/t).
+ * src/world/dream_scene.c).
  *
  * The texture is bound by reset (+0x040), which the ctor calls with its own
  * arguments: `texture` is a TimImage (include/tim_image.h: its GsIMAGE is at +0x02C,

@@ -1,5 +1,5 @@
 /*
- * task -- the task classes and the viewport they draw through. In address
+ * task.c -- the task classes and the viewport they draw through. In address
  * order:
  *  - StreamTask (include/stream_task.h), whole: it plays one movie stream
  *    through a MoviePlayer inside TaskCore's fade and state machine;

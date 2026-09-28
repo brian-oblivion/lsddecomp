@@ -154,7 +154,7 @@ typedef struct Descriptor10 {
     s16 h8;
 } Descriptor10;
 
-/* A Descriptor10 as dream_aux and the style layer build it for
+/* A Descriptor10 as dream_aux.c and the style layer build it for
  * computeCellOffsets, from two halves each copied whole: `key` (the chunk's
  * column/row bytes as one u16, then the cell's) and `offset`, the s16 x/y/z
  * inside the cell. MATCHING: x and y are one struct, so each copy is one

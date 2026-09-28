@@ -18,7 +18,7 @@
  * New_LinkResource over the sub-block at the buffer's third word, New_TodSet
  * over the buffer past +0x0C) and forward TOD packet decoding to the set
  * (+0x080/+0x084); its outside users, TodActor (TodActor.modelData,
- * `tmd`/`tods`) and dream_aux (InitDreamAux's MOM files), hold it as the
+ * `tmd`/`tods`) and dream_aux.c (InitDreamAux's MOM files), hold it as the
  * model and animation data of an actor.
  *
  * PARENT BY CTOR CHAIN, NOT BY ID. The id 0x5F03 puts it under TimBlockSrc

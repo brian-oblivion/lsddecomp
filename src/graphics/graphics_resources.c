@@ -1,5 +1,5 @@
 /*
- * graphics_resources -- the FileResource data sources that turn loaded files
+ * graphics_resources.c -- the FileResource data sources that turn loaded files
  * into graphics objects, the tile-map background layer, and the FMV player.
  *
  * FileResource subclasses, each reached through one of

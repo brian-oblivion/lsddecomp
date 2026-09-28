@@ -92,7 +92,7 @@ extern GraphRoomMethods *GetGraphRoomMethods(void); /* returns &gGraphRoomMethod
  * then plays GameApplication__PlaySpecialDayMovies. */
 #define GRAPHROOM_RESULT_SCORED 2
 
-/* The class's own methods, in ROM order (dream_scene). */
+/* The class's own methods, in ROM order (dream_scene.c). */
 GraphRoom *New_GraphRoom(struct DreamSys *dreamSys);
 void GraphRoom__GraphRoom(GraphRoom *self, struct DreamSys *dreamSys);
 void GraphRoom__Reset(GraphRoom *self);

@@ -1,5 +1,5 @@
 /*
- * dream_aux -- the dream's aux entities: one resident Entity kept near the
+ * dream_aux.c -- the dream's aux entities: one resident Entity kept near the
  * player, and the chunk triggers that spawn Entities as the StageMap loads
  * chunks.
  *

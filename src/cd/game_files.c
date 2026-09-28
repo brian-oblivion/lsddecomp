@@ -1,5 +1,5 @@
 /*
- * game_files -- the LbdFile class, and the getters over the game's table of
+ * game_files.c -- the LbdFile class, and the getters over the game's table of
  * file names.
  *
  * LbdFile (include/lbd_file.h, which documents the class): New_LbdFile to

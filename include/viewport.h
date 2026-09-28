@@ -103,7 +103,7 @@ struct ViewportRefView {
     /* +0x094 */ void (*onFrameClockEvent)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnFrameClockEvent: onNotify's class-5 (FrameClock) case */ \
     /* +0x098 */ void (*onDrawSystemEvent)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnDrawSystemEvent: onNotify's DrawSystem (1) case */ \
     /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; NodeGuardedViewport__Update */ \
-    /* +0x0A0 */ void (*drawNode)(Self *self, SceneNode *node);   /* Viewport__DrawNode (viewport_draw) */ \
+    /* +0x0A0 */ void (*drawNode)(Self *self, SceneNode *node);   /* Viewport__DrawNode (viewport_draw.c) */ \
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
     /* +0x0A8 */ void (*setFadeBox)(Self *self, SceneNode *handle); /* Viewport__SetFadeBox */  \
     /* +0x0AC */ SceneNode *(*getFadeBox)(Self *self);          /* Viewport__GetFadeBox */      \

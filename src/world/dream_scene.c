@@ -1,5 +1,5 @@
 /*
- * dream_scene -- the day's scene object and what it runs, with the classes
+ * dream_scene.c -- the day's scene object and what it runs, with the classes
  * that sit between them in ROM. In address order, each under its own section
  * banner below:
  *  - ItemList's second half (include/item_list.h; the first half is in
