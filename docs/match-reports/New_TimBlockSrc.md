@@ -89,7 +89,7 @@ Verbatim as it stood before the round-93 comment pass; the new banner says what 
  *   - ModelData / TriggerWorld (gModelDataMethods / gTriggerWorldMethods, TriggerWorld a
  *     ModelData subclass): a LinkResource+TodSet pair, and an array of
  *     those pairs; ModelData named from code_55dd4.h/.c's own "tmd"/"tods"/
- *     "modelData" fields, TriggerWorld from code_4cd08.c's own declared
+ *     "modelData" fields, TriggerWorld from DreamAux.c's own declared
  *     return type.
  *   - TileMap / TileAtlas (gTileMapMethods / gTileAtlasMethods): a 20x15 grid of
  *     16x16-cell map data (a GsMAP, consumed by BgLayer as its map source)

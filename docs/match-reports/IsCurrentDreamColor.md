@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005CD58` on 2026-09-21 (tools/rename.py). Address 0x8005cd58.
 
-**Unit:** code_4cd08 · **Size:** 20 words · **Status:** MATCHED round 43
+**Unit:** DreamAux · **Size:** 20 words · **Status:** MATCHED round 43
 (20/20, byte-exact whole-image build).
 
 ## History
@@ -73,10 +73,10 @@ the point of use here rather than declared as a pointer at file scope, since
 `SetDreamAuxWorld` treats the same global as a generic `s32` parameter store.
 `TriggerWorldFn80` started as a local typedef distinct from `TriggerWorldFn`
 (vtable slot 0x22, different arity) and was promoted into
-`include/code_4cd08.h` once `RemapTriggerForDreamColor` (matched immediately after, same
+`include/DreamAux.h` once `RemapTriggerForDreamColor` (matched immediately after, same
 round) turned out to need the identical alias -- see that function's report.
 `D_80088D16` (a small `s8[]` lookup table, layout otherwise unknown) is now
-declared in `include/code_4cd08.h` alongside this unit's other module-owned
+declared in `include/DreamAux.h` alongside this unit's other module-owned
 data tables.
 
 ## Proposed learning
@@ -101,14 +101,14 @@ world's vtable-0x80 slot itself represents is unknown.
 ## Track 4 (2026-09-26, round 88, bravo)
 
 The view `*gDreamAuxWorld` is cast to is renamed `DreamAuxWorld` /
-`DreamAuxWorldFn80` in include/code_4cd08.h (was `TriggerWorld` /
+`DreamAuxWorldFn80` in include/DreamAux.h (was `TriggerWorld` /
 `TriggerWorldFn80`, same `{ void **vtable; }` shape, so the call is
 unchanged). The name `TriggerWorld` now belongs to the class gTriggerWorldMethods
 (include/TriggerWorld.h), whose table is 0x8C bytes: this call loads byte
 +0x200 of its object's table (`lw v0,512(v0)`), so gDreamAuxWorld is not a
 TriggerWorld. Its real class is unresolved. Bytes unchanged.
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 
@@ -132,6 +132,6 @@ The comments, as they stood:
 
 /* gDreamAuxWorld is the player DreamSys (include/DreamSys.h, track 4
  * round 88): the +0x200 its table is called at is getDreamColor, and
- * class_3bb8c_k hands SetDreamAuxWorld its DreamSys `target`. code_4cd08.c
+ * class_3bb8c_k hands SetDreamAuxWorld its DreamSys `target`. DreamAux.c
  * declares it; the DreamAuxWorld view that stood here is gone. */
 ```

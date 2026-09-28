@@ -27,7 +27,7 @@ The leading `addu $v0, $a0, $zero` copies the incoming pointer into the return
 register before the stores, which only makes sense if the function's C source
 actually returns it — nothing else in the body needs a copy of `$a0` in
 `$v0`. Declared accordingly, rather than as `void`, on that positive evidence
-(the one caller found, in `asm/nonmatchings/code_4cd08/InitDreamAux.s`,
+(the one caller found, in `asm/nonmatchings/DreamAux/InitDreamAux.s`,
 discards the return value, so a `void` guess would have looked equally
 plausible from the call site alone — the `addu` in this function's own body is
 what settles it):
@@ -90,7 +90,7 @@ Not `LongVec3` (the words are a pointer, a string and a flag) and not Sony's
 
 Several unit-local views of this same descriptor remain, under other names:
 `ResourceSource` and `ResourceSourceArgs` (GraphicsResources.c),
-`DreamAuxLoadReq` (code_4cd08.h), `LoadRequest` (class_39e08.h),
+`DreamAuxLoadReq` (DreamAux.h), `LoadRequest` (class_39e08.h),
 `LoadModelRequest` (GameApplicationFileResource), `ResourceSourceRequest` (class_3bb8c.c). Some are
 0x10-byte locals, where the stack slot size may be what matches, so merging
 them is a head decision (proposed below), not a rename.
@@ -102,11 +102,11 @@ them is a head decision (proposed below), not a rename.
   `ResourceSource`/`ResourceSourceArgs`, `DreamAuxLoadReq`, `LoadRequest`,
   `LoadModelRequest` and `ResourceSourceRequest`, with `ResourceRequest__Set`'s
   prototype there. Check each 0x10-byte local keeps its size.
-- `include/code_4cd08.h`'s comment above `DreamAuxLoadReq` still quotes the
+- `include/DreamAux.h`'s comment above `DreamAuxLoadReq` still quotes the
   old body (`this->x=x; ...`) and calls the record "physically the same shape"
   as the vector; it now reads as the same descriptor as `ResourceRequest`.
 - `ResourceRequest__Set`'s prototype is not in `include/GameApplicationFileResource.h`: three
-  units declare their own (typed to their local view), and code_4cd08.h's
+  units declare their own (typed to their local view), and DreamAux.h's
   would conflict with it in any file including both.
 
 ### Track 6 (round 97, alpha): one definition
@@ -117,7 +117,7 @@ them is a head decision (proposed below), not a rename.
 longer defines it. The body reads `this->src.buffer = buffer;
 this->src.name = name; this->mode = mode;`. Retired onto it:
 GraphicsResources.c's `ResourceSourceArgs` (ModelData__BuildResources,
-TriggerWorld__BuildResources, TodSet__BuildTods) and include/code_4cd08.h's
+TriggerWorld__BuildResources, TodSet__BuildTods) and include/DreamAux.h's
 `DreamAuxLoadReq` (InitDreamAux), along with the local
 `ResourceRequest__Set` externs typed to them. Every `(ResourceSource *)&req`
 cast became `&req.src`. `mode` stays tier B: every caller passes 1 and no

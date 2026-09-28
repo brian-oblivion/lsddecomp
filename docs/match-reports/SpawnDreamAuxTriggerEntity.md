@@ -2,9 +2,9 @@
 
 > Renamed from `func_8005CDF8` on 2026-09-21 (tools/rename.py). Address 0x8005cdf8.
 
-**Unit:** code_4cd08 · **Size:** 79 words · **Status:** MATCHED round 43
+**Unit:** DreamAux · **Size:** 79 words · **Status:** MATCHED round 43
 (79/79, byte-exact whole-image build). This was the LAST of the eight
-functions assigned to runner charlie this round -- `code_4cd08.c` now has
+functions assigned to runner charlie this round -- `DreamAux.c` now has
 zero `INCLUDE_ASM` lines.
 
 ## History
@@ -173,7 +173,7 @@ The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
 Parameters kind/out/ctx/entry -> moodIndex/desc/trigger/spawnIndex (`ctx` is
 the chunk's DreamAuxTriggerEntry; `*(u16 *)ctx` is `trigger->key`; reading it

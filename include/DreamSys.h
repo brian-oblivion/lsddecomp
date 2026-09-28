@@ -9,7 +9,7 @@
  * ctor-chain parent. Every method is in src/DreamSys.c. One instance, made
  * by GameApplication__GameApplication (src/GameApplicationFileResource.c, New_DreamSys) and kept in
  * GameApplication::dreamSys; the same object is GraphRoom::dreamSys, the
- * `target` class_3bb8c_k hands SetDreamAuxWorld (code_4cd08's
+ * `target` class_3bb8c_k hands SetDreamAuxWorld (DreamAux's
  * gDreamAuxWorld), and the `peer` every Entity links to.
  *
  * It owns the dream clock (SceneNode's `tick`, advanced by

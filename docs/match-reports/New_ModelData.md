@@ -50,7 +50,7 @@ ModelData *New_ModelData(ResourceSource *src) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. The allocator now reads `ModelData *New_ModelData(ResourceSource *src)` (was `void *` from `s32 arg0`): its argument is the ctor's descriptor, passed through unchanged in $a1, so the bytes are the same. Its callers cast: TriggerWorld__BuildResources, InitDreamAux (code_4cd08) and TodActor__AcquireModelData (code_55dd4), whose local externs of it are deleted. The ctor is still reached through the unprototyped UnprototypedCtorTable view, because FILERESOURCE_SLOTS declares +0x008 returning void. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. The allocator now reads `ModelData *New_ModelData(ResourceSource *src)` (was `void *` from `s32 arg0`): its argument is the ctor's descriptor, passed through unchanged in $a1, so the bytes are the same. Its callers cast: TriggerWorld__BuildResources, InitDreamAux (DreamAux) and TodActor__AcquireModelData (code_55dd4), whose local externs of it are deleted. The ctor is still reached through the unprototyped UnprototypedCtorTable view, because FILERESOURCE_SLOTS declares +0x008 returning void. Image byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

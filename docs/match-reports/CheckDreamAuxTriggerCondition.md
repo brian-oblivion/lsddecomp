@@ -11,7 +11,7 @@
 > permuter: it is a consequence of WHICH BASIC BLOCK GCC PLACES WHERE, and
 > the source controls that.
 >
-> Retail's layout, read off `asm/nonmatchings/code_4cd08/CheckDreamAuxTriggerCondition.s`:
+> Retail's layout, read off `asm/nonmatchings/DreamAux/CheckDreamAuxTriggerCondition.s`:
 >
 > ```
 >         bgez  $a0, .L8005CC0C     # sel >= 0 -> the "idx = sel" arm
@@ -133,7 +133,7 @@
 > **The actual cause: retail MERGES switch cases 6 and 7 into ONE shared
 > handler, and the preserved C body had them as two separate `case` blocks.**
 > Proof is in the function's own jump table, still on disk in
-> `asm/nonmatchings/code_4cd08/CheckDreamAuxTriggerCondition.s`:
+> `asm/nonmatchings/DreamAux/CheckDreamAuxTriggerCondition.s`:
 >
 > ```
 >     /* 20A4 800118A4 C8CC0580 */ .word .L8005CCC8   <- index 6
@@ -330,7 +330,7 @@
 > near-miss, and it should not be staffed again until that blocker is resolved.
 >
 > The tell was in this report's own file all along and was never run:
-> `grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/code_4cd08/CheckDreamAuxTriggerCondition.s`
+> `grep -n 'addiu *\$at, *\$at, *%lo' asm/nonmatchings/DreamAux/CheckDreamAuxTriggerCondition.s`
 > hits at line 66. CLAUDE.md's screen says in terms that a `%lo(jtbl_*)` hit
 > counts; the screen was not applied to this function because it had already
 > been reasoned about as a preamble problem. **The blocker screen is a
@@ -341,7 +341,7 @@
 
 Unit `code_4cd08` ("DreamAux"). Restored to `INCLUDE_ASM`; no C left in
 `src/`. Owns the `0x206C` rodata slot's jump table (`jtbl_8001188C`, 20
-entries) -- untouched, stays embedded in `asm/nonmatchings/code_4cd08/CheckDreamAuxTriggerCondition.s`
+entries) -- untouched, stays embedded in `asm/nonmatchings/DreamAux/CheckDreamAuxTriggerCondition.s`
 since the function reverted to `INCLUDE_ASM`.
 
 Every branch target and every case body in this ~100-word, 20-case switch
@@ -393,7 +393,7 @@ below refers to.
 
 ```c
 #include "common.h"
-#include "code_4cd08.h"
+#include "DreamAux.h"
 
 bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record)
 {
@@ -480,7 +480,7 @@ the top of this report).
 
 ```c
 #include "common.h"
-#include "code_4cd08.h"
+#include "DreamAux.h"
 
 bool CheckDreamAuxTriggerCondition(s32 value, TriggerRecord *record)
 {
@@ -561,7 +561,7 @@ success:
 ```
 
 Needs `TriggerRecord`, `IsDayInPeriodPhase`, `IsStyleVariantEven`, `IsCurrentDreamColor` from
-`include/code_4cd08.h` (already added this round -- `IsDayInPeriodPhase` is
+`include/DreamAux.h` (already added this round -- `IsDayInPeriodPhase` is
 matched, see its own report; `IsStyleVariantEven`/`IsCurrentDreamColor` are still
 `INCLUDE_ASM` elsewhere in this unit and off-limits this round, gp-relative-
 blocked per `docs/research/gp-relative-blocker.md`).
@@ -776,10 +776,10 @@ hence B not A. Renamed `record->unk0` to `triggered` in the struct
 definition as part of this pass (see the commit renaming struct fields);
 every accessor was confined to this unit, confirmed by rebuild.
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
 `value` -> `day`, `sel` -> `condition`, `idx` -> `id`. The ids are
-enum TriggerCondition (include/code_4cd08.h), and `switch (idx - 2)` with
+enum TriggerCondition (include/DreamAux.h), and `switch (idx - 2)` with
 cases 0..19 is `switch (id)` with the enum's cases: GCC subtracts the lowest
 case itself, byte-identical. Two MATCHING lines stand for the derivation
 below and above: the `id = condition; goto have_idx;` arm placed before

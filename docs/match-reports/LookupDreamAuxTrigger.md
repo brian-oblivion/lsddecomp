@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005C8AC` on 2026-09-21 (tools/rename.py). Address 0x8005c8ac.
 
-**Unit:** code_4cd08 · **Size:** 33 words · **Status:** MATCHED round 43
+**Unit:** DreamAux · **Size:** 33 words · **Status:** MATCHED round 43
 (33/33, byte-exact whole-image build).
 
 ## History
@@ -95,7 +95,7 @@ issue.
 `RemapTriggerForDreamColor`. The search IS the function's purpose, so tier
 A applies even though it delegates the on-hit adjustment to a sibling.
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
 Returns `DreamAuxTriggerEntry *` (was the entry smuggled as s32); a0 ->
 `chunkKey`, idx -> `stage`, entry -> `trigger`. DreamAuxTriggerEntry's other

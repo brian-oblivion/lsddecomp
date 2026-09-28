@@ -124,6 +124,6 @@ stay padding in this view.
 and the fallback reads `New_ModelData(&other->src)` without the cast. Its
 first 8 bytes are a ResourceSource because they go straight to
 New_ModelData, which reads them as one. +0x08 is not typed as
-ResourceRequest's `mode`: no code writes it. The two builders (code_4cd08's
+ResourceRequest's `mode`: no code writes it. The two builders (DreamAux's
 SetDreamAuxWorld and ProcessDreamAuxTriggerRecord) fill only word 3 of an
 `s32[4]`, and nothing calls ResourceRequest__Set on it. Byte-identical.

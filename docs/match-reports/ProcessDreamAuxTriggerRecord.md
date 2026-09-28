@@ -63,7 +63,7 @@ next record in the array; otherwise return `false`.
 
 ## Types derived, and what's still unknown
 
-New in `include/code_4cd08.h`: `TriggerRecord` (fields at `0x1`-used-by-
+New in `include/DreamAux.h`: `TriggerRecord` (fields at `0x1`-used-by-
 `CheckDreamAuxTriggerCondition`... actually not yet named there, `0x2` `parity`, `0x3`
 `kind`, `0x4..0x7` `entries[4]`, stride `0x38` total), `TriggerWorld` (a
 method-table object per CLAUDE.md's offset-0 convention, only slot `0x88`
@@ -175,9 +175,9 @@ converts to u32 with the same sign-extended register). The result is a
 ModelData, which is why it goes to `scratch[3]`: New_Entity's descriptor word
 +0x00C is the ModelData TodActor__AcquireModelData borrows. The former
 `TriggerWorld { void **vtable; }` / `TriggerWorldFn` view in
-include/code_4cd08.h is gone. Bytes unchanged.
+include/DreamAux.h is gone. Bytes unchanged.
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
 TriggerRecord is 8 bytes (FireDreamAuxTriggerEntries' and InitDreamAux's
 stride), so the kind-2 recursion, `record + 1` of a 0x38-byte struct, is
@@ -216,7 +216,7 @@ The header comments, as they stood:
 
 /* ProcessDreamAuxTriggerRecord's `world` is a TriggerWorld (gTriggerWorldMethods,
  * include/TriggerWorld.h; FireDreamAuxTriggerEntries gets it from
- * New_TriggerWorld), unified in track 4 (round 88); code_4cd08.c includes
+ * New_TriggerWorld), unified in track 4 (round 88); DreamAux.c includes
  * that header. This file's former `TriggerWorld { void **vtable; }` view
  * is gone. */
 ```

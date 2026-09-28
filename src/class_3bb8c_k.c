@@ -670,7 +670,7 @@ void ObjM__TogglePause(ObjM *self) {
 
 void ObjM__NoOpSlot7C(void) {}
 
-/* src/code_4cd08.c's; no header declares it. It keeps the stage, the
+/* src/DreamAux.c's; no header declares it. It keeps the stage, the
  * StageMap, the DreamSys (gDreamAuxWorld), the sound and the FrameClock for
  * the dream's aux entities. */
 struct FrameClock;
@@ -911,7 +911,7 @@ typedef struct ChunkCoord {
     u8 row;
 } ChunkCoord;
 
-/* src/code_4cd08.c; it reads `coord` as one s16 trigger key. */
+/* src/DreamAux.c; it reads `coord` as one s16 trigger key. */
 extern s32 TryDreamAuxTrigger(s32 data, ChunkCoord *coord, s32 day);
 
 /* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005C9DC` on 2026-09-21 (tools/rename.py). Address 0x8005c9dc.
 
-**Unit:** code_4cd08 · **Size:** 54 words · **Status:** MATCHED round 43
+**Unit:** DreamAux · **Size:** 54 words · **Status:** MATCHED round 43
 (54/54, byte-exact whole-image build).
 
 ## History
@@ -133,14 +133,14 @@ established from this unit alone, hence B.
 ## Track 4 (2026-09-26, round 88, bravo)
 
 `world` is now the unified `TriggerWorld *` (include/TriggerWorld.h, class
-gTriggerWorldMethods), which code_4cd08.c includes; the unit's local
+gTriggerWorldMethods), which DreamAux.c includes; the unit's local
 `extern TriggerWorld *New_TriggerWorld(s32 *ctx)` is gone. New_TriggerWorld
 takes the ctor's descriptor (`struct ResourceSource *`: {buffer, name}), so the
 call casts the stack array whose first word is the buffer:
 `New_TriggerWorld((struct ResourceSource *)ctxArg)`. A pointer cast, no code; bytes
 unchanged.
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
 Parameters a0/a1/a2 -> day/trigger/data; returns TriggerWorld *. The
 descriptor is a ResourceRequest (`req.src.buffer = data`): a bare

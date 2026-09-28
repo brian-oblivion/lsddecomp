@@ -1679,7 +1679,7 @@ s32 GetStageLinkAngle(void) {
     return result;
 }
 
-/* Set by SetInstantTeleportersEnabled (code_4cd08.c calls it), tested by
+/* Set by SetInstantTeleportersEnabled (DreamAux.c calls it), tested by
    Test4InstantTeleporters. */
 extern s32 gInstantTeleportersEnabled;
 

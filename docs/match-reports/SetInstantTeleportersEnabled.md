@@ -17,7 +17,7 @@ missing.
 ## What it does
 
 A one-instruction setter: stores its argument into the global flag
-`gInstantTeleportersEnabled`. `code_4cd08.c` calls it as `SetInstantTeleportersEnabled(bool value)` with
+`gInstantTeleportersEnabled`. `DreamAux.c` calls it as `SetInstantTeleportersEnabled(bool value)` with
 either a computed boolean expression or the literal `1` -- consistent with a
 plain `bool` parameter here.
 
@@ -25,7 +25,7 @@ plain `bool` parameter here.
 
 ```c
 /* Flag set here, tested by Test4InstantTeleporters right below; local to
-   this unit -- code_4cd08.c calls the setter through its own extern
+   this unit -- DreamAux.c calls the setter through its own extern
    (`extern void SetInstantTeleportersEnabled(bool value);`), never touches the flag
    directly. */
 extern s32 gInstantTeleportersEnabled;
@@ -58,7 +58,7 @@ round 43, runner ALPHA, unit DreamSys.
 
 ## Naming
 
-- **Tier A.** Sets the flag Test4InstantTeleporters gates on (returns -1 immediately when it is 0); called externally from src/code_4cd08.c via its own extern declaration.
+- **Tier A.** Sets the flag Test4InstantTeleporters gates on (returns -1 immediately when it is 0); called externally from src/DreamAux.c via its own extern declaration.
 
 ## Comment moved from src/DreamSys.c (round 92, track 7)
 
@@ -66,7 +66,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
 
 ```c
 /* Flag set here, tested by Test4InstantTeleporters right below; local to
-   this unit -- code_4cd08.c calls the setter through its own extern
+   this unit -- DreamAux.c calls the setter through its own extern
    (`extern void SetInstantTeleportersEnabled(bool value);`), never touches the flag
    directly. */
 ```

@@ -1,5 +1,5 @@
 /*
- * code_4cd08 -- the dream's aux entities: one resident Entity kept near the
+ * DreamAux -- the dream's aux entities: one resident Entity kept near the
  * player, and the chunk triggers that spawn Entities as the StageMap loads
  * chunks.
  *
@@ -31,7 +31,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "Entity.h"
-#include "code_4cd08.h"
+#include "DreamAux.h"
 #include "SceneNode.h"
 #include "ModelData.h"
 #include "TriggerWorld.h"

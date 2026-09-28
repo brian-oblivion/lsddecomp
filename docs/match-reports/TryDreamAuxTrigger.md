@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005C7D4` on 2026-09-21 (tools/rename.py). Address 0x8005c7d4.
 
-**Unit:** code_4cd08 · **Size:** 54 words · **Status:** MATCHED round 43
+**Unit:** DreamAux · **Size:** 54 words · **Status:** MATCHED round 43
 (54/54, byte-exact whole-image build).
 
 ## History
@@ -113,7 +113,7 @@ a small random/parity chance, silently despawns instead
 broader game meaning of the (value, key, parity) triple it is handed is not
 established from this unit alone, hence B not A.
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
 Parameters from the caller (ObjM__CheckAuxTrigger, class_3bb8c_k.c): a0 ->
 `data` (the chunk's loaded data block), a1 -> `chunkKey` (a ChunkCoord read

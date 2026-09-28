@@ -15,7 +15,7 @@
  * parent. Methods in src/Entity.c (New_Entity .. Entity__UpdateDeactivationState)
  * and src/Entity.c (the last three slots, the range helpers, the getter).
  * The MoodCue handlers in Entity..Entity are not in the table: they are
- * the `handler` of gEntityMoodHandlerTable's rows. Spawned by code_4cd08
+ * the `handler` of gEntityMoodHandlerTable's rows. Spawned by DreamAux
  * (SetDreamAuxWorld, SpawnDreamAuxTriggerEntity).
  *
  * The mood row. New_Entity's first argument is `moodIndex`, which selects a
@@ -25,7 +25,7 @@
  * start/stop pair and updateTargetProximity, then TodActor's update.
  *
  * The peer is the player. attachToParent's (self, peer, companion, parent,
- * offset) is TodActor's; code_4cd08 passes gDreamAuxWorld as the peer, and
+ * offset) is TodActor's; DreamAux passes gDreamAuxWorld as the peer, and
  * the slots Entity calls on `peer` (+0x100, +0x120, +0x1A0, +0x200, +0x21C)
  * lie past the end of TodActor's table: their occupants in
  * gDreamSysMethods are DreamSys__GetLinkCommandFlag,
@@ -37,7 +37,7 @@
  * Actor's `grid` field (+0x04C).
  *
  * Sound cues. startSoundCue calls InitSoundCueSet on `soundCueSet` with
- * TodActor's `sound` (the ctor's third argument; code_4cd08 passes
+ * TodActor's `sound` (the ctor's third argument; DreamAux passes
  * gDreamAuxSound) as the sound object, itself as the owner and the mood row's
  * handler as the callback, and selects tick callback 'B' in reset
  * (Entity__TickSoundCue, +0x11C), which services the set once per tick. So a
@@ -135,7 +135,7 @@ extern EntityMethods gEntityMethods;
 extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
 
 /* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C)
- * is the grid manager, StageMap (include/StageMap.h; code_4cd08 passes
+ * is the grid manager, StageMap (include/StageMap.h; DreamAux passes
  * gDreamAuxStageMap). Entity/_e/_g call its startScaleRamp (+0x138). */
 
 /* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
