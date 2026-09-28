@@ -51,7 +51,7 @@ extern u8 D_8006D8D8[3];
 extern s32 D_8008B3E4;
 extern s32 D_8008B3E8;
 extern const char *D_8008B3EC;
-extern u8 D_8008B3CC[];
+extern u8 Result[];
 extern u8 D_8008B3D4[];
 extern u8 D_8008B3DC[];                /* 8-byte record, this function's second flag's snapshot buffer */
 
@@ -130,7 +130,7 @@ skip_timeout:
                 }
                 if (flags & 2) {
                     if (CD_cbsync != NULL) {
-                        CD_cbsync(*state, D_8008B3CC);
+                        CD_cbsync(*state, Result);
                     }
                 }
             }
@@ -184,7 +184,7 @@ ret1:
 ## What is known independently of this body
 
 - Screened blocker-clean at carve time (round 26).
-- `D_8008B3DC` is a NEW symbol this unit introduces (not referenced by `libcd_bios.c` or `libcd_bios.c`'s own local views) -- an 8-byte scratch buffer parallel to `D_8008B3CC`/`D_8008B3D4`, no dlabel in `asm/data/*.s` (uninitialized/BSS-style, same as those two).
+- `D_8008B3DC` is a NEW symbol this unit introduces (not referenced by `libcd_bios.c` or `libcd_bios.c`'s own local views) -- an 8-byte scratch buffer parallel to `Result`/`D_8008B3D4`, no dlabel in `asm/data/*.s` (uninitialized/BSS-style, same as those two).
 - The two flag bytes (`D_8006D8D8[1]`, `D_8006D8D8[2]`) are read/written ONLY by this function within the unit; `CD_sync` and `CD_cw` only ever touch `D_8006D8D8[0]`/`[1]`.
 
 ### Proposed learning

@@ -31,7 +31,7 @@ The CD-ROM "command" dispatcher: `arg0` is a command byte (`0`..`0x1B`ish, looke
 6. Records the command byte itself into `CD_com` (used by the OTHER two functions' printf as the "current wait's name" selector) and `*D_8006D8C4`.
 7. If `arg3 != 0` (fire-and-forget), returns `0` immediately.
 8. Otherwise runs the SAME timeout/print/flush-loop idiom as `CD_sync`/`CD_ready` (see those reports), polling `D_8006D8D8[0]` until nonzero, printing `"CD_cw"` on timeout.
-9. Once `D_8006D8D8[0]` is nonzero: if it is exactly `2` AND `cmd == 0xE`, snapshots `*(u8*)arg1` into `CD_mode`; unconditionally (if `arg2 != 0`) copies the 8-byte `D_8008B3CC` snapshot into `arg2`; returns `-1` if the final state is `5`, else `0`.
+9. Once `D_8006D8D8[0]` is nonzero: if it is exactly `2` AND `cmd == 0xE`, snapshots `*(u8*)arg1` into `CD_mode`; unconditionally (if `arg2 != 0`) copies the 8-byte `Result` snapshot into `arg2`; returns `-1` if the final state is `5`, else `0`.
 
 ## A real, measured finding about `D_8006D840`/`D_6D740` addressing (documented so nobody re-derives it)
 
@@ -74,7 +74,7 @@ extern u8 D_8006D8D9;
 extern s32 D_8008B3E4;
 extern s32 D_8008B3E8;
 extern const char *D_8008B3EC;
-extern u8 D_8008B3CC[];
+extern u8 Result[];
 extern u8 D_8008B3D4[];
 
 extern void (*CD_cbready)(s32 arg0, void *arg1);
@@ -193,7 +193,7 @@ skip_timeout3:
                     }
                     if (flags & 2) {
                         if (CD_cbsync != NULL) {
-                            CD_cbsync(*state, D_8008B3CC);
+                            CD_cbsync(*state, Result);
                         }
                     }
                 }
@@ -207,7 +207,7 @@ skip_timeout3:
     }
 
     dst = (u8 *)arg2;
-    src = D_8008B3CC;
+    src = Result;
     if (dst != NULL) {
         for (i = 7; i != -1; i--) {
             *dst = *src;
@@ -397,7 +397,7 @@ assignment inserted as the printf call's 4th argument --
 `table[state[1]]` gets assigned into the already-declared (but at that
 point still-unused) `src` pointer, with the ASSIGNMENT's value (not `src`
 itself) passed to `printf`. `src` is unconditionally overwritten later in
-the function (`src = D_8008B3CC;`, in the tail copy) before its value
+the function (`src = Result;`, in the tail copy) before its value
 from this assignment is ever read, so this is a pure dead store with zero
 behavioral effect -- its only role is nudging the register allocator.
 Translated into idiomatic C as a separate statement immediately before
