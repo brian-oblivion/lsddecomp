@@ -29,14 +29,14 @@ void Entity__MoodCue24(Entity *this, EntityMoodHandlerArg *out) {
 - Three unconditional vtable calls in a row after the gate -- straight
   sequential statements, no reshaping needed.
 - Extern added: `ROTATION_YAW_PLUS2` (own file-scope declaration; already declared
-  in `Entity_b.c`).
+  in `Entity.c`).
 - Clean of both open toolchain blockers.
 
 Matched first attempt (1/30).
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 24 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 24 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity/d/e/g.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

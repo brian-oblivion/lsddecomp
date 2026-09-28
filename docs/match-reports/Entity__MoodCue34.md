@@ -90,7 +90,7 @@ void Entity__MoodCue34(Entity *this) {
   label (`.L8005FBD4`) confirms retail's source reaches the same call site
   from two different tests, matching the two-arm duplication above.
 - `(u32)(x - LOW) < COUNT` is the established unsigned-range-check idiom
-  already used in `Entity_b.c` (`Entity__MoodCue11`'s
+  already used in `Entity.c` (`Entity__MoodCue11`'s
   `(u32)(this->unkFC - 0xD5D) < 0x78`).
 - Externs added: `ROTATION_YAW_PLUS9`, `ROTATION_YAW_MINUS9`.
 - Clean of both open toolchain blockers.
@@ -112,7 +112,7 @@ spend attempts theorizing about symbol/table layout while it stands.
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 34 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 34 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity/d/e/g.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

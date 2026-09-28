@@ -50,7 +50,7 @@ Evidence: the whole body is `return &gBasicClassMethods;`, and `gBasicClassMetho
 BasicClass's own 14-slot method table (`tools/classtable.py gBasicClassMethods`).
 The spelling is the house convention rather than an invention:
 `Get_vtable_DreamSys` (`src/DreamSys.c`) and `Get_vtable_Entity`
-(`src/Entity_b.c`) are the two existing vtable accessors in the tree and
+(`src/Entity.c`) are the two existing vtable accessors in the tree and
 both are `Get_vtable_<Class>`. 62 files reference this function, which is
 what makes matching the existing convention worth more than a tidier one.
 

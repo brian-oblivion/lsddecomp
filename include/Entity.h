@@ -13,8 +13,8 @@
  * class derives from it. The ctor calls TodActor's first
  * (GetTodActorMethods()->ctor), so the id parent is the ctor-chain
  * parent. Methods in src/Entity.c (New_Entity .. Entity__UpdateDeactivationState)
- * and src/Entity_b.c (the last three slots, the range helpers, the getter).
- * The MoodCue handlers in Entity_b..Entity_g are not in the table: they are
+ * and src/Entity.c (the last three slots, the range helpers, the getter).
+ * The MoodCue handlers in Entity..Entity_g are not in the table: they are
  * the `handler` of gEntityMoodHandlerTable's rows. Spawned by code_4cd08
  * (SetDreamAuxWorld, SpawnDreamAuxTriggerEntity).
  *
@@ -136,7 +136,7 @@ extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
 
 /* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C)
  * is the grid manager, StageMap (include/StageMap.h; code_4cd08 passes
- * gDreamAuxStageMap). Entity_b/_e/_g call its startScaleRamp (+0x138). */
+ * gDreamAuxStageMap). Entity/_e/_g call its startScaleRamp (+0x138). */
 
 /* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
  * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what
@@ -151,7 +151,7 @@ extern s32 gEntityFadeBoxDefaultOffset[2];
  * gEntityLinkStageTable and gEntityEventVideoTable are two of its columns
  * seen as flat arrays (the row base + 7 and + 8, indexed moodIndex * 16):
  * GCC spells a constant-offset field of a global array as `%hi`/`%lo(sym +
- * off)`, which splat labels as a symbol of its own. Entity_b still reads them
+ * off)`, which splat labels as a symbol of its own. Entity still reads them
  * that way; the field spelling compiles to the same bytes. */
 struct EntityMoodRow {
     u8 pad00[0x02];
@@ -205,10 +205,10 @@ enum EntityDeactivateKind {
 #define ENTITY_RANGE_UNIT (1 << ENTITY_RANGE_SHIFT)
 
 extern EntityMoodRow gEntityMoodTable[];
-extern s8 gEntityLinkStageTable[];  /* the linkStage column (Entity_b) */
-extern s8 gEntityEventVideoTable[]; /* the eventVideo column (Entity_b) */
+extern s8 gEntityLinkStageTable[];  /* the linkStage column (Entity) */
+extern s8 gEntityEventVideoTable[]; /* the eventVideo column (Entity) */
 
-/* The class's own methods, in ROM order (Entity, then Entity_b). A caller
+/* The class's own methods, in ROM order (Entity, then Entity). A caller
  * reaching the base ones goes through GetTodActorMethods() and upcasts. */
 Entity *New_Entity(s32 moodIndex, void *desc, void *sound);
 Entity *Entity__Entity(Entity *self, s32 moodIndex, void *desc, void *sound);
@@ -249,7 +249,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 
                                             s32 deactivateTimer, s32 zStep); /* Entity_g; called by Entity_d */
 
 /* The motion templates (.data, 0x80089C58..0x80089E97, in address order):
- * the constant triples the MoodCue handlers in Entity_b..Entity_g pass to
+ * the constant triples the MoodCue handlers in Entity..Entity_g pass to
  * updateRotation (+0x044) and updateScale (+0x048) -- three Ratio16s
  * (include/SceneNode.h), degrees or scale factors, {x, y, z} -- and to
  * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take

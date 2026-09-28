@@ -10,7 +10,7 @@
 
 Gated by `this->unkF0` (set by `Entity__Activate`, cleared by `Entity__Deactivate`):
 looks up this entity's mood row (`gEntityMoodTable[this->moodIndex]`), calls
-`Entity__NotifyIfTargetInRange(this, 0)` (still-uncarved, in `Entity_b` — see "Proposed
+`Entity__NotifyIfTargetInRange(this, 0)` (still-uncarved, in `Entity` — see "Proposed
 learning" below for the second argument), then decides whether to detach
 based on `row->linkKind`:
 
@@ -111,7 +111,7 @@ first, it's an argument) caught a real case here — but the callee
 clobbered as scratch before any read). A function can have a dead parameter
 that's still part of its real signature and must still be passed by every
 caller; "the callee doesn't seem to read it" is not evidence the caller
-doesn't pass it. Anyone carving `Entity__NotifyIfTargetInRange` out of `Entity_b` should
+doesn't pass it. Anyone carving `Entity__NotifyIfTargetInRange` out of `Entity` should
 give it a real 2-parameter signature (`Entity *this, s32 arg1`) even though
 `arg1` looks unused in its body — other call sites may rely on side effects
 this one doesn't need, or it may simply be dead in the source too.

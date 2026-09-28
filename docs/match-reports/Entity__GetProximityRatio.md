@@ -127,7 +127,7 @@ retail's exact `mflo`/`div`/`break` sequence with no special handling.
 
 **Tier B.** Renamed from `func_8005D864` this round (tools/rename.py).
 Occupies `EntityMethods` +0x148 (`tools/classtable.py`, confirmed CROSS-UNIT
--- Entity_b/c/d/e/f/g all dispatch through `slot148`). Computes
+-- Entity/c/d/e/f/g all dispatch through `slot148`). Computes
 `slot144_result / (gEntityProximityThresholdTable_value / this->
 proximityDivisor)`, or -1 when out of range -- a ratio (or sentinel), fully
 described by the body; what the many cross-unit callers DO with that ratio

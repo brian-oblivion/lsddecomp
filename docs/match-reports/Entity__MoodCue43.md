@@ -89,7 +89,7 @@ handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
 `src/Entity_d.c`'s unit header comment, which flags that row order does NOT
 track code address once row 115 is reached). Mechanics established
 (mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
-`Entity_b.c`'s own header comment); which dream object owns the row is not.
+`Entity.c`'s own header comment); which dream object owns the row is not.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

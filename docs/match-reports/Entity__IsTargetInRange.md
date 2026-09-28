@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005E02C` on 2026-09-23 (tools/rename.py). Address 0x8005e02c.
 
-**Unit:** Entity_b · **Size:** 33 words · **Status:** MATCHED (33/33 words,
+**Unit:** Entity · **Size:** 33 words · **Status:** MATCHED (33/33 words,
 whole-image build verified byte-exact). Superseded a prior STALL
 classification -- see "Round 8: the stall was a missing argument" below for
 what actually closed it and why fourteen prior attempts (two authors) missed
@@ -181,7 +181,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` at the
 top of the body is **retired**. Measured by deleting it alone and rebuilding:
-`build/src/Entity_b.c.o` came out byte-identical to the object built with it
+`build/src/Entity.c.o` came out byte-identical to the object built with it
 (`cmp`), and `./build-and-verify.sh` stayed green. The barrier was dead in the
 current source; the load-delay-slot effect described above no longer depends on
 it. The function now carries no `__asm__`.

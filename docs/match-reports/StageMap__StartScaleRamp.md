@@ -553,7 +553,7 @@ new `ChunkNeighbourDelta` for `sChunkNeighbourDeltas` (was typed as the
 earlier sections' history prose in this and sibling reports (known, pending
 an operator decision; not hand-reverted).
 
-This function: `StageMap__ConfigureRateEntry` -> `StageMap__StartScaleRamp` (`python3 tools/rename.py StageMap__ConfigureRateEntry StageMap__StartScaleRamp`, tier B): picks one of four Ratio16[3] steps (y +1/64, +1/4, -1/64, -1/4 by the sign of the amount and the flag) and sets `scaleRampTicks` to |amount| times the step's y den, so the ramp changes every cell's y scale by the amount. Callers: Entity_b/e/g with (1,1), (-1,0), (4,0).
+This function: `StageMap__ConfigureRateEntry` -> `StageMap__StartScaleRamp` (`python3 tools/rename.py StageMap__ConfigureRateEntry StageMap__StartScaleRamp`, tier B): picks one of four Ratio16[3] steps (y +1/64, +1/4, -1/64, -1/4 by the sign of the amount and the flag) and sets `scaleRampTicks` to |amount| times the step's y den, so the ramp changes every cell's y scale by the amount. Callers: Entity/e/g with (1,1), (-1,0), (4,0).
 
 ## Round 96 (track 7, delta)
 

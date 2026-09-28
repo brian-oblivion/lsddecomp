@@ -87,7 +87,7 @@ direction. This function's bytes ARE evidence, and they say `void`.
 
 ### Blast radius, all re-verified byte-exact
 
-35 `this->methods->slotCC(...)` call sites across `Entity_b/c/d/e/g`. Only two
+35 `this->methods->slotCC(...)` call sites across `Entity/c/d/e/g`. Only two
 use the value, both in `src/Entity_c.c`:
 
 - the local function-pointer variable in `func_8005FE1C`'s block
@@ -102,7 +102,7 @@ use the value, both in `src/Entity_c.c`:
 
 A mood-dispatch handler in this unit's family (`Entity *this,
 EntityMoodHandlerArg *out`). On `this->unk44 == 0`, calls
-`Entity__IsTargetInRange(this, 0x800)` (matched in `Entity_b.c`; this is its first
+`Entity__IsTargetInRange(this, 0x800)` (matched in `Entity.c`; this is its first
 cross-unit caller); on a nonzero result it runs a "detach" burst (two
 `SceneNode__FaceTarget` calls with swapped first/second arguments — see the
 round-13 head finding below —, `activate`, `startSoundCue`,

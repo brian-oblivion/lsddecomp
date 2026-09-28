@@ -36,7 +36,7 @@ Matched on the first attempt.
 This function (along with `Entity__OnGridCellLinkCommand`, `Entity__Update`, `Entity__GetOrCreateFadeBox`)
 is what established `GetTodActorMethods()`'s SHARED-vtable role for this unit —
 see the class-framework comment block now at the top of `Entity.h`. Worth
-flagging for anyone touching `Entity_b` next: `GetTodActorMethods()` (matched,
+flagging for anyone touching `Entity` next: `GetTodActorMethods()` (matched,
 `code_55dd4.c`) is not TodActor-specific despite living in that unit and
 returning `TodActorMethods*` there — it's the common ancestor's vtable
 accessor, reused verbatim by Entity. A local, Entity-scoped `BasicClassMethods`

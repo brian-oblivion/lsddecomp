@@ -70,7 +70,7 @@ two self-only slot calls, clears `this->unkF8`. Exact mirror of
 - `EntityMethods::slot16C` -> `stopSoundCue` -- **tier B.** `tools/
   classtable.py` resolves +0x16C to this very function. CROSS-UNIT: called
   by `Entity__Deactivate` (consistent: deactivating stops the sound cue),
-  `Entity__UpdateSoundCueStop` (Entity_b.c) and `Entity__MoodCue77` (Entity_e.c). Proposed
+  `Entity__UpdateSoundCueStop` (Entity.c) and `Entity__MoodCue77` (Entity_e.c). Proposed
   rather than applied.
 
 ## Track 4 (2026-09-26, round 88, echo)

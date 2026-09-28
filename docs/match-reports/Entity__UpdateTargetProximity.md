@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005DE18` on 2026-09-23 (tools/rename.py). Address 0x8005de18.
 
-**Unit:** Entity_b · **Size:** 50 words · **Status:** MATCHED (50/50 words,
+**Unit:** Entity · **Size:** 50 words · **Status:** MATCHED (50/50 words,
 whole-image build verified byte-exact)
 
 ## What it does
@@ -116,7 +116,7 @@ Also renamed here: `EntityMoodRow::unk6` -> `proximityRange` (compiler-checked: 
 
 ## Proposed field names
 
-Cross-unit (the compiler lists accessors outside Entity_b), so these are proposals only:
+Cross-unit (the compiler lists accessors outside Entity), so these are proposals only:
 
 | member | proposed | tier | evidence |
 | --- | --- | --- | --- |

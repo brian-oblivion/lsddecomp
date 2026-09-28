@@ -60,7 +60,7 @@ Matched on the first build.
 
 The `gEntityMoodHandlerTable` mood-handler table has (at least) 99 rows -- this unit's
 first function alone lands at row index 98, well past the ~20 rows Entity/
-Entity_b/Entity_c/Entity_d/Entity_e have matched so far. Every row's first
+Entity/Entity_c/Entity_d/Entity_e have matched so far. Every row's first
 word is a function taking `(Entity *this, EntityMoodHandlerArg *out)`, but
 `out` is not always read -- do not treat an unused `out` parameter as a
 signature-derivation problem; declare it anyway for consistency with the
@@ -84,7 +84,7 @@ address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
 order does not track code address). Tier B: the row-to-function mapping is
 a compiler fact, not a guess, but which dream state or object each row
 represents is not established -- the row number is kept decimal, matching
-the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+the existing `MoodCueNN` siblings (Entity through Entity_f), so the
 names sort in table order.
 
 ## Track 4 (2026-09-26, round 87, echo)

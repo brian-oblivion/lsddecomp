@@ -3,13 +3,13 @@
  *
  * The whole 97-function remainder this came out of has zero `jlabel`s and
  * zero `jr $t2`, so no slice of it needs a rodata slot attached and none of
- * it is a BIOS trampoline. Entity/Entity_b's `include/Entity.h` is already
+ * it is a BIOS trampoline. Entity/Entity's `include/Entity.h` is already
  * heavily typed and these functions are the same class family -- extend that
  * header rather than starting a new one.
  *
  * All 20 functions are `gEntityMoodHandlerTable` mood-dispatch callbacks,
  * `Entity__MoodCueNN` where NN is the table row (`asm/data/79528.data.s`,
- * stride 0x10) -- same family and naming convention as Entity_b/_d/_e/_g.
+ * stride 0x10) -- same family and naming convention as Entity/_d/_e/_g.
  * Row order does not track code address, so this unit's rows (19-27, 29-38,
  * plus 119) are not contiguous with each other or with source order;
  * `Entity__MoodCue119` sits far from its neighbours by address alone,

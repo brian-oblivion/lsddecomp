@@ -16,7 +16,7 @@ abs(arg3)` depending on sign), and tail-calls `this->unk94`'s vtable slot
 function was already extensively cross-validated by header comments and
 five other units' match reports (`Entity__UpdateTargetProximity`, `Entity__UpdateSoundCueStart`,
 `Entity__UpdateActivationState`, `Entity__MoodCue57`, `Entity__UpdateSoundCueStop`, `Entity__MoodCue07`, plus
-`Entity_b`/`Entity_d`) that all already call it with `s32`-not-`s8`
+`Entity`/`Entity_d`) that all already call it with `s32`-not-`s8`
 parameters and treat its return as a real value compared against 0 -- this
 round only had to supply the BODY, the signature was already settled.
 
@@ -121,7 +121,7 @@ already in `Entity.h`'s `Unk94Obj` comment before this round.
 
 - `Entity::unk94` -> `target` -- **tier B.** Same evidence as above
   (`SceneNode__FaceTarget` treats it as its own "target" argument).
-  CROSS-UNIT (Entity_b/c/d/e/f/g all dereference `->unk94`, grep -rn --
+  CROSS-UNIT (Entity/c/d/e/f/g all dereference `->unk94`, grep -rn --
   '->unk94\b'), so proposed rather than applied.
 
 ## Track 4 (2026-09-26, round 88, echo)

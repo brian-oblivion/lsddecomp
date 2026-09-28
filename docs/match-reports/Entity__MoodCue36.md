@@ -45,11 +45,11 @@ void Entity__MoodCue36(Entity *this) {
   first, pointer setup second) fixed the frame and matched first try after
   the fix.
 - `SceneNode__FaceTarget(this, this->unk94, 1, 0, 0)` is the established
-  five-argument call shape already used throughout `Entity_b.c`.
+  five-argument call shape already used throughout `Entity.c`.
 - `this->methods->slot144(this, this->unk94)` matches the two-argument
   `slot144` signature already established in `include/Entity.h`
   (`Entity__IsTargetInRange`'s residue).
-- Extern added: `SCALE_DOUBLE` (already declared as `u8[]` in `Entity_b.c`;
+- Extern added: `SCALE_DOUBLE` (already declared as `u8[]` in `Entity.c`;
   this unit needs its own file-scope declaration).
 - Clean of both open toolchain blockers.
 
@@ -74,7 +74,7 @@ and reordering around the call (not adding a barrier) is the fix.
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 36 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 36 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity/d/e/g.
 
 ## Proposed field names
 

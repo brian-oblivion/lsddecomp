@@ -44,7 +44,7 @@ void Entity__MoodCue79(Entity *this, EntityMoodHandlerArg *out) {
   standard back-to-back guard clauses, not two independent `if`s (there is
   no code between them for a first `if` to fall through into).
 - `ROTATION_YAW_PLUS2` already has externs and a callsite (`slot44(this, 0,
-  ROTATION_YAW_PLUS2)`) in `Entity_b.c`/`Entity_c.c`; this unit gets its own
+  ROTATION_YAW_PLUS2)`) in `Entity.c`/`Entity_c.c`; this unit gets its own
   per-unit `extern u8 ROTATION_YAW_PLUS2[];` per the file's existing convention
   (documented at the top of the data-table externs already in this file),
   not a shared header declaration.
@@ -57,7 +57,7 @@ known.
 
 Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 79 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
 
-Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity_b/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice0Pitch`.
+Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice0Pitch`.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

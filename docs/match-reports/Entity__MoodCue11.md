@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005E7F8` on 2026-09-23 (tools/rename.py). Address 0x8005e7f8.
 
-**Unit:** Entity_b · **Size:** 167 words · **Status:** MATCHED (167/167
+**Unit:** Entity · **Size:** 167 words · **Status:** MATCHED (167/167
 words, whole-image build verified byte-exact) — the unit's largest function
 and the last of this queue; the head predicted a residue would survive here,
 but none did.
