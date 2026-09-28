@@ -34,16 +34,10 @@
  */
 
 #include "common.h"
-#include <libsnd.h>
-#include "SsScore.h"
-#include "SvmData.h"
+#include "libsnd_internal.h"
 
-/* libsnd vmanager's _svm_tn (pinned at this address): the current VAB's
- * tone table, 16 VagAtr per program, indexed prog * 16 + tone. */
-extern VagAtr *_svm_tn;
-
-/* Holds the base of the SPU register block, 0x1F801C00, indexed in
- * halfwords as libsnd_ut_ako.c's SsUtAllKeyOff indexes it.
+/* The SPU register block, 0x1F801C00, indexed in halfwords as
+ * libsnd_ut_ako.c's SsUtAllKeyOff indexes it.
  * MATCHING: not volatile here; volatile moves SsUtKeyOff's second store out
  * of its branch delay slot. */
 extern u16 *_svm_sreg;
@@ -54,73 +48,10 @@ extern u16 *_svm_sreg;
 #define SPU_NOISE_ON_LO (0x194 / 2)
 #define SPU_NOISE_ON_HI (0x196 / 2)
 
-/* Reentrancy lock, the same identifier and type as Sony's
- * `SsSeqCalledTbyT` (`libsnd/sscall`) reads: "if already busy, return/skip;
- * set; ...; clear before returning" guarding a per-channel operation. */
-extern s32 _snd_ev_flag;
-
-/* "Currently selected channel" scratch globals: written as a side
- * effect and then re-read from the global (not from the parameter) by
- * the same and sibling functions -- same idiom as this file's own
- * D_8008EA22 above. */
-extern volatile u16 D_8008EA26;
+/* _svm_cur + 0x0C, the tone within the program (the rest of _svm_cur is in
+ * libsnd_internal.h). MATCHING: volatile here; plain changes SsUtKeyOnV's
+ * NON_MATCHING body by a word. */
 extern volatile u8 D_8008EA18;
-extern u16 D_8008EA22;
-
-/* libsnd vmanager's _svm_pg (pinned at this address): the current VAB's
- * program table, indexed by program number. */
-extern ProgAtr *_svm_pg;
-
-/* SsUtKeyOn's own scratch globals -- a "start channel" setup
- * routine that stages its parameters and a couple of table lookups
- * into a block of one/two-byte globals before registering a new
- * active-channel record.  Offsets are exact (this unit's own field
- * accesses); names are opaque placeholders per the reduced-local-view
- * convention. */
-extern u8 D_8008EA0C;
-extern u8 D_8008EA0E;
-extern u8 D_8008EA0F;
-extern u8 D_8008EA10;
-extern u8 D_8008EA11;
-extern u8 D_8008EA13;
-extern u8 D_8008EA16;
-extern u8 D_8008EA17;
-extern u8 D_8008EA19;
-extern u8 D_8008EA1A;
-extern u8 D_8008EA1B;
-extern u8 D_8008EA1C;
-extern u8 D_8008EA1D;
-extern u8 D_8008EA1E;
-extern u8 D_8008EA1F;
-extern u8 D_8008EA20;
-extern u16 D_8008EA24;
-
-extern s32 SpuVmAlloc(void);
-extern void SpuVmDoAllocate(void);
-extern void vmNoiseOn(s32 a0);
-extern s32 note2pitch2(u16 a0, u16 a1);
-extern void SpuVmKeyOnNow(s32 a0, u16 a1);
-extern s32 SpuVmVSetUp(s16 a0, s16 a1);
-
-/* Loop bound for a small table of active "objects" (screen/slot
- * pairs); see libsnd_decre.c's D_80090B68/6C for the sibling reading of
- * an analogous count. */
-extern u8 spuVmMaxVoice;
-
-/* A pair of 16-bit bitmasks split across a 0..0x1F channel space
- * (low 16 channels in the first word, next 16 in the second), each
- * paired with an "active mask" word that is cleared wherever the
- * channel mask bit is set. */
-extern u16 _svm_okof1;
-extern u16 _svm_okof2;
-extern u16 _svm_okon1;
-extern u16 _svm_okon2;
-
-/* libsnd vmanager's _svm_vh (pinned at this address): the current VAB's
- * header. */
-extern VabHdr *_svm_vh;
-
-extern s16 _svm_stereo_mono;
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 315/324 words, 9 words short. Residue: one GCC CSE

@@ -16,13 +16,7 @@
  */
 
 #include "common.h"
-#include "SsScore.h"
-
-/* libsnd's sequence-volume accessors, defined in libsnd_vmanager.c. The access
- * number packs the SEQ/SEP access in the low byte and the sequence in the
- * high byte. */
-extern s32 SpuVmSetSeqVol(s16 a0, u16 a1, u16 a2, s32 a3);
-extern s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2);
+#include "libsnd_internal.h"
 
 /* One tick of the fade Snd_SetDecres (libsnd/vol) started on
  * _ss_score[a0][a1]: every unk42 ticks (or unk42's magnitude per tick, when

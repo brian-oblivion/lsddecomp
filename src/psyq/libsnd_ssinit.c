@@ -23,27 +23,18 @@
  * libsnd_ssinit_libapi_counter in the yaml, not to this unit.
  */
 #include "common.h"
+#include "libsnd_internal.h"
 #include <libetc.h>
-#include <libsnd.h>
 #include <libspu.h>
 
-extern void SpuInitHot(void); /* Sony libspu/s_ih; not in this SDK's LIBSPU.H */
-extern void SpuVmInit(s32 arg0);
+/* libspu's s_i and s_ih; <libspu.h> declares no functions. */
+extern void SpuInit(void);
+extern void SpuInitHot(void);
+
+/* The register templates _SsInit writes: one voice's, into all 24, and the
+ * control block's. */
 extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
-extern s32 VBLANK_MINUS;
-extern s32 _snd_openflag;
-extern s32 _snd_use_vsync_cb;
-extern s32 _snd_use_interrupt_id;
-extern s32 _snd_1per2;
-extern void (*_snd_vsync_cb)(void);
-extern s32 _snd_video_mode;
-extern s32 _snd_ev_flag;
-
-/* The mark callbacks SsSetMarkCallback installs, one per (access number,
- * sequence number); _SsInit clears them all.  Same table ContNrpn1
- * (libsnd_seqread) calls through. */
-extern SsMarkCallbackProc _ss_MarkCallback[0x20][16];
 
 /*
  * Sound-system init.  Reached only through SsInit (arg0 = 0) and

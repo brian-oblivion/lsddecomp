@@ -13,19 +13,11 @@
  * 3.5 it is the last function of vmanager.o. 3.6's text is 0x138 bytes
  * against retail's 0x20C, so it cannot be linked.
  *
- * This file's declarations stay local, except Sony's _svm_voice, whose one
- * type is include/SvmData.h.
+ * Its declarations are include/libsnd_internal.h's, except _svm_sreg,
+ * which it reads through its own spelling.
  */
 #include "common.h"
-#include "SvmData.h"
-
-/* Written as a side effect, then re-read from the global a few
- * instructions later: it needs volatile, or cc1 proves the re-read
- * redundant and drops it. */
-extern volatile u16 D_8008EA26;
-
-/* The number of voices the voice manager owns. */
-extern u8 spuVmMaxVoice;
+#include "libsnd_internal.h"
 
 /*
  * _svm_sreg as this function reads it: a pointer variable (loaded with `lw`,
@@ -40,18 +32,10 @@ extern u8 spuVmMaxVoice;
  */
 extern volatile u16 *_svm_sreg;
 
-/* The voice manager's pending key masks, voices 0-15 then 16-23, which
- * SpuVmFlush writes to the SPU once per tick: each voice's bit is set in
- * the key-off masks and cleared from the key-on masks. */
-extern u16 _svm_okof1;
-extern u16 _svm_okof2;
-extern u16 _svm_okon1;
-extern u16 _svm_okon2;
-
 #ifdef NON_MATCHING
 /* NON_MATCHING: length exact, 131 words; a register-identity residue on
  * bitLo/bitHi (docs/match-reports/SsUtAllKeyOff.md). */
-void SsUtAllKeyOff(void) {
+void SsUtAllKeyOff(s16 mode) {
     s16 i;
     s16 woff;
     u16 bitpos;

@@ -630,3 +630,16 @@ The file's banner carried its edge evidence:
 > where tuboundary.py reads "start edge possible" -- the rodata is silent,
 > and the edge is kept because play and seqread are separate objects in
 > every libsnd build. After it: libsnd/adsr, a placed Sony object.
+
+## History (round 103): the third parameter, moved from src/psyq/libsnd_seqread.c
+
+SeqPlay was defined `void SeqPlay(s16 a0, s16 a1, s16 a2)` and Snd_play
+(libsnd_play.c) declared it `s32 SeqPlay(s16, s16)` with an arity-ok note.
+Round 103 dropped the unread third parameter: `void SeqPlay(s16 a0, s16 a1)`
+builds byte-identical (funcdiff 69/69, whole image green), so Snd_play and
+the definition now share one prototype in include/libsnd_internal.h, and
+Snd_play is `void`. The comment the definition carried:
+
+> The third parameter is unused; retail reuses its dead register
+> ($a2) to hold rec->unk70 for that store (docs/match-reports/SeqPlay.md).
+
