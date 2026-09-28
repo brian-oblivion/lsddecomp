@@ -1609,6 +1609,16 @@
           "note": "Four files jobs, five regions to six files: code_2864 -> ViewportDraw; code_39094 -> GameFiles (LbdFile plus the path getters, split parked); code_2c054..code_2cc8c_d -> Task (five slices, one file on single-user data; the head moved the 0x1890 rodata line and folded TaskViewport.h into Task.h); code_179d8_d..j -> PlacementGridVabSound + libsnd_vmanager (vmanager.o spans l/m/j on every disc); code_2cc8c_e..f -> ScreenWidgets.",
           "round": 100,
           "runners": 4
+        },
+        {
+          "attempts": 6,
+          "calibration": true,
+          "date": "2026-09-28",
+          "matches": 6,
+          "model": "opus",
+          "note": "Six files jobs, eleven regions, 45 units to 32 files, track 8 done: GameApplicationFileResource (code_1677c+code_171e0, the getter-follows-class rule), TimImage, FlatLightObj, SceneNode (three slices, code_d294.h folded in), DrawSystem, Pad, WBgm, CdDriver (five slices; rodata joins s|q|r|h; the head hand-merged o since CdDriver is also a type name), Application, DayTaskStageMap and TitleMenuTaskObjF (the head moved the 0x1D7C rodata line and merged _g), TextEntryItemList, ObjMStyleActor (ten slices), DreamAux, Entity (seven slices), TodActor. Parked: b|c and j|k carve edges that content would split.",
+          "round": 101,
+          "runners": 6
         }
       ],
       "status": "auto"
