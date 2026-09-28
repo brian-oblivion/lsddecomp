@@ -1,16 +1,46 @@
 /*
- * ObjMStyleActor -- the second half of ItemList's methods and the first of
- * ObjM's.
- *  - ItemList (include/ItemList.h), the list of strings the player picks one
- *    from: setState and tickClosing (close, then report the result to the
- *    parents), handleInputCode (the Pad events it answers) and playSound,
- *    the cursor and scroll methods, the four visible rows (createRows,
- *    releaseRows, refreshRows, and the non-virtual helpers FormatRowText and
- *    SetView), stepCursorInView, getCursorIndex and the table getter
- *    GetItemListMethods. Its ctor and resource methods are in TextEntryItemList.
- *  - ObjM (include/ObjM.h): its allocator, ctor, finalize and onNotify,
- *    which dispatches on the sender's class id. The rest of ObjM is in
- *    class_3bb8c_l and class_3bb8c_m.
+ * ObjMStyleActor -- the day's scene object and what it runs, with the classes
+ * that sit between them in ROM. In address order, each under its own section
+ * banner below:
+ *  - ItemList's second half (include/ItemList.h; the first half is in
+ *    TextEntryItemList.c): setState and tickClosing (close, then report the
+ *    result to the parents), handleInputCode (the Pad events it answers) and
+ *    playSound, the cursor and scroll methods, the four visible rows
+ *    (createRows, releaseRows, refreshRows, and the non-virtual helpers
+ *    FormatRowText and SetView), stepCursorInView, getCursorIndex and the
+ *    table getter GetItemListMethods;
+ *  - ObjM (include/ObjM.h), whole: the TimedTask DayTask starts for a day's
+ *    scene;
+ *  - the style layer, whose client ObjM is: its setup (RegisterStyleConfig
+ *    to ApplyStyleDecorationIfSet), its per-scene objects (StyleFlushDecoration
+ *    to StyleScrollVramStrips) and its sound cues (StyleCue00..13);
+ *  - StyleEffect (include/StyleEffect.h), whole, the Actor the style layer
+ *    keeps at an offset from its target, then SetStyleEffectSources;
+ *  - Actor (include/Actor.h), whole, the base of TodActor, DreamSys and
+ *    StyleEffect;
+ *  - VariantSprite (include/VariantSprite.h), whole;
+ *  - GraphRoom (include/GraphRoom.h), whole, the mood graph screen.
+ *
+ * What decided its edges (python3 tools/tuboundary.py). The start edge is
+ * kept because the binary forces a boundary in its stretch: the jump tables
+ * of TextEntry__HandleCommand (0x80011628, TextEntryItemList.c) and
+ * ItemList__HandleInputCode (0x800116f4, here) differ in parity ("a forced
+ * boundary lies in this stretch: tables 0x80011628 / 0x800116f4"). The end
+ * edge, before New_DreamSys, is kept for the same reason: ObjM__OnDreamSysNotify
+ * (0x8001174c) and DreamSys__OnPadEvent (0x80011788) were in different files,
+ * and this edge is the only gap left between them outside DreamSys's own
+ * class. Inside, the file is ten old carve slices, class_3bb8c_k to _t, and
+ * each of the nine edges between them cut a class: ObjM at k|l and l|m, the
+ * style layer at m|n and n|r, StyleEffect at r|s and s|o, Actor at o|p and
+ * VariantSprite at p|q and q|t. tuboundary calls each "start edge
+ * possible", six of them soft-unlikely on single-user data (l|m, m|n, s|o,
+ * o|p, p|q, q|t); content decided, so all ten were merged.
+ * PARKED: the soft signal and the content agree that the game's files ended
+ * after each Get<Class>Methods getter (GetItemListMethods, GetObjMMethods,
+ * GetStyleEffectMethods or SetStyleEffectSources, GetActorMethods,
+ * GetVariantSpriteMethods): those gaps are "boundary possible" between
+ * "unlikely" ones. Those are content splits, a new carve each, so the file
+ * keeps them all and is named for its main subjects.
  */
 #include "common.h"
 #include <libgte.h>
@@ -351,6 +381,13 @@ ItemListMethods *GetItemListMethods(void) {
     return &gItemListMethods;
 }
 
+/* ---- ObjM (include/ObjM.h) ---------------------------------------------
+ *
+ * Its allocator, ctor, finalize and onNotify, which dispatches on the
+ * sender's class id; then, in the next two sections, its table's slots in
+ * order.
+ */
+
 ObjM *New_ObjM(BasicClass *sound, struct WBgm *bgm, TimImage *etcTim,
                struct LinkResource *dreamerTmd, s32 stage) {
     ObjM *self;
@@ -400,11 +437,9 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
     }
 }
 
-/* ---- merged from class_3bb8c_l ---- */
-
-/*
- * class_3bb8c_l -- ObjM's methods from resetCounters (+0x040) through
- * enterState6 (+0x09C), in table order. The class is include/ObjM.h.
+/* ---- ObjM, resetCounters (+0x040) to enterState6 (+0x09C) ---------------
+ *
+ * In table order.
  *
  *  - init and deinit (AttachTarget, DetachTarget): install
  *    ObjM__GetGridRecord as the StageMap's chunk-record callback and keep
@@ -423,10 +458,10 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
  *    ExitSceneStyle, EnterStyleSession, TickStyle.
  *  - OnDreamSysNotify turns the DreamSys's link codes into enterState4..B;
  *    EnterState4/5/6 set IntermediateBase::state and start a fade up
- *    (ObjM__StartFadeUp, class_3bb8c_m).
+ *    (ObjM__StartFadeUp, next section).
  * NoOpSlot40 and NoOpSlot7C are empty.
  *
- * include/class_3bb8c.h is shared with every other class_3bb8c_* unit;
+ * include/class_3bb8c.h is shared with the other class_3bb8c* files;
  * edits to it are additive.
  */
 
@@ -865,12 +900,11 @@ void ObjM__EnterState6(ObjM *self) {
     self->dreamSys->methods->blockMovement(self->dreamSys);
 }
 
-/* ---- merged from class_3bb8c_m ---- */
-
-/*
- * class_3bb8c_m -- ObjM's methods from +0x0A0 to the end of its table
- * (gObjMMethods, include/ObjM.h) and its getter, then the style layer's
- * setup: the four free functions that pick the stage's scene style.
+/* ---- ObjM, +0x0A0 to its getter; the style layer's setup ----------------
+ *
+ * ObjM's methods from +0x0A0 to the end of its table (gObjMMethods) and its
+ * getter, then the style layer's setup: the four free functions that pick
+ * the stage's scene style.
  *
  * ObjM, in ROM order:
  *  - EnterState7/8/A and NotifyParentsCodeB, the DreamSys link codes
@@ -891,10 +925,10 @@ void ObjM__EnterState6(ObjM *self) {
  *    NoOpSlotBC is empty.
  *
  * The style setup is not ObjM's, but ObjM is its client:
- * ObjM__InitStyleAndWorld (ObjMStyleActor) calls RegisterStyleConfig once
+ * ObjM__InitStyleAndWorld (above) calls RegisterStyleConfig once
  * per scene and keeps the result, sStyleConfig, as ObjM::styleConfig.
  * RegisterStyleConfig stores the scene (grid, stage, ObjM's scene
- * references, day) in the gStyle globals class_3bb8c_n reads;
+ * references, day) in the gStyle globals the next section reads;
  * ApplyStyleConfig takes the stage's four-byte StyleStageConfig, or
  * PickStyleFallbackConfig's, and FillStyleFromConfig turns it into
  * StyleConfig colours and a fog distance. ApplyStyleDecorationIfSet builds
@@ -1081,7 +1115,7 @@ extern s32 gStyleDay;
 extern s32 sStyleUnreadArg;
 extern s32 gStyleSceneRefs; /* a StyleSceneRefs * (below) */
 extern s32 gStyleVariant;
-/* class_3bb8c_n.c defines StyleCueSlot; this unit only clears the slots. */
+/* StyleCueSlot is defined with the cue functions below; this only clears the slots. */
 typedef struct StyleCueSlot StyleCueSlot;
 extern StyleCueSlot *gStyleCueSlots[2];
 
@@ -1113,7 +1147,7 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
 
 /* A stage's style config: four signed bytes, from sStyleStageConfigs (NULL
  * for a stage without a fixed one) or PickStyleFallbackConfig
- * (class_3bb8c_n), which FillStyleFromConfig turns into sStyleConfig's last
+ * (next section), which FillStyleFromConfig turns into sStyleConfig's last
  * four words. */
 typedef struct StyleStageConfig {
     s8 colorMode; /* StyleConfig::colorMode */
@@ -1172,7 +1206,7 @@ typedef struct StyleSceneRefs {
     Viewport *viewport; /* +0x00C, ObjM::cachedViewport */
 } StyleSceneRefs;
 
-extern s32 gStyleDecorObj;           /* a BoxFill *; class_3bb8c_n.c declares it s32 too */
+extern s32 gStyleDecorObj;           /* a BoxFill * */
 extern s32 sStyleDecorBoxSize[2];    /* 320 x 240, the screen */
 extern BoxFillPos sStyleDecorBoxPos; /* (-100, -100), as Viewport's own fade box */
 
@@ -1192,14 +1226,13 @@ void ApplyStyleDecorationIfSet(void) {
     }
 }
 
-/* ---- merged from class_3bb8c_n ---- */
-
-/*
- * class_3bb8c_n -- the style layer's per-scene objects: what TickStyle
+/* ---- The style layer's per-scene objects ---------------------------------
+ *
+ * What TickStyle
  * builds on a scene's first tick, updates on every tick, and StyleTeardown
  * releases.
  *
- * RegisterStyleConfig (ObjMStyleActor.c), called by ObjM__InitStyleAndWorld
+ * RegisterStyleConfig (previous section), called by ObjM__InitStyleAndWorld
  * and a no-op until StyleTeardown clears gStyleGrid, sets the state read here: gStyleGrid (the
  * scene's StageMap), gStyleStage (ObjM's stage), gStyleSceneRefs (ObjM's
  * sound, resources and viewport; StyleSceneRefs below) and gStyleDay (the
@@ -1209,7 +1242,7 @@ void ApplyStyleDecorationIfSet(void) {
  *
  * What TickStyle keeps, each built on the first tick:
  *  - the decoration box, gStyleDecorObj, when the config has a colour for
- *    it (ObjMStyleActor builds it, StyleFlushDecoration releases it);
+ *    it (ApplyStyleDecorationIfSet builds it, StyleFlushDecoration releases it);
  *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (gStyleDecorSlots)
  *    coloured from gStyleDecorColors and attached under the viewport's fade
  *    box; every tick StyleUpdateDecorSet shifts their colours, their
@@ -1222,7 +1255,7 @@ void ApplyStyleDecorationIfSet(void) {
  *  - two positional sound cues (gStyleCueSlots, in gStyleCueSlotPool): a
  *    free slot claims the next record of the stage's cue list that lies
  *    within its cue's distance of the target and starts the record's
- *    SoundCueSet callback (gStyleCueCallbacks, class_3bb8c_r.c); a claimed
+ *    SoundCueSet callback (gStyleCueCallbacks, next section); a claimed
  *    slot is serviced while the target stays in range and flushed when it
  *    leaves.
  * StyleScrollVramStrips also rotates a VRAM strip one column per tick on
@@ -1259,7 +1292,7 @@ void ApplyStyleDecorationIfSet(void) {
 
 
 extern const u8 *gStyleDecorColor;
-extern s32 gStyleDecorObj; /* a BoxFill; ObjMStyleActor.c declares it s32 too */
+extern s32 gStyleDecorObj; /* a BoxFill */
 
 /* Releases the decoration box, if ApplyStyleDecorationIfSet made one. */
 void StyleFlushDecoration(void) {
@@ -1327,7 +1360,7 @@ extern s32 gStyleDecorPosY;
 extern s32 gStyleDecorSizeW;
 extern s32 gStyleDecorSizeH;
 extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
-extern s32 gStyleSceneRefs; /* a StyleSceneRefs *; ObjMStyleActor.c declares it s32 too */
+extern s32 gStyleSceneRefs; /* a StyleSceneRefs * */
 
 /* gStyleDecorPosX/Y and gStyleDecorSizeW/H are adjacent word pairs.
  * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
@@ -1533,7 +1566,7 @@ struct StyleCueSlot {
 
 extern StyleCueSlot *FlushStyleCue(StyleCueSlot *slot);
 
-extern s32 gStyleGrid; /* a StageMap; ObjMStyleActor.c declares it s32 too */
+extern s32 gStyleGrid; /* a StageMap */
 extern StyleCueSlot *gStyleCueSlots[2];
 
 /* Releases everything TickStyle built and unregisters the scene. */
@@ -1919,7 +1952,7 @@ s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
     return 0;
 }
 
-extern void ApplyStyleDecorationIfSet(void); /* ObjMStyleActor.c */
+extern void ApplyStyleDecorationIfSet(void); /* previous section */
 extern void StyleBuildDecorSet(void);
 extern void StyleUpdateDecorSet(void);
 extern void StyleScrollVramStrips(void);
@@ -1993,15 +2026,13 @@ void StyleScrollVramStrips(void) {
     RotateVramRectRight(rect, count, scratch);
 }
 
-/* ---- merged from class_3bb8c_r ---- */
-
-/*
- * class_3bb8c_r -- the style layer's sound cues and StyleEffect's lifecycle.
- * Two unrelated groups share this file, with one predicate between them:
+/* ---- The style layer's sound cues; StyleEffect's lifecycle -------------
+ *
+ * Two groups, with one predicate between them:
  *
  *  - StyleCue00..StyleCue13, the 14 rows of gStyleCueCallbacks, and their
  *    helper ComputeStyleCueFalloff. Each is a SoundCueSet callback
- *    (include/SoundCueSet.h): TryStartStyleCue (ObjMStyleActor.c) starts a
+ *    (include/SoundCueSet.h): TryStartStyleCue (previous section) starts a
  *    style-cue slot's embedded set with the claimed cue record's index as the
  *    tag and that row of the table as the callback, as Entity does with its
  *    Entity__MoodCueNN handlers. Every tick a callback sets the set's
@@ -2010,12 +2041,12 @@ void StyleScrollVramStrips(void) {
  *    requests VAB programs on the three voices; most restart the pattern by
  *    setting `tick` to -1 once it passes a limit.
  *  - IsStyleVariantEven: whether the variant PickStyleFallbackConfig chose
- *    (gStyleVariant, ObjMStyleActor.c) is even.
+ *    (gStyleVariant) is even.
  *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style layer
  *    keeps at an offset from its target: its ctor, finalize, reset
  *    (StyleEffect__SetParams) and update slot occupants, and the
- *    New_StyleEffect allocator. The per-kind work is in class_3bb8c_s.c and
- *    class_3bb8c_o.c.
+ *    New_StyleEffect allocator. The per-kind work follows, in the next two
+ *    sections.
  */
 
 /* ------------------------------------------------------------------ *
@@ -2023,14 +2054,13 @@ void StyleScrollVramStrips(void) {
  * helper ComputeStyleCueFalloff they all call first.
  * ------------------------------------------------------------------ */
 
-/* The owner every StyleCueNN callback receives: one of ObjMStyleActor.c's
- * style-cue slots (its `StyleCueSlot`, of which this is a local view).
+/* The owner every StyleCueNN callback receives: one of the style layer's
+ * style-cue slots (its `StyleCueSlot`, above, of which this is a local view).
  * TryStartStyleCue passes the slot as InitSoundCueSet's owner and its
  * embedded `cueSet` as the set, so a callback's `set` is `&ctx->cueSet`. */
 typedef struct StyleCueParam StyleCueParam;
 
-/* The cue-table record the slot claimed (ObjMStyleActor.c's
- * `StyleCueEntryView`). */
+/* The cue-table record the slot claimed (`StyleCueEntryView`, above). */
 typedef struct StyleCueParamMethods {
     u8 pad0[0x6];
     s8 cue; /* +0x006, the record's cue index (its gStyleCueCallbacks row
@@ -2335,10 +2365,7 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
     StyleEffect__UpdateByKind(self, pos);
 }
 
-/* ---- merged from class_3bb8c_s ---- */
-
-/*
- * class_3bb8c_s -- StyleEffect's per-kind work (include/StyleEffect.h).
+/* ---- StyleEffect's per-kind work (include/StyleEffect.h) ---------------
  *
  * The three switches on `kind` (StyleEffectKind) that its ctor, update and
  * finalize run: InitByKind (attach at pos + offset, link the model, build
@@ -2348,8 +2375,8 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
  * drift and release the two model children -- and for the sprite kinds,
  * build the five sprites. Two small helpers every kind uses sit among
  * them: AddVec3 and AttachWithRotScale (attach, then set the rotation and
- * scale). The slot occupants themselves are in ObjMStyleActor.c; the rest
- * of the sprite helpers, and SetStyleEffectSources, in class_3bb8c_o.c.
+ * scale). The slot occupants themselves are in the previous section; the
+ * rest of the sprite helpers, and SetStyleEffectSources, in the next.
  */
 
 /* The class and its children: include/StyleEffect.h (the owner),
@@ -2369,17 +2396,17 @@ void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, 
  * __BuildRandomSprites and __DriftModelChildren read only `self`, but the
  * calls below pass a second, dead argument that retail loads, so
  * include/StyleEffect.h declares them without a prototype. NoOpIgnoreArgs
- * (class_3bb8c_o.c, empty) is declared the same way here. */
+ * (next section, empty) is declared the same way here. */
 extern void NoOpIgnoreArgs();
 
 /* New_VariantSprite: include/VariantSprite.h. */
 
-/* What SetStyleEffectSources (class_3bb8c_o.c) recorded, declared there
+/* What SetStyleEffectSources (next section) recorded, declared there
  * with the same types: the DREAMER.TMD Actor the model kinds fetch their
  * model from (setBackClip), the TIM image New_VariantSprite is handed, and
  * the scene's Viewport, whose viewpoint y (refView.vp.y) InitByKind
  * snapshots into gStyleEffectBaseViewY and UpdateByKind follows. The
- * viewport stays `void *` because that is how class_3bb8c_o.c declares it. */
+ * viewport stays `void *` because that is how the next section declares it. */
 extern Actor *gStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
 extern void *gStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
@@ -2453,7 +2480,7 @@ void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
 
 /* Called from the class's dtor (StyleEffect__Finalize): release whichever child
  * array this kind built (both sprite kinds release `sprites`, through two
- * identical class_3bb8c_o.c functions). */
+ * identical functions in the next section). */
 void StyleEffect__ReleaseByKind(StyleEffect *self) {
     switch (self->pendingExtra) {
         case STYLE_EFFECT_MODEL_ROW:
@@ -2633,7 +2660,7 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
 /* Create the five sprites (New_VariantSprite), attach each to self at no offset,
  * give each self's colour (Sprite's setColor sets GsSPRITE r,g,b), and
  * assign `scale` as their scale when non-NULL. `self` stays `void *`: it is
- * the prototype class_3bb8c_o.c calls through, and a typed local alias of
+ * the prototype the next section calls through, and a typed local alias of
  * it costs a callee-saved register (see this function's report). */
 void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale) {
     VariantSprite **slot = ((StyleEffect *)self)->sprites;
@@ -2651,16 +2678,14 @@ void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale)
     }
 }
 
-/* ---- merged from class_3bb8c_o ---- */
-
-/*
+/* ---- StyleEffect's sprite helpers and getter; Actor, first half --------
+ *
  * The tail of StyleEffect's sprite helpers, then the first half of Actor's
- * own methods (the second half is class_3bb8c_p.c). The file is cut by
- * address, not by class, so it holds two groups:
+ * own methods (the second half is the next section):
  *
  *  - StyleEffect (include/StyleEffect.h): the per-kind pieces for its two
  *    sprite kinds that StyleEffect__UpdateByKind and ReleaseByKind
- *    (ObjMStyleActor.c) call. SpawnPlainSprites builds the five sprites,
+ *    (previous section) call. SpawnPlainSprites builds the five sprites,
  *    RandomizeSprites re-shapes four of them every frame, NoOpIgnoreArgs is
  *    the empty per-frame step, and ReleaseSprites / ReleaseSpritesB are two
  *    identical functions that release them. Behind them, by address, sit the
@@ -2723,7 +2748,7 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
     return &gStyleEffectMethods;
 }
 
-/* What StyleEffect's methods (ObjMStyleActor.c, which declares the same
+/* What StyleEffect's methods (previous sections, which declare the same
  * globals) draw from: the scene's TMD resource, its TIM image and the
  * viewport. The TMD resource's getModel slot sits where Actor has
  * setBackClip, hence the Actor view. */
@@ -2912,24 +2937,23 @@ void Actor__AddLocalTranslation(Actor *self, s16 *local) {
 }
 
 /* The z of the s16 local move vector whose x and y are gActorLocalMove
- * (class_3bb8c_p.c, with MoveLocalX/Y and MoveAlongLocalAxis). */
+ * (next section, with MoveLocalX/Y and MoveAlongLocalAxis). */
 extern s16 gActorLocalMoveZ;
 
 void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
     Actor__MoveAlongLocalAxis(self, &gActorLocalMoveZ, val, notify, ACTOR_EVENT_MOVED_Z);
 }
 
-/* ---- merged from class_3bb8c_p ---- */
-
-/*
- * class_3bb8c_p -- Actor's movement and link-search methods (include/Actor.h,
- * occupants of the base table gActorMethods, +0x0C8..+0x0EC), and
- * VariantSprite's allocator and ctor.
+/* ---- Actor's movement and link search; VariantSprite's ctor -------------
+ *
+ * Actor's movement and link-search methods (include/Actor.h, occupants of
+ * the base table gActorMethods, +0x0C8..+0x0EC), and VariantSprite's
+ * allocator and ctor.
  *
  *  - Local-axis moves. Actor__MoveLocalX/Y put `val` into one component of
  *    the local move vector gActorLocalMove, apply it through
  *    addLocalTranslation and clear it again (Actor__MoveAlongLocalAxis;
- *    MoveLocalZ is in ObjMStyleActor.c).
+ *    MoveLocalZ is in the previous section).
  *  - Move, else find a link. Actor__MoveLocalZOrFindLink/XOrFindLink clear
  *    linkTarget and move; when the move set no linkTarget,
  *    Actor__FindNearbyLink searches the StageMap grid round the actor's
@@ -2945,7 +2969,7 @@ void Actor__MoveLocalZ(Actor *self, s32 val, void *notify) {
  */
 
 /* The local move vector's x and y (s16; the z, gActorLocalMoveZ, is the next
- * halfword, ObjMStyleActor.c). All three stay 0 between moves: a move sets
+ * halfword, previous section). All three stay 0 between moves: a move sets
  * one component, addLocalTranslation rotates the whole vector by the
  * actor's orientation, and the component is cleared again. */
 extern s16 gActorLocalMove[2];
@@ -3223,8 +3247,8 @@ ActorMethods *GetActorMethods(void) {
 
 extern void *BMemPMgrAlloc(s32 size);
 
-/* VariantSprite's allocator; its other methods are in class_3bb8c_q.c and
- * class_3bb8c_t.c. */
+/* VariantSprite's allocator; its other methods follow in the next two
+ * sections. */
 VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
     void *obj = BMemPMgrAlloc(sizeof(VariantSprite));
     if (obj != NULL) {
@@ -3250,13 +3274,11 @@ void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetA
     ((VariantSpriteResetFn)self->methods->reset)(self, variant);
 }
 
-/* ---- merged from class_3bb8c_q ---- */
-
-/*
- * class_3bb8c_q -- two methods of VariantSprite (include/VariantSprite.h), a
- * Sprite whose variant, 0 or 1, picks its texture cell and CLUT. The ctor
- * and allocator are in ObjMStyleActor.c, the empty leaves and the table
- * getter in class_3bb8c_t.c.
+/* ---- VariantSprite (include/VariantSprite.h) ---------------------------
+ *
+ * A Sprite whose variant, 0 or 1, picks its texture cell and CLUT. Its ctor
+ * and allocator are just above, the empty leaves and the table getter at the
+ * head of the next section.
  *
  * - VariantSprite__SetVariantClut (reset, +0x040, called last by the ctor
  *   with the variant): records the variant and points the GsSPRITE's CLUT
@@ -3318,14 +3340,9 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
     }
 }
 
-/* ---- merged from class_3bb8c_t ---- */
-
-/*
- * class_3bb8c_t -- the graph room, and the tail of VariantSprite.
+/* ---- VariantSprite's tail; GraphRoom -----------------------------------
  *
- * - VariantSprite (include/VariantSprite.h): four empty methods and the
- *   table getter. Its ctor is in ObjMStyleActor, two more methods in
- *   ObjMStyleActor.
+ * - VariantSprite: four empty methods and the table getter.
  * - GraphRoom (include/GraphRoom.h, whose banner has the slots and fields),
  *   a TaskCore subclass, whole: allocator, ctor, every override, ScoreDayLog
  *   and the getter.
