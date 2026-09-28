@@ -55,7 +55,7 @@
 #include "TextEntry.h"
 #include "ItemList.h"
 #include "bmem_pmgr.h"
-#include "FullWidthSjis.h"
+#include "full_width_sjis.h"
 #include <stdio.h>
 #include <convert.h>
 

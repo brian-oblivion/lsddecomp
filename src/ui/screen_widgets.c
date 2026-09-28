@@ -30,7 +30,7 @@
 #include "task.h"
 #include "TextRow.h"
 #include "bmem_pmgr.h"
-#include "FullWidthSjis.h"
+#include "full_width_sjis.h"
 #include <strings.h>
 #include "scene_node.h"
 

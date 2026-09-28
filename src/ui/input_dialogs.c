@@ -34,7 +34,7 @@
 #include "ItemList.h"
 #include "ScreenSprite.h"
 #include "bmem_pmgr.h"
-#include "FullWidthSjis.h"
+#include "full_width_sjis.h"
 #include "data_source.h"
 
 /* The cursor sprite's position at index 0, (-62, -12): loadCardResources

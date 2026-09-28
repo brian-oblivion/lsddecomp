@@ -1,5 +1,5 @@
-#ifndef FULLWIDTHSJIS_H
-#define FULLWIDTHSJIS_H
+#ifndef FULL_WIDTH_SJIS_H
+#define FULL_WIDTH_SJIS_H
 
 /*
  * Conversions between printable ASCII and its full-width Shift-JIS forms,
