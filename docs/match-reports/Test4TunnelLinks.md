@@ -15,7 +15,7 @@ different table triple (tunnel links instead of permalinks).
 s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
 {
 	return GetStaticSpawn(target, currentPos, stage, sTunnelTriggersCount,
-	                       sTunnelTriggers, TUNNEL_SPAWNS, 1);
+	                       sTunnelTriggers, sTunnelSpawns, 1);
 }
 ```
 
