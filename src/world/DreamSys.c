@@ -1593,7 +1593,7 @@ void DreamSys__RestoreLinkSnapshot(DreamSys *self) {
     p->flg = 0;
 }
 
-s32 DreamSys__func_5ba20(DreamSys *self, s32 value) {
+s32 DreamSys__GetSetConfigOption(DreamSys *self, s32 value) {
     s32 old;
 
     if (value >= 0) {
