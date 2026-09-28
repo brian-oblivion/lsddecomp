@@ -351,6 +351,7 @@ s32 note2pitch2(s32 note, s32 fine) {
 
 /* Bends a keyed voice by `bend` (signed, 127 = the tone's full pbmax
  * semitones up; below 0, its pbmin down) and retunes it. */
+/* MATCHING: progIndex and tone are read through value casts; an address cast, *(u8 *)&v.progIndex, grows the frame by 8 bytes. */
 void SePitchBend(s32 chan, s32 bend) {
     s32 sregIndex;
     s32 prod;
@@ -1163,6 +1164,7 @@ s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
             u16 lowMask;
             u16 highMask;
 
+            /* MATCHING: the voice (_svm_cur +0x1A) is volatile: stored and read straight back, a plain one loses the reload. */
             D_8008EA26 = i;
             chan = D_8008EA26;
             if (chan < 0x10) {
