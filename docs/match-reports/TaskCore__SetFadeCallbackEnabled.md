@@ -27,7 +27,7 @@ void TaskCore__SetFadeCallbackEnabled(Obj86B60 *self, s32 a1)
 
 A setter for the `unk88` callback (see `TaskCore__TickFadeCallback`, which invokes it):
 `a1==0` clears it, `a1==1` sets it to this class's OWN vtable slot `+0xB0`
-(`TaskCore__TickColorFade`) read as a raw function-pointer VALUE (never called through
+(`TaskCore__TickFadeIn`) read as a raw function-pointer VALUE (never called through
 here), any other `a1` leaves it untouched.
 
 ## Residue and fix (2 wasted attempts, then matched)
@@ -68,7 +68,7 @@ whole function reuses across a `switch`.
 
 - `Obj86B60::unk88` (`s32 (*)(Obj86B60*)`, +0x088) -- OBSERVED here as a
   setter target; invoked by `TaskCore__TickFadeCallback`.
-- `Obj86B60Methods::slotB0` (+0x0B0) -- IS `TaskCore__TickColorFade`; here it is read
+- `Obj86B60Methods::slotB0` (+0x0B0) -- IS `TaskCore__TickFadeIn`; here it is read
   as raw DATA (a function-pointer value), never called through the vtable
   in this unit.
 
@@ -81,7 +81,7 @@ round 2026-09-02, runner echo, unit Task. 3 attempts.
 **Tier B.** `func_8003CAF8` -> `Obj86B60__SetFadeCallbackEnabled`. Body:
 `switch(a1) { case 0: self->unk88 = NULL; break; case 1: self->unk88 =
 methods->slotB0; break; }`. In this unit's evidence, `slotB0` is ALWAYS
-`TaskCore__TickColorFade` (its own IS-occupant, see that report) and nothing
+`TaskCore__TickFadeIn` (its own IS-occupant, see that report) and nothing
 else ever writes `self->unk88`, so "fade callback" is a grounded mechanical
 description, not a guess: this is a boolean enable/disable toggle for the
 colour-fade tick. Called with a literal boolean-shaped `a1` at every site we
@@ -91,7 +91,7 @@ can see (0 or 1), which is why "Enabled" rather than a generic "Set".
 
 `Obj86B60::unk88` (`s32 (*)(Obj86B60 *self)`, +0x088) -> `fadeCallback`.
 Tier B: in this unit's own evidence the only value ever stored here besides
-NULL is `self->methods->slotB0` (`TaskCore__TickColorFade`), and
+NULL is `self->methods->slotB0` (`TaskCore__TickFadeIn`), and
 `TaskCore__TickFadeCallback` is its sole invoker. Grep shows `unk88` textual
 hits in Task.c/code_179d8_{k,f}.c/code_2cc8c_{d,e}.c/Entity.c
 (several genuinely this same shared Obj86B60 struct, per Task/e), so

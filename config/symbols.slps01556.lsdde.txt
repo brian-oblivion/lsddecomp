@@ -2384,7 +2384,7 @@ TaskCore__SetFadeOutCallbackEnabled = 0x8003CB30; // type:func
 TaskCore__SetColors = 0x8003CB68; // type:func
 TaskCore__SetFadeRate = 0x8003CBB8; // type:func
 TaskCore__TickFadeCallback = 0x8003CBC0; // type:func
-TaskCore__TickColorFade = 0x8003CC2C; // type:func
+TaskCore__TickFadeIn = 0x8003CC2C; // type:func
 TaskCore__TickFadeOutCallback = 0x8003CCDC; // type:func
 // libsnd SpuVmSetVol, identified (plan revision 16): its only caller is Sony's
 // _SsSetControlChange, which calls it at the three sites where 3.3/3.5

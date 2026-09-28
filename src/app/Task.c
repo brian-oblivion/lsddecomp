@@ -581,7 +581,7 @@ s32 TaskCore__TickFadeCallback(TaskCore *self) {
     return done;
 }
 
-s32 TaskCore__TickColorFade(TaskCore *self) {
+s32 TaskCore__TickFadeIn(TaskCore *self) {
     s32 level;
     u8 color[3];
 

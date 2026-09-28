@@ -1,4 +1,6 @@
-# TaskCore__TickColorFade — MATCH (44/44 words)
+# TaskCore__TickFadeIn — MATCH (44/44 words)
+
+> Renamed from `TaskCore__TickColorFade` on 2026-09-28 (tools/rename.py). Address 0x8003cc2c.
 
 > Renamed from `Obj86B60__TickColorFade` on 2026-09-25 (tools/rename.py). Address 0x8003cc2c.
 
@@ -9,7 +11,7 @@
 ## What it does
 
 ```c
-s32 TaskCore__TickColorFade(Obj86B60 *self)
+s32 TaskCore__TickFadeIn(Obj86B60 *self)
 {
     s32 prod;
     u8 buffer[3];

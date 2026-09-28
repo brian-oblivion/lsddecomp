@@ -38,7 +38,7 @@ runner alpha). Tier A: a pure leaf increment (`self->unk1C++`) -- tier A by
 the same "mechanics ARE the purpose" rule as a getter/clamp/list-push.
 "FrameCounter" reuses the already-established cross-function reading of
 `unk1C` ("a running count/frame value multiplied against unk84",
-`TaskCore__TickColorFade`, Task.c) rather than inventing a new one; `unk1C`
+`TaskCore__TickFadeIn`, Task.c) rather than inventing a new one; `unk1C`
 itself is PROPOSED for rename to `frameCounter` in this unit's
 `## Proposed field names` (shared with Task.c).
 
@@ -49,11 +49,11 @@ itself is PROPOSED for rename to `frameCounter` in this unit's
   (`IntermediateBase__IncrementFrameCounter`), zeroed on state-reset paths
   (`IntermediateBase__ResetCounters`, `IntermediateBase__OnState2`,
   `IntermediateBase__OnState3`, and `TaskCore__SetState` in `Task.c` on
-  several message codes), and consumed as a multiplier in `TaskCore__TickColorFade`
+  several message codes), and consumed as a multiplier in `TaskCore__TickFadeIn`
   (Task.c) against `unk84` -- consistent with a per-instance
   frame/tick counter. What in-game effect the resulting product drives is
   NOT established, hence tier B. NOT renamed directly: shared with
-  `Task.c` (`TaskCore__SetState`, `TaskCore__TickColorFade`, and likely
+  `Task.c` (`TaskCore__SetState`, `TaskCore__TickFadeIn`, and likely
   `TaskCore__SetFadeRate`/`TaskCore__TickFadeCallback`'s own callers of `self->unk1C`). Head
   applies by type scope.
 
