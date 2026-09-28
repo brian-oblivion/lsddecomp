@@ -1602,9 +1602,8 @@ extern s32 sStyleSpawnModelLayout;
 
 /* Randomises the spawn parameters: offset y (offsetY, or a random choice
  * when 0), x and z offsets of 0..22 steps of 2048 either side, a rotation
- * and a model layout. `pos` is unused.
- * MATCHING: sStyleSpawnOffsetX is declared a scalar, not an array (an array
- * decay is kept in a saved register across the rand() calls). */
+ * and a model layout. `pos` is unused. */
+/* MATCHING: sStyleSpawnOffsetX is declared a scalar, not an array. */
 void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     if (offsetY == 0) {
         offsetY = sStyleSpawnYChoices[rand() & 3];
@@ -1628,9 +1627,8 @@ extern s32 sStyleSpawnYChoice1;
  * by day % 3 (40960, -40960, 2048), then the same rotation and layout
  * picks as SetupStyleSpawnParamsRandom. Both parameters are unused; it has
  * that function's signature because StyleFillEffectKind0 calls either
- * through one pointer.
- * MATCHING: each rand() is used inline; one local for all three adds a move
- * after every call. */
+ * through one pointer. */
+/* MATCHING: each rand() is used inline; one local for all three adds a move after every call. */
 void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     s32 dayMod3;
 
@@ -2439,9 +2437,9 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
 
 /* Create the five sprites (New_VariantSprite), attach each to self at no offset,
  * give each self's colour (Sprite's setColor sets GsSPRITE r,g,b), and
- * assign `scale` as their scale when non-NULL. `self` stays `void *`: it is
- * the prototype the next section calls through, and a typed local alias of
- * it costs a callee-saved register (see this function's report). */
+ * assign `scale` as their scale when non-NULL. `self` is `void *`, the
+ * prototype the next section calls through. */
+/* MATCHING: self stays void * and is cast at each use; a typed local alias does not match. */
 void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale) {
     VariantSprite **slot = ((StyleEffect *)self)->sprites;
     VariantSprite *sprite;
@@ -3266,8 +3264,7 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
         if (day < 0) {
             day = DAYS_PER_YEAR - 1;
         }
-        /* MATCHING: indexed twice; through a `MoodGraphPoint *` to the day,
-         * cc1 adds the array's +0x018 to the pointer first. */
+        /* MATCHING: indexed twice; a MoodGraphPoint pointer to the day does not match */
         dx = save->moodPreviousDays[day].axis.dynamic;
         point.x = dx * GRAPH_PIXELS_PER_MOOD - GRAPH_POINT_SIZE / 2;
         dy = save->moodPreviousDays[day].axis.upper;
