@@ -1276,7 +1276,7 @@ void ApplyStyleDecorationIfSet(void) {
 #define STYLE_VARIANT2_EFFECTS 16
 
 /* The palette entry that, as a variant-0 config's decor colour, selects
- * gStyleDecorColorsB instead of sStyleDecorColorsA (PickStyleFallbackConfig). */
+ * sStyleDecorColorsB instead of sStyleDecorColorsA (PickStyleFallbackConfig). */
 #define STYLE_DECOR_B_PALETTE_INDEX 18
 
 
@@ -1299,7 +1299,7 @@ extern s8 gStyleVariantConfigCounts[];
 extern s32 sStyleConfigIndex;
 extern s8 *gStyleVariantConfigs[];
 extern const u8 *sStyleClearColor;
-extern u8 gStyleDecorColorsB[];
+extern u8 sStyleDecorColorsB[];
 extern u8 gStylePalette[][3];
 extern const u8 *sStyleDecorColors;
 extern u8 sStyleDecorColorsA[];
@@ -1330,7 +1330,7 @@ void *PickStyleFallbackConfig(void) {
         clearIndex = config[3];
         sStyleClearColor = gStylePalette[clearIndex];
         decorIndex = config[2];
-        decorColors = gStyleDecorColorsB;
+        decorColors = sStyleDecorColorsB;
         if (decorIndex != STYLE_DECOR_B_PALETTE_INDEX) {
             decorColors = sStyleDecorColorsA;
         }
@@ -1654,7 +1654,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     PtrBoxK3 *rotation;
 
     SetupStyleSpawnParamsRandom(pos, gStyleSpawnYChoice2);
-    if (gStyleDecorVariant != 0 && sStyleDecorColors == gStyleDecorColorsB) {
+    if (gStyleDecorVariant != 0 && sStyleDecorColors == sStyleDecorColorsB) {
         gStyleSpawnOffsetX = -45056;
         gStyleSpawnOffsetY = -8192;
         gStyleSpawnOffsetZ = 0;

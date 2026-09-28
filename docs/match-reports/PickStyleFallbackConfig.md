@@ -25,7 +25,7 @@ extern s8 gStyleVariantConfigCounts[];        /* divisor table, indexed by "kind
 extern s32 sStyleConfigIndex;
 extern s32 gStyleVariantConfigs[];       /* array of raw base addresses, indexed by "kind" (scaled x4) */
 extern s32 sStyleClearColor;
-extern u8 gStyleDecorColorsB[];        /* address only taken */
+extern u8 sStyleDecorColorsB[];        /* address only taken */
 extern u8 gStylePalette[];        /* 3-byte-stride table, indexed by a byte field */
 extern s32 sStyleDecorColors;
 extern u8 sStyleDecorColorsA[];        /* address only taken */
@@ -56,7 +56,7 @@ void *PickStyleFallbackConfig(void) {
         b3 = result[3];
         sStyleClearColor = (s32) (gStylePalette + b3 * 3);
         b2 = result[2];
-        tab = gStyleDecorColorsB;
+        tab = sStyleDecorColorsB;
         if (b2 != 0x12) {
             tab = sStyleDecorColorsA;
         }
@@ -92,18 +92,18 @@ Notes:
 ## Lever: a ternary's branch/default assignment ORDER is not guaranteed to
 match source intent -- write it as an explicit default-then-override
 
-First attempt used `tab = (b2 == 0x12) ? gStyleDecorColorsB : sStyleDecorColorsA;`, which
+First attempt used `tab = (b2 == 0x12) ? sStyleDecorColorsB : sStyleDecorColorsA;`, which
 compiled to the OPPOSITE physical layout from retail: GCC chose
-`sStyleDecorColorsA` as the unconditional default and `gStyleDecorColorsB` as the
+`sStyleDecorColorsA` as the unconditional default and `sStyleDecorColorsB` as the
 conditional override (with the branch polarity flipped to match, `bne`
 where retail has `beq`) -- functionally identical, but two words differ
 because the *constant addresses* land in the swapped slots and the branch
 test is inverted. Retail's actual shape is imperative, not ternary-shaped:
-compute the default (`gStyleDecorColorsB`) unconditionally, then overwrite it with
+compute the default (`sStyleDecorColorsB`) unconditionally, then overwrite it with
 `sStyleDecorColorsA` only when `b2 != 0x12`:
 
 ```c
-tab = gStyleDecorColorsB;
+tab = sStyleDecorColorsB;
 if (b2 != 0x12) {
     tab = sStyleDecorColorsA;
 }
@@ -152,7 +152,7 @@ A).
 | `D_800873C8` | `gStyleVariantConfigs` | A | 4 pointers, one per variant, to arrays of 4-byte config records; the function returns `table[variant] + index * 4`, the record ApplyStyleConfig/FillStyleFromConfig read. |
 | `D_8008AC84` | `sStyleConfigIndex` | A | written with the config index `(day + stage) % count`; nothing reads it. |
 | `D_800872C4` | `gStylePalette` | A | 24 RGB triples (FillStyleFromConfig, ApplyStyleConfig and this function index it by a config byte); this function takes byte 3's entry as `sStyleClearColor`. |
-| `D_80087234`, `D_8008726C` | `sStyleDecorColorsA`, `gStyleDecorColorsB` | B | two 18-triple colour tables (one per decor band); B when config byte 2 is palette entry 18 (`STYLE_DECOR_B_PALETTE_INDEX`), A otherwise. Which look each is, is not established, hence the letters. |
+| `D_80087234`, `D_8008726C` | `sStyleDecorColorsA`, `sStyleDecorColorsB` | B | two 18-triple colour tables (one per decor band); B when config byte 2 is palette entry 18 (`STYLE_DECOR_B_PALETTE_INDEX`), A otherwise. Which look each is, is not established, hence the letters. |
 | `gStyleFlushColor` | `sStyleClearColor` | A | its only reader, StyleUpdateDecorSet, hands the adjusted copy to the viewport's setClearColor. |
 | `gStyleColorTable` | `sStyleDecorColors` | A | the current band colour table: StyleBuildDecorSet colours band i from entry i. |
 | `gStyleKind` | `gStyleStage` | A | RegisterStyleConfig stores its arg1 there, and its one caller, ObjM__InitStyleAndWorld, passes `self->stage`. |
