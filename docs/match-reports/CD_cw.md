@@ -50,7 +50,7 @@ extern s32 CD_debug;
 extern u8 CD_mode;
 extern u8 CD_com;
 extern const char *CD_comstr[];
-extern const char *D_8006D6A0[];
+extern const char *CD_intstr[];
 extern u8 CD_pos[4];               /* 4-byte record, written here for cmd == 2 */
 extern s32 D_8006D740[];               /* flag table, indexed by cmd; cmd+0x40 reaches the "needs param" table's
                                          * memory (see the addressing note above) -- do NOT re-split this into a
@@ -148,7 +148,7 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
     D_8008B3EC = D_80010A38;
 
     if (*state == 0) {
-        table = D_8006D6A0;
+        table = CD_intstr;
         state1 = state + 1;
         do {
             if (D_8008B3E4 < VSync(-1)) {

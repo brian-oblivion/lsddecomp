@@ -46,7 +46,7 @@ extern s32 CD_debug;                 /* verbosity level; libcd_bios.c's func_800
 extern u8 CD_mode;
 extern u8 CD_com;                  /* selector into CD_comstr for the "name" of the current wait */
 extern const char *CD_comstr[];       /* string table, selector 0..0x1B -- shared reading, libcd_bios.c */
-extern const char *D_8006D6A0[];       /* string table, selector 0..0x6 -- shared reading, libcd_bios.c */
+extern const char *CD_intstr[];       /* string table, selector 0..0x6 -- shared reading, libcd_bios.c */
 
 extern volatile u8 *D_8006D8C0;
 extern u8 D_8006D8D8[3];
@@ -88,7 +88,7 @@ s32 CD_sync(s32 arg0, s32 arg1)
     s32 i;
 
     D_8008B3E4 = VSync(-1) + 0x1E0;
-    table = D_8006D6A0;
+    table = CD_intstr;
     state = D_8006D8D8;
     state1 = state + 1;
     D_8008B3E8 = 0;

@@ -43,7 +43,7 @@ Two real fixes ARE folded into the body below and are worth keeping on record:
 extern s32 CD_debug;
 extern u8 CD_com;
 extern const char *CD_comstr[];
-extern const char *D_8006D6A0[];
+extern const char *CD_intstr[];
 
 extern volatile u8 *D_8006D8C0;
 extern u8 D_8006D8D8[3];
@@ -86,7 +86,7 @@ s32 CD_ready(s32 arg0, s32 arg1)
     s32 i;
 
     D_8008B3E4 = VSync(-1) + 0x1E0;
-    table = D_8006D6A0;
+    table = CD_intstr;
     state = D_8006D8D8;
     state1 = state + 1;
     state2 = state + 2;

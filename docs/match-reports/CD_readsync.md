@@ -20,7 +20,7 @@ if (p6A0 || pF8) {
 }
 ```
 
-`p6A0` is `D_8006D6A0` (an array) and `pF8` is `&D_8006D8F8`, so **the
+`p6A0` is `CD_intstr` (an array) and `pF8` is `&D_8006D8F8`, so **the
 condition is a tautology and both arms are identical.** GCC 2.6.3 cross-jumps
 the arms back into the single `sb $s1, 0($v0)` retail has, so the construct
 emits no instruction of its own. Its entire effect is to perturb register
@@ -60,12 +60,12 @@ catalogue is in that table, and none of them reaches it.
 Both operands are spelled in this unit as address-of:
 
 ```c
-extern s32 D_8006D6A0[];      /* p6A0 = D_8006D6A0;   */
+extern s32 CD_intstr[];      /* p6A0 = CD_intstr;   */
 extern s32 D_8006D8F8;        /* pF8  = &D_8006D8F8;  */
 ```
 
 If either is really a **pointer global** in retail's source
-(`extern s32 *D_8006D6A0;`), then `if (p6A0 || pF8)` is an ordinary null test
+(`extern s32 *CD_intstr;`), then `if (p6A0 || pF8)` is an ordinary null test
 that happens to be true at runtime -- the construct stops being a hack, stops
 needing duplicated arms, and the function becomes an honest match. That is a
 data-modelling question, it is cheap to test, and **nobody has tested it.**
@@ -83,7 +83,7 @@ needed to establish it:
 
 | operand | what the data says | where |
 | --- | --- | --- |
-| `D_8006D6A0` | a fixed **8-element table of rodata string addresses** (`0x8001097C`, `0x80010970`, ...) -- an array, so the decay is tautologically non-null | `asm/data/5DDFC.data.s:121-130` |
+| `CD_intstr` | a fixed **8-element table of rodata string addresses** (`0x8001097C`, `0x80010970`, ...) -- an array, so the decay is tautologically non-null | `asm/data/5DDFC.data.s:121-130` |
 | `D_8006D8F8` | **one zero word** that the sibling `cb_read` stores `VSync(-1)`'s return into (`lui`/`addiu`/`sw $v0`) -- an `s32` timestamp | `asm/nonmatchings/libcd_bios/cb_read.s:49-51` |
 
 A pointer global would be a word holding an address; this one holds a frame
@@ -202,9 +202,9 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
   different string (`"CD_datasync"`, `D_80010AE0`).
 - On timeout, prints `"CD timeout: "` then `"%s:(%s) Sync=%s, Ready=%s\n"`
   (`D_80010994`, confirmed 4-`%s` format via `asm/data/FD8.rodata.s`) with
-  args `(D_8008B3EC, CD_comstr[D_6006D61D], D_8006D6A0[D_8006D8D8[0]],
-  D_8006D6A0[D_8006D8D8[1]])`, calls `CD_flush()`, and returns -1.
-  **This means `CD_comstr`/`D_8006D6A0` are STRING-POINTER tables (each
+  args `(D_8008B3EC, CD_comstr[D_6006D61D], CD_intstr[D_8006D8D8[0]],
+  CD_intstr[D_8006D8D8[1]])`, calls `CD_flush()`, and returns -1.
+  **This means `CD_comstr`/`CD_intstr` are STRING-POINTER tables (each
   element is a `char *`, stored as `s32`), not raw values — worth carrying
   forward for whoever next touches `CD_datasync`, see the anomaly note
   below.**
@@ -259,7 +259,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
     s32 result;
 
     now = func_80025900(-1);
-    p6A0 = D_8006D6A0;
+    p6A0 = CD_intstr;
     p8D8 = D_8006D8D8;
     p8D9 = &D_8006D8D8[1];
     pF8 = &D_8006D8F8;
@@ -445,7 +445,7 @@ func_80012C20(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[CD_com], p6A0[p8D8[0]]);
 but `asm/nonmatchings/libcd_bios/CD_datasync.s` (lines ~50-70) shows the
 EXACT same instruction shape as this function's own diagnostic block: `a1 =
 D_8008B3EC` (not `p8D8[0]`), `a2 = D_6006D620[CD_com]`, `a3 =
-D_8006D6A0[D_8006D8D8[0]]`, stack-arg = `D_8006D6A0[D_8006D8D8[1]]` —
+CD_intstr[D_8006D8D8[0]]`, stack-arg = `CD_intstr[D_8006D8D8[1]]` —
 confirmed by reading the raw `.s` directly and cross-checking against this
 function's own byte-identical-shaped block. `D_80010994`'s format string
 (`"%s:(%s) Sync=%s, Ready=%s\n"`, four `%s`) also only makes sense with
@@ -667,7 +667,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
     s32 result;
 
     now = VSync(-1);
-    p6A0 = D_8006D6A0;
+    p6A0 = CD_intstr;
     p8D8 = D_8006D8D8;
     p8D9 = &D_8006D8D8[1];
     pF8 = &D_8006D8F8;
@@ -891,7 +891,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
     s32 result;
 
     now = VSync(-1);
-    p6A0 = D_8006D6A0;
+    p6A0 = CD_intstr;
     p8D8 = D_8006D8D8;
     p8D9 = &D_8006D8D8[1];
     pF8 = &D_8006D8F8;

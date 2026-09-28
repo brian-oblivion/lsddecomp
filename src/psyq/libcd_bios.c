@@ -179,7 +179,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_sync);
 extern s32 CD_debug;
 extern u8 CD_com;
 extern const char *CD_comstr[];
-extern const char *D_8006D6A0[];
+extern const char *CD_intstr[];
 
 extern volatile u8 *D_8006D8C0;
 extern u8 D_8006D8D8[3];
@@ -218,7 +218,7 @@ s32 CD_ready(s32 arg0, s32 arg1)
     s32 i;
 
     D_8008B3E4 = VSync(-1) + 0x1E0;
-    table = D_8006D6A0;
+    table = CD_intstr;
     state = D_8006D8D8;
     state1 = state + 1;
     state2 = state + 2;
@@ -321,7 +321,7 @@ extern s32 CD_debug;
 extern u8 CD_mode;
 extern u8 CD_com;
 extern const char *CD_comstr[];
-extern const char *D_8006D6A0[];
+extern const char *CD_intstr[];
 extern u8 CD_pos[4];               /* 4-byte record, written here for cmd == 2 */
 extern s32 D_8006D740[];               /* flag table, indexed by cmd; cmd+0x40 reaches the "needs param" table's
                                          * memory (see the addressing note in the match report) -- do NOT re-split
@@ -416,7 +416,7 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
     D_8008B3EC = D_80010A38;
 
     if (*state == 0) {
-        table = D_8006D6A0;
+        table = CD_intstr;
         state1 = state + 1;
         do {
             if (D_8008B3E4 < VSync(-1)) {
@@ -497,7 +497,7 @@ extern u8 D_8006D619;
 extern u8 D_8006D61A;
 extern u8 CD_mode;
 extern u8 CD_com;
-extern s32 D_8006D6A0[]; /* lookup table, indexed by a byte field << 2 */
+extern s32 CD_intstr[]; /* lookup table, indexed by a byte field << 2 */
 
 extern volatile u8 *D_8006D8C0;
 extern volatile u8 *D_8006D8C4;
@@ -935,7 +935,7 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
     s32 result;
 
     now = VSync(-1);
-    p6A0 = D_8006D6A0;
+    p6A0 = CD_intstr;
     p8D8 = D_8006D8D8;
     p8D9 = &D_8006D8D8[1];
     pF8 = &D_8006D8DC[7];
@@ -1042,7 +1042,7 @@ s32 CD_datasync(s32 arg0) {
 
     D_8008B3E4 = VSync(-1) + 0x1E0;
     p620 = CD_comstr;
-    p6A0 = D_8006D6A0;
+    p6A0 = CD_intstr;
     p8D8 = D_8006D8D8;
     D_8008B3E8 = 0;
     D_8008B3EC = (s32)D_80010AE0;
