@@ -14,7 +14,7 @@ assigned queue).
 
 ## What it does
 
-Looks up a "heading" byte from `TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex]`,
+Looks up a "heading" byte from `sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex]`,
 validates it against `currentPos`'s stored heading via the already-matched
 `IsHeadingAligned` (a cardinal-direction proximity test), and on success
 writes one or two computed pointers (into a `DirectionTableEntry`-strided
@@ -24,12 +24,12 @@ table, `sCardinalRotations`) through its two optional output parameters. Called 
 
 ## New declarations needed
 
-`TUNNEL_ENTER_HEADINGS` and `TUNNEL_EXIT_HEADINGS` are per-stage tables of pointers to byte
+`sTunnelEnterHeadings` and `TUNNEL_EXIT_HEADINGS` are per-stage tables of pointers to byte
 arrays (4-byte stride, indexed by `gLinkSrcStage`/`gLinkDstStage` respectively,
 each further indexed by `gLinkTriggerIndex`/`gLinkSpawnIndex` to read a single `u8`):
 
 ```c
-extern u8 *TUNNEL_ENTER_HEADINGS[];
+extern u8 *sTunnelEnterHeadings[];
 extern u8 *TUNNEL_EXIT_HEADINGS[];
 ```
 
@@ -67,7 +67,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	u8 heading;
 	s32 idx;
 
-	heading = TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
+	heading = sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
 	if (!IsHeadingAligned((DirectionCheckArg *)arg2, heading))
 		return 0;
 
@@ -101,7 +101,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
+	heading = sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
 			*arg1 = (s32)&sCardinalRotations[heading];
@@ -151,14 +151,14 @@ queue).
 
 ## Naming
 
-- **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (TUNNEL_ENTER_HEADINGS/TUNNEL_EXIT_HEADINGS here); called from DreamSys__TryTunnelLink.
+- **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (sTunnelEnterHeadings/TUNNEL_EXIT_HEADINGS here); called from DreamSys__TryTunnelLink.
 
 ## Comment moved from src/DreamSys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 
 ```c
-/* TUNNEL_ENTER_HEADINGS: a per-stage table of pointers to byte arrays (4-byte stride,
+/* sTunnelEnterHeadings: a per-stage table of pointers to byte arrays (4-byte stride,
    indexed by gLinkSrcStage), each further indexed by gLinkTriggerIndex to read the
    "heading" byte passed to IsHeadingAligned. TUNNEL_EXIT_HEADINGS is the analogous
    table for gLinkDstStage/gLinkSpawnIndex. Neither array's own element type is
