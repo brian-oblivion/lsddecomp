@@ -41,7 +41,7 @@ void UpdateFlashbackLock(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
   (`unk1E4` at +0x1E4) -- appended as `pad1E8[0x2F4-0x1E8]` + `unk2F4`,
   with every existing field/pad left untouched. This is the tail extension
   the round's brief anticipated; flagging here per that brief's request in
-  case runner alpha's own class_3bb8c_b work touches the same tail.
+  case runner alpha's own class_39e08 work touches the same tail.
 
 ## New types: Ctx678_3bb8c_c / Result678_3bb8c_c
 

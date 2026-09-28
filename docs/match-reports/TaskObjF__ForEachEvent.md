@@ -8,7 +8,7 @@
 
 Every function from here through `TaskObjF__OnNotify` in this unit shares one
 object type — call it `TaskObjF` — that is **not** `Obj866E8`
-(class_3bb8c_b/c/d/e's class) and not any previously-documented class in
+(class_39e08/c/d/e's class) and not any previously-documented class in
 this codebase. Established from first principles across this whole batch:
 
 - `TaskObjF`'s vtable pointer sits at offset 0, and its first several

@@ -148,7 +148,7 @@ a pointer-cast read, deliberately, to avoid introducing a union into
   reason -- `Class86E00_3bb8c_g`, `ObjM`, `Obj87034_3bb8c_l`, `ItemList`).
 - **`Obj866E8Methods::slot128`** (new field, appended -- no padding
   needed, `slot124` ends exactly at `+0x128`): resolves via classtable to
-  `StageMap__RefreshFootprint`, already matched in the sibling unit `class_3bb8c_b`
+  `StageMap__RefreshFootprint`, already matched in the sibling unit `class_39e08`
   with signature `void StageMap__RefreshFootprint(Obj866E8 *self)`. Typed
   `void (*slot128)(Obj866E8 *self);` to match.
 

@@ -234,7 +234,7 @@ no accessor outside `src/class_39e08.c`):
 loop wraps X after 21 columns (`x = 0x400 + k * 0x800`, reset when
 `x > 0xA400`), and 0x668 bytes is 410 cell pointers -- neither `20 * 20` nor a
 whole number of 21-cell rows. The grid's INDEX stride is 20, byte-verified
-twice over (`class_3bb8c_b`'s matched `StageMap__SetFootprintVisible`, and
+twice over (`class_39e08`'s matched `StageMap__SetFootprintVisible`, and
 `gDefaultGridSpan >> 11`). This function is byte-exact, so both constants are
 certainly right; what the extra column and the 10 spare pointers are for is
 unknown. Do not "correct" the stride to 21 on this function's evidence alone.

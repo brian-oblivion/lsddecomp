@@ -12,7 +12,7 @@
 **2/27, exact length, zero drift, funcdiff `insertions 6 / deletions 6`,
 positional skeleton diffs 25** — the same as round 71.
 
-**The body that matches** (live in `src/class_3bb8c_b.c`, `INCLUDE_ASM` and
+**The body that matches** (live in `src/class_39e08.c`, `INCLUDE_ASM` and
 the `NON_MATCHING` block removed):
 
 ```c
@@ -180,9 +180,9 @@ block live after any checkout.
 > check even harder than round 18's did, so no search was launched.**
 > Rebuilt the round-19 `goto`-form best body (Shape A, reproduced below)
 > from a clean `INCLUDE_ASM` baseline first per Gate 1b: temporarily
-> enabled it in `src/class_3bb8c_b.c` and confirmed **2/27, exact length,
+> enabled it in `src/class_39e08.c` and confirmed **2/27, exact length,
 > no outside-range drift** -- identical to round 19's own recorded figure.
-> Reverted immediately (`git checkout -- src/class_3bb8c_b.c`; clean
+> Reverted immediately (`git checkout -- src/class_39e08.c`; clean
 > `OK: build matches retail` confirmed afterward).
 >
 > Built a brand-new scaffold from scratch (`tools/setup-permuter.sh
@@ -601,7 +601,7 @@ compiled shape, not a repeat of Shape A or B.** The raw `funcdiff` output
 shows a different instruction sequence throughout (not just a different
 score composition); it does not recover either missing instruction (`move
 a2,a0`; the `sra a0,a3,24` re-extract). No better than the existing best.
-Reverted (`git checkout -- src/class_3bb8c_b.c`; clean `OK: build matches
+Reverted (`git checkout -- src/class_39e08.c`; clean `OK: build matches
 retail` confirmed immediately after).
 
 **Disposition unchanged: `INCLUDE_ASM`, still 2/27, still not
@@ -658,7 +658,7 @@ build looks like.
 ```sh
 tools/setup-permuter.sh IsPointOutOfBounds <Shape-A seed> permuter-work/cd38
 tools/binutils/bin/mipsel-linux-gnu-objdump -d permuter-work/cd38/base.o
-tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/class_3bb8c_b.c.o
+tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/class_39e08.c.o
 ```
 
 The two disassemblies of `IsPointOutOfBounds` are **identical instruction for
@@ -773,7 +773,7 @@ measures; a wrong CAUSE is what the next round acts on."
 Track 1b promotion. Score re-verified unchanged (2/27, exact length, zero
 drift) before promoting. Placed Shape A — the plain four-early-return form
 (`This maps directly onto:` above; byte-identical to attempts 1/3/4/5 per
-rounds 19/46/58) — in `src/class_3bb8c_b.c` inside `#ifdef NON_MATCHING`,
+rounds 19/46/58) — in `src/class_39e08.c` inside `#ifdef NON_MATCHING`,
 with `INCLUDE_ASM` in the `#else`. Chosen over the goto/alias form because
 it is the plainer restatement of the same compiled shape and no more or
 less byte-exact. Both oracles green: `./build-and-verify.sh` (exit 0, `OK:

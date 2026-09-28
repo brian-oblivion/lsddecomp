@@ -154,12 +154,12 @@ Round 67 (track 3, naming pass).
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x08C` | `rects` | A | Saved and restored as one 0x30-byte block here; written a rectangle at a time by `StageMap__SetFootprintRect`; read as a bounded array of grid rectangles by `StageMap__DispatchToRectCells` here and by `class_3bb8c_b`'s BYTE-MATCHED `StageMap__SetFootprintVisible`. |
+| `StageMap+0x08C` | `rects` | A | Saved and restored as one 0x30-byte block here; written a rectangle at a time by `StageMap__SetFootprintRect`; read as a bounded array of grid rectangles by `StageMap__DispatchToRectCells` here and by `class_39e08`'s BYTE-MATCHED `StageMap__SetFootprintVisible`. |
 
 Local types renamed this round: `HistoryEntry_3ac78` -> `GridRect_3ac78`,
 `HistoryBlock_3ac78` -> `GridRectList_3ac78`. The "History" name was a
 hypothesis from before the block's reader was understood; `StageMap__SetFootprintVisible`
-(matched, `class_3bb8c_b`) reads the same 0xC bytes as
+(matched, `class_39e08`) reads the same 0xC bytes as
 `{elemIdx, startCol, startRow, width, height}` and walks a grid rectangle with
 them. The members' own names (`elemIdx`/`col`/`row`/`width`/`height`) were
 already correct and are unchanged.

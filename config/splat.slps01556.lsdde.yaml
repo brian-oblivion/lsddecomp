@@ -1408,7 +1408,6 @@ segments:
       # earlier version of this comment said the next carve had to settle
       # both; that was wrong, and acting on it would have meant doing
       # expensive work four carves early.
-      - [0x3CD88, c, class_3bb8c_b]
       # class_3bb8c_c: third 20-function slice, 0x3DA54..0x3DF04.
       # 0x3DF04 (func_8004D704) is a real boundary -- func_8004D6AC closes
       # with `nop` + `endlabel` and func_8004D704 opens its own frame.

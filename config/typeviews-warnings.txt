@@ -24,9 +24,9 @@ TmdModel: warning: unused variable `unused'
 ViewportDraw: warning: unused variable `scr'
 class_39e08: warning: unused variable `unused'
 class_39e08: warning: control reaches end of non-void function
-class_3bb8c_b: warning: `junk' might be used uninitialized in this function
-class_3bb8c_b: warning: `lateral' might be used uninitialized in this function
-class_3bb8c_b: warning: `shiftCol' might be used uninitialized in this function
+class_39e08: warning: `junk' might be used uninitialized in this function
+class_39e08: warning: `lateral' might be used uninitialized in this function
+class_39e08: warning: `shiftCol' might be used uninitialized in this function
 class_3bb8c_e: warning: control reaches end of non-void function
 class_3bb8c_f: warning: `state' might be used uninitialized in this function
 class_3bb8c_g: warning: implicit declaration of function `strcpy'

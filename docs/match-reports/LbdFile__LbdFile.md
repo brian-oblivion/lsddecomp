@@ -135,7 +135,7 @@ apply by type scope.
   finds the element holding a given chunk by it. Accessors: GameFiles.c
   (LbdFile__LbdFile, LbdFile__ReleaseHeader), class_39e08.c
   (ApplyRateEntries, ResetElementCells, ComputeFootprintDescriptor,
-  GetLastTargetRateSplit), class_3bb8c_b.c (FindElemIndexByUnk30).
+  GetLastTargetRateSplit), class_39e08.c (FindElemIndexByUnk30).
 - `LbdFile.ownerKey` (+0x032) -> `elemKey`. StageMap's ctor writes the
   element's index, BuildRateEntries copies each element's `key` in, and
   FindElemByUnk32 / UpdateFootprintTracking / class_3bb8c_p read it back to

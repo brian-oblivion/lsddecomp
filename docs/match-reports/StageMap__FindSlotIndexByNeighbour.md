@@ -146,7 +146,7 @@ The unit banner was rewritten (what the file holds); the old one, verbatim:
 
 ```c
 /*
- * class_3bb8c_b -- the last third of StageMap (include/StageMap.h),
+ * class_39e08 -- the last third of StageMap (include/StageMap.h),
  * sharing include/class_3bb8c.h with class_39e08.c.
  *
  *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: slot lookups.

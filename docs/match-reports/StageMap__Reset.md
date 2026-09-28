@@ -87,7 +87,7 @@ Field names established here:
 | --- | --- | --- | --- |
 | `StageMap+0x068` | `config` | B | Cleared here, set by `StageMap__SetConfig`, read by `StageMap__ApplyToSenderFootprint` as `config->unk4`; `class_39e08` reads the same pointee as `{s16 divisor, s16 count, s32 unk4}` from four functions -- a small parameter block, not an object. |
 | `StageMap+0x0E8` | `acceptedTags` | A | See `StageMap__ForwardAcceptedCommand.md`: its only reader walks it as a NUL-terminated list of vtable header words and uses it to accept or reject a sender. |
-| `StageMap+0x088` | `rectCount` | A | Its only writers set it to 1 (`StageMap__SetFootprintRect`) or save/restore it around a walk (`StageMap__ApplyToSenderFootprint`), and its only readers bound a loop over `rects[]` (here, and `class_3bb8c_b`'s matched `StageMap__SetFootprintVisible`). |
+| `StageMap+0x088` | `rectCount` | A | Its only writers set it to 1 (`StageMap__SetFootprintRect`) or save/restore it around a walk (`StageMap__ApplyToSenderFootprint`), and its only readers bound a loop over `rects[]` (here, and `class_39e08`'s matched `StageMap__SetFootprintVisible`). |
 
 `unk1CC`/`unk1D0`/`unk1D4`/`unk1D8` deliberately keep placeholder names: all
 that is known is that they are four consecutive words set to `-1` here and
