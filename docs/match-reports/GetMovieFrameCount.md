@@ -9,7 +9,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot.
-- **What:** `return gMovieFrameCounts[index];` over `extern s16 gMovieFrameCounts[]` (sll/addu/lh through `$at`, the resolved addiu_at construct).
+- **What:** `return sMovieFrameCounts[index];` over `extern s16 sMovieFrameCounts[]` (sll/addu/lh through `$at`, the resolved addiu_at construct).
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -17,7 +17,7 @@ the first build; whole-image SHA1 green.
 
 ```c
 s32 GetMovieFrameCount(s32 index) {
-    return gMovieFrameCounts[index];
+    return sMovieFrameCounts[index];
 }
 ```
 
@@ -25,7 +25,7 @@ s32 GetMovieFrameCount(s32 index) {
 
 - **Name:** `GetMovieFrameCount`
 - **Tier:** A
-- **Evidence:** returns gMovieFrameCounts[movieId] (renamed from gStreamTypeToGroupTable); every caller passes it to StreamTask__Init, which hands it to MoviePlayer__Play as `frameCount` (src/graphics/GraphicsResources.c). Its argument is always a movie id from this unit's movie getters.
+- **Evidence:** returns sMovieFrameCounts[movieId] (renamed from gStreamTypeToGroupTable); every caller passes it to StreamTask__Init, which hands it to MoviePlayer__Play as `frameCount` (src/graphics/GraphicsResources.c). Its argument is always a movie id from this unit's movie getters.
 
 ## Naming history
 

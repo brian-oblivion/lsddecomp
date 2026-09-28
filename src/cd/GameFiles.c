@@ -19,7 +19,7 @@
  * The stage getters return a record, used as a path: PickStageBgm's goes to
  * the WBgm's setSeq, PickStageTexture's to New_TimBlockSrc, and a map
  * chunk's to an LbdFile. The movie getters also hand back a movie id, the
- * movie's index in gMovieFrameCounts, whose value GetMovieFrameCount gives
+ * movie's index in sMovieFrameCounts, whose value GetMovieFrameCount gives
  * GameApplicationFileResource.c's StreamTasks as the MoviePlayer's frame count.
  *
  * The random pickers draw through SeedAndRandom; SetPickOverrides forces
@@ -54,7 +54,7 @@ enum RecordIndex {
 /* The seven gSoundBankPaths entries, SND\AMBIENT .. SND\STANDERD. */
 #define SOUND_BANK_COUNT 7
 
-/* Movie ids: a movie record's index in gMovieFrameCounts, handed back
+/* Movie ids: a movie record's index in sMovieFrameCounts, handed back
  * through the movie getters' movieIdOut. */
 enum MovieId {
     MOVIE_OPENING_FIRST = 0,      /* OPENING_MOVIE_COUNT, A to G */
@@ -204,7 +204,7 @@ extern u8 gSoundBankPaths[];
 extern u8 gRecordTable[];
 extern char *gSoundEffectDirPtr; /* -> "SND\\SE" */
 extern const char sAsmkMoviePath[];
-extern s16 gMovieFrameCounts[];
+extern s16 sMovieFrameCounts[];
 extern s16 gStageFirstRecord[];
 
 /* slot +0x088 of gLbdFileMethods */
@@ -410,7 +410,7 @@ FilePathRecord *GetSpecialDayOrEventRecord(s32 *movieIdOut, RecPick pick) {
 }
 
 s32 GetMovieFrameCount(s32 movieId) {
-    return gMovieFrameCounts[movieId];
+    return sMovieFrameCounts[movieId];
 }
 
 /* The first movie of special day `day`; *frameTotal is the frame count of
@@ -426,7 +426,7 @@ FilePathRecord *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount) {
     start = firstMovieId;
     dayCount += start;
     for (movieId = start; movieId < dayCount; movieId++) {
-        *frameTotal += gMovieFrameCounts[movieId] + MOVIE_SPAN_GAP_FRAMES;
+        *frameTotal += sMovieFrameCounts[movieId] + MOVIE_SPAN_GAP_FRAMES;
     }
     *frameTotal -= MOVIE_SPAN_GAP_FRAMES;
     return rec;

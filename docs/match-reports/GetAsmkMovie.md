@@ -28,7 +28,7 @@ const char *GetAsmkMovie(s32 *typeCodeOut) {
 
 - **Name:** `GetAsmkMovie`
 - **Tier:** A
-- **Evidence:** returns sAsmkMoviePath (renamed from sAsmkStreamPath), "ETC\ASMK.STR", an STR movie, and writes movie id 49 (MOVIE_ASMK), whose gMovieFrameCounts entry GameApplication__ShowIntroLogos passes to the StreamTask. Named for the file, not for a role.
+- **Evidence:** returns sAsmkMoviePath (renamed from sAsmkStreamPath), "ETC\ASMK.STR", an STR movie, and writes movie id 49 (MOVIE_ASMK), whose sMovieFrameCounts entry GameApplication__ShowIntroLogos passes to the StreamTask. Named for the file, not for a role.
 
 ## Naming history
 
