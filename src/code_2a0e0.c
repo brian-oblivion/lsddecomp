@@ -1,21 +1,12 @@
 /*
- * code_2a0e0 -- GAME code carved from psyq_2a0e0 on 2026-09-25 (FINISHING-PLAN
- * revision 18). 0x2A0E0..0x2A878 (vram 0x800398E0..0x8003A078). It was counted
- * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
- * into game code, a method-table entry beside game methods, or contiguity with
- * those, and no Sony fingerprint). What it holds: WBgm, a background-music
- * SEQ player built on New_VabStreamObj; the yaml had called this gap "the
- * game's own libspu build".
- *
- * All 17 functions matched in round 81 (runners echo and delta); named round
- * 82 (runner bravo, FINISHING-PLAN track 3). Class named WBgm from rodata
- * sSeqOpenErrorMsg ("Seq Open error in WBgmHandleMonitorEvent"): the string is part
- * of WBgm__HandleMonitorEvent's own matched body (the printf sits right where
- * it is read), so it is body evidence for that function's name and, via its
- * "WBgm" prefix, a lead for the class -- weighed as evidence, not proof.
- *
- * Track 4 (round 88): the class is declared once, in include/WBgm.h (table
- * gWBgmMethods); this unit keeps no view of it.
+ * WBgm, the background-music player: one libsnd SEQ played on one VAB bank
+ * (the class is documented in include/WBgm.h). The file holds its allocator,
+ * constructor and methods in table order, with the non-slot helper
+ * WBgm__HandleMonitorEvent (it SsSeqOpens the SEQ once both files have
+ * loaded) after update; then the table getter; IsWBgmActive, which
+ * VabStreamObj__Finalize checks before it shuts libsnd down; and
+ * GetSsSizeTableBuf, the buffer PlacementGridVabSound.c passes to
+ * SsSetTableSize.
  */
 #include "common.h"
 #include <libsnd.h>
