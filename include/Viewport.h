@@ -64,7 +64,7 @@ typedef struct ViewportRefView ViewportRefView;
 
 /* The screen size: drawNode reads it as the width and height the box and
  * screen-space sprite paths take percentages of. Defaults 256 x 240
- * (gDefaultViewportWidth, sDefaultViewportHeight). setScreenSize copies it whole: retail loads both
+ * (sDefaultViewportWidth, sDefaultViewportHeight). setScreenSize copies it whole: retail loads both
  * words before storing either. */
 struct ViewportSize {
     s32 width;

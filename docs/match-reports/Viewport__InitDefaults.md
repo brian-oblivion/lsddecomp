@@ -60,7 +60,7 @@ matching byte-for-byte -- confirming the CSE was genuinely the whole
 length story. What remained was a residue in the function's FIRST 21
 words: retail interleaves the two unconditional zero-inits
 (`self->unk90 = 0; self->unk70 = 0;`) and the two global-loaded field
-stores (`self->unk34.a = gDefaultViewportWidth; self->unk34.b = sDefaultViewportHeight;`) at
+stores (`self->unk34.a = sDefaultViewportWidth; self->unk34.b = sDefaultViewportHeight;`) at
 their natural source position, immediately after the two `lw`s that
 produce them. Our build (correctly ordered in C, unchanged from every
 prior round) instead deferred ALL FOUR of those stores to just before
@@ -79,7 +79,7 @@ Two bare `__asm__("");` scheduling barriers close it:
 self->unk90 = 0;
 self->unk70 = 0;
 __asm__("");
-self->unk34.a = gDefaultViewportWidth;
+self->unk34.a = sDefaultViewportWidth;
 self->unk34.b = sDefaultViewportHeight;
 __asm__("");
 self->unk3C = 0xD;
@@ -98,7 +98,7 @@ happen early vs. late), never which register holds a value.
 ### Final matched body
 
 ```c
-extern s32 gDefaultViewportWidth;
+extern s32 sDefaultViewportWidth;
 extern s32 sDefaultViewportHeight;
 extern SByte3_d294 sDefaultViewportColor;
 extern SByte3_d294 D_8008A8F8_b __asm__("sDefaultViewportColor");
@@ -107,7 +107,7 @@ void Viewport__InitDefaults(Unk18Obj *self) {
     self->unk90 = 0;
     self->unk70 = 0;
     __asm__("");
-    self->unk34.a = gDefaultViewportWidth;
+    self->unk34.a = sDefaultViewportWidth;
     self->unk34.b = sDefaultViewportHeight;
     __asm__("");
     self->unk3C = 0xD;
@@ -230,14 +230,14 @@ this unit (`unk90`, `unk70`, `unk34` (`Pair32_d294`), `unk3C`/`unk40`/
 is a pure codegen residue.
 
 ```c
-extern s32 gDefaultViewportWidth;
+extern s32 sDefaultViewportWidth;
 extern s32 sDefaultViewportHeight;
 extern SByte3_d294 sDefaultViewportColor;
 
 void Viewport__InitDefaults(Unk18Obj *self) {
     self->unk90 = 0;
     self->unk70 = 0;
-    self->unk34.a = gDefaultViewportWidth;
+    self->unk34.a = sDefaultViewportWidth;
     self->unk34.b = sDefaultViewportHeight;
     self->unk3C = 0xD;
     self->unk44 = 0x7D0;
@@ -254,7 +254,7 @@ void Viewport__InitDefaults(Unk18Obj *self) {
 }
 ```
 
-`gDefaultViewportWidth`/`sDefaultViewportHeight` are plain `.sdata` words (already in
+`sDefaultViewportWidth`/`sDefaultViewportHeight` are plain `.sdata` words (already in
 `config/gp-symbols.txt`, ordinary `%gp_rel` accesses, no issue).
 `sDefaultViewportColor` is a 4-byte all-zero `.sdata` region, read as a whole
 `SByte3_d294` struct (3 signed bytes) via its ADDRESS -- retail computes
@@ -272,7 +272,7 @@ with nothing in between. My build's GCC 2.6.3 CSEs this: it computes the
 address ONCE and reuses the same register for both copies, coming out
 **2 words (8 bytes) shorter** than retail. The rest of the function
 additionally gets **rescheduled wholesale** around this: retail issues the
-two loads of `gDefaultViewportWidth`/`sDefaultViewportHeight` early (to hide load latency) but
+two loads of `sDefaultViewportWidth`/`sDefaultViewportHeight` early (to hide load latency) but
 stores them, and stores the two unconditional zero-inits (`unk90`,
 `unk70`), almost immediately after; my build defers ALL FOUR of those
 stores to just before the byte-copy blocks, apparently because removing
@@ -363,7 +363,7 @@ toolchain question, not a per-function one)?
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__InitDefaults`. The +0x040 slot's occupant, named `initDefaults`. The defaults name the fields: screenSize 256x240 (gDefaultViewportWidth/sDefaultViewportHeight), otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 0x10000, drawEnabled 1. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__InitDefaults`. The +0x040 slot's occupant, named `initDefaults`. The defaults name the fields: screenSize 256x240 (sDefaultViewportWidth/sDefaultViewportHeight), otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 0x10000, drawEnabled 1. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## asm sites
 
@@ -372,7 +372,7 @@ Round 89 (runner delta, track 5 `asm-sites`), three sites, all kept:
 - **First bare `__asm__("")`** (after `self->otReady = 0;`) -- **justified**,
   now commented at the site. Deleting it alone: image red (12 bytes),
   `funcdiff` 37/41, asm-differ shows `lw v0,0xf4(gp)` / `lw v1,0xf8(gp)`
-  (`gDefaultViewportWidth`, `sDefaultViewportHeight`) hoisted above `sw zero,0x90(a0)` and
+  (`sDefaultViewportWidth`, `sDefaultViewportHeight`) hoisted above `sw zero,0x90(a0)` and
   `sw zero,0x70(a0)`. Instruction order.
 - **Second bare `__asm__("")`** (after the two `screenSize` stores) --
   **justified**, now commented at the site. Deleting it alone: image red
@@ -393,7 +393,7 @@ Round 89 (runner delta, track 5 `asm-sites`), three sites, all kept:
 
 ## Track 7 (round 95, alpha, polish pass)
 
-Constants in decimal (otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 65536, fogNear 20000). The data it reads are renamed with `tools/rename.py`: `D_8008A8FC`/`D_8008A900` -> `gDefaultViewportWidth`/`sDefaultViewportHeight` (256, 240), `D_8008A8F8` -> `sDefaultViewportColor` ({0, 0, 0}); the local alias `D_8008A8F8_b` is now `gDefaultViewportColorAlias` (a C identifier only; its `__asm__` name is the symbol). The comment above the externs now keeps only `MATCHING:` lines; what it said, verbatim:
+Constants in decimal (otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 65536, fogNear 20000). The data it reads are renamed with `tools/rename.py`: `D_8008A8FC`/`D_8008A900` -> `sDefaultViewportWidth`/`sDefaultViewportHeight` (256, 240), `D_8008A8F8` -> `sDefaultViewportColor` ({0, 0, 0}); the local alias `D_8008A8F8_b` is now `gDefaultViewportColorAlias` (a C identifier only; its `__asm__` name is the symbol). The comment above the externs now keeps only `MATCHING:` lines; what it said, verbatim:
 
 ```c
 /* MATCHED round 49. Two levers were needed, see docs/match-reports/Viewport__InitDefaults.md:
