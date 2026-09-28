@@ -38,7 +38,7 @@ does track 4's class-table unification pass rather than let two separate
 
 ## Round 95 (track 7, charlie)
 
-### Moved from src/TitleMenuTaskObjF.c
+### Moved from src/ui/TitleMenuTaskObjF.c
 
 The kernel event declarations' comment, shortened in the unit:
 

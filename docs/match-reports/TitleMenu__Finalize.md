@@ -81,14 +81,14 @@ Renamed `func_8004D704` -> `TitleMenu__Finalize`. **Tier A**: matches the
 BasicClass-family destructor shape (release owned sub-objects, then
 forward to the base class's own dtor slot). Field `unkA8` renamed to
 `iconHandle` in the same round (compiler-ownership check: accessor set
-entirely inside `src/TitleMenuTaskObjF.c`).
+entirely inside `src/ui/TitleMenuTaskObjF.c`).
 
 ## Proposed field names
 
 **Head, round 77:** `unkAC -> saveCtrl` APPLIED by type scope (11 accessors, TitleMenuTaskObjF/_d).
 
 `TitleMenu::unkAC` has a real accessor outside this unit
-(`src/TitleMenuTaskObjF.c`'s `TitleMenu__TitleMenu` zeroes it), so per the
+(`src/ui/TitleMenuTaskObjF.c`'s `TitleMenu__TitleMenu` zeroes it), so per the
 compiler-ownership rule this is a PROPOSAL, not a rename. Also posted to
 the round-77 broadcast.
 

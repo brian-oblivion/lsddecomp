@@ -68,7 +68,7 @@ the whole image after any further edit there.)
   +0x0CC, 0x10 bytes after this round's `slotB8` (+0x0B8) with an
   intervening pad.
 - `UpdateFlashbackLock(self, self->unk4C, self->unkA4);` -- `UpdateFlashbackLock` is
-  ALREADY MATCHED, in a DIFFERENT unit (`src/TitleMenuTaskObjF.c`), as a
+  ALREADY MATCHED, in a DIFFERENT unit (`src/ui/TitleMenuTaskObjF.c`), as a
   genuinely 2-parameter function (`Ctx678_3bb8c_c *ctx, Result678_3bb8c_c
   *out`). This call site sets up a THIRD argument (`self->unkA4` in `$a2`)
   that unit's own signature never receives -- the same independent-arities
@@ -119,7 +119,7 @@ the whole image after any further edit there.)
   `slot60` (+0x060, `pad044` split), `slotE0` (+0x0E0, `pad0DC` split),
   `slot11C` (+0x11C, `pad0F4` split).
 
-`src/TitleMenuTaskObjF.c`: local (not shared-header) 3-argument extern for
+`src/ui/TitleMenuTaskObjF.c`: local (not shared-header) 3-argument extern for
 `UpdateFlashbackLock`, matching this call site; `TitleMenuTaskObjF.c`'s own
 2-argument declaration for the same real function is untouched.
 
@@ -163,7 +163,7 @@ setState arguments are TaskCore states (see TitleMenu__SetState's
 report).
 
 Comment moved here from the unit: UpdateFlashbackLock is matched in
-src/TitleMenuTaskObjF.c as a 2-argument function, but this call site sets up
+src/ui/TitleMenuTaskObjF.c as a 2-argument function, but this call site sets up
 a 3rd argument (self->dreamSys in $a2) that the definition never
 receives; the same independent-arities situation was documented for
 Get_vtable_TaskCore until round 84. The extern's arity-ok note said: the

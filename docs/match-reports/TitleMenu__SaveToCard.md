@@ -91,7 +91,7 @@ Renamed `func_8004E0E4` -> `TitleMenu__SaveToCard`. **Tier B, lower confidence**
 **Head, round 77: NOT APPLIED.** `saveInfoWord`/`saveInfoBuf` restate the types (a word, a buffer) without saying what they hold; kept `unkBC`/`unkC0` until a reader establishes it.
 
 `TitleMenu::unkBC`/`unkC0` both have real accessors outside this unit
-(`src/TitleMenuTaskObjF.c`'s `TitleMenu__TitleMenu` sets both from
+(`src/ui/TitleMenuTaskObjF.c`'s `TitleMenu__TitleMenu` sets both from
 `dreamSysView->methods->slot1B0`), so per the compiler-ownership rule
 these are PROPOSALS, not renames. Also posted to the round-77 broadcast.
 

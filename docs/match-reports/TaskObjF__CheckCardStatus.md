@@ -292,7 +292,7 @@ done:
 #endif
 ```
 
-Needs (already declared locally in `src/TitleMenuTaskObjF.c`): `Node3bb8cE`,
+Needs (already declared locally in `src/ui/TitleMenuTaskObjF.c`): `Node3bb8cE`,
 `TaskObjF__CardInfoAndLoadStatus` (forward-declared, defined later in this same unit).
 
 ### Direction NOT tried, with reason

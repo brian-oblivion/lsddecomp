@@ -29,7 +29,7 @@ s32 TaskObjF__CloseEvents(Node3bb8cE *self)
 
 `TaskObjF__DisableEvents`, `TaskObjF__ForEachEvent` (both still `INCLUDE_ASM` in
 `TitleMenuTaskObjF.c`, runner charlie's unit) and `func_8003902C` (uncarved).
-Declared locally in `src/TitleMenuTaskObjF.c`, not in the shared
+Declared locally in `src/ui/TitleMenuTaskObjF.c`, not in the shared
 `include/class_3bb8c.h` — see the file-top comment there for why.
 
 ### Proposed learning

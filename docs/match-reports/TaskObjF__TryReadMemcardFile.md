@@ -95,7 +95,7 @@ with a MATCHING line: the readable
 `(iconFlag - MEMCARD_ICON_FLAG_BASE + 1) * MEMCARD_SECTOR_SIZE` built
 54/56 (two words reordered), measured this round.
 
-### Moved from src/TitleMenuTaskObjF.c
+### Moved from src/ui/TitleMenuTaskObjF.c
 
 The BIOS file-call declarations' comment, whose history is this:
 

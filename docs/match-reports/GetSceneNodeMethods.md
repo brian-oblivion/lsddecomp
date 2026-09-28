@@ -55,7 +55,7 @@ from a large number of OTHER units with DIFFERENT per-call-site arities
 and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
-`src/graphics/SceneNode.c`, `src/TitleMenuTaskObjF.c`, `src/world/ObjMStyleActor.c`,
+`src/graphics/SceneNode.c`, `src/ui/TitleMenuTaskObjF.c`, `src/world/ObjMStyleActor.c`,
 `src/world/ObjMStyleActor.c`, `src/world/DayTaskStageMap.c`, `src/ScreenWidgets.c`,
 `src/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.

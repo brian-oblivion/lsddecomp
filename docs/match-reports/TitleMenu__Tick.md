@@ -98,7 +98,7 @@ Renamed `func_8004D9D4` -> `TitleMenu__Tick`. **Tier B**: Unconditionally calls 
 compiler-ownership recipe (renamed the field alone in the `TitleMenu`
 struct definition, rebuilt default build and
 `tools/check-nonmatching.sh`): the accessor set landed entirely inside
-`src/TitleMenuTaskObjF.c` (this function's own `switch`, and
+`src/ui/TitleMenuTaskObjF.c` (this function's own `switch`, and
 `TitleMenu__RefreshMenu`'s read/write), so this was renamed directly
 rather than proposed. `unk58` also names unrelated fields on other structs
 in this same header (e.g. `TaskObjF::unk58`) -- untouched, since their own

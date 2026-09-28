@@ -434,7 +434,7 @@ s32 TaskObjF__BeginSave(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s
 
 Needs `TaskObjF`/`TaskObjFMethods` (see `TaskObjF__ForEachEvent`'s report) and a
 forward declaration of `TaskObjF__Validate` (defined later in this unit's ROM
-order; already present near the top of `src/TitleMenuTaskObjF.c`).
+order; already present near the top of `src/ui/TitleMenuTaskObjF.c`).
 
 ## Proposed learning
 
@@ -504,7 +504,7 @@ the file), 0x11 `EDIT_TITLE`, 0xB `SAVING`, 9 `SAVE_NO_SPACE` ("SAVEEMPT":
 checkCardSpace failed); opMode 2 `TASKOBJF_OP_SAVE`; probeMemcardFile's
 `0` destination is `NULL`. Zero bytes.
 
-### Moved from src/TitleMenuTaskObjF.c
+### Moved from src/ui/TitleMenuTaskObjF.c
 
 Replaced in the unit by a MATCHING line:
 

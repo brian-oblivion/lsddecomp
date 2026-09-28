@@ -167,7 +167,7 @@ extern s32 sSaveTitleColorFrame;
  * only on the first construction, when it was 0 before the increment. */
 extern s32 sTaskObjFCount;
 
-/* Formats the current day into the save title (src/TitleMenuTaskObjF.c);
+/* Formats the current day into the save title (src/ui/TitleMenuTaskObjF.c);
  * TitleMenu__TitleMenu calls it with DreamSys's getCurrentDayAndYear. */
 extern void StampSaveTitleDay(s32 day);
 
@@ -207,7 +207,7 @@ extern McDevicePath gMcDevicePath0; /* "bu00:" */
 /* The game's own strcat (src/app/GameApplicationFileResource.c). */
 extern char *strcat(char *dest, char *src);
 
-/* Game code (src/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
+/* Game code (src/ui/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
  * around its retry loop, and with (arg, 0) when the loop gives up. The BIOS
  * file calls (open, read, lseek, close, delete; Sony's libapi) are declared
  * in the units that call them. */

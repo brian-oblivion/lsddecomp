@@ -52,7 +52,7 @@ s32 TaskObjF__OpenEvents(Node3bb8cE *self)
 ### Header/struct change
 
 Added `s32 threads[4];` at `+0x014` to `Node3bb8cE` (local to
-`src/TitleMenuTaskObjF.c`, not the shared header), replacing what had been
+`src/ui/TitleMenuTaskObjF.c`, not the shared header), replacing what had been
 undifferentiated padding there.
 
 ### Proposed learning

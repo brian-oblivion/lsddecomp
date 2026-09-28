@@ -113,7 +113,7 @@ SLPS_015.56`.
   reassigns it, so whatever sets the real value is outside this unit's
   ground. Flagged as a placeholder-value caveat, not resolved further.
 
-`src/TitleMenuTaskObjF.c`: local (not shared-header) type `Arg1DB18_3bb8c_d`
+`src/ui/TitleMenuTaskObjF.c`: local (not shared-header) type `Arg1DB18_3bb8c_d`
 and externs for `strcpy`/`strlen` (Sony's, linked from `lib/libc2`, same
 per-unit convention as `src/TextEntryItemList.c`/`src/class_3bb8c_j.c`) and
 `DecodeFullWidthSjis` (already matched elsewhere; independent local arity).

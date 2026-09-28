@@ -34,7 +34,7 @@ Also dropped: the `arity-ok` K&R declaration. Both call sites in this unit
 now pass three arguments, so `extern void *BuildMemcardPath(void *dest,
 s32 selector, void *suffix);` is a real prototype and the whole image
 stays byte-exact (TaskObjF__ProbeCardFreeSpace 29/29). `docs/match-reports/BuildMemcardPath.md`
-("Why src/TitleMenuTaskObjF.c must declare it unprototyped") is superseded by
+("Why src/ui/TitleMenuTaskObjF.c must declare it unprototyped") is superseded by
 this -- flagged for the head, not edited.
 
 ```c
@@ -202,7 +202,7 @@ s32 TaskObjF__OpenAndReadMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *filterNa
 #endif
 ```
 
-Needs (already declared in `src/TitleMenuTaskObjF.c`, all local to this
+Needs (already declared in `src/ui/TitleMenuTaskObjF.c`, all local to this
 unit): `Node3bb8cE`, `BuildMemcardPath`, `func_80050938`, `func_80050928`,
 `func_800508F8`, `BMemPMgrAlloc`, `BMemPMgrFree`, `strcpy`.
 
@@ -286,7 +286,7 @@ even though the project's rule (correctly) forbids calling it
 
 Promoted the preserved near-miss body (the `#if 0` block above, unchanged
 since round 14) into `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif`
-in `src/TitleMenuTaskObjF.c`. This is a **hand-derived** body -- both permuter
+in `src/ui/TitleMenuTaskObjF.c`. This is a **hand-derived** body -- both permuter
 runs on record for this function (round 14, ~4600 iterations; round 19,
 ~130,167 iterations) converged on a best score of 5 (not 0), and the
 lowest-scoring variant either run found was a read of an uninitialized

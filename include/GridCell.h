@@ -7,7 +7,7 @@
  * GridCell -- one cell of StageMap's grid: a SceneNode that carries the
  * model placed in that cell. Class id 0x24, method table gGridCellMethods;
  * SceneNode's subclass (the ctor chains to SceneNode's first), no class
- * below it. Methods in src/TitleMenuTaskObjF.c.
+ * below it. Methods in src/ui/TitleMenuTaskObjF.c.
  *
  * Lifecycle: only StageMap__StageMap (src/world/DayTaskStageMap.c) creates them.
  * For each of its seven elements it makes one GridCell as the element's
