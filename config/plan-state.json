@@ -1634,6 +1634,7 @@
     },
     "9": {
       "checklist": {
+        "comments": true,
         "docs-budget": true,
         "nonmatching-clean": true,
         "style": true
