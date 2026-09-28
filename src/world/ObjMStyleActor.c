@@ -418,7 +418,7 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
     }
 }
 
-/* ---- ObjM, resetCounters (+0x040) to enterState6 (+0x09C) ---------------
+/* ---- ObjM, resetCounters (+0x040) to enterLinkWall (+0x09C) ---------------
  *
  * In table order.
  *
@@ -437,8 +437,9 @@ void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event) {
  *    while it is being built; togglePause.
  *  - the style scene slots +0x080..+0x08C: SetupSceneStyle,
  *    ExitSceneStyle, EnterStyleSession, TickStyle.
- *  - OnDreamSysNotify turns the DreamSys's link codes into enterState4..B;
- *    EnterState4/5/6 set IntermediateBase::state and start a fade up
+ *  - OnDreamSysNotify turns the DreamSys's link codes into the enter*
+ *    slots and notifyLinkTeleport; EnterTimeUp, EnterLinkDynamic and
+ *    EnterLinkWall set IntermediateBase::state and start a fade up
  *    (ObjM__StartFadeUp, next section).
  * NoOpSlot40 and NoOpSlot7C are empty.
  */
@@ -624,7 +625,7 @@ void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
 
 /* onPadEvent, only in session: Start pressed toggles the pause, Select
  * held and released sets and clears the close-ready flag, triangle pressed
- * closes (closeAndNotifyD).
+ * closes (closeAndNotifyNewGame).
  * MATCHING: the gotos keep retail's compare order; a switch sorts the cases. */
 void ObjM__DispatchPadEvent(ObjM *self, void *sender, s32 code) {
     ObjMMethods *m = self->methods;
@@ -656,7 +657,7 @@ updateCloseReady:
     fn = m->updateCloseReadyFlag;
     goto call;
 closeAndNotify:
-    fn = m->closeAndNotifyD;
+    fn = m->closeAndNotifyNewGame;
     goto call;
 clearCloseReady:
     fn = m->clearCloseReadyFlag;
@@ -805,27 +806,27 @@ void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code) {
     if (self->state == 0) {
         switch (code) {
             case DREAMSYS_TIME_UP:
-                self->methods->enterState4(self);
+                self->methods->enterTimeUp(self);
                 break;
             case DREAMSYS_LINK_DAY_START:
                 break;
             case DREAMSYS_LINK_DYNAMIC:
-                self->methods->enterState5(self);
+                self->methods->enterLinkDynamic(self);
                 break;
             case DREAMSYS_LINK_WALL:
-                self->methods->enterState6(self);
+                self->methods->enterLinkWall(self);
                 break;
             case DREAMSYS_LINK_FLASHBACK:
-                self->methods->enterState7(self);
+                self->methods->enterLinkFlashback(self);
                 break;
             case DREAMSYS_LINK_TUNNEL:
-                self->methods->enterState8(self);
+                self->methods->enterLinkTunnel(self);
                 break;
             case DREAMSYS_LINK_STAGE_TIMER:
-                self->methods->enterStateA(self);
+                self->methods->enterLinkStageTimer(self);
                 break;
             case DREAMSYS_LINK_TELEPORT:
-                self->methods->notifyParentsCodeB(self);
+                self->methods->notifyLinkTeleport(self);
                 break;
         }
     } else if (code >= 9) {
@@ -870,7 +871,7 @@ void ObjM__EnterLinkDynamic(ObjM *self) {
     s32 color;
 
     if (self->dreamSys->currentStage < 0) {
-        self->methods->enterState6(self);
+        self->methods->enterLinkWall(self);
     } else {
         self->state = 5;
         color = self->dreamSys->methods->getDreamColor(self->dreamSys);
@@ -895,7 +896,7 @@ void ObjM__EnterLinkWall(ObjM *self) {
  * the stage's scene style.
  *
  * ObjM, in ROM order:
- *  - EnterState7/8/A and NotifyParentsCodeB, the DreamSys link codes
+ *  - EnterLinkFlashback, EnterLinkTunnel, EnterLinkStageTimer and NotifyLinkTeleport, the DreamSys link codes
  *    ObjM__OnDreamSysNotify hands on (flashback, tunnel, stage timer,
  *    teleport): each sets IntermediateBase::state (enum ObjMState) and
  *    fades up through StartFadeUp, or notifies its parent at once.
@@ -908,7 +909,7 @@ void ObjM__EnterLinkWall(ObjM *self) {
  *  - The pause overlay: AdvancePauseSetup builds the "Pause" TextRow and,
  *    four calls later, hides the viewport and pauses the FrameClock, the
  *    WBgm and the VabStreamObj; TeardownPauseOverlay undoes it. While it is
- *    up and ObjM is IDLE, the close-ready flag arms CloseAndNotifyC/D,
+ *    up and ObjM is IDLE, the close-ready flag arms CloseAndNotify and CloseAndNotifyNewGame,
  *    which tear it down and notify a close (DayTask ends the day).
  *    NoOpSlotBC is empty.
  *

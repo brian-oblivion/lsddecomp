@@ -32,9 +32,9 @@
  *    advancePauseSetup while the "Pause" overlay is up; onPadEvent maps
  *    pad codes onto togglePause and the close-ready slots;
  *  - onNotify splits by the sender's class id: the DreamSys's codes
- *    0xA..0x11 go to enterState4..A, the viewport's fade object
- *    (FadeBox) reports fade down/up done (5/6), and the StageMap's
- *    event 7 runs checkAuxTrigger. The enterState/close methods set
+ *    0xA..0x11 go to enterTimeUp..notifyLinkTeleport, the viewport's fade
+ *    object (FadeBox) reports fade down/up done (5/6), and the StageMap's
+ *    event 7 runs checkAuxTrigger. The enter and close methods set
  *    IntermediateBase::state and notifyParents it; DayTask's
  *    onObjMNotify acts on those codes.
  * A day's play loop is the reading the evidence invites, but none of it
@@ -125,13 +125,13 @@ struct ObjMMethods {
     /* +0x08C */ void (*tickStyle)(ObjM *self); /* ObjM__TickStyle: update, no pause overlay */
     /* +0x090 */ void (*onDreamSysNotify)(ObjM *self, BasicClass *sender,
                                           s32 event); /* ObjM__OnDreamSysNotify: onNotify's 0x1F34 sender */
-    /* +0x094 */ void (*enterState4)(ObjM *self); /* ObjM__EnterTimeUp: OnDreamSysNotify's code 0xA */
-    /* +0x098 */ void (*enterState5)(ObjM *self); /* ObjM__EnterLinkDynamic: code 0xC */
-    /* +0x09C */ void (*enterState6)(ObjM *self); /* ObjM__EnterLinkWall: code 0xD; EnterState5 before a stage */
-    /* +0x0A0 */ void (*enterState7)(ObjM *self);        /* ObjM__EnterLinkFlashback: code 0xE */
-    /* +0x0A4 */ void (*enterState8)(ObjM *self);        /* ObjM__EnterLinkTunnel: code 0xF */
-    /* +0x0A8 */ void (*enterStateA)(ObjM *self);        /* ObjM__EnterLinkStageTimer: code 0x10 */
-    /* +0x0AC */ void (*notifyParentsCodeB)(ObjM *self); /* ObjM__NotifyLinkTeleport: code 0x11 */
+    /* +0x094 */ void (*enterTimeUp)(ObjM *self); /* ObjM__EnterTimeUp: OnDreamSysNotify's code 0xA */
+    /* +0x098 */ void (*enterLinkDynamic)(ObjM *self); /* ObjM__EnterLinkDynamic: code 0xC */
+    /* +0x09C */ void (*enterLinkWall)(ObjM *self); /* ObjM__EnterLinkWall: code 0xD; EnterLinkDynamic before a stage */
+    /* +0x0A0 */ void (*enterLinkFlashback)(ObjM *self);  /* ObjM__EnterLinkFlashback: code 0xE */
+    /* +0x0A4 */ void (*enterLinkTunnel)(ObjM *self);     /* ObjM__EnterLinkTunnel: code 0xF */
+    /* +0x0A8 */ void (*enterLinkStageTimer)(ObjM *self); /* ObjM__EnterLinkStageTimer: code 0x10 */
+    /* +0x0AC */ void (*notifyLinkTeleport)(ObjM *self);  /* ObjM__NotifyLinkTeleport: code 0x11 */
     /* +0x0B0 */ void (*onFadeNotify)(ObjM *self, struct FadeBox *sender,
                                       s32 event); /* ObjM__OnFadeNotify: onNotify's 0x164 sender; 5 fade down done, 6 up */
     /* +0x0B4 */ void (*onStageMapNotify)(ObjM *self, BasicClass *sender,
@@ -140,15 +140,15 @@ struct ObjMMethods {
     /* +0x0BC */ void (*slotBC)(void);               /* ObjM__NoOpSlotBC, empty; never called */
     /* +0x0C0 */ void (*updateCloseReadyFlag)(ObjM *self); /* ObjM__UpdateCloseReadyFlag: DispatchPadEvent's 0xC */
     /* +0x0C4 */ void (*clearCloseReadyFlag)(ObjM *self); /* ObjM__ClearCloseReadyFlag: DispatchPadEvent's 0x2C, TogglePause */
-    /* +0x0C8 */ void (*closeAndNotifyD)(ObjM *self); /* ObjM__CloseAndNotifyNewGame: DispatchPadEvent's 0x16 */
-    /* +0x0CC */ void (*closeAndNotifyC)(ObjM *self); /* ObjM__CloseAndNotify: no caller in C */
+    /* +0x0C8 */ void (*closeAndNotifyNewGame)(ObjM *self); /* ObjM__CloseAndNotifyNewGame: DispatchPadEvent's 0x16 */
+    /* +0x0CC */ void (*closeAndNotify)(ObjM *self); /* ObjM__CloseAndNotify: no caller in C */
     /* +0x0D0 */ void (*advancePauseSetup)(ObjM *self); /* ObjM__AdvancePauseSetup: update and TogglePause */
-    /* +0x0D4 */ void (*teardownPauseOverlay)(ObjM *self); /* ObjM__TeardownPauseOverlay: TogglePause, ExitSceneStyle, CloseAndNotifyC/D */
+    /* +0x0D4 */ void (*teardownPauseOverlay)(ObjM *self); /* ObjM__TeardownPauseOverlay: TogglePause, ExitSceneStyle, CloseAndNotify, CloseAndNotifyNewGame */
 };
 
 struct ObjM {
     TIMEDTASK_FIELDS(ObjMMethods);
-    /* +0x038 */ s32 stage; /* the ctor's; DayTask__StartObjM's stage. PickStageBgm, GetStageMapChunkRecord, GetStageGridDimensions, gStagePendingExtras[stage], EnterState4 */
+    /* +0x038 */ s32 stage; /* the ctor's; DayTask__StartObjM's stage. PickStageBgm, GetStageMapChunkRecord, GetStageGridDimensions, gStagePendingExtras[stage], EnterTimeUp */
     /* +0x03C */ struct DreamSys *dreamSys; /* init's third argument (AttachTarget); a child. Every DreamSys slot ObjM calls */
     /* +0x040 */ s32 tickPeriod; /* InitStyleAndWorld: 16; the DreamSys's resetLinkState's tickPeriod (EnterStyleSession) */
     /* +0x044 */ s32 moveMode; /* InitStyleAndWorld: 2 or 3; resetLinkState's moveMode, a sMoveModeSpeeds index (EnterStyleSession) */
@@ -167,7 +167,7 @@ struct ObjM {
     /* +0x078 */ struct NodeGuardedViewport *cachedViewport; /* InitStyleAndWorld: IntermediateBase::viewport */
     /* +0x07C */ struct TextRow *pauseText; /* AdvancePauseSetup's New_TextRow(etcTim, 5, "Pause"); TeardownPauseOverlay releases it */
     /* +0x080 */ s32 pauseSetupStep; /* the ctor zeroes it; AdvancePauseSetup counts 0..4, TeardownPauseOverlay clears it */
-    /* +0x084 */ s32 closeReady; /* UpdateCloseReadyFlag sets, ClearCloseReadyFlag clears; CloseAndNotifyC/D test it */
+    /* +0x084 */ s32 closeReady; /* UpdateCloseReadyFlag sets, ClearCloseReadyFlag clears; CloseAndNotify, CloseAndNotifyNewGame test it */
 }; /* 0x88 bytes: New_ObjM */
 
 extern ObjMMethods gObjMMethods;
