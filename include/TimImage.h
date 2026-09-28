@@ -6,7 +6,7 @@
 /*
  * TimImage -- a FileResource data source (class id 0x103, method table
  * gTimImageMethods) whose buffer holds one TIM image. Methods in
- * src/TimImage.c. No classes derive from it (`typeviews.py --tree`), so
+ * src/graphics/TimImage.c. No classes derive from it (`typeviews.py --tree`), so
  * there are no FIELDS/SLOTS macros.
  *
  * The ctor chain agrees with the id: TimImage__TimImage's first call is

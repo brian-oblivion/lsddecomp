@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003B624` on 2026-09-26 (tools/rename.py). Address 0x8003b624.
 
-Round 81, runner echo. Unit `src/TimImage.c`. Fresh ground, no prior attempt.
+Round 81, runner echo. Unit `src/graphics/TimImage.c`. Fresh ground, no prior attempt.
 Byte-exact on the first build.
 
 - **Where:** after the table getter GetTimImageMethods; it is not a slot of

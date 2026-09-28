@@ -2,11 +2,11 @@
 
 > Renamed from `func_8003B614` on 2026-09-25 (tools/rename.py). Address 0x8003b614.
 
-Round 81, runner echo. Unit `src/TimImage.c` (carved from `psyq_2bb9c` in
+Round 81, runner echo. Unit `src/graphics/TimImage.c` (carved from `psyq_2bb9c` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** not a slot: the table getter for TimImage's table `gTimImageMethods`.
-- **What:** the class's method-table getter (`lui/addiu %hi/%lo(gTimImageMethods)`). It is not a table slot. `New_TimImage` and `TimImage__TimImage` call it. The table is declared `extern FileResourceMethods gTimImageMethods;` in this report's own local view, which is a base-class view of a 39-slot table; `src/TimImage.c` itself now declares the full `TimImageMethods` view.
+- **What:** the class's method-table getter (`lui/addiu %hi/%lo(gTimImageMethods)`). It is not a table slot. `New_TimImage` and `TimImage__TimImage` call it. The table is declared `extern FileResourceMethods gTimImageMethods;` in this report's own local view, which is a base-class view of a 39-slot table; `src/graphics/TimImage.c` itself now declares the full `TimImageMethods` view.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 4/4,
   and the whole-image SHA1 is green (`OK: build matches retail`).
 - **Name:** `GetTimImageMethods`, tier A (round 81 naming pass, runner
@@ -21,7 +21,7 @@ TimImageMethods *GetTimImageMethods(void) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/TimImage.c`:
+The unit-local view it needs, from the top of `src/graphics/TimImage.c`:
 
 ```c
 #include "FileResource.h"
