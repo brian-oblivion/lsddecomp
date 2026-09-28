@@ -112,7 +112,7 @@ set the start colour and the step's sign, and configure turns on additive
 5/6 "fade down/up done" it handles, and Entity's on-demand `unk100`, which
 the MoodCue handlers fade). The name claims a fading box and no more: which
 game transitions use it is the callers' business. The header moved to
-`include/FadeBox.h`, the family's types followed (`FadeBoxMethods`,
+`include/fade_box.h`, the family's types followed (`FadeBoxMethods`,
 `FadeBoxResetFn`), and the own field `unk84` became `maskPerTick`
 (configure's `BoxFill::mask / ticksLeft`; written, never read). renametype.py
 also rewrote the old class name inside earlier sections' history prose in
@@ -164,7 +164,7 @@ renametype's rewrite of the class name):
  * WHAT THIS UNIT IS (round 61, track 3; revised rounds 85 and 87, track 4).
  * Its 17 functions are the bottom two links of `SceneNode -> BoxFill ->
  * FadeBox`: first FadeBox's (gFadeBoxMethods, 0x164, `New_FadeBox` to
- * `GetFadeBoxMethods`, include/FadeBox.h), then BoxFill's allocator,
+ * `GetFadeBoxMethods`, include/fade_box.h), then BoxFill's allocator,
  * ctor and Reset (0x64, include/box_fill.h, a GsBOXF screen rectangle; the
  * rest of its methods open screen_widgets).
  *
@@ -172,7 +172,7 @@ renametype's rewrite of the class name):
  * 4/2/1 = r/g/b mask) and a tick count, StartFadeDown/StartFadeUp set the
  * start colour and the step's sign, Update steps the selected channels once
  * per call until Stop, and PushPosition/PopPosition save and restore the
- * box's size and position (tier B; include/FadeBox.h's banner has the
+ * box's size and position (tier B; include/fade_box.h's banner has the
  * evidence). See each function's own `## Naming` section.
  */
 ```
@@ -203,7 +203,7 @@ Outside this job's edit set (the head applies them by type scope):
   getter slot `getSubHandle` -> `getFadeBox`: the ctor fills it with
   New_FadeBox, and both ObjM callers cast the result to `FadeBox *`.
   Viewport.h's banner still lists it as "not settled"; its type could
-  become `FadeBox *` once Viewport.h can include FadeBox.h.
+  become `FadeBox *` once Viewport.h can include fade_box.h.
 - `FadeBox::unk7C` stays: configure stores its third argument there and
   update skips stepping while it is 9, but every caller passes 0, so what
   9 means is not shown.

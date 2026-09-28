@@ -66,7 +66,7 @@ sets `step` to 10, `altMode` to 0, and turns the box's display and
 semi-transparency off (the inherited `setDisplay`/`setSemiTrans`). Its
 parameter list `(self, channels)` differs from the slot's `(self)`, so the
 slot keeps the inherited type and the ctor calls it through
-`FadeBoxResetFn` (include/FadeBox.h). Tier A.
+`FadeBoxResetFn` (include/fade_box.h). Tier A.
 
 ## Track 6 (2026-09-26, round 93, charlie)
 

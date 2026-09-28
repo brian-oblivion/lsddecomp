@@ -39,7 +39,7 @@
 
 /* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
  * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what
- * Viewport gives its FadeBox (FadeBox.h). */
+ * Viewport gives its FadeBox (fade_box.h). */
 extern s32 sEntityFadeBoxDefaultSize[2];
 extern s32 sEntityFadeBoxDefaultOffset[2];
 

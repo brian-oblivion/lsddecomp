@@ -925,7 +925,7 @@
         "gFadeBoxMethods": {
           "class": "FadeBox",
           "date": "2026-09-26",
-          "header": "include/FadeBox.h"
+          "header": "include/fade_box.h"
         },
         "gFileResourceMethods": {
           "class": "FileResource",

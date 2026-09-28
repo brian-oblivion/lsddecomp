@@ -5,7 +5,7 @@
 #include "basic_class.h"
 #include "scene_node.h"
 #include "box_fill.h"
-#include "FadeBox.h"
+#include "fade_box.h"
 #include "IntermediateBase.h"
 #include "TaskCore.h"
 #include "StreamTask.h"
@@ -18,7 +18,7 @@
  * Declarations shared by src/app/task.c and the unit after it,
  * screen_widgets.c (FadeBox, BoxFill, TextRow): the data and outside callees
  * they reach that no class header owns. The classes are in their own headers: StreamTask.h,
- * TaskCore.h, IntermediateBase.h, Viewport.h, box_fill.h, FadeBox.h, TextRow.h.
+ * TaskCore.h, IntermediateBase.h, Viewport.h, box_fill.h, fade_box.h, TextRow.h.
  */
 
 /* Defined in task.c: &sDefaultMovieFrame. */

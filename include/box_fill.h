@@ -29,7 +29,7 @@
  * Ctor chain: BoxFill__BoxFill calls GetSceneNodeMethods()->ctor first, so
  * the id parent (0x4) is the ctor-chain parent. One class derives from it,
  * FadeBox (gFadeBoxMethods, 0x164, a colour fade over the box;
- * include/FadeBox.h), whose ctor calls this one's first
+ * include/fade_box.h), whose ctor calls this one's first
  * (FadeBox__FadeBox: GetBoxFillMethods()->ctor).
  *
  * Overrides whose parameter list differs from the inherited slot keep the

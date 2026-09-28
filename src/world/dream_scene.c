@@ -36,7 +36,7 @@
 #include "ObjM.h"
 #include "VabStreamObj.h"
 #include "pad.h"
-#include "FadeBox.h"
+#include "fade_box.h"
 #include "dream_sys.h"
 #include "StageMap.h"
 #include "NodeGuardedViewport.h"

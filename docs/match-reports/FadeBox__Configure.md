@@ -405,7 +405,7 @@ The field this method writes at +0x084 is now `maskPerTick` (was `unk84`):
   `fadeMode`, whose own callers all pass 0), so no other value is observed;
   "mode" says only that it selects a variant.
 - Parameter `arg3` -> `mode` here, in StartFadeDown and StartFadeUp, and in
-  FadeBox.h's three slots and prototypes; locals `q1` -> `ticks`.
+  fade_box.h's three slots and prototypes; locals `q1` -> `ticks`.
 
 ### History: the in-place division is no longer load-bearing (round 100)
 

@@ -158,7 +158,7 @@ callback); which dream object owns the row is not.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-`this->unk100` is a `FadeBox *` (include/FadeBox.h); the slot
+`this->unk100` is a `FadeBox *` (include/fade_box.h); the slot
 call through its +0x0D4 is now `startFadeDown` (FadeBox__StartFadeDown), with `companion2`, an
 `s32` in entity.h, cast `(BasicClass *)` as the fade's source (FadeBox's
 configure adds it as a child; no code). Image byte-identical.
@@ -177,7 +177,7 @@ Every literal in the live body is in its base: decimal for moodTimer ticks, dist
 
 - `Entity::unk100` -> `fade` (and `Entity__GetOrCreateFadeBox` ->
   `Entity__GetOrCreateFade`). It is a FadeBox, the BoxFill that fades its
-  colour (include/FadeBox.h); Entity__GetOrCreateFadeBox is its only
+  colour (include/fade_box.h); Entity__GetOrCreateFadeBox is its only
   writer (New_FadeBox, then setStep from its fourth argument, 10 here),
   Entity__Finalize releases it, and every other access (here, Entity x3,
   Entity x1) calls startFadeDown or startFadeUp on it. Accessors outside

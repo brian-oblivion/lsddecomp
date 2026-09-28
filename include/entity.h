@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "tod_actor.h"
-#include "FadeBox.h"
+#include "fade_box.h"
 #include "SoundCueSet.h"
 
 /*

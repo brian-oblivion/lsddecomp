@@ -140,7 +140,7 @@ not after a guess about what the object represents.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-`Entity::unk100` is now typed `FadeBox *` (include/FadeBox.h); the
+`Entity::unk100` is now typed `FadeBox *` (include/fade_box.h); the
 local `Unk100Obj`/`Unk100Methods` view and entity.h's own
 `extern Unk100Obj *New_FadeBox` are deleted. This function's four slot
 calls resolve through gFadeBoxMethods (`tools/classtable.py gFadeBoxMethods`) and now

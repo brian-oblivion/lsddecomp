@@ -1,5 +1,5 @@
-#ifndef FADEBOX_H
-#define FADEBOX_H
+#ifndef FADE_BOX_H
+#define FADE_BOX_H
 
 #include "box_fill.h"
 
