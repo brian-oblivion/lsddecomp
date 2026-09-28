@@ -777,7 +777,7 @@ void Entity__MoodCue16(Entity *this) {
                 turn = sRotationYawPlus90;
             }
             this->methods->updateRotation(this, 0, turn);
-            this->methods->addTranslation(this, TRANSLATE_Y_PLUS256);
+            this->methods->addTranslation(this, sTranslateYPlus256);
         } else {
             this->methods->moveLocalZOrFindLink(this, -374, (void *)(rand() % 2));
         }

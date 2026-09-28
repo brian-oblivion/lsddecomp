@@ -274,7 +274,7 @@ extern Ratio16 ROTATION_YAW_PLUS4[];
 extern Ratio16 ROTATION_XPLUS90[];
 extern Ratio16 ROTATION_YAW_PLUS1[];
 extern Ratio16 ROTATION_ZMINUS90[];
-extern LongVec3 TRANSLATE_Y_PLUS256[];
+extern LongVec3 sTranslateYPlus256[];
 extern LongVec3 TRANSLATE_Y_MINUS4096[];
 extern LongVec3 TRANSLATE_Y_MINUS512[];
 extern LongVec3 TRANSLATE_Y_PLUS64[];
