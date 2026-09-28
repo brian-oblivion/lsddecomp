@@ -9,7 +9,7 @@
 ## Source
 
 ```c
-extern u8 gCdSeekLoc[8];
+extern u8 sCdSeekLoc[8];
 extern void *gCdSeekParam;
 extern s32 gCdTickStep;
 
@@ -35,14 +35,14 @@ s32 CdDriver__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
                 s0tmp = s0tmp + 1;
             }
             v0 = CdPosToInt(self->unk18);
-            CdIntToPos(v0 + s0tmp, gCdSeekLoc);
+            CdIntToPos(v0 + s0tmp, sCdSeekLoc);
             if (arg2 == 0) {
                 if (sCdAsyncEnabled != 0) {
-                    gCdSeekParam = gCdSeekLoc - 0x14;
+                    gCdSeekParam = sCdSeekLoc - 0x14;
                     gCdTickStep = 1;
                 } else {
                     do {
-                        CdControl(2, gCdSeekLoc, 0);
+                        CdControl(2, sCdSeekLoc, 0);
                         do {
                             v0 = CdSync(0, 0);
                         } while (v0 == 0);
@@ -117,10 +117,10 @@ passed to `CdPosToInt`) and `self->unk1C` is a `u32` byte-length field
 (rounded up to a 0x800-byte sector boundary, same formula as
 `GetCdFileSize`'s own `((self->unk1C >> 11) + 1) << 11`, CdDriver.c) --
 this is the SAME struct as `ObjA34_179D8H` there, and that unit already
-names offset 0x1C the same way, independently. `gCdSeekLoc` is an 8-byte
+names offset 0x1C the same way, independently. `sCdSeekLoc` is an 8-byte
 zero-initialized buffer (`asm/data/5DB70.data.s`); this function only ever
 takes its address, so it's declared as a plain byte array locally.
-`gCdSeekParam = gCdSeekLoc - 0x14` matches `CdDriver.c`'s existing reads of
+`gCdSeekParam = sCdSeekLoc - 0x14` matches `CdDriver.c`'s existing reads of
 that global (`(u8 *)gCdSeekParam + 0x14`) -- the same pointer, offset the other
 direction.
 
@@ -147,7 +147,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 **Evidence.** `(self, offset, mode)`. Inside a queue dispatch on an open
 file it converts `self->pos` to a sector number (`CdPosToInt`), adds
 `offset` rounded up to whole 0x800-byte sectors, and writes the result to
-`gCdSeekLoc` (`CdIntToPos`). With `mode == 0` it then seeks there
+`sCdSeekLoc` (`CdIntToPos`). With `mode == 0` it then seeks there
 (CdlSetloc, or queues the seek on the state machine) and returns 0; with
 `mode != 0` it instead returns `self->size` rounded up to a whole sector.
 Outside a dispatch it enqueues op 4 with both arguments. The base-class
@@ -169,7 +169,7 @@ at slot `+0x04C`. The prefix names the table, not the developers' class.
 ## Track 4b (2026-09-25, round 85)
 
 The CD driver's shared globals and records are now declared once, in
-`include/CdDriver.h`, and this body uses that one reading: the fake seek entry is spelled `(CdFileEntry *)(gCdSeekLoc - 0x14)`, so the state machine's `&gCdSeekParam->pos` lands on the loc. The
+`include/CdDriver.h`, and this body uses that one reading: the fake seek entry is spelled `(CdFileEntry *)(sCdSeekLoc - 0x14)`, so the state machine's `&gCdSeekParam->pos` lands on the loc. The
 global's type comes from its accessors (`gFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.

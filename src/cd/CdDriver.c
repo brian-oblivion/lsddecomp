@@ -170,7 +170,7 @@ void CdDriver__Close(CdDriver *self) {
     UnlockCd();
 }
 
-extern CdlLOC gCdSeekLoc;
+extern CdlLOC sCdSeekLoc;
 
 extern s32 GetCdFileSize(CdDriver *self);
 
@@ -189,16 +189,16 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
             if ((offset & (CD_SECTOR_SIZE - 1)) != 0) {
                 sectors = sectors + 1;
             }
-            CdIntToPos(CdPosToInt(&self->pos) + sectors, &gCdSeekLoc);
+            CdIntToPos(CdPosToInt(&self->pos) + sectors, &sCdSeekLoc);
             if (mode == 0) {
                 if (sCdAsyncEnabled != 0) {
                     /* the state machine seeks to &gCdSeekParam->pos: aim it
-                     * at a pretend entry whose pos is gCdSeekLoc */
-                    gCdSeekParam = (CdFileEntry *)((u8 *)&gCdSeekLoc - offsetof(CdFileEntry, pos));
+                     * at a pretend entry whose pos is sCdSeekLoc */
+                    gCdSeekParam = (CdFileEntry *)((u8 *)&sCdSeekLoc - offsetof(CdFileEntry, pos));
                     gCdTickStep = CD_TICK_STATE_MACHINE;
                 } else {
                     do {
-                        CdControl(CdlSetloc, (u_char *)&gCdSeekLoc, 0);
+                        CdControl(CdlSetloc, (u_char *)&sCdSeekLoc, 0);
                         do {
                             status = CdSync(0, 0);
                         } while (status == CdlNoIntr);

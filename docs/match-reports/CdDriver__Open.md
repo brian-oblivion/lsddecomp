@@ -246,7 +246,7 @@ its one reader here ORs flags bit 0, but no writer of a nonzero value is
 identified (CdDriver's `UnkC80::unk04` store goes through an
 uninitialised pointer).
 
-Globals: `D_8006D574` -> `gCdSeekLoc` (A: 8 bytes of .data written only by
+Globals: `D_8006D574` -> `sCdSeekLoc` (A: 8 bytes of .data written only by
 `CdDriver__Seek`'s `CdIntToPos` and used as its CdlSetloc target).
 `gCdSyncQueueMode` keeps its placeholder for CdDriver's stated reason: every
 read here is the `sCdAsyncEnabled == 0 && gCdSyncQueueMode == 0` sync-mode test and
