@@ -1683,7 +1683,7 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
 #define SAVE_TITLE_LETTER_FIELD 3
 #define SAVE_TITLE_LETTER 4
 /* SAVE_TITLE_PADDING (12) is defined above, with sSaveTitle. */
-/* gSaveTitleGlyphs: the full-width letters a..o (0..14), one per save file
+/* sSaveTitleGlyphs: the full-width letters a..o (0..14), one per save file
  * -01..-15, then three full-width spaces and "Day" (15..20). */
 #define SAVE_TITLE_GLYPH_SPACES 15
 /* A save file name is namePrefix ("BISLPS-01556", 12 characters) + "-NN";
@@ -1693,14 +1693,14 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
 /* Sony's (libc2). A leading 0 makes it parse octal. */
 extern s32 atoi(char *s);
 
-extern FullWidthChar *gSaveTitleGlyphs;
+extern FullWidthChar *sSaveTitleGlyphs;
 
 /* Writes a save file's letter into the full-width `title`: the letter
  * field becomes a space, the letter for the file name's -NN (a for -01 ..
  * o for -15) and a space, followed by "Day", and a space goes after the day
  * number. With no file name it only blanks the letter field. -08 and -09
  * are parsed from their second digit, which atoi would otherwise read as
- * octal. Returns a pointer into gSaveTitleGlyphs that no caller reads.
+ * octal. Returns a pointer into sSaveTitleGlyphs that no caller reads.
  * MATCHING:
  * `glyphs` is the return value, not a second read of the global. */
 s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
@@ -1713,16 +1713,16 @@ s32 StampSaveTitleFileLetter(char *titleText, char *fileName) {
         numberPos = ((u32)(fileName[SAVE_FILE_NAME_NUMBER + 1] - '8') < 2) ? SAVE_FILE_NAME_NUMBER + 1
                                                                            : SAVE_FILE_NAME_NUMBER;
 
-        title[SAVE_TITLE_PADDING] = gSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
+        title[SAVE_TITLE_PADDING] = sSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
         *(FullWidthChars6 *)&title[SAVE_TITLE_LETTER_FIELD] =
-            *(FullWidthChars6 *)&gSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
+            *(FullWidthChars6 *)&sSaveTitleGlyphs[SAVE_TITLE_GLYPH_SPACES];
 
         letter = atoi(fileName + numberPos) - 1;
-        glyph = &gSaveTitleGlyphs[letter];
+        glyph = &sSaveTitleGlyphs[letter];
         title[SAVE_TITLE_LETTER] = *glyph;
         return (s32)glyph;
     } else {
-        FullWidthChar *glyphs = gSaveTitleGlyphs;
+        FullWidthChar *glyphs = sSaveTitleGlyphs;
 
         *(FullWidthChars3 *)&title[SAVE_TITLE_LETTER_FIELD] =
             *(FullWidthChars3 *)&glyphs[SAVE_TITLE_GLYPH_SPACES];

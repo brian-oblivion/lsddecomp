@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gSaveTitleGlyphs
 gSoundEffectDirPtr
 gSsTicksPerSecond
 gStartupBMemPMgr
@@ -204,6 +203,7 @@ sSaveTitle
 sSaveTitleBlanks
 sSaveTitleColorChannel
 sSaveTitleColorFrame
+sSaveTitleGlyphs
 sSaveTitleOffset
 sSpecialDayMood
 sStage5TriggerGridPos
