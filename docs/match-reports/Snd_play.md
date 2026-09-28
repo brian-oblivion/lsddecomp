@@ -40,3 +40,16 @@ Round 34 (2026-09-12) linked `libsnd/replay` and `libsnd/vs_vab` into the
 middle of the `libsnd_decre` slice, leaving Snd_play as the one-function unit
 `src/code_179d8_i_b.c`. Round 98 (track 8) renamed it `src/libsnd_play.c`
 for the Sony module it is (`libsnd/play.o`, 0x2C, the unit's exact size).
+
+## History (moved from src/libsnd_play.c, comments pass)
+
+The arity-ok note on the SeqPlay prototype read:
+
+> arity-ok: the definition's third parameter is never read (round 69, docs/match-reports/SeqPlay.md); its return type is void there, see PROGRESS round 69
+
+The file's banner carried its edge evidence:
+
+> Edges. Before: libsnd/vs_vab, a placed Sony object. After:
+> libsnd_seqread.c, where tuboundary.py reads "start edge possible" -- the
+> rodata is silent -- and the edge is kept because play and seqread are
+> separate objects in every libsnd build.
