@@ -607,7 +607,7 @@ void Entity__MoodCue07(Entity *this, SoundCueSet *out) {
         this->methods->updateRotation(this, 0, sRotationYawPlus2);
         this->methods->moveLocalZ(this, -320, 0);
     } else if (this->moodTimer >= 56 || Entity__IsNearTarget(this, this->coord2->coord.t, 1, 1) != 0) {
-        this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
+        this->methods->addTranslation(this, sTranslateYMinus64);
     } else if (this->moodTimer >= 10) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         this->methods->moveLocalZ(this, -256, 0);
@@ -618,7 +618,7 @@ void Entity__MoodCue07(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue08(Entity *this) {
     this->methods->updateScale(this, 1, SCALE_DOUBLE);
-    this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
+    this->methods->addTranslation(this, sTranslateYMinus64);
 }
 
 void Entity__MoodCue09(Entity *this, SoundCueSet *out) {
@@ -867,7 +867,7 @@ void Entity__MoodCue23(Entity *this) {
             this->moodTimer = 0;
         }
         if (this->moodTimer >= 7) {
-            this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
+            this->methods->addTranslation(this, sTranslateYMinus64);
             this->methods->moveLocalZ(this, 10, 0);
         } else {
             this->methods->addTranslation(this, TRANSLATE_X_MINUS64);
@@ -877,7 +877,7 @@ void Entity__MoodCue23(Entity *this) {
     } else if (this->moodTimer < 65) {
         this->methods->addTranslation(this, TRANSLATE_Y_PLUS64);
     } else if (this->moodTimer < 71) {
-        this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
+        this->methods->addTranslation(this, sTranslateYMinus64);
         this->methods->moveLocalZ(this, -30, 0);
     } else {
         EntityMethods *methods = this->methods;
@@ -1101,7 +1101,7 @@ void Entity__MoodCue35(Entity *this) {
     (*moveZ)(this, arg1c, 0);
 
     if (rem500 < 32) {
-        this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
+        this->methods->addTranslation(this, sTranslateYMinus64);
     } else if (rem500 < 64) {
         this->methods->addTranslation(this, TRANSLATE_Y_PLUS64);
     }
