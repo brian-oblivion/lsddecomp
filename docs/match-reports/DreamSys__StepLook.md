@@ -19,7 +19,7 @@ void DreamSys__StepLook(DreamSys *this)
 Vtable slot `0x140`. Two straight-line, single-argument (`this` only)
 virtual calls; the second reloads `this->vt` fresh instead of caching it in
 a local (no shared pointer between the two calls, so there's nothing to
-hoist here — contrast `DreamSys__SelectLookCallback`/`DreamSys__SelectCallback98` earlier this round,
+hoist here — contrast `DreamSys__SelectLookCallback`/`DreamSys__SelectMoveCallback` earlier this round,
 where the SAME `vt` value feeds multiple slot reads).
 
 ## Proposed learning

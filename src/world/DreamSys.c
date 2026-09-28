@@ -496,7 +496,7 @@ void DreamSys__SelectLookCallback(DreamSys *this, s32 mode) {
 
 extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, DreamSys *arg3, void *arg4);
 
-void DreamSys__SelectCallback98(DreamSys *this, s32 mode) {
+void DreamSys__SelectMoveCallback(DreamSys *this, s32 mode) {
     DreamSysMethods *vt = this->methods;
 
     if (this->moveCallbackMode == MOVE_CALLBACK_TICK_DRIFT)

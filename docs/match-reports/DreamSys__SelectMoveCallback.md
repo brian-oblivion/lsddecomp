@@ -1,4 +1,6 @@
-# DreamSys__SelectCallback98 — MATCHED
+# DreamSys__SelectMoveCallback — MATCHED
+
+> Renamed from `DreamSys__SelectCallback98` on 2026-09-28 (tools/rename.py). Address 0x800596e8.
 
 > Renamed from `func_800596E8` on 2026-09-22 (tools/rename.py). Address 0x800596e8.
 
@@ -9,7 +11,7 @@ Round 2026-08-30, runner ALPHA, unit `DreamSys`. 54/54 words, full match.
 ```c
 extern void InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, DreamSys *arg3, void *arg4);
 
-void DreamSys__SelectCallback98(DreamSys *this, s32 arg1)
+void DreamSys__SelectMoveCallback(DreamSys *this, s32 arg1)
 {
 	struct vtable_DreamSys *vt = this->vt;
 

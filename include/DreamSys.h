@@ -427,11 +427,11 @@ struct DreamSys {
     s32 lookYawCommand;
     /* Running delta accumulator paired with lookYawCommand; see DreamSys__StepLookYaw. */
     s32 lookYaw;
-    /* Set by DreamSys__SelectCallback98(this, arg1) as lookCallback is by
+    /* Set by DreamSys__SelectMoveCallback(this, arg1) as lookCallback is by
        SelectCallback80, from a different trio of vtable slots. Called with
        (this) by DreamSys__RunTickCallbacks, if non-NULL. */
     void (*moveCallback)(struct DreamSys *this);
-    /* "Mode" field read/written by DreamSys__SelectCallback98(this, arg1): when ==2 on
+    /* "Mode" field read/written by DreamSys__SelectMoveCallback(this, arg1): when ==2 on
        entry, this->methods->stopDrift(this, 0) fires first; then it is set
        unconditionally to arg1. */
     s32 moveCallbackMode;
@@ -473,10 +473,10 @@ struct DreamSys {
        >= 0. */
     s32 voiceIndex;
     s8 unknown_values_0xC0[4];
-    /* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside cueServiceActive and
+    /* Set to 1 by DreamSys__SelectMoveCallback's arg1==2 case, alongside cueServiceActive and
        moveCallback. */
     s32 driftActive;
-    /* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside driftActive. */
+    /* Set to 1 by DreamSys__SelectMoveCallback's arg1==2 case, alongside driftActive. */
     s32 cueServiceActive;
     /* The sound cue drifting runs: SelectCallback98 mode 2 starts it with
      * soundCueCallback, TickDrift services it, ClearTickCallbacks flushes it. */
@@ -663,7 +663,7 @@ struct DreamSysMethods {
     /* +0x134 */ void (*setTickCallbacks)(DreamSys *self, s32 arg1,
                                           s32 arg2); /* DreamSys__SetTickCallbacks: selectCallback98(arg1), selectCallback80(arg2) */
     /* +0x138 */ void (*selectCallback80)(DreamSys *self, s32 arg1); /* DreamSys__SelectLookCallback */
-    /* +0x13C */ void (*selectCallback98)(DreamSys *self, s32 arg1); /* DreamSys__SelectCallback98 */
+    /* +0x13C */ void (*selectCallback98)(DreamSys *self, s32 arg1); /* DreamSys__SelectMoveCallback */
     /* +0x140 */ void (*stepLook)(DreamSys *self);                   /* DreamSys__StepLook */
     /* +0x144 */ void (*stepLookOffset)(DreamSys *self);             /* DreamSys__StepLookOffset */
     /* +0x148 */ void (*stepLookYaw)(DreamSys *self);                /* DreamSys__StepLookYaw */

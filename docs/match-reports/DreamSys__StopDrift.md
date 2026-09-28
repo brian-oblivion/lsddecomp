@@ -8,7 +8,7 @@
 
 Vtable slot `+0x17C`. Zeroes `unk_0xC4`, unconditionally stores `arg1` into
 `unk_0xC8`, and, only if `arg1 != 0`, calls `FlushSoundCueSet(this->unk_0x58,
-this->unk_0xCC)`. Called by `DreamSys__SelectCallback98`'s entry guard (per an earlier
+this->unk_0xCC)`. Called by `DreamSys__SelectMoveCallback`'s entry guard (per an earlier
 round's vtable comment) as `(this, 0)` when `this->unk_0x9C == 2`.
 
 ## The C
@@ -48,6 +48,6 @@ Renamed from `func_8005A134`.
 Always clears `driftActive`, which is what stops
 `DreamSys__TickDrift`'s vertical step; sets `cueServiceActive` to its argument and
 flushes the sound cue set when that argument is nonzero. Its only carved call site
-(`DreamSys__SelectCallback98`'s entry guard, when the mode being left was 2) passes
+(`DreamSys__SelectMoveCallback`'s entry guard, when the mode being left was 2) passes
 0, so the flush branch is never observed running. Tier B, and the argument is the
 reason: the name describes the unconditional half.

@@ -11,7 +11,7 @@ runner BRAVO. Matched on the first attempt — no residue.
 
 Vtable slot `+0x0F8`. A straight-line "start dream" initializer, no
 branches at all: six vtable calls (`LogChunkMood`, `DreamSys__SelectLookCallback`,
-`DreamSys__SelectCallback98`, `DreamSys__GetSetMoveMode`, `DreamSys__SetGateFlags`, `DreamSys__SetTickPeriod`), a large
+`DreamSys__SelectMoveCallback`, `DreamSys__GetSetMoveMode`, `DreamSys__SetGateFlags`, `DreamSys__SetTickPeriod`), a large
 block of per-dream state zeroed in between/after, and a closing
 `SceneNode__GetRotationDegrees`/`SceneNode__UpdateRotation` pair over a small local buffer — the same
 `SceneNode__UpdateRotation(this, 1, &local)` shape already established by
@@ -49,7 +49,7 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 arg1, s32 arg2)
 
 	this->vt->LogChunkMood(this, &this->linkCoordinates);
 	this->vt->DreamSys__SelectLookCallback(this, 1);
-	this->vt->DreamSys__SelectCallback98(this, 1);
+	this->vt->DreamSys__SelectMoveCallback(this, 1);
 	this->vt->DreamSys__GetSetMoveMode(this, arg1);
 
 	this->unk_0xBC = -1;

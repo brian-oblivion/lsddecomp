@@ -287,7 +287,7 @@ No source changes at the time; `INCLUDE_ASM` untouched.
 Renamed from `func_8005A1F4`.
 
 Named for where its ADDRESS goes, which is the only thing that
-identifies it: `DreamSys__SelectCallback98`'s mode-2 case passes
+identifies it: `DreamSys__SelectMoveCallback`'s mode-2 case passes
 `this->vt->DreamSys__SoundCueCallback` as `InitSoundCueSet`'s fifth argument, and
 that function (src/sound/PlacementGridVabSound.c, matched) stores it in `SoundCueSet::callback`.
 Nothing in any carved unit calls it, so its own parameter struct stays local and
