@@ -284,27 +284,22 @@ s32 GameApplication__RunDayTask(GameApplication *self) {
 void GameApplication__PlayCinematic(GameApplication *self) {
     CinematicCall cc;
 
-    /* MATCHING: the frame keeps 12 bytes here, movieId in the first 4. */
-    struct {
-        s32 movieId;
-        u8 pad04[8];
-    } idBuf;
+    s32 movieId;
 
     const char *path;
     s32 frameCount;
     TaskCore *task;
 
     cc = self->dreamSys->methods->getCinematic(self->dreamSys);
-    path = (const char *)GetSpecialDayOrEventRecord(&idBuf.movieId,
-                                                    (u16)cc.bank | ((u32)(u16)cc.entry << 16));
+    path = (const char *)GetSpecialDayOrEventRecord(&movieId, cc);
     SetActiveDataSourceDriverMode(0, 0, 0);
 
-    if (idBuf.movieId != -1) {
+    if (movieId != -1) {
         if (self->config->playStreams != 0) {
             StreamTask *streamTask = New_StreamTask(0, 0, 0, 0);
 
             streamTask->methods->setSkipOnConfirm(streamTask, 0);
-            frameCount = GetMovieFrameCount(idBuf.movieId);
+            frameCount = GetMovieFrameCount(movieId);
             ((StreamTaskInitFn)streamTask->methods->init)(
                 streamTask, (IntermediateBaseInitArgs *)self->aux, path, frameCount, 1);
             streamTask->methods->release(streamTask);

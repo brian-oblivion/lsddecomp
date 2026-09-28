@@ -187,3 +187,7 @@ extern s32 GetSpecialDayOrEventRecord(s32 *out, s32 packedBankEntry); /* psyq_me
 ## Track 10 (2026-09-28, round 104, alpha)
 
 `StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+GetSpecialDayOrEventRecord is now prototyped in include/GameFiles.h with the definition's `(s32 *movieIdOut, CinematicCall pick)`, and PlayCinematic passes `cc` directly instead of packing bank | entry << 16 by hand. cc1 passes the 4-byte struct in $a1 with the same lhu/sll/or the hand packing wrote, so the only change was the frame: the 12-byte `idBuf` struct (movieId plus 8 bytes of pad) had been sized to match the frame the packing produced, and with the struct passed directly a plain `s32 movieId` gives retail's 0x40 frame. Byte-identical (97/97, whole image green).
