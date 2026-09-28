@@ -448,3 +448,23 @@ channel (GetSeqData stores a status byte's low nibble), not a byte offset to
 an "embedded state block" as the old local comment read it. Byte-exact
 unchanged; the NON_MATCHING object is identical too (objdump of
 `build/nonmatching/src/code_179d8_k.c.o` before/after).
+
+## History (moved from src/libsnd_seqread.c, comments pass)
+
+The comment above this function's NON_MATCHING body in src/libsnd_seqread.c read:
+
+> NON_MATCHING: 122/172 words, length exact. Residue: a pure
+> register-identity swap (retail's widened "channel" lives in $s4 and its
+> per-case data byte in $s3; this C compiles the same roles into $s3/$s4
+> the other way around), CLAUDE.md's register-identity STALL rule --
+> reshaping tried and did not move it (docs/match-reports/GetSeqData.md).
+> Hand-derived.
+
+The forward declarations above GetSeqData carried:
+
+> Forward declarations for sibling functions defined later in THIS unit,
+> needed because GetSeqData dispatches to them by MIDI-style status
+> byte before they appear in ROM-address order below.  NoteOn's
+> signature is the one already established in its own (still-stalled) STALL
+> comment above; _SsSetControlChange's and GetMetaEvent's are this function's own
+> reading, derived from the registers loaded before each call below.
