@@ -74,9 +74,10 @@ PROCESS_RE = [
     ("instruction", re.compile(r"\b(?:lwl|lwr|swl|swr|jalr?|addiu|lui|sltiu?|sll|sra|srl|mflo|mfhi|"
                                r"lbu|lhu|sb|sh|sw|lw|lb|lh|beqz?|bnez?|bgez|bltz|blez|bgtz|nop)\b")),
     ("delay slot", re.compile(r"\bdelay[- ]slot", re.I)),
+    ("register", re.compile(r"\b(?:saved|temporary|callee[- ]saved|argument|return|scratch) registers?\b", re.I)),
     ("toolchain", re.compile(r"\b(?:cc1|gcc|GCC|maspsx|splat|m2c|permuter|asm-differ|objdump|"
                              r"INCLUDE_ASM|funcdiff|pycparser|codegen)\b|\bcompil(?:er|es|ed|ing)\b", re.I)),
-    ("retail", re.compile(r"\bretail\b|\bbyte[- ](?:exact|identical|for[- ]byte|match)|\bnon[-_ ]?matching\b|"
+    ("retail", re.compile(r"\bretail\b|\bbyte[- ](?:exact|identical|for[- ]byte|match(?:es|ed|ing)?\b)|\bnon[-_ ]?matching\b|"
                           r"\bmatch(?:es|ed)? (?:retail|the bytes)|\bstall(?:s|ed)?\b", re.I)),
     ("project", re.compile(r"\bround \d+|\brunners?\b|\bmatch[- ]reports?\b|\bFirecatFG\b|"
                            r"\bthe operator\b|\bFINISHING-PLAN\b|\bCLAUDE\.md\b|\bplan revision\b|\(no code\)", re.I)),
@@ -312,6 +313,8 @@ def census(files=None):
                 elif b - a > 1:
                     hits[f].append((a, "process", f"MATCHING: note of {b - a + 1} lines (one line; the rest to the report)"))
                 continue
+            if "MATCHING:" in body:
+                hits[f].append((a, "process", "MATCHING: inside a longer comment (give it its own line)"))
             if is_c and b - a + 1 > BANNER_LINES:
                 hits[f].append((a, "banner", f"{b - a + 1}-line comment"))
             for n, ln in enumerate(txt.split("\n")):
