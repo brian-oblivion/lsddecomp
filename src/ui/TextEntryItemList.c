@@ -630,7 +630,7 @@ extern char *BuildFileName(char *dest, const char *name, const char *dir, const 
 extern const char sStrSelect[];              /* "SELECT" */
 extern const char sItemListCardPathPrefix[]; /* "CARD\\" */
 extern const char sItemListTimExt[];         /* ".TIM" */
-extern SpriteRect gItemListPanelRect;        /* SELECT's cell: 256 x 160 from (0, 0) */
+extern SpriteRect sItemListPanelRect;        /* SELECT's cell: 256 x 160 from (0, 0) */
 extern ScreenSpritePos sItemListPanelPos;    /* (-100, -60) */
 extern const char sItemListStrFontIcon[];    /* "FONTICON" */
 
@@ -659,7 +659,7 @@ void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
 
     panelTim = New_TimImage(BuildFileName(path, sStrSelect, dir, ext));
     ((TimImageUploadFn)panelTim->methods->processBuffer)(panelTim);
-    self->panelSprite = New_ScreenSprite(panelTim, &gItemListPanelRect, 0);
+    self->panelSprite = New_ScreenSprite(panelTim, &sItemListPanelRect, 0);
     panelTim->methods->release(panelTim);
     self->panelSprite->methods->attachToParent(self->panelSprite, parent, (LongVec3 *)&sItemListPanelPos);
 
