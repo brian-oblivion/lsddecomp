@@ -785,7 +785,7 @@ extern s32 rand(void);
 
 extern s8 sSpecialColors[];
 
-/* Shared by TestForStaticLink/TestForTunnelLinks/Test4StaircaseNodes/
+/* Shared by TestForStaticLink/TestForTunnelLinks/TestForStaircaseNodes/
    TestForInstantTeleporters, each of which forwards its own three args
    straight through and appends a fixed trailing quadruple (length table,
    trigger table, spawn table, literal 1); every call site tests the result
@@ -814,7 +814,7 @@ extern s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2);
 /* Called by DreamSys__TryStaircaseLink as (&this->linkCoordinates,
    currentPos, this->currentStage) -- same forwarding shape as
    TestForTunnelLinks/TestForStaticLink above. Defined after its caller. */
-extern s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2);
+extern s32 TestForStaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2);
 
 /* Called by DreamSys__TryStaircaseLink as (&this->exitRotation, &this->enterRotation, &local) --
    identical call shape to DreamSys__CheckTunnelHeading above (same `local` buffer, same two
@@ -838,7 +838,7 @@ extern s8 sTunnelTriggersCount[];
 extern StaticLinkTrigger *sTunnelTriggers[];
 extern StageSpawn *sTunnelSpawns[];
 
-/* Table triple for Test4StaircaseNodes. */
+/* Table triple for TestForStaircaseNodes. */
 extern s8 sStaircaseTriggersCount[];
 extern StaticLinkTrigger *sStaircaseTriggers[];
 extern StageSpawn *sStaircaseSpawns[];

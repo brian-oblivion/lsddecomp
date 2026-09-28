@@ -16,7 +16,7 @@ function matched on the first rebuild.
 
 A single array-of-array index: `sStaircaseSpawns[gLinkDstStage]` is a `StageSpawn*`
 (one of a table of per-stage spawn-point arrays, same table
-`Test4StaircaseNodes` already uses a few lines above), indexed a second time
+`TestForStaircaseNodes` already uses a few lines above), indexed a second time
 by `gLinkSpawnIndex`, reading that entry's `.extra` byte (`StageSpawn`'s last
 field, a signed byte at offset 5 -- matches the retail `lb` at `+0x5`).
 

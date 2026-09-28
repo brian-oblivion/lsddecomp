@@ -1062,7 +1062,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
                     this->methods->restorePreviousMoveMode(this);
                 }
             }
-        } else if (Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage) >= 0) {
+        } else if (TestForStaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage) >= 0) {
             SceneNode__GetRotationDegrees((SceneNode *)this, (Ratio16 *)rotation);
             if (DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, rotation) &&
                 this->moveCommandLatch != 0) {
@@ -1710,7 +1710,7 @@ s32 GetTeleportTimeBonus(void) {
     return (gLinkSrcStage == 0) ? 10 : 0;
 }
 
-s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
+s32 TestForStaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
     if (stage == 0)
         return GetStaticSpawn(target, currentPos, 0, sStaircaseTriggersCount, sStaircaseTriggers,
                               sStaircaseSpawns, 0);

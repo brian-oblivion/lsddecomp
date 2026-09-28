@@ -1,4 +1,6 @@
-# Test4StaircaseNodes
+# TestForStaircaseNodes
+
+> Renamed from `Test4StaircaseNodes` on 2026-09-28 (tools/rename.py). Address 0x8005bfdc.
 
 **Unit:** DreamSys · **Size:** 20 instructions · **Status:** MATCHED (20/20 words)
 
@@ -13,7 +15,7 @@ directly when `arg2 != 0`.
 ## The C
 
 ```c
-s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2)
+s32 TestForStaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2)
 {
 	if (arg2 == 0)
 		return GetStaticSpawn(target, currentPos, 0, sStaircaseTriggersCount,

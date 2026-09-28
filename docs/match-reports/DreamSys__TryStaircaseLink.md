@@ -65,7 +65,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 					this->vt->DreamSys__RestorePreviousMoveMode(this);
 				}
 			}
-		} else if (Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage) >= 0) {
+		} else if (TestForStaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage) >= 0) {
 			SceneNode__GetRotationDegrees(this, local);
 			if (DreamSys__CheckStaircaseHeading(&this->exitRotation, &this->enterRotation, local)
 			    && this->moveCommandLatch != 0) {
@@ -215,7 +215,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 	return false;
 
 staircase:
-	result = Test4StaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage);
+	result = TestForStaircaseNodes(&this->linkCoordinates, currentPos, this->currentStage);
 	if (result < 0) {
 		return false;
 	}
@@ -270,11 +270,11 @@ All in `include/DreamSys.h`:
   already-matched `s32 (DreamSys *this)` functions `DreamSys__TickStaircaseCase0`/
   `DreamSys__TickStaircaseCase1`/`DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase3`, confirmed by their own
   existing definitions in `src/world/DreamSys.c`.
-- **`extern s32 Test4StaircaseNodes(...)`** and **`extern s32
+- **`extern s32 TestForStaircaseNodes(...)`** and **`extern s32
   DreamSys__CheckStaircaseHeading(...)`** forward/call-site prototypes added near the
   existing `DreamSys__CheckTunnelHeading` one (same 3-arg shape; `DreamSys__CheckStaircaseHeading` is
   blocked by the same gp-relative+addiu_at pair as `DreamSys__CheckTunnelHeading`, per its
-  own existing stub report). `Test4StaircaseNodes` is defined later in this
+  own existing stub report). `TestForStaircaseNodes` is defined later in this
   same unit's ROM order, so its prototype here is a plain forward
   declaration, not a cross-unit one.
 - **`extern s32 GetLastSpawnExtra(void)`** -- corrected from a guessed
@@ -540,7 +540,7 @@ expression."
 
 ## Naming
 
-- **Tier B.** STALL (still INCLUDE_ASM). Wraps Test4StaircaseNodes and DreamSys__CheckStaircaseHeading, and on success wires up the DreamSys__TickStaircaseCase0..3 dispatch via GetLastSpawnExtra, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink.
+- **Tier B.** STALL (still INCLUDE_ASM). Wraps TestForStaircaseNodes and DreamSys__CheckStaircaseHeading, and on success wires up the DreamSys__TickStaircaseCase0..3 dispatch via GetLastSpawnExtra, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink.
 
 ## Comment moved from src/world/DreamSys.c (round 92, track 7)
 

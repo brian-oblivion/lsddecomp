@@ -133,4 +133,4 @@ return instead, unconditionally, as a first attempt rather than a last resort.
 
 ## Naming
 
-- **Tier B.** One of the 4-entry sStaircaseTickFns dispatch table's own functions, in table order (this is index 0), chosen by DreamSys__TryStaircaseLink via GetLastSpawnExtra. Does an initial DreamSys__ApplyRelativeOffset against sStaircaseOffset0, then a stage-family bounds check incrementing the unk_0x914 attempt counter. Only ever wired up after Test4StaircaseNodes succeeds -- the "staircase" context is solid; the difference between cases 0..3 is not.
+- **Tier B.** One of the 4-entry sStaircaseTickFns dispatch table's own functions, in table order (this is index 0), chosen by DreamSys__TryStaircaseLink via GetLastSpawnExtra. Does an initial DreamSys__ApplyRelativeOffset against sStaircaseOffset0, then a stage-family bounds check incrementing the unk_0x914 attempt counter. Only ever wired up after TestForStaircaseNodes succeeds -- the "staircase" context is solid; the difference between cases 0..3 is not.
