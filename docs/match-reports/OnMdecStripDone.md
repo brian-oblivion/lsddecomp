@@ -1,4 +1,6 @@
-# OnMdecFrameReady -- MATCHED (14/14 words)
+# OnMdecStripDone -- MATCHED (14/14 words)
+
+> Renamed from `OnMdecFrameReady` on 2026-09-28 (tools/rename.py). Address 0x80045de0.
 
 > Renamed from `func_80045DE0` on 2026-09-25 (tools/rename.py). Address 0x80045de0.
 
@@ -24,7 +26,7 @@ Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 extern DataSrc33808 *gActiveMoviePlayer;
 
 /* Slot +0x060 of the object in gActiveMoviePlayer, when there is one. */
-void OnMdecFrameReady(void) {
+void OnMdecStripDone(void) {
     if (gActiveMoviePlayer != NULL) {
         ((void (*)())gActiveMoviePlayer->methods->slot60)(gActiveMoviePlayer);
     }
@@ -40,7 +42,7 @@ void OnMdecFrameReady(void) {
 
 ## Naming
 
-- **OnMdecFrameReady**, tier A. The DecDCToutCallback target: forwards to the active movie's own slot60 when there is one.
+- **OnMdecStripDone**, tier A. The DecDCToutCallback target: forwards to the active movie's own slot60 when there is one.
 
 ## Track 4 (2026-09-26, round 89)
 

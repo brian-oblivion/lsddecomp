@@ -1290,7 +1290,7 @@ MoviePlayer *New_MoviePlayer(DrawRect *frame, s32 cdSpeed, s32 external) {
 
 /* ctor (+0x008): a CdStream and the decode buffers (1 when either cannot be
  * had), the MDEC reset by the first player built, its output callback
- * OnMdecFrameReady, and auto-play on. */
+ * OnMdecStripDone, and auto-play on. */
 s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 cdSpeed, s32 external) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetMoviePlayerMethods();
@@ -1301,7 +1301,7 @@ s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 cdSpeed, s3
                 DecDCTReset(0);
             }
             gMdecInitialized = 1;
-            DecDCToutCallback(OnMdecFrameReady);
+            DecDCToutCallback(OnMdecStripDone);
             self->stream->methods->setRing(self->stream, self->ring, MOVIE_RING_SIZE);
             self->pendingStart = 0;
             self->methods->setAutoPlay(self, 1);
@@ -1559,7 +1559,7 @@ s32 MoviePlayer__DecodeFrame(MoviePlayer *self) {
 
 /* The MDEC's DecDCTout callback: drawStrip of gActiveMoviePlayer, when
  * there is one. */
-void OnMdecFrameReady(void) {
+void OnMdecStripDone(void) {
     if (gActiveMoviePlayer != NULL) {
         gActiveMoviePlayer->methods->drawStrip(gActiveMoviePlayer);
     }

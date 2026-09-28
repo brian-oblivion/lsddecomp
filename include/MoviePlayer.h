@@ -24,7 +24,7 @@
  *     previous frame's last strip (`frameDone`, WaitFrameReady), feeds
  *     frames[frameIndex] to the MDEC (DecDCTin) and asks for the first strip
  *     (DecDCTout into `strip`), then pulls the next frame;
- *   - the MDEC's output callback (OnMdecFrameReady) runs the ACTIVE player's
+ *   - the MDEC's output callback (OnMdecStripDone) runs the ACTIVE player's
  *     drawStrip: upload `strip` at `stripRect` (DrawSystem loadImage), step
  *     stripRect.x by its 16-pixel width, and either request the next strip
  *     or, past the frame's right edge, rewind and set `frameDone`.
@@ -53,7 +53,7 @@ struct MoviePlayerMethods {
     /* +0x054 */ void (*slot54)(void);             /* MoviePlayer__NoOpSlot54; no caller */
     /* +0x058 */ s32 (*pullFrame)(MoviePlayer *self); /* MoviePlayer__PullFrame: 0 pulled (or end reached), 1 no data */
     /* +0x05C */ void (*slot5C)(void);                 /* MoviePlayer__NoOpSlot5C; no caller */
-    /* +0x060 */ void (*drawStrip)(MoviePlayer *self); /* MoviePlayer__DrawStrip: OnMdecFrameReady's call */
+    /* +0x060 */ void (*drawStrip)(MoviePlayer *self); /* MoviePlayer__DrawStrip: OnMdecStripDone's call */
     /* +0x064 */ s32 (*pollActive)(MoviePlayer *self); /* MoviePlayer__PollActive: 1 once the movie is over */
     /* +0x068 */ s32 (*decodeFrame)(MoviePlayer *self); /* MoviePlayer__DecodeFrame: advance's tail call */
     /* +0x06C */ void (*setAutoPlay)(MoviePlayer *self, s32 autoPlay); /* MoviePlayer__SetAutoPlay */
@@ -112,7 +112,7 @@ void MoviePlayer__NoOpSlot5C(void);
 void MoviePlayer__DrawStrip(MoviePlayer *self);
 s32 MoviePlayer__PollActive(MoviePlayer *self);
 s32 MoviePlayer__DecodeFrame(MoviePlayer *self);
-void OnMdecFrameReady(void); /* the DecDCTout callback: gActiveMoviePlayer's drawStrip */
+void OnMdecStripDone(void); /* the DecDCTout callback: gActiveMoviePlayer's drawStrip */
 void MoviePlayer__WaitFrameReady(MoviePlayer *self); /* spin until frameDone */
 void MoviePlayer__SetAutoPlay(MoviePlayer *self, s32 autoPlay);
 
