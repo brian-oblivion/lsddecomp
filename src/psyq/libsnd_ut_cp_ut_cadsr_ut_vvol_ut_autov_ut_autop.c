@@ -53,7 +53,7 @@ extern void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3);
 extern SpuRegs *_svm_sreg;
 
 /* STALL -- docs/match-reports/SsUtChangePitch.md (84/88 words). */
-INCLUDE_ASM("asm/nonmatchings/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop", SsUtChangePitch);
+INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop", SsUtChangePitch);
 
 /* MATCHING: `dead` only makes GCC reserve retail's unused 8-byte frame,
  * which puts the stack arguments at 0x18/0x1C($sp); nothing else may be added. */

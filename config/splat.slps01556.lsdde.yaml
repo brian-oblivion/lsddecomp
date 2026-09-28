@@ -913,7 +913,7 @@ segments:
       # above, which is what the `_c` suffix records.  Text-only; still no
       # rodata attach anywhere in this family.
       - [0x221B4, o, libsnd/ut_pb]      # SsUtPitchBend
-      - [0x22244, c, libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop]
+      - [0x22244, c, psyq/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop]
       # code_179d8_mid_d: the one function left between the code_179d8_j
       # carve above and code_179d8_c below -- func_80031F3C (131w).  A carve
       # remainder, not a unit.

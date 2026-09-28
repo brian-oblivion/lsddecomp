@@ -2,7 +2,7 @@
 
 > Renamed from `func_80031CF0` on 2026-09-23 (tools/rename.py). Address 0x80031cf0.
 
-Unit: `src/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c` · vram `0x80031CF0` · file `0x224F0-0x2256C` · 31 words.
+Unit: `src/psyq/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c` · vram `0x80031CF0` · file `0x224F0-0x2256C` · 31 words.
 
 Closed in round 38. Whole-image SHA1 green; `funcdiff` 31/31 with zero
 out-of-range bytes. The function was **never permuter-searched** and did not
