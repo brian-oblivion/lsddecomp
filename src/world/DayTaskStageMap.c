@@ -676,8 +676,8 @@ void StageMap__SetChildParams(StageMap *self, s32 count, s32 dirs, s32 colors) {
 
     for (i = 0; i < count; i++) {
         light = (FlatLightObj *)self->methods->getLight(self, i);
-        light->methods->setColor(light, 1, (FlatLightColor *)colors);
-        colors += sizeof(FlatLightColor);
+        light->methods->setColor(light, 1, (ColorRgb *)colors);
+        colors += sizeof(ColorRgb);
         light->methods->setDirection(light, 1, (s16 *)dirs);
         dirs += 3 * sizeof(s16);
     }

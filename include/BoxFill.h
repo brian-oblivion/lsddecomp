@@ -96,13 +96,11 @@ struct BoxFillPos {
     s32 y; /* +0x004 */
 };
 
-/* The box's colour, GsBOXF r, g, b, a ColorRgb (include/DrawSystem.h):
+/* The box's colour, GsBOXF r, g, b, is a ColorRgb (include/DrawSystem.h):
  * what setColor copies into `color` (or adds to it when overwrite is 0), and
  * the ctor's (and Reset's) colour argument. A whole-struct copy is three
  * lb/sb pairs (BoxFill__ApplyColor, GraphRoom__BuildGraphPoints). The field
- * and the slot parameter stay `u8 color[3]` and `void *rgb`. This spelling
- * is the one ScreenWidgets.c, Task.c and ObjMStyleActor.c still use. */
-typedef ColorRgb BoxFillRgb;
+ * and the slot parameter stay `u8 color[3]` and `void *rgb`. */
 
 /* SceneNode's slots, then this class's own. `tools/classtable.py
  * gBoxFillMethods --vs gSceneNodeMethods` lists the overrides of the

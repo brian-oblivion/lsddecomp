@@ -113,3 +113,7 @@ banner: stop notifies 5 after a fade down, 6 after a fade up); states
 setMoveOverride's 0 is `MOVE_OVERRIDE_NONE`. The three-conjunct guard
 keeps a one-line `MATCHING:` comment pointing at the section above. Zero
 bytes.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads with `lbu` and interleaves (built 1480 lines vs retail, diff at +0x000), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

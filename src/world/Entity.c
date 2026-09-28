@@ -2002,7 +2002,7 @@ void Entity__MoodCue73(Entity *self, SoundCueSet *out) {
 }
 
 /* {0, 100, 190}: the clear colour Entity__MoodCue74 gives the peer's viewport. */
-extern ViewportRgb sMoodCue74ClearColor;
+extern ColorRgb sMoodCue74ClearColor;
 
 void Entity__MoodCue74(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {

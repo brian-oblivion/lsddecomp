@@ -585,7 +585,7 @@ void ObjM__OnDrawSystemEvent(ObjM *self, void *sender, s32 event) {
 void ObjM__PollTimBlockLoad(ObjM *self, TimBlockSrc *src) {
     s32 timer;
     s32 colorMode;
-    TimBlockSrcColor *color;
+    ColorRgb *color;
     TimBlockSrcMethods *m;
 
     if (self->timBlockPending != 0) {
@@ -718,7 +718,7 @@ void ObjM__SetupSceneStyle(ObjM *self) {
     rig = (StageMap *)self->lightRig;
     self->methods->addChild(self, (BasicClass *)rig);
 
-    rig->methods->setAmbientColor(rig, (LightRigRgb *)style->ambientColor, 0);
+    rig->methods->setAmbientColor(rig, (ColorRgb *)style->ambientColor, 0);
     rig->methods->setChildParams(rig, 3, style->lightDirs, style->lightColors);
     rig->methods->setConfig(rig, GetStageGridDimensions(self->stage));
     ((DreamSysAttachToParentFn)self->dreamSys->methods->attachToParent)(self->dreamSys, rig);
@@ -974,7 +974,7 @@ void ObjM__OnFadeNotify(ObjM *self, FadeBox *sender, s32 event) {
             self->methods->removeChild(self, (BasicClass *)sender);
             color = sender->methods->getColor(sender);
             ((NodeGuardedViewport *)self->viewport)
-                ->methods->setClearColor((NodeGuardedViewport *)self->viewport, (ViewportRgb *)color);
+                ->methods->setClearColor((NodeGuardedViewport *)self->viewport, (ColorRgb *)color);
             /* MATCHING: the two dead `!=` tests are retail's compares. */
             if (self->state != OBJM_STATE_LINK_DYNAMIC && self->state != OBJM_STATE_LINK_TUNNEL &&
                 self->state == OBJM_STATE_LINK_STAGE_TIMER) {
@@ -1182,7 +1182,7 @@ void ApplyStyleDecorationIfSet(void) {
     SceneNode *fadeBox;
 
     if (sStyleDecorColor != 0) {
-        sStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (BoxFillRgb *)sStyleDecorColor, 0);
+        sStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (ColorRgb *)sStyleDecorColor, 0);
         ((BoxFill *)sStyleDecorObj)->methods->setSemiTransOn((BoxFill *)sStyleDecorObj, 1);
         ((BoxFill *)sStyleDecorObj)->methods->setSemiTransRate((BoxFill *)sStyleDecorObj, 0);
 
@@ -1406,7 +1406,7 @@ void StyleUpdateDecorSet(void) {
         slot++;
     } while (i < STYLE_DECOR_BANDS);
     AdjustRgbByDelta(rgb, (u8 *)sStyleClearColor, fade);
-    viewport->methods->setClearColor(viewport, (ViewportRgb *)rgb);
+    viewport->methods->setClearColor(viewport, (ColorRgb *)rgb);
 }
 
 /* dst = src with red and green less `delta`, blue more. */
@@ -3276,16 +3276,16 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
     }
 }
 
-/* A graph point's colour is New_BoxFill's colour argument, a BoxFillRgb
+/* A graph point's colour is New_BoxFill's colour argument, a ColorRgb
  * (include/BoxFill.h).
- * MATCHING: signed, and exactly three bytes -- the whole-struct copy of `rgb`
- * below is three lb/sb pairs. */
+ * MATCHING: exactly three bytes, so the whole-struct copy of `rgb` below is
+ * three lb/sb pairs. */
 extern s32 sGraphPointSize[2];
-extern BoxFillRgb sGraphPointNewestColor;
-extern BoxFillRgb sGraphPointBaseColor;
+extern ColorRgb sGraphPointNewestColor;
+extern ColorRgb sGraphPointBaseColor;
 
 void GraphRoom__BuildGraphPoints(GraphRoom *self) {
-    BoxFillRgb rgb;
+    ColorRgb rgb;
     s32 i;
 
     self->points[0] = New_BoxFill(sGraphPointSize, &sGraphPointNewestColor, 0);
@@ -3440,7 +3440,7 @@ fail:
     return 0;
 }
 
-extern BoxFillRgb sGraphPointHighlightColor;
+extern ColorRgb sGraphPointHighlightColor;
 
 void GraphRoom__TickHighlight(GraphRoom *self) {
     if (self->scored != 0) {

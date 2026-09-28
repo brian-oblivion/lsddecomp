@@ -43,9 +43,6 @@ enum TimBlockLoadState {
 typedef struct TimBlockSrc TimBlockSrc;
 typedef struct TimBlockSrcMethods TimBlockSrcMethods;
 
-/* The spelling ObjMStyleActor.c still uses for a fade colour. */
-typedef ColorRgb TimBlockSrcColor;
-
 /* One CLUT row's fade ramp. 0x10 bytes: TimArraySrc__BuildImages steps a
  * TimImage's clutBase through them 16 bytes a CLUT row. */
 typedef struct TimBlockSrcEntry {

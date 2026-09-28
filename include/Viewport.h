@@ -70,10 +70,6 @@ struct ViewportSize {
     s32 height;
 };
 
-/* The spelling Task.c, ObjMStyleActor.c and Entity.c still use; Task.c
- * defines SetClearColor and SetFarColor with it, so their prototypes keep it. */
-typedef ColorRgb ViewportRgb;
-
 /* libgs GsRVIEW2, 0x20 bytes, field for field: the argument GsSetRefView2
  * takes. Kept local rather than Sony's GsRVIEW2 because the game uses vp and
  * vr as whole vectors: setViewPoint/setViewRef copy each as one LongVec3
@@ -187,8 +183,8 @@ void Viewport__SetProjection(Viewport *self, s32 h);
 void Viewport__NoOpSlot58(void);
 void Viewport__NoOpSlot5C(void);
 void Viewport__SetLightMode(Viewport *self, s32 mode);
-void Viewport__SetClearColor(Viewport *self, ViewportRgb *color);
-void Viewport__SetFarColor(Viewport *self, ViewportRgb *color);
+void Viewport__SetClearColor(Viewport *self, ColorRgb *color);
+void Viewport__SetFarColor(Viewport *self, ColorRgb *color);
 void Viewport__SetFogNear(Viewport *self, s32 fogNear);
 void Viewport__AttachViewChild(Viewport *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr,
                                Ratio16 *twist);

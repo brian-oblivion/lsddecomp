@@ -310,7 +310,7 @@ void BoxFill__SetColor(BoxFill *self, s32 overwrite, u8 *rgb) {
 
 void BoxFill__ApplyColor(BoxFill *self, u8 *dst, u8 *src, s32 overwrite) {
     if (overwrite) {
-        *(BoxFillRgb *)dst = *(BoxFillRgb *)src;
+        *(ColorRgb *)dst = *(ColorRgb *)src;
     } else {
         dst[0] += src[0];
         dst[1] += src[1];

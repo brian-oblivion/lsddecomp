@@ -222,3 +222,7 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 ## Track 6 (2026-09-27, round 98, delta): `GraphPointColor` -> `BoxFillRgb`
 
 The local `GraphPointColor` (round 97) is retired onto include/BoxFill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (ScreenWidgets's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `sGraphPointNewestColor`, `sGraphPointBaseColor`, `sGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads with `lbu` and interleaves (built 1480 lines vs retail, diff at +0x000), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

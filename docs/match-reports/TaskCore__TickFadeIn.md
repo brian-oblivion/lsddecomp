@@ -93,3 +93,7 @@ Locals `prod`/`buffer` -> `level`/`color`; the `level + base` operand order
 (the residue above) carries a MATCHING line. `(u8)prod >= 0x81` is now
 `(u8)level > TASKCORE_FADE_FULL` (128, the neutral GsBG/sprite colour),
 byte-identical.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads with `lbu` and interleaves (built 1480 lines vs retail, diff at +0x000), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
