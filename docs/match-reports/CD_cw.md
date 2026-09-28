@@ -70,7 +70,7 @@ extern const char *D_8008B3EC;
 extern u8 D_8008B3CC[];
 extern u8 D_8008B3D4[];
 
-extern void (*D_8006D600)(s32 arg0, void *arg1);
+extern void (*CD_cbready)(s32 arg0, void *arg1);
 extern void (*CD_cbsync)(s32 arg0, void *arg1);
 
 extern s32 VSync(s32 arg0);
@@ -180,8 +180,8 @@ skip_timeout3:
                         break;
                     }
                     if (flags & 4) {
-                        if (D_8006D600 != NULL) {
-                            D_8006D600(*state1, D_8008B3D4);
+                        if (CD_cbready != NULL) {
+                            CD_cbready(*state1, D_8008B3D4);
                         }
                     }
                     if (flags & 2) {

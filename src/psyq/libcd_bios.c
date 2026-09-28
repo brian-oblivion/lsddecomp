@@ -191,7 +191,7 @@ extern u8 D_8008B3CC[];
 extern u8 D_8008B3D4[];
 extern u8 D_8008B3DC[];                /* 8-byte record, this function's second flag's snapshot buffer */
 
-extern void (*D_8006D600)(s32 arg0, void *arg1);
+extern void (*CD_cbready)(s32 arg0, void *arg1);
 extern void (*CD_cbsync)(s32 arg0, void *arg1);
 
 extern void CD_flush(void);
@@ -256,8 +256,8 @@ skip_timeout:
                     break;
                 }
                 if (flags & 4) {
-                    if (D_8006D600 != NULL) {
-                        D_8006D600(*state1, D_8008B3D4);
+                    if (CD_cbready != NULL) {
+                        CD_cbready(*state1, D_8008B3D4);
                     }
                 }
                 if (flags & 2) {
@@ -342,7 +342,7 @@ extern const char *D_8008B3EC;
 extern u8 D_8008B3CC[];
 extern u8 D_8008B3D4[];
 
-extern void (*D_8006D600)(s32 arg0, void *arg1);
+extern void (*CD_cbready)(s32 arg0, void *arg1);
 extern void (*CD_cbsync)(s32 arg0, void *arg1);
 
 extern void CD_flush(void);
@@ -449,8 +449,8 @@ skip_timeout3:
                         break;
                     }
                     if (flags & 4) {
-                        if (D_8006D600 != NULL) {
-                            D_8006D600(*state1, D_8008B3D4);
+                        if (CD_cbready != NULL) {
+                            CD_cbready(*state1, D_8008B3D4);
                         }
                     }
                     if (flags & 2) {
@@ -487,7 +487,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_cw);
 
 extern s32 D_8006D8A4;
 extern s32 CD_cbsync;
-extern s32 D_8006D600;
+extern s32 CD_cbready;
 extern s32 D_8006D604;
 extern s32 D_8006D60C;
 extern s32 D_8006D610;
@@ -563,7 +563,7 @@ extern s32 CD_datasync(s32 arg0);
 /* Forward declarations: taken by address before their own ROM-order definition
  * further down this file (CD_initintr/CD_init hand callback to
  * InterruptCallback as a thread entry; cd_read_retry hands cb_read to
- * D_8006D600 as a callback). */
+ * CD_cbready as a callback). */
 void callback(void);
 void cb_read(s32 arg0, s32 arg1);
 
@@ -656,7 +656,7 @@ void CD_initintr(void) {
     s32 *p;
     s32 i;
 
-    D_8006D600 = 0;
+    CD_cbready = 0;
     CD_cbsync = 0;
     D_8006D610 = 0;
     D_8006D60C = 0;
@@ -686,7 +686,7 @@ s32 CD_init(void) {
 
     D_8006D61D = 0;
     D_8006D61C = 0;
-    D_8006D600 = 0;
+    CD_cbready = 0;
     CD_cbsync = 0;
     D_8006D610 = 0;
     D_8006D60C = 0;
@@ -773,7 +773,7 @@ s32 cd_read_retry(void) {
 
     tmp = D_8006D8DC;
     n = *tmp;
-    D_8006D600 = 0;
+    CD_cbready = 0;
     CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
@@ -845,7 +845,7 @@ s32 cd_read_retry(void) {
                 }
             }
 
-            D_8006D600 = (s32)cb_read;
+            CD_cbready = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -908,7 +908,7 @@ join:
     D_8006D8E0 = arg1;
     D_8006D8DC[0] = 8;
     D_8006D8FC = CD_cbsync;
-    D_8006D900 = D_8006D600;
+    D_8006D900 = CD_cbready;
 
     if (D_8006D60C & 0xE0) {
         CD_cw(9, 0, 0, 0);
@@ -984,8 +984,8 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
                 if (flags == 0) {
                     break;
                 }
-                if ((flags & 4) && D_8006D600 != 0) {
-                    ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
+                if ((flags & 4) && CD_cbready != 0) {
+                    ((void (*)(s32, u8 *))CD_cbready)(p8D9[0], D_8008B3D4);
                 }
                 if ((flags & 2) && CD_cbsync != 0) {
                     ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);
@@ -1119,7 +1119,7 @@ void callback(void) {
             break;
         }
         if (flags & 4) {
-            handler = D_8006D600;
+            handler = CD_cbready;
             if (handler != 0) {
                 ((void (*)(s32, u8 *))handler)(*pd9, D_8008B3D4);
             }
@@ -1170,7 +1170,7 @@ shared: {
 
     if ((*(new_var = &D_8006D8F4)) <= 0) {
         CD_cbsync = D_8006D8FC;
-        D_8006D600 = D_8006D900;
+        CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
         if (D_8006D604 != 0) {
             if ((*new_var) == 0) {

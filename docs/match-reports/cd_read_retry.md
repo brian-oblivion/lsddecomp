@@ -60,7 +60,7 @@ s32 cd_read_retry(void)
 
     tmp = &D_8006D8DC;
     n = *tmp;
-    D_8006D600 = 0;
+    CD_cbready = 0;
     CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
@@ -126,7 +126,7 @@ s32 cd_read_retry(void)
                 }
             }
 
-            D_8006D600 = (s32)cb_read;
+            CD_cbready = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -333,7 +333,7 @@ prologue's own register numbers, accounting for essentially all of the
 21 remaining word mismatches. **Tried two reshapes, both regressed
 severely rather than helping** (declaration-order swap of `n`/`tmp`: no
 change at all, 202/223 unchanged; reordering
-`D_8006D600=0;CD_cbsync=0;` to before the load: catastrophic
+`CD_cbready=0;CD_cbsync=0;` to before the load: catastrophic
 regression to 9/223, i.e. this exact statement order is otherwise
 load-bearing and fragile). Not spending further attempts on this --
 register-identity-driven pseudo-allocation choices for a function's
@@ -364,7 +364,7 @@ s32 cd_read_retry(void)
 
     tmp = &D_8006D8DC;
     n = *tmp;
-    D_8006D600 = 0;
+    CD_cbready = 0;
     CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
@@ -434,7 +434,7 @@ s32 cd_read_retry(void)
                 }
             }
 
-            D_8006D600 = (s32)cb_read;
+            CD_cbready = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -794,7 +794,7 @@ s32 cd_read_retry(void)
 
     tmp = &D_8006D8DC;
     n = *tmp;
-    D_8006D600 = 0;
+    CD_cbready = 0;
     CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
@@ -864,7 +864,7 @@ s32 cd_read_retry(void)
                 }
             }
 
-            D_8006D600 = (s32)cb_read;
+            CD_cbready = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -909,7 +909,7 @@ round's recorded figure exactly.
 trick** (which closed a register-numbering residue in this same unit's
 `CD_readsync` after manual reorders had failed) against the one open
 residue here (the `tmp`/`n` address-vs-value swap at the function's first
-computed temporary). Wrapped the `D_8006D600 = 0;` statement immediately
+computed temporary). Wrapped the `CD_cbready = 0;` statement immediately
 after the load in a duplicated `if (tmp || n) {...} else {...}` referencing
 both contested values:
 
@@ -917,9 +917,9 @@ both contested values:
 tmp = &D_8006D8DC;
 n = *tmp;
 if (tmp || n) {
-    D_8006D600 = 0;
+    CD_cbready = 0;
 } else {
-    D_8006D600 = 0;
+    CD_cbready = 0;
 }
 CD_cbsync = 0;
 *tmp = n - 1;
@@ -1135,7 +1135,7 @@ s32 cd_read_retry(void)
 
     tmp = D_8006D8DC;
     n = *tmp;
-    D_8006D600 = 0;
+    CD_cbready = 0;
     CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
@@ -1207,7 +1207,7 @@ s32 cd_read_retry(void)
                 }
             }
 
-            D_8006D600 = (s32)cb_read;
+            CD_cbready = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];

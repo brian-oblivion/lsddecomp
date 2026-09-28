@@ -6,13 +6,13 @@
 
 ## What it does
 
-Registered as a callback (`D_8006D600 = cb_read` in `cd_read_retry`,
+Registered as a callback (`CD_cbready = cb_read` in `cd_read_retry`,
 still `INCLUDE_ASM`). If `arg0 == 1` and the retry counter `D_8006D8F4` is
 still positive, calls `CD_getsector(D_8006D8E8, D_8006D8F0)`, advances
 `D_8006D8E8` by `D_8006D8F0 * 4`, and decrements `D_8006D8F4`; otherwise
 sets `D_8006D8F4 = -1`. Records `D_8006D8F8 = func_80025900(-1)`. If
 `D_8006D8F4 < 0` and `D_8006D8DC > 0`, calls `cd_read_retry()`. If
-`D_8006D8F4 <= 0`, restores the `CD_cbsync`/`D_8006D600` callback pair from
+`D_8006D8F4 <= 0`, restores the `CD_cbsync`/`CD_cbready` callback pair from
 `D_8006D8FC`/`D_8006D900` and dispatches `D_8006D604(2 or 5, arg1)`.
 
 ## Best C reached (17/91 words -- restored to INCLUDE_ASM)
@@ -43,7 +43,7 @@ void cb_read(s32 arg0, s32 arg1)
 
     if (D_8006D8F4 <= 0) {
         CD_cbsync = D_8006D8FC;
-        D_8006D600 = D_8006D900;
+        CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
         if (D_8006D604 != 0) {
             if (D_8006D8F4 != 0) {
@@ -136,7 +136,7 @@ shared:
 
     if (D_8006D8F4 <= 0) {
         CD_cbsync = D_8006D8FC;
-        D_8006D600 = D_8006D900;
+        CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
         if (D_8006D604 != 0) {
             if (D_8006D8F4 != 0) {
@@ -376,7 +376,7 @@ shared:
 
     if (D_8006D8F4 <= 0) {
         CD_cbsync = D_8006D8FC;
-        D_8006D600 = D_8006D900;
+        CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
         if (D_8006D604 != 0) {
             if (D_8006D8F4 == 0) {
@@ -583,7 +583,7 @@ shared:
 
     if (D_8006D8F4 <= 0) {
         CD_cbsync = D_8006D8FC;
-        D_8006D600 = D_8006D900;
+        CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
         if (D_8006D604 != 0) {
             if (D_8006D8F4 == 0) {
@@ -745,7 +745,7 @@ volatile s32 *new_var;
 ...
 if ((*(new_var = &D_8006D8F4)) <= 0) {
     CD_cbsync = D_8006D8FC;
-    D_8006D600 = D_8006D900;
+    CD_cbready = D_8006D900;
     CD_cw(9, 0, 0, 0);
     if (D_8006D604 != 0) {
         if ((*new_var) == 0) {
@@ -857,7 +857,7 @@ shared:
 
     if ((*(new_var = &D_8006D8F4)) <= 0) {
         CD_cbsync = D_8006D8FC;
-        D_8006D600 = D_8006D900;
+        CD_cbready = D_8006D900;
         CD_cw(9, 0, 0, 0);
         if (D_8006D604 != 0) {
             if ((*new_var) == 0) {

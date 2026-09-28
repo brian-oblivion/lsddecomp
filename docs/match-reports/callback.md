@@ -7,7 +7,7 @@
 Thread entry point registered by `CD_initintr`/`CD_init` via
 `func_80024D40(2, callback)`. Loops on `getintr()` (still
 `INCLUDE_ASM`/BLOCKED in `libcd_bios`) dispatching two optional callbacks
-(`D_8006D600` and `CD_cbsync`, both function pointers) based on flag bits,
+(`CD_cbready` and `CD_cbsync`, both function pointers) based on flag bits,
 until `getintr()` returns 0, then restores the driver's saved status
 byte into `*D_8006D8C0`.
 
@@ -33,7 +33,7 @@ void callback(void)
             break;
         }
         if (flags & 4) {
-            handler = D_8006D600;
+            handler = CD_cbready;
             if (handler != 0) {
                 ((void (*)(s32, u8 *))handler)(*pd9, D_8008B3D4);
             }
@@ -133,7 +133,7 @@ the report's claim precisely: retail does NOT hoist `D_8006D8D8`'s
 address despite it being loop-invariant (apparently a register-pressure
 choice, not a correctness one -- `$s0`/`$s1`/`$s2` are already spoken for
 by `flags`/`status`/`pd9`, leaving no fourth callee-saved slot, and
-retail's compiler evidently preferred to keep `D_8006D600`/`CD_cbsync`
+retail's compiler evidently preferred to keep `CD_cbready`/`CD_cbsync`
 un-hoisted too rather than hoist a fourth value), and just needs the
 UNFOLDED 3-instruction address-then-load shape reproduced without
 inviting the hoist.
@@ -194,7 +194,7 @@ Directly tested the type/width lever against this function's own
 disassembly. `D_8006D8D8` loads via `lbu` (unsigned byte, matching its
 `u8[2]` declaration exactly); the OTHER callback's argument,
 `D_8006D8D9`, also loads via `lbu` (matching its `u8` declaration);
-`CD_cbsync`/`D_8006D600` (function-pointer globals) and
+`CD_cbsync`/`CD_cbready` (function-pointer globals) and
 `D_8006D8C0` (a `volatile u8 *`, itself loaded via `lw` since it is a
 POINTER, then dereferenced via `lbu`/`sb` for the byte it points to) all
 match their current declared types exactly, opcode for opcode. No room
@@ -225,7 +225,7 @@ assuming that generalizes):
 1. **`D_8006D8D8`'s extern declaration retyped `volatile`** (`extern
    volatile u8 D_8006D8D8[2];` instead of plain `u8[2]`).
 2. Both callback pointers precomputed **before** their null-check
-   (`handler = D_8006D600; if (handler != 0) { cb = (cast)handler; ... }`
+   (`handler = CD_cbready; if (handler != 0) { cb = (cast)handler; ... }`
    for one branch, `cb = (cast)CD_cbsync; if (CD_cbsync != 0) {
    cb(...); }` for the other -- note the asymmetry between the two
    branches is itself part of the winning shape, not noise).
@@ -569,7 +569,7 @@ x->y; p->z = 0;` where `p` already holds `x->y` from earlier in the same
 block) against this function's body before spending an attempt, per this
 round's own instruction to read a register-identity/addressing residue for
 it first.** It does not apply: every value this function touches
-(`D_8006D8C0`, `D_8006D8D9`/`pd9`, `D_8006D600`, `CD_cbsync`,
+(`D_8006D8C0`, `D_8006D8D9`/`pd9`, `CD_cbready`, `CD_cbsync`,
 `D_8006D8D8`) is read exactly once per site with no earlier same-block load
 of the same address to make redundant. The residue here is confirmed
 instruction-SELECTION (folded vs. unfolded addressing for `D_8006D8D8`'s
@@ -677,7 +677,7 @@ does not have that property.
 ### Hand variant: the same idiom with a genuinely safe sink (`handler`) -- tried, regresses with drift
 
 `handler` (`s32 handler;`) IS a safe reuse target: it is assigned fresh from
-`D_8006D600` at the top of every `flags & 4` branch, immediately before its
+`CD_cbready` at the top of every `flags & 4` branch, immediately before its
 only read, so any value left in it from a previous iteration (including one
 written by a different branch) is never read under a stale meaning. Tried
 reusing it for the same address-computation idiom instead of `pd9`:

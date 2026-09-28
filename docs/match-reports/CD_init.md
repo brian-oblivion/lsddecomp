@@ -60,7 +60,7 @@ s32 CD_init(void)
 
     D_8006D61D = 0;
     D_8006D61C = 0;
-    D_8006D600 = 0;
+    CD_cbready = 0;
     CD_cbsync = 0;
     D_8006D610 = 0;
     D_8006D60C = 0;
@@ -520,7 +520,7 @@ s32 CD_init(void)
 
     D_8006D61D = 0;
     D_8006D61C = 0;
-    D_8006D600 = 0;
+    CD_cbready = 0;
     CD_cbsync = 0;
     D_8006D610 = 0;
     D_8006D60C = 0;

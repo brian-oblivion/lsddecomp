@@ -212,7 +212,7 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
   `(s32)(u16)D_8006C272`, still `INCLUDE_ASM` in `asm/psyq_GsLinkObject4.s`
   — declared here as `extern s32 func_80024E64(void);`); if nonzero, saves
   `*D_8006D8C0 & 3`, runs the same button-dispatch loop as
-  `callback`/`CD_datasync` (bit 4 → `D_8006D600(D_8006D8D8[1],
+  `callback`/`CD_datasync` (bit 4 → `CD_cbready(D_8006D8D8[1],
   D_8008B3D4)`, bit 2 → `CD_cbsync(D_8006D8D8[0], D_8008B3CC)`, until
   `getintr()` returns 0), then restores the saved status byte.
 - Copies 8 bytes from `D_8008B3D4` into `*(u8 *)arg1` — but ONLY if `arg1 !=
@@ -304,8 +304,8 @@ s32 CD_readsync(s32 arg0, s32 arg1)
                 if (flags == 0) {
                     break;
                 }
-                if ((flags & 4) && D_8006D600 != 0) {
-                    ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
+                if ((flags & 4) && CD_cbready != 0) {
+                    ((void (*)(s32, u8 *))CD_cbready)(p8D9[0], D_8008B3D4);
                 }
                 if ((flags & 2) && CD_cbsync != 0) {
                     ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);
@@ -717,8 +717,8 @@ s32 CD_readsync(s32 arg0, s32 arg1)
                 if (flags == 0) {
                     break;
                 }
-                if ((flags & 4) && D_8006D600 != 0) {
-                    ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
+                if ((flags & 4) && CD_cbready != 0) {
+                    ((void (*)(s32, u8 *))CD_cbready)(p8D9[0], D_8008B3D4);
                 }
                 if ((flags & 2) && CD_cbsync != 0) {
                     ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);
@@ -940,8 +940,8 @@ s32 CD_readsync(s32 arg0, s32 arg1)
                 if (flags == 0) {
                     break;
                 }
-                if ((flags & 4) && D_8006D600 != 0) {
-                    ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
+                if ((flags & 4) && CD_cbready != 0) {
+                    ((void (*)(s32, u8 *))CD_cbready)(p8D9[0], D_8008B3D4);
                 }
                 if ((flags & 2) && CD_cbsync != 0) {
                     ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);

@@ -3155,3 +3155,4 @@ sItemListTimExt = 0x8008AB24;
 sDefaultButtonMasks = 0x80010764;
 sSeqOpenErrorMsg = 0x80010FEC;
 CD_cbsync = 0x8006D5FC;
+CD_cbready = 0x8006D600;
