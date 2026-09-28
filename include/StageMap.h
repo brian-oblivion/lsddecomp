@@ -247,11 +247,16 @@ enum ChunkNeighbour {
 /* applyChunkLoads' 0xC-byte entries, one per slot to (re)load: the file
  * record chunkFileFn returned for the chunk (NULL: cancel the slot's load), the
  * chunk's index in the stage grid and the neighbour key of the slot that
- * takes it. ComputeChunkLoadEntry writes chunkIndex as a whole word. */
+ * takes it. ComputeChunkLoadEntry writes and reads chunkIndex as a whole
+ * word; ApplyChunkLoads reads its low half. */
 typedef struct ChunkLoadEntry {
-    void *file;     /* +0x0 */
-    s16 chunkIndex; /* +0x4 */
-    u8 pad6[0x8 - 0x6];
+    void *file; /* +0x0 */
+
+    union {
+        s32 word;
+        s16 index;
+    } chunkIndex; /* +0x4 */
+
     s32 neighbour; /* +0x8 */
 } ChunkLoadEntry;
 

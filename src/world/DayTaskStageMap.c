@@ -1098,8 +1098,7 @@ s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 chunk, s32 oddRow) {
 /* Fills `out` for the slot taking neighbour key `neighbour` of centreChunk:
  * the neighbour's chunk index and the chunk's file record from the
  * callback, or a NULL file when that neighbour lies off the grid. Returns 1
- * for a file, 0 for none. chunkIndex is written as a whole word (see
- * ChunkLoadEntry). MATCHING: one `step` local carries every addend. */
+ * for a file, 0 for none. MATCHING: one `step` local carries every addend. */
 s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 columns, s32 oddRow,
                                     s32 centreChunk, s32 onGridMask, s32 neighbour) {
     s32 bit = sNeighbourBits[neighbour];
@@ -1126,12 +1125,12 @@ s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 col
             }
         }
         chunk = centreChunk + step;
-        *(s32 *)((u8 *)out + 4) = chunk;
+        out->chunkIndex.word = chunk;
     } else {
-        *(s32 *)((u8 *)out + 4) = centreChunk + neighbour;
+        out->chunkIndex.word = centreChunk + neighbour;
     }
 
-    out->file = self->chunkFileFn(self->chunkFileCtx, *(s32 *)((u8 *)out + 4), 0, 0);
+    out->file = self->chunkFileFn(self->chunkFileCtx, out->chunkIndex.word, 0, 0);
     do { /* MATCHING: removing it drifts the image */
     } while (0);
     result = 1;
