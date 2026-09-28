@@ -239,8 +239,8 @@ TitleMenuTaskObjF/_t's spelling). The `slot94Call` label is `callPrevChar`.
 Parameters `arg1`/`arg2` -> `sender`/`command`.
 
 Moved here from the comment on `EncodeFullWidthSjis` (stale: it is matched
-in ScreenWidgets.c since round 38): "TextEntry__HandleCommand's own
-name-copy helper -- uncarved elsewhere (`ScreenWidgets`, still
+in screen_widgets.c since round 38): "TextEntry__HandleCommand's own
+name-copy helper -- uncarved elsewhere (`screen_widgets`, still
 `INCLUDE_ASM`), typed purely from this call site's own register usage:
 `a0`/`a1` are `self->textBuf`/`self->editBuf` (both `char *`, the same pair
 `strcpy` is fed in the other arm), return value unused. Same

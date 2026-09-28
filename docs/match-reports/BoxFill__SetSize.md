@@ -2,7 +2,7 @@
 
 > Renamed from `func_80040824` on 2026-09-25 (tools/rename.py). Address 0x80040824.
 
-Unit: `src/ui/ScreenWidgets.c`. 3 attempts.
+Unit: `src/ui/screen_widgets.c`. 3 attempts.
 
 ```c
 void BoxFill__SetSize(Obj6EAC0 *self, s32 *a1) {

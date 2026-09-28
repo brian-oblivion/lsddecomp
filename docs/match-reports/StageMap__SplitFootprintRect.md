@@ -583,7 +583,7 @@ Assigned as one of three functions in a round-53 Sonnet calibration slot for
 the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `IsPointOutOfBounds`
 and `StageMap__StartScaleRamp`. Round 33's disposition ("still a pure register-identity
 rotation with no new lever found") is the reason this unit was picked over
-the plan's higher-ranked but levers-measurably-spent `ScreenWidgets` job.
+the plan's higher-ranked but levers-measurably-spent `screen_widgets` job.
 
 Rebuilt the round-19/33 preserved body fresh first, per hygiene: confirmed
 **55/97, exact length (0x184), zero outside-range drift** — unchanged from

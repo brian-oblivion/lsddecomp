@@ -111,7 +111,7 @@ helpers and 16-byte `libapi`/`libcard` BIOS stubs:
 | --- | --- |
 | GameApplicationFileResource, PlacementGridVabSound/_h | `strcat`, `strcpy`, `strstr`, `strcmp`, `strncmp` |
 | code_179d8, _c, _f, _i, _j | 19 `libsnd` objects (`sscall`, `stop`, `adsr`, `sstable`, …) |
-| ScreenWidgets | `libgs/gs_133`, `gs_111`, `gs_113`, `gs_108`, `libgte/fgo_00`, `fog_01` |
+| screen_widgets | `libgs/gs_133`, `gs_111`, `gs_113`, `gs_108`, `libgte/fgo_00`, `fog_01` |
 | class_3bb8c_h, _h_b, _h_c | 13 BIOS trampolines: `libapi/a5x`, `libcard/a7x`, `c17x`, `c112` |
 
 Two consequences. `func_8003FC70`, closed as a game match in round 20 (35/35),
@@ -349,7 +349,7 @@ back. Decisions and measurements made on the way:
 
 Head work while two runners converted the text-only game-unit runs
 (`libsnd` in `libsnd_decre/_j/_f`; the 13 BIOS trampolines, `strcat`, and
-the `libgs`/`libgte` objects in `ScreenWidgets`).
+the `libgs`/`libgte` objects in `screen_widgets`).
 
 **`libc2/strcpy` + `libc2/strstr` + `libcd/sys`** (0x19378..0x19C78, crossing
 `CdDriver` / `libcd_bios`): 27 functions, 22 of them matched C and three
@@ -400,7 +400,7 @@ placed object inside a game unit -- the `SUSPECT` `ssinit_c` false positive.
   the pieces do not tile; `libsnd/next` is 3.5-only; `libsnd/vm_prog` and
   `libsnd/ut_pb` are **3.6-only**.
 - **An attached rodata slot can stop existing rather than move.**
-  `jtbl_80011108` (`0x1908`) was attached to `ScreenWidgets` since round 14
+  `jtbl_80011108` (`0x1908`) was attached to `screen_widgets` since round 14
   because its `.L` words are local to `Gssub_make_matrix`'s `.s`. That table is
   `libgs/gs_123.o`'s own `.rdata`, so table and indexing code now arrive in
   one object and no label crosses a boundary in either direction; the tail

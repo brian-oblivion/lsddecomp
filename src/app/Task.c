@@ -15,7 +15,7 @@
  *  - Sony's GsSetProjection (libgs/gs_106), carried as C because no SDK
  *    object places it.
  * include/Task.h holds the declarations this file shares with
- * ScreenWidgets.c, which follows it.
+ * screen_widgets.c, which follows it.
  */
 #include "common.h"
 #include <libgte.h>

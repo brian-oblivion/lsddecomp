@@ -28,7 +28,7 @@ void StampSaveTitleDay(s32 arg0)
 }
 ```
 
-`FormatFullWidthNumber` (matched round 38, `src/ui/ScreenWidgets.c`) formats `arg0` as a
+`FormatFullWidthNumber` (matched round 38, `src/ui/screen_widgets.c`) formats `arg0` as a
 zero-padded 3-digit decimal string into the buffer pointed to by
 `sDayDigits`. This unit keeps `FormatFullWidthNumber`'s `self` parameter opaque
 (`void *`) rather than pulling in `Obj6EAC0` from `Task.h`, since

@@ -11,7 +11,7 @@ Line numbers are as of commit b23bdf545 and drift; search for the name.
 **Verdict.** The function bodies are in good shape: one-line `MATCHING:`
 notes, Sony types under Sony's names, few raw casts. draw_system.c,
 flat_light_obj.c, TimImage.c, pad.c, cd_stream.c, application.c, StageGrid.c,
-TodActor.c, DayTaskStageMap.c, WBgm.c and ScreenWidgets.c's FadeBox code
+TodActor.c, DayTaskStageMap.c, WBgm.c and screen_widgets.c's FadeBox code
 are close to release quality. The debt is in declarations, a few
 conventions, names the code has outgrown, and headers written as analysis
 rather than API.
@@ -40,7 +40,7 @@ rather than API.
   dream_sys.h's `CinematicCall{bank,entry}` are one packed pair, repacked by
   hand at GameApplicationFileResource.c:80, 317. Add game_files.h.
 - **Full-width SJIS helpers.** `DecodeFullWidthSjis` is `u8 *(u8 *, u8 *)`
-  (ScreenWidgets) but `void (void *, void *)` at TitleMenuTaskObjF.c:316 and
+  (screen_widgets) but `void (void *, void *)` at TitleMenuTaskObjF.c:316 and
   `char *(char *, char *)` at TextEntryItemList.c:41, 511;
   `FormatFullWidthNumber` re-declared at TitleMenuTaskObjF.c:193. One header.
 - **Others without a header or disagreeing:** `BuildFileName`
@@ -170,7 +170,7 @@ rather than API.
 - **ui/sound:** class ids `0x10`/`0x20` and `kind == 2/5` at
   TitleMenuTaskObjF.c:589-611, 1284-1296 (PAD_/FRAMECLOCK_CLASS_ID exist),
   `setState(self, 5/0xA/0xB/0xF)` where TASKCORE_STATE_* exist;
-  ScreenWidgets.c:103, 145 local `mask` is the channel set; GridCell `unk34`,
+  screen_widgets.c:103, 145 local `mask` is the channel set; GridCell `unk34`,
   CellPlacement `unk1`/`unk2C`; SsScore.h (39) and SvmData.h (32) `unkNN`
   fields are each described well enough to name.
 

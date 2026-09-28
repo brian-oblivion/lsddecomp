@@ -6,7 +6,7 @@
 
 Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior attempt.
 
-- **Where:** not in any method table (allocator for CharSprite, the 8x8-cell sprite). Called from TextEntryItemList.c (`New_CharSprite(handle2, 0x5F)`) and ScreenWidgets.c (`New_CharSprite(a1, 0x20)`).
+- **Where:** not in any method table (allocator for CharSprite, the 8x8-cell sprite). Called from TextEntryItemList.c (`New_CharSprite(handle2, 0x5F)`) and screen_widgets.c (`New_CharSprite(a1, 0x20)`).
 - **What:** `BMemPMgrAlloc(0xAC)`; if non-NULL, calls slot +0x008 (ctor, CharSprite__CharSprite) of `GetCharSpriteMethods()` (the gCharSpriteMethods table) with `(obj, texture, cell)` and returns obj, else NULL.
 - **Result:** byte-exact, 27/27 words, 0 ins / 0 del, whole-image SHA1 green. Third build.
 - **Levers, measured:**

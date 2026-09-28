@@ -170,7 +170,7 @@ Read each named class's header first; its banner points to the units.
   (`src/ui/TitleMenuTaskObjF.c`), the START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE
   menu. `TimedTask`, IntermediateBase's other subclass, is the base of
   `DayTask` and `ObjM`. The 2D pieces are `Sprite` and its subclasses (`src/graphics/Sprite.c`,
-  down to `TextRow`), `BoxFill` and `FadeBox` (`src/ui/ScreenWidgets.c`) and `TextEntry`
+  down to `TextRow`), `BoxFill` and `FadeBox` (`src/ui/screen_widgets.c`) and `TextEntry`
   (`src/ui/TextEntryItemList.c`).
 - **Memory-card saves.** `TitleMenu` owns a `TaskObjF`, the save/load
   controller (both in `src/ui/TitleMenuTaskObjF.c`): a state machine over the

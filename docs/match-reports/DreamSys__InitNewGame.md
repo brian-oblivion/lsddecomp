@@ -52,7 +52,7 @@ void DreamSys__InitNewGame(DreamSys *this)
 }
 ```
 
-`memset`'s extern declaration copies `ScreenWidgets.c`'s own local view
+`memset`'s extern declaration copies `screen_widgets.c`'s own local view
 verbatim (`extern void *memset(unsigned char *dst, unsigned char c, int
 n);`) -- it is a Psy-Q/libc function, uncarved (`psyq_memset.s`), so per
 project convention this is a unit-local prototype, not something added to a

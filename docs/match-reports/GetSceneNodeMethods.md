@@ -56,12 +56,12 @@ and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
 `src/graphics/scene_node.c`, `src/ui/TitleMenuTaskObjF.c`, `src/world/ObjMStyleActor.c`,
-`src/world/ObjMStyleActor.c`, `src/world/DayTaskStageMap.c`, `src/ui/ScreenWidgets.c`,
-`src/ui/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
+`src/world/ObjMStyleActor.c`, `src/world/DayTaskStageMap.c`, `src/ui/screen_widgets.c`,
+`src/ui/screen_widgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/dream_sys.h`.
 Renaming this symbol would edit every one of those files -- squarely
 out of this round's `SceneNode`-only scope, and a live collision risk
-with this round's `ScreenWidgets` runner. Posted to the broadcast in
+with this round's `screen_widgets` runner. Posted to the broadcast in
 strong terms: this is the single highest-value rename in this unit
 (11 files reference the placeholder name) and the evidence for
 `GetSceneNodeMethods` is as solid as any tier-A name gets, but it

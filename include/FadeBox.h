@@ -6,7 +6,7 @@
 /*
  * FadeBox -- a BoxFill whose colour ramps a step per update until a tick
  * count runs out: a screen fade (class id 0x164, method table
- * gFadeBoxMethods, parent BoxFill; methods in src/ui/ScreenWidgets.c; no
+ * gFadeBoxMethods, parent BoxFill; methods in src/ui/screen_widgets.c; no
  * subclasses). The ctor chains to BoxFill's ctor, then Reset stores the
  * default channel mask, a step of 10, and turns the box's display and
  * semi-transparency off.
@@ -133,7 +133,7 @@ extern FadeBoxMethods *GetFadeBoxMethods(void); /* returns &gFadeBoxMethods */
 /* +0x040's occupant, as the ctor calls it through the inherited slot. */
 typedef void (*FadeBoxResetFn)(FadeBox *self, s32 channels);
 
-/* The class's own methods, in ROM order (ScreenWidgets). */
+/* The class's own methods, in ROM order (screen_widgets). */
 FadeBox *New_FadeBox(void *size, s32 channels, s32 pri);
 void FadeBox__FadeBox(FadeBox *self, void *size, s32 channels, s32 pri);
 void FadeBox__Reset(FadeBox *self, s32 channels);

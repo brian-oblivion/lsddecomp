@@ -4,7 +4,7 @@
 
 > Renamed from `func_800407F8` on 2026-09-18 (tools/rename.py). Address 0x800407f8.
 
-Unit: `src/ui/ScreenWidgets.c`. Blocker screen clean. Retail's own
+Unit: `src/ui/screen_widgets.c`. Blocker screen clean. Retail's own
 callee-saved count is 0 -- not the saturated-register-file class.
 
 **Round 19 correction: the "missing unconditional cache" framing below

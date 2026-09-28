@@ -134,7 +134,7 @@ learning below.
   is this function (not `Viewport__OnFrameClockEvent`, which only dispatches it), and
   `slotA4`'s real occupant is `Viewport__Flip` (not `Viewport__OnDrawSystemEvent`, ditto).
 - New externs: `GsSetNearClip`/`func_8003FC70`/`func_8003FD4C`/
-  `GsSetWorkBase` (all `asm/ScreenWidgets.s`, next slice, uncarved) and
+  `GsSetWorkBase` (all `asm/screen_widgets.s`, next slice, uncarved) and
   `func_80024AE4` (PsyQ, `asm/psyq_GsLinkObject4.s`).
 
 ## Proposed learning
@@ -239,7 +239,7 @@ extern void SetFarColor(u8 a0, u8 a1, u8 a2);
  * GsClearOt's real third argument is a `GsOT *` (its first two are Sony's
  * `offset` and `point`). This call site already passed it as a plain word, so
  * it is left that way -- the shape the header carried before round 14 retyped
- * it to a `TexPageDesc *`, which was ScreenWidgets.c's reading of that same
+ * it to a `TexPageDesc *`, which was screen_widgets.c's reading of that same
  * GsOT. */
 extern void GsSetLightMode(s32 a0);
 extern void SetFogNear(s32 a0, s32 a1);

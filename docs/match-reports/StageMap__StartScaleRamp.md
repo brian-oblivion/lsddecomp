@@ -334,7 +334,7 @@ the track-1 stop rule (`docs/FINISHING-PLAN.md`), alongside `IsPointOutOfBounds`
 and `StageMap__SplitFootprintRect`. This report's disposition (round 18: "bounded search
 exhausted its time budget with no improvement, NOT permuter-exhausted") is
 the reason it was picked over the plan's higher-ranked but
-levers-measurably-spent `ScreenWidgets` job.
+levers-measurably-spent `screen_widgets` job.
 
 **Checked whether anything relevant changed since round 25.** The
 `nop_mflo_mfhi` toolchain blocker was resolved in round 42

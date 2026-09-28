@@ -4,7 +4,7 @@
 
 > Renamed from `func_800408A8` on 2026-09-18 (tools/rename.py). Address 0x800408a8.
 
-Unit: `src/ui/ScreenWidgets.c`. First attempt.
+Unit: `src/ui/screen_widgets.c`. First attempt.
 
 ```c
 s32 BoxFill__SetMask(Obj6EAC0 *self, s32 a1) {

@@ -38,7 +38,7 @@ Round 96 (alpha, track 6). The +0x064 slot is `setSemiTransOn`, not
 `setSemiTrans`: <libgpu.h> defines the function-like macro
 `setSemiTrans(p, abe)`, so `methods->setSemiTrans(self, 1)` expanded to Sony's
 macro (a parse error) in every caller that takes Sony's headers
-(ObjMStyleActor, class_3bb8c_s, ScreenWidgets). Sony keeps Sony's names, so the
+(ObjMStyleActor, class_3bb8c_s, screen_widgets). Sony keeps Sony's names, so the
 slot moved; the method names do not collide and stay. Zero bytes.
 
 ## Round 101 (delta): track 7

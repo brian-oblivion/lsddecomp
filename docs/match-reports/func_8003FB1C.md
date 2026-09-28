@@ -3,8 +3,8 @@
 > **ROUND 34 (2026-09-12), runner bravo. THIS FUNCTION IS NOW LINKED FROM
 > SONY'S OWN OBJECT `libgs/gs_123.o` (Psy-Q 3.3) AND IS NAMED
 > `Gssub_make_matrix`.** The object's 0xC8 of text covers exactly it. It sat
-> one function INTO `ScreenWidgets`, so that unit is split
-> `[c libgs_gs_101][o libgs/gs_123][c ScreenWidgets]` and GsSetNearClip, the
+> one function INTO `screen_widgets`, so that unit is split
+> `[c libgs_gs_101][o libgs/gs_123][c screen_widgets]` and GsSetNearClip, the
 > single function in front, moved to `src/psyq/libgs_gs_101.c`.
 >
 > **This RECLASSIFIES a matched function out of the game-code count, which is
@@ -25,7 +25,7 @@
 > used -- it is the PSX `MATRIX`, and round 33's own note about two units
 > holding independent views of `D_8008E98C` is unaffected.
 
-Unit: `ScreenWidgets` (until round 34) · Size: 50 words · Round 23 (2026-09-07), head.
+Unit: `screen_widgets` (until round 34) · Size: 50 words · Round 23 (2026-09-07), head.
 **Matched on the FIRST attempt**, fresh ground (no prior report).
 
 ## What it is
@@ -63,7 +63,7 @@ void func_8003FB1C(Matrix2cc8c *dst, s16 sin, s16 cos, u8 axis) {
 }
 ```
 
-with, unit-locally in `src/ui/ScreenWidgets.c`:
+with, unit-locally in `src/ui/screen_widgets.c`:
 
 ```c
 typedef struct Matrix2cc8c {
@@ -108,9 +108,9 @@ reading's opaque `unk0[5]` is this one's `m[3][3]` plus its tail pad, and its
 `StageMap__ComputeFootprintFromRotation` zeroes two of them and sets the third, i.e. it is setting a
 translation vector on a copied identity matrix.
 
-Neither declaration was moved. `ScreenWidgets` does not include
+Neither declaration was moved. `screen_widgets` does not include
 `class_3bb8c.h`, so there is no collision, and the matrix view lives in
-`src/ui/ScreenWidgets.c` rather than in the six-unit `Task.h`. This is the
+`src/ui/screen_widgets.c` rather than in the six-unit `Task.h`. This is the
 multiple-independent-local-views convention working as intended: the
 cross-reference belongs in a report, not in a shared header.
 

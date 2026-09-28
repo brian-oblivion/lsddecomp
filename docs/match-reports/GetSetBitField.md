@@ -192,7 +192,7 @@ residue, before spending a permuter budget on it.
   here: several callers use the return value
   (`return GetSetBitField(&self->unk10, 0x1F, 1, a1 == 0) == 0;`).
 - Corroborated at scale: thirteen one-line wrappers across `scene_node.c`,
-  `scene_node.c` and `ScreenWidgets.c` call it at fixed, non-overlapping
+  `scene_node.c` and `screen_widgets.c` call it at fixed, non-overlapping
   (shift, width) pairs over one word -- the per-field setters of a packed
   register. That word is `SceneNodeObj::unk10`, which the PSY-Q
   IDENTIFICATION note in include/scene_node.h pins as `GsDOBJ2.attribute`.
@@ -235,5 +235,5 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * shifted down to bit 0. The mask is built one bit at a time by a loop
  * rather than as `(1 << width) - 1`; that loop is retail's own shape, not
  * an artefact. Thirteen thin per-field setters across scene_node.c,
- * scene_node.c and ScreenWidgets.c are wrappers around this. */
+ * scene_node.c and screen_widgets.c are wrappers around this. */
 ```

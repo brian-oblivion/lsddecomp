@@ -10,7 +10,7 @@ Unit `TextEntryItemList`, carved round 14.
 
 `Obj86ED0`'s vtable slot 0x040. Stores its `mode` argument and name pointer,
 resets two counters, then either transliterates the name into the owned
-buffer (`DecodeFullWidthSjis`, an uncarved `ScreenWidgets` helper -- byte-translate
+buffer (`DecodeFullWidthSjis`, an uncarved `screen_widgets` helper -- byte-translate
 + return-dest, same convention as `strcpy`) and halves `unk10` (a plain
 signed `/2`, which this GCC compiles to the classic `srl`+`addu`+`sra`
 round-toward-zero sequence), or falls back to a straight `strcpy` when
@@ -72,10 +72,10 @@ plain strcpy; HandleCommand's circle arm encodes back in the same mode).
 local prototype. Zero bytes changed.
 
 Moved here from src/ui/TextEntryItemList.c (stale history; DecodeFullWidthSjis
-is matched in ScreenWidgets.c since round 38, typed `u8 *(u8 *dst, u8
+is matched in screen_widgets.c since round 38, typed `u8 *(u8 *dst, u8
 *src)`): "This project's own strcpy (matched elsewhere) -- TextEntry__SetText's
 own caller, same local-declaration convention as TitleMenuTaskObjF.c/others."
-and "Uncarved helper, `ScreenWidgets`, still INCLUDE_ASM --
+and "Uncarved helper, `screen_widgets`, still INCLUDE_ASM --
 TextEntry__SetText's own call. Translates each byte of `src` (a name
 string) into `dest` (folding a couple of special-case byte ranges) and
 returns `dest`, same convention as `strcpy`. Typed purely from this call

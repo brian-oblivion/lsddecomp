@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003FE2C` on 2026-09-20 (tools/rename.py). Address 0x8003fe2c.
 
-Unit `ScreenWidgets`, carved round 14. `FadeBoxObj`'s own constructor
+Unit `screen_widgets`, carved round 14. `FadeBoxObj`'s own constructor
 (`FadeBoxMethods::ctor`, slot `+0x008`).
 
 ```c

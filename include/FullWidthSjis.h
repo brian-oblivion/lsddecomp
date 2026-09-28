@@ -3,7 +3,7 @@
 
 /*
  * Conversions between printable ASCII and its full-width Shift-JIS forms,
- * two bytes a character (src/ui/ScreenWidgets.c). The save title, the text
+ * two bytes a character (src/ui/screen_widgets.c). The save title, the text
  * entry buffer and the item list's names are stored full-width and edited
  * or drawn one byte a character.
  */

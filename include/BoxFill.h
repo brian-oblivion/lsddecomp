@@ -6,8 +6,8 @@
 /*
  * BoxFill -- a flat-coloured screen rectangle (class id 0x64, method table
  * gBoxFillMethods): a SceneNode subclass holding one libgs GsBOXF.
- * Methods in src/ui/ScreenWidgets.c (New_BoxFill, the ctor, Reset) and
- * src/ui/ScreenWidgets.c (the rest, up to GetBoxFillMethods). The name is for
+ * Methods in src/ui/screen_widgets.c (New_BoxFill, the ctor, Reset) and
+ * src/ui/screen_widgets.c (the rest, up to GetBoxFillMethods). The name is for
  * what the class does, and the evidence is this:
  *  - Viewport__DrawNode (ViewportDraw.c) takes its own path for a node whose
  *    class-id low byte is 0x64, i.e. this class and everything below it:
@@ -152,7 +152,7 @@ extern BoxFillMethods *GetBoxFillMethods(void); /* returns &gBoxFillMethods */
 typedef void (*BoxFillResetFn)(BoxFill *self, BoxFillSize *size, void *color, s32 pri);
 typedef void (*BoxFillAttachToParentFn)(BoxFill *self, SceneNode *parent, BoxFillPos *pos);
 
-/* The class's own methods, in ROM order (ScreenWidgets, then ScreenWidgets).
+/* The class's own methods, in ROM order (screen_widgets, then screen_widgets).
  * A subclass reaches the base ones through GetBoxFillMethods() and upcasts. */
 BoxFill *New_BoxFill(void *size, void *color, s32 pri);
 void BoxFill__BoxFill(BoxFill *self, BoxFillSize *size, void *color, s32 pri);

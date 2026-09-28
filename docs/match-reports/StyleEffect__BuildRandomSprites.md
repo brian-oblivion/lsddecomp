@@ -63,10 +63,10 @@ already passes it a second argument:
 ```
 src/world/ObjMStyleActor.c:72   self->unk18->methods->slot64(self->unk18, v);
 src/world/entity.c:244       this->unk94->unk5C->methods->slot64(..., sMoodCue74ClearColor);
-src/ui/ScreenWidgets.c:319   self->methods->slot64(self, 0);
-src/ui/ScreenWidgets.c:419   methods->slot64(self, 1);
-src/ui/ScreenWidgets.c:437   methods->slot64(self, 0);
-src/ui/ScreenWidgets.c:445   methods->slot64(self, 0);
+src/ui/screen_widgets.c:319   self->methods->slot64(self, 0);
+src/ui/screen_widgets.c:419   methods->slot64(self, 1);
+src/ui/screen_widgets.c:437   methods->slot64(self, 0);
+src/ui/screen_widgets.c:445   methods->slot64(self, 0);
 src/world/ObjMStyleActor.c:207  unk18->methods->slot64(unk18, unk50->unkC);
 ```
 

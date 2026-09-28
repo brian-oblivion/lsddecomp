@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004001C` on 2026-09-20 (tools/rename.py). Address 0x8004001c.
 
-Unit `ScreenWidgets`, carved round 14. Plain setter, `FadeBoxMethods::setStep`
+Unit `screen_widgets`, carved round 14. Plain setter, `FadeBoxMethods::setStep`
 (`+0x0D0`): `void FadeBox__SetStep(FadeBoxObj *self, s32 a1) { self->step =
 a1; }`. Counted as trivial work (a `jr $ra`-adjacent two-instruction body)
 per the round's "count trivial functions separately" convention.

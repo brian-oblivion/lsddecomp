@@ -569,7 +569,7 @@ reshaping).
 Assigned as one of three functions in a round-53 Sonnet calibration slot for
 the track-1 stop rule (`docs/FINISHING-PLAN.md`); this report's own text is
 the reason it was picked over the plan's higher-ranked but
-levers-measurably-spent `ScreenWidgets` job — round 18 and round 46 both say
+levers-measurably-spent `screen_widgets` job — round 18 and round 46 both say
 explicitly this is NOT permuter-exhausted, so a real attempt was owed before
 any further stop-rule conclusion.
 

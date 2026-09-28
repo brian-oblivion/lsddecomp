@@ -10,7 +10,7 @@
 
 > **ROUND 34 (2026-09-12), runner bravo -- UNIT MOVE, nothing else.** This
 > function is still game code and still MATCHED; it simply lives in a
-> different file. Seven of `ScreenWidgets`'s functions turned out to be Sony's
+> different file. Seven of `screen_widgets`'s functions turned out to be Sony's
 > and are now linked from SDK objects, which left this one wedged between
 > `o` segments -- so it has its own one-function unit, **`libgs_gs_101`**
 > (`src/psyq/libgs_gs_101.c`). The body below is unchanged and still compiles
@@ -19,7 +19,7 @@
 > cross-checked by the compiler and must be kept in step by hand.
 
 
-Unit `ScreenWidgets`, carved round 14.
+Unit `screen_widgets`, carved round 14.
 
 Plain global-pointer setter: `void GsSetNearClip(void *a0) { GsCLIP3near = a0;
 }`. `GsCLIP3near` is otherwise unreferenced anywhere else decompiled so far;

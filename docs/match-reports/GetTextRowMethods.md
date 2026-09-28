@@ -4,7 +4,7 @@
 
 > Renamed from `func_80040FB0` on 2026-09-18 (tools/rename.py). Address 0x80040fb0.
 
-Unit: `src/ui/ScreenWidgets.c`. First attempt.
+Unit: `src/ui/screen_widgets.c`. First attempt.
 
 ```c
 Obj6EAC0Methods *GetTextRowMethods(void) {
@@ -38,4 +38,4 @@ Not a twin of GetBoxFillMethods in the class tree: gTextRowMethods is class 0x11
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__GetDerivedMethods`: the class getter, returns &gTextRowMethods (was D_8006EB90, renamed with rename.py). Image byte-identical; the current source is src/ui/ScreenWidgets.c.
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__GetDerivedMethods`: the class getter, returns &gTextRowMethods (was D_8006EB90, renamed with rename.py). Image byte-identical; the current source is src/ui/screen_widgets.c.

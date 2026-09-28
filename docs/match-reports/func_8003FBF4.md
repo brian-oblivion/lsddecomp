@@ -3,7 +3,7 @@
 > **ROUND 34 (2026-09-12), runner bravo. THIS FUNCTION IS NOW LINKED FROM
 > SONY'S OWN OBJECT `libgs/gs_111.o` (Psy-Q 3.3) AND IS NAMED `GsDrawOt`.**
 > The object's text covers exactly it. It was part of the five-object run
-> 0x303F4..0x305B0 inside `ScreenWidgets`; that unit is now split three ways
+> 0x303F4..0x305B0 inside `screen_widgets`; that unit is now split three ways
 > and this function is no longer in it.
 >
 > **This RECLASSIFIES a matched function out of the game-code count, which is
@@ -21,7 +21,7 @@
 _Previously: func_8003FBF4 -- MATCH (9/9 words, first attempt)_
 
 
-Unit `ScreenWidgets`, carved round 14.
+Unit `screen_widgets`, carved round 14.
 
 ```c
 void func_8003FBF4(FadeBoxObj *self) {

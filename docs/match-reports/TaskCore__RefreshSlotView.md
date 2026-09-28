@@ -255,14 +255,14 @@ not read this as "95 words wrong."
 detour:** rebuilding this body threw a much larger-looking failure than
 expected -- the whole-image `cmp -l` first divergence landed at file
 offset `0x1908`, inside a DIFFERENT unit's rodata
-(`ScreenWidgets.c.o`'s `jtbl_80011108`), nowhere near this function's own
+(`screen_widgets.c.o`'s `jtbl_80011108`), nowhere near this function's own
 address range. This is NOT a new bug and NOT evidence of cross-unit
 corruption -- it is the ordinary, fully-expected consequence of this
 function compiling 4 bytes (one instruction) short: with `section_order`
 concatenating every file's output in a fixed order, a 4-byte shrink in
 this unit's `.text` shifts the START address of every later file's
 sections by 4 bytes, which is exactly what showed up as a mismatch deep
-inside `ScreenWidgets`'s already-matched rodata. Confirmed by direct
+inside `screen_widgets`'s already-matched rodata. Confirmed by direct
 section-size diffing (`objdump -h` on `Task.c.o`, INCLUDE_ASM
 vs. this body: `.text` `0x1258` -> `0x1254`, exactly 4 bytes) --
 CLAUDE.md's own "one instruction short, everything after it shifted"

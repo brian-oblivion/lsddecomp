@@ -824,7 +824,6 @@
         "GameApplicationFileResource": "2026-09-24",
         "ObjMStyleActor": "2026-09-24",
         "PlacementGridVabSound": "2026-09-24",
-        "ScreenWidgets": "2026-09-20",
         "Sprite": "2026-09-25",
         "StageGrid": "2026-09-23",
         "Task": "2026-09-23",
@@ -857,7 +856,8 @@
         "libspu_s_ih": "2026-09-24",
         "main": "2026-09-25",
         "pad": "2026-09-24",
-        "scene_node": "2026-09-23"
+        "scene_node": "2026-09-23",
+        "screen_widgets": "2026-09-20"
       }
     },
     "4": {
@@ -1556,7 +1556,6 @@
         "GameApplicationFileResource": "2026-09-27",
         "ObjMStyleActor": "2026-09-27",
         "PlacementGridVabSound": "2026-09-27",
-        "ScreenWidgets": "2026-09-27",
         "Sprite": "2026-09-27",
         "StageGrid": "2026-09-28",
         "Task": "2026-09-27",
@@ -1582,7 +1581,8 @@
         "libsnd_vmanager": "2026-09-27",
         "main": "2026-09-28",
         "pad": "2026-09-28",
-        "scene_node": "2026-09-28"
+        "scene_node": "2026-09-28",
+        "screen_widgets": "2026-09-27"
       }
     },
     "8": {

@@ -66,7 +66,7 @@ first try.
 Before this generalizes further than warranted: **all five of this
 round's whole-struct-assignment closures are within units descended from
 the same original `Task` monolith** (`Task`, `code_2cc8c_b`,
-`Task`, `ScreenWidgets`, `code_2cc8c_f` -- all carved from one
+`Task`, `screen_widgets`, `code_2cc8c_f` -- all carved from one
 segment across earlier rounds). I have not tried this lever, or seen it
 tried, anywhere outside that family (`entity.c`, `dream_sys.c`,
 `DayTaskStageMap*.c`, etc.), so I cannot personally attest it holds there.
@@ -84,11 +84,11 @@ idiom" and worth stating precisely:
   case should not have closed. It did, on the first attempt, with no
   adjustment.
 - **Two genuinely independent class/vtable families.** `BoxFillPos` copies
-  live in `Obj6EAC0`/`FadeBoxObj` (units `ScreenWidgets`/`_f`); THIS
+  live in `Obj6EAC0`/`FadeBoxObj` (units `screen_widgets`/`_f`); THIS
   function's 3-byte struct lives in `Obj86B60` (unit `Task`,
   matched by a DIFFERENT runner in an EARLIER round before this round's
   fix) while `BoxFill__ApplyColor`'s matching 3-byte case lives in `Obj6EAC0`
-  (unit `ScreenWidgets`) -- so the SAME struct shape closed in two
+  (unit `screen_widgets`) -- so the SAME struct shape closed in two
   unrelated classes, and two DIFFERENT struct shapes closed within the
   same class family. The lever's success does not track any one
   struct's identity or any one class's field layout.
@@ -145,7 +145,7 @@ Byte-identical: whole image green, 0 new warnings, nonmatching green.
 
 Proposed, not applied (header edit, other units): `TaskCore.h`'s `baseColor`,
 `unk93`, `unk96` retyped from `u8[3]` to `BgLayerRgb`, which would drop the
-casts here and in `Task.c`. `ScreenWidgets.c`'s `RGB80040790`
+casts here and in `Task.c`. `screen_widgets.c`'s `RGB80040790`
 (`BoxFill__ApplyColor`) is the same shape (s8 r, g, b, struct-copied); a
 separate job.
 

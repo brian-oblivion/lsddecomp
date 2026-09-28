@@ -171,7 +171,7 @@ division 3, as the round-bravo report already noted. This strengthens
 before spending further hand attempts on expression-level variants of
 the third division alone.
 
-Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::configure` (`+0x0DC`,
+Unit `screen_widgets`, carved round 14. `FadeBoxMethods::configure` (`+0x0DC`,
 shared verbatim with `ClassEAC0Methods::configure`).
 
 ## Shape

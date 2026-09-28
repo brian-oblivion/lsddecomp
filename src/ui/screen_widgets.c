@@ -1,5 +1,5 @@
 /*
- * ScreenWidgets -- the screen widgets FadeBox, BoxFill and TextRow, and three
+ * screen_widgets -- the screen widgets FadeBox, BoxFill and TextRow, and three
  * full-width Shift-JIS string helpers.
  *
  * FadeBox (include/FadeBox.h), New_FadeBox to GetFadeBoxMethods: a BoxFill
