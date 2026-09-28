@@ -1,4 +1,6 @@
-# ObjM__EnterState6
+# ObjM__EnterLinkWall
+
+> Renamed from `ObjM__EnterState6` on 2026-09-28 (tools/rename.py). Address 0x80053c94.
 
 > Renamed from `func_80053C94` on 2026-09-24 (tools/rename.py). Address 0x80053c94.
 
@@ -8,7 +10,7 @@
 ## What it does
 
 ```c
-void ObjM__EnterState6(Obj87034_3bb8c_l *self) {
+void ObjM__EnterLinkWall(Obj87034_3bb8c_l *self) {
     s32 color;
 
     self->unk20 = 6;
@@ -48,7 +50,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 | was | now | tier | evidence |
 | --- | --- | --- | --- |
-| `func_80053C94` | `ObjM__EnterState6` | B | see below |
+| `func_80053C94` | `ObjM__EnterLinkWall` | B | see below |
 
 **Evidence.** vtable slot +0x09C. Sets `self->phase = 6`; same evidence as `ObjM__EnterTimeUp`.
 

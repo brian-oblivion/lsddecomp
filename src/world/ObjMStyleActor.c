@@ -879,7 +879,7 @@ void ObjM__EnterLinkDynamic(ObjM *self) {
     }
 }
 
-void ObjM__EnterState6(ObjM *self) {
+void ObjM__EnterLinkWall(ObjM *self) {
     s32 color;
 
     self->state = 6;

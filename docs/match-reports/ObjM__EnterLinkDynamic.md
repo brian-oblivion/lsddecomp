@@ -46,7 +46,7 @@ void ObjM__EnterLinkDynamic(Obj87034_3bb8c_l *self) {
   padding gap additively.
 - `ObjM__StartFadeUp` is the sibling-unit helper (`ObjMStyleActor`, matched by
   echo round 15) already forward-declared in this file for
-  `ObjM__EnterState6`'s use; that `extern` declaration was moved earlier in the
+  `ObjM__EnterLinkWall`'s use; that `extern` declaration was moved earlier in the
   file (still unit-local, not the shared header) since `ObjM__EnterLinkDynamic`
   (ROM-earlier) now needs it too. No behavior change, pure reordering.
 
