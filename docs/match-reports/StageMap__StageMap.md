@@ -407,3 +407,13 @@ Zero-byte polish, each step verified whole-image:
 - constants: `0x668` -> `STAGE_SLOT_CELLS * sizeof(GridCell *)`, `0x400` -> `STAGE_CELL_SIZE / 2`, `0x800` -> `STAGE_CELL_SIZE`, `0xA400` -> `STAGE_CHUNK_SIZE + STAGE_CELL_SIZE / 2` (all include/StageMap.h), `0x80000000` -> Sony's `GsDOFF`, the `setLightMode` 1 annotated `GsFOG` (SceneNode__SetLightMode's 3-bit field at bit 3, as in Entity.c and ObjMStyleActor.c), `i < 7` -> `ARRAY_COUNT(self->slots)`, `acceptedTags = 0` -> `NULL`;
 - `BMemPMgrAlloc`/`BMemPMgrFree` come from include/BMemPMgr.h; the unit's local externs and their comment ("all still-uncarved elsewhere, typed purely from this call site's own register usage", stale since BMemPMgr.c was carved) are gone.
 - the in-code comment on the wrap test records the 21-positions-per-row fact from "The 21-vs-20 discrepancy" above, without a reading of it.
+
+## History (moved from include/class_3bb8c.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * class_3bb8c.h -- the data and shared helper declarations of the units
+ * carved from the old class_3bb8c segment. The classes those units hold
+```

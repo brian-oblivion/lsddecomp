@@ -88,3 +88,11 @@ what the code is.
  * ones their accessors need. A global only one unit touches stays a local
  * extern in that unit (track 4b, round 85). */
 ```
+
+```c
+ * --vs gFileResourceMethods`); the slot names are FileResource's, which were named for
+ * these occupants. Slot types are FileResource's too. Where the old local
+ * views disagreed (open/close/loadFile/setFlag/stopService returning s32,
+ * read's buf as s32), the occupants return void / take void * and the
+ * bytes did not move when the views were replaced.
+```

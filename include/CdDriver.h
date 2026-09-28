@@ -37,11 +37,9 @@
  * FileResource's size.
  *
  * Every own method is named for its slot (`classtable.py gCdDriverMethods
- * --vs gFileResourceMethods`); the slot names are FileResource's, which were named for
- * these occupants. Slot types are FileResource's too. Where the old local
- * views disagreed (open/close/loadFile/setFlag/stopService returning s32,
- * read's buf as s32), the occupants return void / take void * and the
- * bytes did not move when the views were replaced.
+ * --vs gFileResourceMethods`); the slot names and types are FileResource's:
+ * open/close/loadFile/setFlag/stopService return void and read's buf is
+ * void *.
  *
  * NO FIELDS/SLOTS MACROS: no class lies below 0x13 (`typeviews.py --tree`).
  */

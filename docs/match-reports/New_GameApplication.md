@@ -195,3 +195,14 @@ Moved here from the source, verbatim (names as they stood then, where the tools 
  * correct about the C -- the bytes are what say the original had it too.
  * See docs/match-reports/New_GameApplication.md for the full derivation. */
 ```
+
+## History (moved from include/GameApplicationFileResource.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* The game's allocator, in the uncarved BMemPMgr block. Returns void *
+ * rather than a typed pointer because every New_X in the game calls it
+ * (one argument, confirmed by New_GameApplication.md). */
+```

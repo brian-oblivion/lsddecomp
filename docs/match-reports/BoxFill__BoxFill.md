@@ -63,3 +63,8 @@ what the code is.
 ```c
  * slot's type (FINISHING-PLAN track 4 step 6); a caller reaching the
 ```
+
+```c
+ * FadeBox (gFadeBoxMethods, 0x164, a colour fade over the box; unified in
+ * include/FadeBox.h), whose ctor
+```
