@@ -77,7 +77,7 @@ merely holds a value in transit.
 extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnYChoice1;
 extern s32 gStyleSpawnOffsetX;
-extern s32 gStyleDay;
+extern s32 sStyleDay;
 extern s32 gStyleSpawnOffsetZ;
 extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
@@ -89,7 +89,7 @@ void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1) {
     rand();
     gStyleSpawnOffsetY = gStyleSpawnYChoice1;
     gStyleSpawnOffsetX = (rand() % 20) << 11;
-    mod3 = gStyleDay % 3;
+    mod3 = sStyleDay % 3;
     gStyleSpawnOffsetZ = 0xA000;
     if (mod3 == 1) {
         gStyleSpawnOffsetZ = -0xA000;
@@ -214,7 +214,7 @@ use.
 **`SetupStyleSpawnParamsDayMod7`, tier B.**
 
 The other function-pointer target `StyleFillEffectKind0` dispatches
-through (selected when `gStyleDay % 7 == 0`, the ~1/7 branch). Same
+through (selected when `sStyleDay % 7 == 0`, the ~1/7 branch). Same
 scratch-global cluster as `SetupStyleSpawnParamsRandom`, different constants.
 MATCHED, 87/87, ins 0/del 0.
 

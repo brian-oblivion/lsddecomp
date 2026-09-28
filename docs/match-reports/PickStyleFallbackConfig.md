@@ -17,9 +17,9 @@ fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
 ## New externs
 
 ```c
-extern s32 gStyleDay;         /* already s32 in ObjMStyleActor.c */
+extern s32 sStyleDay;         /* already s32 in ObjMStyleActor.c */
 extern s32 gStyleStage;         /* already s32 in ObjMStyleActor.c and this unit's own StyleScrollVramStrips */
-extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (gStyleDay+gStyleStage)&0xF */
+extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (sStyleDay+gStyleStage)&0xF */
 extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
 extern s32 sStyleConfigIndex;
@@ -45,7 +45,7 @@ void *PickStyleFallbackConfig(void) {
     s32 b2;
     u8 *tab;
 
-    sum = gStyleDay + gStyleStage;
+    sum = sStyleDay + gStyleStage;
     kind = gStyleVariantPicks[sum & 0xF];
     gStyleVariant = kind;
     divisor = gStyleVariantConfigCounts[kind];
@@ -134,7 +134,7 @@ inverted branch; second: explicit default-then-override, byte-exact).
 Literal call site in `ApplyStyleConfig` (ObjMStyleActor.c, already matched):
 `cfg = func_80054758();`, used only when the direct per-`gStyleStage` config
 table entry (`sStyleStageConfigs[gStyleStage]`) is NULL -- i.e. this is the fallback
-path. Body hashes `gStyleDay + gStyleStage` into a 16-entry table to pick
+path. Body hashes `sStyleDay + gStyleStage` into a 16-entry table to pick
 a `gStyleVariant` ("kind"), then a per-variant divisor/remainder select a
 config row. "Fallback" is evidenced by the call site; "kind"/variant
 selection mechanics are evidenced by the body; WHY a fallback is needed, or
@@ -156,6 +156,6 @@ A).
 | `gStyleFlushColor` | `sStyleClearColor` | A | its only reader, StyleUpdateDecorSet, hands the adjusted copy to the viewport's setClearColor. |
 | `gStyleColorTable` | `gStyleDecorColors` | A | the current band colour table: StyleBuildDecorSet colours band i from entry i. |
 | `gStyleKind` | `gStyleStage` | A | RegisterStyleConfig stores its arg1 there, and its one caller, ObjM__InitStyleAndWorld, passes `self->stage`. |
-| `gStyleCounter` | `gStyleDay` | A | RegisterStyleConfig stores its arg3 there; its one caller passes `DreamSys__GetCurrentDayAndYear()` (`currentDay + 1`). |
+| `gStyleCounter` | `sStyleDay` | A | RegisterStyleConfig stores its arg3 there; its one caller passes `DreamSys__GetCurrentDayAndYear()` (`currentDay + 1`). |
 
 Locals: `seed` (day + stage), `variant`, `count`, `index`, `config`, `clearIndex`/`decorIndex` (config bytes 3 and 2), `decorColors`.

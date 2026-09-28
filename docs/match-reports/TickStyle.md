@@ -278,7 +278,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * NAMING PASS, round 72 (runner alpha).  Every function, and the thirteen
  * globals its functions set up or gate on, renamed via `tools/rename.py`,
  * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
- * cluster (`gStyleStage`/`gStyleDay`/`gStyleSceneRefs`/`gStyleVariant`/
+ * cluster (`gStyleStage`/`sStyleDay`/`gStyleSceneRefs`/`gStyleVariant`/
  * `gStyleDecorObj`/`gStyleGrid`/`gStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
  * `ObjMStyleActor.c`'s already-confirmed "Style" subsystem sets

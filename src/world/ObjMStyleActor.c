@@ -1100,7 +1100,7 @@ ObjMMethods *GetObjMMethods(void) {
 extern s32 gStyleGrid;
 extern s32 gStyleStage;
 extern s32 gStyleTickCount;
-extern s32 gStyleDay;
+extern s32 sStyleDay;
 extern s32 sStyleUnreadArg;
 extern s32 gStyleSceneRefs; /* a StyleSceneRefs * (below) */
 extern s32 gStyleVariant;
@@ -1121,7 +1121,7 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
         gStyleStage = stage;
         gStyleSceneRefs = sceneRefs;
         gStyleVariant = -1;
-        gStyleDay = day;
+        sStyleDay = day;
         sStyleUnreadArg = unreadArg;
         gStyleTickCount = 0;
         do {
@@ -1224,7 +1224,7 @@ void ApplyStyleDecorationIfSet(void) {
  * RegisterStyleConfig (previous section), called by ObjM__InitStyleAndWorld
  * and a no-op until StyleTeardown clears gStyleGrid, sets the state read here: gStyleGrid (the
  * scene's StageMap), gStyleStage (ObjM's stage), gStyleSceneRefs (ObjM's
- * sound, resources and viewport; StyleSceneRefs below) and gStyleDay (the
+ * sound, resources and viewport; StyleSceneRefs below) and sStyleDay (the
  * DreamSys day). ApplyStyleConfig then takes the stage's fixed config or,
  * with none, PickStyleFallbackConfig's: a variant (gStyleVariant, 0..3) and
  * a config record picked from day + stage.
@@ -1291,7 +1291,7 @@ void StyleFlushDecoration(void) {
     }
 }
 
-extern s32 gStyleDay;
+extern s32 sStyleDay;
 extern s32 gStyleStage;
 extern s8 gStyleVariantPicks[];
 extern s32 gStyleVariant;
@@ -1319,7 +1319,7 @@ void *PickStyleFallbackConfig(void) {
     s32 decorIndex;
     u8 *decorColors;
 
-    seed = gStyleDay + gStyleStage;
+    seed = sStyleDay + gStyleStage;
     variant = gStyleVariantPicks[seed & 0xF];
     gStyleVariant = variant;
     count = gStyleVariantConfigCounts[variant];
@@ -1599,7 +1599,7 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
         offsetY = gStyleSpawnYChoices[offsetY];
     }
     setup = SetupStyleSpawnParamsDayMod7;
-    if (gStyleDay % 7 != 0) {
+    if (sStyleDay % 7 != 0) {
         setup = SetupStyleSpawnParamsRandom;
     }
     for (i = 0; i < count; i++) {
@@ -1687,7 +1687,7 @@ extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 gStyleSpawnTableIndex;
 
 /* MATCHING: the first colour store goes through a one-field struct, as
- * PtrBoxK3's does, so the gStyleDay load may schedule above it. */
+ * PtrBoxK3's does, so the sStyleDay load may schedule above it. */
 typedef struct S32BoxK2 {
     s32 v; /* +0x000 */
 } S32BoxK2;
@@ -1704,8 +1704,8 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     color = (S32BoxK2 *)gStyleSpawnColors;
     color->v = (s32)gStyleKind2Colors[(u32)r % 3];
     color++;
-    altColor = (gStyleDay / 20) * 20; /* MATCHING: not `% 20`, which jump.c folds */
-    if (gStyleDay != altColor) {
+    altColor = (sStyleDay / 20) * 20; /* MATCHING: not `% 20`, which jump.c folds */
+    if (sStyleDay != altColor) {
         altColor = gStyleKind2AltColor;
     } else {
         altColor = 0;
@@ -1767,7 +1767,7 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     rand();
     gStyleSpawnOffsetY = gStyleSpawnYChoice1;
     gStyleSpawnOffsetX = (rand() % 20) << 11;
-    dayMod3 = gStyleDay % 3;
+    dayMod3 = sStyleDay % 3;
     gStyleSpawnOffsetZ = 40960;
     if (dayMod3 == 1) {
         gStyleSpawnOffsetZ = -40960;

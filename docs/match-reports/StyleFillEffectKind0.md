@@ -148,7 +148,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
         t3 = gStyleSpawnYChoices[t3];
     }
     fp = SetupStyleSpawnParamsDayMod7;
-    if (gStyleDay % 7 != 0) {
+    if (sStyleDay % 7 != 0) {
         fp = SetupStyleSpawnParamsRandom;
     }
     for (i = 0; i < arg1; i++) {
@@ -173,7 +173,7 @@ Every value confirmed directly off the raw bytes:
   `s3` is reused: first as the `%7` magic constant, then unconditionally
   loaded with `&SetupStyleSpawnParamsDayMod7` (filling the `mult`'s latency slot for free),
   then conditionally overwritten to `&SetupStyleSpawnParamsRandom` if
-  `gStyleDay % 7 != 0`. This is the **same shared-dispatch idiom
+  `sStyleDay % 7 != 0`. This is the **same shared-dispatch idiom
   `TickStyle` uses via `ObjAB4C::slotE8`**, except here the two
   candidates are plain functions (not vtable slots), selected by a modulo
   test rather than a self-object's own state.
@@ -239,7 +239,7 @@ literal FIRST argument of `0`. That argument is confirmed (by reading
 object's `kind` field -- so "Kind0" in the name is the literal tag value
 this function passes, not a guessed category. Selects which of two
 "spawn-parameter" setup functions (`SetupStyleSpawnParamsRandom`/`B`) to call each
-iteration via a `gStyleDay % 7` test. STALL, 93/99, whole-function
+iteration via a `sStyleDay % 7` test. STALL, 93/99, whole-function
 3-register rotation; naming from mechanics, unaffected by match state.
 
 ## Track 4 (2026-09-26, round 88, charlie)
@@ -267,7 +267,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
 ```c
 /* Fills arg1 slots with New_StyleEffect(kind 0, ...) objects, first setting
  * up the random style parameters and choosing the per-slot setup function by
- * gStyleDay % 7; returns the next free slot. Matched round 75: arg0 is
+ * sStyleDay % 7; returns the next free slot. Matched round 75: arg0 is
  * the walking pointer itself (a separate `arr = arg0` copy reordered the
  * prologue's argument moves). */
 ```

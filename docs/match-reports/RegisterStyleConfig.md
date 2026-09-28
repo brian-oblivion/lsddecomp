@@ -18,7 +18,7 @@ result.
 extern s32 gStyleGrid;
 extern s32 gStyleStage;
 extern s32 gStyleTickCount;
-extern s32 gStyleDay;
+extern s32 sStyleDay;
 extern s32 sStyleUnreadArg;
 extern s32 gStyleSceneRefs;
 extern s32 gStyleVariant;
@@ -37,7 +37,7 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
         gStyleStage = a1;
         gStyleSceneRefs = a2;
         gStyleVariant = -1;
-        gStyleDay = a3;
+        sStyleDay = a3;
         sStyleUnreadArg = arg4;
         gStyleTickCount = 0;
         do {
