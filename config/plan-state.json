@@ -1605,6 +1605,7 @@
     },
     "9": {
       "checklist": {
+        "nonmatching-clean": true,
         "style": true
       },
       "reason": "",
