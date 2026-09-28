@@ -45,7 +45,7 @@ Renamed from `func_80059384`.
 A pure setter for `heightCurve`. The name describes what the
 pointed-to object is USED as here and nothing more: `DreamSys__ProjectPointAtDistance`
 reads two `DreamSysInterpPoint`s from it (+0x14 and +0x20) and calls
-`InterpolateKeyframeValue(a, b, dist)`, which linearly interpolates their `value`
+`InterpolateYAtZ(a, b, dist)`, which linearly interpolates their `value`
 fields against their `position` fields; the result becomes the Y of a world-space
 point. So the object holds a height-versus-distance curve. `DreamSys__StepLookOffset`
 offsets the far point's value (`endValue`) and `DreamSys__AdvanceMoveCycle` nudges
