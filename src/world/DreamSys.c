@@ -9,7 +9,7 @@
  * 2. The per-tick chain. TimerTick advances the dream clock (Actor's `tick`)
  *    and, at dreamTimeLimit, loads the next flashback or ends the dream;
  *    below the limit it runs UpdateTickState and RunTickCallbacks, which call
- *    the look and move callbacks SelectCallback80/98 install. The look
+ *    the look and move callbacks SelectLookCallback/SelectMoveCallback install. The look
  *    callback is StepLook: two spring-back accumulators, StepLookOffset (the
  *    view height) and StepLookYaw (45 degrees a tick, up to 181, and back).
  *    The move callback is TickDrift or TickMove, the movement state machine
@@ -320,8 +320,8 @@ void DreamSys__ResetLinkState(DreamSys *this, s32 moveMode, s32 tickPeriod) {
     RotationRatios rotation;
 
     this->methods->logChunkMood(this, &this->linkCoordinates);
-    this->methods->selectCallback80(this, LOOK_CALLBACK_STEP_LOOK);
-    this->methods->selectCallback98(this, MOVE_CALLBACK_TICK_MOVE);
+    this->methods->selectLookCallback(this, LOOK_CALLBACK_STEP_LOOK);
+    this->methods->selectMoveCallback(this, MOVE_CALLBACK_TICK_MOVE);
     this->methods->getSetMoveMode(this, moveMode);
 
     this->voiceIndex = -1;
@@ -464,14 +464,14 @@ s32 DreamSys__NoOpSlot12C(DreamSys *this) {
 }
 
 void DreamSys__ClearTickCallbacks(DreamSys *this, bool clearLook) {
-    this->methods->selectCallback98(this, MOVE_CALLBACK_NONE);
+    this->methods->selectMoveCallback(this, MOVE_CALLBACK_NONE);
     if (clearLook)
-        this->methods->selectCallback80(this, LOOK_CALLBACK_NONE);
+        this->methods->selectLookCallback(this, LOOK_CALLBACK_NONE);
 }
 
-void DreamSys__SetTickCallbacks(DreamSys *this, s32 mode98, s32 mode80) {
-    this->methods->selectCallback98(this, mode98);
-    this->methods->selectCallback80(this, mode80);
+void DreamSys__SetTickCallbacks(DreamSys *this, s32 moveMode, s32 lookMode) {
+    this->methods->selectMoveCallback(this, moveMode);
+    this->methods->selectLookCallback(this, lookMode);
 }
 
 void DreamSys__SelectLookCallback(DreamSys *this, s32 mode) {

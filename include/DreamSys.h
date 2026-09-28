@@ -16,7 +16,7 @@
  * DreamSys__TimerTick, the update (+0x098) override, against
  * dreamTimeLimit), the player's movement (the pad handler OnPadEvent,
  * +0x094, sets move/turn/look commands that the tick callbacks installed by
- * SelectCallback80/98 consume), the mood graph (two MoodGraphContributor
+ * SelectLookCallback/SelectMoveCallback consume), the mood graph (two MoodGraphContributor
  * accumulators averaged into a DreamColors value), flashback recording and
  * playback, and the link state machine that ends one stage and starts the
  * next (static wall links, dynamic and instance links, tunnels, staircases,
@@ -90,7 +90,7 @@ enum DreamSysMoveCommand {
  * staircase walk takes about a seventh of the frames in it. */
 #define MOVE_MODE_RUN 4
 
-/* DreamSys::lookCallbackMode: what SelectCallback80 installs in lookCallback. */
+/* DreamSys::lookCallbackMode: what SelectLookCallback installs in lookCallback. */
 enum DreamSysLookCallback {
     LOOK_CALLBACK_NONE = 0,
     LOOK_CALLBACK_STEP_LOOK = 1, /* stepLook */
@@ -98,7 +98,7 @@ enum DreamSysLookCallback {
     LOOK_CALLBACK_SLOT150 = 3    /* an empty slot */
 };
 
-/* DreamSys::moveCallbackMode: what SelectCallback98 installs in moveCallback. */
+/* DreamSys::moveCallbackMode: what SelectMoveCallback installs in moveCallback. */
 enum DreamSysMoveCallback {
     MOVE_CALLBACK_NONE = 0,
     MOVE_CALLBACK_TICK_MOVE = 1, /* tickMove */
@@ -428,7 +428,7 @@ struct DreamSys {
     /* Running delta accumulator paired with lookYawCommand; see DreamSys__StepLookYaw. */
     s32 lookYaw;
     /* Set by DreamSys__SelectMoveCallback(this, arg1) as lookCallback is by
-       SelectCallback80, from a different trio of vtable slots. Called with
+       SelectLookCallback, from a different trio of vtable slots. Called with
        (this) by DreamSys__RunTickCallbacks, if non-NULL. */
     void (*moveCallback)(struct DreamSys *this);
     /* "Mode" field read/written by DreamSys__SelectMoveCallback(this, arg1): when ==2 on
@@ -478,7 +478,7 @@ struct DreamSys {
     s32 driftActive;
     /* Set to 1 by DreamSys__SelectMoveCallback's arg1==2 case, alongside driftActive. */
     s32 cueServiceActive;
-    /* The sound cue drifting runs: SelectCallback98 mode 2 starts it with
+    /* The sound cue drifting runs: SelectMoveCallback mode 2 starts it with
      * soundCueCallback, TickDrift services it, ClearTickCallbacks flushes it. */
     SoundCueSet soundCueSet;
 
@@ -661,12 +661,12 @@ struct DreamSysMethods {
     /* +0x12C */ s32 (*slot12C)(DreamSys *self);  /* DreamSys__NoOpSlot12C */
     /* +0x130 */ void (*clearTickCallbacks)(DreamSys *self, bool arg1); /* DreamSys__ClearTickCallbacks */
     /* +0x134 */ void (*setTickCallbacks)(DreamSys *self, s32 arg1,
-                                          s32 arg2); /* DreamSys__SetTickCallbacks: selectCallback98(arg1), selectCallback80(arg2) */
-    /* +0x138 */ void (*selectCallback80)(DreamSys *self, s32 arg1); /* DreamSys__SelectLookCallback */
-    /* +0x13C */ void (*selectCallback98)(DreamSys *self, s32 arg1); /* DreamSys__SelectMoveCallback */
-    /* +0x140 */ void (*stepLook)(DreamSys *self);                   /* DreamSys__StepLook */
-    /* +0x144 */ void (*stepLookOffset)(DreamSys *self);             /* DreamSys__StepLookOffset */
-    /* +0x148 */ void (*stepLookYaw)(DreamSys *self);                /* DreamSys__StepLookYaw */
+                                          s32 arg2); /* DreamSys__SetTickCallbacks: selectMoveCallback(arg1), selectLookCallback(arg2) */
+    /* +0x138 */ void (*selectLookCallback)(DreamSys *self, s32 arg1); /* DreamSys__SelectLookCallback */
+    /* +0x13C */ void (*selectMoveCallback)(DreamSys *self, s32 arg1); /* DreamSys__SelectMoveCallback */
+    /* +0x140 */ void (*stepLook)(DreamSys *self);                     /* DreamSys__StepLook */
+    /* +0x144 */ void (*stepLookOffset)(DreamSys *self); /* DreamSys__StepLookOffset */
+    /* +0x148 */ void (*stepLookYaw)(DreamSys *self);    /* DreamSys__StepLookYaw */
     /* +0x14C */ void (*slot14C)(DreamSys *self); /* DreamSys__NoOpSlot14C, empty; a lookCallback choice */
     /* +0x150 */ void (*slot150)(DreamSys *self); /* DreamSys__NoOpSlot150, empty; a lookCallback choice */
     /* +0x154 */ s32 (*tickMove)(DreamSys *self);                   /* DreamSys__TickMove */
