@@ -1,4 +1,6 @@
-# TodActor__TickCallbackA
+# TodActor__TickMoveZ
+
+> Renamed from `TodActor__TickCallbackA` on 2026-09-28 (tools/rename.py). Address 0x80066150.
 
 > Renamed from `Class65650__TickCallbackA` on 2026-09-26 (tools/rename.py). Address 0x80066150.
 
@@ -15,7 +17,7 @@ if `self->unk64 == 1` **and** `self->unk68` is set, calls `unk68`'s own
 vtable slot `+0x088` with the literal `6`.
 
 ```c
-void TodActor__TickCallbackA(TodActor *self)
+void TodActor__TickMoveZ(TodActor *self)
 {
     self->methods->slotC4(self, -0x1E, 0);
     if (self->unk64 == 1 && self->unk68 != NULL) {
@@ -48,7 +50,7 @@ before nesting.
 
 Round 75 (charlie), track 3.
 
-- `TodActor__TickCallbackA` (was `func_80066150`), tier B. Occupies +0x118, the callback SelectTickCallback installs for 'A' (InitDefaults' default). Calls slotC4 (Actor__MoveLocalZ) with (-0x1E, 0), and if unk64 == 1 and mainPart is set, mainPart->slot88(6) (Actor__NotifyMove). Neither callee has a purpose name yet, hence B.
+- `TodActor__TickMoveZ` (was `func_80066150`), tier B. Occupies +0x118, the callback SelectTickCallback installs for 'A' (InitDefaults' default). Calls slotC4 (Actor__MoveLocalZ) with (-0x1E, 0), and if unk64 == 1 and mainPart is set, mainPart->slot88(6) (Actor__NotifyMove). Neither callee has a purpose name yet, hence B.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

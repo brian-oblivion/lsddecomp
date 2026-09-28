@@ -438,7 +438,7 @@ void TodActor__DisableTickCallback(TodActor *self) {
     self->tickCallbackEnabled = 0;
 }
 
-void TodActor__TickCallbackA(TodActor *self) {
+void TodActor__TickMoveZ(TodActor *self) {
     self->methods->moveLocalZ(self, TODACTOR_STEP_Z, 0);
     if (self->mainPartNotifies == 1 && self->mainPart != NULL) {
         self->mainPart->methods->notifyWithHull(self->mainPart, ACTOR_EVENT_MOVED_Z);

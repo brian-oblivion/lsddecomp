@@ -18,7 +18,7 @@ calls `this->methods->slotC4(this, -0x1E, 0)`.
 TodActor's vtable (`gTodActorMethods`, `src/code_55dd4.c`) hold the identical
 function (`Actor__MoveLocalZ`) at `+0xC4`, and `TodActor.c`'s own
 `TodActorMethods.slotC4` already documents the exact same call shape
-(`slotC4(self, -0x1E, 0)`, from `TodActor__TickCallbackA`) — so this is not a
+(`slotC4(self, -0x1E, 0)`, from `TodActor__TickMoveZ`) — so this is not a
 coincidence, it is the shared ancestor's method, reached the same way in two
 unrelated classes.
 

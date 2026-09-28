@@ -94,7 +94,7 @@ struct TagCheckArg;  /* onNotify's sender, read only for its table's low id half
     /* +0x10C */ void (*selectTickCallback)(Self *self, s32 which); /* TodActor__SelectTickCallback: TICK_CALLBACK_A..C */ \
     /* +0x110 */ s32 (*enableTickCallback)(Self *self);         /* TodActor__EnableTickCallback */ \
     /* +0x114 */ void (*disableTickCallback)(Self *self);       /* TodActor__DisableTickCallback */ \
-    /* +0x118 */ void *tickCallbackA;                           /* TodActor__TickCallbackA; only the VALUE is read (selectTickCallback) */ \
+    /* +0x118 */ void *tickCallbackA;                           /* TodActor__TickMoveZ; only the VALUE is read (selectTickCallback) */ \
     /* +0x11C */ void *tickCallbackB;                           /* TodActor__TickCallbackB, empty (Entity: Entity__TickSoundCue) */ \
     /* +0x120 */ void *tickCallbackC;                           /* TodActor__TickCallbackC, empty */ \
     /* +0x124 */ void (*playTone)(Self *self, s32 index);       /* TodActor__PlayTone: arg2's playTone(index, 0x6E, 0x6E); not dispatched in C */ \
@@ -175,7 +175,7 @@ void TodActor__Tick(TodActor *self);
 void TodActor__SelectTickCallback(TodActor *self, s32 which);
 s32 TodActor__EnableTickCallback(TodActor *self);
 void TodActor__DisableTickCallback(TodActor *self);
-void TodActor__TickCallbackA(TodActor *self);
+void TodActor__TickMoveZ(TodActor *self);
 void TodActor__TickCallbackB(void);
 void TodActor__TickCallbackC(void);
 void TodActor__PlayTone(TodActor *self, s32 index);
