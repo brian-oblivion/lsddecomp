@@ -215,6 +215,12 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   recoverable from it.** The tell it is a `switch` at all is a range-split `slti`/`sltiu` mid-chain.
   SCOPE: needs at least THREE explicit case values; at two-plus-default, `switch` and `if`-chain are
   byte-identical. (a §"A `switch`'s CASE ORDER is recoverable from the binary")
+- **In a sparse switch the case BODY order still sets each tree node's branch encoding.** The tests
+  come out ascending whatever you write, but the bodies are laid out in source order, so which body
+  sits next to a test decides `bne`-to-end with the body inline versus `beq`-to-body with a store in
+  the delay slot. Discriminator: a polarity-flipped test on one value with the rest byte-exact.
+  Evidence: TickCdStateMachine closed 84/86 to exact with `case CdlDiskError` written first
+  (round 101), and a goto ladder that mirrors GCC's decision tree is that switch, written out.
 - **A genuine `switch` and a logically identical if/else chain are not interchangeable, and neither
   is "the" answer** — a real `switch` moved `_SsStart` 24 -> 65/164 and closed `RegisterRecordTableFiles`
   48/48, while elsewhere a sparse switch beat a chain that would not converge; `if`/`else-if` and a
