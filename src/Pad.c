@@ -9,11 +9,6 @@
  * loadButtonTable copies sDefaultButtonMasks, a fixed table of libetc's
  * mask values, into sButtonMasks, whose order is enum PadButton. The two
  * remaining slots are empty and never called.
- *
- * Edges: Sony objects on both sides, libc2/puts before and libetc/pad
- * after, so the file is exactly this unit. tuboundary.py finds no rodata
- * crossing; its "a forced boundary lies in this stretch" note is satisfied
- * by those Sony edges. Named for its class.
  */
 #include "common.h"
 #include <libetc.h>

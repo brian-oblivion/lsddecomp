@@ -127,3 +127,12 @@ through `BMemPMgrAlloc`, then calls the class's own ctor slot through
 `PadInit`, so `New_Pad`, `Pad__Pad` and the Pad ctor slot now take
 `s32 mode` where the body above says `void *arg1`. Byte-identical; whole-image
 SHA1 unchanged.
+
+## History (moved from src/Pad.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> Edges: Sony objects on both sides, libc2/puts before and libetc/pad
+> after, so the file is exactly this unit. tuboundary.py finds no rodata
+> crossing; its "a forced boundary lies in this stretch" note is satisfied
+> by those Sony edges. Named for its class.
