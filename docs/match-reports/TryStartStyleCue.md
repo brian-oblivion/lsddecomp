@@ -140,10 +140,10 @@ Looks up a nearby record via `FindNextStyleCueInRange`; on success,
 claims it into `arg0->entry`, starts `InitSoundCueSet` on the slot's
 embedded `cueSet`, and toggles the claimed entry's sign tag so it will not
 be picked twice. Called from `TickStyle` for each of the two
-`gStyleCueSlots` when that slot is empty. "TryStart" over a bare "Start"
+`sStyleCueSlots` when that slot is empty. "TryStart" over a bare "Start"
 because failure (returning `NULL`) is a real, handled path, not an error --
 the slot stays empty and `TickStyle` retries next frame (implicit from the
-call site's `gStyleCueSlots[i] = TryStartStyleCue(...)` pattern, no
+call site's `sStyleCueSlots[i] = TryStartStyleCue(...)` pattern, no
 error-log or assert on failure). MATCHED, 45/45.
 
 ## Round 93 polish (delta, track 7)

@@ -10,7 +10,7 @@ before this round.
 Register-once initializer: if `gStyleGrid` (a `.sdata` flag word, zero at
 boot) is already set, return 0. Otherwise stash the 5 arguments (4 in
 registers, 1 on the stack at `0x28($sp)`) into a scatter of `.sbss` globals,
-zero two adjacent words (`D_8008ACA0`, and `gStyleCueSlots` immediately below it
+zero two adjacent words (`D_8008ACA0`, and `sStyleCueSlots` immediately below it
 by pointer decrement), then tail-call `ApplyStyleConfig()` and return its
 result.
 
@@ -54,14 +54,14 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
 ## Two levers, both worth generalizing
 
 1. **The 2-word zero loop is NOT two scalar assignments.** Writing
-   `D_8008ACA0 = 0; gStyleCueSlots = 0;` directly compiles to two `gp_rel` stores
+   `D_8008ACA0 = 0; sStyleCueSlots = 0;` directly compiles to two `gp_rel` stores
    (both symbols are `.sbss`, both are in `config/gp-symbols.txt`) -- a
    completely different, shorter instruction sequence than retail's
    absolute-address `lui`/`addiu` pointer with a decrementing `do`/`while`
    loop. `tools/m2ctx.py --run` was decisive here: it recovers the loop shape
    (`s32 *p = &D_8008ACA0; do { *p = 0; i--; p--; } while (i >= 0);`)
    directly from the asm, which a from-scratch reading of two adjacent `sw`s
-   would not suggest. **`gStyleCueSlots` is never named in the C** -- it is
+   would not suggest. **`sStyleCueSlots` is never named in the C** -- it is
    reached purely by decrementing `p` from `&D_8008ACA0`, relying on the
    linker's real (fixed, splat-derived) placement of the two words adjacent
    in `.sbss`.
@@ -88,10 +88,10 @@ produce, and the difference changes the instruction count.
 
 ## Track 7 (2026-09-27, round 98, delta)
 
-- The zeroing loop no longer reaches `gStyleCueSlots` through
+- The zeroing loop no longer reaches `sStyleCueSlots` through
   `D_8008ACA0`, which is only splat's label for the SECOND of its two
-  slots: `extern void *gStyleCueSlots[2]` and
-  `slot = &gStyleCueSlots[ARRAY_COUNT(gStyleCueSlots) - 1]` link to the
+  slots: `extern void *sStyleCueSlots[2]` and
+  `slot = &sStyleCueSlots[ARRAY_COUNT(sStyleCueSlots) - 1]` link to the
   same address, and the loop shape (the lever above) is kept. Byte-exact.
 - Parameters `a0..a3, arg4` are `grid, stage, sceneRefs, day, unreadArg`
   (ObjM__InitStyleAndWorld passes the StageMap, its stage, &ctorSound and

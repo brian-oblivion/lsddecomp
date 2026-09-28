@@ -35,7 +35,7 @@ worth translating).
 
 **The lever, translated and verified against the REAL build (not just the
 scaffold):** a dead `i++; i--;` pair, placed as the LAST two statements
-inside the `if (gStyleCueSlots[i] != 0) { ... }` arm (after the
+inside the `if (sStyleCueSlots[i] != 0) { ... }` arm (after the
 `ServiceStyleCueIfNear`/`FlushStyleCue` handling, before that arm's closing brace),
 perturbs GCC 2.6.3's register allocator enough to swap `ctx`/`i` back into
 retail's colours -- with zero net effect on either variable's value at any
@@ -194,12 +194,12 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     StyleScrollVramStrips();
     sStyleCueRecordIndex = 0;
     for (i = 0; i < 2; i++) {
-        if (gStyleCueSlots[i] != 0) {
-            if (ServiceStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
-                gStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(gStyleCueSlots[i]);
+        if (sStyleCueSlots[i] != 0) {
+            if (ServiceStyleCueIfNear(sStyleCueSlots[i], ctx, arg1) == 0) {
+                sStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(sStyleCueSlots[i]);
             }
         } else {
-            gStyleCueSlots[i] = TryStartStyleCue((ObjN14 *) (sStyleCueSlotPool + i * 0x68), &arg2, ctx, arg1);
+            sStyleCueSlots[i] = TryStartStyleCue((ObjN14 *) (sStyleCueSlotPool + i * 0x68), &arg2, ctx, arg1);
         }
     }
     return arg2;
@@ -251,7 +251,7 @@ residue); reverted to the best body and restored `INCLUDE_ASM`.
 The per-frame orchestrator: on the FIRST call (`gStyleTickCount++ == 0`)
 runs `ApplyStyleDecorationIfSet`/`StyleBuildDecorSet`/`StyleBuildEffectSlots`
 (one-time setup), then every call runs `StyleUpdateDecorSet`/
-`StyleUpdateEffectSlots`/`StyleScrollVramStrips` and the two `gStyleCueSlots`
+`StyleUpdateEffectSlots`/`StyleScrollVramStrips` and the two `sStyleCueSlots`
 flush-or-start steps. Called from `src/world/ObjMStyleActor.c`'s `ObjM__TickStyle`
 (the call this unit had already forward-declared as its own entry point),
 which is a genuine per-tick call site -- the evidence for "Tick" over a
@@ -294,7 +294,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * StyleEffect "effect slots" array (`gStyleEffectSlots`, include/
  * StyleEffect.h, `New_StyleEffect`-allocated, kind-tagged 0..3 by
  * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
- * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
+ * positional sound-cue subsystem (`sStyleCueSlots`, `TryStartStyleCue`/
  * `FindNextStyleCueInRange`/`FlushStyleCue`/`ServiceStyleCueIfNear`/
  * `IsStyleCueNear`). `TickStyle` is the per-frame entry point (called from
  * `src/world/ObjMStyleActor.c`); `StyleTeardown` is the scene-exit release of

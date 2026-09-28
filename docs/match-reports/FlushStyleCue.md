@@ -84,4 +84,4 @@ slot, when `ServiceStyleCueIfNear` reports the cue is no longer near). MATCHED,
 
 ### Naming
 
-Round 93: returns `StyleCueSlot *` (always NULL, stored back into gStyleCueSlots) rather than `s32`; FlushSoundCueSet given its real prototype. Parameter `slot`.
+Round 93: returns `StyleCueSlot *` (always NULL, stored back into sStyleCueSlots) rather than `s32`; FlushSoundCueSet given its real prototype. Parameter `slot`.

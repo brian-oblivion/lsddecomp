@@ -1106,7 +1106,7 @@ extern s32 gStyleSceneRefs; /* a StyleSceneRefs * (below) */
 extern s32 gStyleVariant;
 /* StyleCueSlot is defined with the cue functions below; this only clears the slots. */
 typedef struct StyleCueSlot StyleCueSlot;
-extern StyleCueSlot *gStyleCueSlots[2];
+extern StyleCueSlot *sStyleCueSlots[2];
 
 extern void *ApplyStyleConfig(void);
 
@@ -1115,8 +1115,8 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
     s32 i;
 
     if (gStyleGrid == 0) {
-        i = ARRAY_COUNT(gStyleCueSlots) - 1;
-        slot = &gStyleCueSlots[ARRAY_COUNT(gStyleCueSlots) - 1];
+        i = ARRAY_COUNT(sStyleCueSlots) - 1;
+        slot = &sStyleCueSlots[ARRAY_COUNT(sStyleCueSlots) - 1];
         gStyleGrid = grid;
         gStyleStage = stage;
         gStyleSceneRefs = sceneRefs;
@@ -1241,7 +1241,7 @@ void ApplyStyleDecorationIfSet(void) {
  *    built from one parameter block, gStyleSpawnOffsetX..gStyleSpawnColors,
  *    that StyleFillEffectKindN and SetupStyleSpawnParamsRandom/B fill in; each
  *    tick updates them with the target position;
- *  - two positional sound cues (gStyleCueSlots, in sStyleCueSlotPool): a
+ *  - two positional sound cues (sStyleCueSlots, in sStyleCueSlotPool): a
  *    free slot claims the next record of the stage's cue list that lies
  *    within its cue's distance of the target and starts the record's
  *    SoundCueSet callback (sStyleCueCallbacks, next section); a claimed
@@ -1556,7 +1556,7 @@ struct StyleCueSlot {
 extern StyleCueSlot *FlushStyleCue(StyleCueSlot *slot);
 
 extern s32 gStyleGrid; /* a StageMap */
-extern StyleCueSlot *gStyleCueSlots[2];
+extern StyleCueSlot *sStyleCueSlots[2];
 
 /* Releases everything TickStyle built and unregisters the scene. */
 void StyleTeardown(void) {
@@ -1565,8 +1565,8 @@ void StyleTeardown(void) {
     StyleFlushDecoration();
     StyleReleaseDecorSet();
     StyleReleaseEffectSlots();
-    for (i = 0; i < ARRAY_COUNT(gStyleCueSlots); i++) {
-        gStyleCueSlots[i] = FlushStyleCue(gStyleCueSlots[i]);
+    for (i = 0; i < ARRAY_COUNT(sStyleCueSlots); i++) {
+        sStyleCueSlots[i] = FlushStyleCue(sStyleCueSlots[i]);
     }
     if (gStyleGrid != 0) {
         gStyleGrid = 0; /* RegisterStyleConfig registers only while this is 0 */
@@ -1974,16 +1974,16 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     StyleUpdateEffectSlots(target);
     StyleScrollVramStrips();
     sStyleCueRecordIndex = 0;
-    for (i = 0; i < ARRAY_COUNT(gStyleCueSlots); i++) {
-        if (gStyleCueSlots[i] != 0) {
-            if (ServiceStyleCueIfNear(gStyleCueSlots[i], target, unused) == 0) {
-                gStyleCueSlots[i] = FlushStyleCue(gStyleCueSlots[i]);
+    for (i = 0; i < ARRAY_COUNT(sStyleCueSlots); i++) {
+        if (sStyleCueSlots[i] != 0) {
+            if (ServiceStyleCueIfNear(sStyleCueSlots[i], target, unused) == 0) {
+                sStyleCueSlots[i] = FlushStyleCue(sStyleCueSlots[i]);
             }
             /* MATCHING: a no-op pair that gives target/i retail's registers */
             i++;
             i--;
         } else {
-            gStyleCueSlots[i] = TryStartStyleCue(&sStyleCueSlotPool[i], &lastCue, target, unused);
+            sStyleCueSlots[i] = TryStartStyleCue(&sStyleCueSlotPool[i], &lastCue, target, unused);
         }
     }
     return lastCue;

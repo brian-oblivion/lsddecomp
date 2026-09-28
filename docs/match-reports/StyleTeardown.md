@@ -23,8 +23,8 @@ jal   StyleFlushDecoration
 jal   StyleReleaseDecorSet
  addu $s1, $zero, $zero
 jal   StyleReleaseEffectSlots
-lui   $s0, %hi(gStyleCueSlots)
-addiu $s0, $s0, %lo(gStyleCueSlots)
+lui   $s0, %hi(sStyleCueSlots)
+addiu $s0, $s0, %lo(sStyleCueSlots)
 .L80054D5C:
 lw    $a0, 0x0($s0)
 jal   FlushStyleCue
@@ -42,18 +42,18 @@ jr $ra
 ```
 
 Calls the three just-matched one-shot-flag helpers unconditionally, then
-loops twice over `gStyleCueSlots[i]`, replacing each element with
+loops twice over `sStyleCueSlots[i]`, replacing each element with
 `FlushStyleCue`'s return (`FlushStyleCue` always returns 0, so this clears
 the two-slot array), then clears the `gStyleGrid` flag if set. Since
 `FlushStyleCue` is defined later in this unit (higher ROM address) but
 called here, it needs a forward declaration -- matching the pattern already
 used for `ObjM__StartFadeUp` in `src/world/ObjMStyleActor.c`.
 
-`gStyleCueSlots` holds two elements of a local per-unit type introduced here,
+`sStyleCueSlots` holds two elements of a local per-unit type introduced here,
 `ObjN14` (named for its two accessed fields: `unk0`, address-taken then
 chased for a byte at `+0x6`; `unk14`, only ever address-taken and handed to
 `FlushSoundCueSet`/`ServiceSoundCueSet` by `FlushStyleCue` and `ServiceStyleCueIfNear`
-respectively -- see their own reports). `gStyleCueSlots` is `.sbss`
+respectively -- see their own reports). `sStyleCueSlots` is `.sbss`
 (`asm/data/7B46C.sbss.s`), adjacent to the other `D_8008ACxx` globals this
 class family already uses.
 
@@ -74,7 +74,7 @@ struct ObjN14 {
 extern s32 FlushStyleCue(ObjN14 *arg0);
 
 extern s32 gStyleGrid;
-extern ObjN14 *gStyleCueSlots[2];
+extern ObjN14 *sStyleCueSlots[2];
 
 void StyleTeardown(void) {
     s32 i;
@@ -83,7 +83,7 @@ void StyleTeardown(void) {
     StyleReleaseDecorSet();
     StyleReleaseEffectSlots();
     for (i = 0; i < 2; i++) {
-        gStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(gStyleCueSlots[i]);
+        sStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(sStyleCueSlots[i]);
     }
     if (gStyleGrid != 0) {
         gStyleGrid = 0;
@@ -91,7 +91,7 @@ void StyleTeardown(void) {
 }
 ```
 
-An ordinary indexed `for` loop over `gStyleCueSlots[i]` compiled to retail's
+An ordinary indexed `for` loop over `sStyleCueSlots[i]` compiled to retail's
 pointer-increment loop (`$s0 += 4` each iteration) with no rewriting needed
 -- GCC 2.6.3 -O2 does that strength reduction on its own here.
 
@@ -107,7 +107,7 @@ before.
 **`StyleTeardown`, tier B.**
 
 Calls `StyleFlushDecoration`, `StyleReleaseDecorSet`, `StyleReleaseEffectSlots`
-unconditionally, then flushes both `gStyleCueSlots[2]` entries via
+unconditionally, then flushes both `sStyleCueSlots[2]` entries via
 `FlushStyleCue`, then clears `gStyleGrid`. Called from
 `src/world/ObjMStyleActor.c`'s `ObjM__TeardownStyle` (itself calling `self->methods->slot84`
 and `ReleaseDreamAuxEntities()`, an end-of-scene-style teardown), which is the

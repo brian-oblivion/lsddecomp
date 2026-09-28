@@ -14,7 +14,7 @@ Fills `arg1` slots of the array at `arg0` (advancing it by one pointer each
 time) with `New_StyleEffect(...)` results, and returns the pointer one past
 the last slot written -- the classic "array fill, return next free slot"
 idiom (matches this unit's already-established preference for that shape;
-see `StyleTeardown`'s per-index rewrite of `gStyleCueSlots`).
+see `StyleTeardown`'s per-index rewrite of `sStyleCueSlots`).
 
 ## New externs
 
