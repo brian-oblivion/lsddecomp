@@ -398,7 +398,7 @@ bool IsDayInPeriodPhase(s32 day, s32 phase) {
 }
 
 /* One placement: the cell (column, row) inside the chunk, a yaw from
- * gDreamAuxSpawnRotations and an offset inside the cell from
+ * sDreamAuxSpawnRotations and an offset inside the cell from
  * sDreamAuxPosTable. */
 typedef struct {
     u16 cell;
@@ -422,7 +422,7 @@ typedef struct {
 extern DreamAuxPos6 sDreamAuxPosTable[];
 
 /* Ratio16 degree triples: yaw 0, -90, +90 and 180. */
-extern Ratio16 gDreamAuxSpawnRotations[][3];
+extern Ratio16 sDreamAuxSpawnRotations[][3];
 
 /* Makes an Entity of mood row `moodIndex`, turns it and attaches it at
  * placement `spawnIndex` of `trigger`'s chunk. True when New_Entity failed. */
@@ -446,7 +446,7 @@ bool SpawnDreamAuxTriggerEntity(s32 moodIndex, void *desc, DreamAuxTriggerEntry 
         cellDesc.offset = sDreamAuxPosTable[spawn->offsetIndex];
 
         gDreamAuxStageMap->methods->computeCellOffsets(gDreamAuxStageMap, worldPos, &cellDesc);
-        entity->methods->updateRotation(entity, 1, gDreamAuxSpawnRotations[spawn->rotationIndex]);
+        entity->methods->updateRotation(entity, 1, sDreamAuxSpawnRotations[spawn->rotationIndex]);
         ((TodActorAttachToParentFn)entity->methods->attachToParent)(
             (TodActor *)entity, (TodActor *)gDreamAuxWorld, sDreamAuxFrameClock,
             (void *)gDreamAuxStageMap, worldPos);

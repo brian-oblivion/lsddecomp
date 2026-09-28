@@ -41,7 +41,7 @@ typedef struct {
 } DreamAuxPos6;
 
 extern DreamAuxPos6 sDreamAuxPosTable[];
-extern u8 gDreamAuxSpawnRotations[];
+extern u8 sDreamAuxSpawnRotations[];
 
 typedef void (*DreamAuxObjFn11)(DreamAuxObj *self, s32 arg1, void *arg2);
 typedef void (*DreamAuxObjFn3A)(DreamAuxObj *self, void *arg1, void *arg2);
@@ -67,7 +67,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 
         obj = (DreamAuxObj *)gDreamAuxStageMap;
         ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
-        ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, gDreamAuxSpawnRotations + rec->val2 * 12);
+        ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, sDreamAuxSpawnRotations + rec->val2 * 12);
         ((DreamAuxObjFn13)entity->vtable[0x13])(entity, gDreamAuxWorld, sDreamAuxFrameClock, (void *)gDreamAuxStageMap, outBuf);
         return false;
     }
@@ -181,7 +181,7 @@ through the s16 field is byte-identical). The local cell descriptor
 is StageMap.h's Descriptor10 as computeCellOffsets reads it: `chunk` (the
 chunk's column/row), `cell` (DreamAuxSpawnInfo.cell, was val0), `offset`
 (sDreamAuxPosTable[offsetIndex], was posIndex). D_80088F18 was renamed
-gDreamAuxSpawnRotations (tools/rename.py, tier A): four Ratio16 triples,
+sDreamAuxSpawnRotations (tools/rename.py, tier A): four Ratio16 triples,
 yaw 0, -90, +90, 180, typed Ratio16[][3] and indexed by rotationIndex (was
 val2) instead of `+ val2 * 12`. outBuf -> worldPos. Byte-identical.
 
