@@ -92,7 +92,7 @@ methods: every kind attaches under the parent at pos + params.offset
 y change since it was built (UpdateByKind); what it carries is chosen by
 `kind` (a model, the model with two copies in a row, or five sprites). Its
 only creator is the style layer's effect-slot code (StyleFillEffectKind0..3
-into gStyleEffectSlots), whose vocabulary the name reuses. What an effect is
+into sStyleEffectSlots), whose vocabulary the name reuses. What an effect is
 in the game is not shown. The kinds became `enum StyleEffectKind` in
 include/StyleEffect.h (MODEL_ROW, MODEL, SPRITES, JITTER_SPRITES), from what
 each switch arm in ObjMStyleActor.c does; the switches still spell numbers.

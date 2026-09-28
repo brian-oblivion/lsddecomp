@@ -27,7 +27,7 @@ extern void StyleFillEffectKind2(void *arg0, void *arg1);                   /* f
 `void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3)`; this
 call site only needs the ABI shape (`s32,void*,s32,s32`), matching the
 project's convention of a looser cross-unit local signature. `gStyleVariant`,
-`gStyleSceneRefs`, `sStyleEffectSlotCount` and `gStyleEffectSlots` are fresh copies of externs
+`gStyleSceneRefs`, `sStyleEffectSlotCount` and `sStyleEffectSlots` are fresh copies of externs
 already declared later in this file, needed here because this function's
 ROM address is earlier (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`).
 
@@ -48,7 +48,7 @@ void StyleBuildEffectSlots(void *arg0) {
     val = gStyleKind0Counts[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
     sStyleEffectSlotCount = val + count;
-    filled = (void **) StyleFillEffectKind0(gStyleEffectSlots, val, arg0);
+    filled = (void **) StyleFillEffectKind0(sStyleEffectSlots, val, arg0);
     filled = StyleFillEffectKind1(filled, count, arg0);
     if (gStyleVariant == 0) {
         StyleFillEffectKind3(filled, arg0);
@@ -86,17 +86,17 @@ in the `else` reproduces that skip.
 **`StyleBuildEffectSlots`, tier B.**
 
 Dispatches on `gStyleVariant` (`PickStyleFallbackConfig`'s "kind") to
-`SetStyleEffectSources`, then fills `gStyleEffectSlots` via
+`SetStyleEffectSources`, then fills `sStyleEffectSlots` via
 `StyleFillEffectKind0`/`StyleFillEffectKind1`, then finishes via
 `StyleFillEffectKind3` (variant 0) or `StyleFillEffectKind2` (variant 2).
 The build/update/release triad naming mirrors `StyleBuildDecorSet` above,
-for the SEPARATE `gStyleEffectSlots` array (a different object class --
+for the SEPARATE `sStyleEffectSlots` array (a different object class --
 `Obj876FC`, allocated through `ObjMStyleActor.c`'s `New_StyleEffect`, not
 `New_BoxFill`). MATCHED, 60/60, first build.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` retyped `void *[]` -> `StyleEffect *[]` (every element is a New_StyleEffect object); ReleaseBasicClassArray takes it as `(void **)`. Image byte-identical.
+`sStyleEffectSlots` retyped `void *[]` -> `StyleEffect *[]` (every element is a New_StyleEffect object); ReleaseBasicClassArray takes it as `(void **)`. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 

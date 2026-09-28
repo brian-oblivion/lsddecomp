@@ -18,7 +18,7 @@
  * first calls SetStyleEffectSources with the scene's DREAMER.TMD resource,
  * ETC.TIM image and viewport (gStyleEffectTmd, gStyleEffectTim,
  * gStyleEffectViewport), then StyleFillEffectKind0..3 fill
- * gStyleEffectSlots with New_StyleEffect(kind, params, gStyleGrid, pos):
+ * sStyleEffectSlots with New_StyleEffect(kind, params, gStyleGrid, pos):
  * several of kind 0, of kind 1 for variant 2, then one of kind 3 (variant 0)
  * or kind 2 (variant 2). `params` is one StyleEffectParams laid over the
  * separately-declared gStyleSpawnOffsetX .. gStyleSpawnColors, which the

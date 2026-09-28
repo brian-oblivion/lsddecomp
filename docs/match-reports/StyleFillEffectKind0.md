@@ -116,7 +116,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);
 
 Already forward-declared this way at the call site in `StyleBuildEffectSlots`
 (matched, this unit, earlier round): `filled = (void **)
-StyleFillEffectKind0(gStyleEffectSlots, val, arg0);`. `arg1` is the loop bound, `arg0` is
+StyleFillEffectKind0(sStyleEffectSlots, val, arg0);`. `arg1` is the loop bound, `arg0` is
 the output array walked and returned one slot advanced (the same
 "array-fill, return next slot" idiom as `StyleFillEffectKind1`/`StyleFillEffectKind3`/
 `StyleFillEffectKind2`), `arg2` is passed through unchanged to every callee.
@@ -232,7 +232,7 @@ runner/round rather than re-deriving the structure.
 
 **`StyleFillEffectKind0`, tier B.**
 
-Fills `arg1` slots of `gStyleEffectSlots` by repeatedly calling
+Fills `arg1` slots of `sStyleEffectSlots` by repeatedly calling
 `ObjMStyleActor.c`'s `New_StyleEffect` (New_X for the `Obj876FC` class) with a
 literal FIRST argument of `0`. That argument is confirmed (by reading
 `New_StyleEffect`'s own ctor chain, `ObjMStyleActor.c`) to become the new
@@ -244,7 +244,7 @@ iteration via a `sStyleDay % 7` test. STALL, 93/99, whole-function
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`gStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+`sStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 

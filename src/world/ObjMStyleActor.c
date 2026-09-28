@@ -1237,7 +1237,7 @@ void ApplyStyleDecorationIfSet(void) {
  *    box; every tick StyleUpdateDecorSet shifts their colours, their
  *    position and the viewport's clear colour by the view point's y offset
  *    from its reference point;
- *  - the effect slots: StyleEffect objects of kinds 0..3 (gStyleEffectSlots)
+ *  - the effect slots: StyleEffect objects of kinds 0..3 (sStyleEffectSlots)
  *    built from one parameter block, gStyleSpawnOffsetX..gStyleSpawnColors,
  *    that StyleFillEffectKindN and SetupStyleSpawnParamsRandom/B fill in; each
  *    tick updates them with the target position;
@@ -1469,7 +1469,7 @@ extern s32 gStyleSceneRefs;
 extern s32 rand(void);
 extern s8 gStyleKind0Counts[];
 extern s32 sStyleEffectSlotCount;
-extern StyleEffect *gStyleEffectSlots[];
+extern StyleEffect *sStyleEffectSlots[];
 extern StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos);
 extern StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos);
 extern StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos);
@@ -1494,7 +1494,7 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     kind0Count = gStyleKind0Counts[rand() & 3];
     kind1Count = (gStyleVariant == 2) ? STYLE_VARIANT2_EFFECTS - kind0Count : 0;
     sStyleEffectSlotCount = kind0Count + kind1Count;
-    next = StyleFillEffectKind0(gStyleEffectSlots, kind0Count, pos);
+    next = StyleFillEffectKind0(sStyleEffectSlots, kind0Count, pos);
     next = StyleFillEffectKind1(next, kind1Count, pos);
     if (gStyleVariant == 0) {
         StyleFillEffectKind3(next, pos);
@@ -1519,7 +1519,7 @@ void StyleUpdateEffectSlots(LongVec3 *pos) {
         return;
     }
     for (i = 0; i < sStyleEffectSlotCount; i++) {
-        slot = gStyleEffectSlots[i];
+        slot = sStyleEffectSlots[i];
         ((StyleEffectUpdateFn)slot->methods->setPendingExtra)(slot, pos);
     }
 }
@@ -1530,7 +1530,7 @@ extern s32 sStyleEffectSlotCount;
 /* Releases the effect slots, if StyleBuildEffectSlots ran. */
 void StyleReleaseEffectSlots(void) {
     if (gStyleVariant >= 0) {
-        ReleaseBasicClassArray((void **)gStyleEffectSlots, sStyleEffectSlotCount);
+        ReleaseBasicClassArray((void **)sStyleEffectSlots, sStyleEffectSlotCount);
     }
 }
 
