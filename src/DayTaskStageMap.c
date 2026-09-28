@@ -1,23 +1,46 @@
 /*
- * DayTaskStageMap -- the methods of DayTask and of most of its parent TimedTask,
- * with one free function between them.
+ * DayTaskStageMap -- the dream day's task and the stage map it builds: DayTask,
+ * RegisterRecordTableFiles, TimedTask (DayTask's parent, and ObjM's) and
+ * StageMap, in that ROM order.
  *
  * DayTask (include/DayTask.h), New_DayTask through GetDayTaskMethods: the
  * task GameApplication__RunDayTask runs for one dream day. Its ctor loads
  * the day's shared resources (ETC\ETC.TIM, ETC\DREAMER.TMD, the week's
- * BGM) and fills the init args' viewport, frame clock and light rig; on each
- * DrawSystem VSync DayTask__AdvancePhase starts the day or replaces the
- * running ObjM, and DayTask__OnObjMNotify turns ObjM's states into the next
- * phase or the task's result.
+ * BGM) and fills the init args' viewport (a NodeGuardedViewport), frame
+ * clock and light rig (a StageMap); on each DrawSystem VSync
+ * DayTask__AdvancePhase starts the day or replaces the running ObjM, and
+ * DayTask__OnObjMNotify turns ObjM's states into the next phase or the
+ * task's result.
  *
  * RegisterRecordTableFiles: registers gRecordTable's file entries with the
  * CD driver in at most two batches (DayTask's ctor, and the loader-task
  * callback in GameApplicationFileResource.c).
  *
  * TimedTask (include/TimedTask.h), New_TimedTask through
- * TimedTask__SetTimeout: an IntermediateBase with a frame timeout, a sound
- * object and a result. Its last two functions, TimedTask__PlaySound and
- * GetTimedTaskMethods, open class_3ac78.
+ * GetTimedTaskMethods: an IntermediateBase with a frame timeout, a sound
+ * object and a result.
+ *
+ * StageMap (include/StageMap.h, whose banner describes the class),
+ * New_StageMap through GetStageMapMethods: the loaded part of a stage's
+ * map, seven chunk slots each laid out as a lattice of GridCells. Its
+ * methods fall in three runs, each introduced below: life and the command
+ * path; placing, loading and querying the slots; the drawn window and the
+ * scale ramp. Its data tables and SplitCoord2 are in include/class_3bb8c.h.
+ *
+ * What decided its edges (python3 tools/tuboundary.py): the start is
+ * "start edge possible" after StageGrid.c, which follows the placed Sony
+ * object libc2/rand; the binary is silent there and content keeps the two
+ * apart (StageGrid's free lookups, then DayTask). The forced boundary noted
+ * on DayTask's early gaps is the jump-table pair 0x80011290 / 0x8001140c,
+ * whose interval runs from Sprite.c to DayTask__OnObjMNotify across placed
+ * Sony objects, so it forces nothing here. Inside, it was four carve
+ * slices (class_39e08, class_3ac78, class_3bb8c, class_3bb8c_b), merged
+ * because a class straddled each edge: TimedTask the first (PlaySound and
+ * the getter opened class_3ac78, "start edge possible"), StageMap the other
+ * two ("start edge possible, soft-unlikely" at both). The end is "start edge
+ * possible" before TitleMenuTaskObjF.c and nothing straddles it; see that
+ * file's banner for why NodeGuardedViewport and GridCell, which content
+ * would put here, sit there.
  */
 #include "common.h"
 #include <libgte.h>
@@ -364,13 +387,9 @@ void TimedTask__SetTimeout(TimedTask *self, s32 timeout) {
     self->timeoutFrames = (timeout < 0) ? timeout : timeout * TIMEDTASK_TIMEOUT_UNIT_FRAMES;
 }
 
-/* ---- merged from class_3ac78 ---- */
-
 /*
- * class_3ac78 -- TimedTask's last two functions (TimedTask__PlaySound and
- * GetTimedTaskMethods, include/TimedTask.h; the rest are in DayTaskStageMap),
- * then the front third of StageMap (include/StageMap.h): the loaded part of
- * a stage's map, seven chunk slots each laid out as a lattice of GridCells.
+ * TimedTask's last two functions, then the front third of StageMap's
+ * methods.
  *
  * This third holds the object's life and its command path: the allocator
  * and ctor (seven slots, each an LbdFile, a placement list, a cellParent
@@ -828,16 +847,11 @@ void StageMap__SetConfig(StageMap *self, StageGridDimensions *config) {
     self->config = config;
 }
 
-/* ---- merged from class_3bb8c ---- */
-
 /*
- * class_3bb8c -- the middle of StageMap's methods (include/StageMap.h, whose
- * banner describes the class): placing a cell descriptor in the world,
+ * The middle of StageMap's methods: placing a cell descriptor in the world,
  * loading the seven chunk slots around a centre chunk, linking a loaded
  * chunk into its slot's cells, and the queries that turn a position back
- * into a slot and cell. DayTaskStageMap.c holds the methods before these and
- * class_3bb8c_b.c those after; the class's data tables are declared in
- * include/class_3bb8c.h.
+ * into a slot and cell.
  *
  *  - SetTargetAndLoadChunks, ComputeCellOffsets, ComputeCellWorldOffsets:
  *    a cell descriptor to a world position and the chunk it lies in.
@@ -1445,12 +1459,8 @@ ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
     return 0;
 }
 
-/* ---- merged from class_3bb8c_b ---- */
-
 /*
- * class_3bb8c_b -- StageMap's drawn window and scale ramp: the last of the
- * class's methods (include/StageMap.h; the others are in DayTaskStageMap.c and
- * DayTaskStageMap.c).
+ * StageMap's drawn window and scale ramp: the last of the class's methods.
  *
  *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: which of the seven
  *    slots holds a neighbour key, or a loaded chunk.

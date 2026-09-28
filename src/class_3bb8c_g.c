@@ -2,7 +2,10 @@
  * class_3bb8c_g -- TaskObjF's state machine (include/TaskObjF.h): slots
  * +0x07C..+0x0B0 of gTaskObjFMethods and the table getter, plus
  * StampSaveTitleFileLetter, which writes a save file's letter into its
- * title.
+ * title. TaskObjF's other methods are in TitleMenuTaskObjF.c, and this unit
+ * joins that file (FINISHING-PLAN track 8) once its .rodata line (the two
+ * jump tables) is renamed to it: unitfile.py leaves that yaml edit to the
+ * head.
  *
  * setState (enum TaskObjFState) notifies the parent, swaps the message icon
  * (a ScreenSprite of CARD\<name>.TIM: loadCardIcon, releaseCardIcon) and

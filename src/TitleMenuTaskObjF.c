@@ -1,6 +1,7 @@
 /*
- * TitleMenuTaskObjF -- the constructors and table methods of two small classes,
- * and TitleMenu's allocator and ctor with its two save-title helpers.
+ * TitleMenuTaskObjF -- the menu between days and its memory-card task:
+ * TitleMenu and TaskObjF, led in by the constructors and table methods of
+ * two small classes, NodeGuardedViewport and GridCell.
  *
  * NodeGuardedViewport (include/NodeGuardedViewport.h) is a Viewport whose
  * update skips the frame while no view node is attached or the ordering
@@ -11,12 +12,37 @@
  * calls the ctor through the class's table; the ctor chains the parent's
  * ctor, then installs its own table.
  *
- * TitleMenu (include/TitleMenu.h, a TaskCore) is the menu between days; its
- * other methods are in class_3bb8c_d.c. Two free functions serve it:
+ * TitleMenu (include/TitleMenu.h, a TaskCore) is the menu between days:
+ * its allocator and ctor with two save-title helpers, then its methods and
+ * getter, each run introduced below. Two free functions serve it:
  * UpdateFlashbackLock (called from TitleMenu__RefreshMenu) locks or unlocks
  * the menu's FLASHBACK entry from two words of the save block, and
  * StampSaveTitleDay (called from the ctor with the current day) writes the
  * day as three full-width digits into the save title, "LSD   Day001".
+ *
+ * TaskObjF (include/TaskObjF.h) is the memory-card task TitleMenu's SAVE
+ * and LOAD drive: its allocator and ctor, then its child links, card
+ * events, checks and file probes, then its file I/O, buffers and the two
+ * operations. Its state machine, its getter and StampSaveTitleFileLetter
+ * are still src/class_3bb8c_g.c, pending the head's yaml edit (below).
+ *
+ * What decided its edges (python3 tools/tuboundary.py): it was four carve
+ * slices (class_3bb8c_c, _d, _e, _f), merged because a class straddled
+ * each edge: TitleMenu the first ("start edge possible, soft-unlikely"),
+ * TaskObjF the other two ("start edge possible", then "soft-unlikely").
+ * TaskObjF also straddles the edge to class_3bb8c_g ("soft-unlikely"), but
+ * that unit owns the region's .rodata line (its two jump tables) and this
+ * one owns none, so unitfile.py leaves the merge to the head. The file's
+ * end after class_3bb8c_g is real: the placed Sony object libapi/a51
+ * follows, and it meets the forced boundary tuboundary notes there (jump
+ * tables 0x80011594 / 0x80011628).
+ *
+ * PARKED: the start, after DayTaskStageMap.c, is "start edge possible" and
+ * no class straddles it, but content says the file boundary lies one step
+ * later, between GridCell and TitleMenu: DayTask's ctor makes the
+ * NodeGuardedViewport and StageMap is GridCell's only maker. A split is a
+ * new carve, not a merge or rename, so the carve edge stays and the file
+ * is named for the two classes that make up the rest of it.
  */
 #include "common.h"
 #include <libgte.h>
@@ -188,12 +214,10 @@ void StampSaveTitleDay(s32 day) {
     *(FullWidthChars3 *)&((FullWidthChar *)gSaveTitle)[SAVE_TITLE_DAY] = *(FullWidthChars3 *)sDayDigits;
 }
 
-/* ---- merged from class_3bb8c_d ---- */
-
 /*
- * class_3bb8c_d -- TitleMenu's methods (include/TitleMenu.h; its allocator
- * and ctor are in TitleMenuTaskObjF.c) and its getter, then TaskObjF's
- * allocator and ctor (include/TaskObjF.h).
+ * TitleMenu's methods (include/TitleMenu.h; its allocator and ctor are
+ * above) and its getter, then TaskObjF's allocator and ctor
+ * (include/TaskObjF.h).
  *
  * TitleMenu is the TaskCore menu between days: START, FLASHBACK, SAVE, LOAD,
  * GRAPH and SHAKE over ETC\TITLE.TIM. In ROM order here: finalize, onNotify,
@@ -502,8 +526,6 @@ void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
     TaskObjF__ClearLinks(self);
     self->methods->setCardSlot(self, cardSlot);
 }
-
-/* ---- merged from class_3bb8c_e ---- */
 
 /*
  * TaskObjF's child links, card events, card checks and file probes
@@ -828,8 +850,6 @@ s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
     delete (pathBuf);
     return 1;
 }
-
-/* ---- merged from class_3bb8c_f ---- */
 
 /*
  * TaskObjF's file I/O, card events, load buffers and its two operations

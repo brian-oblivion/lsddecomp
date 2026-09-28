@@ -8,14 +8,14 @@
 #include "DrawSystem.h"
 
 /*
- * class_3bb8c.h -- the data and shared helper declarations of the
- * class_3bb8c* units. The classes those units hold each have their own
- * header, and nothing here redefines them:
+ * class_3bb8c.h -- the data and shared helper declarations of the units
+ * carved from the old class_3bb8c segment. The classes those units hold
+ * each have their own header, and nothing here redefines them:
  *
- *   class_3bb8c, _b    StageMap (include/StageMap.h), the chunk grid manager
- *   TitleMenuTaskObjF      NodeGuardedViewport, GridCell, TitleMenu's ctor
- *   TitleMenuTaskObjF      TitleMenu (include/TitleMenu.h, a TaskCore)
- *   TitleMenuTaskObjF..g   TaskObjF (include/TaskObjF.h), the memory-card task
+ *   DayTaskStageMap    StageMap (include/StageMap.h), the chunk grid manager
+ *   TitleMenuTaskObjF  NodeGuardedViewport, GridCell, TitleMenu
+ *                      (include/TitleMenu.h, a TaskCore), TaskObjF
+ *   class_3bb8c_g      TaskObjF (include/TaskObjF.h), the memory-card task
  *   class_3bb8c_i, _j  TextEntry (include/TextEntry.h)
  *   class_3bb8c_j, _k  ItemList (include/ItemList.h)
  *   class_3bb8c_k..m   ObjM (include/ObjM.h)

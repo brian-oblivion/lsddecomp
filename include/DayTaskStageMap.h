@@ -5,9 +5,9 @@
 #include "DayTask.h"
 
 /*
- * Declarations src/DayTaskStageMap.c uses (DayTask, TimedTask and
- * RegisterRecordTableFiles; the .c's banner says what it holds): the
- * functions it calls that no header it includes declares, and the call-site
+ * Declarations src/DayTaskStageMap.c's DayTask, TimedTask and
+ * RegisterRecordTableFiles use (the .c's banner says what it holds): the
+ * functions they call that no header it includes declares, and the call-site
  * view of the one object it reaches without its class's header. DayTask and
  * TimedTask themselves are include/DayTask.h and include/TimedTask.h.
  */
