@@ -1418,7 +1418,7 @@ segments:
       # never through the caller's frame.
       # Clear of both remainder hazards (zero `jlabel`, zero `jr $t2`), so
       # no rodata slot to attach and no hasm/.word disposition here either.
-      - [0x3DA54, c, class_3bb8c_c]
+      - [0x3DA54, c, TitleMenuTaskObjF]
       # class_3bb8c_d / _e / _f: front of the 305-function class_3bb8c
       # remainder, split into three ~20-function C units in round 14. The
       # tail (#59 onward, 0x403E4) deliberately STAYS asm as class_3bb8c_g

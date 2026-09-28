@@ -38,7 +38,7 @@ matching this unit's own function addresses (each of the 12 fresh
 functions plus the 3 non-`gp_rel` blocked ones appears EXACTLY ONCE, in one
 contiguous table starting at file offset `0x77648` / vram `0x80086E48`,
 slots `+0x048`..`+0x074`). Slots `+0x004`..`+0x03C` belong to
-`class_3bb8c_c`/`class_3bb8c_f` (confirmed by `grep`ping their `.c` files
+`TitleMenuTaskObjF`/`class_3bb8c_f` (confirmed by `grep`ping their `.c` files
 for those function names) -- this round's other two runners sharing
 `include/class_3bb8c.h`.
 
@@ -46,7 +46,7 @@ for those function names) -- this round's other two runners sharing
 -- unlike the single-owner `TitleMenu`/`NodeGuardedViewport`/`GridCell` already
 in this header. Since three units reach into this ONE real table this
 round, an unsuffixed `Class86E00` risks a same-named, differently-shaped
-definition arriving from `class_3bb8c_c` or `class_3bb8c_f` at merge time
+definition arriving from `TitleMenuTaskObjF` or `class_3bb8c_f` at merge time
 with no conflict marker -- the exact round-13 silent-collision hazard the
 shared-header rules exist to prevent. This is a purely additive,
 brand-new struct (nothing existed at these offsets before), so there is

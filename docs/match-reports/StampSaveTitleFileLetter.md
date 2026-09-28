@@ -114,12 +114,12 @@ copies one or more fixed byte ranges out of the `gSaveTitleGlyphs` template into
 the caller's buffer, optionally selecting a table entry via
 `atoi()` on a field of the caller-supplied `src` when one is given. Named
 from its one real caller context established elsewhere in this project
-(`TaskObjF__WriteMemcardSaveFile`, `class_3bb8c_m`, and `class_3bb8c_c`'s
+(`TaskObjF__WriteMemcardSaveFile`, `class_3bb8c_m`, and `TitleMenuTaskObjF`'s
 own call site) -- a memcard save-file writer building the save's on-card
 icon/header block from a shared template. The exact semantic meaning of
 each copied range (icon pixels vs. a formatted date/glyph, per the
 sibling `gSaveTitle`/`DecodeFullWidthSjis` context nearby in
-`class_3bb8c_c.c`) is not established, so this is named for the
+`TitleMenuTaskObjF.c`) is not established, so this is named for the
 mechanism (template copy) plus its one known call context rather than a
 specific claim about pixel vs. text content.
 
@@ -153,7 +153,7 @@ glyph 15). The positions are unit-local `#define`s: SAVE_TITLE_LETTER_FIELD
 SAVE_FILE_NAME_NUMBER 13. Image byte-identical at every step.
 
 The signature stays `s32 (s32, s32)`: it is include/class_3bb8c.h's
-prototype, which class_3bb8c_c.c and class_3bb8c_f.c call with casts.
+prototype, which TitleMenuTaskObjF.c and class_3bb8c_f.c call with casts.
 Proposed: `s32 StampSaveTitleFileLetter(char *title, char *fileName)` there,
 dropping the four casts.
 
@@ -164,7 +164,7 @@ Comments moved out of the source (verbatim):
 - on `gSaveTitleGlyphs`: "VALUE-of `%gp_rel`, round 45's own local view --
   a fixed rodata template (ROM image still-uncarved,
   `asm/data/1C34.rodata.s` region) this function copies raw byte ranges out
-  of; also read by `class_3bb8c_c.c`'s own (differently-typed) local view."
+  of; also read by `TitleMenuTaskObjF.c`'s own (differently-typed) local view."
   (Round 95: no other unit declares it now.)
 - on the three copy types: "Struct-copy helper types for round 45's
   StampSaveTitleFileLetter, all deliberately all-`s8` (alignment 1) per
@@ -209,7 +209,7 @@ structs: the source keeps its one `MATCHING:` line. No existing type in
 `include/` or `src/` named a full-width character (grepped for
 Sjis/FullWidth/Glyph), so these are new and stay unit-local.
 
-`class_3bb8c_c`'s `Buf6_3bb8c_c` (`s8 a..f`, the formatted day number
+`TitleMenuTaskObjF`'s `Buf6_3bb8c_c` (`s8 a..f`, the formatted day number
 copied into the same title at +0x12, characters 9..11) is the same record
 as `FullWidthChars3`: a later job, left untouched here. If a second unit
 takes these types they move to the header that owns the save title
@@ -220,5 +220,5 @@ them. `FullWidthChar`, `FullWidthChars3` and `FullWidthChars6` now live in
 `include/TitleMenu.h` (the save title is TitleMenu's buffer; see
 StampSaveTitleDay.md's track 6 section), unchanged in layout, with the
 `MATCHING:` line kept once there; class_3bb8c_g.c's local definitions are
-deleted and it includes TitleMenu.h. class_3bb8c_c's `Buf6_3bb8c_c` is
+deleted and it includes TitleMenu.h. TitleMenuTaskObjF's `Buf6_3bb8c_c` is
 retired for `FullWidthChars3`. Image byte-identical.

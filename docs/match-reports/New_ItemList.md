@@ -15,10 +15,10 @@ this function's own body never touches; ROUND 75 CORRECTION, see
 `GetTextEntryMethods.md`).
 
 This function ALREADY had an extern declaration in the shared
-`include/class_3bb8c.h` (class_3bb8c_c's own screening, "Address-of only
+`include/class_3bb8c.h` (TitleMenuTaskObjF's own screening, "Address-of only
 in this unit's own screening"), with the correct signature
 `void *New_ItemList(void *arg0, s32 arg1)` -- confirms `arg1` is `s32`
-(class_3bb8c_c's own call site passes a literal `1`), which fixed this
+(TitleMenuTaskObjF's own call site passes a literal `1`), which fixed this
 unit's own ctor-table `+0x008` slot signature to match.
 
 ## Body

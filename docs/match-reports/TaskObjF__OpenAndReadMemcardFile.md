@@ -34,7 +34,7 @@ Also dropped: the `arity-ok` K&R declaration. Both call sites in this unit
 now pass three arguments, so `extern void *BuildMemcardPath(void *dest,
 s32 selector, void *suffix);` is a real prototype and the whole image
 stays byte-exact (TaskObjF__ProbeCardFreeSpace 29/29). `docs/match-reports/BuildMemcardPath.md`
-("Why src/class_3bb8c_c.c must declare it unprototyped") is superseded by
+("Why src/TitleMenuTaskObjF.c must declare it unprototyped") is superseded by
 this -- flagged for the head, not edited.
 
 ```c
@@ -76,7 +76,7 @@ an argument deserve this check.
 
 Previous title: TaskObjF__OpenAndReadMemcardFile — NON_MATCHING body promoted, round 71. Length: 1 word SHORT (40/41, 0xA0/0xA4). Word-match: 1/41 in-range (live-measured round 71, matches rounds 14/19/37 -- the body is structurally right, see below). First real diff: file 0x3F238 / vram 0x8004EA3C.
 
-**Unit:** class_3bb8c_c (round 14, `Node3bb8cE` class). Restored to
+**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class). Restored to
 `INCLUDE_ASM` — see "Why restored" below; this is a correct-LENGTH
 placeholder, not a correct-BYTES one.
 
@@ -115,7 +115,7 @@ address drift caused by ONE MISSING instruction: retail copies `self`
 (`lw $a1, 0xc($v0)`) a few instructions later, rather than reading it
 directly through `$a0` before `$a0` gets reused to hold the local
 buffer's address. My compiled function is 40 words; retail's is 41 —
-confirmed via `objdump -d build/src/class_3bb8c_c.c.o`, which shows my
+confirmed via `objdump -d build/src/TitleMenuTaskObjF.c.o`, which shows my
 version reading `self->unkC` via `$a0` directly (skipping the redundant
 copy entirely) since `$a0` hasn't been clobbered yet at that point.
 
@@ -202,7 +202,7 @@ s32 TaskObjF__OpenAndReadMemcardFile(Node3bb8cE *self, u8 *destBuf, u8 *filterNa
 #endif
 ```
 
-Needs (already declared in `src/class_3bb8c_c.c`, all local to this
+Needs (already declared in `src/TitleMenuTaskObjF.c`, all local to this
 unit): `Node3bb8cE`, `BuildMemcardPath`, `func_80050938`, `func_80050928`,
 `func_800508F8`, `BMemPMgrAlloc`, `BMemPMgrFree`, `strcpy`.
 
@@ -286,7 +286,7 @@ even though the project's rule (correctly) forbids calling it
 
 Promoted the preserved near-miss body (the `#if 0` block above, unchanged
 since round 14) into `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif`
-in `src/class_3bb8c_c.c`. This is a **hand-derived** body -- both permuter
+in `src/TitleMenuTaskObjF.c`. This is a **hand-derived** body -- both permuter
 runs on record for this function (round 14, ~4600 iterations; round 19,
 ~130,167 iterations) converged on a best score of 5 (not 0), and the
 lowest-scoring variant either run found was a read of an uninitialized
@@ -321,9 +321,9 @@ unchanged (round 75; this was an `arity-ok` K&R declaration until then, on
 the reading that TaskObjF__OpenAndReadMemcardFile made a 2-argument call)."
 
 Constants: `open(path, 1)` is `O_RDONLY` (`<sys/file.h>`, as
-class_3bb8c_c.c's TryReadMemcardFile spells it); the 0x80 allocation and
+TitleMenuTaskObjF.c's TryReadMemcardFile spells it); the 0x80 allocation and
 read are `MEMCARD_SECTOR_SIZE` (include/TaskObjF.h), the title sector;
 the path buffer is `char[32]` (was `s32[8]`, byte-identical). The `+ 4`
-is the save header's title (`McSaveHeader::title`, which class_3bb8c_c.c
+is the save header's title (`McSaveHeader::title`, which TitleMenuTaskObjF.c
 defines locally); the head has the proposal to move that struct into
 TaskObjF.h so this reads `header->title`. Zero bytes changed.

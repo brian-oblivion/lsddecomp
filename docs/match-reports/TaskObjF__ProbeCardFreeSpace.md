@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004ECCC` on 2026-09-24 (tools/rename.py). Address 0x8004eccc.
 
-**Unit:** class_3bb8c_c (round 14, `Node3bb8cE` class).
+**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -97,14 +97,14 @@ The two-argument / `filterName` reading of `BuildMemcardPath` above is
 superseded. Round 75 matched `TaskObjF__OpenAndReadMemcardFile` by calling it with THREE
 arguments `(pathBuf, self->unkC, suffix)`, the third forwarded from the
 caller's own third parameter already in `$a2` (so no `$a2` set-up is
-emitted, which is why it read as two). `src/class_3bb8c_c.c` now declares
+emitted, which is why it read as two). `src/TitleMenuTaskObjF.c` now declares
 one real prototype, `extern void *BuildMemcardPath(void *dest, s32 selector,
 void *suffix);`, replacing the unprototyped `arity-ok` declarations; this
 function's bytes are unchanged (see `TaskObjF__OpenAndReadMemcardFile.md`).
 
 ## Naming (round 78, track 3)
 
-`func_8004ECCC` -> `TaskObjF__ProbeCardFreeSpace`. **Tier A.** Private helper called only by `TaskObjF__CheckCardSpace`. Computes a sector count from `sizeArg` with the identical round-up formula class_3bb8c_c.c's already-matched `TaskObjF__TryWriteMemcardSaveFile` uses (`(size + 0x21FF) >> 13`), builds a path with the placeholder suffix `sMcTempFileSuffix` (literal "TEMP", asm/data/7B12C.sdata.s), OPENS a file of that many reserved sectors, then immediately closes and deletes it. This is the same create-then-delete idiom `TaskObjF__TryWriteMemcardSaveFile` uses on its real save path (open with `(sectors<<16)|0x200` fails with -1 if there isn't room) -- here applied to a throwaway file purely to test whether that much free space exists, without leaving a file behind. The `id` parameter is unused in the body. Tier A: the create/delete idiom and the dedicated placeholder suffix make the mechanism unambiguous.
+`func_8004ECCC` -> `TaskObjF__ProbeCardFreeSpace`. **Tier A.** Private helper called only by `TaskObjF__CheckCardSpace`. Computes a sector count from `sizeArg` with the identical round-up formula TitleMenuTaskObjF.c's already-matched `TaskObjF__TryWriteMemcardSaveFile` uses (`(size + 0x21FF) >> 13`), builds a path with the placeholder suffix `sMcTempFileSuffix` (literal "TEMP", asm/data/7B12C.sdata.s), OPENS a file of that many reserved sectors, then immediately closes and deletes it. This is the same create-then-delete idiom `TaskObjF__TryWriteMemcardSaveFile` uses on its real save path (open with `(sectors<<16)|0x200` fails with -1 if there isn't room) -- here applied to a throwaway file purely to test whether that much free space exists, without leaving a file behind. The `id` parameter is unused in the body. Tier A: the create/delete idiom and the dedicated placeholder suffix make the mechanism unambiguous.
 
 ## Source comment moved here, and constants (round 98, track 7)
 

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E4E8` on 2026-09-24 (tools/rename.py). Address 0x8004e4e8.
 
-**Unit:** class_3bb8c_c (round 14, `Node3bb8cE` class).
+**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -65,5 +65,5 @@ its structural mirror. See that report for the full derivation.
 gFrameClockMethods' word +0x000 are 0x2 and 0x5). The two-nibble tests stay
 literal: `& 0xFF` against 0x10 (gTextEntryMethods' word +0x000) and 0x20
 (gItemListMethods'), proposed to the head as `TEXTENTRY_CLASS_ID` and
-`ITEMLIST_CLASS_ID` because class_3bb8c_c.c's OnNotify spells the same ids.
+`ITEMLIST_CLASS_ID` because TitleMenuTaskObjF.c's OnNotify spells the same ids.
 Zero bytes changed.

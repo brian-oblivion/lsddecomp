@@ -122,7 +122,7 @@ a length/placement cascade off this ONE missing instruction, not 75
 independent residues. Every earlier line in the diff (`sw $s2`/`sw $s1`
 register-number swaps) is a pure rename (`r`), not a real difference.
 
-Unit `class_3bb8c_c`, class `TitleMenu`. The round-14 stub recorded 9
+Unit `TitleMenuTaskObjF`, class `TitleMenu`. The round-14 stub recorded 9
 `gp_rel` hits and no derivation. This round derived and nearly matched the
 whole function; the residue is a register-CLASS choice on one local value,
 not a control-flow or field-typing error.
@@ -183,7 +183,7 @@ skip:
 ```
 
 This is preserved verbatim, `#if 0`-wrapped, immediately above the
-`INCLUDE_ASM` in `src/class_3bb8c_c.c`.
+`INCLUDE_ASM` in `src/TitleMenuTaskObjF.c`.
 
 ## Derivation (all confirmed by the diff -- this is not in question)
 

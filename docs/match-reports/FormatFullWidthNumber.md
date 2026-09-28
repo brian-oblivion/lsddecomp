@@ -555,7 +555,7 @@ the plan's own rule for "a getter, a clamp, a list push"): converts `a1`
 to a decimal string (`itoa`+`strcpy`), zero-pads it to `width` unless
 `unpadded` is set, then feeds the result through `EncodeFullWidthSjis`
 (this same unit, confirmed tier A against real SJIS codes). Its own
-caller (`src/class_3bb8c_c.c:168`, `FormatFullWidthNumber(sDayDigits,
+caller (`src/TitleMenuTaskObjF.c:168`, `FormatFullWidthNumber(sDayDigits,
 arg0, 3, 0)`) passes a plain buffer as the first argument, not an
 `Obj6EAC0 *`, confirming this function (despite living in this file and
 sharing its dominant `self`-typed signature style) is unrelated to the

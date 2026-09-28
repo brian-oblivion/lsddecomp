@@ -1,5 +1,5 @@
 /*
- * class_3bb8c_c -- the constructors and table methods of two small classes,
+ * TitleMenuTaskObjF -- the constructors and table methods of two small classes,
  * and TitleMenu's allocator and ctor with its two save-title helpers.
  *
  * NodeGuardedViewport (include/NodeGuardedViewport.h) is a Viewport whose
@@ -192,7 +192,7 @@ void StampSaveTitleDay(s32 day) {
 
 /*
  * class_3bb8c_d -- TitleMenu's methods (include/TitleMenu.h; its allocator
- * and ctor are in class_3bb8c_c.c) and its getter, then TaskObjF's
+ * and ctor are in TitleMenuTaskObjF.c) and its getter, then TaskObjF's
  * allocator and ctor (include/TaskObjF.h).
  *
  * TitleMenu is the TaskCore menu between days: START, FLASHBACK, SAVE, LOAD,

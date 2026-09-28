@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004F4A4` on 2026-09-20 (tools/rename.py). Address 0x8004f4a4.
 
-**Unit:** class_3bb8c_c · **Size:** 9 words (0x24) · **Status:** MATCH
+**Unit:** TitleMenuTaskObjF · **Size:** 9 words (0x24) · **Status:** MATCH
 
 `s32 TaskObjF__WaitForReadyEvent(TaskObjF *self) { return WaitForReadyEvent(self->field14,
 4); }` — a one-line forward to `WaitForReadyEvent` (see its report), passing

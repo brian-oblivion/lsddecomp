@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004E0E4` on 2026-09-24 (tools/rename.py). Address 0x8004e0e4.
 
-Unit `class_3bb8c_c`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
+Unit `TitleMenuTaskObjF`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 3 `gp_rel` hits
 and no derivation; this round wrote and matched the function from scratch.
 
@@ -91,7 +91,7 @@ Renamed `func_8004E0E4` -> `TitleMenu__SaveToCard`. **Tier B, lower confidence**
 **Head, round 77: NOT APPLIED.** `saveInfoWord`/`saveInfoBuf` restate the types (a word, a buffer) without saying what they hold; kept `unkBC`/`unkC0` until a reader establishes it.
 
 `TitleMenu::unkBC`/`unkC0` both have real accessors outside this unit
-(`src/class_3bb8c_c.c`'s `TitleMenu__TitleMenu` sets both from
+(`src/TitleMenuTaskObjF.c`'s `TitleMenu__TitleMenu` sets both from
 `dreamSysView->methods->slot1B0`), so per the compiler-ownership rule
 these are PROPOSALS, not renames. Also posted to the round-77 broadcast.
 

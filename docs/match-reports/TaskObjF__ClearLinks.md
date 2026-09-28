@@ -4,8 +4,8 @@
 
 > Renamed from `func_8004E3F4` on 2026-09-24 (tools/rename.py). Address 0x8004e3f4.
 
-**Unit:** class_3bb8c_c (round 14, first slice of the new `Node3bb8cE` class --
-see `include`-local declarations at the top of `src/class_3bb8c_c.c`; this
+**Unit:** TitleMenuTaskObjF (round 14, first slice of the new `Node3bb8cE` class --
+see `include`-local declarations at the top of `src/TitleMenuTaskObjF.c`; this
 class is unrelated to `Obj866E8`/`gStageMapMethods` in `include/class_3bb8c.h`).
 
 ## What it does
@@ -39,7 +39,7 @@ needs nothing beyond a direct transcription.
 
 ## Naming (round 78, track 3)
 
-`func_8004E3F4` -> `TaskObjF__ClearLinks`. **Tier B.** NOT a `gTaskObjFMethods` entry (checked against the full table) -- called once, directly, from `TaskObjF__TaskObjF`'s own ctor (class_3bb8c_c.c), before `self->methods->slot40(self, arg2)` (`TaskObjF__SetCardSlot`). Zeroes the same five resource-slot pointers (`res02`/`res05`/`unk68`/`res10`/`res20`) that `TaskObjF__RemoveAllChildren` zeroes before chaining to the base class. Mechanics are exact (construction-time init of the resource slots); tier B because it is one line of evidence (a single call site) rather than two independent callers agreeing.
+`func_8004E3F4` -> `TaskObjF__ClearLinks`. **Tier B.** NOT a `gTaskObjFMethods` entry (checked against the full table) -- called once, directly, from `TaskObjF__TaskObjF`'s own ctor (TitleMenuTaskObjF.c), before `self->methods->slot40(self, arg2)` (`TaskObjF__SetCardSlot`). Zeroes the same five resource-slot pointers (`res02`/`res05`/`unk68`/`res10`/`res20`) that `TaskObjF__RemoveAllChildren` zeroes before chaining to the base class. Mechanics are exact (construction-time init of the resource slots); tier B because it is one line of evidence (a single call site) rather than two independent callers agreeing.
 
 ## Naming (round 98, track 7)
 

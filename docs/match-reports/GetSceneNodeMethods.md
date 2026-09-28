@@ -55,7 +55,7 @@ from a large number of OTHER units with DIFFERENT per-call-site arities
 and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
-`src/SceneNode.c`, `src/class_3bb8c_c.c`, `src/class_3bb8c_o.c`,
+`src/SceneNode.c`, `src/TitleMenuTaskObjF.c`, `src/class_3bb8c_o.c`,
 `src/class_3bb8c_p.c`, `src/DayTaskStageMap.c`, `src/ScreenWidgets.c`,
 `src/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
@@ -154,7 +154,7 @@ in `include/SceneNode.h`. The deleted local return-type views were
 `BaseCtorTableB_3bb8c_c` (include/class_3bb8c.h), `FixedBaseTable`
 (src/class_3bb8c_o.c), `SceneNodeBaseTable` (src/class_3bb8c_p.c),
 `D6B5CCGetterMethodsCC8C` (include/Task.h) and the untyped `void *` in
-src/DayTaskStageMap.c. The one- and two-argument calls in class_3bb8c_c.c and
+src/DayTaskStageMap.c. The one- and two-argument calls in TitleMenuTaskObjF.c and
 DayTaskStageMap.c now pass nothing, because round 59 measured those arguments as
 zero-cost. The raw `+ 0x38`/`+ 0x88` offset calls in DayTaskStageMap.c are now
 `onNotify`/`notifyIfUnk20Active` slot calls. Byte-identical.

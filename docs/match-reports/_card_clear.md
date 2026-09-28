@@ -258,13 +258,13 @@ Both callees are BIOS trampolines in the neighbouring `asm` segments
 | `func_80050B58` | `0x4E` | `_card_write(chan, sector, src)` |
 
 So the function is `_new_card(); return _card_write(chan, 0x3F, NULL);` --
-`arg0` is the memory-card channel. Note `src/class_3bb8c_c.c` calls that
+`arg0` is the memory-card channel. Note `src/TitleMenuTaskObjF.c` calls that
 argument "a resource handle" in a field comment; that was a guess and this
 identifies it. Its declaration there is otherwise correct and is the one to
 match:
 
 ```c
-extern s32 _card_clear(s32 arg0);        /* class_3bb8c_c.c:276 */
+extern s32 _card_clear(s32 arg0);        /* TitleMenuTaskObjF.c:276 */
 ```
 
 The remaining trampolines in the two sibling segments decode as `0x4A`

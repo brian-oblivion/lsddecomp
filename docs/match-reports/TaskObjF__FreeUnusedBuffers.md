@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004F784` on 2026-09-20 (tools/rename.py). Address 0x8004f784.
 
-**Unit:** class_3bb8c_c · **Size:** 35 words (0x8C) · **Status:** MATCH
+**Unit:** TitleMenuTaskObjF · **Size:** 35 words (0x8C) · **Status:** MATCH
 
 `void TaskObjF__FreeUnusedBuffers(TaskObjF *self)`. Frees `self->unk38[i]` for `i` from
 `self->unk2C` up to (not including) 15, storing each `BMemPMgrFree`

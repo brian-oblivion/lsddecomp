@@ -8,9 +8,9 @@
  * table gTaskObjFMethods): BasicClass's direct subclass, no class below it.
  * The name is the old unit view's (FINISHING-PLAN track 4 step 2); what the
  * class does is measured below. Methods: the allocator and ctor in
- * src/class_3bb8c_c.c, BasicClass's overrides and the card primitives
- * (+0x00C..+0x060) in src/class_3bb8c_c.c, the file I/O, events, buffers and
- * the two operations (+0x064..+0x078, +0x038) in src/class_3bb8c_c.c, the
+ * src/TitleMenuTaskObjF.c, BasicClass's overrides and the card primitives
+ * (+0x00C..+0x060) in src/TitleMenuTaskObjF.c, the file I/O, events, buffers and
+ * the two operations (+0x064..+0x078, +0x038) in src/TitleMenuTaskObjF.c, the
  * state machine (+0x07C..+0x0B0) in src/class_3bb8c_g.c.
  *
  *  - The ctor runs InitCARD/StartCARD/_bu_init once per boot (sTaskObjFCount)

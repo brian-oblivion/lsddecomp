@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004EDC0` on 2026-09-20 (tools/rename.py). Address 0x8004edc0.
 
-**Unit:** class_3bb8c_c · **Size:** 56 words (0xE0) · **Status:** MATCH
+**Unit:** TitleMenuTaskObjF · **Size:** 56 words (0xE0) · **Status:** MATCH
 
 ## What it does
 
@@ -95,7 +95,7 @@ with a MATCHING line: the readable
 `(iconFlag - MEMCARD_ICON_FLAG_BASE + 1) * MEMCARD_SECTOR_SIZE` built
 54/56 (two words reordered), measured this round.
 
-### Moved from src/class_3bb8c_c.c
+### Moved from src/TitleMenuTaskObjF.c
 
 The BIOS file-call declarations' comment, whose history is this:
 
@@ -104,7 +104,7 @@ The BIOS file-call declarations' comment, whose history is this:
  * (libapi/a50,a52,a51,a54,a69 -- one 0x10-byte object per stub). These used
  * to live as `func_8005xxxx` prototypes in include/class_3bb8c.h; they are
  * LOCAL here on purpose, because a shared header eleven units include is the
- * wrong place for names this generic, and because class_3bb8c_c.c's view of
+ * wrong place for names this generic, and because TitleMenuTaskObjF.c's view of
  * `open` takes a `void *` where this unit's takes a `char *`. Two local
  * views are legitimate; one shared declaration would not be.
  * These are C89 identifiers under -fno-builtin, nothing else claims them. */

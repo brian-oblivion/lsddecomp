@@ -6,7 +6,7 @@
 
 Two-instruction leaf: `jr $ra` / `sw $a1, 0x1DC($a0)`. Not a vtable slot,
 no caller found anywhere in the executable — a plain setter, presumably
-called from as-yet-uncarved ground (`class_3bb8c_c`) or from outside this
+called from as-yet-uncarved ground (`TitleMenuTaskObjF`) or from outside this
 365-function block entirely.
 
 ## Disassembly

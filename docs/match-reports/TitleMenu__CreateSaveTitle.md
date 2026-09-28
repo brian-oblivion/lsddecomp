@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004DB18` on 2026-09-24 (tools/rename.py). Address 0x8004db18.
 
-Unit `class_3bb8c_c`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
+Unit `TitleMenuTaskObjF`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 5 `gp_rel` hits
 and no derivation; this round wrote and matched the function from scratch.
 
@@ -113,7 +113,7 @@ SLPS_015.56`.
   reassigns it, so whatever sets the real value is outside this unit's
   ground. Flagged as a placeholder-value caveat, not resolved further.
 
-`src/class_3bb8c_c.c`: local (not shared-header) type `Arg1DB18_3bb8c_d`
+`src/TitleMenuTaskObjF.c`: local (not shared-header) type `Arg1DB18_3bb8c_d`
 and externs for `strcpy`/`strlen` (Sony's, linked from `lib/libc2`, same
 per-unit convention as `src/class_3bb8c_i.c`/`src/class_3bb8c_j.c`) and
 `DecodeFullWidthSjis` (already matched elsewhere; independent local arity).
@@ -141,7 +141,7 @@ TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus
 ## Track 7 (round 96, echo)
 
 Naming: `D_8008AA18` -> `gSaveTitle` (tier A: the pointer every reader
-uses as the save title's full-width text; class_3bb8c_c.c writes the day
+uses as the save title's full-width text; TitleMenuTaskObjF.c writes the day
 into it, hence `g`); `D_8008AA14` -> `sSaveTitleBlanks` (tier A: its ROM
 value points at 19 full-width spaces). Both retyped `void *` -> `char *`
 in include/class_3bb8c.h, which removes the `(char *)` casts. `+ 0x18` is
