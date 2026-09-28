@@ -18,7 +18,7 @@
  * state, with CD_FLAG_LOAD_FILE_DONE (0x200) in `flags`, it opens the
  * header (SsVabOpenHead) and loads "<base>.VB" (loadFile, +0x058) in
  * VABSTREAM_LOAD_BODY. In that state it transfers the body (SsVabTransBody)
- * and calls slot78, VabStreamObj__OnBodyReady. That waits on SsVabTransCompleted and then
+ * and calls processBuffer (+0x078), VabStreamObj__OnBodyReady. That waits on SsVabTransCompleted and then
  * runs loadVagAttrs (+0x07C), which caches the bank's VagAtr records per
  * program. +0x058 and +0x06C are NULL in the static table.
  * SetActiveDataSource fills them from the active driver
@@ -66,7 +66,7 @@ enum VabStreamLoadState {
     VABSTREAM_LOAD_BODY = 6    /* waiting for "<base>.VB" */
 };
 
-/* slot78 is FileResource's `void *slot78` (NULL there). This class's occupant,
+/* +0x078 is FileResource's untyped `processBuffer`. This class's occupant,
  * VabStreamObj__OnBodyReady, is called through this typedef. That takes no
  * code. */
 typedef s32 (*VabStreamObjOnBodyReadyFn)(VabStreamObj *self, s32 done);

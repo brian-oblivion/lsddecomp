@@ -264,7 +264,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
         SsSetTableSize(GetSsSizeTableBuf(), 2, 1); /* two scores of one track */
     }
     if (sVabStreamInited == 0) {
-        sSsTicksPerSecond = 60; /* SS_TICK60 */
+        sSsTicksPerSecond = 60; /* the rate SS_TICK60 sets */
         SsSetTickMode(SS_TICK60);
         sVabStreamInited = 1;
     }

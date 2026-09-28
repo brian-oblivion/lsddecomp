@@ -36,7 +36,7 @@ struct NullDriverMethods {
      * it as GetActiveDataSourceMethods()->ctor(self). */
     FILERESOURCE_SLOTS(NullDriver, (NullDriver * self));
     /* The table is 29 slots and ends after +0x074: the word at +0x078
-     * (FileResource's slot78) is gVabStreamObjMethods's header, 0xA03. */
+     * (FileResource's processBuffer) is gVabStreamObjMethods's header, 0xA03. */
 };
 
 struct NullDriver {
