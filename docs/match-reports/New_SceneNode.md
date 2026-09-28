@@ -75,4 +75,5 @@ Step 5 (comments): the unit banner was rewritten as documentation (lifecycle, ch
  * UpdateScale (set or add three Ratio16s into the GsCOORD2PARAM); attach to
  * and detach from a parent's coordinate; and the first five setters over
  * GsDOBJ2.attribute. Part 2 is code_d294_b.c, part 3 code_d294_c.c.
- */```
+ */
+```
