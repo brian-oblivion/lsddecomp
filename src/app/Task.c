@@ -1633,7 +1633,7 @@ void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event) {
 }
 
 /* A DrawSystem event: its per-VSync event runs flip. */
-void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event) {
+void Viewport__OnDrawSystemEvent(Viewport *self, BasicClass *sender, s32 event) {
     if (event == DRAWSYSTEM_EVENT_VSYNC) {
         self->methods->flip(self);
     }

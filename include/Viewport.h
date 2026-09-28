@@ -120,7 +120,7 @@ struct ViewportRefView {
     /* +0x08C */ void (*initOt)(Self *self);                       /* Viewport__InitOt */            \
     /* +0x090 */ void (*deinitOt)(Self *self);                     /* Viewport__DeinitOt */          \
     /* +0x094 */ void (*onNotifyTag5)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag5: onNotify's class-5 (FrameClock) case */ \
-    /* +0x098 */ void (*onNotifyTag1)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnNotifyTag1: onNotify's DrawSystem (1) case */ \
+    /* +0x098 */ void (*onNotifyTag1)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnDrawSystemEvent: onNotify's DrawSystem (1) case */ \
     /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; NodeGuardedViewport__Update */ \
     /* +0x0A0 */ void (*drawNode)(Self *self, SceneNode *node);   /* Viewport__DrawNode (ViewportDraw) */ \
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
@@ -206,7 +206,7 @@ void Viewport__NoOpSlot88(void);
 void Viewport__InitOt(Viewport *self);
 void Viewport__DeinitOt(Viewport *self);
 void Viewport__OnNotifyTag5(Viewport *self, BasicClass *sender, s32 event);
-void Viewport__OnNotifyTag1(Viewport *self, BasicClass *sender, s32 event);
+void Viewport__OnDrawSystemEvent(Viewport *self, BasicClass *sender, s32 event);
 void Viewport__Update(Viewport *self);
 void Viewport__Flip(Viewport *self);
 void Viewport__SetFadeBox(Viewport *self, SceneNode *handle);

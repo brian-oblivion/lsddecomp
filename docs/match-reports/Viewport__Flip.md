@@ -14,7 +14,7 @@ void Viewport__Flip(Unk18Obj *self);
 ```
 
 `Unk18ObjMethods`'s own `+0x0A4` slot occupant (`slotA4`, dispatched by
-`Viewport__OnNotifyTag1`, this round).
+`Viewport__OnDrawSystemEvent`, this round).
 
 ## What it does
 

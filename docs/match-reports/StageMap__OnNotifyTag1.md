@@ -79,7 +79,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BD14` | `StageMap__OnNotifyTag1` | B | Occupant of `gStageMapMethods` +0x100 (`slot100`). `DayTaskStageMap`'s `StageMap__OnNotify` (already matched) dispatches this slot, unconditionally, only when `(sender->methods->header & 0xF) == 1` -- i.e. only for one sender class tag. Follows the SAME "OnNotifyTagN" naming convention already established elsewhere in this codebase for identical per-tag dispatch targets (`Viewport__OnNotifyTag5`/`Viewport__OnNotifyTag1`, `src/app/Task.c`). `mode` here is the caller's own `command`, but the body itself early-returns unless `mode == 2` -- narrower than "every tag-1 notification", which the name does not claim (only that this IS the tag-1 dispatch target). |
+| `func_8004BD14` | `StageMap__OnNotifyTag1` | B | Occupant of `gStageMapMethods` +0x100 (`slot100`). `DayTaskStageMap`'s `StageMap__OnNotify` (already matched) dispatches this slot, unconditionally, only when `(sender->methods->header & 0xF) == 1` -- i.e. only for one sender class tag. Follows the SAME "OnNotifyTagN" naming convention already established elsewhere in this codebase for identical per-tag dispatch targets (`Viewport__OnNotifyTag5`/`Viewport__OnDrawSystemEvent`, `src/app/Task.c`). `mode` here is the caller's own `command`, but the body itself early-returns unless `mode == 2` -- narrower than "every tag-1 notification", which the name does not claim (only that this IS the tag-1 dispatch target). |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 

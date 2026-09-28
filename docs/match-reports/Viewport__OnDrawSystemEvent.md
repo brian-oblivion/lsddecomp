@@ -1,4 +1,6 @@
-# Viewport__OnNotifyTag1 — MATCHED
+# Viewport__OnDrawSystemEvent — MATCHED
+
+> Renamed from `Viewport__OnNotifyTag1` on 2026-09-28 (tools/rename.py). Address 0x8003ee88.
 
 > Renamed from `Unk18Obj__OnNotifyTag1` on 2026-09-25 (tools/rename.py). Address 0x8003ee88.
 
@@ -9,7 +11,7 @@ Unit: `Task`. Round 14, runner delta. 14/14 words, full match.
 ## Signature
 
 ```c
-void Viewport__OnNotifyTag1(Unk18Obj *self, GenericObj *arg1, s32 arg2);
+void Viewport__OnDrawSystemEvent(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 ```
 
 `Unk18ObjMethods`'s own `+0x098` slot occupant (`slot98`, dispatched by
@@ -18,7 +20,7 @@ void Viewport__OnNotifyTag1(Unk18Obj *self, GenericObj *arg1, s32 arg2);
 ## What it does
 
 ```c
-void Viewport__OnNotifyTag1(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
+void Viewport__OnDrawSystemEvent(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
     if (arg2 == 2) {
         self->methods->slotA4(self);
     }

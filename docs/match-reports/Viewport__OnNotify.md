@@ -58,7 +58,7 @@ finding.
 
 `include/Task.h`: `Unk18ObjMethods` gains `slot94`/`slot98` (both
 `void (*)(Unk18Obj*, GenericObj*, s32)`, occupants `Viewport__OnNotifyTag5`/
-`Viewport__OnNotifyTag1`, still queued as of this report) plus the corrective
+`Viewport__OnDrawSystemEvent`, still queued as of this report) plus the corrective
 `pad09C` gap described above.
 
 ## Naming

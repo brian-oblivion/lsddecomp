@@ -132,7 +132,7 @@ learning below.
 - Corrected two earlier comments that conflated "which function OBSERVED
   this slot" with "which function OCCUPIES it" — `slot9C`'s real occupant
   is this function (not `Viewport__OnNotifyTag5`, which only dispatches it), and
-  `slotA4`'s real occupant is `Viewport__Flip` (not `Viewport__OnNotifyTag1`, ditto).
+  `slotA4`'s real occupant is `Viewport__Flip` (not `Viewport__OnDrawSystemEvent`, ditto).
 - New externs: `GsSetNearClip`/`func_8003FC70`/`func_8003FD4C`/
   `GsSetWorkBase` (all `asm/ScreenWidgets.s`, next slice, uncarved) and
   `func_80024AE4` (PsyQ, `asm/psyq_GsLinkObject4.s`).
