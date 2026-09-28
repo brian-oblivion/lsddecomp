@@ -196,7 +196,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
                                            (LongVec3 *)&gTextEntryTextPos);
     self->textRow->methods->setColor(self->textRow, &gTextEntryTextColor);
     self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)parent,
-                                                (LongVec3 *)&gTextEntryCursorPos);
+                                                (LongVec3 *)&sTextEntryCursorPos);
 }
 
 void TextEntry__ReleaseCardResources(TextEntry *self) {
@@ -438,8 +438,8 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
     CharSprite *cursor;
 
     if (self->panelSprite) {
-        screenPos.y = gTextEntryCursorPos.y;
-        screenPos.x = pos * TEXTROW_DEFAULT_PITCH + gTextEntryCursorPos.x;
+        screenPos.y = sTextEntryCursorPos.y;
+        screenPos.x = pos * TEXTROW_DEFAULT_PITCH + sTextEntryCursorPos.x;
         cursor = self->cursorSprite;
         cursor->methods->setPosition(cursor, &screenPos);
         self->cursorIndex = pos;

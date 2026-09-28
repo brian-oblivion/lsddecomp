@@ -16,7 +16,7 @@
  *    back into `textBuf` (EncodeFullWidthSjis in mode 1) and closes with
  *    state 2, a cross press closes with state 3 without writing.
  *  - moveCursorRight/Left step `cursorIndex` inside [0, textLen) and move the
- *    cursor sprite (setCursorPos: x = index * 7 from gTextEntryCursorPos).
+ *    cursor sprite (setCursorPos: x = index * 7 from sTextEntryCursorPos).
  *  - nextChar/prevChar step `charIndex` through sNameCharTable, whose length
  *    the ctor counts into `charCount`, and setCharAt writes that byte into
  *    `editBuf` at the cursor and into the text row. resetChar/resetAllChars
@@ -111,7 +111,7 @@ extern TextEntryMethods *GetTextEntryMethods(void); /* returns &gTextEntryMethod
 
 /* The cursor sprite's position at index 0, (-62, -12): loadCardResources
  * attaches the cursor there, setCursorPos moves it to x + index * 7, y. */
-extern ScreenSpritePos gTextEntryCursorPos;
+extern ScreenSpritePos sTextEntryCursorPos;
 
 /* The class's own methods, in address order. */
 TextEntry *New_TextEntry(char *text, s32 mode);

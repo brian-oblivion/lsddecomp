@@ -23,7 +23,7 @@ extern s32 gTextEntryPanelRect; /* 3-word opaque block, New_ScreenSprite's arg1,
 extern s32 gTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
 extern s32 gTextEntryPanelPos; /* opaque block, self->unk48's slot4C arg2, address-only here */
 extern s32 gTextEntryTextPos; /* opaque block, self->unk44's slot4C arg2, address-only here */
-extern s32 gTextEntryCursorPos; /* opaque block, self->unk40's slot4C arg2, address-only here */
+extern s32 sTextEntryCursorPos; /* opaque block, self->unk40's slot4C arg2, address-only here */
 
 void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
 {
@@ -56,7 +56,7 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
     handle2->methods->release(handle2);
     self->unk44->methods->slot4C(self->unk44, arg1, (void *)&gTextEntryTextPos);
     self->unk44->methods->slotB8(self->unk44, (void *)&gTextEntryTextColor);
-    self->unk40->methods->slot4C(self->unk40, arg1, (void *)&gTextEntryCursorPos);
+    self->unk40->methods->slot4C(self->unk40, arg1, (void *)&sTextEntryCursorPos);
 }
 ```
 
@@ -191,7 +191,7 @@ says what they are):
 | D_8008AAC8 | gTextEntryTextColor | the text row's setColor: (128, 128, 0) |
 | D_8008AACC | gTextEntryPanelPos | the panel's attachToParent position: (-70, -60) |
 | D_8008AAD4 | gTextEntryTextPos | the text row's attachToParent position: (-62, -15) |
-| D_8008AADC | gTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (TextEntryItemList) reads its x |
+| D_8008AADC | sTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (TextEntryItemList) reads its x |
 
 The externs are typed `SpriteRect`, `SpriteRgb` and `ScreenSpritePos`
 (TaskObjF's sCardIconRect/sCardIconPos are the precedent), so two casts
@@ -202,12 +202,12 @@ cast. Locals `handle1`/`handle2` -> `panelTim`/`fontTim`, parameter
 
 Proposed (TextEntryItemList's): D_8008AAE0 is the cursor position's y (-12),
 read by SetCursorPos; a name such as `gTextEntryCursorY`, or reading it as
-`gTextEntryCursorPos.y` once TextEntryItemList types gTextEntryCursorPos as a
+`sTextEntryCursorPos.y` once TextEntryItemList types sTextEntryCursorPos as a
 ScreenSpritePos.
 
-## Round 98: gTextEntryCursorPos unified (track 4b)
+## Round 98: sTextEntryCursorPos unified (track 4b)
 
-The local `extern ScreenSpritePos gTextEntryCursorPos` moved to
+The local `extern ScreenSpritePos sTextEntryCursorPos` moved to
 include/TextEntry.h, the only declaration; TextEntryItemList's `s32` view and its
-`D_8008AAE0` (the y) now read `gTextEntryCursorPos.x`/`.y`, byte-exact. The
+`D_8008AAE0` (the y) now read `sTextEntryCursorPos.x`/`.y`, byte-exact. The
 proposal above is applied.

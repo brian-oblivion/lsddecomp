@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gTextEntryCursorPos
 gTextEntryPanelPos
 gTextEntryTextColor
 gTextEntryTextPos
@@ -216,5 +215,6 @@ sStyleTickCount
 sStyleUnreadArg
 sStyleVariant
 sTaskObjFCount
+sTextEntryCursorPos
 sTimExt
 sTitleCardPathPrefix
