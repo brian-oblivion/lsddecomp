@@ -25,7 +25,7 @@ one of them (`DrawSystem.c`) has a live matching runner this round
 this pass started). Recorded as proposals for the head to apply with
 `tools/rename.py` once safe.
 
-- `GetDrawSystem` (defined `src/DrawSystem.c`, returns `Class6C070 *`): called
+- `GetDrawSystem` (defined `src/graphics/DrawSystem.c`, returns `Class6C070 *`): called
   here only as `addChild`/`removeChild`'s argument, registering `WBgm` as a
   child of that singleton for lifecycle notification -- the same pattern
   `DayTaskStageMap.c` and `TimImage.c` use it for. No WBgm-specific evidence for

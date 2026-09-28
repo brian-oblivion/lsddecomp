@@ -2,7 +2,7 @@
 
 > Renamed from `func_800209A0` on 2026-09-25 (tools/rename.py). Address 0x800209a0.
 
-Round 82, runner alpha. Unit `src/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x05C (`tools/classtable.py gDrawSystemMethods`), the
   sibling of DrawSystem__LoadImage (+0x058).
@@ -33,7 +33,7 @@ void DrawSystem__StoreImage(Class6C070 *self, u_long *pixels, Class6C070Rect *sr
 ```
 
 The declarations it needs are the unit-local `Class6C070`, `RECT` and
-`Class6C070Rect` view at the top of `src/DrawSystem.c` (reproduced in full in
+`Class6C070Rect` view at the top of `src/graphics/DrawSystem.c` (reproduced in full in
 `docs/match-reports/DrawSystem__LoadImage.md`), plus `DrawSync` and `ConvertRect`.
 
 ## Naming

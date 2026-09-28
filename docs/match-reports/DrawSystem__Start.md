@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002085C` on 2026-09-25 (tools/rename.py). Address 0x8002085c.
 
-Round 81, runner alpha. Unit `src/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 81, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x048 (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** if +0x10 is clear, sets it to 1 and calls slot +0x068 (DrawSystem__RunLoop).
@@ -21,7 +21,7 @@ void DrawSystem__Start(Class6C070 *self) {
 }
 ```
 
-The declarations it needs (unit-local view in `src/DrawSystem.c`; the class
+The declarations it needs (unit-local view in `src/graphics/DrawSystem.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
 `include/BasicClass.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):

@@ -472,7 +472,7 @@ segments:
       - [0x10DC0, o, libgte/msc01]      # SquareRoot0, SquareRoot12. .data at 0x5C6F0
       # 0x10EE0..0x11474: game code (revision 18; was the head of psyq_10ee0).
       # 0x11474..0x14098: libgpu/sys from ResetGraph, Sony's, still asm.
-      - [0x10EE0, c, DrawSystem]
+      - [0x10EE0, c, graphics/DrawSystem]
       - [0x11474, asm, psyq_11474]      # libgpu/sys from ResetGraph (Dec 1995 build, never places)
       - [0x14098, o, libapi/c73]        # GPU_cw (Psy-Q 3.3)
       - [0x140A8, o, libc2/memcpy]      # memcpy

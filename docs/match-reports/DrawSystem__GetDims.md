@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020C08` on 2026-09-25 (tools/rename.py). Address 0x80020c08.
 
-Round 81, runner alpha. Unit `src/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 81, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x07C (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** if out is non-NULL writes {0, 0, size.w, size.h * 2}; returns &self->size (+0x14).
@@ -24,7 +24,7 @@ Class6C070Size *DrawSystem__GetDims(Class6C070 *self, Class6C070Dims *out) {
 }
 ```
 
-The declarations it needs (unit-local view in `src/DrawSystem.c`; the class
+The declarations it needs (unit-local view in `src/graphics/DrawSystem.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
 `include/BasicClass.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):

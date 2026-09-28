@@ -4,7 +4,7 @@
 `sdk-headers`).** Per the operator's decision of the same day, every header
 under `include/psyq/` is now LF and lowercase (as Sony's own `#include`s spell
 them, and as the pe2 and sotn decomps keep them), `include/types.h` defines
-Sony's `u_*` names under `<sys/types.h>`'s guards, and `src/DrawSystem.c`
+Sony's `u_*` names under `<sys/types.h>`'s guards, and `src/graphics/DrawSystem.c`
 includes `<libgte.h>`, `<libgpu.h>`, `<libgs.h>` and `<libetc.h>` with the image
 byte-identical. `setPolyFT4()` and friends expand again. The include route is
 FINISHING-PLAN track 6; `tools/sonyheaders.py` lists what still collides. The

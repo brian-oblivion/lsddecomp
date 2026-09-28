@@ -2,7 +2,7 @@
 
 > Renamed from `func_800208B8` on 2026-09-25 (tools/rename.py). Address 0x800208b8.
 
-Round 81, runner bravo. Unit `src/DrawSystem.c` (carved from `psyq_10ee0` in
+Round 81, runner bravo. Unit `src/graphics/DrawSystem.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x050 (method-table slots resolved with `tools/classtable.py gDrawSystemMethods`).
@@ -21,7 +21,7 @@ void DrawSystem__SwapBuffers(Class6C070 *self) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/DrawSystem.c`:
+The unit-local view it needs, from the top of `src/graphics/DrawSystem.c`:
 
 ```c
 #include "BasicClass.h"
