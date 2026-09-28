@@ -64,7 +64,7 @@ function's own report for the blocker and the broadcast post.
 
 **2026-09-25, round 84 (echo).** The class is declared once, in
 `include/Application.h`. The parameter is now `dataSource`: it goes straight
-to `SetActiveDataSource`, and the one caller passes `gGameApplicationConfig`'s
+to `SetActiveDataSource`, and the one caller passes `sGameApplicationConfig`'s
 first word, 0x13 (the CD driver's class id, gCdDriverMethods). The table getter is
 `GetApplicationMethods` (renamed from `func_8003B20C`). Bytes unchanged.
 

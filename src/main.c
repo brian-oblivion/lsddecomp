@@ -3,7 +3,7 @@
  *
  * Sony's crt0 calls `main` once. It sets the memory size, makes the game's
  * one BMemPMgr pool and installs it as the default every BMemPMgrAlloc
- * uses, builds the root GameApplication from gGameApplicationConfig,
+ * uses, builds the root GameApplication from sGameApplicationConfig,
  * builds the DrawSystem and a Pad on the first controller port, and hands
  * both to the application's initSystems. Then it calls runMainLoop, which
  * never returns: the game loop is Application's, not this file's.
@@ -30,7 +30,7 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 
 extern BMemPMgr *gStartupBMemPMgr;
 extern GameApplication *sGameApplication;
-extern GameApplicationConfig gGameApplicationConfig;
+extern GameApplicationConfig sGameApplicationConfig;
 
 /* SetMem's argument: the RAM size in megabytes (Psy-Q libapi takes 2, a
  * retail console, or 8, a development board). */
@@ -48,7 +48,7 @@ void main(void) {
     /* MATCHING: the unread 0 is retail's `move $a1, $zero`. */
     gStartupBMemPMgr = BMemPMgrInit(DEFAULT_POOL_SIZE, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
-    sGameApplication = New_GameApplication(&gGameApplicationConfig);
+    sGameApplication = New_GameApplication(&sGameApplicationConfig);
     drawSystem = New_DrawSystem();
     pad = New_Pad(0, 0); /* PadInit mode 0, port 0 */
     /* MATCHING: the override, GameApplication__InitSystems, takes three

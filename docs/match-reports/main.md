@@ -13,7 +13,7 @@ This is the game's own `main()`. It runs an empty startup stub
 `SetMem(2)`, stands up the game's `BMemPMgr` heap (`BMemPMgrInit`), installs
 it as the default pool (`SetDefaultBMemPMgr`), constructs the `GameApplication`
 instance at `sGameApplication` (`New_GameApplication`, seeded from the constant block
-`gGameApplicationConfig = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
+`sGameApplicationConfig = {0x13, 0, 1, 1, 1, 1}`), allocates a second object via the
 still-uncarved `New_DrawSystem`, opens a `Pad` (`New_Pad(NULL, 0)`),
 and dispatches two methods through `sGameApplication`'s own vtable (`+0x044` and
 `+0x04C`) before returning. It never loops -- the real game loop presumably
@@ -66,7 +66,7 @@ extern void *New_DrawSystem(void);
 
 extern BMemPMgr *gStartupBMemPMgr;
 extern GameApplication *sGameApplication;
-extern GameApplicationConfig gGameApplicationConfig;
+extern GameApplicationConfig sGameApplicationConfig;
 
 /* Matched in GameApplicationFileResource.c; not yet declared in any header (no other carved
  * caller existed until now). */
@@ -81,7 +81,7 @@ void main(void)
     SetMem(2);
     gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
     SetDefaultBMemPMgr(gStartupBMemPMgr);
-    sGameApplication = New_GameApplication(&gGameApplicationConfig);
+    sGameApplication = New_GameApplication(&sGameApplicationConfig);
     obj = New_DrawSystem();
     pad = New_Pad(0, 0);
     sGameApplication->methods->forwardToBaseSlot44UnlessFlagged(sGameApplication, obj, pad);
@@ -175,7 +175,7 @@ this is a documentation sync only.)
     keeping the class's identity tied to its vtable address until a
     game-purpose name is established (track 4). Read and written only here
     and in the shared header's comments (updated by this rename).
-  - `D_80066828` -> `gGameApplicationConfig`, tier A: purely mechanical, it
+  - `D_80066828` -> `sGameApplicationConfig`, tier A: purely mechanical, it
     IS the one `GameApplicationConfig` block in the image, passed to
     `New_GameApplication` at its only call site. `{0x13, 0, 1, 1, 1, 1}`, per
     `include/GameApplication.h`'s existing documentation of which two fields

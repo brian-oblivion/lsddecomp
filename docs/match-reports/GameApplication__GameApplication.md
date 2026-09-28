@@ -116,7 +116,7 @@ another caller is found that writes them.
 
 - `include/GameApplication.h`: added `GameApplicationConfig` (the ctor's `arg`
   parameter type — only `+0x00` and `+0x14` are read here, observed against
-  the one call site's data, `asm/main.s`'s `gGameApplicationConfig` global:
+  the one call site's data, `asm/main.s`'s `sGameApplicationConfig` global:
   `{0x13, 0, 1, 1, 1, 1}`), added `LoadModelRequest`, retyped
   `MiddleClassMethods.ctor` and `GameApplicationMethods.ctor`/`.slot40` from
   opaque `void *` to real callable signatures now that this function
@@ -165,7 +165,7 @@ Class `Class6D3C8` renamed `GameApplication` (`tools/renametype.py
 Class6D3C8 GameApplication`), table `D_8006D3C8` renamed
 `gGameApplicationMethods` (`tools/rename.py`). **Tier A.** It is the only
 Application subclass and the one object main() builds (`New_GameApplication(
-&gGameApplicationConfig)` into `sGameApplication`, then initSystems and the
+&sGameApplicationConfig)` into `sGameApplication`, then initSystems and the
 never-returning runMainLoop); its ctor builds and keeps the game's DreamSys,
 and its own methods are exactly the six hooks Application's main loop calls
 (intro logos, weekly stream, GraphRoom poll, DayTask run, cinematic and
@@ -177,7 +177,7 @@ Types renamed with it:
 
 - `Class6D3C8CtorArgs` -> `GameApplicationConfig` (`renametype.py
   GameApplicationCtorArgs GameApplicationConfig --any-stem`, after the family
-  rename), with `gClass6D3C8CtorArgs` -> `gGameApplicationConfig`. Tier A: one
+  rename), with `gClass6D3C8CtorArgs` -> `sGameApplicationConfig`. Tier A: one
   static instance, `{0x13, 0, 1, 1, 1, 1}`, whose words are the data source and
   on/off switches the hooks test (`playStreams`, `showIntroLogos`,
   `pollGraphRoom`). The field that keeps it, `ctorArgs`, is now `config`
