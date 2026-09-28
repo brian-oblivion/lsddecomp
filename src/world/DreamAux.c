@@ -56,17 +56,17 @@ void InitDreamAux(void) {
 
     ResourceRequest__Set(&req, 0, (char *)gMomPathSymSpy, 1);
 
-    for (i = 0; i < ARRAY_COUNT(gDreamAuxSlots); i++) {
-        gDreamAuxSlots[i].model = New_ModelData(&req.src);
+    for (i = 0; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
+        sDreamAuxSlots[i].model = New_ModelData(&req.src);
         req.src.name = (char *)gMomPathSymDog;
     }
 }
 
 void ReleaseDreamAuxModels(void) {
-    DreamAuxSlot *slot = gDreamAuxSlots;
+    DreamAuxSlot *slot = sDreamAuxSlots;
     u32 i;
 
-    for (i = 0; i < ARRAY_COUNT(gDreamAuxSlots); i++) {
+    for (i = 0; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
         ModelData *model = slot->model;
 
         if (model != NULL) {
@@ -90,7 +90,7 @@ void SetTeleportsEnabled(s32 stage);
 
 void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct VabStreamObj *sound,
                       struct FrameClock *frameClock) {
-    DreamAuxSlot *slot = gDreamAuxSlots;
+    DreamAuxSlot *slot = sDreamAuxSlots;
     u32 i;
 
     gDreamAuxStage = stage;
@@ -99,7 +99,7 @@ void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct Vab
     gDreamAuxSound = sound;
     sDreamAuxFrameClock = frameClock;
 
-    for (i = 0; i < ARRAY_COUNT(gDreamAuxSlots); i++) {
+    for (i = 0; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
         s32 desc[4]; /* New_Entity's descriptor: word +0x00C the ModelData */
         desc[3] = (s32)slot->model;
         slot->entity = New_Entity(i + DREAM_AUX_FIRST_MOOD, desc, gDreamAuxSound);
@@ -168,7 +168,7 @@ s32 TryDreamAuxTrigger(s32 data, s16 *chunkKey, s32 day) {
             return (s32)FireDreamAuxTriggerEntries(day, trigger, data);
         }
         if (gDreamAuxStage != 0 && rand() % 12 == 0 && (day & 1) == 0) {
-            PlaceDreamAuxEntityByPlayer(gDreamAuxSlots);
+            PlaceDreamAuxEntityByPlayer(sDreamAuxSlots);
         }
     }
     return 0;

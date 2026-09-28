@@ -24,9 +24,9 @@ typedef struct DreamAuxSlot {
     s32 pos[3];
 } DreamAuxSlot;
 
-extern DreamAuxSlot gDreamAuxSlots[1];
+extern DreamAuxSlot sDreamAuxSlots[1];
 
-/* gDreamAuxSlots one word in, so each element's `model` is that slot's
+/* sDreamAuxSlots one word in, so each element's `model` is that slot's
  * entity: ReleaseDreamAuxEntities walks it. */
 extern DreamAuxSlot gDreamAuxSlots2[1];
 

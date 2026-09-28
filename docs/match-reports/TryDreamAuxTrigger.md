@@ -35,7 +35,7 @@ s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
             return FireDreamAuxTriggerEntries(a2, record, a0);
         }
         if (gDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
-            PlaceDreamAuxEntityByPlayer(gDreamAuxSlots);
+            PlaceDreamAuxEntityByPlayer(sDreamAuxSlots);
         }
     }
     return 0;

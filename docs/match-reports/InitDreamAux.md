@@ -9,7 +9,7 @@
 > after that fix** -- the same way `CheckDreamAuxTriggerCondition`'s report was missed by
 > round 22's sweep because it reads as a considered plateau, not a stub.
 >
-> The residue this report called unclosable (`%lo(gDreamAuxSlots)` folded into
+> The residue this report called unclosable (`%lo(sDreamAuxSlots)` folded into
 > the store's own displacement, instead of retail's full `lui`+`addiu`
 > materialize-then-`addu`) is **the exact same construct** as the switch
 > jump-table fold that blocked `CheckDreamAuxTriggerCondition` -- an indexed-global address
@@ -72,7 +72,7 @@ audio-stream-request object:
    `name="ETC\\SYMSPY.MOM"`, `mode=1`.
 3. A `for (i = 0; i < 1; i++)` loop (see the "loop that only runs once" note
    in `ReleaseDreamAuxModels`'s report -- same confirmed idiom) that calls
-   `New_ModelData((struct ResourceSource *)&req)` and stores the result into `gDreamAuxSlots[0].obj`,
+   `New_ModelData((struct ResourceSource *)&req)` and stores the result into `sDreamAuxSlots[0].obj`,
    then overwrites `req.name` with `"ETC\\SYMDOG.MOM"`. Because the loop
    only runs once, that second name write is dead in THIS retail build --
    likely a leftover of an original 2-iteration loop (SYMSPY then SYMDOG)
@@ -105,7 +105,7 @@ void InitDreamAux(void)
     ResourceRequest__Set(&req, 0, gMomPathSymSpy, 1);
 
     for (i = 0; i < 1; i++) {
-        gDreamAuxSlots[i].obj = New_ModelData((struct ResourceSource *)&req);
+        sDreamAuxSlots[i].obj = New_ModelData((struct ResourceSource *)&req);
         req.name = gMomPathSymDog;
     }
 }
@@ -113,15 +113,15 @@ void InitDreamAux(void)
 
 Needs (from `include/DreamAux.h`, added this round):
 `DreamAuxLoadReq`, `DreamAuxGroupRecord`, `sDreamAuxGroupCounts`, `sDreamAuxGroupRecords`,
-`DreamAuxSlot`, `gDreamAuxSlots`, `ResourceRequest__Set`, `New_ModelData`.
+`DreamAuxSlot`, `sDreamAuxSlots`, `ResourceRequest__Set`, `New_ModelData`.
 
 ## The residue, precisely
 
-Retail, storing the call result into `gDreamAuxSlots[i].obj`:
+Retail, storing the call result into `sDreamAuxSlots[i].obj`:
 
 ```
-lui   at, %hi(gDreamAuxSlots)
-addiu at, at, %lo(gDreamAuxSlots)   ; <-- retail materializes the FULL address
+lui   at, %hi(sDreamAuxSlots)
+addiu at, at, %lo(sDreamAuxSlots)   ; <-- retail materializes the FULL address
 addu  at, at, s0                 ;     (s0 = running byte offset, i*0x14)
 sw    v0, 0(at)
 ```
@@ -129,9 +129,9 @@ sw    v0, 0(at)
 Every source shape tried here compiles to:
 
 ```
-lui   at, %hi(gDreamAuxSlots)
+lui   at, %hi(sDreamAuxSlots)
 addu  at, at, s0
-sw    v0, %lo(gDreamAuxSlots)(at)   ; <-- %lo folded into the store's own
+sw    v0, %lo(sDreamAuxSlots)(at)   ; <-- %lo folded into the store's own
                                  ;     displacement instead
 ```
 
@@ -166,12 +166,12 @@ which shows the first ~46 instructions matching before this one diverges).
    clean but do not add the missing instruction (most made other things
    *worse*, none improved past 40/56): reordering `req.name = ...` before
    vs. after the store; splitting the call result into a named temporary
-   before storing it; declaring `gDreamAuxSlots` with an explicit bound (`[14]`)
+   before storing it; declaring `sDreamAuxSlots` with an explicit bound (`[14]`)
    vs. incomplete (`[]`) -- no difference either way; replacing the
    `u8 unk4[0x10]` padding with four named `s32` fields -- no difference;
-   `DreamAuxSlot *entry = &gDreamAuxSlots[i]; entry->obj = ...;` -- worse
+   `DreamAuxSlot *entry = &sDreamAuxSlots[i]; entry->obj = ...;` -- worse
    (36/56); explicit byte-pointer arithmetic
-   (`*(DreamAuxObj **)((u8 *)gDreamAuxSlots + i * sizeof(DreamAuxSlot))`) --
+   (`*(DreamAuxObj **)((u8 *)sDreamAuxSlots + i * sizeof(DreamAuxSlot))`) --
    worse (36/56 and 28/56 depending on exact form); a `volatile` cast on the
    array -- worse (36/56); a bare `__asm__("")` as the function's first
    statement -- worse (33/56), and per CLAUDE.md rule 6 this would need
@@ -220,7 +220,7 @@ call inside `DayTask__DayTask` (a constructor: `GetTimedTaskMethods()->ctor(self
 self->methods = GetDayTaskMethods(); InitDreamAux(); ...`), before the rest of
 that object's own fields are set up. Clears every `gDreamAuxGroupRecord`'s
 `flag` across all 14 groups and loads the initial MOM audio-stream object
-into `gDreamAuxSlots[0].obj`. "Init" fits the one-shot, construction-time
+into `sDreamAuxSlots[0].obj`. "Init" fits the one-shot, construction-time
 call site; the broader game reason (why THIS unit's state resets alongside
 that particular object's construction) is not established from this unit
 alone, hence tier B rather than A.
@@ -249,7 +249,7 @@ Findings of the pass that change what those comments said: DreamAuxGroupRecord
 is TriggerRecord (the same 8-byte records; `flag` is `triggered`), so the view
 is gone and the record is TriggerRecord.triggered; the per-stage tables are 14
 pointers each (DREAM_AUX_STAGE_COUNT, from the label spacing) and the slot
-arrays hold ONE slot (sDreamAuxPosTable starts 0x14 after gDreamAuxSlots), not
+arrays hold ONE slot (sDreamAuxPosTable starts 0x14 after sDreamAuxSlots), not
 14; a slot's first word is the ModelData New_ModelData returns (`model`), and
 the "tick" at method slot +0x004 is BasicClass's release. The MOM files are
 ModelData files (a TMD and a TodSet, include/ModelData.h), not audio. With one
@@ -266,7 +266,7 @@ The header banner:
  * `value` (CheckDreamAuxTriggerCondition) and a coordinate parity
  * (CheckTriggerParity), that on success spawns or despawns an Entity into
  * one of two 14-slot object-tracking families (SpawnDreamAuxTriggerEntity /
- * DespawnDreamAuxEntity, backed by gDreamAuxSlots / gDreamAuxSlots2) and can
+ * DespawnDreamAuxEntity, backed by sDreamAuxSlots / gDreamAuxSlots2) and can
  * gate the game's teleport flag (EnableTeleportsForKind, SetTeleportsEnabled
  * in DreamSys.c). InitDreamAux/TickDreamAuxSlots/TickDreamAuxSlots2 are the
  * construct/tick/destruct hooks a caller in DayTaskStageMap.c and
@@ -293,7 +293,7 @@ The slot and its object view (DreamAuxObj / DreamAuxTickFn, deleted):
  * and a 3-word position vector at +0x8 that DespawnDreamAuxEntity passes as
  * `SceneNode__LocalOffsetToWorldPos`'s `src` (that function's own signature, `SceneNode.h`,
  * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
- * confirmed by SetDreamAuxWorld's walk over gDreamAuxSlots. */
+ * confirmed by SetDreamAuxWorld's walk over sDreamAuxSlots. */
 ```
 
 The group-record view (deleted; TriggerRecord):

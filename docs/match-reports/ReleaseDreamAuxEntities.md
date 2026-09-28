@@ -6,7 +6,7 @@
 
 Unit `DreamAux` (was `code_4cd08`). 26/26 words, `0x4CF6C`-`0x4CFD4`. Whole-image
 `build-and-verify.sh` green. Same shape as `ReleaseDreamAuxModels`, over `gDreamAuxSlots2`
-instead of `gDreamAuxSlots` (see that report for the object/vtable/loop-shape
+instead of `sDreamAuxSlots` (see that report for the object/vtable/loop-shape
 derivation -- not repeated here).
 
 ```c
@@ -91,7 +91,7 @@ this is the same class of residue before reshaping further:
 ## Naming
 
 **ReleaseDreamAuxEntities** — tier A. Identical mechanics to `ReleaseDreamAuxModels`,
-over `gDreamAuxSlots2` instead of `gDreamAuxSlots` (see that report/entry for
+over `gDreamAuxSlots2` instead of `sDreamAuxSlots` (see that report/entry for
 the shared derivation). Tier A for the same reason: the tick pass over the
 slot family IS the function's purpose. Called from `ObjM__TeardownStyle`
 (`ObjMStyleActor.c`) alongside other per-frame-looking calls, consistent with
@@ -104,7 +104,7 @@ this unit's own queue).
 ## Naming (round 100)
 
 **ReleaseDreamAuxEntities** (was TickDreamAuxSlots2) -- tier A.
-gDreamAuxSlots2 (0x80088D2C) is gDreamAuxSlots one word in, so the word each
+gDreamAuxSlots2 (0x80088D2C) is sDreamAuxSlots one word in, so the word each
 element's first field reads is the slot's `entity`, the Entity
 SetDreamAuxWorld made; slot +0x004 is `release`. Its only caller is
 ObjM__TeardownStyle (onDeinit, src/world/ObjMStyleActor.c), mirroring ObjM's scene

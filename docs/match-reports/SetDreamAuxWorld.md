@@ -31,7 +31,7 @@ void SetTeleportsEnabled(s32 triggerType);
 
 void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
 {
-    DreamAuxSlot *slot = gDreamAuxSlots;
+    DreamAuxSlot *slot = sDreamAuxSlots;
     u32 i;
 
     gDreamAuxStage = a0;
@@ -108,7 +108,7 @@ Two independent instances now confirm it in this unit alone
 
 **SetDreamAuxWorld** — tier B. Installs its five parameters into the unit's
 shared context globals (`gDreamAuxStage`, `gDreamAuxWorld` and three still-
-unnamed siblings), spawns one entity into `gDreamAuxSlots[0].entity` via
+unnamed siblings), spawns one entity into `sDreamAuxSlots[0].entity` via
 `New_Entity`, then calls `SetTeleportsEnabled`. Called from
 `ObjM__SetupSceneStyle` (`ObjMStyleActor.c`), itself a per-object/per-level setup
 routine. "World" reflects `gDreamAuxWorld`'s own established role (cast
