@@ -1451,7 +1451,7 @@ extern const char gCardPathSuffix[]; /* ".TIM" */
 /* {0, 0, 160, 120} */
 extern SpriteRect gCardIconRect;
 /* (-70, -60), percent of half the screen from the centre */
-extern ScreenSpritePos gCardIconPos;
+extern ScreenSpritePos sCardIconPos;
 
 void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     char pathBuf[32];
@@ -1484,7 +1484,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     icon = New_ScreenSprite(tim, &gCardIconRect, 0);
     self->cardIcon = icon;
     tim->methods->release(tim);
-    icon->methods->attachToParent(icon, self->spriteParent, (LongVec3 *)&gCardIconPos);
+    icon->methods->attachToParent(icon, self->spriteParent, (LongVec3 *)&sCardIconPos);
 }
 
 void TaskObjF__ReleaseCardIcon(TaskObjF *self) {

@@ -18,7 +18,7 @@ extern char *sCardIconNames[];
 extern const char gCardPathPrefix[]; /* "CARD\\" */
 extern const char gCardPathSuffix[]; /* ".TIM" */
 extern s32 gCardIconRect; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
-extern s32 gCardIconPos; /* opaque block, the fresh unk70's own slot4C arg2, address-only here */
+extern s32 sCardIconPos; /* opaque block, the fresh unk70's own slot4C arg2, address-only here */
 
 void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
 {
@@ -50,7 +50,7 @@ void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
     newVal = New_ScreenSprite(handle, (void *)&gCardIconRect, 0);
     self->unk70 = newVal;
     handle->methods->release(handle);
-    newVal->methods->slot4C(newVal, self->unk68, (void *)&gCardIconPos);
+    newVal->methods->slot4C(newVal, self->unk68, (void *)&sCardIconPos);
 }
 ```
 
@@ -100,7 +100,7 @@ padding `+0x008` through `+0x04C` -- the call's own evidence types `arg1`
 as `self->unk68` forwarded verbatim (that field is already the owning
 struct's established bare `s32`, per its own header comment: "never
 dereferenced in this unit") and `arg2` as an address-only opaque block
-(`gCardIconPos`).
+(`sCardIconPos`).
 
 ## The one real residue: buffer/handle register reuse and a discarded call result
 
@@ -152,7 +152,7 @@ or cache-fill.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern (which typed the return `ChildObj86ED0 *`) is gone. The call reads `newVal = (Class86E00Unk70Obj_3bb8c_g *)New_ScreenSprite(handle, (SpriteRect *)&gCardIconRect, 0)`: gCardIconRect is the rect (words 0, 160, 120). The unit's baseline "assignment from incompatible pointer type" was this line and is gone. `cardIcon`'s type, Class86E00Unk70Obj_3bb8c_g, is Class86E00's view of a ScreenSprite (release at +0x004, attachToParent at +0x04C with the screen position gCardIconPos = (-70, -60)); it is Class86E00's field and is left as it is. Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern (which typed the return `ChildObj86ED0 *`) is gone. The call reads `newVal = (Class86E00Unk70Obj_3bb8c_g *)New_ScreenSprite(handle, (SpriteRect *)&gCardIconRect, 0)`: gCardIconRect is the rect (words 0, 160, 120). The unit's baseline "assignment from incompatible pointer type" was this line and is gone. `cardIcon`'s type, Class86E00Unk70Obj_3bb8c_g, is Class86E00's view of a ScreenSprite (release at +0x004, attachToParent at +0x04C with the screen position sCardIconPos = (-70, -60)); it is Class86E00's field and is left as it is. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88)
 
@@ -166,7 +166,7 @@ Image byte-identical.
 
 `D_80086EC4` -> `gCardIconRect` (declared `SpriteRect`, its three words
 {0, 0, 160, 120}; the `(SpriteRect *)` cast went) and `D_8008AA94` ->
-`gCardIconPos` (declared `ScreenSpritePos`, (-70, -60)), both tier A, by what
+`sCardIconPos` (declared `ScreenSpritePos`, (-70, -60)), both tier A, by what
 they hold (tools/rename.py). Locals: `arg1` -> `index`, the array `path` ->
 `pathBuf` (size written 32), `buf` -> `path`, `handle` -> `tim`, `newVal`
 -> `icon`. The guard `index >= 0x11` is `ARRAY_COUNT(sCardIconNames)`, the
@@ -184,6 +184,6 @@ Comments moved out of the source (verbatim):
   0x8001150C), the rest into sdata.
 - on `gCardIconRect`: "3 words, `New_ScreenSprite`'s rect: a SpriteRect
   {0, 0, 160, 120}."
-- on `gCardIconPos`: "opaque block, the fresh `cardIcon`'s own `slot4C`
+- on `sCardIconPos`: "opaque block, the fresh `cardIcon`'s own `slot4C`
   arg2, address-only here." (slot +0x04C is attachToParent; ScreenSprite's
   override hands it to setPosition.)

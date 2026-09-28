@@ -194,7 +194,7 @@ says what they are):
 | D_8008AADC | gTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (TextEntryItemList) reads its x |
 
 The externs are typed `SpriteRect`, `SpriteRgb` and `ScreenSpritePos`
-(TaskObjF's gCardIconRect/gCardIconPos are the precedent), so two casts
+(TaskObjF's gCardIconRect/sCardIconPos are the precedent), so two casts
 are gone; the three positions still go through the LongVec3 slot with a
 cast. Locals `handle1`/`handle2` -> `panelTim`/`fontTim`, parameter
 `arg1` -> `parent`, `path[0x20]` -> `path[32]`, the cursor cell `0x5F` ->
