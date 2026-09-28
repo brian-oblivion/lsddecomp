@@ -132,7 +132,7 @@ retail has. Byte-exact on this second attempt.
 
 ### Proposed learning
 
-Same family as `Test4InstantTeleporters`'s and `TestForStageTransition`'s lessons
+Same family as `TestForInstantTeleporters`'s and `TestForStageTransition`'s lessons
 earlier this round, now confirmed a third time with a genuinely different
 shape (an early-return GUARD at the top of a function, not an if/else
 spanning the whole body): an early `if (!cond) return X;` at the top of a

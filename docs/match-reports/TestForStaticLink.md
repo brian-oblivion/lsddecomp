@@ -50,7 +50,7 @@ one caller (`DreamSys__StaticWallLink`) tests the result with `bltz`
 convention already documented elsewhere in this header
 (`GetRandomSpawnFromStage`).
 
-`TestForTunnelLinks`, `Test4StaircaseNodes`, and `Test4InstantTeleporters`
+`TestForTunnelLinks`, `Test4StaircaseNodes`, and `TestForInstantTeleporters`
 (none in this round's scope) share the identical shape against different
 table triples -- `GetStaticSpawn`'s declared signature should cover all
 four once someone gets to them.

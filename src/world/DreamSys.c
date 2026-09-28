@@ -1012,7 +1012,7 @@ bool DreamSys__TryInstantTeleportLink(DreamSys *this, PlayerSpawnPoint *currentP
     s32 bonus;
     s32 cellPos[4];
 
-    result = Test4InstantTeleporters(&this->linkCoordinates, currentPos, this->currentStage);
+    result = TestForInstantTeleporters(&this->linkCoordinates, currentPos, this->currentStage);
     if (result >= 0) {
         bonus = GetTeleportTimeBonus();
         if (ExecuteLink(this, result, DREAMSYS_LINK_TELEPORT, 0)) {
@@ -1681,20 +1681,20 @@ s32 GetStageLinkAngle(void) {
 }
 
 /* Set by SetInstantTeleportersEnabled (DreamAux.c calls it), tested by
-   Test4InstantTeleporters. */
+   TestForInstantTeleporters. */
 extern s32 gInstantTeleportersEnabled;
 
 void SetInstantTeleportersEnabled(bool value) {
     gInstantTeleportersEnabled = value;
 }
 
-/* Test4InstantTeleporters' GetStaticSpawn tables: trigger counts,
+/* TestForInstantTeleporters' GetStaticSpawn tables: trigger counts,
    triggers and spawns per stage, as for tunnels and staircases. */
 extern s8 sTeleportTriggersCount[];
 extern StaticLinkTrigger *sTeleportTriggers[];
 extern StageSpawn *sTeleportSpawns[];
 
-s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
+s32 TestForInstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
     s32 result;
 
     if (gInstantTeleportersEnabled == 0) {

@@ -786,7 +786,7 @@ extern s32 rand(void);
 extern s8 sSpecialColors[];
 
 /* Shared by TestForStaticLink/TestForTunnelLinks/Test4StaircaseNodes/
-   Test4InstantTeleporters, each of which forwards its own three args
+   TestForInstantTeleporters, each of which forwards its own three args
    straight through and appends a fixed trailing quadruple (length table,
    trigger table, spawn table, literal 1); every call site tests the result
    with `bltz`. Defined after those callers in src/world/DreamSys.c. */
@@ -825,7 +825,7 @@ extern s32 DreamSys__CheckStaircaseHeading(s32 *arg0, s32 *arg1, void *arg2);
    above -- called by DreamSys__TryInstantTeleportLink as
    (&this->linkCoordinates, currentPos, this->currentStage), result tested
    with `bltz`. Defined after its caller. */
-extern s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
+extern s32 TestForInstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 
 /* Called by DreamSys__TryInstantTeleportLink with no arguments, like
    GetStageLinkAngle; its return value goes straight into ExecuteLink's

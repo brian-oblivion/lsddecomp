@@ -21,7 +21,7 @@ as the already-matched `GenerateInitialSpawn`), increments
 `*gpDinamicLinkPenalty`, and returns the chosen stage. Called throughout
 this unit as the shared "give me somewhere to land" primitive (already
 visible at several now-matched call sites: `TestForStageTransition`,
-`Test4InstantTeleporters`'s trigger tables, `DreamSys__DynamicLink`).
+`TestForInstantTeleporters`'s trigger tables, `DreamSys__DynamicLink`).
 
 ## `D_80087F34` is NOT a second table -- same discovery as `sCardinalRotations`/`sCardinalAngles`
 

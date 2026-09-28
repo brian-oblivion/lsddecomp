@@ -1,4 +1,6 @@
-# Test4InstantTeleporters — MATCHED 20/20
+# TestForInstantTeleporters — MATCHED 20/20
+
+> Renamed from `Test4InstantTeleporters` on 2026-09-28 (tools/rename.py). Address 0x8005bf74.
 
 **Unit:** DreamSys · **Size:** 20 words · **Status:** MATCHED, round 43.
 
@@ -65,7 +67,7 @@ neither path can reach the shared tail for free).
 ## Final body: condition written as `== 0` first, `else` second (20/20)
 
 ```c
-s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
+s32 TestForInstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage)
 {
 	s32 result;
 
@@ -96,7 +98,7 @@ extern StageSpawn* sTeleportSpawns[];
 ## Verification
 
 `./build-and-verify.sh` -> `build exit=0`, whole-image SHA1 matches retail.
-`tools/funcdiff.py Test4InstantTeleporters` -> `20/20 words match`.
+`tools/funcdiff.py TestForInstantTeleporters` -> `20/20 words match`.
 
 ### Proposed learning
 

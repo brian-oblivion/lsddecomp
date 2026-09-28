@@ -50,7 +50,7 @@ Renamed from `func_8005BFC4` (tier C since round 66).
 
 Round 66 kept the placeholder because "nothing in any carved unit calls it"; that
 stopped being true when `DreamSys__TryInstantTeleportLink` was matched. That
-caller, after `Test4InstantTeleporters` has found a link (which leaves the
+caller, after `TestForInstantTeleporters` has found a link (which leaves the
 trigger's stage in `gLinkSrcStage`), calls this with no arguments and, when the
 result is non-zero and the dream is not a flashback session, sets the dream time
 limit to `getDreamTimerScaled() + result` -- i.e. the result is extra time, in

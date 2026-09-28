@@ -12,7 +12,7 @@ Filed round 2026-08-30-a as BLOCKED on `gp_rel` (6 references, the first to
 
 The shared "static link" lookup used by
 `TestForStaticLink`/`TestForTunnelLinks`/`Test4StaircaseNodes`/
-`Test4InstantTeleporters` (all already matched or forwarding wrappers):
+`TestForInstantTeleporters` (all already matched or forwarding wrappers):
 scans `triggers[stage][0..triggerLens[stage])` for an entry whose `chunk`
 matches `currentPos->chunk` and whose `tile` either matches
 `currentPos->tile` or is a wildcard (negative `tile.value`); on a match,
