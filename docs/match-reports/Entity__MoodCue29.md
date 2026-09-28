@@ -17,7 +17,7 @@ one-shot effect via `Unk94Obj::slot200`'s return value, then always rerolls
 void Entity__MoodCue29(Entity *this) {
     if (this->unkFC == 0) {
         if (this->unk94->methods->slot200(this->unk94) == 7) {
-            this->methods->slot48(this, 1, SCALE_TRIPLE);
+            this->methods->slot48(this, 1, sScaleTriple);
             this->methods->slotCC(this, -0x7800, 0);
         }
         this->unk44 = rand() % 5;
@@ -30,7 +30,7 @@ void Entity__MoodCue29(Entity *this) {
 
 Second confirmed caller of `Unk94Methods::slot200` (previously known only
 from `Entity__MoodCue00`, compared against the literal `5`; this compares
-against `7`, no new signature information). `SCALE_TRIPLE` and `sRotationYawPlus1`
+against `7`, no new signature information). `sScaleTriple` and `sRotationYawPlus1`
 are new rodata pointers, extern-declared alongside this unit's other
 `D_80089*` constants -- neither yet dereferenced by any carved code.
 

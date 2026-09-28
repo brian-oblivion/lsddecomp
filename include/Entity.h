@@ -298,7 +298,7 @@ extern Ratio16 sScaleSix[];
 extern Ratio16 SCALE_TWO_FIFTHS[];
 extern Ratio16 sScaleY2[];
 extern Ratio16 sScaleY4[];
-extern Ratio16 SCALE_TRIPLE[];
+extern Ratio16 sScaleTriple[];
 extern Ratio16 sScaleThirtySecond[];
 extern Ratio16 sScaleX3[];
 

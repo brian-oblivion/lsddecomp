@@ -974,7 +974,7 @@ void Entity__MoodCue119(Entity *this) {
 void Entity__MoodCue29(Entity *this) {
     if (this->moodTimer == 0) {
         if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == DREAM_COLOR_WHITE) {
-            this->methods->updateScale(this, 1, SCALE_TRIPLE);
+            this->methods->updateScale(this, 1, sScaleTriple);
             this->methods->moveLocalY(this, -30720, 0);
         }
         this->state = rand() % 5;
