@@ -80,7 +80,7 @@ void ReleaseDreamAuxModels(void) {
  * Entity here attaches to), the player (each Entity's peer), the sound bank
  * each Entity is built with and the FrameClock each attaches as its
  * companion. */
-extern s32 gDreamAuxStage;
+extern s32 sDreamAuxStage;
 extern StageMap *gDreamAuxStageMap;
 extern DreamSys *gDreamAuxWorld;
 extern struct VabStreamObj *sDreamAuxSound;
@@ -93,7 +93,7 @@ void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct Vab
     DreamAuxSlot *slot = sDreamAuxSlots;
     u32 i;
 
-    gDreamAuxStage = stage;
+    sDreamAuxStage = stage;
     gDreamAuxStageMap = stageMap;
     gDreamAuxWorld = world;
     sDreamAuxSound = sound;
@@ -167,7 +167,7 @@ s32 TryDreamAuxTrigger(s32 data, s16 *chunkKey, s32 day) {
         if (CheckTriggerDayParity(day, trigger)) {
             return (s32)FireDreamAuxTriggerEntries(day, trigger, data);
         }
-        if (gDreamAuxStage != 0 && rand() % 12 == 0 && (day & 1) == 0) {
+        if (sDreamAuxStage != 0 && rand() % 12 == 0 && (day & 1) == 0) {
             PlaceDreamAuxEntityByPlayer(sDreamAuxSlots);
         }
     }
@@ -177,7 +177,7 @@ s32 TryDreamAuxTrigger(s32 data, s16 *chunkKey, s32 day) {
 DreamAuxTriggerEntry *RemapTriggerForDreamColor(DreamAuxTriggerEntry *trigger, s32 index);
 
 DreamAuxTriggerEntry *LookupDreamAuxTrigger(s16 *chunkKey) {
-    s32 stage = gDreamAuxStage;
+    s32 stage = sDreamAuxStage;
     s32 count = gDreamAuxTriggerCounts[stage];
     DreamAuxTriggerEntry *trigger = gDreamAuxTriggerEntries[stage];
     s32 i;
@@ -193,7 +193,7 @@ DreamAuxTriggerEntry *LookupDreamAuxTrigger(s16 *chunkKey) {
 
 /* On stage 4, a red dream swaps the stage's trigger 16 for trigger 21. */
 DreamAuxTriggerEntry *RemapTriggerForDreamColor(DreamAuxTriggerEntry *trigger, s32 index) {
-    s32 stage = gDreamAuxStage;
+    s32 stage = sDreamAuxStage;
 
     if (stage == 4 && index == 16) {
         DreamSys *player = gDreamAuxWorld;
@@ -230,7 +230,7 @@ TriggerWorld *FireDreamAuxTriggerEntries(s32 day, DreamAuxTriggerEntry *trigger,
     world = New_TriggerWorld(&req.src);
 
     if (world != NULL) {
-        TriggerRecord *records = sDreamAuxGroupRecords[gDreamAuxStage];
+        TriggerRecord *records = sDreamAuxGroupRecords[sDreamAuxStage];
         s8 *next = trigger->recordIndices;
         s8 *end = trigger->recordIndices + ARRAY_COUNT(trigger->recordIndices);
 

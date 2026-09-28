@@ -21,7 +21,7 @@ The initializer for this unit's five `%gp_rel` globals plus a one-shot
 
 ```c
 extern void *New_Entity(void *arg0, void *arg1, void *arg2);
-extern s32 gDreamAuxStage;
+extern s32 sDreamAuxStage;
 extern s32 gDreamAuxStageMap;
 extern s32 gDreamAuxWorld;
 extern s32 sDreamAuxSound;
@@ -34,7 +34,7 @@ void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
     DreamAuxSlot *slot = sDreamAuxSlots;
     u32 i;
 
-    gDreamAuxStage = a0;
+    sDreamAuxStage = a0;
     gDreamAuxStageMap = a1;
     gDreamAuxWorld = a2;
     sDreamAuxSound = a3;
@@ -107,7 +107,7 @@ Two independent instances now confirm it in this unit alone
 ## Naming
 
 **SetDreamAuxWorld** — tier B. Installs its five parameters into the unit's
-shared context globals (`gDreamAuxStage`, `gDreamAuxWorld` and three still-
+shared context globals (`sDreamAuxStage`, `gDreamAuxWorld` and three still-
 unnamed siblings), spawns one entity into `sDreamAuxSlots[0].entity` via
 `New_Entity`, then calls `SetTeleportsEnabled`. Called from
 `ObjM__SetupSceneStyle` (`ObjMStyleActor.c`), itself a per-object/per-level setup

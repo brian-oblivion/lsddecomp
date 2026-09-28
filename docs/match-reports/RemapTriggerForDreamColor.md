@@ -22,7 +22,7 @@ dispatch idiom.
 ```c
 s32 RemapTriggerForDreamColor(s32 a0, s32 a1)
 {
-    s32 val = gDreamAuxStage;
+    s32 val = sDreamAuxStage;
 
     if (val == 4 && a1 == 0x10) {
         TriggerWorld *w = (TriggerWorld *)gDreamAuxWorld;
@@ -36,12 +36,12 @@ s32 RemapTriggerForDreamColor(s32 a0, s32 a1)
 }
 ```
 
-`a0 + 0x1E` (30) only happens when the unit is in state 4 (`gDreamAuxStage == 4`),
+`a0 + 0x1E` (30) only happens when the unit is in state 4 (`sDreamAuxStage == 4`),
 the caller passes `0x10` as `a1`, and a re-check of the same vtable-0x80
 predicate used by `IsCurrentDreamColor` still reports state 4. Otherwise `a0` is
 returned unchanged. `val` is read once into a local and reused both for the
 initial `== 4` test and the post-call re-check (`result == val`), matching
-retail's single `lw $s1, %gp_rel(gDreamAuxStage)($gp)` cached across the call --
+retail's single `lw $s1, %gp_rel(sDreamAuxStage)($gp)` cached across the call --
 re-reading the global a second time in C, or comparing against the literal
 `4` instead of `val`, would very likely still be correct C but was not
 tested since the cached-local reading matched on the first build.

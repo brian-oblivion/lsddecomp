@@ -34,7 +34,7 @@ s32 TryDreamAuxTrigger(s32 a0, s16 *a1, s32 a2)
         if (CheckTriggerDayParity(a2, (s8 *)record)) {
             return FireDreamAuxTriggerEntries(a2, record, a0);
         }
-        if (gDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
+        if (sDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0) {
             PlaceDreamAuxEntityByPlayer(sDreamAuxSlots);
         }
     }
@@ -86,7 +86,7 @@ One attempt short of byte-exact, one arithmetic-idiom fix:
   that difference was just the reproducer's own `return (cond);` idiom
   materializing a boolean where the real call site's `if (...)` guard
   branches directly; it went away once substituted into the real
-  `if (gDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0)` guard. Fixing
+  `if (sDreamAuxStage != 0 && rand() % 12 == 0 && (a2 & 1) == 0)` guard. Fixing
   the divisor alone (`% 3` -> `% 12`) reached byte-exact.
 
 ## Proposed learning

@@ -17,7 +17,7 @@ and matched it.
 Construct a `TriggerWorld` via `New_TriggerWorld`; if construction succeeds,
 walk 3 candidate bytes (`a1[3..5]`, terminated early by a `-1` sentinel) and
 fire `ProcessDreamAuxTriggerRecord` once per non-sentinel byte against the SAME
-`sDreamAuxGroupRecords`/`gDreamAuxStage` parallel-group table `InitDreamAux` clears
+`sDreamAuxGroupRecords`/`sDreamAuxStage` parallel-group table `InitDreamAux` clears
 (8-byte stride, confirmed there and reused here identically); the loop's
 `ProcessDreamAuxTriggerRecord` results are discarded (called for side effects only). The
 return value is just whether construction succeeded:
@@ -35,7 +35,7 @@ s32 FireDreamAuxTriggerEntries(s32 a0, s8 *a1, s32 a2)
     world = New_TriggerWorld(ctxArg);
 
     if (world != NULL) {
-        DreamAuxGroupRecord *base = sDreamAuxGroupRecords[gDreamAuxStage];
+        DreamAuxGroupRecord *base = sDreamAuxGroupRecords[sDreamAuxStage];
         s8 *p = a1 + 3;
         s8 *end = a1 + 6;
 

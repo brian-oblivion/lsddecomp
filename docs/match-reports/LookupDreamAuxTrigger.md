@@ -14,7 +14,7 @@ Round 43 derived and matched it fresh.
 
 ## What it does
 
-A linear search over one of 14 parallel groups (selected by `gDreamAuxStage`,
+A linear search over one of 14 parallel groups (selected by `sDreamAuxStage`,
 the same index this unit also uses in `RemapTriggerForDreamColor`/`IsCurrentDreamColor`) for
 an entry whose 2-byte `key` matches `*a0`, dispatching the match (or its
 absence) into `RemapTriggerForDreamColor`:
@@ -30,7 +30,7 @@ extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[];
 
 s32 LookupDreamAuxTrigger(s16 *a0)
 {
-    s32 idx = gDreamAuxStage;
+    s32 idx = sDreamAuxStage;
     s32 count = gDreamAuxTriggerCounts[idx];
     DreamAuxTriggerEntry *entry = gDreamAuxTriggerEntries[idx];
     s32 i;
@@ -48,7 +48,7 @@ s32 LookupDreamAuxTrigger(s16 *a0)
 `gDreamAuxTriggerCounts`/`gDreamAuxTriggerEntries` is a second "count + pointer-to-array" parallel
 family in this unit, structurally identical to the already-documented
 `sDreamAuxGroupCounts`/`sDreamAuxGroupRecords` (`InitDreamAux`) but a different stride (6 bytes,
-not 8) and a different index space (`gDreamAuxStage`, not a loop counter). The
+not 8) and a different index space (`sDreamAuxStage`, not a loop counter). The
 record type is named `DreamAuxTriggerEntry` since `LookupDreamAuxTrigger`'s only
 consumer of the match, `RemapTriggerForDreamColor`, is itself part of this unit's
 trigger-dispatch cluster (`ProcessDreamAuxTriggerRecord`/`CheckDreamAuxTriggerCondition`/etc.).
@@ -90,7 +90,7 @@ issue.
 ## Naming
 
 **LookupDreamAuxTrigger** — tier A. A linear search over
-`gDreamAuxTriggerEntries[gDreamAuxStage]` for an entry whose `key` matches
+`gDreamAuxTriggerEntries[sDreamAuxStage]` for an entry whose `key` matches
 `*a0`, dispatching the match (or its absence) into
 `RemapTriggerForDreamColor`. The search IS the function's purpose, so tier
 A applies even though it delegates the on-hit adjustment to a sibling.
@@ -107,7 +107,7 @@ The header comment, as it stood:
 ```c
 /* A second parallel-group family, same "count + pointer to array" shape as
  * DreamAuxGroupRecord above but a different stride and a different index
- * space: 14 (0xE) groups selected by `gDreamAuxStage` (not a loop index),
+ * space: 14 (0xE) groups selected by `sDreamAuxStage` (not a loop index),
  * gDreamAuxTriggerCounts[i] a signed count, gDreamAuxTriggerEntries[i] a pointer to an array of
  * count 6-byte records whose first 2 bytes (`key`, read with `lh`) are the
  * only field LookupDreamAuxTrigger accesses. The remaining 4 bytes are undiscovered

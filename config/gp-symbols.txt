@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gDreamAuxStage
 gDreamAuxStageMap
 gDreamAuxWorld
 gEntityFadeBoxDefaultOffset
@@ -182,6 +181,7 @@ sDivPolygon4
 sDrawSystem
 sDreamAuxFrameClock
 sDreamAuxSound
+sDreamAuxStage
 sItemListCardPathPrefix
 sItemListTimExt
 sLinkAngle180
