@@ -829,7 +829,7 @@ void Entity__MoodCue19(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue20(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0 && rand() % 7 == 0) {
-        this->methods->updateScale(this, 1, SCALE_Y2);
+        this->methods->updateScale(this, 1, sScaleY2);
     }
     if ((out->tick & 3) == 0) {
         out->attenuation = this->methods->getProximityRatio(this);
@@ -1513,7 +1513,7 @@ void Entity__MoodCue55(Entity *this, SoundCueSet *out) {
 
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
-            this->methods->updateScale(this, 1, SCALE_Y2);
+            this->methods->updateScale(this, 1, sScaleY2);
         }
     }
     out->attenuation = this->methods->getProximityRatio(this);
@@ -2097,7 +2097,7 @@ void Entity__MoodCue78(Entity *this, SoundCueSet *out) {
     } else if (this->state >= 12 && out->tick >= 330 && (out->tick % 60) == 30) {
         rollOrDy = 0;
         if (rand() & 1) {
-            table = SCALE_Y2;
+            table = sScaleY2;
             rollOrDy = (this->state == 12) ? 400 : 0;
             this->state = 13;
         } else {

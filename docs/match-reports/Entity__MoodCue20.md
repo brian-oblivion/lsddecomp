@@ -9,7 +9,7 @@ Unit: `Entity`. Runner: bravo.
 ```c
 void Entity__MoodCue20(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0 && rand() % 7 == 0) {
-        this->methods->slot48(this, 1, SCALE_Y2);
+        this->methods->slot48(this, 1, sScaleY2);
     }
     if ((out->unk4 & 3) == 0) {
         out->unk10 = this->methods->slot148(this);
@@ -33,7 +33,7 @@ void Entity__MoodCue20(Entity *this, EntityMoodHandlerArg *out) {
   remembering as a candidate discriminator: a bare `andi` with no correction
   present in the asm is a tell that the source used `&`, not `%`, even where
   a modulus by a power of two would read equally naturally.
-- Extern added: `SCALE_Y2` (opaque row pointer, same convention as the
+- Extern added: `sScaleY2` (opaque row pointer, same convention as the
   other `D_80089Dxx`/`D_80089Cxx` rows already declared in `Entity.c`).
 - Clean of both open toolchain blockers.
 

@@ -174,11 +174,11 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_80089CAC` | `ROTATION_YAW_MINUS_THIRD` | A (by value) | `.word 0x00010000, 0x0003FFFF, 0x00010000` = {0/1, -1/3, 0/1}: yaw -1/3 degree per call |
-| `D_80089DE4` | `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` | A (by value) | `.word 0x00050004, 0x00050006, 0x00050005` = {4/5, 6/5, 5/5}; z is 5/5 = 1, omitted like `SCALE_Y2`'s unit axes |
+| `D_80089DE4` | `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` | A (by value) | `.word 0x00050004, 0x00050006, 0x00050005` = {4/5, 6/5, 5/5}; z is 5/5 = 1, omitted like `sScaleY2`'s unit axes |
 | local `a2` | `scale` (now `Ratio16 *`, was `void *`) | -- | the `updateScale` argument; byte-exact |
 
 The "left unnamed" section above predates the precedent: round 94's
-`ROTATION_XPLUS_EIGHTH` (x = 1/8 degree) and `sScaleX3`/`SCALE_Y2` are the
+`ROTATION_XPLUS_EIGHTH` (x = 1/8 degree) and `sScaleX3`/`sScaleY2` are the
 fractional-degree and non-uniform-scale precedents it asked for.
 
 ### `state = 1` at `moodTimer >= 2000` is `ENTITY_STATE_DONE`

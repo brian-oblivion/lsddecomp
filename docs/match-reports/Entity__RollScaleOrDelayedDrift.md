@@ -152,6 +152,6 @@ derivation, verbatim:
 `Entity__MoodCueNN.md`'s `## Naming`; the row-115 ordering point is in
 `Entity__MoodCue115.md`'s. In the text above the helper appears under its
 old name. The old extern comment also said the tables followed "the same
-convention as Entity.c's own SCALE_Y2/sScaleSix/etc externs (separate
+convention as Entity.c's own sScaleY2/sScaleSix/etc externs (separate
 local view per translation unit, not shared via the header)"; round 93
 retyped them from `u8[]` to `Ratio16[]`, byte-identical.)
