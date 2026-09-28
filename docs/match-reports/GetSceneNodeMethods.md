@@ -56,7 +56,7 @@ and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
 `src/code_d294.c`, `src/class_3bb8c_c.c`, `src/class_3bb8c_k.c`,
-`src/class_3bb8c_p.c`, `src/class_3ac78.c`, `src/ScreenWidgets.c`,
+`src/class_3bb8c_k.c`, `src/class_3ac78.c`, `src/ScreenWidgets.c`,
 `src/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
 Renaming this symbol would edit every one of those files -- squarely

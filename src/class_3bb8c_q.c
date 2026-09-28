@@ -1,7 +1,7 @@
 /*
  * class_3bb8c_q -- two methods of VariantSprite (include/VariantSprite.h), a
  * Sprite whose variant, 0 or 1, picks its texture cell and CLUT. The ctor
- * and allocator are in class_3bb8c_p.c, the empty leaves and the table
+ * and allocator are in class_3bb8c_k.c, the empty leaves and the table
  * getter in class_3bb8c_t.c.
  *
  * - VariantSprite__SetVariantClut (reset, +0x040, called last by the ctor

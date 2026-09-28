@@ -9,7 +9,7 @@ occupant (`slotC4`), already independently confirmed `void` from BOTH
 `Entity.h` and `code_55dd4.h`'s `TodActorMethods::slotC4` (both tables
 hold this exact function at `+0xC4`, per `Entity.h`'s own comment). Tail-
 calls `Actor__MoveAlongLocalAxis` (still `INCLUDE_ASM`, sibling unit
-`class_3bb8c_p`) with a fixed global address and a literal `6`.
+`class_3bb8c_k`) with a fixed global address and a literal `6`.
 
 ## Final source
 
@@ -60,7 +60,7 @@ generalizes past the two instances (`Entity__MoodCue32`, `Entity__MoodCue00`)
 `slotC4` `BasicClass`-inherited slot, confirmed by `tools/classtable.py`
 against `Entity.h`/`code_55dd4.h`'s independent readings of the same
 address), but the function tail-calls a still-`INCLUDE_ASM` sibling-unit
-function (`Actor__MoveAlongLocalAxis`, `class_3bb8c_p.c`) with a fixed global address
+function (`Actor__MoveAlongLocalAxis`, `class_3bb8c_k.c`) with a fixed global address
 and a literal mode value `6`, and no occupant of `slotC4` anywhere in the
 codebase has an established purpose either (`Entity.h`'s own comment on
 this exact slot only documents a MUST-STAY-`void` return-type constraint,

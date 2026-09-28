@@ -1723,7 +1723,6 @@ segments:
       # -- the cleanest window found anywhere this round.  Four are
       # 2-instruction leaves.  Owns NO switch jump table, so no rodata
       # attach.  Same multi-class caveat as _o above.
-      - [0x47CC4, c, class_3bb8c_p]
       # class_3bb8c_q: functions 94..95 of that remainder, 0x485BC..0x48738.
       # CARVED round 47 (2026-09-16).  The note this replaces said "both are
       # blocked -- func_80057DBC on addiu-$at and func_80057DF4 on

@@ -32,7 +32,7 @@ own `GetGraphRoomMethods`, still queued -- forward-declared here) with `(obj,
 arg1)`, return the allocation regardless of the ctor's own return value.
 `return obj;` sits INSIDE the success `if`, with a trailing `return
 NULL;` -- the shape established as necessary for this exact pattern in
-`class_3bb8c_p`'s `New_VariantSprite` report.
+`class_3bb8c_k`'s `New_VariantSprite` report.
 
 This introduces this unit's own view of `gGraphRoomMethods` (73 slots,
 `D_80087AACMethods`/`D_80087AACObj`, currently typing only the ctor slot
@@ -77,7 +77,7 @@ The unit banner of `src/class_3bb8c_t.c` was rewritten to say what the file hold
  * - Four empty leaves plus the table getter (VariantSprite__Update,
  *   VariantSprite__NoOpSlotBC/C0/C4, GetVariantSpriteMethods) of the
  *   unrelated VariantSprite (include/VariantSprite.h; its ctor is in
- *   `class_3bb8c_p`, two more methods in `class_3bb8c_q`).
+ *   `class_3bb8c_k`, two more methods in `class_3bb8c_q`).
  * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
  *   73 slots), a TaskCore subclass, unified in include/GraphRoom.h (track 4,
  *   round 87; the header's banner has the slots, fields and evidence).

@@ -2,7 +2,7 @@
  * class_3bb8c_t -- the graph room, and the tail of VariantSprite.
  *
  * - VariantSprite (include/VariantSprite.h): four empty methods and the
- *   table getter. Its ctor is in class_3bb8c_p, two more methods in
+ *   table getter. Its ctor is in class_3bb8c_k, two more methods in
  *   class_3bb8c_q.
  * - GraphRoom (include/GraphRoom.h, whose banner has the slots and fields),
  *   a TaskCore subclass, whole: allocator, ctor, every override, ScoreDayLog

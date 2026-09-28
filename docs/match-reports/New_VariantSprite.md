@@ -6,7 +6,7 @@
 
 > Renamed from `func_80057C94` on 2026-09-19 (tools/rename.py). Address 0x80057c94.
 
-Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` family -- plain
+Unit: `src/class_3bb8c_k.c`. Class: `DreamSys` family -- plain
 allocator/constructor wrapper (`New_X` shape per CLAUDE.md's own
 description), not a vtable slot itself.
 

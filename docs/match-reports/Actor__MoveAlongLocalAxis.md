@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057534` on 2026-09-19 (tools/rename.py). Address 0x80057534.
 
-Unit: `src/class_3bb8c_p.c`. Class: `DreamSys` (self+0, vtable
+Unit: `src/class_3bb8c_k.c`. Class: `DreamSys` (self+0, vtable
 `vtable_DreamSys`, resolved via `tools/classtable.py gDreamSysMethods`).
 
 ## Signature
@@ -136,7 +136,7 @@ in the same function; truncate once into a named local instead).
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__ApplyOffsetSlotAndNotify`. The body behind the three moves: store val in one component (`axis`) of the local move vector gActorLocalMove, keep it in lastOffsetValue, addLocalTranslation (+0x0C0) the whole vector, clear the component, and when `notify` is non-NULL call notifyIfUnk20Active (+0x088) with the move's event (6 z, 7 x, 8 y). DreamSys__NotifyLinkAttempt was DreamSys's override of that slot, not the slot. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__ApplyOffsetSlotAndNotify`. The body behind the three moves: store val in one component (`axis`) of the local move vector gActorLocalMove, keep it in lastOffsetValue, addLocalTranslation (+0x0C0) the whole vector, clear the component, and when `notify` is non-NULL call notifyIfUnk20Active (+0x088) with the move's event (6 z, 7 x, 8 y). DreamSys__NotifyLinkAttempt was DreamSys's override of that slot, not the slot. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_k.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 

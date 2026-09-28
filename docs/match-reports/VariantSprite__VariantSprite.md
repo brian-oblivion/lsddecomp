@@ -6,7 +6,7 @@
 
 > Renamed from `func_80057D10` on 2026-09-19 (tools/rename.py). Address 0x80057d10.
 
-Unit: `src/class_3bb8c_p.c`. Class: `gVariantSpriteMethods` (49 slots, uncarved --
+Unit: `src/class_3bb8c_k.c`. Class: `gVariantSpriteMethods` (49 slots, uncarved --
 `asm/class_3bb8c_q.s`) -- THIS is its own ctor, resolved via
 `tools/classtable.py gVariantSpriteMethods` at `+0x008`, and the callee of this
 unit's own `New_VariantSprite` (`GetVariantSpriteMethods()->ctor(...)`, see its

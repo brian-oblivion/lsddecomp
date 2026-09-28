@@ -20,12 +20,12 @@ D_800879C4Table *GetVariantSpriteMethods(void) {
 
 This same table was already established with fields
 (`D_800879C4Methods`/`D_800879C4Obj`, ctor at `+0x008`, `slot0x40`) in the
-neighbouring `class_3bb8c_p` unit earlier this round, which owns the
+neighbouring `class_3bb8c_k` unit earlier this round, which owns the
 ctor (`VariantSprite__VariantSprite`) and this table's own leaf slots
 (`VariantSprite__Update/40/48/50`). This function needs none of those fields --
 only the address -- so it's declared here as an opaque incomplete type,
 per the multiple-independent-local-views convention (this unit does not
-include `class_3bb8c_p`'s header).
+include `class_3bb8c_k`'s header).
 
 ## Verify
 
@@ -41,7 +41,7 @@ Renamed from `func_80057F58` (tools/rename.py), tier A: a plain getter for
 `GetSpriteMethods` / `GetActorMethods`. It now returns `VariantSpriteMethods *`
 (`include/VariantSprite.h`); class_3bb8c_t.c's opaque `D_800879C4Table`
 typedef and extern are gone. Its callers are the class's own allocator and
-ctor (class_3bb8c_p.c). Byte-identical.
+ctor (class_3bb8c_k.c). Byte-identical.
 
 ## Track 6 (2026-09-26, round 93, bravo)
 

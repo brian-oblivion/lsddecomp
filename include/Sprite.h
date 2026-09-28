@@ -13,7 +13,7 @@
  * classes derive from it (`typeviews.py --tree`): ScreenSprite (0x144, the
  * screen-space sprite, include/ScreenSprite.h), CharSprite (0x1144, one 8x8
  * font character, include/CharSprite.h), TextRow (0x11144) and gVariantSpriteMethods (0x1F44,
- * class_3bb8c_p/q/t).
+ * class_3bb8c_k/q/t).
  *
  * The texture is bound by reset (+0x040), which the ctor calls with its own
  * arguments: `texture` is a TimImage (include/TimImage.h: its GsIMAGE is at +0x02C,

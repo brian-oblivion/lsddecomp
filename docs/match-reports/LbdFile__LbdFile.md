@@ -138,9 +138,9 @@ apply by type scope.
   GetLastTargetRateSplit), class_3bb8c_b.c (FindElemIndexByUnk30).
 - `LbdFile.ownerKey` (+0x032) -> `elemKey`. StageMap's ctor writes the
   element's index, BuildRateEntries copies each element's `key` in, and
-  FindElemByUnk32 / UpdateFootprintTracking / class_3bb8c_p read it back to
+  FindElemByUnk32 / UpdateFootprintTracking / class_3bb8c_k read it back to
   find an element. Accessors: class_3ac78.c, class_3bb8c.c, class_3bb8c_b.c,
-  class_3bb8c_p.c (none in GameFiles.c; the ctor zeroes it).
+  class_3bb8c_k.c (none in GameFiles.c; the ctor zeroes it).
 - `LbdFileHeader.gridOffset` / `gridSize` (+0x04 / +0x08) ->
   `placementsOffset` / `placementsSize`. StageMap__PopulateSlotCells
   points the element's PlacementGrid (a 20x20 grid of placement records) at
