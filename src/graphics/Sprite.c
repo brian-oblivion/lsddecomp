@@ -45,7 +45,7 @@ extern FileResourceMethods *GetActiveDataSourceMethods(void);
 extern LongVec3 gVec3Zero;
 
 /* Cell 0 of the font texture, {u 0, v 0, w 8, h 8}: GetCellRect offsets it. */
-extern SpriteRect gCharSpriteCellRect;
+extern SpriteRect sCharSpriteCellRect;
 
 /* A 0..255 colour channel to GsSetAmbient's 0..ONE scale (255 << 4 is 4080). */
 #define AMBIENT_TO_FIX12_SHIFT 4
@@ -99,10 +99,10 @@ CharSpriteMethods *GetCharSpriteMethods(void) {
     return &gCharSpriteMethods;
 }
 
-/* The rect of character `cell` in the font texture: gCharSpriteCellRect moved
+/* The rect of character `cell` in the font texture: sCharSpriteCellRect moved
  * to the cell's column and row. Only the low byte of `cell` counts. */
 void GetCellRect(SpriteRect *dst, u32 cell) {
-    *dst = gCharSpriteCellRect;
+    *dst = sCharSpriteCellRect;
     cell &= 0xFF;
     dst->u += (cell % CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE;
     dst->v += (cell / CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE;

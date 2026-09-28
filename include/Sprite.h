@@ -60,7 +60,7 @@ struct SpriteRgb {
 
 /* A texture cell: 16-bit origin in the texture page, 32-bit extent. The
  * ctor's `rect`, copied to `rect` by reset; gVariantSpriteCells (VariantSprite's two
- * cells) and gCharSpriteCellRect (CharSprite's 8x8 cell origin) are these. */
+ * cells) and sCharSpriteCellRect (CharSprite's 8x8 cell origin) are these. */
 struct SpriteRect {
     /* +0x000 */ u16 u;
     /* +0x002 */ u16 v;
