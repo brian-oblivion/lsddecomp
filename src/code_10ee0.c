@@ -127,7 +127,7 @@ void DrawSystem__StoreImage(DrawSystem *self, u32 *pixels, DrawRect *src) {
     }
 }
 
-s32 DrawSystem__func_80020A1C(DrawSystem *self) {
+s32 DrawSystem__NoOpSlot60(DrawSystem *self) {
     return 0;
 }
 

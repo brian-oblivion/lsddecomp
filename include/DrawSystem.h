@@ -65,7 +65,7 @@ struct DrawSystemMethods {
     /* +0x054 */ s32 (*getActiveBuffer)(DrawSystem *self); /* DrawSystem__GetActiveBuffer */
     /* +0x058 */ void (*loadImage)(DrawSystem *self, DrawRect *rect, u32 *pixels); /* DrawSystem__LoadImage */
     /* +0x05C */ void (*storeImage)(DrawSystem *self, u32 *pixels, DrawRect *rect); /* DrawSystem__StoreImage */
-    /* +0x060 */ s32 (*slot60)(DrawSystem *self); /* DrawSystem__func_80020A1C, always returns 0 */
+    /* +0x060 */ s32 (*slot60)(DrawSystem *self); /* DrawSystem__NoOpSlot60, always returns 0 */
     /* +0x064: the occupant takes s16 x, y and sign-extends them itself; the slot passes
      * s32 because its caller's bytes need it (RotateVramRectRight, TimImage: an s16
      * prototype adds a caller-side sll/sra per argument). */
@@ -110,7 +110,7 @@ void DrawSystem__SwapBuffers(DrawSystem *self);
 s32 DrawSystem__GetActiveBuffer(DrawSystem *self);
 void DrawSystem__LoadImage(DrawSystem *self, DrawRect *rect, u32 *pixels);
 void DrawSystem__StoreImage(DrawSystem *self, u32 *pixels, DrawRect *rect);
-s32 DrawSystem__func_80020A1C(DrawSystem *self);
+s32 DrawSystem__NoOpSlot60(DrawSystem *self);
 void DrawSystem__MoveImage(DrawSystem *self, DrawRect *rect, s16 x, s16 y);
 void DrawSystem__RunLoop(DrawSystem *self);
 void DrawSystem__CountFrames(DrawSystem *self);

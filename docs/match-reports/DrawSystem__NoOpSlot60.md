@@ -1,4 +1,6 @@
-# DrawSystem__func_80020A1C -- MATCHED (2/2 words), round 81
+# DrawSystem__NoOpSlot60 -- MATCHED (2/2 words), round 81
+
+> Renamed from `DrawSystem__func_80020A1C` on 2026-09-28 (tools/rename.py). Address 0x80020a1c.
 
 > Renamed from `func_80020A1C` on 2026-09-25 (tools/rename.py). Address 0x80020a1c.
 
@@ -16,7 +18,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-s32 DrawSystem__func_80020A1C(Class6C070 *self) {
+s32 DrawSystem__NoOpSlot60(Class6C070 *self) {
     return 0;
 }
 ```
@@ -48,7 +50,7 @@ extern void GsSwapDispBuff(void);
 
 ## Naming
 
-Kept the tier-C `DrawSystem__func_80020A1C` form (class known, function
+Kept the tier-C `DrawSystem__NoOpSlot60` form (class known, function
 purpose not): the body is `return 0;` with no caller in this unit and no
 other evidence of what the constant answers. A guessed name (e.g. "CanX")
 would be worse than the placeholder.
