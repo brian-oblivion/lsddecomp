@@ -1756,8 +1756,9 @@ extern s32 gStyleSpawnModelLayout;
 
 /* The every-seventh-day setup: fixed offset y, x of 0..19 steps of 2048, z
  * by day % 3 (40960, -40960, 2048), then the same rotation and layout
- * picks as A. Both parameters are unused; it has A's signature because
- * StyleFillEffectKind0 calls either through one pointer.
+ * picks as SetupStyleSpawnParamsRandom. Both parameters are unused; it has
+ * that function's signature because StyleFillEffectKind0 calls either
+ * through one pointer.
  * MATCHING: each rand() is used inline; one local for all three adds a move
  * after every call. */
 void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
@@ -2676,7 +2677,7 @@ void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale)
  *    sprite kinds that StyleEffect__UpdateByKind and ReleaseByKind
  *    (previous section) call. SpawnPlainSprites builds the five sprites,
  *    RandomizeSprites re-shapes four of them every frame, NoOpIgnoreArgs is
- *    the empty per-frame step, and ReleaseSprites / ReleaseSpritesB are two
+ *    the empty per-frame step, and ReleaseSprites / ReleaseJitterSprites are two
  *    identical functions that release them. Behind them, by address, sit the
  *    class's table getter and SetStyleEffectSources, which records the
  *    TMD resource, TIM image and viewport every StyleEffect draws from.
@@ -2703,7 +2704,7 @@ extern void ReleaseBasicClassArray(void **array, s32 count);
  * the same with 3 and 2; z is 1/1. VariantSprite__UpdateScale reads x and y. */
 extern Ratio16 gStyleEffectJitterScales[6][3];
 
-/* Kind 2's release; ReleaseSpritesB, kind 3's, is the same body. */
+/* Kind 2's release; ReleaseJitterSprites, kind 3's, is the same body. */
 void StyleEffect__ReleaseSprites(StyleEffect *self) {
     ReleaseBasicClassArray((void **)self->sprites, ARRAY_COUNT(self->sprites));
 }
