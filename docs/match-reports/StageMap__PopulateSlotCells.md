@@ -881,10 +881,10 @@ This function: `StageMap__LoadElementResources` -> `StageMap__PopulateSlotCells`
 
 Unit-local views. `LinkResEntry` is gone: it was a view of TmdModel read only
 for its +0x010, and the body now reads `((TmdModel *)(*slot)->model)->object`
-(include/TmdModel.h), cast to `s32` for SceneNode's `tmd` and to `u_long` for
+(include/tmd_model.h), cast to `s32` for SceneNode's `tmd` and to `u_long` for
 Sony's `GsLinkObject4`. The comment that stood on it, moved here: *"PlacementGrid__ResolveEntry's
 non-0/non-(-1) return value (what LinkResource__GetModel returns): a TmdModel
-(include/TmdModel.h), read only for its +0x010, TmdModel's `object`. A view of
+(include/tmd_model.h), read only for its +0x010, TmdModel's `object`. A view of
 TmdModel, left for that class (round 89, LinkResource's unification did not
 retype it)."* `ResourceSourceRequest.field0` is `buffer` (tier A: it is the first word of
 New_LinkResource's descriptor, graphics_resources.c's `ResourceSource { void *buffer; char

@@ -826,7 +826,6 @@
         "PlacementGridVabSound": "2026-09-24",
         "TextEntryItemList": "2026-09-24",
         "TitleMenuTaskObjF": "2026-09-22",
-        "TmdModel": "2026-09-25",
         "TmdRenderer": "2026-09-17",
         "TodActor": "2026-09-24",
         "ViewportDraw": "2026-09-25",
@@ -857,7 +856,8 @@
         "sprite": "2026-09-25",
         "stage_grid": "2026-09-23",
         "task": "2026-09-23",
-        "tim_image": "2026-09-25"
+        "tim_image": "2026-09-25",
+        "tmd_model": "2026-09-25"
       }
     },
     "4": {
@@ -1110,7 +1110,7 @@
         "gTmdModelMethods": {
           "class": "TmdModel",
           "date": "2026-09-26",
-          "header": "include/TmdModel.h"
+          "header": "include/tmd_model.h"
         },
         "gTodActorMethods": {
           "class": "TodActor",
@@ -1558,7 +1558,6 @@
         "PlacementGridVabSound": "2026-09-27",
         "TextEntryItemList": "2026-09-27",
         "TitleMenuTaskObjF": "2026-09-27",
-        "TmdModel": "2026-09-26",
         "TmdRenderer": "2026-09-26",
         "TodActor": "2026-09-27",
         "ViewportDraw": "2026-09-27",
@@ -1582,7 +1581,8 @@
         "sprite": "2026-09-27",
         "stage_grid": "2026-09-28",
         "task": "2026-09-27",
-        "tim_image": "2026-09-27"
+        "tim_image": "2026-09-27",
+        "tmd_model": "2026-09-26"
       }
     },
     "8": {

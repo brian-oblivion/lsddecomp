@@ -76,7 +76,7 @@ rather than API.
   `CdlFILE`; a signed 3-byte colour is defined six times (`BgLayerRgb`,
   `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `ColorRgb`, `ViewportRgb`):
   one type. `FIX12_SHIFT` and `CD_SECTOR_SIZE` redefined at
-  graphics_resources.c:63-64. `ABS_fa50` (TmdModel.c:53) open-coded twice more.
+  graphics_resources.c:63-64. `ABS_fa50` (tmd_model.c:53) open-coded twice more.
 - **Headers not self-contained:** six M-Z headers use `GsCOORDINATE2`,
   `SVECTOR`, `MATRIX`, `RECT` without including Sony's header.
 
@@ -230,7 +230,7 @@ reads them, so nothing names them).
   or to the report): register and ABI notes (`$a0`-`$v0`) in scene_node.h,
   TaskCore.h, TextEntry.h, TextRow.h, TileAtlas.h, TileMap.h, sprite.h,
   task.h, ItemList.h, StreamTask.h; lwl/lwr and "retail reloads" in
-  StageMap.h, TitleMenu.h, TaskObjF.h, TmdModel.h, sprite.h, StyleEffect.h,
+  StageMap.h, TitleMenu.h, TaskObjF.h, tmd_model.h, sprite.h, StyleEffect.h,
   Viewport.h, MoviePlayer.h, GraphRoom.h, LbdFile.h, common.h; GCC and splat
   notes in entity.h:46-51, 102-107, 148-153; about 120 lines in gte.h; 32
   pointers at `tools/` commands and `docs/` files; "(no code)" jargon (8).

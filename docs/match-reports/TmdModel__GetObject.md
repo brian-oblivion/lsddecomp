@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001F360` on 2026-09-25 (tools/rename.py). Address 0x8001f360.
 
-Round 82, runner charlie (matching slot). Unit `src/graphics/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner charlie (matching slot). Unit `src/graphics/tmd_model.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** slot +0x048 of gTmdModelMethods (`tools/classtable.py gTmdModelMethods`).
 - **What:** returns `&self->data->recs[i]`: a 28-byte record array at +0x0C of the model data at object +0x0C. `sll 3; subu; sll 2` = i*28, then `addiu 0xC` for the array offset.

@@ -143,7 +143,7 @@ Read each named class's header first; its banner points to the units.
   libgs `GsDOBJ2` and its coordinate system (`src/graphics/scene_node.c`); `Actor`
   adds movement (`src/world/ObjMStyleActor.c`). `LinkResource`, `ModelData` and `Tod`/`TodSet`
   (`src/graphics/graphics_resources.c`) load models and TOD animations;
-  `TmdModel` (`src/graphics/TmdModel.c`) is one object of a TMD, and
+  `TmdModel` (`src/graphics/tmd_model.c`) is one object of a TMD, and
   `SortTmdObject` (`src/graphics/TmdRenderer.c`) turns it into GPU primitives.
   `Viewport` (`src/app/task.c`, its draw pass in `src/graphics/ViewportDraw.c`)
   renders a scene through libgs;

@@ -983,7 +983,7 @@ NON_MATCHING body promoted, round 69
 
 ## Track 6 (round 91, echo)
 
-The local corner list AttachCornerList_d294b and `other->notifyVerts`'s GenericCountList_d294 are both TmdModel.h's TmdHull; Vec3S16_d294 is TmdVec3. Byte-identical.
+The local corner list AttachCornerList_d294b and `other->notifyVerts`'s GenericCountList_d294 are both tmd_model.h's TmdHull; Vec3S16_d294 is TmdVec3. Byte-identical.
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 

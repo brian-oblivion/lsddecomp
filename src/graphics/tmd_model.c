@@ -1,5 +1,5 @@
 /*
- * TmdModel (include/TmdModel.h; method table
+ * TmdModel (include/tmd_model.h; method table
  * gTmdModelMethods, class tag 9): one object of a TMD file (the "model"
  * SceneNode__LinkModel, src/graphics/scene_node.c, links into a GsDOBJ2). Its
  * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
@@ -23,7 +23,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "TmdModel.h"
+#include "tmd_model.h"
 #include "bmem_pmgr.h"
 
 extern s32 sTmdModelBoundsCount; /* boxes in the bounds buffer: 1, set by the ctor */

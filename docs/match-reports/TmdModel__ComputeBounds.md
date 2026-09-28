@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001F3B0` on 2026-09-25 (tools/rename.py). Address 0x8001f3b0.
 
-Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/TmdModel.c`. Fresh ground, no prior attempt.
+Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/tmd_model.c`. Fresh ground, no prior attempt.
 
 - **What:** axis-aligned bounding box of a TMD object's vertex list. `self->object` is the TMD object-table entry (the 28-byte `TmdObject_fa50`, now given its first two fields `verts`/`nverts`; +0x0C in `ModelData_fa50` is exactly a TMD's 12-byte header, so `recs[]` is the TMD object table). Box = `{s16 x,y,z} min, max` (12 bytes); vertices are 8-byte SVECTORs. Called by `TmdModel__UpdateBoundsBuffer` (into `sTmdModelBoundsBuf`) and `TmdModel__GetHull` (into a stack buffer).
 - **Result:** byte-exact; 77/77 words, whole-image SHA1 green. Build 8.

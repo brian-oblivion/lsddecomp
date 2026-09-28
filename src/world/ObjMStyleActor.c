@@ -51,7 +51,7 @@
 #include "SoundCueSet.h"
 #include "VariantSprite.h"
 #include <rand.h>
-#include "TmdModel.h"
+#include "tmd_model.h"
 #include "GridCell.h"
 #include "GraphRoom.h"
 #include "bmem_pmgr.h"

@@ -1,12 +1,12 @@
-#ifndef TMDMODEL_H
-#define TMDMODEL_H
+#ifndef TMD_MODEL_H
+#define TMD_MODEL_H
 
 #include "basic_class.h"
 
 /*
  * TmdModel -- one object of a TMD model file (class id 0x9, method table
  * gTmdModelMethods): a BasicClass subclass with no subclasses of its own.
- * Methods in src/graphics/TmdModel.c.
+ * Methods in src/graphics/tmd_model.c.
  *
  * The object is built on ONE entry of a TMD's object table (New_TmdModel's
  * argument; LinkResource__BuildModels, graphics_resources, builds one per entry of a
@@ -138,7 +138,7 @@ TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *ou
 /* Points the first primitive's CLUT id at the CLUT at VRAM (xy[0], xy[1]). */
 void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy);
 
-/* Turns each hull of the list and offsets it by `delta` (TmdModel.c, not a
+/* Turns each hull of the list and offsets it by `delta` (tmd_model.c, not a
  * method). */
 void RotateAndOffsetHullList(TmdHull *h, s32 turn, s32 back, s32 delta);
 

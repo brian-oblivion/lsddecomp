@@ -129,7 +129,7 @@ header.
 ## Round 95 (bravo): BoundsBox_d294 is TmdBox
 
 `BoundsBox_d294` (low corner, high corner, three s16 each) was the same
-struct as include/TmdModel.h's `TmdBox` (min, max), which is also what
+struct as include/tmd_model.h's `TmdBox` (min, max), which is also what
 `TmdModel__GetBoundsBuffer` returns. The placeholder is deleted; this function,
 `ClipSegmentToBox`, `CalcBoxOutcode` and `SceneNode__CheckBoundsOverlap` take
 `TmdBox *`, with `lo`/`hi` read as `min`/`max`. Byte-identical. The comment

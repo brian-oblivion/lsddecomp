@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001F66C` on 2026-09-25 (tools/rename.py). Address 0x8001f66c.
 
-Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/TmdModel.c`. Fresh ground, no prior attempt.
+Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/tmd_model.c`. Fresh ground, no prior attempt.
 
 - **What:** walks a counted list of box-corner sets (`HullList_fa50`: `s32 n` then `n` x 48-byte `BoxCorners`, eight `{s16 x,y,z}` as two faces of four; `TmdModel__GetHull` writes a list of one). For each: if `turn`, copy the 48 bytes to a stack temp and permute the corners back in (a quarter turn of the box), then add `d` to `.x` of face `back`; otherwise add `d` to `.z` of face `back`. Caller: `ObjMStyleActor.c` (`RotateAndOffsetHullList(&buf, isSeven, nonneg, adjusted)`).
 - **Result:** byte-exact; 147/147 words, whole-image SHA1 green. Build 5.
@@ -98,7 +98,7 @@ already say what they select. A `MATCHING:` line marks the per-branch `k`
 ## Naming (track 6, round 95)
 
 2026-09-27, delta: `HullList_fa50` (`s32 count; BoxCorners boxes[1];`) is
-deleted and the parameter is `include/TmdModel.h`'s `TmdHull`. Same layout
+deleted and the parameter is `include/tmd_model.h`'s `TmdHull`. Same layout
 (0x34 bytes: the count, then 48 bytes of corners) and the same object: the
 one caller, `Actor__NotifyMove` (ObjMStyleActor.c), fills its buffer through
 `getModelHull` (TmdModel__GetHull writes a `TmdHull`) and hands the same

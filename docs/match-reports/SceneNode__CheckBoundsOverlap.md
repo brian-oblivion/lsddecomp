@@ -839,7 +839,7 @@ Both placeholders in include/scene_node.h are deleted. `Sixteen6_d294` (six
 s16s) was only ever a view of a `TmdModel__GetBoundsBuffer` record, which is a
 `TmdBox`; `SceneNode__RaycastHullAgainstFaces` now holds its `plane` as `TmdBox *`
 with no casts. `CornerList_d294` (a count, then corner[0] with the rest after
-it) is include/TmdModel.h's `TmdHull`, which is what
+it) is include/tmd_model.h's `TmdHull`, which is what
 `SceneNode__TryAttachNearby` passes as this function's `corners`: the body
 reads `list->v` for `&list->hdr`. Byte-identical. The comments the two types
 carried, moved here verbatim:

@@ -102,7 +102,7 @@ callers upcast. Byte-identical.
 
 The local `ModelObj_d294` view (`tmdFile` at +0x00C, `tmd` at +0x010) was a
 view of TmdModel and is deleted; the body now reads the class header
-(include/TmdModel.h), byte-identical:
+(include/tmd_model.h), byte-identical:
 
 ```c
 void SceneNode__LinkModel(SceneNode *self, void *model) {
@@ -137,7 +137,7 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * is the GsDOBJ2 embedded in every SceneNode instance (attribute at +0x10,
  * coord2 at +0x14, tmd at +0x18), and Sony's GsLinkObject4(tmd_base, objp,
  * n) links object `n` of a TMD to it. `model` is a TmdModel
- * (include/TmdModel.h): its `data->objects` is the object table past the
+ * (include/tmd_model.h): its `data->objects` is the object table past the
  * 0xC-byte TMD header, and its `object` pointer is what GsDOBJ2.tmd gets.
  * `self->model` keeps the TmdModel.
  *

@@ -65,7 +65,7 @@ s32 LinkResource__BuildModels(DataSrc33808 *self) {
 
 ## Notes
 
-Second build (the first did not compile: `Rec6F13C` is defined later in the unit, so the local buffer view uses `u8 recs[1][0x1C]`). Byte-exact at once with the unwinding loop in the shape TodSet__BuildTods established this session -- `while (i != 0) { i--; objs--; release(*objs); }` -- which also yields retail's post-loop `addiu s1,s1,4` fix-up so the array base reaches BMemPMgrFree. The early `if (objs == NULL) return 1;` was fine here. New_TmdModel (TmdModel.c) is prototyped locally with void * return; slot78 is cast at the call site.
+Second build (the first did not compile: `Rec6F13C` is defined later in the unit, so the local buffer view uses `u8 recs[1][0x1C]`). Byte-exact at once with the unwinding loop in the shape TodSet__BuildTods established this session -- `while (i != 0) { i--; objs--; release(*objs); }` -- which also yields retail's post-loop `addiu s1,s1,4` fix-up so the array base reaches BMemPMgrFree. The early `if (objs == NULL) return 1;` was fine here. New_TmdModel (tmd_model.c) is prototyped locally with void * return; slot78 is cast at the call site.
 
 ## Naming
 
@@ -78,7 +78,7 @@ renamed from D_8006F13C) is unified in `include/LinkResource.h`. The
 unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 `Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
 `self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
-read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
+read as `TmdFile *` (include/tmd_model.h), the allocator's descriptor is
 `ResourceSource *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.
 

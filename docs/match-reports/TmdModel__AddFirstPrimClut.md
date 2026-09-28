@@ -4,7 +4,7 @@
 
 > Renamed from `func_800204D0` on 2026-09-25 (tools/rename.py). Address 0x800204d0.
 
-Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/TmdModel.c`. Fresh ground, no prior attempt.
+Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/tmd_model.c`. Fresh ground, no prior attempt.
 
 - **What:** sibling of `TmdModel__SetFirstPrimClut`: `t = self->unk10->unk10; t->unk6 += xy[0] / 16; t->unk6 += xy[1] * 64;` with `xy` an `s32 *` (retail `lw`, not `lh`).
 - **Result:** byte-exact; 16/16 words, whole-image SHA1 green. Third build.
@@ -54,7 +54,7 @@ placeholders pending whichever unit's class actually owns this chain.
 ## Track 7 (2026-09-26, round 94, bravo)
 
 Named the fields themselves, unlike the types above: every accessor of
-`unk6`/`unk10` is in this unit (`src/graphics/TmdModel.c`, `grep -rl` over `src/`
+`unk6`/`unk10` is in this unit (`src/graphics/tmd_model.c`, `grep -rl` over `src/`
 finds no other file mentioning `Outer_fa50`/`Inner_fa50`/`Target_fa50`), so
 the field rule (unit-local struct, name accessed `unk` fields) applies even
 though the owning CLASS is still unconfirmed -- that is a track-6 question

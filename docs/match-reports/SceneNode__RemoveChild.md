@@ -47,4 +47,4 @@ Round 71 (alpha). `func_8001CCB4` -> `SceneNode__RemoveChild`, **tier A**. Overr
 
 ## Round 101 (delta): track 7
 
-Step 4 (constants): `CLASS_TAG_MASK` / `TAG_TMDMODEL` -> `CLASS_ID_ROOT_MASK` / `TMDMODEL_CLASS_ID` (include/TmdModel.h, new), as in SceneNode__AddChild. Byte-identical.
+Step 4 (constants): `CLASS_TAG_MASK` / `TAG_TMDMODEL` -> `CLASS_ID_ROOT_MASK` / `TMDMODEL_CLASS_ID` (include/tmd_model.h, new), as in SceneNode__AddChild. Byte-identical.

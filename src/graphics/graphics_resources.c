@@ -54,7 +54,7 @@
 #include "BgLayer.h"
 #include "TileMap.h"
 #include "TileAtlas.h"
-#include "TmdModel.h"
+#include "tmd_model.h"
 #include "LinkResource.h"
 #include "draw_system.h"
 #include "cd_stream.h"

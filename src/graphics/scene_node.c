@@ -54,7 +54,7 @@
 #include "scene_node.h"
 #include "pad.h"
 #include "FrameClock.h"
-#include "TmdModel.h"
+#include "tmd_model.h"
 #include "Actor.h"
 #include "bmem_pmgr.h"
 

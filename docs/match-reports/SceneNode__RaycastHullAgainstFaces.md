@@ -565,7 +565,7 @@ NON_MATCHING body promoted, round 69
 
 ## Track 6 (round 91, echo)
 
-AttachCornerList_d294b is TmdModel.h's TmdHull and Vec3S16_d294 is TmdVec3. Byte-identical.
+AttachCornerList_d294b is tmd_model.h's TmdHull and Vec3S16_d294 is TmdVec3. Byte-identical.
 
 ## Round 100 (delta): track 7
 
@@ -585,11 +585,11 @@ caller's delta is overwritten with the hit point), `list` -> `hull`; the
 prototype and slot follow. Locals: `mid` -> `center`, `p` -> `c`, `hi` ->
 `opposite`, `v` -> `corner`, `count1` -> `boundsCount`, `plane` -> `bounds`,
 `cnt2` -> `hullCount`, `m` -> `j`, `bigConst` -> `nearest`, `outWord` ->
-`height`. Constants: `0x7FFFFFFF` -> `DIST_NONE` (added to TmdModel.h,
-token-identical to TmdModel.c's own define, which cpp accepts; RaycastFaces
+`height`. Constants: `0x7FFFFFFF` -> `DIST_NONE` (added to tmd_model.h,
+token-identical to tmd_model.c's own define, which cpp accepts; RaycastFaces
 sets `*best = DIST_NONE` itself, so the caller's store is redundant but
 retail's), `>= 0x201` -> `> HIT_HEIGHT_THRESHOLD` 512 (unit-local), the
-corner strides 4 -> `HULL_FACE_CORNERS` (TmdModel.h). The redundant
+corner strides 4 -> `HULL_FACE_CORNERS` (tmd_model.h). The redundant
 `(TmdVec3 *)` casts on TmdVec3 pointers are gone. `u8 pad[0x18]` -> `[24]`.
 
 ### History: the comments in src/code_d294_b.c before this pass, verbatim
