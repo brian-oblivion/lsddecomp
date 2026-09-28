@@ -20,7 +20,7 @@ extern const char sStrFontIcon[]; /* "FONTICON" */
 extern const char sCardPathPrefix[]; /* "CARD\\" */
 extern const char sTimExt[]; /* ".TIM" */
 extern s32 sTextEntryPanelRect; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
-extern s32 gTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
+extern s32 sTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
 extern s32 sTextEntryPanelPos; /* opaque block, self->unk48's slot4C arg2, address-only here */
 extern s32 gTextEntryTextPos; /* opaque block, self->unk44's slot4C arg2, address-only here */
 extern s32 sTextEntryCursorPos; /* opaque block, self->unk40's slot4C arg2, address-only here */
@@ -55,7 +55,7 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
     self->unk40 = (ChildObj86ED0 *)New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
     self->unk44->methods->slot4C(self->unk44, arg1, (void *)&gTextEntryTextPos);
-    self->unk44->methods->slotB8(self->unk44, (void *)&gTextEntryTextColor);
+    self->unk44->methods->slotB8(self->unk44, (void *)&sTextEntryTextColor);
     self->unk40->methods->slot4C(self->unk40, arg1, (void *)&sTextEntryCursorPos);
 }
 ```
@@ -176,7 +176,7 @@ object behind them is the `New_TextRow` result, so TextEntry::textRow
 (+0x044, include/TextEntry.h) is `struct TextRow *`. The slots map onto
 TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 (position cast to `LongVec3 *`, as ScreenSprite's banner describes), +0x0B8
-`setColor` (`gTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
+`setColor` (`sTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `SpriteRgb *`),
 +0x0C4 `setCell`, called through `TextRowSetCellAtFn` because
 TextRow__SetCellAt takes the index too. Zero bytes changed.
 
@@ -188,7 +188,7 @@ says what they are):
 | old | new | evidence |
 | --- | --- | --- |
 | D_80086F7C | sTextEntryPanelRect | New_ScreenSprite's rect for COMINPUT.TIM: {0, 0, 224, 120} |
-| D_8008AAC8 | gTextEntryTextColor | the text row's setColor: (128, 128, 0) |
+| D_8008AAC8 | sTextEntryTextColor | the text row's setColor: (128, 128, 0) |
 | D_8008AACC | sTextEntryPanelPos | the panel's attachToParent position: (-70, -60) |
 | D_8008AAD4 | gTextEntryTextPos | the text row's attachToParent position: (-62, -15) |
 | D_8008AADC | sTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (TextEntryItemList) reads its x |

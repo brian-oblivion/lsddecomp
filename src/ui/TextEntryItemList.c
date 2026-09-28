@@ -159,7 +159,7 @@ extern const char sStrFontIcon[];          /* "FONTICON" */
 extern const char sCardPathPrefix[];       /* "CARD\\" */
 extern const char sTimExt[];               /* ".TIM" */
 extern SpriteRect sTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0, 0) */
-extern SpriteRgb gTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
+extern SpriteRgb sTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
 extern ScreenSpritePos sTextEntryPanelPos; /* (-70, -60) */
 extern ScreenSpritePos gTextEntryTextPos;  /* (-62, -15) */
 
@@ -194,7 +194,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     fontTim->methods->release(fontTim);
     self->textRow->methods->attachToParent(self->textRow, (SceneNode *)parent,
                                            (LongVec3 *)&gTextEntryTextPos);
-    self->textRow->methods->setColor(self->textRow, &gTextEntryTextColor);
+    self->textRow->methods->setColor(self->textRow, &sTextEntryTextColor);
     self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)parent,
                                                 (LongVec3 *)&sTextEntryCursorPos);
 }
