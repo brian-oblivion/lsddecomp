@@ -50,7 +50,7 @@ Evidence considered and why it falls short of tier A/B:
   function with the constant 1", which says nothing about game purpose.
 - **Callee**: `func_80038E44` is itself unnamed, uncarved, and lives in the
   "game's own libspu build" gap (`0x29644..0x2976C`, no SDK disc covers it;
-  see `src/libspu_s_ih.c`'s header and `config/splat.slps01556.lsdde.yaml`
+  see `src/psyq/libspu_s_ih.c`'s header and `config/splat.slps01556.lsdde.yaml`
   line ~1131). It is not a placed Sony object (`tools/sdkstalls.py` has no
   hit for `SpuInitHot`), so this is not the "give no game name to
   anything Sony owns" case -- but its own purpose is equally undetermined

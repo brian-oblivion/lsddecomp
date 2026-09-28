@@ -1119,7 +1119,7 @@ segments:
       # Text-only; the unit owns no jump table, so NO rodata attach moved --
       # the 0xFD8 rodata slot list names no `code_179d8_f` line at all.
       - [0x270E8, o, libsnd/stop]       # Snd_stop, SsSeqStop, SsSepStop
-      - [0x272A8, c, libspu_s_ih]
+      - [0x272A8, c, psyq/libspu_s_ih]
       # psyq_SpuSetMute (0x272C8..0x2C054) is converted to linked Sony objects
       # one run at a time. 35 objects tile nine runs exactly, all from the 3.3
       # disc; the eight gaps between the runs are the game's own libspu/libsnd
