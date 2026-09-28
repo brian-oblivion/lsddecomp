@@ -96,3 +96,12 @@ The banner of `src/code_2bb9c.c` as it stood before the track-7 pass; the new ba
  * `New_TimImage` was renamed in track 4 (round 88).
  */
 ```
+
+## History (moved from src/TimImage.c, comments pass)
+
+The file's banner carried its edge evidence and the reason it is parked:
+
+> Edges: both are placed Sony objects (libcd/event before, libgs/gs_122 after),
+> so the file is this whole gap. Content alone would put RotateVramRectRight in
+> a file of its own; no tool splits a unit and the binary is silent on it
+> (tuboundary.py: "boundary possible" at every gap), so it stays here, parked.
