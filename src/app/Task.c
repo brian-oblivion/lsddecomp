@@ -1294,7 +1294,7 @@ void IntermediateBase__SetState(IntermediateBase *self, s32 state) {
     fn(self);
 }
 
-void IntermediateBase__OnState2(IntermediateBase *self) {
+void IntermediateBase__OnStart(IntermediateBase *self) {
     DrawSystem *drawSystem;
 
     self->frameCounter = 0;

@@ -65,7 +65,7 @@ before the byte-level score did.
   gViewportMethods`), not `IntermediateBase__ResetCounters`. Two unrelated tables, same offset,
   different occupants -- ordinary vtable-layout coincidence, not evidence
   of a shared ancestor at this slot (contrast with the GENUINELY shared
-  slots this unit has documented elsewhere, e.g. `IntermediateBase__OnState2`).
+  slots this unit has documented elsewhere, e.g. `IntermediateBase__OnStart`).
 - New type `SubHandleObj`/`SubHandleObjMethods` (`slot4C`) -- this unit's own
   local view of `include/Entity.h`'s `Unk100Obj`/`New_FadeBox`, per this
   project's independent-local-views convention.

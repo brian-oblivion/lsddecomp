@@ -1,4 +1,6 @@
-# IntermediateBase__OnState2 — MATCH (16/16 words, 2 attempts)
+# IntermediateBase__OnStart — MATCH (16/16 words, 2 attempts)
+
+> Renamed from `IntermediateBase__OnState2` on 2026-09-28 (tools/rename.py). Address 0x8003e538.
 
 > Renamed from `Obj86B60__NotifyTargetReset` on 2026-09-25 (tools/rename.py). Address 0x8003e538.
 
@@ -10,7 +12,7 @@
 
 A shared "base-class" method, reached through `Obj86B60Methods::slot64`
 -- and, per `include/DayTaskStageMap.h`'s own note on an UNRELATED class
-(`Obj865C8Methods`/`TimedTaskMethods` both list `IntermediateBase__OnState2` at their
+(`Obj865C8Methods`/`TimedTaskMethods` both list `IntermediateBase__OnStart` at their
 own `+0x064`), this function is genuinely shared across multiple otherwise-
 unrelated classes at the same vtable slot, not something `Obj86B60`
 introduces itself.
@@ -22,7 +24,7 @@ header): `self->unkC->target->methods->slot48(target)`.
 ## The C
 
 ```c
-void IntermediateBase__OnState2(Obj86B60 *self)
+void IntermediateBase__OnStart(Obj86B60 *self)
 {
     Obj86B60UnkCTarget *target;
 
@@ -74,7 +76,7 @@ round 12 (2026-09-03), runner alpha, unit Task. 2 attempts.
 
 ## Naming
 
-**IntermediateBase__OnState2** (renamed from `func_8003E538`, round 55,
+**IntermediateBase__OnStart** (renamed from `func_8003E538`, round 55,
 runner alpha). Tier B: `Obj86B60Methods::slot64` occupant (dispatched by
 `IntermediateBase__SetState` on mode 2). Mechanics fully known: zeroes
 `self->unk1C` (the frame counter) then forwards a notification to

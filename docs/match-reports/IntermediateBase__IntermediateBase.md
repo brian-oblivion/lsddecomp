@@ -14,7 +14,7 @@ getter `GetIntermediateBaseMethods`), then dispatches its own freshly-installed 
 (`IntermediateBase__ResetCounters`, already matched, void-returning) once.
 
 Same self-typing convention as this unit's other already-matched siblings
-from the same shared table (`IntermediateBase__ResetCounters`, `IntermediateBase__IncrementFrameCounter`, `IntermediateBase__OnState2`):
+from the same shared table (`IntermediateBase__ResetCounters`, `IntermediateBase__IncrementFrameCounter`, `IntermediateBase__OnStart`):
 `Obj86B60 *self`, even though the class is generically shared across many
 unrelated tables (`Task.h`'s `TaskUtilMethods` names the same function
 `gIntermediateBaseMethods+0x008`, called there as `GetIntermediateBaseMethods()->slot08(self)` on a

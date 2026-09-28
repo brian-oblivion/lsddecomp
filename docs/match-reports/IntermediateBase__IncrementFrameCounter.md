@@ -47,7 +47,7 @@ itself is PROPOSED for rename to `frameCounter` in this unit's
 - `Obj86B60::unk1C` -> `frameCounter` (tier B). Mechanics established across
   three independent sources: incremented here unconditionally
   (`IntermediateBase__IncrementFrameCounter`), zeroed on state-reset paths
-  (`IntermediateBase__ResetCounters`, `IntermediateBase__OnState2`,
+  (`IntermediateBase__ResetCounters`, `IntermediateBase__OnStart`,
   `IntermediateBase__OnState3`, and `TaskCore__SetState` in `Task.c` on
   several message codes), and consumed as a multiplier in `TaskCore__TickFadeIn`
   (Task.c) against `unk84` -- consistent with a per-instance

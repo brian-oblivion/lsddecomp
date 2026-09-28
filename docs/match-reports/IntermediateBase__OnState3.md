@@ -11,7 +11,7 @@
 `gIntermediateBaseMethods+0x068` (and `gTitleMenuMethods`'s own verbatim-inherited `+0x068`,
 `IntermediateBase__SetState`'s `slot68` occupant): dereferences `self->unkC->unk0` (the
 `Obj86B60InitArgs` field `IntermediateBase__Init`/`IntermediateBase__Deinit` only ever forward
-opaquely, and the same field `IntermediateBase__OnState2` reaches independently through
+opaquely, and the same field `IntermediateBase__OnStart` reaches independently through
 the completely unrelated `Obj86B60UnkC->target` reading) as a real class
 instance and dispatches its `slot4C`, then zeroes `self->unk1C`.
 
@@ -66,7 +66,7 @@ first build.
 
 **IntermediateBase__OnState3** (renamed from `func_8003E578`, round 55,
 runner alpha). Tier B: `Obj86B60Methods::slot68` occupant (dispatched by
-`IntermediateBase__SetState` on mode 3), mirroring `IntermediateBase__OnState2`'s
+`IntermediateBase__SetState` on mode 3), mirroring `IntermediateBase__OnStart`'s
 shape exactly but forwarding to `self->initArgs->unk0` instead --
 `initArgs->unk0` is the SAME field `IntermediateBase__Init` registers as a child
 via `addChild` (see `Obj86B60InitArgs`'s own header comment), which is why
@@ -75,7 +75,7 @@ remains unestablished (tier B).
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyChildReset. It occupies +0x068, which IntermediateBase__SetState runs on state 3: slot `onState3`, occupant named for it. It calls initArgs->unk0 at +0x04C and clears frameCounter; IntermediateBase__OnState2 does the same with +0x048 on the same object. Tier B.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyChildReset. It occupies +0x068, which IntermediateBase__SetState runs on state 3: slot `onState3`, occupant named for it. It calls initArgs->unk0 at +0x04C and clears frameCounter; IntermediateBase__OnStart does the same with +0x048 on the same object. Tier B.
 
 ## Track 7 (round 98, echo)
 

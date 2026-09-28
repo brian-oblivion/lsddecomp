@@ -78,7 +78,7 @@ without a register-pressure iteration this time.
   unit outside `IntermediateBase__Init`'s own (non-dereferencing) forwards.
 - This confirms `self->unkC`'s runtime identity across BOTH functions that
   touch it: it is the `Obj86B60InitArgs *` `IntermediateBase__Init` stored there, not
-  the unrelated `Obj86B60UnkC *` reading `IntermediateBase__OnState2` uses at the same
+  the unrelated `Obj86B60UnkC *` reading `IntermediateBase__OnStart` uses at the same
   offset from a completely different call path -- consistent with this
   project's established "one struct offset, multiple independent readings by
   different call paths" pattern (`Unk4CObj->unk24`, `Unk64Elem`'s own

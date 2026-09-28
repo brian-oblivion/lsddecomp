@@ -64,7 +64,7 @@ struct IntermediateBaseInitArgs {
     /* +0x058 */ void (*onPadEvent)(Self *self, BasicClass *sender, s32 event);   /* NULL; onNotify's Pad (2) case */ \
     /* +0x05C */ void (*update)(Self *self, BasicClass *sender, s32 event);       /* IntermediateBase__IncrementFrameCounter: onNotify's FrameClock (5) case */ \
     /* +0x060 */ void (*setState)(Self *self, s32 state);    /* IntermediateBase__SetState; TaskCore__SetState, TitleMenu__SetState */ \
-    /* +0x064 */ void (*onState2)(Self *self);               /* IntermediateBase__OnState2 */    \
+    /* +0x064 */ void (*onState2)(Self *self);               /* IntermediateBase__OnStart */    \
     /* +0x068 */ void (*onState3)(Self *self)                /* IntermediateBase__OnState3 */
 /* clang-format on */
 
@@ -99,7 +99,7 @@ void IntermediateBase__Deinit(IntermediateBase *self);
 void IntermediateBase__OnDrawSystemEvent(IntermediateBase *self, BasicClass *sender, s32 event);
 void IntermediateBase__IncrementFrameCounter(IntermediateBase *self);
 void IntermediateBase__SetState(IntermediateBase *self, s32 state);
-void IntermediateBase__OnState2(IntermediateBase *self);
+void IntermediateBase__OnStart(IntermediateBase *self);
 void IntermediateBase__OnState3(IntermediateBase *self);
 
 #endif
