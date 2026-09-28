@@ -50,11 +50,11 @@ extern DrawRect sDefaultMovieFrame;
 
 /* Viewport's ctor data: gViewportFadeBoxSize is the (320, 240) it passes
  * New_FadeBox; gFadeBoxAttachPos the (-100, -100) screen position the ctor
- * and SetSubHandle attach the sub handle at; gDefaultViewTwist ({0, 1}) is
+ * and SetSubHandle attach the sub handle at; sDefaultViewTwist ({0, 1}) is
  * Viewport__AttachViewChild's twist when its own is NULL. */
 extern u8 gViewportFadeBoxSize[];
 extern u8 gFadeBoxAttachPos[];
-extern Ratio16 gDefaultViewTwist;
+extern Ratio16 sDefaultViewTwist;
 
 /* FadeBox's colour tables, eight RGB entries each, indexed at a 3-byte
  * stride by a channel mask: gFadeBoxMaskColors holds each mask's own
