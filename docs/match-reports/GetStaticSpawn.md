@@ -95,7 +95,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
 		if (*(s16 *)&currentPos->tile != trig->tile.value && trig->tile.value >= 0)
 			continue;
 
-		gLinkSrcStage = stage;
+		sLinkSrcStage = stage;
 		gLinkTriggerIndex = i;
 		triggerStage = trig->stage;
 		sLinkDstStage = triggerStage;

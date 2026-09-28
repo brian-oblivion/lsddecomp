@@ -1697,7 +1697,7 @@ extern DirectionTableEntry sCardinalAngles[];
 extern s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading);
 
 /* Cardinal-direction indices, per stage: the player must face
-   sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex] to take the
+   sTunnelEnterHeadings[sLinkSrcStage][gLinkTriggerIndex] to take the
    tunnel GetStaticSpawn matched, and leaves facing
    sTunnelExitHeadings[sLinkDstStage][sLinkSpawnIndex]. */
 extern u8 *sTunnelEnterHeadings[];
@@ -1715,7 +1715,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     s32 idx;
     s32 result;
 
-    heading = sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
+    heading = sTunnelEnterHeadings[sLinkSrcStage][gLinkTriggerIndex];
     if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
         if (outEnter != NULL)
             *outEnter = (s32)&sCardinalRotations[heading];
@@ -1825,7 +1825,7 @@ s32 TestForInstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *curren
 }
 
 s32 GetTeleportTimeBonus(void) {
-    return (gLinkSrcStage == 0) ? 10 : 0;
+    return (sLinkSrcStage == 0) ? 10 : 0;
 }
 
 s32 TestForStaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
@@ -1845,7 +1845,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
     s32 idx;
     s32 result;
 
-    heading = sStaircaseEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
+    heading = sStaircaseEnterHeadings[sLinkSrcStage][gLinkTriggerIndex];
     if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
         if (outEnter != NULL)
             *outEnter = (s32)&sCardinalRotations[heading];
@@ -1885,7 +1885,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
         if (*(s16 *)&currentPos->tile != trig->tile.value && trig->tile.value >= 0)
             continue;
 
-        gLinkSrcStage = stage;
+        sLinkSrcStage = stage;
         gLinkTriggerIndex = i;
         triggerStage = trig->stage;
         sLinkDstStage = triggerStage;
