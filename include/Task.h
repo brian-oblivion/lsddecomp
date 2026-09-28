@@ -15,10 +15,9 @@
 #include "TextRow.h"
 
 /*
- * Declarations shared by src/app/Task.c and the two units after it,
- * ScreenWidgets.c (FadeBox, BoxFill's first methods) and ScreenWidgets.c (the
- * rest of BoxFill, TextRow): the data and outside callees they reach that no
- * class header owns. The classes are in their own headers: StreamTask.h,
+ * Declarations shared by src/app/Task.c and the unit after it,
+ * ScreenWidgets.c (FadeBox, BoxFill, TextRow): the data and outside callees
+ * they reach that no class header owns. The classes are in their own headers: StreamTask.h,
  * TaskCore.h, IntermediateBase.h, Viewport.h, BoxFill.h, FadeBox.h, TextRow.h.
  */
 
