@@ -195,3 +195,17 @@ Moved here from the source, verbatim (names as they stood then, where the tools 
  * correct about the C -- the bytes are what say the original had it too.
  * See docs/match-reports/New_GameApplication.md for the full derivation. */
 ```
+
+## History (moved from src/GameApplicationFileResource.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> Edges: libapi/a21 before and Sony's libc2/strcat after are placed objects.
+> tuboundary.py is silent inside ("boundary possible" at every gap, "start
+> edge possible" at the old code_1677c|code_171e0 carve edge), so content
+> decided, and it rules out that edge: the code after it opened with
+> GetGameApplicationMethods, and in every file of this game that defines a
+> Get<Class>Methods getter the getter closes its own class's methods. The
+> carve edge cut GameApplication off its getter, so the two units were
+> merged (round 101). Whether FileResource began a file of its own right
+> after the getter the binary cannot say, and no tool splits a unit.
