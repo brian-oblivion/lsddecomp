@@ -223,7 +223,7 @@ elsewhere in code_179d8; confirm with tools/classtable.py, do not assume.
 
 ## File name (round 97, charlie, track 8)
 
-`code_179d8_f.c` became `src/libsnd_cres.c` (`tools/unitfile.py rename`,
+`code_179d8_f.c` became `src/psyq/libsnd_cres.c` (`tools/unitfile.py rename`,
 image byte-identical). Evidence: `tuboundary.py --unit code_179d8_f` reports
 `code_179d8_f (after sony:libsnd/vm_doff): start edge possible`, and the yaml
 places `libsnd/stop` directly after it, so both edges are Sony objects and
