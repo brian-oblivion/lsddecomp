@@ -10,7 +10,7 @@
  * first (TodSet__TodSet: GetTodMethods()->ctor(self, arg)) and whose
  * TodSet__BuildTods makes one Tod per sub-block of its buffer (New_Tod).
  *
- * The name is round 83's, kept on this evidence: its own methods walk
+ * What its own methods do: walk
  * the buffer's packet words (ScanTodPackets, from buffer +8 with the u16
  * packet count at +2 before it) decoding each into a low byte, the nibbles
  * at bits 16 and 20 and a top-byte length in words (DecodeTodPacketWord);
@@ -57,9 +57,7 @@ struct ResourceSource;
 typedef struct Tod Tod;
 typedef struct TodMethods TodMethods;
 
-/* Both own slots are typed as their occupants. +0x07C returns u8: cc1 still
- * emits Tod__ScanPackets' trailing `andi 0xFF` over a u8 slot, so the bytes
- * do not need the s32 the unit-local view had (round 86). */
+/* Both own slots are typed as their occupants; +0x07C returns u8. */
 /* clang-format off */
 #define TOD_SLOTS(Self, CtorParams)                                                                \
     FILERESOURCE_SLOTS(Self, CtorParams);                                                            \

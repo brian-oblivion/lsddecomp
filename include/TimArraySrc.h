@@ -15,8 +15,8 @@
  * is GetActiveDataSourceMethods()->ctor, and finalize forwards to the
  * active driver's, as TimBlockSrc, TimImage and TileAtlas do.
  *
- * The name is round 83's, and the evidence is BuildImages: one
- * New_TimImage(NULL) per offset, each adopting its TIM in place.
+ * BuildImages makes one New_TimImage(NULL) per offset, each adopting its
+ * TIM in place.
  *
  * How it is used, at the one New_TimArraySrc call site
  * (TimBlockSrc__AdvanceLoadState, include/TimBlockSrc.h): New_TimArraySrc(0)

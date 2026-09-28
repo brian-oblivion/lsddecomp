@@ -80,3 +80,14 @@ unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
 `ResourceSource *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.
+
+## History (moved from include/LinkResource.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * The name is round 20's, from DayTaskStageMap.c's local view of the object
+ * StageMap__PopulateSlotCells stores in a PlacementGrid's `linkResource`;
+ * it is kept on this evidence: the class's own methods map the file's TMD
+```

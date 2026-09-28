@@ -9,9 +9,7 @@
  * (include/TmdModel.h) per object of the TMD and hands them out by index.
  * Methods in src/GraphicsResources.c; no subclasses.
  *
- * The name is round 20's, from DayTaskStageMap.c's local view of the object
- * StageMap__PopulateSlotCells stores in a PlacementGrid's `linkResource`;
- * it is kept on this evidence: the class's own methods map the file's TMD
+ * What its own methods do: map the file's TMD
  * (LinkResource__MapModel: GsMapModelingData(&file->flags)) and build and
  * return the TmdModel objects the callers LINK -- TodActor.c's TOD
  * model-id packet passes getModel's result to SceneNode__LinkModel, and

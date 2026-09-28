@@ -10,7 +10,7 @@
  * subclasses. Its parent is its id parent: TodSet__TodSet's first call is
  * GetTodMethods()->ctor.
  *
- * The name is round 83's, kept on this evidence: TodSet__BuildTods (its
+ * What its own methods do: TodSet__BuildTods (its
  * +0x064) makes one Tod per entry of the buffer's counted offset table
  * (New_Tod over buffer + entries[i]) and stores each back into the table's
  * own word; TodSet__Finalize releases that array (ReleaseBasicClassArray);

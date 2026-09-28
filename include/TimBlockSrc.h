@@ -29,7 +29,7 @@
  * signatures (ScanTodPackets returns a u8 from four arguments where
  * TimBlockSrc__FadeAllEntries takes two and returns nothing). None of them
  * carries a byte of this class's layout, so they expand FILERESOURCE's macros
- * directly (round 83).
+ * directly.
  */
 
 /* TimBlockSrc__AdvanceLoadState's steps, in FileResource's loadState. */

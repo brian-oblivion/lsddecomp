@@ -50,3 +50,13 @@ Class unified as TimArraySrc (include/TimArraySrc.h); self retyped from the unit
 ## Round 93 polish (charlie, track 7)
 
 Comment rewritten only; no names or constants changed.
+
+## History (moved from include/TimArraySrc.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * The name is round 83's, and the evidence is BuildImages: one
+ * New_TimImage(NULL) per offset, each adopting its TIM in place.
+```

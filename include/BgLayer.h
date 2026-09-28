@@ -11,7 +11,7 @@
  * r, g, b, map, mx, my, scalex, scaley, rotate). Methods in
  * src/GraphicsResources.c; no class derives from it.
  *
- * The name is round 83's, and the evidence is the GsBG: Viewport__DrawNode
+ * Its GsBG is what makes it a background layer: Viewport__DrawNode
  * (src/ViewportDraw.c) passes a class-0x54 node's +0x044 to GsSortBg, and
  * BgLayer__Reset lays that GsBG over a map source's GsMAP. Its one outside
  * user is TaskCore (src/Task.c): TaskCore__TaskCore builds one over its
@@ -28,7 +28,7 @@
  *  - +0x040 reset, BgLayer__Reset(self, src, mode): lays the GsBG over
  *    src's GsMAP. Its parameter list differs from the inherited slot's
  *    (self only), so the slot keeps SceneNode's type and the ctor, its one
- *    caller, casts to BgLayerResetFn (FINISHING-PLAN track 4 step 6);
+ *    caller, casts to BgLayerResetFn;
  *  - +0x044 updateRotation (BgLayer__UpdateRotation) and +0x048 updateScale
  *    (BgLayer__UpdateScale): set or add, from the same Ratio16
  *    {num, den} ratio table SceneNode's reads; the GsBG's rotate from entry
@@ -44,7 +44,7 @@
  * copies them lb/lb/lb, sb/sb/sb (BgLayer__SetColor, BgLayer__Reset), which
  * three u8 members would not give.
  *
- * The map source is a TileMap (gTileMapMethods, include/TileMap.h, round 88),
+ * The map source is a TileMap (gTileMapMethods, include/TileMap.h),
  * whose GsMAP starts at +0x02C. Only its tag is named here, as
  * include/TriggerWorld.h does for its descriptor.
  */
