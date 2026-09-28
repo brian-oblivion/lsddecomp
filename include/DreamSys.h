@@ -388,9 +388,9 @@ extern struct RelativePos STAIRCASE_OFFSET_3;
    DreamSys__TickStaircaseCase2. Typed RotationRatios round 66: its three
    {numerator, denominator} words are {0,1} {0x2D,1} {0,1}, byte-identical in
    form to sRotationYaw180 and to every CARDINAL_ROTATIONS entry. */
-extern RotationRatios ROTATION_YAW_PLUS45;
+extern RotationRatios sRotationYawPlus45;
 
-/* (0 deg, -45 deg, 0 deg) -- the mirror of ROTATION_YAW_PLUS45 above
+/* (0 deg, -45 deg, 0 deg) -- the mirror of sRotationYawPlus45 above
    ({0,1} {0xFFD3,1} {0,1}), used the same way by
    DreamSys__TickStaircaseCase1 and DreamSys__TickStaircaseCase3. */
 extern RotationRatios ROTATION_YAW_MINUS45;

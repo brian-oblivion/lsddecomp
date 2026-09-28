@@ -65,7 +65,7 @@ additional coaxing.
   passed as `DreamSys__ApplyRelativeOffset`'s `a` argument.
 - **`ROTATION_YAW_MINUS45`**, another opaque forwarded-pointer constant for
   `vt->SceneNode__UpdateRotation`'s `arg2`, same shape as the already-known
-  `ROTATION_YAW_PLUS45`.
+  `sRotationYawPlus45`.
 - **A single flag value can be computed from TWO DIFFERENT numeric
   expressions depending on which arm set it** (`(unk_0x914-0x1E) < 0x34` in
   one arm, `unk_0x914 < 9` in the other) and still merge into ONE shared

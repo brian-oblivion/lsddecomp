@@ -30,7 +30,7 @@ differ in their band limits and in what they do inside the band:
 | arm | band guard | in-band window | in-band action |
 | --- | --- | --- | --- |
 | `unk_0xAC != 4` | `< 0x65` | `0x2B..0x39` | `this->unk_0xA4 = 2` |
-| `unk_0xAC == 4` | `< 15`   | `8..9`       | `vt->SceneNode__UpdateRotation(this, 0, &ROTATION_YAW_PLUS45)` |
+| `unk_0xAC == 4` | `< 15`   | `8..9`       | `vt->SceneNode__UpdateRotation(this, 0, &sRotationYawPlus45)` |
 
 Past the band guard each arm returns `1` immediately. Otherwise both fall
 through to a shared tail: `unk_0xA0 = 1`, `unk_0x914++`, `return 0`.
@@ -54,7 +54,7 @@ s32 DreamSys__TickStaircaseCase2(DreamSys *this)
 	} else {
 		if (this->unk_0x914 < 15) {
 			if ((u32)(this->unk_0x914 - 8) < 2) {
-				this->vt->SceneNode__UpdateRotation(this, 0, &ROTATION_YAW_PLUS45);
+				this->vt->SceneNode__UpdateRotation(this, 0, &sRotationYawPlus45);
 			}
 		} else {
 			return 1;
@@ -85,7 +85,7 @@ All of this came in with the salvaged tree and is part of the match:
   `unknown_values_0x918[4]` plus `unknown_values_0x922[2]`.
 - **`STAIRCASE_OFFSET_2` (`struct RelativePos`)** — a constant, `DreamSys__ApplyRelativeOffset`'s `a`
   argument.
-- **`ROTATION_YAW_PLUS45` (`u8[]`)** — address-of only, never dereferenced here;
+- **`sRotationYawPlus45` (`u8[]`)** — address-of only, never dereferenced here;
   forwarded as vtable slot `+0x044`'s (`SceneNode__UpdateRotation`) second argument. Same
   opaque-generic-pointer shape as that slot's other known call site.
 

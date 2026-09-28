@@ -1103,7 +1103,7 @@ s32 DreamSys__TickStaircaseCase0(DreamSys *this) {
         if (this->staircaseFrame >= 19)
             return 1;
         if ((u32)(this->staircaseFrame - 8) < 2 || (u32)(this->staircaseFrame - 13) < 2) {
-            this->methods->updateRotation(this, 0, &ROTATION_YAW_PLUS45);
+            this->methods->updateRotation(this, 0, &sRotationYawPlus45);
         }
     }
     this->moveCommand = MOVE_COMMAND_FORWARD;
@@ -1157,7 +1157,7 @@ s32 DreamSys__TickStaircaseCase2(DreamSys *this) {
     } else {
         if (this->staircaseFrame < 15) {
             if ((u32)(this->staircaseFrame - 8) < 2) {
-                this->methods->updateRotation(this, 0, &ROTATION_YAW_PLUS45);
+                this->methods->updateRotation(this, 0, &sRotationYawPlus45);
             }
         } else {
             return 1;
