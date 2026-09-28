@@ -1297,10 +1297,10 @@ s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 cdSpeed, s3
     self->stream = New_CdStream(cdSpeed, MOVIE_FPS, 0);
     if (self->stream != NULL) {
         if (MoviePlayer__InitFrame(self, frame, external) == 0) {
-            if (gMdecInitialized == 0) {
+            if (sMdecInitialized == 0) {
                 DecDCTReset(0);
             }
-            gMdecInitialized = 1;
+            sMdecInitialized = 1;
             DecDCToutCallback(OnMdecStripDone);
             self->stream->methods->setRing(self->stream, self->ring, MOVIE_RING_SIZE);
             self->pendingStart = 0;

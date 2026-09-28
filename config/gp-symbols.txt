@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gMdecInitialized
 gMovieClearColor
 gMoviePollCounter
 gNameCharTable
@@ -188,6 +187,7 @@ sListViewSize
 sMcDevicePath0
 sMcDevicePath1
 sMcTempFileSuffix
+sMdecInitialized
 sMoodCue74ClearColor
 sMoodCue78TransitionDone
 sNdivOverride

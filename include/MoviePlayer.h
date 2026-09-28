@@ -90,7 +90,7 @@ extern MoviePlayerMethods gMoviePlayerMethods;
 extern MoviePlayerMethods *GetMoviePlayerMethods(void); /* returns &gMoviePlayerMethods */
 
 extern MoviePlayer *sActiveMoviePlayer; /* the playing movie, or NULL (play sets it, pollActive clears it) */
-extern s32 gMdecInitialized;            /* set by the first ctor, which DecDCTReset(0)s the MDEC */
+extern s32 sMdecInitialized;            /* set by the first ctor, which DecDCTReset(0)s the MDEC */
 extern s32 gMoviePollCounter;           /* pollActive's call count */
 extern u8 gMovieClearColor[4];          /* a zero word: play's clearImage color, black */
 
