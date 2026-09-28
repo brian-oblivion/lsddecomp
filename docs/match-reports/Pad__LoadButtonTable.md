@@ -104,3 +104,26 @@ Sony's own default 16-entry digital-button mask table (`sDefaultButtonMasks`, in
 the `psyq_15d04` rodata blob) into this unit's runtime copy (`sButtonMasks`)
 -- mechanics fully derived in this report, matching the slot's existing name
 exactly.
+
+## Naming of `sDefaultButtonMasks` (round 101, track 7)
+
+Renamed from `D_80010764` (`tools/rename.py`). **Tier A** for what it is: the
+16 read-only words this function copies into `sButtonMasks`, and nothing else
+reads them (`grep` over `src/` and `asm/`). Its values are libetc's pad masks
+(`PADLup` 0x1000 ... `PADstart` 0x0800) in `enum PadButton` order, so it is
+the default contents of the table `Pad__DispatchEvents` scans. `s` prefix,
+not `g`: it is this unit's own data, from the link order below.
+
+### Correction: the table is class_16334's rodata, not Psy-Q's
+
+This report and `include/class_16334.h` used to call the table "Psy-Q's own
+... inside the `psyq_15d04` rodata blob". The link order says otherwise.
+Rodata follows the code objects' order: `libetc/intr_dma` .rdata at 0xF28 and
+`libetc/vsync` .rdata at 0xF54 are placed, the next code objects are
+`libc2/puts` (no .rdata; its only data is 7 bytes of .sdata),
+`class_16334`, `libetc/pad` (the linked 3.5 `pad.o`: .text and .bss only, no
+.rdata) and `libapi/a22`, and the next rodata slot, 0xFA4, is
+`GameApplicationFileResource`'s (the unit after them). The only object in
+that stretch able to own 0x40 bytes of .rodata at 0xF64 is this unit. The yaml
+line for 0xF64 still says "owner not placed yet (libetc intr?)"; proposed to
+the head, not edited (runners do not edit the yaml).

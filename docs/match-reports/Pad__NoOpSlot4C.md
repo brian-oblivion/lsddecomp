@@ -15,16 +15,14 @@ derivation was needed.
 
 ## Naming
 
-**Tier C.** The class is known (`Pad`, established by the sibling functions
-in this unit -- see `include/class_16334.h`'s header comment), so the
-tier-C form is `Class__func_xxxxx` rather than bare `func_800xxxxx`. Nothing
-beyond "does nothing" is recoverable: `classtable.py`'s diff against
-`gBasicClassMethods` shows this slot exists only in `gPadMethods` (not inherited
-from `BasicClassMethods`), and a tree-wide grep finds no caller anywhere --
-neither this unit nor `src/main.c` (the only place a `Pad *` is used)
-invokes slot `+0x4C` through the vtable. A retail no-op with zero call
-sites gives no purpose to name; `func4C` (the struct field) and this
-function name both stay literal.
+**Tier A** (round 101, track 7; was tier C `Pad__func_800xxxxx`). An empty
+leaf's mechanics are its purpose, which the naming rules make tier A by
+definition, and `Class__NoOpSlotNN` is the project's established form for an
+empty method-table occupant (`Actor__NoOpSlotD8`, `StreamTask__NoOpSlot88`,
+`Application__NoOpSlot48`, ...). The slot number is `gPadMethods+0x4C`,
+the field it occupies (`PadMethods.slot4C`, which stays a slot name: there
+is still no caller to name it for). No caller anywhere in `src/` dispatches
+through it; its sibling `Pad__NoOpSlot54` is the same shape.
 
 ### Proposed field names
 

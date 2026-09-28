@@ -22,6 +22,8 @@ typedef struct {
     u32 w[16];
 } Block64;
 
-extern Block64 sDefaultButtonMasks; /* Psy-Q's own default button-mask table (psyq_15d04 rodata) */
+/* The unit's own read-only table of libetc's 16 button masks, in enum
+ * PadButton order (PADLup, PADLdown, ... PADstart). */
+extern Block64 sDefaultButtonMasks;
 
 #endif

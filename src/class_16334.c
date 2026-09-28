@@ -1,3 +1,15 @@
+/*
+ * The Pad class: a controller port wrapped as a BasicClass (include/Pad.h
+ * documents the class and its events; main() creates the one instance).
+ * Instances share the Psy-Q pad library: the first ctor calls PadInit and
+ * the last finalize PadStop (sPadRefCount). On every DrawSystem vsync
+ * event (IntermediateBase__OnTag1Notify) updateMasks turns two consecutive
+ * PadRead words into held, pressed and released edge masks, and
+ * dispatchEvents sends at most one event per button to the pad's parents.
+ * loadButtonTable copies sDefaultButtonMasks, a fixed table of libetc's
+ * mask values, into sButtonMasks, whose order is enum PadButton. The two
+ * remaining slots are empty and never called.
+ */
 #include "common.h"
 #include "class_16334.h"
 
@@ -62,11 +74,7 @@ void Pad__DispatchEvents(Pad *self) {
     s32 code;
     s32 i;
 
-    /* Bare scheduling barrier. Without it the four prologue register stores
-     * come out in the order s0, ra, s2, s1 instead of retail's ra, s2, s1, s0
-     * -- same registers, same stack offsets, order only, so this is the
-     * permitted form under the project rule and not a register pin. Ten source
-     * shapes were tried first; see docs/match-reports/Pad__DispatchEvents.md. */
+    /* MATCHING: without this barrier the prologue saves s0 before ra, s2, s1. */
     __asm__("");
     held = self->heldMask;
     released = self->releasedMask;

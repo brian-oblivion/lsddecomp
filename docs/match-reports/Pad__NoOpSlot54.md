@@ -16,12 +16,14 @@ derivation was needed. Identical shape to `Pad__NoOpSlot4C` at `+0x4C`
 
 ## Naming
 
-**Tier C.** Same reasoning as `Pad__NoOpSlot4C`: class known (`Pad`), so
-`Class__func_xxxxx`; purpose unrecoverable, since this slot too is never
-invoked anywhere in the decompiled tree (`classtable.py`'s diff shows it
-exists only in `gPadMethods`, not inherited, and a tree-wide grep for a
-`+0x54`-slot call over any `Pad *` value finds none). A retail no-op with
-zero call sites gives no purpose to name.
+**Tier A** (round 101, track 7; was tier C `Pad__func_800xxxxx`). An empty
+leaf's mechanics are its purpose, which the naming rules make tier A by
+definition, and `Class__NoOpSlotNN` is the project's established form for an
+empty method-table occupant (`Actor__NoOpSlotD8`, `StreamTask__NoOpSlot88`,
+`Application__NoOpSlot48`, ...). The slot number is `gPadMethods+0x54`,
+the field it occupies (`PadMethods.slot54`, which stays a slot name: there
+is still no caller to name it for). No caller anywhere in `src/` dispatches
+through it; its sibling `Pad__NoOpSlot4C` is the same shape.
 
 ### Proposed field names
 
