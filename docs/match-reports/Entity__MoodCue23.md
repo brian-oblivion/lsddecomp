@@ -25,7 +25,7 @@ void Entity__MoodCue23(Entity *this) {
             this->methods->slotBC(this, sTranslateYMinus64);
             this->methods->slotC4(this, 0xA, 0);
         } else {
-            this->methods->slotBC(this, TRANSLATE_X_MINUS64);
+            this->methods->slotBC(this, sTranslateXMinus64);
         }
     } else if (this->unkFC == 0) {
         this->methods->slotBC(this, sTranslateYMinus4096);
@@ -47,7 +47,7 @@ void Entity__MoodCue23(Entity *this) {
 }
 ```
 
-`sTranslateYMinus64`/`TRANSLATE_X_MINUS64`/`sTranslateYMinus4096`/`sTranslateYPlus64` are new rodata pointers
+`sTranslateYMinus64`/`sTranslateXMinus64`/`sTranslateYMinus4096`/`sTranslateYPlus64` are new rodata pointers
 (`sTranslateYMinus64` used twice, by two different arms), extern-declared alongside
 this unit's other `D_80089*` constants; none yet dereferenced by any carved
 code.

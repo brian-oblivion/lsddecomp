@@ -870,7 +870,7 @@ void Entity__MoodCue23(Entity *this) {
             this->methods->addTranslation(this, sTranslateYMinus64);
             this->methods->moveLocalZ(this, 10, 0);
         } else {
-            this->methods->addTranslation(this, TRANSLATE_X_MINUS64);
+            this->methods->addTranslation(this, sTranslateXMinus64);
         }
     } else if (this->moodTimer == 0) {
         this->methods->addTranslation(this, sTranslateYMinus4096);
