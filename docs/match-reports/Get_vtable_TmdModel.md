@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001F384` on 2026-09-25 (tools/rename.py). Address 0x8001f384.
 
-Round 82, runner charlie (matching slot). Unit `src/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner charlie (matching slot). Unit `src/graphics/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table; the gTmdModelMethods table getter, called by `New_TmdModel` and `TmdModel__TmdModel` (`tools/classtable.py gTmdModelMethods`).
 - **What:** returns `gTmdModelMethods`

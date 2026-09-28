@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001F66C` on 2026-09-25 (tools/rename.py). Address 0x8001f66c.
 
-Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/TmdModel.c`. Fresh ground, no prior attempt.
+Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/TmdModel.c`. Fresh ground, no prior attempt.
 
 - **What:** walks a counted list of box-corner sets (`HullList_fa50`: `s32 n` then `n` x 48-byte `BoxCorners`, eight `{s16 x,y,z}` as two faces of four; `TmdModel__GetHull` writes a list of one). For each: if `turn`, copy the 48 bytes to a stack temp and permute the corners back in (a quarter turn of the box), then add `d` to `.x` of face `back`; otherwise add `d` to `.z` of face `back`. Caller: `ObjMStyleActor.c` (`RotateAndOffsetHullList(&buf, isSeven, nonneg, adjusted)`).
 - **Result:** byte-exact; 147/147 words, whole-image SHA1 green. Build 5.

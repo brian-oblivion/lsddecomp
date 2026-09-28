@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001F33C` on 2026-09-25 (tools/rename.py). Address 0x8001f33c.
 
-Round 82, runner charlie (matching slot). Unit `src/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner charlie (matching slot). Unit `src/graphics/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** slot +0x044 of gTmdModelMethods (`tools/classtable.py gTmdModelMethods`).
 - **What:** `GsMapModelingData(&self->data->head[1])`: maps the TMD held at object +0x0C, skipping its first word (the Psy-Q idiom `GsMapModelingData(tmd + 1)`).

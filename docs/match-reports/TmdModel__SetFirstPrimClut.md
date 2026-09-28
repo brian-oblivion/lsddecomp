@@ -4,7 +4,7 @@
 
 > Renamed from `func_80020510` on 2026-09-25 (tools/rename.py). Address 0x80020510.
 
-Round 82, runner charlie (matching slot). Unit `src/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner charlie (matching slot). Unit `src/graphics/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table; called from ObjMStyleActor.c as `TmdModel__SetFirstPrimClut(obj, &gStyleEffectClutPos)` (`tools/classtable.py gTmdModelMethods`).
 - **What:** `t = self->unk10->unk10; v = xy[0] / 16; t->unk6 = v; t->unk6 = v + xy[1] * 64;`: a double store to one s16 field, the second one reusing the first value without reloading it.

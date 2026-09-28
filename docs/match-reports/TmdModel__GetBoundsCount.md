@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001F3A4` on 2026-09-25 (tools/rename.py). Address 0x8001f3a4.
 
-Round 82, runner charlie (matching slot). Unit `src/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner charlie (matching slot). Unit `src/graphics/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table; called from SceneNode (code_d294.c) and ObjMStyleActor.c as `TmdModel__GetBoundsCount(model)` (`tools/classtable.py gTmdModelMethods`).
 - **What:** returns the sbss flag `gTmdModelBoundsCount` (reached `%gp_rel`, via `--gp-symbols`); its argument is ignored. Callers use the result both as a truth value and as a count.
