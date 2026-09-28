@@ -151,15 +151,15 @@ typedef void (*TodActorAttachToParentFn)(TodActor *self, TodActor *peer, void *c
 
 /* The class's own methods, in ROM order (TodActor). A subclass reaches
  * the base ones through GetTodActorMethods() and upcasts. */
-void *New_TodActor(void *desc, void *arg2);
-TodActor *TodActor__TodActor(TodActor *self, void *desc, void *arg2);
+void *New_TodActor(void *desc, void *sound);
+TodActor *TodActor__TodActor(TodActor *self, void *desc, void *sound);
 void TodActor__Finalize(TodActor *self);
 void TodActor__OnNotify(TodActor *self, struct TagCheckArg *sender, s32 event);
 void TodActor__Reset(TodActor *self);
 void TodActor__AttachToParent(TodActor *self, TodActor *peer, void *companion, void *parent, void *offset);
 void TodActor__DetachFromParent(TodActor *self);
-void TodActor__SetDisplay(TodActor *self, void *arg);
-void TodActor__SetLightMode(TodActor *self, void *arg);
+void TodActor__SetDisplay(TodActor *self, void *on);
+void TodActor__SetLightMode(TodActor *self, void *mode);
 void TodActor__Update(TodActor *self, void *sender, s32 event);
 void TodActor__SetMainPartNotifies(TodActor *self, s32 on);
 s32 TodActor__SetupModelData(TodActor *self, void *desc);

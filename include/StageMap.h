@@ -438,26 +438,27 @@ void StageMap__SetGridSpan(StageMap *self, s32 span);
 void StageMap__SetConfig(StageMap *self, StageGridDimensions *config);
 s32 StageMap__SetTargetAndLoadChunks(StageMap *self, void *outPos, SceneNode *target, Descriptor10 *cell);
 s32 StageMap__ComputeCellOffsets(StageMap *self, void *outPos, void *cell);
-s32 ComputeCellWorldOffsets(s32 *outPos, s32 *outBuf, StageGridDimensions *config, LongVec3 *origin,
+s32 ComputeCellWorldOffsets(s32 *outPos, s32 *chunkPos, StageGridDimensions *dims, LongVec3 *origin,
                             Descriptor10 *cell);
 void StageMap__Enable(StageMap *self);
 void StageMap__Disable(StageMap *self);
 s32 StageMap__UpdateFootprintTracking(StageMap *self);
-void StageMap__LoadChunksAround(StageMap *self, s32 val, LongVec3 *pos, ChunkSlotSpec *specs);
-s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 val, s32 flag);
-s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *entry, s32 divisor, s32 flag,
-                                    s32 val, s32 savedResult,
-                                    s32 key); /* 0 or 1; LoadChunksAround discards it */
-void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entries, s32 count);
+void StageMap__LoadChunksAround(StageMap *self, s32 centreChunk, LongVec3 *centrePos,
+                                ChunkSlotSpec *specs);
+s32 StageMap__ComputeNeighbourMask(StageMap *self, s32 chunk, s32 oddRow);
+s32 StageMap__ComputeChunkLoadEntry(StageMap *self, ChunkLoadEntry *out, s32 columns, s32 oddRow,
+                                    s32 centreChunk, s32 onGridMask,
+                                    s32 neighbour); /* 0 or 1; LoadChunksAround discards it */
+void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entry, s32 count);
 s32 StageMap__CountPendingLoads(StageMap *self);
-void StageMap__OnDrawSystemEvent(StageMap *self, void *sender, s32 mode);
+void StageMap__OnDrawSystemEvent(StageMap *self, void *sender, s32 command);
 void StageMap__PopulateSlotCells(StageMap *self, ChunkSlot *slot);
 void StageMap__ClearSlotCells(StageMap *self, ChunkSlot *slot);
-Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *out, void **outPos);
+Descriptor10 *StageMap__GetTargetDescriptor(StageMap *self, Descriptor10Ext *desc, void **outPos);
 s32 StageMap__ComputeFootprintDescriptor(StageMap *self, Descriptor10Ext *out, SplitLongVec3 *pos);
-void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 val);
+void StageMap__SplitChunkIndex(StageMap *self, u8 *out, s32 chunkIndex);
 ChunkSlot *StageMap__GetLastEventSlotChunk(StageMap *self, u8 *out);
-ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 key);
+ChunkSlot *StageMap__FindSlotByNeighbour(StageMap *self, s32 neighbour);
 ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos);
 s32 StageMap__FindSlotIndexByNeighbour(StageMap *self, s32 key);
 s32 StageMap__FindSlotIndexByChunk(StageMap *self, s32 chunkIndex);
