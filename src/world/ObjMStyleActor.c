@@ -3343,14 +3343,14 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
  * a day's two signed mood bytes, times 10, are its dot's centre, the upper
  * axis pointing up the screen. The newest dot is red and blinks while
  * inputMode is 1; the others fade from white. ScoreDayLog checks, once per
- * save, that four fixed moods (gGraphScoreMoods) all appear among the
+ * save, that four fixed moods (sGraphScoreMoods) all appear among the
  * plotted days, and TickHighlight then turns each one's dot green, one
  * every 24 frames once frameCounter passes 30.
  */
 
 extern void *BMemPMgrAlloc(s32 size);
 
-/* gGraphScoreMoods' length: ScoreDayLog's targets, one matchedDayIndices
+/* sGraphScoreMoods' length: ScoreDayLog's targets, one matchedDayIndices
  * byte and one highlight each. */
 #define GRAPH_SCORE_MOOD_COUNT 4
 
@@ -3534,15 +3534,15 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
 
 /* The four moods ScoreDayLog looks for, as (dynamic, upper): (-1, 1),
  * (1, 1), (0, 0), (0, -3). */
-extern MoodGraphPoint gGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
+extern MoodGraphPoint sGraphScoreMoods[GRAPH_SCORE_MOOD_COUNT];
 
-/* Whether every gGraphScoreMoods entry appears among the plotted days (the
+/* Whether every sGraphScoreMoods entry appears among the plotted days (the
  * window PopulateGraphPoints walks, newest first), recording in
  * matchedDayIndices the oldest dot holding each. Fails at once when
  * graphScored is set, and sets it on success.
  * MATCHING: the `targets`/`days` caches, the dead else branch and the
  * chained assignment are all inert; without any one, cc1 strength-reduces
- * gGraphScoreMoods[i] into a pointer hoisted across the outer loop. */
+ * sGraphScoreMoods[i] into a pointer hoisted across the outer loop. */
 s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
     u32 i;
     MoodGraphPoint *days;
@@ -3572,9 +3572,9 @@ s32 GraphRoom__ScoreDayLog(GraphRoom *self, DreamSaveBlock *log) {
             if (day < 0) {
                 day = DAYS_PER_YEAR - 1;
             } else {
-                targets = gGraphScoreMoods;
+                targets = sGraphScoreMoods;
             }
-            targets = (days = gGraphScoreMoods);
+            targets = (days = sGraphScoreMoods);
             days = log->moodPreviousDays;
             if (targets[i].value == days[day].value) {
                 self->matchedDayIndices[i] = dot;

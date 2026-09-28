@@ -95,7 +95,7 @@ The unit banner of `src/world/ObjMStyleActor.c` was rewritten to say what the fi
  * `dreamSys`'s GetSaveBlock returns) -- each day's two signed bytes become
  * an `{x, y}` point handed to a point's `attachAbsolute`. `ScoreDayLog`
  * separately scans that same ring for four fixed mood targets
- * (`gGraphScoreMoods`) and records, per target, the dot index it last matched at;
+ * (`sGraphScoreMoods`) and records, per target, the dot index it last matched at;
  * `TickHighlight` later highlights the matching point. Together this is
  * the in-game graph screen that plots mood history as coloured dots.
  * Round 87 correction: the ring IS DreamSys's `moodPreviousDays` -- the
