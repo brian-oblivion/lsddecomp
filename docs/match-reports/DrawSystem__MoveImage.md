@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020A24` on 2026-09-25 (tools/rename.py). Address 0x80020a24.
 
-Round 81, runner alpha. Unit `src/code_10ee0.c`. Fresh ground, no prior attempt.
+Round 81, runner alpha. Unit `src/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x064 (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** RECT from ConvertRect, then MoveImage(&rect, x, y). Declaring x/y as `s16` parameters gives retail exactly: the raw args are held in s0/s1 across the call and sign-extended (sll/sra 16) only at the MoveImage call.
@@ -21,7 +21,7 @@ void DrawSystem__MoveImage(Class6C070 *self, Class6C070Rect *src, s16 x, s16 y) 
 }
 ```
 
-The declarations it needs (unit-local view in `src/code_10ee0.c`; the class
+The declarations it needs (unit-local view in `src/DrawSystem.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
 `include/BasicClass.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):

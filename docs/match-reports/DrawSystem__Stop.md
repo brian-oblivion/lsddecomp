@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002089C` on 2026-09-25 (tools/rename.py). Address 0x8002089c.
 
-Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
+Round 81, runner bravo. Unit `src/DrawSystem.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x04C (method-table slots resolved with `tools/classtable.py gDrawSystemMethods`).
@@ -23,7 +23,7 @@ void DrawSystem__Stop(Class6C070 *self) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/code_10ee0.c`:
+The unit-local view it needs, from the top of `src/DrawSystem.c`:
 
 ```c
 #include "BasicClass.h"

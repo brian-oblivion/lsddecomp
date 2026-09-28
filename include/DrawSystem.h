@@ -7,7 +7,7 @@
  * DrawSystem -- the game's screen/graphics singleton, class id 0x1, method
  * table gDrawSystemMethods, a direct BasicClass subclass (`tools/classtable.py
  * gDrawSystemMethods --vs gBasicClassMethods`: overrides only the ctor, adds seventeen
- * slots). Methods in src/code_10ee0.c; no class derives from it.
+ * slots). Methods in src/DrawSystem.c; no class derives from it.
  *
  * main() builds the one instance (New_DrawSystem) and hands it to
  * Application__InitSystems (code_2b78c), which stores it as the singleton

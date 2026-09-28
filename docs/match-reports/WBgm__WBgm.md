@@ -20,12 +20,12 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Proposed names for symbols defined outside this unit
 
 Not renamed here -- both are defined in a unit this round did not touch, and
-one of them (`code_10ee0.c`) has a live matching runner this round
+one of them (`DrawSystem.c`) has a live matching runner this round
 (`GetDrawSystem`, per the round-82 broadcast: alpha finished it just before
 this pass started). Recorded as proposals for the head to apply with
 `tools/rename.py` once safe.
 
-- `GetDrawSystem` (defined `src/code_10ee0.c`, returns `Class6C070 *`): called
+- `GetDrawSystem` (defined `src/DrawSystem.c`, returns `Class6C070 *`): called
   here only as `addChild`/`removeChild`'s argument, registering `WBgm` as a
   child of that singleton for lifecycle notification -- the same pattern
   `class_3ac78.c` and `TimImage.c` use it for. No WBgm-specific evidence for

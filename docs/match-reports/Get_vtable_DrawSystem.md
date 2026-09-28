@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020C4C` on 2026-09-25 (tools/rename.py). Address 0x80020c4c.
 
-Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
+Round 81, runner bravo. Unit `src/DrawSystem.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** not a method: the table getter (method-table slots resolved with `tools/classtable.py gDrawSystemMethods`).
@@ -21,7 +21,7 @@ Class6C070Methods *Get_vtable_DrawSystem(void) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/code_10ee0.c`:
+The unit-local view it needs, from the top of `src/DrawSystem.c`:
 
 ```c
 #include "BasicClass.h"

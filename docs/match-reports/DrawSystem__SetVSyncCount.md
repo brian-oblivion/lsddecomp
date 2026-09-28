@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020B4C` on 2026-09-25 (tools/rename.py). Address 0x80020b4c.
 
-Round 81, runner bravo. Unit `src/code_10ee0.c` (carved from `psyq_10ee0` in
+Round 81, runner bravo. Unit `src/DrawSystem.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x070 (method-table slots resolved with `tools/classtable.py gDrawSystemMethods`).
@@ -23,7 +23,7 @@ void DrawSystem__SetVSyncCount(Class6C070 *self, s32 value) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/code_10ee0.c`:
+The unit-local view it needs, from the top of `src/DrawSystem.c`:
 
 ```c
 #include "BasicClass.h"
@@ -54,7 +54,7 @@ extern void GsSwapDispBuff(void);
 `running`) of the field `DrawSystem__RunLoop` passes to `VSync()` and
 `DrawSystem__CountFrames` compares a counter against; the field's exact
 in-game meaning (a VSync wait mode vs. a frame-count threshold -- see
-`src/code_10ee0.c`'s `unk20` comment) isn't pinned down, so the setter's
+`src/DrawSystem.c`'s `unk20` comment) isn't pinned down, so the setter's
 name follows the field's more literal reading rather than asserting one.
 
 ## Track 4 (2026-09-26, round 87, bravo)
