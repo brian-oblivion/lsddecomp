@@ -127,3 +127,15 @@ The file's banner carried its edge evidence:
 > so nothing to merge with.
 >
 > The carve history is in docs/match-reports/SpuInitHot.md, "File history".
+
+## History (moved from src/psyq/libspu_s_ih.c, round 103)
+
+The unit's comment on its callee, before the callee was renamed from
+`func_80038E44` to Sony's `_SpuInit` (libspu/s_ini on the 3.3, 3.5 and 3.6
+discs; s_ih.o and s_i.o call it by that name, with 1 and 0):
+
+> _SpuInit is defined in the Psy-Q SPU/SND block at 0x272C8..0x2C054
+> (the game's own libspu build, which no SDK disc has); its own
+> body is a single straight-line path (no branches) ending in a chain of
+> global stores with $v0 never touched afterward -- genuinely void, not
+> just an unobserved return.

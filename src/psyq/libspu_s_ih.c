@@ -8,12 +8,9 @@
  */
 #include "common.h"
 
-/* _SpuInit is defined in the Psy-Q SPU/SND block at 0x272C8..0x2C054
- * (the game's own libspu build, which no SDK disc has); its own
- * body is a single straight-line path (no branches) ending in a chain of
- * global stores with $v0 never touched afterward -- genuinely void, not
- * just an unobserved return. */
-extern void _SpuInit(s32 a0);
+/* libspu's s_ini: the SPU reset that SpuInit (mode 0) and SpuInitHot
+ * (mode 1) share. It returns nothing. */
+extern void _SpuInit(s32 mode);
 
 void SpuInitHot(void) {
     _SpuInit(1);
