@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gStyleDecorPosX
 gStyleDecorPosY
 gStyleDecorSizeH
 gStyleDecorSizeW
@@ -214,6 +213,7 @@ sStyleDecorBoxSize
 sStyleDecorColor
 sStyleDecorColors
 sStyleDecorObj
+sStyleDecorPosX
 sStyleUnreadArg
 sTaskObjFCount
 sTimExt
