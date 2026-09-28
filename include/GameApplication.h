@@ -17,7 +17,7 @@
  * Lifecycle.
  *   ctor(config)   Application's ctor with config->dataSource, this table, the
  *                  config kept, the DreamSys built from "ETC\DREAME5.TMD"
- *                  (New_LinkResource), config->unk14 handed to it, and the RNG
+ *                  (New_LinkResource), config->dreamSysConfigOption handed to it, and the RNG
  *                  seeded (setScreenDims's occupant, below).
  *   initSystems    Application's, unless already initialized.
  *   runMainLoop    Application's: once showIntroLogos, then forever
@@ -65,7 +65,7 @@ typedef struct GameApplicationConfig {
                                      * PlayCinematic's movie branch, PlayEndingMovie */
     /* +0x0C */ s32 showIntroLogos; /* gates ShowIntroLogos */
     /* +0x10 */ s32 pollGraphRoom;  /* gates RunTitleMenu (0: it returns 2 at once) */
-    /* +0x14 */ s32 unk14; /* the ctor passes it to the DreamSys's slot228 (DreamSys__func_5ba20),
+    /* +0x14 */ s32 dreamSysConfigOption; /* the ctor passes it to the DreamSys's slot228 (DreamSys__func_5ba20),
                             * which stores a value >= 0 at DreamSys +0x924. The DreamSys ctor
                             * zeroes that word and no code reads it back, so what it selects is
                             * not established (sGameApplicationConfig passes 1). */

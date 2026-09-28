@@ -77,7 +77,7 @@ GameApplication *New_GameApplication(GameApplicationConfig *config) {
 
 /* ctor: Application's ctor with config->dataSource, this table, the config
  * kept, the data directory reset to its default, the DreamSys built from
- * ETC\DREAME5.TMD, config->unk14 handed to it, then the RNG seeded through
+ * ETC\DREAME5.TMD, config->dreamSysConfigOption handed to it, then the RNG seeded through
  * +0x040 (GameApplication__SeedRandom). */
 void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *config) {
     /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
@@ -92,7 +92,7 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
     req.src.name = sModelPathDreamE5;
     self->dreamSys = New_DreamSys(New_LinkResource(&req.src), 0, 0);
     self->skipGraphRoomPoll = 0;
-    self->dreamSys->methods->slot228(self->dreamSys, config->unk14);
+    self->dreamSys->methods->slot228(self->dreamSys, config->dreamSysConfigOption);
     ((GameApplicationSeedRandomFn)self->methods->setScreenDims)(self);
 }
 
