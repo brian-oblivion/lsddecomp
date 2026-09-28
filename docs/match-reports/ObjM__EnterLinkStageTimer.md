@@ -1,4 +1,6 @@
-# ObjM__EnterStateA
+# ObjM__EnterLinkStageTimer
+
+> Renamed from `ObjM__EnterStateA` on 2026-09-28 (tools/rename.py). Address 0x80053e00.
 
 > Renamed from `func_80053E00` on 2026-09-23 (tools/rename.py). Address 0x80053e00.
 
@@ -13,7 +15,7 @@ then slot `0xF4` (the same slot `ObjM__EnterLinkTunnel` uses) also with argument
 ## The C
 
 ```c
-void ObjM__EnterStateA(ObjM *self) {
+void ObjM__EnterLinkStageTimer(ObjM *self) {
     self->unk20 = 0xA;
     ObjM__StartFadeUp(self, 0, 0, 6, 1);
     self->unk3C->methods->slot13C(self->unk3C, 2);
@@ -31,7 +33,7 @@ round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
-**ObjM__EnterStateA** -- tier B. Same shape again for `ObjM::mode = 0xA`, forwarding request code 6, then `dreamSys->selectCallback98(dreamSys, 2)` and `setMoveOverride(dreamSys, 2)`. Tier B for the same reason as its two siblings.
+**ObjM__EnterLinkStageTimer** -- tier B. Same shape again for `ObjM::mode = 0xA`, forwarding request code 6, then `dreamSys->selectCallback98(dreamSys, 2)` and `setMoveOverride(dreamSys, 2)`. Tier B for the same reason as its two siblings.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

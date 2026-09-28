@@ -956,7 +956,7 @@ void ObjM__EnterLinkTunnel(ObjM *self) {
     self->dreamSys->methods->setMoveOverride(self->dreamSys, MOVE_OVERRIDE_FORCED);
 }
 
-void ObjM__EnterStateA(ObjM *self) {
+void ObjM__EnterLinkStageTimer(ObjM *self) {
     self->state = OBJM_STATE_LINK_STAGE_TIMER;
     ObjM__StartFadeUp(self, DREAM_COLOR_BLACK, 0, 6, 1);
     self->dreamSys->methods->selectMoveCallback(self->dreamSys, MOVE_CALLBACK_TICK_DRIFT);

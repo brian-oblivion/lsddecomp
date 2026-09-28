@@ -130,7 +130,7 @@ struct ObjMMethods {
     /* +0x09C */ void (*enterState6)(ObjM *self); /* ObjM__EnterLinkWall: code 0xD; EnterState5 before a stage */
     /* +0x0A0 */ void (*enterState7)(ObjM *self);        /* ObjM__EnterLinkFlashback: code 0xE */
     /* +0x0A4 */ void (*enterState8)(ObjM *self);        /* ObjM__EnterLinkTunnel: code 0xF */
-    /* +0x0A8 */ void (*enterStateA)(ObjM *self);        /* ObjM__EnterStateA: code 0x10 */
+    /* +0x0A8 */ void (*enterStateA)(ObjM *self);        /* ObjM__EnterLinkStageTimer: code 0x10 */
     /* +0x0AC */ void (*notifyParentsCodeB)(ObjM *self); /* ObjM__NotifyParentsCodeB: code 0x11 */
     /* +0x0B0 */ void (*onFadeNotify)(ObjM *self, struct FadeBox *sender,
                                       s32 event); /* ObjM__OnFadeNotify: onNotify's 0x164 sender; 5 fade down done, 6 up */
@@ -202,7 +202,7 @@ void ObjM__EnterLinkDynamic(ObjM *self);
 void ObjM__EnterLinkWall(ObjM *self);
 void ObjM__EnterLinkFlashback(ObjM *self);
 void ObjM__EnterLinkTunnel(ObjM *self);
-void ObjM__EnterStateA(ObjM *self);
+void ObjM__EnterLinkStageTimer(ObjM *self);
 void ObjM__NotifyParentsCodeB(ObjM *self);
 void ObjM__StartFadeUp(ObjM *self, s32 channels, s32 fadeMode, s32 step, s32 addChild);
 void ObjM__OnFadeNotify(ObjM *self, struct FadeBox *sender, s32 event);

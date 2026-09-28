@@ -304,7 +304,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_80053ACC` | `ObjM__EnterTimeUp` | B | see below |
 
-**Evidence.** vtable slot +0x094. Sets `self->phase = 4`. The state-code numbering is confirmed, not guessed: sibling unit ObjMStyleActor already established `ObjM__EnterLinkFlashback`/`ObjM__EnterLinkTunnel`/`ObjM__EnterStateA` for the SAME field on the SAME class, and this unit's own `ObjM__OnDreamSysNotify` dispatches codes 0xA..0x11 onto exactly the same run of vtable slots (+0x094..+0x0AC) that these three functions occupy, so 4/5/6 continue that one numbering.
+**Evidence.** vtable slot +0x094. Sets `self->phase = 4`. The state-code numbering is confirmed, not guessed: sibling unit ObjMStyleActor already established `ObjM__EnterLinkFlashback`/`ObjM__EnterLinkTunnel`/`ObjM__EnterLinkStageTimer` for the SAME field on the SAME class, and this unit's own `ObjM__OnDreamSysNotify` dispatches codes 0xA..0x11 onto exactly the same run of vtable slots (+0x094..+0x0AC) that these three functions occupy, so 4/5/6 continue that one numbering.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
