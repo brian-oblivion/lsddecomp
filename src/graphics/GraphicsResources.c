@@ -711,7 +711,7 @@ void BgLayer__BgLayer(BgLayer *self, TileMap *src, s32 mode) {
 /* reset (+0x040): lay the GsBG over `src`'s map, sized to the map (mode 0,
  * 8-bit CLUT) or to the screen (mode 1, 15-bit), at the origin, unscaled,
  * unrotated, pivoting on its centre. */
-extern BgLayerRgb sBgLayerDefaultColor;
+extern ColorRgb sBgLayerDefaultColor;
 
 void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
     if (mode == 0) {
@@ -820,7 +820,7 @@ void BgLayer__UpdateScale(BgLayer *self, s32 set, Ratio16 *src) {
 }
 
 /* +0x0B8: take `rgb` as the GsBG's colour when `enable`. */
-void BgLayer__SetColor(BgLayer *self, s32 enable, BgLayerRgb *rgb) {
+void BgLayer__SetColor(BgLayer *self, s32 enable, ColorRgb *rgb) {
     if (enable) {
         self->color = *rgb;
     }

@@ -40,9 +40,9 @@
  *
  * FIELDS: the GsBG, +0x044..+0x067; the object is 0x68 bytes (New_BgLayer).
  * `bgAttribute` because SceneNode's +0x010 (GsDOBJ2.attribute) already has
- * the name. r, g, b are one signed three-byte struct (BgLayerRgb): retail
- * copies them lb/lb/lb, sb/sb/sb (BgLayer__SetColor, BgLayer__Reset), which
- * three u8 members would not give.
+ * the name. r, g, b are one ColorRgb (include/DrawSystem.h): retail copies
+ * them lb/lb/lb, sb/sb/sb (BgLayer__SetColor, BgLayer__Reset), a whole-struct
+ * copy.
  *
  * The map source is a TileMap (gTileMapMethods, include/TileMap.h),
  * whose GsMAP starts at +0x02C. Only its tag is named here, as
@@ -59,16 +59,12 @@ typedef struct BgLayerMethods BgLayerMethods;
  * (Viewport__DrawNode). */
 #define BGLAYER_CLASS_ID 0x54
 
-/* GsBG's r, g, b. Signed: see the banner. */
-typedef struct BgLayerRgb {
-    s8 r;
-    s8 g;
-    s8 b;
-} BgLayerRgb;
+/* The spelling TaskCore's colour code (src/app/Task.c) still uses. */
+typedef ColorRgb BgLayerRgb;
 
 struct BgLayerMethods {
     SCENENODE_SLOTS(BgLayer, (BgLayer * self, struct TileMap *src, s32 mode));
-    /* +0x0B8 */ void (*setColor)(BgLayer *self, s32 enable, BgLayerRgb *rgb); /* BgLayer__SetColor */
+    /* +0x0B8 */ void (*setColor)(BgLayer *self, s32 enable, ColorRgb *rgb); /* BgLayer__SetColor */
     /* +0x0BC */ void (*slotBC)(void); /* BgLayer__NoOp, empty; no known caller */
 };
 
@@ -85,7 +81,7 @@ struct BgLayer {
     /* +0x04E */ s16 h;
     /* +0x050 */ s16 scrollx;
     /* +0x052 */ s16 scrolly;
-    /* +0x054 */ BgLayerRgb color; /* GsBG r, g, b: sBgLayerDefaultColor at reset; setColor */
+    /* +0x054 */ ColorRgb color; /* GsBG r, g, b: sBgLayerDefaultColor at reset; setColor */
     /* +0x057 */ u8 pad57;
     /* +0x058 */ void *map; /* GsBG.map: the source's GsMAP (&src->map, +0x02C) */
     /* +0x05C */ s16 mx;    /* the pivot: w / 2, h / 2 */
@@ -104,7 +100,7 @@ void BgLayer__BgLayer(BgLayer *self, struct TileMap *src, s32 mode);
 void BgLayer__Reset(BgLayer *self, struct TileMap *src, s32 mode);
 void BgLayer__UpdateRotation(BgLayer *self, s32 set, Ratio16 *table);
 void BgLayer__UpdateScale(BgLayer *self, s32 set, Ratio16 *table);
-void BgLayer__SetColor(BgLayer *self, s32 enable, BgLayerRgb *rgb);
+void BgLayer__SetColor(BgLayer *self, s32 enable, ColorRgb *rgb);
 void BgLayer__NoOp(void);
 
 #endif
