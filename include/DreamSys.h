@@ -196,9 +196,10 @@ typedef struct {
     PlayerSpawnPoint position;
     FlashbackRotation rotation;
     s16 timeLimit;
-    /* s16: DreamSys__AddFlashback stores it with `sh`. Two bytes of
-       alignment padding follow, before `day`. */
-    s16 unknown_value_0x1c;
+    /* AddFlashback's fifth argument, stored with `sh` (FlashbackSaving always
+       passes 0); nothing reads it. Two bytes of alignment padding follow,
+       before `day`. */
+    s16 unk1C;
     s32 day;
 } FlashbackEntry;
 
@@ -275,10 +276,11 @@ struct DreamSys {
     /* Cleared to 0, then set to (tick % tickPeriod == 0) by
            DreamSys__UpdateTickState. */
     s32 linkCommandFlag;
-    /* Cleared to 0 by DreamSys__func_59598; no other observed use. */
-    s32 unk_0x78;
-    /* Cleared to 0 by DreamSys__func_59590; no other observed use. */
-    s32 unk_0x7C;
+    /* Cleared by DreamSys__func_59598 (slot128), ResetSessionState and
+       ResetLinkState; nothing sets it nonzero or reads it. */
+    s32 unk78;
+    /* Cleared by DreamSys__func_59590 (slot124); nothing else touches it. */
+    s32 unk7C;
     /* Set by DreamSys__SelectLookCallback(self, arg1): NULL when arg1==0, otherwise one of
            three vtable-slot function pointers selected by arg1 (1/2/3). Called
            with (self) by DreamSys__RunTickCallbacks, if non-NULL. */
@@ -343,7 +345,7 @@ struct DreamSys {
        soundObj's stopVoice (+0x084), then resets this to -1) only while this is
        >= 0. */
     s32 voiceIndex;
-    s8 unknown_values_0xC0[4];
+    u8 padC0[4];
     /* Set to 1 by DreamSys__SelectMoveCallback's arg1==2 case, alongside cueServiceActive and
        moveCallback. */
     s32 driftActive;
@@ -357,15 +359,13 @@ struct DreamSys {
     s32 tickPeriod;
     /* Result of DreamSys__UpdateTickState's (tick % tickPeriod == 0) check. */
     s32 tickBoundary;
-    /* tickBoundary/0x128/0x12C/0x130 are also bounds-checked-set as a group of
-       four by DreamSys__SetGateFlags (vtable +0x18C): each is overwritten with the
-       corresponding argument only when that argument is >= 0. */
-    s32 unk_0x128;
-    s32 unk_0x12C;
-    s32 unk_0x130;
+    /* tickBoundary and these three are set as a group of four by
+       DreamSys__SetGateFlags (vtable +0x18C), each only when its argument is
+       >= 0; ResetLinkState sets these three to 1. No code reads them. */
+    s32 gateFlags[3];
 
     s32 dreamTimeLimit;
-    s8 unknown_values_0x138[12];
+    u8 pad138[12];
 
     MoodGraphContributor areaMoods;
     MoodGraphContributor entityMoods;
@@ -384,17 +384,23 @@ struct DreamSys {
     s32 amountFlashbacksAvailable;
     FlashbackEntry storedFlashbacks[10];
 
-    s8 unknown_values_0x5d8[8];
+    /* InitNewGame clears it; nothing reads it. */
+    s8 unk5D8;
+    u8 pad5D9[6];
+    /* DreamSaveBlock's graphScored: GraphRoom__ScoreDayLog sets it; InitNewGame clears it. */
+    s8 graphScored;
 
     s8 navChallengesArray[NAV_CHALLENGE_COUNT];
     /* 2 bytes unused */
     s32 amountDynamicLinksDone;
-    s8 unknown_values_0x604[116];
+    u8 pad604[116];
 
     bool screenShakeOn;
-    s32 unknown_word_0x67c;
-    s32 unknown_word_0x680;
-    s8 unknown_values_0x684[500];
+    /* InitNewGame clears these three; nothing else touches them. They are
+       inside the save block (saveMagic up to newGamePending). */
+    s32 unk67C;
+    s32 unk680;
+    s8 unk684[500];
 
     s32 newGamePending;
     s32 currentFlashbackIndex;
@@ -437,8 +443,10 @@ struct DreamSys {
     /* A `struct RelativePos`, address-taken and passed to DreamSys__ApplyRelativeOffset as
        its `b` argument (DreamSys__TickStaircaseYawPlus45). */
     struct RelativePos staircaseOrigin;
-    s8 unknown_values_0x922[2];
-    s32 unk_0x924;
+    u8 pad922[2];
+    /* GameApplication's config word +0x14, through DreamSys__func_5ba20
+       (slot228); ResetSessionState clears it. Nothing reads it. */
+    s32 configOption;
 };
 
 /* The bytes DreamSys__GetSaveBlock hands out, from saveMagic up to
@@ -449,7 +457,7 @@ struct DreamSys {
  * there: each field is the DreamSys field above at its DreamSys offset less
  * saveMagic's +0x178. UpdateFlashbackLock (TitleMenu) reads the flashback
  * pair; GraphRoom reads the year, the day and the mood ring, and sets
- * graphScored, DreamSys +0x5DF, the last byte of unknown_values_0x5d8[8]. */
+ * graphScored, DreamSys +0x5DF. */
 typedef struct DreamSaveBlock {
     u8 pad00[0x4];
     /* +0x004 */ s32 currentYear; /* DreamSys +0x17C; nonzero: the ring is full, plot all 100 days */
@@ -516,8 +524,8 @@ struct DreamSysMethods {
     /* +0x11C */ void (*runTickCallbacks)(DreamSys *self);     /* DreamSys__RunTickCallbacks */
     /* +0x120 */ s32 (*projectPointAtDistance)(DreamSys *self, s32 *out, s32 dist, s32 *reference,
                                                s32 tolerance); /* DreamSys__ProjectPointAtDistance */
-    /* +0x124 */ void (*slot124)(DreamSys *self); /* DreamSys__func_59590: unk_0x7C = 0 */
-    /* +0x128 */ void (*slot128)(DreamSys *self); /* DreamSys__func_59598: unk_0x78 = 0 */
+    /* +0x124 */ void (*slot124)(DreamSys *self); /* DreamSys__func_59590: unk7C = 0; never called */
+    /* +0x128 */ void (*slot128)(DreamSys *self); /* DreamSys__func_59598: unk78 = 0; never called */
     /* +0x12C */ s32 (*slot12C)(DreamSys *self);  /* DreamSys__NoOpSlot12C */
     /* +0x130 */ void (*clearTickCallbacks)(DreamSys *self, bool arg1); /* DreamSys__ClearTickCallbacks */
     /* +0x134 */ void (*setTickCallbacks)(DreamSys *self, s32 arg1,

@@ -242,8 +242,8 @@ void DreamSys__ResetSessionState(DreamSys *self) {
     self->staircaseActive = 0;
     self->staircaseMoveGate = 0;
     self->staircaseTickFn = 0;
-    self->unk_0x78 = 0;
-    self->unk_0x924 = 0;
+    self->unk78 = 0;
+    self->configOption = 0;
 }
 
 void DreamSys__SpawnAtLink(DreamSys *self, StageMap *grid) {
@@ -470,7 +470,7 @@ void DreamSys__ResetLinkState(DreamSys *self, s32 moveMode, s32 tickPeriod) {
     self->staircaseActive = 0;
     self->staircaseMoveGate = 0;
     self->staircaseTickFn = 0;
-    self->unk_0x78 = 0;
+    self->unk78 = 0;
     SceneNode__GetRotationDegrees((SceneNode *)self, rotation);
 
     rotation[2].num = 0;
@@ -577,11 +577,11 @@ s32 InterpolateKeyframeValue(LongVec3 *from, LongVec3 *to, s32 at) {
 }
 
 void DreamSys__func_59590(DreamSys *self) {
-    self->unk_0x7C = 0;
+    self->unk7C = 0;
 }
 
 void DreamSys__func_59598(DreamSys *self) {
-    self->unk_0x78 = 0;
+    self->unk78 = 0;
 }
 
 s32 DreamSys__NoOpSlot12C(DreamSys *self) {
@@ -922,11 +922,11 @@ void DreamSys__SetGateFlags(DreamSys *self, s32 a, s32 b, s32 c, s32 d) {
     if (a >= 0)
         self->tickBoundary = a;
     if (b >= 0)
-        self->unk_0x128 = b;
+        self->gateFlags[0] = b;
     if (c >= 0)
-        self->unk_0x12C = c;
+        self->gateFlags[1] = c;
     if (d >= 0)
-        self->unk_0x130 = d;
+        self->gateFlags[2] = d;
 }
 
 void DreamSys__SetTickPeriod(DreamSys *self, s32 value) {
@@ -959,13 +959,13 @@ void DreamSys__InitNewGame(DreamSys *self) {
     self->navigationFlashbackUnlockScore = 0;
     self->instanceFlashbackUnlockScore = 0;
     self->amountFlashbacksAvailable = 0;
-    self->unknown_values_0x5d8[7] = 0;
-    self->unknown_values_0x5d8[0] = 0;
+    self->graphScored = 0;
+    self->unk5D8 = 0;
     self->screenShakeOn = 1;
-    self->unknown_word_0x67c = 0;
-    self->unknown_word_0x680 = 0;
+    self->unk67C = 0;
+    self->unk680 = 0;
     InitNavChallengesArray(&self->navChallengesArray, &self->amountDynamicLinksDone);
-    memset(self->unknown_values_0x684, 0, sizeof(self->unknown_values_0x684));
+    memset(self->unk684, 0, sizeof(self->unk684));
 }
 
 void DreamSys__GetSetScreenShake(DreamSys *self, bool *value) {
@@ -1557,7 +1557,7 @@ void DreamSys__AddFlashback(DreamSys *self, s32 stage, PlayerSpawnPoint *pos, s3
     entry->stageID = stage;
     entry->position = *pos;
     entry->rotation = *(FlashbackRotation *)angles;
-    entry->unknown_value_0x1c = unknown;
+    entry->unk1C = unknown;
     entry->timeLimit = time;
     entry->day = day;
 }
@@ -1597,10 +1597,10 @@ s32 DreamSys__func_5ba20(DreamSys *self, s32 value) {
     s32 old;
 
     if (value >= 0) {
-        old = self->unk_0x924;
-        self->unk_0x924 = value;
+        old = self->configOption;
+        self->configOption = value;
     } else {
-        old = self->unk_0x924;
+        old = self->configOption;
     }
     return old;
 }
