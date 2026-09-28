@@ -25,7 +25,7 @@
  * map, seven chunk slots each laid out as a lattice of GridCells. Its
  * methods fall in three runs, each introduced below: life and the command
  * path; placing, loading and querying the slots; the drawn window and the
- * scale ramp. Its data tables and SplitCoord2 are in include/class_3bb8c.h.
+ * scale ramp. Its data tables and SplitCoord2 are in include/StageMap.h.
  *
  * What decided its edges (python3 tools/tuboundary.py): the start is
  * "start edge possible" after StageGrid.c, which follows the placed Sony
@@ -867,7 +867,7 @@ void StageMap__SetConfig(StageMap *self, StageGridDimensions *config) {
  *  - GetTargetDescriptor, ComputeFootprintDescriptor, SplitChunkIndex,
  *    GetLastEventSlotChunk, FindSlotByNeighbour, FindSlotForPosition:
  *    queries. A slot's position is its cellParent's GsCOORDINATE2, read
- *    through SplitCoord2 (include/class_3bb8c.h).
+ *    through SplitCoord2 (include/StageMap.h).
  *
  * Positions are in world units: a cell is STAGE_CELL_SIZE square, a chunk
  * STAGE_CHUNK_SIZE (include/StageMap.h).
