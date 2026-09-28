@@ -23,11 +23,15 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "code_d294.h"
+#include "SceneNode.h"
 #include "Pad.h"
 #include "FrameClock.h"
 #include "TmdModel.h"
 #include "Actor.h"
+
+/* BMemPMgr.c's pool allocator, in this file's view of it. */
+extern void *BMemPMgrAlloc(s32 size);
+extern void BMemPMgrFree(void *arg);
 
 /* UpdateRotation's divisor: its inputs are degrees, and a degree count in
  * 20.12 fixed point divided by 360 is the angle in 4096ths of a turn (ONE to
