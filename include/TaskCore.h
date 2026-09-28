@@ -129,7 +129,7 @@ struct TaskCoreTarget {
     /* +0x016 */ u8 pad16[2];
     /* +0x018 */ void **hiddenSlots; /* NULL entries are the slots find{Next,Prev}FreeSlot stop at */
     /* +0x01C */ char **names;       /* NULL-terminated; one New_TextRow widget per name */
-    /* +0x020 */ u8 *slotPositions; /* 8 bytes a slot, updateSlotElements' position for each widget */
+    /* +0x020 */ struct ScreenSpritePos *slotPositions; /* per slot: updateSlotElements' position for its widget */
     /* +0x024 */ TaskCoreItemList **slotLists; /* per slot: NULL, or the item list the slot opens */
 };
 

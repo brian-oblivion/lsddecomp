@@ -660,12 +660,6 @@ epilogue:
 extern s32 sListViewSize[2];
 extern BoxFillRgb sListViewColor;
 
-/* A screen position, x then y. */
-typedef struct {
-    s32 x;
-    s32 y;
-} SlotPos;
-
 /* The scrolled list's layout (RefreshSlotView, CommitElementScroll): item
  * rows are SLOT_LIST_ROW_PITCH apart, and listView, the frame behind them,
  * is SLOT_LIST_FRAME_WIDTH wide and SLOT_LIST_FRAME_ROW_HEIGHT tall a row. */
@@ -685,7 +679,7 @@ struct TaskCoreItemList {
     /* +0x010 where the cursor's row is drawn; the list starts savedCursor rows
      * above. MATCHING: a struct, so the copy is lw/lw, sw/sw, then a reload of
      * .y (CommitElementScroll); two s32 fields compile differently. */
-    SlotPos pos;
+    ScreenSpritePos pos;
     char **itemNames; /* +0x018 NULL-terminated; one New_TextRow per name */
 };
 
@@ -804,14 +798,14 @@ void TaskCore__ReleaseTarget(TaskCore *self) {
 
 void TaskCore__UpdateSlotElements(TaskCore *self, void *parent) {
     TextRow **widget;
-    SlotPos *position;
+    ScreenSpritePos *position;
     s32 i;
 
     if (self->target == NULL) {
         return;
     }
     widget = (TextRow **)self->slotElements;
-    position = (SlotPos *)self->target->slotPositions;
+    position = self->target->slotPositions;
     for (i = 0; i < self->slotCount; i++, widget++, position++) {
         if (self->target->hiddenSlots[i] == NULL) {
             TextRow *row = *widget;
@@ -968,7 +962,7 @@ void TaskCore__RefreshSlotView(TaskCore *self, void *parent, s32 show) {
     TextRow **item;
     s32 count;
     s32 cursor;
-    SlotPos pos;
+    ScreenSpritePos pos;
     s32 i;
 
     slot = self->activeSlot;
@@ -1045,7 +1039,7 @@ void TaskCore__BeginElementScroll(TaskCore *self) {
 void TaskCore__CommitElementScroll(TaskCore *self) {
     s32 slot;
     s32 cursor;
-    SlotPos pos;
+    ScreenSpritePos pos;
     TextRow **item;
     s32 count;
     s32 i;
@@ -1062,7 +1056,7 @@ void TaskCore__CommitElementScroll(TaskCore *self) {
     count = self->itemCounts[slot];
     for (i = 0; i < count; i++) {
         (*item)->methods->setDisplay(*item, 0);
-        (*item)->methods->setPosition(*item, (ScreenSpritePos *)&pos);
+        (*item)->methods->setPosition(*item, &pos);
         pos.y += SLOT_LIST_ROW_PITCH;
         item++;
     }
