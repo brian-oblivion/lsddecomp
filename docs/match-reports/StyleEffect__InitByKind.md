@@ -172,7 +172,7 @@ method signatures; zero bytes changed.
 | +0x064 | unk64 | rotation | B | passed as updateRotation's data |
 | +0x068 | unk68 | scale | B | passed as updateScale's data |
 | +0x06C | unk6C | modelChildLayout | B | 0 = no model children; index into gModelChildSpacing |
-| +0x070 | unk70 | tableIndex | C-ish | only ever an index (gModelChildDriftZ, gSpriteShiftX) |
+| +0x070 | unk70 | tableIndex | C-ish | only ever an index (sModelChildDriftZ, gSpriteShiftX) |
 | +0x074 | unk74 | color | B | every sprite's slotB8 (Sprite__SetColor copies 3 bytes to GsSPRITE r,g,b) |
 | +0x078 | unk78 | altColor | B | sprites[1]'s slotB8 argument instead of color when non-NULL |
 | +0x07C | arr7C | modelChildren | B | New_Actor objects, linked to the owner's model |

@@ -14,12 +14,12 @@ positional skeleton diffs 4)`, first real diff at word 12 (0x471D8):
 
 Builds, in order:
 
-1. **No named pointer at all**: `gModelChildDriftZ[idx]` in the guard
-   (`layout != 0 && gModelChildDriftZ[idx] != 0 && tick >= 0x1F5` as one
+1. **No named pointer at all**: `sModelChildDriftZ[idx]` in the guard
+   (`layout != 0 && sModelChildDriftZ[idx] != 0 && tick >= 0x1F5` as one
    condition) and in the loop. The word-12 swap **closed** (sll v1 / lui v0,
    as retail), but with no copy the address lived in `s4` directly: one word
    short (retail's `move s4,s1`), 14/121 raw with drift.
-2. As 1, plus `stepZ = &gModelChildDriftZ[idx];` recomputed **after** the
+2. As 1, plus `stepZ = &sModelChildDriftZ[idx];` recomputed **after** the
    `updateRotation` call, before `accumOffset = 0`, with `for (i = 0; ...)`.
    Length exact again, 115/121: only `i` and `accumOffset` swapped `s1`/`s3`
    and the order of `move s3,zero` / `move s4,s1`.
@@ -29,7 +29,7 @@ Builds, in order:
 
 Why it works: retail's `move s4,s1` right before the call is not the copy of
 a C variable (round 44's `tab70b = tab70`). It is CSE finding that the loop's
-second `&gModelChildDriftZ[idx]` already sits in the guard's pseudo and
+second `&sModelChildDriftZ[idx]` already sits in the guard's pseudo and
 replacing the recomputation with a register copy. With a NAMED pointer
 assigned before the branch, that variable's pseudo is born before the
 `lui`, which gives the shift the lower register; without one the
@@ -63,7 +63,7 @@ an "active" guard and `self->unk70` as an index into a small lookup table; if
 both guards and a third bound check on `self->unk24` pass, it forwards a
 table handle to `self` and to each of the two `arr7C` children, folds a
 per-child Vec3 offset and dispatches it through vtable slot `slotBC`, then
-runs a modulus check against a `24500 / gModelChildDriftZ[idx]` quotient to decide
+runs a modulus check against a `24500 / sModelChildDriftZ[idx]` quotient to decide
 whether to call `StyleEffect__PlaceModelChildren(self, 1)`. Always zeroes `*self->unk14` on
 every exit path.
 
@@ -85,7 +85,7 @@ from what round 26 assumed.
 ```c
 #if 0
 /* After 500 frames (tick >= 0x1F5), for kinds with model children and a
- * nonzero gModelChildDriftZ step: spin self and both children, move the
+ * nonzero sModelChildDriftZ step: spin self and both children, move the
  * children along z, and every 24500 / step frames snap them back to their
  * layout. Always marks self's coord2 for recompute.
  *
@@ -106,7 +106,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self)
 
     idx = self->tableIndex;
     if (self->modelChildLayout != 0) {
-        tab70 = &gModelChildDriftZ[idx];
+        tab70 = &sModelChildDriftZ[idx];
         if (*tab70 != 0 && (u32) self->tick >= 0x1F5) {
             p = self->modelChildren;
             self->methods->updateRotation(self, 0, (s32) gSpinRotStep);
@@ -123,7 +123,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self)
                 p++;
             }
 
-            divq = 24500 / gModelChildDriftZ[idx];
+            divq = 24500 / sModelChildDriftZ[idx];
             modend = self->tick;
             if (divq >= 0) {
                 if ((u32) modend % (u32) divq == 0) {
@@ -158,7 +158,7 @@ s32 tableIndex;             /* +0x070 */
 LinkNode *modelChildren[2]; /* +0x07C */
 
 typedef struct LinkNode StyleEffect;
-extern s32 gModelChildDriftZ[];
+extern s32 sModelChildDriftZ[];
 extern Vec3S sModelChildDriftInit;
 extern s32 gSpinRotStep[];
 ```
@@ -220,20 +220,20 @@ None of these four changed the function's WORD COUNT — length has been exact
 
 ## NOT CLOSED this round: one residue, 4 words, pure commutative register identity
 
-**The `&gModelChildDriftZ[idx]` pointer computation's TWO temp registers are still
+**The `&sModelChildDriftZ[idx]` pointer computation's TWO temp registers are still
 swapped** at the FIRST occurrence only (before `tab70b` exists) — `v0`/`v1`
 hold the shift-result and the base address in the opposite roles from
 retail:
 
 ```
-retail:  sll v1,s5,2 / lui v0,%hi(gModelChildDriftZ) / addiu v0,v0,%lo(...) / addu s1,v1,v0
-built:   sll v0,s5,2 / lui v1,%hi(gModelChildDriftZ) / addiu v1,v1,%lo(...) / addu s1,v0,v1
+retail:  sll v1,s5,2 / lui v0,%hi(sModelChildDriftZ) / addiu v0,v0,%lo(...) / addu s1,v1,v0
+built:   sll v0,s5,2 / lui v1,%hi(sModelChildDriftZ) / addiu v1,v1,%lo(...) / addu s1,v0,v1
 ```
 
 Tried this round, both inert (byte-identical output to the array form):
-- `tab70 = gModelChildDriftZ + idx;` (pointer-arithmetic form) — confirms round
+- `tab70 = sModelChildDriftZ + idx;` (pointer-arithmetic form) — confirms round
   26's own finding still holds under the new context.
-- `tab70 = (s32 *)((u8 *)gModelChildDriftZ + (idx << 2));` (explicit byte-offset
+- `tab70 = (s32 *)((u8 *)sModelChildDriftZ + (idx << 2));` (explicit byte-offset
   cast form) — also no effect, ruling out the array-vs-pointer-vs-manual-shift
   surface syntax entirely as a lever for THIS specific commutative pair.
 
@@ -255,7 +255,7 @@ under `lsddecomp2-wt-charlie`) and left to self-terminate on its own
 
 ## Do not re-try, without a new idea
 
-- Any resyntax of `&gModelChildDriftZ[idx]` vs `gModelChildDriftZ + idx` vs explicit
+- Any resyntax of `&sModelChildDriftZ[idx]` vs `sModelChildDriftZ + idx` vs explicit
   pointer-cast-and-shift: three surface spellings tried across two rounds,
   byte-identical machine code every time. The RTL this lowers to is fixed
   regardless of source spelling; the swap is a register-allocator choice made
@@ -298,7 +298,7 @@ the same function."
 Round 70 (alpha). `func_800569A8` -> `StyleEffect__DriftModelChildren`, **tier B**.
 
 Named from its preserved body and asm (still a stall, so B): gated on
-modelChildLayout != 0, gModelChildDriftZ[tableIndex] != 0 and tick >= 501;
+modelChildLayout != 0, sModelChildDriftZ[tableIndex] != 0 and tick >= 501;
 adds gSpinRotStep via updateRotation(.., 0, ..) to self and both children,
 adds a z delta via each child's slot +0x0BC (Actor__AddTranslation in
 gActorMethods), and every 24500 / step frames calls
@@ -306,7 +306,7 @@ StyleEffect__PlaceModelChildren(self, 1) to snap them back. Always stores 0
 to `*coord2` (GsCOORDINATE2.flg). Caller: StyleEffect__UpdateByKind, kind 0.
 
 Globals named in this pass (only this unit references them, tier B):
-`gModelChildDriftZ` (was D_8008780C, s32[8] = {0, 0, 0, -1, -2, -4, -16,
+`sModelChildDriftZ` (was D_8008780C, s32[8] = {0, 0, 0, -1, -2, -4, -16,
 -256}), `sModelChildDriftInit` (was D_8008782C, all-zero Vec3S) and
 `gSpinRotStep` (was D_80087838, ratio triple {0/1, 1/10, 0/1}, read by
 RatioToFixed12).

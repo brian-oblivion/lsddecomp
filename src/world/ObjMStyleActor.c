@@ -2542,7 +2542,7 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
 /* Per-`tableIndex` z step for the model children (0 = no drift), also the
  * divisor of MODEL_CHILD_DRIFT_RANGE for the reset period below. Same index space as
  * gSpriteShiftX. */
-extern s32 gModelChildDriftZ[];
+extern s32 sModelChildDriftZ[];
 /* All-zero LongVec3, the start value of each child's per-frame z delta. */
 extern LongVec3 sModelChildDriftInit;
 /* Ratio triple {0/1, 1/10, 0/1}: the per-frame rotation increment
@@ -2552,11 +2552,11 @@ extern Ratio16 gSpinRotStep[3];
 /* Ticks (StyleEffect::tick) before the model children start to drift. */
 #define MODEL_CHILD_DRIFT_DELAY 500
 /* The z distance a child drifts before it snaps back: the reset period is
- * this over the child's per-tick step, gModelChildDriftZ[tableIndex]. */
+ * this over the child's per-tick step, sModelChildDriftZ[tableIndex]. */
 #define MODEL_CHILD_DRIFT_RANGE 24500
 
 /* Once tick passes MODEL_CHILD_DRIFT_DELAY, for a layout with model
- * children and a nonzero gModelChildDriftZ step: spin self and both
+ * children and a nonzero sModelChildDriftZ step: spin self and both
  * children, move child i along z by step + 3 * i, and every
  * MODEL_CHILD_DRIFT_RANGE / step ticks (the period's magnitude, whatever
  * the step's sign) snap them back to their layout. Always marks self's
@@ -2571,7 +2571,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
     s32 *stepZ;
 
     tableIndex = self->params.tableIndex;
-    if (self->params.modelChildLayout != 0 && gModelChildDriftZ[tableIndex] != 0 &&
+    if (self->params.modelChildLayout != 0 && sModelChildDriftZ[tableIndex] != 0 &&
         (u32)self->tick > MODEL_CHILD_DRIFT_DELAY) {
         slot = self->modelChildren;
         self->methods->updateRotation(self, 0, gSpinRotStep);
@@ -2579,7 +2579,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
         /* MATCHING: the guard reads the step from the table and the pointer
          * is taken only here, after the call; either held earlier in a
          * local swaps two registers. */
-        stepZ = &gModelChildDriftZ[tableIndex];
+        stepZ = &sModelChildDriftZ[tableIndex];
         extraZ = 0;
         for (; i < ARRAY_COUNT(self->modelChildren); i++) {
             LongVec3 delta = sModelChildDriftInit;
@@ -2590,7 +2590,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
             slot++;
         }
 
-        period = MODEL_CHILD_DRIFT_RANGE / gModelChildDriftZ[tableIndex];
+        period = MODEL_CHILD_DRIFT_RANGE / sModelChildDriftZ[tableIndex];
         tick = self->tick;
         if (period >= 0) {
             if ((u32)tick % (u32)period == 0) {
