@@ -396,76 +396,76 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
 #define DATASOURCE_CD 0x13
 #define DATASOURCE_NULL 0x23
 
-void *FileResource__Release(FileResource *this) {
-    this->freeGuard = 0;
-    this->methods->finalize(this);
-    GetBasicClassMethods()->finalize((BasicClass *)this);
-    BMemPMgrFree(this);
+void *FileResource__Release(FileResource *self) {
+    self->freeGuard = 0;
+    self->methods->finalize(self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
+    BMemPMgrFree(self);
     return NULL;
 }
 
-void FileResource__FileResource(FileResource *this) {
-    GetBasicClassMethods()->ctor((BasicClass *)this);
-    this->methods = GetFileResourceMethods();
-    this->isOpen = 0;
-    this->buffer = NULL;
-    this->bufferSize = 0;
-    this->freeGuard = 0;
-    this->pendingRequests = 0;
-    this->flags = 0;
-    this->inQueueDispatch = 0;
-    this->loadState = 0;
+void FileResource__FileResource(FileResource *self) {
+    GetBasicClassMethods()->ctor((BasicClass *)self);
+    self->methods = GetFileResourceMethods();
+    self->isOpen = 0;
+    self->buffer = NULL;
+    self->bufferSize = 0;
+    self->freeGuard = 0;
+    self->pendingRequests = 0;
+    self->flags = 0;
+    self->inQueueDispatch = 0;
+    self->loadState = 0;
 }
 
-void FileResource__Finalize(FileResource *this) {
-    this->methods->close(this);
-    this->methods->freeBuffer(this);
+void FileResource__Finalize(FileResource *self) {
+    self->methods->close(self);
+    self->methods->freeBuffer(self);
 }
 
-void FileResource__LoadFile(FileResource *this, char *name) {
+void FileResource__LoadFile(FileResource *self, char *name) {
     s32 savedIsOpen;
     s32 size;
     void *buffer;
 
-    if (this->buffer != NULL) {
+    if (self->buffer != NULL) {
         return;
     }
-    savedIsOpen = this->isOpen;
-    this->isOpen = 0;
-    this->methods->open(this, name, 1, 0);
-    size = this->methods->seek(this, 0, 2);
+    savedIsOpen = self->isOpen;
+    self->isOpen = 0;
+    self->methods->open(self, name, 1, 0);
+    size = self->methods->seek(self, 0, 2);
     buffer = BMemPMgrAlloc(size);
     if (buffer != NULL) {
-        this->methods->seek(this, 0, 0);
-        this->methods->read(this, buffer, size);
-        this->methods->close(this);
-        this->buffer = buffer;
-        this->bufferSize = size;
-        this->isOpen = savedIsOpen;
+        self->methods->seek(self, 0, 0);
+        self->methods->read(self, buffer, size);
+        self->methods->close(self);
+        self->buffer = buffer;
+        self->bufferSize = size;
+        self->isOpen = savedIsOpen;
     } else {
         BMemPMgrFree(NULL);
-        this->methods->close(this);
+        self->methods->close(self);
     }
 }
 
-void FileResource__FreeBuffer(FileResource *this) {
-    if (this->buffer == NULL) {
+void FileResource__FreeBuffer(FileResource *self) {
+    if (self->buffer == NULL) {
         return;
     }
-    if (this->bufferSize == 0) {
+    if (self->bufferSize == 0) {
         return;
     }
-    if (this->freeGuard != 0) {
+    if (self->freeGuard != 0) {
         return;
     }
-    BMemPMgrFree(this->buffer);
-    this->buffer = NULL;
+    BMemPMgrFree(self->buffer);
+    self->buffer = NULL;
 }
 
 void NoOp(void) {}
 
-void FileResource__OnRequestDone(FileResource *this) {
-    this->flags |= 1;
+void FileResource__OnRequestDone(FileResource *self) {
+    self->flags |= 1;
 }
 
 FileResourceMethods *GetFileResourceMethods(void) {
@@ -482,11 +482,11 @@ void *GetActiveDataSourceMethods(void) {
     }
 }
 
-ResourceRequest *ResourceRequest__Set(ResourceRequest *this, void *buffer, char *name, s32 mode) {
-    this->src.buffer = buffer;
-    this->src.name = name;
-    this->mode = mode;
-    return this;
+ResourceRequest *ResourceRequest__Set(ResourceRequest *self, void *buffer, char *name, s32 mode) {
+    self->src.buffer = buffer;
+    self->src.name = name;
+    self->mode = mode;
+    return self;
 }
 
 /* Install a new active data source, then copy its method block
