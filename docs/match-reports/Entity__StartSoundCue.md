@@ -112,3 +112,12 @@ wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.
 
 - Step 2: the local EntityMoodHandlerRow view (a handler word padded to 16 bytes, over gEntityMoodHandlerTable) is deleted: the handler is EntityMoodRow::handler (+0x0C, SoundCueCallbackFn). The local InitSoundCueSet extern now spells PlacementGridVabSound.c's definition (VabStreamObj *, SoundCueSet *, SoundCueCallbackFn, s32 return); byte-identical.
+
+## History (moved from include/Entity.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* +0x0C, the Entity__MoodCueNN Entity__StartSoundCue installs (symbol gEntityMoodHandlerTable, 0x80089EB0) */
+```

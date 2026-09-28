@@ -380,3 +380,12 @@ header declares. Text the header carried until round 99, kept here:
   `dreamerTmd`). Unit-static: no other code reads them.
 - DreamSys +0x114 `slot114` -> `setEtcTim`, the name DreamSys__SetEtcTim.md
   proposed; this unit holds the slot's only accessor.
+
+## History (moved from include/DayTaskStageMap.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* arity-ok: the definition takes no parameter and reads no argument register, but this dead argument IS byte-load-bearing -- retail emits `move a0,zero` at 0x800496A8 ahead of the jal at 0x800496B0 */
+```

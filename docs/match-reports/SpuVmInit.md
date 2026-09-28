@@ -796,3 +796,48 @@ Round 96 (charlie, track 6) moved `src/libsnd_vmanager.c` onto Sony's headers (`
  * permuter trace, and why the naive two-variable translation regresses
  * sharply (47/270) despite being semantically identical. */
 ```
+
+## History (moved from include/SvmData.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * _svm_sreg_dirty and _svm_voice. (Round 86 created this file as
+ * SvmVoice.h for _svm_voice alone and renamed it when the other two
+ * joined.)
+```
+
+```c
+ * +0x198, _svm_envx_ptr +0x678, _svm_envx_hist +0x67C. Anchored at
+ * 0x8008D7F0 every one of them lands, so _svm_voice = 0x8008D988 and its
+ * 0x4E0 bytes are 24 voices x 0x34 (ending exactly at _svm_envx_ptr).
+```
+
+```c
+ * For the same reason every field is named by its OFFSET only. Per
+ * FINISHING-PLAN's Sony rule (track 3, "Naming rules") NO game name goes
+ * on any field of this struct: only libsnd functions read it. A comment
+ * describing a field's MECHANICS is fine and is kept below.
+ *
+ * Field types are what the accessors need (track 4b step 1): the width
+ * every accessor agrees on, and the signedness most of them read. The one
+ * accessor that reads otherwise, SePitchBend (+0x0C unsigned, +0x10 and
+ * +0x14 as bytes), uses VALUE casts at the site -- (u16)v.unk0C,
+ * (u8)v.unk10 -- which are byte-exact; the address-cast spelling
+ * *(u8 *)&v.unk10 is not (it grows that function's frame by 8 bytes).
+ * No unit keeps a signedness view. SpuVmFlush keeps a u16 walk type over
+ * +0x06, for its pointer stride, not for signedness.
+ *
+ * Earlier rounds split this table into one splat symbol per field
+ * (D_8008D98A, D_8008D98C, ... at a 0x34 stride) and gave twelve of them
+ * game names; round 86 (alpha, track 2) merged them back into this one
+ * table. splat still prints the per-address auto-symbols in asm/ (the
+ * table lies past the global segment's vram range, so splat never hands
+ * _svm_voice's size to spimdisasm); the linker resolves both spellings to
+ * the same bytes.
+```
+
+```c
+ * SvmVoice: libsnd/vmanager.o bss +0x000, 24 voices x 0x10, 0x8008D7F0;
+```

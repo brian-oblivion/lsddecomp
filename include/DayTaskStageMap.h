@@ -35,7 +35,7 @@ extern void ReleaseDreamAuxModels(void);
 
 /* src/GameFiles.c: the "SND\\SE" sound bank path, which DayTask's ctor
  * passes as TimedTask's soundBankPath. */
-extern char *GetSoundEffectDir(s32 unused); /* arity-ok: the definition takes no parameter and reads no argument register, but this dead argument IS byte-load-bearing -- retail emits `move a0,zero` at 0x800496A8 ahead of the jal at 0x800496B0 */
+extern char *GetSoundEffectDir(s32 unused); /* arity-ok: MATCHING: the definition takes no parameter; this dead argument is the `move a0,zero` before DayTask__DayTask's call */
 
 /* src/DreamAux.c; DayTask's ctor calls it, and its finalize
  * ReleaseDreamAuxModels. */

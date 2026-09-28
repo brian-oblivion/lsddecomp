@@ -5,41 +5,30 @@
 
 /*
  * SvmData.h -- libsnd vmanager's per-voice bss tables: _svm_sreg_buf,
- * _svm_sreg_dirty and _svm_voice. (Round 86 created this file as
- * SvmVoice.h for _svm_voice alone and renamed it when the other two
- * joined.)
+ * _svm_sreg_dirty and _svm_voice.
  *
  * SvmVoice -- one record of libsnd's per-voice table _svm_voice.
  *
  * Sony's, not the game's. libsnd/vmanager.o (Psy-Q disc 3.5) defines the
  * bss block _svm_sreg_buf +0x000, _svm_sreg_dirty +0x180, _svm_voice
- * +0x198, _svm_envx_ptr +0x678, _svm_envx_hist +0x67C. Anchored at
- * 0x8008D7F0 every one of them lands, so _svm_voice = 0x8008D988 and its
+ * +0x198, _svm_envx_ptr +0x678, _svm_envx_hist +0x67C, so _svm_voice's
  * 0x4E0 bytes are 24 voices x 0x34 (ending exactly at _svm_envx_ptr).
  *
  * The type name is derived from Sony's VARIABLE name, because Sony's own
  * struct tag is unknown: no libsnd internal header ships on any SDK disc.
- * For the same reason every field is named by its OFFSET only. Per
- * FINISHING-PLAN's Sony rule (track 3, "Naming rules") NO game name goes
- * on any field of this struct: only libsnd functions read it. A comment
- * describing a field's MECHANICS is fine and is kept below.
+ * For the same reason every field is named by its OFFSET only, and no
+ * game name goes on any field: only libsnd functions read it.
  *
- * Field types are what the accessors need (track 4b step 1): the width
- * every accessor agrees on, and the signedness most of them read. The one
- * accessor that reads otherwise, SePitchBend (+0x0C unsigned, +0x10 and
- * +0x14 as bytes), uses VALUE casts at the site -- (u16)v.unk0C,
- * (u8)v.unk10 -- which are byte-exact; the address-cast spelling
- * *(u8 *)&v.unk10 is not (it grows that function's frame by 8 bytes).
- * No unit keeps a signedness view. SpuVmFlush keeps a u16 walk type over
- * +0x06, for its pointer stride, not for signedness.
+ * Field types are what the accessors need: the width every accessor agrees
+ * on, and the signedness most of them read. SePitchBend reads otherwise
+ * (+0x0C unsigned, +0x10 and +0x14 as bytes) through value casts at the
+ * site, (u16)v.unk0C and (u8)v.unk10. MATCHING: an address cast,
+ * *(u8 *)&v.unk10, grows SePitchBend's frame by 8 bytes. SpuVmFlush walks
+ * +0x06 as u16 for its pointer stride.
  *
- * Earlier rounds split this table into one splat symbol per field
- * (D_8008D98A, D_8008D98C, ... at a 0x34 stride) and gave twelve of them
- * game names; round 86 (alpha, track 2) merged them back into this one
- * table. splat still prints the per-address auto-symbols in asm/ (the
- * table lies past the global segment's vram range, so splat never hands
- * _svm_voice's size to spimdisasm); the linker resolves both spellings to
- * the same bytes.
+ * asm/ names this table's fields by address (D_8008D98A, D_8008D98C, ...
+ * at a 0x34 stride); the linker resolves those and this struct to the same
+ * bytes.
  */
 typedef struct SvmVoice {
     s16 unk00; /* +0x00 -- 0xFF after SpuVmInit/SsUtAllKeyOff; key-on stores D_8008EA24; SsUtKeyOff tests == 0xFF; key-off paths clear it */
@@ -81,7 +70,7 @@ extern SvmVoice _svm_voice[]; /* 24 voices */
  * of the SPU voice registers that SpuVmFlush copies out through
  * _svm_sreg (the SPU voice register block) for every voice whose
  * _svm_sreg_dirty byte has bits set. Same provenance and naming rule as
- * SvmVoice: libsnd/vmanager.o bss +0x000, 24 voices x 0x10, 0x8008D7F0;
+ * SvmVoice: libsnd/vmanager.o bss +0x000, 24 voices x 0x10;
  * fields by offset only.
  */
 typedef struct SvmSreg {
