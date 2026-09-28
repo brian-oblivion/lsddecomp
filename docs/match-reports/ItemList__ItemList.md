@@ -57,7 +57,7 @@
 
 ---
 
-Unit: `src/class_3bb8c_j.c`. `self` is `ItemList_3bb8c_j`. This is `ItemList_3bb8c_j`'s
+Unit: `src/class_3bb8c_i.c`. `self` is `ItemList_3bb8c_j`. This is `ItemList_3bb8c_j`'s
 own constructor -- the occupant of `ItemListMethods_3bb8c_j::ctor` (+0x008),
 reached indirectly by `New_ItemList`
 (`GetItemListMethods()->ctor(self, arg0, arg1)`).
@@ -96,7 +96,7 @@ the fix. Settled by address, not by guess:
 Nothing about the matched BYTES was ever affected by any of this (a type
 name is not codegen) -- `build-and-verify.sh` and `tools/check-nonmatching.sh`
 stayed green throughout. Only the class attribution and `self`'s type
-name were wrong. See `src/class_3bb8c_j.c`'s file header comment for the
+name were wrong. See `src/class_3bb8c_i.c`'s file header comment for the
 short version, and `GetTextEntryMethods.md` for the getter-side half of
 this same correction.
 
@@ -190,7 +190,7 @@ caches it in a register at all, re-reading and re-writing
 conditional `sw`) -- the plain `if (self->unk14 < len) self->unk14 = len;`
 above reproduces that shape with no local needed.
 
-Declarations it needs (all already live in `src/class_3bb8c_j.c`'s
+Declarations it needs (all already live in `src/class_3bb8c_i.c`'s
 `ItemList_3bb8c_j`/`ItemListMethods_3bb8c_j` definitions, plus these locally-scoped
 externs which were removed when the function was restored to
 `INCLUDE_ASM` -- re-add if resuming):
@@ -276,7 +276,7 @@ the callee-saved register COUNT, seems to be what predicts this.
 ## Round 73 (charlie) — NON_MATCHING body promoted
 
 Track 1b: the round-19 preserved body above (with the `srl`/`sra` fix and
-the two scheduling matches) is now live in `src/class_3bb8c_j.c` under
+the two scheduling matches) is now live in `src/class_3bb8c_i.c` under
 `#ifdef NON_MATCHING`, with the verified build still taking the `#else`
 `INCLUDE_ASM` branch. `./build-and-verify.sh` stayed green (no bytes
 changed) and `tools/check-nonmatching.sh` compiles and link-resolves it.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051784` on 2026-09-24 (tools/rename.py). Address 0x80051784.
 
-Unit: `src/class_3bb8c_j.c` (class_3bb8c_j, newly carved round 15).
+Unit: `src/class_3bb8c_i.c` (class_3bb8c_i, newly carved round 15).
 
 ## Class identity
 
@@ -20,7 +20,7 @@ five siblings named below, at its +0x094..+0x0A8) -- `gTextEntryMethods` is
 whose own struct already carries unk10/unk14/unk18/unk1C/unk20/unk48 and
 whose own comments already tie slotA4/slotA8 to this unit's
 `TextEntry__SetCursorPos`/`TextEntry__SetCharAt` ("outside
-this unit's slice"). See `src/class_3bb8c_j.c`'s file header comment for
+this unit's slice"). See `src/class_3bb8c_i.c`'s file header comment for
 the full evidence. Nothing about the matched BYTES was ever affected (a
 type name is not codegen) -- only the class attribution and the `self`
 type were wrong, both now fixed to the already-shared `Obj86ED0`/

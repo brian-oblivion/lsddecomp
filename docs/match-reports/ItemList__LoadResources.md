@@ -6,7 +6,7 @@
 
 > Renamed from `func_80051F24` on 2026-09-24 (tools/rename.py). Address 0x80051f24.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `ItemList_3bb8c_j`.
+Unit: `src/class_3bb8c_i.c`. `self` is `ItemList_3bb8c_j`.
 
 ## Semantics (established with reasonable confidence from the disassembly)
 
@@ -126,7 +126,7 @@ register diffs, nothing else).
 **A permuter lead that scores well against the permuter's own stripped
 scaffold does not always transfer to the real build.** Confirmed here:
 a score-30 candidate (down from 140) translated by hand back into
-`src/class_3bb8c_j.c` and rebuilt through `./build-and-verify.sh`
+`src/class_3bb8c_i.c` and rebuilt through `./build-and-verify.sh`
 reproduced the ORIGINAL 75/95 score exactly, no improvement. Worth a
 `--debug` re-check of the CANDIDATE (not just the base) before trusting
 a non-zero permuter score as a real lead -- this project's existing
@@ -209,7 +209,7 @@ reshaping).
 
 **Three independent functions across two different header families
 (`class_3bb8c_b`'s `StageMap__BuildFootprintRects`, `class_3bb8c_f`'s `TaskObjF__WriteMemcardSaveFile`,
-`class_3bb8c_j`'s `ItemList__LoadResources`) now confirm the same negative result
+`class_3bb8c_i`'s `ItemList__LoadResources`) now confirm the same negative result
 for the SAME lever (declaration/introduction order of the contested
 locals).** This is strong enough evidence to stop treating "try a
 different declaration order" as a live lever for this residue class at
@@ -225,7 +225,7 @@ reordering attempt first.
 
 Track 1b: the preserved body above (75/95, pure register-identity
 rotation of the two repeated global addresses and the handle across the
-same three registers) is now live in `src/class_3bb8c_j.c` under
+same three registers) is now live in `src/class_3bb8c_i.c` under
 `#ifdef NON_MATCHING`, with the verified build still taking the `#else`
 `INCLUDE_ASM` branch. `./build-and-verify.sh` stayed green (no bytes
 changed) and `tools/check-nonmatching.sh` compiles and link-resolves it.

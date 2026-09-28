@@ -10,7 +10,7 @@ Unit `class_3bb8c_i`, carved round 14.
 `gTextEntryMethods`, resolved with `tools/classtable.py gTextEntryMethods`): allocates the
 0x4C-byte instance and dispatches its own ctor (slot 0x008, `TextEntry__TextEntry`,
 itself a STALLED gp_rel-blocked function in this same unit -- see its own
-report). `GetTextEntryMethods` (`class_3bb8c_j`, still `INCLUDE_ASM`) is this
+report). `GetTextEntryMethods` (`class_3bb8c_i`, still `INCLUDE_ASM`) is this
 class's own table getter, mirroring `Get_vtable_BasicClass`'s no-argument shape;
 its return type only needed naming here (`Obj86ED0Methods *`), not a body.
 

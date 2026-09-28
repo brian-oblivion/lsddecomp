@@ -1632,7 +1632,6 @@ segments:
       # `jr $t2` trampolines, zero `alabel`s.
       # Blocker profile: 2 of 20 -- func_800518F4 and func_80051998, both
       # gp_rel. 18 clean. Owns NO switch jump table, so no rodata attach.
-      - [0x41F84, c, class_3bb8c_j]
       # class_3bb8c_k: second 20-function slice, 0x429D4..0x435E0. Carved
       # round 15. Boundary checked on both sides: func_80052D10 closes
       # `jr $ra; nop` + endlabel and func_80052DE0 is a frameless

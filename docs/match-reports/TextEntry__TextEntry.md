@@ -43,7 +43,7 @@ void TextEntry__TextEntry(Obj86ED0 *self, char *arg1, s32 arg2)
 This is `Obj86ED0`'s own ctor, called through `Obj86ED0Methods::ctor` at
 `New_TextEntry`'s allocation site: base ctor first
 (`Get_vtable_BasicClass()->ctor(self)`), then `self->methods` overridden to this
-class's own table (`GetTextEntryMethods()`, defined in `class_3bb8c_j.c`) — same
+class's own table (`GetTextEntryMethods()`, defined in `class_3bb8c_i.c`) — same
 shape as `NodeGuardedViewport__NodeGuardedViewport` in `class_3bb8c_c.c`.
 
 `self->unk10 = strlen(arg1)` then `self->unk28 = BMemPMgrAlloc(self->unk10
@@ -102,7 +102,7 @@ changed.
 
 Moved here from the comment on `gNameCharTable` in src/class_3bb8c_i.c:
 "VALUE-of `%gp_rel`, round 45's own local view -- same global as
-class_3bb8c_j's `gNameCharTable` (a byte lookup table whose length this
+class_3bb8c_i's `gNameCharTable` (a byte lookup table whose length this
 function counts by hand rather than via `strlen`, since GCC 2.6.3 with
 `-fno-builtin` never turns a `strlen` CALL into inline code -- the inline
 loop below has to be literal source, not a call)." The source keeps one

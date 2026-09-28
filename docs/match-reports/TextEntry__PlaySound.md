@@ -55,7 +55,7 @@ than the call appears to set explicitly.
 
 ## Naming
 
-- `TextEntry__PlaySound` -- tier B. gTextEntryMethods +0x060 (classtable.py) -- this IS the `slot60` implementation dispatched by both TextEntry__HandleCommand (arg1=0x10) and class_3bb8c_j's TextEntry__SetCursorPos/TextEntry__SetCharAt (arg1=0). Forwards arg1 to the attached `target`'s own slot80(target, arg1, 0x60, 0x60) when target != NULL. Mechanics clear (pings the linked TargetObj86ED0 whenever the name cursor or character selection changes); the on-screen meaning of the two 0x60 literals is not established. Since `slot60` is referenced by both this unit and class_3bb8c_j, the SLOT NAME is left as `slot60` in the shared header (PROPOSED name below), even though the FUNCTION name is confidently renamed here (function renames are tree-wide, not subject to the field-ownership rule).
+- `TextEntry__PlaySound` -- tier B. gTextEntryMethods +0x060 (classtable.py) -- this IS the `slot60` implementation dispatched by both TextEntry__HandleCommand (arg1=0x10) and class_3bb8c_i's TextEntry__SetCursorPos/TextEntry__SetCharAt (arg1=0). Forwards arg1 to the attached `target`'s own slot80(target, arg1, 0x60, 0x60) when target != NULL. Mechanics clear (pings the linked TargetObj86ED0 whenever the name cursor or character selection changes); the on-screen meaning of the two 0x60 literals is not established. Since `slot60` is referenced by both this unit and class_3bb8c_i, the SLOT NAME is left as `slot60` in the shared header (PROPOSED name below), even though the FUNCTION name is confidently renamed here (function renames are tree-wide, not subject to the field-ownership rule).
 
 ## Track 4 (2026-09-26, round 87)
 
@@ -84,7 +84,7 @@ Zero bytes changed.
 ### Proposed field names (round 98)
 
 - gTextEntryMethods +0x060 `notifyTarget` -> `playSound` (accessors: this
-  unit's HandleCommand, class_3bb8c_j's SetCursorPos/SetCharAt), so the
+  unit's HandleCommand, class_3bb8c_i's SetCursorPos/SetCharAt), so the
   slot is named like its occupant; the prototype's `arg1` -> `tone`.
 - TextEntry +0x03C `target` -> `sound`, TaskObjF's name for the same
   object (accessors: this unit's AttachTarget/DetachTarget/PlaySound only;

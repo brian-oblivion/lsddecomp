@@ -17,7 +17,7 @@
  *   class_3bb8c_d      TitleMenu (include/TitleMenu.h, a TaskCore)
  *   class_3bb8c_d..g   TaskObjF (include/TaskObjF.h), the memory-card task
  *   class_3bb8c_i, _j  TextEntry (include/TextEntry.h)
- *   class_3bb8c_j, _k  ItemList (include/ItemList.h)
+ *   class_3bb8c_i, _k  ItemList (include/ItemList.h)
  *   class_3bb8c_k..m   ObjM (include/ObjM.h)
  *
  * What is here, in that order: StageMap's lookup tables and SplitCoord2,

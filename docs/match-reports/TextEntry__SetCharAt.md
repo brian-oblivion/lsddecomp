@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051998` on 2026-09-24 (tools/rename.py). Address 0x80051998.
 
-**Unit:** class_3bb8c_j · **Size:** 45 words (0xB4 bytes)
+**Unit:** class_3bb8c_i · **Size:** 45 words (0xB4 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Matched on the first
@@ -17,7 +17,7 @@ This report originally typed `self` as `Obj866E8` (gStageMapMethods) and typed
 `self->unk44` through a unit-local `Unk44Obj866E8`/`Unk44Obj866E8Methods`
 duplicate. Both were wrong, for the same reason as its sibling
 `TextEntry__SetCursorPos` (see that report and
-`src/class_3bb8c_j.c`'s file header comment): `self` is `Obj86ED0`
+`src/class_3bb8c_i.c`'s file header comment): `self` is `Obj86ED0`
 (`tools/classtable.py gTextEntryMethods` places this function at +0x0A8), whose
 shared struct already types `self->unk44` as `ChildObj86ED0 *`. The
 `+0x0C4` slot is now `ChildMethods86ED0::slotC4`, added additively next to

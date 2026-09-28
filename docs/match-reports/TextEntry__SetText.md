@@ -80,6 +80,6 @@ TextEntry__SetText's own call. Translates each byte of `src` (a name
 string) into `dest` (folding a couple of special-case byte ranges) and
 returns `dest`, same convention as `strcpy`. Typed purely from this call
 site's own register usage. Declared HERE, not in include/class_3bb8c.h:
-src/class_3bb8c_j.c types the same (still undefined) function as `void
+src/class_3bb8c_i.c types the same (still undefined) function as `void
 (void *, void *)` from its own call site, and two call-site typings of one
 function cannot share a header."

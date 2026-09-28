@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051A4C` on 2026-09-24 (tools/rename.py). Address 0x80051a4c.
 
-Unit: `src/class_3bb8c_j.c`. ROUND 75 CORRECTION: this is NOT
+Unit: `src/class_3bb8c_i.c`. ROUND 75 CORRECTION: this is NOT
 `ItemList_3bb8c_j`'s own getter (an earlier round assumed so, since it was
 the only table getter this unit's C had resolved at the time, and named the
 whole sibling class after it -- see `ItemList__ItemList.md`

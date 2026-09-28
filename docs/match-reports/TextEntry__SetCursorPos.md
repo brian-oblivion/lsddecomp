@@ -4,7 +4,7 @@
 
 > Renamed from `func_800518F4` on 2026-09-24 (tools/rename.py). Address 0x800518f4.
 
-**Unit:** class_3bb8c_j · **Size:** 41 words (0xA4 bytes)
+**Unit:** class_3bb8c_i · **Size:** 41 words (0xA4 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Matched on the first
@@ -21,7 +21,7 @@ type), whose OWN struct in `include/class_3bb8c.h` already types
 `self->unk40` as `ChildObj86ED0 *`. The `+0x0BC` slot this function
 dispatches through was simply missing a name on the shared
 `ChildMethods86ED0` -- added additively there instead of duplicated
-locally. See `src/class_3bb8c_j.c`'s file header comment and
+locally. See `src/class_3bb8c_i.c`'s file header comment and
 `TextEntry__PrevChar.md` for the full evidence trail. Zero bytes
 affected (type names are not codegen).
 

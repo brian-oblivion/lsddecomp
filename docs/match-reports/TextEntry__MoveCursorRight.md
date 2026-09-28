@@ -62,7 +62,7 @@ account.
 
 ## Naming
 
-- `TextEntry__MoveCursorRight` -- tier A. gTextEntryMethods +0x088 (moveCursorRight slot, classtable.py -- also confirmed as HandleCommand's own case 21/5 target). Increments the name-buffer index unk18, bounded by the name length unk10; reverts on overflow. Symmetric with TextEntry__MoveCursorLeft; forwards to TextEntry__SetCursorPos (class_3bb8c_j).
+- `TextEntry__MoveCursorRight` -- tier A. gTextEntryMethods +0x088 (moveCursorRight slot, classtable.py -- also confirmed as HandleCommand's own case 21/5 target). Increments the name-buffer index unk18, bounded by the name length unk10; reverts on overflow. Symmetric with TextEntry__MoveCursorLeft; forwards to TextEntry__SetCursorPos (class_3bb8c_i).
 
 ## Track 4 (2026-09-26, round 87)
 
