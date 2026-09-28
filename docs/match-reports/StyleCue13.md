@@ -2,7 +2,7 @@
 
 > Renamed from `func_80056238` on 2026-09-23 (tools/rename.py). Address 0x80056238.
 
-Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #14 (the
+Unit: `class_3bb8c_k` (round 17 continuation). Slot occupant #14 (the
 LAST) of `gStyleCueCallbacks`. The simplest of the fourteen: a single
 `kind == 0` check, no `else`.
 
@@ -34,7 +34,7 @@ None.
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
-class_3bb8c_r.c's `StyleCueParam` used to type both parameters of every
+class_3bb8c_k.c's `StyleCueParam` used to type both parameters of every
 StyleCueNN callback and of ComputeStyleCueFalloff; its old comment called it
 "very likely a SoundCueSet-shaped object" but kept one local type because
 nothing confirmed `self` and `ctx` were the same object. They are not, and

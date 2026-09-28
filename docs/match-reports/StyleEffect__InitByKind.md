@@ -134,7 +134,7 @@ the wrong function.
 
 Round 70 (alpha). `func_80056520` -> `StyleEffect__InitByKind`, **tier B**.
 
-Only caller is the class's ctor `StyleEffect__StyleEffect` (class_3bb8c_r.c), with the
+Only caller is the class's ctor `StyleEffect__StyleEffect` (class_3bb8c_k.c), with the
 ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(gStyleEffectViewport + 0x18)`
 into gStyleEffectBaseViewY; `AttachWithRotScale(self, parent, pos + offset,
 rotation, scale)`; for kind < 2, `SceneNode__LinkModel(self,
@@ -193,7 +193,7 @@ different object (captured by SetStyleEffectSources) whose class is unknown.
 
 For the HEAD, by type scope; none applied here (other units' views).
 
-- `class_3bb8c_r.c` `Obj876FC` (same object): `unk24` -> `tick` (B, same
+- `class_3bb8c_k.c` `Obj876FC` (same object): `unk24` -> `tick` (B, same
   evidence as above: zeroed by StyleEffect__SetParams, incremented by StyleEffect__Update);
   `unk54` -> `kind` (B); `block58` -> `params` (B: the 0x24-byte block this
   unit reads as offset/rotation/scale/modelChildLayout/tableIndex/color/

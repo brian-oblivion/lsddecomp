@@ -4,7 +4,7 @@
 
 > Renamed from `func_80056320` on 2026-09-23 (tools/rename.py). Address 0x80056320.
 
-Unit: `class_3bb8c_r` (round 17 continuation). `New_X` allocator (0x98
+Unit: `class_3bb8c_k` (round 17 continuation). `New_X` allocator (0x98
 bytes) for the `gStyleEffectMethods` class, dispatching through
 `GetStyleEffectMethods()->ctor` -- a CROSS-UNIT call into the already-matched
 `class_3bb8c_o.c` (previous pass, same round) rather than calling

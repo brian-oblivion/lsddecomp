@@ -108,7 +108,7 @@ typedef void (*StyleEffectUpdateFn)(StyleEffect *self, LongVec3 *pos);
 extern StyleEffectMethods gStyleEffectMethods;
 extern StyleEffectMethods *GetStyleEffectMethods(void); /* class_3bb8c_o.c; returns &gStyleEffectMethods */
 
-/* The class's own methods, in address order (class_3bb8c_r, _s, then _o).
+/* The class's own methods, in address order (class_3bb8c_k, _s, then _o).
  * Four are declared WITHOUT a prototype on purpose: each is one-parameter,
  * but a caller in class_3bb8c_s.c passes a dead second argument that is
  * byte-load-bearing (the `arity-ok` notes there and in the reports). */

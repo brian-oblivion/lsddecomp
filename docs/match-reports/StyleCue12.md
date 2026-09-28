@@ -2,7 +2,7 @@
 
 > Renamed from `func_80056194` on 2026-09-23 (tools/rename.py). Address 0x80056194.
 
-Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #13 of
+Unit: `class_3bb8c_k` (round 17 continuation). Slot occupant #13 of
 `gStyleCueCallbacks`. Four-way discrete-`kind` dispatch (0, 4, 0x14, and a
 threshold), reusing the cached `kind` local across all four arms with no
 reloads (unlike `StyleCue05`, which needed the opposite treatment --
@@ -56,7 +56,7 @@ mid-arm.
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
-class_3bb8c_r.c's `StyleCueParam` used to type both parameters of every
+class_3bb8c_k.c's `StyleCueParam` used to type both parameters of every
 StyleCueNN callback and of ComputeStyleCueFalloff; its old comment called it
 "very likely a SoundCueSet-shaped object" but kept one local type because
 nothing confirmed `self` and `ctx` were the same object. They are not, and

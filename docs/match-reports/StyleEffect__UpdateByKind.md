@@ -101,7 +101,7 @@ them, and forwards `$a1` straight on:
 (`move a1,s1` at `0x800566D8`, `0x800566EC`, `0x800566FC`). So the definition's
 `void StyleEffect__UpdateByKind(LinkNode *self, void *arg1)` is right: two real arguments.
 
-**Why `src/class_3bb8c_r.c`'s one-parameter declaration stays.** Its caller
+**Why `src/class_3bb8c_k.c`'s one-parameter declaration stays.** Its caller
 `StyleEffect__Update` passes only `self`, and retail sets up nothing else:
 
 ```
@@ -119,7 +119,7 @@ with the difference that here it reproduces retail, so the narrow declaration
 is correct for this unit and must not be widened.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/class_3bb8c_r.c:438`. Oracle green.
+added to `src/class_3bb8c_k.c:438`. Oracle green.
 
 ## Naming
 

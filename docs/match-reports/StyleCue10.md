@@ -2,7 +2,7 @@
 
 > Renamed from `func_80056054` on 2026-09-23 (tools/rename.py). Address 0x80056054.
 
-Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #11 of
+Unit: `class_3bb8c_k` (round 17 continuation). Slot occupant #11 of
 `gStyleCueCallbacks`. Dispatches on the ACTUAL REMAINDER of `self->kind % 20`
 (not just divisibility) -- the first sibling in this family to keep the
 remainder value itself rather than only testing it against zero.
@@ -47,7 +47,7 @@ None -- a natural extension of the `%20` idiom already confirmed in
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
-class_3bb8c_r.c's `StyleCueParam` used to type both parameters of every
+class_3bb8c_k.c's `StyleCueParam` used to type both parameters of every
 StyleCueNN callback and of ComputeStyleCueFalloff; its old comment called it
 "very likely a SoundCueSet-shaped object" but kept one local type because
 nothing confirmed `self` and `ctx` were the same object. They are not, and

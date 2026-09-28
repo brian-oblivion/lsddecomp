@@ -4,7 +4,7 @@
 
 > Renamed from `func_800563C0` on 2026-09-23 (tools/rename.py). Address 0x800563c0.
 
-Unit: `class_3bb8c_r` (round 17 continuation). `StyleEffectMethods::ctor`
+Unit: `class_3bb8c_k` (round 17 continuation). `StyleEffectMethods::ctor`
 (vtable offset `+0x008` of `gStyleEffectMethods`) -- chains to the shared base
 class's own ctor (`GetActorMethods()->ctor`, the SAME shared-base getter
 `class_3bb8c_o.c` already used for its own `Actor__Actor`/
@@ -75,7 +75,7 @@ fail:
 
 ## Naming
 
-**Tier A.** `StyleEffect` is the class name class_3bb8c_s.c already uses for `gStyleEffectMethods` (its own comment: "`StyleEffect` here; class_3bb8c_r.c's `Obj876FC`" -- confirmed via `tools/classtable.py 0x800876FC`, whose slot list mixes `SceneNode__`/`BaseObjO__`/`DreamSys__`-prefixed inherited slots with this unit's own `+0x008`/`+0x00C`/`+0x040`/`+0x0EC`). Ctor naming follows the `Class__Class` convention already used for `Actor__Actor`/`SceneNode__SceneNode`. The body is a constructor by construction (chains the shared base ctor, installs the vtable, dispatches init) -- purpose evident from the body.
+**Tier A.** `StyleEffect` is the class name class_3bb8c_s.c already uses for `gStyleEffectMethods` (its own comment: "`StyleEffect` here; class_3bb8c_k.c's `Obj876FC`" -- confirmed via `tools/classtable.py 0x800876FC`, whose slot list mixes `SceneNode__`/`BaseObjO__`/`DreamSys__`-prefixed inherited slots with this unit's own `+0x008`/`+0x00C`/`+0x040`/`+0x0EC`). Ctor naming follows the `Class__Class` convention already used for `Actor__Actor`/`SceneNode__SceneNode`. The body is a constructor by construction (chains the shared base ctor, installs the vtable, dispatches init) -- purpose evident from the body.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 

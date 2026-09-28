@@ -233,9 +233,9 @@ runner/round rather than re-deriving the structure.
 **`StyleFillEffectKind0`, tier B.**
 
 Fills `arg1` slots of `gStyleEffectSlots` by repeatedly calling
-`class_3bb8c_r.c`'s `New_StyleEffect` (New_X for the `Obj876FC` class) with a
+`class_3bb8c_k.c`'s `New_StyleEffect` (New_X for the `Obj876FC` class) with a
 literal FIRST argument of `0`. That argument is confirmed (by reading
-`New_StyleEffect`'s own ctor chain, `class_3bb8c_r.c`) to become the new
+`New_StyleEffect`'s own ctor chain, `class_3bb8c_k.c`) to become the new
 object's `kind` field -- so "Kind0" in the name is the literal tag value
 this function passes, not a guessed category. Selects which of two
 "spawn-parameter" setup functions (`SetupStyleSpawnParamsA`/`B`) to call each

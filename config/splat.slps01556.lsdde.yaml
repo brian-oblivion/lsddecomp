@@ -1693,7 +1693,6 @@ segments:
       # body, several 40-70 instructions.  Owns NO switch jump table, so no
       # rodata attach.  Expect it to span more than one class; identify each
       # with tools/classtable.py rather than assuming.
-      - [0x46288, c, class_3bb8c_r]
       # class_3bb8c_s: functions 44..53 of that remainder, 0x46D20..0x475F0.
       # CARVED round 21 (2026-09-06) and BANKED -- see the DELIBERATELY
       # UNWORKED note in src/class_3bb8c_s.c.  Carved rather than left asm

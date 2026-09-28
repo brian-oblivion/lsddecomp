@@ -2,7 +2,7 @@
 
 > Renamed from `func_80055CA8` on 2026-09-23 (tools/rename.py). Address 0x80055ca8.
 
-Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #5 of
+Unit: `class_3bb8c_k` (round 17 continuation). Slot occupant #5 of
 `gStyleCueCallbacks`. Three independent divisibility checks (`% 3`, `% 5`, `% 7`)
 on `self->kind`.
 
@@ -54,7 +54,7 @@ None beyond what's already written up in `StyleCue03`'s report.
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
-class_3bb8c_r.c's `StyleCueParam` used to type both parameters of every
+class_3bb8c_k.c's `StyleCueParam` used to type both parameters of every
 StyleCueNN callback and of ComputeStyleCueFalloff; its old comment called it
 "very likely a SoundCueSet-shaped object" but kept one local type because
 nothing confirmed `self` and `ctx` were the same object. They are not, and

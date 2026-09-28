@@ -2,13 +2,13 @@
 
 > Renamed from `func_8005630C` on 2026-09-23 (tools/rename.py). Address 0x8005630c.
 
-Unit `class_3bb8c_r`. **5/5 words, byte-exact.** First build after reopening.
+Unit `class_3bb8c_k`. **5/5 words, byte-exact.** First build after reopening.
 
 ## What it was
 
 Carved round 17, filed as `gp_rel` blocked. Round 42 resolved `gp_rel` via
 `--gp-symbols`; round 44's head reopened this unit's stub as `REOPENED --
-ASSIGNABLE` (see the file banner in `src/class_3bb8c_r.c`). Never attempted
+ASSIGNABLE` (see the file banner in `src/class_3bb8c_k.c`). Never attempted
 until now.
 
 ## Derivation

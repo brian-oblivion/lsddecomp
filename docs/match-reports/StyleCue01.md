@@ -2,7 +2,7 @@
 
 > Renamed from `func_80055B10` on 2026-09-23 (tools/rename.py). Address 0x80055b10.
 
-Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #2 of
+Unit: `class_3bb8c_k` (round 17 continuation). Slot occupant #2 of
 `gStyleCueCallbacks`. Same shape as `StyleCue00` (see that report and the
 file banner) with a two-way `kind` dispatch instead of four-way.
 
@@ -39,7 +39,7 @@ None -- see `ComputeStyleCueFalloff`'s and `StyleCue07`'s reports.
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
-class_3bb8c_r.c's `StyleCueParam` used to type both parameters of every
+class_3bb8c_k.c's `StyleCueParam` used to type both parameters of every
 StyleCueNN callback and of ComputeStyleCueFalloff; its old comment called it
 "very likely a SoundCueSet-shaped object" but kept one local type because
 nothing confirmed `self` and `ctx` were the same object. They are not, and

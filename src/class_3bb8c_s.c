@@ -9,7 +9,7 @@
  * drift and release the two model children -- and for the sprite kinds,
  * build the five sprites. Two small helpers every kind uses sit among
  * them: AddVec3 and AttachWithRotScale (attach, then set the rotation and
- * scale). The slot occupants themselves are in class_3bb8c_r.c; the rest
+ * scale). The slot occupants themselves are in class_3bb8c_k.c; the rest
  * of the sprite helpers, and SetStyleEffectSources, in class_3bb8c_o.c.
  */
 #include "common.h"

@@ -39,7 +39,7 @@ Neither of the two exceptions is a BasicClass override:
   function it names lives in `asm/psyq_10ee0.s` (SDK). That is a
   mis-detected table start, not a class.
 - `gStyleCueCallbacks` is a wholly independent 14-slot class — `ParamObj` in
-  `src/class_3bb8c_r.c` — that overrides **every** slot including `+0x004`,
+  `src/class_3bb8c_k.c` — that overrides **every** slot including `+0x004`,
   and whose slots do not correspond to BasicClass's semantically at all
   (its `+0x030`, `+0x034` and `+0x038` are three sibling per-kind parameter
   tweaks, `StyleCue11`/`StyleCue12`/`StyleCue13`, not a

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005627C` on 2026-09-23 (tools/rename.py). Address 0x8005627c.
 
-Unit: `class_3bb8c_r` (round 17 continuation). The shared helper every
+Unit: `class_3bb8c_k` (round 17 continuation). The shared helper every
 `gStyleCueCallbacks` slot occupant calls first: reads a small signed tag byte off
 `ctx->methods`, looks it up with a NEGATIVE index into a 15-entry global
 table, and returns a chained division result.
@@ -84,7 +84,7 @@ s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
-class_3bb8c_r.c's `StyleCueParam` used to type both parameters of every
+class_3bb8c_k.c's `StyleCueParam` used to type both parameters of every
 StyleCueNN callback and of ComputeStyleCueFalloff; its old comment called it
 "very likely a SoundCueSet-shaped object" but kept one local type because
 nothing confirmed `self` and `ctx` were the same object. They are not, and
@@ -119,7 +119,7 @@ Locals `kind` became `tick`. Zero bytes.
   edge of the range (SoundCueSet.h: attenuation 10 leaves only `vol % 10`).
   Zero bytes (a local's name is not in the object).
 
-Two comments in `src/class_3bb8c_r.c` lost their history (it is in the
+Two comments in `src/class_3bb8c_k.c` lost their history (it is in the
 Derivation above) and now read as documentation. What they said, verbatim:
 
 ```c

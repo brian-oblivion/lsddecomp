@@ -164,7 +164,7 @@ reset to -1/0/0x7F/0x40, +0x10 zeroed, callback(owner, set), +0x04
 incremented), FlushSoundCueSet (slot +0x0 through stopVoice, +0x00
 cleared), Entity__GetProximityRatio (+0x14 divisor), the Entity__MoodCueNN
 handlers (+0x04, +0x10, slot 0 +0x4..+0x10, slot 1/2 +0x4/+0x8),
-class_3bb8c_r's StyleCueNN `self` (the same offsets) and DreamSys.h's
+class_3bb8c_k's StyleCueNN `self` (the same offsets) and DreamSys.h's
 `SoundCueCallbackArg` (+0x00 == tag 1, +0x04 % 20, slot 0/1 +0x4/+0x8).
 
 Names, tier A, each from what its readers do:

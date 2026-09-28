@@ -4,7 +4,7 @@
 
 > Renamed from `func_800564F4` on 2026-09-23 (tools/rename.py). Address 0x800564f4.
 
-Unit: `class_3bb8c_r` (round 17 continuation). Increments `self->unk24`
+Unit: `class_3bb8c_k` (round 17 continuation). Increments `self->unk24`
 and forwards to `StyleEffect__UpdateByKind` (a plain statement call, not a tail-call
 whose return is forwarded -- the function itself is `void`).
 

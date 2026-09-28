@@ -2,7 +2,7 @@
 
 > Renamed from `func_80055A88` on 2026-09-23 (tools/rename.py). Address 0x80055a88.
 
-Unit: `class_3bb8c_r` (round 17 continuation). Slot occupant #1 of
+Unit: `class_3bb8c_k` (round 17 continuation). Slot occupant #1 of
 `gStyleCueCallbacks` (14 slots, header word 0 -- see the unit's own file banner
 for why this is NOT a BasicClass override despite the matching slot
 count). Calls the shared helper `ComputeStyleCueFalloff`, stores its result, then
@@ -53,7 +53,7 @@ written up once, in `ComputeStyleCueFalloff`'s and `StyleCue07`'s reports.
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
-class_3bb8c_r.c's `StyleCueParam` used to type both parameters of every
+class_3bb8c_k.c's `StyleCueParam` used to type both parameters of every
 StyleCueNN callback and of ComputeStyleCueFalloff; its old comment called it
 "very likely a SoundCueSet-shaped object" but kept one local type because
 nothing confirmed `self` and `ctx` were the same object. They are not, and
@@ -80,12 +80,12 @@ Locals `kind` became `tick`. Zero bytes.
 
 ## Track 7 (2026-09-27, round 96, charlie)
 
-The unit banner of `src/class_3bb8c_r.c` was rewritten to say what the file
+The unit banner of `src/class_3bb8c_k.c` was rewritten to say what the file
 holds (and now names IsStyleVariantEven). The old one, verbatim:
 
 ```c
 /*
- * class_3bb8c_r -- 0x46288..0x46D20 (vram 0x80055A88..0x80056520), the tail
+ * class_3bb8c_k -- 0x46288..0x46D20 (vram 0x80055A88..0x80056520), the tail
  * of the `class_3bb8c_k` remainder (carved round 17). All 21 functions are
  * MATCHED. Two unrelated classes share the slice, cut at ROM addresses
  * rather than at a class boundary (tools/classtable.py, round 17):

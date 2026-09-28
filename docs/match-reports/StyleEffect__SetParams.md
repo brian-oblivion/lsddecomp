@@ -4,7 +4,7 @@
 
 > Renamed from `func_800564A4` on 2026-09-23 (tools/rename.py). Address 0x800564a4.
 
-Unit: `class_3bb8c_r` (round 17 continuation). `StyleEffectMethods::slot40`
+Unit: `class_3bb8c_k` (round 17 continuation). `StyleEffectMethods::slot40`
 (vtable offset `+0x040` of `gStyleEffectMethods`) -- a plain 0x24-byte block copy
 from the caller's argument into `self+0x58`, plus a single word clear.
 
