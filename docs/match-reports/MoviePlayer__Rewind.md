@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Only when self is the object held in the global gActiveMoviePlayer: zero +0x3C/+0x40/+0x44/+0x48, set +0x4C = 1, call the +0x60 object's slot +0x07C with (obj, MoviePlayer__RequestRestart, self) -- MoviePlayer__RequestRestart sets +0x50 = -1, so it is a completion callback --, clear +0x64, then call the +0x60 object's slot +0x058 with it alone. This is the slot +0x044 that MoviePlayer__PollActive calls every ~100 polls.
+Only when self is the object held in the global sActiveMoviePlayer: zero +0x3C/+0x40/+0x44/+0x48, set +0x4C = 1, call the +0x60 object's slot +0x07C with (obj, MoviePlayer__RequestRestart, self) -- MoviePlayer__RequestRestart sets +0x50 = -1, so it is a completion callback --, clear +0x64, then call the +0x60 object's slot +0x058 with it alone. This is the slot +0x044 that MoviePlayer__PollActive calls every ~100 polls.
 
 Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x044.
 
@@ -51,7 +51,7 @@ typedef struct Obj458B8 {
 } Obj458B8;
 
 void MoviePlayer__Rewind(Obj458B8 *self) {
-    Obj458B8 *cur = (Obj458B8 *)gActiveMoviePlayer;
+    Obj458B8 *cur = (Obj458B8 *)sActiveMoviePlayer;
 
     if (cur == self) {
         cur->unk40 = 0;
@@ -80,4 +80,4 @@ The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Sub45
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; Obj458B8 is gone; `cur` is a `MoviePlayer *` straight from `gActiveMoviePlayer` (now declared `MoviePlayer *`, was the unit's DataSrc33808 view). `unk64` -> `started`. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; Obj458B8 is gone; `cur` is a `MoviePlayer *` straight from `sActiveMoviePlayer` (now declared `MoviePlayer *`, was the unit's DataSrc33808 view). `unk64` -> `started`. Byte-identical; `typeviews.py --warnings` 0 new.

@@ -28,7 +28,7 @@
  *     drawStrip: upload `strip` at `stripRect` (DrawSystem loadImage), step
  *     stripRect.x by its 16-pixel width, and either request the next strip
  *     or, past the frame's right edge, rewind and set `frameDone`.
- * One movie plays at a time: `gActiveMoviePlayer` is the player play made
+ * One movie plays at a time: `sActiveMoviePlayer` is the player play made
  * active; rewind, advance, abort and decodeFrame do nothing for any other
  * object, and pollActive clears it when the movie is over.
  *
@@ -89,7 +89,7 @@ struct MoviePlayer {
 extern MoviePlayerMethods gMoviePlayerMethods;
 extern MoviePlayerMethods *GetMoviePlayerMethods(void); /* returns &gMoviePlayerMethods */
 
-extern MoviePlayer *gActiveMoviePlayer; /* the playing movie, or NULL (play sets it, pollActive clears it) */
+extern MoviePlayer *sActiveMoviePlayer; /* the playing movie, or NULL (play sets it, pollActive clears it) */
 extern s32 gMdecInitialized;            /* set by the first ctor, which DecDCTReset(0)s the MDEC */
 extern s32 gMoviePollCounter;           /* pollActive's call count */
 extern u8 gMovieClearColor[4];          /* a zero word: play's clearImage color, black */
@@ -112,7 +112,7 @@ void MoviePlayer__NoOpSlot5C(void);
 void MoviePlayer__DrawStrip(MoviePlayer *self);
 s32 MoviePlayer__PollActive(MoviePlayer *self);
 s32 MoviePlayer__DecodeFrame(MoviePlayer *self);
-void OnMdecStripDone(void); /* the DecDCTout callback: gActiveMoviePlayer's drawStrip */
+void OnMdecStripDone(void); /* the DecDCTout callback: sActiveMoviePlayer's drawStrip */
 void MoviePlayer__WaitFrameReady(MoviePlayer *self); /* spin until frameDone */
 void MoviePlayer__SetAutoPlay(MoviePlayer *self, s32 autoPlay);
 

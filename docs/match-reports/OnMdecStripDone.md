@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-`if (gActiveMoviePlayer != NULL) gActiveMoviePlayer->methods->slot60(gActiveMoviePlayer);` -- gp-relative global (resolved `gp_rel`, --gp-symbols), slot +0x060 cast to an unprototyped pointer (the unified macro declares it `void (*)(void)`).
+`if (sActiveMoviePlayer != NULL) sActiveMoviePlayer->methods->slot60(sActiveMoviePlayer);` -- gp-relative global (resolved `gp_rel`, --gp-symbols), slot +0x060 cast to an unprototyped pointer (the unified macro declares it `void (*)(void)`).
 
 Table slot (`tools/classtable.py`): none (no method table lists it).
 
@@ -23,12 +23,12 @@ fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/Graphic
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-extern DataSrc33808 *gActiveMoviePlayer;
+extern DataSrc33808 *sActiveMoviePlayer;
 
-/* Slot +0x060 of the object in gActiveMoviePlayer, when there is one. */
+/* Slot +0x060 of the object in sActiveMoviePlayer, when there is one. */
 void OnMdecStripDone(void) {
-    if (gActiveMoviePlayer != NULL) {
-        ((void (*)())gActiveMoviePlayer->methods->slot60)(gActiveMoviePlayer);
+    if (sActiveMoviePlayer != NULL) {
+        ((void (*)())sActiveMoviePlayer->methods->slot60)(sActiveMoviePlayer);
     }
 }
 ```
@@ -46,4 +46,4 @@ void OnMdecStripDone(void) {
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; `gActiveMoviePlayer` is a `MoviePlayer *`, so the call is `gActiveMoviePlayer->methods->drawStrip(gActiveMoviePlayer)` with no function-pointer cast. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; `sActiveMoviePlayer` is a `MoviePlayer *`, so the call is `sActiveMoviePlayer->methods->drawStrip(sActiveMoviePlayer)` with no function-pointer cast. Byte-identical; `typeviews.py --warnings` 0 new.

@@ -25,7 +25,7 @@
  *    rotation and scale follow SceneNode's ratio tables.
  *  - MoviePlayer, CD-streamed and MDEC-decoded FMV (CdStream frames,
  *    DecDCTvlc, then DecDCTin/DecDCTout in 16-pixel strips uploaded as they
- *    finish), one movie at a time (gActiveMoviePlayer).
+ *    finish), one movie at a time (sActiveMoviePlayer).
  * The ctors take include/FileResource.h's ResourceSource; the build steps
  * that make them fill one as a ResourceRequest's `src`. The unit's own
  * types: UnprototypedCtorTable, the view the allocators call a ctor slot
@@ -1374,13 +1374,13 @@ void MoviePlayer__FreeFrameBuffers(MoviePlayer *self) {
 s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepActive, s32 loops) {
     DrawSystem *ds;
 
-    if (gActiveMoviePlayer == NULL) {
+    if (sActiveMoviePlayer == NULL) {
         if (self->autoPlay != 0) {
             MoviePlayer__RequestStart(self);
         }
         self->frameCount = frameCount;
         if (self->stream->methods->open(self->stream, name, MOVIE_OPEN_TRIES) == 0) {
-            gActiveMoviePlayer = self;
+            sActiveMoviePlayer = self;
             self->haveFrame = 0;
             self->frameIndex = 0;
             self->frameDone = 1;
@@ -1404,7 +1404,7 @@ void MoviePlayer__RequestStart(MoviePlayer *self) {
 /* rewind (+0x044): when active, reset the frame state and restart the stream
  * (its slot7C, handed RequestRestart, is empty). */
 void MoviePlayer__Rewind(MoviePlayer *self) {
-    MoviePlayer *cur = gActiveMoviePlayer;
+    MoviePlayer *cur = sActiveMoviePlayer;
 
     if (cur == self) {
         cur->haveFrame = 0;
@@ -1426,7 +1426,7 @@ void MoviePlayer__RequestRestart(MoviePlayer *self) {
  * stream reading on a pending start (on a restart, muting it once `loops`
  * runs out), else decode once started. */
 s32 MoviePlayer__Advance(MoviePlayer *self) {
-    MoviePlayer *cur = gActiveMoviePlayer;
+    MoviePlayer *cur = sActiveMoviePlayer;
 
     if (cur == self) {
         if (cur->pendingStart == 0) {
@@ -1451,7 +1451,7 @@ out:; /* MATCHING: retail returns no value on this path */
 
 /* abort (+0x04C): when active, close the stream and finish. */
 void MoviePlayer__Abort(MoviePlayer *self) {
-    MoviePlayer *cur = gActiveMoviePlayer;
+    MoviePlayer *cur = sActiveMoviePlayer;
 
     if (cur == self) {
         cur->streamEnded = 1;
@@ -1530,14 +1530,14 @@ s32 MoviePlayer__PollActive(MoviePlayer *self) {
         }
         return 0;
     }
-    gActiveMoviePlayer = NULL;
+    sActiveMoviePlayer = NULL;
     return 1;
 }
 
 /* decodeFrame (+0x068): when active and not finished, hand the pulled
  * frame to the MDEC once the last one is drawn, and pull the next. */
 s32 MoviePlayer__DecodeFrame(MoviePlayer *self) {
-    MoviePlayer *cur = gActiveMoviePlayer;
+    MoviePlayer *cur = sActiveMoviePlayer;
 
     if (cur == self) {
         if (cur->finished == 0) {
@@ -1557,11 +1557,11 @@ s32 MoviePlayer__DecodeFrame(MoviePlayer *self) {
     }
 } /* MATCHING: no return when another player is active, as retail */
 
-/* The MDEC's DecDCTout callback: drawStrip of gActiveMoviePlayer, when
+/* The MDEC's DecDCTout callback: drawStrip of sActiveMoviePlayer, when
  * there is one. */
 void OnMdecStripDone(void) {
-    if (gActiveMoviePlayer != NULL) {
-        gActiveMoviePlayer->methods->drawStrip(gActiveMoviePlayer);
+    if (sActiveMoviePlayer != NULL) {
+        sActiveMoviePlayer->methods->drawStrip(sActiveMoviePlayer);
     }
 }
 
