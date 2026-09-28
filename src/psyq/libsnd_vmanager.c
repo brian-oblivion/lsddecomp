@@ -20,7 +20,7 @@
  * The data keeps Sony's types: the key-on request in _svm_cur, the current
  * VAB through <libsnd.h>'s VabHdr, ProgAtr and VagAtr (_svm_vh, _svm_pg,
  * _svm_tn), the voice tables in include/SvmData.h and the sequence records
- * in include/SsScore.h. A key-on or key-off is not written to the SPU when
+ * in include/ss_score.h. A key-on or key-off is not written to the SPU when
  * it is requested: it is collected in the _svm_okon/_svm_okof masks, which
  * SpuVmFlush writes out once per tick. No jump table and no rodata attach.
  */
@@ -1201,7 +1201,7 @@ s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
  *
  * A sequence is named by one packed number: the SEQ/SEP access in the low
  * byte, the sequence within it in the high byte, reaching
- * _ss_score[access][seq] (include/SsScore.h). Each volume accessor
+ * _ss_score[access][seq] (include/ss_score.h). Each volume accessor
  * records it in D_8008EA22, vmanager's current-sequence global
  * (SpuVmGetSeqLVol records only the access byte).
  */

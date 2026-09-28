@@ -13,7 +13,7 @@
  */
 #include "common.h"
 #include <libsnd.h>
-#include "SsScore.h"
+#include "ss_score.h"
 #include "SvmData.h"
 
 /* libsnd/seqread: one tick of sequence _ss_score[access][seq]. */

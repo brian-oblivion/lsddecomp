@@ -1,10 +1,10 @@
-#ifndef SSSCORE_H
-#define SSSCORE_H
+#ifndef SS_SCORE_H
+#define SS_SCORE_H
 
 #include "common.h"
 
 /*
- * SsScore.h -- libsnd's per-sequence play state, the records behind Sony's
+ * ss_score.h -- libsnd's per-sequence play state, the records behind Sony's
  * _ss_score.
  *
  * Sony's, not the game's. _ss_score (pinned in config/psyq-objects.ld) is an

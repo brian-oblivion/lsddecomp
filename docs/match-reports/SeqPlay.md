@@ -574,7 +574,7 @@ The carve record (round 24) and the blocker re-census (rounds 42 and 43), moved 
 
 ## Round 97 types pass (echo)
 
-code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
+code_179d8_k's local `Entry90902E8` view retired onto `include/ss_score.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
 libsnd_cres, libsnd_decre and libsnd_vmanager already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type

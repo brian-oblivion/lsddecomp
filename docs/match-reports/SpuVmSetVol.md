@@ -1123,7 +1123,7 @@ The NON_MATCHING body now reads `_svm_voice[i].unk0E/unk12/unk16/unk10/unk08/unk
 The unit's placeholder types, as this function reads them:
 
 - `D800902E8Entry` -> **`SsScore`** (tier A for WHAT it is, offsets-only
-  fields), now `include/SsScore.h`. The record behind Sony's `_ss_score`
+  fields), now `include/ss_score.h`. The record behind Sony's `_ss_score`
   (pinned in `config/psyq-objects.ld`), reached as
   `_ss_score[access][seq]`; its 0xAC size is `<libsnd.h>`'s `SS_SEQ_TABSIZ`,
   the per-sequence size of the table `SsSetTableSize` hands libsnd. No Sony
