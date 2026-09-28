@@ -39,9 +39,8 @@ typedef struct PlacementGridBuffer {
 } PlacementGridBuffer;
 
 /* LinkResource__GetModel as PlacementGrid__ResolveEntry calls it through
- * `linkResource`'s getModel (+0x080). The occupant reads only (self, index);
- * a function-pointer cast, no code.
- * MATCHING: the four arguments keep `placement` in $a3 across the call. */
+ * `linkResource`'s getModel (+0x080). The occupant reads only (self, index). */
+/* MATCHING: the four arguments keep `placement` in $a3 across the call */
 typedef s32 (*PlacementGridGetModelFn)(LinkResource *self, s32 model, s32 cell, CellPlacement *placement);
 
 PlacementGrid *New_PlacementGrid(char *name) {
@@ -144,31 +143,17 @@ void NullDriver__Seek(void) {}
 void NullDriver__NoOpSlot50(void) {}
 
 /*
- * The VAB sound backend: the rest of the NullDriver data source's empty slots and mode
- * accessors, the VabStreamObj class (one sound bank, loaded through the
- * active data source and played through libsnd), and the SoundCueSet
- * start/flush pair.
+ * The VAB sound backend: the rest of NullDriver's empty slots and its mode
+ * accessors (include/null_driver.h), the VabStreamObj class
+ * (include/vab_stream_obj.h, whose class documentation describes the load
+ * sequence and libsnd's set-up), and the SoundCueSet functions
+ * (include/sound_cue_set.h).
  *
- * NullDriver (include/null_driver.h, class id 0x23 = DATASOURCE_NULL) is the
- * data source game_shell.c selects when it is not reading the CD; the CD
- * driver (include/cd_driver.h, 0x13) is the other. Its Read, LoadFile,
- * RunRequestQueue, RequestLoadFile, StopService and CancelRequests slots do
- * nothing. GetNullDriverMode, SetNullDriverMode and GetNullDriverUseVSyncCallback
- * answer the queries game_shell.c's GetActiveDataSource* functions forward
- * to the CD driver's GetCdDriverMode, SetCdDriverMode and
- * GetCdUseVSyncCallback: they keep the two mode words and report no VSync
- * callback.
- *
- * VabStreamObj (include/vab_stream_obj.h, 0xA03) is a FileResource subclass
- * whose ctor and finalize chain to the active driver's. The header's banner
- * describes the load sequence and the slots. The first bank constructed
- * initialises libsnd (SsInit, the score size table, a 60 Hz tick); the first
- * whose attributes load starts it (SsStart, the master volume). Finalizing
- * the last open bank (sOpenVabCount) while no WBgm plays ends it.
- *
- * InitSoundCueSet and FlushSoundCueSet (include/sound_cue_set.h) are free
- * functions, not methods: they take the sound object first, and Flush stops
- * the cue's voices through its stopVoice slot.
+ * NullDriver is the data source game_shell.c selects when it is not reading
+ * the CD. GetNullDriverMode, SetNullDriverMode and
+ * GetNullDriverUseVSyncCallback answer the queries game_shell.c's
+ * GetActiveDataSource* functions otherwise forward to CdDriver: they keep
+ * the two mode words and report no VSync callback.
  */
 
 /* ".VH" and ".VB", in .sdata. */
@@ -513,14 +498,14 @@ s32 InitSoundCueSet(VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
     return 1;
 }
 
-void FlushSoundCueSet(VabStreamObj *self, SoundCueSet *set) {
+void FlushSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
     s32 i;
     SoundCueSlot *slot;
 
     slot = set->slots;
     for (i = 0; i < ARRAY_COUNT(set->slots); i++) {
         if (slot->voice >= 0) {
-            slot->voice = self->methods->stopVoice(self, slot->voice);
+            slot->voice = sound->methods->stopVoice(sound, slot->voice);
         }
         slot++;
     }
