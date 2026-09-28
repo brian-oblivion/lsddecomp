@@ -7,7 +7,7 @@ before this round.
 
 ## What it does
 
-Register-once initializer: if `gStyleGrid` (a `.sdata` flag word, zero at
+Register-once initializer: if `sStyleGrid` (a `.sdata` flag word, zero at
 boot) is already set, return 0. Otherwise stash the 5 arguments (4 in
 registers, 1 on the stack at `0x28($sp)`) into a scatter of `.sbss` globals,
 zero two adjacent words (`D_8008ACA0`, and `sStyleCueSlots` immediately below it
@@ -15,7 +15,7 @@ by pointer decrement), then tail-call `ApplyStyleConfig()` and return its
 result.
 
 ```c
-extern s32 gStyleGrid;
+extern s32 sStyleGrid;
 extern s32 gStyleStage;
 extern s32 gStyleTickCount;
 extern s32 sStyleDay;
@@ -30,10 +30,10 @@ s32 RegisterStyleConfig(s32 a0, s32 a1, s32 a2, s32 a3, s32 arg4) {
     s32 *p;
     s32 i;
 
-    if (gStyleGrid == 0) {
+    if (sStyleGrid == 0) {
         i = 1;
         p = &D_8008ACA0;
-        gStyleGrid = a0;
+        sStyleGrid = a0;
         gStyleStage = a1;
         gStyleSceneRefs = a2;
         gStyleVariant = -1;
@@ -84,7 +84,7 @@ produce, and the difference changes the instruction count.
 
 ## Naming
 
-**RegisterStyleConfig** -- tier B. Free function (VerbNoun, unrelated to the `ObjM`/`DreamSys` cluster above): a register-once guard over a `.sdata` flag word (`gStyleGrid`), stashing five style-config arguments into `.sbss` globals and zeroing two more before tail-calling `ApplyStyleConfig`. Mechanically well understood from the disassembly; "style" describes the data it touches (color/config table consumed by `FillStyleFromConfig`/`StyleM`), not a confirmed game concept.
+**RegisterStyleConfig** -- tier B. Free function (VerbNoun, unrelated to the `ObjM`/`DreamSys` cluster above): a register-once guard over a `.sdata` flag word (`sStyleGrid`), stashing five style-config arguments into `.sbss` globals and zeroing two more before tail-calling `ApplyStyleConfig`. Mechanically well understood from the disassembly; "style" describes the data it touches (color/config table consumed by `FillStyleFromConfig`/`StyleM`), not a confirmed game concept.
 
 ## Track 7 (2026-09-27, round 98, delta)
 

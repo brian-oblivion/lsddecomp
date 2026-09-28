@@ -131,7 +131,7 @@ struct ObjAB4C {
 };
 ```
 
-`gStyleGrid`'s value is another "pointer stored as a plain `s32`" global
+`sStyleGrid`'s value is another "pointer stored as a plain `s32`" global
 (same idiom as `gStyleSceneRefs`), dispatched here as a self object through
 method slot `+0xE8` -- the third such `ObjXXXX`/`ObjXXXXMethods` local view
 in this unit (`ObjAB54`, `ObjE0C8`, now `ObjAB4C`).
@@ -182,7 +182,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     ctx = 0;
     if (arg0 != 0) {
         ctx = buf;
-        ((ObjAB4C *) gStyleGrid)->methods->slotE8((ObjAB4C *) gStyleGrid, ctx, arg0);
+        ((ObjAB4C *) sStyleGrid)->methods->slotE8((ObjAB4C *) sStyleGrid, ctx, arg0);
     }
     if (gStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();
@@ -209,7 +209,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
 
 Needs (already present earlier in the unit, in strict ROM order, at the
 point this body would compile): the `ObjAB4C`/`ObjAB4CMethods` local view
-above; `extern s32 gStyleGrid;`, `extern s32 gStyleTickCount;`,
+above; `extern s32 sStyleGrid;`, `extern s32 gStyleTickCount;`,
 `extern void ApplyStyleDecorationIfSet(void);` (matched, `ObjMStyleActor.c`),
 `extern void StyleBuildDecorSet(void);`/`extern void StyleUpdateDecorSet(void);`
 (forward, own unit, still cold), `void StyleBuildEffectSlots(void *arg0);` (matched
@@ -279,7 +279,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * globals its functions set up or gate on, renamed via `tools/rename.py`,
  * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
  * cluster (`gStyleStage`/`sStyleDay`/`gStyleSceneRefs`/`gStyleVariant`/
- * `sStyleDecorObj`/`gStyleGrid`/`gStyleTickCount`, formerly
+ * `sStyleDecorObj`/`sStyleGrid`/`gStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
  * `ObjMStyleActor.c`'s already-confirmed "Style" subsystem sets
  * (`RegisterStyleConfig`/`ApplyStyleConfig`/`FillStyleFromConfig`/

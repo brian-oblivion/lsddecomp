@@ -26,7 +26,7 @@ void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2) {
     ...
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arg0 = New_StyleEffect((void *) 0, &gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
+        *arg0 = New_StyleEffect((void *) 0, &gStyleSpawnOffsetX, (void *) sStyleGrid, arg2);
         arg0++;
     }
     return arg0;
@@ -153,7 +153,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = New_StyleEffect((void *) 0, gStyleSpawnOffsetX, (void *) gStyleGrid, arg2);
+        *arr = New_StyleEffect((void *) 0, gStyleSpawnOffsetX, (void *) sStyleGrid, arg2);
         arr++;
     }
     return (void *) arr;
@@ -244,7 +244,7 @@ iteration via a `sStyleDay % 7` test. STALL, 93/99, whole-function
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`sStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and gStyleGrid as the `SceneNode *` parent. Image byte-identical.
+`sStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and sStyleGrid as the `SceneNode *` parent. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 

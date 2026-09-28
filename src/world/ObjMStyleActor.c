@@ -1097,7 +1097,7 @@ ObjMMethods *GetObjMMethods(void) {
     return &gObjMMethods;
 }
 
-extern s32 gStyleGrid;
+extern s32 sStyleGrid;
 extern s32 gStyleStage;
 extern s32 gStyleTickCount;
 extern s32 sStyleDay;
@@ -1114,10 +1114,10 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
     StyleCueSlot **slot;
     s32 i;
 
-    if (gStyleGrid == 0) {
+    if (sStyleGrid == 0) {
         i = ARRAY_COUNT(sStyleCueSlots) - 1;
         slot = &sStyleCueSlots[ARRAY_COUNT(sStyleCueSlots) - 1];
-        gStyleGrid = grid;
+        sStyleGrid = grid;
         gStyleStage = stage;
         gStyleSceneRefs = sceneRefs;
         gStyleVariant = -1;
@@ -1222,7 +1222,7 @@ void ApplyStyleDecorationIfSet(void) {
  * releases.
  *
  * RegisterStyleConfig (previous section), called by ObjM__InitStyleAndWorld
- * and a no-op until StyleTeardown clears gStyleGrid, sets the state read here: gStyleGrid (the
+ * and a no-op until StyleTeardown clears sStyleGrid, sets the state read here: sStyleGrid (the
  * scene's StageMap), gStyleStage (ObjM's stage), gStyleSceneRefs (ObjM's
  * sound, resources and viewport; StyleSceneRefs below) and sStyleDay (the
  * DreamSys day). ApplyStyleConfig then takes the stage's fixed config or,
@@ -1555,7 +1555,7 @@ struct StyleCueSlot {
 
 extern StyleCueSlot *FlushStyleCue(StyleCueSlot *slot);
 
-extern s32 gStyleGrid; /* a StageMap */
+extern s32 sStyleGrid; /* a StageMap */
 extern StyleCueSlot *sStyleCueSlots[2];
 
 /* Releases everything TickStyle built and unregisters the scene. */
@@ -1568,8 +1568,8 @@ void StyleTeardown(void) {
     for (i = 0; i < ARRAY_COUNT(sStyleCueSlots); i++) {
         sStyleCueSlots[i] = FlushStyleCue(sStyleCueSlots[i]);
     }
-    if (gStyleGrid != 0) {
-        gStyleGrid = 0; /* RegisterStyleConfig registers only while this is 0 */
+    if (sStyleGrid != 0) {
+        sStyleGrid = 0; /* RegisterStyleConfig registers only while this is 0 */
     }
 }
 
@@ -1605,7 +1605,7 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     for (i = 0; i < count; i++) {
         setup(pos, offsetY);
         *slots =
-            New_StyleEffect(0, (StyleEffectParams *)&gStyleSpawnOffsetX, (SceneNode *)gStyleGrid, pos);
+            New_StyleEffect(0, (StyleEffectParams *)&gStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
         slots++;
     }
     return slots;
@@ -1625,7 +1625,7 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
     for (i = 0; i < count; i++) {
         SetupStyleSpawnParamsRandom(pos, offsetY);
         *slots =
-            New_StyleEffect(1, (StyleEffectParams *)&gStyleSpawnOffsetX, (SceneNode *)gStyleGrid, pos);
+            New_StyleEffect(1, (StyleEffectParams *)&gStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
         slots++;
     }
     return slots;
@@ -1641,7 +1641,7 @@ extern s32 gStyleSpawnOffsetZ;
 extern u8 gStyleKind3Colors[][3];
 
 /* MATCHING: the rotation store goes through a one-field struct, so the
- * gStyleGrid load may schedule above it (a plain pointer store blocks it). */
+ * sStyleGrid load may schedule above it (a plain pointer store blocks it). */
 typedef struct PtrBoxK3 {
     Ratio16 *p; /* +0x000 */
 } PtrBoxK3;
@@ -1674,7 +1674,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     /* MATCHING: the block's address is taken back from its rotation member */
     *slots = New_StyleEffect(
         3, (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
-        (SceneNode *)gStyleGrid, pos);
+        (SceneNode *)sStyleGrid, pos);
     slots++;
     return slots;
 }
@@ -1718,7 +1718,7 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     /* MATCHING: the block's address is taken back from its rotation member */
     *slots = New_StyleEffect(
         2, (StyleEffectParams *)((u8 *)rotation - offsetof(StyleEffectParams, rotation)),
-        (SceneNode *)gStyleGrid, pos);
+        (SceneNode *)sStyleGrid, pos);
     slots++;
     return slots;
 }
@@ -1869,7 +1869,7 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
         if (entry->cue > 0) {
             buf.pos = entry->pos;
             buf.tab = sStyleCueOffsets[entry->offsetIndex];
-            grid = (StageMap *)gStyleGrid;
+            grid = (StageMap *)sStyleGrid;
             grid->methods->computeCellOffsets(grid, pos, &buf);
             dx = pos->x - target->x;
             if (dx < 0) {
@@ -1963,7 +1963,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     target = 0;
     if (cell != 0) {
         target = &targetPos;
-        ((StageMap *)gStyleGrid)->methods->computeCellOffsets((StageMap *)gStyleGrid, target, cell);
+        ((StageMap *)sStyleGrid)->methods->computeCellOffsets((StageMap *)sStyleGrid, target, cell);
     }
     if (gStyleTickCount++ == 0) {
         ApplyStyleDecorationIfSet();

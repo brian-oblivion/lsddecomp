@@ -81,7 +81,7 @@ void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *) (sStyleCueOffsets + entry->idx * 6);
-            self = (void *) gStyleGrid;
+            self = (void *) sStyleGrid;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
             if (d1 < 0) {
@@ -106,7 +106,7 @@ fail:
 
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
-`extern s32 gStyleStage, sStyleCueRecordIndex, gStyleGrid, sStyleCueDistanceTable[];`,
+`extern s32 gStyleStage, sStyleCueRecordIndex, sStyleGrid, sStyleCueDistanceTable[];`,
 `extern u8 *sStyleCueRecordLists[], sStyleCueRecordCounts[], sStyleCueOffsets[];` (all already
 declared in `src/world/ObjMStyleActor.c` ahead of this function).
 
@@ -213,7 +213,7 @@ void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *) (sStyleCueOffsets + entry->idx * 6);
-            self = (void *) gStyleGrid;
+            self = (void *) sStyleGrid;
             ((ObjAB4C *) self)->methods->slotE8((ObjAB4C *) self, arg0, &buf);
             d1 = *(s32 *) arg0 - *(s32 *) arg2;
             if (d1 < 0) {
@@ -246,7 +246,7 @@ Notes on the recovery:
   `lwl 3(s1)/lwr 0(s1)` + `swl 0x13(sp)/swr 0x10(sp)` sequences.
 - **The `ObjAB4C`/`ObjAB4CMethods` local view (self-dispatch through method
   slot `+0xE8`) is the SAME idiom `TickStyle` establishes** for
-  `gStyleGrid` -- moved that typedef earlier in the unit (it originally sat
+  `sStyleGrid` -- moved that typedef earlier in the unit (it originally sat
   just before `TickStyle`, which is ROM-later) since this function,
   ROM-earlier, also needs it. No behavioural change, pure reordering of a
   type declaration.
@@ -335,7 +335,7 @@ MATCHED, 111/111.
 | `D_800876EC` | `sStyleCueRecordCounts` | A | per-stage record count, the loop bound. |
 | `D_800874EC` | `sStyleCueOffsets` | A | 6-byte s16 x/y/z entries, indexed by the record's byte 4; copied after the record's 4 cell bytes to make the 10-byte cell key (StageMap's Descriptor10 shape) computeCellOffsets turns into a world position. |
 
-The `+0x0E8` local view on `gStyleGrid` is StageMap's computeCellOffsets. Locals: `pos`, `outDist`, `target`, `remaining`, `records`, `dx`, `dz`, `grid`.
+The `+0x0E8` local view on `sStyleGrid` is StageMap's computeCellOffsets. Locals: `pos`, `outDist`, `target`, `remaining`, `records`, `dx`, `dz`, `grid`.
 
 ### Comments moved here from src/world/ObjMStyleActor.c
 

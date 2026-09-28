@@ -33,9 +33,9 @@ sw    $v0, 0x0($s0)
 slti  $v0, $s1, 0x2
 bnez  $v0, .L80054D5C
  addiu $s0, $s0, 0x4
-lw    $v0, %gp_rel(gStyleGrid)($gp)
+lw    $v0, %gp_rel(sStyleGrid)($gp)
 beqz  $v0, .L80054D8C
-sw    $zero, %gp_rel(gStyleGrid)($gp)
+sw    $zero, %gp_rel(sStyleGrid)($gp)
 .L80054D8C:
 ...
 jr $ra
@@ -44,7 +44,7 @@ jr $ra
 Calls the three just-matched one-shot-flag helpers unconditionally, then
 loops twice over `sStyleCueSlots[i]`, replacing each element with
 `FlushStyleCue`'s return (`FlushStyleCue` always returns 0, so this clears
-the two-slot array), then clears the `gStyleGrid` flag if set. Since
+the two-slot array), then clears the `sStyleGrid` flag if set. Since
 `FlushStyleCue` is defined later in this unit (higher ROM address) but
 called here, it needs a forward declaration -- matching the pattern already
 used for `ObjM__StartFadeUp` in `src/world/ObjMStyleActor.c`.
@@ -73,7 +73,7 @@ struct ObjN14 {
 
 extern s32 FlushStyleCue(ObjN14 *arg0);
 
-extern s32 gStyleGrid;
+extern s32 sStyleGrid;
 extern ObjN14 *sStyleCueSlots[2];
 
 void StyleTeardown(void) {
@@ -85,8 +85,8 @@ void StyleTeardown(void) {
     for (i = 0; i < 2; i++) {
         sStyleCueSlots[i] = (ObjN14 *) FlushStyleCue(sStyleCueSlots[i]);
     }
-    if (gStyleGrid != 0) {
-        gStyleGrid = 0;
+    if (sStyleGrid != 0) {
+        sStyleGrid = 0;
     }
 }
 ```
@@ -108,7 +108,7 @@ before.
 
 Calls `StyleFlushDecoration`, `StyleReleaseDecorSet`, `StyleReleaseEffectSlots`
 unconditionally, then flushes both `sStyleCueSlots[2]` entries via
-`FlushStyleCue`, then clears `gStyleGrid`. Called from
+`FlushStyleCue`, then clears `sStyleGrid`. Called from
 `src/world/ObjMStyleActor.c`'s `ObjM__TeardownStyle` (itself calling `self->methods->slot84`
 and `ReleaseDreamAuxEntities()`, an end-of-scene-style teardown), which is the
 evidence for "Teardown" over a narrower "Reset" -- it releases every

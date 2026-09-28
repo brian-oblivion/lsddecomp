@@ -334,7 +334,7 @@ sStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` vi
 | --- | --- | --- | --- |
 | `gStyleDecorPosAX`/`AY` | `sStyleDecorPosX`/`Y` | A | copied whole and passed as attachToParent's third argument, BoxFill's screen position (BoxFillPos). |
 | `gStyleDecorPosBX`/`BY` | `sStyleDecorSizeW`/`H` | A | copied whole and passed as New_BoxFill's first argument, the size (BoxFill.h: BoxFillSize, width then height); `h` drops by 7 per band. |
-| `gStyleCueSelf` | `gStyleGrid` | A | RegisterStyleConfig stores its arg0; its one caller passes ObjM's `unk14`, the StageMap (IntermediateBase.h, ObjM.h); this unit calls StageMap's computeCellOffsets on it and parents every effect under it. |
+| `gStyleCueSelf` | `sStyleGrid` | A | RegisterStyleConfig stores its arg0; its one caller passes ObjM's `unk14`, the StageMap (IntermediateBase.h, ObjM.h); this unit calls StageMap's computeCellOffsets on it and parents every effect under it. |
 | `0x12` | `STYLE_DECOR_BANDS` (18) | A | the band count: New_BoxFill loop bound, ReleaseBasicClassArray count, the colour tables' 18 triples. |
 | `0x1FFF` | `STYLE_DECOR_PRI` | A | New_BoxFill's pri argument; 13 bits, the mask BoxFill__Reset's setMask(13) sets. Hex: a mask-shaped value. |
 | `0x1E` | `STYLE_DECOR_VARIANT2_DROP` (30) | B | added to the y position when `sStyleDecorVariant == 2`, here and in StyleUpdateDecorSet. |
