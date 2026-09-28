@@ -2,9 +2,9 @@
 
 > Renamed from `func_8005F544` on 2026-09-24 (tools/rename.py). Address 0x8005f544.
 
-Unit: `Entity_c`. Originally staffed to runner bravo (stalled at 30/49,
+Unit: `Entity`. Originally staffed to runner bravo (stalled at 30/49,
 ~7 attempts). Reopened for runner alpha per HEAD BROADCAST (round following
-alpha's `Entity_c` batch of six) on the strength of the permuter setup and
+alpha's `Entity` batch of six) on the strength of the permuter setup and
 the cross-jump-control levers alpha's own round had just established.
 Closed by alpha in ~10 further attempts (17/30 total spent across both
 runners).

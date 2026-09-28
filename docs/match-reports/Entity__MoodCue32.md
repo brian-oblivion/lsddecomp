@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005FA64` on 2026-09-24 (tools/rename.py). Address 0x8005fa64.
 
-**Unit:** Entity_c · **Size:** 12 words · **Status:** MATCHED (12/12 words,
+**Unit:** Entity · **Size:** 12 words · **Status:** MATCHED (12/12 words,
 whole-image build verified byte-exact)
 
 ## What it does

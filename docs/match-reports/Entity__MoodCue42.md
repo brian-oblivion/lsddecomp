@@ -49,7 +49,7 @@ None beyond what's already documented -- this one was a clean first-attempt
 match once the mood-dispatch family's established shape (three-way dispatch
 on a small integer field, `this->methods->slotNN(this)` calls, `out->unkNN`
 writes) was recognized from the sibling functions already matched in
-`Entity_c.c`.
+`Entity.c`.
 
 ## Naming
 

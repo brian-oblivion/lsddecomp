@@ -74,7 +74,7 @@ out with no source change at all.
 
 ### Why the old typing was adopted, and why it was never evidence
 
-`slotCC` was typed `s32` on the strength of `Entity__MoodCue37` (Entity_c) being a
+`slotCC` was typed `s32` on the strength of `Entity__MoodCue37` (Entity) being a
 lone one-line wrapper, `return this->methods->slotCC(this, -0x5A, 0);` —
 CLAUDE.md's "one-line wrapper" rule, which says a discarded return is never
 evidence of `void`, so a wrapper returning the callee's value should be typed
@@ -88,7 +88,7 @@ direction. This function's bytes ARE evidence, and they say `void`.
 ### Blast radius, all re-verified byte-exact
 
 35 `this->methods->slotCC(...)` call sites across `Entity/c/d/e/g`. Only two
-use the value, both in `src/Entity_c.c`:
+use the value, both in `src/Entity.c`:
 
 - the local function-pointer variable in `func_8005FE1C`'s block
   (`s32 (**slotCC)(Entity *, s32, s32);` → `void (**slotCC)(...)`)

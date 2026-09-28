@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005F6D4` on 2026-09-24 (tools/rename.py). Address 0x8005f6d4.
 
-**Unit:** Entity_c · **Size:** 13 words · **Status:** MATCHED (13/13 words,
+**Unit:** Entity · **Size:** 13 words · **Status:** MATCHED (13/13 words,
 whole-image build verified byte-exact)
 
 ## What it does
@@ -17,7 +17,7 @@ a new data row.
 
 `SCALE_SIX` -- a fifth `D_8008xxxx` opaque data-row extern, same
 convention as the ones already declared in `Entity.c`. Declared fresh in
-`Entity_c.c` (a separate translation unit, so it needs its own `extern`).
+`Entity.c` (a separate translation unit, so it needs its own `extern`).
 
 ## Final C
 

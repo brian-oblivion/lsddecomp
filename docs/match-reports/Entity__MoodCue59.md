@@ -78,7 +78,7 @@ Every literal in the live body is in its base: decimal for moodTimer and cue-set
 
 The pre-track-7 banner of `src/Entity_e.c` carried this history, now here:
 the unit was carved as the third 20-function slice of the Entity class's
-97-function remainder, after Entity_c and Entity_d. Its functions are the
+97-function remainder, after Entity and Entity_d. Its functions are the
 `gEntityMoodHandlerTable` handlers of rows 59, 61-62, 64-71 and 73-81, each
 named `Entity__MoodCueNN` for its row; row order does not track code
 address (each report derives its row). Rows 60, 63 and 72 have a NULL

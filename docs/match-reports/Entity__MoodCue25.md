@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005F454` on 2026-09-24 (tools/rename.py). Address 0x8005f454.
 
-**Unit:** Entity_c · **Size:** 60 words · **Status:** MATCHED (60/60 words,
+**Unit:** Entity · **Size:** 60 words · **Status:** MATCHED (60/60 words,
 whole-image build verified byte-exact)
 
 ## What it does

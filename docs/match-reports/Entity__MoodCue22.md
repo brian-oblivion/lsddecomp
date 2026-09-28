@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005F1A8` on 2026-09-24 (tools/rename.py). Address 0x8005f1a8.
 
-**Unit:** Entity_c · **Size:** 11 words · **Status:** MATCHED (11/11 words,
+**Unit:** Entity · **Size:** 11 words · **Status:** MATCHED (11/11 words,
 whole-image build verified byte-exact)
 
 ## What it does
@@ -21,7 +21,7 @@ void Entity__MoodCue22(Entity *this) {
 
 ## Attempt log
 
-Matched on the first attempt. This is the first function in `Entity_c.c`;
+Matched on the first attempt. This is the first function in `Entity.c`;
 added `#include "Entity.h"` to the top of the file (it previously only
 included `common.h`, since every function was still `INCLUDE_ASM`).
 

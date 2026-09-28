@@ -3,7 +3,7 @@
 > Renamed from `func_800602AC` on 2026-09-24 (tools/rename.py). Address 0x800602ac.
 
 Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch handler, same
-family as `Entity_c.c`'s `Entity__MoodCue19`/`Entity__MoodCue20`/etc: `void
+family as `Entity.c`'s `Entity__MoodCue19`/`Entity__MoodCue20`/etc: `void
 Entity__MoodCue41(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source

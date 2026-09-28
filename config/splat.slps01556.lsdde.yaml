@@ -1763,7 +1763,6 @@ segments:
       # own `addiu $sp, $sp, -0x20`. The WHOLE 97-function block has zero
       # `jlabel`s and zero `jr $t2`, so neither slice needs a rodata slot
       # attached and none of it is a BIOS trampoline.
-      - [0x4F754, c, Entity_c]
       # Entity_d: second 20-function slice of the remainder,
       # 0x5077C..0x52290. 0x52290 (func_80061A90) is a real boundary --
       # func_80061778 closes `jr $ra; nop` + endlabel and func_80061A90

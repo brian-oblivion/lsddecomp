@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005EFF4` on 2026-09-24 (tools/rename.py). Address 0x8005eff4.
 
-Unit: `Entity_c`. Runner: bravo.
+Unit: `Entity`. Runner: bravo.
 
 ## Shape
 
