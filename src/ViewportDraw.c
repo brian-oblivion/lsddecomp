@@ -31,12 +31,7 @@
  * The subclasses spell their GsBG/GsBOXF/GsSPRITE field by field, hence the
  * casts to Sony's types at the libgs calls.
  *
- * Edges: the file is exactly this one function, between two linked Sony
- * objects (_obj/malloc before it, libapi/c159 after it), so the binary puts
- * both edges there and there is no neighbouring game unit to merge with. The
- * rest of the Viewport class is in other files, well away from this one.
- * This file is named for what it holds, the Viewport's scene-graph draw, and
- * leaves the Viewport stem to the class header, include/Viewport.h.
+ * The rest of the Viewport class is in Task.c.
  */
 #include "common.h"
 #include <libgte.h>

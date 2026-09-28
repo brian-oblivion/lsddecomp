@@ -7,12 +7,6 @@
  * VabStreamObj__Finalize checks before it shuts libsnd down; and
  * GetSsSizeTableBuf, the buffer PlacementGridVabSound.c passes to
  * SsSetTableSize.
- *
- * Edges: Sony objects on both sides, libspu/s_sav before and libsnd/ssvol
- * after, so the file is exactly this unit; its one string (80010FEC,
- * HandleMonitorEvent's) is its own. tuboundary.py's "a forced boundary lies
- * in this stretch" note is satisfied by those Sony edges. Named for its
- * class.
  */
 #include "common.h"
 #include <libsnd.h>

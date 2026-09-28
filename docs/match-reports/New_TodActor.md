@@ -99,3 +99,12 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 
 Parameters `desc`, `sound` (TodActor.h's banner: the descriptor and the
 VabStreamObj); the allocation is `sizeof(TodActor)` (0x98). Byte-identical.
+
+## History (moved from src/TodActor.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> What decided its edges (python3 tools/tuboundary.py): the edge before it,
+> after Entity__MoodCue129, is "start edge possible" and kept on content:
+> Entity (Entity.c) is TodActor's subclass, a different class, and this
+> file is TodActor whole, New_TodActor to GetTodActorMethods.
