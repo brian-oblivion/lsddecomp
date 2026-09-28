@@ -71,6 +71,15 @@ typedef struct TodFrame {
     /* +0x08 */ u32 packets[1]; /* the first packet (a TodPacket) */
 } TodFrame;
 
+/* A TOD packet's header word as DecodeTodPacketWord writes it out, one
+ * byte per field (its four out-pointers). */
+typedef struct TodPacketHeader {
+    /* +0x00 */ u8 objectId; /* the low byte of the object id */
+    /* +0x01 */ u8 type;     /* TOD_PACKET_* */
+    /* +0x02 */ u8 flag; /* TOD_OBJECT_* for object control, TOD_COORD_* for a coordinate packet */
+    /* +0x03 */ u8 length; /* the packet's length in words, header included */
+} TodPacketHeader;
+
 /* A TOD packet: the header word DecodeTodPacketWord splits, then the data;
  * a TOD_PACKET_MODEL_ID packet's data starts with the TMD id. */
 typedef struct TodPacket {
@@ -86,7 +95,7 @@ typedef struct TodMethods TodMethods;
 #define TOD_SLOTS(Self, CtorParams)                                                                \
     FILERESOURCE_SLOTS(Self, CtorParams);                                                            \
     /* +0x07C */ u8 (*scanTodPackets)(Self *self, u8 *out, u32 *sel, u32 *data); /* ScanTodPackets, in both tables */ \
-    /* +0x080 */ u32 *(*decodePacketWord)(Self *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3) /* DecodeTodPacketWord, in both tables */
+    /* +0x080 */ u32 *(*decodePacketWord)(Self *self, u32 *packet, u8 *objId, u8 *type, u8 *flag, u8 *len) /* DecodeTodPacketWord, in both tables */
 /* clang-format on */
 
 /* clang-format off */
@@ -110,6 +119,6 @@ void Tod__Tod(Tod *self, struct ResourceSource *src);
 void Tod__Finalize(Tod *self);
 u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel);
 u8 ScanTodPackets(Tod *self, u8 *out, u32 *sel, u32 *data);
-u32 *DecodeTodPacketWord(Tod *self, u32 *acc, u8 *out0, u8 *out1, u8 *out2, u8 *out3);
+u32 *DecodeTodPacketWord(Tod *self, u32 *packet, u8 *objId, u8 *type, u8 *flag, u8 *len);
 
 #endif

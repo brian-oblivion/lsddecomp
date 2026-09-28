@@ -100,3 +100,7 @@ A loop pre-test that retail does as a SIGNED compare (`blez`) on a value cc1 can
 | `8`, `0` | `TOD_PACKET_OBJECT_CONTROL`, `TOD_OBJECT_CREATE` (include/Tod.h) | A | Sony's TOD packet type 8 is object control, flag 0 create; the function collects those packets' object ids |
 | `2` | `TOD_PACKET_MODEL_ID` (include/Tod.h, the same spelling as src/world/TodActor.c's) | A | type 2 carries the TMD id, read at packet +4 |
 | `((u16 *)data)[1]`, `[2]` | `TodFrame.packetCount`, `TodPacket.tmdId` | A | a TOD frame header is {size, packet count, frame number}; a model-id packet's data starts with the id |
+
+## Track 10 (2026-09-28, round 104, echo)
+
+TodActor.c's `TodPacketHeader` (the four bytes DecodeTodPacketWord writes out) moved to include/Tod.h beside `TodPacket`, and ScanTodPackets decodes into one `TodPacketHeader head` instead of four u8 locals: they already sat at sp+0x18..0x1B in that order, so the frame is unchanged (98/98, whole image green). Tod.h's DecodeTodPacketWord prototype and slot take the definition's parameter names. `TodPacket` (the raw header word plus data) stays a separate type: it is the packet in memory, TodPacketHeader its decoded fields, whose bytes do not line up with the word's (type and flag are nibbles of byte 2).

@@ -70,15 +70,6 @@
 /* PlayTone's volume, both arguments of the bank's playTone (vol, endVol). */
 #define TODACTOR_TONE_VOLUME 110
 
-/* A TOD packet's header word, as decodePacketWord writes it out byte by
- * byte. */
-typedef struct TodPacketHeader {
-    u8 objectId; /* +0x000 the low byte of the object id */
-    u8 type;     /* +0x001 TOD_PACKET_* */
-    u8 flag;     /* +0x002 TOD_COORD_* for a coordinate packet */
-    u8 length;   /* +0x003 the packet's length in words, header included */
-} TodPacketHeader;
-
 /* A TodSet's buffer once TodSet__BuildTods has run: a word, a count, then
  * the table whose each entry (an offset into the buffer) it replaced with
  * the Tod it built over that sub-block. */
