@@ -1655,12 +1655,21 @@
       "reason": "",
       "rounds": [
         {
+          "amended": [
+            {
+              "date": "2026-09-28",
+              "was": {
+                "note": "layout (src/ into app, cd, graphics, world, sound, ui, psyq; 44 unitfile.py moves, all byte-identical), comments split src/ and include/ (history 113 and 103 to 0; moved verbatim to 127 reports), readme (14 corrections, each measured). None sent back. Track 9 done."
+              },
+              "why": "the note said 127 reports, the two runners' counts added; three reports received both, git diff counts 124"
+            }
+          ],
           "attempts": 4,
           "calibration": true,
           "date": "2026-09-28",
           "matches": 4,
           "model": "opus",
-          "note": "layout (src/ into app, cd, graphics, world, sound, ui, psyq; 44 unitfile.py moves, all byte-identical), comments split src/ and include/ (history 113 and 103 to 0; moved verbatim to 127 reports), readme (14 corrections, each measured). None sent back. Track 9 done.",
+          "note": "layout (src/ into app, cd, graphics, world, sound, ui, psyq; 44 unitfile.py moves, all byte-identical), comments split src/ and include/ (history 113 and 103 to 0; moved verbatim into 124 reports), readme (14 corrections, each measured). None sent back. Track 9 done.",
           "round": 102,
           "runners": 4
         },
