@@ -1058,7 +1058,7 @@ storeKey:
     return result;
 }
 
-/* MATCHING: `tail` from `entry` inside the loop, `entry` itself advancing; a copy swaps two locals */
+/* MATCHING: `tail` from `entry` inside the loop, `entry` itself advancing; a copy swaps two registers */
 void StageMap__ApplyChunkLoads(StageMap *self, ChunkLoadEntry *entry, s32 count) {
     s32 i;
     ChunkSlot *slot;
