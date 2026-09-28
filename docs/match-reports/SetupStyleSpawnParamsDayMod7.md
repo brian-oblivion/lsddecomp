@@ -15,8 +15,8 @@ shape rounds 46-48 recovered was already correct.**
 
 The inherited body did not rebuild at its recorded 25/87, for a reason that
 has nothing to do with this function: earlier in the same session I retyped
-the shared global `gStyleSpawnOffsetX` from `extern u8 gStyleSpawnOffsetX[]` to
-`extern s32 gStyleSpawnOffsetX` to close `SetupStyleSpawnParamsRandom`, and this body writes that
+the shared global `sStyleSpawnOffsetX` from `extern u8 sStyleSpawnOffsetX[]` to
+`extern s32 sStyleSpawnOffsetX` to close `SetupStyleSpawnParamsRandom`, and this body writes that
 symbol too. So the first figure below is the inherited body under the
 already-changed declaration, and the second is the inherited body's own
 recorded state, which I recovered afterwards by experiment.
@@ -42,7 +42,7 @@ The body carried `s32 r` and reused it for all three `rand()` results:
 
 ```c
 r = rand();
-gStyleSpawnOffsetX = (r % 20) << 11;
+sStyleSpawnOffsetX = (r % 20) << 11;
 ...
 r = rand();
 gStyleSpawnRotation = gStyleSpawnRotations + ((u32) r % 7) * 12;
@@ -76,7 +76,7 @@ merely holds a value in transit.
 ```c
 extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnYChoice1;
-extern s32 gStyleSpawnOffsetX;
+extern s32 sStyleSpawnOffsetX;
 extern s32 sStyleDay;
 extern s32 gStyleSpawnOffsetZ;
 extern u8 *gStyleSpawnRotation;
@@ -88,7 +88,7 @@ void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1) {
 
     rand();
     gStyleSpawnOffsetY = gStyleSpawnYChoice1;
-    gStyleSpawnOffsetX = (rand() % 20) << 11;
+    sStyleSpawnOffsetX = (rand() % 20) << 11;
     mod3 = sStyleDay % 3;
     gStyleSpawnOffsetZ = 0xA000;
     if (mod3 == 1) {
@@ -129,7 +129,7 @@ the only axis it had.
 The interim row in the table above is a trap I walked into and measured my way
 out of, so it is recorded rather than quietly dropped.
 
-The `gStyleSpawnOffsetX` retype moved this function **25/87 -> 10/87** and 2 words
+The `sStyleSpawnOffsetX` retype moved this function **25/87 -> 10/87** and 2 words
 long -> 3 words long. Read at face value that is a regression, and the
 standing rule (`DECOMPILATION_LEARNINGS` 3d, "Levers do not commute: if a
 residue MOVES rather than SHRINKS, revert before the next") says revert it.

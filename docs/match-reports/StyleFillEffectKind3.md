@@ -39,17 +39,17 @@ new -- a TYPE on the store's lvalue controlling scheduler motion.
 | build | body | score |
 | --- | --- | --- |
 | 1 | preserved (shared `t`) | 79/81, ins 0 / del 0 |
-| 2 | struct view over gStyleSpawnOffsetX..B0, direct field store `SP->fC = ...` | 73/81 (store goes direct `lui at`, loses retail's `q` register) |
+| 2 | struct view over sStyleSpawnOffsetX..B0, direct field store `SP->fC = ...` | 73/81 (store goes direct `lui at`, loses retail's `q` register) |
 | 3-5 | `p` reused as `q`, dedicated `t`, orders | 76/81, `li a0,3` falls out of the reorg-stolen join slot |
 | 6 | no `t` at all, plain `u8 **q` | 75/81 |
-| 7 | `q = &SP->fC` (struct view) + `&gStyleSpawnOffsetX` arg | 78/81 -- CSE `related_value` reproduces `addiu a1,v1,-0xc` from `&base.fC`; residue back to the store placement |
+| 7 | `q = &SP->fC` (struct view) + `&sStyleSpawnOffsetX` arg | 78/81 -- CSE `related_value` reproduces `addiu a1,v1,-0xc` from `&base.fC`; residue back to the store placement |
 | 9-10 | store inside a comma expression in arg 2 / arg 4 | 78/81, 73/81 |
 | 11 | **`PtrBoxK3 *q`, `q->p = ...`, no `t`** | **81/81, `OK: build matches retail`** |
-| 12 | same, with `q = &SP->fC` (struct view whose +0xC is a `PtrBoxK3`) and `&gStyleSpawnOffsetX` as the argument | 81/81 too |
+| 12 | same, with `q = &SP->fC` (struct view whose +0xC is a `PtrBoxK3`) and `&sStyleSpawnOffsetX` as the argument | 81/81 too |
 
 Build 11's form is the one committed (smaller local view, no struct laid
 over four separately-declared externs). Build 12 is recorded because it says
-the `- 0xC` was very probably `&struct` in the original: gStyleSpawnOffsetX..C0
+the `- 0xC` was very probably `&struct` in the original: sStyleSpawnOffsetX..C0
 look like one spawn-parameter struct whose +0xC member is itself a struct.
 Whole image green, `tools/check-nonmatching.sh` green.
 
@@ -197,7 +197,7 @@ sink below it. Two independent experiments prove it is this and nothing else:
 - Write the store as a plain global (`gStyleSpawnRotation = gStyleSpawnRotations;`, a
   `(mem (symbol_ref))` the scheduler CAN disambiguate) and **the load hoists
   immediately** -- but the `q` pointer then folds away and the address
-  argument regresses to `lui a1; addiu a1,%lo(gStyleSpawnOffsetX)` (73/81).
+  argument regresses to `lui a1; addiu a1,%lo(sStyleSpawnOffsetX)` (73/81).
 - Keep the pointer store and hoist the load by hand instead
   (`t = sStyleGrid;` as a local placed BEFORE the store): the ordering becomes
   **byte-for-byte retail's**, delay slot included, with *zero* structural
@@ -331,7 +331,7 @@ done would have produced.
 extern s32 sStyleDecorVariant;
 extern s32 sStyleDecorColors;
 extern u8 sStyleDecorColorsB[];
-extern u8 gStyleSpawnOffsetX[];
+extern u8 sStyleSpawnOffsetX[];
 extern s32 sStyleGrid;
 extern s32 gStyleSpawnYChoice2;
 extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);
@@ -351,7 +351,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
 
     SetupStyleSpawnParamsRandom(arg1, (void *) gStyleSpawnYChoice2);
     if (sStyleDecorVariant != 0 && sStyleDecorColors == (s32) sStyleDecorColorsB) {
-        *(s32 *) gStyleSpawnOffsetX = 0xFFFF5000;
+        *(s32 *) sStyleSpawnOffsetX = 0xFFFF5000;
         gStyleSpawnOffsetY = -0x2000;
         gStyleSpawnOffsetZ = 0;
         sStyleSpawnColors[0] = (s32) (sStyleKind3Colors + 3);
@@ -438,7 +438,7 @@ as `StyleFillEffectKind0`/`1`/`2`.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`sStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and sStyleGrid as the `SceneNode *` parent. Image byte-identical.
+`sStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared sStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and sStyleGrid as the `SceneNode *` parent. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 

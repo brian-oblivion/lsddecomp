@@ -54,7 +54,7 @@ this time reached through a vtable dispatch rather than a bare `jal`.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Retyped with the class's unification (include/StyleEffect.h): returns `StyleEffect *` and takes `(s32 kind, StyleEffectParams *params, SceneNode *parent, LongVec3 *pos)` -- kind 0..3 from StyleFillEffectKind0..3's constants, params the gStyleSpawnOffsetX block the reset slot copies, parent sStyleGrid (attachToParent's parent), pos the caller's position (AddVec3's input). Image byte-identical.
+Retyped with the class's unification (include/StyleEffect.h): returns `StyleEffect *` and takes `(s32 kind, StyleEffectParams *params, SceneNode *parent, LongVec3 *pos)` -- kind 0..3 from StyleFillEffectKind0..3's constants, params the sStyleSpawnOffsetX block the reset slot copies, parent sStyleGrid (attachToParent's parent), pos the caller's position (AddVec3's input). Image byte-identical.
 
 ## Track 7 (2026-09-27, round 96, charlie)
 

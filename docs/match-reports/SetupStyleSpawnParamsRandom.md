@@ -46,13 +46,13 @@ structural cause with a long tail.
 
 ### The cause: an INCOMPLETE-ARRAY declaration, not register allocation
 
-The inherited body accessed `gStyleSpawnOffsetX` through the unit's local view
-`extern u8 gStyleSpawnOffsetX[];` plus a cast:
+The inherited body accessed `sStyleSpawnOffsetX` through the unit's local view
+`extern u8 sStyleSpawnOffsetX[];` plus a cast:
 
 ```c
-*(s32 *) gStyleSpawnOffsetX = (rand() % 23) << 11;
+*(s32 *) sStyleSpawnOffsetX = (rand() % 23) << 11;
 if (rand() & 1) {
-    *(s32 *) gStyleSpawnOffsetX = -*(s32 *) gStyleSpawnOffsetX;
+    *(s32 *) sStyleSpawnOffsetX = -*(s32 *) sStyleSpawnOffsetX;
 }
 ```
 
@@ -74,9 +74,9 @@ three accesses, which is what cc1 emits for a plain scalar global assigned
 **by name**:
 
 ```
-lui $at, %hi(gStyleSpawnOffsetX);  sw $v0, %lo(gStyleSpawnOffsetX)($at)
-lui $v0, %hi(gStyleSpawnOffsetX);  lw $v0, %lo(gStyleSpawnOffsetX)($v0)
-lui $at, %hi(gStyleSpawnOffsetX);  sw $v0, %lo(gStyleSpawnOffsetX)($at)
+lui $at, %hi(sStyleSpawnOffsetX);  sw $v0, %lo(sStyleSpawnOffsetX)($at)
+lui $v0, %hi(sStyleSpawnOffsetX);  lw $v0, %lo(sStyleSpawnOffsetX)($v0)
+lui $at, %hi(sStyleSpawnOffsetX);  sw $v0, %lo(sStyleSpawnOffsetX)($at)
 ```
 
 With `$s0` spent on the address, the magic constant `0xB21642C9` was pushed
@@ -91,10 +91,10 @@ mechanism it implies.
 
 | # | declaration | expression | result |
 | --- | --- | --- | --- |
-| 1 | `extern u8 gStyleSpawnOffsetX[];` | `*(s32 *) gStyleSpawnOffsetX = v` | **5/110 RED** -- frame `-0x20`, extra `$s1`, ins 5 / del 5, 102 skeleton diffs |
-| 2 | `extern s32 gStyleSpawnOffsetX[];` | `gStyleSpawnOffsetX[0] = v` | **5/110 RED** -- byte-for-byte the SAME residue as (1) |
-| 3 | `extern s32 gStyleSpawnOffsetX;` | `*(s32 *) &gStyleSpawnOffsetX = v` | **110/110 GREEN**, image green |
-| 4 | `extern s32 gStyleSpawnOffsetX;` | `gStyleSpawnOffsetX = v` | **110/110 GREEN**, image green -- shipped |
+| 1 | `extern u8 sStyleSpawnOffsetX[];` | `*(s32 *) sStyleSpawnOffsetX = v` | **5/110 RED** -- frame `-0x20`, extra `$s1`, ins 5 / del 5, 102 skeleton diffs |
+| 2 | `extern s32 sStyleSpawnOffsetX[];` | `sStyleSpawnOffsetX[0] = v` | **5/110 RED** -- byte-for-byte the SAME residue as (1) |
+| 3 | `extern s32 sStyleSpawnOffsetX;` | `*(s32 *) &sStyleSpawnOffsetX = v` | **110/110 GREEN**, image green |
+| 4 | `extern s32 sStyleSpawnOffsetX;` | `sStyleSpawnOffsetX = v` | **110/110 GREEN**, image green -- shipped |
 
 Read off the table directly:
 
@@ -139,18 +139,18 @@ One declaration -- array to scalar. The casts went with it for readability,
 but per row (3) of the table they were not carrying any weight:
 
 ```c
-extern s32 gStyleSpawnOffsetX;          /* was: extern u8 gStyleSpawnOffsetX[]; */
+extern s32 sStyleSpawnOffsetX;          /* was: extern u8 sStyleSpawnOffsetX[]; */
 ...
-gStyleSpawnOffsetX = (rand() % 23) << 11;
+sStyleSpawnOffsetX = (rand() % 23) << 11;
 if (rand() & 1) {
-    gStyleSpawnOffsetX = -gStyleSpawnOffsetX;
+    sStyleSpawnOffsetX = -sStyleSpawnOffsetX;
 }
 ```
 
-`gStyleSpawnOffsetX` is a file-scope local view shared by four bodies in this unit,
+`sStyleSpawnOffsetX` is a file-scope local view shared by four bodies in this unit,
 so the retype is not local to this function. The two live pointer-take call
-sites were rewritten `New_StyleEffect(..., gStyleSpawnOffsetX, ...)` ->
-`New_StyleEffect(..., &gStyleSpawnOffsetX, ...)` (array decay and `&scalar` both
+sites were rewritten `New_StyleEffect(..., sStyleSpawnOffsetX, ...)` ->
+`New_StyleEffect(..., &sStyleSpawnOffsetX, ...)` (array decay and `&scalar` both
 compile to `lui`/`addiu`, so this is free), and the two preserved `#if 0`
 bodies that use the symbol (`StyleFillEffectKind3`, `SetupStyleSpawnParamsDayMod7`) were updated
 to the same spelling. **`StyleFillEffectKind1` is live and already matched and
@@ -161,7 +161,7 @@ the retype, so the retype cost it nothing.
 
 ```c
 extern s32 gStyleSpawnYChoices[];
-extern s32 gStyleSpawnOffsetX;
+extern s32 sStyleSpawnOffsetX;
 extern s32 gStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
 extern u8 *gStyleSpawnRotation;
@@ -173,9 +173,9 @@ void SetupStyleSpawnParamsRandom(void *arg0, void *arg1) {
         arg1 = (void *) gStyleSpawnYChoices[rand() & 3];
     }
     gStyleSpawnOffsetY = (s32) arg1;
-    gStyleSpawnOffsetX = (rand() % 23) << 11;
+    sStyleSpawnOffsetX = (rand() % 23) << 11;
     if (rand() & 1) {
-        gStyleSpawnOffsetX = -gStyleSpawnOffsetX;
+        sStyleSpawnOffsetX = -sStyleSpawnOffsetX;
     }
     gStyleSpawnOffsetZ = (rand() % 23) << 11;
     if (rand() & 1) {
@@ -196,7 +196,7 @@ declaration moved.
 
 Round 47/48 recorded two negatives on this residue and both stand:
 
-1. `*(volatile s32 *) gStyleSpawnOffsetX` -- inert. Correct: `volatile` governs
+1. `*(volatile s32 *) sStyleSpawnOffsetX` -- inert. Correct: `volatile` governs
    whether the MEMORY ACCESS may be elided or reordered, and the thing being
    cached here is the ADDRESS-OF computation, which is not the access.
 2. A bare `__asm__("")` after the first store -- inert. Correct, and per
@@ -329,11 +329,11 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
 ```c
 /* MATCHED round 64 (charlie), 110/110, ins 0 / del 0, one build.  The
  * round-46..48 residue (an extra callee-saved register caching
- * `gStyleSpawnOffsetX`'s address, frame -0x18 -> -0x20) was NOT register identity:
- * `gStyleSpawnOffsetX` was declared as an INCOMPLETE ARRAY.  Every reference to
- * `extern T gStyleSpawnOffsetX[]` is an array decay, i.e. an address-take VALUE,
+ * `sStyleSpawnOffsetX`'s address, frame -0x18 -> -0x20) was NOT register identity:
+ * `sStyleSpawnOffsetX` was declared as an INCOMPLETE ARRAY.  Every reference to
+ * `extern T sStyleSpawnOffsetX[]` is an array decay, i.e. an address-take VALUE,
  * which cc1 2.6.3's CSE promotes into a callee-saved register across the
- * intervening `rand()` calls; declared `extern s32 gStyleSpawnOffsetX` it emits
+ * intervening `rand()` calls; declared `extern s32 sStyleSpawnOffsetX` it emits
  * retail's absolute `lui $at, %hi / sw %lo($at)` fresh at each of the three
  * accesses.  Four in-tree variants pin the axis to ARRAY vs SCALAR: the
  * element type (`u8[]` vs `s32[]`) and the cast spelling (`*(s32 *) &D_X`

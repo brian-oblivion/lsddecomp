@@ -26,7 +26,7 @@ void **StyleFillEffectKind0(void **arg0, s32 arg1, void *arg2) {
     ...
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arg0 = New_StyleEffect((void *) 0, &gStyleSpawnOffsetX, (void *) sStyleGrid, arg2);
+        *arg0 = New_StyleEffect((void *) 0, &sStyleSpawnOffsetX, (void *) sStyleGrid, arg2);
         arg0++;
     }
     return arg0;
@@ -128,7 +128,7 @@ extern u8 gStyleSpawnScales[];
 extern s32 gStyleSpawnYChoices[];
 extern u8 *gStyleSpawnScale;
 extern s32 gStyleSpawnTableIndex;
-extern u8 gStyleSpawnOffsetX[];
+extern u8 sStyleSpawnOffsetX[];
 extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);   /* this unit, cold */
 extern void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1);   /* this unit, cold,
                                                          signature widened */
@@ -153,7 +153,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     }
     for (i = 0; i < arg1; i++) {
         fp(arg2, (void *) t3);
-        *arr = New_StyleEffect((void *) 0, gStyleSpawnOffsetX, (void *) sStyleGrid, arg2);
+        *arr = New_StyleEffect((void *) 0, sStyleSpawnOffsetX, (void *) sStyleGrid, arg2);
         arr++;
     }
     return (void *) arr;
@@ -244,7 +244,7 @@ iteration via a `sStyleDay % 7` test. STALL, 93/99, whole-function
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-`sStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared gStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and sStyleGrid as the `SceneNode *` parent. Image byte-identical.
+`sStyleEffectSlots` holds StyleEffect objects (New_StyleEffect), so the walking pointer is `StyleEffect **` and the position `LongVec3 *`; `kind` is passed as a plain `s32` (was `(void *) N`), the params block as `(StyleEffectParams *)` over the separately-declared sStyleSpawnOffsetX.. symbols (one 0x24-byte StyleEffectParams in the bytes; left as they are, a track 4b job), and sStyleGrid as the `SceneNode *` parent. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 
@@ -252,7 +252,7 @@ iteration via a `sStyleDay % 7` test. STALL, 93/99, whole-function
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_8008E0A4`..`D_8008E0C0` | `gStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `gStyleSpawnRotation`, `gStyleSpawnScale`, `sStyleSpawnModelLayout`, `gStyleSpawnTableIndex`, `sStyleSpawnColors` | A | the 0x24-byte block passed to New_StyleEffect as its `StyleEffectParams` (include/StyleEffect.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsRandom's match depends on the scalar declarations. |
+| `D_8008E0A4`..`D_8008E0C0` | `sStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `gStyleSpawnRotation`, `gStyleSpawnScale`, `sStyleSpawnModelLayout`, `gStyleSpawnTableIndex`, `sStyleSpawnColors` | A | the 0x24-byte block passed to New_StyleEffect as its `StyleEffectParams` (include/StyleEffect.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsRandom's match depends on the scalar declarations. |
 | `D_800871C8` | `gStyleSpawnScales` | A | 5 Ratio16 triples, one picked by `rand() % 5` into the params' scale. |
 | `D_80087328` | `gStyleSpawnYChoices` | A | 4 words {-0x1800, -0x2800, -0x3800, -0x5000}: the offset-y values SetupStyleSpawnParamsRandom picks from. |
 

@@ -1238,7 +1238,7 @@ void ApplyStyleDecorationIfSet(void) {
  *    position and the viewport's clear colour by the view point's y offset
  *    from its reference point;
  *  - the effect slots: StyleEffect objects of kinds 0..3 (sStyleEffectSlots)
- *    built from one parameter block, gStyleSpawnOffsetX..sStyleSpawnColors,
+ *    built from one parameter block, sStyleSpawnOffsetX..sStyleSpawnColors,
  *    that StyleFillEffectKindN and SetupStyleSpawnParamsRandom/B fill in; each
  *    tick updates them with the target position;
  *  - two positional sound cues (sStyleCueSlots, in sStyleCueSlotPool): a
@@ -1578,8 +1578,8 @@ extern s32 gStyleSpawnYChoices[];
 extern Ratio16 *gStyleSpawnScale;
 extern s32 gStyleSpawnTableIndex;
 /* The first word of the StyleEffectParams block every effect is built from
- * (gStyleSpawnOffsetX .. sStyleSpawnColors, separate symbols in the image). */
-extern s32 gStyleSpawnOffsetX;
+ * (sStyleSpawnOffsetX .. sStyleSpawnColors, separate symbols in the image). */
+extern s32 sStyleSpawnOffsetX;
 extern void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY);
 extern void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY);
 
@@ -1605,7 +1605,7 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     for (i = 0; i < count; i++) {
         setup(pos, offsetY);
         *slots =
-            New_StyleEffect(0, (StyleEffectParams *)&gStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
+            New_StyleEffect(0, (StyleEffectParams *)&sStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
         slots++;
     }
     return slots;
@@ -1625,7 +1625,7 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
     for (i = 0; i < count; i++) {
         SetupStyleSpawnParamsRandom(pos, offsetY);
         *slots =
-            New_StyleEffect(1, (StyleEffectParams *)&gStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
+            New_StyleEffect(1, (StyleEffectParams *)&sStyleSpawnOffsetX, (SceneNode *)sStyleGrid, pos);
         slots++;
     }
     return slots;
@@ -1655,7 +1655,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
 
     SetupStyleSpawnParamsRandom(pos, gStyleSpawnYChoice2);
     if (sStyleDecorVariant != 0 && sStyleDecorColors == sStyleDecorColorsB) {
-        gStyleSpawnOffsetX = -45056;
+        sStyleSpawnOffsetX = -45056;
         gStyleSpawnOffsetY = -8192;
         gStyleSpawnOffsetZ = 0;
         sStyleSpawnColors[0] = (s32)sStyleKind3Colors[1];
@@ -1732,16 +1732,16 @@ extern s32 sStyleSpawnModelLayout;
 /* Randomises the spawn parameters: offset y (offsetY, or a random choice
  * when 0), x and z offsets of 0..22 steps of 2048 either side, a rotation
  * and a model layout. `pos` is unused.
- * MATCHING: gStyleSpawnOffsetX is declared a scalar, not an array (an array
+ * MATCHING: sStyleSpawnOffsetX is declared a scalar, not an array (an array
  * decay is kept in a saved register across the rand() calls). */
 void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     if (offsetY == 0) {
         offsetY = gStyleSpawnYChoices[rand() & 3];
     }
     gStyleSpawnOffsetY = offsetY;
-    gStyleSpawnOffsetX = (rand() % 23) << 11;
+    sStyleSpawnOffsetX = (rand() % 23) << 11;
     if (rand() & 1) {
-        gStyleSpawnOffsetX = -gStyleSpawnOffsetX;
+        sStyleSpawnOffsetX = -sStyleSpawnOffsetX;
     }
     gStyleSpawnOffsetZ = (rand() % 23) << 11;
     if (rand() & 1) {
@@ -1766,7 +1766,7 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
 
     rand();
     gStyleSpawnOffsetY = gStyleSpawnYChoice1;
-    gStyleSpawnOffsetX = (rand() % 20) << 11;
+    sStyleSpawnOffsetX = (rand() % 20) << 11;
     dayMod3 = sStyleDay % 3;
     gStyleSpawnOffsetZ = 40960;
     if (dayMod3 == 1) {
