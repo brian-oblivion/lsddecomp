@@ -74,3 +74,10 @@ typed it `s32`, and its one caller ignores $v0. Bytes unchanged.
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (gDrawSystemMethods unified). Byte-identical.
+
+## Track 7 (round 101, charlie)
+
+`BMemPMgrAlloc(0x14)` is now `BMemPMgrAlloc(sizeof(IntermediateBaseInitArgs))`:
+the block is `self->aux`, typed `IntermediateBaseInitArgs *`, and that struct
+(include/IntermediateBase.h) is five pointers, 0x14 bytes, every one of which
+this body writes. Byte-identical. The Final C above is the pre-track-7 text.

@@ -3,7 +3,8 @@
  * its ctor (CD init, data source, default screen), its finalize, the screen
  * size setter, initSystems (display, sound and 3D bring-up, and the shared
  * task argument block), a no-op slot, the never-returning main loop that
- * drives the subclass's hooks, and the table getter.
+ * drives the subclass's hooks by runTitleMenu's ApplicationLoopStatus, and
+ * the table getter.
  */
 #include "common.h"
 #include "Application.h"
@@ -16,7 +17,7 @@ extern int CdInit(void);
 extern void SsInit(void);
 extern void GsInit3D(void);
 
-extern void SetActiveDataSource(s32 arg0); /* GameApplicationFileResource */
+extern void SetActiveDataSource(s32 source); /* src/GameApplicationFileResource.c */
 extern void *BMemPMgrAlloc(s32 size);
 
 void Application__Application(Application *self, s32 dataSource) {
@@ -44,7 +45,7 @@ void Application__InitSystems(Application *self, DrawSystem *drawSystem, struct 
         drawSystem->methods->initGraph(drawSystem, &self->dims, self->vramMode);
         SsInit();
         GsInit3D();
-        self->aux = BMemPMgrAlloc(0x14);
+        self->aux = BMemPMgrAlloc(sizeof(IntermediateBaseInitArgs));
         self->aux->drawSystem = (BasicClass *)drawSystem;
         self->aux->pad = (BasicClass *)pad;
         self->aux->frameClock = NULL;
@@ -65,16 +66,16 @@ void Application__RunMainLoop(Application *self) {
             self->methods->playOpeningMovie(self);
             for (;;) {
                 status = self->methods->runTitleMenu(self);
-                if (status == 1) {
+                if (status == APPLICATION_LOOP_SLOT5C) {
                     self->methods->slot5C(self);
                     continue;
                 }
-                if (status == 2) {
+                if (status == APPLICATION_LOOP_DAY) {
                     if (self->methods->runDayTask(self)) {
                         self->methods->playEndingMovie(self);
                     }
                 }
-                if (status == 0) {
+                if (status == APPLICATION_LOOP_OPENING) {
                     break;
                 }
             }
