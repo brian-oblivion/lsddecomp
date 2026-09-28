@@ -819,18 +819,26 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
         region_rows.append({"units": reg, "ph_units": ph_units, "ph_headers": ph_hdrs, "state": state,
                             "blockers": blockers, "joins": joins, "splits": splits})
     open8 = [r for r in region_rows if r["state"] in ("ready", "waiting")]
+    # A placeholder-named header whose unit a merge absorbed belongs to no
+    # region, so the region test above cannot see it (round 102:
+    # class_3bb8c.h, orphaned by round 101's merge, left track 8 "done").
+    in_regions = {u for reg in regions for u in reg}
+    orphans8 = [h for h in rd["placeholder_headers"]
+                if Path(h).stem not in in_regions and f"include/{h}" not in parked8]
     if t8["status"] != "auto":
         s8 = t8["status"]
     elif not phase2:
         s8 = "waiting (phase 2 opens when track 5 is done)"
     else:
-        s8 = "done" if not open8 else "open"
+        s8 = "done" if not (open8 or orphans8) else "open"
 
     # --- track 9: close-out ---------------------------------------------------
     ticked9 = t9["checklist"]
     if t9["status"] != "auto":
         s9 = t9["status"]
-    elif not (s6 == "done" and s7 == "done" and s8 == "done"):
+    elif not (s6 == "done" and s7 == "done" and s8 == "done") and not any(ticked9.values()):
+        # Once opened (an item ticked), it stays open beside a reopened
+        # earlier track, as phase 2 stays open beside phase 1.
         s9 = "waiting (opens when tracks 6, 7 and 8 are done)"
     else:
         s9 = "done" if all(ticked9.get(k) for k in TRACK9_ITEMS) else "open"
@@ -850,7 +858,8 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
               "regions_done": sum(r["state"] == "done" for r in region_rows),
               "regions_ready": sum(r["state"] == "ready" for r in region_rows),
               "placeholder_units": rd["totals"]["placeholder_units"],
-              "placeholder_headers": rd["totals"]["placeholder_headers"], "tu_model_valid": tu_ok},
+              "placeholder_headers": rd["totals"]["placeholder_headers"], "tu_model_valid": tu_ok,
+              "orphan_headers": orphans8},
         "9": {"status": s9, "checklist": {k: bool(ticked9.get(k)) for k in TRACK9_ITEMS},
               "history": rd["totals"]["history"] + rd["totals"]["header_history"]},
         "_class_jobs": class_jobs, "_homes": homes, "_types": types, "_todo7": todo7,
@@ -1311,6 +1320,12 @@ def jobs(d, n):
                             f"{'; ' + '; '.join(ev) if ev else ''}) (units: {','.join(us)})",
                        MODELS["files_runner"]))
             batch.clear()
+        for h in t["8"]["orphan_headers"]:
+            us = sony_includers(h)
+            q8.append(("8", f"re-home include/{h}: a placeholder-named header no unit owns; move each "
+                            f"section into the header that owns its subject (archived track 4b), or rename "
+                            f"it for what it holds (units: include/{h},{','.join(us)})",
+                       MODELS["files_runner"]))
         for r in p2["_regions"]:
             if r["state"] != "ready":
                 continue
