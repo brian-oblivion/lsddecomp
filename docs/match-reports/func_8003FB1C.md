@@ -110,7 +110,7 @@ translation vector on a copied identity matrix.
 
 Neither declaration was moved. `screen_widgets` does not include
 `class_3bb8c.h`, so there is no collision, and the matrix view lives in
-`src/ui/screen_widgets.c` rather than in the six-unit `Task.h`. This is the
+`src/ui/screen_widgets.c` rather than in the six-unit `task.h`. This is the
 multiple-independent-local-views convention working as intended: the
 cross-reference belongs in a report, not in a shared header.
 

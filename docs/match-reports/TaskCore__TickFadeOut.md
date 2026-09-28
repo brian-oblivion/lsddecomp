@@ -6,13 +6,13 @@
 
 > Renamed from `func_8003CD48` on 2026-09-24 (tools/rename.py). Address 0x8003cd48.
 
-**Unit:** Task · **Size:** 38 words · **Result:** byte-exact
+**Unit:** task · **Size:** 38 words · **Result:** byte-exact
 
 ## What it does
 
-`Obj86B60Methods::slotC4` (confirmed by `Task.h`'s own header comment,
+`Obj86B60Methods::slotC4` (confirmed by `task.h`'s own header comment,
 which already recorded this slot as "external (TaskCore__TickFadeOut)" from the
-`Task` unit's own `classtable.py` work before this unit ever attempted
+`task` unit's own `classtable.py` work before this unit ever attempted
 the function). Computes a greyscale-ish colour byte from two fields, fills a
 3-byte buffer with it, forwards the buffer to two other objects, and returns
 whether the byte exceeds a threshold.
@@ -62,10 +62,10 @@ s32 c: li v0,0x80 / subu v0,v0,v1   (matches retail)
 
 ## Header note
 
-No changes to `include/Task.h` were needed — `self->unk1C`,
+No changes to `include/task.h` were needed — `self->unk1C`,
 `self->unk84`, `self->methods->slotE4`, `self->unk78`,
 `self->unk78->methods->slotB8` were all already modelled from the sibling
-unit's (`Task`) prior work on this same class, and every field/slot
+unit's (`task`) prior work on this same class, and every field/slot
 type matched this function's actual usage with no adjustment.
 
 ### Proposed learning

@@ -58,7 +58,7 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 - **Naming: `D_80011778` -> `sGraphTimPath`** (tier A): the rodata string `"ETC\HGRAPH.TIM"`, Reset's path for `setSubHandle`; its only user.
 - Constants in decimal: `unk2C = 400` (the 0x190; TaskCore's reset writes 300, TitleMenuTaskObjF writes 400; it becomes Viewport's `unk44`, one factor of each buffer's packet area), `setFrameBound(10)` (frameBound = 10 * 20). `setSubHandle`'s handle is `NULL`. Zero bytes changed.
-- Left: `unk2C` is TaskCore's field, accessed in Task.c and TitleMenuTaskObjF.c too: a name is proposed to the head rather than applied.
+- Left: `unk2C` is TaskCore's field, accessed in task.c and TitleMenuTaskObjF.c too: a name is proposed to the head rather than applied.
 
 ## Track 10 (2026-09-28, round 104, echo)
 

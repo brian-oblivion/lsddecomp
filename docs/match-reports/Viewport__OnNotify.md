@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E8B8` on 2026-09-23 (tools/rename.py). Address 0x8003e8b8.
 
-Unit: `Task`. Round 14, runner delta. 44/44 words, full match.
+Unit: `task`. Round 14, runner delta. 44/44 words, full match.
 
 ## Signature
 
@@ -56,7 +56,7 @@ finding.
 
 ## Header changes
 
-`include/Task.h`: `Unk18ObjMethods` gains `slot94`/`slot98` (both
+`include/task.h`: `Unk18ObjMethods` gains `slot94`/`slot98` (both
 `void (*)(Unk18Obj*, GenericObj*, s32)`, occupants `Viewport__OnFrameClockEvent`/
 `Viewport__OnDrawSystemEvent`, still queued as of this report) plus the corrective
 `pad09C` gap described above.

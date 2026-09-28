@@ -34,7 +34,7 @@ That is the signature of a THIRD parameter being forwarded unchanged: the
 function's own second parameter arrives in `$a1` and is never moved, because
 it is already sitting in the exact register the call needs. This project has
 the same idiom at several other call sites already (`src/world/ObjMStyleActor.c`,
-`src/app/Task.c`, `src/ui/TitleMenuTaskObjF.c`, `src/world/TodActor.c`:
+`src/app/task.c`, `src/ui/TitleMenuTaskObjF.c`, `src/world/TodActor.c`:
 `obj->methods->slot80(obj, arg1, 0x60, 0x60)` / `(..., 0x7F, 0x7F)` /
 `(..., 0x6E, 0x6E)`), so recognizing it here just meant trusting the pattern
 instead of the header's (incomplete) prior reading.

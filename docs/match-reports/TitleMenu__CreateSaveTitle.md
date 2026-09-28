@@ -100,7 +100,7 @@ SLPS_015.56`.
   fields, offsets +0x0AA/+0x0AB/+0x0AC) via a `pad004[0x0AA-0x004]` gap.
   Noted in the new field's comment: `TitleMenuUnkB0ObjMethods_3bb8c_d`'s
   own slot offsets (`release`+0x004, `slot4C`+0x04C) numerically match
-  `Task.h`'s `Unk64ElemMethods`/this header's own `FieldM7CMethods`
+  `task.h`'s `Unk64ElemMethods`/this header's own `FieldM7CMethods`
   (slot4/slot4C/slotB8 at 0x004/0x04C/0x0B8) -- suggestive that `nameField` is
   the SAME real class those units call `Unk64Elem`/`FieldM7C`, consistent
   with `New_TextRow`'s return value landing there.

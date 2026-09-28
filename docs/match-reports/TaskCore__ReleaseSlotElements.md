@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003D6D4` on 2026-09-24 (tools/rename.py). Address 0x8003d6d4.
 
-**Unit:** Task · **Size:** 26 words · **Result:** byte-exact, first attempt
+**Unit:** task · **Size:** 26 words · **Result:** byte-exact, first attempt
 
 ## What it does
 
@@ -22,7 +22,7 @@ void TaskCore__ReleaseSlotElements(Obj86B60 *self)
 
 ## Header additions
 
-`include/Task.h`:
+`include/task.h`:
 
 - New fields `unk5C`/`unk64` on `Obj86B60`, both `void **`, carved out of
   existing padding (`0x05C`-`0x070`, previously undifferentiated). No

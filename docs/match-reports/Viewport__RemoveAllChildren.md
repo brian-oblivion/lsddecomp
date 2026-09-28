@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E874` on 2026-09-19 (tools/rename.py). Address 0x8003e874.
 
-**Unit:** Task · **Size:** 17 instructions
+**Unit:** task · **Size:** 17 instructions
 
 ## What it does
 
@@ -32,14 +32,14 @@ void Viewport__RemoveAllChildren(Obj86B60 *self)
 - `Obj86B60::unkC` (+0x00C, pointer to `Obj86B60UnkC`), `unk10` (+0x010,
   `s32`, meaning unknown beyond "zeroed here"), `unk30` (+0x030, `s32`,
   same) -- all new fields carved out of previously-opaque padding in
-  `include/Task.h`.
+  `include/task.h`.
 - This unit's own local view of the shared `BasicClass` ancestor table
   (`BasicClassMethodsCC8C`, only `slot18` typed) and its getter
   `GetBasicClassMethods(void)`.
 
 ## Provenance
 
-round 12 (2026-09-03), runner alpha, unit Task. Matched on the
+round 12 (2026-09-03), runner alpha, unit task. Matched on the
 first build.
 
 ## Naming

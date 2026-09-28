@@ -64,10 +64,10 @@ different values" as an earlier draft of that research doc claimed).
 This function's retype (`SubHandleObj *` -> `FadeBoxObj *`) was
 committed alongside a header change that used `ClassEAC0Obj` at a line
 position ABOVE that type's own forward declaration -- a parse error in
-`Task.c` (a DIFFERENT unit) that made `make` skip the final link
+`task.c` (a DIFFERENT unit) that made `make` skip the final link
 entirely, leaving `build/SLPS_015.56` stale. `funcdiff.py`'s own
 STALE-BUILD guard did not catch it because the STALE object here was
-`Task.c.o`, not `screen_widgets.c.o` -- this unit's own object kept
+`task.c.o`, not `screen_widgets.c.o` -- this unit's own object kept
 rebuilding fine, so nothing about the guard's usual signal (source newer
 than binary) looked wrong; the binary just never reached the final link
 step at all. Caught only by cross-checking EVERY function's LINKED

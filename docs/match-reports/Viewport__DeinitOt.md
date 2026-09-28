@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EDF4` on 2026-09-23 (tools/rename.py). Address 0x8003edf4.
 
-Unit: `Task`. Round 14, runner delta. 19/19 words, full match.
+Unit: `task`. Round 14, runner delta. 19/19 words, full match.
 
 ## Signature
 
@@ -32,7 +32,7 @@ void Viewport__DeinitOt(Unk18Obj *self) {
 
 ## Header changes
 
-`include/Task.h`: new extern `DrawSync(s32 a0)` (PsyQ library,
+`include/task.h`: new extern `DrawSync(s32 a0)` (PsyQ library,
 `asm/psyq_GsLinkObject4.s`, not decompiled).
 
 ## Naming
@@ -45,13 +45,13 @@ Renamed from `Unk18Obj__DeinitOt`. Slot +0x090 `deinitOt`; frees `ot[0]`, the st
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/app/Task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: none: `DrawSync(0)`'s int return is ignored, as before.
+src/app/task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: none: `DrawSync(0)`'s int return is ignored, as before.
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 
 ```c
 /* Sony's `DrawSync` (libgpu/sys, fingerprint exact vs the disc corpus, not
- * yet linked from an SDK object). LOCAL to this unit, not Task.h --
+ * yet linked from an SDK object). LOCAL to this unit, not task.h --
  * see the note on ResetGraph/GsClearOt above: a second declaration of this
  * name in a header six units include is exactly where LIBGPU.H's own
  * prototype (`extern int DrawSync(int mode);`) will one day collide. This

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C48C` on 2026-09-24 (tools/rename.py). Address 0x8003c48c.
 
-Unit: `Task` · Size: 36 instructions (0x90 bytes) · Round 23 (2026-09-07),
+Unit: `task` · Size: 36 instructions (0x90 bytes) · Round 23 (2026-09-07),
 head. **First of the five `REOPENED -- ASSIGNABLE` functions to be closed, which
 is the measurement that says the round-21 `addiu_at` resolution actually
 returned ground rather than merely retiring paperwork.**
@@ -71,7 +71,7 @@ identical call shapes and needed no encouragement.
 `Obj86B60Methods` slots `+0x074`..`+0x084`, previously inside
 `u8 pad074[0x090 - 0x074]`. **The pad split is additive and preserves the
 original 0x1C total** (5 pointers = 0x14, plus a new `pad088` of 8) — required,
-because `include/Task.h` is shared by six units and any offset movement
+because `include/task.h` is shared by six units and any offset movement
 would have changed an already-matched function's codegen elsewhere. Verified by
 the whole-image SHA1, which is the only thing that can see it.
 
@@ -118,7 +118,7 @@ is its first realised match.
 `gTaskCoreMethods` (the base table), `gTitleMenuMethods` and
 `gGraphRoomMethods` identically (unoverridden by either derived class --
 `tools/classtable.py gTaskCoreMethods`/`gTitleMenuMethods`/`gGraphRoomMethods`).
-`IntermediateBase__OnNotify` (Task.c) dispatches an incoming `EventArg` whose
+`IntermediateBase__OnNotify` (task.c) dispatches an incoming `EventArg` whose
 `target->header & 0xF == 2` through `self->methods->slot58`, matching the
 already-established `onTag1Notify` (header==1, slot54) naming convention one
 slot up. Two independent pieces of evidence agree (the dispatcher's own

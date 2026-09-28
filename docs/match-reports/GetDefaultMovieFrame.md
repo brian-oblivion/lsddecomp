@@ -4,12 +4,12 @@
 
 > Renamed from `func_8003DFCC` on 2026-09-19 (tools/rename.py). Address 0x8003dfcc.
 
-**Unit:** Task · **Size:** 4 instructions
+**Unit:** task · **Size:** 4 instructions
 
 ## What it does
 
 A tiny getter: returns the address of the static table `sDefaultMovieFrame`, a
-3-word struct per `include/Task.h`'s own `StreamTaskInitData` local
+3-word struct per `include/task.h`'s own `StreamTaskInitData` local
 view (that unit's `StreamTask__StreamTask` uses it as the 5th/stack argument to a
 constructor call, and `GetDefaultMovieFrame()`'s return value feeds the same
 3-word copy). This unit never dereferences it, only returns its address,
@@ -28,7 +28,7 @@ void *GetDefaultMovieFrame(void)
 
 ## Provenance
 
-round 12 (2026-09-03), runner alpha, unit Task. Matched on the
+round 12 (2026-09-03), runner alpha, unit task. Matched on the
 first build.
 
 ## Naming
@@ -36,14 +36,14 @@ first build.
 **GetDefaultMovieFrame** (renamed from `func_8003DFCC`, round 55,
 runner alpha). Tier A: pure leaf getter, returns `&sDefaultMovieFrame`
 (formerly `D_8006E854`), already declared `StreamTaskInitData *func_8003DFCC(void)`
-in `include/Task.h` and used there (`Task.c`) as the fallback
+in `include/task.h` and used there (`task.c`) as the fallback
 default when a caller supplies no init data -- "Default" is the confirmed
 mechanic (a fixed fallback constant), not a guess.
 
 
 ## Track 6 (2026-09-27, round 99, runner bravo)
 
-Returns `DrawRect *` now (was `void *` here and a `StreamTaskInitData *` prototype in Task.h; the local type is deleted, StreamTask__StreamTask.md). The C above is the round-12 match; the live body is `return &sDefaultMovieFrame;` over `extern DrawRect sDefaultMovieFrame;`. Byte-identical.
+Returns `DrawRect *` now (was `void *` here and a `StreamTaskInitData *` prototype in task.h; the local type is deleted, StreamTask__StreamTask.md). The C above is the round-12 match; the live body is `return &sDefaultMovieFrame;` over `extern DrawRect sDefaultMovieFrame;`. Byte-identical.
 
 Names, through `tools/rename.py`:
 

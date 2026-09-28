@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003EE88` on 2026-09-23 (tools/rename.py). Address 0x8003ee88.
 
-Unit: `Task`. Round 14, runner delta. 14/14 words, full match.
+Unit: `task`. Round 14, runner delta. 14/14 words, full match.
 
 ## Signature
 
@@ -29,7 +29,7 @@ void Viewport__OnDrawSystemEvent(Unk18Obj *self, GenericObj *arg1, s32 arg2) {
 
 ## Header changes
 
-`include/Task.h`: `Unk18ObjMethods` gains `slotA4` (`+0x0A4`,
+`include/task.h`: `Unk18ObjMethods` gains `slotA4` (`+0x0A4`,
 `void (*)(Unk18Obj*)`), splitting the pad between `slot9C` and the
 already-typed `slotA8`.
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E770` on 2026-09-19 (tools/rename.py). Address 0x8003e770.
 
-**Unit:** Task · **Size:** 33 instructions
+**Unit:** task · **Size:** 33 instructions
 
 ## What it does
 
@@ -77,7 +77,7 @@ a close cousin one level of indirection removed).
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. Matched on the
+round 13 (2026-09-03), runner alpha, unit task. Matched on the
 first build.
 
 ## Naming
@@ -95,11 +95,11 @@ shape. Mirrored exactly by `Viewport__RemoveChild`.
 - `Unk18ObjMethods::slot10` -> `addChild` (tier A). Offset `+0x010` matches
   the canonical `BasicClassMethods::addChild` offset exactly, and this
   header already documents it as "inherited BasicClass addChild". NOT
-  renamed directly: `Task.c`'s `Viewport__AttachViewChild` also dispatches
+  renamed directly: `task.c`'s `Viewport__AttachViewChild` also dispatches
   `m->slot10(self, a1)` on a `Unk18Obj *`, so this field is shared with
   that unit. Head applies by type scope (rename in `Unk18ObjMethods`'s own
-  definition, fix the compiler-listed accessors in both `Task.c`
-  and `Task.c`, oracle).
+  definition, fix the compiler-listed accessors in both `task.c`
+  and `task.c`, oracle).
 
 ## Track 4 (2026-09-25, round 85, bravo)
 

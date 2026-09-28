@@ -83,7 +83,7 @@ which is the procedure working in the direction where it can work. for the head
 `arg2` -> `event`. **Tier B**, same evidence. Cross-unit and the widest
 replace of the round: 13 units access `->slot38`
 (`TitleMenuTaskObjF/f/i/j/k.c`, `DayTaskStageMap.c`, `class_3ac78.c`,
-`Task/d.c`, `TodActor.c`, `scene_node.c`, `code_d294_b.c`, plus
+`task/d.c`, `TodActor.c`, `scene_node.c`, `code_d294_b.c`, plus
 this unit). Worth doing alone rather than batched.
 
 ## Round 91 polish (delta, track 7)

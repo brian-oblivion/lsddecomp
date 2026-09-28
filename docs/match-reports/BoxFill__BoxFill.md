@@ -45,7 +45,7 @@ an s32 field into the u16 `boxW`/`boxH` still reads only the low halfword
 halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
 became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
 BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
-its caller in Task passes an `s32 size[2]`).
+its caller in task passes an `s32 size[2]`).
 
 ## Track 7 (round 100, charlie)
 

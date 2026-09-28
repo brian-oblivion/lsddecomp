@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003BDF4` on 2026-09-23 (tools/rename.py). Address 0x8003bdf4.
 
-**Unit:** Task · **Size:** 26 words · **Status:** MATCHED (26/26)
+**Unit:** task · **Size:** 26 words · **Status:** MATCHED (26/26)
 
 ## Summary
 
@@ -60,4 +60,4 @@ Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, i
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4Obj view is gone and Task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The +0x04C call is `abort`. Byte-identical.
+The player is a MoviePlayer (`include/MoviePlayer.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The +0x04C call is `abort`. Byte-identical.

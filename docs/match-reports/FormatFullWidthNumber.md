@@ -60,12 +60,12 @@ and a length mismatch.
 
 Verified `build exit=2` with zero compile-error hits, so the score is from a
 fresh build. Splice this in place of the `INCLUDE_ASM` and it compiles as
-written; `Obj6EAC0` comes from `include/Task.h`, already included by the
+written; `Obj6EAC0` comes from `include/task.h`, already included by the
 unit.
 
 ```c
 /* Psy-Q libc, called by name from this unit only -- declared HERE rather than in
- * include/Task.h, which six units share (a cross-unit prototype in a
+ * include/task.h, which six units share (a cross-unit prototype in a
  * shared header is the one collision git does not mark). strcpy's RETURN value
  * is load-bearing below: with -fno-builtin the compiler cannot know it equals
  * the destination, so `strlen(strcpy(d, s))` and `strcpy(d, s); strlen(d)`
@@ -349,7 +349,7 @@ differs — so still banned from a forcing fix. `INCLUDE_ASM` restored;
 ```c
 #if 0
 /* Psy-Q libc, called by name from this unit only -- declared HERE rather than in
- * include/Task.h, which six units share (a cross-unit prototype in a
+ * include/task.h, which six units share (a cross-unit prototype in a
  * shared header is the one collision git does not mark). strcpy's RETURN value
  * is load-bearing below: with -fno-builtin the compiler cannot know it equals
  * the destination, so `strlen(strcpy(d, s))` and `strcpy(d, s); strlen(d)`

@@ -138,9 +138,9 @@ PY
 
 | where | instances |
 | --- | --- |
-| carved, queued now | **5** — `New_DayTask`, `New_TimedTask` (class_39e08); `New_StageMap` (class_3ac78); `New_StreamTask`, `New_TaskCore` (Task) |
+| carved, queued now | **5** — `New_DayTask`, `New_TimedTask` (class_39e08); `New_StageMap` (class_3ac78); `New_StreamTask`, `New_TaskCore` (task) |
 | `class_3bb8c` (uncarved) | 11 |
-| `Task` (uncarved) | 4 |
+| `task` (uncarved) | 4 |
 | `code_179d8` (uncarved) | 3 |
 | `SceneNode` (uncarved) | 1 |
 
@@ -164,8 +164,8 @@ Five instances, all byte-exact, all with `return NULL;` last:
 | `New_StageMap` | class_39e08 | 27/27 |
 | `New_TimedTask` | class_39e08 | 27/27 |
 | `New_DayTask` | class_39e08 | 31/31 |
-| `New_StreamTask` | Task | 36/36 |
-| `New_TaskCore` | Task | 31/31 |
+| `New_StreamTask` | task | 36/36 |
+| `New_TaskCore` | task | 31/31 |
 
 ### Still open: the `nop` sub-shape
 
@@ -189,7 +189,7 @@ without a new idea.
 
 The census below counts 24 corpus-wide. Five are closed and one is the open
 sub-shape, leaving **18 in still-uncarved segments** (`class_3bb8c` 11,
-`Task` 4, `code_179d8` 3, `SceneNode` 1). Each should be a near-free
+`task` 4, `code_179d8` 3, `SceneNode` 1). Each should be a near-free
 match the moment its segment is carved, provided it screens as the
 `move $v0, $zero` shape. That makes those four segments materially more
 attractive as carve targets than their raw function counts suggest.

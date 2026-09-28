@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003CA94` on 2026-09-24 (tools/rename.py). Address 0x8003ca94.
 
-**Unit:** Task · **Size:** 22 instructions
+**Unit:** task · **Size:** 22 instructions
 
 ## What it does
 
@@ -33,7 +33,7 @@ established first since it is the 3-instruction setter). The `slot60(self,
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit Task. 1 attempt.
+round 2026-09-02, runner echo, unit task. 1 attempt.
 
 ## Naming (round 78, delta)
 

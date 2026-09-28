@@ -10,10 +10,10 @@
 > the correction CLAUDE.md asks for, not a regression.** Nothing here is
 > assignable.
 >
-> Its declaration left `include/Task.h` (six units) in the same step
+> Its declaration left `include/task.h` (six units) in the same step
 > rather than being renamed in place -- under Sony's name in a shared header
 > it is the `conflicting types` failure against LIBGS.H that round 33 flagged
-> for GsSetRefView2. The caller, `src/app/Task.c`, declares it locally
+> for GsSetRefView2. The caller, `src/app/task.c`, declares it locally
 > under the Sony name with its own call site's shape.
 >
 > **Everything below is kept as the derivation it was, not as live guidance.**
@@ -33,7 +33,7 @@ void func_8003FBF4(FadeBoxObj *self) {
 decompiled here; declared with the opaque `void *` shape its own body
 forwards without dereferencing.
 
-`self->unk10` (`FadeBoxObj`, `include/Task.h`) is loaded as a plain
+`self->unk10` (`FadeBoxObj`, `include/task.h`) is loaded as a plain
 word and forwarded unmodified -- same base offset as `SceneNodeObj`'s own
 inherited `unk10` field in `scene_node.h` (a `u32` packed bit-flags word),
 plausibly the same underlying field reused opaquely here, but kept as an
@@ -41,7 +41,7 @@ independent local view per this project's convention.
 
 ## Existing-declaration retype
 
-`Task.c`'s `Viewport__Flip` already forward-declared this function
+`task.c`'s `Viewport__Flip` already forward-declared this function
 (`extern void func_8003FBF4(s32 a0);`) before this unit was carved. Retyped
 the header declaration to `extern void func_8003FBF4(FadeBoxObj *self);`
 to match the real signature -- ABI-identical (both a plain word register),

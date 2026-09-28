@@ -1,5 +1,5 @@
 /*
- * Task -- the task classes and the viewport they draw through. In address
+ * task -- the task classes and the viewport they draw through. In address
  * order:
  *  - StreamTask (include/StreamTask.h), whole: it plays one movie stream
  *    through a MoviePlayer inside TaskCore's fade and state machine;
@@ -14,14 +14,14 @@
  *    allocator to its table getter, then GetRootNode;
  *  - Sony's GsSetProjection (libgs/gs_106), carried as C because no SDK
  *    object places it.
- * include/Task.h holds the declarations this file shares with
+ * include/task.h holds the declarations this file shares with
  * screen_widgets.c, which follows it.
  */
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "Task.h"
+#include "task.h"
 #include "bmem_pmgr.h"
 #include "VabStreamObj.h"
 #include "BgLayer.h"
@@ -1151,7 +1151,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, s32 withSound) {
  *
  * TaskCore__GetActiveItemCursor, GetTaskCoreMethods and
  * GetDefaultMovieFrame come first: one TaskCore method and two plain
- * accessors for data used far more widely (Task.c, ObjMStyleActor.c).
+ * accessors for data used far more widely (task.c, ObjMStyleActor.c).
  *
  * Then IntermediateBase (include/IntermediateBase.h, whose banner says what
  * the class does): the ctor, onNotify's split by the sender's root class,

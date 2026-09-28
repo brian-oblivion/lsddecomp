@@ -11,7 +11,7 @@ void BoxFill__SetPri(Obj6EAC0 *self, s32 a1) {
 ```
 
 Base-table occupant of `Obj6EAC0Methods::slot0xC8` (see
-`include/Task.h`); the derived table's slot0xC8 is
+`include/task.h`); the derived table's slot0xC8 is
 `TextRow__NoOpGetCell`, a splat-generated trivial `jr $ra; nop` already present
 in `src/ui/screen_widgets.c` before this unit was carved.
 

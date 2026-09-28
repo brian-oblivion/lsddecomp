@@ -73,7 +73,7 @@ rodata bytes at `sStrComInput`/`sStrFontIcon`/`sCardPathPrefix`/`sTimExt`
 
 `New_TimImage` (a resource loader taking a path, returning a handle) is
 already typed at several OTHER call sites in the project
-(`Task.h`/`DayTaskStageMap.h`/`TextEntryItemList.c`, all with their own local
+(`task.h`/`DayTaskStageMap.h`/`TextEntryItemList.c`, all with their own local
 return-type view per this project's established convention) -- confirmed
 this is the same function by address, given its own local reading here.
 
@@ -104,7 +104,7 @@ bytes of cost (pointer reinterpretation is free). `New_CharSprite` and
 they got fresh local `extern` declarations here, typed purely from this
 call site's own register usage (same convention as `DecodeFullWidthSjis` above
 in this file) -- and diverge from `New_CharSprite`'s OTHER call-site typing
-in `Task.h` (`(s32, s32)`), which is expected and fine.
+in `task.h` (`(s32, s32)`), which is expected and fine.
 
 ## The one real residue: register identity from live-range shape, not code shape
 

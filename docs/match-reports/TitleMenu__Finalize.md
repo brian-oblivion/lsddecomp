@@ -32,7 +32,7 @@ immediately continuing `TitleMenuTaskObjF`'s work on the same class). Structure:
   (`GenericReleaseObj_3bb8c_d`, a local independent view of the same shared
   slot `include/code_8220.h`'s `BasicClassMethods::release` occupies).
 - `GetTaskCoreMethods()` is the class hierarchy's shared base-class method table
-  getter (same real global, `gTaskCoreMethods`, as `include/Task.h`'s
+  getter (same real global, `gTaskCoreMethods`, as `include/task.h`'s
   `TaskCoreMethods`). Its `+0x00C` slot is called unconditionally last —
   the base class's own destructor forward.
 
@@ -58,7 +58,7 @@ byte-exact on the next build.
 - `TitleMenu::iconHandle` — new field, was anonymous padding
   (`pad0A8[0x0AC-0x0A8]`), now named and typed the same as `unkAC`.
 - `BaseTaskCtorTable_3bb8c_c::slot0C` — new slot, `void (*)(void *self)`.
-  Same offset AND arity as `Task.h`'s independently-derived
+  Same offset AND arity as `task.h`'s independently-derived
   `TaskCoreMethods::slot0C` on the same real global (`gTaskCoreMethods`) —
   cross-unit confirmation, not a coincidence.
 - Also added (needed by later functions in this same round, grouped into

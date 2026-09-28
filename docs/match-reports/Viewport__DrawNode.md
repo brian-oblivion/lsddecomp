@@ -27,7 +27,7 @@ It draws `node` into `self->ot[self->buf]` (the GsOT pointers at +0x78, index at
    `self->projH`, clamp to +-0x200, `GsSortSprite` with a depth-derived priority).
 
 All types (`DrawNode`, `DrawView`, the Gs shapes) are local to `src/graphics/ViewportDraw.c`. No header was
-edited; `include/Task.h` / `include/class_3bb8c.h` untouched as instructed.
+edited; `include/task.h` / `include/class_3bb8c.h` untouched as instructed.
 
 ## Path to the match (build scores)
 

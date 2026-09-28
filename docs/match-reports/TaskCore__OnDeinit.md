@@ -7,10 +7,10 @@
 > **Type rename note (round 73, track 3):** `self->unk18`'s type
 > (`TaskCoreObj *` / `TaskCoreObjMethods *` below) was renamed to
 > `StreamTaskUnk18Obj *` / `StreamTaskUnk18Methods *` in
-> `include/Task.h` -- see `TaskCore__OnInit.md`'s own note
+> `include/task.h` -- see `TaskCore__OnInit.md`'s own note
 > for why. The text below is left as originally written for the history.
 
-**Unit:** Task · **Size:** 47 words · **Status:** MATCHED (47/47)
+**Unit:** task · **Size:** 47 words · **Status:** MATCHED (47/47)
 
 ## Summary
 
@@ -122,7 +122,7 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj cast is gon
   `TaskTextObj` view is retired for include/draw_system.h's type
   (TaskCore__OnInit's report). Byte-identical.
 - `unk34` and `unk93` are also accessed by TitleMenuTaskObjF.c (TitleMenu__Reset,
-  TitleMenu__OnDeinit) and Task.c, so they are proposed, not renamed:
+  TitleMenu__OnDeinit) and task.c, so they are proposed, not renamed:
   `unk93` -> `clearColor` (setColors' second triple, `clear` there; both this
   function and TitleMenu__OnDeinit clear the screen to it), `unk34` ->
   `clearOnDeinit` (reset 1, TitleMenu 0; this function clears only while it is
@@ -130,9 +130,9 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj cast is gon
 
 ## Proposed field names
 
-- TaskCore `+0x093 unk93` -> `clearColor`; accessors Task.c,
-  TitleMenuTaskObjF.c, Task.c (TaskCore__SetColors).
-- TaskCore `+0x034 unk34` -> `clearOnDeinit`; accessors Task.c,
+- TaskCore `+0x093 unk93` -> `clearColor`; accessors task.c,
+  TitleMenuTaskObjF.c, task.c (TaskCore__SetColors).
+- TaskCore `+0x034 unk34` -> `clearOnDeinit`; accessors task.c,
   TitleMenuTaskObjF.c.
 
 ## Track 10 (2026-09-28, round 104, echo)

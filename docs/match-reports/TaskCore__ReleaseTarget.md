@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003D050` on 2026-09-24 (tools/rename.py). Address 0x8003d050.
 
-**Unit:** Task · round 12 straggler.
+**Unit:** task · round 12 straggler.
 
 ## What it does
 
@@ -91,7 +91,7 @@ Renamed from Obj86B60__ReleaseTarget (tools/rename.py): the class prefix. Occupa
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`) and `include/Task.h`'s
+TimImage is unified (`include/TimImage.h`) and `include/task.h`'s
 `Unk74Obj`/`Unk74ObjMethods` view of it is deleted, together with that
 header's local `extern` of New_TimImage. The handle is cast to
 `TimImage *` (TaskCore.h still types the field `BasicClass *`); its slots are
@@ -102,4 +102,4 @@ New_TimImage. Image byte-identical.
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).

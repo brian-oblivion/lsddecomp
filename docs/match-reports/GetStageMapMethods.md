@@ -50,7 +50,7 @@ Obj866E8Methods *GetStageMapMethods(void) {
 
 None new — confirms the already-established "extern Methods D_xxx; return
 &D_xxx;" getter idiom used throughout the project (`pad.c`,
-`entity.c`, `DayTaskStageMap.c`, `class_3ac78.c`, `Task.c`,
+`entity.c`, `DayTaskStageMap.c`, `class_3ac78.c`, `task.c`,
 `TodActor.c`).
 
 ## Naming

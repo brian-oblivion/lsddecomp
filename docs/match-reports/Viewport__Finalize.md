@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E6CC` on 2026-09-19 (tools/rename.py). Address 0x8003e6cc.
 
-**Unit:** Task · **Size:** 41 instructions
+**Unit:** task · **Size:** 41 instructions
 
 ## What it does
 
@@ -66,7 +66,7 @@ not as a permanent property.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. Matched on the
+round 13 (2026-09-03), runner alpha, unit task. Matched on the
 first build.
 
 ## Naming

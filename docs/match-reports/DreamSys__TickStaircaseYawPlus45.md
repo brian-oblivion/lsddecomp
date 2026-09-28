@@ -100,7 +100,7 @@ reasoning that produced the range-check form is lost.
 ## Proposed learning
 
 None specific to this function. The process finding belongs to the round
-rather than the report: bravo produced eleven matches in `Task`, then
+rather than the report: bravo produced eleven matches in `task`, then
 seven more across two DreamSys batches, and the last one existed only as
 uncommitted working-tree state when the runner died. Round 7 opened with the
 same situation inherited from round 6 (three uncommitted matches in a

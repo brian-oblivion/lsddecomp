@@ -56,7 +56,7 @@ void (*slot44)(void *self, s32 arg1, s32 arg2); /* +0x044 */
 ```
 
 typed `(void *self, s32, s32)`, matching the sibling unit's existing
-`Task.h` `TaskUtilMethods::slot44`, which resolves through the SAME
+`task.h` `TaskUtilMethods::slot44`, which resolves through the SAME
 accessor (`GetIntermediateBaseMethods()`, same `gIntermediateBaseMethods` table). That sibling's
 occupant, `TaskCore__Init`, is a near-identical shape one level down a
 different delegation chain: `GetIntermediateBaseMethods()->slot44(self, a1, a2); return
@@ -76,7 +76,7 @@ the analogous position in its own chain.
 
 `GetIntermediateBaseMethods()` (table `gIntermediateBaseMethods`) slot +0x044 is confirmed
 `void (*)(void *self, s32 arg1, s32 arg2)` from two independent call sites in
-two different units (`Task.c`'s `TaskCore__Init`, this unit's
+two different units (`task.c`'s `TaskCore__Init`, this unit's
 `TimedTask__Init`) — both immediately store the same two register-passed
 arguments into the call and immediately read a `self`-relative `s32` field
 back out. Worth typing consistently anywhere else this same accessor/slot

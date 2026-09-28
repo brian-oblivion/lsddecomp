@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E4A4` on 2026-09-19 (tools/rename.py). Address 0x8003e4a4.
 
-**Unit:** Task · **Size:** 5 instructions
+**Unit:** task · **Size:** 5 instructions
 
 ## What it does
 
@@ -28,7 +28,7 @@ void IntermediateBase__IncrementFrameCounter(Obj86B60 *self)
 
 ## Provenance
 
-round 12 (2026-09-03), runner alpha, unit Task. Matched on the
+round 12 (2026-09-03), runner alpha, unit task. Matched on the
 first build.
 
 ## Naming
@@ -38,9 +38,9 @@ runner alpha). Tier A: a pure leaf increment (`self->unk1C++`) -- tier A by
 the same "mechanics ARE the purpose" rule as a getter/clamp/list-push.
 "FrameCounter" reuses the already-established cross-function reading of
 `unk1C` ("a running count/frame value multiplied against unk84",
-`TaskCore__TickFadeIn`, Task.c) rather than inventing a new one; `unk1C`
+`TaskCore__TickFadeIn`, task.c) rather than inventing a new one; `unk1C`
 itself is PROPOSED for rename to `frameCounter` in this unit's
-`## Proposed field names` (shared with Task.c).
+`## Proposed field names` (shared with task.c).
 
 ## Proposed field names
 
@@ -48,12 +48,12 @@ itself is PROPOSED for rename to `frameCounter` in this unit's
   three independent sources: incremented here unconditionally
   (`IntermediateBase__IncrementFrameCounter`), zeroed on state-reset paths
   (`IntermediateBase__ResetCounters`, `IntermediateBase__OnStart`,
-  `IntermediateBase__OnStop`, and `TaskCore__SetState` in `Task.c` on
+  `IntermediateBase__OnStop`, and `TaskCore__SetState` in `task.c` on
   several message codes), and consumed as a multiplier in `TaskCore__TickFadeIn`
-  (Task.c) against `unk84` -- consistent with a per-instance
+  (task.c) against `unk84` -- consistent with a per-instance
   frame/tick counter. What in-game effect the resulting product drives is
   NOT established, hence tier B. NOT renamed directly: shared with
-  `Task.c` (`TaskCore__SetState`, `TaskCore__TickFadeIn`, and likely
+  `task.c` (`TaskCore__SetState`, `TaskCore__TickFadeIn`, and likely
   `TaskCore__SetFadeRate`/`TaskCore__TickFadeInCallback`'s own callers of `self->unk1C`). Head
   applies by type scope.
 

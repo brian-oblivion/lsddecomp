@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BD74` on 2026-09-23 (tools/rename.py). Address 0x8003bd74.
 
-**Unit:** Task · **Size:** 14 instructions (0x38 bytes) · **Status:** MATCHED (14/14 words, whole-image SHA1 green), first attempt
+**Unit:** task · **Size:** 14 instructions (0x38 bytes) · **Status:** MATCHED (14/14 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -47,7 +47,7 @@ specifically was found to confirm either way -- flagged for whoever adds one.
 
 ## New struct/header knowledge
 
-Added `include/Task.h`'s `TaskCoreMethods` (this unit's own local view
+Added `include/task.h`'s `TaskCoreMethods` (this unit's own local view
 of `gTaskCoreMethods`, independent of `GameApplication.h`'s `LoaderTaskMethods`, same
 precedent as `GetStreamTaskMethods`'s report) with slot `+0x080` typed
 `void (*)(StreamTaskObj *self)`.

@@ -8,7 +8,7 @@
  * StreamTask -- class id 0x1130, method table gStreamTaskMethods, a TaskCore
  * subclass (`tools/classtable.py gStreamTaskMethods --vs gTaskCoreMethods`:
  * fourteen overrides and five slots of its own). No class derives from it.
- * src/app/Task.c holds the whole class: allocator, ctor, every override,
+ * src/app/task.c holds the whole class: allocator, ctor, every override,
  * the setters and the getter. The object is 0xDC bytes (New_StreamTask).
  *
  * What it does: it owns a MoviePlayer (`player`, New_MoviePlayer, gMoviePlayerMethods)

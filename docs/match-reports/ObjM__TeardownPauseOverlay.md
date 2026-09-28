@@ -23,7 +23,7 @@ compiles identically whether declared `s32` or a pointer type. Verified:
 full rebuild stays whole-image green, and `ObjM__StartFadeUp` itself still
 scores 52/52 unchanged.
 
-`FieldM50` is deliberately NOT unified with `include/Task.h`'s
+`FieldM50` is deliberately NOT unified with `include/task.h`'s
 `Unk64Elem`, despite `unk7C` sharing every slot NUMBER and SIGNATURE with
 it (0x004/0x04C/0x0B8) -- see the `FieldM7C` comment in
 `include/class_3bb8c.h` for the reasoning (this unit keeps its own

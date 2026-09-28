@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E7F4` on 2026-09-19 (tools/rename.py). Address 0x8003e7f4.
 
-**Unit:** Task · **Size:** 32 instructions
+**Unit:** task · **Size:** 32 instructions
 
 ## What it does
 
@@ -53,7 +53,7 @@ together.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. Matched on the
+round 13 (2026-09-03), runner alpha, unit task. Matched on the
 first build. Last function in this round's queue -- see `IntermediateBase__OnNotify.md`
 and `New_Viewport.md` for the two shared-table classtable dumps
 (`gIntermediateBaseMethods`, `gViewportMethods`) that resolved this and every other function in
@@ -72,12 +72,12 @@ tag-keyed cached reference, THEN forwards to
 - `Unk18ObjMethods::slot14` -> `removeChild` (tier A). Offset `+0x014`
   matches the canonical `BasicClassMethods::removeChild` offset exactly,
   and this header already documents it as "inherited BasicClass
-  removeChild". NOT renamed directly: `Task.c`'s `Viewport__DetachViewChild`
+  removeChild". NOT renamed directly: `task.c`'s `Viewport__DetachViewChild`
   also dispatches `self->methods->slot14(self, self->unk10)` on a
   `Unk18Obj *`, so this field is shared with that unit. Head applies by
   type scope (rename in `Unk18ObjMethods`'s own definition, fix the
-  compiler-listed accessors in both `Task.c` and
-  `Task.c`, oracle).
+  compiler-listed accessors in both `task.c` and
+  `task.c`, oracle).
 
 ## Track 4 (2026-09-25, round 85, bravo)
 

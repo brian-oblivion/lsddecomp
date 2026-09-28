@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003B9DC` on 2026-09-23 (tools/rename.py). Address 0x8003b9dc.
 
-**Unit:** Task · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
+**Unit:** task · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -43,7 +43,7 @@ is `self->unkB4` itself (a virtual self-call on the sub-object), not `self`.
 
 ## New struct/header knowledge
 
-Added `include/Task.h`'s `StreamTaskUnkB4Obj`/`StreamTaskUnkB4Methods`
+Added `include/task.h`'s `StreamTaskUnkB4Obj`/`StreamTaskUnkB4Methods`
 (a new, previously-unseen 1-slot-vtable object reached through
 `StreamTaskObj::unkB4`, `+0x0B4`) and `TaskCoreMethods::slot0C` (this unit's
 local view of `gTaskCoreMethods`, see `StreamTask__OnPadPrev`'s report).
@@ -74,4 +74,4 @@ Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, i
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4Obj view is gone and Task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The +0x004 call is `release`. Byte-identical.
+The player is a MoviePlayer (`include/MoviePlayer.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The +0x004 call is `release`. Byte-identical.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C008` on 2026-09-23 (tools/rename.py). Address 0x8003c008.
 
-**Unit:** Task · **Size:** 69 words · **Status:** MATCHED (69/69)
+**Unit:** task · **Size:** 69 words · **Status:** MATCHED (69/69)
 
 ## Summary
 
@@ -51,7 +51,7 @@ This function is what triggered the retype documented in
 `self->unk80` were modeled as plain `s32` there (no counter-evidence at the
 time — they were just call results). Here, all three are dereferenced as
 `field->methods->slot04(field)` — impossible for a plain integer. Retyped
-all three to `StreamTaskUnkB4Obj *` in `include/Task.h`; this changes
+all three to `StreamTaskUnkB4Obj *` in `include/task.h`; this changes
 no compiled bytes anywhere (same register width, pure pointer/int
 relabeling) and a full rebuild confirmed every one of this round's nine
 prior matches (`StreamTask__OnPadConfirm` through `TaskCore__TaskCore`) is still

@@ -19,9 +19,9 @@ rather than API.
 ## Track 10 `prototypes`: one declaration per name
 
 - **Allocator.** `BMemPMgrAlloc` is re-declared locally in about 20 units
-  and in dream_sys.h:376, entity.h:308, DayTaskStageMap.h:30, Task.h:27.
+  and in dream_sys.h:376, entity.h:308, DayTaskStageMap.h:30, task.h:27.
   `BMemPMgrFree` returns `void` in entity.h:309 and
-  GameApplicationFileResource.h:16 but `void *` in bmem_pmgr.h:83 and Task.h:28,
+  GameApplicationFileResource.h:16 but `void *` in bmem_pmgr.h:83 and task.h:28,
   so any unit including two of them fails with conflicting types. main.c:28
   declares `BMemPMgrInit`/`SetDefaultBMemPMgr` because bmem_pmgr.h omits them.
   bmem_pmgr.h:82 leaves Alloc unprototyped on purpose (arity); keep that as one
@@ -49,15 +49,15 @@ rather than API.
   only); `LockCd`/`UnlockCd` declared `s32` at GameApplicationFileResource.c:535,
   defined `void`; `SetActiveDataSourceDriverMode` `s32` in DayTaskStageMap.h:57
   vs `void` definition; `GetSoundEffectDir(s32)` vs `(void)`;
-  `IsStyleVariantEven` `bool` vs `s32`; `ReleaseBasicClassArray` in Task.h:32
+  `IsStyleVariantEven` `bool` vs `s32`; `ReleaseBasicClassArray` in task.h:32
   `(void *, void *)` vs `(BasicClass **, s32)` at TmdRenderer.c:86 (plus three
   `void **` spellings); `GetActiveDataSourceMethods` local in 4 files;
-  `GetSetBitField` duplicated (sprite.c:41, Task.h:36 vs scene_node.h:216);
+  `GetSetBitField` duplicated (sprite.c:41, task.h:36 vs scene_node.h:216);
   `ApplyMatrixToLVArray` extern at ViewportDraw.c:62 though scene_node.h is
   included; `sHitHeightGate` declared twice in scene_node.c. cd_driver.c
   re-declares its own functions two or three times (55/60/794/795, 58/463/907,
   ...): keep one forward block.
-- **Sony names re-declared.** `ResetGraph` (Task.h:40), `rand`, `strlen`,
+- **Sony names re-declared.** `ResetGraph` (task.h:40), `rand`, `strlen`,
   `strcat`, `strcpy`, `memset`, `memcpy`, `printf` (declared `void (const char *)`
   at TitleMenuTaskObjF.c:980 and WBgm.c:18 against stdio.h's variadic `int`).
   Use include/psyq's headers (verify bytes: strings.h's `strlen` is K&R).
@@ -72,7 +72,7 @@ rather than API.
   SJIS bytes make grep treat it as binary (`grep -a` finds them).
 - **Duplicate types.** `RotationRatio(s)` (dream_sys.h:172) is `Ratio16`;
   `SubObjE` (DayTaskStageMap.h:18) is a DrawSystem view; `SlotEntry`/`SrcDesc`
-  (Task.c:658, 670) are one record; `CdStreamFile` (cd_stream.h:44) is
+  (task.c:658, 670) are one record; `CdStreamFile` (cd_stream.h:44) is
   `CdlFILE`; a signed 3-byte colour is defined six times (`BgLayerRgb`,
   `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `ColorRgb`, `ViewportRgb`):
   one type. `FIX12_SHIFT` and `CD_SECTOR_SIZE` redefined at
@@ -91,7 +91,7 @@ rather than API.
   prototypes; `self` everywhere else.
 - **Guards:** dream_sys.h `CLASS_DREAMSYS`, stage_grid.h `STAGE_GRID`.
 - **`s` externs in headers:** 24 (StageMap.h:416-441, TitleMenu.h:147-170,
-  Task.h:47/57, scene_node.h:204-205 `sRotationZero`/`sSceneNodeScaleOne`,
+  task.h:47/57, scene_node.h:204-205 `sRotationZero`/`sSceneNodeScaleOne`,
   which are also typed `u8[0xC]` for `Ratio16[3]`). Move into the .c or
   rename `g`. Conversely 8 `g` symbols used by one unit only
   (`sCdStreamAudioMixSet`, `sCdFileNotFoundFmt`, `sFileTableRegistered`, ...).
@@ -112,7 +112,7 @@ rather than API.
   - IntermediateBase `unk10`/`unk14` are the frameClock and lightRig (about
     20 casting sites in ObjMStyleActor.c); `onTag1Notify`/`onNotifyTag1`,
     `onState2`/`onState3` are the DrawSystem event and start/stop hooks, and
-    Task.c uses literal 2/3 where `INTERMEDIATEBASE_STATE_START/STOP` exist.
+    task.c uses literal 2/3 where `INTERMEDIATEBASE_STATE_START/STOP` exist.
   - `SelectCallback80/98`, `LOOK_CALLBACK_SLOT14C/150` (named for offsets).
   - `StageMap__GetUnk1CC`; NullDriver/`DATASOURCE_SPU` for a driver whose
     methods are all empty; `withSound` typed `void *` in TaskCore's functions
@@ -181,7 +181,7 @@ by the debt item that owns it. A duplicate type is a MERGE, not a rename:
 `renametype.py` refuses a target that exists, and the field names differ,
 so merge by hand, one commit per type, the accessors from the compiler.
 
-- **app/cd:** `SlotEntry`/`SrcDesc` (Task.c) into one record;
+- **app/cd:** `SlotEntry`/`SrcDesc` (task.c) into one record;
   `CdStreamFile` (cd_stream.h) into `CdlFILE`; TaskCore's `withSound` is
   `void *` in its functions and `s32` in its slots; `SetTickCallbacks`'
   header prototype still names its parameters `arg1`/`arg2`.
@@ -229,7 +229,7 @@ reads them, so nothing names them).
 - Process text to move out of headers (to the .c as one `MATCHING:` line,
   or to the report): register and ABI notes (`$a0`-`$v0`) in scene_node.h,
   TaskCore.h, TextEntry.h, TextRow.h, TileAtlas.h, TileMap.h, sprite.h,
-  Task.h, ItemList.h, StreamTask.h; lwl/lwr and "retail reloads" in
+  task.h, ItemList.h, StreamTask.h; lwl/lwr and "retail reloads" in
   StageMap.h, TitleMenu.h, TaskObjF.h, TmdModel.h, sprite.h, StyleEffect.h,
   Viewport.h, MoviePlayer.h, GraphRoom.h, LbdFile.h, common.h; GCC and splat
   notes in entity.h:46-51, 102-107, 148-153; about 120 lines in gte.h; 32
@@ -237,7 +237,7 @@ reads them, so nothing names them).
 - Stale names inside header prose: StageMap.h's `buildRateEntries`
   (`loadChunksAround`), `ChunkSlotSpec::key`, `LbdFile::ownerKey`; entity.h's
   merged-unit names ("(Entity, then Entity)"); IntermediateBase.h's
-  `args->unk0..unkC`; NullDriver.h and Task.h name one file twice; cd_driver.h
+  `args->unk0..unkC`; NullDriver.h and task.h name one file twice; cd_driver.h
   "that unit still spells them as literals"; basic_class.h "all 59 method
   tables" (60).
 - Unit-private headers (DayTaskStageMap.h, GameApplicationFileResource.h,

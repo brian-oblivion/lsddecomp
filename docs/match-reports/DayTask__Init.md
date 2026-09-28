@@ -106,7 +106,7 @@ this function was reconfirmed at 41/41 after the change.
 
 ## Naming
 
-`DayTask__Init` -- tier B. Occupies +0x044 -- compared against `gIntermediateBaseMethods`'s own +0x044 slot, which forwards to `IntermediateBase__Init` (Task.h), the established base-class Init slot at this exact offset. This override configures the `subD` sub-object and forwards to the sibling class's own +0x044 (`TimedTask__Init`); what 'init' accomplishes for THIS class beyond that is not established.
+`DayTask__Init` -- tier B. Occupies +0x044 -- compared against `gIntermediateBaseMethods`'s own +0x044 slot, which forwards to `IntermediateBase__Init` (task.h), the established base-class Init slot at this exact offset. This override configures the `subD` sub-object and forwards to the sibling class's own +0x044 (`TimedTask__Init`); what 'init' accomplishes for THIS class beyond that is not established.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 

@@ -40,7 +40,7 @@ First build. The failing-ctor allocator lever with the test inverted: this class
 
 ## Naming
 
-- **New_MoviePlayer**, tier A. Called from src/app/Task.c's TaskCore__TaskCore; externally typed `StreamTaskUnkB4Obj *` there. Opens a CD stream object and drives an MDEC decode/upload state machine (mechanics match the class name; the constructor/finalize/state-machine functions ARE playing a movie).
+- **New_MoviePlayer**, tier A. Called from src/app/task.c's TaskCore__TaskCore; externally typed `StreamTaskUnkB4Obj *` there. Opens a CD stream object and drives an MDEC decode/upload state machine (mechanics match the class name; the constructor/finalize/state-machine functions ARE playing a movie).
 
 ## Track 4 (2026-09-26, round 89)
 

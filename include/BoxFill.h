@@ -42,7 +42,7 @@
  *    screen position (a BoxFillPos) where the slot, SceneNode's, types a
  *    LongVec3 offset; it attaches with a NULL offset, then setPosition.
  *    Callers cast to BoxFillAttachToParentFn (the style layer
- *    in ObjMStyleActor.c, Task) or, through a SceneNode pointer, cast the argument
+ *    in ObjMStyleActor.c, task) or, through a SceneNode pointer, cast the argument
  *    (Viewport__SetFadeBox). BoxFill__AttachAbsolute calls it with FOUR
  *    arguments through an unprototyped pointer (see its match report).
  * The ctor itself returns nothing where SceneNode's slot returns `void *`;

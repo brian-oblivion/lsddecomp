@@ -297,7 +297,7 @@ Tier B. Evidence, all from this class's own bodies and its one caller:
 
 It is tier B, not A, because the "day" reading rests on DreamSys's
 startDay/endDay, which are FirecatFG's names (tier-B hypotheses by rule).
-The `Task` suffix follows the project's other IntermediateBase jobs run to
+The `task` suffix follows the project's other IntermediateBase jobs run to
 a result (StreamTask) and its parent, TimedTask.
 
 The unit banner (include/DayTaskStageMap.h) no longer carries "track 4, round

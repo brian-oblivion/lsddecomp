@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BD10` on 2026-09-23 (tools/rename.py). Address 0x8003bd10.
 
-**Unit:** Task · **Size:** 25 words · **Status:** MATCHED (25/25)
+**Unit:** task · **Size:** 25 words · **Status:** MATCHED (25/25)
 
 ## Summary
 
@@ -25,7 +25,7 @@ void StreamTask__OnPadConfirm(StreamTaskObj *self) {
 ## Evidence
 
 - `GetTaskCoreMethods()` returns `&gTaskCoreMethods` (`TaskCoreMethods`, established
-  elsewhere in `Task.h`). `tools/classtable.py gTaskCoreMethods` shows slot
+  elsewhere in `task.h`). `tools/classtable.py gTaskCoreMethods` shows slot
   `+0x078 = TaskCore__OnPadConfirm` (a different unit, not touched here — only the
   slot's existence and signature matter for this call site).
 - `self->methods` is `StreamTaskObjMethods*` (`gStreamTaskMethods`).

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003E538` on 2026-09-19 (tools/rename.py). Address 0x8003e538.
 
-**Unit:** Task · **Size:** 16 instructions
+**Unit:** task · **Size:** 16 instructions
 
 ## What it does
 
@@ -72,7 +72,7 @@ control-flow cost.
 
 ## Provenance
 
-round 12 (2026-09-03), runner alpha, unit Task. 2 attempts.
+round 12 (2026-09-03), runner alpha, unit task. 2 attempts.
 
 ## Naming
 

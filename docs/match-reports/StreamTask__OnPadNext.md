@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BDAC` on 2026-09-23 (tools/rename.py). Address 0x8003bdac.
 
-**Unit:** Task · **Size:** 14 instructions (0x38 bytes) · **Status:** MATCHED (14/14 words, whole-image SHA1 green), first attempt
+**Unit:** task · **Size:** 14 instructions (0x38 bytes) · **Status:** MATCHED (14/14 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -26,7 +26,7 @@ Matched first attempt, same reasoning as `StreamTask__OnPadPrev`.
 ## New struct/header knowledge
 
 Added `TaskCoreMethods::slot84` alongside `slot80` in
-`include/Task.h` (see `StreamTask__OnPadPrev`'s report).
+`include/task.h` (see `StreamTask__OnPadPrev`'s report).
 
 ## Proposed learning
 

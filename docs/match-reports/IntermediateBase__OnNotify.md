@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E030` on 2026-09-19 (tools/rename.py). Address 0x8003e030.
 
-**Unit:** Task · **Size:** 52 instructions
+**Unit:** task · **Size:** 52 instructions
 
 ## What it does
 
@@ -48,7 +48,7 @@ void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
   `IntermediateBase__Init`), `slot40` (`IntermediateBase__ResetCounters`, `IntermediateBase__IntermediateBase`), `slot48`
   (`IntermediateBase__Deinit`, `IntermediateBase__Init`), `slot4C` (external `TaskCore__OnInit`,
   `IntermediateBase__Init`), `slot54` (`IntermediateBase__OnDrawSystemEvent`), `slot58` (external
-  `TaskCore__OnPadEvent`, STALL in unit `Task` -- its own report confirms
+  `TaskCore__OnPadEvent`, STALL in unit `task` -- its own report confirms
   signature `(Obj86B60 *, s32 a1, s32 a2)`; this call site's `a1` is
   genuinely `EventArg *`, an independent local view of the same shared
   slot, not a conflict), `slot5C` (`TaskCore__Update`, already matched
@@ -72,7 +72,7 @@ functions except `New_Viewport`/`Viewport__Viewport`/`Viewport__Finalize`/
 When a unit's queue functions are all small and share a ROM range, run
 `tools/classtable.py <addr>` against every nearby vtable found via
 `grep -rn func_NAME asm/data/*.s` (or a sibling unit's own header comments
-citing the same table, as `Task.h`'s `TaskUtilMethods` did here) before
+citing the same table, as `task.h`'s `TaskUtilMethods` did here) before
 reading any single function's disassembly in isolation. The table dump
 resolves not just the CURRENT function's identity but its callers' and
 callees' argument SHAPES (arity, and often a concrete non-`s32` type) for
@@ -82,14 +82,14 @@ this function's own bytes.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. Matched on the first
+round 13 (2026-09-03), runner alpha, unit task. Matched on the first
 build.
 
 ## Naming
 
 **IntermediateBase__OnNotify** (renamed from `func_8003E030`, round 55, runner
 alpha). Tier A: forwards to `GetBasicClassMethods()->slot38` first (that
-slot IS `BasicClass__OnNotify` per `include/Task.h`'s own
+slot IS `BasicClass__OnNotify` per `include/task.h`'s own
 `BasicClassMethodsCC8C` struct, offset-verified against
 `include/code_8220.h`'s canonical, already-named `BasicClassMethods::slot38`
 = `onNotify`), then adds its own dispatch on the incoming `EventArg`'s
@@ -97,7 +97,7 @@ dynamic class tag -- the textbook "override calls base first, then does its
 own work" shape for a virtual method whose base identity is independently
 confirmed. `GetBasicClassMethods()->slot38` is PROPOSED for rename to
 `onNotify` in this unit's `## Proposed field names` (shared with
-`Task.c`'s own `Viewport__OnNotify`).
+`task.c`'s own `Viewport__OnNotify`).
 
 ## Proposed field names
 
@@ -105,12 +105,12 @@ confirmed. `GetBasicClassMethods()->slot38` is PROPOSED for rename to
   matches `include/code_8220.h`'s own canonical, already-named
   `BasicClassMethods::slot38` = `onNotify` exactly (`IS BasicClass__OnNotify`,
   TmdRenderer, per this header's own comment). NOT renamed directly:
-  `Task.c`'s `Viewport__OnNotify` also calls
+  `task.c`'s `Viewport__OnNotify` also calls
   `GetBasicClassMethods()->slot38(self, arg1, arg2)`, so this field is
-  shared within the Task family. Head applies by type scope (rename
+  shared within the task family. Head applies by type scope (rename
   the field in `BasicClassMethodsCC8C`'s own definition,
-  `include/Task.h`, rebuild, fix the compiler-listed accessors in
-  both `Task.c` and `code_2cc8c_d.c`, oracle).
+  `include/task.h`, rebuild, fix the compiler-listed accessors in
+  both `task.c` and `code_2cc8c_d.c`, oracle).
 
 ## Track 4 (2026-09-25, round 82, charlie)
 

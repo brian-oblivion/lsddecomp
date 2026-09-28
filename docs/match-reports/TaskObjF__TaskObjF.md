@@ -94,7 +94,7 @@ this codebase type-checks the two against each other (the vtable's own
 initializer is still raw, uncarved `.data`, not a C initializer), so this
 is the same "independent arities for the same real callee" situation
 already documented for `GetTaskCoreMethods`/`BaseTaskCtorTable_3bb8c_c` versus
-`TaskCoreMethods` in `include/Task.h`.
+`TaskCoreMethods` in `include/task.h`.
 
 ### Proposed learning
 

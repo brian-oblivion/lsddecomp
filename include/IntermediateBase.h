@@ -6,7 +6,7 @@
 /*
  * IntermediateBase -- class id 0x30, method table gIntermediateBaseMethods: a
  * BasicClass subclass that runs one attached job to a result. Methods in
- * src/app/Task.c. Two classes derive from it (`typeviews.py --tree`):
+ * src/app/task.c. Two classes derive from it (`typeviews.py --tree`):
  * TaskCore (0x130, gTaskCoreMethods: StreamTask, TitleMenu, GraphRoom
  * below it) and TimedTask (0x230: gDayTaskMethods's DayTask and gObjMMethods's ObjM
  * below it). It is abstract: +0x04C, +0x050 and +0x058 are NULL in its own

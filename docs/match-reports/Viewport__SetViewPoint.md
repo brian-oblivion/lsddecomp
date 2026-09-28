@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EBC4` on 2026-09-23 (tools/rename.py). Address 0x8003ebc4.
 
-Unit: `Task`. Round 14, runner delta. 13/13 words, full match.
+Unit: `task`. Round 14, runner delta. 13/13 words, full match.
 
 ## Signature
 
@@ -31,7 +31,7 @@ void Viewport__SetViewPoint(Unk18Obj *self, Vec3_2cc8c *a1) {
 
 ## Header changes
 
-`include/Task.h`:
+`include/task.h`:
 - New `Vec3_2cc8c` type (`{ s32 x, y, z; }`, local view — same shape as
   `scene_node.h`'s own `LongVec3`, not unified per this project's
   convention).

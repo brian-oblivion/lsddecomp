@@ -15,13 +15,13 @@
 #include "TextRow.h"
 
 /*
- * Declarations shared by src/app/Task.c and the unit after it,
+ * Declarations shared by src/app/task.c and the unit after it,
  * screen_widgets.c (FadeBox, BoxFill, TextRow): the data and outside callees
  * they reach that no class header owns. The classes are in their own headers: StreamTask.h,
  * TaskCore.h, IntermediateBase.h, Viewport.h, BoxFill.h, FadeBox.h, TextRow.h.
  */
 
-/* Defined in Task.c: &sDefaultMovieFrame. */
+/* Defined in task.c: &sDefaultMovieFrame. */
 extern DrawRect *GetDefaultMovieFrame(void);
 
 #endif

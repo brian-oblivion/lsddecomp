@@ -96,7 +96,7 @@ since `unk2C`'s meaning is not established and 10 is the slot's `bound`.
 
 ## Proposed field names
 
-TaskCore's (include/TaskCore.h, accessed by Task.c/TaskViewport*.c):
+TaskCore's (include/TaskCore.h, accessed by task.c/TaskViewport*.c):
 `unk34` -> `clearOnDeinit` (TaskCore__OnDeinit clears the display with
 `unk93` only when it is nonzero; this Reset sets 0 and TitleMenu's own
 onDeinit clears both buffers instead). `unk2C` stays: it is the viewport's

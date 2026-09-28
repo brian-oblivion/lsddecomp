@@ -33,7 +33,7 @@ references any argument, so the definition needs none).
 purpose (nothing happens). Named after the established project convention
 for exactly this shape -- compare `Actor__NoOpSlotD8`/`NoOpSlotE8`
 (`src/world/ObjMStyleActor.c`), `TextRow__NoOpSlotD0` (`src/ui/screen_widgets.c`),
-`StreamTask__NoOpSlot88`/`NoOpSlot8C` (`src/app/Task.c`) -- all
+`StreamTask__NoOpSlot88`/`NoOpSlot8C` (`src/app/task.c`) -- all
 `Class__NoOpSlotOFFSET` for an empty vtable-slot implementation of otherwise-
 unknown purpose. No carved caller currently dispatches this slot on a
 `GameApplication` instance.

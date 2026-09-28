@@ -29,7 +29,7 @@ s32 GraphRoom__Init(D_80087AACObj *self, void *arg1, void *arg2) {
 
 Calls the shared base-class table's own `+0x044` slot (`GetTaskCoreMethods()`,
 this unit's own local view -- a plain no-argument getter established
-elsewhere, e.g. `include/Task.h`), then returns `self->unk_0x38` if
+elsewhere, e.g. `include/task.h`), then returns `self->unk_0x38` if
 `self->unk_0x238 == 0`, else the literal `2`.
 
 ## Shape note

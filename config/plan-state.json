@@ -824,7 +824,6 @@
         "GameApplicationFileResource": "2026-09-24",
         "ObjMStyleActor": "2026-09-24",
         "PlacementGridVabSound": "2026-09-24",
-        "Task": "2026-09-23",
         "TextEntryItemList": "2026-09-24",
         "TimImage": "2026-09-25",
         "TitleMenuTaskObjF": "2026-09-22",
@@ -857,7 +856,8 @@
         "scene_node": "2026-09-23",
         "screen_widgets": "2026-09-20",
         "sprite": "2026-09-25",
-        "stage_grid": "2026-09-23"
+        "stage_grid": "2026-09-23",
+        "task": "2026-09-23"
       }
     },
     "4": {
@@ -1556,7 +1556,6 @@
         "GameApplicationFileResource": "2026-09-27",
         "ObjMStyleActor": "2026-09-27",
         "PlacementGridVabSound": "2026-09-27",
-        "Task": "2026-09-27",
         "TextEntryItemList": "2026-09-27",
         "TimImage": "2026-09-27",
         "TitleMenuTaskObjF": "2026-09-27",
@@ -1582,7 +1581,8 @@
         "scene_node": "2026-09-28",
         "screen_widgets": "2026-09-27",
         "sprite": "2026-09-27",
-        "stage_grid": "2026-09-28"
+        "stage_grid": "2026-09-28",
+        "task": "2026-09-27"
       }
     },
     "8": {

@@ -14,7 +14,7 @@
 > and are now linked from SDK objects, which left this one wedged between
 > `o` segments -- so it has its own one-function unit, **`libgs_gs_101`**
 > (`src/psyq/libgs_gs_101.c`). The body below is unchanged and still compiles
-> byte-exact. `include/Task.h` still declares it for its one caller,
+> byte-exact. `include/task.h` still declares it for its one caller,
 > but that new file does NOT include the header, so the two are no longer
 > cross-checked by the compiler and must be kept in step by hand.
 
@@ -44,10 +44,10 @@ declared `void *` since nothing dereferences it here.
 > body is exactly and only `GsCLIP3near = a0;`, so "sets Sony's GS
 > near-clip-plane pointer" is not inferred from the one call site, it is
 > what Sony's own name for the write target says the write target IS.
-> `include/Task.h`'s prototype and `src/code_2cc8c_d.c`'s one call
+> `include/task.h`'s prototype and `src/code_2cc8c_d.c`'s one call
 > site (`GsSetNearClip(self->unk4C);`, inside `Viewport__Update`) were updated
 > by `rename.py` tree-wide, automatically. No `Unk18Obj` field was touched
-> or proposed by this pass: `self->unk4C` belongs to `Task.c`'s own
+> or proposed by this pass: `self->unk4C` belongs to `task.c`'s own
 > unit (PARALLEL-RUNS.md collision rule 1), and the value it holds is a
 > plain `s32` reused three lines later in `Viewport__Update` in an ordinary
 > size/count calculation (`(self->unk50 - self->unk4C) / (1 <<

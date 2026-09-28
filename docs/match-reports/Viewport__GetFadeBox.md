@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003F230` on 2026-09-23 (tools/rename.py). Address 0x8003f230.
 
-Unit: `Task`. Round 14, runner delta. 3/3 words, full match.
+Unit: `task`. Round 14, runner delta. 3/3 words, full match.
 
 ## Signature
 

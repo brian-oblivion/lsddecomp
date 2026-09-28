@@ -31,7 +31,7 @@
  * The subclasses spell their GsBG/GsBOXF/GsSPRITE field by field, hence the
  * casts to Sony's types at the libgs calls.
  *
- * The rest of the Viewport class is in Task.c.
+ * The rest of the Viewport class is in task.c.
  */
 #include "common.h"
 #include <libgte.h>

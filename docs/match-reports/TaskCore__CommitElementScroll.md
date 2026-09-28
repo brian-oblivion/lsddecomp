@@ -67,7 +67,7 @@ is BLKmode, so the following field access must go back to memory, and the
 block-move pattern's scratch registers set the register identity the
 allocator was blamed for. The shared header still spells `Unk24Elem`'s
 +0x10/+0x14 as two scalars; retyping them as one struct member is a header
-change for the head (only `Task.c` references `Unk24Elem`).
+change for the head (only `task.c` references `Unk24Elem`).
 
 ## Earlier title: TaskCore__CommitElementScroll -- STALL: length EXACT (118/118 words, no drift); 114/118 raw word-match; first real diff at in-range word 11 (file 0x2E304 / vram 0x8003DB04), the `bne $v1, $v0` delay slot
 
@@ -124,7 +124,7 @@ best-posed never-searched target in the whole brief). Ran all three
 mandated checks before spending the search:
 
 1. **Correctness:** the preserved body below (byte-identical to the copy
-   already on file) was spliced into `src/app/Task.c` in place of the
+   already on file) was spliced into `src/app/task.c` in place of the
    `INCLUDE_ASM` and rebuilt through the full oracle in isolation (every
    other INCLUDE_ASM in all four of this runner's units confirmed still
    wrapped first). Reproduces **exactly 114/118, zero outside-range
@@ -432,7 +432,7 @@ cheaply, verify immediately, and revert without hesitation if it makes
 things worse -- do not assume it will help just because the SYMPTOM
 (wrong delay slot for an otherwise-correct instruction) looks the same.
 
-**Unit:** Task · round 12 straggler · slot `+0x10C` (`slot10C`,
+**Unit:** task · round 12 straggler · slot `+0x10C` (`slot10C`,
 per `Obj86B60Methods`).
 
 ## What it does
@@ -461,7 +461,7 @@ record shape.
 
 All of this is corroborated independently by `TaskCore__RefreshSlotView` (the other
 stall this round, which touches the SAME `Unk24Elem`/`slotBC`/`unk68.slot50`
-surface) and is safe to keep in `include/Task.h` regardless of this
+surface) and is safe to keep in `include/task.h` regardless of this
 function's own stall status.
 
 ## Where it stalled
@@ -520,8 +520,8 @@ report never claimed such a shift:
   spilling into `$fp`.
 
 ```sh
-grep -oE 'sw +\$s[0-9]' asm/nonmatchings/Task/TaskCore__CommitElementScroll.s | sort -u | wc -l   # 6
-grep -oE 'sw +\$s[0-9]' asm/nonmatchings/Task/TaskCore__RefreshSlotView.s | sort -u | wc -l   # 8
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/task/TaskCore__CommitElementScroll.s | sort -u | wc -l   # 6
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/task/TaskCore__RefreshSlotView.s | sort -u | wc -l   # 8
 ```
 
 Do not carry this function's fixes to that one expecting them to transfer —
@@ -635,7 +635,7 @@ void TaskCore__CommitElementScroll(Obj86B60 *self)
 }
 ```
 
-Requires (already committed to `include/Task.h`, so this body
+Requires (already committed to `include/task.h`, so this body
 compiles as-is against current `main`): `Unk24Elem`, `Unk64ElemMethods`
 with `slot60`/`slotBC`/`slotB8`, `Unk68ObjMethods` with `slot50`,
 `Obj86B60Methods` with `slot60`, `Obj86B60.unk68`/`unk4C`/`unk58`/`unk3C`,
@@ -670,8 +670,8 @@ listView is a BoxFill (include/BoxFill.h); the `Unk68Obj` slot50 call is detachF
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
-`SlotEntry` and `SrcDesc` moved out of `include/Task.h` into
-`src/app/Task.c` (only this unit uses them). `SlotEntry`'s `unk10`/`unk14`
+`SlotEntry` and `SrcDesc` moved out of `include/task.h` into
+`src/app/task.c` (only this unit uses them). `SlotEntry`'s `unk10`/`unk14`
 pair is now a `SlotPos pos` field, so the `SLOT_POS()` macro and its
 `*(SlotPos *)&target->unk10` cast are gone; the source still reads
 `pos = entry->pos;`, the same whole-struct copy round 75 found, byte-exact.
@@ -691,8 +691,8 @@ TitleMenu's `D_80086CA8`: savedCursor 0, cursorColor (128, 128, 0), pos
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-Task.c's local `SlotPos` ({s32 x, y}) is gone: the positions are ScreenSprite.h's `ScreenSpritePos`, the same two words, which setPosition takes, and `TaskCoreTarget::slotPositions` is `ScreenSpritePos *` (was `u8 *`). Byte-identical.
+task.c's local `SlotPos` ({s32 x, y}) is gone: the positions are ScreenSprite.h's `ScreenSpritePos`, the same two words, which setPosition takes, and `TaskCoreTarget::slotPositions` is `ScreenSpritePos *` (was `u8 *`). Byte-identical.

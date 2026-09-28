@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003B854` on 2026-09-23 (tools/rename.py). Address 0x8003b854.
 
-**Unit:** Task · **Status:** MATCHED (36/36 words)
+**Unit:** task · **Status:** MATCHED (36/36 words)
 
 A `New_X` class allocator: allocate 0xDC bytes, and if that succeeds dispatch
 the class's constructor slot (`+0x008`) with the caller's arguments forwarded
@@ -26,7 +26,7 @@ StreamTaskObj *New_StreamTask(s32 a1, s32 a2, s32 a3, s32 a4)
 }
 ```
 
-See `src/app/Task.c` for the exact text.
+See `src/app/task.c` for the exact text.
 
 ## Why it matched: `return NULL;` goes LAST
 

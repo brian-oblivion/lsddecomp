@@ -27,7 +27,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 | `func_80040740` | (kept `func_80040740` at track 3; `BoxFill__SetSemiTransRate` since round 85, see Track 4) | C |
 
 **What is known.** A thin wrapper around `GetSetBitField(&self->flags,
-shift, width, value)` (see `include/Task.h`'s own comment on
+shift, width, value)` (see `include/task.h`'s own comment on
 `flags`, renamed from `unk58` this round), the SAME generic
 packed-bitfield-word accessor `scene_node.c`'s own sibling functions
 (`SceneNode__SetDisplay`/`D374`/`D3A0`) wrap -- and those, the FIRST instances

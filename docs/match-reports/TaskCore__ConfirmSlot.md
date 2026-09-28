@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003CA1C` on 2026-09-24 (tools/rename.py). Address 0x8003ca1c.
 
-**Unit:** Task · **Size:** 30 instructions
+**Unit:** task · **Size:** 30 instructions
 
 ## What it does
 
@@ -71,7 +71,7 @@ not a subtraction) before trusting it.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit Task. 2 attempts.
+round 2026-09-02, runner echo, unit task. 2 attempts.
 
 ## Naming (round 78, delta)
 
@@ -99,4 +99,4 @@ Local `idx` -> `slot`. Byte-identical.
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).

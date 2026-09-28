@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003E418` on 2026-09-19 (tools/rename.py). Address 0x8003e418.
 
-**Unit:** Task · **Size:** 35 instructions
+**Unit:** task · **Size:** 35 instructions
 
 ## What it does
 
@@ -55,7 +55,7 @@ Matched on the first build.
 `arg1` (the `EventArg *` `IntermediateBase__OnNotify` forwards to `slot54`/`58`/`5C`)
 went completely unused here -- a live-but-unconsumed register at this call
 site, same shape as `TaskCore__Update`'s own `$a1` note in
-`include/Task.h`. Declaring the parameter with its full established
+`include/task.h`. Declaring the parameter with its full established
 type (`EventArg *`, matching the vtable field) rather than degrading it to
 `s32`/`void *` costs nothing and keeps the signature consistent with its
 two siblings (`slot58`, `slot5C`) for whoever reads this table's occupants
@@ -70,7 +70,7 @@ side by side.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. Matched on the
+round 13 (2026-09-03), runner alpha, unit task. Matched on the
 first build.
 
 ## Naming
@@ -87,7 +87,7 @@ object; what event code 2 represents in the game is not established
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__OnTag1Notify (class prefix). Occupies +0x054, slot `onTag1Notify`: OnNotify's case for a sender of root class 1 (gDrawSystemMethods). Parameters are (sender, event). The calls on unk10 and initArgs->unk4 use one local view in Task.c (IntermediateBaseLinked); their classes are not established.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__OnTag1Notify (class prefix). Occupies +0x054, slot `onTag1Notify`: OnNotify's case for a sender of root class 1 (gDrawSystemMethods). Parameters are (sender, event). The calls on unk10 and initArgs->unk4 use one local view in task.c (IntermediateBaseLinked); their classes are not established.
 
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 

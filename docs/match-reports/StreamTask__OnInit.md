@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BAB4` on 2026-09-23 (tools/rename.py). Address 0x8003bab4.
 
-**Unit:** Task · **Size:** 42 words · **Status:** MATCHED (42/42)
+**Unit:** task · **Size:** 42 words · **Status:** MATCHED (42/42)
 
 ## Summary
 
@@ -85,7 +85,7 @@ Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, i
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4Obj view is gone and Task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The calls are `setAutoPlay` (+0x06C) and `play` (+0x040), `play`'s name argument cast `(char *)self->streamName` (no code). Byte-identical.
+The player is a MoviePlayer (`include/MoviePlayer.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The calls are `setAutoPlay` (+0x06C) and `play` (+0x040), `play`'s name argument cast `(char *)self->streamName` (no code). Byte-identical.
 
 ## Track 10 (2026-09-28, round 104, alpha)
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C11C` on 2026-09-23 (tools/rename.py). Address 0x8003c11c.
 
-**Unit:** Task · **Size:** 48 words · **Status:** MATCHED (48/48)
+**Unit:** task · **Size:** 48 words · **Status:** MATCHED (48/48)
 
 ## Summary
 

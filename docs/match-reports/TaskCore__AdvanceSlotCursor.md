@@ -4,11 +4,11 @@
 
 > Renamed from `func_8003DDC8` on 2026-09-24 (tools/rename.py). Address 0x8003ddc8.
 
-**Unit:** Task · **Size:** 26 words · **Result:** byte-exact
+**Unit:** task · **Size:** 26 words · **Result:** byte-exact
 
 ## What it does
 
-`Obj86B60Methods::slot114` (already recorded in `Task.h` before this
+`Obj86B60Methods::slot114` (already recorded in `task.h` before this
 session, from an earlier round's `classtable.py` cross-reference). Advances
 a ring-buffer index (`self->unk60[idx]`), wrapping to 0 at the per-slot
 capacity (`self->unk5C[idx]`), and reports the new index through a call
@@ -52,7 +52,7 @@ but had opposite effects; the load/increment split alone was the lever.
 
 ## Header additions
 
-`include/Task.h`: new slot `slot11C` on `Obj86B60Methods`
+`include/task.h`: new slot `slot11C` on `Obj86B60Methods`
 (`void (*)(Obj86B60 *, s32, s32)`), immediately after the existing
 `slot118`. No existing slot's offset or type changed — `slot11C` was
 previously undifferentiated space past the struct's last modelled slot.

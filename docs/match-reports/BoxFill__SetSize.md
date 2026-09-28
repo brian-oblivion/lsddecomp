@@ -24,7 +24,7 @@ wrong (`0x2` vs retail's `0x4`).
 First attempt (before this) also caught a real struct bug: I had
 declared `unk60`/`unk62` immediately after `unk58` (a `u32` ending at
 `+0x05C`) with no padding, so they silently landed at `+0x05C`/`+0x05E`
-instead of the intended `+0x060`/`+0x062` -- `include/Task.h` now
+instead of the intended `+0x060`/`+0x062` -- `include/task.h` now
 has an explicit `pad05C[0x060 - 0x05C]` gap. This is exactly the
 "field inserted without its leading padNN" trap CLAUDE.md warns about;
 caught immediately here because the SAME struct's `BoxFill__SetSize` was
@@ -76,4 +76,4 @@ an s32 field into the u16 `boxW`/`boxH` still reads only the low halfword
 halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
 became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
 BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
-its caller in Task passes an `s32 size[2]`).
+its caller in task passes an `s32 size[2]`).

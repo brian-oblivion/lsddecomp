@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EA0C` on 2026-09-23 (tools/rename.py). Address 0x8003ea0c.
 
-Unit: `Task`. Round 14, runner delta. 6/6 words, full match (2
+Unit: `task`. Round 14, runner delta. 6/6 words, full match (2
 real attempts).
 
 ## Signature
@@ -38,7 +38,7 @@ unk34` field so `self->unk34 = *pair;` is a single assignment.
 
 ## Header changes
 
-`include/Task.h`: new `Pair32_d294` type (`{ s32 a, b; }`); `Unk18Obj`
+`include/task.h`: new `Pair32_d294` type (`{ s32 a, b; }`); `Unk18Obj`
 gains `unk34` (`+0x034`, `Pair32_d294`, spanning what would have been
 `+0x034`/`+0x038` as two scalars).
 

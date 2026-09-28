@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EA74` on 2026-09-27 (tools/rename.py). Address 0x8003ea74.
 
-Unit: `Task`. Round 73, runner charlie (report written retroactively;
+Unit: `task`. Round 73, runner charlie (report written retroactively;
 same shape as `Viewport__NoOpSlot58` immediately above it in ROM order).
 
 ## Signature

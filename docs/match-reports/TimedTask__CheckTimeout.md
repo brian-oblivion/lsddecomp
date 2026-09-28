@@ -86,7 +86,7 @@ assuming a scheduling quirk.
 
 ## Naming
 
-`TimedTask__CheckTimeout` -- tier B. Occupies +0x05C. Forwards to the base's own +0x05C (`IntermediateBase__IncrementFrameCounter`, Task.h) then compares `frameCounter > timeoutFrames`, triggering `onEventArg(self, 4)` on overflow -- a timeout check by construction, though what the timeout gates in-game is not established.
+`TimedTask__CheckTimeout` -- tier B. Occupies +0x05C. Forwards to the base's own +0x05C (`IntermediateBase__IncrementFrameCounter`, task.h) then compares `frameCounter > timeoutFrames`, triggering `onEventArg(self, 4)` on overflow -- a timeout check by construction, though what the timeout gates in-game is not established.
 
 ## Track 4
 

@@ -145,7 +145,7 @@ Read each named class's header first; its banner points to the units.
   (`src/graphics/graphics_resources.c`) load models and TOD animations;
   `TmdModel` (`src/graphics/TmdModel.c`) is one object of a TMD, and
   `SortTmdObject` (`src/graphics/TmdRenderer.c`) turns it into GPU primitives.
-  `Viewport` (`src/app/Task.c`, its draw pass in `src/graphics/ViewportDraw.c`)
+  `Viewport` (`src/app/task.c`, its draw pass in `src/graphics/ViewportDraw.c`)
   renders a scene through libgs;
   `FrameClock` (`src/graphics/sprite.c`) is the per-frame tick objects listen to; `Pad` (`src/app/pad.c`)
   turns the controller into button events; `DrawSystem` (`src/graphics/draw_system.c`)
@@ -163,7 +163,7 @@ Read each named class's header first; its banner points to the units.
   builds an `ObjM` per stage (`src/world/ObjMStyleActor.c`, with the style layer
   and `StyleEffect`).
 - **Screens and menus.** `IntermediateBase` runs one attached job to a
-  result. `TaskCore` (`src/app/Task.c`, with `StreamTask`, `IntermediateBase` and
+  result. `TaskCore` (`src/app/task.c`, with `StreamTask`, `IntermediateBase` and
   `Viewport`) is the base of the menu and screen
   tasks: `StreamTask` (plays one movie), `GraphRoom` (the mood graph,
   `src/world/ObjMStyleActor.c`) and `TitleMenu`

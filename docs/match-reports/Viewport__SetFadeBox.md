@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003F1A8` on 2026-09-23 (tools/rename.py). Address 0x8003f1a8.
 
-Unit: `Task`. Round 14, runner delta. 34/34 words, full match (2
+Unit: `task`. Round 14, runner delta. 34/34 words, full match (2
 real attempts).
 
 ## Signature
@@ -60,7 +60,7 @@ guard's own C source structure has to reflect directly.
 
 ## Header changes
 
-`include/Task.h`: `SubHandleObjMethods` gains `slot4`
+`include/task.h`: `SubHandleObjMethods` gains `slot4`
 (`void (*)(SubHandleObj*)`, release-shaped, no extra args), splitting the
 old `pad000[0x04C]` span ahead of the already-typed `slot4C`.
 
@@ -70,7 +70,7 @@ old `pad000[0x04C]` span ahead of the already-typed `slot4C`.
 
 ## Proposed field names
 
-Not applied -- `unkB0`/`unkAC` are both shared with `Task.c`
+Not applied -- `unkB0`/`unkAC` are both shared with `task.c`
 (`Viewport__Viewport` sets both, `Viewport__Finalize` releases `unkAC`), so
 outside this unit's ownership per track 3's rule.
 
@@ -80,7 +80,7 @@ outside this unit's ownership per track 3's rule.
 - `unkAC` -> not proposed beyond the existing `Unk18AcObj` typedef's own
   documentation; this unit only forwards it opaquely (`arg1->methods->
   slot4C(arg1, self->unkAC, sFadeBoxAttachPos)`), no new evidence over what
-  `include/Task.h`'s own comment on `Unk18Obj::unkAC` already records.
+  `include/task.h`'s own comment on `Unk18Obj::unkAC` already records.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 

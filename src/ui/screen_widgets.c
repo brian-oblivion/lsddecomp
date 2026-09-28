@@ -27,7 +27,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "FrameClock.h"
-#include "Task.h"
+#include "task.h"
 #include "TextRow.h"
 #include "bmem_pmgr.h"
 #include "FullWidthSjis.h"

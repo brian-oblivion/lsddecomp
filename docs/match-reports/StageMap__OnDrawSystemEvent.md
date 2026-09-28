@@ -81,7 +81,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BD14` | `StageMap__OnDrawSystemEvent` | B | Occupant of `gStageMapMethods` +0x100 (`slot100`). `DayTaskStageMap`'s `StageMap__OnNotify` (already matched) dispatches this slot, unconditionally, only when `(sender->methods->header & 0xF) == 1` -- i.e. only for one sender class tag. Follows the SAME "OnNotifyTagN" naming convention already established elsewhere in this codebase for identical per-tag dispatch targets (`Viewport__OnFrameClockEvent`/`Viewport__OnDrawSystemEvent`, `src/app/Task.c`). `mode` here is the caller's own `command`, but the body itself early-returns unless `mode == 2` -- narrower than "every tag-1 notification", which the name does not claim (only that this IS the tag-1 dispatch target). |
+| `func_8004BD14` | `StageMap__OnDrawSystemEvent` | B | Occupant of `gStageMapMethods` +0x100 (`slot100`). `DayTaskStageMap`'s `StageMap__OnNotify` (already matched) dispatches this slot, unconditionally, only when `(sender->methods->header & 0xF) == 1` -- i.e. only for one sender class tag. Follows the SAME "OnNotifyTagN" naming convention already established elsewhere in this codebase for identical per-tag dispatch targets (`Viewport__OnFrameClockEvent`/`Viewport__OnDrawSystemEvent`, `src/app/task.c`). `mode` here is the caller's own `command`, but the body itself early-returns unless `mode == 2` -- narrower than "every tag-1 notification", which the name does not claim (only that this IS the tag-1 dispatch target). |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 
@@ -117,4 +117,4 @@ Parameters and locals: `arg1` -> `sender`, `mode` -> `command` (OnNotify's comma
 
 Constants: 2 -> `DRAWSYSTEM_EVENT_VSYNC` (include/draw_system.h, new): OnNotify calls this method for a sender whose class id's low nibble is 1, DrawSystem's family (class id 0x1), and DrawSystem__RunLoop (src/code_10ee0.c) calls `notifyParents(self, 2)` once per VSync pass; draw_system.h's banner says StageMap adds it as a child. 7 -> `STAGEMAP_EVENT_SLOT_DATA_READY`, `headerReady = 2` -> `LBDFILE_HEADER_CONSUMED` (include/LbdFile.h, new; its banner already said "marks the header consumed (headerReady 2)"), loop bound -> `ARRAY_COUNT(self->slots)`.
 
-Not renamed: the method name. Viewport has the same `OnNotifyTag1` for its DrawSystem case (src/app/Task.c), so it is a convention across two classes; proposed to the head as one rename of both (e.g. `OnDrawSystemNotify`) rather than breaking the pair here.
+Not renamed: the method name. Viewport has the same `OnNotifyTag1` for its DrawSystem case (src/app/task.c), so it is a convention across two classes; proposed to the head as one rename of both (e.g. `OnDrawSystemNotify`) rather than breaking the pair here.

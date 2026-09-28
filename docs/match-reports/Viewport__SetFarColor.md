@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003EAA4` on 2026-09-23 (tools/rename.py). Address 0x8003eaa4.
 
-Unit: `Task`. Round 14, runner delta. 8/8 words, full match.
+Unit: `task`. Round 14, runner delta. 8/8 words, full match.
 
 ## Signature
 
@@ -30,7 +30,7 @@ void Viewport__SetFarColor(Unk18Obj *self, SByte3_d294 *src) {
 
 ## Header changes
 
-`include/Task.h`: `Unk18Obj` gains `unk5B` (`+0x05B`, `SByte3_d294`).
+`include/task.h`: `Unk18Obj` gains `unk5B` (`+0x05B`, `SByte3_d294`).
 
 ## Naming
 

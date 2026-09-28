@@ -24,7 +24,7 @@ PlacementGridVabSound: warning: unused variable `unused'
 scene_node: warning: unused variable `pad'
 scene_node: warning: unused variable `unused'
 sprite: warning: unused variable `pad'
-Task: warning: assignment from incompatible pointer type
+task: warning: assignment from incompatible pointer type
 TitleMenuTaskObjF: warning: `state' might be used uninitialized in this function
 TitleMenuTaskObjF: warning: control reaches end of non-void function
 TmdModel: warning: `p' might be used uninitialized in this function

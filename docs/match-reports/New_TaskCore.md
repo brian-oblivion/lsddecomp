@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BE94` on 2026-09-23 (tools/rename.py). Address 0x8003be94.
 
-**Unit:** Task · **Status:** MATCHED (31/31 words)
+**Unit:** task · **Status:** MATCHED (31/31 words)
 
 A `New_X` class allocator: allocate 0xA4 bytes, and if that succeeds dispatch
 the class's constructor slot (`+0x008`) with the caller's arguments forwarded
@@ -26,7 +26,7 @@ TaskCoreObj *New_TaskCore(s32 a1, s32 a2, s32 a3)
 }
 ```
 
-See `src/app/Task.c` for the exact text.
+See `src/app/task.c` for the exact text.
 
 ## Why it matched: `return NULL;` goes LAST
 
