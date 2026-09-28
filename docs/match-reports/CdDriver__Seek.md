@@ -120,7 +120,7 @@ this is the SAME struct as `ObjA34_179D8H` there, and that unit already
 names offset 0x1C the same way, independently. `gCdSeekLoc` is an 8-byte
 zero-initialized buffer (`asm/data/5DB70.data.s`); this function only ever
 takes its address, so it's declared as a plain byte array locally.
-`gCdSeekParam = gCdSeekLoc - 0x14` matches `code_179d8_r.c`'s existing reads of
+`gCdSeekParam = gCdSeekLoc - 0x14` matches `code_179d8_s.c`'s existing reads of
 that global (`(u8 *)gCdSeekParam + 0x14`) -- the same pointer, offset the other
 direction.
 

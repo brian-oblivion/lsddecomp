@@ -35,7 +35,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `D_8008A874` | `gCdOperation` | A |
 
 **Evidence.** The global has exactly one writer that sets it non-zero:
-`StartCdOperation(arg0, arg1)` (code_179d8_r), which stores `arg0` into it. Its
+`StartCdOperation(arg0, arg1)` (code_179d8_s), which stores `arg0` into it. Its
 five call sites are the five methods of this class in `code_179d8_s`, each
 passing a distinct constant -- `CdDriver__Close` 0 (close), `CdDriver__Open` 1
 (open by name), `CdDriver__Seek` 2 (seek), `CdDriver__Read` 3 (read),

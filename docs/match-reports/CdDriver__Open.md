@@ -151,7 +151,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
 
 `Obj80027480.unk18` is now `Pos18` (was `u8[4]`) -- a CdlLOC-shaped 4-byte
 position, alignment 2. `Rec80028448` is a local view of the 0x1C-byte string
-records at `gFileTable` (`src/code_179d8_r.c`'s own comment already
+records at `gFileTable` (`src/code_179d8_s.c`'s own comment already
 describes this table); only the trailing two fields this function reads are
 named. `StatBuf80027` is this unit's OWN local view of the CD stat buffer
 `code_179d8_h.c`'s `OpenCdFile` already independently discovered as
@@ -220,7 +220,7 @@ oracles green after.
 | `Pos18` | -- | `CdLoc16` | A | code_179d8_s's name for the same 2-aligned CdlLOC shape |
 | `Rec80028448` | -- | `CdFileEntry` | A | code_179d8_s's name for the 0x1C-byte file-table record |
 | `StatBuf80027` | -- | `CdFileInfo` | A | code_179d8_s's name for CdSearchFile's CdlFILE output |
-| `Node8008A894` | -- | `CdRequestNode` | A | code_179d8_r's name for the queue node |
+| `Node8008A894` | -- | `CdRequestNode` | A | code_179d8_s's name for the queue node |
 | `Class6D4E8` | `unk0C` | `isOpen` | A | set 1 by Open, 0 by Close; Seek/Read require it; code_179d8_h's name |
 | `Class6D4E8` | `unk10` | `buffer` | A | LoadFile's BMemPMgrAlloc result / read target; FileResource's name |
 | `Class6D4E8` | `unk14` | `bufferSize` | A | LoadFile stores the sector-rounded read size; FileResource's name |

@@ -19,7 +19,7 @@
  *                       getter; the queue front end (EnqueueCdRequest), the
  *                       file table's setters, ResolveFileEntries, the lock
  *                       and the VSync service tick (ServiceCdDriver)
- *   src/code_179d8_r.c  the read state machine, AllocCdRequestNode /
+ *   src/code_179d8_s.c  the read state machine, AllocCdRequestNode /
  *                       FreeCdRequestNode, the file-table lookups
  *   src/code_179d8_h.c  the synchronous OpenCdFile / CloseCdFile /
  *                       GetCdFileSize / ReadCdFile the methods call when
@@ -112,7 +112,7 @@ typedef struct CdRequestNode {
 #define CD_OP_READ 5
 #define CD_OP_LOAD_FILE 7
 
-/* gCdTickStep: which of code_179d8_r.c's two state machines ServiceCdDriver
+/* gCdTickStep: which of code_179d8_s.c's two state machines ServiceCdDriver
  * ticks. */
 #define CD_TICK_NONE 0          /* neither: ResetCdStateMachine's value */
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
@@ -130,7 +130,7 @@ typedef struct CdRequestNode {
 #define CD_OPERATION_LOAD_FILE 4
 
 /* gCdState: the state machines' phase, StartCdOperation's second argument
- * (code_179d8_r.c's banner; that unit still spells them as literals). */
+ * (code_179d8_s.c's banner; that unit still spells them as literals). */
 #define CD_STATE_IDLE 0        /* ResetCdStateMachine's value */
 #define CD_STATE_SETLOC 1      /* issue CdControl(CdlSetloc) */
 #define CD_STATE_SETLOC_WAIT 2 /* poll CdSync for it */

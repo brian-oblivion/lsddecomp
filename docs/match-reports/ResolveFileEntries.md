@@ -48,7 +48,7 @@ struct CdFileInfo {
  * CdSearchFile lookup on that path, so an entry is a name resolved once and
  * reused as a seek target. gFileTable and gFileTableCount (this unit's
  * SetFileTable / SetFileTableCount) are the array's base and length --
- * FindCdFileIndex (code_179d8_r) walks the identical 0x1C stride over
+ * FindCdFileIndex (code_179d8_s) walks the identical 0x1C stride over
  * gFileTable doing strstr() against `name`, confirming the layout
  * independently. */
 typedef struct CdFileEntry CdFileEntry;
@@ -61,7 +61,7 @@ struct CdFileEntry {
 extern const char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
 extern s32 CdSearchFile(CdFileInfo *fileInfo, char *path); /* libcd/iso9660.o */
 extern void printf(const char *fmt, void *arg1);
-extern char *BuildCdFilePath(char *dest, char *suffix); /* code_179d8_r */
+extern char *BuildCdFilePath(char *dest, char *suffix); /* code_179d8_s */
 extern void InitCdDrive(void);
 
 #define CD_SEARCH_RETRIES 0x65
@@ -202,7 +202,7 @@ element. Turning names into disc positions is the entire function; tier A.
   alignment and the copy would stop matching. The two halves keep placeholder
   names -- nothing in this corpus reads them apart.
 - `FileEntryQ` -> `CdFileEntry`, `unk14`/`unk18` -> `pos`/`size`. Filled
-  straight from `CdFileInfo.pos`/`.size`; `code_179d8_r` confirms the 0x14
+  straight from `CdFileInfo.pos`/`.size`; `code_179d8_s` confirms the 0x14
   name field independently by `strstr`-ing it. Tier A.
 - `CD_SEARCH_RETRIES` for the bare `0x65`.
 
@@ -239,7 +239,7 @@ CdlLOC's four bytes under another name, so the copy is spelled
 `entries->pos = *(CdLoc16 *)&info.pos;`. Byte-exact: the access type (and so
 the 2-byte-aligned `lwl`/`lwr` copy) is unchanged. Proposed at the head:
 replace `CdLoc16` with `CdlLOC` in include/FileResource.h once its includers
-can take `<libcd.h>` (code_179d8_r/_s, CdStream still re-declare libcd).
+can take `<libcd.h>` (code_179d8_s/_s, CdStream still re-declare libcd).
 
 ## Track 7 (round 101, echo): comments moved here, and names
 

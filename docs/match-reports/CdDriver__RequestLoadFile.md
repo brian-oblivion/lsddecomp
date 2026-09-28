@@ -59,7 +59,7 @@ struct UnkC80 {
 struct Obj6D4E8_282AC;
 extern void EnqueueCdRequest(struct Obj6D4E8_282AC *owner, s32 fileIndex,
                              s32 op, s32 param0, s32 param1);
-extern s32 FindCdFileIndex(char *name); /* code_179d8_r: name -> table index */
+extern s32 FindCdFileIndex(char *name); /* code_179d8_s: name -> table index */
 extern s32 gCdAsyncEnabled;
 
 void CdDriver__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
@@ -136,7 +136,7 @@ allows.
   — a single early-return-free `if` wrapping the whole body reproduces this
   with no duplicated tail, the same shape CLAUDE.md/prior reports document
   for this unit.
-- `FindCdFileIndex` (still `INCLUDE_ASM` in `code_179d8_r.c`, foxtrot's unit)
+- `FindCdFileIndex` (still `INCLUDE_ASM` in `code_179d8_s.c`, foxtrot's unit)
   takes a single `char *` argument that it passes straight to `strstr` as
   the needle — read from its own disassembly, not guessed — hence `char
   *arg0` here rather than `void *`. `arg1` of `CdDriver__RequestLoadFile` is typed the

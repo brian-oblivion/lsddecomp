@@ -67,10 +67,10 @@ The conditional is half the function, so the name carries it -- calling this
 `StopCdService` would say it always stops, which it does not. The mirror of
 `StartCdService`.
 
-`gCdTickStep` itself is left named: it is `code_179d8_r`'s "which state-machine
+`gCdTickStep` itself is left named: it is `code_179d8_s`'s "which state-machine
 step to tick" selector (1 or 2), written by `code_179d8_s` and cleared by
 that unit's reset, so it belongs to whichever unit's naming pass takes
-`code_179d8_r`. Proposed there: `gCdStep`.
+`code_179d8_s`. Proposed there: `gCdStep`.
 
 ## Track 7 (round 101, echo): comments moved here, and names
 

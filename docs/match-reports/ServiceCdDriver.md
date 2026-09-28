@@ -20,8 +20,8 @@ carries the evidence for each one.
 extern s32 GetBMemPMgrBusy(void); /* TmdRenderer */
 extern s32 gCdUseVSyncCallback;
 extern s32 gCdTickStep;
-extern void TickCdStateMachine(void); /* code_179d8_r: state-machine step 1 */
-extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine step 2 */
+extern void TickCdStateMachine(void); /* code_179d8_s: state-machine step 1 */
+extern void TickCdLoadFileStateMachine(void); /* code_179d8_s: state-machine step 2 */
 extern s32 sCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
@@ -91,7 +91,7 @@ of getting a fallthrough instruction of its own.
 
 Body: an optional `VSyncCallback(0)` (`gCdUseVSyncCallback`), a two-way dispatch on
 `gCdTickStep` (1 -> `TickCdStateMachine`, 2 -> `TickCdLoadFileStateMachine`, both in the
-sibling `code_179d8_r` unit — declared extern here per the
+sibling `code_179d8_s` unit — declared extern here per the
 per-call-site-typed convention `code_179d8_h.c` already established for
 cross-unit libcd calls, now confirmed to apply to cross-unit game-code calls
 too), an optional virtual dispatch through `gCdDriverMethods`'s own table slot
@@ -127,7 +127,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 `VSyncCallback`, and `SetCdDriverMode` passes the same address to the
 singleton's `+0x84` callback slot when the VSync path is off. One call does
 all the periodic work there is -- skip if `sCdLock` is held or
-`GetBMemPMgrBusy` says no; step `code_179d8_r`'s CD state machine
+`GetBMemPMgrBusy` says no; step `code_179d8_s`'s CD state machine
 (`TickCdStateMachine` for `gCdTickStep == 1`, `TickCdLoadFileStateMachine` for 2); drain the
 request queue through the class's own `+0x068` slot; re-arm itself. "Service"
 is the one word that covers a tick that both advances a state machine and

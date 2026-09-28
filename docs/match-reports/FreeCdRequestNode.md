@@ -2,7 +2,7 @@
 
 > Renamed from `func_800283C4` on 2026-09-18 (tools/rename.py). Address 0x800283c4.
 
-**Unit:** code_179d8_r · **Size:** 33 words · **Status:** MATCHED (33/33 words) · **Round 45**
+**Unit:** code_179d8_s · **Size:** 33 words · **Status:** MATCHED (33/33 words) · **Round 45**
 
 ## What it does
 

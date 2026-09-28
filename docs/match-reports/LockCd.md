@@ -53,7 +53,7 @@ VSync-driven service tick, which skips its turn rather than walk a
 half-updated queue. That is a re-entrancy latch against an interrupt-time
 callback, not a mutex: nothing spins or blocks on it.
 
-`code_179d8_r`'s header comment had already called this pair lock/unlock;
+`code_179d8_s`'s header comment had already called this pair lock/unlock;
 this rename records it in the symbols.
 
 ## Track 7 (round 101, echo): comments moved here, and names
