@@ -869,3 +869,18 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * `node != NULL`: the disassembly forms &workm.t (node + 0x38) first and
  * tests THAT. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments' process text here,
+verbatim; the source keeps a one-line `MATCHING:` note or the API doc.
+
+From `src/graphics/scene_node.c`:
+
+```c
+ * MATCHING, each measured (the report has the alternatives):
+ *  - coord.t is copied as one LongVec3 assignment, not three;
+ *  - the parent ternary is written twice per axis and reached by field;
+ *  - the hit branch is written once per probe, inside the model test;
+ *  - `node->workm.t != NULL` tests the array's address, as retail does. */
+```

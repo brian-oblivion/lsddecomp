@@ -698,3 +698,16 @@ ACTOR_CLASS_ID` (byte-identical: cc1 narrows the load to the same lbu), and
  * literal 4 into $s1. The goto form of earlier rounds had no loop notes, so
  * it needed a named `tag` and could not get retail's register order. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments' process text here,
+verbatim; the source keeps a one-line `MATCHING:` note or the API doc.
+
+From `src/graphics/scene_node.c`:
+
+```c
+/* Adds this node as a child (addChild) to every parent of `node` that is
+ * an Actor. MATCHING: the two nested do/while loops, not gotos: loop.c
+ * then hoists SCENENODE_CLASS_ID into a saved register, as retail does. */
+```
