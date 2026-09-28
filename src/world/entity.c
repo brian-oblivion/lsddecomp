@@ -1,30 +1,8 @@
-/* Entity -- the class whole (include/entity.h): its methods, its table
- * getter GetEntityMethods, and the MoodCue handlers of its mood rows.
- *
- * An Entity is a TodActor driven by one row of sEntityMoodTable, chosen by
- * New_Entity's moodIndex. The first section holds:
- *  - construction and teardown: New_Entity, Entity__Entity, Entity__Reset
- *    (fog for unlockKind 1 to 9, tick callback B, start inactive),
- *    Entity__Finalize, and Entity__GetOrCreateFadeBox, the screen fade some
- *    handlers run;
- *  - attaching: Entity__AttachToParent activates the entity at once when its
- *    row has no activation condition, and then starts its sound cue when the
- *    row has no cue range; Entity__DetachFromParent deactivates it;
- *  - the tick: Entity__Update runs the activation, deactivation, sound-cue and
- *    proximity slots, then TodActor's update. Entity__UpdateActivationState and
- *    Entity__UpdateDeactivationState test the row's activateKind and
- *    deactivateKind against Entity__IsNearTarget (the player's projected
- *    position against this entity's, in ENTITY_RANGE_UNITs);
- *  - link commands: Entity__NotifyLinkStage passes them to TodActor's
- *    handler and, on event 4, sends the row's EntityEffect to its parents;
- *    Entity__OnGridCellLinkCommand deactivates on event 4;
- *  - the sound cue: Entity__StartSoundCue installs the row's handler on
- *    soundCueSet, Entity__TickSoundCue services it and counts moodTimer,
- *    Entity__StopSoundCue flushes it;
- *  - the getters the dream reads when an Entity sends an effect: the row
- *    itself, its unlock score, link stage and event video, and
- *    Entity__GetProximityRatio, the sound attenuation step for the player's
- *    distance.
+/*
+ * entity.c -- Entity (include/entity.h): its methods, in address order, then
+ * the MoodCue handlers of its mood rows, in sections by row. The class doc in
+ * include/entity.h says what an Entity is, how its mood row drives it and
+ * what a MoodCue handler does.
  */
 #include "common.h"
 #include <libgte.h>
@@ -37,6 +15,9 @@
 #include "viewport.h"
 #include "bmem_pmgr.h"
 
+/* MATCHING: playTod is called through EntityPlayTodFn (void); through the s32 slot, calls stop merging */
+/* MATCHING: tod_actor.h's moveLocalZ/moveLocalY must return void, or the handlers' calls stop merging */
+
 /* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its
  * `size`/`offset` arguments are NULL: {320, 240} and {-100, -100}, what
  * Viewport gives its FadeBox (fade_box.h). */
@@ -44,8 +25,11 @@ extern s32 sEntityFadeBoxDefaultSize[2];
 extern s32 sEntityFadeBoxDefaultOffset[2];
 
 extern EntityMoodRow sEntityMoodTable[];
-extern s8 sEntityLinkStageTable[];  /* the linkStage column (Entity) */
-extern s8 sEntityEventVideoTable[]; /* the eventVideo column (Entity) */
+/* The linkStage and eventVideo columns of sEntityMoodTable as flat arrays,
+ * indexed moodIndex * 16. Entity__NotifyIfTargetInRange reads them this way;
+ * reading the row's fields would do the same. */
+extern s8 sEntityLinkStageTable[];
+extern s8 sEntityEventVideoTable[];
 
 /* The motion templates (.data, in address order):
  * the constant triples the MoodCue handlers in src/world/entity.c pass to
@@ -53,9 +37,9 @@ extern s8 sEntityEventVideoTable[]; /* the eventVideo column (Entity) */
  * (include/scene_node.h), degrees or scale factors, {x, y, z} -- and to
  * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take
  * the table untyped, so the element type is the reader's (SceneNode__Update-
- * Rotation/UpdateScale), not the callers'. sTranslateYMinus64's label also
- * holds a second triple, (0, -0x20, 0); sScaleX3's z den is entity.c's
- * sScaleTemplateZDenom. */
+ * Rotation/UpdateScale), not the callers'. sTranslateYMinus64's data also
+ * holds a second triple, (0, -0x20, 0); sScaleX3's z den is
+ * sScaleTemplateZDenom (below). */
 extern Ratio16 sRotationXPlusEighth[];
 extern Ratio16 sRotationYawPlus9[];
 extern Ratio16 sRotationYawMinus9[];
@@ -453,26 +437,10 @@ s32 Entity__UpdateDeactivationState(Entity *self) {
 
 /* ---- Entity's last methods; MoodCue handlers, rows 0 to 17 -------------
  *
- * The methods. Entity__Update runs the table's last three slots every tick:
- * Entity__UpdateTargetProximity (+0x178) latches targetReached through
- * setTargetReached once the player (`peer`) is within the mood row's
- * proximityRange, Entity__UpdateSoundCueStart (+0x17C) starts the sound cue
- * when the player comes within the row's cueRange, and
- * Entity__UpdateSoundCueStop (+0x180) stops it again when the player leaves
- * that range. Entity__NotifyIfTargetInRange and Entity__IsTargetInRange are
- * the range test Entity__UpdateDeactivationState makes on the row's
- * sEntityEventVideoTable entry; GetEntityMethods is the table's getter.
- *
- * The handlers. Each Entity__MoodCueNN is the `handler` of
- * gEntityMoodHandlerTable's row NN: rows 0, 1, 5 and 7 to 17 (rows 2 to 4
- * and 6 have none). An Entity whose moodIndex selects the row installs it as
- * its SoundCueSet callback, so ServiceSoundCueSet calls it once per tick
- * with the Entity and its cue set. A handler requests tones by filling the
- * set's slots (a VAB program of the cue's sound object, or SOUND_CUE_STOP),
- * moves, turns and scales the entity on moodTimer (the ticks since
- * startSoundCue), on the cue set's own `tick`, or on todFrame (the frame of
- * its TOD animation), and sends the dream an EntityEffect through
- * notifyParents. Which dream object owns each row is not established.
+ * The table's last three slots (updateTargetProximity, updateSoundCueStart,
+ * updateSoundCueStop), the range test updateDeactivationState makes
+ * (NotifyIfTargetInRange, IsTargetInRange), GetEntityMethods, then the
+ * handlers of rows 0, 1, 5 and 7 to 17 (rows 2 to 4 and 6 have none).
  *
  * The literals are left unnamed where they are one handler's tuning: tick
  * counts, distances in world units, TOD frame numbers, VAB program numbers,
@@ -851,27 +819,8 @@ void Entity__MoodCue17(Entity *self) {
 
 /* ---- MoodCue handlers, rows 19 to 38 and 119 ---------------------------
  *
- * All 20 functions are `gEntityMoodHandlerTable` mood-dispatch callbacks,
- * `Entity__MoodCueNN` where NN is the table row (`asm/data/79528.data.s`,
- * stride 0x10), as in every handler section.
- * Row order does not track code address, so this section's rows (19-27, 29-38,
- * plus 119) are not contiguous with each other or with source order;
- * `Entity__MoodCue119` sits far from its neighbours by address alone,
- * confirmed against the table rather than assumed from proximity.
- * `Entity__MoodCue30` additionally occupies row 122 with the same handler
- * and different data words -- one function shared by two distinct mood-row
- * configurations, named for its lower row (same precedent as
- * `Entity__MoodCue81`, below).
- *
- * Fields and slots are the unified Entity's (include/entity.h): the
- * inherited ones carry TodActor's, Actor's and SceneNode's names (`state`,
- * `linkTarget`, `peer`, moveLocalZ/X/Y, moveLocalZOrFindLink, ...), Entity's
- * own are named for their occupants.
- *
- * The literals are left unnamed where they are one handler's tuning: tick
- * counts, distances in world units, TOD frame numbers, VAB program numbers,
- * and the `state` values other than 0 and ENTITY_STATE_DONE, which are each
- * handler's own phases.
+ * Rows 19 to 27, 29 to 38 and 119. Row order does not follow address order,
+ * so Entity__MoodCue119 sits here among rows 19 to 38.
  */
 
 void Entity__MoodCue19(Entity *self, SoundCueSet *out) {
@@ -984,17 +933,11 @@ void Entity__MoodCue26(Entity *self, SoundCueSet *out) {
     s32 zDelta;
     void (**moveZOrFindLink)(Entity *self, s32 val, void *notify);
 
-    /* The do/while(0) wrapper is a no-op scoping device, load-bearing for
-     * register allocation only -- see the match report. Without it GCC
-     * swaps which callee-saved register holds `self` vs `out` for the
-     * whole function. */
-    do {
+    do { /* MATCHING: without the do/while(0), `self` and `out` swap registers */
         if (out->tick % self->todFrameCount == 0) {
             out->attenuation = self->methods->getProximityRatio(self);
             out->slots[0].program = 26;
-            /* Keeps the `li` of v1 = 110 below the out->slots[0].program store; without it
-             * GCC schedules it above the out->attenuation store, right after the call. */
-            __asm__("");
+            __asm__(""); /* MATCHING: keeps v1 = 110 below the program store */
             v1 = 110;
             goto compare;
         }
@@ -1039,6 +982,7 @@ void Entity__MoodCue29(Entity *self) {
     }
 }
 
+/* Row 30's handler, and row 122's (its data words differ). */
 void Entity__MoodCue30(Entity *self) {
     if (self->state == 0) {
         if (((DreamSys *)self->peer)->methods->getDreamColor((DreamSys *)self->peer) == 1) {
@@ -1194,31 +1138,14 @@ void Entity__MoodCue38(Entity *self, SoundCueSet *out) {
 
 /* ---- MoodCue handlers, rows 39 to 58 and 115 ---------------------------
  *
- * Nineteen of Entity's MoodCue handlers and the helper two of them share.
- *
- * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
- * NN (include/entity.h): rows 39 to 52, 55 to 58 and 115. An Entity whose
- * moodIndex selects the row installs it as its SoundCueSet callback, so
- * ServiceSoundCueSet calls it once per tick with the Entity and its cue
- * set. A handler requests tones by filling the set's slots (a VAB program
- * of the cue's sound object, or SOUND_CUE_STOP), moves and turns the
- * entity (or the player, its `peer`) on moodTimer, the ticks since
- * startSoundCue, or on todFrame, the frame of its TOD animation, and sends
- * the dream an EntityEffect through notifyParents. Entity__MoodCue45 is
- * empty: its row has no per-tick effect.
- *
- * Entity__RollScaleOrDelayedDrift is not a row: Entity__MoodCue43 and
- * Entity__MoodCue44 call it first thing every tick.
- *
- * The literals are left unnamed where they are one handler's tuning: tick
- * counts, distances in world units, TOD frame numbers, VAB program numbers,
- * and the `state` values other than 0 and ENTITY_STATE_DONE, which are each
- * handler's own phases.
+ * Rows 39 to 52, 55 to 58 and 115. Entity__MoodCue45 is empty: its row has
+ * no per-tick effect. Entity__RollScaleOrDelayedDrift is not a row:
+ * Entity__MoodCue43 and Entity__MoodCue44 call it first thing every tick.
  */
 
 /* The z den of a scale template, three Ratio16s {1/1, 1/1, 1/zDenom} that
- * end here (the range splat labels sScaleX3 runs on into its first ten
- * bytes). Entity__MoodCue41 writes the den and passes the template. */
+ * end here (sScaleX3's data runs on into the template's first ten bytes).
+ * Entity__MoodCue41 writes the den and passes the template. */
 extern s16 sScaleTemplateZDenom;
 
 /* Defined after Entity__MoodCue43, which calls it. */
@@ -1295,8 +1222,8 @@ void Entity__MoodCue41(Entity *self, SoundCueSet *out) {
             roll = rand();
             zDenom = &sScaleTemplateZDenom;
             *zDenom = roll % 32 + 1;
-            /* Back from the den to the start of its template. MATCHING:
-             * retail relocates against sScaleTemplateZDenom, not sScaleX3. */
+            /* Back from the den to the start of its template. */
+            /* MATCHING: the address is formed from sScaleTemplateZDenom, not sScaleX3 */
             self->methods->updateScale(self, 1, (Ratio16 *)(zDenom + 1) - 3);
         }
     }
@@ -1753,26 +1680,9 @@ tail:
 
 /* ---- MoodCue handlers, rows 59 to 81 ------------------------------------
  *
- * Twenty of Entity's MoodCue handlers.
- *
- * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
- * NN (include/entity.h): rows 59, 61, 62, 64 to 71 and 73 to 81, and
- * Entity__MoodCue81 is row 120's handler too (the row's data words
- * differ). Rows 60, 63 and 72 have no handler. An Entity whose moodIndex
- * selects the row installs it as its SoundCueSet callback, so
- * ServiceSoundCueSet calls it once per tick with the Entity and its cue
- * set. A handler requests tones by filling the set's slots (a VAB program
- * of the cue's sound object, or SOUND_CUE_STOP), moves and turns the
- * entity (or the player, its `peer`) on moodTimer, the ticks since
- * startSoundCue, on the cue set's own `tick`, or on todFrame, the frame of
- * its TOD animation, and sends the dream an EntityEffect through
- * notifyParents. Entity__MoodCue108 (below) runs Entity__MoodCue71 and
- * then sets its scale to sScaleSix.
- *
- * The literals are left unnamed where they are one handler's tuning: tick
- * counts, distances in world units, TOD frame numbers, VAB program numbers,
- * and the `state` values other than 0 and ENTITY_STATE_DONE, which are each
- * handler's own phases.
+ * Rows 59, 61, 62, 64 to 71 and 73 to 81 (rows 60, 63 and 72 have none).
+ * Entity__MoodCue108 (below) runs Entity__MoodCue71 and then sets its scale
+ * to sScaleSix.
  */
 
 void Entity__MoodCue59(Entity *self, SoundCueSet *out) {
@@ -2103,9 +2013,7 @@ void Entity__MoodCue77(Entity *self, SoundCueSet *out) {
 extern s32 sMoodCue78TransitionDone;
 
 void Entity__MoodCue78(Entity *self, SoundCueSet *out) {
-    /* MATCHING: one local for the roll and then the y move; two allocate
-     * differently. */
-    s32 rollOrDy;
+    s32 rollOrDy; /* MATCHING: one local for the roll and then the y move; two allocate differently */
     void *table;
 
     if (out->tick == 0) {
@@ -2200,6 +2108,7 @@ void Entity__MoodCue80(Entity *self, SoundCueSet *out) {
     SceneNode__FaceTarget((SceneNode *)self, (SceneNode *)self->peer, 1, 0, 0);
 }
 
+/* Row 81's handler, and row 120's (its data words differ). */
 void Entity__MoodCue81(Entity *self, SoundCueSet *out) {
     s32 dz;
     s32 state;
@@ -2266,33 +2175,13 @@ void Entity__MoodCue81(Entity *self, SoundCueSet *out) {
 
 /* ---- MoodCue handlers, rows 82 to 96 ------------------------------------
  *
- * Fifteen of Entity's MoodCue handlers and the two tone setters they share.
- *
- * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
- * NN (include/entity.h): rows 82 to 96, and Entity__MoodCue93 is row 107's
- * handler too (same `handler` word, different data words), named for its
- * lower row. An Entity whose moodIndex selects the row installs it as its
- * SoundCueSet callback, so ServiceSoundCueSet calls it once per tick with
- * the Entity and its cue set. A handler requests tones by filling the
- * set's slots (a VAB program of the cue's sound object, or SOUND_CUE_STOP),
- * moves, turns and scales the entity (or the player, its `peer`) on
- * moodTimer, the ticks since startSoundCue, on the cue set's own `tick`, or
- * on todFrame, the frame of its TOD animation, and sends the dream an
- * EntityEffect through notifyParents. Entity__MoodCue91 and
- * Entity__MoodCue92 skip their TOD animation ahead to frame 24 by stepping
- * applyTodFrame, which returns the next frame's pointer.
- *
- * SetCueTones7_7_7 and SetCueTones18_3_3 are not rows: they write a fixed
- * three-voice request into the set, unattenuated (programs 7, 7, 7 at
- * octave -2, and 18, 3, 3), for Entity__MoodCue85 and
- * Entity__MoodCue86. Entity__MoodCue82 and Entity__MoodCue89 write the
- * 18, 3 request inline.
- *
- * The literals are left unnamed where they are one handler's tuning: tick
- * counts, distances in world units, TOD frame numbers, VAB program numbers,
- * and the `state` values other than 0 and ENTITY_STATE_DONE, which are each
- * handler's own phases. The motion templates (ROTATION_*, SCALE_*,
- * TRANSLATE_*) are named by value and declared once in include/entity.h.
+ * Rows 82 to 96. Entity__MoodCue91 and Entity__MoodCue92 skip their TOD
+ * animation ahead to frame 24 by stepping applyTodFrame, which returns the
+ * next frame's pointer. SetCueTones7_7_7 and SetCueTones18_3_3 are not
+ * rows: they write a fixed three-voice request into the set, unattenuated
+ * (programs 7, 7, 7 at octave -2, and 18, 3, 3), for Entity__MoodCue85 and
+ * Entity__MoodCue86; Entity__MoodCue82 and Entity__MoodCue89 write the 18, 3
+ * request inline.
  */
 
 /* Defined after Entity__MoodCue86, which calls them. */
@@ -2568,6 +2457,7 @@ void Entity__MoodCue92(Entity *self, SoundCueSet *out) {
     self->methods->updateScale(self, 1, sScaleXFourFifthsYSixFifths);
 }
 
+/* Row 93's handler, and row 107's (its data words differ). */
 void Entity__MoodCue93(Entity *self, SoundCueSet *out) {
     out->attenuation = self->methods->getProximityRatio(self);
     if (out->tick % 10 == 0) {
@@ -2636,32 +2526,9 @@ void Entity__MoodCue96(Entity *self, SoundCueSet *out) {
 
 /* ---- MoodCue handlers, rows 98 to 129 -----------------------------------
  *
- * Nineteen of Entity's MoodCue handlers and a per-tick helper one of them
- * shares with a handler above.
- *
- * Each Entity__MoodCueNN is the `handler` of gEntityMoodHandlerTable's row
- * NN (include/entity.h): rows 98, 102 to 106, 108 to 111, 113, 114, 117,
- * 118, 121, 123, 125, 128 and 129. Entity__MoodCue123 is also row 126's
- * handler (same `handler` word, different data words), named for its lower
- * row. An Entity whose moodIndex selects the row installs it as its
- * SoundCueSet callback, so ServiceSoundCueSet calls it once per tick with
- * the Entity and its cue set. A handler requests tones by filling the
- * set's slots (a VAB program of the cue's sound object, or SOUND_CUE_STOP),
- * moves and turns the entity (or the player, its `peer`) on moodTimer, the
- * ticks since startSoundCue, or on todFrame, the frame of its TOD
- * animation, and sends the dream an EntityEffect through notifyParents.
- *
- * Entity__StepYawInWindowsThenDeactivate is not a row: it is a shared
- * per-tick helper called directly by two different row handlers,
- * Entity__MoodCue111 (this section, twice) and Entity__MoodCue40 (rows 39
- * to 58, its only caller outside this section).
- *
- * The literals are left unnamed where they are one handler's tuning: tick
- * counts, distances in world units, TOD frame numbers, VAB program
- * numbers, and the `state` values other than 0 and ENTITY_STATE_DONE,
- * which are each handler's own phases. The motion templates the handlers
- * pass to updateRotation and updateScale (ROTATION_*, SCALE_*) are named
- * by value and declared once in include/entity.h.
+ * Rows 98, 102 to 106, 108 to 111, 113, 114, 117, 118, 121, 123, 125, 128
+ * and 129. Entity__StepYawInWindowsThenDeactivate is not a row:
+ * Entity__MoodCue111 (twice) and Entity__MoodCue40 call it.
  */
 
 void Entity__MoodCue98(Entity *self, SoundCueSet *out) {
@@ -2811,7 +2678,7 @@ void Entity__MoodCue111(Entity *self, SoundCueSet *out) {
         }
     }
     if (self->state != 0 && self->moodTimer >= 2160) {
-        /* MATCHING: the repeated `>= 2160` is retail's second range test. */
+        /* MATCHING: the repeated `>= 2160` test stays; it is the second range test */
         if (self->moodTimer >= 2160 && self->moodTimer <= 2560) {
             if (self->moodTimer == 2160) {
                 self->methods->stopTod(self);
@@ -2897,6 +2764,7 @@ void Entity__MoodCue121(Entity *self, SoundCueSet *out) {
     self->methods->updateScale(self, 1, sScaleQuarter);
 }
 
+/* Row 123's handler, and row 126's (its data words differ). */
 void Entity__MoodCue123(Entity *self, SoundCueSet *out) {
     if (self->moodTimer == 0) {
         if (rand() % 5 == 0) {

@@ -611,3 +611,11 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 - The `EntityPlayTodFn` cast on `playTod` is not needed for THIS function's
   bytes (measured 98/98 without it) but kept: `include/entity.h` documents
   it as the convention at every Entity call site.
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+        /* MATCHING: the repeated `>= 2160` is retail's second range test. */
+```

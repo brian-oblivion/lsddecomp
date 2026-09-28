@@ -240,3 +240,13 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Track 7 (round 93, echo)
 
 Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Local `tmp` is `rollOrDy`: it holds the rand() % 3 roll and later the y move. Splitting it into `roll` and `dy` was measured and changes the register allocation (whole image red), so it stays one local with a `MATCHING:` line. Both `state = 1` after stopSoundCue are ENTITY_STATE_DONE. `sMoodCue78TransitionDone` got a comment on its declaration (what sets and reads it). `sScaleUnit` ({1,1} x3, the identity scale) stays a symbol: Entity declares it too, so a rename moves a declaration in another unit; proposed to the head. Byte-identical (whole image green).
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+    /* MATCHING: one local for the roll and then the y move; two allocate
+     * differently. */
+    s32 rollOrDy;
+```

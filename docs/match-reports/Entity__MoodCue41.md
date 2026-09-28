@@ -103,3 +103,18 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Track 7 (round 93, bravo)
 
 Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). The call's template address is spelled `(Ratio16 *)(zDenom + 1) - 3` (the Ratio16[3] that ends at the den) instead of `(u8 *)tablePtr - 0xA`: the same -10, byte-identical. Locals `rv`/`tablePtr` are `roll`/`zDenom`. The old in-body comment said the template reached back into sScaleX3's tail; the retail words show it is its own {1/1, 1/1, 1/den} directly after sScaleX3's twelve bytes, inside the range splat labels sScaleX3. Byte-identical (whole image green).
+
+## History: track 12 (round 106, delta), comments moved out of the source
+
+What the source said before track 12 moved it here (the one-line `MATCHING:` note stays in the .c):
+
+```c
+/* The z den of a scale template, three Ratio16s {1/1, 1/1, 1/zDenom} that
+ * end here (the range splat labels sScaleX3 runs on into its first ten
+ * bytes). Entity__MoodCue41 writes the den and passes the template. */
+```
+
+```c
+            /* Back from the den to the start of its template. MATCHING:
+             * retail relocates against sScaleTemplateZDenom, not sScaleX3. */
+```
