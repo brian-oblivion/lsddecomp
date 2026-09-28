@@ -3436,14 +3436,14 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
  * MATCHING: signed, and exactly three bytes -- the whole-struct copy of `rgb`
  * below is three lb/sb pairs. */
 extern s32 gGraphPointSize[2];
-extern BoxFillRgb gGraphPointNewestColor;
+extern BoxFillRgb sGraphPointNewestColor;
 extern BoxFillRgb sGraphPointBaseColor;
 
 void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     BoxFillRgb rgb;
     s32 i;
 
-    self->points[0] = New_BoxFill(gGraphPointSize, &gGraphPointNewestColor, 0);
+    self->points[0] = New_BoxFill(gGraphPointSize, &sGraphPointNewestColor, 0);
     rgb = sGraphPointBaseColor;
     for (i = 1; i < ARRAY_COUNT(self->points); i++) {
         s32 step;
