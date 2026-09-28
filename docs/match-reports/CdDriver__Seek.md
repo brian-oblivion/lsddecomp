@@ -170,7 +170,7 @@ at slot `+0x04C`. The prefix names the table, not the developers' class.
 
 The CD driver's shared globals and records are now declared once, in
 `include/CdDriver.h`, and this body uses that one reading: the fake seek entry is spelled `(CdFileEntry *)(sCdSeekLoc - 0x14)`, so the state machine's `&sCdSeekParam->pos` lands on the loc. The
-global's type comes from its accessors (`gFileTable` is walked at the 0x1C
+global's type comes from its accessors (`sFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
 

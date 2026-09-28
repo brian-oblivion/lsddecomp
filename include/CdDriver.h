@@ -154,7 +154,7 @@ typedef struct CdRequestNode {
 extern s32 sCdAsyncEnabled;
 extern s32 sCdSyncQueueMode; /* nonzero with sCdAsyncEnabled 0: requests queue, then run blocking */
 extern s32 sCdBusy;          /* 0/1 */
-extern CdFileEntry *gFileTable;        /* SetFileTable */
+extern CdFileEntry *sFileTable;        /* SetFileTable */
 extern s32 gFileTableCount;            /* SetFileTableCount */
 extern s32 sCdIdle;                    /* 0/1 */
 extern s32 sCdOperation;               /* StartCdOperation's op, GetCdOperation's result */

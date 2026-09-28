@@ -151,7 +151,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
 
 `Obj80027480.unk18` is now `Pos18` (was `u8[4]`) -- a CdlLOC-shaped 4-byte
 position, alignment 2. `Rec80028448` is a local view of the 0x1C-byte string
-records at `gFileTable` (`src/cd/CdDriver.c`'s own comment already
+records at `sFileTable` (`src/cd/CdDriver.c`'s own comment already
 describes this table); only the trailing two fields this function reads are
 named. `StatBuf80027` is this unit's OWN local view of the CD stat buffer
 `CdDriver.c`'s `OpenCdFile` already independently discovered as

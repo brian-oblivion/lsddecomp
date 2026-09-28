@@ -188,7 +188,7 @@ which is the procedure working in the direction where it can work.
 
 The CD driver's shared globals and records are now declared once, in
 `include/CdDriver.h`, and this body uses that one reading: the node is `CdRequestNode` (was the local `CdRequest_D70` view), `owner` is compared as a `struct Class6D4E8 *`, and the saved seek target is a `CdFileEntry *`. The
-global's type comes from its accessors (`gFileTable` is walked at the 0x1C
+global's type comes from its accessors (`sFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
 

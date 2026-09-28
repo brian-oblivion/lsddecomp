@@ -463,7 +463,7 @@ extern void FreeCdRequestNode(CdRequestNode *node); /* unlink and free */
 extern void ResetCdStateMachine(void);              /* end the operation, mark idle */
 extern void TickCdStateMachine(void);               /* CD_TICK_STATE_MACHINE */
 extern void TickCdLoadFileStateMachine(void);       /* CD_TICK_LOAD_FILE */
-extern s32 FindCdFileIndex(char *name);             /* name -> gFileTable index */
+extern s32 FindCdFileIndex(char *name);             /* name -> sFileTable index */
 
 /* Part 4, below. */
 extern char *BuildCdFilePath(char *dest, char *name); /* "\\<data directory><name>;1" */
@@ -620,7 +620,7 @@ s32 SetCdDriverMode(s32 async, s32 syncQueueMode, s32 useVSyncCallback) {
 }
 
 void SetFileTable(CdFileEntry *table) {
-    gFileTable = table;
+    sFileTable = table;
 }
 
 void SetFileTableCount(s32 count) {
@@ -784,7 +784,7 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
  * AllocCdRequestNode appends a zeroed node to sCdRequestQueue and
  * FreeCdRequestNode unlinks one; EnqueueCdRequest (part 3) fills
  * them and CdDriver__RunRequestQueue (part 2) consumes them from the
- * head. FindCdFileEntry and FindCdFileIndex look a name up in gFileTable by
+ * head. FindCdFileEntry and FindCdFileIndex look a name up in sFileTable by
  * substring, GetCdFileEntry indexes it. Every function but the three
  * state setters brackets its body with LockCd / UnlockCd, which makes
  * ServiceCdDriver skip its tick in between.
@@ -861,7 +861,7 @@ void FreeCdRequestNode(CdRequestNode *node) {
  * skips UnlockCd, as FindCdFileIndex's does, so ServiceCdDriver stays off
  * until the next UnlockCd anywhere. */
 void *FindCdFileEntry(char *name) {
-    CdFileEntry *cur = gFileTable;
+    CdFileEntry *cur = sFileTable;
     s32 i = 0;
 
     LockCd();
@@ -878,7 +878,7 @@ void *FindCdFileEntry(char *name) {
 
 /* The index of the first entry whose name contains `name`, or -1. */
 s32 FindCdFileIndex(char *name) {
-    CdFileEntry *cur = gFileTable;
+    CdFileEntry *cur = sFileTable;
     s32 i = 0;
 
     LockCd();
@@ -894,7 +894,7 @@ s32 FindCdFileIndex(char *name) {
 }
 
 void *GetCdFileEntry(s32 index) {
-    CdFileEntry *table = gFileTable;
+    CdFileEntry *table = sFileTable;
     CdFileEntry *entry;
 
     LockCd();

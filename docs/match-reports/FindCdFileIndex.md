@@ -6,7 +6,7 @@
 
 ## What it does
 
-Sibling of `FindCdFileEntry` over the same `gFileTable`/`gFileTableCount` record
+Sibling of `FindCdFileEntry` over the same `sFileTable`/`gFileTableCount` record
 table, but returns the matching record's **index** (`s32`) instead of a
 pointer, and `-1` if none match. Here the loop counter only increments on
 the not-found path (a plain instruction, not a branch-delay-slot trick),
@@ -17,7 +17,7 @@ so the returned index is exactly the position of the match.
 ```c
 s32 FindCdFileIndex(char *arg0)
 {
-    char *cur = gFileTable;
+    char *cur = sFileTable;
     s32 i = 0;
 
     LockCd();
@@ -46,7 +46,7 @@ pre-existing comment there put it: "CdDriver: name -> table index".
 
 The CD driver's shared globals and records are now declared once, in
 `include/CdDriver.h`, and this body uses that one reading: the walk is `CdFileEntry *cur; cur++` over `cur->name` (was `char *` stepped by 0x1C). The
-global's type comes from its accessors (`gFileTable` is walked at the 0x1C
+global's type comes from its accessors (`sFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
 
