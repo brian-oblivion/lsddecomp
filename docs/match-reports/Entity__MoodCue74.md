@@ -2,7 +2,7 @@
 
 > Renamed from `func_80062730` on 2026-09-24 (tools/rename.py). Address 0x80062730.
 
-Unit: `Entity_e` (round 13). Ignores `out` entirely. A first-tick block
+Unit: `Entity` (round 13). Ignores `out` entirely. A first-tick block
 dispatches through a brand-new nested object (`unk94->unk5C`'s own
 vtable), rolls `unk44 = rand() % 3` and clamps it to 0 based on a
 `z`-position gate; the rest of the function is an `if (unk44 != 0)` /
@@ -64,7 +64,7 @@ void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
     return discarded, same caveat.
 - `sMoodCue74ClearColor` (a single-word data table at `asm/data/7B3F8.sdata.s`,
   immediately after the already-known `gEntityFadeBoxDefaultSize`/`gEntityFadeBoxDefaultOffset`) gets its
-  own per-unit `extern u8 sMoodCue74ClearColor[];` in `Entity_e.c`, same convention
+  own per-unit `extern u8 sMoodCue74ClearColor[];` in `Entity.c`, same convention
   as this file's other opaque data-table externs.
 
 **No existing declaration was retyped, renamed, or resized** -- every change

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8006204C` on 2026-09-24 (tools/rename.py). Address 0x8006204c.
 
-Unit: `Entity_e` (round 12). A mood handler testing `out->unk4 % 30 == 0`.
+Unit: `Entity` (round 12). A mood handler testing `out->unk4 % 30 == 0`.
 `void Entity__MoodCue66(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source

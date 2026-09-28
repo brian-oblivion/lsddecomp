@@ -2,7 +2,7 @@
 
 > Renamed from `func_800620C4` on 2026-09-24 (tools/rename.py). Address 0x800620c4.
 
-Unit: `Entity_e` (round 13). Never touches its `out` argument at all (same
+Unit: `Entity` (round 13). Never touches its `out` argument at all (same
 shape as `Entity__MoodCue70` below it in this unit) -- a one-shot "roll dice on
 the first tick" gate that sets `unk44 = 0xB`, followed by two independent
 `unkFC`-threshold actions guarded by that flag.

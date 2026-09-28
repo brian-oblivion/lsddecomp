@@ -262,7 +262,7 @@ emitted.
 ## HEAD FINDING, round 13: the reversed `SceneNode__FaceTarget` arguments are a DIRECTION FLAG
 
 Runner echo (`Entity__MoodCue115`, `Entity`) and runner bravo (`Entity__MoodCue81`,
-`Entity_e`) each independently flagged a `SceneNode__FaceTarget` call site
+`Entity`) each independently flagged a `SceneNode__FaceTarget` call site
 whose first two arguments are swapped relative to every other known site. Both
 verified it against raw disassembly. The head then surveyed **every** call site
 in the executable, and the swap is not an outlier convention — it is perfectly
@@ -352,7 +352,7 @@ lever stays cleanly scoped.
 `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base 0x80089EB0,
 0x10-byte stride) at row 115 (0x80089EB0 + 0x10*115 = 0x8008A5E0), read
 directly from `disk/SLPS_015.56`. Row 115 is NOT contiguous with this
-unit's other rows (39-52, 55-58) or with Entity_e's own rows (59-92ish),
+unit's other rows (39-52, 55-58) or with Entity's own rows (59-92ish),
 confirming the row index tracks moodIndex assignment rather than code
 address -- flagged in `src/Entity.c`'s unit header comment so the next
 reader doesn't assume a typo. Mechanics established (mood-tick sound-cue-set

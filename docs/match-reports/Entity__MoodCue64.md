@@ -2,7 +2,7 @@
 
 > Renamed from `func_80061E60` on 2026-09-24 (tools/rename.py). Address 0x80061e60.
 
-Unit: `Entity_e` (round 12). A mood handler that reduces `out->unk4` modulo
+Unit: `Entity` (round 12). A mood handler that reduces `out->unk4` modulo
 300 and dispatches on the remainder.
 `void Entity__MoodCue64(Entity *this, EntityMoodHandlerArg *out)`.
 

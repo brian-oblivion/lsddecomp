@@ -2,7 +2,7 @@
 
 > Renamed from `func_80061A90` on 2026-09-24 (tools/rename.py). Address 0x80061a90.
 
-Unit: `Entity_e` (round 13, first function in this file). Two independent
+Unit: `Entity` (round 13, first function in this file). Two independent
 "divisible by 10" checks (one gated on `unkFC==0` against `rand()`, one on
 `out->unk4` unconditionally), a `unkFC==0` coin-flip `slotCC` call, an
 unconditional `slotC4`, and a final `unk44`/`unkFC` combo that reaches
@@ -74,9 +74,9 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Byte-identical (whole image green).
 
-## Unit notes (moved from src/Entity_e.c's banner, round 93)
+## Unit notes (moved from src/Entity.c's banner, round 93)
 
-The pre-track-7 banner of `src/Entity_e.c` carried this history, now here:
+The pre-track-7 banner of `src/Entity.c` carried this history, now here:
 the unit was carved as the third 20-function slice of the Entity class's
 97-function remainder, after Entity and Entity_d. Its functions are the
 `gEntityMoodHandlerTable` handlers of rows 59, 61-62, 64-71 and 73-81, each

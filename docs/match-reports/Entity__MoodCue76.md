@@ -2,7 +2,7 @@
 
 > Renamed from `func_80062970` on 2026-09-24 (tools/rename.py). Address 0x80062970.
 
-Unit: `Entity_e` (round 12). The hardest function in this batch: two
+Unit: `Entity` (round 12). The hardest function in this batch: two
 branches each end in a vtable dispatch through a *different* slot
 (`EntityMethods::slot48` in one, `slot44` in the other) with different
 table arguments, and retail's compiled code shares a single `jalr`

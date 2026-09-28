@@ -2,7 +2,7 @@
 
 > Renamed from `func_80063094` on 2026-09-24 (tools/rename.py). Address 0x80063094.
 
-Unit: `Entity_e` (round 12). A three-way branch on `this->unkFC` vs
+Unit: `Entity` (round 12). A three-way branch on `this->unkFC` vs
 `this->unk80`, with a nested (and, on the surface, logically redundant)
 double-guard on `this->unk84` in one arm.
 `void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out)`.

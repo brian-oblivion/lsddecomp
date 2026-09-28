@@ -2,7 +2,7 @@
 
 > Renamed from `func_80062A40` on 2026-09-24 (tools/rename.py). Address 0x80062a40.
 
-Unit: `Entity_e` (round 13). A four-way dispatch: `slot148`+`%5` mood
+Unit: `Entity` (round 13). A four-way dispatch: `slot148`+`%5` mood
 setup, then an early-return branch on a new gate field (`unk7C`), then a
 second early-return branch on `unk44 == 0` doing an unkFC-literal-set
 check, and finally the fallthrough path doing the same check against two
@@ -89,7 +89,7 @@ fields carved from previously-unlabeled padding, plus one comment append.
   (`unkFC != 0x140`) skips past. Modeled directly as one `||`-chained
   condition guarding one call, which reproduced this exactly.
 - `ROTATION_YAW_PLUS90`/`ROTATION_YAW_MINUS90` reuse this file's existing per-unit externs
-  (already declared earlier in `Entity_e.c` for `Entity__MoodCue65`/
+  (already declared earlier in `Entity.c` for `Entity__MoodCue65`/
   `Entity__MoodCue73`); no new externs needed here.
 
 No other new struct or vtable-slot knowledge; `slot148`, `slot44`, `slotD0`,

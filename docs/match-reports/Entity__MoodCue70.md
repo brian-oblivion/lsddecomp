@@ -2,7 +2,7 @@
 
 > Renamed from `func_800624BC` on 2026-09-24 (tools/rename.py). Address 0x800624bc.
 
-Unit: `Entity_e` (round 12). Three independent, unrelated checks on
+Unit: `Entity` (round 12). Three independent, unrelated checks on
 `this->unkFC` in sequence; `out` (the `EntityMoodHandlerArg *` parameter)
 is unused entirely -- confirmed by the disassembly never touching `$a1`.
 `void Entity__MoodCue70(Entity *this, EntityMoodHandlerArg *out)`.

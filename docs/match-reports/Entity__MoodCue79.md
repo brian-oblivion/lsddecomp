@@ -2,7 +2,7 @@
 
 > Renamed from `func_80062FAC` on 2026-09-24 (tools/rename.py). Address 0x80062fac.
 
-Unit: `Entity_e` (round 13). Dispatches `slot148`, checks `out->unk4 % 10`,
+Unit: `Entity` (round 13). Dispatches `slot148`, checks `out->unk4 % 10`,
 unconditionally fires `slot44` with the same `ROTATION_YAW_PLUS2` table other units
 already reference, then a one-shot `slot30`/`unk44` latch gated on
 `unk44 == 0 && unkF4 != 0`.

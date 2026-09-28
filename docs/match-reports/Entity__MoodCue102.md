@@ -190,5 +190,5 @@ reactivate or restart the cue". By 2000 ticks the scale has settled at
 `SCALE_UNIT` (from 1936) and the handler stops its own `moveLocalZ`; setting
 1 also stops the `state == 0` link-stage trigger from firing. The same
 value is stored without a `deactivate` by `Entity__MoodCue123` and by
-Entity_e's MoodCue after `stopSoundCue`, so the header comment's "after
+Entity's MoodCue after `stopSoundCue`, so the header comment's "after
 deactivate" is narrower than the uses (proposed to the head).

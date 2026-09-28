@@ -244,7 +244,7 @@ s32 Entity__UpdateSoundCueStop(Entity *self);
 
 /* MoodCue handlers called from another Entity unit. */
 void Entity__MoodCue51(Entity *self, SoundCueSet *out); /* Entity; called by Entity__MoodCue113 (Entity_g) */
-void Entity__MoodCue71(Entity *self, SoundCueSet *out); /* Entity_e; called by Entity__MoodCue108 (Entity_g) */
+void Entity__MoodCue71(Entity *self, SoundCueSet *out); /* Entity; called by Entity__MoodCue108 (Entity_g) */
 void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 windowStart,
                                             s32 deactivateTimer, s32 zStep); /* Entity_g; called by Entity */
 

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80062570` on 2026-09-24 (tools/rename.py). Address 0x80062570.
 
-Unit: `Entity_e` (round 13). Dispatches `slot148`, and on `out->unk4 == 0`
+Unit: `Entity` (round 13). Dispatches `slot148`, and on `out->unk4 == 0`
 picks one of three `slotC8` variants via `rand() % 3`; separately fires
 `SceneNode__FaceTarget` once `unkFC` crosses a threshold, then unconditionally
 calls `slotC4`. `void Entity__MoodCue71(Entity *this, EntityMoodHandlerArg *out)`.

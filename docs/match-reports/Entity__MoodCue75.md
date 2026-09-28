@@ -2,7 +2,7 @@
 
 > Renamed from `func_800628D4` on 2026-09-24 (tools/rename.py). Address 0x800628d4.
 
-Unit: `Entity_e` (round 12). Calls `SceneNode__FaceTarget` with the same
+Unit: `Entity` (round 12). Calls `SceneNode__FaceTarget` with the same
 `(this, this->unk94, 1, 0, 0)` argument shape already established in
 `Entity.c`'s handlers, plus a same-value dispatch through
 `EntityMethods::slot130`/`slot30`.

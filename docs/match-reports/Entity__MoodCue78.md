@@ -4,7 +4,7 @@
 
 REVISITED, round 59: MATCHED 213/213 byte-exact; names/types not relevant
 
-**Unit:** `Entity_e` · **Size:** 213 words · **Result:** 213/213 words,
+**Unit:** `Entity` · **Size:** 213 words · **Result:** 213/213 words,
 `insertions 0 / deletions 0`, `./build-and-verify.sh` green
 (`OK: build matches retail SLPS_015.56`), `Entity__MoodCue79` back at its retail
 address `0x80062fac`.
@@ -18,7 +18,7 @@ resolved round 42). Closed in **11 builds** this round.
 The unit's names and types **did change** since round 45 — `unkFC` is now
 `moodTimer`, `unk94` is `target`, `slot148` is `getProximityRatio`,
 `slot16C` is `stopSoundCue` — and `tools/rename.py` had already rewritten
-the preserved `#if 0` body in `src/Entity_e.c` accordingly. **None of it
+the preserved `#if 0` body in `src/Entity.c` accordingly. **None of it
 mattered.** Every renamed field was already correctly identified in round
 45's derivation; the new names made the body easier to read and changed
 nothing about what compiled. Re-reading the callers likewise produced

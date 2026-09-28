@@ -2,7 +2,7 @@
 
 > Renamed from `func_80061C04` on 2026-09-24 (tools/rename.py). Address 0x80061c04.
 
-Unit: `Entity_e` (round 12, first carve of this unit). Smallest function in
+Unit: `Entity` (round 12, first carve of this unit). Smallest function in
 the unit's queue, a one-shot mood handler with no loop or nested branch.
 `void Entity__MoodCue61(Entity *this, EntityMoodHandlerArg *out)`.
 

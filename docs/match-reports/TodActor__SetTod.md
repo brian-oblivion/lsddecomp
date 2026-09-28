@@ -264,7 +264,7 @@ if that specific pairwise swap is not in the table.
 
 Round 75 (charlie), track 3.
 
-- `TodActor__SetTod` (was `func_80066214`), tier A. Occupies +0x128. Selects TOD `index` from modelData->tods (arr + 8 + index*4 -> holder -> +0x10 TOD data), stores todIndex, todFrameCount = TOD +0x4 (frame count), todFramePtr = TOD + 8 (first frame), todFrame = 0, and applies that first frame. InitDefaults calls setTod(0); Entity_e calls setTod(1).
+- `TodActor__SetTod` (was `func_80066214`), tier A. Occupies +0x128. Selects TOD `index` from modelData->tods (arr + 8 + index*4 -> holder -> +0x10 TOD data), stores todIndex, todFrameCount = TOD +0x4 (frame count), todFramePtr = TOD + 8 (first frame), todFrame = 0, and applies that first frame. InitDefaults calls setTod(0); Entity calls setTod(1).
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

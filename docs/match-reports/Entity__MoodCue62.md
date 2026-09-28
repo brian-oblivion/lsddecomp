@@ -2,7 +2,7 @@
 
 > Renamed from `func_80061C2C` on 2026-09-24 (tools/rename.py). Address 0x80061c2c.
 
-Unit: `Entity_e` (round 13). The unit's longest match so far this round: a
+Unit: `Entity` (round 13). The unit's longest match so far this round: a
 `% 30` mood-code check, an `unkFC`-threshold `SceneNode__FaceTarget` call, an
 unconditional `slotC4`, a compound `unkFC==0x12C && slot144()<0x1000`
 vs. `unkFC==0x1F4` dispatch, a `rand()`-driven state machine that seeds

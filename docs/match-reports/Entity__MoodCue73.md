@@ -2,7 +2,7 @@
 
 > Renamed from `func_80062660` on 2026-09-24 (tools/rename.py). Address 0x80062660.
 
-Unit: `Entity_e` (round 12). First function in this unit to dispatch through
+Unit: `Entity` (round 12). First function in this unit to dispatch through
 `Unk94Methods::slot44`/`slot130` directly (both slots were already typed
 from `Entity`'s `Entity__MoodCue49`/`Entity__MoodCue01` comments, but not yet
 exercised as a *call site* in this unit).

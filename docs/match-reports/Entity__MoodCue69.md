@@ -2,7 +2,7 @@
 
 > Renamed from `func_800623E8` on 2026-09-24 (tools/rename.py). Address 0x800623e8.
 
-Unit: `Entity_e` (round 13). A mood handler that dispatches `slot148`, gates a
+Unit: `Entity` (round 13). A mood handler that dispatches `slot148`, gates a
 final-tick check against `this->unk80 - 1`, and fires two independent
 "every N ticks" checks against `out->unk4` (mod 4 and mod 200).
 `void Entity__MoodCue69(Entity *this, EntityMoodHandlerArg *out)`.

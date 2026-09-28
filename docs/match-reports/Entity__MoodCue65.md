@@ -2,7 +2,7 @@
 
 > Renamed from `func_80061F30` on 2026-09-24 (tools/rename.py). Address 0x80061f30.
 
-Unit: `Entity_e` (round 13). Ignores its `out` argument entirely (same shape
+Unit: `Entity` (round 13). Ignores its `out` argument entirely (same shape
 as `Entity__MoodCue67`/`Entity__MoodCue70` in this unit): a one-shot 1-in-3 dice
 roll on the first tick fires three vtable calls and sets `unk44 = 0xB`,
 then a second block guarded by that flag fires an `unkFC`-threshold call

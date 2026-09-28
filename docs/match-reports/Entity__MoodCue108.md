@@ -11,7 +11,7 @@ No hits.
 ## What it does
 
 `gEntityMoodHandlerTable` handler row that forwards straight to another handler,
-`Entity__MoodCue71` (already matched, `Entity_e.c`), passing its own `(this,
+`Entity__MoodCue71` (already matched, `Entity.c`), passing its own `(this,
 out)` through unchanged, then dispatches `slot48(this, 1, SCALE_SIX)`.
 
 ## The C
@@ -27,7 +27,7 @@ Matched on the first build.
 
 ## Header note
 
-Added an extern for `Entity__MoodCue71` (already matched, `Entity_e.c`) to
+Added an extern for `Entity__MoodCue71` (already matched, `Entity.c`) to
 `include/Entity.h`, at the bottom after `EntityMoodHandlerArg`'s own
 definition -- needed there rather than earlier since the type isn't
 `typedef`'d until that struct. First cross-unit caller of that function.

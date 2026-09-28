@@ -1784,7 +1784,6 @@ segments:
       # remainder, so no rodata slot to attach and no hasm/.word
       # disposition. Blocker census over the slice: 1 of 20 gp_rel-blocked
       # (func_80062C58), zero addiu-$at.
-      - [0x52290, c, Entity_e]
       # Entity_f / Entity_g: the 37-function Entity remainder, 0x53CA8..0x55DD4
       # (bounded by code_55dd4, already carved C, so there is no data tail).
       # Carved round 13 and SPLIT IN TWO deliberately: 37 in one unit would

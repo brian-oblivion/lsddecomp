@@ -69,7 +69,7 @@ names sort in table order.
 the row's other three words -- data0/data1/data2 -- differ between the two
 rows, so it is one function shared by two distinct mood-row
 configurations, not a naming collision). Named for its lower/first row per
-the existing convention (Entity__MoodCue81, Entity_e round 59/77); not a
+the existing convention (Entity__MoodCue81, Entity round 59/77); not a
 second name.
 
 ## Track 4 (2026-09-26, round 88, echo)
