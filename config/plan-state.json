@@ -1480,6 +1480,16 @@
           "note": "Eleven units marked after five samples each: code_2cc8c_d (Viewport maxPackets/packetSize/extraSwap, GsLMODE_*, NoOpSlots), code_179d8_s (CdDriver onto <libcd.h>, CD_OPERATION_*/CD_STATE_*, gCdSyncQueueMode), code_d294_b (RaycastHullAgainstFaces, AddToActorParents, ClipResult/OUTCODE_*), code_39094 (the file-path table: sound banks, stage records, movies, read from retail), code_4cd08 (dream aux entities: triggers, day parity, spawn rotations), code_179d8_d (PlacementGrid geometry, ReturnZero), code_2cc8c_e (FadeBox colour tables and channel masks), class_3bb8c_c (TitleMenu save-title day, UpdateFlashbackLock), class_3bb8c_j (ItemList panel data, ITEMLIST_MODE_FULLWIDTH), code_2bb9c (TimImage empty slots, TIM_PMODE_CLUT_BIT), code_1677c (GameApplication hooks: ShowIntroLogos, PlayOpeningMovie, RunTitleMenu, RunDayTask, PlayEndingMovie). Head applied proposals across units: CD_FLAG_* into FileResource.h, Viewport and Application slots, SetDreamAuxWorld typed, BoxFill attachArg.",
           "round": 100,
           "runners": 11
+        },
+        {
+          "attempts": 13,
+          "calibration": true,
+          "date": "2026-09-28",
+          "matches": 13,
+          "model": "opus",
+          "note": "Thirteen units marked after five samples each, track 7 done: class_3bb8c_q (Sprite accumScaleX/Y, Ratio16 UpdateScale), class_3bb8c_s (StyleEffect kinds, ARRAY_COUNT, refView.vp.y), code_d294 (SceneNode class ids, sizeof, DEGREES_PER_TURN), code_179d8_r (onto <libcd.h>, the tick functions as switches), code_3311c (FlatLightObj onto <libgs.h>), code_10ee0 (DrawSystem countReached, GsOFSGTE|GsNONINTER), class_16334 (Pad NoOpSlots, sDefaultButtonMasks is Pad's own rodata), code_2a0e0 (WBgm onto <libsnd.h>, WBgmOpenState), code_179d8_o (sizeof(CdDriver)), main (CONSOLE_RAM_MB, DEFAULT_POOL_SIZE), code_179d8_q (13 implicit-declaration warnings gone, sCd* statics, CD_TICK_NONE), code_2b78c (ApplicationLoopStatus), StageGrid (16 UPPER_SNAKE globals to sName). Head applied: accumulateScale, gStyleEffectViewport as Viewport *, ATTR_*_SHIFT once, CdLoc16 retired for CdlLOC, one loop-status enum, StageGrid.h params.",
+          "round": 101,
+          "runners": 13
         }
       ],
       "status": "auto",
