@@ -11,7 +11,7 @@
 ```c
 extern s32 sCdReadSectorCount; /* CdRead sector count */
 extern void *sCdReadBuffer; /* CdRead target buffer */
-extern s32 gCdTickStep;
+extern s32 sCdTickStep;
 
 extern void ReadCdFile(Obj80027480 *self, void *arg1, s32 arg2);
 extern s32 CdRead(s32 sectors, void *buf, s32 mode);
@@ -32,7 +32,7 @@ s32 CdDriver__Read(Obj80027480 *self, void *buf, u32 size) {
             if (sCdAsyncEnabled != 0) {
                 sCdReadSectorCount = size >> 11;
                 sCdReadBuffer = buf;
-                gCdTickStep = 1;
+                sCdTickStep = 1;
             } else {
             retry:
                 CdRead(size >> 11, buf, 0x80);

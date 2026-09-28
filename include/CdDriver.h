@@ -109,7 +109,7 @@ typedef struct CdRequestNode {
 #define CD_OP_READ 5
 #define CD_OP_LOAD_FILE 7
 
-/* gCdTickStep: which of CdDriver.c's two state machines ServiceCdDriver
+/* sCdTickStep: which of CdDriver.c's two state machines ServiceCdDriver
  * ticks. */
 #define CD_TICK_NONE 0          /* neither: ResetCdStateMachine's value */
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
@@ -164,7 +164,7 @@ extern s32 sCdReadSectorCount;         /* CdRead sector count */
 extern void *sCdReadBuffer;            /* CdRead target buffer */
 extern CdFileEntry *sCdSavedSeekParam; /* LoadFile's saved sCdSeekParam */
 extern CdRequestNode *sCdRequestQueue; /* list head */
-extern s32 gCdTickStep;                /* CD_TICK_* */
+extern s32 sCdTickStep;                /* CD_TICK_* */
 extern s32 gCdUseVSyncCallback;
 
 #endif /* CDDRIVER_H */

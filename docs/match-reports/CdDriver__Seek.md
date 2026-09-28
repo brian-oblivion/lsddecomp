@@ -11,7 +11,7 @@
 ```c
 extern u8 sCdSeekLoc[8];
 extern void *sCdSeekParam;
-extern s32 gCdTickStep;
+extern s32 sCdTickStep;
 
 extern s32 GetCdFileSize(Obj80027480 *self);
 extern s32 CdPosToInt(void *pos);
@@ -39,7 +39,7 @@ s32 CdDriver__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
             if (arg2 == 0) {
                 if (sCdAsyncEnabled != 0) {
                     sCdSeekParam = sCdSeekLoc - 0x14;
-                    gCdTickStep = 1;
+                    sCdTickStep = 1;
                 } else {
                     do {
                         CdControl(2, sCdSeekLoc, 0);

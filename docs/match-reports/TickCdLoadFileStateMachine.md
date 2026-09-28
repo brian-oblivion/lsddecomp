@@ -8,7 +8,7 @@
 
 The sibling tick of the CD-read state machine implemented by
 `TickCdStateMachine` (see that report for the full state description), called
-from `ServiceCdDriver` when `gCdTickStep == 2`. Identical to `TickCdStateMachine`
+from `ServiceCdDriver` when `sCdTickStep == 2`. Identical to `TickCdStateMachine`
 in every state except:
 
 - **state 2, `CdSync` reports "still busy, same phase"**: `TickCdStateMachine`
@@ -171,7 +171,7 @@ arm and both compiled to the same (wrong) encoding; hoisting it above the
 ## Naming
 
 **Tier B.** The state machine's other tick function, selected by
-`ServiceCdDriver` when `gCdTickStep == 2`. Grepping every `gCdTickStep = 2`
+`ServiceCdDriver` when `sCdTickStep == 2`. Grepping every `sCdTickStep = 2`
 assignment in CdDriver.c finds exactly one: `CdDriver__LoadFile`, which
 `docs/match-reports` for the class's method table (`GetCdDriverMethods`'s
 own comment, CdDriver.c) identifies via `tools/classtable.py` as the

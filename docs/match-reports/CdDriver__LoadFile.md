@@ -71,7 +71,7 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
                 }
                 if (sCdAsyncEnabled != 0) {
                     self->unk14 = pos;
-                    gCdTickStep = 2;
+                    sCdTickStep = 2;
                 } else {
                 retry:
                     do {

@@ -30,7 +30,7 @@ typedef struct Rec80028448 {
 extern void *FindCdFileEntry(char *arg0);
 extern s32 FindCdFileIndex(char *arg0);
 extern void *sCdSeekParam;
-extern s32 gCdTickStep;
+extern s32 sCdTickStep;
 
 extern void OpenCdFile(Obj80027480 *self, char *suffix);
 extern char *BuildCdFilePath(char *dest, char *suffix);
@@ -67,7 +67,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
                 }
                 self->unk18 = rec->unk14;
                 temp = ((Rec80028448 *)sCdSeekParam)->unk18;
-                gCdTickStep = 1;
+                sCdTickStep = 1;
                 self->unk0C = 1;
                 self->unk1C = temp;
             } else {
@@ -119,7 +119,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
    the register that still holds the identical value (`rec`/`a2`). My first
    attempt wrote `self->unk1C = ((Rec80028448 *)sCdSeekParam)->unk18;` as the
    LAST statement in the branch (after the two flag stores
-   `gCdTickStep = 1; self->unk0C = 1;`), and GCC's CSE collapsed the global
+   `sCdTickStep = 1; self->unk0C = 1;`), and GCC's CSE collapsed the global
    read into reusing `rec`'s register anyway -- 1 word short.
    **Moving that same statement to IMMEDIATELY after the first field copy
    (`self->unk18 = rec->unk14;`), before the two flag stores, was enough to

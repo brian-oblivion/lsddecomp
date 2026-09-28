@@ -19,7 +19,7 @@ void ResetCdStateMachine(void)
 {
     sCdOperation = 0;
     sCdState = 0;
-    gCdTickStep = 0;
+    sCdTickStep = 0;
     sCdIdle = 1;
     gCdTimeoutCounter = 0;
     sCdBusy = 0;

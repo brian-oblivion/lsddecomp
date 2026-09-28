@@ -19,7 +19,7 @@ carries the evidence for each one.
 ```c
 extern s32 GetBMemPMgrBusy(void); /* TmdRenderer */
 extern s32 gCdUseVSyncCallback;
-extern s32 gCdTickStep;
+extern s32 sCdTickStep;
 extern void TickCdStateMachine(void); /* CdDriver: state-machine step 1 */
 extern void TickCdLoadFileStateMachine(void); /* CdDriver: state-machine step 2 */
 extern s32 sCdQueueEnabled;
@@ -52,9 +52,9 @@ s32 ServiceCdDriver(void)
         VSyncCallback(0);
     }
 
-    if (gCdTickStep == 1) {
+    if (sCdTickStep == 1) {
         TickCdStateMachine();
-    } else if (gCdTickStep == 2) {
+    } else if (sCdTickStep == 2) {
         TickCdLoadFileStateMachine();
     }
 
@@ -90,7 +90,7 @@ idiom as the first guard, just with the zeroing sharing a delay slot instead
 of getting a fallthrough instruction of its own.
 
 Body: an optional `VSyncCallback(0)` (`gCdUseVSyncCallback`), a two-way dispatch on
-`gCdTickStep` (1 -> `TickCdStateMachine`, 2 -> `TickCdLoadFileStateMachine`, both in the
+`sCdTickStep` (1 -> `TickCdStateMachine`, 2 -> `TickCdLoadFileStateMachine`, both in the
 sibling `CdDriver` unit — declared extern here per the
 per-call-site-typed convention `CdDriver.c` already established for
 cross-unit libcd calls, now confirmed to apply to cross-unit game-code calls
@@ -128,7 +128,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 singleton's `+0x84` callback slot when the VSync path is off. One call does
 all the periodic work there is -- skip if `sCdLock` is held or
 `GetBMemPMgrBusy` says no; step `CdDriver`'s CD state machine
-(`TickCdStateMachine` for `gCdTickStep == 1`, `TickCdLoadFileStateMachine` for 2); drain the
+(`TickCdStateMachine` for `sCdTickStep == 1`, `TickCdLoadFileStateMachine` for 2); drain the
 request queue through the class's own `+0x068` slot; re-arm itself. "Service"
 is the one word that covers a tick that both advances a state machine and
 drains a queue.
@@ -145,5 +145,5 @@ method `classtable.py` resolves it to, per track 3's vtable-slot rule.
 
 ## Track 7 (round 101, echo): comments moved here, and names
 
-`gCdTickStep`'s `1`/`2` are spelled `CD_TICK_STATE_MACHINE` /
+`sCdTickStep`'s `1`/`2` are spelled `CD_TICK_STATE_MACHINE` /
 `CD_TICK_LOAD_FILE` (CdDriver.h); `VSyncCallback(0)` is `VSyncCallback(NULL)`.

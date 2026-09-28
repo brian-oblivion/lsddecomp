@@ -11,9 +11,9 @@ phase (0 default, 1 = issue `CdControlF` seek, 2 = poll `CdSync`, 7 = issue
 `CdRead`, 8 = poll `CdReadSync`; anything else in `{3,4,5,6}` or `>8` is a
 no-op). `gCdTimeoutCounter` is a busy-wait timeout counter, reset by
 `SetCdState` whenever the phase advances. Called from
-`ServiceCdDriver` (in the sibling unit `CdDriver.c`) when `gCdTickStep ==
+`ServiceCdDriver` (in the sibling unit `CdDriver.c`) when `sCdTickStep ==
 1`; `TickCdLoadFileStateMachine` is this same state machine's other tick variant
-(`gCdTickStep == 2`), differing only in what happens when `CdSync` reports
+(`sCdTickStep == 2`), differing only in what happens when `CdSync` reports
 "still the same phase" and after a successful `CdReadSync`.
 
 ## The C
@@ -133,8 +133,8 @@ what reproduces the exact branch/block layout, not just the logic.
 **Tier B.** One tick of the CD-read state-machine's phase dispatch (phase 1
 = issue `CdControlF(CD_CMD_SETLOC, ...)`, 2 = poll `CdSync`, 7 = issue
 `CdRead`, 8 = poll `CdReadSync`), selected by `ServiceCdDriver`
-(CdDriver.c) when `gCdTickStep == 1`. This is the *default* of the two
-tick functions: cross-referencing every `gCdTickStep = 1` assignment in
+(CdDriver.c) when `sCdTickStep == 1`. This is the *default* of the two
+tick functions: cross-referencing every `sCdTickStep = 1` assignment in
 CdDriver.c shows it backs three different request paths --
 `CdDriver__Open` (open/resolve), `CdDriver__Seek` (explicit seek) and
 `CdDriver__Read` (straight read from the current position, which starts at

@@ -9,7 +9,7 @@ Round 45, runner echo (second sitting), `src/cd/CdDriver.c`.
 Byte-exact on the first attempt.
 
 ```c
-extern s32 gCdTickStep;
+extern s32 sCdTickStep;
 extern s32 sCdCallbackInstalled;
 extern s32 gCdUseVSyncCallback;
 extern s32 sCdQueueEnabled;
@@ -19,7 +19,7 @@ void StopCdServiceIfIdle(void)
 {
     LockCd();
 
-    if (gCdTickStep == 0 && sCdCallbackInstalled != 0) {
+    if (sCdTickStep == 0 && sCdCallbackInstalled != 0) {
         if (gCdUseVSyncCallback != 0) {
             VSyncCallback(0);
         }
@@ -34,7 +34,7 @@ void StopCdServiceIfIdle(void)
 ## Derivation
 
 Straight read: sets the `sCdLock` latch (`LockCd`), then a guarded
-block only entered when `gCdTickStep == 0` AND `sCdCallbackInstalled != 0` (the two
+block only entered when `sCdTickStep == 0` AND `sCdCallbackInstalled != 0` (the two
 `beqz`/`bnez` gp_rel loads collapse into one `&&`), inside which an optional
 `VSyncCallback(0)` fires when `gCdUseVSyncCallback != 0`, then both `sCdCallbackInstalled` and
 `sCdQueueEnabled` are cleared; falls through either way to clear the latch
@@ -60,20 +60,20 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_80028218` | `StopCdServiceIfIdle` | A |
 
-**Evidence.** Under the lock, and only when `gCdTickStep == 0` (no
+**Evidence.** Under the lock, and only when `sCdTickStep == 0` (no
 state-machine step is armed) AND the callback is installed: unregister the
 `VSyncCallback`, clear `sCdCallbackInstalled` and clear `sCdQueueEnabled`.
 The conditional is half the function, so the name carries it -- calling this
 `StopCdService` would say it always stops, which it does not. The mirror of
 `StartCdService`.
 
-`gCdTickStep` itself is left named: it is `CdDriver`'s "which state-machine
+`sCdTickStep` itself is left named: it is `CdDriver`'s "which state-machine
 step to tick" selector (1 or 2), written by `CdDriver` and cleared by
 that unit's reset, so it belongs to whichever unit's naming pass takes
 `CdDriver`. Proposed there: `gCdStep`.
 
 ## Track 7 (round 101, echo): comments moved here, and names
 
-`gCdTickStep == 0` is spelled `CD_TICK_NONE`, added to include/CdDriver.h
+`sCdTickStep == 0` is spelled `CD_TICK_NONE`, added to include/CdDriver.h
 next to CD_TICK_STATE_MACHINE / CD_TICK_LOAD_FILE: no state machine is
 ticking (ResetCdStateMachine's value).
