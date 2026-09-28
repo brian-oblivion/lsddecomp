@@ -158,7 +158,7 @@ rather than API.
   as literals (actor.h names 5-8); `New_TimBlockSrc(s32 name)` and
   `ModelData__ForwardScan*` take pointers as `s32`; the `+ 0x5C` at
   tmd_renderer.c:1194 is `offsetof(PolyDrawCtx, sxy) - sizeof(DVECTOR)`;
-  stale `unk2A` in TimBlockSrc.h/TileMap.h/TileAtlas.h (now `loadState`);
+  stale `unk2A` in TimBlockSrc.h/TileMap.h/tile_atlas.h (now `loadState`);
   scene_node.c's two mid-file banners and self-reference (merge leftovers);
   tmd_renderer.c opens with BasicClass/BMemPMgr helpers.
 - **world:** DreamSys `func_59590`, `func_59598`, `func_5ba20` (a get/set of
@@ -228,7 +228,7 @@ reads them, so nothing names them).
   field lists (`*_FIELDS`) need `MACRO_EXPANSION` in the Doxyfile.
 - Process text to move out of headers (to the .c as one `MATCHING:` line,
   or to the report): register and ABI notes (`$a0`-`$v0`) in scene_node.h,
-  task_core.h, text_entry.h, text_row.h, TileAtlas.h, TileMap.h, sprite.h,
+  task_core.h, text_entry.h, text_row.h, tile_atlas.h, TileMap.h, sprite.h,
   task.h, item_list.h, stream_task.h; lwl/lwr and "retail reloads" in
   stage_map.h, TitleMenu.h, task_objf.h, tmd_model.h, sprite.h, style_effect.h,
   Viewport.h, movie_player.h, graph_room.h, lbd_file.h, common.h; GCC and splat

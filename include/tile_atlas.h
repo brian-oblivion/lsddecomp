@@ -1,5 +1,5 @@
-#ifndef TILEATLAS_H
-#define TILEATLAS_H
+#ifndef TILE_ATLAS_H
+#define TILE_ATLAS_H
 
 #include "file_resource.h"
 #include <libgte.h>

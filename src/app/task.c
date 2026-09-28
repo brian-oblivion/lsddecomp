@@ -26,7 +26,7 @@
 #include "VabStreamObj.h"
 #include "bg_layer.h"
 #include "TileMap.h"
-#include "TileAtlas.h"
+#include "tile_atlas.h"
 #include "pad.h"
 #include "tim_image.h"
 #include "Viewport.h"

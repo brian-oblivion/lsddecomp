@@ -27,7 +27,7 @@
  * How it is used, at the one New_TileMap call site (TaskCore__TaskCore,
  * src/app/task.c): New_TileAtlas(0), then New_TileMap(0, atlas), then
  * New_BgLayer(tileMap, 1); TaskCore__Finalize releases the three (+0x004).
- * The atlas is a TileAtlas (gTileAtlasMethods, include/TileAtlas.h, by tag here):
+ * The atlas is a TileAtlas (gTileAtlasMethods, include/tile_atlas.h, by tag here):
  * its `cells` is the 300-GsCELL array BuildMap copies into map.base.
  *
  * SLOTS (`classtable.py gTileMapMethods --vs gFileResourceMethods`, 30 against 30):
@@ -64,7 +64,7 @@ struct TileMapMethods {
 struct TileMap {
     FILERESOURCE_FIELDS(TileMapMethods);
     /* +0x02C */ GsMAP map; /* TileMap__BuildMap fills it; BgLayer__Reset points its GsBG here */
-    /* +0x03C */ struct TileAtlas *atlas; /* include/TileAtlas.h: the ctor's third argument; BuildMap reads its cells */
+    /* +0x03C */ struct TileAtlas *atlas; /* include/tile_atlas.h: the ctor's third argument; BuildMap reads its cells */
     /* +0x040 */ u16 defaultGrid; /* 1 from the ctor when arg1 == 0; BuildMap lays out the 20 x 15 grid only when set */
     /* +0x042 */ u16 loaded; /* 0 from the ctor, 1 from TileMap__Load after BuildMap */
 }; /* 0x44 bytes: New_TileMap */

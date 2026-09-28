@@ -95,7 +95,7 @@ Verbatim as it stood before the round-93 comment pass; the new banner says what 
  *     16x16-cell map data (a GsMAP, consumed by BgLayer as its map source)
  *     and the 300-GsCELL texture atlas it indexes; built together and used
  *     together in src/app/task.c's TaskCore__TaskCore (include/TileMap.h,
- *     include/TileAtlas.h, track 4, round 88).
+ *     include/tile_atlas.h, track 4, round 88).
  *
  * Two more classes, not FileResource subclasses:
  *

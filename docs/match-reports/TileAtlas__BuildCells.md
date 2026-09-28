@@ -90,7 +90,7 @@ Eleventh build. The cell is LIBGS.H's GsCELL (u, v, cba, flag, tpage), unit-loca
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). `self` is `TileAtlas *` (was `Obj6F514`); the cell type is LIBGS.H's `GsCELL`, now defined in the header (was the unit-local `Cell450B4`, same layout), and the flag at +0x030 is `defaultCells`. `cells` is the array TileMap__BuildMap takes as its GsMAP base. No rename. Byte-identical.
+Class unified in `include/tile_atlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). `self` is `TileAtlas *` (was `Obj6F514`); the cell type is LIBGS.H's `GsCELL`, now defined in the header (was the unit-local `Cell450B4`, same layout), and the flag at +0x030 is `defaultCells`. `cells` is the array TileMap__BuildMap takes as its GsMAP base. No rename. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 
