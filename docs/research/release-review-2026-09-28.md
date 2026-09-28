@@ -92,7 +92,7 @@ rather than API.
   Task.h:47/57, SceneNode.h:204-205 `sRotationZero`/`sSceneNodeScaleOne`,
   which are also typed `u8[0xC]` for `Ratio16[3]`). Move into the .c or
   rename `g`. Conversely 8 `g` symbols used by one unit only
-  (`sCdStreamAudioMixSet`, `sCdFileNotFoundFmt`, `gFileTableRegistered`, ...).
+  (`sCdStreamAudioMixSet`, `sCdFileNotFoundFmt`, `sFileTableRegistered`, ...).
 - **Typos:** `DreamSys__InitMoodContributors`, `totalFlasbackUnlockScore` and
   siblings, DreamSys.h's @brief typos (flashabcks, appropiate, indicies,
   recieve, adquired, lank). `Test4*` (4 functions) for `TestFor*`.

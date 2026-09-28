@@ -3126,7 +3126,7 @@ D_8006DAD8 = 0x8006DAD8;
 SetDataDirectory = 0x800270AC; // type:func
 GetDataDirectory = 0x800270B8; // type:func
 sDataDirectory = 0x8008A854;
-gFileTableRegistered = 0x8008A850;
+sFileTableRegistered = 0x8008A850;
 sDefaultDataDirectory = 0x8008A960;
 // identified (round 99, echo's evidence, head's rename): as _svm_okon2 --
 // every aligned access at ratio >= 0.95 in libsnd/vmanager (discs 3.3, 3.5)
