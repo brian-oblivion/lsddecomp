@@ -30,7 +30,7 @@ name carries the tier-C form the project already uses for that case
 | --- | --- |
 | `BasicClass__func_18350` (this function) | 58 |
 | `func_80023368` | 1 (`D_8006C0F8`) |
-| `StyleCue12` | 1 (`gStyleCueCallbacks`) |
+| `StyleCue12` | 1 (`sStyleCueCallbacks`) |
 
 Neither of the two exceptions is a BasicClass override:
 
@@ -38,7 +38,7 @@ Neither of the two exceptions is a BasicClass override:
   every real table in this corpus has a small id/flags value, and the
   function it names lives in `asm/psyq_10ee0.s` (SDK). That is a
   mis-detected table start, not a class.
-- `gStyleCueCallbacks` is a wholly independent 14-slot class — `ParamObj` in
+- `sStyleCueCallbacks` is a wholly independent 14-slot class — `ParamObj` in
   `src/world/ObjMStyleActor.c` — that overrides **every** slot including `+0x004`,
   and whose slots do not correspond to BasicClass's semantically at all
   (its `+0x030`, `+0x034` and `+0x038` are three sibling per-kind parameter

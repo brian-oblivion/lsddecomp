@@ -3,7 +3,7 @@
 > Renamed from `func_80056238` on 2026-09-23 (tools/rename.py). Address 0x80056238.
 
 Unit: `ObjMStyleActor` (round 17 continuation). Slot occupant #14 (the
-LAST) of `gStyleCueCallbacks`. The simplest of the fourteen: a single
+LAST) of `sStyleCueCallbacks`. The simplest of the fourteen: a single
 `kind == 0` check, no `else`.
 
 ## Final source
@@ -20,7 +20,7 @@ void StyleCue13(StyleCueParam *ctx, StyleCueParam *self) {
 
 ## Derivation
 
-Direct transcription, matched first try -- and confirms `gStyleCueCallbacks`'s
+Direct transcription, matched first try -- and confirms `sStyleCueCallbacks`'s
 own slot table ends here (`asm/data/76DC8.data.s` lists exactly 14
 function pointers, and this is the 14th).
 
@@ -30,7 +30,7 @@ None.
 
 ## Naming
 
-**Tier B.** `StyleCue13` is row +0x038 of `gStyleCueCallbacks` (`tools/classtable.py 0x800874B0`, round 73). `TryStartStyleCue` (ObjMStyleActor.c) installs `gStyleCueCallbacks[sub->countSign]` as `SoundCueSet::callback` via `InitSoundCueSet` (PlacementGridVabSound.c) -- the same per-tag sound-cue-callback slot `gEntityMoodHandlerTable`'s `MoodCueNN` occupants hold for `Entity` (`Entity__MoodCueNN` match reports). The `StyleCueNN` numbering follows table row order, same convention as `MoodCueNN`. Mechanics are established (a per-tag callback that reads `self->kind` and writes a handful of numeric fields, calling `ComputeStyleCueFalloff` first); which dream/style object or which field means what in the running game is not, so the specific `kind` branches and the numeric literals they write stay unnamed.
+**Tier B.** `StyleCue13` is row +0x038 of `sStyleCueCallbacks` (`tools/classtable.py 0x800874B0`, round 73). `TryStartStyleCue` (ObjMStyleActor.c) installs `sStyleCueCallbacks[sub->countSign]` as `SoundCueSet::callback` via `InitSoundCueSet` (PlacementGridVabSound.c) -- the same per-tag sound-cue-callback slot `gEntityMoodHandlerTable`'s `MoodCueNN` occupants hold for `Entity` (`Entity__MoodCueNN` match reports). The `StyleCueNN` numbering follows table row order, same convention as `MoodCueNN`. Mechanics are established (a per-tag callback that reads `self->kind` and writes a handful of numeric fields, calling `ComputeStyleCueFalloff` first); which dream/style object or which field means what in the running game is not, so the specific `kind` branches and the numeric literals they write stay unnamed.
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 

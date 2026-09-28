@@ -171,7 +171,7 @@ independent checks agree:
   BasicClass's table is 15 slots, not 14.
 
 `python3 tools/typeviews.py --tree` prints the tree; it finds 58 classes.
-`classtable.py --scan`'s 60 tables include `gStyleCueCallbacks` (a callback
+`classtable.py --scan`'s 60 tables include `sStyleCueCallbacks` (a callback
 array sharing no slot with any class) and `D_8006C0F8` (its first word is a
 code pointer). `gFileResourceMethods`'s scan also reads on into the next symbol,
 `sDataSourceClientGetters`, a NULL-terminated list of table getters.

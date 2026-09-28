@@ -1244,7 +1244,7 @@ void ApplyStyleDecorationIfSet(void) {
  *  - two positional sound cues (gStyleCueSlots, in gStyleCueSlotPool): a
  *    free slot claims the next record of the stage's cue list that lies
  *    within its cue's distance of the target and starts the record's
- *    SoundCueSet callback (gStyleCueCallbacks, next section); a claimed
+ *    SoundCueSet callback (sStyleCueCallbacks, next section); a claimed
  *    slot is serviced while the target stays in range and flushed when it
  *    leaves.
  * StyleScrollVramStrips also rotates a VRAM strip one column per tick on
@@ -1534,7 +1534,7 @@ void StyleReleaseEffectSlots(void) {
     }
 }
 
-/* A cue record's view here: `cue` is its cue index (the gStyleCueCallbacks
+/* A cue record's view here: `cue` is its cue index (the sStyleCueCallbacks
  * and gStyleCueDistanceTable row, InitSoundCueSet's tag), negated while a
  * slot holds the record. EntrySlot, below, is the whole 8-byte record. */
 typedef struct StyleCueEntryView StyleCueEntryView;
@@ -1780,7 +1780,7 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
 
 extern s32 gStyleSceneRefs;
 extern void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target);
-extern SoundCueCallbackFn gStyleCueCallbacks[];
+extern SoundCueCallbackFn sStyleCueCallbacks[];
 extern s32 InitSoundCueSet(void *sound, SoundCueSet *set, s32 tag, void *owner,
                            SoundCueCallbackFn callback);
 
@@ -1793,7 +1793,7 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
     if (entry != 0) {
         slot->entry = entry;
         InitSoundCueSet(((StyleSceneRefs *)gStyleSceneRefs)->sound, &slot->cueSet, entry->cue, slot,
-                        gStyleCueCallbacks[entry->cue]);
+                        sStyleCueCallbacks[entry->cue]);
         if (entry->cue == *lastCue) {
             *lastCue = -entry->cue;
         }
@@ -2020,7 +2020,7 @@ void StyleScrollVramStrips(void) {
  *
  * Two groups, with one predicate between them:
  *
- *  - StyleCue00..StyleCue13, the 14 rows of gStyleCueCallbacks, and their
+ *  - StyleCue00..StyleCue13, the 14 rows of sStyleCueCallbacks, and their
  *    helper ComputeStyleCueFalloff. Each is a SoundCueSet callback
  *    (include/SoundCueSet.h): TryStartStyleCue (previous section) starts a
  *    style-cue slot's embedded set with the claimed cue record's index as the
@@ -2040,7 +2040,7 @@ void StyleScrollVramStrips(void) {
  */
 
 /* ------------------------------------------------------------------ *
- * gStyleCueCallbacks's 14 slots (StyleCue00..StyleCue13) plus the shared
+ * sStyleCueCallbacks's 14 slots (StyleCue00..StyleCue13) plus the shared
  * helper ComputeStyleCueFalloff they all call first.
  * ------------------------------------------------------------------ */
 
@@ -2053,7 +2053,7 @@ typedef struct StyleCueParam StyleCueParam;
 /* The cue-table record the slot claimed (`StyleCueEntryView`, above). */
 typedef struct StyleCueParamMethods {
     u8 pad0[0x6];
-    s8 cue; /* +0x006, the record's cue index (its gStyleCueCallbacks row
+    s8 cue; /* +0x006, the record's cue index (its sStyleCueCallbacks row
              * and InitSoundCueSet tag), negated while a slot has it
              * claimed; ComputeStyleCueFalloff indexes gStyleCueDistanceTable
              * with its negative. */

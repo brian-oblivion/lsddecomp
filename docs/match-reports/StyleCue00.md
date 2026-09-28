@@ -3,7 +3,7 @@
 > Renamed from `func_80055A88` on 2026-09-23 (tools/rename.py). Address 0x80055a88.
 
 Unit: `ObjMStyleActor` (round 17 continuation). Slot occupant #1 of
-`gStyleCueCallbacks` (14 slots, header word 0 -- see the unit's own file banner
+`sStyleCueCallbacks` (14 slots, header word 0 -- see the unit's own file banner
 for why this is NOT a BasicClass override despite the matching slot
 count). Calls the shared helper `ComputeStyleCueFalloff`, stores its result, then
 dispatches on `self->kind` ("kind") to fill in a handful of fields.
@@ -49,7 +49,7 @@ written up once, in `ComputeStyleCueFalloff`'s and `StyleCue07`'s reports.
 
 ## Naming
 
-**Tier B.** `StyleCue00` is row +0x004 of `gStyleCueCallbacks` (`tools/classtable.py 0x800874B0`, round 73). `TryStartStyleCue` (ObjMStyleActor.c) installs `gStyleCueCallbacks[sub->countSign]` as `SoundCueSet::callback` via `InitSoundCueSet` (PlacementGridVabSound.c) -- the same per-tag sound-cue-callback slot `gEntityMoodHandlerTable`'s `MoodCueNN` occupants hold for `Entity` (`Entity__MoodCueNN` match reports). The `StyleCueNN` numbering follows table row order, same convention as `MoodCueNN`. Mechanics are established (a per-tag callback that reads `self->kind` and writes a handful of numeric fields, calling `ComputeStyleCueFalloff` first); which dream/style object or which field means what in the running game is not, so the specific `kind` branches and the numeric literals they write stay unnamed.
+**Tier B.** `StyleCue00` is row +0x004 of `sStyleCueCallbacks` (`tools/classtable.py 0x800874B0`, round 73). `TryStartStyleCue` (ObjMStyleActor.c) installs `sStyleCueCallbacks[sub->countSign]` as `SoundCueSet::callback` via `InitSoundCueSet` (PlacementGridVabSound.c) -- the same per-tag sound-cue-callback slot `gEntityMoodHandlerTable`'s `MoodCueNN` occupants hold for `Entity` (`Entity__MoodCueNN` match reports). The `StyleCueNN` numbering follows table row order, same convention as `MoodCueNN`. Mechanics are established (a per-tag callback that reads `self->kind` and writes a handful of numeric fields, calling `ComputeStyleCueFalloff` first); which dream/style object or which field means what in the running game is not, so the specific `kind` branches and the numeric literals they write stay unnamed.
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
@@ -90,7 +90,7 @@ holds (and now names IsStyleVariantEven). The old one, verbatim:
  * MATCHED. Two unrelated classes share the slice, cut at ROM addresses
  * rather than at a class boundary (tools/classtable.py, round 17):
  *
- *  - StyleCue00..StyleCue13, the complete 14-slot table `gStyleCueCallbacks`,
+ *  - StyleCue00..StyleCue13, the complete 14-slot table `sStyleCueCallbacks`,
  *    and their helper ComputeStyleCueFalloff. They are SoundCueSet
  *    callbacks (include/SoundCueSet.h): TryStartStyleCue (ObjMStyleActor.c)
  *    starts a style-cue slot's embedded set with the claimed record's cue

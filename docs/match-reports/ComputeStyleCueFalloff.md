@@ -3,7 +3,7 @@
 > Renamed from `func_8005627C` on 2026-09-23 (tools/rename.py). Address 0x8005627c.
 
 Unit: `ObjMStyleActor` (round 17 continuation). The shared helper every
-`gStyleCueCallbacks` slot occupant calls first: reads a small signed tag byte off
+`sStyleCueCallbacks` slot occupant calls first: reads a small signed tag byte off
 `ctx->methods`, looks it up with a NEGATIVE index into a 15-entry global
 table, and returns a chained division result.
 
@@ -39,7 +39,7 @@ s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
 ## Derivation
 
 - **Placement.** This function's own ROM address, `0x8005627C`, is AFTER
-  all 14 `gStyleCueCallbacks` occupants that call it (they run `0x80055A88` ..
+  all 14 `sStyleCueCallbacks` occupants that call it (they run `0x80055A88` ..
   `0x80056238`; this function sits right before the blocked
   `IsStyleVariantEven`). Its definition lives at that later position in the
   file, with a forward declaration (`s32 ComputeStyleCueFalloff(StyleCueParam *ctx);`)
