@@ -283,7 +283,7 @@ extern LongVec3 sTranslateYMinus64[];
 extern LongVec3 sTranslateYMinus256[];
 extern LongVec3 sTranslateXMinus64[];
 extern LongVec3 sTranslateYPlus64ZMinus64[];
-extern LongVec3 TRANSLATE_Y_MINUS1500_Z_PLUS1024[];
+extern LongVec3 sTranslateYMinus1500ZPlus1024[];
 extern LongVec3 sTranslateZMinus256[];
 extern Ratio16 sScaleQuarter[];
 extern Ratio16 sScaleHalf[];
