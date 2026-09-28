@@ -1722,7 +1722,7 @@ s32 GetTeleportTimeBonus(void) {
 
 s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
     if (stage == 0)
-        return GetStaticSpawn(target, currentPos, 0, sStaircaseTriggersCount, STAIRCASE_TRIGGERS,
+        return GetStaticSpawn(target, currentPos, 0, sStaircaseTriggersCount, sStaircaseTriggers,
                               STAIRCASE_SPAWNS, 0);
     return -1;
 }

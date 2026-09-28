@@ -942,7 +942,7 @@ extern StageSpawn *sTunnelSpawns[];
 
 /* Table triple for Test4StaircaseNodes (round 2026-08-30-d). */
 extern s8 sStaircaseTriggersCount[];
-extern StaticLinkTrigger *STAIRCASE_TRIGGERS[];
+extern StaticLinkTrigger *sStaircaseTriggers[];
 extern StageSpawn *STAIRCASE_SPAWNS[];
 
 /* This function might be called when the player hits a wall?
