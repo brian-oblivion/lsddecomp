@@ -10,8 +10,9 @@
  * initSystems and then runMainLoop, which never returns. Application brings the
  * console up and owns the outer loop; this class fills the loop's six hooks with
  * the game's sequence and owns the game's DreamSys (include/DreamSys.h). Class id
- * 0x1F60, method table gGameApplicationMethods, getter GetGameApplicationMethods
- * (src/GameApplicationFileResource.c); methods in src/GameApplicationFileResource.c. No class derives from it.
+ * 0x1F60, method table gGameApplicationMethods; the methods and the getter
+ * GetGameApplicationMethods are in src/GameApplicationFileResource.c. No class
+ * derives from it.
  *
  * Lifecycle.
  *   ctor(config)   Application's ctor with config->dataSource, this table, the
