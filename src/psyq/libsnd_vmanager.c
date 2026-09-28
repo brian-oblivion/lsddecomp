@@ -65,24 +65,24 @@ s32 SpuVmAlloc(s32 unused) {
     threshold = D_8008EA1B;
 
     for (idx = 0; (u8)idx < spuVmMaxVoice; idx++) {
-        if (_svm_voice[(u8)idx].unk1B != 0 || _svm_voice[(u8)idx].unk06 != 0) {
-            pri = _svm_voice[(u8)idx].unk18;
+        if (_svm_voice[(u8)idx].keyState != 0 || _svm_voice[(u8)idx].envx != 0) {
+            pri = _svm_voice[(u8)idx].prior;
             if (pri < (s32)(u16)threshold) {
                 threshold = pri;
                 bestIdx = idx;
-                bestSec = _svm_voice[(u8)idx].unk06;
-                bestTer = _svm_voice[(u8)idx].unk02;
+                bestSec = _svm_voice[(u8)idx].envx;
+                bestTer = _svm_voice[(u8)idx].age;
                 found = 1;
             } else if (pri == (s32)(u16)threshold) {
                 found++;
-                newSec = _svm_voice[(u8)idx].unk06;
+                newSec = _svm_voice[(u8)idx].envx;
                 if (newSec < bestSec) {
-                    bestTer = _svm_voice[(u8)idx].unk02;
+                    bestTer = _svm_voice[(u8)idx].age;
                     bestSec = newSec;
                     bestIdx = idx;
                 } else if (newSec == bestSec) {
-                    if (bestTer < (s16)_svm_voice[(u8)idx].unk02) {
-                        bestTer = (s16)_svm_voice[(u8)idx].unk02;
+                    if (bestTer < (s16)_svm_voice[(u8)idx].age) {
+                        bestTer = (s16)_svm_voice[(u8)idx].age;
                         bestIdx = idx;
                     }
                 }
@@ -104,12 +104,12 @@ s32 SpuVmAlloc(s32 unused) {
     if ((u8)chosen < count) {
         if (count != 0) {
             for (idx = 0; (u8)idx < count; idx++) {
-                _svm_voice[(u8)idx].unk02 = _svm_voice[(u8)idx].unk02 + 1;
+                _svm_voice[(u8)idx].age = _svm_voice[(u8)idx].age + 1;
             }
         }
-        _svm_voice[(u8)chosen].unk02 = 0;
-        _svm_voice[(u8)chosen].unk18 = D_8008EA1B;
-        if (_svm_voice[(u8)chosen].unk1B == 2) {
+        _svm_voice[(u8)chosen].age = 0;
+        _svm_voice[(u8)chosen].prior = D_8008EA1B;
+        if (_svm_voice[(u8)chosen].keyState == 2) {
             SpuSetNoiseVoice(SPU_OFF, SPU_ALLCH);
         }
     }
@@ -189,8 +189,8 @@ void SpuVmKeyOnNow(s32 unused, s32 pitch) {
     ((s16 *)_svm_sreg_buf)[(u16)sregIndex + 1] = (s16)(volRSq / 16383);
 
     _svm_sreg_dirty[KEYON_VOICE] |= SVM_SREG_DIRTY_VOL | SVM_SREG_DIRTY_PITCH;
-    _svm_voice[KEYON_VOICE].unk04 = (s16)pitch;
-    _svm_voice[KEYON_VOICE].unk1B = 1;
+    _svm_voice[KEYON_VOICE].pitch = (s16)pitch;
+    _svm_voice[KEYON_VOICE].keyState = 1;
 
     if (KEYON_VOICE < 16) {
         lowBit = 1 << KEYON_VOICE;
@@ -262,17 +262,17 @@ void vmNoiseOn2(s32 voice, s32 volL, s32 volR, s32 unusedAdsr1, s32 unusedAdsr2)
     }
 
     n = spuVmMaxVoice;
-    _svm_voice[(u8)voiceArg].unk04 = 10;
+    _svm_voice[(u8)voiceArg].pitch = 10;
     if (n != 0) {
         i = 0;
         do {
-            _svm_voice[(u16)i].unk1B = _svm_voice[(u16)i].unk1B & 1;
+            _svm_voice[(u16)i].keyState = _svm_voice[(u16)i].keyState & 1;
             i++;
         } while ((u16)i < spuVmMaxVoice);
     }
-    _svm_voice[(u8)voiceArg].unk1B = 2;
+    _svm_voice[(u8)voiceArg].keyState = 2;
 
-    _svm_voice[(u8)voiceArg].unk02 = 0;
+    _svm_voice[(u8)voiceArg].age = 0;
     _svm_okon1 = lowBit | _svm_okon1;
     _svm_okon2 = highBit | _svm_okon2;
     _svm_okof1 = _svm_okof1 & ~_svm_okon1;
@@ -365,18 +365,18 @@ void SePitchBend(s32 chan, s32 bend) {
     if ((u32)(chan & 0xFF) < 24) {
         /* MATCHING: the direct D_8008EA13 spelling does not match. */
         curProg = &D_8008EA13;
-        *curProg = (u8)_svm_voice[(chan & 0xFF)].unk10;
-        D_8008EA18 = (u8)_svm_voice[(chan & 0xFF)].unk14;
+        *curProg = (u8)_svm_voice[(chan & 0xFF)].progIndex;
+        D_8008EA18 = (u8)_svm_voice[(chan & 0xFF)].tone;
         D_8008EA26 = (u8)chan;
         toneIndex = D_8008EA18 + (*curProg << 4);
         amount = bend;
         if (amount >= 0) {
             prod = amount * _svm_tn[toneIndex].pbmax;
-            note = (u16)_svm_voice[(chan & 0xFF)].unk0C + prod / 127;
+            note = (u16)_svm_voice[(chan & 0xFF)].note + prod / 127;
             fine = prod % 127;
         } else {
             q = (amount * _svm_tn[toneIndex].pbmin) / 127;
-            note = (u16)_svm_voice[(chan & 0xFF)].unk0C + q - 1;
+            note = (u16)_svm_voice[(chan & 0xFF)].note + q - 1;
             fine = q + 127;
         }
         ((u16 *)_svm_sreg_buf)[sregIndex + 2] = note2pitch2((u16)note, (u16)fine);
@@ -390,25 +390,25 @@ void SsUtVibrateOff(short vc) {}
 
 /* Starts a volume ramp on a voice from `from` to `to` over `duration`
  * ticks, which SetAutoVol steps. Same body as SeAutoPan (below),
- * over _svm_voice +0x1C..+0x26 instead of +0x28..+0x32. */
+ * over the autoVol fields instead of autoPan. */
 void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
     s16 q;
 
     if (from == to) {
         return;
     }
-    _svm_voice[voice].unk1C = 1;
-    _svm_voice[voice].unk24 = from;
-    _svm_voice[voice].unk26 = to;
+    _svm_voice[voice].autoVolActive = 1;
+    _svm_voice[voice].autoVolValue = from;
+    _svm_voice[voice].autoVolTarget = to;
     if ((from - to < 0 ? to - from : from - to) < duration) {
         q = duration / (from - to);
-        _svm_voice[voice].unk1E = 1;
-        _svm_voice[voice].unk20 = q;
-        _svm_voice[voice].unk22 = q;
+        _svm_voice[voice].autoVolStep = 1;
+        _svm_voice[voice].autoVolInterval = q;
+        _svm_voice[voice].autoVolCountdown = q;
     } else {
         q = (from - to) / duration;
-        _svm_voice[voice].unk20 = 0;
-        _svm_voice[voice].unk1E = q;
+        _svm_voice[voice].autoVolInterval = 0;
+        _svm_voice[voice].autoVolStep = q;
     }
 }
 
@@ -463,26 +463,26 @@ void SetAutoVol(s16 voice) {
 
     v = voice;
     off = voice * 8;
-    if (_svm_voice[voice].unk20 != 0) {
-        if (_svm_voice[voice].unk22-- > 0) {
+    if (_svm_voice[voice].autoVolInterval != 0) {
+        if (_svm_voice[voice].autoVolCountdown-- > 0) {
             return;
         }
-        _svm_voice[voice].unk22 = _svm_voice[voice].unk20;
+        _svm_voice[voice].autoVolCountdown = _svm_voice[voice].autoVolInterval;
     }
-    _svm_voice[voice].unk24 += _svm_voice[voice].unk1E;
-    if (_svm_voice[voice].unk1E > 0) {
-        if (_svm_voice[voice].unk24 >= _svm_voice[voice].unk26) {
-            _svm_voice[voice].unk24 = _svm_voice[voice].unk26;
-            _svm_voice[voice].unk1C = 0;
+    _svm_voice[voice].autoVolValue += _svm_voice[voice].autoVolStep;
+    if (_svm_voice[voice].autoVolStep > 0) {
+        if (_svm_voice[voice].autoVolValue >= _svm_voice[voice].autoVolTarget) {
+            _svm_voice[voice].autoVolValue = _svm_voice[voice].autoVolTarget;
+            _svm_voice[voice].autoVolActive = 0;
         }
-    } else if (_svm_voice[voice].unk1E < 0) {
-        if (_svm_voice[voice].unk24 <= _svm_voice[voice].unk26) {
-            _svm_voice[voice].unk24 = _svm_voice[voice].unk26;
-            _svm_voice[voice].unk1C = 0;
+    } else if (_svm_voice[voice].autoVolStep < 0) {
+        if (_svm_voice[voice].autoVolValue <= _svm_voice[voice].autoVolTarget) {
+            _svm_voice[voice].autoVolValue = _svm_voice[voice].autoVolTarget;
+            _svm_voice[voice].autoVolActive = 0;
         }
     }
 
-    acc = _svm_voice[v].unk24;
+    acc = _svm_voice[v].autoVolValue;
     D_8008EA10 = acc;
 
     vol = _svm_vh->mvol * 0x3FFF;
@@ -535,18 +535,18 @@ void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3) {
     if (a1 == a2) {
         return;
     }
-    _svm_voice[a0].unk28 = 1;
-    _svm_voice[a0].unk30 = a1;
-    _svm_voice[a0].unk32 = a2;
+    _svm_voice[a0].autoPanActive = 1;
+    _svm_voice[a0].autoPanValue = a1;
+    _svm_voice[a0].autoPanTarget = a2;
     if ((a1 - a2 < 0 ? a2 - a1 : a1 - a2) < a3) {
         q = a3 / (a1 - a2);
-        _svm_voice[a0].unk2A = 1;
-        _svm_voice[a0].unk2C = q;
-        _svm_voice[a0].unk2E = q;
+        _svm_voice[a0].autoPanStep = 1;
+        _svm_voice[a0].autoPanInterval = q;
+        _svm_voice[a0].autoPanCountdown = q;
     } else {
         q = (a1 - a2) / a3;
-        _svm_voice[a0].unk2C = 0;
-        _svm_voice[a0].unk2A = q;
+        _svm_voice[a0].autoPanInterval = 0;
+        _svm_voice[a0].autoPanStep = q;
     }
 }
 
@@ -570,26 +570,26 @@ void SetAutoPan(s16 voice) {
 
     v = voice;
     off = voice * 8;
-    if (_svm_voice[voice].unk2C != 0) {
-        if (_svm_voice[voice].unk2E-- > 0) {
+    if (_svm_voice[voice].autoPanInterval != 0) {
+        if (_svm_voice[voice].autoPanCountdown-- > 0) {
             return;
         }
-        _svm_voice[voice].unk2E = _svm_voice[voice].unk2C;
+        _svm_voice[voice].autoPanCountdown = _svm_voice[voice].autoPanInterval;
     }
-    _svm_voice[voice].unk30 += _svm_voice[voice].unk2A;
-    if (_svm_voice[voice].unk2A > 0) {
-        if (_svm_voice[voice].unk30 >= _svm_voice[voice].unk32) {
-            _svm_voice[voice].unk30 = _svm_voice[voice].unk32;
-            _svm_voice[voice].unk28 = 0;
+    _svm_voice[voice].autoPanValue += _svm_voice[voice].autoPanStep;
+    if (_svm_voice[voice].autoPanStep > 0) {
+        if (_svm_voice[voice].autoPanValue >= _svm_voice[voice].autoPanTarget) {
+            _svm_voice[voice].autoPanValue = _svm_voice[voice].autoPanTarget;
+            _svm_voice[voice].autoPanActive = 0;
         }
-    } else if (_svm_voice[voice].unk2A < 0) {
-        if (_svm_voice[voice].unk30 <= _svm_voice[voice].unk32) {
-            _svm_voice[voice].unk30 = _svm_voice[voice].unk32;
-            _svm_voice[voice].unk28 = 0;
+    } else if (_svm_voice[voice].autoPanStep < 0) {
+        if (_svm_voice[voice].autoPanValue <= _svm_voice[voice].autoPanTarget) {
+            _svm_voice[voice].autoPanValue = _svm_voice[voice].autoPanTarget;
+            _svm_voice[voice].autoPanActive = 0;
         }
     }
 
-    acc = *(u8 *)&_svm_voice[v].unk30;
+    acc = *(u8 *)&_svm_voice[v].autoPanValue;
     D_8008EA11 = acc;
 
     vol = _svm_vh->mvol * 0x3FFF;
@@ -691,27 +691,27 @@ void SpuVmInit(s32 a0) {
 
         woff = (u16)i * 8;
 
-        _svm_voice[(u16)i].unk02 = 0x18;
-        _svm_voice[(u16)i].unk0E = -1;
-        _svm_voice[(u16)i].unk00 = 0xFF;
-        _svm_voice[(u16)i].unk1B = 0;
-        _svm_voice[(u16)i].unk04 = 0;
-        _svm_voice[(u16)i].unk06 = 0;
-        _svm_voice[(u16)i].unk10 = 0;
-        _svm_voice[(u16)i].unk12 = 0;
-        _svm_voice[(u16)i].unk14 = 0xFF;
-        _svm_voice[(u16)i].unk08 = 0;
-        _svm_voice[(u16)i].unk0A = 0x40;
-        _svm_voice[(u16)i].unk1C = 0;
-        _svm_voice[(u16)i].unk1E = 0;
-        _svm_voice[(u16)i].unk20 = 0;
-        _svm_voice[(u16)i].unk22 = 0;
-        _svm_voice[(u16)i].unk28 = 0;
-        _svm_voice[(u16)i].unk2A = 0;
-        _svm_voice[(u16)i].unk2C = 0;
-        _svm_voice[(u16)i].unk2E = 0;
-        _svm_voice[(u16)i].unk30 = 0;
-        _svm_voice[(u16)i].unk24 = 0;
+        _svm_voice[(u16)i].age = 0x18;
+        _svm_voice[(u16)i].seq = -1;
+        _svm_voice[(u16)i].vag = 0xFF;
+        _svm_voice[(u16)i].keyState = 0;
+        _svm_voice[(u16)i].pitch = 0;
+        _svm_voice[(u16)i].envx = 0;
+        _svm_voice[(u16)i].progIndex = 0;
+        _svm_voice[(u16)i].prog = 0;
+        _svm_voice[(u16)i].tone = 0xFF;
+        _svm_voice[(u16)i].vol = 0;
+        _svm_voice[(u16)i].pan = 0x40;
+        _svm_voice[(u16)i].autoVolActive = 0;
+        _svm_voice[(u16)i].autoVolStep = 0;
+        _svm_voice[(u16)i].autoVolInterval = 0;
+        _svm_voice[(u16)i].autoVolCountdown = 0;
+        _svm_voice[(u16)i].autoPanActive = 0;
+        _svm_voice[(u16)i].autoPanStep = 0;
+        _svm_voice[(u16)i].autoPanInterval = 0;
+        _svm_voice[(u16)i].autoPanCountdown = 0;
+        _svm_voice[(u16)i].autoPanValue = 0;
+        _svm_voice[(u16)i].autoVolValue = 0;
 
         ((s16 *)_svm_sreg)[woff + 3] = 0x200; /* voice[i].addr */
         scratch = woff;
@@ -734,9 +734,9 @@ void SpuVmInit(s32 a0) {
             highMask = 1 << (chan - 0x10);
         }
 
-        _svm_voice[chan].unk1B = 0;
-        _svm_voice[chan].unk04 = 0;
-        _svm_voice[chan].unk00 = 0;
+        _svm_voice[chan].keyState = 0;
+        _svm_voice[chan].pitch = 0;
+        _svm_voice[chan].vag = 0;
         _svm_okof1 |= lowMask;
         _svm_okof2 |= highMask;
         woff = _svm_okof1;
@@ -776,9 +776,9 @@ void SpuVmNoiseOff(void) {
     s16 i;
 
     for (i = 0; i < spuVmMaxVoice; i++) {
-        if (_svm_voice[i].unk1B == 2) {
-            _svm_voice[(u8)i].unk1B = 0;
-            _svm_voice[(u8)i].unk04 = 0;
+        if (_svm_voice[i].keyState == 2) {
+            _svm_voice[(u8)i].keyState = 0;
+            _svm_voice[(u8)i].pitch = 0;
             _svm_sreg->noiseOn[0] = 0;
             _svm_sreg->noiseOn[1] = 0;
         }
@@ -813,18 +813,18 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
     u8 byteVal;
 
     threshold = a4 - 0x40;
-    if (_svm_voice[a0].unk0E != a1) {
+    if (_svm_voice[a0].seq != a1) {
         return 0;
     }
-    if (_svm_voice[a0].unk16 != a2) {
+    if (_svm_voice[a0].vabId != a2) {
         return 0;
     }
-    if (_svm_voice[a0].unk12 != a3) {
+    if (_svm_voice[a0].prog != a3) {
         return 0;
     }
 
-    someTotal = _svm_voice[a0].unk14 + (D_8008EA13 << 4);
-    baseValue = _svm_voice[a0].unk0C;
+    someTotal = _svm_voice[a0].tone + (D_8008EA13 << 4);
+    baseValue = _svm_voice[a0].note;
 
     if (threshold > 0) {
         tableByte = _svm_tn[someTotal].pbmax;
@@ -847,7 +847,7 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
         }
     }
 
-    byteVal = *(u8 *)&_svm_voice[a0].unk14;
+    byteVal = *(u8 *)&_svm_voice[a0].tone;
     D_8008EA26 = a0;
     D_8008EA18 = byteVal;
     _svm_sreg_buf[a0].pitch = note2pitch2(outA2 & 0xFFFF, outA1 & 0xFFFF);
@@ -886,7 +886,7 @@ extern s32 _svm_envx_hist[];
 /* A u16 at a 0x34 stride: SpuVmFlush walks _svm_voice's +0x06 field
  * with a pointer of this type (store, then re-check the SAME field via
  * `lhu`). Kept as the walk's own element type so the pointer steps one
- * record at a time from &_svm_voice[0].unk06. */
+ * record at a time from &_svm_voice[0].envx. */
 typedef struct {
     u16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
@@ -913,7 +913,7 @@ void SpuVmFlush(void) {
     *slot = 0;
 
     if (count > 0) {
-        Rec34HalfU2 *p98E = (Rec34HalfU2 *)&_svm_voice[0].unk06;
+        Rec34HalfU2 *p98E = (Rec34HalfU2 *)&_svm_voice[0].envx;
         SpuVoiceRegs *pDad = _svm_sreg->voice;
 
         for (i = 0; i < count; i++) {
@@ -939,10 +939,10 @@ void SpuVmFlush(void) {
             s32 bit = 1 << i;
 
             if (mask & bit) {
-                if (_svm_voice[i].unk1B == 2) {
+                if (_svm_voice[i].keyState == 2) {
                     SpuSetNoiseVoice(0, 0xFFFFFF);
                 }
-                _svm_voice[i].unk1B = 0;
+                _svm_voice[i].keyState = 0;
             }
         }
     }
@@ -951,10 +951,10 @@ void SpuVmFlush(void) {
     _svm_okon2 &= ~_svm_okof2;
 
     for (i = 0; i < 0x18; i++) {
-        if (_svm_voice[i].unk1C != 0) {
+        if (_svm_voice[i].autoVolActive != 0) {
             SetAutoVol(i);
         }
-        if (_svm_voice[i].unk28 != 0) {
+        if (_svm_voice[i].autoPanActive != 0) {
             SetAutoPan(i);
         }
     }
@@ -1095,24 +1095,24 @@ s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
                 chan = SpuVmAlloc(0) & 0xFF;
                 D_8008EA26 = chan;
                 if (chan < spuVmMaxVoice) {
-                    _svm_voice[chan].unk1B = 1;
-                    _svm_voice[D_8008EA26].unk02 = 0;
-                    _svm_voice[D_8008EA26].unk0E = (s16)a0;
-                    _svm_voice[D_8008EA26].unk16 = *((u8 *)&D_8008EA24 - 0x17);
-                    _svm_voice[D_8008EA26].unk10 = D_8008EA13;
-                    _svm_voice[D_8008EA26].unk12 = origA2;
+                    _svm_voice[chan].keyState = 1;
+                    _svm_voice[D_8008EA26].age = 0;
+                    _svm_voice[D_8008EA26].seq = (s16)a0;
+                    _svm_voice[D_8008EA26].vabId = *((u8 *)&D_8008EA24 - 0x17);
+                    _svm_voice[D_8008EA26].progIndex = D_8008EA13;
+                    _svm_voice[D_8008EA26].prog = origA2;
 
                     if ((s16)a0 != 0x21) {
                         s16 speed = s6->unk4E[s6->unk12];
 
-                        _svm_voice[D_8008EA26].unk08 = s2 / speed;
+                        _svm_voice[D_8008EA26].vol = s2 / speed;
                     }
 
-                    _svm_voice[D_8008EA26].unk0A = (u8)a5;
-                    _svm_voice[D_8008EA26].unk14 = D_8008EA18;
-                    _svm_voice[D_8008EA26].unk0C = a3;
-                    _svm_voice[D_8008EA26].unk18 = D_8008EA1B;
-                    _svm_voice[D_8008EA26].unk00 = D_8008EA24;
+                    _svm_voice[D_8008EA26].pan = (u8)a5;
+                    _svm_voice[D_8008EA26].tone = D_8008EA18;
+                    _svm_voice[D_8008EA26].note = a3;
+                    _svm_voice[D_8008EA26].prior = D_8008EA1B;
+                    _svm_voice[D_8008EA26].vag = D_8008EA24;
 
                     SpuVmDoAllocate();
                     if (D_8008EA24 == 0xFF) {
@@ -1141,21 +1141,21 @@ s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
 
     count = 0;
     for (i = 0; i < spuVmMaxVoice; i++) {
-        if (_svm_voice[i].unk0C != a3) {
+        if (_svm_voice[i].note != a3) {
             continue;
         }
-        if (_svm_voice[i].unk12 != a2) {
+        if (_svm_voice[i].prog != a2) {
             continue;
         }
-        if (_svm_voice[i].unk0E != a0) {
+        if (_svm_voice[i].seq != a0) {
             continue;
         }
-        if (_svm_voice[i].unk16 != a1) {
+        if (_svm_voice[i].vabId != a1) {
             continue;
         }
-        if (_svm_voice[i].unk00 == 0xFF) {
-            _svm_voice[i].unk1B = 0;
-            _svm_voice[i].unk04 = 0;
+        if (_svm_voice[i].vag == 0xFF) {
+            _svm_voice[i].keyState = 0;
+            _svm_voice[i].pitch = 0;
             _svm_sreg->noiseOn[0] = 0;
             _svm_sreg->noiseOn[1] = 0;
         } else {
@@ -1172,9 +1172,9 @@ s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
                 lowMask = 0;
                 highMask = 1 << (chan - 0x10);
             }
-            _svm_voice[chan].unk1B = 0;
-            _svm_voice[chan].unk04 = 0;
-            _svm_voice[chan].unk00 = 0;
+            _svm_voice[chan].keyState = 0;
+            _svm_voice[chan].pitch = 0;
+            _svm_voice[chan].vag = 0;
             _svm_okof1 |= lowMask;
             _svm_okof2 |= highMask;
             _svm_okon1 &= ~_svm_okof1;

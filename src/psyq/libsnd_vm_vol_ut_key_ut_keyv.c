@@ -55,7 +55,7 @@ extern volatile u8 D_8008EA18;
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 315/324 words, 9 words short. Residue: one GCC CSE
- * decision on the `_svm_tn[_svm_voice[i].unk14]` address plus two
+ * decision on the `_svm_tn[_svm_voice[i].tone]` address plus two
  * loop-invariant hoists (docs/match-reports/SpuVmSetVol.md). */
 s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     SsScore *e;
@@ -72,10 +72,10 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
     if (spuVmMaxVoice != 0) {
         i = 0;
         do {
-            if (_svm_voice[i].unk0E == (s16)a0) {
-                s32 t0 = _svm_voice[i].unk12;
-                if (t0 == (s16)a2 && _svm_voice[i].unk16 == (s16)a1) {
-                    u8 e968FromD998 = _svm_pg[_svm_voice[i].unk10].mvol;
+            if (_svm_voice[i].seq == (s16)a0) {
+                s32 t0 = _svm_voice[i].prog;
+                if (t0 == (s16)a2 && _svm_voice[i].vabId == (s16)a1) {
+                    u8 e968FromD998 = _svm_pg[_svm_voice[i].progIndex].mvol;
                     u8 e968FromT0 = _svm_pg[t0].mvol;
                     s32 lvl0;
                     s32 prio;
@@ -89,7 +89,7 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                     u32 pan1sq;
                     u32 pan2sq;
 
-                    lvl0 = _svm_voice[i].unk08 * (u16)a3 / 127;
+                    lvl0 = _svm_voice[i].vol * (u16)a3 / 127;
                     prio = lvl0 * 0x3FFF;
                     lvl1 = _svm_vh->mvol * prio / 16129;
 
@@ -99,21 +99,21 @@ s32 SpuVmSetVol(s32 a0, s32 a1, s32 a2, s32 a3, u16 a4) {
                         lvl1b = lvl1 * e968FromD998;
                     }
 
-                    e978c = _svm_tn[_svm_voice[i].unk14].vol;
+                    e978c = _svm_tn[_svm_voice[i].tone].vol;
                     lvl1c = lvl1b * e978c;
                     lvl2 = lvl1c / 16129;
 
                     pan1 = (lvl2 * e->unk74) / 127;
                     pan2 = (lvl2 * e->unk76) / 127;
 
-                    e978d = _svm_tn[_svm_voice[i].unk14].pan;
+                    e978d = _svm_tn[_svm_voice[i].tone].pan;
                     if (e978d < 0x40) {
                         pan2 = (pan2 * e978d) / 63;
                     } else {
                         pan1 = (pan1 * (0x7F - e978d)) / 63;
                     }
 
-                    e968d = _svm_pg[_svm_voice[i].unk10].mpan;
+                    e968d = _svm_pg[_svm_voice[i].progIndex].mpan;
                     if (e968d < 0x40) {
                         pan2 = (pan2 * e968d) / 63;
                     } else {
@@ -212,23 +212,23 @@ s16 SsUtKeyOn(s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) {
     __asm__("");
     D_8008EA26 = (u8)result;
     __asm__("");
-    _svm_voice[(u8)result].unk0E = 0x21;
+    _svm_voice[(u8)result].seq = 0x21;
     __asm__("");
-    _svm_voice[(u8)result].unk16 = p0;
+    _svm_voice[(u8)result].vabId = p0;
     __asm__("");
-    _svm_voice[(u8)result].unk12 = p1;
+    _svm_voice[(u8)result].prog = p1;
     __asm__("");
-    _svm_voice[(u8)result].unk10 = D_8008EA13;
+    _svm_voice[(u8)result].progIndex = D_8008EA13;
     __asm__("");
-    _svm_voice[(u8)result].unk00 = D_8008EA24;
+    _svm_voice[(u8)result].vag = D_8008EA24;
     __asm__("");
     pending18 = D_8008EA18;
-    _svm_voice[(u8)result].unk0C = p3;
-    _svm_voice[(u8)result].unk1B = 1;
+    _svm_voice[(u8)result].note = p3;
+    _svm_voice[(u8)result].keyState = 1;
     __asm__("");
-    _svm_voice[(u8)result].unk02 = 0;
+    _svm_voice[(u8)result].age = 0;
     __asm__("");
-    _svm_voice[(u8)result].unk14 = pending18;
+    _svm_voice[(u8)result].tone = pending18;
 
     SpuVmDoAllocate();
     if ((s16)D_8008EA24 == 0xFF) {
@@ -261,13 +261,13 @@ s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
     if ((u16)idx >= 0x18) {
         goto fail;
     }
-    if (_svm_voice[idx].unk16 != p1 || _svm_voice[idx].unk12 != p2 || _svm_voice[idx].unk14 != p3 ||
-        _svm_voice[idx].unk0C != p4) {
+    if (_svm_voice[idx].vabId != p1 || _svm_voice[idx].prog != p2 || _svm_voice[idx].tone != p3 ||
+        _svm_voice[idx].note != p4) {
         goto fail;
     }
-    if (_svm_voice[idx].unk00 == 0xFF) {
-        _svm_voice[(u8)idx].unk1B = 0;
-        _svm_voice[(u8)idx].unk04 = 0;
+    if (_svm_voice[idx].vag == 0xFF) {
+        _svm_voice[(u8)idx].keyState = 0;
+        _svm_voice[(u8)idx].pitch = 0;
         _svm_sreg[SPU_NOISE_ON_LO] = 0;
         _svm_sreg[SPU_NOISE_ON_HI] = 0;
     } else {
@@ -280,9 +280,9 @@ s16 SsUtKeyOff(s16 idx, s16 p1, s16 p2, s16 p3, s16 p4) {
             mask0 = 0;
             mask1 = 1 << (chan - 0x10);
         }
-        _svm_voice[chan].unk1B = 0;
-        _svm_voice[chan].unk04 = 0;
-        _svm_voice[chan].unk00 = 0;
+        _svm_voice[chan].keyState = 0;
+        _svm_voice[chan].pitch = 0;
+        _svm_voice[chan].vag = 0;
         _svm_okof1 = mask0 | _svm_okof1;
         _svm_okof2 |= mask1;
         _svm_okon1 &= ~_svm_okof1;
@@ -353,23 +353,23 @@ s16 SsUtKeyOnV(s16 idx, s16 p0, s16 p1, s16 p2, s16 p3, s16 p4, s16 p5, s16 p6) 
     __asm__("");
     D_8008EA26 = idx;
     __asm__("");
-    _svm_voice[idx].unk0E = 0x21;
+    _svm_voice[idx].seq = 0x21;
     __asm__("");
-    _svm_voice[idx].unk16 = p0;
+    _svm_voice[idx].vabId = p0;
     __asm__("");
-    _svm_voice[idx].unk12 = p1;
+    _svm_voice[idx].prog = p1;
     __asm__("");
-    _svm_voice[idx].unk10 = D_8008EA13;
+    _svm_voice[idx].progIndex = D_8008EA13;
     __asm__("");
-    _svm_voice[idx].unk00 = D_8008EA24;
+    _svm_voice[idx].vag = D_8008EA24;
     __asm__("");
     pending18 = D_8008EA18;
-    _svm_voice[idx].unk0C = p3;
-    _svm_voice[idx].unk1B = 1;
+    _svm_voice[idx].note = p3;
+    _svm_voice[idx].keyState = 1;
     __asm__("");
-    _svm_voice[idx].unk02 = 0;
+    _svm_voice[idx].age = 0;
     __asm__("");
-    _svm_voice[idx].unk14 = pending18;
+    _svm_voice[idx].tone = pending18;
     SpuVmDoAllocate();
     if ((s16)D_8008EA24 == 0xFF) {
         vmNoiseOn((u8)idx);
@@ -415,9 +415,9 @@ s16 SsUtKeyOffV(s16 idx) {
         mask0 = 0;
         mask1 = 1 << (chan - 0x10);
     }
-    _svm_voice[chan].unk1B = 0;
-    _svm_voice[chan].unk04 = 0;
-    _svm_voice[chan].unk00 = 0;
+    _svm_voice[chan].keyState = 0;
+    _svm_voice[chan].pitch = 0;
+    _svm_voice[chan].vag = 0;
     _snd_ev_flag = 0;
     _svm_okof1 = mask0 | _svm_okof1;
     _svm_okof2 |= mask1;
