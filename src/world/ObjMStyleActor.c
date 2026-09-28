@@ -3285,7 +3285,7 @@ void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetA
  * MATCHING: two externs, as retail takes one %hi/%lo base for x, one for y.
  */
 extern const s16 sVariantSpriteClutX[];
-extern const s16 gVariantSpriteClutY[];
+extern const s16 sVariantSpriteClutY[];
 
 /* One {x, y} entry of that table, in s16s: the stride both lookups index by. */
 #define VARIANT_CLUT_STRIDE 2
@@ -3293,7 +3293,7 @@ extern const s16 gVariantSpriteClutY[];
 void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant) {
     self->variant = variant;
     self->sprite.cx = sVariantSpriteClutX[variant * VARIANT_CLUT_STRIDE];
-    self->sprite.cy = gVariantSpriteClutY[variant * VARIANT_CLUT_STRIDE];
+    self->sprite.cy = sVariantSpriteClutY[variant * VARIANT_CLUT_STRIDE];
 }
 
 /*
