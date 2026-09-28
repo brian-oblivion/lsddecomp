@@ -121,7 +121,7 @@ the round-20 working names (`FadeBoxObj`, `FadeBox__GetMethods`, ...): those
 lines name types and functions that were then `Class6E99C...` (known,
 pending an operator decision; not hand-reverted).
 
-### The unit banner and function comments, moved from src/ScreenWidgets.c
+### The unit banner and function comments, moved from src/ui/ScreenWidgets.c
 
 The banner now says what the file holds. Its history, and the long form of
 three comments now reduced to one `MATCHING:` line each, verbatim (with

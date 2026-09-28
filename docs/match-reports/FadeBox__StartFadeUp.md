@@ -50,7 +50,7 @@ void FadeBox__StartFadeUp(FadeBoxObj *self, s32 a1, s32 a2, s32 a3) {
 }
 ```
 
-`Configure6E99CFn` is defined once in `src/ScreenWidgets.c`, above
+`Configure6E99CFn` is defined once in `src/ui/ScreenWidgets.c`, above
 `FadeBox__StartFadeDown`; the shared `FadeBoxMethods::configure`
 slot is not retyped.
 
@@ -342,7 +342,7 @@ assuming the existing lever generalises.
 NON_MATCHING body promoted, round 59. The exact preserved body above (40/41
 compiled words, 1 word short, per the round-21/46 corrected reading -- the
 raw funcdiff word-match count is not trustworthy past the length divergence)
-is now live in `src/ScreenWidgets.c` under `#ifdef NON_MATCHING`, with the
+is now live in `src/ui/ScreenWidgets.c` under `#ifdef NON_MATCHING`, with the
 verified build still taking the `#else INCLUDE_ASM` branch.
 `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
 

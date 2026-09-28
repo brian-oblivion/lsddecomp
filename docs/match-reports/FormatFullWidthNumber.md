@@ -10,7 +10,7 @@ renamed to `strlen`/`itoa`, so it could not link. Fixed and reconfirmed at
 account at the bottom of this file; the improved body there supersedes the
 one below for splicing purposes.**
 
-Unit: `src/ScreenWidgets.c` · Size: 56 words · Round 23 (2026-09-07), head.
+Unit: `src/ui/ScreenWidgets.c` · Size: 56 words · Round 23 (2026-09-07), head.
 Blocker screen clean. **Supersedes the round-21 `REOPENED -- ASSIGNABLE`
 disposition and the round-13 "NOT ATTEMPTED, predicted register saturation"
 triage that preceded it.** The function has now been attempted; the body is
@@ -221,8 +221,8 @@ Splicing the body preserved in this report (as of round 27's re-confirmation)
 back in and building gives:
 
 ```
-tools/binutils/bin/mipsel-linux-gnu-ld: src/ScreenWidgets.c:(.text+0xa94): undefined reference to `func_800411A8'
-tools/binutils/bin/mipsel-linux-gnu-ld: src/ScreenWidgets.c:(.text+0xaa8): undefined reference to `func_80013348'
+tools/binutils/bin/mipsel-linux-gnu-ld: src/ui/ScreenWidgets.c:(.text+0xa94): undefined reference to `func_800411A8'
+tools/binutils/bin/mipsel-linux-gnu-ld: src/ui/ScreenWidgets.c:(.text+0xaa8): undefined reference to `func_80013348'
 build exit=2
 ```
 

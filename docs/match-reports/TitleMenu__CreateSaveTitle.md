@@ -69,7 +69,7 @@ SLPS_015.56`.
   for this half-length-plus-pad allocation idiom.
 - `buf = BMemPMgrAlloc(size);` (pool allocator, already canonical) then
   `DecodeFullWidthSjis(buf, gSaveTitle)` -- `DecodeFullWidthSjis` is already matched
-  (`src/ScreenWidgets.c`, `u8 *DecodeFullWidthSjis(u8 *dst, u8 *src)`), return
+  (`src/ui/ScreenWidgets.c`, `u8 *DecodeFullWidthSjis(u8 *dst, u8 *src)`), return
   value unused here, so this unit's own local view stays `void`-returning
   per the project's independent-arities convention (same idiom already
   used for `Get_vtable_TaskCore`/`BaseTaskCtorTable_3bb8c_c`).
@@ -155,6 +155,6 @@ Comments moved here from the unit:
   libc2/strcpy, libc2/strlen), declared locally per the per-unit
   convention for these two (src/ui/TextEntryItemList.c, src/class_3bb8c_j.c).
 - DecodeFullWidthSjis is this unit's own view of the matched function in
-  src/ScreenWidgets.c: `void`, because the return value is unused at these
+  src/ui/ScreenWidgets.c: `void`, because the return value is unused at these
   call sites, unlike that unit's own `u8 *` view (independent-arities
   convention).

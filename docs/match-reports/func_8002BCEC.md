@@ -557,7 +557,7 @@ object was linked in the interim (rounds 29-30's SDK-objects work; see
 "moved into src/app/BMemPMgr.c when the SDK objects were linked"). Every other
 unit that calls this function now declares it as `printf` directly (see
 `src/libcd_bios.c`, `src/cd/CdDriver.c`, `src/ui/TitleMenuTaskObjF.c`,
-`src/ScreenWidgets.c`, each with the argument shape their own call site
+`src/ui/ScreenWidgets.c`, each with the argument shape their own call site
 needs — per-unit local views, not a shared header, matching this project's
 convention). Fixed in `src/sound/PlacementGridVabSound.c` by declaring
 `extern void printf(const char *fmt, ...);` and renaming all four call

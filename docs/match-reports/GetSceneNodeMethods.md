@@ -56,8 +56,8 @@ and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
 `src/graphics/SceneNode.c`, `src/ui/TitleMenuTaskObjF.c`, `src/world/ObjMStyleActor.c`,
-`src/world/ObjMStyleActor.c`, `src/world/DayTaskStageMap.c`, `src/ScreenWidgets.c`,
-`src/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
+`src/world/ObjMStyleActor.c`, `src/world/DayTaskStageMap.c`, `src/ui/ScreenWidgets.c`,
+`src/ui/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
 Renaming this symbol would edit every one of those files -- squarely
 out of this round's `SceneNode`-only scope, and a live collision risk

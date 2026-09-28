@@ -2,7 +2,7 @@
 
 > Renamed from `func_80040714` on 2026-09-25 (tools/rename.py). Address 0x80040714.
 
-Unit: `src/ScreenWidgets.c`. First attempt.
+Unit: `src/ui/ScreenWidgets.c`. First attempt.
 
 ```c
 s32 BoxFill__SetSemiTrans(Obj6EAC0 *self, s32 a1) {

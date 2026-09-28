@@ -3,7 +3,7 @@
 > **ROUND 34 (2026-09-12), runner bravo. THIS FUNCTION IS NOW LINKED FROM
 > SONY'S OWN OBJECT `libgte/fgo_00.o` (Psy-Q 3.3) AND IS NAMED
 > `TransposeMatrix`.** Its 0x50 of text covers exactly these 20 words. The
-> `INCLUDE_ASM` is gone from `src/ScreenWidgets.c`, the object sits in the yaml
+> `INCLUDE_ASM` is gone from `src/ui/ScreenWidgets.c`, the object sits in the yaml
 > at 0x304FC, and the whole image is byte-exact. **There is no stall left to
 > work and nothing here is assignable.**
 >

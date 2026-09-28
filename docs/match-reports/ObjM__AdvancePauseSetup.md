@@ -10,7 +10,7 @@ Establishes `ObjM::unk74` (`void *`, forwarded opaquely to
 `New_TextRow`'s `ctx` argument) and `ObjM::unk7C` (`FieldM7C *`, first
 WRITTEN here from `New_TextRow`'s return, then dispatched in
 `ObjM__TeardownPauseOverlay`). Also the first function in this unit to call the
-already-matched-elsewhere `New_TextRow` (`src/ScreenWidgets.c`,
+already-matched-elsewhere `New_TextRow` (`src/ui/ScreenWidgets.c`,
 established there with return type `Unk64Elem *` -- this unit keeps its
 own independent local return type `FieldM7C *` for the same external
 symbol, which is fine: each translation unit's own typing of a shared

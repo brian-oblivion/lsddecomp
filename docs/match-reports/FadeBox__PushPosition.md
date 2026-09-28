@@ -518,7 +518,7 @@ confirms it, the same discipline already applied to permuter zeros and
 
 NON_MATCHING body promoted, round 59. The exact preserved body above (22/25
 words, length exact, permuter-exhausted redundant-move residue) is now live
-in `src/ScreenWidgets.c` under `#ifdef NON_MATCHING`, with the verified build
+in `src/ui/ScreenWidgets.c` under `#ifdef NON_MATCHING`, with the verified build
 still taking the `#else INCLUDE_ASM` branch. `./build-and-verify.sh` and
 `tools/check-nonmatching.sh` both green.
 

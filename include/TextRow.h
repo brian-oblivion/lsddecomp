@@ -6,7 +6,7 @@
 /*
  * TextRow -- a row of CharSprite cells showing a string (class id 0x11144,
  * method table gTextRowMethods): CharSprite's subclass. Methods in
- * src/ScreenWidgets.c, New_TextRow to GetTextRowMethods. The name is for what
+ * src/ui/ScreenWidgets.c, New_TextRow to GetTextRowMethods. The name is for what
  * the class's own methods do, and the evidence is this:
  *  - The ctor makes `count` CharSprites (New_CharSprite, same texture, cell
  *    0x20) into `cells`, then reset sets the pitch to 7 and the text.

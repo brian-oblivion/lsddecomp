@@ -63,7 +63,7 @@ void func_8003FB1C(Matrix2cc8c *dst, s16 sin, s16 cos, u8 axis) {
 }
 ```
 
-with, unit-locally in `src/ScreenWidgets.c`:
+with, unit-locally in `src/ui/ScreenWidgets.c`:
 
 ```c
 typedef struct Matrix2cc8c {
@@ -110,7 +110,7 @@ translation vector on a copied identity matrix.
 
 Neither declaration was moved. `ScreenWidgets` does not include
 `class_3bb8c.h`, so there is no collision, and the matrix view lives in
-`src/ScreenWidgets.c` rather than in the six-unit `Task.h`. This is the
+`src/ui/ScreenWidgets.c` rather than in the six-unit `Task.h`. This is the
 multiple-independent-local-views convention working as intended: the
 cross-reference belongs in a report, not in a shared header.
 
