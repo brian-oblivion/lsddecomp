@@ -19,7 +19,7 @@ The CD-ROM "command" dispatcher: `arg0` is a command byte (`0`..`0x1B`ish, looke
 1. If verbosity (`CD_debug`) is `>= 2`, prints `"%s...\n"` with the command's name.
 2. Looks up `D_8006D840[cmd]` -- "does this command need a parameter" -- and if it does and `arg1 == 0`, prints (when verbosity is on) `"%s: no param\n"` and returns `-2`.
 3. Calls `CD_sync(0, 0)` -- blocks until CD sync (see that report).
-4. If `cmd == 2`, copies 4 bytes from `arg1` into `D_8006D618`.
+4. If `cmd == 2`, copies 4 bytes from `arg1` into `CD_pos`.
 5. Clears the driver-state byte `D_8006D8D8[0]`, conditionally clears `D_8006D8D9` (gated by `D_8006D740[cmd]`), clears the hardware-register-ish `*D_8006D8C0`, and if `D_8006D740[cmd + 0x40]` is positive, streams that many bytes from `arg1` through `*D_8006D8C8` one at a time.
 6. Records the command byte itself into `D_8006D61D` (used by the OTHER two functions' printf as the "current wait's name" selector) and `*D_8006D8C4`.
 7. If `arg3 != 0` (fire-and-forget), returns `0` immediately.
@@ -35,7 +35,7 @@ The CD-ROM "command" dispatcher: `arg0` is a command byte (`0`..`0x1B`ish, looke
 **All three of this function's own residues are already-characterized, not-fixable-by-hand classes documented in `docs/DECOMPILATION_LEARNINGS.md` and in this unit's sibling reports (`CD_sync.md`, `CD_ready.md`):**
 
 1. **A missing delay-slot `andi $v0, $s3, 0xFF`** at retail vram `0x80029FF8`, immediately after the `bne $v1, $v0, .L8002A02C` that decides whether `cmd == 2`. Retail fills this branch's delay slot with a re-materialization of `cmd & 0xFF` (unused at the jump target, which immediately recomputes its own fresh `&D_8006D8D8`); this build leaves a plain `move $a0, zero` there instead. This is the delay-slot-fill family DECOMPILATION_LEARNINGS calls out as separate from block-order and explicitly still open: *"the compiler schedules an independent instruction into a delay slot that retail leaves empty or fills differently... that family remains open and is worth its own investigation; do not spend block-order attempts on it."*
-2. **A missing MIPS-I load-delay `nop`** inside the 4-byte `D_8006D618` copy loop (retail: `lbu $v0, 0($v1)` / `nop` / `lui $at, ...`; this build's scheduler fills the slot differently and drops the `nop` entirely since nothing in this build's ordering needs it). Tried an explicit incrementing-pointer rewrite of the loop (`src++` each iteration instead of `arg1[i]`, per the project's own "inner loops want INCREMENTING POINTERS" idiom) -- no change; the scheduler's choice here is independent of that idiom.
+2. **A missing MIPS-I load-delay `nop`** inside the 4-byte `CD_pos` copy loop (retail: `lbu $v0, 0($v1)` / `nop` / `lui $at, ...`; this build's scheduler fills the slot differently and drops the `nop` entirely since nothing in this build's ordering needs it). Tried an explicit incrementing-pointer rewrite of the loop (`src++` each iteration instead of `arg1[i]`, per the project's own "inner loops want INCREMENTING POINTERS" idiom) -- no change; the scheduler's choice here is independent of that idiom.
 3. **Two missing `addiu`-materialized-pointer-then-zero-offset-access instructions, each paired with a missing redundant `andi` mask**, at the two "fresh" (post-loop) reads of `D_8006D8D8[0]` -- the `== 2 && cmd == 0xE` tail check and the final `== 5` return check. Retail computes these as a genuine 3-instruction `lui`/`addiu`/`lbu` sequence (a materialized pointer VALUE, then a zero-offset load) plus a redundant `andi ,0xFF`; this build folds the access to a 2-instruction `lui`/`lbu`-with-nonzero-offset (a plain addressing-mode fold, which is STRICTLY equivalent code and the more natural compilation of a bare `D_8006D8D8[0]`). Tried forcing a local `u8 *p = D_8006D8D8; *p` indirection for both spots -- GCC's constant propagator sees the offset is `0` and folds the indirection straight back to the 2-instruction form (no arithmetic to preserve, unlike the loop-internal `state`/`state1` pointers elsewhere in this unit, which DO need separate registers because they cross real `jal`s). Tried a `__asm__("")` barrier between the pointer materialization and the store for the EARLIER `D_8006D8D8[0] = 0` instance specifically -- it moved the store's position (to right after the `D_6D740[cmd]` lookup instead of before it) without adding the missing `addiu`, and cost the function a NET word elsewhere; reverted.
 
 Given three independent, already-catalogued "not worth further hand attempts" residue classes account for essentially the entire remaining 4-word gap (1 + 1 + 2, matching exactly), and the whole rest of the 282-word function -- every branch, every call, every global read in the retail order -- is structurally accounted for, this is being filed as a characterized stall rather than continuing to search for a fourth C-level lever.
@@ -51,7 +51,7 @@ extern u8 D_8006D61C;
 extern u8 D_8006D61D;
 extern const char *D_8006D620[];
 extern const char *D_8006D6A0[];
-extern u8 D_8006D618[4];               /* 4-byte record, written here for cmd == 2 */
+extern u8 CD_pos[4];               /* 4-byte record, written here for cmd == 2 */
 extern s32 D_8006D740[];               /* flag table, indexed by cmd; cmd+0x40 reaches the "needs param" table's
                                          * memory (see the addressing note above) -- do NOT re-split this into a
                                          * second D_8006D840[cmd] access for the cmd+0x40 case */
@@ -116,7 +116,7 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
     if ((arg0 & 0xFF) == 2) {
         src = (const u8 *)arg1;
         for (i = 0; i < 4; i++) {
-            D_8006D618[i] = *src;
+            CD_pos[i] = *src;
             src++;
         }
     }
@@ -217,7 +217,7 @@ skip_timeout3:
 
 - Screened blocker-clean at carve time (round 26). Biggest function in the unit (282 retail words).
 - Calling convention confirmed against two ALREADY-MATCHED call sites in `libcd_bios.c` (`CD_shell`, `CD_readm`) -- both pass `0`/constant literals for `arg2`/`arg3` and use the return value as a truth value in one case (`while (CD_cw(0x16, D_8006D908, 0, 0))`), confirming `s32` return, not `void`.
-- `D_8006D618` is this unit's own local reading of a symbol `libcd_bios.c` declares as a bare `extern u8 D_8006D618;` (singular) -- this function indexes it `[0..3]`, a genuinely different (but not conflicting, since neither file shares a header) local view. Flagged per the project's multiple-independent-local-views convention.
+- `CD_pos` is this unit's own local reading of a symbol `libcd_bios.c` declares as a bare `extern u8 CD_pos;` (singular) -- this function indexes it `[0..3]`, a genuinely different (but not conflicting, since neither file shares a header) local view. Flagged per the project's multiple-independent-local-views convention.
 
 ### Proposed learning
 
@@ -323,7 +323,7 @@ Used `tools/asm-differ/diff.py` to locate the ONE remaining structural
 defect (rather than trust the noisy raw diff, which is full of the
 constant-offset drift artifacts described above). Found it exactly where
 the ORIGINAL report's item 2 already named it: inside the 4-byte
-`D_8006D618` copy loop, retail emits an explicit `nop` immediately after
+`CD_pos` copy loop, retail emits an explicit `nop` immediately after
 `lbu $v0, 0($v1)` at the loop's branch-target instruction, which this
 build's scheduler omits (filling the slot naturally via the following
 independent `lui $at,...` three instructions later instead, which is

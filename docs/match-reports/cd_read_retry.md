@@ -72,7 +72,7 @@ s32 cd_read_retry(void)
             if (*pRetry < 7) {
                 counter = 0;
                 puts(D_80010AAC);
-                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+                printf(D_80010ABC, *pRetry, CD_pos, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < CD_nopen) {
                     saved = CD_cbsync;
@@ -98,7 +98,7 @@ s32 cd_read_retry(void)
                 if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&CD_pos, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -376,7 +376,7 @@ s32 cd_read_retry(void)
             if (*pRetry < 7) {
                 counter = 0;
                 puts(D_80010AAC);
-                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+                printf(D_80010ABC, *pRetry, CD_pos, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < CD_nopen) {
                     saved = CD_cbsync;
@@ -402,7 +402,7 @@ s32 cd_read_retry(void)
                 if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&CD_pos, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -806,7 +806,7 @@ s32 cd_read_retry(void)
             if (*pRetry < 7) {
                 counter = 0;
                 puts(D_80010AAC);
-                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+                printf(D_80010ABC, *pRetry, CD_pos, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < CD_nopen) {
                     saved = CD_cbsync;
@@ -832,7 +832,7 @@ s32 cd_read_retry(void)
                 if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&CD_pos, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -1147,7 +1147,7 @@ s32 cd_read_retry(void)
             if (*pRetry < 7) {
                 counter = 0;
                 puts(D_80010AAC);
-                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+                printf(D_80010ABC, *pRetry, CD_pos, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < CD_nopen) {
                     saved = CD_cbsync;
@@ -1173,7 +1173,7 @@ s32 cd_read_retry(void)
                 if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&CD_pos, 0, 0) != 0) {
                     goto tail;
                 }
             }

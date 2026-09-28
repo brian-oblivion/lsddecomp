@@ -322,7 +322,7 @@ extern u8 D_8006D61C;
 extern u8 D_8006D61D;
 extern const char *D_8006D620[];
 extern const char *D_8006D6A0[];
-extern u8 D_8006D618[4];               /* 4-byte record, written here for cmd == 2 */
+extern u8 CD_pos[4];               /* 4-byte record, written here for cmd == 2 */
 extern s32 D_8006D740[];               /* flag table, indexed by cmd; cmd+0x40 reaches the "needs param" table's
                                          * memory (see the addressing note in the match report) -- do NOT re-split
                                          * this into a second D_8006D840[cmd] access for the cmd+0x40 case */
@@ -384,7 +384,7 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
     if ((arg0 & 0xFF) == 2) {
         src = (const u8 *)arg1;
         for (i = 0; i < 4; i++) {
-            D_8006D618[i] = *src;
+            CD_pos[i] = *src;
             src++;
         }
     }
@@ -492,7 +492,7 @@ extern s32 CD_cbread;
 extern s32 CD_status;
 extern s32 CD_status1;
 extern s32 CD_nopen;
-extern u8 D_8006D618;
+extern u8 CD_pos;
 extern u8 D_8006D619;
 extern u8 D_8006D61A;
 extern u8 D_8006D61C;
@@ -785,7 +785,7 @@ s32 cd_read_retry(void) {
             if (*pRetry < 7) {
                 counter = 0;
                 puts(D_80010AAC);
-                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+                printf(D_80010ABC, *pRetry, CD_pos, D_8006D619, D_8006D61A);
 
                 if (D_8006D904 < CD_nopen) {
                     saved = CD_cbsync;
@@ -811,7 +811,7 @@ s32 cd_read_retry(void) {
                 if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&CD_pos, 0, 0) != 0) {
                     goto tail;
                 }
             }

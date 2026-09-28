@@ -3161,3 +3161,4 @@ CD_debug = 0x8006D608;
 CD_status = 0x8006D60C;
 CD_status1 = 0x8006D610;
 CD_nopen = 0x8006D614;
+CD_pos = 0x8006D618;
