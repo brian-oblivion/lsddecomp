@@ -1,15 +1,8 @@
 /*
  * libsnd_vmanager -- Sony's libsnd voice manager (`libsnd/vmanager`),
- * carried as C, with one game function ahead of it.
+ * carried as C.
  *
- * ServiceSoundCueSet (game code) runs one tick of a SoundCueSet
- * (include/SoundCueSet.h): it resets the set's three cue slots, lets the
- * set's callback fill them, then stops, retunes and replays each slot's tone
- * through the VabStreamObj's method table (include/VabStreamObj.h), scaled
- * down by the set's attenuation. Its siblings InitSoundCueSet and
- * FlushSoundCueSet end PlacementGridVabSound.c.
- *
- * Everything from SpuVmAlloc on is Sony's, under Sony's names. Retail's
+ * Everything here is Sony's, under Sony's names. Retail's
  * build of the voice manager is on no SDK disc, so it never placed as
  * objects; the symbols file identifies each function against discs 3.3/3.5
  * and progress.py counts them as library by address. On the 3.0/3.3/3.5
@@ -24,9 +17,6 @@
  * SpuVmSeKeyOn, SpuVmSeKeyOff, KeyOnCheck) and vm_seq (the SpuVm*SeqVol
  * accessors and SpuVmSeqKeyOff).
  *
- * ServiceSoundCueSet is game code and ends a game file; the file is named
- * for the Sony object that follows it.
- *
  * The data keeps Sony's types: the key-on request in _svm_cur, the current
  * VAB through <libsnd.h>'s VabHdr, ProgAtr and VagAtr (_svm_vh, _svm_pg,
  * _svm_tn), the voice tables in include/SvmData.h and the sequence records
@@ -39,12 +29,6 @@
 #include <libspu.h>
 #include "SsScore.h"
 #include "SvmData.h"
-#include "VabStreamObj.h"
-#include "SoundCueSet.h"
-
-/* Tones per VAB program: playTone's index is program * 16 + tone
- * (token-identical to PlacementGridVabSound.c's, which owns PlayTone). */
-#define VAB_TONES_PER_PROG 16
 
 /*
  * libsnd's _svm_cur (pinned in config/psyq-objects.ld, 0x20 bytes): the
@@ -92,54 +76,6 @@ extern SpuRegs *_svm_sreg; /* the SPU's register block */
 /* vmanager's static pitch table: 12 semitones x 16 fine steps, the SPU
  * pitch of each at octave 5. */
 extern u16 D_8006DAD8[];
-
-void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
-    s32 i;
-    SoundCueSlot *slot;
-    s32 vol;
-    s32 endVol;
-    s32 toneIndex;
-
-    if (set->tag > 0) {
-        i = 0;
-        slot = &set->slots[0];
-        do {
-            i++;
-            slot->program = SOUND_CUE_NONE;
-            slot->octave = 0;
-            slot->vol = SOUND_CUE_DEFAULT_VOL;
-            slot->endVol = SOUND_CUE_DEFAULT_END_VOL;
-            slot++;
-        } while (i < ARRAY_COUNT(set->slots));
-
-        set->attenuation = 0;
-        if (set->callback != NULL) {
-            set->callback(set->owner, set);
-        }
-
-        if (set->attenuation >= 0) {
-            slot = &set->slots[0];
-            i = 0;
-            do {
-                if (slot->program >= 0) {
-                    if (slot->voice >= 0) {
-                        sound->methods->stopVoice(sound, slot->voice);
-                    }
-                    sound->methods->setPitchOffset(sound, slot->octave);
-                    toneIndex = slot->program * VAB_TONES_PER_PROG;
-                    vol = slot->vol - (slot->vol / set->attenuationSteps) * set->attenuation;
-                    endVol = slot->endVol - (slot->endVol / set->attenuationSteps) * set->attenuation;
-                    slot->voice = sound->methods->playTone(sound, toneIndex, vol, endVol);
-                } else if (slot->program == SOUND_CUE_STOP && slot->voice >= 0) {
-                    sound->methods->stopVoice(sound, slot->voice);
-                }
-                i++;
-                slot++;
-            } while (i < ARRAY_COUNT(set->slots));
-        }
-        set->tick++;
-    }
-}
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 167/167 words, length exact; the residue is a register

@@ -1,7 +1,7 @@
 /*
  * PlacementGridVabSound -- two subjects in one file: PlacementGrid, then the
- * VAB sound backend (VabDriver, VabStreamObj and the SoundCueSet start/flush
- * pair), with ReturnZero between them.
+ * VAB sound backend (VabDriver, VabStreamObj and the SoundCueSet's init,
+ * flush and per-tick service), with ReturnZero between them.
  *
  * PlacementGrid (include/PlacementGrid.h), New_PlacementGrid to
  * GetPlacementGridMethods: the model placements of one map chunk's 20 x 20
@@ -9,9 +9,6 @@
  * occupant that turns one placement record per call into a CellPlacement and
  * its model, and the table getter. ReturnZero follows; nothing calls it or
  * points at it.
- *
- * ServiceSoundCueSet, the third SoundCueSet function, which belongs with
- * Init/Flush below, is at the head of libsnd_vmanager.c.
  *
  * The prototypes for FileResource's active-driver getter and the pool
  * allocator, and the cast for LinkResource's getModel, are this file's
@@ -543,4 +540,52 @@ void FlushSoundCueSet(VabStreamObj *self, SoundCueSet *set) {
         slot++;
     }
     set->tag = 0;
+}
+
+void ServiceSoundCueSet(VabStreamObj *sound, SoundCueSet *set) {
+    s32 i;
+    SoundCueSlot *slot;
+    s32 vol;
+    s32 endVol;
+    s32 toneIndex;
+
+    if (set->tag > 0) {
+        i = 0;
+        slot = &set->slots[0];
+        do {
+            i++;
+            slot->program = SOUND_CUE_NONE;
+            slot->octave = 0;
+            slot->vol = SOUND_CUE_DEFAULT_VOL;
+            slot->endVol = SOUND_CUE_DEFAULT_END_VOL;
+            slot++;
+        } while (i < ARRAY_COUNT(set->slots));
+
+        set->attenuation = 0;
+        if (set->callback != NULL) {
+            set->callback(set->owner, set);
+        }
+
+        if (set->attenuation >= 0) {
+            slot = &set->slots[0];
+            i = 0;
+            do {
+                if (slot->program >= 0) {
+                    if (slot->voice >= 0) {
+                        sound->methods->stopVoice(sound, slot->voice);
+                    }
+                    sound->methods->setPitchOffset(sound, slot->octave);
+                    toneIndex = slot->program * VAB_TONES_PER_PROG;
+                    vol = slot->vol - (slot->vol / set->attenuationSteps) * set->attenuation;
+                    endVol = slot->endVol - (slot->endVol / set->attenuationSteps) * set->attenuation;
+                    slot->voice = sound->methods->playTone(sound, toneIndex, vol, endVol);
+                } else if (slot->program == SOUND_CUE_STOP && slot->voice >= 0) {
+                    sound->methods->stopVoice(sound, slot->voice);
+                }
+                i++;
+                slot++;
+            } while (i < ARRAY_COUNT(set->slots));
+        }
+        set->tick++;
+    }
 }

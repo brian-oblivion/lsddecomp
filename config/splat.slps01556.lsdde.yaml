@@ -789,7 +789,7 @@ segments:
       # Owns NO jump table (the 0xFD8 slot's seven jtbl blocks all fall
       # outside 0x8002BC40..0x8002C408), so unlike _b and _c it needs no
       # rodata attach.
-      - [0x1C92C, c, sound/PlacementGridVabSound]     # 0x1C92C..0x1D508: code_179d8_d and _e, merged round 100 (track 8)
+      - [0x1C92C, c, sound/PlacementGridVabSound]     # 0x1C92C..0x1D718: code_179d8_d and _e, merged round 100 (track 8), plus ServiceSoundCueSet (round 103)
       # (carve history; merged into PlacementGridVabSound above, round 100)
       # code_179d8_e: functions 120..148 of the original, 0x1CC08..0x1D508
       # (29 functions).  Census 2026-09-04, three-grep screen per function:
@@ -838,7 +838,7 @@ segments:
       #
       # Expect this slice to span more than one class; identify each with
       # tools/classtable.py rather than assuming the unit has one.
-      - [0x1D508, c, psyq/libsnd_vmanager]
+      - [0x1D718, c, psyq/libsnd_vmanager]     # from SpuVmAlloc; ServiceSoundCueSet (0x1D508) ends PlacementGridVabSound (round 103)
       # (carve history; merged into libsnd_vmanager above, round 100)
       # code_179d8_m: BACK half of the old `code_179d8_mid_c` remainder --
       # functions 161..172 of the original, 0x1ECD8..0x20ADC (12 functions,
