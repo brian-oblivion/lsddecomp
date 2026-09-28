@@ -1700,8 +1700,8 @@ s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentP
     if (gInstantTeleportersEnabled == 0) {
         result = -1;
     } else {
-        result = GetStaticSpawn(target, currentPos, stage, sTeleportTriggersCount, sTeleportTriggers,
-                                sTeleportSpawns, 0);
+        result = GetStaticSpawn(target, currentPos, stage, sTeleportTriggersCount,
+                                sTeleportTriggers, sTeleportSpawns, 0);
     }
     return result;
 }
