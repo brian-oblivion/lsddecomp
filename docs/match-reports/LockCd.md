@@ -6,24 +6,24 @@
 
 ## What this function does
 
-Sets the scalar `s32` global `gCdLock` to `1`. No arguments, no return
+Sets the scalar `s32` global `sCdLock` to `1`. No arguments, no return
 value. Paired with `UnlockCd` a few functions later in ROM order,
 which clears the same global back to `0`. Reads as a 1/0 "active" latch:
 `CdDriver__RequestLoadFile` (this unit's first function, a slot of the `gCdDriverMethods`
 class -- see `GetCdDriverMethods.md`) opens with `jal LockCd` (sets the
 latch on entry) and closes with `jal UnlockCd` on every exit path
 (clears it). Nothing in this unit's own decompiled bodies dereferences
-`gCdLock` directly, so its reader lives elsewhere (not yet carved from
+`sCdLock` directly, so its reader lives elsewhere (not yet carved from
 this monolith, or already carved in a sibling unit).
 
 ## The C
 
 ```c
-extern s32 gCdLock;
+extern s32 sCdLock;
 
 void LockCd(void)
 {
-    gCdLock = 1;
+    sCdLock = 1;
 }
 ```
 
@@ -40,7 +40,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_800280D0` | `LockCd` | A |
-| `D_8008A88C` | `gCdLock` | A |
+| `D_8008A88C` | `sCdLock` | A |
 
 **Evidence, and it corrects this report's round-45 reading.** That reading
 said "nothing in this unit's own bodies dereferences `D_8008A88C`, so its

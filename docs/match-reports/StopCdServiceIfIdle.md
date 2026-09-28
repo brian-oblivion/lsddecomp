@@ -33,7 +33,7 @@ void StopCdServiceIfIdle(void)
 
 ## Derivation
 
-Straight read: sets the `gCdLock` latch (`LockCd`), then a guarded
+Straight read: sets the `sCdLock` latch (`LockCd`), then a guarded
 block only entered when `gCdTickStep == 0` AND `gCdCallbackInstalled != 0` (the two
 `beqz`/`bnez` gp_rel loads collapse into one `&&`), inside which an optional
 `VSyncCallback(0)` fires when `gCdUseVSyncCallback != 0`, then both `gCdCallbackInstalled` and

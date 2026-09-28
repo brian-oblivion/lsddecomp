@@ -72,7 +72,6 @@ gCdCallbackInstalled
 gCdFileVersionSuffix
 gCdIdle
 gCdInitDone
-gCdLock
 gCdOperation
 gCdQueueEnabled
 gCdReadBuffer
@@ -189,6 +188,7 @@ gpNavChallengesComplete
 sCardFilePrefix
 sCardPathPrefix
 sCdDriveInited
+sCdLock
 sDayDigits
 sDivClipHeight
 sDivClipWidth

@@ -40,7 +40,7 @@ struct Methods6D4E8_80EC {
 
 s32 ServiceCdDriver(void)
 {
-    if (gCdLock != 0) {
+    if (sCdLock != 0) {
         return 0;
     }
 
@@ -72,7 +72,7 @@ s32 ServiceCdDriver(void)
 
 ## Derivation
 
-Two early-return guards (the `gCdLock` latch, then `GetBMemPMgrBusy()`
+Two early-return guards (the `sCdLock` latch, then `GetBMemPMgrBusy()`
 gp_rel getter from `TmdRenderer`) both return literal `0` — **not** the
 callee's own return value, even for the `GetBMemPMgrBusy()` guard. This was
 the one wrinkle: an intermediate attempt captured `GetBMemPMgrBusy()`'s result
@@ -126,7 +126,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 `StartCdService` and this function itself pass its address to
 `VSyncCallback`, and `SetCdDriverMode` passes the same address to the
 singleton's `+0x84` callback slot when the VSync path is off. One call does
-all the periodic work there is -- skip if `gCdLock` is held or
+all the periodic work there is -- skip if `sCdLock` is held or
 `GetBMemPMgrBusy` says no; step `code_179d8_r`'s CD state machine
 (`TickCdStateMachine` for `gCdTickStep == 1`, `TickCdLoadFileStateMachine` for 2); drain the
 request queue through the class's own `+0x068` slot; re-arm itself. "Service"

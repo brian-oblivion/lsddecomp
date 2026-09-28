@@ -23,12 +23,12 @@ void DisableCdQueue(void)
 
 Straight call sequence: `jal LockCd`, a gp_rel store of 0 to
 `gCdQueueEnabled`, `jal UnlockCd`, then epilogue. Both callees are already
-matched in this unit (`LockCd` sets `gCdLock = 1`, `UnlockCd`
+matched in this unit (`LockCd` sets `sCdLock = 1`, `UnlockCd`
 sets it back to `0`) — see the header comment above `LockCd` in the
 `.c`, which already named this function as the one that "clears it right
 back". Confirms that comment: `DisableCdQueue` calls the set-to-1 helper,
 clears an unrelated flag `gCdQueueEnabled`, then calls the set-to-0 helper —
-net effect is `gCdLock` ends at 0 and `gCdQueueEnabled` is cleared. No new
+net effect is `sCdLock` ends at 0 and `gCdQueueEnabled` is cleared. No new
 struct/class knowledge.
 
 ### Proposed learning

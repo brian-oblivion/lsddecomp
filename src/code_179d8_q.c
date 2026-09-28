@@ -236,20 +236,20 @@ s32 ResolveFileEntries(CdFileEntry *entries, s32 count) {
 }
 
 /* The driver's re-entrancy lock, and its one reader is ServiceCdDriver
- * below: the service tick returns immediately while gCdLock is set, so every
+ * below: the service tick returns immediately while sCdLock is set, so every
  * public entry point in this unit and in code_179d8_r/_s brackets its body
  * with LockCd()/UnlockCd() to keep the VSync-driven tick out of a
  * half-updated queue. Not a mutex -- nothing spins or blocks on it. */
-extern s32 gCdLock;
+extern s32 sCdLock;
 
 void LockCd(void) {
-    gCdLock = 1;
+    sCdLock = 1;
 }
 
-extern s32 gCdLock;
+extern s32 sCdLock;
 
 void UnlockCd(void) {
-    gCdLock = 0;
+    sCdLock = 0;
 }
 
 extern s32 GetBMemPMgrBusy(void);             /* TmdRenderer */
@@ -258,7 +258,7 @@ extern void TickCdLoadFileStateMachine(void); /* code_179d8_r: state-machine ste
 extern s32 gCdQueueEnabled;
 
 s32 ServiceCdDriver(void) {
-    if (gCdLock != 0) {
+    if (sCdLock != 0) {
         return 0;
     }
 

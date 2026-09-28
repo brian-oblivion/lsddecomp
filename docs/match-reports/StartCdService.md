@@ -29,7 +29,7 @@ void StartCdService(void)
 
 ## Derivation
 
-Set the `gCdLock` latch, then a one-shot guard on `gCdCallbackInstalled`: if it's
+Set the `sCdLock` latch, then a one-shot guard on `gCdCallbackInstalled`: if it's
 still 0, optionally register `ServiceCdDriver` as a `VSyncCallback` (guarded
 by `gCdUseVSyncCallback`) and set the guard to 1. Either way, set `gCdQueueEnabled = 1`
 and clear the latch. All three loads/stores collapse to constant `1`s in
