@@ -1360,7 +1360,7 @@ segments:
       - [0x38EAC, o, libcd/c_009]      # StGetNext
       - [0x38F70, o, libcd/c_004]      # data_ready_callback
       - [0x38FD8, o, libcd/c_007]      # StFreeRing
-      - [0x39094, c, GameFiles]       # game code (revision 18; was psyq_39094)
+      - [0x39094, c, cd/GameFiles]       # game code (revision 18; was psyq_39094)
       # psyq_rand, retired whole. Its 4-byte .sbss seed is placed NOLOAD by
       # config/psyq-objects.ld at 0x8008AC68; the plain sbss slot below is
       # unchanged.

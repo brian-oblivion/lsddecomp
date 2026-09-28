@@ -15,7 +15,7 @@ a 10-unit gap between entries), returns `rec`.
 
 ## Source
 
-Declarations: `FilePathRecord` and `extern s16 gMovieFrameCounts[];` in `src/GameFiles.c`.
+Declarations: `FilePathRecord` and `extern s16 gMovieFrameCounts[];` in `src/cd/GameFiles.c`.
 
 ```c
 FilePathRecord *GetSpecialDayMovieSpan(s32 *total, s32 n, s32 len) {

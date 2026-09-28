@@ -18,7 +18,7 @@ Method slot +0x084 of gLbdFileMethods (table word at 0x800819C4). Clears `dataRe
 ## Source
 
 ```c
-/* DataSrc39094: the local view at the top of src/GameFiles.c --
+/* DataSrc39094: the local view at the top of src/cd/GameFiles.c --
  * FILERESOURCE_FIELDS, then u16 headerReady, u16 dataReady, u8 pad30[4], void *dataBuffer, s32 autoLoadData. */
 extern void *BMemPMgrFree(void *ptr);
 

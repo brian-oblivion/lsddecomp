@@ -18,7 +18,7 @@ Method slot +0x074 of gLbdFileMethods (cancelRequests; table word at 0x800819B4)
 ## Source
 
 ```c
-/* DataSrc39094: the local view at the top of src/GameFiles.c --
+/* DataSrc39094: the local view at the top of src/cd/GameFiles.c --
  * FILERESOURCE_FIELDS, then u16 headerReady, u16 dataReady, u8 pad30[4], void *dataBuffer, s32 autoLoadData. */
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 

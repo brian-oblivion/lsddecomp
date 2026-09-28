@@ -17,7 +17,7 @@ Slot +0x008 (ctor) of gLbdFileMethods: runs the active data source's ctor on sel
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/GameFiles.c`
+Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
 (`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
@@ -88,7 +88,7 @@ name follows the siblings named for the format they load (TimImage, Tod,
 VabStreamObj). What the header block's two regions and the data block hold
 beyond what their consumers do with them is not established here.
 
-The unit banner of `src/GameFiles.c` was rewritten as documentation in
+The unit banner of `src/cd/GameFiles.c` was rewritten as documentation in
 the same pass; its history is kept here verbatim (with the class tokens as
 renamed):
 
@@ -122,7 +122,7 @@ renamed):
 
 ## Proposed field names
 
-Not applied: every accessor outside `src/GameFiles.c` is in StageMap's
+Not applied: every accessor outside `src/cd/GameFiles.c` is in StageMap's
 units (DayTaskStageMap.c, class_3bb8c_b.c), outside this job. For the head to
 apply by type scope.
 

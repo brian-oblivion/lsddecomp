@@ -233,7 +233,7 @@ typedef struct StyleConfig {
     s32 fogNear; /* +0x01C, EnterStyleSession: the viewport's setFogNear; a sStyleFogNears value */
 } StyleConfig;
 
-/* ObjM__GetGridRecord's grid lookups (src/GameFiles.c): a
+/* ObjM__GetGridRecord's grid lookups (src/cd/GameFiles.c): a
  * non-negative code is a linear cell index (GetStageMapChunkRecord(index, code)),
  * a negative one sends x/y to GetStageMapChunkRecordXY. */
 extern s32 GetStageMapChunkRecord(s32 index, s32 sub);

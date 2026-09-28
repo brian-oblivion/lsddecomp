@@ -494,7 +494,7 @@ void ObjM__DetachTarget(ObjM *self) {
     GetTimedTaskMethods()->deinit((TimedTask *)self);
 }
 
-/* Defined elsewhere, no header: src/GameFiles.c (PickStageBgm and
+/* Defined elsewhere, no header: src/cd/GameFiles.c (PickStageBgm and
  * PickStageTexture return a FilePathRecord *, a 0x1C-byte record handed on here as a
  * name), src/SceneNode.c (GetSetHitHeightGate sets the flag
  * SceneNode__RaycastHullAgainstFaces tests). RegisterStyleConfig, which

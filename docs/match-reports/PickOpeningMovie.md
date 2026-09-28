@@ -16,7 +16,7 @@ Random pick within the record block at 0x230: `r = (u32)SeedAndRandom(0, ?) % 7`
 
 ## Source
 
-Declarations: the local views at the top of `src/GameFiles.c` (`FilePathRecord`).
+Declarations: the local views at the top of `src/cd/GameFiles.c` (`FilePathRecord`).
 
 ```c
 FilePathRecord *PickOpeningMovie(s32 *countOut, s32 arg1) {

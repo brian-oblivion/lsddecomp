@@ -12,7 +12,7 @@
  * mood value to choose a spawn point (GenerateInitialSpawn).
  * GetStageGridDimensionsCount, GetStageGridDimensionsTable and
  * GetStageGridDimensions are plain accessors over the dimensions table;
- * GetStageMapChunkRecordXY (src/GameFiles.c) turns a chunk's (x, y) into the
+ * GetStageMapChunkRecordXY (src/cd/GameFiles.c) turns a chunk's (x, y) into the
  * index of its map-chunk file with the same row-major `columns` stride.
  *
  * What decided its edges (python3 tools/tuboundary.py): the placed Sony

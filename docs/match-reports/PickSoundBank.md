@@ -15,7 +15,7 @@ Weekly table pick: `r = (u32)SeedAndRandom(0, arg) % 7` (unsigned: retail's mult
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/GameFiles.c`
+Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
 (`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
