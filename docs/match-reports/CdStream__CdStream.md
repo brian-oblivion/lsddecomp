@@ -4,7 +4,7 @@
 
 > Renamed from `func_80046F88` on 2026-09-25 (tools/rename.py). Address 0x80046f88.
 
-Round 82, runner delta (second session). Unit `src/CdStream.c`. Fresh
+Round 82, runner delta (second session). Unit `src/cd/CdStream.c`. Fresh
 ground, no prior attempt. Byte-exact on build 8; whole-image SHA1 green.
 
 - **Where:** slot +0x008 (ctor) of gCdStreamMethods; `New_CdStream` (the

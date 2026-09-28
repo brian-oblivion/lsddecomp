@@ -101,7 +101,7 @@ state before these renames.
 **Evidence.** Round 52 found no caller. There are three now, and they agree:
 
 - **Readers.** `BuildCdFilePath` (CdDriver) and `CdStream__Open`
-  (src/CdStream.c) both build `"\\" + GetDataDirectory() + name + ";1"` and
+  (src/cd/CdStream.c) both build `"\\" + GetDataDirectory() + name + ";1"` and
   pass the result to the CD file lookup. So the value is the directory
   part of an ISO9660 path, and it sits between the root `\` and the file
   name.
