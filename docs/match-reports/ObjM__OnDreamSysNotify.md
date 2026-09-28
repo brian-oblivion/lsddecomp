@@ -109,7 +109,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_80053984` | `ObjM__OnDreamSysNotify` | B | see below |
 
-**Evidence.** vtable slot +0x090. The class's own state-transition dispatcher: gated on `self->phase == 0`, switches on `code - 0xA` (`jtbl_8001174C`, codes 0xA..0x11) and routes each case onto the SAME class's own `slot94`..`slotAC` -- i.e. `ObjM__EnterTimeUp`, `ObjM__EnterLinkDynamic`, `ObjM__EnterLinkWall` (this unit) and `ObjM__EnterState7`, `ObjM__EnterState8`, `ObjM__EnterStateA`, `ObjM__NotifyParentsCodeB` (sibling unit ObjMStyleActor) one-to-one, confirmed directly off `tools/classtable.py 0x80087034`'s slot list. When `phase != 0` and `code >= 9` it instead clears `self->target->unk44`.
+**Evidence.** vtable slot +0x090. The class's own state-transition dispatcher: gated on `self->phase == 0`, switches on `code - 0xA` (`jtbl_8001174C`, codes 0xA..0x11) and routes each case onto the SAME class's own `slot94`..`slotAC` -- i.e. `ObjM__EnterTimeUp`, `ObjM__EnterLinkDynamic`, `ObjM__EnterLinkWall` (this unit) and `ObjM__EnterLinkFlashback`, `ObjM__EnterState8`, `ObjM__EnterStateA`, `ObjM__NotifyParentsCodeB` (sibling unit ObjMStyleActor) one-to-one, confirmed directly off `tools/classtable.py 0x80087034`'s slot list. When `phase != 0` and `code >= 9` it instead clears `self->target->unk44`.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

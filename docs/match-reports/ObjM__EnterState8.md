@@ -6,7 +6,7 @@
 
 ## What this function does
 
-Sets `self->unk20` (the same mode/state field `ObjM__EnterState7` writes) to 8,
+Sets `self->unk20` (the same mode/state field `ObjM__EnterLinkFlashback` writes) to 8,
 calls the shared helper `ObjM__StartFadeUp(self, 0, 0, 6, 1)`, then tells
 `self->unk3C` (via vtable slot `0xF4`) to run with argument 1.
 
@@ -33,7 +33,7 @@ round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
-**ObjM__EnterState8** -- tier B. Same shape as `ObjM__EnterState7` for `ObjM::mode = 8`, forwarding request code 6 and then `dreamSys->setMoveOverride(dreamSys, 1)`. Mechanically described, purpose (why 8) not established.
+**ObjM__EnterState8** -- tier B. Same shape as `ObjM__EnterLinkFlashback` for `ObjM::mode = 8`, forwarding request code 6 and then `dreamSys->setMoveOverride(dreamSys, 1)`. Mechanically described, purpose (why 8) not established.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

@@ -942,7 +942,7 @@ extern char sPauseText[];             /* "Pause" */
 extern ScreenSpritePos sPauseTextPos; /* (-20, -50) */
 extern SpriteRgb sPauseTextColor;     /* red: (255, 0, 0) */
 
-void ObjM__EnterState7(ObjM *self) {
+void ObjM__EnterLinkFlashback(ObjM *self) {
     DreamColors color;
     self->state = OBJM_STATE_LINK_FLASHBACK;
     self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, &color, -1);

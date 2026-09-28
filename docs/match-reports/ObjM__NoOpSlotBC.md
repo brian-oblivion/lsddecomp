@@ -8,7 +8,7 @@
 
 Vtable slot `+0x0BC` of `gObjMMethods` (`tools/classtable.py 0x80087034`), the
 same class table this unit's other 13 vtable-slot functions populate
-(`ObjM__EnterState7` .. `ObjM__TeardownPauseOverlay`, offsets
+(`ObjM__EnterLinkFlashback` .. `ObjM__TeardownPauseOverlay`, offsets
 `+0xA0`..`+0xD4`). This report did not exist before round 69's naming pass
 even though the function was already matched -- created now so
 `tools/progress.py` counts it correctly and so the next reader does not

@@ -1,4 +1,6 @@
-# ObjM__EnterState7
+# ObjM__EnterLinkFlashback
+
+> Renamed from `ObjM__EnterState7` on 2026-09-28 (tools/rename.py). Address 0x80053d18.
 
 > Renamed from `func_80053D18` on 2026-09-23 (tools/rename.py). Address 0x80053d18.
 
@@ -28,7 +30,7 @@ do something with no arguments via slot `0xFC`.
 ## The C
 
 ```c
-void ObjM__EnterState7(ObjM *self) {
+void ObjM__EnterLinkFlashback(ObjM *self) {
     s32 val;
     self->unk20 = 7;
     self->unk3C->methods->slotF0(self->unk3C, &val, -1);
@@ -60,7 +62,7 @@ round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
-**ObjM__EnterState7** -- tier B. Sets `ObjM::mode = 7`, queries `dreamSys->getSetFlashbackSession(dreamSys, &val, -1)` (offset +0xF0, confirmed via `tools/classtable.py 0x80087BDC`), forwards the result into `ObjM__StartFadeUp`, then calls `dreamSys->blockMovement`. Mechanics are fully pinned down; the game-level meaning of "mode 7" is not, so this stays tier B rather than a guessed purpose name.
+**ObjM__EnterLinkFlashback** -- tier B. Sets `ObjM::mode = 7`, queries `dreamSys->getSetFlashbackSession(dreamSys, &val, -1)` (offset +0xF0, confirmed via `tools/classtable.py 0x80087BDC`), forwards the result into `ObjM__StartFadeUp`, then calls `dreamSys->blockMovement`. Mechanics are fully pinned down; the game-level meaning of "mode 7" is not, so this stays tier B rather than a guessed purpose name.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

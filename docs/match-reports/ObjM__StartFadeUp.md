@@ -8,7 +8,7 @@
 
 ## Context
 
-This is the shared helper called by `ObjM__EnterState7`, `ObjM__EnterState8` and
+This is the shared helper called by `ObjM__EnterLinkFlashback`, `ObjM__EnterState8` and
 `ObjM__EnterStateA` (all matched this round, see their own reports). Its
 5th argument arrives on the stack in the standard o32 convention (caller
 reserves 0x10 bytes for `$a0`-`$a3`, so a 5th argument lands at

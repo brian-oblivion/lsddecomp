@@ -128,7 +128,7 @@ struct ObjMMethods {
     /* +0x094 */ void (*enterState4)(ObjM *self); /* ObjM__EnterTimeUp: OnDreamSysNotify's code 0xA */
     /* +0x098 */ void (*enterState5)(ObjM *self); /* ObjM__EnterLinkDynamic: code 0xC */
     /* +0x09C */ void (*enterState6)(ObjM *self); /* ObjM__EnterLinkWall: code 0xD; EnterState5 before a stage */
-    /* +0x0A0 */ void (*enterState7)(ObjM *self);        /* ObjM__EnterState7: code 0xE */
+    /* +0x0A0 */ void (*enterState7)(ObjM *self);        /* ObjM__EnterLinkFlashback: code 0xE */
     /* +0x0A4 */ void (*enterState8)(ObjM *self);        /* ObjM__EnterState8: code 0xF */
     /* +0x0A8 */ void (*enterStateA)(ObjM *self);        /* ObjM__EnterStateA: code 0x10 */
     /* +0x0AC */ void (*notifyParentsCodeB)(ObjM *self); /* ObjM__NotifyParentsCodeB: code 0x11 */
@@ -200,7 +200,7 @@ void ObjM__OnDreamSysNotify(ObjM *self, BasicClass *sender, s32 code);
 void ObjM__EnterTimeUp(ObjM *self);
 void ObjM__EnterLinkDynamic(ObjM *self);
 void ObjM__EnterLinkWall(ObjM *self);
-void ObjM__EnterState7(ObjM *self);
+void ObjM__EnterLinkFlashback(ObjM *self);
 void ObjM__EnterState8(ObjM *self);
 void ObjM__EnterStateA(ObjM *self);
 void ObjM__NotifyParentsCodeB(ObjM *self);
