@@ -14,8 +14,8 @@ beqz  $a0, .L800494C8
  ori  $v0, $zero, 0xE
 sw    $v0, 0x0($a0)
 .L800494C8:
-lui   $v0, %hi(STAGE_GRID_DIMENSIONS)
-addiu $v0, $v0, %lo(STAGE_GRID_DIMENSIONS)
+lui   $v0, %hi(sStageGridDimensions)
+addiu $v0, $v0, %lo(sStageGridDimensions)
 jr    $ra
  nop
 ```
@@ -32,13 +32,13 @@ written as an ordinary `if` body in C.
 ```c
 StageGridDimensions *GetStageGridDimensionsTable(s32 *count) {
     if (count != NULL) {
-        *count = STAGE_GRID_DIMENSIONS_COUNT;
+        *count = STAGE_COUNT;
     }
-    return STAGE_GRID_DIMENSIONS;
+    return sStageGridDimensions;
 }
 ```
 
-Returning the bare array name (not `&STAGE_GRID_DIMENSIONS`, not a cast) is what
+Returning the bare array name (not `&sStageGridDimensions`, not a cast) is what
 produces the plain `lui`/`addiu` pair.
 
 ## Naming
@@ -50,3 +50,10 @@ written a length through, never read, so it is an out-parameter, and `count`
 is what it counts (confirmed against `GetStageGridDimensionsCount`, which
 returns the identical `0xE`). Fixed the header prototype this round, which
 still said `s32 *unknown` after the definition had already moved to `count`.
+
+**Global `STAGE_GRID_DIMENSIONS` -> `sStageGridDimensions` (round 101, track
+7; `tools/rename.py`).** The table is defined in splat data and named in C only
+by `src/StageGrid.c` (grep over `src/` and `asm/`); every other unit reaches it
+through this getter or `GetStageGridDimensions`. Unit-static data is `sName`
+under the naming rules. Its `extern` still sits in `include/StageGrid.h`
+(proposal to the head: move it into `src/StageGrid.c`).

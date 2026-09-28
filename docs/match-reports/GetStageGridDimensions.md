@@ -30,8 +30,8 @@ Written as pointer arithmetic rather than `&table[index]` — both compile the
 same here, but the pointer form matches how the result is used.
 
 ```c
-StageGridDimensions *GetStageGridDimensions(s32 index) {
-    return GetStageGridDimensionsTable(NULL) + index;
+StageGridDimensions *GetStageGridDimensions(s32 stage) {
+    return GetStageGridDimensionsTable(NULL) + stage;
 }
 ```
 
@@ -49,3 +49,8 @@ table `GetStageGridDimensionsTable` returns, and the one confirmed caller
 (`src/class_3bb8c_l.c:346`, `unk14->methods->slotE0(unk14,
 GetStageGridDimensions((s32)self->unk38))`) is consistent with an index
 lookup, agreeing with the name from the body alone.
+
+**Parameter `index` -> `stage` (round 101, track 7).** The table has one entry
+per stage (`STAGE_COUNT`), and the value is used only to index it, so the index
+IS a stage index. The header prototype still says `index` (proposal to the
+head).
