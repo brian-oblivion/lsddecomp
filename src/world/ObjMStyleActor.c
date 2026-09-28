@@ -210,7 +210,7 @@ void ItemList__CursorDown(ItemList *self, s32 unused1, s32 unused2, s32 forwarde
  * ItemList__CreateRows's `pos`; each further row is ITEMLIST_ROW_SPACING
  * lower. */
 extern s32 sItemListRowOriginX;
-extern s32 gItemListRowOriginY;
+extern s32 sItemListRowOriginY;
 
 /* The y step from one row to the next (createRows). */
 #define ITEMLIST_ROW_SPACING 10
@@ -228,7 +228,7 @@ void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32
     }
 
     pos.x = sItemListRowOriginX;
-    pos.y = gItemListRowOriginY;
+    pos.y = sItemListRowOriginY;
     count = self->itemCount;
     row = &self->rows[0];
     if (count > ARRAY_COUNT(self->rows)) {
