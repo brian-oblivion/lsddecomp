@@ -293,7 +293,7 @@ extern Ratio16 sScaleMinusSixtyFourth[];
 extern Ratio16 sScaleEightSevenths[];
 extern Ratio16 sScaleUnit[]; /* {1/1, 1/1, 1/1}, a .data copy of SceneNode.h's sSceneNodeScaleOne */
 extern Ratio16 sScaleEighth[];
-extern Ratio16 SCALE_X_EIGHTH_Y2_Z_EIGHTH[];
+extern Ratio16 sScaleXEighthY2ZEighth[];
 extern Ratio16 sScaleSix[];
 extern Ratio16 SCALE_TWO_FIFTHS[];
 extern Ratio16 sScaleY2[];

@@ -2711,7 +2711,7 @@ void Entity__MoodCue106(Entity *this, SoundCueSet *out) {
         if (this->moodTimer == 0) {
             this->methods->stopTod(this);
         }
-        this->methods->updateScale(this, 1, SCALE_X_EIGHTH_Y2_Z_EIGHTH);
+        this->methods->updateScale(this, 1, sScaleXEighthY2ZEighth);
         return;
     }
     if (this->moodTimer == 0) {
