@@ -91,7 +91,7 @@ struct LbdFile {
     /* +0x02C */ s16 headerReady; /**< 1 when the header is read; StageMap__OnDrawSystemEvent sets LBDFILE_HEADER_CONSUMED. */
     /* +0x02E */ s16 dataReady; /**< 1 when the data block is read; cleared by StageMap__OnDrawSystemEvent. */
     /* +0x030 */ s16 chunkIndex; /**< The loaded chunk's record index in its stage (StageMap__ApplyChunkLoads); -1 when none. */
-    /* +0x032 */ s16 elemKey; /**< The owner's element key: StageMap__StageMap's index, then StageMap__UpdateFootprintTracking's. */
+    /* +0x032 */ s16 elemKey; /**< The owner's element key: StageMap__StageMap's index, then StageMap__LoadChunksAround's neighbour key (UpdateFootprintTracking reads it). */
     /* +0x034 */ void *dataBuffer; /**< The data block, BMemPMgrAlloc(dataSize); freed by ReleaseDataBlock. */
     /* +0x038 */ s32 autoLoadData; /**< Nonzero (the ctor's 1): the header's completion starts loadDataBlock. */
 }; /* 0x3C bytes: New_LbdFile. `buffer` is the header block; `loadState` an LbdFileLoadState. */
