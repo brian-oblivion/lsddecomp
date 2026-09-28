@@ -2676,7 +2676,7 @@ void Entity__MoodCue103(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 11) {
         if (this->moodTimer < 1020) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS_HALF);
+            this->methods->updateRotation(this, 0, sRotationYawMinusHalf);
             this->methods->moveLocalY(this, 30, 0);
         }
         if (this->moodTimer == 930) {
