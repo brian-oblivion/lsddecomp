@@ -22,7 +22,7 @@
  * (TimBlockSrc__AdvanceLoadState, include/TimBlockSrc.h): New_TimArraySrc(0)
  * per block, then the block's sector buffer as `buffer` (size 0, so the
  * TimArraySrc never owns it), `clutBase` = the address of the TimBlockSrc's
- * four CLUT fade ramps, then setFlag (+0x064, BuildImages) and +0x078
+ * four CLUT fade ramps, then onRequestDone (+0x064, BuildImages) and +0x078
  * (UploadImages); the TimBlockSrc keeps it in `blocks` and releases it.
  *
  * SLOTS (`classtable.py gTimArraySrcMethods --vs gFileResourceMethods`, 30 against 30; the
@@ -33,8 +33,8 @@
  *  - +0x00C finalize, TimArraySrc__Finalize: ReleaseBasicClassArray the
  *    images, free the array, then the active driver's finalize;
  *  - +0x058 loadFile is NULL in this table;
- *  - +0x064 setFlag, TimArraySrc__BuildImages (named for what it does; the
- *    driver runs setFlag when a read completes, and TimBlockSrc calls it
+ *  - +0x064 onRequestDone, TimArraySrc__BuildImages (named for what it does; the
+ *    driver runs onRequestDone when a read completes, and TimBlockSrc calls it
  *    directly);
  *  - +0x078 is FileResource's `void *slot78` (NULL there); this table's
  *    occupant is TimArraySrc__UploadImages, called through

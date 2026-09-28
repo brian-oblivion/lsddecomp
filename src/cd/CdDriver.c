@@ -36,7 +36,7 @@
  *
  * runRequestQueue looks only at the head node: a node not yet started is
  * dispatched to its owner's slot; a started one, once the drive is idle, is
- * reported to its owner as CD_FLAG_* bits in `flags` (then setFlag) and
+ * reported to its owner as CD_FLAG_* bits in `flags` (then onRequestDone) and
  * freed, and the service stops when the queue empties.
  */
 #include "common.h"
@@ -278,7 +278,7 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
     if (gCdAsyncEnabled == 0 && gCdSyncQueueMode == 0) {
         ((LoadFileNoArgsFn)FileResource__LoadFile)();
         self->flags |= CD_FLAG_LOAD_FILE_DONE;
-        self->methods->setFlag(self);
+        self->methods->onRequestDone(self);
         return;
     }
     LockCd();
@@ -401,7 +401,7 @@ void CdDriver__RunRequestQueue(void) {
                     self->flags |= CD_FLAG_LOAD_FILE_DONE;
                     break;
             }
-            self->methods->setFlag(self);
+            self->methods->onRequestDone(self);
             FreeCdRequestNode(node);
             if (gCdRequestQueue == NULL) {
                 self->methods->stopService(self);

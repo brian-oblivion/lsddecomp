@@ -205,7 +205,7 @@ extern void LockActiveDataSource(void);
 extern void UnlockActiveDataSource(void);
 u32 FindMaxTimBlockSize(FileResource *self);
 
-/* setFlag (+0x064), run when a read completes: once the header sector is
+/* onRequestDone (+0x064), run when a read completes: once the header sector is
  * in, keep the header and read the first block into a buffer the size of
  * the largest; once a block is in, build a TimArraySrc over it (its images
  * take their CLUTs from `entries`), upload it, and read the next, until the
@@ -247,7 +247,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                 (*p)->bufferSize = 0;
                 (*p)->clutBase = (s32)self->entries;
                 n++;
-                (*p)->methods->setFlag(*p);
+                (*p)->methods->onRequestDone(*p);
                 ((TimArraySrcUploadFn)(*p)->methods->processBuffer)(*p);
                 self->blockCount = n;
                 if (n < ((TimBlockHeader *)self->buffer)->count) {
@@ -260,7 +260,7 @@ void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self) {
                     self->sectorSize = 0;
                     self->loadState = TIMBLOCK_LOAD_IDLE;
                     self->loaded = 1;
-                    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+                    GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
                 }
             }
             break;
@@ -407,7 +407,7 @@ void *LinkResource__LinkResource(LinkResource *self, ResourceSource *src) {
         if (src->buffer != NULL) {
             self->buffer = src->buffer;
             self->bufferSize = 0;
-            if (((LinkResourceBuildModelsFn)self->methods->setFlag)(self)) {
+            if (((LinkResourceBuildModelsFn)self->methods->onRequestDone)(self)) {
                 goto fail;
             }
         } else {
@@ -431,7 +431,7 @@ void LinkResource__Finalize(LinkResource *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* setFlag (+0x064): map the TMD, then build a NULL-ended array of one
+/* onRequestDone (+0x064): map the TMD, then build a NULL-ended array of one
  * TmdModel per TMD object. 1 when an allocation fails, with everything
  * built so far released; else 0. */
 s32 LinkResource__BuildModels(LinkResource *self) {
@@ -458,7 +458,7 @@ s32 LinkResource__BuildModels(LinkResource *self) {
         models++;
     }
     *models = NULL;
-    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+    GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
     return 0;
 }
 
@@ -524,7 +524,7 @@ typedef struct TimArrayBuf {
     /* +0x04 */ s32 offsets[1];
 } TimArrayBuf;
 
-/* setFlag (+0x064): once the buffer is in, build one TimImage over each of
+/* onRequestDone (+0x064): once the buffer is in, build one TimImage over each of
  * its images, in place, each with the fade ramp (`clutBase`'s entries) its
  * CLUT row falls in. */
 void TimArraySrc__BuildImages(TimArraySrc *self) {
@@ -551,7 +551,7 @@ void TimArraySrc__BuildImages(TimArraySrc *self) {
                 objs++;
             }
             self->ready = 1;
-            GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+            GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
         }
     }
 }
@@ -589,7 +589,7 @@ void Tod__Tod(Tod *self, ResourceSource *src) {
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
         self->bufferSize = 0;
-        self->methods->setFlag(self);
+        self->methods->onRequestDone(self);
     } else {
         self->methods->requestLoadFile(self, src->name);
     }
@@ -857,7 +857,7 @@ void *ModelData__ModelData(ModelData *self, ResourceSource *src, s32 owns) {
     if (src->buffer != NULL) {
         self->buffer = src->buffer;
         self->bufferSize = 0;
-        if (((s32 (*)())self->methods->setFlag)(self)) {
+        if (((s32 (*)())self->methods->onRequestDone)(self)) {
             goto fail;
         }
     } else {
@@ -874,9 +874,9 @@ void ModelData__Finalize(ModelData *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* setFlag (+0x064): the driver's, then BuildResources. */
+/* onRequestDone (+0x064): the driver's, then BuildResources. */
 void ModelData__Load(ModelData *self) {
-    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+    GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
     ((s32 (*)())self->methods->processBuffer)(self);
 }
 
@@ -962,7 +962,7 @@ void *TriggerWorld__TriggerWorld(TriggerWorld *self, ResourceSource *src) {
     ((UnprototypedCtorTable *)GetModelDataMethods())->ctor(self, src, 0);
     self->methods = GetTriggerWorldMethods();
     if (src->buffer != NULL) {
-        if (((s32 (*)())self->methods->setFlag)(self)) {
+        if (((s32 (*)())self->methods->onRequestDone)(self)) {
             return NULL;
         }
     }
@@ -975,7 +975,7 @@ void TriggerWorld__Finalize(TriggerWorld *self) {
     GetModelDataMethods()->finalize((ModelData *)self);
 }
 
-/* setFlag (+0x064): BuildResources. */
+/* onRequestDone (+0x064): BuildResources. */
 void TriggerWorld__Load(TriggerWorld *self) {
     ((s32 (*)())self->methods->processBuffer)(self);
 }
@@ -1053,7 +1053,7 @@ void TileMap__TileMap(TileMap *self, s32 source, TileAtlas *atlas) {
     if (source == 0) {
         self->defaultGrid = 1;
         self->loadState = 0;
-        self->methods->setFlag(self);
+        self->methods->onRequestDone(self);
     }
 }
 
@@ -1063,7 +1063,7 @@ void TileMap__Finalize(TileMap *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* setFlag (+0x064): when idle, BuildMap. */
+/* onRequestDone (+0x064): when idle, BuildMap. */
 void TileMap__Load(TileMap *self) {
     if (self->loadState == 0) {
         ((TileMapBuildMapFn)self->methods->processBuffer)(); /* MATCHING: retail passes no argument */
@@ -1125,7 +1125,7 @@ void TileAtlas__TileAtlas(TileAtlas *self, s32 source) {
     if (source == 0) {
         self->defaultCells = 1;
         self->loadState = 0;
-        self->methods->setFlag(self);
+        self->methods->onRequestDone(self);
     }
 }
 
@@ -1137,7 +1137,7 @@ void TileAtlas__Finalize(TileAtlas *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* setFlag (+0x064): when idle, BuildCells. */
+/* onRequestDone (+0x064): when idle, BuildCells. */
 void TileAtlas__Load(TileAtlas *self) {
     s32 unused[8]; /* MATCHING: retail's 0x38-byte frame */
 
@@ -1217,7 +1217,7 @@ void *TodSet__TodSet(TodSet *self, ResourceSource *src) {
     GetTodMethods()->ctor((Tod *)self, src);
     self->methods = GetTodSetMethods();
     if (src->buffer != NULL) {
-        if (((s32 (*)())self->methods->setFlag)(self)) {
+        if (((s32 (*)())self->methods->onRequestDone)(self)) {
             return NULL;
         }
     }
@@ -1232,7 +1232,7 @@ void TodSet__Finalize(TodSet *self) {
     GetTodMethods()->finalize((Tod *)self);
 }
 
-/* setFlag (+0x064): build a Tod over each of the buffer's sub-blocks, in
+/* onRequestDone (+0x064): build a Tod over each of the buffer's sub-blocks, in
  * place of its offset; 1, with those built released, when one fails. */
 s32 TodSet__BuildTods(TodSet *self) {
     ResourceRequest req;

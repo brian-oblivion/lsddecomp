@@ -16,7 +16,7 @@
  * The file is streamed in two stages. loadHeader (+0x078, FileResource's
  * processBuffer slot) opens the file and reads its first 0xB358 bytes into
  * the ctor's fixed `buffer` (loadState 9); that block starts with an
- * LbdFileHeader. When the CD driver reports the read done (setFlag, +0x064,
+ * LbdFileHeader. When the CD driver reports the read done (onRequestDone, +0x064,
  * LbdFile__AdvanceLoadState, bit 0x80 of `flags`), `headerReady` is set and,
  * unless setAutoLoadData turned it off, loadDataBlock (+0x080) reads the
  * optional data block the header locates into a second allocation,
@@ -24,7 +24,7 @@
  * releaseHeader and releaseDataBlock free the two halves.
  *
  * Like every FileResource client it runs on the active driver: the ctor,
- * finalize, setFlag and cancelRequests chain to GetActiveDataSourceMethods()'s
+ * finalize, onRequestDone and cancelRequests chain to GetActiveDataSourceMethods()'s
  * first, and GetLbdFileMethods is in gDataSourceClientGetters, so
  * SetActiveDataSource rebinds this table's file-I/O slots.
  *

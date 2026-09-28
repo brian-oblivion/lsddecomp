@@ -29,7 +29,7 @@
 /* FileResource's, GameApplicationFileResource.c: the active driver's table (gVabDriverMethods
  * or gCdDriverMethods, both FileResource tables), through which
  * PlacementGrid's and VabStreamObj's ctors and finalizes, and PlacementGrid's
- * setFlag, reach their parent's. */
+ * onRequestDone, reach their parent's. */
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* The pool allocator (include/BMemPMgr.h, not included here; Pad.c
@@ -79,7 +79,7 @@ void PlacementGrid__Finalize(PlacementGrid *self) {
 
 void PlacementGrid__OnRequestDone(PlacementGrid *self) {
     self->loaded = 1;
-    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+    GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
 }
 
 /* Fill `placement` from cell `cell`'s first record, or, when

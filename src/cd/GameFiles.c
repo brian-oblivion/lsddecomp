@@ -118,7 +118,7 @@ void LbdFile__Finalize(LbdFile *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* slot +0x064 of gLbdFileMethods (setFlag) */
+/* slot +0x064 of gLbdFileMethods (onRequestDone) */
 void LbdFile__AdvanceLoadState(LbdFile *self) {
     if (self->loadState == LBDFILE_LOAD_HEADER) {
         if (self->flags & CD_FLAG_READ_DONE) {
@@ -135,7 +135,7 @@ void LbdFile__AdvanceLoadState(LbdFile *self) {
             self->loadState = LBDFILE_LOAD_IDLE;
         }
     }
-    GetActiveDataSourceMethods()->setFlag((FileResource *)self);
+    GetActiveDataSourceMethods()->onRequestDone((FileResource *)self);
 }
 
 /* slot +0x074 of gLbdFileMethods (cancelRequests) */

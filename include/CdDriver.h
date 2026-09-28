@@ -38,7 +38,7 @@
  *
  * Every own method is named for its slot (`classtable.py gCdDriverMethods
  * --vs gFileResourceMethods`); the slot names and types are FileResource's:
- * open/close/loadFile/setFlag/stopService return void and read's buf is
+ * open/close/loadFile/onRequestDone/stopService return void and read's buf is
  * void *.
  *
  * NO FIELDS/SLOTS MACROS: no class lies below 0x13 (`typeviews.py --tree`).

@@ -30,11 +30,11 @@
  * SLOTS (`classtable.py gTileMapMethods --vs gFileResourceMethods`, 30 against 30):
  *  - +0x008 ctor, TileMap__TileMap(self, arg1, atlas): the active driver's
  *    ctor, this table, atlas at +0x03C, loaded = 0; with arg1 == 0,
- *    defaultGrid = 1, unk2A = 0 and setFlag (+0x064). What a nonzero arg1
+ *    defaultGrid = 1, unk2A = 0 and onRequestDone (+0x064). What a nonzero arg1
  *    means is not shown: the one caller passes 0;
  *  - +0x00C finalize, TileMap__Finalize: frees map.index, then the active
  *    driver's finalize;
- *  - +0x064 setFlag, TileMap__Load: unless unk2A is set, +0x078 and
+ *  - +0x064 onRequestDone, TileMap__Load: unless unk2A is set, +0x078 and
  *    loaded = 1. It calls +0x078 with NO argument ($a0 is never set up;
  *    TileMap__Load's report), through TileMapBuildMapFn;
  *  - +0x078 is FileResource's `void *slot78` (NULL there); this table's

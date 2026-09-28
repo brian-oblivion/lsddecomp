@@ -28,12 +28,12 @@
  * words from +0x07C on are gDataSourceClientGetters, not this table):
  *  - +0x008 ctor, TileAtlas__TileAtlas(self, arg1): the active driver's
  *    ctor, this table, unk34 = 0, loaded = 0; with arg1 == 0,
- *    defaultCells = 1, unk2A = 0 and setFlag (+0x064). What a nonzero arg1
+ *    defaultCells = 1, unk2A = 0 and onRequestDone (+0x064). What a nonzero arg1
  *    means is not shown: the one caller passes 0;
  *  - +0x00C finalize, TileAtlas__Finalize: frees unk34 and cells, then the
  *    active driver's finalize;
  *  - +0x058 loadFile is NULL in this table (a TileAtlas loads no file);
- *  - +0x064 setFlag, TileAtlas__Load: unless unk2A is set, +0x078 and
+ *  - +0x064 onRequestDone, TileAtlas__Load: unless unk2A is set, +0x078 and
  *    loaded = 1. It calls +0x078 with NO argument ($a0 is never set up,
  *    as in TileMap__Load), through TileAtlasBuildCellsFn;
  *  - +0x078 is FileResource's `void *slot78` (NULL there); this table's

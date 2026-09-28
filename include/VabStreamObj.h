@@ -13,7 +13,7 @@
  *
  * Loading. The ctor copies the base path (`baseFilename`) and asks the
  * driver for "<base>.VH" (requestLoadFile, +0x06C), with `loadState` set to
- * VABSTREAM_LOAD_HEADER. The driver calls setFlag (+0x064,
+ * VABSTREAM_LOAD_HEADER. The driver calls onRequestDone (+0x064,
  * VabStreamObj__AdvanceLoadState) when a request completes. In the header
  * state, with CD_FLAG_LOAD_FILE_DONE (0x200) in `flags`, it opens the
  * header (SsVabOpenHead) and loads "<base>.VB" (loadFile, +0x058) in

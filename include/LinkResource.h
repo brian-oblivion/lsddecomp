@@ -32,8 +32,8 @@
  *   +0x008 ctor: LinkResource__LinkResource returns self, or NULL when the
  *          buffer it adopted fails to build (New_LinkResource tests it,
  *          through GraphicsResources.c's unprototyped UnprototypedCtorTable view).
- *   +0x064 setFlag: LinkResource__BuildModels(self), s32: 1 when an
- *          allocation fails, else 0 after the active driver's setFlag.
+ *   +0x064 onRequestDone: LinkResource__BuildModels(self), s32: 1 when an
+ *          allocation fails, else 0 after the active driver's onRequestDone.
  *   +0x078 slot78 (NULL in FileResource): LinkResource__MapModel(self).
  *
  * The ctor's descriptor is ResourceSource (include/FileResource.h): a buffer
