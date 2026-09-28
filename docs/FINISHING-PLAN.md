@@ -19,9 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 43 (2026-09-28, round 103's premium head: track 10's
-declaration census is `tools/declcheck.py`, duplicate types go to the debt
-passes; revision 42 phase 4, 41 phase 3).
+Plan revision: 44 (2026-09-28, round 105's premium head: track 11's
+file renames are `tools/unitfile.py rename|header|check`; revision 43 the
+declaration census, 42 phase 4, 41 phase 3).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -146,9 +146,9 @@ body lives only in an `#ifdef NON_MATCHING` block (CLAUDE.md).
 
 ### The class model
 
-`include/BasicClass.h`'s banner is the worked example; `include/FileResource.h`
-the first class with subclasses. One header per class, `include/<Class>.h`,
-holds the object struct, the method table struct, the table's extern and
+`include/basic_class.h`'s banner is the worked example; `include/FileResource.h`
+the first class with subclasses. One header per class (its own, named in
+snake_case by track 11; `plan.class_header` finds it) holds the object struct, the method table struct, the table's extern and
 getter, and the class's own method prototypes; a class with subclasses also
 defines `<CLASS>_FIELDS(Methods)` and `<CLASS>_SLOTS(Self, CtorParams)`,
 which each subclass expands first, so accessors stay flat at any depth.
@@ -225,8 +225,12 @@ target.
 **Track 11: file names.** Every game file in `src/` and `include/` is
 snake_case (`scene_node.c`, `scene_node.h`) and named for what it holds; a
 file holding two classes is named for its subsystem, never a concatenation
-(`TextEntryItemList`). Types keep PascalCase. The setup item extends `unitfile.py` to rename a
-type-named file's stem and to rename a header with no unit.
+(`TextEntryItemList`). Types keep PascalCase. `tools/unitfile.py rename <Unit>
+<dir>/<name>` moves a unit and its same-stem header (by paths only when the
+stem is a type), `unitfile.py header <Old> <name>` a header no unit owns, and
+`unitfile.py check` lists what is left; each run is its own commit. The tools
+list the rule docs' mentions instead of rewriting them: the head updates
+those at merge.
 
 **Track 12: documented API** (after every name has settled). Every game
 header is API documentation in Doxygen form: a `/** @file */` saying what it

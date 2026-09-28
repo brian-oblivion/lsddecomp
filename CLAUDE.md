@@ -498,8 +498,8 @@ Gate 2.
    convention is what makes two readings legitimate — it is placing them in
    one shared header that breaks. **The convention ends, class by class, in
    track 4:** a class `plan.py classes` lists as UNIFIED has exactly one
-   definition, `include/<Class>.h`, and no unit declares its own view of it
-   again (FINISHING-PLAN §3, the class model; `include/BasicClass.h`). `python3 tools/headercontention.py` shows
+   definition, in its own header, and no unit declares its own view of it
+   again (FINISHING-PLAN §3, the class model; `include/basic_class.h`). `python3 tools/headercontention.py` shows
    which units share a header and would therefore see each other's
    declarations.
 
