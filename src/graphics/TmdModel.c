@@ -68,7 +68,7 @@ typedef union VectorOrBox {
     TmdBox b;
 } VectorOrBox;
 
-extern TmdBox gTmdModelBoundsBuf[];
+extern TmdBox sTmdModelBoundsBuf[];
 extern void *BMemPMgrAlloc(s32 size);
 
 TmdModel *New_TmdModel(TmdObject *object) {
@@ -151,11 +151,11 @@ void TmdModel__ComputeBounds(TmdModel *self, TmdBox *box) {
 }
 
 void TmdModel__UpdateBoundsBuffer(TmdModel *self) {
-    TmdModel__ComputeBounds(self, gTmdModelBoundsBuf);
+    TmdModel__ComputeBounds(self, sTmdModelBoundsBuf);
 }
 
 TmdBox *TmdModel__GetBoundsBuffer(TmdModel *self, s32 i) {
-    return gTmdModelBoundsBuf;
+    return sTmdModelBoundsBuf;
 }
 
 void TmdModel__GetHull(TmdModel *self, TmdHull *out) {

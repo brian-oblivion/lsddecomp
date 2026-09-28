@@ -61,11 +61,11 @@ idiom from DECOMPILATION_LEARNINGS, applied six times per iteration.
 
 **Pass 2** — after the corner loop, three PsyQ calls:
 ```c
-TmdModel__UpdateBoundsBuffer(self->unk20);              /* fills PsyQ global gTmdModelBoundsBuf */
-arr = TmdModel__GetBoundsBuffer(self->unk20, 0);     /* IGNORES both args, returns &gTmdModelBoundsBuf */
+TmdModel__UpdateBoundsBuffer(self->unk20);              /* fills PsyQ global sTmdModelBoundsBuf */
+arr = TmdModel__GetBoundsBuffer(self->unk20, 0);     /* IGNORES both args, returns &sTmdModelBoundsBuf */
 cnt2 = TmdModel__GetBoundsCount(self->unk20);       /* returns a count */
 ```
-**`TmdModel__GetBoundsBuffer`'s whole body is `lui/addiu %hi/%lo(gTmdModelBoundsBuf); jr $ra`** —
+**`TmdModel__GetBoundsBuffer`'s whole body is `lui/addiu %hi/%lo(sTmdModelBoundsBuf); jr $ra`** —
 MEASURED (`asm/psyq_GsLinkObject4.s`), it is a plain getter for a PsyQ-
 internal global that `TmdModel__UpdateBoundsBuffer` fills one instruction earlier via
 `TmdModel__ComputeBounds`. This resolved what looked at first like a confusing
@@ -256,7 +256,7 @@ concrete, measured leads for the next attempt:
   `CornerList_d294` (`{ s32 count; Vec3S16_d294 hdr; }`) types.
 - New externs `TmdModel__UpdateBoundsBuffer(void *arg0)` and `TmdModel__GetBoundsBuffer(void *arg0,
   s32 arg1)` returning `Sixteen6_d294 *` (PsyQ library,
-  `asm/psyq_GsLinkObject4.s`) — see the `gTmdModelBoundsBuf` finding above.
+  `asm/psyq_GsLinkObject4.s`) — see the `sTmdModelBoundsBuf` finding above.
 - Prototype for `SceneNode__CheckBoundsOverlap` itself.
 - **No existing declaration was modified** for this function — `SceneNodeMethods::slotA8`
   (typed `s32 (*)(SceneNodeObj*, void*, Vec3S16_d294*)`) was already added
