@@ -95,7 +95,7 @@ produce, and the difference changes the instruction count.
   same address, and the loop shape (the lever above) is kept. Byte-exact.
 - Parameters `a0..a3, arg4` are `grid, stage, sceneRefs, day, unreadArg`
   (ObjM__InitStyleAndWorld passes the StageMap, its stage, &ctorSound and
-  the day; class_3bb8c_l's prototype names the first four the same way).
+  the day; class_3bb8c_k's prototype names the first four the same way).
 - `D_8008AC78` is `sStyleUnreadArg` (tools/rename.py), tier B: this
   function stores its fifth argument there, and nothing in the image
   reads it (no reference in any `asm/` file or `src/` unit, measured).

@@ -98,7 +98,7 @@ Twenty-ninth build (four families of levers, all needed together): (1) an `s16 s
 
 ## Naming
 
-- **TimBlockSrc__TimBlockSrc**, tier B. Constructs a sector-header + block loader with 4 CLUT palette-fade channel entries at +0x40; mechanics described, no external caller names this class (class_3bb8c_l.c's own caller comment calls its return type opaque).
+- **TimBlockSrc__TimBlockSrc**, tier B. Constructs a sector-header + block loader with 4 CLUT palette-fade channel entries at +0x40; mechanics described, no external caller names this class (class_3bb8c_k.c's own caller comment calls its return type opaque).
 
 ## Track 4 (2026-09-25, round 83, bravo)
 

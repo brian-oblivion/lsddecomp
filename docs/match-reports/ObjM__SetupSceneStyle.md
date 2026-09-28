@@ -2,7 +2,7 @@
 
 > Renamed from `func_800534C8` on 2026-09-24 (tools/rename.py). Address 0x800534c8.
 
-**Unit:** class_3bb8c_l · **Size:** 122 words (0x1E8 bytes)
+**Unit:** class_3bb8c_k · **Size:** 122 words (0x1E8 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15, then re-affirmed "STILL
 BLOCKED, stub report stands" in the round-24 re-screen. That blocker was

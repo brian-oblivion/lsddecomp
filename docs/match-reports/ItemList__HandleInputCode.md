@@ -45,11 +45,11 @@ void ItemList__HandleInputCode(Obj87034_3bb8c_k *self, void *arg1, s32 code) {
 `arg1` (the incoming second register argument) is never referenced in the
 body -- matches this project's established event-dispatcher signature
 shape (`self`, an unused/opaque second argument, an `s32` code), the same
-one `class_3bb8c_l`'s `ObjM__OnDreamSysNotify`/`ObjM__DispatchPadEvent` use.
+one `class_3bb8c_k`'s `ObjM__OnDreamSysNotify`/`ObjM__DispatchPadEvent` use.
 
 ## HEAD BROADCAST 1 (source-declaration-order case layout) DOES apply here
 
-Unlike the sibling `ObjM__OnDreamSysNotify` (`class_3bb8c_l`, same round), whose
+Unlike the sibling `ObjM__OnDreamSysNotify` (`class_3bb8c_k`, same round), whose
 jump-table entry order already coincided with ascending case-value order,
 THIS function's case bodies are laid out in the file in the order
 **25, 23, 5, 4, 18, 19** -- neither ascending nor descending by value, and
@@ -67,7 +67,7 @@ to read the jump table's own body layout off the `.s` before writing the
 `Class87034Methods_3bb8c_k` is declared directly in
 `src/class_3bb8c_k.c` (not `include/class_3bb8c.h`) -- this unit's own
 independent, disjoint-slot view of table `gObjMMethods`, per the header's
-own standing note that `class_3bb8c_l` reaches a different, non-overlapping
+own standing note that `class_3bb8c_k` reaches a different, non-overlapping
 slot set on the identical table. Added six new slots, all inside the
 existing `pad044[0x090-0x044]` (0x4C = 76 bytes):
 

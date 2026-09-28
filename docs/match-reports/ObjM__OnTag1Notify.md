@@ -4,7 +4,7 @@
 
 > Renamed from `func_800531A0` on 2026-09-24 (tools/rename.py). Address 0x800531a0.
 
-**Unit:** class_3bb8c_l · **Size:** 11 words (0x2C bytes) ·
+**Unit:** class_3bb8c_k · **Size:** 11 words (0x2C bytes) ·
 **Status: MATCHED 11/11**, whole-image SHA1 green.
 
 ## What it does

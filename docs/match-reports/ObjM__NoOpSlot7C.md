@@ -1,6 +1,6 @@
 # ObjM__NoOpSlot7C
 
-**Unit:** class_3bb8c_l · **Status:** MATCHED (splat-generated, `jr $ra; nop`)
+**Unit:** class_3bb8c_k · **Status:** MATCHED (splat-generated, `jr $ra; nop`)
 
 ## What it does
 

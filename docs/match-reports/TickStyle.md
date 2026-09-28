@@ -252,7 +252,7 @@ The per-frame orchestrator: on the FIRST call (`gStyleTickCount++ == 0`)
 runs `ApplyStyleDecorationIfSet`/`StyleBuildDecorSet`/`StyleBuildEffectSlots`
 (one-time setup), then every call runs `StyleUpdateDecorSet`/
 `StyleUpdateEffectSlots`/`StyleScrollVramStrips` and the two `gStyleCueSlots`
-flush-or-start steps. Called from `src/class_3bb8c_l.c`'s `ObjM__TickStyle`
+flush-or-start steps. Called from `src/class_3bb8c_k.c`'s `ObjM__TickStyle`
 (the call this unit had already forward-declared as its own entry point),
 which is a genuine per-tick call site -- the evidence for "Tick" over a
 generic "Update", matching this codebase's existing `ReleaseDreamAuxEntities`
@@ -297,7 +297,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
  * `FindNextStyleCueInRange`/`FlushStyleCue`/`ServiceStyleCueIfNear`/
  * `IsStyleCueNear`). `TickStyle` is the per-frame entry point (called from
- * `src/class_3bb8c_l.c`); `StyleTeardown` is the scene-exit release of
+ * `src/class_3bb8c_k.c`); `StyleTeardown` is the scene-exit release of
  * everything `TickStyle` builds.
  *
  * What the "Style" subsystem is FOR in gameplay terms -- which dream/link

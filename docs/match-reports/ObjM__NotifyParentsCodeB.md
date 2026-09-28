@@ -44,5 +44,5 @@ The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_800870
 `OBJM_NOTIFY_LINK_TELEPORT` for 0xB: OnDreamSysNotify calls this slot for
 DREAMSYS_LINK_TELEPORT (17 = 11 + 6). The state is not changed, and
 DayTask__OnObjMNotify has no case for 11. The method name is left
-(its slot, `notifyParentsCodeB`, is read in class_3bb8c_l); see the unit's
+(its slot, `notifyParentsCodeB`, is read in class_3bb8c_k); see the unit's
 proposals. Zero bytes.

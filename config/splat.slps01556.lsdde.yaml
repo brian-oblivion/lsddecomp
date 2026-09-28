@@ -280,7 +280,6 @@ segments:
       #     remainder, so they must stay in a STANDALONE object -- attaching
       #     them to _l would strand them (nowhere to migrate to).
       - [0x1EF4, .rodata, class_3bb8c_k]   # jtbl_800116F4
-      - [0x1F4C, .rodata, class_3bb8c_l]   # jtbl_8001174C
       - [0x1F6C, rodata]                   # two strings -> remainder, NOT ours
       # JUMP TABLES, and the one rodata slot that MUST stay attached to its
       # unit. Its words are pointers to `.L8005....` labels INSIDE DreamSys's
@@ -1648,7 +1647,6 @@ segments:
       # func_800534C8 (gp_rel) and func_80053984 (addiu-$at, and it OWNS
       # jtbl_8001174C, so the rodata slot at 0x1F4C is attached here).
       # 17 clean.
-      - [0x435E0, c, class_3bb8c_l]
       # class_3bb8c_m: fourth 20-function slice, 0x44518..0x44F14. Carved
       # round 15. Boundary checked on both sides: func_80054660 closes
       # `jr $ra; nop` + endlabel and func_80054714 opens with its own

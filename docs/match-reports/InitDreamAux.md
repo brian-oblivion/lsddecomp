@@ -270,7 +270,7 @@ The header banner:
  * gate the game's teleport flag (EnableTeleportsForKind, SetTeleportsEnabled
  * in DreamSys.c). InitDreamAux/TickDreamAuxSlots/TickDreamAuxSlots2 are the
  * construct/tick/destruct hooks a caller in class_39e08.c and
- * class_3bb8c_l.c drives this subsystem through. `gDreamAuxStage`,
+ * class_3bb8c_k.c drives this subsystem through. `gDreamAuxStage`,
  * `gDreamAuxWorld` and three sibling globals SetDreamAuxWorld installs are
  * the shared context every other function in the unit reads.
  */

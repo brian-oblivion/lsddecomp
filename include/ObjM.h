@@ -8,7 +8,7 @@
  * subclass (its ctor calls TimedTask__TimedTask first; the first is
  * DayTask). No class derives from it. Methods, in ROM order:
  * src/class_3bb8c_k.c (New_ObjM, ctor, Finalize, OnNotify),
- * src/class_3bb8c_l.c (NoOpSlot40 through EnterState6) and
+ * src/class_3bb8c_k.c (NoOpSlot40 through EnterState6) and
  * src/class_3bb8c_m.c (EnterState7 through GetObjMMethods). The object is
  * 0x88 bytes (New_ObjM); its own fields run from TimedTask's 0x38.
  *

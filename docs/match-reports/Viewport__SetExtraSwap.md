@@ -43,15 +43,15 @@ Renamed from `Unk18Obj__SetUnkB4`. Slot +0x0B0 `setUnkB4`. unkB4 makes Flip swap
 
 ## Proposed field names (round 95, alpha)
 
-Viewport's `unkB4` -> `extraSwap`, slot `setUnkB4` -> `setExtraSwap`, this function -> `Viewport__SetExtraSwap` (tier B: Flip swaps the DrawSystem's buffers once more on buffer 0, before and after the draw, while it is set; why is not shown). Slot caller outside this unit: class_3bb8c_l.c.
+Viewport's `unkB4` -> `extraSwap`, slot `setUnkB4` -> `setExtraSwap`, this function -> `Viewport__SetExtraSwap` (tier B: Flip swaps the DrawSystem's buffers once more on buffer 0, before and after the draw, while it is set; why is not shown). Slot caller outside this unit: class_3bb8c_k.c.
 
 
 ## Track 7 (round 100, echo, polish pass)
 
 ## Naming
 
-Renamed `Viewport__SetUnkB4` -> `Viewport__SetExtraSwapOnBuffer0` -> `Viewport__SetExtraSwap` with `tools/rename.py` (the second run takes round 95's proposal above): tier B. The field is now `extraSwap` (include/Viewport.h; every accessor is in Task.c): while it is set, Flip calls the DrawSystem's swapBuffers once more before the clear and once more after the draw on buffer 0. What that is for is not shown; the only caller in C (class_3bb8c_l.c) passes 0, as InitDefaults does. Parameter `value` -> `on`.
+Renamed `Viewport__SetUnkB4` -> `Viewport__SetExtraSwapOnBuffer0` -> `Viewport__SetExtraSwap` with `tools/rename.py` (the second run takes round 95's proposal above): tier B. The field is now `extraSwap` (include/Viewport.h; every accessor is in Task.c): while it is set, Flip calls the DrawSystem's swapBuffers once more before the clear and once more after the draw on buffer 0. What that is for is not shown; the only caller in C (class_3bb8c_k.c) passes 0, as InitDefaults does. Parameter `value` -> `on`.
 
 ## Proposed field names
 
-Slot +0x0B0 `setUnkB4` -> `setExtraSwap` (caller outside this unit: class_3bb8c_l.c).
+Slot +0x0B0 `setUnkB4` -> `setExtraSwap` (caller outside this unit: class_3bb8c_k.c).

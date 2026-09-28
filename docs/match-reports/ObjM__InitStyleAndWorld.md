@@ -2,7 +2,7 @@
 
 > Renamed from `func_80052F10` on 2026-09-24 (tools/rename.py). Address 0x80052f10.
 
-Unit `src/class_3bb8c_l.c`. Round 26, runner delta.
+Unit `src/class_3bb8c_k.c`. Round 26, runner delta.
 
 ## What it is
 

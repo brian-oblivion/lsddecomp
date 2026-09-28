@@ -67,7 +67,7 @@ src/ScreenWidgets.c:319   self->methods->slot64(self, 0);
 src/ScreenWidgets.c:419   methods->slot64(self, 1);
 src/ScreenWidgets.c:437   methods->slot64(self, 0);
 src/ScreenWidgets.c:445   methods->slot64(self, 0);
-src/class_3bb8c_l.c:207  unk18->methods->slot64(unk18, unk50->unkC);
+src/class_3bb8c_k.c:207  unk18->methods->slot64(unk18, unk50->unkC);
 ```
 
 (`PlacementGridVabSound.c`'s `s32 (*slot64)(void *)` is a different class's table and

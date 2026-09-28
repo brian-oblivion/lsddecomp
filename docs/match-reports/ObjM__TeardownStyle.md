@@ -2,7 +2,7 @@
 
 > Renamed from `func_80053134` on 2026-09-24 (tools/rename.py). Address 0x80053134.
 
-**Unit:** class_3bb8c_l · **Size:** 27 words (0x6C bytes) ·
+**Unit:** class_3bb8c_k · **Size:** 27 words (0x6C bytes) ·
 **Status: MATCHED 27/27**, whole-image SHA1 green.
 
 ## What it does

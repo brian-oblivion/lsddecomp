@@ -22,7 +22,7 @@
  *    NoOpSlotBC is empty.
  *
  * The style setup is not ObjM's, but ObjM is its client:
- * ObjM__InitStyleAndWorld (class_3bb8c_l) calls RegisterStyleConfig once
+ * ObjM__InitStyleAndWorld (class_3bb8c_k) calls RegisterStyleConfig once
  * per scene and keeps the result, sStyleConfig, as ObjM::styleConfig.
  * RegisterStyleConfig stores the scene (grid, stage, ObjM's scene
  * references, day) in the gStyle globals class_3bb8c_n reads;

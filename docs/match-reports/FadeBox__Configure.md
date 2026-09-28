@@ -401,7 +401,7 @@ The field this method writes at +0x084 is now `maskPerTick` (was `unk84`):
   function from its third argument, zeroed by Reset, read only by Update,
   which skips the colour step while it is 9 (the tick countdown and the stop
   still run, so 9 holds the colour for the fade's length). Every caller in
-  the tree passes 0 (Entity_d/_f/_g, class_3bb8c_l, and ObjM__StartFadeUp's
+  the tree passes 0 (Entity_d/_f/_g, class_3bb8c_k, and ObjM__StartFadeUp's
   `fadeMode`, whose own callers all pass 0), so no other value is observed;
   "mode" says only that it selects a variant.
 - Parameter `arg3` -> `mode` here, in StartFadeDown and StartFadeUp, and in

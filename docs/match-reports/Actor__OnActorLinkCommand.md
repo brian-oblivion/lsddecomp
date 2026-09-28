@@ -80,7 +80,7 @@ gates the attach attempt is not established.
 
 `vtable_DreamSys::slotA0` is accessed from SEVEN other units too
 (`grep -rln -- '->slotA0\b' src/` lists `class_3bb8c_g.c`,
-`class_3bb8c_l.c`, `class_3bb8c_c.c`, `code_d294_b.c`, `Task.c`,
+`class_3bb8c_k.c`, `class_3bb8c_c.c`, `code_d294_b.c`, `Task.c`,
 `class_3bb8c_i.c`, `Task.c`, besides this unit), so per
 FINISHING-PLAN.md track 3 step 3 it is proposed here, not renamed, and
 posted to the broadcast for the head to apply at merge.

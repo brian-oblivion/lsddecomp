@@ -2,7 +2,7 @@
 
 > Renamed from `func_80052DE8` on 2026-09-24 (tools/rename.py). Address 0x80052de8.
 
-**Unit:** class_3bb8c_l · **Size:** 37 words (0x94 bytes) ·
+**Unit:** class_3bb8c_k · **Size:** 37 words (0x94 bytes) ·
 **Status: MATCHED 37/37**, whole-image SHA1 green.
 
 ## What it does

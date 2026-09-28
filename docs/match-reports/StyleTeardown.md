@@ -9,7 +9,7 @@ Unit `class_3bb8c_n`. **29/29 words, byte-exact.** First build.
 Fresh ground, carved round 45, never attempted. Already declared in the
 shared header (`include/class_3bb8c.h:2557`, `extern void
 StyleTeardown(void);`) and called with no arguments from
-`src/class_3bb8c_l.c:173`, which fixed its signature before any decompiling
+`src/class_3bb8c_k.c:173`, which fixed its signature before any decompiling
 started here.
 
 ## Derivation
@@ -109,7 +109,7 @@ before.
 Calls `StyleFlushDecoration`, `StyleReleaseDecorSet`, `StyleReleaseEffectSlots`
 unconditionally, then flushes both `gStyleCueSlots[2]` entries via
 `FlushStyleCue`, then clears `gStyleGrid`. Called from
-`src/class_3bb8c_l.c`'s `ObjM__TeardownStyle` (itself calling `self->methods->slot84`
+`src/class_3bb8c_k.c`'s `ObjM__TeardownStyle` (itself calling `self->methods->slot84`
 and `ReleaseDreamAuxEntities()`, an end-of-scene-style teardown), which is the
 evidence for "Teardown" over a narrower "Reset" -- it releases every
 resource `TickStyle` builds, matching a scene-exit shape rather than a

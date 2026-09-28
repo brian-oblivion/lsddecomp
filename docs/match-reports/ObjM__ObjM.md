@@ -24,7 +24,7 @@ as a post-construct hook.
 Added a unit-LOCAL pair of types, `Class87034Methods_3bb8c_k` /
 `Obj87034_3bb8c_k`, in `src/class_3bb8c_k.c` itself (not in the shared
 `include/class_3bb8c.h`) -- deliberately, per this round's header-contention
-rule. `class_3bb8c_l` (echo, live in the same round) already has its OWN
+rule. `class_3bb8c_k` (echo, live in the same round) already has its OWN
 independent view of the SAME table (`Obj87034Methods_3bb8c_l` in the shared
 header), reaching a disjoint set of slots (0x004/0x010/0x014/0x048/0x074/
 0x07C/0x080/0x084/0x088/0x08C/0x0C0/0x0C4/0x0C8/0x0D0/0x0D4). This unit's

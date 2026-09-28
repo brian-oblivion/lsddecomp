@@ -141,7 +141,7 @@ Zero bytes (whole-image SHA1 green, 0 new typeview warnings).
 
 Evidence: `gStyleSceneRefs` (0x8008AC7C, an `s32` in every unit) is
 RegisterStyleConfig's third argument, which ObjM__InitStyleAndWorld
-(class_3bb8c_l) passes as `&self->ctorSound`: it points at ObjM's
+(class_3bb8c_k) passes as `&self->ctorSound`: it points at ObjM's
 +0x06C..+0x07B block (include/ObjM.h's banner). The holder's +0x00C is
 therefore ObjM::cachedViewport, a NodeGuardedViewport, and +0x0AC of its
 table is Viewport's `getFadeBox` (include/Viewport.h, `SceneNode *(*)(Self *)`)
