@@ -17,7 +17,7 @@ missing.
 ## What it does
 
 A one-instruction setter: stores its argument into the global flag
-`gInstantTeleportersEnabled`. `DreamAux.c` calls it as `SetInstantTeleportersEnabled(bool value)` with
+`sInstantTeleportersEnabled`. `DreamAux.c` calls it as `SetInstantTeleportersEnabled(bool value)` with
 either a computed boolean expression or the literal `1` -- consistent with a
 plain `bool` parameter here.
 
@@ -28,18 +28,18 @@ plain `bool` parameter here.
    this unit -- DreamAux.c calls the setter through its own extern
    (`extern void SetInstantTeleportersEnabled(bool value);`), never touches the flag
    directly. */
-extern s32 gInstantTeleportersEnabled;
+extern s32 sInstantTeleportersEnabled;
 
 void SetInstantTeleportersEnabled(bool value)
 {
-	gInstantTeleportersEnabled = value;
+	sInstantTeleportersEnabled = value;
 }
 ```
 
-`gInstantTeleportersEnabled` is declared `extern s32` (not `bool`) because it is also read as
+`sInstantTeleportersEnabled` is declared `extern s32` (not `bool`) because it is also read as
 a plain nonzero/zero flag by `TestForInstantTeleporters` (next in ROM order),
 and its underlying data is a full 32-bit word (`asm/data/7B3C0.sdata.s`,
-`gInstantTeleportersEnabled`, one `.word`).
+`sInstantTeleportersEnabled`, one `.word`).
 
 ## Verification
 

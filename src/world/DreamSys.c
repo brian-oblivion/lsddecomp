@@ -1800,10 +1800,10 @@ s32 GetStageLinkAngle(void) {
 
 /* Set by SetInstantTeleportersEnabled (DreamAux.c calls it), tested by
    TestForInstantTeleporters. */
-extern s32 gInstantTeleportersEnabled;
+extern s32 sInstantTeleportersEnabled;
 
 void SetInstantTeleportersEnabled(bool value) {
-    gInstantTeleportersEnabled = value;
+    sInstantTeleportersEnabled = value;
 }
 
 /* TestForInstantTeleporters' GetStaticSpawn tables: trigger counts,
@@ -1815,7 +1815,7 @@ extern StageSpawn *sTeleportSpawns[];
 s32 TestForInstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
     s32 result;
 
-    if (gInstantTeleportersEnabled == 0) {
+    if (sInstantTeleportersEnabled == 0) {
         result = -1;
     } else {
         result = GetStaticSpawn(target, currentPos, stage, sTeleportTriggersCount,
