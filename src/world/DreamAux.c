@@ -49,7 +49,7 @@ void InitDreamAux(void) {
     s32 record;
 
     for (i = 0; i < ARRAY_COUNT(gDreamAuxGroupRecords); i++) {
-        for (record = 0; record < gDreamAuxGroupCounts[i]; record++) {
+        for (record = 0; record < sDreamAuxGroupCounts[i]; record++) {
             gDreamAuxGroupRecords[i][record].triggered = 0;
         }
     }

@@ -81,7 +81,7 @@ typedef struct TriggerRecord {
     s8 spawnIndices[4];
 } TriggerRecord;
 
-extern s8 gDreamAuxGroupCounts[DREAM_AUX_STAGE_COUNT];
+extern s8 sDreamAuxGroupCounts[DREAM_AUX_STAGE_COUNT];
 extern TriggerRecord *gDreamAuxGroupRecords[DREAM_AUX_STAGE_COUNT];
 
 extern bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record);
