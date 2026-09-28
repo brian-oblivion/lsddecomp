@@ -22,7 +22,7 @@ of the executable:
   `s16 columns; s16 rows; bool isVertical;` with `bool` = `int` (`include/types.h`)
   gives exactly 8. Entry 0 is `{1, 5, 1}`, entry 1 `{3, 2, 0}`, entry 2 `{6, 6, 0}`,
   entry 3 `{16, 16, 0}` — the existing header struct is correct as written.
-- `sStageChunkMoods` (`0x80086590`) is 14 pointers, to `STG00_CHUNK_MOODS` …
+- `sStageChunkMoods` (`0x80086590`) is 14 pointers, to `sStage00ChunkMoods` …
   `STG13_CHUNK_MOODS`. Row-major arrays of the 2-byte `MoodGraphPoint` union.
 - `D_800861D6` is **not a separate object**: it is splat's symbol for
   `sStageGridDimensions[0].rows`, at base+2. `%hi`/`%lo(D_800861D6)` and a
