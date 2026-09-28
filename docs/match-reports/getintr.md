@@ -464,3 +464,11 @@ From `src/psyq/libcd_bios.c`:
 > QImode value, so its zero-extension survives as retail's `andi v0,v0,0xff`;
 > flags is then CSE'd from the value just stored.  resp[1] is a plain read."
 > Now a one-line MATCHING note.
+
+From `src/psyq/libcd_bios.c`:
+
+> On copy8, the inline helper getintr copies each response through: "8-byte
+> response copy with a null guard on dst (2.6.3 does not fold `&array !=
+> NULL`). MATCHING: an inline function, not a do{}while(0) macro, which swaps
+> the dst and counter registers at every site." The MATCHING note is now its
+> own line.

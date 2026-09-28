@@ -93,8 +93,8 @@ extern u8 Result[3][8];
 
 /* The timeout of the wait in progress: its deadline in VSync ticks, a spin
  * count, and the waiting function's name for the diagnostic. bios.o calls
- * the group Alarm; it stays three words here.
- * MATCHING: a struct over them makes CD_readsync share one base register. */
+ * the group Alarm; it stays three words here. */
+/* MATCHING: a struct over them makes CD_readsync share one base register. */
 extern s32 D_8008B3E4;
 extern s32 D_8008B3E8;
 extern char *D_8008B3EC;
@@ -132,9 +132,8 @@ s32 CD_datasync(s32 arg0);
 void callback(void);
 void cb_read(s32 arg0, s32 arg1);
 
-/* 8-byte response copy with a null guard on dst (2.6.3 does not fold
- * `&array != NULL`). MATCHING: an inline function, not a do{}while(0)
- * macro, which swaps the dst and counter registers at every site. */
+/* getintr's 8-byte response copy, with a null guard on dst. */
+/* MATCHING: an inline function; a do{}while(0) macro swaps the dst and counter registers at every site. */
 static __inline__ void copy8(u8 *d, const u8 *s) {
     s32 i;
     if (d != NULL) {
