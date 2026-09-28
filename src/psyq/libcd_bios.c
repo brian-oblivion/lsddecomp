@@ -1,24 +1,21 @@
 /*
  * libcd_bios -- Sony's libcd `bios.c`, the low-level CD-ROM controller
- * driver, carried as C. The game links a libcd build (RCS ids of December
- * 1995) that no SDK disc carries, so this object cannot be linked from lib/
- * the way its neighbours are (docs/research/psyq-sdk-objects.md); every
- * function here is matched, or queued, as C instead. Sony's names
- * throughout.
+ * driver, carried as C under Sony's names: the game links a libcd build
+ * (RCS ids of December 1995) that no SDK disc carries, so this object
+ * cannot be linked from lib/ the way its neighbours are.
  *
- * What it holds, in bios.c's own order:
- *   - getintr: reads the controller's interrupt cause and response bytes,
- *     records them per cause, and reports the event to its caller;
- *   - CD_sync / CD_ready: wait (with a timeout and a diagnostic print) for
- *     a command to complete or for data to become ready;
- *   - CD_cw: issue one controller command with its parameter bytes;
- *   - CD_vol, CD_shell, CD_flush, CD_initvol, CD_initintr, CD_init: volume
- *     set-up, shell-open recovery, draining the controller, and the reset
- *     sequence that installs `callback` as the CD interrupt handler;
- *   - cd_read_retry, CD_readm, CD_readsync, CD_datasync, CD_getsector: the
- *     sector-read state machine and its DMA transfer;
- *   - CD_set_test_parmnum, callback, cb_read: a one-word setter, the interrupt
- *     handler, and the per-sector read callback.
+ * What it holds, in bios.c's own order: getintr (reads the controller's
+ * interrupt cause and response bytes, records them per cause, and reports
+ * the event); CD_sync and CD_ready (wait, with a timeout and a diagnostic
+ * print, for a command to complete or for data to become ready); CD_cw
+ * (issue one controller command with its parameter bytes); CD_vol,
+ * CD_shell, CD_flush, CD_initvol, CD_initintr and CD_init (volume set-up,
+ * shell-open recovery, draining the controller, and the reset sequence
+ * that installs `callback` as the CD interrupt handler); cd_read_retry,
+ * CD_readm, CD_readsync, CD_datasync and CD_getsector (the sector-read
+ * state machine and its DMA transfer); CD_set_test_parmnum, callback and
+ * cb_read (a one-word setter, the interrupt handler, and the per-sector
+ * read callback).
  */
 #include "common.h"
 
@@ -45,8 +42,8 @@ extern char *CD_comstr[]; /* each command's name, for the diagnostics */
 extern char *CD_intstr[]; /* each interrupt state's name */
 
 /* bios.o's unnamed per-command tables, 32 words each, indexed by the
- * command. CD_cw reads D_8006D840 both directly and as
- * D_8006D740[cmd + 0x40] (docs/match-reports/CD_cw.md). */
+ * command. CD_cw reads the parameter counts both directly and through the
+ * second table, 0x40 words on. */
 extern s32 D_8006D6C0[]; /* nonzero: a second interrupt, not the acknowledge, completes the command */
 extern s32 D_8006D740[]; /* nonzero: issuing the command clears the ready state */
 extern s32 D_8006D7C0[]; /* nonzero: the command's acknowledge interrupt updates CD_status */
@@ -75,8 +72,8 @@ extern volatile u8 D_8006D8DA;
 /* The read state machine (CD_readm, cd_read_retry, cb_read). */
 extern s32 D_8006D8A4;     /* CD_set_test_parmnum's word */
 extern s32 D_8006D8DC[10]; /* first of 10 consecutive words zeroed by a pointer walk;
-                            * D_8006D8E0..D_8006D904 are the other nine, each
-                            * already individually named -- not a real array. */
+                            * the other nine are declared one by one below,
+                            * so it is not a real array. */
 extern s32 D_8006D8E0;
 extern s32 D_8006D8E4;
 extern volatile s32 D_8006D8E8;
@@ -178,9 +175,7 @@ s32 getintr(void) {
         if (!(CD_status & 0x10) && (resp[0] & 0x10)) {
             CD_nopen++;
         }
-        /* The volatile read keeps resp[0] a QImode value, so its
-         * zero-extension survives as retail's `andi v0,v0,0xff`; flags is
-         * then CSE'd from the value just stored.  resp[1] is a plain read. */
+        /* MATCHING: the volatile read keeps resp[0]'s byte zero-extension; resp[1] is a plain read. */
         CD_status = *(volatile u8 *)&resp[0];
         CD_status1 = resp[1];
         flags = CD_status & 0x1D;
@@ -250,8 +245,6 @@ s32 getintr(void) {
 INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_sync);
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 178 words against retail's 180
- * (docs/match-reports/CD_ready.md). */
 s32 CD_ready(s32 arg0, s32 arg1) {
     char **table;
     u8 *state;
@@ -365,8 +358,6 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_ready);
 #endif
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 284 words against retail's 282, 97 equal at the same
- * index (docs/match-reports/CD_cw.md). */
 s32 CD_cw(s32 arg0, u8 *arg1, u8 *arg2, s32 arg3) {
     char **table;
     volatile u8 *state;
@@ -546,8 +537,7 @@ void CD_flush(void) {
     q = &D_8006D8D9;
     CD_mode = 0;
     *q = D_8006D8DA;
-    /* Keeps the D_8006D8C0 pointer load and the D_8006D8D8[0] = 2 store
-     * below the CD_mode / D_8006D8D9 stores; without it GCC hoists them above. */
+    /* MATCHING: keeps the port load and the sync-state store below the CD_mode stores. */
     __asm__("");
     D_8006D8D8[0] = 2;
     *D_8006D8C0 = 0;
@@ -598,10 +588,6 @@ void CD_initintr(void) {
 }
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 171/196 words, length exact. Residue: list scheduling:
- * retail splits CD_cw(1,0,0,0)'s argument set-up from its own a3/jal by
- * about 90 bytes, and neither call position tried reproduces it
- * (docs/match-reports/CD_init.md). */
 s32 CD_init(void) {
     s32 *p;
     s32 i;
@@ -684,11 +670,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_init);
 #endif
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 215/223 words, length exact. Residue: a loop-setup
- * scheduling swap (p2 computed from $a0 before vs. after the move into $s5)
- * and a register-identity swap in the final D_8006D8F4 = -1 block
- * (docs/match-reports/cd_read_retry.md). The n/saved sinks below are
- * written on every path before their next read. */
+/* The n/saved sinks below are written on every path before their next read. */
 s32 cd_read_retry(void) {
     s32 n;
     s32 *tmp;
@@ -806,10 +788,7 @@ s32 CD_readm(s32 arg0, s32 arg1, s32 arg2) {
     *p = arg2;
     t = *p & 0x30;
 
-    /* MATCHING: the goto layout and the local `volatile s32 *` pointers
-     * keep the three D_8006D8F0 stores as separate blocks, each with its
-     * own address computation; an if/else chain or a switch lets GCC merge
-     * them into one store. */
+    /* MATCHING: the gotos and local volatile pointers keep the three mode stores as separate blocks. */
     if (t == 0) {
         goto case1;
     }
@@ -919,12 +898,7 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
                     CD_cbsync(p8D8[0], Result[0]);
                 }
             }
-            /* MATCHING: a known-bad construct, do not copy it. p6A0 and pF8
-             * are both addresses of globals, so the test is always true and
-             * both arms are the same store; cross-jumping folds them into
-             * retail's single sb, and the construct only steers register
-             * allocation (`status` in $s1 across the loop). The report has
-             * the alternatives tried. */
+            /* MATCHING: do not copy: the test is always true and both arms are one store; it only steers registers. */
             if (p6A0 || pF8) {
                 *D_8006D8C0 = status;
             } else {
@@ -957,8 +931,6 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
 }
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: length exact, 91 words; register identity on the three
- * hoisted table pointers (docs/match-reports/CD_datasync.md). */
 s32 CD_datasync(s32 arg0) {
     s32 now;
     s32 ok;
@@ -986,8 +958,6 @@ s32 CD_datasync(s32 arg0) {
         }
         if (!ok) {
             puts(D_80010984);
-            /* NON_MATCHING: the last argument reuses the dead `ok` as its
-             * register target; a fresh local compiles further from retail. */
             printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[CD_com], ok = (s32)p6A0[p8D8[0]]);
             CD_flush();
             return -1;
@@ -1027,9 +997,6 @@ void CD_set_test_parmnum(s32 arg0) {
 }
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 30/56 words, length 1 short. Residue: instruction
- * selection (retail computes &D_8006D8D8 unfolded inside the loop; this
- * folds it) (docs/match-reports/callback.md). */
 void callback(void) {
     u8 status;
     s32 flags;

@@ -95,3 +95,11 @@ hoisted above the `sb zero` to `CD_mode` and the `sb` through `q` to
 `D_8006D8D9`; retail performs those two stores first. As knock-on effects the
 pointer lands in `a0` instead of `v1` and the loop's `li v1,0x7` / `li a0,0x1`
 pair swaps order. The primary change is instruction order.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libcd_bios.c`:
+
+> At the order-only barrier: "Keeps the D_8006D8C0 pointer load and the
+> D_8006D8D8[0] = 2 store below the CD_mode / D_8006D8D9 stores; without it
+> GCC hoists them above." Now a one-line MATCHING note.

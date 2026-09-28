@@ -667,3 +667,13 @@ The NON_MATCHING line above the preserved body read:
 > (the three hoisted pointers p620/p6A0/p8D8 land in different
 > callee-saved registers than retail's $s3/$s1/$s0) (docs/match-reports/
 > CD_datasync.md).
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libcd_bios.c`:
+
+> The NON_MATCHING body's score comment: "NON_MATCHING: length exact, 91
+> words; register identity on the three hoisted table pointers
+> (docs/match-reports/CD_datasync.md)." And inside the body, at the printf:
+> "NON_MATCHING: the last argument reuses the dead `ok` as its register
+> target; a fresh local compiles further from retail."

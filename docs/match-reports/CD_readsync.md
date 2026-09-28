@@ -1059,3 +1059,13 @@ The comment on `pEC = &D_8008B3EC` read:
 > unfolded lui/addiu addressing retail uses for this argument;
 > a plain `D_8008B3EC` reference here compiles FOLDED instead.
 > See docs/match-reports/CD_readsync.md's round-36 entry.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libcd_bios.c`:
+
+> "MATCHING: a known-bad construct, do not copy it. p6A0 and pF8 are both
+> addresses of globals, so the test is always true and both arms are the same
+> store; cross-jumping folds them into retail's single sb, and the construct
+> only steers register allocation (`status` in $s1 across the loop). The
+> report has the alternatives tried." Now one line.

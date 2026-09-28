@@ -1472,3 +1472,18 @@ The comment above this function's NON_MATCHING body in src/libcd_bios.c read:
 > confirmed sound (both are freshly written on every path before their
 > next read) against a rejected sibling candidate that hoisted a value
 > across a loop boundary unsoundly.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/psyq/libcd_bios.c`:
+
+> On the read-state words: "first of 10 consecutive words zeroed by a pointer
+> walk; D_8006D8E0..D_8006D904 are the other nine, each already individually
+> named -- not a real array."
+>
+> The NON_MATCHING body's score comment: "NON_MATCHING: 215/223 words, length
+> exact. Residue: a loop-setup scheduling swap (p2 computed from $a0 before
+> vs. after the move into $s5) and a register-identity swap in the final
+> D_8006D8F4 = -1 block (docs/match-reports/cd_read_retry.md). The n/saved
+> sinks below are written on every path before their next read." The last
+> sentence stays in the source.
