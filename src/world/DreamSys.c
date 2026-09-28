@@ -37,6 +37,7 @@
 #include <rand.h>
 #include "DreamSys.h"
 #include "Entity.h"
+#include "Pad.h"
 #include "LinkResource.h"
 #include "StageMap.h"
 #include "LbdFile.h"
@@ -314,48 +315,48 @@ void DreamSys__OnPadEvent(DreamSys *self, s32 sender, s32 event) {
     if (self->staircaseActive != 0)
         return;
 
-    switch (event - 2) {
-        case 0:
+    switch (event) {
+        case PAD_EVENT_HELD + PAD_BUTTON_LUP:
             self->moveCommand = MOVE_COMMAND_FORWARD;
             break;
-        case 1:
+        case PAD_EVENT_HELD + PAD_BUTTON_LDOWN:
             self->moveCommand = MOVE_COMMAND_BACK;
             break;
-        case 2:
+        case PAD_EVENT_HELD + PAD_BUTTON_LLEFT:
             self->turnCommand = 1;
             break;
-        case 3:
+        case PAD_EVENT_HELD + PAD_BUTTON_LRIGHT:
             self->turnCommand = 2;
             break;
-        case 4:
+        case PAD_EVENT_HELD + PAD_BUTTON_RUP:
             self->lookOffsetCommand = 1;
             break;
-        case 5:
+        case PAD_EVENT_HELD + PAD_BUTTON_RDOWN:
             if (self->moveCommand == MOVE_COMMAND_FORWARD)
                 self->methods->changeMoveMode(self, MOVE_MODE_RUN);
             break;
-        case 6:
+        case PAD_EVENT_HELD + PAD_BUTTON_RLEFT:
             self->lookOffsetCommand = 2;
             break;
-        case 11:
+        case PAD_EVENT_HELD + PAD_BUTTON_R1:
             self->lookYawCommand = 2;
             break;
-        case 12:
+        case PAD_EVENT_HELD + PAD_BUTTON_R2:
             self->moveCommand = MOVE_COMMAND_RIGHT;
             break;
-        case 13:
+        case PAD_EVENT_HELD + PAD_BUTTON_L1:
             self->lookYawCommand = 1;
             break;
-        case 14:
+        case PAD_EVENT_HELD + PAD_BUTTON_L2:
             self->moveCommand = MOVE_COMMAND_LEFT;
             break;
-        case 23:
+        case PAD_EVENT_PRESSED + PAD_BUTTON_RRIGHT:
             self->linkCommandFlag = 1;
             break;
-        case 32:
+        case PAD_EVENT_RELEASED + PAD_BUTTON_LUP:
             self->methods->restorePreviousMoveMode(self);
             break;
-        case 47:
+        case PAD_EVENT_RELEASED + PAD_BUTTON_START: /* MATCHING: empty; retail's jump table runs to it */
             break;
     }
 }
