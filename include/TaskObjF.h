@@ -209,6 +209,10 @@ enum TaskObjFState {
 extern TaskObjFMethods gTaskObjFMethods;
 extern TaskObjFMethods *GetTaskObjFMethods(void); /* returns &gTaskObjFMethods */
 
+/* TaskObjF__TaskObjF's construction count: InitCARD/StartCARD/_bu_init run
+ * only on the first construction, when it was 0 before the increment. */
+extern s32 sTaskObjFCount;
+
 /* The class's own methods, in address order. */
 TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot);
 void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot);

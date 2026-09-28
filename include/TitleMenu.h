@@ -2,6 +2,7 @@
 #define TITLEMENU_H
 
 #include "TaskCore.h"
+#include "DrawSystem.h"
 
 /*
  * TitleMenu -- the menu over ETC\TITLE.TIM that the game returns to between
@@ -140,6 +141,76 @@ typedef void (*TitleMenuResetCallFn)(TitleMenu *self, struct DreamSys *dreamSys)
 
 extern TitleMenuMethods gTitleMenuMethods;
 extern TitleMenuMethods *GetTitleMenuMethods(void); /* returns &gTitleMenuMethods */
+
+/* TitleMenu's menu description, a TaskCoreTarget: TitleMenu__TitleMenu
+ * passes &sTitleMenuTarget as TaskCore's ctor's `target` and again to setTarget. */
+extern TaskCoreTarget sTitleMenuTarget;
+
+/* "ETC\ETCSE", TitleMenu__TitleMenu's soundBankPath for TaskCore's ctor
+ * (the ctor casts away the const for its `char *`). */
+extern const char sTitleMenuSoundBankPath[];
+
+/* "ETC\TITLE.TIM", TitleMenu__Reset's path for setSubHandle. */
+extern const char sTitleTimPath[];
+
+/* "CARD\FILEICN1.TIM", TitleMenu__BeginCardAccess's path for New_TimImage.
+ * A string splat already emitted as a symbol: a literal would emit a
+ * second copy. */
+extern const char sSaveIconTimPath[];
+
+/* The two 320 x 240 display buffers, stacked in VRAM at y 0 and y 240:
+ * TitleMenu__OnDeinit clears each with the DrawSystem's clearImage. */
+extern DrawRect sDisplayBufferRects[2];
+
+/* TitleMenu__AttachSaveTitle's position for the save title's attachToParent
+ * (-4, -23: percent of half the screen from the centre). A TextRow's
+ * position is a ScreenSpritePos (include/TextRow.h), passed through
+ * SceneNode's LongVec3 slot. */
+extern struct ScreenSpritePos sSaveTitleOffset;
+
+/*
+ * The save file's name and title, as TaskObjF's beginSave/beginLoad take
+ * them (`fileName`, `title`): TitleMenu__SaveToCard and
+ * TitleMenu__LoadFromCard pass both. The ROM image points them into the
+ * rodata block at D_80011434: sSaveFileName at "BISLPS-01556xxx", which
+ * SaveToCard empties on a new game; gSaveTitle at the full-width
+ * "LSD   Day001" followed by 19 full-width spaces, which
+ * TitleMenu__CreateSaveTitle reblanks from its 12th character on a new game
+ * and StampSaveTitleDay writes the day into.
+ */
+extern char *sSaveFileName;
+extern char *gSaveTitle;
+
+/* The buffer StampSaveTitleDay formats the day into
+ * (FormatFullWidthNumber) before copying it into gSaveTitle's title. The
+ * ROM image points it at the "7654321" string D_8008AA1C. */
+extern void *sDayDigits;
+
+/* 19 full-width spaces, the tail TitleMenu__CreateSaveTitle copies over
+ * gSaveTitle's on a new game (the ROM image points it just past
+ * sSaveFileName's string). */
+extern char *sSaveTitleBlanks;
+
+/* TaskObjF's init `namePrefix` (TitleMenu__BeginCardAccess): the ROM image
+ * points it at the product code "BISLPS-01556" in D_80011434. */
+extern char *sCardFilePrefix;
+
+/* TaskObjF's init `nameSuffixes` (TitleMenu__BeginCardAccess): the 15 file
+ * suffixes "-01" (D_8008AA0C) to "-15" (D_8008A9D4), then NULL. */
+extern char *sSaveFileSuffixes[];
+
+/* TitleMenu__CycleSaveTitleColor's index (0, 1, 2) into its 3-byte colour.
+ * The storage is a word; every access is a byte (lbu/sb). */
+extern u8 sSaveTitleColorChannel;
+
+/* TitleMenu__CycleSaveTitleColor's frame counter (wraps to 0 at 0x101). */
+extern s32 sSaveTitleColorFrame;
+/* Formats the current day into the save title (src/TitleMenuTaskObjF.c);
+ * TitleMenu__TitleMenu calls it with DreamSys's getCurrentDayAndYear. */
+extern void StampSaveTitleDay(s32 day);
+
+/* The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock),
+ * which UpdateFlashbackLock reads, is DreamSaveBlock in include/DreamSys.h. */
 
 /* The class's own methods, in ROM order (src/TitleMenuTaskObjF.c). */
 TitleMenu *New_TitleMenu(struct DreamSys *dreamSys);
