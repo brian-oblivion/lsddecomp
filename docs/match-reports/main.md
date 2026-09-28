@@ -279,3 +279,85 @@ failure, not a claim about the code.
 ## Track 4 (2026-09-26, round 87, bravo)
 
 The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
+
+## History (moved from src/main.c, round 101)
+
+Track 7 (alpha) rewrote the unit's comments to describe the code only. What
+they recorded, verbatim as they stood at `57fb90b6`:
+
+The unit banner:
+
+```c
+/*
+ * The game's entry point. `main` (formerly `func_800118DC`) is called
+ * directly by Sony's `crt0` (config/splat.slps01556.lsdde.yaml, the `main`
+ * c-segment) and runs once: it sets the Psy-Q memory mode, stands up the
+ * game's `BMemPMgr` heap, constructs the root `GameApplication` object from a
+ * fixed ctor-args block, opens a `Pad`, and dispatches into the root
+ * object's own vtable (+0x044, +0x04C) before returning. It never loops --
+ * the real game loop lives inside whatever the dispatched vtable slots (or
+ * a callee reached from them) do.
+ *
+ * The first thing `main` calls is `__main`, and the C does not write that
+ * call: cc1 inserts `jal __main` at the top of any function spelled `main`,
+ * and retail's first instruction pair is exactly that call (round 79: the
+ * explicit call removed, the image stays byte-identical). `__main` is
+ * Sony's empty stub from the SDK's `_obj/none` module (see its symbols
+ * entry). It lives here as matched C only because no object places it.
+ */
+```
+
+The declarations block (the opaque typedef it opens is gone: `BMemPMgr`
+now comes from `include/BMemPMgr.h`):
+
+```c
+/* Local, opaque: nothing here dereferences a BMemPMgr (BMemPMgr.h), it
+ * only passes the pointer through. */
+typedef struct BMemPMgr BMemPMgr;
+
+/* Psy-Q libapi (`SetMem`, linked from `libapi/c159`, splat `o` segment).
+ * One `s32` argument observed at this, its only call site. */
+extern void SetMem(s32 mode);
+
+/* BMemPMgrInit is fully matched in BMemPMgr.c as a single-argument
+ * function (`s32 poolSize`, see docs/match-reports/BMemPMgrInit.md,
+ * 31/31 words). THIS call site pushes a second, dead argument (0) that the
+ * matched body never reads -- an unspecified-parameter declaration lets the
+ * call carry it without contradicting the real prototype, the same idiom
+ * BMemPMgr.h already uses for BMemPMgrAlloc/BMemPMgrFree. */
+extern void *BMemPMgrInit(); /* arity-ok: the dead 2nd argument IS byte-load-bearing here -- retail emits `move a1,zero` in the jal's delay slot at 0x80011900 */
+
+/* SetDefaultBMemPMgr(BMemPMgr *pool) -- one-line `gDefaultBMemPMgr = pool;`, matched
+ * in BMemPMgr.c but not yet declared in BMemPMgr.h (no carved caller
+ * existed until now). */
+extern void SetDefaultBMemPMgr(BMemPMgr *pool);
+
+/* New_DrawSystem comes from include/DrawSystem.h (through GameApplication.h). */
+```
+
+Above the `initSystems` call:
+
+```c
+    /* GameApplication__InitSystems takes no 4th argument: include/GameApplication.h. */
+```
+
+The `arity-ok` line's retail evidence: the dead second argument of
+`BMemPMgrInit` is the `move a1,zero` in the `jal`'s delay slot at
+0x80011900 (see "Two levers" above).
+
+## Naming (round 101, track 7, alpha)
+
+| old | new | tier | evidence |
+| --- | --- | --- | --- |
+| local `obj` | `drawSystem` | A | it holds `New_DrawSystem()`'s return and is passed as `initSystems`'s `DrawSystem *drawSystem` |
+| `2` (SetMem) | `CONSOLE_RAM_MB` | A | Psy-Q libapi's `SetMem(n)` takes the RAM size in megabytes, 2 on a retail console, 8 on a development board |
+| `0x166C00` | `DEFAULT_POOL_SIZE` = `(1435 * 1024)` | A | `BMemPMgrInit(s32 poolSize)` (src/BMemPMgr.c) stores it as `pool->poolSize`; the pool is installed by `SetDefaultBMemPMgr`, whose only caller is `main`, as the `gDefaultBMemPMgr` every `BMemPMgrAlloc` uses |
+
+`New_Pad(0, 0)` keeps its literals with a comment: they are `PadInit`'s mode
+and the port, and a name would restate them.
+
+Two constructs carry `/* MATCHING: */` lines. The unread `0` passed to
+`BMemPMgrInit` is retail's `move $a1, $zero` ("Two levers", 1). The
+`GameApplicationInitSystemsFn` cast is measured: calling the slot through its
+own four-parameter type with a trailing `0` compiles to 41/46 words
+(`funcdiff.py main`, reverted), so the cast is what matches.
