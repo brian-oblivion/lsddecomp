@@ -2,7 +2,7 @@
 
 > Renamed from `func_80056794` on 2026-09-23 (tools/rename.py). Address 0x80056794.
 
-Unit `ObjMStyleActor`. Frameless, no self/vtable involved.
+Unit `dream_scene`. Frameless, no self/vtable involved.
 
 ## Classification
 
@@ -24,10 +24,10 @@ void AddVec3(Vec3S *dst, Vec3S *a, Vec3S *b) {
 }
 ```
 
-`Vec3S` is this unit's own local reading of the same shape `ObjMStyleActor.c`
+`Vec3S` is this unit's own local reading of the same shape `dream_scene.c`
 already has under its own name `Vec3O` -- kept separate per the
 multiple-independent-local-views convention (this unit is not
-`ObjMStyleActor.c`'s to edit).
+`dream_scene.c`'s to edit).
 
 ### Proposed learning
 

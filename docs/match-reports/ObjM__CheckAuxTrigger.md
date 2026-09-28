@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054120` on 2026-09-23 (tools/rename.py). Address 0x80054120.
 
-**Unit:** ObjMStyleActor · **Size:** 43 instructions · **Status:** MATCHED (43/43 words)
+**Unit:** dream_scene · **Size:** 43 instructions · **Status:** MATCHED (43/43 words)
 
 ## Context
 
@@ -75,7 +75,7 @@ call.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
+round 15 (2026-09-04), runner echo, fresh carve `dream_scene`.
 
 ## Naming
 
@@ -84,7 +84,7 @@ round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `unk14` is the StageMap: +0x114 is getLastTargetRateSplit, returning a ChunkSlot whose +0x004 is `loader` (the LbdFile) and +0x014 `heldObj`, which takes TryDreamAuxTrigger's result (cast to BasicClass *).
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `unk14` is the StageMap: +0x114 is getLastTargetRateSplit, returning a ChunkSlot whose +0x004 is `loader` (the LbdFile) and +0x014 `heldObj`, which takes TryDreamAuxTrigger's result (cast to BasicClass *).
 
 ## Track 7 (2026-09-27, round 98, delta)
 

@@ -1,4 +1,4 @@
-# StyleUpdateEffectSlots -- MATCHED (34/34 words), ObjMStyleActor
+# StyleUpdateEffectSlots -- MATCHED (34/34 words), dream_scene
 
 > Renamed from `func_80054C74` on 2026-09-23 (tools/rename.py). Address 0x80054c74.
 

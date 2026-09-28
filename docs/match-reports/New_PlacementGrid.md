@@ -31,7 +31,7 @@ void *New_PlacementGrid(s32 arg1)
 }
 ```
 
-This is the EXACT same shape as `ObjMStyleActor`'s `New_ObjM`
+This is the EXACT same shape as `dream_scene`'s `New_ObjM`
 (matched earlier this round, same runner) -- success path's `return self;`
 inside the `if`-body, failure path's `return NULL;` trailing and
 unconditional. Reused directly rather than re-derived, and it matched on

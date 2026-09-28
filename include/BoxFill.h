@@ -42,7 +42,7 @@
  *    screen position (a BoxFillPos) where the slot, SceneNode's, types a
  *    LongVec3 offset; it attaches with a NULL offset, then setPosition.
  *    Callers cast to BoxFillAttachToParentFn (the style layer
- *    in ObjMStyleActor.c, task) or, through a SceneNode pointer, cast the argument
+ *    in dream_scene.c, task) or, through a SceneNode pointer, cast the argument
  *    (Viewport__SetFadeBox). BoxFill__AttachAbsolute calls it with FOUR
  *    arguments through an unprototyped pointer (see its match report).
  * The ctor itself returns nothing where SceneNode's slot returns `void *`;
@@ -78,7 +78,7 @@ typedef struct BoxFillPos BoxFillPos;
  * size argument, setSize's and FadeBox's pushPosition's. Each word is stored
  * into the u16 boxW/boxH, which reads only its low halfword (lhu at +0x000
  * and +0x004). The callers pass two-word arrays and pairs of their own
- * (sListViewSize, sGraphPointSize, sStyleDecorBoxSize, and ObjMStyleActor's
+ * (sListViewSize, sGraphPointSize, sStyleDecorBoxSize, and dream_scene's
  * BoxFillSize copied from sStyleDecorSizeW), so New_BoxFill and the ctor slot take `void *` and setSize
  * `s32 *`. The same layout as BoxFillPos, which is a position. */
 struct BoxFillSize {

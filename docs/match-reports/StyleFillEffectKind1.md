@@ -1,4 +1,4 @@
-# StyleFillEffectKind1 -- MATCHED (42/42 words), ObjMStyleActor
+# StyleFillEffectKind1 -- MATCHED (42/42 words), dream_scene
 
 > Renamed from `func_80054F30` on 2026-09-23 (tools/rename.py). Address 0x80054f30.
 
@@ -24,14 +24,14 @@ extern u8 sStyleKind1Scale[];            /* address only taken, never indexed */
 extern u8 sStyleSpawnOffsetX[];            /* address only taken, passed to New_X */
 extern u8 *sStyleSpawnScale;             /* set to &sStyleKind1Scale unconditionally */
 extern void *SetupStyleSpawnParamsRandom(void *arg0, void *arg1);   /* forward decl, own unit, cold */
-extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3); /* ObjMStyleActor.c, ALREADY MATCHED */
+extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3); /* dream_scene.c, ALREADY MATCHED */
 ```
 
 `sStyleSpawnYChoice2` is a 2-word dlabel in `asm/data/76DC8.data.s`; only the first
 word is read here (`lw`, not indexed), so it is declared scalar rather than
 an array -- if a sibling function later indexes `[1]`, retype there, not
 here (no other unit references any of these four symbols currently).
-`New_StyleEffect` is `ObjMStyleActor.c`'s already-matched `New_X`-style
+`New_StyleEffect` is `dream_scene.c`'s already-matched `New_X`-style
 allocator (`void *(void*,void*,void*,void*)`), called cross-unit by
 prototype only. `SetupStyleSpawnParamsRandom` is one of this unit's own still-cold
 functions (110w, queued later); its return value is discarded here (`jal`

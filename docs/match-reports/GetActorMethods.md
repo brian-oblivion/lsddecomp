@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057C84` on 2026-09-19 (tools/rename.py). Address 0x80057c84.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys` family -- plain getter, not
+Unit: `src/world/dream_scene.c`. Class: `DreamSys` family -- plain getter, not
 a vtable slot itself (checked all 6 method tables reachable from this
 unit's addresses, no hit; called directly by symbol name from
 `New_VariantSprite`, `VariantSprite__VariantSprite`, and this unit's own already-typed
@@ -46,4 +46,4 @@ tools/funcdiff.py GetActorMethods   # 4/4
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__GetBaseMethods`. Returns `&gActorMethods`: the class's own table getter (Get<Class>Methods, as GetSceneNodeMethods). The old name put it in DreamSys, a SUBCLASS; TodActor and StyleEffect call it for their base too. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__GetBaseMethods`. Returns `&gActorMethods`: the class's own table getter (Get<Class>Methods, as GetSceneNodeMethods). The old name put it in DreamSys, a SUBCLASS; TodActor and StyleEffect call it for their base too. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

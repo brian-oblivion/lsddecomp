@@ -94,7 +94,7 @@ this is the same class of residue before reshaping further:
 over `sDreamAuxSlots2` instead of `sDreamAuxSlots` (see that report/entry for
 the shared derivation). Tier A for the same reason: the tick pass over the
 slot family IS the function's purpose. Called from `ObjM__TeardownStyle`
-(`ObjMStyleActor.c`) alongside other per-frame-looking calls, consistent with
+(`dream_scene.c`) alongside other per-frame-looking calls, consistent with
 "tick", though nothing in this unit distinguishes what makes the "2" family
 different in KIND from the first (it is never populated by any function in
 this unit's own queue).
@@ -107,7 +107,7 @@ this unit's own queue).
 sDreamAuxSlots2 (0x80088D2C) is sDreamAuxSlots one word in, so the word each
 element's first field reads is the slot's `entity`, the Entity
 SetDreamAuxWorld made; slot +0x004 is `release`. Its only caller is
-ObjM__TeardownStyle (onDeinit, src/world/ObjMStyleActor.c), mirroring ObjM's scene
+ObjM__TeardownStyle (onDeinit, src/world/dream_scene.c), mirroring ObjM's scene
 setup calling SetDreamAuxWorld. The body reads it as `(Entity *)slot->model`
 with a comment. `done` -> `i`; the split `i = 0; slot = ...;` keeps a
 one-line MATCHING comment (the derivation is above). Byte-identical.

@@ -4,7 +4,7 @@
 
 > Renamed from `Noop` on 2026-09-18 (tools/rename.py). Address 0x80056df0.
 
-Unit: `ObjMStyleActor` (round 17; named round 52). `void func_80056DF0(void) {}`
+Unit: `dream_scene` (round 17; named round 52). `void func_80056DF0(void) {}`
 -- an empty body, `jr $ra; nop`. No hand derivation was needed or done; it is
 included here (unlike most such stubs) because it is a deliberate no-op
 target of a dispatch table, not merely an unworked artifact of extraction.
@@ -20,7 +20,7 @@ void NoOpIgnoreArgs(void) {
 
 Whole body is the trivial `jr $ra; nop` epilogue with nothing in between --
 splat emits this shape itself for any zero-instruction function. Called from
-`src/world/ObjMStyleActor.c`'s `StyleEffect__UpdateByKind` as the `self->unk54 == 2` handler,
+`src/world/dream_scene.c`'s `StyleEffect__UpdateByKind` as the `self->unk54 == 2` handler,
 alongside two real handlers for `case 0` and `case 3` -- i.e. retail's own
 source really does dispatch to an empty function for this state, this is not
 a decompilation artifact.
@@ -29,7 +29,7 @@ a decompilation artifact.
 
 **`NoOpIgnoreArgs` -- tier A.** A pure leaf whose mechanics ARE its purpose: the body
 does nothing, and it is reached as the `case 2:` arm of the state switch on
-`self->unk54` in `ObjMStyleActor.c:StyleEffect__UpdateByKind`, beside real arms
+`self->unk54` in `dream_scene.c:StyleEffect__UpdateByKind`, beside real arms
 (`StyleEffect__DriftModelChildren`, `StyleEffect__RandomizeSprites`) that take the same
 `(self, arg1)` shape -- which rules out "this is just an unextracted stub" as
 the alternative reading. No class prefix: the function takes no `self` (a

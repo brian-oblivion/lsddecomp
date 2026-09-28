@@ -6,7 +6,7 @@
 
 > Renamed from `func_800540E8` on 2026-09-23 (tools/rename.py). Address 0x800540e8.
 
-**Unit:** ObjMStyleActor · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
+**Unit:** dream_scene · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
 
 ## What this function does
 
@@ -33,7 +33,7 @@ None — matched on the first attempt.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
+round 15 (2026-09-04), runner echo, fresh carve `dream_scene`.
 
 ## Naming
 

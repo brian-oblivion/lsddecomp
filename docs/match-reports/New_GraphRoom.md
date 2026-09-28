@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057F68` on 2026-09-24 (tools/rename.py). Address 0x80057f68.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `gVariantSpriteMethods` family -- plain
+Unit: `src/world/dream_scene.c`. Class: `gVariantSpriteMethods` family -- plain
 allocator/constructor wrapper (`New_X` shape), not a vtable slot.
 
 ## Signature
@@ -32,7 +32,7 @@ own `GetGraphRoomMethods`, still queued -- forward-declared here) with `(obj,
 arg1)`, return the allocation regardless of the ctor's own return value.
 `return obj;` sits INSIDE the success `if`, with a trailing `return
 NULL;` -- the shape established as necessary for this exact pattern in
-`ObjMStyleActor`'s `New_VariantSprite` report.
+`dream_scene`'s `New_VariantSprite` report.
 
 This introduces this unit's own view of `gGraphRoomMethods` (73 slots,
 `D_80087AACMethods`/`D_80087AACObj`, currently typing only the ctor slot
@@ -51,7 +51,7 @@ tools/funcdiff.py New_GraphRoom   # 24/24
 
 **`New_GraphRoom`** -- tier B. `New_X`-shaped allocator (allocate
 `0x244` bytes, null-check, dispatch the ctor slot) for the class named
-`GraphRoomObj` this round -- see `src/world/ObjMStyleActor.c`'s own header
+`GraphRoomObj` this round -- see `src/world/dream_scene.c`'s own header
 comment for the class-identity evidence (loads "ETC\HGRAPH.TIM", builds
 100 coloured points from a day-type ring).
 
@@ -61,11 +61,11 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 ## Track 7 (2026-09-27, round 97, delta): the unit banner, moved here
 
-The unit banner of `src/world/ObjMStyleActor.c` was rewritten to say what the file holds. Its history, verbatim as it stood before the pass (the class-identity reading and the round-87 correction are this class's, so they live with its allocator):
+The unit banner of `src/world/dream_scene.c` was rewritten to say what the file holds. Its history, verbatim as it stood before the pass (the class-identity reading and the round-87 correction are this class's, so they live with its allocator):
 
 ```c
 /*
- * class_3bb8c_t -- functions 96..112 of the 113-function `ObjMStyleActor`
+ * class_3bb8c_t -- functions 96..112 of the 113-function `dream_scene`
  * remainder, 0x48738..0x48F74 (vram 0x80057F38..0x80058774).  Carved
  * MID-round 17 (2026-09-04) to re-staff a runner whose own unit was
  * exhausted.  This is the LAST slice of the dream_day block.
@@ -77,7 +77,7 @@ The unit banner of `src/world/ObjMStyleActor.c` was rewritten to say what the fi
  * - Four empty leaves plus the table getter (VariantSprite__Update,
  *   VariantSprite__NoOpSlotBC/C0/C4, GetVariantSpriteMethods) of the
  *   unrelated VariantSprite (include/VariantSprite.h; its ctor is in
- *   `ObjMStyleActor`, two more methods in `class_3bb8c_q`).
+ *   `dream_scene`, two more methods in `class_3bb8c_q`).
  * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
  *   73 slots), a TaskCore subclass, unified in include/GraphRoom.h (track 4,
  *   round 87; the header's banner has the slots, fields and evidence).

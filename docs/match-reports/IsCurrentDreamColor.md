@@ -132,6 +132,6 @@ The comments, as they stood:
 
 /* sDreamAuxWorld is the player DreamSys (include/dream_sys.h, track 4
  * round 88): the +0x200 its table is called at is getDreamColor, and
- * ObjMStyleActor hands SetDreamAuxWorld its DreamSys `target`. dream_aux.c
+ * dream_scene hands SetDreamAuxWorld its DreamSys `target`. dream_aux.c
  * declares it; the DreamAuxWorld view that stood here is gone. */
 ```

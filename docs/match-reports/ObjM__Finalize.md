@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052CD8` on 2026-09-24 (tools/rename.py). Address 0x80052cd8.
 
-Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0; whole-image
+Unit `dream_scene`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py ObjM__Finalize`: 14/14 words match.
 
 This is vtable slot `+0x00C` (`dtor`) of `gObjMMethods` -- a SECOND class
@@ -44,7 +44,7 @@ Slot +0x00C of gObjMMethods (`tools/classtable.py 0x80087034`). Forwards to the 
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-ObjM__Finalize's parameter was `Obj865C8 *` (the sibling class's view); it is now `ObjM_3bb8c_k *`, ObjMStyleActor's own view of this method's class (gObjMMethods). Byte-identical.
+ObjM__Finalize's parameter was `Obj865C8 *` (the sibling class's view); it is now `ObjM_3bb8c_k *`, dream_scene's own view of this method's class (gObjMMethods). Byte-identical.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

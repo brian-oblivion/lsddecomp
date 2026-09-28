@@ -109,7 +109,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
  * that decides the next day's dream, and the "link" (teleport) machinery
  * that ends one stage and starts another. See include/dream_sys.h for the
  * class as a whole; several of its methods live in sibling units
- * (ObjMStyleActor/t/r/o) because the class spans more than one segment.
+ * (dream_scene/t/r/o) because the class spans more than one segment.
  *
  * Four groups of functions live here.
  *

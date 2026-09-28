@@ -55,8 +55,8 @@ from a large number of OTHER units with DIFFERENT per-call-site arities
 and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
-`src/graphics/scene_node.c`, `src/ui/title_menu.c`, `src/world/ObjMStyleActor.c`,
-`src/world/ObjMStyleActor.c`, `src/world/dream_day.c`, `src/ui/screen_widgets.c`,
+`src/graphics/scene_node.c`, `src/ui/title_menu.c`, `src/world/dream_scene.c`,
+`src/world/dream_scene.c`, `src/world/dream_day.c`, `src/ui/screen_widgets.c`,
 `src/ui/screen_widgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/task.h`, `include/dream_sys.h`.
 Renaming this symbol would edit every one of those files -- squarely
@@ -152,7 +152,7 @@ ours to change.
 One declaration is left: `extern SceneNodeMethods *GetSceneNodeMethods(void);`
 in `include/scene_node.h`. The deleted local return-type views were
 `BaseCtorTableB_3bb8c_c` (include/class_3bb8c.h), `FixedBaseTable`
-(src/world/ObjMStyleActor.c), `SceneNodeBaseTable` (src/class_3bb8c_p.c),
+(src/world/dream_scene.c), `SceneNodeBaseTable` (src/class_3bb8c_p.c),
 `D6B5CCGetterMethodsCC8C` (include/task.h) and the untyped `void *` in
 src/world/dream_day.c. The one- and two-argument calls in title_menu.c and
 dream_day.c now pass nothing, because round 59 measured those arguments as

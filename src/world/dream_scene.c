@@ -1,5 +1,5 @@
 /*
- * ObjMStyleActor -- the day's scene object and what it runs, with the classes
+ * dream_scene -- the day's scene object and what it runs, with the classes
  * that sit between them in ROM. In address order, each under its own section
  * banner below:
  *  - ItemList's second half (include/ItemList.h; the first half is in
@@ -561,7 +561,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 i
     self->state = 5;
 }
 
-/* ObjM__TeardownStyle's helpers (src/world/dream_aux.c, src/world/ObjMStyleActor.c). */
+/* ObjM__TeardownStyle's helpers (src/world/dream_aux.c, src/world/dream_scene.c). */
 extern void StyleTeardown(void);
 
 /* onDeinit. */

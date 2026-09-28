@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054558` on 2026-09-23 (tools/rename.py). Address 0x80054558.
 
-Unit `ObjMStyleActor`. **41/41 words, byte-exact.** Reopened (both `gp_rel`
+Unit `dream_scene`. **41/41 words, byte-exact.** Reopened (both `gp_rel`
 and `addiu_at` are resolved), never attempted before this round.
 
 ## What it does
@@ -104,6 +104,6 @@ The config pointer is a unit-local `StyleStageConfig` (four `s8`:
 colorMode, fogLevel, farColorIndex, clearColorIndex -- what
 FillStyleFromConfig stores each byte as). Zero bytes.
 
-Proposal: `sStyleKind2AltColor` (0x80087430, ObjMStyleActor) is
+Proposal: `sStyleKind2AltColor` (0x80087430, dream_scene) is
 `sStyleConfig + 0x00C`, i.e. `sStyleConfig.clearColor`: its "alternate
 colour" is the current config's clear colour.

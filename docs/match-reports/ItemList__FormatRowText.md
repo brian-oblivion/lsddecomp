@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005292C` on 2026-09-24 (tools/rename.py). Address 0x8005292c.
 
-**Unit:** ObjMStyleActor · **Size:** 52 instructions (0xD0 bytes) ·
+**Unit:** dream_scene · **Size:** 52 instructions (0xD0 bytes) ·
 **Status: MATCHED 52/52**, whole-image SHA1 green.
 
 ## Role
@@ -32,7 +32,7 @@ carries no header-contention risk from a sibling unit.
 a byte-pointer argument) and `func_800238A8` (Psy-Q `psyq_GsLinkObject4.s`:
 `if (dest == NULL) return NULL; else copy n bytes src->dest, return dest`
 -- a strncpy-without-null-pad) are declared LOCAL to this unit
-(`ObjMStyleActor.c`), not in a shared header, per the project's
+(`dream_scene.c`), not in a shared header, per the project's
 cross-unit-prototype rule. `func_80013348` already has a differently-typed
 local declaration elsewhere (`input_dialogs.c`: `s32 func_80013348(void
 *arg0)`); this unit's own call site reads a byte pointer, so it is typed
@@ -118,7 +118,7 @@ Round 75 (bravo, track 3). `func_8005292C` -> `ItemList__FormatRowText`, **tier 
 
 Not a table slot (non-virtual helper). Copies item (top + row)'s text, starting `column` characters in, into `dest`, truncated to 26 characters, pads to 26 with spaces, NUL-terminates, returns dest. Callers: CreateRows, RefreshRows. The matched body types `column` as `char *` and `texts` as `s32 *` (their sum is the source pointer); retyping them the natural way is left alone because it touches a matched body.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/dream_scene.c`).
 
 ## Track 4 (2026-09-26, round 89)
 

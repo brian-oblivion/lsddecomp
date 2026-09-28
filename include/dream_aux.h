@@ -73,7 +73,7 @@ extern bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record);
 extern bool SpawnDreamAuxTriggerEntity(s32 moodIndex, void *desc, DreamAuxTriggerEntry *trigger,
                                        s32 spawnIndex);
 extern void EnableTeleportsForKind(s32 moodIndex);
-extern s32 IsStyleVariantEven(void); /* ObjMStyleActor.c */
+extern s32 IsStyleVariantEven(void); /* dream_scene.c */
 extern bool IsCurrentDreamColor(s32 condition);
 extern bool IsDayInPeriodPhase(s32 day, s32 phase);
 

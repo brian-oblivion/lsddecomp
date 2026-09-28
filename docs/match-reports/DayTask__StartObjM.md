@@ -136,4 +136,4 @@ The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Day
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. DayTask::objM is `struct ObjM *`; New_ObjM's arguments go uncast and init/deinit/release are called by name.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. DayTask::objM is `struct ObjM *`; New_ObjM's arguments go uncast and init/deinit/release are called by name.

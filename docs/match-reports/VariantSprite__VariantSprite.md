@@ -6,8 +6,8 @@
 
 > Renamed from `func_80057D10` on 2026-09-19 (tools/rename.py). Address 0x80057d10.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `gVariantSpriteMethods` (49 slots, uncarved --
-`asm/ObjMStyleActor.s`) -- THIS is its own ctor, resolved via
+Unit: `src/world/dream_scene.c`. Class: `gVariantSpriteMethods` (49 slots, uncarved --
+`asm/dream_scene.s`) -- THIS is its own ctor, resolved via
 `tools/classtable.py gVariantSpriteMethods` at `+0x008`, and the callee of this
 unit's own `New_VariantSprite` (`GetVariantSpriteMethods()->ctor(...)`, see its
 report).
@@ -49,7 +49,7 @@ matched with no iteration:
    `GetActorMethods`/`New_VariantSprite`'s reports for the sibling pattern),
    zeroes `self->unk_0xA4`, then TAIL-CALLS its own class's `+0x040` slot
    (`self->methods->postConstruct`, resolves to `VariantSprite__SetVariantClut` -- the first
-   function of this unit's successor `ObjMStyleActor`, out of range) and
+   function of this unit's successor `dream_scene`, out of range) and
    forwards its return value.
 
 `D800879C4Methods` and `D800879C4Obj` (declared once, above
@@ -65,7 +65,7 @@ Mechanics are construction (chains a base-class ctor, sets its own
 vtable pointer and `unk_0xA4`, tail-calls its class's own `postConstruct`
 slot) -- named with the `Class__Class` constructor convention even though
 the CLASS's own purpose in the game remains completely unknown (it lives
-in uncarved ground, `ObjMStyleActor.s`, out of this runner's scope).
+in uncarved ground, `dream_scene.s`, out of this runner's scope).
 
 ## Verify
 

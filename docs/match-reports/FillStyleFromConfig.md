@@ -2,7 +2,7 @@
 
 > Renamed from `func_800545FC` on 2026-09-23 (tools/rename.py). Address 0x800545fc.
 
-Unit: `ObjMStyleActor` · Size: 25 words · Round 23 (2026-09-07), head.
+Unit: `dream_scene` · Size: 25 words · Round 23 (2026-09-07), head.
 **Matched on the FIRST attempt.** This function's prior disposition was a
 carve-time stub saying "do not attempt"; see below.
 
@@ -64,7 +64,7 @@ other functions in this unit; this function writes a colour-table pointer to
 +0x018 and a plain sign-extended byte to +0x014. Same offsets, incompatible
 types — so `$a0` is a different struct.
 
-`struct StyleM` therefore lives in `src/world/ObjMStyleActor.c`, not in
+`struct StyleM` therefore lives in `src/world/dream_scene.c`, not in
 `include/class_3bb8c.h` (eleven units). Nothing in the shared header changed.
 
 ### Proposed learning

@@ -19,7 +19,7 @@ allocating 0x4C bytes and dispatching its ctor through `->ctor(...)` on the
 pointer this function returns). So this function is `Obj86ED0`'s own
 table getter, simply DEFINED in this unit; `ItemList_3bb8c_j`'s real
 table is gItemListMethods, reached instead through `GetItemListMethods()`
-(ObjMStyleActor).
+(dream_scene).
 
 ## Body
 

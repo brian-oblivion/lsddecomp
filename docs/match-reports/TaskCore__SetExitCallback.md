@@ -40,7 +40,7 @@ context argument verbatim, no other logic. Corroborated by
 `Obj86B60::unkA0` (`void *`, +0x0A0) -> `viewCallbackCtx`. Tier B (mechanics:
 a callback+context pair invoked by `TaskCore__Exit`, hence
 "view"; not a guess about what the callback itself does). Grep shows
-`unk9C`/`unkA0` textual hits in ObjMStyleActor.c/class_3bb8c_q.c/task.c/
+`unk9C`/`unkA0` textual hits in dream_scene.c/class_3bb8c_q.c/task.c/
 libsnd_decre.c (unrelated structs sharing the name), so proposal only.
 
 

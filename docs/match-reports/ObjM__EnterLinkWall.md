@@ -4,7 +4,7 @@
 
 > Renamed from `func_80053C94` on 2026-09-24 (tools/rename.py). Address 0x80053c94.
 
-**Unit:** ObjMStyleActor · **Size:** 33 words (0x84 bytes) ·
+**Unit:** dream_scene · **Size:** 33 words (0x84 bytes) ·
 **Status: MATCHED 33/33**, whole-image SHA1 green.
 
 ## What it does
@@ -27,7 +27,7 @@ CANNOT be called directly here (it would compile to a plain `jal` by
 symbol, not the `jalr` through the vtable pointer retail actually uses),
 so this unit's own `DreamSysMethods_3bb8c_l::slot200` field is dispatched
 through instead. `ObjM__StartFadeUp` is this unit's OWN sibling slice
-`ObjMStyleActor` (still `INCLUDE_ASM` there); its 5th argument (`1`) is
+`dream_scene` (still `INCLUDE_ASM` there); its 5th argument (`1`) is
 passed on the stack past the four register argument slots, matching a
 plain `extern s32 ObjM__StartFadeUp(Obj87034_3bb8c_l*, s32, s32, s32, s32);`
 declaration with no special handling needed.
@@ -57,7 +57,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
 
 ## Round 95 (track 7, echo)
 

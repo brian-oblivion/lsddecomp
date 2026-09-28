@@ -5,7 +5,7 @@
 #include "VariantSprite.h"
 
 /*
- * StyleEffect -- an Actor the style layer (src/world/ObjMStyleActor.c) places at an
+ * StyleEffect -- an Actor the style layer (src/world/dream_scene.c) places at an
  * offset from the target position and keeps there: every frame it moves to
  * pos + offset, plus however far the viewport's viewpoint has risen or
  * fallen since it was built. Its `kind` picks what it carries (enum
@@ -54,7 +54,7 @@ typedef struct StyleEffectMethods StyleEffectMethods;
 typedef struct StyleEffectParams StyleEffectParams;
 
 /* What each `kind` builds and does per frame (the switches in
- * ObjMStyleActor.c). */
+ * dream_scene.c). */
 typedef enum StyleEffectKind {
     STYLE_EFFECT_MODEL_ROW =
         0, /* model, plus two copies in a row (modelChildren) that spin and drift along z after 500 ticks */
@@ -106,9 +106,9 @@ typedef void (*StyleEffectSetParamsFn)(StyleEffect *self, StyleEffectParams *par
 typedef void (*StyleEffectUpdateFn)(StyleEffect *self, LongVec3 *pos);
 
 extern StyleEffectMethods gStyleEffectMethods;
-extern StyleEffectMethods *GetStyleEffectMethods(void); /* ObjMStyleActor.c; returns &gStyleEffectMethods */
+extern StyleEffectMethods *GetStyleEffectMethods(void); /* dream_scene.c; returns &gStyleEffectMethods */
 
-/* The class's own methods, in address order (src/world/ObjMStyleActor.c).
+/* The class's own methods, in address order (src/world/dream_scene.c).
  * The four marked MATCHING are declared without a prototype. */
 StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *parent,
                              LongVec3 *pos); /* BMemPMgrAlloc(sizeof(StyleEffect)), then ctor */

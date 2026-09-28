@@ -2,7 +2,7 @@
 
 > Renamed from `func_80052F10` on 2026-09-24 (tools/rename.py). Address 0x80052f10.
 
-Unit `src/world/ObjMStyleActor.c`. Round 26, runner delta.
+Unit `src/world/dream_scene.c`. Round 26, runner delta.
 
 ## What it is
 
@@ -200,7 +200,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The onInit override: `world` was IntermediateBase::viewport (NodeGuardedViewport: detachViewChild, attachViewChild), `unk54` the bgm (WBgm setSeq), `pendingOther` the New_TimBlockSrc object (`timBlockSrc`), `unk38` the stage, `unk48` gridSpan (the StageMap's setGridSpan), `unk14` the StageMap (setBounds); `&ctorSound` is RegisterStyleConfig's third argument.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The onInit override: `world` was IntermediateBase::viewport (NodeGuardedViewport: detachViewChild, attachViewChild), `unk54` the bgm (WBgm setSeq), `pendingOther` the New_TimBlockSrc object (`timBlockSrc`), `unk38` the stage, `unk48` gridSpan (the StageMap's setGridSpan), `unk14` the StageMap (setBounds); `&ctorSound` is RegisterStyleConfig's third argument.
 
 ## asm sites
 

@@ -1,7 +1,7 @@
 /*
  * input_dialogs -- two classes, in ROM order: TextEntry whole, then the
  * first half of ItemList (its allocator to detachTarget). ItemList's list
- * methods and its getter follow in ObjMStyleActor.c.
+ * methods and its getter follow in dream_scene.c.
  *
  * A TextEntry (include/TextEntry.h) edits a caller-owned string on screen.
  * setText keeps the caller's buffer and copies it into its own `editBuf`
@@ -474,7 +474,7 @@ TextEntryMethods *GetTextEntryMethods(void) {
  * from: its allocator and ctor, BasicClass's overrides (finalize, child
  * bookkeeping, onNotify), and the view and resource methods resetView,
  * loadResources, releaseResources, attachTarget and detachTarget. Its list
- * methods and GetItemListMethods are in ObjMStyleActor.c.
+ * methods and GetItemListMethods are in dream_scene.c.
  *
  * Like TextEntry it keeps its input and tick children by kind (Pad,
  * FrameClock) and draws through a ScreenSprite panel and TextRows built from

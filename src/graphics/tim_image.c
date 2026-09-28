@@ -13,7 +13,7 @@
  *
  * RotateVramRectRight is not a TimImage method (no method table lists it): it
  * circularly scrolls a VRAM rectangle right, one column at a time, through the
- * draw singleton's moveImage slot, for ObjMStyleActor.c's StyleScrollVramStrips.
+ * draw singleton's moveImage slot, for dream_scene.c's StyleScrollVramStrips.
  */
 #include "common.h"
 #include <libgte.h>

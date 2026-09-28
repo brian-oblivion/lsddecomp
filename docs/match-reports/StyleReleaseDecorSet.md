@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054B50` on 2026-09-23 (tools/rename.py). Address 0x80054b50.
 
-Unit `ObjMStyleActor`. **13/13 words, byte-exact.** First build.
+Unit `dream_scene`. **13/13 words, byte-exact.** First build.
 
 ## What it was
 
@@ -25,7 +25,7 @@ jr $ra
 
 Same one-shot-flag shape as `StyleFlushDecoration`: test `sStyleDecorVariant`, act, then
 clear the flag. `ReleaseBasicClassArray` is already established across the codebase
-(`src/graphics/tmd_renderer.c`, `src/class_3bb8c_o.c`, `src/world/ObjMStyleActor.c`) as
+(`src/graphics/tmd_renderer.c`, `src/class_3bb8c_o.c`, `src/world/dream_scene.c`) as
 `void ReleaseBasicClassArray(void **array, s32 count)`. `sStyleDecorSlots` is plain `.bss`
 (no `.sdata`/`.sbss` dlabel anywhere; resolved via
 `config/undefined_syms_auto.slps01556.lsdde.txt`, confirmed in

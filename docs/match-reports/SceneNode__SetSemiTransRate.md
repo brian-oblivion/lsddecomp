@@ -30,7 +30,7 @@ group; see `SceneNode__SetDisplay.md`).
 
 ## Naming
 
-Round 71 (alpha). `func_8001D3A0` -> `SceneNode__SetSemiTransRate`, **tier A**. Table slot +0x068. Writes the 2-bit field at attribute bits 28-29 (GsAZERO..GsATHREE, the semi-transparency rate) and returns the old value. ObjMStyleActor calls the slot setSemiTransRate.
+Round 71 (alpha). `func_8001D3A0` -> `SceneNode__SetSemiTransRate`, **tier A**. Table slot +0x068. Writes the 2-bit field at attribute bits 28-29 (GsAZERO..GsATHREE, the semi-transparency rate) and returns the old value. dream_scene calls the slot setSemiTransRate.
 
 ## Round 101 (delta): track 7
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_800570B4` on 2026-09-18 (tools/rename.py). Address 0x800570b4.
 
-Unit: `ObjMStyleActor` (round 17). `BaseObjOMethods::slot10` -- the "link"
+Unit: `dream_scene` (round 17). `BaseObjOMethods::slot10` -- the "link"
 half of a buddy-object pair, already named `slot10`
 (`tod_actor.c`/`D800878D4Methods`) and `vtable_DreamSys::slot10`
 (`dream_sys.h`) by two sibling units, both citing this exact function
@@ -85,7 +85,7 @@ half, right after it in ROM order.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__LinkCompanion`. Override of +0x010 (addChild), named for its slot: chains SceneNode's addChild, then records the child as `grid` when its class id & 0xFFF is 0x114 (StageMap, the grid manager) or as `ticker` when id & 0xF is 5 (FrameClock). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__LinkCompanion`. Override of +0x010 (addChild), named for its slot: chains SceneNode's addChild, then records the child as `grid` when its class id & 0xFFF is 0x114 (StageMap, the grid manager) or as `ticker` when id & 0xF is 5 (FrameClock). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, alpha)
 

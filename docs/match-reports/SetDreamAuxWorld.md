@@ -110,7 +110,7 @@ Two independent instances now confirm it in this unit alone
 shared context globals (`sDreamAuxStage`, `sDreamAuxWorld` and three still-
 unnamed siblings), spawns one entity into `sDreamAuxSlots[0].entity` via
 `New_Entity`, then calls `SetTeleportsEnabled`. Called from
-`ObjM__SetupSceneStyle` (`ObjMStyleActor.c`), itself a per-object/per-level setup
+`ObjM__SetupSceneStyle` (`dream_scene.c`), itself a per-object/per-level setup
 routine. "World" reflects `sDreamAuxWorld`'s own established role (cast
 `TriggerWorld*`, dispatched through vtable slots 0x80/0x22 elsewhere in the
 unit) -- but this function's OWN purpose (why these five values, together,
@@ -126,13 +126,13 @@ Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 The third parameter is retyped `s32 a2` -> `DreamSys *world`, and the global
 it is stored in, sDreamAuxWorld, `s32` -> `DreamSys *` (dream_aux.c). Its
-only caller, ObjM__SetupSceneStyle (ObjMStyleActor), passes its DreamSys
+only caller, ObjM__SetupSceneStyle (dream_scene), passes its DreamSys
 `target`; dream_aux calls +0x200 of its table (getDreamColor) and passes
 it as Entity's peer. Byte-identical.
 
 ## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
-Parameters named from the caller (ObjM__SetupSceneStyle, ObjMStyleActor.c,
+Parameters named from the caller (ObjM__SetupSceneStyle, dream_scene.c,
 whose own declaration already says `stage, grid, world, sound, clock`, and
 ObjM.h: unk14 the StageMap, unk10 the FrameClock, TimedTask's sound the
 VabStreamObj): a0..a4 -> stage, stageMap, world, sound, frameClock. The
@@ -147,5 +147,5 @@ The extern comments, as they stood:
 
 ```c
 extern StageMap *D_8008ABFC; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
-extern DreamSys *sDreamAuxWorld; /* the player DreamSys: ObjMStyleActor passes its `target` */
+extern DreamSys *sDreamAuxWorld; /* the player DreamSys: dream_scene passes its `target` */
 ```

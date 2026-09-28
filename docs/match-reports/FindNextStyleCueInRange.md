@@ -108,7 +108,7 @@ Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
 `extern s32 sStyleStage, sStyleCueRecordIndex, sStyleGrid, sStyleCueDistanceTable[];`,
 `extern u8 *sStyleCueRecordLists[], sStyleCueRecordCounts[], sStyleCueOffsets[];` (all already
-declared in `src/world/ObjMStyleActor.c` ahead of this function).
+declared in `src/world/dream_scene.c` ahead of this function).
 
 ### Proposed learning
 
@@ -337,7 +337,7 @@ MATCHED, 111/111.
 
 The `+0x0E8` local view on `sStyleGrid` is StageMap's computeCellOffsets. Locals: `pos`, `outDist`, `target`, `remaining`, `records`, `dx`, `dz`, `grid`.
 
-### Comments moved here from src/world/ObjMStyleActor.c
+### Comments moved here from src/world/dream_scene.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

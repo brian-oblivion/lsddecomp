@@ -17,7 +17,7 @@
  * it turns each box a quarter turn and offsets one face. The last two,
  * TmdModel__AddFirstPrimClut and TmdModel__SetFirstPrimClut, move or set the
  * CLUT id of the model's first primitive (TMD_P_TF3's clut) from a VRAM
- * position; SetStyleEffectSources (ObjMStyleActor.c) calls the second.
+ * position; SetStyleEffectSources (dream_scene.c) calls the second.
  */
 #include "common.h"
 #include <libgte.h>

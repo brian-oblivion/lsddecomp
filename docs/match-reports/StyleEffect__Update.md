@@ -4,7 +4,7 @@
 
 > Renamed from `func_800564F4` on 2026-09-23 (tools/rename.py). Address 0x800564f4.
 
-Unit: `ObjMStyleActor` (round 17 continuation). Increments `self->unk24`
+Unit: `dream_scene` (round 17 continuation). Increments `self->unk24`
 and forwards to `StyleEffect__UpdateByKind` (a plain statement call, not a tail-call
 whose return is forwarded -- the function itself is `void`).
 
@@ -40,7 +40,7 @@ None -- a plain leaf, last of the twenty functions attempted this pass.
 
 `StyleEffect__UpdateByKind` was still `INCLUDE_ASM` when this report was written, so
 its real arity was unknown here. It has since matched (round 44,
-`ObjMStyleActor.c`) as genuinely 2-argument:
+`dream_scene.c`) as genuinely 2-argument:
 `void StyleEffect__UpdateByKind(LinkNode *self, void *arg1)`, and `arg1` is not
 dead -- it is dereferenced (`AddVec3(&local, (Vec3S *)arg1,
 &self->unk58);`) and forwarded live to three further callees in that
@@ -58,11 +58,11 @@ next touches this function or its caller.
 
 ## Naming
 
-**Tier A.** `+0x0EC`, the class's own per-frame slot per ObjMStyleActor.c's banner ("update slot (+0x0EC)"); the body ticks a counter and forwards to `StyleEffect__UpdateByKind` every call, which is what "Update" names.
+**Tier A.** `+0x0EC`, the class's own per-frame slot per dream_scene.c's banner ("update slot (+0x0EC)"); the body ticks a counter and forwards to `StyleEffect__UpdateByKind` every call, which is what "Update" names.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Occupies Actor's +0x0EC `setPendingExtra` slot; kept its name because it is the per-frame update, not a setter. Now declared `(StyleEffect *self, LongVec3 *pos)` and forwards `pos` to StyleEffect__UpdateByKind: its only caller, StyleUpdateEffectSlots (ObjMStyleActor.c), passes the position in $a1 and UpdateByKind reads it, so the "arity-ok" 1-argument call above was the same bytes spelled with the argument implicit. Byte-identical with the argument explicit.
+Occupies Actor's +0x0EC `setPendingExtra` slot; kept its name because it is the per-frame update, not a setter. Now declared `(StyleEffect *self, LongVec3 *pos)` and forwards `pos` to StyleEffect__UpdateByKind: its only caller, StyleUpdateEffectSlots (dream_scene.c), passes the position in $a1 and UpdateByKind reads it, so the "arity-ok" 1-argument call above was the same bytes spelled with the argument implicit. Byte-identical with the argument explicit.
 
 ## Track 7 (2026-09-27, round 96, charlie)
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052598` on 2026-09-24 (tools/rename.py). Address 0x80052598.
 
-Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0; whole-image
+Unit `dream_scene`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py ItemList__CursorDown`: 43/43 words match.
 
 This is vtable slot `+0x088` of `gItemListMethods`; `slot94`/`slot98` are this
@@ -84,7 +84,7 @@ Round 75 (bravo, track 3). `func_80052598` -> `ItemList__CursorDown`, **tier A**
 
 Slot +0x088 (`tools/classtable.py gItemListMethods`). Mirror of CursorUp: bounded by `itemCount`, steps within the window while cursor-top < 3, else scrolls the window down one item. Dispatched by HandleInputCode on code 19.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/dream_scene.c`).
 
 ## Round 99 (delta, track 7)
 

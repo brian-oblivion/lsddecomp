@@ -4,7 +4,7 @@
 
 > Renamed from `func_80053358` on 2026-09-24 (tools/rename.py). Address 0x80053358.
 
-**Unit:** ObjMStyleActor · **Size:** 38 words (0x98 bytes) ·
+**Unit:** dream_scene · **Size:** 38 words (0x98 bytes) ·
 **Status: MATCHED 38/38**, whole-image SHA1 green.
 
 ## What it does

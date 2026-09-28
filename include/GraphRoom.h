@@ -7,7 +7,7 @@
  * GraphRoom -- class id 0x2F130, method table gGraphRoomMethods, a TaskCore
  * subclass (`tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`:
  * nine overrides and one slot of its own). No class derives from it.
- * src/world/ObjMStyleActor.c holds the whole class: allocator, ctor, every
+ * src/world/dream_scene.c holds the whole class: allocator, ctor, every
  * override, ScoreDayLog, and the getter.
  *
  * The name is a reading of its data: reset loads "ETC\HGRAPH.TIM" as the
@@ -92,7 +92,7 @@ extern GraphRoomMethods *GetGraphRoomMethods(void); /* returns &gGraphRoomMethod
  * then plays GameApplication__PlaySpecialDayMovies. */
 #define GRAPHROOM_RESULT_SCORED 2
 
-/* The class's own methods, in ROM order (ObjMStyleActor). */
+/* The class's own methods, in ROM order (dream_scene). */
 GraphRoom *New_GraphRoom(struct DreamSys *dreamSys);
 void GraphRoom__GraphRoom(GraphRoom *self, struct DreamSys *dreamSys);
 void GraphRoom__Reset(GraphRoom *self);

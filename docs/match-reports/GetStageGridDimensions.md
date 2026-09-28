@@ -46,7 +46,7 @@ context beyond the one function.
 **`GetStageGridDimensions`, tier A.** An indexed table accessor, tier A by
 definition (a getter). The body is literally `table[index]` over the same
 table `GetStageGridDimensionsTable` returns, and the one confirmed caller
-(`src/world/ObjMStyleActor.c:346`, `unk14->methods->slotE0(unk14,
+(`src/world/dream_scene.c:346`, `unk14->methods->slotE0(unk14,
 GetStageGridDimensions((s32)self->unk38))`) is consistent with an index
 lookup, agreeing with the name from the body alone.
 

@@ -27,7 +27,7 @@ void *GetStageTextureRecords(s32 index) {
 
 - **Name:** `GetStageTextureRecords`
 - **Tier:** A
-- **Evidence:** tail call of GetStageRecords: the group's first four records are TEXA..TEXD.TIX (the record paths are retail's sRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100); PickStageTexture indexes it and ObjM hands the pick to New_TimBlockSrc (ObjMStyleActor.c).
+- **Evidence:** tail call of GetStageRecords: the group's first four records are TEXA..TEXD.TIX (the record paths are retail's sRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100); PickStageTexture indexes it and ObjM hands the pick to New_TimBlockSrc (dream_scene.c).
 
 ## Naming history
 

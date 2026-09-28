@@ -2,7 +2,7 @@
 
 > Renamed from `func_800544D4` on 2026-09-23 (tools/rename.py). Address 0x800544d4.
 
-**Unit:** ObjMStyleActor · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
+**Unit:** dream_scene · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
 ## What this function does
 
@@ -25,7 +25,7 @@ None -- matched on the first attempt.
 
 ## Provenance
 
-round 15b (2026-09-04), runner echo, second pass on `ObjMStyleActor`
+round 15b (2026-09-04), runner echo, second pass on `dream_scene`
 (the three functions left over the first round's 12-function budget).
 
 ## Naming
@@ -35,4 +35,4 @@ round 15b (2026-09-04), runner echo, second pass on `ObjMStyleActor`
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

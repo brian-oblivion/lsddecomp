@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052644` on 2026-09-24 (tools/rename.py). Address 0x80052644.
 
-**Unit:** ObjMStyleActor · **Size:** 82 words (0x148 bytes)
+**Unit:** dream_scene · **Size:** 82 words (0x148 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). The unit header comment
@@ -124,7 +124,7 @@ Round 75 (bravo, track 3). `func_80052644` -> `ItemList__CreateRows`, **tier A**
 
 Slot +0x08C (`tools/classtable.py gItemListMethods`). Called by ItemList__LoadResources (input_dialogs) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (sItemListRowOriginX, sItemListRowOriginY + 0xA*i), colours it sItemListRowColor, then SetView(..., highlight=1).
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/dream_scene.c`).
 
 ## Round 99 (delta, track 7)
 

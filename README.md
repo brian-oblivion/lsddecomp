@@ -141,7 +141,7 @@ Read each named class's header first; its banner points to the units.
   `src/cd/game_files.c`.
 - **Scene objects.** `SceneNode` is the positioned 3D object, wrapping a
   libgs `GsDOBJ2` and its coordinate system (`src/graphics/scene_node.c`); `Actor`
-  adds movement (`src/world/ObjMStyleActor.c`). `LinkResource`, `ModelData` and `Tod`/`TodSet`
+  adds movement (`src/world/dream_scene.c`). `LinkResource`, `ModelData` and `Tod`/`TodSet`
   (`src/graphics/graphics_resources.c`) load models and TOD animations;
   `TmdModel` (`src/graphics/tmd_model.c`) is one object of a TMD, and
   `SortTmdObject` (`src/graphics/tmd_renderer.c`) turns it into GPU primitives.
@@ -160,13 +160,13 @@ Read each named class's header first; its banner points to the units.
   `StageMap` keeps the seven map chunks around its target loaded, each
   chunk's `PlacementGrid` linked into a lattice of `GridCell`s. `DayTask` runs one day around the
   DreamSys's startDay/endDay (both classes in `src/world/dream_day.c`) and
-  builds an `ObjM` per stage (`src/world/ObjMStyleActor.c`, with the style layer
+  builds an `ObjM` per stage (`src/world/dream_scene.c`, with the style layer
   and `StyleEffect`).
 - **Screens and menus.** `IntermediateBase` runs one attached job to a
   result. `TaskCore` (`src/app/task.c`, with `StreamTask`, `IntermediateBase` and
   `Viewport`) is the base of the menu and screen
   tasks: `StreamTask` (plays one movie), `GraphRoom` (the mood graph,
-  `src/world/ObjMStyleActor.c`) and `TitleMenu`
+  `src/world/dream_scene.c`) and `TitleMenu`
   (`src/ui/title_menu.c`), the START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE
   menu. `TimedTask`, IntermediateBase's other subclass, is the base of
   `DayTask` and `ObjM`. The 2D pieces are `Sprite` and its subclasses (`src/graphics/sprite.c`,
@@ -175,7 +175,7 @@ Read each named class's header first; its banner points to the units.
 - **Memory-card saves.** `TitleMenu` owns a `TaskObjF`, the save/load
   controller (both in `src/ui/title_menu.c`): a state machine over the
   BIOS memory-card calls, which shows its choices in an `ItemList` scrolling
-  list (`src/ui/input_dialogs.c` and `src/world/ObjMStyleActor.c`).
+  list (`src/ui/input_dialogs.c` and `src/world/dream_scene.c`).
 - **CD and data sources.** `FileResource` is the base of every class loaded
   from a file; its file interface is bound at run time to the active driver: `CdDriver`
   (`src/cd/cd_driver.c`: blocking file access, the CD request queue, its state

@@ -29,14 +29,14 @@ rather than API.
   see it.
 - **SoundCueSet.** `InitSoundCueSet`, `FlushSoundCueSet`,
   `ServiceSoundCueSet` have three spellings each (dream_sys.c:72-73, 497;
-  entity.c:298-299, entity.h:310-311; ObjMStyleActor.c:1782, 1893, 1903);
+  entity.c:298-299, entity.h:310-311; dream_scene.c:1782, 1893, 1903);
   the definitions take `(VabStreamObj *, SoundCueSet *)`. Declare once in
   SoundCueSet.h.
 - **game_files.** No header. `GetStageMapChunkRecord`/`...XY` are declared
-  `s32`/`void` in ObjMStyleActor.c:462-473 but return `FilePathRecord *`
+  `s32`/`void` in dream_scene.c:462-473 but return `FilePathRecord *`
   (game_files.c:317, 322); `ObjM__GetGridRecord` is declared void and "returns"
   through $v0. `PickSoundBank` returns `s32` for a path (game_files.c:203),
-  `PickStageBgm` likewise (ObjMStyleActor.c:525). `RecPick{group,sub}` and
+  `PickStageBgm` likewise (dream_scene.c:525). `RecPick{group,sub}` and
   dream_sys.h's `CinematicCall{bank,entry}` are one packed pair, repacked by
   hand at game_shell.c:80, 317. Add game_files.h.
 - **Full-width SJIS helpers.** `DecodeFullWidthSjis` is `u8 *(u8 *, u8 *)`
@@ -110,7 +110,7 @@ rather than API.
     markers; `TickColorFade`/`TickFadeColor` are fade in/out; `Tick` runs on
     confirm; `RefreshViewValue` finishes.
   - IntermediateBase `unk10`/`unk14` are the frameClock and lightRig (about
-    20 casting sites in ObjMStyleActor.c); `onTag1Notify`/`onNotifyTag1`,
+    20 casting sites in dream_scene.c); `onTag1Notify`/`onNotifyTag1`,
     `onState2`/`onState3` are the DrawSystem event and start/stop hooks, and
     task.c uses literal 2/3 where `INTERMEDIATEBASE_STATE_START/STOP` exist.
   - `SelectCallback80/98`, `LOOK_CALLBACK_SLOT14C/150` (named for offsets).
@@ -195,7 +195,7 @@ so merge by hand, one commit per type, the accessors from the compiler.
   item may edit game_files.c/h for it; `GetSpecialDayOrEventRecord` stays
   unprototyped, see its MATCHING line); IntermediateBase's `frameClock` /
   `lightRig` are still `BasicClass *`, so about 20 casts in
-  ObjMStyleActor.c remain.
+  dream_scene.c remain.
 - **ui/sound/psyq:** src/psyq/libsnd_ssinit_libapi_counter.c defines the
   root counters (`SetRCnt`, `GetRCnt`, `StartRCnt`, `StopRCnt`,
   `ResetRCnt`) with types that conflict with kernel.h, so it cannot include

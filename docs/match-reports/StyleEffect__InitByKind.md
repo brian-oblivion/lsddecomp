@@ -4,7 +4,7 @@
 
 > Renamed from `func_80056520` on 2026-09-23 (tools/rename.py). Address 0x80056520.
 
-**Unit:** ObjMStyleActor · **Round:** 44 (2026-09-15)
+**Unit:** dream_scene · **Round:** 44 (2026-09-15)
 
 ## Provenance
 
@@ -56,7 +56,7 @@ void StyleEffect__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
 }
 ```
 
-Declarations added to `src/world/ObjMStyleActor.c` (kept regardless of any other
+Declarations added to `src/world/dream_scene.c` (kept regardless of any other
 function's match state):
 
 ```c
@@ -94,7 +94,7 @@ green).
   multiple-independent-local-views convention).
 - **Two functions called here (`StyleEffect__BuildRandomSprites`, `StyleEffect__SpawnPlainSprites`) are defined
   with a NARROWER real prototype than this call site uses** (`StyleEffect__BuildRandomSprites`
-  takes only `self`; `StyleEffect__SpawnPlainSprites` — defined in `ObjMStyleActor.c` — takes
+  takes only `self`; `StyleEffect__SpawnPlainSprites` — defined in `dream_scene.c` — takes
   only `this`). Retail's own call sites still set up a dead second argument
   register for both. Reproduced with old-style (unprototyped) `extern void
   func_X();` declarations local to this file, which suppress the
@@ -134,7 +134,7 @@ the wrong function.
 
 Round 70 (alpha). `func_80056520` -> `StyleEffect__InitByKind`, **tier B**.
 
-Only caller is the class's ctor `StyleEffect__StyleEffect` (ObjMStyleActor.c), with the
+Only caller is the class's ctor `StyleEffect__StyleEffect` (dream_scene.c), with the
 ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(sStyleEffectViewport + 0x18)`
 into sStyleEffectBaseViewY; `AttachWithRotScale(self, parent, pos + offset,
 rotation, scale)`; for kind < 2, `SceneNode__LinkModel(self,
@@ -145,7 +145,7 @@ StyleEffect__PlaceModelChildren(self, 0), 2 -> StyleEffect__BuildRandomSprites,
 
 The class: every function here runs on a gStyleEffectMethods instance.
 `New_StyleEffect` allocates 0x98 bytes (where `sprites[5]` ends) and passes a
-kind 0..3 as its first argument (ObjMStyleActor.c passes 0, 1, 2, 3 at its
+kind 0..3 as its first argument (dream_scene.c passes 0, 1, 2, 3 at its
 four call sites); `StyleEffect__StyleEffect` (table +0x008, the ctor) stores it at
 +0x054. `StyleEffect` is the table-address class name, the
 `SceneNode`/`TodActor` convention.
@@ -156,9 +156,9 @@ StyleEffect__UpdateByKind; only this unit references it).
 
 ### Field and slot names in this unit's local view (applied, round 70)
 
-`LinkNode` and `LinkNodeMethods` are defined only in `src/world/ObjMStyleActor.c`,
+`LinkNode` and `LinkNodeMethods` are defined only in `src/world/dream_scene.c`,
 so the compiler's accessor list after renaming the definition was entirely in
-this unit (every `has no member` error was in src/world/ObjMStyleActor.c, all fixed; build and `tools/check-nonmatching.sh`
+this unit (every `has no member` error was in src/world/dream_scene.c, all fixed; build and `tools/check-nonmatching.sh`
 green). `typedef struct LinkNode StyleEffect;` was added for the owner's
 method signatures; zero bytes changed.
 
@@ -167,7 +167,7 @@ method signatures; zero bytes changed.
 | +0x014 | unk14 | coord2 | B | scene_node.h maps SceneNodeObj +0x14 to GsDOBJ2.coord2; `*coord2 = 0` is its flg |
 | +0x020 | unk20 | model | A | SceneNode__LinkModel stores its 2nd argument here; PlaceModelChildren hands it to each child |
 | +0x024 | unk24 | tick | B | StyleEffect__SetParams zeroes it, StyleEffect__Update (slot +0x0EC) increments it before every update |
-| +0x054 | unk54 | kind | B | ctor stores New's first argument, 0..3 at the four ObjMStyleActor.c call sites; three switches on it |
+| +0x054 | unk54 | kind | B | ctor stores New's first argument, 0..3 at the four dream_scene.c call sites; three switches on it |
 | +0x058 | unk58 | offset | B | added to the caller's position in Init and Update |
 | +0x064 | unk64 | rotation | B | passed as updateRotation's data |
 | +0x068 | unk68 | scale | B | passed as updateScale's data |
@@ -193,7 +193,7 @@ different object (captured by SetStyleEffectSources) whose class is unknown.
 
 For the HEAD, by type scope; none applied here (other units' views).
 
-- `ObjMStyleActor.c` `Obj876FC` (same object): `unk24` -> `tick` (B, same
+- `dream_scene.c` `Obj876FC` (same object): `unk24` -> `tick` (B, same
   evidence as above: zeroed by StyleEffect__SetParams, incremented by StyleEffect__Update);
   `unk54` -> `kind` (B); `block58` -> `params` (B: the 0x24-byte block this
   unit reads as offset/rotation/scale/modelChildLayout/tableIndex/color/
@@ -204,14 +204,14 @@ For the HEAD, by type scope; none applied here (other units' views).
 
 ## Track 4b (2026-09-25, round 85)
 
-`sStyleEffectTmd`/`sStyleEffectTim`/`sStyleEffectViewport` were `s32` in ObjMStyleActor.c and
-`D_8008ACA4Obj *`/`void *`/`void *` in ObjMStyleActor.c. Both units now
+`sStyleEffectTmd`/`sStyleEffectTim`/`sStyleEffectViewport` were `s32` in dream_scene.c and
+`D_8008ACA4Obj *`/`void *`/`void *` in dream_scene.c. Both units now
 declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `SetStyleEffectSources` calls the same slot by. Byte-identical; no new `-Wall`
 warning.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+dream_scene.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
 
 ## Track 6 (round 93, bravo)
 
@@ -268,9 +268,9 @@ Viewport's `refView.vp.y`, see below.)
 
 - `*(s32 *)((u8 *)sStyleEffectViewport + 0x18)` is
   `((Viewport *)sStyleEffectViewport)->refView.vp.y`: the pointer is
-  StyleSceneRefs::viewport, a `Viewport *` (ObjMStyleActor.c passes it to
+  StyleSceneRefs::viewport, a `Viewport *` (dream_scene.c passes it to
   SetStyleEffectSources), and +0x018 is `refView` (+0x014) `.vp.y` (+0x004)
-  in include/Viewport.h. The extern stays `void *` because ObjMStyleActor.c
+  in include/Viewport.h. The extern stays `void *` because dream_scene.c
   declares it so (proposed to the head: retype both).
 - Locals: `local` -> `placed` (pos + offset), `state` -> `kind` (it is
   `pendingExtra`, the StyleEffectKind), `ret` -> `model` (setBackClip's

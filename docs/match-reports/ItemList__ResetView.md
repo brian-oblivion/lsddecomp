@@ -32,5 +32,5 @@ Trivial three-field reset, an unrelated field group from `ItemList__ClearCachedR
 
 Renamed from `ItemList__ResetCounters`: the three words it zeroes are
 `topIndex`, `column` and `cursorIndex` (+0x020..+0x028, named from
-ObjMStyleActor's accessors), the trio ItemList__SetView sets. They are
+dream_scene's accessors), the trio ItemList__SetView sets. They are
 the list's view position, not counters.

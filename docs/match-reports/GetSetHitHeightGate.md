@@ -52,7 +52,7 @@ pattern held for a 3rd, unrelated unit.
     documented stall), where `sHitHeightGate == 0 || outWord >= 0x201` gates
     whether a `TmdModel__RaycastFaces` result is accepted -- and `TmdModel__RaycastFaces` is
     unidentified Psy-Q, so what is being accepted is unknown. The only
-    known writer is `ObjMStyleActor.c`'s `ObjM__InitStyleAndWorld`, which passes a
+    known writer is `dream_scene.c`'s `ObjM__InitStyleAndWorld`, which passes a
     flag it computes as "this stage/mode value is 3, 5 or 6" -- a flag
     whose own meaning that unit does not establish either.
   - Naming it would mean choosing between "a precision/threshold mode", "a
@@ -77,7 +77,7 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * established, so there is no noun to put in the name: its only known
  * reader is SceneNode__RaycastHullAgainstFaces (SceneNode), where `sHitHeightGate == 0 || outWord
  * >= 0x201` gates accepting a hit, and its only known writer is
- * ObjMStyleActor.c's ObjM__InitStyleAndWorld, which passes a flag derived from a
+ * dream_scene.c's ObjM__InitStyleAndWorld, which passes a flag derived from a
  * stage/mode value of 3, 5 or 6. Two call sites, neither naming the thing.
  * sHitHeightGate keeps its placeholder name for the same reason. */
 ```

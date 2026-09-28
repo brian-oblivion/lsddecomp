@@ -4,7 +4,7 @@
 
 > Renamed from `func_80053ACC` on 2026-09-24 (tools/rename.py). Address 0x80053acc.
 
-Unit: `src/world/ObjMStyleActor.c`. Originally stalled by echo (round 16), CLOSED by
+Unit: `src/world/dream_scene.c`. Originally stalled by echo (round 16), CLOSED by
 bravo (round 19) via the permuter. `./build-and-verify.sh` green,
 byte-exact (verified directly against `disk/SLPS_015.56` at
 `0x442CC-0x443E8`, independent of the whole-image SHA1 which was still red
@@ -74,7 +74,7 @@ live when 12+ manual attempts have already covered order/shape/polarity.
 
 # Prior state (round 16-18), preserved for context
 
-Unit: `src/world/ObjMStyleActor.c`. Runner: echo, round 16. `INCLUDE_ASM` restored;
+Unit: `src/world/dream_scene.c`. Runner: echo, round 16. `INCLUDE_ASM` restored;
 `./build-and-verify.sh` green.
 
 ## Signature
@@ -130,7 +130,7 @@ void ObjM__EnterTimeUp(Obj87034_3bb8c_l *self) {
   question, not the struct layout.
 - All literal values (`unk20=4`, mask `&3`, case values 0/4/7, `arg3`
   0xA/5, the trailing `1`/`0`) are confirmed against the raw bytes.
-- `ObjM__StartFadeUp` (the sibling-unit helper from `ObjMStyleActor`, matched by
+- `ObjM__StartFadeUp` (the sibling-unit helper from `dream_scene`, matched by
   echo round 15) is called TWICE in source -- once at the end of the
   `ret==0`+switch path, once for the `ret!=0` path -- not once after a
   shared if/else. This was itself a finding: see "the two-call lever" below.
@@ -304,12 +304,12 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_80053ACC` | `ObjM__EnterTimeUp` | B | see below |
 
-**Evidence.** vtable slot +0x094. Sets `self->phase = 4`. The state-code numbering is confirmed, not guessed: sibling unit ObjMStyleActor already established `ObjM__EnterLinkFlashback`/`ObjM__EnterLinkTunnel`/`ObjM__EnterLinkStageTimer` for the SAME field on the SAME class, and this unit's own `ObjM__OnDreamSysNotify` dispatches codes 0xA..0x11 onto exactly the same run of vtable slots (+0x094..+0x0AC) that these three functions occupy, so 4/5/6 continue that one numbering.
+**Evidence.** vtable slot +0x094. Sets `self->phase = 4`. The state-code numbering is confirmed, not guessed: sibling unit dream_scene already established `ObjM__EnterLinkFlashback`/`ObjM__EnterLinkTunnel`/`ObjM__EnterLinkStageTimer` for the SAME field on the SAME class, and this unit's own `ObjM__OnDreamSysNotify` dispatches codes 0xA..0x11 onto exactly the same run of vtable slots (+0x094..+0x0AC) that these three functions occupy, so 4/5/6 continue that one numbering.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
 
 ## Round 95 (track 7, echo)
 

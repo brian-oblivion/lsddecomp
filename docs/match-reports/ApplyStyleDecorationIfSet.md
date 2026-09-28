@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054660` on 2026-09-23 (tools/rename.py). Address 0x80054660.
 
-Unit `ObjMStyleActor`. **45/45 words, byte-exact.** Reopened, never attempted
+Unit `dream_scene`. **45/45 words, byte-exact.** Reopened, never attempted
 before this round.
 
 ## What it does
@@ -141,15 +141,15 @@ Zero bytes (whole-image SHA1 green, 0 new typeview warnings).
 
 Evidence: `sStyleSceneRefs` (0x8008AC7C, an `s32` in every unit) is
 RegisterStyleConfig's third argument, which ObjM__InitStyleAndWorld
-(ObjMStyleActor) passes as `&self->ctorSound`: it points at ObjM's
+(dream_scene) passes as `&self->ctorSound`: it points at ObjM's
 +0x06C..+0x07B block (include/ObjM.h's banner). The holder's +0x00C is
 therefore ObjM::cachedViewport, a NodeGuardedViewport, and +0x0AC of its
 table is Viewport's `getFadeBox` (include/Viewport.h, `SceneNode *(*)(Self *)`)
--- ObjM.h's banner already said so. ObjMStyleActor.c had the same block as
+-- ObjM.h's banner already said so. dream_scene.c had the same block as
 `StyleSceneRefs {sound, dreamerTmd, etcTim, Viewport *viewport}`; this unit
 now carries the identical view (`typeviews.py --merge StyleSceneRefs`: 2
 views, 0x10, 0 conflicts). Tier A for the type (it names what the pointer
-is, established from the one writer); the name is ObjMStyleActor's, not new.
+is, established from the one writer); the name is dream_scene's, not new.
 
 Not applied (outside the edit set): hoisting `StyleSceneRefs` into one
 shared header (ObjM.h, beside the block it views) and dropping both unit

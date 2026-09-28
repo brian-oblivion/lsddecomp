@@ -2,7 +2,7 @@
 
 > Renamed from `Class879C4__Update` on 2026-09-26 (tools/rename.py). Address 0x80057f38.
 
-Unit: `src/world/ObjMStyleActor.c`. Address 0x80057f38. `jr $ra; nop`: splat
+Unit: `src/world/dream_scene.c`. Address 0x80057f38. `jr $ra; nop`: splat
 matched it itself, so there is no derivation.
 
 ## Naming

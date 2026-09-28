@@ -4,7 +4,7 @@
 
 > Renamed from `func_80058404` on 2026-09-24 (tools/rename.py). Address 0x80058404.
 
-Unit `ObjMStyleActor`. Byte-exact. Genuinely fresh ground — no prior
+Unit `dream_scene`. Byte-exact. Genuinely fresh ground — no prior
 attempt, no inherited verdict, no preserved body (this round's fourth
 pass incorrectly named `GraphRoom__BuildGraphPoints` as the fresh one; see that
 function's own report for the correction — this is the one that actually
@@ -39,7 +39,7 @@ several places:
 ```c
 /* +0x0E0, called by this unit's own GraphRoom__PopulateGraphPoints as (self, arg1) -- the
  * FIRST thing that function does, before touching anything else. */
-/* (added to D_8006E730Methods, see include comment in src/world/ObjMStyleActor.c) */
+/* (added to D_8006E730Methods, see include comment in src/world/dream_scene.c) */
 
 /* +0x0C4, called by this unit's own GraphRoom__PopulateGraphPoints as (self, arg1, &point,
  * 0), where `point` is a 2-word {x, y}-shaped local. */

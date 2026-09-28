@@ -233,9 +233,9 @@ runner/round rather than re-deriving the structure.
 **`StyleFillEffectKind0`, tier B.**
 
 Fills `arg1` slots of `sStyleEffectSlots` by repeatedly calling
-`ObjMStyleActor.c`'s `New_StyleEffect` (New_X for the `Obj876FC` class) with a
+`dream_scene.c`'s `New_StyleEffect` (New_X for the `Obj876FC` class) with a
 literal FIRST argument of `0`. That argument is confirmed (by reading
-`New_StyleEffect`'s own ctor chain, `ObjMStyleActor.c`) to become the new
+`New_StyleEffect`'s own ctor chain, `dream_scene.c`) to become the new
 object's `kind` field -- so "Kind0" in the name is the literal tag value
 this function passes, not a guessed category. Selects which of two
 "spawn-parameter" setup functions (`SetupStyleSpawnParamsRandom`/`B`) to call each
@@ -260,7 +260,7 @@ Note: the offset-y pick is `rand() % 5`, and 0 means "let SetupStyleSpawnParamsR
 
 Locals: `slots`, `count`, `pos`, `offsetY`, `setup`.
 
-### Comments moved here from src/world/ObjMStyleActor.c
+### Comments moved here from src/world/dream_scene.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

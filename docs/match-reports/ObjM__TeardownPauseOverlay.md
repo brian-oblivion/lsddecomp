@@ -2,7 +2,7 @@
 
 > Renamed from `func_800543FC` on 2026-09-23 (tools/rename.py). Address 0x800543fc.
 
-**Unit:** ObjMStyleActor · **Size:** 54 instructions · **Status:** MATCHED (54/54 words)
+**Unit:** dream_scene · **Size:** 54 instructions · **Status:** MATCHED (54/54 words)
 
 ## Context
 
@@ -59,7 +59,7 @@ field types were in place.
 
 ## Provenance
 
-round 15b (2026-09-04), runner echo, second pass on `ObjMStyleActor`.
+round 15b (2026-09-04), runner echo, second pass on `dream_scene`.
 
 ## Naming
 
@@ -68,4 +68,4 @@ round 15b (2026-09-04), runner echo, second pass on `ObjMStyleActor`.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Holders now typed: pauseText (TextRow release), sound (VabStreamObj unmute), bgm (WBgm resume), unk10 (FrameClock resume), viewport (NodeGuardedViewport setDrawEnabled).
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Holders now typed: pauseText (TextRow release), sound (VabStreamObj unmute), bgm (WBgm resume), unk10 (FrameClock resume), viewport (NodeGuardedViewport setDrawEnabled).

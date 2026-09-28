@@ -2,7 +2,7 @@
 
 > Renamed from `func_800542D0` on 2026-09-23 (tools/rename.py). Address 0x800542d0.
 
-**Unit:** ObjMStyleActor · **Size:** 75 instructions · **Status:** MATCHED (75/75 words)
+**Unit:** dream_scene · **Size:** 75 instructions · **Status:** MATCHED (75/75 words)
 
 ## Context
 
@@ -99,7 +99,7 @@ it into `self->unk80 = state + 1; return;` for clarity, verified to
 score identically.
 
 Nothing in this unit calls `ObjM__AdvancePauseSetup` (still uncalled within
-`ObjMStyleActor`), so there is no caller evidence either way about the
+`dream_scene`), so there is no caller evidence either way about the
 return type -- the toolchain fact above (only `void` reproduces the
 byte sequence) IS the evidence.
 
@@ -127,7 +127,7 @@ constant needing yet another phrasing.
 
 ## Provenance
 
-round 15b (2026-09-04), runner echo, second pass on `ObjMStyleActor`.
+round 15b (2026-09-04), runner echo, second pass on `dream_scene`.
 Permuter transcript and the 18 reproducers referenced above were run
 in this session; the reproducers themselves were scratch files under
 `/tmp`, not preserved.
@@ -139,7 +139,7 @@ in this session; the reproducers themselves were scratch files under
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Holders now typed: pauseText (+0x07C, TextRow: attachToParent, setColor), etcTim (+0x074, New_TextRow's font), viewport (NodeGuardedViewport setDrawEnabled), unk10 (FrameClock pause), bgm (WBgm pause), sound (VabStreamObj mute).
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Holders now typed: pauseText (+0x07C, TextRow: attachToParent, setColor), etcTim (+0x074, New_TextRow's font), viewport (NodeGuardedViewport setDrawEnabled), unk10 (FrameClock pause), bgm (WBgm pause), sound (VabStreamObj mute).
 
 ## Track 7 (2026-09-27, round 98, delta)
 

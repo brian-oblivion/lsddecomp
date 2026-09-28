@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057618` on 2026-09-19 (tools/rename.py). Address 0x80057618.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys`. Plain internal helper --
+Unit: `src/world/dream_scene.c`. Class: `DreamSys`. Plain internal helper --
 not a vtable slot itself (checked all 6 method tables reachable from this
 unit's addresses with `tools/classtable.py`, no hit).
 
@@ -57,4 +57,4 @@ tools/funcdiff.py Actor__MoveOrFindNearbyLink   # 20/20
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__ApplyOffsetOrFindNearby`. Clears linkTarget, runs the move it is handed, and when the move did not set linkTarget searches the grid (Actor__FindNearbyLink). Reached only from +0x0D0/+0x0D4. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__ApplyOffsetOrFindNearby`. Clears linkTarget, runs the move it is handed, and when the move did not set linkTarget searches the grid (Actor__FindNearbyLink). Reached only from +0x0D0/+0x0D4. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
