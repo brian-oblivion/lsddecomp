@@ -492,7 +492,7 @@ func_8002CD08(...)`), and `DreamSys__StopDrift` calls the sibling
 `PlacementGridVabSound.c`) to tear the same cue set down. A field literally named
 `cueServiceActive` gating the call is about as direct as tier-A evidence
 gets: this is the "service" (per-tick) half of the cue-set's start/stop
-pair, `FlushSoundCueSet` the "flush"/stop half. `include/DreamSys.h` and
+pair, `FlushSoundCueSet` the "flush"/stop half. `include/dream_sys.h` and
 `include/entity.h` both already carried a stale `func_8002CD08/
 FlushSoundCueSet` cross-reference from an earlier round's guess that this
 was the SAME function as `FlushSoundCueSet` -- it is not (confirmed: they
@@ -576,7 +576,7 @@ reset to -1/0/0x7F/0x40, +0x10 zeroed, callback(owner, set), +0x04
 incremented), FlushSoundCueSet (slot +0x0 through stopVoice, +0x00
 cleared), Entity__GetProximityRatio (+0x14 divisor), the Entity__MoodCueNN
 handlers (+0x04, +0x10, slot 0 +0x4..+0x10, slot 1/2 +0x4/+0x8),
-ObjMStyleActor's StyleCueNN `self` (the same offsets) and DreamSys.h's
+ObjMStyleActor's StyleCueNN `self` (the same offsets) and dream_sys.h's
 `SoundCueCallbackArg` (+0x00 == tag 1, +0x04 % 20, slot 0/1 +0x4/+0x8).
 
 Names, tier A, each from what its readers do:
@@ -603,7 +603,7 @@ a pitch offset (that is what setPitchOffset computes from it). `tick` and
 `callback` is typed `SoundCueCallbackFn`, `void (*)(void *owner,
 SoundCueSet *set)`; InitSoundCueSet's parameter takes that type and its
 first parameter is `sound` (it is unused). The three functions have no
-shared prototype: entity.h, DreamSys.c and ObjMStyleActor.c declare them
+shared prototype: entity.h, dream_sys.c and ObjMStyleActor.c declare them
 with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.

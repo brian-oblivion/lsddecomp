@@ -36,7 +36,7 @@ own offset 0 (a value, not the `FieldAC7CHolder.unkC` field
 pointer, kept as its own independent local reading rather than importing
 that unit's type). The offset-0 value is passed as `FlushSoundCueSet`'s `self`
 argument, matching that function's existing loose declaration in
-`include/entity.h`/`include/DreamSys.h` (`extern void FlushSoundCueSet(s32
+`include/entity.h`/`include/dream_sys.h` (`extern void FlushSoundCueSet(s32
 arg0, void *arg1);`) -- each caller already carries its own local reading of
 `self`'s real type, so this unit does the same rather than pulling in
 `ObjDA34`.

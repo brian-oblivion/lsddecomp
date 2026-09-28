@@ -43,5 +43,5 @@ The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_800870
 ## Track 7 (2026-09-27, round 98, delta)
 
 `OBJM_STATE_LINK_STAGE_TIMER` for 0xA, `DREAM_COLOR_BLACK` for the zero
-mask, `MOVE_CALLBACK_TICK_DRIFT` for selectCallback98's 2 (DreamSys.h's
+mask, `MOVE_CALLBACK_TICK_DRIFT` for selectCallback98's 2 (dream_sys.h's
 existing enum), `MOVE_OVERRIDE_HELD` for setMoveOverride's 2. Zero bytes.

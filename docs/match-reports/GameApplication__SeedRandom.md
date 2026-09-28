@@ -111,7 +111,7 @@ GameApplicationFileResource.c still says "advances the day cursor": that is trac
 
 ## Track 7 polish (round 100, echo)
 
-Body changes, all byte-identical: *(s32 *)0x1F800000 % 365 -> *(s32 *)getScratchAddr(0) % DAYS_PER_YEAR (libetc.h's macro; DreamSys.h); the SeedAndRandom extern returns s32, as defined (GameFiles.c).
+Body changes, all byte-identical: *(s32 *)0x1F800000 % 365 -> *(s32 *)getScratchAddr(0) % DAYS_PER_YEAR (libetc.h's macro; dream_sys.h); the SeedAndRandom extern returns s32, as defined (GameFiles.c).
 
 ### History: code_1677c.c comments before the round-100 polish
 

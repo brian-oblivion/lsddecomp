@@ -5,7 +5,7 @@
 > Renamed from `func_80057C7C` on 2026-09-19 (tools/rename.py). Address 0x80057c7c.
 
 Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0EC`
-(base-class-inherited; `include/DreamSys.h` already named this slot in an
+(base-class-inherited; `include/dream_sys.h` already named this slot in an
 earlier commit this round).
 
 ## Body

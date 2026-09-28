@@ -821,7 +821,6 @@
       "status": "open",
       "units_done": {
         "DayTaskStageMap": "2026-09-23",
-        "DreamSys": "2026-09-22",
         "FlatLightObj": "2026-09-25",
         "GameApplicationFileResource": "2026-09-24",
         "GameFiles": "2026-09-25",
@@ -847,6 +846,7 @@
         "cd_stream": "2026-09-25",
         "draw_system": "2026-09-25",
         "dream_aux": "2026-09-21",
+        "dream_sys": "2026-09-22",
         "entity": "2026-09-19",
         "libcard_card": "2026-09-23",
         "libcd_bios": "2026-09-23",
@@ -915,7 +915,7 @@
         "gDreamSysMethods": {
           "class": "DreamSys",
           "date": "2026-09-26",
-          "header": "include/DreamSys.h"
+          "header": "include/dream_sys.h"
         },
         "gEntityMethods": {
           "class": "Entity",
@@ -1553,7 +1553,6 @@
       "status": "auto",
       "units_done": {
         "DayTaskStageMap": "2026-09-27",
-        "DreamSys": "2026-09-26",
         "FlatLightObj": "2026-09-28",
         "GameApplicationFileResource": "2026-09-27",
         "GameFiles": "2026-09-27",
@@ -1579,6 +1578,7 @@
         "cd_stream": "2026-09-27",
         "draw_system": "2026-09-28",
         "dream_aux": "2026-09-27",
+        "dream_sys": "2026-09-26",
         "entity": "2026-09-27",
         "libsnd_vmanager": "2026-09-27",
         "main": "2026-09-28",

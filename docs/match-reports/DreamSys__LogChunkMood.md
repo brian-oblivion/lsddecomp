@@ -23,7 +23,7 @@ void DreamSys__LogChunkMood(DreamSys *this, PlayerSpawnPoint *currentPos)
 `GetMoodFromStageChunk`'s second parameter is `StageChunk *`
 (`{s8 column; s8 row;}`), which is byte-layout-identical to
 `PlayerSpawnPoint`'s own leading `MapChunk` member -- the cast is exact,
-not approximate. Added `#include "StageGrid.h"` to `DreamSys.h` for this
+not approximate. Added `#include "StageGrid.h"` to `dream_sys.h` for this
 (the only cross-unit include this unit needed this round).
 
 ## Provenance

@@ -32,7 +32,7 @@ tree it gives 2/2 words with the whole-image SHA1 verifying.
 
 Scoring note: the head's first pass at rescoring these 14 bodies read numbers
 from a build that had failed to compile (the spliced file was missing echo's
-`#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
+`#include "dream_sys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
 
@@ -46,7 +46,7 @@ its purpose; what was missing in round 66 was a name for the field. The one
 caller, `DayTask__DayTask` (src/world/DayTaskStageMap.c), passes `self->etcTim` --
 the `TimImage` it has just loaded, uploaded and freed the buffer of -- right after
 handing the DreamSys its sound object through `setSoundObj`. The field
-(`unk_0x64` until this round, renamed `etcTim` in include/DreamSys.h; its only
+(`unk_0x64` until this round, renamed `etcTim` in include/dream_sys.h; its only
 accessors are this setter and `DreamSys__DreamSys`, which clears it) is typed
 `s32` because nothing in the DreamSys ever dereferences it. Slot +0x114 is still
 `slot114`: its accessor is in src/world/DayTaskStageMap.c, outside this job, so the slot

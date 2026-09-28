@@ -35,7 +35,7 @@
 #include "scene_node.h"
 #include "ModelData.h"
 #include "TriggerWorld.h"
-#include "DreamSys.h"
+#include "dream_sys.h"
 #include "StageMap.h"
 #include <rand.h>
 

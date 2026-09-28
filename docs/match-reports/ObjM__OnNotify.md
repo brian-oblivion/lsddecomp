@@ -92,7 +92,7 @@ The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_800870
 
 ## Round 99 (delta, track 7)
 
-The class ids are named in each class's own header, read off the tables' word +0x000 (`plan.py classes`): `STAGEMAP_CLASS_ID` 0x114 (include/StageMap.h), `FADEBOX_CLASS_ID` 0x164 (include/FadeBox.h), `DREAMSYS_CLASS_ID` 0x1F34 (include/DreamSys.h). The masks stay literal (three nibbles, four nibbles), as Actor.h's and Pad.h's comments spell them.
+The class ids are named in each class's own header, read off the tables' word +0x000 (`plan.py classes`): `STAGEMAP_CLASS_ID` 0x114 (include/StageMap.h), `FADEBOX_CLASS_ID` 0x164 (include/FadeBox.h), `DREAMSYS_CLASS_ID` 0x1F34 (include/dream_sys.h). The masks stay literal (three nibbles, four nibbles), as Actor.h's and Pad.h's comments spell them.
 
 ## Proposed field names
 

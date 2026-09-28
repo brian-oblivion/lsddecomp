@@ -32,7 +32,7 @@
 #include <libgs.h>
 #include <libetc.h>
 #include "GameApplication.h"
-#include "DreamSys.h"
+#include "dream_sys.h"
 #include "LinkResource.h"
 #include "TaskCore.h"
 #include "StreamTask.h"

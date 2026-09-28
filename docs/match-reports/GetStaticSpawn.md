@@ -119,7 +119,7 @@ special handling needed, consistent with the already-documented
 "alignment-2 struct assignment compiles to `lwl`/`lwr`+`swl`/`swr`" pattern
 (CLAUDE.md).
 
-`sLinkTriggerIndex` was already declared in `include/DreamSys.h` from earlier
+`sLinkTriggerIndex` was already declared in `include/dream_sys.h` from earlier
 rounds' call-site analysis; no header changes needed.
 
 ## Verification

@@ -50,4 +50,4 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 ## Track 7 (2026-09-27, round 97, delta)
 
-`playSound(0x10)` is written `playSound(1 << 4)`: VabStreamObj__PlayTone's index is `program << 4 | tone` (SoundCueSet.h, DreamSys.h), so VAB program 1, tone 0, spelt as TitleMenuTaskObjF spells its own. Zero bytes changed.
+`playSound(0x10)` is written `playSound(1 << 4)`: VabStreamObj__PlayTone's index is `program << 4 | tone` (SoundCueSet.h, dream_sys.h), so VAB program 1, tone 0, spelt as TitleMenuTaskObjF spells its own. Zero bytes changed.

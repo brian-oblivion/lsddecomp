@@ -37,7 +37,7 @@
 #include "VabStreamObj.h"
 #include "Pad.h"
 #include "FadeBox.h"
-#include "DreamSys.h"
+#include "dream_sys.h"
 #include "StageMap.h"
 #include "NodeGuardedViewport.h"
 #include "TimBlockSrc.h"
@@ -3226,7 +3226,7 @@ VariantSpriteMethods *GetVariantSpriteMethods(void) {
  * implementations are reached through GetTaskCoreMethods() with `self`
  * upcast. */
 
-/* DreamSaveBlock, the save block GraphRoom plots, is include/DreamSys.h's. */
+/* DreamSaveBlock, the save block GraphRoom plots, is include/dream_sys.h's. */
 
 GraphRoom *New_GraphRoom(struct DreamSys *dreamSys) {
     GraphRoom *obj = BMemPMgrAlloc(sizeof(GraphRoom));

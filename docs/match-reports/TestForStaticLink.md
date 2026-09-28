@@ -59,7 +59,7 @@ four once someone gets to them.
 
 round 2026-08-30-c, runner ALPHA, unit DreamSys (whole-unit second pass).
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

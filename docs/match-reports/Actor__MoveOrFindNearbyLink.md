@@ -30,7 +30,7 @@ void Actor__MoveOrFindNearbyLink(DreamSys *self, void (*callback)(DreamSys *, s3
 ```
 
 Zeroes `self->unk_0x28` (already typed `DreamSysUnk28Target *` in
-`include/DreamSys.h`), invokes the passed-in callback with `(self, val,
+`include/dream_sys.h`), invokes the passed-in callback with `(self, val,
 extra)`, then -- only if the callback did NOT set `unk_0x28` back to
 non-NULL -- calls `Actor__FindNearbyLink` (this unit's own, still queued at the
 time this was written; see its own report).

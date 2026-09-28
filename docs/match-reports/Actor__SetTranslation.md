@@ -6,8 +6,8 @@
 
 Unit: `ObjMStyleActor` (round 17). One-line wrapper: `Actor__UpdateTranslation(self, 1,
 arg1)`. Already named `Actor__SetTranslation` at `vtable_DreamSys` `+0x0B8` in
-`DreamSys.h`, typed `void (*Actor__SetTranslation)(DreamSys *this, void *arg1)`
-there (a looser reading than this unit's own, since DreamSys.h only needed
+`dream_sys.h`, typed `void (*Actor__SetTranslation)(DreamSys *this, void *arg1)`
+there (a looser reading than this unit's own, since dream_sys.h only needed
 the call site's own arity, not this function's real body).
 
 ## Final source

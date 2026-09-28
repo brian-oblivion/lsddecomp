@@ -1,12 +1,12 @@
-#ifndef DREAMSYS_H
-#define DREAMSYS_H
+#ifndef DREAM_SYS_H
+#define DREAM_SYS_H
 
 /*
  * DreamSys -- the dream in progress (class id 0x1F34, method table
  * gDreamSysMethods, getter GetDreamSysMethods): an Actor subclass
  * (include/Actor.h); no class derives from it. The ctor calls Actor's first
  * (DreamSys__DreamSys: GetActorMethods()->ctor), so the id parent is the
- * ctor-chain parent. Every method is in src/world/DreamSys.c. One instance, made
+ * ctor-chain parent. Every method is in src/world/dream_sys.c. One instance, made
  * by GameApplication__GameApplication (src/app/GameApplicationFileResource.c, New_DreamSys) and kept in
  * GameApplication::dreamSys; the same object is GraphRoom::dreamSys, the
  * `target` ObjMStyleActor hands SetDreamAuxWorld (dream_aux's
@@ -137,7 +137,7 @@ extern s32 *gpDinamicLinkPenalty;
    and either STORES them into the object's rotation vector (flag != 0) or
    ADDS them modulo a full turn (flag == 0). Every constant this unit hands
    that slot is a Ratio16[3]: see sRotationYaw180 / Plus45 / Minus45 and
-   sCardinalRotations (src/world/DreamSys.c). */
+   sCardinalRotations (src/world/dream_sys.c). */
 
 typedef struct {
     MoodGraphPoint lastMood;
@@ -204,7 +204,7 @@ typedef struct {
 } FlashbackEntry;
 
 /* DreamSys::viewport is a Viewport (include/Viewport.h; tag only here,
-   DreamSys.c includes the header). This class moves its GsRVIEW2 refView:
+   dream_sys.c includes the header). This class moves its GsRVIEW2 refView:
    +0x014 vp and +0x020 vr (the two "points"
    ProjectPointAtDistance interpolates between), +0x018 vp.y and +0x024
    vr.y (AdvanceMoveCycle's view bob moves both; StepLookOffset, StopDrift
@@ -214,7 +214,7 @@ typedef struct {
 struct Viewport;
 
 /* DreamSys::soundObj is a VabStreamObj (include/VabStreamObj.h; tag only
-   here, DreamSys.c includes the header). StartVoice / ExecuteLink call playTone (+0x080; the voice
+   here, dream_sys.c includes the header). StartVoice / ExecuteLink call playTone (+0x080; the voice
    it returns goes to voiceIndex), StopVoice calls stopVoice (+0x084), and
    StartVoice calls setPitchOffset (+0x09C). */
 
@@ -228,7 +228,7 @@ struct TimImage;
    child. */
 
 /* Actor::grid is the grid manager, StageMap (include/StageMap.h);
-   DreamSys.c includes that header and calls it directly. */
+   dream_sys.c includes that header and calls it directly. */
 
 /* DreamSys's base class is Actor (include/Actor.h): DreamSys's own methods
    reach the base implementations through GetActorMethods() and upcast. */
@@ -458,7 +458,7 @@ typedef struct DreamSaveBlock {
 
 /* Called by DreamSys__TryStaircaseLink with no argument setup; its return
    value indexes sStaircaseTickFns. Defined after its caller in
-   src/world/DreamSys.c. */
+   src/world/dream_sys.c. */
 extern s32 GetLastSpawnExtra(void);
 
 typedef enum DreamColors {
@@ -620,7 +620,7 @@ extern DreamSysMethods gDreamSysMethods;
    TestForInstantTeleporters, each of which forwards its own three args
    straight through and appends a fixed trailing quadruple (length table,
    trigger table, spawn table, literal 1); every call site tests the result
-   with `bltz`. Defined after those callers in src/world/DreamSys.c. */
+   with `bltz`. Defined after those callers in src/world/dream_sys.c. */
 extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
                           s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
 

@@ -34,7 +34,7 @@ void TodActor__DetachFromParent(TodActor *self)
 Matched on the direct translation, no reshaping.
 
 `self->unk0C`'s name and gating role echo `DreamSys`'s own `unk_0xC` gate
-field (`include/DreamSys.h`) — both classes share the same intermediate
+field (`include/dream_sys.h`) — both classes share the same intermediate
 base `gActorMethods`, so a coincidence at the same low offset is plausible,
 but nothing here proves the two fields are the same base-class field
 rather than each subclass's own; noted, not claimed.

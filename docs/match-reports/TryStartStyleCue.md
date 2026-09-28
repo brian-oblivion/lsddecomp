@@ -51,7 +51,7 @@ extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4)
 `InitSoundCueSet` is defined in `src/sound/PlacementGridVabSound.c`
 (`s32 InitSoundCueSet(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32
 arg4)`); this call site only needs `void *`/`s32` at the ABI level (matches
-the looser local signatures `entity.c` and `DreamSys.c` already use for the
+the looser local signatures `entity.c` and `dream_sys.c` already use for the
 same cross-unit call, per the multiple-independent-local-views convention).
 `sStyleSceneRefs` is redeclared fresh here (not reusing the copy later in this
 file for `FlushStyleCue`/`ServiceStyleCueIfNear`) because this function's ROM

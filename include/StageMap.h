@@ -65,7 +65,7 @@
  * after tracking) adds it to every cell's scale until the count runs out,
  * and endScaleRamp sets every cell back to 1/1.
  *
- * Descriptor10 has the shape of DreamSys.h's PlayerSpawnPoint (chunk
+ * Descriptor10 has the shape of dream_sys.h's PlayerSpawnPoint (chunk
  * col/row, tile col/row, s16 x/y/z): DreamSys__WallLink copies
  * getCurrentCellKey's result into its linkCoordinates whole. The two are
  * not one type: this class reads the leading bytes signed

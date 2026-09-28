@@ -134,7 +134,7 @@ with the identical `index >= 0` test.
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
-`include/DreamSys.h`'s `DreamSysUnk58`/`DreamSysUnk58Vtable` view is deleted.
+`include/dream_sys.h`'s `DreamSysUnk58`/`DreamSysUnk58Vtable` view is deleted.
 `DreamSys::soundObj` is cast to `VabStreamObj *` (`include/VabStreamObj.h`),
 and the slots are called by the class's names: `slot0x80` -> `playTone`
 (`VabStreamObj__PlayTone`: index = program << 4 | tone, then vol and

@@ -35,7 +35,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <strings.h>
-#include "DreamSys.h"
+#include "dream_sys.h"
 #include "scene_node.h"
 #include "Actor.h"
 #include "Viewport.h"

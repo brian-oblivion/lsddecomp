@@ -50,7 +50,7 @@ needed to find this; reading the disassembly's tail directly (delay slot after
 the final `jalr` flows straight into the `lw $ra`/epilogue, no `move $v0,...`
 anywhere) made it obvious before writing any C.
 
-## New knowledge (all `include/DreamSys.h`)
+## New knowledge (all `include/dream_sys.h`)
 
 - **`DreamSysBaseMethods` (this unit's local view of the shared `gActorMethods`
   base table) gets a new slot at `+0x008`: `ctor`.** Cross-confirmed against
@@ -99,7 +99,7 @@ DreamSysCtorArgObj/DreamSysCtorArgMethods view is gone and the call is
 first TmdModel, added as a child). `unk_0x60`, the ctor slot's and
 New_DreamSys's parameter are typed `struct LinkResource *`. Byte-identical.
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 
@@ -107,7 +107,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
 /* DreamSys -- the object that IS a dream in progress: it owns the dream
  * clock, the player-ish body that walks around the stage, the mood record
  * that decides the next day's dream, and the "link" (teleport) machinery
- * that ends one stage and starts another. See include/DreamSys.h for the
+ * that ends one stage and starts another. See include/dream_sys.h for the
  * class as a whole; several of its methods live in sibling units
  * (ObjMStyleActor/t/r/o) because the class spans more than one segment.
  *
@@ -161,7 +161,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
   "ETC\DREAME5.TMD" -- as its child.
 - Field `DreamSys::unk_0x60` -> `modelSource` (tier A: its one writer is this
   ctor, storing that LinkResource; nothing reads it back). Every accessor is in
-  src/world/DreamSys.c.
+  src/world/dream_sys.c.
 
 ## History (moved from include/DreamSys.h, round 102)
 

@@ -52,14 +52,14 @@ Deliberately NOT called `TickFall` or `TickRise`: this unit never establishes wh
 way +Y points, so the name says "drift" and the comment says "+512 on the Y
 axis".
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 
 ```c
 /* libsnd_vmanager's SoundCueSet service pair, as this unit calls them
    (DreamSys__TickDrift / DreamSys__StopDrift: (soundObj, soundCueSet)).
-   Moved here from DreamSys.h in track 4 (round 88): entity.h declares the
+   Moved here from dream_sys.h in track 4 (round 88): entity.h declares the
    same functions with `void *` parameters, and a unit including both
    headers would see conflicting types. */
 ```

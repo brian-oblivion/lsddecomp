@@ -242,7 +242,7 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 - **Naming: `D_80087BD4` -> `sGraphScoreMoods`** (tier B: the mechanics are certain, what the game makes of these four moods is not). Four `.data` halfwords `0x01FF, 0x0101, 0x0000, 0xFD00`, i.e. MoodGraphPoint `(dynamic, upper)` = (-1, 1), (1, 1), (0, 0), (0, -3). This function is its only user. Declared `MoodGraphPoint[GRAPH_SCORE_MOOD_COUNT]` and compared by `.value`; `targets`/`days` are `MoodGraphPoint *`. Zero bytes changed.
 - `GRAPH_SCORE_MOOD_COUNT` (4, unit-local): the table's length, this loop's bound, matchedDayIndices' allocation and TickHighlight's bound.
-- `limit`'s 100s are `ARRAY_COUNT(self->points)`; the wrap index 0x16C is `DAYS_PER_YEAR - 1` (DreamSys.h). Locals: `p` -> `targets`, `idx` -> `day`, `j` -> `dot`, `found` -> `matches`.
+- `limit`'s 100s are `ARRAY_COUNT(self->points)`; the wrap index 0x16C is `DAYS_PER_YEAR - 1` (dream_sys.h). Locals: `p` -> `targets`, `idx` -> `day`, `j` -> `dot`, `found` -> `matches`.
 - The source comments below were replaced by a function comment and a one-line `MATCHING:` note. Verbatim as they stood (with the step-1/3 renames already applied):
 
 ```c

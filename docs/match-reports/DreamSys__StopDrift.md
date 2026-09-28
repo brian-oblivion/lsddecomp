@@ -32,7 +32,7 @@ reproduces this directly; no need for a delay-slot-mimicking trick.
 
 `FlushSoundCueSet` was already declared in `entity.h` for a different struct's
 fields (`extern void FlushSoundCueSet(s32 arg0, void *arg1);`); added the same
-declaration locally to `DreamSys.h` rather than cross-including `entity.h`.
+declaration locally to `dream_sys.h` rather than cross-including `entity.h`.
 
 ## Provenance
 

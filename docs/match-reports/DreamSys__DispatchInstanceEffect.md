@@ -18,13 +18,13 @@ offsets involved and the class-id constant being compared.
 to `Actor__OnActorLinkCommand`, out of this unit's scope. `this->vt->slot0x1E8` resolves
 (via `tools/classtable.py gDreamSysMethods`) to
 `DreamSys__InstanceEffectsOnJournal` -- already forward-declared in
-`include/DreamSys.h` and already has a real body pending as
+`include/dream_sys.h` and already has a real body pending as
 `DreamSys__InstanceEffectsOnJournal` (`INCLUDE_ASM` elsewhere in this file).
 
 The vtable's own field name at `+0x1E8` was a stale placeholder,
 `InstanceEffectsOnPlayer` -- it never matched the actual symbol
 (`DreamSys__InstanceEffectsOnJournal`, confirmed by `tools/classtable.py`
-and already used as the `INCLUDE_ASM` name in `src/world/DreamSys.c`). Corrected
+and already used as the `INCLUDE_ASM` name in `src/world/dream_sys.c`). Corrected
 in this round; no call site referenced the old name, so this is a plain
 fix, not a rename requiring an out-of-scope edit.
 

@@ -19,7 +19,7 @@
  * GameApplication__RunTask(New_GraphRoom, self->dreamSys, ...), so the ctor's
  * one argument, kept at +0x0A4, is the game's DreamSys. Its +0x1B0 is
  * DreamSys__GetSaveBlock, which returns &saveMagic; this unit reads that
- * block as DreamSaveBlock (include/DreamSys.h: +0x004 currentYear, +0x008
+ * block as DreamSaveBlock (include/dream_sys.h: +0x004 currentYear, +0x008
  * currentDay, +0x018 moodPreviousDays[365], the same offsets as DreamSys's
  * fields from saveMagic at DreamSys +0x178).
  *

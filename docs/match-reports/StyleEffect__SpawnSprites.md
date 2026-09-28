@@ -63,14 +63,14 @@ Per CLAUDE.md's own recipe for exactly this signature (`cmp -l` +
 cmp -l build/SLPS_015.56 disk/SLPS_015.56 | head
 #  8073 304 270   (1-based; vram = (8073-1) - 0x800 + 0x80010000 = 0x80011788)
 grep -n 80011788 build/lsdde.map
-#  .rodata  0x80011788  0xe4  build/src/DreamSys.c.o
+#  .rodata  0x80011788  0xe4  build/src/dream_sys.c.o
 ```
 
 The build was also 12 bytes (505868 vs 505856) LARGER than retail overall.
 Since `.rodata` links before `.text` project-wide, a 12-byte GROWTH anywhere
 early enough shifts every subsequent address, including unrelated units'
 `.rodata` — which is exactly what the map showed, even though nothing in
-this session touched `DreamSys.c.o` or its rodata. The actual cause was
+this session touched `dream_sys.c.o` or its rodata. The actual cause was
 local: `LinkNode *sn = self;` added ONE extra callee-saved register to
 `StyleEffect__SpawnSprites`'s own prologue (bigger `-0x30` frame vs retail's `-0x28`),
 growing THIS function by exactly 12 bytes/3 words and cascading forward

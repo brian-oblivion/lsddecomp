@@ -287,7 +287,7 @@ segments:
       # standalone rodata object cannot resolve them and the link dies. The
       # dot form plus `migrate_rodata_to_functions` puts each table in the same
       # .s as the switch that uses it, where the label is in scope.
-      - [0x1F88, .rodata, world/DreamSys]
+      - [0x1F88, .rodata, world/dream_sys]
       # Jump tables for code_4cd08's switches -- its words point at
       # `.L8005....` labels inside that unit's functions, so it must be
       # attached (the yaml's inherited `# greyman` guess was wrong about
@@ -1738,7 +1738,7 @@ segments:
       # are STRINGS referenced by symbol, which a standalone rodata object
       # resolves fine (the 0xA8C precedent), so no attach is expected; the
       # slice owns no `jtbl_` reference either.
-      - [0x48F74, c, world/DreamSys]
+      - [0x48F74, c, world/dream_sys]
       - [0x4CD08, c, world/dream_aux]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
       # one runner may own a unit. Carved in slices; the remainder stays

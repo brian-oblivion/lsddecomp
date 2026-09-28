@@ -153,7 +153,7 @@ queue).
 
 - **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (sTunnelEnterHeadings/sTunnelExitHeadings here); called from DreamSys__TryTunnelLink.
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 
@@ -170,7 +170,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
    separately-referenced `sCardinalAngles` -- splat drew the boundary there
    because `sCardinalAngles` is independently referenced, not because the
    underlying data is two different tables. Round 66 types it
-   `RotationRatios` (include/DreamSys.h) rather than as a stride-only
+   `RotationRatios` (include/dream_sys.h) rather than as a stride-only
    placeholder: every entry is three {numerator, denominator} degree ratios
    in exactly the form SceneNode__UpdateRotation consumes, and the four entries' yaw
    numerators are 0, 0x5A, 0xB4, 0x10E -- 0, 90, 180 and 270 degrees. That is

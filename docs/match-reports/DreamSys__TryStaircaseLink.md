@@ -44,7 +44,7 @@ them kept the early-return guard structure and varied only things inside
 it (`if/else` vs `goto` spell the same CFG, and both leave the label).
 
 Header note, not acted on (shared header, comment-only): the
-`PlayerSpawnGridPos` comment in `include/DreamSys.h` says retail copies
+`PlayerSpawnGridPos` comment in `include/dream_sys.h` says retail copies
 the two halves separately; it copies them as one `PlayerSpawnPoint`. A
 union of `PlayerSpawnPoint staircaseSpawn` over `staircaseGridPos` /
 `staircaseOrigin` would remove the cast; the `DreamSys__TickStaircaseCase*`
@@ -250,7 +250,7 @@ a decompilation error.
 
 ## New struct/vtable knowledge committed alongside this round
 
-All in `include/DreamSys.h`:
+All in `include/dream_sys.h`:
 
 - **`DreamSys::unk_0x910` retyped `s32` -> `s32 (*)(struct DreamSys *this)`**
   (a function pointer, called through directly, `0` used as its "unset"
@@ -269,7 +269,7 @@ All in `include/DreamSys.h`:
 - **`extern s32 (*sStaircaseTickFns[4])(DreamSys *this)`** -- a table of the four
   already-matched `s32 (DreamSys *this)` functions `DreamSys__TickStaircaseYawPlus90`/
   `DreamSys__TickStaircaseYawMinus135`/`DreamSys__TickStaircaseYawPlus45`/`DreamSys__TickStaircaseYawMinus90`, confirmed by their own
-  existing definitions in `src/world/DreamSys.c`.
+  existing definitions in `src/world/dream_sys.c`.
 - **`extern s32 TestForStaircaseNodes(...)`** and **`extern s32
   DreamSys__CheckStaircaseHeading(...)`** forward/call-site prototypes added near the
   existing `DreamSys__CheckTunnelHeading` one (same 3-arg shape; `DreamSys__CheckStaircaseHeading` is
@@ -542,7 +542,7 @@ expression."
 
 - **Tier B.** STALL (still INCLUDE_ASM). Wraps TestForStaircaseNodes and DreamSys__CheckStaircaseHeading, and on success wires up the DreamSys__TickStaircaseYawPlus90..3 dispatch via GetLastSpawnExtra, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink.
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

@@ -16,7 +16,7 @@ with C's round-toward-zero `%`, not `& 1` — see below).
 Called from `TryDreamAuxTrigger` as `CheckTriggerDayParity(thirdParam, candidateRecord)`
 where `candidateRecord` comes from `LookupDreamAuxTrigger`, one of this unit's
 stage-table lookups (6-byte-stride records, same size as `StageSpawn` /
-`StaticLinkTrigger` in `include/DreamSys.h`, but the field this function reads
+`StaticLinkTrigger` in `include/dream_sys.h`, but the field this function reads
 is loaded with `lb` — a SIGNED byte — while both of those structs' offset-2
 field is an unsigned `MapTile`. Under `-funsigned-char` a signed load only
 happens for an explicit `s8` field, so this is either a third, still-unnamed

@@ -77,7 +77,7 @@ try the other form before reaching for anything else. (Measured here: 19/20 vs
 **`GetMoodFromStageChunk`, tier A.** Inherited from lsddecomp, confirmed: the
 body is exactly "given a stage and a chunk, return that chunk's mood point",
 which is what the name says, and the one call site outside this unit,
-`src/world/DreamSys.c:1460` inside `DreamSys__LogChunkMood` (`mood =
+`src/world/dream_sys.c:1460` inside `DreamSys__LogChunkMood` (`mood =
 GetMoodFromStageChunk(this->currentStage, (StageChunk *)currentPos);`, whose
 result is immediately logged via `LogMood`), passes the player's current
 stage and position and reads back a mood value, agreeing with the name.
@@ -87,7 +87,7 @@ Confirmed, not renamed.
 own data read confirms the STRUCT is 8 bytes and that the third field exists
 (entry 0's third word is `1`, entry 1's is `0`), but no code anywhere in
 `src/` reads `isVertical` — `columns` and `rows` are the only fields any
-function in this unit or `DreamSys.c` accesses, so there is no accessor to
+function in this unit or `dream_sys.c` accesses, so there is no accessor to
 check the name against. It stays an inherited hypothesis, recorded rather
 than confirmed; see `## Proposed field names` below.
 

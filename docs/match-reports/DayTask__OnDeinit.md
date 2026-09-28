@@ -42,7 +42,7 @@ void DayTask__OnDeinit(Obj865C8 *self) {
 
 `SubObjA` is an opaque, minimally-typed view (vtable pointer at offset 0,
 only the two slots this function dispatches through named) -- same policy as
-`DreamSysEntityObj` in `include/DreamSys.h`. Nothing here identifies which
+`DreamSysEntityObj` in `include/dream_sys.h`. Nothing here identifies which
 concrete class `subA` points to; both slot numbers exceed `gDayTaskMethods`'s own
 33-slot table, so it is a genuinely different class, not a self-dispatch.
 

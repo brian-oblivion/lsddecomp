@@ -7,7 +7,7 @@
 ## What it does
 
 A one-line accessor: index into the `s16 sStageTimeLimits[]` table (already
-declared in `include/DreamSys.h:1059`) and return the time limit for a given
+declared in `include/dream_sys.h:1059`) and return the time limit for a given
 stage.
 
 ```c

@@ -67,7 +67,7 @@ shared header.
 
 round 43, runner ALPHA, unit DreamSys.
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

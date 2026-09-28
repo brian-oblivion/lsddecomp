@@ -6,7 +6,7 @@
  * and every chunk owns one MoodGraphPoint in a row-major per-stage table
  * (sStageChunkMoods: one pointer per stage, to sStage00ChunkMoods ..
  * sStage13ChunkMoods). GetMoodFromStageChunk and GetStageChunkFromMood
- * convert between a chunk and its mood value; DreamSys (src/world/DreamSys.c) is
+ * convert between a chunk and its mood value; DreamSys (src/world/dream_sys.c) is
  * the only caller of either, reading the mood of the player's current chunk
  * (DreamSys__LogChunkMood) and finding the stage and chunk that own a given
  * mood value to choose a spawn point (GenerateInitialSpawn).

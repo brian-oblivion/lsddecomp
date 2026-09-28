@@ -35,7 +35,7 @@ void DreamSys__InitMoodContributors(DreamSys *this, MoodGraphPoint *special)
 - `this->vt->LogMood`: vtable slot `+0x208`, immediately after
   `ClearMoodGraph` in both the disassembly (`0x204` then `0x208`) and the
   already-declared `vtable_DreamSys` struct order in
-  `include/DreamSys.h` -- no new typing needed, just confirms the existing
+  `include/dream_sys.h` -- no new typing needed, just confirms the existing
   declaration's slot position is right.
 
 No new fields, no new slots. Matched on the first attempt.

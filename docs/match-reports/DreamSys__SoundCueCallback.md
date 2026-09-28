@@ -92,7 +92,7 @@ void DreamSys__SoundCueCallback(void *arg0, Func8005A1F4Arg *arg1)
 
 This is byte-exact (25/25), confirmed with the real oracle
 (`./build-and-verify.sh` exits 0, whole-image SHA1 matches). Landed in
-`src/world/DreamSys.c` in place of the `INCLUDE_ASM`.
+`src/world/dream_sys.c` in place of the `INCLUDE_ASM`.
 
 ### Proposed learning
 

@@ -73,7 +73,7 @@ The two-sided window tests are written as the single unsigned comparison
 what retail has here (`addiu` of the negated low bound followed by `sltiu`).
 Writing them as `x >= LO && x <= HI` produces the two-branch form instead.
 
-## New struct and symbol knowledge (`include/DreamSys.h`)
+## New struct and symbol knowledge (`include/dream_sys.h`)
 
 All of this came in with the salvaged tree and is part of the match:
 

@@ -41,7 +41,7 @@
 #include "WBgm.h"
 #include "TimImage.h"
 #include "FrameClock.h"
-#include "DreamSys.h"
+#include "dream_sys.h"
 #include "LinkResource.h"
 #include "ObjM.h"
 #include "Actor.h"

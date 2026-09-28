@@ -22,7 +22,7 @@ still needed a name.
 **StreamTask__NoOpSlot88** -- tier A. An intentionally empty vtable-slot
 override; the mechanics ARE the whole purpose (do nothing when this slot is
 dispatched). Matches the `Class__NoOpSlotNN` convention already established
-in this codebase for the identical shape (`DreamSys.h`'s
+in this codebase for the identical shape (`dream_sys.h`'s
 `DreamSys__NoOpSlotE8Default`/`Actor__NoOpSlotD8`, `Task.h`'s
 `TextRow__NoOpGetCell`/`TextRow__NoOpSlotD0`).
 

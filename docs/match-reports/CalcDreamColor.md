@@ -256,7 +256,7 @@ observable side effect, which changes scheduling/reload behavior enough
 to move the residue -- but it is not a claim about the retail source; the
 real declaration (`typedef enum DreamColors {...} DreamColors;`, used as
 this function's return type everywhere else it's referenced, e.g.
-`src/world/DreamSys.c`'s two call sites) has no `volatile` anywhere in this
+`src/world/dream_sys.c`'s two call sites) has no `volatile` anywhere in this
 codebase. Rejected as a different function, not a match.
 
 ### One candidate at 135 is legitimate C and UNTRIED in the real build
@@ -285,7 +285,7 @@ attempt's 610... note: attempt 3's kept form above is actually the
 610-scoring BASE for this permuter run, i.e. the intermediate-pointer
 split alone was not enough; THIS candidate adds the `p`-then-`entry`
 indirection on top of it). Per this round's "do not start anything new"
-instruction, it was NOT applied to `src/world/DreamSys.c` or verified against
+instruction, it was NOT applied to `src/world/dream_sys.c` or verified against
 `build-and-verify.sh` this round -- flagging it here as the concrete next
 manual attempt rather than a fresh blind permuter search.
 
@@ -480,7 +480,7 @@ the preserved body live in place of `INCLUDE_ASM` and rebuilt --
 byte-identical **28/35 words, zero address drift**, matching this report's
 title exactly (last measured round 49; unchanged). No compile errors.
 Reverted, then placed the body under `#ifdef NON_MATCHING ... #else
-INCLUDE_ASM ... #endif` in `src/world/DreamSys.c`, written in its plain form (no
+INCLUDE_ASM ... #endif` in `src/world/dream_sys.c`, written in its plain form (no
 byte-shaped constructs to strip -- the kept body never needed a
 `do {...} while(0)` or similar). `./build-and-verify.sh` green (whole-image
 SHA1 unchanged) and `tools/check-nonmatching.sh` green. This body is
@@ -490,7 +490,7 @@ permuter output.
 
 NON_MATCHING body promoted, round 70.
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

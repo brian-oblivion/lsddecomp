@@ -7,11 +7,11 @@
 > Renamed from `func_80057C14` on 2026-09-19 (tools/rename.py). Address 0x80057c14.
 
 Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0E0`
-in the shared base table `gActorMethods` (`include/DreamSys.h`'s
+in the shared base table `gActorMethods` (`include/dream_sys.h`'s
 `DreamSysBaseMethods::slot0xE0` already carried a comment naming this
 exact function as its resolution). Not overridden at the top `DreamSys`
 level, which instead has its own distinct `+0xE0` implementation
-(`DreamSys__WallLink`, `LinkWall` in `include/DreamSys.h`).
+(`DreamSys__WallLink`, `LinkWall` in `include/dream_sys.h`).
 
 ## Signature
 

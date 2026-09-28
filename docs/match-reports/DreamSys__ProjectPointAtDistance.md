@@ -8,7 +8,7 @@ Closed round 19 (second pass, runner delta) from a mid-attempt snapshot that
 did not even compile. History below in arrival order; read this section
 first.
 
-## Final body (landed in `src/world/DreamSys.c`)
+## Final body (landed in `src/world/dream_sys.c`)
 
 ```c
 extern void SceneNode__LocalOffsetToWorldPos(void *self, s32 *dst, s32 *src, s32 arg4);
@@ -48,7 +48,7 @@ tolerance)` -- 5 parameters, the 5th (`tolerance`) passed on the stack
 confirmed against the O32 ABI's arithmetic: frame is `-0x38`, +0x10 for the
 reserved a0-a3 spill slots = 0x48). The project's own vtable slot
 (`vtable_DreamSys::DreamSys__ProjectPointAtDistance`) was declared with only 4 params before
-this round; corrected in `include/DreamSys.h` (function-pointer prototype
+this round; corrected in `include/dream_sys.h` (function-pointer prototype
 only, no struct-size change -- verified safe since `gDreamSysMethods`
 itself is not yet a C data definition anywhere, so nothing could break from
 the signature edit).
@@ -59,7 +59,7 @@ the signature edit).
 global scratch vector. The other two words were NOT independently named --
 splat's dlabel boundary put them inside `sVoicePitchBySelect`'s dlabel as unlabeled
 tail bytes (`asm/data/783DC.data.s`), because nothing took their address
-directly until this function. Declared in `include/DreamSys.h` as
+directly until this function. Declared in `include/dream_sys.h` as
 `extern s32 sProjectOffsetZ;` (unchanged type -- it really is a lone word by
 itself); the vector's start is reached with pointer arithmetic off it,
 `(s32 *)&sProjectOffsetZ - 2`, since renaming/resegmenting `sVoicePitchBySelect`'s dlabel
@@ -265,7 +265,7 @@ carry `position` fields, and the z component of a local offset -- a distance.
 Tier B: the computation is certain, what the projected point is FOR is not (it has
 no carved caller; the vtable slot is +0x120).
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

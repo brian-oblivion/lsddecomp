@@ -140,4 +140,4 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 7 (round 94, delta)
 
-`getDreamColor(...) == 5` is `DREAM_COLOR_PINK` (DreamSys.h's DreamColors, the slot's declared return type). `program = -2` is `SOUND_CUE_STOP`. `state = 100` is this handler's own non-zero phase (banner convention). A comment explains `moodTimer = -1` (Entity__TickSoundCue counts it back to 0). Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs and `state` phases (hex remains only for masks). Byte-identical (whole image green).
+`getDreamColor(...) == 5` is `DREAM_COLOR_PINK` (dream_sys.h's DreamColors, the slot's declared return type). `program = -2` is `SOUND_CUE_STOP`. `state = 100` is this handler's own non-zero phase (banner convention). A comment explains `moodTimer = -1` (Entity__TickSoundCue counts it back to 0). Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs and `state` phases (hex remains only for masks). Byte-identical (whole image green).

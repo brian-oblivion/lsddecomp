@@ -147,7 +147,7 @@ extern TitleMenuMethods *GetTitleMenuMethods(void); /* returns &gTitleMenuMethod
 extern void StampSaveTitleDay(s32 day);
 
 /* The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock),
- * which UpdateFlashbackLock reads, is DreamSaveBlock in include/DreamSys.h. */
+ * which UpdateFlashbackLock reads, is DreamSaveBlock in include/dream_sys.h. */
 
 /* The class's own methods, in ROM order (src/ui/TitleMenuTaskObjF.c). */
 TitleMenu *New_TitleMenu(struct DreamSys *dreamSys);

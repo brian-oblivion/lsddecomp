@@ -40,7 +40,7 @@ Byte-exact on the first attempt, whole-image build verified.
 ## Notes
 
 `InitSoundCueSet`'s own match report (in `PlacementGridVabSound.c`) already established
-its real signature; DreamSys.c's own extern (`InitSoundCueSet(s32, void *,
+its real signature; dream_sys.c's own extern (`InitSoundCueSet(s32, void *,
 s32, DreamSys *, void *)`) is the same function called with a different
 unit's own local `arg3` type -- per project convention, this file's own
 extern types `arg3` as `Entity *` instead, matching the "multiple

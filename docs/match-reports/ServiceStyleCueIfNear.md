@@ -41,7 +41,7 @@ dereference for `self`, same `&arg0->unk14` embedded sub-object -- and
 returns 1; otherwise returns 0 (retail's own `ServiceSoundCueSet` return value,
 if any, is discarded and overwritten by the explicit `ori $v0,$zero,0x1`
 right after the call, consistent with `ServiceSoundCueSet`'s existing
-`void`-returning declaration in `include/entity.h`/`include/DreamSys.h`).
+`void`-returning declaration in `include/entity.h`/`include/dream_sys.h`).
 
 ```c
 extern s32 IsStyleCueNear(ObjN14 *arg0, void *arg1);
@@ -71,7 +71,7 @@ itself -- not this unit's to name, per track 3's "do not rename a Sony
 symbol" analog for a cross-unit function this unit only calls) on the slot's
 `cueSet`, and returns 1; otherwise returns 0. `ServiceSoundCueSet` is read here
 as "stop" by the established pairing with `FlushSoundCueSet`/`InitSoundCueSet`
-(init/flush/stop triad) documented in `include/entity.h`/`include/DreamSys.h`,
+(init/flush/stop triad) documented in `include/entity.h`/`include/dream_sys.h`,
 which is cross-unit evidence, not a single-call-site guess. MATCHED,
 18/18, first build.
 

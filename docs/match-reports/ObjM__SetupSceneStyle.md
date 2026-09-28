@@ -176,7 +176,7 @@ Comment history moved from the unit's externs:
 > dream_aux.c's (MATCHED round 43); no header declares it. `world` is the
 > DreamSys it installs as sDreamAuxWorld (track 4, round 88).
 
-> GetStageGridDimensions comes from include/StageGrid.h, through DreamSys.h.
+> GetStageGridDimensions comes from include/StageGrid.h, through dream_sys.h.
 
 > The StageMap's accepted tags (setAcceptedTags), an opaque .data block
 > (asm/data/76DC8.data.s) reached by address.

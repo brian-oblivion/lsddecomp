@@ -30,7 +30,7 @@
  * gDreamSysMethods are DreamSys__GetLinkCommandFlag,
  * DreamSys__ProjectPointAtDistance, DreamSys__GetCurrentDayAndYear,
  * DreamSys__GetDreamColor and DreamSys__ResetFlashbackList. The units that
- * call it include include/DreamSys.h and cast `peer` (TodActor's field,
+ * call it include include/dream_sys.h and cast `peer` (TodActor's field,
  * typed TodActor *) to DreamSys *. Entity's attachToParent keeps its `parent` argument in
  * Actor's `grid` field (+0x04C).
  *

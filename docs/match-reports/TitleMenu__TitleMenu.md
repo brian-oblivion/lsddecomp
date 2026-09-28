@@ -72,7 +72,7 @@ presence anywhere in the project. Placed as one new block right before the
 - `DreamSysView_3bb8c_c`/`DreamSysViewMethods_3bb8c_c`: a LOCAL, minimal
   opaque view of `dreamSys`, typing only `slot1A0` (+0x1A0) and `slot1B0`
   (+0x1B0), the two slots this function reaches. The project already has a
-  large canonical `DreamSys` type in `include/DreamSys.h` with its own
+  large canonical `DreamSys` type in `include/dream_sys.h` with its own
   `vt` field, but neither offset is established there yet, and this unit
   does not edit that header -- kept local per this project's established
   independent-view convention.

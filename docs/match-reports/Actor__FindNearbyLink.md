@@ -51,7 +51,7 @@ s32 Actor__FindNearbyLink(DreamSys *self) {
 
 Fetches an output position (`self->unk_0x14 + 0x18`, raw byte offset --
 `unk_0x14` is `DreamSysUnk14 *`, already established in
-`include/DreamSys.h`) via `self->unk_0x4C`'s own vtable slot `+0x110`
+`include/dream_sys.h`) via `self->unk_0x4C`'s own vtable slot `+0x110`
 (`DreamSysUnk4CMethods::queryLinkAtPos`, newly named this round, splitting the
 existing `pad_0x110[0x11C-0x110]`), then -- only if that call signals
 success (`== 0`) -- builds a query (`Actor__BuildLinkQueries`, THIS unit's own,
@@ -84,7 +84,7 @@ both are declared as opaque `u8` padding.
 
 - `LinkQueryBuf` grown from `0x28` to `0x30` bytes (this file's own
   local type, first introduced in `Actor__BuildLinkQueries`'s stalled report).
-- `include/DreamSys.h`: `DreamSysUnk4CMethods::queryLinkAtPos` (already added
+- `include/dream_sys.h`: `DreamSysUnk4CMethods::queryLinkAtPos` (already added
   alongside `getGridArrElemAt` in the previous commit, for this function).
 - The forward declaration `s32 Actor__FindNearbyLink(DreamSys *self);` (added
   earlier for `Actor__MoveOrFindNearbyLink`'s call) had to be updated from a stale
@@ -108,7 +108,7 @@ is not established, which keeps this tier B rather than A.
 ## Proposed field names
 
 `DreamSys::unk_0x28` and `DreamSys::unk_0x4C` are accessed from OTHER
-units too (`src/world/DreamSys.c`, per `grep -rn -- '->unk_0x28\b\|->unk_0x4C\b'
+units too (`src/world/dream_sys.c`, per `grep -rn -- '->unk_0x28\b\|->unk_0x4C\b'
 src/`), so per FINISHING-PLAN.md track 3 step 3 they are proposed here,
 not renamed, and posted to the broadcast for the head to apply by type
 scope at merge.
@@ -122,9 +122,9 @@ scope at merge.
   every access in this unit.
 - **`DreamSys::unk_0x4C` -> `linkMgr`** (type `DreamSysUnk4CObj *`, tier
   B). Evidence: this function calls `unk_0x4C->methods->queryLinkAtPos`
-  to look up a link at a position; `include/DreamSys.h`'s own existing
+  to look up a link at a position; `include/dream_sys.h`'s own existing
   comments show it used the same way by `DreamSys__WallLink`,
-  `DreamSys__TryInstantTeleportLink` and `DreamSys__DetachFromParent` in `src/world/DreamSys.c` -- every access
+  `DreamSys__TryInstantTeleportLink` and `DreamSys__DetachFromParent` in `src/world/dream_sys.c` -- every access
   across every unit is link-related.
 
 ## Verify
@@ -149,7 +149,7 @@ for another.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__FindNearbyLink`. Reached only from Actor__MoveOrFindNearbyLink (base slots +0x0D0/+0x0D4), so the method is Actor's. Accessors now: grid (+0x04C, the StageMap child; cast to DreamSys.h's DreamSysUnk4CObj view for queryLinkAtPos), &coord2->tx, linkTarget, addTranslation, notifyIfUnk20Active (-1 found, -2 not). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__FindNearbyLink`. Reached only from Actor__MoveOrFindNearbyLink (base slots +0x0D0/+0x0D4), so the method is Actor's. Accessors now: grid (+0x04C, the StageMap child; cast to dream_sys.h's DreamSysUnk4CObj view for queryLinkAtPos), &coord2->tx, linkTarget, addTranslation, notifyIfUnk20Active (-1 found, -2 not). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 

@@ -197,7 +197,7 @@ barrier-less build branches to 0x49640, the identical tail after the
 `notifyParents(this, 0xA)` call. So what it forces is block identity (no
 cross-jump between two identical tails), not register identity.
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

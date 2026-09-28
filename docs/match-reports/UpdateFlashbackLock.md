@@ -153,7 +153,7 @@ object it reads is a StageMap; it is not. Its one caller,
 `ctx->+0x0BC` is `TitleMenu::saveBlock` (include/TitleMenu.h: the DreamSys's
 `getSaveBlock` result, `&saveMagic`), and a StageMap is only 0x1E8 bytes
 while this reads +0x2F4. From `saveMagic`, +0x00C is DreamSys's
-`totalFlasbackUnlockScore` (include/DreamSys.h: saveMagic, currentYear,
+`totalFlasbackUnlockScore` (include/dream_sys.h: saveMagic, currentYear,
 currentDay, totalFlasbackUnlockScore), which is the word compared against
 9999999. Image byte-identical.
 

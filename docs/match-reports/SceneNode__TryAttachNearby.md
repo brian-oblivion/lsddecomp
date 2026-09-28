@@ -657,9 +657,9 @@ notifying it (`other->methods->slot38`) if ALL three pass. "TryAttachNearby"
 describes the measured gate-then-link mechanics; the game-level meaning
 of "nearby" (why `+/-0x4000` specifically, what kind of object `other`
 is) is not established. Held back from an actual rename because this
-symbol is referenced (in comments) from `include/DreamSys.h:895` and
+symbol is referenced (in comments) from `include/dream_sys.h:895` and
 `include/Task.h:752` -- two different units, both discussing this
-function as cross-unit precedent (DreamSys.h for the vtable slot
+function as cross-unit precedent (dream_sys.h for the vtable slot
 resolution, Task.h for the `switch`-vs-`if` residue). Posted to
 the broadcast.
 

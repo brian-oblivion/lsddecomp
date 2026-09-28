@@ -56,7 +56,7 @@ already a pointer.
 
 **`FadeBox__FadeBox`** -- tier A. `FadeBoxMethods::ctor`
 (`+0x008`). Named per the project's `Class__Class` constructor convention
-(see `Entity__Entity`, `DreamSys.c`): calls the further-base ctor
+(see `Entity__Entity`, `dream_sys.c`): calls the further-base ctor
 (`GetBoxFillMethods()->ctor(...)`) first, then installs this class's
 own `&gFadeBoxMethods` table, then redispatches through `finishConstruct` --
 the textbook "base ctor first, then own vtable, then dispatch" idiom

@@ -32,7 +32,7 @@
 #include <libgs.h>
 #include <rand.h>
 #include "entity.h"
-#include "DreamSys.h"
+#include "dream_sys.h"
 #include "StageMap.h"
 #include "Viewport.h"
 #include "bmem_pmgr.h"

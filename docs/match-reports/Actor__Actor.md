@@ -41,7 +41,7 @@ implicit base-construction step -- confirmed three ways:
    `Actor__AddChild`/`Actor__RemoveChild`/`Actor__RemoveAllChildren` -- occupy exactly
    `D800878D4Methods`'s `+0x010`/`+0x014`/`+0x018` slots, and
    `Actor__AddChild`/`Actor__RemoveChild` are independently named at
-   `vtable_DreamSys`'s `+0x010`/`+0x014` in `DreamSys.h` too (as
+   `vtable_DreamSys`'s `+0x010`/`+0x014` in `dream_sys.h` too (as
    "the SAME shared base class... slot10/slot14, the link/unlink pair").
 3. `GetActorMethods()->ctor(self)` returning NULL on failure and `self` on
    success matches this function's OWN return convention exactly (a
@@ -104,7 +104,7 @@ base's own constructor, not `TodActor`'s: (1) it installs the exact
 table `GetActorMethods()` returns, (2) the functions defined right after it
 in this unit occupy that same table's `+0x010`/`+0x014`/`+0x018` slots and
 are independently named at the identical offsets in two sibling headers'
-own local views (`DreamSys.h`, `TodActor.h`), (3) `TodActor.c`'s real
+own local views (`dream_sys.h`, `TodActor.h`), (3) `TodActor.c`'s real
 `TodActor` constructor (`TodActor__TodActor`) calls THIS function
 through `base->ctor(self)` to chain to it first, then immediately
 overwrites `self->methods` with `TodActor`'s own, more specific table --

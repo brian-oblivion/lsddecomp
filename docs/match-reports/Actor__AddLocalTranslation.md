@@ -38,7 +38,7 @@ project's per-call-site-typing convention for cross-unit calls.
 
 The second call, `self->methods->slotBC(self, &buf)`, dispatches through
 `self`'s OWN vtable (not a fixed/global table) at `+0xBC` -- the exact slot
-`Actor__AddTranslation` (this unit) already occupies per `DreamSys.h`'s
+`Actor__AddTranslation` (this unit) already occupies per `dream_sys.h`'s
 `vtable_DreamSys::Actor__AddTranslation`. This is a self-referential virtual call
 (the class calling its own overridable slot rather than jumping to
 `Actor__AddTranslation` by name), matched by adding `slotBC` to `BaseObjOMethods`

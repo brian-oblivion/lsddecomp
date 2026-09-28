@@ -22,7 +22,7 @@ void ObjM__EnterLinkWall(Obj87034_3bb8c_l *self) {
 
 Matched on the first attempt. `self->unk3C->methods->slot200` is a
 `DreamSys` slot resolved via `tools/classtable.py 0x80087BDC` to
-`DreamSys__GetDreamColor` (`include/DreamSys.h`) — that named C function
+`DreamSys__GetDreamColor` (`include/dream_sys.h`) — that named C function
 CANNOT be called directly here (it would compile to a plain `jal` by
 symbol, not the `jalr` through the vtable pointer retail actually uses),
 so this unit's own `DreamSysMethods_3bb8c_l::slot200` field is dispatched

@@ -268,7 +268,7 @@ The header banner:
  * one of two 14-slot object-tracking families (SpawnDreamAuxTriggerEntity /
  * DespawnDreamAuxEntity, backed by sDreamAuxSlots / sDreamAuxSlots2) and can
  * gate the game's teleport flag (EnableTeleportsForKind, SetTeleportsEnabled
- * in DreamSys.c). InitDreamAux/TickDreamAuxSlots/TickDreamAuxSlots2 are the
+ * in dream_sys.c). InitDreamAux/TickDreamAuxSlots/TickDreamAuxSlots2 are the
  * construct/tick/destruct hooks a caller in DayTaskStageMap.c and
  * ObjMStyleActor.c drives this subsystem through. `sDreamAuxStage`,
  * `sDreamAuxWorld` and three sibling globals SetDreamAuxWorld installs are

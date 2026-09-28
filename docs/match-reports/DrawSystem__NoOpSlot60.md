@@ -68,5 +68,5 @@ form is the project's existing one for a constant-return empty slot
 (`DreamSys__NoOpSlot12C`, also `s32` returning 0) and for the empty +0x060
 overrides of the other tables (`CdStream__NoOpSlot60`). The section above
 saying the placeholder was kept predates this rename. The slot keeps the
-name `slot60`, the house form for an empty slot (`DreamSys.h`,
+name `slot60`, the house form for an empty slot (`dream_sys.h`,
 `FileResource.h`, `TaskCore.h`). Nothing in C calls it.

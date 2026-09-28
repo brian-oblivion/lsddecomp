@@ -7,7 +7,7 @@
 Unit: `ObjMStyleActor` (round 17). `BaseObjOMethods::slot10` -- the "link"
 half of a buddy-object pair, already named `slot10`
 (`TodActor.c`/`D800878D4Methods`) and `vtable_DreamSys::slot10`
-(`DreamSys.h`) by two sibling units, both citing this exact function
+(`dream_sys.h`) by two sibling units, both citing this exact function
 address. Chains to a fixed base handler, then classifies `arg` by its own
 vtable header word and records it into one of two companion-pointer
 fields.

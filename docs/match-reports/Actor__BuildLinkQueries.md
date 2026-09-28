@@ -37,7 +37,7 @@ New types this function needed, declared once (shared with
 `Actor__FindNearbyLink`, `Actor__ScanLinkCandidates`, `Actor__ScanGridWindow`) above `Actor__FindNearbyLink`
 in this file: `LinkQueryBuf` (`arg3`'s type -- `s8 queryCol`/`queryRow`, `GridArrElem
 *source`), and `DreamSysUnk4C68Obj`/`DreamSysUnk4CObj::unk_0x68` (added to
-`include/DreamSys.h`, additive). `DreamSysUnk4CMethods::queryLinkAtPos`/
+`include/dream_sys.h`, additive). `DreamSysUnk4CMethods::queryLinkAtPos`/
 `getGridArrElemAt` were also added there (splitting the existing
 `pad_0x110[0x11C-0x110]`).
 
@@ -247,11 +247,11 @@ residue analysis above), so no separate review was needed beyond checking
 current symbol/field names.
 
 One rename needed: `self->unk_0x4C` is now `self->linkMgr` in
-`include/DreamSys.h` (renamed since this report was written); the promoted
+`include/dream_sys.h` (renamed since this report was written); the promoted
 body uses the current name. Every other name the body references
 (`DreamSysUnk4CObj`, `DreamSysUnk4C68Obj`, `unk_0x68`, `unk_0x4`, `unk_0x2`,
 `getGridArrElemAt`, `LinkQueryBuf::queryCol/queryRow/source`) already matches
-`include/DreamSys.h` as committed; `tools/stalesyms.py` found nothing stale
+`include/dream_sys.h` as committed; `tools/stalesyms.py` found nothing stale
 for this function.
 
 Re-measured the score with the body compiled live (temporarily, in place of
@@ -360,7 +360,7 @@ source shape. A shared header's per-slot type can be overridden with a local
 function-pointer cast at the call site, which leaves the header alone.
 
 The header comment on `DreamSysUnk4CMethods::getGridArrElemAt` in
-`include/DreamSys.h` still describes the 4-argument reading; it is left
+`include/dream_sys.h` still describes the 4-argument reading; it is left
 unedited here (shared header, additive edits only) and should be corrected
 by whoever owns that header: both calls take `(this, pos)`.
 

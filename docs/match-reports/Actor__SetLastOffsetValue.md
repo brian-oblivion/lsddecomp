@@ -5,7 +5,7 @@
 > Renamed from `func_80057C6C` on 2026-09-19 (tools/rename.py). Address 0x80057c6c.
 
 Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0E4`
-(base-class-inherited; `include/DreamSys.h` already named this slot in an
+(base-class-inherited; `include/dream_sys.h` already named this slot in an
 earlier commit this round).
 
 ## Body
@@ -23,7 +23,7 @@ A single `sh` store, splat-matched-length two-word leaf.
 **`Actor__SetLastOffsetValue` -- tier A.** A pure setter (`self->lastOffsetValue = val`) --
 mechanics ARE the purpose. Named after the field it sets
 (`DreamSys::lastOffsetValue`, this round's naming pass -- see that
-field's own comment in `include/DreamSys.h`).
+field's own comment in `include/dream_sys.h`).
 
 ## Verify
 

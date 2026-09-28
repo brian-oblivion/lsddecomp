@@ -116,7 +116,7 @@ TriggerWorld. Its real class is unresolved. Bytes unchanged.
 It returns whether the player's getDreamColor (DreamSys +0x200) equals a
 signed byte at D_80088D16 + idx. D_80088D16 is splat's split of sSpecialDays'
 last 10 bytes, and its only caller passes ids 10..17, so the bytes read are
-sSpecialColors[0..7] (0x80088D20; DreamSys.h, previously with no reader):
+sSpecialColors[0..7] (0x80088D20; dream_sys.h, previously with no reader):
 `sSpecialColors[condition - TRIGGER_COND_DREAM_COLOR_FIRST]` is
 byte-identical and the D_80088D16 extern is gone. Locals idx/w/val/result ->
 condition/player/color/current.
@@ -130,7 +130,7 @@ The comments, as they stood:
  * `idx` parameter. Layout beyond "one signed byte per entry" is not known
  * from this unit alone. */
 
-/* sDreamAuxWorld is the player DreamSys (include/DreamSys.h, track 4
+/* sDreamAuxWorld is the player DreamSys (include/dream_sys.h, track 4
  * round 88): the +0x200 its table is called at is getDreamColor, and
  * ObjMStyleActor hands SetDreamAuxWorld its DreamSys `target`. dream_aux.c
  * declares it; the DreamAuxWorld view that stood here is gone. */

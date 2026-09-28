@@ -7,7 +7,7 @@
 > SLPS_015.56`). Everything below this banner describes the STALL history
 > (rounds 2026-09-06 through 35) and the round-37 process that closed it; kept
 > for the record and for the generalizable lever it demonstrates. Live C is
-> in `src/world/DreamSys.c` (no longer `#if 0`/`INCLUDE_ASM`).
+> in `src/world/dream_sys.c` (no longer `#if 0`/`INCLUDE_ASM`).
 >
 > **How it closed, in two permuter searches.** Round 37 first ran a permuter
 > search (the first ever on this function -- 72/72 exact length, zero drift,
@@ -25,7 +25,7 @@
 > 900s/`rc=0` bound). The raw candidate was noisy (a Yoda comparison, an
 > unused literal-holding temp, a mismatched `unsigned int`) but genuinely
 > byte-exact; six individually-verified simplifications reduced it to the
-> clean form now in `src/world/DreamSys.c`, with two of those simplification
+> clean form now in `src/world/dream_sys.c`, with two of those simplification
 > attempts caught as real regressions (not permuter noise) and reverted.
 > Full account in "Round 37" at the end of this report.
 >
@@ -95,12 +95,12 @@ void DreamSys__StartVoice(DreamSys *this)
 }
 ```
 
-Preserved in `src/world/DreamSys.c` as `#if 0 ... #endif` immediately above its
+Preserved in `src/world/dream_sys.c` as `#if 0 ... #endif` immediately above its
 restored `INCLUDE_ASM`, in strict ROM order.
 
 ## New struct/extern knowledge committed alongside this report
 
-All in `include/DreamSys.h`, purely additive, byte-verified against this
+All in `include/dream_sys.h`, purely additive, byte-verified against this
 function's own load/call instructions before being trusted:
 
 - `DreamSysUnk58Vtable` gains `slot0x80`'s return type widened `void` ->
@@ -213,7 +213,7 @@ attempt does not have to rediscover both the promise and the trap.
 
 Re-measured before making any change, per the standing "verify a claim before
 building on it" discipline: spliced the exact preserved body (above) back
-into `src/world/DreamSys.c` and rebuilt. Reproduced **55/72 words, zero address
+into `src/world/dream_sys.c` and rebuilt. Reproduced **55/72 words, zero address
 drift**, byte-identical diff to what this report already describes (register
 swap: retail's `this`=`$s2`/`heading`=`$s0`, this build's `this`=`$s0`/
 `heading`=`$s2` -- confirmed via `tools/asm-differ/diff.py`, first divergence
@@ -485,7 +485,7 @@ byte-exact before being kept**, never assumed from the permuter's own score
    scratch`) -- **byte-identical**, as expected (naming and declaration
    order are the already-established "inert" axis).
 
-Final clean form (now live in `src/world/DreamSys.c`, with a comment explaining why
+Final clean form (now live in `src/world/dream_sys.c`, with a comment explaining why
 `headingArg` and `scratch` are load-bearing rather than superfluous):
 
 ```c
@@ -589,7 +589,7 @@ Tier B: the two extra layered voices played when `voiceSelect == 0xB`, and what 
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
-`include/DreamSys.h`'s `DreamSysUnk58`/`DreamSysUnk58Vtable` view is deleted.
+`include/dream_sys.h`'s `DreamSysUnk58`/`DreamSysUnk58Vtable` view is deleted.
 `DreamSys::soundObj` is cast to `VabStreamObj *` (`include/VabStreamObj.h`),
 and the slots are called by the class's names: `slot0x80` -> `playTone`
 (`VabStreamObj__PlayTone`: index = program << 4 | tone, then vol and
@@ -600,7 +600,7 @@ The view had typed stopVoice `void`, but its occupant returns s32 (always
 call site discards the value. `soundObj` itself stays `s32`: it is
 DreamSys's field.
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

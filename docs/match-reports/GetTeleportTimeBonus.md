@@ -32,7 +32,7 @@ s32 GetTeleportTimeBonus(void)
 }
 ```
 
-`sLinkSrcStage` was already declared `extern s32 sLinkSrcStage;` in `include/DreamSys.h`.
+`sLinkSrcStage` was already declared `extern s32 sLinkSrcStage;` in `include/dream_sys.h`.
 
 ## Verification
 

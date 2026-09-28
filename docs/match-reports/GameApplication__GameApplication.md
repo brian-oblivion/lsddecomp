@@ -124,11 +124,11 @@ another caller is found that writes them.
   to their real pointer types, and declared the small externs this function
   needed (`GetGameApplicationMethods`, `sModelPathDreamE5`, `GetDefaultDataDirectory`, `SetDataDirectory`,
   `New_LinkResource`).
-- `include/DreamSys.h`: extended `struct vtable_DreamSys` past its
+- `include/dream_sys.h`: extended `struct vtable_DreamSys` past its
   previously-documented end (`0x21c`) with 3 padding words and a new named
   slot at `+0x228` (`func_228`), discovered purely from this call site —
   nothing in `DreamSys`'s own unit references it yet. Added the
-  `New_DreamSys` prototype (still `INCLUDE_ASM` in `src/world/DreamSys.c`; this
+  `New_DreamSys` prototype (still `INCLUDE_ASM` in `src/world/dream_sys.c`; this
   is a same-shape cross-unit call as documented in
   `docs/DECOMPILATION_LEARNINGS.md`).
 
@@ -251,7 +251,7 @@ extern const char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD", asm/data/FA4.rodata
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`GameApplicationConfig::unk14` is `dreamSysConfigOption`, the name charlie gave the DreamSys word it lands in (DreamSys +0x924, `configOption`, set through slot228). Tier B: stored once here (sGameApplicationConfig passes 1); no code reads the word back. Proposed, not applied (DreamSys.h is world's): slot228 -> `getSetConfigOption`.
+`GameApplicationConfig::unk14` is `dreamSysConfigOption`, the name charlie gave the DreamSys word it lands in (DreamSys +0x924, `configOption`, set through slot228). Tier B: stored once here (sGameApplicationConfig passes 1); no code reads the word back. Proposed, not applied (dream_sys.h is world's): slot228 -> `getSetConfigOption`.
 
 ## Track 10 (2026-09-28, round 104, echo)
 

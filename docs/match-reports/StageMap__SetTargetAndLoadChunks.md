@@ -43,7 +43,7 @@ to be `s8`/`s16` (no `s32`) -- confirmed by cross-referencing
 bytes at `+0x0..+0x3`, signed halfwords at `+0x4`,`+0x6`,`+0x8`), giving a
 mixed byte/short struct (`Descriptor10`) whose alignment is 2. This is the
 same "no s32 member forces the unaligned-block-copy shape" idiom already
-documented for `FlashbackRotation` in `include/DreamSys.h` -- confirmed as a
+documented for `FlashbackRotation` in `include/dream_sys.h` -- confirmed as a
 second, independent instance.
 
 `self->unk6C = arg2;` (raw pointer store, no dereference in this function)

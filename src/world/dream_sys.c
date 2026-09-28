@@ -1,4 +1,4 @@
-/* DreamSys -- the class that runs a dream in progress (include/DreamSys.h
+/* DreamSys -- the class that runs a dream in progress (include/dream_sys.h
  * has the class as a whole). Every DreamSys method is here, in four groups,
  * followed by the free functions the link tests are built from.
  *
@@ -35,7 +35,7 @@
 #include <libgs.h>
 #include <memory.h>
 #include <rand.h>
-#include "DreamSys.h"
+#include "dream_sys.h"
 #include "entity.h"
 #include "Pad.h"
 #include "FrameClock.h"

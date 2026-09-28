@@ -105,8 +105,8 @@ register too (`$v1` vs `$a0` for the switch's own dispatch constant); no
 
 Fields `callback_0x98 / callback98Mode` -> `moveCallback / moveCallbackMode` (tier A): mode 1 of the one installs the
 look step and of the other the movement step, and RunTickCallbacks calls them
-in that order each tick. The switch cases are enum DreamSysMoveCallback: 0 none, 1 tickMove, 2 tickDrift (which also starts the sound cue set; leaving mode 2 calls stopDrift), in include/DreamSys.h.
-Every accessor of the fields is in src/world/DreamSys.c. The method names stay: they
+in that order each tick. The switch cases are enum DreamSysMoveCallback: 0 none, 1 tickMove, 2 tickDrift (which also starts the sound cue set; leaving mode 2 calls stopDrift), in include/dream_sys.h.
+Every accessor of the fields is in src/world/dream_sys.c. The method names stay: they
 are reached through the slots `selectCallback80` / `selectCallback98`, and
 `DreamSys__SelectLookCallback` / `DreamSys__SelectMoveCallback` is a proposal
 for the head.

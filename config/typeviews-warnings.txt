@@ -5,7 +5,7 @@ DayTaskStageMap: warning: `lateral' might be used uninitialized in this function
 DayTaskStageMap: warning: `shiftCol' might be used uninitialized in this function
 DayTaskStageMap: warning: control reaches end of non-void function
 DayTaskStageMap: warning: unused variable `unused'
-DreamSys: warning: control reaches end of non-void function
+dream_sys: warning: control reaches end of non-void function
 entity: warning: passing arg 4 of `Entity__GetOrCreateFadeBox' makes pointer from integer without a cast
 GameApplicationFileResource: warning: assignment from incompatible pointer type
 GameApplicationFileResource: warning: control reaches end of non-void function

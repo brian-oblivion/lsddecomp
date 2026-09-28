@@ -52,7 +52,7 @@ entry are left as `unkN` padding.
 
 Both callers of this function (`DreamSys__CheckTunnelHeading`, `DreamSys__CheckStaircaseHeading`, both
 themselves stalled on the `gp_rel` blocker per their own reports) pass down,
-two levels removed, the `s32 local[4]` buffer that `DreamSys.c:727` fills via
+two levels removed, the `s32 local[4]` buffer that `dream_sys.c:727` fills via
 `SceneNode__GetRotationDegrees(this, local)`. That function's own report
 (`docs/match-reports/SceneNode__GetRotationDegrees.md`, unit `SceneNode`) establishes it
 writes a 3-entry `Ratio16 {s16 whole; s16 frac;}` table there, so byte
@@ -95,7 +95,7 @@ instruction over the precedent.
 
 - **Tier A.** Pure leaf: normalizes a heading delta to [-180,180) and tests it against a fixed window. Mechanics are the whole story; free function shared by DreamSys__CheckTunnelHeading and DreamSys__CheckStaircaseHeading.
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

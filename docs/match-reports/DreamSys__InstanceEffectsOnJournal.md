@@ -207,7 +207,7 @@ fresh `unk_` offset.
 
 ## New struct/vtable knowledge committed alongside this round
 
-Both in `include/DreamSys.h`:
+Both in `include/dream_sys.h`:
 
 - **`DreamSysEntityMethods` (the existing minimal local view of `entity`,
   previously typing only its own `+0x10C`) extended with `+0x38`, `+0x14C`,
@@ -603,7 +603,7 @@ live) and simply has nothing to attach to on this class of residue. This
 unit contributed three of round 39's clearest confirmations that the lever's
 precondition is a real filter, not just a label to check after the fact.
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

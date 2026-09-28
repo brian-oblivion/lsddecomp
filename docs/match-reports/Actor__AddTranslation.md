@@ -5,7 +5,7 @@
 > Renamed from `func_800573A8` on 2026-09-18 (tools/rename.py). Address 0x800573a8.
 
 Unit: `ObjMStyleActor` (round 17). One-line wrapper: `Actor__UpdateTranslation(self, 0,
-arg1)`. Already named at `vtable_DreamSys` `+0x0BC` in `DreamSys.h`, typed
+arg1)`. Already named at `vtable_DreamSys` `+0x0BC` in `dream_sys.h`, typed
 `void (*Actor__AddTranslation)(DreamSys *this, DreamSysVec3 *arg1)` there.
 
 ## Final source
@@ -22,9 +22,9 @@ Identical shape to `Actor__SetTranslation` (same report applies) except the flag
 literal is `0` instead of `1` -- `Actor__UpdateTranslation`'s "accumulate" mode
 instead of its "overwrite" mode. `Vec3O` here is this unit's own local
 type, structurally identical to (but independently declared from)
-`DreamSys.h`'s `DreamSysVec3` -- both are plain `{ s32 x, y, z; }`, per the
+`dream_sys.h`'s `DreamSysVec3` -- both are plain `{ s32 x, y, z; }`, per the
 project's multiple-independent-local-views convention; this unit does not
-include `DreamSys.h`.
+include `dream_sys.h`.
 
 ### Proposed learning
 

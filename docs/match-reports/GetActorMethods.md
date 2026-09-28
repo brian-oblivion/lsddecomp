@@ -9,7 +9,7 @@ a vtable slot itself (checked all 6 method tables reachable from this
 unit's addresses, no hit; called directly by symbol name from
 `New_VariantSprite`, `VariantSprite__VariantSprite`, and this unit's own already-typed
 `extern DreamSysBaseMethods *GetActorMethods(void);` declaration in
-`include/DreamSys.h`, added by an earlier round before this unit existed).
+`include/dream_sys.h`, added by an earlier round before this unit existed).
 
 ## Body
 

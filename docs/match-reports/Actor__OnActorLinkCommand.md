@@ -5,7 +5,7 @@
 > Renamed from `func_80057B90` on 2026-09-19 (tools/rename.py). Address 0x80057b90.
 
 Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0DC`
-(base-class-inherited at this offset; `include/DreamSys.h`'s
+(base-class-inherited at this offset; `include/dream_sys.h`'s
 `DreamSysBaseMethods::slot0xDC` already carried a comment naming this
 exact function as its `+0xDC` resolution, from before this unit converted
 it).
@@ -38,7 +38,7 @@ tables:
   This unit's own local view (`SceneNodeBaseTable`, declared in this file)
   types only that one slot.
 - The second, conditional on `5 <= count < 9`, dispatches through
-  `self`'s OWN vtable (`self->vt->slotA0`, `include/DreamSys.h`) at
+  `self`'s OWN vtable (`self->vt->slotA0`, `include/dream_sys.h`) at
   `+0x0A0` -- ordinary polymorphic dispatch, resolves to `SceneNode__TryAttachNearby`
   currently (not overridden at the `DreamSys` level, per
   `tools/classtable.py gDreamSysMethods`), but written as a real vtable

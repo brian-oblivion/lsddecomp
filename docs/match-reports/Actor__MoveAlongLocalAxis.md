@@ -34,11 +34,11 @@ void Actor__MoveAlongLocalAxis(DreamSys *self, s16 *slot, s32 val, void *extra, 
 Writes `val` (truncated to 16 bits) into `*slot` and into
 `self->lastOffsetValue`, dispatches through the shared base table's `+0x0C0`
 slot (`Actor__AddLocalTranslation`, resolves to `Actor__MoveLocalZ`'s neighbour -- out of
-this unit's range, see `include/DreamSys.h`) with a hardcoded
+this unit's range, see `include/dream_sys.h`) with a hardcoded
 `&sActorLocalMove[0]` argument (always the FIRST element, regardless of which
 `slot` was written), unconditionally resets `*slot` to 0, then -- only if
 `extra` is non-NULL -- dispatches through `+0x088`
-(`DreamSys__NotifyLinkAttempt`, already named in `include/DreamSys.h`) with `count`.
+(`DreamSys__NotifyLinkAttempt`, already named in `include/dream_sys.h`) with `count`.
 
 The `*slot = 0` reset is unconditional even though it reads as though it
 belongs to the `if`: retail schedules it into the `beqz`'s delay slot,
@@ -92,7 +92,7 @@ into the caller-supplied `slot` pointer AND into
 buffer through the inherited `Actor__AddLocalTranslation`, resets
 `*slot` back to 0, and -- only if `extra` is non-NULL -- forwards `count`
 through `self->vt->DreamSys__NotifyLinkAttempt` (a notify/dispatch call, already named
-in `include/DreamSys.h` but not yet given a friendly name by that slot's
+in `include/dream_sys.h` but not yet given a friendly name by that slot's
 own owning unit). "AndNotify" covers that conditional tail without
 asserting what the notification means.
 

@@ -45,7 +45,7 @@ void StyleEffect__SetParams(StyleEffect *self, Block24 *src) {
   different instruction COUNT and shape, not a subtle residue. Retyping
   the field to a WORD array (`s32 raw[9]`) forced 4-byte alignment and
   fixed it in one step, matching the already-documented
-  `DreamSysUnk14Tail` idiom (`DreamSys.h`) for exactly this situation.
+  `DreamSysUnk14Tail` idiom (`dream_sys.h`) for exactly this situation.
 - Field write ORDER matches retail: the block copy happens first, the
   `self->unk24 = 0` clear happens last (in the delay slot of the
   function's own `jr $ra`) -- writing the C statements in that order
@@ -56,7 +56,7 @@ void StyleEffect__SetParams(StyleEffect *self, Block24 *src) {
 - **A block-copy target field should be declared as a WORD array by
   default when the source is a whole-struct assignment, not as a byte
   array "to be safe about size."** This is not a new idiom --
-  `DreamSys.h`'s `DreamSysUnk14Tail` already documents it -- but this is
+  `dream_sys.h`'s `DreamSysUnk14Tail` already documents it -- but this is
   a second, independent confirmation in a different unit, and the
   failure mode (a completely different, much longer instruction
   sequence, not a near-miss) is worth remembering as the SPECIFIC

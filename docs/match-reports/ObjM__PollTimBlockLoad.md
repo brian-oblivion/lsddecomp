@@ -56,8 +56,8 @@ void ObjM__PollTimBlockLoad(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
 almost certainly `DreamSys *` — see the header comment on
 `DreamSysObj_3bb8c_l`/`DreamSysMethods_3bb8c_l` in `include/class_3bb8c.h`
 for the full cross-check against `tools/classtable.py 0x80087BDC`
-(`gDreamSysMethods`, `include/DreamSys.h`). Declared as this unit's own
-independent minimal view rather than editing `DreamSys.h`, since none of
+(`gDreamSysMethods`, `include/dream_sys.h`). Declared as this unit's own
+independent minimal view rather than editing `dream_sys.h`, since none of
 that header's own named fields cover the offsets this unit reaches
 (`+0x050`, `+0x074`, `+0x0FC`, `+0x104`, `+0x108`, `+0x200` all fall inside
 its `unknown_functions_0x..` padding arrays there).
@@ -124,7 +124,7 @@ Zero bytes changed.
 ## Round 95 (track 7, echo)
 
 Locals `ret` -> `timer`, `sel` -> `colorMode`; the failure path's `0x1E`
-is 30 (seconds, getSetDreamTimeLimit's unit per DreamSys.h's
+is 30 (seconds, getSetDreamTimeLimit's unit per dream_sys.h's
 DREAM_TICKS_PER_SECOND). colorMode's values (1, 2) stay literals:
 StyleConfig belongs to include/class_3bb8c.h, proposed there as an enum.
 

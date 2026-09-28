@@ -119,7 +119,7 @@ Renamed from `ObjM__HandleStateCode` (rename.py): it occupies gObjMMethods +0x09
 ## Round 95 (track 7, echo)
 
 `switch (code - 0xA)` with cases 0..7 became `switch (code)` over
-include/DreamSys.h's `enum DreamSysLinkCode` (DREAMSYS_TIME_UP ..
+include/dream_sys.h's `enum DreamSysLinkCode` (DREAMSYS_TIME_UP ..
 DREAMSYS_LINK_TELEPORT), and the DreamSys's state is cleared with
 DREAMSYS_NO_LINK: byte-identical (GCC subtracts the lowest case itself, the
 same jump table). The `code >= 9` test keeps its literal: 9 is not a link

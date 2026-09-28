@@ -19,7 +19,7 @@ rather than API.
 ## Track 10 `prototypes`: one declaration per name
 
 - **Allocator.** `BMemPMgrAlloc` is re-declared locally in about 20 units
-  and in DreamSys.h:376, entity.h:308, DayTaskStageMap.h:30, Task.h:27.
+  and in dream_sys.h:376, entity.h:308, DayTaskStageMap.h:30, Task.h:27.
   `BMemPMgrFree` returns `void` in entity.h:309 and
   GameApplicationFileResource.h:16 but `void *` in bmem_pmgr.h:83 and Task.h:28,
   so any unit including two of them fails with conflicting types. main.c:28
@@ -28,7 +28,7 @@ rather than API.
   `MATCHING:` line, and put a public prototype pair where bmem_pmgr.c does not
   see it.
 - **SoundCueSet.** `InitSoundCueSet`, `FlushSoundCueSet`,
-  `ServiceSoundCueSet` have three spellings each (DreamSys.c:72-73, 497;
+  `ServiceSoundCueSet` have three spellings each (dream_sys.c:72-73, 497;
   entity.c:298-299, entity.h:310-311; ObjMStyleActor.c:1782, 1893, 1903);
   the definitions take `(VabStreamObj *, SoundCueSet *)`. Declare once in
   SoundCueSet.h.
@@ -37,7 +37,7 @@ rather than API.
   (GameFiles.c:317, 322); `ObjM__GetGridRecord` is declared void and "returns"
   through $v0. `PickSoundBank` returns `s32` for a path (GameFiles.c:203),
   `PickStageBgm` likewise (ObjMStyleActor.c:525). `RecPick{group,sub}` and
-  DreamSys.h's `CinematicCall{bank,entry}` are one packed pair, repacked by
+  dream_sys.h's `CinematicCall{bank,entry}` are one packed pair, repacked by
   hand at GameApplicationFileResource.c:80, 317. Add GameFiles.h.
 - **Full-width SJIS helpers.** `DecodeFullWidthSjis` is `u8 *(u8 *, u8 *)`
   (ScreenWidgets) but `void (void *, void *)` at TitleMenuTaskObjF.c:316 and
@@ -70,7 +70,7 @@ rather than API.
   disc into include/psyq. **Wrong (round 103):** no disc ships a libapi.h;
   kernel.h does declare them, and plain `grep` missed it because the file's
   SJIS bytes make grep treat it as binary (`grep -a` finds them).
-- **Duplicate types.** `RotationRatio(s)` (DreamSys.h:172) is `Ratio16`;
+- **Duplicate types.** `RotationRatio(s)` (dream_sys.h:172) is `Ratio16`;
   `SubObjE` (DayTaskStageMap.h:18) is a DrawSystem view; `SlotEntry`/`SrcDesc`
   (Task.c:658, 670) are one record; `CdStreamFile` (cd_stream.h:44) is
   `CdlFILE`; a signed 3-byte colour is defined six times (`BgLayerRgb`,
@@ -86,17 +86,17 @@ rather than API.
   DreamSys, Entity, CdStream, DrawSystem, FlatLightObj, FrameClock,
   IntermediateBase, Pad, StreamTask, TaskCore, TmdModel, WBgm). Rename; add
   the form to §3's conventions.
-- **Receiver:** `this` in DreamSys.c (93 methods), entity.c (138), 7
-  FileResource methods in GameApplicationFileResource.c, DreamSys.h's
+- **Receiver:** `this` in dream_sys.c (93 methods), entity.c (138), 7
+  FileResource methods in GameApplicationFileResource.c, dream_sys.h's
   prototypes; `self` everywhere else.
-- **Guards:** DreamSys.h `CLASS_DREAMSYS`, StageGrid.h `STAGE_GRID`.
+- **Guards:** dream_sys.h `CLASS_DREAMSYS`, StageGrid.h `STAGE_GRID`.
 - **`s` externs in headers:** 24 (StageMap.h:416-441, TitleMenu.h:147-170,
   Task.h:47/57, scene_node.h:204-205 `sRotationZero`/`sSceneNodeScaleOne`,
   which are also typed `u8[0xC]` for `Ratio16[3]`). Move into the .c or
   rename `g`. Conversely 8 `g` symbols used by one unit only
   (`sCdStreamAudioMixSet`, `sCdFileNotFoundFmt`, `sFileTableRegistered`, ...).
 - **Typos:** `DreamSys__InitMoodContributors`, `totalFlasbackUnlockScore` and
-  siblings, DreamSys.h's @brief typos (flashabcks, appropiate, indicies,
+  siblings, dream_sys.h's @brief typos (flashabcks, appropiate, indicies,
   recieve, adquired, lank). `Test4*` (4 functions) for `TestFor*`.
 - **Misleading names** (rename; each quoted against its code by a reviewer):
   - FileResource slot `setFlag`: the base sets bit 1, every subclass uses it
@@ -162,7 +162,7 @@ rather than API.
   scene_node.c's two mid-file banners and self-reference (merge leftovers);
   TmdRenderer.c opens with BasicClass/BMemPMgr helpers.
 - **world:** DreamSys `func_59590`, `func_59598`, `func_5ba20` (a get/set of
-  `unk_0x924`); DreamSys.h's `unk_0x*` fields (snake/hex spelling, no offset
+  `unk_0x924`); dream_sys.h's `unk_0x*` fields (snake/hex spelling, no offset
   comments; `unknown_values_0x922` looks like padding); dream_aux's
   `sDreamAuxSlots2` alias; `TestForStageTransition` and
   `EnableTeleportsForKind` goto ladders over raw stage/mood numbers with no
@@ -189,8 +189,8 @@ so merge by hand, one commit per type, the accessors from the compiler.
   `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `ColorRgb`,
   `ViewportRgb`) into one, in a graphics header (BoxFill.h is ui's, and
   this item may edit it for that).
-- **world:** `RotationRatio(s)` (DreamSys.h) into `Ratio16`; `SubObjE`
-  (DayTaskStageMap.h) into its DrawSystem type; DreamSys.h's
+- **world:** `RotationRatio(s)` (dream_sys.h) into `Ratio16`; `SubObjE`
+  (DayTaskStageMap.h) into its DrawSystem type; dream_sys.h's
   `CinematicCall` and GameFiles.c's `RecPick` into one packed pair (this
   item may edit GameFiles.c/h for it; `GetSpecialDayOrEventRecord` stays
   unprototyped, see its MATCHING line); IntermediateBase's `frameClock` /
@@ -218,7 +218,7 @@ reads them, so nothing names them).
 ## Track 12: what the documentation pass needs
 
 - About 1134 prototypes in include/, 240 with an adjacent comment; no header
-  uses `/**`, and DreamSys.h's and StageGrid.h's `/* @brief` lines are
+  uses `/**`, and dream_sys.h's and StageGrid.h's `/* @brief` lines are
   invisible to Doxygen. Header comment words outnumber code words 3 to 1,
   most of it good class documentation written as analysis.
 - Style: `/** @file */`; a 5-15 line class block (what, parent, class id,

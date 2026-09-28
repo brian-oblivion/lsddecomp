@@ -9,7 +9,7 @@ never a `STALL`, just never documented.
 
 ## Which slot this overrides
 
-`include/DreamSys.h`'s `vtable_DreamSys` names the DEFAULT `+0x0E8` value
+`include/dream_sys.h`'s `vtable_DreamSys` names the DEFAULT `+0x0E8` value
 `DreamSys__NoOpSlotE8Default` ("this unit's own no-op stub... Called by DreamSys__WallLink
 as (this)"), a DIFFERENT function belonging to a different unit. This
 function (`0x80057C74`) is a SIBLING override of that SAME conceptual
