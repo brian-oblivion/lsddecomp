@@ -41,7 +41,7 @@ struct Obj6D4E8_D70 {
 };
 
 extern s32 gCdRequestQueue;
-extern s32 gCdIdle;
+extern s32 sCdIdle;
 extern s32 gCdSavedSeekParam;
 extern s32 gCdSeekParam;
 extern void CdFlush(void);
@@ -62,7 +62,7 @@ void CdDriver__CancelRequests(Obj6D4E8_D70 *self)
     if (entry != NULL && self->pendingRequests != 0) {
         self->flags = 0;
 
-        if (entry->owner == (s32)self && entry->active != 0 && gCdIdle == 0) {
+        if (entry->owner == (s32)self && entry->active != 0 && sCdIdle == 0) {
             CdFlush();
             ResetCdStateMachine();
             saved = gCdSavedSeekParam;
@@ -91,7 +91,7 @@ unlink and free them." Two guards gate the ENTIRE body (not just the
 `self->pendingRequests` (spelled `unk22` when this was written) must be non-zero — if either fails, the
 function does nothing but the latch dance. Inside that, an inner
 three-condition guard (head node's owner is `self`, head node's `active` flag (`unk00` when this was written)
-flag is set, and `gCdIdle == 0`) triggers `CdFlush()` +
+flag is set, and `sCdIdle == 0`) triggers `CdFlush()` +
 `ResetCdStateMachine()` (both cross-unit — `ResetCdStateMachine` from foxtrot's
 `CdDriver`) and a load-clear-store handoff between `gCdSavedSeekParam` and
 `gCdSeekParam` (needs an explicit temp: the store order is `gCdSavedSeekParam`

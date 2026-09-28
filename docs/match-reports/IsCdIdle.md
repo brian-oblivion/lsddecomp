@@ -7,17 +7,17 @@
 ## What this function does
 
 A plain `$gp`-relative getter, no arguments. Reads the scalar `s32` global
-`gCdIdle` (in `.sdata`, initialized to `0x00000001` per
+`sCdIdle` (in `.sdata`, initialized to `0x00000001` per
 `asm/data/7B048.sdata.s`) and returns it.
 
 ## The C
 
 ```c
-extern s32 gCdIdle;
+extern s32 sCdIdle;
 
 s32 IsCdIdle(void)
 {
-    return gCdIdle;
+    return sCdIdle;
 }
 ```
 
@@ -33,19 +33,19 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | was | now | tier |
 | --- | --- | --- |
 | `func_80027ED4` | `IsCdIdle` | B |
-| `D_8008A870` | `gCdIdle` | B |
+| `D_8008A870` | `sCdIdle` | B |
 
 **Evidence.** Written in exactly the same two places as `sCdBusy` and always
 to the opposite value: `StartCdOperation` (operation start) sets `sCdBusy = 1`
-and `gCdIdle = 0`, `ResetCdStateMachine` (state-machine reset) sets `gCdIdle = 1`
+and `sCdIdle = 0`, `ResetCdStateMachine` (state-machine reset) sets `sCdIdle = 1`
 and `sCdBusy = 0`. Its initial value in `.sdata` is 1. `GameApplicationFileResource.c`'s
 wrapper returns 1 when no CD source is selected, matching "idle". The one
 reader that is not a getter is `CdDriver__CancelRequests`, which only
-aborts a transfer in flight when `gCdIdle == 0`.
+aborts a transfer in flight when `sCdIdle == 0`.
 
 **Why B and not A.** The mechanics are certain; what is NOT established is
 why the driver carries two globals that are exact complements. One of them
 presumably means something narrower than the other, and nothing in the three
-carved units distinguishes them. A reader should know that `gCdIdle` is
+carved units distinguishes them. A reader should know that `sCdIdle` is
 `!sCdBusy` in every write the corpus contains, which is why this is written
 down rather than smoothed over.

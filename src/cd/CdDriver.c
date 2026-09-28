@@ -374,7 +374,7 @@ void CdDriver__RunRequestQueue(void) {
                     break;
             }
             self->inQueueDispatch = 0;
-        } else if (gCdIdle != 0) {
+        } else if (sCdIdle != 0) {
             if (node->unk4 != 0) {
                 self->flags |= 1;
             }
@@ -525,7 +525,7 @@ void CdDriver__CancelRequests(CdDriver *self) {
     if (head != NULL && self->pendingRequests != 0) {
         self->flags = 0;
 
-        if (head->owner == self && head->active != 0 && gCdIdle == 0) {
+        if (head->owner == self && head->active != 0 && sCdIdle == 0) {
             CdFlush();
             ResetCdStateMachine();
             saved = gCdSavedSeekParam;
@@ -568,7 +568,7 @@ s32 IsCdBusy(void) {
 }
 
 s32 IsCdIdle(void) {
-    return gCdIdle;
+    return sCdIdle;
 }
 
 s32 GetCdOperation(void) {
@@ -1027,7 +1027,7 @@ void StartCdOperation(s32 op, s32 state) {
     sCdBusy = 1;
     gCdOperation = op;
     gCdState = state;
-    gCdIdle = 0;
+    sCdIdle = 0;
     gCdRequestQueue->active = 1;
 }
 
@@ -1036,7 +1036,7 @@ void ResetCdStateMachine(void) {
     gCdOperation = 0;
     gCdState = CD_STATE_IDLE;
     gCdTickStep = CD_TICK_NONE;
-    gCdIdle = 1;
+    sCdIdle = 1;
     gCdTimeoutCounter = 0;
     sCdBusy = 0;
 }

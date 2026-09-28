@@ -156,7 +156,7 @@ OK: build matches retail SLPS_015.56
 ```
 
 No permuter search was run and none was needed. `Obj80027480`, `Methods80027480`,
-`Node8008A894`, `gCdIdle`, `GetCdFileEntry` and `FreeCdRequestNode` are unchanged from
+`Node8008A894`, `sCdIdle`, `GetCdFileEntry` and `FreeCdRequestNode` are unchanged from
 round 47; no struct was edited, so the shared-struct oracle re-run is the same green
 whole-image build above.
 
@@ -210,7 +210,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 `runRequestQueue`. It takes the head of `gCdRequestQueue`: if the node is
 not yet active it raises `owner->inQueueDispatch` and calls the owner's
 slot for `node->op` (open/close/seek/read/loadFile, the CD_OP_* values the
-five methods above enqueue); once `gCdIdle` says the drive finished, it
+five methods above enqueue); once `sCdIdle` says the drive finished, it
 decrements `owner->pendingRequests`, ORs `CD_FLAG_DONE`, `CD_FLAG_NONE_PENDING`
 (when the count hits 0) and the op's own completion bit into `owner->flags`,
 calls `setFlag`, frees the node, and calls `stopCdService` when the queue

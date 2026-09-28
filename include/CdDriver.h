@@ -156,7 +156,7 @@ extern s32 gCdSyncQueueMode; /* nonzero with sCdAsyncEnabled 0: requests queue, 
 extern s32 sCdBusy;          /* 0/1 */
 extern CdFileEntry *gFileTable;        /* SetFileTable */
 extern s32 gFileTableCount;            /* SetFileTableCount */
-extern s32 gCdIdle;                    /* 0/1 */
+extern s32 sCdIdle;                    /* 0/1 */
 extern s32 gCdOperation;               /* StartCdOperation's op, GetCdOperation's result */
 extern s32 gCdState;                   /* the state machine's phase */
 extern CdFileEntry *gCdSeekParam;      /* the state machines seek to &gCdSeekParam->pos */
