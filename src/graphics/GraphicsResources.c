@@ -1401,8 +1401,8 @@ void MoviePlayer__RequestStart(MoviePlayer *self) {
     self->pendingStart = 1;
 }
 
-/* stop (+0x044): when active, reset the frame state and restart the stream
- * (its slot7C, handed MarkStopped, is empty). */
+/* rewind (+0x044): when active, reset the frame state and restart the stream
+ * (its slot7C, handed RequestRestart, is empty). */
 void MoviePlayer__Rewind(MoviePlayer *self) {
     MoviePlayer *cur = gActiveMoviePlayer;
 
@@ -1520,13 +1520,13 @@ void MoviePlayer__DrawStrip(MoviePlayer *self) {
 }
 
 /* pollActive (+0x064), once the movie has finished: with keepActive, stay
- * active, stopping the stream every MOVIE_KEEP_ACTIVE_POLLS calls (0);
+ * active, rewinding the stream every MOVIE_KEEP_ACTIVE_POLLS calls (0);
  * otherwise no movie is active any more (1). */
 s32 MoviePlayer__PollActive(MoviePlayer *self) {
     if (self->keepActive != 0) {
         if (gMoviePollCounter++ > MOVIE_KEEP_ACTIVE_POLLS) {
             gMoviePollCounter = 1;
-            self->methods->stop(self);
+            self->methods->rewind(self);
         }
         return 0;
     }

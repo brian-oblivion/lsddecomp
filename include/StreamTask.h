@@ -115,7 +115,7 @@ struct StreamTask {
     /* +0x0B4 */ struct MoviePlayer *player; /* New_MoviePlayer(GetDefaultMovieFrame(), 0, 0); finalize releases it */
     /* +0x0B8 */ s32 streamName;  /* Init's; the player's Play name. ctor: 0 */
     /* +0x0BC */ s32 streamGroup; /* Init's (GetMovieFrameCount, or -1); Play's second argument */
-    /* +0x0C0 */ s32 autoPlay; /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to MarkPlaying at once */
+    /* +0x0C0 */ s32 autoPlay; /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to RequestStart at once */
     /* +0x0C4 */ s32 keepActive; /* setKeepActive; reset 0; Play's keepActive (MoviePlayer::keepActive, +0x054) */
     /* +0x0C8 */ s32 loopCount; /* setLoopCount; reset -1; Play's fourth argument, the player's `loops` (MoviePlayer__Advance) */
     /* +0x0CC */ s32 skipOnConfirm; /* setSkipOnConfirm; reset 1; OnPadConfirm: nonzero ends the task with result 2 */
