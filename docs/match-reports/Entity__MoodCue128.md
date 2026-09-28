@@ -47,7 +47,7 @@ names sort in table order.
 `SCALE_THIRTY_SECOND` (0x80089E80), this function's `updateScale`
 argument, decoded from `disk/SLPS_015.56` as four s16 `{num,den}` pairs:
 `(1,32, 1,32, 1,32, 3,1)` -- uniform X=Y=Z=1/32, W=3/1 ignored per the
-established precedent. Same unit-fraction-word convention as `SCALE_HALF`
+established precedent. Same unit-fraction-word convention as `sScaleHalf`
 (1/2)/`SCALE_EIGHTH` (1/8)/`SCALE_QUARTER` (1/4).
 
 ## Track 4 (2026-09-26, round 88, echo)

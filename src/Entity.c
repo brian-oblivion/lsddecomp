@@ -672,7 +672,7 @@ void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
     } else if (this->state == 13) {
         this->lastOffsetValue = -120;
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
-        this->methods->updateScale(this, 1, SCALE_HALF);
+        this->methods->updateScale(this, 1, sScaleHalf);
         if (this->methods->distanceToPeer(this, this->peer) < 1024) {
             this->methods->notifyParents(this, ENTITY_EFFECT_EVENT_VIDEO);
         }
@@ -791,7 +791,7 @@ void Entity__MoodCue16(Entity *this) {
 }
 
 void Entity__MoodCue17(Entity *this) {
-    this->methods->updateScale(this, 1, SCALE_HALF);
+    this->methods->updateScale(this, 1, sScaleHalf);
 }
 
 /* ---- MoodCue handlers, rows 19 to 38 and 119 ---------------------------
@@ -1803,7 +1803,7 @@ void Entity__MoodCue64(Entity *this, SoundCueSet *out) {
 void Entity__MoodCue65(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
-            this->methods->updateScale(this, 1, SCALE_HALF);
+            this->methods->updateScale(this, 1, sScaleHalf);
             this->methods->moveLocalY(this, -300, 0);
             this->methods->updateRotation(this, 1, sRotationYawPlus90);
             this->state = 11;
@@ -2643,7 +2643,7 @@ void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
         } else if (this->moodTimer >= 1931) {
             scale = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
         } else if (this->moodTimer >= 1926) {
-            scale = SCALE_HALF;
+            scale = sScaleHalf;
         } else if (this->moodTimer >= 1921) {
             scale = SCALE_QUARTER;
         } else {
@@ -2726,7 +2726,7 @@ void Entity__MoodCue108(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue109(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_HALF);
+    this->methods->updateScale(this, 1, sScaleHalf);
     this->methods->moveLocalZ(this, -10, 0);
 }
 

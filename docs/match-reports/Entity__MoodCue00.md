@@ -132,7 +132,7 @@ Slots of `EntityMethods` (include/Entity.h). The compiler lists accessors in Ent
 | slot | proposed | tier | evidence |
 | --- | --- | --- | --- |
 | `slot44` (+0x44) | `updateRotation` | B | occupant `func_8001CEB4` (`tools/classtable.py gEntityMethods`), the same function the head named `SceneNodeMethods::updateRotation` in round 70. Every data argument here is a {num, den} degree triple (ROTATION_YAW_*), flag 1 = set, 0 = add |
-| `slot48` (+0x48) | `updateScale` | B | occupant `func_8001D008`, round 70's `SceneNodeMethods::updateScale`; arguments SCALE_HALF / SCALE_DOUBLE |
+| `slot48` (+0x48) | `updateScale` | B | occupant `func_8001D008`, round 70's `SceneNodeMethods::updateScale`; arguments sScaleHalf / SCALE_DOUBLE |
 
 ## Track 4 (2026-09-26, round 88, echo)
 

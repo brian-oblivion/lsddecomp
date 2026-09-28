@@ -10,7 +10,7 @@ whole-image build verified byte-exact)
 A short two-call dispatcher, not itself a `gEntityMoodHandlerTable` table entry (no
 `EntityMoodHandlerArg` argument): `this->methods->slot48(this, 1,
 SCALE_DOUBLE)` followed by `this->methods->slotBC(this, sTranslateYMinus64)`. Both
-`SCALE_HALF`/`SCALE_DOUBLE`/`sTranslateYMinus64` are opaque data blobs only ever
+`sScaleHalf`/`SCALE_DOUBLE`/`sTranslateYMinus64` are opaque data blobs only ever
 address-taken (never dereferenced) by this unit's functions, so they are
 declared as plain `u8[]` in `Entity.c`.
 
