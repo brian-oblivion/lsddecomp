@@ -339,8 +339,10 @@ struct ChunkSlot {
 };
 
 /* The ctor's callback pair (setCallback): ComputeChunkLoadEntry calls
- * chunkFileFn(chunkFileCtx, value, 0, 0) and keeps the result as the entry's file record. */
-typedef void *(*ChunkFileFn)(void *ctx, s32 value, s32 arg2, s32 arg3);
+ * chunkFileFn(chunkFileCtx, chunk, 0, 0) and keeps the result as the entry's
+ * file record. ObjM__GetGridRecord, the one callback, takes the chunk by x/y
+ * when `chunk` is negative. */
+typedef void *(*ChunkFileFn)(void *ctx, s32 chunk, s32 x, s32 y);
 
 /* LightRig's slots, then this class's own. */
 struct StageMapMethods {
@@ -352,7 +354,7 @@ struct StageMapMethods {
     /* +0x0CC */ void (*setAcceptedTags)(StageMap *self, s32 *tags); /* StageMap__SetAcceptedTags */
     /* +0x0D0 */ void (*forwardAcceptedCommand)(StageMap *self, void *sender,
                                                 s32 command); /* StageMap__ForwardAcceptedCommand */
-    /* +0x0D4 */ Descriptor10 *(*getCurrentCellKey)(StageMap *self, void *arg1); /* StageMap__GetCurrentCellKey (reads only self; see the banner) */
+    /* +0x0D4 */ Descriptor10 *(*getCurrentCellKey)(StageMap *self, void *sender); /* StageMap__GetCurrentCellKey (reads only self; see the banner) */
     /* +0x0D8 */ void (*slotD8)(void); /* StageMap__NoOpSlotD8, empty; never called */
     /* +0x0DC */ void (*setGridSpan)(StageMap *self, s32 span); /* StageMap__SetGridSpan */
     /* +0x0E0 */ void (*setConfig)(StageMap *self, StageGridDimensions *config); /* StageMap__SetConfig */

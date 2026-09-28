@@ -23,7 +23,7 @@
  *                      makes one Actor (New_Actor) per object: `parts`, their
  *                      ids in `partIds`, `mainPart` the one the scan names
  *                      first. The ModelData becomes a child, and reset runs.
- *                      `sound` is kept in arg2. Returns self, or NULL.
+ *                      `sound` is kept in `sound`. Returns self, or NULL.
  *   reset              setDisplay(0), mainPartNotifies 1, lastOffsetValue
  *                      300, tick callback 'A' selected but disabled, TOD 0
  *                      set and stopped, and mainPart's model linked as this
@@ -55,7 +55,7 @@
  * it to TodActorAttachToParentFn (a function-pointer cast emits no code).
  * detachFromParent undoes all three.
  *
- * Sound. arg2, the ctor's second argument, is a VabStreamObj (include/
+ * Sound. `sound`, the ctor's second argument, is a VabStreamObj (include/
  * VabStreamObj.h; DreamAux passes the same bank to every Entity). playTone
  * (+0x124) plays one of its tones at volume 0x6E; Entity drives its
  * SoundCueSet on it.
@@ -96,7 +96,7 @@ struct VabStreamObj; /* include/VabStreamObj.h: the sound bank the ctor's second
     /* +0x118 */ void *tickMoveZ;                             /* TodActor__TickMoveZ; only the VALUE is read (selectTickCallback) */ \
     /* +0x11C */ void *tickCallbackB;                           /* TodActor__TickCallbackB, empty (Entity: Entity__TickSoundCue) */ \
     /* +0x120 */ void *tickCallbackC;                           /* TodActor__TickCallbackC, empty */ \
-    /* +0x124 */ void (*playTone)(Self *self, s32 index);       /* TodActor__PlayTone: arg2's playTone(index, 0x6E, 0x6E); not dispatched in C */ \
+    /* +0x124 */ void (*playTone)(Self *self, s32 index);       /* TodActor__PlayTone: sound's playTone(index, 0x6E, 0x6E); not dispatched in C */ \
     /* +0x128 */ void (*setTod)(Self *self, s32 index);         /* TodActor__SetTod */           \
     /* +0x12C */ s32 (*playTod)(Self *self);                    /* TodActor__PlayTod */          \
     /* +0x130 */ void (*stopTod)(Self *self);                   /* TodActor__StopTod */          \
@@ -128,7 +128,7 @@ struct VabStreamObj; /* include/VabStreamObj.h: the sound bank the ctor's second
 /* clang-format on */
 
 struct TodActorMethods {
-    TODACTOR_SLOTS(TodActor, (TodActor * self, void *desc, void *arg2));
+    TODACTOR_SLOTS(TodActor, (TodActor * self, void *desc, void *sound));
 };
 
 struct TodActor {
