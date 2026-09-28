@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gStyleConfigIndex
 gStyleCueRecordIndex
 gStyleCueSlots
 gStyleDay
@@ -212,6 +211,7 @@ sStaircaseOffset3
 sStartupBMemPMgr
 sStrSelect
 sStyleClearColor
+sStyleConfigIndex
 sStyleDecorBoxPos
 sStyleDecorBoxSize
 sStyleUnreadArg
