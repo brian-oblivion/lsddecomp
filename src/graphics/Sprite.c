@@ -42,7 +42,7 @@ extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* The zero offset ScreenSprite__AttachToParent attaches with. */
-extern LongVec3 gVec3Zero;
+extern LongVec3 sVec3Zero;
 
 /* Cell 0 of the font texture, {u 0, v 0, w 8, h 8}: GetCellRect offsets it. */
 extern SpriteRect sCharSpriteCellRect;
@@ -135,7 +135,7 @@ void ScreenSprite__Reset(ScreenSprite *self) {}
  * setPosition (+0x0BC). */
 void ScreenSprite__AttachToParent(ScreenSprite *self, SceneNode *parent, ScreenSpritePos *pos) {
     if (self->parent == NULL) {
-        GetSpriteMethods()->attachToParent((Sprite *)self, parent, &gVec3Zero);
+        GetSpriteMethods()->attachToParent((Sprite *)self, parent, &sVec3Zero);
         self->methods->setPosition(self, pos);
     }
 }
