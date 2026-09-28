@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004B31C` on 2026-09-22 (tools/rename.py). Address 0x8004b31c.
 
-**Unit:** class_39e08 · **Size:** 2 words · **Status:** MATCHED (2/2 words)
+**Unit:** DayTaskStageMap · **Size:** 2 words · **Status:** MATCHED (2/2 words)
 
 ## What it does
 
@@ -21,7 +21,7 @@ jr    $ra
 
 A leaf computing `&self->unk1C0` and returning it. Sized the trailing
 `unk1C0` field as `u8 unk1C0[0x1E8 - 0x1C0]` (0x28 bytes) in
-`include/class_39e08.h` so `StageMap`'s total size comes out to exactly
+`include/DayTaskStageMap.h` so `StageMap`'s total size comes out to exactly
 0x1E8 — the same constant `New_StageMap`'s allocator call uses — without
 asserting anything about the field's internal structure.
 

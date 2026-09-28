@@ -1,5 +1,5 @@
 /*
- * class_39e08 -- the methods of DayTask and of most of its parent TimedTask,
+ * DayTaskStageMap -- the methods of DayTask and of most of its parent TimedTask,
  * with one free function between them.
  *
  * DayTask (include/DayTask.h), New_DayTask through GetDayTaskMethods: the
@@ -23,7 +23,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "class_39e08.h"
+#include "DayTaskStageMap.h"
 #include "VabStreamObj.h"
 #include "NodeGuardedViewport.h"
 #include "StageMap.h"
@@ -368,7 +368,7 @@ void TimedTask__SetTimeout(TimedTask *self, s32 timeout) {
 
 /*
  * class_3ac78 -- TimedTask's last two functions (TimedTask__PlaySound and
- * GetTimedTaskMethods, include/TimedTask.h; the rest are in class_39e08),
+ * GetTimedTaskMethods, include/TimedTask.h; the rest are in DayTaskStageMap),
  * then the front third of StageMap (include/StageMap.h): the loaded part of
  * a stage's map, seven chunk slots each laid out as a lattice of GridCells.
  *
@@ -835,7 +835,7 @@ void StageMap__SetConfig(StageMap *self, StageGridDimensions *config) {
  * banner describes the class): placing a cell descriptor in the world,
  * loading the seven chunk slots around a centre chunk, linking a loaded
  * chunk into its slot's cells, and the queries that turn a position back
- * into a slot and cell. class_39e08.c holds the methods before these and
+ * into a slot and cell. DayTaskStageMap.c holds the methods before these and
  * class_3bb8c_b.c those after; the class's data tables are declared in
  * include/class_3bb8c.h.
  *
@@ -1449,8 +1449,8 @@ ChunkSlot *StageMap__FindSlotForPosition(StageMap *self, LongVec3 *pos) {
 
 /*
  * class_3bb8c_b -- StageMap's drawn window and scale ramp: the last of the
- * class's methods (include/StageMap.h; the others are in class_39e08.c and
- * class_39e08.c).
+ * class's methods (include/StageMap.h; the others are in DayTaskStageMap.c and
+ * DayTaskStageMap.c).
  *
  *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: which of the seven
  *    slots holds a neighbour key, or a loaded chunk.

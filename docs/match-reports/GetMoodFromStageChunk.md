@@ -102,7 +102,7 @@ work ends up reading this field (likely wherever the grid is actually
 rendered/laid out) to confirm or correct.
 
 **Update (round 101, track 7): `isVertical` now has accessors.** The two
-paragraphs above predate them. `src/class_39e08.c`, `src/class_3bb8c_b.c`
+paragraphs above predate them. `src/DayTaskStageMap.c`, `src/class_3bb8c_b.c`
 and `src/class_3bb8c_p.c` read `StageGridDimensions.isVertical` (tested
 against 0 and 1) through a dimensions pointer, so the field is no longer
 padding-by-rule; confirming or sharpening its name belongs to whoever

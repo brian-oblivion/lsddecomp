@@ -10,7 +10,7 @@
 
 Replaces `self`'s cached sub-resource handle (`self->unk74`). If a path
 string is given, tears down the old handle (if one was live), loads a new
-one via `New_TimImage` (already matched in `class_39e08.c`), and runs two
+one via `New_TimImage` (already matched in `DayTaskStageMap.c`), and runs two
 init calls on it. If no path is given, the caller-supplied handle `a2` is
 installed directly with no teardown/init calls at all.
 
@@ -54,11 +54,11 @@ each arm by the compiler rather than needing to be written twice by hand.
   padding, not a change to any already-typed field, so it does not affect
   `Task.c`'s 16 already-matched functions.
 - `extern Unk74Obj *New_TimImage(const char *path);` — a local retyped view
-  of the already-matched `class_39e08.c` function of the same name, which
+  of the already-matched `DayTaskStageMap.c` function of the same name, which
   there returns its own unit's local view `SubObjG *`. Per this project's
   established multiple-independent-local-views convention (see
-  `class_39e08`/`class_3bb8c` in DECOMPILATION_LEARNINGS), this unit keeps
-  its own view rather than including `class_39e08.h`.
+  `DayTaskStageMap`/`class_3bb8c` in DECOMPILATION_LEARNINGS), this unit keeps
+  its own view rather than including `DayTaskStageMap.h`.
 
 ## The one residue, and how it closed
 

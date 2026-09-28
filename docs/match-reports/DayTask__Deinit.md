@@ -63,7 +63,7 @@ void DayTask__Deinit(Obj865C8 *self) {
 }
 ```
 
-## New struct knowledge (`include/class_39e08.h`)
+## New struct knowledge (`include/DayTaskStageMap.h`)
 
 - `Obj865C8::unk0C` retyped from `s32` (its only other use so far,
   `DayTask__StartObjM`'s forwarded arg to `Get_vtable_IntermediateBase()->slot44`, a plain
@@ -108,4 +108,4 @@ matches.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Prefix only. Accessors: unk38 -> dreamSys, unk0C->unk4 -> initArgs->unk4, unk10 -> IntermediateBase's unk10.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Prefix only. Accessors: unk38 -> dreamSys, unk0C->unk4 -> initArgs->unk4, unk10 -> IntermediateBase's unk10.

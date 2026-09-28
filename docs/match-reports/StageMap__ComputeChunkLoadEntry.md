@@ -90,7 +90,7 @@ were all already correct; the stall was one variable too many).
 > should re-run the oracle after deleting even a provably-empty statement.
 >
 > Oracle: `build exit=0`, `OK: build matches retail SLPS_015.56`, funcdiff
-> 63/63 ins 0/del 0, no drift. Unit `class_39e08` INCLUDE_ASM count 5 -> 4.
+> 63/63 ins 0/del 0, no drift. Unit `DayTaskStageMap` INCLUDE_ASM count 5 -> 4.
 >
 > ### Proposed learning
 >
@@ -123,7 +123,7 @@ were all already correct; the stall was one variable too many).
 > unchanged from round 46.**
 >
 > **Checked this round's headline instruction (run permuter check 3 before
-> believing any inherited negative in the `class_39e08`/`Obj866E8`
+> believing any inherited negative in the `DayTaskStageMap`/`Obj866E8`
 > family) against this function's own history.** This function's two
 > permuter searches (round 27, round 32) both explicitly ran `--debug`
 > BEFORE searching and recorded the scaffold's base score (25) with the
@@ -146,7 +146,7 @@ were all already correct; the stall was one variable too many).
 > field read shared between an `if`'s condition and its own body.
 >
 > **Disposition unchanged: 58/63.** No new attempt made; time went to
-> confirming this and the other five `class_39e08` residues' permuter
+> confirming this and the other five `DayTaskStageMap` residues' permuter
 > check-3 status is what it was recorded as, since that is this round's
 > stated priority for this family. `INCLUDE_ASM` untouched throughout
 > (verification only, `git status` clean before and after).
@@ -172,7 +172,7 @@ were all already correct; the stall was one variable too many).
 > which variables hold which sub-computation -- not declare-vs-assign
 > form). Split all three into separate declaration and assignment
 > statements in one build, rebuilt: **58/63, IDENTICAL diff, no drift --
-> fully inert.** Reverted (`git checkout -- src/class_39e08.c`; clean
+> fully inert.** Reverted (`git checkout -- src/DayTaskStageMap.c`; clean
 > build confirmed after).
 >
 > This is a FOURTH confirmed instance (joining `StageMap__ApplyChunkLoads`,
@@ -308,7 +308,7 @@ were all already correct; the stall was one variable too many).
 > and `StageMap__ComputeFootprintDescriptor` instead, per this round's staffing guidance. Restored
 > to `INCLUDE_ASM` unchanged.
 
-Unit `class_39e08`. FRESH this round (no prior report). Restored to
+Unit `DayTaskStageMap`. FRESH this round (no prior report). Restored to
 `INCLUDE_ASM`; no C left in `src/`.
 
 Only a caller-side prototype existed before this round (in
@@ -390,7 +390,7 @@ this function.
 
 ## SUPERSEDED by round 63 -- the matching body
 
-The round-63 match is live in `src/class_39e08.c`. It differs from the 58/63
+The round-63 match is live in `src/DayTaskStageMap.c`. It differs from the 58/63
 body below only inside the `self->unk68->unk4 == 0` block: `fieldVal`, `lo`
 and `sum` collapse into a single `sum`, and `value = val + sum;` is hoisted
 out of both branches. The `do {} while (0);` is load-bearing -- see the
@@ -611,7 +611,7 @@ Parameters and locals, tier A: `arg1` -> `out`, `divisor` -> `columns`, `flag` -
 
 Left: the two `*(s32 *)((u8 *)out + 4)` writes. ChunkLoadEntry declares `chunkIndex` s16 plus a pad; retyping it `s32` (dropping `pad6`) and writing `out->chunkIndex` builds byte-identical (measured this round, then reverted: include/StageMap.h is shared and the change is not additive). Proposed to the head. The `do {} while (0);` keeps a one-line `/* MATCHING */`.
 
-The comment that stood above the function in `src/class_39e08.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 63 (delta): closed a 58/63 stall that had stood since round

@@ -32,7 +32,7 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
   unit is a whole number of 0x1C-byte records into that table, so the unit
   types the table as `FilePathRecord` (size only). The record's fields are unknown.
 - Callers in other units still declare their own prototypes (`s32` returns in
-  class_39e08.h / class_3bb8c.h); those are independent declarations and were
+  DayTaskStageMap.h / class_3bb8c.h); those are independent declarations and were
   not touched.
 
 ## The second parameter (round 82, alpha, track 3 externcheck)

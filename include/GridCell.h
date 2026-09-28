@@ -9,7 +9,7 @@
  * SceneNode's subclass (the ctor chains to SceneNode's first), no class
  * below it. Methods in src/class_3bb8c_c.c.
  *
- * Lifecycle: only StageMap__StageMap (src/class_39e08.c) creates them.
+ * Lifecycle: only StageMap__StageMap (src/DayTaskStageMap.c) creates them.
  * For each of its seven elements it makes one GridCell as the element's
  * `cellParent`, attached to the StageMap at `origin`, and 410 more as
  * the element's `cells` (a 20 x 20 lattice, row stride 20, then 10

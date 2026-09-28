@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004C3F0` on 2026-09-24 (tools/rename.py). Address 0x8004c3f0.
 
-**Unit:** class_39e08 · **Size:** 17 words · **Status:** MATCHED (first attempt).
+**Unit:** DayTaskStageMap · **Size:** 17 words · **Status:** MATCHED (first attempt).
 
 ## Result
 

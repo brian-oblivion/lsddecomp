@@ -70,7 +70,7 @@ first written.)
 the base's own slot44, returns `self->unk28`) — its `s32` return is discarded
 here.
 
-## New struct knowledge (`include/class_39e08.h`)
+## New struct knowledge (`include/DayTaskStageMap.h`)
 
 Continues carving `Obj0C` (fields `unk8`, `unk10` added alongside the
 already-known `unk4`) and `SubObjDMethods` (`slot10` added alongside the
@@ -100,7 +100,7 @@ consistent with either a scalar or a pointer. `DayTask__Finalize`
 directly (`->methods->slot4`) and settles it: they are `SubObjG *`. This
 function's own derivation above is left as originally written (it was, and
 remains, an accurate account of what THIS function's disassembly shows);
-the field type in `include/class_39e08.h` and the two call-site casts above
+the field type in `include/DayTaskStageMap.h` and the two call-site casts above
 have been updated to match the corrected type, and the build/funcdiff for
 this function was reconfirmed at 41/41 after the change.
 
@@ -110,4 +110,4 @@ this function was reconfirmed at 41/41 after the change.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Prefix only. Now returns s32 (the parent init's result, `return GetTimedTaskMethods()->init(...)`), byte-identical: the slot is s32 and PollStatusObj switches on it. It takes self alone, unlike the slot's (self, args, mode); the slot keeps IntermediateBase's type and PollStatusObj calls through DayTaskInitFn.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Prefix only. Now returns s32 (the parent init's result, `return GetTimedTaskMethods()->init(...)`), byte-identical: the slot is s32 and PollStatusObj switches on it. It takes self alone, unlike the slot's (self, args, mode); the slot keeps IntermediateBase's type and PollStatusObj calls through DayTaskInitFn.

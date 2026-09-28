@@ -333,7 +333,7 @@ one real call site, `StageMap__OnNotifyTag1`'s `self->methods->slot104(self, e)`
 - `EntryChildObj::unk36` -- `s16` at `+0x036`, carved out of the old
   `pad24[0x38-0x24]` (20 bytes -> 18 + 2, same total).
 - Forward typedefs only for `LinkTarget866E8`, `ResInfo866E8`, `EntryGpu`
-  (top-of-file block) -- their FULL bodies live in `class_39e08.c`, not the
+  (top-of-file block) -- their FULL bodies live in `DayTaskStageMap.c`, not the
   header, since none of the 11 sibling units touch them. This is the
   "own local view, own file" half of the project's shared-header
   discipline; only the field additions on the three already-shared types
@@ -712,7 +712,7 @@ This is the Gate 1b "rebuild before trusting" check, and it matters here
 because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
-four preserved bodies in `class_39e08` were rebuilt this round and all four
+four preserved bodies in `DayTaskStageMap` were rebuilt this round and all four
 are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
 `StageMap__LoadChunksAround` 125/140, `StageMap__PopulateSlotCells` 130/150. No stale figure and no
 never-linked body in this unit.
@@ -739,7 +739,7 @@ premature**:
 **A permuter scaffold's `base.c` is NOT the project's C.**
 `tools/setup-permuter.sh` emits a FLATTENED translation unit -- the function
 plus its own inlined preamble of typedefs. Pasting that body straight into
-`src/class_39e08.c` cannot work, because this function's local types live in
+`src/DayTaskStageMap.c` cannot work, because this function's local types live in
 this report's `#if 0` block, not in the unit. Bring the declarations across
 with the body, build, *then* believe the figure.
 
@@ -804,7 +804,7 @@ sibling it was worth 12 words.
 
 The head applied it and the build failed: ``LinkResource' undeclared``. The
 permuter's `base.c` is a FLATTENED scaffold with its own preamble, so its body
-is not directly pasteable into `src/class_39e08.c` -- this function's local
+is not directly pasteable into `src/DayTaskStageMap.c` -- this function's local
 types live in this report's own `#if 0` block and must come across with it.
 That is a ten-minute job and a runner's, not a head's, and doing it badly
 would have produced a figure that measured the wrong thing.
@@ -830,7 +830,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BE54` | `StageMap__PopulateSlotCells` | B | Occupant of `gStageMapMethods` +0x104 (`slot104`), and its own identity slot -- `StageMap__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/class_39e08.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
+| `func_8004BE54` | `StageMap__PopulateSlotCells` | B | Occupant of `gStageMapMethods` +0x104 (`slot104`), and its own identity slot -- `StageMap__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/DayTaskStageMap.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
 
 ## Track 4 (2026-09-26, round 87, echo)
 
@@ -935,7 +935,7 @@ unread +0x04..+0x0F stays padding (no code reads or writes it).
 
 **Proposed (head, not applied: outside this job's edit set).** The same
 0x10-byte record is declared twice more, with ResourceSource's fields under
-other names: include/class_39e08.h `LoadRequest` and src/GameApplicationFileResource.c
+other names: include/DayTaskStageMap.h `LoadRequest` and src/GameApplicationFileResource.c
 `LoadModelRequest`, both `{ s32 type; const char *path; s32 unk08; s32
 unk0C; }`, whose callers write `type = 0` (ResourceSource's NULL `buffer`)
 and `path` (its `name`) before `New_LinkResource`. One
@@ -965,7 +965,7 @@ The descriptor is embedded rather than spelled as two loose words, so the
 callers pass `&req.src` with no cast; measured byte-exact at all three call
 sites. This unit's local view retired onto it (the local is now `req`, the
 body writes `req.src.buffer`); the `MATCHING` line on the 0x10 size moved to
-the header's type. include/class_39e08.h `LoadRequest` (DayTask__DayTask)
+the header's type. include/DayTaskStageMap.h `LoadRequest` (DayTask__DayTask)
 and src/GameApplicationFileResource.c `LoadModelRequest` (GameApplication__GameApplication)
 retired onto the same type; their `type`/`path` accessors became
 `src.buffer`/`src.name`, the only ones the compiler listed.

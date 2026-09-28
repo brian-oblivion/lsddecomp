@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004A228` on 2026-09-23 (tools/rename.py). Address 0x8004a228.
 
-**Unit:** class_39e08 · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED (27/27 words)
+**Unit:** DayTaskStageMap · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED (27/27 words)
 
 ## What it does
 
@@ -54,7 +54,7 @@ void TimedTask__Finalize(Obj865C8 *self) {
 `IntermediateBaseMethods` (the base table's own type, only slots +0x00C,
 +0x048, +0x060 typed -- the three this unit calls through explicitly) and
 `SubObjB` (opaque, only slot +0x004 named) are established in
-`include/class_39e08.h`, added this round.
+`include/DayTaskStageMap.h`, added this round.
 
 ## Proposed learning
 

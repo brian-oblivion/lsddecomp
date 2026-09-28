@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004B324` on 2026-09-27 (tools/rename.py). Address 0x8004b324.
 
-**Unit:** class_39e08 &middot; **Size:** 2 words &middot; **Status:** MATCHED
+**Unit:** DayTaskStageMap &middot; **Size:** 2 words &middot; **Status:** MATCHED
 (`void StageMap__NoOpSlotD8(void) {}`)
 
 ## What it does

@@ -17,7 +17,7 @@
  * start and end are real file boundaries. Inside, tools/tuboundary.py finds
  * no rodata tying or splitting the six functions (all five gaps "boundary
  * possible"; the forced boundary it notes spans Sprite.c's jump table at
- * 0x80011290 to class_39e08.c's at 0x8001140C and is met by Sony edges
+ * 0x80011290 to DayTaskStageMap.c's at 0x8001140C and is met by Sony edges
  * elsewhere, so it forces nothing here). Content decided the rest: one class,
  * whole, is one file, named for it.
  */

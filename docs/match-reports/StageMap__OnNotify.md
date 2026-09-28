@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A984` on 2026-09-22 (tools/rename.py). Address 0x8004a984.
 
-**Unit:** class_39e08 · **Size:** 35 instructions · **Result:** 35/35 words
+**Unit:** DayTaskStageMap · **Size:** 35 instructions · **Result:** 35/35 words
 
 ## What it does
 
@@ -74,7 +74,7 @@ since pointers and `s32` are both 32-bit registers.
 
 ## Provenance
 
-round 2026-09-02, runner ALPHA, unit class_39e08.
+round 2026-09-02, runner ALPHA, unit DayTaskStageMap.
 
 ## Naming
 

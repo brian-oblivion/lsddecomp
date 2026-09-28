@@ -84,7 +84,7 @@ discipline and the file banner), so this unit keeps its own local reading,
 ### Proposed learning
 
 - **`GetSceneNodeMethods`'s per-call-site-typing precedent is not unique to
-  `class_3bb8c.h`/`SceneNode.h`/`class_39e08.c`.** A fourth, independent
+  `class_3bb8c.h`/`SceneNode.h`/`DayTaskStageMap.c`.** A fourth, independent
   local reading (`FixedBaseTable` here) needed the SAME non-void-vs-void
   fork on the SAME slot (`ctor`, offset `+0x008`) for the identical reason
   (this call site's return value is checked). Worth noting because it

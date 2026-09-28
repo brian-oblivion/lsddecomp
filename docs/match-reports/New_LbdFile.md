@@ -43,7 +43,7 @@ DataSrc39094 *New_LbdFile(void) {
   (`s32 unused`): PickSoundBank passes one in `$a1`, as GameApplicationFileResource's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
-  (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
+  (DayTaskStageMap.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
 
 ## Naming
 

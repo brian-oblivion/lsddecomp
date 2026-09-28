@@ -7,14 +7,14 @@
 > Renamed from `func_8004C5D0` on 2026-09-24 (tools/rename.py). Address 0x8004c5d0.
 
 A vtable slot in `gStageMapMethods` (`+0x124`, per `tools/classtable.py`), and
-already independently visible from `class_39e08.h`'s own view of the same
+already independently visible from `DayTaskStageMap.h`'s own view of the same
 table — its own comment types the occupant as `void
 *(*slot124)(StageMap *self, void *arg1)`. Reading THIS unit's actual
 occupant body shows that typing is likely wrong: the function returns a
 plain `s32` (an array index, or `-1`), not a pointer, and its second
 argument is compared directly against a signed 16-bit struct field (a
 key), not dereferenced as a pointer anywhere. Per parallel-mode rules this
-unit does not edit `class_39e08.h` (a different unit's own file) — flagged
+unit does not edit `DayTaskStageMap.h` (a different unit's own file) — flagged
 here for the head to reconcile; see "Proposed learning" below.
 
 ## Disassembly
@@ -84,7 +84,7 @@ s32 StageMap__FindSlotIndexByChunk(Obj866E8 *self, s32 key) {
 
 ### Proposed learning
 
-**`class_39e08.h`'s independent typing of `gStageMapMethods` slot `+0x124`
+**`DayTaskStageMap.h`'s independent typing of `gStageMapMethods` slot `+0x124`
 (`void *(*slot124)(StageMap *self, void *arg1)`) does not match this
 occupant's own body** — the occupant returns `s32` (an index or `-1`) and
 never dereferences `arg1`, only compares it against a signed 16-bit field.
@@ -92,7 +92,7 @@ This is the same trap the project's "a discarded return value/empty-bodied
 occupant is never evidence of a slot's true signature" guidance already
 warns about, in the opposite direction: a *guessed* signature from the
 caller side, never checked against the occupant's own disassembly. Since
-`class_39e08.h` belongs to a different unit under this round's parallel
+`DayTaskStageMap.h` belongs to a different unit under this round's parallel
 rules, this is left for the head to reconcile rather than edited directly
 — flagged explicitly per the runner brief's shared-vtable-slot caution.
 
@@ -104,18 +104,18 @@ rules, this is left for the head to reconcile rather than edited directly
 on a miss. Named the same way and for the same reason -- by the field it
 searches, since `unk30`/`unk2C` are cross-unit `ElemTarget` fields this
 unit does not own (also read by `StageMap__OnNotifyTag1`/`StageMap__ClearSlotCells` in
-class_39e08.c).
+DayTaskStageMap.c).
 
 ## Proposed field names
 
-**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that StageMap__ComputeFootprintDescriptor sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (class_39e08.c), where all readers are in one unit.
+**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that StageMap__ComputeFootprintDescriptor sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (DayTaskStageMap.c), where all readers are in one unit.
 
-`ElemTarget::unk30` and `ElemTarget::unk2C` (also read by class_39e08.c's
+`ElemTarget::unk30` and `ElemTarget::unk2C` (also read by DayTaskStageMap.c's
 `StageMap__OnNotifyTag1`/`StageMap__ClearSlotCells` -- cross-unit, not renamed here).
 Proposed: `unk30` -> `key` (same reasoning as `unk32` above -- compared
 for equality against this function's own `key` argument);
 `unk2C` -> `enabled` (gates this function's match with a nonzero test,
-and class_39e08.c's `StageMap__OnNotifyTag1` gates its own dispatch on the same
+and DayTaskStageMap.c's `StageMap__OnNotifyTag1` gates its own dispatch on the same
 field the same way -- a plain "is this target live" flag is the simplest
 reading that fits both call sites, though neither establishes it beyond
 "nonzero enables").

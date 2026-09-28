@@ -68,7 +68,7 @@ The unit banner of `src/class_3bb8c_t.c` was rewritten to say what the file hold
  * class_3bb8c_t -- functions 96..112 of the 113-function `class_3bb8c_n`
  * remainder, 0x48738..0x48F74 (vram 0x80057F38..0x80058774).  Carved
  * MID-round 17 (2026-09-04) to re-staff a runner whose own unit was
- * exhausted.  This is the LAST slice of the class_39e08 block.
+ * exhausted.  This is the LAST slice of the DayTaskStageMap block.
  *
  * EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS.  It is cut at ROM
  * addresses, not class boundaries.  Identify each with tools/classtable.py.

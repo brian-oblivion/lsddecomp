@@ -16,7 +16,7 @@
  * map chunk, STGnn\Mnnn.LBD.
  *
  * gRecordTable is an array of 0x1C-byte records (FilePathRecord), each a file path
- * padded with zeros; class_39e08.c's RegisterRecordTableFiles hands them to
+ * padded with zeros; DayTaskStageMap.c's RegisterRecordTableFiles hands them to
  * the CD driver. In order:
  *  - the seven sound banks' SND\name.VH/VB pairs and SND\SE.VH/VB;
  *  - each stage's files, from gStageFirstRecord[stage]: its four textures

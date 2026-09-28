@@ -10,7 +10,7 @@
 
 Get-vtable helper for a small sibling class: returns `&gNodeGuardedViewportMethods`, the
 vtable this unit calls `NodeGuardedViewportMethods`. Same shape as the game's other
-`func_80xxxxxx()->ctor(...)` vtable getters (e.g. class_39e08.c's
+`func_80xxxxxx()->ctor(...)` vtable getters (e.g. DayTaskStageMap.c's
 `GetTimedTaskMethods`/`GetStageMapMethods`).
 
 ## The C
@@ -48,7 +48,7 @@ way really is a vtable and not incidental data.
 
 **GetNodeGuardedViewportMethods** -- tier A. Pure vtable getter (`return
 &gNodeGuardedViewportMethods;`), the same shape and role as the project's other
-`GetClassXMethods` getters (e.g. `GetTimedTaskMethods`, class_39e08.c).
+`GetClassXMethods` getters (e.g. `GetTimedTaskMethods`, DayTaskStageMap.c).
 The mechanics -- "returns a pointer to this specific class's own methods
 table" -- ARE the purpose, so tier A applies by the leaf-getter rule. The
 underlying vtable global was renamed alongside it, `D_800869D8` ->

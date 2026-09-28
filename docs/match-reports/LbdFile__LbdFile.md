@@ -49,7 +49,7 @@ void LbdFile__LbdFile(DataSrc39094 *self) {
   (`s32 unused`): PickSoundBank passes one in `$a1`, as GameApplicationFileResource's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
-  (class_39e08.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
+  (DayTaskStageMap.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
 
 ## Naming
 
@@ -123,7 +123,7 @@ renamed):
 ## Proposed field names
 
 Not applied: every accessor outside `src/GameFiles.c` is in StageMap's
-units (class_39e08.c, class_3bb8c_b.c), outside this job. For the head to
+units (DayTaskStageMap.c, class_3bb8c_b.c), outside this job. For the head to
 apply by type scope.
 
 - `LbdFile.ownerRate` (+0x030) -> `chunkIndex`. StageMap__ApplyChunkLoads
@@ -133,16 +133,16 @@ apply by type scope.
   tests `>= 0`); StageMap__SplitChunkIndex splits it into column
   (`% divisor`) and row (`/ divisor`); StageMap__FindSlotIndexByChunk
   finds the element holding a given chunk by it. Accessors: GameFiles.c
-  (LbdFile__LbdFile, LbdFile__ReleaseHeader), class_39e08.c
+  (LbdFile__LbdFile, LbdFile__ReleaseHeader), DayTaskStageMap.c
   (ApplyRateEntries, ResetElementCells, ComputeFootprintDescriptor,
-  GetLastTargetRateSplit), class_39e08.c (FindElemIndexByUnk30).
+  GetLastTargetRateSplit), DayTaskStageMap.c (FindElemIndexByUnk30).
 - `LbdFile.ownerKey` (+0x032) -> `elemKey`. StageMap's ctor writes the
   element's index, BuildRateEntries copies each element's `key` in, and
   FindElemByUnk32 / UpdateFootprintTracking / class_3bb8c_p read it back to
-  find an element. Accessors: class_39e08.c, class_3bb8c.c, class_3bb8c_b.c,
+  find an element. Accessors: DayTaskStageMap.c, class_3bb8c.c, class_3bb8c_b.c,
   class_3bb8c_p.c (none in GameFiles.c; the ctor zeroes it).
 - `LbdFileHeader.gridOffset` / `gridSize` (+0x04 / +0x08) ->
   `placementsOffset` / `placementsSize`. StageMap__PopulateSlotCells
   points the element's PlacementGrid (a 20x20 grid of placement records) at
   header + gridOffset and builds its LinkResource from header + gridOffset +
-  gridSize, i.e. right after the placements. Accessor: class_39e08.c only.
+  gridSize, i.e. right after the placements. Accessor: DayTaskStageMap.c only.

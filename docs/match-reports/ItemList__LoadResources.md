@@ -208,7 +208,7 @@ reshaping).
 ### Proposed learning (reinforces existing entry, does not add a new class)
 
 **Three independent functions across two different header families
-(`class_39e08`'s `StageMap__BuildFootprintRects`, `class_3bb8c_f`'s `TaskObjF__WriteMemcardSaveFile`,
+(`DayTaskStageMap`'s `StageMap__BuildFootprintRects`, `class_3bb8c_f`'s `TaskObjF__WriteMemcardSaveFile`,
 `class_3bb8c_j`'s `ItemList__LoadResources`) now confirm the same negative result
 for the SAME lever (declaration/introduction order of the contested
 locals).** This is strong enough evidence to stop treating "try a

@@ -9,7 +9,7 @@
  * pair and, in between, runs the day's play as ObjM children (one per
  * stage), and init returns how the day ended. The object is 0x50 bytes; its
  * own fields run from TimedTask's 0x38. No class derives from it. Methods:
- * src/class_39e08.c, New_DayTask through GetDayTaskMethods.
+ * src/DayTaskStageMap.c, New_DayTask through GetDayTaskMethods.
  *
  * Who creates it. Application__RunMainLoop (src/code_2b78c.c) calls
  * GameApplication__RunDayTask (src/GameApplicationFileResource.c) when the GraphRoom poll

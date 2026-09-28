@@ -211,7 +211,7 @@ level the name claims.
 ## Track 6 (round 96, delta): the request local is ResourceSourceRequest
 
 src/GameApplicationFileResource.c `LoadModelRequest`, `{ s32 type; const char *path; s32 unk08; s32 unk0C; }`, is the same
-0x10-byte record as class_39e08.c's and the third caller's: the body writes
+0x10-byte record as DayTaskStageMap.c's and the third caller's: the body writes
 `type = 0` (ResourceSource's NULL `buffer`: no buffer to adopt) and `path`
 (its `name`: the file to request) and passes it to New_LinkResource. It
 retired onto include/FileResource.h's `ResourceSourceRequest` (a

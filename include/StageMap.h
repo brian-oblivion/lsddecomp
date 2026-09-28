@@ -9,9 +9,9 @@
  * around a tracked target, each laid out as a lattice of GridCells. Class
  * id 0x114, method table gStageMapMethods; LightRig's subclass (its ctor
  * and finalize chain to LightRig's first; getLight and setAmbientColor are
- * inherited unchanged), no class below it. Methods in src/class_39e08.c
- * (New_StageMap .. SetConfig), src/class_39e08.c (SetTargetAndLoadChunks
- * .. FindSlotForPosition) and src/class_39e08.c
+ * inherited unchanged), no class below it. Methods in src/DayTaskStageMap.c
+ * (New_StageMap .. SetConfig), src/DayTaskStageMap.c (SetTargetAndLoadChunks
+ * .. FindSlotForPosition) and src/DayTaskStageMap.c
  * (FindSlotIndexByNeighbour .. GetStageMapMethods).
  *
  * Lifecycle. The game makes one, at boot (DayTask__DayTask, via

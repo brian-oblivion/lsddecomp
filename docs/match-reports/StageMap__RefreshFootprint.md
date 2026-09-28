@@ -88,7 +88,7 @@ flag over the current footprint, recompute it via one of two strategies
 gated on `self->unk68->unk4`, set the flag again), but WHY the object's
 grid footprint needs refreshing (what game event triggers it) is not
 established from this unit alone. "Footprint" is not a guess -- it is
-class_39e08's own already-established vocabulary for the identical
+DayTaskStageMap's own already-established vocabulary for the identical
 mechanism on this same class (`StageMap__ApplyToSenderFootprint`,
 `StageMap__SetFootprintRect`), confirmed by that unit's independent view
 reaching the same `self->unk68->unk4` dispatch.

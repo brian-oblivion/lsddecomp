@@ -265,7 +265,7 @@ to code_179d8_h's blocking call and never touches the queue. `gCdAsyncEnabled`
 `CdDriver__RunRequestQueue` dispatches it back the method runs it as a
 blocking CdControl/CdSync/CdRead spin on the spot. So the word selects
 "synchronous, but through the request queue". Its one nonzero writer is
-`SetCdDriverMode(async, 1, 1)` reached from class_39e08 through
+`SetCdDriverMode(async, 1, 1)` reached from DayTaskStageMap through
 `SetActiveDataSourceDriverMode(syncDriver == 0, 1, 1)`; every other caller
 passes 0. Tier B: the mechanics are the bodies', why the game wants the
 queued blocking mode is not established.

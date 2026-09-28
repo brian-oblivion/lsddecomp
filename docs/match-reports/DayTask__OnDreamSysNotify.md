@@ -20,4 +20,4 @@ A no-op BODY is not evidence the SLOT's signature takes no arguments (CLAUDE.md)
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in class_39e08.h are gone. Renamed from Obj865C8__Noop80: own slot +0x080, which DayTask__OnNotify calls for a sender whose id & 0xFFFF is 0x1F34, DreamSys's. Empty.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Renamed from Obj865C8__Noop80: own slot +0x080, which DayTask__OnNotify calls for a sender whose id & 0xFFFF is 0x1F34, DreamSys's. Empty.
