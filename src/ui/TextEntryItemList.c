@@ -53,7 +53,7 @@ TextEntry *New_TextEntry(char *text, s32 mode) {
 }
 
 /* The characters nextChar/prevChar step through, NUL-terminated. */
-extern u8 *gNameCharTable;
+extern u8 *sNameCharTable;
 
 void TextEntry__TextEntry(TextEntry *self, char *text, s32 mode) {
     u8 *p;
@@ -64,8 +64,8 @@ void TextEntry__TextEntry(TextEntry *self, char *text, s32 mode) {
     self->textLen = strlen(text);
     self->editBuf = BMemPMgrAlloc(self->textLen + 4);
 
-    /* MATCHING: counted inline; strlen(gNameCharTable) would be a call. */
-    p = gNameCharTable;
+    /* MATCHING: counted inline; strlen(sNameCharTable) would be a call. */
+    p = sNameCharTable;
     count = 0;
     while (*p != 0) {
         p++;
@@ -451,15 +451,15 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
 
 /* The characters an entry can hold, in the order nextChar/prevChar step
  * through them: a pointer to a NUL-terminated byte string (TextEntry.h). */
-extern u8 *gNameCharTable;
+extern u8 *sNameCharTable;
 
 void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
     TextRow *row;
 
     if (self->panelSprite) {
-        self->editBuf[pos] = gNameCharTable[charIndex];
+        self->editBuf[pos] = sNameCharTable[charIndex];
         row = self->textRow;
-        ((TextRowSetCellAtFn)row->methods->setCell)(row, gNameCharTable[charIndex], pos);
+        ((TextRowSetCellAtFn)row->methods->setCell)(row, sNameCharTable[charIndex], pos);
         self->cursorIndex = pos;
         self->charIndex = charIndex;
         if (notify) {

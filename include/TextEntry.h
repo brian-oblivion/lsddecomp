@@ -17,7 +17,7 @@
  *    state 2, a cross press closes with state 3 without writing.
  *  - moveCursorRight/Left step `cursorIndex` inside [0, textLen) and move the
  *    cursor sprite (setCursorPos: x = index * 7 from gTextEntryCursorPos).
- *  - nextChar/prevChar step `charIndex` through gNameCharTable, whose length
+ *  - nextChar/prevChar step `charIndex` through sNameCharTable, whose length
  *    the ctor counts into `charCount`, and setCharAt writes that byte into
  *    `editBuf` at the cursor and into the text row. resetChar/resetAllChars
  *    write byte 0 of the table at the cursor / at every position.
@@ -90,9 +90,9 @@ struct TextEntry {
     BASICCLASS_FIELDS(TextEntryMethods);
     /* +0x00C */ s32 mode;    /* setText: 1 = the caller's buffer is full-width SJIS */
     /* +0x010 */ s32 textLen; /* ctor: strlen(text), halved by setText in mode 1; the cursor's bound */
-    /* +0x014 */ s32 charCount; /* ctor: length of gNameCharTable; nextChar's bound, prevChar's wrap value */
+    /* +0x014 */ s32 charCount; /* ctor: length of sNameCharTable; nextChar's bound, prevChar's wrap value */
     /* +0x018 */ s32 cursorIndex; /* setText zeroes; moveCursorRight/Left, setCursorPos, setCharAt */
-    /* +0x01C */ s32 charIndex; /* setText zeroes; index into gNameCharTable: nextChar/prevChar/resetChar, setCharAt */
+    /* +0x01C */ s32 charIndex; /* setText zeroes; index into sNameCharTable: nextChar/prevChar/resetChar, setCharAt */
     /* +0x020 */ s32 actOnHeld; /* toggleActOnHeld flips it; handleCommand's arrow cases act on Pad presses when 0, on held buttons when set */
     /* +0x024 */ char *textBuf; /* setText: the caller's buffer; a circle press (handleCommand) writes editBuf back into it */
     /* +0x028 */ char *editBuf; /* ctor allocates textLen + 4, finalize frees; setText copies into it, setCharAt writes it */

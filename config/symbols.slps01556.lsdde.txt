@@ -2241,7 +2241,7 @@ sStrComInput = 0x80011610;
 sStrFontIcon = 0x8001161C;
 sCardPathPrefix = 0x8008AAE8;
 sTimExt = 0x8008AAF0;
-gNameCharTable = 0x8008AAE4;
+sNameCharTable = 0x8008AAE4;
 gTextEntryMethods = 0x80086ED0;
 // identified: fingerprint EXACT (TINY 4w) vs libgs/gs_124 GsSetWorkBase (discs 3.3,3.5,3.6) + sole store is GsOUT_PACKET_P (psyq-objects.ld pin) + position between placed gs_123 and gs_111; header LIBGS.H. Round 78.
 GsSetWorkBase = 0x8003FBE4; // type:func

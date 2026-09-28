@@ -150,7 +150,7 @@ the head to apply by type scope:
   `strlen(arg1)` (halved when `mode==1`); read as the upper bound in
   `TextEntry__MoveCursorRight`'s `unk18` test.
 - `unk14` -> `charTableLen` (tier B). Set by `TextEntry__TextEntry`'s own hand
-  counted walk over `gNameCharTable` until the NUL byte; read as the upper
+  counted walk over `sNameCharTable` until the NUL byte; read as the upper
   bound in `TextEntry__NextChar` and as the countdown's own reset
   value in TextEntryItemList's `TextEntry__PrevChar`.
 - `unk18` -> `cursorIndex` (tier B). The name-buffer edit-cursor index,
@@ -182,7 +182,7 @@ the head to apply by type scope:
   freed by `TextEntry__Finalize`; the decode/copy destination in
   `TextEntry__SetText` and the encode SOURCE in this function's own `case 25`;
   also the per-index byte array TextEntryItemList's `TextEntry__SetCharAt`
-  writes through `gNameCharTable`. Working (half-width-decoded) copy of the
+  writes through `sNameCharTable`. Working (half-width-decoded) copy of the
   name the caller supplies via `nameBuf`.
 - `unk40`/`unk44`/`unk48` -> `iconRes`/`fontRes`/`inputRes` (tier B).
   Resolved in `TextEntry__LoadCardResources`: `unk48` from the `COMINPUT.TIM`
