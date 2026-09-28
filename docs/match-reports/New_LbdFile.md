@@ -74,7 +74,7 @@ callback is ObjM__GetGridRecord (ObjM__AttachTarget installs it), whose
 tail call GetStageMapChunkRecord(stage, chunk) / GetStageMapChunkRecordXY leaves
 `&group[9 + chunk]` of sRecordTable in $v0. sRecordTable's 0x1C-byte records
 begin with a path, and record 9 of every stage group is its M000.LBD
-(stage 0: gStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
+(stage 0: sStageFirstRecord[0] = 16, record 25 at 0x80081CC0 =
 "STG00\M000.LBD"; stage 1: record 39 at 0x80081E48 = "STG01\M000.LBD").
 The same index goes into `ownerRate` and is split into column and row
 (StageMap__SplitChunkIndex). LBD is the game's own extension, and the

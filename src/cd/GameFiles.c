@@ -10,7 +10,7 @@
  * padded with zeros; DayTaskStageMap.c's RegisterRecordTableFiles hands them to
  * the CD driver. In order:
  *  - the seven sound banks' SND\name.VH/VB pairs and SND\SE.VH/VB;
- *  - each stage's files, from gStageFirstRecord[stage]: its four textures
+ *  - each stage's files, from sStageFirstRecord[stage]: its four textures
  *    (TEXA..TEXD.TIX), five BGM sequences (BGA..BGE.SEQ) and map chunks
  *    (Mnnn.LBD, laid out as StageGrid.h's grid);
  *  - from RECORD_TABLE_COUNT, the movies (ETC\OPENINGA..G.STR,
@@ -40,7 +40,7 @@ enum RecordIndex {
     RECORD_SPECIAL_DAYS = 574    /* SPECIAL_DAY_RECORD_COUNT per special day */
 };
 
-/* A stage's records, from gStageFirstRecord[stage]: TEXA..TEXD.TIX, then
+/* A stage's records, from sStageFirstRecord[stage]: TEXA..TEXD.TIX, then
  * BGA..BGE.SEQ, then its Mnnn.LBD map chunks. */
 #define STAGE_TEXTURE_COUNT 4
 #define STAGE_BGM_COUNT 5
@@ -205,7 +205,7 @@ extern u8 sRecordTable[];
 extern char *sSoundEffectDirPtr; /* -> "SND\\SE" */
 extern const char sAsmkMoviePath[];
 extern s16 sMovieFrameCounts[];
-extern s16 gStageFirstRecord[];
+extern s16 sStageFirstRecord[];
 
 /* slot +0x088 of gLbdFileMethods */
 void LbdFile__SetAutoLoadData(LbdFile *self, s32 value) {
@@ -274,7 +274,7 @@ char *GetSoundEffectDir(void) {
 }
 
 FilePathRecord *GetStageRecords(s32 stage) {
-    return &((FilePathRecord *)GetRecordTable(NULL))[gStageFirstRecord[stage]];
+    return &((FilePathRecord *)GetRecordTable(NULL))[sStageFirstRecord[stage]];
 }
 
 FilePathRecord *GetStageTextureRecords(s32 stage) {

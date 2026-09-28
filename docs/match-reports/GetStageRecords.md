@@ -11,7 +11,7 @@ out-of-range drift.
 
 ## What it does
 
-Record lookup: `gStageFirstRecord` is an s16 table of record indices; returns `&table[gStageFirstRecord[index]]` where `table` is GetRecordTable(NULL). The call precedes the index load in retail, which is the natural evaluation order.
+Record lookup: `sStageFirstRecord` is an s16 table of record indices; returns `&table[sStageFirstRecord[index]]` where `table` is GetRecordTable(NULL). The call precedes the index load in retail, which is the natural evaluation order.
 
 ## Source
 
@@ -20,7 +20,7 @@ Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
 
 ```c
 FilePathRecord *GetStageRecords(s32 index) {
-    return &((FilePathRecord *)GetRecordTable(NULL))[gStageFirstRecord[index]];
+    return &((FilePathRecord *)GetRecordTable(NULL))[sStageFirstRecord[index]];
 }
 ```
 
@@ -41,7 +41,7 @@ FilePathRecord *GetStageRecords(s32 index) {
 
 - **Name:** `GetStageRecords`
 - **Tier:** A
-- **Evidence:** returns &sRecordTable[gStageFirstRecord[stage]] (gStageFirstRecord renamed from gRecordIndexTable); the record paths are retail's sRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100: record 0 of each group is STGnn\TEXA.TIX, and gStageFirstRecord[0] = 16 is the first record after the sound banks. Every caller passes ObjM::stage.
+- **Evidence:** returns &sRecordTable[sStageFirstRecord[stage]] (sStageFirstRecord renamed from gRecordIndexTable); the record paths are retail's sRecordTable data (0x80081A04), read from disk/SLPS_015.56 in round 100: record 0 of each group is STGnn\TEXA.TIX, and sStageFirstRecord[0] = 16 is the first record after the sound banks. Every caller passes ObjM::stage.
 
 ## Naming history
 
