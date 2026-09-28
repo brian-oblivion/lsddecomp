@@ -1636,7 +1636,7 @@ extern void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY);
 extern s32 sStyleSpawnColors[];
 extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
-extern s32 gStyleSpawnOffsetY;
+extern s32 sStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
 extern u8 sStyleKind3Colors[][3];
 
@@ -1656,7 +1656,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     SetupStyleSpawnParamsRandom(pos, gStyleSpawnYChoice2);
     if (sStyleDecorVariant != 0 && sStyleDecorColors == sStyleDecorColorsB) {
         sStyleSpawnOffsetX = -45056;
-        gStyleSpawnOffsetY = -8192;
+        sStyleSpawnOffsetY = -8192;
         gStyleSpawnOffsetZ = 0;
         sStyleSpawnColors[0] = (s32)sStyleKind3Colors[1];
     } else {
@@ -1723,7 +1723,7 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     return slots;
 }
 
-extern s32 gStyleSpawnOffsetY;
+extern s32 sStyleSpawnOffsetY;
 extern s32 gStyleSpawnOffsetZ;
 extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
@@ -1738,7 +1738,7 @@ void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     if (offsetY == 0) {
         offsetY = gStyleSpawnYChoices[rand() & 3];
     }
-    gStyleSpawnOffsetY = offsetY;
+    sStyleSpawnOffsetY = offsetY;
     sStyleSpawnOffsetX = (rand() % 23) << 11;
     if (rand() & 1) {
         sStyleSpawnOffsetX = -sStyleSpawnOffsetX;
@@ -1765,7 +1765,7 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     s32 dayMod3;
 
     rand();
-    gStyleSpawnOffsetY = gStyleSpawnYChoice1;
+    sStyleSpawnOffsetY = gStyleSpawnYChoice1;
     sStyleSpawnOffsetX = (rand() % 20) << 11;
     dayMod3 = sStyleDay % 3;
     gStyleSpawnOffsetZ = 40960;

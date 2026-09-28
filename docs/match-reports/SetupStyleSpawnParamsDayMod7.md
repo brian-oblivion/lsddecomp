@@ -74,7 +74,7 @@ round 60's alias entry draws between a local that earns its name and one that
 merely holds a value in transit.
 
 ```c
-extern s32 gStyleSpawnOffsetY;
+extern s32 sStyleSpawnOffsetY;
 extern s32 gStyleSpawnYChoice1;
 extern s32 sStyleSpawnOffsetX;
 extern s32 sStyleDay;
@@ -87,7 +87,7 @@ void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1) {
     s32 mod3;
 
     rand();
-    gStyleSpawnOffsetY = gStyleSpawnYChoice1;
+    sStyleSpawnOffsetY = gStyleSpawnYChoice1;
     sStyleSpawnOffsetX = (rand() % 20) << 11;
     mod3 = sStyleDay % 3;
     gStyleSpawnOffsetZ = 0xA000;
