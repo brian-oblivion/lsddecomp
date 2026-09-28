@@ -40,7 +40,7 @@ typedef struct {
     s16 z;
 } DreamAuxPos6;
 
-extern DreamAuxPos6 gDreamAuxPosTable[];
+extern DreamAuxPos6 sDreamAuxPosTable[];
 extern u8 gDreamAuxSpawnRotations[];
 
 typedef void (*DreamAuxObjFn11)(DreamAuxObj *self, s32 arg1, void *arg2);
@@ -63,7 +63,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
         coords.ctxVal = *(u16 *)ctx;
         rec = &gDreamAuxSpawnInfo[entry];
         coords.recordVal0 = rec->val0;
-        coords.pos = gDreamAuxPosTable[rec->posIndex];
+        coords.pos = sDreamAuxPosTable[rec->posIndex];
 
         obj = (DreamAuxObj *)gDreamAuxStageMap;
         ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
@@ -79,7 +79,7 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
 `SetDreamAuxWorld`'s call: `(kind, out, gDreamAuxSound)`, where `out` is THIS
 function's own `void *out` parameter, itself a 4-word caller-provided
 scratch buffer per the header's existing comment on this function's
-signature (`ProcessDreamAuxTriggerRecord`'s `scratch[4]`). `gDreamAuxSpawnInfo`/`gDreamAuxPosTable` are two
+signature (`ProcessDreamAuxTriggerRecord`'s `scratch[4]`). `gDreamAuxSpawnInfo`/`sDreamAuxPosTable` are two
 more small unit-owned lookup tables (a 4-byte "spawn info" record indexed by
 `entry`, and a 6-byte position record indexed by that record's `posIndex`
 field, named round 63). `entity->vtable[0x13]` is the SAME slot `PlaceDreamAuxEntityByPlayer` (matched
@@ -119,7 +119,7 @@ Four attempts to byte-exact, three distinct mechanisms:
    `z` half-word's symbol) from the same register before storing anything.
 3. **Third pass, the fix:** merged the destination fields into a single
    embedded `DreamAuxPos6 pos;` member and did ONE whole-struct assignment,
-   `coords.pos = gDreamAuxPosTable[rec->val3];`, instead of two separate sub-field
+   `coords.pos = sDreamAuxPosTable[rec->val3];`, instead of two separate sub-field
    assignments. This is the SAME "all-s8/s16 struct, alignment 2, whole-
    struct assignment compiles to `lwl`/`lwr` + `swl`/`swr`" idiom CLAUDE.md
    already documents (confirmed there three times previously) -- but this is
@@ -128,13 +128,13 @@ Four attempts to byte-exact, three distinct mechanisms:
    assignments of its two halves) was the difference between computing the
    shared index once versus twice. Byte-exact immediately after (79/79).
 
-The `gDreamAuxPosTable`/`D_80088D3F` symbol pair (used respectively for the `lwr`
+The `sDreamAuxPosTable`/`D_80088D3F` symbol pair (used respectively for the `lwr`
 and `lwl` halves of the unaligned load, 3 bytes apart) is not referenced by
-name anywhere in this unit's C -- only `gDreamAuxPosTable` appears in the source,
+name anywhere in this unit's C -- only `sDreamAuxPosTable` appears in the source,
 scaled by `sizeof(DreamAuxPos6)` (6) through ordinary array indexing.
-`D_80088D3F` is retail's own separately-named symbol for `gDreamAuxPosTable+3`
+`D_80088D3F` is retail's own separately-named symbol for `sDreamAuxPosTable+3`
 (the byte address `lwl` needs); since both resolve to the same linked
-address, the compiler's own `+3` computation over `gDreamAuxPosTable` produces
+address, the compiler's own `+3` computation over `sDreamAuxPosTable` produces
 identical final bytes to referencing `D_80088D3F` directly. Nothing needed
 to be added to `config/` for this.
 
@@ -158,7 +158,7 @@ handled at the wrong granularity" issue.
 
 **SpawnDreamAuxTriggerEntity** — tier B. Spawns an `Entity` via `New_Entity`
 for a trigger `entry`; on success, fills a local coordinate buffer from
-`gDreamAuxSpawnInfo`/`gDreamAuxPosTable` and dispatches it through three
+`gDreamAuxSpawnInfo`/`sDreamAuxPosTable` and dispatches it through three
 vtable calls (two through the new entity, one through `gDreamAuxStageMap`); on
 `New_Entity` failure returns `true` (treated as "handled" by callers) rather
 than `false`. Named for the mechanic that dominates the body (spawn +
@@ -180,7 +180,7 @@ the chunk's DreamAuxTriggerEntry; `*(u16 *)ctx` is `trigger->key`; reading it
 through the s16 field is byte-identical). The local cell descriptor
 is StageMap.h's Descriptor10 as computeCellOffsets reads it: `chunk` (the
 chunk's column/row), `cell` (DreamAuxSpawnInfo.cell, was val0), `offset`
-(gDreamAuxPosTable[offsetIndex], was posIndex). D_80088F18 was renamed
+(sDreamAuxPosTable[offsetIndex], was posIndex). D_80088F18 was renamed
 gDreamAuxSpawnRotations (tools/rename.py, tier A): four Ratio16 triples,
 yaw 0, -90, +90, 180, typed Ratio16[][3] and indexed by rotationIndex (was
 val2) instead of `+ val2 * 12`. outBuf -> worldPos. Byte-identical.
@@ -201,7 +201,7 @@ The comments, as they stood:
 /* A 4-byte record indexed by `entry` (this function's own last parameter):
  * a u16 followed by two signed bytes. `val2` indexes D_80088F18 (stride
  * 0xC, element type undiscovered -- only its address is ever taken here)
- * and `posIndex` indexes gDreamAuxPosTable (stride 6, see DreamAuxPos6
+ * and `posIndex` indexes sDreamAuxPosTable (stride 6, see DreamAuxPos6
  * below; named round 63 -- confirmed by this struct's only reader). */
 
 /* A 6-byte position record: a 4-byte (x,y) pair copied as ONE unaligned

@@ -249,7 +249,7 @@ Findings of the pass that change what those comments said: DreamAuxGroupRecord
 is TriggerRecord (the same 8-byte records; `flag` is `triggered`), so the view
 is gone and the record is TriggerRecord.triggered; the per-stage tables are 14
 pointers each (DREAM_AUX_STAGE_COUNT, from the label spacing) and the slot
-arrays hold ONE slot (gDreamAuxPosTable starts 0x14 after gDreamAuxSlots), not
+arrays hold ONE slot (sDreamAuxPosTable starts 0x14 after gDreamAuxSlots), not
 14; a slot's first word is the ModelData New_ModelData returns (`model`), and
 the "tick" at method slot +0x004 is BasicClass's release. The MOM files are
 ModelData files (a TMD and a TodSet, include/ModelData.h), not audio. With one
