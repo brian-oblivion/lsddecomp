@@ -27,7 +27,7 @@ void ItemList__SetView(ItemList *self, s32 a1, s32 a2, s32 a3, s32 a4)
     }
     a3 -= a1;
     elem = self->unk40[a3];
-    elem->methods->slotB8(elem, &gItemListCursorColor);
+    elem->methods->slotB8(elem, &sItemListCursorColor);
 }
 ```
 
@@ -42,7 +42,7 @@ UNCONDITIONALLY (all three sit before the `a4 == 0` guard in retail's own
 instruction order -- the `unk28` store is in the guarding branch's delay
 slot, so it always executes even on the early-return path), then, only if
 `a4 != 0`, indexes `self->unk40[a3 - a1]` and dispatches that element's
-own `slotB8(elem, &gItemListCursorColor)`.
+own `slotB8(elem, &sItemListCursorColor)`.
 
 **Two independent residues, both register/scheduling, no register or CFG
 value was ever wrong:**
@@ -88,7 +88,7 @@ stall, especially after a permuter search comes back empty.
 
 Round 75 (bravo, track 3). `func_800529FC` -> `ItemList__SetView`, **tier A**.
 
-Non-virtual helper. Stores topIndex/column/cursorIndex; if `highlight`, colours row (cursor - top) with gItemListCursorColor. Callers: CreateRows (highlight 1), RefreshRows (0).
+Non-virtual helper. Stores topIndex/column/cursorIndex; if `highlight`, colours row (cursor - top) with sItemListCursorColor. Callers: CreateRows (highlight 1), RefreshRows (0).
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
 

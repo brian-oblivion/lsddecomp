@@ -35,7 +35,7 @@ void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 flag)
         self->unk28--;
         p--;
     }
-    (*p)->methods->slotB8(*p, &gItemListCursorColor);
+    (*p)->methods->slotB8(*p, &sItemListCursorColor);
     if (flag) {
         self->methods->slot60(self, 0);
     }
@@ -55,9 +55,9 @@ the updated `unk28`.
   dispatch (still `INCLUDE_ASM` as of this function's match; both call
   sites pass `(self, 0)`).
 - `gItemListRowColor` (`extern s32`) -- 4 bytes of rodata immediately before the
-  already-declared `gItemListCursorColor` (itself `ItemList__SetView`'s fixed 2nd
+  already-declared `sItemListCursorColor` (itself `ItemList__SetView`'s fixed 2nd
   `slotB8` argument); this function's FIRST dispatch uses the new one, its
-  SECOND dispatch reuses `gItemListCursorColor`.
+  SECOND dispatch reuses `sItemListCursorColor`.
 
 Both additions are additive splits of existing padding/adjacent rodata, no
 existing declaration changed.
@@ -66,7 +66,7 @@ existing declaration changed.
 
 Round 75 (bravo, track 3). `func_80052A58` -> `ItemList__StepCursorInView`, **tier A**.
 
-Slot +0x098 (`tools/classtable.py gItemListMethods`). Re-colours the current cursor row gItemListRowColor, moves `cursorIndex` +1 (dir != 0) or -1, colours the new row gItemListCursorColor, and if `notify` calls forwardToTarget(0). Callers: CursorUp (dir 0), CursorDown (dir 1).
+Slot +0x098 (`tools/classtable.py gItemListMethods`). Re-colours the current cursor row gItemListRowColor, moves `cursorIndex` +1 (dir != 0) or -1, colours the new row sItemListCursorColor, and if `notify` calls forwardToTarget(0). Callers: CursorUp (dir 0), CursorDown (dir 1).
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
 

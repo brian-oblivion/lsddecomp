@@ -328,7 +328,7 @@ void ItemList__SetView(ItemList *self, s32 top, s32 column, s32 cursor, s32 high
     }
     cursor -= top; /* MATCHING: reuses cursor's register for the index */
     row = self->rows[cursor];
-    row->methods->setColor(row, &gItemListCursorColor);
+    row->methods->setColor(row, &sItemListCursorColor);
 }
 
 void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
@@ -348,7 +348,7 @@ void ItemList__StepCursorInView(ItemList *self, s32 dir, s32 notify) {
         self->cursorIndex--;
         row--;
     }
-    (*row)->methods->setColor(*row, &gItemListCursorColor);
+    (*row)->methods->setColor(*row, &sItemListCursorColor);
     if (notify) {
         self->methods->playSound(self, 0);
     }
