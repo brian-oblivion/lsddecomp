@@ -221,7 +221,7 @@ side effect of the image moving. The honest figures are the two in the title:
 ## Preserved near-miss body (1 word short, `#if 0` in `src/world/ObjMStyleActor.c`)
 
 Needs, already present earlier in the unit in strict ROM order:
-`extern s32 gStyleDecorVariant, sStyleDecorPosX, sStyleDecorPosY, gStyleDecorSizeW, gStyleDecorSizeH,
+`extern s32 gStyleDecorVariant, sStyleDecorPosX, sStyleDecorPosY, gStyleDecorSizeW, sStyleDecorSizeH,
 gStyleSceneRefs, sStyleDecorColors;`, `extern void *gStyleDecorSlots[];`,
 `extern void *New_BoxFill(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
@@ -346,7 +346,7 @@ Local views replaced by the real classes: the `+0x0AC` slot on `gStyleSceneRefs`
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 
 ```c
-/* Local view: sStyleDecorPosX/sStyleDecorPosY and gStyleDecorSizeW/gStyleDecorSizeH are two
+/* Local view: sStyleDecorPosX/sStyleDecorPosY and gStyleDecorSizeW/sStyleDecorSizeH are two
  * adjacent 8-byte pairs, and this unit copies each into a local pair as a
  * WHOLE-STRUCT assignment rather than field by field.  That is not a style
  * choice -- it is load-bearing.  A BLKmode set makes gcc 2.6.3's cse.c call

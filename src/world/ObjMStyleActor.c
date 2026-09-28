@@ -1347,7 +1347,7 @@ void *PickStyleFallbackConfig(void) {
 extern s32 sStyleDecorPosX;
 extern s32 sStyleDecorPosY;
 extern s32 gStyleDecorSizeW;
-extern s32 gStyleDecorSizeH;
+extern s32 sStyleDecorSizeH;
 extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
 extern s32 gStyleSceneRefs; /* a StyleSceneRefs * */
 
