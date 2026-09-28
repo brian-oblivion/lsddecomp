@@ -47,9 +47,13 @@
 extern void LockCd(void);
 extern void UnlockCd(void);
 
-/* Both state==2 branches below busy-wait this many ticks (~601 service-pump
- * calls) before giving up and retrying the command from state 1. */
-#define CD_WAIT_TIMEOUT 0x259
+/* CdSync / CdReadSync mode: return the current status at once (0 waits).
+ * CdReadSync then answers -1 for an error, 0 when the read is done, and
+ * otherwise the sectors still to come. */
+#define CD_SYNC_POLL 1
+
+/* Polls of CdSync that answer CdlNoIntr before the seek is issued again. */
+#define CD_WAIT_TIMEOUT 601
 
 /* Psy-Q pool allocator, BMemPMgr.c. */
 extern void *BMemPMgrAlloc(s32 size);
@@ -66,7 +70,7 @@ CdRequestNode *AllocCdRequestNode(void) {
     CdRequestNode *cur;
 
     LockCd();
-    node = BMemPMgrAlloc(0x24);
+    node = BMemPMgrAlloc(sizeof(CdRequestNode));
     if (node != NULL) {
         head = gCdRequestQueue;
         node->prev = NULL;
@@ -160,158 +164,116 @@ extern void ResetCdStateMachine(void);
 extern void SetCdState(s32 state);
 
 void TickCdStateMachine(void) {
-    s32 state;
     s32 result;
-    s32 newstate;
+    s32 newState;
 
     LockCd();
-    state = gCdState;
-
-    if (state == 2)
-        goto L_state2;
-    if (state < 3) {
-        if (state == 1)
-            goto L_state1;
-        goto L_end;
+    switch (gCdState) {
+        case CD_STATE_SETLOC:
+            if (CdControlF(CdlSetloc, (u_char *)&gCdSeekParam->pos) == 0) {
+                goto unlock;
+            }
+            newState = CD_STATE_SETLOC_WAIT;
+            break;
+        case CD_STATE_SETLOC_WAIT:
+            switch (CdSync(CD_SYNC_POLL, NULL)) {
+                /* MATCHING: CdlDiskError's case first; last, its test flips polarity */
+                case CdlDiskError:
+                    newState = CD_STATE_SETLOC;
+                    break;
+                case CdlComplete:
+                    ResetCdStateMachine();
+                    goto unlock;
+                case CdlNoIntr:
+                    gCdTimeoutCounter++;
+                    if (gCdTimeoutCounter < CD_WAIT_TIMEOUT) {
+                        goto unlock;
+                    }
+                    newState = CD_STATE_SETLOC;
+                    break;
+                default:
+                    goto unlock;
+            }
+            break;
+        case CD_STATE_READ:
+            if (CdRead(gCdReadSectorCount, gCdReadBuffer, CdlModeSpeed) == 0) {
+                goto unlock;
+            }
+            newState = CD_STATE_READ_WAIT;
+            break;
+        case CD_STATE_READ_WAIT:
+            result = CdReadSync(CD_SYNC_POLL, NULL);
+            if (result == -1) {
+                CdFlush();
+                newState = CD_STATE_SETLOC;
+                break;
+            }
+            if (result == 0) {
+                ResetCdStateMachine();
+            }
+            goto unlock;
+        default:
+            goto unlock;
     }
-    if (state == 7)
-        goto L_state7;
-    if (state == 8)
-        goto L_state8;
-    goto L_end;
-
-L_state1:
-    if (CdControlF(CdlSetloc, (u_char *)&gCdSeekParam->pos) == 0)
-        goto L_end;
-    newstate = 2;
-    goto L_set;
-
-L_state2:
-    result = CdSync(1, NULL);
-    if (result == state)
-        goto L_reset;
-    if (result < 3) {
-        if (result == 0)
-            goto L_count;
-        goto L_end;
-    }
-    if (result != 5)
-        goto L_end;
-    newstate = 1;
-    goto L_set;
-
-L_count:
-    gCdTimeoutCounter++;
-    if (gCdTimeoutCounter < CD_WAIT_TIMEOUT)
-        goto L_end;
-    newstate = 1;
-    goto L_set;
-
-L_state7:
-    if (CdRead(gCdReadSectorCount, gCdReadBuffer, 0x80) == 0)
-        goto L_end;
-    newstate = 8;
-    goto L_set;
-
-L_state8:
-    result = CdReadSync(1, 0);
-    if (result == -1)
-        goto L_pending;
-    if (result != 0)
-        goto L_end;
-
-L_reset:
-    ResetCdStateMachine();
-    goto L_end;
-
-L_pending:
-    CdFlush();
-    newstate = 1;
-
-L_set:
-    SetCdState(newstate);
-
-L_end:
+    SetCdState(newState);
+unlock:
     UnlockCd();
 }
 
 void TickCdLoadFileStateMachine(void) {
-    s32 state;
     s32 result;
-    s32 newstate;
-    CdFileEntry *saved;
+    s32 newState;
 
     LockCd();
-    state = gCdState;
-
-    if (state == 2)
-        goto L_state2;
-    if (state < 3) {
-        if (state == 1)
-            goto L_state1;
-        goto L_end;
+    switch (gCdState) {
+        case CD_STATE_SETLOC:
+            if (CdControlF(CdlSetloc, (u_char *)&gCdSeekParam->pos) == 0) {
+                goto unlock;
+            }
+            newState = CD_STATE_SETLOC_WAIT;
+            break;
+        case CD_STATE_SETLOC_WAIT:
+            switch (CdSync(CD_SYNC_POLL, NULL)) {
+                case CdlComplete:
+                    newState = CD_STATE_READ;
+                    break;
+                case CdlNoIntr:
+                    gCdTimeoutCounter++;
+                    if (gCdTimeoutCounter < CD_WAIT_TIMEOUT) {
+                        goto unlock;
+                    }
+                    newState = CD_STATE_SETLOC;
+                    break;
+                case CdlDiskError:
+                    newState = CD_STATE_SETLOC;
+                    break;
+                default:
+                    goto unlock;
+            }
+            break;
+        case CD_STATE_READ:
+            if (CdRead(gCdReadSectorCount, gCdReadBuffer, CdlModeSpeed) == 0) {
+                goto unlock;
+            }
+            newState = CD_STATE_READ_WAIT;
+            break;
+        case CD_STATE_READ_WAIT:
+            result = CdReadSync(CD_SYNC_POLL, NULL);
+            if (result == -1) {
+                newState = CD_STATE_SETLOC;
+                break;
+            }
+            if (result == 0) {
+                ResetCdStateMachine();
+                gCdSeekParam = gCdSavedSeekParam;
+                gCdSavedSeekParam = NULL;
+            }
+            goto unlock;
+        default:
+            goto unlock;
     }
-    if (state == 7)
-        goto L_state7;
-    if (state == 8)
-        goto L_state8;
-    goto L_end;
-
-L_state1:
-    if (CdControlF(CdlSetloc, (u_char *)&gCdSeekParam->pos) == 0)
-        goto L_end;
-    newstate = 2;
-    goto L_set;
-
-L_state2:
-    result = CdSync(1, NULL);
-    if (result == state)
-        goto L_busy;
-    if (result < 3) {
-        if (result == 0)
-            goto L_count;
-        goto L_end;
-    }
-    newstate = 1;
-    if (result == 5)
-        goto L_set;
-    goto L_end;
-
-L_busy:
-    newstate = 7;
-    goto L_set;
-
-L_count:
-    gCdTimeoutCounter++;
-    if (gCdTimeoutCounter < CD_WAIT_TIMEOUT)
-        goto L_end;
-    newstate = 1;
-    goto L_set;
-
-L_state7:
-    if (CdRead(gCdReadSectorCount, gCdReadBuffer, 0x80) == 0)
-        goto L_end;
-    newstate = 8;
-    goto L_set;
-
-L_state8:
-    result = CdReadSync(1, 0);
-    if (result == -1) {
-        newstate = 1;
-        goto L_set;
-    }
-    if (result != 0)
-        goto L_end;
-    ResetCdStateMachine();
-    saved = gCdSavedSeekParam;
-    gCdSavedSeekParam = NULL;
-    gCdSeekParam = saved;
-    goto L_end;
-
-L_set:
-    SetCdState(newstate);
-
-L_end:
+    SetCdState(newState);
+unlock:
     UnlockCd();
 }
 
