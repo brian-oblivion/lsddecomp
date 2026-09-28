@@ -92,7 +92,7 @@ Renamed from CdStreamObj__Open (tools/rename.py), the class rename only.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_8008A954` | `gCdStreamVersionSuffix` | A | sdata `.asciz ";1"`, strcat'd after the name to make the ISO9660 path CdSearchFile looks up; same role as `gCdFileVersionSuffix` (code_179d8_s.c), a separate copy |
+| `D_8008A954` | `gCdStreamVersionSuffix` | A | sdata `.asciz ";1"`, strcat'd after the name to make the ISO9660 path CdSearchFile looks up; same role as `gCdFileVersionSuffix` (CdDriver.c), a separate copy |
 | `D_8008A94C` | `gCdStreamAudioMixSet` | B | written only here, with SetupCdStreamAudio's return (always 1) after the SPU CD mix is set; read nowhere in the executable (only reference in asm/ is its sdata definition) |
 
 Constants: the path buffer is `CDSTREAM_PATH_SIZE` (32, unit-local; the CD

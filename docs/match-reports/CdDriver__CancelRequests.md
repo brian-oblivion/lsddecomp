@@ -4,7 +4,7 @@
 
 > Renamed from `func_80027D70` on 2026-09-17 (tools/rename.py). Address 0x80027d70.
 
-Round 45, runner echo (second sitting), `src/code_179d8_s.c`. This class's
+Round 45, runner echo (second sitting), `src/CdDriver.c`. This class's
 own method-table slot **+0x074** (see the class-map comment above
 `GetCdDriverMethods` in the `.c`).
 
@@ -19,10 +19,10 @@ byte-identical, and the `## Naming` section at the end of this report
 carries the evidence for each one.
 
 ```c
-/* The queued-request node AllocCdRequestNode (code_179d8_s) allocates and
- * FreeCdRequestNode (code_179d8_s) unlinks and frees -- only the fields this
+/* The queued-request node AllocCdRequestNode (CdDriver) allocates and
+ * FreeCdRequestNode (CdDriver) unlinks and frees -- only the fields this
  * call site itself reads are typed here. `active` is the flag StartCdOperation
- * (code_179d8_s) sets on the head node when it starts an operation on it;
+ * (CdDriver) sets on the head node when it starts an operation on it;
  * AllocCdRequestNode clears it at allocation. The list head is gCdRequestQueue. */
 typedef struct CdRequest_D70 CdRequest_D70;
 struct CdRequest_D70 {
@@ -45,8 +45,8 @@ extern s32 gCdIdle;
 extern s32 gCdSavedSeekParam;
 extern s32 gCdSeekParam;
 extern void CdFlush(void);
-extern void ResetCdStateMachine(void); /* code_179d8_s: reset the state machine */
-extern void FreeCdRequestNode(CdRequest_D70 *req); /* code_179d8_s: unlink+free */
+extern void ResetCdStateMachine(void); /* CdDriver: reset the state machine */
+extern void FreeCdRequestNode(CdRequest_D70 *req); /* CdDriver: unlink+free */
 
 void CdDriver__CancelRequests(Obj6D4E8_D70 *self)
 {
@@ -93,13 +93,13 @@ function does nothing but the latch dance. Inside that, an inner
 three-condition guard (head node's owner is `self`, head node's `active` flag (`unk00` when this was written)
 flag is set, and `gCdIdle == 0`) triggers `CdFlush()` +
 `ResetCdStateMachine()` (both cross-unit — `ResetCdStateMachine` from foxtrot's
-`code_179d8_s`) and a load-clear-store handoff between `gCdSavedSeekParam` and
+`CdDriver`) and a load-clear-store handoff between `gCdSavedSeekParam` and
 `gCdSeekParam` (needs an explicit temp: the store order is `gCdSavedSeekParam`
 cleared BEFORE the old value lands in `gCdSeekParam`, not the natural-looking
 `gCdSeekParam = gCdSavedSeekParam; gCdSavedSeekParam = 0;`, which would store in the
 opposite order). Then, regardless of that inner guard, a loop walks the
 whole list unlinking every node whose `owner == self` via
-`FreeCdRequestNode` (also `code_179d8_s`) and decrementing `self->pendingRequests` per
+`FreeCdRequestNode` (also `CdDriver`) and decrementing `self->pendingRequests` per
 node removed.
 
 Two register-allocation traps, both giving clean length-matching near-misses
@@ -148,7 +148,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 
 **Evidence.** Slot `+0x074` of `gCdDriverMethods`. It walks the `gCdRequestQueue`
 request list and, for every node whose `owner` is this object, calls
-`FreeCdRequestNode` (code_179d8_s: unlink + free) and decrements the object's own
+`FreeCdRequestNode` (CdDriver: unlink + free) and decrements the object's own
 pending count. Before that, if the HEAD node is this object's and is already
 `active` and the drive is not idle, it aborts the transfer in flight
 (`CdFlush`, `ResetCdStateMachine` = reset the state machine) and restores the saved
@@ -158,7 +158,7 @@ function; the `Cancel` is not an inference about purpose but a description of
 
 **Field names established here** (applied in this unit, which owns its views):
 
-- `CdRequest_D70.active` (`+0x00`): `StartCdOperation` (code_179d8_s) sets the
+- `CdRequest_D70.active` (`+0x00`): `StartCdOperation` (CdDriver) sets the
   head node's `+0x00` to 1 when it starts an operation on it, and
   `AllocCdRequestNode` clears it at allocation. Tier B -- "an operation has been
   started on this node" is what the two writers show; whether it also means
@@ -173,7 +173,7 @@ function; the `Cancel` is not an inference about purpose but a description of
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/code_179d8_s.c:143`
+mis-hit had to be resolved by receiver type: `src/CdDriver.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
@@ -181,8 +181,8 @@ which is the procedure working in the direction where it can work.
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| code_179d8_s | `Node8008A894` | `unk0` | `active` | B | set by `StartCdOperation` on the head node at operation start, cleared at allocation |
-| code_179d8_s | `Node8008A894` | `unkC` | `owner` | A | written by `EnqueueCdRequest` with the requesting object |
+| CdDriver | `Node8008A894` | `unk0` | `active` | B | set by `StartCdOperation` on the head node at operation start, cleared at allocation |
+| CdDriver | `Node8008A894` | `unkC` | `owner` | A | written by `EnqueueCdRequest` with the requesting object |
 
 ## Track 4b (2026-09-25, round 85)
 

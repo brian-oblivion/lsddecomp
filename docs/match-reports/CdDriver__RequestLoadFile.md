@@ -4,7 +4,7 @@
 
 > Renamed from `func_80027C80` on 2026-09-17 (tools/rename.py). Address 0x80027c80.
 
-Round 45, runner echo (third sitting), `src/code_179d8_s.c`. This class's own
+Round 45, runner echo (third sitting), `src/CdDriver.c`. This class's own
 slot +0x06C of `gCdDriverMethods`.
 
 ## Result
@@ -20,7 +20,7 @@ carries the evidence for each one.
 ```c
 /* The class's method table down to +0x058: the one slot
  * CdDriver__RequestLoadFile dispatches. `tools/classtable.py gCdDriverMethods`
- * resolves that slot to CdDriver__LoadFile (code_179d8_s), which loads a named
+ * resolves that slot to CdDriver__LoadFile (CdDriver), which loads a named
  * file off the disc, so the slot is named for the method it dispatches to.
  * The sibling class gFileResourceMethods (include/GameApplicationFileResource.h's
  * FileResourceMethods) leaves the identical offset unnamed -- this
@@ -51,7 +51,7 @@ struct UnkC80 {
     /* +0x04 */ s32 unk04;
 };
 
-/* The request op codes are a small enumeration shared with code_179d8_s,
+/* The request op codes are a small enumeration shared with CdDriver,
  * which enqueues 2 (open by name), 3 (close), 4 (seek) and 5 (read) from the
  * class's other slots. Only the one this unit itself uses is named. */
 #define CD_OP_LOAD_FILE 7
@@ -59,7 +59,7 @@ struct UnkC80 {
 struct Obj6D4E8_282AC;
 extern void EnqueueCdRequest(struct Obj6D4E8_282AC *owner, s32 fileIndex,
                              s32 op, s32 param0, s32 param1);
-extern s32 FindCdFileIndex(char *name); /* code_179d8_s: name -> table index */
+extern s32 FindCdFileIndex(char *name); /* CdDriver: name -> table index */
 extern s32 gCdAsyncEnabled;
 
 void CdDriver__RequestLoadFile(Obj6D4E8_C80 *self, char *name)
@@ -136,7 +136,7 @@ allows.
   — a single early-return-free `if` wrapping the whole body reproduces this
   with no duplicated tail, the same shape CLAUDE.md/prior reports document
   for this unit.
-- `FindCdFileIndex` (still `INCLUDE_ASM` in `code_179d8_s.c`, foxtrot's unit)
+- `FindCdFileIndex` (still `INCLUDE_ASM` in `CdDriver.c`, foxtrot's unit)
   takes a single `char *` argument that it passes straight to `strstr` as
   the needle — read from its own disassembly, not guessed — hence `char
   *arg0` here rather than `void *`. `arg1` of `CdDriver__RequestLoadFile` is typed the
@@ -154,7 +154,7 @@ allows.
   class `gFileResourceMethods` leaves as an unnamed pad in
   `include/GameApplicationFileResource.h`'s `FileResourceMethods` ("FileResource__LoadFile's own
   slot, unused here"). Rather than editing that shared header — which
-  `code_179d8_s.c` and `GameApplicationFileResource.c` also include —
+  `CdDriver.c` and `GameApplicationFileResource.c` also include —
   this unit keeps its own local view (`Methods6D4E8_C80`/`Obj6D4E8_C80`), per the
   project's multiple-independent-local-views convention.
 
@@ -186,7 +186,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 file name, it either enqueues a `CD_OP_LOAD_FILE` (7) request through
 `EnqueueCdRequest` with `FindCdFileIndex`'s file-table index, or -- when
 `gCdAsyncEnabled` is 0 -- calls the class's own `+0x058` slot
-(`CdDriver__LoadFile`, code_179d8_s) directly, which is the synchronous
+(`CdDriver__LoadFile`, CdDriver) directly, which is the synchronous
 load-this-file-by-name method that enqueues the identical op 7 on its own
 async path. So both arms request the same thing, which is what `Request`
 names; `LoadFile` is the op, read off the slot it dispatches to and off the
@@ -209,7 +209,7 @@ would be invention.
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/code_179d8_s.c:143`
+mis-hit had to be resolved by receiver type: `src/CdDriver.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
@@ -221,8 +221,8 @@ views; proposing rather than renaming, since those units are not mine:
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| code_179d8_s | `Obj80027480` | `unk22` | `pendingRequests` | A | `EnqueueCdRequest` increments it per queued request; `CdDriver__CancelRequests` decrements it once per node it unlinks |
-| code_179d8_s | `Obj80027480` | `unk24` | `flags` | A | only ever `|=` a bit (4 here, 0x200 in `CdDriver__LoadFile`) or cleared |
+| CdDriver | `Obj80027480` | `unk22` | `pendingRequests` | A | `EnqueueCdRequest` increments it per queued request; `CdDriver__CancelRequests` decrements it once per node it unlinks |
+| CdDriver | `Obj80027480` | `unk24` | `flags` | A | only ever `|=` a bit (4 here, 0x200 in `CdDriver__LoadFile`) or cleared |
 
 
 Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is VabDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__RequestLoadFile` -> `CdDriver__RequestLoadFile` by rename.py.
@@ -262,7 +262,7 @@ EnqueueCdRequest's `fileIndex`). `self->flags |= 4` is
 `CD_FLAG_NONE_PENDING` (FileResource.h): the synchronous load is done and
 `pendingRequests` is 0, the same condition RunRequestQueue sets it on.
 
-**The build warnings.** code_179d8_s.c's compile printed 13 warnings
+**The build warnings.** CdDriver.c's compile printed 13 warnings
 (`implicit declaration of function 'LockCd'`, `type mismatch with previous
 external decl`, `'LockCd' was previously implicitly declared to return
 'int'`, the same for `UnlockCd`). This function was the first to call

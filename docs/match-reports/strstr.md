@@ -5,7 +5,7 @@
 > matched C counted as game code; the object owns its bytes, so the C is gone from
 > `src/` and the game-code count shrank by it -- the correction CLAUDE.md asks
 > for, not a regression. The run `libc2/strcpy` + `libc2/strstr` + `libcd/sys`
-> tiles 0x19378..0x19C78 and crosses the code_179d8_s / libcd_bios boundary;
+> tiles 0x19378..0x19C78 and crosses the CdDriver / libcd_bios boundary;
 > both units trimmed. Whole-image SHA1 green. Nothing here is assignable and
 > there is no stall left to work. The text below is the pre-conversion record.
 
@@ -13,7 +13,7 @@
 
 # strstr -- MATCHED 30/30 (round 18, echo, via permuter)
 
-Unit: `code_179d8_s`.
+Unit: `CdDriver`.
 
 ## RESOLUTION (round 18) — permuter zero, and it was ALREADY idiomatic
 
@@ -68,7 +68,7 @@ that placement change reads as dead code or as ordinary hoisting depends on
 whether the variable is used elsewhere on the same path, which has to be
 checked per-instance -- it is not something the permuter's score tells you.
 
-**Committed body (identical to the one above, in `src/code_179d8_s.c`):**
+**Committed body (identical to the one above, in `src/CdDriver.c`):**
 
 ```c
 char *strstr(char *haystack, char *needle) {
@@ -129,7 +129,7 @@ ruled-out attempts, all on the (as it turned out, wrong) axis.
 retail) -- NOT register identity, and a scheduling barrier did not fix it
 
 Screened clean on both documented blockers. Confirmed structurally via
-`tools/m2ctx.py code_179d8_s --sig 'char *strstr(char *haystack, char
+`tools/m2ctx.py CdDriver --sig 'char *strstr(char *haystack, char
 *needle)' --run`, which independently reconstructs the same algorithm: a
 single forward scan over `haystack` with a persistent needle cursor that
 resets to `needle` on any mismatch, and a "match started" flag so the

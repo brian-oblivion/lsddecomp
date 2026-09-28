@@ -2,7 +2,7 @@
 
 > Renamed from `func_800286E4` on 2026-09-18 (tools/rename.py). Address 0x800286e4.
 
-**Unit:** code_179d8_s · **Round 46** · **MATCHED**
+**Unit:** CdDriver · **Round 46** · **MATCHED**
 
 ## What it does
 
@@ -172,9 +172,9 @@ arm and both compiled to the same (wrong) encoding; hoisting it above the
 
 **Tier B.** The state machine's other tick function, selected by
 `ServiceCdDriver` when `gCdTickStep == 2`. Grepping every `gCdTickStep = 2`
-assignment in code_179d8_s.c finds exactly one: `CdDriver__LoadFile`, which
+assignment in CdDriver.c finds exactly one: `CdDriver__LoadFile`, which
 `docs/match-reports` for the class's method table (`GetCdDriverMethods`'s
-own comment, code_179d8_s.c) identifies via `tools/classtable.py` as the
+own comment, CdDriver.c) identifies via `tools/classtable.py` as the
 `loadFile` slot (+0x58) of class `D_6D4E8` -- i.e. the
 `CdDriver__RequestLoadFile` worker. The two mechanical differences from
 `TickCdStateMachine` both make sense for that one operation: on the

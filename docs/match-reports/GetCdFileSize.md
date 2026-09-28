@@ -2,7 +2,7 @@
 
 > Renamed from `func_80028A50` on 2026-09-21 (tools/rename.py). Address 0x80028a50.
 
-Unit: `code_179d8_s`. Runner: echo, round 17 (second assignment).
+Unit: `CdDriver`. Runner: echo, round 17 (second assignment).
 
 ## Result
 
@@ -51,7 +51,7 @@ buffer (re)alloc"), and `self->size` falls inside that struct's
 Extending the shared header would require splitting that padding without
 shifting anything after it, which is mechanically safe -- but
 `GameApplicationFileResource.h` is OUT OF UNIT (shared with `GameApplicationFileResource.c` and
-`code_179d8_s.c`, neither this unit) and the rule is explicit that nothing
+`CdDriver.c`, neither this unit) and the rule is explicit that nothing
 outside the assigned unit + its reports gets edited. Kept as this unit's own
 narrower local reading instead, per the project's multiple-independent-
 local-views convention. Worth flagging for the head: if this coincidence
@@ -107,7 +107,7 @@ reasoning.
 
 ## Naming (round 64, runner alpha)
 
-- `func_80028A50` -> `GetCdFileSize`, tier B. `src/code_179d8_s.c`'s
+- `func_80028A50` -> `GetCdFileSize`, tier B. `src/CdDriver.c`'s
   `CdDriver__Seek` calls this function directly (ignoring its own `arg1`,
   `arg2`) when CD-async mode is off; its async path, when asked to just
   query size (`arg2 != 0`), does the IDENTICAL `self->unk1C` rounding as a
@@ -115,7 +115,7 @@ reasoning.
   `CloseCdFile`/`ReadCdFile` (also this unit) as an Open/Close/Size/Read
   quad.
 - `ObjA34_179D8H::unk0C` -> `isOpen`, `unk1C` -> `size` (tier B, both).
-  Evidence is cross-unit: `src/code_179d8_s.c`'s `Obj80027480` is an
+  Evidence is cross-unit: `src/CdDriver.c`'s `Obj80027480` is an
   independent local view of what is very likely the SAME object (see the
   coincidence note above and `CloseCdFile.md`), and its own
   `CdDriver__Open`/`CdDriver__Close`/`CdDriver__Seek` async bodies set/clear

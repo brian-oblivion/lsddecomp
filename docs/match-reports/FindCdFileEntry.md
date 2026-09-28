@@ -2,7 +2,7 @@
 
 > Renamed from `func_80028448` on 2026-09-18 (tools/rename.py). Address 0x80028448.
 
-**Unit:** code_179d8_s · **Size:** 31 words · **Status:** MATCHED (31/31 words) · **Round 45**
+**Unit:** CdDriver · **Size:** 31 words · **Status:** MATCHED (31/31 words) · **Round 45**
 
 ## What it does
 
@@ -54,7 +54,7 @@ this unit.
 table, `strstr`-matching `name` against each 0x1C-byte record; returns the
 matching record pointer or `NULL`. Distinguished from `GetCdFileEntry`
 (direct index-to-pointer, no search) by the Find/Get convention. Caller
-`CdDriver__LoadFile` (code_179d8_s.c, the `CdDriver__RequestLoadFile` worker)
+`CdDriver__LoadFile` (CdDriver.c, the `CdDriver__RequestLoadFile` worker)
 uses the returned record's `pos`/`size` fields to seek to and size the read,
 confirming "find the file's table entry by name" as the purpose.
 

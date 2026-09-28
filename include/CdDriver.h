@@ -12,16 +12,16 @@
  *
  *   src/code_179d8_o.c  New_CdDriver, the ctor (FileResource's ctor, then
  *                       InitCdDrive), Finalize, NoOpSlot40
- *   src/code_179d8_s.c  Open, Close, Seek, NoOpSlot50, Read, LoadFile,
+ *   src/CdDriver.c  Open, Close, Seek, NoOpSlot50, Read, LoadFile,
  *                       RunRequestQueue: each enqueues a CD_OP_* request, or
  *                       starts it when RunRequestQueue dispatches it back
- *   src/code_179d8_s.c  RequestLoadFile, StopService, CancelRequests, the
+ *   src/CdDriver.c  RequestLoadFile, StopService, CancelRequests, the
  *                       getter; the queue front end (EnqueueCdRequest), the
  *                       file table's setters, ResolveFileEntries, the lock
  *                       and the VSync service tick (ServiceCdDriver)
- *   src/code_179d8_s.c  the read state machine, AllocCdRequestNode /
+ *   src/CdDriver.c  the read state machine, AllocCdRequestNode /
  *                       FreeCdRequestNode, the file-table lookups
- *   src/code_179d8_s.c  the synchronous OpenCdFile / CloseCdFile /
+ *   src/CdDriver.c  the synchronous OpenCdFile / CloseCdFile /
  *                       GetCdFileSize / ReadCdFile the methods call when
  *                       the driver is not in async mode
  *
@@ -112,7 +112,7 @@ typedef struct CdRequestNode {
 #define CD_OP_READ 5
 #define CD_OP_LOAD_FILE 7
 
-/* gCdTickStep: which of code_179d8_s.c's two state machines ServiceCdDriver
+/* gCdTickStep: which of CdDriver.c's two state machines ServiceCdDriver
  * ticks. */
 #define CD_TICK_NONE 0          /* neither: ResetCdStateMachine's value */
 #define CD_TICK_STATE_MACHINE 1 /* TickCdStateMachine */
@@ -121,7 +121,7 @@ typedef struct CdRequestNode {
 /* gCdOperation: which method's request the state machine is running,
  * StartCdOperation's first argument and GetCdOperation's (and so
  * GetActiveDataSourceOperation's) result. Each value is passed by exactly one
- * of code_179d8_s.c's methods. 0 is also what ResetCdStateMachine leaves
+ * of CdDriver.c's methods. 0 is also what ResetCdStateMachine leaves
  * when nothing runs: Close resets straight after starting. */
 #define CD_OPERATION_CLOSE 0
 #define CD_OPERATION_OPEN 1
@@ -130,7 +130,7 @@ typedef struct CdRequestNode {
 #define CD_OPERATION_LOAD_FILE 4
 
 /* gCdState: the state machines' phase, StartCdOperation's second argument
- * (code_179d8_s.c's banner; that unit still spells them as literals). */
+ * (CdDriver.c's banner; that unit still spells them as literals). */
 #define CD_STATE_IDLE 0        /* ResetCdStateMachine's value */
 #define CD_STATE_SETLOC 1      /* issue CdControl(CdlSetloc) */
 #define CD_STATE_SETLOC_WAIT 2 /* poll CdSync for it */

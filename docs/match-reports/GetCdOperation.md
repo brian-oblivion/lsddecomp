@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027EE0` on 2026-09-17 (tools/rename.py). Address 0x80027ee0.
 
-**Unit:** code_179d8_s (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
+**Unit:** CdDriver (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 
 ## What this function does
 
@@ -22,7 +22,7 @@ s32 GetCdOperation(void)
 
 ## Provenance
 
-round 45 (2026-09-15), runner echo, unit code_179d8_s (fresh carve). See
+round 45 (2026-09-15), runner echo, unit CdDriver (fresh carve). See
 IsCdBusy.md for the sibling-accessor context.
 
 ## Naming
@@ -35,8 +35,8 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `D_8008A874` | `gCdOperation` | A |
 
 **Evidence.** The global has exactly one writer that sets it non-zero:
-`StartCdOperation(arg0, arg1)` (code_179d8_s), which stores `arg0` into it. Its
-five call sites are the five methods of this class in `code_179d8_s`, each
+`StartCdOperation(arg0, arg1)` (CdDriver), which stores `arg0` into it. Its
+five call sites are the five methods of this class in `CdDriver`, each
 passing a distinct constant -- `CdDriver__Close` 0 (close), `CdDriver__Open` 1
 (open by name), `CdDriver__Seek` 2 (seek), `CdDriver__Read` 3 (read),
 `CdDriver__LoadFile` 4 (load file). `ResetCdStateMachine` (reset) clears it. A per-method

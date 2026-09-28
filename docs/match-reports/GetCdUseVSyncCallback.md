@@ -2,7 +2,7 @@
 
 > Renamed from `func_80028B6C` on 2026-09-21 (tools/rename.py). Address 0x80028b6c.
 
-Unit: `src/code_179d8_s.c` (carved mid-round 17, 2026-09-04). Size: 3 words
+Unit: `src/CdDriver.c` (carved mid-round 17, 2026-09-04). Size: 3 words
 (0xC bytes), file offset `0x1936C`, vram `0x80028B6C`.
 
 The report below (kept for history) marked this a `gp_rel` blocker, citing
@@ -36,7 +36,7 @@ s32 GetCdUseVSyncCallback(void) {
 }
 ```
 
-Built to `0xC` bytes (`objdump -t build/src/code_179d8_s.c.o`), matching
+Built to `0xC` bytes (`objdump -t build/src/CdDriver.c.o`), matching
 retail's `nonmatching GetCdUseVSyncCallback, 0xC` header exactly. `funcdiff.py`
 reports 3/3 words match in-range (some out-of-range drift was present at
 measurement time from this runner's other in-progress stalls elsewhere in
@@ -61,12 +61,12 @@ MATCHED. Committed as C.
 > derivation may still be right, its VERDICT is not. Rebuild before believing
 > any score in it.
 
-Unit `code_179d8_s`, carved mid-round 17 (2026-09-04). **Not attempted.**
+Unit `CdDriver`, carved mid-round 17 (2026-09-04). **Not attempted.**
 
 ## Classification
 
 ```sh
-grep -n 'gp_rel' asm/nonmatchings/code_179d8_s/GetCdUseVSyncCallback.s
+grep -n 'gp_rel' asm/nonmatchings/CdDriver/GetCdUseVSyncCallback.s
 ```
 
 Hit. The function is 3 instructions long and is a bare gp-relative load and
@@ -88,6 +88,6 @@ body is `return gCdUseVSyncCallback;` -- and per CLAUDE.md/FINISHING-PLAN.md
 track 3, "a pure leaf whose mechanics ARE its purpose (a getter, a clamp, a
 list push) is tier A by definition." `gCdUseVSyncCallback` itself was
 already properly named (not a placeholder) before this round, by
-`src/code_179d8_s.c`'s own header comment ("the driver mode:
+`src/CdDriver.c`'s own header comment ("the driver mode:
 gCdAsyncEnabled and gCdUseVSyncCallback, set through SetCdDriverMode"); no
 further rename needed there.

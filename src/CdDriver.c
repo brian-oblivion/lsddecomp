@@ -373,7 +373,7 @@ void CdDriver__RunRequestQueue(void) {
  * front end, the driver mode, the file table and the service tick. The
  * class, the queue's types and the shared module state are
  * include/CdDriver.h's; the constructor is in code_179d8_o.c, the other
- * request methods in code_179d8_s.c, the state machines and the queue's
+ * request methods in CdDriver.c, the state machines and the queue's
  * nodes in code_179d8_r.c, the blocking file calls in code_179d8_h.c.
  *
  *   - The driver mode. SetCdDriverMode sets gCdAsyncEnabled (requests are
@@ -535,7 +535,7 @@ s32 GetCdState(void) {
 
 /* gCdSyncQueueMode is written only by SetCdDriverMode's second argument.
  * With it set and gCdAsyncEnabled clear, the request methods
- * (code_179d8_s.c) still queue each request but run it as a blocking spin
+ * (CdDriver.c) still queue each request but run it as a blocking spin
  * when runRequestQueue dispatches it; with both clear they skip the queue. */
 
 s32 GetCdDriverMode(s32 *outSyncQueueMode) {
@@ -717,9 +717,9 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
  * include/CdDriver.h's).
  *
  * The state machine takes one step each time ServiceCdDriver
- * (code_179d8_s.c, a VSync callback) runs: it calls TickCdStateMachine or
+ * (CdDriver.c, a VSync callback) runs: it calls TickCdStateMachine or
  * TickCdLoadFileStateMachine as gCdTickStep says, after a CdDriver method
- * (code_179d8_s.c) has started an operation with StartCdOperation and set
+ * (CdDriver.c) has started an operation with StartCdOperation and set
  * gCdSeekParam, gCdReadSectorCount and gCdReadBuffer. gCdState walks
  * CD_STATE_SETLOC (CdControlF(CdlSetloc) to gCdSeekParam->pos),
  * CD_STATE_SETLOC_WAIT (poll CdSync), CD_STATE_READ (CdRead) and
@@ -736,15 +736,15 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
  * gCdSavedSeekParam.
  *
  * AllocCdRequestNode appends a zeroed node to gCdRequestQueue and
- * FreeCdRequestNode unlinks one; EnqueueCdRequest (code_179d8_s.c) fills
- * them and CdDriver__RunRequestQueue (code_179d8_s.c) consumes them from the
+ * FreeCdRequestNode unlinks one; EnqueueCdRequest (CdDriver.c) fills
+ * them and CdDriver__RunRequestQueue (CdDriver.c) consumes them from the
  * head. FindCdFileEntry and FindCdFileIndex look a name up in gFileTable by
  * substring, GetCdFileEntry indexes it. Every function but the three
  * state setters brackets its body with LockCd / UnlockCd, which makes
  * ServiceCdDriver skip its tick in between.
  */
 
-/* Defined in code_179d8_s.c. */
+/* Defined in CdDriver.c. */
 extern void LockCd(void);
 extern void UnlockCd(void);
 
@@ -1007,7 +1007,7 @@ void SetCdState(s32 state) {
  * into a CD driver.
  *
  * OpenCdFile, CloseCdFile, GetCdFileSize and ReadCdFile are what CdDriver's
- * open, close, seek and read slots (code_179d8_s.c) call when the driver is
+ * open, close, seek and read slots (CdDriver.c) call when the driver is
  * not in async mode. Like those slots they run on whichever FileResource
  * object called them (CdDriver.h's banner) and use only its isOpen, pos and
  * size. OpenCdFile looks the name up with CdSearchFile under the path

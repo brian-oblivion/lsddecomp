@@ -2,7 +2,7 @@
 
 > Renamed from `func_800280EC` on 2026-09-17 (tools/rename.py). Address 0x800280ec.
 
-Round 45, runner echo (second sitting), `src/code_179d8_s.c`. Its address is
+Round 45, runner echo (second sitting), `src/CdDriver.c`. Its address is
 taken 3x elsewhere in the slice (this function itself, twice as a
 `VSyncCallback` argument, once by `StartCdService`) — a function pointer.
 
@@ -20,8 +20,8 @@ carries the evidence for each one.
 extern s32 GetBMemPMgrBusy(void); /* TmdRenderer */
 extern s32 gCdUseVSyncCallback;
 extern s32 gCdTickStep;
-extern void TickCdStateMachine(void); /* code_179d8_s: state-machine step 1 */
-extern void TickCdLoadFileStateMachine(void); /* code_179d8_s: state-machine step 2 */
+extern void TickCdStateMachine(void); /* CdDriver: state-machine step 1 */
+extern void TickCdLoadFileStateMachine(void); /* CdDriver: state-machine step 2 */
 extern s32 sCdQueueEnabled;
 extern void VSyncCallback(void (*cb)(void));
 
@@ -29,7 +29,7 @@ extern void VSyncCallback(void (*cb)(void));
  * class-map comment above); only the one slot this call site dispatches is
  * typed, following the pad-to-offset convention include/GameApplicationFileResource.h uses
  * for gFileResourceMethods's own table. tools/classtable.py resolves +0x068 to
- * CdDriver__RunRequestQueue (code_179d8_s), which walks the gCdRequestQueue request list,
+ * CdDriver__RunRequestQueue (CdDriver), which walks the gCdRequestQueue request list,
  * dispatches each request through its owner's own slots and frees it with
  * FreeCdRequestNode -- so the slot is named for what that method does. */
 typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
@@ -91,8 +91,8 @@ of getting a fallthrough instruction of its own.
 
 Body: an optional `VSyncCallback(0)` (`gCdUseVSyncCallback`), a two-way dispatch on
 `gCdTickStep` (1 -> `TickCdStateMachine`, 2 -> `TickCdLoadFileStateMachine`, both in the
-sibling `code_179d8_s` unit — declared extern here per the
-per-call-site-typed convention `code_179d8_s.c` already established for
+sibling `CdDriver` unit — declared extern here per the
+per-call-site-typed convention `CdDriver.c` already established for
 cross-unit libcd calls, now confirmed to apply to cross-unit game-code calls
 too), an optional virtual dispatch through `gCdDriverMethods`'s own table slot
 +0x68 (guarded by `sCdQueueEnabled`), and finally an optional
@@ -127,7 +127,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 `VSyncCallback`, and `SetCdDriverMode` passes the same address to the
 singleton's `+0x84` callback slot when the VSync path is off. One call does
 all the periodic work there is -- skip if `sCdLock` is held or
-`GetBMemPMgrBusy` says no; step `code_179d8_s`'s CD state machine
+`GetBMemPMgrBusy` says no; step `CdDriver`'s CD state machine
 (`TickCdStateMachine` for `gCdTickStep == 1`, `TickCdLoadFileStateMachine` for 2); drain the
 request queue through the class's own `+0x068` slot; re-arm itself. "Service"
 is the one word that covers a tick that both advances a state machine and
@@ -135,7 +135,7 @@ drains a queue.
 
 **`sCdQueueEnabled`.** Its only reader is the guard on the `+0x068` dispatch
 here, and `tools/classtable.py` resolves that slot to `CdDriver__RunRequestQueue`
-(code_179d8_s), which walks `gCdRequestQueue`, dispatches each request and frees
+(CdDriver), which walks `gCdRequestQueue`, dispatches each request and frees
 it with `FreeCdRequestNode`. So the flag gates queue processing specifically --
 not the tick, which still runs the state machine while the flag is clear.
 Tier A.

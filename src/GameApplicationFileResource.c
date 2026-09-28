@@ -398,7 +398,7 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
 
 /* gActiveDataSource's two observed values are the header words of the two
  * sibling classes it selects between: gCdDriverMethods (the CD-ROM read driver,
- * code_179d8_s.c) and gVabDriverMethods (VabDriver, the SPU/VAB driver, include/VabDriver.h). */
+ * CdDriver.c) and gVabDriverMethods (VabDriver, the SPU/VAB driver, include/VabDriver.h). */
 #define DATASOURCE_CD 0x13
 #define DATASOURCE_SPU 0x23
 

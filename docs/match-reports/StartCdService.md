@@ -2,7 +2,7 @@
 
 > Renamed from `func_800281B0` on 2026-09-17 (tools/rename.py). Address 0x800281b0.
 
-Round 45, runner echo (second sitting), `src/code_179d8_s.c`.
+Round 45, runner echo (second sitting), `src/CdDriver.c`.
 
 ## Result
 
@@ -73,7 +73,7 @@ else. Tier A.
 ## Track 7 (round 101, echo): comments moved here, and names
 
 `gCdCallbackInstalled` -> `sCdCallbackInstalled` and `gCdQueueEnabled` ->
-`sCdQueueEnabled` (`tools/rename.py`): only code_179d8_s accesses either
+`sCdQueueEnabled` (`tools/rename.py`): only CdDriver accesses either
 (StartCdService, StopCdServiceIfIdle, DisableCdQueue, ServiceCdDriver), so
 they are unit-static data, `sName`. The meanings stand as named: the
 first is set once the tick is installed and cleared when

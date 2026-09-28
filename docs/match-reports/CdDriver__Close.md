@@ -11,7 +11,7 @@ diverge; second attempt (after fixing an if/else-if inversion) matched.
 
 ```c
 /* Local view of the object CdDriver__Close/EnqueueCdRequest/CloseCdFile read
- * through -- the real struct is ObjA34_179D8H (src/code_179d8_s.c), but that
+ * through -- the real struct is ObjA34_179D8H (src/CdDriver.c), but that
  * type is that unit's own local reading, not a shared header, so this unit
  * carries its own minimal view of the two offsets it actually touches. */
 typedef struct Obj80027480 {
@@ -75,8 +75,8 @@ sibling blocks the compiler places first, driven purely by which one is the
 
 ## Struct note
 
-`self` is `ObjA34_179D8H` (see `src/code_179d8_s.c`), which this unit does
-not include -- that type is `code_179d8_s`'s own local reading, not a shared
+`self` is `ObjA34_179D8H` (see `src/CdDriver.c`), which this unit does
+not include -- that type is `CdDriver`'s own local reading, not a shared
 header. This unit's local view (`Obj80027480`) only names the two offsets
 this function touches (`unk0C` at +0xC, a `s32`; `unk28` at +0x28, a `u16`,
 loaded with `lhu`). Padding through +0xC and +0x28 is otherwise unestablished
@@ -115,7 +115,7 @@ calls this slot last, after the read, and also on allocation failure, and
 to `Methods80027480::slot48`) from two give-up call sites. `classtable.py`
 resolves `+0x048` to this function, whose body is a close, and the base
 class also calls it on the SUCCESS path. The slot is now `close` in this
-unit; the same rename is PROPOSED for code_179d8_s's `MethodsA34_179D8H`
+unit; the same rename is PROPOSED for CdDriver's `MethodsA34_179D8H`
 (below, `## Proposed field names`).
 
 **Class prefix.** `Class6D4E8` is the placeholder token for the method
@@ -129,7 +129,7 @@ For the head to apply by type scope (out of unit):
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| code_179d8_s | `MethodsA34_179D8H` | `onError` | `close` | A | `+0x048` of `gCdDriverMethods` is `CdDriver__Close`; `ReadCdFile` calls it when the file is not open, which is a close of an unopened file, not an error report |
+| CdDriver | `MethodsA34_179D8H` | `onError` | `close` | A | `+0x048` of `gCdDriverMethods` is `CdDriver__Close`; `ReadCdFile` calls it when the file is not open, which is a close of an unopened file, not an error report |
 | include/GameApplicationFileResource.h | `FileResourceMethods` | `onBufferChanged` | `close` | A | `+0x048`; `FileResource__LoadFile` calls it after the read and on allocation failure, `FileResource__Finalize` before freeing the buffer; the one populated override is `CdDriver__Close` |
 
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_800276C8` on 2026-09-25 (tools/rename.py). Address 0x800276c8.
 
-Unit `code_179d8_s`. A bare `jr $ra; nop` leaf that splat matched at carve
+Unit `CdDriver`. A bare `jr $ra; nop` leaf that splat matched at carve
 time (round 47); it had no report until this naming pass.
 
 ```c

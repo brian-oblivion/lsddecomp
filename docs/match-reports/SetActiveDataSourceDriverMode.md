@@ -94,7 +94,7 @@ a 3-argument setter with a retry loop.
 
 **Evidence.** The typedef's only use is this function's local `fn`, and it
 has exactly two occupants, one per branch of `gActiveDataSource ==
-DATASOURCE_CD`: `SetCdDriverMode` (CD driver, `code_179d8_s.c`, 3 args) and
+DATASOURCE_CD`: `SetCdDriverMode` (CD driver, `CdDriver.c`, 3 args) and
 `SetVabDriverMode` (SPU/VAB driver, `PlacementGridVabSound.c`, 2 args, ignores the
 third). Both occupants agree on what they do -- set the selected data
 source's driver mode, returning 0 while not yet accepted, which the caller

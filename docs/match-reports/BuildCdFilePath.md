@@ -2,7 +2,7 @@
 
 > Renamed from `func_800289CC` on 2026-09-21 (tools/rename.py). Address 0x800289cc.
 
-Unit: `code_179d8_s`. Runner: echo, round 17 (second assignment).
+Unit: `CdDriver`. Runner: echo, round 17 (second assignment).
 
 ## Result
 

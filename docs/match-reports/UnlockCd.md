@@ -2,7 +2,7 @@
 
 > Renamed from `func_800280E0` on 2026-09-17 (tools/rename.py). Address 0x800280e0.
 
-**Unit:** code_179d8_s (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
+**Unit:** CdDriver (fresh carve) · **Size:** 3 instructions · **Status:** MATCHED (3/3 words)
 
 ## What this function does
 
@@ -25,7 +25,7 @@ void UnlockCd(void)
 
 ## Provenance
 
-round 45 (2026-09-15), runner echo, unit code_179d8_s (fresh carve). See
+round 45 (2026-09-15), runner echo, unit CdDriver (fresh carve). See
 IsCdBusy.md for the sibling-accessor context; see LockCd.md for
 its pair.
 

@@ -101,13 +101,13 @@ specific fields travel together and not the gap is not established.
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/code_179d8_s.c:143`
+mis-hit had to be resolved by receiver type: `src/CdDriver.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
-Same cross-unit exposure (`code_179d8_h.c`/`code_179d8_s.c` include
+Same cross-unit exposure (`code_179d8_h.c`/`CdDriver.c` include
 `FileResource`), so PROPOSED, not renamed. None of `unk40`/`unk44`/
 `unk48`/`unk4C`/`unk50`/`unk54`/`unk58`/`unk68`/`unk6C`/`unk70`/`unk74` has
 any evidence beyond "copied together, in this order, with a real 0xC-byte

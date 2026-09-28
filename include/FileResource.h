@@ -114,7 +114,7 @@ void FileResource__FileResource(FileResource *self);
 void FileResource__Finalize(FileResource *self);
 void FileResource__LoadFile(FileResource *self, char *name);
 void FileResource__FreeBuffer(FileResource *self);
-/* Bits CdDriver__RunRequestQueue (code_179d8_s.c) ORs into a client's
+/* Bits CdDriver__RunRequestQueue (CdDriver.c) ORs into a client's
  * `flags` when one of its requests completes; the clients poll them. Bit 0 (1) is left a literal: it is also FileResource__SetFlag's bit,
  * and the queue node field that sets it (`unk4`) has no established meaning. */
 #define CD_FLAG_DONE 0x002         /* some request completed */

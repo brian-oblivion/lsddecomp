@@ -2,7 +2,7 @@
 
 > Renamed from `func_800282AC` on 2026-09-17 (tools/rename.py). Address 0x800282ac.
 
-Round 45, runner echo (second sitting), `src/code_179d8_s.c`.
+Round 45, runner echo (second sitting), `src/CdDriver.c`.
 
 ## Result
 
@@ -16,12 +16,12 @@ carries the evidence for each one.
 
 ```c
 /* The same 0x24-byte queue node CdRequest_D70 above is a view of, from the
- * writing side: AllocCdRequestNode (code_179d8_s) allocates one and links it onto
+ * writing side: AllocCdRequestNode (CdDriver) allocates one and links it onto
  * gCdRequestQueue, and only the fields this call site writes are typed here
  * (padded to their offsets, per this unit's convention). `op` takes the
  * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into gFileTable (0
  * when the op does not name a file), and param0/param1 are the two per-op
- * arguments code_179d8_s passes through: a byte count and a flag for op 4, a
+ * arguments CdDriver passes through: a byte count and a flag for op 4, a
  * buffer and a size for op 5. */
 typedef struct CdRequest_282AC CdRequest_282AC;
 struct CdRequest_282AC {
@@ -32,7 +32,7 @@ struct CdRequest_282AC {
     /* +0x14 */ s32 param0;
     /* +0x18 */ s32 param1;
 };
-extern CdRequest_282AC *AllocCdRequestNode(void); /* code_179d8_s: alloc + link */
+extern CdRequest_282AC *AllocCdRequestNode(void); /* CdDriver: alloc + link */
 
 typedef struct Obj6D4E8_282AC Obj6D4E8_282AC;
 struct Obj6D4E8_282AC {
@@ -66,9 +66,9 @@ void EnqueueCdRequest(Obj6D4E8_282AC *owner, s32 fileIndex, s32 op,
 Five-argument function (four in registers, a fifth on the caller's stack at
 `0x38($sp)` after this function's own `-0x28` prologue adjustment —
 standard o32 stack-arg slot). Allocates/links a list node via
-`AllocCdRequestNode` (foxtrot's `code_179d8_s`, still `INCLUDE_ASM` there —
+`AllocCdRequestNode` (foxtrot's `CdDriver`, still `INCLUDE_ASM` there —
 declared `extern` here per the cross-unit convention already established by
-`code_179d8_s.c` and `ServiceCdDriver`'s report) and fills five of its
+`CdDriver.c` and `ServiceCdDriver`'s report) and fills five of its
 fields with the incoming parameters. The store order to the new entry
 (`+0x08, +0x14, +0x0C, +0x10, +0x18`) is NOT ascending-offset — it's
 `arg2, arg3, arg0, arg1, arg4` in that literal order — and reproducing it
@@ -102,11 +102,11 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | --- | --- | --- |
 | `func_800282AC` | `EnqueueCdRequest` | A |
 
-**Evidence.** Allocates and links a node via `AllocCdRequestNode` (code_179d8_s,
+**Evidence.** Allocates and links a node via `AllocCdRequestNode` (CdDriver,
 which appends to the `gCdRequestQueue` list), fills five of its fields from the
 parameters, bumps the requesting object's pending count, clears its flags and
 calls `StartCdService`. Every caller is a class method taking its
-asynchronous path (`code_179d8_s` at op 2/3/4/5/7,
+asynchronous path (`CdDriver` at op 2/3/4/5/7,
 `CdDriver__RequestLoadFile` at op 7). Append a request and make sure the
 service runs: tier A.
 
@@ -129,7 +129,7 @@ call site and false of three.
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/code_179d8_s.c:143`
+mis-hit had to be resolved by receiver type: `src/CdDriver.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
@@ -137,17 +137,17 @@ which is the procedure working in the direction where it can work.
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| code_179d8_s | `Node8008A894` | `unk8` | `op` | A | as above |
-| code_179d8_s | `Node8008A894` | `unkC` | `owner` | A | as above |
-| code_179d8_s | `Node8008A894` | `unk10` | `fileIndex` | A | as above |
-| code_179d8_s | `Node8008A894` | `unk14`/`unk18` | `param0`/`param1` | B | as above |
-| code_179d8_s | `Node8008A894` | `unk4` | *(no proposal)* | C | this unit never touches `+0x04`; only `AllocCdRequestNode` zeroes it |
+| CdDriver | `Node8008A894` | `unk8` | `op` | A | as above |
+| CdDriver | `Node8008A894` | `unkC` | `owner` | A | as above |
+| CdDriver | `Node8008A894` | `unk10` | `fileIndex` | A | as above |
+| CdDriver | `Node8008A894` | `unk14`/`unk18` | `param0`/`param1` | B | as above |
+| CdDriver | `Node8008A894` | `unk4` | *(no proposal)* | C | this unit never touches `+0x04`; only `AllocCdRequestNode` zeroes it |
 
 ## Round 96 (track 6, echo): `CdRequest_282AC` is `CdRequestNode`
 
 The unit-local placeholder `CdRequest_282AC` (op/owner/fileIndex/param0/param1
 at +0x08..+0x18, padded) was a writing-side view of include/CdDriver.h's
-`CdRequestNode`, the same 0x24-byte node AllocCdRequestNode (code_179d8_s)
+`CdRequestNode`, the same 0x24-byte node AllocCdRequestNode (CdDriver)
 returns: same offsets, same allocator. The view is deleted and `entry` is a
 `CdRequestNode *`; `owner` is that struct's `CdDriver *`, so the `(s32)` cast
 on the store went too. Byte-exact.
