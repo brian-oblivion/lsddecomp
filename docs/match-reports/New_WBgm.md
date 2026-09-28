@@ -6,7 +6,7 @@ Round 81, runner delta. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot none (not in the table); allocator (slots resolved with `tools/classtable.py gWBgmMethods`).
-- **What:** `New_` wrapper: `BMemPMgrAlloc(0x24)`, then the ctor through `Get_vtable_WBgm()->ctor` (slot +0x008) with the three arguments, `return self` / `return NULL`.
+- **What:** `New_` wrapper: `BMemPMgrAlloc(0x24)`, then the ctor through `GetWBgmMethods()->ctor` (slot +0x008) with the three arguments, `return self` / `return NULL`.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 31/31
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -34,7 +34,7 @@ WBgm *New_WBgm(s32 vabArg, s32 seqArg, s32 autoPlay) {
 
     self = BMemPMgrAlloc(0x24);
     if (self != NULL) {
-        Get_vtable_WBgm()->ctor(self, vabArg, seqArg, autoPlay);
+        GetWBgmMethods()->ctor(self, vabArg, seqArg, autoPlay);
         return self;
     }
     return NULL;
@@ -110,7 +110,7 @@ extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-WBgmMethods *Get_vtable_WBgm(void);
+WBgmMethods *GetWBgmMethods(void);
 
 extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);

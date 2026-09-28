@@ -1,4 +1,6 @@
-# Get_vtable_WBgm -- MATCHED (4/4 words), round 81
+# GetWBgmMethods -- MATCHED (4/4 words), round 81
+
+> Renamed from `Get_vtable_WBgm` on 2026-09-28 (tools/rename.py). Address 0x8003a04c.
 
 > Renamed from `func_8003A04C` on 2026-09-25 (tools/rename.py). Address 0x8003a04c.
 
@@ -10,16 +12,16 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 0
   insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`). No levers were needed.
-- **Name:** renamed round 82 to `Get_vtable_WBgm` (see `## Naming` below).
+- **Name:** renamed round 82 to `GetWBgmMethods` (see `## Naming` below).
 
 ## Naming
 
-`Get_vtable_WBgm`, tier A. matches the `Get_vtable_<Class>` convention (`GetBasicClassMethods`, BasicClass.h); returns `&gWBgmMethods`, the table this class installs in its own ctor.
+`GetWBgmMethods`, tier A. matches the `Get_vtable_<Class>` convention (`GetBasicClassMethods`, BasicClass.h); returns `&gWBgmMethods`, the table this class installs in its own ctor.
 
 ## Source
 
 ```c
-WBgmMethods *Get_vtable_WBgm(void) {
+WBgmMethods *GetWBgmMethods(void) {
     return &gWBgmMethods;
 }
 ```

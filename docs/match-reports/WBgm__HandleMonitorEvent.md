@@ -40,7 +40,7 @@ WBgm *New_WBgm(s32 vabArg, s32 seqArg, s32 autoPlay) {
 
     self = BMemPMgrAlloc(0x24);
     if (self != NULL) {
-        Get_vtable_WBgm()->ctor(self, vabArg, seqArg, autoPlay);
+        GetWBgmMethods()->ctor(self, vabArg, seqArg, autoPlay);
         return self;
     }
     return NULL;
@@ -116,7 +116,7 @@ extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-WBgmMethods *Get_vtable_WBgm(void);
+WBgmMethods *GetWBgmMethods(void);
 
 extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);

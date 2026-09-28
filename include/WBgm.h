@@ -77,7 +77,7 @@ struct WBgm {
 }; /* 0x24 bytes: New_WBgm */
 
 extern WBgmMethods gWBgmMethods;
-extern WBgmMethods *Get_vtable_WBgm(void); /* returns &gWBgmMethods */
+extern WBgmMethods *GetWBgmMethods(void); /* returns &gWBgmMethods */
 
 extern s32 gWBgmActive; /* 1 between WBgm__WBgm and WBgm__Finalize */
 

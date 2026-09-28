@@ -6,7 +6,7 @@ Round 81, runner delta. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x008 (ctor) (slots resolved with `tools/classtable.py gWBgmMethods`).
-- **What:** constructor: base ctor via `GetBasicClassMethods()->ctor`, installs `Get_vtable_WBgm()`, zeroes +0x0C/+0x10/+0x14/+0x1A/+0x1C/+0x1E, stores the third argument at +0x20 (auto-play flag), sets `gWBgmActive = 1` (gp_rel global), then calls its own slots +0x05C (with arg 2) and +0x060 (with arg 1) and registers itself as a child of the `GetDrawSystem()` singleton.
+- **What:** constructor: base ctor via `GetBasicClassMethods()->ctor`, installs `GetWBgmMethods()`, zeroes +0x0C/+0x10/+0x14/+0x1A/+0x1C/+0x1E, stores the third argument at +0x20 (auto-play flag), sets `gWBgmActive = 1` (gp_rel global), then calls its own slots +0x05C (with arg 2) and +0x060 (with arg 1) and registers itself as a child of the `GetDrawSystem()` singleton.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 54/54
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`).
@@ -52,7 +52,7 @@ still matches after the change.
 ```c
 void WBgm__WBgm(WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_WBgm();
+    self->methods = GetWBgmMethods();
     self->vab = NULL;
     self->seqData = NULL;
     self->seqId = 0;
@@ -136,7 +136,7 @@ extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
 extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-WBgmMethods *Get_vtable_WBgm(void);
+WBgmMethods *GetWBgmMethods(void);
 
 extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);

@@ -31,7 +31,7 @@ WBgm *New_WBgm(char *vabPath, char *seqPath, s32 autoPlay) {
 
     self = BMemPMgrAlloc(sizeof(WBgm));
     if (self != NULL) {
-        Get_vtable_WBgm()->ctor(self, vabPath, seqPath, autoPlay);
+        GetWBgmMethods()->ctor(self, vabPath, seqPath, autoPlay);
         return self;
     }
     return NULL;
@@ -39,7 +39,7 @@ WBgm *New_WBgm(char *vabPath, char *seqPath, s32 autoPlay) {
 
 void WBgm__WBgm(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_WBgm();
+    self->methods = GetWBgmMethods();
     self->vab = NULL;
     self->seqData = NULL;
     self->seqId = 0;
@@ -187,7 +187,7 @@ void WBgm__SetVab(WBgm *self, char *vabPath) {
     }
 }
 
-WBgmMethods *Get_vtable_WBgm(void) {
+WBgmMethods *GetWBgmMethods(void) {
     return &gWBgmMethods;
 }
 
