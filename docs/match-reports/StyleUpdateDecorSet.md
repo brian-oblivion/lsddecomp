@@ -165,3 +165,11 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
 ## Track 10 (2026-09-28, round 104, echo)
 
 The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the comment above StyleBuildDecorSet on
+sStyleDecorPosX/Y and sStyleDecorSizeW/H (now a one-line `MATCHING:`):
+
+> MATCHING: copied whole, never field by field (a BLKmode copy makes cse
+> drop cached memory values; scalar copies lose retail's reloads).

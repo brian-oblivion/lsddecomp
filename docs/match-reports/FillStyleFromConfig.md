@@ -108,3 +108,11 @@ destination (D_80087424, via ApplyStyleConfig) is not an ObjM: it is the
 record ObjM keeps as `styleConfig`, which include/class_3bb8c.h views as
 StyleConfig. The two views stay separate here: the record is not a class,
 and merging them is a global's type (track 4b)." They are now one view.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the comment above sStyleFogNears (now a
+one-line `MATCHING:` below it):
+
+> MATCHING: indexed as `u8[][3]`, for retail's `i*2 + i + base` stride-3
+> address arithmetic.

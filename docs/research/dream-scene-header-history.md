@@ -85,3 +85,18 @@ src/world/dream_day.c and src/world/dream_scene.c include it, so it is a
 shared header and stays one; its `@file` block now names its clients. The
 subsystem description that was `src/world/dream_aux.c`'s banner moved into
 that `@file` block.
+
+### src/world/dream_scene.c banners
+
+The style layer's section banner ("The style layer's per-scene objects")
+ended with a pointer at the reports, dropped from the source:
+
+```c
+ * is in the game -- what a variant, an effect kind or a cue stands for -- is
+ * not established; the names describe mechanics. Evidence and tiers are in
+ * each function's match report, `## Naming`.
+```
+
+The file banner, the ObjM banners and the StyleEffect and Actor banners
+were cut to what the file holds; what they said about each class moved to
+its header's class and function documentation.

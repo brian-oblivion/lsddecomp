@@ -3,12 +3,8 @@
  * that sit between them in ROM. In address order, each under its own section
  * banner below:
  *  - ItemList's second half (include/item_list.h; the first half is in
- *    input_dialogs.c): setState and tickClosing (close, then report the
- *    result to the parents), handleInputCode (the Pad events it answers) and
- *    playSound, the cursor and scroll methods, the four visible rows
- *    (createRows, releaseRows, refreshRows, and the non-virtual helpers
- *    FormatRowText and SetView), stepCursorInView, getCursorIndex and the
- *    table getter GetItemListMethods;
+ *    input_dialogs.c): closing and reporting, the Pad events, the cursor and
+ *    scroll methods, the four visible rows and the table getter;
  *  - ObjM (include/objm.h), whole: the TimedTask DayTask starts for a day's
  *    scene;
  *  - the style layer, whose client ObjM is: its setup (RegisterStyleConfig
@@ -20,9 +16,7 @@
  *    StyleEffect;
  *  - VariantSprite (include/variant_sprite.h), whole;
  *  - GraphRoom (include/graph_room.h), whole, the mood graph screen.
- *
- * The game's own files most likely ended after each class's table getter;
- * this file keeps the classes together.
+ * The game's own files most likely ended after each class's table getter.
  */
 #include "common.h"
 #include <libgte.h>
@@ -1112,9 +1106,8 @@ void *ApplyStyleConfig(void) {
 }
 
 /* sStylePalette is 24 RGB triples (a greyscale ramp first: 0, 64, 128, 255).
- * MATCHING: indexed as `u8[][3]`, for retail's `i*2 + i + base` stride-3
- * address arithmetic. sStyleFogNears is six fogNear distances, 26624 down to
- * 2048. */
+ * sStyleFogNears is six fogNear distances, 26624 down to 2048. */
+/* MATCHING: sStylePalette is indexed as u8[][3], for the stride-3 address arithmetic. */
 extern s32 sStyleFogNears[];
 
 void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg) {
@@ -1156,44 +1149,23 @@ void ApplyStyleDecorationIfSet(void) {
 
 /* ---- The style layer's per-scene objects ---------------------------------
  *
- * What TickStyle
- * builds on a scene's first tick, updates on every tick, and StyleTeardown
- * releases.
- *
- * RegisterStyleConfig (previous section), called by ObjM__InitStyleAndWorld
- * and a no-op until StyleTeardown clears sStyleGrid, sets the state read here: sStyleGrid (the
- * scene's StageMap), sStyleStage (ObjM's stage), sStyleSceneRefs (ObjM's
- * sound, resources and viewport; StyleSceneRefs below) and sStyleDay (the
- * DreamSys day). ApplyStyleConfig then takes the stage's fixed config or,
- * with none, PickStyleFallbackConfig's: a variant (sStyleVariant, 0..3) and
- * a config record picked from day + stage.
- *
- * What TickStyle keeps, each built on the first tick:
- *  - the decoration box, sStyleDecorObj, when the config has a colour for
- *    it (ApplyStyleDecorationIfSet builds it, StyleFlushDecoration releases it);
- *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (sStyleDecorSlots)
- *    coloured from sStyleDecorColors and attached under the viewport's fade
- *    box; every tick StyleUpdateDecorSet shifts their colours, their
- *    position and the viewport's clear colour by the view point's y offset
- *    from its reference point;
- *  - the effect slots: StyleEffect objects of kinds 0..3 (sStyleEffectSlots)
- *    built from one parameter block, sStyleSpawnOffsetX..sStyleSpawnColors,
- *    that StyleFillEffectKindN and SetupStyleSpawnParamsRandom/B fill in; each
- *    tick updates them with the target position;
- *  - two positional sound cues (sStyleCueSlots, in sStyleCueSlotPool): a
- *    free slot claims the next record of the stage's cue list that lies
- *    within its cue's distance of the target and starts the record's
- *    SoundCueSet callback (sStyleCueCallbacks, next section); a claimed
- *    slot is serviced while the target stays in range and flushed when it
- *    leaves.
- * StyleScrollVramStrips also rotates a VRAM strip one column per tick on
- * stages 2 to 5.
- *
- * The target is the grid's target cell (ObjM__TickStyle passes
- * getTargetDescriptor) turned into a world position. What the style layer
- * is in the game -- what a variant, an effect kind or a cue stands for -- is
- * not established; the names describe mechanics. Evidence and tiers are in
- * each function's match report, `## Naming`.
+ * What TickStyle builds on a scene's first tick, updates every tick and
+ * StyleTeardown releases, in sStyle globals RegisterStyleConfig set (the
+ * scene's StageMap, ObjM's stage, its StyleSceneRefs and the day):
+ *  - the decoration box (sStyleDecorObj), when the config has a colour;
+ *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (sStyleDecorSlots) under
+ *    the viewport's fade box, shaded every tick by the view point's height;
+ *  - the effect slots: StyleEffects of kinds 0..3 (sStyleEffectSlots), each
+ *    built from the one parameter block the StyleFillEffectKindN functions
+ *    fill, updated every tick with the target position;
+ *  - two positional sound cues (sStyleCueSlots): a free slot claims the next
+ *    record of the stage's cue list within its cue's distance of the target
+ *    and starts the record's SoundCueSet callback; a claimed slot is
+ *    serviced while the target stays in range and flushed when it leaves.
+ * The target is the grid's target cell as a world position; on stages 2 to
+ * 5 StyleScrollVramStrips also rotates a VRAM strip. What a variant, an
+ * effect kind or a cue stands for in the game is not established; the names
+ * describe mechanics.
  */
 
 /* The decoration set: this many BoxFill bands, stacked 3 pixels apart. */
@@ -1281,9 +1253,8 @@ extern s32 sStyleDecorSizeH;
 extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
 
 /* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs, a
- * BoxFillPos and a BoxFillSize.
- * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
- * drop cached memory values; scalar copies lose retail's reloads). */
+ * BoxFillPos and a BoxFillSize. */
+/* MATCHING: both are copied whole, never field by field. */
 
 /* Builds the bands: band 0 in sStyleDecorColors' first colour, bands 1..17
  * attached under it, each 3 pixels lower and 7 shorter than the one before;
@@ -1495,8 +1466,8 @@ extern void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY);
 
 /* Fills `count` slots with kind-0 effects: a table index and scale for all
  * of them, an offset y (0: each setup picks one; a pick of 4 reads the word
- * after sStyleSpawnYChoices, as retail does), and per slot
- * SetupStyleSpawnParamsRandom, or B on every seventh day. Returns the next slot. */
+ * after sStyleSpawnYChoices), and per slot SetupStyleSpawnParamsRandom, or
+ * SetupStyleSpawnParamsDayMod7 on every seventh day. Returns the next slot. */
 StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
@@ -1875,21 +1846,16 @@ void StyleScrollVramStrips(void) {
  *
  *  - StyleCue00..StyleCue13, the 14 rows of sStyleCueCallbacks, and their
  *    helper ComputeStyleCueFalloff. Each is a SoundCueSet callback
- *    (include/sound_cue_set.h): TryStartStyleCue (previous section) starts a
- *    style-cue slot's embedded set with the claimed cue record's index as the
- *    tag and that row of the table as the callback, as Entity does with its
+ *    (include/sound_cue_set.h): TryStartStyleCue starts a style-cue slot's
+ *    embedded set with the claimed cue record's index as the tag and that
+ *    row of the table as the callback, as Entity does with its
  *    Entity__MoodCueNN handlers. Every tick a callback sets the set's
- *    attenuation from the slot's distance to the target
- *    (ComputeStyleCueFalloff) and, on the ticks its pattern selects,
- *    requests VAB programs on the three voices; most restart the pattern by
- *    setting `tick` to -1 once it passes a limit.
- *  - IsStyleVariantEven: whether the variant PickStyleFallbackConfig chose
- *    (sStyleVariant) is even.
- *  - StyleEffect (include/style_effect.h), the Actor subclass the style layer
- *    keeps at an offset from its target: its ctor, finalize, reset
- *    (StyleEffect__SetParams) and update slot occupants, and the
- *    New_StyleEffect allocator. The per-kind work follows, in the next two
- *    sections.
+ *    attenuation from the slot's distance to the target and, on the ticks
+ *    its pattern selects, requests VAB programs on the three voices; most
+ *    restart the pattern by setting `tick` to -1 once it passes a limit.
+ *  - IsStyleVariantEven (include/dream_aux.h).
+ *  - StyleEffect's slot occupants and allocator (include/style_effect.h);
+ *    its per-kind work follows in the next two sections.
  */
 
 /* ------------------------------------------------------------------ *
