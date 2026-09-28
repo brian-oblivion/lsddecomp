@@ -12,7 +12,7 @@
  * src/graphics/graphics_resources.c; no class derives from it.
  *
  * Its GsBG is what makes it a background layer: Viewport__DrawNode
- * (src/graphics/ViewportDraw.c) passes a class-0x54 node's +0x044 to GsSortBg, and
+ * (src/graphics/viewport_draw.c) passes a class-0x54 node's +0x044 to GsSortBg, and
  * BgLayer__Reset lays that GsBG over a map source's GsMAP. Its one outside
  * user is TaskCore (src/app/task.c): TaskCore__TaskCore builds one over its
  * TileMap (New_BgLayer(tileMap, 1)) into TaskCore::bgLayer, OnInit attaches

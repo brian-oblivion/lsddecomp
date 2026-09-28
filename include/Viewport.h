@@ -8,7 +8,7 @@
 /*
  * Viewport -- the object that renders a scene (class id 0x7, method table
  * gViewportMethods): a BasicClass subclass. Its methods are in src/app/task.c,
- * except drawNode, in src/graphics/ViewportDraw.c. IntermediateBase and
+ * except drawNode, in src/graphics/viewport_draw.c. IntermediateBase and
  * TaskCore hold one as `viewport` (New_Viewport, or the caller's own).
  *
  * The name is for what the class's own methods do:
@@ -46,7 +46,7 @@
  * to each buffer's packet area (InitOt; defaults 2000 and 64); which is the
  * count and which the size comes from Sony's PACKETMAX * size idiom and the
  * values callers pass, not from the code. drawNode (Viewport__DrawNode) reads its
- * node through ViewportDraw.c's own DrawNode view, so it is not prototyped
+ * node through viewport_draw.c's own DrawNode view, so it is not prototyped
  * here.
  *
  * The OT pair is Sony's (GsOT headers, GsOT_TAG arrays, PACKET areas), so an
@@ -103,7 +103,7 @@ struct ViewportRefView {
     /* +0x094 */ void (*onFrameClockEvent)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnFrameClockEvent: onNotify's class-5 (FrameClock) case */ \
     /* +0x098 */ void (*onDrawSystemEvent)(Self *self, BasicClass *sender, s32 event); /* Viewport__OnDrawSystemEvent: onNotify's DrawSystem (1) case */ \
     /* +0x09C */ void (*update)(Self *self);                       /* Viewport__Update; NodeGuardedViewport__Update */ \
-    /* +0x0A0 */ void (*drawNode)(Self *self, SceneNode *node);   /* Viewport__DrawNode (ViewportDraw) */ \
+    /* +0x0A0 */ void (*drawNode)(Self *self, SceneNode *node);   /* Viewport__DrawNode (viewport_draw) */ \
     /* +0x0A4 */ void (*flip)(Self *self);                         /* Viewport__Flip */              \
     /* +0x0A8 */ void (*setFadeBox)(Self *self, SceneNode *handle); /* Viewport__SetFadeBox */  \
     /* +0x0AC */ SceneNode *(*getFadeBox)(Self *self);          /* Viewport__GetFadeBox */      \

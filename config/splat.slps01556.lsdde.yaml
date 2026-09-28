@@ -332,7 +332,7 @@ segments:
       # 0x2864..0x2F68 is func_80012064 ALONE. It was psyq_2864 ("no SDK disc
       # places it") until revision 18 measured it as GAME code: it calls the
       # game's own functions and sits in a game method table. A C unit now.
-      - [0x2864, c, graphics/ViewportDraw]
+      - [0x2864, c, graphics/viewport_draw]
       - [0x2F68, o, libapi/c159]      # SetMem
       - [0x2F78, o, libc2/bcopy]      # bcopy, bzero, bcmp
       - [0x3038, o, libgs/matrix]     # GsInitCoordinate2 .. print_vector

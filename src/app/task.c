@@ -10,7 +10,7 @@
  *    then, in sections 1 to 3 below, its pad dispatch, state machine, fades
  *    and menu methods up to its table getter;
  *  - IntermediateBase (include/IntermediateBase.h), TaskCore's parent, whole;
- *  - Viewport (include/Viewport.h), except drawNode (ViewportDraw.c): its
+ *  - Viewport (include/Viewport.h), except drawNode (viewport_draw.c): its
  *    allocator to its table getter, then GetRootNode;
  *  - Sony's GsSetProjection (libgs/gs_106), carried as C because no SDK
  *    object places it.
@@ -1392,7 +1392,7 @@ void Viewport__RemoveAllChildren(Viewport *self) {
  * Section 4. Viewport's methods from onNotify (+0x038) to the end of
  * gViewportMethods (include/Viewport.h, whose banner says what the class
  * is); the ctor, finalize and the child overrides are in section 3,
- * drawNode in ViewportDraw.c. In table order:
+ * drawNode in viewport_draw.c. In table order:
  *  - onNotify and its two per-sender handlers: a FrameClock event runs
  *    update, the DrawSystem's VSync event runs flip;
  *  - initDefaults and the field setters (screen size, OT length, packet

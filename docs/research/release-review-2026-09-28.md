@@ -53,7 +53,7 @@ rather than API.
   `(void *, void *)` vs `(BasicClass **, s32)` at tmd_renderer.c:86 (plus three
   `void **` spellings); `GetActiveDataSourceMethods` local in 4 files;
   `GetSetBitField` duplicated (sprite.c:41, task.h:36 vs scene_node.h:216);
-  `ApplyMatrixToLVArray` extern at ViewportDraw.c:62 though scene_node.h is
+  `ApplyMatrixToLVArray` extern at viewport_draw.c:62 though scene_node.h is
   included; `sHitHeightGate` declared twice in scene_node.c. cd_driver.c
   re-declares its own functions two or three times (55/60/794/795, 58/463/907,
   ...): keep one forward block.

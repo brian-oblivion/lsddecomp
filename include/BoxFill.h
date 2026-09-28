@@ -9,7 +9,7 @@
  * Methods in src/ui/screen_widgets.c (New_BoxFill, the ctor, Reset) and
  * src/ui/screen_widgets.c (the rest, up to GetBoxFillMethods). The name is for
  * what the class does, and the evidence is this:
- *  - Viewport__DrawNode (ViewportDraw.c) takes its own path for a node whose
+ *  - Viewport__DrawNode (viewport_draw.c) takes its own path for a node whose
  *    class-id low byte is 0x64, i.e. this class and everything below it:
  *    it computes the GsBOXF's x/y from `posX`/`posY` (as a percentage of
  *    half the screen width/height while `relative` is set, as pixels

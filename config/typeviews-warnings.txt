@@ -31,7 +31,7 @@ tmd_model: warning: `p' might be used uninitialized in this function
 tmd_model: warning: `size' might be used uninitialized in this function
 tmd_model: warning: unused variable `unused'
 tod_actor: warning: unused variable `unused'
-ViewportDraw: warning: unused variable `scr'
+viewport_draw: warning: unused variable `scr'
 libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'
 libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop: warning: unused variable `unused'
 libsnd_vmanager: warning: comparison between signed and unsigned
