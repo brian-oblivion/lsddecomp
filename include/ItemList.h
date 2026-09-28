@@ -1,7 +1,7 @@
 #ifndef ITEMLIST_H
 #define ITEMLIST_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 
 /*
  * ItemList -- a list of strings the player picks one from (class id 0x20,

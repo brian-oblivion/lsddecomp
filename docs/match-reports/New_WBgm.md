@@ -15,7 +15,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 ## Naming
 
-`New_WBgm`, tier A. the `New_<Class>` allocator convention (BasicClass.h); mechanics are its purpose (alloc + call the ctor slot).
+`New_WBgm`, tier A. the `New_<Class>` allocator convention (basic_class.h); mechanics are its purpose (alloc + call the ctor slot).
 
 ## View changes (additive, unit-local)
 
@@ -44,7 +44,7 @@ WBgm *New_WBgm(s32 vabArg, s32 seqArg, s32 autoPlay) {
 The unit-local view it needs, from the top of `src/sound/WBgm.c`:
 
 ```c
-#include "BasicClass.h"
+#include "basic_class.h"
 
 /* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */

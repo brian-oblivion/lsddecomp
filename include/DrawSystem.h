@@ -1,7 +1,7 @@
 #ifndef DRAWSYSTEM_H
 #define DRAWSYSTEM_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 
 /*
  * DrawSystem -- the game's screen/graphics singleton, class id 0x1, method

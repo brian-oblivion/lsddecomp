@@ -32,7 +32,7 @@ void WBgm__Crescendo(WBgm *self, s16 vol, s32 scale) {
 The unit-local view it needs, from the top of `src/sound/WBgm.c`:
 
 ```c
-#include "BasicClass.h"
+#include "basic_class.h"
 
 
 /* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the

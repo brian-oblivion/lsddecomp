@@ -26,7 +26,7 @@ Class6C070 *New_DrawSystem(void) {
 
 The declarations it needs (unit-local view in `src/graphics/DrawSystem.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
-`include/BasicClass.h`, and the SDK externs are local copies of the
+`include/basic_class.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):
 
 ```c
@@ -78,7 +78,7 @@ struct Class6C070Methods {
 `src/graphics/DrawSystem.c`'s header comment for the cross-unit evidence); the
 `New_<Class>` allocator shape (alloc + call the ctor slot) is a pure
 mechanic, so once the class has a name the allocator's name follows by the
-project's own convention (`BasicClass.h`; matches `New_WBgm`, round 81).
+project's own convention (`basic_class.h`; matches `New_WBgm`, round 81).
 
 ## Track 4 (2026-09-26, round 87, bravo)
 

@@ -1,7 +1,7 @@
 #ifndef FRAMECLOCK_H
 #define FRAMECLOCK_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 
 /*
  * FrameClock -- class id 0x5, method table gFrameClockMethods (22 slots), a

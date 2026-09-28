@@ -86,6 +86,6 @@ Renamed from `Unk18Obj__RemoveChild`. The +0x014 removeChild override; clears th
 ## Track 7 (round 98, echo)
 
 Local `header` -> `rootClass`, masked with `CLASS_ID_ROOT_MASK` (0xF,
-BasicClass.h); the cases are `SCENENODE_CLASS_ID` (4, gSceneNodeMethods,
+basic_class.h); the cases are `SCENENODE_CLASS_ID` (4, gSceneNodeMethods,
 SceneNode.h) and `DRAWSYSTEM_CLASS_ID` (1, DrawSystem.h), the classes of the
 two fields it fills. Pointer stores of 0 are spelled NULL. Byte-identical.

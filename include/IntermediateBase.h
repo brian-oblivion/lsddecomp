@@ -1,7 +1,7 @@
 #ifndef INTERMEDIATEBASE_H
 #define INTERMEDIATEBASE_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 
 /*
  * IntermediateBase -- class id 0x30, method table gIntermediateBaseMethods: a

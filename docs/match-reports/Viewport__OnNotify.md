@@ -74,4 +74,4 @@ Renamed from `Unk18Obj__OnNotify`. The +0x038 onNotify override: after the base,
 
 ## Constants
 
-`0xF` -> `CLASS_ID_ROOT_MASK` (include/BasicClass.h), `5` -> `FRAMECLOCK_CLASS_ID`, `1` -> `DRAWSYSTEM_CLASS_ID`: the sender's class-id root nibble, compared with the two classes whose handlers this dispatches to.
+`0xF` -> `CLASS_ID_ROOT_MASK` (include/basic_class.h), `5` -> `FRAMECLOCK_CLASS_ID`, `1` -> `DRAWSYSTEM_CLASS_ID`: the sender's class-id root nibble, compared with the two classes whose handlers this dispatches to.

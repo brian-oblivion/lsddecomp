@@ -1,7 +1,7 @@
 #ifndef TMDMODEL_H
 #define TMDMODEL_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 
 /*
  * TmdModel -- one object of a TMD model file (class id 0x9, method table

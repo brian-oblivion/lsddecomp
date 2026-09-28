@@ -1,7 +1,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "DrawSystem.h"
 #include "IntermediateBase.h"
 

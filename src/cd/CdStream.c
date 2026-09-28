@@ -14,7 +14,7 @@
 #include "common.h"
 #include <libcd.h>
 #include <libspu.h>
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "CdStream.h"
 #include "CdDriver.h" /* CD_SECTOR_SHIFT */
 #include "BMemPMgr.h"

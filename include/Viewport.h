@@ -1,7 +1,7 @@
 #ifndef VIEWPORT_H
 #define VIEWPORT_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "SceneNode.h"
 #include "DrawSystem.h"
 

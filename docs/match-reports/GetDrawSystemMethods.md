@@ -26,7 +26,7 @@ Class6C070Methods *GetDrawSystemMethods(void) {
 The unit-local view it needs, from the top of `src/graphics/DrawSystem.c`:
 
 ```c
-#include "BasicClass.h"
+#include "basic_class.h"
 
 typedef struct Class6C070 Class6C070;
 typedef struct Class6C070Methods Class6C070Methods;
@@ -52,7 +52,7 @@ extern void GsSwapDispBuff(void);
 
 `GetDrawSystemMethods`, tier A. The class's own method-table getter
 (returns `&gDrawSystemMethods`); matches the project's `Get_vtable_<Class>`
-convention for this exact role (`BasicClass.h`'s `GetBasicClassMethods`,
+convention for this exact role (`basic_class.h`'s `GetBasicClassMethods`,
 round 81's `GetWBgmMethods`).
 
 ## Track 4 (2026-09-26, round 87, bravo)

@@ -10,7 +10,7 @@
  *    BMemPMgrAlloc and BMemPMgrFree work on sDefaultBMemPMgr
  *    (SetDefaultBMemPMgr) and fall back to their pool argument only while
  *    no default is set.
- *  - BasicClass's methods (include/BasicClass.h), with
+ *  - BasicClass's methods (include/basic_class.h), with
  *    PushBasicClassListNode/RemoveBasicClassListNode, the pool-backed list
  *    primitives its `children` and `parentRefs` lists share, and the list
  *    helpers, table getter and notification pair that close the file, with

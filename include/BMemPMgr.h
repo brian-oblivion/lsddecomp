@@ -5,9 +5,9 @@
 
 /* The BMemPMgr pool allocator, src/app/BMemPMgr.c, with its busy-flag
  * accessors. BasicClass, whose child and parent lists are
- * allocated from the pool, is include/BasicClass.h; both files that include
+ * allocated from the pool, is include/basic_class.h; both files that include
  * this header use it. */
-#include "BasicClass.h"
+#include "basic_class.h"
 
 /*
  * BMemBlockHdr -- the header word of one block in a BMemPMgr pool, and, while

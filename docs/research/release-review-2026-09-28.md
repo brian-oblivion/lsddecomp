@@ -238,7 +238,7 @@ reads them, so nothing names them).
   (`loadChunksAround`), `ChunkSlotSpec::key`, `LbdFile::ownerKey`; entity.h's
   merged-unit names ("(Entity, then Entity)"); IntermediateBase.h's
   `args->unk0..unkC`; NullDriver.h and Task.h name one file twice; CdDriver.h
-  "that unit still spells them as literals"; BasicClass.h "all 59 method
+  "that unit still spells them as literals"; basic_class.h "all 59 method
   tables" (60).
 - Unit-private headers (DayTaskStageMap.h, GameApplicationFileResource.h,
   DreamAux.h) fold into their .c files or become real class headers first,

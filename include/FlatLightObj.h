@@ -1,7 +1,7 @@
 #ifndef FLATLIGHTOBJ_H
 #define FLATLIGHTOBJ_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "DrawSystem.h"
 
 /*

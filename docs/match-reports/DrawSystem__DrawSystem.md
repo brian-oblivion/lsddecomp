@@ -22,7 +22,7 @@ void DrawSystem__DrawSystem(Class6C070 *self) {
 
 The declarations it needs (unit-local view in `src/graphics/DrawSystem.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
-`include/BasicClass.h`, and the SDK externs are local copies of the
+`include/basic_class.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):
 
 ```c
@@ -73,7 +73,7 @@ struct Class6C070Methods {
 `DrawSystem__DrawSystem`, tier A. The class is named `DrawSystem` this round
 (see `src/graphics/DrawSystem.c`'s header comment); this function occupies the +0x008
 ctor slot, and `Class__Class` is the project's ctor-naming convention
-(`BasicClass.h`).
+(`basic_class.h`).
 
 ## Track 4 (2026-09-26, round 87, bravo)
 

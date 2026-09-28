@@ -10,7 +10,7 @@
  */
 #include "common.h"
 #include <libsnd.h>
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "DrawSystem.h"
 #include "WBgm.h"
 #include "BMemPMgr.h"

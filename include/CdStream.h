@@ -1,7 +1,7 @@
 #ifndef CDSTREAM_H
 #define CDSTREAM_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 #include <libcd.h>
 
 /*

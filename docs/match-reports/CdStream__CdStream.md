@@ -36,7 +36,7 @@ ground, no prior attempt. Byte-exact on build 8; whole-image SHA1 green.
 
 ## Naming
 
-Tier A. `CdStream__CdStream` -- slot +0x008, the ctor (`Class__Class` convention, BasicClass.h's model). Evidence: installs the method table, initializes every field the rest of the unit reads (state, muted, speed, bytesPerFrame, ring, the three callbacks).
+Tier A. `CdStream__CdStream` -- slot +0x008, the ctor (`Class__Class` convention, basic_class.h's model). Evidence: installs the method table, initializes every field the rest of the unit reads (state, muted, speed, bytesPerFrame, ring, the three callbacks).
 
 ### Field, slot and global names (round 82 naming pass)
 

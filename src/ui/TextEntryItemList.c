@@ -480,7 +480,7 @@ TextEntryMethods *GetTextEntryMethods(void) {
  * FrameClock) and draws through a ScreenSprite panel and TextRows built from
  * CARD\ TIMs; its list methods do nothing until loading has made
  * `panelSprite`. The base-class calls go through BasicClass's table
- * (include/BasicClass.h) and upcast `self`.
+ * (include/basic_class.h) and upcast `self`.
  */
 
 ItemList *New_ItemList(char **items, s32 mode) {

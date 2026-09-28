@@ -141,7 +141,7 @@ GsSortObject4); `14` -> unit-local `OTZ_BITS` (SortTmdObject indexes
 `otBase[otz >> otShift]`, TmdRenderer.c, so `14 - otLength` spans a 14-bit
 OTZ over 1 << otLength tags); `0x200` -> unit-local `SPRITE_POS_LIMIT 512`.
 Left literal: the class-id nibble masks `0xFF`/`0xFFF` (no name in
-BasicClass.h beyond CLASS_ID_ROOT_MASK; proposed), the percent scale `100`
+basic_class.h beyond CLASS_ID_ROOT_MASK; proposed), the percent scale `100`
 and `10000` (= 100 * 100, the ScreenSprite spelling of `half * pos / 100`),
 and `0xFFFF`, the GTE's 16-bit screen-z bound, explained where it is used.
 

@@ -96,7 +96,7 @@ and BasicClass `0x0`. The id is a first guess; the constructor chain (each
 ctor calls its parent's first) is the real inheritance, and
 `plan.py classes` marks where the two disagree.
 
-`include/BasicClass.h` is the worked example. BasicClass is the root: every
+`include/basic_class.h` is the worked example. BasicClass is the root: every
 table starts with its slots (release, ctor, finalize, a child list, a list of
 parent back-references, and `notifyParents`/`onNotify` events, which is how
 objects talk to each other). Each class has exactly one header,

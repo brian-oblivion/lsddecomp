@@ -48,7 +48,7 @@
 #include "TaskObjF.h"
 #include <kernel.h>
 #include <sys/file.h>
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "Pad.h"
 #include "FrameClock.h"
 #include "ScreenSprite.h"

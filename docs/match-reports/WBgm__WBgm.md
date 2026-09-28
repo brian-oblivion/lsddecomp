@@ -15,7 +15,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 ## Naming
 
-`WBgm__WBgm`, tier A. the ctor slot (+0x008); matches `Class__Class` convention (BasicClass.h). Body is the whole object's field init, confirmed by every setter it calls.
+`WBgm__WBgm`, tier A. the ctor slot (+0x008); matches `Class__Class` convention (basic_class.h). Body is the whole object's field init, confirmed by every setter it calls.
 
 ## Proposed names for symbols defined outside this unit
 
@@ -70,7 +70,7 @@ void WBgm__WBgm(WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
 The unit-local view it needs, from the top of `src/sound/WBgm.c`:
 
 ```c
-#include "BasicClass.h"
+#include "basic_class.h"
 
 /* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the
  * libsnd calls they feed. */

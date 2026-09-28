@@ -20,7 +20,7 @@ s32 DrawSystem__GetActiveBuffer(Class6C070 *self) {
 
 The declarations it needs (unit-local view in `src/graphics/DrawSystem.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
-`include/BasicClass.h`, and the SDK externs are local copies of the
+`include/basic_class.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):
 
 ```c

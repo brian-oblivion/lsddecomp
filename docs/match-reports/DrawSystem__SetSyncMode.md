@@ -24,7 +24,7 @@ void DrawSystem__SetSyncMode(Class6C070 *self, s32 value) {
 The unit-local view it needs, from the top of `src/graphics/DrawSystem.c`:
 
 ```c
-#include "BasicClass.h"
+#include "basic_class.h"
 
 typedef struct Class6C070 Class6C070;
 typedef struct Class6C070Methods Class6C070Methods;

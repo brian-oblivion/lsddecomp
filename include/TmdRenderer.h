@@ -5,7 +5,7 @@
  * The TMD renderer, src/graphics/TmdRenderer.c: the per-face projection,
  * lighting and subdivision a GsDOBJ2's TMD goes through into an ordering
  * table. The BasicClass methods and the pool allocator's busy flag at the
- * head of that file are declared by include/BasicClass.h and
+ * head of that file are declared by include/basic_class.h and
  * include/BMemPMgr.h.
  */
 

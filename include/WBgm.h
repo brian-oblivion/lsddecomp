@@ -1,7 +1,7 @@
 #ifndef WBGM_H
 #define WBGM_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "DrawSystem.h"
 #include "VabStreamObj.h"
 #include "RequestedFile.h"

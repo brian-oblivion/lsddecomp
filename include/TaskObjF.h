@@ -1,7 +1,7 @@
 #ifndef TASKOBJF_H
 #define TASKOBJF_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 
 /*
  * TaskObjF -- the memory-card save/load controller (class id 0xB, method

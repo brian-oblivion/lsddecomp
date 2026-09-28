@@ -41,7 +41,7 @@ position in the base class.
 
 Renamed `PlacementGrid__Destroy -> PlacementGrid__Finalize`: it occupies slot
 +0x00C of gPlacementGridMethods, which is `finalize` in every class
-(`include/BasicClass.h`; `tools/classtable.py gPlacementGridMethods --vs gFileResourceMethods`
+(`include/basic_class.h`; `tools/classtable.py gPlacementGridMethods --vs gFileResourceMethods`
 shows it overriding `FileResource__Finalize`), and its body is only the
 parent's finalize, reached through the active data source's table
 (`GetActiveDataSourceMethods()->finalize`). The slot is `void`, so the

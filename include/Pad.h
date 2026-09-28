@@ -1,7 +1,7 @@
 #ifndef PAD_H
 #define PAD_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 
 /*
  * Pad -- a controller port, class id 0x2, method table gPadMethods, a direct

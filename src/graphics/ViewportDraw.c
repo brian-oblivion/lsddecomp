@@ -38,7 +38,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <libetc.h>
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "SceneNode.h"
 #include "GridCell.h"
 #include "BgLayer.h"

@@ -873,7 +873,7 @@
         "gBasicClassMethods": {
           "class": "BasicClass",
           "date": "2026-09-25",
-          "header": "include/BasicClass.h"
+          "header": "include/basic_class.h"
         },
         "gBgLayerMethods": {
           "class": "BgLayer",

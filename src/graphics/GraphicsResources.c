@@ -41,7 +41,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include <libpress.h>
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "SceneNode.h"
 #include "FileResource.h"
 #include "TimBlockSrc.h"

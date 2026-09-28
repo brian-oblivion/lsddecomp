@@ -6,12 +6,12 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/gra
 
 - **What:** the allocator of class gTmdModelMethods: `p = BMemPMgrAlloc(0x24); if (p != NULL) { GetTmdModelMethods()->ctor(p, arg); return p; } return NULL;`. The ctor (slot +0x008, `TmdModel__TmdModel`) takes the allocator's argument as its second parameter.
 - **Result:** byte-exact; 24/24 words, whole-image SHA1 green. First build (the broadcast allocator shape).
-- **Types:** the unit's local `TmdModel` view is now `BASICCLASS_FIELDS(TmdModelMethods)` + its own fields, with `TmdModelMethods` = `BASICCLASS_SLOTS(TmdModel, (TmdModel *self, void *arg))` (unit includes `BasicClass.h`, the UNIFIED header, unchanged). The previous view had `void *vtable; u8 pad4[8];` at the same offsets. `GetTmdModelMethods` (matched earlier this round) was retyped in this unit from `void *` to `TmdModelMethods *` (same bytes; no other unit declares it).
+- **Types:** the unit's local `TmdModel` view is now `BASICCLASS_FIELDS(TmdModelMethods)` + its own fields, with `TmdModelMethods` = `BASICCLASS_SLOTS(TmdModel, (TmdModel *self, void *arg))` (unit includes `basic_class.h`, the UNIFIED header, unchanged). The previous view had `void *vtable; u8 pad4[8];` at the same offsets. `GetTmdModelMethods` (matched earlier this round) was retyped in this unit from `void *` to `TmdModelMethods *` (same bytes; no other unit declares it).
 
 ## Source
 
 ```c
-#include "BasicClass.h"
+#include "basic_class.h"
 typedef struct TmdModel TmdModel;
 typedef struct TmdModelMethods TmdModelMethods;
 struct TmdModelMethods {

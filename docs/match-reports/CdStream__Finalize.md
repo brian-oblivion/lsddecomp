@@ -15,7 +15,7 @@ the first build of the real body; whole-image SHA1 green.
 
 ## Naming
 
-Tier A. `CdStream__Finalize` -- slot +0x00C, overrides BasicClass's finalize (`Class__Finalize` convention, BasicClass.h's model). Evidence: calls `close(self)` then chains to `GetBasicClassMethods()->finalize`.
+Tier A. `CdStream__Finalize` -- slot +0x00C, overrides BasicClass's finalize (`Class__Finalize` convention, basic_class.h's model). Evidence: calls `close(self)` then chains to `GetBasicClassMethods()->finalize`.
 
 ## Source
 

@@ -5,7 +5,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "TmdModel.h"
 #include "DrawSystem.h"
 

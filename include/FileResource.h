@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include <libcd.h>
-#include "BasicClass.h"
+#include "basic_class.h"
 
 /*
  * FileResource -- the base of every class the game loads from a file (class

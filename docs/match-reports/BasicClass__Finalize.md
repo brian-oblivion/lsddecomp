@@ -67,6 +67,6 @@ comment. Called by `BasicClass__Release` before freeing `self`.
 ## Polish (round 97, runner delta)
 
 `notifyParents(self, 1)` -> `BASICCLASS_EVENT_FINALIZED`, a new enum in
-`include/BasicClass.h`. Evidence: the base `BasicClass__OnNotify`
+`include/basic_class.h`. Evidence: the base `BasicClass__OnNotify`
 (`TmdRenderer.c`) acts on event 1 and only 1, by removing the sender from its
 children, and this function, the base finalizer, is its sender. Byte-identical.

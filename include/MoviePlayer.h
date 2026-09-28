@@ -1,7 +1,7 @@
 #ifndef MOVIEPLAYER_H
 #define MOVIEPLAYER_H
 
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "CdStream.h"
 #include "DrawSystem.h"
 

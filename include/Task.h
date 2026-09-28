@@ -2,7 +2,7 @@
 #define TASK_H
 
 #include "common.h"
-#include "BasicClass.h"
+#include "basic_class.h"
 #include "SceneNode.h"
 #include "BoxFill.h"
 #include "FadeBox.h"

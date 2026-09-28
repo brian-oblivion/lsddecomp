@@ -1,5 +1,5 @@
-#ifndef BASICCLASS_H
-#define BASICCLASS_H
+#ifndef BASIC_CLASS_H
+#define BASIC_CLASS_H
 
 #include "common.h"
 

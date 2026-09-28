@@ -16,7 +16,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 ## Naming
 
-`GetWBgmMethods`, tier A. matches the `Get_vtable_<Class>` convention (`GetBasicClassMethods`, BasicClass.h); returns `&gWBgmMethods`, the table this class installs in its own ctor.
+`GetWBgmMethods`, tier A. matches the `Get_vtable_<Class>` convention (`GetBasicClassMethods`, basic_class.h); returns `&gWBgmMethods`, the table this class installs in its own ctor.
 
 ## Source
 
@@ -29,7 +29,7 @@ WBgmMethods *GetWBgmMethods(void) {
 The unit-local view it needs, from the top of `src/sound/WBgm.c`:
 
 ```c
-#include "BasicClass.h"
+#include "basic_class.h"
 
 
 /* Local view of gWBgmMethods's objects: a SEQ player. Fields named from the

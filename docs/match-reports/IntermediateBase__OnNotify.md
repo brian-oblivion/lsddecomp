@@ -119,7 +119,7 @@ The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/c
 ## Track 7 (round 98, echo)
 
 Local `header` -> `rootClass`: the sender's table word +0x000 masked to
-its lowest nibble, `CLASS_ID_ROOT_MASK` (0xF, new in BasicClass.h). The
+its lowest nibble, `CLASS_ID_ROOT_MASK` (0xF, new in basic_class.h). The
 cases are `DRAWSYSTEM_CLASS_ID` (1, gDrawSystemMethods), `PAD_CLASS_ID`
 (2, gPadMethods) and `FRAMECLOCK_CLASS_ID` (5, gFrameClockMethods), each
 in its class's header (`plan.py classes` lists those ids). Byte-identical.
