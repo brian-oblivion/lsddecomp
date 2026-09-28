@@ -9,11 +9,11 @@ ground, no prior attempt. Byte-exact on the first build; whole-image SHA1
 green.
 
 - **Where:** slot +0x054 of gCdStreamMethods.
-- **What:** if state is 2 and this is the active stream (`gActiveCdStream`): call
+- **What:** if state is 2 and this is the active stream (`sActiveCdStream`): call
   slot +0x64 (mute), +0x78 (clearRing, StClearRing wrapper), +0x74
   (unsetRing, StUnSetRing wrapper), busy-wait `CdControl(9 /*CdlPause*/, 0, 0)`,
   then state = 4.
-- **Levers:** none. Direct `gActiveCdStream == self` compare (no local) matches.
+- **Levers:** none. Direct `sActiveCdStream == self` compare (no local) matches.
 - **Context:** extended the local `CdStreamObjMethods` view with slots
   +0x074 `unsetRing`, +0x078 `clearRing`, +0x07C `slot7C` (additive; the
   table is 31 slots per `tools/classtable.py`).
@@ -26,7 +26,7 @@ Tier A. `CdStream__Stop` -- slot +0x054. Evidence: only fires from the reading s
 
 ```c
 void CdStream__Stop(CdStreamObj *self) {
-    if (self->unk2C == 2 && gActiveCdStream == self) {
+    if (self->unk2C == 2 && sActiveCdStream == self) {
         self->methods->mute(self);
         self->methods->clearRing(self);
         self->methods->unsetRing(self);

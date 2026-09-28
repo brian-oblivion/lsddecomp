@@ -11,7 +11,7 @@ the first build of the real body; whole-image SHA1 green.
 - **Where:** slot +0x04C (seek) of gCdStreamMethods.
 - **What:** if state is not 2 and active: with a +0x54 callback, install `OnCdSeekComplete` via `CdSyncCallback` and issue the non-blocking `CdControlF(0x15 /*CdlSeekL*/, loc)`; otherwise busy-wait the blocking `CdControl(0x15, loc, 0)`. Either way state = 1.
 - **Levers:** one `self->unk2C = 1;` after the if/else; cc1 emits the `li v0,1` in both arms and shares the store.
-- **Context:** round 82 extended the unit's local `CdStreamObj` view: `loc` (+0x0C, the seek location passed to slot +0x4C), `s32 muted` (+0x30), `void *cbArg` (+0x44), callbacks `cb48`/`cb4C`/`cb54` (+0x48/+0x4C/+0x54, each called with `cbArg`), object size 0x5C (the allocator's request); method slots +0x040..+0x070 typed; ctor slot takes `(self, s32, s32, s32)`. The active stream object is the sdata global `gActiveCdStream` (`CdStreamObj *`). libcd externs `CdSyncCallback`, `CdControl`, `CdControlF` declared in the unit from the Psy-Q prototypes.
+- **Context:** round 82 extended the unit's local `CdStreamObj` view: `loc` (+0x0C, the seek location passed to slot +0x4C), `s32 muted` (+0x30), `void *cbArg` (+0x44), callbacks `cb48`/`cb4C`/`cb54` (+0x48/+0x4C/+0x54, each called with `cbArg`), object size 0x5C (the allocator's request); method slots +0x040..+0x070 typed; ctor slot takes `(self, s32, s32, s32)`. The active stream object is the sdata global `sActiveCdStream` (`CdStreamObj *`). libcd externs `CdSyncCallback`, `CdControl`, `CdControlF` declared in the unit from the Psy-Q prototypes.
 
 ## Naming
 
@@ -21,7 +21,7 @@ Tier A. `CdStream__Seek` -- slot +0x04C (the struct's own pre-existing field nam
 
 ```c
 void CdStream__Seek(CdStreamObj *self, u8 *loc) {
-    if (self->unk2C != 2 && gActiveCdStream == self) {
+    if (self->unk2C != 2 && sActiveCdStream == self) {
         if (self->cb54 != NULL) {
             CdSyncCallback(OnCdSeekComplete);
             CdControlF(0x15, loc);

@@ -14,14 +14,14 @@ ground, no prior attempt. Byte-exact on build 4; whole-image SHA1 green.
   `CdSearchFile(&self->loc, path)` (a negative `tries` retries forever;
   timeout returns 1). On success: +0x40 = file size (`CdlFILE.size`, +0x10)
   / +0x38; `gCdStreamAudioMixSet = SetupCdStreamAudio(self)` (SPU CD-volume setup);
-  `gActiveCdStream = self`; `seek(self, &self->loc)`; return 0.
+  `sActiveCdStream = self`; `seek(self, &self->loc)`; return 0.
 - **Levers:** the return structure decides the block layout:
 
   | form | score |
   | --- | --- |
   | flat early returns (`if (unk2C != 0) return 1; ...`), loop then found code | 75 words, 20/75 (found block placed ahead of the path build, s-regs renumbered) |
   | same with `for (;;) { if (found) break; ... }` | identical, 20/75 |
-  | flat, with everything after the checks nested in `if (gActiveCdStream == NULL) {...} return 0;` | 2 words short, 52/75 (the loop's `return 1` cross-jumped into the unk2C one) |
+  | flat, with everything after the checks nested in `if (sActiveCdStream == NULL) {...} return 0;` | 2 words short, 52/75 (the loop's `return 1` cross-jumped into the unk2C one) |
   | **`if (self->unk2C == 0) { ...all of it...; return 0; } return 1;`** | **75/75** |
 
   The copy `n = tries` is the "retry forever" flag tested by `bltz`, and
@@ -38,7 +38,7 @@ ground, no prior attempt. Byte-exact on build 4; whole-image SHA1 green.
 
 ## Naming
 
-Tier A. `CdStream__Open` -- slot +0x044. Evidence: searches the disc for the named file (`CdSearchFile`), computes the frame count from its size, activates the object as the single active stream (`gActiveCdStream`), and seeks to it -- the standard "open a file for streaming" sequence.
+Tier A. `CdStream__Open` -- slot +0x044. Evidence: searches the disc for the named file (`CdSearchFile`), computes the frame count from its size, activates the object as the single active stream (`sActiveCdStream`), and seeks to it -- the standard "open a file for streaming" sequence.
 
 ## Source
 
@@ -52,7 +52,7 @@ s32 CdStream__Open(CdStreamObj *self, char *name, s32 tries) {
         if (self->ring == NULL) {
             return 1;
         }
-        if (gActiveCdStream != NULL) {
+        if (sActiveCdStream != NULL) {
             return 0;
         }
         path[0] = '\\';
@@ -66,7 +66,7 @@ s32 CdStream__Open(CdStreamObj *self, char *name, s32 tries) {
         }
         self->unk40 = *(u32 *)&self->loc[4] / self->unk38;
         gCdStreamAudioMixSet = SetupCdStreamAudio(self);
-        gActiveCdStream = self;
+        sActiveCdStream = self;
         self->methods->seek(self, self->loc);
         return 0;
     }
