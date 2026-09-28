@@ -402,7 +402,9 @@
       "status": "auto"
     },
     "12": {
-      "checklist": {},
+      "checklist": {
+        "apidoc-setup": true
+      },
       "reason": "",
       "status": "auto"
     },
