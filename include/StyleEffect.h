@@ -130,6 +130,6 @@ void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale)
 void StyleEffect__ReleaseSprites(StyleEffect *self);
 void StyleEffect__SpawnPlainSprites(); /* (StyleEffect *self); see above */
 void StyleEffect__RandomizeSprites();  /* (StyleEffect *self); see above */
-void StyleEffect__ReleaseSpritesB(StyleEffect *self);
+void StyleEffect__ReleaseJitterSprites(StyleEffect *self);
 
 #endif

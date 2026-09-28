@@ -15,7 +15,7 @@ Clean on all four carve-time screens. Trivial once the dispatch shape was
 clear: a `switch` on `self->unk54` (the same state field `StyleEffect__InitByKind` and
 `StyleEffect__UpdateByKind`, its two siblings in this unit, both also switch on) with
 four cases, two of which forward straight into `ObjMStyleActor.c`'s
-`StyleEffect__ReleaseSprites`/`StyleEffect__ReleaseSpritesB`.
+`StyleEffect__ReleaseSprites`/`StyleEffect__ReleaseJitterSprites`.
 
 ## Body
 
@@ -29,7 +29,7 @@ void StyleEffect__ReleaseByKind(LinkNode *self) {
         StyleEffect__ReleaseSprites(self);
         break;
     case 3:
-        StyleEffect__ReleaseSpritesB(self);
+        StyleEffect__ReleaseJitterSprites(self);
         break;
     default:
         break;

@@ -51,7 +51,7 @@ class the rest of this unit implements, see the file banner) -- `+0x84`
 would overflow that class's 0x58-byte allocation (`New_Actor`). It is
 kept as its own independent local type, `LinkOwnerObj`, established
 together with `StyleEffect__RandomizeSprites` (which walks indices 1..4 of the SAME
-5-element array) and `StyleEffect__ReleaseSpritesB` (byte-identical body to this
+5-element array) and `StyleEffect__ReleaseJitterSprites` (byte-identical body to this
 function).
 
 ### Proposed learning
@@ -86,4 +86,4 @@ View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in ObjMStyleA
 
 ## Track 7 (round 99, alpha)
 
-The count is ARRAY_COUNT(self->sprites) (5); a comment says kind 2 releases through it and kind 3 through the identical StyleEffect__ReleaseSpritesB.
+The count is ARRAY_COUNT(self->sprites) (5); a comment says kind 2 releases through it and kind 3 through the identical StyleEffect__ReleaseJitterSprites.

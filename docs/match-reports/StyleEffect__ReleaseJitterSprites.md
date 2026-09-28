@@ -1,4 +1,6 @@
-# StyleEffect__ReleaseSpritesB -- MATCHED (9/9 words)
+# StyleEffect__ReleaseJitterSprites -- MATCHED (9/9 words)
+
+> Renamed from `StyleEffect__ReleaseSpritesB` on 2026-09-28 (tools/rename.py). Address 0x80056f28.
 
 > Renamed from `Class876FC__ReleaseSpritesB` on 2026-09-26 (tools/rename.py). Address 0x80056f28.
 
@@ -12,7 +14,7 @@ Unit: `ObjMStyleActor` (round 17). Byte-identical body to `StyleEffect__ReleaseS
 ## Final source
 
 ```c
-void StyleEffect__ReleaseSpritesB(LinkOwnerObj *this) {
+void StyleEffect__ReleaseJitterSprites(LinkOwnerObj *this) {
     ReleaseBasicClassArray((void **)this->arr84, 5);
 }
 ```
@@ -34,7 +36,7 @@ None -- see `StyleEffect__ReleaseSprites`.
 
 ## Naming
 
-**`StyleEffect__ReleaseSpritesB` -- tier A.** Byte-identical body to
+**`StyleEffect__ReleaseJitterSprites` -- tier A.** Byte-identical body to
 `StyleEffect__ReleaseSprites` (see that report), but a genuinely different
 ROM function, reached from a different dispatch state
 (`ObjMStyleActor.c:StyleEffect__ReleaseByKind`'s `case 3` vs. `ReleaseLinks`'s `case 2`).

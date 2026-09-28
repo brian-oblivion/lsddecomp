@@ -2479,7 +2479,7 @@ void StyleEffect__ReleaseByKind(StyleEffect *self) {
             StyleEffect__ReleaseSprites(self);
             break;
         case STYLE_EFFECT_JITTER_SPRITES:
-            StyleEffect__ReleaseSpritesB(self);
+            StyleEffect__ReleaseJitterSprites(self);
             break;
         default:
             break;
@@ -2728,7 +2728,7 @@ void StyleEffect__RandomizeSprites(StyleEffect *self) {
     }
 }
 
-void StyleEffect__ReleaseSpritesB(StyleEffect *self) {
+void StyleEffect__ReleaseJitterSprites(StyleEffect *self) {
     ReleaseBasicClassArray((void **)self->sprites, ARRAY_COUNT(self->sprites));
 }
 
