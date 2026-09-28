@@ -22,7 +22,7 @@ The initializer for this unit's five `%gp_rel` globals plus a one-shot
 ```c
 extern void *New_Entity(void *arg0, void *arg1, void *arg2);
 extern s32 sDreamAuxStage;
-extern s32 gDreamAuxStageMap;
+extern s32 sDreamAuxStageMap;
 extern s32 gDreamAuxWorld;
 extern s32 sDreamAuxSound;
 extern s32 sDreamAuxFrameClock;
@@ -35,7 +35,7 @@ void SetDreamAuxWorld(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4)
     u32 i;
 
     sDreamAuxStage = a0;
-    gDreamAuxStageMap = a1;
+    sDreamAuxStageMap = a1;
     gDreamAuxWorld = a2;
     sDreamAuxSound = a3;
     sDreamAuxFrameClock = a4;
@@ -137,7 +137,7 @@ whose own declaration already says `stage, grid, world, sound, clock`, and
 ObjM.h: unk14 the StageMap, unk10 the FrameClock, TimedTask's sound the
 VabStreamObj): a0..a4 -> stage, stageMap, world, sound, frameClock. The
 globals it installs were renamed with tools/rename.py: D_8008ABFC ->
-gDreamAuxStageMap (tier A), D_8008AC04 -> sDreamAuxSound (tier A, New_Entity's
+sDreamAuxStageMap (tier A), D_8008AC04 -> sDreamAuxSound (tier A, New_Entity's
 `sound`), D_8008AC08 -> sDreamAuxFrameClock (tier A, TodActor's attachToParent
 `companion`), and typed `struct VabStreamObj *` / `struct FrameClock *`. The
 entity's mood row is DREAM_AUX_FIRST_MOOD + i (98); `buf` -> `desc`

@@ -3135,7 +3135,7 @@ sDefaultDataDirectory = 0x8008A960;
 // Report: SpuVmKeyOnNow.md.
 _svm_okon1 = 0x8008E228;
 sCdSyncQueueMode = 0x8008A860;
-gDreamAuxStageMap = 0x8008ABFC;
+sDreamAuxStageMap = 0x8008ABFC;
 sDreamAuxSound = 0x8008AC04;
 sDreamAuxFrameClock = 0x8008AC08;
 sDreamAuxSpawnRotations = 0x80088F18;

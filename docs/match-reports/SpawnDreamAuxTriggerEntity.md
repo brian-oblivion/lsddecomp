@@ -65,10 +65,10 @@ bool SpawnDreamAuxTriggerEntity(s32 kind, void *out, void *ctx, s32 entry)
         coords.recordVal0 = rec->val0;
         coords.pos = sDreamAuxPosTable[rec->posIndex];
 
-        obj = (DreamAuxObj *)gDreamAuxStageMap;
+        obj = (DreamAuxObj *)sDreamAuxStageMap;
         ((DreamAuxObjFn3A)obj->vtable[0x3A])(obj, outBuf, &coords);
         ((DreamAuxObjFn11)entity->vtable[0x11])(entity, 1, sDreamAuxSpawnRotations + rec->val2 * 12);
-        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, gDreamAuxWorld, sDreamAuxFrameClock, (void *)gDreamAuxStageMap, outBuf);
+        ((DreamAuxObjFn13)entity->vtable[0x13])(entity, gDreamAuxWorld, sDreamAuxFrameClock, (void *)sDreamAuxStageMap, outBuf);
         return false;
     }
     return true;
@@ -84,7 +84,7 @@ more small unit-owned lookup tables (a 4-byte "spawn info" record indexed by
 `entry`, and a 6-byte position record indexed by that record's `posIndex`
 field, named round 63). `entity->vtable[0x13]` is the SAME slot `PlaceDreamAuxEntityByPlayer` (matched
 earlier this round) dispatches through, reusing `DreamAuxObjFn13`.
-`gDreamAuxStageMap`'s vtable slot 0x3A (byte offset 0xE8) and `entity`'s slot 0x11
+`sDreamAuxStageMap`'s vtable slot 0x3A (byte offset 0xE8) and `entity`'s slot 0x11
 (byte offset 0x44) are new, function-local typedefs.
 
 ## Derivation notes
@@ -159,7 +159,7 @@ handled at the wrong granularity" issue.
 **SpawnDreamAuxTriggerEntity** — tier B. Spawns an `Entity` via `New_Entity`
 for a trigger `entry`; on success, fills a local coordinate buffer from
 `sDreamAuxSpawnInfo`/`sDreamAuxPosTable` and dispatches it through three
-vtable calls (two through the new entity, one through `gDreamAuxStageMap`); on
+vtable calls (two through the new entity, one through `sDreamAuxStageMap`); on
 `New_Entity` failure returns `true` (treated as "handled" by callers) rather
 than `false`. Named for the mechanic that dominates the body (spawn +
 attach); tier B since the exact game meaning of the coordinate/dispatch
@@ -169,7 +169,7 @@ rename, confirmed confined to this unit by rebuild).
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are the typed slots updateRotation and attachToParent (through TodActorAttachToParentFn: peer gDreamAuxWorld, companion sDreamAuxFrameClock, parent gDreamAuxStageMap, offset outBuf), same bytes. DreamAuxObjFn11/13 deleted.
+The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are the typed slots updateRotation and attachToParent (through TodActorAttachToParentFn: peer gDreamAuxWorld, companion sDreamAuxFrameClock, parent sDreamAuxStageMap, offset outBuf), same bytes. DreamAuxObjFn11/13 deleted.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
