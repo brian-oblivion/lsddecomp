@@ -31,7 +31,7 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self)
         return;
     }
     self->methods->slot5C(self);
-    self->streamBuffer = gPendingVabBuffer;
+    self->streamBuffer = sPendingVabBuffer;
     result = SsUtGetVabHdr(self->vabId, &self->vabHdr);
     if (result == -1) {
         return;

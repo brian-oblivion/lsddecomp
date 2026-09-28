@@ -24,7 +24,7 @@ void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
         if (self->flags & 0x200) {
             self->vabId = SsVabOpenHead(self->streamBuffer, -1);
             func_800270C4(path, self->baseFilename, NULL, gVabBodySuffix);
-            gPendingVabBuffer = self->streamBuffer;
+            sPendingVabBuffer = self->streamBuffer;
             self->loadState = 6;
             self->streamBuffer = NULL;
             self->methods->slot58(self, path);
@@ -56,7 +56,7 @@ unk10/unk5C/unk5A` are now `loadState`/`flags`/`vabId`/`streamBuffer`/
 State 1 ("header pending", set by `VabStreamObj__VabStreamObj`): if the object's flag
 word has bit 0x200 set, open the VAB header (`SsVabOpenHead`), build a
 ".VB" path from the same base filename, hand the old streaming buffer
-pointer off to the shared `gPendingVabBuffer` global, transition to state 6, and
+pointer off to the shared `sPendingVabBuffer` global, transition to state 6, and
 dispatch the body transfer through `methods->slot58` (null in retail's own
 `gVabStreamObjMethods` -- see `VabStreamObj__VabStreamObj.md`); then free the filename copy if one
 was allocated. State 6 ("body pending"): if the same flag is set, continue

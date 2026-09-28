@@ -202,7 +202,7 @@ extern s32 sOpenVabCount;     /* VabStreamObjs constructed and not yet finalized
 extern s32 gSsTicksPerSecond; /* the SsSetTickMode rate, for callers timing in ticks */
 /* The .VH buffer, kept from the header state until LoadVagAttrs takes it
  * back as the object's buffer. */
-extern void *gPendingVabBuffer;
+extern void *sPendingVabBuffer;
 
 s32 NullDriver__Read(void) {
     return 0;
@@ -324,7 +324,7 @@ void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
             if (self->flags & CD_FLAG_LOAD_FILE_DONE) {
                 self->vabId = SsVabOpenHead(self->buffer, -1);
                 BuildFileName(path, self->baseFilename, NULL, gVabBodySuffix);
-                gPendingVabBuffer = self->buffer;
+                sPendingVabBuffer = self->buffer;
                 self->loadState = VABSTREAM_LOAD_BODY;
                 self->buffer = NULL;
                 self->methods->loadFile(self, path);
@@ -375,7 +375,7 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
         return;
     }
     self->methods->freeBuffer(self);
-    self->buffer = gPendingVabBuffer;
+    self->buffer = sPendingVabBuffer;
     result = SsUtGetVabHdr(self->vabId, (VabHdr *)&self->vabHdr);
     if (result == -1) {
         return;
