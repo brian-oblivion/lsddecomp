@@ -15,7 +15,7 @@ void CloseCdFile(ObjA34_179D8H *self) {
 ```
 
 with a new local `ObjA34_179D8H` type (see `GetCdFileSize`'s report for why
-it's local rather than an extension of `code_171e0.h`'s
+it's local rather than an extension of `code_1677c.h`'s
 `FileResource`, whose `pendingGeneration` field and documented-unknown
 `pad18` padding this struct's fields happen to coincide with).
 

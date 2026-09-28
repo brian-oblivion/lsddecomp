@@ -230,19 +230,19 @@ at slot `+0x058`. The prefix names the table, not the developers' class.
 ## Proposed field names
 
 For the head to apply by type scope (out of unit). `FileResource__LoadFile`
-(code_171e0), the base method this function overrides and calls in sync
+(code_1677c), the base method this function overrides and calls in sync
 mode, drives these slots in the order open, size query, alloc, rewind, read,
 close; the one class that fills them (`gCdDriverMethods`) fills them with the
 methods named here.
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| include/code_171e0.h | `FileResourceMethods` | `configureBuffer` (+0x44) | `open` | A | called with the file name first; override is `CdDriver__Open` |
-| include/code_171e0.h | `FileResourceMethods` | `bufferControl` (+0x4C) | `seek` | B | called `(0, 2)` for the size and `(0, 0)` to rewind; override is `CdDriver__Seek` |
-| include/code_171e0.h | `FileResourceMethods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `CdDriver__Read` |
-| include/code_171e0.h | `FileResource` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
+| include/code_1677c.h | `FileResourceMethods` | `configureBuffer` (+0x44) | `open` | A | called with the file name first; override is `CdDriver__Open` |
+| include/code_1677c.h | `FileResourceMethods` | `bufferControl` (+0x4C) | `seek` | B | called `(0, 2)` for the size and `(0, 0)` to rewind; override is `CdDriver__Seek` |
+| include/code_1677c.h | `FileResourceMethods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `CdDriver__Read` |
+| include/code_1677c.h | `FileResource` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
 
-Also noted for whoever names code_171e0 again: `FileResource__LoadFile`
+Also noted for whoever names code_1677c again: `FileResource__LoadFile`
 opens, sizes, allocates for, reads and closes a named file, i.e. it is the
 base-class LoadFile. Not renamed here (out of unit).
 

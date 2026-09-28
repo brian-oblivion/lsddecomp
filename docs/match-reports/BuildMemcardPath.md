@@ -11,7 +11,7 @@ Copies a fixed 6-byte PS-X BIOS memory-card device-name template
 ("bu10:" when `selector` is nonzero, "bu00:" otherwise —
 `asm/data/7B008.sdata.s`, `gMcDevicePath1`/`gMcDevicePath0`) into `dest`, appends
 `suffix` with this project's own `strcat` (matched elsewhere,
-`src/code_171e0.c`), and returns `dest`.
+`src/code_1677c.c`), and returns `dest`.
 
 This function's `dest` argument is **not** the `TaskObjF` class this unit's
 other queued functions operate on (see `TaskObjF__ForEachEvent`'s report for that
@@ -39,8 +39,8 @@ already documented for `Descriptor10` in `include/class_3bb8c.h`.
 - `McDevicePath` (new type) and its two extern instances `gMcDevicePath1`
   ("bu10:") / `gMcDevicePath0` ("bu00:").
 - `extern char *strcat(char *dest, char *src);` — **an extern for a
-  function outside this unit** (matched in `src/code_171e0.c`, declared in
-  `include/code_171e0.h`; this header had no prior declaration of it, so
+  function outside this unit** (matched in `src/code_1677c.c`, declared in
+  `include/code_1677c.h`; this header had no prior declaration of it, so
   this is a fresh, independent one, not an edit to an existing
   declaration).
 

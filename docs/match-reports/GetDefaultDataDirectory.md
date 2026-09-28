@@ -23,7 +23,7 @@ s32 GetDefaultDataDirectory(void) {
 
 Round 82 (bravo, naming pass). Left as `func_`, tier C. It is mechanically a
 pure getter (which would ordinarily be tier A), but its target `gDefaultDataDirectory`
-has no established purpose: its only consumer is `SetDataDirectory` (code_171e0.c,
+has no established purpose: its only consumer is `SetDataDirectory` (code_1677c.c,
 deliberately left unnamed by that unit -- "a getter/setter pair for gDataDirectory
 ... left unnamed"), which just stores it into a second, equally unnamed
 small-data global at GameApplication construction time. There is nothing here to
@@ -36,7 +36,7 @@ name the getter FOR, so `Get<Something>` would be a guess, not evidence.
 `gDefaultDataDirectory` (was `D_8008A960`), an sdata word initialised to the
 address of the sdata string `"CDI\\"` (`D_8008A958`). Its one caller,
 GameApplication's ctor, passes it straight to `SetDataDirectory`
-(code_171e0.c), which installs the directory BuildCdFilePath and
+(code_1677c.c), which installs the directory BuildCdFilePath and
 CdStream__Open put between the root `\` and a file name. Retyped `char *`
 here, in code_1677c.c's externs, and in CdStream.c's `GetDataDirectory`
-prototype; zero bytes. Proposed by charlie's code_171e0 pass.
+prototype; zero bytes. Proposed by charlie's code_1677c pass.

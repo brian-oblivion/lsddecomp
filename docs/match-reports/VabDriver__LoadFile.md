@@ -42,7 +42,7 @@ Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
 gVabDriverMethods --vs gFileResourceMethods` puts this function at `+0x058`, one of
 FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
 names it `loadFile`; the CD driver's occupant is `CdDriver__LoadFile (FileResource__LoadFile in the base table)`).
-`SetActiveDataSource` (code_171e0.c) copies the active driver's interface
+`SetActiveDataSource` (code_1677c.c) copies the active driver's interface
 slots into FileResource's table and every client table, and takes this table
 (`GetVabDriverMethods()`) whenever `gActiveDataSource != DATASOURCE_CD`, so
 when the SPU/VAB source is active every `methods->loadFile(...)` in the game

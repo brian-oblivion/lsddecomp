@@ -4,12 +4,12 @@
 
 > Renamed from `func_80026A50` on 2026-09-18 (tools/rename.py). Address 0x80026a50.
 
-**Unit:** code_171e0 · **Size:** 25 instructions · **Status:** MATCHED (25/25 words, whole-image build verified byte-exact)
+**Unit:** code_1677c · **Size:** 25 instructions · **Status:** MATCHED (25/25 words, whole-image build verified byte-exact)
 
 ## What it does
 
 The constructor for the `gFileResourceMethods` class (its own vtable slot `+0x008`,
-per `include/code_171e0.h`'s `FileResourceMethods`). Chains the base
+per `include/code_1677c.h`'s `FileResourceMethods`). Chains the base
 class's constructor first (`Get_vtable_BasicClass()->ctor(this)`), then installs
 this class's own vtable pointer (fetched via the already-matched
 `GetFileResourceMethods`, which just returns `&gFileResourceMethods`), then zeroes every field
@@ -182,5 +182,5 @@ that was true of this unit only. `unk22` and `unk28` have since been named
 (`pendingRequests`, `inQueueDispatch`); `unk2A` is the row just above.
 
 `FileResource__LoadFile`'s local `savedPendingGeneration` keeps `isOpen`
-across the load; its name predates the field's and is code_171e0's polish
+across the load; its name predates the field's and is code_1677c's polish
 work, not a type change.

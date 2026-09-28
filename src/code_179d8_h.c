@@ -16,7 +16,7 @@
  * FileResource__InstallCdReadDriver runs FileResource's ctor, then gives the
  * object gCdDriverMethods and marks it closed; FileResource__DestroyCdReadDriver
  * runs FileResource's finalize. GetCdUseVSyncCallback is the CD half of
- * code_171e0.c's GetActiveDataSourceUseVSyncCallback.
+ * code_1677c.c's GetActiveDataSourceUseVSyncCallback.
  *
  * Nothing in the executable calls the install/destroy pair or NoOp2, NoOp3
  * and NoOp4 (no jal, stored pointer or built address reaches them).
@@ -24,10 +24,10 @@
 #include "common.h"
 #include <libcd.h>
 #include "CdDriver.h"
-/* FileResource and its table come from include/FileResource.h, through code_171e0.h. */
-#include "code_171e0.h"
+/* FileResource and its table come from include/FileResource.h, through code_1677c.h. */
+#include "code_1677c.h"
 
-/* Defined in other units: GetDataDirectory (code_171e0.c) returns the data
+/* Defined in other units: GetDataDirectory (code_1677c.c) returns the data
  * directory's name; strcpy and strcat are Sony's libc2. */
 extern void printf(const char *fmt, void *arg);
 extern char *GetDataDirectory(void);

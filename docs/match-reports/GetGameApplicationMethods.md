@@ -4,7 +4,7 @@
 
 > Renamed from `func_800269E0` on 2026-09-18 (tools/rename.py). Address 0x800269e0.
 
-**Unit:** code_171e0 · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
+**Unit:** code_1677c · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
 ## What it does
 
@@ -67,5 +67,5 @@ purpose.
 
 Retyped to `GameApplicationMethods *GetGameApplicationMethods(void)`, returning
 `&gGameApplicationMethods`; both are declared once, in `include/GameApplication.h`
-(`include/code_171e0.h`'s `extern s32 gGameApplicationMethods[]` view is deleted, and
+(`include/code_1677c.h`'s `extern s32 gGameApplicationMethods[]` view is deleted, and
 New_GameApplication no longer casts the result). Image byte-identical.

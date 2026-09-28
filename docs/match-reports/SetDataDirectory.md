@@ -6,7 +6,7 @@
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- `gDataDirectory = value;`, as this report predicted. The C is in `src/code_171e0.c`. Everything below is the
+> the live tests -- `gDataDirectory = value;`, as this report predicted. The C is in `src/code_1677c.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
@@ -20,7 +20,7 @@
 
 # SetDataDirectory
 
-**Unit:** code_171e0 · **Size:** 3 instructions · **Status:** STALLED, class TOOLCHAIN
+**Unit:** code_1677c · **Size:** 3 instructions · **Status:** STALLED, class TOOLCHAIN
 
 ## What it does
 
@@ -28,7 +28,7 @@ A setter: `gDataDirectory = value;`. `gDataDirectory` is another slot in the sam
 `.sdata` region as `gActiveDataSource` (file `0x7b008`; see
 `asm/data/7B008.sdata.s`), initialized in retail to `0x8006D4A8` — a pointer
 value. `D_8006D4A8` itself sits right at the tail of the `gFileResourceMethods` method
-table as splat has that table carved (see `include/code_171e0.h`), which may
+table as splat has that table carved (see `include/code_1677c.h`), which may
 mean the table's boundary was drawn one word short and `gDataDirectory` actually
 points at the start of a separate, still-unidentified global — not resolved
 here.

@@ -54,7 +54,7 @@ extern s32 PickSoundBank(s32 unused);
  * declares it too. */
 extern s32 RegisterRecordTableFiles(s32 all);
 
-/* src/code_171e0.c (a void function); code_1677c.c declares it the same
+/* src/code_1677c.c (a void function); code_1677c.c declares it the same
  * way. */
 extern s32 SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
 

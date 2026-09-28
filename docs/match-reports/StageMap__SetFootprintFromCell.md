@@ -17,7 +17,7 @@ with a plain (non-virtual) tail call to `StageMap__BuildFootprintRects(self)`.
 call through `StageMapMethods` slot `+0x110`, itself not decompiled) so
 only the two bytes this function actually reads are typed — added as
 `UnkArgObj_3ac78` in `include/class_3ac78.h`, following the
-`Unk*Obj_<unit>` naming convention already used in `code_171e0.h`.
+`Unk*Obj_<unit>` naming convention already used in `code_1677c.h`.
 
 ## Final source
 

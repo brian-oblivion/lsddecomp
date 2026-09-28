@@ -2,10 +2,10 @@
 
 > **ROUND 34 (2026-09-12), runner bravo. THIS FUNCTION IS NOW LINKED FROM
 > SONY'S OWN OBJECT `libc2/strcat.o` (Psy-Q 3.3), WHOSE 0xA8 OF TEXT COVERS
-> EXACTLY IT.** It was `code_171e0`'s LAST function, so the conversion is a
-> pure suffix split -- `[c code_171e0 0x171E0][o libc2/strcat 0x17930]` -- with
+> EXACTLY IT.** It was `code_1677c`'s LAST function, so the conversion is a
+> pure suffix split -- `[c code_1677c 0x171E0][o libc2/strcat 0x17930]` -- with
 > no new unit name, no function reordering and no rodata attach to move. The C
-> body is deleted from `src/code_171e0.c`; callers keep spelling it `strcat`
+> body is deleted from `src/code_1677c.c`; callers keep spelling it `strcat`
 > and now resolve to the object. Whole-image SHA1 green.
 >
 > **This RECLASSIFIES a matched function out of the game-code count, and that
@@ -23,7 +23,7 @@
 > post-increment scan worth 25 words, `return dest` over `return NULL` worth
 > one) are the durable finding and generalise past this function.
 
-**Unit:** code_171e0 (until round 34) · **Size:** 42 instructions (0xA8 bytes) ·
+**Unit:** code_1677c (until round 34) · **Size:** 42 instructions (0xA8 bytes) ·
 **Status: was MATCHED 42/42**, whole-image SHA1 green. Closed by the head in
 round 8 (2026-09-02) with the project's second permuter run.
 
@@ -296,7 +296,7 @@ scheduling barriers.
 
 ```c
 #if 0
-/* include/code_171e0.h already declares:  extern s32 func_80013348(char *s); */
+/* include/code_1677c.h already declares:  extern s32 func_80013348(char *s); */
 
 char *strcat(char *dest, char *src) {
     char *origDest;

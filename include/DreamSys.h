@@ -422,7 +422,7 @@ extern s8 DREAM_COLOR_TABLE[9];
 extern const s8 VOICE_BY_SELECT[0x18];
 extern const s8 VOICE_PITCH_BY_SELECT[0x18];
 
-/* BasicClass-family allocator; see code_171e0.h / code_55dd4.h / Entity.h /
+/* BasicClass-family allocator; see code_1677c.h / code_55dd4.h / Entity.h /
    class_16334.h for the other units that also declare it locally. */
 extern void *BMemPMgrAlloc(s32 size);
 

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80026E38` on 2026-09-18 (tools/rename.py). Address 0x80026e38.
 
-**Unit:** code_171e0 · **Size:** 11 words · **Status:** MATCHED, round 43
+**Unit:** code_1677c · **Size:** 11 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 11/11 words, byte-exact whole-image build.
 
 ## History

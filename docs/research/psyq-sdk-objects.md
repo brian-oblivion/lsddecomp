@@ -109,7 +109,7 @@ helpers and 16-byte `libapi`/`libcard` BIOS stubs:
 
 | where | what |
 | --- | --- |
-| code_171e0, PlacementGridVabSound/_h | `strcat`, `strcpy`, `strstr`, `strcmp`, `strncmp` |
+| code_1677c, PlacementGridVabSound/_h | `strcat`, `strcpy`, `strstr`, `strcmp`, `strncmp` |
 | code_179d8, _c, _f, _i, _j | 19 `libsnd` objects (`sscall`, `stop`, `adsr`, `sstable`, …) |
 | ScreenWidgets | `libgs/gs_133`, `gs_111`, `gs_113`, `gs_108`, `libgte/fgo_00`, `fog_01` |
 | class_3bb8c_h, _h_b, _h_c | 13 BIOS trampolines: `libapi/a5x`, `libcard/a7x`, `c17x`, `c112` |

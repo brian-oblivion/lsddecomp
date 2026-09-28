@@ -63,7 +63,7 @@ copies it and leaves `$a0` intact), and `CdDriver__CancelRequests`
 (code_179d8_q.c) reads `self` from `$a0`. So the call does pass `self`.
 Retyped to `void (*cancelRequests)(void *self)` and called as
 `self->methods->cancelRequests(self)`: **byte-identical** (build exit 0,
-SHA1 OK, check-nonmatching green). `FileResource__Finalize` in code_171e0.c
+SHA1 OK, check-nonmatching green). `FileResource__Finalize` in code_1677c.c
 has the identical compiled shape with `this` passed explicitly, which is
 the precedent. The nop delay slot said only that no argument register
 needed LOADING, not that none was read.

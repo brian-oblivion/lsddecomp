@@ -29,7 +29,7 @@ void TaskCore__ReleaseSlotElements(Obj86B60 *self)
   existing field's type or offset changed.
 - `extern void *BMemPMgrAlloc(s32 size);` and
   `extern void BMemPMgrFree(void *ptr);` — both already confirmed
-  elsewhere in the project (many units use the allocator; `code_171e0.h`
+  elsewhere in the project (many units use the allocator; `code_1677c.h`
   and `Entity.h` both type the release call `void`-returning, and this
   unit's call site discards any return too, consistent with that).
 - `extern void ReleaseBasicClassArray(void *a0, void *a1);` — not previously seen in
