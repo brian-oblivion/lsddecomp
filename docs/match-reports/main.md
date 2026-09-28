@@ -64,7 +64,7 @@ extern void SetDefaultBMemPMgr(BMemPMgr *pool);
  * of THIS call, not of the one whose delay slot it sits in. */
 extern void *New_DrawSystem(void);
 
-extern BMemPMgr *gStartupBMemPMgr;
+extern BMemPMgr *sStartupBMemPMgr;
 extern GameApplication *sGameApplication;
 extern GameApplicationConfig sGameApplicationConfig;
 
@@ -79,8 +79,8 @@ void main(void)
 
     __main();
     SetMem(2);
-    gStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
-    SetDefaultBMemPMgr(gStartupBMemPMgr);
+    sStartupBMemPMgr = BMemPMgrInit(0x166C00, 0);
+    SetDefaultBMemPMgr(sStartupBMemPMgr);
     sGameApplication = New_GameApplication(&sGameApplicationConfig);
     obj = New_DrawSystem();
     pad = New_Pad(0, 0);
@@ -163,7 +163,7 @@ this is a documentation sync only.)
   `tools/broadcast.sh`.
 
 - **Globals, all three named (this unit is their only C reference site):**
-  - `D_8008A808` -> `gStartupBMemPMgr`, tier B. Holds `BMemPMgrInit`'s
+  - `D_8008A808` -> `sStartupBMemPMgr`, tier B. Holds `BMemPMgrInit`'s
     return value between that call and the immediately following
     `SetDefaultBMemPMgr(...)` call -- set once, read once, both in
     `main`. Mechanics are clear (it stages the newly created heap

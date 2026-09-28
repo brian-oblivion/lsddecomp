@@ -2438,7 +2438,7 @@ sTranslateYMinus256 = 0x80089D90;
 KeyOnCheck = 0x800303FC; // type:func
 // main: the C entry point; crt0 calls it at 0x80011A3C (`jal` word 0x0C004637).
 main = 0x800118DC; // type:func
-gStartupBMemPMgr = 0x8008A808;
+sStartupBMemPMgr = 0x8008A808;
 sGameApplication = 0x8008AC20;
 sGameApplicationConfig = 0x80066828;
 // identified: Psy-Q _obj/none __main (discs 3.0, 3.6), the empty stub

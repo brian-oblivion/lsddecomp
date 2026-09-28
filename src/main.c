@@ -28,7 +28,7 @@ extern void SetMem(s32 megabytes);
 extern void *BMemPMgrInit(); /* arity-ok: main passes a dead 2nd argument that retail loads (main.md, "Two levers") */
 extern void SetDefaultBMemPMgr(BMemPMgr *pool);
 
-extern BMemPMgr *gStartupBMemPMgr;
+extern BMemPMgr *sStartupBMemPMgr;
 extern GameApplication *sGameApplication;
 extern GameApplicationConfig sGameApplicationConfig;
 
@@ -46,8 +46,8 @@ void main(void) {
 
     SetMem(CONSOLE_RAM_MB);
     /* MATCHING: the unread 0 is retail's `move $a1, $zero`. */
-    gStartupBMemPMgr = BMemPMgrInit(DEFAULT_POOL_SIZE, 0);
-    SetDefaultBMemPMgr(gStartupBMemPMgr);
+    sStartupBMemPMgr = BMemPMgrInit(DEFAULT_POOL_SIZE, 0);
+    SetDefaultBMemPMgr(sStartupBMemPMgr);
     sGameApplication = New_GameApplication(&sGameApplicationConfig);
     drawSystem = New_DrawSystem();
     pad = New_Pad(0, 0); /* PadInit mode 0, port 0 */
