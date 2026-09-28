@@ -1,7 +1,7 @@
 /*
  * task -- the task classes and the viewport they draw through. In address
  * order:
- *  - StreamTask (include/StreamTask.h), whole: it plays one movie stream
+ *  - StreamTask (include/stream_task.h), whole: it plays one movie stream
  *    through a MoviePlayer inside TaskCore's fade and state machine;
  *  - TaskCore (include/TaskCore.h), the base of the game's menu and screen
  *    tasks: allocator, ctor, finalize, resetCounters, init and the

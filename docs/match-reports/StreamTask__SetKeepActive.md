@@ -70,7 +70,7 @@ run of five identical-shape setters at consecutive table slots
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Own slot +0x124. unkC4 is MoviePlayer__Play's third argument (stored at the player's +0x054); left unnamed until MoviePlayer's class is.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Own slot +0x124. unkC4 is MoviePlayer__Play's third argument (stored at the player's +0x054); left unnamed until MoviePlayer's class is.
 
 ## Track 7 (2026-09-27, round 99, alpha)
 

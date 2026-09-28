@@ -42,4 +42,4 @@ five described in `StreamTask__SetKeepActive`'s report; same convention.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Own slot +0x130. unkD0 is written by this setter and StreamTask__Reset (0) and read by none of the class's own methods.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Own slot +0x130. unkD0 is written by this setter and StreamTask__Reset (0) and read by none of the class's own methods.

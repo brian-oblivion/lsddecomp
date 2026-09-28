@@ -61,4 +61,4 @@ fixed-literal field stores, exactly this function's own shape.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Occupies +0x040 resetCounters, as TaskCore__Reset does: the name follows TaskCore's.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Occupies +0x040 resetCounters, as TaskCore__Reset does: the name follows TaskCore's.

@@ -65,4 +65,4 @@ StreamTaskObj now expands TASKCORE_FIELDS/TASKCORE_SLOTS (include/TaskCore.h, ro
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__SetUnk40 (+0x040 is TaskCore's frameBound word, not a slot). Occupies +0x06C setFrameBound: frameBound = bound * 15 (TaskCore__SetFrameBound: * 20), negative kept. game_shell's GameApplication__PlaySpecialDayMovies calls it with count / 15.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__SetUnk40 (+0x040 is TaskCore's frameBound word, not a slot). Occupies +0x06C setFrameBound: frameBound = bound * 15 (TaskCore__SetFrameBound: * 20), negative kept. game_shell's GameApplication__PlaySpecialDayMovies calls it with count / 15.

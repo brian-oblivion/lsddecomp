@@ -229,7 +229,7 @@ reads them, so nothing names them).
 - Process text to move out of headers (to the .c as one `MATCHING:` line,
   or to the report): register and ABI notes (`$a0`-`$v0`) in scene_node.h,
   TaskCore.h, TextEntry.h, TextRow.h, TileAtlas.h, TileMap.h, sprite.h,
-  task.h, item_list.h, StreamTask.h; lwl/lwr and "retail reloads" in
+  task.h, item_list.h, stream_task.h; lwl/lwr and "retail reloads" in
   stage_map.h, TitleMenu.h, TaskObjF.h, tmd_model.h, sprite.h, StyleEffect.h,
   Viewport.h, movie_player.h, graph_room.h, lbd_file.h, common.h; GCC and splat
   notes in entity.h:46-51, 102-107, 148-153; about 120 lines in gte.h; 32

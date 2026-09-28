@@ -1045,7 +1045,7 @@
         "gStreamTaskMethods": {
           "class": "StreamTask",
           "date": "2026-09-26",
-          "header": "include/StreamTask.h"
+          "header": "include/stream_task.h"
         },
         "gStyleEffectMethods": {
           "class": "StyleEffect",

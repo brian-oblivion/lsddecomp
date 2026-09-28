@@ -60,4 +60,4 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BD10. Occupies +0x078 onPadConfirm, up-calls TaskCore's, then with `skipOnConfirm` set: result = 2, setState(0x12).
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BD10. Occupies +0x078 onPadConfirm, up-calls TaskCore's, then with `skipOnConfirm` set: result = 2, setState(0x12).

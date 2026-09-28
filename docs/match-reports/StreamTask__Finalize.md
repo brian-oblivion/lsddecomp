@@ -70,8 +70,8 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__Destroy. It occupies +0x00C, the finalize slot (TaskCore__Finalize in the parent, `classtable.py gStreamTaskMethods --vs gTaskCoreMethods`), releases the MoviePlayer at +0x0B4 and up-calls TaskCore's finalize: named for its slot.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__Destroy. It occupies +0x00C, the finalize slot (TaskCore__Finalize in the parent, `classtable.py gStreamTaskMethods --vs gTaskCoreMethods`), releases the MoviePlayer at +0x0B4 and up-calls TaskCore's finalize: named for its slot.
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/movie_player.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The +0x004 call is `release`. Byte-identical.
+The player is a MoviePlayer (`include/movie_player.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in stream_task.h) to `MoviePlayer *`. The +0x004 call is `release`. Byte-identical.

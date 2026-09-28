@@ -81,11 +81,11 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BAB4. Occupies +0x04C onInit and up-calls TaskCore's first, then MoviePlayer__SetAutoPlay(autoPlay) and MoviePlayer__Play(streamName, streamGroup, unkC4, loopCount); a nonzero Play result is setFrameBound(0).
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BAB4. Occupies +0x04C onInit and up-calls TaskCore's first, then MoviePlayer__SetAutoPlay(autoPlay) and MoviePlayer__Play(streamName, streamGroup, unkC4, loopCount); a nonzero Play result is setFrameBound(0).
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/movie_player.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The calls are `setAutoPlay` (+0x06C) and `play` (+0x040), `play`'s name argument cast `(char *)self->streamName` (no code). Byte-identical.
+The player is a MoviePlayer (`include/movie_player.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in stream_task.h) to `MoviePlayer *`. The calls are `setAutoPlay` (+0x06C) and `play` (+0x040), `play`'s name argument cast `(char *)self->streamName` (no code). Byte-identical.
 
 ## Track 10 (2026-09-28, round 104, alpha)
 

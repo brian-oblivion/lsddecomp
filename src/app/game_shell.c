@@ -35,7 +35,7 @@
 #include "dream_sys.h"
 #include "link_resource.h"
 #include "TaskCore.h"
-#include "StreamTask.h"
+#include "stream_task.h"
 #include "graph_room.h"
 #include "TitleMenu.h"
 #include "day_task.h"

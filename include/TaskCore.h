@@ -8,7 +8,7 @@
  * IntermediateBase subclass behind the game's menu/screen tasks. Its methods
  * are in src/app/task.c. The object is 0xA4 bytes (New_TaskCore). Three classes derive from
  * it, each ctor calling TaskCore__TaskCore first (`typeviews.py --tree`):
- * StreamTask (0x1130, gStreamTaskMethods, include/StreamTask.h), TitleMenu
+ * StreamTask (0x1130, gStreamTaskMethods, include/stream_task.h), TitleMenu
  * (0x1F130, gTitleMenuMethods, include/TitleMenu.h) and GraphRoom (0x2F130, include/graph_room.h).
  *
  * Construction, ctor(target, soundBankPath, sound): the base ctor, then
@@ -44,7 +44,7 @@
  * call playSound(0x10), VabStreamObj's PlayTone on `sound`; setActiveSlot
  * and setSlotCursor call playSound(0) when their last argument is nonzero.
  *
- * StreamTask (include/StreamTask.h) expands these macros; its
+ * StreamTask (include/stream_task.h) expands these macros; its
  * +0x044 override StreamTask__Init takes (args, streamName, streamGroup,
  * autoPlay) where IntermediateBase's init takes (args, mode): the table
  * keeps the inherited slot and game_shell's callers cast to

@@ -1,5 +1,5 @@
-#ifndef STREAMTASK_H
-#define STREAMTASK_H
+#ifndef STREAM_TASK_H
+#define STREAM_TASK_H
 
 #include "TaskCore.h"
 #include "draw_system.h"
