@@ -172,3 +172,19 @@ straight past the second `== 5`), `funcdiff.py TestForStageTransition`
 not match: it becomes a jump table over 1..12. The stage numbers and the y
 thresholds (-4095, 2048) stay literal; the function comment says what each
 one gates, and no stage names are established.
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* Called by DreamSys__TryStageTimerLink as (&self->linkCoordinates, self->currentStage,
+   currentPos, self->tick); result tested with `bltz`, like
+   TestForStaticLink's. Defined after its caller. */
+extern s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos,
+                                  s32 timer);
+```

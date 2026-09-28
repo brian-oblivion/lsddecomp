@@ -71,3 +71,18 @@ what the code is.
    unit's own ROM order -- forward declaration only (gp-relative blocker
    resolved; see docs/match-reports/GetTeleportTimeBonus.md). */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* Called by DreamSys__TryInstantTeleportLink with no arguments, like
+   GetStageLinkAngle; its return value goes straight into ExecuteLink's
+   stage-type argument. Defined after its caller. */
+extern s32 GetTeleportTimeBonus(void);
+```

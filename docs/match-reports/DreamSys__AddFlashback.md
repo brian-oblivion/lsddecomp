@@ -133,3 +133,26 @@ what the code is.
 	   remaining 2 bytes before `day` are ordinary C struct alignment
 	   padding, not a separate field. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* pitch/heading/roll as one 12-byte struct, which DreamSys__AddFlashback
+   copies from its `angles` argument.
+   MATCHING: one whole-struct assignment (all six lwl/lwr loads before the six swl/swr stores). */
+```
+
+From `include/dream_sys.h`:
+
+```c
+    /* AddFlashback's fifth argument, stored with `sh` (FlashbackSaving always
+       passes 0); nothing reads it. Two bytes of alignment padding follow,
+       before `day`. */
+    s16 unk1C;
+```

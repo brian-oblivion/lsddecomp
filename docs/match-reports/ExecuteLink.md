@@ -114,3 +114,16 @@ The view had typed stopVoice `void`, but its occupant returns s32 (always
 -1). The whole image stays byte-identical with the s32 slot, because the one
 call site discards the value. `soundObj` itself stays `s32`: it is
 DreamSys's field.
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* Called during some links, but no idea what it actually does */
+bool ExecuteLink(DreamSys *system, s32 stage, s32 linkType, s32 playSound);
+```

@@ -412,3 +412,37 @@ what the code is.
 ```c
 /* Table triple for Test4StaircaseNodes (round 2026-08-30-d). */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+ * The object is 0x928 bytes (New_DreamSys); Actor's fields end at +0x058.
+ * The ctor returns whatever its last call, reset, leaves in $v0
+ * (DreamSysResetRetFn); New_DreamSys ignores it.
+```
+
+From `include/dream_sys.h`:
+
+```c
+ * Two inherited slots are called with a type other than their own, each
+ * through a function-pointer cast (no code), as tod_actor.h's banner does:
+ *  - reset (+0x040): DreamSys__DreamSys returns what the call leaves in $v0
+ *    (`return self->methods->reset(self)`, a tail position retail keeps), so
+ *    it calls through DreamSysResetRetFn below.
+ *  - attachToParent (+0x04C): DreamSys__SpawnAtLink takes (self, parent),
+ *    no offset; ObjM__SetupSceneStyle calls it through
+ *    DreamSysAttachToParentFn. */
+```
+
+From `include/dream_sys.h`:
+
+```c
+/* reset (+0x040) as DreamSys__DreamSys calls it (see above). */
+typedef DreamSys *(*DreamSysResetRetFn)(DreamSys *self);
+```

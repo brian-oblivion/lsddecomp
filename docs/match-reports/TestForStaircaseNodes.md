@@ -53,3 +53,18 @@ what the code is.
    ROM order (`src/DreamSys.c`); this is a forward declaration for that
    earlier call site, not a cross-unit prototype. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* Called by DreamSys__TryStaircaseLink as (&self->linkCoordinates,
+   currentPos, self->currentStage) -- same forwarding shape as
+   TestForTunnelLinks/TestForStaticLink above. Defined after its caller. */
+extern s32 TestForStaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
+```

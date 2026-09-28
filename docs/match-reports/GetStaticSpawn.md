@@ -166,3 +166,21 @@ what the code is.
    function is its own real C body, only while it is still INCLUDE_ASM
    (round 2026-08-30-c note superseded). */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* Shared by TestForStaticLink/TestForTunnelLinks/TestForStaircaseNodes/
+   TestForInstantTeleporters, each of which forwards its own three args
+   straight through and appends a fixed trailing quadruple (length table,
+   trigger table, spawn table, literal 1); every call site tests the result
+   with `bltz`. Defined after those callers in src/world/dream_sys.c. */
+extern s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
+                          s8 *triggerLens, StaticLinkTrigger **triggers, StageSpawn **spawns, s32 flag);
+```

@@ -65,3 +65,18 @@ what the code is.
    (docs/match-reports/GetLastSpawnExtra.md). Still declared here to type
    DreamSys__TryStaircaseLink's call site, which remains INCLUDE_ASM in this unit. */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* Called by DreamSys__TryStaircaseLink with no argument setup; its return
+   value indexes sStaircaseTickFns. Defined after its caller in
+   src/world/dream_sys.c. */
+extern s32 GetLastSpawnExtra(void);
+```

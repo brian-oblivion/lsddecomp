@@ -63,3 +63,18 @@ movement path (`DreamSys__ApplyPendingTurn` + `DreamSys__TickMoveFree`), 2 runs
 `DreamSys__TickMoveForced` (force the move command to 1 first). So a nonzero value
 replaces the normal per-tick movement with a forced variant -- which is what the
 name says and all it says.
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+    /* Gate flag read by DreamSys__SetMoveOverride: when nonzero
+       (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
+       SceneNode__UpdateRotation's arg2 -- cast from s32 to void*, not dereferenced. */
+    s32 enterRotation;
+```

@@ -133,3 +133,19 @@ what the code is.
    ROM order -- forward declaration only (gp-relative blocker resolved; see
    docs/match-reports/Test4InstantTeleporters.md). */
 ```
+
+## History: track 12 (round 106, charlie), comments moved out of the source
+
+The API documentation pass moved these comments here, verbatim (commit
+`2aa001d93`); the source keeps the API doc and, where a C spelling needs
+it, a one-line `MATCHING:` note.
+
+From `include/dream_sys.h`:
+
+```c
+/* Same (target, currentPos, stage) forwarding shape as TestForTunnelLinks
+   above -- called by DreamSys__TryInstantTeleportLink as
+   (&self->linkCoordinates, currentPos, self->currentStage), result tested
+   with `bltz`. Defined after its caller. */
+extern s32 TestForInstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
+```
