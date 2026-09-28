@@ -41,7 +41,7 @@ Same shape as `src/Entity.c`'s `New_Entity`.
 
 `GetSceneNodeMethods()` is a plain no-argument getter (`lui/addiu %hi/%lo
 (gSceneNodeMethods); jr $ra`, MEASURED from its own disassembly in
-`asm/code_d294_b.s`, the next uncarved slice). Its whole-file `->ctor`
+`asm/code_d294.s`, the next uncarved slice). Its whole-file `->ctor`
 call here checked the return with `bnez`, and that observation, combined
 with reading `SceneNode__SceneNode` (this class's ctor, `docs/match-
 reports/SceneNode__SceneNode.md`) confirmed `SceneNode__SceneNode` really does return
@@ -74,6 +74,6 @@ Step 5 (comments): the unit banner was rewritten as documentation (lifecycle, ch
  * the sender's class id; Reset (identity transform); UpdateRotation and
  * UpdateScale (set or add three Ratio16s into the GsCOORD2PARAM); attach to
  * and detach from a parent's coordinate; and the first five setters over
- * GsDOBJ2.attribute. Part 2 is code_d294_b.c, part 3 code_d294_c.c.
+ * GsDOBJ2.attribute. Part 2 is code_d294.c, part 3 code_d294_c.c.
  */
 ```

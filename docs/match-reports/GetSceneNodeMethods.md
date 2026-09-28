@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001E57C` on 2026-09-18 (tools/rename.py). Address 0x8001e57c.
 
-Round 12, runner delta. `code_d294_b`.
+Round 12, runner delta. `code_d294`.
 
 ## Summary
 
@@ -28,7 +28,7 @@ all of which belong to this and the sibling `code_d294`/`code_d294_c` units.
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/GetSceneNodeMethods.s`):
+Disassembly (`asm/nonmatchings/code_d294/GetSceneNodeMethods.s`):
 ```
 lui   $v0, %hi(gSceneNodeMethods)
 addiu $v0, $v0, %lo(gSceneNodeMethods)
@@ -60,7 +60,7 @@ length -- see this unit's own header banner and `include/class_3bb8c.h`):
 `src/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
 Renaming this symbol would edit every one of those files -- squarely
-out of this round's `code_d294_b`-only scope, and a live collision risk
+out of this round's `code_d294`-only scope, and a live collision risk
 with this round's `ScreenWidgets` runner. Posted to the broadcast in
 strong terms: this is the single highest-value rename in this unit
 (11 files reference the placeholder name) and the evidence for
@@ -74,7 +74,7 @@ round's 17 findings where a declaration was actually wrong rather than
 deliberate.
 
 **Callee evidence** (`0x8001E57C`, and the definition at
-`src/code_d294_b.c:736`):
+`src/code_d294.c:736`):
 
 ```
 8001e57c:  lui   v0,0x8007

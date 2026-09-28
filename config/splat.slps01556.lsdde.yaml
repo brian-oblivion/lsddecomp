@@ -446,7 +446,6 @@ segments:
       # `jr $ra`. Zero `jlabel`, zero `jr $t2`, so no rodata slot to
       # attach and no hasm/.word disposition. Blocker census over the
       # slice: 1 of 20 gp_rel-blocked (func_8001DDF4), zero addiu-$at.
-      - [0xDC24, c, code_d294_b]
       # code_d294_c: third and FINAL slice of the code_d294 block,
       # 0xED8C..0xF770 (psyq_GsLinkObject4 follows), 15 functions.
       # Carved round 13. Gate 2 checks, all run before the carve and all

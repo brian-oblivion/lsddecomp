@@ -314,7 +314,7 @@ total shortfall). The first jump is at retail address range
 this build's flat 4-condition C source never emits at all.
 
 **The mechanism, read directly from retail's own `.s`
-(`asm/nonmatchings/code_d294_b/ClipSegmentToBox.s`), not inferred:** retail
+(`asm/nonmatchings/code_d294/ClipSegmentToBox.s`), not inferred:** retail
 computes `r1`/`r2` outcodes into `$s0`/`$v1`, then tests them with THREE
 physical `andi $v0,$s0,0xFF` instructions, not two -- at `0x8001E15C`,
 `0x8001E16C` (both explained by the existing flat-condition reading), and
@@ -393,7 +393,7 @@ Five variants tried against this single word, all negative:
   (cosmetic only, as expected).
 
 Filing as STALL at **95/118** (up from 16/118), `INCLUDE_ASM` restored;
-`src/code_d294_b.c` confirmed clean (`git diff --stat` empty, whole-image
+`src/code_d294.c` confirmed clean (`git diff --stat` empty, whole-image
 `build exit=0`).
 
 ## Preserved body (round 20 best, 95/118, 1-word overshoot)
@@ -555,7 +555,7 @@ allocation, not correctness" levers, just discovered by search rather
 than by hand, and manifesting as a dead conditional rather than a bare
 `__asm__("")`.
 
-Filed as **MATCHED**, `src/code_d294_b.c` updated in place (no more
+Filed as **MATCHED**, `src/code_d294.c` updated in place (no more
 `INCLUDE_ASM`/`#if 0`), `git status --porcelain` clean after commit.
 
 ### Proposed learning

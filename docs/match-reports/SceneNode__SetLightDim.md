@@ -6,7 +6,7 @@
 
 > Renamed from `func_8001D424` on 2026-09-18 (tools/rename.py). Address 0x8001d424.
 
-Round 12, runner delta. `code_d294_b`.
+Round 12, runner delta. `code_d294`.
 
 ## Summary
 
@@ -24,7 +24,7 @@ u32 SceneNode__SetLightDim(SceneNodeObj *self, u32 a1) {
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__SetLightDim.s`):
+Disassembly (`asm/nonmatchings/code_d294/SceneNode__SetLightDim.s`):
 ```
 addu $a3, $a1, $zero      # a3 (value) = a1
 addiu $a0, $a0, 0x10      # a0 = &self->unk10
@@ -51,7 +51,7 @@ exact symbol is name-checked (in a comment, not a call) from
 `include/class_3bb8c.h:2360` -- a DIFFERENT unit's own vtable-slot
 census, discussing a coincidental address match in an unrelated table.
 Renaming would edit that file too, which is out of this round's scope
-(`code_d294_b` only). Posted to the broadcast for the head to apply, or
+(`code_d294` only). Posted to the broadcast for the head to apply, or
 for whoever next runs track 3 on `class_3bb8c.h`'s own unit to confirm
 independently.
 

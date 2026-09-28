@@ -6,7 +6,7 @@
 
 > Renamed from `func_8001E4A4` on 2026-09-18 (tools/rename.py). Address 0x8001e4a4.
 
-Unit: `code_d294_b`. Round 13, runner delta; improved round 19 (echo), see
+Unit: `code_d294`. Round 13, runner delta; improved round 19 (echo), see
 that section at the end. Best score reached: 48/54 words
 in-range, build clean at that point (verified: this score was read with
 `build exit=0` before reverting). ~15 real attempts (round 13) + a further
@@ -533,7 +533,7 @@ matches this report's own figures with no contamination.
   the loop's masked-comparison line, then again at the dispatch
   eligibility check, then again at the `slot10` call), is not a source-level
   redundancy needing a manual fix -- reading retail's own disassembly
-  (`asm/nonmatchings/code_d294_b/SceneNode__AddToActorParents.s`) shows GCC 2.6.3
+  (`asm/nonmatchings/code_d294/SceneNode__AddToActorParents.s`) shows GCC 2.6.3
   ALREADY reuses the SAME register (`$a1`) across the eligibility check
   (`lbu $v1,0x0($a1)`, `0x8001E530`) and the `slot10` load
   (`lw $v0,0x10($a1)`, `0x8001E540`) with no re-fetch of `entry->methods`
@@ -562,7 +562,7 @@ is a PURE 38-point stack+register penalty with zero insertions and zero
 deletions -- a lever that works by eliminating an instruction (an
 insertion/deletion-class fix) has nothing to act on in a residue that is
 already structurally minimal. Filing unchanged as STALL at 48/54,
-`INCLUDE_ASM` confirmed restored, `git diff --stat src/code_d294_b.c`
+`INCLUDE_ASM` confirmed restored, `git diff --stat src/code_d294.c`
 clean after the check (verbatim re-restore, byte-for-byte identical to
 the committed state).
 
@@ -651,7 +651,7 @@ split-expression axis, round-20's three further axes, a 73118-iteration
 permuter search (round 37) that never beat the base score, and round-41's
 dead-reload-lever check (ruled inapplicable, clean negative). Filing
 unchanged as STALL at 48/54, `INCLUDE_ASM` confirmed restored,
-`git diff --stat src/code_d294_b.c` empty after the check.
+`git diff --stat src/code_d294.c` empty after the check.
 
 REVISITED (round 55): confirmed unchanged at 48/54; round-54 naming reached
 none of this function's own symbols; no new lever found or attempted beyond

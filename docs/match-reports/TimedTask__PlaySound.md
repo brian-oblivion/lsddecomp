@@ -64,7 +64,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004A478` | `TimedTask__SetChildFlag8` | B | `gTimedTaskMethods`'s own last slot (`+0x070`). Reads the child object at `self->unk34`, and if non-NULL dispatches its `+0x080` slot. In `StageMap` that slot is the inherited `SceneNode__SetBackClip` (matched, `code_d294_b`), a get-or-set of bit 8 of the object's `unk10` bitfield, taking `(self, value)` -- so the two literal `0x7F`s this call sets up are not read by that occupant. Tier B, and prefixed with the containing class rather than the callee's: the name says what this method does (push a flag down to the held child), not what the child's class is. |
+| `func_8004A478` | `TimedTask__SetChildFlag8` | B | `gTimedTaskMethods`'s own last slot (`+0x070`). Reads the child object at `self->unk34`, and if non-NULL dispatches its `+0x080` slot. In `StageMap` that slot is the inherited `SceneNode__SetBackClip` (matched, `code_d294`), a get-or-set of bit 8 of the object's `unk10` bitfield, taking `(self, value)` -- so the two literal `0x7F`s this call sets up are not read by that occupant. Tier B, and prefixed with the containing class rather than the callee's: the name says what this method does (push a flag down to the held child), not what the child's class is. |
 
 Deliberately NOT asserted: that `TimedTask::unk34` is a `StageMap`. The
 header claims it, but the only evidence is that slot `+0x080` exists in

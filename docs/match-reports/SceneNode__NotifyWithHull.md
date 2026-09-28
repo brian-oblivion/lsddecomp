@@ -6,7 +6,7 @@
 
 > Renamed from `func_8001D568` on 2026-09-18 (tools/rename.py). Address 0x8001d568.
 
-Unit: `code_d294_b`. Round 13, runner delta. 38/38 words, full match.
+Unit: `code_d294`. Round 13, runner delta. 38/38 words, full match.
 
 ## Signature
 

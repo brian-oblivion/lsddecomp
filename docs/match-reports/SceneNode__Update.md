@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001D6AC` on 2026-09-26 (tools/rename.py). Address 0x8001d6ac.
 
-Round 54 (bravo, track 3). `code_d294_b`.
+Round 54 (bravo, track 3). `code_d294`.
 
 ## What it does
 

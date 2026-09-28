@@ -169,7 +169,7 @@ The header's banner was rewritten as documentation in round 95; the comments it 
 /* The model SceneNode keeps at +0x020 is a TmdModel (TmdModel). Its
  * methods -- TmdModel__GetHull, TmdModel__GetBoundsCount,
  * TmdModel__UpdateBoundsBuffer/GetBoundsBuffer, TmdModel__RaycastFaces --
- * are declared once, in include/TmdModel.h, which code_d294_b.c and
+ * are declared once, in include/TmdModel.h, which code_d294.c and
  * code_d294_c.c include themselves (track 4, round 87). */
 ```
 

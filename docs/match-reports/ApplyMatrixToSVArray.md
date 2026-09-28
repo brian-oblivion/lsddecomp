@@ -252,7 +252,7 @@ swap between a function's own parameters.
   destination and source the wrong way round: the loop copies an element out
   of the 2nd argument and calls `ApplyMatrixSV(m, &buf, dst)`, so the 1st
   argument is written. Both call sites (`SceneNode__TransformAndNotifyParents`, `SceneNode__ComposeAndApplyRotation`,
-  code_d294_b) pass the same address for both, which is why it was
+  code_d294) pass the same address for both, which is why it was
   invisible. Names only -- no type, arity or order change; byte-identical.
 - **The local `Rec6_d294` typedef is gone**, replaced by the existing
   `Vec3S16_d294`. Same layout and the same all-`s16` alignment-2 property
@@ -274,7 +274,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * retail's unaligned lwl/lwr + swl/swr copy come out) and forwards it to
  * Sony's `ApplyMatrixSV(m, &buf, dst)` -- so the 1st parameter is the
  * WRITE destination and the 2nd the read source, confirmed against the
- * byte-exact disassembly. `SceneNode__TransformAndNotifyParents` (code_d294_b) calls it with both
+ * byte-exact disassembly. `SceneNode__TransformAndNotifyParents` (code_d294) calls it with both
  * equal to the SAME address, which is why the asymmetry was invisible
  * until this function was actually matched; round 50 renamed the
  * parameters (names only) to say which is which. Declared with the opaque
@@ -293,7 +293,7 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * order: the WRITE destination is the 1st argument and the read source the
  * 2nd, which is the opposite of the names this body carried before -- read
  * off the byte-exact call, `ApplyMatrixSV(m, &buf, dst)` with `buf` copied
- * out of `src`. Both of this function's call sites (code_d294_b) pass the
+ * out of `src`. Both of this function's call sites (code_d294) pass the
  * same address for both, so the asymmetry is invisible from them.
  *
  * The per-element stack copy must be a struct whose members are ALL s16:

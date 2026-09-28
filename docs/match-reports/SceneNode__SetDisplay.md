@@ -15,7 +15,7 @@ value was 0 (i.e. it returns the logical negation of the old bit).
 See `include/code_d294.h` for `GetSetBitField`, the generic packed-bitfield
 accessor all five sibling functions in this file (`SceneNode__SetDisplay`,
 `SceneNode__SetSemiTrans`, `SceneNode__SetSemiTransRate`, `SceneNode__SetLighting`, `SceneNode__SetLightMode`) wrap.
-It lives in the next, still-uncarved slice (`asm/code_d294_b.s`) and was
+It lives in the next, still-uncarved slice (`asm/code_d294.s`) and was
 read directly off its own disassembly rather than decompiled here.
 
 ## The C

@@ -82,14 +82,14 @@ own; caching the pointer in a variable first changes the code shape
 
 ## Naming
 
-Round 71 (alpha). `func_8001CD60` -> `SceneNode__OnNotify`, **tier A**. Overrides BasicClass slot +0x038, BasicClass__OnNotify (receiving half of notifyParents; include/code_8220.h). Forwards to the base first, then dispatches on the SENDER's class tag: 2 (the pad class gPadMethods) -> slot +0x094, 5 (FrameClock) -> +0x098, 4 (SceneNode family) -> +0x09C dispatchLinkCommand. Slots 94/98 keep placeholders: their occupants (SceneNode__OnPadEvent/SceneNode__Update, code_d294_b) are not named.
+Round 71 (alpha). `func_8001CD60` -> `SceneNode__OnNotify`, **tier A**. Overrides BasicClass slot +0x038, BasicClass__OnNotify (receiving half of notifyParents; include/code_8220.h). Forwards to the base first, then dispatches on the SENDER's class tag: 2 (the pad class gPadMethods) -> slot +0x094, 5 (FrameClock) -> +0x098, 4 (SceneNode family) -> +0x09C dispatchLinkCommand. Slots 94/98 keep placeholders: their occupants (SceneNode__OnPadEvent/SceneNode__Update, code_d294) are not named.
 
 ## Proposed field names
 
 For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
 
-- `SceneNodeMethods.slot30` -> `notifyParents` (tier A): the occupant is BasicClass__NotifyParents (inherited verbatim), and BasicClassMethods names the slot notifyParents. Accessor: code_d294_b (TransformAndNotifyParents).
-- `GenericMethods_d294.slot38` -> `onNotify` (tier A): BasicClass slot +0x038, called as `(other, self, 4)`, i.e. sender self, event 4. Accessor: only the NON_MATCHING body of SceneNode__TryAttachNearby in code_d294_b (the default build does not see it; check-nonmatching does).
+- `SceneNodeMethods.slot30` -> `notifyParents` (tier A): the occupant is BasicClass__NotifyParents (inherited verbatim), and BasicClassMethods names the slot notifyParents. Accessor: code_d294 (TransformAndNotifyParents).
+- `GenericMethods_d294.slot38` -> `onNotify` (tier A): BasicClass slot +0x038, called as `(other, self, 4)`, i.e. sender self, event 4. Accessor: only the NON_MATCHING body of SceneNode__TryAttachNearby in code_d294 (the default build does not see it; check-nonmatching does).
 
 ## Round 101 (delta): track 7
 

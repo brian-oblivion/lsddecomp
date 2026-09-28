@@ -6,7 +6,7 @@
 
 > Renamed from `func_8001D450` on 2026-09-18 (tools/rename.py). Address 0x8001d450.
 
-Round 12, runner delta. `code_d294_b`.
+Round 12, runner delta. `code_d294`.
 
 ## Summary
 
@@ -25,7 +25,7 @@ s32 SceneNode__SetUseZ(SceneNodeObj *self, s32 a1) {
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__SetUseZ.s`):
+Disassembly (`asm/nonmatchings/code_d294/SceneNode__SetUseZ.s`):
 ```
 sltiu $a3, $a1, 0x1       # a3 (value) = (a1 < 1) = (a1 == 0)
 addiu $a0, $a0, 0x10      # a0 = &self->unk10

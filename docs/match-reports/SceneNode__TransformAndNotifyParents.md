@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D624` on 2026-09-18 (tools/rename.py). Address 0x8001d624.
 
-Round 12, runner delta. `code_d294_b`.
+Round 12, runner delta. `code_d294`.
 
 ## Summary
 
@@ -56,7 +56,7 @@ loose `void *`/`*a1` reads into real fields.
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__TransformAndNotifyParents.s`).
+Disassembly (`asm/nonmatchings/code_d294/SceneNode__TransformAndNotifyParents.s`).
 
 ### Proposed learning
 

@@ -31,7 +31,7 @@ void SceneNode__RotateLocalVector(SceneNodeObj *self, SceneNodeSub44 *dst, s16 *
   s32)`), split out of the `pad060[0x094-0x060]` range this round
   established (now `pad060[0x084-0x060]` + `slot84` + `pad088[0x094-
   0x088]`). Confirmed against `tools/classtable.py gSceneNodeMethods`: the
-  occupant is `SceneNode__GetRotMatrix`, in `code_d294_b` (out of this carve's
+  occupant is `SceneNode__GetRotMatrix`, in `code_d294` (out of this carve's
   scope, not decompiled here).
 - **New forward declaration for `ApplyMatrixToLVArray`** (this unit, matched
   separately this round) and a new opaque extern for `func_80015618`
@@ -69,7 +69,7 @@ larger, partially-opaque) extent.
 ## Naming (round 50, charlie -- FINISHING-PLAN track 3)
 
 - **`func_8001E58C` -> `SceneNode__RotateLocalVector`. Tier B.** It calls
-  `slot84(self, buf, 0)`, whose occupant is `SceneNode__GetRotMatrix` (code_d294_b,
+  `slot84(self, buf, 0)`, whose occupant is `SceneNode__GetRotMatrix` (code_d294,
   matched: `RotMatrix(&param->rotate, buf)` with the angles NOT negated when
   the 3rd argument is 0), then applies that matrix to a widened copy of its
   own 3-element `s16` argument. So "Rotate" is the operation and "Local" is
@@ -95,7 +95,7 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
 ```c
 /* Rotates a 3-element s16 vector, given in the object's own local frame,
  * by the object's own orientation, widening it into `dst`. `slot84`
- * (SceneNode__GetRotMatrix, code_d294_b) builds that rotation with RotMatrix from
+ * (SceneNode__GetRotMatrix, code_d294) builds that rotation with RotMatrix from
  * GsCOORD2PARAM.rotate; its `0` argument selects the un-negated angles,
  * i.e. local -> parent, not the inverse. `dst` is a bare 3-word vector:
  * class_3bb8c_o's own call site (Actor__AddLocalTranslation) passes a local `Vec3O`. */

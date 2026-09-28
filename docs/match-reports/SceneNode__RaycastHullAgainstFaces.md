@@ -110,7 +110,7 @@ precise relationship between the middle `k` loop ... and the inner fixed-4
 
 ## Part 3, resolved
 
-Re-read `asm/nonmatchings/code_d294_b/SceneNode__RaycastHullAgainstFaces.s` lines 197-268
+Re-read `asm/nonmatchings/code_d294/SceneNode__RaycastHullAgainstFaces.s` lines 197-268
 (`.L8001DFD0` through `.L8001E0B4`) instruction-by-instruction:
 
 - The innermost loop runs `m = 0..3` (4 passes, unconditional), but the
@@ -378,11 +378,11 @@ unit passed track 3 naming last round. Rebuilt the round-46 preserved body
 live first: reproduces exactly, `build exit=2`, no compile errors,
 `funcdiff.py` confirms **29/199**, no drift, isolated (only this function's
 own `#if 0` wrapper removed; every sibling confirmed still wrapped via
-`grep -c '^INCLUDE_ASM' src/code_d294_b.c`).
+`grep -c '^INCLUDE_ASM' src/code_d294.c`).
 
 **The round-46 title's own framing -- "register identity: `self` lands in
 $s4 here, $s5 in retail" -- undersells the residue.** Reading
-`asm/nonmatchings/code_d294_b/SceneNode__RaycastHullAgainstFaces.s` against
+`asm/nonmatchings/code_d294/SceneNode__RaycastHullAgainstFaces.s` against
 the built object's own disassembly line by line (not just the funcdiff word
 count) for the FIRST loop (the 2-row box-midpoint average, this report's own
 "Part 1") shows retail does not index through `mid[row].x/.y/.z` at all.
@@ -523,7 +523,7 @@ three candidates found) -- two safe candidates translated and verified
 inert against the real oracle (still 29/199), one candidate rejected
 outright as semantically unsound (reads a bit-mask value where the source
 means a plane-test result) rather than tested. Restored to `INCLUDE_ASM`,
-`git diff --stat src/code_d294_b.c` confirmed clean after the check.
+`git diff --stat src/code_d294.c` confirmed clean after the check.
 
 ### Proposed learning (round 55)
 

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8001D600` on 2026-09-18 (tools/rename.py). Address 0x8001d600.
 
-Round 12, runner delta. `code_d294_b`.
+Round 12, runner delta. `code_d294`.
 
 ## Summary
 
@@ -43,7 +43,7 @@ image SHA1 still green).
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294_b/SceneNode__GetModelHull.s`):
+Disassembly (`asm/nonmatchings/code_d294/SceneNode__GetModelHull.s`):
 ```
 lw  $a0, 0x20($a0)      # a0 = self->unk20
 jal TmdModel__GetHull

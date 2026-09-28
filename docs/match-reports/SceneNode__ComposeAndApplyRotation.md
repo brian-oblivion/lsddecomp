@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D950` on 2026-09-18 (tools/rename.py). Address 0x8001d950.
 
-Unit: `code_d294_b`. Round 13, runner delta. 54/54 words, full match.
+Unit: `code_d294`. Round 13, runner delta. 54/54 words, full match.
 
 ## Signature
 
@@ -73,7 +73,7 @@ First attempt (declaring `buf1` before `buf2`, matching the order they're
 first *used* in the source) compiled clean but scored 3/54 with the usual
 big "differs outside range" warning (a 5th callee-saved register, `s1`,
 appeared where retail has none). Comparing `objdump -d
-build/src/code_d294_b.c.o` against retail's disassembly showed the actual
+build/src/code_d294.c.o` against retail's disassembly showed the actual
 cause: GCC 2.6.3 recognized `&buf2` as loop-invariant (same address every
 iteration of the `self->unkC` walk) and hoisted it into a persistent
 callee-saved register (`s1`) *before* the loop, then reused it both inside

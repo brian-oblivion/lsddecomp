@@ -73,7 +73,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
 
 ```c
 /* RatioToFixed12 (round 54 correction: this banner was STALE -- it is
- * now carved and MATCHED in src/code_d294_c.c, not code_d294_b, and the
+ * now carved and MATCHED in src/code_d294_c.c, not code_d294, and the
  * nop_mflo_mfhi toolchain flag it was once blocked on is RESOLVED per
  * CLAUDE.md's "Open toolchain blockers" table; see
  * docs/match-reports/RatioToFixed12.md for the current history): reads

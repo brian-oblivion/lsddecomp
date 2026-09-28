@@ -5,7 +5,7 @@
 #include "SceneNode.h"
 
 /* The private header of SceneNode's three method units, code_d294.c,
- * code_d294_b.c and code_d294_c.c. The class itself (object, method table,
+ * code_d294.c and code_d294_c.c. The class itself (object, method table,
  * method prototypes) is include/SceneNode.h, and the model's types (TmdVec3,
  * TmdBox, TmdHull) are include/TmdModel.h. This holds the free helpers those
  * units define or call by symbol: the rotation and scale inputs, the
@@ -38,7 +38,7 @@ void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
 /* Bit positions in GsDOBJ2.attribute (include/psyq/libgs.h), the fields the
- * SceneNode attribute setters (code_d294.c, code_d294_b.c) replace. */
+ * SceneNode attribute setters (code_d294.c, code_d294.c) replace. */
 #define ATTR_LDIM_SHIFT 0      /* GsLDIM0..GsLDIM7, 3 bits */
 #define ATTR_LIGHTMODE_SHIFT 3 /* GsFOG|GsMATE|GsLLMOD, 3 bits */
 #define ATTR_LOFF_SHIFT 6      /* GsLOFF */

@@ -192,7 +192,7 @@ residue, before spending a permuter budget on it.
   here: several callers use the return value
   (`return GetSetBitField(&self->unk10, 0x1F, 1, a1 == 0) == 0;`).
 - Corroborated at scale: thirteen one-line wrappers across `code_d294.c`,
-  `code_d294_b.c` and `ScreenWidgets.c` call it at fixed, non-overlapping
+  `code_d294.c` and `ScreenWidgets.c` call it at fixed, non-overlapping
   (shift, width) pairs over one word -- the per-field setters of a packed
   register. That word is `SceneNodeObj::unk10`, which the PSY-Q
   IDENTIFICATION note in include/code_d294.h pins as `GsDOBJ2.attribute`.
@@ -206,12 +206,12 @@ The header's banner was rewritten as documentation in round 95; the comment it c
 
 ```c
 /* GetSetBitField (round 54 correction: this banner was STALE -- it is
- * now carved and MATCHED in src/code_d294_c.c, not code_d294_b): a
+ * now carved and MATCHED in src/code_d294_c.c, not code_d294): a
  * generic packed-bitfield accessor. Given a word pointer, a bit SHIFT, a
  * bit WIDTH and a VALUE, it clears WIDTH bits at bit-offset SHIFT in *word,
  * ORs in (value << shift), and returns the PREVIOUS contents of that
  * bitfield (shifted back down to bit 0). MEASURED from its own disassembly
- * (asm/code_d294_b.s @ GetSetBitField): a `while` loop builds `(1 << width)
+ * (asm/code_d294.s @ GetSetBitField): a `while` loop builds `(1 << width)
  * - 1` one bit at a time (i.e. computes a WIDTH-bit mask, not a
  * `(1<<width)-1` closed form -- retail's own source apparently spelled it
  * as the loop), then shifts that mask into position, clears/sets, and
@@ -235,5 +235,5 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * shifted down to bit 0. The mask is built one bit at a time by a loop
  * rather than as `(1 << width) - 1`; that loop is retail's own shape, not
  * an artefact. Thirteen thin per-field setters across code_d294.c,
- * code_d294_b.c and ScreenWidgets.c are wrappers around this. */
+ * code_d294.c and ScreenWidgets.c are wrappers around this. */
 ```
