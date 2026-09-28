@@ -15,10 +15,9 @@
 #include "WBgm.h"
 #include "BMemPMgr.h"
 #include <stdio.h>
+#include "VabStreamObj.h"
 
 extern char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-
-extern s32 GetSsTicksPerSecond(void);
 
 extern u8 gSsSizeTableBuf[];
 

@@ -19,8 +19,6 @@ GraphicsResources: warning: unused variable `unused'
 GraphicsResources: warning: unused variable `unused'
 ObjMStyleActor: warning: unused variable `pad48Tail'
 ObjMStyleActor: warning: unused variable `unused'
-PlacementGridVabSound: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
-PlacementGridVabSound: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 PlacementGridVabSound: warning: unused variable `unused'
 PlacementGridVabSound: warning: unused variable `unused'
 SceneNode: warning: unused variable `pad'

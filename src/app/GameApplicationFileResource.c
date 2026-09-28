@@ -45,14 +45,9 @@
 #include "BMemPMgr.h"
 #include "GameFiles.h"
 #include <strings.h>
+#include "DayTaskStageMap.h"
 
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
-
-extern void SetDataDirectory(char *dir); /* below */
-
-/* Below: waits until the data source's driver takes the mode; every
- * task here starts with (0, 0, 0). */
-extern void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
 
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char sLogoPathOsd[];  /* "ETC\OSDLOGO.TIM" */
@@ -142,8 +137,6 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     task->methods->init(task, (IntermediateBaseInitArgs *)self->aux, 0);
     task->methods->release(task);
 }
-
-extern s32 RegisterRecordTableFiles(s32 all); /* DayTaskStageMap.c */
 
 /* ShowImage's view callback: registers gRecordTable's files with the CD
  * driver. */
@@ -455,11 +448,11 @@ FileResourceMethods *GetFileResourceMethods(void) {
 
 extern s32 gActiveDataSource;
 
-void *GetActiveDataSourceMethods(void) {
+FileResourceMethods *GetActiveDataSourceMethods(void) {
     if (gActiveDataSource == DATASOURCE_SPU) {
-        return GetVabDriverMethods();
+        return (FileResourceMethods *)GetVabDriverMethods();
     } else {
-        return GetCdDriverMethods();
+        return (FileResourceMethods *)GetCdDriverMethods();
     }
 }
 
@@ -517,23 +510,17 @@ void CopyDataSourceSlots(FileResourceMethods *dst, FileResourceMethods *src) {
     dst->cancelRequests = src->cancelRequests;
 }
 
-extern s32 LockCd(void);
-
 void LockActiveDataSource(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         LockCd();
     }
 }
 
-extern s32 UnlockCd(void);
-
 void UnlockActiveDataSource(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         UnlockCd();
     }
 }
-
-extern s32 IsCdBusy(void);
 
 s32 IsActiveDataSourceBusy(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
@@ -542,8 +529,6 @@ s32 IsActiveDataSourceBusy(void) {
     return 0;
 }
 
-extern s32 IsCdIdle(void);
-
 s32 IsActiveDataSourceIdle(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         return IsCdIdle();
@@ -551,16 +536,12 @@ s32 IsActiveDataSourceIdle(void) {
     return 1;
 }
 
-extern s32 GetCdOperation(void);
-
 s32 GetActiveDataSourceOperation(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdOperation();
     }
     return 0;
 }
-
-extern s32 GetCdState(void);
 
 s32 GetActiveDataSourceState(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
@@ -570,12 +551,11 @@ s32 GetActiveDataSourceState(void) {
 }
 
 typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
+
 /* SetVabDriverMode takes two arguments and SetCdDriverMode three. Both are
  * called through the three-argument type, and the VAB driver ignores the
  * third. Assigning SetVabDriverMode to `fn` warns about incompatible pointer
  * types, and that is harmless. */
-extern s32 SetVabDriverMode(s32 async, s32 mode2);
-extern s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
 
 void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     DataSourceSetDriverModeFn fn;
@@ -589,19 +569,13 @@ void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     } while (fn(async, mode2, useVSyncCallback) == 0);
 }
 
-extern s32 GetCdDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2); retail's tail call passes nothing */
-extern s32 GetVabDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2); retail's tail call passes nothing */
-
-s32 GetActiveDataSourceDriverMode(void) {
+s32 GetActiveDataSourceDriverMode(s32 *outMode2) {
     if (gActiveDataSource == DATASOURCE_CD) {
-        return GetCdDriverMode();
+        return GetCdDriverMode(outMode2);
     } else {
-        return GetVabDriverMode();
+        return GetVabDriverMode(outMode2);
     }
 }
-
-extern s32 GetCdUseVSyncCallback(void);
-extern s32 GetVabUseVSyncCallback(void);
 
 s32 GetActiveDataSourceUseVSyncCallback(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
@@ -612,10 +586,6 @@ s32 GetActiveDataSourceUseVSyncCallback(void) {
 }
 
 extern s32 gFileTableRegistered;
-extern void SetFileTable(CdFileEntry *table);
-extern s32 GetFileTableCount(void);
-extern void SetFileTableCount(s32 count);
-extern s32 ResolveFileEntries(CdFileEntry *entries, s32 count);
 
 s32 RegisterFileTableEntries(CdFileEntry *table, s32 count) {
     s32 first;

@@ -31,6 +31,7 @@
 #include "BMemPMgr.h"
 #include "GameFiles.h"
 #include <rand.h>
+#include "GameApplicationFileResource.h"
 
 /* gRecordTable's record indices. The first RECORD_TABLE_COUNT are the
  * sound banks (SND\*.VH/VB) and then each stage's files; the movie records
@@ -77,8 +78,6 @@ enum MovieId {
 /* GetSpecialDayMovieSpan adds this to every movie's frame count but the
  * last. What the frames are for is not established. */
 #define MOVIE_SPAN_GAP_FRAMES 10
-
-extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* allocator: new LbdFile object */
 LbdFile *New_LbdFile(void) {

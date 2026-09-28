@@ -42,8 +42,4 @@ extern const char sDreamerTmdPath[];
  * declares it too. */
 extern s32 RegisterRecordTableFiles(s32 all);
 
-/* src/app/GameApplicationFileResource.c (a void function); GameApplicationFileResource.c declares it the same
- * way. */
-extern s32 SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
-
 #endif

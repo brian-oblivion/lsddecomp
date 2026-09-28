@@ -54,6 +54,7 @@
 #include "FlatLightObj.h"
 #include "BMemPMgr.h"
 #include "GameFiles.h"
+#include "GameApplicationFileResource.h"
 
 /* The viewpoint and view-reference points DayTask__OnInit hands the
  * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000). */
@@ -260,11 +261,6 @@ void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event) {
 DayTaskMethods *GetDayTaskMethods(void) {
     return &gDayTaskMethods;
 }
-
-/* src/app/GameApplicationFileResource.c: appends `count` records of `table` to the CD driver's
- * file table and resolves them; returns 0 to be retried, and 1 when the CD
- * driver is not the active data source. */
-extern s32 RegisterFileTableEntries(void *table, s32 count);
 
 /* How many times RegisterRecordTableFiles has run (a call with `all` set
  * counts as two), and how many records its first, half-table batch took. */

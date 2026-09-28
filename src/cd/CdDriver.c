@@ -52,29 +52,11 @@
 /* `pos` (self->pos, CdFileEntry::pos) is Sony's CdlLOC; CdControl takes it
  * as the u_char * parameter bytes, hence those casts. */
 
-
-extern void CloseCdFile(CdDriver *self);
-extern void LockCd(void);
-/* op is a CD_OPERATION_* and state the first CD_STATE_* (CdDriver.h). */
-extern void StartCdOperation(s32 op, s32 state);
-extern void ResetCdStateMachine(void);
-extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
-extern void UnlockCd(void);
-
-extern void *FindCdFileEntry(char *name);
-extern s32 FindCdFileIndex(char *name);
-
-extern void OpenCdFile(CdDriver *self, char *name);
-extern char *BuildCdFilePath(char *dest, char *name);
-
 /* ---- part 1: the lifecycle ---- */
 
 /* Nothing calls New_CdDriver: SetActiveDataSource copies the driver's slots
  * into its clients' tables, so the request methods below run on other
  * objects. The ctor runs InitCdDrive (part 3) once per boot. */
-
-/* Defined in CdDriver.c. */
-extern void InitCdDrive(void);
 
 CdDriver *New_CdDriver(void) {
     CdDriver *self;
@@ -172,8 +154,6 @@ void CdDriver__Close(CdDriver *self) {
 
 extern CdlLOC gCdSeekLoc;
 
-extern s32 GetCdFileSize(CdDriver *self);
-
 s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
     s32 status;
     u32 sectors;
@@ -222,8 +202,6 @@ s32 CdDriver__Seek(CdDriver *self, u32 offset, s32 mode) {
 }
 
 void CdDriver__NoOpSlot50(void) {}
-
-extern s32 ReadCdFile(CdDriver *self, void *buf, s32 size);
 
 s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
     s32 status;
@@ -337,11 +315,6 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
     UnlockCd();
 }
 
-extern void FreeCdRequestNode(CdRequestNode *node);
-/* An entry's name is its first member, so the entry is also the name that
- * open and loadFile take. */
-extern void *GetCdFileEntry(s32 index);
-
 void CdDriver__RunRequestQueue(void) {
     CdRequestNode *node;
     CdDriver *self;
@@ -446,28 +419,6 @@ void CdDriver__RunRequestQueue(void) {
  * wrappers while the active data source is this class's id, DATASOURCE_CD
  * (0x13); the other source is the SPU/VAB driver, DATASOURCE_SPU (0x23).
  */
-
-/* This unit's own functions, called before their definitions. */
-void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
-void InitCdDrive(void);
-void LockCd(void);
-void UnlockCd(void);
-s32 ServiceCdDriver(void);
-void StopCdServiceIfIdle(void);
-
-/* Part 3, below: the request list, the state machines, the file-table lookup. */
-extern CdRequestNode *AllocCdRequestNode(void);     /* allocate and link at the tail */
-extern void FreeCdRequestNode(CdRequestNode *node); /* unlink and free */
-extern void ResetCdStateMachine(void);              /* end the operation, mark idle */
-extern void TickCdStateMachine(void);               /* CD_TICK_STATE_MACHINE */
-extern void TickCdLoadFileStateMachine(void);       /* CD_TICK_LOAD_FILE */
-extern s32 FindCdFileIndex(char *name);             /* name -> gFileTable index */
-
-/* Part 4, below. */
-extern char *BuildCdFilePath(char *dest, char *name); /* "\\<data directory><name>;1" */
-
-/* TmdRenderer.c */
-extern s32 GetBMemPMgrBusy(void);
 
 extern char sFileNotFoundMsg[]; /* "File not found. file = %s\n" */
 
@@ -786,10 +737,6 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
  * ServiceCdDriver skip its tick in between.
  */
 
-/* Part 2's, above. */
-extern void LockCd(void);
-extern void UnlockCd(void);
-
 /* CdSync / CdReadSync mode: return the current status at once (0 waits).
  * CdReadSync then answers -1 for an error, 0 when the read is done, and
  * otherwise the sectors still to come. */
@@ -896,10 +843,6 @@ void *GetCdFileEntry(s32 index) {
     UnlockCd();
     return entry;
 }
-
-/* Defined below. */
-extern void ResetCdStateMachine(void);
-extern void SetCdState(s32 state);
 
 void TickCdStateMachine(void) {
     s32 result;
@@ -1067,15 +1010,8 @@ void SetCdState(s32 state) {
  */
 /* FileResource and its table come from include/FileResource.h, through GameApplicationFileResource.h. */
 
-/* Defined in other units: GetDataDirectory (GameApplicationFileResource.c) returns the data
- * directory's name; strcpy and strcat are Sony's libc2. */
-extern char *GetDataDirectory(void);
-
 extern char gCdFileNotFoundFmt[];   /* "File not found. path = %s\n" */
 extern char gCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix */
-
-/* Defined below, after its caller OpenCdFile: functions stay in ROM order. */
-char *BuildCdFilePath(char *dest, char *name);
 
 void FileResource__InstallCdReadDriver(FileResource *self) {
     GetFileResourceMethods()->ctor(self);

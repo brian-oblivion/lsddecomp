@@ -19,6 +19,7 @@
 #include "CdDriver.h" /* CD_SECTOR_SHIFT */
 #include "BMemPMgr.h"
 #include <strings.h>
+#include "GameApplicationFileResource.h"
 
 /* The ctor: a drive speed below this is double speed. */
 #define CDSTREAM_DOUBLE_SPEED_BELOW 4
@@ -40,11 +41,6 @@
 #define CDSTREAM_MODE_1X (CdlModeStream | CdlModeRT)
 /* getNextFrame's poll count when `tries` is negative. */
 #define CDSTREAM_NEXT_FRAME_TRIES 8388608
-
-/* Defined in other units: GetDataDirectory (GameApplicationFileResource.c) returns the data
- * directory's name; strcpy and strcat are Sony's libc2; BMemPMgrAlloc is the
- * game's heap allocator. */
-char *GetDataDirectory(void);
 
 extern s32 gCdStreamAudioMixSet;
 extern char gCdStreamVersionSuffix[]; /* ";1" */

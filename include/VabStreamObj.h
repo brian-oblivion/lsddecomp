@@ -118,4 +118,10 @@ void VabStreamObj__NoOpSlot94(void);
 void VabStreamObj__NoOpSlot98(void);
 void VabStreamObj__SetPitchOffset(VabStreamObj *self, s32 octave);
 
+/* VabStreamObjs constructed and not yet finalized, and the libsnd tick rate
+ * (60 a second, SS_TICK60) the first one's ctor set, for callers timing in
+ * ticks. */
+extern s32 GetOpenVabCount(void);
+extern s32 GetSsTicksPerSecond(void);
+
 #endif

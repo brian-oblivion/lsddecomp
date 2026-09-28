@@ -60,6 +60,7 @@
 #include "CdStream.h"
 #include "MoviePlayer.h"
 #include "BMemPMgr.h"
+#include "GameApplicationFileResource.h"
 
 #define CD_SECTOR_SIZE 2048 /* a CD-ROM data sector: TimBlockSrc's first read */
 #define FIX12_SHIFT 12      /* ONE == 1 << FIX12_SHIFT: 20.12 fixed point */
@@ -112,7 +113,6 @@ typedef struct SubBlockTable {
     /* +0x08 */ s32 entries[1];
 } SubBlockTable;
 
-extern FileResourceMethods *GetActiveDataSourceMethods(void);
 extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
 
 /* A method table's ctor slot, unprototyped: the allocators that check the
@@ -200,8 +200,6 @@ void TimBlockSrc__Finalize(TimBlockSrc *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-extern void LockActiveDataSource(void);
-extern void UnlockActiveDataSource(void);
 u32 FindMaxTimBlockSize(FileResource *self);
 
 /* setFlag (+0x064), run when a read completes: once the header sector is

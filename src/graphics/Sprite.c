@@ -36,10 +36,10 @@
 #include "FrameClock.h"
 #include "BMemPMgr.h"
 #include <strings.h>
+#include "GameApplicationFileResource.h"
 
 /* Defined in other units. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
-extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* The zero offset ScreenSprite__AttachToParent attaches with. */
 extern LongVec3 gVec3Zero;

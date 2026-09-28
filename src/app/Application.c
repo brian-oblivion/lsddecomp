@@ -14,11 +14,10 @@
 #include <libgs.h>
 #include "Application.h"
 #include "BMemPMgr.h"
+#include "GameApplicationFileResource.h"
 
 extern s32 gCdInitDone;               /* CdInit has been called */
 extern ScreenDims gDefaultScreenDims; /* {320, 240} */
-
-extern void SetActiveDataSource(s32 source); /* src/app/GameApplicationFileResource.c */
 
 void Application__Application(Application *self, s32 dataSource) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);

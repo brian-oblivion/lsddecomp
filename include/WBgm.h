@@ -96,6 +96,7 @@ void WBgm__SetVol(WBgm *self, s16 left, s16 right);
 void WBgm__Crescendo(WBgm *self, s16 vol, s32 seconds);
 void WBgm__SetSeq(WBgm *self, char *seqPath);
 void WBgm__SetVab(WBgm *self, char *vabPath);
-s32 IsWBgmActive(void); /* returns gWBgmActive */
+s32 IsWBgmActive(void);        /* returns gWBgmActive */
+void *GetSsSizeTableBuf(void); /* &gSsSizeTableBuf, the SsSetTableSize buffer */
 
 #endif

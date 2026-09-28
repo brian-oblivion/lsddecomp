@@ -35,6 +35,7 @@
 #include "ScreenSprite.h"
 #include "BMemPMgr.h"
 #include "FullWidthSjis.h"
+#include "GameApplicationFileResource.h"
 
 TextEntry *New_TextEntry(char *text, s32 mode) {
     TextEntry *self;
@@ -144,15 +145,13 @@ void TextEntry__SetText(TextEntry *self, char *text, s32 mode) {
     }
 }
 
-/* LoadCardResources' data. BuildFileName (GameApplicationFileResource.c) writes dir, name
- * and ext into dest and returns it. Positions are percent of half the
- * screen from the centre (include/ScreenSprite.h). */
-extern char *BuildFileName(char *dest, const char *name, const char *dir, const char *ext);
+/* LoadCardResources' data. Positions are percent of half the screen from
+ * the centre (include/ScreenSprite.h). */
 
-extern const char sStrComInput[];          /* "COMINPUT" */
-extern const char sStrFontIcon[];          /* "FONTICON" */
-extern const char sCardPathPrefix[];       /* "CARD\\" */
-extern const char sTimExt[];               /* ".TIM" */
+extern char sStrComInput[];                /* "COMINPUT" */
+extern char sStrFontIcon[];                /* "FONTICON" */
+extern char sCardPathPrefix[];             /* "CARD\\" */
+extern char sTimExt[];                     /* ".TIM" */
 extern SpriteRect gTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0, 0) */
 extern SpriteRgb gTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
 extern ScreenSpritePos gTextEntryPanelPos; /* (-70, -60) */
@@ -160,8 +159,8 @@ extern ScreenSpritePos gTextEntryTextPos;  /* (-62, -15) */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     char path[32];
-    const char *dir;
-    const char *ext;
+    char *dir;
+    char *ext;
     TimImage *panelTim;
     TimImage *fontTim;
 
@@ -619,13 +618,12 @@ void ItemList__ResetView(ItemList *self) {
 /* loadResources' path buffer, BuildFileName's dest: "CARD\\" + name + ".TIM". */
 #define CARD_TIM_PATH_SIZE 32
 
-extern char *BuildFileName(char *dest, const char *name, const char *dir, const char *ext);
-extern const char sStrSelect[];              /* "SELECT" */
-extern const char sItemListCardPathPrefix[]; /* "CARD\\" */
-extern const char sItemListTimExt[];         /* ".TIM" */
-extern SpriteRect gItemListPanelRect;        /* SELECT's cell: 256 x 160 from (0, 0) */
-extern ScreenSpritePos gItemListPanelPos;    /* (-100, -60) */
-extern const char sItemListStrFontIcon[];    /* "FONTICON" */
+extern char sStrSelect[];                 /* "SELECT" */
+extern char sItemListCardPathPrefix[];    /* "CARD\\" */
+extern char sItemListTimExt[];            /* ".TIM" */
+extern SpriteRect gItemListPanelRect;     /* SELECT's cell: 256 x 160 from (0, 0) */
+extern ScreenSpritePos gItemListPanelPos; /* (-100, -60) */
+extern char sItemListStrFontIcon[];       /* "FONTICON" */
 
 /*
  * Loads CARD\SELECT.TIM as the panel sprite, placed at gItemListPanelPos
@@ -635,8 +633,8 @@ extern const char sItemListStrFontIcon[];    /* "FONTICON" */
  */
 void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
     char path[CARD_TIM_PATH_SIZE];
-    const char *dir;
-    const char *ext;
+    char *dir;
+    char *ext;
     TimImage *panelTim; /* MATCHING: two handles, not one reused */
     TimImage *fontTim;
 

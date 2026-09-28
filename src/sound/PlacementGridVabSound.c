@@ -27,12 +27,8 @@
 #include "SoundCueSet.h"
 #include "BMemPMgr.h"
 #include <strings.h>
-
-/* FileResource's, GameApplicationFileResource.c: the active driver's table (gVabDriverMethods
- * or gCdDriverMethods, both FileResource tables), through which
- * PlacementGrid's and VabStreamObj's ctors and finalizes, and PlacementGrid's
- * setFlag, reach their parent's. */
-extern FileResourceMethods *GetActiveDataSourceMethods(void);
+#include "WBgm.h"
+#include "GameApplicationFileResource.h"
 
 /* What `buffer` points at: 8 bytes nothing here reads, then each cell's
  * first record, one per cell of the chunk's 20 x 20 lattice, row-major. A
@@ -175,14 +171,9 @@ void VabDriver__NoOpSlot50(void) {}
  * the cue's voices through its stopVoice slot.
  */
 
-/* Defined in other units. */
-extern char *BuildFileName(char *dest, char *name, char *dir, char *ext);
-extern char *GetSsSizeTableBuf(void);
-extern s32 IsWBgmActive(void);
-
 /* ".VH" and ".VB", in .sdata. */
-extern const char gVabHeaderSuffix[];
-extern const char gVabBodySuffix[];
+extern char gVabHeaderSuffix[];
+extern char gVabBodySuffix[];
 
 /* SetVabDriverMode's two words, read back by GetVabDriverMode. */
 extern s32 gVabDriverMode;
@@ -248,7 +239,6 @@ VabStreamObj *New_VabStreamObj(char *path) {
 /* The "<base>.VH"/"<base>.VB" path buffers the ctor and AdvanceLoadState
  * build on the stack. */
 #define VAB_PATH_SIZE 32
-
 
 /* SsSetMVol's level for both channels, set once when the first bank's
  * attributes are loaded (Sony's maximum is 127). */
