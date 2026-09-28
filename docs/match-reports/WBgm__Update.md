@@ -68,7 +68,7 @@ extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
+extern s32 sWBgmActive;
 extern u8 sSsSizeTableBuf[];
 ```
 

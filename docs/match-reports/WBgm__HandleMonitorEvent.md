@@ -32,7 +32,7 @@ still matches after the change.
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
+extern s32 sWBgmActive;
 extern u8 sSsSizeTableBuf[];
 
 WBgm *New_WBgm(s32 vabArg, s32 seqArg, s32 autoPlay) {
@@ -122,7 +122,7 @@ extern s32 GetSsTicksPerSecond(void);
 s32 WBgm__HandleMonitorEvent(WBgm *self);
 
 extern WBgmMethods gWBgmMethods;
-extern s32 gWBgmActive;
+extern s32 sWBgmActive;
 extern u8 sSsSizeTableBuf[];
 ```
 

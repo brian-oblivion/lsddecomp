@@ -34,7 +34,7 @@
  * pause and +0x050 resume on it (ObjM__AdvancePauseSetup,
  * ObjM__TeardownPauseOverlay; include/ObjM.h).
  *
- * gWBgmActive is 1 from the ctor to finalize; IsWBgmActive returns it, and
+ * sWBgmActive is 1 from the ctor to finalize; IsWBgmActive returns it, and
  * VabStreamObj__Finalize (src/sound/PlacementGridVabSound.c) shuts libsnd down (SsEnd,
  * SsQuit) only when the last VAB closes AND no WBgm is active.
  */
@@ -79,7 +79,7 @@ struct WBgm {
 extern WBgmMethods gWBgmMethods;
 extern WBgmMethods *GetWBgmMethods(void); /* returns &gWBgmMethods */
 
-extern s32 gWBgmActive; /* 1 between WBgm__WBgm and WBgm__Finalize */
+extern s32 sWBgmActive; /* 1 between WBgm__WBgm and WBgm__Finalize */
 
 /* The class's own methods and helpers, in address order. */
 WBgm *New_WBgm(char *vabPath, char *seqPath, s32 autoPlay); /* BMemPMgrAlloc(0x24), then ctor */
@@ -96,6 +96,6 @@ void WBgm__SetVol(WBgm *self, s16 left, s16 right);
 void WBgm__Crescendo(WBgm *self, s16 vol, s32 seconds);
 void WBgm__SetSeq(WBgm *self, char *seqPath);
 void WBgm__SetVab(WBgm *self, char *vabPath);
-s32 IsWBgmActive(void); /* returns gWBgmActive */
+s32 IsWBgmActive(void); /* returns sWBgmActive */
 
 #endif

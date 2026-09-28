@@ -47,14 +47,14 @@ void WBgm__WBgm(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay) {
     self->paused = 0;
     self->playing = 0;
     self->autoPlay = autoPlay;
-    gWBgmActive = 1;
+    sWBgmActive = 1;
     self->methods->setSeq(self, seqPath);
     self->methods->setVab(self, vabPath);
     self->methods->addChild(self, (BasicClass *)GetDrawSystem());
 }
 
 void WBgm__Finalize(WBgm *self) {
-    gWBgmActive = 0;
+    sWBgmActive = 0;
     self->methods->stop(self);
     SsSeqClose(self->seqId);
     if (self->vab != NULL) {
@@ -192,7 +192,7 @@ WBgmMethods *GetWBgmMethods(void) {
 }
 
 s32 IsWBgmActive(void) {
-    return gWBgmActive;
+    return sWBgmActive;
 }
 
 void *GetSsSizeTableBuf(void) {
