@@ -171,11 +171,11 @@ Read each named class's header first; its banner points to the units.
   menu. `TimedTask`, IntermediateBase's other subclass, is the base of
   `DayTask` and `ObjM`. The 2D pieces are `Sprite` and its subclasses (`src/graphics/sprite.c`,
   down to `TextRow`), `BoxFill` and `FadeBox` (`src/ui/screen_widgets.c`) and `TextEntry`
-  (`src/ui/TextEntryItemList.c`).
+  (`src/ui/input_dialogs.c`).
 - **Memory-card saves.** `TitleMenu` owns a `TaskObjF`, the save/load
   controller (both in `src/ui/title_menu.c`): a state machine over the
   BIOS memory-card calls, which shows its choices in an `ItemList` scrolling
-  list (`src/ui/TextEntryItemList.c` and `src/world/ObjMStyleActor.c`).
+  list (`src/ui/input_dialogs.c` and `src/world/ObjMStyleActor.c`).
 - **CD and data sources.** `FileResource` is the base of every class loaded
   from a file; its file interface is bound at run time to the active driver: `CdDriver`
   (`src/cd/cd_driver.c`: blocking file access, the CD request queue, its state

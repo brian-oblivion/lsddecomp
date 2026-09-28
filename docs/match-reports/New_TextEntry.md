@@ -4,13 +4,13 @@
 
 > Renamed from `func_80050BA8` on 2026-09-24 (tools/rename.py). Address 0x80050ba8.
 
-Unit `TextEntryItemList`, carved round 14.
+Unit `input_dialogs`, carved round 14.
 
 `New_X`-shaped factory for `Obj86ED0` (see `include/class_3bb8c.h`, vtable
 `gTextEntryMethods`, resolved with `tools/classtable.py gTextEntryMethods`): allocates the
 0x4C-byte instance and dispatches its own ctor (slot 0x008, `TextEntry__TextEntry`,
 itself a STALLED gp_rel-blocked function in this same unit -- see its own
-report). `GetTextEntryMethods` (`TextEntryItemList`, still `INCLUDE_ASM`) is this
+report). `GetTextEntryMethods` (`input_dialogs`, still `INCLUDE_ASM`) is this
 class's own table getter, mirroring `GetBasicClassMethods`'s no-argument shape;
 its return type only needed naming here (`Obj86ED0Methods *`), not a body.
 
@@ -70,8 +70,8 @@ Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTe
 Allocation size `0x4C` is `sizeof(TextEntry)` (the struct ends with
 `panelSprite` at +0x048). Zero bytes changed.
 
-Moved here from the unit banner of src/ui/TextEntryItemList.c (history, not
-documentation): "TextEntryItemList -- third carved slice of the DayTaskStageMap
+Moved here from the unit banner of src/ui/input_dialogs.c (history, not
+documentation): "input_dialogs -- third carved slice of the DayTaskStageMap
 block, 20 functions, carved round 14. All 20 are TextEntry methods
 (gTextEntryMethods, `D_80086ED0`, 42 slots; `tools/classtable.py
 gTextEntryMethods`) ... routes a numeric command switch (HandleCommand) to

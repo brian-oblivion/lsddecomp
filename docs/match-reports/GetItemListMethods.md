@@ -30,4 +30,4 @@ matched this round. Matched first attempt.
 
 Round 75 (bravo, track 3). `func_80052B60` -> `GetItemListMethods`, **tier A**.
 
-Returns &gItemListMethods. Used as the ctor table by New_ItemList and ItemList__ItemList (TextEntryItemList). Named like GetTimedTaskMethods/GetObjMMethods.
+Returns &gItemListMethods. Used as the ctor table by New_ItemList and ItemList__ItemList (input_dialogs). Named like GetTimedTaskMethods/GetObjMMethods.

@@ -3,7 +3,7 @@
  * that sit between them in ROM. In address order, each under its own section
  * banner below:
  *  - ItemList's second half (include/ItemList.h; the first half is in
- *    TextEntryItemList.c): setState and tickClosing (close, then report the
+ *    input_dialogs.c): setState and tickClosing (close, then report the
  *    result to the parents), handleInputCode (the Pad events it answers) and
  *    playSound, the cursor and scroll methods, the four visible rows
  *    (createRows, releaseRows, refreshRows, and the non-virtual helpers

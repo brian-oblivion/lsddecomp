@@ -41,10 +41,10 @@ rather than API.
   hand at game_shell.c:80, 317. Add game_files.h.
 - **Full-width SJIS helpers.** `DecodeFullWidthSjis` is `u8 *(u8 *, u8 *)`
   (screen_widgets) but `void (void *, void *)` at title_menu.c:316 and
-  `char *(char *, char *)` at TextEntryItemList.c:41, 511;
+  `char *(char *, char *)` at input_dialogs.c:41, 511;
   `FormatFullWidthNumber` re-declared at title_menu.c:193. One header.
 - **Others without a header or disagreeing:** `BuildFileName`
-  (TextEntryItemList.c:155, 629; PlacementGridVabSound.c:185, with `const`);
+  (input_dialogs.c:155, 629; PlacementGridVabSound.c:185, with `const`);
   `GetSsSizeTableBuf` (`void *` vs `char *`); `GetSsTicksPerSecond` (wbgm.c:21
   only); `LockCd`/`UnlockCd` declared `s32` at game_shell.c:535,
   defined `void`; `SetActiveDataSourceDriverMode` `s32` in DayTaskStageMap.h:57

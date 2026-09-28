@@ -689,7 +689,7 @@ Apply by type scope (edit `SceneNodeMethods`'s own definition in
 lists), per CLAUDE.md's shared-struct-hazard rule -- a whole-tree text
 replace of e.g. `slotA4` would corrupt every OTHER class's own
 identically-named, unrelated `slotA4` field (measured: `title_menu.c`,
-`task.c`, `TextEntryItemList.c`/`_j.c`/`_l.c` all have their own,
+`task.c`, `input_dialogs.c`/`_j.c`/`_l.c` all have their own,
 different `slotA4`).
 
 ## Round 55 (charlie): REVISITED (round 55) -- LENGTH closed exactly

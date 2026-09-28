@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051200` on 2026-09-24 (tools/rename.py). Address 0x80051200.
 
-Unit `TextEntryItemList`, carved round 14.
+Unit `input_dialogs`, carved round 14.
 
 `Obj86ED0`'s vtable slot 0x04C: adds two children via `self->methods->
 addChild` (the class's OWN overridden addChild, `TextEntry__AddChild`, reached

@@ -122,7 +122,7 @@ shifts register allocation across the whole function").
 
 Round 75 (bravo, track 3). `func_80052644` -> `ItemList__CreateRows`, **tier A**.
 
-Slot +0x08C (`tools/classtable.py gItemListMethods`). Called by ItemList__LoadResources (TextEntryItemList) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (sItemListRowOriginX, sItemListRowOriginY + 0xA*i), colours it sItemListRowColor, then SetView(..., highlight=1).
+Slot +0x08C (`tools/classtable.py gItemListMethods`). Called by ItemList__LoadResources (input_dialogs) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (sItemListRowOriginX, sItemListRowOriginY + 0xA*i), colours it sItemListRowColor, then SetView(..., highlight=1).
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
 

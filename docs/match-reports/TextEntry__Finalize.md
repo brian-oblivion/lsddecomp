@@ -4,7 +4,7 @@
 
 > Renamed from `func_80050CE8` on 2026-09-24 (tools/rename.py). Address 0x80050ce8.
 
-Unit `TextEntryItemList`, carved round 14.
+Unit `input_dialogs`, carved round 14.
 
 `Obj86ED0`'s finalize override (vtable slot 0x00C, per
 `tools/classtable.py gTextEntryMethods`): frees the owned name buffer, then

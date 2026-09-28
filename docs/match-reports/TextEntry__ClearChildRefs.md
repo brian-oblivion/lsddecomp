@@ -4,7 +4,7 @@
 
 > Renamed from `func_80050CD8` on 2026-09-24 (tools/rename.py). Address 0x80050cd8.
 
-Unit `TextEntryItemList`, carved round 14.
+Unit `input_dialogs`, carved round 14.
 
 Trivial reset helper on `Obj86ED0` (see `include/class_3bb8c.h`): zeroes the
 two child-slot fields and the release-gated pointer. Called both from this
@@ -33,7 +33,7 @@ Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTe
 ## Track 7 (2026-09-27, round 98, bravo)
 
 TextEntry +0x034/+0x038 `childType2`/`childType5` -> `inputSource`/
-`tickSource` (include/TextEntry.h; accessed only in TextEntryItemList, so
+`tickSource` (include/TextEntry.h; accessed only in input_dialogs, so
 renamed in the definition). They are the children of class 2 and 5, which
 are Pad and FrameClock (`typeviews.py --tree`), and ItemList and TaskObjF
 already call the same pair `inputSource`/`tickSource`. The kind test reads

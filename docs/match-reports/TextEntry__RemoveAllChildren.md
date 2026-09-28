@@ -4,7 +4,7 @@
 
 > Renamed from `func_80050E34` on 2026-09-24 (tools/rename.py). Address 0x80050e34.
 
-Unit `TextEntryItemList`, carved round 14.
+Unit `input_dialogs`, carved round 14.
 
 `Obj86ED0`'s removeAllChildren override (vtable slot 0x018): zeroes the
 same three fields `TextEntry__ClearChildRefs` zeroes, then dispatches the BASE class's
@@ -36,7 +36,7 @@ Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTe
 ## Track 7 (2026-09-27, round 98, bravo)
 
 TextEntry +0x034/+0x038 `childType2`/`childType5` -> `inputSource`/
-`tickSource` (include/TextEntry.h; accessed only in TextEntryItemList, so
+`tickSource` (include/TextEntry.h; accessed only in input_dialogs, so
 renamed in the definition). They are the children of class 2 and 5, which
 are Pad and FrameClock (`typeviews.py --tree`), and ItemList and TaskObjF
 already call the same pair `inputSource`/`tickSource`. The kind test reads

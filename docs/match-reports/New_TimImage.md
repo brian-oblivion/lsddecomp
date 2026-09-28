@@ -39,7 +39,7 @@ plus slots +0x07C..+0x09C; `extern void *BMemPMgrAlloc(s32 size);`;
   `New_Class` constructor-helper convention (`New_DayTask`,
   `New_BoxFill`, ...: `alloc(size); if (self) { ctor(); return self; }
   return NULL;`); every project-wide call site (`DayTaskStageMap.c`,
-  `title_menu.c`, `class_3bb8c_g.c`, `TextEntryItemList.c`, `class_3bb8c_j.c`,
+  `title_menu.c`, `class_3bb8c_g.c`, `input_dialogs.c`, `class_3bb8c_j.c`,
   `task.c`) builds a `"...\ .TIM"` path (via `BuildFileName` or
   literal `sEtcTimPath`/`sSaveIconTimPath`/`sDreamerTmdPath`/`sCardPathSuffix`) and hands
   it straight to this function, then calls the result's slot78

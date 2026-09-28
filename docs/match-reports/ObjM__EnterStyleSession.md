@@ -91,7 +91,7 @@ before `DreamSysMethods_3bb8c_l` looked like the obvious fix but GCC 2.6.3
 rejects a duplicate `typedef struct X X;` even when the underlying type is
 identical each time (`redefinition of 'DreamSysObj_3bb8c_l'`), and this
 header is included by two OTHER live units this round (alpha's
-`TextEntryItemList`, bravo's `ObjMStyleActor`) so the break wasn't visible until
+`input_dialogs`, bravo's `ObjMStyleActor`) so the break wasn't visible until
 a full `./build-and-verify.sh`. The elaborated-`struct` spelling sidesteps
 the whole issue: C allows naming an incomplete struct tag via a pointer
 before its full definition is in scope, no typedef required.

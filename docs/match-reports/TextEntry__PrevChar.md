@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051784` on 2026-09-24 (tools/rename.py). Address 0x80051784.
 
-Unit: `src/ui/TextEntryItemList.c` (TextEntryItemList, newly carved round 15).
+Unit: `src/ui/input_dialogs.c` (input_dialogs, newly carved round 15).
 
 ## Class identity
 
@@ -16,11 +16,11 @@ NOT contain this function's address at any of its 80 slots) versus
 `tools/classtable.py gTextEntryMethods` (which places this function, and all
 five siblings named below, at its +0x094..+0x0A8) -- `gTextEntryMethods` is
 `Obj86ED0`, a DIFFERENT, ALREADY shared and fully-typed class in
-`include/class_3bb8c.h`, established independently by TextEntryItemList,
+`include/class_3bb8c.h`, established independently by input_dialogs,
 whose own struct already carries unk10/unk14/unk18/unk1C/unk20/unk48 and
 whose own comments already tie slotA4/slotA8 to this unit's
 `TextEntry__SetCursorPos`/`TextEntry__SetCharAt` ("outside
-this unit's slice"). See `src/ui/TextEntryItemList.c`'s file header comment for
+this unit's slice"). See `src/ui/input_dialogs.c`'s file header comment for
 the full evidence. Nothing about the matched BYTES was ever affected (a
 type name is not codegen) -- only the class attribution and the `self`
 type were wrong, both now fixed to the already-shared `Obj86ED0`/
@@ -38,7 +38,7 @@ fields (`TextEntry__SetCursorPos`, `TextEntry__SetCharAt`).
 
 None (round 75): the fields and slots below were already present on the
 shared `Obj86ED0`/`Obj86ED0Methods` in `include/class_3bb8c.h`, established
-by TextEntryItemList. (The paragraph that used to describe additive edits to
+by input_dialogs. (The paragraph that used to describe additive edits to
 `Obj866E8`/`Obj866E8Methods` here described edits to the WRONG type --
 see the correction above. `Obj866E8`/`Obj866E8Methods` are untouched,
 correctly used elsewhere by DayTaskStageMap/etc.)

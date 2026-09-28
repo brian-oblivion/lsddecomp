@@ -6,7 +6,7 @@
 
 > Renamed from `func_80051D1C` on 2026-09-24 (tools/rename.py). Address 0x80051d1c.
 
-Unit: `src/ui/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`. This is the "add
+Unit: `src/ui/input_dialogs.c`. `self` is `ItemList_3bb8c_j`. This is the "add
 child" method: registers `arg1` with the inherited `BasicClass::addChild`
 and additionally caches it into one of two single-slot fields depending
 on a tag read off `arg1`'s own vtable header word.
@@ -47,5 +47,5 @@ disassembly rather than assuming a shared order.
 
 `**(s32 **)child & 0xF` is `((BasicClass *)child)->methods->header &
 CLASS_ID_ROOT_MASK`, and the kinds 2/5 are PAD_CLASS_ID/FRAMECLOCK_CLASS_ID,
-as TextEntry__AddChild (TextEntryItemList) already spells them. Zero bytes
+as TextEntry__AddChild (input_dialogs) already spells them. Zero bytes
 changed. The same change is in RemoveChild and OnNotify.
