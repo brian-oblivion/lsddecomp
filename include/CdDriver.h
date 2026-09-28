@@ -86,7 +86,7 @@ typedef struct CdFileEntry {
 } CdFileEntry; /* size 0x1C */
 
 /* One queued request: AllocCdRequestNode allocates and links it at the tail
- * of gCdRequestQueue, EnqueueCdRequest fills it, StartCdOperation sets
+ * of sCdRequestQueue, EnqueueCdRequest fills it, StartCdOperation sets
  * `active` on the head node, CdDriver__RunRequestQueue dispatches `op` back
  * to `owner`'s slot of the same name, FreeCdRequestNode unlinks and frees. */
 typedef struct CdRequestNode {
@@ -163,7 +163,7 @@ extern CdFileEntry *gCdSeekParam;      /* the state machines seek to &gCdSeekPar
 extern s32 sCdReadSectorCount;         /* CdRead sector count */
 extern void *sCdReadBuffer;            /* CdRead target buffer */
 extern CdFileEntry *gCdSavedSeekParam; /* LoadFile's saved gCdSeekParam */
-extern CdRequestNode *gCdRequestQueue; /* list head */
+extern CdRequestNode *sCdRequestQueue; /* list head */
 extern s32 gCdTickStep;                /* CD_TICK_* */
 extern s32 gCdUseVSyncCallback;
 

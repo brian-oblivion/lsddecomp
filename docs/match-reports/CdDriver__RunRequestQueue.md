@@ -207,7 +207,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 
 **Evidence.** Called every service tick through the class table by
 `ServiceCdDriver` (CdDriver), whose local view already names the slot
-`runRequestQueue`. It takes the head of `gCdRequestQueue`: if the node is
+`runRequestQueue`. It takes the head of `sCdRequestQueue`: if the node is
 not yet active it raises `owner->inQueueDispatch` and calls the owner's
 slot for `node->op` (open/close/seek/read/loadFile, the CD_OP_* values the
 five methods above enqueue); once `sCdIdle` says the drive finished, it

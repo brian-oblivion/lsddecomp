@@ -17,7 +17,7 @@ carries the evidence for each one.
 ```c
 /* The same 0x24-byte queue node CdRequest_D70 above is a view of, from the
  * writing side: AllocCdRequestNode (CdDriver) allocates one and links it onto
- * gCdRequestQueue, and only the fields this call site writes are typed here
+ * sCdRequestQueue, and only the fields this call site writes are typed here
  * (padded to their offsets, per this unit's convention). `op` takes the
  * CD_OP_* values, `fileIndex` is FindCdFileIndex's index into gFileTable (0
  * when the op does not name a file), and param0/param1 are the two per-op
@@ -103,7 +103,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `func_800282AC` | `EnqueueCdRequest` | A |
 
 **Evidence.** Allocates and links a node via `AllocCdRequestNode` (CdDriver,
-which appends to the `gCdRequestQueue` list), fills five of its fields from the
+which appends to the `sCdRequestQueue` list), fills five of its fields from the
 parameters, bumps the requesting object's pending count, clears its flags and
 calls `StartCdService`. Every caller is a class method taking its
 asynchronous path (`CdDriver` at op 2/3/4/5/7,
@@ -158,7 +158,7 @@ The comment on the definition was cut to a one-line `MATCHING:` on the
 first store; the full text was:
 
 ```c
-/* Fills a node AllocCdRequestNode has already linked onto gCdRequestQueue,
+/* Fills a node AllocCdRequestNode has already linked onto sCdRequestQueue,
  * counts it against its owner and starts the service tick.
  * MATCHING: the stores are in retail's order (+0x08, +0x14, +0x0C, +0x10,
  * +0x18); this compiler keeps statement order. */

@@ -7,7 +7,7 @@
 ## What it does
 
 Allocates a 0x24-byte doubly-linked-list node (`BMemPMgrAlloc(0x24)`) and
-appends it to the tail of the list rooted at `gCdRequestQueue`. New-node fields
+appends it to the tail of the list rooted at `sCdRequestQueue`. New-node fields
 at offset 0x0 and 0x4 are zeroed; 0x1C/0x20 are the prev/next links. If the
 list is empty, the new node simply becomes the head; otherwise the function
 walks `next` pointers to the current tail and links the new node on.
@@ -24,7 +24,7 @@ typedef struct Node8008A894 {
     /* 0x20 */ struct Node8008A894 *next;
 } Node8008A894; /* size 0x24 */
 
-extern Node8008A894 *gCdRequestQueue; /* list head */
+extern Node8008A894 *sCdRequestQueue; /* list head */
 
 Node8008A894 *AllocCdRequestNode(void)
 {
@@ -35,7 +35,7 @@ Node8008A894 *AllocCdRequestNode(void)
     LockCd();
     node = BMemPMgrAlloc(0x24);
     if (node != NULL) {
-        head = gCdRequestQueue;
+        head = sCdRequestQueue;
         node->prev = NULL;
         node->next = NULL;
         node->unk0 = 0;
@@ -50,7 +50,7 @@ Node8008A894 *AllocCdRequestNode(void)
             cur->next = node;
             node->prev = cur;
         } else {
-            gCdRequestQueue = node;
+            sCdRequestQueue = node;
         }
     }
     UnlockCd();
@@ -75,7 +75,7 @@ UnlockCd(void);` rather than sharing a header with the adjacent unit.
 ## Naming
 
 **Tier A.** Allocates a 0x24-byte queue node (`BMemPMgrAlloc(0x24)`) and
-appends it to the tail of `gCdRequestQueue`, clearing `active` (offset 0x00)
+appends it to the tail of `sCdRequestQueue`, clearing `active` (offset 0x00)
 and `unk4` (offset 0x04). Named for exactly this mechanics -- a pure
 alloc+link leaf, tier A by the "mechanics ARE its purpose" rule. Corroborated
 independently by CdDriver.c's own comment on this function (written

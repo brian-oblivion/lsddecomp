@@ -29,7 +29,7 @@ extern void VSyncCallback(void (*cb)(void));
  * class-map comment above); only the one slot this call site dispatches is
  * typed, following the pad-to-offset convention include/GameApplicationFileResource.h uses
  * for gFileResourceMethods's own table. tools/classtable.py resolves +0x068 to
- * CdDriver__RunRequestQueue (CdDriver), which walks the gCdRequestQueue request list,
+ * CdDriver__RunRequestQueue (CdDriver), which walks the sCdRequestQueue request list,
  * dispatches each request through its owner's own slots and frees it with
  * FreeCdRequestNode -- so the slot is named for what that method does. */
 typedef struct Methods6D4E8_80EC Methods6D4E8_80EC;
@@ -135,7 +135,7 @@ drains a queue.
 
 **`sCdQueueEnabled`.** Its only reader is the guard on the `+0x068` dispatch
 here, and `tools/classtable.py` resolves that slot to `CdDriver__RunRequestQueue`
-(CdDriver), which walks `gCdRequestQueue`, dispatches each request and frees
+(CdDriver), which walks `sCdRequestQueue`, dispatches each request and frees
 it with `FreeCdRequestNode`. So the flag gates queue processing specifically --
 not the tick, which still runs the state machine while the flag is clear.
 Tier A.

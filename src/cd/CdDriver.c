@@ -329,7 +329,7 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
                     goto retry;
                 }
                 self->bufferSize = readSize;
-                gCdRequestQueue->active = 1;
+                sCdRequestQueue->active = 1;
                 ResetCdStateMachine();
             }
         }
@@ -350,7 +350,7 @@ void CdDriver__RunRequestQueue(void) {
     s32 op;
 
     LockCd();
-    node = gCdRequestQueue;
+    node = sCdRequestQueue;
     if (node != NULL) {
         self = node->owner;
         op = node->op;
@@ -403,7 +403,7 @@ void CdDriver__RunRequestQueue(void) {
             }
             self->methods->onRequestDone(self);
             FreeCdRequestNode(node);
-            if (gCdRequestQueue == NULL) {
+            if (sCdRequestQueue == NULL) {
                 self->methods->stopService(self);
             }
         }
@@ -520,7 +520,7 @@ void CdDriver__CancelRequests(CdDriver *self) {
 
     LockCd();
 
-    head = gCdRequestQueue;
+    head = sCdRequestQueue;
 
     if (head != NULL && self->pendingRequests != 0) {
         self->flags = 0;
@@ -533,7 +533,7 @@ void CdDriver__CancelRequests(CdDriver *self) {
             gCdSeekParam = saved;
         }
 
-        for (node = gCdRequestQueue; node != NULL; node = next) {
+        for (node = sCdRequestQueue; node != NULL; node = next) {
             next = node->next;
             if (node->owner == self) {
                 FreeCdRequestNode(node);
@@ -738,7 +738,7 @@ void DisableCdQueue(void) {
     UnlockCd();
 }
 
-/* Fills a node AllocCdRequestNode has already linked onto gCdRequestQueue,
+/* Fills a node AllocCdRequestNode has already linked onto sCdRequestQueue,
  * counts it against its owner and starts the service tick. */
 void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1) {
     CdRequestNode *node = AllocCdRequestNode();
@@ -781,7 +781,7 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
  * and when the read is done restores the gCdSeekParam LoadFile saved in
  * gCdSavedSeekParam.
  *
- * AllocCdRequestNode appends a zeroed node to gCdRequestQueue and
+ * AllocCdRequestNode appends a zeroed node to sCdRequestQueue and
  * FreeCdRequestNode unlinks one; EnqueueCdRequest (part 3) fills
  * them and CdDriver__RunRequestQueue (part 2) consumes them from the
  * head. FindCdFileEntry and FindCdFileIndex look a name up in gFileTable by
@@ -816,7 +816,7 @@ CdRequestNode *AllocCdRequestNode(void) {
     LockCd();
     node = BMemPMgrAlloc(sizeof(CdRequestNode));
     if (node != NULL) {
-        head = gCdRequestQueue;
+        head = sCdRequestQueue;
         node->prev = NULL;
         node->next = NULL;
         node->active = 0;
@@ -829,7 +829,7 @@ CdRequestNode *AllocCdRequestNode(void) {
             cur->next = node;
             node->prev = cur;
         } else {
-            gCdRequestQueue = node;
+            sCdRequestQueue = node;
         }
     }
     UnlockCd();
@@ -846,7 +846,7 @@ void FreeCdRequestNode(CdRequestNode *node) {
         if (prev != NULL) {
             prev->next = node->next;
         } else {
-            gCdRequestQueue = node->next;
+            sCdRequestQueue = node->next;
         }
         next = node->next;
         if (next != NULL) {
@@ -1028,7 +1028,7 @@ void StartCdOperation(s32 op, s32 state) {
     sCdOperation = op;
     gCdState = state;
     sCdIdle = 0;
-    gCdRequestQueue->active = 1;
+    sCdRequestQueue->active = 1;
 }
 
 /* No operation, no tick step: the driver is idle. */

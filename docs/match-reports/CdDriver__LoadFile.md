@@ -25,7 +25,7 @@ typedef struct Node8008A894 {
     s32 unk0;
 } Node8008A894;
 
-extern Node8008A894 *gCdRequestQueue;
+extern Node8008A894 *sCdRequestQueue;
 extern void *BMemPMgrAlloc(s32 size);
 
 void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
@@ -88,7 +88,7 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
                         goto retry;
                     }
                     self->unk14 = pos;
-                    gCdRequestQueue->unk0 = 1;
+                    sCdRequestQueue->unk0 = 1;
                     ResetCdStateMachine();
                 }
             }
@@ -156,7 +156,7 @@ not necessarily the order that matters most:
    RECOMPUTED `a0=2` (the next iteration's `CdControl` argument setup) that
    duplicates an already-present, real instruction at the retry target --
    1 word too long -- instead of retail's `li v0,1` (the constant later
-   stored through `gCdRequestQueue->unk0`). Rewriting only this OUTERMOST loop
+   stored through `sCdRequestQueue->unk0`). Rewriting only this OUTERMOST loop
    as `retry: ...; if (v1 == -1) goto retry;` (keeping the two INNER retry
    loops as plain `do`/`while`, since their own hoisted-constant shapes
    already matched) fixed it immediately. **So the goto-vs-do-while choice
