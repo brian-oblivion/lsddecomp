@@ -10,7 +10,7 @@
  * WBgm -- class id 0x50, method table gWBgmMethods (24 slots), a direct
  * BasicClass subclass (its ctor calls Get_vtable_BasicClass()->ctor first;
  * `classtable.py gWBgmMethods --vs gBasicClassMethods` overrides the ctor, finalize
- * and onNotify and adds nine slots). Methods in src/WBgm.c. No class
+ * and onNotify and adds nine slots). Methods in src/sound/WBgm.c. No class
  * derives from it. Name from rodata sSeqOpenErrorMsg, "Seq Open error in
  * WBgmHandleMonitorEvent", printed by WBgm__HandleMonitorEvent's own body.
  *

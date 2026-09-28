@@ -2,7 +2,7 @@
 
 > Renamed from `func_80039CBC` on 2026-09-25 (tools/rename.py). Address 0x80039cbc.
 
-Round 81, runner echo. Unit `src/WBgm.c` (carved from `psyq_2a0e0` in
+Round 81, runner echo. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x044 (resolved with `tools/classtable.py gWBgmMethods`).
@@ -28,7 +28,7 @@ void WBgm__Play(WBgm *self) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/WBgm.c`:
+The unit-local view it needs, from the top of `src/sound/WBgm.c`:
 
 ```c
 #include "BasicClass.h"

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003A04C` on 2026-09-25 (tools/rename.py). Address 0x8003a04c.
 
-Round 81, runner echo. Unit `src/WBgm.c` (carved from `psyq_2a0e0` in
+Round 81, runner echo. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** not a class slot; unit-level getter.
@@ -24,7 +24,7 @@ WBgmMethods *Get_vtable_WBgm(void) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/WBgm.c`:
+The unit-local view it needs, from the top of `src/sound/WBgm.c`:
 
 ```c
 #include "BasicClass.h"

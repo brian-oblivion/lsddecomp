@@ -1166,7 +1166,7 @@ segments:
       # Gap: 0x2A0E0..0x2A878. Called "the game's own libspu build" until
       # revision 18 measured it: game code (BasicClass-table methods that
       # call the framework), carved as a C unit.
-      - [0x2a0e0, c, WBgm]
+      - [0x2a0e0, c, sound/WBgm]
       # Chunk D: three libsnd runs, all text-only.
       - [0x2a878, o, libsnd/ssvol]       # Snd_SetVol, SsSeqSetVol, SsSepSetVol
       - [0x2a918, asm, psyq_2a918]       # 0x2A918..0x2A94C, unowned

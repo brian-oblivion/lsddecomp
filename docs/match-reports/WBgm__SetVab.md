@@ -2,7 +2,7 @@
 
 > Renamed from `func_80039F64` on 2026-09-25 (tools/rename.py). Address 0x80039f64.
 
-Round 81, runner delta. Unit `src/WBgm.c` (carved from `psyq_2a0e0` in
+Round 81, runner delta. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x060 (setVab) (slots resolved with `tools/classtable.py gWBgmMethods`).
@@ -50,7 +50,7 @@ void WBgm__SetVab(WBgm *self, s32 arg) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/WBgm.c`:
+The unit-local view it needs, from the top of `src/sound/WBgm.c`:
 
 ```c
 #include "BasicClass.h"
