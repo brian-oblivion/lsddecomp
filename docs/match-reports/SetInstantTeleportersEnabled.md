@@ -58,7 +58,7 @@ round 43, runner ALPHA, unit DreamSys.
 
 ## Naming
 
-- **Tier A.** Sets the flag Test4InstantTeleporters gates on (returns -1 immediately when it is 0); called externally from src/DreamAux.c via its own extern declaration.
+- **Tier A.** Sets the flag Test4InstantTeleporters gates on (returns -1 immediately when it is 0); called externally from src/world/DreamAux.c via its own extern declaration.
 
 ## Comment moved from src/world/DreamSys.c (round 92, track 7)
 

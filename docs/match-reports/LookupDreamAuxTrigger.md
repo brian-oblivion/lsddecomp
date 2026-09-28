@@ -95,7 +95,7 @@ issue.
 `RemapTriggerForDreamColor`. The search IS the function's purpose, so tier
 A applies even though it delegates the on-hit adjustment to a sibling.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 Returns `DreamAuxTriggerEntry *` (was the entry smuggled as s32); a0 ->
 `chunkKey`, idx -> `stage`, entry -> `trigger`. DreamAuxTriggerEntry's other

@@ -140,7 +140,7 @@ call casts the stack array whose first word is the buffer:
 `New_TriggerWorld((struct ResourceSource *)ctxArg)`. A pointer cast, no code; bytes
 unchanged.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 Parameters a0/a1/a2 -> day/trigger/data; returns TriggerWorld *. The
 descriptor is a ResourceRequest (`req.src.buffer = data`): a bare

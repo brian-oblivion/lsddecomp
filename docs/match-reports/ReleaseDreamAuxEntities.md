@@ -99,7 +99,7 @@ slot family IS the function's purpose. Called from `ObjM__TeardownStyle`
 different in KIND from the first (it is never populated by any function in
 this unit's own queue).
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 

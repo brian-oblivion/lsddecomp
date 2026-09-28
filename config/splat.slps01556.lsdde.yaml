@@ -292,7 +292,7 @@ segments:
       # `.L8005....` labels inside that unit's functions, so it must be
       # attached (the yaml's inherited `# greyman` guess was wrong about
       # which unit owns it).
-      - [0x206C, .rodata, DreamAux]
+      - [0x206C, .rodata, world/DreamAux]
 
       # ---- text -----------------------------------------------------------
       # `psyq_*` blocks are Sony SDK library code compiled into the executable.
@@ -1737,7 +1737,7 @@ segments:
       # resolves fine (the 0xA8C precedent), so no attach is expected; the
       # slice owns no `jtbl_` reference either.
       - [0x48F74, c, world/DreamSys]
-      - [0x4CD08, c, DreamAux]   # DreamAux
+      - [0x4CD08, c, world/DreamAux]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
       # one runner may own a unit. Carved in slices; the remainder stays
       # `asm` until someone needs it. Both 0x4E618 (func_8005DE18) and

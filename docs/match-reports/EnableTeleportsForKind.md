@@ -103,7 +103,7 @@ actual argument and this unit's own `TriggerRecord.kind` field. Tier B, not
 A, because WHY these four values enable teleports (as opposed to some other
 game-meaningful grouping) is not established from this unit alone.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 Parameter `kind` -> `moodIndex`: ProcessDreamAuxTriggerRecord passes the
 record's moodIndex, the same byte it passes New_Entity as its mood row. The

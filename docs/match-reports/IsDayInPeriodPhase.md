@@ -94,7 +94,7 @@ The `/ 30` is suggestive of a day-to-period conversion given this project's
 `DreamSys__AdvanceDay`, but nothing in this unit establishes it, so the name
 does not encode it.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 

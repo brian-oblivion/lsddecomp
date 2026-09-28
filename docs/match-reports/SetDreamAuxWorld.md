@@ -130,7 +130,7 @@ only caller, ObjM__SetupSceneStyle (ObjMStyleActor), passes its DreamSys
 `target`; DreamAux calls +0x200 of its table (getDreamColor) and passes
 it as Entity's peer. Byte-identical.
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 Parameters named from the caller (ObjM__SetupSceneStyle, ObjMStyleActor.c,
 whose own declaration already says `stage, grid, world, sound, clock`, and

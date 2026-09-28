@@ -116,7 +116,7 @@ not read directly off any single instruction.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
-## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 
