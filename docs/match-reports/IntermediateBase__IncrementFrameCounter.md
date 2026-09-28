@@ -54,7 +54,7 @@ itself is PROPOSED for rename to `frameCounter` in this unit's
   frame/tick counter. What in-game effect the resulting product drives is
   NOT established, hence tier B. NOT renamed directly: shared with
   `Task.c` (`TaskCore__SetState`, `TaskCore__TickFadeIn`, and likely
-  `TaskCore__SetFadeRate`/`TaskCore__TickFadeCallback`'s own callers of `self->unk1C`). Head
+  `TaskCore__SetFadeRate`/`TaskCore__TickFadeInCallback`'s own callers of `self->unk1C`). Head
   applies by type scope.
 
 ## Track 4 (2026-09-25, round 82, charlie)

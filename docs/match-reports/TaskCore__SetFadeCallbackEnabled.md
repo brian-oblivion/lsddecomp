@@ -25,7 +25,7 @@ void TaskCore__SetFadeCallbackEnabled(Obj86B60 *self, s32 a1)
 }
 ```
 
-A setter for the `unk88` callback (see `TaskCore__TickFadeCallback`, which invokes it):
+A setter for the `unk88` callback (see `TaskCore__TickFadeInCallback`, which invokes it):
 `a1==0` clears it, `a1==1` sets it to this class's OWN vtable slot `+0xB0`
 (`TaskCore__TickFadeIn`) read as a raw function-pointer VALUE (never called through
 here), any other `a1` leaves it untouched.
@@ -67,7 +67,7 @@ whole function reuses across a `switch`.
 ## Struct knowledge established
 
 - `Obj86B60::unk88` (`s32 (*)(Obj86B60*)`, +0x088) -- OBSERVED here as a
-  setter target; invoked by `TaskCore__TickFadeCallback`.
+  setter target; invoked by `TaskCore__TickFadeInCallback`.
 - `Obj86B60Methods::slotB0` (+0x0B0) -- IS `TaskCore__TickFadeIn`; here it is read
   as raw DATA (a function-pointer value), never called through the vtable
   in this unit.
@@ -92,7 +92,7 @@ can see (0 or 1), which is why "Enabled" rather than a generic "Set".
 `Obj86B60::unk88` (`s32 (*)(Obj86B60 *self)`, +0x088) -> `fadeCallback`.
 Tier B: in this unit's own evidence the only value ever stored here besides
 NULL is `self->methods->slotB0` (`TaskCore__TickFadeIn`), and
-`TaskCore__TickFadeCallback` is its sole invoker. Grep shows `unk88` textual
+`TaskCore__TickFadeInCallback` is its sole invoker. Grep shows `unk88` textual
 hits in Task.c/code_179d8_{k,f}.c/code_2cc8c_{d,e}.c/Entity.c
 (several genuinely this same shared Obj86B60 struct, per Task/e), so
 proposal only -- the head should apply via type scope on `Obj86B60`, not a

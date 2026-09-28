@@ -48,7 +48,7 @@ First forwards to the shared "IntermediateBase" utility class
 `unk40` is (unsigned) less than `unk1C`, calls `slot60` with reason `6`.
 Finally switches on `unk20` and forwards to one of four more vtable slots
 depending on its value -- two of which (`slotAC`/`slotC0`) ARE this unit's
-own `TaskCore__TickFadeCallback`/`TaskCore__TickFadeOutCallback`.
+own `TaskCore__TickFadeInCallback`/`TaskCore__TickFadeOutCallback`.
 
 ## Residues found, and what closed each
 
@@ -70,9 +70,9 @@ is CALLER-saved and the intervening call (`slot60` itself) is free to
 clobber it, so whatever value reaches `slotAC`/`slotC0` is NOT a
 meaningful forwarded argument, just physically-whatever's-left-in-the-
 register. **Fix: call `slotAC(self)`/`slotC0(self)` with ONE argument**,
-and retype the shared vtable slots (and `TaskCore__TickFadeCallback`'s own definition,
+and retype the shared vtable slots (and `TaskCore__TickFadeInCallback`'s own definition,
 already matched earlier this round) down to `s32 (*)(Obj86B60*)` -- this
-does not change `TaskCore__TickFadeCallback`'s own compiled bytes (it never read the
+does not change `TaskCore__TickFadeInCallback`'s own compiled bytes (it never read the
 parameter either way) so the earlier match stays intact.
 
 **Residue 2: `self->methods` must be cached into a local BEFORE the
@@ -114,7 +114,7 @@ residues 1-2 were already fixed.
 - `Obj86B60Methods::slotAC`/`::slotC0` RETYPED from `(Obj86B60*, s32)` to
   `(Obj86B60*)` -- the `s32 a1` parameter in the original signature was
   never a real argument at this (their only) call site, just a leftover
-  caller-saved register value. `TaskCore__TickFadeCallback`'s own C definition updated
+  caller-saved register value. `TaskCore__TickFadeInCallback`'s own C definition updated
   to match (no effect on its already-matched bytes).
 - `Obj86B60::unk20` (s32, +0x020) -- confirmed as a real dispatch/state
   value (previously only known as "set to 5" by `TaskCore__SetState`, STALL).

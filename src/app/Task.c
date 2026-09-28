@@ -568,7 +568,7 @@ void TaskCore__SetFadeRate(TaskCore *self, s32 rate) {
     self->fadeRate = rate;
 }
 
-s32 TaskCore__TickFadeCallback(TaskCore *self) {
+s32 TaskCore__TickFadeInCallback(TaskCore *self) {
     s32 done;
 
     done = 1;

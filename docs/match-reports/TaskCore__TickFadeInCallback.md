@@ -1,4 +1,6 @@
-# TaskCore__TickFadeCallback — MATCH (27/27 words)
+# TaskCore__TickFadeInCallback — MATCH (27/27 words)
+
+> Renamed from `TaskCore__TickFadeCallback` on 2026-09-28 (tools/rename.py). Address 0x8003cbc0.
 
 > Renamed from `Obj86B60__TickFadeCallback` on 2026-09-25 (tools/rename.py). Address 0x8003cbc0.
 
@@ -9,7 +11,7 @@
 ## What it does
 
 ```c
-s32 TaskCore__TickFadeCallback(Obj86B60 *self)
+s32 TaskCore__TickFadeInCallback(Obj86B60 *self)
 {
     s32 result;
 
