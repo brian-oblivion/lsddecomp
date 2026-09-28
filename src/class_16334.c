@@ -4,7 +4,7 @@
 Pad *New_Pad(s32 mode, s32 port) {
     Pad *self;
 
-    self = BMemPMgrAlloc(0x20);
+    self = BMemPMgrAlloc(sizeof(Pad));
     if (self == NULL) {
         goto fail;
     }
@@ -53,7 +53,7 @@ u32 Pad__UpdateMasks(Pad *self) {
 }
 
 void Pad__DispatchEvents(Pad *self) {
-    s32 events[16];
+    s32 events[PAD_BUTTON_COUNT];
     void (*notifyParents)(Pad *self, s32 event);
     u32 held;
     u32 released;
@@ -76,16 +76,16 @@ void Pad__DispatchEvents(Pad *self) {
         return;
     }
 
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < PAD_BUTTON_COUNT; i++) {
         u32 mask = sButtonMasks[i];
 
         code = -1;
         if (released & mask) {
-            code = 0x22;
+            code = PAD_EVENT_RELEASED;
         } else if (pressed & mask) {
-            code = 0x12;
+            code = PAD_EVENT_PRESSED;
         } else if (held & mask) {
-            code = 0x02;
+            code = PAD_EVENT_HELD;
         }
         if (code >= 0) {
             *p++ = code + i;
@@ -110,7 +110,7 @@ void Pad__LoadButtonTable(void) {
     local = sDefaultButtonMasks;
     i = 0;
     src = local.w;
-    for (; i < 16; i++) {
+    for (; i < PAD_BUTTON_COUNT; i++) {
         *dst++ = *src++;
     }
 }

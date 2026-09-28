@@ -48,7 +48,8 @@ enum PadButton {
     PAD_BUTTON_R2 = 12,     /* PADm, PADR2 */
     PAD_BUTTON_L1 = 13,     /* PADn, PADL1 */
     PAD_BUTTON_L2 = 14,     /* PADo, PADL2 */
-    PAD_BUTTON_START = 15   /* PADh, PADstart */
+    PAD_BUTTON_START = 15,  /* PADh, PADstart */
+    PAD_BUTTON_COUNT = 16   /* sButtonMasks' length, one event per button per frame at most */
 };
 
 typedef struct Pad Pad;

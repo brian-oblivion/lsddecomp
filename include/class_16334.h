@@ -14,7 +14,7 @@
 extern void *BMemPMgrAlloc(s32 size);
 
 extern s32 sPadRefCount; /* live instances: the first ctor calls PadInit, the last finalize PadStop */
-extern u32 sButtonMasks[16]; /* runtime copy of the button-mask table, filled by Pad__LoadButtonTable */
+extern u32 sButtonMasks[PAD_BUTTON_COUNT]; /* runtime copy of the button-mask table, filled by Pad__LoadButtonTable */
 
 /* A 0x40-byte block, copied as a whole (GCC's inlined block-move codegen for
  * a struct assignment, not a word loop) rather than word-indexed. */
