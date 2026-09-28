@@ -2376,7 +2376,7 @@ extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gSpriteShiftX[];
 extern Ratio16 sSpriteScaleLarge[3];
 extern Ratio16 sSpriteScaleHalf[3];
-extern Ratio16 gSpriteScaleSmall[3];
+extern Ratio16 sSpriteScaleSmall[3];
 extern LongVec3 gSpriteShiftScratch;
 
 void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b);
@@ -2641,7 +2641,7 @@ void StyleEffect__BuildRandomSprites(StyleEffect *self) {
         sprite = self->sprites[1];
         sprite->methods->setSemiTransOn(sprite, 1);
         sprite->methods->setSemiTransRate(sprite, 0);
-        sprite->methods->updateScale(sprite, 1, (parity != 0) ? sSpriteScaleLarge : gSpriteScaleSmall);
+        sprite->methods->updateScale(sprite, 1, (parity != 0) ? sSpriteScaleLarge : sSpriteScaleSmall);
     }
 
     self->sprites[2]->methods->setDisplay(self->sprites[2], 0);
@@ -3299,7 +3299,7 @@ void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant) {
 /*
  * Overrides SceneNode__UpdateScale. `ratios` is two num/den pairs, x then y
  * (the callers' tables hold three, sSpriteScaleLarge's {6,5} and
- * gSpriteScaleSmall's {4,6}; the third is not read), each turned into 20.12
+ * sSpriteScaleSmall's {4,6}; the third is not read), each turned into 20.12
  * by the split division RatioToFixed12 uses. The ratios go to the GsSPRITE's
  * scalex/scaley, or, while Sprite's accumulateScale is set, multiply accumScaleX/Y
  * instead. `set` is not read.
