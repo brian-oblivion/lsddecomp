@@ -117,3 +117,17 @@ since a length mismatch inside a single function still passes a naive
 ## Provenance
 
 round 43, runner ALPHA, unit DreamSys.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* Same (target, currentPos, stage) forwarding shape as Test4TunnelLinks
+   above (see that function's own comment) -- called by DreamSys__TryInstantTeleportLink as
+   (&this->linkCoordinates, currentPos, this->currentStage), result compared
+   with `bltz` (round 2026-09-02). MATCHED, defined later in this unit's own
+   ROM order -- forward declaration only (gp-relative blocker resolved; see
+   docs/match-reports/Test4InstantTeleporters.md). */
+```

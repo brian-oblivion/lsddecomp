@@ -162,3 +162,253 @@ Replaced in the source by a comment that says what the code does; kept here as w
 - Field `DreamSys::unk_0x60` -> `modelSource` (tier A: its one writer is this
   ctor, storing that LinkResource; nothing reads it back). Every accessor is in
   src/DreamSys.c.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+ * Round 66's naming (per-name evidence in docs/match-reports/<func>.md)
+ * rests on two cross-unit identifications: updateRotation (+0x044) is the
+ * rotation setter, so every constant passed to it is three degree ratios
+ * (RotationRatios below); and soundObj is a VabStreamObj, whose +0x080/
+ * +0x084/+0x09C (playTone/stopVoice/setPitchOffset) name voiceSelect and
+ * voiceIndex.
+```
+
+```c
+/* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood
+   (round 2026-08-30-d). */
+```
+
+```c
+/* .sbss values. The 7B4B4 sbss segment that actually holds these is still
+   plain `data` (un-flipped to dot-form), so it already provides these
+   symbols; declaring them `extern` here lets this header be #included
+   without a multiple-definition link error. Whoever flips that segment to
+   `.data, DreamSys` should drop `extern` here in the same commit. */
+```
+
+```c
+   threshold. Still raw `nonmatching` data (round 2026-08-30). */
+```
+
+```c
+/* A single {numerator, denominator} degree ratio. This is not a guess about
+   the LAYOUT any more (round 66): SceneNode__UpdateRotation -- vtable slot +0x044, the
+   inherited rotation setter, MATCHED in src/SceneNode.c -- reads exactly
+   three of these from its `data` argument, one per axis, converts each with
+   RatioToFixed12 and divides by 360, then either STORES them into the
+   object's rotation vector (flag != 0) or ADDS them modulo a full turn
+   (flag == 0). Every constant this unit hands that slot is three of these,
+   and every one of them decodes to a plausible angle: see
+   ROTATION_YAW_180 / _PLUS45 / _MINUS45 and CARDINAL_ROTATIONS below. */
+```
+
+```c
+/* DreamSys::viewport is a Viewport (include/Viewport.h; tag only here,
+   DreamSys.c includes the header). Named heightCurve / DreamSysUnk5C until
+   track 4 (round 88); the offsets that view named are the Viewport's
+   GsRVIEW2 refView: +0x014 vp and +0x020 vr (the two "points"
+   ProjectPointAtDistance interpolates between), +0x018 vp.y and +0x024
+   vr.y (AdvanceMoveCycle's view bob moves both; StepLookOffset, StopDrift
+   and TickDrift move vr.y, i.e. look up and down). DayTask__Init installs
+   a New_NodeGuardedViewport through setViewport, and Entity__MoodCue74 calls its
+   setClearColor (+0x064). */
+```
+
+```c
+/* DreamSys::soundObj is a VabStreamObj (include/VabStreamObj.h): DreamSys.c
+   casts it there. StartVoice / ExecuteLink call playTone (+0x080; the voice
+   it returns goes to voiceIndex), StopVoice calls stopVoice (+0x084), and
+   StartVoice calls setPitchOffset (+0x09C). This header used to carry that
+   view as DreamSysUnk58 / DreamSysUnk58Vtable (deleted round 87, track 4). */
+```
+
+```c
+/* DreamSys__DreamSys's `arg1` is a LinkResource (include/LinkResource.h;
+   GameApplication__GameApplication passes New_LinkResource("ETC\DREAME5.TMD")): the
+   ctor keeps it in modelSource and adds its getModel(0), a TmdModel, as a
+   child. This header used to carry that view as DreamSysCtorArgObj /
+   DreamSysCtorArgMethods (deleted round 89, track 4). */
+```
+
+```c
+/* Actor::grid is the grid manager, StageMap (include/StageMap.h, track 4
+   round 89); DreamSys.c includes that header and calls it directly. */
+```
+
+```c
+/* A `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a` argument
+   by DreamSys__TickStaircaseCase2 (round 2026-09-02). */
+```
+
+```c
+/* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
+   argument by DreamSys__TickStaircaseCase0 -- same call shape as STAIRCASE_OFFSET_2 above, just a
+   different constant (round 2026-09-02). */
+```
+
+```c
+/* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
+   argument by DreamSys__TickStaircaseCase1 -- same call shape as STAIRCASE_OFFSET_0/STAIRCASE_OFFSET_2
+   above, just a different constant (round 2026-09-02). */
+```
+
+```c
+/* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
+   argument by DreamSys__TickStaircaseCase3 -- same call shape as STAIRCASE_OFFSET_2/STAIRCASE_OFFSET_0
+   above, just a different constant (round 2026-09-02). */
+```
+
+```c
+   DreamSys__TickStaircaseCase2. Typed RotationRatios round 66: its three
+   {numerator, denominator} words are {0,1} {0x2D,1} {0,1}, byte-identical in
+   form to ROTATION_YAW_180 and to every CARDINAL_ROTATIONS entry. */
+```
+
+```c
+/* 3x3 lookup table indexed by [dynamicClass][upperClass], each axis
+   classified into {0,1,2} by CalcDreamColor first (round 2026-08-30-d). */
+```
+
+```c
+    /* Set unconditionally to the constructor's `arg1` by DreamSys__DreamSys
+	   (round 2026-09-02): the LinkResource its model 0 came from. No other
+	   observed use in this unit's queued functions. */
+```
+
+```c
+    /* Read by DreamSys__TickMove; compared against 0 / 1, else-branch otherwise.
+	   Meaning unidentified beyond that (round 2026-08-30). */
+```
+
+```c
+    /* Set unconditionally to arg1 by DreamSys__SelectCallback80(this, arg1); no other
+	   observed use (round 2026-08-30). */
+```
+
+```c
+    /* Index into the (LOOK_OFFSET_STEPS, LOOK_OFFSET_LIMITS) delta/threshold table pair,
+	   consumed and reset to 0 by DreamSys__StepLookOffset (round 2026-08-30). */
+```
+
+```c
+    /* Running accumulator nudged by lookOffsetCommand's table entry, or decayed by
+	   600/call towards 0 when lookOffsetCommand is 0; also propagated into
+	   viewport->refView.vr.y. Set by DreamSys__StepLookOffset (round 2026-08-30). */
+```
+
+```c
+    /* Index into the (LOOK_YAW_STEPS, LOOK_YAW_LIMITS) delta/threshold table pair,
+	   consumed and reset to 0 by DreamSys__StepLookYaw (round 2026-08-30). */
+```
+
+```c
+    /* Running delta accumulator paired with lookYawCommand; see DreamSys__StepLookYaw
+	   (round 2026-08-30). */
+```
+
+```c
+    /* Set by DreamSys__SelectCallback80(this, arg1) exactly like lookCallback, but from
+	   a *different* trio of vtable slots. Called with (this) by
+	   DreamSys__RunTickCallbacks, if non-NULL. */
+```
+
+```c
+    /* "Mode" field read/written by DreamSys__SelectCallback98(this, arg1): when ==2 on
+	   entry, this->methods->stopDrift(this, 0) fires first; then it is set
+	   unconditionally to arg1 (round 2026-08-30). */
+```
+
+```c
+    /* (this->moveCommand ^ 1) < 1u, i.e. (moveCommand == 1), written by
+	   DreamSys__StepLookYaw; also toggled/incremented by DreamSys__FlipMoveCommand and forced
+	   to 1 by DreamSys__TickMoveForced (round 2026-08-30). */
+```
+
+```c
+    /* Index into the 12-byte-stride TURN_ROTATIONS table; consumed and reset
+	   to 0 by DreamSys__ApplyPendingTurn (round 2026-08-30-b). */
+```
+
+```c
+    /* (moveCommand == 1) as computed by DreamSys__StepLookYaw; unconditionally cleared
+	   to 0 by DreamSys__FlipMoveCommand on every call (round 2026-08-30). */
+```
+
+```c
+    /* "Current" value; DreamSys__RestorePreviousMoveMode overwrites this with previousMoveMode.
+	   DreamSys__GetSetMoveMode's bounds-checked setter (vtable +0x180) writes both
+	   this and previousMoveMode together; DreamSys__ChangeMoveMode copies the OLD value of
+	   this into previousMoveMode before overwriting it, when the new value
+	   differs (round 2026-08-30-b). */
+```
+
+```c
+    /* "Previous"/paired value; see moveMode (round 2026-08-30-b). */
+```
+
+```c
+	   moveMode) to force moveCommand back to 0 (round 2026-09-02). */
+```
+
+```c
+    /* Derived from `linkTarget->flags36` masked to 0x7F, or forced to
+	   0 (if >= 0x18) or 2 (if `state == 15` and this is still 0)
+	   by DreamSys__NotifyLinkAttempt's `arg1 == -1` path (round 2026-09-02). Also an index:
+	   DreamSys__StartVoice (round 2026-09-06) does nothing when this is 0, else
+	   uses it to index VOICE_BY_SELECT/VOICE_PITCH_BY_SELECT (see those externs), compares
+	   it against 0x16 (22) to decide whether to keep or discard
+	   voiceIndex's new value, and against 0xB (11) to gate two extra vtable
+	   calls. */
+```
+
+```c
+    /* Gate flag: DreamSys__StopVoice runs its body (a call through
+	   soundObj's stopVoice (+0x084), then resets this to -1) only while this is
+	   >= 0 (round 2026-08-30-b). */
+```
+
+```c
+    /* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside cueServiceActive and
+	   moveCallback (round 2026-08-30). */
+```
+
+```c
+    /* Set to 1 by DreamSys__SelectCallback98's arg1==2 case, alongside driftActive
+	   (round 2026-08-30). */
+```
+
+```c
+    /* tickBoundary/0x128/0x12C/0x130 are also bounds-checked-set as a group of
+	   four by DreamSys__SetGateFlags (vtable +0x18C): each is overwritten with the
+	   corresponding argument only when that argument is >= 0
+	   (round 2026-08-30-b). */
+```
+
+```c
+    /* Set (whole word) by DreamSys__TryStageTimerLink to GetStageLinkAngle()'s return value,
+	   right before an ExecuteLink (round 2026-09-02). */
+```
+
+```c
+    /* Gate flag read by DreamSys__SetMoveOverride (round 2026-08-30-b): when nonzero
+	   (reusing the SAME loaded value, not a fresh 0/1 test), forwarded as
+	   SceneNode__UpdateRotation's arg2 -- cast from s32 to void*, not dereferenced. */
+```
+
+```c
+    /* Zeroed (whole word) by DreamSys__TryStageTimerLink alongside enterRotation
+	   (round 2026-09-02). */
+```
+
+```c
+/* Table triple for Test4TunnelLinks (round 2026-08-30-d), same roles as the
+   STAGE_PERMALINK_* triple above but for tunnel links specifically. */
+```
+
+```c
+/* Table triple for Test4StaircaseNodes (round 2026-08-30-d). */
+```

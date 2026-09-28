@@ -139,3 +139,16 @@ it looks redundant with the `goto` version.
 round 2026-08-30-b, runner ALPHA, address range `0x80058774`-`0x8005A1EC`
 (reshapes 1-5, stalled). Resolved round 2026-08-30-c, same runner, address
 range widened to the whole unit (reshape 6, matched).
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* @brief Allocates and constructs a DreamSys instance.
+ * Still INCLUDE_ASM in src/DreamSys.c; declared here so other units'
+ * matched C (e.g. GameApplication__GameApplication in src/GameApplicationFileResource.c) can call it -- see
+ * "Calling into a function that is still INCLUDE_ASM in another unit is
+ * fine" in docs/DECOMPILATION_LEARNINGS.md. */
+```

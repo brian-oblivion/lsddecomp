@@ -163,3 +163,22 @@ round 2026-09-02, runner ALPHA, unit DreamSys.
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+    /* The struct previously ended here (0x890), but New_DreamSys allocates
+	   sizeof(DreamSys) via a literal `ori $a0, $zero, 0x928` -- 0x98 bytes
+	   more than any field so far discovered accounts for. Extended to the
+	   allocator's real size (round 2026-08-30-b); the four words
+	   DreamSys__ResetSessionState clears are named, the rest of the tail is still
+	   unclaimed. The first 0x78 bytes of that tail are a save/restore
+	   scratch buffer for the coordinate: DreamSys__SaveLinkSnapshot copies
+	   *coord2 (the 0x50-byte GsCOORDINATE2) then *coord2->param (the
+	   0x28-byte GsCOORD2PARAM) into these two fields;
+	   DreamSys__RestoreLinkSnapshot copies them back and then clears
+	   coord2->flg (round 2026-09-02; SceneNode's own types, track 4). */
+```

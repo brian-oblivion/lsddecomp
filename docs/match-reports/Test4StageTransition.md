@@ -145,3 +145,17 @@ round 43, runner ALPHA, unit DreamSys.
 ## Naming
 
 - **Tier B.** Same family shape as the already-named TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/Test4InstantTeleporters (a PlayerSpawnPoint-in, stage-out test used by DreamSys__TryStageTimerLink), but unlike its siblings it does not consult a trigger table -- it applies stage/position/timer-parity rules directly and always produces a spawn via GetRandomSpawnFromStage when they hold.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* Called by DreamSys__TryStageTimerLink as (&this->linkCoordinates, this->currentStage,
+   currentPos, this->tick); result compared with `bltz` exactly like
+   TestForStaticLink's call site, so s32 (round 2026-09-02). MATCHED, defined
+   later in this unit's own ROM order -- this is a forward declaration, not a
+   cross-unit prototype (the gp-relative blocker this was once filed under is
+   resolved; see docs/match-reports/Test4StageTransition.md). */
+```

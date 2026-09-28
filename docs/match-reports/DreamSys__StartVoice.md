@@ -617,3 +617,19 @@ Replaced in the source by a comment that says what the code does; kept here as w
    (rebuilding the "obvious" simpler form) reproduces a real, measured
    regression -- see docs/match-reports/DreamSys__StartVoice.md. */
 ```
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* Byte tables indexed by DreamSys::voiceSelect (already bounded to [0,0x18) at
+   the write site -- see that field's own comment). DreamSys__StartVoice
+   (round 2026-09-06) reads both: VOICE_BY_SELECT[voiceSelect] (values 0..0x1E) feeds
+   VabStreamObj playTone's `index` argument (program << 4, tone 0);
+   VOICE_PITCH_BY_SELECT[voiceSelect] (values include -2..2, hence `s8` not `u8`) feeds
+   setPitchOffset's `octave` argument directly. VOICE_PITCH_BY_SELECT's real extent is exactly
+   these 24 bytes -- the trailing zero bytes splat lumped into its dlabel
+   belong to the gProjectOffsetZ vector documented above, not to this table. */
+```

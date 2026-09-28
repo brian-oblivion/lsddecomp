@@ -138,3 +138,19 @@ command is what it takes, and applying it may mean linking instead of moving.
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* Consumed by DreamSys__ApplyMoveCommand (round 2026-09-06), both indexed by that
+```
+
+```c
+    /* Compared with an UNSIGNED `< 1` (sltiu) by DreamSys__ApplyMoveCommand (round
+	   2026-09-06) -- typed `u32` rather than `s32` to reproduce that,
+	   confirmed safe since its only two writers (round 2026-08-30) both
+	   set it to the literal 0. */
+```

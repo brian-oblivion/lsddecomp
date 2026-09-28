@@ -731,3 +731,20 @@ Replaced in the source by a comment that says what the code does; kept here as w
        set. Every earlier body passing `this` directly was one word short
        (round 73). */
 ```
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* One 12-byte-stride RotationRatios array that splat had to split across two
+   labels, because DreamSys__StepLookYaw references its SECOND word (entry
+   0's yaw numerator, which it overwrites with its own per-tick delta) while
+   DreamSys__ApplyPendingTurn address-takes whole entries. The round-2026-08-30-b
+   note here read the 4-byte and 12-byte views as "likely two unrelated
+   globals"; they are one table, and the data says so -- entry 0 is
+   (0 deg, 45 deg, 0 deg) with the 45 being exactly the +-0x2D
+   DreamSys__StepLookYaw writes, entry 1 is (0, -6, 0) and entry 2 is
+   (0, +6, 0), which are DreamSys::turnCommand's two values 1 and 2. */
+```

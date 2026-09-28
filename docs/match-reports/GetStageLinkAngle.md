@@ -102,3 +102,16 @@ Replaced in the source by a comment that says what the code does; kept here as w
    ExecuteLink; only ever address-taken here, never dereferenced by this
    unit's queued functions. */
 ```
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* Called by DreamSys__TryStageTimerLink with NO arguments (the disassembly's call site has
+   an empty delay slot and no a0-a3 setup); its return value is stored whole
+   into this->stageLinkAngle, hence s32 (round 2026-09-02). MATCHED, defined later
+   in this unit's own ROM order -- forward declaration only (gp-relative
+   blocker resolved; see docs/match-reports/GetStageLinkAngle.md). */
+```

@@ -58,3 +58,16 @@ the same units as `DreamSys__GetSetDreamTimeLimit`, granted by the teleport. The
 body gives 10 of those units when the teleporter was on stage 0 and none
 otherwise. Tier B: the mechanics (a time bonus that depends on the source
 stage) are established; why stage 0 alone earns it is not.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* Called by DreamSys__TryInstantTeleportLink with NO arguments, same shape as GetStageLinkAngle
+   above; return value is forwarded straight into ExecuteLink's stage-type
+   argument, hence s32 (round 2026-09-02). MATCHED, defined later in this
+   unit's own ROM order -- forward declaration only (gp-relative blocker
+   resolved; see docs/match-reports/GetTeleportTimeBonus.md). */
+```

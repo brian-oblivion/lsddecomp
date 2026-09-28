@@ -72,3 +72,17 @@ queue).
 ## Naming
 
 - **Tier B.** Near-identical body to DreamSys__CheckTunnelHeading, differing only in which per-stage heading table it indexes (STAIRCASE_ENTER_HEADINGS/STAIRCASE_EXIT_HEADINGS here); called from DreamSys__TryStaircaseLink.
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* Called by DreamSys__TryStaircaseLink as (&this->exitRotation, &this->enterRotation, &local) --
+   identical call shape to DreamSys__CheckTunnelHeading above (same `local` buffer, same two
+   `this` fields), so the same signature. MATCHED, defined later in this
+   unit's own ROM order -- forward declaration only (the gp-relative and
+   addiu_at blockers this was once filed under are both resolved; see
+   docs/match-reports/DreamSys__CheckStaircaseHeading.md). */
+```

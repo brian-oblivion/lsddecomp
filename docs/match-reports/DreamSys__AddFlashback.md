@@ -108,3 +108,28 @@ effect) is a cheaper first move than reshaping the *variables*, but when it
 doesn't move a whole-function register swap, reshaping the variable count
 is the next lever, not a `register T v asm("$N")` pin (which would still be
 banned here regardless).
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* pitch/heading/roll grouped into one 12-byte nested struct (round
+   2026-09-02, DreamSys__AddFlashback): that function block-copies all
+   three from its `angles` argument in ONE retail load-all-then-store-all
+   sequence (six unaligned lwl/lwr loads, all before any of the six
+   unaligned swl/swr stores) -- the same "whole-struct assignment, not a
+   per-word copy" idiom already documented for other block moves in this
+   project. A per-field or looped copy would not reproduce that
+   instruction ordering. */
+```
+
+```c
+    /* Was `s32`; retyped (round 2026-09-02): DreamSys__AddFlashback writes
+	   it with a bare `sh` (halfword store) from an `s32` argument, which
+	   only makes sense if the field itself is 2 bytes -- an `s32` field
+	   fed by an `s32` argument would store all 4 bytes (`sw`), not 2. The
+	   remaining 2 bytes before `day` are ordinary C struct alignment
+	   padding, not a separate field. */
+```

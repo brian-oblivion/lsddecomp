@@ -180,3 +180,17 @@ Replaced in the source by a comment that says what the code does; kept here as w
    in DreamSys__SetMoveOverride, DreamSys__SpawnAtLink and
    DreamSys__TryStaircaseLink. */
 ```
+
+## History (moved from include/DreamSys.h, round 102)
+
+Comment text moved verbatim out of the header, which now says only
+what the code is.
+
+```c
+/* Called by DreamSys__TryTunnelLink as (&this->exitRotation, &this->enterRotation, &local) --
+   same `local` buffer SceneNode__GetRotationDegrees fills above; result used as a truth
+   value (`beqz`), so s32 (round 2026-09-02). MATCHED, defined later in
+   this unit's own ROM order -- forward declaration only (the gp-relative
+   and addiu_at blockers this was once filed under are both resolved; see
+   docs/match-reports/DreamSys__CheckTunnelHeading.md). */
+```
