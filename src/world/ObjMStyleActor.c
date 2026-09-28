@@ -1239,8 +1239,8 @@ void ApplyStyleDecorationIfSet(void) {
 /* The decoration set: this many BoxFill bands, stacked 3 pixels apart. */
 #define STYLE_DECOR_BANDS 18
 
-/* Every band's draw priority: the largest value BoxFill's default 13-bit
- * priority mask admits (BoxFill__Reset calls setMask(13)). */
+/* Every band's draw priority, which Viewport__DrawNode hands to
+ * GsSortBoxFill unmasked. */
 #define STYLE_DECOR_PRI 0x1FFF
 
 /* How far down (pixels) decor variant 2 draws the set. */

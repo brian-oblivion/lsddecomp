@@ -78,8 +78,8 @@ typedef struct BoxFillPos BoxFillPos;
  * size argument, setSize's and FadeBox's pushPosition's. Each word is stored
  * into the u16 boxW/boxH, which reads only its low halfword (lhu at +0x000
  * and +0x004). The callers pass two-word arrays and pairs of their own
- * (sListViewSize, sGraphPointSize, sStyleDecorBoxSize, ObjMStyleActor's
- * PairXY), so New_BoxFill and the ctor slot take `void *` and setSize
+ * (sListViewSize, sGraphPointSize, sStyleDecorBoxSize, and ObjMStyleActor's
+ * BoxFillSize copied from sStyleDecorSizeW), so New_BoxFill and the ctor slot take `void *` and setSize
  * `s32 *`. The same layout as BoxFillPos, which is a position. */
 struct BoxFillSize {
     s32 w; /* +0x000 */
@@ -133,7 +133,7 @@ struct BoxFillPos {
     /* +0x062 */ u16 boxH;         /* GsBOXF.h */                                                  \
     /* +0x064 */ u8 color[3];      /* GsBOXF.r, g, b: setColor (Reset's default sBoxFillDefaultColor) */     \
     /* +0x067 */ u8 pad67;                                                                         \
-    /* +0x068 */ s32 mask          /* setMask. The object is 0x6C bytes (New_BoxFill) */
+    /* +0x068 */ s32 mask          /* setMask; read only by FadeBox's configure (maskPerTick). The object is 0x6C bytes (New_BoxFill) */
 /* clang-format on */
 
 struct BoxFillMethods {
