@@ -15,7 +15,7 @@ Retail:
 ```
 beqz  $a0, .L8002C45C
 nop
-lw    $v0, %gp_rel(gNullDriverModeArg)($gp)
+lw    $v0, %gp_rel(sNullDriverModeArg)($gp)
 nop
 sw    $v0, 0x0($a0)
 .L8002C45C:
@@ -24,18 +24,18 @@ jr    $ra
 nop
 ```
 
-If the argument pointer is non-NULL, store `gNullDriverModeArg` through it; either
+If the argument pointer is non-NULL, store `sNullDriverModeArg` through it; either
 way, return `sNullDriverMode`. Same two globals `SetNullDriverMode` (already matched,
 just below in ROM order) writes through plain assignment -- this is the
 paired reader. Written as an ordinary conditional store plus return:
 
 ```c
 extern s32 sNullDriverMode;
-extern s32 gNullDriverModeArg;
+extern s32 sNullDriverModeArg;
 
 s32 GetNullDriverMode(s32 *arg0) {
     if (arg0 != NULL) {
-        *arg0 = gNullDriverModeArg;
+        *arg0 = sNullDriverModeArg;
     }
     return sNullDriverMode;
 }
@@ -69,9 +69,9 @@ Renamed `func_8002C448` -> `GetNullDriverMode`, tier B. Evidence:
 `GameApplicationFileResource.c`'s own `func_80026FAC` calls `GetCdDriverMode()` when
 `sActiveDataSource == 0x13`, else calls this function -- a direct,
 call-site-level substitution for a named Sony "get driver mode" accessor,
-confirming this backend's own `sNullDriverMode`/`gNullDriverModeArg` pair
+confirming this backend's own `sNullDriverMode`/`sNullDriverModeArg` pair
 serves the same role for the SPU/VAB data source. Not tier A: the exact
-in-game reason `gNullDriverModeArg` exists (a second word alongside the mode
+in-game reason `sNullDriverModeArg` exists (a second word alongside the mode
 itself) is not established, only that it's read/written alongside the mode.
 
 ## Extern arity (round 59)

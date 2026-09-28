@@ -8,7 +8,7 @@
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- two stores to `sNullDriverMode`/`gNullDriverModeArg` and `return 1`. The C is in `src/sound/PlacementGridVabSound.c`. Everything below is the
+> the live tests -- two stores to `sNullDriverMode`/`sNullDriverModeArg` and `return 1`. The C is in `src/sound/PlacementGridVabSound.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
