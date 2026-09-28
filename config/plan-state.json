@@ -1639,6 +1639,7 @@
         "globals": true,
         "layout": true,
         "nonmatching-clean": true,
+        "readme": true,
         "style": true
       },
       "reason": "",
