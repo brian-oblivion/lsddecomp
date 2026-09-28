@@ -3251,14 +3251,14 @@ VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
 /* VariantSprite's two texture cells, forwarded as the Sprite ctor's `rect`
  * (Sprite__Reset copies it into Sprite.rect): u,v = (0x00,0x20) and
  * (0x10,0x20), 16x16. */
-extern SpriteRect gVariantSpriteCells[2];
+extern SpriteRect sVariantSpriteCells[2];
 
 /* Sprite's ctor with the variant's cell, then this class's table, and the
  * reset slot (VariantSprite__SetVariantClut) with the variant, through
  * VariantSpriteResetFn. Returns nothing: it ends in that call and sets no
  * $v0. */
 void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetArg, void *texture) {
-    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &gVariantSpriteCells[variant], resetArg, 0);
+    GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &sVariantSpriteCells[variant], resetArg, 0);
     self->methods = GetVariantSpriteMethods();
     self->unkA4 = 0;
     ((VariantSpriteResetFn)self->methods->reset)(self, variant);

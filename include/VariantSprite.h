@@ -6,7 +6,7 @@
 /*
  * VariantSprite -- a world-space sprite (Sprite, include/Sprite.h) that comes
  * in two variants, and the variant is the whole of what it adds: `variant`,
- * 0 or 1, picks the texture cell the Sprite ctor binds (gVariantSpriteCells,
+ * 0 or 1, picks the texture cell the Sprite ctor binds (sVariantSpriteCells,
  * two adjacent 16x16 cells) and the CLUT the reset slot then points the
  * GsSPRITE at (gVariantSpriteClutX/Y, two adjacent 16-colour rows at
  * VRAM y 0x1FF). Class id 0x1F44: its low 12 bits are not 0x144, so

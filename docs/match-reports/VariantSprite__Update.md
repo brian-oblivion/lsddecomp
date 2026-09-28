@@ -21,7 +21,7 @@ The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
-(`gVariantSpriteCells`) and the CLUT row the reset slot sets
+(`sVariantSpriteCells`) and the CLUT row the reset slot sets
 (`gVariantSpriteClutX/Y`). What the sprites are in the game is not
 established (their only builder is StyleEffect, kinds 2 and 3, and every
 path passes variant 0), which is why it is not tier A. The table, getter,
