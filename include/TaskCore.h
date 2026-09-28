@@ -233,7 +233,7 @@ struct TaskCore {
 };
 
 extern TaskCoreMethods gTaskCoreMethods;
-extern TaskCoreMethods *Get_vtable_TaskCore(void); /* returns &gTaskCoreMethods */
+extern TaskCoreMethods *GetTaskCoreMethods(void); /* returns &gTaskCoreMethods */
 
 TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound);
 void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankPath, BasicClass *sound);

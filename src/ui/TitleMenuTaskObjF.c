@@ -157,8 +157,7 @@ TitleMenu *New_TitleMenu(struct DreamSys *dreamSys) {
 void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
     VabStreamObj *sound;
 
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, &sTitleMenuTarget,
-                                (char *)sTitleMenuSoundBankPath, NULL);
+    GetTaskCoreMethods()->ctor((TaskCore *)self, &sTitleMenuTarget, (char *)sTitleMenuSoundBankPath, NULL);
     self->methods = GetTitleMenuMethods();
     sound = (VabStreamObj *)self->sound;
     sound->methods->setPitchOffset(sound, -1); /* 36 semitones down */
@@ -228,11 +227,11 @@ void TitleMenu__Finalize(TitleMenu *self) {
         self->saveCtrl->methods->release(self->saveCtrl);
         self->saveIcon->methods->release(self->saveIcon);
     }
-    Get_vtable_TaskCore()->finalize((TaskCore *)self);
+    GetTaskCoreMethods()->finalize((TaskCore *)self);
 }
 
 void TitleMenu__OnNotify(TitleMenu *self, BasicClass *sender, s32 event) {
-    Get_vtable_TaskCore()->onNotify((TaskCore *)self, sender, event);
+    GetTaskCoreMethods()->onNotify((TaskCore *)self, sender, event);
     if ((sender->methods->header & 0xF) == TASKOBJF_CLASS_ID) {
         self->methods->onCardEvent(self, sender, event);
     }
@@ -262,7 +261,7 @@ void TitleMenu__OnDeinit(TitleMenu *self) {
 }
 
 void TitleMenu__SetState(TitleMenu *self, s32 state) {
-    Get_vtable_TaskCore()->setState((TaskCore *)self, state);
+    GetTaskCoreMethods()->setState((TaskCore *)self, state);
     if (state == 5) {
         self->methods->refreshMenu(self, 0);
     }
@@ -276,7 +275,7 @@ void TitleMenu__SetState(TitleMenu *self, s32 state) {
 void TitleMenu__Tick(TitleMenu *self) {
     void (*fn)(TitleMenu *);
 
-    Get_vtable_TaskCore()->tick((TaskCore *)self);
+    GetTaskCoreMethods()->tick((TaskCore *)self);
     switch (self->activeSlot) {
         case TITLEMENU_FLASHBACK:
             self->result = 0;
@@ -302,7 +301,7 @@ void TitleMenu__Tick(TitleMenu *self) {
 void TitleMenu__RefreshViewValue(TitleMenu *self) {
     s32 shake;
 
-    Get_vtable_TaskCore()->refreshViewValue((TaskCore *)self);
+    GetTaskCoreMethods()->refreshViewValue((TaskCore *)self);
     shake = self->slotCounts[TITLEMENU_SHAKE];
     self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
 }
@@ -351,11 +350,11 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
 
 void TitleMenu__DestroySaveTitle(TitleMenu *self) {
     self->saveTitle->methods->release(self->saveTitle);
-    Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
+    GetTaskCoreMethods()->releaseTarget((TaskCore *)self);
 }
 
 void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
-    Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
+    GetTaskCoreMethods()->updateSlotElements((TaskCore *)self, parent);
     self->saveTitle->methods->attachToParent(self->saveTitle, (SceneNode *)parent,
                                              (LongVec3 *)&sSaveTitleOffset);
 }
@@ -377,7 +376,7 @@ void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
     u8 *channels;
 
     channels = (u8 *)&rgb;
-    Get_vtable_TaskCore()->broadcastToSlots((TaskCore *)self, (u8 *)color);
+    GetTaskCoreMethods()->broadcastToSlots((TaskCore *)self, (u8 *)color);
     if (self->inputMode != 0) {
         channels[0] = 0;
         channels[1] = 0;

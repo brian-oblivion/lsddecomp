@@ -38,7 +38,7 @@ SLPS_015.56`.
   &buf);` -- the IDENTICAL idiom already matched in this unit's own
   `TitleMenu__RefreshViewValue` (stack-buffer-out-parameter call on the same
   `DreamSysView_3bb8c_c::slot19C`), just without that function's own
-  leading `Get_vtable_TaskCore()->slot94(self)` base-class call.
+  leading `GetTaskCoreMethods()->slot94(self)` base-class call.
 - `self->methods->slot128(self)` -- the slot this round's `TitleMenu__LoadFromCard`
   established (single-argument, `self` only).
 - `self->unkA4->methods->slot1AC(self->unkA4)` -- a NEW slot on

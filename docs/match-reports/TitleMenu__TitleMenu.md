@@ -10,7 +10,7 @@
 
 The ctor (slot +0x008) for the new `TitleMenu` sibling class (allocated by
 `New_TitleMenu`, matched alongside this function). Chains to a base ctor
-(`Get_vtable_TaskCore()->slot08`, 4 args), installs this class's own vtable
+(`GetTaskCoreMethods()->slot08`, 4 args), installs this class's own vtable
 directly (rather than fetching it through another getter -- the base-class
 constructor chaining pattern already documented for
 `TaskCoreMethods::slotD8` in `include/Task.h`), tears down an object
@@ -28,7 +28,7 @@ void TitleMenu__TitleMenu(TitleMenu *self, void *dreamSys)
     DreamSysView_3bb8c_c *dream;
     TitleMenuUnk48Obj *obj;
 
-    Get_vtable_TaskCore()->slot08(self, &sTitleMenuTarget, &sTitleMenuSoundBankPath, 0);
+    GetTaskCoreMethods()->slot08(self, &sTitleMenuTarget, &sTitleMenuSoundBankPath, 0);
     self->methods = GetTitleMenuMethods();
     obj = self->unk48;
     obj->methods->slot9C(obj, -1);
@@ -77,10 +77,10 @@ presence anywhere in the project. Placed as one new block right before the
   does not edit that header -- kept local per this project's established
   independent-view convention.
 - `BaseTaskCtorTable_3bb8c_c`: this function's own local view of
-  `Get_vtable_TaskCore`'s return type, typing `slot08` (+0x008) as a 4-argument
+  `GetTaskCoreMethods`'s return type, typing `slot08` (+0x008) as a 4-argument
   call (`self, arg1, arg2, arg3`). **This is the SAME real global,
   `gTaskCoreMethods`, as `include/Task.h`'s already-established
-  `TaskCoreMethods`** (that header's own comment documents `Get_vtable_TaskCore`
+  `TaskCoreMethods`** (that header's own comment documents `GetTaskCoreMethods`
   returning `&gTaskCoreMethods`, and its `slot08` is independently confirmed
   3-argument-plus-self by a byte-exact call in `StreamTask__StreamTask`, matching
   THIS call site's arity exactly -- both units agree on the real arity
@@ -140,7 +140,7 @@ shape ("runs right after self->methods is installed") as
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

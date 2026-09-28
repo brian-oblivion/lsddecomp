@@ -14,7 +14,7 @@ void TitleMenu__Tick(TitleMenu *self)
 {
     void (*fn)(TitleMenu *);
 
-    Get_vtable_TaskCore()->slot90(self);
+    GetTaskCoreMethods()->slot90(self);
     switch (self->state) {
     case 1:
         self->unk38 = 0;
@@ -106,7 +106,7 @@ definitions were not edited.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

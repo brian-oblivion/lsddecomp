@@ -38,7 +38,7 @@ ties them to the same concrete class beyond the shared idiom):
   indirection: `self->unkC->unk0->methods->slot78(...)`.
 - `self->unk18` (`+0x018`, `TaskCoreObj *`): a per-instance object.
   **CORRECTED (later this round, by `TaskCore__OnInit`):** originally modeled
-  as sharing `TaskCoreMethods` itself (the class `Get_vtable_TaskCore()`'s
+  as sharing `TaskCoreMethods` itself (the class `GetTaskCoreMethods()`'s
   gTaskCoreMethods singleton belongs to), on the strength of `classtable.py
   gTaskCoreMethods` having non-null entries at the two offsets (`+0x074`,
   `+0x090`) called here. That agreement was coincidence, not evidence:

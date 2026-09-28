@@ -14,7 +14,7 @@ SHA1 matches retail. `funcdiff.py TitleMenu__OnNotify`: 35/35 words match.
 ```c
 void TitleMenu__OnNotify(TitleMenu *self, GenericHeaderObj_3bb8c_d *arg1, s32 arg2)
 {
-    Get_vtable_TaskCore()->slot38(self, arg1, arg2);
+    GetTaskCoreMethods()->slot38(self, arg1, arg2);
     if ((arg1->methods->header & 0xF) == 0xB) {
         self->methods->slot138(self, arg1, arg2);
     }
@@ -61,14 +61,14 @@ Renamed `func_8004D788` -> `TitleMenu__OnNotify`. **Tier B**: Forwards to the ba
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
 Renamed `TitleMenu__ForwardIfTagB` -> `TitleMenu__OnNotify` (tools/rename.py):
 it is the occupant of gTitleMenuMethods +0x038, BasicClass's `onNotify` slot,
 and its body is an onNotify override -- the base onNotify
-(IntermediateBase__OnNotify, through Get_vtable_TaskCore()), then this class's
+(IntermediateBase__OnNotify, through GetTaskCoreMethods()), then this class's
 own +0x138 (`onTagBValue`, TitleMenu__OnCardEvent) with the same
 (sender, event) when the SENDER's class-id low nibble is 0xB. Its parameters
 are now onNotify's: `BasicClass *sender` (the `GenericHeaderObj_3bb8c_d`

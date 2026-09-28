@@ -10,14 +10,14 @@
 
 Identical shape to `StreamTask__OnPadPrev` (see that report for the full
 derivation and the return-type discussion) one slot over: forwards to
-`Get_vtable_TaskCore()`'s (i.e. `gTaskCoreMethods`'s / `LoaderTaskMethods`'s) slot
+`GetTaskCoreMethods()`'s (i.e. `gTaskCoreMethods`'s / `LoaderTaskMethods`'s) slot
 `+0x084` instead of `+0x080`. Occupies `gStreamTaskMethods` slot `+0x084` itself.
 
 ## Derivation
 
 ```c
 void StreamTask__OnPadNext(StreamTaskObj *self) {
-    Get_vtable_TaskCore()->slot84(self);
+    GetTaskCoreMethods()->slot84(self);
 }
 ```
 
@@ -41,7 +41,7 @@ slot `+0x084`; identical pure up-call shape to
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87)
 

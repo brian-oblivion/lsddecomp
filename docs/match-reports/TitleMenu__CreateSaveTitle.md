@@ -72,7 +72,7 @@ SLPS_015.56`.
   (`src/ui/ScreenWidgets.c`, `u8 *DecodeFullWidthSjis(u8 *dst, u8 *src)`), return
   value unused here, so this unit's own local view stays `void`-returning
   per the project's independent-arities convention (same idiom already
-  used for `Get_vtable_TaskCore`/`BaseTaskCtorTable_3bb8c_c`).
+  used for `GetTaskCoreMethods`/`BaseTaskCtorTable_3bb8c_c`).
 - `self->nameField = (TitleMenuUnkB0Obj_3bb8c_d *) New_TextRow(arg1->unk4,
   size, buf);` -- `New_TextRow` is ALREADY declared, unconditionally, in
   this very header (`include/class_3bb8c.h`, a different unit's section)

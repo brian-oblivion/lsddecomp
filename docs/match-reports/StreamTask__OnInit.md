@@ -10,7 +10,7 @@
 
 ```c
 void StreamTask__OnInit(StreamTaskObj *self) {
-    Get_vtable_TaskCore()->slot4C(self);
+    GetTaskCoreMethods()->slot4C(self);
     self->unkA4 = 0;
     self->unkB4->methods->slot6C(self->unkB4, self->unkC0);
     if (self->unkB4->methods->slot40(self->unkB4, self->unkB8, self->unkBC, self->unkC4, self->unkC8) != 0) {
@@ -21,7 +21,7 @@ void StreamTask__OnInit(StreamTaskObj *self) {
 
 ## Evidence
 
-- `Get_vtable_TaskCore()->slot4C`: `TaskCoreMethods` slot `+0x04C`. `classtable.py
+- `GetTaskCoreMethods()->slot4C`: `TaskCoreMethods` slot `+0x04C`. `classtable.py
   gTaskCoreMethods` shows it occupied by `TaskCore__OnInit`, this unit's own (still
   queued, larger) function — confirms existence/arity, result discarded here
   so typed `void`.
@@ -77,7 +77,7 @@ than guess.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). The onInit up-call casts the slot to `void (*)(TaskCore *)`: IntermediateBase types onInit (self, s32, s32, s32) from init's call, and this call passes self alone.
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). The onInit up-call casts the slot to `void (*)(TaskCore *)`: IntermediateBase types onInit (self, s32, s32, s32) from init's call, and this call passes self alone.
 
 ## Track 4 (2026-09-26, round 87)
 

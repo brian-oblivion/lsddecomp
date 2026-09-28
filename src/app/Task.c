@@ -47,7 +47,7 @@ StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicCla
 
 void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soundBankPath,
                             BasicClass *sound, DrawRect *initData) {
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, target, soundBankPath, sound);
+    GetTaskCoreMethods()->ctor((TaskCore *)self, target, soundBankPath, sound);
     self->methods = GetStreamTaskMethods();
     if (initData != NULL) {
         self->initData = *initData;
@@ -61,7 +61,7 @@ void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soun
 
 void StreamTask__Finalize(StreamTask *self) {
     self->player->methods->release(self->player);
-    Get_vtable_TaskCore()->finalize((TaskCore *)self);
+    GetTaskCoreMethods()->finalize((TaskCore *)self);
 }
 
 void StreamTask__Reset(StreamTask *self) {
@@ -77,13 +77,13 @@ void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, s32 stre
     self->streamName = streamName;
     self->streamGroup = streamGroup;
     self->autoPlay = autoPlay;
-    Get_vtable_TaskCore()->init((TaskCore *)self, args, 0);
+    GetTaskCoreMethods()->init((TaskCore *)self, args, 0);
 }
 
 void StreamTask__OnInit(StreamTask *self) {
     /* IntermediateBase's onInit slot names init's (0, 0, 0); TaskCore__OnInit
      * takes self alone, and this up-call passes nothing else. */
-    ((void (*)(TaskCore *))Get_vtable_TaskCore()->onInit)((TaskCore *)self);
+    ((void (*)(TaskCore *))GetTaskCoreMethods()->onInit)((TaskCore *)self);
     self->playDone = 0;
     self->player->methods->setAutoPlay(self->player, self->autoPlay);
     if (self->player->methods->play(self->player, (char *)self->streamName, self->streamGroup,
@@ -93,7 +93,7 @@ void StreamTask__OnInit(StreamTask *self) {
 }
 
 void StreamTask__Update(StreamTask *self, BasicClass *sender, s32 event) {
-    Get_vtable_TaskCore()->update((TaskCore *)self, sender, event);
+    GetTaskCoreMethods()->update((TaskCore *)self, sender, event);
     if (self->playDone != 0) {
         return;
     }
@@ -108,7 +108,7 @@ void StreamTask__Update(StreamTask *self, BasicClass *sender, s32 event) {
 }
 
 void StreamTask__SetState(StreamTask *self, s32 state) {
-    Get_vtable_TaskCore()->setState((TaskCore *)self, state);
+    GetTaskCoreMethods()->setState((TaskCore *)self, state);
     switch (state) {
         case TASKCORE_STATE_ACTIVE:
             self->fadingOut = 0;
@@ -135,7 +135,7 @@ void StreamTask__SetFrameBound(StreamTask *self, s32 bound) {
 }
 
 void StreamTask__OnPadConfirm(StreamTask *self) {
-    Get_vtable_TaskCore()->onPadConfirm((TaskCore *)self);
+    GetTaskCoreMethods()->onPadConfirm((TaskCore *)self);
     if (self->skipOnConfirm != 0) {
         self->result = STREAMTASK_RESULT_SKIPPED;
         self->methods->setState(self, STREAMTASK_STATE_SKIPPED);
@@ -143,11 +143,11 @@ void StreamTask__OnPadConfirm(StreamTask *self) {
 }
 
 void StreamTask__OnPadPrev(StreamTask *self) {
-    Get_vtable_TaskCore()->onPadPrev((TaskCore *)self);
+    GetTaskCoreMethods()->onPadPrev((TaskCore *)self);
 }
 
 void StreamTask__OnPadNext(StreamTask *self) {
-    Get_vtable_TaskCore()->onPadNext((TaskCore *)self);
+    GetTaskCoreMethods()->onPadNext((TaskCore *)self);
 }
 
 void StreamTask__NoOpSlot88(void) {}
@@ -191,7 +191,7 @@ TaskCore *New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *
 
     self = BMemPMgrAlloc(sizeof(TaskCore));
     if (self != NULL) {
-        Get_vtable_TaskCore()->ctor(self, target, soundBankPath, sound);
+        GetTaskCoreMethods()->ctor(self, target, soundBankPath, sound);
         return self;
     }
     return NULL;
@@ -203,8 +203,8 @@ void TaskCore__TaskCore(TaskCore *self, TaskCoreTarget *target, char *soundBankP
     TaskCoreMethods *methods;
 
     GetIntermediateBaseMethods()->ctor((IntermediateBase *)self);
-    /* MATCHING: one Get_vtable_TaskCore() call; a second one for setTarget adds a jal. */
-    methods = Get_vtable_TaskCore();
+    /* MATCHING: one GetTaskCoreMethods() call; a second one for setTarget adds a jal. */
+    methods = GetTaskCoreMethods();
     self->methods = methods;
     methods->setTarget(self, target);
     if (soundBankPath != NULL) {
@@ -1140,7 +1140,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
 /* Section 3. IntermediateBase's methods, the start of Viewport's, and
  * three accessors ahead of them.
  *
- * TaskCore__GetActiveSlotCount, Get_vtable_TaskCore and
+ * TaskCore__GetActiveSlotCount, GetTaskCoreMethods and
  * GetDefaultMovieFrame come first: one TaskCore method and two plain
  * accessors for data used far more widely (Task.c, ObjMStyleActor.c).
  *
@@ -1161,7 +1161,7 @@ s32 TaskCore__GetActiveSlotCount(TaskCore *self) {
     return self->slotCounts[self->activeSlot];
 }
 
-TaskCoreMethods *Get_vtable_TaskCore(void) {
+TaskCoreMethods *GetTaskCoreMethods(void) {
     return &gTaskCoreMethods;
 }
 

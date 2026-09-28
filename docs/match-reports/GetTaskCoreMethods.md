@@ -1,4 +1,6 @@
-# Get_vtable_TaskCore — MATCH (4/4 words)
+# GetTaskCoreMethods — MATCH (4/4 words)
+
+> Renamed from `Get_vtable_TaskCore` on 2026-09-28 (tools/rename.py). Address 0x8003dfbc.
 
 > Renamed from `func_8003DFBC` on 2026-09-19 (tools/rename.py). Address 0x8003dfbc.
 
@@ -17,7 +19,7 @@ returns its address, so it is declared here as an opaque `u8[]`.
 ```c
 extern u8 gTaskCoreMethods[];
 
-void *Get_vtable_TaskCore(void)
+void *GetTaskCoreMethods(void)
 {
     return gTaskCoreMethods;
 }
@@ -30,7 +32,7 @@ first build.
 
 ## Naming
 
-**Get_vtable_TaskCore** (renamed from `func_8003DFBC`, round 55, runner alpha).
+**GetTaskCoreMethods** (renamed from `func_8003DFBC`, round 55, runner alpha).
 Tier A: pure leaf getter, returns `&gTaskCoreMethods` (formerly `D_8006E730`).
 Already independently declared and named `TaskCoreMethods *func_8003DFBC(void)`
 in `include/Task.h` (that unit's own richer local view of the same

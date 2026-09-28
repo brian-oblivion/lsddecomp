@@ -14,7 +14,7 @@ call `self->methods->slot60(self, 0x12)`.
 
 ```c
 void StreamTask__OnPadConfirm(StreamTaskObj *self) {
-    Get_vtable_TaskCore()->slot78(self);
+    GetTaskCoreMethods()->slot78(self);
     if (self->unkCC != 0) {
         self->unk38 = 2;
         self->methods->slot60(self, 0x12);
@@ -24,7 +24,7 @@ void StreamTask__OnPadConfirm(StreamTaskObj *self) {
 
 ## Evidence
 
-- `Get_vtable_TaskCore()` returns `&gTaskCoreMethods` (`TaskCoreMethods`, established
+- `GetTaskCoreMethods()` returns `&gTaskCoreMethods` (`TaskCoreMethods`, established
   elsewhere in `Task.h`). `tools/classtable.py gTaskCoreMethods` shows slot
   `+0x078 = TaskCore__OnPadConfirm` (a different unit, not touched here — only the
   slot's existence and signature matter for this call site).
@@ -56,7 +56,7 @@ the other side), so left `Class__func_xxxxx`.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). StreamTaskObj now expands TASKCORE_FIELDS: +0x038 is `result`.
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). StreamTaskObj now expands TASKCORE_FIELDS: +0x038 is `result`.
 
 ## Track 4 (2026-09-26, round 87)
 

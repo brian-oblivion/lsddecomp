@@ -18,7 +18,7 @@ s32 GraphRoom__Init(D_80087AACObj *self, void *arg1, void *arg2);
 ```c
 s32 GraphRoom__Init(D_80087AACObj *self, void *arg1, void *arg2) {
     s32 result;
-    Get_vtable_TaskCore()->slot44(self, arg1, arg2);
+    GetTaskCoreMethods()->slot44(self, arg1, arg2);
     result = 2;
     if (self->unk_0x238 == 0) {
         result = self->unk_0x38;
@@ -27,14 +27,14 @@ s32 GraphRoom__Init(D_80087AACObj *self, void *arg1, void *arg2) {
 }
 ```
 
-Calls the shared base-class table's own `+0x044` slot (`Get_vtable_TaskCore()`,
+Calls the shared base-class table's own `+0x044` slot (`GetTaskCoreMethods()`,
 this unit's own local view -- a plain no-argument getter established
 elsewhere, e.g. `include/Task.h`), then returns `self->unk_0x38` if
 `self->unk_0x238 == 0`, else the literal `2`.
 
 ## Shape note
 
-`s32 result = 2;` declared BEFORE the `Get_vtable_TaskCore()->slot44(...)`
+`s32 result = 2;` declared BEFORE the `GetTaskCoreMethods()->slot44(...)`
 call scored 26/29 -- retail reloads a fresh `v1` after the call rather
 than keeping `2` live across it in a callee-saved register. Assigning
 `result = 2;` AFTER the call (same value, same variable, just moved past
@@ -65,7 +65,7 @@ strong enough to name past that -- kept `func_`.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__func_80058390` -> `GraphRoom__Init`
 

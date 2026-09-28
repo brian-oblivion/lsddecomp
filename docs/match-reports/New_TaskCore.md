@@ -19,7 +19,7 @@ TaskCoreObj *New_TaskCore(s32 a1, s32 a2, s32 a3)
 
     self = BMemPMgrAlloc(0xA4);
     if (self != NULL) {
-        Get_vtable_TaskCore()->slot08(self, a1, a2, a3);
+        GetTaskCoreMethods()->slot08(self, a1, a2, a3);
         return self;
     }
     return NULL;

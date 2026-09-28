@@ -72,7 +72,7 @@ the whole image after any further edit there.)
   genuinely 2-parameter function (`Ctx678_3bb8c_c *ctx, Result678_3bb8c_c
   *out`). This call site sets up a THIRD argument (`self->unkA4` in `$a2`)
   that unit's own signature never receives -- the same independent-arities
-  situation already on file for `Get_vtable_TaskCore`/`BaseTaskCtorTable_
+  situation already on file for `GetTaskCoreMethods`/`BaseTaskCtorTable_
   3bb8c_c` vs. `TaskCoreMethods` (`include/Task.h`). This unit's own
   local 3-argument extern matches what THIS call site actually needs;
   TitleMenuTaskObjF.c's 2-argument declaration is untouched. (`include/class_
@@ -166,7 +166,7 @@ Comment moved here from the unit: UpdateFlashbackLock is matched in
 src/ui/TitleMenuTaskObjF.c as a 2-argument function, but this call site sets up
 a 3rd argument (self->dreamSys in $a2) that the definition never
 receives; the same independent-arities situation was documented for
-Get_vtable_TaskCore until round 84. The extern's arity-ok note said: the
+GetTaskCoreMethods until round 84. The extern's arity-ok note said: the
 callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the
 3rd argument is byte-load-bearing here: retail emits `lw a2,164(s0)` at
 0x8004DE74.

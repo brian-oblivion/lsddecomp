@@ -60,7 +60,7 @@ void GraphRoom__PopulateGraphPoints(D_80087AACObj *self, void *arg1) {
     Point2 point;
     Point2 firstPoint;
 
-    Get_vtable_TaskCore()->slotE0(self, arg1);
+    GetTaskCoreMethods()->slotE0(self, arg1);
     result = self->unk_0xA4->methods->slot1B0(self->unk_0xA4, 0);
     self->unk_0x238 = GraphRoom__ScoreDayLog(self, result);
 
@@ -209,7 +209,7 @@ identity evidence.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-25, round 85, charlie)
 

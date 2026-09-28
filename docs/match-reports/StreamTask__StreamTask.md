@@ -15,7 +15,7 @@ comment that named this function as the ctor reached through
 
 ```c
 void StreamTask__StreamTask(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamTaskInitData *a4) {
-    Get_vtable_TaskCore()->slot08(self, a1, a2, a3);
+    GetTaskCoreMethods()->slot08(self, a1, a2, a3);
     self->methods = GetStreamTaskMethods();
     if (a4 != NULL) {
         self->unkA8 = *a4;
@@ -30,7 +30,7 @@ void StreamTask__StreamTask(StreamTaskObj *self, s32 a1, s32 a2, s32 a3, StreamT
 
 ## New structure discovered
 
-- `Get_vtable_TaskCore()->slot08(...)`: new `TaskCoreMethods` slot `+0x008`.
+- `GetTaskCoreMethods()->slot08(...)`: new `TaskCoreMethods` slot `+0x008`.
   `classtable.py gTaskCoreMethods` shows it occupied by `TaskCore__TaskCore` — **this
   unit's own next queued function**, confirming the 4-argument
   `(self, a1, a2, a3)` signature ahead of writing that function.
@@ -109,7 +109,7 @@ codebase (`IntermediateBase__IntermediateBase`, `StageMap__StageMap`).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87)
 

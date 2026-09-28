@@ -23,7 +23,7 @@ This function was already forward-declared, opaquely, in
 while deriving `TitleMenuTaskObjF`'s own `New_TaskObjF` (a `New_X` allocator
 that calls `GetTaskObjFMethods()->ctor(...)`) last round -- that declaration
 predicted exactly this shape (a trivial vtable-getter, same pattern as
-`GetTitleMenuMethods`/`gTitleMenuMethods` and `Get_vtable_TaskCore`/`gTaskCoreMethods` elsewhere in
+`GetTitleMenuMethods`/`gTitleMenuMethods` and `GetTaskCoreMethods`/`gTaskCoreMethods` elsewhere in
 this header) before this function's own body was ever read. Confirmed
 correct on the first attempt: the real global is `gTaskObjFMethods`, added here
 as `extern GenericCtorTable_3bb8c_d gTaskObjFMethods;` right next to the getter's

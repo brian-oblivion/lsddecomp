@@ -3376,7 +3376,7 @@ VariantSpriteMethods *GetVariantSpriteMethods(void) {
 }
 
 /* GraphRoom's object, table and methods: include/GraphRoom.h. The base
- * implementations are reached through Get_vtable_TaskCore() with `self`
+ * implementations are reached through GetTaskCoreMethods() with `self`
  * upcast. */
 
 /* DreamSaveBlock, the save block GraphRoom plots, is include/DreamSys.h's. */
@@ -3393,7 +3393,7 @@ GraphRoom *New_GraphRoom(struct DreamSys *dreamSys) {
 extern char sGraphSoundBankPath[];
 
 void GraphRoom__GraphRoom(GraphRoom *self, struct DreamSys *dreamSys) {
-    Get_vtable_TaskCore()->ctor((TaskCore *)self, NULL, sGraphSoundBankPath, NULL);
+    GetTaskCoreMethods()->ctor((TaskCore *)self, NULL, sGraphSoundBankPath, NULL);
     self->methods = GetGraphRoomMethods();
     ((VabStreamObj *)self->sound)->methods->setPitchOffset((VabStreamObj *)self->sound, -1); /* TaskCore::sound is a VabStreamObj */
     self->dreamSys = dreamSys;
@@ -3411,7 +3411,7 @@ void GraphRoom__Reset(GraphRoom *self) {
 }
 
 void GraphRoom__Update(GraphRoom *self, BasicClass *sender, s32 event) {
-    Get_vtable_TaskCore()->update((TaskCore *)self, sender, event);
+    GetTaskCoreMethods()->update((TaskCore *)self, sender, event);
     if (self->inputMode == 1) {
         DreamSaveBlock *save =
             (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
@@ -3465,12 +3465,12 @@ void GraphRoom__ReleaseGraphPoints(GraphRoom *self) {
     for (i = 0; i < ARRAY_COUNT(self->points); i++) {
         self->points[i]->methods->release(self->points[i]);
     }
-    Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
+    GetTaskCoreMethods()->releaseTarget((TaskCore *)self);
 }
 
 s32 GraphRoom__Init(GraphRoom *self, IntermediateBaseInitArgs *args, s32 mode) {
     s32 result;
-    Get_vtable_TaskCore()->init((TaskCore *)self, args, mode);
+    GetTaskCoreMethods()->init((TaskCore *)self, args, mode);
     result = 2;
     if (self->scored == 0) {
         result = self->result;
@@ -3487,7 +3487,7 @@ void GraphRoom__PopulateGraphPoints(GraphRoom *self, void *parent) {
     BoxFillPos point;
     BoxFillPos firstPoint;
 
-    Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
+    GetTaskCoreMethods()->updateSlotElements((TaskCore *)self, parent);
     save = (DreamSaveBlock *)self->dreamSys->methods->getSaveBlock(self->dreamSys, 0);
     self->scored = GraphRoom__ScoreDayLog(self, save);
 

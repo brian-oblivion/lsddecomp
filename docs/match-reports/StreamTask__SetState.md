@@ -16,7 +16,7 @@ classic binary-search pivot, matches the already-documented
 
 ```c
 void StreamTask__SetState(StreamTaskObj *self, s32 a1) {
-    Get_vtable_TaskCore()->slot60(self, a1);
+    GetTaskCoreMethods()->slot60(self, a1);
     switch (a1) {
     case 5:
         self->unkD8 = 0;
@@ -38,7 +38,7 @@ void StreamTask__SetState(StreamTaskObj *self, s32 a1) {
 
 ## Evidence
 
-- `Get_vtable_TaskCore()->slot60(self, a1)`: new `TaskCoreMethods` slot `+0x060`.
+- `GetTaskCoreMethods()->slot60(self, a1)`: new `TaskCoreMethods` slot `+0x060`.
   `classtable.py gTaskCoreMethods` confirms it's occupied (`TaskCore__SetState`, a
   different unit) — result discarded, typed `void`.
 - `self->methods->slot94(self)`: new `StreamTaskObjMethods` slot `+0x094`.
@@ -54,7 +54,7 @@ void StreamTask__SetState(StreamTaskObj *self, s32 a1) {
 
 **Not needed here.** No `self->field` value is read, survives a `jalr`, and
 is read again — `self->methods` is fetched exactly once (folded into the
-first call via `Get_vtable_TaskCore()`, not `self->methods` at all), and every
+first call via `GetTaskCoreMethods()`, not `self->methods` at all), and every
 other field access in each `case` arm happens without an intervening call in
 between reads. Matched on the first attempt with plain inline field/slot
 accesses, no local variables needed. Filed as a negative data point per the
@@ -80,7 +80,7 @@ meaning.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87)
 

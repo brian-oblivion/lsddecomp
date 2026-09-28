@@ -18,7 +18,7 @@ void TitleMenu__Finalize(TitleMenu *self)
         self->unkAC->methods->release(self->unkAC);
         self->iconHandle->methods->release(self->iconHandle);
     }
-    Get_vtable_TaskCore()->slot0C(self);
+    GetTaskCoreMethods()->slot0C(self);
 }
 ```
 
@@ -31,7 +31,7 @@ immediately continuing `TitleMenuTaskObjF`'s work on the same class). Structure:
   through the shared BasicClass-family `release` slot at `+0x004`
   (`GenericReleaseObj_3bb8c_d`, a local independent view of the same shared
   slot `include/code_8220.h`'s `BasicClassMethods::release` occupies).
-- `Get_vtable_TaskCore()` is the class hierarchy's shared base-class method table
+- `GetTaskCoreMethods()` is the class hierarchy's shared base-class method table
   getter (same real global, `gTaskCoreMethods`, as `include/Task.h`'s
   `TaskCoreMethods`). Its `+0x00C` slot is called unconditionally last —
   the base class's own destructor forward.
@@ -105,7 +105,7 @@ the round-77 broadcast.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `Get_vtable_TaskCore()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
