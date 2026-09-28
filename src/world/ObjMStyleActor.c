@@ -494,7 +494,7 @@ extern s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 
  * stage. */
 extern LongVec3 sObjMViewPoint;
 extern LongVec3 sObjMViewRefPoint;
-extern s32 gStagePendingExtras[];
+extern s32 sStagePendingExtras[];
 extern CellBounds sStage0Bounds;
 
 /* onInit's gridSpan when it is passed 0: sDefaultGridSpan's value, the one
@@ -562,7 +562,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
     }
     GetSetHitHeightGate(flag);
 
-    self->dreamSys->methods->setPendingExtra(self->dreamSys, gStagePendingExtras[self->stage]);
+    self->dreamSys->methods->setPendingExtra(self->dreamSys, sStagePendingExtras[self->stage]);
     self->state = 5;
 }
 
