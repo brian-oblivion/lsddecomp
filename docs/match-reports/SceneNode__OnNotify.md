@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001CD60` on 2026-09-23 (tools/rename.py). Address 0x8001cd60.
 
-Unit: `code_d294` (round 14, first function of a fresh 3-function queue in
+Unit: `SceneNode` (round 14, first function of a fresh 3-function queue in
 this carve). Occupies `SceneNodeMethods` vtable slot `+0x038` (an
 override, per the file banner's `classtable.py` census). Forwards
 unconditionally to a new `BasicClassMethodsD294` slot, then dispatches to
@@ -30,7 +30,7 @@ void SceneNode__OnNotify(SceneNodeObj *self, GenericObj_d294 *other, s32 arg2) {
 }
 ```
 
-## New struct knowledge (`include/code_d294.h`, additive)
+## New struct knowledge (`include/SceneNode.h`, additive)
 
 - **`BasicClassMethodsD294` gains `slot38`** (`void(void*,void*,s32)`),
   carved out of what was previously the struct's own trailing padding (the
@@ -88,8 +88,8 @@ Round 71 (alpha). `func_8001CD60` -> `SceneNode__OnNotify`, **tier A**. Override
 
 For the head to apply by type scope. Each one fails to compile in another unit when renamed in the definition, so this unit did not apply it.
 
-- `SceneNodeMethods.slot30` -> `notifyParents` (tier A): the occupant is BasicClass__NotifyParents (inherited verbatim), and BasicClassMethods names the slot notifyParents. Accessor: code_d294 (TransformAndNotifyParents).
-- `GenericMethods_d294.slot38` -> `onNotify` (tier A): BasicClass slot +0x038, called as `(other, self, 4)`, i.e. sender self, event 4. Accessor: only the NON_MATCHING body of SceneNode__TryAttachNearby in code_d294 (the default build does not see it; check-nonmatching does).
+- `SceneNodeMethods.slot30` -> `notifyParents` (tier A): the occupant is BasicClass__NotifyParents (inherited verbatim), and BasicClassMethods names the slot notifyParents. Accessor: SceneNode (TransformAndNotifyParents).
+- `GenericMethods_d294.slot38` -> `onNotify` (tier A): BasicClass slot +0x038, called as `(other, self, 4)`, i.e. sender self, event 4. Accessor: only the NON_MATCHING body of SceneNode__TryAttachNearby in SceneNode (the default build does not see it; check-nonmatching does).
 
 ## Round 101 (delta): track 7
 

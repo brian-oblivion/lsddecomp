@@ -2,9 +2,9 @@
 
 > Renamed from `func_8001EDAC` on 2026-09-17 (tools/rename.py). Address 0x8001edac.
 
-Unit: `code_d294` (round 14). The generic packed-bitfield accessor
+Unit: `SceneNode` (round 14). The generic packed-bitfield accessor
 already MEASURED and documented (before this carve existed) in
-`include/code_d294.h`'s standing comment: clears `width` bits at bit
+`include/SceneNode.h`'s standing comment: clears `width` bits at bit
 offset `shift` in `*word`, ORs in `value << shift`, and returns the
 PREVIOUS contents of that bitfield shifted back to bit 0. Five (now more)
 sibling functions in this class of unit are thin wrappers around it, all
@@ -36,7 +36,7 @@ u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value) {
 ```
 
 Preserved inline per project convention (`#if 0`, positioned where it
-would compile back into `src/code_d294.c` in place of the current
+would compile back into `src/SceneNode.c` in place of the current
 `INCLUDE_ASM`):
 
 ```c
@@ -154,7 +154,7 @@ identical and (per the six prior manual attempts) statement order,
 operand order, and intermediate-naming alone hadn't found this specific
 split.
 
-**Translated to `src/code_d294.c` verbatim and reverified with the real
+**Translated to `src/SceneNode.c` verbatim and reverified with the real
 oracle** (not just the permuter's own scorer):
 
 ```
@@ -163,7 +163,7 @@ GetSetBitField: 22/22 words match (file 0xF5AC-0xF604)
 OK: build matches retail SLPS_015.56
 ```
 
-Full match, whole-image green. `include/code_d294.h`'s comment on this
+Full match, whole-image green. `include/SceneNode.h`'s comment on this
 function's role (generic packed-bitfield accessor) is unaffected -- no
 struct or signature changes, so no other unit is affected.
 
@@ -191,27 +191,27 @@ residue, before spending a permuter budget on it.
   `DreamSys__GetSetDreamTimeLimit` in the symbols file) and is load-bearing
   here: several callers use the return value
   (`return GetSetBitField(&self->unk10, 0x1F, 1, a1 == 0) == 0;`).
-- Corroborated at scale: thirteen one-line wrappers across `code_d294.c`,
-  `code_d294.c` and `ScreenWidgets.c` call it at fixed, non-overlapping
+- Corroborated at scale: thirteen one-line wrappers across `SceneNode.c`,
+  `SceneNode.c` and `ScreenWidgets.c` call it at fixed, non-overlapping
   (shift, width) pairs over one word -- the per-field setters of a packed
   register. That word is `SceneNodeObj::unk10`, which the PSY-Q
-  IDENTIFICATION note in include/code_d294.h pins as `GsDOBJ2.attribute`.
+  IDENTIFICATION note in include/SceneNode.h pins as `GsDOBJ2.attribute`.
 - The mask is built by a loop rather than `(1 << width) - 1`; that is
   retail's own source shape and the name does not assert otherwise.
 
 
-## Round 95 (bravo): moved from include/code_d294.h
+## Round 95 (bravo): moved from include/SceneNode.h
 
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 
 ```c
 /* GetSetBitField (round 54 correction: this banner was STALE -- it is
- * now carved and MATCHED in src/code_d294_c.c, not code_d294): a
+ * now carved and MATCHED in src/code_d294_c.c, not SceneNode): a
  * generic packed-bitfield accessor. Given a word pointer, a bit SHIFT, a
  * bit WIDTH and a VALUE, it clears WIDTH bits at bit-offset SHIFT in *word,
  * ORs in (value << shift), and returns the PREVIOUS contents of that
  * bitfield (shifted back down to bit 0). MEASURED from its own disassembly
- * (asm/code_d294.s @ GetSetBitField): a `while` loop builds `(1 << width)
+ * (asm/SceneNode.s @ GetSetBitField): a `while` loop builds `(1 << width)
  * - 1` one bit at a time (i.e. computes a WIDTH-bit mask, not a
  * `(1<<width)-1` closed form -- retail's own source apparently spelled it
  * as the loop), then shifts that mask into position, clears/sets, and
@@ -223,7 +223,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * register and these five functions are its per-field setters. */
 ```
 
-## Round 98 (echo): track 7, moved from src/code_d294.c
+## Round 98 (echo): track 7, moved from src/SceneNode.c
 
 The mask loop keeps a one-line `MATCHING:` note in the source.
 
@@ -234,6 +234,6 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * `*word` with `value` and RETURNS the previous contents of that field,
  * shifted down to bit 0. The mask is built one bit at a time by a loop
  * rather than as `(1 << width) - 1`; that loop is retail's own shape, not
- * an artefact. Thirteen thin per-field setters across code_d294.c,
- * code_d294.c and ScreenWidgets.c are wrappers around this. */
+ * an artefact. Thirteen thin per-field setters across SceneNode.c,
+ * SceneNode.c and ScreenWidgets.c are wrappers around this. */
 ```

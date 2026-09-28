@@ -6,7 +6,7 @@
 
 > Renamed from `func_8001D600` on 2026-09-18 (tools/rename.py). Address 0x8001d600.
 
-Round 12, runner delta. `code_d294`.
+Round 12, runner delta. `SceneNode`.
 
 ## Summary
 
@@ -36,14 +36,14 @@ explicitly flagged for a later carve to retype). This function passes it
 straight through as `TmdModel__GetHull`'s own `void *` arg0 (which
 `TmdModel__GetHull` forwards unmodified to `TmdModel__ComputeBounds`, which dereferences
 it at `+0x10`) -- genuinely a pointer. Retyped to `void *unk20` in
-`include/code_d294.h`. The only existing write site, `self->unk20 = 0;` in
-`SceneNode__SceneNode` (`src/code_d294.c`), is an integer-constant-zero assignment
+`include/SceneNode.h`. The only existing write site, `self->unk20 = 0;` in
+`SceneNode__SceneNode` (`src/SceneNode.c`), is an integer-constant-zero assignment
 and compiles unchanged under the new type (checked: `build exit=0`, full
 image SHA1 still green).
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294/SceneNode__GetModelHull.s`):
+Disassembly (`asm/nonmatchings/SceneNode/SceneNode__GetModelHull.s`):
 ```
 lw  $a0, 0x20($a0)      # a0 = self->unk20
 jal TmdModel__GetHull

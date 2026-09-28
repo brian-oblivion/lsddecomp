@@ -12,7 +12,7 @@ s32 BoxFill__SetSemiTrans(Obj6EAC0 *self, s32 a1) {
 
 Sibling of `BoxFill__SetDisplay`/`BoxFill__SetSemiTransRate`; base-table occupant of
 `Obj6EAC0Methods::slot0x64`. Shift 0x1E, width 1, no negation on the
-result -- matches `code_d294.c`'s `SceneNode__SetSemiTrans` shape exactly modulo
+result -- matches `SceneNode.c`'s `SceneNode__SetSemiTrans` shape exactly modulo
 field name.
 
 ### Proposed learning
@@ -30,7 +30,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 **What is known.** A thin wrapper around `GetSetBitField(&self->flags,
 shift, width, value)` (see `include/Task.h`'s own comment on
 `flags`, renamed from `unk58` this round), the SAME generic
-packed-bitfield-word accessor `code_d294.c`'s own sibling functions
+packed-bitfield-word accessor `SceneNode.c`'s own sibling functions
 (`SceneNode__SetDisplay`/`D374`/`D3A0`) wrap -- and those, the FIRST instances
 of this exact idiom in the project, are still unnamed too, for the same
 reason: `GetSetBitField` returns the bit's OLD value while setting a

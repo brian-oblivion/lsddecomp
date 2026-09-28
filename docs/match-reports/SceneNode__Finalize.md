@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001CBA4` on 2026-09-23 (tools/rename.py). Address 0x8001cba4.
 
-**Unit:** code_d294 · **Size:** 41 words · **Status:** MATCHED (41/41 words)
+**Unit:** SceneNode · **Size:** 41 words · **Status:** MATCHED (41/41 words)
 
 ## What it does
 
@@ -37,13 +37,13 @@ That slot's CURRENT occupant, `SceneNode__NoOpSlot5C`, is already matched
 elsewhere in this unit as a no-argument `void(void)` body (`{}`, a bare
 `jr $ra`). Both are right about their own codegen — the callee ignores
 every argument it's given, so the caller's arity is unconstrained. Typed
-`slot5C` as `void (*)(SceneNodeObj *, s32)` in `include/code_d294.h`
+`slot5C` as `void (*)(SceneNodeObj *, s32)` in `include/SceneNode.h`
 to match THIS call site; did not touch `SceneNode__NoOpSlot5C`'s own declaration.
 Same precedent as `GetSceneNodeMethods`, documented in `include/class_3bb8c.h`.
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
+round 11 (2026-09-03), runner charlie, unit SceneNode (fresh carve, first attempt).
 Matched on the first build once `SceneNode__SceneNode`'s size-drift bug (see its
 own report) was fixed — this function's own diff was already 41/41 before
 that point; the WARNING about out-of-range bytes was entirely

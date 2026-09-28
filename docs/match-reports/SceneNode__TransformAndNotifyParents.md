@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D624` on 2026-09-18 (tools/rename.py). Address 0x8001d624.
 
-Round 12, runner delta. `code_d294`.
+Round 12, runner delta. `SceneNode`.
 
 ## Summary
 
@@ -27,7 +27,7 @@ loose `void *`/`*a1` reads into real fields.
 
 ## New types/fields
 
-- **`GenericCountList_d294`** (new local type, `include/code_d294.h`): a
+- **`GenericCountList_d294`** (new local type, `include/SceneNode.h`): a
   third "just enough to dispatch" view, seen only through this call site.
   `unk0` (its own first field) is read once and multiplied by 8 to form
   `ApplyMatrixToSVArray`'s iteration count; `&unk4` (address only, never
@@ -50,13 +50,13 @@ loose `void *`/`*a1` reads into real fields.
   cleared again right after -- reads like a "currently processing" scratch
   slot, not a durable one. (`unk28` was already added by `SceneNode__DispatchLinkCommand`,
   matched earlier this round; this function only adds `unk2C`/`unk30`.)
-- **`ApplyMatrixToSVArray`** (extern, `asm/code_d294.s`, the next slice, still
+- **`ApplyMatrixToSVArray`** (extern, `asm/SceneNode.s`, the next slice, still
   uncarved): declared `(void *src, void *dest, s32 count, void *out)`,
   typed only to this call site's own shape.
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294/SceneNode__TransformAndNotifyParents.s`).
+Disassembly (`asm/nonmatchings/SceneNode/SceneNode__TransformAndNotifyParents.s`).
 
 ### Proposed learning
 

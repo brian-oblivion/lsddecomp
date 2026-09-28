@@ -16,7 +16,7 @@ Occupies `EntityMethods` slot `+0x178` (dispatched by `Entity__Update` in
   row->unk9)`, and if that returns non-zero, dispatches
   `this->methods->slot164(this, 1)`.
 - independently (not `else`), if `row->unk6 < 0`: calls
-  `SceneNode__FaceTarget(this, this->unk94, 1, 0, 0)` (still uncarved, `code_d294.s`).
+  `SceneNode__FaceTarget(this, this->unk94, 1, 0, 0)` (still uncarved, `SceneNode.s`).
 
 Returns `this->unkF4` regardless of whether the `if (this->unkF0 != 0)` body
 ran — the one known caller (`Entity__Update`) discards the result, but that is

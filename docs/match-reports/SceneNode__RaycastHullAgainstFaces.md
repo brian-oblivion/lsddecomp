@@ -110,7 +110,7 @@ precise relationship between the middle `k` loop ... and the inner fixed-4
 
 ## Part 3, resolved
 
-Re-read `asm/nonmatchings/code_d294/SceneNode__RaycastHullAgainstFaces.s` lines 197-268
+Re-read `asm/nonmatchings/SceneNode/SceneNode__RaycastHullAgainstFaces.s` lines 197-268
 (`.L8001DFD0` through `.L8001E0B4`) instruction-by-instruction:
 
 - The innermost loop runs `m = 0..3` (4 passes, unconditional), but the
@@ -181,7 +181,7 @@ extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32
 extern s32 gHitHeightGate;
 ```
 
-**Note the signature conflicts with `code_d294.c`'s own existing local
+**Note the signature conflicts with `SceneNode.c`'s own existing local
 extern** (`s32 arg3` there, literal `0` at its only call site) -- THIS
 function's own call site passes `&outWord`, a genuine pointer, in that
 position. Both externs are legitimate, independent local views (per this
@@ -366,7 +366,7 @@ the measured mechanics (a plane-membership/clip test, not a specific
 game concept); which planes `self->unk20` holds is not established
 beyond "the same planes `SceneNode__CheckBoundsOverlap` reads." Held
 back from an actual rename because this symbol is referenced (in a
-comment) from `src/code_d294.c:414` -- a different unit. Posted to
+comment) from `src/SceneNode.c:414` -- a different unit. Posted to
 the broadcast.
 
 ## Round 55 (charlie): REVISITED (round 55) -- register-identity framing
@@ -378,11 +378,11 @@ unit passed track 3 naming last round. Rebuilt the round-46 preserved body
 live first: reproduces exactly, `build exit=2`, no compile errors,
 `funcdiff.py` confirms **29/199**, no drift, isolated (only this function's
 own `#if 0` wrapper removed; every sibling confirmed still wrapped via
-`grep -c '^INCLUDE_ASM' src/code_d294.c`).
+`grep -c '^INCLUDE_ASM' src/SceneNode.c`).
 
 **The round-46 title's own framing -- "register identity: `self` lands in
 $s4 here, $s5 in retail" -- undersells the residue.** Reading
-`asm/nonmatchings/code_d294/SceneNode__RaycastHullAgainstFaces.s` against
+`asm/nonmatchings/SceneNode/SceneNode__RaycastHullAgainstFaces.s` against
 the built object's own disassembly line by line (not just the funcdiff word
 count) for the FIRST loop (the 2-row box-midpoint average, this report's own
 "Part 1") shows retail does not index through `mid[row].x/.y/.z` at all.
@@ -523,7 +523,7 @@ three candidates found) -- two safe candidates translated and verified
 inert against the real oracle (still 29/199), one candidate rejected
 outright as semantically unsound (reads a bit-mask value where the source
 means a plane-test result) rather than tested. Restored to `INCLUDE_ASM`,
-`git diff --stat src/code_d294.c` confirmed clean after the check.
+`git diff --stat src/SceneNode.c` confirmed clean after the check.
 
 ### Proposed learning (round 55)
 

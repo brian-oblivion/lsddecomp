@@ -243,7 +243,7 @@ correct; the residue is a pure peephole-adjacent merge decision.
 
 ## Header changes kept
 
-`include/code_d294.h`:
+`include/SceneNode.h`:
 - `SceneNodeSub14`: added `LongVec3 pos` at `+0x038` (see above). Also
   **moved `LongVec3`'s typedef earlier in the file** (it was previously
   defined AFTER `SceneNodeSub14`, which only worked because nothing inside
@@ -282,7 +282,7 @@ appears to need" — worth a shared idiom entry if a third instance turns up.
 ## Head note, round 13: `pos` was renamed to `unk38`
 
 `SceneNodeSub14`'s +0x038 field is no longer called `pos`. Runner bravo,
-matching `SceneNode__LocalOffsetToWorldPos` and `SceneNode__FaceTarget` in `code_d294` in the same
+matching `SceneNode__LocalOffsetToWorldPos` and `SceneNode__FaceTarget` in `SceneNode` in the same
 round, measured the SAME 12 bytes and needed them as an INDEXABLE
 `s32 unk38[3]` — it takes the field's address and walks `[i]` for `i` in
 0..2, adding each word into a caller-supplied vector as a per-axis delta.
@@ -323,7 +323,7 @@ pass is DEFERRED, not run, this round -- the scaffold is left in place
 next, or for a future round of this same runner once `StageMap__UnloadAllSlots`'s
 search completes.
 
-Inlined the literal per-axis body into `src/code_d294.c` as `#if 0`
+Inlined the literal per-axis body into `src/SceneNode.c` as `#if 0`
 (the report's own prose placeholder is preserved here as compilable
 code for the first time). No header changes needed -- all supporting
 types/slots were already present from the original round-13 pass.
@@ -406,7 +406,7 @@ interact via cross-jumping with which others.
 
 Preserved body updated below to the 141/143 best. Filing as STALL,
 `INCLUDE_ASM` restored; confirmed clean rebuild (`build exit=0`,
-whole-image OK, `git diff --stat src/code_d294.c` shows only the
+whole-image OK, `git diff --stat src/SceneNode.c` shows only the
 preserved-body text differs from the committed state, no functional
 change).
 
@@ -527,7 +527,7 @@ single confirmation check, not a fresh attempt cycle.
 
 **Re-verified the 141/143 claim live first**, per this round's "build
 any inherited body before trusting its score" discipline: dropped the
-preserved round-20 body into `src/code_d294.c`, confirmed via `nm -S`
+preserved round-20 body into `src/SceneNode.c`, confirmed via `nm -S`
 on the built object that it compiles to exactly **`0x234` bytes = 141
 words**, matching the report's own figure exactly (retail is `0x23C` =
 143 words, the same 2-word deficit). No drift beyond what the 2-word
@@ -567,7 +567,7 @@ exactly on 143. Filing unchanged as STALL at 141/143 words (2 words
 short), raw funcdiff word-match figure not meaningful without
 realignment (see above), first realigned/real divergence at retail vram
 `0x8001DA18` (the Y-axis positive-branch un-merge). `INCLUDE_ASM`
-restored, `src/code_d294.c` confirmed byte-identical to the committed
+restored, `src/SceneNode.c` confirmed byte-identical to the committed
 state after the check.
 
 ### Proposed learning (round 41)
@@ -624,7 +624,7 @@ into the shared merge point instead of ending in its own `slti`/`beqz`).
    as much of the old shared path as retail's own un-merged structure
    implies it should.
 
-Both variants reverted immediately; `git diff --stat src/code_d294.c`
+Both variants reverted immediately; `git diff --stat src/SceneNode.c`
 confirmed empty and whole-image build restored to `OK` after each check.
 Filing unchanged as STALL at 141/143 words (2 short), first real diff
 unchanged at retail vram `0x8001DA18`.
@@ -667,8 +667,8 @@ the broadcast.
 
 This function's own dispatch chain touches four vtable slots that are
 still named generically by offset (`slotA0`/`slotA4`/`slotA8`/`slotAC`)
-in `include/code_d294.h`'s `SceneNodeMethods` struct. That struct is
-shared: `slotA4` is also dispatched from `code_d294.c` (a different
+in `include/SceneNode.h`'s `SceneNodeMethods` struct. That struct is
+shared: `slotA4` is also dispatched from `SceneNode.c` (a different
 unit, `self->methods->slotA4(self, 0, buf18, delta, 1)`), so per
 FINISHING-PLAN track 3's field-ownership rule this is PROPOSED, not
 renamed directly. Proposed slot names, backed by this round's function
@@ -685,7 +685,7 @@ renames/proposals:
 | `+0x0AC` | `slotAC` | `classifyAgainstPlanes` | `SceneNode__RaycastHullAgainstFaces` (proposed `SceneNode__RaycastHullAgainstFaces`) |
 
 Apply by type scope (edit `SceneNodeMethods`'s own definition in
-`include/code_d294.h`, rebuild, fix exactly the accessors the compiler
+`include/SceneNode.h`, rebuild, fix exactly the accessors the compiler
 lists), per CLAUDE.md's shared-struct-hazard rule -- a whole-tree text
 replace of e.g. `slotA4` would corrupt every OTHER class's own
 identically-named, unrelated `slotA4` field (measured: `class_3bb8c_f.c`,
@@ -861,7 +861,7 @@ closed 2 more words via a permuter-found pointer-caching lever (138 ->
 hand declaration/caching variants plus two bounded permuter searches
 (79117 + 52653 = 131770 combined iterations, neither beating its own base
 score). `INCLUDE_ASM` restored, preserved body updated below to the new
-best, `git diff --stat src/code_d294.c` confirmed clean after the check.
+best, `git diff --stat src/SceneNode.c` confirmed clean after the check.
 
 ### Proposed learning (round 55)
 

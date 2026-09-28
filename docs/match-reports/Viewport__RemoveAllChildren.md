@@ -13,7 +13,7 @@ A ctor-shaped function: zeroes three `Obj86B60` fields (`unk30`, `unk10`,
 dereferences `unkC`), then forwards unconditionally to the shared
 `BasicClass` ancestor's own `+0x018` slot, `Get_vtable_BasicClass()->slot18(self)`
 -- the same no-argument-getter idiom already established independently in
-`include/class_16334.h`, `include/GameApplicationFileResource.h` and `include/code_d294.h`.
+`include/class_16334.h`, `include/GameApplicationFileResource.h` and `include/SceneNode.h`.
 
 ## The C
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001E58C` on 2026-09-17 (tools/rename.py). Address 0x8001e58c.
 
-Unit: `code_d294` (round 14). Calls a new `SceneNodeMethods` slot
+Unit: `SceneNode` (round 14). Calls a new `SceneNodeMethods` slot
 (`+0x084`) to fill a 0x20-byte stack buffer, copies a 3-element `s16`
 source into `dst`'s leading three `SceneNodeSub44` fields, then forwards
 the buffer's leading 0xC bytes into `ApplyMatrixToLVArray` (this unit, also
@@ -25,13 +25,13 @@ void SceneNode__RotateLocalVector(SceneNodeObj *self, SceneNodeSub44 *dst, s16 *
 }
 ```
 
-## New struct/extern knowledge (`include/code_d294.h`, additive)
+## New struct/extern knowledge (`include/SceneNode.h`, additive)
 
 - **`SceneNodeMethods` gains `slot84`** (`void(SceneNodeObj*, void*,
   s32)`), split out of the `pad060[0x094-0x060]` range this round
   established (now `pad060[0x084-0x060]` + `slot84` + `pad088[0x094-
   0x088]`). Confirmed against `tools/classtable.py gSceneNodeMethods`: the
-  occupant is `SceneNode__GetRotMatrix`, in `code_d294` (out of this carve's
+  occupant is `SceneNode__GetRotMatrix`, in `SceneNode` (out of this carve's
   scope, not decompiled here).
 - **New forward declaration for `ApplyMatrixToLVArray`** (this unit, matched
   separately this round) and a new opaque extern for `func_80015618`
@@ -69,7 +69,7 @@ larger, partially-opaque) extent.
 ## Naming (round 50, charlie -- FINISHING-PLAN track 3)
 
 - **`func_8001E58C` -> `SceneNode__RotateLocalVector`. Tier B.** It calls
-  `slot84(self, buf, 0)`, whose occupant is `SceneNode__GetRotMatrix` (code_d294,
+  `slot84(self, buf, 0)`, whose occupant is `SceneNode__GetRotMatrix` (SceneNode,
   matched: `RotMatrix(&param->rotate, buf)` with the angles NOT negated when
   the 3rd argument is 0), then applies that matrix to a widened copy of its
   own 3-element `s16` argument. So "Rotate" is the operation and "Local" is
@@ -86,7 +86,7 @@ larger, partially-opaque) extent.
   bare 3-word local (`Vec3O buf`). The old typing matched by offset
   coincidence with `GsCOORD2PARAM.scale`. Byte-identical after the retype.
 
-## Round 98 (echo): track 7, moved from src/code_d294.c
+## Round 98 (echo): track 7, moved from src/SceneNode.c
 
 The `u8 buf[0x20]` rotation buffer is now `MATRIX rot` (0x20 bytes, the type getRotMatrix fills): byte-identical.
 
@@ -95,7 +95,7 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
 ```c
 /* Rotates a 3-element s16 vector, given in the object's own local frame,
  * by the object's own orientation, widening it into `dst`. `slot84`
- * (SceneNode__GetRotMatrix, code_d294) builds that rotation with RotMatrix from
+ * (SceneNode__GetRotMatrix, SceneNode) builds that rotation with RotMatrix from
  * GsCOORD2PARAM.rotate; its `0` argument selects the un-negated angles,
  * i.e. local -> parent, not the inverse. `dst` is a bare 3-word vector:
  * class_3bb8c_o's own call site (Actor__AddLocalTranslation) passes a local `Vec3O`. */

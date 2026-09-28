@@ -6,7 +6,7 @@
 
 > Renamed from `func_8001D480` on 2026-09-18 (tools/rename.py). Address 0x8001d480.
 
-Round 12, runner delta. `code_d294`.
+Round 12, runner delta. `SceneNode`.
 
 ## Summary
 
@@ -21,7 +21,7 @@ u32 SceneNode__SetSubdivision(SceneNodeObj *self, u32 a1) {
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294/SceneNode__SetSubdivision.s`):
+Disassembly (`asm/nonmatchings/SceneNode/SceneNode__SetSubdivision.s`):
 ```
 addu $a3, $a1, $zero      # a3 (value) = a1
 addiu $a0, $a0, 0x10      # a0 = &self->unk10

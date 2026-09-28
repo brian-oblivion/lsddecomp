@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D008` on 2026-09-23 (tools/rename.py). Address 0x8001d008.
 
-Unit: `code_d294` (round 14). Occupies `SceneNodeMethods` vtable slot
+Unit: `SceneNode` (round 14). Occupies `SceneNodeMethods` vtable slot
 `+0x048` (already typed as `slot48` before this round, per the header's
 own note pointing at this function). Reads a 3-entry `{s16 whole; s16
 frac}` fixed-point table via three calls to `RatioToFixed12`, then either
@@ -40,7 +40,7 @@ void SceneNode__UpdateScale(SceneNodeObj *self, s32 flag, void *data) {
 
 Retypes `self->unk14->unk44` from opaque `void *` to the new
 `SceneNodeSub44 *` type (see `SceneNode__UpdateRotation`'s report and
-`include/code_d294.h`, filled in jointly by this function and
+`include/SceneNode.h`, filled in jointly by this function and
 `SceneNode__UpdateRotation` -- documented once there to avoid duplicating the same
 struct comment across two reports).
 

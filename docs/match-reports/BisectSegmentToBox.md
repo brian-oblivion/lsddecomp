@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001E2E8` on 2026-09-18 (tools/rename.py). Address 0x8001e2e8.
 
-Unit: `code_d294`. Round 13, runner delta. 109/109 words, full match on the
+Unit: `SceneNode`. Round 13, runner delta. 109/109 words, full match on the
 first attempt.
 
 ## Signature
@@ -101,7 +101,7 @@ iteration — this is why there are two 6-byte stack slots (`sp+0x0`,
 
 ## Header changes
 
-`include/code_d294.h`:
+`include/SceneNode.h`:
 
 - New `Vec3S16_d294` (`{ s16 x, y, z; }`, 6 bytes) and `BoundsBox_d294`
   (`{ Vec3S16_d294 lo, hi; }`, 12 bytes) types.
@@ -133,7 +133,7 @@ struct as include/TmdModel.h's `TmdBox` (min, max), which is also what
 `TmdModel__GetBoundsBuffer` returns. The placeholder is deleted; this function,
 `ClipSegmentToBox`, `CalcBoxOutcode` and `SceneNode__CheckBoundsOverlap` take
 `TmdBox *`, with `lo`/`hi` read as `min`/`max`. Byte-identical. The comment
-the placeholder carried in include/code_d294.h, moved here verbatim:
+the placeholder carried in include/SceneNode.h, moved here verbatim:
 
 ```c
 /* Round 13 (BisectSegmentToBox): an axis-aligned bounding box, low corner then
@@ -148,9 +148,9 @@ typedef struct BoundsBox_d294 {
 ## Round 100 (delta): track 7
 
 Locals `buf0`/`buf1`/`flags` -> `insideBuf`/`outsideBuf`/`outcode`. The six
-bit values -> `OUTCODE_*`, added to include/code_d294.h token-identical to
-code_d294.c's copy (CalcBoxOutcode's bits); proposed that the head delete
-code_d294.c's copy.
+bit values -> `OUTCODE_*`, added to include/SceneNode.h token-identical to
+SceneNode.c's copy (CalcBoxOutcode's bits); proposed that the head delete
+SceneNode.c's copy.
 
 ### History: the comments in src/code_d294_b.c before this pass, verbatim
 

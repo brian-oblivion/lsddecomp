@@ -21,7 +21,7 @@ blocked) that consumes that buffer and gates the rest of the function.
 signature.
 
 `SceneNode__GetRotationDegrees` is NOT in this unit at all; its body disassembles into
-`asm/code_d294.s`, an uncarved segment untouched by this round. Per
+`asm/SceneNode.s`, an uncarved segment untouched by this round. Per
 `DECOMPILATION_LEARNINGS.md` ("calling into a function that is still
 `INCLUDE_ASM` elsewhere is fine"), it gets a local `extern` prototype typed
 purely from this call site's register setup (`this`, `&local`), with the

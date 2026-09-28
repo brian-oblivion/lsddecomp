@@ -292,7 +292,7 @@ extern Ratio16 SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS[]; /* {4/5, 6/5, 5/5} */
 extern Ratio16 SCALE_DOUBLE[];
 extern Ratio16 SCALE_MINUS_SIXTY_FOURTH[];
 extern Ratio16 SCALE_EIGHT_SEVENTHS[];
-extern Ratio16 SCALE_UNIT[]; /* {1/1, 1/1, 1/1}, a .data copy of code_d294.h's SCALE_ONE */
+extern Ratio16 SCALE_UNIT[]; /* {1/1, 1/1, 1/1}, a .data copy of SceneNode.h's SCALE_ONE */
 extern Ratio16 SCALE_EIGHTH[];
 extern Ratio16 SCALE_X_EIGHTH_Y2_Z_EIGHTH[];
 extern Ratio16 SCALE_SIX[];

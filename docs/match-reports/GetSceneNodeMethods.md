@@ -4,12 +4,12 @@
 
 > Renamed from `func_8001E57C` on 2026-09-18 (tools/rename.py). Address 0x8001e57c.
 
-Round 12, runner delta. `code_d294`.
+Round 12, runner delta. `SceneNode`.
 
 ## Summary
 
 This unit's own no-argument vtable getter, already well documented in
-`include/code_d294.h`'s file banner and in `include/class_3bb8c.h` (which
+`include/SceneNode.h`'s file banner and in `include/class_3bb8c.h` (which
 calls the same symbol with a different arity from a different unit --
 established cross-unit precedent, not new). Whole body is `lui/addiu
 %hi/%lo(gSceneNodeMethods); jr $ra`.
@@ -24,11 +24,11 @@ SceneNodeMethods *GetSceneNodeMethods(void) {
 its address is declared, `extern SceneNodeMethods gSceneNodeMethods;`, typed to
 this getter's own return type. Confirmed against `tools/classtable.py
 gSceneNodeMethods`, which shows the table starting exactly there with 45 slots,
-all of which belong to this and the sibling `code_d294`/`code_d294_c` units.
+all of which belong to this and the sibling `SceneNode`/`code_d294_c` units.
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294/GetSceneNodeMethods.s`):
+Disassembly (`asm/nonmatchings/SceneNode/GetSceneNodeMethods.s`):
 ```
 lui   $v0, %hi(gSceneNodeMethods)
 addiu $v0, $v0, %lo(gSceneNodeMethods)
@@ -39,7 +39,7 @@ jr    $ra
 ### Proposed learning
 
 None new -- this is the same getter/arity-per-call-site precedent already
-documented in `include/code_d294.h` and `include/class_3bb8c.h`; this round
+documented in `include/SceneNode.h` and `include/class_3bb8c.h`; this round
 just supplies the getter's own C body.
 
 ## Naming (round 54, bravo, track 3)
@@ -55,12 +55,12 @@ from a large number of OTHER units with DIFFERENT per-call-site arities
 and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
-`src/code_d294.c`, `src/class_3bb8c_c.c`, `src/class_3bb8c_o.c`,
+`src/SceneNode.c`, `src/class_3bb8c_c.c`, `src/class_3bb8c_o.c`,
 `src/class_3bb8c_p.c`, `src/class_3ac78.c`, `src/ScreenWidgets.c`,
 `src/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
 Renaming this symbol would edit every one of those files -- squarely
-out of this round's `code_d294`-only scope, and a live collision risk
+out of this round's `SceneNode`-only scope, and a live collision risk
 with this round's `ScreenWidgets` runner. Posted to the broadcast in
 strong terms: this is the single highest-value rename in this unit
 (11 files reference the placeholder name) and the evidence for
@@ -74,7 +74,7 @@ round's 17 findings where a declaration was actually wrong rather than
 deliberate.
 
 **Callee evidence** (`0x8001E57C`, and the definition at
-`src/code_d294.c:736`):
+`src/SceneNode.c:736`):
 
 ```
 8001e57c:  lui   v0,0x8007

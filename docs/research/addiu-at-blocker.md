@@ -848,7 +848,7 @@ re-measured, re-measured.** That section closed with: *"Revisit if the 7
 uncarved hits turn into queued ones as carving proceeds — that is the number to
 re-measure, not this paragraph."* Carving has proceeded, so here it is.
 
-Round 13's runner bravo stalled `SceneNode__UpdateRotation` (`code_d294`) on exactly this
+Round 13's runner bravo stalled `SceneNode__UpdateRotation` (`SceneNode`) on exactly this
 construct — the pinned pipeline inserting two `nop`s between an `mfhi` and a
 following `mult` that retail's own bytes do not have — and correctly declined
 to act on it. It found the construct with the tighter screen this document

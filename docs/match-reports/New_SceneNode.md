@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001CA94` on 2026-09-23 (tools/rename.py). Address 0x8001ca94.
 
-**Unit:** code_d294 · **Size:** 24 words · **Status:** MATCHED (24/24 words)
+**Unit:** SceneNode · **Size:** 24 words · **Status:** MATCHED (24/24 words)
 
 ## What it does
 
@@ -41,19 +41,19 @@ Same shape as `src/Entity.c`'s `New_Entity`.
 
 `GetSceneNodeMethods()` is a plain no-argument getter (`lui/addiu %hi/%lo
 (gSceneNodeMethods); jr $ra`, MEASURED from its own disassembly in
-`asm/code_d294.s`, the next uncarved slice). Its whole-file `->ctor`
+`asm/SceneNode.s`, the next uncarved slice). Its whole-file `->ctor`
 call here checked the return with `bnez`, and that observation, combined
 with reading `SceneNode__SceneNode` (this class's ctor, `docs/match-
 reports/SceneNode__SceneNode.md`) confirmed `SceneNode__SceneNode` really does return
 `self` on success and `NULL` on failure — the two reports cross-check
 each other.
 
-See `include/code_d294.h`'s file banner for the full `classtable.py`
+See `include/SceneNode.h`'s file banner for the full `classtable.py`
 census this unit's header is built from.
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attempt).
+round 11 (2026-09-03), runner charlie, unit SceneNode (fresh carve, first attempt).
 
 ## Naming
 
@@ -74,6 +74,6 @@ Step 5 (comments): the unit banner was rewritten as documentation (lifecycle, ch
  * the sender's class id; Reset (identity transform); UpdateRotation and
  * UpdateScale (set or add three Ratio16s into the GsCOORD2PARAM); attach to
  * and detach from a parent's coordinate; and the first five setters over
- * GsDOBJ2.attribute. Part 2 is code_d294.c, part 3 code_d294_c.c.
+ * GsDOBJ2.attribute. Part 2 is SceneNode.c, part 3 code_d294_c.c.
  */
 ```

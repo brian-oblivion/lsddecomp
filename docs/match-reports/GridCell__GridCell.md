@@ -54,7 +54,7 @@ declarations of one symbol means nobody has established the real signature
 yet, and settling it is one `cat` away: read the CALLEE.**
 
 Here that read settles it flatly. `GetSceneNodeMethods`'s entire body
-(`asm/code_d294.s`) is:
+(`asm/SceneNode.s`) is:
 
 ```
 lui   $v0, %hi(gSceneNodeMethods)

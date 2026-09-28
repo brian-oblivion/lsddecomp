@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001CE30` on 2026-09-23 (tools/rename.py). Address 0x8001ce30.
 
-**Unit:** code_d294 · **Size:** 33 words · **Status:** MATCHED (33/33 words)
+**Unit:** SceneNode · **Size:** 33 words · **Status:** MATCHED (33/33 words)
 
 ## What it does
 
@@ -34,7 +34,7 @@ void SceneNode__Reset(SceneNodeObj *self) {
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on the first build.
+round 11 (2026-09-03), runner charlie, unit SceneNode, second pass. Matched on the first build.
 Established `SceneNodeMethods::slot44`/`slot48` (`(self, s32, void*)`,
 still-queued occupants `SceneNode__UpdateRotation`/`SceneNode__UpdateScale`) and the
 `ROTATION_ZERO`/`SCALE_ONE` rodata tables (0xC bytes each, shape confirmed
@@ -53,7 +53,7 @@ GsCOORDINATE2 *base)`. The call is `GsInitCoordinate2(NULL, (GsCOORDINATE2
 is GsCOORDINATE2 offset for offset) becomes Sony's type. Byte-identical.
 
 
-## Round 95 (bravo): moved from include/code_d294.h
+## Round 95 (bravo): moved from include/SceneNode.h
 
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 

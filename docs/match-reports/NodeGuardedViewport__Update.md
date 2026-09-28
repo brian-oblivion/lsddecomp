@@ -56,7 +56,7 @@ evident from the body (forward to the base ctor table's `slot9C` iff both
 forward's in-game purpose, is not established -- only that both gate the
 call (see the struct comments). Named on the "NotifyIfUnkNActive"-style
 precedent already used elsewhere in this codebase for a gated-forward shape
-(e.g. `SceneNode__NotifyWithHull`, include/code_d294.h) rather than
+(e.g. `SceneNode__NotifyWithHull`, include/SceneNode.h) rather than
 inventing a semantic verb ("Notify"/"Release"/etc.) the body does not
 support. `unk10`/`unk70` themselves are left unnamed -- no evidence beyond
 "nonzero gate" exists for either.

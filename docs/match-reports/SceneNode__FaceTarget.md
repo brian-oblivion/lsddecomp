@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001EACC` on 2026-09-17 (tools/rename.py). Address 0x8001eacc.
 
-Unit: `code_d294` (round 14). **The function two runners independently
+Unit: `SceneNode` (round 14). **The function two runners independently
 flagged for its argument-swap oddity** (see `docs/match-reports/
 Entity__MoodCue115.md` and `Entity__MoodCue81.md` from earlier rounds, and
 `docs/DECOMPILATION_LEARNINGS.md`). A "face target" orientation setter:
@@ -110,10 +110,10 @@ same base class?**
    locally available (matching the `+0xC`/`+0x14` layout used), per the
    project's established "per-call-site signature, not a callee
    property" precedent (same as `GetSceneNodeMethods`/`SceneNode__NoOpSlot5C`). Full
-   writeup left in `include/code_d294.h`'s own comment on this function,
+   writeup left in `include/SceneNode.h`'s own comment on this function,
    so the next reader doesn't have to re-derive it.
 
-## New extern knowledge (`include/code_d294.h`, additive)
+## New extern knowledge (`include/SceneNode.h`, additive)
 
 - **`ratan2`** (Psy-Q library, `s32 ratan2(s32 dy, s32 dx)`): arctangent
   in PSX-native 4096-per-circle BAM units -- confirmed by this function's
@@ -215,7 +215,7 @@ here exactly as already declared.
   both are converted to degrees by the same `* 360 / 4096` this unit's
   `SceneNode__GetRotationDegrees` uses; they are packed as a
   `Ratio16[3]` and dispatched to `slot44`, whose occupant is
-  `SceneNode__UpdateRotation` (code_d294.c, matched) -- the setter that writes
+  `SceneNode__UpdateRotation` (SceneNode.c, matched) -- the setter that writes
   `GsCOORD2PARAM.rotate`, i.e. the object's own rotation. Compute an
   orientation from self toward a target and install it as the object's
   rotation is the whole function.
@@ -232,7 +232,7 @@ here exactly as already declared.
   branches, not evidence.
 
 
-## Round 95 (bravo): moved from include/code_d294.h
+## Round 95 (bravo): moved from include/SceneNode.h
 
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 
@@ -284,7 +284,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/code_d294.c
+## Round 98 (echo): track 7, moved from src/SceneNode.c
 
 Parameters named for what their branches do, which is all the body establishes (tier B; the purpose of the modes stays open, as round 50 said): `arg2` -> `zeroPitch` (non-zero clears the pitch entry), `arg3` -> `noHalfTurn` (0 adds 180 degrees to the yaw), `arg4` -> `extraRotation` (a Ratio16[3] handed to updateRotation with set = 0, i.e. added). `table` -> `targetPos`, and the pitch half's reuse of `dx` for the y difference is now its own `dy` local: byte-identical. `4096` is `ONE`, the quarter turn `0x400` is `ONE / 4`, and the half turn `0xB4` is written `180` (degrees).
 

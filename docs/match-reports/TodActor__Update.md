@@ -76,7 +76,7 @@ never being asked to preserve it.
 
 Round 75 (charlie), track 3.
 
-- `TodActor__Update` (was `func_80065B80`), tier B. Occupies +0x098, which SceneNode__OnNotify (code_d294.c) dispatches to when the sender's header tag is 5 (TAG_CLASS6EF50, FrameClock). Code 2 calls tick (+0x108), code 4 calls release. Mechanics known; what Class6EF50 is (the tag-5 companion held in BaseObjO companion2) is not, hence B. Entity overrides this slot as Entity__Update.
+- `TodActor__Update` (was `func_80065B80`), tier B. Occupies +0x098, which SceneNode__OnNotify (SceneNode.c) dispatches to when the sender's header tag is 5 (TAG_CLASS6EF50, FrameClock). Code 2 calls tick (+0x108), code 4 calls release. Mechanics known; what Class6EF50 is (the tag-5 companion held in BaseObjO companion2) is not, hence B. Entity overrides this slot as Entity__Update.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 

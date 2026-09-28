@@ -6,12 +6,12 @@
 
 > Renamed from `func_8001D424` on 2026-09-18 (tools/rename.py). Address 0x8001d424.
 
-Round 12, runner delta. `code_d294`.
+Round 12, runner delta. `SceneNode`.
 
 ## Summary
 
 Sibling of the five `self->unk10` bitfield accessors already matched in
-`code_d294.c` (`SceneNode__SetDisplay`/`D374`/`D3A0`/`D3CC`/`D3F8`). Thin wrapper
+`SceneNode.c` (`SceneNode__SetDisplay`/`D374`/`D3A0`/`D3CC`/`D3F8`). Thin wrapper
 around `GetSetBitField(&self->unk10, shift, width, value)`, shift 0, width 3,
 value and result both pass straight through (no `== 0` boolean conversion on
 either side -- same shape as `SceneNode__SetSemiTrans`/`D3A0`/`D3F8`).
@@ -24,7 +24,7 @@ u32 SceneNode__SetLightDim(SceneNodeObj *self, u32 a1) {
 
 ## Evidence
 
-Disassembly (`asm/nonmatchings/code_d294/SceneNode__SetLightDim.s`):
+Disassembly (`asm/nonmatchings/SceneNode/SceneNode__SetLightDim.s`):
 ```
 addu $a3, $a1, $zero      # a3 (value) = a1
 addiu $a0, $a0, 0x10      # a0 = &self->unk10
@@ -38,7 +38,7 @@ is returned as-is.
 ### Proposed learning
 
 None beyond what's already documented for the sibling family in
-`include/code_d294.h` -- this just extends the same census (now 9
+`include/SceneNode.h` -- this just extends the same census (now 9
 non-overlapping bitfields at `self->unk10`: shifts 0,3,6,7,8,9,28,30,31).
 
 ## Naming (round 54, bravo, track 3)
@@ -51,7 +51,7 @@ exact symbol is name-checked (in a comment, not a call) from
 `include/class_3bb8c.h:2360` -- a DIFFERENT unit's own vtable-slot
 census, discussing a coincidental address match in an unrelated table.
 Renaming would edit that file too, which is out of this round's scope
-(`code_d294` only). Posted to the broadcast for the head to apply, or
+(`SceneNode` only). Posted to the broadcast for the head to apply, or
 for whoever next runs track 3 on `class_3bb8c.h`'s own unit to confirm
 independently.
 
@@ -62,8 +62,8 @@ independently.
 ## Round 100 (delta): track 7
 
 Parameter `a1` -> `value`. Shift 0 -> `ATTR_LDIM_SHIFT` (unit-local, beside
-code_d294.c's `ATTR_*_SHIFT`; GsLDIM0..7 are bits 0-2 of GsDOBJ2.attribute,
-include/psyq/libgs.h). The width 3 stays a literal, as in code_d294.c.
+SceneNode.c's `ATTR_*_SHIFT`; GsLDIM0..7 are bits 0-2 of GsDOBJ2.attribute,
+include/psyq/libgs.h). The width 3 stays a literal, as in SceneNode.c.
 
 The file's own banner, before this pass, is kept below with this function's
 comment (this is the unit's first function).

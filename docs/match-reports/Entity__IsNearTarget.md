@@ -113,7 +113,7 @@ Every known caller (5+ units, per this report and `Entity.h`) compares its
 return against 0, i.e. treats it as a boolean predicate; it applies a mood-
 scaled Y offset and a fixed-point-11 distance conversion, then tail-calls
 `this->unk94`'s own `slot120`. "Target" is not a fresh guess for
-`this->unk94` -- it is `SceneNode__FaceTarget`'s (code_d294.c, a different
+`this->unk94` -- it is `SceneNode__FaceTarget`'s (SceneNode.c, a different
 unit) OWN established name for dereferencing this exact field, cited
 already in `Entity.h`'s `Unk94Obj` comment before this round.
 

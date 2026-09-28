@@ -1,7 +1,7 @@
 /*
- * code_d294 -- SceneNode (include/SceneNode.h), part 1 of 3: the occupants
+ * SceneNode -- SceneNode (include/SceneNode.h), part 1 of 3: the occupants
  * of slots +0x000 to +0x070 of gSceneNodeMethods. Part 2 is code_d294_b.c,
- * part 3 code_d294_c.c; their shared helpers are declared in code_d294.h.
+ * part 3 code_d294_c.c; their shared helpers are declared in SceneNode.h.
  *
  * Lifecycle: New_SceneNode, the ctor (which allocates the node's
  * GsCOORDINATE2 and its GsCOORD2PARAM, and fails when either allocation
@@ -290,7 +290,7 @@ u32 SceneNode__SetLightMode(SceneNode *self, u32 mode) {
 /*
  * code_d294_b -- SceneNode (include/SceneNode.h), part 2 of 3: the
  * occupants of slots +0x074 to +0x0B4, and the segment-against-box clippers
- * the link test uses. Part 1 is code_d294.c, part 3 code_d294_c.c.
+ * the link test uses. Part 1 is SceneNode.c, part 3 code_d294_c.c.
  *
  * SetLightDim, SetUseZ, SetSubdivision and SetBackClip set the last four
  * fields of GsDOBJ2.attribute; GetRotMatrix makes the node's rotation, or
@@ -308,7 +308,7 @@ u32 SceneNode__SetLightMode(SceneNode *self, u32 mode) {
  *
  * Also: the empty onPadEvent and update defaults and slot +0x0B0,
  * AddToActorParents, the table getter, and ClipSegmentToBox and
- * BisectSegmentToBox (declared in include/code_d294.h).
+ * BisectSegmentToBox (declared in include/SceneNode.h).
  */
 
 
@@ -322,7 +322,7 @@ u32 SceneNode__SetLightMode(SceneNode *self, u32 mode) {
 #define HIT_HEIGHT_THRESHOLD 512
 
 /* Sets the GsLDIM field to `value` and returns the old field. The four
- * setters here are wrappers around GetSetBitField, like code_d294.c's. */
+ * setters here are wrappers around GetSetBitField, like SceneNode.c's. */
 u32 SceneNode__SetLightDim(SceneNode *self, u32 value) {
     return GetSetBitField(&self->attribute, ATTR_LDIM_SHIFT, 3, value);
 }

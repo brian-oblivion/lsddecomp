@@ -35,7 +35,7 @@
  * records the sender as `linkTarget`. notifyWithHull is the sending side:
  * it transforms the model's hull into world space and notifies the parents.
  *
- * Methods: src/code_d294.c, code_d294.c, code_d294.c. Subclasses:
+ * Methods: src/SceneNode.c, SceneNode.c, SceneNode.c. Subclasses:
  * `python3 tools/plan.py classes` (Actor, Sprite, LightRig, BoxFill and
  * more); they expand SCENENODE_FIELDS and SCENENODE_SLOTS first.
  *

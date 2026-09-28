@@ -142,7 +142,7 @@ PY
 | `class_3bb8c` (uncarved) | 11 |
 | `Task` (uncarved) | 4 |
 | `code_179d8` (uncarved) | 3 |
-| `code_d294` (uncarved) | 1 |
+| `SceneNode` (uncarved) | 1 |
 
 Note that three of the five carved instances have **never been attempted** —
 they sat in this round's fresh queue below the cut. Their reports do not exist
@@ -189,7 +189,7 @@ without a new idea.
 
 The census below counts 24 corpus-wide. Five are closed and one is the open
 sub-shape, leaving **18 in still-uncarved segments** (`class_3bb8c` 11,
-`Task` 4, `code_179d8` 3, `code_d294` 1). Each should be a near-free
+`Task` 4, `code_179d8` 3, `SceneNode` 1). Each should be a near-free
 match the moment its segment is carved, provided it screens as the
 `move $v0, $zero` shape. That makes those four segments materially more
 attractive as carve targets than their raw function counts suggest.

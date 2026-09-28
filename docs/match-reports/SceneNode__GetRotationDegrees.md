@@ -69,7 +69,7 @@ and the axis is absent from it: the omission is what made it invisible.
 Its measurement of the residue is exact and is what made the fix findable.
 Only the verdict is superseded.
 
-Unit: `code_d294` (round 14). Converts `self->unk14->unk44`'s three
+Unit: `SceneNode` (round 14). Converts `self->unk14->unk44`'s three
 4096-per-circle angle fields (`SceneNodeSub44::unk10/unk12/unk14`) into a
 3-entry `Ratio16` table: `whole = field * 45 >> 9` (== `field *
 360/4096`, i.e. angle units to degrees) and a constant `frac = 1` for
@@ -98,7 +98,7 @@ void SceneNode__GetRotationDegrees(SceneNodeObj *self, Ratio16 *out) {
 ```
 
 Preserved inline (`#if 0`, positioned where it would compile back into
-`src/code_d294.c` in place of the current `INCLUDE_ASM`):
+`src/SceneNode.c` in place of the current `INCLUDE_ASM`):
 
 ```c
 #if 0
@@ -118,7 +118,7 @@ void SceneNode__GetRotationDegrees(SceneNodeObj *self, Ratio16 *out) {
 
 ## New struct/extern knowledge already committed alongside this report
 
-`include/code_d294.h` gains a proper named type for the `{s16 whole; s16
+`include/SceneNode.h` gains a proper named type for the `{s16 whole; s16
 frac;}` pair `RatioToFixed12` reads and this function produces --
 `Ratio16`, replacing the previous prose-only description. This is
 purely additive (a new typedef/struct; `RatioToFixed12`'s own `void *pair`
@@ -183,7 +183,7 @@ either failure mode equally).
 ## Round 18 (permuter pass, charlie)
 
 Header note: this report's preserved body used `src->unk10/unk12/unk14`
-for the three angle fields, but `include/code_d294.h`'s `SceneNodeSub44`
+for the three angle fields, but `include/SceneNode.h`'s `SceneNodeSub44`
 has since been retyped (a later round's `S16Quad_d294 vec` at `+0x10`,
 fields `vec.x/vec.y/vec.z`) -- the permuter seed was updated to
 `src->vec.x/y/z` accordingly; this is a pure rename with no semantic
@@ -274,7 +274,7 @@ the head cited.
 ## Round 19 (echo): claim re-verified, one more axis tried and closed negative
 
 Re-confirmed this report's own baseline claim before doing anything
-else: `INCLUDE_ASM` was still in place in `src/code_d294.c`, a fresh
+else: `INCLUDE_ASM` was still in place in `src/SceneNode.c`, a fresh
 full build was green (`build exit=0`), and `funcdiff.py` reported the
 expected retail-vs-retail full-match warning (meaningless, confirms
 harness sanity only).
@@ -325,7 +325,7 @@ identity vs. pair-swap) before reaching for an axis that closed a
 
 - **`func_8001E6F8` -> `SceneNode__GetRotationDegrees`. Tier A.** Every
   term is measured, none inferred: the source is `self->unk14->unk44->vec`,
-  which the PSY-Q IDENTIFICATION note in include/code_d294.h pins as
+  which the PSY-Q IDENTIFICATION note in include/SceneNode.h pins as
   `GsCOORDINATE2.param->rotate`, Sony's own SVECTOR of Euler angles; the
   conversion `* 45 >> 9` is exactly `* 360 / 4096`, i.e. PSX 4096-per-turn
   units to degrees; and the three outputs are written as a
@@ -341,7 +341,7 @@ identity vs. pair-swap) before reaching for an axis that closed a
 
 GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/SceneNode.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/code_d294.c
+## Round 98 (echo): track 7, moved from src/SceneNode.c
 
 The old comment's `unk14->unk44->vec` is `coord2->param->rotate` (GsCOORD2PARAM.rotate, SVECTOR). The num-before-den order keeps a one-line `MATCHING:` note in the source; the derivation stays in this report.
 

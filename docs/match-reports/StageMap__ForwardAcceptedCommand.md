@@ -137,7 +137,7 @@ declaration both called it `count`, and that was wrong. Three independent
 witnesses: this function gates it on a small non-contiguous set (a count would
 not skip 4); the base occupant of the sibling slot `+0x09C`,
 `SceneNode__DispatchLinkCommand(self, a1, a2)`, switches on the same-position
-parameter over `{2,3,4}`; and `SceneNode__OnNotify` in `code_d294` dispatches these
+parameter over `{2,3,4}`; and `SceneNode__OnNotify` in `SceneNode` dispatches these
 slots as `(self, sender, event)`. Renamed `list` -> `sender`,
 `count` -> `command`, in the definition, the slot declarations and the two
 callers. Byte-neutral, oracle green.

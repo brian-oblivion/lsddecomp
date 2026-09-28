@@ -11,18 +11,18 @@ s32 BoxFill__SetDisplay(Obj6EAC0 *self, s32 a1) {
 ```
 
 Same generic packed-bitfield-word accessor already documented in
-`include/code_d294.h` (`GetSetBitField(word, shift, width, value)`),
-here over `self->unk58` (a fresh field, not `code_d294`'s `unk10`).
-Shift/width/negate shape matches `code_d294.c`'s own
+`include/SceneNode.h` (`GetSetBitField(word, shift, width, value)`),
+here over `self->unk58` (a fresh field, not `SceneNode`'s `unk10`).
+Shift/width/negate shape matches `SceneNode.c`'s own
 `SceneNode__SetDisplay` verbatim (`GetSetBitField(&self->unk10, 0x1F, 1,
 a1 == 0) == 0`), just against a different field.
 
 ### Proposed learning
 
-The `GetSetBitField`-wrapper family generalises past `code_d294`: any
+The `GetSetBitField`-wrapper family generalises past `SceneNode`: any
 unit with a packed-bitfield-word field can reuse the exact same
 shift/width/`==0` idioms already catalogued there. Worth checking
-`code_d294.h`'s comment block first whenever a new unit's disassembly
+`SceneNode.h`'s comment block first whenever a new unit's disassembly
 shows a `jal GetSetBitField` (or the sibling helper it's built from).
 
 ## Naming
@@ -36,7 +36,7 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 **What is known.** A thin wrapper around `GetSetBitField(&self->flags,
 shift, width, value)` (see `include/Task.h`'s own comment on
 `flags`, renamed from `unk58` this round), the SAME generic
-packed-bitfield-word accessor `code_d294.c`'s own sibling functions
+packed-bitfield-word accessor `SceneNode.c`'s own sibling functions
 (`SceneNode__SetDisplay`/`D374`/`D3A0`) wrap -- and those, the FIRST instances
 of this exact idiom in the project, are still unnamed too, for the same
 reason: `GetSetBitField` returns the bit's OLD value while setting a

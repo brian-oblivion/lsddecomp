@@ -11,7 +11,7 @@ the wrong hypothesis.
 
 **Historical status (kept for context): STALL (unexplained outgoing-arg frame-size gap, 19/31 words)
 
-Unit: `code_d294` (round 14). A paired-array iteration: `count`
+Unit: `SceneNode` (round 14). A paired-array iteration: `count`
 iterations, 0xC bytes/element, calling `func_80015618(fixed, b, a)` once
 per element and advancing both `a`/`b` by 0xC each time while `fixed`
 stays constant. Called by `SceneNode__RotateLocalVector` (this unit, matched this
@@ -39,7 +39,7 @@ void ApplyMatrixToLVArray(void *a, void *b, s32 count, void *fixed) {
 ```
 
 Preserved inline (`#if 0`, positioned where it would compile back into
-`src/code_d294.c` in place of the current `INCLUDE_ASM`):
+`src/SceneNode.c` in place of the current `INCLUDE_ASM`):
 
 ```c
 #if 0
@@ -124,7 +124,7 @@ residue from scratch.
 
 **The real, current score is 19/31 -- the title figure, not the "29/29" the
 head flagged as ambiguous.** Confirmed directly with the real oracle: the
-best-reached source above was dropped into `src/code_d294.c` in place of
+best-reached source above was dropped into `src/SceneNode.c` in place of
 the `INCLUDE_ASM`, and `./build-and-verify.sh` + `funcdiff.py` gave
 
 ```
@@ -345,7 +345,7 @@ make either call site (3 args vs 6 args to the same declared function) a
 compile error; only a K&R-style declaration lets each call site's own
 argument list stand on its own.
 
-Translated directly into `src/code_d294.c` (only the identifier names
+Translated directly into `src/SceneNode.c` (only the identifier names
 changed to match this project's own convention -- `end`/`a`/`b`/`fixed`
 already matched):
 
@@ -370,15 +370,15 @@ SLPS_015.56`.** Full match, no warnings from the compiler on the
 mismatched-arity calls (expected -- that is exactly what an unprototyped
 declaration permits).
 
-`include/code_d294.h` updated: `func_80015618`'s declaration changed from
+`include/SceneNode.h` updated: `func_80015618`'s declaration changed from
 a 3-parameter ANSI prototype to `extern void func_80015618();`, with a
 comment explaining why (the two call sites in this same file need
 different, incompatible arities). This has no effect on any other unit --
 `func_80015618` is declared LOCALLY per-unit throughout this project (a
 DIFFERENT 3-parameter prototype already exists in
 `include/class_3bb8c.h`, a sibling unit's own independent local view,
-untouched by this change) and `include/code_d294.h`'s own declaration is
-only ever used by this one call site in `code_d294.c`.
+untouched by this change) and `include/SceneNode.h`'s own declaration is
+only ever used by this one call site in `SceneNode.c`.
 
 ### Proposed learning
 
@@ -420,7 +420,7 @@ source-level answer.
 - **Parameters corrected to `(dst, src, count, m)`** from `(a, b, count,
   fixed)`, per the byte-exact call `ApplyMatrixLV(m, src, dst)` inside the
   loop: the 1st argument is written. Names only; byte-identical. The
-  declaration in include/code_d294.h was updated to match, and that is an
+  declaration in include/SceneNode.h was updated to match, and that is an
   edit to an EXISTING declaration in a shared header -- flagged as such in
   the round summary.
 - **The `if (0)` branch is untouched and must stay.** It is what sizes
@@ -431,7 +431,7 @@ source-level answer.
 
 ## Round 95 (bravo): Sony's declarations
 
-`include/code_d294.h` no longer declares `ApplyMatrixLV` unprototyped; the
+`include/SceneNode.h` no longer declares `ApplyMatrixLV` unprototyped; the
 three SceneNode units take libgte.h's prototype, `VECTOR *ApplyMatrixLV(MATRIX
 *, VECTOR *, VECTOR *)`. The six-argument call in the `if (0)` branch, which
 only sizes the outgoing-argument area, now goes through a cast to an
@@ -439,7 +439,7 @@ unprototyped function type, `((void (*)())ApplyMatrixLV)(m, src, dst, 0, 0,
 0)`. The frame is still 24 bytes; whole-image SHA1 unchanged.
 
 
-## Round 95 (bravo): moved from include/code_d294.h
+## Round 95 (bravo): moved from include/SceneNode.h
 
 The header's banner was rewritten as documentation in round 95; the comments it carried about this function, verbatim:
 
@@ -463,9 +463,9 @@ The header's banner was rewritten as documentation in round 95; the comments it 
  * applies to ApplyMatrixToSVArray's declaration above. */
 ```
 
-## Round 98 (echo): track 7, moved from src/code_d294.c
+## Round 98 (echo): track 7, moved from src/SceneNode.c
 
-The `(u8 *)p + 0xC` byte walks are now `(LongVec3 *)p + 1` element walks: byte-identical. The parameters stay `void *` because src/ViewportDraw.c declares its own `void *` extern of this function while also including code_d294.h, so a typed prototype there would be `conflicting types` in a unit outside this job (proposed to the head). Typed locals copied from the parameters score 25/31 for the same prologue-order reason as ApplyMatrixToSVArray.
+The `(u8 *)p + 0xC` byte walks are now `(LongVec3 *)p + 1` element walks: byte-identical. The parameters stay `void *` because src/ViewportDraw.c declares its own `void *` extern of this function while also including SceneNode.h, so a typed prototype there would be `conflicting types` in a unit outside this job (proposed to the head). Typed locals copied from the parameters score 25/31 for the same prologue-order reason as ApplyMatrixToSVArray.
 
 The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
 

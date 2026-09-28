@@ -30,7 +30,7 @@ confirmed by the disassembly falling straight through the epilogue with
 return type in this unit's own local reading (a fresh `void *` field
 alongside `ctor`) purely because THIS call site's return value is used;
 per the shared getter's already-established per-call-site-typing
-precedent (`class_3bb8c_o.c`, and `class_3bb8c.h`/`code_d294.h`'s own
+precedent (`class_3bb8c_o.c`, and `class_3bb8c.h`/`SceneNode.h`'s own
 notes on the sibling symbol `GetSceneNodeMethods`).
 
 ### Proposed learning

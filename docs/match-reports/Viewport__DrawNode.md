@@ -146,9 +146,9 @@ and `10000` (= 100 * 100, the ScreenSprite spelling of `half * pos / 100`),
 and `0xFFFF`, the GTE's 16-bit screen-z bound, explained where it is used.
 
 The extern `ApplyMatrixToLVArray(void *, void *, s32, void *)` stays in this
-unit: ViewportDraw does NOT include include/code_d294.h (round 98's note that it
-did came from a grep matching this unit's comment `(include/code_d294.h)`),
-so typing code_d294.h's prototype cannot collide here.
+unit: ViewportDraw does NOT include include/SceneNode.h (round 98's note that it
+did came from a grep matching this unit's comment `(include/SceneNode.h)`),
+so typing SceneNode.h's prototype cannot collide here.
 
 The unit banner, verbatim, as it was before this pass:
 
@@ -203,4 +203,4 @@ them are "Levers" above):
  */
 ```
 
-The extern's comment was `/* code_d294_c.c (include/code_d294.h) */`, and `scr`'s was `/* never used; reserves retail's 8 unused frame bytes */`.
+The extern's comment was `/* code_d294_c.c (include/SceneNode.h) */`, and `scr`'s was `/* never used; reserves retail's 8 unused frame bytes */`.

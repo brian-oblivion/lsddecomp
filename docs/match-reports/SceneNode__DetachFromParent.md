@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001D1A4` on 2026-09-23 (tools/rename.py). Address 0x8001d1a4.
 
-**Unit:** code_d294 · **Size:** 24 words · **Status:** MATCHED (24/24 words)
+**Unit:** SceneNode · **Size:** 24 words · **Status:** MATCHED (24/24 words)
 
 ## What it does
 
@@ -43,7 +43,7 @@ generalizes unchanged.
 
 ## Provenance
 
-round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on the first build (no
+round 11 (2026-09-03), runner charlie, unit SceneNode, second pass. Matched on the first build (no
 iteration needed). Cross-checks `SceneNode__AttachToParent`'s `UnkOwner_d294` type:
 both functions dispatch through the identical `+0x010`/`+0x014` slot
 shape on whatever `self->unkC` points to.

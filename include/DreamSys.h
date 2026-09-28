@@ -168,7 +168,7 @@ extern s8 MOVE_COMMAND_SIGNS[8];
 
 /* A single {numerator, denominator} degree ratio. This is not a guess about
    the LAYOUT any more (round 66): SceneNode__UpdateRotation -- vtable slot +0x044, the
-   inherited rotation setter, MATCHED in src/code_d294.c -- reads exactly
+   inherited rotation setter, MATCHED in src/SceneNode.c -- reads exactly
    three of these from its `data` argument, one per axis, converts each with
    RatioToFixed12 and divides by 360, then either STORES them into the
    object's rotation vector (flag != 0) or ADDS them modulo a full turn
@@ -354,9 +354,9 @@ extern LongVec3 DRIFT_STEP;
      exactly 24 bytes (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero
      bytes splat lumped into its dlabel (`0x80087EE0`-`0x80087EE7`) are
      never reached by that indexed access and belong to something else.
-   - `SceneNode__LocalOffsetToWorldPos` (code_d294, already matched) forwards its own `src`
+   - `SceneNode__LocalOffsetToWorldPos` (SceneNode, already matched) forwards its own `src`
      parameter to `ApplyMatrixToLVArray(dst, src, 1, buf)`, and `ApplyMatrixToLVArray`'s
-     own doc comment (include/code_d294.h) confirms it treats both
+     own doc comment (include/SceneNode.h) confirms it treats both
      pointers as 0xC-byte (3-word) elements. `DreamSys__ProjectPointAtDistance` passes
      `(s32 *)&gProjectOffsetZ - 2` as that exact `src` argument, which only
      type-checks sensibly as a 3-word vector's start -- matching the 8

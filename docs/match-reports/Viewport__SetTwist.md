@@ -11,7 +11,7 @@ above was never actually attempted until now.
 ## Round 44 (echo)
 
 Guarded 20.12 fixed-point division: if `self->unk10 != NULL`, computes the
-same split-division idiom as `code_d294`'s `RatioToFixed12` on a caller-
+same split-division idiom as `SceneNode`'s `RatioToFixed12` on a caller-
 supplied `{s16 whole; s16 frac;}` pair and stores the result to a
 NEW field, `Unk18Obj::unk2C` (previously undiscovered padding, +0x02C --
 exactly the 4 bytes between `unk20` (`Vec3_2cc8c`, ending at +0x02C) and the
@@ -30,7 +30,7 @@ void Viewport__SetTwist(Unk18Obj *self, s16 *pair) {
 }
 ```
 
-Read the input pair as raw `s16 *` rather than reusing `code_d294.h`'s
+Read the input pair as raw `s16 *` rather than reusing `SceneNode.h`'s
 `Ratio16` -- this unit has its own local view of the shape and does
 not include that header; a shared struct across units is a shared-header
 hazard per CLAUDE.md's "one exception" note, and there is no reuse benefit
@@ -50,7 +50,7 @@ exit=0`). Zero attempts beyond this one.
 
 ## Proposed learning
 
-Second confirmation this round (after `RatioToFixed12`, `code_d294`) that
+Second confirmation this round (after `RatioToFixed12`, `SceneNode`) that
 the split-division idiom for 20.12 fixed-point (`q,r = a/b, a%b; return (q
 << 12) + ((r << 12) / b);`) is a recognizable retail shape wherever a
 `nop_mflo_mfhi`-flagged function's disassembly shows two adjacent
@@ -61,7 +61,7 @@ often, not a coincidence.
 
 ## Naming
 
-`Unk18Obj__SetRatio12` -- tier B. Computes a 20.12 fixed-point value from a caller-supplied `{s16 whole; s16 frac;}` pair via the same split-division idiom as `code_d294`'s `RatioToFixed12` (divide for quotient+remainder, divide the shifted remainder again for the fraction), guarded by `self->unk10`, stores to `unk2C`. Named after the identified idiom (matches an existing, already-named sibling function's own algorithm), not after any established in-game meaning for the ratio.
+`Unk18Obj__SetRatio12` -- tier B. Computes a 20.12 fixed-point value from a caller-supplied `{s16 whole; s16 frac;}` pair via the same split-division idiom as `SceneNode`'s `RatioToFixed12` (divide for quotient+remainder, divide the shifted remainder again for the fraction), guarded by `self->unk10`, stores to `unk2C`. Named after the identified idiom (matches an existing, already-named sibling function's own algorithm), not after any established in-game meaning for the ratio.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
