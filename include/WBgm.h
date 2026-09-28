@@ -50,8 +50,8 @@ struct WBgmMethods {
     /* +0x048 */ void (*stop)(WBgm *self);   /* WBgm__Stop: SsSeqStop + SsSeqClose */
     /* +0x04C */ void (*pause)(WBgm *self);  /* WBgm__Pause */
     /* +0x050 */ void (*resume)(WBgm *self); /* WBgm__Resume */
-    /* +0x054 */ void (*setVol)(WBgm *self, s16 left, s16 right);   /* WBgm__SetVol */
-    /* +0x058 */ void (*crescendo)(WBgm *self, s16 vol, s32 scale); /* WBgm__Crescendo */
+    /* +0x054 */ void (*setVol)(WBgm *self, s16 left, s16 right);     /* WBgm__SetVol */
+    /* +0x058 */ void (*crescendo)(WBgm *self, s16 vol, s32 seconds); /* WBgm__Crescendo */
     /* +0x05C */ void (*setSeq)(WBgm *self, char *seqPath); /* WBgm__SetSeq; NULL only drops the old one */
     /* +0x060 */ void (*setVab)(WBgm *self, char *vabPath); /* WBgm__SetVab; NULL only drops the old one */
 };
@@ -85,7 +85,7 @@ void WBgm__Stop(WBgm *self);
 void WBgm__Pause(WBgm *self);
 void WBgm__Resume(WBgm *self);
 void WBgm__SetVol(WBgm *self, s16 left, s16 right);
-void WBgm__Crescendo(WBgm *self, s16 vol, s32 scale);
+void WBgm__Crescendo(WBgm *self, s16 vol, s32 seconds);
 void WBgm__SetSeq(WBgm *self, char *seqPath);
 void WBgm__SetVab(WBgm *self, char *vabPath);
 s32 IsWBgmActive(void); /* returns gWBgmActive */

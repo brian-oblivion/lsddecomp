@@ -156,8 +156,8 @@ void WBgm__SetVol(WBgm *self, s16 left, s16 right) {
     SsSeqSetVol(self->seqId, left, right);
 }
 
-void WBgm__Crescendo(WBgm *self, s16 vol, s32 scale) {
-    SsSeqSetCrescendo(self->seqId, vol, GetSsTicksPerSecond() * scale);
+void WBgm__Crescendo(WBgm *self, s16 vol, s32 seconds) {
+    SsSeqSetCrescendo(self->seqId, vol, GetSsTicksPerSecond() * seconds);
 }
 
 void WBgm__SetSeq(WBgm *self, char *seqPath) {
