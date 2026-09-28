@@ -11,7 +11,7 @@ Byte-exact on the second build; whole-image SHA1 green, funcdiff 46/46.
 
 Random pick of one of five records in the block `GetStageBgmRecords(index)`
 (record 4 of the group): `r = rand % 5`; for group 9, r 2 becomes 3 and an
-override gForcedStageBgm of 3 becomes 4. Returns `&rec[gForcedStageBgm - 1]` when the
+override sForcedStageBgm of 3 becomes 4. Returns `&rec[sForcedStageBgm - 1]` when the
 override is set, else `&rec[r]`.
 
 ## Source
@@ -24,12 +24,12 @@ FilePathRecord *PickStageBgm(s32 index, s32 arg1) {
         if (r == 2) {
             r = 3;
         }
-        if (gForcedStageBgm == 3) {
-            gForcedStageBgm = 4;
+        if (sForcedStageBgm == 3) {
+            sForcedStageBgm = 4;
         }
     }
     rec = GetStageBgmRecords(index);
-    return &rec[gForcedStageBgm != 0 ? gForcedStageBgm - 1 : r];
+    return &rec[sForcedStageBgm != 0 ? sForcedStageBgm - 1 : r];
 }
 ```
 
@@ -60,7 +60,7 @@ caller's 2-parameter extern now agrees with the definition.
 
 - **Name:** `PickStageBgm`
 - **Tier:** A
-- **Evidence:** random 1-of-5 (or gForcedStageBgm, renamed from gForcedVariant) of GetStageBgmRecords; its caller hands the record to the WBgm's setSeq (ObjMStyleActor.c). Stage 9 skips index 2, BGC.SEQ.
+- **Evidence:** random 1-of-5 (or sForcedStageBgm, renamed from gForcedVariant) of GetStageBgmRecords; its caller hands the record to the WBgm's setSeq (ObjMStyleActor.c). Stage 9 skips index 2, BGC.SEQ.
 
 ## Naming history
 

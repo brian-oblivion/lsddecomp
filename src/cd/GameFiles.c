@@ -199,7 +199,7 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
 
 extern char *sDefaultDataDirectory; /* "CDI\\" (sdata) */
 extern s32 sForcedSoundBank;
-extern s32 gForcedStageBgm;
+extern s32 sForcedStageBgm;
 extern u8 gSoundBankPaths[];
 extern u8 gRecordTable[];
 extern char *gSoundEffectDirPtr; /* -> "SND\\SE" */
@@ -235,7 +235,7 @@ void SetPickOverrides(s32 soundBank, s32 stageBgm) {
         sForcedSoundBank = soundBank;
     }
     if (stageBgm >= 0) {
-        gForcedStageBgm = stageBgm;
+        sForcedStageBgm = stageBgm;
     }
 }
 
@@ -302,12 +302,12 @@ FilePathRecord *PickStageBgm(s32 stage, s32 unused) {
         if (r == 2) {
             r = 3;
         }
-        if (gForcedStageBgm == 3) {
-            gForcedStageBgm = 4;
+        if (sForcedStageBgm == 3) {
+            sForcedStageBgm = 4;
         }
     }
     rec = GetStageBgmRecords(stage);
-    return &rec[gForcedStageBgm != 0 ? gForcedStageBgm - 1 : r];
+    return &rec[sForcedStageBgm != 0 ? sForcedStageBgm - 1 : r];
 }
 
 FilePathRecord *GetStageMapChunkRecords(s32 stage) {

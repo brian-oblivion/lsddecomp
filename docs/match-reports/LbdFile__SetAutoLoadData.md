@@ -29,7 +29,7 @@ typedef struct DataSrc39094 {
 extern u8 gLbdFileMethods[];   /* method table, 34 slots */
 extern s32 sDefaultDataDirectory;
 extern s32 sForcedSoundBank;
-extern s32 gForcedStageBgm;
+extern s32 sForcedStageBgm;
 extern u8 gSoundBankPaths[];
 extern u8 gRecordTable[];
 extern char *gSoundEffectDirPtr;  /* -> "SND\\SE" */
