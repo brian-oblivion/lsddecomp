@@ -821,7 +821,6 @@
       "status": "open",
       "units_done": {
         "DayTaskStageMap": "2026-09-23",
-        "FlatLightObj": "2026-09-25",
         "GameApplicationFileResource": "2026-09-24",
         "GameFiles": "2026-09-25",
         "GraphicsResources": "2026-09-25",
@@ -848,6 +847,7 @@
         "dream_aux": "2026-09-21",
         "dream_sys": "2026-09-22",
         "entity": "2026-09-19",
+        "flat_light_obj": "2026-09-25",
         "libcard_card": "2026-09-23",
         "libcd_bios": "2026-09-23",
         "libgs_gs_101": "2026-09-24",
@@ -935,7 +935,7 @@
         "gFlatLightObjMethods": {
           "class": "FlatLightObj",
           "date": "2026-09-26",
-          "header": "include/FlatLightObj.h"
+          "header": "include/flat_light_obj.h"
         },
         "gFrameClockMethods": {
           "class": "FrameClock",
@@ -1553,7 +1553,6 @@
       "status": "auto",
       "units_done": {
         "DayTaskStageMap": "2026-09-27",
-        "FlatLightObj": "2026-09-28",
         "GameApplicationFileResource": "2026-09-27",
         "GameFiles": "2026-09-27",
         "GraphicsResources": "2026-09-26",
@@ -1580,6 +1579,7 @@
         "dream_aux": "2026-09-27",
         "dream_sys": "2026-09-26",
         "entity": "2026-09-27",
+        "flat_light_obj": "2026-09-28",
         "libsnd_vmanager": "2026-09-27",
         "main": "2026-09-28",
         "scene_node": "2026-09-28"

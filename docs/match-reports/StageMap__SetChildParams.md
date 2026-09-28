@@ -96,7 +96,7 @@ an operator decision; not hand-reverted).
 
 ## Track 7 (2026-09-27, round 98, charlie)
 
-`colors += 3` -> `colors += sizeof(FlatLightColor)`, `dirs += 6` -> `dirs += 3 * sizeof(s16)` (an r,g,b and an s16 vx,vy,vz per light, include/FlatLightObj.h). Zero bytes. The `s32` source parameters stay (the slot's type in StageMap.h; proposed to the head as `FlatLightColor *` / `s16 *`, which would drop the casts and let the steps be `++` / `+= 3`).
+`colors += 3` -> `colors += sizeof(FlatLightColor)`, `dirs += 6` -> `dirs += 3 * sizeof(s16)` (an r,g,b and an s16 vx,vy,vz per light, include/flat_light_obj.h). Zero bytes. The `s32` source parameters stay (the slot's type in StageMap.h; proposed to the head as `FlatLightColor *` / `s16 *`, which would drop the casts and let the steps be `++` / `+= 3`).
 
 ## Track 10 (2026-09-28, round 104, echo)
 

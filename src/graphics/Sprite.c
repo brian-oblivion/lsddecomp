@@ -30,7 +30,7 @@
 #include <libgs.h>
 #include "CharSprite.h"
 #include "LightRig.h"
-#include "FlatLightObj.h"
+#include "flat_light_obj.h"
 #include "RequestedFile.h"
 #include "TimImage.h"
 #include "FrameClock.h"

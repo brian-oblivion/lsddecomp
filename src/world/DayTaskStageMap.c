@@ -51,7 +51,7 @@
 #include "PlacementGrid.h"
 #include "LbdFile.h"
 #include "GridCell.h"
-#include "FlatLightObj.h"
+#include "flat_light_obj.h"
 #include "bmem_pmgr.h"
 #include "GameFiles.h"
 #include "GameApplicationFileResource.h"

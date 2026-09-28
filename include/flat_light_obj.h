@@ -1,5 +1,5 @@
-#ifndef FLATLIGHTOBJ_H
-#define FLATLIGHTOBJ_H
+#ifndef FLAT_LIGHT_OBJ_H
+#define FLAT_LIGHT_OBJ_H
 
 #include "basic_class.h"
 #include "draw_system.h"
@@ -8,7 +8,7 @@
  * FlatLightObj -- one Psy-Q flat light, class id 0x6, method table
  * gFlatLightObjMethods, a direct BasicClass subclass (`tools/classtable.py
  * gFlatLightObjMethods --vs gBasicClassMethods`: overrides the ctor, adds three
- * slots). No class derives from it. Methods in src/graphics/FlatLightObj.c, which holds
+ * slots). No class derives from it. Methods in src/graphics/flat_light_obj.c, which holds
  * the whole class: allocator, ctor, the three own slots and the getter.
  *
  * "FlatLight" is Sony's own name (LIBGS.H's GsF_LIGHT and GsSetFlatLight),
@@ -18,7 +18,7 @@
  * layout (`int vx,vy,vz; unsigned char r,g,b;`, same offsets) with r,g,b
  * grouped as a ColorRgb (include/draw_system.h), which setColor's whole-struct
  * copy needs;
- * src/graphics/FlatLightObj.c takes GsSetFlatLight from <libgs.h> and casts to GsF_LIGHT *.
+ * src/graphics/flat_light_obj.c takes GsSetFlatLight from <libgs.h> and casts to GsF_LIGHT *.
  *
  * Who holds one: LightRig__LightRig (src/graphics/Sprite.c, include/LightRig.h)
  * makes three with New_FlatLightObj(0), (1), (2), keeps them in

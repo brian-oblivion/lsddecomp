@@ -10,7 +10,7 @@
  * do, and the evidence is this:
  *  - The ctor makes three FlatLightObj children (New_FlatLightObj(0), (1),
  *    (2): one Psy-Q flat light each, set through GsSetFlatLight; src/
- *    FlatLightObj.c), keeps them in `lights` and adds each as a child.
+ *    flat_light_obj.c), keeps them in `lights` and adds each as a child.
  *  - Finalize fetches the same three through getLight (+0x0B8) and releases
  *    each before SceneNode's finalize.
  *  - setAmbientColor (+0x0BC) stores an r,g,b in `ambient` and hands it,

@@ -2,7 +2,7 @@
  * FlatLightObj: one Psy-Q flat light as a BasicClass object. This file holds
  * the whole class: the allocator New_FlatLightObj, the constructor, its three
  * own slots (setLightId, setColor, setDirection) and the table getter. The
- * object and its method table are declared in include/FlatLightObj.h.
+ * object and its method table are declared in include/flat_light_obj.h.
  *
  * setColor and setDirection update the object's copy of the light, then hand
  * all of it to Sony's GsSetFlatLight under the object's light id, so a light
@@ -15,7 +15,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "FlatLightObj.h"
+#include "flat_light_obj.h"
 #include "bmem_pmgr.h"
 
 FlatLightObj *New_FlatLightObj(s32 lightId) {
