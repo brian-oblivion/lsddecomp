@@ -70,7 +70,7 @@ Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTe
 Allocation size `0x4C` is `sizeof(TextEntry)` (the struct ends with
 `panelSprite` at +0x048). Zero bytes changed.
 
-Moved here from the unit banner of src/TextEntryItemList.c (history, not
+Moved here from the unit banner of src/ui/TextEntryItemList.c (history, not
 documentation): "TextEntryItemList -- third carved slice of the DayTaskStageMap
 block, 20 functions, carved round 14. All 20 are TextEntry methods
 (gTextEntryMethods, `D_80086ED0`, 42 slots; `tools/classtable.py

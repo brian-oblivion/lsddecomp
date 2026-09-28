@@ -6,7 +6,7 @@
 
 > Renamed from `func_80051C84` on 2026-09-24 (tools/rename.py). Address 0x80051c84.
 
-Unit: `src/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`. This is its destructor
+Unit: `src/ui/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`. This is its destructor
 body (dispatched through `BasicClass`'s inherited `finalize` slot chain,
 `Get_vtable_BasicClass()->finalize`).
 

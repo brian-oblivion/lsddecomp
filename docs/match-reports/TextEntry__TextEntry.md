@@ -100,7 +100,7 @@ Parameters `arg1`/`arg2` -> `text`/`mode` (the prototype's names).
 `extern s32 strlen(char *s)`; the K&R declaration returns int, zero bytes
 changed.
 
-Moved here from the comment on `gNameCharTable` in src/TextEntryItemList.c:
+Moved here from the comment on `gNameCharTable` in src/ui/TextEntryItemList.c:
 "VALUE-of `%gp_rel`, round 45's own local view -- same global as
 TextEntryItemList's `gNameCharTable` (a byte lookup table whose length this
 function counts by hand rather than via `strlen`, since GCC 2.6.3 with

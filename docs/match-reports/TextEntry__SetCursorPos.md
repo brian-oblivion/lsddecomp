@@ -21,7 +21,7 @@ type), whose OWN struct in `include/class_3bb8c.h` already types
 `self->unk40` as `ChildObj86ED0 *`. The `+0x0BC` slot this function
 dispatches through was simply missing a name on the shared
 `ChildMethods86ED0` -- added additively there instead of duplicated
-locally. See `src/TextEntryItemList.c`'s file header comment and
+locally. See `src/ui/TextEntryItemList.c`'s file header comment and
 `TextEntry__PrevChar.md` for the full evidence trail. Zero bytes
 affected (type names are not codegen).
 
