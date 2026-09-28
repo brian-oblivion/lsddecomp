@@ -19,7 +19,7 @@ see `StyleTeardown`'s per-index rewrite of `sStyleCueSlots`).
 ## New externs
 
 ```c
-extern s32 gStyleSpawnYChoice2;             /* only element [0] read here */
+extern s32 sStyleSpawnYChoice2;             /* only element [0] read here */
 extern u8 sStyleKind1Scale[];            /* address only taken, never indexed */
 extern u8 sStyleSpawnOffsetX[];            /* address only taken, passed to New_X */
 extern u8 *sStyleSpawnScale;             /* set to &sStyleKind1Scale unconditionally */
@@ -27,7 +27,7 @@ extern void *SetupStyleSpawnParamsRandom(void *arg0, void *arg1);   /* forward d
 extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3); /* ObjMStyleActor.c, ALREADY MATCHED */
 ```
 
-`gStyleSpawnYChoice2` is a 2-word dlabel in `asm/data/76DC8.data.s`; only the first
+`sStyleSpawnYChoice2` is a 2-word dlabel in `asm/data/76DC8.data.s`; only the first
 word is read here (`lw`, not indexed), so it is declared scalar rather than
 an array -- if a sibling function later indexes `[1]`, retype there, not
 here (no other unit references any of these four symbols currently).
@@ -46,7 +46,7 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     s32 i;
     s32 val;
 
-    val = gStyleSpawnYChoice2;
+    val = sStyleSpawnYChoice2;
     sStyleSpawnScale = sStyleKind1Scale;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsRandom(arg2, (void *) val);
@@ -60,13 +60,13 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
 ## Lever: capture a global into a local BEFORE a loop that calls through it,
 even when the call's return value is discarded
 
-First attempt read `gStyleSpawnYChoice2` directly inside the loop body
-(`SetupStyleSpawnParamsRandom(arg2, (void *) gStyleSpawnYChoice2)`), which is semantically identical
+First attempt read `sStyleSpawnYChoice2` directly inside the loop body
+(`SetupStyleSpawnParamsRandom(arg2, (void *) sStyleSpawnYChoice2)`), which is semantically identical
 -- but GCC 2.6.3 can't prove `SetupStyleSpawnParamsRandom` doesn't write back to
-`gStyleSpawnYChoice2`, so it reloads the global from memory on every iteration
+`sStyleSpawnYChoice2`, so it reloads the global from memory on every iteration
 (`lui`/`lw` inside the loop, one fewer callee-saved register overall: 39
 words instead of retail's 42). Retail hoists the read to a local
-(`s32 val = gStyleSpawnYChoice2;`) *before* the loop, which is picked up into a
+(`s32 val = sStyleSpawnYChoice2;`) *before* the loop, which is picked up into a
 saved register ($s4) that survives across the loop's two calls -- 3 extra
 words (the load-once-and-keep pattern) and matches exactly.
 
@@ -94,7 +94,7 @@ Sibling of `StyleFillEffectKind0`: fills `arg1` slots of `sStyleEffectSlots`
 via the same `New_StyleEffect` allocator, this time with a literal kind
 argument of `1`. Called unconditionally (every `gStyleVariant`) from
 `StyleBuildEffectSlots`, right after `StyleFillEffectKind0`. MATCHED,
-42/42, second build (one lever: hoist the read of `gStyleSpawnYChoice2` out of the
+42/42, second build (one lever: hoist the read of `sStyleSpawnYChoice2` out of the
 loop).
 
 ## Track 4 (2026-09-26, round 88, charlie)
@@ -108,6 +108,6 @@ loop).
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_80087204` | `sStyleKind1Scale` | A | stored as the params' scale for every kind-1 effect. |
-| `D_80087330` | `gStyleSpawnYChoice2` | A | the word at `gStyleSpawnYChoices[2]` (-0x3800), a separate splat symbol; spelling it as the array element changes StyleFillEffectKind2's bytes (measured round 93), so the symbol stays. |
+| `D_80087330` | `sStyleSpawnYChoice2` | A | the word at `gStyleSpawnYChoices[2]` (-0x3800), a separate splat symbol; spelling it as the array element changes StyleFillEffectKind2's bytes (measured round 93), so the symbol stays. |
 
 Locals: `slots`, `count`, `pos`, `offsetY`.

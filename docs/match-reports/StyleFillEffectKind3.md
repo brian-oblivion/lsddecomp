@@ -333,7 +333,7 @@ extern s32 sStyleDecorColors;
 extern u8 sStyleDecorColorsB[];
 extern u8 sStyleSpawnOffsetX[];
 extern s32 sStyleGrid;
-extern s32 gStyleSpawnYChoice2;
+extern s32 sStyleSpawnYChoice2;
 extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);
 extern s32 sStyleSpawnColors[];
 extern u8 *sStyleSpawnRotation;
@@ -349,7 +349,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     s32 *p;
     u8 **q;
 
-    SetupStyleSpawnParamsRandom(arg1, (void *) gStyleSpawnYChoice2);
+    SetupStyleSpawnParamsRandom(arg1, (void *) sStyleSpawnYChoice2);
     if (sStyleDecorVariant != 0 && sStyleDecorColors == (s32) sStyleDecorColorsB) {
         *(s32 *) sStyleSpawnOffsetX = 0xFFFF5000;
         sStyleSpawnOffsetY = -0x2000;

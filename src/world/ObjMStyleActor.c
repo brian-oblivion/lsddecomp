@@ -1611,16 +1611,16 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     return slots;
 }
 
-extern s32 gStyleSpawnYChoice2;
+extern s32 sStyleSpawnYChoice2;
 extern Ratio16 sStyleKind1Scale[];
 
 /* Fills `count` slots with kind-1 effects: sStyleKind1Scale, offset y
- * gStyleSpawnYChoice2. */
+ * sStyleSpawnYChoice2. */
 StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
 
-    offsetY = gStyleSpawnYChoice2;
+    offsetY = sStyleSpawnYChoice2;
     sStyleSpawnScale = sStyleKind1Scale;
     for (i = 0; i < count; i++) {
         SetupStyleSpawnParamsRandom(pos, offsetY);
@@ -1631,7 +1631,7 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
     return slots;
 }
 
-extern s32 gStyleSpawnYChoice2;
+extern s32 sStyleSpawnYChoice2;
 extern void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY);
 extern s32 sStyleSpawnColors[];
 extern Ratio16 *sStyleSpawnRotation;
@@ -1653,7 +1653,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     s32 *offsetZ;
     PtrBoxK3 *rotation;
 
-    SetupStyleSpawnParamsRandom(pos, gStyleSpawnYChoice2);
+    SetupStyleSpawnParamsRandom(pos, sStyleSpawnYChoice2);
     if (sStyleDecorVariant != 0 && sStyleDecorColors == sStyleDecorColorsB) {
         sStyleSpawnOffsetX = -45056;
         sStyleSpawnOffsetY = -8192;
@@ -1711,7 +1711,7 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
         altColor = 0;
     }
     color->v = altColor;
-    SetupStyleSpawnParamsRandom(pos, gStyleSpawnYChoice2);
+    SetupStyleSpawnParamsRandom(pos, sStyleSpawnYChoice2);
     rotation = &sStyleSpawnRotation;
     *rotation = sStyleSpawnRotations[0];
     sStyleSpawnTableIndex = rand() % 6;
