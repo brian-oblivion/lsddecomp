@@ -95,7 +95,7 @@ struct DrawSystem {
 };
 
 extern DrawSystemMethods gDrawSystemMethods; /* DrawSystem's method table */
-extern DrawSystemMethods *Get_vtable_DrawSystem(void);
+extern DrawSystemMethods *GetDrawSystemMethods(void);
 
 DrawSystem *GetDrawSystem(void); /* returns gDrawSystem, the singleton */
 void SetDrawSystem(DrawSystem *obj);

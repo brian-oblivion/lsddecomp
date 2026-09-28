@@ -28,7 +28,7 @@ DrawSystem *New_DrawSystem(void) {
     DrawSystem *obj = BMemPMgrAlloc(sizeof(DrawSystem));
 
     if (obj != NULL) {
-        Get_vtable_DrawSystem()->ctor(obj);
+        GetDrawSystemMethods()->ctor(obj);
         return obj;
     }
     return NULL;
@@ -36,7 +36,7 @@ DrawSystem *New_DrawSystem(void) {
 
 void DrawSystem__DrawSystem(DrawSystem *self) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_DrawSystem();
+    self->methods = GetDrawSystemMethods();
     self->methods->init(self);
 }
 
@@ -181,7 +181,7 @@ void DrawSystem__SetCallback(DrawSystem *self, void (*callback)(void)) {
     self->callback = callback;
 }
 
-DrawSystemMethods *Get_vtable_DrawSystem(void) {
+DrawSystemMethods *GetDrawSystemMethods(void) {
     return &gDrawSystemMethods;
 }
 

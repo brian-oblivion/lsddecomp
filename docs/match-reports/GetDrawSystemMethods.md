@@ -1,4 +1,6 @@
-# Get_vtable_DrawSystem -- MATCHED (4/4 words), round 81
+# GetDrawSystemMethods -- MATCHED (4/4 words), round 81
+
+> Renamed from `Get_vtable_DrawSystem` on 2026-09-28 (tools/rename.py). Address 0x80020c4c.
 
 > Renamed from `func_80020C4C` on 2026-09-25 (tools/rename.py). Address 0x80020c4c.
 
@@ -16,7 +18,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Source
 
 ```c
-Class6C070Methods *Get_vtable_DrawSystem(void) {
+Class6C070Methods *GetDrawSystemMethods(void) {
     return &gDrawSystemMethods;
 }
 ```
@@ -48,7 +50,7 @@ extern void GsSwapDispBuff(void);
 
 ## Naming
 
-`Get_vtable_DrawSystem`, tier A. The class's own method-table getter
+`GetDrawSystemMethods`, tier A. The class's own method-table getter
 (returns `&gDrawSystemMethods`); matches the project's `Get_vtable_<Class>`
 convention for this exact role (`BasicClass.h`'s `GetBasicClassMethods`,
 round 81's `Get_vtable_WBgm`).

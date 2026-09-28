@@ -5,7 +5,7 @@
 Round 81, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x008 (ctor) (slots resolved with `tools/classtable.py gDrawSystemMethods`).
-- **What:** base ctor through GetBasicClassMethods()->ctor, then installs the table from Get_vtable_DrawSystem() and calls slot +0x040 (DrawSystem__Init). The `sw v0,0(s0); lw v0,0x40(v0)` reuse falls out of plain sequential C.
+- **What:** base ctor through GetBasicClassMethods()->ctor, then installs the table from GetDrawSystemMethods() and calls slot +0x040 (DrawSystem__Init). The `sw v0,0(s0); lw v0,0x40(v0)` reuse falls out of plain sequential C.
 - **Result:** byte-exact on the FIRST build, no levers; `funcdiff.py` reports
   21/21 words, 0 insertions / 0 deletions, and the whole-image SHA1 is
   green (`OK: build matches retail`).
@@ -15,7 +15,7 @@ Round 81, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior
 ```c
 void DrawSystem__DrawSystem(Class6C070 *self) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_DrawSystem();
+    self->methods = GetDrawSystemMethods();
     self->methods->init(self);
 }
 ```

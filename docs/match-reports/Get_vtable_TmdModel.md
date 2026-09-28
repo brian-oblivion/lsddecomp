@@ -21,7 +21,7 @@ void *Get_vtable_TmdModel(void) {
 ## Naming
 
 `Get_vtable_TmdModel` -- tier B. Convention: `Get_vtable_<Class>` (matches
-`GetBasicClassMethods`, `GetCdStreamMethods`, `Get_vtable_DrawSystem`).
+`GetBasicClassMethods`, `GetCdStreamMethods`, `GetDrawSystemMethods`).
 Class name `TmdModel`: gTmdModelMethods is class tag 9, the object
 `SceneNode__LinkModel` (src/graphics/SceneNode.c) links as `self->model` -- that
 unit's own `ModelObj_d294` local view (pad to +0xC, `tmdFile` at +0xC, `tmd`
