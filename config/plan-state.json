@@ -1120,7 +1120,7 @@
         "gTodMethods": {
           "class": "Tod",
           "date": "2026-09-26",
-          "header": "include/Tod.h"
+          "header": "include/tod.h"
         },
         "gTodSetMethods": {
           "class": "TodSet",

@@ -1,7 +1,7 @@
 #ifndef TODSET_H
 #define TODSET_H
 
-#include "Tod.h"
+#include "tod.h"
 
 /*
  * TodSet -- a Tod subclass (class id 0x14F03, method table gTodSetMethods) over

@@ -48,7 +48,7 @@ u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *o
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-`self` is now `Tod *` (include/Tod.h), and the function is Tod's +0x080 `decodePacketWord` slot (TodSet inherits it). Bytes unchanged.
+`self` is now `Tod *` (include/tod.h), and the function is Tod's +0x080 `decodePacketWord` slot (TodSet inherits it). Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 
@@ -57,4 +57,4 @@ u32 *DecodeTodPacketWord(DataSrc33808 *self, u32 *acc, u8 *out0, u8 *out1, u8 *o
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `acc`, `out0`..`out3`, `v` | `packet`, `objId`, `type`, `flag`, `len`, `word` | A | Sony's TOD packet header: id bits 0..15, type 16..19, flag 20..23, length in words 24..31 |
-| `16`, `20`, `24`, `0xF` | `TOD_PACKET_TYPE_SHIFT`, `_FLAG_SHIFT`, `_LEN_SHIFT`, `TOD_PACKET_NIBBLE` (include/Tod.h) | A | the same layout |
+| `16`, `20`, `24`, `0xF` | `TOD_PACKET_TYPE_SHIFT`, `_FLAG_SHIFT`, `_LEN_SHIFT`, `TOD_PACKET_NIBBLE` (include/tod.h) | A | the same layout |

@@ -40,7 +40,7 @@ u8 Tod__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-Now `u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel)` (include/Tod.h): the two pass-through arguments are ScanTodPackets' `out`/`sel`, and it calls the named slot `scanTodPackets` (+0x07C) instead of the unprototyped `slot7C`. The slot is typed `u8` as its occupant is; cc1 still emits the trailing `andi 0xFF` over a u8 slot result, so the s32 the old view gave it was not what the bytes needed. The function itself sits in FileResource's `slot78`, which keeps its name; ModelData__ForwardScanPackets casts it. Bytes unchanged.
+Now `u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *sel)` (include/tod.h): the two pass-through arguments are ScanTodPackets' `out`/`sel`, and it calls the named slot `scanTodPackets` (+0x07C) instead of the unprototyped `slot7C`. The slot is typed `u8` as its occupant is; cc1 still emits the trailing `andi 0xFF` over a u8 slot result, so the s32 the old view gave it was not what the bytes needed. The function itself sits in FileResource's `slot78`, which keeps its name; ModelData__ForwardScanPackets casts it. Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 

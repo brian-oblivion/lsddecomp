@@ -34,4 +34,4 @@ void *GetTodMethods(void) {
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-The local `extern s32 gTodMethods[];` is gone: the table is `extern TodMethods gTodMethods;` in include/Tod.h and the getter returns `TodMethods *` (`return &gTodMethods;`). Bytes unchanged.
+The local `extern s32 gTodMethods[];` is gone: the table is `extern TodMethods gTodMethods;` in include/tod.h and the getter returns `TodMethods *` (`return &gTodMethods;`). Bytes unchanged.

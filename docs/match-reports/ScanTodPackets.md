@@ -88,7 +88,7 @@ A loop pre-test that retail does as a SIGNED compare (`blez`) on a value cc1 can
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-`self` is now `Tod *` (include/Tod.h), and the function is Tod's +0x07C `scanTodPackets` slot (TodSet inherits it). The forward prototype of DecodeTodPacketWord above it moved into the header. Bytes unchanged.
+`self` is now `Tod *` (include/tod.h), and the function is Tod's +0x07C `scanTodPackets` slot (TodSet inherits it). The forward prototype of DecodeTodPacketWord above it moved into the header. Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 
@@ -97,10 +97,10 @@ A loop pre-test that retail does as a SIGNED compare (`blez`) on a value cc1 can
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `value`, `sub`, `n`, `cnt`, `found`, `sel` | `objId`, `flag`, `packetCount`, `created`, `index`, `tmdId` | A/B | DecodeTodPacketWord splits Sony's TOD packet header (object id, type, flag, length); `tmdId` is B: in, the TMD id matched against model-id packets; out, the index or count |
-| `8`, `0` | `TOD_PACKET_OBJECT_CONTROL`, `TOD_OBJECT_CREATE` (include/Tod.h) | A | Sony's TOD packet type 8 is object control, flag 0 create; the function collects those packets' object ids |
-| `2` | `TOD_PACKET_MODEL_ID` (include/Tod.h, the same spelling as src/world/tod_actor.c's) | A | type 2 carries the TMD id, read at packet +4 |
+| `8`, `0` | `TOD_PACKET_OBJECT_CONTROL`, `TOD_OBJECT_CREATE` (include/tod.h) | A | Sony's TOD packet type 8 is object control, flag 0 create; the function collects those packets' object ids |
+| `2` | `TOD_PACKET_MODEL_ID` (include/tod.h, the same spelling as src/world/tod_actor.c's) | A | type 2 carries the TMD id, read at packet +4 |
 | `((u16 *)data)[1]`, `[2]` | `TodFrame.packetCount`, `TodPacket.tmdId` | A | a TOD frame header is {size, packet count, frame number}; a model-id packet's data starts with the id |
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-tod_actor.c's `TodPacketHeader` (the four bytes DecodeTodPacketWord writes out) moved to include/Tod.h beside `TodPacket`, and ScanTodPackets decodes into one `TodPacketHeader head` instead of four u8 locals: they already sat at sp+0x18..0x1B in that order, so the frame is unchanged (98/98, whole image green). Tod.h's DecodeTodPacketWord prototype and slot take the definition's parameter names. `TodPacket` (the raw header word plus data) stays a separate type: it is the packet in memory, TodPacketHeader its decoded fields, whose bytes do not line up with the word's (type and flag are nibbles of byte 2).
+tod_actor.c's `TodPacketHeader` (the four bytes DecodeTodPacketWord writes out) moved to include/tod.h beside `TodPacket`, and ScanTodPackets decodes into one `TodPacketHeader head` instead of four u8 locals: they already sat at sp+0x18..0x1B in that order, so the frame is unchanged (98/98, whole image green). tod.h's DecodeTodPacketWord prototype and slot take the definition's parameter names. `TodPacket` (the raw header word plus data) stays a separate type: it is the packet in memory, TodPacketHeader its decoded fields, whose bytes do not line up with the word's (type and flag are nibbles of byte 2).

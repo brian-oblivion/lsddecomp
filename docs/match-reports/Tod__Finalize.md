@@ -40,4 +40,4 @@ void Tod__Finalize(FileResource *self) {
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-`self` is now `Tod *` (include/Tod.h), no longer `FileResource *`; the call to the active driver's finalize upcasts `(FileResource *)self` (a pointer cast, no code). Bytes unchanged.
+`self` is now `Tod *` (include/tod.h), no longer `FileResource *`; the call to the active driver's finalize upcasts `(FileResource *)self` (a pointer cast, no code). Bytes unchanged.

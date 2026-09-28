@@ -24,7 +24,7 @@
 #include <libgs.h>
 #include "tod_actor.h"
 #include "model_data.h"
-#include "Tod.h"
+#include "tod.h"
 #include "link_resource.h"
 #include "VabStreamObj.h"
 #include "frame_clock.h"

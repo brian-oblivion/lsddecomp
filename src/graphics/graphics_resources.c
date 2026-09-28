@@ -46,7 +46,7 @@
 #include "file_resource.h"
 #include "tim_block_src.h"
 #include "model_data.h"
-#include "Tod.h"
+#include "tod.h"
 #include "TodSet.h"
 #include "TriggerWorld.h"
 #include "tim_image.h"

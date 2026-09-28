@@ -49,7 +49,7 @@ First build. The else branch reuses the just-stored table pointer (GCC CSE of `s
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-`self` is now `Tod *` (include/Tod.h), no longer the unit-local `DataSrc33808 *`; `self->methods = GetTodMethods()` is a `TodMethods *` and `setFlag`/`requestLoadFile` are FileResource's inherited slots. Bytes unchanged.
+`self` is now `Tod *` (include/tod.h), no longer the unit-local `DataSrc33808 *`; `self->methods = GetTodMethods()` is a `TodMethods *` and `setFlag`/`requestLoadFile` are FileResource's inherited slots. Bytes unchanged.
 
 ## History (moved from include/Tod.h, round 102)
 
