@@ -287,7 +287,7 @@ extern LongVec3 sTranslateYMinus1500ZPlus1024[];
 extern LongVec3 sTranslateZMinus256[];
 extern Ratio16 sScaleQuarter[];
 extern Ratio16 sScaleHalf[];
-extern Ratio16 SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS[]; /* {4/5, 6/5, 5/5} */
+extern Ratio16 sScaleXFourFifthsYSixFifths[]; /* {4/5, 6/5, 5/5} */
 extern Ratio16 sScaleDouble[];
 extern Ratio16 sScaleMinusSixtyFourth[];
 extern Ratio16 sScaleEightSevenths[];

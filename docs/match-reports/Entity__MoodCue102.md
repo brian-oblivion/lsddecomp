@@ -45,7 +45,7 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         if (this->unkFC >= 0x790) {
             a2 = sScaleUnit;
         } else if (this->unkFC >= 0x78B) {
-            a2 = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
+            a2 = sScaleXFourFifthsYSixFifths;
         } else if (this->unkFC >= 0x786) {
             a2 = sScaleHalf;
         } else if (this->unkFC >= 0x781) {
@@ -159,7 +159,7 @@ elsewhere in this unit -- same symbol, not redecoded per call site.
   `sSceneNodeScaleOne` used by `SceneNode__UpdateScale`. Not renamed to `sSceneNodeScaleOne`
   or a variant: two differently-addressed, differently-shaped symbols
   sharing one implied meaning is confusing, not clarifying.
-- `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` (`updateScale` arg, `moodTimer >= 0x78B` arm): decoded
+- `sScaleXFourFifthsYSixFifths` (`updateScale` arg, `moodTimer >= 0x78B` arm): decoded
   `(4,5, 6,5, 5,5, 2,1)` -- X=4/5, Y=6/5, Z=1, not uniform, so it is not
   one of this project's single-ratio `SCALE_*` names.
 
@@ -174,7 +174,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_80089CAC` | `sRotationYawMinusThird` | A (by value) | `.word 0x00010000, 0x0003FFFF, 0x00010000` = {0/1, -1/3, 0/1}: yaw -1/3 degree per call |
-| `D_80089DE4` | `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` | A (by value) | `.word 0x00050004, 0x00050006, 0x00050005` = {4/5, 6/5, 5/5}; z is 5/5 = 1, omitted like `sScaleY2`'s unit axes |
+| `D_80089DE4` | `sScaleXFourFifthsYSixFifths` | A (by value) | `.word 0x00050004, 0x00050006, 0x00050005` = {4/5, 6/5, 5/5}; z is 5/5 = 1, omitted like `sScaleY2`'s unit axes |
 | local `a2` | `scale` (now `Ratio16 *`, was `void *`) | -- | the `updateScale` argument; byte-exact |
 
 The "left unnamed" section above predates the precedent: round 94's

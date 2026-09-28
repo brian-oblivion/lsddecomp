@@ -2485,7 +2485,7 @@ void Entity__MoodCue91(Entity *this, SoundCueSet *out) {
         out->attenuation = 0;
         out->slots[0].program = 21;
     }
-    this->methods->updateScale(this, 1, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS);
+    this->methods->updateScale(this, 1, sScaleXFourFifthsYSixFifths);
 }
 
 void Entity__MoodCue92(Entity *this, SoundCueSet *out) {
@@ -2510,7 +2510,7 @@ void Entity__MoodCue92(Entity *this, SoundCueSet *out) {
             this->methods->notifyParents(this, ENTITY_EFFECT_LINK_STAGE);
         }
     }
-    this->methods->updateScale(this, 1, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS);
+    this->methods->updateScale(this, 1, sScaleXFourFifthsYSixFifths);
 }
 
 void Entity__MoodCue93(Entity *this, SoundCueSet *out) {
@@ -2641,7 +2641,7 @@ void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
         if (this->moodTimer >= 1936) {
             scale = sScaleUnit;
         } else if (this->moodTimer >= 1931) {
-            scale = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
+            scale = sScaleXFourFifthsYSixFifths;
         } else if (this->moodTimer >= 1926) {
             scale = sScaleHalf;
         } else if (this->moodTimer >= 1921) {
