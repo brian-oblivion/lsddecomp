@@ -1436,7 +1436,7 @@ void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
 }
 
 extern s32 gDefaultViewportWidth;
-extern s32 gDefaultViewportHeight;
+extern s32 sDefaultViewportHeight;
 extern ViewportRgb sDefaultViewportColor;
 /* MATCHING: a second name for the same symbol, so cc1 cannot share one
  * address computation between the two copies; retail loads it twice. */
@@ -1460,7 +1460,7 @@ void Viewport__InitDefaults(Viewport *self) {
     /* MATCHING: without it both loads hoist above the two zero stores. */
     __asm__("");
     self->screenSize.width = gDefaultViewportWidth;
-    self->screenSize.height = gDefaultViewportHeight;
+    self->screenSize.height = sDefaultViewportHeight;
     /* MATCHING: without it both stores sink below the constant stores. */
     __asm__("");
     self->otLength = VIEWPORT_DEFAULT_OT_LENGTH;
