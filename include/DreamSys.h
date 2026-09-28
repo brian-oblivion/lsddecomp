@@ -381,7 +381,7 @@ extern struct RelativePos sStaircaseOffset1;
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
    argument by DreamSys__TickStaircaseCase3 -- same call shape as sStaircaseOffset2/sStaircaseOffset0
    above, just a different constant (round 2026-09-02). */
-extern struct RelativePos STAIRCASE_OFFSET_3;
+extern struct RelativePos sStaircaseOffset3;
 
 /* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (SceneNode__UpdateRotation)
    arg2 with flag 0 (relative) by DreamSys__TickStaircaseCase0 and

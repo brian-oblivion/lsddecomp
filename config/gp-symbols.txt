@@ -51,7 +51,6 @@ LINK_ANGLE_180
 SAVE_MAGIC
 SPECIAL_DAY_MOOD
 STAGE5_TRIGGER_GRIDPOS
-STAIRCASE_OFFSET_3
 gActiveCdStream
 gActiveDataSource
 gActiveMoviePlayer
@@ -212,6 +211,7 @@ sSaveTitleOffset
 sStaircaseOffset0
 sStaircaseOffset1
 sStaircaseOffset2
+sStaircaseOffset3
 sStrSelect
 sStyleDecorBoxPos
 sStyleDecorBoxSize

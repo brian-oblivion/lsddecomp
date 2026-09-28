@@ -29,7 +29,7 @@ Both blocker screens are clean: no `gp_rel` hit and no
 
 - `sStaircaseOffset1` (`struct RelativePos`) — this function's own per-instance
   constant passed to `DreamSys__ApplyRelativeOffset`, sibling to the already-named
-  `sStaircaseOffset0`/`sStaircaseOffset2`/`STAIRCASE_OFFSET_3`.
+  `sStaircaseOffset0`/`sStaircaseOffset2`/`sStaircaseOffset3`.
 
 No struct fields needed new names or types — every field this function
 touches (`unk_0x914`, `unk_0xAC`, `unk_0xA4`, `unk_0x88`, `unk_0xA0`,

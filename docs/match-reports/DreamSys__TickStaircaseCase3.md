@@ -18,7 +18,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 	s32 flag;
 
 	if (this->unk_0x914 == 0) {
-		DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_3, &this->unk_0x91C);
+		DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset3, &this->unk_0x91C);
 	}
 	if (this->unk_0xAC != 4) {
 		if (this->unk_0x914 >= 0x71)
@@ -60,7 +60,7 @@ additional coaxing.
 
 ## New knowledge
 
-- **`STAIRCASE_OFFSET_3`** (`struct RelativePos`), a third constant in the same table
+- **`sStaircaseOffset3`** (`struct RelativePos`), a third constant in the same table
   as `DreamSys__TickStaircaseCase2`'s `sStaircaseOffset2` and `DreamSys__TickStaircaseCase0`'s `sStaircaseOffset0`,
   passed as `DreamSys__ApplyRelativeOffset`'s `a` argument.
 - **`sRotationYawMinus45`**, another opaque forwarded-pointer constant for
@@ -85,4 +85,4 @@ guard clauses into one physical block when retail does so.
 
 ## Naming
 
-- **Tier B.** Table index 3 of the same sStaircaseTickFns family, against STAIRCASE_OFFSET_3; same evidence and caveat.
+- **Tier B.** Table index 3 of the same sStaircaseTickFns family, against sStaircaseOffset3; same evidence and caveat.

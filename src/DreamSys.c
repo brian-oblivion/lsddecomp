@@ -1172,7 +1172,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this) {
     s32 flag;
 
     if (this->staircaseFrame == 0) {
-        DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_3, &this->staircaseOrigin);
+        DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset3, &this->staircaseOrigin);
     }
     if (this->moveMode != MOVE_MODE_RUN) {
         if (this->staircaseFrame >= 113)
