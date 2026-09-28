@@ -112,7 +112,7 @@ renamed):
  *    records (FilePathRecord): random-or-forced pickers (SeedAndRandom,
  *    SetPickOverrides/sForcedSoundBank/sForcedStageBgm), record-group
  *    accessors indexed by sStageFirstRecord and, for GetStageMapChunkRecordXY, by
- *    StageGrid.h's cell columns, and a family of "stream channel" lookups
+ *    stage_grid.h's cell columns, and a family of "stream channel" lookups
  *    (GetAsmkMovie, PickOpeningMovie, GetEndingMovie,
  *    GetSpecialDayOrEventRecord, GetSpecialDayMovieSpan) whose shapes match
  *    their exact call sites in GameApplicationFileResource.c one for one. The records' own

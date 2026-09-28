@@ -5,7 +5,7 @@
 ## What it does
 
 Vtable `+0x1F4`. Looks up the mood for the chunk at `currentPos` on the
-current stage (`GetMoodFromStageChunk`, from `StageGrid.h`), then logs it
+current stage (`GetMoodFromStageChunk`, from `stage_grid.h`), then logs it
 into `this->areaMoods` via the already-established `vt->LogMood` shape.
 
 ## The C
@@ -23,7 +23,7 @@ void DreamSys__LogChunkMood(DreamSys *this, PlayerSpawnPoint *currentPos)
 `GetMoodFromStageChunk`'s second parameter is `StageChunk *`
 (`{s8 column; s8 row;}`), which is byte-layout-identical to
 `PlayerSpawnPoint`'s own leading `MapChunk` member -- the cast is exact,
-not approximate. Added `#include "StageGrid.h"` to `dream_sys.h` for this
+not approximate. Added `#include "stage_grid.h"` to `dream_sys.h` for this
 (the only cross-unit include this unit needed this round).
 
 ## Provenance

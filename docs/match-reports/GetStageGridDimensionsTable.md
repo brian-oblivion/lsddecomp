@@ -1,6 +1,6 @@
 # GetStageGridDimensionsTable
 
-**Unit:** StageGrid · **Size:** 7 instructions · **Status:** MATCHED (7/7 words)
+**Unit:** stage_grid · **Size:** 7 instructions · **Status:** MATCHED (7/7 words)
 
 ## What it does
 
@@ -53,7 +53,7 @@ still said `s32 *unknown` after the definition had already moved to `count`.
 
 **Global `STAGE_GRID_DIMENSIONS` -> `sStageGridDimensions` (round 101, track
 7; `tools/rename.py`).** The table is defined in splat data and named in C only
-by `src/world/StageGrid.c` (grep over `src/` and `asm/`); every other unit reaches it
+by `src/world/stage_grid.c` (grep over `src/` and `asm/`); every other unit reaches it
 through this getter or `GetStageGridDimensions`. Unit-static data is `sName`
-under the naming rules. Its `extern` still sits in `include/StageGrid.h`
-(proposal to the head: move it into `src/world/StageGrid.c`).
+under the naming rules. Its `extern` still sits in `include/stage_grid.h`
+(proposal to the head: move it into `src/world/stage_grid.c`).

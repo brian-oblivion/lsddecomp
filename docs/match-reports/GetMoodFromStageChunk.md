@@ -1,6 +1,6 @@
 # GetMoodFromStageChunk
 
-Unit: `StageGrid` · Size: 20 words (0x50 bytes) · Status: **MATCHED, byte-exact
+Unit: `stage_grid` · Size: 20 words (0x50 bytes) · Status: **MATCHED, byte-exact
 (20/20, whole-image `build exit=0`)** · Round 23 (2026-09-07), head.
 
 ## What it is
@@ -15,7 +15,7 @@ MoodGraphPoint *GetMoodFromStageChunk(s32 stage, StageChunk *chunk) {
 ```
 
 The data was the only thing standing between this function and a one-line body,
-which is why `src/world/StageGrid.c`'s header comment banked it as head work. Read out
+which is why `src/world/stage_grid.c`'s header comment banked it as head work. Read out
 of the executable:
 
 - `sStageGridDimensions` (`0x800861D4`) is 14 entries of an **8-byte** struct.
@@ -93,7 +93,7 @@ than confirmed; see `## Proposed field names` below.
 
 ## Proposed field names
 
-`StageGridDimensions.isVertical` (`include/StageGrid.h`): inherited name,
+`StageGridDimensions.isVertical` (`include/stage_grid.h`): inherited name,
 plausible (a grid can be laid out row-major or column-major, and the field
 sits exactly where a 2-byte pad would otherwise go), but **unconfirmed** —
 no function in the codebase reads it. Leaving it as-is rather than
@@ -111,7 +111,7 @@ polishes those units, who can see what the two branches do.
 **Globals `STAGE_CHUNK_MOODS` -> `sStageChunkMoods` and `STGnn_CHUNK_MOODS` ->
 `sStageNnChunkMoods`, nn = 00..13 (round 101, track 7; fifteen
 `tools/rename.py` runs).** `sStageChunkMoods` is named in C only by
-`src/world/StageGrid.c`; the fourteen per-stage arrays are named by nothing but its
+`src/world/stage_grid.c`; the fourteen per-stage arrays are named by nothing but its
 pointer initialisers in splat data. Unit-static data, so `sName`; the stage
 number stays in the name because the arrays are indexed by stage and stage nn
 is the disc's `STGnn` directory.

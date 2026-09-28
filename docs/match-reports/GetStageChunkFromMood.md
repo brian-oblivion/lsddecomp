@@ -1,6 +1,6 @@
 # GetStageChunkFromMood
 
-Unit: `StageGrid` · Size: 43 words (0xAC bytes) · Status: **MATCHED, byte-exact
+Unit: `stage_grid` · Size: 43 words (0xAC bytes) · Status: **MATCHED, byte-exact
 (43/43, whole-image `build exit=0`)** · Round 23 (2026-09-07), head.
 
 ## What it is

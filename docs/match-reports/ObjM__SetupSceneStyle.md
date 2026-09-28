@@ -82,8 +82,8 @@ the middle.
   prototype anywhere, so this unit's own call-site typing (all `s32`,
   matching its real definition) is local, same convention as
   `PickStageBgm`/`PickStageTexture`/etc. already declared in this file.
-- **`GetStageGridDimensions`** (already matched, `src/world/StageGrid.c`) has a
-  real prototype in `include/StageGrid.h` returning `StageGridDimensions
+- **`GetStageGridDimensions`** (already matched, `src/world/stage_grid.c`) has a
+  real prototype in `include/stage_grid.h` returning `StageGridDimensions
   *`, but this unit doesn't include that header and only forwards the
   return value opaquely, so a local `void *`-returning declaration is used
   instead — a different return type from the canonical one is fine for an
@@ -176,7 +176,7 @@ Comment history moved from the unit's externs:
 > dream_aux.c's (MATCHED round 43); no header declares it. `world` is the
 > DreamSys it installs as sDreamAuxWorld (track 4, round 88).
 
-> GetStageGridDimensions comes from include/StageGrid.h, through dream_sys.h.
+> GetStageGridDimensions comes from include/stage_grid.h, through dream_sys.h.
 
 > The StageMap's accepted tags (setAcceptedTags), an opaque .data block
 > (asm/data/76DC8.data.s) reached by address.

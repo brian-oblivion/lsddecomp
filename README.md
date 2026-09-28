@@ -154,8 +154,8 @@ Read each named class's header first; its banner points to the units.
   dream clock, the player's movement, the mood record that picks the next
   day's dream, and the "link" teleport that ends one stage and starts
   another. `Entity` (`src/world/entity.c`, over `TodActor`, `src/world/TodActor.c`) is a TOD-animated
-  actor driven by per-mood tables. `StageGrid` maps mood-graph values to
-  stage chunks (`src/world/StageGrid.c`); `dream_aux` (`src/world/dream_aux.c`) spawns the
+  actor driven by per-mood tables. `stage_grid` maps mood-graph values to
+  stage chunks (`src/world/stage_grid.c`); `dream_aux` (`src/world/dream_aux.c`) spawns the
   dream's trigger entities;
   `StageMap` keeps the seven map chunks around its target loaded, each
   chunk's `PlacementGrid` linked into a lattice of `GridCell`s. `DayTask` runs one day around the

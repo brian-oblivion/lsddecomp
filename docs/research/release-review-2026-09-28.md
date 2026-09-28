@@ -10,7 +10,7 @@ Line numbers are as of commit b23bdf545 and drift; search for the name.
 
 **Verdict.** The function bodies are in good shape: one-line `MATCHING:`
 notes, Sony types under Sony's names, few raw casts. draw_system.c,
-flat_light_obj.c, TimImage.c, pad.c, cd_stream.c, application.c, StageGrid.c,
+flat_light_obj.c, TimImage.c, pad.c, cd_stream.c, application.c, stage_grid.c,
 TodActor.c, DayTaskStageMap.c, WBgm.c and screen_widgets.c's FadeBox code
 are close to release quality. The debt is in declarations, a few
 conventions, names the code has outgrown, and headers written as analysis
@@ -89,7 +89,7 @@ rather than API.
 - **Receiver:** `this` in dream_sys.c (93 methods), entity.c (138), 7
   FileResource methods in GameApplicationFileResource.c, dream_sys.h's
   prototypes; `self` everywhere else.
-- **Guards:** dream_sys.h `CLASS_DREAMSYS`, StageGrid.h `STAGE_GRID`.
+- **Guards:** dream_sys.h `CLASS_DREAMSYS`, stage_grid.h `STAGE_GRID`.
 - **`s` externs in headers:** 24 (StageMap.h:416-441, TitleMenu.h:147-170,
   Task.h:47/57, scene_node.h:204-205 `sRotationZero`/`sSceneNodeScaleOne`,
   which are also typed `u8[0xC]` for `Ratio16[3]`). Move into the .c or
@@ -218,7 +218,7 @@ reads them, so nothing names them).
 ## Track 12: what the documentation pass needs
 
 - About 1134 prototypes in include/, 240 with an adjacent comment; no header
-  uses `/**`, and dream_sys.h's and StageGrid.h's `/* @brief` lines are
+  uses `/**`, and dream_sys.h's and stage_grid.h's `/* @brief` lines are
   invisible to Doxygen. Header comment words outnumber code words 3 to 1,
   most of it good class documentation written as analysis.
 - Style: `/** @file */`; a 5-15 line class block (what, parent, class id,
@@ -245,4 +245,4 @@ reads them, so nothing names them).
   so the pass documents public API only.
 - `types.h:4` `typedef char int8_t` is unsigned under `-funsigned-char`
   (unused; make it `signed char`); common.h's `MoodGraphPoint` belongs in
-  StageGrid.h; StageGrid.h's `struct simplePair` is unused.
+  stage_grid.h; stage_grid.h's `struct simplePair` is unused.

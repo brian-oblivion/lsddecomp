@@ -1,4 +1,4 @@
-/* StageGrid: each stage's grid of map chunks, and the two-way lookup between
+/* stage_grid: each stage's grid of map chunks, and the two-way lookup between
  * a mood-graph value and the grid cell (stage + chunk) that owns it.
  *
  * Each of the STAGE_COUNT stages divides into a `columns` x `rows` grid of
@@ -16,7 +16,7 @@
  * index of its map-chunk file with the same row-major `columns` stride.
  */
 #include "common.h"
-#include "StageGrid.h"
+#include "stage_grid.h"
 
 /* The two per-stage tables (splat data), read only here. */
 extern StageGridDimensions sStageGridDimensions[];

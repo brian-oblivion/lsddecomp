@@ -11,7 +11,7 @@ out-of-range drift.
 
 ## What it does
 
-Grid-cell record: `GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y)`. Uses `StageGrid.h`'s `StageGridDimensions` (first field `s16 columns`); the header is now included by this unit (additive).
+Grid-cell record: `GetStageMapChunkRecord(index, x + GetStageGridDimensions(index)->columns * y)`. Uses `stage_grid.h`'s `StageGridDimensions` (first field `s16 columns`); the header is now included by this unit (additive).
 
 ## Source
 

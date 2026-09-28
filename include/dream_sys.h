@@ -45,7 +45,7 @@
 #include "Actor.h"
 #include "game_files.h"
 /* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood. */
-#include "StageGrid.h"
+#include "stage_grid.h"
 #include "SoundCueSet.h"
 
 typedef struct DreamSys DreamSys;

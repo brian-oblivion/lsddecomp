@@ -2,7 +2,7 @@
 #define STAGEMAP_H
 
 #include "LightRig.h"
-#include "StageGrid.h"
+#include "stage_grid.h"
 
 /*
  * StageMap -- the part of a stage's map that is loaded: seven map chunks

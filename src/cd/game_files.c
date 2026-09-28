@@ -12,7 +12,7 @@
  *  - the seven sound banks' SND\name.VH/VB pairs and SND\SE.VH/VB;
  *  - each stage's files, from sStageFirstRecord[stage]: its four textures
  *    (TEXA..TEXD.TIX), five BGM sequences (BGA..BGE.SEQ) and map chunks
- *    (Mnnn.LBD, laid out as StageGrid.h's grid);
+ *    (Mnnn.LBD, laid out as stage_grid.h's grid);
  *  - from RECORD_TABLE_COUNT, the movies (ETC\OPENINGA..G.STR,
  *    ETC\ENDING.STR, FILM\EVENTn.STR), then six records per special day
  *    (FILM\SPDAYnnA/B.STR, IMG1\SPDAYnnC..F.TIM).
@@ -27,7 +27,7 @@
  */
 #include "common.h"
 #include "LbdFile.h"
-#include "StageGrid.h"
+#include "stage_grid.h"
 #include "bmem_pmgr.h"
 #include "game_files.h"
 #include <rand.h>
