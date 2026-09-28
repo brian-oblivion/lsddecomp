@@ -12,7 +12,7 @@ Looks up a "cfg" byte-array pointer for the current style index
 `sStyleStageConfigs`; if the slot is NULL, falls back to `PickStyleFallbackConfig()` to
 produce one. Feeds `cfg` into the already-matched `FillStyleFromConfig(style,
 cfg)` against the fixed global `sStyleConfig` (a `StyleM` instance, split by
-splat into two adjacent labels `sStyleConfig`/`gStyleKind2AltColor` purely because
+splat into two adjacent labels `sStyleConfig`/`sStyleKind2AltColor` purely because
 something else references the middle of it -- the object is one 0x20-byte
 struct). Then does its own separate raw-byte read of `cfg[1]`/`cfg[2]`: if
 `cfg[1] >= 4`, stores a `gStylePalette[cfg[2]]` colour-table entry pointer into
@@ -104,6 +104,6 @@ The config pointer is a unit-local `StyleStageConfig` (four `s8`:
 colorMode, fogLevel, farColorIndex, clearColorIndex -- what
 FillStyleFromConfig stores each byte as). Zero bytes.
 
-Proposal: `gStyleKind2AltColor` (0x80087430, ObjMStyleActor) is
+Proposal: `sStyleKind2AltColor` (0x80087430, ObjMStyleActor) is
 `sStyleConfig + 0x00C`, i.e. `sStyleConfig.clearColor`: its "alternate
 colour" is the current config's clear colour.

@@ -1679,7 +1679,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     return slots;
 }
 
-extern s32 gStyleKind2AltColor;
+extern s32 sStyleKind2AltColor;
 extern u8 gStyleKind2Colors[][3];
 extern s32 gStyleSpawnColors[];
 extern Ratio16 *gStyleSpawnRotation;
@@ -1693,7 +1693,7 @@ typedef struct S32BoxK2 {
 } S32BoxK2;
 
 /* Appends one kind-2 effect with a random colour and, except on every
- * twentieth day, gStyleKind2AltColor as its alternate colour. */
+ * twentieth day, sStyleKind2AltColor as its alternate colour. */
 StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     s32 r;
     s32 altColor;
@@ -1706,7 +1706,7 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     color++;
     altColor = (sStyleDay / 20) * 20; /* MATCHING: not `% 20`, which jump.c folds */
     if (sStyleDay != altColor) {
-        altColor = gStyleKind2AltColor;
+        altColor = sStyleKind2AltColor;
     } else {
         altColor = 0;
     }
