@@ -62,6 +62,15 @@ typedef struct TodFile {
     /* +0x08 */ u32 frames[1]; /* the first frame (a TodFrame) */
 } TodFile;
 
+/* A TOD frame (Sony's TOD format): its size in words, its packet count and
+ * its frame number, then the packets. */
+typedef struct TodFrame {
+    /* +0x00 */ u8 pad0[2]; /* size in words: not read */
+    /* +0x02 */ u16 packetCount;
+    /* +0x04 */ u8 pad4[4];     /* frame number: not read */
+    /* +0x08 */ u32 packets[1]; /* the first packet (a TodPacket) */
+} TodFrame;
+
 /* A TOD packet: the header word DecodeTodPacketWord splits, then the data;
  * a TOD_PACKET_MODEL_ID packet's data starts with the TMD id. */
 typedef struct TodPacket {

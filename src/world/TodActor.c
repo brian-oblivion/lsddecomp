@@ -79,15 +79,6 @@ typedef struct TodPacketHeader {
     u8 length;   /* +0x003 the packet's length in words, header included */
 } TodPacketHeader;
 
-/* A TOD frame's header (Sony's TOD format: size in words, packet count,
- * frame number), then its packets. */
-typedef struct TodFrame {
-    u8 pad00[0x02];  /* +0x000 size in words: not read */
-    u16 packetCount; /* +0x002 */
-    u8 pad04[0x04];  /* +0x004 frame number: not read */
-    u8 packets[1];   /* +0x008 the first packet */
-} TodFrame;
-
 /* A TodSet's buffer once TodSet__BuildTods has run: a word, a count, then
  * the table whose each entry (an offset into the buffer) it replaced with
  * the Tod it built over that sub-block. */

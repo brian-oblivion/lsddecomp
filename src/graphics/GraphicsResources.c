@@ -604,13 +604,6 @@ u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *tmdId) {
     return self->methods->scanTodPackets(self, out, tmdId, ((TodFile *)self->buffer)->frames);
 }
 
-/* A TOD frame's header: its size in words, its packet count and its frame
- * number, then the packets. */
-typedef struct TodFrame {
-    /* +0x00 */ u8 pad0[2];
-    /* +0x02 */ u16 packetCount;
-} TodFrame;
-
 /* scanTodPackets (+0x07C, both tables): walk the TOD frame at `data`.
  * Returns the number of object-create packets, whose object ids go to `out`
  * when there is one. With `out`, a model-id packet naming TMD `*tmdId`
