@@ -1,4 +1,6 @@
-# MoviePlayer__Stop -- MATCHED (33/33 words)
+# MoviePlayer__Rewind -- MATCHED (33/33 words)
+
+> Renamed from `MoviePlayer__Stop` on 2026-09-28 (tools/rename.py). Address 0x800458b8.
 
 > Renamed from `func_800458B8` on 2026-09-25 (tools/rename.py). Address 0x800458b8.
 
@@ -48,7 +50,7 @@ typedef struct Obj458B8 {
     /* +0x064 */ s32 unk64;
 } Obj458B8;
 
-void MoviePlayer__Stop(Obj458B8 *self) {
+void MoviePlayer__Rewind(Obj458B8 *self) {
     Obj458B8 *cur = (Obj458B8 *)gActiveMoviePlayer;
 
     if (cur == self) {
@@ -70,7 +72,7 @@ First build. Written through a local copy of the global (`cur`) -- retail keeps 
 
 ## Naming
 
-- **MoviePlayer__Stop**, tier A. Slot +0x044: when this is the active movie, resets its state words and marks it stopped (callback cleared, MarkStopped).
+- **MoviePlayer__Rewind**, tier A. Slot +0x044: when this is the active movie, resets its state words and marks it stopped (callback cleared, MarkStopped).
 
 ## Track 4 (2026-09-26, round 87)
 

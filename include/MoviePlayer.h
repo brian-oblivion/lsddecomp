@@ -46,7 +46,7 @@ struct MoviePlayerMethods {
     BASICCLASS_SLOTS_R(MoviePlayer, s32, (MoviePlayer * self, DrawRect *frame, s32 speed, s32 external));
     /* +0x040 */ s32 (*play)(MoviePlayer *self, char *name, s32 frameCount, s32 keepActive,
                              s32 loops); /* MoviePlayer__Play: 0 started (or another movie is active), 1 open failed */
-    /* +0x044 */ void (*stop)(MoviePlayer *self); /* MoviePlayer__Stop: reset, hand the stream MarkStopped, restart it */
+    /* +0x044 */ void (*stop)(MoviePlayer *self); /* MoviePlayer__Rewind: reset, hand the stream MarkStopped, restart it */
     /* +0x048 */ s32 (*advance)(MoviePlayer *self); /* MoviePlayer__Advance: StreamTask's per-tick call; nonzero when done */
     /* +0x04C */ void (*abort)(MoviePlayer *self); /* MoviePlayer__Abort: close the stream, finish */
     /* +0x050 */ void (*slot50)(void);             /* MoviePlayer__NoOpSlot50; no caller */
@@ -101,7 +101,7 @@ s32 MoviePlayer__InitFrame(MoviePlayer *self, DrawRect *frame, s32 external);
 void MoviePlayer__FreeFrameBuffers(MoviePlayer *self);
 s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepActive, s32 loops);
 void MoviePlayer__MarkPlaying(MoviePlayer *self); /* pendingStart = 1; play's call */
-void MoviePlayer__Stop(MoviePlayer *self);
+void MoviePlayer__Rewind(MoviePlayer *self);
 void MoviePlayer__MarkStopped(MoviePlayer *self); /* pendingStart = -1; stop hands it to the stream's slot7C, whose occupant is empty */
 s32 MoviePlayer__Advance(MoviePlayer *self);
 void MoviePlayer__Abort(MoviePlayer *self);

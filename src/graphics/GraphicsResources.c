@@ -1403,7 +1403,7 @@ void MoviePlayer__MarkPlaying(MoviePlayer *self) {
 
 /* stop (+0x044): when active, reset the frame state and restart the stream
  * (its slot7C, handed MarkStopped, is empty). */
-void MoviePlayer__Stop(MoviePlayer *self) {
+void MoviePlayer__Rewind(MoviePlayer *self) {
     MoviePlayer *cur = gActiveMoviePlayer;
 
     if (cur == self) {

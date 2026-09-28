@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Only when self is the object in gActiveMoviePlayer: set +0x48 = 1, clear +0x54, call the +0x60 object's +0x048 with it, set +0x44 = 1; then, if +0x64 is clear, call the +0x60 object's +0x07C with (obj, 0, 0) (clearing the callback MoviePlayer__Stop installed), set +0x64 = 1 and +0x44 = 1 again.
+Only when self is the object in gActiveMoviePlayer: set +0x48 = 1, clear +0x54, call the +0x60 object's +0x048 with it, set +0x44 = 1; then, if +0x64 is clear, call the +0x60 object's +0x07C with (obj, 0, 0) (clearing the callback MoviePlayer__Rewind installed), set +0x64 = 1 and +0x44 = 1 again.
 
 Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x04C.
 
@@ -70,7 +70,7 @@ void MoviePlayer__Abort(Obj458B8 *self) {
 
 ## Notes
 
-First build. The same through-the-global shape as MoviePlayer__Stop (a local `cur` copy of gActiveMoviePlayer). The duplicated `unk44 = 1` is real source: retail stores it in the bnez delay slot (both paths) and again inside the if. Views Methods458B8/Obj458B8 (defined at MoviePlayer__Stop) gained slot48 and unk54 additively.
+First build. The same through-the-global shape as MoviePlayer__Rewind (a local `cur` copy of gActiveMoviePlayer). The duplicated `unk44 = 1` is real source: retail stores it in the bnez delay slot (both paths) and again inside the if. Views Methods458B8/Obj458B8 (defined at MoviePlayer__Rewind) gained slot48 and unk54 additively.
 
 ## Naming
 
