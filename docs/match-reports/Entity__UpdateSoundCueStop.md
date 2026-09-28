@@ -26,7 +26,7 @@ s32 Entity__UpdateSoundCueStop(Entity *this) {
     s32 dist;
 
     if (this->unkF0 != 0 && this->unkF8 != 0) {
-        row = &gEntityMoodTable[this->moodIndex];
+        row = &sEntityMoodTable[this->moodIndex];
         dist = row->unkB;
         if (dist < 0) {
             dist = ~dist + 1;

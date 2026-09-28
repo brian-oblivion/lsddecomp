@@ -1,7 +1,7 @@
 /* Entity -- the class whole (include/Entity.h): its methods, its table
  * getter GetEntityMethods, and the MoodCue handlers of its mood rows.
  *
- * An Entity is a TodActor driven by one row of gEntityMoodTable, chosen by
+ * An Entity is a TodActor driven by one row of sEntityMoodTable, chosen by
  * New_Entity's moodIndex. The first section holds:
  *  - construction and teardown: New_Entity, Entity__Entity, Entity__Reset
  *    (fog for unlockKind 1 to 9, tick callback B, start inactive),
@@ -160,7 +160,7 @@ void Entity__Finalize(Entity *this) {
 void Entity__Reset(Entity *this) {
     s32 kind;
 
-    kind = (u8)gEntityMoodTable[this->moodIndex].unlockKind;
+    kind = (u8)sEntityMoodTable[this->moodIndex].unlockKind;
     if (kind >= 1 && kind <= 9) {
         this->methods->setLightMode(this, 1); /* fog on (GsFOG) */
     }
@@ -176,11 +176,11 @@ void Entity__AttachToParent(Entity *this, TodActor *peer, void *companion, struc
     ((TodActorAttachToParentFn)GetTodActorMethods()->attachToParent)((TodActor *)this, peer,
                                                                      companion, parent, offset);
     this->grid = parent;
-    if (gEntityMoodTable[this->moodIndex].activateKind != 0) {
+    if (sEntityMoodTable[this->moodIndex].activateKind != 0) {
         return;
     }
     this->methods->activate(this);
-    if (gEntityMoodTable[this->moodIndex].cueRange != 0) {
+    if (sEntityMoodTable[this->moodIndex].cueRange != 0) {
         return;
     }
     this->methods->startSoundCue(this);
@@ -210,7 +210,7 @@ void Entity__Update(Entity *this, void *sender, s32 event) {
 void Entity__NotifyLinkStage(Entity *this, void *sender, s32 event) {
     s32 linkStage;
 
-    linkStage = gEntityMoodTable[this->moodIndex].linkStage;
+    linkStage = sEntityMoodTable[this->moodIndex].linkStage;
     if (event >= 2 && event <= 8) {
         if (linkStage <= 0) {
             return;
@@ -226,7 +226,7 @@ void Entity__NotifyLinkStage(Entity *this, void *sender, s32 event) {
     /* MATCHING: the effect reuses `event`; a local of its own compiles differently */
     if (linkStage != ENTITY_LINK_STAGE_END_DREAM) {
         event = ENTITY_EFFECT_LINK_STAGE;
-    } else if (gEntityMoodTable[this->moodIndex].eventVideo != 0) {
+    } else if (sEntityMoodTable[this->moodIndex].eventVideo != 0) {
         event = ENTITY_EFFECT_EVENT_VIDEO;
     } else {
         event = ENTITY_EFFECT_END_DREAM;
@@ -255,7 +255,7 @@ s32 Entity__IsNearTarget(Entity *this, void *pos, s32 range, s32 tolerance) {
     s32 kind;
 
     point = *(LongVec3 *)pos;
-    kind = (u8)gEntityMoodTable[this->moodIndex].unlockKind;
+    kind = (u8)sEntityMoodTable[this->moodIndex].unlockKind;
     if ((s8)kind >= -9 && (s8)kind < 0) {
         point.y += (s8)kind * 1024;
     }
@@ -300,7 +300,7 @@ s32 Entity__GetProximityRatio(Entity *this) {
         }
     } while (0);
     result = this->methods->distanceToPeer(this, this->peer);
-    threshold = gEntityMoodTable[this->moodIndex].proximityThreshold << ENTITY_RANGE_SHIFT;
+    threshold = sEntityMoodTable[this->moodIndex].proximityThreshold << ENTITY_RANGE_SHIFT;
     if (threshold < result) {
         return -1;
     }
@@ -308,17 +308,17 @@ s32 Entity__GetProximityRatio(Entity *this) {
 }
 
 EntityMoodRow *Entity__GetMoodEffect(Entity *this) {
-    return &gEntityMoodTable[this->moodIndex];
+    return &sEntityMoodTable[this->moodIndex];
 }
 
 s32 Entity__GetUnlockEffect(Entity *this) {
-    return gEntityMoodTable[this->moodIndex].unlockKind * 1000;
+    return sEntityMoodTable[this->moodIndex].unlockKind * 1000;
 }
 
 /* The stage index a linkStage names: n - 1 for a positive n, ~n for a
  * negative one (so -1 is stage 0). */
 s32 Entity__GetLinkStage(Entity *this) {
-    s32 linkStage = gEntityMoodTable[this->moodIndex].linkStage;
+    s32 linkStage = sEntityMoodTable[this->moodIndex].linkStage;
 
     if (linkStage < 0) {
         return ~linkStage;
@@ -327,7 +327,7 @@ s32 Entity__GetLinkStage(Entity *this) {
 }
 
 s32 Entity__GetEventVideo(Entity *this) {
-    return gEntityMoodTable[this->moodIndex].eventVideo - 1;
+    return sEntityMoodTable[this->moodIndex].eventVideo - 1;
 }
 
 void Entity__Activate(Entity *this) {
@@ -356,7 +356,7 @@ extern s32 InitSoundCueSet(struct VabStreamObj *sound, SoundCueSet *set, s32 tag
 
 void Entity__StartSoundCue(Entity *this) {
     InitSoundCueSet(this->sound, &this->soundCueSet, this->moodIndex + 1, this,
-                    gEntityMoodTable[this->moodIndex].handler);
+                    sEntityMoodTable[this->moodIndex].handler);
     ((EntityPlayTodFn)this->methods->playTod)(this);
     this->methods->enableTickCallback(this);
     this->moodTimer = 0;
@@ -375,7 +375,7 @@ s32 Entity__UpdateActivationState(Entity *this) {
     s32 doActivate;
 
     if (this->active == 0 && this->state != ENTITY_STATE_DONE) {
-        row = &gEntityMoodTable[this->moodIndex];
+        row = &sEntityMoodTable[this->moodIndex];
         doActivate = 0;
         if (row->activateKind != ENTITY_ACTIVATE_AT_ATTACH) {
             if (row->activateKind == ENTITY_ACTIVATE_RANDOM) {
@@ -415,7 +415,7 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
     s32 near;
 
     if (this->active != 0) {
-        row = &gEntityMoodTable[this->moodIndex];
+        row = &sEntityMoodTable[this->moodIndex];
         doDeactivate = 0;
         Entity__NotifyIfTargetInRange(this, 0);
         if (row->deactivateKind != ENTITY_DEACTIVATE_NONE &&
@@ -477,7 +477,7 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
     long *pos;
     s32 dist;
 
-    row = &gEntityMoodTable[this->moodIndex];
+    row = &sEntityMoodTable[this->moodIndex];
     if (this->active != 0) {
         if (this->targetReached == 0) {
             pos = this->coord2->coord.t;
@@ -502,7 +502,7 @@ s32 Entity__UpdateSoundCueStart(Entity *this) {
     s32 dist;
 
     if (this->active != 0 && this->soundCueActive == 0 && this->state != ENTITY_STATE_DONE) {
-        row = &gEntityMoodTable[this->moodIndex];
+        row = &sEntityMoodTable[this->moodIndex];
         if (row->cueRange != 0) {
             pos = this->coord2->coord.t;
             dist = row->cueRange;
@@ -559,7 +559,7 @@ s32 Entity__UpdateSoundCueStop(Entity *this) {
     s32 dist;
 
     if (this->active != 0 && this->soundCueActive != 0) {
-        row = &gEntityMoodTable[this->moodIndex];
+        row = &sEntityMoodTable[this->moodIndex];
         dist = row->cueRange;
         if (dist < 0) {
             dist = ~dist + 1; /* MATCHING: -dist compiles differently */

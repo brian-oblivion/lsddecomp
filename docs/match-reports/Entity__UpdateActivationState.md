@@ -119,7 +119,7 @@ Attempted round 2026-09-01 (runner bravo, Entity 11-function pass).
 ## What it does
 
 Gated by `this->unkF0 == 0 && this->unk44 != 1`: looks up this entity's mood
-row (`gEntityMoodTable[this->moodIndex]`) and decides whether to detach based on
+row (`sEntityMoodTable[this->moodIndex]`) and decides whether to detach based on
 `row->detachKind`:
 
 - `detachKind == 4`: detach iff `(rand() & 0x7F) == 0`.
@@ -150,7 +150,7 @@ s32 Entity__UpdateActivationState(Entity *this) {
     s32 doDetach;
 
     if (this->unkF0 == 0 && this->unk44 != 1) {
-        row = &gEntityMoodTable[this->moodIndex];
+        row = &sEntityMoodTable[this->moodIndex];
         doDetach = 0;
         if (row->detachKind != 0) {
             if (row->detachKind == 4) {

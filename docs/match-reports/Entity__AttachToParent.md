@@ -51,7 +51,7 @@ respectively) -- this is just their second known caller.
 strided tables in the same family as the already-declared `gEntityUnlockKindTable`
 ("GetUnlockEffect"), `sEntityLinkStageTable` ("GetLinkStage"), `sEntityEventVideoTable`
 ("GetEventVideo") -- confirmed via `asm/data/79528.data.s` as their own
-`dlabel`s (own relocations), not sub-fields of `gEntityMoodTable`. Declared
+`dlabel`s (own relocations), not sub-fields of `sEntityMoodTable`. Declared
 `extern s8 D_80089EA7[]`/`extern s8 D_80089EAF[]` in `Entity.h` next to
 their siblings, matching the `lb` (signed) instruction at both sites.
 
@@ -94,8 +94,8 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 ## Polish (round 96, bravo, track 7)
 
 `D_80089EA7[moodIndex * 0x10]` and `D_80089EAF[moodIndex * 0x10]` are
-`gEntityMoodTable[moodIndex].detachKind` (+0x03) and `.cueRange` (+0x0B):
-0x80089EA7 and 0x80089EAF are gEntityMoodTable (0x80089EA4) + 3 and + 0xB,
+`sEntityMoodTable[moodIndex].detachKind` (+0x03) and `.cueRange` (+0x0B):
+0x80089EA7 and 0x80089EAF are sEntityMoodTable (0x80089EA4) + 3 and + 0xB,
 and the field spelling is byte-identical (whole image green). GCC emits a
 constant-offset field of a global array as `%hi`/`%lo(sym + off)`, which
 splat labels as its own `D_` symbol; that, not a separate array, is why each

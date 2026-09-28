@@ -18,7 +18,7 @@
  * (SetDreamAuxWorld, SpawnDreamAuxTriggerEntity).
  *
  * The mood row. New_Entity's first argument is `moodIndex`, which selects a
- * 16-byte row of gEntityMoodTable and of the parallel byte tables below.
+ * 16-byte row of sEntityMoodTable and of the parallel byte tables below.
  * Every tick, update (+0x098) runs updateActivationState (activate when the
  * row's activateKind condition holds), updateDeactivationState, the sound-cue
  * start/stop pair and updateTargetProximity, then TodActor's update.
@@ -71,7 +71,7 @@ struct EntityMethods {
     TODACTOR_SLOTS(Entity, (Entity * self, s32 moodIndex, void *desc, void *sound));
     /* +0x144 */ s32 (*distanceToPeer)(Entity *self, TodActor *peer); /* Entity__DistanceToPeer: |dx| + |dz| from coord2's translation to peer's world position */
     /* +0x148 */ s32 (*getProximityRatio)(Entity *self); /* Entity__GetProximityRatio: -1 when no peer or out of range */
-    /* +0x14C */ EntityMoodRow *(*getMoodEffect)(Entity *self); /* Entity__GetMoodEffect: &gEntityMoodTable[moodIndex] */
+    /* +0x14C */ EntityMoodRow *(*getMoodEffect)(Entity *self); /* Entity__GetMoodEffect: &sEntityMoodTable[moodIndex] */
     /* +0x150 */ s32 (*getUnlockEffect)(Entity *self); /* Entity__GetUnlockEffect */
     /* +0x154 */ s32 (*getLinkStage)(Entity *self);    /* Entity__GetLinkStage */
     /* +0x158 */ s32 (*getEventVideo)(Entity *self);   /* Entity__GetEventVideo */
@@ -89,7 +89,7 @@ struct EntityMethods {
 
 struct Entity {
     TODACTOR_FIELDS(EntityMethods);
-    /* +0x098 */ s32 moodIndex; /* New_Entity's first argument: the row of gEntityMoodTable and the byte tables */
+    /* +0x098 */ s32 moodIndex; /* New_Entity's first argument: the row of sEntityMoodTable and the byte tables */
     /* +0x09C */ SoundCueSet soundCueSet; /* startSoundCue starts it; the MoodCue handlers are its callback */
     /* +0x0F0 */ s32 active;              /* activate / deactivate */
     /* +0x0F4 */ s32 targetReached;  /* setTargetReached; latched by updateTargetProximity */
@@ -202,7 +202,7 @@ enum EntityDeactivateKind {
 #define ENTITY_RANGE_SHIFT 11
 #define ENTITY_RANGE_UNIT (1 << ENTITY_RANGE_SHIFT)
 
-extern EntityMoodRow gEntityMoodTable[];
+extern EntityMoodRow sEntityMoodTable[];
 extern s8 sEntityLinkStageTable[];  /* the linkStage column (Entity) */
 extern s8 sEntityEventVideoTable[]; /* the eventVideo column (Entity) */
 

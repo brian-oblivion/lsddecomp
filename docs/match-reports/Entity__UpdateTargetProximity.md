@@ -9,7 +9,7 @@ whole-image build verified byte-exact)
 
 Occupies `EntityMethods` slot `+0x178` (dispatched by `Entity__Update` in
 `Entity.c` as `this->methods->slot178(this)`). Looks up this entity's mood row
-(`gEntityMoodTable[this->moodIndex]`), and, gated on `this->unkF0 != 0`:
+(`sEntityMoodTable[this->moodIndex]`), and, gated on `this->unkF0 != 0`:
 
 - if `this->unkF4 == 0`: computes a distance argument from `row->unk6`
   (absolute value), calls `Entity__IsNearTarget(this, &this->unk14->x, dist,
@@ -31,7 +31,7 @@ s32 Entity__UpdateTargetProximity(Entity *this) {
     s32 *xptr;
     s32 dist;
 
-    row = &gEntityMoodTable[this->moodIndex];
+    row = &sEntityMoodTable[this->moodIndex];
     if (this->unkF0 != 0) {
         if (this->unkF4 == 0) {
             xptr = &this->unk14->x;
@@ -57,7 +57,7 @@ This was the first function tackled this round, and it (plus its immediate
 sibling `Entity__UpdateSoundCueStart`) surfaced three reusable residues:
 
 1. **`row` must be computed OUTSIDE the `if (this->unkF0 != 0)` guard.**
-   Retail computes `&gEntityMoodTable[this->moodIndex]` unconditionally, right at
+   Retail computes `&sEntityMoodTable[this->moodIndex]` unconditionally, right at
    the top of the function, and lets the guarding `beqz` skip over its
    (harmless, dead) use in the delay slot. Nesting the computation inside the
    `if` instead made GCC schedule it AFTER the branch, shifting every
