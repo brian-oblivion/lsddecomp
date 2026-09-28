@@ -164,7 +164,7 @@ method signatures; zero bytes changed.
 
 | offset | old | new | tier | evidence |
 | --- | --- | --- | --- | --- |
-| +0x014 | unk14 | coord2 | B | SceneNode.h maps SceneNodeObj +0x14 to GsDOBJ2.coord2; `*coord2 = 0` is its flg |
+| +0x014 | unk14 | coord2 | B | scene_node.h maps SceneNodeObj +0x14 to GsDOBJ2.coord2; `*coord2 = 0` is its flg |
 | +0x020 | unk20 | model | A | SceneNode__LinkModel stores its 2nd argument here; PlaceModelChildren hands it to each child |
 | +0x024 | unk24 | tick | B | StyleEffect__SetParams zeroes it, StyleEffect__Update (slot +0x0EC) increments it before every update |
 | +0x054 | unk54 | kind | B | ctor stores New's first argument, 0..3 at the four ObjMStyleActor.c call sites; three switches on it |
@@ -198,7 +198,7 @@ For the HEAD, by type scope; none applied here (other units' views).
   `unk54` -> `kind` (B); `block58` -> `params` (B: the 0x24-byte block this
   unit reads as offset/rotation/scale/modelChildLayout/tableIndex/color/
   altColor).
-- `include/SceneNode.h` `SceneNodeMethods`: `slot44` -> `updateRotation`,
+- `include/scene_node.h` `SceneNodeMethods`: `slot44` -> `updateRotation`,
   `slot48` -> `updateScale` (B; SceneNode__UpdateRotation / SceneNode__UpdateScale bodies, both
   matched since those comments said "still queued").
 

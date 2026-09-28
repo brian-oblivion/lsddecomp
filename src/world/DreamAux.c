@@ -32,7 +32,7 @@
 #include <libgs.h>
 #include "entity.h"
 #include "DreamAux.h"
-#include "SceneNode.h"
+#include "scene_node.h"
 #include "ModelData.h"
 #include "TriggerWorld.h"
 #include "DreamSys.h"

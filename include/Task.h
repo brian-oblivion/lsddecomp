@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "basic_class.h"
-#include "SceneNode.h"
+#include "scene_node.h"
 #include "BoxFill.h"
 #include "FadeBox.h"
 #include "IntermediateBase.h"

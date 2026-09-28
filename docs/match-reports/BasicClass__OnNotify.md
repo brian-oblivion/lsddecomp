@@ -56,7 +56,7 @@ Evidence:
   notifying. Hence `sender`.
 - `arg2` is not a boolean, and that is why `event` and not `isFinalizing`.
   Two overrides in other units forward to the base and then keep using the
-  same value: `SceneNode__OnNotify` (`src/graphics/SceneNode.c`) calls
+  same value: `SceneNode__OnNotify` (`src/graphics/scene_node.c`) calls
   `GetBasicClassMethods()->slot38(self, other, arg2)` and then dispatches
   to slot `+0x094`/`+0x098`/`+0x09C` **by the sender's class tag**, passing
   `arg2` through each time; `TodActor__OnNotify` (`src/world/TodActor.c`) calls the
@@ -83,7 +83,7 @@ which is the procedure working in the direction where it can work. for the head
 `arg2` -> `event`. **Tier B**, same evidence. Cross-unit and the widest
 replace of the round: 13 units access `->slot38`
 (`TitleMenuTaskObjF/f/i/j/k.c`, `DayTaskStageMap.c`, `class_3ac78.c`,
-`Task/d.c`, `TodActor.c`, `SceneNode.c`, `code_d294_b.c`, plus
+`Task/d.c`, `TodActor.c`, `scene_node.c`, `code_d294_b.c`, plus
 this unit). Worth doing alone rather than batched.
 
 ## Round 91 polish (delta, track 7)

@@ -37,7 +37,7 @@
 #include "BMemPMgr.h"
 #include <strings.h>
 #include "GameApplicationFileResource.h"
-#include "SceneNode.h"
+#include "scene_node.h"
 
 /* Defined in other units. */
 

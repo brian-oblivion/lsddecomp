@@ -18,8 +18,8 @@ registers, all read before written — the standard
 
 **Why the two declarations disagree.** `include/class_3bb8c.h`'s 3-parameter
 prototype is the true signature; `DayTaskStageMap.c:105` calls it with three
-arguments. `include/SceneNode.h`'s `extern void ApplyMatrixLV();` is round
-19's *deliberate* unprototyped form: `ApplyMatrixToLVArray` (src/graphics/SceneNode.c)
+arguments. `include/scene_node.h`'s `extern void ApplyMatrixLV();` is round
+19's *deliberate* unprototyped form: `ApplyMatrixToLVArray` (src/graphics/scene_node.c)
 must contain both a live 3-argument call and an unreachable
 `if (0) { ApplyMatrixLV(m, src, dst, 0, 0, 0); }`, because GCC 2.6.3 sizes the
 outgoing-argument area from every call expression's argument count during RTL
@@ -35,7 +35,7 @@ declaration states the signature, the other deliberately states nothing.
 markers added to
 
 - `include/class_3bb8c.h` — `extern void ApplyMatrixLV(QueryTemplate866E8 *arg0, s32 *arg1, s32 *arg2);`
-- `include/SceneNode.h` — `extern void ApplyMatrixLV();`
+- `include/scene_node.h` — `extern void ApplyMatrixLV();`
 
 Oracle green (`build exit=0`, `OK: build matches retail`) after the edit; a
 comment moves zero bytes.

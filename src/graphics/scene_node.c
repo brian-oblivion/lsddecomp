@@ -1,5 +1,5 @@
 /*
- * SceneNode (include/SceneNode.h): every method of the class, the table
+ * SceneNode (include/scene_node.h): every method of the class, the table
  * getter, and the free vector and clipping helpers its methods call by
  * symbol, in ROM order: the occupants of gSceneNodeMethods' slots +0x000 to
  * +0x0B4, the getter, then the methods that sit in no slot and the helpers.
@@ -51,7 +51,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "SceneNode.h"
+#include "scene_node.h"
 #include "Pad.h"
 #include "FrameClock.h"
 #include "TmdModel.h"
@@ -920,7 +920,7 @@ void SceneNode__LinkModel(SceneNode *self, void *model) {
     self->model = model;
     self->tmd = (s32)((TmdModel *)model)->object;
     /* Casts: Sony types tmd_base as an address (`unsigned long`), and
-     * SceneNode.h spells the embedded GsDOBJ2 as four separate fields. */
+     * scene_node.h spells the embedded GsDOBJ2 as four separate fields. */
     GsLinkObject4((u_long)((TmdModel *)self->model)->data->objects, (GsDOBJ2 *)&self->attribute, 0);
 }
 

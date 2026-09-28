@@ -256,7 +256,7 @@ Naming, all zero bytes:
 - `arg3` / `unk4C` kept: stored, never read, and IntermediateBase__Init
   passes 0, so nothing names it.
 - `flag` kept: it goes to GetSetHitHeightGate, whose global's meaning is not
-  established (SceneNode.c's tier-C note).
+  established (scene_node.c's tier-C note).
 
 ## Track 10 (2026-09-28, round 104, echo)
 

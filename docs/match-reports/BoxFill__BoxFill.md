@@ -17,10 +17,10 @@ void BoxFill__BoxFill(ClassEAC0Obj *self, BoxFillSize *a1, void *a2, s32 a3) {
 }
 ```
 
-`GetSceneNodeMethods` is `SceneNode.h`'s own bare getter for the ACTUAL
+`GetSceneNodeMethods` is `scene_node.h`'s own bare getter for the ACTUAL
 `SceneNodeObj` table (`gSceneNodeMethods`) -- this is the point where the chain
 bottoms out at the REAL base class two units over. Its `ctor` slot there
-takes only `self` (`void *(*ctor)(void *self)`, `SceneNode.h`), matching
+takes only `self` (`void *(*ctor)(void *self)`, `scene_node.h`), matching
 this call site's own single-argument setup.
 
 ## Naming (round 61, track 3)

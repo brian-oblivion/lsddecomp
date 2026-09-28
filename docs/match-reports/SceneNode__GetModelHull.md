@@ -36,8 +36,8 @@ explicitly flagged for a later carve to retype). This function passes it
 straight through as `TmdModel__GetHull`'s own `void *` arg0 (which
 `TmdModel__GetHull` forwards unmodified to `TmdModel__ComputeBounds`, which dereferences
 it at `+0x10`) -- genuinely a pointer. Retyped to `void *unk20` in
-`include/SceneNode.h`. The only existing write site, `self->unk20 = 0;` in
-`SceneNode__SceneNode` (`src/graphics/SceneNode.c`), is an integer-constant-zero assignment
+`include/scene_node.h`. The only existing write site, `self->unk20 = 0;` in
+`SceneNode__SceneNode` (`src/graphics/scene_node.c`), is an integer-constant-zero assignment
 and compiles unchanged under the new type (checked: `build exit=0`, full
 image SHA1 still green).
 
@@ -65,7 +65,7 @@ actually being read. Purely local to this unit + its header.
 
 ## Track 6 (round 91, echo): named `SceneNode__GetModelHull`, tier A
 
-The body is `TmdModel__GetHull(self->model, dest)`: the linked TmdModel's eight-corner hull (TmdHull) into `dest`. Was `ReadUnk20Data` (`unk20` is now `model`). Slot +0x08C kept as `readUnk20Data` (caller in ObjMStyleActor.c); `getModelHull` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+The body is `TmdModel__GetHull(self->model, dest)`: the linked TmdModel's eight-corner hull (TmdHull) into `dest`. Was `ReadUnk20Data` (`unk20` is now `model`). Slot +0x08C kept as `readUnk20Data` (caller in ObjMStyleActor.c); `getModelHull` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/scene_node.h's banner has the evidence).
 
 ## Round 100 (delta): track 7
 

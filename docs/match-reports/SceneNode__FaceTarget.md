@@ -110,10 +110,10 @@ same base class?**
    locally available (matching the `+0xC`/`+0x14` layout used), per the
    project's established "per-call-site signature, not a callee
    property" precedent (same as `GetSceneNodeMethods`/`SceneNode__NoOpSlot5C`). Full
-   writeup left in `include/SceneNode.h`'s own comment on this function,
+   writeup left in `include/scene_node.h`'s own comment on this function,
    so the next reader doesn't have to re-derive it.
 
-## New extern knowledge (`include/SceneNode.h`, additive)
+## New extern knowledge (`include/scene_node.h`, additive)
 
 - **`ratan2`** (Psy-Q library, `s32 ratan2(s32 dy, s32 dx)`): arctangent
   in PSX-native 4096-per-circle BAM units -- confirmed by this function's
@@ -215,7 +215,7 @@ here exactly as already declared.
   both are converted to degrees by the same `* 360 / 4096` this unit's
   `SceneNode__GetRotationDegrees` uses; they are packed as a
   `Ratio16[3]` and dispatched to `slot44`, whose occupant is
-  `SceneNode__UpdateRotation` (SceneNode.c, matched) -- the setter that writes
+  `SceneNode__UpdateRotation` (scene_node.c, matched) -- the setter that writes
   `GsCOORD2PARAM.rotate`, i.e. the object's own rotation. Compute an
   orientation from self toward a target and install it as the object's
   rotation is the whole function.
@@ -232,12 +232,12 @@ here exactly as already declared.
   branches, not evidence.
 
 
-## Round 95 (bravo): moved from include/SceneNode.h
+## Round 95 (bravo): moved from include/scene_node.h
 
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 
 ```c
-/* SceneNode__FaceTarget (prototype in include/SceneNode.h; round 14, this unit -- the SAME external symbol
+/* SceneNode__FaceTarget (prototype in include/scene_node.h; round 14, this unit -- the SAME external symbol
  * Entity_b/c/d/e.c call via their own separate `entity.h` declaration,
  * `SceneNode__FaceTarget(Entity *this, void *arg1, s32 arg2, s32 arg3, s32
  * arg4)`; same "per-call-site signature, not a callee property"
@@ -284,7 +284,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
 Parameters named for what their branches do, which is all the body establishes (tier B; the purpose of the modes stays open, as round 50 said): `arg2` -> `zeroPitch` (non-zero clears the pitch entry), `arg3` -> `noHalfTurn` (0 adds 180 degrees to the yaw), `arg4` -> `extraRotation` (a Ratio16[3] handed to updateRotation with set = 0, i.e. added). `table` -> `targetPos`, and the pitch half's reuse of `dx` for the y difference is now its own `dy` local: byte-identical. `4096` is `ONE`, the quarter turn `0x400` is `ONE / 4`, and the half turn `0xB4` is written `180` (degrees).
 

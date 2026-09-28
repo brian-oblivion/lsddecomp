@@ -22,7 +22,7 @@ BasicClass *LightRig__GetLight(LightRig *self, s32 index) {
 
 ## Naming
 
-- `D8006EFAC__GetChild` -- tier A. Slot +0x0B8: returns children[index]. Shared, unchanged, with gStageMapMethods's own slot +0x0B8 (include/SceneNode.h documents D_8006EFAC as "the base of StageMap"), i.e. StageMap simply inherits this getChild rather than overriding it. Pure getter.
+- `D8006EFAC__GetChild` -- tier A. Slot +0x0B8: returns children[index]. Shared, unchanged, with gStageMapMethods's own slot +0x0B8 (include/scene_node.h documents D_8006EFAC as "the base of StageMap"), i.e. StageMap simply inherits this getChild rather than overriding it. Pure getter.
 
 ## Track 4
 

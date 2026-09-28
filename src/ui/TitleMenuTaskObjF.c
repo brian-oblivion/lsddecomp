@@ -36,7 +36,7 @@
 #include <libgs.h>
 #include <strings.h>
 #include "DreamSys.h"
-#include "SceneNode.h"
+#include "scene_node.h"
 #include "Actor.h"
 #include "Viewport.h"
 #include "NodeGuardedViewport.h"

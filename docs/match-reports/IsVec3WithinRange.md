@@ -73,7 +73,7 @@ retail's literal shape over the "cleaner" idiomatic form.
   the code does not have. The explicit pointer walks in the `for`
   increment clause are load-bearing (see the derivation above) and unchanged.
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
 The pointer-bump placement keeps a one-line `MATCHING:` note in the source.
 

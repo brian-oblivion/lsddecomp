@@ -150,7 +150,7 @@ nothing, which the header now says.
 ## Proposed (not applied)
 
 - `VariantSprite__UpdateScale`'s `s16 *ratios` -> `Ratio16 *ratios`
-  (SceneNode.h's num/den pair, the type `Sprite__UpdateRotation` already
+  (scene_node.h's num/den pair, the type `Sprite__UpdateRotation` already
   takes): the body reads `ratios[0]/[1]` and `[2]/[3]` as two such pairs.
   A body edit in `src/world/ObjMStyleActor.c`, so it is track 7's, not this
   pass's.

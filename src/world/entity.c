@@ -50,7 +50,7 @@ extern s8 sEntityEventVideoTable[]; /* the eventVideo column (Entity) */
 /* The motion templates (.data, in address order):
  * the constant triples the MoodCue handlers in src/world/entity.c pass to
  * updateRotation (+0x044) and updateScale (+0x048) -- three Ratio16s
- * (include/SceneNode.h), degrees or scale factors, {x, y, z} -- and to
+ * (include/scene_node.h), degrees or scale factors, {x, y, z} -- and to
  * addTranslation (+0x0BC), three s32 deltas. Named by value. The slots take
  * the table untyped, so the element type is the reader's (SceneNode__Update-
  * Rotation/UpdateScale), not the callers'. sTranslateYMinus64's label also
@@ -91,7 +91,7 @@ extern Ratio16 sScaleXFourFifthsYSixFifths[]; /* {4/5, 6/5, 5/5} */
 extern Ratio16 sScaleDouble[];
 extern Ratio16 sScaleMinusSixtyFourth[];
 extern Ratio16 sScaleEightSevenths[];
-extern Ratio16 sScaleUnit[]; /* {1/1, 1/1, 1/1}, a .data copy of SceneNode.h's sSceneNodeScaleOne */
+extern Ratio16 sScaleUnit[]; /* {1/1, 1/1, 1/1}, a .data copy of scene_node.h's sSceneNodeScaleOne */
 extern Ratio16 sScaleEighth[];
 extern Ratio16 sScaleXEighthY2ZEighth[];
 extern Ratio16 sScaleSix[];

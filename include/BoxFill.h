@@ -1,7 +1,7 @@
 #ifndef BOXFILL_H
 #define BOXFILL_H
 
-#include "SceneNode.h"
+#include "scene_node.h"
 
 /*
  * BoxFill -- a flat-coloured screen rectangle (class id 0x64, method table

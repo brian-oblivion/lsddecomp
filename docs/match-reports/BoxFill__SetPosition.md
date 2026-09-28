@@ -123,9 +123,9 @@ a BoxFillPos is that only while `relative` is set, and pixels after
 `attachAbsolute` (GraphRoom's dots, ObjMStyleActor, pass
 `dx * 10 - 5`-style pixel offsets). TaskCore__RefreshSlotView
 (Task.c) passes one local SlotPos to both a BoxFill and its
-TextRows, so a single `ScreenPos` in SceneNode.h is a reasonable proposal
+TextRows, so a single `ScreenPos` in scene_node.h is a reasonable proposal
 for the head; it cannot be done through `renametype.py` (the new name
-already exists) and would touch ScreenSprite.h and SceneNode.h, outside
+already exists) and would touch ScreenSprite.h and scene_node.h, outside
 this job.
 
 Image byte-identical.

@@ -1,7 +1,7 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include "SceneNode.h"
+#include "scene_node.h"
 
 /*
  * Sprite -- the base of the game's 2-D sprites (class id 0x44, method table

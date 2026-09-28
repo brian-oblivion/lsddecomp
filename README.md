@@ -140,7 +140,7 @@ Read each named class's header first; its banner points to the units.
   textures, music and map chunks, the movies) are one table,
   `src/cd/GameFiles.c`.
 - **Scene objects.** `SceneNode` is the positioned 3D object, wrapping a
-  libgs `GsDOBJ2` and its coordinate system (`src/graphics/SceneNode.c`); `Actor`
+  libgs `GsDOBJ2` and its coordinate system (`src/graphics/scene_node.c`); `Actor`
   adds movement (`src/world/ObjMStyleActor.c`). `LinkResource`, `ModelData` and `Tod`/`TodSet`
   (`src/graphics/GraphicsResources.c`) load models and TOD animations;
   `TmdModel` (`src/graphics/TmdModel.c`) is one object of a TMD, and

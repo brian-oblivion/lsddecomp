@@ -11,7 +11,7 @@
 `SceneNode` vtable slot `+0x014`, mirror of `SceneNode__AddChild` (`+0x010`).
 If `other`'s vtable header tag is `9`, first calls `SceneNode__UnlinkModel(self)`
 (zeroes `self->unk18`/`self->unk20` -- MEASURED from its own disassembly,
-see `include/SceneNode.h`), THEN unconditionally forwards to the base
+see `include/scene_node.h`), THEN unconditionally forwards to the base
 class's own `+0x014` slot (`GetBasicClassMethods()->slot14`). "Detach" to
 `SceneNode__AddChild`'s "attach": the pre-work happens before the base call here,
 where `SceneNode__AddChild` did its post-work after.

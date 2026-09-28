@@ -291,7 +291,7 @@ The slot and its object view (DreamAuxObj / DreamAuxTickFn, deleted):
  * detaches and re-attaches (detachFromParent, attachToParent with the
  * player sDreamAuxWorld as the peer);
  * and a 3-word position vector at +0x8 that DespawnDreamAuxEntity passes as
- * `SceneNode__LocalOffsetToWorldPos`'s `src` (that function's own signature, `SceneNode.h`,
+ * `SceneNode__LocalOffsetToWorldPos`'s `src` (that function's own signature, `scene_node.h`,
  * takes `s32 *src` and treats it as a 3-word vector). Stride is 0x14,
  * confirmed by SetDreamAuxWorld's walk over sDreamAuxSlots. */
 ```

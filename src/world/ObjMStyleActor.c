@@ -479,7 +479,7 @@ void ObjM__DetachTarget(ObjM *self) {
     GetTimedTaskMethods()->deinit((TimedTask *)self);
 }
 
-/* Defined elsewhere, no header: src/graphics/SceneNode.c (GetSetHitHeightGate
+/* Defined elsewhere, no header: src/graphics/scene_node.c (GetSetHitHeightGate
  * sets the flag SceneNode__RaycastHullAgainstFaces tests). RegisterStyleConfig,
  * which keeps `sceneRefs` as sStyleSceneRefs, is defined below, after ObjM. */
 extern s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadArg);

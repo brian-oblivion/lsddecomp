@@ -48,7 +48,7 @@
  * slot differs between a class and its subclasses: an override that needed a
  * different return type or parameter list would be a different slot. The one
  * exception is the ctor's return type, for the same reason as its parameters:
- * BASICCLASS_SLOTS_R takes it (include/SceneNode.h, whose ctor returns self).
+ * BASICCLASS_SLOTS_R takes it (include/scene_node.h, whose ctor returns self).
  */
 
 typedef struct BasicClass BasicClass;

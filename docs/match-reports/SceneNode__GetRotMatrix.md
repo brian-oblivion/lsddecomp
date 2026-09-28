@@ -50,7 +50,7 @@ void SceneNode__GetRotMatrix(SceneNodeObj *self, s32 a1, s32 a2) {
 
 ## Header changes
 
-`include/SceneNode.h`:
+`include/scene_node.h`:
 
 - New `S16Quad_d294` type: `{ s16 x, y, z, w; }`. All-`s16` members give it
   alignment 2, which is exactly what makes retail's whole-struct copy
@@ -64,7 +64,7 @@ void SceneNode__GetRotMatrix(SceneNodeObj *self, s32 a1, s32 a2) {
   `{ u8 pad0[0x10]; S16Quad_d294 vec; }`. Only +0x10 is known; the rest of
   the 0x28-byte block is still opaque.
 - `SceneNodeSub14::unk44` retyped from `void *` to `SceneNodeBlock44 *`.
-  Checked both other referencing sites in `src/graphics/SceneNode.c` before doing
+  Checked both other referencing sites in `src/graphics/scene_node.c` before doing
   this (`self->unk14->unk44 = blockB;` where `blockB` is `void *`, and
   `BMemPMgrFree(sub->unk44)`, which takes `void *`) — both are safe under
   implicit pointer conversion, no cast needed.
@@ -94,12 +94,12 @@ project).
 (tier B). Slot `+0x084` occupant (`tools/classtable.py gSceneNodeMethods`),
 dispatched as `slot84(self, out, flag)` from both this unit's own
 `SceneNode__ComposeAndApplyRotation` (`self` as receiver) and
-`SceneNode.c`'s `SceneNode__RotateLocalVector` (a different
+`scene_node.c`'s `SceneNode__RotateLocalVector` (a different
 SceneNodeObj instance) -- so the SIGNATURE this file declares
 (`SceneNode__GetRotMatrix(SceneNodeObj *self, s32 a1, s32 a2)`) is really
 `(self, MATRIX *out, s32 negate)`: builds this object's own rotation
 quad (`self->unk14->unk44->vec`, the PSY-Q-identified `GsCOORD2PARAM.rotate`
-per `include/SceneNode.h`'s own "PSY-Q IDENTIFICATION" note -- negated
+per `include/scene_node.h`'s own "PSY-Q IDENTIFICATION" note -- negated
 per-axis when `negate` is set, copied verbatim otherwise) and hands it
 to Sony's `RotMatrix(vec, out)` to fill the caller's matrix. "GetRotMatrix"
 describes the measured mechanics (compute-and-write-out this object's
@@ -107,24 +107,24 @@ rotation matrix, optionally mirrored); tier B because the negate flag's
 in-game meaning (which callers want the mirrored form, and why) is not
 established from this function's own body. Held back from an actual
 rename because this symbol is referenced (in a comment) from
-`src/graphics/SceneNode.c:27` -- a different unit -- discussing exactly the
+`src/graphics/scene_node.c:27` -- a different unit -- discussing exactly the
 slot-84 relationship above. Posted to the broadcast.
 
 ## Round 95 (bravo): Sony's declarations
 
 `RotMatrix` now comes from `<libgte.h>`, `MATRIX *RotMatrix(SVECTOR *r,
 MATRIX *m)`. The call casts `&buf` to `SVECTOR *` (S16Quad_d294 is SVECTOR's
-layout) and `a1` to `MATRIX *` (SceneNode.h prototypes the parameter as
-`s32 out`); both casts go when SceneNode.h takes Sony's types. Byte-identical.
+layout) and `a1` to `MATRIX *` (scene_node.h prototypes the parameter as
+`s32 out`); both casts go when scene_node.h takes Sony's types. Byte-identical.
 
 ## Round 97 (alpha): Sony's SVECTOR
 
-S16Quad_d294 is deleted: SceneNode.h now takes Sony's SVECTOR (four shorts vx, vy, vz, pad; 8 bytes, alignment 2 -- the same layout and the same alignment, so the whole-struct copy still compiles to lwl/lwr). `buf` and `src` are SVECTOR, the negate path writes vx/vy/vz, and the `(SVECTOR *)` cast is gone; the `(MATRIX *)a1` cast stays until the prototype types `out`. Byte-identical.
+S16Quad_d294 is deleted: scene_node.h now takes Sony's SVECTOR (four shorts vx, vy, vz, pad; 8 bytes, alignment 2 -- the same layout and the same alignment, so the whole-struct copy still compiles to lwl/lwr). `buf` and `src` are SVECTOR, the negate path writes vx/vy/vz, and the `(SVECTOR *)` cast is gone; the `(MATRIX *)a1` cast stays until the prototype types `out`. Byte-identical.
 
 ## Round 100 (delta): track 7
 
 Parameters `a1`/`a2` -> `out`/`invert`, locals `buf`/`src` -> `angles`/`rotate`.
-`out` is now `MATRIX *` in the definition and in SceneNode.h's prototype (it
+`out` is now `MATRIX *` in the definition and in scene_node.h's prototype (it
 was `s32`, with a cast at RotMatrix); the slot already typed it `void *`, and
 no caller names the function. Byte-identical.
 

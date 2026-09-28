@@ -478,7 +478,7 @@ Evidence: this unit's own `TaskObjF__WriteMemcardSaveFile` (its only
 caller) is the bounded-retry wrapper around it, and the "Try" prefix
 matches this project's existing convention for a single, non-retrying
 attempt a caller may retry (`SceneNode__TryAttachNearby`,
-`src/graphics/SceneNode.c`). "Memcard" is established by `BuildMemcardPath`'s
+`src/graphics/scene_node.c`). "Memcard" is established by `BuildMemcardPath`'s
 own `bu00:`/`bu10:` device templates; "SaveFile" is established by the
 0x200-byte buffer's structural match to the PS1 memory-card save file
 header format (see the local-type naming note below) plus the BIOS

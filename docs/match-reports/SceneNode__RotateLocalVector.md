@@ -25,7 +25,7 @@ void SceneNode__RotateLocalVector(SceneNodeObj *self, SceneNodeSub44 *dst, s16 *
 }
 ```
 
-## New struct/extern knowledge (`include/SceneNode.h`, additive)
+## New struct/extern knowledge (`include/scene_node.h`, additive)
 
 - **`SceneNodeMethods` gains `slot84`** (`void(SceneNodeObj*, void*,
   s32)`), split out of the `pad060[0x094-0x060]` range this round
@@ -86,7 +86,7 @@ larger, partially-opaque) extent.
   bare 3-word local (`Vec3O buf`). The old typing matched by offset
   coincidence with `GsCOORD2PARAM.scale`. Byte-identical after the retype.
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
 The `u8 buf[0x20]` rotation buffer is now `MATRIX rot` (0x20 bytes, the type getRotMatrix fills): byte-identical.
 

@@ -1,7 +1,7 @@
 #ifndef LIGHTRIG_H
 #define LIGHTRIG_H
 
-#include "SceneNode.h"
+#include "scene_node.h"
 
 /*
  * LightRig -- a scene node that owns the flat lights and the ambient colour

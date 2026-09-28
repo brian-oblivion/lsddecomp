@@ -32,7 +32,7 @@
 #include "BMemPMgr.h"
 #include "FullWidthSjis.h"
 #include <strings.h>
-#include "SceneNode.h"
+#include "scene_node.h"
 
 /* FadeBox's colour tables, eight RGB entries each, indexed at a 3-byte
  * stride by a channel mask: sFadeBoxMaskColors holds each mask's own

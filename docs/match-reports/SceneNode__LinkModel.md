@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001E770` on 2026-09-17 (tools/rename.py). Address 0x8001e770.
 
-Unit: `code_d294_c` (round 14). Called by `SceneNode__AddChild` (`SceneNode.c`)
+Unit: `code_d294_c` (round 14). Called by `SceneNode__AddChild` (`scene_node.c`)
 as its conditional forward target when `other`'s vtable-header tag is 9.
 Stores `other` into `self->unk20`, copies one field out of it, then calls
 the Psy-Q `GsLinkObject4` through a pointer computed off `other->unkC`.
@@ -20,7 +20,7 @@ void SceneNode__LinkModel(SceneNodeObj *self, GenericObj_d294 *other) {
 }
 ```
 
-## New struct/extern knowledge (`include/SceneNode.h`, additive)
+## New struct/extern knowledge (`include/scene_node.h`, additive)
 
 - **`GenericObj_d294` gains `unk10`** (`s32`), immediately following the
   already-known `unkC` (`void *`) with no gap -- read here into
@@ -92,7 +92,7 @@ not in registers.
 The signature is now `(SceneNode *self, void *model)`. The argument is the
 class-9 child (gTmdModelMethods) that SceneNode__AddChild tag-tests. That class
 has no C yet, so the two words LinkModel reads live in a local
-`ModelObj_d294` view in `src/graphics/SceneNode.c`: `+0x0C tmdFile` and `+0x10 tmd`.
+`ModelObj_d294` view in `src/graphics/scene_node.c`: `+0x0C tmdFile` and `+0x10 tmd`.
 The object fields are renamed: +0x18 `unk18` is now `tmd` (GsDOBJ2.tmd), and
 +0x20 `unk20` is now `model`. The local externs in `src/world/TodActor.c` and
 `src/world/ObjMStyleActor.c`, `(void *self, s32 arg)`, are deleted, and their
@@ -121,12 +121,12 @@ not done here.
 
 `GsLinkObject4` now comes from `<libgs.h>`: `(unsigned long tmd_base, GsDOBJ2
 *objp, int n)`. The call casts `data->objects` to `u_long` (Sony types the
-TMD base as an address) and `&self->attribute` to `GsDOBJ2 *` (SceneNode.h
+TMD base as an address) and `&self->attribute` to `GsDOBJ2 *` (scene_node.h
 spells the embedded GsDOBJ2 as four separate fields; embedding Sony's struct
-there is proposed, not done: SceneNode.h has many includers).
+there is proposed, not done: scene_node.h has many includers).
 Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
 The re-read of `self->model` keeps a one-line `MATCHING:` note in the source.
 

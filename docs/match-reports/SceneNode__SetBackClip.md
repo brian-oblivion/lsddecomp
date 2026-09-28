@@ -60,7 +60,7 @@ too, out of this round's scope. Posted to the broadcast.
 
 ## Track 6 (round 91, echo): named `SceneNode__SetBackClip`, tier A
 
-`GetSetBitField(&self->attribute, 8, 1, on == 0) == 0`: `on` clears libgs.h's GsNBACKC ("no back clip"), the same inverted shape as SetDisplay/GsDOFF and SetLighting/GsLOFF. Was `GetSetUnk10Flag8`. Slot +0x080 kept as `getSetUnk10Flag8`: its callers are in class_3bb8c_o.c and ObjMStyleActor.c, outside this job; `setBackClip` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+`GetSetBitField(&self->attribute, 8, 1, on == 0) == 0`: `on` clears libgs.h's GsNBACKC ("no back clip"), the same inverted shape as SetDisplay/GsDOFF and SetLighting/GsLOFF. Was `GetSetUnk10Flag8`. Slot +0x080 kept as `getSetUnk10Flag8`: its callers are in class_3bb8c_o.c and ObjMStyleActor.c, outside this job; `setBackClip` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/scene_node.h's banner has the evidence).
 
 ## Round 100 (delta): track 7
 

@@ -2,7 +2,7 @@
 #define VIEWPORT_H
 
 #include "basic_class.h"
-#include "SceneNode.h"
+#include "scene_node.h"
 #include "DrawSystem.h"
 
 /*
@@ -31,7 +31,7 @@
  * Children are cached by their class-id nibble (AddChild/RemoveChild): 1 is
  * the DrawSystem (gDrawSystemMethods, id 0x1), 4 a SceneNode, the node the view is
  * attached to. Each is typed by its class (include/DrawSystem.h,
- * include/SceneNode.h).
+ * include/scene_node.h).
  *
  * The ctor chains to BasicClass's first (GetBasicClassMethods()->ctor),
  * and gNodeGuardedViewportMethods's (0x17, include/NodeGuardedViewport.h) chains to this one,

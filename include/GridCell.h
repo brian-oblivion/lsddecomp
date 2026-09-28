@@ -1,7 +1,7 @@
 #ifndef GRIDCELL_H
 #define GRIDCELL_H
 
-#include "SceneNode.h"
+#include "scene_node.h"
 
 /*
  * GridCell -- one cell of StageMap's grid: a SceneNode that carries the

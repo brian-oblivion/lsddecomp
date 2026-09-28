@@ -21,8 +21,8 @@ ObjMStyleActor: warning: unused variable `pad48Tail'
 ObjMStyleActor: warning: unused variable `unused'
 PlacementGridVabSound: warning: unused variable `unused'
 PlacementGridVabSound: warning: unused variable `unused'
-SceneNode: warning: unused variable `pad'
-SceneNode: warning: unused variable `unused'
+scene_node: warning: unused variable `pad'
+scene_node: warning: unused variable `unused'
 Sprite: warning: unused variable `pad'
 Task: warning: assignment from incompatible pointer type
 TitleMenuTaskObjF: warning: `state' might be used uninitialized in this function

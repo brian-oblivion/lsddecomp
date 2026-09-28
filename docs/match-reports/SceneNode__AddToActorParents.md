@@ -222,7 +222,7 @@ whether the function itself matched)
   at this edit put `slot10` immediately after `header` with no padding,
   silently shifting the already-matched `slot50` from its correct `+0x050`
   to `+0x044`. This didn't fail the build (compiles clean either way) —it
-  broke the WHOLE-IMAGE SHA1 by one byte, in `SceneNode__DetachAttachedChildren` (`SceneNode.c`,
+  broke the WHOLE-IMAGE SHA1 by one byte, in `SceneNode__DetachAttachedChildren` (`scene_node.c`,
   a different unit, already matched, calling `entry->methods->slot50`).
   Caught by running the full `./build-and-verify.sh` and then `cmp -l
   build/SLPS_015.56 disk/SLPS_015.56` to localize the single differing byte
@@ -242,7 +242,7 @@ whether the function itself matched)
 
 ## Header changes kept
 
-`include/SceneNode.h`:
+`include/scene_node.h`:
 - `GenericMethods_d294`: added `pad004[0x010-0x004]` + `slot10` (see above;
   the padding fix is the load-bearing part).
 - New extern `BasicClass__GetNextParentRef(void *self, GenericObj_d294 **outParent,
@@ -451,7 +451,7 @@ round's identified never-searched near-misses, despite already carrying
 three prior rounds of hand-lever attempts.
 
 `tools/setup-permuter.sh SceneNode__AddToActorParents <seed>` scaffolded cleanly (seed:
-the round-19 48/54 body, `#include "SceneNode.h"` for the project's own
+the round-19 48/54 body, `#include "scene_node.h"` for the project's own
 struct/extern declarations rather than re-declaring them locally, since
 this unit already shares that header). `--debug --stack-diffs` sanity
 check: **base score = 38** (8 stack-difference points, 6
@@ -562,7 +562,7 @@ is a PURE 38-point stack+register penalty with zero insertions and zero
 deletions -- a lever that works by eliminating an instruction (an
 insertion/deletion-class fix) has nothing to act on in a residue that is
 already structurally minimal. Filing unchanged as STALL at 48/54,
-`INCLUDE_ASM` confirmed restored, `git diff --stat src/graphics/SceneNode.c`
+`INCLUDE_ASM` confirmed restored, `git diff --stat src/graphics/scene_node.c`
 clean after the check (verbatim re-restore, byte-for-byte identical to
 the committed state).
 
@@ -597,12 +597,12 @@ at the first hit. "NotifyTaggedParents" describes the measured
 mechanics (scan parents, filter by a tag byte, dispatch to matches);
 the game-level meaning of tag `4`/`0x34` and what the `+0x010`
 dispatch actually does to `entry` is not established. This is also the
-class's own table-slot BOUNDARY -- `SceneNode.c`'s own file banner
+class's own table-slot BOUNDARY -- `scene_node.c`'s own file banner
 already documents "`tools/classtable.py gSceneNodeMethods` stops at
 SceneNode__AddToActorParents" -- i.e. it is `SceneNodeMethods`'s LAST slot
 (`+0x0B4`), not evidence of anything about this function's own
 purpose beyond position. Held back from an actual rename because this
-symbol is referenced (in a comment) from `src/graphics/SceneNode.c:13` -- a
+symbol is referenced (in a comment) from `src/graphics/scene_node.c:13` -- a
 different unit's own file banner, making exactly that boundary
 observation. Posted to the broadcast.
 
@@ -651,7 +651,7 @@ split-expression axis, round-20's three further axes, a 73118-iteration
 permuter search (round 37) that never beat the base score, and round-41's
 dead-reload-lever check (ruled inapplicable, clean negative). Filing
 unchanged as STALL at 48/54, `INCLUDE_ASM` confirmed restored,
-`git diff --stat src/graphics/SceneNode.c` empty after the check.
+`git diff --stat src/graphics/scene_node.c` empty after the check.
 
 REVISITED (round 55): confirmed unchanged at 48/54; round-54 naming reached
 none of this function's own symbols; no new lever found or attempted beyond

@@ -9,7 +9,7 @@ Round 12, runner delta. `SceneNode`.
 ## Summary
 
 This unit's own no-argument vtable getter, already well documented in
-`include/SceneNode.h`'s file banner and in `include/class_3bb8c.h` (which
+`include/scene_node.h`'s file banner and in `include/class_3bb8c.h` (which
 calls the same symbol with a different arity from a different unit --
 established cross-unit precedent, not new). Whole body is `lui/addiu
 %hi/%lo(gSceneNodeMethods); jr $ra`.
@@ -39,7 +39,7 @@ jr    $ra
 ### Proposed learning
 
 None new -- this is the same getter/arity-per-call-site precedent already
-documented in `include/SceneNode.h` and `include/class_3bb8c.h`; this round
+documented in `include/scene_node.h` and `include/class_3bb8c.h`; this round
 just supplies the getter's own C body.
 
 ## Naming (round 54, bravo, track 3)
@@ -55,7 +55,7 @@ from a large number of OTHER units with DIFFERENT per-call-site arities
 and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
-`src/graphics/SceneNode.c`, `src/ui/TitleMenuTaskObjF.c`, `src/world/ObjMStyleActor.c`,
+`src/graphics/scene_node.c`, `src/ui/TitleMenuTaskObjF.c`, `src/world/ObjMStyleActor.c`,
 `src/world/ObjMStyleActor.c`, `src/world/DayTaskStageMap.c`, `src/ui/ScreenWidgets.c`,
 `src/ui/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
@@ -74,7 +74,7 @@ round's 17 findings where a declaration was actually wrong rather than
 deliberate.
 
 **Callee evidence** (`0x8001E57C`, and the definition at
-`src/graphics/SceneNode.c:736`):
+`src/graphics/scene_node.c:736`):
 
 ```
 8001e57c:  lui   v0,0x8007
@@ -150,7 +150,7 @@ ours to change.
 ## Track 4 (2026-09-25, round 81, charlie)
 
 One declaration is left: `extern SceneNodeMethods *GetSceneNodeMethods(void);`
-in `include/SceneNode.h`. The deleted local return-type views were
+in `include/scene_node.h`. The deleted local return-type views were
 `BaseCtorTableB_3bb8c_c` (include/class_3bb8c.h), `FixedBaseTable`
 (src/world/ObjMStyleActor.c), `SceneNodeBaseTable` (src/class_3bb8c_p.c),
 `D6B5CCGetterMethodsCC8C` (include/Task.h) and the untyped `void *` in

@@ -52,9 +52,9 @@ rather than API.
   `IsStyleVariantEven` `bool` vs `s32`; `ReleaseBasicClassArray` in Task.h:32
   `(void *, void *)` vs `(BasicClass **, s32)` at TmdRenderer.c:86 (plus three
   `void **` spellings); `GetActiveDataSourceMethods` local in 4 files;
-  `GetSetBitField` duplicated (Sprite.c:41, Task.h:36 vs SceneNode.h:216);
-  `ApplyMatrixToLVArray` extern at ViewportDraw.c:62 though SceneNode.h is
-  included; `sHitHeightGate` declared twice in SceneNode.c. CdDriver.c
+  `GetSetBitField` duplicated (Sprite.c:41, Task.h:36 vs scene_node.h:216);
+  `ApplyMatrixToLVArray` extern at ViewportDraw.c:62 though scene_node.h is
+  included; `sHitHeightGate` declared twice in scene_node.c. CdDriver.c
   re-declares its own functions two or three times (55/60/794/795, 58/463/907,
   ...): keep one forward block.
 - **Sony names re-declared.** `ResetGraph` (Task.h:40), `rand`, `strlen`,
@@ -91,7 +91,7 @@ rather than API.
   prototypes; `self` everywhere else.
 - **Guards:** DreamSys.h `CLASS_DREAMSYS`, StageGrid.h `STAGE_GRID`.
 - **`s` externs in headers:** 24 (StageMap.h:416-441, TitleMenu.h:147-170,
-  Task.h:47/57, SceneNode.h:204-205 `sRotationZero`/`sSceneNodeScaleOne`,
+  Task.h:47/57, scene_node.h:204-205 `sRotationZero`/`sSceneNodeScaleOne`,
   which are also typed `u8[0xC]` for `Ratio16[3]`). Move into the .c or
   rename `g`. Conversely 8 `g` symbols used by one unit only
   (`sCdStreamAudioMixSet`, `sCdFileNotFoundFmt`, `sFileTableRegistered`, ...).
@@ -159,7 +159,7 @@ rather than API.
   `ModelData__ForwardScan*` take pointers as `s32`; the `+ 0x5C` at
   TmdRenderer.c:1194 is `offsetof(PolyDrawCtx, sxy) - sizeof(DVECTOR)`;
   stale `unk2A` in TimBlockSrc.h/TileMap.h/TileAtlas.h (now `loadState`);
-  SceneNode.c's two mid-file banners and self-reference (merge leftovers);
+  scene_node.c's two mid-file banners and self-reference (merge leftovers);
   TmdRenderer.c opens with BasicClass/BMemPMgr helpers.
 - **world:** DreamSys `func_59590`, `func_59598`, `func_5ba20` (a get/set of
   `unk_0x924`); DreamSys.h's `unk_0x*` fields (snake/hex spelling, no offset
@@ -227,7 +227,7 @@ reads them, so nothing names them).
   tables point at the method (`@see`), not a second description. Macro
   field lists (`*_FIELDS`) need `MACRO_EXPANSION` in the Doxyfile.
 - Process text to move out of headers (to the .c as one `MATCHING:` line,
-  or to the report): register and ABI notes (`$a0`-`$v0`) in SceneNode.h,
+  or to the report): register and ABI notes (`$a0`-`$v0`) in scene_node.h,
   TaskCore.h, TextEntry.h, TextRow.h, TileAtlas.h, TileMap.h, Sprite.h,
   Task.h, ItemList.h, StreamTask.h; lwl/lwr and "retail reloads" in
   StageMap.h, TitleMenu.h, TaskObjF.h, TmdModel.h, Sprite.h, StyleEffect.h,

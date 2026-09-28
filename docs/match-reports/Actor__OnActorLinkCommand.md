@@ -34,7 +34,7 @@ tables:
 - The first, unconditional, dispatches through
   `GetSceneNodeMethods()`'s return -- the shared base-class table at
   `gSceneNodeMethods` (already established with the project's "per-call-site
-  signature" precedent in `include/SceneNode.h`) -- at its `+0x09C` slot.
+  signature" precedent in `include/scene_node.h`) -- at its `+0x09C` slot.
   This unit's own local view (`SceneNodeBaseTable`, declared in this file)
   types only that one slot.
 - The second, conditional on `5 <= count < 9`, dispatches through
@@ -80,7 +80,7 @@ gates the attach attempt is not established.
 
 `vtable_DreamSys::slotA0` is accessed from SEVEN other units too
 (`grep -rln -- '->slotA0\b' src/` lists `TitleMenuTaskObjF.c`,
-`ObjMStyleActor.c`, `TitleMenuTaskObjF.c`, `SceneNode.c`, `Task.c`,
+`ObjMStyleActor.c`, `TitleMenuTaskObjF.c`, `scene_node.c`, `Task.c`,
 `TextEntryItemList.c`, `Task.c`, besides this unit), so per
 FINISHING-PLAN.md track 3 step 3 it is proposed here, not renamed, and
 posted to the broadcast for the head to apply at merge.
@@ -138,4 +138,4 @@ The function comment, verbatim:
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The link-event literals are spelled with their enums: 4 is `SCENENODE_EVENT_LINKED`, 2 and 3 `SCENENODE_EVENT_HULL_FIRST`/`HULL_LAST` (include/SceneNode.h), 5 to 8 `ACTOR_EVENT_UNSWEPT`..`ACTOR_EVENT_MOVED_Y` (include/Actor.h). Every function tested here receives the event through a DispatchLinkCommand/onActorLinkCommand/onGridCellLinkCommand chain from SceneNode's link protocol, so the numbers are that enum's. Byte-identical (`event < 9` spelled `event <= ACTOR_EVENT_MOVED_Y` compiles the same).
+The link-event literals are spelled with their enums: 4 is `SCENENODE_EVENT_LINKED`, 2 and 3 `SCENENODE_EVENT_HULL_FIRST`/`HULL_LAST` (include/scene_node.h), 5 to 8 `ACTOR_EVENT_UNSWEPT`..`ACTOR_EVENT_MOVED_Y` (include/Actor.h). Every function tested here receives the event through a DispatchLinkCommand/onActorLinkCommand/onGridCellLinkCommand chain from SceneNode's link protocol, so the numbers are that enum's. Byte-identical (`event < 9` spelled `event <= ACTOR_EVENT_MOVED_Y` compiles the same).

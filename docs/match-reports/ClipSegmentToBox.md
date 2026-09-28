@@ -184,7 +184,7 @@ issue #1, not an independent defect — worth re-checking automatically once
 
 ## Header changes kept
 
-`include/SceneNode.h`:
+`include/scene_node.h`:
 - New extern `s32 CalcBoxOutcode(BoundsBox_d294 *box, Vec3S16_d294 *point)` —
   MEASURED shape (identical outcode-computation body to `BisectSegmentToBox`'s
   own `flags` logic, see that report), not guessed.
@@ -393,7 +393,7 @@ Five variants tried against this single word, all negative:
   (cosmetic only, as expected).
 
 Filing as STALL at **95/118** (up from 16/118), `INCLUDE_ASM` restored;
-`src/graphics/SceneNode.c` confirmed clean (`git diff --stat` empty, whole-image
+`src/graphics/scene_node.c` confirmed clean (`git diff --stat` empty, whole-image
 `build exit=0`).
 
 ## Preserved body (round 20 best, 95/118, 1-word overshoot)
@@ -555,7 +555,7 @@ allocation, not correctness" levers, just discovered by search rather
 than by hand, and manifesting as a dead conditional rather than a bare
 `__asm__("")`.
 
-Filed as **MATCHED**, `src/graphics/SceneNode.c` updated in place (no more
+Filed as **MATCHED**, `src/graphics/scene_node.c` updated in place (no more
 `INCLUDE_ASM`/`#if 0`), `git status --porcelain` clean after commit.
 
 ### Proposed learning
@@ -588,7 +588,7 @@ red herring in the next reader's mental model of what code was
 Renamed from `func_8001E110` via `tools/rename.py`. **Tier A** -- a free
 function (no `self`/`SceneNodeObj` argument at all): a recursive
 Cohen-Sutherland-style line-segment-vs-AABB clip, using `CalcBoxOutcode`
-(already named, `SceneNode.c`) for the outcode test and
+(already named, `scene_node.c`) for the outcode test and
 `BisectSegmentToBox` (this unit, below) for the bisection step when the
 segment straddles the box. The algorithm shape is unambiguous from the
 body alone -- this is the textbook mechanism, not a guess about game
@@ -598,7 +598,7 @@ purpose. Purely local to this unit + its header.
 
 Locals `r1`/`r2` -> `code1`/`code2`. Returns 0..3 -> `enum ClipResult`
 (`CLIP_MISS`, `CLIP_INSIDE`, `CLIP_P1_INSIDE`, `CLIP_P2_INSIDE`, added to
-include/SceneNode.h beside the prototype, whose comment already stated the
+include/scene_node.h beside the prototype, whose comment already stated the
 four cases).
 
 ### History: the comments in src/code_d294_b.c before this pass, verbatim

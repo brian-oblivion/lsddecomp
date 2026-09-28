@@ -102,8 +102,8 @@ mechanics are established; "the stage's map" rests on the files it loads and
 the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -118,6 +118,6 @@ an operator decision; not hand-reverted).
 
 ## Track 7 (2026-09-27, round 98, charlie)
 
-Moved here from the `.c` comment above this function, which read: "GetSceneNodeMethods: include/SceneNode.h. Round 59 measured the two arguments these calls used to pass the no-argument getter as zero-cost (the jal's delay slot holds a callee-save spill); track 4 dropped them."
+Moved here from the `.c` comment above this function, which read: "GetSceneNodeMethods: include/scene_node.h. Round 59 measured the two arguments these calls used to pass the no-argument getter as zero-cost (the jal's delay slot holds a callee-save spill); track 4 dropped them."
 
 The comment now says what the test does: a sender whose class id's low nibble is 1 is DrawSystem or below it (`classtable.py --scan`: gDrawSystemMethods, 0x1, is the only table with root nibble 1). `0xF` and `1` stay literals in this branch because `CLASS_ID_ROOT_MASK` (basic_class.h) and `DRAWSYSTEM_CLASS_ID` (DrawSystem.h) landed on main this round after this branch forked; proposed to the head: `(sender->methods->header & CLASS_ID_ROOT_MASK) == DRAWSYSTEM_CLASS_ID`.

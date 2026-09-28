@@ -98,17 +98,17 @@ For the head to apply by type scope. Each one fails to compile in another unit w
 
 ## Track 6 (round 91, echo): the class is SceneNode
 
-Class6B5CC -> SceneNode (`renametype.py`), tier A for what it is: the ctor allocates a GsCOORDINATE2 (0x50) and a GsCOORD2PARAM (0x28) and the object embeds a GsDOBJ2 at +0x010 (SceneNode__LinkModel passes &attribute to GsLinkObject4); attachToParent/detachFromParent maintain `parent` and coord2->super, a libgs transform hierarchy; sixteen classes derive from it (Actor, Sprite, LightRig, BoxFill, ...). The libgs member types (SceneNodeSub14 = GsCOORDINATE2, SceneNodeSub44 = GsCOORD2PARAM, S16Quad_d294 = SVECTOR) are not yet substituted: including <libgs.h> in SceneNode.h breaks 24 units whose headers declare Sony names their own way (measured this round).
+Class6B5CC -> SceneNode (`renametype.py`), tier A for what it is: the ctor allocates a GsCOORDINATE2 (0x50) and a GsCOORD2PARAM (0x28) and the object embeds a GsDOBJ2 at +0x010 (SceneNode__LinkModel passes &attribute to GsLinkObject4); attachToParent/detachFromParent maintain `parent` and coord2->super, a libgs transform hierarchy; sixteen classes derive from it (Actor, Sprite, LightRig, BoxFill, ...). The libgs member types (SceneNodeSub14 = GsCOORDINATE2, SceneNodeSub44 = GsCOORD2PARAM, S16Quad_d294 = SVECTOR) are not yet substituted: including <libgs.h> in scene_node.h breaks 24 units whose headers declare Sony names their own way (measured this round).
 
 
-## Round 95 (bravo): moved from include/SceneNode.h
+## Round 95 (bravo): moved from include/scene_node.h
 
 The header's banner was rewritten as documentation in round 95; the comments it carried about SceneNode and its libgs types, verbatim:
 
 ```c
 /* code_d294, code_d294_b, code_d294_c: the methods of SceneNode, whose one
  * definition (object, method table, getter, method prototypes) is
- * include/SceneNode.h since track 4 (round 81). This header keeps what only
+ * include/scene_node.h since track 4 (round 81). This header keeps what only
  * these three units use: the bounds-box helpers' types and the prototypes of
  * the Psy-Q and utility functions the methods call.
  *
@@ -157,7 +157,7 @@ The header's banner was rewritten as documentation in round 95; the comments it 
  *   its GsDOBJ2 argument, which only type-checks at this layout, and the
  *   ctor calls GsInitCoordinate2 on the 0x50-byte block.
  *
- * TRACK 4 (round 81, include/SceneNode.h) named the GsDOBJ2 words on the
+ * TRACK 4 (round 81, include/scene_node.h) named the GsDOBJ2 words on the
  * object (attribute, coord2, tmd, id) and GsCOORDINATE2's super/sub, but kept
  * the project's own SceneNodeSub14/SceneNodeSub44 types and their field
  * names (tx/ty/tz, unk24, unk38, param, rotate): retyping them to LIBGS.H's
@@ -169,13 +169,13 @@ The header's banner was rewritten as documentation in round 95; the comments it 
 /* The model SceneNode keeps at +0x020 is a TmdModel (TmdModel). Its
  * methods -- TmdModel__GetHull, TmdModel__GetBoundsCount,
  * TmdModel__UpdateBoundsBuffer/GetBoundsBuffer, TmdModel__RaycastFaces --
- * are declared once, in include/TmdModel.h, which SceneNode.c and
- * SceneNode.c include themselves (track 4, round 87). */
+ * are declared once, in include/TmdModel.h, which scene_node.c and
+ * scene_node.c include themselves (track 4, round 87). */
 ```
 
 ## Round 97 (alpha): Sony's types substituted
 
-SceneNode.h now uses Sony's types for all three: S16Quad_d294 -> SVECTOR (x/y/z/w -> vx/vy/vz/pad), SceneNodeSub44 -> GsCOORD2PARAM (scaleX/Y/Z -> scale.vx/vy/vz; rotate), SceneNodeSub14 -> GsCOORDINATE2 (pad04 -> coord.m, tx/ty/tz -> coord.t[0..2], workm bytes + unk38 -> workm.m + workm.t; flg is unsigned long now, compared only against 0). Each layout was re-checked against include/psyq/libgte.h and libgs.h before its struct was deleted; the table above stands. Every includer of SceneNode.h takes <libgte.h>, <libgpu.h>, <libgs.h> after common.h. Zero bytes.
+scene_node.h now uses Sony's types for all three: S16Quad_d294 -> SVECTOR (x/y/z/w -> vx/vy/vz/pad), SceneNodeSub44 -> GsCOORD2PARAM (scaleX/Y/Z -> scale.vx/vy/vz; rotate), SceneNodeSub14 -> GsCOORDINATE2 (pad04 -> coord.m, tx/ty/tz -> coord.t[0..2], workm bytes + unk38 -> workm.m + workm.t; flg is unsigned long now, compared only against 0). Each layout was re-checked against include/psyq/libgte.h and libgs.h before its struct was deleted; the table above stands. Every includer of scene_node.h takes <libgte.h>, <libgpu.h>, <libgs.h> after common.h. Zero bytes.
 
 ## Round 101 (delta): track 7
 

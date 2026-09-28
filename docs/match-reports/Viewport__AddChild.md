@@ -109,5 +109,5 @@ Renamed from `Unk18Obj__AddChild`. The +0x010 addChild override. Its parameter i
 
 Local `header` -> `rootClass`, masked with `CLASS_ID_ROOT_MASK` (0xF,
 basic_class.h); the cases are `SCENENODE_CLASS_ID` (4, gSceneNodeMethods,
-SceneNode.h) and `DRAWSYSTEM_CLASS_ID` (1, DrawSystem.h), the classes of the
+scene_node.h) and `DRAWSYSTEM_CLASS_ID` (1, DrawSystem.h), the classes of the
 two fields it fills. Pointer stores of 0 are spelled NULL. Byte-identical.

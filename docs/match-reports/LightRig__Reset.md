@@ -12,7 +12,7 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 - **Result:** byte-exact on the FIRST build; 3/3 words, 0 insertions /
   0 deletions, whole-image SHA1 green. No levers needed.
 - **Types:** SceneNode-derived methods take `SceneNode *` from the UNIFIED
-  `include/SceneNode.h` (untouched). The FrameClock and RequestedFile objects use
+  `include/scene_node.h` (untouched). The FrameClock and RequestedFile objects use
   unit-local views (`D_8006EF50Obj`, `D_8006EED8Obj`) declared at the top of
   the unit; nothing was added to a shared header.
 
@@ -27,7 +27,7 @@ void LightRig__Reset(LightRig *self) {
 
 ## Naming
 
-- `D8006EFAC__Reset` -- tier A. Reset override (slot +0x040): marks the SceneNode coordinate dirty (coord2->flg = 0, include/SceneNode.h's documented "0 = recompute").
+- `D8006EFAC__Reset` -- tier A. Reset override (slot +0x040): marks the SceneNode coordinate dirty (coord2->flg = 0, include/scene_node.h's documented "0 = recompute").
 
 ## Track 4
 

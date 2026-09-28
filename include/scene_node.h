@@ -1,5 +1,5 @@
-#ifndef SCENENODE_H
-#define SCENENODE_H
+#ifndef SCENE_NODE_H
+#define SCENE_NODE_H
 
 #include "common.h"
 #include <libgte.h>
@@ -40,7 +40,7 @@
  * SCENENODE_EVENT_LINKED records the sender as `linkTarget`. notifyWithHull is the sending side:
  * it transforms the model's hull into world space and notifies the parents.
  *
- * Methods: src/graphics/SceneNode.c. Subclasses:
+ * Methods: src/graphics/scene_node.c. Subclasses:
  * `python3 tools/plan.py classes` (Actor, Sprite, LightRig, BoxFill and
  * more); they expand SCENENODE_FIELDS and SCENENODE_SLOTS first.
  *
@@ -209,7 +209,7 @@ void SceneNode__UnlinkModel(SceneNode *self);
 s32 SceneNode__RaycastVertical(SceneNode *self, s32 *offset, s32 *target);
 void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 yawOnly, s32 swapped, void *extra);
 
-/* SceneNode's free helpers, defined in src/graphics/SceneNode.c and called there by
+/* SceneNode's free helpers, defined in src/graphics/scene_node.c and called there by
  * symbol: the rotation and scale inputs, the matrix-over-array transforms,
  * the attribute-word accessor and the box-clipping primitives. Sony's
  * functions (RotMatrix, MulMatrix2, ApplyMatrixLV, ratan2,
@@ -237,7 +237,7 @@ extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 extern s32 GetSetHitHeightGate(s32 value);
 
 /* Bit positions in GsDOBJ2.attribute (include/psyq/libgs.h), the fields the
- * SceneNode attribute setters (src/graphics/SceneNode.c) replace. */
+ * SceneNode attribute setters (src/graphics/scene_node.c) replace. */
 #define ATTR_LDIM_SHIFT 0      /* GsLDIM0..GsLDIM7, 3 bits */
 #define ATTR_LIGHTMODE_SHIFT 3 /* GsFOG|GsMATE|GsLLMOD, 3 bits */
 #define ATTR_LOFF_SHIFT 6      /* GsLOFF */

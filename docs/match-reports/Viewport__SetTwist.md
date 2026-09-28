@@ -30,7 +30,7 @@ void Viewport__SetTwist(Unk18Obj *self, s16 *pair) {
 }
 ```
 
-Read the input pair as raw `s16 *` rather than reusing `SceneNode.h`'s
+Read the input pair as raw `s16 *` rather than reusing `scene_node.h`'s
 `Ratio16` -- this unit has its own local view of the shape and does
 not include that header; a shared struct across units is a shared-header
 hazard per CLAUDE.md's "one exception" note, and there is no reuse benefit

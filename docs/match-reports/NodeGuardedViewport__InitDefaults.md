@@ -29,7 +29,7 @@ report per function, matched ones included.
 precedent for a genuinely empty, no-established-purpose vtable stub is to
 keep the bare `func_` name even when the occupying class IS known
 (`StageMap__NoOpSlotD8` in `src/world/DayTaskStageMap.c`, `SceneNode__NoOpSlot5C` in
-`src/graphics/SceneNode.c` -- both documented "keeps its placeholder name
+`src/graphics/scene_node.c` -- both documented "keeps its placeholder name
 deliberately"). This function fits the same shape exactly: `void (void)`,
 zero registers read, no caller in any carved unit dispatches it with
 information this unit could use to infer purpose. A `NodeGuardedViewport__func_...`

@@ -181,7 +181,7 @@ extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32
 extern s32 sHitHeightGate;
 ```
 
-**Note the signature conflicts with `SceneNode.c`'s own existing local
+**Note the signature conflicts with `scene_node.c`'s own existing local
 extern** (`s32 arg3` there, literal `0` at its only call site) -- THIS
 function's own call site passes `&outWord`, a genuine pointer, in that
 position. Both externs are legitimate, independent local views (per this
@@ -366,7 +366,7 @@ the measured mechanics (a plane-membership/clip test, not a specific
 game concept); which planes `self->unk20` holds is not established
 beyond "the same planes `SceneNode__CheckBoundsOverlap` reads." Held
 back from an actual rename because this symbol is referenced (in a
-comment) from `src/graphics/SceneNode.c:414` -- a different unit. Posted to
+comment) from `src/graphics/scene_node.c:414` -- a different unit. Posted to
 the broadcast.
 
 ## Round 55 (charlie): REVISITED (round 55) -- register-identity framing
@@ -378,7 +378,7 @@ unit passed track 3 naming last round. Rebuilt the round-46 preserved body
 live first: reproduces exactly, `build exit=2`, no compile errors,
 `funcdiff.py` confirms **29/199**, no drift, isolated (only this function's
 own `#if 0` wrapper removed; every sibling confirmed still wrapped via
-`grep -c '^INCLUDE_ASM' src/graphics/SceneNode.c`).
+`grep -c '^INCLUDE_ASM' src/graphics/scene_node.c`).
 
 **The round-46 title's own framing -- "register identity: `self` lands in
 $s4 here, $s5 in retail" -- undersells the residue.** Reading
@@ -523,7 +523,7 @@ three candidates found) -- two safe candidates translated and verified
 inert against the real oracle (still 29/199), one candidate rejected
 outright as semantically unsound (reads a bit-mask value where the source
 means a plane-test result) rather than tested. Restored to `INCLUDE_ASM`,
-`git diff --stat src/graphics/SceneNode.c` confirmed clean after the check.
+`git diff --stat src/graphics/scene_node.c` confirmed clean after the check.
 
 ### Proposed learning (round 55)
 

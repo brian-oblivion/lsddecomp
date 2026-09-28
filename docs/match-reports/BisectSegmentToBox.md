@@ -101,7 +101,7 @@ iteration — this is why there are two 6-byte stack slots (`sp+0x0`,
 
 ## Header changes
 
-`include/SceneNode.h`:
+`include/scene_node.h`:
 
 - New `Vec3S16_d294` (`{ s16 x, y, z; }`, 6 bytes) and `BoundsBox_d294`
   (`{ Vec3S16_d294 lo, hi; }`, 12 bytes) types.
@@ -133,7 +133,7 @@ struct as include/TmdModel.h's `TmdBox` (min, max), which is also what
 `TmdModel__GetBoundsBuffer` returns. The placeholder is deleted; this function,
 `ClipSegmentToBox`, `CalcBoxOutcode` and `SceneNode__CheckBoundsOverlap` take
 `TmdBox *`, with `lo`/`hi` read as `min`/`max`. Byte-identical. The comment
-the placeholder carried in include/SceneNode.h, moved here verbatim:
+the placeholder carried in include/scene_node.h, moved here verbatim:
 
 ```c
 /* Round 13 (BisectSegmentToBox): an axis-aligned bounding box, low corner then
@@ -148,9 +148,9 @@ typedef struct BoundsBox_d294 {
 ## Round 100 (delta): track 7
 
 Locals `buf0`/`buf1`/`flags` -> `insideBuf`/`outsideBuf`/`outcode`. The six
-bit values -> `OUTCODE_*`, added to include/SceneNode.h token-identical to
-SceneNode.c's copy (CalcBoxOutcode's bits); proposed that the head delete
-SceneNode.c's copy.
+bit values -> `OUTCODE_*`, added to include/scene_node.h token-identical to
+scene_node.c's copy (CalcBoxOutcode's bits); proposed that the head delete
+scene_node.c's copy.
 
 ### History: the comments in src/code_d294_b.c before this pass, verbatim
 

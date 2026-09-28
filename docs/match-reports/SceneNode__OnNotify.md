@@ -30,7 +30,7 @@ void SceneNode__OnNotify(SceneNodeObj *self, GenericObj_d294 *other, s32 arg2) {
 }
 ```
 
-## New struct knowledge (`include/SceneNode.h`, additive)
+## New struct knowledge (`include/scene_node.h`, additive)
 
 - **`BasicClassMethodsD294` gains `slot38`** (`void(void*,void*,s32)`),
   carved out of what was previously the struct's own trailing padding (the

@@ -30,7 +30,7 @@ consumed by the caller regardless). `pair` ($a2) is a caller-supplied
 `{s16 whole; s16 frac;}` pair, twice over (axis 0 at `+0x0`/`+0x2`, axis
 1 at `+0x4`/`+0x6`), read as a raw `s16 *` rather than a named struct --
 same shape and same precedent as `Task.c`'s `Viewport__SetTwist` and
-`SceneNode.c`'s `RatioToFixed12` (`Task.h`'s own note on
+`scene_node.c`'s `RatioToFixed12` (`Task.h`'s own note on
 `Ratio16`: "a different unit's own local view of the same shape,
 not a shared type").
 
@@ -75,7 +75,7 @@ project's already-established 20.12 fixed-point split-division idiom
 (one `div` reused for quotient+remainder via `mflo`/`mfhi`, then a SECOND
 `div` for the shifted remainder) -- confirmed live and matched at
 `Task.c:Viewport__SetTwist` and referenced from
-`SceneNode.c:RatioToFixed12`. Read straight off the two GTE-style
+`scene_node.c:RatioToFixed12`. Read straight off the two GTE-style
 overflow-check idioms (`bnez`/`break 7` for divide-by-zero, the
 `-1`/`0x80000000` pair check/`break 6` for `INT_MIN / -1`) that GCC 2.6.3
 emits for a plain C `/` and `%` on `s32`.
@@ -170,7 +170,7 @@ class's track 7 pass (see `VariantSprite__SetVariantClut`'s report).
 | name | tier | evidence |
 | --- | --- | --- |
 | Sprite fields `accumScaleX` / `accumScaleY` (were `unk5C` / `unk60`, `+0x05C` / `+0x060`) | B | Mechanics only: while `unk58` is non-zero this method multiplies each by its axis's 20.12 ratio (`(ratio * v) >> 12`) and stores it back, in place of writing `sprite.scalex/scaley`, so the ratios accumulate into them. Renaming them in `SPRITE_FIELDS` (include/Sprite.h) broke only this unit in the default build and under `-DNON_MATCHING`, so this is their whole accessor set: nothing else reads or writes them, `Viewport__DrawNode` included. What the accumulated value is for is not established (nothing found sets `unk58` non-zero), hence B. |
-| param `ratios`: `s16 *` -> `Ratio16 *` | A | The body reads `[0]/[1]` and `[2]/[3]` as num/den, two SceneNode.h `Ratio16`s (x, y), the type `Sprite__UpdateRotation` and `BgLayer__UpdateScale` already take; round 93's proposal. A type change, so the oracle decided: byte-identical. The prototype in include/VariantSprite.h changed with it; nothing calls it directly (only `gVariantSpriteMethods`' slot). |
+| param `ratios`: `s16 *` -> `Ratio16 *` | A | The body reads `[0]/[1]` and `[2]/[3]` as num/den, two scene_node.h `Ratio16`s (x, y), the type `Sprite__UpdateRotation` and `BgLayer__UpdateScale` already take; round 93's proposal. A type change, so the oracle decided: byte-identical. The prototype in include/VariantSprite.h changed with it; nothing calls it directly (only `gVariantSpriteMethods`' slot). |
 | locals `xWhole`/`xRem`/`xFrac`/`xRatio`, `y...` (were `q1`/`r1`/`q2`/`ratio1`, `q3`/`r3`/`q4`/`ratio2`) | A | The split division: whole part `num / den`, remainder, the remainder's 12 fractional bits, and their 20.12 sum. |
 | locals `xScale` / `yScale` (were `short1` / `short2`) | A | The 16-bit truncations stored into `sprite.scalex` / `.scaley`. |
 

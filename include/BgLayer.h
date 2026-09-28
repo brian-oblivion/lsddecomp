@@ -1,7 +1,7 @@
 #ifndef BGLAYER_H
 #define BGLAYER_H
 
-#include "SceneNode.h"
+#include "scene_node.h"
 
 /*
  * BgLayer -- class id 0x54, method table gBgLayerMethods: a SceneNode subclass

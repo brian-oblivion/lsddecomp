@@ -75,7 +75,7 @@ void SceneNode__NotifyWithHull(SceneNodeObj *self, s32 a1) {
 
 ## Header changes
 
-`include/SceneNode.h`:
+`include/scene_node.h`:
 
 - `SceneNodeMethods`: typed `+0x08C` (`slot8C`, `void (*)(SceneNodeObj*,
   void*)`, occupant `SceneNode__GetModelHull`) and `+0x090` (`slot90`, `void (*)
@@ -125,7 +125,7 @@ underlying notification is not established. Purely local to this unit
 
 ## Track 6 (round 91, echo): named `SceneNode__NotifyWithHull`, tier B
 
-For `2 <= event < 4`, when a model with bounds is linked, fills a TmdHull through getModelHull and hands it to transformAndNotifyParents with the event. Mechanics only: what events 2 and 3 mean is not established. Overridden by Actor__NotifyMove, DreamSys__NotifyLinkAttempt, StageMap__OnSlotEvent. Was `NotifyIfUnk20Active`. Slot +0x088 kept as `notifyIfUnk20Active` (callers in six units outside this job); `notifyWithHull` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+For `2 <= event < 4`, when a model with bounds is linked, fills a TmdHull through getModelHull and hands it to transformAndNotifyParents with the event. Mechanics only: what events 2 and 3 mean is not established. Overridden by Actor__NotifyMove, DreamSys__NotifyLinkAttempt, StageMap__OnSlotEvent. Was `NotifyIfUnk20Active`. Slot +0x088 kept as `notifyIfUnk20Active` (callers in six units outside this job); `notifyWithHull` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/scene_node.h's banner has the evidence).
 
 ## Round 100 (delta): track 7
 

@@ -32,7 +32,7 @@
  *
  * Two cross-unit identifications carry the names below: updateRotation
  * (+0x044) is the rotation setter, so every constant passed to it is three
- * degree ratios (Ratio16[3], include/SceneNode.h); and soundObj is a VabStreamObj,
+ * degree ratios (Ratio16[3], include/scene_node.h); and soundObj is a VabStreamObj,
  * whose +0x080/+0x084/+0x09C (playTone/stopVoice/setPitchOffset) name
  * voiceSelect and voiceIndex.
  *
@@ -635,7 +635,7 @@ extern s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpa
 extern s32 GetStageLinkAngle(void);
 
 /* SceneNode__GetRotationDegrees (DreamSys__TryTunnelLink fills its 0x10-byte
-   `local` with it): include/SceneNode.h. */
+   `local` with it): include/scene_node.h. */
 
 /* Called by DreamSys__TryTunnelLink as (&self->exitRotation, &self->enterRotation, &local) --
    the `local` buffer SceneNode__GetRotationDegrees fills; result a truth

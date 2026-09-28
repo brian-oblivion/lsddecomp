@@ -146,9 +146,9 @@ and `10000` (= 100 * 100, the ScreenSprite spelling of `half * pos / 100`),
 and `0xFFFF`, the GTE's 16-bit screen-z bound, explained where it is used.
 
 The extern `ApplyMatrixToLVArray(void *, void *, s32, void *)` stays in this
-unit: ViewportDraw does NOT include include/SceneNode.h (round 98's note that it
-did came from a grep matching this unit's comment `(include/SceneNode.h)`),
-so typing SceneNode.h's prototype cannot collide here.
+unit: ViewportDraw does NOT include include/scene_node.h (round 98's note that it
+did came from a grep matching this unit's comment `(include/scene_node.h)`),
+so typing scene_node.h's prototype cannot collide here.
 
 The unit banner, verbatim, as it was before this pass:
 
@@ -160,7 +160,7 @@ The unit banner, verbatim, as it was before this pass:
  *
  * It is slot +0x0A0 (drawNode) of gViewportMethods, inherited unchanged by
  * gNodeGuardedViewportMethods (include/Viewport.h); `self` is the Viewport
- * and `node` a SceneNode (include/SceneNode.h). The class-id low byte picks
+ * and `node` a SceneNode (include/scene_node.h). The class-id low byte picks
  * the draw path, and each path reads the node as the subclass that id names:
  * 0x54 a BgLayer (its GsBG at +0x044 to GsSortBg), 0x64 a BoxFill (its GsBOXF
  * placed in percent of the half-screen while `relative` is set), 0x144 a
@@ -203,7 +203,7 @@ them are "Levers" above):
  */
 ```
 
-The extern's comment was `/* code_d294_c.c (include/SceneNode.h) */`, and `scr`'s was `/* never used; reserves retail's 8 unused frame bytes */`.
+The extern's comment was `/* code_d294_c.c (include/scene_node.h) */`, and `scr`'s was `/* never used; reserves retail's 8 unused frame bytes */`.
 
 ## History (moved from src/ViewportDraw.c, comments pass)
 

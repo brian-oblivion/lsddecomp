@@ -42,7 +42,7 @@
 #include <libgs.h>
 #include <libpress.h>
 #include "basic_class.h"
-#include "SceneNode.h"
+#include "scene_node.h"
 #include "FileResource.h"
 #include "TimBlockSrc.h"
 #include "ModelData.h"

@@ -12,7 +12,7 @@
 `self->unk10` to `(a1 == 0)`, and returns whether the field's PREVIOUS
 value was 0 (i.e. it returns the logical negation of the old bit).
 
-See `include/SceneNode.h` for `GetSetBitField`, the generic packed-bitfield
+See `include/scene_node.h` for `GetSetBitField`, the generic packed-bitfield
 accessor all five sibling functions in this file (`SceneNode__SetDisplay`,
 `SceneNode__SetSemiTrans`, `SceneNode__SetSemiTransRate`, `SceneNode__SetLighting`, `SceneNode__SetLightMode`) wrap.
 It lives in the next, still-uncarved slice (`asm/SceneNode.s`) and was

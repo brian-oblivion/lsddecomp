@@ -44,7 +44,7 @@ real purpose not established. Purely local to this unit + its header.
 
 ## Track 6 (round 91, echo): named `SceneNode__SetSubdivision`, tier A
 
-`GetSetBitField(&self->attribute, 9, 3, value)`: bits 9-11 are libgs.h's GsDIV1..GsDIV5 (polygon subdivision). Was `GetSetUnk10Field9`. Slot +0x07C renamed `setSubdivision` (no accessor). The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+`GetSetBitField(&self->attribute, 9, 3, value)`: bits 9-11 are libgs.h's GsDIV1..GsDIV5 (polygon subdivision). Was `GetSetUnk10Field9`. Slot +0x07C renamed `setSubdivision` (no accessor). The class was renamed Class6B5CC -> SceneNode in the same pass (include/scene_node.h's banner has the evidence).
 
 ## Round 100 (delta): track 7
 

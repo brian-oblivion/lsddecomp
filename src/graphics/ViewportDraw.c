@@ -39,7 +39,7 @@
 #include <libgs.h>
 #include <libetc.h>
 #include "basic_class.h"
-#include "SceneNode.h"
+#include "scene_node.h"
 #include "GridCell.h"
 #include "BgLayer.h"
 #include "BoxFill.h"

@@ -1,7 +1,7 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
-#include "SceneNode.h"
+#include "scene_node.h"
 
 /*
  * Actor -- a positioned scene object that moves (class id 0x34, method table

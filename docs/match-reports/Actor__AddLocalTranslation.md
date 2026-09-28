@@ -30,10 +30,10 @@ in the `jal`'s own delay slot, overwriting whatever `$a1` held), and `$a2`
 via `addu $a2,$a1,zero` -- note this reads the OLD `$a1`, i.e. `arg1`,
 ahead of the delay slot's overwrite). This establishes `arg1`'s type as
 `s16 *`, matching `SceneNode__RotateLocalVector`'s own already-decompiled signature
-elsewhere (`SceneNode.c`:
+elsewhere (`scene_node.c`:
 `void SceneNode__RotateLocalVector(SceneNodeObj *self, SceneNodeSub44 *dst, s16 *src)`)
 -- declared locally here with this unit's own generic types rather than
-pulling in `SceneNode.h`'s `SceneNodeObj`/`SceneNodeSub44`, per the
+pulling in `scene_node.h`'s `SceneNodeObj`/`SceneNodeSub44`, per the
 project's per-call-site-typing convention for cross-unit calls.
 
 The second call, `self->methods->slotBC(self, &buf)`, dispatches through

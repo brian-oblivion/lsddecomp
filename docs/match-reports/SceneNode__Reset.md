@@ -49,11 +49,11 @@ Round 71 (alpha). `func_8001CE30` -> `SceneNode__Reset`, **tier B**. Table slot 
 
 `GsInitCoordinate2` now comes from `<libgs.h>`, `(GsCOORDINATE2 *super,
 GsCOORDINATE2 *base)`. The call is `GsInitCoordinate2(NULL, (GsCOORDINATE2
-*)self->coord2)`: the cast stands until SceneNode.h's SceneNodeSub14 (which
+*)self->coord2)`: the cast stands until scene_node.h's SceneNodeSub14 (which
 is GsCOORDINATE2 offset for offset) becomes Sony's type. Byte-identical.
 
 
-## Round 95 (bravo): moved from include/SceneNode.h
+## Round 95 (bravo): moved from include/scene_node.h
 
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 

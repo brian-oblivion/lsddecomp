@@ -132,7 +132,7 @@ Every literal in the live body is in its base: decimal for moodTimer ticks, dist
 ## Proposed field names
 
 - `SceneNodeSub14::unk38` (the `coord2->unk38` this handler passes to the
-  peer's setTranslation): include/SceneNode.h already documents it as
+  peer's setTranslation): include/scene_node.h already documents it as
   `workm.t`, the world position, and SceneNodeSub14 is the node's
   GsCOORDINATE2 ("GsDOBJ2.coord2: the ctor's 0x50-byte GsCOORDINATE2"). The
   fix is track 6's: Sony's GsCOORDINATE2 in place of SceneNodeSub14, which
