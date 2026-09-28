@@ -23,7 +23,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "tod_actor.h"
-#include "ModelData.h"
+#include "model_data.h"
 #include "Tod.h"
 #include "link_resource.h"
 #include "VabStreamObj.h"

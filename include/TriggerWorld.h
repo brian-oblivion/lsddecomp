@@ -1,7 +1,7 @@
 #ifndef TRIGGERWORLD_H
 #define TRIGGERWORLD_H
 
-#include "ModelData.h"
+#include "model_data.h"
 
 /*
  * TriggerWorld -- a ModelData subclass (class id 0x15F03, method table

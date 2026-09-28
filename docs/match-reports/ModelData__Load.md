@@ -21,7 +21,7 @@ fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphic
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-#include "ModelData.h"
+#include "model_data.h"
 
 /* gModelDataMethods +0x064: the active driver's setFlag, then slot +0x078. */
 void ModelData__Load(ModelData *self) {
@@ -43,4 +43,4 @@ void ModelData__Load(ModelData *self) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x078 keeps FileResource's name `slot78`: an inherited slot keeps the parent's name. Its occupant here is ModelData__BuildResources, so the call still casts it. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x078 keeps FileResource's name `slot78`: an inherited slot keeps the parent's name. Its occupant here is ModelData__BuildResources, so the call still casts it. Image byte-identical.

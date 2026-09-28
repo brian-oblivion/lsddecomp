@@ -20,7 +20,7 @@ The unit-local view `DataSrc33808` (a FileResource subclass built with the unifi
 fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
-#include "ModelData.h"
+#include "model_data.h"
 
 /* Allocate and construct a gModelDataMethods object (second constructor argument 1); freed and NULL when the constructor fails. */
 ModelData *New_ModelData(ResourceSource *src) {
@@ -50,7 +50,7 @@ ModelData *New_ModelData(ResourceSource *src) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. The allocator now reads `ModelData *New_ModelData(ResourceSource *src)` (was `void *` from `s32 arg0`): its argument is the ctor's descriptor, passed through unchanged in $a1, so the bytes are the same. Its callers cast: TriggerWorld__BuildResources, InitDreamAux (dream_aux) and TodActor__AcquireModelData (TodActor), whose local externs of it are deleted. The ctor is still reached through the unprototyped UnprototypedCtorTable view, because FILERESOURCE_SLOTS declares +0x008 returning void. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`; the unit-shared `DataSrc33808` view no longer types it. The allocator now reads `ModelData *New_ModelData(ResourceSource *src)` (was `void *` from `s32 arg0`): its argument is the ctor's descriptor, passed through unchanged in $a1, so the bytes are the same. Its callers cast: TriggerWorld__BuildResources, InitDreamAux (dream_aux) and TodActor__AcquireModelData (TodActor), whose local externs of it are deleted. The ctor is still reached through the unprototyped UnprototypedCtorTable view, because FILERESOURCE_SLOTS declares +0x008 returning void. Image byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

@@ -15,7 +15,7 @@
  *
  * Lifecycle.
  *   ctor(desc, sound)  Actor's ctor, then setupModelData(desc): the ModelData
- *                      (include/ModelData.h: a TMD LinkResource and a TodSet
+ *                      (include/model_data.h: a TMD LinkResource and a TodSet
  *                      over one file) at desc +0x00C is borrowed, or, when
  *                      there is none, New_ModelData(desc) makes one this
  *                      object owns (ownsModelData). setupParts then asks the
@@ -69,7 +69,7 @@ typedef struct TodActorMethods TodActorMethods;
 
 /* Tags completed in the unit that reads them (src/world/tod_actor.c), so
  * that any header may repeat these declarations. */
-struct ModelData;    /* include/ModelData.h */
+struct ModelData;    /* include/model_data.h */
 struct TodActorDesc; /* the ctor's descriptor: +0x00C a ModelData to borrow */
 struct VabStreamObj; /* include/VabStreamObj.h: the sound bank the ctor's second argument names */
 

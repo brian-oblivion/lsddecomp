@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top
 `src/graphics/graphics_resources.c`.
 
 ```c
-#include "ModelData.h"
+#include "model_data.h"
 
 typedef struct ResourceSourceArgs {
     /* +0x00 */ void *buffer;
@@ -67,7 +67,7 @@ First build. The redundant `sw zero, 0x30` on the second failure is an explicit 
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x02C is `linkResource` (`FileResource *`, New_LinkResource's result; the `(s32)` and `(void *)` casts are gone), +0x030 is `todSet` (`FileResource *`, New_TodSet's result) and +0x034 is `ownsResources`. The failure path calls `releaseResources(self)` (slot +0x07C). Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`; the unit-shared `DataSrc33808` view no longer types it. +0x02C is `linkResource` (`FileResource *`, New_LinkResource's result; the `(s32)` and `(void *)` casts are gone), +0x030 is `todSet` (`FileResource *`, New_TodSet's result) and +0x034 is `ownsResources`. The failure path calls `releaseResources(self)` (slot +0x07C). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, delta)
 

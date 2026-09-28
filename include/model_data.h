@@ -1,5 +1,5 @@
-#ifndef MODELDATA_H
-#define MODELDATA_H
+#ifndef MODEL_DATA_H
+#define MODEL_DATA_H
 
 #include "file_resource.h"
 #include "TodSet.h"

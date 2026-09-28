@@ -33,7 +33,7 @@
 #include "entity.h"
 #include "dream_aux.h"
 #include "scene_node.h"
-#include "ModelData.h"
+#include "model_data.h"
 #include "TriggerWorld.h"
 #include "dream_sys.h"
 #include "StageMap.h"

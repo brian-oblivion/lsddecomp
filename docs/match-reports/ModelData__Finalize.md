@@ -21,7 +21,7 @@ fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphic
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-#include "ModelData.h"
+#include "model_data.h"
 
 /* gModelDataMethods +0x00C: finalize -- slot +0x07C, then the active driver's. */
 void ModelData__Finalize(ModelData *self) {
@@ -43,4 +43,4 @@ void ModelData__Finalize(ModelData *self) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x07C is `releaseResources` (occupant ModelData__ReleaseResources), prototyped `void (*)(ModelData *self)`. The call is now `releaseResources(self)`; before, it was the unprototyped `slot7C()` with no argument. The bytes are the same because self is already in $a0 at the jalr. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x07C is `releaseResources` (occupant ModelData__ReleaseResources), prototyped `void (*)(ModelData *self)`. The call is now `releaseResources(self)`; before, it was the unprototyped `slot7C()` with no argument. The bytes are the same because self is already in $a0 at the jalr. Image byte-identical.

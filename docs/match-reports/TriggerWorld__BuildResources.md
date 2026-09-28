@@ -67,7 +67,7 @@ First build. The loop pointer walks `buf->entries` while the offset is re-read t
 
 ## Track 4
 
-2026-09-25, round 84 (delta): Its parent ModelData (gModelDataMethods) is unified in `include/ModelData.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((ResourceSource *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
+2026-09-25, round 84 (delta): Its parent ModelData (gModelDataMethods) is unified in `include/model_data.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((ResourceSource *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

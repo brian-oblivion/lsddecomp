@@ -21,7 +21,7 @@ fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphic
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-#include "ModelData.h"
+#include "model_data.h"
 
 /* gModelDataMethods/gTriggerWorldMethods +0x080: forwarded to slot +0x078 of the object at +0x30. */
 u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
@@ -42,7 +42,7 @@ u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x080 is `scanPackets`, `u8 (*)(ModelData *self, s32 arg1, s32 arg2)`. The forwarded call reads `todSet->methods->slot78` through FileResource's table, still cast, because the TodSet class (gTodSetMethods) is not unified. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x080 is `scanPackets`, `u8 (*)(ModelData *self, s32 arg1, s32 arg2)`. The forwarded call reads `todSet->methods->slot78` through FileResource's table, still cast, because the TodSet class (gTodSetMethods) is not unified. Image byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 
@@ -50,7 +50,7 @@ u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `arg1`, `arg2` | `out`, `tmdId` | A | forwarded to TodSet__ScanPackets(self, out, tmdId); still `s32` because include/ModelData.h declares them so |
+| `arg1`, `arg2` | `out`, `tmdId` | A | forwarded to TodSet__ScanPackets(self, out, tmdId); still `s32` because include/model_data.h declares them so |
 
 ## Track 10 (2026-09-28, round 104, echo)
 

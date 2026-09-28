@@ -18,7 +18,7 @@
  * the counted array. ModelData builds one over its buffer past +0x0C
  * (ModelData__BuildResources: New_TodSet) and forwards its TOD packet scans
  * to it (ModelData.todSet, still declared `FileResource *` in
- * include/ModelData.h).
+ * include/model_data.h).
  *
  * NO OWN SLOTS: the table is Tod's 0x84 bytes, with +0x008, +0x00C, +0x064
  * and +0x078 overridden (`classtable.py gTodSetMethods --vs gTodMethods`).

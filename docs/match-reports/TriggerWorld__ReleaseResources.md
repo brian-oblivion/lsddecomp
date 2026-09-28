@@ -45,7 +45,7 @@ void TriggerWorld__ReleaseResources(DataSrc33808 *self) {
 ## Track 4 (2026-09-26, round 88, bravo)
 
 Renamed from `TriggerWorld__ReleaseParts`: it occupies +0x07C, ModelData's
-`releaseResources` slot (MODELDATA_SLOTS in `include/ModelData.h`), and the
+`releaseResources` slot (MODELDATA_SLOTS in `include/model_data.h`), and the
 body does exactly what the slot says for this class (release the ModelData
 array TriggerWorld__BuildResources built, zero the count at +0x038). An
 override is named for its slot (FINISHING-PLAN track 4 step 6). Class

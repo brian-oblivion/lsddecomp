@@ -45,7 +45,7 @@
 #include "scene_node.h"
 #include "file_resource.h"
 #include "TimBlockSrc.h"
-#include "ModelData.h"
+#include "model_data.h"
 #include "Tod.h"
 #include "TodSet.h"
 #include "TriggerWorld.h"

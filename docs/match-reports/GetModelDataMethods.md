@@ -16,7 +16,7 @@ Table slot (`tools/classtable.py`): `gFileResourceMethods` +0x0AC.
 ## Source
 
 ```c
-#include "ModelData.h"
+#include "model_data.h"
 
 ModelDataMethods *GetModelDataMethods(void) {
     return &gModelDataMethods;
@@ -34,4 +34,4 @@ ModelDataMethods *GetModelDataMethods(void) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. The getter returns `ModelDataMethods *` from `&gModelDataMethods`, where it used to return `void *` from a local `extern s32 gModelDataMethods[]` that is now deleted. The code is the same lui/addiu. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`; the unit-shared `DataSrc33808` view no longer types it. The getter returns `ModelDataMethods *` from `&gModelDataMethods`, where it used to return `void *` from a local `extern s32 gModelDataMethods[]` that is now deleted. The code is the same lui/addiu. Image byte-identical.

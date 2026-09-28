@@ -23,7 +23,7 @@
  * getModel(0) as its child).
  *
  * Its parent ctor is the active driver's (GetActiveDataSourceMethods()->ctor,
- * chosen at run time; see include/ModelData.h), so the fields below assume
+ * chosen at run time; see include/model_data.h), so the fields below assume
  * FileResource's own 0x2C-byte layout. The object is 0x30 bytes
  * (New_LinkResource).
  *

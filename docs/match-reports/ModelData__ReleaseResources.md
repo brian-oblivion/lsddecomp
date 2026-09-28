@@ -21,7 +21,7 @@ fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top
 `src/graphics/graphics_resources.c`.
 
 ```c
-#include "ModelData.h"
+#include "model_data.h"
 
 /* gModelDataMethods +0x07C: when +0x34 is set, release the objects at +0x30 and
  * +0x2C (each when there is one). */
@@ -47,4 +47,4 @@ First build. +0x2C is `s32` in the unit-local DataSrc33808 view (other classes s
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Its slot, +0x07C, is named `releaseResources` for this function. Both releases now go through the unified FileResource table (`linkResource->methods->release`, `todSet->methods->release`); before, they went through `DataSrc33808` casts. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`; the unit-shared `DataSrc33808` view no longer types it. Its slot, +0x07C, is named `releaseResources` for this function. Both releases now go through the unified FileResource table (`linkResource->methods->release`, `todSet->methods->release`); before, they went through `DataSrc33808` casts. Image byte-identical.

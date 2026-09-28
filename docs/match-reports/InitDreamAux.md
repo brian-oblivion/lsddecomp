@@ -227,7 +227,7 @@ alone, hence tier B rather than A.
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. dream_aux includes it, and include/dream_aux.h's local `extern void *New_ModelData(DreamAuxLoadReq *req)` is deleted. The call reads `New_ModelData((struct ResourceSource *)&req)`, a pointer cast with no code. DreamAuxLoadReq {flag, name, mode} has the descriptor's own shape: word 0 is the buffer to adopt, and it is 0 here, so ModelData__ModelData requests the MOM file named in word 1. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`. dream_aux includes it, and include/dream_aux.h's local `extern void *New_ModelData(DreamAuxLoadReq *req)` is deleted. The call reads `New_ModelData((struct ResourceSource *)&req)`, a pointer cast with no code. DreamAuxLoadReq {flag, name, mode} has the descriptor's own shape: word 0 is the buffer to adopt, and it is 0 here, so ModelData__ModelData requests the MOM file named in word 1. Image byte-identical.
 
 ### Track 6 (round 97, alpha)
 
@@ -252,7 +252,7 @@ pointers each (DREAM_AUX_STAGE_COUNT, from the label spacing) and the slot
 arrays hold ONE slot (sDreamAuxPosTable starts 0x14 after sDreamAuxSlots), not
 14; a slot's first word is the ModelData New_ModelData returns (`model`), and
 the "tick" at method slot +0x004 is BasicClass's release. The MOM files are
-ModelData files (a TMD and a TodSet, include/ModelData.h), not audio. With one
+ModelData files (a TMD and a TodSet, include/model_data.h), not audio. With one
 slot, SYMDOG.MOM is never requested. Locals: `j` -> `record`; the 14 and 1
 loop bounds are ARRAY_COUNT of the tables they walk. Byte-identical.
 
