@@ -713,7 +713,7 @@ void BgLayer__BgLayer(BgLayer *self, TileMap *src, s32 mode) {
 /* reset (+0x040): lay the GsBG over `src`'s map, sized to the map (mode 0,
  * 8-bit CLUT) or to the screen (mode 1, 15-bit), at the origin, unscaled,
  * unrotated, pivoting on its centre. */
-extern BgLayerRgb gBgLayerDefaultColor;
+extern BgLayerRgb sBgLayerDefaultColor;
 
 void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
     if (mode == 0) {
@@ -729,7 +729,7 @@ void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
     self->y = 0;
     self->scrollx = 0;
     self->scrolly = 0;
-    self->color = gBgLayerDefaultColor;
+    self->color = sBgLayerDefaultColor;
     self->map = &src->map;
     self->scalex = ONE;
     self->scaley = ONE;

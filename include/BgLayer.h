@@ -85,7 +85,7 @@ struct BgLayer {
     /* +0x04E */ s16 h;
     /* +0x050 */ s16 scrollx;
     /* +0x052 */ s16 scrolly;
-    /* +0x054 */ BgLayerRgb color; /* GsBG r, g, b: gBgLayerDefaultColor at reset; setColor */
+    /* +0x054 */ BgLayerRgb color; /* GsBG r, g, b: sBgLayerDefaultColor at reset; setColor */
     /* +0x057 */ u8 pad57;
     /* +0x058 */ void *map; /* GsBG.map: the source's GsMAP (&src->map, +0x02C) */
     /* +0x05C */ s16 mx;    /* the pivot: w / 2, h / 2 */
