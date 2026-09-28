@@ -7,7 +7,7 @@
  * TriggerWorld -- a ModelData subclass (class id 0x15F03, method table
  * gTriggerWorldMethods) over a buffer holding several model files: a counted offset
  * table, one ModelData per entry, then the data. Methods in
- * src/graphics/GraphicsResources.c; no subclasses. Its parent is its id parent:
+ * src/graphics/graphics_resources.c; no subclasses. Its parent is its id parent:
  * TriggerWorld__TriggerWorld's first call is GetModelDataMethods()->ctor
  * (with a third argument 0, so ModelData's own resource build and release
  * never act on it).
@@ -37,7 +37,7 @@
  *
  * The ctor returns self or NULL (New_TriggerWorld tests it), but
  * MODELDATA_SLOTS declares +0x008 returning void, as FileResource's own ctor
- * does; the allocator reaches it through GraphicsResources.c's unprototyped
+ * does; the allocator reaches it through graphics_resources.c's unprototyped
  * UnprototypedCtorTable view, as every allocator in that unit does. The descriptor is
  * include/FileResource.h's ResourceSource ({buffer to adopt, file name to request}).
  */

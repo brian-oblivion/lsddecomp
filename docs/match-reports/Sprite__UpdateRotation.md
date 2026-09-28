@@ -26,4 +26,4 @@ void Sprite__UpdateRotation(Sprite *self, s32 set, Ratio16 *table) {
 
 ## Track 7 (round 99, charlie)
 
-`<< 12` -> `<< FIX12_SHIFT` (include/common.h, added this round: `ONE == 1 << FIX12_SHIFT`, token-identical to GraphicsResources.c's local definition). Byte-exact.
+`<< 12` -> `<< FIX12_SHIFT` (include/common.h, added this round: `ONE == 1 << FIX12_SHIFT`, token-identical to graphics_resources.c's local definition). Byte-exact.

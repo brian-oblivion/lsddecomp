@@ -9,7 +9,7 @@
  * libcd streaming library (StSetRing/StSetStream/StGetNext/StFreeRing), class
  * id 0x40, method table gCdStreamMethods, a direct BasicClass subclass.
  * Methods in src/cd/cd_stream.c. The one holder is MoviePlayer (gMoviePlayerMethods,
- * src/graphics/GraphicsResources.c), whose ctor builds one with New_CdStream(cdSpeed, MOVIE_FPS, 0)
+ * src/graphics/graphics_resources.c), whose ctor builds one with New_CdStream(cdSpeed, MOVIE_FPS, 0)
  * into its +0x060 and drives it through the slots below.
  *
  * One stream at a time. `sActiveCdStream` is the stream that owns the drive:

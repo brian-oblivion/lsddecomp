@@ -2,7 +2,7 @@
 
 > Renamed from `func_80045BC8` on 2026-09-25 (tools/rename.py). Address 0x80045bc8.
 
-Round 82, runner echo (GraphicsResources session, echo #8), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #8), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 51/51 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x060.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/graphics/GraphicsResources.c`.
+`src/graphics/graphics_resources.c`.
 
 ```c
 typedef struct DrawSysMethods45BC8 {
@@ -88,7 +88,7 @@ The local view of the DrawSystem singleton quoted above is gone; the unit takes 
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; Obj45BC8 and Rect45BC8 are gone. `rect` is `stripRect`, a DrawRect with an s32 w: retail's `lhu +0x030` is cc1 narrowing the load of that word, measured by building this view with `s32 w` byte-identical before the merge. `x0`/`y0`/`width` are `frame.x`/`frame.y`/`frame.w`, `unk34` is `stripRect.h` (the frame height), `unk4C`/`unk48`/`unk44` are `frameDone`/`streamEnded`/`finished`. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; Obj45BC8 and Rect45BC8 are gone. `rect` is `stripRect`, a DrawRect with an s32 w: retail's `lhu +0x030` is cc1 narrowing the load of that word, measured by building this view with `s32 w` byte-identical before the merge. `x0`/`y0`/`width` are `frame.x`/`frame.y`/`frame.w`, `unk34` is `stripRect.h` (the frame height), `unk4C`/`unk48`/`unk44` are `frameDone`/`streamEnded`/`finished`. Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 

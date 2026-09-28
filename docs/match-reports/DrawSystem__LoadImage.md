@@ -78,7 +78,7 @@ slot (+0x058) `loadImage`.
 
 The class is unified: its one definition is `include/draw_system.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
 
-Callers outside this unit, now through the header: TimImage__Upload (TimImage) and MoviePlayer__DrawStrip (GraphicsResources, rect cast from its own Rect45BC8).
+Callers outside this unit, now through the header: TimImage__Upload (TimImage) and MoviePlayer__DrawStrip (graphics_resources, rect cast from its own Rect45BC8).
 
 ## History (moved from include/types.h, round 102)
 

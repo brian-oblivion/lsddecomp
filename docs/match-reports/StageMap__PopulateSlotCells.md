@@ -887,7 +887,7 @@ non-0/non-(-1) return value (what LinkResource__GetModel returns): a TmdModel
 (include/TmdModel.h), read only for its +0x010, TmdModel's `object`. A view of
 TmdModel, left for that class (round 89, LinkResource's unification did not
 retype it)."* `ResourceSourceRequest.field0` is `buffer` (tier A: it is the first word of
-New_LinkResource's descriptor, GraphicsResources.c's `ResourceSource { void *buffer; char
+New_LinkResource's descriptor, graphics_resources.c's `ResourceSource { void *buffer; char
 *name; }`, and holds the address of the chunk header's model block). The type
 keeps its placeholder name (track 6); its 0x10 size is kept, not measured as
 load-bearing. Byte-identical.
@@ -920,11 +920,11 @@ The barrier's two-line comment became `/* MATCHING: keeps the rec.x/.y/.z loads 
 
 `BE54LoadReq` -> `ResourceSourceRequest` (tier A). It is the descriptor the
 body passes to `New_LinkResource`, cast to that ctor's `struct
-ResourceSource` (src/graphics/GraphicsResources.c: `{ void *buffer; char *name; }`,
+ResourceSource` (src/graphics/graphics_resources.c: `{ void *buffer; char *name; }`,
 a buffer to adopt, or with `buffer` NULL a file name to request), and the
 body sets only `buffer`, to the chunk header's model block
 (`header + placementsOffset + placementsSize`). The name follows
-include/LinkResource.h's banner ("the callers outside GraphicsResources
+include/LinkResource.h's banner ("the callers outside graphics_resources
 build it in their own 0x10-byte request types").
 
 Its 0x10 size is load-bearing, measured this round: giving it
@@ -942,16 +942,16 @@ and `path` (its `name`) before `New_LinkResource`. One
 `ResourceSourceRequest { void *buffer; char *name; u8 pad8[8]; }` in the
 header owning ResourceSource (LinkResource.h, or FileResource.h, the
 common parent of the five ctors that take it, once ResourceSource itself
-moves out of GraphicsResources.c) would retire all three; field renames
+moves out of graphics_resources.c) would retire all three; field renames
 `type` -> `buffer`, `path` -> `name`. The three-word ResourceRequest__Set descriptors
-(GraphicsResources.c `ResourceSourceArgs`, include/dream_aux.h
+(graphics_resources.c `ResourceSourceArgs`, include/dream_aux.h
 `DreamAuxLoadReq`, include/GameApplicationFileResource.h `ResourceRequest`) are the same family
 at 0x0C and are left to that job.
 
 ## Track 6 (round 96, delta, second job): ResourceSourceRequest unified
 
 The proposal above, applied. `ResourceSource` moved from
-src/graphics/GraphicsResources.c to include/FileResource.h (the parent of the five
+src/graphics/graphics_resources.c to include/FileResource.h (the parent of the five
 ctors that take it), and one `ResourceSourceRequest` sits beside it:
 
 ```c

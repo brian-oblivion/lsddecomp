@@ -76,7 +76,7 @@ rather than API.
   `CdlFILE`; a signed 3-byte colour is defined six times (`BgLayerRgb`,
   `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `ColorRgb`, `ViewportRgb`):
   one type. `FIX12_SHIFT` and `CD_SECTOR_SIZE` redefined at
-  GraphicsResources.c:63-64. `ABS_fa50` (TmdModel.c:53) open-coded twice more.
+  graphics_resources.c:63-64. `ABS_fa50` (TmdModel.c:53) open-coded twice more.
 - **Headers not self-contained:** six M-Z headers use `GsCOORDINATE2`,
   `SVECTOR`, `MATRIX`, `RECT` without including Sony's header.
 
@@ -211,7 +211,7 @@ so merge by hand, one commit per type, the accessors from the compiler.
 Round 104 did the four debt passes; each item's list above is done or
 measured wrong (the per-finding verdicts are in PROGRESS.md, round 104).
 Still open, none a track 10 item: what IsDaySpecial's `% 12` counts;
-whether TodActor's `TodSetBuffer` and GraphicsResources' `SubBlockTable` are
+whether TodActor's `TodSetBuffer` and graphics_resources' `SubBlockTable` are
 one type; the write-only `unk` fields readability.py still lists (nothing
 reads them, so nothing names them).
 

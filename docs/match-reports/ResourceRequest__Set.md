@@ -10,7 +10,7 @@
 
 Fills a `ResourceRequest` (`include/GameApplicationFileResource.h`) -- `buffer`, `name`,
 `mode` -- and returns the pointer. That is the descriptor the LinkResource,
-Tod, TodSet, ModelData and TriggerWorld ctors take (GraphicsResources.c's
+Tod, TodSet, ModelData and TriggerWorld ctors take (graphics_resources.c's
 `ResourceSource` declares only its first two words).
 
 ## Derivation
@@ -89,7 +89,7 @@ Not `LongVec3` (the words are a pointer, a string and a flag) and not Sony's
 `VECTOR` (no fourth word is touched).
 
 Several unit-local views of this same descriptor remain, under other names:
-`ResourceSource` and `ResourceSourceArgs` (GraphicsResources.c),
+`ResourceSource` and `ResourceSourceArgs` (graphics_resources.c),
 `DreamAuxLoadReq` (dream_aux.h), `LoadRequest` (DayTaskStageMap.h),
 `LoadModelRequest` (GameApplicationFileResource), `ResourceSourceRequest` (DayTaskStageMap.c). Some are
 0x10-byte locals, where the stack slot size may be what matches, so merging
@@ -98,7 +98,7 @@ them is a head decision (proposed below), not a rename.
 ## Proposed (not applied: outside this job's edit set)
 
 - One header for the descriptor (e.g. `include/ResourceSource.h`) holding a
-  single definition, retiring `ResourceRequest`, GraphicsResources.c's
+  single definition, retiring `ResourceRequest`, graphics_resources.c's
   `ResourceSource`/`ResourceSourceArgs`, `DreamAuxLoadReq`, `LoadRequest`,
   `LoadModelRequest` and `ResourceSourceRequest`, with `ResourceRequest__Set`'s
   prototype there. Check each 0x10-byte local keeps its size.
@@ -116,7 +116,7 @@ them is a head decision (proposed below), not a rename.
 `ResourceRequest__Set`'s one prototype under it. `include/GameApplicationFileResource.h` no
 longer defines it. The body reads `this->src.buffer = buffer;
 this->src.name = name; this->mode = mode;`. Retired onto it:
-GraphicsResources.c's `ResourceSourceArgs` (ModelData__BuildResources,
+graphics_resources.c's `ResourceSourceArgs` (ModelData__BuildResources,
 TriggerWorld__BuildResources, TodSet__BuildTods) and include/dream_aux.h's
 `DreamAuxLoadReq` (InitDreamAux), along with the local
 `ResourceRequest__Set` externs typed to them. Every `(ResourceSource *)&req`

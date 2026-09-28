@@ -7,7 +7,7 @@
  * LinkResource -- a FileResource data source (class id 0xD03, method table
  * gLinkResourceMethods) over one loaded TMD file: it builds one TmdModel
  * (include/TmdModel.h) per object of the TMD and hands them out by index.
- * Methods in src/graphics/GraphicsResources.c; no subclasses.
+ * Methods in src/graphics/graphics_resources.c; no subclasses.
  *
  * What its own methods do: map the file's TMD
  * (LinkResource__MapModel: GsMapModelingData(&file->flags)) and build and
@@ -31,7 +31,7 @@
  * differ from them in two places, and the callers cast:
  *   +0x008 ctor: LinkResource__LinkResource returns self, or NULL when the
  *          buffer it adopted fails to build (New_LinkResource tests it,
- *          through GraphicsResources.c's unprototyped UnprototypedCtorTable view).
+ *          through graphics_resources.c's unprototyped UnprototypedCtorTable view).
  *   +0x064 onRequestDone: LinkResource__BuildModels(self), s32: 1 when an
  *          allocation fails, else 0 after the active driver's onRequestDone.
  *   +0x078 processBuffer (NULL in FileResource): LinkResource__MapModel(self).

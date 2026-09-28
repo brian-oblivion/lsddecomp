@@ -4,7 +4,7 @@
 
 > Renamed from `func_80045DE0` on 2026-09-25 (tools/rename.py). Address 0x80045de0.
 
-Round 82, runner echo (GraphicsResources session, echo #6), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #6), 2026-09-25. Unit `graphics_resources`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 14/14 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -19,7 +19,7 @@ Table slot (`tools/classtable.py`): none (no method table lists it).
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
@@ -46,4 +46,4 @@ void OnMdecStripDone(void) {
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; `sActiveMoviePlayer` is a `MoviePlayer *`, so the call is `sActiveMoviePlayer->methods->drawStrip(sActiveMoviePlayer)` with no function-pointer cast. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; `sActiveMoviePlayer` is a `MoviePlayer *`, so the call is `sActiveMoviePlayer->methods->drawStrip(sActiveMoviePlayer)` with no function-pointer cast. Byte-identical; `typeviews.py --warnings` 0 new.

@@ -9,14 +9,14 @@ dream_sys: warning: control reaches end of non-void function
 entity: warning: passing arg 4 of `Entity__GetOrCreateFadeBox' makes pointer from integer without a cast
 GameApplicationFileResource: warning: assignment from incompatible pointer type
 GameApplicationFileResource: warning: control reaches end of non-void function
-GraphicsResources: warning: `sx' might be used uninitialized in this function
-GraphicsResources: warning: `sy' might be used uninitialized in this function
-GraphicsResources: warning: control reaches end of non-void function
-GraphicsResources: warning: control reaches end of non-void function
-GraphicsResources: warning: unused variable `unused'
-GraphicsResources: warning: unused variable `unused'
-GraphicsResources: warning: unused variable `unused'
-GraphicsResources: warning: unused variable `unused'
+graphics_resources: warning: `sx' might be used uninitialized in this function
+graphics_resources: warning: `sy' might be used uninitialized in this function
+graphics_resources: warning: control reaches end of non-void function
+graphics_resources: warning: control reaches end of non-void function
+graphics_resources: warning: unused variable `unused'
+graphics_resources: warning: unused variable `unused'
+graphics_resources: warning: unused variable `unused'
+graphics_resources: warning: unused variable `unused'
 ObjMStyleActor: warning: unused variable `pad48Tail'
 ObjMStyleActor: warning: unused variable `unused'
 PlacementGridVabSound: warning: unused variable `unused'

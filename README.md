@@ -142,7 +142,7 @@ Read each named class's header first; its banner points to the units.
 - **Scene objects.** `SceneNode` is the positioned 3D object, wrapping a
   libgs `GsDOBJ2` and its coordinate system (`src/graphics/scene_node.c`); `Actor`
   adds movement (`src/world/ObjMStyleActor.c`). `LinkResource`, `ModelData` and `Tod`/`TodSet`
-  (`src/graphics/GraphicsResources.c`) load models and TOD animations;
+  (`src/graphics/graphics_resources.c`) load models and TOD animations;
   `TmdModel` (`src/graphics/TmdModel.c`) is one object of a TMD, and
   `SortTmdObject` (`src/graphics/TmdRenderer.c`) turns it into GPU primitives.
   `Viewport` (`src/app/Task.c`, its draw pass in `src/graphics/ViewportDraw.c`)
@@ -182,7 +182,7 @@ Read each named class's header first; its banner points to the units.
   machines and the file table)
   or `VabDriver`. `TimImage` (`src/graphics/TimImage.c`), `TimArraySrc`, `TimBlockSrc`, `TileMap` and
   `TileAtlas` load and build textures.
-- **Movies.** `MoviePlayer` (`src/graphics/GraphicsResources.c`) decodes MDEC FMV from a
+- **Movies.** `MoviePlayer` (`src/graphics/graphics_resources.c`) decodes MDEC FMV from a
   `CdStream` (`src/cd/cd_stream.c`, over libcd streaming).
 - **Sound.** `VabStreamObj` loads VAB banks, `WBgm` plays background music
   (`src/sound/WBgm.c`), `src/sound/PlacementGridVabSound.c` holds `VabDriver`, `VabStreamObj` and

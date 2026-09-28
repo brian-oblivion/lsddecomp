@@ -60,7 +60,7 @@ Renamed `TimImage__func_8003B5E4` -> `TimImage__SetFlag` with `tools/rename.py`
 `unk48` -> `flag48` and the table slot +0x098 `slot98` -> `setFlag48` in
 `include/TimImage.h`; the compiler's accessor set for both was this unit only
 (the ctor, which clears it, and this setter). No reader of TimImage +0x048 is
-found in `src/` (the eleven TimImage.h includers and GraphicsResources.c's
+found in `src/` (the eleven TimImage.h includers and graphics_resources.c's
 TimArraySrc, which builds TimImages), and no C calls +0x098, so what the flag
 gates is not established: the field name says only that it is a flag.
 

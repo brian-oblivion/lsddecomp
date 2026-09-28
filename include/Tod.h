@@ -5,7 +5,7 @@
 
 /*
  * Tod -- a FileResource data source (class id 0x4F03, method table gTodMethods)
- * over one TOD animation's packet stream. Methods in src/graphics/GraphicsResources.c; one
+ * over one TOD animation's packet stream. Methods in src/graphics/graphics_resources.c; one
  * subclass, TodSet (gTodSetMethods, 0x14F03), whose ctor calls this class's
  * first (TodSet__TodSet: GetTodMethods()->ctor(self, arg)) and whose
  * TodSet__BuildTods makes one Tod per sub-block of its buffer (New_Tod).
@@ -34,7 +34,7 @@
  * the parent's name).
  *
  * The ctor's descriptor is include/FileResource.h's ResourceSource ({buffer
- * to adopt, file name to request}). The allocators reach the ctor through GraphicsResources.c's unprototyped
+ * to adopt, file name to request}). The allocators reach the ctor through graphics_resources.c's unprototyped
  * UnprototypedCtorTable view.
  */
 

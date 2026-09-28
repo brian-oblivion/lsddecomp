@@ -2,7 +2,7 @@
 
 > Renamed from `func_800441A4` on 2026-09-25 (tools/rename.py). Address 0x800441a4.
 
-Round 82, runner echo (GraphicsResources session, echo #5), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #5), 2026-09-25. Unit `graphics_resources`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 4/4 words, 0 insertions / 0
 deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior report).
@@ -26,7 +26,7 @@ void *GetTodMethods(void) {
 ## Notes
 
 - Only `common.h` is included; no shared header was edited. Local declarations
-  sit directly above the function in `src/graphics/GraphicsResources.c`.
+  sit directly above the function in `src/graphics/graphics_resources.c`.
 
 ## Naming
 
