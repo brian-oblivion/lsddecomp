@@ -246,17 +246,6 @@ typedef struct DreamSysEntityObj {
     DreamSysEntityMethods *methods;
 } DreamSysEntityObj;
 
-/* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
-   value (+0x4) and a position/time (+0x8); +0x0 is not read.
-   DreamSys__ProjectPointAtDistance calls it as
-   InterpolateKeyframeValue(&viewport->refView.vp, &viewport->refView.vr, dist):
-   the viewpoint and the reference point, read as {x, y = value, z = position}. */
-typedef struct DreamSysInterpPoint {
-    s8 unknown_values_0x0[4];
-    s32 value;
-    s32 position;
-} DreamSysInterpPoint;
-
 /* The object. Actor's fields (include/Actor.h) run to +0x058; DreamSys's
  * own start there. New_DreamSys allocates 0x928 bytes. */
 struct DreamSys {

@@ -528,8 +528,10 @@ void DreamSys__RunTickCallbacks(DreamSys *self) {
         self->moveCallback(self);
 }
 
-/* Defined right after its caller. */
-extern s32 InterpolateKeyframeValue(DreamSysInterpPoint *from, DreamSysInterpPoint *to, s32 at);
+/* The y of the line through `from` and `to` in the y/z plane, at z = `at`;
+ * the z distance is taken in units of 1024 (1 when it rounds to 0). Defined
+ * right after its caller. */
+extern s32 InterpolateKeyframeValue(LongVec3 *from, LongVec3 *to, s32 at);
 
 /* Converts the local offset (0, 0, dist) to a world position, takes its
    height from the viewport's two refView points interpolated at `dist`,
@@ -546,8 +548,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *self, s32 *out, s32 dist, s32 *re
     *offsetZ = dist;
     SceneNode__LocalOffsetToWorldPos((SceneNode *)self, worldPos, offsetZ - 2, 0);
 
-    height = InterpolateKeyframeValue((void *)&self->viewport->refView.vp,
-                                      (void *)&self->viewport->refView.vr, dist);
+    height = InterpolateKeyframeValue(&self->viewport->refView.vp, &self->viewport->refView.vr, dist);
 
     worldTrans = self->parent != 0 ? self->coord2->workm.t : 0;
     worldPos[1] = height + worldTrans[1];
@@ -561,18 +562,18 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *self, s32 *out, s32 dist, s32 *re
     return 0;
 }
 
-s32 InterpolateKeyframeValue(DreamSysInterpPoint *from, DreamSysInterpPoint *to, s32 at) {
+s32 InterpolateKeyframeValue(LongVec3 *from, LongVec3 *to, s32 at) {
     s32 scaledAt;
     s32 dt;
     s32 dv;
 
     scaledAt = at;
     scaledAt = scaledAt / 1024;
-    dt = (to->position - from->position) / 1024;
+    dt = (to->z - from->z) / 1024;
     if (dt == 0)
         dt = 1;
-    dv = to->value - from->value;
-    return (dv * scaledAt) / dt + from->value;
+    dv = to->y - from->y;
+    return (dv * scaledAt) / dt + from->y;
 }
 
 void DreamSys__func_59590(DreamSys *self) {
