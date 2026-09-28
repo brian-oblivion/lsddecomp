@@ -59,7 +59,6 @@
 typedef struct Viewport Viewport;
 typedef struct ViewportMethods ViewportMethods;
 typedef struct ViewportSize ViewportSize;
-typedef struct ViewportRgb ViewportRgb;
 typedef struct ViewportRefView ViewportRefView;
 
 /* The screen size: drawNode reads it as the width and height the box and
@@ -71,13 +70,9 @@ struct ViewportSize {
     s32 height;
 };
 
-/* An RGB triple, copied whole (retail loads all three bytes before storing
- * any). Written as signed bytes, read unsigned by GsSortClear/SetFarColor. */
-struct ViewportRgb {
-    s8 r;
-    s8 g;
-    s8 b;
-};
+/* The spelling Task.c, ObjMStyleActor.c and Entity.c still use; Task.c
+ * defines SetClearColor and SetFarColor with it, so their prototypes keep it. */
+typedef ColorRgb ViewportRgb;
 
 /* libgs GsRVIEW2, 0x20 bytes, field for field: the argument GsSetRefView2
  * takes. Kept local rather than Sony's GsRVIEW2 because the game uses vp and
@@ -107,8 +102,8 @@ struct ViewportRefView {
     /* +0x058 */ void (*slot58)(void);                             /* Viewport__NoOpSlot58, empty */        \
     /* +0x05C */ void (*slot5C)(void);                             /* Viewport__NoOpSlot5C, empty */        \
     /* +0x060 */ void (*setLightMode)(Self *self, s32 mode);       /* Viewport__SetLightMode */      \
-    /* +0x064 */ void (*setClearColor)(Self *self, ViewportRgb *color); /* Viewport__SetClearColor */ \
-    /* +0x068 */ void (*setFarColor)(Self *self, ViewportRgb *color);   /* Viewport__SetFarColor */ \
+    /* +0x064 */ void (*setClearColor)(Self *self, ColorRgb *color); /* Viewport__SetClearColor */ \
+    /* +0x068 */ void (*setFarColor)(Self *self, ColorRgb *color);   /* Viewport__SetFarColor */ \
     /* +0x06C */ void (*setFogNear)(Self *self, s32 fogNear);      /* Viewport__SetFogNear */        \
     /* +0x070 */ void (*attachViewChild)(Self *self, BasicClass *node, LongVec3 *vp, LongVec3 *vr, Ratio16 *twist); /* Viewport__AttachViewChild; NULL twist: sDefaultViewTwist */ \
     /* +0x074 */ void (*detachViewChild)(Self *self);              /* Viewport__DetachViewChild */   \
@@ -144,8 +139,8 @@ struct ViewportRefView {
     /* +0x04C */ s32 nearZ;               /* GsSetNearClip; drawNode's sprite near limit */        \
     /* +0x050 */ s32 farZ;                /* zDiv = (farZ - nearZ) / (1 << otLength) + 1 */        \
     /* +0x054 */ s32 lightMode;           /* GsSetLightMode; 1 or 3 also sets the fog */           \
-    /* +0x058 */ ViewportRgb clearColor;  /* Flip's GsSortClear */                                 \
-    /* +0x05B */ ViewportRgb farColor;    /* Update's SetFarColor */                               \
+    /* +0x058 */ ColorRgb clearColor;  /* Flip's GsSortClear */                                 \
+    /* +0x05B */ ColorRgb farColor;    /* Update's SetFarColor */                               \
     /* +0x05E */ u8 pad05E[2];                                                                     \
     /* +0x060 */ s32 fogNear;             /* Update's SetFogNear */                                \
     /* +0x064 */ u8 pad064[0x070 - 0x064];                                                         \
