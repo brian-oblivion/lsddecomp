@@ -10,7 +10,7 @@
  * shared buffer of gTmdModelBoundsCount boxes, TmdModel__UpdateBoundsBuffer /
  * TmdModel__GetBoundsBuffer / TmdModel__GetBoundsCount), and ray-cast a
  * segment against every face (TmdModel__RaycastFaces) for SceneNode's own
- * collision helpers in SceneNode.c/SceneNode.c.
+ * collision helpers in SceneNode.c.
  *
  * RotateAndOffsetHullList is a free function over a TmdHull (a counted list
  * of box corners, the buffer Actor__NotifyMove fills through getModelHull):

@@ -1,7 +1,18 @@
 /*
- * SceneNode -- SceneNode (include/SceneNode.h), part 1 of 3: the occupants
- * of slots +0x000 to +0x070 of gSceneNodeMethods. Part 2 is code_d294_b.c,
- * part 3 code_d294_c.c; their shared helpers are declared in SceneNode.h.
+ * SceneNode (include/SceneNode.h): every method of the class, the table
+ * getter, and the free vector and clipping helpers its methods call by
+ * symbol, in ROM order: the occupants of gSceneNodeMethods' slots +0x000 to
+ * +0x0B4, the getter, then the methods that sit in no slot and the helpers.
+ *
+ * Edges. The file starts after Sony's libgte/divgt4a and ends before the
+ * head of the old psyq_GsLinkObject4 (0xF770). It was carved as three
+ * slices (code_d294, _b, _c) and merged in round 101: tuboundary.py finds
+ * no rodata crossing and no forced boundary anywhere in the stretch, calls
+ * the first slice edge "boundary unlikely (single-user data)" and the
+ * second "boundary possible", and the content is one class throughout, so
+ * content decided the merge.
+ *
+ * Slots +0x000 to +0x070.
  *
  * Lifecycle: New_SceneNode, the ctor (which allocates the node's
  * GsCOORDINATE2 and its GsCOORD2PARAM, and fails when either allocation
@@ -285,12 +296,9 @@ u32 SceneNode__SetLightMode(SceneNode *self, u32 mode) {
     return GetSetBitField(&self->attribute, ATTR_LIGHTMODE_SHIFT, 3, mode);
 }
 
-/* ---- merged from code_d294_b ---- */
-
 /*
- * code_d294_b -- SceneNode (include/SceneNode.h), part 2 of 3: the
- * occupants of slots +0x074 to +0x0B4, and the segment-against-box clippers
- * the link test uses. Part 1 is SceneNode.c, part 3 code_d294_c.c.
+ * Slots +0x074 to +0x0B4, the table getter, and the segment-against-box
+ * clippers the link test uses.
  *
  * SetLightDim, SetUseZ, SetSubdivision and SetBackClip set the last four
  * fields of GsDOBJ2.attribute; GetRotMatrix makes the node's rotation, or
@@ -855,12 +863,9 @@ SceneNodeMethods *GetSceneNodeMethods(void) {
     return &gSceneNodeMethods;
 }
 
-/* ---- merged from code_d294_c ---- */
-
 /*
- * code_d294_c -- SceneNode (include/SceneNode.h), part 3 of 3: the class's
- * methods that sit in no slot, and the vector helpers the game calls by
- * symbol.
+ * The class's methods that sit in no slot, and the vector helpers the game
+ * calls by symbol.
  *
  * Methods: RotateLocalVector and LocalOffsetToWorldPos (an offset in the
  * node's own frame, rotated into its parent's, or made a world position),
