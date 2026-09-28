@@ -78,7 +78,7 @@ void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soun
         self->initData = *GetDefaultMovieFrame();
     }
     self->player = New_MoviePlayer(GetDefaultMovieFrame(), 0, 0);
-    self->streamName = 0;
+    self->streamName = NULL;
     self->methods->resetCounters(self);
 }
 
@@ -95,7 +95,7 @@ void StreamTask__Reset(StreamTask *self) {
     self->abortBeforeFade = 1;
 }
 
-void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, s32 streamName,
+void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, const char *streamName,
                       s32 streamGroup, s32 autoPlay) {
     self->streamName = streamName;
     self->streamGroup = streamGroup;

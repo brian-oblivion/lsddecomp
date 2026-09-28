@@ -86,3 +86,7 @@ Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, i
 ## Track 4 (2026-09-26, round 89)
 
 The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4Obj view is gone and Task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The calls are `setAutoPlay` (+0x06C) and `play` (+0x040), `play`'s name argument cast `(char *)self->streamName` (no code). Byte-identical.
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.

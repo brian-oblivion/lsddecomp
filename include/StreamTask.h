@@ -25,7 +25,7 @@
  *   +0x008 ctor           StreamTask__StreamTask: TaskCore's ctor, this
  *                         table, initData (a DrawRect) copied from the
  *                         fifth argument or GetDefaultMovieFrame(), the player,
- *                         streamName 0, resetCounters.
+ *                         streamName NULL, resetCounters.
  *   +0x00C finalize       StreamTask__Finalize: releases the player, then
  *                         TaskCore's.
  *   +0x040 resetCounters  StreamTask__Reset: loopCount -1, keepActive 0,
@@ -64,10 +64,9 @@
  * StreamTaskInitFn (a pointer cast, no code). The override returns nothing
  * (no caller reads it).
  *
- * `streamName` is MoviePlayer__Play's name argument (`char *` there); it is
- * s32 here because four of the five callers pass a helper's s32 result
- * (only the intro logo passes a string), and retyping those helpers is not
- * this class's job.
+ * `streamName` is MoviePlayer__Play's name argument (`char *` there): the
+ * movie's path, from GetAsmkMovie or a FilePathRecord the GameFiles.h
+ * getters return.
  */
 
 typedef struct StreamTask StreamTask;
@@ -113,7 +112,7 @@ struct StreamTask {
     /* +0x0A4 */ s32 playDone;      /* OnInit: 0; Update: the player's Advance until nonzero */
     /* +0x0A8 */ DrawRect initData; /* the ctor's fifth argument or the default */
     /* +0x0B4 */ struct MoviePlayer *player; /* New_MoviePlayer(GetDefaultMovieFrame(), 0, 0); finalize releases it */
-    /* +0x0B8 */ s32 streamName;  /* Init's; the player's Play name. ctor: 0 */
+    /* +0x0B8 */ const char *streamName; /* Init's; the player's Play name. ctor: NULL */
     /* +0x0BC */ s32 streamGroup; /* Init's (GetMovieFrameCount, or -1); Play's second argument */
     /* +0x0C0 */ s32 autoPlay; /* Init's (every caller 1); the player's setAutoPlay (MoviePlayer::autoPlay, +0x068), which Play tests to RequestStart at once */
     /* +0x0C4 */ s32 keepActive; /* setKeepActive; reset 0; Play's keepActive (MoviePlayer::keepActive, +0x054) */
@@ -125,8 +124,8 @@ struct StreamTask {
 };
 
 /* +0x044's occupant as its callers need it (see the banner). */
-typedef void (*StreamTaskInitFn)(StreamTask *self, IntermediateBaseInitArgs *args, s32 streamName,
-                                 s32 streamGroup, s32 autoPlay);
+typedef void (*StreamTaskInitFn)(StreamTask *self, IntermediateBaseInitArgs *args,
+                                 const char *streamName, s32 streamGroup, s32 autoPlay);
 
 extern StreamTaskMethods gStreamTaskMethods;
 extern StreamTaskMethods *GetStreamTaskMethods(void); /* returns &gStreamTaskMethods */
@@ -137,7 +136,7 @@ void StreamTask__StreamTask(StreamTask *self, TaskCoreTarget *target, char *soun
                             BasicClass *sound, DrawRect *initData);
 void StreamTask__Finalize(StreamTask *self);
 void StreamTask__Reset(StreamTask *self);
-void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, s32 streamName,
+void StreamTask__Init(StreamTask *self, IntermediateBaseInitArgs *args, const char *streamName,
                       s32 streamGroup, s32 autoPlay);
 void StreamTask__OnInit(StreamTask *self);
 void StreamTask__Update(StreamTask *self, BasicClass *sender, s32 event);

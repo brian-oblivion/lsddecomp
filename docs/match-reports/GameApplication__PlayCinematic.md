@@ -183,3 +183,7 @@ extern s32 GetSpecialDayOrEventRecord(s32 *out, s32 packedBankEntry); /* psyq_me
     back as a signed 32-bit number. Also returns its own (separate) s32 value, kept by
     GameApplication__PlayCinematic. */
 ```
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.

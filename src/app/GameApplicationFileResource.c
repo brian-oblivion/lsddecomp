@@ -123,7 +123,7 @@ void GameApplication__ShowIntroLogos(GameApplication *self) {
         moviePath = GetAsmkMovie(&movieId);
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
-                                                (s32)moviePath, frameCount, 1);
+                                                moviePath, frameCount, 1);
         task->methods->release(task);
         GameApplication__ShowImage(self, sLogoPathOsd);
     }
@@ -161,7 +161,7 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
         moviePath = (const char *)PickOpeningMovie(&movieId, 0);
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
-                                                (s32)moviePath, frameCount, 1);
+                                                moviePath, frameCount, 1);
         task->methods->release(task);
     }
 }
@@ -238,7 +238,7 @@ void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
         task->methods->setFrameBound(task, (u32)buf.frameTotal / STREAMTASK_FRAMES_PER_SECOND);
         task->methods->setSkipOnConfirm(task, 0);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
-                                                (s32)moviePath, -1, 1);
+                                                moviePath, -1, 1);
         task->methods->release(task);
     }
 }
@@ -306,7 +306,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
             streamTask->methods->setSkipOnConfirm(streamTask, 0);
             frameCount = GetMovieFrameCount(idBuf.movieId);
             ((StreamTaskInitFn)streamTask->methods->init)(
-                streamTask, (IntermediateBaseInitArgs *)self->aux, (s32)path, frameCount, 1);
+                streamTask, (IntermediateBaseInitArgs *)self->aux, path, frameCount, 1);
             streamTask->methods->release(streamTask);
         }
     } else {
@@ -332,7 +332,7 @@ void GameApplication__PlayEndingMovie(GameApplication *self) {
         moviePath = (const char *)GetEndingMovie(&movieId, 0);
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
-                                                (s32)moviePath, frameCount, 1);
+                                                moviePath, frameCount, 1);
         task->methods->release(task);
     }
 }
