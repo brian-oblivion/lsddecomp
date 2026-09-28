@@ -30,7 +30,7 @@ helper, see its report), which is what actually invokes it.
 **`Actor__MoveLocalZOrFindLink` -- tier B.** Confirmed mechanics: reads
 (does not call) the vtable's `+0x0C4` slot (`Actor__MoveLocalZ`, a
 sibling of this unit's own offset-slot family defined in a DIFFERENT
-unit, `class_3bb8c_o.c`, and out of this runner's scope to rename) as a
+unit, `class_3bb8c_k.c`, and out of this runner's scope to rename) as a
 raw function pointer, and forwards it to
 `Actor__MoveOrFindNearbyLink`. Named by the SLOT it reads (`C4`,
 objective) rather than by inventing a name for `Actor__MoveLocalZ`'s

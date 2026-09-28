@@ -7,14 +7,14 @@
 Unit `class_3bb8c_k`. `self` is this unit's local `LinkNode` (see the unit's
 own file banner / `class_3bb8c_k.c` for the full type; kept local per the
 multiple-independent-local-views convention, not shared with
-`class_3bb8c_o.c`'s `LinkOwnerObj`).
+`class_3bb8c_k.c`'s `LinkOwnerObj`).
 
 ## Classification
 
 Clean on all four carve-time screens. Trivial once the dispatch shape was
 clear: a `switch` on `self->unk54` (the same state field `StyleEffect__InitByKind` and
 `StyleEffect__UpdateByKind`, its two siblings in this unit, both also switch on) with
-four cases, two of which forward straight into `class_3bb8c_o.c`'s
+four cases, two of which forward straight into `class_3bb8c_k.c`'s
 `StyleEffect__ReleaseSprites`/`StyleEffect__ReleaseSpritesB`.
 
 ## Body

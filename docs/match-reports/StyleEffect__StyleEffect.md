@@ -7,7 +7,7 @@
 Unit: `class_3bb8c_k` (round 17 continuation). `StyleEffectMethods::ctor`
 (vtable offset `+0x008` of `gStyleEffectMethods`) -- chains to the shared base
 class's own ctor (`GetActorMethods()->ctor`, the SAME shared-base getter
-`class_3bb8c_o.c` already used for its own `Actor__Actor`/
+`class_3bb8c_k.c` already used for its own `Actor__Actor`/
 `New_Actor` last pass), installs this class's own vtable, sets two
 fields, dispatches its own `slot40`, and tail-calls `StyleEffect__InitByKind` for
 its return value's side effect only.
@@ -33,7 +33,7 @@ fail:
 ## Derivation
 
 - **`GetActorMethods()`, not `GetSceneNodeMethods()`.** Both are fixed-table
-  getters `class_3bb8c_o.c` already resolved last pass for the SAME
+  getters `class_3bb8c_k.c` already resolved last pass for the SAME
   shared intermediate base class, but they are DIFFERENT symbols with
   DIFFERENT call sites in that unit (`GetSceneNodeMethods` for the ctor CHAIN
   inside `Actor__Actor`; `GetActorMethods` for the plain-allocator
@@ -41,7 +41,7 @@ fail:
   calls `GetActorMethods`, confirmed directly rather than assumed from
   surface similarity to last pass's ctor.
 - **`goto fail; ... fail: return NULL;`, not `if (cond) return NULL;`.**
-  Same lever as `class_3bb8c_o.c`'s own `Actor__Actor` (documented
+  Same lever as `class_3bb8c_k.c`'s own `Actor__Actor` (documented
   there): with a plain `if`/`return NULL`, the return-`self` path needs
   its own explicit `j` to reach the shared epilogue, costing one word.
   `goto` collapses both exits onto ONE epilogue.

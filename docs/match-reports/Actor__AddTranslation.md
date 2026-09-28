@@ -4,7 +4,7 @@
 
 > Renamed from `func_800573A8` on 2026-09-18 (tools/rename.py). Address 0x800573a8.
 
-Unit: `class_3bb8c_o` (round 17). One-line wrapper: `Actor__UpdateTranslation(self, 0,
+Unit: `class_3bb8c_k` (round 17). One-line wrapper: `Actor__UpdateTranslation(self, 0,
 arg1)`. Already named at `vtable_DreamSys` `+0x0BC` in `DreamSys.h`, typed
 `void (*Actor__AddTranslation)(DreamSys *this, DreamSysVec3 *arg1)` there.
 
@@ -39,4 +39,4 @@ wrapper causes to happen; mirrors `Actor__SetTranslation`'s naming logic.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__AddVec14`. Occupant of +0x0BC: Actor__UpdateTranslation(self, 0, v), i.e. coord2->coord.t += v. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__AddVec14`. Occupant of +0x0BC: Actor__UpdateTranslation(self, 0, v), i.e. coord2->coord.t += v. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_k.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

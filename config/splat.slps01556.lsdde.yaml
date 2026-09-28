@@ -1718,7 +1718,6 @@ segments:
       # rodata attach.  EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS -- it
       # is cut at ROM addresses, not at class boundaries; identify each
       # with tools/classtable.py rather than assuming one class per unit.
-      - [0x475F0, c, class_3bb8c_o]
       # class_3bb8c_p: functions 74..93 of that remainder, 0x47CC4..0x485BC
       # (20 functions).  Census 2026-09-04: 20/20 clean on all three greps
       # -- the cleanest window found anywhere this round.  Four are

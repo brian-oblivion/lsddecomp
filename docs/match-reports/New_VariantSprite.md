@@ -39,7 +39,7 @@ discarded).
 `GetVariantSpriteMethods` is a plain no-argument getter (`return &gVariantSpriteMethods;`),
 confirmed by reading its body directly in `asm/class_3bb8c_q.s` -- the
 still-monolithic segment immediately behind this unit
-(`class_3bb8c_o.c`'s own file banner already names it as this unit's
+(`class_3bb8c_k.c`'s own file banner already names it as this unit's
 successor, `class_3bb8c_q`). `gVariantSpriteMethods` is a 49-slot table
 (`tools/classtable.py` header `0x1F44`) whose `+0x008` slot resolves to
 THIS unit's own `VariantSprite__VariantSprite` (still queued at the time this was

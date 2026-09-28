@@ -5,7 +5,7 @@
 > Renamed from `func_80056858` on 2026-09-23 (tools/rename.py). Address 0x80056858.
 
 Unit `class_3bb8c_k`. `self` is the owning `LinkNode`; this is the function
-that either attaches a fresh child (via `class_3bb8c_o.c`'s
+that either attaches a fresh child (via `class_3bb8c_k.c`'s
 `New_Actor`/`SceneNode__LinkModel` plus this unit's own `AttachWithRotScale`) or
 re-touches an existing one (`self->arr7C[i]->methods->slotB8`), driven by its
 own `reuse` argument.

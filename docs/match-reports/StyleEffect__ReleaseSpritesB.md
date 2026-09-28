@@ -6,7 +6,7 @@
 
 > Renamed from `func_80056F28` on 2026-09-18 (tools/rename.py). Address 0x80056f28.
 
-Unit: `class_3bb8c_o` (round 17). Byte-identical body to `StyleEffect__ReleaseSprites`
+Unit: `class_3bb8c_k` (round 17). Byte-identical body to `StyleEffect__ReleaseSprites`
 (see that report) -- releases the same 5-element `arr84` array.
 
 ## Final source
@@ -56,7 +56,7 @@ another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 `updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 
-View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
+View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_k.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
 
 ## Track 7 (round 99, alpha)
 

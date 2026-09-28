@@ -24,10 +24,10 @@ void AddVec3(Vec3S *dst, Vec3S *a, Vec3S *b) {
 }
 ```
 
-`Vec3S` is this unit's own local reading of the same shape `class_3bb8c_o.c`
+`Vec3S` is this unit's own local reading of the same shape `class_3bb8c_k.c`
 already has under its own name `Vec3O` -- kept separate per the
 multiple-independent-local-views convention (this unit is not
-`class_3bb8c_o.c`'s to edit).
+`class_3bb8c_k.c`'s to edit).
 
 ### Proposed learning
 

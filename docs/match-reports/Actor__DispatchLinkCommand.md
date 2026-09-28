@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057320` on 2026-09-18 (tools/rename.py). Address 0x80057320.
 
-Unit: `class_3bb8c_o` (round 17). A tag-gated double dispatch: reads
+Unit: `class_3bb8c_k` (round 17). A tag-gated double dispatch: reads
 `arg1`'s own vtable header LOW BYTE and calls one of two of `self`'s own
 vtable slots depending on its value.
 
@@ -74,7 +74,7 @@ the prefix rather than guessing `BaseObjO`.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DispatchObjO__func_57320`. Override of +0x09C (SceneNode's dispatchLinkCommand), named for its slot: routes by the sender's class byte, 0x34 (an Actor) to onActorLinkCommand (+0x0DC), 0x24 (GridCell) to onGridCellLinkCommand (+0x0E0). The C now passes (self, sender, event) to both explicitly; the old view passed self alone and relied on $a1/$a2 being untouched, which they are (same bytes). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DispatchObjO__func_57320`. Override of +0x09C (SceneNode's dispatchLinkCommand), named for its slot: routes by the sender's class byte, 0x34 (an Actor) to onActorLinkCommand (+0x0DC), 0x24 (GridCell) to onGridCellLinkCommand (+0x0E0). The C now passes (self, sender, event) to both explicitly; the old view passed self alone and relied on $a1/$a2 being untouched, which they are (same bytes). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_k.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, alpha)
 

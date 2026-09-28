@@ -81,7 +81,7 @@ larger, partially-opaque) extent.
   ends at `SceneNode__AddToActorParents`); the prefix records the receiver, matching
   `BasicClass__*` and `DreamSys__*` already in the symbols file.
 - **Parameter `dst` retyped `SceneNodeSub44 *` -> `LongVec3 *`.** Evidence:
-  only three words at +0/+4/+8 are ever written, and `class_3bb8c_o`'s
+  only three words at +0/+4/+8 are ever written, and `class_3bb8c_k`'s
   `Actor__AddLocalTranslation` -- the one external call site -- passes the address of a
   bare 3-word local (`Vec3O buf`). The old typing matched by offset
   coincidence with `GsCOORD2PARAM.scale`. Byte-identical after the retype.
@@ -98,5 +98,5 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * (SceneNode__GetRotMatrix, code_d294_b) builds that rotation with RotMatrix from
  * GsCOORD2PARAM.rotate; its `0` argument selects the un-negated angles,
  * i.e. local -> parent, not the inverse. `dst` is a bare 3-word vector:
- * class_3bb8c_o's own call site (Actor__AddLocalTranslation) passes a local `Vec3O`. */
+ * class_3bb8c_k's own call site (Actor__AddLocalTranslation) passes a local `Vec3O`. */
 ```

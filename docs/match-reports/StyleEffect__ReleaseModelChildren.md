@@ -11,7 +11,7 @@ Unit `class_3bb8c_k`. `self` is the owning `LinkNode`.
 Clean on all four carve-time screens. A guarded release of the fixed
 2-element `arr7C` array, using the same `ReleaseBasicClassArray(void **array, s32
 count)` already established in `TmdRenderer.c` and reused (for the SIBLING
-5-element `arr84` array) in `class_3bb8c_o.c`.
+5-element `arr84` array) in `class_3bb8c_k.c`.
 
 ## Body
 

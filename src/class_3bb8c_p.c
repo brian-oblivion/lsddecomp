@@ -6,7 +6,7 @@
  *  - Local-axis moves. Actor__MoveLocalX/Y put `val` into one component of
  *    the local move vector gActorLocalMove, apply it through
  *    addLocalTranslation and clear it again (Actor__MoveAlongLocalAxis;
- *    MoveLocalZ is in class_3bb8c_o.c).
+ *    MoveLocalZ is in class_3bb8c_k.c).
  *  - Move, else find a link. Actor__MoveLocalZOrFindLink/XOrFindLink clear
  *    linkTarget and move; when the move set no linkTarget,
  *    Actor__FindNearbyLink searches the StageMap grid round the actor's
@@ -32,7 +32,7 @@
 #include "VariantSprite.h"
 
 /* The local move vector's x and y (s16; the z, gActorLocalMoveZ, is the next
- * halfword, class_3bb8c_o.c). All three stay 0 between moves: a move sets
+ * halfword, class_3bb8c_k.c). All three stay 0 between moves: a move sets
  * one component, addLocalTranslation rotates the whole vector by the
  * actor's orientation, and the component is cleared again. */
 extern s16 gActorLocalMove[2];

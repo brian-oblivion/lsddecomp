@@ -106,7 +106,7 @@ typedef void (*StyleEffectSetParamsFn)(StyleEffect *self, StyleEffectParams *par
 typedef void (*StyleEffectUpdateFn)(StyleEffect *self, LongVec3 *pos);
 
 extern StyleEffectMethods gStyleEffectMethods;
-extern StyleEffectMethods *GetStyleEffectMethods(void); /* class_3bb8c_o.c; returns &gStyleEffectMethods */
+extern StyleEffectMethods *GetStyleEffectMethods(void); /* class_3bb8c_k.c; returns &gStyleEffectMethods */
 
 /* The class's own methods, in address order (class_3bb8c_k, _s, then _o).
  * Four are declared WITHOUT a prototype on purpose: each is one-parameter,

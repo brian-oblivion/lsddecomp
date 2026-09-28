@@ -51,7 +51,7 @@ void StyleEffect__UpdateByKind(LinkNode *self, void *arg1) {
 
 ## Notes
 
-- **`NoOpIgnoreArgs` and `StyleEffect__RandomizeSprites` are `class_3bb8c_o.c` functions with
+- **`NoOpIgnoreArgs` and `StyleEffect__RandomizeSprites` are `class_3bb8c_k.c` functions with
   narrower real signatures** (`NoOpIgnoreArgs(void)`, `StyleEffect__RandomizeSprites
   (LinkOwnerObj *this)`) than this call site's two-argument shape. Retail's
   own caller here still sets up the dead second register regardless.

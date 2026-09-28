@@ -106,7 +106,7 @@ stayed green, so none needed proposing.
 | +0x0C | parent | A | SceneNode's +0x0C (code_d294.h `parent`); AttachToParent runs while 0, DetachFromParent while set |
 | +0x14 | coord2 | A | SceneNode's GsCOORDINATE2; Tick zeroes its first word (flg) |
 | +0x24 | tick | B | SceneNode `tick` (tier B there); Tick increments it |
-| +0x50 | companion2 | B | BaseObjO `companion2` (tag-5 companion, class_3bb8c_o.c) |
+| +0x50 | companion2 | B | BaseObjO `companion2` (tag-5 companion, class_3bb8c_k.c) |
 | +0x5C | modelData | B | gModelDataMethods instance (header 0x5F03) from New_ModelData or borrowed; supplies part ids, TOD packets, models |
 | +0x60 | ownsModelData | A | 1 when New_ModelData made it, 0 when borrowed; ReleaseModelData releases only when set |
 | +0x64 | unk64 (kept) | C | set by SetUnk64 (1 in InitDefaults), gates TickCallbackA; meaning unknown |

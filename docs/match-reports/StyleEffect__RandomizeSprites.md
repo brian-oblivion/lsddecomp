@@ -6,7 +6,7 @@
 
 > Renamed from `func_80056E44` on 2026-09-18 (tools/rename.py). Address 0x80056e44.
 
-Unit: `class_3bb8c_o` (round 17). Walks 4 elements of the 5-element
+Unit: `class_3bb8c_k` (round 17). Walks 4 elements of the 5-element
 `arr84` array (indices 1..4), and for each one calls its own vtable
 `slot48` with a random entry from a 6-element global table, then sets a
 random "angle" field.
@@ -101,7 +101,7 @@ not established).
 stays.
 
 **Callee evidence** (`0x80056E44`, and the definition in
-`src/class_3bb8c_o.c`): entry is `addiu s0,a0,136` and `$a1` is never read —
+`src/class_3bb8c_k.c`): entry is `addiu s0,a0,136` and `$a1` is never read —
 one real argument, exactly as `void StyleEffect__RandomizeSprites(LinkOwnerObj *this)`
 says.
 
@@ -137,7 +137,7 @@ another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 `updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 
-View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
+View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_k.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
 
 ## Track 7 (round 99, alpha)
 

@@ -28,7 +28,7 @@ this project's established "per-call-site signature" precedent, see
 **`Actor__NoOpSlotD8` -- tier A.** A pure no-op leaf: mechanics ARE
 the purpose (nothing happens). Named after the established project
 convention for exactly this shape -- compare `TextRow__NoOpSlotD0`
-(`src/ScreenWidgets.c`) and `NoOpIgnoreArgs` (`src/class_3bb8c_o.c`), both
+(`src/ScreenWidgets.c`) and `NoOpIgnoreArgs` (`src/class_3bb8c_k.c`), both
 `Class__NoOpSlotOFFSET`/`NoOpXxx` for an empty vtable-slot implementation
 of otherwise-unknown purpose. `Actor__NoOpSlotE8` (this unit, below)
 is the sibling case: a DIFFERENT slot with the SAME shape.

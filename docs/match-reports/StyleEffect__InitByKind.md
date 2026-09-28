@@ -94,7 +94,7 @@ green).
   multiple-independent-local-views convention).
 - **Two functions called here (`StyleEffect__BuildRandomSprites`, `StyleEffect__SpawnPlainSprites`) are defined
   with a NARROWER real prototype than this call site uses** (`StyleEffect__BuildRandomSprites`
-  takes only `self`; `StyleEffect__SpawnPlainSprites` — defined in `class_3bb8c_o.c` — takes
+  takes only `self`; `StyleEffect__SpawnPlainSprites` — defined in `class_3bb8c_k.c` — takes
   only `this`). Retail's own call sites still set up a dead second argument
   register for both. Reproduced with old-style (unprototyped) `extern void
   func_X();` declarations local to this file, which suppress the
@@ -204,7 +204,7 @@ For the HEAD, by type scope; none applied here (other units' views).
 
 ## Track 4b (2026-09-25, round 85)
 
-`gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport` were `s32` in class_3bb8c_o.c and
+`gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport` were `s32` in class_3bb8c_k.c and
 `D_8008ACA4Obj *`/`void *`/`void *` in class_3bb8c_k.c. Both units now
 declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `SetStyleEffectSources` calls the same slot by. Byte-identical; no new `-Wall`
 warning.
@@ -270,7 +270,7 @@ Viewport's `refView.vp.y`, see below.)
   `((Viewport *)gStyleEffectViewport)->refView.vp.y`: the pointer is
   StyleSceneRefs::viewport, a `Viewport *` (class_3bb8c_k.c passes it to
   SetStyleEffectSources), and +0x018 is `refView` (+0x014) `.vp.y` (+0x004)
-  in include/Viewport.h. The extern stays `void *` because class_3bb8c_o.c
+  in include/Viewport.h. The extern stays `void *` because class_3bb8c_k.c
   declares it so (proposed to the head: retype both).
 - Locals: `local` -> `placed` (pos + offset), `state` -> `kind` (it is
   `pendingExtra`, the StyleEffectKind), `ret` -> `model` (setBackClip's

@@ -4,7 +4,7 @@
 
 > Renamed from `Noop` on 2026-09-18 (tools/rename.py). Address 0x80056df0.
 
-Unit: `class_3bb8c_o` (round 17; named round 52). `void func_80056DF0(void) {}`
+Unit: `class_3bb8c_k` (round 17; named round 52). `void func_80056DF0(void) {}`
 -- an empty body, `jr $ra; nop`. No hand derivation was needed or done; it is
 included here (unlike most such stubs) because it is a deliberate no-op
 target of a dispatch table, not merely an unworked artifact of extraction.

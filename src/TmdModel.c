@@ -17,7 +17,7 @@
  * it turns each box a quarter turn and offsets one face. The last two,
  * TmdModel__AddFirstPrimClut and TmdModel__SetFirstPrimClut, move or set the
  * CLUT id of the model's first primitive (TMD_P_TF3's clut) from a VRAM
- * position; SetStyleEffectSources (class_3bb8c_o.c) calls the second.
+ * position; SetStyleEffectSources (class_3bb8c_k.c) calls the second.
  *
  * File edges: this is one whole original file. It lies between two placed
  * Sony objects, libgte/ratan before and libgs/gs_105 after, so both edges

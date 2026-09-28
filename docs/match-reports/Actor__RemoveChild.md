@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057130` on 2026-09-18 (tools/rename.py). Address 0x80057130.
 
-Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot14` -- the
+Unit: `class_3bb8c_k` (round 17). `BaseObjOMethods::slot14` -- the
 "unlink" companion of `Actor__AddChild` (`slot10`), already named by both
 `code_55dd4.h` and `DreamSys.h` at the identical offset in sibling classes.
 
@@ -61,7 +61,7 @@ occupant.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__UnlinkCompanion`. Override of +0x014 (removeChild), named for its slot: clears `grid`/`ticker` by the same class-id tests, then chains SceneNode's removeChild. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__UnlinkCompanion`. Override of +0x014 (removeChild), named for its slot: clears `grid`/`ticker` by the same class-id tests, then chains SceneNode's removeChild. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_k.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, alpha)
 

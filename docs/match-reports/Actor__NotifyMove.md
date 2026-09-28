@@ -4,7 +4,7 @@
 
 > Renamed from `func_800571F8` on 2026-09-18 (tools/rename.py). Address 0x800571f8.
 
-Unit: `class_3bb8c_o` (round 17). `BaseObjOMethods::slot88` (via the fixed
+Unit: `class_3bb8c_k` (round 17). `BaseObjOMethods::slot88` (via the fixed
 `GetSceneNodeMethods()` table) followed by a guarded body that only runs for
 `arg1` in `[5, 9)`: an "is armed" check on `self->unk20`, an own-`slot8C`
 call, a conditional angle-adjustment helper call, an own-`slot90` call, and
@@ -148,7 +148,7 @@ most consequential unknown in the unit.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__func_571f8`. Override of +0x088 (notifyIfUnk20Active). Not named for the slot because the body does more: it chains the base, then for events 5..8 with an active model reads the model data (readUnk20Data, +0x08C), for events other than 5 adjusts it by lastOffsetValue +- pendingExtra (RotateAndOffsetHullList), hands it to transformAndNotifyParents (+0x090), and calls slotE8 on an Actor linkTarget. Events 6, 7 and 8 are exactly the ones Actor__MoveLocalZ/X/Y pass (through Actor__MoveAlongLocalAxis); tier B. The fields read here: unk20 = SceneNode.model, unk28 = linkTarget, unk48 = lastOffsetValue, unk54 = pendingExtra (s32: this function's addu/subu settle the merge CONFLICT with DreamSys's void *). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__func_571f8`. Override of +0x088 (notifyIfUnk20Active). Not named for the slot because the body does more: it chains the base, then for events 5..8 with an active model reads the model data (readUnk20Data, +0x08C), for events other than 5 adjusts it by lastOffsetValue +- pendingExtra (RotateAndOffsetHullList), hands it to transformAndNotifyParents (+0x090), and calls slotE8 on an Actor linkTarget. Events 6, 7 and 8 are exactly the ones Actor__MoveLocalZ/X/Y pass (through Actor__MoveAlongLocalAxis); tier B. The fields read here: unk20 = SceneNode.model, unk28 = linkTarget, unk48 = lastOffsetValue, unk54 = pendingExtra (s32: this function's addu/subu settle the merge CONFLICT with DreamSys's void *). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_k.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, alpha)
 

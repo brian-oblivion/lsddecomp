@@ -28,7 +28,7 @@ void StyleEffect__SetParams(StyleEffect *self, Block24 *src) {
 ## Derivation
 
 - **This closes the identity of `BaseObjOMethods::slot40`, left as
-  "occupant outside this unit" in `class_3bb8c_o.c`'s own
+  "occupant outside this unit" in `class_3bb8c_k.c`'s own
   `Actor__Actor` report last pass.** That function called
   `self->methods->slot40(self)` (a plain no-argument dispatch, since its
   OWN concrete class -- a different sibling -- happens to call slot40
@@ -36,7 +36,7 @@ void StyleEffect__SetParams(StyleEffect *self, Block24 *src) {
   (`StyleEffect__StyleEffect`, this unit) calls the SAME shared slot with a real
   second argument, `slot40(self, arg2)`. Both are correct about their own
   call sites: the slot's real arity is 1 argument beyond `self`, and the
-  DreamSys-family sibling in `class_3bb8c_o.c` simply never had a value
+  DreamSys-family sibling in `class_3bb8c_k.c` simply never had a value
   worth passing.
 - **`u8 raw[0x24]` (a byte array) miscompiled the copy into a
   runtime-alignment-checked loop** (`or`/`andi`/`beqz` testing pointer

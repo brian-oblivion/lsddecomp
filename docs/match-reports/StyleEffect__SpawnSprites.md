@@ -16,7 +16,7 @@ finding and undoing a self-inflicted whole-image size regression (below).
 ## What it is
 
 Populates all 5 slots of `self->arr84` (already known from
-`class_3bb8c_o.c`'s `LinkOwnerObj::arr84`) with freshly-allocated nodes via
+`class_3bb8c_k.c`'s `LinkOwnerObj::arr84`) with freshly-allocated nodes via
 `New_VariantSprite`, wires each one to `self` through `slot4C`, forwards
 `self->unk74` through `slotB8`, and — only when the caller passed a non-NULL
 `tbl` — also calls each new node's `slot48` with it.
@@ -105,7 +105,7 @@ merely aliases an existing pointer/value for readability."
 Round 70 (alpha). `func_80056D18` -> `StyleEffect__SpawnSprites`, **tier B**.
 
 Two callers: StyleEffect__BuildRandomSprites (tbl = gSpriteScaleHalf or NULL)
-and class_3bb8c_o.c's StyleEffect__SpawnPlainSprites (tbl = NULL, kind 3). Body:
+and class_3bb8c_k.c's StyleEffect__SpawnPlainSprites (tbl = NULL, kind 3). Body:
 five `New_VariantSprite(a2, 0, gStyleEffectTim)` into +0x084, each attachToParent(self,
 no offset), slotB8(self->color), and updateScale(1, tbl) when tbl != NULL.
 

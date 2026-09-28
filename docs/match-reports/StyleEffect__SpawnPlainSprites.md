@@ -6,7 +6,7 @@
 
 > Renamed from `func_80056E1C` on 2026-09-18 (tools/rename.py). Address 0x80056e1c.
 
-Unit: `class_3bb8c_o` (round 17). A 4-argument forward to `StyleEffect__SpawnSprites`.
+Unit: `class_3bb8c_k` (round 17). A 4-argument forward to `StyleEffect__SpawnSprites`.
 
 ## Final source
 
@@ -62,7 +62,7 @@ Kept the tier-C `Class__func_xxxxx` form per FINISHING-PLAN track 3.
 stays.
 
 **Callee evidence** (`0x80056E1C`, and the definition in
-`src/class_3bb8c_o.c`): the whole body is a forwarding tail call, and it
+`src/class_3bb8c_k.c`): the whole body is a forwarding tail call, and it
 *writes* `$a1`/`$a2`/`$a3` to zero before reading anything, passing only its
 incoming `$a0` through:
 
@@ -107,7 +107,7 @@ another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 `updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 
-View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
+View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_k.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
 
 ## Track 7 (round 99, alpha)
 

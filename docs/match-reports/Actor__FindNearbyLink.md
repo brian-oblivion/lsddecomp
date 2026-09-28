@@ -168,7 +168,7 @@ comment pass, i.e. with this round's renames already applied (the
   but BuildLinkQueries fills at most 3, so the pad stays and keeps one
   `/* MATCHING: */` line.
 - Proposed: the notifyWithHull events -1/-2 (linked / not linked) and
-  MoveAlongLocalAxis's 6/7/8 as one enum in Actor.h (head; class_3bb8c_o
+  MoveAlongLocalAxis's 6/7/8 as one enum in Actor.h (head; class_3bb8c_k
   would change too).
 
 The pad's comment, verbatim:
