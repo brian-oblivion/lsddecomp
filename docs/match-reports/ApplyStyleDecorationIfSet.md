@@ -130,7 +130,7 @@ logic, only a different way of naming the same values.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-sStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `LocalM4D0Obj` view's slots are setSemiTrans (+0x064, 1), setSemiTransRate (+0x068, 0) and attachToParent (+0x04C, cast to BoxFillAttachToParentFn). Zero bytes.
+sStyleDecorObj is a BoxFill (include/box_fill.h); the deleted `LocalM4D0Obj` view's slots are setSemiTrans (+0x064, 1), setSemiTransRate (+0x068, 0) and attachToParent (+0x04C, cast to BoxFillAttachToParentFn). Zero bytes.
 
 ## Track 6 (2026-09-27, round 96, charlie)
 
@@ -163,7 +163,7 @@ copies; retyping the `sStyleSceneRefs` global from `s32` to
 | `D_8008AB58` | `sStyleDecorBoxPos` | A | (-100, -100), the box's attachToParent position; now declared `BoxFillPos`, no cast (Viewport places its own fade box there) |
 | `D_8008AB60` | `sStyleDecorBoxSize` | A | (320, 240), New_BoxFill's size pair; now `s32[2]` |
 
-The colour goes in as `(BoxFillRgb *)sStyleDecorColor` (BoxFill.h's
+The colour goes in as `(BoxFillRgb *)sStyleDecorColor` (box_fill.h's
 record, this round) instead of `(void *)`. Zero bytes. The comment "(track
 4b's to retype)" on sStyleDecorObj is gone; the declaration says it holds
 a BoxFill *.

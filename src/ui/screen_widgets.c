@@ -8,7 +8,7 @@
  * semi-transparency on, and notifies its parents when the ramp runs out.
  * Viewport's fadeBox and Entity's are the two users.
  *
- * BoxFill (include/BoxFill.h), New_BoxFill to GetBoxFillMethods: a
+ * BoxFill (include/box_fill.h), New_BoxFill to GetBoxFillMethods: a
  * flat-coloured GsBOXF screen rectangle's allocator, ctor, Reset, attach,
  * attribute bits, colour, position, size, priority and mask.
  *
@@ -333,7 +333,7 @@ void BoxFill__SetSize(BoxFill *self, s32 *size) {
 
 /* +0x04C is called with FOUR arguments through an unprototyped pointer: its
  * occupant reads three, and the fourth is this function's own a3, already in
- * $a3 (BoxFill.h's banner). */
+ * $a3 (box_fill.h's banner). */
 void BoxFill__AttachAbsolute(BoxFill *self, SceneNode *parent, BoxFillPos *pos, s32 attachArg) {
     void (*fn)();
 

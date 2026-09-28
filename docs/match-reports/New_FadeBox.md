@@ -165,7 +165,7 @@ renametype's rewrite of the class name):
  * Its 17 functions are the bottom two links of `SceneNode -> BoxFill ->
  * FadeBox`: first FadeBox's (gFadeBoxMethods, 0x164, `New_FadeBox` to
  * `GetFadeBoxMethods`, include/FadeBox.h), then BoxFill's allocator,
- * ctor and Reset (0x64, include/BoxFill.h, a GsBOXF screen rectangle; the
+ * ctor and Reset (0x64, include/box_fill.h, a GsBOXF screen rectangle; the
  * rest of its methods open screen_widgets).
  *
  * FadeBox fades the box's colour: configure picks the channels (a
@@ -207,9 +207,9 @@ Outside this job's edit set (the head applies them by type scope):
 - `FadeBox::unk7C` stays: configure stores its third argument there and
   update skips stepping while it is 9, but every caller passes 0, so what
   9 means is not shown.
-- `BoxFillPos` (include/BoxFill.h) is named after this class's old
+- `BoxFillPos` (include/box_fill.h) is named after this class's old
   address; it is BoxFill's position record (setPosition, attachToParent,
-  TextRow's layout) and belongs to BoxFill.h's job, not this one.
+  TextRow's layout) and belongs to box_fill.h's job, not this one.
 
 
 ## History (moved from src/ScreenWidgets.c, comments pass)

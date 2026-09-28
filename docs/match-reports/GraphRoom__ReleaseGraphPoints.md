@@ -55,7 +55,7 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `destroy` (+0x004) is release. Zero bytes.
+points[] are BoxFills (include/box_fill.h); the deleted `GraphRoomPoint` view's `destroy` (+0x004) is release. Zero bytes.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__Destroy` -> `GraphRoom__ReleaseGraphPoints`
 

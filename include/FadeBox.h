@@ -1,7 +1,7 @@
 #ifndef FADEBOX_H
 #define FADEBOX_H
 
-#include "BoxFill.h"
+#include "box_fill.h"
 
 /*
  * FadeBox -- a BoxFill whose colour ramps a step per update until a tick

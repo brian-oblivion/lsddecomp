@@ -61,7 +61,7 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `slot60` is setDisplay: points[0] blinks with the hour's low bit. Zero bytes.
+points[] are BoxFills (include/box_fill.h); the deleted `GraphRoomPoint` view's `slot60` is setDisplay: points[0] blinks with the hour's low bit. Zero bytes.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__UpdateFromLog` -> `GraphRoom__Update`
 

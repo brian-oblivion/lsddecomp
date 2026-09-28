@@ -43,7 +43,7 @@
 #include "TimBlockSrc.h"
 #include "wbgm.h"
 #include "LbdFile.h"
-#include "BoxFill.h"
+#include "box_fill.h"
 #include "FrameClock.h"
 #include "actor.h"
 #include "StyleEffect.h"
@@ -3277,7 +3277,7 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
 }
 
 /* A graph point's colour is New_BoxFill's colour argument, a ColorRgb
- * (include/BoxFill.h).
+ * (include/box_fill.h).
  * MATCHING: exactly three bytes, so the whole-struct copy of `rgb` below is
  * three lb/sb pairs. */
 extern s32 sGraphPointSize[2];

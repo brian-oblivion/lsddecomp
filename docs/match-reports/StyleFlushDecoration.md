@@ -92,7 +92,7 @@ callee's.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-sStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `ObjAB54` view's +0x004 is release. Zero bytes.
+sStyleDecorObj is a BoxFill (include/box_fill.h); the deleted `ObjAB54` view's +0x004 is release. Zero bytes.
 
 ## Round 93 polish (delta, track 7)
 
@@ -102,6 +102,6 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
 
 ```c
 /* sStyleDecorObj and sStyleDecorSlots[] hold BoxFill objects
- * (include/BoxFill.h, New_BoxFill), in globals typed `s32`/`void *[]`
+ * (include/box_fill.h, New_BoxFill), in globals typed `s32`/`void *[]`
  * (track 4b's to retype). */
 ```

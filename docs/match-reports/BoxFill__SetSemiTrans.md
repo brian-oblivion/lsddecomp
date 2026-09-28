@@ -42,4 +42,4 @@ consistent with this project's own precedent on the sibling group.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_80040714`: the +0x064 occupant (SceneNode's setSemiTrans), the same GetSetBitField call as SceneNode__SetSemiTrans (shift 30, width 1, `on != 0`) over the GsBOXF attribute (tier A). ApplyStyleDecorationIfSet calls it with 1.
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/box_fill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_80040714`: the +0x064 occupant (SceneNode's setSemiTrans), the same GetSetBitField call as SceneNode__SetSemiTrans (shift 30, width 1, `on != 0`) over the GsBOXF attribute (tier A). ApplyStyleDecorationIfSet calls it with 1.

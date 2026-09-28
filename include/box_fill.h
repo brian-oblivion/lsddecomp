@@ -1,5 +1,5 @@
-#ifndef BOXFILL_H
-#define BOXFILL_H
+#ifndef BOX_FILL_H
+#define BOX_FILL_H
 
 #include "scene_node.h"
 

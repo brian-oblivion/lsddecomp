@@ -200,7 +200,7 @@ comment); also allocates the 4-byte `matchedDayIndices` scratch buffer
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-The points are New_BoxFill boxes (include/BoxFill.h): size &sGraphPointSize, colour &sGraphPointNewestColor then the fading `rgb`, priority 0. Zero bytes.
+The points are New_BoxFill boxes (include/box_fill.h): size &sGraphPointSize, colour &sGraphPointNewestColor then the fading `rgb`, priority 0. Zero bytes.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__BuildGraphPoints` -> `GraphRoom__BuildGraphPoints`
 
@@ -208,20 +208,20 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 ## Track 6 (2026-09-27, round 97, delta): `D_8008ABB8Color` -> `GraphPointColor`, `D_8008ABB8` -> `sGraphPointBaseColor`
 
-- **`GraphPointColor`** (tier A for what it is): the colour argument this function hands `New_BoxFill`; `BoxFill__SetColor` copies its three bytes into the box's `GsBOXF` r, g, b (`include/BoxFill.h`, `color[3]`), which confirms round 19's "plausible RGB reading" of the field names. It is the only user of the type (`grep -rn` over `src/`, no other view).
+- **`GraphPointColor`** (tier A for what it is): the colour argument this function hands `New_BoxFill`; `BoxFill__SetColor` copies its three bytes into the box's `GsBOXF` r, g, b (`include/box_fill.h`, `color[3]`), which confirms round 19's "plausible RGB reading" of the field names. It is the only user of the type (`grep -rn` over `src/`, no other view).
 - **Not Sony's `CVECTOR`**: `CVECTOR` is `u_char r, g, b, cd`, four bytes. Retail copies the global into the local with three `lb`/`sb` pairs (signed, three bytes), so a four-byte unsigned struct would not compile to it. Kept as its own `s8` triple, like `BgLayerRgb`/`ViewportRgb`.
 - **`sGraphPointBaseColor`** (tier A): 4 bytes of sdata `FF FF FF 00`, white. This function is its only reader: points 1..99 start from a copy of it and darken by 0x14 per point for the first six, then by 1. (Point 0 takes `sGraphPointNewestColor`, `FF 00 00`, red -- left unnamed, outside the job.)
 - The type's comment moved round 19's history here and says what the type is; zero bytes changed.
 
 ## Track 7 (2026-09-27, round 97, delta)
 
-- **Naming: `D_8008ABAC` -> `sGraphPointSize`** (tier A): two sdata words `{10, 10}`, New_BoxFill's size argument (BoxFill reads the low halfwords into boxW/boxH, include/BoxFill.h `BoxFillSize`) for all 100 dots. Its only user. Now declared `s32 sGraphPointSize[2]` and passed bare instead of `&` of a `u8`: zero bytes changed.
+- **Naming: `D_8008ABAC` -> `sGraphPointSize`** (tier A): two sdata words `{10, 10}`, New_BoxFill's size argument (BoxFill reads the low halfwords into boxW/boxH, include/box_fill.h `BoxFillSize`) for all 100 dots. Its only user. Now declared `s32 sGraphPointSize[2]` and passed bare instead of `&` of a `u8`: zero bytes changed.
 - **Naming: `D_8008ABB4` -> `sGraphPointNewestColor`** (tier A): sdata `FF 00 00`, red, the colour of `points[0]`, which PopulateGraphPoints plots from the newest logged day (`currentDay - 1`) and Update blinks. Its only user. Declared `GraphPointColor` instead of `u8`: zero bytes changed.
 - Local `dec` -> `step`; the loop bound is `ARRAY_COUNT(self->points)`; the darkening step 0x14 is decimal 20; `matchedDayIndices` is `BMemPMgrAlloc(GRAPH_SCORE_MOOD_COUNT * sizeof(s8))`, one byte per sGraphScoreMoods entry.
 
 ## Track 6 (2026-09-27, round 98, delta): `GraphPointColor` -> `BoxFillRgb`
 
-The local `GraphPointColor` (round 97) is retired onto include/BoxFill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (screen_widgets's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `sGraphPointNewestColor`, `sGraphPointBaseColor`, `sGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.
+The local `GraphPointColor` (round 97) is retired onto include/box_fill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (screen_widgets's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `sGraphPointNewestColor`, `sGraphPointBaseColor`, `sGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.
 
 ## Track 10 (2026-09-28, round 104, echo)
 

@@ -885,7 +885,7 @@
         "gBoxFillMethods": {
           "class": "BoxFill",
           "date": "2026-09-26",
-          "header": "include/BoxFill.h"
+          "header": "include/box_fill.h"
         },
         "gCdDriverMethods": {
           "class": "CdDriver",

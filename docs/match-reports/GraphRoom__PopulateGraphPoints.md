@@ -213,7 +213,7 @@ Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `setPosition` (+0x0C4) is attachAbsolute(parent, &point, 0): attach at a pixel position. Zero bytes.
+points[] are BoxFills (include/box_fill.h); the deleted `GraphRoomPoint` view's `setPosition` (+0x0C4) is attachAbsolute(parent, &point, 0): attach at a pixel position. Zero bytes.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__PopulateGraphPoints` -> `GraphRoom__PopulateGraphPoints`
 
@@ -223,7 +223,7 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 - **The raw offsets are fields.** `p = (s8 *)((u8 *)result + idx * 2); dx = p[0x18]; dy = p[0x19];` is now `save->moodPreviousDays[day].axis.dynamic` / `.axis.upper`: DreamSaveBlock's ring is typed `MoodGraphPoint[DAYS_PER_YEAR]` (include/common.h's union, the type dream_sys.h declares the ring with). Zero bytes changed.
 - **Measured: the pointer form does not match.** `MoodGraphPoint *p = &save->moodPreviousDays[day]; dx = p->axis.dynamic; dy = p->axis.upper;` makes cc1 add the array's +0x018 to the pointer first (an extra `addiu`, the loop shifted from word 50 on). Indexing the array twice is byte-exact, and carries a `MATCHING:` line.
-- `Point2` deleted: it was `BoxFillPos` (include/BoxFill.h), the type attachAbsolute takes, and the two `(BoxFillPos *)` casts went with it.
+- `Point2` deleted: it was `BoxFillPos` (include/box_fill.h), the type attachAbsolute takes, and the two `(BoxFillPos *)` casts went with it.
 - Constants: the 100s are `ARRAY_COUNT(self->points)` (`count >= 0x65` is `count > ARRAY_COUNT(...)`), 0x16C is `DAYS_PER_YEAR - 1`, and `* 10 - 5` is `* GRAPH_PIXELS_PER_MOOD - GRAPH_POINT_SIZE / 2`: sGraphPointSize is 10 square and BoxFill's position is the GsBOXF's top-left, so the -5 centres each dot on its mood times 10. Two names because the two 10s mean different things.
 - Locals: `result` -> `save`, `idx` -> `day`, `flag` -> `haveNewest`.
 - Moved from the source, verbatim, the DreamSaveBlock comment's history and the Point2 comment:

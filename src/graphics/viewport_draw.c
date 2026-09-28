@@ -42,7 +42,7 @@
 #include "scene_node.h"
 #include "GridCell.h"
 #include "bg_layer.h"
-#include "BoxFill.h"
+#include "box_fill.h"
 #include "sprite.h"
 #include "ScreenSprite.h"
 #include "Viewport.h"

@@ -187,7 +187,7 @@ so merge by hand, one commit per type, the accessors from the compiler.
   header prototype still names its parameters `arg1`/`arg2`.
 - **graphics:** the six signed 3-byte colour types (`BgLayerRgb`,
   `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `ColorRgb`,
-  `ViewportRgb`) into one, in a graphics header (BoxFill.h is ui's, and
+  `ViewportRgb`) into one, in a graphics header (box_fill.h is ui's, and
   this item may edit it for that).
 - **world:** `RotationRatio(s)` (dream_sys.h) into `Ratio16`; `SubObjE`
   (dream_day.h) into its DrawSystem type; dream_sys.h's

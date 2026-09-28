@@ -60,7 +60,7 @@ kept `func_`/`unk60`/`unk62` unrenamed rather than assert "size" or
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_80040824`: the +0x0C0 occupant, BoxFill's own `setSize` (tier A): while attached it stores the low halves of a {w, h} word pair into +0x060/+0x062, the GsBOXF w/h. TaskCore__RefreshSlotView calls it on listView with {0x28, count * 12}.
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/box_fill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_80040824`: the +0x0C0 occupant, BoxFill's own `setSize` (tier A): while attached it stores the low halves of a {w, h} word pair into +0x060/+0x062, the GsBOXF w/h. TaskCore__RefreshSlotView calls it on listView with {0x28, count * 12}.
 
 ## Track 7 (round 99, bravo)
 
