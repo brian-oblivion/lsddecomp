@@ -2879,7 +2879,7 @@ void Entity__MoodCue125(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue128(Entity *this, SoundCueSet *out) {
     SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
-    this->methods->updateScale(this, 1, SCALE_THIRTY_SECOND);
+    this->methods->updateScale(this, 1, sScaleThirtySecond);
     this->methods->moveLocalZ(this, -30, (void *)1);
 }
 

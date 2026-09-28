@@ -299,7 +299,7 @@ extern Ratio16 SCALE_TWO_FIFTHS[];
 extern Ratio16 sScaleY2[];
 extern Ratio16 sScaleY4[];
 extern Ratio16 SCALE_TRIPLE[];
-extern Ratio16 SCALE_THIRTY_SECOND[];
+extern Ratio16 sScaleThirtySecond[];
 extern Ratio16 sScaleX3[];
 
 /* Functions of other units Entity calls directly. The SoundCueSet functions
