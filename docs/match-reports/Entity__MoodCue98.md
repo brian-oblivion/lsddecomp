@@ -2,17 +2,17 @@
 
 > Renamed from `func_80064618` on 2026-09-24 (tools/rename.py). Address 0x80064618.
 
-**Unit:** Entity_g · **Size:** 48 instructions
+**Unit:** Entity · **Size:** 48 instructions
 
 ## Blocker screen (mandatory)
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/Entity__MoodCue98.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity/Entity__MoodCue98.s
 ```
 
 No hits. Consistent with the coordinator's measured all-clear for this unit
 (all three blocker screens return zero across all 37 functions of the
-original `Entity_f`/`Entity_g` segment).
+original `Entity`/`Entity_g` segment).
 
 ## What it does
 
@@ -60,7 +60,7 @@ Matched on the first build.
 
 The `gEntityMoodHandlerTable` mood-handler table has (at least) 99 rows -- this unit's
 first function alone lands at row index 98, well past the ~20 rows Entity/
-Entity_b/Entity_c/Entity_d/Entity_e have matched so far. Every row's first
+Entity/Entity_c/Entity_d/Entity_e have matched so far. Every row's first
 word is a function taking `(Entity *this, EntityMoodHandlerArg *out)`, but
 `out` is not always read -- do not treat an unused `out` parameter as a
 signature-derivation problem; declare it anyway for consistency with the
@@ -71,7 +71,7 @@ function really is one of these handlers before assuming the signature.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g. Matched on the first
+round 13 (2026-09-03), runner alpha, unit Entity. Matched on the first
 build.
 
 
@@ -80,11 +80,11 @@ build.
 Why `MoodCue98`: the function's address sits in `gEntityMoodHandlerTable`
 row 98 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
 confirmed by reading `disk/SLPS_015.56` directly rather than trusting
-address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+address proximity (Entity/Entity_e, rounds 76-77, measured that row
 order does not track code address). Tier B: the row-to-function mapping is
 a compiler fact, not a guess, but which dream state or object each row
 represents is not established -- the row number is kept decimal, matching
-the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+the existing `MoodCueNN` siblings (Entity through Entity_f), so the
 names sort in table order.
 
 ## Track 4 (2026-09-26, round 87, echo)

@@ -54,7 +54,7 @@ anywhere) made it obvious before writing any C.
 
 - **`DreamSysBaseMethods` (this unit's local view of the shared `gActorMethods`
   base table) gets a new slot at `+0x008`: `ctor`.** Cross-confirmed against
-  `include/code_55dd4.h`'s `D800878D4Methods`, which ALREADY names and
+  `src/TodActor.c`'s `D800878D4Methods`, which ALREADY names and
   resolves this exact slot as `Actor__Actor`, taking/returning
   `TodActor *self` — the same base constructor, just viewed through a
   different subclass's local header (per this project's established
@@ -64,7 +64,7 @@ anywhere) made it obvious before writing any C.
   return value is discarded at this call site (the base ctor returns `self`
   for chaining, unneeded since the caller already holds `this`).
 - **`vtable_DreamSys+0x010` is `slot10`, shared with TodActor's OWN vtable
-  at the identical offset.** `code_55dd4.h` already names and resolves it
+  at the identical offset.** `TodActor.c` already names and resolves it
   there as `Actor__AddChild`, and its own comment identifies it as the "link"
   companion of `slot14`/`Actor__RemoveChild` — a slot THIS unit's header already
   names (at `+0x014`, same offset relationship) with the same companion
@@ -109,7 +109,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
  * that decides the next day's dream, and the "link" (teleport) machinery
  * that ends one stage and starts another. See include/DreamSys.h for the
  * class as a whole; several of its methods live in sibling units
- * (class_3bb8c_p/t/r/o) because the class spans more than one segment.
+ * (ObjMStyleActor/t/r/o) because the class spans more than one segment.
  *
  * Four groups of functions live here.
  *

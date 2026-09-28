@@ -60,7 +60,7 @@
  * applyToSenderFootprint hand a sender's command to every cell under its
  * rectangle (DispatchToRectCells, NotifyGridCell).
  *
- * Scale ramp. startScaleRamp (called by Entity_b/e/g) picks a Ratio16[3]
+ * Scale ramp. startScaleRamp (called by Entity/e/g) picks a Ratio16[3]
  * step, y +-1/64 or +-1/4, and a tick count; stepScaleRamp (every tick
  * after tracking) adds it to every cell's scale until the count runs out,
  * and endScaleRamp sets every cell back to 1/1.

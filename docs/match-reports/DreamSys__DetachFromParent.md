@@ -16,11 +16,11 @@ class's method table:
    sole argument.
 2. `this->vt->Actor__RemoveChild(this, this->unk_0x4C)` -- resolved via
    `tools/classtable.py gDreamSysMethods` to vtable offset `+0x014`, shared
-   with `TodActor`'s inherited "slot14" (`code_55dd4.h` calls it the
+   with `TodActor`'s inherited "slot14" (`code_55dd4.c` calls it the
    "'unlink' companion of slot10"). Still `INCLUDE_ASM`; its address
    (`0x80057130`) is below this unit/runner's range.
 3. `GetActorMethods()->slot0x50(this)` -- the shared intermediate base class
-   table (`gActorMethods`), same one `code_55dd4.h`'s `D800878D4Methods` types
+   table (`gActorMethods`), same one `TodActor.c`'s `D800878D4Methods` types
    for `TodActor` (a DreamSys sibling under that base, per
    `docs/research/class-framework.md`).
 

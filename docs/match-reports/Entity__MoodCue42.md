@@ -2,7 +2,7 @@
 
 > Renamed from `func_800603C4` on 2026-09-24 (tools/rename.py). Address 0x800603c4.
 
-Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch handler:
+Unit: `Entity` (fresh carve, round 2026-09-03). Mood-dispatch handler:
 `void Entity__MoodCue42(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
@@ -49,7 +49,7 @@ None beyond what's already documented -- this one was a clean first-attempt
 match once the mood-dispatch family's established shape (three-way dispatch
 on a small integer field, `this->methods->slotNN(this)` calls, `out->unkNN`
 writes) was recognized from the sibling functions already matched in
-`Entity_c.c`.
+`Entity.c`.
 
 ## Naming
 
@@ -58,10 +58,10 @@ convention as `Entity__MoodCue00` (round 71): the function's address is the
 handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
 0x80089EB0, 0x10-byte stride) at row 42, read directly from
 `disk/SLPS_015.56` (not inferred from address proximity -- see
-`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+`src/Entity.c`'s unit header comment, which flags that row order does NOT
 track code address once row 115 is reached). Mechanics established
 (mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
-`Entity_b.c`'s own header comment); which dream object owns the row is not.
+`Entity.c`'s own header comment); which dream object owns the row is not.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

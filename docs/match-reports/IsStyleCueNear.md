@@ -1,4 +1,4 @@
-# IsStyleCueNear -- MATCHED (31/31 words), class_3bb8c_n
+# IsStyleCueNear -- MATCHED (31/31 words), ObjMStyleActor
 
 > Renamed from `func_80055874` on 2026-09-23 (tools/rename.py). Address 0x80055874.
 

@@ -8,7 +8,7 @@
 
 > Renamed from `func_80051F14` on 2026-09-24 (tools/rename.py). Address 0x80051f14.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `ItemList_3bb8c_j`.
+Unit: `src/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`.
 
 ## Body
 
@@ -32,5 +32,5 @@ Trivial three-field reset, an unrelated field group from `ItemList__ClearCachedR
 
 Renamed from `ItemList__ResetCounters`: the three words it zeroes are
 `topIndex`, `column` and `cursorIndex` (+0x020..+0x028, named from
-class_3bb8c_k's accessors), the trio ItemList__SetView sets. They are
+ObjMStyleActor's accessors), the trio ItemList__SetView sets. They are
 the list's view position, not counters.

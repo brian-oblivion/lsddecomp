@@ -4,7 +4,7 @@
 
 > Renamed from `func_800529FC` on 2026-09-24 (tools/rename.py). Address 0x800529fc.
 
-Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
+Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py ItemList__SetView`: 23/23 words match.
 
 Called (not through a vtable) by `ItemList__RefreshRows` (this unit, still
@@ -90,13 +90,13 @@ Round 75 (bravo, track 3). `func_800529FC` -> `ItemList__SetView`, **tier A**.
 
 Non-virtual helper. Stores topIndex/column/cursorIndex; if `highlight`, colours row (cursor - top) with gItemListCursorColor. Callers: CreateRows (highlight 1), RefreshRows (0).
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
 
 ## asm sites
 
 Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` that was
 the body's first statement is **retired**. Measured by deleting it alone and
-rebuilding: `build/src/class_3bb8c_k.c.o` came out byte-identical to the object
+rebuilding: `build/src/ObjMStyleActor.c.o` came out byte-identical to the object
 built with it (`cmp`), and `./build-and-verify.sh` stayed green. In the current
 source the early load of the `highlight` argument no longer depends on the
 barrier (the `s32 flag = highlight;` copy was already present when this was

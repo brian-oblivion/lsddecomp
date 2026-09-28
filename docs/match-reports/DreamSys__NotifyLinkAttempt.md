@@ -143,7 +143,7 @@ an arbitrary number of blocks that converge on one shared tail.
 
 ## Naming
 
-- **Tier B.** Forwards `arg1` to the base class's generic +0x88 notify slot unconditionally, then handles two DreamSys-specific sentinel values: -1 and -2, called with exactly those literals by Actor__FindNearbyLink (class_3bb8c_p.c) on link-found / link-not-found, and with a small positive mode code by Actor__MoveAlongLocalAxis (same unit).
+- **Tier B.** Forwards `arg1` to the base class's generic +0x88 notify slot unconditionally, then handles two DreamSys-specific sentinel values: -1 and -2, called with exactly those literals by Actor__FindNearbyLink (ObjMStyleActor.c) on link-found / link-not-found, and with a small positive mode code by Actor__MoveAlongLocalAxis (same unit).
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 

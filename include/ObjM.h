@@ -7,9 +7,7 @@
  * ObjM -- class id 0x2F230, method table gObjMMethods: TimedTask's second
  * subclass (its ctor calls TimedTask__TimedTask first; the first is
  * DayTask). No class derives from it. Methods, in ROM order:
- * src/class_3bb8c_k.c (New_ObjM, ctor, Finalize, OnNotify),
- * src/class_3bb8c_l.c (NoOpSlot40 through EnterState6) and
- * src/class_3bb8c_m.c (EnterState7 through GetObjMMethods). The object is
+ * src/ObjMStyleActor.c, New_ObjM through GetObjMMethods. The object is
  * 0x88 bytes (New_ObjM); its own fields run from TimedTask's 0x38.
  *
  * Built by DayTask__StartObjM (src/DayTaskStageMap.c): New_ObjM(DayTask's
@@ -54,7 +52,7 @@
  * The +0x06C..+0x07B words are read as one block from outside:
  * ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
  * keeps it in gStyleSceneRefs, and ApplyStyleDecorationIfSet
- * (class_3bb8c_m) calls +0x0AC on that block's +0x00C, cachedViewport
+ * (ObjMStyleActor) calls +0x0AC on that block's +0x00C, cachedViewport
  * (Viewport's getFadeBox). The fields are kept flat.
  */
 
@@ -147,7 +145,7 @@ struct ObjM {
     /* +0x064 */ s32 unk64; /* the ctor zeroes it; PollTimBlockLoad sets 1 before enterStyleSession */
     /* +0x068 */ s32 inSession; /* the ctor zeroes it; EnterStyleSession sets it; gates update, onPadEvent, enterStyleSession */
     /* +0x06C */ BasicClass *ctorSound; /* the ctor's sound again (also TimedTask::sound); &ctorSound is RegisterStyleConfig's arg2 (see the banner) */
-    /* +0x070 */ struct LinkResource *dreamerTmd; /* the ctor's (DayTask's "ETC\DREAMER.TMD"); read through gStyleSceneRefs (class_3bb8c_n) */
+    /* +0x070 */ struct LinkResource *dreamerTmd; /* the ctor's (DayTask's "ETC\DREAMER.TMD"); read through gStyleSceneRefs (ObjMStyleActor) */
     /* +0x074 */ struct TimImage *etcTim; /* the ctor's (DayTask's "ETC\ETC.TIM"); AdvancePauseSetup's New_TextRow font */
     /* +0x078 */ struct NodeGuardedViewport *cachedViewport; /* InitStyleAndWorld: IntermediateBase::viewport */
     /* +0x07C */ struct TextRow *pauseText; /* AdvancePauseSetup's New_TextRow(etcTim, 5, "Pause"); TeardownPauseOverlay releases it */

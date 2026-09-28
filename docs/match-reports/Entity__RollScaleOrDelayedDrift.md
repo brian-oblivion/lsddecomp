@@ -4,7 +4,7 @@
 
 > Renamed from `func_80060710` on 2026-09-24 (tools/rename.py). Address 0x80060710.
 
-Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch helper called
+Unit: `Entity` (fresh carve, round 2026-09-03). Mood-dispatch helper called
 by `Entity__MoodCue43`, but itself takes only `Entity *this` -- no `out`
 parameter, despite the family convention. Signature: `void
 Entity__RollScaleOrDelayedDrift(Entity *this)`.
@@ -116,18 +116,18 @@ the game (which dream objects use rows 43/44) is not established, hence B.
 The literals are decimal (10, 201); the `state` value 10 is this helper's
 own phase, shared with nothing.
 
-## Entity_d banner before round 93 (moved here, not deleted)
+## Entity banner before round 93 (moved here, not deleted)
 
 The unit banner was rewritten as documentation in round 93. Its history and
 derivation, verbatim:
 
 ```text
 /* Second 20-function slice of the Entity class's 97-function remainder,
- * 0x5077C..0x52290 (Entity_c is the first slice, Entity_e the third).
+ * 0x5077C..0x52290 (Entity is the first slice, Entity_e the third).
  *
  * 19 of the 20 are gEntityMoodHandlerTable callbacks (Entity.h), named
  * Entity__MoodCueNN for the row they occupy -- rows 39-52 and 55-58 are
- * consecutive with Entity_c's own tail, row 115 (Entity__MoodCue115, this
+ * consecutive with Entity's own tail, row 115 (Entity__MoodCue115, this
  * unit's last function) is not, confirming row order tracks moodIndex
  * assignment, not code address. The names were confirmed by reading
  * disk/SLPS_015.56 directly rather than trusting address proximity:
@@ -152,6 +152,6 @@ derivation, verbatim:
 `Entity__MoodCueNN.md`'s `## Naming`; the row-115 ordering point is in
 `Entity__MoodCue115.md`'s. In the text above the helper appears under its
 old name. The old extern comment also said the tables followed "the same
-convention as Entity_c.c's own SCALE_Y2/SCALE_SIX/etc externs (separate
+convention as Entity.c's own SCALE_Y2/SCALE_SIX/etc externs (separate
 local view per translation unit, not shared via the header)"; round 93
 retyped them from `u8[]` to `Ratio16[]`, byte-identical.)

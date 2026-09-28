@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005EFF4` on 2026-09-24 (tools/rename.py). Address 0x8005eff4.
 
-Unit: `Entity_c`. Runner: bravo.
+Unit: `Entity`. Runner: bravo.
 
 ## Shape
 
@@ -23,7 +23,7 @@ void Entity__MoodCue20(Entity *this, EntityMoodHandlerArg *out) {
 
 - The first gate is `rand() % 7 == 0`, guarded by `this->unkFC == 0` -- the
   usual "one-shot random effect on entry" shape already seen in
-  `Entity__MoodCue16`/`Entity__MoodCue12` in `src/Entity_b.c`.
+  `Entity__MoodCue16`/`Entity__MoodCue12` in `src/Entity.c`.
 - **`out->unk4 & 3`, not `% 4`.** Retail emits a bare `andi $v0,$v0,0x3` with
   no sign-correction shift, unlike every modulus-by-non-power-of-2 gate in
   this unit (which all carry the mult/mfhi/sra/subu chain). Writing `% 4`
@@ -34,7 +34,7 @@ void Entity__MoodCue20(Entity *this, EntityMoodHandlerArg *out) {
   present in the asm is a tell that the source used `&`, not `%`, even where
   a modulus by a power of two would read equally naturally.
 - Extern added: `SCALE_Y2` (opaque row pointer, same convention as the
-  other `D_80089Dxx`/`D_80089Cxx` rows already declared in `Entity_b.c`).
+  other `D_80089Dxx`/`D_80089Cxx` rows already declared in `Entity.c`).
 - Clean of both open toolchain blockers.
 
 Matched first attempt (1/30).
@@ -48,7 +48,7 @@ real discriminator, not just an equally-valid alternate spelling.
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 20 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 20 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity/d/e/g.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

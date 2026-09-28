@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Forwarder: `return self->unk30->methods->slot78(self->unk30, arg1, arg2);` returning u8 (`andi 0xFF`).
 
-Table slot (`tools/classtable.py`): gModelDataMethods +0x080 and gTriggerWorldMethods +0x080 (include/code_55dd4.h names this slot `getObjectIds` in its Unk5CObj view).
+Table slot (`tools/classtable.py`): gModelDataMethods +0x080 and gTriggerWorldMethods +0x080 (src/TodActor.c names this slot `getObjectIds` in its Unk5CObj view).
 
 ## Source
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_800531CC` on 2026-09-24 (tools/rename.py). Address 0x800531cc.
 
-**Unit:** class_3bb8c_l · **Size:** 99 words (0x18C bytes) ·
+**Unit:** ObjMStyleActor · **Size:** 99 words (0x18C bytes) ·
 **Status: MATCHED 99/99**, whole-image SHA1 green. One of the two "large"
 functions in this unit's queue.
 

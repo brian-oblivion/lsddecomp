@@ -268,7 +268,7 @@ segments:
       # that unit's own function .s, so it MUST be attached);
       # D_800116A4 unreferenced; D_800116E4 -> class_3bb8c_j, still uncarved,
       # so it must stay in a standalone object.
-      - [0x1E28, .rodata, class_3bb8c_i]   # jtbl_80011628
+      - [0x1E28, .rodata, TextEntryItemList]   # jtbl_80011628
       - [0x1EA4, rodata]                   # D_800116A4 / D_800116E4 -> not ours
       # Slot 0x1EF4 has THREE owners, so it splits twice (the shared-slot case
       # from PARALLEL-RUNS Gate 2). Ownership, one grep per symbol:
@@ -279,8 +279,7 @@ segments:
       #     func_80058084, both still in the uncarved class_3bb8c_m
       #     remainder, so they must stay in a STANDALONE object -- attaching
       #     them to _l would strand them (nowhere to migrate to).
-      - [0x1EF4, .rodata, class_3bb8c_k]   # jtbl_800116F4
-      - [0x1F4C, .rodata, class_3bb8c_l]   # jtbl_8001174C
+      - [0x1EF4, .rodata, ObjMStyleActor]   # jtbl_800116F4
       - [0x1F6C, rodata]                   # two strings -> remainder, NOT ours
       # JUMP TABLES, and the one rodata slot that MUST stay attached to its
       # unit. Its words are pointers to `.L8005....` labels INSIDE DreamSys's
@@ -293,7 +292,7 @@ segments:
       # `.L8005....` labels inside that unit's functions, so it must be
       # attached (the yaml's inherited `# greyman` guess was wrong about
       # which unit owns it).
-      - [0x206C, .rodata, code_4cd08]
+      - [0x206C, .rodata, DreamAux]
 
       # ---- text -----------------------------------------------------------
       # `psyq_*` blocks are Sony SDK library code compiled into the executable.
@@ -1613,7 +1612,7 @@ segments:
       # jump table, so expect the rodata attach/split from Gate 2). 18 clean,
       # none wanting 7+ callee-saved registers (the corrected threshold; the
       # one function at 5 is ordinary work, see DECOMPILATION_LEARNINGS).
-      - [0x413A8, c, class_3bb8c_i]
+      - [0x413A8, c, TextEntryItemList]
       # class_3bb8c_j: first 20-function slice of the 193-function remainder,
       # 0x41F84..0x429D4. Carved round 15. Boundary checked on both sides:
       # func_8005217C closes `jr $ra; nop` + endlabel and func_800521D4 opens
@@ -1622,7 +1621,6 @@ segments:
       # `jr $t2` trampolines, zero `alabel`s.
       # Blocker profile: 2 of 20 -- func_800518F4 and func_80051998, both
       # gp_rel. 18 clean. Owns NO switch jump table, so no rodata attach.
-      - [0x41F84, c, class_3bb8c_j]
       # class_3bb8c_k: second 20-function slice, 0x429D4..0x435E0. Carved
       # round 15. Boundary checked on both sides: func_80052D10 closes
       # `jr $ra; nop` + endlabel and func_80052DE0 is a frameless
@@ -1630,7 +1628,7 @@ segments:
       # Blocker profile: 2 of 20 -- func_800522DC (addiu-$at, and it OWNS
       # jtbl_800116F4, so the rodata slot at 0x1EF4 is attached here) and
       # func_80052644 (gp_rel). 18 clean.
-      - [0x429D4, c, class_3bb8c_k]
+      - [0x429D4, c, ObjMStyleActor]
       # class_3bb8c_l: third 20-function slice, 0x435E0..0x44518. Carved
       # round 15. Boundary checked on both sides: func_80053C94 closes
       # `jr $ra; nop` + endlabel and func_80053D18 opens with its own
@@ -1639,7 +1637,6 @@ segments:
       # func_800534C8 (gp_rel) and func_80053984 (addiu-$at, and it OWNS
       # jtbl_8001174C, so the rodata slot at 0x1F4C is attached here).
       # 17 clean.
-      - [0x435E0, c, class_3bb8c_l]
       # class_3bb8c_m: fourth 20-function slice, 0x44518..0x44F14. Carved
       # round 15. Boundary checked on both sides: func_80054660 closes
       # `jr $ra; nop` + endlabel and func_80054714 opens with its own
@@ -1649,7 +1646,6 @@ segments:
       # func_80054660 (gp_rel). 16 clean, and the four blocked ones are the
       # LAST four in ROM order, so the clean run is contiguous. Owns NO
       # switch jump table.
-      - [0x44518, c, class_3bb8c_m]
       # class_3bb8c_n: functions 0..22 of the old 113-function remainder,
       # 0x44F14..0x46288 (23 functions, 1245 words).  CARVED round 45
       # (2026-09-15) and BANKED -- see the DELIBERATELY UNWORKED note in
@@ -1679,7 +1675,6 @@ segments:
       # Sizes run 13w..111w with no trivial leaves -- every one is a real
       # body.  Expect this slice to span more than one class; identify each
       # with `tools/classtable.py` rather than assuming the unit has one.
-      - [0x44F14, c, class_3bb8c_n]
       # class_3bb8c_r: functions 23..43 of that remainder, 0x46288..0x46D20
       # (21 functions).  Carved MID-round 17 to re-staff a runner whose own
       # unit was exhausted.  Census 2026-09-04, three-grep screen per
@@ -1688,7 +1683,6 @@ segments:
       # body, several 40-70 instructions.  Owns NO switch jump table, so no
       # rodata attach.  Expect it to span more than one class; identify each
       # with tools/classtable.py rather than assuming.
-      - [0x46288, c, class_3bb8c_r]
       # class_3bb8c_s: functions 44..53 of that remainder, 0x46D20..0x475F0.
       # CARVED round 21 (2026-09-06) and BANKED -- see the DELIBERATELY
       # UNWORKED note in src/class_3bb8c_s.c.  Carved rather than left asm
@@ -1707,7 +1701,6 @@ segments:
       # one `addiu $sp, $sp, -N`, every one ends in its own `jr $ra`, and
       # the single frameless function (func_80056794) opens on its own $a1,
       # not on $sp.
-      - [0x46D20, c, class_3bb8c_s]
       # class_3bb8c_o: functions 54..73 of that remainder, 0x475F0..0x47CC4
       # (20 functions).  Census 2026-09-04, three-grep screen per function:
       # 19/20 clean, the one blocked is func_80056F5C (gp_rel).  Owns NO
@@ -1715,13 +1708,11 @@ segments:
       # rodata attach.  EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS -- it
       # is cut at ROM addresses, not at class boundaries; identify each
       # with tools/classtable.py rather than assuming one class per unit.
-      - [0x475F0, c, class_3bb8c_o]
       # class_3bb8c_p: functions 74..93 of that remainder, 0x47CC4..0x485BC
       # (20 functions).  Census 2026-09-04: 20/20 clean on all three greps
       # -- the cleanest window found anywhere this round.  Four are
       # 2-instruction leaves.  Owns NO switch jump table, so no rodata
       # attach.  Same multi-class caveat as _o above.
-      - [0x47CC4, c, class_3bb8c_p]
       # class_3bb8c_q: functions 94..95 of that remainder, 0x485BC..0x48738.
       # CARVED round 47 (2026-09-16).  The note this replaces said "both are
       # blocked -- func_80057DBC on addiu-$at and func_80057DF4 on
@@ -1735,7 +1726,6 @@ segments:
       # are frameless leaves (zero `addiu $sp, $sp, -N`), which is why the
       # prologue census reads 0 rather than 1.  Owns no jump table, so no
       # rodata attach.  Same multi-class caveat as _o/_p above.
-      - [0x485BC, c, class_3bb8c_q]
       # class_3bb8c_t: functions 96..112 of that remainder, 0x48738..0x48F74
       # (17 functions).  Carved MID-round 17 to re-staff a runner whose own
       # unit was exhausted.  Census 2026-09-04, three-grep screen per
@@ -1746,9 +1736,8 @@ segments:
       # are STRINGS referenced by symbol, which a standalone rodata object
       # resolves fine (the 0xA8C precedent), so no attach is expected; the
       # slice owns no `jtbl_` reference either.
-      - [0x48738, c, class_3bb8c_t]
       - [0x48F74, c, DreamSys]
-      - [0x4CD08, c, code_4cd08]   # DreamAux
+      - [0x4CD08, c, DreamAux]   # DreamAux
       # Entity is 142 functions -- too big for one runner queue, and only
       # one runner may own a unit. Carved in slices; the remainder stays
       # `asm` until someone needs it. Both 0x4E618 (func_8005DE18) and
@@ -1758,14 +1747,12 @@ segments:
       # Entity_b carries NO switch jump tables -- the whole 117-function
       # block had zero `jlabel`s -- so no rodata slot needed attaching.
       - [0x4D7DC, c, Entity]
-      - [0x4E618, c, Entity_b]
       # Entity_c: first 20-function slice of the 97-function remainder,
       # 0x4F754..0x5077C. 0x5077C (func_8005FF7C) is a real boundary --
       # func_8005FEF8 ends `jr $ra; nop` and func_8005FF7C opens with its
       # own `addiu $sp, $sp, -0x20`. The WHOLE 97-function block has zero
       # `jlabel`s and zero `jr $t2`, so neither slice needs a rodata slot
       # attached and none of it is a BIOS trampoline.
-      - [0x4F754, c, Entity_c]
       # Entity_d: second 20-function slice of the remainder,
       # 0x5077C..0x52290. 0x52290 (func_80061A90) is a real boundary --
       # func_80061778 closes `jr $ra; nop` + endlabel and func_80061A90
@@ -1776,7 +1763,6 @@ segments:
       # Still zero `jlabel` and zero `jr $t2` in the whole remainder, so
       # no rodata slot to attach and no hasm/.word disposition. Blocker
       # census over the slice: zero gp_rel, zero addiu-$at.
-      - [0x5077C, c, Entity_d]
       # Entity_e: third 20-function slice of the remainder,
       # 0x52290..0x53CA8. 0x53CA8 (func_800634A8) is a real boundary --
       # func_80063144 closes `addiu $sp, $sp, 0x28; jr $ra; nop` and
@@ -1788,7 +1774,6 @@ segments:
       # remainder, so no rodata slot to attach and no hasm/.word
       # disposition. Blocker census over the slice: 1 of 20 gp_rel-blocked
       # (func_80062C58), zero addiu-$at.
-      - [0x52290, c, Entity_e]
       # Entity_f / Entity_g: the 37-function Entity remainder, 0x53CA8..0x55DD4
       # (bounded by code_55dd4, already carved C, so there is no data tail).
       # Carved round 13 and SPLIT IN TWO deliberately: 37 in one unit would
@@ -1808,10 +1793,8 @@ segments:
       # needed 5+ and both functions at 8+ stalled.
       #
       # Entity_f: first 17, 0x53CA8..0x54E18.
-      - [0x53CA8, c, Entity_f]
       # Entity_g: remaining 20, 0x54E18..0x55DD4.
-      - [0x54E18, c, Entity_g]
-      - [0x55DD4, c, code_55dd4]
+      - [0x55DD4, c, TodActor]
       # ---- data ------------------------------------------------------------
       # ALL DATA STARTS AS ASSEMBLY, including the slots that belong to the two
       # carved C units. splat's dot-prefixed form (`.data, DreamSys`) means

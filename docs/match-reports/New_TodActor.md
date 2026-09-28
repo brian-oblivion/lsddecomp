@@ -4,14 +4,14 @@
 
 > Renamed from `New_class_65650` on 2026-09-24 (tools/rename.py). Address 0x800655d4.
 
-**Unit:** code_55dd4 · **Size:** 31 words (0x7C bytes) · **Status:** MATCHED
+**Unit:** TodActor · **Size:** 31 words (0x7C bytes) · **Status:** MATCHED
 (31/31 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does
 
 The `New_X` allocator for the class whose method table is `gTodActorMethods`
 (resolved with `tools/classtable.py gTodActorMethods --vs 0x800878D4`; see
-`include/code_55dd4.h` for the full inheritance chain). Allocates a 0x98-byte
+`include/TodActor.h` for the full inheritance chain). Allocates a 0x98-byte
 instance through the game allocator `BMemPMgrAlloc`, fetches the class's own
 vtable via `GetTodActorMethods()` (a `Get_vtable`-style accessor, matched
 separately, see its own report), and calls the constructor slot (`+0x008`)
@@ -68,7 +68,7 @@ rewrite to every `New_X` residue.
 
 ## Notes on the header
 
-`include/code_55dd4.h` types `BMemPMgrAlloc` as taking a single `s32 size`
+`include/TodActor.h` types `BMemPMgrAlloc` as taking a single `s32 size`
 parameter (matching the correction the head made to `Pad.h`'s
 `BMemPMgrAlloc` prototype in the same round) — the call site here sets only
 `$a0` before `jal`.

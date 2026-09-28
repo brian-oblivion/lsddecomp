@@ -1,9 +1,9 @@
-#ifndef CODE_4CD08_H
-#define CODE_4CD08_H
+#ifndef DREAMAUX_H
+#define DREAMAUX_H
 
 #include "common.h"
 
-/* The dream's aux entities and chunk triggers (src/code_4cd08.c; its banner
+/* The dream's aux entities and chunk triggers (src/DreamAux.c; its banner
  * describes the subsystem). Only that unit includes this header. */
 
 /* The per-stage tables hold 14 pointers each (0x38 bytes between one

@@ -29,7 +29,7 @@ struct SubObjE {
 /* The object allocator every New_<Class> calls. */
 extern void *BMemPMgrAlloc(s32 size);
 
-/* src/code_4cd08.c; DayTask's finalize calls it after releasing its
+/* src/DreamAux.c; DayTask's finalize calls it after releasing its
  * resources. */
 extern void ReleaseDreamAuxModels(void);
 
@@ -37,7 +37,7 @@ extern void ReleaseDreamAuxModels(void);
  * passes as TimedTask's soundBankPath. */
 extern char *GetSoundEffectDir(s32 unused); /* arity-ok: the definition takes no parameter and reads no argument register, but this dead argument IS byte-load-bearing -- retail emits `move a0,zero` at 0x800496A8 ahead of the jal at 0x800496B0 */
 
-/* src/code_4cd08.c; DayTask's ctor calls it, and its finalize
+/* src/DreamAux.c; DayTask's ctor calls it, and its finalize
  * ReleaseDreamAuxModels. */
 extern void InitDreamAux(void);
 

@@ -6,7 +6,7 @@
 
 > Renamed from `func_80066818` on 2026-09-24 (tools/rename.py). Address 0x80066818.
 
-**Unit:** code_55dd4 · **Size:** 4 words (0x10 bytes) · **Status:** MATCHED
+**Unit:** TodActor · **Size:** 4 words (0x10 bytes) · **Status:** MATCHED
 (4/4 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does

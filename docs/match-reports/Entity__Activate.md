@@ -44,7 +44,7 @@ Matched on the first attempt.
 ## Proposed learning
 
 None new — a clean instance of the vtable-dispatch-needs-no-forward-
-declaration pattern already documented for `code_55dd4`.
+declaration pattern already documented for `TodActor`.
 
 ## Naming
 
@@ -62,7 +62,7 @@ same tie-break the other way and documents why. Pairs with
 
 - `Entity::unkF0` -> `active` -- **tier B.** Toggled by this function and
   its pair; read directly (not just through the accessor pair) by
-  Entity_b.c (`grep -rn -- '->unkF0\b' src/Entity_b.c`). CROSS-UNIT,
+  Entity.c (`grep -rn -- '->unkF0\b' src/Entity.c`). CROSS-UNIT,
   proposed rather than applied.
 
 ## Track 4 (2026-09-26, round 88, echo)

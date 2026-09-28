@@ -120,7 +120,7 @@ use the same record" was already stale (TextRow's methods take
 ScreenSpritePos since round 86), and the two do not mean the same thing.
 A ScreenSpritePos is always a percentage of half the screen from the centre;
 a BoxFillPos is that only while `relative` is set, and pixels after
-`attachAbsolute` (GraphRoom's dots, class_3bb8c_t, pass
+`attachAbsolute` (GraphRoom's dots, ObjMStyleActor, pass
 `dx * 10 - 5`-style pixel offsets). TaskCore__RefreshSlotView
 (Task.c) passes one local SlotPos to both a BoxFill and its
 TextRows, so a single `ScreenPos` in SceneNode.h is a reasonable proposal

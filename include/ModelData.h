@@ -16,8 +16,8 @@
  * TMD model source and a TOD set over one buffer (ModelData__BuildResources:
  * New_LinkResource over the sub-block at the buffer's third word, New_TodSet
  * over the buffer past +0x0C) and forward TOD packet decoding to the set
- * (+0x080/+0x084); its outside users, code_55dd4 (TodActor.modelData,
- * `tmd`/`tods`) and code_4cd08 (InitDreamAux's MOM files), hold it as the
+ * (+0x080/+0x084); its outside users, TodActor (TodActor.modelData,
+ * `tmd`/`tods`) and DreamAux (InitDreamAux's MOM files), hold it as the
  * model and animation data of an actor.
  *
  * PARENT BY CTOR CHAIN, NOT BY ID. The id 0x5F03 puts it under TimBlockSrc

@@ -46,7 +46,7 @@ void *New_TimBlockSrc(s32 arg0) {
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-The allocator; 0x84 is the class size the header records. It now reaches the ctor through the typed getter (`GetTimBlockSrcMethods()->ctor(obj, (char *)arg0)`) instead of the unit's `UnprototypedCtorTable` cast; its own signature is unchanged because `src/class_3bb8c_l.c` declares it `s32 New_TimBlockSrc(s32)` locally. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The allocator; 0x84 is the class size the header records. It now reaches the ctor through the typed getter (`GetTimBlockSrcMethods()->ctor(obj, (char *)arg0)`) instead of the unit's `UnprototypedCtorTable` cast; its own signature is unchanged because `src/ObjMStyleActor.c` declares it `s32 New_TimBlockSrc(s32)` locally. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Round 93 polish (charlie, track 7)
 
@@ -85,11 +85,11 @@ Verbatim as it stood before the round-93 comment pass; the new banner says what 
  *     (include/TimArraySrc.h, track 4, round 88).
  *   - Tod / TodSet (gTodMethods / gTodSetMethods, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
- *     of them; named from include/code_55dd4.h's own "TOD set" (Unk30Obj).
+ *     of them; named from src/TodActor.c's own "TOD set" (Unk30Obj).
  *   - ModelData / TriggerWorld (gModelDataMethods / gTriggerWorldMethods, TriggerWorld a
  *     ModelData subclass): a LinkResource+TodSet pair, and an array of
- *     those pairs; ModelData named from code_55dd4.h/.c's own "tmd"/"tods"/
- *     "modelData" fields, TriggerWorld from code_4cd08.c's own declared
+ *     those pairs; ModelData named from TodActor.c/.c's own "tmd"/"tods"/
+ *     "modelData" fields, TriggerWorld from DreamAux.c's own declared
  *     return type.
  *   - TileMap / TileAtlas (gTileMapMethods / gTileAtlasMethods): a 20x15 grid of
  *     16x16-cell map data (a GsMAP, consumed by BgLayer as its map source)

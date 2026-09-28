@@ -1,5 +1,5 @@
 DreamSys: warning: control reaches end of non-void function
-Entity_g: warning: passing arg 4 of `Entity__GetOrCreateFadeBox' makes pointer from integer without a cast
+Entity: warning: passing arg 4 of `Entity__GetOrCreateFadeBox' makes pointer from integer without a cast
 GameApplicationFileResource: warning: assignment from incompatible pointer type
 GameApplicationFileResource: warning: control reaches end of non-void function
 GraphicsResources: warning: `sx' might be used uninitialized in this function
@@ -32,12 +32,24 @@ TitleMenuTaskObjF: warning: `state' might be used uninitialized in this function
 TitleMenuTaskObjF: warning: implicit declaration of function `strcpy'
 TitleMenuTaskObjF: warning: passing arg 2 of `strcat' discards `const' from pointer target type
 TitleMenuTaskObjF: warning: passing arg 2 of `strcat' discards `const' from pointer target type
-class_3bb8c_k: warning: unused variable `unused'
-class_3bb8c_p: warning: unused variable `pad48Tail'
-class_3bb8c_s: warning: implicit declaration of function `rand'
+ObjMStyleActor: warning: unused variable `unused'
+ObjMStyleActor: warning: unused variable `pad48Tail'
 CdDriver: warning: unused variable `scratch'
+CdDriver: src/CdDriver.c: At top level:
+CdDriver: warning: `LockCd' was previously implicitly declared to return `int'
+CdDriver: warning: `UnlockCd' was previously implicitly declared to return `int'
 CdDriver: warning: `unassigned' might be used uninitialized in this function
-code_55dd4: warning: unused variable `unused'
+CdDriver: warning: implicit declaration of function `LockCd'
+CdDriver: warning: implicit declaration of function `UnlockCd'
+CdDriver: warning: previous external decl of `LockCd'
+CdDriver: warning: previous external decl of `UnlockCd'
+CdDriver: warning: previous implicit declaration of `LockCd'
+CdDriver: warning: previous implicit declaration of `UnlockCd'
+CdDriver: warning: type mismatch with previous external decl
+CdDriver: warning: type mismatch with previous external decl
+CdDriver: warning: type mismatch with previous implicit declaration
+CdDriver: warning: type mismatch with previous implicit declaration
+TodActor: warning: unused variable `unused'
 SceneNode: warning: unused variable `pad'
 SceneNode: warning: unused variable `unused'
 libcd_bios: warning: passing arg 2 of `CD_cw' makes integer from pointer without a cast

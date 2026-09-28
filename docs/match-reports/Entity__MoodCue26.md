@@ -2,9 +2,9 @@
 
 > Renamed from `func_8005F544` on 2026-09-24 (tools/rename.py). Address 0x8005f544.
 
-Unit: `Entity_c`. Originally staffed to runner bravo (stalled at 30/49,
+Unit: `Entity`. Originally staffed to runner bravo (stalled at 30/49,
 ~7 attempts). Reopened for runner alpha per HEAD BROADCAST (round following
-alpha's `Entity_c` batch of six) on the strength of the permuter setup and
+alpha's `Entity` batch of six) on the strength of the permuter setup and
 the cross-jump-control levers alpha's own round had just established.
 Closed by alpha in ~10 further attempts (17/30 total spent across both
 runners).
@@ -242,7 +242,7 @@ compare:
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 26 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 26 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity/d/e/g.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

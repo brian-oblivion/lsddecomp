@@ -59,7 +59,7 @@ Evidence:
   same value: `SceneNode__OnNotify` (`src/SceneNode.c`) calls
   `Get_vtable_BasicClass()->slot38(self, other, arg2)` and then dispatches
   to slot `+0x094`/`+0x098`/`+0x09C` **by the sender's class tag**, passing
-  `arg2` through each time; `TodActor__OnNotify` (`src/code_55dd4.c`) calls the
+  `arg2` through each time; `TodActor__OnNotify` (`src/TodActor.c`) calls the
   base and then tests `arg1->tagged->tag == 0x5F03 && arg2 == 1`.
 - Slot census (`tools/classtable.py`, all 60 tables): 27 tables use this
   base implementation at `+0x038` and 14 more override it with
@@ -83,7 +83,7 @@ which is the procedure working in the direction where it can work. for the head
 `arg2` -> `event`. **Tier B**, same evidence. Cross-unit and the widest
 replace of the round: 13 units access `->slot38`
 (`TitleMenuTaskObjF/f/i/j/k.c`, `DayTaskStageMap.c`, `class_3ac78.c`,
-`Task/d.c`, `code_55dd4.c`, `SceneNode.c`, `code_d294_b.c`, plus
+`Task/d.c`, `TodActor.c`, `SceneNode.c`, `code_d294_b.c`, plus
 this unit). Worth doing alone rather than batched.
 
 ## Round 91 polish (delta, track 7)

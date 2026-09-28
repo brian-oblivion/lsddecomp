@@ -300,7 +300,7 @@ built object: `ClipSegmentToBox` compiles to `0x1D0` bytes (116 words), not
 retail's `0x1D8` (118 words) -- **a real 2-word size shortfall**, not a
 pure register-coloring residue. This is the same class of false claim
 just corrected in this session's other unit (`TodActor__SetLightMode`,
-`code_55dd4`): a re-verification that only re-reads the SCORE, not
+`TodActor`): a re-verification that only re-reads the SCORE, not
 `funcdiff`'s own drift warning or `nm`'s size, can reproduce a wrong
 number turn after turn without ever catching it.
 

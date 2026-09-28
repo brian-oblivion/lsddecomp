@@ -2,7 +2,7 @@
 
 > Renamed from `func_80063ED4` on 2026-09-25 (tools/rename.py). Address 0x80063ed4.
 
-**Unit:** Entity_f · **Size:** 105 words · **Status:** MATCHED (105/105 words)
+**Unit:** Entity · **Size:** 105 words · **Status:** MATCHED (105/105 words)
 
 ## What it does
 
@@ -28,7 +28,7 @@ path falls through to the identical check after the loop. Writing this as
 nested-inside-else would have made the `unkFC==0` path skip the `>=0x19`
 check, which is wrong. Same "independent top-level `if` after a reload,
 not an `else` branch" idiom already established in this project for
-functions with a similar shared-tail shape (see e.g. Entity_d's
+functions with a similar shared-tail shape (see e.g. Entity's
 `Entity__MoodCue58` report).
 
 The `slot134` loop is byte-identical in shape to `Entity__MoodCue92`'s own
@@ -61,7 +61,7 @@ as `callback(owner, set)`, so `out` is the `SoundCueSet` (`EntityMoodHandlerArg`
 is Entity.h's local view; field readings in `Entity__MoodCue07.md`
 `## Proposed field names`: `unk4` tick, `unk10` attenuation, `unk1C`/`unk30`/`unk44`
 voice 0/1/2 tone request (-2 = stop), `unk20`/`unk34`/`unk48` pitch offset).
-Tier B, same as every sibling `Entity__MoodCueNN` (Entity_b..Entity_g): the
+Tier B, same as every sibling `Entity__MoodCueNN` (Entity..Entity_g): the
 row mapping is a fact of the binary, which dream object or state a row is
 for is not established. Row kept decimal so names sort in table order.
 
@@ -74,15 +74,15 @@ What it does, in the unit's current field names: Tick 0: gets/creates `unk100`, 
 | `D_80089D90` | `TRANSLATE_Y_MINUS256` | A | three s32 `(0, -256, 0)`, the format of `TRANSLATE_Y_MINUS512`/`TRANSLATE_Y_MINUS64`; passed to `addVec14` like the other `TRANSLATE_*` tables |
 
 `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` (`(4,5, 6,5, 5,5)` as s16 pairs, a non-uniform 4/5, 6/5, 1
-scale) is left unnamed, as Entity_g's header comment already decided for the
+scale) is left unnamed, as Entity's header comment already decided for the
 same symbol: no precedent for naming a non-uniform, non-unit-fraction scale.
 
-### Fields renamed (round 79, applied, compiler-listed accessors all in Entity_f)
+### Fields renamed (round 79, applied, compiler-listed accessors all in Entity)
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `EntityMethods::slot134` (+0x134) | `applyTodFrame` | A | `tools/classtable.py gEntityMethods` +0x134 = `TodActor__ApplyTodFrame`; `code_55dd4.h` already calls the same slot `applyTodFrame` in TodActor's own method table. Here: `todFramePtr = applyTodFrame(this, todFramePtr, 0)` 24 times, i.e. fast-forward 24 TOD frames |
-| `Entity::unk88` (+0x88) | `todFramePtr` | A | TodActor's own +0x88 is `todFramePtr` (`code_55dd4.h`; `TodActor__SetTod` writes it, `TodActor__Tick` stores `applyTodFrame`'s return in it), and Entity inherits TodActor's layout (`Entity__Entity` runs TodActor's ctor). The only accessor, this loop, uses it exactly that way |
+| `EntityMethods::slot134` (+0x134) | `applyTodFrame` | A | `tools/classtable.py gEntityMethods` +0x134 = `TodActor__ApplyTodFrame`; `code_55dd4.c` already calls the same slot `applyTodFrame` in TodActor's own method table. Here: `todFramePtr = applyTodFrame(this, todFramePtr, 0)` 24 times, i.e. fast-forward 24 TOD frames |
+| `Entity::unk88` (+0x88) | `todFramePtr` | A | TodActor's own +0x88 is `todFramePtr` (`code_55dd4.c`; `TodActor__SetTod` writes it, `TodActor__Tick` stores `applyTodFrame`'s return in it), and Entity inherits TodActor's layout (`Entity__Entity` runs TodActor's ctor). The only accessor, this loop, uses it exactly that way |
 
 Types were left as they were (`s32`), not corrected to TodActor's `u8 *`;
 no offset or size moved. Both oracles green after each.

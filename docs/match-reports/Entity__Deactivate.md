@@ -42,7 +42,7 @@ unrelated "Link" vocabulary already established for `Entity__GetLinkStage`.
 
 - `EntityMethods::slot160` -> `deactivate` -- **tier B.** `tools/
   classtable.py` on `gEntityMethods` resolves +0x160 to this very function
-  (self-referential dispatch). CROSS-UNIT: called from Entity_c/d/e/f/g
+  (self-referential dispatch). CROSS-UNIT: called from Entity/d/e/f/g
   (grep -rn -- '->slot160(' src/Entity_*.c), so proposed rather than
   applied even though this unit's OWN three callers
   (`Entity__DetachFromParent`, `Entity__OnGridCellLinkCommand`, `Entity__

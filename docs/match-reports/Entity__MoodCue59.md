@@ -2,7 +2,7 @@
 
 > Renamed from `func_80061A90` on 2026-09-24 (tools/rename.py). Address 0x80061a90.
 
-Unit: `Entity_e` (round 13, first function in this file). Two independent
+Unit: `Entity` (round 13, first function in this file). Two independent
 "divisible by 10" checks (one gated on `unkFC==0` against `rand()`, one on
 `out->unk4` unconditionally), a `unkFC==0` coin-flip `slotCC` call, an
 unconditional `slotC4`, and a final `unk44`/`unkFC` combo that reaches
@@ -58,13 +58,13 @@ void Entity__MoodCue59(Entity *this, EntityMoodHandlerArg *out) {
   site (the first, in `Entity__MoodCue12`, is what typed the slot originally).
 
 No new struct or vtable-slot knowledge; every field/slot here was already
-known from earlier work in `Entity_d`/`Entity_e`.
+known from earlier work in `Entity`/`Entity_e`.
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 59 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 59 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity.
 
-Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity_b/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice0Pitch`.
+Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice0Pitch`.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
@@ -74,16 +74,16 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Byte-identical (whole image green).
 
-## Unit notes (moved from src/Entity_e.c's banner, round 93)
+## Unit notes (moved from src/Entity.c's banner, round 93)
 
-The pre-track-7 banner of `src/Entity_e.c` carried this history, now here:
+The pre-track-7 banner of `src/Entity.c` carried this history, now here:
 the unit was carved as the third 20-function slice of the Entity class's
-97-function remainder, after Entity_c and Entity_d. Its functions are the
+97-function remainder, after Entity and Entity_d. Its functions are the
 `gEntityMoodHandlerTable` handlers of rows 59, 61-62, 64-71 and 73-81, each
 named `Entity__MoodCueNN` for its row; row order does not track code
 address (each report derives its row). Rows 60, 63 and 72 have a NULL
 handler word: those mood indices dispatch no per-tick callback, not a gap
 in the unit. `Entity__MoodCue81` also occupies row 120 (its report), and
-`Entity__MoodCue71` is called from Entity_g's `Entity__MoodCue108`.
+`Entity__MoodCue71` is called from Entity's `Entity__MoodCue108`.
 `sMoodCue78TransitionDone` is a one-shot s32 flag used only by
 `Entity__MoodCue78`.

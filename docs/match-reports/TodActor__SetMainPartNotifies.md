@@ -6,7 +6,7 @@
 
 > Renamed from `func_80065BF4` on 2026-09-24 (tools/rename.py). Address 0x80065bf4.
 
-**Unit:** code_55dd4 · **Size:** 2 words (0x8 bytes) · **Status:** MATCHED
+**Unit:** TodActor · **Size:** 2 words (0x8 bytes) · **Status:** MATCHED
 (2/2 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does
@@ -41,7 +41,7 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 Renamed `TodActor__SetUnk64` -> `TodActor__SetMainPartNotifies`
 (`tools/rename.py`), slot `setUnk64` -> `setMainPartNotifies`, field `unk64`
 -> `mainPartNotifies` (header edit; the compiler listed 3 accessors, all in
-code_55dd4.c). **Tier B**: the field's one reader, TodActor__TickCallbackA,
+TodActor.c). **Tier B**: the field's one reader, TodActor__TickCallbackA,
 has mainPart send event 6 (`notifyWithHull`) after the actor's own move only
 while it is 1; Reset sets it to 1. What the notification is for is not
 established.

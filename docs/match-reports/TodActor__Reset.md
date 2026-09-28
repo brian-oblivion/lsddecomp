@@ -6,7 +6,7 @@
 
 > Renamed from `func_80065830` on 2026-09-24 (tools/rename.py). Address 0x80065830.
 
-**Unit:** code_55dd4 · **Size:** 58 words (0xE8 bytes) · **Status:** MATCHED
+**Unit:** TodActor · **Size:** 58 words (0xE8 bytes) · **Status:** MATCHED
 (58/58 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does
@@ -78,6 +78,6 @@ Renamed from `TodActor__InitDefaults`. Override of +0x040, SceneNode's `reset` (
 
 ## Track 7 (round 99, bravo)
 
-`0x12C` is written decimal (300), unnamed: Actor__Reset (class_3bb8c_o) writes
+`0x12C` is written decimal (300), unnamed: Actor__Reset (ObjMStyleActor) writes
 the same default into lastOffsetValue, so a name belongs in include/Actor.h
 (proposed to the head, not applied here).

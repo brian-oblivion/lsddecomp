@@ -12,7 +12,7 @@
  * (with a third argument 0, so ModelData's own resource build and release
  * never act on it).
  *
- * The name is round 83's (code_4cd08.c had declared New_TriggerWorld's
+ * The name is round 83's (DreamAux.c had declared New_TriggerWorld's
  * result `TriggerWorld *`), kept as the only name any view gave the class.
  * What its own methods do: TriggerWorld__BuildResources (+0x078) makes one
  * ModelData per entry of the buffer's counted offset table (New_ModelData
@@ -20,7 +20,7 @@
  * table's own word, counting them at +0x038; TriggerWorld__ReleaseResources
  * (+0x07C) releases that array (ReleaseBasicClassArray); and
  * TriggerWorld__GetModelData (+0x088) returns entry `index`, 0 out of range.
- * Its one outside user, code_4cd08's FireDreamAuxTriggerEntries, builds one
+ * Its one outside user, DreamAux's FireDreamAuxTriggerEntries, builds one
  * over a trigger group's buffer, and ProcessDreamAuxTriggerRecord passes
  * getModelData(record->parity) on as New_Entity's descriptor word +0x00C,
  * which TodActor__AcquireModelData borrows as the entity's ModelData.

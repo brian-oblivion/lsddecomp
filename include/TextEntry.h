@@ -7,8 +7,8 @@
 /*
  * TextEntry -- an editor for a caller-owned string (class id 0x10, method
  * table gTextEntryMethods): BasicClass's direct subclass, no class below it.
- * Methods in src/class_3bb8c_i.c (New_TextEntry .. NextChar) and
- * src/class_3bb8c_j.c (PrevChar .. GetTextEntryMethods). The name is for
+ * Methods in src/TextEntryItemList.c, New_TextEntry to GetTextEntryMethods.
+ * The name is for
  * what its own methods do, and the evidence is this:
  *  - setText (the ctor forwards to it) keeps the caller's buffer in `textBuf`
  *    and copies it into its own `editBuf` (mode 1 decodes full-width SJIS

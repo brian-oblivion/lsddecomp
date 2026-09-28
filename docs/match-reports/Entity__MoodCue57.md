@@ -2,7 +2,7 @@
 
 > Renamed from `func_80061198` on 2026-09-24 (tools/rename.py). Address 0x80061198.
 
-**Unit:** Entity_d · **Size:** 154 words · **Status:** MATCHED (154/154 words)
+**Unit:** Entity · **Size:** 154 words · **Status:** MATCHED (154/154 words)
 
 ## What it does
 
@@ -179,8 +179,8 @@ Every literal in the live body is in its base: decimal for moodTimer ticks, dist
   `Entity__GetOrCreateFade`). It is a FadeBox, the BoxFill that fades its
   colour (include/FadeBox.h); Entity__GetOrCreateFadeBox is its only
   writer (New_FadeBox, then setStep from its fourth argument, 10 here),
-  Entity__Finalize releases it, and every other access (here, Entity_f x3,
-  Entity_g x1) calls startFadeDown or startFadeUp on it. Accessors outside
+  Entity__Finalize releases it, and every other access (here, Entity x3,
+  Entity x1) calls startFadeDown or startFadeUp on it. Accessors outside
   Entity_d (Entity.c, Entity_f.c, Entity_g.c), so proposed, not applied.
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2

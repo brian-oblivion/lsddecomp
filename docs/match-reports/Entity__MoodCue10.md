@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005E7A8` on 2026-09-23 (tools/rename.py). Address 0x8005e7a8.
 
-**Unit:** Entity_b · **Size:** 20 words · **Status:** MATCHED (20/20 words,
+**Unit:** Entity · **Size:** 20 words · **Status:** MATCHED (20/20 words,
 whole-image build verified byte-exact)
 
 ## What it does
@@ -15,8 +15,8 @@ calls `this->methods->slotC4(this, -0x1E, 0)`.
 
 `slotC4` is a shared BasicClass-inherited slot: confirmed with
 `tools/classtable.py` that BOTH this unit's own vtable (`gEntityMethods`) and
-TodActor's vtable (`gTodActorMethods`, `include/code_55dd4.h`) hold the identical
-function (`Actor__MoveLocalZ`) at `+0xC4`, and `code_55dd4.h`'s own
+TodActor's vtable (`gTodActorMethods`, `src/code_55dd4.c`) hold the identical
+function (`Actor__MoveLocalZ`) at `+0xC4`, and `TodActor.c`'s own
 `TodActorMethods.slotC4` already documents the exact same call shape
 (`slotC4(self, -0x1E, 0)`, from `TodActor__TickCallbackA`) — so this is not a
 coincidence, it is the shared ancestor's method, reached the same way in two
@@ -47,7 +47,7 @@ which needed a correction for the analogous shape).
 ## Proposed learning
 
 Cross-referencing `tools/classtable.py`'s output for a suspicious 3-argument
-vtable call against `include/code_55dd4.h`'s already-documented
+vtable call against `src/TodActor.c`'s already-documented
 `TodActorMethods` slots is a fast way to confirm a shared-ancestor slot's
 signature without deriving it from scratch — the same physical function
 occupying the same offset in two different classes' tables is strong

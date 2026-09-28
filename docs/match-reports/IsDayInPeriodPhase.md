@@ -6,7 +6,7 @@
 
 > Renamed from `func_8005CDA8` on 2026-09-21 (tools/rename.py). Address 0x8005cda8.
 
-Unit `code_4cd08` ("DreamAux"). 20/20 words, `0x4D5A8`-`0x4D5F8`. Whole-image
+Unit `DreamAux` (was `code_4cd08`). 20/20 words, `0x4D5A8`-`0x4D5F8`. Whole-image
 `build-and-verify.sh` green. First attempt matched.
 
 ```c
@@ -94,7 +94,7 @@ The `/ 30` is suggestive of a day-to-period conversion given this project's
 `DreamSys__AdvanceDay`, but nothing in this unit establishes it, so the name
 does not encode it.
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 

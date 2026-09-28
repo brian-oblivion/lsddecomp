@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052498` on 2026-09-24 (tools/rename.py). Address 0x80052498.
 
-Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
+Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py ItemList__ScrollLeft`: 24/24 words match.
 
 This is vtable slot `+0x080` of `gItemListMethods` (`ItemListMethods::slot80`),
@@ -53,4 +53,4 @@ Round 75 (bravo, track 3). `func_80052498` -> `ItemList__ScrollLeft`, **tier A**
 
 Slot +0x080 (`tools/classtable.py gItemListMethods`). Decrements `column` if it stays >= 0, then refreshRows. Dispatched by HandleInputCode on code 4.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).

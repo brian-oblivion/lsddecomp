@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005DF9C` on 2026-09-23 (tools/rename.py). Address 0x8005df9c.
 
-Unit: `Entity_b` · Size: 36 words · Round 23 (2026-09-07), head. Fresh ground
+Unit: `Entity` · Size: 36 words · Round 23 (2026-09-07), head. Fresh ground
 (no prior report).
 
 ## The match
@@ -19,7 +19,7 @@ void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1) {
 }
 ```
 
-with, locally in `src/Entity_b.c`:
+with, locally in `src/Entity.c`:
 
 ```c
 extern s32 Entity__IsTargetInRange(Entity *this, s32 arg1);

@@ -2,12 +2,12 @@
 
 > Renamed from `func_8005E0B0` on 2026-09-23 (tools/rename.py). Address 0x8005e0b0.
 
-**Unit:** Entity_b · **Size:** 40 words · **Status:** MATCHED (40/40 words,
+**Unit:** Entity · **Size:** 40 words · **Status:** MATCHED (40/40 words,
 whole-image build verified byte-exact)
 
 ## What it does
 
-A close sibling of `Entity__UpdateTargetProximity`/`Entity__UpdateSoundCueStart` (both in `src/Entity_b.c`,
+A close sibling of `Entity__UpdateTargetProximity`/`Entity__UpdateSoundCueStart` (both in `src/Entity.c`,
 top of the file): another mood-row-driven "detach if too far" check, keyed off
 `row->unkB` instead of `row->unk6`/`row->unkB` in the other two. Guarded by
 `this->unkF0 != 0 && this->unkF8 != 0` (both must be true to enter the body,
@@ -50,7 +50,7 @@ Two attempts. The first attempt used `Entity__IsNearTarget(...) != 0` (mirroring
 `Entity__UpdateTargetProximity`/`Entity__UpdateSoundCueStart`'s sibling shape), which built at the right
 LENGTH (40 words) but left one register-identical, condition-inverted branch
 (`beqz` where retail has `bnez`, same target). Reading the raw retail bytes
-directly (`asm/nonmatchings/Entity_b/Entity__UpdateSoundCueStop.s`) showed the call to
+directly (`asm/nonmatchings/Entity/Entity__UpdateSoundCueStop.s`) showed the call to
 `slot16C` gated on the *opposite* polarity from its two siblings — this
 function's own body genuinely differs from `Entity__UpdateTargetProximity`/`Entity__UpdateSoundCueStart`,
 not just superficially. Flipping to `== 0` matched immediately.

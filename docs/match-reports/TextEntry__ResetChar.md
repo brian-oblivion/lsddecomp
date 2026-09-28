@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051814` on 2026-09-24 (tools/rename.py). Address 0x80051814.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `Obj86ED0` (ROUND 75 CORRECTION: was misattributed to `Obj866E8`, actually `Obj86ED0` -- gTextEntryMethods, established by class_3bb8c_i; see TextEntry__PrevChar.md for
+Unit: `src/TextEntryItemList.c` (was `src/class_3bb8c_j.c`). `self` is `Obj86ED0` (ROUND 75 CORRECTION: was misattributed to `Obj866E8`, actually `Obj86ED0` -- gTextEntryMethods, established by TextEntryItemList; see TextEntry__PrevChar.md for
 the class-identity evidence shared across this group).
 
 ## Body

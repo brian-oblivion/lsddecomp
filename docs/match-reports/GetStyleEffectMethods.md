@@ -4,9 +4,9 @@
 
 > Renamed from `func_80056F4C` on 2026-09-23 (tools/rename.py). Address 0x80056f4c.
 
-Unit: `class_3bb8c_o` (round 17). A sibling class's own method-table
+Unit: `ObjMStyleActor` (round 17). A sibling class's own method-table
 getter, analogous to `GetActorMethods`/`GetTodActorMethods` already documented in
-`code_55dd4.h`.
+`TodActor.c`.
 
 ## Final source
 
@@ -56,7 +56,7 @@ Left as `func_` for consistency with the rest of this getter family.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-StyleEffect unified (include/StyleEffect.h): the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_o.c are deleted and the unit includes include/StyleEffect.h (the getter now returns `StyleEffectMethods *`; it was typed as its parent's `ActorMethods`). Image byte-identical.
+StyleEffect unified (include/StyleEffect.h): the `LinkOwnerObj`/`LinkElemObj` views in ObjMStyleActor.c are deleted and the unit includes include/StyleEffect.h (the getter now returns `StyleEffectMethods *`; it was typed as its parent's `ActorMethods`). Image byte-identical.
 
 ## Track 7 (round 99, alpha)
 

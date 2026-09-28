@@ -2,7 +2,7 @@
 
 > Renamed from `func_80064294` on 2026-09-25 (tools/rename.py). Address 0x80064294.
 
-**Unit:** Entity_f · **Size:** 111 words · **Status:** MATCHED (111/111 words)
+**Unit:** Entity · **Size:** 111 words · **Status:** MATCHED (111/111 words)
 
 ## What it does
 
@@ -37,7 +37,7 @@ as `callback(owner, set)`, so `out` is the `SoundCueSet` (`EntityMoodHandlerArg`
 is Entity.h's local view; field readings in `Entity__MoodCue07.md`
 `## Proposed field names`: `unk4` tick, `unk10` attenuation, `unk1C`/`unk30`/`unk44`
 voice 0/1/2 tone request (-2 = stop), `unk20`/`unk34`/`unk48` pitch offset).
-Tier B, same as every sibling `Entity__MoodCueNN` (Entity_b..Entity_g): the
+Tier B, same as every sibling `Entity__MoodCueNN` (Entity..Entity_g): the
 row mapping is a fact of the binary, which dream object or state a row is
 for is not established. Row kept decimal so names sort in table order.
 

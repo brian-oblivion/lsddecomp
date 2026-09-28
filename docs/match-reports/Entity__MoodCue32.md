@@ -2,14 +2,14 @@
 
 > Renamed from `func_8005FA64` on 2026-09-24 (tools/rename.py). Address 0x8005fa64.
 
-**Unit:** Entity_c · **Size:** 12 words · **Status:** MATCHED (12/12 words,
+**Unit:** Entity · **Size:** 12 words · **Status:** MATCHED (12/12 words,
 whole-image build verified byte-exact)
 
 ## What it does
 
 `(Entity *this) -> void`. A one-line wrapper: `this->methods->slotC4(this,
 -0x1E, 0);` -- reuses `EntityMethods::slotC4`, already declared `void` in
-`Entity_b`'s round.
+`Entity`'s round.
 
 ## `slotC4`'s return type: a real conflict, resolved in favor of a
 DIFFERENT already-matched function's own bytes
@@ -19,7 +19,7 @@ flags: `slotC4`'s return value is discarded at every OTHER known call site,
 which per the "a discarded return is never evidence of void" rule is not
 positive evidence either way, and the naive next step would be to retype
 `slotC4` to `s32` and write `return this->methods->slotC4(...);` here (the
-same move that resolved `slot48`/`Entity__MoodCue17` in `Entity_b`).
+same move that resolved `slot48`/`Entity__MoodCue17` in `Entity`).
 
 **That move was tried and reverted.** Retyping `EntityMethods::slotC4` to
 `s32` compiles byte-identically for `Entity__MoodCue32` itself, but it also
@@ -30,9 +30,9 @@ With `slotC4` `void`, GCC tail-merges those two identical discarded calls
 into one shared call site (retail's actual shape). With `slotC4` retyped to
 `s32`, GCC stops performing that merge, and `Entity__MoodCue00` grows 4 words
 -- which, because this project keeps every function in strict ROM-address
-order, shifts every later function in `Entity_b.c` and would have silently
+order, shifts every later function in `Entity.c` and would have silently
 un-matched a function nobody was even touching this round. Verified with an
-isolated `cpp | cc1` recompile of `Entity_b.c` alone, diffing the `.s`
+isolated `cpp | cc1` recompile of `Entity.c` alone, diffing the `.s`
 output line-for-line against the unmodified baseline.
 
 `Entity__MoodCue00`'s own bytes are the stronger, more direct evidence (an
@@ -72,7 +72,7 @@ symmetric.
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 32 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 32 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity/d/e/g.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

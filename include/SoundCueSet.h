@@ -27,8 +27,8 @@
  * and volumes) on the ticks it wants a tone, timing them on `tick`, which
  * it may set to -1 to restart the count. The owners: Entity embeds one at
  * +0x09C and its callbacks are gEntityMoodHandlerTable's Entity__MoodCueNN
- * handlers (include/Entity.h); class_3bb8c_n's style-cue slots embed one and
- * install gStyleCueCallbacks' StyleCueNN (class_3bb8c_r.c); DreamSys embeds
+ * handlers (include/Entity.h); ObjMStyleActor's style-cue slots embed one and
+ * install gStyleCueCallbacks' StyleCueNN (ObjMStyleActor.c); DreamSys embeds
  * one and installs DreamSys__SoundCueCallback.
  *
  * Both proximity helpers that feed attenuation (Entity__GetProximityRatio,

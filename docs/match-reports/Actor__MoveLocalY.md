@@ -4,7 +4,7 @@
 
 > Renamed from `func_800574FC` on 2026-09-19 (tools/rename.py). Address 0x800574fc.
 
-Unit: `src/class_3bb8c_p.c`. Class: `DreamSys`, own vtable slot `+0x0CC`
+Unit: `src/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0CC`
 (base-class-inherited; resolved via `tools/classtable.py gDreamSysMethods`).
 
 ## Signature
@@ -40,4 +40,4 @@ tools/funcdiff.py Actor__MoveLocalY   # 14/14
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__ApplyOffsetSlot1`. Occupant of +0x0CC: gActorLocalMove[1], the y component, event 8. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_p.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__ApplyOffsetSlot1`. Occupant of +0x0CC: gActorLocalMove[1], the y component, event 8. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

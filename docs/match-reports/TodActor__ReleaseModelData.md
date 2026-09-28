@@ -4,7 +4,7 @@
 
 > Renamed from `func_80065CEC` on 2026-09-24 (tools/rename.py). Address 0x80065cec.
 
-**Unit:** code_55dd4 · **Size:** 30 words (0x78 bytes) · **Status:** MATCHED
+**Unit:** TodActor · **Size:** 30 words (0x78 bytes) · **Status:** MATCHED
 (30/30 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does

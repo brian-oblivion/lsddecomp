@@ -4,7 +4,7 @@
 
 > Renamed from `func_80056D18` on 2026-09-23 (tools/rename.py). Address 0x80056d18.
 
-**Unit:** class_3bb8c_s · **Round:** 44 (2026-09-15)
+**Unit:** ObjMStyleActor · **Round:** 44 (2026-09-15)
 
 ## Provenance
 
@@ -16,7 +16,7 @@ finding and undoing a self-inflicted whole-image size regression (below).
 ## What it is
 
 Populates all 5 slots of `self->arr84` (already known from
-`class_3bb8c_o.c`'s `LinkOwnerObj::arr84`) with freshly-allocated nodes via
+`ObjMStyleActor.c`'s `LinkOwnerObj::arr84`) with freshly-allocated nodes via
 `New_VariantSprite`, wires each one to `self` through `slot4C`, forwards
 `self->unk74` through `slotB8`, and — only when the caller passed a non-NULL
 `tbl` — also calls each new node's `slot48` with it.
@@ -105,7 +105,7 @@ merely aliases an existing pointer/value for readability."
 Round 70 (alpha). `func_80056D18` -> `StyleEffect__SpawnSprites`, **tier B**.
 
 Two callers: StyleEffect__BuildRandomSprites (tbl = gSpriteScaleHalf or NULL)
-and class_3bb8c_o.c's StyleEffect__SpawnPlainSprites (tbl = NULL, kind 3). Body:
+and ObjMStyleActor.c's StyleEffect__SpawnPlainSprites (tbl = NULL, kind 3). Body:
 five `New_VariantSprite(a2, 0, gStyleEffectTim)` into +0x084, each attachToParent(self,
 no offset), slotB8(self->color), and updateScale(1, tbl) when tbl != NULL.
 
@@ -129,7 +129,7 @@ the `(void *)` cast and the result is cast to this unit's `LinkNode *`
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
 
 ## Track 6 (round 93, bravo)
 

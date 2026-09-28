@@ -2,7 +2,7 @@
 
 > Renamed from `func_800650F4` on 2026-09-24 (tools/rename.py). Address 0x800650f4.
 
-**Unit:** Entity_g · **Size:** 42 instructions
+**Unit:** Entity · **Size:** 42 instructions
 
 ## Blocker screen
 
@@ -43,7 +43,7 @@ the second build.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g. 2 attempts.
+round 13 (2026-09-03), runner alpha, unit Entity. 2 attempts.
 
 
 ## Naming
@@ -51,11 +51,11 @@ round 13 (2026-09-03), runner alpha, unit Entity_g. 2 attempts.
 Why `MoodCue114`: the function's address sits in `gEntityMoodHandlerTable`
 row 114 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
 confirmed by reading `disk/SLPS_015.56` directly rather than trusting
-address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+address proximity (Entity/Entity_e, rounds 76-77, measured that row
 order does not track code address). Tier B: the row-to-function mapping is
 a compiler fact, not a guess, but which dream state or object each row
 represents is not established -- the row number is kept decimal, matching
-the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+the existing `MoodCueNN` siblings (Entity through Entity_f), so the
 names sort in table order.
 
 ## Track 4 (2026-09-26, round 88, echo)

@@ -47,7 +47,7 @@ return's delay slot", no residue.
 Added `include/Task.h`: this unit's own local view of the `StreamTask`
 class (named `StreamTaskObj`/`StreamTaskObjMethods` here, independent of
 `GameApplication.h`'s same-named-concept `StreamTask`, per the `Entity.h` /
-`code_55dd4.h` precedent of keeping local views separate rather than editing
+`TodActor.c` precedent of keeping local views separate rather than editing
 another unit's header) — fields `unkC4`/`unkC8`/`unkCC`/`unkD0`/`unkD4` (this
 run of setters), plus everything else this unit's other queued functions in
 the same batch needed. See the sibling reports for the rest.

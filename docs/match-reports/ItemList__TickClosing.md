@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005227C` on 2026-09-24 (tools/rename.py). Address 0x8005227c.
 
-Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
+Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py ItemList__TickClosing`: 24/24 words match.
 
 This is vtable slot `+0x058` of `gItemListMethods` (`ItemListMethods` does not
@@ -49,9 +49,9 @@ no register or scheduling residue.
 
 Round 75 (bravo, track 3). `func_8005227C` -> `ItemList__TickClosing`, **tier B**.
 
-Slot +0x058 (`tools/classtable.py gItemListMethods`), which ItemList__OnNotify (class_3bb8c_j) dispatches for notifications from its tag-5 child. While `result` is 2 or 3 it counts calls in `closeTicks` and on the second call dispatches setState(self, 4). What the tag-5 child is (a per-frame tick?) is not established, hence tier B.
+Slot +0x058 (`tools/classtable.py gItemListMethods`), which ItemList__OnNotify (TextEntryItemList) dispatches for notifications from its tag-5 child. While `result` is 2 or 3 it counts calls in `closeTicks` and on the second call dispatches setState(self, 4). What the tag-5 child is (a per-frame tick?) is not established, hence tier B.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
 
 ## Round 99 (delta, track 7)
 

@@ -535,8 +535,8 @@ a compiler-flag or source-shape question.
 
 **Project-wide scale, for whoever picks this up:** `grep -rl 'addiu.*\$at, \$at, %lo' asm/`
 finds this exact instruction sequence in 502 lines across `DayTaskStageMap.s`,
-`code_179d8.s`, `Task.s`, `Entity_b.s`, and inside several
-`code_4cd08`/`DreamSys`/`Entity`/`StageGrid`/`psyq_*` `nonmatchings/*.s`
+`code_179d8.s`, `Task.s`, `Entity.s`, and inside several
+`DreamAux`/`DreamSys`/`Entity`/`StageGrid`/`psyq_*` `nonmatchings/*.s`
 files. **None of those functions are matched yet** — I confirmed by checking
 every unit's `.c` file; every occurrence is still `INCLUDE_ASM`. This isn't
 a one-off: it's a pattern that will block the first attempt at

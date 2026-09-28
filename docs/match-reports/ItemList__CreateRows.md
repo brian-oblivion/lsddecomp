@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052644` on 2026-09-24 (tools/rename.py). Address 0x80052644.
 
-**Unit:** class_3bb8c_k · **Size:** 82 words (0x148 bytes)
+**Unit:** ObjMStyleActor · **Size:** 82 words (0x148 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). The unit header comment
@@ -122,9 +122,9 @@ shifts register allocation across the whole function").
 
 Round 75 (bravo, track 3). `func_80052644` -> `ItemList__CreateRows`, **tier A**.
 
-Slot +0x08C (`tools/classtable.py gItemListMethods`). Called by ItemList__LoadResources (class_3bb8c_j) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (gItemListRowOriginX, gItemListRowOriginY + 0xA*i), colours it gItemListRowColor, then SetView(..., highlight=1).
+Slot +0x08C (`tools/classtable.py gItemListMethods`). Called by ItemList__LoadResources (TextEntryItemList) as (self, parent, FONTICON handle, topIndex, column, cursorIndex). Builds min(itemCount, 4) row text objects with New_TextRow(font, 26, text), lays each out at (gItemListRowOriginX, gItemListRowOriginY + 0xA*i), colours it gItemListRowColor, then SetView(..., highlight=1).
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
 
 ## Round 99 (delta, track 7)
 

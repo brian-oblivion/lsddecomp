@@ -98,4 +98,4 @@ symbols, own lui/addiu) ... not sub-fields of the gEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.
 
-- Step 4: selectTickCallback(0x42) -> TICK_CALLBACK_B (TodActor.h); setLightMode(1) keeps its literal with a comment (fog on: mode 1 is GsFOG >> ATTR_LIGHTMODE_SHIFT, as class_3bb8c_l writes it); `(u32)(kind - 1) < 9` -> `kind >= 1 && kind <= 9`, byte-identical (GCC emits the same addiu/sltiu).
+- Step 4: selectTickCallback(0x42) -> TICK_CALLBACK_B (TodActor.h); setLightMode(1) keeps its literal with a comment (fog on: mode 1 is GsFOG >> ATTR_LIGHTMODE_SHIFT, as ObjMStyleActor writes it); `(u32)(kind - 1) < 9` -> `kind >= 1 && kind <= 9`, byte-identical (GCC emits the same addiu/sltiu).

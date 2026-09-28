@@ -327,11 +327,11 @@ few wrong instructions.
 2. **Collapsed `subPtr` into the call expression** —
    `func_800160B0((u8 *)sub + 0x10, &desc);` instead of a separate
    assignment, on the theory (confirmed useful elsewhere this round, see
-   `Entity__MoodCue58`'s and `Entity__MoodCue115`'s reports in the Entity_d unit)
+   `Entity__MoodCue58`'s and `Entity__MoodCue115`'s reports in the Entity unit)
    that a receiver/argument computed inline rather than pre-assigned can
    change which register class GCC 2.6.3 picks. Marginal improvement
    (60/165), same `-0x90`/8-register frame — this lever, which worked for
-   a *timing* residue in Entity_d, did not reach for the *count* residue
+   a *timing* residue in Entity, did not reach for the *count* residue
    here.
 
 Given `StageMap__SplitFootprintRect`'s own report already tried (and exhausted, within
@@ -641,7 +641,7 @@ Notes on the derivation, for whoever revisits this:
 - `SceneNode__FaceTarget`-style dual argument-order surprises were checked for at
   both library calls and NOT found: `func_800160B0`'s and
   `func_80015618`'s argument registers are unambiguous and match a
-  straightforward reading (no swapped self/arg1 pattern like Entity_d's
+  straightforward reading (no swapped self/arg1 pattern like Entity's
   `SceneNode__FaceTarget` anomaly this round).
 
 ## Header additions (`include/class_3bb8c.h`, additive only, except one retype)

@@ -12,18 +12,17 @@
  * carved from the old class_3bb8c segment. The classes those units hold
  * each have their own header, and nothing here redefines them:
  *
- *   DayTaskStageMap    StageMap (include/StageMap.h), the chunk grid manager
- *   TitleMenuTaskObjF  NodeGuardedViewport, GridCell, TitleMenu
- *                      (include/TitleMenu.h, a TaskCore), TaskObjF
- *   TitleMenuTaskObjF      TaskObjF (include/TaskObjF.h), the memory-card task
- *   class_3bb8c_i, _j  TextEntry (include/TextEntry.h)
- *   class_3bb8c_j, _k  ItemList (include/ItemList.h)
- *   class_3bb8c_k..m   ObjM (include/ObjM.h)
+ *   DayTaskStageMap.c    StageMap (include/StageMap.h), the chunk grid manager
+ *   TitleMenuTaskObjF.c  NodeGuardedViewport, GridCell, TitleMenu
+ *                        (include/TitleMenu.h, a TaskCore) and TaskObjF
+ *                        (include/TaskObjF.h), the memory-card task
+ *   TextEntryItemList.c  TextEntry (include/TextEntry.h), ItemList's first half
+ *   ObjMStyleActor.c     ItemList's second half (include/ItemList.h),
+ *                        ObjM (include/ObjM.h) and the style layer
  *
  * What is here, in that order: StageMap's lookup tables and SplitCoord2,
  * the view of a slot's origin its methods read; TitleMenu's data (menu
- * description, paths, the save title's buffers, the colour cycle) and
- * DreamSaveBlock, the save-block view UpdateFlashbackLock reads; TaskObjF's
+ * description, paths, the save title's buffers, the colour cycle); TaskObjF's
  * event table, the memory-card device names (McDevicePath) and helpers;
  * ObjM's StyleConfig record and the helpers its methods call.
  *
@@ -172,18 +171,8 @@ extern s32 sTaskObjFCount;
  * TitleMenu__TitleMenu calls it with DreamSys's getCurrentDayAndYear. */
 extern void StampSaveTitleDay(s32 day);
 
-/*
- * The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock):
- * DreamSys from `saveMagic` (+0x178) on, so each field here is the DreamSys
- * field (include/DreamSys.h) 0x178 bytes further in. UpdateFlashbackLock
- * reads the two below.
- */
-typedef struct DreamSaveBlock {
-    u8 pad00[0x00C];
-    s32 totalFlasbackUnlockScore; /* +0x00C, DreamSys +0x184: FLASHBACK unlocks past 9999999 */
-    u8 pad10[0x2F4 - 0x010];
-    s32 amountFlashbacksAvailable; /* +0x2F4, DreamSys +0x46C: ... and only with one stored */
-} DreamSaveBlock;
+/* The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock),
+ * which UpdateFlashbackLock reads, is DreamSaveBlock in include/DreamSys.h. */
 
 /* ---- TaskObjF ---------------------------------------------------- */
 
@@ -229,7 +218,7 @@ extern s32 StampSaveTitleFileLetter(char *titleText, char *fileName);
 /* ObjM::styleConfig's pointee (include/ObjM.h): the day's scene style, a
  * plain record. RegisterStyleConfig returns sStyleConfig after
  * FillStyleFromConfig fills its last four words from the stage's config
- * bytes (class_3bb8c_m, whose local StyleM views the same words), or
+ * bytes (ObjMStyleActor, whose local StyleM views the same words), or
  * InitStyleAndWorld's caller supplies one. ObjM__SetupSceneStyle hands the
  * first three to the StageMap's lights, ObjM__EnterStyleSession the rest to
  * the viewport, ObjM__PollTimBlockLoad a colour to the TimBlockSrc. */
@@ -250,10 +239,7 @@ typedef struct StyleConfig {
 extern s32 GetStageMapChunkRecord(s32 index, s32 sub);
 extern void GetStageMapChunkRecordXY(s32 index, s32 x, s32 y);
 
-/* ObjM__TickStyle's helper (src/class_3bb8c_n.c), typed from that call. */
-extern void TickStyle(void *arg0, void *arg1, s32 arg2);
-
-/* ObjM__TeardownStyle's helpers (src/code_4cd08.c, src/class_3bb8c_n.c). */
+/* ObjM__TeardownStyle's helpers (src/DreamAux.c, src/ObjMStyleActor.c). */
 extern void ReleaseDreamAuxEntities(void);
 extern void StyleTeardown(void);
 

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80053764` on 2026-09-24 (tools/rename.py). Address 0x80053764.
 
-Unit: `src/class_3bb8c_l.c`. Runner: echo, round 16.
+Unit: `src/ObjMStyleActor.c`. Runner: echo, round 16.
 
 118/118 words, byte-exact. `./build-and-verify.sh` green (whole-image SHA1
 verified).
@@ -91,7 +91,7 @@ before `DreamSysMethods_3bb8c_l` looked like the obvious fix but GCC 2.6.3
 rejects a duplicate `typedef struct X X;` even when the underlying type is
 identical each time (`redefinition of 'DreamSysObj_3bb8c_l'`), and this
 header is included by two OTHER live units this round (alpha's
-`class_3bb8c_i`, bravo's `class_3bb8c_k`) so the break wasn't visible until
+`TextEntryItemList`, bravo's `ObjMStyleActor`) so the break wasn't visible until
 a full `./build-and-verify.sh`. The elaborated-`struct` spelling sidesteps
 the whole issue: C allows naming an incomplete struct tag via a pointer
 before its full definition is in scope, no typedef required.
@@ -172,7 +172,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `world` is the viewport (NodeGuardedViewport: setLightMode, setClearColor, setFogNear, setFarColor, setUnkB4, setDrawEnabled), its getSubHandle the FadeBox fade box (setDivisorMode +0x0F0, startFadeDown +0x0D4); `attached` is `inSession`.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `world` is the viewport (NodeGuardedViewport: setLightMode, setClearColor, setFogNear, setFarColor, setUnkB4, setDrawEnabled), its getSubHandle the FadeBox fade box (setDivisorMode +0x0F0, startFadeDown +0x0D4); `attached` is `inSession`.
 
 ## Round 94 (track 6, charlie)
 

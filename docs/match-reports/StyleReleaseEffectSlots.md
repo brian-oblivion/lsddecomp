@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054CFC` on 2026-09-23 (tools/rename.py). Address 0x80054cfc.
 
-Unit `class_3bb8c_n`. **13/13 words, byte-exact.** First build.
+Unit `ObjMStyleActor`. **13/13 words, byte-exact.** First build.
 
 ## What it was
 
@@ -42,7 +42,7 @@ void StyleReleaseEffectSlots(void) {
 ```
 
 `gStyleVariant` is the same global already read elsewhere in this class family
-(`class_3bb8c_m.c`, `class_3bb8c_r.c IsStyleVariantEven`) as a plain `s32`.
+(`ObjMStyleActor.c`, `class_3bb8c_r.c IsStyleVariantEven`) as a plain `s32`.
 
 ### Proposed learning
 

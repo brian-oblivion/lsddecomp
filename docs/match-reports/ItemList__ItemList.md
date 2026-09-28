@@ -57,7 +57,7 @@
 
 ---
 
-Unit: `src/class_3bb8c_j.c`. `self` is `ItemList_3bb8c_j`. This is `ItemList_3bb8c_j`'s
+Unit: `src/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`. This is `ItemList_3bb8c_j`'s
 own constructor -- the occupant of `ItemListMethods_3bb8c_j::ctor` (+0x008),
 reached indirectly by `New_ItemList`
 (`GetItemListMethods()->ctor(self, arg0, arg1)`).
@@ -73,10 +73,10 @@ the fix. Settled by address, not by guess:
 - `func_80051A4C` (this unit, now named `GetTextEntryMethods`) returns
   `&gTextEntryMethods` directly -- but `gTextEntryMethods` is `Obj86ED0`'s OWN table
   (42 slots, `tools/classtable.py gTextEntryMethods`), a DIFFERENT class
-  established independently by class_3bb8c_i. It has NOTHING to do with
+  established independently by TextEntryItemList. It has NOTHING to do with
   this constructor's class.
 - This class's REAL table is `gItemListMethods`, reached through
-  `GetItemListMethods()` (class_3bb8c_k, MATCHED) -- `tools/classtable.py
+  `GetItemListMethods()` (ObjMStyleActor, MATCHED) -- `tools/classtable.py
   gItemListMethods` places every one of this unit's remaining functions
   (this ctor at +0x008, plus `ItemList__Finalize`/`AddChild`/
   `RemoveChild`/`RemoveAllChildren`/`NotifyChild`/`ResetCounters`/
@@ -86,7 +86,7 @@ the fix. Settled by address, not by guess:
   resolvable by `classtable.py` after all -- the earlier "no classtable
   entry exists for it" note was itself part of the same mistake (it
   looked up the wrong global).
-- class_3bb8c_k's OWN local view of this same gItemListMethods table already
+- ObjMStyleActor's OWN local view of this same gItemListMethods table already
   carries the name `ItemList`/`ItemListMethods` in the shared header,
   established independently from ITS OWN call sites. Reusing that bare
   name here would collide (both visible in this translation unit through
@@ -96,7 +96,7 @@ the fix. Settled by address, not by guess:
 Nothing about the matched BYTES was ever affected by any of this (a type
 name is not codegen) -- `build-and-verify.sh` and `tools/check-nonmatching.sh`
 stayed green throughout. Only the class attribution and `self`'s type
-name were wrong. See `src/class_3bb8c_j.c`'s file header comment for the
+name were wrong. See `src/TextEntryItemList.c`'s file header comment for the
 short version, and `GetTextEntryMethods.md` for the getter-side half of
 this same correction.
 
@@ -190,7 +190,7 @@ caches it in a register at all, re-reading and re-writing
 conditional `sw`) -- the plain `if (self->unk14 < len) self->unk14 = len;`
 above reproduces that shape with no local needed.
 
-Declarations it needs (all already live in `src/class_3bb8c_j.c`'s
+Declarations it needs (all already live in `src/TextEntryItemList.c`'s
 `ItemList_3bb8c_j`/`ItemListMethods_3bb8c_j` definitions, plus these locally-scoped
 externs which were removed when the function was restored to
 `INCLUDE_ASM` -- re-add if resuming):
@@ -276,7 +276,7 @@ the callee-saved register COUNT, seems to be what predicts this.
 ## Round 73 (charlie) — NON_MATCHING body promoted
 
 Track 1b: the round-19 preserved body above (with the `srl`/`sra` fix and
-the two scheduling matches) is now live in `src/class_3bb8c_j.c` under
+the two scheduling matches) is now live in `src/TextEntryItemList.c` under
 `#ifdef NON_MATCHING`, with the verified build still taking the `#else`
 `INCLUDE_ASM` branch. `./build-and-verify.sh` stayed green (no bytes
 changed) and `tools/check-nonmatching.sh` compiles and link-resolves it.
@@ -393,5 +393,5 @@ Local `p` renamed `item`. Constants: `mode == 1` is
 the two allocation sizes are `i * sizeof(*self->texts)` and
 `self->itemCount * sizeof(*self->textLens)` (were `* 4`). strlen/strcpy now
 come from Sony's `<strings.h>`, and DecodeFullWidthSjis's extern is
-`char *(char *dest, char *src)`, as class_3bb8c_i spells it. Zero bytes
+`char *(char *dest, char *src)`, as TextEntryItemList spells it. Zero bytes
 changed.

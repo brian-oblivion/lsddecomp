@@ -2,7 +2,7 @@
 
 > Renamed from `func_800534C8` on 2026-09-24 (tools/rename.py). Address 0x800534c8.
 
-**Unit:** class_3bb8c_l · **Size:** 122 words (0x1E8 bytes)
+**Unit:** ObjMStyleActor · **Size:** 122 words (0x1E8 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15, then re-affirmed "STILL
 BLOCKED, stub report stands" in the round-24 re-screen. That blocker was
@@ -78,7 +78,7 @@ the middle.
   division by 3) are BOTH canonical GCC 2.6.3 constant-division sequences —
   writing `val / 2 * 5 / 3` in ordinary C reproduces both exactly; no need
   to spell out the magic constant or shift amounts by hand.
-- **`SetDreamAuxWorld`** (matched round 43, `src/code_4cd08.c`) has no header
+- **`SetDreamAuxWorld`** (matched round 43, `src/DreamAux.c`) has no header
   prototype anywhere, so this unit's own call-site typing (all `s32`,
   matching its real definition) is local, same convention as
   `PickStageBgm`/`PickStageTexture`/etc. already declared in this file.
@@ -141,7 +141,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `self->unkC` was IntermediateBase::initArgs (its unk0 is read), `world` the viewport (setProjection +0x054, attachViewChild), `unk14` the StageMap (setAmbientColor +0x0BC, setChildParams, setConfig, setGridSpan, setAcceptedTags), `unk34` TimedTask::sound, `unk10` the FrameClock.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `self->unkC` was IntermediateBase::initArgs (its unk0 is read), `world` the viewport (setProjection +0x054, attachViewChild), `unk14` the StageMap (setAmbientColor +0x0BC, setChildParams, setConfig, setGridSpan, setAcceptedTags), `unk34` TimedTask::sound, `unk10` the FrameClock.
 
 ## Round 94 (track 6, charlie)
 
@@ -173,7 +173,7 @@ call and can go the same way.
 
 Comment history moved from the unit's externs:
 
-> code_4cd08.c's (MATCHED round 43); no header declares it. `world` is the
+> DreamAux.c's (MATCHED round 43); no header declares it. `world` is the
 > DreamSys it installs as gDreamAuxWorld (track 4, round 88).
 
 > GetStageGridDimensions comes from include/StageGrid.h, through DreamSys.h.

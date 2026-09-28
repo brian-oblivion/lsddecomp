@@ -102,7 +102,7 @@ same base class?**
    natural order, `a3==1` <-> swapped order) is exactly what this
    mechanism predicts.
 3. **This does NOT resolve the cross-unit question of whether `Entity`
-   and `Unk94Obj` (the types `Entity_e.c`/`Entity_d.c` etc. pass at THEIR
+   and `Unk94Obj` (the types `Entity_e.c`/`Entity.c` etc. pass at THEIR
    OWN call sites, via `Entity.h`'s own separate declaration) share a
    named common base with `SceneNodeObj`.** That question stays open --
    this function's own two parameters are typed `SceneNodeObj *` here

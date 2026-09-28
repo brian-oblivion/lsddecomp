@@ -2,9 +2,9 @@
 
 > Renamed from `func_800628D4` on 2026-09-24 (tools/rename.py). Address 0x800628d4.
 
-Unit: `Entity_e` (round 12). Calls `SceneNode__FaceTarget` with the same
+Unit: `Entity` (round 12). Calls `SceneNode__FaceTarget` with the same
 `(this, this->unk94, 1, 0, 0)` argument shape already established in
-`Entity_d.c`'s handlers, plus a same-value dispatch through
+`Entity.c`'s handlers, plus a same-value dispatch through
 `EntityMethods::slot130`/`slot30`.
 `void Entity__MoodCue75(Entity *this, EntityMoodHandlerArg *out)`.
 
@@ -44,9 +44,9 @@ over-correcting into "always hoist stores out of `if` bodies".
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 75 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 75 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity.
 
-Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity_b/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice1Tone`, `voice2Tone`.
+Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice1Tone`, `voice2Tone`.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

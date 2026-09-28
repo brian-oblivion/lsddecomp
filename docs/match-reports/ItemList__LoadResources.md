@@ -6,7 +6,7 @@
 
 > Renamed from `func_80051F24` on 2026-09-24 (tools/rename.py). Address 0x80051f24.
 
-Unit: `src/class_3bb8c_j.c`. `self` is `ItemList_3bb8c_j`.
+Unit: `src/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`.
 
 ## Semantics (established with reasonable confidence from the disassembly)
 
@@ -126,7 +126,7 @@ register diffs, nothing else).
 **A permuter lead that scores well against the permuter's own stripped
 scaffold does not always transfer to the real build.** Confirmed here:
 a score-30 candidate (down from 140) translated by hand back into
-`src/class_3bb8c_j.c` and rebuilt through `./build-and-verify.sh`
+`src/TextEntryItemList.c` and rebuilt through `./build-and-verify.sh`
 reproduced the ORIGINAL 75/95 score exactly, no improvement. Worth a
 `--debug` re-check of the CANDIDATE (not just the base) before trusting
 a non-zero permuter score as a real lead -- this project's existing
@@ -209,7 +209,7 @@ reshaping).
 
 **Three independent functions across two different header families
 (`DayTaskStageMap`'s `StageMap__BuildFootprintRects`, `TitleMenuTaskObjF`'s `TaskObjF__WriteMemcardSaveFile`,
-`class_3bb8c_j`'s `ItemList__LoadResources`) now confirm the same negative result
+`TextEntryItemList`'s `ItemList__LoadResources`) now confirm the same negative result
 for the SAME lever (declaration/introduction order of the contested
 locals).** This is strong enough evidence to stop treating "try a
 different declaration order" as a live lever for this residue class at
@@ -225,7 +225,7 @@ reordering attempt first.
 
 Track 1b: the preserved body above (75/95, pure register-identity
 rotation of the two repeated global addresses and the handle across the
-same three registers) is now live in `src/class_3bb8c_j.c` under
+same three registers) is now live in `src/TextEntryItemList.c` under
 `#ifdef NON_MATCHING`, with the verified build still taking the `#else`
 `INCLUDE_ASM` branch. `./build-and-verify.sh` stayed green (no bytes
 changed) and `tools/check-nonmatching.sh` compiles and link-resolves it.
@@ -257,7 +257,7 @@ handle has a short, dense live range, outranks the addresses, and takes `$s0`
 in turn, as retail does.
 
 The template was the MATCHED sibling `TextEntry__LoadCardResources` in
-`src/class_3bb8c_i.c`: the same "CARD\\<name>.TIM" resource loader, with
+`src/TextEntryItemList.c`: the same "CARD\\<name>.TIM" resource loader, with
 `char path[0x20]`, `dir`/`ext` locals and `handle1`/`handle2`. Screen for the
 next case: a cross-unit sibling with the same call skeleton (here
 `BuildFileName` -> `New_TimImage` -> `slot78` -> `New_ScreenSprite`).
@@ -334,9 +334,9 @@ Data this function reads, renamed with tools/rename.py:
 | D_80087028 | gItemListPanelRect | A | the only reference is this New_ScreenSprite call's rect: SELECT.TIM's cell, SpriteRect {0, 0, 256, 160}; sibling of gTextEntryPanelRect |
 | D_8008AAF8 | gItemListPanelPos | A | the panel's attachToParent position (-100, -60), a ScreenSpritePos; sibling of gTextEntryPanelPos |
 | D_8008AB14 | sStrSelect | A | the string "SELECT", the panel TIM's name; sibling of sStrComInput |
-| D_800116E4 | sItemListStrFontIcon | A | this unit's copy of "FONTICON" (class_3bb8c_i's is sStrFontIcon, 0x8001161C) |
-| D_8008AB1C | sItemListCardPathPrefix | A | this unit's copy of "CARD\\" (class_3bb8c_i's is sCardPathPrefix) |
-| D_8008AB24 | sItemListTimExt | A | this unit's copy of ".TIM" (class_3bb8c_i's is sTimExt) |
+| D_800116E4 | sItemListStrFontIcon | A | this unit's copy of "FONTICON" (TextEntryItemList's is sStrFontIcon, 0x8001161C) |
+| D_8008AB1C | sItemListCardPathPrefix | A | this unit's copy of "CARD\\" (TextEntryItemList's is sCardPathPrefix) |
+| D_8008AB24 | sItemListTimExt | A | this unit's copy of ".TIM" (TextEntryItemList's is sTimExt) |
 
 The path buffer's 0x20 is `CARD_TIM_PATH_SIZE` (32, unit-local). The two
 data externs are typed as what they are (`SpriteRect`, `ScreenSpritePos`,

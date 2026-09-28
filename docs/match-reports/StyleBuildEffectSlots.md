@@ -1,4 +1,4 @@
-# StyleBuildEffectSlots -- MATCHED (60/60 words), class_3bb8c_n
+# StyleBuildEffectSlots -- MATCHED (60/60 words), ObjMStyleActor
 
 > Renamed from `func_80054B84` on 2026-09-23 (tools/rename.py). Address 0x80054b84.
 
@@ -14,7 +14,7 @@ void StyleBuildEffectSlots(void *arg0);
 ## New externs
 
 ```c
-extern void SetStyleEffectSources(s32 arg0, void *arg1, s32 arg2, s32 arg3); /* class_3bb8c_o.c, ALREADY MATCHED */
+extern void SetStyleEffectSources(s32 arg0, void *arg1, s32 arg2, s32 arg3); /* ObjMStyleActor.c, ALREADY MATCHED */
 extern s32 rand(void);                                               /* libc, shared local view used project-wide */
 extern s8 gStyleKind0Counts[];                                              /* 4-entry table, forward-indexed by rand()&3 */
 extern void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2);        /* forward decl, own unit, cold */
@@ -23,7 +23,7 @@ extern void StyleFillEffectKind3(void *arg0, void *arg1);                   /* f
 extern void StyleFillEffectKind2(void *arg0, void *arg1);                   /* forward decl, own unit, cold */
 ```
 
-`SetStyleEffectSources` is `class_3bb8c_o.c`'s already-matched
+`SetStyleEffectSources` is `ObjMStyleActor.c`'s already-matched
 `void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3)`; this
 call site only needs the ABI shape (`s32,void*,s32,s32`), matching the
 project's convention of a looser cross-unit local signature. `gStyleVariant`,
@@ -91,7 +91,7 @@ Dispatches on `gStyleVariant` (`PickStyleFallbackConfig`'s "kind") to
 `StyleFillEffectKind3` (variant 0) or `StyleFillEffectKind2` (variant 2).
 The build/update/release triad naming mirrors `StyleBuildDecorSet` above,
 for the SEPARATE `gStyleEffectSlots` array (a different object class --
-`Obj876FC`, allocated through `class_3bb8c_r.c`'s `New_StyleEffect`, not
+`Obj876FC`, allocated through `ObjMStyleActor.c`'s `New_StyleEffect`, not
 `New_BoxFill`). MATCHED, 60/60, first build.
 
 ## Track 4 (2026-09-26, round 88, charlie)
@@ -105,7 +105,7 @@ for the SEPARATE `gStyleEffectSlots` array (a different object class --
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_80087324` | `gStyleKind0Counts` | A | 4 bytes {0, 3, 8, 16} picked by `rand() & 3`, passed as StyleFillEffectKind0's count. |
-| `gStyleTargetObj` | `gStyleSceneRefs` | A | RegisterStyleConfig stores its arg2 there, and its one caller passes `&ObjM::ctorSound`, the start of the sound/dreamerTmd/etcTim/cachedViewport block (`StyleSceneRefs`); kept `s32` because class_3bb8c_m.c declares it so. |
+| `gStyleTargetObj` | `gStyleSceneRefs` | A | RegisterStyleConfig stores its arg2 there, and its one caller passes `&ObjM::ctorSound`, the start of the sound/dreamerTmd/etcTim/cachedViewport block (`StyleSceneRefs`); kept `s32` because ObjMStyleActor.c declares it so. |
 | `0x10` | `STYLE_VARIANT2_EFFECTS` (16) | B | variant 2 fills kind 1 up to this many kind-0 plus kind-1 effects. |
 
 `gStyleSceneRefs + 4/8/0xC` are fields of the `StyleSceneRefs` view (ObjM's dreamerTmd, etcTim, cachedViewport). Locals: `pos`, `refs`, `kind0Count`, `kind1Count`, `next`.

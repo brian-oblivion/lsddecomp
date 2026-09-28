@@ -278,9 +278,9 @@ from the retail bytes), the same mask `Update` tests (4 = r, 2 = g, 1 = b).
 Its sibling counts up; see `FadeBox__StartFadeUp`. The arguments are
 `configure`'s, forwarded (`source`, `channels`, `unk7C`), and the slot is
 now typed with them. Callers, all through Entity's `unk100`:
-Entity__MoodCue57 (Entity_d) passes (companion2, 4, 0), Entity__MoodCue85
-(Entity_f) and Entity__MoodCue98 (Entity_g) (companion2, 7, 0), and
-Entity__MoodCue91 (Entity_f) (companion2, 0, 0). Tier B: what the fade is for is not shown.
+Entity__MoodCue57 (Entity) passes (companion2, 4, 0), Entity__MoodCue85
+(Entity) and Entity__MoodCue98 (Entity_g) (companion2, 7, 0), and
+Entity__MoodCue91 (Entity) (companion2, 0, 0). Tier B: what the fade is for is not shown.
 
 ## Track 6 (2026-09-26, round 93, charlie)
 

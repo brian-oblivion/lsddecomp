@@ -4,7 +4,7 @@
 
 > Renamed from `func_800533F0` on 2026-09-24 (tools/rename.py). Address 0x800533f0.
 
-**Unit:** class_3bb8c_l · **Size:** 26 words (0x68 bytes) ·
+**Unit:** ObjMStyleActor · **Size:** 26 words (0x68 bytes) ·
 **Status: MATCHED 26/26**, whole-image SHA1 green.
 
 ## What it does

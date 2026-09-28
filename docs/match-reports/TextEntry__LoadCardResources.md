@@ -4,7 +4,7 @@
 
 > Renamed from `func_80050F98` on 2026-09-24 (tools/rename.py). Address 0x80050f98.
 
-Unit `class_3bb8c_i`, 125-line body -- the largest function in this round's
+Unit `TextEntryItemList`, 125-line body -- the largest function in this round's
 batch. Obj86ED0's own "load the two memory-card TIM resources" method:
 builds two `CARD\\<NAME>.TIM` paths, loads each through a short-lived
 resource handle, and wraps/converts each into a `ChildObj86ED0`-shaped
@@ -73,7 +73,7 @@ rodata bytes at `sStrComInput`/`sStrFontIcon`/`sCardPathPrefix`/`sTimExt`
 
 `New_TimImage` (a resource loader taking a path, returning a handle) is
 already typed at several OTHER call sites in the project
-(`Task.h`/`DayTaskStageMap.h`/`class_3bb8c_j.c`, all with their own local
+(`Task.h`/`DayTaskStageMap.h`/`TextEntryItemList.c`, all with their own local
 return-type view per this project's established convention) -- confirmed
 this is the same function by address, given its own local reading here.
 
@@ -191,7 +191,7 @@ says what they are):
 | D_8008AAC8 | gTextEntryTextColor | the text row's setColor: (128, 128, 0) |
 | D_8008AACC | gTextEntryPanelPos | the panel's attachToParent position: (-70, -60) |
 | D_8008AAD4 | gTextEntryTextPos | the text row's attachToParent position: (-62, -15) |
-| D_8008AADC | gTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (class_3bb8c_j) reads its x |
+| D_8008AADC | gTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (TextEntryItemList) reads its x |
 
 The externs are typed `SpriteRect`, `SpriteRgb` and `ScreenSpritePos`
 (TaskObjF's gCardIconRect/gCardIconPos are the precedent), so two casts
@@ -200,14 +200,14 @@ cast. Locals `handle1`/`handle2` -> `panelTim`/`fontTim`, parameter
 `arg1` -> `parent`, `path[0x20]` -> `path[32]`, the cursor cell `0x5F` ->
 `'_'`. Zero bytes changed.
 
-Proposed (class_3bb8c_j's): D_8008AAE0 is the cursor position's y (-12),
+Proposed (TextEntryItemList's): D_8008AAE0 is the cursor position's y (-12),
 read by SetCursorPos; a name such as `gTextEntryCursorY`, or reading it as
-`gTextEntryCursorPos.y` once class_3bb8c_j types gTextEntryCursorPos as a
+`gTextEntryCursorPos.y` once TextEntryItemList types gTextEntryCursorPos as a
 ScreenSpritePos.
 
 ## Round 98: gTextEntryCursorPos unified (track 4b)
 
 The local `extern ScreenSpritePos gTextEntryCursorPos` moved to
-include/TextEntry.h, the only declaration; class_3bb8c_j's `s32` view and its
+include/TextEntry.h, the only declaration; TextEntryItemList's `s32` view and its
 `D_8008AAE0` (the y) now read `gTextEntryCursorPos.x`/`.y`, byte-exact. The
 proposal above is applied.

@@ -5,10 +5,10 @@
 
 /*
  * Actor -- a positioned scene object that moves (class id 0x34, method table
- * gActorMethods): a SceneNode subclass. Methods in src/class_3bb8c_o.c and
- * src/class_3bb8c_p.c. Three classes derive from it directly
- * (`typeviews.py --tree`): TodActor (0x234, code_55dd4; Entity below it),
- * DreamSys (0x1F34) and StyleEffect (0xEF34, class_3bb8c_r/s).
+ * gActorMethods): a SceneNode subclass. Methods in src/ObjMStyleActor.c.
+ * Three classes derive from it directly (`typeviews.py --tree`): TodActor
+ * (0x234, src/TodActor.c; Entity below it), DreamSys (0x1F34) and
+ * StyleEffect (0xEF34, src/ObjMStyleActor.c).
  *
  * Children and companions. addChild/removeChild/removeAllChildren chain
  * SceneNode's and also record two companions by the child's class id:
@@ -110,7 +110,7 @@ struct Actor {
 extern ActorMethods gActorMethods;
 extern ActorMethods *GetActorMethods(void); /* returns &gActorMethods */
 
-/* The class's own methods, in ROM order (class_3bb8c_o, then class_3bb8c_p),
+/* The class's own methods, in ROM order (src/ObjMStyleActor.c),
  * then its non-slot helpers. A subclass reaches the base ones through
  * GetActorMethods() and upcasts. */
 void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport);

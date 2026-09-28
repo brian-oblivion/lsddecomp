@@ -28,7 +28,18 @@
  * 4. Linking: WallLink/DynamicLink and the Try...Link family, over the free
  *    Test4.../GetStaticSpawn testers and the stage spawn tables. ExecuteLink
  *    records the link (enum DreamSysLinkCode) in Actor's `state` and tells
- *    the parents. */
+ *    the parents.
+ *
+ * What decided its edges (python3 tools/tuboundary.py): both are kept, and
+ * the binary forces a file boundary in each one's stretch. Before it, the
+ * jump tables of ObjM__OnDreamSysNotify (0x8001174c, ObjMStyleActor.c) and
+ * DreamSys__OnPadEvent (0x80011788) differ in parity ("a forced boundary
+ * lies in this stretch: tables 0x8001174c / 0x80011788"), and the edge
+ * after GetGraphRoomMethods is the only gap left there outside this class.
+ * After it, DreamSys__InstanceEffectsOnJournal (0x80011848) and
+ * CheckDreamAuxTriggerCondition (0x8001188c, DreamAux.c) do the same
+ * ("tables 0x80011848 / 0x8001188c"), and content puts that boundary at
+ * the edge: DreamAux is its own subsystem, with its own .rodata line. */
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
@@ -1679,7 +1690,7 @@ s32 GetStageLinkAngle(void) {
     return result;
 }
 
-/* Set by SetInstantTeleportersEnabled (code_4cd08.c calls it), tested by
+/* Set by SetInstantTeleportersEnabled (DreamAux.c calls it), tested by
    Test4InstantTeleporters. */
 extern s32 gInstantTeleportersEnabled;
 

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005F708` on 2026-09-24 (tools/rename.py). Address 0x8005f708.
 
-**Unit:** Entity_c · **Size:** 62 words · **Status:** MATCHED (62/62 words,
+**Unit:** Entity · **Size:** 62 words · **Status:** MATCHED (62/62 words,
 whole-image build verified byte-exact)
 
 ## What it does
@@ -54,7 +54,7 @@ and whether the multiply-back chain has that trailing doubling step.
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 29 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_b/d/e/g.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 29 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), read directly off the table (this unit's own row assignment, round 78). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity/d/e/g.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

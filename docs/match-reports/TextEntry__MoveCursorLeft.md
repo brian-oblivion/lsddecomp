@@ -4,7 +4,7 @@
 
 > Renamed from `func_800516C0` on 2026-09-24 (tools/rename.py). Address 0x800516c0.
 
-Unit `class_3bb8c_i`. Obj86ED0's own "retreat frame counter, clamped at
+Unit `TextEntryItemList`. Obj86ED0's own "retreat frame counter, clamped at
 zero" method. Mirror pair with `TextEntry__MoveCursorRight` (increment/clamp-at-`unk10`,
 matched alongside it) -- see that report for the shared shape discussion.
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_800518F4` on 2026-09-24 (tools/rename.py). Address 0x800518f4.
 
-**Unit:** class_3bb8c_j · **Size:** 41 words (0xA4 bytes)
+**Unit:** TextEntryItemList · **Size:** 41 words (0xA4 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Matched on the first
@@ -16,12 +16,12 @@ This report originally typed `self` as `Obj866E8` (gStageMapMethods) and typed
 `self->unk40` through a unit-local `Unk40Obj866E8`/`Unk40Obj866E8Methods`
 duplicate. Both were wrong. `tools/classtable.py gTextEntryMethods` places this
 function at that table's +0x0A4 (`gStageMapMethods`'s 80 slots hold none of this
-group's six addresses) -- `self` is `Obj86ED0` (class_3bb8c_i's shared
+group's six addresses) -- `self` is `Obj86ED0` (TextEntryItemList's shared
 type), whose OWN struct in `include/class_3bb8c.h` already types
 `self->unk40` as `ChildObj86ED0 *`. The `+0x0BC` slot this function
 dispatches through was simply missing a name on the shared
 `ChildMethods86ED0` -- added additively there instead of duplicated
-locally. See `src/class_3bb8c_j.c`'s file header comment and
+locally. See `src/TextEntryItemList.c`'s file header comment and
 `TextEntry__PrevChar.md` for the full evidence trail. Zero bytes
 affected (type names are not codegen).
 
@@ -71,11 +71,11 @@ delay slot since it doesn't depend on the branch outcome.
 - `ChildMethods86ED0::slotBC` (offset 0x0BC) — round 75, this function's own
   dispatch target on the ALREADY-shared `ChildObj86ED0` (`self->unk40`).
   `unk28`/`unk40`/`unk44`/`Obj86ED0Methods::slot60` were already present on
-  the shared `Obj86ED0`/`Obj86ED0Methods`, established by class_3bb8c_i —
+  the shared `Obj86ED0`/`Obj86ED0Methods`, established by TextEntryItemList —
   no edit needed for those.
 
 `gTextEntryCursorPos` is read here as a plain VALUE (`s32`, used arithmetically:
-`arg1 * 7 + gTextEntryCursorPos`), a different reading from `class_3bb8c_i.c`'s own
+`arg1 * 7 + gTextEntryCursorPos`), a different reading from `TextEntryItemList.c`'s own
 `extern s32 gTextEntryCursorPos;` (there, only its ADDRESS is taken, as an opaque
 `slot4C` argument). Both are legitimate independent local views of the same
 global per the project's convention — they're in separate translation
@@ -113,5 +113,5 @@ reference.
 
 Locals `local`/`obj` renamed `screenPos`/`cursor`. The `* 7` is
 TEXTROW_DEFAULT_PITCH (include/TextRow.h): gTextEntryCursorPos.x (-62)
-equals gTextEntryTextPos.x (-62, class_3bb8c_i), so the cursor steps across
+equals gTextEntryTextPos.x (-62, TextEntryItemList), so the cursor steps across
 the text row's cells at the row's own default pitch. Zero bytes changed.

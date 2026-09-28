@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054B1C` on 2026-09-23 (tools/rename.py). Address 0x80054b1c.
 
-Unit `class_3bb8c_n`. **13/13 words, byte-exact.** First build.
+Unit `ObjMStyleActor`. **13/13 words, byte-exact.** First build.
 
 ## What it was
 
@@ -25,7 +25,7 @@ function -- no globals, no calls.
 
 Three independent byte ops on two 3-byte buffers with a shared delta --
 reads like an RGB colour nudge (two channels subtracted, one added), which
-fits this class's neighbourhood: `class_3bb8c_m.c` (the sibling unit just
+fits this class's neighbourhood: `ObjMStyleActor.c` (the sibling unit just
 before this one) reads a 3-byte-stride colour table (`gStylePalette`) into the
 same region of globals this unit's other functions touch.
 

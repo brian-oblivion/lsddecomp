@@ -4,7 +4,7 @@
 
 REVISITED, round 59: MATCHED 213/213 byte-exact; names/types not relevant
 
-**Unit:** `Entity_e` · **Size:** 213 words · **Result:** 213/213 words,
+**Unit:** `Entity` · **Size:** 213 words · **Result:** 213/213 words,
 `insertions 0 / deletions 0`, `./build-and-verify.sh` green
 (`OK: build matches retail SLPS_015.56`), `Entity__MoodCue79` back at its retail
 address `0x80062fac`.
@@ -18,7 +18,7 @@ resolved round 42). Closed in **11 builds** this round.
 The unit's names and types **did change** since round 45 — `unkFC` is now
 `moodTimer`, `unk94` is `target`, `slot148` is `getProximityRatio`,
 `slot16C` is `stopSoundCue` — and `tools/rename.py` had already rewritten
-the preserved `#if 0` body in `src/Entity_e.c` accordingly. **None of it
+the preserved `#if 0` body in `src/Entity.c` accordingly. **None of it
 mattered.** Every renamed field was already correctly identified in round
 45's derivation; the new names made the body easier to read and changed
 nothing about what compiled. Re-reading the callers likewise produced
@@ -225,9 +225,9 @@ is. Round 45 rejected a correct lever on a 5-word score drop.
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 78 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 78 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity.
 
-Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity_b/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`.
+Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`.
 
 **Data/global renamed this round:** `D_80089D0C` -> `ROTATION_XPLUS90` (first {num,den} pair = (90,1), the X slot by the same X/Y/Z decoding as `Entity__MoodCue68`'s report), tier B. `D_8008ACCC` -> `sMoodCue78TransitionDone`, tier B: a one-shot s32 flag local to this function -- cleared at `out->unk4==0`, set when the `moodState==0xB` branch fires at `unk4==0x1FE`, read once more at `unk4==0x208` to gate a second `stopSoundCue`/`moodState` reset. No other file in `src/` references it.
 
@@ -239,4 +239,4 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 7 (round 93, echo)
 
-Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Local `tmp` is `rollOrDy`: it holds the rand() % 3 roll and later the y move. Splitting it into `roll` and `dy` was measured and changes the register allocation (whole image red), so it stays one local with a `MATCHING:` line. Both `state = 1` after stopSoundCue are ENTITY_STATE_DONE. `sMoodCue78TransitionDone` got a comment on its declaration (what sets and reads it). `SCALE_UNIT` ({1,1} x3, the identity scale) stays a symbol: Entity_g declares it too, so a rename moves a declaration in another unit; proposed to the head. Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Local `tmp` is `rollOrDy`: it holds the rand() % 3 roll and later the y move. Splitting it into `roll` and `dy` was measured and changes the register allocation (whole image red), so it stays one local with a `MATCHING:` line. Both `state = 1` after stopSoundCue are ENTITY_STATE_DONE. `sMoodCue78TransitionDone` got a comment on its declaration (what sets and reads it). `SCALE_UNIT` ({1,1} x3, the identity scale) stays a symbol: Entity declares it too, so a rename moves a declaration in another unit; proposed to the head. Byte-identical (whole image green).

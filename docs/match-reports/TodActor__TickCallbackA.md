@@ -4,7 +4,7 @@
 
 > Renamed from `func_80066150` on 2026-09-24 (tools/rename.py). Address 0x80066150.
 
-**Unit:** code_55dd4 · **Size:** 29 words (0x74 bytes) · **Status:** MATCHED
+**Unit:** TodActor · **Size:** 29 words (0x74 bytes) · **Status:** MATCHED
 (29/29 words, whole-image `./build-and-verify.sh` green)
 
 ## What it does
@@ -31,7 +31,7 @@ semantically equivalent but is not what was tried first — the combined form
 matched immediately).
 
 Corrects `self->unk68`'s type from the generic `void *` the first pass gave
-it to `Unk68Obj *` (a new minimal type in `include/code_55dd4.h`, typed
+it to `Unk68Obj *` (a new minimal type in `src/TodActor.c`, typed
 only at its `+0x088` slot, the only one this unit calls). Adds `slotC4`
 (`+0x0C4`) to `TodActorMethods`.
 

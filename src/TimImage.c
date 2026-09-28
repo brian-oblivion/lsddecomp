@@ -13,7 +13,7 @@
  *
  * RotateVramRectRight is not a TimImage method (no method table lists it): it
  * circularly scrolls a VRAM rectangle right, one column at a time, through the
- * draw singleton's moveImage slot, for class_3bb8c_n.c's StyleScrollVramStrips.
+ * draw singleton's moveImage slot, for ObjMStyleActor.c's StyleScrollVramStrips.
  *
  * Edges: both are placed Sony objects (libcd/event before, libgs/gs_122 after),
  * so the file is this whole gap. Content alone would put RotateVramRectRight in

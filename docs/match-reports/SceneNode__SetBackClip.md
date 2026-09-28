@@ -52,7 +52,7 @@ None new -- extends the family census.
 (tier A: pure bitfield accessor, shift 8 width 1, double-inverted
 boolean -- same shape as the renamed `SceneNode__SetUseZ`).
 Held back because this symbol is name-checked (in comments, not calls)
-from `src/class_3bb8c_o.c:186` and `include/DayTaskStageMap.h:173` -- two
+from `src/ObjMStyleActor.c:186` and `include/DayTaskStageMap.h:173` -- two
 different units' own vtable-slot census comments, both discussing a
 coincidental address match in an unrelated table (`gStyleEffectMethods`'s own
 slot80, a different class entirely). Renaming would edit those files
@@ -60,7 +60,7 @@ too, out of this round's scope. Posted to the broadcast.
 
 ## Track 6 (round 91, echo): named `SceneNode__SetBackClip`, tier A
 
-`GetSetBitField(&self->attribute, 8, 1, on == 0) == 0`: `on` clears libgs.h's GsNBACKC ("no back clip"), the same inverted shape as SetDisplay/GsDOFF and SetLighting/GsLOFF. Was `GetSetUnk10Flag8`. Slot +0x080 kept as `getSetUnk10Flag8`: its callers are in class_3bb8c_o.c and class_3bb8c_s.c, outside this job; `setBackClip` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+`GetSetBitField(&self->attribute, 8, 1, on == 0) == 0`: `on` clears libgs.h's GsNBACKC ("no back clip"), the same inverted shape as SetDisplay/GsDOFF and SetLighting/GsLOFF. Was `GetSetUnk10Flag8`. Slot +0x080 kept as `getSetUnk10Flag8`: its callers are in class_3bb8c_o.c and ObjMStyleActor.c, outside this job; `setBackClip` proposed. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
 
 ## Round 100 (delta): track 7
 

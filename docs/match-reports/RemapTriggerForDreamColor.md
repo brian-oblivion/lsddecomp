@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005C930` on 2026-09-21 (tools/rename.py). Address 0x8005c930.
 
-**Unit:** code_4cd08 · **Size:** 29 words · **Status:** MATCHED round 43
+**Unit:** DreamAux · **Size:** 29 words · **Status:** MATCHED round 43
 (29/29, byte-exact whole-image build, first attempt).
 
 ## History
@@ -48,7 +48,7 @@ tested since the cached-local reading matched on the first build.
 
 `TriggerWorldFn80` (vtable slot 0x80, self-only, `s32` return) was promoted
 from a function-local typedef in `IsCurrentDreamColor`'s first draft to a shared
-typedef in `include/code_4cd08.h`, since this function needed the identical
+typedef in `include/DreamAux.h`, since this function needed the identical
 one immediately after -- two independent call sites is the point past which
 sharing beats duplicating for a same-unit type. `TriggerWorldFn` (the
 existing two-argument vtable-0x22 alias) and `TriggerWorldFn80` now sit next
@@ -75,14 +75,14 @@ gates it, are not established from this unit alone, hence B not A.
 ## Track 4 (2026-09-26, round 88, bravo)
 
 The view `*gDreamAuxWorld` is cast to is renamed `DreamAuxWorld` /
-`DreamAuxWorldFn80` in include/code_4cd08.h (was `TriggerWorld` /
+`DreamAuxWorldFn80` in include/DreamAux.h (was `TriggerWorld` /
 `TriggerWorldFn80`, same `{ void **vtable; }` shape, so the call is
 unchanged). The name `TriggerWorld` now belongs to the class gTriggerWorldMethods
 (include/TriggerWorld.h), whose table is 0x8C bytes: this call loads byte
 +0x200 of its object's table (`lw v0,512(v0)`), so gDreamAuxWorld is not a
 TriggerWorld. Its real class is unresolved. Bytes unchanged.
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 

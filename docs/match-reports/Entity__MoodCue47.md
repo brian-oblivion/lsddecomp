@@ -2,7 +2,7 @@
 
 > Renamed from `func_8006090C` on 2026-09-24 (tools/rename.py). Address 0x8006090c.
 
-Unit: `Entity_d` (second pass, round 2026-09-03). State-machine-style
+Unit: `Entity` (second pass, round 2026-09-03). State-machine-style
 dispatch on `this->unk44`, no "out" parameter (confirmed from its own body,
 same as `Entity__RollScaleOrDelayedDrift`/`Entity__MoodCue56` earlier in this unit).
 `void Entity__MoodCue47(Entity *this)`.
@@ -64,7 +64,7 @@ None -- clean state-machine dispatch, no residue, no register-allocation
 surprises. Notable only for being the third distinct slot discovered on
 `Unk94Methods` in this unit (after `slot1A0` from `Entity__MoodCue46`),
 confirming `Unk94Obj` carries a substantial vtable of its own worth
-resolving incrementally as more Entity_d functions touch it.
+resolving incrementally as more Entity functions touch it.
 
 ## Naming
 
@@ -73,10 +73,10 @@ convention as `Entity__MoodCue00` (round 71): the function's address is the
 handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
 0x80089EB0, 0x10-byte stride) at row 47, read directly from
 `disk/SLPS_015.56` (not inferred from address proximity -- see
-`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+`src/Entity.c`'s unit header comment, which flags that row order does NOT
 track code address once row 115 is reached). Mechanics established
 (mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
-`Entity_b.c`'s own header comment); which dream object owns the row is not.
+`Entity.c`'s own header comment); which dream object owns the row is not.
 
 ## Proposed field names
 
@@ -89,7 +89,7 @@ track code address once row 115 is reached). Mechanics established
 Not proposing `unk80`/`unk84`: both are read here as `moodTimer`-scaling
 constants (a divisor/multiplier derived from the mood row) but the existing
 header comment already flags `unk84` as carrying a SECOND, unrelated
-loop-counter meaning in `Entity_f.c` (`Entity__MoodCue91`/`Entity__MoodCue92`), so a
+loop-counter meaning in `Entity.c` (`Entity__MoodCue91`/`Entity__MoodCue92`), so a
 single name would misdescribe one of the two uses -- exactly the ambiguity
 CLAUDE.md's field-ownership rule exists to keep out of a shared header.
 

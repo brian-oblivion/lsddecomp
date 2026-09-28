@@ -83,7 +83,7 @@ not in registers.
   generic.
 - **`other` is not narrowed.** Other units call this symbol with a different
   class as the receiver and a plain `s32` second argument
-  (`include/code_55dd4.h`, `src/class_3bb8c_s.c`); the `SceneNode__` prefix
+  (`src/TodActor.c`, `src/ObjMStyleActor.c`); the `SceneNode__` prefix
   is still right, because any caller must carry the GsDOBJ2 layout this body
   dereferences.
 
@@ -94,8 +94,8 @@ class-9 child (gTmdModelMethods) that SceneNode__AddChild tag-tests. That class
 has no C yet, so the two words LinkModel reads live in a local
 `ModelObj_d294` view in `src/SceneNode.c`: `+0x0C tmdFile` and `+0x10 tmd`.
 The object fields are renamed: +0x18 `unk18` is now `tmd` (GsDOBJ2.tmd), and
-+0x20 `unk20` is now `model`. The local externs in `include/code_55dd4.h` and
-`src/class_3bb8c_s.c`, `(void *self, s32 arg)`, are deleted, and their
++0x20 `unk20` is now `model`. The local externs in `src/TodActor.c` and
+`src/ObjMStyleActor.c`, `(void *self, s32 arg)`, are deleted, and their
 callers upcast. Byte-identical.
 
 ## Track 4 (2026-09-26, round 87, delta)

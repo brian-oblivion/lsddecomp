@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057FC8` on 2026-09-24 (tools/rename.py). Address 0x80057fc8.
 
-Unit: `src/class_3bb8c_t.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x008`
+Unit: `src/ObjMStyleActor.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x008`
 -- THIS is `gGraphRoomMethods`'s own ctor (resolved via `tools/classtable.py
 gGraphRoomMethods`), the callee of this unit's own `New_GraphRoom`'s `ctor(...)`
 call.
@@ -38,7 +38,7 @@ opaque object type, `D_80087AACUnk48Obj`), stashes `arg1` into
 `self->unk_0xA4`, and finally TAIL-CALLS its own class's `+0x040` slot
 (`slot40`), forwarding its return value -- the exact same "ctor ends by
 calling another of its own class's slots" shape already seen in
-`class_3bb8c_p`'s `VariantSprite__VariantSprite`.
+`ObjMStyleActor`'s `VariantSprite__VariantSprite`.
 
 Uses `sGraphSoundBankPath` (the `"ETC\ETCSE"` string, the other of this unit's two
 standalone strings named in its own header comment).
@@ -68,7 +68,7 @@ tools/funcdiff.py GraphRoom__GraphRoom   # 44/44
 **`GraphRoom__GraphRoom`** -- tier B. `Class__Class` ctor
 convention; this IS `GraphRoomObj`'s own vtable slot +0x008
 (`tools/classtable.py gGraphRoomMethods`). Class identity: see
-`src/class_3bb8c_t.c`'s header comment.
+`src/ObjMStyleActor.c`'s header comment.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

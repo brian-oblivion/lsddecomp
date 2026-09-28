@@ -57,7 +57,7 @@ translated to idiomatic naming:
   documents the exact same lever from `ItemList__AttachTarget` ("A `do { ... }
   while (0)` wrapper around an otherwise-unconditional body can be
   load-bearing for delay-slot scheduling... mechanism unexplained"), and
-  `src/Entity_c.c`'s `Entity__MoodCue26` already ships it in matched,
+  `src/Entity.c`'s `Entity__MoodCue26` already ships it in matched,
   committed code with an identical comment ("load-bearing for register
   allocation only... without it GCC swaps which callee-saved register
   holds `this` vs `out`"). This is a THIRD confirmed instance of the same
@@ -223,4 +223,4 @@ stays in the unit):
 
 ## Track 7 (round 99, bravo)
 
-The fourth parameter `arg3` is now `attachArg` (here, in BoxFill.h's prototype and in the +0x0C4 slot; names only). The `q = self` copy is gone: the body uses `self` directly, byte-exact. The do/while(0) stays: removed, the build differs at 0x80040860 (`sw $ra` / `sw $s1` swapped, retail `1800bfaf`, built `1400b1af`), measured this round; it now carries a one-line `MATCHING:` comment. The field it writes, `unk4C`, is also written by BoxFill__Reset in ScreenWidgets, so its name is proposed, not applied: `attachArg` (the fourth argument stored; no reader anywhere, and both call sites, in GraphRoom (class_3bb8c_t), pass 0).
+The fourth parameter `arg3` is now `attachArg` (here, in BoxFill.h's prototype and in the +0x0C4 slot; names only). The `q = self` copy is gone: the body uses `self` directly, byte-exact. The do/while(0) stays: removed, the build differs at 0x80040860 (`sw $ra` / `sw $s1` swapped, retail `1800bfaf`, built `1400b1af`), measured this round; it now carries a one-line `MATCHING:` comment. The field it writes, `unk4C`, is also written by BoxFill__Reset in ScreenWidgets, so its name is proposed, not applied: `attachArg` (the fourth argument stored; no reader anywhere, and both call sites, in GraphRoom (ObjMStyleActor), pass 0).

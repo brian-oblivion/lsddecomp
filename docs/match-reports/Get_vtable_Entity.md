@@ -1,6 +1,6 @@
 # Get_vtable_Entity
 
-**Unit:** Entity_b · **Size:** 4 words · **Status:** MATCHED (4/4 words,
+**Unit:** Entity · **Size:** 4 words · **Status:** MATCHED (4/4 words,
 whole-image build verified byte-exact)
 
 ## What it does

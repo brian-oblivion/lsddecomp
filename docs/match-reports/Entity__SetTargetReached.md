@@ -66,9 +66,9 @@ own broader significance (read by every Entity_x unit) is not established.
   named `BasicClass__NotifyParents` (a slot inherited from the shared
   ancestor `GetTodActorMethods()` also returns -- same idiom, confirmed by
   offset match against that table). CROSS-UNIT: `slot30` is dispatched from
-  every one of Entity_b/c/d/e/f/g (`grep -rn -- '->slot30(' src/Entity_*.c`)
+  every one of Entity/c/d/e/f/g (`grep -rn -- '->slot30(' src/Entity_*.c`)
   as well as this unit's own `Entity__SetTargetReached`/`Entity__NotifyIfTargetInRange` (the latter
-  in Entity_b.c), so proposed rather than applied.
+  in Entity.c), so proposed rather than applied.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80056FE4` on 2026-09-18 (tools/rename.py). Address 0x80056fe4.
 
-Unit: `class_3bb8c_o` (round 17). The BaseObjO allocator -- allocates 0x58
+Unit: `ObjMStyleActor` (round 17). The BaseObjO allocator -- allocates 0x58
 bytes, constructs, frees and returns `NULL` on construction failure.
 
 ## Final source
@@ -37,7 +37,7 @@ literal `ori $a0,$zero,0x58` allocation, an unconditional test of the
 result, then `GetActorMethods()->ctor(self)`'s OWN return checked against
 NULL -- nonzero means success (return `self`), zero means failure
 (`BMemPMgrFree(self)` then return `NULL`). `GetActorMethods` is already
-declared elsewhere (`code_55dd4.h`) returning `D800878D4Methods *`; this
+declared elsewhere (`TodActor.c`) returning `D800878D4Methods *`; this
 unit uses its own local `BaseObjOMethods *` reading of the same table (see
 `Actor__Actor`'s report). `BMemPMgrAlloc`/`BMemPMgrFree` are the
 project's established single-argument pool allocator pair.
@@ -63,14 +63,14 @@ name in prose before anyone renamed it. Constructs a `BaseObjO`, not a
 argument, which only makes sense if that slot resolves to
 `Actor__Actor` (this unit's own 1-argument base ctor) rather than to
 `TodActor`'s real, 3-argument constructor
-(`code_55dd4.c:TodActor__TodActor`) -- confirmed directly by
+(`TodActor.c:TodActor__TodActor`) -- confirmed directly by
 `GetActorMethods`'s declared return type, `BaseObjOMethods *` here (this
-unit's own reading of the SAME table `code_55dd4.h` calls
+unit's own reading of the SAME table `TodActor.c` calls
 `D800878D4Methods`).
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `New_BaseObjO`. BMemPMgrAlloc(0x58) then the table's ctor: the allocator, and the source of the class size 0x58. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_o.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `New_BaseObjO`. BMemPMgrAlloc(0x58) then the table's ctor: the allocator, and the source of the class size 0x58. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, alpha)
 

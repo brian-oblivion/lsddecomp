@@ -2,7 +2,7 @@
 
 > Renamed from `func_80053E84` on 2026-09-23 (tools/rename.py). Address 0x80053e84.
 
-**Unit:** class_3bb8c_m · **Size:** 12 instructions · **Status:** MATCHED (12/12 words)
+**Unit:** ObjMStyleActor · **Size:** 12 instructions · **Status:** MATCHED (12/12 words)
 
 ## What this function does
 
@@ -28,7 +28,7 @@ None — matched on the first attempt.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
@@ -37,12 +37,12 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
 
 ## Track 7 (2026-09-27, round 98, delta)
 
 `OBJM_NOTIFY_LINK_TELEPORT` for 0xB: OnDreamSysNotify calls this slot for
 DREAMSYS_LINK_TELEPORT (17 = 11 + 6). The state is not changed, and
 DayTask__OnObjMNotify has no case for 11. The method name is left
-(its slot, `notifyParentsCodeB`, is read in class_3bb8c_l); see the unit's
+(its slot, `notifyParentsCodeB`, is read in ObjMStyleActor); see the unit's
 proposals. Zero bytes.

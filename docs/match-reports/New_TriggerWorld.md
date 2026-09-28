@@ -44,12 +44,12 @@ void *New_TriggerWorld(s32 arg0) {
 
 ## Naming
 
-- **New_TriggerWorld**, tier B (head review, round 83: was A). code_4cd08.c already declares `extern TriggerWorld *func_80044A0C(s32 *ctx)`, and docs/match-reports/FireDreamAuxTriggerEntries.md (a caller in that same unit) already ties this object into the dream-aux trigger system.
-  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (DayTaskStageMap.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
+- **New_TriggerWorld**, tier B (head review, round 83: was A). DreamAux.c already declares `extern TriggerWorld *func_80044A0C(s32 *ctx)`, and docs/match-reports/FireDreamAuxTriggerEntries.md (a caller in that same unit) already ties this object into the dream-aux trigger system.
+  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (DayTaskStageMap.c round 20 for LinkResource; DreamAux.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Now `TriggerWorld *New_TriggerWorld(struct ResourceSource *src)` (include/TriggerWorld.h): the argument is the construction descriptor the ctor hands to ModelData__ModelData, and the object is a TriggerWorld (0x3C bytes, one own field at +0x038). The ctor is still reached through the unprototyped UnprototypedCtorTable view, because MODELDATA_SLOTS types +0x008 returning void while this ctor returns self or NULL. code_4cd08's FireDreamAuxTriggerEntries, the one caller, casts its stack array in. Bytes unchanged.
+Now `TriggerWorld *New_TriggerWorld(struct ResourceSource *src)` (include/TriggerWorld.h): the argument is the construction descriptor the ctor hands to ModelData__ModelData, and the object is a TriggerWorld (0x3C bytes, one own field at +0x038). The ctor is still reached through the unprototyped UnprototypedCtorTable view, because MODELDATA_SLOTS types +0x008 returning void while this ctor returns self or NULL. DreamAux's FireDreamAuxTriggerEntries, the one caller, casts its stack array in. Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 

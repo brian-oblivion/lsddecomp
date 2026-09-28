@@ -85,7 +85,7 @@ broadcast instead.
 
 - `Entity::unkFC` -> `moodTimer` -- **tier B.** Reset to 0 by
   `Entity__StartSoundCue`, incremented here, and read/compared by every one
-  of Entity_b/c/d/e/f/g (grep -rn -- '->unkFC\b') for purposes well beyond
+  of Entity/c/d/e/f/g (grep -rn -- '->unkFC\b') for purposes well beyond
   sound (mood-duration and threshold comparisons in those units' own
   reports) -- so a sound-specific name would undersell it. CROSS-UNIT,
   proposed rather than applied.

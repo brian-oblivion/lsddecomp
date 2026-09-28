@@ -2,11 +2,11 @@
 
 > Renamed from `func_80053D18` on 2026-09-23 (tools/rename.py). Address 0x80053d18.
 
-**Unit:** class_3bb8c_m · **Size:** 33 instructions · **Status:** MATCHED (33/33 words)
+**Unit:** ObjMStyleActor · **Size:** 33 instructions · **Status:** MATCHED (33/33 words)
 
 ## Context
 
-First function of `class_3bb8c_m`, the fourth 20-function slice carved from
+First function of `ObjMStyleActor`, the fourth 20-function slice carved from
 the tail of the large `DayTaskStageMap` block (0x44518..0x44F14). This unit's
 `self` object (`ObjM`, `include/class_3bb8c.h`) is a NEW, independent type —
 its field offsets (0x10, 0x14, 0x18, 0x20, 0x3C, 0x80, 0x84) and its own
@@ -38,7 +38,7 @@ void ObjM__EnterState7(ObjM *self) {
 ```
 
 `ObjM__StartFadeUp` is defined later in this same file (ROM order), so a local
-forward `extern` prototype is added at the top of `class_3bb8c_m.c` ahead
+forward `extern` prototype is added at the top of `ObjMStyleActor.c` ahead
 of this function's definition (calling a not-yet-defined-in-this-TU
 function is fine per DECOMPILATION_LEARNINGS' "Calling into a function
 that is still INCLUDE_ASM in another unit" note — the same reasoning
@@ -56,7 +56,7 @@ straightforward once the struct layout is right.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
@@ -65,7 +65,7 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
 
 ## Track 7 (2026-09-27, round 98, delta)
 

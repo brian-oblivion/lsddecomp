@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005C76C` on 2026-09-21 (tools/rename.py). Address 0x8005c76c.
 
-Unit `code_4cd08` ("DreamAux"). 26/26 words, `0x4CF6C`-`0x4CFD4`. Whole-image
+Unit `DreamAux` (was `code_4cd08`). 26/26 words, `0x4CF6C`-`0x4CFD4`. Whole-image
 `build-and-verify.sh` green. Same shape as `ReleaseDreamAuxModels`, over `gDreamAuxSlots2`
 instead of `gDreamAuxSlots` (see that report for the object/vtable/loop-shape
 derivation -- not repeated here).
@@ -94,12 +94,12 @@ this is the same class of residue before reshaping further:
 over `gDreamAuxSlots2` instead of `gDreamAuxSlots` (see that report/entry for
 the shared derivation). Tier A for the same reason: the tick pass over the
 slot family IS the function's purpose. Called from `ObjM__TeardownStyle`
-(`class_3bb8c_l.c`) alongside other per-frame-looking calls, consistent with
+(`ObjMStyleActor.c`) alongside other per-frame-looking calls, consistent with
 "tick", though nothing in this unit distinguishes what makes the "2" family
 different in KIND from the first (it is never populated by any function in
 this unit's own queue).
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 
@@ -107,7 +107,7 @@ this unit's own queue).
 gDreamAuxSlots2 (0x80088D2C) is gDreamAuxSlots one word in, so the word each
 element's first field reads is the slot's `entity`, the Entity
 SetDreamAuxWorld made; slot +0x004 is `release`. Its only caller is
-ObjM__TeardownStyle (onDeinit, src/class_3bb8c_l.c), mirroring ObjM's scene
+ObjM__TeardownStyle (onDeinit, src/ObjMStyleActor.c), mirroring ObjM's scene
 setup calling SetDreamAuxWorld. The body reads it as `(Entity *)slot->model`
 with a comment. `done` -> `i`; the split `i = 0; slot = ...;` keeps a
 one-line MATCHING comment (the derivation is above). Byte-identical.

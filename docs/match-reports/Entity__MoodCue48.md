@@ -2,7 +2,7 @@
 
 > Renamed from `func_80060A4C` on 2026-09-24 (tools/rename.py). Address 0x80060a4c.
 
-Unit: `Entity_d` (fresh carve, round 2026-09-03). Mood-dispatch handler:
+Unit: `Entity` (fresh carve, round 2026-09-03). Mood-dispatch handler:
 `void Entity__MoodCue48(Entity *this, EntityMoodHandlerArg *out)`.
 
 ## Final source
@@ -68,10 +68,10 @@ convention as `Entity__MoodCue00` (round 71): the function's address is the
 handler word of `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base
 0x80089EB0, 0x10-byte stride) at row 48, read directly from
 `disk/SLPS_015.56` (not inferred from address proximity -- see
-`src/Entity_d.c`'s unit header comment, which flags that row order does NOT
+`src/Entity.c`'s unit header comment, which flags that row order does NOT
 track code address once row 115 is reached). Mechanics established
 (mood-tick sound-cue-set callback, per `Entity__StartSoundCue`/
-`Entity_b.c`'s own header comment); which dream object owns the row is not.
+`Entity.c`'s own header comment); which dream object owns the row is not.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

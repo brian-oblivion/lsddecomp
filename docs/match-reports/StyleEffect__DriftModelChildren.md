@@ -37,7 +37,7 @@ address is a temporary of the comparison and the allocation comes out as
 retail's. Round 44's alias lever was right about the copy and wrong about
 where it came from.
 
-The matched body is the plain C in `src/class_3bb8c_s.c` (the round-44 body
+The matched body is the plain C in `src/ObjMStyleActor.c` (the round-44 body
 below is kept as history).
 
 ### Proposed learning
@@ -55,7 +55,7 @@ temp registers" residue in the address computation itself (here
 
 > Renamed from `func_800569A8` on 2026-09-23 (tools/rename.py). Address 0x800569a8.
 
-Unit `class_3bb8c_s`, round 44 (2026-09-15), building on round 26's derivation
+Unit `ObjMStyleActor`, round 44 (2026-09-15), building on round 26's derivation
 (see the git history of this file for the prior 120/121, 23/121-raw state).
 Not a class method dispatcher itself, but calls through `self->methods` twice
 and through each `arr7C` child's methods twice more. Reads `self->unk6C` as
@@ -142,7 +142,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self)
 #endif
 ```
 
-Declarations this needs (already committed in `src/class_3bb8c_s.c`, kept
+Declarations this needs (already committed in `src/ObjMStyleActor.c`, kept
 regardless of this function's match state):
 
 ```c
@@ -208,7 +208,7 @@ before the next was tried:
 None of these four changed the function's WORD COUNT — length has been exact
 (121/121 emitted) since lever 1; only word-content differed from there on.
 
-## Struct findings (kept in `src/class_3bb8c_s.c` independent of this stall)
+## Struct findings (kept in `src/ObjMStyleActor.c` independent of this stall)
 
 - **`LinkNodeMethods` needed a NEW slot, `slotBC` at +0x0BC**, distinct from
   the already-established `slotB8` at +0x0B8 (round 26 finding, unchanged).
@@ -338,7 +338,7 @@ byte-load-bearing. Same idiom as the three sibling externs above it; annotated
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
 
 ## History moved from the unit's comments (track 7, round 101)
 

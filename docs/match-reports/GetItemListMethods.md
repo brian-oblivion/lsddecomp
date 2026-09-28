@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052B60` on 2026-09-24 (tools/rename.py). Address 0x80052b60.
 
-Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
+Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py GetItemListMethods`: 4/4 words match.
 
 ## Source
@@ -30,4 +30,4 @@ matched this round. Matched first attempt.
 
 Round 75 (bravo, track 3). `func_80052B60` -> `GetItemListMethods`, **tier A**.
 
-Returns &gItemListMethods. Used as the ctor table by New_ItemList and ItemList__ItemList (class_3bb8c_j). Named like GetTimedTaskMethods/GetObjMMethods.
+Returns &gItemListMethods. Used as the ctor table by New_ItemList and ItemList__ItemList (TextEntryItemList). Named like GetTimedTaskMethods/GetObjMMethods.

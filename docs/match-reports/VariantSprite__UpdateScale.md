@@ -6,7 +6,7 @@
 
 > Renamed from `func_80057DF4` on 2026-09-25 (tools/rename.py). Address 0x80057df4.
 
-Round 47 (runner charlie). Unit: `src/class_3bb8c_q.c`, a BRAND NEW carve
+Round 47 (runner charlie). Unit: `src/ObjMStyleActor.c`, a BRAND NEW carve
 (this unit did not exist before round 47). Class: table `gVariantSpriteMethods` (49
 slots, resolved with `tools/classtable.py 0x800879C4`) -- this is slot48,
 immediately after `VariantSprite__SetVariantClut` (slot40, same unit, see its own
@@ -127,7 +127,7 @@ set, s16 *ratios)` with `spriteScaleX`/`spriteScaleY`, byte-identical.
 
 | name | tier | evidence |
 | --- | --- | --- |
-| `VariantSprite__UpdateScale` (was `func_80057DF4`) | A | Slot `+0x048` of `gVariantSpriteMethods`; `tools/classtable.py gVariantSpriteMethods --vs gSceneNodeMethods` shows it overriding `SceneNode__UpdateScale`, and the name follows the slot. Every caller agrees it is a scale: class_3bb8c_s.c calls it through `updateScale` on the sprites with `gSpriteScaleLarge` ({6,5},{6,5},{1,1}) / `gSpriteScaleSmall` ({4,6},{4,6},{1,1}) or a caller-supplied table (`StyleEffect__SpawnSprites`), always `set = 1`. The body turns two num/den ratios into 20.12 and (unk58 == 0) stores them at `+0x80`/`+0x82`, which are GsSPRITE.scalex/scaley at `+0x64` (layout evidence in `VariantSprite__SetVariantClut`'s report). |
+| `VariantSprite__UpdateScale` (was `func_80057DF4`) | A | Slot `+0x048` of `gVariantSpriteMethods`; `tools/classtable.py gVariantSpriteMethods --vs gSceneNodeMethods` shows it overriding `SceneNode__UpdateScale`, and the name follows the slot. Every caller agrees it is a scale: ObjMStyleActor.c calls it through `updateScale` on the sprites with `gSpriteScaleLarge` ({6,5},{6,5},{1,1}) / `gSpriteScaleSmall` ({4,6},{4,6},{1,1}) or a caller-supplied table (`StyleEffect__SpawnSprites`), always `set = 1`. The body turns two num/den ratios into 20.12 and (unk58 == 0) stores them at `+0x80`/`+0x82`, which are GsSPRITE.scalex/scaley at `+0x64` (layout evidence in `VariantSprite__SetVariantClut`'s report). |
 | param `set` | A | The base method's name for `$a1` (1 = assign, 0 = accumulate); this override never reads it. |
 | param `ratios` | A | Two s16 {num, den} pairs, x then y. The round-47 description "`{s16 whole; s16 frac;}`" was wrong: the body computes `num / den` in 20.12, and the caller tables hold {6,5} and {4,6}. |
 | fields `spriteScaleX` / `spriteScaleY` (`+0x80`/`+0x82`) | A | GsSPRITE.scalex/scaley. Unit-local struct: renamed in place. |
@@ -201,7 +201,7 @@ the source keeps one `MATCHING:` line on `xScale`.
   `accumScaleX/Y` by the ratios instead of writing `sprite.scalex/scaley`.
   No writer of a non-zero value found. Not applied: `Sprite__Reset` is
   outside this job. The rename touches `self->unk58` in src/Sprite.c and
-  src/class_3bb8c_q.c, plus the comments on the two fields after it and
+  src/ObjMStyleActor.c, plus the comments on the two fields after it and
   VariantSprite.h's banner line that names it.
 
 Applied by the round 101 head at merge: `unk58` is `accumulateScale` (tier B), in `SPRITE_FIELDS`, `Sprite__Reset` and this method; zero bytes.

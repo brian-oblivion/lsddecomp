@@ -174,7 +174,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   0;`. Closed `DreamSys__TryInstantTeleportLink` 58/63. (PROGRESS round 73)
 - **Guard + `do/while` + a leading `__asm__("")` + a `u8 unused[N]` frame filler is ONE wrong
   loop kind, and a plain `for` fixes all three symptoms** (prologue store order, the early
-  `move $sN,$aN`, frame size): three `code_55dd4` stalls, one with 192k permuter iterations on the
+  `move $sN,$aN`, frame size): three `TodActor` stalls, one with 192k permuter iterations on the
   wrong shape. Where `i++` sits decides whether its `addiu` fills the `jalr` slot. The reverse also
   occurs (`FlagLargePolyForDivide`: a value computed before the loop-skip test took the slot from the stack
   adjustment), and a retry loop testing its counter AFTER the call is a `while`, not a goto loop

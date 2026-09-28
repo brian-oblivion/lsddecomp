@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005E02C` on 2026-09-23 (tools/rename.py). Address 0x8005e02c.
 
-**Unit:** Entity_b · **Size:** 33 words · **Status:** MATCHED (33/33 words,
+**Unit:** Entity · **Size:** 33 words · **Status:** MATCHED (33/33 words,
 whole-image build verified byte-exact). Superseded a prior STALL
 classification -- see "Round 8: the stall was a missing argument" below for
 what actually closed it and why fourteen prior attempts (two authors) missed
@@ -137,7 +137,7 @@ identical 5-word residue: `this->unk94`'s value in `$v0`/`$a1` one register
 off from retail's `$a1`/`$a2` chain. A corpus census of the shape "an
 argument register vacated into a callee-saved register, then reused within 3
 instructions as a fresh load's destination" found 6 hits in 4 files
-(`Entity_c.s`, `DayTaskStageMap.s`, `Task.s`, and this function), three of
+(`Entity.s`, `DayTaskStageMap.s`, `Task.s`, and this function), three of
 them in still-uncarved segments — noted at the time as a poor permuter
 target on rarity grounds. That count was measuring the wrong shape (the
 census pattern doesn't describe "value kept live in place because it's a
@@ -167,7 +167,7 @@ unrelated function in the same unit surfaced the missing parameter.
 
 `Entity__IsTargetInRange` -- tier A (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005E02C`.
 
-A pure predicate leaf: returns 1 when `this->target`'s y is within +/-0x200 of this entity's y AND slot +0x144 (`distanceToRegion`, occupant `Entity__DistanceToPeer`) from this entity to the target is below `range`, else 0. Callers agree: `Entity__NotifyIfTargetInRange` (range = eventVideo << 9) and `Entity__MoodCue115` (Entity_d, range 0x800, then faces the target). The parameter `arg1` is renamed `range` at the definition.
+A pure predicate leaf: returns 1 when `this->target`'s y is within +/-0x200 of this entity's y AND slot +0x144 (`distanceToRegion`, occupant `Entity__DistanceToPeer`) from this entity to the target is below `range`, else 0. Callers agree: `Entity__NotifyIfTargetInRange` (range = eventVideo << 9) and `Entity__MoodCue115` (Entity, range 0x800, then faces the target). The parameter `arg1` is renamed `range` at the definition.
 
 Observation for the head, outside this unit: `Entity__DistanceToPeer` (Entity.c) is called with `this->target` as its `EntityRegionRef *` at every call site this pass found (here, Entity__GetProximityRatio, Entity__MoodCue11/12, Entity_c..g). With that reading, `region->slots` at +0x14 is the target's GsCOORDINATE2 (the same +0x14 pointer `EntityPos` models), and `slots[1].x0`/`z0` at +0x38/+0x40 are `workm.t[0]`/`t[2]`. So the function returns |dx| + |dz| between this entity's local x/z and the other object's world x/z, and `flag` (+0xC) is the other object's +0xC word. `Entity__DistanceToPeer` may deserve a sharper name and type. I left it alone because Entity.c owns it.
 
@@ -181,7 +181,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 Round 89 (runner delta, track 5 `asm-sites`): the bare `__asm__("")` at the
 top of the body is **retired**. Measured by deleting it alone and rebuilding:
-`build/src/Entity_b.c.o` came out byte-identical to the object built with it
+`build/src/Entity.c.o` came out byte-identical to the object built with it
 (`cmp`), and `./build-and-verify.sh` stayed green. The barrier was dead in the
 current source; the load-delay-slot effect described above no longer depends on
 it. The function now carries no `__asm__`.

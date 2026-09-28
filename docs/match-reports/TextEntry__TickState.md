@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051370` on 2026-09-24 (tools/rename.py). Address 0x80051370.
 
-Unit `class_3bb8c_i`. Gated `self->unk30` increment: only proceeds when
+Unit `TextEntryItemList`. Gated `self->unk30` increment: only proceeds when
 `self->unk2C` is 2 or 3, then increments `self->unk30` and dispatches
 `slot54(self, 4)` only when the OLD value of `self->unk30` was nonzero.
 

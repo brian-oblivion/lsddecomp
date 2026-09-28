@@ -13,7 +13,7 @@
  * StageMap__PopulateSlotCells stores in a PlacementGrid's `linkResource`;
  * it is kept on this evidence: the class's own methods map the file's TMD
  * (LinkResource__MapModel: GsMapModelingData(&file->flags)) and build and
- * return the TmdModel objects the callers LINK -- code_55dd4.c's TOD
+ * return the TmdModel objects the callers LINK -- TodActor.c's TOD
  * model-id packet passes getModel's result to SceneNode__LinkModel, and
  * DayTaskStageMap.c links the TmdObject behind it with GsLinkObject4.
  *

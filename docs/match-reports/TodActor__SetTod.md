@@ -4,7 +4,7 @@
 
 > Renamed from `func_80066214` on 2026-09-24 (tools/rename.py). Address 0x80066214.
 
-**Unit:** code_55dd4 · **Size:** 37 words (0x94 bytes) · **Status:** MATCHED,
+**Unit:** TodActor · **Size:** 37 words (0x94 bytes) · **Status:** MATCHED,
 whole-image green. See "Round 19 (echo): MATCHED" at the end of this report
 for the winning source and what changed from the round-14 stall below.
 
@@ -34,7 +34,7 @@ void TodActor__SetTod(TodActor *self, s32 index)
 ```
 
 This is the first function in the unit to touch `self->unk5C->unk30`, so it
-derives (and adds to `include/code_55dd4.h`) an entirely new chain of
+derives (and adds to `src/TodActor.c`) an entirely new chain of
 minimal types:
 
 - `Unk5CObj` gained a `+0x30` field, `Unk30Obj *unk30`.
@@ -146,7 +146,7 @@ void TodActor__SetTod(TodActor *self, s32 index)
 
 (Types `GroupObj`, `EntryObj2`, `Unk30Obj`, and the `Unk5CObj::unk30` /
 `TodActor::unk7C..unk88` / `TodActorMethods::slot134` fields this body
-depends on are kept live in `include/code_55dd4.h` — they are confirmed
+depends on are kept live in `src/TodActor.c` — they are confirmed
 correct by the byte-identical first 27 words, independent of this stall.)
 
 ### Proposed learning
@@ -234,7 +234,7 @@ void TodActor__SetTod(TodActor *self, s32 index)
 }
 ```
 
-This is now the committed source in `src/code_55dd4.c`, replacing the
+This is now the committed source in `src/TodActor.c`, replacing the
 `INCLUDE_ASM`. No header/type changes were needed beyond what round 14
 already derived (`GroupObj`, `EntryObj2`, `Unk30Obj`, `Unk5CObj::unk30`,
 and the `TodActor`/`TodActorMethods` fields this body reads) --
@@ -264,7 +264,7 @@ if that specific pairwise swap is not in the table.
 
 Round 75 (charlie), track 3.
 
-- `TodActor__SetTod` (was `func_80066214`), tier A. Occupies +0x128. Selects TOD `index` from modelData->tods (arr + 8 + index*4 -> holder -> +0x10 TOD data), stores todIndex, todFrameCount = TOD +0x4 (frame count), todFramePtr = TOD + 8 (first frame), todFrame = 0, and applies that first frame. InitDefaults calls setTod(0); Entity_e calls setTod(1).
+- `TodActor__SetTod` (was `func_80066214`), tier A. Occupies +0x128. Selects TOD `index` from modelData->tods (arr + 8 + index*4 -> holder -> +0x10 TOD data), stores todIndex, todFrameCount = TOD +0x4 (frame count), todFramePtr = TOD + 8 (first frame), todFrame = 0, and applies that first frame. InitDefaults calls setTod(0); Entity calls setTod(1).
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
@@ -275,7 +275,7 @@ The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `incl
 `GroupObj` (a holder with its data pointer at +0x010) is a `Tod`, whose
 FileResource `buffer` is that pointer: TodSet__BuildTods replaces each word of
 its buffer's counted offset table, from +0x8, with the Tod it built there. The
-expression is now `TODSET_TOD(set, i)` (include/code_55dd4.h), and `EntryObj2`,
+expression is now `TODSET_TOD(set, i)` (src/TodActor.c), and `EntryObj2`,
 the TOD data's header with the frame count at +0x4, is `TodHeader`. Same
 address arithmetic, byte-identical.
 

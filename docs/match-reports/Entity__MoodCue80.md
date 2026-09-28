@@ -2,7 +2,7 @@
 
 > Renamed from `func_80063094` on 2026-09-24 (tools/rename.py). Address 0x80063094.
 
-Unit: `Entity_e` (round 12). A three-way branch on `this->unkFC` vs
+Unit: `Entity` (round 12). A three-way branch on `this->unkFC` vs
 `this->unk80`, with a nested (and, on the surface, logically redundant)
 double-guard on `this->unk84` in one arm.
 `void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out)`.
@@ -47,7 +47,7 @@ This reads as `switch`-like source that a human (or an earlier, unoptimized
 compilation pass) wrote as nested guards rather than a single combined
 test -- plausible given this unit's other mood handlers use a similar
 "early-exit on a sentinel value before checking the real case" shape (see
-`Entity__MoodCue39` in `Entity_d.c`'s `goto skip48` pattern for a related
+`Entity__MoodCue39` in `Entity.c`'s `goto skip48` pattern for a related
 early-exit idiom in a sibling handler).
 
 ### Proposed learning
@@ -70,9 +70,9 @@ window once a drift warning is present.
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 80 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 80 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity.
 
-Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity_b/Entity_d/Entity_g): `attenuation`, `voice0Tone`.
+Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity/Entity_d/Entity_g): `attenuation`, `voice0Tone`.
 
 **Data constant renamed this round:** `D_80089D54` -> `TRANSLATE_Y_MINUS512`, tier B. 32-bit value at the Y slot (offset +4) is `0xfffffe00` = -512, matching the `TRANSLATE_Y_MINUS64`/`TRANSLATE_Y_PLUS256` s32-triple format confirmed in `Entity__MoodCue68`'s report.
 

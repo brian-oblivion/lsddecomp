@@ -49,7 +49,7 @@ Matched first as `PickStageBgm(s32 index)` passing an uninitialised local as
 SeedAndRandom's second argument (cc1: ``'unused' might be used
 uninitialized``). The body never writes `$a1` before the `jal SeedAndRandom`,
 so the register SeedAndRandom receives is PickStageBgm's own incoming `$a1`,
-and its only caller (ObjM__InitStyleAndWorld, class_3bb8c_l.c) loads it
+and its only caller (ObjM__InitStyleAndWorld, ObjMStyleActor.c) loads it
 explicitly (`move a1,zero` at the jal). That is the forwarding idiom:
 PickStageBgm takes a second parameter and forwards it, exactly as
 PickStageTexture does with its `arg1`. Rewritten with the parameter;
@@ -60,7 +60,7 @@ caller's 2-parameter extern now agrees with the definition.
 
 - **Name:** `PickStageBgm`
 - **Tier:** A
-- **Evidence:** random 1-of-5 (or gForcedStageBgm, renamed from gForcedVariant) of GetStageBgmRecords; its caller hands the record to the WBgm's setSeq (class_3bb8c_l.c). Stage 9 skips index 2, BGC.SEQ.
+- **Evidence:** random 1-of-5 (or gForcedStageBgm, renamed from gForcedVariant) of GetStageBgmRecords; its caller hands the record to the WBgm's setSeq (ObjMStyleActor.c). Stage 9 skips index 2, BGC.SEQ.
 
 ## Naming history
 

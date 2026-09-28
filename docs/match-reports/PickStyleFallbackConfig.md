@@ -1,4 +1,4 @@
-# PickStyleFallbackConfig -- MATCHED (62/62 words), class_3bb8c_n
+# PickStyleFallbackConfig -- MATCHED (62/62 words), ObjMStyleActor
 
 > Renamed from `func_80054758` on 2026-09-23 (tools/rename.py). Address 0x80054758.
 
@@ -17,8 +17,8 @@ fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
 ## New externs
 
 ```c
-extern s32 gStyleDay;         /* already s32 in class_3bb8c_m.c */
-extern s32 gStyleStage;         /* already s32 in class_3bb8c_m.c and this unit's own StyleScrollVramStrips */
+extern s32 gStyleDay;         /* already s32 in ObjMStyleActor.c */
+extern s32 gStyleStage;         /* already s32 in ObjMStyleActor.c and this unit's own StyleScrollVramStrips */
 extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (gStyleDay+gStyleStage)&0xF */
 extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
@@ -131,7 +131,7 @@ inverted branch; second: explicit default-then-override, byte-exact).
 
 **`PickStyleFallbackConfig`, tier B.**
 
-Literal call site in `ApplyStyleConfig` (class_3bb8c_m.c, already matched):
+Literal call site in `ApplyStyleConfig` (ObjMStyleActor.c, already matched):
 `cfg = func_80054758();`, used only when the direct per-`gStyleStage` config
 table entry (`sStyleStageConfigs[gStyleStage]`) is NULL -- i.e. this is the fallback
 path. Body hashes `gStyleDay + gStyleStage` into a 16-entry table to pick

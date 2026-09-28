@@ -4,7 +4,7 @@
 
 > Renamed from `func_80050E78` on 2026-09-24 (tools/rename.py). Address 0x80050e78.
 
-Unit `class_3bb8c_i`, carved round 14.
+Unit `TextEntryItemList`, carved round 14.
 
 `Obj86ED0`'s slot38 override (vtable slot 0x038, the last slot BasicClass
 itself defines). Dispatches the BASE class's own `slot38` first, then reads
@@ -72,7 +72,7 @@ Renamed from Obj86ED0__Notify for its slot, BasicClass's onNotify (+0x038). It c
 ## Track 7 (2026-09-27, round 98, bravo)
 
 TextEntry +0x034/+0x038 `childType2`/`childType5` -> `inputSource`/
-`tickSource` (include/TextEntry.h; accessed only in class_3bb8c_i, so
+`tickSource` (include/TextEntry.h; accessed only in TextEntryItemList, so
 renamed in the definition). They are the children of class 2 and 5, which
 are Pad and FrameClock (`typeviews.py --tree`), and ItemList and TaskObjF
 already call the same pair `inputSource`/`tickSource`. The kind test reads

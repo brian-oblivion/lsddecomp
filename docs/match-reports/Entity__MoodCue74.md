@@ -2,7 +2,7 @@
 
 > Renamed from `func_80062730` on 2026-09-24 (tools/rename.py). Address 0x80062730.
 
-Unit: `Entity_e` (round 13). Ignores `out` entirely. A first-tick block
+Unit: `Entity` (round 13). Ignores `out` entirely. A first-tick block
 dispatches through a brand-new nested object (`unk94->unk5C`'s own
 vtable), rolls `unk44 = rand() % 3` and clamps it to 0 based on a
 `z`-position gate; the rest of the function is an `if (unk44 != 0)` /
@@ -64,7 +64,7 @@ void Entity__MoodCue74(Entity *this, EntityMoodHandlerArg *out) {
     return discarded, same caveat.
 - `sMoodCue74ClearColor` (a single-word data table at `asm/data/7B3F8.sdata.s`,
   immediately after the already-known `gEntityFadeBoxDefaultSize`/`gEntityFadeBoxDefaultOffset`) gets its
-  own per-unit `extern u8 sMoodCue74ClearColor[];` in `Entity_e.c`, same convention
+  own per-unit `extern u8 sMoodCue74ClearColor[];` in `Entity.c`, same convention
   as this file's other opaque data-table externs.
 
 **No existing declaration was retyped, renamed, or resized** -- every change
@@ -113,7 +113,7 @@ opcode's low bits differ, so this is easy to misdiagnose as "close enough."
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 74 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 74 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity.
 
 **`sMoodCue74ClearColor` left unnamed this round.** Already documented (this report's own body, pre-rename) as a single-word data table adjacent to `gEntityFadeBoxDefaultSize`/`gEntityFadeBoxDefaultOffset`, not a rotation/scale/translate-style {num,den} or s32-triple table, and passed to `Unk5CObj::slot64` whose own purpose is unestablished -- no evident value to name it from.
 
@@ -123,7 +123,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 7 (round 93, echo)
 
-Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). `D_8008AC1C` -> `sMoodCue74ClearColor` (`python3 tools/rename.py`, tier A): a ViewportRgb {0, 100, 190} in .sdata (the word 0x00BE6400) whose address this function alone passes to the viewport's setClearColor; declared as the ViewportRgb it is, so the cast went. notifyParents' 10 is ENTITY_EFFECT_LINK_STAGE; setTickCallbacks(1, 1) is MOVE_CALLBACK_TICK_MOVE, LOOK_CALLBACK_STEP_LOOK. The range test `(u32)(moodTimer - 0x14) < 0x64` reads as `moodTimer >= 20 && moodTimer < 120`: the same bytes, cc1 folds the pair into the unsigned test (as in Entity_d). Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). `D_8008AC1C` -> `sMoodCue74ClearColor` (`python3 tools/rename.py`, tier A): a ViewportRgb {0, 100, 190} in .sdata (the word 0x00BE6400) whose address this function alone passes to the viewport's setClearColor; declared as the ViewportRgb it is, so the cast went. notifyParents' 10 is ENTITY_EFFECT_LINK_STAGE; setTickCallbacks(1, 1) is MOVE_CALLBACK_TICK_MOVE, LOOK_CALLBACK_STEP_LOOK. The range test `(u32)(moodTimer - 0x14) < 0x64` reads as `moodTimer >= 20 && moodTimer < 120`: the same bytes, cc1 folds the pair into the unsigned test (as in Entity). Byte-identical (whole image green).
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 

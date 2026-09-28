@@ -320,7 +320,7 @@ void GridCell__OnActorLinkCommand(GridCell *self, void *sender, s32 event)
 ## Track 7 (round 100)
 
 The early-return and `do { } while (0)` shape above is replaced by the nested
-test Actor__OnActorLinkCommand (src/class_3bb8c_p.c) matched with,
+test Actor__OnActorLinkCommand (src/ObjMStyleActor.c) matched with,
 byte-identical here too:
 
 ```c

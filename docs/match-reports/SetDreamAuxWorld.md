@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005C650` on 2026-09-21 (tools/rename.py). Address 0x8005c650.
 
-**Unit:** code_4cd08 · **Size:** 34 words · **Status:** MATCHED round 43
+**Unit:** DreamAux · **Size:** 34 words · **Status:** MATCHED round 43
 (34/34, byte-exact whole-image build).
 
 ## History
@@ -67,7 +67,7 @@ Two derivation points worth recording:
   confirmed data points for the "run this loop once" idiom, and both need
   the counter unsigned to match.**
 - **The struct field this function writes did not exist yet.** `DreamAuxSlot`
-  (`include/code_4cd08.h`) previously had `void *obj; u8 unk4[0x10];`. This
+  (`include/DreamAux.h`) previously had `void *obj; u8 unk4[0x10];`. This
   function's `sw $v0, 0x4($s1)` after the `New_Entity` call writes a pointer
   at the slot's offset 0x4, so `unk4` is now split into a named `void *entity`
   plus the remaining `u8 unkC[0xC]` (unread by anything in this unit still).
@@ -92,7 +92,7 @@ own reading of that argument). The cast to `(void *)` here is cosmetic --
 GCC 2.6.3 does not care about the mismatch for either codegen or scoring, and
 `New_Entity`'s own signature is out of scope for this unit to change. Its
 prototype and the five new `%gp_rel` globals are declared locally in
-`code_4cd08.c` (not in `code_4cd08.h`), per the shared-header rule: `Entity.c`
+`DreamAux.c` (not in `DreamAux.h`), per the shared-header rule: `Entity.c`
 owns `New_Entity`, this unit only calls it.
 
 ## Proposed learning
@@ -110,7 +110,7 @@ Two independent instances now confirm it in this unit alone
 shared context globals (`gDreamAuxStage`, `gDreamAuxWorld` and three still-
 unnamed siblings), spawns one entity into `gDreamAuxSlots[0].entity` via
 `New_Entity`, then calls `SetTeleportsEnabled`. Called from
-`ObjM__SetupSceneStyle` (`class_3bb8c_l.c`), itself a per-object/per-level setup
+`ObjM__SetupSceneStyle` (`ObjMStyleActor.c`), itself a per-object/per-level setup
 routine. "World" reflects `gDreamAuxWorld`'s own established role (cast
 `TriggerWorld*`, dispatched through vtable slots 0x80/0x22 elsewhere in the
 unit) -- but this function's OWN purpose (why these five values, together,
@@ -125,14 +125,14 @@ Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 ## Track 4 (2026-09-26, round 88)
 
 The third parameter is retyped `s32 a2` -> `DreamSys *world`, and the global
-it is stored in, gDreamAuxWorld, `s32` -> `DreamSys *` (code_4cd08.c). Its
-only caller, ObjM__SetupSceneStyle (class_3bb8c_l), passes its DreamSys
-`target`; code_4cd08 calls +0x200 of its table (getDreamColor) and passes
+it is stored in, gDreamAuxWorld, `s32` -> `DreamSys *` (DreamAux.c). Its
+only caller, ObjM__SetupSceneStyle (ObjMStyleActor), passes its DreamSys
+`target`; DreamAux calls +0x200 of its table (getDreamColor) and passes
 it as Entity's peer. Byte-identical.
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
-Parameters named from the caller (ObjM__SetupSceneStyle, class_3bb8c_l.c,
+Parameters named from the caller (ObjM__SetupSceneStyle, ObjMStyleActor.c,
 whose own declaration already says `stage, grid, world, sound, clock`, and
 ObjM.h: unk14 the StageMap, unk10 the FrameClock, TimedTask's sound the
 VabStreamObj): a0..a4 -> stage, stageMap, world, sound, frameClock. The
@@ -147,5 +147,5 @@ The extern comments, as they stood:
 
 ```c
 extern StageMap *D_8008ABFC; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
-extern DreamSys *gDreamAuxWorld; /* the player DreamSys: class_3bb8c_l passes its `target` */
+extern DreamSys *gDreamAuxWorld; /* the player DreamSys: ObjMStyleActor passes its `target` */
 ```

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8005161C` on 2026-09-24 (tools/rename.py). Address 0x8005161c.
 
-Unit `class_3bb8c_i`. Obj86ED0's own method: if `self->unk3C` (a
+Unit `TextEntryItemList`. Obj86ED0's own method: if `self->unk3C` (a
 `TargetObj86ED0 *`, a wholly separate class reached only through this one
 field) is non-NULL, dispatch its own `slot80` on it.
 
@@ -33,8 +33,8 @@ while `$a1` is never touched inside the function body at all.
 That is the signature of a THIRD parameter being forwarded unchanged: the
 function's own second parameter arrives in `$a1` and is never moved, because
 it is already sitting in the exact register the call needs. This project has
-the same idiom at several other call sites already (`src/class_3bb8c_k.c`,
-`src/Task.c`, `src/TitleMenuTaskObjF.c`, `src/code_55dd4.c`:
+the same idiom at several other call sites already (`src/ObjMStyleActor.c`,
+`src/Task.c`, `src/TitleMenuTaskObjF.c`, `src/TodActor.c`:
 `obj->methods->slot80(obj, arg1, 0x60, 0x60)` / `(..., 0x7F, 0x7F)` /
 `(..., 0x6E, 0x6E)`), so recognizing it here just meant trusting the pattern
 instead of the header's (incomplete) prior reading.
@@ -55,7 +55,7 @@ than the call appears to set explicitly.
 
 ## Naming
 
-- `TextEntry__PlaySound` -- tier B. gTextEntryMethods +0x060 (classtable.py) -- this IS the `slot60` implementation dispatched by both TextEntry__HandleCommand (arg1=0x10) and class_3bb8c_j's TextEntry__SetCursorPos/TextEntry__SetCharAt (arg1=0). Forwards arg1 to the attached `target`'s own slot80(target, arg1, 0x60, 0x60) when target != NULL. Mechanics clear (pings the linked TargetObj86ED0 whenever the name cursor or character selection changes); the on-screen meaning of the two 0x60 literals is not established. Since `slot60` is referenced by both this unit and class_3bb8c_j, the SLOT NAME is left as `slot60` in the shared header (PROPOSED name below), even though the FUNCTION name is confidently renamed here (function renames are tree-wide, not subject to the field-ownership rule).
+- `TextEntry__PlaySound` -- tier B. gTextEntryMethods +0x060 (classtable.py) -- this IS the `slot60` implementation dispatched by both TextEntry__HandleCommand (arg1=0x10) and TextEntryItemList's TextEntry__SetCursorPos/TextEntry__SetCharAt (arg1=0). Forwards arg1 to the attached `target`'s own slot80(target, arg1, 0x60, 0x60) when target != NULL. Mechanics clear (pings the linked TargetObj86ED0 whenever the name cursor or character selection changes); the on-screen meaning of the two 0x60 literals is not established. Since `slot60` is referenced by both this unit and TextEntryItemList, the SLOT NAME is left as `slot60` in the shared header (PROPOSED name below), even though the FUNCTION name is confidently renamed here (function renames are tree-wide, not subject to the field-ownership rule).
 
 ## Track 4 (2026-09-26, round 87)
 
@@ -84,7 +84,7 @@ Zero bytes changed.
 ### Proposed field names (round 98)
 
 - gTextEntryMethods +0x060 `notifyTarget` -> `playSound` (accessors: this
-  unit's HandleCommand, class_3bb8c_j's SetCursorPos/SetCharAt), so the
+  unit's HandleCommand, TextEntryItemList's SetCursorPos/SetCharAt), so the
   slot is named like its occupant; the prototype's `arg1` -> `tone`.
 - TextEntry +0x03C `target` -> `sound`, TaskObjF's name for the same
   object (accessors: this unit's AttachTarget/DetachTarget/PlaySound only;

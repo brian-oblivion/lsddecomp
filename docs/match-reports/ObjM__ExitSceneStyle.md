@@ -2,7 +2,7 @@
 
 > Renamed from `func_800536B0` on 2026-09-24 (tools/rename.py). Address 0x800536b0.
 
-**Unit:** class_3bb8c_l · **Size:** 45 words (0xB4 bytes) ·
+**Unit:** ObjMStyleActor · **Size:** 45 words (0xB4 bytes) ·
 **Status: MATCHED 45/45**, whole-image SHA1 green.
 
 ## What it does
@@ -47,4 +47,4 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

@@ -9,7 +9,7 @@
  * ctor-chain parent. Every method is in src/DreamSys.c. One instance, made
  * by GameApplication__GameApplication (src/GameApplicationFileResource.c, New_DreamSys) and kept in
  * GameApplication::dreamSys; the same object is GraphRoom::dreamSys, the
- * `target` class_3bb8c_l hands SetDreamAuxWorld (code_4cd08's
+ * `target` ObjMStyleActor hands SetDreamAuxWorld (DreamAux's
  * gDreamAuxWorld), and the `peer` every Entity links to.
  *
  * It owns the dream clock (SceneNode's `tick`, advanced by
@@ -422,7 +422,7 @@ extern s8 DREAM_COLOR_TABLE[9];
 extern const s8 VOICE_BY_SELECT[0x18];
 extern const s8 VOICE_PITCH_BY_SELECT[0x18];
 
-/* BasicClass-family allocator; see GameApplicationFileResource.h / code_55dd4.h / Entity.h /
+/* BasicClass-family allocator; see GameApplicationFileResource.h / TodActor.c / Entity.h /
    Pad.c for the other units that also declare it locally. */
 extern void *BMemPMgrAlloc(s32 size);
 
@@ -640,6 +640,24 @@ struct DreamSys {
    newGamePending: 1792. */
 #define DREAMSYS_SAVE_SIZE (offsetof(DreamSys, newGamePending) - offsetof(DreamSys, saveMagic))
 
+/* What DreamSys__GetSaveBlock (+0x1B0) returns, &saveMagic, viewed from
+ * there: each field is the DreamSys field above at its DreamSys offset less
+ * saveMagic's +0x178. UpdateFlashbackLock (TitleMenu) reads the flashback
+ * pair; GraphRoom reads the year, the day and the mood ring, and sets
+ * graphScored, DreamSys +0x5DF, the last byte of unknown_values_0x5d8[8]. */
+typedef struct DreamSaveBlock {
+    u8 pad00[0x4];
+    /* +0x004 */ s32 currentYear;              /* DreamSys +0x17C; nonzero: the ring is full, plot all 100 days */
+    /* +0x008 */ s32 currentDay;               /* DreamSys +0x180; days logged this year, the ring's write cursor */
+    /* +0x00C */ s32 totalFlasbackUnlockScore; /* DreamSys +0x184: FLASHBACK unlocks past 9999999 */
+    u8 pad10[0x18 - 0x10];
+    /* +0x018 */ MoodGraphPoint moodPreviousDays[DAYS_PER_YEAR]; /* walked backwards from currentDay - 1 */
+    u8 pad2F2[0x2F4 - 0x2F2];
+    /* +0x2F4 */ s32 amountFlashbacksAvailable; /* DreamSys +0x46C: ... and only with one stored */
+    u8 pad2F8[0x467 - 0x2F8];
+    /* +0x467 */ s8 graphScored; /* set once GraphRoom__ScoreDayLog's scan has succeeded */
+} DreamSaveBlock;
+
 /* Dispatch table indexed by DreamSys__ApplyMoveCommand's `arg1`; see that table's own
    comment near MOVE_MODE_SPEEDS/MOVE_COMMAND_SIGNS above. Same element signature as
    Actor__MoveLocalZOrFindLink/Actor__MoveLocalXOrFindLink (Actor +0x0D0/+0x0D4). */
@@ -790,7 +808,7 @@ struct DreamSysMethods {
 typedef DreamSys *(*DreamSysResetRetFn)(DreamSys *self);
 
 /* attachToParent (+0x04C) as its occupant, DreamSys__SpawnAtLink, takes it:
- * (self, parent), no offset. ObjM__SetupSceneStyle (class_3bb8c_l) calls it
+ * (self, parent), no offset. ObjM__SetupSceneStyle (ObjMStyleActor) calls it
  * through this cast. */
 typedef void (*DreamSysAttachToParentFn)(DreamSys *self, void *parent);
 

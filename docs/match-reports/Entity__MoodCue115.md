@@ -2,7 +2,7 @@
 
 > Renamed from `func_80061778` on 2026-09-24 (tools/rename.py). Address 0x80061778.
 
-**Unit:** Entity_d · **Size:** 198 words · **Status:** MATCHED (round 68) — 198/198, whole-image oracle green
+**Unit:** Entity · **Size:** 198 words · **Status:** MATCHED (round 68) — 198/198, whole-image oracle green
 
 REVISITED, round 68: MATCHED 198/198 on the first build after retyping
 `EntityMethods::slotCC` from `s32` back to `void`; names/types used — the
@@ -74,7 +74,7 @@ out with no source change at all.
 
 ### Why the old typing was adopted, and why it was never evidence
 
-`slotCC` was typed `s32` on the strength of `Entity__MoodCue37` (Entity_c) being a
+`slotCC` was typed `s32` on the strength of `Entity__MoodCue37` (Entity) being a
 lone one-line wrapper, `return this->methods->slotCC(this, -0x5A, 0);` —
 CLAUDE.md's "one-line wrapper" rule, which says a discarded return is never
 evidence of `void`, so a wrapper returning the callee's value should be typed
@@ -87,8 +87,8 @@ direction. This function's bytes ARE evidence, and they say `void`.
 
 ### Blast radius, all re-verified byte-exact
 
-35 `this->methods->slotCC(...)` call sites across `Entity_b/c/d/e/g`. Only two
-use the value, both in `src/Entity_c.c`:
+35 `this->methods->slotCC(...)` call sites across `Entity/c/d/e/g`. Only two
+use the value, both in `src/Entity.c`:
 
 - the local function-pointer variable in `func_8005FE1C`'s block
   (`s32 (**slotCC)(Entity *, s32, s32);` → `void (**slotCC)(...)`)
@@ -102,7 +102,7 @@ use the value, both in `src/Entity_c.c`:
 
 A mood-dispatch handler in this unit's family (`Entity *this,
 EntityMoodHandlerArg *out`). On `this->unk44 == 0`, calls
-`Entity__IsTargetInRange(this, 0x800)` (matched in `Entity_b.c`; this is its first
+`Entity__IsTargetInRange(this, 0x800)` (matched in `Entity.c`; this is its first
 cross-unit caller); on a nonzero result it runs a "detach" burst (two
 `SceneNode__FaceTarget` calls with swapped first/second arguments — see the
 round-13 head finding below —, `activate`, `startSoundCue`,
@@ -129,7 +129,7 @@ from every path) is a `slot144(this, target) < 0x200` check driving
 
 ## Final body
 
-As committed in `src/Entity_d.c` — the inherited near-miss body unchanged
+As committed in `src/Entity.c` — the inherited near-miss body unchanged
 apart from the renames. The fix was entirely in the header.
 
 ```c
@@ -261,8 +261,8 @@ emitted.
 
 ## HEAD FINDING, round 13: the reversed `SceneNode__FaceTarget` arguments are a DIRECTION FLAG
 
-Runner echo (`Entity__MoodCue115`, `Entity_d`) and runner bravo (`Entity__MoodCue81`,
-`Entity_e`) each independently flagged a `SceneNode__FaceTarget` call site
+Runner echo (`Entity__MoodCue115`, `Entity`) and runner bravo (`Entity__MoodCue81`,
+`Entity`) each independently flagged a `SceneNode__FaceTarget` call site
 whose first two arguments are swapped relative to every other known site. Both
 verified it against raw disassembly. The head then surveyed **every** call site
 in the executable, and the swap is not an outlier convention — it is perfectly
@@ -352,9 +352,9 @@ lever stays cleanly scoped.
 `gEntityMoodHandlerTable` (`asm/data/79528.data.s`, base 0x80089EB0,
 0x10-byte stride) at row 115 (0x80089EB0 + 0x10*115 = 0x8008A5E0), read
 directly from `disk/SLPS_015.56`. Row 115 is NOT contiguous with this
-unit's other rows (39-52, 55-58) or with Entity_e's own rows (59-92ish),
+unit's other rows (39-52, 55-58) or with Entity's own rows (59-92ish),
 confirming the row index tracks moodIndex assignment rather than code
-address -- flagged in `src/Entity_d.c`'s unit header comment so the next
+address -- flagged in `src/Entity.c`'s unit header comment so the next
 reader doesn't assume a typo. Mechanics established (mood-tick sound-cue-set
 callback); which dream object owns the row is not.
 

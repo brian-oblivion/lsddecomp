@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005C9A4` on 2026-09-21 (tools/rename.py). Address 0x8005c9a4.
 
-**Unit:** code_4cd08 · **Size:** 14 words · **Status:** MATCHED (14/14 words)
+**Unit:** DreamAux · **Size:** 14 words · **Status:** MATCHED (14/14 words)
 
 ## What it does
 
@@ -101,7 +101,7 @@ without being proven to be the same field (see the header's own caveat on
 `TriggerRecord`'s offset-0x2 comment) -- "Trigger" alone reflects that
 looser confidence.
 
-## Round 100 (alpha): track 7, moved from src/code_4cd08.c and include/code_4cd08.h
+## Round 100 (alpha): track 7, moved from src/DreamAux.c and include/DreamAux.h
 
 ## Naming (round 100)
 

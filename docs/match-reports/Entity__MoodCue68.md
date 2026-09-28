@@ -2,7 +2,7 @@
 
 > Renamed from `func_800621A8` on 2026-09-24 (tools/rename.py). Address 0x800621a8.
 
-Unit: `Entity_e` (round 13). Sets `Entity::unk48` (the s16 field, a
+Unit: `Entity` (was `Entity_e`) (round 13). Sets `Entity::unk48` (the s16 field, a
 different field from `EntityMoodHandlerArg::unk48`) via a coin flip, then
 branches on `this->unk44`: a `== 0` path doing two independent modulo
 checks (`% 10`, `% 20`) plus an "odd tick" gate that can promote `unk44` to
@@ -117,9 +117,9 @@ from the "obvious" spelling to match retail's exact lowering.
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 68 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 68 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity.
 
-Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity_b/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice1Tone`, `voice1Pitch`, `voice2Tone`, `voice2Pitch`.
+Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice1Tone`, `voice1Pitch`, `voice2Tone`, `voice2Pitch`.
 
 **Data constants renamed this round:** `D_80089CC4` -> `ROTATION_ZPLUS9` and `D_80089D6C` -> `TRANSLATE_Y_PLUS8`, tier B. Byte-decoded from `disk/SLPS_015.56` against the existing `ROTATION_YAW_PLUS9`/`ROTATION_ZMINUS90`/`TRANSLATE_Y_PLUS256` tables: rotation tables are four s16 {num,den} pairs for X/Y(yaw)/Z/W, only one pair with den=1; translate tables are three consecutive s32 (X,Y,Z), only one nonzero. `D_80089CC4`'s nonzero pair is the THIRD (Z) slot at (9,1) -- same slot `ROTATION_X50_YMINUS120_Z30` already confirmed is Z, so `ROTATION_ZPLUS9` follows `ROTATION_ZMINUS90`'s no-underscore single-letter-axis convention. `D_80089D6C`'s nonzero 32-bit slot is the second (Y) at +8, matching `TRANSLATE_Y_*`.
 

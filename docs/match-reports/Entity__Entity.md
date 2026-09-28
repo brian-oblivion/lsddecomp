@@ -8,7 +8,7 @@ Entity's constructor, reached both directly (this function) and indirectly
 through the vtable's own `ctor` slot (`Get_vtable_Entity()->ctor`, see
 `New_Entity`). First calls the shared base-class constructor,
 `GetTodActorMethods()->ctor(this, arg2, arg3)` — `GetTodActorMethods()` (matched in
-`code_55dd4.c`) returns the SAME shared "BasicClass" ancestor vtable that
+`TodActor.c`) returns the SAME shared "BasicClass" ancestor vtable that
 `TodActor` also derives from (see the big comment at the top of
 `include/Entity.h`). Only on success does it finish initializing: assigns
 `this->methods` to `Get_vtable_Entity()` (Entity's OWN vtable — the base

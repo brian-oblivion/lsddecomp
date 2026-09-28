@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005281C` on 2026-09-24 (tools/rename.py). Address 0x8005281c.
 
-**Unit:** class_3bb8c_k · **Size:** 68 instructions (0x110 bytes) ·
+**Unit:** ObjMStyleActor · **Size:** 68 instructions (0x110 bytes) ·
 **Status: MATCHED 68/68**, whole-image SHA1 green.
 
 ## Role
@@ -101,7 +101,7 @@ Round 75 (bravo, track 3). `func_8005281C` -> `ItemList__RefreshRows`, **tier A*
 
 Slot +0x094 (`tools/classtable.py gItemListMethods`). (self, top, column, cursor, notify): re-formats every visible row's text for the new top/column (setText), SetView without highlight, and if `notify` calls forwardToTarget(0). Callers: ScrollRight, ScrollLeft, CursorUp, CursorDown (all notify=1).
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
 
 ## Round 99 (delta, track 7)
 

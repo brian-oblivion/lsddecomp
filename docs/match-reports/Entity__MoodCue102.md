@@ -2,12 +2,12 @@
 
 > Renamed from `func_800646D8` on 2026-09-24 (tools/rename.py). Address 0x800646d8.
 
-**Unit:** Entity_g · **Size:** 148 instructions
+**Unit:** Entity · **Size:** 148 instructions
 
 ## Blocker screen
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity_g/Entity__MoodCue102.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo|nop_mflo_mfhi' asm/nonmatchings/Entity/Entity__MoodCue102.s
 ```
 
 No hits.
@@ -88,7 +88,7 @@ row pointer; closed to 148/148 on the second build.
 ## Struct/table knowledge established
 
 - No new fields; corroborates every field this unit's first function
-  (`Entity__MoodCue98`) and the existing `Entity_b.c` siblings already
+  (`Entity__MoodCue98`) and the existing `Entity.c` siblings already
   established (`unkFC`, `unk44`, `unk80`, `unk84`, `unkF4`, `unk94`).
 
 ### Proposed learning
@@ -111,7 +111,7 @@ and vtable dispatch.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Entity_g. 2 attempts (one residue,
+round 13 (2026-09-03), runner alpha, unit Entity. 2 attempts (one residue,
 two swapped row-pointer arms in a cascading range chain).
 
 
@@ -120,11 +120,11 @@ two swapped row-pointer arms in a cascading range chain).
 Why `MoodCue102`: the function's address sits in `gEntityMoodHandlerTable`
 row 102 (base 0x80089EB0, stride 0x10, the row's own `handler` word),
 confirmed by reading `disk/SLPS_015.56` directly rather than trusting
-address proximity (Entity_d/Entity_e, rounds 76-77, measured that row
+address proximity (Entity/Entity_e, rounds 76-77, measured that row
 order does not track code address). Tier B: the row-to-function mapping is
 a compiler fact, not a guess, but which dream state or object each row
 represents is not established -- the row number is kept decimal, matching
-the existing `MoodCueNN` siblings (Entity_b through Entity_f), so the
+the existing `MoodCueNN` siblings (Entity through Entity_f), so the
 names sort in table order.
 
 ## Data constants decoded this round
@@ -190,5 +190,5 @@ reactivate or restart the cue". By 2000 ticks the scale has settled at
 `SCALE_UNIT` (from 1936) and the handler stops its own `moveLocalZ`; setting
 1 also stops the `state == 0` link-stage trigger from firing. The same
 value is stored without a `deactivate` by `Entity__MoodCue123` and by
-Entity_e's MoodCue after `stopSoundCue`, so the header comment's "after
+Entity's MoodCue after `stopSoundCue`, so the header comment's "after
 deactivate" is narrower than the uses (proposed to the head).

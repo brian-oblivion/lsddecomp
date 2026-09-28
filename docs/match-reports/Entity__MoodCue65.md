@@ -2,7 +2,7 @@
 
 > Renamed from `func_80061F30` on 2026-09-24 (tools/rename.py). Address 0x80061f30.
 
-Unit: `Entity_e` (round 13). Ignores its `out` argument entirely (same shape
+Unit: `Entity` (round 13). Ignores its `out` argument entirely (same shape
 as `Entity__MoodCue67`/`Entity__MoodCue70` in this unit): a one-shot 1-in-3 dice
 roll on the first tick fires three vtable calls and sets `unk44 = 0xB`,
 then a second block guarded by that flag fires an `unkFC`-threshold call
@@ -42,7 +42,7 @@ to scaling the remainder by a further constant.
 
 `slot48` (already `s32`-returning), `slotCC` (`s32`-returning), `slot44`
 (`void`, `(self, s32, void*)`), and `slotC4` (`void`) are all pre-existing
-vtable slot types from earlier work in this unit and `Entity_d`; every
+vtable slot types from earlier work in this unit and `Entity`; every
 call here discards its return value, consistent with those slots' existing
 types. `ROTATION_YAW_PLUS90` already has an extern/callsite later in this same file
 (`Entity__MoodCue73`); `SCALE_HALF` and `ROTATION_YAW_MINUS90` are new per-unit `extern
@@ -52,7 +52,7 @@ No new struct or vtable-slot knowledge.
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 65 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 65 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

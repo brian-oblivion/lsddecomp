@@ -6,7 +6,7 @@
 
 > Renamed from `func_80050F28` on 2026-09-24 (tools/rename.py). Address 0x80050f28.
 
-Unit `class_3bb8c_i`, carved round 14.
+Unit `TextEntryItemList`, carved round 14.
 
 `Obj86ED0`'s vtable slot 0x040. Stores its `mode` argument and name pointer,
 resets two counters, then either transliterates the name into the owned
@@ -71,7 +71,7 @@ plain strcpy; HandleCommand's circle arm encodes back in the same mode).
 `strcpy` comes from Sony's `<strings.h>` (libc2/strcpy.o is linked), not a
 local prototype. Zero bytes changed.
 
-Moved here from src/class_3bb8c_i.c (stale history; DecodeFullWidthSjis
+Moved here from src/TextEntryItemList.c (stale history; DecodeFullWidthSjis
 is matched in ScreenWidgets.c since round 38, typed `u8 *(u8 *dst, u8
 *src)`): "This project's own strcpy (matched elsewhere) -- TextEntry__SetText's
 own caller, same local-declaration convention as TitleMenuTaskObjF.c/others."
@@ -80,6 +80,6 @@ TextEntry__SetText's own call. Translates each byte of `src` (a name
 string) into `dest` (folding a couple of special-case byte ranges) and
 returns `dest`, same convention as `strcpy`. Typed purely from this call
 site's own register usage. Declared HERE, not in include/class_3bb8c.h:
-src/class_3bb8c_j.c types the same (still undefined) function as `void
+src/TextEntryItemList.c types the same (still undefined) function as `void
 (void *, void *)` from its own call site, and two call-site typings of one
 function cannot share a header."

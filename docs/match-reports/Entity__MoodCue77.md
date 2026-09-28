@@ -2,7 +2,7 @@
 
 > Renamed from `func_80062A40` on 2026-09-24 (tools/rename.py). Address 0x80062a40.
 
-Unit: `Entity_e` (round 13). A four-way dispatch: `slot148`+`%5` mood
+Unit: `Entity` (round 13). A four-way dispatch: `slot148`+`%5` mood
 setup, then an early-return branch on a new gate field (`unk7C`), then a
 second early-return branch on `unk44 == 0` doing an unkFC-literal-set
 check, and finally the fallthrough path doing the same check against two
@@ -89,7 +89,7 @@ fields carved from previously-unlabeled padding, plus one comment append.
   (`unkFC != 0x140`) skips past. Modeled directly as one `||`-chained
   condition guarding one call, which reproduced this exactly.
 - `ROTATION_YAW_PLUS90`/`ROTATION_YAW_MINUS90` reuse this file's existing per-unit externs
-  (already declared earlier in `Entity_e.c` for `Entity__MoodCue65`/
+  (already declared earlier in `Entity.c` for `Entity__MoodCue65`/
   `Entity__MoodCue73`); no new externs needed here.
 
 No other new struct or vtable-slot knowledge; `slot148`, `slot44`, `slotD0`,
@@ -123,9 +123,9 @@ multi-walker array induction, and switch/jump-table drift sizing):
 
 ## Naming
 
-Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 77 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity_d/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity_d.
+Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 77 (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), confirmed by reading `disk/SLPS_015.56` directly rather than trusting address proximity (Entity/round 76 measured that row order does not track code address). Tier B: the row-to-function mapping is a compiler fact, not a guess, but which dream object or mood state each row represents is not established -- the row number is kept decimal and zero-padded so the names sort in table order, same convention as Entity.
 
-Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity_b/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice0Pitch`.
+Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice0Pitch`.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
