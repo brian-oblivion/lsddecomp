@@ -44,18 +44,6 @@
  * allocates and TodActor.modelData points at. */
 #define MODEL_DATA_CLASS_HEADER 0x5F03
 
-/* TOD packet types and coordinate-packet flag bits, as
- * TodActor__ApplyTodPacket decodes them (the decoded header is
- * {object id, type, flag, length in words}). */
-#define TOD_PACKET_ATTRIBUTE 0
-#define TOD_PACKET_COORDINATE 1
-#define TOD_PACKET_MODEL_ID 2
-#define TOD_PACKET_PARENT 3
-#define TOD_COORD_DIFFERENTIAL 1
-#define TOD_COORD_ROTATE 2
-#define TOD_COORD_SCALE 4
-#define TOD_COORD_TRANSLATE 8
-
 /* A TOD rotation is in 1/4096 degree; divided by 360 it is a GTE angle
  * (ONE to the turn), which ApplyTodPacket then wraps with % ONE. */
 #define TOD_ROTATE_PER_ANGLE 360

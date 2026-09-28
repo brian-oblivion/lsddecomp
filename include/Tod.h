@@ -48,11 +48,20 @@ struct ResourceSource;
 #define TOD_PACKET_LEN_SHIFT 24
 #define TOD_PACKET_NIBBLE 0xF /* the type and flag fields' mask */
 
-/* The packet types ScanTodPackets tests. TOD_PACKET_MODEL_ID is spelled
- * exactly as src/world/TodActor.c's, which defines the other types. */
-#define TOD_PACKET_MODEL_ID 2       /* data: the TMD id the object is drawn with */
+/* The packet types the game reads: ScanTodPackets tests model-id and
+ * object-control packets, TodActor__ApplyTodPacket applies the first four. */
+#define TOD_PACKET_ATTRIBUTE 0
+#define TOD_PACKET_COORDINATE 1
+#define TOD_PACKET_MODEL_ID 2 /* data: the TMD id the object is drawn with */
+#define TOD_PACKET_PARENT 3
 #define TOD_PACKET_OBJECT_CONTROL 8 /* the flag says create or kill */
 #define TOD_OBJECT_CREATE 0         /* an object-control packet's flag: create */
+
+/* A coordinate packet's flag bits. */
+#define TOD_COORD_DIFFERENTIAL 1
+#define TOD_COORD_ROTATE 2
+#define TOD_COORD_SCALE 4
+#define TOD_COORD_TRANSLATE 8
 
 /* A TOD file (Sony's TOD format): id, version and resolution, the frame
  * count, then the frames, each a word-aligned run of words. */
