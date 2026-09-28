@@ -10,7 +10,7 @@
  * do, and the evidence is this:
  *  - The ctor makes three FlatLightObj children (New_FlatLightObj(0), (1),
  *    (2): one Psy-Q flat light each, set through GsSetFlatLight; src/
- *    code_3311c.c), keeps them in `lights` and adds each as a child.
+ *    FlatLightObj.c), keeps them in `lights` and adds each as a child.
  *  - Finalize fetches the same three through getLight (+0x0B8) and releases
  *    each before SceneNode's finalize.
  *  - setAmbientColor (+0x0BC) stores an r,g,b in `ambient` and hands it,
@@ -45,7 +45,7 @@ typedef struct LightRigRgb LightRigRgb;
 /* A 3-byte colour. All-s8 members give it alignment 1, which is what makes
  * LightRig__SetAmbientColor's whole-struct copies compile to lb,lb,lb then
  * sb,sb,sb (DECOMPILATION_LEARNINGS, the 3-byte all-s8 struct idiom). The
- * same shape as Sprite.h's SpriteRgb and code_3311c's FlatLightColor. */
+ * same shape as Sprite.h's SpriteRgb and FlatLightObj's FlatLightColor. */
 struct LightRigRgb {
     s8 r, g, b;
 };
