@@ -1,5 +1,5 @@
 /*
- * GameFiles -- the LbdFile class, and the getters over the game's table of
+ * game_files -- the LbdFile class, and the getters over the game's table of
  * file names.
  *
  * LbdFile (include/LbdFile.h, which documents the class): New_LbdFile to
@@ -29,7 +29,7 @@
 #include "LbdFile.h"
 #include "StageGrid.h"
 #include "bmem_pmgr.h"
-#include "GameFiles.h"
+#include "game_files.h"
 #include <rand.h>
 #include "GameApplicationFileResource.h"
 

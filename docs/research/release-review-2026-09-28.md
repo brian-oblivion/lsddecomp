@@ -32,13 +32,13 @@ rather than API.
   entity.c:298-299, entity.h:310-311; ObjMStyleActor.c:1782, 1893, 1903);
   the definitions take `(VabStreamObj *, SoundCueSet *)`. Declare once in
   SoundCueSet.h.
-- **GameFiles.** No header. `GetStageMapChunkRecord`/`...XY` are declared
+- **game_files.** No header. `GetStageMapChunkRecord`/`...XY` are declared
   `s32`/`void` in ObjMStyleActor.c:462-473 but return `FilePathRecord *`
-  (GameFiles.c:317, 322); `ObjM__GetGridRecord` is declared void and "returns"
-  through $v0. `PickSoundBank` returns `s32` for a path (GameFiles.c:203),
+  (game_files.c:317, 322); `ObjM__GetGridRecord` is declared void and "returns"
+  through $v0. `PickSoundBank` returns `s32` for a path (game_files.c:203),
   `PickStageBgm` likewise (ObjMStyleActor.c:525). `RecPick{group,sub}` and
   dream_sys.h's `CinematicCall{bank,entry}` are one packed pair, repacked by
-  hand at GameApplicationFileResource.c:80, 317. Add GameFiles.h.
+  hand at GameApplicationFileResource.c:80, 317. Add game_files.h.
 - **Full-width SJIS helpers.** `DecodeFullWidthSjis` is `u8 *(u8 *, u8 *)`
   (ScreenWidgets) but `void (void *, void *)` at TitleMenuTaskObjF.c:316 and
   `char *(char *, char *)` at TextEntryItemList.c:41, 511;
@@ -191,8 +191,8 @@ so merge by hand, one commit per type, the accessors from the compiler.
   this item may edit it for that).
 - **world:** `RotationRatio(s)` (dream_sys.h) into `Ratio16`; `SubObjE`
   (DayTaskStageMap.h) into its DrawSystem type; dream_sys.h's
-  `CinematicCall` and GameFiles.c's `RecPick` into one packed pair (this
-  item may edit GameFiles.c/h for it; `GetSpecialDayOrEventRecord` stays
+  `CinematicCall` and game_files.c's `RecPick` into one packed pair (this
+  item may edit game_files.c/h for it; `GetSpecialDayOrEventRecord` stays
   unprototyped, see its MATCHING line); IntermediateBase's `frameClock` /
   `lightRig` are still `BasicClass *`, so about 20 casts in
   ObjMStyleActor.c remain.

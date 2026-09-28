@@ -138,7 +138,7 @@ Read each named class's header first; its banner points to the units.
   logos, play an opening movie, run the title menu, run a day, and play the
   ending movie when a year has gone by. The game's file paths (sound banks, each stage's
   textures, music and map chunks, the movies) are one table,
-  `src/cd/GameFiles.c`.
+  `src/cd/game_files.c`.
 - **Scene objects.** `SceneNode` is the positioned 3D object, wrapping a
   libgs `GsDOBJ2` and its coordinate system (`src/graphics/scene_node.c`); `Actor`
   adds movement (`src/world/ObjMStyleActor.c`). `LinkResource`, `ModelData` and `Tod`/`TodSet`

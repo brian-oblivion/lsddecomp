@@ -6,7 +6,7 @@
 
 > Renamed from `func_800489B4` on 2026-09-25 (tools/rename.py). Address 0x800489b4.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the first build; whole-image SHA1 green, funcdiff 45/45.
 
 ## What it does
@@ -42,7 +42,7 @@ void LbdFile__AdvanceLoadState(DataSrc39094 *self) {
 ## Notes
 
 The local view's `DataSrc39094Methods.loadDataBlock` was retyped from `void *` to
-`void (*)(void)` (local to `src/cd/GameFiles.c`, no other reader), and later in
+`void (*)(void)` (local to `src/cd/game_files.c`, no other reader), and later in
 the same session to the unprototyped `s32 (*)()` once LbdFile__LoadDataBlock (its
 occupant, which returns s32 and reads `self`) was matched; still byte-exact. Retail does
 not set `$a0` before `jalr` on slot +0x080 even though its occupant
@@ -71,7 +71,7 @@ block load in flight.
   load-in-progress marker -- established only from this one subclass's
   usage; FileResource.h's own comment says only that it is the last field
   before a subclass's own fields start, with no meaning of its own).
-- **Evidence:** every read/write of `unk2A` in `src/cd/GameFiles.c` (this
+- **Evidence:** every read/write of `unk2A` in `src/cd/game_files.c` (this
   report; LbdFile__CancelRequests, LbdFile__LoadHeader,
   LbdFile__LoadDataBlock).
 - **Caution for the head applying this:** FileResource has sixteen

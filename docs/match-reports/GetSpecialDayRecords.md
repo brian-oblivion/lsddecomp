@@ -4,7 +4,7 @@
 
 > Renamed from `func_800492D0` on 2026-09-25 (tools/rename.py). Address 0x800492d0.
 
-Round 82, runner echo (second echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (second echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
 retail SLPS_015.56`), funcdiff 25/25, 0 insertions / 0 deletions, no
 out-of-range drift.
@@ -15,7 +15,7 @@ Record accessor: base is record 0x23E (byte +0x3EC8) of GetRecordTable's table, 
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
+Declarations it needs are the local views at the top of `src/cd/game_files.c`
 (`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
@@ -53,4 +53,4 @@ FilePathRecord *GetSpecialDayRecords(s32 *countOut, s32 n) {
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

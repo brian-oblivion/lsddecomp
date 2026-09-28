@@ -6,7 +6,7 @@
 
 > Renamed from `func_80048BC0` on 2026-09-25 (tools/rename.py). Address 0x80048bc0.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the third build; whole-image SHA1 green, funcdiff 54/54.
 
 ## What it does
@@ -19,7 +19,7 @@ start, 0 otherwise. State 10 is completed by LbdFile__AdvanceLoadState.
 
 ## Source
 
-Needs the local views at the top of `src/cd/GameFiles.c`, with
+Needs the local views at the top of `src/cd/game_files.c`, with
 `DataSrc39094Methods.releaseAlloc` declared UNPROTOTYPED (`void (*releaseAlloc)();`),
 plus:
 

@@ -6,7 +6,7 @@
 
 > Renamed from `func_80048B78` on 2026-09-25 (tools/rename.py). Address 0x80048b78.
 
-Round 82, runner echo (second echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (second echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
 retail SLPS_015.56`), funcdiff 18/18, 0 insertions / 0 deletions, no
 out-of-range drift.
@@ -17,7 +17,7 @@ gLbdFileMethods method: calls its own `freeBuffer` (slot +0x05C, FileResource in
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
+Declarations it needs are the local views at the top of `src/cd/game_files.c`
 (`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c

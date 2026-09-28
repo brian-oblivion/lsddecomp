@@ -18,7 +18,7 @@
  * Every hook but RunDayTask first calls SetActiveDataSourceDriverMode(0, 0,
  * 0). Every task is handed the Application's `aux` as its
  * IntermediateBaseInitArgs, runs to its end inside init, and is released. A
- * movie is a StreamTask given the path and movie id GameFiles.c's getters
+ * movie is a StreamTask given the path and movie id game_files.c's getters
  * return, the id turned into a frame count by GetMovieFrameCount; an image is
  * a TaskCore showing the TIM. Every movie but the intro's is gated by
  * config->playStreams. GetGameApplicationMethods, the table's getter, ends
@@ -43,7 +43,7 @@
 #include "NullDriver.h"
 #include "cd_driver.h"
 #include "bmem_pmgr.h"
-#include "GameFiles.h"
+#include "game_files.h"
 #include <strings.h>
 #include "DayTaskStageMap.h"
 

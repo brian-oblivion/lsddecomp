@@ -4,7 +4,7 @@
 
 > Renamed from `func_80048F84` on 2026-09-25 (tools/rename.py). Address 0x80048f84.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the second build; whole-image SHA1 green, funcdiff 46/46.
 
 ## What it does
@@ -68,4 +68,4 @@ caller's 2-parameter extern now agrees with the definition.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

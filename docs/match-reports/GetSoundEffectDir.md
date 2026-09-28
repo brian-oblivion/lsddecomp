@@ -2,7 +2,7 @@
 
 > Renamed from `func_80048E08` on 2026-09-25 (tools/rename.py). Address 0x80048e08.
 
-Round 82, runner echo, 2026-09-25. Unit `GameFiles` (carved revision 18).
+Round 82, runner echo, 2026-09-25. Unit `game_files` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
 (`./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`), funcdiff
 9/9, 0 insertions / 0 deletions, no out-of-range drift. No levers needed.

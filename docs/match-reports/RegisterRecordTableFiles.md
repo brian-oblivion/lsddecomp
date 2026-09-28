@@ -120,7 +120,7 @@ now says so. (The derivation above quotes the old comment as it was.)
 
 `func_8004A070` -> `RegisterRecordTableFiles` (tier B). The body, read with
 its two callees: GetRecordTable returns sRecordTable (0x230 records of 0x1C
-bytes, each a file path first; GameFiles.c's banner) and its count;
+bytes, each a file path first; game_files.c's banner) and its count;
 RegisterFileTableEntries (GameApplicationFileResource.c) appends `count` records to the CD
 driver's file table and resolves them, returns 0 to be retried, and 1 when
 the CD driver is not the active source. So the function registers the record
@@ -138,4 +138,4 @@ GameApplication__RegisterFilesCallback 0) is not, hence B.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

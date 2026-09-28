@@ -55,7 +55,7 @@
 #include "GridCell.h"
 #include "GraphRoom.h"
 #include "bmem_pmgr.h"
-#include "GameFiles.h"
+#include "game_files.h"
 #include <strings.h>
 #include "dream_aux.h"
 

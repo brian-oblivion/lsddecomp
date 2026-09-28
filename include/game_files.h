@@ -1,8 +1,8 @@
-#ifndef GAMEFILES_H
-#define GAMEFILES_H
+#ifndef GAME_FILES_H
+#define GAME_FILES_H
 
 /*
- * The getters over the game's table of file names, src/cd/GameFiles.c (the
+ * The getters over the game's table of file names, src/cd/game_files.c (the
  * LbdFile class it also holds is include/LbdFile.h). A record is one
  * sRecordTable entry, a CdFileEntry (include/cd_driver.h) whose name is a
  * zero-padded path: RegisterRecordTableFiles hands the table to the CD

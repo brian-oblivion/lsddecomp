@@ -96,7 +96,7 @@ nothing a screen-dimensions setter would.
 Renamed `GameApplication__SetDayFromTickCount` -> `GameApplication__SeedRandom`
 (`tools/rename.py`); its cast type `GameApplicationSetDayFn` ->
 `GameApplicationSeedRandomFn`. **Tier A**, from the body alone now that the
-callee is matched C (src/cd/GameFiles.c): `SeedAndRandom(seed, unused)` is
+callee is matched C (src/cd/game_files.c): `SeedAndRandom(seed, unused)` is
 `if (seed != 0) srand(seed); return rand();`, and this function discards the
 result, so all it does is seed the C library's RNG with the scratchpad word at
 0x1F800000 reduced mod 365. Nothing stores a day, so "SetDay" claimed more than
@@ -111,7 +111,7 @@ GameApplicationFileResource.c still says "advances the day cursor": that is trac
 
 ## Track 7 polish (round 100, echo)
 
-Body changes, all byte-identical: *(s32 *)0x1F800000 % 365 -> *(s32 *)getScratchAddr(0) % DAYS_PER_YEAR (libetc.h's macro; dream_sys.h); the SeedAndRandom extern returns s32, as defined (GameFiles.c).
+Body changes, all byte-identical: *(s32 *)0x1F800000 % 365 -> *(s32 *)getScratchAddr(0) % DAYS_PER_YEAR (libetc.h's macro; dream_sys.h); the SeedAndRandom extern returns s32, as defined (game_files.c).
 
 ### History: code_1677c.c comments before the round-100 polish
 

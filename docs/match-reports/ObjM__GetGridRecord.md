@@ -37,7 +37,7 @@ void ObjM__GetGridRecord(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
   the branch TARGET. To match a specific target/fallthrough placement,
   solve for the written `C` that makes `NOT(C)` equal the actual machine
   test, don't guess from the semantics alone.
-- `GetStageMapChunkRecord(index, sub)` (now matched, GameFiles.c) reads both `$a0`
+- `GetStageMapChunkRecord(index, sub)` (now matched, game_files.c) reads both `$a0`
   and `$a1`, and this function writes nothing to `$a1` before the jal, so
   the value the callee uses as `sub` is `code`. Until round 82 this call was
   written with one argument against a K&R declaration, reading `code` as a
@@ -92,11 +92,11 @@ the body does. Parameters: `code, arg2, arg3` -> `cell, x, y` (GetStageMapChunkR
 prototype follows.
 
 The body stays `void`: class_3bb8c.h declares GetStageMapChunkRecordXY `void`
-although GameFiles.c defines it returning `FilePathRecord *`, so the record is
+although game_files.c defines it returning `FilePathRecord *`, so the record is
 returned only because it is still in $v0. Proposed for the head: that
 prototype returns `FilePathRecord *` (or `void *`), after which this body can
 `return` both calls.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

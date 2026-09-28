@@ -4,7 +4,7 @@
 
 > Renamed from `func_80049334` on 2026-09-25 (tools/rename.py). Address 0x80049334.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the third build; whole-image SHA1 green, funcdiff 37/37,
 0 insertions / 0 deletions.
 
@@ -18,7 +18,7 @@ Non-negative `group`: `rec = GetSpecialDayRecords(&count, group)`, writes
 
 ## Source
 
-Declarations: `FilePathRecord` at the top of `src/cd/GameFiles.c`, plus:
+Declarations: `FilePathRecord` at the top of `src/cd/game_files.c`, plus:
 
 ```c
 typedef struct RecPick {
@@ -66,4 +66,4 @@ the value's register swapped (v0/v1) -> one assignment of a ternary.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

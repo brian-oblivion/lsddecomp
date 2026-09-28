@@ -458,7 +458,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   callers passing `self` stay legal C. **Neither form is a safe default**: the same situation matched
   as `slot(self)` in `MoviePlayer__PollActive` (the zero-argument form moved a constant out of the delay slot
   and ran one word long) and as `slot()` in `func_80048BC0` and `TileMap__Load`. Try the other
-  first when one misses. (round 82, GameFiles and GraphicsResources)
+  first when one misses. (round 82, game_files and GraphicsResources)
 - **The same forward trace applies to a DEAD PARAMETER's register, which 2.6.3 reuses as scratch.**
   A delay-slot `move $aN, $vM` is filler only once `$aN`'s next READ on every path is found; in
   `SeqPlay` a store two blocks on read it, so the source stored the wrong value (the unused

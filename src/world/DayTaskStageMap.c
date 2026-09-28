@@ -53,7 +53,7 @@
 #include "GridCell.h"
 #include "flat_light_obj.h"
 #include "bmem_pmgr.h"
-#include "GameFiles.h"
+#include "game_files.h"
 #include "GameApplicationFileResource.h"
 #include "dream_aux.h"
 

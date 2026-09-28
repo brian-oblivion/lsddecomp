@@ -4,7 +4,7 @@
 
 > Renamed from `func_80048D74` on 2026-09-25 (tools/rename.py). Address 0x80048d74.
 
-Round 82, runner echo (second echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (second echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the fourth build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
 retail SLPS_015.56`), funcdiff 33/33, 0 insertions / 0 deletions, no
 out-of-range drift.
@@ -15,7 +15,7 @@ Weekly table pick: `r = (u32)SeedAndRandom(0, arg) % 7` (unsigned: retail's mult
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
+Declarations it needs are the local views at the top of `src/cd/game_files.c`
 (`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
 
 ```c
