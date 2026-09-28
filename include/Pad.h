@@ -76,7 +76,7 @@ struct Pad {
 };
 
 extern PadMethods gPadMethods;
-extern PadMethods *Get_vtable_Pad(void);
+extern PadMethods *GetPadMethods(void);
 
 Pad *New_Pad(s32 mode, s32 port);
 void Pad__Pad(Pad *self, s32 mode, s32 port);

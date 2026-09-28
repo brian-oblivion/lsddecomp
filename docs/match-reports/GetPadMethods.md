@@ -1,4 +1,6 @@
-# Get_vtable_Pad
+# GetPadMethods
+
+> Renamed from `Get_vtable_Pad` on 2026-09-28 (tools/rename.py). Address 0x80025e9c.
 
 > Renamed from `func_80025E9C` on 2026-09-24 (tools/rename.py). Address 0x80025e9c.
 
@@ -17,7 +19,7 @@ constructor itself) to install `self->methods`.
 ## Final C
 
 ```c
-PadMethods *Get_vtable_Pad(void) {
+PadMethods *GetPadMethods(void) {
     return &gPadMethods;
 }
 ```

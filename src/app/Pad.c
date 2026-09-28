@@ -39,7 +39,7 @@ Pad *New_Pad(s32 mode, s32 port) {
     if (self == NULL) {
         goto fail;
     }
-    Get_vtable_Pad()->ctor(self, mode, port);
+    GetPadMethods()->ctor(self, mode, port);
     return self;
 fail:
     return NULL;
@@ -47,7 +47,7 @@ fail:
 
 void Pad__Pad(Pad *self, s32 mode, s32 port) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_Pad();
+    self->methods = GetPadMethods();
     if (sPadRefCount++ == 0) {
         PadInit(mode);
     }
@@ -144,6 +144,6 @@ void Pad__LoadButtonTable(void) {
 
 void Pad__NoOpSlot54(void) {}
 
-PadMethods *Get_vtable_Pad(void) {
+PadMethods *GetPadMethods(void) {
     return &gPadMethods;
 }

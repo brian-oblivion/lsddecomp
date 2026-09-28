@@ -64,7 +64,7 @@ it matches `gDreamSysMethods`, the one method table in the tree that is
 already named. **`tools/rename.py` refuses it** and I did not work around
 it: its "NEW already appears" guard fires because six files
 (`docs/match-reports/BasicClass__BasicClass.md`, this report,
-`Pad__LoadButtonTable.md`, `Get_vtable_Pad.md`, `include/Pad.h`,
+`Pad__LoadButtonTable.md`, `GetPadMethods.md`, `include/Pad.h`,
 `include/class_3bb8c.h`) already contain the string `BASICCLASS_METHODS` as
 PROSE describing this very symbol. The guard is correct in general and
 wrong in this instance; see `### Proposed learning` below.
