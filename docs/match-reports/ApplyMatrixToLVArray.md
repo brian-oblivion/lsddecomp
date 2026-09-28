@@ -465,7 +465,7 @@ The header's banner was rewritten as documentation in round 95; the comments it 
 
 ## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
-The `(u8 *)p + 0xC` byte walks are now `(LongVec3 *)p + 1` element walks: byte-identical. The parameters stay `void *` because src/ViewportDraw.c declares its own `void *` extern of this function while also including SceneNode.h, so a typed prototype there would be `conflicting types` in a unit outside this job (proposed to the head). Typed locals copied from the parameters score 25/31 for the same prologue-order reason as ApplyMatrixToSVArray.
+The `(u8 *)p + 0xC` byte walks are now `(LongVec3 *)p + 1` element walks: byte-identical. The parameters stay `void *` because src/graphics/ViewportDraw.c declares its own `void *` extern of this function while also including SceneNode.h, so a typed prototype there would be `conflicting types` in a unit outside this job (proposed to the head). Typed locals copied from the parameters score 25/31 for the same prologue-order reason as ApplyMatrixToSVArray.
 
 The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
 

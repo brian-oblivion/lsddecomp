@@ -12,7 +12,7 @@
  * src/GraphicsResources.c; no class derives from it.
  *
  * The name is round 83's, and the evidence is the GsBG: Viewport__DrawNode
- * (src/ViewportDraw.c) passes a class-0x54 node's +0x044 to GsSortBg, and
+ * (src/graphics/ViewportDraw.c) passes a class-0x54 node's +0x044 to GsSortBg, and
  * BgLayer__Reset lays that GsBG over a map source's GsMAP. Its one outside
  * user is TaskCore (src/app/Task.c): TaskCore__TaskCore builds one over its
  * TileMap (New_BgLayer(tileMap, 1)) into TaskCore::bgLayer, OnInit attaches

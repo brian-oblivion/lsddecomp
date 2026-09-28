@@ -4,7 +4,7 @@
 
 > Renamed from `func_80012064` on 2026-09-25 (tools/rename.py). Address 0x80012064.
 
-Unit `src/ViewportDraw.c` (the unit's only function, 449 words, 0x80012064..0x80012768).
+Unit `src/graphics/ViewportDraw.c` (the unit's only function, 449 words, 0x80012064..0x80012768).
 Byte-exact, whole-image SHA1 green (`./build-and-verify.sh`: OK), `tools/check-nonmatching.sh` green.
 
 ## What it is
@@ -26,7 +26,7 @@ It draws `node` into `self->ot[self->buf]` (the GsOT pointers at +0x78, index at
    optional `ApplyMatrixToLVArray` offset when the parent has a parent, perspective divide by
    `self->projH`, clamp to +-0x200, `GsSortSprite` with a depth-derived priority).
 
-All types (`DrawNode`, `DrawView`, the Gs shapes) are local to `src/ViewportDraw.c`. No header was
+All types (`DrawNode`, `DrawView`, the Gs shapes) are local to `src/graphics/ViewportDraw.c`. No header was
 edited; `include/Task.h` / `include/class_3bb8c.h` untouched as instructed.
 
 ## Path to the match (build scores)
@@ -121,7 +121,7 @@ Update's `(PACKET *)` cast are gone. Byte-identical (whole image green).
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
 
-## Round 99 (delta): track 7, moved from src/ViewportDraw.c
+## Round 99 (delta): track 7, moved from src/graphics/ViewportDraw.c
 
 Locals renamed for their roles (zero bytes): `c` -> `coord2`, `m` -> `elem`,
 `sc` -> `scale`, `tag` -> `classId`, `b` -> `box`, the ScreenSprite `n` ->
