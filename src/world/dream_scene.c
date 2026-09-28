@@ -3052,8 +3052,7 @@ extern SpriteRect sVariantSpriteCells[2];
 
 /* Sprite's ctor with the variant's cell, then this class's table, and the
  * reset slot (VariantSprite__SetVariantClut) with the variant, through
- * VariantSpriteResetFn. Returns nothing: it ends in that call and sets no
- * $v0. */
+ * VariantSpriteResetFn. Returns nothing: it ends in that call. */
 void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetArg, void *texture) {
     GetSpriteMethods()->ctor((Sprite *)self, texture, 0, &sVariantSpriteCells[variant], resetArg, 0);
     self->methods = GetVariantSpriteMethods();
@@ -3075,11 +3074,9 @@ void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetA
  *   into GsSPRITE scalex/scaley.
  */
 
-/*
- * The two variants' CLUT positions, one {x, y} table in VRAM:
- * {976, 511} and {992, 511}, adjacent 16-colour rows on the bottom line.
- * MATCHING: two externs, as retail takes one %hi/%lo base for x, one for y.
- */
+/* The two variants' CLUT positions, one {x, y} table in VRAM:
+ * {976, 511} and {992, 511}, adjacent 16-colour rows on the bottom line. */
+/* MATCHING: two externs, one address base for x and one for y. */
 extern const s16 sVariantSpriteClutX[];
 extern const s16 sVariantSpriteClutY[];
 

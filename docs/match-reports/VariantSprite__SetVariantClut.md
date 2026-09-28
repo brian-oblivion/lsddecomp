@@ -172,3 +172,10 @@ The source comment on `gVariantSpriteClutX/Y` carried the derivation
 "confirmed against asm/data/76DC8.data.s"); both are in "The rodata shape"
 above. The source now says what the table holds, `{976, 511}` and
 `{992, 511}` in VRAM, and keeps one `MATCHING:` line for the two externs.
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the comment on sVariantSpriteClutX/Y ended
+(now a one-line `MATCHING:` in C terms):
+
+> MATCHING: two externs, as retail takes one %hi/%lo base for x, one for y.

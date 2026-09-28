@@ -55,3 +55,11 @@ sActorLocalMoveZ); the header now names the symbol only:
 ```c
  * s16 vector at sActorLocalMove (x at ABA4, y at ABA6, z at ABA8), apply it through
 ```
+
+`include/variant_sprite.h`, above VARIANTSPRITE_SLOTS:
+
+```c
+/* Sprite's slots, then this class's own three, which hold empty functions
+ * and which nothing calls. `tools/classtable.py gVariantSpriteMethods --vs
+ * gSpriteMethods` lists the inherited slots it overrides (see the banner). */
+```

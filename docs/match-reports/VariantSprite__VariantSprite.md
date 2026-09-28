@@ -148,3 +148,11 @@ The function comment, reworded; the old one, verbatim:
  * The retail ctor ends in that call without setting $v0: it returns
  * nothing. */
 ```
+
+## History (source comments moved in track 12, round 106)
+
+From `src/world/dream_scene.c`, the function comment ended:
+
+> Returns nothing: it ends in that call and sets no $v0.
+
+It now ends at "it ends in that call".
