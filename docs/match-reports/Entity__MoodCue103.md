@@ -85,4 +85,4 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 | `D_80089CB8` | `ROTATION_YAW_MINUS_HALF` | A (by value) | `.word 0x00010000, 0x0002FFFF, 0x00010000` = {0/1, -1/2, 0/1}: yaw -1/2 degree per call |
 
 The fractional-degree precedent the section above wanted is
-`ROTATION_XPLUS_EIGHTH` (0x80089C58, x = 1/8).
+`sRotationXPlusEighth` (0x80089C58, x = 1/8).

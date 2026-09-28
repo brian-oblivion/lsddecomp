@@ -256,7 +256,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 
  * Rotation/UpdateScale), not the callers'. sTranslateYMinus64's label also
  * holds a second triple, (0, -0x20, 0); sScaleX3's z den is Entity.c's
  * sScaleTemplateZDenom. */
-extern Ratio16 ROTATION_XPLUS_EIGHTH[];
+extern Ratio16 sRotationXPlusEighth[];
 extern Ratio16 sRotationYawPlus9[];
 extern Ratio16 sRotationYawMinus9[];
 extern Ratio16 sRotationYawPlus180[];

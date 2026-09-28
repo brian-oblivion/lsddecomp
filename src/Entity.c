@@ -919,7 +919,7 @@ void Entity__MoodCue25(Entity *this, SoundCueSet *out) {
         out->slots[2].octave = -1;
         this->methods->moveLocalY(this, -256, 0);
     } else {
-        this->methods->updateRotation(this, 0, ROTATION_XPLUS_EIGHTH);
+        this->methods->updateRotation(this, 0, sRotationXPlusEighth);
         this->methods->moveLocalY(this, -512, 0);
     }
 }
