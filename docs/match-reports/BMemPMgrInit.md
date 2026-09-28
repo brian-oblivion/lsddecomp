@@ -46,7 +46,7 @@ void *BMemPMgrInit(s32 poolSize)
   runner delta). The rodata string is
   `"bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n"`, and its one reader is
   this function's malloc-failed branch. `s` prefix: unit-static data, read
-  by no other unit (precedent `sStrComInput`; `gCdFileNotFoundFmt` is the
+  by no other unit (precedent `sStrComInput`; `sCdFileNotFoundFmt` is the
   same shape of name for a string another unit shares).
 
 ## Three levers, each confirmed by objdump before moving to the next

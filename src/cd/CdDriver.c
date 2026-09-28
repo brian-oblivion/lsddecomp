@@ -1079,7 +1079,7 @@ extern char *GetDataDirectory(void);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
 
-extern char gCdFileNotFoundFmt[];   /* "File not found. path = %s\n" */
+extern char sCdFileNotFoundFmt[];   /* "File not found. path = %s\n" */
 extern char gCdFileVersionSuffix[]; /* ";1", the ISO9660 CD file-version suffix */
 
 /* Defined below, after its caller OpenCdFile: functions stay in ROM order. */
@@ -1115,7 +1115,7 @@ void OpenCdFile(CdDriver *self, char *name) {
             if (retries++ < CD_SEARCH_ATTEMPTS - 1) {
                 goto retry;
             }
-            printf(gCdFileNotFoundFmt, path);
+            printf(sCdFileNotFoundFmt, path);
             return;
         }
         self->pos = file.pos;

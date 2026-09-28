@@ -47,7 +47,7 @@ field names used unchanged; the lever was control flow).
 >             if (i++ < 100) {
 >                 goto retry;
 >             }
->             printf(gCdFileNotFoundFmt, path);
+>             printf(sCdFileNotFoundFmt, path);
 >             return;
 >         }
 >         self->pos = statBuf.pos;
@@ -136,7 +136,7 @@ field names used unchanged; the lever was control flow).
 >                goto found;
 >            }
 >        } while (i++ < 100);
->        printf(gCdFileNotFoundFmt, path);
+>        printf(sCdFileNotFoundFmt, path);
 >        goto end;
 >    found:
 >        self->unk18 = statBuf.unk0;
@@ -165,7 +165,7 @@ field names used unchanged; the lever was control flow).
 >                break;
 >            }
 >            if (!(i++ < 100)) {
->                printf(gCdFileNotFoundFmt, path);
+>                printf(sCdFileNotFoundFmt, path);
 >                return;
 >            }
 >        }
@@ -290,7 +290,7 @@ typedef struct StatBuf179D8H {
  * SDK-object conversion -- corrected round 36. */
 extern s32 CdSearchFile(StatBuf179D8H *statBuf, char *path);
 extern void printf(const char *fmt, void *arg1);
-extern char gCdFileNotFoundFmt[];
+extern char sCdFileNotFoundFmt[];
 char *BuildCdFilePath(char *dest, char *suffix);  /* forward decl, ROM order */
 
 void OpenCdFile(ObjA34_179D8H *self, char *suffix) {
@@ -307,7 +307,7 @@ void OpenCdFile(ObjA34_179D8H *self, char *suffix) {
             }
             i++;
             if (i >= 100) {
-                printf(gCdFileNotFoundFmt, path);
+                printf(sCdFileNotFoundFmt, path);
                 return;
             }
         }
