@@ -847,7 +847,7 @@ extern StageSpawn *sStageSpawnPoints[];
    forces GCC to add a second `blez` check that retail does not have. */
 extern u8 sStageSpawnPointsCount[];
 
-extern StageSpawn *STAGE_PERMALINK_SPAWNS[];
+extern StageSpawn *sStagePermalinkSpawns[];
 extern StaticLinkTrigger *STAGE_PERMALINK_TRIGGERS[];
 extern s8 LEN_STAGE_PERMALINK_TRIGGERS[];
 

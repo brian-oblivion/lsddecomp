@@ -1558,7 +1558,7 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 fromStage, s32 unused)
 
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
     return GetStaticSpawn(target, currentPos, stage, LEN_STAGE_PERMALINK_TRIGGERS,
-                          STAGE_PERMALINK_TRIGGERS, STAGE_PERMALINK_SPAWNS, 1);
+                          STAGE_PERMALINK_TRIGGERS, sStagePermalinkSpawns, 1);
 }
 
 s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
