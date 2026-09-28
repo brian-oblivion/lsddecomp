@@ -1,4 +1,6 @@
-# SetupStyleSpawnParamsB -- MATCHED round 64, 87/87 words, ins 0 / del 0, length exact (0x15C)
+# SetupStyleSpawnParamsDayMod7 -- MATCHED round 64, 87/87 words, ins 0 / del 0, length exact (0x15C)
+
+> Renamed from `SetupStyleSpawnParamsB` on 2026-09-28 (tools/rename.py). Address 0x80055410.
 
 > Renamed from `func_80055410` on 2026-09-23 (tools/rename.py). Address 0x80055410.
 
@@ -81,7 +83,7 @@ extern u8 *gStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 gStyleSpawnModelLayout;
 
-void SetupStyleSpawnParamsB(void *arg0, void *arg1) {
+void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1) {
     s32 mod3;
 
     rand();
@@ -209,7 +211,7 @@ use.
 
 ## Naming
 
-**`SetupStyleSpawnParamsB`, tier B.**
+**`SetupStyleSpawnParamsDayMod7`, tier B.**
 
 The other function-pointer target `StyleFillEffectKind0` dispatches
 through (selected when `gStyleDay % 7 == 0`, the ~1/7 branch). Same
@@ -248,5 +250,5 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * The signature keeps round 47's two dead void* params: StyleFillEffectKind0
  * dispatches this through a function pointer shared with SetupStyleSpawnParamsRandom, so
  * the ABI slot is call-site-determined.  Dead params cost nothing here.
- * See docs/match-reports/SetupStyleSpawnParamsB.md. */
+ * See docs/match-reports/SetupStyleSpawnParamsDayMod7.md. */
 ```

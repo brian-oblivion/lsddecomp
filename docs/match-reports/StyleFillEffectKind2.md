@@ -248,7 +248,7 @@ slot and forcing the two-block form.
 **Negative 2: deleting the single-use `idx` local is exactly INERT.**
 `idx = (u32) rand() % 3;` used once, inlined into the store expression:
 42/79 -> 42/79, ins 8/8, 35 skeleton diffs -- byte-identical, not merely
-similar. This is a useful boundary on the lever that closed `SetupStyleSpawnParamsB`
+similar. This is a useful boundary on the lever that closed `SetupStyleSpawnParamsDayMod7`
 in this same session and same unit: **that lever needs a local whose LIVE
 RANGE CROSSES A CALL** (`r` there carried three `rand()` results across
 intervening calls, costing one `move` per call). `idx`'s live range is

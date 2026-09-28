@@ -1581,7 +1581,7 @@ extern s32 gStyleSpawnTableIndex;
  * (gStyleSpawnOffsetX .. gStyleSpawnColors, separate symbols in the image). */
 extern s32 gStyleSpawnOffsetX;
 extern void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY);
-extern void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY);
+extern void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY);
 
 /* Fills `count` slots with kind-0 effects: a table index and scale for all
  * of them, an offset y (0: each setup picks one; a pick of 4 reads the word
@@ -1598,7 +1598,7 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
     if (offsetY != 0) {
         offsetY = gStyleSpawnYChoices[offsetY];
     }
-    setup = SetupStyleSpawnParamsB;
+    setup = SetupStyleSpawnParamsDayMod7;
     if (gStyleDay % 7 != 0) {
         setup = SetupStyleSpawnParamsRandom;
     }
@@ -1760,7 +1760,7 @@ extern s32 gStyleSpawnModelLayout;
  * StyleFillEffectKind0 calls either through one pointer.
  * MATCHING: each rand() is used inline; one local for all three adds a move
  * after every call. */
-void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY) {
+void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     s32 dayMod3;
 
     rand();

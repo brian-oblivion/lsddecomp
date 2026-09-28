@@ -130,7 +130,7 @@ extern u8 *gStyleSpawnScale;
 extern s32 gStyleSpawnTableIndex;
 extern u8 gStyleSpawnOffsetX[];
 extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);   /* this unit, cold */
-extern void SetupStyleSpawnParamsB(void *arg0, void *arg1);   /* this unit, cold,
+extern void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1);   /* this unit, cold,
                                                          signature widened */
 extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3);
 
@@ -147,7 +147,7 @@ void *StyleFillEffectKind0(void *arg0, s32 arg1, void *arg2) {
     if (t3 != 0) {
         t3 = gStyleSpawnYChoices[t3];
     }
-    fp = SetupStyleSpawnParamsB;
+    fp = SetupStyleSpawnParamsDayMod7;
     if (gStyleDay % 7 != 0) {
         fp = SetupStyleSpawnParamsRandom;
     }
@@ -171,21 +171,21 @@ Every value confirmed directly off the raw bytes:
   reassignment shape.
 - **A function pointer, not a branch, dispatches the per-iteration call.**
   `s3` is reused: first as the `%7` magic constant, then unconditionally
-  loaded with `&SetupStyleSpawnParamsB` (filling the `mult`'s latency slot for free),
+  loaded with `&SetupStyleSpawnParamsDayMod7` (filling the `mult`'s latency slot for free),
   then conditionally overwritten to `&SetupStyleSpawnParamsRandom` if
   `gStyleDay % 7 != 0`. This is the **same shared-dispatch idiom
   `TickStyle` uses via `ObjAB4C::slotE8`**, except here the two
   candidates are plain functions (not vtable slots), selected by a modulo
   test rather than a self-object's own state.
-- `SetupStyleSpawnParamsB` is called through this pointer with **two live argument
+- `SetupStyleSpawnParamsDayMod7` is called through this pointer with **two live argument
   registers** (`a0=arg2`, `a1=t3`) even though its OWN body (round 46's
   derivation, unrelated to this call) never references either -- the
   standard "already-matched/derived signature can be too narrow" situation.
-  Widened its signature from `void SetupStyleSpawnParamsB(void)` to
-  `void SetupStyleSpawnParamsB(void *arg0, void *arg1)` (dead params, zero cost in
-  the callee, confirmed: rebuilding `SetupStyleSpawnParamsB`'s own preserved body
+  Widened its signature from `void SetupStyleSpawnParamsDayMod7(void)` to
+  `void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1)` (dead params, zero cost in
+  the callee, confirmed: rebuilding `SetupStyleSpawnParamsDayMod7`'s own preserved body
   under the wider signature still reproduces its recorded 25/87 score
-  exactly -- see `docs/match-reports/SetupStyleSpawnParamsB.md`).
+  exactly -- see `docs/match-reports/SetupStyleSpawnParamsDayMod7.md`).
 
 ## The stall: `arg0`/`arg1`/`arg2` land in swapped saved registers
 
