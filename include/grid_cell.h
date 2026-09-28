@@ -1,5 +1,5 @@
-#ifndef GRIDCELL_H
-#define GRIDCELL_H
+#ifndef GRID_CELL_H
+#define GRID_CELL_H
 
 #include "scene_node.h"
 

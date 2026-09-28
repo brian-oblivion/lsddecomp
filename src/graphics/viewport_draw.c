@@ -40,7 +40,7 @@
 #include <libetc.h>
 #include "basic_class.h"
 #include "scene_node.h"
-#include "GridCell.h"
+#include "grid_cell.h"
 #include "bg_layer.h"
 #include "box_fill.h"
 #include "sprite.h"

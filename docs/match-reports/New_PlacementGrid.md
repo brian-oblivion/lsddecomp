@@ -95,7 +95,7 @@ cell's centre (column/row * 0x800 + 0x400) and returns the model
 linkResource's getModel gives for its index. StageMap__PopulateSlotCells
 points `buffer` at the grid element's LbdFile header block +
 `placementsOffset` (LbdFileHeader's own field name) and puts each result
-into that element's GridCell lattice (20 x 20, 0x800 apart: GridCell.h),
+into that element's GridCell lattice (20 x 20, 0x800 apart: grid_cell.h),
 chained records into the overflow cells. So the class is the placements of
 one grid element's cells. **`CellPlacement`** is ResolveEntry's output, one
 model's placement in one cell. The name says what the records are, not

@@ -78,4 +78,4 @@ Renamed from `DispatchObjO__func_57320`. Override of +0x09C (SceneNode's dispatc
 
 ## Track 7 (round 99, alpha)
 
-Name unchanged. The class-byte tests read `(u8)sender->methods->header` against ACTOR_CLASS_ID and GRIDCELL_CLASS_ID (added to include/GridCell.h: 0x24, two nibbles), the same lbu as the old `*(u8 *)sender->methods`. The comment that said both targets were called with self alone was stale since track 4 (the C passes sender and event); it now says what the routing is.
+Name unchanged. The class-byte tests read `(u8)sender->methods->header` against ACTOR_CLASS_ID and GRIDCELL_CLASS_ID (added to include/grid_cell.h: 0x24, two nibbles), the same lbu as the old `*(u8 *)sender->methods`. The comment that said both targets were called with self alone was stale since track 4 (the C passes sender and event); it now says what the routing is.

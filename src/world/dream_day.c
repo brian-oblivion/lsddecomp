@@ -50,7 +50,7 @@
 #include "draw_system.h"
 #include "PlacementGrid.h"
 #include "LbdFile.h"
-#include "GridCell.h"
+#include "grid_cell.h"
 #include "flat_light_obj.h"
 #include "bmem_pmgr.h"
 #include "game_files.h"

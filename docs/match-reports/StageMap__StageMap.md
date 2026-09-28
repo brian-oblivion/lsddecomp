@@ -251,7 +251,7 @@ The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it come
 
 The objects this ctor builds with `New_GridCell()` are typed as what they
 are: `UnkSlotEntry_3ac78::cellParent` is `struct GridCell *` and the
-cell-building local `obj` is `GridCell *` (include/GridCell.h), and the
+cell-building local `obj` is `GridCell *` (include/grid_cell.h), and the
 local `extern GenericObject *New_GridCell(void)` is gone. The generic
 slots resolve to SceneNode's: `slot4C` is `attachToParent` (the cellParent
 attached to the StageMap at `origin`, each cell attached to the

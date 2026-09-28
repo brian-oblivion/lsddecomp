@@ -109,7 +109,7 @@ evidence class as `NodeGuardedViewport__NodeGuardedViewport`.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-GridCell is unified in `include/GridCell.h` and expands
+GridCell is unified in `include/grid_cell.h` and expands
 SCENENODE_FIELDS: the three fields this ctor zeroes are SceneNode's, so
 `unk36` -> `flags36` and `unk38` (s32) -> `nextInCell` (void *, written as
 `NULL`; StageMap__DispatchToRectCells walks it as a pointer). The store is

@@ -955,7 +955,7 @@
         "gGridCellMethods": {
           "class": "GridCell",
           "date": "2026-09-26",
-          "header": "include/GridCell.h"
+          "header": "include/grid_cell.h"
         },
         "gIntermediateBaseMethods": {
           "class": "IntermediateBase",

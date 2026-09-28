@@ -6,7 +6,7 @@
  * NodeGuardedViewport (include/NodeGuardedViewport.h) is a Viewport whose
  * update skips the frame while no view node is attached or the ordering
  * table is not ready; its seven table methods, New_ and the table getter are
- * all here. GridCell (include/GridCell.h, a SceneNode) is one cell of
+ * all here. GridCell (include/grid_cell.h, a SceneNode) is one cell of
  * StageMap's grid, carrying the model placed there; its five table methods,
  * New_ and the getter are all here too. Each New_X allocates the object and
  * calls the ctor through the class's table; the ctor chains the parent's
@@ -40,7 +40,7 @@
 #include "actor.h"
 #include "Viewport.h"
 #include "NodeGuardedViewport.h"
-#include "GridCell.h"
+#include "grid_cell.h"
 #include "TitleMenu.h"
 #include "VabStreamObj.h"
 #include "TextRow.h"

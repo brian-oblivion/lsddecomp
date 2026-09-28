@@ -52,7 +52,7 @@
 #include "VariantSprite.h"
 #include <rand.h>
 #include "tmd_model.h"
-#include "GridCell.h"
+#include "grid_cell.h"
 #include "graph_room.h"
 #include "bmem_pmgr.h"
 #include "game_files.h"

@@ -41,6 +41,6 @@ class.
 ## Constants (round 100, track 7)
 
 `BMemPMgrAlloc(0x3C)` is `BMemPMgrAlloc(GRIDCELL_SIZE)`, `#define
-GRIDCELL_SIZE 60` added to include/GridCell.h. Not `sizeof(GridCell)`: the
+GRIDCELL_SIZE 60` added to include/grid_cell.h. Not `sizeof(GridCell)`: the
 struct expands SCENENODE_FIELDS whole, so sizeof is SceneNode's 0x44, eight
-bytes more than the object (GridCell.h's banner).
+bytes more than the object (grid_cell.h's banner).
