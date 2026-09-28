@@ -1141,8 +1141,8 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
 typedef struct StyleStageConfig {
     s8 colorMode; /* StyleConfig::colorMode */
     s8 fogLevel; /* sStyleFogNears index; STYLE_DECOR_FOG_LEVEL and up also build the decoration box */
-    s8 farColorIndex; /* gStylePalette index: StyleConfig::farColor, and the decoration box's colour */
-    s8 clearColorIndex; /* gStylePalette index: StyleConfig::clearColor */
+    s8 farColorIndex; /* sStylePalette index: StyleConfig::farColor, and the decoration box's colour */
+    s8 clearColorIndex; /* sStylePalette index: StyleConfig::clearColor */
 } StyleStageConfig;
 
 /* The fog levels whose config also gets a decoration box (ApplyStyleConfig):
@@ -1153,7 +1153,7 @@ extern StyleConfig sStyleConfig;
 extern StyleStageConfig *sStyleStageConfigs[];
 extern void *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg);
-extern u8 gStylePalette[][3];
+extern u8 sStylePalette[][3];
 extern const u8 *sStyleDecorColor;
 
 /* The stage's fixed config, or with none PickStyleFallbackConfig's, into
@@ -1167,20 +1167,20 @@ void *ApplyStyleConfig(void) {
     }
     FillStyleFromConfig(&sStyleConfig, cfg);
     if (cfg->fogLevel >= STYLE_DECOR_FOG_LEVEL) {
-        sStyleDecorColor = gStylePalette[cfg->farColorIndex];
+        sStyleDecorColor = sStylePalette[cfg->farColorIndex];
     }
     return &sStyleConfig;
 }
 
-/* gStylePalette is 24 RGB triples (a greyscale ramp first: 0, 64, 128, 255).
+/* sStylePalette is 24 RGB triples (a greyscale ramp first: 0, 64, 128, 255).
  * MATCHING: indexed as `u8[][3]`, for retail's `i*2 + i + base` stride-3
  * address arithmetic. sStyleFogNears is six fogNear distances, 26624 down to
  * 2048. */
 extern s32 sStyleFogNears[];
 
 void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg) {
-    style->clearColor = gStylePalette[cfg->clearColorIndex];
-    style->farColor = gStylePalette[cfg->farColorIndex];
+    style->clearColor = sStylePalette[cfg->clearColorIndex];
+    style->farColor = sStylePalette[cfg->farColorIndex];
     style->fogNear = sStyleFogNears[cfg->fogLevel];
     style->colorMode = cfg->colorMode;
 }
@@ -1300,7 +1300,7 @@ extern s32 sStyleConfigIndex;
 extern s8 *gStyleVariantConfigs[];
 extern const u8 *sStyleClearColor;
 extern u8 sStyleDecorColorsB[];
-extern u8 gStylePalette[][3];
+extern u8 sStylePalette[][3];
 extern const u8 *sStyleDecorColors;
 extern u8 sStyleDecorColorsA[];
 extern s32 sStyleDecorVariant;
@@ -1328,7 +1328,7 @@ void *PickStyleFallbackConfig(void) {
     config = gStyleVariantConfigs[variant] + index * 4;
     if (variant == 0) {
         clearIndex = config[3];
-        sStyleClearColor = gStylePalette[clearIndex];
+        sStyleClearColor = sStylePalette[clearIndex];
         decorIndex = config[2];
         decorColors = sStyleDecorColorsB;
         if (decorIndex != STYLE_DECOR_B_PALETTE_INDEX) {

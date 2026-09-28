@@ -84,10 +84,10 @@ typedef struct StyleConfig {
     s32 lightDirs;    /* +0x000, SetupSceneStyle: the StageMap's setChildParams `dirs` */
     s32 lightColors;  /* +0x004, SetupSceneStyle: setChildParams `colors` */
     s32 ambientColor; /* +0x008, SetupSceneStyle: setAmbientColor's rgb (a pointer) */
-    void *clearColor; /* +0x00C, EnterStyleSession: the viewport's setClearColor; a gStylePalette entry */
+    void *clearColor; /* +0x00C, EnterStyleSession: the viewport's setClearColor; a sStylePalette entry */
     u8 pad10[0x014 - 0x010];
     s32 colorMode; /* +0x014, EnterStyleSession: 1 makes the far colour clearColor; PollTimBlockLoad: 2 fades to clearColor, else farColor */
-    void *farColor; /* +0x018, EnterStyleSession: setFarColor unless colorMode is 1; a gStylePalette entry */
+    void *farColor; /* +0x018, EnterStyleSession: setFarColor unless colorMode is 1; a sStylePalette entry */
     s32 fogNear; /* +0x01C, EnterStyleSession: the viewport's setFogNear; a sStyleFogNears value */
 } StyleConfig;
 

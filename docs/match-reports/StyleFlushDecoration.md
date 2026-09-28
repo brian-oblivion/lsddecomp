@@ -29,7 +29,7 @@ jr $ra
 
 `sStyleDecorColor` is a `.sdata` pointer, already established in
 `src/world/ObjMStyleActor.c` as `extern const u8 *sStyleDecorColor;`, and used there as an
-actual colour-table pointer (`sStyleDecorColor = gStylePalette[cfg[2]];`). Here it is
+actual colour-table pointer (`sStyleDecorColor = sStylePalette[cfg[2]];`). Here it is
 only ever tested against zero, so it reads as a one-shot "pending" flag on
 top of the same storage. `sStyleDecorObj` is that unit's `LocalM4D0Obj *`
 (round 15's own local type, unrelated to this unit) with named slots at

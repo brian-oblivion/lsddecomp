@@ -15,7 +15,7 @@ cfg)` against the fixed global `sStyleConfig` (a `StyleM` instance, split by
 splat into two adjacent labels `sStyleConfig`/`sStyleKind2AltColor` purely because
 something else references the middle of it -- the object is one 0x20-byte
 struct). Then does its own separate raw-byte read of `cfg[1]`/`cfg[2]`: if
-`cfg[1] >= 4`, stores a `gStylePalette[cfg[2]]` colour-table entry pointer into
+`cfg[1] >= 4`, stores a `sStylePalette[cfg[2]]` colour-table entry pointer into
 `sStyleDecorColor`. Always returns `&sStyleConfig`.
 
 ```c
@@ -26,7 +26,7 @@ extern s32 sStyleConfig;
 extern s8 *sStyleStageConfigs[];
 extern s8 *PickStyleFallbackConfig(void);
 extern void FillStyleFromConfig(struct StyleM *style, s8 *cfg);
-extern u8 gStylePalette[][3];
+extern u8 sStylePalette[][3];
 extern const u8 *sStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
@@ -37,7 +37,7 @@ void *ApplyStyleConfig(void) {
     }
     FillStyleFromConfig((struct StyleM *) &sStyleConfig, cfg);
     if (cfg[1] >= 4) {
-        sStyleDecorColor = gStylePalette[cfg[2]];
+        sStyleDecorColor = sStylePalette[cfg[2]];
     }
     return &sStyleConfig;
 }
@@ -51,13 +51,13 @@ First attempt wrote the natural-looking guard form:
 if (cfg[1] < 4) {
     return &sStyleConfig;
 }
-sStyleDecorColor = gStylePalette[cfg[2]];
+sStyleDecorColor = sStylePalette[cfg[2]];
 return &sStyleConfig;
 ```
 
 This built 40/41 words with the tail one word SHORT: retail has an extra
 `move v0,s1` immediately before falling into the shared epilogue, which my
-version didn't emit. Cause: retail's `gStylePalette[cfg[2]]` address
+version didn't emit. Cause: retail's `sStylePalette[cfg[2]]` address
 computation clobbers `v0` as scratch (it's a 3-way live register at that
 point -- the delay slot of the `bnez` unconditionally sets `v0 = s1` before
 either path runs), so retail needs to explicitly restore `v0 = s1` before
