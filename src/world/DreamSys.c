@@ -1680,27 +1680,8 @@ s32 TestForTunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s
                           sTunnelSpawns, 1);
 }
 
-/* The rotation SceneNode__GetRotationDegrees writes, as IsHeadingAligned
-   reads it: +4 is the yaw in whole degrees, read unsigned. A local view,
-   because Ratio16 reads the same bytes signed. */
-typedef struct DirectionCheckArg {
-    u8 pad0[4];
-    u16 heading;
-} DirectionCheckArg;
-
-/* sCardinalRotations seen from its yaw: this label starts 4 bytes into that
-   table, so `angle` is sCardinalRotations[i][1].num (0, 90, 180, 270
-   degrees). A separate view, because this one reads the angle as a number
-   and the other is only handed to SceneNode__UpdateRotation. */
-typedef struct DirectionTableEntry {
-    u16 angle;
-    u16 pad2[5];
-} DirectionTableEntry;
-
-extern DirectionTableEntry sCardinalAngles[];
-
 /* Defined below, in ROM order. */
-extern s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading);
+extern s32 IsHeadingAligned(Ratio16 *rotation, u8 heading);
 
 /* Cardinal-direction indices, per stage: the player must face
    sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex] to take the
@@ -1722,7 +1703,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     s32 result;
 
     heading = sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
-    if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
+    if (IsHeadingAligned(rotation, heading)) {
         if (outEnter != NULL)
             *outEnter = (s32)sCardinalRotations[heading];
 
@@ -1737,10 +1718,12 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     return result;
 }
 
-s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading) {
+/* Whether the yaw of `rotation` (SceneNode__GetRotationDegrees' form) is
+ * within 44 degrees of cardinal direction `heading`. */
+s32 IsHeadingAligned(Ratio16 *rotation, u8 heading) {
     s16 diff;
 
-    diff = rotation->heading - sCardinalAngles[heading].angle;
+    diff = rotation[1].num - sCardinalRotations[heading][1].num;
     if (diff >= 181) {
         diff -= 360;
     } else if (diff < -180) {
@@ -1839,7 +1822,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
     s32 result;
 
     heading = sStaircaseEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
-    if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
+    if (IsHeadingAligned(rotation, heading)) {
         if (outEnter != NULL)
             *outEnter = (s32)sCardinalRotations[heading];
 
