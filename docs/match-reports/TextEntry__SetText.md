@@ -74,7 +74,7 @@ local prototype. Zero bytes changed.
 Moved here from src/ui/TextEntryItemList.c (stale history; DecodeFullWidthSjis
 is matched in screen_widgets.c since round 38, typed `u8 *(u8 *dst, u8
 *src)`): "This project's own strcpy (matched elsewhere) -- TextEntry__SetText's
-own caller, same local-declaration convention as TitleMenuTaskObjF.c/others."
+own caller, same local-declaration convention as title_menu.c/others."
 and "Uncarved helper, `screen_widgets`, still INCLUDE_ASM --
 TextEntry__SetText's own call. Translates each byte of `src` (a name
 string) into `dest` (folding a couple of special-case byte ranges) and

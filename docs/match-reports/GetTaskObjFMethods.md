@@ -4,7 +4,7 @@
 
 > Renamed from `func_800507E8` on 2026-09-23 (tools/rename.py). Address 0x800507e8.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py GetTaskObjFMethods`: 4/4 words match.
 
 ## Source
@@ -20,7 +20,7 @@ GenericCtorTable_3bb8c_d *GetTaskObjFMethods(void)
 
 This function was already forward-declared, opaquely, in
 `include/class_3bb8c.h` as `GenericCtorTable_3bb8c_d *GetTaskObjFMethods(void)`
-while deriving `TitleMenuTaskObjF`'s own `New_TaskObjF` (a `New_X` allocator
+while deriving `title_menu`'s own `New_TaskObjF` (a `New_X` allocator
 that calls `GetTaskObjFMethods()->ctor(...)`) last round -- that declaration
 predicted exactly this shape (a trivial vtable-getter, same pattern as
 `GetTitleMenuMethods`/`gTitleMenuMethods` and `GetTaskCoreMethods`/`gTaskCoreMethods` elsewhere in

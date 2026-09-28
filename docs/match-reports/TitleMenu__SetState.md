@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004D90C` on 2026-09-24 (tools/rename.py). Address 0x8004d90c.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__SetState`: 50/50 words match.
 
 ## Source
@@ -60,7 +60,7 @@ cover this; filing as a confirming instance rather than a new bullet.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D90C` -> `TitleMenu__SetState`. **Tier B**: Forwards `arg1` to the base class's own state-setter (`GetTaskCoreMethods()->slot60(self, arg1)`) and does extra dispatch for two literal values (5, 0xA) -- the same "forward-then-special-case" shape already named `SetState` for `TaskObjF` (`TitleMenuTaskObjF.c`). Purpose of the two particular state values not established.
+Renamed `func_8004D90C` -> `TitleMenu__SetState`. **Tier B**: Forwards `arg1` to the base class's own state-setter (`GetTaskCoreMethods()->slot60(self, arg1)`) and does extra dispatch for two literal values (5, 0xA) -- the same "forward-then-special-case" shape already named `SetState` for `TaskObjF` (`title_menu.c`). Purpose of the two particular state values not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

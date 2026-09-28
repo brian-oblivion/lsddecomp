@@ -265,7 +265,7 @@ regressions:**
 > loop, register lands in the wrong callee-saved slot" residue, since it
 > is cheap and, here, closed 48 of the function's 70 remaining words in
 > one attempt. The load-delay-slot-fill class itself remains open; this
-> function is the second STALL this round in `DayTaskStageMap`/`TitleMenuTaskObjF`
+> function is the second STALL this round in `DayTaskStageMap`/`title_menu`
 > where a source-level restructuring provably could not reach a
 > retail-chosen instruction SCHEDULE, even though the SHAPE (branches,
 > registers) was already fully correct -- worth a permuter pass (see

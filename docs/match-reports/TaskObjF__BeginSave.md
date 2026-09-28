@@ -94,7 +94,7 @@ NON_MATCHING body promoted, round 73
 
 > Renamed from `func_8004F8A4` on 2026-09-20 (tools/rename.py). Address 0x8004f8a4.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 77 words (0x134) · **Status:** STALL —
+**Unit:** title_menu · **Size:** 77 words (0x134) · **Status:** STALL —
 tail-merge / early-return scheduling residue. Previously 36/77 (0x130, 1 word
 short); ROUND 27 (delta) raised this to 63/77 (0x140, 3 words long -- the
 opposite direction) with a genuine structural fix, then hit a SECOND,
@@ -434,7 +434,7 @@ s32 TaskObjF__BeginSave(TaskObjF *self, s32 a1, s32 a2, s32 a3, u8 a5, s32 a6, s
 
 Needs `TaskObjF`/`TaskObjFMethods` (see `TaskObjF__ForEachEvent`'s report) and a
 forward declaration of `TaskObjF__Validate` (defined later in this unit's ROM
-order; already present near the top of `src/ui/TitleMenuTaskObjF.c`).
+order; already present near the top of `src/ui/title_menu.c`).
 
 ## Proposed learning
 
@@ -504,7 +504,7 @@ the file), 0x11 `EDIT_TITLE`, 0xB `SAVING`, 9 `SAVE_NO_SPACE` ("SAVEEMPT":
 checkCardSpace failed); opMode 2 `TASKOBJF_OP_SAVE`; probeMemcardFile's
 `0` destination is `NULL`. Zero bytes.
 
-### Moved from src/ui/TitleMenuTaskObjF.c
+### Moved from src/ui/title_menu.c
 
 Replaced in the unit by a MATCHING line:
 

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E77C` on 2026-09-24 (tools/rename.py). Address 0x8004e77c.
 
-**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class).
+**Unit:** title_menu (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -46,7 +46,7 @@ DECLARATION to `s32` while leaving the BODY exactly as originally
 written (no explicit `return`, relying on `$v0` already holding the
 right value when control falls off the end — triggers a harmless
 "control reaches end of non-void function" warning). Left as `void` here
-since no function in `src/ui/TitleMenuTaskObjF.c` currently reads this
+since no function in `src/ui/title_menu.c` currently reads this
 function's return value; `TaskObjF__CheckCardStatus`'s own stalled body (preserved
 in its report) shows the `s32`-declared form for when/if it's needed.
 

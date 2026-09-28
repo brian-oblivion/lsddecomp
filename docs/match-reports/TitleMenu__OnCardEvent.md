@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004E230` on 2026-09-24 (tools/rename.py). Address 0x8004e230.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__OnCardEvent`: 40/40 words match.
 
 ## Source

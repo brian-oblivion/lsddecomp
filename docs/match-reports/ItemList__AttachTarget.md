@@ -90,7 +90,7 @@ Renamed from `ItemList__AddChildAndSetState`. The body is
 TextEntry__AttachTarget's, at the same slot (+0x04C) of a sibling class with
 the same one caller: addChild(child1), addChild(child2), `target = arg3`,
 `result = 0` (TextEntry also clears altCommands). Its only caller,
-TaskObjF__AttachItemList (TitleMenuTaskObjF), passes `(unk60, unk64, childC)`
+TaskObjF__AttachItemList (title_menu), passes `(unk60, unk64, childC)`
 exactly as TaskObjF__AttachTextEntry passes them to TextEntry's attachTarget, and
 `target` is what ForwardToTarget calls. Nothing in it sets a state; the
 cleared word is `result`.
@@ -98,7 +98,7 @@ cleared word is `result`.
 ## Round 94 (track 6, charlie): the target is a VabStreamObj
 
 `TargetObj86ED0`/`TargetMethods86ED0` (include/class_3bb8c.h) are deleted.
-Both attachTarget callers (TaskObjF, src/ui/TitleMenuTaskObjF.c) pass TaskObjF's
+Both attachTarget callers (TaskObjF, src/ui/title_menu.c) pass TaskObjF's
 `sound`, already typed `struct VabStreamObj *`, and the one slot the view
 named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
 (include/VabStreamObj.h): the `(code, 0x60, 0x60)` call plays tone `code`

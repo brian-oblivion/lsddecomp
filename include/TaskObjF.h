@@ -9,8 +9,8 @@
  * Methods: the allocator and ctor,
  * BasicClass's overrides and the card primitives (+0x00C..+0x060), the file
  * I/O, events, buffers and the two operations (+0x064..+0x078, +0x038) in
- * src/ui/TitleMenuTaskObjF.c, the state machine (+0x07C..+0x0B0) in
- * src/ui/TitleMenuTaskObjF.c.
+ * src/ui/title_menu.c, the state machine (+0x07C..+0x0B0) in
+ * src/ui/title_menu.c.
  *
  *  - The ctor runs InitCARD/StartCARD/_bu_init once per boot (sTaskObjFCount)
  *    and setCardSlot(cardSlot); +0x040..+0x068 wrap the PS-X memory-card
@@ -266,7 +266,7 @@ typedef struct McSaveHeader {
     IconFrame frame2;
 } McSaveHeader;
 
-/* Game code (src/ui/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
+/* Game code (src/ui/title_menu.c). TaskObjF__WriteMemcardSaveFile calls it
  * around its retry loop, and with (arg, 0) when the loop gives up. The BIOS
  * file calls (open, read, lseek, close, delete; Sony's libapi) are declared
  * in the units that call them. */

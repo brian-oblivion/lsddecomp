@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D704` on 2026-09-24 (tools/rename.py). Address 0x8004d704.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__Finalize`: 33/33 words match.
 
 ## Source
@@ -24,8 +24,8 @@ void TitleMenu__Finalize(TitleMenu *self)
 
 ## Derivation
 
-This is `TitleMenu`'s own destructor (the first function of `TitleMenuTaskObjF`,
-immediately continuing `TitleMenuTaskObjF`'s work on the same class). Structure:
+This is `TitleMenu`'s own destructor (the first function of `title_menu`,
+immediately continuing `title_menu`'s work on the same class). Structure:
 
 - `self->unkAC` and `self->iconHandle` are two owned sub-objects, each released
   through the shared BasicClass-family `release` slot at `+0x004`
@@ -81,14 +81,14 @@ Renamed `func_8004D704` -> `TitleMenu__Finalize`. **Tier A**: matches the
 BasicClass-family destructor shape (release owned sub-objects, then
 forward to the base class's own dtor slot). Field `unkA8` renamed to
 `iconHandle` in the same round (compiler-ownership check: accessor set
-entirely inside `src/ui/TitleMenuTaskObjF.c`).
+entirely inside `src/ui/title_menu.c`).
 
 ## Proposed field names
 
-**Head, round 77:** `unkAC -> saveCtrl` APPLIED by type scope (11 accessors, TitleMenuTaskObjF/_d).
+**Head, round 77:** `unkAC -> saveCtrl` APPLIED by type scope (11 accessors, title_menu/_d).
 
 `TitleMenu::unkAC` has a real accessor outside this unit
-(`src/ui/TitleMenuTaskObjF.c`'s `TitleMenu__TitleMenu` zeroes it), so per the
+(`src/ui/title_menu.c`'s `TitleMenu__TitleMenu` zeroes it), so per the
 compiler-ownership rule this is a PROPOSAL, not a rename. Also posted to
 the round-77 broadcast.
 

@@ -44,7 +44,7 @@ This is `Obj86ED0`'s own ctor, called through `Obj86ED0Methods::ctor` at
 `New_TextEntry`'s allocation site: base ctor first
 (`GetBasicClassMethods()->ctor(self)`), then `self->methods` overridden to this
 class's own table (`GetTextEntryMethods()`, defined in `TextEntryItemList.c`) — same
-shape as `NodeGuardedViewport__NodeGuardedViewport` in `TitleMenuTaskObjF.c`.
+shape as `NodeGuardedViewport__NodeGuardedViewport` in `title_menu.c`.
 
 `self->unk10 = strlen(arg1)` then `self->unk28 = BMemPMgrAlloc(self->unk10
 + 4)` allocates a name buffer 4 bytes larger than the string. Retail's own

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004ED40` on 2026-09-20 (tools/rename.py). Address 0x8004ed40.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 32 words (0x80) · **Status:** MATCH
+**Unit:** title_menu · **Size:** 32 words (0x80) · **Status:** MATCH
 
 ## What it does
 
@@ -33,7 +33,7 @@ untouched through to the function's own `return`.
 ## Header additions
 
 - Forward declaration `s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix,
-  void *outBuf, s32 outSize);` in `src/ui/TitleMenuTaskObjF.c` (defined later in
+  void *outBuf, s32 outSize);` in `src/ui/title_menu.c` (defined later in
   ROM order).
 
 See `TaskObjF__TryReadMemcardFile`'s report for the callee's own signature and the
@@ -54,14 +54,14 @@ the body plus the callee's own established behaviour.
 `count` -> `retries`; the `10` is `MEMCARD_RETRIES` (include/TaskObjF.h:
 attempts after the first; the loop runs 11 times). Zero bytes.
 
-### Moved from src/ui/TitleMenuTaskObjF.c
+### Moved from src/ui/title_menu.c
 
 The unit banner before track 7 (its history -- "track 4 round 89" -- is
 here; the new banner describes the file only):
 
 ```c
 /*
- * TitleMenuTaskObjF: `TaskObjF` methods (include/TaskObjF.h, track 4 round 89),
+ * title_menu: `TaskObjF` methods (include/TaskObjF.h, track 4 round 89),
  * slots +0x064..+0x078 and the +0x038 onNotify override, with the unit's
  * helpers:
  *

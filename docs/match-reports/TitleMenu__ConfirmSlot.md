@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D9D4` on 2026-09-24 (tools/rename.py). Address 0x8004d9d4.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__ConfirmSlot`: 58/58 words match.
 
 ## Source
@@ -100,7 +100,7 @@ Renamed `func_8004D9D4` -> `TitleMenu__ConfirmSlot`. **Tier B**: Unconditionally
 compiler-ownership recipe (renamed the field alone in the `TitleMenu`
 struct definition, rebuilt default build and
 `tools/check-nonmatching.sh`): the accessor set landed entirely inside
-`src/ui/TitleMenuTaskObjF.c` (this function's own `switch`, and
+`src/ui/title_menu.c` (this function's own `switch`, and
 `TitleMenu__RefreshMenu`'s read/write), so this was renamed directly
 rather than proposed. `unk58` also names unrelated fields on other structs
 in this same header (e.g. `TaskObjF::unk58`) -- untouched, since their own

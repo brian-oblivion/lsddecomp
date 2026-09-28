@@ -4,7 +4,7 @@
 
 > Renamed from `func_80050034` on 2026-09-23 (tools/rename.py). Address 0x80050034.
 
-Unit `TitleMenuTaskObjF`, class `Class86E00_3bb8c_g`. State-transition dispatcher
+Unit `title_menu`, class `Class86E00_3bb8c_g`. State-transition dispatcher
 driven by `self->unk28` (dense `switch`, retail compiles it to
 `jtbl_80011594`): three case groups each fire a pair of `slot8C`/`slot7C`
 (or `slot78`/`slot74`) transition calls, with one group (`unk28==0xE`)
@@ -55,7 +55,7 @@ void TaskObjF__AdvanceState(Class86E00_3bb8c_g *self)
 
 The dense range check (`(self->unk28 - 2) unsigned < 0xF`, i.e.
 `self->unk28` in `2..0x10`) plus `jtbl_80011594`'s 15 entries in
-`asm/nonmatchings/TitleMenuTaskObjF/TaskObjF__AdvanceState.s` give the case grouping
+`asm/nonmatchings/title_menu/TaskObjF__AdvanceState.s` give the case grouping
 directly by READING the table, not by guessing: entries land on only four
 distinct labels, so it's four case groups, not fifteen. **The one place
 this cost an attempt: index 11 (`self->unk28==0xD`) lands on the SAME

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E2E0` on 2026-09-24 (tools/rename.py). Address 0x8004e2e0.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py New_TaskObjF`: 27/27 words match.
 
 ## Source
@@ -58,7 +58,7 @@ own return value is discarded).
   -- this function's own base/sibling class ctor-table getter, same shape
   as `GetTaskCoreMethods`/`GetSceneNodeMethods` elsewhere in this header but for yet
   another table. `BMemPMgrAlloc` was already declared in this header from
-  prior `TitleMenuTaskObjF` work, so no change needed there.
+  prior `title_menu` work, so no change needed there.
 
 ### Proposed learning
 
@@ -74,7 +74,7 @@ score six times worse before the documented lever recovered it.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E2E0` -> `New_TaskObjF`. **Tier A**: Standard `New_X` allocator (pool-alloc 0x84 bytes, null-check, construct through `GetTaskObjFMethods()->ctor`) for the class whose vtable is `gTaskObjFMethods` -- the same real class `TitleMenuTaskObjF.c`/`class_3bb8c_g.c` already name `TaskObjF` tree-wide. Distinct from the already-named `New_TitleMenu` (a different class, alloc size 0xC4).
+Renamed `func_8004E2E0` -> `New_TaskObjF`. **Tier A**: Standard `New_X` allocator (pool-alloc 0x84 bytes, null-check, construct through `GetTaskObjFMethods()->ctor`) for the class whose vtable is `gTaskObjFMethods` -- the same real class `title_menu.c`/`class_3bb8c_g.c` already name `TaskObjF` tree-wide. Distinct from the already-named `New_TitleMenu` (a different class, alloc size 0xC4).
 
 ## Track 7 (round 96, echo)
 

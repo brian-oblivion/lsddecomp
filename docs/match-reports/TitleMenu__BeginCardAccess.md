@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004DF64` on 2026-09-24 (tools/rename.py). Address 0x8004df64.
 
-Unit `TitleMenuTaskObjF`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
+Unit `title_menu`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 1 `gp_rel` hit
 and no derivation; this round wrote and matched the function from scratch.
 
@@ -41,7 +41,7 @@ SLPS_015.56`.
   (`iconHandle`/`unkAC`).
 - `New_TimImage(sSaveIconTimPath)` -- `New_TimImage` is already matched
   project-wide under many independent local arities/return types (see
-  e.g. `src/ui/TitleMenuTaskObjF.c`, `src/ui/TextEntryItemList.c`); this unit's own view
+  e.g. `src/ui/title_menu.c`, `src/ui/TextEntryItemList.c`); this unit's own view
   returns exactly what it is stored into, `GenericReleaseObj_3bb8c_d *`.
   `sSaveIconTimPath` is a real dlabel string, `"CARD\FILEICN1.TIM"`
   (`asm/data/1C34.rodata.s`) -- referenced by symbol per CLAUDE.md's rule
@@ -82,7 +82,7 @@ SLPS_015.56`.
 - New externs: `sSaveIconTimPath` (`const char[]`, a real string dlabel),
   `sCardFilePrefix` (`void *`, VALUE-of `%gp_rel`), `sSaveFileSuffixes` (`s32`,
   address-of placeholder for a real 16-entry pointer table).
-- `src/ui/TitleMenuTaskObjF.c`: local extern for `New_TimImage` (own arity/
+- `src/ui/title_menu.c`: local extern for `New_TimImage` (own arity/
   return type, per the project's established independent-views
   convention for this widely-shared external symbol).
 

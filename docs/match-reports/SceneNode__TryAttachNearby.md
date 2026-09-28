@@ -688,7 +688,7 @@ Apply by type scope (edit `SceneNodeMethods`'s own definition in
 `include/scene_node.h`, rebuild, fix exactly the accessors the compiler
 lists), per CLAUDE.md's shared-struct-hazard rule -- a whole-tree text
 replace of e.g. `slotA4` would corrupt every OTHER class's own
-identically-named, unrelated `slotA4` field (measured: `TitleMenuTaskObjF.c`,
+identically-named, unrelated `slotA4` field (measured: `title_menu.c`,
 `task.c`, `TextEntryItemList.c`/`_j.c`/`_l.c` all have their own,
 different `slotA4`).
 

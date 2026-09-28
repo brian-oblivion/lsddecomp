@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004D6AC` on 2026-09-22 (tools/rename.py). Address 0x8004d6ac.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 22 words (0x58 bytes)
+**Unit:** title_menu · **Size:** 22 words (0x58 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 9. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Rebuilding this stub
@@ -127,9 +127,9 @@ the six bytes are three full-width Shift-JIS digits, which
 `FormatFullWidthNumber(..., 3, 0)` writes and the copy puts at the save
 title's +0x12, characters 9..11 (the "001" of "LSD   Day001"; the title's
 layout was measured in round 95, StampSaveTitleFileLetter.md). It is the
-same record TitleMenuTaskObjF's StampSaveTitleFileLetter copies, so the three
+same record title_menu's StampSaveTitleFileLetter copies, so the three
 types (`FullWidthChar`, `FullWidthChars3`, `FullWidthChars6`) moved from
-TitleMenuTaskObjF.c into `include/TitleMenu.h`: the save title is TitleMenu's
+title_menu.c into `include/TitleMenu.h`: the save title is TitleMenu's
 buffer (its banner: createSaveTitle builds `saveTitle` from the SJIS title
 in sSaveTitle's buffer; both writers serve it), and `TaskObjF.h` only sees
 a `char *title` passed in. Alignment is still 1 (all-`s8` leaves), so the
@@ -165,7 +165,7 @@ loads/stores."
   "7654321" string D_8008AA1C.
 
 Constants: `SAVE_TITLE_DAY` (9) and `SAVE_TITLE_DAY_DIGITS` (3),
-unit-local, on TitleMenuTaskObjF.c's `SAVE_TITLE_*` model; the store is
+unit-local, on title_menu.c's `SAVE_TITLE_*` model; the store is
 `*(FullWidthChars3 *)&((FullWidthChar *)sSaveTitle)[SAVE_TITLE_DAY]`, as
 StampSaveTitleFileLetter indexes its `FullWidthChar *title`, in place of
 `(s8 *)sSaveTitle + 0x12`. Byte-identical.

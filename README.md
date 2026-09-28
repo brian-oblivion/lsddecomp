@@ -167,13 +167,13 @@ Read each named class's header first; its banner points to the units.
   `Viewport`) is the base of the menu and screen
   tasks: `StreamTask` (plays one movie), `GraphRoom` (the mood graph,
   `src/world/ObjMStyleActor.c`) and `TitleMenu`
-  (`src/ui/TitleMenuTaskObjF.c`), the START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE
+  (`src/ui/title_menu.c`), the START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE
   menu. `TimedTask`, IntermediateBase's other subclass, is the base of
   `DayTask` and `ObjM`. The 2D pieces are `Sprite` and its subclasses (`src/graphics/sprite.c`,
   down to `TextRow`), `BoxFill` and `FadeBox` (`src/ui/screen_widgets.c`) and `TextEntry`
   (`src/ui/TextEntryItemList.c`).
 - **Memory-card saves.** `TitleMenu` owns a `TaskObjF`, the save/load
-  controller (both in `src/ui/TitleMenuTaskObjF.c`): a state machine over the
+  controller (both in `src/ui/title_menu.c`): a state machine over the
   BIOS memory-card calls, which shows its choices in an `ItemList` scrolling
   list (`src/ui/TextEntryItemList.c` and `src/world/ObjMStyleActor.c`).
 - **CD and data sources.** `FileResource` is the base of every class loaded

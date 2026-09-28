@@ -79,8 +79,8 @@ gates the attach attempt is not established.
 ## Proposed field names
 
 `vtable_DreamSys::slotA0` is accessed from SEVEN other units too
-(`grep -rln -- '->slotA0\b' src/` lists `TitleMenuTaskObjF.c`,
-`ObjMStyleActor.c`, `TitleMenuTaskObjF.c`, `scene_node.c`, `task.c`,
+(`grep -rln -- '->slotA0\b' src/` lists `title_menu.c`,
+`ObjMStyleActor.c`, `title_menu.c`, `scene_node.c`, `task.c`,
 `TextEntryItemList.c`, `task.c`, besides this unit), so per
 FINISHING-PLAN.md track 3 step 3 it is proposed here, not renamed, and
 posted to the broadcast for the head to apply at merge.

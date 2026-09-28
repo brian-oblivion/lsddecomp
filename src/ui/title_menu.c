@@ -1,5 +1,5 @@
 /*
- * TitleMenuTaskObjF -- the menu between days and its memory-card task:
+ * title_menu -- the menu between days and its memory-card task:
  * TitleMenu and TaskObjF, led in by the constructors and table methods of
  * two small classes, NodeGuardedViewport and GridCell.
  *

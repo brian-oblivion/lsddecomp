@@ -40,9 +40,9 @@ rather than API.
   dream_sys.h's `CinematicCall{bank,entry}` are one packed pair, repacked by
   hand at game_shell.c:80, 317. Add game_files.h.
 - **Full-width SJIS helpers.** `DecodeFullWidthSjis` is `u8 *(u8 *, u8 *)`
-  (screen_widgets) but `void (void *, void *)` at TitleMenuTaskObjF.c:316 and
+  (screen_widgets) but `void (void *, void *)` at title_menu.c:316 and
   `char *(char *, char *)` at TextEntryItemList.c:41, 511;
-  `FormatFullWidthNumber` re-declared at TitleMenuTaskObjF.c:193. One header.
+  `FormatFullWidthNumber` re-declared at title_menu.c:193. One header.
 - **Others without a header or disagreeing:** `BuildFileName`
   (TextEntryItemList.c:155, 629; PlacementGridVabSound.c:185, with `const`);
   `GetSsSizeTableBuf` (`void *` vs `char *`); `GetSsTicksPerSecond` (wbgm.c:21
@@ -59,10 +59,10 @@ rather than API.
   ...): keep one forward block.
 - **Sony names re-declared.** `ResetGraph` (task.h:40), `rand`, `strlen`,
   `strcat`, `strcpy`, `memset`, `memcpy`, `printf` (declared `void (const char *)`
-  at TitleMenuTaskObjF.c:980 and wbgm.c:18 against stdio.h's variadic `int`).
+  at title_menu.c:980 and wbgm.c:18 against stdio.h's variadic `int`).
   Use include/psyq's headers (verify bytes: strings.h's `strlen` is K&R).
 - **BIOS and card calls with no declaration at all** (cpp-confirmed in
-  TitleMenuTaskObjF.c): OpenEvent, TestEvent, CloseEvent, EnableEvent,
+  title_menu.c): OpenEvent, TestEvent, CloseEvent, EnableEvent,
   DisableEvent, InitCARD, StartCARD, _bu_init, _card_info/_load/_clear, open,
   read, write, lseek, close, delete, format; `EnterCriticalSection` used before
   its `extern void` at :1065. The comments at :501, 647, 870, 1046 claim
@@ -168,7 +168,7 @@ rather than API.
   `EnableTeleportsForKind` goto ladders over raw stage/mood numbers with no
   MATCHING line; `*(s32 *)((u8 *)out + 4)` at DayTaskStageMap.c:1096.
 - **ui/sound:** class ids `0x10`/`0x20` and `kind == 2/5` at
-  TitleMenuTaskObjF.c:589-611, 1284-1296 (PAD_/FRAMECLOCK_CLASS_ID exist),
+  title_menu.c:589-611, 1284-1296 (PAD_/FRAMECLOCK_CLASS_ID exist),
   `setState(self, 5/0xA/0xB/0xF)` where TASKCORE_STATE_* exist;
   screen_widgets.c:103, 145 local `mask` is the channel set; GridCell `unk34`,
   CellPlacement `unk1`/`unk2C`; SsScore.h (39) and SvmData.h (32) `unkNN`

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004F40C` on 2026-09-20 (tools/rename.py). Address 0x8004f40c.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 38 words (0x98) · **Status:** MATCH
+**Unit:** title_menu · **Size:** 38 words (0x98) · **Status:** MATCH
 
 ## The class this unit's back half operates on
 
@@ -114,7 +114,7 @@ Sony's TestEvent, and TaskObjF's `field14` became `events` in round 60.
 `flag` -> `critical` (it brackets the loop in Enter/ExitCriticalSection);
 `i < 4` -> `i < ARRAY_COUNT(self->events)`. Zero bytes.
 
-### Moved from src/ui/TitleMenuTaskObjF.c
+### Moved from src/ui/title_menu.c
 
 ```c
 /* Psy-Q's kernel critical-section pair (libapi/a36, libapi/a37, linked from

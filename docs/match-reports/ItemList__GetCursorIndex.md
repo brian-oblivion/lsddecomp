@@ -29,6 +29,6 @@ A plain one-field getter. Matched first attempt.
 
 Round 75 (bravo, track 3). `func_80052B54` -> `ItemList__GetCursorIndex`, **tier A**.
 
-Slot +0x09C (`tools/classtable.py gItemListMethods`), a getter returning `cursorIndex`. The caller TaskObjF__OnItemListResult (TitleMenuTaskObjF) calls it through the child's +0x09C on result 2 and stores the value as `selectedItem`.
+Slot +0x09C (`tools/classtable.py gItemListMethods`), a getter returning `cursorIndex`. The caller TaskObjF__OnItemListResult (title_menu) calls it through the child's +0x09C on result 2 and stores the value as `selectedItem`.
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).

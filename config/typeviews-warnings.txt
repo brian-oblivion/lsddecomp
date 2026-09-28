@@ -25,8 +25,8 @@ scene_node: warning: unused variable `pad'
 scene_node: warning: unused variable `unused'
 sprite: warning: unused variable `pad'
 task: warning: assignment from incompatible pointer type
-TitleMenuTaskObjF: warning: `state' might be used uninitialized in this function
-TitleMenuTaskObjF: warning: control reaches end of non-void function
+title_menu: warning: `state' might be used uninitialized in this function
+title_menu: warning: control reaches end of non-void function
 tmd_model: warning: `p' might be used uninitialized in this function
 tmd_model: warning: `size' might be used uninitialized in this function
 tmd_model: warning: unused variable `unused'

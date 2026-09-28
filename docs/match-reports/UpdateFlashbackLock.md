@@ -6,12 +6,12 @@
 
 > Renamed from `func_8004D678` on 2026-09-22 (tools/rename.py). Address 0x8004d678.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 13 words · **Status:** MATCHED (13/13)
+**Unit:** title_menu · **Size:** 13 words · **Status:** MATCHED (13/13)
 
 ## What it does
 
 Not a `NodeGuardedViewport`/`GridCell` method -- called directly (`jal`) from the
-still-uncarved `TitleMenu__RefreshMenu` in `asm/TitleMenuTaskObjF.s`. Given a caller-side
+still-uncarved `TitleMenu__RefreshMenu` in `asm/title_menu.s`. Given a caller-side
 context struct and a result struct, reaches through the context to an
 `Obj866E8` instance, checks one of its fields against a large constant
 (9999999) and a second field against zero, and writes a 0/1 flag into the
@@ -90,11 +90,11 @@ matches the project's existing `New_GameApplication`/`strcat`
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/ui/TitleMenuTaskObjF.c`'s 3-parameter declaration
+**Verdict: arity-ok idiom.** `src/ui/title_menu.c`'s 3-parameter declaration
 stays.
 
 **Callee evidence** (`0x8004D678`, and the matched definition in
-`src/ui/TitleMenuTaskObjF.c`): the body reads `$a0` and `$a1`, and *writes* `$a2`
+`src/ui/title_menu.c`): the body reads `$a0` and `$a1`, and *writes* `$a2`
 before ever reading it:
 
 ```
@@ -125,7 +125,7 @@ a `too many arguments` error, and dropping the argument from the call site would
 delete `lw a2,164(s0)` and break `TitleMenu__RefreshMenu`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/ui/TitleMenuTaskObjF.c:219`. Oracle green.
+added to `src/ui/title_menu.c:219`. Oracle green.
 
 ## Naming
 

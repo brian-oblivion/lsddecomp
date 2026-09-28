@@ -82,7 +82,7 @@ which is the procedure working in the direction where it can work. for the head
 `BasicClassMethods::slot38` -> `onNotify`, its `arg1` -> `sender`, its
 `arg2` -> `event`. **Tier B**, same evidence. Cross-unit and the widest
 replace of the round: 13 units access `->slot38`
-(`TitleMenuTaskObjF/f/i/j/k.c`, `DayTaskStageMap.c`, `class_3ac78.c`,
+(`title_menu/f/i/j/k.c`, `DayTaskStageMap.c`, `class_3ac78.c`,
 `task/d.c`, `tod_actor.c`, `scene_node.c`, `code_d294_b.c`, plus
 this unit). Worth doing alone rather than batched.
 

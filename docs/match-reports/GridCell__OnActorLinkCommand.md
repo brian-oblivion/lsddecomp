@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D47C` on 2026-09-22 (tools/rename.py). Address 0x8004d47c.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 33 words · **Status:** MATCHED.
+**Unit:** title_menu · **Size:** 33 words · **Status:** MATCHED.
 Two prior rounds (including a head re-verification) confirmed this as a
 genuine register-identity stall unreachable by every manual reshaping
 lever available (see the full history below, kept for the record). A

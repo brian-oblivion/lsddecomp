@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004DABC` on 2026-09-24 (tools/rename.py). Address 0x8004dabc.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__Exit`: 23/23 words match.
 
 ## Source

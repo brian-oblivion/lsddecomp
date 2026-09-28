@@ -260,7 +260,7 @@ segments:
       #   D_80011530  class_3bb8c_f       jtbl_8001157C/jtbl_80011594  _g
       #   D_800115D0  (unreferenced)      D_80011610/D_8001161C  class_3bb8c_h
       - [0x1C34, rodata]
-      - [0x1D7C, .rodata, ui/TitleMenuTaskObjF]   # jtbl_8001157C + jtbl_80011594
+      - [0x1D7C, .rodata, ui/title_menu]   # jtbl_8001157C + jtbl_80011594
       - [0x1DD0, rodata]
       # Split at the ownership boundary (third instance of the shared-slot
       # case this round -- see PARALLEL-RUNS Gate 2). Ownership, one grep per
@@ -1416,7 +1416,7 @@ segments:
       # never through the caller's frame.
       # Clear of both remainder hazards (zero `jlabel`, zero `jr $t2`), so
       # no rodata slot to attach and no hasm/.word disposition here either.
-      - [0x3DA54, c, ui/TitleMenuTaskObjF]
+      - [0x3DA54, c, ui/title_menu]
       # class_3bb8c_d / _e / _f: front of the 305-function class_3bb8c
       # remainder, split into three ~20-function C units in round 14. The
       # tail (#59 onward, 0x403E4) deliberately STAYS asm as class_3bb8c_g

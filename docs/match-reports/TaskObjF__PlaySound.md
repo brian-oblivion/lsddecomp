@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004FFF4` on 2026-09-23 (tools/rename.py). Address 0x8004fff4.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TaskObjF__PlaySound`: 16/16 words match.
 
 ## Source
@@ -45,8 +45,8 @@ exposure)
 
 Both retyped declarations were introduced by this unit's own earlier
 functions THIS round (not inherited from `main`), so there is nothing to
-flag for `TitleMenuTaskObjF`/`class_3bb8c_f` here -- the correction is fully
-internal to `TitleMenuTaskObjF`'s own work.
+flag for `title_menu`/`class_3bb8c_f` here -- the correction is fully
+internal to `title_menu`'s own work.
 
 ### Proposed learning
 

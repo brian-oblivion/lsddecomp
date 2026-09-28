@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004D578` on 2026-09-22 (tools/rename.py). Address 0x8004d578.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 64 words · **Status:** MATCHED (64/64)
+**Unit:** title_menu · **Size:** 64 words · **Status:** MATCHED (64/64)
 
 ## What it does
 
@@ -53,7 +53,7 @@ presence anywhere in the project. Placed as one new block right before the
   `slot40` (+0x040, this function's own last call), `slotD8` (+0x0D8, this
   function's own second-to-last call). Vtable is `gTitleMenuMethods`, resolved
   via `GetTitleMenuMethods` (still raw asm in the uncarved
-  `asm/TitleMenuTaskObjF.s`, called directly by `jal` -- same "vtable getter"
+  `asm/title_menu.s`, called directly by `jal` -- same "vtable getter"
   shape as `GetNodeGuardedViewportMethods`/`GetGridCellMethods`).
 - `TitleMenu` struct fields: `unk48` (`TitleMenuUnk48Obj *`, set up by
   the base ctor chain, read here), `unkA4` (`void *`, stores `dreamSys`
@@ -128,11 +128,11 @@ installed table twice more in the same function (`slotD8`, then
 
 Renamed following the compiler-ownership recipe (FINISHING-PLAN.md track
 3 step 3), not assumed safe: `TitleMenuMethods` is otherwise SHARED with
-`src/ui/TitleMenuTaskObjF.c` (most of its other slots are dispatched from
+`src/ui/title_menu.c` (most of its other slots are dispatched from
 functions there). Renamed the field in the struct DEFINITION alone,
 rebuilt, and the compiler's error was confined to this unit's own call
-site (`src/ui/TitleMenuTaskObjF.c`, this function's own last statement) --
-nothing in `TitleMenuTaskObjF.c` or anywhere else references this specific
+site (`src/ui/title_menu.c`, this function's own last statement) --
+nothing in `title_menu.c` or anywhere else references this specific
 slot. Fixed the one call site, oracle green. Same name and same evidence
 shape ("runs right after self->methods is installed") as
 `NodeGuardedViewportMethods::onConstruct`, which this unit's other ctor
@@ -185,7 +185,7 @@ from the body and the menu entry that reaches them):
 
 Header edit (one commit): the six own slots take the methods' names, and the
 fields `nameField` -> `saveTitle`, `iconHandle` -> `saveIcon`; all their
-accessors are in src/ui/TitleMenuTaskObjF.c. The old banner's history ("unified
+accessors are in src/ui/title_menu.c. The old banner's history ("unified
 round 88", "Named by its table's address") is this section and the Track 4
 sections above.
 

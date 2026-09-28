@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004E2D0` on 2026-09-24 (tools/rename.py). Address 0x8004e2d0.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py GetTitleMenuMethods`: 4/4 words match.
 
 ## Source
@@ -19,7 +19,7 @@ TitleMenuMethods *GetTitleMenuMethods(void)
 ## Notes
 
 Already fully declared in `include/class_3bb8c.h` from prior work on
-`TitleMenuTaskObjF` (the comment at `TitleMenuMethods *GetTitleMenuMethods(void)`'s
+`title_menu` (the comment at `TitleMenuMethods *GetTitleMenuMethods(void)`'s
 declaration already named this exact function as the getter, and `gTitleMenuMethods`
 was already `extern`-declared as `TitleMenuMethods`). No header changes
 needed -- this function only had to be typed in and moved out of

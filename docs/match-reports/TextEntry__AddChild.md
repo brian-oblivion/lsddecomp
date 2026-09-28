@@ -12,7 +12,7 @@ class's own `addChild` first, then reads the new child's method-table
 elsewhere in this project -- a per-class type tag, first word of every
 BasicClass-family vtable) and stashes the child pointer into one of two
 typed slots depending on the tag, mirroring the ALREADY-MATCHED
-`TaskObjF__OnNotify` (`src/ui/TitleMenuTaskObjF.c`) which reads the identical tag the
+`TaskObjF__OnNotify` (`src/ui/title_menu.c`) which reads the identical tag the
 identical way (`**(s32 **)arg1`, masked `& 0xF`).
 
 ```c

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E5E4` on 2026-09-24 (tools/rename.py). Address 0x8004e5e4.
 
-**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class).
+**Unit:** title_menu (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -52,7 +52,7 @@ s32 TaskObjF__OpenEvents(Node3bb8cE *self)
 ### Header/struct change
 
 Added `s32 threads[4];` at `+0x014` to `Node3bb8cE` (local to
-`src/ui/TitleMenuTaskObjF.c`, not the shared header), replacing what had been
+`src/ui/title_menu.c`, not the shared header), replacing what had been
 undifferentiated padding there.
 
 ### Proposed learning

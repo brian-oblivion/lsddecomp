@@ -7,7 +7,7 @@
  * NodeGuardedViewport -- a Viewport that skips its frame while no view node
  * is attached (class id 0x17, method table gNodeGuardedViewportMethods). Its
  * ctor chains to Viewport's (GetViewportMethods()->ctor) first. Methods in
- * src/ui/TitleMenuTaskObjF.c. No class derives from it.
+ * src/ui/title_menu.c. No class derives from it.
  *
  * What it changes (`classtable.py gNodeGuardedViewportMethods --vs
  * gViewportMethods`):

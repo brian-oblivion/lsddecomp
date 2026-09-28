@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D434` on 2026-09-22 (tools/rename.py). Address 0x8004d434.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 18 words · **Status:** MATCHED (18/18)
+**Unit:** title_menu · **Size:** 18 words · **Status:** MATCHED (18/18)
 
 ## What it does
 

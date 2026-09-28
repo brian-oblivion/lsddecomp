@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004EEA0` on 2026-09-20 (tools/rename.py). Address 0x8004eea0.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 51 words (0xCC)
+**Unit:** title_menu · **Size:** 51 words (0xCC)
 
 ## What it does
 
@@ -85,7 +85,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s
 ```
 
 Needs a forward declaration of `TaskObjF__TryWriteMemcardSaveFile` (defined later in this
-unit's ROM order; already present near the top of `src/ui/TitleMenuTaskObjF.c`)
+unit's ROM order; already present near the top of `src/ui/title_menu.c`)
 and `StampSaveTitleFileLetter`'s extern (declared in `include/class_3bb8c.h`).
 
 ## Header additions (`include/class_3bb8c.h`, additive only)
@@ -101,7 +101,7 @@ and `StampSaveTitleFileLetter`'s extern (declared in `include/class_3bb8c.h`).
 
 **A second confirmed instance of the zero-drift register-PERMUTATION
 class outside the `DayTaskStageMap`/`_c` header family it was first
-documented in** (this is `TitleMenuTaskObjF`) — this residue is not specific
+documented in** (this is `title_menu`) — this residue is not specific
 to one header's functions; it recurs whenever a function has ~8-9
 simultaneously-live values and GCC 2.6.3 happens to pick a different
 (but equally valid) bijection from values to registers than retail's
@@ -156,7 +156,7 @@ was never a rotation-of-independent-values problem at all, it was one
 mistyped parameter cascading into what LOOKED like a register permutation
 across the whole function.
 
-**Applied verbatim to `src/ui/TitleMenuTaskObjF.c`** (body otherwise unchanged
+**Applied verbatim to `src/ui/title_menu.c`** (body otherwise unchanged
 from the preserved near-miss):
 
 ```c
@@ -226,7 +226,7 @@ why "SaveFile": the 0x200-byte buffer it submits is structurally exact
 to the documented PS1 memory-card save file header format), bracketed by
 a `StampSaveTitleFileLetter(handle, ...)` registry mark/unmark call (mark before
 the retry loop, unmark only if every attempt failed). The registry call
-itself is a different unit's own helper (`src/ui/TitleMenuTaskObjF.c`) and its
+itself is a different unit's own helper (`src/ui/title_menu.c`) and its
 exact purpose is not re-derived here.
 
 ## Track 4 (2026-09-26, round 89)

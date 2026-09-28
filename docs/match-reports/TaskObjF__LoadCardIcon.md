@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004FE24` on 2026-09-23 (tools/rename.py). Address 0x8004fe24.
 
-Unit `TitleMenuTaskObjF`, class `Class86E00_3bb8c_g`. "Load a card-slot resource
+Unit `title_menu`, class `Class86E00_3bb8c_g`. "Load a card-slot resource
 by index, if not already loaded" -- builds a `CARD\<NAME>.TIM` path (same
 naming shape as `TextEntry__LoadCardResources`'s `CARD\COMINPUT.TIM`, a different unit),
 loads it through the `ChildObj86ED0` short-lived-handle idiom, and stashes

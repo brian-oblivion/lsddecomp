@@ -10,7 +10,7 @@
  * TaskCoreTarget, sTitleMenuTarget), with the memory-card save title ("LSD   Day001")
  * shown as a TextRow. A TaskCore (class id 0x1F130, table gTitleMenuMethods;
  * fourteen overrides and six slots of its own); no class derives from it.
- * src/ui/TitleMenuTaskObjF.c holds the allocator and ctor, every other method
+ * src/ui/title_menu.c holds the allocator and ctor, every other method
  * and the getter.
  *
  * Who makes one: GameApplication__RunTitleMenu (src/app/game_shell.c) runs
@@ -142,14 +142,14 @@ typedef void (*TitleMenuResetCallFn)(TitleMenu *self, struct DreamSys *dreamSys)
 extern TitleMenuMethods gTitleMenuMethods;
 extern TitleMenuMethods *GetTitleMenuMethods(void); /* returns &gTitleMenuMethods */
 
-/* Formats the current day into the save title (src/ui/TitleMenuTaskObjF.c);
+/* Formats the current day into the save title (src/ui/title_menu.c);
  * TitleMenu__TitleMenu calls it with DreamSys's getCurrentDayAndYear. */
 extern void StampSaveTitleDay(s32 day);
 
 /* The save block DreamSys's getSaveBlock returns (TitleMenu::saveBlock),
  * which UpdateFlashbackLock reads, is DreamSaveBlock in include/dream_sys.h. */
 
-/* The class's own methods, in ROM order (src/ui/TitleMenuTaskObjF.c). */
+/* The class's own methods, in ROM order (src/ui/title_menu.c). */
 TitleMenu *New_TitleMenu(struct DreamSys *dreamSys);
 void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys);
 void TitleMenu__Finalize(TitleMenu *self);

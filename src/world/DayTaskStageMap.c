@@ -28,7 +28,7 @@
  * scale ramp. Its data tables and SplitCoord2 are in include/StageMap.h.
  *
  * NodeGuardedViewport and GridCell, which DayTask and StageMap use, are
- * defined in TitleMenuTaskObjF.c.
+ * defined in title_menu.c.
  */
 #include "common.h"
 #include <libgte.h>

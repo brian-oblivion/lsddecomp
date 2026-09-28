@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004D35C` on 2026-09-26 (tools/rename.py). Address 0x8004d35c.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 2 words · **Status:** MATCHED (2/2)
+**Unit:** title_menu · **Size:** 2 words · **Status:** MATCHED (2/2)
 
 ## What it does
 

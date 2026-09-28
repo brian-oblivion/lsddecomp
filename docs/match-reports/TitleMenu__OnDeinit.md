@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D898` on 2026-09-24 (tools/rename.py). Address 0x8004d898.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__OnDeinit`: 29/29 words match.
 
 ## Source

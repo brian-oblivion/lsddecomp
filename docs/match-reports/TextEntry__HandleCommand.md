@@ -235,7 +235,7 @@ So `altCommands` selects between acting on presses (clear) and on held
 buttons (set); the field-name proposal is below. `setState(2)`/`(3)` are
 `TEXTENTRY_RESULT_ACCEPTED`/`CANCELLED`; the sound `0x10` is `1 << 4`,
 VAB program 1 tone 0 (playTone keys program index >> 4, tone index & 0xF;
-TitleMenuTaskObjF/_t's spelling). The `slot94Call` label is `callPrevChar`.
+title_menu/_t's spelling). The `slot94Call` label is `callPrevChar`.
 Parameters `arg1`/`arg2` -> `sender`/`command`.
 
 Moved here from the comment on `EncodeFullWidthSjis` (stale: it is matched
