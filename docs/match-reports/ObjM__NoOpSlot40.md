@@ -53,7 +53,7 @@ commit), all read only by this unit:
 | `D_80087118` | `gStagePendingExtras` | 14 words, one DreamSys setPendingExtra value per stage (0x80, 0x400, 0x80, 0x100, ...) |
 | `D_80087150` | `gStage0Bounds` | CellBounds {0, 0, 8, 9}: setBounds on stage 0 only |
 | `D_8008715C` | `sObjMViewPoint` | LongVec3 {0, -1200, 0}: attachViewChild's `vp` |
-| `D_80087168` | `gObjMViewRefPoint` | LongVec3 {0, -1200, 10000}: attachViewChild's `vr` |
+| `D_80087168` | `sObjMViewRefPoint` | LongVec3 {0, -1200, 10000}: attachViewChild's `vr` |
 | `D_8008AB34` | `sObjMProjectionBias` | s32 0 (.sdata), added to setProjection's distance; no writer anywhere |
 
 Tier A for all six: each name says what the data is and where it goes,
