@@ -52,7 +52,7 @@ struct TimImageMethods {
     /* +0x08C */ void (*slot8C)(void);
     /* +0x090 */ void (*slot90)(void);
     /* +0x094 */ void (*slot94)(void);
-    /* +0x098 */ void (*setFlag48)(TimImage *self); /* TimImage__SetFlag48: flag48 = 1 */
+    /* +0x098 */ void (*setFlag48)(TimImage *self); /* TimImage__SetFlag: flag48 = 1 */
     /* +0x09C */ void (*getTimInfo)(TimImage *self, GsIMAGE *tim); /* TimImage__GetTimInfo */
 }; /* 39 slots, 0xA0 bytes */
 
@@ -83,7 +83,7 @@ void TimImage__NoOpSlot88(void);
 void TimImage__NoOpSlot8C(void);
 void TimImage__NoOpSlot90(void);
 void TimImage__NoOpSlot94(void);
-void TimImage__SetFlag48(TimImage *self);
+void TimImage__SetFlag(TimImage *self);
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim);
 
 /* An s16 VRAM point. */

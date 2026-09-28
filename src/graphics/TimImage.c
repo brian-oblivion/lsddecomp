@@ -101,7 +101,7 @@ void TimImage__NoOpSlot90(void) {}
 void TimImage__NoOpSlot94(void) {}
 
 /* TimImage +0x098: sets flag48 (the ctor clears it); no code reads it. */
-void TimImage__SetFlag48(TimImage *self) {
+void TimImage__SetFlag(TimImage *self) {
     self->flag48 = 1;
 }
 

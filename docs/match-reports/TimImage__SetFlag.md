@@ -1,4 +1,6 @@
-# TimImage__SetFlag48 -- MATCHED (3/3 words), round 81
+# TimImage__SetFlag -- MATCHED (3/3 words), round 81
+
+> Renamed from `TimImage__SetFlag48` on 2026-09-28 (tools/rename.py). Address 0x8003b5e4.
 
 > Renamed from `TimImage__func_8003B5E4` on 2026-09-27 (tools/rename.py). Address 0x8003b5e4.
 
@@ -11,7 +13,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 - **What:** sets the subclass field +0x048 to 1 (`ori $v0,$zero,1; jr $ra; sw $v0,0x48($a0)`). TimImage__TimImage clears the same field. No other function in the unit reads it, and no caller outside the unit reaches this slot directly, so its purpose is not established; it keeps `unk48`.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 3/3,
   and the whole-image SHA1 is green (`OK: build matches retail`).
-- **Name:** `TimImage__SetFlag48`, tier C (round 81 naming pass, runner
+- **Name:** `TimImage__SetFlag`, tier C (round 81 naming pass, runner
   bravo): the class is confirmed as `TimImage` (see `## Naming` below), but
   the field it sets (`unk48`) is written here and nowhere read within the
   unit, so what the flag MEANS is unknown -- tier-C `Class__func_xxxxx`.
@@ -19,7 +21,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 ## Source
 
 ```c
-void TimImage__SetFlag48(TimImage *self) {
+void TimImage__SetFlag(TimImage *self) {
     self->unk48 = 1;
 }
 ```
@@ -42,7 +44,7 @@ extern FileResourceMethods gTimImageMethods;
 
 ## Naming
 
-- **`TimImage__SetFlag48`**, tier C: class confirmed as `TimImage` (this
+- **`TimImage__SetFlag`**, tier C: class confirmed as `TimImage` (this
   round), slot +0x098. The body sets `unk48 = 1`, and `TimImage__TimImage`
   clears the same field, but nothing in this unit reads `unk48`, and no
   cross-unit caller reaches this slot directly (`TimImage` is always seen as
@@ -51,7 +53,7 @@ extern FileResourceMethods gTimImageMethods;
 
 ## Naming (track 7, round 100, delta)
 
-Renamed `TimImage__func_8003B5E4` -> `TimImage__SetFlag48` with `tools/rename.py`
+Renamed `TimImage__func_8003B5E4` -> `TimImage__SetFlag` with `tools/rename.py`
 (the tier-C line above predates it). **Tier A**: a pure leaf setter,
 `self->flag48 = 1` (`ori $v0,$zero,1; jr $ra; sw $v0,0x48($a0)`), named as
 `FrameClock__Stop` is for the same shape. The field +0x048 is renamed
