@@ -113,7 +113,7 @@ extern s32 D_80090C18;              /* GsDIV1..5: subdivision level */
 extern s32 sSortUseGlobalLightMode; /* GsLLMOD */
 extern s32 sSortLightMode;          /* GsFOG | GsMATE */
 
-/* MATCHING: three s8s, so SortTmdObject's copy of gTexturedFaceColor is a
+/* MATCHING: three s8s, so SortTmdObject's copy of sTexturedFaceColor is a
  * 3-byte block move (`la`, three `lb`, three `sb`). */
 typedef struct {
     s8 r, g, b;
@@ -140,7 +140,7 @@ typedef struct PolyDrawCtx {
     /* +0x028 */ s32 opz;          /* nclip result (MAC0) */
     /* +0x02C */ s32 dpShift;      /* dp >> dpShift is the CLUT row offset */
     /* +0x030 */ GsOT_TAG *otSlot; /* &otBase[otz >> otShift] */
-    /* +0x034 */ Rgb8 faceColor;   /* gTexturedFaceColor's copy */
+    /* +0x034 */ Rgb8 faceColor;   /* sTexturedFaceColor's copy */
     u8 pad037[0x038 - 0x037];
     /* +0x038 */ MATRIX savedRotMatrix;
     u8 pad058[0x05C - 0x058];
@@ -198,7 +198,7 @@ typedef struct TmdGroupHeader {
         ((POLY_FT3 *)(p))->clut += (rows) << 6; \
     } while (0)
 /* clang-format on */
-extern Rgb8 gTexturedFaceColor;
+extern Rgb8 sTexturedFaceColor;
 
 /* The two subdivision work buffers the SubmitPoly* wrappers hand Sony's
  * RCpoly* packers, a DIVPOLYGON3 and a DIVPOLYGON4 back to back (0x218
@@ -316,7 +316,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
     sSortLightMode = (obj->attribute >> 3) & 0x3;
     ctx->unk8 = 10;
 
-    ctx->faceColor = gTexturedFaceColor;
+    ctx->faceColor = sTexturedFaceColor;
 
     if ((sSortUseGlobalLightMode != 0 && GsLIGHT_MODE != 0) || sSortLightMode != 0) {
         dpShift = DP_CLUT_SHIFT_CUED;
@@ -438,7 +438,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_TF3 *)(elem - offsetof(TMD_P_TF3, n0)))
 #define POLY ((POLY_FT3 *)prim)
 
-                    /* TMD_P_TF3 -> POLY_FT3: lit, from gTexturedFaceColor, which is
+                    /* TMD_P_TF3 -> POLY_FT3: lit, from sTexturedFaceColor, which is
                      * loaded into the GTE once per run. */
                     setPolyFT3(prim);
                     SetupPrimCode(prim, ctx);
@@ -555,7 +555,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 #define PKT ((TMD_P_TF4 *)(elem - offsetof(TMD_P_TF4, n0)))
 #define POLY ((POLY_FT4 *)prim)
 
-                    /* TMD_P_TF4 -> POLY_FT4: lit, from gTexturedFaceColor. */
+                    /* TMD_P_TF4 -> POLY_FT4: lit, from sTexturedFaceColor. */
                     setPolyFT4(prim);
                     SetupPrimCode(prim, ctx);
                     gte_ldrgb(&ctx->faceColor);
