@@ -196,7 +196,7 @@ extern s32 sNullDriverModeArg;
 /* libsnd set-up, done once and undone when the last bank closes: SsInit and
  * the size table; the tick mode; SsStart and the master volume. */
 extern s32 sVabSizeTableInited;
-extern s32 gVabStreamInited;
+extern s32 sVabStreamInited;
 extern s32 gVabVolumeInited;
 extern s32 sOpenVabCount;     /* VabStreamObjs constructed and not yet finalized */
 extern s32 sSsTicksPerSecond; /* the SsSetTickMode rate, for callers timing in ticks */
@@ -278,10 +278,10 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
         sVabSizeTableInited = 1;
         SsSetTableSize(GetSsSizeTableBuf(), 2, 1); /* two scores of one track */
     }
-    if (gVabStreamInited == 0) {
+    if (sVabStreamInited == 0) {
         sSsTicksPerSecond = 60; /* SS_TICK60 */
         SsSetTickMode(SS_TICK60);
-        gVabStreamInited = 1;
+        sVabStreamInited = 1;
     }
     sOpenVabCount++;
     if (path != NULL) {
@@ -304,7 +304,7 @@ void VabStreamObj__Finalize(VabStreamObj *self) {
     if (sOpenVabCount == 0 && IsWBgmActive() == 0) {
         sVabSizeTableInited = 0;
         gVabVolumeInited = 0;
-        gVabStreamInited = 0;
+        sVabStreamInited = 0;
         SsEnd();
         SsQuit();
     }

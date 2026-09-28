@@ -63,10 +63,10 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
         sVabSizeTableInited = 1;
         SsSetTableSize(GetSsSizeTableBuf(), 2, 1);
     }
-    if (gVabStreamInited == 0) {
+    if (sVabStreamInited == 0) {
         sSsTicksPerSecond = 0x3C;
         SsSetTickMode(1);
-        gVabStreamInited = 1;
+        sVabStreamInited = 1;
     }
     sOpenVabCount++;
     if (arg1 != NULL) {
