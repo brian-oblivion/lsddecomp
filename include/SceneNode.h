@@ -102,7 +102,7 @@ struct Ratio16 {
     /* +0x050 */ SceneNode *(*detachFromParent)(Self *self); /* SceneNode__DetachFromParent */ \
     /* +0x054 */ void (*detachAttachedChildren)(Self *self); /* SceneNode__DetachAttachedChildren */ \
     /* +0x058 */ void (*getNextAttachedChild)(Self *self, SceneNode **entry, BasicClassListNode **cursor); /* SceneNode__GetNextAttachedChild */ \
-    /* +0x05C */ void (*slot5C)(Self *self, s32 arg1); /* SceneNode__NoOpSlot5C; Finalize passes (self, 0) */ \
+    /* +0x05C */ void (*finalizeHook)(Self *self, s32 arg1); /* SceneNode__NoOpSlot5C; Finalize calls it with (self, 0); no subclass overrides it */ \
     /* +0x060 */ s32 (*setDisplay)(Self *self, s32 on); /* SceneNode__SetDisplay: GsDOFF */ \
     /* +0x064 */ u32 (*setSemiTransOn)(Self *self, s32 on); /* SceneNode__SetSemiTrans: GsALON; not setSemiTrans, which is <libgpu.h>'s macro */ \
     /* +0x068 */ u32 (*setSemiTransRate)(Self *self, u32 rate); /* SceneNode__SetSemiTransRate: GsAZERO..GsATHREE */ \

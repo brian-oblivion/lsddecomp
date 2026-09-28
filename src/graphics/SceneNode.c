@@ -108,7 +108,7 @@ void *SceneNode__SceneNode(SceneNode *self) {
 void SceneNode__Finalize(SceneNode *self) {
     self->methods->detachFromParent(self);
     self->methods->detachAttachedChildren(self);
-    self->methods->slot5C(self, 0);
+    self->methods->finalizeHook(self, 0);
     BMemPMgrFree(self->coord2->param);
     BMemPMgrFree(self->coord2);
     GetBasicClassMethods()->finalize((BasicClass *)self);
