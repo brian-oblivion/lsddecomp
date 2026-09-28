@@ -107,3 +107,11 @@ and `src/class_3bb8c_p.c` read `StageGridDimensions.isVertical` (tested
 against 0 and 1) through a dimensions pointer, so the field is no longer
 padding-by-rule; confirming or sharpening its name belongs to whoever
 polishes those units, who can see what the two branches do.
+
+**Globals `STAGE_CHUNK_MOODS` -> `sStageChunkMoods` and `STGnn_CHUNK_MOODS` ->
+`sStageNnChunkMoods`, nn = 00..13 (round 101, track 7; fifteen
+`tools/rename.py` runs).** `sStageChunkMoods` is named in C only by
+`src/StageGrid.c`; the fourteen per-stage arrays are named by nothing but its
+pointer initialisers in splat data. Unit-static data, so `sName`; the stage
+number stays in the name because the arrays are indexed by stage and stage nn
+is the disc's `STGnn` directory.
