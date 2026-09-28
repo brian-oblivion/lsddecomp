@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004D36C` on 2026-09-26 (tools/rename.py). Address 0x8004d36c.
 
-**Unit:** class_3bb8c_c · **Size:** 2 words · **Status:** MATCHED (2/2)
+**Unit:** TitleMenuTaskObjF · **Size:** 2 words · **Status:** MATCHED (2/2)
 
 ## What it does
 
@@ -26,7 +26,7 @@ report per function, matched ones included.
 **NodeGuardedViewport__NoOpSlotC0** -- tier C, kept deliberately. This project's established
 precedent for a genuinely empty, no-established-purpose vtable stub is to
 keep the bare `func_` name even when the occupying class IS known
-(`StageMap__NoOpSlotD8` in `src/class_3ac78.c`, `SceneNode__NoOpSlot5C` in
+(`StageMap__NoOpSlotD8` in `src/DayTaskStageMap.c`, `SceneNode__NoOpSlot5C` in
 `src/SceneNode.c` -- both documented "keeps its placeholder name
 deliberately"). This function fits the same shape exactly: `void (void)`,
 zero registers read, no caller in any carved unit dispatches it with

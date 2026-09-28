@@ -409,11 +409,11 @@ a subscript-notation change) and rebuilt. **Byte-identical to the
 un-reversed form: 28/35, same two words differing, same diff.** Both C
 operand orders produce the identical wrong register/operand assignment
 -- exactly the datum the coordinator used to confirm charlie's two
-`class_3bb8c` instances as the same phenomenon.
+`DayTaskStageMap` instances as the same phenomenon.
 
 **This makes CalcDreamColor a sixth confirmed instance of the class, and
 the third unrelated unit** (after three in `libsnd_ssinit` and two in
-`class_3bb8c`), independently found without knowing charlie's result in
+`DayTaskStageMap`), independently found without knowing charlie's result in
 advance -- this report's own residue description ("both addus end up
 register-swapped relative to retail... reshapes... all four producing
 the identical result") already matches the class's signature exactly; it

@@ -61,7 +61,7 @@ left-hand/`unk1C` operand first, matching retail's load order) and casting
 both operands `(u32)` (forces `sltu` instead of `slt`) fixed both at once —
 one source change, two residue lines.
 
-## New struct knowledge (`include/class_39e08.h`)
+## New struct knowledge (`include/DayTaskStageMap.h`)
 
 - `Obj865C8::unk1C` (s32) — compared unsigned against `unk2C`.
 - `IntermediateBaseMethods::slot5C` typed `void (*)(void *self, s32 arg1,

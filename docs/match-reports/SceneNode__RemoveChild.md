@@ -43,7 +43,7 @@ round 11 (2026-09-03), runner charlie, unit SceneNode, second pass. Matched on t
 
 ## Naming
 
-Round 71 (alpha). `func_8001CCB4` -> `SceneNode__RemoveChild`, **tier A**. Overrides BasicClass slot +0x014 `removeChild`. If the child's tag is 9, SceneNode__UnlinkModel first, then forwards to the base. Mirror of SceneNode__AddChild; class_3ac78.h already calls this address `removeChild`.
+Round 71 (alpha). `func_8001CCB4` -> `SceneNode__RemoveChild`, **tier A**. Overrides BasicClass slot +0x014 `removeChild`. If the child's tag is 9, SceneNode__UnlinkModel first, then forwards to the base. Mirror of SceneNode__AddChild; DayTaskStageMap.h already calls this address `removeChild`.
 
 ## Round 101 (delta): track 7
 

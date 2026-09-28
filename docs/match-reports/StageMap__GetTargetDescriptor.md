@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004C158` on 2026-09-24 (tools/rename.py). Address 0x8004c158.
 
-**Unit:** class_3bb8c · **Size:** 26 words · **Status:** MATCHED (first attempt).
+**Unit:** DayTaskStageMap · **Size:** 26 words · **Status:** MATCHED (first attempt).
 
 ## Result
 

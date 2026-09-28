@@ -812,7 +812,7 @@ unique extension beyond FileResource's base layout, confirmed by
 grid-cell-shaped index (cached byte offset, or fresh `index*12+8` lookup),
 and when present computes position-like fields on a 0x800/0x400 lattice
 with row stride 20 before forwarding to `ctx->unk2C->methods->slot80`.
-That lattice/stride matches `class_3ac78.c`'s own header comment for
+That lattice/stride matches `DayTaskStageMap.c`'s own header comment for
 `StageMap`'s 20-column grid verbatim ("seeds every cell with a world
 position on a 0x800 lattice") -- a real lead for a future round, not
 claimed as proof here, since nothing in this unit confirms `ctx`/`self`
@@ -877,7 +877,7 @@ stores that in the GridCell's `flags36`, whose bit 0x80 NotifyGridCell tests
 and whose low seven bits DreamSys__NotifyLinkAttempt reads as a voice
 select. Named for where it goes; what the bits mean in the map is not
 established. `CellPlacement.unk2E` -> `cellFlags` is PROPOSED, not applied:
-its reader is in class_3bb8c.c. `unk1` / `unk2C` stay: written here, read
+its reader is in DayTaskStageMap.c. `unk1` / `unk2C` stay: written here, read
 nowhere.
 
 ## Track 7 (round 100, delta)

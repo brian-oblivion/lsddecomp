@@ -136,5 +136,5 @@ BATCHED ahead of the stores rather than interleaved one-for-one.
 
 ## Round 94 (track 6)
 
-The second view is gone: class_3bb8c_b.c declares `extern MATRIX D_8008E98C;`
+The second view is gone: DayTaskStageMap.c declares `extern MATRIX D_8008E98C;`
 from `<libgte.h>`, so both readers now use Sony's type.

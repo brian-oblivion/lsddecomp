@@ -43,7 +43,7 @@ First build; the same shape as TodSet__TodSet (gTodSetMethods's ctor). The alloc
 ## Naming
 
 - **TriggerWorld__TriggerWorld**, tier B (head review, round 83: was A). Constructor: the parent ModelData's ctor (owns=0), then this table; runs its own Load when the argument's first word is set.
-  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (class_3bb8c.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
+  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (DayTaskStageMap.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

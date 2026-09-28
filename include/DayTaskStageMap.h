@@ -1,13 +1,13 @@
-#ifndef CLASS_39E08_H
-#define CLASS_39E08_H
+#ifndef DAYTASKSTAGEMAP_H
+#define DAYTASKSTAGEMAP_H
 
 #include "common.h"
 #include "DayTask.h"
 
 /*
- * Declarations src/class_39e08.c uses (DayTask, TimedTask and
- * RegisterRecordTableFiles; the .c's banner says what it holds): the
- * functions it calls that no header it includes declares, and the call-site
+ * Declarations src/DayTaskStageMap.c's DayTask, TimedTask and
+ * RegisterRecordTableFiles use (the .c's banner says what it holds): the
+ * functions they call that no header it includes declares, and the call-site
  * view of the one object it reaches without its class's header. DayTask and
  * TimedTask themselves are include/DayTask.h and include/TimedTask.h.
  */
@@ -50,7 +50,7 @@ extern const char sDreamerTmdPath[];
  * passes to New_WBgm as its vabPath. */
 extern s32 PickSoundBank(s32 unused);
 
-/* Defined in src/class_39e08.c, after DayTask's methods; GameApplicationFileResource.c
+/* Defined in src/DayTaskStageMap.c, after DayTask's methods; GameApplicationFileResource.c
  * declares it too. */
 extern s32 RegisterRecordTableFiles(s32 all);
 

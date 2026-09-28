@@ -17,7 +17,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "class_3bb8c.h"
-#include "class_39e08.h"
+#include "DayTaskStageMap.h"
 #include "TimedTask.h"
 #include "TextRow.h"
 #include "TimImage.h"

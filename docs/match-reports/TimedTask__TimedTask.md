@@ -69,7 +69,7 @@ describes the right SIGNATURE for the shared struct layout; only the actual
 function invoked at runtime differs by which vtable `self->methods` points
 at. No behavioral ambiguity, just a naming note for the next reader.
 
-## New/changed struct knowledge (`include/class_39e08.h`)
+## New/changed struct knowledge (`include/DayTaskStageMap.h`)
 
 - `IntermediateBaseMethods::ctor` added at +0x008: `void *(*ctor)(void
   *self)` — called with only `self` set up, matching the base-ctor shape
@@ -115,8 +115,8 @@ particular call site once a subclass's vtable is installed.
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
-`include/class_39e08.h`'s local `extern BasicClass *New_VabStreamObj(char *)`
-is deleted. `src/class_39e08.c` now includes `include/VabStreamObj.h`, where
+`include/DayTaskStageMap.h`'s local `extern BasicClass *New_VabStreamObj(char *)`
+is deleted. `src/DayTaskStageMap.c` now includes `include/VabStreamObj.h`, where
 the allocator returns `VabStreamObj *`, and casts the result to
 `BasicClass *` for `TimedTask::sound`. The whole image stays
 byte-identical.

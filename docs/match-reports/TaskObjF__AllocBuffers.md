@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004F704` on 2026-09-20 (tools/rename.py). Address 0x8004f704.
 
-**Unit:** class_3bb8c_f · **Size:** 32 words (0x80) · **Status:** MATCH
+**Unit:** TitleMenuTaskObjF · **Size:** 32 words (0x80) · **Status:** MATCH
 
 `void TaskObjF__AllocBuffers(TaskObjF *self)`. If `self->unk38` (a `void **`, a
 16-entry pointer array) is unallocated, allocates it (`BMemPMgrAlloc

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D788` on 2026-09-24 (tools/rename.py). Address 0x8004d788.
 
-Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__OnNotify`: 35/35 words match.
 
 ## Source
@@ -43,7 +43,7 @@ whoever next resolves a caller of this function.
   reads a vtable's header word as a full `s32` (`lw` then `andi`), NOT the
   existing `GenericTagInst_3bb8c_c`/`GenericTagMethods_3bb8c_c` (which reads
   only the low BYTE via `lbu`, established by `GridCell__DispatchLinkCommand` in
-  `class_3bb8c_c`). Reusing the byte-typed struct here would have emitted
+  `TitleMenuTaskObjF`). Reusing the byte-typed struct here would have emitted
   the wrong load width.
 - `BaseTaskCtorTable_3bb8c_c::slot38` -- new slot, `void (*)(void *self,
   void *arg1, s32 arg2)`.
@@ -57,7 +57,7 @@ the first time this unit's own `slot38`/`slot138` pair exercises it.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D788` -> `TitleMenu__OnNotify`. **Tier B**: Forwards to the base class's `slot38` unconditionally, then to its own `slot138` only when `arg1`'s vtable header low nibble == 0xB -- the same runtime-type-id-gated forward shape already named `GridCell__DispatchLinkCommand` in `class_3bb8c_c.c`. Purpose of tag 0xB itself not established.
+Renamed `func_8004D788` -> `TitleMenu__OnNotify`. **Tier B**: Forwards to the base class's `slot38` unconditionally, then to its own `slot138` only when `arg1`'s vtable header low nibble == 0xB -- the same runtime-type-id-gated forward shape already named `GridCell__DispatchLinkCommand` in `TitleMenuTaskObjF.c`. Purpose of tag 0xB itself not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

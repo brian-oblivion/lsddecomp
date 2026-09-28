@@ -169,7 +169,7 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     task->methods->release(task);
 }
 
-extern s32 RegisterRecordTableFiles(s32 all); /* class_39e08.c */
+extern s32 RegisterRecordTableFiles(s32 all); /* DayTaskStageMap.c */
 
 /* ShowImage's view callback: registers gRecordTable's files with the CD
  * driver. */

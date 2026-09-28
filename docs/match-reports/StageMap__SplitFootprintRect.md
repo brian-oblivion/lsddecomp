@@ -501,7 +501,7 @@ s32 StageMap__SplitFootprintRect(Obj866E8 *self, CellRect *slot, s32 count, s32 
 #endif
 ```
 
-Register mapping at this state (`objdump -d build/src/class_3bb8c_b.c.o`):
+Register mapping at this state (`objdump -d build/src/DayTaskStageMap.c.o`):
 `count`=`$s2`, `nextArg`=`$s4`, `hSpan`=`$s5`, `p5`=`$s6`, `p7`=`$s7` all
 match retail exactly. Only `self`, `slot`, and the reused
 `hSpan2`-then-`h4sum` temporary rotate: retail is
@@ -545,7 +545,7 @@ from one existing struct instance into another. The shape does not occur.
 
 ## Round 33 (charlie) — re-derived from the raw asm by hand, register rotation confirmed genuine; permuter scaffold mismatch re-checked, still unusable
 
-Traced every instruction in `asm/nonmatchings/class_3bb8c_b/StageMap__SplitFootprintRect.s`
+Traced every instruction in `asm/nonmatchings/DayTaskStageMap/StageMap__SplitFootprintRect.s`
 fresh against the round-19 preserved body, line by line, specifically hunting
 for anything the earlier rounds might have missed (in the spirit of this
 round's other stall on this unit, `StageMap__ComputeFootprintFromRotation`, where the same exercise
@@ -633,7 +633,7 @@ where its old value could have been considered dead. The "mention it twice"
 lever's precondition (a value whose lifetime the compiler is currently
 choosing to SHORTEN) does not hold for a parameter that is live throughout.
 
-Both reverted (`git checkout -- src/class_3bb8c_b.c`; clean `OK: build
+Both reverted (`git checkout -- src/DayTaskStageMap.c`; clean `OK: build
 matches retail` confirmed after each).
 
 **Disposition unchanged: `INCLUDE_ASM`, still 55/97, still a clean 3-register
@@ -744,7 +744,7 @@ what was compared was two tools' *summary numbers*. Run properly this round:
 
 ```sh
 tools/binutils/bin/mipsel-linux-gnu-objdump -d permuter-work/StageMap__SplitFootprintRect/base.o
-tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/class_3bb8c_b.c.o
+tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/DayTaskStageMap.c.o
 ```
 
 `StageMap__SplitFootprintRect` is **byte-identical** between the two, instruction for
@@ -918,7 +918,7 @@ allocation that is already the right size.
 
 Track 1b promotion. Score re-verified unchanged (62/97, exact length, zero
 drift) before promoting. Placed the existing round-58 preserved body
-(the do-while(0)-plus-named-h8Val body carried in `src/class_3bb8c_b.c`)
+(the do-while(0)-plus-named-h8Val body carried in `src/DayTaskStageMap.c`)
 inside `#ifdef NON_MATCHING`, with `INCLUDE_ASM` restored in the `#else`.
 No source change beyond the wrapper and comment; both oracles green:
 `./build-and-verify.sh` (exit 0, `OK: build matches retail`) and

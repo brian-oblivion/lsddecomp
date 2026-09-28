@@ -247,7 +247,7 @@ segments:
       # slot (strings, then jtbl_8001157C and jtbl_80011594, whose targets
       # are at 0x8004Fxxx/0x8005xxx and still live in `asm`) stays a
       # standalone rodata object from 0x1C34.
-      - [0x1C0C, .rodata, class_39e08]
+      - [0x1C0C, .rodata, DayTaskStageMap]
       # Slot 0x1C34 is shared by FIVE units. Only the two JUMP TABLES need
       # attaching -- they hold `.L` labels local to class_3bb8c_g's own
       # function .s files, which a standalone rodata object cannot resolve.
@@ -1372,8 +1372,7 @@ segments:
       # monolithic `asm` segment awaiting a carve (docs/PARALLEL-RUNS.md
       # Gate 2).
       - [0x39cb4, c, StageGrid]
-      - [0x39e08, c, class_39e08]
-      - [0x3ac78, c, class_3ac78]
+      - [0x39e08, c, DayTaskStageMap]
       # class_3bb8c is 365 functions -- the largest uncarved block in the
       # game, and the one holding all 13 PSX BIOS trampolines (`jr $t2`,
       # not expressible in C). Carved in slices from the front, like Entity.
@@ -1385,7 +1384,6 @@ segments:
       # needs attaching and no `hasm`/`.word` disposition is required yet.
       # BOTH are still ahead in the remainder: whoever carves the next
       # slice must decide the BIOS-stub disposition AT CARVE TIME.
-      - [0x3bb8c, c, class_3bb8c]
       # class_3bb8c_b: second 20-function slice, 0x3CD88..0x3DA54.
       # 0x3DA54 (func_8004D254) is a real boundary -- func_8004D244 is a
       # two-instruction `jr $ra` leaf that ends cleanly, and func_8004D254
@@ -1407,7 +1405,6 @@ segments:
       # earlier version of this comment said the next carve had to settle
       # both; that was wrong, and acting on it would have meant doing
       # expensive work four carves early.
-      - [0x3CD88, c, class_3bb8c_b]
       # class_3bb8c_c: third 20-function slice, 0x3DA54..0x3DF04.
       # 0x3DF04 (func_8004D704) is a real boundary -- func_8004D6AC closes
       # with `nop` + `endlabel` and func_8004D704 opens its own frame.
@@ -1418,7 +1415,7 @@ segments:
       # never through the caller's frame.
       # Clear of both remainder hazards (zero `jlabel`, zero `jr $t2`), so
       # no rodata slot to attach and no hasm/.word disposition here either.
-      - [0x3DA54, c, class_3bb8c_c]
+      - [0x3DA54, c, TitleMenuTaskObjF]
       # class_3bb8c_d / _e / _f: front of the 305-function class_3bb8c
       # remainder, split into three ~20-function C units in round 14. The
       # tail (#59 onward, 0x403E4) deliberately STAYS asm as class_3bb8c_g
@@ -1433,11 +1430,8 @@ segments:
       # exactly.
       #
       # class_3bb8c_d: #0..#19, 0x3DF04..0x3EBF4.
-      - [0x3DF04, c, class_3bb8c_d]
       # class_3bb8c_e: #20..#38, 0x3EBF4..0x3F540.
-      - [0x3EBF4, c, class_3bb8c_e]
       # class_3bb8c_f: #39..#58, 0x3F540..0x403E4.
-      - [0x3F540, c, class_3bb8c_f]
       # class_3bb8c_g: the remaining ~246 functions, 0x403E4.. -- UNCARVED
       # deliberately. Both of Gate 2's routine carve hazards are in here and
       # neither is in the three slices above:

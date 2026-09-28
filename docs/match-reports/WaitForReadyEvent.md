@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004F4C8` on 2026-09-20 (tools/rename.py). Address 0x8004f4c8.
 
-**Unit:** class_3bb8c_f · **Size:** 37 words (0x94) · **Status:** MATCH
+**Unit:** TitleMenuTaskObjF · **Size:** 37 words (0x94) · **Status:** MATCH
 
 ## What it does
 

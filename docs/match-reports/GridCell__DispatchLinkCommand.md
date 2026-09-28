@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D434` on 2026-09-22 (tools/rename.py). Address 0x8004d434.
 
-**Unit:** class_3bb8c_c · **Size:** 18 words · **Status:** MATCHED (18/18)
+**Unit:** TitleMenuTaskObjF · **Size:** 18 words · **Status:** MATCHED (18/18)
 
 ## What it does
 

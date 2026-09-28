@@ -4,13 +4,13 @@
 
 > Renamed from `func_8004D37C` on 2026-09-22 (tools/rename.py). Address 0x8004d37c.
 
-**Unit:** class_3bb8c_c · **Size:** 4 words · **Status:** MATCHED (4/4)
+**Unit:** TitleMenuTaskObjF · **Size:** 4 words · **Status:** MATCHED (4/4)
 
 ## What it does
 
 Get-vtable helper for a small sibling class: returns `&gNodeGuardedViewportMethods`, the
 vtable this unit calls `NodeGuardedViewportMethods`. Same shape as the game's other
-`func_80xxxxxx()->ctor(...)` vtable getters (e.g. class_3ac78.c's
+`func_80xxxxxx()->ctor(...)` vtable getters (e.g. DayTaskStageMap.c's
 `GetTimedTaskMethods`/`GetStageMapMethods`).
 
 ## The C
@@ -48,7 +48,7 @@ way really is a vtable and not incidental data.
 
 **GetNodeGuardedViewportMethods** -- tier A. Pure vtable getter (`return
 &gNodeGuardedViewportMethods;`), the same shape and role as the project's other
-`GetClassXMethods` getters (e.g. `GetTimedTaskMethods`, class_3ac78.c).
+`GetClassXMethods` getters (e.g. `GetTimedTaskMethods`, DayTaskStageMap.c).
 The mechanics -- "returns a pointer to this specific class's own methods
 table" -- ARE the purpose, so tier A applies by the leaf-getter rule. The
 underlying vtable global was renamed alongside it, `D_800869D8` ->

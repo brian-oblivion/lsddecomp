@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004D6AC` on 2026-09-22 (tools/rename.py). Address 0x8004d6ac.
 
-**Unit:** class_3bb8c_c · **Size:** 22 words (0x58 bytes)
+**Unit:** TitleMenuTaskObjF · **Size:** 22 words (0x58 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 9. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Rebuilding this stub

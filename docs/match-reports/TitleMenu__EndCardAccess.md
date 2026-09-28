@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004E054` on 2026-09-24 (tools/rename.py). Address 0x8004e054.
 
-Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__EndCardAccess`: 36/36 words match.
 
 ## Source

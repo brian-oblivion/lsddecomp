@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004EEA0` on 2026-09-20 (tools/rename.py). Address 0x8004eea0.
 
-**Unit:** class_3bb8c_f · **Size:** 51 words (0xCC)
+**Unit:** TitleMenuTaskObjF · **Size:** 51 words (0xCC)
 
 ## What it does
 
@@ -27,7 +27,7 @@ counted as the same register). Blocker screen clean (no `gp_rel`, no
 LENGTH are settled** — the best attempt compiles to exactly 51 words with
 **zero address drift** (no "differs outside this range" warning), the
 same "confirmed zero-drift register PERMUTATION" signature CLAUDE.md
-documents for `StageMap__BuildFootprintRects` in the `class_3bb8c_b`/`_c` header family.
+documents for `StageMap__BuildFootprintRects` in the `DayTaskStageMap`/`_c` header family.
 Retail's own register assignment: `self`→`$fp`, `a1`→`$s3`, `handle`→
 `$s2`, `a3`→`$s7`, `arg5`→`$s6`, `arg6`→`$s5`, `arg7`→`$s4`, plus `$s1`
 (retry counter) and `$s0` (result). The best attempt reached (preserved
@@ -85,7 +85,7 @@ s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3, s
 ```
 
 Needs a forward declaration of `TaskObjF__TryWriteMemcardSaveFile` (defined later in this
-unit's ROM order; already present near the top of `src/class_3bb8c_f.c`)
+unit's ROM order; already present near the top of `src/TitleMenuTaskObjF.c`)
 and `StampSaveTitleFileLetter`'s extern (declared in `include/class_3bb8c.h`).
 
 ## Header additions (`include/class_3bb8c.h`, additive only)
@@ -100,8 +100,8 @@ and `StampSaveTitleFileLetter`'s extern (declared in `include/class_3bb8c.h`).
 ## Proposed learning
 
 **A second confirmed instance of the zero-drift register-PERMUTATION
-class outside the `class_3bb8c_b`/`_c` header family it was first
-documented in** (this is `class_3bb8c_f`) — this residue is not specific
+class outside the `DayTaskStageMap`/`_c` header family it was first
+documented in** (this is `TitleMenuTaskObjF`) — this residue is not specific
 to one header's functions; it recurs whenever a function has ~8-9
 simultaneously-live values and GCC 2.6.3 happens to pick a different
 (but equally valid) bijection from values to registers than retail's
@@ -156,7 +156,7 @@ was never a rotation-of-independent-values problem at all, it was one
 mistyped parameter cascading into what LOOKED like a register permutation
 across the whole function.
 
-**Applied verbatim to `src/class_3bb8c_f.c`** (body otherwise unchanged
+**Applied verbatim to `src/TitleMenuTaskObjF.c`** (body otherwise unchanged
 from the preserved near-miss):
 
 ```c

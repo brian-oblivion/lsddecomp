@@ -42,7 +42,7 @@ void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 ## Struct/table knowledge established
 
 - `EventArg`/`HeaderObj`: this unit's own local view of the same two-type
-  shape `include/class_39e08.h` independently derived (`arg1->target->header`).
+  shape `include/DayTaskStageMap.h` independently derived (`arg1->target->header`).
   Only the one field each touches is modelled.
 - `Obj86B60Methods`: added `slot10` (BasicClass addChild, inherited,
   `IntermediateBase__Init`), `slot40` (`IntermediateBase__ResetCounters`, `IntermediateBase__IntermediateBase`), `slot48`

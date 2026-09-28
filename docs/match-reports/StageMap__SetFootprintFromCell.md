@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004AFE0` on 2026-09-22 (tools/rename.py). Address 0x8004afe0.
 
-**Unit:** class_3ac78 · **Size:** 20 instructions · **Result:** 20/20 words
+**Unit:** DayTaskStageMap · **Size:** 20 instructions · **Result:** 20/20 words
 
 ## What it does
 
@@ -16,7 +16,7 @@ with a plain (non-virtual) tail call to `StageMap__BuildFootprintRects(self)`.
 `arg1`'s buffer is populated elsewhere (out of this round's scope, by a
 call through `StageMapMethods` slot `+0x110`, itself not decompiled) so
 only the two bytes this function actually reads are typed — added as
-`UnkArgObj_3ac78` in `include/class_3ac78.h`, following the
+`UnkArgObj_3ac78` in `include/DayTaskStageMap.h`, following the
 `Unk*Obj_<unit>` naming convention already used in `GameApplicationFileResource.h`.
 
 ## Final source
@@ -76,7 +76,7 @@ placement reachable from C.
 
 ## Provenance
 
-round 2026-09-02, runner ALPHA, unit class_3ac78.
+round 2026-09-02, runner ALPHA, unit DayTaskStageMap.
 
 ## Naming
 
@@ -84,11 +84,11 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AFE0` | `StageMap__SetFootprintFromCell` | B | Not a vtable slot -- a plain helper, called only from `StageMap__ApplyToSenderFootprint`, on the `config->unk4 == 0` branch. It writes a single cell coordinate (`footprintCol`/`footprintRow`, each a descriptor byte minus one) and a square span (`footprintW` and `footprintH` both set to the same argument), then tail-calls `StageMap__BuildFootprintRects`, which `class_3bb8c` documents as the function that turns `footprintCol`/`footprintW` into grid rectangles. So: set up a footprint from one cell plus a span. Tier B. |
+| `func_8004AFE0` | `StageMap__SetFootprintFromCell` | B | Not a vtable slot -- a plain helper, called only from `StageMap__ApplyToSenderFootprint`, on the `config->unk4 == 0` branch. It writes a single cell coordinate (`footprintCol`/`footprintRow`, each a descriptor byte minus one) and a square span (`footprintW` and `footprintH` both set to the same argument), then tail-calls `StageMap__BuildFootprintRects`, which `DayTaskStageMap` documents as the function that turns `footprintCol`/`footprintW` into grid rectangles. So: set up a footprint from one cell plus a span. Tier B. |
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x07C` | `footprintCol` | B | Written here from a descriptor byte; `class_3bb8c`'s `StageMap__BuildFootprintRects` clamps it into `[0, 0x14)` -- i.e. into `[0, 20)`, the grid's column range -- and uses it with `footprintW` to decide whether the footprint spans one or two cells. |
+| `StageMap+0x07C` | `footprintCol` | B | Written here from a descriptor byte; `DayTaskStageMap`'s `StageMap__BuildFootprintRects` clamps it into `[0, 0x14)` -- i.e. into `[0, 20)`, the grid's column range -- and uses it with `footprintW` to decide whether the footprint spans one or two cells. |
 | `StageMap+0x07E` | `footprintRow` | B | Same treatment, vertical. |
 | `StageMap+0x080` | `footprintW` | B | Written here; forwarded by `StageMap__BuildFootprintRects` as the horizontal extent. |
 | `StageMap+0x084` | `footprintH` | B | Same, vertical. Both receive the SAME value from this function, which is why they were previously read as one duplicated field. |

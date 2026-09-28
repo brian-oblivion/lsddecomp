@@ -658,7 +658,7 @@ This function: `StageMap__ApplyRateEntries` -> `StageMap__ApplyChunkLoads` (`pyt
 
 Parameters and locals, tier A: `arr1` -> `entry` (the walked parameter), `sp` -> `tail` (the ChunkLoadEntryTail view), `e` -> `slot`. Constant: 6 -> `STAGEMAP_EVENT_SLOT_RELEASE`. The walker shape keeps a two-line `MATCHING` note in the function comment.
 
-The comment that stood above the function in `src/class_3bb8c.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 73 (bravo): 105/105. Retail's `+4` walker is a

@@ -108,7 +108,7 @@ Roughly 25 build-and-diff attempts across five functions and four units:
 - `Pad__DispatchEvents` (two broadcast instances).
 - `New_TimedTask` (class_39e08, 26/27) — runner: `__asm__("")` after the malloc;
   early return. Head: result variable (0/27); comma-ternary (16/27).
-- `New_StageMap` (class_3ac78, 26/27) — 5 reshapes, two with size regressions.
+- `New_StageMap` (class_39e08, 26/27) — 5 reshapes, two with size regressions.
 
 Two runners on different units reached this class independently in one round and
 classified it identically without either seeing the other's work.
@@ -161,7 +161,7 @@ Five instances, all byte-exact, all with `return NULL;` last:
 
 | function | unit | words |
 | --- | --- | --- |
-| `New_StageMap` | class_3ac78 | 27/27 |
+| `New_StageMap` | class_39e08 | 27/27 |
 | `New_TimedTask` | class_39e08 | 27/27 |
 | `New_DayTask` | class_39e08 | 31/31 |
 | `New_StreamTask` | Task | 36/36 |

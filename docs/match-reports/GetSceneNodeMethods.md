@@ -55,8 +55,8 @@ from a large number of OTHER units with DIFFERENT per-call-site arities
 and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
-`src/SceneNode.c`, `src/class_3bb8c_c.c`, `src/class_3bb8c_o.c`,
-`src/class_3bb8c_p.c`, `src/class_3ac78.c`, `src/ScreenWidgets.c`,
+`src/SceneNode.c`, `src/TitleMenuTaskObjF.c`, `src/class_3bb8c_o.c`,
+`src/class_3bb8c_p.c`, `src/DayTaskStageMap.c`, `src/ScreenWidgets.c`,
 `src/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
 Renaming this symbol would edit every one of those files -- squarely
@@ -96,10 +96,10 @@ so the declaration has to keep its arity or the call site's bytes change. Here
 it emits nothing — all three call sites already have the value in the register:
 
 ```
-8004a9a0:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnNotify (class_3ac78.c, 2-arg call)
+8004a9a0:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnNotify (DayTaskStageMap.c, 2-arg call)
 8004a9a4:  move  s2,a2                             ; callee-save SPILL, not argument setup
 
-8004aa88:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnSlotEvent (class_3ac78.c, 2-arg call)
+8004aa88:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnSlotEvent (DayTaskStageMap.c, 2-arg call)
 8004aa8c:  move  s2,a2                             ; ditto
 
 8004d3e8:  jal   8001e57c <GetSceneNodeMethods>   ; GridCell__GridCell (via include/class_3bb8c.h, 1-arg call)
@@ -121,7 +121,7 @@ reduce either declaration to `(void)` — which is correct and unchanged, since
 `(void)` would make both call sites a `too many arguments` compile error. `()`
 is a different spelling and was never considered.
 
-- `src/class_3ac78.c:182` — `extern void *GetSceneNodeMethods(StageMap *self, s32 arg1);` -> `extern void *GetSceneNodeMethods();`
+- `src/DayTaskStageMap.c:182` — `extern void *GetSceneNodeMethods(StageMap *self, s32 arg1);` -> `extern void *GetSceneNodeMethods();`
 - `include/class_3bb8c.h:952` — `extern BaseCtorTableB_3bb8c_c *GetSceneNodeMethods(void *self);` -> `extern BaseCtorTableB_3bb8c_c *GetSceneNodeMethods();`
 
 Return types are untouched (they are this project's multiple-independent-local-views
@@ -154,9 +154,9 @@ in `include/SceneNode.h`. The deleted local return-type views were
 `BaseCtorTableB_3bb8c_c` (include/class_3bb8c.h), `FixedBaseTable`
 (src/class_3bb8c_o.c), `SceneNodeBaseTable` (src/class_3bb8c_p.c),
 `D6B5CCGetterMethodsCC8C` (include/Task.h) and the untyped `void *` in
-src/class_3ac78.c. The one- and two-argument calls in class_3bb8c_c.c and
-class_3ac78.c now pass nothing, because round 59 measured those arguments as
-zero-cost. The raw `+ 0x38`/`+ 0x88` offset calls in class_3ac78.c are now
+src/DayTaskStageMap.c. The one- and two-argument calls in TitleMenuTaskObjF.c and
+DayTaskStageMap.c now pass nothing, because round 59 measured those arguments as
+zero-cost. The raw `+ 0x38`/`+ 0x88` offset calls in DayTaskStageMap.c are now
 `onNotify`/`notifyIfUnk20Active` slot calls. Byte-identical.
 
 ## Round 100 (delta): track 7

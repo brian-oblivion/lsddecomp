@@ -58,7 +58,7 @@ void StageMap__AddScaleStepToCell(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
   (`void (*slot48)(Unk10ChildObj_3bb8c_b *self, s32 arg1, void *arg2)`),
   resolved from this function and its sibling `StageMap__ResetCellScale`.
 - `Elem::unk10` (`Unk10ChildObj_3bb8c_b **`, +0x010) — same real field
-  `class_3ac78.h`'s independent view already names `unk10`
+  `DayTaskStageMap.h`'s independent view already names `unk10`
   (`GenericObject **`) on its own `UnkSlotEntry_3ac78` type; both
   descriptions agree on offset and "array of pointers, walked to +0x668".
 - `Obj866E8::unk1E4` (`void *`, +0x1E4) — forwarded opaquely as `slot48`'s

@@ -22,7 +22,7 @@
  * makes three with New_FlatLightObj(0), (1), (2), keeps them in
  * LightRig::lights and adds each as a child; LightRig__Finalize releases
  * them. The one caller of setColor (+0x044) and setDirection (+0x048) is
- * StageMap__SetChildParams (src/class_3ac78.c), through LightRig's
+ * StageMap__SetChildParams (src/DayTaskStageMap.c), through LightRig's
  * getLight, with update = 1 and sources stepping 3 bytes (an r,g,b) and 6
  * bytes (an s16 vx,vy,vz) per light. That call site casts getLight's
  * BasicClass * to FlatLightObj * and its s32 sources to the slots' types

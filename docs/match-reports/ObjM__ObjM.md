@@ -14,7 +14,7 @@ The ctor for the class whose method table is `gObjMMethods` (`GetObjMMethods`'s
 return value) -- this IS the function `New_ObjM`'s `New_X` allocator
 dispatches to through that vtable's `+0x008` slot. First chains to the base
 class's ctor (`GetTimedTaskMethods()->ctor(self, 0, arg1)`, the shared
-`TimedTaskMethods` accessor already declared in `include/class_39e08.h`),
+`TimedTaskMethods` accessor already declared in `include/DayTaskStageMap.h`),
 then sets `self->methods` to `GetObjMMethods()`'s vtable, fills several
 fields from its own arguments, and finally dispatches `self->methods->slot40(self)`
 as a post-construct hook.
@@ -48,7 +48,7 @@ void ObjM__ObjM(Obj87034_3bb8c_k *self, SubObjB *arg1, s32 arg2, s32 arg3, s32 a
 `arg1`'s type (`SubObjB *`) is fixed by the base-ctor call
 (`GetTimedTaskMethods()->ctor(self, 0, arg1)` dispatches through
 `TimedTaskMethods::ctor`, already typed `(Obj865C8 *, s32, SubObjB *)` in
-`include/class_39e08.h`) -- `arg1` is forwarded there verbatim as that
+`include/DayTaskStageMap.h`) -- `arg1` is forwarded there verbatim as that
 call's `SubObjB *` argument, and separately stored into `self->unk6C`.
 
 ## Final source
@@ -109,7 +109,7 @@ class_3bb8c_m, not this unit, so not applied here):
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Fields stored: bgm +0x054, stage +0x038, ctorSound +0x06C (the sound again, beside TimedTask::sound), etcTim +0x074, dreamerTmd +0x070 (LinkResource, never read by ObjM), timBlockPending +0x060 = 1, unk64/inSession/pauseSetupStep/closeReady zeroed; the last call is resetCounters (+0x040).
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Fields stored: bgm +0x054, stage +0x038, ctorSound +0x06C (the sound again, beside TimedTask::sound), etcTim +0x074, dreamerTmd +0x070 (LinkResource, never read by ObjM), timBlockPending +0x060 = 1, unk64/inSession/pauseSetupStep/closeReady zeroed; the last call is resetCounters (+0x040).
 
 ## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
 

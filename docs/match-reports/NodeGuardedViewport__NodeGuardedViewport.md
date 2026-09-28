@@ -4,12 +4,12 @@
 
 > Renamed from `func_8004D2A4` on 2026-09-22 (tools/rename.py). Address 0x8004d2a4.
 
-**Unit:** class_3bb8c_c · **Size:** 21 words · **Status:** MATCHED (21/21)
+**Unit:** TitleMenuTaskObjF · **Size:** 21 words · **Status:** MATCHED (21/21)
 
 ## What it does
 
 The constructor (`ctor`, slot +0x008) for `NodeGuardedViewport`. Standard
-class-framework shape, same as e.g. class_39e08.c's `TimedTask__TimedTask`: chain
+class-framework shape, same as e.g. DayTaskStageMap.c's `TimedTask__TimedTask`: chain
 to a base class's ctor (fetched via `GetViewportMethods()`), install this
 class's own vtable, then call the just-installed vtable's own
 post-construct hook (slot +0x040, currently `NodeGuardedViewport__InitDefaults` -- already
@@ -61,4 +61,4 @@ NodeGuardedViewport's parent is Viewport (id 0x7, include/Viewport.h, round 85):
 
 The class was renamed `Class869D8` -> `NodeGuardedViewport` (`tools/renametype.py`, tier B): its one behavioural override, update, runs Viewport__Update only while a view node is attached, which is what lets ObjM leave it detached after ExitSceneStyle. The name says the mechanism, not the viewport's role in the game. (renametype also rewrote the historical token `Class869D8__ForwardIfUnk10AndUnk70` above.)
 
-The banner history that moved out of include/NodeGuardedViewport.h: IntermediateBaseInitArgs +0x010, where DayTask__DayTask stores this object, was once viewed by class_39e08.h as `Obj0C::unk10`; the id tree 0x7 -> 0x17 was confirmed as the ctor chain in round 87 (track 4).
+The banner history that moved out of include/NodeGuardedViewport.h: IntermediateBaseInitArgs +0x010, where DayTask__DayTask stores this object, was once viewed by DayTaskStageMap.h as `Obj0C::unk10`; the id tree 0x7 -> 0x17 was confirmed as the ctor chain in round 87 (track 4).

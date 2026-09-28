@@ -45,7 +45,7 @@ void *New_TriggerWorld(s32 arg0) {
 ## Naming
 
 - **New_TriggerWorld**, tier B (head review, round 83: was A). code_4cd08.c already declares `extern TriggerWorld *func_80044A0C(s32 *ctx)`, and docs/match-reports/FireDreamAuxTriggerEntries.md (a caller in that same unit) already ties this object into the dream-aux trigger system.
-  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (class_3bb8c.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
+  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (DayTaskStageMap.c round 20 for LinkResource; code_4cd08.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

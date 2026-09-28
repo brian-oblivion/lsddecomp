@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004F394` on 2026-09-20 (tools/rename.py). Address 0x8004f394.
 
-**Unit:** class_3bb8c_f · **Size:** 10 words (0x28) · **Status:** MATCH
+**Unit:** TitleMenuTaskObjF · **Size:** 10 words (0x28) · **Status:** MATCH
 
 `s32 TaskObjF__EnableEvents(TaskObjF *self) { return TaskObjF__ForEachEvent(self,
 func_80038F6C, 1); }` — a one-line forward to `TaskObjF__ForEachEvent` (see its
@@ -22,7 +22,7 @@ callee directly.
 
 **Two classes documented as "unrelated" in different rounds may share
 concrete evidence worth cross-checking before track 4 unifies types.**
-`class_3bb8c_e.c`'s `Node3bb8cE` (a distinct local view, its own header
+`TitleMenuTaskObjF.c`'s `Node3bb8cE` (a distinct local view, its own header
 comment) and this unit's `TaskObjF` were derived independently and never
 declared the same type -- but `Node3bb8cE::threads[4]` at +0x014 is
 filled by `TaskObjF__OpenEvents` via `OpenEvent(0xF4000001, gCardEventSpecs[i], 0x2000, 0)`,
@@ -38,7 +38,7 @@ does track 4's class-table unification pass rather than let two separate
 
 ## Round 95 (track 7, charlie)
 
-### Moved from src/class_3bb8c_f.c
+### Moved from src/TitleMenuTaskObjF.c
 
 The kernel event declarations' comment, shortened in the unit:
 

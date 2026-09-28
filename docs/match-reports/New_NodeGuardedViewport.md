@@ -4,13 +4,13 @@
 
 > Renamed from `func_8004D254` on 2026-09-22 (tools/rename.py). Address 0x8004d254.
 
-**Unit:** class_3bb8c_c · **Size:** 20 words · **Status:** MATCHED (20/20)
+**Unit:** TitleMenuTaskObjF · **Size:** 20 words · **Status:** MATCHED (20/20)
 
 ## What it does
 
 `New_NodeGuardedViewport`: the allocator for `NodeGuardedViewport`. Standard
-allocate-null-check-ctor shape, identical to class_3ac78.c's
-`New_StageMap`/class_39e08.c's several `New_X` functions -- allocate a
+allocate-null-check-ctor shape, identical to DayTaskStageMap.c's
+`New_StageMap`/DayTaskStageMap.c's several `New_X` functions -- allocate a
 fixed-size block (`0xDC` bytes here), and on success run the class's ctor
 (`NodeGuardedViewport__NodeGuardedViewport`, fetched through `GetNodeGuardedViewportMethods()->ctor`) and return the
 new instance; return `NULL` on allocation failure.
@@ -43,7 +43,7 @@ look like..."). No residue.
 **New_NodeGuardedViewport** -- tier A. Pure `New_X` allocator idiom (allocate fixed
 size, null-check, ctor, return); the allocator's mechanics ARE its purpose
 by the tier-A leaf rule. Matches the project's established `New_StageMap`/
-`New_X` naming convention (class_3ac78.c, class_39e08.c) exactly, and this
+`New_X` naming convention (class_3ac78.c, DayTaskStageMap.c) exactly, and this
 name was already in use in this function's own report prose before the
 round-68 rename made it real.
 

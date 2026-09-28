@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004ACF8` on 2026-09-22 (tools/rename.py). Address 0x8004acf8.
 
-**Unit:** class_3ac78 · **Size:** 51 instructions · **Result:** 51/51 words
+**Unit:** DayTaskStageMap · **Size:** 51 instructions · **Result:** 51/51 words
 
 ## What it does
 
@@ -16,7 +16,7 @@ accumulator that steps by a different amount per call (`arg3 += 3` for
 
 `slotB8` (`LightRig__GetLight`) and the child's own class are not decompiled;
 only the two slots this function reaches on the child are typed, as
-`UnkChildObj_3ac78`/`UnkChildMethods_3ac78` in `include/class_3ac78.h`.
+`UnkChildObj_3ac78`/`UnkChildMethods_3ac78` in `include/DayTaskStageMap.h`.
 
 ## Final source
 
@@ -44,7 +44,7 @@ no reordering or barrier was needed.
 
 ## Provenance
 
-round 2026-09-02, runner ALPHA, unit class_3ac78.
+round 2026-09-02, runner ALPHA, unit DayTaskStageMap.
 
 ## Naming
 
@@ -64,7 +64,7 @@ view stays `UnkChildObj_3ac78`/`UnkChildMethods_3ac78`.
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the +0x0B8 slot it calls is LightRig's `getLight` (LightRig__GetLight, `lights[index]`), and the two slots it drives on each result, +0x044 and +0x048, are FlatLightObj's setColor and setDirection (src/code_3311c.c), consistent with the 3- and 6-byte strides. StageMap's own view (include/class_3ac78.h) still names the slot `getChild` and its result `UnkChildObj_3ac78`; the body is untouched.
+2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the +0x0B8 slot it calls is LightRig's `getLight` (LightRig__GetLight, `lights[index]`), and the two slots it drives on each result, +0x044 and +0x048, are FlatLightObj's setColor and setDirection (src/code_3311c.c), consistent with the 3- and 6-byte strides. StageMap's own view (include/DayTaskStageMap.h) still names the slot `getChild` and its result `UnkChildObj_3ac78`; the body is untouched.
 
 ## Track 6 (2026-09-26, round 93, alpha)
 

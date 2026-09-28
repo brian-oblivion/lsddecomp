@@ -81,7 +81,7 @@ pad044[0x10] + slot54(4) + pad058[8] + slot60(4) + pad064[0x18]
 (already used by `ObjM__OnNotify`) keep their original offsets --
 confirmed by rebuilding (whole-image SHA1 green) after the struct edit,
 before writing this function's body. No cross-unit prototype and no new
-type went into either shared header (`class_3bb8c.h` or `class_39e08.h`);
+type went into either shared header (`class_3bb8c.h` or `DayTaskStageMap.h`);
 this unit already includes both, per the coordinator's specific caution
 for this unit, and neither was touched.
 

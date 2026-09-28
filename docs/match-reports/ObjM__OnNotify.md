@@ -11,7 +11,7 @@ Another method of the `gObjMMethods`-vtable class (`New_ObjM`/
 `ObjM__ObjM`'s own class, see those reports) -- forwards to the shared
 base-class event handler (`GetTimedTaskMethods()->slot38`), then reads the
 event's type tag (`arg1->target->header`, both `EventArg`/`HeaderObj`
-already established in `include/class_39e08.h`) and dispatches to ONE of
+already established in `include/DayTaskStageMap.h`) and dispatches to ONE of
 three of self's own vtable slots depending on which range the tag falls
 in, or does nothing if it matches none of them.
 
@@ -88,7 +88,7 @@ Slot +0x038 of gObjMMethods (`tools/classtable.py 0x80087034`), the slot called 
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The sender is `BasicClass *` (its methods->header is the class id); the three targets are onStageMapNotify (0x114), onFadeNotify (0x164, cast to FadeBox *) and onDreamSysNotify (0x1F34).
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The sender is `BasicClass *` (its methods->header is the class id); the three targets are onStageMapNotify (0x114), onFadeNotify (0x164, cast to FadeBox *) and onDreamSysNotify (0x1F34).
 
 ## Round 99 (delta, track 7)
 

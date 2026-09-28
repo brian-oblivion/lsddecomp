@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004AEA4` on 2026-09-22 (tools/rename.py). Address 0x8004aea4.
 
-**Unit:** class_3ac78 · **Size:** 79 instructions · **Result:** 79/79 words
+**Unit:** DayTaskStageMap · **Size:** 79 instructions · **Result:** 79/79 words
 
 ## What it does
 
@@ -61,7 +61,7 @@ void StageMap__ApplyToSenderFootprint(StageMap *self, UnkListObj_3ac78 *arg1, s3
 `StageMap__SetFootprintFromCell` and `StageMap__SetFootprintRect` are both defined later in this same
 unit/file (matched and STALLED respectively) — the `extern` prototypes
 above are ordinary forward declarations, needed only because ROM address
-order puts `StageMap__ApplyToSenderFootprint` before both of them in `src/class_3ac78.c`.
+order puts `StageMap__ApplyToSenderFootprint` before both of them in `src/DayTaskStageMap.c`.
 `StageMap__DispatchToRectCells` (117 instructions, out of this round's scope) gets the
 same treatment per DECOMPILATION_LEARNINGS' "calling into a function
 still `INCLUDE_ASM` elsewhere is fine" precedent.
@@ -71,7 +71,7 @@ still `INCLUDE_ASM` elsewhere is fine" precedent.
 This function's evidence is stronger than `StageMap__SetFootprintRect`'s (which never
 closed — see its own STALL report), and it directly contradicts two
 fields that stalled attempt tentatively introduced. Both are now fixed in
-`include/class_3ac78.h`, and `StageMap__SetFootprintRect.md` carries a matching
+`include/DayTaskStageMap.h`, and `StageMap__SetFootprintRect.md` carries a matching
 "Update" note per the round's instructions:
 
 1. **`self->unk8C` is a 3-element, 0x30-byte block (`HistoryBlock_3ac78`
@@ -141,7 +141,7 @@ suspecting anything deeper.
 ## Provenance
 
 round 2026-09-02 (head-requested extension), runner ALPHA, unit
-class_3ac78. First attempt 70/79 (two independent, both diagnosed and
+DayTaskStageMap. First attempt 70/79 (two independent, both diagnosed and
 fixed); second attempt 79/79.
 
 ## Naming
@@ -154,12 +154,12 @@ Round 67 (track 3, naming pass).
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x08C` | `rects` | A | Saved and restored as one 0x30-byte block here; written a rectangle at a time by `StageMap__SetFootprintRect`; read as a bounded array of grid rectangles by `StageMap__DispatchToRectCells` here and by `class_3bb8c_b`'s BYTE-MATCHED `StageMap__SetFootprintVisible`. |
+| `StageMap+0x08C` | `rects` | A | Saved and restored as one 0x30-byte block here; written a rectangle at a time by `StageMap__SetFootprintRect`; read as a bounded array of grid rectangles by `StageMap__DispatchToRectCells` here and by `DayTaskStageMap`'s BYTE-MATCHED `StageMap__SetFootprintVisible`. |
 
 Local types renamed this round: `HistoryEntry_3ac78` -> `GridRect_3ac78`,
 `HistoryBlock_3ac78` -> `GridRectList_3ac78`. The "History" name was a
 hypothesis from before the block's reader was understood; `StageMap__SetFootprintVisible`
-(matched, `class_3bb8c_b`) reads the same 0xC bytes as
+(matched, `DayTaskStageMap`) reads the same 0xC bytes as
 `{elemIdx, startCol, startRow, width, height}` and walks a grid rectangle with
 them. The members' own names (`elemIdx`/`col`/`row`/`width`/`height`) were
 already correct and are unchanged.

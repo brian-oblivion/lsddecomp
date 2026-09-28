@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004F9D8` on 2026-09-20 (tools/rename.py). Address 0x8004f9d8.
 
-**Unit:** class_3bb8c_f · **Size:** 75 words (0x12C) · **Status:** MATCH
+**Unit:** TitleMenuTaskObjF · **Size:** 75 words (0x12C) · **Status:** MATCH
 
 ## What it does
 
@@ -62,7 +62,7 @@ gate itself rather than what it checks.
 ### Naming and constants
 
 `slot4CRet`/`buf10`/`buf14`/`buf18` -> `ok`/`error`/`cardChanged`/
-`formatted`, from what TaskObjF__CheckCardStatus writes (class_3bb8c_e.c):
+`formatted`, from what TaskObjF__CheckCardStatus writes (TitleMenuTaskObjF.c):
 its return is 0 when a card call timed out or failed (EvSpTIMOUT, EvSpERROR), the first out is
 set on EvSpERROR, the second when _card_info reports EvSpNEW (a new card),
 the third is cleared when _card_load reports EvSpNEW (unformatted). `code`

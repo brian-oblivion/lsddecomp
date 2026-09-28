@@ -556,7 +556,7 @@ object was linked in the interim (rounds 29-30's SDK-objects work; see
 `include/code_8220.h`'s own note that the old `func_80012C20` declarations
 "moved into src/BMemPMgr.c when the SDK objects were linked"). Every other
 unit that calls this function now declares it as `printf` directly (see
-`src/libcd_bios.c`, `src/CdDriver.c`, `src/class_3bb8c_f.c`,
+`src/libcd_bios.c`, `src/CdDriver.c`, `src/TitleMenuTaskObjF.c`,
 `src/ScreenWidgets.c`, each with the argument shape their own call site
 needs — per-unit local views, not a shared header, matching this project's
 convention). Fixed in `src/PlacementGridVabSound.c` by declaring

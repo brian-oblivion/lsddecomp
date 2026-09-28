@@ -12,7 +12,7 @@
  * src/class_3bb8c_m.c (EnterState7 through GetObjMMethods). The object is
  * 0x88 bytes (New_ObjM); its own fields run from TimedTask's 0x38.
  *
- * Built by DayTask__StartObjM (src/class_39e08.c): New_ObjM(DayTask's
+ * Built by DayTask__StartObjM (src/DayTaskStageMap.c): New_ObjM(DayTask's
  * sound, bgm, etcTim, dreamerTmd, stage), added as a child and init'ed with
  * DayTask's init args and its DreamSys. So the inherited
  * IntermediateBase fields hold that DayTask's init-arg objects:

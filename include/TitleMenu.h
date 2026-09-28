@@ -9,8 +9,8 @@
  * TaskCoreTarget, sTitleMenuTarget), with the memory-card save title ("LSD   Day001")
  * shown as a TextRow. A TaskCore (class id 0x1F130, table gTitleMenuMethods;
  * fourteen overrides and six slots of its own); no class derives from it.
- * src/class_3bb8c_c.c holds the allocator and ctor, src/class_3bb8c_d.c every
- * other method and the getter.
+ * src/TitleMenuTaskObjF.c holds the allocator and ctor, every other method
+ * and the getter.
  *
  * Who makes one: GameApplication__RunTitleMenu (src/GameApplicationFileResource.c) runs
  * it with GameApplication__RunTask(New_TitleMenu, dreamSys, ...) after the
@@ -141,7 +141,7 @@ typedef void (*TitleMenuResetCallFn)(TitleMenu *self, struct DreamSys *dreamSys)
 extern TitleMenuMethods gTitleMenuMethods;
 extern TitleMenuMethods *GetTitleMenuMethods(void); /* returns &gTitleMenuMethods */
 
-/* The class's own methods, in ROM order (class_3bb8c_c, then class_3bb8c_d). */
+/* The class's own methods, in ROM order (src/TitleMenuTaskObjF.c). */
 TitleMenu *New_TitleMenu(struct DreamSys *dreamSys);
 void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys);
 void TitleMenu__Finalize(TitleMenu *self);

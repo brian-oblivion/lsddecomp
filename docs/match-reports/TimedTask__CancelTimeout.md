@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A294` on 2026-09-23 (tools/rename.py). Address 0x8004a294.
 
-**Unit:** class_39e08 · **Size:** 12 words (0x30 bytes) · **Status:** MATCHED (12/12 words)
+**Unit:** DayTaskStageMap · **Size:** 12 words (0x30 bytes) · **Status:** MATCHED (12/12 words)
 
 ## What it does
 

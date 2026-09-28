@@ -468,7 +468,7 @@ exact signature elsewhere in this unit, see
 `docs/match-reports/StageMap__SplitFootprintRect.md`) if spliced back in — add
 `extern s32 StageMap__SplitFootprintRect(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8);`
 before it (this function is defined AFTER `StageMap__BuildFootprintRects` in ROM order in
-`src/class_3bb8c_b.c`).
+`src/DayTaskStageMap.c`).
 
 ```c
 #if 0
@@ -602,10 +602,10 @@ sub-cell offsets `h4`/`h6` are computed from `s16` struct fields
 `CellRect` fields (`slot0->h4`, `slot0->h6`) -- exactly the "narrower
 than declared" shape that closed `TaskObjF__WriteMemcardSaveFile`. Retyping BOTH locals
 from `s32` to `s16` (keeping the rest of the preserved 28/109 body
-unchanged) was tried directly against `src/class_3bb8c_b.c` and
+unchanged) was tried directly against `src/DayTaskStageMap.c` and
 `build-and-verify.sh`: **1/109, with substantial address drift** -- far
 worse than the existing 28/109 baseline, not better. Reverted immediately
-(`git checkout -- src/class_3bb8c_b.c`; confirmed `build exit=0` and a
+(`git checkout -- src/DayTaskStageMap.c`; confirmed `build exit=0` and a
 clean `OK: build matches retail SLPS_015.56` afterward). Unlike
 `TaskObjF__WriteMemcardSaveFile`'s `a3` (used ONLY as `a3 & 0xFF`, no arithmetic on the
 wider value), `h4`/`h6` here have running arithmetic (`+= 0x14`, `+= 0xA`,
@@ -662,7 +662,7 @@ for any other instance's difficulty.
 
 Track 1b promotion. Score re-verified unchanged (45/109, exact length,
 zero drift) before promoting. Placed the existing preserved body — the
-one carried in `src/class_3bb8c_b.c` since round 19, git-diff-empty
+one carried in `src/DayTaskStageMap.c` since round 19, git-diff-empty
 against that commit — inside `#ifdef NON_MATCHING`, with `INCLUDE_ASM`
 restored in the `#else`. No source change beyond the wrapper and comment;
 both oracles green: `./build-and-verify.sh` (exit 0, `OK: build matches

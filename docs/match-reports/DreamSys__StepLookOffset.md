@@ -534,7 +534,7 @@ mechanism, same category: a maspsx/aspsx-version macro-expansion choice, not
 a compiler-flag or source-shape question.
 
 **Project-wide scale, for whoever picks this up:** `grep -rl 'addiu.*\$at, \$at, %lo' asm/`
-finds this exact instruction sequence in 502 lines across `class_39e08.s`,
+finds this exact instruction sequence in 502 lines across `DayTaskStageMap.s`,
 `code_179d8.s`, `Task.s`, `Entity_b.s`, and inside several
 `code_4cd08`/`DreamSys`/`Entity`/`StageGrid`/`psyq_*` `nonmatchings/*.s`
 files. **None of those functions are matched yet** — I confirmed by checking

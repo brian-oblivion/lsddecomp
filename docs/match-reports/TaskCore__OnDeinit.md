@@ -121,7 +121,7 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj cast is gon
   the whole screen cleared to `unk93` while `unk34` is set; the local
   `TaskTextObj` view is retired for include/DrawSystem.h's type
   (TaskCore__OnInit's report). Byte-identical.
-- `unk34` and `unk93` are also accessed by class_3bb8c_d.c (TitleMenu__Reset,
+- `unk34` and `unk93` are also accessed by TitleMenuTaskObjF.c (TitleMenu__Reset,
   TitleMenu__OnDeinit) and Task.c, so they are proposed, not renamed:
   `unk93` -> `clearColor` (setColors' second triple, `clear` there; both this
   function and TitleMenu__OnDeinit clear the screen to it), `unk34` ->
@@ -131,6 +131,6 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj cast is gon
 ## Proposed field names
 
 - TaskCore `+0x093 unk93` -> `clearColor`; accessors Task.c,
-  class_3bb8c_d.c, Task.c (TaskCore__SetColors).
+  TitleMenuTaskObjF.c, Task.c (TaskCore__SetColors).
 - TaskCore `+0x034 unk34` -> `clearOnDeinit`; accessors Task.c,
-  class_3bb8c_d.c.
+  TitleMenuTaskObjF.c.

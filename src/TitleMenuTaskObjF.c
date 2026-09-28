@@ -1,0 +1,1310 @@
+/*
+ * TitleMenuTaskObjF -- the menu between days and its memory-card task:
+ * TitleMenu and TaskObjF, led in by the constructors and table methods of
+ * two small classes, NodeGuardedViewport and GridCell.
+ *
+ * NodeGuardedViewport (include/NodeGuardedViewport.h) is a Viewport whose
+ * update skips the frame while no view node is attached or the ordering
+ * table is not ready; its seven table methods, New_ and the table getter are
+ * all here. GridCell (include/GridCell.h, a SceneNode) is one cell of
+ * StageMap's grid, carrying the model placed there; its five table methods,
+ * New_ and the getter are all here too. Each New_X allocates the object and
+ * calls the ctor through the class's table; the ctor chains the parent's
+ * ctor, then installs its own table.
+ *
+ * TitleMenu (include/TitleMenu.h, a TaskCore) is the menu between days:
+ * its allocator and ctor with two save-title helpers, then its methods and
+ * getter, each run introduced below. Two free functions serve it:
+ * UpdateFlashbackLock (called from TitleMenu__RefreshMenu) locks or unlocks
+ * the menu's FLASHBACK entry from two words of the save block, and
+ * StampSaveTitleDay (called from the ctor with the current day) writes the
+ * day as three full-width digits into the save title, "LSD   Day001".
+ *
+ * TaskObjF (include/TaskObjF.h) is the memory-card task TitleMenu's SAVE
+ * and LOAD drive: its allocator and ctor, then its child links, card
+ * events, checks and file probes, then its file I/O, buffers and the two
+ * operations. Its state machine, its getter and StampSaveTitleFileLetter
+ * are still src/class_3bb8c_g.c, pending the head's yaml edit (below).
+ *
+ * What decided its edges (python3 tools/tuboundary.py): it was four carve
+ * slices (class_3bb8c_c, _d, _e, _f), merged because a class straddled
+ * each edge: TitleMenu the first ("start edge possible, soft-unlikely"),
+ * TaskObjF the other two ("start edge possible", then "soft-unlikely").
+ * TaskObjF also straddles the edge to class_3bb8c_g ("soft-unlikely"), but
+ * that unit owns the region's .rodata line (its two jump tables) and this
+ * one owns none, so unitfile.py leaves the merge to the head. The file's
+ * end after class_3bb8c_g is real: the placed Sony object libapi/a51
+ * follows, and it meets the forced boundary tuboundary notes there (jump
+ * tables 0x80011594 / 0x80011628).
+ *
+ * PARKED: the start, after DayTaskStageMap.c, is "start edge possible" and
+ * no class straddles it, but content says the file boundary lies one step
+ * later, between GridCell and TitleMenu: DayTask's ctor makes the
+ * NodeGuardedViewport and StageMap is GridCell's only maker. A split is a
+ * new carve, not a merge or rename, so the carve edge stays and the file
+ * is named for the two classes that make up the rest of it.
+ */
+#include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
+#include "class_3bb8c.h"
+#include "DreamSys.h"
+#include "SceneNode.h"
+#include "Actor.h"
+#include "Viewport.h"
+#include "NodeGuardedViewport.h"
+#include "GridCell.h"
+#include "TitleMenu.h"
+#include "VabStreamObj.h"
+#include "TextRow.h"
+#include "TimImage.h"
+#include "TaskObjF.h"
+#include <kernel.h>
+#include <sys/file.h>
+#include "BasicClass.h"
+#include "Pad.h"
+#include "FrameClock.h"
+
+NodeGuardedViewport *New_NodeGuardedViewport(void) {
+    NodeGuardedViewport *self;
+
+    self = BMemPMgrAlloc(sizeof(NodeGuardedViewport));
+    if (self != NULL) {
+        GetNodeGuardedViewportMethods()->ctor(self);
+        return self;
+    }
+    return NULL;
+}
+
+void NodeGuardedViewport__NodeGuardedViewport(NodeGuardedViewport *self) {
+    GetViewportMethods()->ctor((Viewport *)self);
+    self->methods = GetNodeGuardedViewportMethods();
+    self->methods->initDefaults(self);
+}
+
+void NodeGuardedViewport__InitDefaults(void) {}
+
+void NodeGuardedViewport__Update(NodeGuardedViewport *self) {
+    if (self->viewNode != NULL && self->otReady != 0) {
+        GetViewportMethods()->update((Viewport *)self);
+    }
+}
+
+void NodeGuardedViewport__NoOpSlotB8(void) {}
+
+void NodeGuardedViewport__NoOpSlotBC(void) {}
+
+void NodeGuardedViewport__NoOpSlotC0(void) {}
+
+void NodeGuardedViewport__NoOpSlotC4(void) {}
+
+NodeGuardedViewportMethods *GetNodeGuardedViewportMethods(void) {
+    return &gNodeGuardedViewportMethods;
+}
+
+GridCell *New_GridCell(void) {
+    GridCell *self;
+
+    self = BMemPMgrAlloc(GRIDCELL_SIZE);
+    if (self != NULL) {
+        GetGridCellMethods()->ctor(self);
+        return self;
+    }
+    return NULL;
+}
+
+void GridCell__GridCell(GridCell *self) {
+    GetSceneNodeMethods()->ctor((SceneNode *)self);
+    self->methods = GetGridCellMethods();
+    self->unk34 = 0;
+    self->flags36 = 0;
+    self->nextInCell = NULL;
+}
+
+void GridCell__Reset(void) {}
+
+/* Passes on only a link command from an Actor or a class below it (the low
+ * byte of the sender's class id); Actor__DispatchLinkCommand makes the same
+ * test for a GridCell sender. */
+void GridCell__DispatchLinkCommand(GridCell *self, BasicClass *sender, s32 event) {
+    if ((u8)sender->methods->header == ACTOR_CLASS_ID) {
+        self->methods->onActorLinkCommand(self, sender, event);
+    }
+}
+
+/* SceneNode's handling, then tryAttachNearby for events 5..8, the body of
+ * Actor__OnActorLinkCommand. tryAttachNearby keeps SceneNode's one-parameter
+ * slot type; this caller passes the sender and event too. */
+void GridCell__OnActorLinkCommand(GridCell *self, void *sender, s32 event) {
+    GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
+    if (event < 9) {
+        if (event >= 5) { /* MATCHING: nested, as && folds to one unsigned test */
+            ((void (*)(GridCell *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
+        }
+    }
+}
+
+void *GridCell__ReturnSelf(GridCell *self) {
+    return self;
+}
+
+GridCellMethods *GetGridCellMethods(void) {
+    return &gGridCellMethods;
+}
+
+TitleMenu *New_TitleMenu(struct DreamSys *dreamSys) {
+    TitleMenu *self;
+
+    self = BMemPMgrAlloc(sizeof(TitleMenu));
+    if (self != NULL) {
+        GetTitleMenuMethods()->ctor(self, dreamSys);
+        return self;
+    }
+    return NULL;
+}
+
+void TitleMenu__TitleMenu(TitleMenu *self, struct DreamSys *dreamSys) {
+    VabStreamObj *sound;
+
+    Get_vtable_TaskCore()->ctor((TaskCore *)self, &sTitleMenuTarget,
+                                (char *)sTitleMenuSoundBankPath, NULL);
+    self->methods = GetTitleMenuMethods();
+    sound = (VabStreamObj *)self->sound;
+    sound->methods->setPitchOffset(sound, -1); /* 36 semitones down */
+    self->dreamSys = dreamSys;
+    self->saveCtrl = NULL;
+    self->saveBlock = dreamSys->methods->getSaveBlock(dreamSys, &self->saveBlockSize);
+    StampSaveTitleDay(dreamSys->methods->getCurrentDayAndYear(dreamSys, NULL));
+    self->methods->setTarget(self, &sTitleMenuTarget);
+    ((TitleMenuResetCallFn)self->methods->resetCounters)(self, dreamSys);
+}
+
+/* The save block's total flashback unlock score must be past this for the
+ * menu to offer FLASHBACK. */
+#define FLASHBACK_UNLOCK_SCORE 9999999
+
+/* FLASHBACK stays locked unless the unlock score is past the threshold and at
+ * least one flashback is stored. `dreamSys` is unread: TitleMenu__RefreshMenu
+ * passes self->dreamSys, and retail loads it into $a2 for the call. */
+void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSys *dreamSys) {
+    DreamSaveBlock *save = (DreamSaveBlock *)self->saveBlock;
+    s32 locked = 1;
+
+    if (save->totalFlasbackUnlockScore > FLASHBACK_UNLOCK_SCORE) {
+        locked = (save->amountFlashbacksAvailable == 0);
+    }
+    /* A NULL entry is one the cursor can stop on. */
+    target->registrationSlots[TITLEMENU_FLASHBACK] = (void *)locked;
+}
+
+/* src/ScreenWidgets.c: `value` as `width` full-width decimal digits into dst,
+ * zero-padded unless `unpadded`. */
+extern void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded);
+
+/* The save title's day number, full-width characters 9..11 of
+ * "LSD   Day001" (class_3bb8c_g.c's layout of the title). */
+#define SAVE_TITLE_DAY 9
+#define SAVE_TITLE_DAY_DIGITS 3
+
+/* Formats the day as three full-width digits in sDayDigits's buffer and
+ * copies them into the save title's day number, characters 9..11. */
+void StampSaveTitleDay(s32 day) {
+    FormatFullWidthNumber(sDayDigits, day, SAVE_TITLE_DAY_DIGITS, 0);
+    *(FullWidthChars3 *)&((FullWidthChar *)gSaveTitle)[SAVE_TITLE_DAY] = *(FullWidthChars3 *)sDayDigits;
+}
+
+/*
+ * TitleMenu's methods (include/TitleMenu.h; its allocator and ctor are
+ * above) and its getter, then TaskObjF's allocator and ctor
+ * (include/TaskObjF.h).
+ *
+ * TitleMenu is the TaskCore menu between days: START, FLASHBACK, SAVE, LOAD,
+ * GRAPH and SHAKE over ETC\TITLE.TIM. In ROM order here: finalize, onNotify,
+ * reset, onDeinit, setState and tick (which acts on the chosen entry),
+ * refreshViewValue (stores SHAKE's setting), the four overrides that manage
+ * the save-title TextRow in place of TaskCore's slot widgets, refreshMenu,
+ * and the memory-card methods that drive `saveCtrl`, a TaskObjF, for SAVE
+ * and LOAD. The header's banner describes the class.
+ *
+ * The data they share is in include/class_3bb8c.h: gSaveTitle, the
+ * full-width save title the TextRow shows and the card save carries;
+ * sSaveFileName; the card's name prefix and suffix table; and the colour
+ * cycle's channel and frame counters.
+ */
+
+void TitleMenu__Finalize(TitleMenu *self) {
+    if (self->saveCtrl != NULL) {
+        self->saveCtrl->methods->release(self->saveCtrl);
+        self->saveIcon->methods->release(self->saveIcon);
+    }
+    Get_vtable_TaskCore()->finalize((TaskCore *)self);
+}
+
+void TitleMenu__OnNotify(TitleMenu *self, BasicClass *sender, s32 event) {
+    Get_vtable_TaskCore()->onNotify((TaskCore *)self, sender, event);
+    if ((sender->methods->header & 0xF) == TASKOBJF_CLASS_ID) {
+        self->methods->onCardEvent(self, sender, event);
+    }
+}
+
+void TitleMenu__Reset(TitleMenu *self) {
+    self->unk34 = 0;
+    self->unk2C = 400;
+    self->methods->setSubHandle(self, sTitleTimPath, 0);
+    self->methods->setFrameBound(self, 10);
+    self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 0);
+}
+
+/* Replaces TaskCore's onDeinit: clears both display buffers to the colour
+ * unk93. */
+void TitleMenu__OnDeinit(TitleMenu *self) {
+    u32 i;
+    DrawRect *rect;
+
+    i = 0;
+    rect = sDisplayBufferRects;
+    for (; i < 2; i++) {
+        ((DrawSystem *)self->initArgs->drawSystem)
+            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->unk93, rect);
+        rect++;
+    }
+}
+
+void TitleMenu__SetState(TitleMenu *self, s32 state) {
+    Get_vtable_TaskCore()->setState((TaskCore *)self, state);
+    if (state == 5) {
+        self->methods->refreshMenu(self, 0);
+    }
+    if (state == 0xA) {
+        self->methods->onPadCancel(self);
+        self->methods->setActiveSlot(self, self->target->unk8, 1);
+        self->methods->onPadConfirm(self);
+    }
+}
+
+void TitleMenu__Tick(TitleMenu *self) {
+    void (*fn)(TitleMenu *);
+
+    Get_vtable_TaskCore()->tick((TaskCore *)self);
+    switch (self->activeSlot) {
+        case TITLEMENU_FLASHBACK:
+            self->result = 0;
+            self->dreamSys->methods->getSetFlashbackSession(self->dreamSys, 0, 1);
+            fn = self->methods->refreshViewValue;
+            break;
+        case TITLEMENU_SAVE:
+            fn = self->methods->saveToCard;
+            break;
+        case TITLEMENU_LOAD:
+            fn = self->methods->loadFromCard;
+            break;
+        case TITLEMENU_GRAPH:
+            self->result = TITLEMENU_RESULT_GRAPH;
+            fn = self->methods->refreshViewValue;
+            break;
+        default:
+            return;
+    }
+    fn(self);
+}
+
+void TitleMenu__RefreshViewValue(TitleMenu *self) {
+    s32 shake;
+
+    Get_vtable_TaskCore()->refreshViewValue((TaskCore *)self);
+    shake = self->slotCounts[TITLEMENU_SHAKE];
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
+}
+
+/* Sony's (libc2). */
+extern char *strcpy(char *dest, char *src);
+extern s32 strlen(char *s);
+
+/* Decodes full-width SJIS into one byte a character (src/ScreenWidgets.c);
+ * nothing here reads its result. */
+extern void DecodeFullWidthSjis(void *dst, void *src);
+
+/* gSaveTitle is 2-byte full-width characters; the characters from here on
+ * are padding after "LSD   Day001" (class_3bb8c_g.c's SAVE_TITLE_PADDING). */
+#define SAVE_TITLE_PADDING 12
+/* beginSave's titleEditPos: the player's text goes in from the character
+ * after the padding's first space. */
+#define SAVE_TITLE_EDIT_POS 13
+
+/* The setTarget override: `target` is the TaskCoreTarget the ctor passes
+ * (&sTitleMenuTarget); only its `handle` is read, as the TextRow's texture. On a
+ * new game the title's padding is reblanked and its letter field cleared
+ * first. The TextRow has a cell a character plus 4, eight of them shown
+ * from cell 4, with a gap before cell 9. */
+void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
+    u32 cellCount;
+    char *text;
+
+    if (target == NULL) {
+        return;
+    }
+    if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
+        strcpy(gSaveTitle + SAVE_TITLE_PADDING * 2, sSaveTitleBlanks);
+        StampSaveTitleFileLetter(gSaveTitle, NULL);
+    }
+    cellCount = strlen(gSaveTitle);
+    cellCount = (cellCount >> 1) + 4;
+    text = BMemPMgrAlloc(cellCount);
+    DecodeFullWidthSjis(text, gSaveTitle);
+    self->saveTitle = New_TextRow(target->handle, cellCount, text);
+    self->saveTitle->visibleCount = 8;
+    self->saveTitle->firstVisible = 4;
+    self->saveTitle->gapIndex = 9;
+    BMemPMgrFree(text);
+}
+
+void TitleMenu__DestroySaveTitle(TitleMenu *self) {
+    self->saveTitle->methods->release(self->saveTitle);
+    Get_vtable_TaskCore()->releaseTarget((TaskCore *)self);
+}
+
+void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent) {
+    Get_vtable_TaskCore()->updateSlotElements((TaskCore *)self, parent);
+    self->saveTitle->methods->attachToParent(self->saveTitle, (SceneNode *)parent,
+                                             (LongVec3 *)&sSaveTitleOffset);
+}
+
+/* The save title's colour cycle: a lit channel's level (or what it adds),
+ * the frames of each cycle that light red, and the cycle's length. */
+#define SAVE_TITLE_LIT 128
+#define SAVE_TITLE_RED_FRAMES 128
+#define SAVE_TITLE_CYCLE_FRAMES 257
+
+/* The broadcastToSlots override, once a frame: the save title's colour.
+ * While the menu takes input it is black with one channel lit, the channel
+ * moving each frame; otherwise `color` with red lifted for the first frames
+ * of each cycle and the moving channel after.
+ * MATCHING: `channels` is taken before the first call (it lives in $s1)
+ * and `rgb = *color` is one struct copy. */
+void TitleMenu__CycleSaveTitleColor(TitleMenu *self, SpriteRgb *color) {
+    SpriteRgb rgb;
+    u8 *channels;
+
+    channels = (u8 *)&rgb;
+    Get_vtable_TaskCore()->broadcastToSlots((TaskCore *)self, (u8 *)color);
+    if (self->inputMode != 0) {
+        channels[0] = 0;
+        channels[1] = 0;
+        channels[2] = 0;
+        channels[sSaveTitleColorChannel] = SAVE_TITLE_LIT;
+    } else {
+        rgb = *color;
+        if (sSaveTitleColorFrame < SAVE_TITLE_RED_FRAMES) {
+            channels[0] += SAVE_TITLE_LIT;
+        } else {
+            channels[sSaveTitleColorChannel] += SAVE_TITLE_LIT;
+        }
+    }
+    if (++sSaveTitleColorChannel >= 3) {
+        sSaveTitleColorChannel = 0;
+    }
+    sSaveTitleColorFrame++;
+    if (sSaveTitleColorFrame >= SAVE_TITLE_CYCLE_FRAMES) {
+        sSaveTitleColorFrame = 0;
+    }
+    self->saveTitle->methods->setColor(self->saveTitle, &rgb);
+}
+
+/* setState(5)'s and a finished card operation's: the save title's text reloaded,
+ * FLASHBACK's lock recomputed, the widgets re-attached and SHAKE's cursor
+ * set from DreamSys's setting; then the entry that was active is
+ * reselected. */
+void TitleMenu__RefreshMenu(TitleMenu *self) {
+    s32 cellCount;
+    s32 origSlot;
+    char *text;
+    s32 shake;
+
+    cellCount = self->saveTitle->cellCount;
+    origSlot = self->activeSlot;
+    text = BMemPMgrAlloc(cellCount);
+    DecodeFullWidthSjis(text, gSaveTitle);
+    self->saveTitle->methods->setText(self->saveTitle, text);
+    BMemPMgrFree(text);
+    UpdateFlashbackLock(self, self->target, self->dreamSys);
+    self->methods->updateSlotElements(self, self->unk14);
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
+    self->activeSlot = TITLEMENU_SHAKE;
+    self->methods->setState(self, 0xB);
+    self->methods->setSlotCursor(self, shake, 1);
+    self->methods->setState(self, 0xF);
+    self->methods->setActiveSlot(self, origSlot, 0);
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
+}
+
+void TitleMenu__BeginCardAccess(TitleMenu *self) {
+    if (self->saveCtrl == NULL) {
+        self->saveIcon = New_TimImage((char *)sSaveIconTimPath);
+        self->saveCtrl = New_TaskObjF(1, 0);
+    }
+    self->saveCtrl->methods->init(self->saveCtrl, sCardFilePrefix, sSaveFileSuffixes,
+                                  self->initArgs->pad, self->unk10, (struct SceneNode *)self->unk14,
+                                  (struct VabStreamObj *)self->sound);
+    self->methods->addChild(self, (BasicClass *)self->saveCtrl);
+    self->methods->removeChild(self, self->initArgs->pad);
+    self->methods->removeChild(self, self->unk10);
+}
+
+void TitleMenu__EndCardAccess(TitleMenu *self) {
+    self->methods->addChild(self, self->initArgs->pad);
+    self->methods->addChild(self, self->unk10);
+    self->methods->removeChild(self, (BasicClass *)self->saveCtrl);
+    self->saveCtrl->methods->deinit(self->saveCtrl);
+}
+
+void TitleMenu__SaveToCard(TitleMenu *self) {
+    s32 shake;
+
+    shake = self->slotCounts[TITLEMENU_SHAKE];
+    self->dreamSys->methods->getSetScreenShake(self->dreamSys, &shake);
+    self->methods->beginCardAccess(self);
+    if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
+        sSaveFileName[0] = '\0';
+    }
+    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, gSaveTitle, SAVE_TITLE_EDIT_POS,
+                                       3, self->saveIcon, self->saveBlock, self->saveBlockSize);
+}
+
+void TitleMenu__LoadFromCard(TitleMenu *self) {
+    self->methods->beginCardAccess(self);
+    self->saveCtrl->methods->beginLoad(self->saveCtrl, sSaveFileName, gSaveTitle, self->saveBlock,
+                                       self->saveBlockSize);
+}
+
+/* saveCtrl's terminal states: either gives input back; a completed save or
+ * load also clears the new-game flag and refreshes the menu. */
+void TitleMenu__OnCardEvent(TitleMenu *self, BasicClass *sender, s32 event) {
+    if (event <= TASKOBJF_STATE_ABORTED) {
+        if (event >= TASKOBJF_STATE_DONE) {
+            self->methods->endCardAccess(self);
+            if (event == TASKOBJF_STATE_DONE) {
+                self->dreamSys->methods->clearNewGameFlag(self->dreamSys);
+                self->methods->refreshMenu(self, TASKOBJF_STATE_DONE);
+            }
+        }
+    }
+}
+
+TitleMenuMethods *GetTitleMenuMethods(void) {
+    return &gTitleMenuMethods;
+}
+
+TaskObjF *New_TaskObjF(s32 padEnable, s32 cardSlot) {
+    TaskObjF *self;
+
+    self = BMemPMgrAlloc(sizeof(TaskObjF));
+    if (self == NULL) {
+        goto fail;
+    }
+    GetTaskObjFMethods()->ctor(self, padEnable, cardSlot);
+    return self;
+fail:
+    return NULL;
+}
+
+/* InitCARD, StartCARD and _bu_init are Sony's (libcard): include/psyq/kernel.h. */
+
+/* The card libraries are started once, by the first TaskObjF made. */
+void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
+    s32 count;
+
+    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    self->methods = GetTaskObjFMethods();
+    count = sTaskObjFCount;
+    sTaskObjFCount = count + 1;
+    if (count == 0) {
+        InitCARD(padEnable);
+        StartCARD();
+        _bu_init();
+    }
+    TaskObjF__ClearLinks(self);
+    self->methods->setCardSlot(self, cardSlot);
+}
+
+/*
+ * TaskObjF's child links, card events, card checks and file probes
+ * (include/TaskObjF.h: slots +0x00C..+0x018 and +0x040..+0x060, and the
+ * helpers they call), in address order:
+ *
+ * - Children. TaskObjF__AddChild files a child by its class id into one of
+ *   four links: a Pad as inputSource, a FrameClock as tickSource, a
+ *   TextEntry, an ItemList. TaskObjF__RemoveChild and
+ *   TaskObjF__RemoveAllChildren clear them; TaskObjF__ClearLinks clears
+ *   them and spriteParent at construction.
+ * - The card. TaskObjF__SetCardSlot picks slot 0 or 1 and its BIOS channel.
+ *   TaskObjF__OpenEvents opens one SwCARD event per gCardEventSpecs entry;
+ *   TaskObjF__CloseEvents closes them.
+ * - Card checks. TaskObjF__CheckCardStatus retries
+ *   TaskObjF__CardInfoAndLoadStatus, which asks _card_info whether a card is
+ *   there and new (TaskObjF__CardInfoStatus), then _card_load whether it is
+ *   formatted (TaskObjF__CardLoadStatus). TaskObjF__FormatCard retries
+ *   format().
+ * - Files, named "bu00:"/"bu10:" plus a prefix and a suffix
+ *   (BuildMemcardPath). TaskObjF__ProbeMemcardFile opens one and can copy
+ *   out its title (TaskObjF__OpenAndReadMemcardFile);
+ *   TaskObjF__FindUnusedMemcardName and
+ *   TaskObjF__CollectExistingMemcardFiles probe a list of suffixes through
+ *   the probeMemcardFile slot. TaskObjF__CheckCardSpace retries
+ *   TaskObjF__ProbeCardFreeSpace, which creates and deletes a TEMP file of
+ *   the save's size.
+ *
+ * A retried call is tried once, then up to MEMCARD_RETRIES more times while
+ * it fails (TaskObjF__ProbeMemcardFile's loop: no more times).
+ */
+
+/* Defined below, after the file I/O: writes the device name into `dest`,
+ * appends `suffix`, and returns `dest`. */
+char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix);
+
+/* "TEMP": the name TaskObjF__ProbeCardFreeSpace creates to test for space. */
+extern char sMcTempFileSuffix[];
+
+extern void *BMemPMgrAlloc(s32 size);
+extern char *strcpy(char *dest, char *src);
+
+void TaskObjF__ClearLinks(TaskObjF *self) {
+    self->inputSource = NULL;
+    self->tickSource = NULL;
+    self->spriteParent = NULL;
+    self->textEntry = NULL;
+    self->itemList = NULL;
+}
+
+void TaskObjF__Finalize(TaskObjF *self) {
+    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+}
+
+void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
+    s32 classId;
+
+    if (child == NULL) {
+        return;
+    }
+    Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
+    classId = child->methods->header;
+    if ((classId & CLASS_ID_ROOT_MASK) == PAD_CLASS_ID) {
+        self->inputSource = child;
+        return;
+    }
+    if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
+        self->tickSource = child;
+        return;
+    }
+    if ((classId & 0xFF) == 0x10) {
+        self->textEntry = (struct TextEntry *)child;
+        return;
+    }
+    if ((classId & 0xFF) == 0x20) {
+        self->itemList = (struct ItemList *)child;
+    }
+}
+
+void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child) {
+    s32 classId;
+
+    if (child == NULL) {
+        return;
+    }
+    classId = child->methods->header;
+    if ((classId & CLASS_ID_ROOT_MASK) == PAD_CLASS_ID) {
+        self->inputSource = NULL;
+    } else if ((classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID) {
+        self->tickSource = NULL;
+    } else if ((classId & 0xFF) == 0x10) {
+        self->textEntry = NULL;
+    } else if ((classId & 0xFF) == 0x20) {
+        self->itemList = NULL;
+    }
+    Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
+}
+
+void TaskObjF__RemoveAllChildren(TaskObjF *self) {
+    self->inputSource = NULL;
+    self->tickSource = NULL;
+    self->spriteParent = NULL;
+    self->textEntry = NULL;
+    self->itemList = NULL;
+    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
+}
+
+void TaskObjF__SetCardSlot(TaskObjF *self, s32 cardSlot) {
+    self->cardSlot = cardSlot;
+    self->cardHandle = cardSlot << 4;
+}
+
+s32 TaskObjF__OpenEvents(TaskObjF *self) {
+    s32 i;
+
+    EnterCriticalSection();
+    i = 0;
+    do {
+        self->events[i] = OpenEvent(SwCARD, gCardEventSpecs[i], EvMdNOINTR, NULL);
+        i++;
+    } while (i < ARRAY_COUNT(self->events));
+    ExitCriticalSection();
+    TaskObjF__EnableEvents(self);
+    return 1;
+}
+
+s32 TaskObjF__CloseEvents(TaskObjF *self) {
+    TaskObjF__DisableEvents(self);
+    /* kernel.h spells CloseEvent with `long`, ForEachEvent's callback with s32. */
+    TaskObjF__ForEachEvent(self, (s32 (*)(s32))CloseEvent, 1);
+    return 1;
+}
+
+/* Nonzero when a card answered. *error is set when it answered with an error,
+ * *cardChanged when the first or the last try found a new card, *formatted
+ * when it is formatted. An error or an unformatted card also counts as a
+ * failed try. */
+s32 TaskObjF__CheckCardStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 *formatted) {
+    s32 retries;
+    s32 firstChanged;
+    s32 result;
+
+    retries = MEMCARD_RETRIES;
+    *cardChanged = 0;
+    result = TaskObjF__CardInfoAndLoadStatus(self, error, &firstChanged, formatted);
+    /* MATCHING: the retry count is tested after the call; testing it first
+     * cross-jumps the two calls into one. */
+    while (result == 0 || *error != 0 || *formatted == 0) {
+        result = TaskObjF__CardInfoAndLoadStatus(self, error, cardChanged, formatted);
+        if (retries-- == 0) {
+            break;
+        }
+    }
+    *cardChanged = *cardChanged | firstChanged;
+    return result;
+}
+
+/* Returns whatever the last call left in $v0: CardInfoStatus's 0, or
+ * CardLoadStatus's status.
+ * MATCHING: an explicit return adds two words. */
+s32 TaskObjF__CardInfoAndLoadStatus(TaskObjF *self, s32 *error, s32 *cardChanged, s32 *formatted) {
+    if (TaskObjF__CardInfoStatus(self, error, cardChanged) != 0) {
+        TaskObjF__CardLoadStatus(self, error, formatted);
+    }
+}
+
+s32 TaskObjF__CardInfoStatus(TaskObjF *self, s32 *error, s32 *cardChanged) {
+    s32 status;
+    s32 answer;
+
+    status = 1;
+    /* MATCHING: one expression keeps both stores ahead of TestEvents. */
+    *cardChanged = *error = 0;
+    TaskObjF__TestEvents(self);
+    while (_card_info(self->cardHandle) == 0)
+        ;
+    answer = TaskObjF__WaitForReadyEvent(self);
+    if (answer == EvSpTIMOUT) {
+        status = 0;
+    } else if (answer == EvSpERROR) {
+        status = 0;
+        *error = 1;
+    } else if (answer == EvSpNEW) {
+        *cardChanged = 1;
+        _card_clear(self->cardHandle);
+    }
+    return status;
+}
+
+s32 TaskObjF__CardLoadStatus(TaskObjF *self, s32 *error, s32 *formatted) {
+    s32 status;
+    s32 answer;
+
+    status = 1;
+    /* MATCHING: one expression keeps both stores ahead of TestEvents. */
+    *formatted = (*error = 0, status);
+    TaskObjF__TestEvents(self);
+    while (_card_load(self->cardHandle) == 0)
+        ;
+    answer = TaskObjF__WaitForReadyEvent(self);
+    if (answer == EvSpTIMOUT) {
+        status = 0;
+    } else if (answer == EvSpERROR) {
+        status = 0;
+        *error = 1;
+    } else if (answer == EvSpNEW) {
+        *formatted = 0;
+    }
+    return status;
+}
+
+s32 TaskObjF__FormatCard(TaskObjF *self) {
+    s32 retries;
+    s32 result;
+    McDevicePath *path;
+
+    retries = MEMCARD_RETRIES;
+    do {
+        path = self->cardSlot != 0 ? &gMcDevicePath1 : &gMcDevicePath0;
+        result = format((char *)path); /* the device name, "bu00:" or "bu10:" */
+    } while (result == 0 && retries-- != 0);
+    return result;
+}
+
+/* Nonzero when the file prefix+suffix exists; copies its title to destTitle
+ * unless that is NULL. An empty suffix names no file. */
+s32 TaskObjF__ProbeMemcardFile(TaskObjF *self, char *destTitle, char *suffix) {
+    s32 retries;
+    s32 result;
+
+    retries = 0; /* the class's retry loop, run once */
+    if (suffix == NULL || *suffix == '\0') {
+        return 0;
+    }
+    do {
+        result = TaskObjF__OpenAndReadMemcardFile(self, destTitle, suffix);
+    } while (result == 0 && retries-- != 0);
+    return result;
+}
+
+s32 TaskObjF__OpenAndReadMemcardFile(TaskObjF *self, char *destTitle, char *suffix) {
+    char pathBuf[32];
+    char *path;
+    s32 handle;
+    void *header;
+
+    path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, suffix);
+    handle = open(path, O_RDONLY);
+    if (handle == -1) {
+        return 0;
+    }
+    if (destTitle != NULL) {
+        header = BMemPMgrAlloc(MEMCARD_SECTOR_SIZE);
+        read(handle, header, MEMCARD_SECTOR_SIZE);
+        strcpy(destTitle, (char *)header + 4); /* the save header's title */
+        BMemPMgrFree(header);
+    }
+    close(handle);
+    return 1;
+}
+
+char *TaskObjF__FindUnusedMemcardName(TaskObjF *self, char *buf, char *prefix, char **suffixes) {
+    while (*suffixes != NULL) {
+        strcpy(buf, prefix);
+        strcat(buf, *suffixes);
+        if (self->methods->probeMemcardFile(self, NULL, buf) == 0) {
+            return buf;
+        }
+        suffixes++;
+    }
+    return NULL;
+}
+
+s32 TaskObjF__CollectExistingMemcardFiles(TaskObjF *self, char **destTitles, char **outSuffixes,
+                                          char *prefix, char **suffixes) {
+    s32 count;
+    char name[32];
+
+    count = 0;
+    while (*suffixes != NULL) {
+        strcpy(name, prefix);
+        strcat(name, *suffixes);
+        if (self->methods->probeMemcardFile(self, *destTitles, name) != 0) {
+            count++;
+            *outSuffixes = *suffixes;
+            destTitles++;
+            outSuffixes++;
+        }
+        suffixes++;
+    }
+    return count;
+}
+
+s32 TaskObjF__CheckCardSpace(TaskObjF *self, u8 iconFrames, s32 size) {
+    s32 retries;
+    s32 result;
+
+    retries = MEMCARD_RETRIES;
+    do {
+        result = TaskObjF__ProbeCardFreeSpace(self, iconFrames, size);
+    } while (result == 0 && retries-- != 0);
+    return result;
+}
+
+/* Creates, then deletes, a file big enough for `size` bytes of save data
+ * after the save header: nonzero when the card has room. */
+s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
+    char pathBuf[32];
+    char *path;
+    s32 handle;
+    s32 blocks;
+
+    /* MATCHING: the u32 cast makes the shift retail's srl. */
+    blocks = (u32)(size + MEMCARD_SAVE_HEADER_SIZE + MEMCARD_BLOCK_SIZE - 1) >> MEMCARD_BLOCK_SHIFT;
+    path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, sMcTempFileSuffix);
+    handle = open(path, MEMCARD_OPEN_BLOCKS(blocks) | O_CREAT);
+    if (handle == -1) {
+        return 0;
+    }
+    close(handle);
+    /* MATCHING: delete(path), the same address, changes the code. */
+    delete (pathBuf);
+    return 1;
+}
+
+/*
+ * TaskObjF's file I/O, card events, load buffers and its two operations
+ * (include/TaskObjF.h: slots +0x064..+0x078 and the +0x038 onNotify
+ * override), in address order:
+ *
+ * - Memory-card files. TaskObjF__ReadMemcardFile and
+ *   TaskObjF__WriteMemcardSaveFile retry TaskObjF__TryReadMemcardFile and
+ *   TaskObjF__TryWriteMemcardSaveFile up to MEMCARD_RETRIES more times.
+ *   Both open a "bu00:"/"bu10:" path (BuildMemcardPath) with the BIOS file
+ *   calls: the write builds the PS-X save header (McSaveHeader) from the
+ *   title and the icon TIM, and the read seeks past it.
+ * - Card events. TaskObjF__EnableEvents/DisableEvents/TestEvents apply one
+ *   kernel call to each of `events` through TaskObjF__ForEachEvent;
+ *   WaitForReadyEvent spins until one tests ready.
+ * - TaskObjF__Init and TaskObjF__Deinit.
+ * - TaskObjF__BeginLoad and TaskObjF__BeginSave store the request, check
+ *   the card (TaskObjF__Validate) and choose the next TaskObjFState;
+ *   TaskObjF__AllocBuffers/FreeUnusedBuffers/FreeBuffers manage the load's
+ *   title buffers.
+ * - TaskObjF__OnNotify routes a child's notification by the child's class
+ *   id, the way TaskObjF__AddChild files the children.
+ */
+
+/* Defined below, called earlier in address order. */
+s32 WaitForReadyEvent(s32 *events, s32 count);
+
+/* The PS-X BIOS file calls (open, read, lseek, close, write, delete) and the
+ * kernel event calls are Sony's libapi: include/psyq/kernel.h. */
+
+/* Half of the icon's 16-colour CLUT.
+ * MATCHING: all-s16 (alignment 2) makes the whole-struct copy retail's
+ * unaligned lwl/lwr + swl/swr pairs. */
+typedef struct IconPaletteHalf {
+    s16 color[8];
+} IconPaletteHalf;
+
+/* One 16x16 4bpp icon frame, one sector.
+ * MATCHING: a byte array (alignment 1) makes the whole-struct copy retail's
+ * runtime-alignment-checked copy loop. */
+typedef struct IconFrame {
+    u8 raw[MEMCARD_SECTOR_SIZE];
+} IconFrame;
+
+/* The icon TimImage's file buffer, a 4bpp TIM with one 16-colour CLUT: the
+ * pads are the TIM header with the CLUT block header, and the pixel block
+ * header. Only the CLUT and the first three frames of pixels are read. */
+typedef struct McIconSource {
+    u8 pad0[0x14];
+    IconPaletteHalf palette[2]; /* +0x14 */
+    u8 pad34[0x40 - 0x34];
+    IconFrame frame0; /* +0x40 */
+    IconFrame frame1; /* +0xC0 */
+    IconFrame frame2; /* +0x140 */
+} McIconSource;
+
+/* The PS-X memory-card save header, MEMCARD_SAVE_HEADER_SIZE bytes: the
+ * title sector ('S', 'C', the icon display flag, the file's size in blocks,
+ * the title field, the CLUT), then up to three icon frames. */
+typedef struct McSaveHeader {
+    u8 magic0;
+    u8 magic1;
+    u8 iconDisplayFlag;
+    u8 blockCount;
+    char title[92]; /* +0x04..+0x5F: the format's 64-byte title and its reserved bytes */
+    IconPaletteHalf palette[2];
+    IconFrame frame0;
+    IconFrame frame1;
+    IconFrame frame2;
+} McSaveHeader;
+
+s32 TaskObjF__ReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
+    s32 retries;
+    s32 result;
+
+    retries = MEMCARD_RETRIES;
+    do {
+        result = TaskObjF__TryReadMemcardFile(self, suffix, outBuf, outSize);
+        if (result != 0) {
+            break;
+        }
+    } while (retries-- != 0);
+    return result;
+}
+
+s32 TaskObjF__TryReadMemcardFile(TaskObjF *self, char *suffix, void *outBuf, s32 outSize) {
+    char pathBuf[32];
+    char *path;
+    s32 handle;
+    McSaveHeader *header;
+    s32 seekPos;
+    u8 iconFlag;
+
+    path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, suffix);
+    handle = open(path, O_RDONLY);
+    if (handle == -1) {
+        return 0;
+    }
+    /* Only the title sector: its icon display flag says where the data starts. */
+    header = BMemPMgrAlloc(MEMCARD_SECTOR_SIZE);
+    read(handle, header, MEMCARD_SECTOR_SIZE);
+    iconFlag = header->iconDisplayFlag;
+    /* The data follows the title sector and the icon frames.
+     * MATCHING: (iconFlag - 0xF) * MEMCARD_SECTOR_SIZE reorders the arithmetic. */
+    seekPos =
+        (iconFlag << MEMCARD_SECTOR_SHIFT) - ((MEMCARD_ICON_FLAG_BASE - 1) << MEMCARD_SECTOR_SHIFT);
+    BMemPMgrFree(header);
+    lseek(handle, seekPos, SEEK_SET);
+    read(handle, outBuf, outSize);
+    close(handle);
+    return 1;
+}
+
+s32 TaskObjF__WriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, char iconFrames,
+                                   struct TimImage *icon, void *data, s32 size) {
+    s32 retries;
+    s32 result;
+
+    retries = MEMCARD_RETRIES;
+    StampSaveTitleFileLetter(title, fileName);
+    do {
+        result = TaskObjF__TryWriteMemcardSaveFile(self, fileName, title, iconFrames & 0xFF, icon,
+                                                   data, size);
+        if (result != 0) {
+            break;
+        }
+    } while (retries-- != 0);
+    if (result == 0) {
+        StampSaveTitleFileLetter(title, NULL);
+    }
+    return result;
+}
+
+extern const char sFileNotCreatedMsg[]; /* "File not create in WriteFile\n" */
+/* Sony's libc2 functions. A local view of printf: the call here passes
+ * only the format string. */
+extern char *strcpy(char *dest, char *src);
+extern void printf(const char *fmt);
+
+/* Deletes the file, creates it at its full size in blocks, then reopens it
+ * to write the save header and the data, each rounded up to whole sectors.
+ * MATCHING: iconFrames is u8: retail keeps the incoming word and its
+ * zero-extended copy in two registers. */
+
+s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, char *fileName, char *title, u8 iconFrames,
+                                      struct TimImage *icon, void *data, s32 size) {
+    char pathBuf[32];
+    char *path;
+    s32 fileHandle;
+    s32 openMode;
+    McIconSource *iconSrc;
+    McSaveHeader *header;
+
+    path = BuildMemcardPath((McDevicePath *)pathBuf, self->cardSlot, fileName);
+    delete (path);
+    openMode = MEMCARD_OPEN_BLOCKS(((u32)size + (MEMCARD_SAVE_HEADER_SIZE + MEMCARD_BLOCK_SIZE - 1)) >>
+                                   MEMCARD_BLOCK_SHIFT) |
+               O_CREAT;
+    fileHandle = open(path, openMode);
+    if (fileHandle == -1) {
+        printf(sFileNotCreatedMsg);
+        return 0;
+    }
+    close(fileHandle);
+    fileHandle = open(path, O_WRONLY);
+    if (fileHandle == -1) {
+        return 0;
+    }
+    iconSrc = (McIconSource *)icon->buffer;
+    header = (McSaveHeader *)BMemPMgrAlloc(sizeof(McSaveHeader));
+    header->magic0 = 'S';
+    header->magic1 = 'C';
+    header->iconDisplayFlag = iconFrames + MEMCARD_ICON_FLAG_BASE;
+    header->blockCount = ((u32)size + (MEMCARD_BLOCK_SIZE - 1)) >> MEMCARD_BLOCK_SHIFT;
+    strcpy(header->title, title);
+    header->palette[0] = iconSrc->palette[0];
+    header->palette[1] = iconSrc->palette[1];
+    header->frame0 = iconSrc->frame0;
+    header->frame1 = iconSrc->frame1;
+    header->frame2 = iconSrc->frame2;
+    /* The title sector and the icon frames.
+     * MATCHING: (iconFrames + 1) * MEMCARD_SECTOR_SIZE reorders the arithmetic. */
+    write(fileHandle, header, (iconFrames << MEMCARD_SECTOR_SHIFT) + MEMCARD_SECTOR_SIZE);
+    BMemPMgrFree(header);
+    write(fileHandle, data,
+          (((u32)size + (MEMCARD_SECTOR_SIZE - 1)) >> MEMCARD_SECTOR_SHIFT) << MEMCARD_SECTOR_SHIFT);
+    close(fileHandle);
+    return 1;
+}
+
+char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix) {
+    McDevicePath *device;
+
+    if (cardSlot) {
+        device = &gMcDevicePath1;
+    } else {
+        device = &gMcDevicePath0;
+    }
+    *dest = *device;
+    strcat((char *)dest, suffix);
+    return (char *)dest;
+}
+
+/* Sony's kernel event calls (libapi/a11..a13, include/psyq/kernel.h). Each
+ * takes an event descriptor and returns a status word, which is what lets
+ * TaskObjF__ForEachEvent take them as its callback; kernel.h spells them with
+ * `long`, hence the casts. */
+
+s32 TaskObjF__EnableEvents(TaskObjF *self) {
+    return TaskObjF__ForEachEvent(self, (s32 (*)(s32))EnableEvent, 1);
+}
+
+s32 TaskObjF__DisableEvents(TaskObjF *self) {
+    return TaskObjF__ForEachEvent(self, (s32 (*)(s32))DisableEvent, 1);
+}
+
+s32 TaskObjF__TestEvents(TaskObjF *self) {
+    return TaskObjF__ForEachEvent(self, (s32 (*)(s32))TestEvent, 0);
+}
+
+/* Sony's libapi/a36 and a37. EnterCriticalSection returns int; nothing
+ * here reads it. */
+extern void EnterCriticalSection(void);
+extern void ExitCriticalSection(void);
+
+/* Calls `callback` on each event until one returns 0, inside a critical
+ * section when `critical` is set; returns the last result. */
+s32 TaskObjF__ForEachEvent(TaskObjF *self, s32 (*callback)(s32), s32 critical) {
+    s32 i;
+    s32 result;
+
+    if (critical) {
+        EnterCriticalSection();
+    }
+    for (i = 0; i < ARRAY_COUNT(self->events); i++) {
+        result = callback(self->events[i]);
+        if (result == 0) {
+            break;
+        }
+    }
+    if (critical) {
+        ExitCriticalSection();
+    }
+    return result;
+}
+
+s32 TaskObjF__WaitForReadyEvent(TaskObjF *self) {
+    return WaitForReadyEvent(self->events, ARRAY_COUNT(self->events));
+}
+
+/* Spins until one of `count` events tests ready and returns that slot's
+ * gCardEventSpecs entry: which answer the card gave. */
+s32 WaitForReadyEvent(s32 *events, s32 count) {
+    s32 i;
+
+    for (;;) {
+        for (i = 0; i < count; i++) {
+            if (TestEvent(events[i]) != 0) {
+                return gCardEventSpecs[i];
+            }
+        }
+    }
+}
+
+void TaskObjF__Init(TaskObjF *self, char *namePrefix, char **nameSuffixes, BasicClass *inputSource,
+                    BasicClass *tickSource, struct SceneNode *spriteParent, struct VabStreamObj *sound) {
+    self->namePrefix = namePrefix;
+    self->nameSuffixes = nameSuffixes;
+    self->titles = NULL;
+    self->spriteParent = spriteParent;
+    self->sound = sound;
+    self->methods->addChild(self, inputSource);
+    self->methods->addChild(self, tickSource);
+    self->cardIcon = NULL;
+    self->state = TASKOBJF_STATE_IDLE;
+    self->opMode = TASKOBJF_OP_NONE;
+}
+
+void TaskObjF__Deinit(TaskObjF *self) {
+    self->sound = NULL;
+    self->spriteParent = NULL;
+    self->methods->removeChild(self, self->inputSource);
+    self->methods->removeChild(self, self->tickSource);
+}
+
+/* Re-entered from LOAD_WARNING once the player has chosen a file, which it
+ * then loads; otherwise it offers the files it found. */
+void TaskObjF__BeginLoad(TaskObjF *self, char *fileName, char *title, void *data, s32 size) {
+    s32 found;
+    s32 state;
+
+    self->fileName = fileName;
+    self->title = title;
+    self->data = data;
+    self->opMode = TASKOBJF_OP_LOAD;
+    self->dataSize = size;
+    if (TaskObjF__Validate(self)) {
+        TaskObjF__FreeBuffers(self);
+        TaskObjF__AllocBuffers(self);
+        found = self->methods->collectExistingMemcardFiles(self, self->titles, self->foundSuffixes,
+                                                           self->namePrefix, self->nameSuffixes);
+        self->bufCount = found;
+        if (found != 0) {
+            TaskObjF__FreeUnusedBuffers(self);
+            if (self->state == TASKOBJF_STATE_LOAD_WARNING) {
+                state = TASKOBJF_STATE_LOADING;
+            } else {
+                state = TASKOBJF_STATE_CHOOSE_FILE;
+            }
+        } else {
+            state = TASKOBJF_STATE_LOAD_NOT_FOUND;
+            self->bufCount = TASKOBJF_MAX_FILES;
+        }
+        self->methods->setState(self, state);
+    }
+}
+
+void TaskObjF__AllocBuffers(TaskObjF *self) {
+    s32 i;
+
+    if (self->titles == NULL) {
+        self->titles = BMemPMgrAlloc((TASKOBJF_MAX_FILES + 1) * sizeof(char *));
+        for (i = 0; i < TASKOBJF_MAX_FILES; i++) {
+            self->titles[i] = BMemPMgrAlloc(TASKOBJF_TITLE_SIZE);
+        }
+        self->foundSuffixes = BMemPMgrAlloc((TASKOBJF_MAX_FILES + 1) * sizeof(char *));
+    }
+}
+
+void TaskObjF__FreeUnusedBuffers(TaskObjF *self) {
+    s32 i;
+
+    for (i = self->bufCount; i < TASKOBJF_MAX_FILES; i++) {
+        self->titles[i] = BMemPMgrFree(self->titles[i]);
+    }
+    self->titles[i] = NULL;
+}
+
+void TaskObjF__FreeBuffers(TaskObjF *self) {
+    s32 i;
+
+    if (self->titles != NULL) {
+        BMemPMgrFree(self->foundSuffixes);
+        for (i = 0; i < self->bufCount; i++) {
+            BMemPMgrFree(self->titles[i]);
+        }
+        BMemPMgrFree(self->titles);
+        self->titles = NULL;
+    }
+}
+
+/* An existing file first asks to overwrite; confirming re-enters from
+ * SAVE_OVERWRITE_WARNING to edit the title, and the edited title re-enters
+ * from EDIT_TITLE to save.
+ * MATCHING: each branch makes its own setState call, which GCC cross-jumps
+ * to one; the function returns nothing. */
+void TaskObjF__BeginSave(TaskObjF *self, char *fileName, char *title, s32 titleEditPos,
+                         u8 iconFrames, struct TimImage *icon, void *data, s32 size) {
+    s32 state;
+    TaskObjFMethods *methods;
+
+    self->fileName = fileName;
+    self->title = title;
+    self->titleEditPos = titleEditPos;
+    self->opMode = TASKOBJF_OP_SAVE;
+    self->iconFrames = iconFrames;
+    self->iconImage = icon;
+    self->data = data;
+    self->dataSize = size;
+    if (TaskObjF__Validate(self)) {
+        if (self->methods->probeMemcardFile(self, NULL, fileName) != 0) {
+            state = TASKOBJF_STATE_SAVE_OVERWRITE_WARNING;
+            if (self->state == state) {
+                state = TASKOBJF_STATE_EDIT_TITLE;
+            } else if (self->state == TASKOBJF_STATE_EDIT_TITLE) {
+                state = TASKOBJF_STATE_SAVING;
+            }
+            self->methods->setState(self, state);
+        } else if (!self->methods->checkCardSpace(self, iconFrames, size)) {
+            self->methods->setState(self, TASKOBJF_STATE_SAVE_NO_SPACE);
+        } else {
+            methods = self->methods;
+            state = TASKOBJF_STATE_EDIT_TITLE;
+            if (self->state == state) {
+                state = TASKOBJF_STATE_SAVING;
+            }
+            methods->setState(self, state);
+        }
+    }
+}
+
+/* Returns 1 when checkCardStatus succeeds on a formatted, unchanged card;
+ * otherwise sets the state that says why and returns 0.
+ * MATCHING: the unreachable `formatted` branch and the one setState call
+ * reached by goto keep retail's branch layout. */
+s32 TaskObjF__Validate(TaskObjF *self) {
+    s32 error;
+    s32 cardChanged;
+    s32 formatted;
+    s32 ok;
+    s32 state;
+
+    self->methods->openEvents(self);
+    ok = self->methods->checkCardStatus(self, &error, &cardChanged, &formatted);
+    self->methods->closeEvents(self);
+
+    if (ok != 0) {
+        if (cardChanged == 0 && formatted != 0) {
+            return 1;
+        }
+    }
+
+    if (ok == 0) {
+        state = TASKOBJF_STATE_NO_CARD;
+    } else if (error != 0) {
+        state = TASKOBJF_STATE_CARD_ERROR;
+    } else if (cardChanged != 0) {
+        state = TASKOBJF_STATE_CARD_CHANGED;
+    } else if (formatted != 0) {
+        goto dispatch;
+    } else if (self->opMode == TASKOBJF_OP_LOAD) {
+        state = TASKOBJF_STATE_UNFORMATTED_LOAD;
+    } else {
+        state = TASKOBJF_STATE_UNFORMATTED_SAVE;
+    }
+
+dispatch:
+    self->methods->setState(self, state);
+    return 0;
+}
+
+void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
+    TaskObjFMethods *methods;
+    BasicClassMethods *base;
+    s32 tag;
+    s32 kind;
+
+    methods = self->methods;
+    base = Get_vtable_BasicClass();
+    base->onNotify((BasicClass *)self, sender, event);
+
+    /* Pad's class id is 0x2 and FrameClock's 0x5, matched with their
+     * subclasses on the low nibble; TextEntry's is 0x10, ItemList's 0x20. */
+    tag = ((BasicClass *)sender)->methods->header;
+    kind = tag & 0xF;
+    if (kind == 0x2) {
+        methods->onInputEvent(self, sender, event);
+    } else if (kind == 0x5) {
+        methods->tickStateDelay(self, sender, event);
+    } else {
+        kind = tag & 0xFF;
+        if (kind == 0x10) {
+            methods->onTextEntryResult(self, sender, event);
+        } else if (kind == 0x20) {
+            methods->onItemListResult(self, sender, event);
+        }
+    }
+}

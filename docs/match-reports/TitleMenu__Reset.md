@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D814` on 2026-09-24 (tools/rename.py). Address 0x8004d814.
 
-Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__Reset`: 33/33 words match.
 
 ## Source
@@ -36,7 +36,7 @@ reshaping needed.
   -- this is the first function to dereference it through its own vtable
   (`slotF0`) rather than only forwarding it opaquely (as
   `TitleMenu__TitleMenu`/`StampSaveTitleDay`, both already matched in
-  `class_3bb8c_c.c`, do). Same size (4 bytes), so no layout change; the
+  `TitleMenuTaskObjF.c`, do). Same size (4 bytes), so no layout change; the
   existing assignment `self->unkA4 = dreamSys;` in `TitleMenu__TitleMenu` (where
   `dreamSys` is a `void *` parameter) still compiles under ordinary C
   pointer-conversion rules -- confirmed by the full rebuild going green.
@@ -64,7 +64,7 @@ Renamed `func_8004D814` -> `TitleMenu__Reset`. **Tier B**: Passes `&sTitleTimPat
 **Head, round 77:** `unkA4 -> dreamSysView` APPLIED by type scope.
 
 `TitleMenu::unkA4` has a real accessor outside this unit
-(`src/class_3bb8c_c.c`'s `TitleMenu__TitleMenu` sets it from its own
+(`src/TitleMenuTaskObjF.c`'s `TitleMenu__TitleMenu` sets it from its own
 `dreamSys` parameter), so per the compiler-ownership rule this is a
 PROPOSAL, not a rename. Also posted to the round-77 broadcast.
 

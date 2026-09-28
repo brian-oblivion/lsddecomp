@@ -73,7 +73,7 @@ rodata bytes at `sStrComInput`/`sStrFontIcon`/`sCardPathPrefix`/`sTimExt`
 
 `New_TimImage` (a resource loader taking a path, returning a handle) is
 already typed at several OTHER call sites in the project
-(`Task.h`/`class_39e08.h`/`class_3bb8c_j.c`, all with their own local
+(`Task.h`/`DayTaskStageMap.h`/`class_3bb8c_j.c`, all with their own local
 return-type view per this project's established convention) -- confirmed
 this is the same function by address, given its own local reading here.
 

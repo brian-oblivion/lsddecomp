@@ -69,7 +69,7 @@ the same original `Task` monolith** (`Task`, `code_2cc8c_b`,
 `Task`, `ScreenWidgets`, `code_2cc8c_f` -- all carved from one
 segment across earlier rounds). I have not tried this lever, or seen it
 tried, anywhere outside that family (`Entity.c`, `DreamSys.c`,
-`class_3bb8c*.c`, etc.), so I cannot personally attest it holds there.
+`DayTaskStageMap*.c`, etc.), so I cannot personally attest it holds there.
 
 Within that scope, though, the evidence is broader than "one struct's
 idiom" and worth stating precisely:
@@ -154,7 +154,7 @@ separate job.
 Parameters `a1..a3` -> `base`, `clear`, `color96` (slot and prototype in
 TaskCore.h too). `unk93` is the colour TaskCore__OnDeinit (when unk34 is
 set) and TitleMenu__OnDeinit clear the screen to; its accessors are in
-Task and class_3bb8c_d, so the name (`clearColor`) is a proposal.
+Task and TitleMenuTaskObjF, so the name (`clearColor`) is a proposal.
 `unk96` has no reader anywhere (Reset sets it to 128 grey from sTaskCoreDefaultColors);
 kept. Retyping all three to BgLayerRgb (delta's round-98 lead) would drop
 these casts but changes Task's accessors: proposed. The casts carry a

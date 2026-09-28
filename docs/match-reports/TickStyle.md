@@ -271,7 +271,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
 
 ```c
 /*
- * class_3bb8c_n -- functions 0..22 of the old 113-function class_3bb8c
+ * class_3bb8c_n -- functions 0..22 of the old 113-function DayTaskStageMap
  * remainder, 0x44F14..0x46288.  23 functions (19 matched, 4 STALL), 1245
  * words.  Carved round 45 (2026-09-15); staffed round 46.
  *
@@ -314,7 +314,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  *
  * This unit includes include/class_3bb8c.h, which eleven other units also
  * include. Whoever edits this unit's C should be the ONLY runner in the
- * class_3bb8c block that round, or price the contention with
+ * DayTaskStageMap block that round, or price the contention with
  * `python3 tools/headercontention.py` first.
  */
 ```

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004B38C` on 2026-09-24 (tools/rename.py). Address 0x8004b38c.
 
-**Unit:** class_3bb8c · **Size:** 35 words · **Status:** MATCHED.
+**Unit:** DayTaskStageMap · **Size:** 35 words · **Status:** MATCHED.
 
 ## Result
 
@@ -77,20 +77,20 @@ Round 78 (track 3, naming pass, bravo).
 ## Proposed field names
 
 Both below are read/written by `Obj866E8`-typed code OUTSIDE this unit
-(`src/class_3bb8c_b.c`), confirmed by actually attempting the rename: the
+(`src/DayTaskStageMap.c`), confirmed by actually attempting the rename: the
 field definition was changed, the whole-image oracle re-run, and
-`class_3bb8c_b.c`'s own `StageMap__ComputeFootprintFromRotation`
+`DayTaskStageMap.c`'s own `StageMap__ComputeFootprintFromRotation`
 (`self->unk6C->unk14->unk44`) failed to compile with no matching member.
 Reverted per track 3 step 3's cross-unit rule; proposing here for the head
 to apply by type scope.
 
 | field | proposed name | tier | evidence |
 | --- | --- | --- | --- |
-| `Obj866E8::unk6C` | `posSource` | B | Stored raw by `StageMap__SetTargetAndLoadChunks` (`self->unk6C = arg2`, never dereferenced there); dereferenced by `StageMap__GetTargetDescriptor` as `self->unk6C->unk14 + 0x18` to obtain the `SplitLongVec3` (world-position triple) fed to `StageMap__ComputeFootprintDescriptor`; `class_3bb8c_b.c`'s `StageMap__ComputeFootprintFromRotation` independently reaches the SAME `->unk14->unk44` chain. "posSource" names the mechanic (an object whose `unk14` substruct supplies positions), not an asserted game identity. |
+| `Obj866E8::unk6C` | `posSource` | B | Stored raw by `StageMap__SetTargetAndLoadChunks` (`self->unk6C = arg2`, never dereferenced there); dereferenced by `StageMap__GetTargetDescriptor` as `self->unk6C->unk14 + 0x18` to obtain the `SplitLongVec3` (world-position triple) fed to `StageMap__ComputeFootprintDescriptor`; `DayTaskStageMap.c`'s `StageMap__ComputeFootprintFromRotation` independently reaches the SAME `->unk14->unk44` chain. "posSource" names the mechanic (an object whose `unk14` substruct supplies positions), not an asserted game identity. |
 | `Obj866E8::unkBC` | `descriptor` | B | Whole-struct-copied from a caller `Descriptor10*` in `StageMap__SetTargetAndLoadChunks`; overwritten wholesale (44 bytes, past the declared field into trailing padding -- see `StageMap__UpdateFootprintTracking.md`'s own derivation) and read back (`StageMap__GetTargetDescriptor` returns `&self->unkBC` directly) as "the object's current footprint descriptor". Not tested for cross-unit accessors this round (only `unk6C` was); the head should re-run the same compiler check before applying. |
 
 **Head disposition, round 78.** `unk6C` applied by type scope as `target`
-(3 accessors: class_3bb8c.c x2, class_3bb8c_b.c x1), not `posSource`: this
+(3 accessors: DayTaskStageMap.c x2, class_3bb8c_b.c x1), not `posSource`: this
 function (`SetTarget...`) stores it and `GetTargetDescriptor` reads it, so the
 unit's own function names already call it the target. `unkBC` -> `descriptor`
 DECLINED: it restates the field's type (`Descriptor10`), round 77's precedent.

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D088` on 2026-09-24 (tools/rename.py). Address 0x8004d088.
 
-Not a vtable slot in this unit's own dispatch (`class_3ac78.h` documents
+Not a vtable slot in this unit's own dispatch (`DayTaskStageMap.h` documents
 it as its OWN independent view's `StageMapMethods::slot140`, called
 from that unit's `StageMap__UnloadAllSlots` — not this unit's concern; here it is
 just a plain function with a real body).

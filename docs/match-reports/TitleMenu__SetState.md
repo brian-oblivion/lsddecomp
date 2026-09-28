@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004D90C` on 2026-09-24 (tools/rename.py). Address 0x8004d90c.
 
-Unit `class_3bb8c_d`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__SetState`: 50/50 words match.
 
 ## Source

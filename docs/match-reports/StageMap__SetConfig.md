@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004B344` on 2026-09-22 (tools/rename.py). Address 0x8004b344.
 
-**Unit:** class_3ac78 · **Size:** 18 words · **Status:** MATCHED (18/18 words)
+**Unit:** DayTaskStageMap · **Size:** 18 words · **Status:** MATCHED (18/18 words)
 
 ## What it does
 
@@ -42,7 +42,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B344` | `StageMap__SetConfig` | B | Occupant of vtable slot `+0x0E0`. Two statements: dispatch `reset` (`+0x040`, `StageMap__Reset`), then store the argument into `config`. The ORDER is load-bearing and is the whole reason the name is not just "set" -- `StageMap__Reset` itself NULLs `config`, so the reset must run first. Tier B: the pointee is a small parameter block (`class_3bb8c` reads it as `{s16 divisor, s16 count, s32 unk4}` from four functions), but what it configures is not established. |
+| `func_8004B344` | `StageMap__SetConfig` | B | Occupant of vtable slot `+0x0E0`. Two statements: dispatch `reset` (`+0x040`, `StageMap__Reset`), then store the argument into `config`. The ORDER is load-bearing and is the whole reason the name is not just "set" -- `StageMap__Reset` itself NULLs `config`, so the reset must run first. Tier B: the pointee is a small parameter block (`DayTaskStageMap` reads it as `{s16 divisor, s16 count, s32 unk4}` from four functions), but what it configures is not established. |
 
 Slot named this round: `StageMapMethods::slot40` -> `reset`.
 
