@@ -582,7 +582,7 @@ void DreamSys__StepLookYaw(DreamSys *this) {
     idx = this->lookYawCommand;
     if (idx != 0) {
         delta = sLookYawSteps[idx];
-        threshold = LOOK_YAW_LIMITS[idx];
+        threshold = sLookYawLimits[idx];
         sum = delta + this->lookYaw;
         if ((sum >= 0) ? (sum < threshold) : ((~sum + 1) < threshold)) {
             TURN_ROTATION_YAW[0].numerator = delta;
