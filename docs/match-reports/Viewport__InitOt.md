@@ -753,3 +753,10 @@ s32 address the allocation arithmetic is written in):
 ## Constants
 
 `4 << otLength` -> `sizeof(GsOT_TAG) << otLength` (both uses): the tag array's byte size. Byte-identical although the expression is now unsigned. Fields `unk44`/`unk48` are now `maxPackets`/`packetSize`.
+
+## History (moved from src/app/task.c, track 12)
+
+The `MATCHING:` note in the source was two lines; it is now one, and the
+full text is kept here:
+
+> MATCHING: written inline, the constant reassociates out of the sum and the final addu/addiu pair swaps.

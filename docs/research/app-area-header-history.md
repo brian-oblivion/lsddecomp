@@ -53,3 +53,47 @@ process text was in them.
 - The class banner cited `tools/classtable.py gPadMethods --vs
   gBasicClassMethods` for "overrides ctor and finalize, adds six slots";
   the method table's doc now states that without the command.
+
+## History (moved from include/task_core.h, track 12)
+
+- The class banner cited `typeviews.py --tree` for the three subclasses
+  whose ctors call TaskCore__TaskCore first.
+- The fields bgLayer, tileMap and tileAtlas were marked "(tag only here)":
+  the header declares them by struct tag, and the class documentation now
+  says a caller includes bg_layer.h, tile_map.h or tile_atlas.h.
+- Section 2 of src/app/task.c opened with a 22-line banner describing the
+  slot and item-list picker; it is now the "picker" paragraph of TaskCore's
+  class documentation, and the .c keeps a short section banner.
+
+## History (moved from include/stream_task.h, track 12)
+
+- The class banner cited `tools/classtable.py gStreamTaskMethods --vs
+  gTaskCoreMethods` for "fourteen overrides and five slots of its own".
+- It listed the MoviePlayer slots the class calls by offset: +0x040 play,
+  +0x048 advance, +0x04C abort, +0x06C setAutoPlay, +0x004 release
+  (movie_player.h). The class documentation names them without offsets.
+- The field docs for autoPlay and keepActive gave MoviePlayer's field
+  offsets (+0x068, +0x054); the names are kept, the offsets are
+  movie_player.h's to state.
+
+## History (moved from include/viewport.h, track 12)
+
+- The slot macro's comment cited `tools/classtable.py gViewportMethods --vs
+  gBasicClassMethods` for the list of inherited slots Viewport overrides.
+- ViewportRefView's comment justified the local struct partly by bytes:
+  setViewPoint/setViewRef copy vp and vr "as one LongVec3 (three field
+  stores do not match)", and "Sony's flat vpx..vrz would put a LongVec3 cast
+  at each copy to save the two at GsSetRefView2". The header keeps the
+  reader's reason (the game treats vp and vr as vectors).
+- Section 4 of src/app/task.c opened with a 27-line banner listing
+  Viewport's methods by group; the list is now in the class documentation,
+  and the .c keeps a short section banner.
+
+## History (moved from include/intermediate_base.h, track 12)
+
+- The class banner cited `typeviews.py --tree` for the two subclasses.
+- It described init in the placeholder field names of an earlier
+  IntermediateBaseInitArgs (`args->unk0`, `args->unk4`, "the +0x010 helper",
+  "the +0x014 object", `initArgs->unk0`), which the release review
+  (2026-09-28) listed as stale. The class documentation now uses the fields'
+  names: drawSystem, pad, frameClock, lightRig.

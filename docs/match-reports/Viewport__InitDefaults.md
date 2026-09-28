@@ -416,3 +416,10 @@ Constants in decimal (otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, fa
 ## Constants
 
 The defaults became unit-local `#define`s in task.c (only InitDefaults uses them): `VIEWPORT_DEFAULT_OT_LENGTH` 13 (8192 tags), `VIEWPORT_DEFAULT_MAX_PACKETS` 2000, `VIEWPORT_DEFAULT_PACKET_SIZE` 64, `VIEWPORT_DEFAULT_PROJ_H` 256, `VIEWPORT_DEFAULT_NEAR_Z` 10, `VIEWPORT_DEFAULT_FAR_Z` 65536, `VIEWPORT_DEFAULT_FOG_NEAR` 20000; `lightMode = 0` -> `GsLMODE_NORMAL` (libgs.h). Fields `unk44`/`unk48`/`unk90`/`unkB4` are now `maxPackets`/`packetSize`/`clockEventCount`/`extraSwap`.
+
+## History (moved from src/app/task.c, track 12)
+
+The `MATCHING:` note in the source was two lines; it is now one, and the
+full text is kept here:
+
+> MATCHING: a second name for the same symbol, so cc1 cannot share one address computation between the two copies; retail loads it twice. (On sDefaultViewportColorAlias, declared just above the function.)

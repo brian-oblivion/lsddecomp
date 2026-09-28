@@ -316,8 +316,7 @@ void BasicClass__RemoveAllChildren(BasicClass *self) {
     BasicClass **childPtr;
     BasicClassListNode *cursor;
 
-    /* MATCHING: the named childPtr and the if/do-while with comma tests keep
-     * &child in one saved register and the loop body first. */
+    /* MATCHING: the named childPtr and the comma-tested if/do-while keep the loop's register and order. */
     childPtr = &child;
     cursor = self->children;
     if (GetNextBasicClass(childPtr, &cursor), child != NULL) {

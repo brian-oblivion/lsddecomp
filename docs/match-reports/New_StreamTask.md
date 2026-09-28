@@ -90,3 +90,13 @@ The file's banner carried its edge evidence and the reason for its name:
 > GsSetProjection is Sony's; no tool splits a unit, so it stays. Named for
 > the task classes rather than for one class, whose header already holds
 > that name.
+
+## History (moved from include/stream_task.h, track 12)
+
+The comment above StreamTaskMethods read:
+
+> The ctor takes FIVE parameters: New_StreamTask dispatches it with
+> $a0-$a3 plus a fifth stored to 0x10($sp), the o32 stack-argument slot
+> (docs/match-reports/New_StreamTask.md).
+
+The header's method-table doc keeps "the ctor takes a fifth argument".

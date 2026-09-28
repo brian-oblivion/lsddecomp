@@ -696,3 +696,13 @@ TitleMenu's `D_80086CA8`: savedCursor 0, cursorColor (128, 128, 0), pos
 ## Track 10 (2026-09-28, round 104, alpha)
 
 task.c's local `SlotPos` ({s32 x, y}) is gone: the positions are screen_sprite.h's `ScreenSpritePos`, the same two words, which setPosition takes, and `TaskCoreTarget::slotPositions` is `ScreenSpritePos *` (was `u8 *`). Byte-identical.
+
+## History (moved from src/app/task.c, track 12)
+
+The comment on TaskCoreItemList::pos (task.c) read:
+
+> +0x010 where the cursor's row is drawn; the list starts savedCursor rows
+> above. MATCHING: a struct, so the copy is lw/lw, sw/sw, then a reload of
+> .y (CommitElementScroll); two s32 fields compile differently.
+
+The .c keeps a one-line `MATCHING:` note without the mnemonics.

@@ -147,3 +147,9 @@ what the code is.
 ## Track 10 (2026-09-28, round 104, alpha)
 
 `StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in game_shell.c are gone. Byte-identical.
+
+## History (moved from include/stream_task.h, track 12)
+
+The header's note on `initData` said it is "copied whole (retail loads all
+three words before storing any: a struct assignment)". The class
+documentation keeps "copied whole".
