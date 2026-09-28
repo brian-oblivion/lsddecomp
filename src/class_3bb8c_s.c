@@ -1,12 +1,16 @@
 /*
- * class_3bb8c_s -- StyleEffect's per-kind work (include/StyleEffect.h): the
- * three switches its ctor, update and finalize run (InitByKind,
- * UpdateByKind, ReleaseByKind), and what they call for the model kinds --
- * laying out, drifting and releasing the two model children -- and for the
- * sprite kinds, building the five sprites. Two small helpers every kind
- * uses sit among them: AddVec3 and AttachWithRotScale (attach, then set the
- * rotation and scale). The slot occupants themselves are in
- * class_3bb8c_r.c; the rest of the sprite helpers in class_3bb8c_o.c.
+ * class_3bb8c_s -- StyleEffect's per-kind work (include/StyleEffect.h).
+ *
+ * The three switches on `kind` (StyleEffectKind) that its ctor, update and
+ * finalize run: InitByKind (attach at pos + offset, link the model, build
+ * the kind's children), UpdateByKind (follow pos + offset and the
+ * viewport's viewpoint y, then the kind's per-frame step) and
+ * ReleaseByKind. Then what they call for the model-row kind -- lay out,
+ * drift and release the two model children -- and for the sprite kinds,
+ * build the five sprites. Two small helpers every kind uses sit among
+ * them: AddVec3 and AttachWithRotScale (attach, then set the rotation and
+ * scale). The slot occupants themselves are in class_3bb8c_r.c; the rest
+ * of the sprite helpers, and SetStyleEffectSources, in class_3bb8c_o.c.
  */
 #include "common.h"
 #include <libgte.h>
@@ -30,45 +34,35 @@ extern LongVec3 gSpriteShiftScratch;
 void AddVec3(LongVec3 *dst, LongVec3 *a, LongVec3 *b);
 void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, void *scale);
 
-/* Four of the class's one-parameter helpers are called here with a dead
- * second argument that is byte-load-bearing, so include/StyleEffect.h
- * declares them WITHOUT a prototype (old-style), which is what lets these
- * calls pass it:
- *  - StyleEffect__SpawnPlainSprites (class_3bb8c_o.c): its body WRITES
- *    $a1/$a2/$a3 to zero before any read, but InitByKind's retail emits
- *    `move a1,zero` at 0x80056624;
- *  - StyleEffect__RandomizeSprites (class_3bb8c_o.c): its body reads only
- *    $a0 (`addiu s0,a0,136`), but UpdateByKind's retail emits `move a1,s1`
- *    at 0x800566FC;
- *  - StyleEffect__BuildRandomSprites (below): its body reads only $a0
- *    (`move s1,a0`); InitByKind's retail emits `move a1,zero` at 0x80056614;
- *  - StyleEffect__DriftModelChildren (below): its body writes $a1 (`move
- *    a1,zero`) before any read; UpdateByKind's retail emits `move a1,s1` in
- *    the jal delay slot at 0x800566D8 (round 75).
- * NoOpIgnoreArgs (class_3bb8c_o.c, empty) is the same idiom. */
+/* MATCHING: StyleEffect__SpawnPlainSprites, __RandomizeSprites,
+ * __BuildRandomSprites and __DriftModelChildren read only `self`, but the
+ * calls below pass a second, dead argument that retail loads, so
+ * include/StyleEffect.h declares them without a prototype. NoOpIgnoreArgs
+ * (class_3bb8c_o.c, empty) is declared the same way here. */
 extern void NoOpIgnoreArgs();
 
 /* New_VariantSprite: include/VariantSprite.h. */
 
-/* Three globals class_3bb8c_o.c's SetStyleEffectSources captures once from its
- * parameters (declared there with the same types; track 4b, round 85):
- * gStyleEffectTmd is the Actor it ran on, called here through SceneNode's
- * +0x080 getSetUnk10Flag8 as that function calls it; gStyleEffectTim is
- * forwarded opaquely to New_VariantSprite as its third argument; gStyleEffectViewport's
- * pointee has a field at +0x018 that StyleEffect__InitByKind and
- * StyleEffect__UpdateByKind snapshot/diff via gStyleEffectBaseViewY. */
+/* What SetStyleEffectSources (class_3bb8c_o.c) recorded, declared there
+ * with the same types: the DREAMER.TMD Actor the model kinds fetch their
+ * model from (setBackClip), the TIM image New_VariantSprite is handed, and
+ * the scene's Viewport, whose viewpoint y (refView.vp.y) InitByKind
+ * snapshots into gStyleEffectBaseViewY and UpdateByKind follows. The
+ * viewport stays `void *` because that is how class_3bb8c_o.c declares it. */
 extern Actor *gStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
 extern void *gStyleEffectTim;
 extern void *gStyleEffectViewport;
 extern s32 gStyleEffectBaseViewY;
 extern s32 gStyleEffectModelIds[];
 
-/* Called once, from the class's ctor (StyleEffect__StyleEffect): place self under
- * `parent` at pos + offset, then build the per-kind parts. Kinds 0 and 1
- * link a model fetched from gStyleEffectTmd by gStyleEffectModelIds[kind]; kind 0 also
- * gets two model children, kind 2 five randomised sprites, kind 3 five
- * plain sprites (StyleEffect__SpawnPlainSprites is StyleEffect__SpawnSprites(self,
- * 0, 0, NULL)). */
+/* Called once, from the class's ctor (StyleEffect__StyleEffect): snapshot the
+ * viewpoint y, place self under `parent` at pos + offset, then build the
+ * per-kind parts. The two model kinds link a model fetched from
+ * gStyleEffectTmd by gStyleEffectModelIds[kind], and STYLE_EFFECT_MODEL_ROW
+ * also gets its two model children; STYLE_EFFECT_SPRITES gets five
+ * randomised sprites, STYLE_EFFECT_JITTER_SPRITES five plain ones
+ * (StyleEffect__SpawnPlainSprites is StyleEffect__SpawnSprites(self, 0, 0,
+ * NULL)). */
 void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos) {
     LongVec3 placed;
     s32 kind;
@@ -101,8 +95,8 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
 
 /* Called every frame from the class's slot +0x0EC (StyleEffect__Update, right
  * after it increments `tick`): set self's translation (Actor's
- * setTranslation) to pos + offset, plus however far gStyleEffectViewport's +0x018
- * word has moved since StyleEffect__InitByKind snapshotted it, then run the
+ * setTranslation) to pos + offset, plus however far the viewpoint y has moved
+ * since StyleEffect__InitByKind snapshotted it, then run the
  * per-kind update. */
 void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
     LongVec3 placed;
@@ -127,7 +121,7 @@ void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
 }
 
 /* Called from the class's dtor (StyleEffect__Finalize): release whichever child
- * array this kind built (kinds 2 and 3 both release `sprites`, through two
+ * array this kind built (both sprite kinds release `sprites`, through two
  * identical class_3bb8c_o.c functions). */
 void StyleEffect__ReleaseByKind(StyleEffect *self) {
     switch (self->pendingExtra) {
@@ -198,7 +192,7 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
 }
 
 /* Per-`tableIndex` z step for the model children (0 = no drift), also the
- * divisor of the 24500 / step reset period below. Same index space as
+ * divisor of MODEL_CHILD_DRIFT_RANGE for the reset period below. Same index space as
  * gSpriteShiftX. */
 extern s32 gModelChildDriftZ[];
 /* All-zero LongVec3, the start value of each child's per-frame z delta. */
@@ -213,14 +207,12 @@ extern Ratio16 gSpinRotStep[3];
  * this over the child's per-tick step, gModelChildDriftZ[tableIndex]. */
 #define MODEL_CHILD_DRIFT_RANGE 24500
 
-/* After 500 frames (tick >= 0x1F5), for kinds with model children and a
- * nonzero gModelChildDriftZ step: spin self and both children, move the
- * children along z, and every 24500 / step frames snap them back to their
- * layout. Always marks self's coord2 for recompute.
- *
- * Matched round 75: the step is read straight from the table in the guard,
- * and the loop's pointer is taken again after the call -- CSE turns that
- * second &gModelChildDriftZ[idx] into retail's `move s4,s1`. */
+/* Once tick passes MODEL_CHILD_DRIFT_DELAY, for a layout with model
+ * children and a nonzero gModelChildDriftZ step: spin self and both
+ * children, move child i along z by step + 3 * i, and every
+ * MODEL_CHILD_DRIFT_RANGE / step ticks (the period's magnitude, whatever
+ * the step's sign) snap them back to their layout. Always marks self's
+ * coord2 for recompute. */
 void StyleEffect__DriftModelChildren(StyleEffect *self) {
     s32 tableIndex;
     s32 extraZ;
@@ -236,6 +228,9 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
         slot = self->modelChildren;
         self->methods->updateRotation(self, 0, gSpinRotStep);
         i = 0;
+        /* MATCHING: the guard reads the step from the table and the pointer
+         * is taken only here, after the call; either held earlier in a
+         * local swaps two registers. */
         stepZ = &gModelChildDriftZ[tableIndex];
         extraZ = 0;
         for (; i < ARRAY_COUNT(self->modelChildren); i++) {

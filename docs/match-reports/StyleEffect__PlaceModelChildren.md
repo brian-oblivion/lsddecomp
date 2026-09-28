@@ -106,3 +106,12 @@ start value) and `gModelChildSpacing` (was D_800877F8, s32[5] = {0, -0x80,
 ## Track 4 (2026-09-26, round 88, charlie)
 
 class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+
+## Naming (track 7, round 101)
+
+- `count` -> `layout`: it is `params.modelChildLayout`, an index into
+  gModelChildSpacing (0 = none), not a count. `accum` -> `childPos`,
+  `p` -> `slot`.
+- `*(s16 *)self->params.scale` is `self->params.scale[0].num` (scale is a
+  `Ratio16 *`; num is its first s16).
+- Loop bound `2` is `ARRAY_COUNT(self->modelChildren)`.
