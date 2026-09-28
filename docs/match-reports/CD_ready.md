@@ -40,7 +40,7 @@ Two real fixes ARE folded into the body below and are worth keeping on record:
 
 ```c
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80024E64 -> CheckCallback, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-extern s32 D_8006D608;
+extern s32 CD_debug;
 extern u8 D_8006D61D;
 extern const char *D_8006D620[];
 extern const char *D_8006D6A0[];

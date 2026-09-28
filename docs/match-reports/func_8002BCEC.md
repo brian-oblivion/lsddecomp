@@ -96,7 +96,7 @@ own read-handle), re-reads THAT directory's sector via the already-matched
    `func_8002BC40`'s `.id == 0` empty-slot convention, just on a different
    field of a different table), and returns 1.
 
-Every diagnostic print is gated behind `D_8006D608` — 0 silent, >0 errors,
+Every diagnostic print is gated behind `CD_debug` — 0 silent, >0 errors,
 >=2 per-entry trace — same convention as `func_8002B94C`/`func_8002B640`.
 
 ## Best-derived body (compiles to 172/175 words, 3 words SHORT; 49/175 raw
@@ -170,7 +170,7 @@ typedef struct EntryB9CC {
 } EntryB9CC;
 extern EntryB9CC D_8008B9CC[];
 
-extern s32 D_8006D608;
+extern s32 CD_debug;
 extern s32 D_8006D938;
 
 /* CD_cachefile diagnostics (confirmed via asm/data/120C.rodata.s) */
@@ -207,14 +207,14 @@ s32 func_8002BCEC(s32 id)
     }
 
     if (func_8002BFA8((void *)1, D_8008B9CC[id].handle, D_8008CFF0) != 1) {
-        if (D_8006D608 > 0) {
+        if (CD_debug > 0) {
             printf(D_80010C58);
         }
         return -1;
     }
 
     count = 0;
-    if (D_8006D608 >= 2) {
+    if (CD_debug >= 2) {
         printf(D_80010C78);
     }
 
@@ -247,7 +247,7 @@ s32 func_8002BCEC(s32 id)
         }
 
         slot++;
-        if (D_8006D608 >= 2) {
+        if (CD_debug >= 2) {
             printf(D_80010C9C, *((u8 *)D_8008B3F0 + off),
                           *((u8 *)D_8008B3F0 + off + 1),
                           *((u8 *)D_8008B3F0 + off + 2),
@@ -267,7 +267,7 @@ s32 func_8002BCEC(s32 id)
     if (count < 0x40) {
         D_8008B3F0[count].name[0] = 0;
     }
-    if (D_8006D608 >= 2) {
+    if (CD_debug >= 2) {
         printf(D_80010CB8, count);
     }
     return 1;
@@ -308,7 +308,7 @@ bytes differ outside the function's own window).
 loop-carried induction register (stride `0x18`, alongside `off` itself)
 because it is referenced from an UNCONDITIONAL statement (the write runs
 every iteration) — the SAME symbol's `+0`/`+1`/`+2` byte reads do NOT get
-this treatment because they only execute inside the `D_8006D608 >= 2`
+this treatment because they only execute inside the `CD_debug >= 2`
 guard. Retail's own instructions confirm it does NOT do this: the write's
 address is recomputed FRESH every iteration via a scratch register
 (`addiu v0,s5,4` / `addu v0,s1,v0`), not maintained.
@@ -390,7 +390,7 @@ tried source expressions triggered.
 ### Residue 2 (OPEN, matches an ALREADY-DOCUMENTED sibling stall): the missing 3-instruction "always-true" check
 
 **Symptom.** Immediately before the loop's own setup (right after the
-`D_8006D608 >= 2` "searching..." print), retail has:
+`CD_debug >= 2` "searching..." print), retail has:
 
 ```
 ori   v0, zero, 1
@@ -434,7 +434,7 @@ condition was not found in the time available here either.
 **Round 27 follow-up: the head's two suggested non-foldable sources
 (global, or call-result) tried and structurally ruled out.**
 
-- **Global-sourced condition, tested:** `if (D_8006D608 >= -1) { <loop> }`
+- **Global-sourced condition, tested:** `if (CD_debug >= -1) { <loop> }`
   (reading the already-in-scope verbosity global again, compared against a
   constant GCC cannot fold since it does not know the global's runtime
   value). This DOES survive — confirming the mechanism the sibling report
@@ -460,7 +460,7 @@ condition was not found in the time available here either.
 **Common structural feature of both confirmed instances (asked for by the
 head):** both `func_8002BCEC`'s and `func_8002B94C`'s dead checks sit
 immediately after a debug-print CALL that is ITSELF conditionally
-executed (`if (D_8006D608 >= N) print(...)`), i.e., right at a CONTROL-FLOW
+executed (`if (CD_debug >= N) print(...)`), i.e., right at a CONTROL-FLOW
 JOIN where two predecessor paths (print-taken, print-skipped) merge before
 falling into a loop setup. Neither instance's dead check is reachable from
 straight-line code alone — both are the first statement AFTER a branch
@@ -473,7 +473,7 @@ computes.
 
 Two variables' declaration/initialization ORDER matters more than expected:
 
-- Moving `count = 0;` to BEFORE the `D_8006D608 >= 2` print (matching
+- Moving `count = 0;` to BEFORE the `CD_debug >= 2` print (matching
   retail's own instruction order, where `count`'s zeroing sits in the
   delay slot of the EARLIER debug-branch, not after it) fixed a `count`
   register-identity mismatch (`s1` vs `s2`) that persisted through the
@@ -490,7 +490,7 @@ Two variables' declaration/initialization ORDER matters more than expected:
 Roughly 17 build/pipeline iterations across two sessions (well under the
 30-attempt cap). Axes varied: loop-guard spelling (bare `while(1)`,
 `if(ok==1)`, `while(ok==1)`, `for(;;)`, a global-sourced `if
-(D_8006D608>=-1)`), the size-write's pointer-vs-field spelling and
+(CD_debug>=-1)`), the size-write's pointer-vs-field spelling and
 association order (6 variants, see the table above — struct-base vs.
 field-pointer, new local vs. reused-existing `slot`, with and without an
 UNCHANGING `base` variable separate from the incrementing `slot`), the

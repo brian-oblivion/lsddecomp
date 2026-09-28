@@ -16,7 +16,7 @@ Confirmed by two already-matched call sites in the sibling unit `libcd_bios.c`: 
 
 The CD-ROM "command" dispatcher: `arg0` is a command byte (`0`..`0x1B`ish, looked up by name in the shared `D_8006D620[]` string table), `arg1` is an optional parameter (pointer or scalar depending on command), `arg2` is an optional 8-byte output buffer, `arg3` is a "fire-and-forget" flag (skip waiting for completion).
 
-1. If verbosity (`D_8006D608`) is `>= 2`, prints `"%s...\n"` with the command's name.
+1. If verbosity (`CD_debug`) is `>= 2`, prints `"%s...\n"` with the command's name.
 2. Looks up `D_8006D840[cmd]` -- "does this command need a parameter" -- and if it does and `arg1 == 0`, prints (when verbosity is on) `"%s: no param\n"` and returns `-2`.
 3. Calls `CD_sync(0, 0)` -- blocks until CD sync (see that report).
 4. If `cmd == 2`, copies 4 bytes from `arg1` into `D_8006D618`.
@@ -46,7 +46,7 @@ One real structural fix IS folded into the body and is worth keeping on record: 
 
 ```c
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80024E64 -> CheckCallback, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-extern s32 D_8006D608;
+extern s32 CD_debug;
 extern u8 D_8006D61C;
 extern u8 D_8006D61D;
 extern const char *D_8006D620[];
@@ -100,12 +100,12 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
     const u8 *src;
     s32 i;
 
-    if (D_8006D608 >= 2) {
+    if (CD_debug >= 2) {
         printf(D_80010A20, D_8006D620[arg0 & 0xFF]);
     }
 
     if (D_8006D840[arg0 & 0xFF] != 0 && arg1 == 0) {
-        if (D_8006D608 > 0) {
+        if (CD_debug > 0) {
             printf(D_80010A28, D_8006D620[arg0 & 0xFF]);
         }
         return -2;
@@ -293,7 +293,7 @@ down from 4.
 attempt does not repeat it:** enabling this change made `funcdiff.py`'s
 "differs outside this range" byte count go UP (298262 bytes, vs 253209
 before), and `build/lsdde.map` showed several unrelated data symbols
-(`CD_cbread`, `D_8006D608`, the whole `CD_cbsync.. D_8006D8D9` cluster)
+(`CD_cbread`, `CD_debug`, the whole `CD_cbsync.. D_8006D8D9` cluster)
 linked 4 bytes earlier than their expected addresses. This LOOKED exactly
 like CLAUDE.md's "a struct edit for one function's sake silently breaks a
 different, already-matched function" hazard, and cost a real diagnostic

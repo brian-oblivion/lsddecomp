@@ -33,7 +33,7 @@ extern s32 D_8006D6C0[]; /* 0/1 flag table, selector 0..0x1B, same index family 
 extern s32 D_8006D7C0[]; /* 0/1 flag table, selector 0..0x1B */
 
 extern s32 D_8006D60C; /* last status byte (resp[0]) */
-extern s32 D_8006D608;
+extern s32 CD_debug;
 extern char *D_8006D620[];
 
 /* CD-ROM controller port pointers. */
@@ -112,7 +112,7 @@ s32 getintr(void) {
 
     if (cause == 5) {
         puts(D_800109B0);
-        if (D_8006D608 > 0) {
+        if (CD_debug > 0) {
             printf(D_800109BC, D_8006D620[D_8006D61D], D_8006D60C, D_8006D610);
         }
     }
@@ -176,7 +176,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_sync);
 /* CD_ready's near-miss body, kept for reading: a stall, 2 words short
  * (docs/match-reports/CD_ready.md). */
 #if 0
-extern s32 D_8006D608;
+extern s32 CD_debug;
 extern u8 D_8006D61D;
 extern const char *D_8006D620[];
 extern const char *D_8006D6A0[];
@@ -317,7 +317,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_ready);
 /* CD_cw's near-miss body, kept for reading: a stall, length exact
  * (docs/match-reports/CD_cw.md). */
 #if 0
-extern s32 D_8006D608;
+extern s32 CD_debug;
 extern u8 D_8006D61C;
 extern u8 D_8006D61D;
 extern const char *D_8006D620[];
@@ -368,12 +368,12 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
     const u8 *src;
     s32 i;
 
-    if (D_8006D608 >= 2) {
+    if (CD_debug >= 2) {
         printf(D_80010A20, D_8006D620[arg0 & 0xFF]);
     }
 
     if (D_8006D840[arg0 & 0xFF] != 0 && arg1 == 0) {
-        if (D_8006D608 > 0) {
+        if (CD_debug > 0) {
             printf(D_80010A28, D_8006D620[arg0 & 0xFF]);
         }
         return -2;

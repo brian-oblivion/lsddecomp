@@ -20,7 +20,7 @@ because no placed object covers it.
 
 The round-21 title said "219/337, register-identity residue, size matches
 retail exactly". Rebuilt verbatim (plus the two externs it used but did not
-declare, `D_8006D608` and `D_8006D620`), it measured:
+declare, `CD_debug` and `D_8006D620`), it measured:
 
 - **159/337 raw, `.text` 0x54c (2 words LONG)**, whole image drifted;
 - `insertions 71 / deletions 71`, positional skeleton diffs 141.
