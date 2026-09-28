@@ -941,7 +941,7 @@ extern StaticLinkTrigger *sTunnelTriggers[];
 extern StageSpawn *sTunnelSpawns[];
 
 /* Table triple for Test4StaircaseNodes (round 2026-08-30-d). */
-extern s8 LEN_STAIRCASE_TRIGGERS[];
+extern s8 sStaircaseTriggersCount[];
 extern StaticLinkTrigger *STAIRCASE_TRIGGERS[];
 extern StageSpawn *STAIRCASE_SPAWNS[];
 
