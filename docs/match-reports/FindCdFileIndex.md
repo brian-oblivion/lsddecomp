@@ -49,3 +49,8 @@ The CD driver's shared globals and records are now declared once, in
 global's type comes from its accessors (`gFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
+
+## Round 101 (track 7 polish)
+
+Commented as the index of the first entry whose name contains `name`, or
+-1; the not-found return skips UnlockCd like FindCdFileEntry's.

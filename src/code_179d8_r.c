@@ -1,49 +1,42 @@
 #include "common.h"
 #include <libcd.h>
+#include <strings.h>
 #include "CdDriver.h"
 
 /*
- * code_179d8_r -- tail slice of the code_179d8 monolith, carved round 45.
- * Named (track 3), round 53 -- runner alpha. All 10 functions were already
- * matched C when this pass started (fresh carve, round 45/46, runner
- * foxtrot); nothing here changes a single byte, only names.
+ * The CD driver's read state machine, its request-queue nodes and its
+ * file-table lookups (the class, the queue and the table are
+ * include/CdDriver.h's).
  *
- * This slice and the adjacent code_179d8_q (runner echo, the CD-ROM read
- * driver's module-level half) share callees LockCd (lock: gCdLock = 1) and
- * UnlockCd (unlock: gCdLock = 0), both defined in code_179d8_q.c. Declared
- * locally here, never in a shared header -- see CLAUDE.md on per-unit local
- * views.
+ * The state machine takes one step each time ServiceCdDriver
+ * (code_179d8_q.c, a VSync callback) runs: it calls TickCdStateMachine or
+ * TickCdLoadFileStateMachine as gCdTickStep says, after a CdDriver method
+ * (code_179d8_s.c) has started an operation with StartCdOperation and set
+ * gCdSeekParam, gCdReadSectorCount and gCdReadBuffer. gCdState walks
+ * CD_STATE_SETLOC (CdControlF(CdlSetloc) to gCdSeekParam->pos),
+ * CD_STATE_SETLOC_WAIT (poll CdSync), CD_STATE_READ (CdRead) and
+ * CD_STATE_READ_WAIT (poll CdReadSync); SetCdState moves it and
+ * ResetCdStateMachine ends the operation and marks the driver idle. A seek
+ * that errors or stays unanswered for CD_WAIT_TIMEOUT polls, and a read that
+ * errors, go back to CD_STATE_SETLOC.
  *
- * The slice implements the driver's small CD-read state machine plus its
- * two support structures:
- *   - gCdState holds the current phase: 1 = issue a CdlSetloc seek, 2 = poll
- *     CdSync for it, 7 = issue CdRead, 8 = poll CdReadSync; gCdTimeoutCounter
- *     is the busy-wait counter both tick functions bump while polling,
- *     cleared on every phase change by SetCdState.
- *   - TickCdStateMachine / TickCdLoadFileStateMachine are the two per-tick
- *     steps ServiceCdDriver (code_179d8_q) dispatches on gCdTickStep (1 / 2).
- *     TickCdStateMachine is the default, used by code_179d8_s.c's open,
- *     explicit-seek and straight-read call sites. TickCdLoadFileStateMachine
- *     is used exclusively by that unit's CdDriver__LoadFile (the
- *     CdDriver__RequestLoadFile worker, per its own report): on the
- *     "still busy" signal at phase 2 it proceeds straight into the read
- *     phase instead of resetting, and on a successful read it restores the
- *     caller's saved gCdSeekParam from gCdSavedSeekParam -- both differences
- *     specific to that one combined seek+read operation.
- *   - StartCdOperation / ResetCdStateMachine are the state machine's "start" /
- *     "reset" bookends -- exact mirror images of each other.
- *   - AllocCdRequestNode / FreeCdRequestNode allocate+link / unlink+free a
- *     request-queue node (CdRequestNode, 0x24 bytes), list head
- *     gCdRequestQueue -- the queue code_179d8_q.c's EnqueueCdRequest and
- *     CdDriver__CancelRequests drive from the other end.
- *   - FindCdFileEntry / FindCdFileIndex / GetCdFileEntry are linear-scan /
- *     index helpers over the file table (CdFileEntry, 0x1C bytes each) based
- *     at gFileTable, count gFileTableCount. That type, CdRequestNode and the
- *     module globals the three CD units share are declared once in
- *     include/CdDriver.h (track 4b, round 85).
+ * The two tick functions differ in three places. TickCdStateMachine, which
+ * Open and Seek use (Read starts it at CD_STATE_READ), ends the operation
+ * when the seek completes and CdFlushes after a read error;
+ * TickCdLoadFileStateMachine, LoadFile's, goes on to read after the seek,
+ * and when the read is done restores the gCdSeekParam LoadFile saved in
+ * gCdSavedSeekParam.
+ *
+ * AllocCdRequestNode appends a zeroed node to gCdRequestQueue and
+ * FreeCdRequestNode unlinks one; EnqueueCdRequest (code_179d8_q.c) fills
+ * them and CdDriver__RunRequestQueue (code_179d8_s.c) consumes them from the
+ * head. FindCdFileEntry and FindCdFileIndex look a name up in gFileTable by
+ * substring, GetCdFileEntry indexes it. Every function but the three
+ * state setters brackets its body with LockCd / UnlockCd, which makes
+ * ServiceCdDriver skip its tick in between.
  */
 
-/* lock/unlock, defined in code_179d8_q.c (runner echo's unit). */
+/* Defined in code_179d8_q.c. */
 extern void LockCd(void);
 extern void UnlockCd(void);
 
@@ -55,14 +48,11 @@ extern void UnlockCd(void);
 /* Polls of CdSync that answer CdlNoIntr before the seek is issued again. */
 #define CD_WAIT_TIMEOUT 601
 
-/* Psy-Q pool allocator, BMemPMgr.c. */
+/* The game's pool allocator, src/BMemPMgr.c. */
 extern void *BMemPMgrAlloc(s32 size);
 extern void *BMemPMgrFree(void *ptr);
 
-/* libc2/strstr.o, linked (see code_179d8_h.c's carve notes). */
-extern char *strstr(char *s1, char *s2);
-
-extern s32 gCdTimeoutCounter; /* timeout counter */
+extern s32 gCdTimeoutCounter; /* CD_STATE_SETLOC_WAIT's polls; SetCdState clears it */
 
 CdRequestNode *AllocCdRequestNode(void) {
     CdRequestNode *node;
@@ -79,10 +69,8 @@ CdRequestNode *AllocCdRequestNode(void) {
         node->unk4 = 0;
         if (head != NULL) {
             cur = head;
-            if (cur->next != NULL) {
-                do {
-                    cur = cur->next;
-                } while (cur->next != NULL);
+            while (cur->next != NULL) {
+                cur = cur->next;
             }
             cur->next = node;
             node->prev = cur;
@@ -115,6 +103,9 @@ void FreeCdRequestNode(CdRequestNode *node) {
     UnlockCd();
 }
 
+/* The first entry whose name contains `name`, or NULL. The not-found return
+ * skips UnlockCd, as FindCdFileIndex's does, so ServiceCdDriver stays off
+ * until the next UnlockCd anywhere. */
 void *FindCdFileEntry(char *name) {
     CdFileEntry *cur = gFileTable;
     s32 i = 0;
@@ -131,6 +122,7 @@ void *FindCdFileEntry(char *name) {
     return NULL;
 }
 
+/* The index of the first entry whose name contains `name`, or -1. */
 s32 FindCdFileIndex(char *name) {
     CdFileEntry *cur = gFileTable;
     s32 i = 0;
@@ -148,18 +140,16 @@ s32 FindCdFileIndex(char *name) {
 }
 
 void *GetCdFileEntry(s32 index) {
+    CdFileEntry *table = gFileTable;
     CdFileEntry *entry;
-    CdFileEntry *table;
 
-    table = gFileTable;
     LockCd();
     entry = &table[index];
     UnlockCd();
     return entry;
 }
 
-/* forward decls -- both defined later in this unit; ROM order keeps the
- * definitions below. */
+/* Defined below. */
 extern void ResetCdStateMachine(void);
 extern void SetCdState(s32 state);
 
@@ -277,6 +267,8 @@ unlock:
     UnlockCd();
 }
 
+/* op is a CD_OPERATION_* and state the first CD_STATE_*; the operation is the
+ * queue's head request, which is marked active. */
 void StartCdOperation(s32 op, s32 state) {
     gCdBusy = 1;
     gCdOperation = op;
@@ -285,9 +277,10 @@ void StartCdOperation(s32 op, s32 state) {
     gCdRequestQueue->active = 1;
 }
 
+/* No operation, no tick step: the driver is idle. */
 void ResetCdStateMachine(void) {
     gCdOperation = 0;
-    gCdState = 0;
+    gCdState = CD_STATE_IDLE;
     gCdTickStep = 0;
     gCdIdle = 1;
     gCdTimeoutCounter = 0;

@@ -65,3 +65,10 @@ The CD driver's shared globals and records are now declared once, in
 global's type comes from its accessors (`gFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
+
+## Round 101 (track 7 polish)
+
+The source now says, over the function, that the not-found return skips
+UnlockCd, so ServiceCdDriver (which returns at once while gCdLock is set)
+stays off until the next UnlockCd anywhere. `strstr` comes from Sony's
+`<strings.h>`.

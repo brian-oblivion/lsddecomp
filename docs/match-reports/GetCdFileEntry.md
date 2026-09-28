@@ -112,3 +112,13 @@ The CD driver's shared globals and records are now declared once, in
 global's type comes from its accessors (`gFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
+
+## Round 101 (track 7 polish)
+
+`base`/`result` are `table`/`entry`, both `CdFileEntry *`, and `table` is
+now initialised at its declaration. With the typed pointer that shape is
+byte-exact too (measured round 101), so the declare-then-assign split
+above was a fact about the `char *` / `void *` spelling, not about this
+function; no MATCHING line is needed. The return type stays `void *`
+because code_179d8_s.c declares it that way (proposal in the round's
+summary).

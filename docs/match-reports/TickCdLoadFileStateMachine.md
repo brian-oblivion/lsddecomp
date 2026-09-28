@@ -190,3 +190,15 @@ guess -- kept tier B because the report can name the caller and the effect
 but not independently confirm from this unit alone why LoadFile specifically
 needs the differences (as opposed to it merely being how retail happened to
 implement it).
+
+## Round 101 (track 7 polish): the goto dispatch is a switch
+
+Rewritten the same way as TickCdStateMachine (see its report): a switch on
+gCdState's `CD_STATE_*`, an inner switch on CdSync's `CdlComplete` /
+`CdlNoIntr` / `CdlDiskError` in that natural order, `newState` and one
+`SetCdState(newState)` after it. Byte-exact on the first build. Round 45's
+residue, the `== 5` test's polarity, is what the natural case order gives
+here; TickCdStateMachine needs `CdlDiskError` first to get the other
+encoding. The `tmp` temporary is gone: `gCdSeekParam = gCdSavedSeekParam;
+gCdSavedSeekParam = NULL;` compiles to the same load/store order.
+Constants as TickCdStateMachine's report lists.
