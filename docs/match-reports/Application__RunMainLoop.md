@@ -87,3 +87,15 @@ slots classtable.py prints); they are named for the subclass's occupants
 `slot5C` for the no-op, `pollStatusObj`, `startStreamTaskWithInit`). +0x060
 stays `s32`: this body tests its return, and the occupant,
 GameApplication__RunDayTask, returns `s32`. Bytes unchanged.
+
+## Track 7 (round 101, charlie)
+
+The status literals are `enum ApplicationLoopStatus` (include/Application.h):
+`APPLICATION_LOOP_OPENING` (0, the `break` back to +0x054),
+`APPLICATION_LOOP_SLOT5C` (1, +0x05C then `continue`) and
+`APPLICATION_LOOP_DAY` (2, +0x060 and, on nonzero, +0x064). Evidence: this
+body's own dispatch; the names follow the hooks', which are named for
+GameApplication's occupants, and agree with GameApplication.h's
+`GameApplicationLoopStatus` (0 = OPENING, 2 = DAY; its RunTitleMenu never
+returns 1). Tier B, like the hook names. Byte-identical. The Final C above is
+the pre-track-7 text.

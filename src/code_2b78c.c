@@ -3,7 +3,8 @@
  * its ctor (CD init, data source, default screen), its finalize, the screen
  * size setter, initSystems (display, sound and 3D bring-up, and the shared
  * task argument block), a no-op slot, the never-returning main loop that
- * drives the subclass's hooks, and the table getter.
+ * drives the subclass's hooks by runTitleMenu's ApplicationLoopStatus, and
+ * the table getter.
  */
 #include "common.h"
 #include "Application.h"
