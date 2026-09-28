@@ -47,13 +47,13 @@ changes, read straight off that candidate's mutated source:
 2. **The `entry` pointer's address computation needed a different operand
    ORDER, not a different value.** The one remaining word after removing
    the redundant guard was `addu $s1,$a0,$v0` (retail) vs `addu
-   $s1,$v0,$a0` (mine) -- `$a0` held `gStyleCueRecordIndex * 8` and `$v0` held
+   $s1,$v0,$a0` (mine) -- `$a0` held `sStyleCueRecordIndex * 8` and `$v0` held
    `base`, both correctly, just encoded in the opposite operand order.
-   **Four different C spellings of `base + gStyleCueRecordIndex * 8` (the original
-   form, `gStyleCueRecordIndex * 8 + base`, `(EntrySlot *) base + gStyleCueRecordIndex`, and
-   `&((EntrySlot *) base)[gStyleCueRecordIndex]`) all produced the SAME operand
+   **Four different C spellings of `base + sStyleCueRecordIndex * 8` (the original
+   form, `sStyleCueRecordIndex * 8 + base`, `(EntrySlot *) base + sStyleCueRecordIndex`, and
+   `&((EntrySlot *) base)[sStyleCueRecordIndex]`) all produced the SAME operand
    order** -- this is not a simple "write the addends in the other order"
-   fix. What worked: `(EntrySlot *) (gStyleCueRecordIndex * 8 + (s32) base)`, casting
+   fix. What worked: `(EntrySlot *) (sStyleCueRecordIndex * 8 + (s32) base)`, casting
    `base` to `s32` explicitly before the addition rather than letting the
    pointer-plus-integer arithmetic happen implicitly. Confirmed byte-exact:
    `build exit=0`, `OK: build matches retail SLPS_015.56`,
@@ -74,10 +74,10 @@ void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
         goto fail;
     }
     base = gStyleCueRecordLists[gStyleStage];
-    n = sStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
-    entry = (EntrySlot *) (gStyleCueRecordIndex * 8 + (s32) base);
+    n = sStyleCueRecordCounts[gStyleStage] - sStyleCueRecordIndex;
+    entry = (EntrySlot *) (sStyleCueRecordIndex * 8 + (s32) base);
     for (j = 0; j < n; j++, entry++) {
-        gStyleCueRecordIndex++;
+        sStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *) (sStyleCueOffsets + entry->idx * 6);
@@ -106,7 +106,7 @@ fail:
 
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
-`extern s32 gStyleStage, gStyleCueRecordIndex, gStyleGrid, sStyleCueDistanceTable[];`,
+`extern s32 gStyleStage, sStyleCueRecordIndex, gStyleGrid, sStyleCueDistanceTable[];`,
 `extern u8 *gStyleCueRecordLists[], sStyleCueRecordCounts[], sStyleCueOffsets[];` (all already
 declared in `src/world/ObjMStyleActor.c` ahead of this function).
 
@@ -178,7 +178,7 @@ returning the first such record or `NULL`.
 
 ```c
 extern s32 gStyleStage;
-extern s32 gStyleCueRecordIndex;
+extern s32 sStyleCueRecordIndex;
 extern u8 *gStyleCueRecordLists[];    /* word array of base pointers, indexed by gStyleStage */
 extern u8 sStyleCueRecordCounts[];    /* byte array of counts, same index */
 extern u8 sStyleCueOffsets[];    /* table, 6-byte stride entries */
@@ -203,13 +203,13 @@ void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
         goto fail;
     }
     base = gStyleCueRecordLists[gStyleStage];
-    n = sStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
+    n = sStyleCueRecordCounts[gStyleStage] - sStyleCueRecordIndex;
     if (n <= 0) {
         goto fail;
     }
-    entry = (EntrySlot *) (base + gStyleCueRecordIndex * 8);
+    entry = (EntrySlot *) (base + sStyleCueRecordIndex * 8);
     for (j = 0; j < n; j++, entry++) {
-        gStyleCueRecordIndex++;
+        sStyleCueRecordIndex++;
         if (entry->count > 0) {
             buf.pos = entry->pos;
             buf.tab = *(TabEntry *) (sStyleCueOffsets + entry->idx * 6);
@@ -313,7 +313,7 @@ shared-label unification still doesn't happen for free.
 
 **`FindNextStyleCueInRange`, tier B.**
 
-Scans a run of 8-byte `EntrySlot` records (`gStyleCueRecordIndex` onward)
+Scans a run of 8-byte `EntrySlot` records (`sStyleCueRecordIndex` onward)
 for one whose `count` field is positive and whose Manhattan-style distance
 to `arg2` is under a per-record threshold (`sStyleCueDistanceTable[entry->count]`),
 returning the first such record or `NULL` and writing the computed distance
@@ -327,7 +327,7 @@ MATCHED, 111/111.
 
 ### Naming
 
-**Renamed from `FindNearestStyleCueEntry`, tier A.** The loop returns the FIRST unclaimed record (cue > 0) whose X+Z distance to the target is under its cue's `sStyleCueDistanceTable` entry, advancing `gStyleCueRecordIndex` past every record it looks at; it never compares candidates, so "nearest" said more than the body does.
+**Renamed from `FindNearestStyleCueEntry`, tier A.** The loop returns the FIRST unclaimed record (cue > 0) whose X+Z distance to the target is under its cue's `sStyleCueDistanceTable` entry, advancing `sStyleCueRecordIndex` past every record it looks at; it never compares candidates, so "nearest" said more than the body does.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |

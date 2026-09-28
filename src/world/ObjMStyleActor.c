@@ -1804,7 +1804,7 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
 }
 
 extern s32 gStyleStage;
-extern s32 gStyleCueRecordIndex;
+extern s32 sStyleCueRecordIndex;
 extern u8 *gStyleCueRecordLists[];
 extern u8 sStyleCueRecordCounts[];
 extern s32 sStyleCueDistanceTable[];
@@ -1845,7 +1845,7 @@ struct LocalBuf {
     TabEntry tab;
 };
 
-/* From gStyleCueRecordIndex on, the first free record of the stage's list
+/* From sStyleCueRecordIndex on, the first free record of the stage's list
  * whose X+Z distance from the target is under its cue's distance; each
  * record looked at advances the index, so the next slot's search this tick
  * goes on from there.
@@ -1862,10 +1862,10 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
         goto fail;
     }
     records = gStyleCueRecordLists[gStyleStage];
-    remaining = sStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
-    entry = (EntrySlot *)(gStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
+    remaining = sStyleCueRecordCounts[gStyleStage] - sStyleCueRecordIndex;
+    entry = (EntrySlot *)(sStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
     for (j = 0; j < remaining; j++, entry++) {
-        gStyleCueRecordIndex++;
+        sStyleCueRecordIndex++;
         if (entry->cue > 0) {
             buf.pos = entry->pos;
             buf.tab = sStyleCueOffsets[entry->offsetIndex];
@@ -1947,7 +1947,7 @@ extern void StyleBuildDecorSet(void);
 extern void StyleUpdateDecorSet(void);
 extern void StyleScrollVramStrips(void);
 extern s32 gStyleTickCount;
-extern s32 gStyleCueRecordIndex;
+extern s32 sStyleCueRecordIndex;
 extern StyleCueSlot gStyleCueSlotPool[];
 extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *target, void *unused);
 extern s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused);
@@ -1973,7 +1973,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     StyleUpdateDecorSet();
     StyleUpdateEffectSlots(target);
     StyleScrollVramStrips();
-    gStyleCueRecordIndex = 0;
+    sStyleCueRecordIndex = 0;
     for (i = 0; i < ARRAY_COUNT(gStyleCueSlots); i++) {
         if (gStyleCueSlots[i] != 0) {
             if (ServiceStyleCueIfNear(gStyleCueSlots[i], target, unused) == 0) {

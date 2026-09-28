@@ -192,7 +192,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
     StyleUpdateDecorSet();
     StyleUpdateEffectSlots(ctx);
     StyleScrollVramStrips();
-    gStyleCueRecordIndex = 0;
+    sStyleCueRecordIndex = 0;
     for (i = 0; i < 2; i++) {
         if (gStyleCueSlots[i] != 0) {
             if (ServiceStyleCueIfNear(gStyleCueSlots[i], ctx, arg1) == 0) {
@@ -215,7 +215,7 @@ above; `extern s32 gStyleGrid;`, `extern s32 gStyleTickCount;`,
 (forward, own unit, still cold), `void StyleBuildEffectSlots(void *arg0);` (matched
 earlier this unit, this round), `void StyleUpdateEffectSlots(void *arg0);` (matched,
 this unit), `extern void StyleScrollVramStrips(void);` (forward, matched, this
-unit, defined later), `extern s32 gStyleCueRecordIndex;`, `extern u8 gStyleCueSlotPool[];`,
+unit, defined later), `extern s32 sStyleCueRecordIndex;`, `extern u8 gStyleCueSlotPool[];`,
 `extern ObjN14 *TryStartStyleCue(ObjN14 *arg0, s32 *arg1, void *arg2, void
 *arg3);`, `extern s32 ServiceStyleCueIfNear(ObjN14 *arg0, void *arg1, void
 *arg2);`.
