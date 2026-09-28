@@ -68,7 +68,7 @@ typedef struct {
     D_8008ACA4Methods *methods;
 } D_8008ACA4Obj;
 extern D_8008ACA4Obj *gStyleEffectTmd;
-extern void *gStyleEffectTim;
+extern void *sStyleEffectTim;
 extern void *gStyleEffectViewport;
 extern s32 sStyleEffectBaseViewY;
 extern s32 sStyleEffectModelIds[];
@@ -204,7 +204,7 @@ For the HEAD, by type scope; none applied here (other units' views).
 
 ## Track 4b (2026-09-25, round 85)
 
-`gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport` were `s32` in ObjMStyleActor.c and
+`gStyleEffectTmd`/`sStyleEffectTim`/`gStyleEffectViewport` were `s32` in ObjMStyleActor.c and
 `D_8008ACA4Obj *`/`void *`/`void *` in ObjMStyleActor.c. Both units now
 declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `SetStyleEffectSources` calls the same slot by. Byte-identical; no new `-Wall`
 warning.

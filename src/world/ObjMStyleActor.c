@@ -2398,7 +2398,7 @@ extern void NoOpIgnoreArgs();
  * snapshots into sStyleEffectBaseViewY and UpdateByKind follows. The
  * viewport stays `void *` because that is how the next section declares it. */
 extern Actor *gStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
-extern void *gStyleEffectTim;
+extern void *sStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
 extern s32 sStyleEffectBaseViewY;
 extern s32 sStyleEffectModelIds[];
@@ -2658,7 +2658,7 @@ void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale)
     s32 i;
 
     for (i = 0; i < ARRAY_COUNT(((StyleEffect *)self)->sprites); i++, slot++) {
-        sprite = New_VariantSprite(variant, 0, gStyleEffectTim);
+        sprite = New_VariantSprite(variant, 0, sStyleEffectTim);
         *slot = sprite;
         sprite->methods->attachToParent(sprite, self, 0);
         (*slot)->methods->setColor(*slot, ((StyleEffect *)self)->params.color);
@@ -2743,7 +2743,7 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
  * viewport. The TMD resource's getModel slot sits where Actor has
  * setBackClip, hence the Actor view. */
 extern Actor *gStyleEffectTmd;
-extern void *gStyleEffectTim;
+extern void *sStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
 extern s32 sStyleEffectModelIds[3];
 extern s16 sStyleEffectClutPos[2];
@@ -2757,7 +2757,7 @@ void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
     TmdModel *model;
 
     gStyleEffectTmd = tmd;
-    gStyleEffectTim = (void *)tim;
+    sStyleEffectTim = (void *)tim;
     gStyleEffectViewport = (Viewport *)viewport;
     i = 0;
     do {

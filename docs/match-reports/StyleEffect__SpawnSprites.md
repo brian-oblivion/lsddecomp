@@ -9,7 +9,7 @@
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies: stub-stalled as
-`gp_rel`-blocked on `gStyleEffectTim`, already present in
+`gp_rel`-blocked on `sStyleEffectTim`, already present in
 `config/gp-symbols.txt`. Matched byte-exact this round, but only after
 finding and undoing a self-inflicted whole-image size regression (below).
 
@@ -30,7 +30,7 @@ void StyleEffect__SpawnSprites(void *self, s32 a1, s32 a2, void *tbl) {
     s32 i;
 
     for (i = 0; i < 5; i++, p++) {
-        node = (LinkNode *)New_VariantSprite(a2, 0, gStyleEffectTim);
+        node = (LinkNode *)New_VariantSprite(a2, 0, sStyleEffectTim);
         *p = node;
         node->methods->slot4C(node, self, 0);
         (*p)->methods->slotB8(*p, ((LinkNode *)self)->unk74);
@@ -106,7 +106,7 @@ Round 70 (alpha). `func_80056D18` -> `StyleEffect__SpawnSprites`, **tier B**.
 
 Two callers: StyleEffect__BuildRandomSprites (tbl = sSpriteScaleHalf or NULL)
 and ObjMStyleActor.c's StyleEffect__SpawnPlainSprites (tbl = NULL, kind 3). Body:
-five `New_VariantSprite(a2, 0, gStyleEffectTim)` into +0x084, each attachToParent(self,
+five `New_VariantSprite(a2, 0, sStyleEffectTim)` into +0x084, each attachToParent(self,
 no offset), slotB8(self->color), and updateScale(1, tbl) when tbl != NULL.
 
 Why "sprites": in D800879C4's table (tools/classtable.py gVariantSpriteMethods) slots
@@ -133,7 +133,7 @@ ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: 
 
 ## Track 6 (round 93, bravo)
 
-D_8008ACA8 -> gStyleEffectTim (rename.py): ObjM's ETC.TIM, stored by
+D_8008ACA8 -> sStyleEffectTim (rename.py): ObjM's ETC.TIM, stored by
 SetStyleEffectSources and handed to New_VariantSprite as its image.
 
 ## Naming (track 7, round 101)
