@@ -37,7 +37,7 @@ Table6D940 gPlacementGridMethods;`.
 Also added `BaseTable6D940` (this file only) -- a SEPARATE table reached
 only via the uncarved accessor `GetActiveDataSourceMethods()`, with three known slots
 (`+0x008`, `+0x00C`, `+0x064`) used by `PlacementGrid__PlacementGrid`/`PlacementGrid__Finalize`/
-`PlacementGrid__SetFlag` respectively (all this unit, this round). Kept entirely
+`PlacementGrid__OnRequestDone` respectively (all this unit, this round). Kept entirely
 local to `PlacementGridVabSound.c`, no shared header, per this round's rule for the
 `code_179d8` slices.
 

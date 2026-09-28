@@ -77,7 +77,7 @@ void PlacementGrid__Finalize(PlacementGrid *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-void PlacementGrid__SetFlag(PlacementGrid *self) {
+void PlacementGrid__OnRequestDone(PlacementGrid *self) {
     self->loaded = 1;
     GetActiveDataSourceMethods()->setFlag((FileResource *)self);
 }
