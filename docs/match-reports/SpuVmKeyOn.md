@@ -9,7 +9,7 @@
 > satisfying the bar without a header prototype (see below). This stays an
 > `INCLUDE_ASM` STALL: it is Sony's code and leaves every matching queue,
 > it is only being named here. The three call sites
-> (`src/libsnd_vmanager.c`, `src/libsnd_seqread.c`, `src/code_179d8_j_c.c`) keep
+> (`src/libsnd_vmanager.c`, `src/psyq/libsnd_seqread.c`, `src/code_179d8_j_c.c`) keep
 > their existing byte-exact local `extern` signatures rather than a
 > LIBSND.H copy: unlike `SsUtKeyOn`, `SpuVmKeyOn` is libsnd/vmanager
 > INTERNAL and has no public prototype in `include/psyq/libsnd.h` (grep

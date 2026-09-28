@@ -10,7 +10,7 @@
 and the whole image is byte-exact. A structured rewrite of the same body is
 also 77/77: `&&` in place of the nested `if`/`goto check`, an `if (kind ==
 0x28)` in place of `goto skip_call`, and `fn(ch, sl, a2)` without the
-redundant `& 0xFF`. That rewrite is the live C in `src/libsnd_seqread.c`. Every
+redundant `& 0xFF`. That rewrite is the live C in `src/psyq/libsnd_seqread.c`. Every
 residue analysis below, the "slot used exactly once" fusion and the permuter
 and volatile levers, was measuring a body that called the callback with one
 argument too few. None of it is a compiler behaviour worth keeping as a

@@ -506,7 +506,7 @@ local entirely:
 
 Every other case, the outer/inner switch structure, and all ten cross-unit
 calls are unchanged from round 35's body above (still current in
-`src/libsnd_seqread.c` as the preserved `#if 0` near-miss).
+`src/psyq/libsnd_seqread.c` as the preserved `#if 0` near-miss).
 
 ## Verification
 
@@ -549,7 +549,7 @@ register-color swap.
 of the `channel` parameter in the body replaced by `ch` (signature
 unchanged).** Rebuilt and measured against the real oracle:
 **161/179 -- ten words WORSE than the 171/179 baseline**, not neutral.
-Reverted immediately (`git checkout -- src/libsnd_seqread.c`,
+Reverted immediately (`git checkout -- src/psyq/libsnd_seqread.c`,
 `build-and-verify.sh` reconfirmed byte-exact with `INCLUDE_ASM` in place).
 
 **Why this negative is informative rather than just a miss:** it bounds
@@ -601,7 +601,7 @@ new_var;`) declared INSIDE the `case 4: ... case 14:` compound block,
 assigned right after the `_SsUtResolveADSR` call (`new_var = channel;`),
 and read back in place of `channel` at that same block's closing
 `SsUtSetVagAtr(channel, slot, kind, &scratch);` call (now `SsUtSetVagAtr
-(new_var, slot, kind, &scratch);`). Translated into `src/libsnd_seqread.c`
+(new_var, slot, kind, &scratch);`). Translated into `src/psyq/libsnd_seqread.c`
 verbatim and rebuilt through the full pipeline:
 
 ```c
