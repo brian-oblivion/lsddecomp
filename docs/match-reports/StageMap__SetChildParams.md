@@ -77,7 +77,7 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
 (include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
@@ -96,7 +96,7 @@ an operator decision; not hand-reverted).
 
 ## Track 7 (2026-09-27, round 98, charlie)
 
-`colors += 3` -> `colors += sizeof(FlatLightColor)`, `dirs += 6` -> `dirs += 3 * sizeof(s16)` (an r,g,b and an s16 vx,vy,vz per light, include/flat_light_obj.h). Zero bytes. The `s32` source parameters stay (the slot's type in StageMap.h; proposed to the head as `FlatLightColor *` / `s16 *`, which would drop the casts and let the steps be `++` / `+= 3`).
+`colors += 3` -> `colors += sizeof(FlatLightColor)`, `dirs += 6` -> `dirs += 3 * sizeof(s16)` (an r,g,b and an s16 vx,vy,vz per light, include/flat_light_obj.h). Zero bytes. The `s32` source parameters stay (the slot's type in stage_map.h; proposed to the head as `FlatLightColor *` / `s16 *`, which would drop the casts and let the steps be `++` / `+= 3`).
 
 ## Track 10 (2026-09-28, round 104, echo)
 

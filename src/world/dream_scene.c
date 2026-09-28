@@ -38,7 +38,7 @@
 #include "pad.h"
 #include "fade_box.h"
 #include "dream_sys.h"
-#include "StageMap.h"
+#include "stage_map.h"
 #include "node_guarded_viewport.h"
 #include "TimBlockSrc.h"
 #include "wbgm.h"

@@ -137,7 +137,7 @@ extern EntityMethods gEntityMethods;
 extern EntityMethods *GetEntityMethods(void); /* returns &gEntityMethods */
 
 /* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C)
- * is the grid manager, StageMap (include/StageMap.h; dream_aux passes
+ * is the grid manager, StageMap (include/stage_map.h; dream_aux passes
  * sDreamAuxStageMap). Entity/_e/_g call its startScaleRamp (+0x138). */
 
 /* One row of the mood table (16 bytes): New_Entity's moodIndex selects it, and
@@ -196,7 +196,7 @@ enum EntityDeactivateKind {
 
 /* The unit of the mood row's ranges and tolerances, in world units: what
  * Entity__IsNearTarget and Entity__GetProximityRatio scale them by (the
- * grid's cell size, STAGE_CELL_SIZE in StageMap.h, has the same value). */
+ * grid's cell size, STAGE_CELL_SIZE in stage_map.h, has the same value). */
 #define ENTITY_RANGE_SHIFT 11
 #define ENTITY_RANGE_UNIT (1 << ENTITY_RANGE_SHIFT)
 

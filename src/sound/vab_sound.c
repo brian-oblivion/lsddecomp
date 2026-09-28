@@ -21,7 +21,7 @@
 #include "null_driver.h"
 #include "placement_grid.h"
 #include "link_resource.h"
-#include "StageMap.h"
+#include "stage_map.h"
 #include <libsnd.h>
 #include "VabStreamObj.h"
 #include "sound_cue_set.h"

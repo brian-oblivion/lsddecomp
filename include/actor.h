@@ -13,7 +13,7 @@
  * Children and companions. addChild/removeChild/removeAllChildren chain
  * SceneNode's and also record two companions by the child's class id:
  * `(id & 0xFFF) == 0x114` is the grid manager (StageMap, include/
- * StageMap.h), kept in `grid`; `(id & 0xF) == 5` is a FrameClock object,
+ * stage_map.h), kept in `grid`; `(id & 0xF) == 5` is a FrameClock object,
  * kept in `ticker` (SceneNode's onNotify routes that class's events to
  * `update`, +0x098, which the subclasses override as TodActor's
  * Update, Entity__Update and DreamSys__TimerTick).
@@ -43,7 +43,7 @@
 typedef struct Actor Actor;
 typedef struct ActorMethods ActorMethods;
 
-/* The grid manager (include/StageMap.h); only its address is kept here. */
+/* The grid manager (include/stage_map.h); only its address is kept here. */
 struct StageMap;
 
 /* Actor's class id (gActorMethods word +0x000). Two nibbles, so

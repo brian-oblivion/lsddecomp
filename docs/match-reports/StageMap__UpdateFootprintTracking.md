@@ -194,7 +194,7 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
 (include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
@@ -213,4 +213,4 @@ an operator decision; not hand-reverted).
 
 ## Track 7 (2026-09-27, round 95, charlie)
 
-Locals, tier A: `buf` -> `desc` (the Descriptor10Ext getTargetDescriptor fills), `e` -> `slot`, `key` -> `neighbour` (the slot loader's `elemKey`, a neighbour key), `result` -> `specIndex` (sFootprintResultRemap's byte, the index into sFootprintResultPtrTable and the return value), `oldRaw` -> `oldChunk` (the old descriptor's b0/b1, chunk column/row, read as one u16). Constant: 5 -> `STAGEMAP_EVENT_CHUNK_CHANGED` (enum StageMapEvent, include/StageMap.h). The one-line pointer comment (`/* StageMap__UpdateFootprintTracking -- see docs/match-reports/... */`) became a comment saying what the function does.
+Locals, tier A: `buf` -> `desc` (the Descriptor10Ext getTargetDescriptor fills), `e` -> `slot`, `key` -> `neighbour` (the slot loader's `elemKey`, a neighbour key), `result` -> `specIndex` (sFootprintResultRemap's byte, the index into sFootprintResultPtrTable and the return value), `oldRaw` -> `oldChunk` (the old descriptor's b0/b1, chunk column/row, read as one u16). Constant: 5 -> `STAGEMAP_EVENT_CHUNK_CHANGED` (enum StageMapEvent, include/stage_map.h). The one-line pointer comment (`/* StageMap__UpdateFootprintTracking -- see docs/match-reports/... */`) became a comment saying what the function does.

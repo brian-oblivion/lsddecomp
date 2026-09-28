@@ -20,12 +20,12 @@
  * GetTimedTaskMethods: an IntermediateBase with a frame timeout, a sound
  * object and a result.
  *
- * StageMap (include/StageMap.h, whose banner describes the class),
+ * StageMap (include/stage_map.h, whose banner describes the class),
  * New_StageMap through GetStageMapMethods: the loaded part of a stage's
  * map, seven chunk slots each laid out as a lattice of GridCells. Its
  * methods fall in three runs, each introduced below: life and the command
  * path; placing, loading and querying the slots; the drawn window and the
- * scale ramp. Its data tables and SplitCoord2 are in include/StageMap.h.
+ * scale ramp. Its data tables and SplitCoord2 are in include/stage_map.h.
  *
  * NodeGuardedViewport and GridCell, which DayTask and StageMap use, are
  * defined in title_menu.c.
@@ -37,7 +37,7 @@
 #include "dream_day.h"
 #include "VabStreamObj.h"
 #include "node_guarded_viewport.h"
-#include "StageMap.h"
+#include "stage_map.h"
 #include "wbgm.h"
 #include "tim_image.h"
 #include "frame_clock.h"
@@ -75,7 +75,7 @@ extern LongVec3 sNeighbourOffsets[];
 extern const s32 sNeighbourBits[7];
 
 /* `key`-indexed chunk-index steps to the seven chunks around a centre chunk
- * (ChunkNeighbourDelta, include/StageMap.h). */
+ * (ChunkNeighbourDelta, include/stage_map.h). */
 extern const ChunkNeighbourDelta sChunkNeighbourDeltas[7];
 
 /* LbdFile::ownerKey-indexed remap, read signed by
@@ -886,10 +886,10 @@ void StageMap__SetConfig(StageMap *self, StageGridDimensions *config) {
  *  - GetTargetDescriptor, ComputeFootprintDescriptor, SplitChunkIndex,
  *    GetLastEventSlotChunk, FindSlotByNeighbour, FindSlotForPosition:
  *    queries. A slot's position is its cellParent's GsCOORDINATE2, read
- *    through SplitCoord2 (include/StageMap.h).
+ *    through SplitCoord2 (include/stage_map.h).
  *
  * Positions are in world units: a cell is STAGE_CELL_SIZE square, a chunk
- * STAGE_CHUNK_SIZE (include/StageMap.h).
+ * STAGE_CHUNK_SIZE (include/stage_map.h).
  */
 
 /* The height of one layer of a vertical grid: FindSlotForPosition gives

@@ -117,7 +117,7 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
 (include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
@@ -146,7 +146,7 @@ The unit banner was rewritten (what the file holds); the old one, verbatim:
 
 ```c
 /*
- * dream_day -- the last third of StageMap (include/StageMap.h),
+ * dream_day -- the last third of StageMap (include/stage_map.h),
  * sharing include/class_3bb8c.h with dream_day.c.
  *
  *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: slot lookups.

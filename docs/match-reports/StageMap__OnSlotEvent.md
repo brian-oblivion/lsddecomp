@@ -124,7 +124,7 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
 (include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
@@ -145,4 +145,4 @@ This function: `StageMap__OnElementEvent` -> `StageMap__OnSlotEvent` (`python3 t
 
 ## Track 7 (2026-09-27, round 98, charlie)
 
-Events `6`/`7` -> `STAGEMAP_EVENT_SLOT_RELEASE`/`STAGEMAP_EVENT_SLOT_DATA_READY` (include/StageMap.h); labels `handle6`/`merge` -> `release`/`record`; parameter `elem` -> `slot` (the header prototype's name). The `if`+`goto` shape carries a `MATCHING:` line (Residue 2 above). Zero bytes.
+Events `6`/`7` -> `STAGEMAP_EVENT_SLOT_RELEASE`/`STAGEMAP_EVENT_SLOT_DATA_READY` (include/stage_map.h); labels `handle6`/`merge` -> `release`/`record`; parameter `elem` -> `slot` (the header prototype's name). The `if`+`goto` shape carries a `MATCHING:` line (Residue 2 above). Zero bytes.

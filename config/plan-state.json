@@ -1040,7 +1040,7 @@
         "gStageMapMethods": {
           "class": "StageMap",
           "date": "2026-09-26",
-          "header": "include/StageMap.h"
+          "header": "include/stage_map.h"
         },
         "gStreamTaskMethods": {
           "class": "StreamTask",

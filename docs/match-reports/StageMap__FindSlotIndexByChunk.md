@@ -131,7 +131,7 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
 (include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
@@ -153,5 +153,5 @@ This function: `StageMap__FindElemIndexByUnk30` -> `StageMap__FindSlotIndexByChu
 ## Round 96 (track 7, delta)
 
 Parameter `key` -> `chunkIndex` (compared with LbdFile::chunkIndex; also
-the prototype and slot +0x124 in StageMap.h), `e` -> `slot`; loop bound
+the prototype and slot +0x124 in stage_map.h), `e` -> `slot`; loop bound
 `ARRAY_COUNT(self->slots)`. Zero bytes.

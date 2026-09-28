@@ -36,7 +36,7 @@
 #include "model_data.h"
 #include "TriggerWorld.h"
 #include "dream_sys.h"
-#include "StageMap.h"
+#include "stage_map.h"
 #include <rand.h>
 
 extern DreamAuxSlot sDreamAuxSlots[1];

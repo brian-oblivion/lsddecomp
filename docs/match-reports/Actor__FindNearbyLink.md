@@ -157,7 +157,7 @@ Comments quoted below are verbatim as the file stood before this round's
 comment pass, i.e. with this round's renames already applied (the
 `LinkQueryBuf` one as it stood before step 2).
 
-- Locals: `sp18` -> `desc` (a `Descriptor10Ext` now, StageMap.h, so the
+- Locals: `sp18` -> `desc` (a `Descriptor10Ext` now, stage_map.h, so the
   `(Descriptor10Ext *)` cast at computeFootprintDescriptor goes; the old
   0x30-byte `LinkQueryBuf` view is retired, and dropping its 4 trailing
   bytes is byte-identical, measured), `sp48` -> `queries`, `sp78` ->

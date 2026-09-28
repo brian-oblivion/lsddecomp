@@ -227,7 +227,7 @@ struct TimImage;
    ctor keeps it in modelSource and adds its getModel(0), a TmdModel, as a
    child. */
 
-/* Actor::grid is the grid manager, StageMap (include/StageMap.h);
+/* Actor::grid is the grid manager, StageMap (include/stage_map.h);
    dream_sys.c includes that header and calls it directly. */
 
 /* DreamSys's base class is Actor (include/actor.h): DreamSys's own methods

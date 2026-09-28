@@ -46,5 +46,5 @@ Renamed from `ObjM__HandleEvent7` (rename.py): it occupies +0x0B4, which `ObjM__
 
 ## Track 7 (2026-09-27, round 98, delta)
 
-`event == 7` is `STAGEMAP_EVENT_SLOT_DATA_READY` (include/StageMap.h's
+`event == 7` is `STAGEMAP_EVENT_SLOT_DATA_READY` (include/stage_map.h's
 existing enum: the slot's LbdFile has read its data block). Zero bytes.

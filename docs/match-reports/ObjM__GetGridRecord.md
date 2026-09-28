@@ -83,7 +83,7 @@ is the second argument; the forwarded form is byte-identical.
 
 Renamed from `ObjM__OnRegistrantEvent` (`tools/rename.py`). Tier A: the
 body is a lookup leaf, and its one use is as the StageMap's chunkFileFn
-(ObjM__AttachTarget's setCallback; StageMap.h: ComputeChunkLoadEntry calls
+(ObjM__AttachTarget's setCallback; stage_map.h: ComputeChunkLoadEntry calls
 `chunkFileFn(ctx, value, 0, 0)` and keeps the result as the entry's file
 record). The name mirrors the two functions it forwards to,
 GetStageMapChunkRecord and GetStageMapChunkRecordXY. "Registrant event" described nothing

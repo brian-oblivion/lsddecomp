@@ -1,5 +1,5 @@
-#ifndef STAGEMAP_H
-#define STAGEMAP_H
+#ifndef STAGE_MAP_H
+#define STAGE_MAP_H
 
 #include "light_rig.h"
 #include "stage_grid.h"

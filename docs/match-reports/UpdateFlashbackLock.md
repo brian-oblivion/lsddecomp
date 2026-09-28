@@ -147,7 +147,7 @@ without stronger cause.
 ## Track 4 (2026-09-26, round 89)
 
 Renamed `CheckObj866E8CountFlag` -> `UpdateFlashbackLock` with tools/rename.py
-while unifying StageMap (include/StageMap.h). The old name claimed the
+while unifying StageMap (include/stage_map.h). The old name claimed the
 object it reads is a StageMap; it is not. Its one caller,
 `TitleMenu__RefreshMenu`, passes its own `self` as `ctx`, so
 `ctx->+0x0BC` is `TitleMenu::saveBlock` (include/TitleMenu.h: the DreamSys's

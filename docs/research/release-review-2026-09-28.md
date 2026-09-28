@@ -90,7 +90,7 @@ rather than API.
   FileResource methods in game_shell.c, dream_sys.h's
   prototypes; `self` everywhere else.
 - **Guards:** dream_sys.h `CLASS_DREAMSYS`, stage_grid.h `STAGE_GRID`.
-- **`s` externs in headers:** 24 (StageMap.h:416-441, TitleMenu.h:147-170,
+- **`s` externs in headers:** 24 (stage_map.h:416-441, TitleMenu.h:147-170,
   task.h:47/57, scene_node.h:204-205 `sRotationZero`/`sSceneNodeScaleOne`,
   which are also typed `u8[0xC]` for `Ratio16[3]`). Move into the .c or
   rename `g`. Conversely 8 `g` symbols used by one unit only
@@ -230,11 +230,11 @@ reads them, so nothing names them).
   or to the report): register and ABI notes (`$a0`-`$v0`) in scene_node.h,
   TaskCore.h, TextEntry.h, TextRow.h, TileAtlas.h, TileMap.h, sprite.h,
   task.h, item_list.h, StreamTask.h; lwl/lwr and "retail reloads" in
-  StageMap.h, TitleMenu.h, TaskObjF.h, tmd_model.h, sprite.h, StyleEffect.h,
+  stage_map.h, TitleMenu.h, TaskObjF.h, tmd_model.h, sprite.h, StyleEffect.h,
   Viewport.h, movie_player.h, graph_room.h, lbd_file.h, common.h; GCC and splat
   notes in entity.h:46-51, 102-107, 148-153; about 120 lines in gte.h; 32
   pointers at `tools/` commands and `docs/` files; "(no code)" jargon (8).
-- Stale names inside header prose: StageMap.h's `buildRateEntries`
+- Stale names inside header prose: stage_map.h's `buildRateEntries`
   (`loadChunksAround`), `ChunkSlotSpec::key`, `LbdFile::ownerKey`; entity.h's
   merged-unit names ("(Entity, then Entity)"); intermediate_base.h's
   `args->unk0..unkC`; null_driver.h and task.h name one file twice; cd_driver.h

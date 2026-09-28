@@ -118,7 +118,7 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
 (include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
@@ -141,4 +141,4 @@ This function: `StageMap__ComputeRateFlags` -> `StageMap__ComputeNeighbourMask` 
 
 Parameters and locals, tier A: `val` -> `chunk`, `flag` -> `oddRow`, `u` -> `dims`, `divisor` -> `columns`, `unk4` -> `isVertical`, `count` -> `rows`, `flags` -> `offGrid` (the neighbours off the grid; the return value is its complement).
 
-Constants: each mask is spelled as `CHUNK_NEIGHBOUR_BIT()`s of the keys it covers (include/StageMap.h): 3 = PREV_ROW_LO | PREV_ROW_HI (first row), 0x60 = NEXT_ROW_LO | NEXT_ROW_HI (last row), 0x25 = PREV_ROW_LO | PREV_COL | NEXT_ROW_LO and 4 = PREV_COL (first column, odd / even row), 0x10 = NEXT_COL and 0x52 = PREV_ROW_HI | NEXT_COL | NEXT_ROW_HI (last column, odd / even row). The key names come from sChunkNeighbourDeltas' data, (row, col odd, col even): 0 (-1,-1,0), 1 (-1,0,1), 2 (0,-1,-1), 3 (0,0,0), 4 (0,1,1), 5 (1,-1,0), 6 (1,0,1); and sNeighbourOffsets' z (row) and x (column) agree. The masks are exactly the keys each edge case puts off the grid, which is the cross-check.
+Constants: each mask is spelled as `CHUNK_NEIGHBOUR_BIT()`s of the keys it covers (include/stage_map.h): 3 = PREV_ROW_LO | PREV_ROW_HI (first row), 0x60 = NEXT_ROW_LO | NEXT_ROW_HI (last row), 0x25 = PREV_ROW_LO | PREV_COL | NEXT_ROW_LO and 4 = PREV_COL (first column, odd / even row), 0x10 = NEXT_COL and 0x52 = PREV_ROW_HI | NEXT_COL | NEXT_ROW_HI (last column, odd / even row). The key names come from sChunkNeighbourDeltas' data, (row, col odd, col even): 0 (-1,-1,0), 1 (-1,0,1), 2 (0,-1,-1), 3 (0,0,0), 4 (0,1,1), 5 (1,-1,0), 6 (1,0,1); and sNeighbourOffsets' z (row) and x (column) agree. The masks are exactly the keys each edge case puts off the grid, which is the cross-check.

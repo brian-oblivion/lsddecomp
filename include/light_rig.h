@@ -25,7 +25,7 @@
  * its FrameClock object (+0x010) to it as a child. One class derives from
  * it: StageMap (gStageMapMethods, 0x114, the grid manager), whose ctor and
  * finalize chain to this class's first and whose table inherits getLight
- * unchanged; it expands these macros (include/StageMap.h).
+ * unchanged; it expands these macros (include/stage_map.h).
  *
  * The ctor chains to SceneNode's (GetSceneNodeMethods()->ctor), so the id
  * tree (0x4 -> 0x14) is the ctor chain. The ctor returns nothing, but the

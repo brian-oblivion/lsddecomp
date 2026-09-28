@@ -178,7 +178,7 @@ Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 Parameters kind/out/ctx/entry -> moodIndex/desc/trigger/spawnIndex (`ctx` is
 the chunk's DreamAuxTriggerEntry; `*(u16 *)ctx` is `trigger->key`; reading it
 through the s16 field is byte-identical). The local cell descriptor
-is StageMap.h's Descriptor10 as computeCellOffsets reads it: `chunk` (the
+is stage_map.h's Descriptor10 as computeCellOffsets reads it: `chunk` (the
 chunk's column/row), `cell` (DreamAuxSpawnInfo.cell, was val0), `offset`
 (sDreamAuxPosTable[offsetIndex], was posIndex). D_80088F18 was renamed
 sDreamAuxSpawnRotations (tools/rename.py, tier A): four Ratio16 triples,

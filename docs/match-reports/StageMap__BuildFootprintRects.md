@@ -689,7 +689,7 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
 (include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
@@ -740,5 +740,5 @@ Kept as a one-line `MATCHING:` note under a new descriptive comment.
   of the chunk), `_PREV_ROW_LO`/`_PREV_ROW_HI` (start above it).
   `key + 1`, the slot of the part past the right edge, stays arithmetic.
 - `0x14` -> `STAGE_CHUNK_CELLS`; `>= 0x15` -> `> STAGE_CHUNK_CELLS` (same
-  code); `0xA` -> `STAGE_CHUNK_HALF_CELLS`, new in StageMap.h (additive,
+  code); `0xA` -> `STAGE_CHUNK_HALF_CELLS`, new in stage_map.h (additive,
   `STAGE_CHUNK_CELLS / 2`, the odd-row stagger).

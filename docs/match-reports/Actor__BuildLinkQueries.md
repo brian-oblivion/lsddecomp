@@ -387,14 +387,14 @@ comment pass, i.e. with this round's renames already applied (the
 | old | new | why |
 | --- | --- | --- |
 | `arr1`, `arr2` | `queries`, `slots` | the GridQuery[] and ChunkSlot *[] it fills |
-| `arg3` | `desc` | computeFootprintDescriptor's `out` (StageMap.h) |
+| `arg3` | `desc` | computeFootprintDescriptor's `out` (stage_map.h) |
 | `arg4` | `span` | the window's width in cells, rounded up to odd; StageMap__SetFootprintFromCell's own name for its span |
 | `f2`, `f3` | `cellCol`, `cellRow` | Descriptor10's b2/b3, the cell column/row in the chunk |
 | `idx` | `count` | the number of queries filled, the return value |
 | `unk4C`, `unk68` | `map`, `dims` | the StageMap and its StageGridDimensions |
 | `src`, `s3`, `pos` | `slot`, `slotKey`, `key` | desc's slot, its loader's elemKey, findSlotByNeighbour's `key` |
 
-- `desc` is now StageMap.h's `Descriptor10Ext *` (this unit's view
+- `desc` is now stage_map.h's `Descriptor10Ext *` (this unit's view
   `LinkQueryBuf` retired: `queryCol`/`queryRow`/`source` are
   `base.b2`/`base.b3`/`slot`; its 4 trailing bytes were not needed, measured).
 - `0x13` is `STAGE_CHUNK_CELLS - 1`, the last cell column/row of a chunk.
@@ -415,7 +415,7 @@ Three comments lost their history; what they said, verbatim:
 ```
 
 ```c
-/* The grid (self->grid) is a StageMap (include/StageMap.h). Its
+/* The grid (self->grid) is a StageMap (include/stage_map.h). Its
  * elements (ChunkSlot) are what Actor__BuildLinkQueries collects: the
  * loader's headerReady gates Actor__ScanLinkCandidates, its ownerKey is the
  * element key BuildLinkQueries steps by one, and `cells` is the 20-wide grid
@@ -425,7 +425,7 @@ Three comments lost their history; what they said, verbatim:
 
 ```c
 /* Output buffer filled in by the grid's computeFootprintDescriptor (a
- * Descriptor10Ext, include/StageMap.h: queryCol/queryRow are base.b2/b3,
+ * Descriptor10Ext, include/stage_map.h: queryCol/queryRow are base.b2/b3,
  * source is unk24; this view is 0x30 bytes, and the frame needs it) and read back by this unit's own Actor__BuildLinkQueries.
  * Only the three fields actually touched are named. `queryCol`/`queryRow`
  * feed straight into GridQuery::startCol/startRow (Actor__BuildLinkQueries,

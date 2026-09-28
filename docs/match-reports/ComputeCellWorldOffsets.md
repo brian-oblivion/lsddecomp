@@ -373,7 +373,7 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
 (include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
@@ -394,7 +394,7 @@ an operator decision; not hand-reverted).
 
 Parameters and locals, tier A from the body: `arg0` -> `outPos` (the cell point), `outBuf` -> `chunkPos` (the chunk corner, then +half a chunk, its centre), `arg2` -> `dims`, `arg3` -> `origin`, `arg4` -> `cell`, `idx` -> `row` (the chunk row, `cell->b1`), `factor` -> `rowSpan` (`rows`, or 1 in a vertical grid), `sum` -> `chunkIndex` (column + columns * row, the return value), `v1` -> `x`, `a0v` -> `z`, `off` -> `halfCell`.
 
-Constants: 0x5000 -> `STAGE_CHUNK_SIZE / 2`, 0xA000 -> `STAGE_CHUNK_SIZE`, `<< 11` -> `<< STAGE_CELL_SHIFT`, 0x400 -> `STAGE_CELL_SIZE / 2` (include/StageMap.h; evidence on the definitions). The one-line `/* MATCHING */` on `halfCell` replaces the history below.
+Constants: 0x5000 -> `STAGE_CHUNK_SIZE / 2`, 0xA000 -> `STAGE_CHUNK_SIZE`, `<< 11` -> `<< STAGE_CELL_SHIFT`, 0x400 -> `STAGE_CELL_SIZE / 2` (include/stage_map.h; evidence on the definitions). The one-line `/* MATCHING */` on `halfCell` replaces the history below.
 
 The comment that stood above the function in `src/world/dream_day.c`, moved here verbatim (its local names are the pre-track-7 ones):
 

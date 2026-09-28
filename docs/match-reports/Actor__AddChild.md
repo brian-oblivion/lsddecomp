@@ -89,4 +89,4 @@ Renamed from `BaseObjO__LinkCompanion`. Override of +0x010 (addChild), named for
 
 ## Track 7 (round 99, alpha)
 
-Local tag -> classId; the FrameClock test is `(classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID` (include/basic_class.h, include/frame_clock.h). The StageMap test keeps `(classId & 0xFFF) == 0x114`: delta adds STAGEMAP_CLASS_ID to include/StageMap.h this round, and using it here is proposed for after the merge.
+Local tag -> classId; the FrameClock test is `(classId & CLASS_ID_ROOT_MASK) == FRAMECLOCK_CLASS_ID` (include/basic_class.h, include/frame_clock.h). The StageMap test keeps `(classId & 0xFFF) == 0x114`: delta adds STAGEMAP_CLASS_ID to include/stage_map.h this round, and using it here is proposed for after the merge.

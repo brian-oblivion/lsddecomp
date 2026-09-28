@@ -40,7 +40,7 @@
 #include "pad.h"
 #include "frame_clock.h"
 #include "link_resource.h"
-#include "StageMap.h"
+#include "stage_map.h"
 #include "lbd_file.h"
 #include "VabStreamObj.h"
 #include "Viewport.h"

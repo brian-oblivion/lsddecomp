@@ -586,7 +586,7 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
 (include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
@@ -609,7 +609,7 @@ This function: `StageMap__ComputeRateEntry` -> `StageMap__ComputeChunkLoadEntry`
 
 Parameters and locals, tier A: `arg1` -> `out`, `divisor` -> `columns`, `flag` -> `oddRow`, `val` -> `centreChunk`, `savedResult` -> `onGridMask`, `key` -> `neighbour`, `mask` -> `bit` (sNeighbourBits[neighbour]), `entry` -> `delta` (the sChunkNeighbourDeltas entry), `value` -> `chunk`, `sum` -> `step` (the merged local the match depends on; now marked `/* MATCHING */`).
 
-Left: the two `*(s32 *)((u8 *)out + 4)` writes. ChunkLoadEntry declares `chunkIndex` s16 plus a pad; retyping it `s32` (dropping `pad6`) and writing `out->chunkIndex` builds byte-identical (measured this round, then reverted: include/StageMap.h is shared and the change is not additive). Proposed to the head. The `do {} while (0);` keeps a one-line `/* MATCHING */`.
+Left: the two `*(s32 *)((u8 *)out + 4)` writes. ChunkLoadEntry declares `chunkIndex` s16 plus a pad; retyping it `s32` (dropping `pad6`) and writing `out->chunkIndex` builds byte-identical (measured this round, then reverted: include/stage_map.h is shared and the change is not additive). Proposed to the head. The `do {} while (0);` keeps a one-line `/* MATCHING */`.
 
 The comment that stood above the function in `src/world/dream_day.c`, moved here verbatim (its local names are the pre-track-7 ones):
 

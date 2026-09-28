@@ -273,7 +273,7 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
 (include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
@@ -404,7 +404,7 @@ Zero-byte polish, each step verified whole-image:
 - the cell walk indexes `GridCell **` (`cells`, `cursor`, `end = cells + STAGE_SLOT_CELLS`) instead of a `u8 *` stepped by 4; the round-67 staging fix above (`end` computed from `cells` before `cursor = cells`) still applies and now carries a `MATCHING:` line;
 - the lattice position is a `LongVec3 pos` instead of `s32 buf[3]` cast to `LongVec3 *`;
 - measured this round: dropping the two reloads `cell = *cursor` (reusing the `New_GridCell()` result) breaks the image, so they carry a `MATCHING:` line;
-- constants: `0x668` -> `STAGE_SLOT_CELLS * sizeof(GridCell *)`, `0x400` -> `STAGE_CELL_SIZE / 2`, `0x800` -> `STAGE_CELL_SIZE`, `0xA400` -> `STAGE_CHUNK_SIZE + STAGE_CELL_SIZE / 2` (all include/StageMap.h), `0x80000000` -> Sony's `GsDOFF`, the `setLightMode` 1 annotated `GsFOG` (SceneNode__SetLightMode's 3-bit field at bit 3, as in entity.c and dream_scene.c), `i < 7` -> `ARRAY_COUNT(self->slots)`, `acceptedTags = 0` -> `NULL`;
+- constants: `0x668` -> `STAGE_SLOT_CELLS * sizeof(GridCell *)`, `0x400` -> `STAGE_CELL_SIZE / 2`, `0x800` -> `STAGE_CELL_SIZE`, `0xA400` -> `STAGE_CHUNK_SIZE + STAGE_CELL_SIZE / 2` (all include/stage_map.h), `0x80000000` -> Sony's `GsDOFF`, the `setLightMode` 1 annotated `GsFOG` (SceneNode__SetLightMode's 3-bit field at bit 3, as in entity.c and dream_scene.c), `i < 7` -> `ARRAY_COUNT(self->slots)`, `acceptedTags = 0` -> `NULL`;
 - `BMemPMgrAlloc`/`BMemPMgrFree` come from include/bmem_pmgr.h; the unit's local externs and their comment ("all still-uncarved elsewhere, typed purely from this call site's own register usage", stale since bmem_pmgr.c was carved) are gone.
 - the in-code comment on the wrap test records the 21-positions-per-row fact from "The 21-vs-20 discrepancy" above, without a reading of it.
 

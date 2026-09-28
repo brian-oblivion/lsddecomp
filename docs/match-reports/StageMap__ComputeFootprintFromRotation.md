@@ -749,7 +749,7 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
 (include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
@@ -808,7 +808,7 @@ retail's compare).
   columns swapped. RefreshFootprint passes gridHalfCells * 2 and gridCells,
   equal (20) at the default span. The backward start in the first arm,
   `cellCol - acrossCells + 1`, uses acrossCells where aheadCells is the
-  width: retail's own, harmless while the two are equal. StageMap.h's
+  width: retail's own, harmless while the two are equal. stage_map.h's
   prototype said `width, height`, which each arm contradicts; it now says
   `acrossCells, aheadCells`.
 - `sub` -> `param` (the coord2's GsCOORD2PARAM), `buf` -> `desc`,
@@ -824,7 +824,7 @@ retail's compare).
   `(135)`, `(225)`, `(270)`: new in include/common.h,
   `((deg) * 4096 / 360)`, exact at multiples of 45. The tests read: facing
   within 45 degrees of 90 or 270 (x), else of 180 or 0 (z).
-- `>> 11` -> `>> STAGE_CELL_SHIFT` (StageMap.h: world units to cells).
+- `>> 11` -> `>> STAGE_CELL_SHIFT` (stage_map.h: world units to cells).
 - `D_8008E98C` -> Sony's `GsIDMATRIX` (config/psyq-objects.ld pins it for
   nine libgs objects); the unit includes `<libgpu.h>` and `<libgs.h>`, the
   local extern is gone. The old extern's comment called it bss; it is libgs

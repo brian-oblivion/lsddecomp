@@ -890,7 +890,7 @@ Zero-byte rewrite of the live body, whole image green:
   records). 76/76 on the first build. The chained-record access,
   `(u8 *)self->buffer + placement->next`, stays a byte offset: `next` is a
   byte offset stored in the file.
-- Constants from `include/StageMap.h`, whose grid geometry this is: 0x190
+- Constants from `include/stage_map.h`, whose grid geometry this is: 0x190
   is `STAGE_SLOT_LATTICE_CELLS`, 20 is `STAGE_CHUNK_CELLS`, `<< 11` is
   `<< STAGE_CELL_SHIFT`, `+ 0x400` is `+ STAGE_CELL_SIZE / 2` (the cell's
   centre). `rotY << 10` is `rotY * ANGLE_DEG(90)`: GsCOORD2PARAM's rotate
