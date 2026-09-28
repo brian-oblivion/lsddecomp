@@ -130,6 +130,13 @@ def main():
         print(f"  token   {t} -> {mapping[t]}   ({len(found[t])} file(s))")
     if hdr_old.exists():
         print(f"  header  include/{old}.h -> include/{new}.h")
+    else:
+        import plan
+        h = plan.class_header(old)
+        if (ROOT / h).exists():
+            # a snake_case file is named for what it holds, not spelled from
+            # the type (track 11): the head decides whether it follows
+            print(f"  header  {h} keeps its name; `tools/unitfile.py header` moves it if it should follow")
     for rel in sorted(rename.RULE_DOCS):
         rp = ROOT / rel
         if rp.exists() and old in rp.read_text(errors="replace"):

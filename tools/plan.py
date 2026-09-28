@@ -299,6 +299,39 @@ def ledger_rename(mapping, drop_duplicates=False):
         save_state(new)
 
 
+def ledger_rename_unit(old, new):
+    """A paths-only unit rename (unitfile.py, track 11): the unit's own keys
+    move (`units_done`, track 8's `parked`) while a class of the same name,
+    and every other value, stays as it is."""
+    if not STATE.exists() or old == new:
+        return
+    st = json.loads(STATE.read_text())
+    changed = False
+    for tr in st["tracks"].values():
+        for key in ("units_done", "parked"):
+            d = tr.get(key)
+            if isinstance(d, dict) and old in d:
+                d[new] = d.pop(old)
+                changed = True
+    if changed:
+        save_state(st)
+
+
+def class_header(name, led=None):
+    """A class's header: the ledger's, else include/<Class>.h, else the game
+    header that defines the type (track 11 names files in snake_case, so the
+    stem no longer spells the class)."""
+    if led and led.get("header"):
+        return led["header"]
+    if (ROOT / f"include/{name}.h").exists():
+        return f"include/{name}.h"
+    rx = re.compile(rf"(?:\}}\s*{re.escape(name)}\s*;|\bstruct\s+{re.escape(name)}\s*\{{)")
+    for h in sorted((ROOT / "include").glob("*.h")):
+        if rx.search(h.read_text(errors="replace")):
+            return f"include/{h.name}"
+    return f"include/{name}.h"
+
+
 def run_json(cmd):
     out = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT).stdout
     # progress.py may print warnings above the JSON
@@ -820,7 +853,7 @@ def collect_phase2(st, info, t5_status, classes, units_meta):
     byt = {c["table"]: c for c in classes}
     for c in sorted(classes, key=lambda c: (dep(c), c["id"])):
         name = c.get("name") or c["table"]
-        hdr = f"include/{name}.h"
+        hdr = class_header(name)
         ph_name = name in types
         ph_table = not TABLE_NAME.match(c["table"])
         if c["table"] in parked6 or not (ph_name or ph_table):
@@ -1600,8 +1633,12 @@ def print_status(d, n, st):
         ck = t[k]["checklist"]
         left = [i for i, v in ck.items() if not v]
         ops = [i for i in left if PHASE3[k][1][i][1] is None]
+        extra = ""
+        if k == "11":
+            import unitfile
+            extra = f"; {len(unitfile.not_snake())} game file(s) not snake_case (tools/unitfile.py check)"
         print(f"  {k:<6} {t[k]['status'].split(' (')[0]:<10} {t[k]['title']}: {sum(ck.values())}/{len(ck)} "
-              f"items ticked" + (f"; operator decision: {', '.join(ops)}" if ops else ""))
+              f"items ticked" + (f"; operator decision: {', '.join(ops)}" if ops else "") + extra)
     for k in ("6", "7", "8", "9", *PHASE3):
         if t[k]["status"].startswith("waiting"):
             print(f"         track {k}: {t[k]['status']}")
@@ -1713,7 +1750,8 @@ def main():
     sub.add_parser("classes")
     mc = sub.add_parser("mark-class")
     mc.add_argument("--table", required=True, help="the method-table symbol (typeviews.py --census)")
-    mc.add_argument("--class", dest="klass", help="the class's type name; its header is include/<Class>.h")
+    mc.add_argument("--class", dest="klass", help="the class's type name; its header is found by plan.class_header")
+    mc.add_argument("--header", help="the class's header, when the lookup cannot tell (include/<file>.h)")
     mc.add_argument("--park", default="", help="park instead of unify: the reason (track 4 park rule)")
     mc.add_argument("--undo", action="store_true")
     r = sub.add_parser("record-round")
@@ -1845,7 +1883,7 @@ def main():
             sys.exit(f"FATAL: {a.table} is not a method table (typeviews.py --tree)")
         if not a.park and not a.klass:
             sys.exit("FATAL: --class is required to mark a class unified")
-        hdr = f"include/{a.klass}.h" if a.klass else None
+        hdr = (a.header or class_header(a.klass)) if a.klass else None
         if hdr and not (ROOT / hdr).exists():
             sys.exit(f"FATAL: {hdr} does not exist; a unified class has its own header")
         led[a.table] = {"class": a.klass, "header": hdr, "date": today,

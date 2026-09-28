@@ -6,7 +6,7 @@
     python3 tools/replay.py ... --dry-run   # list what is left, change nothing
 
 Every rename commit's first line is its exact command (`python3
-tools/rename.py OLD NEW`, `renametype.py`, `unitfile.py rename|merge`). Once
+tools/rename.py OLD NEW`, `renametype.py`, `unitfile.py rename|merge|header`). Once
 the branch is merged its renames are already in the tree, so re-running a
 command is refused (NEW exists, OLD is gone: round 90). What is still wrong is
 each side's OLD tokens in the OTHER side's text: a conflicted hunk resolved to
@@ -46,31 +46,52 @@ def git(*args):
 
 def commands(rng):
     out = []
-    for subj in git("log", "--reverse", "--format=%s", rng).splitlines():
+    for line in git("log", "--reverse", "--format=%H %s", rng).splitlines():
+        sha, _, subj = line.partition(" ")
         w = shlex.split(subj) if subj.startswith("python3 tools/") else []
         flags = tuple(x for x in w if x.startswith("--"))
         w = [x for x in w if not x.startswith("--")]
         if len(w) == 4 and w[1] in ("tools/rename.py", "tools/renametype.py"):
-            out.append((w[1][6:-3], w[2], w[3], flags))
-        elif len(w) == 5 and w[1] == "tools/unitfile.py" and w[2] in ("rename", "merge"):
-            out.append((f"unitfile {w[2]}", w[3], w[4], flags))
+            out.append((w[1][6:-3], w[2], w[3], flags, sha))
+        elif len(w) == 5 and w[1] == "tools/unitfile.py" and w[2] in ("rename", "merge", "header"):
+            out.append((f"unitfile {w[2]}", w[3], w[4], flags, sha))
     return out
 
 
-def mapping(kind, a, b, flags=()):
-    """The token map of one command, from what is LEFT."""
+def moved(sha):
+    """{old path: new path} for the files commit `sha` renamed."""
+    out = {}
+    for l in git("show", "--format=", "--name-status", "-M", sha).splitlines():
+        f = l.split("\t")
+        if f[0].startswith("R") and len(f) == 3:
+            out[f[1]] = f[2]
+    return out
+
+
+def mapping(kind, a, b, flags=(), sha=None):
+    """The token map of one command, from what is LEFT and the paths its
+    commit `sha` moved."""
     if kind == "rename":
         return {a: b}
     if kind == "renametype":
         found, lower_rx, upper_rx = renametype.occurrences(a, a.upper())
         return {t: (lower_rx.sub(b, t) if lower_rx.search(t) else upper_rx.sub(b.upper(), t))
                 for t in found}
-    if kind == "unitfile rename":
+    if kind in ("unitfile rename", "unitfile header"):
         new = unitfile.unit_stem(b)
-        m = {f"src/{a}.c": f"src/{b}.c"}
-        if new != a:
-            m.update({a: new, f"{a.upper()}_H": f"{new.upper()}_H"})
-        return m
+        mv = moved(sha) if sha else {}
+        if kind == "unitfile header":
+            return unitfile.rename_map(a, new, None, None, True, True)
+        cs = [(o, n) for o, n in mv.items() if o.endswith(f"/{a}.c") and o.startswith("src/")]
+        # no move in the command's own commit (squashed, or staged into
+        # another): the tree says where the file went, and a stem change
+        # keeps its directory
+        new_c = cs[0][1] if cs else f"src/{b}.c"
+        old_c = cs[0][0] if cs else f"{new_c.rsplit('/', 1)[0]}/{a}.c"
+        hdr = f"include/{a}.h" in mv or (not cs and (ROOT / f"include/{new}.h").exists()
+                                          and not (ROOT / f"include/{a}.h").exists())
+        # paths only when the stem is still a type in code (unitfile.cmd_rename)
+        return unitfile.rename_map(a, new, old_c, new_c, hdr, bool(unitfile.code_identifier(a)))
     if "--as-b" in flags:
         return {a: b}
     return {b: a}              # unitfile merge A B: B's name became A
@@ -107,16 +128,22 @@ def rewrite(m, tip, dry, unit=False):
     rx = unitfile.token_rx if unit else (lambda o: re.compile(rf"(?<![A-Za-z0-9_]){re.escape(o)}(?![A-Za-z0-9_])"))
     rxs = [(rx(o), n) for o, n in sorted(m.items(), key=lambda kv: -len(kv[0]))]
     hits = []
-    for p in [q for q in rename.text_files() if q.exists()] + [unitfile.WARNINGS]:
+    for p in unitfile.text_files() if unit else [q for q in rename.text_files() if q.exists()] + [unitfile.WARNINGS]:
+        if not p.exists():
+            continue
         text = p.read_text(errors="replace")
         if not any(rx.search(text) for rx, _ in rxs):
             continue
         mine = own_lines(tip, p)
         out = text
-        for rx, n in rxs:
-            if rename.is_code(p):
+        if rename.is_code(p):
+            for rx, n in rxs:
                 out = "\n".join(l if l in mine else rx.sub(n, l) for l in out.split("\n"))
-            else:
+        elif unit:
+            # a unit's keys are judged per line at once, as unitfile.py does
+            out = unitfile.sub_prose_all(rxs, out, p, keep_lines=mine)
+        else:
+            for rx, n in rxs:
                 out = rename.sub_prose(rx, n, out, p, keep_lines=mine)
         if out != text:
             a, b = text.split("\n"), out.split("\n")
@@ -187,14 +214,17 @@ def main():
     cmds = [(c, r.split("..")[-1]) for r in rngs for c in commands(r)]
     print(f"replay {' '.join(rngs)}: {len(cmds)} rename command(s)")
     total, touched = 0, set()
-    for (kind, x, y, flags), tip in cmds:
-        m = mapping(kind, x, y, flags)
+    for (kind, x, y, flags, sha), tip in cmds:
+        m = mapping(kind, x, y, flags, sha)
         hits = rewrite(m, tip, a.dry_run, unit=kind.startswith("unitfile")) if m else []
         total += len(hits)
         touched |= {h for h, _ in hits}
         print(f"  {kind} {x} {y}{''.join(' ' + f for f in flags)}: {len(hits)} leftover(s)" + "".join(f"\n      {h}:{n}" for h, n in hits[:12]))
         if m and not a.dry_run:
             plan.ledger_rename(m, drop_duplicates=kind == "unitfile merge")
+            if kind == "unitfile rename" and x not in m:        # paths only
+                plan.ledger_rename_unit(x, unitfile.unit_stem(y))
+                unitfile.warnings_prefix(x, unitfile.unit_stem(y))
     if not a.dry_run:
         # staged, so the merge commit holds them (round 94: the first merge
         # commit held the pre-replay ObjM.h)

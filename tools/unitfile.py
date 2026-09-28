@@ -3,6 +3,8 @@
 
     python3 tools/unitfile.py rename OLD NEW [--dry-run] [--no-build]
     python3 tools/unitfile.py merge A B [--as-b] [--dry-run] [--no-build]    # B's functions join A
+    python3 tools/unitfile.py header OLD NEW [--dry-run] [--no-build]        # include/OLD.h, no unit
+    python3 tools/unitfile.py check                                          # game files not snake_case
 
 A unit's NAME lives in the splat yaml (`- [0xD294, c, code_d294]` and its
 `.rodata` line), in its file names (src/OLD.c, the same-stem header
@@ -20,9 +22,24 @@ exists), whole-token rewrite of OLD / OLD_H guard in code and docs (not
 PROGRESS.md or the archive, nor a report's history sections, nor a prose
 line already naming NEW, as rename.py), the ledger and the warnings
 baseline; deletes build/src/OLD.c.o; `make extract`; `./build-and-verify.sh`.
-A move into a directory (`rename Entity world/Entity`) keeps the stem, so it
-rewrites only `src/OLD.c` paths and is allowed for a type-named file. `OLD.h`
-is never rewritten while include/OLD.h exists.
+`OLD.h` is never rewritten while include/OLD.h exists.
+
+PATHS ONLY for a type-named file (track 11): when OLD is also an identifier
+in code (`Entity`, `SceneNode`), a token rewrite would rename the type, so
+only file references move: `src/<dir>/OLD.c`, `asm/nonmatchings/<dir>/OLD`,
+`OLD.c`, `OLD.h` (and include/OLD.h itself) and the guard `OLD_H` become
+NEW's, the ledger's `units_done` keys and header paths follow, and so does
+the warnings baseline's `OLD:` prefix. Prose that names the TYPE is left
+alone. `rename Entity world/entity` is one such run; a move into a
+directory that keeps the stem is the same rule with nothing but a path to
+change.
+
+header: include/OLD.h -> include/NEW.h for a header no unit owns (a class
+header whose methods live in a unit named otherwise, `ObjM.h`): `OLD.h`
+references, the guard, the ledger's header paths. Paths only, always.
+
+check: every game file in src/ and include/ whose stem is not snake_case
+(FINISHING-PLAN track 11; Sony's src/psyq/ and include/psyq/ excluded).
 
 merge: B must be the text subsegment IMMEDIATELY after A in the yaml, and if
 both own a `.rodata` line, B's must immediately follow A's (else the merged
@@ -90,20 +107,102 @@ def token_rx(old):
                       if "/" in old else rf"(?<![A-Za-z0-9_]){re.escape(old)}(?![A-Za-z0-9_]){keep_h}")
 
 
+def text_files():
+    """rename.py's files, the README (its code map names paths) and the
+    warnings baseline."""
+    return [q for q in rename.text_files() if q.exists()] + [ROOT / "README.md", WARNINGS]
+
+
+def rename_map(old, new, old_c, new_c, header_moved, paths_only):
+    """The text map of one `rename` or `header` run. old_c/new_c are the .c
+    paths relative to ROOT (None for `header`). Shared with replay.py, which
+    reads them off the commit, so both rewrite exactly the same things."""
+    m = {}
+    if old_c and old_c != new_c:
+        m[old_c] = new_c
+        strip = lambda c: c[len("src/"):-len(".c")]
+        m[f"asm/nonmatchings/{strip(old_c)}"] = f"asm/nonmatchings/{strip(new_c)}"
+    if new != old:
+        if old_c:
+            m[f"{old}.c"] = f"{new}.c"
+        if header_moved:
+            m[f"{old}.h"] = f"{new}.h"
+        m[f"{old.upper()}_H"] = f"{new.upper()}_H"
+        if not paths_only:
+            m[old] = new
+    return {o: n for o, n in m.items() if o != n}      # SceneNode's SCENENODE_H moves; Entity's ENTITY_H does not
+
+
+def sub_prose_all(pairs, text, path, keep_lines=()):
+    """rename.sub_prose for several keys at once. Each line is judged ONCE,
+    on its original text, and then takes every key: applied one key at a
+    time, the first key's rewrite makes the line "already name NEW" for the
+    next, and `src/world/Entity.c` became `src/world/entity.c` beside a bare
+    `Entity.c` left behind."""
+    nxs = [re.compile(rf"(?<![A-Za-z0-9_]){re.escape(n)}(?![A-Za-z0-9_])") for _, n in pairs]
+    frozen = rename.frozen_spans(text) if Path(path).parent.name == "match-reports" else []
+    out, pos = [], 0
+    for line in text.split("\n"):
+        at, pos = pos, pos + len(line) + 1
+        keep = (any(nx.search(line) for nx in nxs) or line in keep_lines
+                or line.startswith(rename.RENAMED_NOTE) or any(s <= at < e for s, e in frozen))
+        if not keep:
+            for rx, n in pairs:
+                line = rx.sub(n, line)
+        out.append(line)
+    return "\n".join(out)
+
+
+def warnings_prefix(old, new, dry=False):
+    """The warnings baseline keys a line by unit name (`Entity: warning:`)."""
+    if old == new or not WARNINGS.exists():
+        return 0
+    text = WARNINGS.read_text()
+    out, n = re.subn(rf"^{re.escape(old)}:", f"{new}:", text, flags=re.M)
+    if n and not dry:
+        WARNINGS.write_text(out)
+    return n
+
+
 def rewrite_tokens(mapping, skip=()):
     rxs = [(token_rx(o), n) for o, n in sorted(mapping.items(), key=lambda kv: -len(kv[0]))]
     touched = []
-    for p in [q for q in rename.text_files() if q.exists()] + [WARNINGS]:
-        if p in skip:
+    for p in text_files():
+        if p in skip or not p.exists():
             continue
         text = p.read_text(errors="replace")
         out = text
-        for rx, n in rxs:
-            out = rx.sub(n, out) if rename.is_code(p) else rename.sub_prose(rx, n, out, p)
+        if rename.is_code(p):
+            for rx, n in rxs:
+                out = rx.sub(n, out)
+        else:
+            out = sub_prose_all(rxs, out, p)
         if out != text:
             p.write_text(out)
             touched.append(p.relative_to(ROOT).as_posix())
     return touched
+
+
+def rule_doc_mentions(mapping):
+    """RULE docs are never rewritten (rename.py): list their mentions for the head."""
+    rxs = [token_rx(o) for o in mapping]
+    for rel in sorted(rename.RULE_DOCS):
+        rp = ROOT / rel
+        if rp.exists():
+            n = sum(len(rx.findall(rp.read_text(errors="replace"))) for rx in rxs)
+            if n:
+                print(f"  rule doc, NOT rewritten: {rel} ({n} mention(s)); the head updates it")
+
+
+SNAKE = re.compile(r"^[a-z][a-z0-9_]*$")
+NOT_GAME = {"include_asm.h"}          # splat regenerates it on every make extract
+
+
+def not_snake():
+    """Game files whose stem is not snake_case (track 11's measurement)."""
+    files = [p for p in srcpath.src_files() if "psyq" not in p.relative_to(ROOT / "src").parts]
+    files += [p for p in sorted((ROOT / "include").glob("*.h")) if p.name not in NOT_GAME]
+    return [p.relative_to(ROOT).as_posix() for p in files if not SNAKE.match(p.stem)]
 
 
 def code_identifier(name):
@@ -143,22 +242,22 @@ def cmd_rename(a):
     c, ro = find_unit(rows, old)
     if c is None:
         sys.exit(f"FATAL: no `c` subsegment named {old} in the yaml")
-    # A move into a directory keeps the stem, so no token changes: only the
-    # file's path does (track 9 `layout`; 16 of 45 files are named for a type).
+    # A type-named file (the stem is also an identifier in code) moves by
+    # paths only: a token rewrite would rename the type (track 11).
     hit = code_identifier(old) if new != old else None
-    if hit:
-        sys.exit(f"FATAL: {old} is also an identifier in code ({hit}); a token rewrite would rename it "
-                 f"too. Rename the file by hand (yaml line, git mv, INCLUDE_ASM paths).")
     src_old = srcpath.unit_src(old)
     old_path = src_old.relative_to(ROOT / "src").with_suffix("").as_posix()
     src_new = ROOT / "src" / f"{new_path}.c"
     hdr_old, hdr_new = ROOT / f"include/{old}.h", ROOT / f"include/{new}.h"
-    if hdr_new.exists() and hdr_old.exists() and new != old:
+    moving_hdr = hdr_old.exists() and new != old
+    if moving_hdr and hdr_new.exists() and hdr_new.resolve() != hdr_old.resolve():
         sys.exit(f"FATAL: include/{new}.h already exists")
-    print(f"unitfile rename {old} -> {new_path}")
+    print(f"unitfile rename {old} -> {new_path}" + (f"  (paths only: {old} is a type, {hit})" if hit else ""))
     print(f"  yaml: {1 + len(ro)} line(s); src: {src_old.relative_to(ROOT)} -> {src_new.relative_to(ROOT)}")
-    if hdr_old.exists() and new != old:
+    if moving_hdr:
         print(f"  header: include/{old}.h -> include/{new}.h")
+    mapping = rename_map(old, new, f"src/{old_path}.c", f"src/{new_path}.c", moving_hdr, bool(hit))
+    rule_doc_mentions(mapping)
     if a.dry_run:
         return 0
     for i, _, _, name in [c] + ro:
@@ -167,23 +266,54 @@ def cmd_rename(a):
     YAML.write_text("\n".join(lines))
     src_new.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(["git", "mv", str(src_old), str(src_new)], check=True)
-    if hdr_old.exists() and new != old:
+    if moving_hdr:
         subprocess.run(["git", "mv", str(hdr_old), str(hdr_new)], check=True)
     text = src_new.read_text()
     text = text.replace(f'"asm/nonmatchings/{old_path}"', f'"asm/nonmatchings/{new_path}"')
     src_new.write_text(text)
-    mapping = {f"src/{old_path}.c": f"src/{new_path}.c"}
-    if new != old:
-        mapping.update({old: new, f"{old.upper()}_H": f"{new.upper()}_H"})
     touched = rewrite_tokens(mapping)
+    warnings_prefix(old, new) if hit else None
     import plan
     if new != old:
-        plan.ledger_rename({old: new})
+        plan.ledger_rename(mapping)
+        plan.ledger_rename_unit(old, new)
     obj = ROOT / "build/src" / f"{old_path}.c.o"
     if obj.exists():
         obj.unlink()
     print(f"  rewrote {len(touched)} file(s)")
     return build(a.no_build)
+
+
+def cmd_header(a):
+    old, new = a.old, a.new
+    if not SNAKE.match(new) and not re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", new):
+        sys.exit(f"FATAL: {new!r} is not a header stem")
+    hdr_old, hdr_new = ROOT / f"include/{old}.h", ROOT / f"include/{new}.h"
+    if not hdr_old.exists():
+        sys.exit(f"FATAL: include/{old}.h does not exist")
+    if hdr_new.exists() and hdr_new.resolve() != hdr_old.resolve():
+        sys.exit(f"FATAL: include/{new}.h already exists")
+    if old in srcpath.units():
+        print(f"  note: unit {old} keeps its name; `rename {old} ...` would have moved both")
+    mapping = rename_map(old, new, None, None, True, True)
+    print(f"unitfile header include/{old}.h -> include/{new}.h")
+    rule_doc_mentions(mapping)
+    if a.dry_run:
+        return 0
+    subprocess.run(["git", "mv", str(hdr_old), str(hdr_new)], check=True)
+    touched = rewrite_tokens(mapping)
+    import plan
+    plan.ledger_rename(mapping)
+    print(f"  rewrote {len(touched)} file(s)")
+    return build(a.no_build)
+
+
+def cmd_check(a):
+    left = not_snake()
+    for f in left:
+        print(f"  {f}")
+    print(f"{len(left)} game file(s) not snake_case (FINISHING-PLAN track 11)")
+    return 0
 
 
 def cmd_merge(a):
@@ -278,12 +408,16 @@ def main():
     m.add_argument("a")
     m.add_argument("b")
     m.add_argument("--as-b", action="store_true", help="the merged file takes B's name (A's is rewritten)")
-    for p in (r, m):
+    h = sub.add_parser("header")
+    h.add_argument("old")
+    h.add_argument("new")
+    sub.add_parser("check")
+    for p in (r, m, h):
         p.add_argument("--dry-run", action="store_true")
         p.add_argument("--no-build", action="store_true")
     a = ap.parse_args()
     os.chdir(ROOT)
-    sys.exit(cmd_rename(a) if a.cmd == "rename" else cmd_merge(a))
+    sys.exit({"rename": cmd_rename, "merge": cmd_merge, "header": cmd_header, "check": cmd_check}[a.cmd](a))
 
 
 if __name__ == "__main__":
