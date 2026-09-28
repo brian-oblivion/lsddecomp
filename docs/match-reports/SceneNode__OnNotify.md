@@ -90,3 +90,9 @@ For the head to apply by type scope. Each one fails to compile in another unit w
 
 - `SceneNodeMethods.slot30` -> `notifyParents` (tier A): the occupant is BasicClass__NotifyParents (inherited verbatim), and BasicClassMethods names the slot notifyParents. Accessor: code_d294_b (TransformAndNotifyParents).
 - `GenericMethods_d294.slot38` -> `onNotify` (tier A): BasicClass slot +0x038, called as `(other, self, 4)`, i.e. sender self, event 4. Accessor: only the NON_MATCHING body of SceneNode__TryAttachNearby in code_d294_b (the default build does not see it; check-nonmatching does).
+
+## Round 101 (delta): track 7
+
+Step 4 (constants): The unit-local tags become the owning headers' class ids: `TAG_PAD` -> `PAD_CLASS_ID` (include/Pad.h), `TAG_CLASS6EF50` -> `FRAMECLOCK_CLASS_ID` (include/FrameClock.h; the old name was the table's address, it is gFrameClockMethods), `TAG_SCENENODE` -> `SCENENODE_CLASS_ID`, `CLASS_TAG_MASK` -> `CLASS_ID_ROOT_MASK`. The unit now includes Pad.h and FrameClock.h. Byte-identical.
+
+Step 5 (comments): Function comment added (the dispatch by sender class).

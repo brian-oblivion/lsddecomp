@@ -15,3 +15,7 @@ Round 71 (alpha). `func_8001D33C` -> `SceneNode__NoOpSlot5C`, **tier C**. Table 
 ## Track 6 (round 91, echo): named `SceneNode__NoOpSlot5C`, tier C
 
 Empty. Slot +0x05C's only caller is SceneNode__Finalize, as `(self, 0)`, and no subclass overrides it, so nothing shows what the slot is for. `NoOpSlotNN` follows MoviePlayer__NoOpSlot5C. Was `SceneNode__func_1d33c`. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+
+## Round 101 (delta): track 7
+
+Step 5 (comments): Function comment added: every subclass table (tools/classtable.py, the 16 tables with a class id under 0x4) keeps this occupant at +0x05C, so the slot has no behaviour to name it after; `slot5C` stays (tier C, proposed nothing).

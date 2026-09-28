@@ -77,3 +77,11 @@ whose `parent` is `self`, and SceneNode__DetachAttachedChildren calls their
 detachFromParent, so they are SceneNodes. `cursor` is the BasicClass child
 list cursor. DetachAttachedChildren's `s32 cont` became that cursor, which
 it only tests for NULL. Byte-identical.
+
+## Round 101 (delta): track 7
+
+Step 3 (locals and parameters): `entry` -> `child`, `tag` -> `classId`. Byte-identical.
+
+Step 4 (constants): `TAG_SCENENODE` / `CLASS_TAG_MASK` -> `SCENENODE_CLASS_ID` / `CLASS_ID_ROOT_MASK` (include/SceneNode.h, include/BasicClass.h). Byte-identical.
+
+Step 5 (comments): The body reads as one condition: the `classId` local that held the constant 4 and the three nested `if`s become `*child != NULL && (header & CLASS_ID_ROOT_MASK) == SCENENODE_CLASS_ID && parent == self`, byte-identical (measured, whole image). A function comment states the iterator protocol.

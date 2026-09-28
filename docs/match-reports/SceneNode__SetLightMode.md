@@ -36,3 +36,7 @@ group; see `SceneNode__SetDisplay.md`).
 ## Naming
 
 Round 71 (alpha). `func_8001D3F8` -> `SceneNode__SetLightMode`, **tier B**. Table slot +0x070. Writes the 3-bit field at attribute bits 3-5, which LIBGS.H defines bit by bit as GsFOG, GsMATE and GsLLMOD, and returns the old value. Tier B: the field is the light-mode group by bit position, but no caller in src/ shows which values the game writes.
+
+## Round 101 (delta): track 7
+
+Step 3 (locals and parameters): `a1` -> `mode` (the 3-bit GsFOG/GsMATE/GsLLMOD field). Byte-identical.

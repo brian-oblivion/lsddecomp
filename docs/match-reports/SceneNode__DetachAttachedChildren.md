@@ -56,3 +56,7 @@ shape (`self, GenericObj_d294 **outEntry, s32 *outCont`) and
 ## Naming
 
 Round 71 (alpha). `func_8001D204` -> `SceneNode__DetachAttachedChildren`, **tier A**. Table slot +0x054. Loops getNextAttachedChild and calls each returned entry's slot +0x050 (SceneNode__DetachFromParent on this class) until the cursor runs out. Finalize calls it right after detaching self.
+
+## Round 101 (delta): track 7
+
+Step 3 (locals and parameters): `entry` -> `child`. Byte-identical.

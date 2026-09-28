@@ -105,3 +105,9 @@ For the head to apply by type scope. Each one fails to compile in another unit w
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
+
+## Round 101 (delta): track 7
+
+Step 3 (locals and parameters): `obj` -> `parent`, `vec` -> `offset` (it becomes coord2->coord.t, the offset from the parent), `sub` -> `coord2`. Byte-identical.
+
+Step 5 (comments): Function comment added; `MATCHING:` on the `coord2` local reloaded after addChild, measured this pass (writing `self->coord2->...` throughout breaks the build).
