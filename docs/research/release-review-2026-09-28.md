@@ -163,7 +163,7 @@ rather than API.
   TmdRenderer.c opens with BasicClass/BMemPMgr helpers.
 - **world:** DreamSys `func_59590`, `func_59598`, `func_5ba20` (a get/set of
   `unk_0x924`); DreamSys.h's `unk_0x*` fields (snake/hex spelling, no offset
-  comments; `unknown_values_0x922` looks like padding); DreamAux's
+  comments; `unknown_values_0x922` looks like padding); dream_aux's
   `sDreamAuxSlots2` alias; `TestForStageTransition` and
   `EnableTeleportsForKind` goto ladders over raw stage/mood numbers with no
   MATCHING line; `*(s32 *)((u8 *)out + 4)` at DayTaskStageMap.c:1096.
@@ -241,7 +241,7 @@ reads them, so nothing names them).
   "that unit still spells them as literals"; basic_class.h "all 59 method
   tables" (60).
 - Unit-private headers (DayTaskStageMap.h, GameApplicationFileResource.h,
-  DreamAux.h) fold into their .c files or become real class headers first,
+  dream_aux.h) fold into their .c files or become real class headers first,
   so the pass documents public API only.
 - `types.h:4` `typedef char int8_t` is unsigned under `-funsigned-char`
   (unused; make it `signed char`); common.h's `MoodGraphPoint` belongs in

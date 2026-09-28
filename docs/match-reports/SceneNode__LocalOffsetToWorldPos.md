@@ -83,7 +83,7 @@ accesses are plain uses of existing fields, not new ones.
 - **Corroborated by both callers**, which is what makes the direction
   (offset in, position out) more than a reading: `DreamSys.c`'s
   `DreamSys__ProjectPointAtDistance` feeds it a 3-word offset and treats the result as a map
-  position; `DreamAux.c`'s `PlaceDreamAuxEntityByPlayer` does the same for an aux slot.
+  position; `dream_aux.c`'s `PlaceDreamAuxEntityByPlayer` does the same for an aux slot.
 
 ## Extern arity (round 59)
 
@@ -101,7 +101,7 @@ definition in `src/graphics/scene_node.c` says.
 80059468:  jal   8001e600 <SceneNode__LocalOffsetToWorldPos>
 
 8005cf78:  jal   8001e600 <SceneNode__LocalOffsetToWorldPos>
-8005cf7c:  move  a3,zero                                  <- PlaceDreamAuxEntityByPlayer (DreamAux.c)
+8005cf7c:  move  a3,zero                                  <- PlaceDreamAuxEntityByPlayer (dream_aux.c)
 ```
 
 Reducing either declaration to the definition's three parameters makes the
@@ -110,11 +110,11 @@ the call site deletes the `move a3,zero` and breaks both matches. The callee
 ignores the value; the caller still has to place it.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/world/DreamSys.c:364` and `src/world/DreamAux.c:443`. Oracle green.
+added to `src/world/DreamSys.c:364` and `src/world/dream_aux.c:443`. Oracle green.
 
 ## Track 4 (2026-09-25, round 81, charlie)
 
-The two 4-argument `arity-ok` externs (`src/world/DreamSys.c`, `src/world/DreamAux.c`)
+The two 4-argument `arity-ok` externs (`src/world/DreamSys.c`, `src/world/dream_aux.c`)
 are gone. SceneNode's one header, `include/scene_node.h`, declares the
 method, and a 3-parameter prototype there would make both callers a compile
 error. Both callers set `$a3 = 0` (0x80059460, 0x8005CF7C), so the

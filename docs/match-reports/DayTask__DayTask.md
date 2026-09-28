@@ -185,7 +185,7 @@ needed anywhere in this 107-word function.
   are `New_X` allocators whose own ctor dispatch passes only the freshly
   allocated `self`, no forwarded arguments; `InitDreamAux` is
   independently established elsewhere as `void InitDreamAux(void)`,
-  itself a documented STALL in `DreamAux` unrelated to this unit).
+  itself a documented STALL in `dream_aux` unrelated to this unit).
   Reading the CALLEE's prologue was the right move here, same lesson
   `DayTask__StartObjM` used earlier this round for the opposite question (an
   argument that looked unused turning out to be real).

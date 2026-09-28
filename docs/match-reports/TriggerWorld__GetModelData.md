@@ -55,7 +55,7 @@ built: TriggerWorld__BuildResources overwrites each `entries[i]` with the
 `New_ModelData` it made over buffer + entries[i], and the ctor runs that
 build (via +0x064 -> +0x078) whenever the descriptor has a buffer.
 
-The caller confirms it. `ProcessDreamAuxTriggerRecord` (DreamAux) gets its
+The caller confirms it. `ProcessDreamAuxTriggerRecord` (dream_aux) gets its
 object from `New_TriggerWorld` (FireDreamAuxTriggerEntries), calls this slot
 (+0x088) with the record's parity, and stores the result at `scratch[3]`
 (+0x00C), which `SpawnDreamAuxTriggerEntity` passes as `New_Entity`'s

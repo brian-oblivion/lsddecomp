@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005C9A4` on 2026-09-21 (tools/rename.py). Address 0x8005c9a4.
 
-**Unit:** DreamAux · **Size:** 14 words · **Status:** MATCHED (14/14 words)
+**Unit:** dream_aux · **Size:** 14 words · **Status:** MATCHED (14/14 words)
 
 ## What it does
 
@@ -95,13 +95,13 @@ shape before anything more exotic.
 byte at offset `0x2` and a caller-supplied `coordParity`: true when the byte
 is 0 (no constraint) or when it disagrees with `coordParity`'s own parity.
 The mechanics (a parity comparison) ARE the name, tier A by the pure-leaf
-rule. Dropped the unit-specific "DreamAux" prefix other functions here carry
+rule. Dropped the unit-specific "dream_aux" prefix other functions here carry
 since this predicate reads a byte offset shared with `TriggerRecord.parity`
 without being proven to be the same field (see the header's own caveat on
 `TriggerRecord`'s offset-0x2 comment) -- "Trigger" alone reflects that
 looser confidence.
 
-## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
 ## Naming (round 100)
 

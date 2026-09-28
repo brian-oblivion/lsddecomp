@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005CF34` on 2026-09-21 (tools/rename.py). Address 0x8005cf34.
 
-**Unit:** DreamAux · **Size:** 42 words · **Status:** MATCHED round 43
+**Unit:** dream_aux · **Size:** 42 words · **Status:** MATCHED round 43
 (42/42, byte-exact whole-image build).
 
 ## History
@@ -43,7 +43,7 @@ offset 0x4, and `DreamAuxSlot`'s remaining 12 bytes (previously
 `u8 unkC[0xC]`) are exactly a 3-word position vector -- confirmed by this
 function passing `a0->pos` as `SceneNode__LocalOffsetToWorldPos`'s `src` parameter (that
 function, `scene_node.c`, treats `src` as a 3-word vector unconditionally).
-`DreamAuxSlot` is renamed accordingly in `include/DreamAux.h`
+`DreamAuxSlot` is renamed accordingly in `include/dream_aux.h`
 (`void *obj; DreamAuxObj *entity; s32 pos[3];`, still 0x14 bytes).
 
 `SceneNode__LocalOffsetToWorldPos` and `SceneNode__FaceTarget` are both already-matched functions in a
@@ -116,7 +116,7 @@ not read directly off any single instruction.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
-## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
 ## Naming (round 100)
 

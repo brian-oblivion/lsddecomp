@@ -55,7 +55,7 @@
 #include "bmem_pmgr.h"
 #include "GameFiles.h"
 #include "GameApplicationFileResource.h"
-#include "DreamAux.h"
+#include "dream_aux.h"
 
 /* The rectangle StageMap__InitFootprintRect copies into rects[index] before
  * setting its slotIndex: no slot (-1), the whole 20 x 20 cells from (0, 0). */

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005C714` on 2026-09-21 (tools/rename.py). Address 0x8005c714.
 
-**Unit:** DreamAux · **Size:** 22 words · **Status:** MATCHED (22/22 words)
+**Unit:** dream_aux · **Size:** 22 words · **Status:** MATCHED (22/22 words)
 
 ## What it does
 
@@ -103,7 +103,7 @@ actual argument and this unit's own `TriggerRecord.kind` field. Tier B, not
 A, because WHY these four values enable teleports (as opposed to some other
 game-meaningful grouping) is not established from this unit alone.
 
-## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
 Parameter `kind` -> `moodIndex`: ProcessDreamAuxTriggerRecord passes the
 record's moodIndex, the same byte it passes New_Entity as its mood row. The

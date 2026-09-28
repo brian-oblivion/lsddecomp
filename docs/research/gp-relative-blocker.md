@@ -214,8 +214,8 @@ true for twenty rounds and is now false.
 
 The `gp_rel` load in the live queue also concentrates, which matters for
 judging what a fix would return: `GameApplicationFileResource` (14), `DreamSys` (13),
-`DreamAux` (8) and `PlacementGridVabSound` (8) hold over half of it between them.
-`GameApplicationFileResource` is 14 of its 27 queued functions and `DreamAux` is 8 of 17 —
+`dream_aux` (8) and `PlacementGridVabSound` (8) hold over half of it between them.
+`GameApplicationFileResource` is 14 of its 27 queued functions and `dream_aux` is 8 of 17 —
 two units a fix would roughly halve on its own.
 
 Do not read these figures as current; re-run the two commands. The SHAPE is

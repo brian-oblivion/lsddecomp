@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005C5E8` on 2026-09-21 (tools/rename.py). Address 0x8005c5e8.
 
-Unit `DreamAux` (was `code_4cd08`). 26/26 words, `0x4CDE8`-`0x4CE50`. Whole-image
+Unit `dream_aux` (was `code_4cd08`). 26/26 words, `0x4CDE8`-`0x4CE50`. Whole-image
 `build-and-verify.sh` green (`build exit=0`, sha1 OK). First attempt matched.
 
 ## What it does
@@ -33,7 +33,7 @@ void ReleaseDreamAuxModels(void)
 ```
 
 Uses `DreamAuxObj`, `DreamAuxTickFn`, `DreamAuxSlot`, `sDreamAuxSlots` from the new
-`include/DreamAux.h` (see below).
+`include/dream_aux.h` (see below).
 
 ## Why the "loop that only runs once" shape
 
@@ -92,7 +92,7 @@ this function alone), so the type is deliberately generic
   GCC 2.6.3 -O2 compiles it to a `do`-style loop with a `beqz $reg` back-edge
   test (no leading guard, no `slti`), and removing the "loop" in favor of a
   plain `if` changes the instruction count. Confirmed independently on two
-  functions in `DreamAux` (`ReleaseDreamAuxModels`, `ReleaseDreamAuxEntities`); the same
+  functions in `dream_aux` (`ReleaseDreamAuxModels`, `ReleaseDreamAuxEntities`); the same
   shape also appears in `SetDreamAuxWorld` and `InitDreamAux`'s tail (both
   otherwise blocked/stalled). Likely a shared "process the first slot of an
   N-slot table" macro/pattern in the original source where N happened to be
@@ -108,7 +108,7 @@ as tier A by FINISHING-PLAN's "pure leaf whose mechanics are its purpose"
 rule regardless of why the caller (`DayTask__Finalize`, apparently a destructor)
 invokes it once at that point.
 
-## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
 ## Naming (round 100)
 

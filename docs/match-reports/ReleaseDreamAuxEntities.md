@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005C76C` on 2026-09-21 (tools/rename.py). Address 0x8005c76c.
 
-Unit `DreamAux` (was `code_4cd08`). 26/26 words, `0x4CF6C`-`0x4CFD4`. Whole-image
+Unit `dream_aux` (was `code_4cd08`). 26/26 words, `0x4CF6C`-`0x4CFD4`. Whole-image
 `build-and-verify.sh` green. Same shape as `ReleaseDreamAuxModels`, over `sDreamAuxSlots2`
 instead of `sDreamAuxSlots` (see that report for the object/vtable/loop-shape
 derivation -- not repeated here).
@@ -99,7 +99,7 @@ slot family IS the function's purpose. Called from `ObjM__TeardownStyle`
 different in KIND from the first (it is never populated by any function in
 this unit's own queue).
 
-## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
 ## Naming (round 100)
 

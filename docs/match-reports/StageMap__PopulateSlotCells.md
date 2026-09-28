@@ -944,7 +944,7 @@ header owning ResourceSource (LinkResource.h, or FileResource.h, the
 common parent of the five ctors that take it, once ResourceSource itself
 moves out of GraphicsResources.c) would retire all three; field renames
 `type` -> `buffer`, `path` -> `name`. The three-word ResourceRequest__Set descriptors
-(GraphicsResources.c `ResourceSourceArgs`, include/DreamAux.h
+(GraphicsResources.c `ResourceSourceArgs`, include/dream_aux.h
 `DreamAuxLoadReq`, include/GameApplicationFileResource.h `ResourceRequest`) are the same family
 at 0x0C and are left to that job.
 

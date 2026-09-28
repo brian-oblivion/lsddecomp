@@ -57,7 +57,7 @@
 #include "bmem_pmgr.h"
 #include "GameFiles.h"
 #include <strings.h>
-#include "DreamAux.h"
+#include "dream_aux.h"
 
 /* The row colours, two 3-byte RGBs in sdata, 4 bytes apart; only their
  * addresses are taken (setColor). */
@@ -561,7 +561,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 i
     self->state = 5;
 }
 
-/* ObjM__TeardownStyle's helpers (src/world/DreamAux.c, src/world/ObjMStyleActor.c). */
+/* ObjM__TeardownStyle's helpers (src/world/dream_aux.c, src/world/ObjMStyleActor.c). */
 extern void StyleTeardown(void);
 
 /* onDeinit. */

@@ -123,7 +123,7 @@ python3 tools/classtable.py <table> --vs <parent-table>   # what a subclass over
 | `src/app/` | the application shell and the object framework: the `BMemPMgr` pool allocator and the first half of `BasicClass`, `Application` and `GameApplication`, `FileResource`, the task classes (`TaskCore`, `IntermediateBase`, `StreamTask`) with `Viewport`, and `Pad` |
 | `src/cd/` | CD access and the game's files: `CdDriver`, `CdStream` streaming, `LbdFile` and the table of file names |
 | `src/graphics/` | the screen, the scene graph and rendering: `DrawSystem`, `SceneNode`, the sprites, `FrameClock`, the lights, `TmdModel` and the TMD renderer (after the rest of `BasicClass`), the Viewport's draw pass, and the loaders that turn TIM, TMD and TOD files into graphics objects (with the tile-map layer and the FMV player) |
-| `src/world/` | the dream world and its actors: `DreamSys`, `DayTask` and `StageMap`, the stage grid, `DreamAux`'s triggers, `Actor`, `TodActor` and `Entity`, and `ObjM` with the style layer and `GraphRoom` (after the second half of `ItemList`) |
+| `src/world/` | the dream world and its actors: `DreamSys`, `DayTask` and `StageMap`, the stage grid, `dream_aux`'s triggers, `Actor`, `TodActor` and `Entity`, and `ObjM` with the style layer and `GraphRoom` (after the second half of `ItemList`) |
 | `src/sound/` | the game's sound: `WBgm` background music and the VAB backend (`VabDriver`, `VabStreamObj`, sound cues), with the map chunks' `PlacementGrid` at the head of its file |
 | `src/ui/` | menus and 2D widgets: `TitleMenu` and the `TaskObjF` memory-card saves (after `NodeGuardedViewport` and `GridCell`, which the day's code uses), `TextEntry` and the first half of `ItemList`, `FadeBox`, `BoxFill` and `TextRow` |
 | `src/psyq/` | Sony library modules not linked from `lib/`, carried in `src/` as C or `INCLUDE_ASM` instead (`libsnd_*`, `libcd_bios`, `libgs_*`, `libspu_s_ih`, `libcard_card`), each file named for its Sony module; `libsnd_vmanager.c` opens with one game function, `ServiceSoundCueSet` |
@@ -155,7 +155,7 @@ Read each named class's header first; its banner points to the units.
   day's dream, and the "link" teleport that ends one stage and starts
   another. `Entity` (`src/world/entity.c`, over `TodActor`, `src/world/TodActor.c`) is a TOD-animated
   actor driven by per-mood tables. `StageGrid` maps mood-graph values to
-  stage chunks (`src/world/StageGrid.c`); `DreamAux` (`src/world/DreamAux.c`) spawns the
+  stage chunks (`src/world/StageGrid.c`); `dream_aux` (`src/world/dream_aux.c`) spawns the
   dream's trigger entities;
   `StageMap` keeps the seven map chunks around its target loaded, each
   chunk's `PlacementGrid` linked into a lattice of `GridCell`s. `DayTask` runs one day around the

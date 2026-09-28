@@ -78,7 +78,7 @@ the middle.
   division by 3) are BOTH canonical GCC 2.6.3 constant-division sequences —
   writing `val / 2 * 5 / 3` in ordinary C reproduces both exactly; no need
   to spell out the magic constant or shift amounts by hand.
-- **`SetDreamAuxWorld`** (matched round 43, `src/world/DreamAux.c`) has no header
+- **`SetDreamAuxWorld`** (matched round 43, `src/world/dream_aux.c`) has no header
   prototype anywhere, so this unit's own call-site typing (all `s32`,
   matching its real definition) is local, same convention as
   `PickStageBgm`/`PickStageTexture`/etc. already declared in this file.
@@ -173,7 +173,7 @@ call and can go the same way.
 
 Comment history moved from the unit's externs:
 
-> DreamAux.c's (MATCHED round 43); no header declares it. `world` is the
+> dream_aux.c's (MATCHED round 43); no header declares it. `world` is the
 > DreamSys it installs as sDreamAuxWorld (track 4, round 88).
 
 > GetStageGridDimensions comes from include/StageGrid.h, through DreamSys.h.

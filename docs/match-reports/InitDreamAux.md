@@ -33,7 +33,7 @@
 > oracle passed outright, which is the strongest possible confirmation: no
 > per-function window, no drift caveat, just a green `build-and-verify.sh`.
 >
-> **This is now real C in `src/world/DreamAux.c`, committed.** The rodata
+> **This is now real C in `src/world/dream_aux.c`, committed.** The rodata
 > ownership trap documented below (defining `sMomPathSymSpy`/`sMomPathSymDog` as real
 > string data ahead of the function) was exactly as described and is now
 > permanent, not a note for a future attempt.
@@ -61,7 +61,7 @@ is not the gp-relative blocker, it is a residue class of its own. Restored to
 
 ## What it does
 
-Two independent passes over unrelated tables, then a load of the "DreamAux"
+Two independent passes over unrelated tables, then a load of the "dream_aux"
 audio-stream-request object:
 
 1. For `i` in `0..13`: `sDreamAuxGroupRecords[i]` is a pointer to an array of
@@ -83,7 +83,7 @@ audio-stream-request object:
 
 ```c
 #include "common.h"
-#include "DreamAux.h"
+#include "dream_aux.h"
 
 /* const char sMomPathSymSpy[] = "ETC\\SYMSPY.MOM"; */
 /* const char sMomPathSymDog[] = "ETC\\SYMDOG.MOM"; */
@@ -111,7 +111,7 @@ void InitDreamAux(void)
 }
 ```
 
-Needs (from `include/DreamAux.h`, added this round):
+Needs (from `include/dream_aux.h`, added this round):
 `DreamAuxLoadReq`, `DreamAuxGroupRecord`, `sDreamAuxGroupCounts`, `sDreamAuxGroupRecords`,
 `DreamAuxSlot`, `sDreamAuxSlots`, `ResourceRequest__Set`, `New_ModelData`.
 
@@ -183,7 +183,7 @@ which shows the first ~46 instructions matching before this one diverges).
 ## Rodata ownership (a real trap, worth flagging even though this stalled)
 
 `config/splat.slps01556.lsdde.yaml` marks the `0x206C` rodata segment
-`.rodata, DreamAux` (dot-prefixed) for `CheckDreamAuxTriggerCondition`'s jump tables, but
+`.rodata, dream_aux` (dot-prefixed) for `CheckDreamAuxTriggerCondition`'s jump tables, but
 `sMomPathSymSpy`/`sMomPathSymDog` (the two MOM filenames) live in the same run and
 are consumed only by `InitDreamAux`. While this function is `INCLUDE_ASM`,
 its own `.s` file carries these two strings as raw (`nonmatching`) asm
@@ -192,7 +192,7 @@ that `.s` file is no longer pulled in by anything (it lives under
 `asm/nonmatchings/`, which per the Makefile is *only* assembled via
 `INCLUDE_ASM`), and both symbols go undefined at link time. Fix: define them
 as real C string data (`const char sMomPathSymSpy[] = "ETC\\SYMSPY.MOM";` etc.)
-directly in `DreamAux.c`, ahead of the function -- this is "flip to the
+directly in `dream_aux.c`, ahead of the function -- this is "flip to the
 dot form in the same commit that writes the C" from
 `docs/DECOMPILATION_LEARNINGS.md`, just for a rodata slot that happens to
 hold strings rather than a table. Whoever re-attempts this function needs
@@ -215,7 +215,7 @@ build will fail at link with `undefined reference to sMomPathSymSpy`.
 
 ## Naming
 
-**InitDreamAux** — tier B. Called exactly once, as the first DreamAux-specific
+**InitDreamAux** — tier B. Called exactly once, as the first dream_aux-specific
 call inside `DayTask__DayTask` (a constructor: `GetTimedTaskMethods()->ctor(self,...);
 self->methods = GetDayTaskMethods(); InitDreamAux(); ...`), before the rest of
 that object's own fields are set up. Clears every `gDreamAuxGroupRecord`'s
@@ -227,7 +227,7 @@ alone, hence tier B rather than A.
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. DreamAux includes it, and include/DreamAux.h's local `extern void *New_ModelData(DreamAuxLoadReq *req)` is deleted. The call reads `New_ModelData((struct ResourceSource *)&req)`, a pointer cast with no code. DreamAuxLoadReq {flag, name, mode} has the descriptor's own shape: word 0 is the buffer to adopt, and it is 0 here, so ModelData__ModelData requests the MOM file named in word 1. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. dream_aux includes it, and include/dream_aux.h's local `extern void *New_ModelData(DreamAuxLoadReq *req)` is deleted. The call reads `New_ModelData((struct ResourceSource *)&req)`, a pointer cast with no code. DreamAuxLoadReq {flag, name, mode} has the descriptor's own shape: word 0 is the buffer to adopt, and it is 0 here, so ModelData__ModelData requests the MOM file named in word 1. Image byte-identical.
 
 ### Track 6 (round 97, alpha)
 
@@ -238,10 +238,10 @@ extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`,
 `(ResourceSource *)&req` becomes `&req.src`. Byte-identical.
 The two MOM path names are `const char[]` and are passed as `(char *)`, since ResourceSource.name is `char *`.
 
-## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
-The pass rewrote the unit's banner (now at the top of src/world/DreamAux.c) and
-every declaration comment in include/DreamAux.h. The comments that carried
+The pass rewrote the unit's banner (now at the top of src/world/dream_aux.c) and
+every declaration comment in include/dream_aux.h. The comments that carried
 history or superseded readings are kept here verbatim, as they stood before
 the pass (names as they were at round 99).
 
@@ -259,7 +259,7 @@ loop bounds are ARRAY_COUNT of the tables they walk. Byte-identical.
 The header banner:
 
 ```c
-/* This unit is lsddecomp's "DreamAux". Fully matched, round 43 (0
+/* This unit is lsddecomp's "dream_aux". Fully matched, round 43 (0
  * INCLUDE_ASM); track 3 naming pass round 63. It owns the 0x206C rodata
  * slot (its switch jump tables) and manages a small "trigger record" system:
  * a table of 8-byte TriggerRecord entries, each gating on a caller-supplied
@@ -310,7 +310,7 @@ The MOM paths:
 ```c
 /* "ETC\\SYMSPY.MOM" / "ETC\\SYMDOG.MOM" -- MOM = this game's audio-stream
  * format (per lsddecomp naming elsewhere in the project). Defined in
- * DreamAux.c, right before InitDreamAux which is their only reader. */
+ * dream_aux.c, right before InitDreamAux which is their only reader. */
 ```
 
 ## History (moved from src/DreamAux.c, comments pass)

@@ -9,7 +9,7 @@
  * ctor-chain parent. Every method is in src/world/DreamSys.c. One instance, made
  * by GameApplication__GameApplication (src/app/GameApplicationFileResource.c, New_DreamSys) and kept in
  * GameApplication::dreamSys; the same object is GraphRoom::dreamSys, the
- * `target` ObjMStyleActor hands SetDreamAuxWorld (DreamAux's
+ * `target` ObjMStyleActor hands SetDreamAuxWorld (dream_aux's
  * sDreamAuxWorld), and the `peer` every Entity links to.
  *
  * It owns the dream clock (SceneNode's `tick`, advanced by
@@ -894,7 +894,7 @@ s32 DreamSys__GetSetConfigOption(DreamSys *self, s32 value);
 void DreamSys__ApplyRelativeOffset(DreamSys *self, struct RelativePos *a, struct RelativePos *b);
 
 /* Enables or disables the instant teleporters TestForInstantTeleporters
- * tests (DreamAux.c's SetTeleportsEnabled sets it per stage). */
+ * tests (dream_aux.c's SetTeleportsEnabled sets it per stage). */
 void SetInstantTeleportersEnabled(bool value);
 
 #endif

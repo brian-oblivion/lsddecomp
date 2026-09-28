@@ -9,7 +9,7 @@
  * 0x234, method table gTodActorMethods, getter GetTodActorMethods; methods
  * in src/world/TodActor.c. Its ctor chains to Actor's (include/Actor.h). One
  * class derives from it, Entity (0x1F234, include/entity.h), and it is only
- * ever built as one: New_Entity (from DreamAux's SetDreamAuxWorld and
+ * ever built as one: New_Entity (from dream_aux's SetDreamAuxWorld and
  * SpawnDreamAuxTriggerEntity) runs this ctor first; New_TodActor has no
  * caller.
  *
@@ -56,7 +56,7 @@
  * detachFromParent undoes all three.
  *
  * Sound. `sound`, the ctor's second argument, is a VabStreamObj (include/
- * VabStreamObj.h; DreamAux passes the same bank to every Entity). playTone
+ * VabStreamObj.h; dream_aux passes the same bank to every Entity). playTone
  * (+0x124) plays one of its tones at volume 0x6E; Entity drives its
  * SoundCueSet on it.
  *
