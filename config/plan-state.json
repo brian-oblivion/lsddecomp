@@ -419,6 +419,7 @@
     },
     "13": {
       "checklist": {
+        "lint": true,
         "readme": true
       },
       "reason": "",
