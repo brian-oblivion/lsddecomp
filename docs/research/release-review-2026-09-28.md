@@ -74,7 +74,7 @@ rather than API.
   `SubObjE` (DayTaskStageMap.h:18) is a DrawSystem view; `SlotEntry`/`SrcDesc`
   (Task.c:658, 670) are one record; `CdStreamFile` (CdStream.h:44) is
   `CdlFILE`; a signed 3-byte colour is defined six times (`BgLayerRgb`,
-  `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `SpriteRgb`, `ViewportRgb`):
+  `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `ColorRgb`, `ViewportRgb`):
   one type. `FIX12_SHIFT` and `CD_SECTOR_SIZE` redefined at
   GraphicsResources.c:63-64. `ABS_fa50` (TmdModel.c:53) open-coded twice more.
 - **Headers not self-contained:** six M-Z headers use `GsCOORDINATE2`,
@@ -153,8 +153,8 @@ rather than API.
   `unk93` (clear colour), `unk96`; TaskCoreTarget `unk8` (initial slot),
   `unk24` (item lists); GameApplication `config->unk14`/`slot228`;
   `APPLICATION_LOOP_SLOT5C`; CdDriver's "part N" notes are off by one.
-- **graphics:** `TmdModel__func_8001F37C`, `BasicClass__func_18350`,
-  `D_8008E248`, `D_80090C18`; `TimImage flag48`; SceneNode link events 2/3/4
+- **graphics:** `TmdModel__NoOpSlot4C`, `BasicClass__NoOpSlot34`,
+  `sSortLightOff`, `sSortNdiv`; `TimImage flag48`; SceneNode link events 2/3/4
   as literals (Actor.h names 5-8); `New_TimBlockSrc(s32 name)` and
   `ModelData__ForwardScan*` take pointers as `s32`; the `+ 0x5C` at
   TmdRenderer.c:1194 is `offsetof(PolyDrawCtx, sxy) - sizeof(DVECTOR)`;
@@ -186,7 +186,7 @@ so merge by hand, one commit per type, the accessors from the compiler.
   `void *` in its functions and `s32` in its slots; `SetTickCallbacks`'
   header prototype still names its parameters `arg1`/`arg2`.
 - **graphics:** the six signed 3-byte colour types (`BgLayerRgb`,
-  `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `SpriteRgb`,
+  `BoxFillRgb`, `FlatLightColor`, `LightRigRgb`, `ColorRgb`,
   `ViewportRgb`) into one, in a graphics header (BoxFill.h is ui's, and
   this item may edit it for that).
 - **world:** `RotationRatio(s)` (DreamSys.h) into `Ratio16`; `SubObjE`

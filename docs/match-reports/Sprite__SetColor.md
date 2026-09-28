@@ -18,7 +18,7 @@ Three builds. (1) three `self->r = rgb[0];` statements over `s8` fields: `lbu`/`
 ```c
 /* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gVariantSpriteMethods (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
-void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
+void Sprite__SetColor(Sprite *self, ColorRgb *rgb) {
     self->sprite.rgb = *rgb;
 }
 ```
@@ -29,4 +29,4 @@ A leaf that loads three signed bytes into three registers with `lb` and only the
 
 ## Track 4 (2026-09-25, round 82, alpha)
 
-Renamed from `func_8004229C`: +0x0B8 is Sprite's first own slot (the SceneNode table ends at +0x0B4), named `setColor` for this occupant, which writes GsSPRITE r,g,b. gTextRowMethods overrides it with TextRow__SetColor; StyleEffect__SpawnSprites passes it its colour triples. `Rgb_322b4` became `SpriteRgb` (same all-s8 3-byte struct; the lever above still holds). And the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
+Renamed from `func_8004229C`: +0x0B8 is Sprite's first own slot (the SceneNode table ends at +0x0B4), named `setColor` for this occupant, which writes GsSPRITE r,g,b. gTextRowMethods overrides it with TextRow__SetColor; StyleEffect__SpawnSprites passes it its colour triples. `Rgb_322b4` became `ColorRgb` (same all-s8 3-byte struct; the lever above still holds). And the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).

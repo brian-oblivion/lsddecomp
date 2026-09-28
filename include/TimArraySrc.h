@@ -36,7 +36,7 @@
  *  - +0x064 onRequestDone, TimArraySrc__BuildImages (named for what it does; the
  *    driver runs onRequestDone when a read completes, and TimBlockSrc calls it
  *    directly);
- *  - +0x078 is FileResource's `void *slot78` (NULL there); this table's
+ *  - +0x078 is FileResource's `processBuffer` (NULL there); this table's
  *    occupant is TimArraySrc__UploadImages, called through
  *    TimArraySrcUploadFn (no code). No own slots past it.
  *
@@ -49,7 +49,7 @@ struct TimImage;
 
 struct TimArraySrcMethods {
     FILERESOURCE_SLOTS(TimArraySrc, (TimArraySrc * self, char *name));
-    /* +0x078 is FileResource's slot78; this table's occupant is
+    /* +0x078 is FileResource's processBuffer; this table's occupant is
      * TimArraySrc__UploadImages (TimArraySrcUploadFn). */
 }; /* 30 slots, 0x7C bytes */
 
@@ -62,7 +62,7 @@ struct TimArraySrc {
 }; /* 0x3C bytes: New_TimArraySrc */
 
 /* TimArraySrc__UploadImages as TimBlockSrc__AdvanceLoadState calls it
- * through slot78. */
+ * through processBuffer. */
 typedef void (*TimArraySrcUploadFn)(TimArraySrc *self);
 
 extern TimArraySrcMethods gTimArraySrcMethods;

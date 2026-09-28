@@ -2,6 +2,7 @@
 #define TIMBLOCKSRC_H
 
 #include "FileResource.h"
+#include "DrawSystem.h"
 
 /*
  * TimBlockSrc -- a FileResource data source (class id 0xF03, method table
@@ -42,12 +43,8 @@ enum TimBlockLoadState {
 typedef struct TimBlockSrc TimBlockSrc;
 typedef struct TimBlockSrcMethods TimBlockSrcMethods;
 
-/* Three bytes, read unsigned by FadeClutRow. */
-typedef struct TimBlockSrcColor {
-    s8 r;
-    s8 g;
-    s8 b;
-} TimBlockSrcColor;
+/* The spelling ObjMStyleActor.c still uses for a fade colour. */
+typedef ColorRgb TimBlockSrcColor;
 
 /* One CLUT row's fade ramp. 0x10 bytes: TimArraySrc__BuildImages steps a
  * TimImage's clutBase through them 16 bytes a CLUT row. */
@@ -57,22 +54,21 @@ typedef struct TimBlockSrcEntry {
     /* +0x04 */ u16 clutX; /* +0x04..+0x0A a RECT: the ctor lays out 0, 0x1E0 + i * mask, 0x100, 1 */
     /* +0x06 */ u16 clutY;
     /* +0x08 */ u16 clutW;
-    /* +0x0A */ u16 clutH;              /* set to mask by FadeClutRow */
-    /* +0x0C */ TimBlockSrcColor color; /* TimBlockSrc__FadeEntry */
+    /* +0x0A */ u16 clutH;      /* set to mask by FadeClutRow */
+    /* +0x0C */ ColorRgb color; /* TimBlockSrc__FadeEntry */
     /* +0x0F */ u8 padF;
 } TimBlockSrcEntry;
 
 struct TimBlockSrcMethods {
     FILERESOURCE_SLOTS(TimBlockSrc, (TimBlockSrc * self, char *name));
-    /* +0x078 is FileResource's slot78; this table's occupant is
+    /* +0x078 is FileResource's processBuffer; this table's occupant is
      * TimBlockSrc__SetEntryShift(self, index, shift). */
-    /* +0x07C */ void (*fadeAllEntries)(TimBlockSrc *self, TimBlockSrcColor *color); /* TimBlockSrc__FadeAllEntries */
-    /* +0x080 */ void (*fadeEntry)(TimBlockSrc *self, s32 index,
-                                   TimBlockSrcColor *color); /* TimBlockSrc__FadeEntry */
+    /* +0x07C */ void (*fadeAllEntries)(TimBlockSrc *self, ColorRgb *color); /* TimBlockSrc__FadeAllEntries */
+    /* +0x080 */ void (*fadeEntry)(TimBlockSrc *self, s32 index, ColorRgb *color); /* TimBlockSrc__FadeEntry */
 };
 
 struct TimBlockSrc {
-    FILERESOURCE_FIELDS(TimBlockSrcMethods); /* unk2A is the load state: 9 header, 10 blocks, 0 done */
+    FILERESOURCE_FIELDS(TimBlockSrcMethods); /* loadState: TIMBLOCK_LOAD_* */
     /* +0x02C */ s32 blockCount;             /* TimArraySrcs built so far */
     /* +0x030 */ struct TimArraySrc **blocks; /* one per block; ReleaseBasicClassArray'd by Finalize */
     /* +0x034 */ void *sector; /* the read buffer: 0x800 for the header, then the largest block size */
@@ -85,13 +81,13 @@ struct TimBlockSrc {
 extern TimBlockSrcMethods gTimBlockSrcMethods;
 extern TimBlockSrcMethods *GetTimBlockSrcMethods(void);
 
-void *New_TimBlockSrc(s32 arg0);
+void *New_TimBlockSrc(s32 name); /* name: the path, a char * the ctor opens; its one caller casts it to s32 */
 void TimBlockSrc__TimBlockSrc(TimBlockSrc *self, char *name);
 void TimBlockSrc__Finalize(TimBlockSrc *self);
 void TimBlockSrc__AdvanceLoadState(TimBlockSrc *self);
 void TimBlockSrc__SetEntryShift(TimBlockSrc *self, s32 index, s32 shift);
-void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, TimBlockSrcColor *color);
-void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, TimBlockSrcColor *color);
+void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, ColorRgb *color);
+void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, ColorRgb *color);
 void FadeClutRow(TimBlockSrcEntry *entry, s32 index);
 
 #endif

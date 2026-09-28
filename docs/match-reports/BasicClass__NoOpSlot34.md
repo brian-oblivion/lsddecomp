@@ -1,4 +1,6 @@
-# BasicClass__func_18350 — MATCHED (2/2 words), NAME DELIBERATELY NOT CHANGED
+# BasicClass__NoOpSlot34 — MATCHED (2/2 words), NAME DELIBERATELY NOT CHANGED
+
+> Renamed from `BasicClass__func_18350` on 2026-09-28 (tools/rename.py). Address 0x80018350.
 
 **Unit:** `TmdRenderer` · **Status:** matched since round 12; splat generated
 the body itself (`jr $ra; nop`). This report was created in round 51 by the
@@ -12,13 +14,13 @@ does.
 `tools/classtable.py gBasicClassMethods`. The body is empty.
 
 ```c
-void BasicClass__func_18350(void) {
+void BasicClass__NoOpSlot34(void) {
 }
 ```
 
 ## Naming (round 51, bravo)
 
-**Kept as `BasicClass__func_18350`. Tier C.** The class is known, so the
+**Kept as `BasicClass__NoOpSlot34`. Tier C.** The class is known, so the
 name carries the tier-C form the project already uses for that case
 (`Class__func_xxxxx`); the method half stays a placeholder.
 
@@ -28,7 +30,7 @@ name carries the tier-C form the project already uses for that case
 
 | slot +0x034 holds | tables |
 | --- | --- |
-| `BasicClass__func_18350` (this function) | 58 |
+| `BasicClass__NoOpSlot34` (this function) | 58 |
 | `func_80023368` | 1 (`D_8006C0F8`) |
 | `StyleCue12` | 1 (`sStyleCueCallbacks`) |
 

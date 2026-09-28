@@ -278,7 +278,7 @@ void Sprite__Update(Sprite *self, void *sender, s32 event) {}
 
 /* Slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gVariantSpriteMethods (the
  * sprite classes): copy three bytes into the embedded GsSPRITE's r,g,b. */
-void Sprite__SetColor(Sprite *self, SpriteRgb *rgb) {
+void Sprite__SetColor(Sprite *self, ColorRgb *rgb) {
     self->sprite.rgb = *rgb;
 }
 
@@ -486,8 +486,8 @@ BasicClass *LightRig__GetLight(LightRig *self, s32 index) {
 
 /* LightRig slot +0x0BC: set the ambient colour (swapping the old one out
  * into *rgb when asked) and hand it to GsSetAmbient. */
-void LightRig__SetAmbientColor(LightRig *self, LightRigRgb *rgb, s32 swap) {
-    LightRigRgb old;
+void LightRig__SetAmbientColor(LightRig *self, ColorRgb *rgb, s32 swap) {
+    ColorRgb old;
 
     if (swap) {
         old = self->ambient;
@@ -496,9 +496,8 @@ void LightRig__SetAmbientColor(LightRig *self, LightRigRgb *rgb, s32 swap) {
     } else {
         self->ambient = *rgb;
     }
-    GsSetAmbient((u8)self->ambient.r << AMBIENT_TO_FIX12_SHIFT,
-                 (u8)self->ambient.g << AMBIENT_TO_FIX12_SHIFT,
-                 (u8)self->ambient.b << AMBIENT_TO_FIX12_SHIFT);
+    GsSetAmbient(self->ambient.r << AMBIENT_TO_FIX12_SHIFT, self->ambient.g << AMBIENT_TO_FIX12_SHIFT,
+                 self->ambient.b << AMBIENT_TO_FIX12_SHIFT);
 }
 
 /* Returns the LightRig method table. */

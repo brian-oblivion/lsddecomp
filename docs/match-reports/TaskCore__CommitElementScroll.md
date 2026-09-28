@@ -684,7 +684,7 @@ deleted): it was derived in round 12 from this function and
 at the same +0x004; round 78 renamed it from `Unk24Elem` and `unk4` to
 `savedCursor` (tier B). Round 12 left the `(u8 *)...unk24[idx] + 8` buffer in
 BeginElementScroll/SetSlotCursor as a raw cast; round 98 names it
-`cursorColor` (+0x008, a `SpriteRgb`), and CancelElementScroll's `[1]` read is
+`cursorColor` (+0x008, a `ColorRgb`), and CancelElementScroll's `[1]` read is
 now `->savedCursor`. Retail data for the one record the game has,
 TitleMenu's `D_80086CA8`: savedCursor 0, cursorColor (128, 128, 0), pos
 (53, 57), item names `D_80086C9C` (two strings).

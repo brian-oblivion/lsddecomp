@@ -4,8 +4,6 @@
  * symbol, in ROM order: the occupants of gSceneNodeMethods' slots +0x000 to
  * +0x0B4, the getter, then the methods that sit in no slot and the helpers.
  *
- * Slots +0x000 to +0x070.
- *
  * Lifecycle: New_SceneNode, the ctor (which allocates the node's
  * GsCOORDINATE2 and its GsCOORD2PARAM, and fails when either allocation
  * does) and Finalize (detach from parent and children, free both).
@@ -16,11 +14,38 @@
  * walk over the children attached to this node (GetNextAttachedChild).
  *
  * Transform: Reset (identity), UpdateRotation and UpdateScale (set or add
- * three Ratio16s into the GsCOORD2PARAM), and attach to and detach from a
- * parent's coordinate.
+ * three Ratio16s into the GsCOORD2PARAM), attach to and detach from a
+ * parent's coordinate, and GetRotMatrix (the node's rotation, or its
+ * negation, as a MATRIX).
  *
- * Attribute: the first five setters over GsDOBJ2.attribute, each replacing
- * one libgs field through GetSetBitField and returning its old value.
+ * Attribute: nine setters over GsDOBJ2.attribute, SetDisplay to
+ * SetBackClip, each replacing one libgs field through GetSetBitField and
+ * returning its old value.
+ *
+ * The link test, both sides. A sender, on SCENENODE_EVENT_HULL_FIRST or
+ * _LAST, fetches its model's hull (NotifyWithHull, GetModelHull), rotates it
+ * by its world matrix and notifies its parents with it in notifyVerts
+ * (TransformAndNotifyParents). A SceneNode receiving that runs
+ * TryAttachNearby on the sender (DispatchLinkCommand): the hull, brought
+ * into the receiver's frame (ComposeAndApplyRotation), must overlap the
+ * model's bounds (CheckBoundsOverlap) and hit one of its faces
+ * (RaycastHullAgainstFaces). On a hit the two record each other as
+ * linkTarget, the sender through the SCENENODE_EVENT_LINKED the receiver
+ * sends back. ClipSegmentToBox and BisectSegmentToBox clip a segment
+ * against a box for it.
+ *
+ * Methods in no slot: RotateLocalVector and LocalOffsetToWorldPos (an
+ * offset in the node's own frame, rotated into its parent's, or made a world
+ * position), RaycastVertical (a vertical ray against the node's model),
+ * GetRotationDegrees and FaceTarget (the rotation read, and aimed at another
+ * node, as Ratio16 degrees), LinkModel and UnlinkModel (the TmdModel whose
+ * TMD GsLinkObject4 links to the node's embedded GsDOBJ2).
+ *
+ * Helpers: SubVec3S16, RatioToFixed12 (a Ratio16 as 20.12 fixed point),
+ * CalcBoxOutcode (ClipSegmentToBox's outcodes), GetSetBitField (behind the
+ * attribute setters), ApplyMatrixToSVArray and ApplyMatrixToLVArray (a matrix
+ * over an array of vectors), IsVec3WithinRange, and GetSetHitHeightGate (the
+ * switch RaycastHullAgainstFaces reads).
  */
 #include "common.h"
 #include <libgte.h>
@@ -83,7 +108,7 @@ void *SceneNode__SceneNode(SceneNode *self) {
 void SceneNode__Finalize(SceneNode *self) {
     self->methods->detachFromParent(self);
     self->methods->detachAttachedChildren(self);
-    self->methods->slot5C(self, 0);
+    self->methods->finalizeHook(self, 0);
     BMemPMgrFree(self->coord2->param);
     BMemPMgrFree(self->coord2);
     GetBasicClassMethods()->finalize((BasicClass *)self);
@@ -290,29 +315,6 @@ u32 SceneNode__SetLightMode(SceneNode *self, u32 mode) {
     return GetSetBitField(&self->attribute, ATTR_LIGHTMODE_SHIFT, 3, mode);
 }
 
-/*
- * Slots +0x074 to +0x0B4, the table getter, and the segment-against-box
- * clippers the link test uses.
- *
- * SetLightDim, SetUseZ, SetSubdivision and SetBackClip set the last four
- * fields of GsDOBJ2.attribute; GetRotMatrix makes the node's rotation, or
- * its negation, a MATRIX.
- *
- * The link test, both sides. A sender, on event 2 or 3, fetches its model's
- * hull (NotifyWithHull, GetModelHull), rotates it by its world matrix and
- * notifies its parents with it in notifyVerts (TransformAndNotifyParents).
- * A SceneNode receiving that runs TryAttachNearby on the sender
- * (DispatchLinkCommand): the hull, brought into the receiver's frame
- * (ComposeAndApplyRotation), must overlap the model's bounds
- * (CheckBoundsOverlap) and hit one of its faces (RaycastHullAgainstFaces).
- * On a hit the two record each other as linkTarget, the sender through the
- * event 4 the receiver sends back.
- *
- * Also: the empty onPadEvent and update defaults and slot +0x0B0,
- * AddToActorParents, the table getter, and ClipSegmentToBox and
- * BisectSegmentToBox (declared in include/SceneNode.h).
- */
-
 /* TryAttachNearby's range: the other node is tested only when its world
  * position is within this distance of this node's on each axis. */
 #define ATTACH_AXIS_RANGE 16384
@@ -322,8 +324,7 @@ u32 SceneNode__SetLightMode(SceneNode *self, u32 mode) {
  * does a centre-line hit while sHitHeightGate is set. */
 #define HIT_HEIGHT_THRESHOLD 512
 
-/* Sets the GsLDIM field to `value` and returns the old field. The four
- * setters here are wrappers around GetSetBitField, like SceneNode.c's. */
+/* Sets the GsLDIM field to `value` and returns the old field. */
 u32 SceneNode__SetLightDim(SceneNode *self, u32 value) {
     return GetSetBitField(&self->attribute, ATTR_LDIM_SHIFT, 3, value);
 }
@@ -362,7 +363,8 @@ void SceneNode__GetRotMatrix(SceneNode *self, MATRIX *out, s32 invert) {
     RotMatrix(&angles, out);
 }
 
-/* The sending side of the link test: for events 2 and 3 only, and only when
+/* The sending side of the link test: for SCENENODE_EVENT_HULL_FIRST and
+ * _LAST only, and only when
  * the node has a model with bounds, fetches the model's hull through
  * getModelHull and passes it and the event to transformAndNotifyParents.
  * Other events are dropped here; overrides handle their own before calling
@@ -370,10 +372,10 @@ void SceneNode__GetRotMatrix(SceneNode *self, MATRIX *out, s32 invert) {
 void SceneNode__NotifyWithHull(SceneNode *self, s32 event) {
     TmdHull hull;
 
-    if (event >= 4) {
+    if (event > SCENENODE_EVENT_HULL_LAST) {
         return;
     }
-    if (event < 2) {
+    if (event < SCENENODE_EVENT_HULL_FIRST) {
         return;
     }
     if (self->model == NULL) {
@@ -410,17 +412,17 @@ void SceneNode__OnPadEvent(void) {}
 void SceneNode__Update(void) {}
 
 /* The receiving side of the link test, reached from OnNotify for a
- * SceneNode sender. Events 2 and 3 run tryAttachNearby on the sender (which
- * arrives as the caller's untouched second argument; see the slot). Event
- * 4 is TryAttachNearby's answer: the sender that found this node records
+ * SceneNode sender. The two hull events run tryAttachNearby on the sender
+ * (which arrives as the caller's untouched second argument; see the slot).
+ * SCENENODE_EVENT_LINKED is TryAttachNearby's answer: the sender that found this node records
  * itself here as linkTarget. */
 void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event) {
     switch (event) {
-        case 2:
-        case 3:
+        case SCENENODE_EVENT_HULL_FIRST:
+        case SCENENODE_EVENT_HULL_LAST:
             self->methods->tryAttachNearby(self);
             break;
-        case 4:
+        case SCENENODE_EVENT_LINKED:
             self->linkTarget = sender;
             break;
     }
@@ -433,7 +435,7 @@ void SceneNode__DispatchLinkCommand(SceneNode *self, void *sender, s32 event) {
  * the hull, moved by the offset, must overlap the model's bounds
  * (checkBoundsOverlap) and hit one of its faces (raycastHullAgainstFaces,
  * which fills other->hitMask). On a hit each node records the other: this
- * one here, `other` on the event 4 sent to it. A node with no parent has
+ * one here, `other` on the SCENENODE_EVENT_LINKED sent to it. A node with no parent has
  * no world position, and the code does not guard that case. */
 void SceneNode__TryAttachNearby(SceneNode *self, SceneNode *other) {
     LongVec3 *otherPos;
@@ -519,7 +521,7 @@ z_done:
     }
 
     self->linkTarget = other;
-    other->methods->onNotify(other, self, 4);
+    other->methods->onNotify(other, self, SCENENODE_EVENT_LINKED);
 }
 
 /* Composes getRotMatrix(invert) of the node and of every ancestor, applies
@@ -855,24 +857,6 @@ void SceneNode__AddToActorParents(SceneNode *self, void *node) {
 SceneNodeMethods *GetSceneNodeMethods(void) {
     return &gSceneNodeMethods;
 }
-
-/*
- * The class's methods that sit in no slot, and the vector helpers the game
- * calls by symbol.
- *
- * Methods: RotateLocalVector and LocalOffsetToWorldPos (an offset in the
- * node's own frame, rotated into its parent's, or made a world position),
- * RaycastVertical (a vertical ray against the node's model), GetRotationDegrees
- * and FaceTarget (the rotation read, and aimed at another node, as Ratio16
- * degrees), LinkModel and UnlinkModel (the TmdModel whose TMD GsLinkObject4
- * links to the node's embedded GsDOBJ2).
- *
- * Helpers: SubVec3S16, RatioToFixed12 (a Ratio16 as 20.12 fixed point),
- * CalcBoxOutcode (ClipSegmentToBox's outcodes), GetSetBitField (behind the
- * attribute setters), ApplyMatrixToSVArray and ApplyMatrixToLVArray (a matrix
- * over an array of vectors), IsVec3WithinRange, and GetSetHitHeightGate (the
- * switch RaycastHullAgainstFaces reads).
- */
 
 /* How far RaycastVertical's ray reaches from its origin, first along -y and
  * then along +y, in the model's own units. */

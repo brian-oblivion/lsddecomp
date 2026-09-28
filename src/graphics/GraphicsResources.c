@@ -134,18 +134,19 @@ void *New_TimBlockSrc(s32 name) {
     return NULL;
 }
 
-/* A TIM-block file's header, as copied. */
-typedef struct TimBlockHeaderBytes {
-    u8 bytes[36];
-} TimBlockHeaderBytes;
-
-/* The same header, read: a block count, then the blocks' file offsets and
- * their sizes. */
+/* A TIM-block file's header: a block count, then the blocks' file offsets
+ * and their sizes. */
 typedef struct TimBlockHeader {
     /* +0x00 */ u32 count;
     /* +0x04 */ u32 offsets[4];
     /* +0x14 */ u32 sizes[4];
 } TimBlockHeader;
+
+/* The same header as AdvanceLoadState copies it out of the sector buffer.
+ * MATCHING: bytes, so the copy is a byte-aligned block move. */
+typedef struct TimBlockHeaderBytes {
+    u8 bytes[sizeof(TimBlockHeader)];
+} TimBlockHeaderBytes;
 
 extern s16 sTimBlockClutShift;
 
@@ -292,7 +293,7 @@ void TimBlockSrc__SetEntryShift(TimBlockSrc *self, s32 index, s32 shift) {
 }
 
 /* fadeAllEntries (+0x07C): fadeEntry every ramp toward `color`. */
-void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, TimBlockSrcColor *color) {
+void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, ColorRgb *color) {
     s32 i;
 
     LockActiveDataSource();
@@ -303,7 +304,7 @@ void TimBlockSrc__FadeAllEntries(TimBlockSrc *self, TimBlockSrcColor *color) {
 }
 
 /* fadeEntry (+0x080): set ramp `index`'s colour and rebuild it. */
-void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, TimBlockSrcColor *src) {
+void TimBlockSrc__FadeEntry(TimBlockSrc *self, s32 index, ColorRgb *src) {
     TimBlockSrcEntry *e;
 
     LockActiveDataSource();
@@ -347,9 +348,9 @@ void FadeClutRow(TimBlockSrcEntry *e, s32 index) {
     dst.x = 0;
     dst.y = 0;
     dst.w = CLUT_COLORS;
-    r = (u8)e->color.r;
-    g = (u8)e->color.g;
-    b = (u8)e->color.b;
+    r = e->color.r;
+    g = e->color.g;
+    b = e->color.b;
     shift = FIX12_SHIFT - e->shift;
     e->clutH = e->mask;
     for (i = 0; i < e->mask - 1; i++) {
@@ -598,13 +599,6 @@ void Tod__Finalize(Tod *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-/* A TOD file: an 8-byte header (id, version, resolution, frame count),
- * then the frames. */
-typedef struct TodFile {
-    /* +0x00 */ u8 pad0[8];
-    /* +0x08 */ u32 frames[1];
-} TodFile;
-
 /* +0x078: scanTodPackets over the TOD's first frame. */
 u8 Tod__ScanPackets(Tod *self, u8 *out, u32 *tmdId) {
     return self->methods->scanTodPackets(self, out, tmdId, ((TodFile *)self->buffer)->frames);
@@ -616,13 +610,6 @@ typedef struct TodFrame {
     /* +0x00 */ u8 pad0[2];
     /* +0x02 */ u16 packetCount;
 } TodFrame;
-
-/* A TOD packet: the header word DecodeTodPacketWord splits, then the data;
- * a TMD-id packet's data starts with the id. */
-typedef struct TodPacket {
-    /* +0x00 */ u8 pad0[4];
-    /* +0x04 */ u16 tmdId;
-} TodPacket;
 
 /* scanTodPackets (+0x07C, both tables): walk the TOD frame at `data`.
  * Returns the number of object-create packets, whose object ids go to `out`
@@ -711,7 +698,7 @@ void BgLayer__BgLayer(BgLayer *self, TileMap *src, s32 mode) {
 /* reset (+0x040): lay the GsBG over `src`'s map, sized to the map (mode 0,
  * 8-bit CLUT) or to the screen (mode 1, 15-bit), at the origin, unscaled,
  * unrotated, pivoting on its centre. */
-extern BgLayerRgb sBgLayerDefaultColor;
+extern ColorRgb sBgLayerDefaultColor;
 
 void BgLayer__Reset(BgLayer *self, TileMap *src, s32 mode) {
     if (mode == 0) {
@@ -820,7 +807,7 @@ void BgLayer__UpdateScale(BgLayer *self, s32 set, Ratio16 *src) {
 }
 
 /* +0x0B8: take `rgb` as the GsBG's colour when `enable`. */
-void BgLayer__SetColor(BgLayer *self, s32 enable, BgLayerRgb *rgb) {
+void BgLayer__SetColor(BgLayer *self, s32 enable, ColorRgb *rgb) {
     if (enable) {
         self->color = *rgb;
     }
@@ -898,7 +885,7 @@ s32 ModelData__BuildResources(ModelData *self) {
         self->linkResource = New_LinkResource(&req.src);
         if (self->linkResource != NULL) {
             req.src.buffer = ((ModelDataHeader *)self->buffer)->tods;
-            self->todSet = (FileResource *)New_TodSet(&req.src);
+            self->todSet = New_TodSet(&req.src);
             if (self->todSet != NULL) {
                 return 0;
             }
@@ -931,9 +918,8 @@ u8 ModelData__ForwardScanPackets(ModelData *self, s32 out, s32 tmdId) {
 /* decodePacketWord (+0x084): the TodSet's. */
 void *ModelData__ForwardDecodePacketWord(ModelData *self, s32 packet, s32 objId, s32 type, s32 flag,
                                          s32 len) {
-    return ((TodSet *)self->todSet)
-        ->methods->decodePacketWord((TodSet *)self->todSet, (u32 *)packet, (u8 *)objId, (u8 *)type,
-                                    (u8 *)flag, (u8 *)len);
+    return self->todSet->methods->decodePacketWord(self->todSet, (u32 *)packet, (u8 *)objId,
+                                                   (u8 *)type, (u8 *)flag, (u8 *)len);
 }
 
 ModelDataMethods *GetModelDataMethods(void) {

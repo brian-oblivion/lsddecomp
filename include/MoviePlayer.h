@@ -77,10 +77,10 @@ struct MoviePlayer {
     /* +0x04C */ s32 frameDone; /* drawStrip after a frame's last strip; WaitFrameReady spins on it; play and rewind set it */
     /* +0x050 */ s32 pendingStart; /* RequestStart 1, RequestRestart -1; advance starts the stream reading (startRead) while nonzero,
                                       * counting `loops` down when negative, then clears it. The ctor clears it */
-    /* +0x054 */ s32 keepActive; /* play's keepActive (StreamTask's unkC4); while set, pollActive does not finish but calls rewind
+    /* +0x054 */ s32 keepActive; /* play's keepActive (StreamTask::keepActive); while set, pollActive does not finish but calls rewind
                                       * every 100 polls; abort clears it */
-    /* +0x058 */ s32 loops;        /* play's; advance mutes the stream when it runs out */
-    /* +0x05C */ s32 frameCount;   /* play's arg2; advance's startRead(1, frameCount) */
+    /* +0x058 */ s32 loops;      /* play's; advance mutes the stream when it runs out */
+    /* +0x05C */ s32 frameCount; /* play's arg2; advance's startRead(1, frameCount) */
     /* +0x060 */ CdStream *stream; /* the ctor's New_CdStream; finalize releases it */
     /* +0x064 */ s32 started; /* advance, after startRead; abort; rewind clears it. With pendingStart clear, advance decodes only once set */
     /* +0x068 */ s32 autoPlay; /* setAutoPlay; play calls RequestStart at once when set */

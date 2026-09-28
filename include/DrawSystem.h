@@ -55,6 +55,15 @@ typedef struct DrawRect {
     /* +0x8 */ s32 h;
 } DrawRect;
 
+/* An r, g, b colour as the game's objects keep and pass it: a sprite's,
+ * a box's, the background's, the ambient and flat lights', a viewport's
+ * clear and far colours. Three bytes, not Sony's four-byte CVECTOR.
+ * MATCHING: byte members give it size 3 and alignment 1, so a whole-struct
+ * copy, which is how its users copy it, is three lb then three sb. */
+typedef struct ColorRgb {
+    u8 r, g, b;
+} ColorRgb;
+
 struct DrawSystemMethods {
     BASICCLASS_SLOTS(DrawSystem, (DrawSystem * self)); /* +0x008: DrawSystem__DrawSystem */
     /* +0x040 */ void (*init)(DrawSystem *self);       /* DrawSystem__Init */

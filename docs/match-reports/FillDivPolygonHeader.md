@@ -22,7 +22,7 @@ Whole-image `./build-and-verify.sh` passes (`build exit=0`).
 ```c
 extern s32 sDivClipWidth;
 extern s32 sDivClipHeight;
-extern s32 D_80090C18;
+extern s32 sSortNdiv;
 extern s32 sNdivOverrideSet;
 extern s32 sNdivOverride;
 
@@ -37,7 +37,7 @@ void FillDivPolygonHeader(void *arg0, void *arg1, PolyUV4 *arg2, s32 arg3, u16 a
     if (sNdivOverrideSet) {
         val = sNdivOverride;
     } else {
-        val = D_80090C18;
+        val = sSortNdiv;
     }
     code = sDivClipWidth;
     code2 = sDivClipHeight;
@@ -185,7 +185,7 @@ Globals renamed with it:
 | `sPolyOtCodeOverrideSet` | `sNdivOverrideSet` | A | gates the word stored at `ndiv` |
 | `sPolyOtCodeOverride` | `sNdivOverride` | A | the `ndiv` used while the gate is set |
 
-`D_80090C18`, the default `ndiv`, keeps its name: `rename.py` refuses it
+`sSortNdiv`, the default `ndiv`, keeps its name: `rename.py` refuses it
 because `config/psyq-objects.ld` pins Sony's `dc_cb` (libpress/vlc2) at
 0x80090C14 with 8 bytes, which covers it. Its only writer is TmdRenderer's
 SortTmdObject, from bits 9-11 of the drawn object's flags, so the word

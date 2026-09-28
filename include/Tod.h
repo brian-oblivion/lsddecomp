@@ -27,7 +27,7 @@
  * TodSet's is 0x2C too (New_TodSet). Everything a Tod reads is in the
  * adopted or loaded `buffer`.
  *
- * +0x078 is FileResource's slot78 (NULL there): this table's occupant is
+ * +0x078 is FileResource's processBuffer (NULL there): this table's occupant is
  * Tod__ScanPackets(self, out, sel), u8, which runs +0x07C over the buffer
  * past its first two words (TodSet's occupant runs it past its counted
  * array); ModelData__ForwardScanPackets casts it (an inherited slot keeps
@@ -53,6 +53,21 @@ struct ResourceSource;
 #define TOD_PACKET_MODEL_ID 2       /* data: the TMD id the object is drawn with */
 #define TOD_PACKET_OBJECT_CONTROL 8 /* the flag says create or kill */
 #define TOD_OBJECT_CREATE 0         /* an object-control packet's flag: create */
+
+/* A TOD file (Sony's TOD format): id, version and resolution, the frame
+ * count, then the frames, each a word-aligned run of words. */
+typedef struct TodFile {
+    /* +0x00 */ u8 pad0[4]; /* id, version, resolution: not read */
+    /* +0x04 */ s32 frameCount;
+    /* +0x08 */ u32 frames[1]; /* the first frame */
+} TodFile;
+
+/* A TOD packet: the header word DecodeTodPacketWord splits, then the data;
+ * a TOD_PACKET_MODEL_ID packet's data starts with the TMD id. */
+typedef struct TodPacket {
+    /* +0x00 */ u32 header;
+    /* +0x04 */ u16 tmdId;
+} TodPacket;
 
 typedef struct Tod Tod;
 typedef struct TodMethods TodMethods;

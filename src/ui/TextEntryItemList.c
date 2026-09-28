@@ -157,7 +157,7 @@ extern char sStrFontIcon[];                /* "FONTICON" */
 extern char sCardPathPrefix[];             /* "CARD\\" */
 extern char sTimExt[];                     /* ".TIM" */
 extern SpriteRect sTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0, 0) */
-extern SpriteRgb sTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
+extern ColorRgb sTextEntryTextColor;       /* the text row's colour: (128, 128, 0) */
 extern ScreenSpritePos sTextEntryPanelPos; /* (-70, -60) */
 extern ScreenSpritePos sTextEntryTextPos;  /* (-62, -15) */
 

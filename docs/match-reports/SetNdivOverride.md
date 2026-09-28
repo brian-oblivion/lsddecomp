@@ -74,7 +74,7 @@ them.
 (`enable`, `code`). **Tier A**: a two-field setter whose read side
 (FillDivPolygonHeader, this unit) is fully derived -- `enable` gates whether
 FillDivPolygonHeader's header word 0 comes from `code` (stored only when
-`enable` is set) or the per-object D_80090C18 default. Matches the
+`enable` is set) or the per-object sSortNdiv default. Matches the
 globals it writes, `sNdivOverrideSet`/`sNdivOverride` (named
 alongside this function).
 

@@ -21,8 +21,9 @@
  * records, and the ndiv override setter. All GTE work goes through
  * include/gte.h's gte_* macros (Sony's names; never <inline.h>).
  *
- * The BasicClass part, which ends at GetBMemPMgrBusy, belongs with
- * BMemPMgr.c; the renderer begins at SortTmdObject.
+ * The BasicClass part ends at GetBMemPMgrBusy and the renderer begins at
+ * SortTmdObject. In ROM the BasicClass part follows the end of BMemPMgr.c,
+ * which holds the rest of BasicClass.
  */
 
 #include "common.h"
@@ -30,12 +31,13 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "BMemPMgr.h"
+#include "DrawSystem.h"
 #include "gte.h"
 #include "TmdRenderer.h"
 
 /* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
- * work and back to 0 after (setter and getter in TmdRenderer.c). Nothing in
- * either waits on it. */
+ * work and back to 0 after (SetBMemPMgrBusy, GetBMemPMgrBusy below). Nothing
+ * in either waits on it. */
 extern s32 sBMemPMgrBusy;
 
 void FreeBasicClassList(BasicClassListNode **head) {
@@ -61,9 +63,8 @@ void BasicClass__NotifyParents(BasicClass *self, s32 event) {
 }
 
 /* BasicClassMethods slot +0x034. Empty, and no BasicClass-derived table
- * overrides it, so nothing says what it is for: the name stays a tier-C
- * placeholder (the table census is in the report). */
-void BasicClass__func_18350(void) {}
+ * overrides it. */
+void BasicClass__NoOpSlot34(void) {}
 
 /* BasicClassMethods slot +0x038, the receiving half of NotifyParents:
  * `sender` is telling `self` that `event` happened. The base class treats
@@ -108,22 +109,15 @@ s32 GetBMemPMgrBusy(void) {
 
 /* The drawn object's attribute bits, as SortTmdObject publishes them for
  * SetupPrimCode and the submit wrappers. Sony's GsSortObject4 keeps the same
- * four fields in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. D_8008E248 is bit 6 of
- * the object's flags word, which SetupPrimCode ORs into the GPU command
- * byte's shade-texture bit 0x1 (Psy-Q's SetShadeTex); it keeps its address
- * name because it is bss past the image end, where rename.py cannot reach
- * (the proposed name is in SetupPrimCode.md). D_80090C18 is the default ndiv
- * from bits 9-11. */
-extern s32 D_8008E248;              /* GsLOFF */
-extern s32 D_80090C18;              /* GsDIV1..5: subdivision level */
+ * four fields in GsNDIV, GsLIOFF, GsLIGNR and GsLMODE. sSortLightOff is bit 6
+ * of the object's attribute word, which SetupPrimCode ORs into the GPU
+ * command byte's shade-texture bit 0x1 (Psy-Q's SetShadeTex). sSortNdiv is
+ * the object's subdivision level, bits 9-11, the ndiv every DIVPOLYGON gets
+ * unless SetNdivOverride has set one. */
+extern s32 sSortLightOff;           /* GsLOFF */
+extern s32 sSortNdiv;               /* GsDIV1..5: subdivision level */
 extern s32 sSortUseGlobalLightMode; /* GsLLMOD */
 extern s32 sSortLightMode;          /* GsFOG | GsMATE */
-
-/* MATCHING: three s8s, so SortTmdObject's copy of sTexturedFaceColor is a
- * 3-byte block move (`la`, three `lb`, three `sb`). */
-typedef struct {
-    s8 r, g, b;
-} Rgb8;
 
 /*
  * The per-object draw context SortTmdObject builds in the PS1 scratchpad
@@ -133,20 +127,20 @@ typedef struct {
 typedef struct PolyDrawCtx {
     /* +0x000 */ GsOT_TAG *otBase;  /* the GsOT's org */
     /* +0x004 */ s32 otShift;       /* otz >> otShift indexes otBase */
-    /* +0x008 */ s32 unk8;          /* set to 10 per object; no reader in carved code */
+    /* +0x008 */ s32 unk8;          /* set to 10 per object; nothing reads it */
     /* +0x00C */ SVECTOR *vertices; /* the TMD object's vertex array */
     /* +0x010 */ SVECTOR *normals;  /* the TMD object's normal array */
     /* +0x014 */ u8 primLen;        /* SetupPrimCode's cached P_TAG length byte */
     /* +0x015 */ u8 primCode;       /* ... and finished GPU command byte */
     u8 pad016[0x018 - 0x016];
-    /* +0x018 */ u32 packetType;   /* the current group's TMD mode/flag word */
-    /* +0x01C */ s32 semiTrans;    /* the group's ABE bit */
-    /* +0x020 */ s32 otz;          /* avsz3 result */
-    /* +0x024 */ s32 dp;           /* IR0, the depth-cue factor */
-    /* +0x028 */ s32 opz;          /* nclip result (MAC0) */
-    /* +0x02C */ s32 dpShift;      /* dp >> dpShift is the CLUT row offset */
-    /* +0x030 */ GsOT_TAG *otSlot; /* &otBase[otz >> otShift] */
-    /* +0x034 */ Rgb8 faceColor;   /* sTexturedFaceColor's copy */
+    /* +0x018 */ u32 packetType;     /* the current group's TMD mode/flag word */
+    /* +0x01C */ s32 semiTrans;      /* the group's ABE bit */
+    /* +0x020 */ s32 otz;            /* avsz3 result */
+    /* +0x024 */ s32 dp;             /* IR0, the depth-cue factor */
+    /* +0x028 */ s32 opz;            /* nclip result (MAC0) */
+    /* +0x02C */ s32 dpShift;        /* dp >> dpShift is the CLUT row offset */
+    /* +0x030 */ GsOT_TAG *otSlot;   /* &otBase[otz >> otShift] */
+    /* +0x034 */ ColorRgb faceColor; /* sTexturedFaceColor's copy */
     u8 pad037[0x038 - 0x037];
     /* +0x038 */ MATRIX savedRotMatrix;
     u8 pad058[0x05C - 0x058];
@@ -204,7 +198,7 @@ typedef struct TmdGroupHeader {
         ((POLY_FT3 *)(p))->clut += (rows) << 6; \
     } while (0)
 /* clang-format on */
-extern Rgb8 sTexturedFaceColor;
+extern ColorRgb sTexturedFaceColor;
 
 /* The two subdivision work buffers the SubmitPoly* wrappers hand Sony's
  * RCpoly* packers, a DIVPOLYGON3 and a DIVPOLYGON4 back to back (0x218
@@ -314,8 +308,8 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 
     /* MATCHING: four struct reads of attribute, hoisted by the scheduler
      * above the global stores; unk8 is stored after them as a field. */
-    D_80090C18 = (obj->attribute >> 9) & 0x7;
-    D_8008E248 = (obj->attribute >> 6) & 0x1;
+    sSortNdiv = (obj->attribute >> 9) & 0x7;
+    sSortLightOff = (obj->attribute >> 6) & 0x1;
     sSortUseGlobalLightMode = (obj->attribute >> 5) & 0x1;
     sSortLightMode = (obj->attribute >> 3) & 0x3;
     ctx->unk8 = 10;
@@ -753,13 +747,13 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
  * Finish the command byte of the primitive SortTmdObject has just given its
  * length and code, and cache both bytes in the context: the ABE
  * (semi-transparency) bit from the run's packet type, the TGE (texture
- * shading off) bit from D_8008E248, the object's GsLOFF bit.
+ * shading off) bit from sSortLightOff, the object's GsLOFF bit.
  * TransformAndCullPoly re-stamps the cached length onto every primitive.
  * MATCHING: two separate statements; one shared local costs the match.
  */
 void SetupPrimCode(void *prim, PolyDrawCtx *ctx) {
     setSemiTrans(prim, ctx->semiTrans);
-    setShadeTex(prim, D_8008E248);
+    setShadeTex(prim, sSortLightOff);
 
     ctx->primLen = getlen(prim);
     ctx->primCode = getcode(prim);
@@ -1194,8 +1188,8 @@ void FlagLargePolyForDivide(void *ctxIn, s32 count) {
 
     xp = &ctx->sxy[1].vx;
     /* MATCHING: this is &ctx->sxy[count - 1].vx, but that spelling folds the
-     * 0x5C into the index before adding ctx, and retail adds ctx first. */
-    end = (short *)((u8 *)ctx + count * sizeof(DVECTOR) + 0x5C);
+     * constant into the index before adding ctx, and retail adds ctx first. */
+    end = (short *)((u8 *)ctx + count * sizeof(DVECTOR) + (offsetof(PolyDrawCtx, sxy) - sizeof(DVECTOR)));
 
     /* MATCHING: a guarded do/while with yp set inside the guard. Setting yp
      * before the test moves the frame setup out of the branch delay slot. */
@@ -1231,7 +1225,7 @@ void FlagLargePolyForDivide(void *ctxIn, s32 count) {
 extern s32 sDivClipWidth;
 extern s32 sDivClipHeight;
 
-/* SetNdivOverride's: when set, sNdivOverride replaces D_80090C18. */
+/* SetNdivOverride's: when set, sNdivOverride replaces sSortNdiv. */
 extern s32 sNdivOverrideSet;
 extern s32 sNdivOverride;
 
@@ -1252,7 +1246,7 @@ void FillDivPolygonHeader(void *divpIn, PolyDrawCtx *ctx, CVECTOR *rgbc, s32 tex
     if (sNdivOverrideSet) {
         ndiv = sNdivOverride;
     } else {
-        ndiv = D_80090C18;
+        ndiv = sSortNdiv;
     }
     pih = sDivClipWidth;
     piv = sDivClipHeight;

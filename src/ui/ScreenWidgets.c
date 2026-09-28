@@ -470,7 +470,7 @@ s32 TextRow__SetDisplay(TextRow *self, s32 on, s32 result) {
     return result;
 }
 
-void TextRow__SetColor(TextRow *self, SpriteRgb *rgb) {
+void TextRow__SetColor(TextRow *self, ColorRgb *rgb) {
     CharSprite **elemp = self->cells + self->firstVisible;
     s32 i = self->firstVisible;
     s32 bound = i;

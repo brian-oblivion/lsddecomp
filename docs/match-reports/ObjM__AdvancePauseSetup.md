@@ -150,7 +150,7 @@ contents are what setColor/attachToParent/New_TextRow take):
 | --- | --- | --- |
 | `D_8008AB44` | `sPauseText` | the `.asciz "Pause"`, New_TextRow's text |
 | `D_8008AB38` | `sPauseTextPos` | two words (-20, -50), attachToParent's position; now declared `ScreenSpritePos` (TextRow's attach reads one) |
-| `D_8008AB40` | `sPauseTextColor` | bytes FF 00 00, setColor's SpriteRgb; now declared `SpriteRgb`, no cast |
+| `D_8008AB40` | `sPauseTextColor` | bytes FF 00 00, setColor's ColorRgb; now declared `ColorRgb`, no cast |
 
 The local `state` is `step` (it is pauseSetupStep). The `5` passed to
 New_TextRow stays a literal: it is the text's length, which the comment

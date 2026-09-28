@@ -99,7 +99,7 @@ struct TmdModelMethods {
     /* +0x040 */ void (*setQuad)(TmdModel *self, TmdModelQuad *src); /* TmdModel__SetQuad */
     /* +0x044 */ void (*mapModelingData)(TmdModel *self);            /* TmdModel__MapModelingData */
     /* +0x048 */ TmdObject *(*getObject)(TmdModel *self, s32 i);     /* TmdModel__GetObject */
-    /* +0x04C */ void (*slot4C)(void); /* TmdModel__func_8001F37C, empty */
+    /* +0x04C */ void (*slot4C)(void); /* TmdModel__NoOpSlot4C, empty */
 };
 
 struct TmdModel {
@@ -119,7 +119,7 @@ void TmdModel__TmdModel(TmdModel *self, TmdObject *object);
 void TmdModel__SetQuad(TmdModel *self, TmdModelQuad *src);
 void TmdModel__MapModelingData(TmdModel *self);
 TmdObject *TmdModel__GetObject(TmdModel *self, s32 i);
-void TmdModel__func_8001F37C(void);
+void TmdModel__NoOpSlot4C(void);
 
 /* Non-virtual methods, called directly. */
 void TmdModel__InitBoundsCount(TmdModel *self);

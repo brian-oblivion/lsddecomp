@@ -40,15 +40,9 @@
 
 typedef struct LightRig LightRig;
 typedef struct LightRigMethods LightRigMethods;
-typedef struct LightRigRgb LightRigRgb;
 
-/* A 3-byte colour. All-s8 members give it alignment 1, which is what makes
- * LightRig__SetAmbientColor's whole-struct copies compile to lb,lb,lb then
- * sb,sb,sb (DECOMPILATION_LEARNINGS, the 3-byte all-s8 struct idiom). The
- * same shape as Sprite.h's SpriteRgb and FlatLightObj's FlatLightColor. */
-struct LightRigRgb {
-    s8 r, g, b;
-};
+/* The spelling ObjMStyleActor.c's setAmbientColor call still casts to. */
+typedef ColorRgb LightRigRgb;
 
 /* SceneNode's slots, then this class's own. `tools/classtable.py
  * gLightRigMethods --vs gSceneNodeMethods` lists the overrides of the
@@ -58,14 +52,14 @@ struct LightRigRgb {
 #define LIGHTRIG_SLOTS(Self, CtorParams)                                                           \
     SCENENODE_SLOTS(Self, CtorParams);                                                            \
     /* +0x0B8 */ BasicClass *(*getLight)(Self *self, s32 index); /* LightRig__GetLight: lights[index]; StageMap inherits it */ \
-    /* +0x0BC */ void (*setAmbientColor)(Self *self, LightRigRgb *rgb, s32 swap) /* LightRig__SetAmbientColor; swap: the old colour comes back in *rgb */
+    /* +0x0BC */ void (*setAmbientColor)(Self *self, ColorRgb *rgb, s32 swap) /* LightRig__SetAmbientColor; swap: the old colour comes back in *rgb */
 /* clang-format on */
 
 /* clang-format off */
 #define LIGHTRIG_FIELDS(Methods)                                                                   \
     SCENENODE_FIELDS(Methods);                                                                    \
     /* +0x044 */ BasicClass *lights[3]; /* the ctor's New_FlatLightObj(0..2), also children */    \
-    /* +0x050 */ LightRigRgb ambient    /* setAmbientColor; GsSetAmbient gets each << 4. The object is 0x54 bytes (New_LightRig) */
+    /* +0x050 */ ColorRgb ambient    /* setAmbientColor; GsSetAmbient gets each << 4. The object is 0x54 bytes (New_LightRig) */
 /* clang-format on */
 
 struct LightRigMethods {
@@ -87,6 +81,6 @@ void LightRig__Finalize(LightRig *self);
 void LightRig__Reset(LightRig *self);
 void LightRig__DispatchLinkCommand(LightRig *self, void *sender, s32 event);
 BasicClass *LightRig__GetLight(LightRig *self, s32 index);
-void LightRig__SetAmbientColor(LightRig *self, LightRigRgb *rgb, s32 swap);
+void LightRig__SetAmbientColor(LightRig *self, ColorRgb *rgb, s32 swap);
 
 #endif

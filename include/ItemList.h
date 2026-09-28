@@ -52,7 +52,7 @@ struct SceneNode;
 struct ScreenSprite;
 struct TextRow;
 struct TimImage;
-struct SpriteRgb;
+struct ColorRgb;
 struct VabStreamObj;
 
 /* ItemList's class id (gItemListMethods word +0x000). Two nibbles, so

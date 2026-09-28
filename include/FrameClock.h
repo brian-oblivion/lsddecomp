@@ -15,10 +15,10 @@
  * 3 (paused: not counted) or 4 (stopped: not counted, takes precedence; only reset clears it).
  * Its tick comes from the DrawSystem's per-VSync event 2
  * (include/DrawSystem.h): IntermediateBase__Init (src/app/Task.c) keeps
- * one at +0x010 (initArgs->unk8, or New_FrameClock()), adds it as a child of
+ * one at +0x010 (initArgs->frameClock, or New_FrameClock()), adds it as a child of
  * itself, of the viewport and of the LightRig, and IntermediateBase__OnDrawSystemEvent
  * calls its tick on the DrawSystem's event 2. DayTask__DayTask
- * (src/world/DayTaskStageMap.c) makes the one handed in as initArgs->unk8.
+ * (src/world/DayTaskStageMap.c) makes the one handed in as initArgs->frameClock.
  *
  * Its listeners, all dispatching on the sender's class nibble 5:
  * IntermediateBase's update counts every event; Viewport__OnFrameClockEvent

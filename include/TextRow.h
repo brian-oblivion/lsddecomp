@@ -88,7 +88,7 @@ void TextRow__Reset(TextRow *self, char *text);
 void TextRow__AttachToParent(TextRow *self, SceneNode *parent, ScreenSpritePos *pos);
 void TextRow__DetachFromParent(TextRow *self);
 s32 TextRow__SetDisplay(TextRow *self, s32 on, s32 result);
-void TextRow__SetColor(TextRow *self, SpriteRgb *rgb);
+void TextRow__SetColor(TextRow *self, ColorRgb *rgb);
 void TextRow__SetPosition(TextRow *self, ScreenSpritePos *pos);
 void TextRow__SetCellAt(TextRow *self, s32 cell, s32 index);
 void TextRow__NoOpGetCell(void);

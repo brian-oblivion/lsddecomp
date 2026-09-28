@@ -41,7 +41,6 @@
 
 typedef struct Sprite Sprite;
 typedef struct SpriteMethods SpriteMethods;
-typedef struct SpriteRgb SpriteRgb;
 typedef struct SpriteRect SpriteRect;
 typedef struct SpriteGs SpriteGs;
 
@@ -50,13 +49,6 @@ typedef struct SpriteGs SpriteGs;
  * every subclass too: ScreenSprite (0x144) and VariantSprite (0x1F44)
  * (Viewport__DrawNode). */
 #define SPRITE_CLASS_ID 0x44
-
-/* A 3-byte colour. All-s8 members give it alignment 1, which is what makes
- * Sprite__SetColor's whole-struct copy compile to lb,lb,lb then sb,sb,sb
- * (DECOMPILATION_LEARNINGS, the 3-byte all-s8 struct idiom). */
-struct SpriteRgb {
-    s8 r, g, b;
-};
 
 /* A texture cell: 16-bit origin in the texture page, 32-bit extent. The
  * ctor's `rect`, copied to `rect` by reset; sVariantSpriteCells (VariantSprite's two
@@ -68,9 +60,9 @@ struct SpriteRect {
     /* +0x008 */ s32 h;
 };
 
-/* libgs GsSPRITE, 0x24 bytes, field for field, with r,g,b as one SpriteRgb.
+/* libgs GsSPRITE, 0x24 bytes, field for field, with r,g,b as one ColorRgb.
  * Kept local rather than Sony's GsSPRITE: Sprite__SetColor copies the colour
- * as one SpriteRgb (the whole-struct copy is what matches), and
+ * as one ColorRgb (the whole-struct copy is what matches), and
  * GetSetBitField takes `attribute` as a u32 *, where Sony's is unsigned long;
  * Sony's type would cost a cast at each of those four sites to save the two
  * in Viewport__DrawNode. */
@@ -85,7 +77,7 @@ struct SpriteGs {
     /* +0x00F */ u8 v;
     /* +0x010 */ s16 cx;
     /* +0x012 */ s16 cy;
-    /* +0x014 */ SpriteRgb rgb;
+    /* +0x014 */ ColorRgb rgb;
     /* +0x017 */ u8 pad17;
     /* +0x018 */ s16 mx;
     /* +0x01A */ s16 my;
@@ -111,7 +103,7 @@ struct SpriteGs {
 /* clang-format off */
 #define SPRITE_SLOTS(Self, CtorParams)                                                             \
     SCENENODE_SLOTS(Self, CtorParams);                                                            \
-    /* +0x0B8 */ void (*setColor)(Self *self, SpriteRgb *rgb) /* Sprite__SetColor; gTextRowMethods: TextRow__SetColor */
+    /* +0x0B8 */ void (*setColor)(Self *self, ColorRgb *rgb) /* Sprite__SetColor; gTextRowMethods: TextRow__SetColor */
 /* clang-format on */
 
 /* clang-format off */
@@ -150,6 +142,6 @@ s32 Sprite__SetDisplay(Sprite *self, s32 on);
 s32 Sprite__SetSemiTrans(Sprite *self, s32 on);
 s32 Sprite__SetSemiTransRate(Sprite *self, s32 rate);
 void Sprite__Update(Sprite *self, void *sender, s32 event);
-void Sprite__SetColor(Sprite *self, SpriteRgb *rgb);
+void Sprite__SetColor(Sprite *self, ColorRgb *rgb);
 
 #endif

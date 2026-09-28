@@ -2,6 +2,7 @@
 #define FLATLIGHTOBJ_H
 
 #include "BasicClass.h"
+#include "DrawSystem.h"
 
 /*
  * FlatLightObj -- one Psy-Q flat light, class id 0x6, method table
@@ -15,7 +16,8 @@
  * +0x010, and setColor/setDirection update the GsF_LIGHT and hand it by
  * address to GsSetFlatLight(lightId, &light). FlatLightParams is GsF_LIGHT's
  * layout (`int vx,vy,vz; unsigned char r,g,b;`, same offsets) with r,g,b
- * grouped as FlatLightColor, which setColor's whole-struct copy needs;
+ * grouped as a ColorRgb (include/DrawSystem.h), which setColor's whole-struct
+ * copy needs;
  * src/graphics/FlatLightObj.c takes GsSetFlatLight from <libgs.h> and casts to GsF_LIGHT *.
  *
  * Who holds one: LightRig__LightRig (src/graphics/Sprite.c, include/LightRig.h)
@@ -33,24 +35,20 @@
 typedef struct FlatLightObj FlatLightObj;
 typedef struct FlatLightObjMethods FlatLightObjMethods;
 
-/* The colour triple. Copied as a whole struct (FlatLightObj__SetColor): the
- * all-s8 members give it alignment 1, and GCC's block move is what loads all
- * three bytes before storing any. */
-typedef struct {
-    s8 r, g, b;
-} FlatLightColor;
+/* The spelling StageMap__SetChildParams (DayTaskStageMap.c) still uses. */
+typedef ColorRgb FlatLightColor;
 
 /* == LIBGS.H GsF_LIGHT: the direction, then the colour. */
 typedef struct {
     /* +0x000 */ s32 vx, vy, vz;
-    /* +0x00C */ FlatLightColor rgb;
+    /* +0x00C */ ColorRgb rgb;
 } FlatLightParams;
 
 struct FlatLightObjMethods {
     BASICCLASS_SLOTS(FlatLightObj, (FlatLightObj * self, s32 lightId)); /* ctor: FlatLightObj__FlatLightObj */
     /* +0x040 */ void (*setLightId)(FlatLightObj *self, s32 lightId); /* FlatLightObj__SetLightId */
     /* +0x044 */ void (*setColor)(FlatLightObj *self, s32 update,
-                                  FlatLightColor *rgb); /* FlatLightObj__SetColor: copy *rgb if update, then GsSetFlatLight */
+                                  ColorRgb *rgb); /* FlatLightObj__SetColor: copy *rgb if update, then GsSetFlatLight */
     /* +0x048 */ void (*setDirection)(FlatLightObj *self, s32 update,
                                       s16 *dir); /* FlatLightObj__SetDirection: widen dir[0..2] if update, then GsSetFlatLight */
 };
@@ -68,7 +66,7 @@ extern FlatLightObjMethods *GetFlatLightObjMethods(void); /* returns &gFlatLight
 FlatLightObj *New_FlatLightObj(s32 lightId);
 void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId);
 void FlatLightObj__SetLightId(FlatLightObj *self, s32 lightId);
-void FlatLightObj__SetColor(FlatLightObj *self, s32 update, FlatLightColor *rgb);
+void FlatLightObj__SetColor(FlatLightObj *self, s32 update, ColorRgb *rgb);
 void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir);
 
 #endif
