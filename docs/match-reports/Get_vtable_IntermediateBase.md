@@ -44,7 +44,7 @@ first build.
 
 **Get_vtable_IntermediateBase** (renamed from `func_8003E5C8`, round 55,
 runner alpha). Tier A: pure leaf getter, returns `&gIntermediateBaseMethods`
-(formerly `D_8006E878`), matching the `Get_vtable_BasicClass` naming
+(formerly `D_8006E878`), matching the `GetBasicClassMethods` naming
 precedent already established in this project for this exact shape. Called
 from `Task.c`, `DayTaskStageMap.c` and this unit (`TaskViewport.c`) --
 confirming, independently of `IntermediateBase__IntermediateBase`'s own evidence, that this

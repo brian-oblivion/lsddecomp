@@ -21,7 +21,7 @@ void TextEntry__OnNotify(Obj86ED0 *self, void *arg1, s32 arg2)
     s32 tag;
     s32 mask;
 
-    Get_vtable_BasicClass()->slot38(self, arg1, arg2);
+    GetBasicClassMethods()->slot38(self, arg1, arg2);
 
     tag = **(s32 **)arg1;
     mask = tag & 0xF;

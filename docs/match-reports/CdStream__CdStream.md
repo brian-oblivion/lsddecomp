@@ -71,7 +71,7 @@ by `grep -rn` over `src/`, `include/`), so these were renamed directly
 
 ```c
 void CdStream__CdStream(CdStreamObj *self, u32 arg1, s32 arg2, s32 arg3) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = Get_vtable_CdStream();
     self->unk34 = arg1;
     self->muted = 0;

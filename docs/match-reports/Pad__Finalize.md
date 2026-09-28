@@ -29,7 +29,7 @@ void *Pad__Finalize(Pad *self) {
     if (--sPadRefCount == 0) {
         PadStop();
     }
-    return Get_vtable_BasicClass()->dtor(self);
+    return GetBasicClassMethods()->dtor(self);
 }
 ```
 

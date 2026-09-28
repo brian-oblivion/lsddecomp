@@ -19,7 +19,7 @@ The gApplicationMethods constructor (slot `+0x008`). GameApplication__GameApplic
 
 ```c
 void Application__Application(Application *self, s32 source) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetApplicationMethods();
     if (gCdInitDone == 0) {
         CdInit();

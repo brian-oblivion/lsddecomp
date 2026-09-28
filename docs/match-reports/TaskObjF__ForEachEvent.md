@@ -15,7 +15,7 @@ this codebase. Established from first principles across this whole batch:
   slots (+0x010 `addChild`, +0x014 `removeChild`) are **inherited,
   unmodified `BasicClass` slots** (`include/code_8220.h`'s
   `BasicClassMethods`) — confirmed because `TaskObjF__OnNotify` fetches
-  `BasicClass`'s own table directly (`Get_vtable_BasicClass()`, which
+  `BasicClass`'s own table directly (`GetBasicClassMethods()`, which
   `include/code_8220.h` already establishes returns `&gBasicClassMethods`) and
   dispatches its slot +0x038 with a `(self, arg1, arg2)` signature that
   matches `BasicClassMethods::slot38` exactly. `TaskObjF` is therefore a
@@ -65,9 +65,9 @@ forwarding `self` unchanged with a different callback
   **externs for functions outside this unit** (typed purely from this call
   site's own register usage: no arguments set up, no return value read).
 - New local view `BasicMethods866E8F` (a minimal `BasicClass` vtable slice,
-  just slot +0x038) and `extern BasicMethods866E8F *Get_vtable_BasicClass(void);`
+  just slot +0x038) and `extern BasicMethods866E8F *GetBasicClassMethods(void);`
   — **an extern for a function declared elsewhere with a different return
-  type** (`include/code_8220.h`'s `BasicClassMethods *Get_vtable_BasicClass(void)`,
+  type** (`include/code_8220.h`'s `BasicClassMethods *GetBasicClassMethods(void)`,
   and several other units' own local views) — deliberately NOT unified
   with that header, same "independent local view" policy as everywhere
   else in this project; flagged per the round's header-collision rule

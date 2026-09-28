@@ -15,7 +15,7 @@ allocation itself is `New_SceneNode`, a separate `New_X` wrapper, not this
 function). Allocates two sub-blocks (`self->unk14`, 0x50 bytes, then
 `self->unk14->unk44`, 0x28 bytes), frees the first and bails out if the
 second allocation fails, otherwise calls the BasicClass base constructor
-(`Get_vtable_BasicClass()->ctor(self)`), overwrites `self->methods` with this
+(`GetBasicClassMethods()->ctor(self)`), overwrites `self->methods` with this
 class's own vtable (`GetSceneNodeMethods()`, i.e. `&gSceneNodeMethods`), zeroes several
 freshly-added fields, and finally calls its own virtual init hook
 (`self->methods->slot40`, `SceneNode__Reset` — still queued) before returning
@@ -37,7 +37,7 @@ void *SceneNode__SceneNode(SceneNodeObj *self) {
         BMemPMgrFree(self->unk14);
         return NULL;
     }
-    Get_vtable_BasicClass()->ctor(self);
+    GetBasicClassMethods()->ctor(self);
     self->methods = GetSceneNodeMethods();
     self->unk20 = 0;
     self->unk18 = 0;

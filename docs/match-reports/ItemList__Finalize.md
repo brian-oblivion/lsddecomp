@@ -8,7 +8,7 @@
 
 Unit: `src/ui/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`. This is its destructor
 body (dispatched through `BasicClass`'s inherited `finalize` slot chain,
-`Get_vtable_BasicClass()->finalize`).
+`GetBasicClassMethods()->finalize`).
 
 ## Body
 
@@ -22,7 +22,7 @@ void ItemList__Finalize(ItemList_3bb8c_j *self)
     }
     BMemPMgrFree(self->unk1C);
     BMemPMgrFree(self->unk18);
-    Get_vtable_BasicClass()->finalize(self);
+    GetBasicClassMethods()->finalize(self);
 }
 ```
 
@@ -36,4 +36,4 @@ already-documented "must reload after call" idiom.
 
 ## Naming
 
-- `ItemList__Finalize` -- tier A. The finalize occupant (classtable.py gItemListMethods +0x00C): frees each unk18[i] buffer, then unk1C and unk18 themselves, then chains Get_vtable_BasicClass()->finalize(self). Matches the BasicClass finalize-slot convention used throughout this header.
+- `ItemList__Finalize` -- tier A. The finalize occupant (classtable.py gItemListMethods +0x00C): frees each unk18[i] buffer, then unk1C and unk18 themselves, then chains GetBasicClassMethods()->finalize(self). Matches the BasicClass finalize-slot convention used throughout this header.

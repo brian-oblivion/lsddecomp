@@ -29,7 +29,7 @@ struct D_8006EF50Methods {
 };
 
 void FrameClock__FrameClock(D_8006EF50Obj *self) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = Get_vtable_FrameClock();
     self->methods->reset(self, 0);
 }

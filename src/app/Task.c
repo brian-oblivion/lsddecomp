@@ -1174,7 +1174,7 @@ DrawRect *GetDefaultMovieFrame(void) {
 }
 
 void IntermediateBase__IntermediateBase(IntermediateBase *self) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = Get_vtable_IntermediateBase();
     self->methods->resetCounters(self);
 }
@@ -1182,7 +1182,7 @@ void IntermediateBase__IntermediateBase(IntermediateBase *self) {
 void IntermediateBase__OnNotify(IntermediateBase *self, BasicClass *sender, s32 event) {
     s32 rootClass;
 
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
     rootClass = sender->methods->header & CLASS_ID_ROOT_MASK;
     if (rootClass == DRAWSYSTEM_CLASS_ID) {
         self->methods->onTag1Notify(self, sender, event);
@@ -1328,7 +1328,7 @@ Viewport *New_Viewport(void) {
 void Viewport__Viewport(Viewport *self) {
     SceneNode *fadeBox;
 
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetViewportMethods();
     self->drawSystem = NULL;
     self->viewNode = NULL;
@@ -1344,13 +1344,13 @@ void Viewport__Finalize(Viewport *self) {
     self->methods->detachViewChild(self);
     self->sceneRoot->methods->release(self->sceneRoot);
     self->methods->setFadeBox(self, 0);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void Viewport__AddChild(Viewport *self, BasicClass *child) {
     s32 rootClass;
 
-    Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
+    GetBasicClassMethods()->addChild((BasicClass *)self, child);
     rootClass = child->methods->header & CLASS_ID_ROOT_MASK;
     if (rootClass == SCENENODE_CLASS_ID) {
         self->viewNode = (SceneNode *)child;
@@ -1370,7 +1370,7 @@ void Viewport__RemoveChild(Viewport *self, BasicClass *child) {
     } else if (rootClass == DRAWSYSTEM_CLASS_ID) {
         self->drawSystem = NULL;
     }
-    Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
+    GetBasicClassMethods()->removeChild((BasicClass *)self, child);
 }
 
 /* Viewport's removeAllChildren override (+0x018 of gViewportMethods and of
@@ -1380,7 +1380,7 @@ void Viewport__RemoveAllChildren(Viewport *self) {
     self->refView.super = NULL;
     self->viewNode = NULL;
     self->drawSystem = NULL;
-    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
+    GetBasicClassMethods()->removeAllChildren((BasicClass *)self);
 }
 
 /*
@@ -1417,7 +1417,7 @@ void Viewport__RemoveAllChildren(Viewport *self) {
 void Viewport__OnNotify(Viewport *self, BasicClass *sender, s32 event) {
     s32 tag;
 
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
 
     tag = sender->methods->header & CLASS_ID_ROOT_MASK;
     if (tag == FRAMECLOCK_CLASS_ID) {

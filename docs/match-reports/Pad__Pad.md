@@ -23,7 +23,7 @@ instance only — initializes the Psy-Q Pad library.
 
 ```c
 void Pad__Pad(Pad *self, void *arg1, s32 port) {
-    Get_vtable_BasicClass()->ctor(self);
+    GetBasicClassMethods()->ctor(self);
     self->methods = Get_vtable_Pad();
     if (sPadRefCount++ == 0) {
         PadInit(arg1);

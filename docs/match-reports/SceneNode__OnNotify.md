@@ -18,7 +18,7 @@ GenericObj_d294 *other, s32 arg2)`.
 void SceneNode__OnNotify(SceneNodeObj *self, GenericObj_d294 *other, s32 arg2) {
     s32 tag;
 
-    Get_vtable_BasicClass()->slot38(self, other, arg2);
+    GetBasicClassMethods()->slot38(self, other, arg2);
     tag = other->methods->header & 0xF;
     if (tag == 2) {
         self->methods->slot94(self, other, arg2);

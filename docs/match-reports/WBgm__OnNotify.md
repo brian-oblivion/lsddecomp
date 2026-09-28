@@ -15,7 +15,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 ## Naming
 
-`WBgm__OnNotify`, tier A. overrides BasicClass's `onNotify` slot (+0x038); chains to `Get_vtable_BasicClass()->onNotify` first, matching every other class's onNotify override in this codebase.
+`WBgm__OnNotify`, tier A. overrides BasicClass's `onNotify` slot (+0x038); chains to `GetBasicClassMethods()->onNotify` first, matching every other class's onNotify override in this codebase.
 
 ## View changes (additive, unit-local)
 
@@ -30,7 +30,7 @@ still matches after the change.
 
 ```c
 void WBgm__OnNotify(WBgm *self, void *sender, s32 event) {
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
     if ((((BasicClass *)sender)->methods->header & 0xF) == 1) {
         self->methods->update(self, (s32)sender, event);
     }

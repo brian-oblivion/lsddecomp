@@ -26,7 +26,7 @@ void ItemList__RemoveChild(ItemList_3bb8c_j *self, void *arg1)
         } else if (tag == 5) {
             self->unk38 = NULL;
         }
-        Get_vtable_BasicClass()->removeChild(self, arg1);
+        GetBasicClassMethods()->removeChild(self, arg1);
     }
 }
 ```

@@ -59,7 +59,7 @@ void TextEntry__TextEntry(TextEntry *self, char *text, s32 mode) {
     u8 *p;
     s32 count;
 
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetTextEntryMethods();
     self->textLen = strlen(text);
     self->editBuf = BMemPMgrAlloc(self->textLen + 4);
@@ -85,14 +85,14 @@ void TextEntry__ClearChildRefs(TextEntry *self) {
 
 void TextEntry__Finalize(TextEntry *self) {
     BMemPMgrFree(self->editBuf);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void TextEntry__AddChild(TextEntry *self, void *child) {
     s32 kind;
 
     if (child != NULL) {
-        Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)child);
+        GetBasicClassMethods()->addChild((BasicClass *)self, (BasicClass *)child);
         kind = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
         if (kind == PAD_CLASS_ID) {
             self->inputSource = child;
@@ -112,7 +112,7 @@ void TextEntry__RemoveChild(TextEntry *self, void *child) {
         } else if (kind == FRAMECLOCK_CLASS_ID) {
             self->tickSource = NULL;
         }
-        Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)child);
+        GetBasicClassMethods()->removeChild((BasicClass *)self, (BasicClass *)child);
     }
 }
 
@@ -120,13 +120,13 @@ void TextEntry__RemoveAllChildren(TextEntry *self) {
     self->inputSource = NULL;
     self->tickSource = NULL;
     self->panelSprite = NULL;
-    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
+    GetBasicClassMethods()->removeAllChildren((BasicClass *)self);
 }
 
 void TextEntry__OnNotify(TextEntry *self, void *sender, s32 event) {
     s32 kind;
 
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
 
     kind = ((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK;
     if (kind == PAD_CLASS_ID) {
@@ -518,7 +518,7 @@ void ItemList__ItemList(ItemList *self, char **items, s32 mode) {
     /* MATCHING: both set before the base ctor call. */
     i = 0;
     item = items;
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetItemListMethods();
 
     while (*item++ != NULL) {
@@ -567,14 +567,14 @@ void ItemList__Finalize(ItemList *self) {
     }
     BMemPMgrFree(self->textLens);
     BMemPMgrFree(self->texts);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void ItemList__AddChild(ItemList *self, void *child) {
     s32 tag;
 
     if (child) {
-        Get_vtable_BasicClass()->addChild((BasicClass *)self, (BasicClass *)child);
+        GetBasicClassMethods()->addChild((BasicClass *)self, (BasicClass *)child);
         tag = ((BasicClass *)child)->methods->header & CLASS_ID_ROOT_MASK;
         if (tag == PAD_CLASS_ID) {
             self->inputSource = child;
@@ -594,7 +594,7 @@ void ItemList__RemoveChild(ItemList *self, void *child) {
         } else if (tag == FRAMECLOCK_CLASS_ID) {
             self->tickSource = NULL;
         }
-        Get_vtable_BasicClass()->removeChild((BasicClass *)self, (BasicClass *)child);
+        GetBasicClassMethods()->removeChild((BasicClass *)self, (BasicClass *)child);
     }
 }
 
@@ -602,13 +602,13 @@ void ItemList__RemoveAllChildren(ItemList *self) {
     self->inputSource = NULL;
     self->tickSource = NULL;
     self->panelSprite = NULL;
-    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
+    GetBasicClassMethods()->removeAllChildren((BasicClass *)self);
 }
 
 void ItemList__OnNotify(ItemList *self, void *sender, s32 event) {
     s32 tag;
 
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
     tag = ((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK;
     if (tag == PAD_CLASS_ID) {
         self->methods->handleInputCode(self, sender, event);

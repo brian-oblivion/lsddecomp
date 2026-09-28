@@ -344,14 +344,14 @@ FrameClock *New_FrameClock(void) {
 
 /* gFrameClockMethods slot +0x008 (ctor): the BasicClass ctor, install the table, reset(0). */
 void FrameClock__FrameClock(FrameClock *self) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = Get_vtable_FrameClock();
     self->methods->reset(self, 0);
 }
 
 /* gFrameClockMethods slot +0x00C (finalize): the BasicClass finalize. */
 void FrameClock__Finalize(FrameClock *self) {
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 /* gFrameClockMethods slot +0x024 (removeParentRef): step the cursor past the parent
@@ -360,7 +360,7 @@ void FrameClock__RemoveParentRef(FrameClock *self, BasicClass *parent) {
     if (self->parentCursor != NULL && parent == self->parentCursor->value) {
         self->parentCursor = self->parentCursor->next;
     }
-    Get_vtable_BasicClass()->removeParentRef((BasicClass *)self, parent);
+    GetBasicClassMethods()->removeParentRef((BasicClass *)self, parent);
 }
 
 /* gFrameClockMethods slot +0x030 (notifyParents): walk the parent refs with

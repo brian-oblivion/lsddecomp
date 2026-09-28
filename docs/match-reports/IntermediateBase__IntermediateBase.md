@@ -8,7 +8,7 @@
 
 This IS `gIntermediateBaseMethods`'s own +0x008 slot -- the "IntermediateBase" shared
 utility class's constructor (`tools/classtable.py gIntermediateBaseMethods` shows
-`+0x008 IntermediateBase__IntermediateBase`). Runs the BasicClass ctor through `Get_vtable_BasicClass()`,
+`+0x008 IntermediateBase__IntermediateBase`). Runs the BasicClass ctor through `GetBasicClassMethods()`,
 installs this class's own vtable (`&gIntermediateBaseMethods`, via the already-matched
 getter `Get_vtable_IntermediateBase`), then dispatches its own freshly-installed slot40
 (`IntermediateBase__ResetCounters`, already matched, void-returning) once.
@@ -25,7 +25,7 @@ unrelated tables (`Task.h`'s `TaskUtilMethods` names the same function
 ```c
 void IntermediateBase__IntermediateBase(Obj86B60 *self)
 {
-    Get_vtable_BasicClass()->ctor(self);
+    GetBasicClassMethods()->ctor(self);
     self->methods = (Obj86B60Methods *)Get_vtable_IntermediateBase();
     self->methods->slot40(self);
 }

@@ -28,7 +28,7 @@ void Viewport__RemoveChild(Unk18Obj *self, GenericObj *arg1)
     } else if (header == 1) {
         self->unkC = NULL;
     }
-    Get_vtable_BasicClass()->slot14(self, arg1);
+    GetBasicClassMethods()->slot14(self, arg1);
 }
 ```
 
@@ -64,7 +64,7 @@ this round except the register-identity stall `IntermediateBase__SetState`.
 **Unk18Obj__RemoveChild** (renamed from `func_8003E7F4`, round 55, runner
 alpha). Tier A: exact mirror of `Viewport__AddChild` -- clears the same
 tag-keyed cached reference, THEN forwards to
-`Get_vtable_BasicClass()->removeChild` (matches canonical
+`GetBasicClassMethods()->removeChild` (matches canonical
 `BasicClassMethods::removeChild` `+0x014`).
 
 ## Proposed field names

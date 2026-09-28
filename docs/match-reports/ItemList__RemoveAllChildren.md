@@ -18,7 +18,7 @@ void ItemList__RemoveAllChildren(ItemList_3bb8c_j *self)
     self->unk34 = NULL;
     self->unk38 = NULL;
     self->unk50 = NULL;
-    Get_vtable_BasicClass()->removeAllChildren(self);
+    GetBasicClassMethods()->removeAllChildren(self);
 }
 ```
 

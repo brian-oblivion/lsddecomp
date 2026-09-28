@@ -22,7 +22,7 @@ Chains directly to `gFileResourceMethods`'s own dtor slot (`GetFileResourceMetho
 i.e. `FileResource__Finalize`, matched in `GameApplicationFileResource.c`) rather than through
 `self->methods` -- same "call the base class's own copy of a slot, not the
 possibly-overridden one on `self`" idiom `FileResource__Release` in that same file
-uses for `Get_vtable_BasicClass()->dtor(this)`. Presumably this unit's own
+uses for `GetBasicClassMethods()->dtor(this)`. Presumably this unit's own
 subclass's chain-up dtor, mirroring `FileResource__InstallCdReadDriver`'s chain-up ctor.
 
 ## Naming (round 64, runner alpha)

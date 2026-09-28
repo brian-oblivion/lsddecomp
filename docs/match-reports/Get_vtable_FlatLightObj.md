@@ -26,4 +26,4 @@ No iteration needed.
 
 ## Naming
 
-`Get_vtable_FlatLightObj`, tier A. Pure getter, mechanics is its purpose by definition: returns `&gFlatLightObjMethods`. `Get_vtable_<Class>` convention (`Get_vtable_Pad`, `Get_vtable_BasicClass`), preferred here over the sibling `Get<Class>Methods` spelling seen elsewhere because `FlatLightObj` is a direct BasicClass child like `Pad`.
+`Get_vtable_FlatLightObj`, tier A. Pure getter, mechanics is its purpose by definition: returns `&gFlatLightObjMethods`. `Get_vtable_<Class>` convention (`Get_vtable_Pad`, `GetBasicClassMethods`), preferred here over the sibling `Get<Class>Methods` spelling seen elsewhere because `FlatLightObj` is a direct BasicClass child like `Pad`.

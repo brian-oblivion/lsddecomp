@@ -35,7 +35,7 @@ DrawSystem *New_DrawSystem(void) {
 }
 
 void DrawSystem__DrawSystem(DrawSystem *self) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = Get_vtable_DrawSystem();
     self->methods->init(self);
 }

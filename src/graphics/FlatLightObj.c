@@ -31,7 +31,7 @@ FlatLightObj *New_FlatLightObj(s32 lightId) {
 }
 
 void FlatLightObj__FlatLightObj(FlatLightObj *self, s32 lightId) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = Get_vtable_FlatLightObj();
     self->methods->setLightId(self, lightId);
 }

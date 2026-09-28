@@ -22,7 +22,7 @@ void TextEntry__TextEntry(Obj86ED0 *self, char *arg1, s32 arg2)
     u8 *p;
     s32 count;
 
-    Get_vtable_BasicClass()->ctor(self);
+    GetBasicClassMethods()->ctor(self);
     self->methods = GetTextEntryMethods();
     self->unk10 = strlen(arg1);
     self->unk28 = BMemPMgrAlloc(self->unk10 + 4);
@@ -42,7 +42,7 @@ void TextEntry__TextEntry(Obj86ED0 *self, char *arg1, s32 arg2)
 
 This is `Obj86ED0`'s own ctor, called through `Obj86ED0Methods::ctor` at
 `New_TextEntry`'s allocation site: base ctor first
-(`Get_vtable_BasicClass()->ctor(self)`), then `self->methods` overridden to this
+(`GetBasicClassMethods()->ctor(self)`), then `self->methods` overridden to this
 class's own table (`GetTextEntryMethods()`, defined in `TextEntryItemList.c`) — same
 shape as `NodeGuardedViewport__NodeGuardedViewport` in `TitleMenuTaskObjF.c`.
 

@@ -82,7 +82,7 @@ TmdModel *New_TmdModel(TmdObject *object) {
 }
 
 void TmdModel__TmdModel(TmdModel *self, TmdObject *object) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = Get_vtable_TmdModel();
     self->object = object;
     self->data = (TmdFile *)((u8 *)object - offsetof(TmdFile, objects));

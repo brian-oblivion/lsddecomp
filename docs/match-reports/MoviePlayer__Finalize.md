@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Finalize: releases the object at +0x60 through its own release slot (+0x004) and stores the result (NULL) back, DecDCToutCallback(NULL), DecDCTReset(0) (libpress, Sony), MoviePlayer__FreeFrameBuffers(self) (frees four buffers), then Get_vtable_BasicClass()->finalize(self).
+Finalize: releases the object at +0x60 through its own release slot (+0x004) and stores the result (NULL) back, DecDCToutCallback(NULL), DecDCTReset(0) (libpress, Sony), MoviePlayer__FreeFrameBuffers(self) (frees four buffers), then GetBasicClassMethods()->finalize(self).
 
 Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x00C.
 
@@ -31,7 +31,7 @@ void MoviePlayer__Finalize(Obj455D4 *self) {
     DecDCToutCallback(NULL);
     DecDCTReset(0);
     MoviePlayer__FreeFrameBuffers(self);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 ```
 

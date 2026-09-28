@@ -8,7 +8,7 @@
 
 `void TaskObjF__Finalize(Node3bb8cE *self)`. A one-line base-class forward:
 fetches the shared `BasicClass`-style vtable via the no-argument getter
-`Get_vtable_BasicClass()` (same base-class framework as `include/code_8220.h`'s
+`GetBasicClassMethods()` (same base-class framework as `include/code_8220.h`'s
 `BasicClassMethods`, this unit's own independent local view named
 `BaseMethods3bb8cE`) and calls its `finalize` slot (+0x00C) on `self`.
 Almost certainly this class's own destructor/finalize override, chaining
@@ -21,7 +21,7 @@ Matched on the first attempt.
 ```c
 void TaskObjF__Finalize(Node3bb8cE *self)
 {
-    Get_vtable_BasicClass()->finalize(self);
+    GetBasicClassMethods()->finalize(self);
 }
 ```
 
@@ -33,7 +33,7 @@ separately-fetched vtable getter" shape.
 ## Naming (round 78, track 3)
 
 `func_8004E40C` -> `TaskObjF__Finalize`. **Tier A.** A one-line forward to
-`Get_vtable_BasicClass()->finalize(self)`, sitting at `gTaskObjFMethods`
+`GetBasicClassMethods()->finalize(self)`, sitting at `gTaskObjFMethods`
 +0x00C (asm/data/76DC8.data.s) -- the exact offset this unit's own
 `BaseMethods3bb8cE` view had already named `finalize`. `TaskObjF__` prefix:
 round 78 cross-checked the whole `gTaskObjFMethods` table and confirmed

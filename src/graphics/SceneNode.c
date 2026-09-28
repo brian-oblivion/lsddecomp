@@ -68,7 +68,7 @@ void *SceneNode__SceneNode(SceneNode *self) {
         BMemPMgrFree(self->coord2);
         return NULL;
     }
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetSceneNodeMethods();
     self->model = NULL;
     self->tmd = 0;
@@ -84,11 +84,11 @@ void SceneNode__Finalize(SceneNode *self) {
     self->methods->slot5C(self, 0);
     BMemPMgrFree(self->coord2->param);
     BMemPMgrFree(self->coord2);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void SceneNode__AddChild(SceneNode *self, BasicClass *child) {
-    Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
+    GetBasicClassMethods()->addChild((BasicClass *)self, child);
     if ((child->methods->header & CLASS_ID_ROOT_MASK) == TMDMODEL_CLASS_ID) {
         SceneNode__LinkModel(self, child);
     }
@@ -98,12 +98,12 @@ void SceneNode__RemoveChild(SceneNode *self, BasicClass *child) {
     if ((child->methods->header & CLASS_ID_ROOT_MASK) == TMDMODEL_CLASS_ID) {
         SceneNode__UnlinkModel(self);
     }
-    Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
+    GetBasicClassMethods()->removeChild((BasicClass *)self, child);
 }
 
 void SceneNode__RemoveAllChildren(SceneNode *self) {
     SceneNode__UnlinkModel(self);
-    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
+    GetBasicClassMethods()->removeAllChildren((BasicClass *)self);
 }
 
 /* The base onNotify first, then by the SENDER's class: a Pad's event goes to
@@ -112,7 +112,7 @@ void SceneNode__RemoveAllChildren(SceneNode *self) {
 void SceneNode__OnNotify(SceneNode *self, BasicClass *sender, s32 event) {
     s32 tag;
 
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
     tag = sender->methods->header & CLASS_ID_ROOT_MASK;
     if (tag == PAD_CLASS_ID) {
         self->methods->onPadEvent(self, sender, event);

@@ -1,4 +1,6 @@
-# Get_vtable_BasicClass
+# GetBasicClassMethods
+
+> Renamed from `Get_vtable_BasicClass` on 2026-09-28 (tools/rename.py). Address 0x80018390.
 
 > Renamed from `func_80018390` on 2026-09-17 (tools/rename.py). Address 0x80018390.
 
@@ -14,7 +16,7 @@ freshly-constructed `BasicClass`.
 ## The C
 
 ```c
-BasicClassMethods *Get_vtable_BasicClass(void)
+BasicClassMethods *GetBasicClassMethods(void)
 {
     return &gBasicClassMethods;
 }
@@ -33,7 +35,7 @@ bytes / 16 words — one header word, 14 method-pointer words matching every
 field of `BasicClassMethods`, and a trailing `.word 0x00000000` past the
 struct's own `0x03C` end. That extra word is not part of the C-visible
 `BasicClassMethods` layout (nothing reads it) and did not need to be modeled
-here; `Get_vtable_BasicClass` only takes the table's address, never indexes past its
+here; `GetBasicClassMethods` only takes the table's address, never indexes past its
 declared fields.
 
 ## Provenance
@@ -43,7 +45,7 @@ Matched first attempt — simple `lui`/`addiu` address-of, no ambiguity.
 
 ## Naming (round 51, bravo)
 
-`func_80018390` -> `Get_vtable_BasicClass`. **Tier A** -- pure leaf
+`func_80018390` -> `GetBasicClassMethods`. **Tier A** -- pure leaf
 returning one known address.
 
 Evidence: the whole body is `return &gBasicClassMethods;`, and `gBasicClassMethods` is

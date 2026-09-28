@@ -10,7 +10,7 @@
 `TaskObjF__AddChild`: if `res` is non-NULL, dispatch on
 `res->methods->header`'s tag (2/5/0x10/0x20) and zero the matching one of
 self's four typed resource slots, then unconditionally chain to the base
-class's `removeChild` (`Get_vtable_BasicClass()`'s +0x014 slot) — even when no
+class's `removeChild` (`GetBasicClassMethods()`'s +0x014 slot) — even when no
 tag matched.
 
 ## Result
@@ -37,7 +37,7 @@ void TaskObjF__RemoveChild(Node3bb8cE *self, Res3bb8cE *res)
     } else if ((tag & 0xFF) == 0x20) {
         self->unk7C = NULL;
     }
-    Get_vtable_BasicClass()->removeChild(self, res);
+    GetBasicClassMethods()->removeChild(self, res);
 }
 ```
 

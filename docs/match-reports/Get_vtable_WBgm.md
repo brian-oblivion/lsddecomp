@@ -14,7 +14,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 ## Naming
 
-`Get_vtable_WBgm`, tier A. matches the `Get_vtable_<Class>` convention (`Get_vtable_BasicClass`, BasicClass.h); returns `&gWBgmMethods`, the table this class installs in its own ctor.
+`Get_vtable_WBgm`, tier A. matches the `Get_vtable_<Class>` convention (`GetBasicClassMethods`, BasicClass.h); returns `&gWBgmMethods`, the table this class installs in its own ctor.
 
 ## Source
 

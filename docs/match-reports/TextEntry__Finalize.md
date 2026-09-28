@@ -8,9 +8,9 @@ Unit `TextEntryItemList`, carved round 14.
 
 `Obj86ED0`'s finalize override (vtable slot 0x00C, per
 `tools/classtable.py gTextEntryMethods`): frees the owned name buffer, then
-dispatches the BASE class's own finalize (`Get_vtable_BasicClass()->finalize`,
+dispatches the BASE class's own finalize (`GetBasicClassMethods()->finalize`,
 NOT `self->methods->finalize`, since that would just call this same
-function again -- confirmed against `Get_vtable_BasicClass`'s local reduced view
+function again -- confirmed against `GetBasicClassMethods`'s local reduced view
 `BasicMethods866E8F`, extended this round with the ctor/finalize/addChild/
 removeChild/removeAllChildren slots that were previously opaque padding).
 
@@ -18,7 +18,7 @@ removeChild/removeAllChildren slots that were previously opaque padding).
 void TextEntry__Finalize(Obj86ED0 *self)
 {
     BMemPMgrFree(self->unk28);
-    Get_vtable_BasicClass()->finalize(self);
+    GetBasicClassMethods()->finalize(self);
 }
 ```
 
@@ -31,17 +31,17 @@ First attempt, straight transcription, matched immediately.
 `removeAllChildren` as opaque `pad000[0x038]`. This round's functions
 (`TextEntry__TextEntry`'s base-ctor call, and this function's base-finalize call,
 plus `TextEntry__AddChild`/`TextEntry__RemoveChild`/`TextEntry__RemoveAllChildren`'s explicit
-`Get_vtable_BasicClass()->addChild/removeChild/removeAllChildren`) named all five.
-Since `Get_vtable_BasicClass` can only have ONE extern declaration per translation
+`GetBasicClassMethods()->addChild/removeChild/removeAllChildren`) named all five.
+Since `GetBasicClassMethods` can only have ONE extern declaration per translation
 unit (this header has exactly one), any future unit needing a currently-pad
 slot of this same getter must EXTEND `BasicMethods866E8F` in place (shrink
 the pad, add the field at its real offset) rather than declaring a second,
-differently-typed `Get_vtable_BasicClass` -- the latter is a straight redeclaration
+differently-typed `GetBasicClassMethods` -- the latter is a straight redeclaration
 conflict the moment both land in one `.c` file via this shared header.
 
 ## Naming
 
-- `TextEntry__Finalize` -- tier A. gTextEntryMethods +0x00C (classtable.py), overrides BasicClass's finalize slot: frees unk28 then chains to Get_vtable_BasicClass()->finalize. Standard dtor-shaped override.
+- `TextEntry__Finalize` -- tier A. gTextEntryMethods +0x00C (classtable.py), overrides BasicClass's finalize slot: frees unk28 then chains to GetBasicClassMethods()->finalize. Standard dtor-shaped override.
 
 ## Track 4 (2026-09-26, round 87)
 

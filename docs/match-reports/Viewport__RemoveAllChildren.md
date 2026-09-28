@@ -11,7 +11,7 @@
 A ctor-shaped function: zeroes three `Obj86B60` fields (`unk30`, `unk10`,
 `unkC` -- all new, only observed here and by `IntermediateBase__OnState2`, which
 dereferences `unkC`), then forwards unconditionally to the shared
-`BasicClass` ancestor's own `+0x018` slot, `Get_vtable_BasicClass()->slot18(self)`
+`BasicClass` ancestor's own `+0x018` slot, `GetBasicClassMethods()->slot18(self)`
 -- the same no-argument-getter idiom already established independently in
 `include/Pad.h`, `include/GameApplicationFileResource.h` and `include/SceneNode.h`.
 
@@ -23,7 +23,7 @@ void Viewport__RemoveAllChildren(Obj86B60 *self)
     self->unk30 = 0;
     self->unk10 = 0;
     self->unkC = NULL;
-    Get_vtable_BasicClass()->slot18(self);
+    GetBasicClassMethods()->slot18(self);
 }
 ```
 
@@ -35,7 +35,7 @@ void Viewport__RemoveAllChildren(Obj86B60 *self)
   `include/Task.h`.
 - This unit's own local view of the shared `BasicClass` ancestor table
   (`BasicClassMethodsCC8C`, only `slot18` typed) and its getter
-  `Get_vtable_BasicClass(void)`.
+  `GetBasicClassMethods(void)`.
 
 ## Provenance
 
@@ -47,7 +47,7 @@ first build.
 **Obj86B60__ResetAndRemoveAllChildren** (renamed from `func_8003E874`,
 round 55, runner alpha). Tier A: mechanics fully known -- zeroes
 `self->unk30`, `self->unk10` and `self->initArgs`, then forwards to
-`Get_vtable_BasicClass()->removeAllChildren` (that base slot's own name,
+`GetBasicClassMethods()->removeAllChildren` (that base slot's own name,
 `+0x018`, matches the canonical `BasicClassMethods::removeAllChildren` at
 the identical offset in `include/code_8220.h`). Named for the whole visible
 effect (clear the object's own cached pointers, then remove every child)

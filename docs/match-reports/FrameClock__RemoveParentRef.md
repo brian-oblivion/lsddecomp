@@ -18,7 +18,7 @@ void FrameClock__RemoveParentRef(D_8006EF50Obj *self, BasicClass *parent) {
     if (self->parentCursor != NULL && parent == self->parentCursor->value) {
         self->parentCursor = self->parentCursor->next;
     }
-    Get_vtable_BasicClass()->removeParentRef((BasicClass *)self, parent);
+    GetBasicClassMethods()->removeParentRef((BasicClass *)self, parent);
 }
 ```
 

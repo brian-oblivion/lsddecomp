@@ -70,7 +70,7 @@ void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event) {
     }
 }
 
-BasicClassMethods *Get_vtable_BasicClass(void) {
+BasicClassMethods *GetBasicClassMethods(void) {
     return &gBasicClassMethods;
 }
 

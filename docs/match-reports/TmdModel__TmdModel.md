@@ -4,7 +4,7 @@
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/TmdModel.c`. Fresh ground, no prior attempt.
 
-- **What:** the constructor of class gTmdModelMethods (its slot +0x008): base ctor through `Get_vtable_BasicClass()->ctor`, install the method table, `object = arg`, `data = (u8 *)arg - 0xC`, then `TmdModel__InitBoundsCount(self)` (sets the flag `gTmdModelBoundsCount = 1`).
+- **What:** the constructor of class gTmdModelMethods (its slot +0x008): base ctor through `GetBasicClassMethods()->ctor`, install the method table, `object = arg`, `data = (u8 *)arg - 0xC`, then `TmdModel__InitBoundsCount(self)` (sets the flag `gTmdModelBoundsCount = 1`).
 - **Result:** byte-exact; 25/25 words, whole-image SHA1 green. Second build.
 - **Build 1:** `TmdModel__InitBoundsCount();` with no argument -- one word short (the `addu a0, s0, zero` before the stores was missing, and every later function shifted). Retail loads `$a0 = self` BEFORE the three stores and then stores through `$a0`: the call's argument was computed early and reused as the store base. So the callee takes `self` even though its body never reads it.
 - **Change to an existing declaration:** `TmdModel__InitBoundsCount` (matched earlier this round, this unit, no other declarer) is now `void TmdModel__InitBoundsCount(TmdModel *self)` instead of `(void)`; identical bytes.
@@ -15,7 +15,7 @@ Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/gra
 void TmdModel__InitBoundsCount(TmdModel *self);
 
 void TmdModel__TmdModel(TmdModel *self, void *arg) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = Get_vtable_TmdModel();
     self->object = arg;
     self->data = (ModelData_fa50 *)((u8 *)arg - 0xC);
@@ -32,7 +32,7 @@ Stores after a call that go through `$a0` (freshly `move a0, sN` just before the
 
 `TmdModel__TmdModel` -- tier A. Convention: `Class__Class` constructor. The
 ctor at slot +0x008 of the TmdModel class table (gTmdModelMethods): base ctor
-through `Get_vtable_BasicClass`, installs the method table, stores the
+through `GetBasicClassMethods`, installs the method table, stores the
 object-table entry and the TMD data header, marks the class constructed.
 
 ## Track 4 (2026-09-26, round 87, delta)

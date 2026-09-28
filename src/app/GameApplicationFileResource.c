@@ -395,13 +395,13 @@ GameApplicationMethods *GetGameApplicationMethods(void) {
 void *FileResource__Release(FileResource *this) {
     this->freeGuard = 0;
     this->methods->finalize(this);
-    Get_vtable_BasicClass()->finalize((BasicClass *)this);
+    GetBasicClassMethods()->finalize((BasicClass *)this);
     BMemPMgrFree(this);
     return NULL;
 }
 
 void FileResource__FileResource(FileResource *this) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)this);
+    GetBasicClassMethods()->ctor((BasicClass *)this);
     this->methods = GetFileResourceMethods();
     this->isOpen = 0;
     this->buffer = NULL;

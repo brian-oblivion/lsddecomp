@@ -38,7 +38,7 @@ WBgm *New_WBgm(char *vabPath, char *seqPath, s32 autoPlay) {
 }
 
 void WBgm__WBgm(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = Get_vtable_WBgm();
     self->vab = NULL;
     self->seqData = NULL;
@@ -64,11 +64,11 @@ void WBgm__Finalize(WBgm *self) {
         self->seqData->methods->release(self->seqData);
     }
     self->methods->removeChild(self, (BasicClass *)GetDrawSystem());
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void WBgm__OnNotify(WBgm *self, void *sender, s32 event) {
-    Get_vtable_BasicClass()->onNotify((BasicClass *)self, sender, event);
+    GetBasicClassMethods()->onNotify((BasicClass *)self, sender, event);
     if ((((BasicClass *)sender)->methods->header & CLASS_ID_ROOT_MASK) == DRAWSYSTEM_CLASS_ID) {
         self->methods->update(self, (DrawSystem *)sender, event);
     }

@@ -21,7 +21,7 @@ extern void SetActiveDataSource(s32 source); /* src/app/GameApplicationFileResou
 extern void *BMemPMgrAlloc(s32 size);
 
 void Application__Application(Application *self, s32 dataSource) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetApplicationMethods();
     if (gCdInitDone == 0) {
         CdInit();

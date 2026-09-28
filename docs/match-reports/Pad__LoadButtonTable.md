@@ -10,7 +10,7 @@
 
 This class's method table (`gPadMethods`, 21 slots, see `tools/classtable.py
 gPadMethods`) inherits 14 slots verbatim from `BASICCLASS_METHODS`
-(`gBasicClassMethods`, returned by `Get_vtable_BasicClass`) and adds 7 of its own at
+(`gBasicClassMethods`, returned by `GetBasicClassMethods`) and adds 7 of its own at
 `+0x38..+0x54`. `Pad__LoadButtonTable` is the slot at `+0x50`.
 
 It copies a 0x40-byte (16-word) block from `sDefaultButtonMasks` into the runtime

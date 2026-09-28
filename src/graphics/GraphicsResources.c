@@ -1292,7 +1292,7 @@ MoviePlayer *New_MoviePlayer(DrawRect *frame, s32 cdSpeed, s32 external) {
  * had), the MDEC reset by the first player built, its output callback
  * OnMdecFrameReady, and auto-play on. */
 s32 MoviePlayer__MoviePlayer(MoviePlayer *self, DrawRect *frame, s32 cdSpeed, s32 external) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetMoviePlayerMethods();
     self->stream = New_CdStream(cdSpeed, MOVIE_FPS, 0);
     if (self->stream != NULL) {
@@ -1318,7 +1318,7 @@ void MoviePlayer__Finalize(MoviePlayer *self) {
     DecDCToutCallback(NULL);
     DecDCTReset(0);
     MoviePlayer__FreeFrameBuffers(self);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 /* Unless `external` (the caller's buffers), allocate the two frame

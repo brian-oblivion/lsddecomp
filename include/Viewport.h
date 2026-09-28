@@ -33,7 +33,7 @@
  * attached to. Each is typed by its class (include/DrawSystem.h,
  * include/SceneNode.h).
  *
- * The ctor chains to BasicClass's first (Get_vtable_BasicClass()->ctor),
+ * The ctor chains to BasicClass's first (GetBasicClassMethods()->ctor),
  * and gNodeGuardedViewportMethods's (0x17, include/NodeGuardedViewport.h) chains to this one,
  * so the id tree (0x0 -> 0x7 -> 0x17) is the ctor chain. NodeGuardedViewport expands
  * these macros.

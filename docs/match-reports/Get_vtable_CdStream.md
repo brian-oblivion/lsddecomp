@@ -15,7 +15,7 @@ the first build; whole-image SHA1 green.
 
 ## Naming
 
-Tier A. `Get_vtable_CdStream` -- returns `&gCdStreamMethods`. Evidence: matches the established `Get_vtable_<Class>` convention used by `Get_vtable_BasicClass`, `Get_vtable_Pad`, `Get_vtable_Entity`, etc.
+Tier A. `Get_vtable_CdStream` -- returns `&gCdStreamMethods`. Evidence: matches the established `Get_vtable_<Class>` convention used by `GetBasicClassMethods`, `Get_vtable_Pad`, `Get_vtable_Entity`, etc.
 
 ## Source
 

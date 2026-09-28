@@ -50,7 +50,7 @@ extern void GsSwapDispBuff(void);
 
 `Get_vtable_DrawSystem`, tier A. The class's own method-table getter
 (returns `&gDrawSystemMethods`); matches the project's `Get_vtable_<Class>`
-convention for this exact role (`BasicClass.h`'s `Get_vtable_BasicClass`,
+convention for this exact role (`BasicClass.h`'s `GetBasicClassMethods`,
 round 81's `Get_vtable_WBgm`).
 
 ## Track 4 (2026-09-26, round 87, bravo)

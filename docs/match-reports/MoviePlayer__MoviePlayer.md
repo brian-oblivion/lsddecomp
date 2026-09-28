@@ -59,7 +59,7 @@ extern int DecDCToutCallback(void (*func)());
 void OnMdecFrameReady(void);
 
 s32 MoviePlayer__MoviePlayer(Obj454C4 *self, s32 arg1, s32 arg2, s32 arg3) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetMoviePlayerMethods();
     self->stream = New_CdStream(arg2, 15, 0);
     if (self->stream != NULL) {

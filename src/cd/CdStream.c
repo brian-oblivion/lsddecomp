@@ -65,7 +65,7 @@ CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
 /* MATCHING: the sectors-a-second choice stays an inline conditional; a local
  * lets cc1 hoist its load and reorder the stores. */
 void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved) {
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = Get_vtable_CdStream();
     self->cdSpeed = cdSpeed;
     self->muted = 0;
@@ -83,7 +83,7 @@ void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved) {
 
 void CdStream__Finalize(CdStream *self) {
     self->methods->close(self);
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void CdStream__SetRing(CdStream *self, u32 *ring, u32 size) {

@@ -284,7 +284,7 @@ void *BasicClass__Release(BasicClass *self) {
 }
 
 void BasicClass__BasicClass(BasicClass *self) {
-    self->methods = Get_vtable_BasicClass();
+    self->methods = GetBasicClassMethods();
     self->parentRefs = NULL;
     self->children = NULL;
 }

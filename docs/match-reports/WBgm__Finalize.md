@@ -40,7 +40,7 @@ void WBgm__Finalize(WBgm *self) {
         self->seqData->methods->release((BasicClass *)self->seqData);
     }
     self->methods->removeChild(self, GetDrawSystem());
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 ```
 

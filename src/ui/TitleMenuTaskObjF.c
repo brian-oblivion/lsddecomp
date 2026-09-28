@@ -504,7 +504,7 @@ fail:
 void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
     s32 count;
 
-    Get_vtable_BasicClass()->ctor((BasicClass *)self);
+    GetBasicClassMethods()->ctor((BasicClass *)self);
     self->methods = GetTaskObjFMethods();
     count = sTaskObjFCount;
     sTaskObjFCount = count + 1;
@@ -567,7 +567,7 @@ void TaskObjF__ClearLinks(TaskObjF *self) {
 }
 
 void TaskObjF__Finalize(TaskObjF *self) {
-    Get_vtable_BasicClass()->finalize((BasicClass *)self);
+    GetBasicClassMethods()->finalize((BasicClass *)self);
 }
 
 void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
@@ -576,7 +576,7 @@ void TaskObjF__AddChild(TaskObjF *self, BasicClass *child) {
     if (child == NULL) {
         return;
     }
-    Get_vtable_BasicClass()->addChild((BasicClass *)self, child);
+    GetBasicClassMethods()->addChild((BasicClass *)self, child);
     classId = child->methods->header;
     if ((classId & CLASS_ID_ROOT_MASK) == PAD_CLASS_ID) {
         self->inputSource = child;
@@ -611,7 +611,7 @@ void TaskObjF__RemoveChild(TaskObjF *self, BasicClass *child) {
     } else if ((classId & 0xFF) == 0x20) {
         self->itemList = NULL;
     }
-    Get_vtable_BasicClass()->removeChild((BasicClass *)self, child);
+    GetBasicClassMethods()->removeChild((BasicClass *)self, child);
 }
 
 void TaskObjF__RemoveAllChildren(TaskObjF *self) {
@@ -620,7 +620,7 @@ void TaskObjF__RemoveAllChildren(TaskObjF *self) {
     self->spriteParent = NULL;
     self->textEntry = NULL;
     self->itemList = NULL;
-    Get_vtable_BasicClass()->removeAllChildren((BasicClass *)self);
+    GetBasicClassMethods()->removeAllChildren((BasicClass *)self);
 }
 
 void TaskObjF__SetCardSlot(TaskObjF *self, s32 cardSlot) {
@@ -1278,7 +1278,7 @@ void TaskObjF__OnNotify(TaskObjF *self, void *sender, s32 event) {
     s32 kind;
 
     methods = self->methods;
-    base = Get_vtable_BasicClass();
+    base = GetBasicClassMethods();
     base->onNotify((BasicClass *)self, sender, event);
 
     /* Pad's class id is 0x2 and FrameClock's 0x5, matched with their

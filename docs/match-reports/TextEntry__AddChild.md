@@ -22,7 +22,7 @@ void TextEntry__AddChild(Obj86ED0 *self, void *arg1)
     s32 mask;
 
     if (arg1 != NULL) {
-        Get_vtable_BasicClass()->addChild(self, arg1);
+        GetBasicClassMethods()->addChild(self, arg1);
         tag = **(s32 **)arg1;
         mask = tag & 0xF;
         if (mask == 2) {

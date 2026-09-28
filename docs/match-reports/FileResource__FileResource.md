@@ -10,7 +10,7 @@
 
 The constructor for the `gFileResourceMethods` class (its own vtable slot `+0x008`,
 per `include/GameApplicationFileResource.h`'s `FileResourceMethods`). Chains the base
-class's constructor first (`Get_vtable_BasicClass()->ctor(this)`), then installs
+class's constructor first (`GetBasicClassMethods()->ctor(this)`), then installs
 this class's own vtable pointer (fetched via the already-matched
 `GetFileResourceMethods`, which just returns `&gFileResourceMethods`), then zeroes every field
 this unit currently knows about.
@@ -18,10 +18,10 @@ this unit currently knows about.
 ## Derivation
 
 ```
-jal   Get_vtable_BasicClass
+jal   GetBasicClassMethods
  addu $s0, $a0, $zero        ; s0 = this
 lw    $v0, 0x8($v0)          ; v0 = (base table)->ctor
-jalr  $v0                    ; Get_vtable_BasicClass()->ctor(this)
+jalr  $v0                    ; GetBasicClassMethods()->ctor(this)
 jal   GetFileResourceMethods          ; v0 = &gFileResourceMethods
 sw    $v0, 0x0($s0)          ; this->methods = v0
 sw    $zero, 0xC($s0)        ; this->unk0C = 0
@@ -42,7 +42,7 @@ field-by-field zeroing matches straight-line C with no reordering needed.
 
 ```c
 void FileResource__FileResource(FileResource *this) {
-    Get_vtable_BasicClass()->ctor(this);
+    GetBasicClassMethods()->ctor(this);
     this->methods = (FileResourceMethods *) GetFileResourceMethods();
     this->unk0C = 0;
     this->unk10 = NULL;
@@ -89,7 +89,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 | `func_80026A50` | `FileResource__FileResource` | A |
 
 **Evidence.** The class's own constructor, `+0x008` slot by the project's
-convention: chains `Get_vtable_BasicClass()->ctor`, installs
+convention: chains `GetBasicClassMethods()->ctor`, installs
 `GetFileResourceMethods()` as `this->methods`, then zeroes every field this
 unit derived. A constructor's mechanics (chain base, install vtable,
 initialise fields) ARE its purpose, so tier A by the plan's own rule.

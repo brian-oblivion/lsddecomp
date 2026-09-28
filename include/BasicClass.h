@@ -44,7 +44,7 @@
  * the subclass, and the constructor's parameter list, because +0x008 is the
  * one slot whose signature every class redefines. Calling the BASE class's
  * implementation goes through the base table and upcasts:
- * `Get_vtable_BasicClass()->finalize((BasicClass *)self)`. Nothing else in a
+ * `GetBasicClassMethods()->finalize((BasicClass *)self)`. Nothing else in a
  * slot differs between a class and its subclasses: an override that needed a
  * different return type or parameter list would be a different slot. The one
  * exception is the ctor's return type, for the same reason as its parameters:
@@ -118,11 +118,11 @@ struct BasicClass {
     BASICCLASS_FIELDS(BasicClassMethods);
 };
 
-extern BasicClassMethods gBasicClassMethods;           /* BasicClass's own method table */
-extern BasicClassMethods *Get_vtable_BasicClass(void); /* returns &gBasicClassMethods */
+extern BasicClassMethods gBasicClassMethods;          /* BasicClass's own method table */
+extern BasicClassMethods *GetBasicClassMethods(void); /* returns &gBasicClassMethods */
 
 /* BasicClass's methods: the occupants of its own table, BMemPMgr and
- * TmdRenderer. A subclass reaches them through Get_vtable_BasicClass(). */
+ * TmdRenderer. A subclass reaches them through GetBasicClassMethods(). */
 void *BasicClass__Release(BasicClass *self);
 void BasicClass__BasicClass(BasicClass *self);
 void BasicClass__Finalize(BasicClass *self);

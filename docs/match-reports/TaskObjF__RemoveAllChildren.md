@@ -8,7 +8,7 @@
 
 `void TaskObjF__RemoveAllChildren(Node3bb8cE *self)`. Zeroes the same five resource-slot
 fields `TaskObjF__ClearLinks` zeroes, then chains to the base class's
-`removeAllChildren` (+0x018 on the `Get_vtable_BasicClass()` vtable). Reads as a
+`removeAllChildren` (+0x018 on the `GetBasicClassMethods()` vtable). Reads as a
 finalize/reset helper distinct from `TaskObjF__Finalize` (which only chains
 `finalize`, +0x00C, without touching the resource slots).
 
@@ -24,7 +24,7 @@ void TaskObjF__RemoveAllChildren(Node3bb8cE *self)
     self->unk68 = NULL;
     self->unk78 = NULL;
     self->unk7C = NULL;
-    Get_vtable_BasicClass()->removeAllChildren(self);
+    GetBasicClassMethods()->removeAllChildren(self);
 }
 ```
 

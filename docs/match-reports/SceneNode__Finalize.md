@@ -15,7 +15,7 @@ virtual teardown hooks in order (`slot50` = `SceneNode__DetachFromParent`, `slot
 for `SceneNode__NoOpSlot5C`, already a matched no-op stub elsewhere), frees the two
 sub-blocks the constructor allocated (`self->unk14->unk44`, then
 `self->unk14` itself), then tail-calls the BasicClass base destructor
-(`Get_vtable_BasicClass()->dtor(self)`).
+(`GetBasicClassMethods()->dtor(self)`).
 
 ## The C
 
@@ -26,7 +26,7 @@ void SceneNode__Finalize(SceneNodeObj *self) {
     self->methods->slot5C(self, 0);
     BMemPMgrFree(self->unk14->unk44);
     BMemPMgrFree(self->unk14);
-    Get_vtable_BasicClass()->dtor(self);
+    GetBasicClassMethods()->dtor(self);
 }
 ```
 
