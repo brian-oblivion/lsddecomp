@@ -14,7 +14,7 @@ void Entity__MoodCue24(Entity *this, EntityMoodHandlerArg *out) {
         out->unk20 = -2;
     }
     this->methods->slot48(this, 1, SCALE_DOUBLE);
-    this->methods->slot44(this, 0, ROTATION_YAW_PLUS2);
+    this->methods->slot44(this, 0, sRotationYawPlus2);
     this->methods->slotC4(this, -0x200, 0);
 }
 ```
@@ -28,7 +28,7 @@ void Entity__MoodCue24(Entity *this, EntityMoodHandlerArg *out) {
   of `Entity__MoodCue33`'s shift 4.
 - Three unconditional vtable calls in a row after the gate -- straight
   sequential statements, no reshaping needed.
-- Extern added: `ROTATION_YAW_PLUS2` (own file-scope declaration; already declared
+- Extern added: `sRotationYawPlus2` (own file-scope declaration; already declared
   in `Entity.c`).
 - Clean of both open toolchain blockers.
 

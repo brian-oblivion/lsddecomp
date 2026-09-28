@@ -604,7 +604,7 @@ void Entity__MoodCue07(Entity *this, SoundCueSet *out) {
         out->slots[2].octave = -1;
     }
     if (this->moodTimer >= 121) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
+        this->methods->updateRotation(this, 0, sRotationYawPlus2);
         this->methods->moveLocalZ(this, -320, 0);
     } else if (this->moodTimer >= 56 || Entity__IsNearTarget(this, this->coord2->coord.t, 1, 1) != 0) {
         this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
@@ -898,7 +898,7 @@ void Entity__MoodCue24(Entity *this, SoundCueSet *out) {
         out->slots[0].octave = -2;
     }
     this->methods->updateScale(this, 1, SCALE_DOUBLE);
-    this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
+    this->methods->updateRotation(this, 0, sRotationYawPlus2);
     this->methods->moveLocalZ(this, -512, 0);
 }
 
@@ -2123,7 +2123,7 @@ void Entity__MoodCue79(Entity *this, SoundCueSet *out) {
         out->slots[0].program = 25;
         out->slots[0].octave = 2;
     }
-    this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
+    this->methods->updateRotation(this, 0, sRotationYawPlus2);
     if (this->state == 0 && this->targetReached != 0) {
         this->methods->notifyParents(this, ENTITY_EFFECT_EVENT_VIDEO);
         this->state = 11;

@@ -259,7 +259,7 @@ above is concrete, not a placeholder.
 `ROTATION_YAW_PLUS1` (0x80089D18), the wobble-pulse `updateRotation`
 argument, decoded from `disk/SLPS_015.56` as four s16 `{num,den}` pairs:
 `(0,1, 1,1, 0,1, 0,1)` -- only Y (yaw) nonzero, a whole 1/1 = 1 degree,
-matching the existing `ROTATION_YAW_PLUS2` precedent for small whole-degree
+matching the existing `sRotationYawPlus2` precedent for small whole-degree
 per-tick amounts.
 
 ## Track 4 (2026-09-26, round 88, echo)
