@@ -1751,7 +1751,7 @@ void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY) {
     sStyleSpawnModelLayout = rand() % 5;
 }
 
-extern s32 gStyleSpawnYChoice1;
+extern s32 sStyleSpawnYChoice1;
 extern s32 sStyleSpawnModelLayout;
 
 /* The every-seventh-day setup: fixed offset y, x of 0..19 steps of 2048, z
@@ -1765,7 +1765,7 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     s32 dayMod3;
 
     rand();
-    sStyleSpawnOffsetY = gStyleSpawnYChoice1;
+    sStyleSpawnOffsetY = sStyleSpawnYChoice1;
     sStyleSpawnOffsetX = (rand() % 20) << 11;
     dayMod3 = sStyleDay % 3;
     sStyleSpawnOffsetZ = 40960;

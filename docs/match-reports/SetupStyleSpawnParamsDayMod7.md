@@ -75,7 +75,7 @@ merely holds a value in transit.
 
 ```c
 extern s32 sStyleSpawnOffsetY;
-extern s32 gStyleSpawnYChoice1;
+extern s32 sStyleSpawnYChoice1;
 extern s32 sStyleSpawnOffsetX;
 extern s32 sStyleDay;
 extern s32 sStyleSpawnOffsetZ;
@@ -87,7 +87,7 @@ void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1) {
     s32 mod3;
 
     rand();
-    sStyleSpawnOffsetY = gStyleSpawnYChoice1;
+    sStyleSpawnOffsetY = sStyleSpawnYChoice1;
     sStyleSpawnOffsetX = (rand() % 20) << 11;
     mod3 = sStyleDay % 3;
     sStyleSpawnOffsetZ = 0xA000;
@@ -224,7 +224,7 @@ MATCHED, 87/87, ins 0/del 0.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_8008732C` | `gStyleSpawnYChoice1` | A | the word at `gStyleSpawnYChoices[1]` (-0x2800), a separate splat symbol. |
+| `D_8008732C` | `sStyleSpawnYChoice1` | A | the word at `gStyleSpawnYChoices[1]` (-0x2800), a separate splat symbol. |
 | `0xA000`, `0x800` | `40960`, `2048` | -- | offsets, decimal. |
 
 Parameters `(LongVec3 *pos, s32 offsetY)`, both unused (see SetupStyleSpawnParamsRandom); local `dayMod3`.
