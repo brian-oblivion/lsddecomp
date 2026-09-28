@@ -1752,37 +1752,24 @@ s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading) {
    raw word; only ever compared here, never dereferenced field-by-field. */
 extern s32 sStage5TriggerGridPos;
 
+/* The stage links that TryStageTimerLink takes: only stages 1, 3, 5, 9 and
+ * 12 have one. Stage 5 links below y -4095 or at the one grid position
+ * sStage5TriggerGridPos, stage 9 at y 2048 and up, the others anywhere. On an
+ * odd timer the link lands on stage 12 (GetRandomSpawnFromStage's negative
+ * form), otherwise away from the current stage. Returns the destination stage
+ * (also sLinkDstStage), or -1 for no link. */
 s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer) {
     s32 result;
 
-    if (stage == 3)
-        goto shared;
-    if (stage == 1)
-        goto shared;
-    if (stage == 5)
-        goto case5;
-    if (stage == 9)
-        goto shared;
-    if (stage != 12)
+    if (stage != 3 && stage != 1 && stage != 5 && stage != 9 && stage != 12)
         return -1;
-
-shared:
-    if (stage != 5)
-        goto case9check;
-case5:
-    if (currentPos->position.y < -4095)
-        goto merge;
-    if (*(s32 *)currentPos == sStage5TriggerGridPos)
-        goto merge;
-    return -1;
-
-case9check:
-    if (stage != 9)
-        goto merge;
-    if (currentPos->position.y < 2048)
-        return -1;
-
-merge:
+    if (stage == 5) {
+        if (currentPos->position.y >= -4095 && *(s32 *)currentPos != sStage5TriggerGridPos)
+            return -1;
+    } else if (stage == 9) {
+        if (currentPos->position.y < 2048)
+            return -1;
+    }
     if (timer & 1)
         stage = -12;
     result = GetRandomSpawnFromStage(target, stage, timer);
