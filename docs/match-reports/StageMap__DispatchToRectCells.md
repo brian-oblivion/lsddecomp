@@ -38,7 +38,7 @@ What the two orders do to the asm:
   of `addiu s1, s1, 1` and fills its own load delay; with `col++` first
   the load follows the increment and costs a `nop`.
 
-The matched C is the live definition in `src/DayTaskStageMap.c`.
+The matched C is the live definition in `src/world/DayTaskStageMap.c`.
 
 ### Proposed learning
 
@@ -414,7 +414,7 @@ the current `include/DayTaskStageMap.h`. The mapping, for whoever rebuilds one:
 | `HistoryEntry_3ac78` / `HistoryBlock_3ac78` | `GridRect_3ac78` / `GridRectList_3ac78` |
 | `->methods->unk04(...)` | `->methods->release(...)` |
 
-The `#if 0` copy that lives in `src/DayTaskStageMap.c` WAS updated to the current
+The `#if 0` copy that lives in `src/world/DayTaskStageMap.c` WAS updated to the current
 names in the same round, so that one still compiles; only identifiers changed
 and the recorded score is unaffected.
 

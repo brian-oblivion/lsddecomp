@@ -129,7 +129,7 @@ Round 67 (track 3, naming pass).
 | --- | --- | --- | --- |
 | `func_8004A4C8` | `New_StageMap` | A | Body is the project's established `New_X` shape: allocate `0x1E8` via `BMemPMgrAlloc`, and on success dispatch the class's ctor slot `+0x008` with the caller's two arguments, else return NULL. `New_Class` is the convention named in FINISHING-PLAN.md track 3, and this report already used the phrase before the rename. |
 
-The one call site is `src/DayTaskStageMap.c`'s `DayTask__DayTask`, the boot path:
+The one call site is `src/world/DayTaskStageMap.c`'s `DayTask__DayTask`, the boot path:
 `arg1->unkC = (SubObjG *)New_StageMap(0, 1);`. So exactly one instance of
 this class exists, created at game start.
 

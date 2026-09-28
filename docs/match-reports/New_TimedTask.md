@@ -26,7 +26,7 @@ Obj865C8 *New_TimedTask(s32 arg1, SubObjB *arg2)
 }
 ```
 
-See `src/DayTaskStageMap.c` for the exact text.
+See `src/world/DayTaskStageMap.c` for the exact text.
 
 ## Why it matched: `return NULL;` goes LAST
 

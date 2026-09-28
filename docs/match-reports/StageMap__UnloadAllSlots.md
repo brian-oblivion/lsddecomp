@@ -30,7 +30,7 @@ release call instead of held.
 2. Hold `list = entry->list;` in a local: retail loads it once into `s1`
    and reuses it for the store-back after `release`.
 
-The matched C is the live definition in `src/DayTaskStageMap.c`.
+The matched C is the live definition in `src/world/DayTaskStageMap.c`.
 
 ### Proposed learning
 
@@ -354,7 +354,7 @@ not to the shipped bytes.
 | --- | --- | --- | --- |
 | `func_8004ABD0` | `StageMap__UnloadAllSlots` | B | Occupant of vtable slot `+0x0C0`, and `DayTaskStageMap`'s matched `StageMap__Disable` calls exactly that slot immediately before clearing `enabled` -- so this is the shutdown/clear path. The body walks all seven `elems[]` entries and for each: dispatches the target's `slot74`, zeroes the entry's `flag`, dispatches `slot108`, releases the list's held object, raises `onElementEvent(self, 6, entry, i)`, dispatches the target's `slot84`. Then zeroes `unk1B4`/`unk1B8` and dispatches `slot140`. Tier B: "reset all elements" is what the loop does; why the object is reset is not established. |
 
-The preserved `#if 0` body in `src/DayTaskStageMap.c` was updated to the current
+The preserved `#if 0` body in `src/world/DayTaskStageMap.c` was updated to the current
 field names in the same round (`entry->unk0` -> `flag`, `entry->unk4` ->
 `target`, `entry->unk8` -> `list`, `self->unkEC` -> `self->elems`). Its score
 and residue are unchanged -- no code was altered, only identifiers.
@@ -381,7 +381,7 @@ the current `include/DayTaskStageMap.h`. The mapping, for whoever rebuilds one:
 | `HistoryEntry_3ac78` / `HistoryBlock_3ac78` | `GridRect_3ac78` / `GridRectList_3ac78` |
 | `->methods->unk04(...)` | `->methods->release(...)` |
 
-The `#if 0` copy that lives in `src/DayTaskStageMap.c` WAS updated to the current
+The `#if 0` copy that lives in `src/world/DayTaskStageMap.c` WAS updated to the current
 names in the same round, so that one still compiles; only identifiers changed
 and the recorded score is unaffected.
 

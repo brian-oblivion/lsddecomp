@@ -195,7 +195,7 @@ Re-verified the "62/113, drifted" claim first: the preserved body above
 does NOT compile as-is against the CURRENT header (`GetDrawSystem` and
 `GetLightRigMethods` have both since been given real, no-argument signatures
 by the sibling ctor `StageMap__StageMap`'s own successful match -- see
-`src/DayTaskStageMap.c`'s own declarations, `extern s32 GetDrawSystem(void);`
+`src/world/DayTaskStageMap.c`'s own declarations, `extern s32 GetDrawSystem(void);`
 and `extern BaseCtorTable_3ac78 *GetLightRigMethods(void);` -- rather than the
 `(self)`-taking guesses this report's preserved body used). This alone
 means the round-13 62/113 score was measuring a body that would not even
@@ -203,7 +203,7 @@ build against today's header; it was not re-derivable verbatim.
 
 **The decisive resource was the ALREADY-MATCHED sibling ctor,
 `StageMap__StageMap` (same unit, same class, right above this function in
-`src/DayTaskStageMap.c`), which allocates and fills the SAME `entry->unk10`
+`src/world/DayTaskStageMap.c`), which allocates and fills the SAME `entry->unk10`
 0x668-byte array this function tears down.** Its own byte-exact source
 was read directly rather than re-guessing the idiom from scratch:
 
@@ -256,7 +256,7 @@ p += 4;
 Result: **113/113, `build exit=0`, whole-image `OK: build matches retail
 SLPS_015.56`.** Full match.
 
-Final source (verbatim, now in `src/DayTaskStageMap.c` in place of the
+Final source (verbatim, now in `src/world/DayTaskStageMap.c` in place of the
 `INCLUDE_ASM`):
 
 ```c

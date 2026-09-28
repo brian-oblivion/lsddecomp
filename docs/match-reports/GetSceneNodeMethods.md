@@ -56,7 +56,7 @@ and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
 `src/graphics/SceneNode.c`, `src/TitleMenuTaskObjF.c`, `src/ObjMStyleActor.c`,
-`src/ObjMStyleActor.c`, `src/DayTaskStageMap.c`, `src/ScreenWidgets.c`,
+`src/ObjMStyleActor.c`, `src/world/DayTaskStageMap.c`, `src/ScreenWidgets.c`,
 `src/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
 Renaming this symbol would edit every one of those files -- squarely
@@ -121,7 +121,7 @@ reduce either declaration to `(void)` — which is correct and unchanged, since
 `(void)` would make both call sites a `too many arguments` compile error. `()`
 is a different spelling and was never considered.
 
-- `src/DayTaskStageMap.c:182` — `extern void *GetSceneNodeMethods(StageMap *self, s32 arg1);` -> `extern void *GetSceneNodeMethods();`
+- `src/world/DayTaskStageMap.c:182` — `extern void *GetSceneNodeMethods(StageMap *self, s32 arg1);` -> `extern void *GetSceneNodeMethods();`
 - `include/class_3bb8c.h:952` — `extern BaseCtorTableB_3bb8c_c *GetSceneNodeMethods(void *self);` -> `extern BaseCtorTableB_3bb8c_c *GetSceneNodeMethods();`
 
 Return types are untouched (they are this project's multiple-independent-local-views
@@ -154,7 +154,7 @@ in `include/SceneNode.h`. The deleted local return-type views were
 `BaseCtorTableB_3bb8c_c` (include/class_3bb8c.h), `FixedBaseTable`
 (src/ObjMStyleActor.c), `SceneNodeBaseTable` (src/class_3bb8c_p.c),
 `D6B5CCGetterMethodsCC8C` (include/Task.h) and the untyped `void *` in
-src/DayTaskStageMap.c. The one- and two-argument calls in TitleMenuTaskObjF.c and
+src/world/DayTaskStageMap.c. The one- and two-argument calls in TitleMenuTaskObjF.c and
 DayTaskStageMap.c now pass nothing, because round 59 measured those arguments as
 zero-cost. The raw `+ 0x38`/`+ 0x88` offset calls in DayTaskStageMap.c are now
 `onNotify`/`notifyIfUnk20Active` slot calls. Byte-identical.

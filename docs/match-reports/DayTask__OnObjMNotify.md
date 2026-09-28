@@ -91,7 +91,7 @@ Two corroborating details, both needed before writing it that way:
 - **Only the `s16` at +2 is ever read** (`lh $v0, 0x12($sp)`), and its sign
   selects between two `unk28` codes. So the struct's full shape is NOT
   established, which is why `struct SubObjDPos` is declared in
-  `src/DayTaskStageMap.c` and not in `include/DayTaskStageMap.h` — a sibling unit could
+  `src/world/DayTaskStageMap.c` and not in `include/DayTaskStageMap.h` — a sibling unit could
   not reuse it unchanged. The header records the return type by name and says
   where the definition lives.
 

@@ -25,7 +25,7 @@
  * sender (DRAWSYSTEM_CLASS_ID) to +0x040 update, which retries on that
  * event.
  *
- * Its one construction: DayTask__DayTask (src/DayTaskStageMap.c),
+ * Its one construction: DayTask__DayTask (src/world/DayTaskStageMap.c),
  * New_WBgm(PickSoundBank(0), NULL, 1): the VAB path is one of the seven
  * gSoundBankPaths strings ("SND\\AMBIENT" ... "SND\\STANDERD",
  * asm/data/1B84.rodata.s), no SEQ yet, autoPlay on. That caller keeps the

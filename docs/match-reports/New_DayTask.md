@@ -28,7 +28,7 @@ Obj865C8 *New_DayTask(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 }
 ```
 
-See `src/DayTaskStageMap.c` for the exact text.
+See `src/world/DayTaskStageMap.c` for the exact text.
 
 ## Why it matched: `return NULL;` goes LAST
 

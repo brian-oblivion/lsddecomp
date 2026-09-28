@@ -66,7 +66,7 @@ jr    $ra
 It reads **neither `$a0` nor `$a1`**. It takes **no arguments** and returns
 `&gSceneNodeMethods` — the plain no-parameter vtable getter already documented in
 `docs/research/class-framework.md`, the same shape as `GetGameApplicationMethods`. So the
-2-argument declaration in `src/DayTaskStageMap.c` and the 1-argument declaration
+2-argument declaration in `src/world/DayTaskStageMap.c` and the 1-argument declaration
 in `include/class_3bb8c.h` are **both wrong about the function**, and both are
 **right about their own call site**, and both units are byte-exact.
 

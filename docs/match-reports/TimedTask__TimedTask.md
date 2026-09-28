@@ -116,7 +116,7 @@ particular call site once a subclass's vtable is installed.
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
 `include/DayTaskStageMap.h`'s local `extern BasicClass *New_VabStreamObj(char *)`
-is deleted. `src/DayTaskStageMap.c` now includes `include/VabStreamObj.h`, where
+is deleted. `src/world/DayTaskStageMap.c` now includes `include/VabStreamObj.h`, where
 the allocator returns `VabStreamObj *`, and casts the result to
 `BasicClass *` for `TimedTask::sound`. The whole image stays
 byte-identical.

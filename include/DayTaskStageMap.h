@@ -5,7 +5,7 @@
 #include "DayTask.h"
 
 /*
- * Declarations src/DayTaskStageMap.c's DayTask, TimedTask and
+ * Declarations src/world/DayTaskStageMap.c's DayTask, TimedTask and
  * RegisterRecordTableFiles use (the .c's banner says what it holds): the
  * functions they call that no header it includes declares, and the call-site
  * view of the one object it reaches without its class's header. DayTask and
@@ -50,7 +50,7 @@ extern const char sDreamerTmdPath[];
  * passes to New_WBgm as its vabPath. */
 extern s32 PickSoundBank(s32 unused);
 
-/* Defined in src/DayTaskStageMap.c, after DayTask's methods; GameApplicationFileResource.c
+/* Defined in src/world/DayTaskStageMap.c, after DayTask's methods; GameApplicationFileResource.c
  * declares it too. */
 extern s32 RegisterRecordTableFiles(s32 all);
 

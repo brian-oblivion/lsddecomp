@@ -739,7 +739,7 @@ premature**:
 **A permuter scaffold's `base.c` is NOT the project's C.**
 `tools/setup-permuter.sh` emits a FLATTENED translation unit -- the function
 plus its own inlined preamble of typedefs. Pasting that body straight into
-`src/DayTaskStageMap.c` cannot work, because this function's local types live in
+`src/world/DayTaskStageMap.c` cannot work, because this function's local types live in
 this report's `#if 0` block, not in the unit. Bring the declarations across
 with the body, build, *then* believe the figure.
 
@@ -804,7 +804,7 @@ sibling it was worth 12 words.
 
 The head applied it and the build failed: ``LinkResource' undeclared``. The
 permuter's `base.c` is a FLATTENED scaffold with its own preamble, so its body
-is not directly pasteable into `src/DayTaskStageMap.c` -- this function's local
+is not directly pasteable into `src/world/DayTaskStageMap.c` -- this function's local
 types live in this report's own `#if 0` block and must come across with it.
 That is a ten-minute job and a runner's, not a head's, and doing it badly
 would have produced a figure that measured the wrong thing.
@@ -830,7 +830,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BE54` | `StageMap__PopulateSlotCells` | B | Occupant of `gStageMapMethods` +0x104 (`slot104`), and its own identity slot -- `StageMap__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/DayTaskStageMap.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
+| `func_8004BE54` | `StageMap__PopulateSlotCells` | B | Occupant of `gStageMapMethods` +0x104 (`slot104`), and its own identity slot -- `StageMap__OnNotifyTag1` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/world/DayTaskStageMap.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
 
 ## Track 4 (2026-09-26, round 87, echo)
 

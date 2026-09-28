@@ -43,5 +43,5 @@ comment moves zero bytes.
 ## Round 94 (track 6)
 
 `include/class_3bb8c.h`'s prototype is gone: its one caller,
-`StageMap__ComputeFootprintFromRotation` (src/DayTaskStageMap.c), takes Sony's
+`StageMap__ComputeFootprintFromRotation` (src/world/DayTaskStageMap.c), takes Sony's
 `VECTOR *ApplyMatrixLV(MATRIX *m, VECTOR *v0, VECTOR *v1)` from `<libgte.h>`.
