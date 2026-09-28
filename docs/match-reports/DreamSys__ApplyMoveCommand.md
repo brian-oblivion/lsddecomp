@@ -21,7 +21,7 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1)
 	PlayerSpawnPoint *pos;
 
 	if (arg1 != 0) {
-		delta = MOVE_COMMAND_SIGNS[arg1] * sMoveModeSpeeds[this->unk_0xAC];
+		delta = sMoveCommandSigns[arg1] * sMoveModeSpeeds[this->unk_0xAC];
 		this->vt->DreamSys__NoOpSlot12C(this);
 		pos = this->unk_0x4C->methods->slot0x10C(this->unk_0x4C, 0, 0);
 		if (!this->vt->DreamSys__TryStaircaseLink(this, pos)
@@ -40,7 +40,7 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 arg1)
 }
 ```
 
-`delta` is a signed value (`MOVE_COMMAND_SIGNS[arg1]`, a small `{0,1,-1}` sign/step
+`delta` is a signed value (`sMoveCommandSigns[arg1]`, a small `{0,1,-1}` sign/step
 table, times `sMoveModeSpeeds[this->unk_0xAC]`, a `{0,0x18,0x40,0x80,0x180}`
 magnitude table indexed by the OTHER "current mood class" field), forwarded
 into `MOVE_COMMAND_DISPATCH[arg1]` -- a genuine dispatch table of function pointers
@@ -77,7 +77,7 @@ All in `include/DreamSys.h`:
 - **`DreamSys::unk_0x90C` retyped `s32` -> `u32`.** Retail compares it with
   `sltiu` (unsigned), not `slti`; both existing writers (round 2026-08-30)
   only ever set it to the literal 0, so the retype is safe.
-- **`extern s32 sMoveModeSpeeds[5]`, `extern s8 MOVE_COMMAND_SIGNS[8]`, and
+- **`extern s32 sMoveModeSpeeds[5]`, `extern s8 sMoveCommandSigns[8]`, and
   `extern void (*MOVE_COMMAND_DISPATCH[5])(DreamSys *this, s32 val, void *extra)`**
   (the last declared after the real `DreamSys` typedef, matching
   `Actor__MoveLocalZOrFindLink`/`Actor__MoveLocalXOrFindLink`'s element signature -- those are two of
@@ -127,7 +127,7 @@ field's sign before assuming it is a control-flow or register problem.
 Renamed from `func_80059E98`.
 
 Given the move command `DreamSys__AdvanceMoveCycle` returned,
-scales it into a delta (`MOVE_COMMAND_SIGNS[cmd] * sMoveModeSpeeds[moveMode]`),
+scales it into a delta (`sMoveCommandSigns[cmd] * sMoveModeSpeeds[moveMode]`),
 fetches the current spawn point from `linkMgr`, and tries the three link tests
 (staircase, instant teleporter, tunnel) BEFORE moving. Only if none of them fires
 does it save the link snapshot and call the mover

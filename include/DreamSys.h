@@ -74,7 +74,7 @@ enum DreamSysLinkCode {
 };
 
 /* DreamSys::moveCommand, set by the pad handler and consumed by
- * AdvanceMoveCycle / ApplyMoveCommand. MOVE_COMMAND_SIGNS and
+ * AdvanceMoveCycle / ApplyMoveCommand. sMoveCommandSigns and
  * MOVE_COMMAND_DISPATCH make 1/2 a +/- step along the local z axis
  * (MoveLocalZOrFindLink) and 3/4 a -/+ step along local x
  * (MoveLocalXOrFindLink); FlipMoveCommand swaps each pair. Forced and
@@ -152,14 +152,14 @@ extern s32 LOOK_YAW_LIMITS[3];
 
 /* Consumed by DreamSys__ApplyMoveCommand (round 2026-09-06), both indexed by that
    function's own `arg1` (a mood/day-type selector, range implied by the
-   table sizes below): `MOVE_COMMAND_SIGNS[arg1] * sMoveModeSpeeds[this->moveMode]` forms
+   table sizes below): `sMoveCommandSigns[arg1] * sMoveModeSpeeds[this->moveMode]` forms
    a signed delta, then `MOVE_COMMAND_DISPATCH[arg1]` is called with it. Index 0 is
    unused/null in MOVE_COMMAND_DISPATCH (arg1 == 0 returns before reaching any of
-   these, per that function's own guard) -- consistent with MOVE_COMMAND_SIGNS[0]
+   these, per that function's own guard) -- consistent with sMoveCommandSigns[0]
    being 0 too. sMoveModeSpeeds is indexed separately by DreamSys::moveMode (its
    own "Current" value, see that field), not by arg1. */
 extern s32 sMoveModeSpeeds[5];
-extern s8 MOVE_COMMAND_SIGNS[8];
+extern s8 sMoveCommandSigns[8];
 
 /* Declared further down (after the real `DreamSys` typedef exists) as
    `extern void (*MOVE_COMMAND_DISPATCH[5])(DreamSys *this, s32 val, void *extra);` --
@@ -659,7 +659,7 @@ typedef struct DreamSaveBlock {
 } DreamSaveBlock;
 
 /* Dispatch table indexed by DreamSys__ApplyMoveCommand's `arg1`; see that table's own
-   comment near sMoveModeSpeeds/MOVE_COMMAND_SIGNS above. Same element signature as
+   comment near sMoveModeSpeeds/sMoveCommandSigns above. Same element signature as
    Actor__MoveLocalZOrFindLink/Actor__MoveLocalXOrFindLink (Actor +0x0D0/+0x0D4). */
 extern void (*MOVE_COMMAND_DISPATCH[5])(DreamSys *this, s32 val, void *extra);
 
