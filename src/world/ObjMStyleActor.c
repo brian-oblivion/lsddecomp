@@ -1325,22 +1325,17 @@ extern s32 sStyleDecorSizeW;
 extern s32 sStyleDecorSizeH;
 extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
 
-/* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs.
+/* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs, a
+ * BoxFillPos and a BoxFillSize.
  * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
  * drop cached memory values; scalar copies lose retail's reloads). */
-typedef struct PairXY PairXY;
-
-struct PairXY {
-    s32 x; /* +0x000 */
-    s32 y; /* +0x004 */
-};
 
 /* Builds the bands: band 0 in sStyleDecorColors' first colour, bands 1..17
  * attached under it, each 3 pixels lower and 7 shorter than the one before;
  * band 0 then goes under the viewport's fade box. */
 void StyleBuildDecorSet(void) {
-    PairXY pos;
-    PairXY size;
+    BoxFillPos pos;
+    BoxFillSize size;
     s32 i;
     BoxFill *band;
     Viewport *viewport;
@@ -1349,25 +1344,25 @@ void StyleBuildDecorSet(void) {
     if (sStyleDecorVariant == 0) {
         return;
     }
-    pos = *(PairXY *)&sStyleDecorPosX;
+    pos = *(BoxFillPos *)&sStyleDecorPosX;
     if (sStyleDecorVariant == 2) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
-    size = *(PairXY *)&sStyleDecorSizeW;
+    size = *(BoxFillSize *)&sStyleDecorSizeW;
     sStyleDecorSlots[0] = New_BoxFill(&size, (void *)sStyleDecorColors, STYLE_DECOR_PRI);
     for (i = 1; i < STYLE_DECOR_BANDS; i++) {
         band = New_BoxFill(&size, (void *)(sStyleDecorColors + i * 3), STYLE_DECOR_PRI);
         sStyleDecorSlots[i] = band;
         ((BoxFillAttachToParentFn)band->methods->attachToParent)(
-            band, (SceneNode *)sStyleDecorSlots[0], (BoxFillPos *)&pos);
+            band, (SceneNode *)sStyleDecorSlots[0], &pos);
         pos.y += 3;
-        size.y -= 7;
+        size.h -= 7;
     }
 
     viewport = ((StyleSceneRefs *)sStyleSceneRefs)->viewport;
     parent = viewport->methods->getFadeBox(viewport);
-    ((BoxFillAttachToParentFn)sStyleDecorSlots[0]->methods->attachToParent)(
-        sStyleDecorSlots[0], parent, (BoxFillPos *)&pos);
+    ((BoxFillAttachToParentFn)sStyleDecorSlots[0]->methods->attachToParent)(sStyleDecorSlots[0],
+                                                                            parent, &pos);
 }
 
 void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta);
@@ -1381,7 +1376,7 @@ void StyleUpdateDecorSet(void) {
     s32 height;
     s32 fade;
     u8 rgb[8]; /* MATCHING: 8, not 3 (the frame keeps pos at sp+0x18) */
-    PairXY pos;
+    BoxFillPos pos;
     s32 colorOfs;
     s32 i;
     BoxFill **slot;
@@ -1396,7 +1391,7 @@ void StyleUpdateDecorSet(void) {
     if (fade <= 0) {
         return;
     }
-    pos = *(PairXY *)&sStyleDecorPosX;
+    pos = *(BoxFillPos *)&sStyleDecorPosX;
     i = 0;
     if (sStyleDecorVariant == 2) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
@@ -1411,7 +1406,7 @@ void StyleUpdateDecorSet(void) {
         band = *slot;
         i++;
         colorOfs += 3;
-        band->methods->setPosition(band, (BoxFillPos *)&pos);
+        band->methods->setPosition(band, &pos);
         pos.y += 3;
         slot++;
     } while (i < STYLE_DECOR_BANDS);
