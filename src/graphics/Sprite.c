@@ -336,7 +336,7 @@ FrameClock *New_FrameClock(void) {
     FrameClock *obj = BMemPMgrAlloc(sizeof(FrameClock));
 
     if (obj != NULL) {
-        Get_vtable_FrameClock()->ctor(obj);
+        GetFrameClockMethods()->ctor(obj);
         return obj;
     }
     return NULL;
@@ -345,7 +345,7 @@ FrameClock *New_FrameClock(void) {
 /* gFrameClockMethods slot +0x008 (ctor): the BasicClass ctor, install the table, reset(0). */
 void FrameClock__FrameClock(FrameClock *self) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_FrameClock();
+    self->methods = GetFrameClockMethods();
     self->methods->reset(self, 0);
 }
 
@@ -428,7 +428,7 @@ void FrameClock__SetFlag14(FrameClock *self) {
 }
 
 /* Returns the gFrameClockMethods method table. */
-FrameClockMethods *Get_vtable_FrameClock(void) {
+FrameClockMethods *GetFrameClockMethods(void) {
     return &gFrameClockMethods;
 }
 

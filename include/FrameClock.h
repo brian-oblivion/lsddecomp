@@ -73,7 +73,7 @@ struct FrameClock {
 }; /* 0x1C bytes: New_FrameClock */
 
 extern FrameClockMethods gFrameClockMethods;
-extern FrameClockMethods *Get_vtable_FrameClock(void); /* returns &gFrameClockMethods */
+extern FrameClockMethods *GetFrameClockMethods(void); /* returns &gFrameClockMethods */
 
 /* The class's own methods, in address order. */
 FrameClock *New_FrameClock(void); /* BMemPMgrAlloc(0x1C), then ctor */

@@ -1,4 +1,6 @@
-# Get_vtable_FrameClock -- MATCHED (4/4 words), round 82
+# GetFrameClockMethods -- MATCHED (4/4 words), round 82
+
+> Renamed from `Get_vtable_FrameClock` on 2026-09-28 (tools/rename.py). Address 0x80042684.
 
 > Renamed from `Get_vtable_D8006EF50` on 2026-09-26 (tools/rename.py). Address 0x80042684.
 
@@ -15,14 +17,14 @@ Round 82, runner alpha (second re-staffed slot of the round). Unit `src/graphics
 
 ```c
 /* Returns the gFrameClockMethods method table. */
-void *Get_vtable_FrameClock(void) {
+void *GetFrameClockMethods(void) {
     return gFrameClockMethods;
 }
 ```
 
 ## Naming
 
-- `Get_vtable_FrameClock` -- tier A. Table getter ("return gFrameClockMethods;").
+- `GetFrameClockMethods` -- tier A. Table getter ("return gFrameClockMethods;").
 
 ## Track 4 (2026-09-26, round 88, delta)
 

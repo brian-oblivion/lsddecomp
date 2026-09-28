@@ -7,7 +7,7 @@
 Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior attempt.
 
 - **Where:** gFrameClockMethods slot +0x008 (ctor).
-- **What:** calls the BasicClass ctor on self, installs the gFrameClockMethods table (`Get_vtable_FrameClock()`), then calls its slot +0x040 (reset, FrameClock__Reset) with `(self, 0)`. Returns nothing (no `$v0` set after the last call).
+- **What:** calls the BasicClass ctor on self, installs the gFrameClockMethods table (`GetFrameClockMethods()`), then calls its slot +0x040 (reset, FrameClock__Reset) with `(self, 0)`. Returns nothing (no `$v0` set after the last call).
 - **Result:** byte-exact, 22/22 words, 0 ins / 0 del, whole-image SHA1 green. First build. The `move a0,s0; sw v0,0(a0)` store through `$a0` came for free from the natural three-statement body (charlie's round-82 note: the next call takes self as arg1).
 - **Types:** the unit-local `D_8006EF50Obj` view gained `methods` at +0x000 (was padding) and a local `D_8006EF50Methods` with `reset` at +0x040; no shared header touched.
 
@@ -30,7 +30,7 @@ struct D_8006EF50Methods {
 
 void FrameClock__FrameClock(D_8006EF50Obj *self) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_FrameClock();
+    self->methods = GetFrameClockMethods();
     self->methods->reset(self, 0);
 }
 ```
