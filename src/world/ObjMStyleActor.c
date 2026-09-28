@@ -1293,7 +1293,7 @@ void StyleFlushDecoration(void) {
 
 extern s32 sStyleDay;
 extern s32 sStyleStage;
-extern s8 gStyleVariantPicks[];
+extern s8 sStyleVariantPicks[];
 extern s32 sStyleVariant;
 extern s8 sStyleVariantConfigCounts[];
 extern s32 sStyleConfigIndex;
@@ -1306,7 +1306,7 @@ extern u8 sStyleDecorColorsA[];
 extern s32 sStyleDecorVariant;
 
 /* The config for a stage without a fixed one: the variant from
- * gStyleVariantPicks[(day + stage) & 0xF], then record (day + stage) % count
+ * sStyleVariantPicks[(day + stage) & 0xF], then record (day + stage) % count
  * of that variant's table. For variant 0 it also sets the clear colour, the
  * band colours and, for records 0..5, the decor variant (1, or 2 for 4..5). */
 void *PickStyleFallbackConfig(void) {
@@ -1320,7 +1320,7 @@ void *PickStyleFallbackConfig(void) {
     u8 *decorColors;
 
     seed = sStyleDay + sStyleStage;
-    variant = gStyleVariantPicks[seed & 0xF];
+    variant = sStyleVariantPicks[seed & 0xF];
     sStyleVariant = variant;
     count = sStyleVariantConfigCounts[variant];
     index = seed % count;

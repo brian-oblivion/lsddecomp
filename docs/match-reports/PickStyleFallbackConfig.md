@@ -19,7 +19,7 @@ fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
 ```c
 extern s32 sStyleDay;         /* already s32 in ObjMStyleActor.c */
 extern s32 sStyleStage;         /* already s32 in ObjMStyleActor.c and this unit's own StyleScrollVramStrips */
-extern s8 gStyleVariantPicks[];        /* 16-entry table, indexed by (sStyleDay+sStyleStage)&0xF */
+extern s8 sStyleVariantPicks[];        /* 16-entry table, indexed by (sStyleDay+sStyleStage)&0xF */
 extern s32 sStyleVariant;
 extern s8 sStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
 extern s32 sStyleConfigIndex;
@@ -46,7 +46,7 @@ void *PickStyleFallbackConfig(void) {
     u8 *tab;
 
     sum = sStyleDay + sStyleStage;
-    kind = gStyleVariantPicks[sum & 0xF];
+    kind = sStyleVariantPicks[sum & 0xF];
     sStyleVariant = kind;
     divisor = sStyleVariantConfigCounts[kind];
     remainder = sum % divisor;
@@ -84,7 +84,7 @@ Notes:
   only `%`, never `/`, on this pair -- writing an unused `quotient = sum /
   divisor;` alongside it would be wrong (and would very likely emit a
   spurious `mflo`).
-- `sStyleVariantConfigCounts[kind]` and `gStyleVariantPicks[idx]` are indexed with NO scale factor
+- `sStyleVariantConfigCounts[kind]` and `sStyleVariantPicks[idx]` are indexed with NO scale factor
   in retail (`addu $at,$at,$a0`, not `sll`+`addu`) because both are `s8`
   arrays -- plain C array indexing on a 1-byte element type already
   reproduces this without any special casting.
@@ -147,7 +147,7 @@ A).
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_800873DC` | `gStyleVariantPicks` | B | 16 bytes, each 0..3, indexed `(day + stage) & 0xF`; the byte read is stored as `sStyleVariant`. |
+| `D_800873DC` | `sStyleVariantPicks` | B | 16 bytes, each 0..3, indexed `(day + stage) & 0xF`; the byte read is stored as `sStyleVariant`. |
 | `D_800873D8` | `sStyleVariantConfigCounts` | A | 4 bytes {7, 10, 12, 5}, indexed by the variant, the divisor of the config index; they are exactly the record counts of the four tables `sStyleVariantConfigs` points at (0x80087340: 7 words, ...735C: 10, ...7384: 12, ...73B4: 5). |
 | `D_800873C8` | `sStyleVariantConfigs` | A | 4 pointers, one per variant, to arrays of 4-byte config records; the function returns `table[variant] + index * 4`, the record ApplyStyleConfig/FillStyleFromConfig read. |
 | `D_8008AC84` | `sStyleConfigIndex` | A | written with the config index `(day + stage) % count`; nothing reads it. |
