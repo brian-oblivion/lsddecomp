@@ -40,7 +40,7 @@ another unit is fine" precedent. `this->vt->DreamSys__SoundCueCallback` (not the
 
 ## Derivation
 
-Same shape as `DreamSys__SelectCallback80`, matched earlier this round: hoist `this->vt`
+Same shape as `DreamSys__SelectLookCallback`, matched earlier this round: hoist `this->vt`
 into a local (retail loads `$s2 = this->vt` unconditionally at entry and
 reuses it), and write the `arg1` dispatch as a `switch` with cases in
 ascending textual order (`0, 1, 2`) — GCC 2.6.3 lays out each case's body in

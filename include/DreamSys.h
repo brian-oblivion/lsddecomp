@@ -408,11 +408,11 @@ struct DreamSys {
     s32 unk_0x78;
     /* Cleared to 0 by DreamSys__func_59590; no other observed use. */
     s32 unk_0x7C;
-    /* Set by DreamSys__SelectCallback80(this, arg1): NULL when arg1==0, otherwise one of
+    /* Set by DreamSys__SelectLookCallback(this, arg1): NULL when arg1==0, otherwise one of
            three vtable-slot function pointers selected by arg1 (1/2/3). Called
            with (this) by DreamSys__RunTickCallbacks, if non-NULL. */
     void (*lookCallback)(struct DreamSys *this);
-    /* Set unconditionally to arg1 by DreamSys__SelectCallback80(this, arg1);
+    /* Set unconditionally to arg1 by DreamSys__SelectLookCallback(this, arg1);
        no other observed use. */
     s32 lookCallbackMode;
     /* Index into the (sLookOffsetSteps, sLookOffsetLimits) delta/threshold table pair,
@@ -662,7 +662,7 @@ struct DreamSysMethods {
     /* +0x130 */ void (*clearTickCallbacks)(DreamSys *self, bool arg1); /* DreamSys__ClearTickCallbacks */
     /* +0x134 */ void (*setTickCallbacks)(DreamSys *self, s32 arg1,
                                           s32 arg2); /* DreamSys__SetTickCallbacks: selectCallback98(arg1), selectCallback80(arg2) */
-    /* +0x138 */ void (*selectCallback80)(DreamSys *self, s32 arg1); /* DreamSys__SelectCallback80 */
+    /* +0x138 */ void (*selectCallback80)(DreamSys *self, s32 arg1); /* DreamSys__SelectLookCallback */
     /* +0x13C */ void (*selectCallback98)(DreamSys *self, s32 arg1); /* DreamSys__SelectCallback98 */
     /* +0x140 */ void (*stepLook)(DreamSys *self);                   /* DreamSys__StepLook */
     /* +0x144 */ void (*stepLookOffset)(DreamSys *self);             /* DreamSys__StepLookOffset */

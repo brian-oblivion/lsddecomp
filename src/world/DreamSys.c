@@ -474,7 +474,7 @@ void DreamSys__SetTickCallbacks(DreamSys *this, s32 mode98, s32 mode80) {
     this->methods->selectCallback80(this, mode80);
 }
 
-void DreamSys__SelectCallback80(DreamSys *this, s32 mode) {
+void DreamSys__SelectLookCallback(DreamSys *this, s32 mode) {
     DreamSysMethods *vt = this->methods;
 
     this->lookCallbackMode = mode;
