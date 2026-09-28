@@ -154,6 +154,30 @@ typedef struct Descriptor10 {
     s16 h8;
 } Descriptor10;
 
+/* A Descriptor10 as DreamAux and the style layer build it for
+ * computeCellOffsets, from two halves each copied whole: `key` (the chunk's
+ * column/row bytes as one u16, then the cell's) and `offset`, the s16 x/y/z
+ * inside the cell. MATCHING: x and y are one struct, so each copy is one
+ * lwl/lwr pair (plus the z halfword). */
+typedef struct CellKey {
+    u16 chunk;
+    u16 cell;
+} CellKey;
+
+typedef struct CellOffset {
+    struct {
+        s16 x;
+        s16 y;
+    } xy;
+
+    s16 z;
+} CellOffset;
+
+typedef struct CellKeyDesc {
+    CellKey key;
+    CellOffset offset;
+} CellKeyDesc;
+
 /* computeFootprintDescriptor's output, 0x2C bytes. `targetCell` holds one. */
 typedef struct Descriptor10Ext {
     Descriptor10 base; /* +0x000 */

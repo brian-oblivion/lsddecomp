@@ -409,18 +409,7 @@ typedef struct {
 
 extern DreamAuxSpawnInfo sDreamAuxSpawnInfo[];
 
-/* MATCHING: x and y are one struct so the copy is one lwl/lwr pair */
-typedef struct {
-    s16 x;
-    s16 y;
-} DreamAuxPosXY;
-
-typedef struct {
-    DreamAuxPosXY xy;
-    s16 z;
-} DreamAuxPos6;
-
-extern DreamAuxPos6 sDreamAuxPosTable[];
+extern CellOffset sDreamAuxPosTable[];
 
 /* Ratio16 degree triples: yaw 0, -90, +90 and 180. */
 extern Ratio16 sDreamAuxSpawnRotations[][3];
@@ -433,17 +422,13 @@ bool SpawnDreamAuxTriggerEntity(s32 moodIndex, void *desc, DreamAuxTriggerEntry 
     if (entity != NULL) {
         DreamAuxSpawnInfo *spawn;
 
-        struct { /* StageMap.h's Descriptor10, as computeCellOffsets reads it */
-            u16 chunk;
-            u16 cell;
-            DreamAuxPos6 offset;
-        } cellDesc;
+        CellKeyDesc cellDesc;
 
         s32 worldPos[4];
 
-        cellDesc.chunk = trigger->key;
+        cellDesc.key.chunk = trigger->key;
         spawn = &sDreamAuxSpawnInfo[spawnIndex];
-        cellDesc.cell = spawn->cell;
+        cellDesc.key.cell = spawn->cell;
         cellDesc.offset = sDreamAuxPosTable[spawn->offsetIndex];
 
         sDreamAuxStageMap->methods->computeCellOffsets(sDreamAuxStageMap, worldPos, &cellDesc);
