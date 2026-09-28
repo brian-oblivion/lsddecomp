@@ -187,7 +187,7 @@ extern s32 IsWBgmActive(void);
 
 /* ".VH" and ".VB", in .sdata. */
 extern const char gVabHeaderSuffix[];
-extern const char gVabBodySuffix[];
+extern const char sVabBodySuffix[];
 
 /* SetNullDriverMode's two words, read back by GetNullDriverMode. */
 extern s32 sNullDriverMode;
@@ -323,7 +323,7 @@ void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
         case VABSTREAM_LOAD_HEADER:
             if (self->flags & CD_FLAG_LOAD_FILE_DONE) {
                 self->vabId = SsVabOpenHead(self->buffer, -1);
-                BuildFileName(path, self->baseFilename, NULL, gVabBodySuffix);
+                BuildFileName(path, self->baseFilename, NULL, sVabBodySuffix);
                 sPendingVabBuffer = self->buffer;
                 self->loadState = VABSTREAM_LOAD_BODY;
                 self->buffer = NULL;

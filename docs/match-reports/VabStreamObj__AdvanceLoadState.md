@@ -23,7 +23,7 @@ void VabStreamObj__AdvanceLoadState(VabStreamObj *self) {
     case 1:
         if (self->flags & 0x200) {
             self->vabId = SsVabOpenHead(self->streamBuffer, -1);
-            func_800270C4(path, self->baseFilename, NULL, gVabBodySuffix);
+            func_800270C4(path, self->baseFilename, NULL, sVabBodySuffix);
             sPendingVabBuffer = self->streamBuffer;
             self->loadState = 6;
             self->streamBuffer = NULL;
@@ -64,7 +64,7 @@ the body transfer (`SsVabTransBody`), and on success mark the object ready
 (`bodyTransferPending = 1`) and notify via `methods->slot78` (==
 `VabStreamObj__OnBodyReady`).
 
-`gVabBodySuffix` is retail's own `.sdata` string `".VB"`, referenced not
+`sVabBodySuffix` is retail's own `.sdata` string `".VB"`, referenced not
 retyped, same as `gVabHeaderSuffix` in the sibling function.
 
 ## Result
