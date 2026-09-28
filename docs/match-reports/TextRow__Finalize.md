@@ -61,7 +61,7 @@ confirmed.
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->finalize((CharSprite *)self)` (was `->slot0C(self)`): an upcast, no code. Image byte-identical.
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/char_sprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->finalize((CharSprite *)self)` (was `->slot0C(self)`): an upcast, no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 

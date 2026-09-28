@@ -164,7 +164,7 @@ purpose is the unit's working hypothesis only).
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74; this class, 0x11144, is still its own job). The chain to the parent ctor is now `GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20)`, still a genuine 3-argument prototyped call, which this report's lever needs; the old spelling cast `slot08` to a local function type. New_CharSprite's result is cast back to the view's `Obj6EAC0 *`: the children are CharSprites, not objects of this class, which the view's `children` comment does not say. Both casts emit no code. Image byte-identical.
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/char_sprite.h`, formerly D_8006EC74; this class, 0x11144, is still its own job). The chain to the parent ctor is now `GetCharSpriteMethods()->ctor((CharSprite *)self, (void *)a1, 0x20)`, still a genuine 3-argument prototyped call, which this report's lever needs; the old spelling cast `slot08` to a local function type. New_CharSprite's result is cast back to the view's `Obj6EAC0 *`: the children are CharSprites, not objects of this class, which the view's `children` comment does not say. Both casts emit no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 

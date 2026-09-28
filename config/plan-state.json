@@ -900,7 +900,7 @@
         "gCharSpriteMethods": {
           "class": "CharSprite",
           "date": "2026-09-26",
-          "header": "include/CharSprite.h"
+          "header": "include/char_sprite.h"
         },
         "gDayTaskMethods": {
           "class": "DayTask",

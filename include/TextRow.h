@@ -1,7 +1,7 @@
 #ifndef TEXTROW_H
 #define TEXTROW_H
 
-#include "CharSprite.h"
+#include "char_sprite.h"
 
 /*
  * TextRow -- a row of CharSprite cells showing a string (class id 0x11144,

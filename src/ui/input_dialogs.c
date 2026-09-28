@@ -25,7 +25,7 @@
 #include <libgs.h>
 #include <strings.h>
 #include "TextEntry.h"
-#include "CharSprite.h"
+#include "char_sprite.h"
 #include "TextRow.h"
 #include "tim_image.h"
 #include "VabStreamObj.h"

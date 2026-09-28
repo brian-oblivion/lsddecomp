@@ -1,5 +1,5 @@
-#ifndef CHARSPRITE_H
-#define CHARSPRITE_H
+#ifndef CHAR_SPRITE_H
+#define CHAR_SPRITE_H
 
 #include "ScreenSprite.h"
 

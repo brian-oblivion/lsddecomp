@@ -2,7 +2,7 @@
 #define TEXTENTRY_H
 
 #include "basic_class.h"
-#include "CharSprite.h"
+#include "char_sprite.h"
 
 /*
  * TextEntry -- an editor for a caller-owned string (class id 0x10, method

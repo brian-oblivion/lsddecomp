@@ -28,7 +28,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "CharSprite.h"
+#include "char_sprite.h"
 #include "LightRig.h"
 #include "flat_light_obj.h"
 #include "RequestedFile.h"

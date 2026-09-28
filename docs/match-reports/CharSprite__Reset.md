@@ -26,4 +26,4 @@ void CharSprite__Reset(CharSprite *self, u8 cell) {
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `D8006EC74__Reset`, tier A: the reset slot (+0x040), whose override adds the cell parameter (the header names the typedef the ctor calls it through). `self` is `CharSprite *`; the call goes through the unified slot name `setCell` (+0x0C4). The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/char_sprite.h`. Renamed from `D8006EC74__Reset`, tier A: the reset slot (+0x040), whose override adds the cell parameter (the header names the typedef the ctor calls it through). `self` is `CharSprite *`; the call goes through the unified slot name `setCell` (+0x0C4). The Source block above is the unified spelling. Image byte-identical.

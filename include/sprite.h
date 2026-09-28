@@ -12,7 +12,7 @@
  * projected from the inherited coordinate. Methods in src/graphics/sprite.c; four
  * classes derive from it (`typeviews.py --tree`): ScreenSprite (0x144, the
  * screen-space sprite, include/ScreenSprite.h), CharSprite (0x1144, one 8x8
- * font character, include/CharSprite.h), TextRow (0x11144) and gVariantSpriteMethods (0x1F44,
+ * font character, include/char_sprite.h), TextRow (0x11144) and gVariantSpriteMethods (0x1F44,
  * dream_scene/q/t).
  *
  * The texture is bound by reset (+0x040), which the ctor calls with its own

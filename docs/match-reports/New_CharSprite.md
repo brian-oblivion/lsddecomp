@@ -39,7 +39,7 @@ Allocator/wrapper whose prologue has the constant arg set (`li a0,K`) BEFORE a c
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `New_D8006EC74`, tier A: the allocator, `New_<Class>`. Returns `CharSprite *` and calls the ctor through the unified table; the unit-local `CellCtorMethods_322b4` is gone, as are the callers' local declarations (include/task.h's `Obj6EAC0 *(s32, s32)`, input_dialogs's `ChildObj86ED0 *(ChildObj86ED0 *, s32)`); both callers now cast the result to their own field types. The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/char_sprite.h`. Renamed from `New_D8006EC74`, tier A: the allocator, `New_<Class>`. Returns `CharSprite *` and calls the ctor through the unified table; the unit-local `CellCtorMethods_322b4` is gone, as are the callers' local declarations (include/task.h's `Obj6EAC0 *(s32, s32)`, input_dialogs's `ChildObj86ED0 *(ChildObj86ED0 *, s32)`); both callers now cast the result to their own field types. The Source block above is the unified spelling. Image byte-identical.
 
 ## Track 7 (round 99, charlie)
 

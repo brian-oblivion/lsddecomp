@@ -208,7 +208,7 @@ those.
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->detachFromParent((CharSprite *)self)` (was `->slot50(self)`): +0x050 is SceneNode's detachFromParent, so this function is gTextRowMethods's detachFromParent override; naming it for the slot is the subclass's job. No code. Image byte-identical.
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/char_sprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->detachFromParent((CharSprite *)self)` (was `->slot50(self)`): +0x050 is SceneNode's detachFromParent, so this function is gTextRowMethods's detachFromParent override; naming it for the slot is the subclass's job. No code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 

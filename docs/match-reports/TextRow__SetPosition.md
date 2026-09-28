@@ -115,7 +115,7 @@ hypothesis) is not independently confirmed, hence tier B. Sibling of
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->setPosition((CharSprite *)self, (ScreenSpritePos *)a1)` (was `->slotBC(self, a1)`): an upcast and a cast of the view's BoxFillPos to ScreenSprite's pair, no code. Image byte-identical.
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/char_sprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->setPosition((CharSprite *)self, (ScreenSpritePos *)a1)` (was `->slotBC(self, a1)`): an upcast and a cast of the view's BoxFillPos to ScreenSprite's pair, no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
