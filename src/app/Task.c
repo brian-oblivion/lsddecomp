@@ -1163,10 +1163,6 @@ TaskCoreMethods *Get_vtable_TaskCore(void) {
     return &gTaskCoreMethods;
 }
 
-/* The default movie frame, {640, 0, 320, 240}: StreamTask's default initData
- * and the rect TaskCore__OnInit clears (Task.h). */
-extern DrawRect gDefaultMovieFrame;
-
 DrawRect *GetDefaultMovieFrame(void) {
     return &gDefaultMovieFrame;
 }

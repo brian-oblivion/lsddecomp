@@ -209,23 +209,21 @@ extern u8 gDivPolygon3[];
 extern u8 gDivPolygon4[];
 
 /* Defined at the bottom of this file, after SortTmdObject and
- * ProjectQuadFace, which call them. The submit wrappers and the two
- * four-vertex XY stores are declared without parameters: each takes its own
- * POLY_* type, while SortTmdObject's packet cursor is a u8 * and
- * ProjectQuadFace's callback takes a void *. The submit wrappers link the
- * finished primitive into the OT (directly, or through its RCpoly*
- * subdivider) and return the packet cursor past what they wrote. */
+ * ProjectQuadFace, which call them. The submit wrappers link the finished
+ * primitive into the OT (directly, or through its RCpoly* subdivider) and
+ * return the packet cursor past what they wrote. SortTmdObject's cursor is
+ * a u8 *, so its calls cast it to each wrapper's POLY_* type. */
 void InitDivPolygonPtrs(RVECTOR **vtxPtrs, void *divp, s32 nverts);
-void StoreSxyPolyFT4();
-void StoreSxyPolyGT4();
-void *SubmitPolyF3();
-void *SubmitPolyG3();
-void *SubmitPolyFT3();
-void *SubmitPolyF4();
-void *SubmitPolyG4();
-void *SubmitPolyFT4();
-void *SubmitPolyGT3();
-void *SubmitPolyGT4();
+void StoreSxyPolyFT4(POLY_FT4 *prim, s32 storeFirst3);
+void StoreSxyPolyGT4(POLY_GT4 *prim, s32 storeFirst3);
+void *SubmitPolyF3(POLY_F3 *prim, PolyDrawCtx *ctx);
+void *SubmitPolyG3(POLY_G3 *prim, PolyDrawCtx *ctx);
+void *SubmitPolyFT3(POLY_FT3 *prim, PolyDrawCtx *ctx);
+void *SubmitPolyF4(POLY_F4 *prim, PolyDrawCtx *ctx);
+void *SubmitPolyG4(POLY_G4 *prim, PolyDrawCtx *ctx);
+void *SubmitPolyFT4(POLY_FT4 *prim, PolyDrawCtx *ctx);
+void *SubmitPolyGT3(POLY_GT3 *prim, PolyDrawCtx *ctx);
+void *SubmitPolyGT4(POLY_GT4 *prim, PolyDrawCtx *ctx);
 
 /* Defined below SortTmdObject, which calls them (and ProjectTriFace and
  * ProjectQuadFace, which call the last two). */
@@ -362,7 +360,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ncds();
                         gte_strgb(&POLY->r0);
                         setcode(prim, ctx->primCode);
-                        prim = SubmitPolyF3(prim, ctx);
+                        prim = SubmitPolyF3((POLY_F3 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_F3);
                     packet += sizeof(TMD_P_F3);
@@ -397,7 +395,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb(&PKT->r2);
                         gte_ncds();
                         gte_strgb(&POLY->r2);
-                        prim = SubmitPolyG3(prim, ctx);
+                        prim = SubmitPolyG3((POLY_G3 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_F3G);
                     packet += sizeof(TMD_P_F3G);
@@ -423,7 +421,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_dpcs();
                         gte_strgb(&POLY->r0);
                         setcode(prim, ctx->primCode);
-                        prim = SubmitPolyF3(prim, ctx);
+                        prim = SubmitPolyF3((POLY_F3 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_NF3);
                     packet += sizeof(TMD_P_NF3);
@@ -455,7 +453,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ncds();
                         gte_strgb(&POLY->r0);
                         setcode(prim, ctx->primCode);
-                        prim = SubmitPolyFT3(prim, ctx);
+                        prim = SubmitPolyFT3((POLY_FT3 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_TF3);
                     packet += sizeof(TMD_P_TF3);
@@ -485,7 +483,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_dpcs();
                         gte_strgb(&POLY->r0);
                         setcode(prim, ctx->primCode);
-                        prim = SubmitPolyFT3(prim, ctx);
+                        prim = SubmitPolyFT3((POLY_FT3 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_TNF3);
                     packet += sizeof(TMD_P_TNF3);
@@ -513,7 +511,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ncds();
                         gte_strgb(&POLY->r0);
                         setcode(prim, ctx->primCode);
-                        prim = SubmitPolyF4(prim, ctx);
+                        prim = SubmitPolyF4((POLY_F4 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_F4);
                     packet += sizeof(TMD_P_F4);
@@ -540,7 +538,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_dpcs();
                         gte_strgb(&POLY->r0);
                         setcode(prim, ctx->primCode);
-                        prim = SubmitPolyF4(prim, ctx);
+                        prim = SubmitPolyF4((POLY_F4 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_NF4);
                     packet += sizeof(TMD_P_NF4);
@@ -563,7 +561,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     elem = packet + offsetof(TMD_P_TF4, n0);
                 loopH:
                     if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
-                                        StoreSxyPolyFT4) == 0) {
+                                        (void (*)(void *, s32))StoreSxyPolyFT4) == 0) {
                         *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
                         *(u32 *)&POLY->u1 = *(u32 *)&PKT->tu1;
                         *(u32 *)&POLY->u2 = *(u32 *)&PKT->tu2;
@@ -573,7 +571,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ncds();
                         gte_strgb(&POLY->r0);
                         setcode(prim, ctx->primCode);
-                        prim = SubmitPolyFT4(prim, ctx);
+                        prim = SubmitPolyFT4((POLY_FT4 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_TF4);
                     packet += sizeof(TMD_P_TF4);
@@ -595,7 +593,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     elem = packet + offsetof(TMD_P_TNF4, r0);
                 loopI:
                     if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
-                                        StoreSxyPolyFT4) == 0) {
+                                        (void (*)(void *, s32))StoreSxyPolyFT4) == 0) {
                         *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
                         *(u32 *)&POLY->u1 = *(u32 *)&PKT->tu1;
                         *(u32 *)&POLY->u2 = *(u32 *)&PKT->tu2;
@@ -605,7 +603,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_dpcs();
                         gte_strgb(&POLY->r0);
                         setcode(prim, ctx->primCode);
-                        prim = SubmitPolyFT4(prim, ctx);
+                        prim = SubmitPolyFT4((POLY_FT4 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_TNF4);
                     packet += sizeof(TMD_P_TNF4);
@@ -630,7 +628,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_dpct();
                         gte_strgb3_g3(prim);
                         setcode(prim, ctx->primCode);
-                        prim = SubmitPolyG3(prim, ctx);
+                        prim = SubmitPolyG3((POLY_G3 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_NG3);
                     packet += sizeof(TMD_P_NG3);
@@ -659,7 +657,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_dpct();
                         gte_strgb3(&POLY->r0, &POLY->r1, &POLY->r2);
                         setcode(prim, ctx->primCode);
-                        prim = SubmitPolyGT3(prim, ctx);
+                        prim = SubmitPolyGT3((POLY_GT3 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_TNG3);
                     packet += sizeof(TMD_P_TNG3);
@@ -690,7 +688,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb(&PKT->r3);
                         gte_dpcs();
                         gte_strgb(&POLY->r3);
-                        prim = SubmitPolyG4(prim, ctx);
+                        prim = SubmitPolyG4((POLY_G4 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_NG4);
                     packet += sizeof(TMD_P_NG4);
@@ -712,7 +710,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                     elem = packet + offsetof(TMD_P_TNG4, r3);
                 loopM:
                     if (ProjectQuadFace(prim, ctx, PKT->v0, PKT->v1, PKT->v2, PKT->v3,
-                                        StoreSxyPolyGT4) == 0) {
+                                        (void (*)(void *, s32))StoreSxyPolyGT4) == 0) {
                         *(u32 *)&POLY->u0 = *(u32 *)&PKT->tu0;
                         *(u32 *)&POLY->u1 = *(u32 *)&PKT->tu1;
                         *(u32 *)&POLY->u2 = *(u32 *)&PKT->tu2;
@@ -726,7 +724,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
                         gte_ldrgb(&PKT->r3);
                         gte_dpcs();
                         gte_strgb(&POLY->r3);
-                        prim = SubmitPolyGT4(prim, ctx);
+                        prim = SubmitPolyGT4((POLY_GT4 *)prim, ctx);
                     }
                     elem += sizeof(TMD_P_TNG4);
                     packet += sizeof(TMD_P_TNG4);

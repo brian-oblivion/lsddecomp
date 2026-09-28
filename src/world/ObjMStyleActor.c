@@ -1256,9 +1256,6 @@ void ApplyStyleDecorationIfSet(void) {
  * gStyleDecorColorsB instead of gStyleDecorColorsA (PickStyleFallbackConfig). */
 #define STYLE_DECOR_B_PALETTE_INDEX 18
 
-extern const u8 *gStyleDecorColor;
-extern s32 gStyleDecorObj; /* a BoxFill */
-
 /* Releases the decoration box, if ApplyStyleDecorationIfSet made one. */
 void StyleFlushDecoration(void) {
     if (gStyleDecorColor != 0) {
@@ -1267,16 +1264,12 @@ void StyleFlushDecoration(void) {
     }
 }
 
-extern s32 gStyleDay;
-extern s32 gStyleStage;
 extern s8 gStyleVariantPicks[];
-extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];
 extern s32 gStyleConfigIndex;
 extern s8 *gStyleVariantConfigs[];
 extern const u8 *gStyleClearColor;
 extern u8 gStyleDecorColorsB[];
-extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColors;
 extern u8 gStyleDecorColorsA[];
 extern s32 gStyleDecorVariant;
@@ -1325,7 +1318,6 @@ extern s32 gStyleDecorPosY;
 extern s32 gStyleDecorSizeW;
 extern s32 gStyleDecorSizeH;
 extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
-extern s32 gStyleSceneRefs; /* a StyleSceneRefs * */
 
 /* gStyleDecorPosX/Y and gStyleDecorSizeW/H are adjacent word pairs.
  * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
@@ -1428,9 +1420,6 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
     dst[2] = src[2] + delta;
 }
 
-extern s32 gStyleDecorVariant;
-extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
-
 /* Releases the bands, if StyleBuildDecorSet made them. */
 void StyleReleaseDecorSet(void) {
     if (gStyleDecorVariant != 0) {
@@ -1439,8 +1428,6 @@ void StyleReleaseDecorSet(void) {
     }
 }
 
-extern s32 gStyleVariant;
-extern s32 gStyleSceneRefs;
 extern s8 gStyleKind0Counts[];
 extern s32 gStyleEffectSlotCount;
 extern StyleEffect *gStyleEffectSlots[];
@@ -1480,9 +1467,6 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     gStyleEffectSlotCount = gStyleEffectSlotCount + 1;
 }
 
-extern s32 gStyleVariant;
-extern s32 gStyleEffectSlotCount;
-
 /* Each slot's +0x0EC is StyleEffect__Update, called with the position
  * (include/StyleEffect.h: the slot keeps Actor's setPendingExtra type). */
 void StyleUpdateEffectSlots(LongVec3 *pos) {
@@ -1497,9 +1481,6 @@ void StyleUpdateEffectSlots(LongVec3 *pos) {
         ((StyleEffectUpdateFn)slot->methods->setPendingExtra)(slot, pos);
     }
 }
-
-extern s32 gStyleVariant;
-extern s32 gStyleEffectSlotCount;
 
 /* Releases the effect slots, if StyleBuildEffectSlots ran. */
 void StyleReleaseEffectSlots(void) {
@@ -1528,9 +1509,6 @@ struct StyleCueSlot {
 }; /* 0x68 bytes */
 
 extern StyleCueSlot *FlushStyleCue(StyleCueSlot *slot);
-
-extern s32 gStyleGrid; /* a StageMap */
-extern StyleCueSlot *gStyleCueSlots[2];
 
 /* Releases everything TickStyle built and unregisters the scene. */
 void StyleTeardown(void) {
@@ -1605,8 +1583,6 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
     return slots;
 }
 
-extern s32 gStyleSpawnYChoice2;
-extern void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY);
 extern s32 gStyleSpawnColors[];
 extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
@@ -1655,10 +1631,6 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
 
 extern s32 gStyleKind2AltColor;
 extern u8 gStyleKind2Colors[][3];
-extern s32 gStyleSpawnColors[];
-extern Ratio16 *gStyleSpawnRotation;
-extern Ratio16 gStyleSpawnRotations[][3];
-extern s32 gStyleSpawnTableIndex;
 
 /* MATCHING: the first colour store goes through a one-field struct, as
  * PtrBoxK3's does, so the gStyleDay load may schedule above it. */
@@ -1697,10 +1669,6 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     return slots;
 }
 
-extern s32 gStyleSpawnOffsetY;
-extern s32 gStyleSpawnOffsetZ;
-extern Ratio16 *gStyleSpawnRotation;
-extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 gStyleSpawnModelLayout;
 
 /* Randomises the spawn parameters: offset y (offsetY, or a random choice
@@ -1726,7 +1694,6 @@ void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY) {
 }
 
 extern s32 gStyleSpawnYChoice1;
-extern s32 gStyleSpawnModelLayout;
 
 /* The every-seventh-day setup: fixed offset y, x of 0..19 steps of 2048, z
  * by day % 3 (40960, -40960, 2048), then the same rotation and layout
@@ -1751,7 +1718,6 @@ void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY) {
     gStyleSpawnModelLayout = rand() % 5;
 }
 
-extern s32 gStyleSceneRefs;
 extern void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target);
 extern SoundCueCallbackFn gStyleCueCallbacks[];
 
@@ -1774,7 +1740,6 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
     return 0;
 }
 
-extern s32 gStyleStage;
 extern s32 gStyleCueRecordIndex;
 extern u8 *gStyleCueRecordLists[];
 extern u8 gStyleCueRecordCounts[];
@@ -1862,8 +1827,6 @@ fail:
     return 0;
 }
 
-extern s32 gStyleSceneRefs;
-
 /* Stops the slot's cue and frees its record. Returns NULL for the slot. */
 StyleCueSlot *FlushStyleCue(StyleCueSlot *slot) {
     FlushSoundCueSet(((StyleSceneRefs *)gStyleSceneRefs)->sound, &slot->cueSet);
@@ -1881,8 +1844,6 @@ s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused) {
     }
     return 0;
 }
-
-extern s32 gStyleCueDistanceTable[];
 
 /* Whether the target is within the held cue's distance (X+Z); keeps the distance. */
 s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
@@ -1915,8 +1876,6 @@ extern void ApplyStyleDecorationIfSet(void); /* previous section */
 extern void StyleBuildDecorSet(void);
 extern void StyleUpdateDecorSet(void);
 extern void StyleScrollVramStrips(void);
-extern s32 gStyleTickCount;
-extern s32 gStyleCueRecordIndex;
 extern StyleCueSlot gStyleCueSlotPool[];
 extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *target, void *unused);
 extern s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused);
@@ -1958,7 +1917,6 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     return lastCue;
 }
 
-extern s32 gStyleStage;
 extern DrawRect gStyleStripRectA;
 extern DrawPoint gStyleStripScratchA;
 extern DrawRect gStyleStripRectB;
@@ -2255,7 +2213,6 @@ void StyleCue13(StyleCueParam *ctx, SoundCueSet *set) {
 /* One range per cue record (15), indexed by the record's cue index: the
  * negative of `cue` while a slot has the record claimed. IsStyleCueNear
  * tests the slot's distance against the same row. */
-extern s32 gStyleCueDistanceTable[];
 
 s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
     s32 range = gStyleCueDistanceTable[-ctx->entry->cue];
@@ -2263,8 +2220,6 @@ s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
 
     return ctx->lastDist / stepDist;
 }
-
-extern s32 gStyleVariant;
 
 s32 IsStyleVariantEven(void) {
     return (gStyleVariant & 1) ^ 1;
@@ -2366,7 +2321,7 @@ extern Actor *gStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
 extern void *gStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
 extern s32 gStyleEffectBaseViewY;
-extern s32 gStyleEffectModelIds[];
+extern s32 gStyleEffectModelIds[3];
 
 /* Called once, from the class's ctor (StyleEffect__StyleEffect): snapshot the
  * viewpoint y, place self under `parent` at pos + offset, then build the
@@ -2705,10 +2660,6 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
  * globals) draw from: the scene's TMD resource, its TIM image and the
  * viewport. The TMD resource's getModel slot sits where Actor has
  * setBackClip, hence the Actor view. */
-extern Actor *gStyleEffectTmd;
-extern void *gStyleEffectTim;
-extern Viewport *gStyleEffectViewport;
-extern s32 gStyleEffectModelIds[3];
 extern s16 gStyleEffectClutPos[2];
 
 /* Records the three sources, then points the first primitive of the TMD's

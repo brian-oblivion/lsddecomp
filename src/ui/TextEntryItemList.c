@@ -443,10 +443,6 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
     }
 }
 
-/* The characters an entry can hold, in the order nextChar/prevChar step
- * through them: a pointer to a NUL-terminated byte string (TextEntry.h). */
-extern u8 *gNameCharTable;
-
 void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
     TextRow *row;
 
