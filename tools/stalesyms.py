@@ -101,10 +101,11 @@ def live_include_asm(srcdir="src"):
     """
     pat = re.compile(r'INCLUDE_ASM\("[^"]*",\s*(\w+)\)')
     live = set()
-    for name in os.listdir(srcdir):
-        if name.endswith(".c"):
-            with open(os.path.join(srcdir, name), errors="replace") as fh:
-                live.update(pat.findall(fh.read()))
+    for top, _, names in os.walk(srcdir):
+        for name in names:
+            if name.endswith(".c"):
+                with open(os.path.join(top, name), errors="replace") as fh:
+                    live.update(pat.findall(fh.read()))
     return live
 
 

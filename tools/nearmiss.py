@@ -266,7 +266,7 @@ def sony_by_address(rows):
     insn = re.compile(r"^\s*/\* [0-9A-F]+ ([0-9A-F]{8}) [0-9A-F]{8} \*/", re.M)
     out = set()
     for _, unit, func, _, _ in rows:
-        spath = os.path.join(ROOT, "asm", "nonmatchings", unit, f"{func}.s")
+        spath = str(srcpath.nm_dir(unit) / f"{func}.s")
         if not os.path.exists(spath):
             continue
         m = insn.search(open(spath, encoding="utf-8", errors="replace").read())
@@ -293,7 +293,7 @@ def main():
         body = open(cpath, encoding="utf-8",
                     errors="replace").read()
         for func in INCLUDE_ASM_RE.findall(body):
-            spath = os.path.join("asm", "nonmatchings", unit, f"{func}.s")
+            spath = str(srcpath.nm_dir(unit) / f"{func}.s")
             if not os.path.exists(spath):
                 rows.append((0, unit, func, ["NO-ASM"], "(no .s -- re-extract?)"))
                 continue

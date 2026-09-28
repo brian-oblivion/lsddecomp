@@ -33,6 +33,8 @@ it before acting, and do not assume either half.
 """
 import argparse, glob, pathlib, re, subprocess, sys
 
+import srcpath
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PY = str(ROOT / ".venv/bin/python3")
 
@@ -62,7 +64,7 @@ def live_functions():
         unit = pathlib.Path(c).stem
         src = pathlib.Path(c).read_text()
         for fn in re.findall(r'^INCLUDE_ASM\("[^"]*",\s*(\w+)\)', src, re.M):
-            s = ROOT / f"asm/nonmatchings/{unit}/{fn}.s"
+            s = srcpath.nm_dir(unit) / f"{fn}.s"
             if not s.exists():
                 continue
             lines = s.read_text().splitlines()
