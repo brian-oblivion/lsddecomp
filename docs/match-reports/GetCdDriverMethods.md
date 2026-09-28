@@ -24,7 +24,7 @@ vtable is `gCdDriverMethods` (29 slots, header word `0x13`, resolved with
 Compared against `gFileResourceMethods` (`include/GameApplicationFileResource.h`'s
 `FileResourceMethods`) with `classtable.py gCdDriverMethods --vs gFileResourceMethods`:
 `FileResource__Release` at `+0x004` and `FileResource__FreeBuffer`/`NoOp`/
-`FileResource__SetFlag` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
+`FileResource__OnRequestDone` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
 between the two tables, strongly suggesting `gCdDriverMethods`'s class is a
 subclass or close sibling of `gFileResourceMethods`'s, inheriting the same BasicClass
 slot block and several of the same concrete method implementations.

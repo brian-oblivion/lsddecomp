@@ -235,7 +235,7 @@ oracles green after.
 | `Class6D4E8Methods` | `slot4C` | `seek` | B | resolves to `CdDriver__Seek` |
 | `Class6D4E8Methods` | `slot54` | `read` | A | resolves to `CdDriver__Read` |
 | `Class6D4E8Methods` | `slot58` | `loadFile` | A | resolves to `CdDriver__LoadFile`; CdDriver's name |
-| `Class6D4E8Methods` | `slot64` | `setFlag` | A | resolves to `FileResource__SetFlag` |
+| `Class6D4E8Methods` | `slot64` | `setFlag` | A | resolves to `FileResource__OnRequestDone` |
 | `Class6D4E8Methods` | `slot70` | `stopCdService` | A | resolves to `CdDriver__StopService` |
 | `CdFileEntry` | `pad0`/`unk14`/`unk18` | `name`/`pos`/`size` | A | CdDriver's CdFileEntry |
 | `CdFileInfo` | `unk0`/`unk4` | `pos`/`size` | A | CdDriver's CdFileInfo |

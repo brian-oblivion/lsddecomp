@@ -51,7 +51,7 @@ typedef struct FileResourceMethods FileResourceMethods;
     /* +0x058 */ void (*loadFile)(Self *self, char *name);      /* FileResource__LoadFile; CD: CdDriver__LoadFile */ \
     /* +0x05C */ void (*freeBuffer)(Self *self);                /* FileResource__FreeBuffer */       \
     /* +0x060 */ void (*slot60)(void);                          /* NoOp, in every FileResource table */ \
-    /* +0x064 */ void (*setFlag)(Self *self);                   /* FileResource__SetFlag */          \
+    /* +0x064 */ void (*setFlag)(Self *self);                   /* FileResource__OnRequestDone */          \
     /* +0x068 */ void (*runRequestQueue)(void);                 /* CD: CdDriver__RunRequestQueue */ \
     /* +0x06C */ void (*requestLoadFile)(Self *self, char *name); /* CD: CdDriver__RequestLoadFile */ \
     /* +0x070 */ void (*stopService)(Self *self);               /* CD: CdDriver__StopService; neither occupant reads self, but CdDriver__RunRequestQueue passes it */ \
@@ -115,7 +115,7 @@ void FileResource__Finalize(FileResource *self);
 void FileResource__LoadFile(FileResource *self, char *name);
 void FileResource__FreeBuffer(FileResource *self);
 /* Bits CdDriver__RunRequestQueue (CdDriver.c) ORs into a client's
- * `flags` when one of its requests completes; the clients poll them. Bit 0 (1) is left a literal: it is also FileResource__SetFlag's bit,
+ * `flags` when one of its requests completes; the clients poll them. Bit 0 (1) is left a literal: it is also FileResource__OnRequestDone's bit,
  * and the queue node field that sets it (`unk4`) has no established meaning. */
 #define CD_FLAG_DONE 0x002         /* some request completed */
 #define CD_FLAG_NONE_PENDING 0x004 /* ... and pendingRequests reached 0 */
@@ -126,7 +126,7 @@ void FileResource__FreeBuffer(FileResource *self);
 #define CD_FLAG_LOAD_FILE_DONE 0x200
 
 void NoOp(void);
-void FileResource__SetFlag(FileResource *self);
+void FileResource__OnRequestDone(FileResource *self);
 void CopyDataSourceSlots(FileResourceMethods *dst, FileResourceMethods *src);
 
 #endif

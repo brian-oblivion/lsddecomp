@@ -1,4 +1,6 @@
-# FileResource__SetFlag
+# FileResource__OnRequestDone
+
+> Renamed from `FileResource__SetFlag` on 2026-09-28 (tools/rename.py). Address 0x80026c88.
 
 > Renamed from `Class6D430__SetFlag` on 2026-09-26 (tools/rename.py). Address 0x80026c88.
 
@@ -35,7 +37,7 @@ typedef struct FileResource {
     s32 flags;
 } FileResource;
 
-void FileResource__SetFlag(FileResource *this) {
+void FileResource__OnRequestDone(FileResource *this) {
     this->flags |= 1;
 }
 ```
@@ -55,7 +57,7 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 | was | now | tier |
 | --- | --- | --- |
-| `func_80026C88` | `FileResource__SetFlag` | B |
+| `func_80026C88` | `FileResource__OnRequestDone` | B |
 
 **Evidence.** `+0x064` slot: `this->flags |= 1;` -- a read-modify-write on
 the single flags word this round also named (see the field-rename commit).

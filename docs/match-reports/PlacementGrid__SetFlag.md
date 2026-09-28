@@ -35,7 +35,7 @@ table `PlacementGrid__Finalize` uses.
 
 Renamed `func_8002C238 -> PlacementGrid__SetFlag`, tier B (mechanics, not
 purpose). Occupies `+0x064` of `gPlacementGridMethods` -- the exact slot
-`FileResource__SetFlag` fills in the base class (`tools/classtable.py
+`FileResource__OnRequestDone` fills in the base class (`tools/classtable.py
 0x8006D430`) and its own verbatim-shared copy in `gCdDriverMethods`
 (`tools/classtable.py 0x8006D4E8`). Named by SLOT POSITION, not by
 asserted behavior: this override does NOT just OR in a flag bit like the

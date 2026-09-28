@@ -460,7 +460,7 @@ void FileResource__FreeBuffer(FileResource *this) {
 
 void NoOp(void) {}
 
-void FileResource__SetFlag(FileResource *this) {
+void FileResource__OnRequestDone(FileResource *this) {
     this->flags |= 1;
 }
 
