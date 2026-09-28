@@ -11,7 +11,7 @@ exit=2`, no compile-error grep hits, **79/81, `insertions 0 / deletions 0`
 
 **The shared `t` was a workaround for the real residue, and the real residue
 was aliasing, not registers.** Round 61 established (correctly) that the
-78/81 body's problem was one instruction: the `*q = gStyleSpawnRotations` store has to
+78/81 body's problem was one instruction: the `*q = sStyleSpawnRotations` store has to
 come AFTER the `lw a2, sStyleGrid` so it lands in the `jal` delay slot, and
 that a plain `u8 **q` store is an opaque `(mem (reg))` the scheduler will not
 move a global load across. Round 61 then forced the order by hoisting the
@@ -27,7 +27,7 @@ typedef struct PtrBoxK3 { u8 *p; } PtrBoxK3;
 PtrBoxK3 *q;
 ...
 q = (PtrBoxK3 *) &sStyleSpawnRotation;
-q->p = gStyleSpawnRotations;
+q->p = sStyleSpawnRotations;
 *arg0 = New_StyleEffect((void *) 3, (u8 *) q - 0xC, (void *) sStyleGrid, arg1);
 ```
 
@@ -177,7 +177,7 @@ Three words differ, and they are one instruction moved:
 
 ```
 retail                              built
-458e8  addiu v0,v0,%lo(gStyleSpawnRotations)  458e8  addiu v0,v0,%lo(gStyleSpawnRotations)
+458e8  addiu v0,v0,%lo(sStyleSpawnRotations)  458e8  addiu v0,v0,%lo(sStyleSpawnRotations)
 458ec  lw    a2,%gp_rel(sStyleGrid) 458ec  sw    v0,0(v1)          <-- here
 458f0  move  a3,s1                  458f0  lw    a2,%gp_rel(sStyleGrid)
 458f4  jal   New_StyleEffect          458f4  jal   New_StyleEffect
@@ -194,7 +194,7 @@ address gcc 2.6.3's `sched_analyze` will not disambiguate -- so the
 gp-relative load of `sStyleGrid` cannot hoist across it and the store cannot
 sink below it. Two independent experiments prove it is this and nothing else:
 
-- Write the store as a plain global (`sStyleSpawnRotation = gStyleSpawnRotations;`, a
+- Write the store as a plain global (`sStyleSpawnRotation = sStyleSpawnRotations;`, a
   `(mem (symbol_ref))` the scheduler CAN disambiguate) and **the load hoists
   immediately** -- but the `q` pointer then folds away and the address
   argument regresses to `lui a1; addiu a1,%lo(sStyleSpawnOffsetX)` (73/81).
@@ -215,7 +215,7 @@ as a limit.
 ```c
     q = &sStyleSpawnRotation;
     t = sStyleGrid;                                    /* s32 t; */
-    *q = gStyleSpawnRotations;
+    *q = sStyleSpawnRotations;
     *arg0 = New_StyleEffect((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
 ```
 
@@ -227,8 +227,8 @@ Every instruction and every placement matches retail. The only diff is a
 458d8  lui   v1,%hi(sStyleSpawnRotation)     |  lui   v0,%hi(sStyleSpawnRotation)
 458dc  addiu v1,v1,%lo(sStyleSpawnRotation)  |  addiu v0,v0,%lo(sStyleSpawnRotation)
 458e0  addiu a1,v1,-0xc             |  addiu a1,v0,-0xc
-458e4  lui   v0,%hi(gStyleSpawnRotations)     |  lui   v1,%hi(gStyleSpawnRotations)
-458e8  addiu v0,v0,%lo(gStyleSpawnRotations)  |  addiu v1,v1,%lo(gStyleSpawnRotations)
+458e4  lui   v0,%hi(sStyleSpawnRotations)     |  lui   v1,%hi(sStyleSpawnRotations)
+458e8  addiu v0,v0,%lo(sStyleSpawnRotations)  |  addiu v1,v1,%lo(sStyleSpawnRotations)
 458f8  sw    v0,0(v1)               |  sw    v1,0(v0)
 ```
 
@@ -241,7 +241,7 @@ it forward as the residue.
 Axes varied against it, all 75/81, all identical output (so the colour is
 invariant to every one of them, not merely unimproved):
 
-- statement order over `{q = &sStyleSpawnRotation, t = sStyleGrid, val = gStyleSpawnRotations}` --
+- statement order over `{q = &sStyleSpawnRotation, t = sStyleGrid, val = sStyleSpawnRotations}` --
   every order that keeps the load before the store;
 - declaration order of `q`, `t`, `val`;
 - naming the stored value in a local vs leaving it anonymous;
@@ -337,7 +337,7 @@ extern s32 gStyleSpawnYChoice2;
 extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);
 extern s32 sStyleSpawnColors[];
 extern u8 *sStyleSpawnRotation;
-extern u8 gStyleSpawnRotations[];
+extern u8 sStyleSpawnRotations[];
 extern s32 sStyleSpawnOffsetY;
 extern s32 sStyleSpawnOffsetZ;
 extern u8 sStyleKind3Colors[];
@@ -368,7 +368,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
     }
     t = sStyleGrid;
     q = &sStyleSpawnRotation;
-    *q = gStyleSpawnRotations;
+    *q = sStyleSpawnRotations;
     *arg0 = New_StyleEffect((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
     arg0++;
     return arg0;
@@ -447,7 +447,7 @@ as `StyleFillEffectKind0`/`1`/`2`.
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_8008721C` | `sStyleKind3Colors` | A | 3 RGB triples stored as the params' color for kind 3. |
-| `D_80087174` | `gStyleSpawnRotations` | A | 7 Ratio16 triples, each (0/1, y/1, 0/1) with y = 0, 60, 120, 180, 230, -5 and (last) -3 with z 180: the params' rotation (SetupStyleSpawnParamsRandom/B pick one by `rand() % 7`); kinds 2 and 3 then take entry 0. |
+| `D_80087174` | `sStyleSpawnRotations` | A | 7 Ratio16 triples, each (0/1, y/1, 0/1) with y = 0, 60, 120, 180, 230, -5 and (last) -3 with z 180: the params' rotation (SetupStyleSpawnParamsRandom/B pick one by `rand() % 7`); kinds 2 and 3 then take entry 0. |
 | `0xFFFF5000`, `-0x2000`, `-0x7800` | `-45056`, `-8192`, `-30720` | -- | offsets, decimal per the base rule; a name would restate them. |
 | `0xC` | `offsetof(StyleEffectParams, rotation)` | A | the params block's address taken back from its rotation member. |
 

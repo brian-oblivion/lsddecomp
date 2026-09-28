@@ -45,7 +45,7 @@ r = rand();
 sStyleSpawnOffsetX = (r % 20) << 11;
 ...
 r = rand();
-sStyleSpawnRotation = gStyleSpawnRotations + ((u32) r % 7) * 12;
+sStyleSpawnRotation = sStyleSpawnRotations + ((u32) r % 7) * 12;
 r = rand();
 sStyleSpawnModelLayout = r % 5;
 ```
@@ -80,7 +80,7 @@ extern s32 sStyleSpawnOffsetX;
 extern s32 sStyleDay;
 extern s32 sStyleSpawnOffsetZ;
 extern u8 *sStyleSpawnRotation;
-extern u8 gStyleSpawnRotations[];
+extern u8 sStyleSpawnRotations[];
 extern s32 sStyleSpawnModelLayout;
 
 void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1) {
@@ -96,7 +96,7 @@ void SetupStyleSpawnParamsDayMod7(void *arg0, void *arg1) {
     } else if (mod3 == 2) {
         sStyleSpawnOffsetZ = 0x800;
     }
-    sStyleSpawnRotation = gStyleSpawnRotations + ((u32) rand() % 7) * 12;
+    sStyleSpawnRotation = sStyleSpawnRotations + ((u32) rand() % 7) * 12;
     sStyleSpawnModelLayout = rand() % 5;
 }
 ```

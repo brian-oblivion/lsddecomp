@@ -77,7 +77,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     slot->v = val;
     SetupStyleSpawnParamsRandom(arg1, (void *) gStyleSpawnYChoice2);
     q = &sStyleSpawnRotation;
-    *q = gStyleSpawnRotations;
+    *q = sStyleSpawnRotations;
     gStyleSpawnTableIndex = rand() % 6;
     *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) sStyleGrid, arg1);
     arg0++;
@@ -133,7 +133,7 @@ exactly. From the disassembly, retail:
 
 ```
 lui   s0,%hi(sStyleSpawnRotation) ; addiu s0,s0,%lo(sStyleSpawnRotation)   /* $s0 = &sStyleSpawnRotation */
-lui   v0,%hi(gStyleSpawnRotations) ; addiu v0,v0,%lo(gStyleSpawnRotations)
+lui   v0,%hi(sStyleSpawnRotations) ; addiu v0,v0,%lo(sStyleSpawnRotations)
 jal   rand
  sw   v0,0x0($s0)                      /* the store rides rand's delay slot */
 ...
@@ -144,7 +144,7 @@ The inherited body wrote the global by name and re-materialised the second
 address absolutely, which costs a word and wastes the delay slot:
 
 ```
-lui v0,%hi(gStyleSpawnRotations) ; addiu v0,v0,%lo(gStyleSpawnRotations)
+lui v0,%hi(sStyleSpawnRotations) ; addiu v0,v0,%lo(sStyleSpawnRotations)
 lui at,%hi(sStyleSpawnRotation) ; sw v0,%lo(sStyleSpawnRotation)(at)      /* 2 words */
 jal rand
  nop                                                     /* delay slot wasted */
@@ -165,7 +165,7 @@ carries in its own preserved body:
 u8 **q;
 ...
 q = &sStyleSpawnRotation;
-*q = gStyleSpawnRotations;
+*q = sStyleSpawnRotations;
 ...
 New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) sStyleGrid, arg1);
 ```
@@ -386,7 +386,7 @@ extern s32 gStyleSpawnYChoice2;
 extern u8 sStyleKind2Colors[];
 extern s32 sStyleSpawnColors[];
 extern u8 *sStyleSpawnRotation;
-extern u8 gStyleSpawnRotations[];
+extern u8 sStyleSpawnRotations[];
 extern s32 gStyleSpawnTableIndex;
 extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);
 extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3);
@@ -410,7 +410,7 @@ void **StyleFillEffectKind2(void **arg0, void *arg1) {
     *slot = v0;
     SetupStyleSpawnParamsRandom(arg1, (void *) gStyleSpawnYChoice2);
     q = &sStyleSpawnRotation;
-    *q = gStyleSpawnRotations;
+    *q = sStyleSpawnRotations;
     randval = rand();
     gStyleSpawnTableIndex = randval - (randval / 3) * 6;
     *arg0 = New_StyleEffect((void *) 2, (u8 *) q - 0xC, (void *) sStyleGrid, arg1);
