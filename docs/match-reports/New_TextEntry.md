@@ -77,3 +77,22 @@ block, 20 functions, carved round 14. All 20 are TextEntry methods
 gTextEntryMethods`) ... routes a numeric command switch (HandleCommand) to
 cursor moves, character stepping, commit (25) and cancel (23)." The new
 banner says what the file holds and names the commands by Pad event.
+
+## History (moved from src/TextEntryItemList.c, comments pass)
+
+The file's banner carried its edge evidence and the reason it is parked:
+
+> What decided its edges (python3 tools/tuboundary.py): the placed object
+> libcard/a80 precedes it ("start edge possible"). The old carve edge
+> class_3bb8c_i|class_3bb8c_j cut TextEntry off PrevChar..SetCharAt and its
+> getter ("start edge possible, soft-unlikely (0x80086f7c, 0x80086ed0)"), so
+> the two were merged. The end edge is kept because the binary forces it: the
+> jump tables of TextEntry__HandleCommand (0x80011628) and
+> ItemList__HandleInputCode (0x800116f4, ObjMStyleActor.c) differ in parity,
+> so a file boundary lies between those two functions ("a forced boundary
+> lies in this stretch: tables 0x80011628 / 0x800116f4"), and with the
+> first edge merged this is the one carve edge left in that stretch.
+> PARKED: content puts that boundary inside this file, between
+> GetTextEntryMethods and New_ItemList (the getter closes its class, and
+> that gap is "boundary possible" between "unlikely" ones); a split is a new
+> carve, so the file keeps ItemList's first half and is named for both.
