@@ -65,7 +65,7 @@ struct DrawSystemMethods {
     /* +0x054 */ s32 (*getActiveBuffer)(DrawSystem *self); /* DrawSystem__GetActiveBuffer */
     /* +0x058 */ void (*loadImage)(DrawSystem *self, DrawRect *rect, u32 *pixels); /* DrawSystem__LoadImage */
     /* +0x05C */ void (*storeImage)(DrawSystem *self, u32 *pixels, DrawRect *rect); /* DrawSystem__StoreImage */
-    /* +0x060 */ s32 (*slot60)(DrawSystem *self); /* DrawSystem__func_80020A1C, always returns 0 */
+    /* +0x060 */ s32 (*slot60)(DrawSystem *self); /* DrawSystem__NoOpSlot60, always returns 0 */
     /* +0x064: the occupant takes s16 x, y and sign-extends them itself; the slot passes
      * s32 because its caller's bytes need it (RotateVramRectRight, TimImage: an s16
      * prototype adds a caller-side sll/sra per argument). */
@@ -83,10 +83,10 @@ struct DrawSystemMethods {
 
 struct DrawSystem {
     BASICCLASS_FIELDS(DrawSystemMethods);
-    /* +0x00C */ s32 unkC; /* set to 1 by countFrames when frameCount reaches vsyncCount and it is 0; no reader in C */
-    /* +0x010 */ s32 running;     /* set by start, cleared by stop; runLoop's condition */
-    /* +0x014 */ ScreenDims size; /* initGraph stores it, getDims returns its address */
-    /* +0x01C */ s32 vramMode;    /* initGraph: GsInitGraph's vram mode */
+    /* +0x00C */ s32 countReached; /* countFrames sets it to 1 (and restarts frameCount) once frameCount reaches vsyncCount while it is 0; nothing in C reads or clears it */
+    /* +0x010 */ s32 running;      /* set by start, cleared by stop; runLoop's condition */
+    /* +0x014 */ ScreenDims size;  /* initGraph stores it, getDims returns its address */
+    /* +0x01C */ s32 vramMode;     /* initGraph: GsInitGraph's vram mode */
     /* +0x020 */ s32 vsyncCount; /* setVSyncCount (only while not running) / getVSyncCount; runLoop's VSync() argument, countFrames's threshold */
     /* +0x024 */ s32 frameCount; /* countFrames counts it up to vsyncCount */
     /* +0x028 */ u8 pad28[4];
@@ -110,7 +110,7 @@ void DrawSystem__SwapBuffers(DrawSystem *self);
 s32 DrawSystem__GetActiveBuffer(DrawSystem *self);
 void DrawSystem__LoadImage(DrawSystem *self, DrawRect *rect, u32 *pixels);
 void DrawSystem__StoreImage(DrawSystem *self, u32 *pixels, DrawRect *rect);
-s32 DrawSystem__func_80020A1C(DrawSystem *self);
+s32 DrawSystem__NoOpSlot60(DrawSystem *self);
 void DrawSystem__MoveImage(DrawSystem *self, DrawRect *rect, s16 x, s16 y);
 void DrawSystem__RunLoop(DrawSystem *self);
 void DrawSystem__CountFrames(DrawSystem *self);
