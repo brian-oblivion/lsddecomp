@@ -490,7 +490,6 @@ void ContNrpn1(s16 a0, s16 a1, u8 a2) {
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-#if 1
 void ContNrpn2(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
     u8 kind = a2;
@@ -533,7 +532,6 @@ void ContNrpn2(s16 a0, s16 a1, u8 a2) {
             return;
     }
 }
-#endif
 
 void ContRpn1(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
@@ -823,7 +821,6 @@ void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrFields 
     }
 }
 
-#if 1
 void SetPitchBend(s16 a0, s16 a1) {
     SsScore *rec = &_ss_score[a0][a1];
     u8 *cursor = rec->unk4;
@@ -840,7 +837,6 @@ void SetPitchBend(s16 a0, s16 a1) {
     SpuVmPitchBend(packed, rec->unk4C, vol, b);
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
-#endif
 
 /* Calls into other modules, typed from this call site: SpuVmSeqKeyOff
  * (libsnd_vmanager.c) takes the packed "(slot<<8)|channel", as in
