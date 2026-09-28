@@ -496,9 +496,8 @@ void LightRig__SetAmbientColor(LightRig *self, ColorRgb *rgb, s32 swap) {
     } else {
         self->ambient = *rgb;
     }
-    GsSetAmbient((u8)self->ambient.r << AMBIENT_TO_FIX12_SHIFT,
-                 (u8)self->ambient.g << AMBIENT_TO_FIX12_SHIFT,
-                 (u8)self->ambient.b << AMBIENT_TO_FIX12_SHIFT);
+    GsSetAmbient(self->ambient.r << AMBIENT_TO_FIX12_SHIFT, self->ambient.g << AMBIENT_TO_FIX12_SHIFT,
+                 self->ambient.b << AMBIENT_TO_FIX12_SHIFT);
 }
 
 /* Returns the LightRig method table. */

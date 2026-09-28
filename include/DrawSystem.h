@@ -59,10 +59,9 @@ typedef struct DrawRect {
  * a box's, the background's, the ambient and flat lights', a viewport's
  * clear and far colours. Three bytes, not Sony's four-byte CVECTOR.
  * MATCHING: byte members give it size 3 and alignment 1, so a whole-struct
- * copy is three lb then three sb (DECOMPILATION_LEARNINGS, the 3-byte
- * all-s8 struct idiom). */
+ * copy, which is how its users copy it, is three lb then three sb. */
 typedef struct ColorRgb {
-    s8 r, g, b;
+    u8 r, g, b;
 } ColorRgb;
 
 struct DrawSystemMethods {

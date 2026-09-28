@@ -26,7 +26,7 @@ void LightRig__SetAmbientColor(LightRig *self, ColorRgb *rgb, s32 swap) {
     } else {
         self->ambient = *rgb;
     }
-    GsSetAmbient((u8)self->ambient.r << 4, (u8)self->ambient.g << 4, (u8)self->ambient.b << 4);
+    GsSetAmbient(self->ambient.r << 4, self->ambient.g << 4, self->ambient.b << 4);
 }
 ```
 
@@ -41,3 +41,13 @@ void LightRig__SetAmbientColor(LightRig *self, ColorRgb *rgb, s32 swap) {
 ## Track 7 (round 99, charlie)
 
 `<< 4` -> `<< AMBIENT_TO_FIX12_SHIFT` (unit-local): a 0..255 channel to GsSetAmbient's 0..ONE scale. The unit's local `GsSetAmbient` and `GetTPage` prototypes were dropped in favour of Sony's (<libgs.h>, <libgpu.h>). Byte-exact.
+
+## Types (track 10 debt pass, round 104, bravo)
+
+`ambient` and `rgb` are the one colour type `ColorRgb` (include/DrawSystem.h),
+which the six per-class 3-byte colour types were merged into. Its channels
+are `u8`: the whole image builds byte-identical with u8 and with s8 members,
+so the signedness was never what the lb/sb copies needed (a whole-struct
+copy of a 3-byte, alignment-1 struct is lb x3 then sb x3 either way, measured
+through the pinned pipeline), and the `(u8)` casts on the GsSetAmbient reads
+are gone as no-ops.
