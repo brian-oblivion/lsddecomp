@@ -2397,7 +2397,7 @@ extern void NoOpIgnoreArgs();
  * the scene's Viewport, whose viewpoint y (refView.vp.y) InitByKind
  * snapshots into sStyleEffectBaseViewY and UpdateByKind follows. The
  * viewport stays `void *` because that is how the next section declares it. */
-extern Actor *gStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
+extern Actor *sStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
 extern void *sStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
 extern s32 sStyleEffectBaseViewY;
@@ -2406,7 +2406,7 @@ extern s32 sStyleEffectModelIds[];
 /* Called once, from the class's ctor (StyleEffect__StyleEffect): snapshot the
  * viewpoint y, place self under `parent` at pos + offset, then build the
  * per-kind parts. The two model kinds link a model fetched from
- * gStyleEffectTmd by sStyleEffectModelIds[kind], and STYLE_EFFECT_MODEL_ROW
+ * sStyleEffectTmd by sStyleEffectModelIds[kind], and STYLE_EFFECT_MODEL_ROW
  * also gets its two model children; STYLE_EFFECT_SPRITES gets five
  * randomised sprites, STYLE_EFFECT_JITTER_SPRITES five plain ones
  * (StyleEffect__SpawnPlainSprites is StyleEffect__SpawnSprites(self, 0, 0,
@@ -2421,7 +2421,7 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
 
     kind = self->pendingExtra;
     if (kind <= STYLE_EFFECT_MODEL) {
-        s32 model = gStyleEffectTmd->methods->setBackClip(gStyleEffectTmd, sStyleEffectModelIds[kind]);
+        s32 model = sStyleEffectTmd->methods->setBackClip(sStyleEffectTmd, sStyleEffectModelIds[kind]);
         SceneNode__LinkModel((SceneNode *)self, (void *)model);
         kind = self->pendingExtra;
     }
@@ -2742,7 +2742,7 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
  * globals) draw from: the scene's TMD resource, its TIM image and the
  * viewport. The TMD resource's getModel slot sits where Actor has
  * setBackClip, hence the Actor view. */
-extern Actor *gStyleEffectTmd;
+extern Actor *sStyleEffectTmd;
 extern void *sStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
 extern s32 sStyleEffectModelIds[3];
@@ -2756,7 +2756,7 @@ void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
     s32 i;
     TmdModel *model;
 
-    gStyleEffectTmd = tmd;
+    sStyleEffectTmd = tmd;
     sStyleEffectTim = (void *)tim;
     gStyleEffectViewport = (Viewport *)viewport;
     i = 0;

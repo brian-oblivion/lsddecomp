@@ -12,7 +12,7 @@ never attempted before this round.
 ## What it does
 
 Stashes `self` (arg1) and two more scalar args (arg2, arg3) into `.sbss`
-globals `gStyleEffectTmd`/`sStyleEffectTim`/`gStyleEffectViewport`, then runs a fixed 2-iteration
+globals `sStyleEffectTmd`/`sStyleEffectTim`/`gStyleEffectViewport`, then runs a fixed 2-iteration
 loop calling `self->methods->slot80(self, sStyleEffectModelIds[i])` and feeding the
 result plus `&sStyleEffectClutPos` (a 1-word `.sdata` constant, address-only, never
 loaded) to library function `TmdModel__SetFirstPrimClut` (still `psyq_fa50.s`, unrenamed
@@ -22,7 +22,7 @@ same as its caller (`StyleBuildEffectSlots`, unaddressed `ObjMStyleActor.s`) pas
 its own unrelated `self` there without any indication of shared meaning.
 
 ```c
-extern s32 gStyleEffectTmd;
+extern s32 sStyleEffectTmd;
 extern s32 sStyleEffectTim;
 extern s32 gStyleEffectViewport;
 extern s32 sStyleEffectModelIds[3];
@@ -34,7 +34,7 @@ void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     s32 i;
     void *ret;
 
-    gStyleEffectTmd = (s32) self;
+    sStyleEffectTmd = (s32) self;
     sStyleEffectTim = arg2;
     gStyleEffectViewport = arg3;
     i = 0;
@@ -84,7 +84,7 @@ Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Act
 
 ## Track 4b (2026-09-25, round 85)
 
-`gStyleEffectTmd`/`sStyleEffectTim`/`gStyleEffectViewport` were `s32` in ObjMStyleActor.c and
+`sStyleEffectTmd`/`sStyleEffectTim`/`gStyleEffectViewport` were `s32` in ObjMStyleActor.c and
 `D_8008ACA4Obj *`/`void *`/`void *` in ObjMStyleActor.c. Both units now
 declare `Actor *`/`void *`/`void *`: this function stores its own `Actor *self` into the first, the two scalars go in through a `(void *)` cast. Byte-identical; no new `-Wall`
 warning.
@@ -99,13 +99,13 @@ viewport, and it only stores them for StyleEffect's methods and prepares
 the two models the TMD's +0x080 slot (LinkResource's getModel) returns for
 sStyleEffectModelIds[0..1] (TmdModel__SetFirstPrimClut with sStyleEffectClutPos). The stored
 globals were renamed with it (one rename.py run each): D_8008ACA4 ->
-gStyleEffectTmd, D_8008ACA8 -> sStyleEffectTim, D_8008ACAC ->
+sStyleEffectTmd, D_8008ACA8 -> sStyleEffectTim, D_8008ACAC ->
 gStyleEffectViewport, D_8008AB98 -> sStyleEffectModelIds. PROPOSED (not
 applied, a prototype and body outside the header): its `Actor *self`
-parameter and the `Actor *` view of gStyleEffectTmd in ObjMStyleActor.c/_s.c
+parameter and the `Actor *` view of sStyleEffectTmd in ObjMStyleActor.c/_s.c
 are really `LinkResource *`, and the `setBackClip` calls through it are
 `getModel`; its prototype belongs in include/StyleEffect.h, not Actor.h.
 
 ## Track 7 (round 99, alpha)
 
-Parameters named (unused, tmd, tim, viewport), in the prototype in include/Actor.h too; the local `ret` is `TmdModel *model`, and the local prototype of TmdModel__SetFirstPrimClut takes its definition's (TmdModel *, s16 *xy). `python3 tools/rename.py D_8008AB94 sStyleEffectClutPos`, **tier A**: an s16[2] VRAM position, 0x01FF03F0 = (x 1008, y 511), which TmdModel__SetFirstPrimClut turns into a CLUT id (x / 16 + y * 64) for the first primitive of each model; this function is its only accessor. The comment on the three source globals, which said "track 4b, round 85", is covered by the Track 4b section above; it now says what they are. Still PROPOSED from track 6 (bravo): `tmd` and gStyleEffectTmd are a LinkResource (the +0x080 slot is LinkResource's getModel, returning a TmdModel), which would drop the Actor view and the cast; that changes ObjMStyleActor.c's declaration too.
+Parameters named (unused, tmd, tim, viewport), in the prototype in include/Actor.h too; the local `ret` is `TmdModel *model`, and the local prototype of TmdModel__SetFirstPrimClut takes its definition's (TmdModel *, s16 *xy). `python3 tools/rename.py D_8008AB94 sStyleEffectClutPos`, **tier A**: an s16[2] VRAM position, 0x01FF03F0 = (x 1008, y 511), which TmdModel__SetFirstPrimClut turns into a CLUT id (x / 16 + y * 64) for the first primitive of each model; this function is its only accessor. The comment on the three source globals, which said "track 4b, round 85", is covered by the Track 4b section above; it now says what they are. Still PROPOSED from track 6 (bravo): `tmd` and sStyleEffectTmd are a LinkResource (the +0x080 slot is LinkResource's getModel, returning a TmdModel), which would drop the Actor view and the cast; that changes ObjMStyleActor.c's declaration too.
