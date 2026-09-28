@@ -416,7 +416,7 @@ semantic-preserving mutations were (a) routing the `else`-branch's
 *(new_var2 = &v1);`) and (b) routing the `SetRCnt` rate argument through
 an `unsigned char` intermediate instead of a direct `(s16)` cast
 (`u8 new_var = (s16)s0; SetRCnt(s1, new_var, 0x1000);`). Applied
-verbatim to `src/libsnd_ssinit_libapi_counter.c` and rebuilt: **14/164 words match,
+verbatim to `src/psyq/libsnd_ssinit_libapi_counter.c` and rebuilt: **14/164 words match,
 WITH drift** -- markedly WORSE than the 65/164 baseline, not better.
 Reverted immediately; confirmed the file returns to the documented
 65/164 no-drift state afterward.

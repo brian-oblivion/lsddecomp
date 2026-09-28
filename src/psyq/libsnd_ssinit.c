@@ -18,7 +18,7 @@
  * and SsInit (12 words) are not retail's (83 and 8 words). Retail links
  * SsSetTableSize from the 3.5 sstable.o in the middle of the module, so
  * libsnd/ssinit is two files here: this one, and the libsnd/ssinit half of
- * src/libsnd_ssinit_libapi_counter.c after the sstable object.
+ * src/psyq/libsnd_ssinit_libapi_counter.c after the sstable object.
  *
  * What decided its edges (python3 tools/tuboundary.py --unit): the placed
  * object libsnd/vm_vsu precedes it ("start edge possible") and the placed

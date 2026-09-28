@@ -131,7 +131,7 @@ segments:
       - [0x14D6, pad]
       # jtbl_80010CD8 belongs to func_80032588, in the code_179d8_c slice --
       # same situation as 0x11F8 above.
-      - [0x14D8, .rodata, libsnd_ssinit_libapi_counter]
+      - [0x14D8, .rodata, psyq/libsnd_ssinit_libapi_counter]
       # 0x14F0 holds EXACTLY three jump tables and nothing else --
       # jtbl_80010CF0 (func_80034690) and jtbl_80010ED8 + jtbl_80010F38
       # (func_800357B0, a double switch), all three in the code_179d8_k
@@ -961,7 +961,7 @@ segments:
       # func_80032588, which is in the tail; left on code_179d8_c the link
       # fails with `undefined reference to '.L800325xx'`.
       - [0x22BA8, o, libsnd/sstable]
-      - [0x22D88, c, libsnd_ssinit_libapi_counter]
+      - [0x22D88, c, psyq/libsnd_ssinit_libapi_counter]
       # code_179d8_tail: functions 220..255 of the original.  UNCARVED
       # remainder in front of the code_179d8_f carve below, and left that
       # way deliberately: 0x23500..0x2673C is addiu-$at dense (26 of its 36

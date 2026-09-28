@@ -77,7 +77,7 @@ Round 69 (delta). `StartRCnt` (was `func_80032BF0`): ORs a bit into
 Tier A -- a setter whose mechanics are its purpose. `D_8006DCAC` (was
 `D_8006DCAC`) and `gRCntIrqMasks` (was `D_8006DCB4`) are named from this
 function's and `StopRCnt`'s own pre-existing doc comment in
-`src/libsnd_ssinit_libapi_counter.c`, which already identified the pair as the PSX
+`src/psyq/libsnd_ssinit_libapi_counter.c`, which already identified the pair as the PSX
 I_STAT/I_MASK shadow and the per-index Tmr0/Tmr1/Tmr2/VBLANK IRQ bit table
 -- tier B for both (the hardware mapping is established; which game
 subsystem relies on it is not).
