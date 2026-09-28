@@ -20,7 +20,7 @@
  *    window's edges), scrollLeft/Right move `column` inside every string; the
  *    cursor row is coloured sItemListCursorColor, the others
  *    sItemListRowColor.
- *  - handleInputCode (the tag-2 child's notifications): 25 closes with
+ *  - handleInputCode (the PAD_CLASS_ID child's notifications): 25 closes with
  *    result 2, 23 with result 3; setState(4) then passes `result` to
  *    notifyParents, and the parent reads the chosen item with getCursorIndex.
  *

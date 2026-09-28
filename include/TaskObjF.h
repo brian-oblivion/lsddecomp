@@ -129,14 +129,14 @@ struct TaskObjF {
     /* +0x054 */ void *data;   /* beginLoad/beginSave: the save block read into or written from */
     /* +0x058 */ s32 dataSize; /* its size in bytes */
     /* +0x05C */ s32 waitCounter; /* setState zeroes; tickStateDelay counts to 6 */
-    /* +0x060 */ BasicClass *inputSource; /* AddChild: the child whose class id's low nibble is 2; its events go to onInputEvent */
-    /* +0x064 */ BasicClass *tickSource; /* ... low nibble 5; its events go to tickStateDelay */
+    /* +0x060 */ BasicClass *inputSource; /* AddChild: the child of class PAD_CLASS_ID (a Pad); its events go to onInputEvent */
+    /* +0x064 */ BasicClass *tickSource; /* ... of class FRAMECLOCK_CLASS_ID (a FrameClock); its events go to tickStateDelay */
     /* +0x068 */ struct SceneNode *spriteParent; /* init; the widgets' and the card icon's sprite parent; with inputSource, gates attach/detach */
     /* +0x06C */ struct VabStreamObj *sound; /* init; playSound's playTone target, the widgets' target too */
     /* +0x070 */ struct ScreenSprite *cardIcon; /* loadCardIcon: New_ScreenSprite of a CARD\*.TIM; releaseCardIcon */
     /* +0x074 */ s32 ownsWidget; /* attachTextEntry/attachItemList set it when they made the widget; detach then releases it */
-    /* +0x078 */ struct TextEntry *textEntry; /* attachTextEntry: New_TextEntry(title + 2 * titleEditPos, 1); AddChild's class 0x10 */
-    /* +0x07C */ struct ItemList *itemList; /* attachItemList: New_ItemList(titles, 1); AddChild's class 0x20 */
+    /* +0x078 */ struct TextEntry *textEntry; /* attachTextEntry: New_TextEntry(title + 2 * titleEditPos, 1); AddChild's TEXTENTRY_CLASS_ID child */
+    /* +0x07C */ struct ItemList *itemList; /* attachItemList: New_ItemList(titles, 1); AddChild's ITEMLIST_CLASS_ID child */
     /* +0x080 */ s32 selectedIndex; /* onItemListResult: the list's getCursorIndex */
 };
 
