@@ -27,7 +27,7 @@ extern void StyleFillEffectKind2(void *arg0, void *arg1);                   /* f
 `void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3)`; this
 call site only needs the ABI shape (`s32,void*,s32,s32`), matching the
 project's convention of a looser cross-unit local signature. `gStyleVariant`,
-`gStyleSceneRefs`, `sStyleEffectSlotCount` and `sStyleEffectSlots` are fresh copies of externs
+`sStyleSceneRefs`, `sStyleEffectSlotCount` and `sStyleEffectSlots` are fresh copies of externs
 already declared later in this file, needed here because this function's
 ROM address is earlier (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`).
 
@@ -43,7 +43,7 @@ void StyleBuildEffectSlots(void *arg0) {
     if (gStyleVariant < 0) {
         return;
     }
-    base = gStyleSceneRefs;
+    base = sStyleSceneRefs;
     SetStyleEffectSources(gStyleVariant, (void *) *(s32 *) (base + 4), *(s32 *) (base + 8), *(s32 *) (base + 0xC));
     val = sStyleKind0Counts[rand() & 3];
     count = (gStyleVariant == 2) ? 0x10 - val : 0;
@@ -61,12 +61,12 @@ void StyleBuildEffectSlots(void *arg0) {
 }
 ```
 
-`base = gStyleSceneRefs;` reads the "pointer stored as a plain `s32`" global once
-(matching this unit's established `gStyleSceneRefs` idiom, e.g.
-`FlushSoundCueSet(*(s32 *) gStyleSceneRefs, ...)`), then indexes off it with plain
+`base = sStyleSceneRefs;` reads the "pointer stored as a plain `s32`" global once
+(matching this unit's established `sStyleSceneRefs` idiom, e.g.
+`FlushSoundCueSet(*(s32 *) sStyleSceneRefs, ...)`), then indexes off it with plain
 integer arithmetic (`*(s32 *) (base + 4)`, etc.) -- GCC keeps the single
 load in a register and reuses it for all three offset reads, matching
-retail's `lw v0, gStyleSceneRefs; lw a1,4(v0); lw a2,8(v0); lw a3,0xC(v0)`
+retail's `lw v0, sStyleSceneRefs; lw a1,4(v0); lw a2,8(v0); lw a3,0xC(v0)`
 without needing to fight CSE.
 
 The trailing `if (gStyleVariant == 0) {...} else if (gStyleVariant == 2) {...}
@@ -105,7 +105,7 @@ for the SEPARATE `sStyleEffectSlots` array (a different object class --
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_80087324` | `sStyleKind0Counts` | A | 4 bytes {0, 3, 8, 16} picked by `rand() & 3`, passed as StyleFillEffectKind0's count. |
-| `gStyleTargetObj` | `gStyleSceneRefs` | A | RegisterStyleConfig stores its arg2 there, and its one caller passes `&ObjM::ctorSound`, the start of the sound/dreamerTmd/etcTim/cachedViewport block (`StyleSceneRefs`); kept `s32` because ObjMStyleActor.c declares it so. |
+| `gStyleTargetObj` | `sStyleSceneRefs` | A | RegisterStyleConfig stores its arg2 there, and its one caller passes `&ObjM::ctorSound`, the start of the sound/dreamerTmd/etcTim/cachedViewport block (`StyleSceneRefs`); kept `s32` because ObjMStyleActor.c declares it so. |
 | `0x10` | `STYLE_VARIANT2_EFFECTS` (16) | B | variant 2 fills kind 1 up to this many kind-0 plus kind-1 effects. |
 
-`gStyleSceneRefs + 4/8/0xC` are fields of the `StyleSceneRefs` view (ObjM's dreamerTmd, etcTim, cachedViewport). Locals: `pos`, `refs`, `kind0Count`, `kind1Count`, `next`.
+`sStyleSceneRefs + 4/8/0xC` are fields of the `StyleSceneRefs` view (ObjM's dreamerTmd, etcTim, cachedViewport). Locals: `pos`, `refs`, `kind0Count`, `kind1Count`, `next`.

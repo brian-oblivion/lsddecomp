@@ -54,7 +54,7 @@ proposed -- brute-force the divisor rather than reverse the reciprocal math --
 stands.
 
 The struct-and-flow recovery (call targets, method slots +0xB8/+0xBC/+0x64,
-`gStyleSceneRefs + 0xC` chased one field further, the loop bounds) was also correct
+`sStyleSceneRefs + 0xC` chased one field further, the loop bounds) was also correct
 throughout. **What was wrong was only the VERDICT**, and specifically the part
 of it that named an unfalsifiable cause. "Register pressure" identifies no
 construct, suggests no experiment, and ends the investigation; two rounds
@@ -77,7 +77,7 @@ void StyleUpdateDecorSet(void) {
     if (sStyleDecorVariant == 0) {
         return;
     }
-    self = *(ObjAC7CSub **) (gStyleSceneRefs + 0xC);
+    self = *(ObjAC7CSub **) (sStyleSceneRefs + 0xC);
     delta = self->field18 - self->field24;
     shift = (delta / 600) * 3;
     if (shift <= 0) {

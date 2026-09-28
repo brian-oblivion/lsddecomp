@@ -51,7 +51,7 @@
  *
  * The +0x06C..+0x07B words are read as one block from outside:
  * ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
- * keeps it in gStyleSceneRefs, and ApplyStyleDecorationIfSet
+ * keeps it in sStyleSceneRefs, and ApplyStyleDecorationIfSet
  * (ObjMStyleActor) calls +0x0AC on that block's +0x00C, cachedViewport
  * (Viewport's getFadeBox). The fields are kept flat.
  */
@@ -162,7 +162,7 @@ struct ObjM {
     /* +0x064 */ s32 unk64; /* the ctor zeroes it; PollTimBlockLoad sets 1 before enterStyleSession */
     /* +0x068 */ s32 inSession; /* the ctor zeroes it; EnterStyleSession sets it; gates update, onPadEvent, enterStyleSession */
     /* +0x06C */ BasicClass *ctorSound; /* the ctor's sound again (also TimedTask::sound); &ctorSound is RegisterStyleConfig's arg2 (see the banner) */
-    /* +0x070 */ struct LinkResource *dreamerTmd; /* the ctor's (DayTask's "ETC\DREAMER.TMD"); read through gStyleSceneRefs (ObjMStyleActor) */
+    /* +0x070 */ struct LinkResource *dreamerTmd; /* the ctor's (DayTask's "ETC\DREAMER.TMD"); read through sStyleSceneRefs (ObjMStyleActor) */
     /* +0x074 */ struct TimImage *etcTim; /* the ctor's (DayTask's "ETC\ETC.TIM"); AdvancePauseSetup's New_TextRow font */
     /* +0x078 */ struct NodeGuardedViewport *cachedViewport; /* InitStyleAndWorld: IntermediateBase::viewport */
     /* +0x07C */ struct TextRow *pauseText; /* AdvancePauseSetup's New_TextRow(etcTim, 5, "Pause"); TeardownPauseOverlay releases it */

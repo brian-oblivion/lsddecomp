@@ -14,7 +14,7 @@ elsewhere as returning `ClassEAC0Obj *` from `include/Task.h`, a header
 this unit doesn't own -- see below), stashes it in `sStyleDecorObj`, and
 dispatches three method calls on it (`slot64(obj,1)`, `slot68(obj,0)`,
 `slot4C(obj,tmp,&sStyleDecorBoxPos)`) plus one call on a completely different
-object reached through `gStyleSceneRefs->unkC` (`slotAC(sub)`, whose return
+object reached through `sStyleSceneRefs->unkC` (`slotAC(sub)`, whose return
 feeds the `slot4C` call's middle argument).
 
 ```c
@@ -62,8 +62,8 @@ void ApplyStyleDecorationIfSet(void) {
         ((LocalM4D0Obj *) sStyleDecorObj)->methods->slot64((LocalM4D0Obj *) sStyleDecorObj, 1);
         ((LocalM4D0Obj *) sStyleDecorObj)->methods->slot68((LocalM4D0Obj *) sStyleDecorObj, 0);
 
-        tmp = ((FieldAC7CHolder *) gStyleSceneRefs)->unkC->methods->slotAC(
-                ((FieldAC7CHolder *) gStyleSceneRefs)->unkC);
+        tmp = ((FieldAC7CHolder *) sStyleSceneRefs)->unkC->methods->slotAC(
+                ((FieldAC7CHolder *) sStyleSceneRefs)->unkC);
 
         ((LocalM4D0Obj *) sStyleDecorObj)->methods->slot4C((LocalM4D0Obj *) sStyleDecorObj, tmp, &sStyleDecorBoxPos);
     }
@@ -126,7 +126,7 @@ logic, only a different way of naming the same values.
 
 ## Naming
 
-**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `sStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_BoxFill`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`gStyleSceneRefs`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
+**ApplyStyleDecorationIfSet** -- tier B. Gated entirely on `sStyleDecorColor` (set by `ApplyStyleConfig`'s colour-table branch): if non-NULL, builds a `ClassEAC0Obj` via the already-known `New_BoxFill`, configures it (`slot64`/`slot68`), pulls a value from an unrelated holder object (`sStyleSceneRefs`'s `unkC`), and feeds both into `slot4C`. Mechanically described; what the conditional decoration represents is not established, hence tier B rather than a guessed "spawn X" name.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
@@ -135,11 +135,11 @@ sStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `LocalM4D0Obj` view
 ## Track 6 (2026-09-27, round 96, charlie)
 
 `FieldAC7CHolder`, `LocalSubObj` and `LocalSubMethods` are retired; the
-function now reads `((StyleSceneRefs *)gStyleSceneRefs)->viewport->methods->getFadeBox(...)`
+function now reads `((StyleSceneRefs *)sStyleSceneRefs)->viewport->methods->getFadeBox(...)`
 into a `SceneNode *fadeBox` and passes that to attachToParent without a cast.
 Zero bytes (whole-image SHA1 green, 0 new typeview warnings).
 
-Evidence: `gStyleSceneRefs` (0x8008AC7C, an `s32` in every unit) is
+Evidence: `sStyleSceneRefs` (0x8008AC7C, an `s32` in every unit) is
 RegisterStyleConfig's third argument, which ObjM__InitStyleAndWorld
 (ObjMStyleActor) passes as `&self->ctorSound`: it points at ObjM's
 +0x06C..+0x07B block (include/ObjM.h's banner). The holder's +0x00C is
@@ -153,7 +153,7 @@ is, established from the one writer); the name is ObjMStyleActor's, not new.
 
 Not applied (outside the edit set): hoisting `StyleSceneRefs` into one
 shared header (ObjM.h, beside the block it views) and dropping both unit
-copies; retyping the `gStyleSceneRefs` global from `s32` to
+copies; retyping the `sStyleSceneRefs` global from `s32` to
 `StyleSceneRefs *` (track 4b, it would remove every cast in _m and _n).
 
 ## Track 7 (2026-09-27, round 98, delta)

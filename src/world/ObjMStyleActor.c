@@ -483,7 +483,7 @@ void ObjM__DetachTarget(ObjM *self) {
  * PickStageTexture return a FilePathRecord *, a 0x1C-byte record handed on here as a
  * name), src/graphics/SceneNode.c (GetSetHitHeightGate sets the flag
  * SceneNode__RaycastHullAgainstFaces tests). RegisterStyleConfig, which
- * keeps `sceneRefs` as gStyleSceneRefs, is defined below, after ObjM. */
+ * keeps `sceneRefs` as sStyleSceneRefs, is defined below, after ObjM. */
 extern s32 PickStageBgm(s32 stage, s32 unused);
 extern s32 PickStageTexture(s32 stage, s32 unused, s32 day);
 extern s32 GetSetHitHeightGate(s32 value);
@@ -1102,7 +1102,7 @@ extern s32 gStyleStage;
 extern s32 gStyleTickCount;
 extern s32 sStyleDay;
 extern s32 sStyleUnreadArg;
-extern s32 gStyleSceneRefs; /* a StyleSceneRefs * (below) */
+extern s32 sStyleSceneRefs; /* a StyleSceneRefs * (below) */
 extern s32 gStyleVariant;
 /* StyleCueSlot is defined with the cue functions below; this only clears the slots. */
 typedef struct StyleCueSlot StyleCueSlot;
@@ -1119,7 +1119,7 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
         slot = &sStyleCueSlots[ARRAY_COUNT(sStyleCueSlots) - 1];
         sStyleGrid = grid;
         gStyleStage = stage;
-        gStyleSceneRefs = sceneRefs;
+        sStyleSceneRefs = sceneRefs;
         gStyleVariant = -1;
         sStyleDay = day;
         sStyleUnreadArg = unreadArg;
@@ -1185,7 +1185,7 @@ void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg) {
     style->colorMode = cfg->colorMode;
 }
 
-/* What gStyleSceneRefs points at: ObjM's +0x06C..+0x07B block
+/* What sStyleSceneRefs points at: ObjM's +0x06C..+0x07B block
  * (ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
  * keeps it; include/ObjM.h). */
 typedef struct StyleSceneRefs {
@@ -1207,8 +1207,8 @@ void ApplyStyleDecorationIfSet(void) {
         ((BoxFill *)sStyleDecorObj)->methods->setSemiTransOn((BoxFill *)sStyleDecorObj, 1);
         ((BoxFill *)sStyleDecorObj)->methods->setSemiTransRate((BoxFill *)sStyleDecorObj, 0);
 
-        fadeBox = ((StyleSceneRefs *)gStyleSceneRefs)
-                      ->viewport->methods->getFadeBox(((StyleSceneRefs *)gStyleSceneRefs)->viewport);
+        fadeBox = ((StyleSceneRefs *)sStyleSceneRefs)
+                      ->viewport->methods->getFadeBox(((StyleSceneRefs *)sStyleSceneRefs)->viewport);
 
         ((BoxFillAttachToParentFn)((BoxFill *)sStyleDecorObj)->methods->attachToParent)(
             (BoxFill *)sStyleDecorObj, fadeBox, &sStyleDecorBoxPos);
@@ -1223,7 +1223,7 @@ void ApplyStyleDecorationIfSet(void) {
  *
  * RegisterStyleConfig (previous section), called by ObjM__InitStyleAndWorld
  * and a no-op until StyleTeardown clears sStyleGrid, sets the state read here: sStyleGrid (the
- * scene's StageMap), gStyleStage (ObjM's stage), gStyleSceneRefs (ObjM's
+ * scene's StageMap), gStyleStage (ObjM's stage), sStyleSceneRefs (ObjM's
  * sound, resources and viewport; StyleSceneRefs below) and sStyleDay (the
  * DreamSys day). ApplyStyleConfig then takes the stage's fixed config or,
  * with none, PickStyleFallbackConfig's: a variant (gStyleVariant, 0..3) and
@@ -1349,7 +1349,7 @@ extern s32 sStyleDecorPosY;
 extern s32 sStyleDecorSizeW;
 extern s32 sStyleDecorSizeH;
 extern BoxFill *sStyleDecorSlots[STYLE_DECOR_BANDS];
-extern s32 gStyleSceneRefs; /* a StyleSceneRefs * */
+extern s32 sStyleSceneRefs; /* a StyleSceneRefs * */
 
 /* sStyleDecorPosX/Y and sStyleDecorSizeW/H are adjacent word pairs.
  * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
@@ -1390,7 +1390,7 @@ void StyleBuildDecorSet(void) {
         size.y -= 7;
     }
 
-    viewport = ((StyleSceneRefs *)gStyleSceneRefs)->viewport;
+    viewport = ((StyleSceneRefs *)sStyleSceneRefs)->viewport;
     parent = viewport->methods->getFadeBox(viewport);
     ((BoxFillAttachToParentFn)sStyleDecorSlots[0]->methods->attachToParent)(
         sStyleDecorSlots[0], parent, (BoxFillPos *)&pos);
@@ -1416,7 +1416,7 @@ void StyleUpdateDecorSet(void) {
     if (sStyleDecorVariant == 0) {
         return;
     }
-    viewport = ((StyleSceneRefs *)gStyleSceneRefs)->viewport;
+    viewport = ((StyleSceneRefs *)sStyleSceneRefs)->viewport;
     height = viewport->refView.vp.y - viewport->refView.vr.y;
     fade = (height / STYLE_DECOR_FADE_HEIGHT) * 3;
     if (fade <= 0) {
@@ -1465,7 +1465,7 @@ void StyleReleaseDecorSet(void) {
 }
 
 extern s32 gStyleVariant;
-extern s32 gStyleSceneRefs;
+extern s32 sStyleSceneRefs;
 extern s32 rand(void);
 extern s8 sStyleKind0Counts[];
 extern s32 sStyleEffectSlotCount;
@@ -1488,7 +1488,7 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     if (gStyleVariant < 0) {
         return;
     }
-    refs = (StyleSceneRefs *)gStyleSceneRefs;
+    refs = (StyleSceneRefs *)sStyleSceneRefs;
     SetStyleEffectSources(gStyleVariant, (Actor *)refs->dreamerTmd, (s32)refs->etcTim,
                           (s32)refs->viewport);
     kind0Count = sStyleKind0Counts[rand() & 3];
@@ -1778,7 +1778,7 @@ void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY) {
     gStyleSpawnModelLayout = rand() % 5;
 }
 
-extern s32 gStyleSceneRefs;
+extern s32 sStyleSceneRefs;
 extern void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target);
 extern SoundCueCallbackFn sStyleCueCallbacks[];
 extern s32 InitSoundCueSet(void *sound, SoundCueSet *set, s32 tag, void *owner,
@@ -1792,7 +1792,7 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
     entry = (StyleCueEntryView *)FindNextStyleCueInRange(&slot->pos, &slot->lastDist, target);
     if (entry != 0) {
         slot->entry = entry;
-        InitSoundCueSet(((StyleSceneRefs *)gStyleSceneRefs)->sound, &slot->cueSet, entry->cue, slot,
+        InitSoundCueSet(((StyleSceneRefs *)sStyleSceneRefs)->sound, &slot->cueSet, entry->cue, slot,
                         sStyleCueCallbacks[entry->cue]);
         if (entry->cue == *lastCue) {
             *lastCue = -entry->cue;
@@ -1891,12 +1891,12 @@ fail:
     return 0;
 }
 
-extern s32 gStyleSceneRefs;
+extern s32 sStyleSceneRefs;
 extern void FlushSoundCueSet(void *sound, SoundCueSet *set);
 
 /* Stops the slot's cue and frees its record. Returns NULL for the slot. */
 StyleCueSlot *FlushStyleCue(StyleCueSlot *slot) {
-    FlushSoundCueSet(((StyleSceneRefs *)gStyleSceneRefs)->sound, &slot->cueSet);
+    FlushSoundCueSet(((StyleSceneRefs *)sStyleSceneRefs)->sound, &slot->cueSet);
     slot->entry->cue = -slot->entry->cue;
     return 0;
 }
@@ -1907,7 +1907,7 @@ extern void ServiceSoundCueSet(void *sound, SoundCueSet *set);
 /* One service pass of the slot's cue while the target is in range; 0 otherwise. */
 s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused) {
     if (IsStyleCueNear(slot, target) != 0) {
-        ServiceSoundCueSet(((StyleSceneRefs *)gStyleSceneRefs)->sound, &slot->cueSet);
+        ServiceSoundCueSet(((StyleSceneRefs *)sStyleSceneRefs)->sound, &slot->cueSet);
         return 1;
     }
     return 0;

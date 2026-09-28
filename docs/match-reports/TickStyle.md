@@ -132,7 +132,7 @@ struct ObjAB4C {
 ```
 
 `sStyleGrid`'s value is another "pointer stored as a plain `s32`" global
-(same idiom as `gStyleSceneRefs`), dispatched here as a self object through
+(same idiom as `sStyleSceneRefs`), dispatched here as a self object through
 method slot `+0xE8` -- the third such `ObjXXXX`/`ObjXXXXMethods` local view
 in this unit (`ObjAB54`, `ObjE0C8`, now `ObjAB4C`).
 
@@ -278,7 +278,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * NAMING PASS, round 72 (runner alpha).  Every function, and the thirteen
  * globals its functions set up or gate on, renamed via `tools/rename.py`,
  * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
- * cluster (`gStyleStage`/`sStyleDay`/`gStyleSceneRefs`/`gStyleVariant`/
+ * cluster (`gStyleStage`/`sStyleDay`/`sStyleSceneRefs`/`gStyleVariant`/
  * `sStyleDecorObj`/`sStyleGrid`/`gStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
  * `ObjMStyleActor.c`'s already-confirmed "Style" subsystem sets
