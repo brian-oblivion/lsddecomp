@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-SPECIAL_DAY_MOOD
 gActiveCdStream
 gActiveDataSource
 gActiveMoviePlayer
@@ -207,6 +206,7 @@ sSaveTitleBlanks
 sSaveTitleColorChannel
 sSaveTitleColorFrame
 sSaveTitleOffset
+sSpecialDayMood
 sStage5TriggerGridPos
 sStaircaseOffset0
 sStaircaseOffset1

@@ -54,7 +54,7 @@ attempt.
 
 `sLinkAngle180` (extern `s32`, single `.word` at `asm/data/7B3C0.sdata.s`) is
 only ever address-taken, matching the existing pattern used by
-`SPECIAL_DAY_MOOD`/`IsDaySpecial` a few hundred lines below in this same unit.
+`sSpecialDayMood`/`IsDaySpecial` a few hundred lines below in this same unit.
 
 ## Verification
 

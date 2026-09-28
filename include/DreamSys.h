@@ -856,7 +856,7 @@ extern s16 sSpecialDays[];
 /* The fixed "special day" mood, returned by IsDaySpecial on a match
    (round 2026-09-02); only ever address-taken there, never dereferenced by
    this unit's queued functions. */
-extern MoodGraphPoint SPECIAL_DAY_MOOD;
+extern MoodGraphPoint sSpecialDayMood;
 
 /* Also declared in Entity.h for the same libc-style function. */
 extern s32 rand(void);
