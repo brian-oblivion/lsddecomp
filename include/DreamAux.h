@@ -41,7 +41,7 @@ typedef struct DreamAuxTriggerEntry {
 } DreamAuxTriggerEntry;
 
 extern s8 sDreamAuxTriggerCounts[DREAM_AUX_STAGE_COUNT];
-extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[DREAM_AUX_STAGE_COUNT];
+extern DreamAuxTriggerEntry *sDreamAuxTriggerEntries[DREAM_AUX_STAGE_COUNT];
 
 /* The two ModelData files InitDreamAux can load. With one slot, only
  * SYMSPY.MOM is ever requested. */

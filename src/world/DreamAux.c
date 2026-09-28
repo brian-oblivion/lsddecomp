@@ -179,7 +179,7 @@ DreamAuxTriggerEntry *RemapTriggerForDreamColor(DreamAuxTriggerEntry *trigger, s
 DreamAuxTriggerEntry *LookupDreamAuxTrigger(s16 *chunkKey) {
     s32 stage = sDreamAuxStage;
     s32 count = sDreamAuxTriggerCounts[stage];
-    DreamAuxTriggerEntry *trigger = gDreamAuxTriggerEntries[stage];
+    DreamAuxTriggerEntry *trigger = sDreamAuxTriggerEntries[stage];
     s32 i;
 
     for (i = 0; i < count; i++) {

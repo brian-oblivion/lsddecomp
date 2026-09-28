@@ -26,13 +26,13 @@ typedef struct DreamAuxTriggerEntry {
 } DreamAuxTriggerEntry;
 
 extern s8 sDreamAuxTriggerCounts[];
-extern DreamAuxTriggerEntry *gDreamAuxTriggerEntries[];
+extern DreamAuxTriggerEntry *sDreamAuxTriggerEntries[];
 
 s32 LookupDreamAuxTrigger(s16 *a0)
 {
     s32 idx = sDreamAuxStage;
     s32 count = sDreamAuxTriggerCounts[idx];
-    DreamAuxTriggerEntry *entry = gDreamAuxTriggerEntries[idx];
+    DreamAuxTriggerEntry *entry = sDreamAuxTriggerEntries[idx];
     s32 i;
 
     for (i = 0; i < count; i++) {
@@ -45,7 +45,7 @@ s32 LookupDreamAuxTrigger(s16 *a0)
 }
 ```
 
-`sDreamAuxTriggerCounts`/`gDreamAuxTriggerEntries` is a second "count + pointer-to-array" parallel
+`sDreamAuxTriggerCounts`/`sDreamAuxTriggerEntries` is a second "count + pointer-to-array" parallel
 family in this unit, structurally identical to the already-documented
 `sDreamAuxGroupCounts`/`sDreamAuxGroupRecords` (`InitDreamAux`) but a different stride (6 bytes,
 not 8) and a different index space (`sDreamAuxStage`, not a loop counter). The
@@ -90,7 +90,7 @@ issue.
 ## Naming
 
 **LookupDreamAuxTrigger** — tier A. A linear search over
-`gDreamAuxTriggerEntries[sDreamAuxStage]` for an entry whose `key` matches
+`sDreamAuxTriggerEntries[sDreamAuxStage]` for an entry whose `key` matches
 `*a0`, dispatching the match (or its absence) into
 `RemapTriggerForDreamColor`. The search IS the function's purpose, so tier
 A applies even though it delegates the on-hit adjustment to a sibling.
@@ -108,7 +108,7 @@ The header comment, as it stood:
 /* A second parallel-group family, same "count + pointer to array" shape as
  * DreamAuxGroupRecord above but a different stride and a different index
  * space: 14 (0xE) groups selected by `sDreamAuxStage` (not a loop index),
- * sDreamAuxTriggerCounts[i] a signed count, gDreamAuxTriggerEntries[i] a pointer to an array of
+ * sDreamAuxTriggerCounts[i] a signed count, sDreamAuxTriggerEntries[i] a pointer to an array of
  * count 6-byte records whose first 2 bytes (`key`, read with `lh`) are the
  * only field LookupDreamAuxTrigger accesses. The remaining 4 bytes are undiscovered
  * from this unit alone. */

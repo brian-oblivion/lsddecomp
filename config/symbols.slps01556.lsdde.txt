@@ -1100,7 +1100,7 @@ gDreamAuxWorld = 0x8008AC00;
 sDreamAuxGroupCounts = 0x80089A7C;
 sDreamAuxGroupRecords = 0x80089A44;
 sDreamAuxTriggerCounts = 0x80089AC4;
-gDreamAuxTriggerEntries = 0x80089A8C;
+sDreamAuxTriggerEntries = 0x80089A8C;
 sDreamAuxSpawnInfo = 0x80088F48;
 sDreamAuxPosTable = 0x80088D3C;
 // identified: fingerprint 1.00 (EXACT) vs libspu/s_i.o (discs 3.3,3.5,3.6),
