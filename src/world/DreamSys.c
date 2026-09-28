@@ -26,7 +26,7 @@
  *    initializes.
  *
  * 4. Linking: WallLink/DynamicLink and the Try...Link family, over the free
- *    Test4.../GetStaticSpawn testers and the stage spawn tables. ExecuteLink
+ *    TestFor.../GetStaticSpawn testers and the stage spawn tables. ExecuteLink
  *    records the link (enum DreamSysLinkCode) in Actor's `state` and tells
  *    the parents. */
 #include "common.h"
@@ -128,7 +128,7 @@ void DreamSys__SpawnAtLink(DreamSys *this, StageMap *grid) {
     GetActorMethods()->attachToParent((Actor *)this, (SceneNode *)grid, (LongVec3 *)attachPos);
     this->methods->addChild(this, (BasicClass *)grid);
     if (this->state == DREAMSYS_LINK_FLASHBACK) {
-        FlashbackEntry *entry = &this->storedFlasbacks[this->currentFlashbackIndex];
+        FlashbackEntry *entry = &this->storedFlashbacks[this->currentFlashbackIndex];
         this->methods->updateRotation(this, 1, &entry->rotation);
         this->methods->getSetDreamTimeLimit(this, entry->timeLimit + 4);
         this->currentFlashbackIndex++;
@@ -831,9 +831,9 @@ void DreamSys__InitNewGame(DreamSys *this) {
     this->saveMagic = sSaveMagic;
     this->currentYear = 0;
     this->currentDay = 0;
-    this->totalFlasbackUnlockScore = 0;
-    this->navigationFlasbackUnlockScore = 0;
-    this->instanceFlasbackUnlockScore = 0;
+    this->totalFlashbackUnlockScore = 0;
+    this->navigationFlashbackUnlockScore = 0;
+    this->instanceFlashbackUnlockScore = 0;
     this->amountFlashbacksAvailable = 0;
     this->unknown_values_0x5d8[7] = 0;
     this->unknown_values_0x5d8[0] = 0;
@@ -960,7 +960,7 @@ bool DreamSys__LoadNextFlashback(DreamSys *this, bool quiet) {
         goto fail;
     }
     this->state = DREAMSYS_LINK_FLASHBACK;
-    entry = &this->storedFlasbacks[idx];
+    entry = &this->storedFlashbacks[idx];
     if (!quiet) {
         this->methods->notifyParents(this, DREAMSYS_LINK_FLASHBACK);
     }
@@ -1236,7 +1236,7 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *this, void *entity, s32 effect
             }
             this->methods->logInstanceMood(
                 this, ((DreamSysEntityObj *)entity)->methods->getMoodEffect(entity));
-            this->instanceFlasbackUnlockScore +=
+            this->instanceFlashbackUnlockScore +=
                 ((DreamSysEntityObj *)entity)->methods->getUnlockEffect(entity);
             this->methods->flashbackSaving(this, 0, 16);
             break;
@@ -1410,22 +1410,22 @@ s32 CalcMoodAxis(s32 last, s32 sum, s32 amount) {
 }
 
 void DreamSys__CalcUnlockScore(DreamSys *this) {
-    this->navigationFlasbackUnlockScore = CalcNavigationScore();
-    if (this->instanceFlasbackUnlockScore < 0) {
-        this->instanceFlasbackUnlockScore = 0;
-    } else if (this->instanceFlasbackUnlockScore > UNLOCK_SCORE_MAX) {
-        this->instanceFlasbackUnlockScore = UNLOCK_SCORE_MAX;
+    this->navigationFlashbackUnlockScore = CalcNavigationScore();
+    if (this->instanceFlashbackUnlockScore < 0) {
+        this->instanceFlashbackUnlockScore = 0;
+    } else if (this->instanceFlashbackUnlockScore > UNLOCK_SCORE_MAX) {
+        this->instanceFlashbackUnlockScore = UNLOCK_SCORE_MAX;
     }
-    this->totalFlasbackUnlockScore =
-        this->navigationFlasbackUnlockScore + this->instanceFlasbackUnlockScore;
+    this->totalFlashbackUnlockScore =
+        this->navigationFlashbackUnlockScore + this->instanceFlashbackUnlockScore;
 }
 
 void DreamSys__AddFlashback(DreamSys *this, s32 stage, PlayerSpawnPoint *pos, s32 *angles,
                             s32 unknown, s32 time, s32 day) {
     FlashbackEntry *entry;
 
-    entry = this->storedFlasbacks;
-    if (this->amountFlashbacksAvailable < ARRAY_COUNT(this->storedFlasbacks)) {
+    entry = this->storedFlashbacks;
+    if (this->amountFlashbacksAvailable < ARRAY_COUNT(this->storedFlashbacks)) {
         entry += this->amountFlashbacksAvailable++;
     } else {
         entry += (u32)this->tick % 9;

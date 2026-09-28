@@ -505,13 +505,13 @@ struct DreamSys {
     s32 saveMagic;
     s32 currentYear;
     s32 currentDay;
-    s32 totalFlasbackUnlockScore;
-    s32 navigationFlasbackUnlockScore;
-    s32 instanceFlasbackUnlockScore;
+    s32 totalFlashbackUnlockScore;
+    s32 navigationFlashbackUnlockScore;
+    s32 instanceFlashbackUnlockScore;
     MoodGraphPoint moodPreviousDays[DAYS_PER_YEAR];
     /* 2 bytes unused */
     s32 amountFlashbacksAvailable;
-    FlashbackEntry storedFlasbacks[10];
+    FlashbackEntry storedFlashbacks[10];
 
     s8 unknown_values_0x5d8[8];
 
@@ -583,7 +583,7 @@ typedef struct DreamSaveBlock {
     u8 pad00[0x4];
     /* +0x004 */ s32 currentYear; /* DreamSys +0x17C; nonzero: the ring is full, plot all 100 days */
     /* +0x008 */ s32 currentDay; /* DreamSys +0x180; days logged this year, the ring's write cursor */
-    /* +0x00C */ s32 totalFlasbackUnlockScore; /* DreamSys +0x184: FLASHBACK unlocks past 9999999 */
+    /* +0x00C */ s32 totalFlashbackUnlockScore; /* DreamSys +0x184: FLASHBACK unlocks past 9999999 */
     u8 pad10[0x18 - 0x10];
     /* +0x018 */ MoodGraphPoint moodPreviousDays[DAYS_PER_YEAR]; /* walked backwards from currentDay - 1 */
     u8 pad2F2[0x2F4 - 0x2F2];
@@ -852,7 +852,7 @@ void DreamSys__WallLink(DreamSys *this, void *unk_class_86aa0, int arg2);
 /* @return The previous time limit, in seconds, or -1. */
 s32 DreamSys__GetSetDreamTimeLimit(DreamSys *this, s32 value);
 
-/* @brief (Re)initializes playthrough-relevant data, like day number, flashabcks, etc. */
+/* @brief (Re)initializes playthrough-relevant data, like day number, flashbacks, etc. */
 void DreamSys__InitNewGame(DreamSys *this);
 
 /* @brief Sets whether the camera should shake when the player walks. */
@@ -864,18 +864,18 @@ void DreamSys__GetSetScreenShake(DreamSys *this, bool *value);
 /* @return Integer between 0 and 364, of the new currentDay value. */
 s32 DreamSys__AdvanceDay(DreamSys *this);
 
-/* @brief Checks what kind of dream comes next, and executes the appropiate start-of-dream actions. */
+/* @brief Checks what kind of dream comes next, and executes the appropriate start-of-dream actions. */
 /* @return ID of the Stage to spawn on. Or -1 if the dream is Special (i.e. non-interactive). */
 s32 DreamSys__StartDay(DreamSys *this);
 
 /* @brief Executes various end-of-dream actions. */
 s32 DreamSys__EndDay(DreamSys *this, s32 arg1);
 
-/* @brief Gets the indicies of the Cinematic to be played next, if any. */
-/* @return CinematicCall with the currently stored indicies. An Entry value of -1 means no cinematic. */
+/* @brief Gets the indices of the Cinematic to be played next, if any. */
+/* @return CinematicCall with the currently stored indices. An Entry value of -1 means no cinematic. */
 CinematicCall DreamSys__GetCinematic(DreamSys *this);
 
-/* @brief Sets the next spawnpoint to be the intial spawn appropiate for the last day's graph. */
+/* @brief Sets the next spawnpoint to be the initial spawn appropriate for the last day's graph. */
 void DreamSys__InitSpawnLoc(DreamSys *this);
 
 /* @brief Handles either dynamic or instance links, based on the value of DreamSys.currentStage */
@@ -932,7 +932,7 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood);
 void DreamSys__ClearMoodGraph(DreamSys *this, MoodGraphContributor *contributor);
 
 /* @brief "Logs" a given Mood Effect on the given Contributor. */
-/* @param layer The contributor that will recieve the mood. */
+/* @param layer The contributor that will receive the mood. */
 /* @param mood The mood contribution to be logged. */
 void DreamSys__LogMood(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoint *mood);
 
@@ -942,12 +942,12 @@ void DreamSys__LogMood(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoi
 /* @return To &ret, MoodPoint between (-9,-9) and (9,9). */
 void DreamSys__GetMoodAverage(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoint *ret);
 
-/* @brief Turns the values of a given mood contributor axis into an useable average */
-/* @param lank The mood contribution that happened last, which recieves a boost in the code */
+/* @brief Turns the values of a given mood contributor axis into a usable average */
+/* @param last The mood contribution that happened last, which receives a boost in the code */
 /* @param sum The cumulative value from all mood contributions */
-/* @param amount The amount of mood contributions adquired */
+/* @param amount The amount of mood contributions acquired */
 /* @return Normalized integer between -9 and 9 */
-s32 CalcMoodAxis(s32 lank, s32 sum, s32 amount);
+s32 CalcMoodAxis(s32 last, s32 sum, s32 amount);
 
 /* @brief Recalculates the total progress towards unlocking the flashback feature */
 void DreamSys__CalcUnlockScore(DreamSys *this);

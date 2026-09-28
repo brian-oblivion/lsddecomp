@@ -180,7 +180,7 @@ void UpdateFlashbackLock(TitleMenu *self, TaskCoreTarget *target, struct DreamSy
     DreamSaveBlock *save = (DreamSaveBlock *)self->saveBlock;
     s32 locked = 1;
 
-    if (save->totalFlasbackUnlockScore > FLASHBACK_UNLOCK_SCORE) {
+    if (save->totalFlashbackUnlockScore > FLASHBACK_UNLOCK_SCORE) {
         locked = (save->amountFlashbacksAvailable == 0);
     }
     /* A NULL entry is one the cursor can stop on. */
