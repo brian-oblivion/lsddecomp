@@ -1701,7 +1701,7 @@ void SetInstantTeleportersEnabled(bool value) {
 /* Test4InstantTeleporters' GetStaticSpawn tables: trigger counts,
    triggers and spawns per stage, as for tunnels and staircases. */
 extern s8 sTeleportTriggersCount[];
-extern StaticLinkTrigger *TELEPORT_TRIGGERS[];
+extern StaticLinkTrigger *sTeleportTriggers[];
 extern StageSpawn *TELEPORT_SPAWNS[];
 
 s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
@@ -1710,7 +1710,7 @@ s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentP
     if (gInstantTeleportersEnabled == 0) {
         result = -1;
     } else {
-        result = GetStaticSpawn(target, currentPos, stage, sTeleportTriggersCount, TELEPORT_TRIGGERS,
+        result = GetStaticSpawn(target, currentPos, stage, sTeleportTriggersCount, sTeleportTriggers,
                                 TELEPORT_SPAWNS, 0);
     }
     return result;
