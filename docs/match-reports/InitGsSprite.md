@@ -5,7 +5,7 @@ Round 82, runner alpha (fifth slot on Sprite). Unit `src/Sprite.c`. Fresh ground
 - **Where:** not in any method table (called by Sprite__Reset) (`tools/classtable.py`).
 - **What:** Fills the GsSPRITE: attribute = (pmode & 3) << 24 (colour mode), x = y = 0, w/h from the cell, mx/my = w/2, h/2 read back from the sprite, tpage = GetTPage(pmode & 3, abr, px, py), u/v the cell origin's low bytes, cx/cy from the image (the CLUT position), r = g = b = 0x80, rotate 0, scalex = scaley = 0x1000.
 - **Result:** byte-exact; 57/57 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK).
-- **Types:** `struct GsIMAGE` is completed in the unit with code_2bb9c.c's layout (Sprite.h keeps only the tag; LIBGS.H is not included here); `GetTPage` declared locally. Sprite.h untouched.
+- **Types:** `struct GsIMAGE` is completed in the unit with TimImage.c's layout (Sprite.h keeps only the tag; LIBGS.H is not included here); `GetTPage` declared locally. Sprite.h untouched.
 
 ## Lever
 
