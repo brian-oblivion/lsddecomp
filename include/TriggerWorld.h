@@ -26,7 +26,7 @@
  * SLOTS (`classtable.py gTriggerWorldMethods --vs gModelDataMethods`: 34 against 33): the
  * overrides are +0x008 (ctor), +0x00C (TriggerWorld__Finalize), +0x064
  * (onRequestDone: TriggerWorld__Load, which only runs +0x078), +0x078 (FileResource's
- * slot78: TriggerWorld__BuildResources, s32, as ModelData__BuildResources
+ * processBuffer: TriggerWorld__BuildResources, s32, as ModelData__BuildResources
  * there; callers cast it) and +0x07C (releaseResources:
  * TriggerWorld__ReleaseResources). +0x080/+0x084 are ModelData's forwarders
  * to its todSet, inherited unchanged although this class never builds one.

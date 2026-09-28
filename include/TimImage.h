@@ -30,7 +30,7 @@
  * src/graphics/GraphicsResources.c) makes them with New_TimImage(NULL), points `buffer`
  * into its own block and sets `clutBase`.
  *
- * +0x078 is FileResource's `void *slot78` (NULL there); this table's occupant
+ * +0x078 is FileResource's `processBuffer` (NULL there); this table's occupant
  * is TimImage__Upload, called through TimImageUploadFn (no code).
  *
  * `tim` is <libgs.h>'s GsIMAGE.
@@ -41,7 +41,7 @@ typedef struct TimImageMethods TimImageMethods;
 
 struct TimImageMethods {
     FILERESOURCE_SLOTS(TimImage, (TimImage * self, char *name));
-    /* +0x078 is FileResource's slot78; this table's occupant is
+    /* +0x078 is FileResource's processBuffer; this table's occupant is
      * TimImage__Upload (TimImageUploadFn). */
     /* +0x07C..+0x094: empty bodies (TimImage__NoOpSlot7C..TimImage__NoOpSlot94); no C
      * caller names them. */

@@ -64,7 +64,7 @@ typedef struct TimBlockSrcEntry {
 
 struct TimBlockSrcMethods {
     FILERESOURCE_SLOTS(TimBlockSrc, (TimBlockSrc * self, char *name));
-    /* +0x078 is FileResource's slot78; this table's occupant is
+    /* +0x078 is FileResource's processBuffer; this table's occupant is
      * TimBlockSrc__SetEntryShift(self, index, shift). */
     /* +0x07C */ void (*fadeAllEntries)(TimBlockSrc *self, TimBlockSrcColor *color); /* TimBlockSrc__FadeAllEntries */
     /* +0x080 */ void (*fadeEntry)(TimBlockSrc *self, s32 index,
@@ -72,7 +72,7 @@ struct TimBlockSrcMethods {
 };
 
 struct TimBlockSrc {
-    FILERESOURCE_FIELDS(TimBlockSrcMethods); /* unk2A is the load state: 9 header, 10 blocks, 0 done */
+    FILERESOURCE_FIELDS(TimBlockSrcMethods); /* loadState: TIMBLOCK_LOAD_* */
     /* +0x02C */ s32 blockCount;             /* TimArraySrcs built so far */
     /* +0x030 */ struct TimArraySrc **blocks; /* one per block; ReleaseBasicClassArray'd by Finalize */
     /* +0x034 */ void *sector; /* the read buffer: 0x800 for the header, then the largest block size */

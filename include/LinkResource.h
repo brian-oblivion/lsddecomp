@@ -34,7 +34,7 @@
  *          through GraphicsResources.c's unprototyped UnprototypedCtorTable view).
  *   +0x064 onRequestDone: LinkResource__BuildModels(self), s32: 1 when an
  *          allocation fails, else 0 after the active driver's onRequestDone.
- *   +0x078 slot78 (NULL in FileResource): LinkResource__MapModel(self).
+ *   +0x078 processBuffer (NULL in FileResource): LinkResource__MapModel(self).
  *
  * The ctor's descriptor is ResourceSource (include/FileResource.h): a buffer
  * to adopt, else a file name to request.

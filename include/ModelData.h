@@ -46,7 +46,7 @@ struct ResourceSource;
 typedef struct ModelData ModelData;
 typedef struct ModelDataMethods ModelDataMethods;
 
-/* +0x078 is FileResource's slot78 (NULL there): this table's occupant is
+/* +0x078 is FileResource's processBuffer (NULL there): this table's occupant is
  * ModelData__BuildResources(self), s32, 0 when both sources exist; the
  * callers cast it (an inherited slot keeps the parent's name). */
 /* clang-format off */

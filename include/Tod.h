@@ -27,7 +27,7 @@
  * TodSet's is 0x2C too (New_TodSet). Everything a Tod reads is in the
  * adopted or loaded `buffer`.
  *
- * +0x078 is FileResource's slot78 (NULL there): this table's occupant is
+ * +0x078 is FileResource's processBuffer (NULL there): this table's occupant is
  * Tod__ScanPackets(self, out, sel), u8, which runs +0x07C over the buffer
  * past its first two words (TodSet's occupant runs it past its counted
  * array); ModelData__ForwardScanPackets casts it (an inherited slot keeps
