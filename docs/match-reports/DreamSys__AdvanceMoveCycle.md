@@ -701,7 +701,7 @@ Runs one tick of a four-tick cycle while `moveCommand` is
 nonzero: `moveCycleTick` counts up, the cycle ends on the fourth
 (`moveCommand = 0`, counter reset), a sound voice is started on the last tick --
 or on every even tick when `moveMode == 4`, the fastest of the five speeds in
-`MOVE_MODE_SPEEDS` -- and `DreamSys__StopVoice` runs on every tick that does not
+`sMoveModeSpeeds` -- and `DreamSys__StopVoice` runs on every tick that does not
 start one. On the ticks in between it applies a +-50 offset to BOTH of
 `heightCurve`'s keyframe values, negative for the first half of the cycle and
 positive for the second, gated on `screenShakeOn`. Returns the command that was

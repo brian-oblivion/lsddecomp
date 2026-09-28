@@ -736,7 +736,7 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 command) {
     PlayerSpawnPoint *pos;
 
     if (command != 0) {
-        delta = MOVE_COMMAND_SIGNS[command] * MOVE_MODE_SPEEDS[this->moveMode];
+        delta = MOVE_COMMAND_SIGNS[command] * sMoveModeSpeeds[this->moveMode];
         this->methods->slot12C(this);
         pos = (PlayerSpawnPoint *)this->grid->methods->getTargetDescriptor(this->grid, 0, 0);
         if (!this->methods->tryStaircaseLink(this, pos) &&

@@ -87,7 +87,7 @@ enum DreamSysMoveCommand {
     MOVE_COMMAND_RIGHT = 4
 };
 
-/* DreamSys::moveMode indexes MOVE_MODE_SPEEDS {0, 24, 64, 128, 384}. The
+/* DreamSys::moveMode indexes sMoveModeSpeeds {0, 24, 64, 128, 384}. The
  * pad handler switches to MOVE_MODE_RUN only while moving forward, and a
  * staircase walk takes about a seventh of the frames in it. */
 #define MOVE_MODE_RUN 4
@@ -152,13 +152,13 @@ extern s32 LOOK_YAW_LIMITS[3];
 
 /* Consumed by DreamSys__ApplyMoveCommand (round 2026-09-06), both indexed by that
    function's own `arg1` (a mood/day-type selector, range implied by the
-   table sizes below): `MOVE_COMMAND_SIGNS[arg1] * MOVE_MODE_SPEEDS[this->moveMode]` forms
+   table sizes below): `MOVE_COMMAND_SIGNS[arg1] * sMoveModeSpeeds[this->moveMode]` forms
    a signed delta, then `MOVE_COMMAND_DISPATCH[arg1]` is called with it. Index 0 is
    unused/null in MOVE_COMMAND_DISPATCH (arg1 == 0 returns before reaching any of
    these, per that function's own guard) -- consistent with MOVE_COMMAND_SIGNS[0]
-   being 0 too. MOVE_MODE_SPEEDS is indexed separately by DreamSys::moveMode (its
+   being 0 too. sMoveModeSpeeds is indexed separately by DreamSys::moveMode (its
    own "Current" value, see that field), not by arg1. */
-extern s32 MOVE_MODE_SPEEDS[5];
+extern s32 sMoveModeSpeeds[5];
 extern s8 MOVE_COMMAND_SIGNS[8];
 
 /* Declared further down (after the real `DreamSys` typedef exists) as
@@ -659,7 +659,7 @@ typedef struct DreamSaveBlock {
 } DreamSaveBlock;
 
 /* Dispatch table indexed by DreamSys__ApplyMoveCommand's `arg1`; see that table's own
-   comment near MOVE_MODE_SPEEDS/MOVE_COMMAND_SIGNS above. Same element signature as
+   comment near sMoveModeSpeeds/MOVE_COMMAND_SIGNS above. Same element signature as
    Actor__MoveLocalZOrFindLink/Actor__MoveLocalXOrFindLink (Actor +0x0D0/+0x0D4). */
 extern void (*MOVE_COMMAND_DISPATCH[5])(DreamSys *this, s32 val, void *extra);
 
