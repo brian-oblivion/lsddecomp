@@ -134,7 +134,7 @@ For the owners of those classes (NOT applied: they are other classes' views):
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-Applied: the proposed `Obj865C8::unk40` -> `bgm`, `struct WBgm *` is DayTask::bgm in include/DayTask.h.
+Applied: the proposed `Obj865C8::unk40` -> `bgm`, `struct WBgm *` is DayTask::bgm in include/day_task.h.
 
 ## History: the unit banner of src/code_2a0e0.c (moved here round 101, track 7)
 

@@ -31,7 +31,7 @@
  *                                 (enum ApplicationLoopStatus)
  *   +0x05C onRepeatMenu           OnRepeatMenu: empty (status 1 is never
  *                                 returned)
- *   +0x060 runDayTask          RunDayTask: one DayTask (include/DayTask.h),
+ *   +0x060 runDayTask          RunDayTask: one DayTask (include/day_task.h),
  *                                 then maybe the current cinematic;
  *                                 nonzero (a year gone by) runs +0x064
  *   +0x064 playEndingMovie  PlayEndingMovie: ETC\ENDING.STR

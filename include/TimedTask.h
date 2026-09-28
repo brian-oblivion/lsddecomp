@@ -11,7 +11,7 @@
  *
  * Nothing builds a bare TimedTask (New_TimedTask has no caller); the game
  * uses its two subclasses, whose ctors call TimedTask__TimedTask first:
- * DayTask (0x1F230, include/DayTask.h), built by
+ * DayTask (0x1F230, include/day_task.h), built by
  * GameApplication__RunDayTask, which switches on init's return; and ObjM
  * (0x2F230, include/ObjM.h), which DayTask builds and hands its sound.
  *

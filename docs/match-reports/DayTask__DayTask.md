@@ -273,7 +273,7 @@ occupant TimImage__Upload) through `TimImageUploadFn`, +0x05C is
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__Obj865C8. Accessors now use the parent's names: unk0C -> initArgs, Obj0C::unk8/unkC/unk10 -> IntermediateBaseInitArgs unk8/unkC/viewport, subB -> sound, slot10 -> addChild, resetState -> resetCounters. Own fields named from this body: dreamSys (+0x038, arg2), etcTim (+0x044, New_TimImage("ETC\ETC.TIM"), TimImage *), dreamerTmd (+0x048, New_LinkResource("ETC\DREAMER.TMD")), bgm (+0x040, New_WBgm, WBgm *; the WBgm runner's proposal in New_WBgm.md). Byte-identical.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__Obj865C8. Accessors now use the parent's names: unk0C -> initArgs, Obj0C::unk8/unkC/unk10 -> IntermediateBaseInitArgs unk8/unkC/viewport, subB -> sound, slot10 -> addChild, resetState -> resetCounters. Own fields named from this body: dreamSys (+0x038, arg2), etcTim (+0x044, New_TimImage("ETC\ETC.TIM"), TimImage *), dreamerTmd (+0x048, New_LinkResource("ETC\DREAMER.TMD")), bgm (+0x040, New_WBgm, WBgm *; the WBgm runner's proposal in New_WBgm.md). Byte-identical.
 
 ## Track 6 (2026-09-26, round 94, alpha): the class name
 

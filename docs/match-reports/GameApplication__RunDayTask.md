@@ -258,7 +258,7 @@ established from this body alone.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The "StatusObj" is DayTask (gDayTaskMethods, include/DayTask.h):
+The "StatusObj" is DayTask (gDayTaskMethods, include/day_task.h):
 `New_Obj865C8` became `New_DayTask`, and this unit's local
 `StatusObj`/`StatusObjMethods` view was deleted. The body now reads
 `((DayTaskInitFn)obj->methods->init)(obj)` then

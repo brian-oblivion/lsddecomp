@@ -232,4 +232,4 @@ the visible cases is itself informative about a missing empty case.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__AdvanceState (the field is `phase`, see DayTask__ResetPhase). +0x054 onTag1Notify override: runs the base's, then on event 2 moves phase 1 (startDay) or 3 (release the old objM, getCurrentStage) to 2 through StartObjM. eventCode is TimedTask's `result`; onEventArg is setState.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__AdvanceState (the field is `phase`, see DayTask__ResetPhase). +0x054 onTag1Notify override: runs the base's, then on event 2 moves phase 1 (startDay) or 3 (release the old objM, getCurrentStage) to 2 through StartObjM. eventCode is TimedTask's `result`; onEventArg is setState.

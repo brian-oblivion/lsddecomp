@@ -110,4 +110,4 @@ this function was reconfirmed at 41/41 after the change.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Prefix only. Now returns s32 (the parent init's result, `return GetTimedTaskMethods()->init(...)`), byte-identical: the slot is s32 and PollStatusObj switches on it. It takes self alone, unlike the slot's (self, args, mode); the slot keeps IntermediateBase's type and PollStatusObj calls through DayTaskInitFn.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Prefix only. Now returns s32 (the parent init's result, `return GetTimedTaskMethods()->init(...)`), byte-identical: the slot is s32 and PollStatusObj switches on it. It takes self alone, unlike the slot's (self, args, mode); the slot keeps IntermediateBase's type and PollStatusObj calls through DayTaskInitFn.

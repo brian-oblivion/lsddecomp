@@ -140,7 +140,7 @@ New_X allocator: BMemPMgrAlloc(0x88), then GetObjMMethods()->ctor (+0x008 of gOb
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Signature now `ObjM *New_ObjM(BasicClass *sound, WBgm *bgm, TimImage *etcTim, LinkResource *dreamerTmd, s32 stage)`: the arguments are DayTask's `sound`, `bgm`, `etcTim`, `dreamerTmd` (include/DayTask.h), which StartObjM now passes uncast.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Signature now `ObjM *New_ObjM(BasicClass *sound, WBgm *bgm, TimImage *etcTim, LinkResource *dreamerTmd, s32 stage)`: the arguments are DayTask's `sound`, `bgm`, `etcTim`, `dreamerTmd` (include/day_task.h), which StartObjM now passes uncast.
 
 ## Round 99 (delta, track 7)
 

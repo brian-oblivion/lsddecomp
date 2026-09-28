@@ -1,5 +1,5 @@
-#ifndef DAYTASK_H
-#define DAYTASK_H
+#ifndef DAY_TASK_H
+#define DAY_TASK_H
 
 #include "TimedTask.h"
 

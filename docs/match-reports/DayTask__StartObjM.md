@@ -131,7 +131,7 @@ was reconfirmed at 33/33 after each retyping pass.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__EnterState2: builds New_ObjM(sound, bgm, etcTim, dreamerTmd, stage), keeps it at +0x04C (objM), adds it as a child, calls its init (+0x044) with (initArgs, dreamSys), phase = 2. Not a slot.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__EnterState2: builds New_ObjM(sound, bgm, etcTim, dreamerTmd, stage), keeps it at +0x04C (objM), adds it as a child, calls its init (+0x044) with (initArgs, dreamSys), phase = 2. Not a slot.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

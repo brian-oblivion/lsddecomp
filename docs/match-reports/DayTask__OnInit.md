@@ -152,7 +152,7 @@ forward-declared struct bodies as a bare `struct X { ... };`, never repeat
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__StartSubA: it is the +0x04C onInit override (IntermediateBase__Init calls it). subA was IntermediateBase's viewport (+0x018), which holds the NodeGuardedViewport the ctor made, and SubObjA's slots are Viewport's: setScreenSize, getSubHandle (then SceneNode setDisplay(1)), setUnk44(0x4B0), attachViewChild(dreamSys, &sDayViewPoint, &sDayViewRef, NULL), initOt. It takes self alone; the slot keeps (self, s32, s32, s32).
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__StartSubA: it is the +0x04C onInit override (IntermediateBase__Init calls it). subA was IntermediateBase's viewport (+0x018), which holds the NodeGuardedViewport the ctor made, and SubObjA's slots are Viewport's: setScreenSize, getSubHandle (then SceneNode setDisplay(1)), setUnk44(0x4B0), attachViewChild(dreamSys, &sDayViewPoint, &sDayViewRef, NULL), initOt. It takes self alone; the slot keeps (self, s32, s32, s32).
 
 ## History moved from comments (track 7, round 99, charlie)
 

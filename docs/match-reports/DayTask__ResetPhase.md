@@ -43,4 +43,4 @@ None beyond what's already documented for this residue-free shape.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__ResetState. The field is `phase` (+0x03C): IntermediateBase already names +0x020 `state`, a different field. This is the +0x040 resetCounters override and clears only phase. Tier A.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__ResetState. The field is `phase` (+0x03C): IntermediateBase already names +0x020 `state`, a different field. This is the +0x040 resetCounters override and clears only phase. Tier A.

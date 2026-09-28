@@ -48,4 +48,4 @@ None beyond what's already documented.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from GetObj865C8Methods with the class (returns &gDayTaskMethods, was D_800865C8). Tier A.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from GetObj865C8Methods with the class (returns &gDayTaskMethods, was D_800865C8). Tier A.

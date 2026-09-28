@@ -29,7 +29,7 @@
  * New_WBgm(PickSoundBank(0), NULL, 1): the VAB path is one of the seven
  * sSoundBankPaths strings ("SND\\AMBIENT" ... "SND\\STANDERD",
  * asm/data/1B84.rodata.s), no SEQ yet, autoPlay on. That caller keeps the
- * object as DayTask::bgm (include/DayTask.h), and
+ * object as DayTask::bgm (include/day_task.h), and
  * hands it to New_ObjM, whose ObjM keeps it at +0x054 and calls +0x04C
  * pause and +0x050 resume on it (ObjM__AdvancePauseSetup,
  * ObjM__TeardownPauseOverlay; include/ObjM.h).

@@ -38,7 +38,7 @@
 #include "StreamTask.h"
 #include "GraphRoom.h"
 #include "TitleMenu.h"
-#include "DayTask.h"
+#include "day_task.h"
 #include "data_source.h"
 #include "NullDriver.h"
 #include "cd_driver.h"

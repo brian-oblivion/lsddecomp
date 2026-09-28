@@ -56,4 +56,4 @@ None beyond what's already documented.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__RunSubUpdates, which misdescribed it: it is the +0x050 onDeinit override, and the two calls are Viewport's deinitOt and detachViewChild.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__RunSubUpdates, which misdescribed it: it is the +0x050 onDeinit override, and the two calls are Viewport's deinitOt and detachViewChild.

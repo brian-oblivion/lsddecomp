@@ -3,7 +3,7 @@
  * RegisterRecordTableFiles, TimedTask (DayTask's parent, and ObjM's) and
  * StageMap, in that ROM order.
  *
- * DayTask (include/DayTask.h), New_DayTask through GetDayTaskMethods: the
+ * DayTask (include/day_task.h), New_DayTask through GetDayTaskMethods: the
  * task GameApplication__RunDayTask runs for one dream day. Its ctor loads
  * the day's shared resources (ETC\ETC.TIM, ETC\DREAMER.TMD, the week's
  * BGM) and fills the init args' viewport (a NodeGuardedViewport), frame
