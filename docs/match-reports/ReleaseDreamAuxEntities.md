@@ -111,3 +111,12 @@ ObjM__TeardownStyle (onDeinit, src/world/ObjMStyleActor.c), mirroring ObjM's sce
 setup calling SetDreamAuxWorld. The body reads it as `(Entity *)slot->model`
 with a comment. `done` -> `i`; the split `i = 0; slot = ...;` keeps a
 one-line MATCHING comment (the derivation is above). Byte-identical.
+
+## History: the sDreamAuxSlots2 alias retired (track 10, debt-world)
+
+The body now walks `sDreamAuxSlots` itself and reads and writes
+`slot->entity`; the `sDreamAuxSlots2` extern (the same table one word in, read
+through `slot->model`) is gone from `src/world/DreamAux.c`. cc1 folds the +4
+field offset into the table address, so the image is byte-identical:
+`funcdiff.py ReleaseDreamAuxEntities` 26/26 and `./build-and-verify.sh` OK.
+The label stays in the symbols file, unreferenced.

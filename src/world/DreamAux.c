@@ -41,10 +41,6 @@
 
 extern DreamAuxSlot sDreamAuxSlots[1];
 
-/* sDreamAuxSlots one word in, so each element's `model` is that slot's
- * entity: ReleaseDreamAuxEntities walks it. */
-extern DreamAuxSlot sDreamAuxSlots2[1];
-
 extern s8 sDreamAuxTriggerCounts[DREAM_AUX_STAGE_COUNT];
 extern DreamAuxTriggerEntry *sDreamAuxTriggerEntries[DREAM_AUX_STAGE_COUNT];
 
@@ -157,13 +153,13 @@ void ReleaseDreamAuxEntities(void) {
 
     /* MATCHING: assignments, not initializers, order the two spills */
     i = 0;
-    slot = sDreamAuxSlots2;
+    slot = sDreamAuxSlots;
 
-    for (; i < ARRAY_COUNT(sDreamAuxSlots2); i++) {
-        Entity *entity = (Entity *)slot->model; /* one word in: the entity */
+    for (; i < ARRAY_COUNT(sDreamAuxSlots); i++) {
+        Entity *entity = slot->entity;
 
         if (entity != NULL) {
-            slot->model = entity->methods->release(entity);
+            slot->entity = entity->methods->release(entity);
         }
         slot++;
     }
