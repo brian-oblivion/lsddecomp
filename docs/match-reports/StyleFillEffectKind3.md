@@ -1,4 +1,4 @@
-# StyleFillEffectKind3 -- MATCHED 81/81 (round 76), lever: store the gStyleSpawnRotation slot through a pointer to a one-field STRUCT (scheduler alias rule), no shared `t`
+# StyleFillEffectKind3 -- MATCHED 81/81 (round 76), lever: store the sStyleSpawnRotation slot through a pointer to a one-field STRUCT (scheduler alias rule), no shared `t`
 
 REVISITED, round 76: MATCHED 81/81 in 12 builds, no permuter, no barrier; names/types used (local struct view `PtrBoxK3` for the store; D_8008E0xx names kept).
 
@@ -26,7 +26,7 @@ pointer as a STRUCT FIELD and the load is free to schedule above it:
 typedef struct PtrBoxK3 { u8 *p; } PtrBoxK3;
 PtrBoxK3 *q;
 ...
-q = (PtrBoxK3 *) &gStyleSpawnRotation;
+q = (PtrBoxK3 *) &sStyleSpawnRotation;
 q->p = gStyleSpawnRotations;
 *arg0 = New_StyleEffect((void *) 3, (u8 *) q - 0xC, (void *) sStyleGrid, arg1);
 ```
@@ -107,7 +107,7 @@ build (`./build-and-verify.sh`, then `tools/funcdiff.py`).
 | 1 | baseline: round 46's preserved body, rebuilt | 38/81 |
 | 2 | `s32 *p = &sStyleSpawnOffsetZ;` for the clamp block | 38, length 79 (2 short), drift |
 | 3 | **+ inline the `rand() % 3` instead of an `idx` local** | **66/81** |
-| 4 | + `u8 **q = &gStyleSpawnRotation;` for the tail store/arg pair | **71/81** |
+| 4 | + `u8 **q = &sStyleSpawnRotation;` for the tail store/arg pair | **71/81** |
 | 5 | + signature `void **StyleFillEffectKind3(void **arg0, void *arg1)` with `*arg0 = ...; arg0++; return arg0;` | **78/81** |
 | 6 | + ONE shared local `t` holding the else branch's computed value AND the hoisted `sStyleGrid` read (found by the permuter) | **79/81, ins 0 / del 0** |
 
@@ -167,7 +167,7 @@ Five further spellings were tried against it, all 79/81 and all
 byte-identical, so the colour is invariant rather than merely unimproved:
 `t` typed `s32` vs `void *`; the else value written as
 `(s32) &sStyleKind3Colors[n*3]` vs `(s32) (sStyleKind3Colors + n*3)`; `t = sStyleGrid`
-before vs after `q = &gStyleSpawnRotation`; `t` declared first vs last. Reusing the
+before vs after `q = &sStyleSpawnRotation`; `t` declared first vs last. Reusing the
 `s32 *p` pointer for all three roles instead of adding `t` regresses to
 73/81.
 
@@ -194,7 +194,7 @@ address gcc 2.6.3's `sched_analyze` will not disambiguate -- so the
 gp-relative load of `sStyleGrid` cannot hoist across it and the store cannot
 sink below it. Two independent experiments prove it is this and nothing else:
 
-- Write the store as a plain global (`gStyleSpawnRotation = gStyleSpawnRotations;`, a
+- Write the store as a plain global (`sStyleSpawnRotation = gStyleSpawnRotations;`, a
   `(mem (symbol_ref))` the scheduler CAN disambiguate) and **the load hoists
   immediately** -- but the `q` pointer then folds away and the address
   argument regresses to `lui a1; addiu a1,%lo(sStyleSpawnOffsetX)` (73/81).
@@ -213,7 +213,7 @@ as a limit.
 ### Waypoint: the `t`-hoist with a dedicated `t` -- 75/81, PURE register colour, zero structural diff
 
 ```c
-    q = &gStyleSpawnRotation;
+    q = &sStyleSpawnRotation;
     t = sStyleGrid;                                    /* s32 t; */
     *q = gStyleSpawnRotations;
     *arg0 = New_StyleEffect((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
@@ -224,8 +224,8 @@ Every instruction and every placement matches retail. The only diff is a
 `$v1` and the stored VALUE in `$v0`, this build does the reverse:
 
 ```
-458d8  lui   v1,%hi(gStyleSpawnRotation)     |  lui   v0,%hi(gStyleSpawnRotation)
-458dc  addiu v1,v1,%lo(gStyleSpawnRotation)  |  addiu v0,v0,%lo(gStyleSpawnRotation)
+458d8  lui   v1,%hi(sStyleSpawnRotation)     |  lui   v0,%hi(sStyleSpawnRotation)
+458dc  addiu v1,v1,%lo(sStyleSpawnRotation)  |  addiu v0,v0,%lo(sStyleSpawnRotation)
 458e0  addiu a1,v1,-0xc             |  addiu a1,v0,-0xc
 458e4  lui   v0,%hi(gStyleSpawnRotations)     |  lui   v1,%hi(gStyleSpawnRotations)
 458e8  addiu v0,v0,%lo(gStyleSpawnRotations)  |  addiu v1,v1,%lo(gStyleSpawnRotations)
@@ -241,7 +241,7 @@ it forward as the residue.
 Axes varied against it, all 75/81, all identical output (so the colour is
 invariant to every one of them, not merely unimproved):
 
-- statement order over `{q = &gStyleSpawnRotation, t = sStyleGrid, val = gStyleSpawnRotations}` --
+- statement order over `{q = &sStyleSpawnRotation, t = sStyleGrid, val = gStyleSpawnRotations}` --
   every order that keeps the load before the store;
 - declaration order of `q`, `t`, `val`;
 - naming the stored value in a local vs leaving it anonymous;
@@ -250,12 +250,12 @@ invariant to every one of them, not merely unimproved):
   `(void *) (q - 3)`;
 - `p` declared at function scope vs inside the `else` block; `q` declared at
   function scope vs inside a trailing block;
-- reusing ONE pointer variable for both `&sStyleSpawnOffsetZ` and `&gStyleSpawnRotation`
+- reusing ONE pointer variable for both `&sStyleSpawnOffsetZ` and `&sStyleSpawnRotation`
   (73/81 -- worse, and the only one of these that moved the score).
 
 Two further axes were tried on the 78/81 body and made it worse, recorded so
 nobody re-spends them: a bare `__asm__("")` before the call (70/81), and an
-initialiser-form declaration `u8 **q = &gStyleSpawnRotation;` (11/81 -- the address
+initialiser-form declaration `u8 **q = &sStyleSpawnRotation;` (11/81 -- the address
 computation moves above the branch).
 
 ## Signature (corrected this round)
@@ -336,7 +336,7 @@ extern s32 sStyleGrid;
 extern s32 gStyleSpawnYChoice2;
 extern void SetupStyleSpawnParamsRandom(void *arg0, void *arg1);
 extern s32 sStyleSpawnColors[];
-extern u8 *gStyleSpawnRotation;
+extern u8 *sStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 sStyleSpawnOffsetY;
 extern s32 sStyleSpawnOffsetZ;
@@ -367,7 +367,7 @@ void **StyleFillEffectKind3(void **arg0, void *arg1) {
         sStyleSpawnColors[0] = t;
     }
     t = sStyleGrid;
-    q = &gStyleSpawnRotation;
+    q = &sStyleSpawnRotation;
     *q = gStyleSpawnRotations;
     *arg0 = New_StyleEffect((void *) 3, (u8 *) q - 0xC, (void *) t, arg1);
     arg0++;
@@ -458,7 +458,7 @@ Locals: `slots`, `pos`, `offsetZ`, `rotation`.
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 
 ```c
-/* Local view: gStyleSpawnRotation stored through a pointer to a ONE-FIELD STRUCT, not
+/* Local view: sStyleSpawnRotation stored through a pointer to a ONE-FIELD STRUCT, not
  * a plain `u8 **`.  Load-bearing: a store through a plain pointer is an
  * opaque (mem (reg)) that gcc 2.6.3's scheduler will not move a later
  * global load above; an in-struct store through a varying address does not

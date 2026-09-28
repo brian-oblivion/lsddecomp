@@ -164,7 +164,7 @@ extern s32 gStyleSpawnYChoices[];
 extern s32 sStyleSpawnOffsetX;
 extern s32 sStyleSpawnOffsetY;
 extern s32 sStyleSpawnOffsetZ;
-extern u8 *gStyleSpawnRotation;
+extern u8 *sStyleSpawnRotation;
 extern u8 gStyleSpawnRotations[];
 extern s32 sStyleSpawnModelLayout;
 
@@ -181,7 +181,7 @@ void SetupStyleSpawnParamsRandom(void *arg0, void *arg1) {
     if (rand() & 1) {
         sStyleSpawnOffsetZ = -sStyleSpawnOffsetZ;
     }
-    gStyleSpawnRotation = gStyleSpawnRotations + ((u32) rand() % 7) * 12;
+    sStyleSpawnRotation = gStyleSpawnRotations + ((u32) rand() % 7) * 12;
     sStyleSpawnModelLayout = rand() % 5;
 }
 ```
