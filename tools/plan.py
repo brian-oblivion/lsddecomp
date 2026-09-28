@@ -1619,6 +1619,7 @@ def main():
     am.add_argument("--attempts", type=int)
     am.add_argument("--matches", type=int)
     am.add_argument("--runners", type=int)
+    am.add_argument("--model", help="which entry, when the round recorded one per model (round 102)")
     am.add_argument("--why", required=True, help="what was wrong; kept in the entry's `amended` list")
     m = sub.add_parser("mark-unit")
     m.add_argument("--unit", required=True)
@@ -1667,7 +1668,8 @@ def main():
               f"{a.attempts} attempt(s) by {a.runners} {a.model} runner(s)")
         return
     if a.cmd == "amend-round":
-        rs = [r for r in st["tracks"].get(a.track, {}).get("rounds", []) if r.get("round") == a.round]
+        rs = [r for r in st["tracks"].get(a.track, {}).get("rounds", []) if r.get("round") == a.round
+              and (a.model is None or r.get("model") == a.model)]
         if len(rs) != 1:
             sys.exit(f"FATAL: {len(rs)} recorded round(s) {a.round} on track {a.track}; need exactly one")
         r, old_ = rs[0], {}
