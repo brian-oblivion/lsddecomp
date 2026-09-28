@@ -61,7 +61,7 @@ the same-value chained assignment (`*a = *b = v;`) — both remove GCC
 
 ## Constants (round 98, track 7)
 
-The answers `TaskObjF__WaitForReadyEvent` returns are `gCardEventSpecs`
+The answers `TaskObjF__WaitForReadyEvent` returns are `sCardEventSpecs`
 entries, i.e. `<kernel.h>` event specs: 0x100 `EvSpTIMOUT` (no card
 answered), 0x8000 `EvSpERROR`, 0x2000 `EvSpNEW` (for `_card_info` a newly
 inserted card, which is then `_card_clear`ed; for `_card_load` an

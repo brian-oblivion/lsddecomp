@@ -9,7 +9,7 @@
 `s32 TaskObjF__OpenEvents(Node3bb8cE *self)`. Enters a critical section
 (`func_80024CE0`), starts 4 PSX threads via `func_80038F7C` (an
 `OpenTh`-style call: fixed mode `0xF4000001`, entry point from
-`gCardEventSpecs[i]`, stack size `0x2000`, priority `0`), storing each returned
+`sCardEventSpecs[i]`, stack size `0x2000`, priority `0`), storing each returned
 handle into `self->threads[i]` (new field, offsets `+0x014`..`+0x020`),
 leaves the critical section (`func_80024CF0`), calls `TaskObjF__EnableEvents(self)`
 and returns `1` unconditionally.
@@ -39,7 +39,7 @@ s32 TaskObjF__OpenEvents(Node3bb8cE *self)
     i = 0;
     cur = self;
     do {
-        cur->threads[0] = func_80038F7C(0xF4000001, gCardEventSpecs[i], 0x2000, 0);
+        cur->threads[0] = func_80038F7C(0xF4000001, sCardEventSpecs[i], 0x2000, 0);
         i++;
         cur = (Node3bb8cE *)((u8 *)cur + 4);
     } while (i < 4);
@@ -78,15 +78,15 @@ direction: NOT introducing the intermediate pointer.
 
 `OpenEvent(0xF4000001, spec, 0x2000, NULL)` is
 `OpenEvent(SwCARD, spec, EvMdNOINTR, NULL)` from `<kernel.h>` (`SwCARD` is
-`DescSW | 0x01`, the BIOS memory-card event class). `gCardEventSpecs`
+`DescSW | 0x01`, the BIOS memory-card event class). `sCardEventSpecs`
 (asm/data/76DC8.data.s, 0x80086E78) holds 0x4, 0x8000, 0x100, 0x2000:
 `EvSpIOE`, `EvSpERROR`, `EvSpTIMOUT`, `EvSpNEW`, the spec
 `WaitForReadyEvent` returns for the event that fired. (splat's
 `gCardIconNames` label at 0x80086E80 falls inside that 4-word table; only
-the first two words sit under `gCardEventSpecs`'s own dlabel.) The loop
+the first two words sit under `sCardEventSpecs`'s own dlabel.) The loop
 bound is `ARRAY_COUNT(self->events)`. Zero bytes changed.
 
-The unit used to declare its own `extern s32 gCardEventSpecs[4]` under a
+The unit used to declare its own `extern s32 sCardEventSpecs[4]` under a
 comment calling it a "PSX thread-table constant ... one per OpenTh-style
 thread it starts", with a note that its lui/addiu-then-lw walk is never
 gp-relative. The table is event specs, not threads; the local declaration

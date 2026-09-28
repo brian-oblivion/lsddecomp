@@ -112,7 +112,7 @@ struct TaskObjF {
     BASICCLASS_FIELDS(TaskObjFMethods);
     /* +0x00C */ s32 cardSlot; /* setCardSlot; 0 or 1: BuildMemcardPath's "bu00:"/"bu10:" */
     /* +0x010 */ s32 cardHandle; /* setCardSlot: cardSlot << 4, the _card_info/_card_load/_card_clear channel */
-    /* +0x014 */ s32 events[4]; /* openEvents: OpenEvent per gCardEventSpecs entry; ForEachEvent/WaitForReadyEvent walk them */
+    /* +0x014 */ s32 events[4]; /* openEvents: OpenEvent per sCardEventSpecs entry; ForEachEvent/WaitForReadyEvent walk them */
     /* +0x024 */ s32 opMode; /* 1 beginLoad, 2 beginSave; the terminal states clear it. advanceState retries the one that is set */
     /* +0x028 */ s32 state;  /* setState; init clears it */
     /* +0x02C */ s32 bufCount; /* collectExistingMemcardFiles's count; how many `titles` buffers are kept */
@@ -216,7 +216,7 @@ extern TaskObjFMethods *GetTaskObjFMethods(void); /* returns &gTaskObjFMethods *
 /* Per TaskObjF::events slot: the event spec TaskObjF__OpenEvents passes to
  * OpenEvent, and the value WaitForReadyEvent returns for that slot.
  * Unsized: only the four slots are read. */
-extern s32 gCardEventSpecs[];
+extern s32 sCardEventSpecs[];
 
 /* A 6-byte memory-card device name, "bu00:" or "bu10:" (the BIOS names of
  * the two card slots). BuildMemcardPath copies one as a whole struct.

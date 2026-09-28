@@ -595,7 +595,7 @@ void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
  *   TaskObjF__RemoveAllChildren clear them; TaskObjF__ClearLinks clears
  *   them and spriteParent at construction.
  * - The card. TaskObjF__SetCardSlot picks slot 0 or 1 and its BIOS channel.
- *   TaskObjF__OpenEvents opens one SwCARD event per gCardEventSpecs entry;
+ *   TaskObjF__OpenEvents opens one SwCARD event per sCardEventSpecs entry;
  *   TaskObjF__CloseEvents closes them.
  * - Card checks. TaskObjF__CheckCardStatus retries
  *   TaskObjF__CardInfoAndLoadStatus, which asks _card_info whether a card is
@@ -701,7 +701,7 @@ s32 TaskObjF__OpenEvents(TaskObjF *self) {
     EnterCriticalSection();
     i = 0;
     do {
-        self->events[i] = OpenEvent(SwCARD, gCardEventSpecs[i], EvMdNOINTR, NULL);
+        self->events[i] = OpenEvent(SwCARD, sCardEventSpecs[i], EvMdNOINTR, NULL);
         i++;
     } while (i < ARRAY_COUNT(self->events));
     ExitCriticalSection();
@@ -1158,14 +1158,14 @@ s32 TaskObjF__WaitForReadyEvent(TaskObjF *self) {
 }
 
 /* Spins until one of `count` events tests ready and returns that slot's
- * gCardEventSpecs entry: which answer the card gave. */
+ * sCardEventSpecs entry: which answer the card gave. */
 s32 WaitForReadyEvent(s32 *events, s32 count) {
     s32 i;
 
     for (;;) {
         for (i = 0; i < count; i++) {
             if (TestEvent(events[i]) != 0) {
-                return gCardEventSpecs[i];
+                return sCardEventSpecs[i];
             }
         }
     }
