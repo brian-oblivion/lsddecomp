@@ -23,7 +23,7 @@ of the executable:
   gives exactly 8. Entry 0 is `{1, 5, 1}`, entry 1 `{3, 2, 0}`, entry 2 `{6, 6, 0}`,
   entry 3 `{16, 16, 0}` — the existing header struct is correct as written.
 - `sStageChunkMoods` (`0x80086590`) is 14 pointers, to `sStage00ChunkMoods` …
-  `STG13_CHUNK_MOODS`. Row-major arrays of the 2-byte `MoodGraphPoint` union.
+  `sStage13ChunkMoods`. Row-major arrays of the 2-byte `MoodGraphPoint` union.
 - `D_800861D6` is **not a separate object**: it is splat's symbol for
   `sStageGridDimensions[0].rows`, at base+2. `%hi`/`%lo(D_800861D6)` and a
   relocation against `sStageGridDimensions` with addend +2 assemble to the same
