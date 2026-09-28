@@ -141,7 +141,7 @@ struct ObjMMethods {
     /* +0x0C0 */ void (*updateCloseReadyFlag)(ObjM *self); /* ObjM__UpdateCloseReadyFlag: DispatchPadEvent's 0xC */
     /* +0x0C4 */ void (*clearCloseReadyFlag)(ObjM *self); /* ObjM__ClearCloseReadyFlag: DispatchPadEvent's 0x2C, TogglePause */
     /* +0x0C8 */ void (*closeAndNotifyD)(ObjM *self); /* ObjM__CloseAndNotifyD: DispatchPadEvent's 0x16 */
-    /* +0x0CC */ void (*closeAndNotifyC)(ObjM *self); /* ObjM__CloseAndNotifyC: no caller in C */
+    /* +0x0CC */ void (*closeAndNotifyC)(ObjM *self); /* ObjM__CloseAndNotify: no caller in C */
     /* +0x0D0 */ void (*advancePauseSetup)(ObjM *self); /* ObjM__AdvancePauseSetup: update and TogglePause */
     /* +0x0D4 */ void (*teardownPauseOverlay)(ObjM *self); /* ObjM__TeardownPauseOverlay: TogglePause, ExitSceneStyle, CloseAndNotifyC/D */
 };
@@ -212,7 +212,7 @@ void ObjM__NoOpSlotBC(void);
 void ObjM__UpdateCloseReadyFlag(ObjM *self);
 void ObjM__ClearCloseReadyFlag(ObjM *self);
 void ObjM__CloseAndNotifyD(ObjM *self);
-void ObjM__CloseAndNotifyC(ObjM *self);
+void ObjM__CloseAndNotify(ObjM *self);
 void ObjM__AdvancePauseSetup(ObjM *self);
 void ObjM__TeardownPauseOverlay(ObjM *self);
 

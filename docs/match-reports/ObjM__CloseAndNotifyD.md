@@ -19,7 +19,7 @@ void ObjM__CloseAndNotifyD(ObjM *self) {
 }
 ```
 
-Nearly identical to `ObjM__CloseAndNotifyC` (this round), differing only in the
+Nearly identical to `ObjM__CloseAndNotify` (this round), differing only in the
 literal passed to `slot30` (`0xD` here, `0xC` there).
 
 ## Residue

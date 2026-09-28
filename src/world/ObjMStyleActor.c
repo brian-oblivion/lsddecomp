@@ -1050,7 +1050,7 @@ void ObjM__CloseAndNotifyD(ObjM *self) {
     }
 }
 
-void ObjM__CloseAndNotifyC(ObjM *self) {
+void ObjM__CloseAndNotify(ObjM *self) {
     if (self->closeReady) {
         self->methods->teardownPauseOverlay(self);
         self->methods->notifyParents(self, OBJM_NOTIFY_CLOSE);

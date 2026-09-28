@@ -93,7 +93,7 @@ Local view fields named round 75 (ObjMStyleActor's `ObjM_3bb8c_k` only):
 `pauseSetupStep` (+0x080) and `closeReady` (+0x084), tier B, from the
 named ObjMStyleActor methods that read them (ObjM__AdvancePauseSetup counts
 +0x080; ObjM__UpdateCloseReadyFlag/ObjM__ClearCloseReadyFlag/
-ObjM__CloseAndNotifyC/D set, clear and test +0x084). The other eight
+ObjM__CloseAndNotify/D set, clear and test +0x084). The other eight
 fields stay `unkNN`: this ctor only stores arguments or constants into them.
 
 ## Proposed field names
@@ -104,7 +104,7 @@ ObjMStyleActor, not this unit, so not applied here):
 | field | proposed | tier | evidence |
 | --- | --- | --- | --- |
 | `ObjM::unk80` | `pauseSetupStep` | B | ObjM__AdvancePauseSetup's step counter; ObjM__UpdateCloseReadyFlag requires it non-zero; ObjM__ObjM zeroes it |
-| `ObjM::unk84` | `closeReady` | B | set by ObjM__UpdateCloseReadyFlag, cleared by ObjM__ClearCloseReadyFlag, gates ObjM__CloseAndNotifyC/D |
+| `ObjM::unk84` | `closeReady` | B | set by ObjM__UpdateCloseReadyFlag, cleared by ObjM__ClearCloseReadyFlag, gates ObjM__CloseAndNotify/D |
 
 
 ## Track 4 (2026-09-26, round 89, echo)

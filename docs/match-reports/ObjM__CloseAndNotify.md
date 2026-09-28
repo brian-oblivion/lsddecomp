@@ -1,4 +1,6 @@
-# ObjM__CloseAndNotifyC
+# ObjM__CloseAndNotify
+
+> Renamed from `ObjM__CloseAndNotifyC` on 2026-09-28 (tools/rename.py). Address 0x8005426c.
 
 > Renamed from `func_8005426C` on 2026-09-23 (tools/rename.py). Address 0x8005426c.
 
@@ -10,7 +12,7 @@ Same shape as `ObjM__CloseAndNotifyD` (this round), differing only in the litera
 passed to `slot30` (`0xC` here vs `0xD` there):
 
 ```c
-void ObjM__CloseAndNotifyC(ObjM *self) {
+void ObjM__CloseAndNotify(ObjM *self) {
     if (self->unk84) {
         self->methods->slotD4(self);
         self->methods->slot30(self, 0xC);
@@ -31,7 +33,7 @@ round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
-**ObjM__CloseAndNotifyC** -- tier B. Identical shape to `ObjM__CloseAndNotifyD`, differing only in the notify code (0xC). Same tier and same caveat.
+**ObjM__CloseAndNotify** -- tier B. Identical shape to `ObjM__CloseAndNotifyD`, differing only in the notify code (0xC). Same tier and same caveat.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
