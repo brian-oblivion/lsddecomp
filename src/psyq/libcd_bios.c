@@ -29,12 +29,12 @@
 extern s32 CD_status1;
 extern s32 CD_nopen;
 extern u8 CD_com;
-extern s32 D_8006D6C0[]; /* 0/1 flag table, selector 0..0x1B, same index family as D_8006D620 */
+extern s32 D_8006D6C0[]; /* 0/1 flag table, selector 0..0x1B, same index family as CD_comstr */
 extern s32 D_8006D7C0[]; /* 0/1 flag table, selector 0..0x1B */
 
 extern s32 CD_status; /* last status byte (resp[0]) */
 extern s32 CD_debug;
-extern char *D_8006D620[];
+extern char *CD_comstr[];
 
 /* CD-ROM controller port pointers. */
 extern volatile u8 *D_8006D8C0;
@@ -113,7 +113,7 @@ s32 getintr(void) {
     if (cause == 5) {
         puts(D_800109B0);
         if (CD_debug > 0) {
-            printf(D_800109BC, D_8006D620[CD_com], CD_status, CD_status1);
+            printf(D_800109BC, CD_comstr[CD_com], CD_status, CD_status1);
         }
     }
 
@@ -178,7 +178,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_sync);
 #if 0
 extern s32 CD_debug;
 extern u8 CD_com;
-extern const char *D_8006D620[];
+extern const char *CD_comstr[];
 extern const char *D_8006D6A0[];
 
 extern volatile u8 *D_8006D8C0;
@@ -236,7 +236,7 @@ s32 CD_ready(s32 arg0, s32 arg1)
         }
 timeout:
         puts(D_80010984);
-        printf(D_80010994, D_8008B3EC, D_8006D620[CD_com],
+        printf(D_80010994, D_8008B3EC, CD_comstr[CD_com],
                       table[state[0]], table[state[1]]);
         CD_flush();
         result = -1;
@@ -320,7 +320,7 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_ready);
 extern s32 CD_debug;
 extern u8 CD_mode;
 extern u8 CD_com;
-extern const char *D_8006D620[];
+extern const char *CD_comstr[];
 extern const char *D_8006D6A0[];
 extern u8 CD_pos[4];               /* 4-byte record, written here for cmd == 2 */
 extern s32 D_8006D740[];               /* flag table, indexed by cmd; cmd+0x40 reaches the "needs param" table's
@@ -369,12 +369,12 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
     s32 i;
 
     if (CD_debug >= 2) {
-        printf(D_80010A20, D_8006D620[arg0 & 0xFF]);
+        printf(D_80010A20, CD_comstr[arg0 & 0xFF]);
     }
 
     if (D_8006D840[arg0 & 0xFF] != 0 && arg1 == 0) {
         if (CD_debug > 0) {
-            printf(D_80010A28, D_8006D620[arg0 & 0xFF]);
+            printf(D_80010A28, CD_comstr[arg0 & 0xFF]);
         }
         return -2;
     }
@@ -430,7 +430,7 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
 timeout3:
             puts(D_80010984);
             src = table[state[1]];
-            printf(D_80010994, D_8008B3EC, D_8006D620[CD_com],
+            printf(D_80010994, D_8008B3EC, CD_comstr[CD_com],
                           table[state[0]], src);
             CD_flush();
             result = -1;
@@ -965,7 +965,7 @@ s32 CD_readsync(s32 arg0, s32 arg1) {
         /* MATCHING: &D_8008B3EC through a local pointer keeps retail's
          * unfolded lui/addiu for this argument; a plain reference folds. */
         pEC = &D_8008B3EC;
-        printf(D_80010994, *pEC, D_8006D620[CD_com], p6A0[idx0], p6A0[idx1]);
+        printf(D_80010994, *pEC, CD_comstr[CD_com], p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
         goto after_diag;
@@ -1041,7 +1041,7 @@ s32 CD_datasync(s32 arg0) {
     s32 *p6A0;
 
     D_8008B3E4 = VSync(-1) + 0x1E0;
-    p620 = D_8006D620;
+    p620 = CD_comstr;
     p6A0 = D_8006D6A0;
     p8D8 = D_8006D8D8;
     D_8008B3E8 = 0;

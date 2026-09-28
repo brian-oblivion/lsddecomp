@@ -14,7 +14,7 @@ Confirmed by two already-matched call sites in the sibling unit `libcd_bios.c`: 
 
 ## What this function does
 
-The CD-ROM "command" dispatcher: `arg0` is a command byte (`0`..`0x1B`ish, looked up by name in the shared `D_8006D620[]` string table), `arg1` is an optional parameter (pointer or scalar depending on command), `arg2` is an optional 8-byte output buffer, `arg3` is a "fire-and-forget" flag (skip waiting for completion).
+The CD-ROM "command" dispatcher: `arg0` is a command byte (`0`..`0x1B`ish, looked up by name in the shared `CD_comstr[]` string table), `arg1` is an optional parameter (pointer or scalar depending on command), `arg2` is an optional 8-byte output buffer, `arg3` is a "fire-and-forget" flag (skip waiting for completion).
 
 1. If verbosity (`CD_debug`) is `>= 2`, prints `"%s...\n"` with the command's name.
 2. Looks up `D_8006D840[cmd]` -- "does this command need a parameter" -- and if it does and `arg1 == 0`, prints (when verbosity is on) `"%s: no param\n"` and returns `-2`.
@@ -49,7 +49,7 @@ One real structural fix IS folded into the body and is worth keeping on record: 
 extern s32 CD_debug;
 extern u8 CD_mode;
 extern u8 CD_com;
-extern const char *D_8006D620[];
+extern const char *CD_comstr[];
 extern const char *D_8006D6A0[];
 extern u8 CD_pos[4];               /* 4-byte record, written here for cmd == 2 */
 extern s32 D_8006D740[];               /* flag table, indexed by cmd; cmd+0x40 reaches the "needs param" table's
@@ -101,12 +101,12 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
     s32 i;
 
     if (CD_debug >= 2) {
-        printf(D_80010A20, D_8006D620[arg0 & 0xFF]);
+        printf(D_80010A20, CD_comstr[arg0 & 0xFF]);
     }
 
     if (D_8006D840[arg0 & 0xFF] != 0 && arg1 == 0) {
         if (CD_debug > 0) {
-            printf(D_80010A28, D_8006D620[arg0 & 0xFF]);
+            printf(D_80010A28, CD_comstr[arg0 & 0xFF]);
         }
         return -2;
     }
@@ -161,7 +161,7 @@ s32 CD_cw(s32 arg0, s32 arg1, s32 arg2, s32 arg3)
             }
 timeout3:
             puts(D_80010984);
-            printf(D_80010994, D_8008B3EC, D_8006D620[CD_com],
+            printf(D_80010994, D_8008B3EC, CD_comstr[CD_com],
                           table[state[0]], table[state[1]]);
             CD_flush();
             result = -1;

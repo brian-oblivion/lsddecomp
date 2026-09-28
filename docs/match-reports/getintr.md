@@ -20,7 +20,7 @@ because no placed object covers it.
 
 The round-21 title said "219/337, register-identity residue, size matches
 retail exactly". Rebuilt verbatim (plus the two externs it used but did not
-declare, `CD_debug` and `D_8006D620`), it measured:
+declare, `CD_debug` and `CD_comstr`), it measured:
 
 - **159/337 raw, `.text` 0x54c (2 words LONG)**, whole image drifted;
 - `insertions 71 / deletions 71`, positional skeleton diffs 141.
@@ -73,7 +73,7 @@ before use, per the project's string-literal rule):
 - `D_800109D8` = `"CDROM: unknown intr"` -- the default-case message.
 - `D_800109B0` = `"DiskError: "`, `D_800109BC` = `"com=%s,code=(%02x:%02x)\n"`
   -- the cause==5 (error) diagnostic, printing a command-name string looked
-  up from `D_8006D620` (the same string table `func_80028CF8`, matched
+  up from `CD_comstr` (the same string table `func_80028CF8`, matched
   earlier this round, indexes) plus two raw status bytes.
 - `D_800109EC` = `"(%d)\n"` -- appended to the unknown-cause message.
 
@@ -91,7 +91,7 @@ missed condition or wrong constant anywhere):
    rest of an 8-byte stack buffer if fewer than 8 arrived.
 3. Re-arm the ports (write 1/7/7 to `D_8006D8C0`/`CC`/`C8`).
 4. Unless cause==3 with a false `D_8006D7C0[CD_com]` lookup (a per-mode
-   flag table, same selector family as `D_8006D620`/`D_6006D6A0`), update
+   flag table, same selector family as `CD_comstr`/`D_6006D6A0`), update
    an error counter (`CD_nopen`) when a flag bit turns on across the
    read, latch the two response bytes into `CD_status`/`CD_status1`, and
    compute a `flags` value (`resp[0] & 0x1D`) used by cases 1-3 below.

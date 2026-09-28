@@ -42,7 +42,7 @@ Two real fixes ARE folded into the body below and are worth keeping on record:
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80024E64 -> CheckCallback, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
 extern s32 CD_debug;
 extern u8 CD_com;
-extern const char *D_8006D620[];
+extern const char *CD_comstr[];
 extern const char *D_8006D6A0[];
 
 extern volatile u8 *D_8006D8C0;
@@ -104,7 +104,7 @@ s32 CD_ready(s32 arg0, s32 arg1)
         }
 timeout:
         puts(D_80010984);
-        printf(D_80010994, D_8008B3EC, D_8006D620[CD_com],
+        printf(D_80010994, D_8008B3EC, CD_comstr[CD_com],
                       table[state[0]], table[state[1]]);
         CD_flush();
         result = -1;

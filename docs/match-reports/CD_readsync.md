@@ -202,9 +202,9 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
   different string (`"CD_datasync"`, `D_80010AE0`).
 - On timeout, prints `"CD timeout: "` then `"%s:(%s) Sync=%s, Ready=%s\n"`
   (`D_80010994`, confirmed 4-`%s` format via `asm/data/FD8.rodata.s`) with
-  args `(D_8008B3EC, D_8006D620[D_6006D61D], D_8006D6A0[D_8006D8D8[0]],
+  args `(D_8008B3EC, CD_comstr[D_6006D61D], D_8006D6A0[D_8006D8D8[0]],
   D_8006D6A0[D_8006D8D8[1]])`, calls `CD_flush()`, and returns -1.
-  **This means `D_8006D620`/`D_8006D6A0` are STRING-POINTER tables (each
+  **This means `CD_comstr`/`D_8006D6A0` are STRING-POINTER tables (each
   element is a `char *`, stored as `s32`), not raw values — worth carrying
   forward for whoever next touches `CD_datasync`, see the anomaly note
   below.**
@@ -284,7 +284,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
         idx0 = p8D8[0];
         idx1 = p8D9[0];
         __asm__("");
-        func_80012C20(D_80010994, D_8008B3EC, D_8006D620[CD_com],
+        func_80012C20(D_80010994, D_8008B3EC, CD_comstr[CD_com],
                       p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
@@ -415,7 +415,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
    $a0,$a0,2`), and reuses that shifted value ~6 instructions later as the
    address for `p6A0[p8D8[0]]`'s dereference. Every C form tried here
    (direct `p6A0[p8D8[0]]` inline, and hoisting `idx0 = p8D8[0];` into a
-   named local used at both the outer `D_8006D620` index computation and
+   named local used at both the outer `CD_comstr` index computation and
    the `p6A0[idx0]` access) instead RE-LOADS the byte from `$s3`+0 a
    second time at the point of the `p6A0[idx0]` access, rather than
    reusing a value already sitting in a register. **A bare `__asm__("")`
@@ -697,7 +697,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
          * a plain `D_8008B3EC` reference here compiles FOLDED instead.
          * See this report's round-36 entry. */
         pEC = &D_8008B3EC;
-        printf(D_80010994, *pEC, D_8006D620[CD_com],
+        printf(D_80010994, *pEC, CD_comstr[CD_com],
                p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
@@ -920,7 +920,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
          * unfolded lui/addiu addressing retail uses for this argument;
          * a plain `D_8008B3EC` reference here compiles FOLDED instead. */
         pEC = &D_8008B3EC;
-        printf(D_80010994, *pEC, D_8006D620[CD_com],
+        printf(D_80010994, *pEC, CD_comstr[CD_com],
                p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
