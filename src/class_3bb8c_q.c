@@ -64,8 +64,8 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, s16 *ratios) {
     short2 = (s16)ratio2;
 
     if (self->unk58 != 0) {
-        self->unk5C = ((s16)ratio1 * self->unk5C) >> 12;
-        self->unk60 = ((s16)ratio2 * self->unk60) >> 12;
+        self->accumScaleX = ((s16)ratio1 * self->accumScaleX) >> 12;
+        self->accumScaleY = ((s16)ratio2 * self->accumScaleY) >> 12;
     } else {
         self->sprite.scalex = short1;
         self->sprite.scaley = short2;

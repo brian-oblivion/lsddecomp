@@ -35,7 +35,7 @@
  *                  CLUT Sprite's reset took from the texture.
  *   +0x048 updateScale  VariantSprite__UpdateScale: two s16 num/den ratios
  *                  (x, y) into sprite.scalex/scaley as 20.12 fixed point,
- *                  or, while Sprite's unk58 is set, into unk5C/unk60.
+ *                  or, while Sprite's unk58 is set, into accumScaleX/Y.
  *   +0x098 update  VariantSprite__Update, empty, as Sprite__Update is (its
  *                  own copy in ROM).
  *

@@ -162,3 +162,15 @@ decision); those lines were left as the tool wrote them.
 
 Its `s16 *ratios` is two `Ratio16` pairs; retyping it is proposed for the
 class's track 7 pass (see `VariantSprite__SetVariantClut`'s report).
+
+## Track 7 (2026-09-28, round 101, echo)
+
+### Naming
+
+| name | tier | evidence |
+| --- | --- | --- |
+| Sprite fields `accumScaleX` / `accumScaleY` (were `unk5C` / `unk60`, `+0x05C` / `+0x060`) | B | Mechanics only: while `unk58` is non-zero this method multiplies each by its axis's 20.12 ratio (`(ratio * v) >> 12`) and stores it back, in place of writing `sprite.scalex/scaley`, so the ratios accumulate into them. Renaming them in `SPRITE_FIELDS` (include/Sprite.h) broke only this unit in the default build and under `-DNON_MATCHING`, so this is their whole accessor set: nothing else reads or writes them, `Viewport__DrawNode` included. What the accumulated value is for is not established (nothing found sets `unk58` non-zero), hence B. |
+
+`unk58` itself is also written by `Sprite__Reset` (src/Sprite.c, outside
+this job), so its name is proposed, not applied: see "Proposed field
+names" below.
