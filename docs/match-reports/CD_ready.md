@@ -10,7 +10,7 @@ Unit `libcd_bios`. Runner echo, round 26. Carved this round; no prior report exi
 s32 CD_ready(s32 arg0, s32 arg1);
 ```
 
-Confirmed by the already-matched call site `src/libcd_bios.c:115` (`return CD_ready(arg0, arg1);`).
+Confirmed by the already-matched call site `src/psyq/libcd_bios.c:115` (`return CD_ready(arg0, arg1);`).
 
 ## What this function does
 
@@ -197,7 +197,7 @@ ret1:
 > `func_8002B94C` cause "suspect" without resolving why. It resolves cleanly:
 > `func_8002B94C` is **`CD_newmedia`**, Sony's code, linked from
 > `lib/libcd/iso9660.o` and reclassified in round 34 --
-> `src/libcd_bios.c`'s header comment records the conversion. It was never
+> `src/psyq/libcd_bios.c`'s header comment records the conversion. It was never
 > a game stall, so **no source shape ever reached those bytes** and there is
 > no "documented `func_8002B94C` cause" to match against. The dead-code
 > elimination of an `andi` after an already-zero-extending `lbu` is a real
@@ -208,7 +208,7 @@ ret1:
 >
 > Note the `CD_readsync` half of that same bullet is the OTHER exit and is
 > fine: that one was matched as game C (174/174, round 39), so its precedent
-> is real and complete -- go read the C in `src/libcd_bios.c` rather than
+> is real and complete -- go read the C in `src/psyq/libcd_bios.c` rather than
 > the report's summary of it.
 
 Same stale-symbol-name hazard as `CD_sync` (see that report's round-35
@@ -312,5 +312,5 @@ above), not a redundant-instruction-elision on address computation or
 staleness the way `CD_cw`'s was -- the two residues only LOOKED
 similar ("something about `D_8006D8D8` accesses"), and the lever that
 helped one function did nothing for the other. Reverted immediately;
-`src/libcd_bios.c` confirmed back to its committed state
+`src/psyq/libcd_bios.c` confirmed back to its committed state
 (`build-and-verify.sh` clean, `git status` empty) before moving on.

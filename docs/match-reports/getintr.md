@@ -4,7 +4,7 @@
 
 REVISITED, round 70: MATCHED (337/337, whole-image SHA1 green); names/types not relevant.
 
-Unit: `src/libcd_bios.c`. 337 words. Owns `jtbl_800109F8` (rodata sub-slot
+Unit: `src/psyq/libcd_bios.c`. 337 words. Owns `jtbl_800109F8` (rodata sub-slot
 `[0x11F8, .rodata, libcd_bios]`), which the `switch` lowering generates and
 which matches with no hand-authoring.
 
@@ -117,7 +117,7 @@ existing forward declaration (`extern s32 getintr(void);`).
 
 ## The source as matched
 
-It is live in `src/libcd_bios.c`. The load-bearing shapes:
+It is live in `src/psyq/libcd_bios.c`. The load-bearing shapes:
 
 ```c
 static __inline__ void copy8(u8 *d, const u8 *s)

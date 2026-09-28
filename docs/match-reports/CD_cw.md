@@ -341,7 +341,7 @@ shape (`src++` per iteration), so nothing new was tried here this round.
 genuine, oracle-verified 3-word gain from a single permuter-found lever.**
 The remaining 1-word gap is the same already-characterized,
 already-negative-tested residue class this report named before the
-search. `INCLUDE_ASM` restored; preserved body in `src/libcd_bios.c`
+search. `INCLUDE_ASM` restored; preserved body in `src/psyq/libcd_bios.c`
 updated to this round's improved version. Given the remaining residue is
 explicitly the kind DECOMPILATION_LEARNINGS says not to spend block-order
 attempts on, a SECOND permuter search seeded from this improved body would

@@ -157,7 +157,7 @@ corrected model.
 **Kept, not reverted, and the choice is deliberate.** Reverting would discard a
 byte-verified match on the strength of a style rule; keeping it silently would
 plant a construct that reads as a bug and invites copying. So it stays, with
-the defect named on the construct itself in `src/libcd_bios.c`, the eleven
+the defect named on the construct itself in `src/psyq/libcd_bios.c`, the eleven
 dead ends recorded here so they are not re-run, and the mis-modelling lead
 written down. **Whether a duplicate-arm form may stand in `src/` at all is a
 project-policy question for the operator, not the head's to settle** -- this

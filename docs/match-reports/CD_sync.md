@@ -10,7 +10,7 @@ Unit `libcd_bios`. Runner echo, round 26. Carved this round; no prior report exi
 s32 CD_sync(s32 arg0, s32 arg1);
 ```
 
-Confirmed by two already-matched call sites: `src/libcd_bios.c:110` (`return CD_sync(arg0, arg1);`) and `src/libcd_bios.c`'s own sibling `CD_cw` (`CD_sync(0, 0);`).
+Confirmed by two already-matched call sites: `src/psyq/libcd_bios.c:110` (`return CD_sync(arg0, arg1);`) and `src/psyq/libcd_bios.c`'s own sibling `CD_cw` (`CD_sync(0, 0);`).
 
 ## What this function does
 
@@ -186,7 +186,7 @@ those six are now stale -- SDK-object conversion rounds between 26 and 35
 renamed them to their real Sony symbols: `func_80025900` -> `VSync`,
 `func_80025AE4` -> `puts`, `func_80024E64` -> `CheckCallback`,
 `func_80012C20` -> `printf` (all confirmed via `config/symbols.slps01556.lsdde.txt`
-and already reflected in `src/libcd_bios.c`'s own local declarations for
+and already reflected in `src/psyq/libcd_bios.c`'s own local declarations for
 the same globals). Spliced verbatim with the round-26 names, this body would
 not have linked; that was never tested, since round 26's own build always
 had all three functions as `INCLUDE_ASM` together after the stall.
@@ -270,7 +270,7 @@ this same round (where a length-exact state was adopted despite a raw-
 match tradeoff, because the structural gap count did not worsen), here
 the length gap did not close at all -- it merely changed sign, and the
 mechanism achieving the raw-match improvement is pushing AGAINST the
-documented root cause rather than around it. Reverted; `src/libcd_bios.c`
+documented root cause rather than around it. Reverted; `src/psyq/libcd_bios.c`
 confirmed back to its committed state (`build-and-verify.sh` clean,
 `git status` empty) before moving on. Filing as STALL, figures unchanged
 from the round-35 addendum (162/161 words LONG, same residue).

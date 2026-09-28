@@ -737,7 +737,7 @@ real oracle (round 19: the winning candidate retypes the global `D_8006D8D8`
 corrupts the already-matched `CD_flush`; reverted, re-confirmed round
 20) or UNSOUND (round 49's 75-score candidate reuses `pd9` across a
 loop-carried stale read, a real logic bug the scorer cannot see). No
-permuter output was ever adopted. Placed in `src/libcd_bios.c` under
+permuter output was ever adopted. Placed in `src/psyq/libcd_bios.c` under
 `#ifdef NON_MATCHING`, using this report's own corrected `D_8006D8D8[0]`
 spelling (runner delta's correction, identical `--debug` score to the
 bare-array form) rather than the original body's implicit-truncation

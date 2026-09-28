@@ -117,7 +117,7 @@ segments:
       # standalone. Survey before moving a boundary here: of the 483 words in
       # the original 0xFD8..0x1764 slot, 179 are vram addresses inside
       # code_179d8's own text and the rest are ASCII.
-      - [0x11F8, .rodata, libcd_bios]
+      - [0x11F8, .rodata, psyq/libcd_bios]
       - [0x120C, rodata]  # was 'code_179d8_mid remainder'; that text
                           # segment is now the code_179d8_n C unit, which
                           # owns no jump table, so this slot stays
@@ -725,7 +725,7 @@ segments:
       # code_179d8_b: what is left of window [60..79] after libcd/sys took its
       # first 19 functions -- 0x19C78..0x1A1BC, ONE function (func_80029478),
       # which still owns jtbl_800109F8 and therefore the 0x11F8 rodata attach.
-      - [0x19C78, c, libcd_bios]
+      - [0x19C78, c, psyq/libcd_bios]
       # code_179d8_n: functions 80..82 of the original monolith, 0x1A1BC..
       # 0x1AB78 (3 functions).  Carved round 26 (2026-09-09) out of what was
       # the `code_179d8_mid` UNCARVED remainder -- renamed on carve because
