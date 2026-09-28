@@ -1464,9 +1464,8 @@ DreamColors DreamSys__GetDreamColor(DreamSys *self) {
 }
 
 /* Classifies each mood axis as low (< -3), middle or high (>= 4) and looks
-   the pair up in the 3x3 sDreamColorTable, [dynamic][upper]. MATCHING: the
-   lookup goes through a row pointer; a flat `[d * 3 + u]` swaps two
-   registers. */
+   the pair up in the 3x3 sDreamColorTable, [dynamic][upper]. */
+/* MATCHING: the lookup goes through a row pointer, not a flat `[d * 3 + u]`. */
 DreamColors CalcDreamColor(MoodGraphPoint *mood) {
     MoodGraphPoint local;
     s8 *p;

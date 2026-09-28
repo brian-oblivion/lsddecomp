@@ -93,9 +93,8 @@ void CdStream__SetRing(CdStream *self, u32 *ring, u32 size) {
 /* Only while idle and with a ring set: looks up "\<data directory><name>;1",
  * retrying up to `tries` more times (forever if negative), counts the file's frames,
  * sets up the CD audio mix and seeks to the file. Returns 0 once seeking, or
- * when another stream owns the drive; 1 otherwise.
- * MATCHING: the whole body nests in `if (idle) { ...; return 0; } return 1;`;
- * flat early returns merge or reorder the two `return 1` paths. */
+ * when another stream owns the drive; 1 otherwise. */
+/* MATCHING: the body nests in `if (idle) { ...; return 0; } return 1;`, not flat early returns. */
 s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
     char path[CDSTREAM_PATH_SIZE];
     s32 n;
