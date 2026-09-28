@@ -23,7 +23,7 @@ this unit as the shared "give me somewhere to land" primitive (already
 visible at several now-matched call sites: `Test4StageTransition`,
 `Test4InstantTeleporters`'s trigger tables, `DreamSys__DynamicLink`).
 
-## `D_80087F34` is NOT a second table -- same discovery as `sCardinalRotations`/`CARDINAL_ANGLES`
+## `D_80087F34` is NOT a second table -- same discovery as `sCardinalRotations`/`sCardinalAngles`
 
 The retail disassembly references `D_80087F34` for reading the `z` field of
 the chosen `sSpawnPosAdjust[adjustment]` entry, looking like a second,

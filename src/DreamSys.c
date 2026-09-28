@@ -1583,7 +1583,7 @@ typedef struct DirectionTableEntry {
     u16 pad2[5];
 } DirectionTableEntry;
 
-extern DirectionTableEntry CARDINAL_ANGLES[];
+extern DirectionTableEntry sCardinalAngles[];
 
 /* Defined below, in ROM order. */
 extern s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading);
@@ -1626,7 +1626,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
 s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading) {
     s16 diff;
 
-    diff = rotation->heading - CARDINAL_ANGLES[heading].angle;
+    diff = rotation->heading - sCardinalAngles[heading].angle;
     if (diff >= 181) {
         diff -= 360;
     } else if (diff < -180) {

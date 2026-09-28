@@ -35,9 +35,9 @@ extern u8 *TUNNEL_EXIT_HEADINGS[];
 
 `sCardinalRotations` is more subtle: it is a `DirectionTableEntry`-strided (12-byte)
 table whose first element sits exactly 4 bytes before the SEPARATELY
-referenced `CARDINAL_ANGLES` (the angle table `IsHeadingAligned` already indexes,
+referenced `sCardinalAngles` (the angle table `IsHeadingAligned` already indexes,
 matched earlier this round's queue). splat drew a symbol boundary there
-because `CARDINAL_ANGLES` is independently referenced elsewhere, not because the
+because `sCardinalAngles` is independently referenced elsewhere, not because the
 underlying retail data is genuinely two different tables. This function
 only ever ADDRESS-TAKES an element (`&sCardinalRotations[i]`, storing the pointer
 into an output parameter) and never dereferences one, so the element type
@@ -50,7 +50,7 @@ extern DirectionTableEntry sCardinalRotations[];
 ```
 
 Also moved the `DirectionCheckArg` typedef, the `DirectionTableEntry`
-typedef, `extern DirectionTableEntry CARDINAL_ANGLES[];`, and a new forward
+typedef, `extern DirectionTableEntry sCardinalAngles[];`, and a new forward
 declaration `extern s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1);` to
 BEFORE `DreamSys__CheckTunnelHeading` (they previously sat between it and
 `IsHeadingAligned`'s own definition) -- `DreamSys__CheckTunnelHeading` needs `DirectionCheckArg`
@@ -167,8 +167,8 @@ Replaced in the source by a comment that says what the code does; kept here as w
 
 ```c
 /* The 12-byte-stride table whose first element sits 4 bytes before the
-   separately-referenced `CARDINAL_ANGLES` -- splat drew the boundary there
-   because `CARDINAL_ANGLES` is independently referenced, not because the
+   separately-referenced `sCardinalAngles` -- splat drew the boundary there
+   because `sCardinalAngles` is independently referenced, not because the
    underlying data is two different tables. Round 66 types it
    `RotationRatios` (include/DreamSys.h) rather than as a stride-only
    placeholder: every entry is three {numerator, denominator} degree ratios
