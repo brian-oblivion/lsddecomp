@@ -3354,7 +3354,7 @@ extern void *BMemPMgrAlloc(s32 size);
  * byte and one highlight each. */
 #define GRAPH_SCORE_MOOD_COUNT 4
 
-/* A plotted dot's side, gGraphPointSize's {10, 10}: PopulateGraphPoints
+/* A plotted dot's side, sGraphPointSize's {10, 10}: PopulateGraphPoints
  * subtracts half of it so each dot is centred on its mood. */
 #define GRAPH_POINT_SIZE 10
 
@@ -3435,7 +3435,7 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
  * (include/BoxFill.h).
  * MATCHING: signed, and exactly three bytes -- the whole-struct copy of `rgb`
  * below is three lb/sb pairs. */
-extern s32 gGraphPointSize[2];
+extern s32 sGraphPointSize[2];
 extern BoxFillRgb sGraphPointNewestColor;
 extern BoxFillRgb sGraphPointBaseColor;
 
@@ -3443,12 +3443,12 @@ void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     BoxFillRgb rgb;
     s32 i;
 
-    self->points[0] = New_BoxFill(gGraphPointSize, &sGraphPointNewestColor, 0);
+    self->points[0] = New_BoxFill(sGraphPointSize, &sGraphPointNewestColor, 0);
     rgb = sGraphPointBaseColor;
     for (i = 1; i < ARRAY_COUNT(self->points); i++) {
         s32 step;
 
-        self->points[i] = New_BoxFill(gGraphPointSize, &rgb, 0);
+        self->points[i] = New_BoxFill(sGraphPointSize, &rgb, 0);
         step = 1;
         if (i < 7) {
             step = 20;

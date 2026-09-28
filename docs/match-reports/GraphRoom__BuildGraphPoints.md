@@ -45,7 +45,7 @@ typedef struct GraphPointColor {
     s8 g;
     s8 b;
 } GraphPointColor;
-extern u8 gGraphPointSize;
+extern u8 sGraphPointSize;
 extern u8 sGraphPointNewestColor;
 extern GraphPointColor sGraphPointBaseColor;
 extern D_80087AACEntry *New_BoxFill(void *a0, void *a1, s32 a2);
@@ -54,12 +54,12 @@ void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
     GraphPointColor rgb;
     s32 i;
 
-    self->unk_0xA8[0] = New_BoxFill(&gGraphPointSize, &sGraphPointNewestColor, 0);
+    self->unk_0xA8[0] = New_BoxFill(&sGraphPointSize, &sGraphPointNewestColor, 0);
     rgb = sGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->unk_0xA8[i] = New_BoxFill(&gGraphPointSize, &rgb, 0);
+        self->unk_0xA8[i] = New_BoxFill(&sGraphPointSize, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;
@@ -72,10 +72,10 @@ void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
 }
 ```
 
-`New_BoxFill` is called with `&gGraphPointSize` (its own address, opaque,
+`New_BoxFill` is called with `&sGraphPointSize` (its own address, opaque,
 never dereferenced by this function) as the first argument -- the
-salvaged snapshot below passed `gGraphPointSize` bare (without `&`), which
-would only compile/link correctly if `gGraphPointSize` were itself already a
+salvaged snapshot below passed `sGraphPointSize` bare (without `&`), which
+would only compile/link correctly if `sGraphPointSize` were itself already a
 pointer-typed global; declaring it as a plain byte and taking its address
 explicitly is the safer, self-consistent reading and is what was used
 here.
@@ -165,12 +165,12 @@ void GraphRoom__BuildGraphPoints(D_80087AACObj *self) {
     GraphPointColor rgb;
     s32 i;
 
-    self->unk_0xA8[0] = New_BoxFill(gGraphPointSize, &sGraphPointNewestColor, 0);
+    self->unk_0xA8[0] = New_BoxFill(sGraphPointSize, &sGraphPointNewestColor, 0);
     rgb = sGraphPointBaseColor;
     for (i = 1; i < 100; i++) {
         s32 dec;
 
-        self->unk_0xA8[i] = New_BoxFill(gGraphPointSize, &rgb, 0);
+        self->unk_0xA8[i] = New_BoxFill(sGraphPointSize, &rgb, 0);
         dec = 1;
         if (i < 7) {
             dec = 0x14;
@@ -200,7 +200,7 @@ comment); also allocates the 4-byte `matchedDayIndices` scratch buffer
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-The points are New_BoxFill boxes (include/BoxFill.h): size &gGraphPointSize, colour &sGraphPointNewestColor then the fading `rgb`, priority 0. Zero bytes.
+The points are New_BoxFill boxes (include/BoxFill.h): size &sGraphPointSize, colour &sGraphPointNewestColor then the fading `rgb`, priority 0. Zero bytes.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__BuildGraphPoints` -> `GraphRoom__BuildGraphPoints`
 
@@ -215,7 +215,7 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 ## Track 7 (2026-09-27, round 97, delta)
 
-- **Naming: `D_8008ABAC` -> `gGraphPointSize`** (tier A): two sdata words `{10, 10}`, New_BoxFill's size argument (BoxFill reads the low halfwords into boxW/boxH, include/BoxFill.h `BoxFillSize`) for all 100 dots. Its only user. Now declared `s32 gGraphPointSize[2]` and passed bare instead of `&` of a `u8`: zero bytes changed.
+- **Naming: `D_8008ABAC` -> `sGraphPointSize`** (tier A): two sdata words `{10, 10}`, New_BoxFill's size argument (BoxFill reads the low halfwords into boxW/boxH, include/BoxFill.h `BoxFillSize`) for all 100 dots. Its only user. Now declared `s32 sGraphPointSize[2]` and passed bare instead of `&` of a `u8`: zero bytes changed.
 - **Naming: `D_8008ABB4` -> `sGraphPointNewestColor`** (tier A): sdata `FF 00 00`, red, the colour of `points[0]`, which PopulateGraphPoints plots from the newest logged day (`currentDay - 1`) and Update blinks. Its only user. Declared `GraphPointColor` instead of `u8`: zero bytes changed.
 - Local `dec` -> `step`; the loop bound is `ARRAY_COUNT(self->points)`; the darkening step 0x14 is decimal 20; `matchedDayIndices` is `BMemPMgrAlloc(GRAPH_SCORE_MOOD_COUNT * sizeof(s8))`, one byte per gGraphScoreMoods entry.
 
