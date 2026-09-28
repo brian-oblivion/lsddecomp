@@ -45,7 +45,7 @@ void TickCdStateMachine(void)
     goto L_end;
 
 L_state1:
-    if (CdControlF(2, (u8 *)gCdSeekParam + 0x14) == 0)
+    if (CdControlF(2, (u8 *)sCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -171,8 +171,8 @@ encodings the tree node gets. The read-wait case matches either as
 `if (result == -1) {...; break;} if (result == 0) Reset...; goto unlock;`
 or with the tests nested the other way.
 
-Other changes, zero bytes: `CdControlF(CdlSetloc, (u_char *)&gCdSeekParam->pos)`
-(was `CdControlF(2, (u8 *)gCdSeekParam + 0x14)`), `CdlModeSpeed` for
+Other changes, zero bytes: `CdControlF(CdlSetloc, (u_char *)&sCdSeekParam->pos)`
+(was `CdControlF(2, (u8 *)sCdSeekParam + 0x14)`), `CdlModeSpeed` for
 CdRead's 0x80, `CD_SYNC_POLL` for CdSync/CdReadSync's mode 1,
 `CD_WAIT_TIMEOUT` as decimal 601, and the Cd* prototypes from Sony's
 `<libcd.h>` instead of local ones.

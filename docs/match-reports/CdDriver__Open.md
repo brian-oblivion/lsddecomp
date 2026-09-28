@@ -29,7 +29,7 @@ typedef struct Rec80028448 {
 
 extern void *FindCdFileEntry(char *arg0);
 extern s32 FindCdFileIndex(char *arg0);
-extern void *gCdSeekParam;
+extern void *sCdSeekParam;
 extern s32 gCdTickStep;
 
 extern void OpenCdFile(Obj80027480 *self, char *suffix);
@@ -61,12 +61,12 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
             StartCdOperation(1, 1);
             if (sCdAsyncEnabled != 0) {
                 rec = FindCdFileEntry(suffix);
-                gCdSeekParam = rec;
+                sCdSeekParam = rec;
                 if (rec == NULL) {
                     return;
                 }
                 self->unk18 = rec->unk14;
-                temp = ((Rec80028448 *)gCdSeekParam)->unk18;
+                temp = ((Rec80028448 *)sCdSeekParam)->unk18;
                 gCdTickStep = 1;
                 self->unk0C = 1;
                 self->unk1C = temp;
@@ -114,10 +114,10 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
 
 3. **The `NEW STALL CLASS` from round 44 (`Viewport__InitDefaults`): retail
    recomputes/re-reads an address our GCC CSEs away.** After
-   `gCdSeekParam = rec;`, retail reloads `gCdSeekParam` from memory a second
-   time (`lw v0,%gp_rel(gCdSeekParam)`) to read `->unk18`, instead of reusing
+   `sCdSeekParam = rec;`, retail reloads `sCdSeekParam` from memory a second
+   time (`lw v0,%gp_rel(sCdSeekParam)`) to read `->unk18`, instead of reusing
    the register that still holds the identical value (`rec`/`a2`). My first
-   attempt wrote `self->unk1C = ((Rec80028448 *)gCdSeekParam)->unk18;` as the
+   attempt wrote `self->unk1C = ((Rec80028448 *)sCdSeekParam)->unk18;` as the
    LAST statement in the branch (after the two flag stores
    `gCdTickStep = 1; self->unk0C = 1;`), and GCC's CSE collapsed the global
    read into reusing `rec`'s register anyway -- 1 word short.
@@ -135,7 +135,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
    EXCLUSIVE `if`/`else` branches can still perturb register allocation in
    the OTHER branch, even though the two uses never execute on the same
    path.** My first draft used a single `s32 v0;` for both (a) the
-   `gCdSeekParam` reload above and (b) the `CdSync` retry loop's return value
+   `sCdSeekParam` reload above and (b) the `CdSync` retry loop's return value
    in the sibling `else` branch. That produced an EXTRA `move v1,v0` right
    after the `CdSync` call, with the loop's own comparisons then reading
    `$v1` -- retail reads `$v0` directly, with no move at all (like

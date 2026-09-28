@@ -78,7 +78,7 @@ void CdDriver__CancelRequests(CdDriver *self);              /* +0x074 cancelRequ
 /* One record of the file table: a name resolved once by ResolveFileEntries
  * (CdSearchFile on BuildCdFilePath(name)) and then reused as a seek target.
  * FindCdFileEntry / FindCdFileIndex / GetCdFileEntry walk it at this 0x1C
- * stride; the state machines seek to `pos` of the entry gCdSeekParam holds. */
+ * stride; the state machines seek to `pos` of the entry sCdSeekParam holds. */
 typedef struct CdFileEntry {
     /* +0x00 */ char name[0x14];
     /* +0x14 */ CdlLOC pos;
@@ -159,10 +159,10 @@ extern s32 gFileTableCount;            /* SetFileTableCount */
 extern s32 sCdIdle;                    /* 0/1 */
 extern s32 sCdOperation;               /* StartCdOperation's op, GetCdOperation's result */
 extern s32 gCdState;                   /* the state machine's phase */
-extern CdFileEntry *gCdSeekParam;      /* the state machines seek to &gCdSeekParam->pos */
+extern CdFileEntry *sCdSeekParam;      /* the state machines seek to &sCdSeekParam->pos */
 extern s32 sCdReadSectorCount;         /* CdRead sector count */
 extern void *sCdReadBuffer;            /* CdRead target buffer */
-extern CdFileEntry *sCdSavedSeekParam; /* LoadFile's saved gCdSeekParam */
+extern CdFileEntry *sCdSavedSeekParam; /* LoadFile's saved sCdSeekParam */
 extern CdRequestNode *sCdRequestQueue; /* list head */
 extern s32 gCdTickStep;                /* CD_TICK_* */
 extern s32 gCdUseVSyncCallback;

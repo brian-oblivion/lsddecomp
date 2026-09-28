@@ -63,7 +63,7 @@ confirming "find the file's table entry by name" as the purpose.
 The CD driver's shared globals and records are now declared once, in
 `include/CdDriver.h`, and this body uses that one reading: the walk is `CdFileEntry *cur; cur++` over `cur->name` (was `char *` stepped by 0x1C). The
 global's type comes from its accessors (`gFileTable` is walked at the 0x1C
-`CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
+`CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
 
 ## Round 101 (track 7 polish)

@@ -43,7 +43,7 @@ struct Obj6D4E8_D70 {
 extern s32 sCdRequestQueue;
 extern s32 sCdIdle;
 extern s32 sCdSavedSeekParam;
-extern s32 gCdSeekParam;
+extern s32 sCdSeekParam;
 extern void CdFlush(void);
 extern void ResetCdStateMachine(void); /* CdDriver: reset the state machine */
 extern void FreeCdRequestNode(CdRequest_D70 *req); /* CdDriver: unlink+free */
@@ -67,7 +67,7 @@ void CdDriver__CancelRequests(Obj6D4E8_D70 *self)
             ResetCdStateMachine();
             saved = sCdSavedSeekParam;
             sCdSavedSeekParam = 0;
-            gCdSeekParam = saved;
+            sCdSeekParam = saved;
         }
 
         for (node = (CdRequest_D70 *)sCdRequestQueue; node != NULL; node = next) {
@@ -94,9 +94,9 @@ three-condition guard (head node's owner is `self`, head node's `active` flag (`
 flag is set, and `sCdIdle == 0`) triggers `CdFlush()` +
 `ResetCdStateMachine()` (both cross-unit — `ResetCdStateMachine` from foxtrot's
 `CdDriver`) and a load-clear-store handoff between `sCdSavedSeekParam` and
-`gCdSeekParam` (needs an explicit temp: the store order is `sCdSavedSeekParam`
-cleared BEFORE the old value lands in `gCdSeekParam`, not the natural-looking
-`gCdSeekParam = sCdSavedSeekParam; sCdSavedSeekParam = 0;`, which would store in the
+`sCdSeekParam` (needs an explicit temp: the store order is `sCdSavedSeekParam`
+cleared BEFORE the old value lands in `sCdSeekParam`, not the natural-looking
+`sCdSeekParam = sCdSavedSeekParam; sCdSavedSeekParam = 0;`, which would store in the
 opposite order). Then, regardless of that inner guard, a loop walks the
 whole list unlinking every node whose `owner == self` via
 `FreeCdRequestNode` (also `CdDriver`) and decrementing `self->pendingRequests` per
@@ -189,7 +189,7 @@ which is the procedure working in the direction where it can work.
 The CD driver's shared globals and records are now declared once, in
 `include/CdDriver.h`, and this body uses that one reading: the node is `CdRequestNode` (was the local `CdRequest_D70` view), `owner` is compared as a `struct Class6D4E8 *`, and the saved seek target is a `CdFileEntry *`. The
 global's type comes from its accessors (`gFileTable` is walked at the 0x1C
-`CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
+`CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
 
 

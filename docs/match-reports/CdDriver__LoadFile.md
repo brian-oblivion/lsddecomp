@@ -45,9 +45,9 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
     if (self->unk28 != 0) {
         if (sCdBusy == 0 && (self->unk10 == NULL || self->unk20 != 0)) {
             StartCdOperation(4, 1);
-            sCdSavedSeekParam = gCdSeekParam;
+            sCdSavedSeekParam = sCdSeekParam;
             rec = FindCdFileEntry(arg1);
-            gCdSeekParam = rec;
+            sCdSeekParam = rec;
             if (rec == NULL) {
                 return;
             }
@@ -75,7 +75,7 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
                 } else {
                 retry:
                     do {
-                        CdControl(2, (u8 *)gCdSeekParam + 0x14, 0);
+                        CdControl(2, (u8 *)sCdSeekParam + 0x14, 0);
                         do {
                             v1 = CdSync(0, 0);
                         } while (v1 == 0);

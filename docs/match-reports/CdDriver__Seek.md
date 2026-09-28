@@ -10,7 +10,7 @@
 
 ```c
 extern u8 sCdSeekLoc[8];
-extern void *gCdSeekParam;
+extern void *sCdSeekParam;
 extern s32 gCdTickStep;
 
 extern s32 GetCdFileSize(Obj80027480 *self);
@@ -38,7 +38,7 @@ s32 CdDriver__Seek(Obj80027480 *self, u32 arg1, s32 arg2) {
             CdIntToPos(v0 + s0tmp, sCdSeekLoc);
             if (arg2 == 0) {
                 if (sCdAsyncEnabled != 0) {
-                    gCdSeekParam = sCdSeekLoc - 0x14;
+                    sCdSeekParam = sCdSeekLoc - 0x14;
                     gCdTickStep = 1;
                 } else {
                     do {
@@ -120,8 +120,8 @@ this is the SAME struct as `ObjA34_179D8H` there, and that unit already
 names offset 0x1C the same way, independently. `sCdSeekLoc` is an 8-byte
 zero-initialized buffer (`asm/data/5DB70.data.s`); this function only ever
 takes its address, so it's declared as a plain byte array locally.
-`gCdSeekParam = sCdSeekLoc - 0x14` matches `CdDriver.c`'s existing reads of
-that global (`(u8 *)gCdSeekParam + 0x14`) -- the same pointer, offset the other
+`sCdSeekParam = sCdSeekLoc - 0x14` matches `CdDriver.c`'s existing reads of
+that global (`(u8 *)sCdSeekParam + 0x14`) -- the same pointer, offset the other
 direction.
 
 ### Proposed learning
@@ -169,9 +169,9 @@ at slot `+0x04C`. The prefix names the table, not the developers' class.
 ## Track 4b (2026-09-25, round 85)
 
 The CD driver's shared globals and records are now declared once, in
-`include/CdDriver.h`, and this body uses that one reading: the fake seek entry is spelled `(CdFileEntry *)(sCdSeekLoc - 0x14)`, so the state machine's `&gCdSeekParam->pos` lands on the loc. The
+`include/CdDriver.h`, and this body uses that one reading: the fake seek entry is spelled `(CdFileEntry *)(sCdSeekLoc - 0x14)`, so the state machine's `&sCdSeekParam->pos` lands on the loc. The
 global's type comes from its accessors (`gFileTable` is walked at the 0x1C
-`CdFileEntry` stride; `gCdSeekParam` is read for `->size` and sought to at
+`CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
 
 
