@@ -364,8 +364,8 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libcd_bios", CD_ready);
 #endif
 
 #ifdef NON_MATCHING
-/* NON_MATCHING: 284 words against retail's 282; the report records a
- * length-exact body (docs/match-reports/CD_cw.md). */
+/* NON_MATCHING: 284 words against retail's 282, 97 equal at the same
+ * index (docs/match-reports/CD_cw.md). */
 s32 CD_cw(s32 arg0, u8 *arg1, u8 *arg2, s32 arg3) {
     char **table;
     volatile u8 *state;

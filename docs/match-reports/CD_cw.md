@@ -1,4 +1,11 @@
-# CD_cw -- STALL (LENGTH EXACT: built 282/retail 282 words, up from 278/282 this round via two stacked permuter-found levers; 98/282 raw words match per funcdiff -- now a TRUSTWORTHY figure, since length carries zero drift -- so roughly 184 individual words still differ, spread across what looks like a register-allocation cascade from the second lever; see the round-37 addenda for both levers and an honest discussion of the raw-match tradeoff)
+# CD_cw -- STALL (the preserved NON_MATCHING body builds to 284 words against retail's 282, 97 words equal at the same index; the round-37 addenda below record a 282-word, 98-equal state that this body no longer reproduces)
+
+> Measured 2026-09-28: `tools/check-nonmatching.sh` builds the body in
+> `src/psyq/libcd_bios.c` into `build/nonmatching/`; its `CD_cw` symbol is
+> 284 words, and 97 of them equal retail's word at the same index with the
+> relocated fields (hi/lo halves, jump targets) masked. Declaring
+> `D_8006D8D8` volatile at its extern, the first round-37 lever, leaves
+> both figures unchanged.
 
 > Renamed from `func_80029F10` on 2026-09-23 (tools/rename.py). Address 0x80029f10.
 
