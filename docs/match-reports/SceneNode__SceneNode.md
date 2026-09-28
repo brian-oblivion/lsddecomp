@@ -180,3 +180,5 @@ SceneNode.h now uses Sony's types for all three: S16Quad_d294 -> SVECTOR (x/y/z/
 ## Round 101 (delta): track 7
 
 Step 3 (locals and parameters): `blockB` -> `param`, and its type `void *` -> `GsCOORD2PARAM *` (the block is coord2->param). Byte-identical.
+
+Step 4 (constants): `0x50` -> `sizeof(GsCOORDINATE2)`, `0x28` -> `sizeof(GsCOORD2PARAM)` (Sony's types, include/psyq/libgs.h); `self->model = 0` and `coord2->super = 0` -> `NULL` (both pointers). Byte-identical.

@@ -45,3 +45,7 @@ For the head to apply by type scope. Each one fails to compile in another unit w
 
 - `SceneNodeObj.unk18` -> `tmd` (tier B): GsDOBJ2.tmd by offset. SceneNode__LinkModel stores the tag-9 child's +0x10 word there and UnlinkModel clears it. Accessors: code_d294, code_d294_c.
 - `SceneNodeObj.unk20` -> `linkedModel` (tier B): SceneNode__LinkModel stores the tag-9 child object itself; code_d294_b passes it to the psyq_fa50 helpers. Accessors: code_d294, code_d294_b, code_d294_c.
+
+## Round 101 (delta): track 7
+
+Step 4 (constants): The unit-local `CLASS_TAG_MASK` / `TAG_TMDMODEL` (0xF, 9) -> BasicClass.h's `CLASS_ID_ROOT_MASK` and a new `TMDMODEL_CLASS_ID` in include/TmdModel.h (gTmdModelMethods word +0x000 is 0x9, tools/classtable.py --scan; tier A). Byte-identical.

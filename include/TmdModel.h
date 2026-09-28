@@ -29,6 +29,11 @@
 typedef struct TmdModel TmdModel;
 typedef struct TmdModelMethods TmdModelMethods;
 
+/* TmdModel's class id (gTmdModelMethods word +0x000). A single nibble, so
+ * `(header & CLASS_ID_ROOT_MASK) == TMDMODEL_CLASS_ID` is its is-kind-of test
+ * (SceneNode's addChild and removeChild, which link or unlink the model). */
+#define TMDMODEL_CLASS_ID 0x9
+
 /* A 6-byte all-s16 vector (alignment 2: whole-value copies are lwl/lwr). */
 typedef struct TmdVec3 {
     s16 x, y, z;

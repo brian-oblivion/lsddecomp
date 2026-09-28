@@ -44,3 +44,7 @@ round 11 (2026-09-03), runner charlie, unit code_d294, second pass. Matched on t
 ## Naming
 
 Round 71 (alpha). `func_8001CCB4` -> `SceneNode__RemoveChild`, **tier A**. Overrides BasicClass slot +0x014 `removeChild`. If the child's tag is 9, SceneNode__UnlinkModel first, then forwards to the base. Mirror of SceneNode__AddChild; class_3ac78.h already calls this address `removeChild`.
+
+## Round 101 (delta): track 7
+
+Step 4 (constants): `CLASS_TAG_MASK` / `TAG_TMDMODEL` -> `CLASS_ID_ROOT_MASK` / `TMDMODEL_CLASS_ID` (include/TmdModel.h, new), as in SceneNode__AddChild. Byte-identical.

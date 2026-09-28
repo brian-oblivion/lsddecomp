@@ -55,3 +55,5 @@ Round 71 (alpha). `func_8001D1A4` -> `SceneNode__DetachFromParent`, **tier A**. 
 ## Round 101 (delta): track 7
 
 Step 3 (locals and parameters): `owner` -> `parent`. Byte-identical.
+
+Step 4 (constants): `coord2->super = 0` -> `NULL`. Byte-identical.

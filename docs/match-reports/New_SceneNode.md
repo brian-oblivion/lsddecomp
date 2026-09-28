@@ -58,3 +58,7 @@ round 11 (2026-09-03), runner charlie, unit code_d294 (fresh carve, first attemp
 ## Naming
 
 Round 71 (alpha). `func_8001CA94` -> `New_SceneNode`, **tier A**. Allocates 0x44 bytes, runs `GetSceneNodeMethods()->ctor` on it, frees and returns NULL if the ctor fails. The project's `New_Class` allocator convention (New_Entity, New_Actor). Not a table slot. Caller: Viewport__Viewport (Task) stores the result.
+
+## Round 101 (delta): track 7
+
+Step 4 (constants): `0x44` -> `sizeof(SceneNode)` (the struct is 0x44 bytes, include/SceneNode.h; the whole-image build proves the size). Byte-identical.
