@@ -1,16 +1,18 @@
-# TitleMenu__RefreshViewValue -- MATCH
+# TitleMenu__Exit -- MATCH
+
+> Renamed from `TitleMenu__RefreshViewValue` on 2026-09-28 (tools/rename.py). Address 0x8004dabc.
 
 > Renamed from `Class86B60__RefreshViewValue` on 2026-09-26 (tools/rename.py). Address 0x8004dabc.
 
 > Renamed from `func_8004DABC` on 2026-09-24 (tools/rename.py). Address 0x8004dabc.
 
 Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
-SHA1 matches retail. `funcdiff.py TitleMenu__RefreshViewValue`: 23/23 words match.
+SHA1 matches retail. `funcdiff.py TitleMenu__Exit`: 23/23 words match.
 
 ## Source
 
 ```c
-void TitleMenu__RefreshViewValue(TitleMenu *self)
+void TitleMenu__Exit(TitleMenu *self)
 {
     s32 buf;
 
@@ -44,7 +46,7 @@ None new.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004DABC` -> `TitleMenu__RefreshViewValue`. **Tier B**: Calls the base class's `slot94`, copies `self->unk60->unk14` into a stack buffer, and forwards its address to `DreamSysView::slot19C` -- the same "read a value, push it through the view's slot19C out-parameter call" idiom that recurs in `TitleMenu__SaveToCard` and `TitleMenu__RefreshMenu` in this same unit. Also the dispatch target for `TitleMenu__ConfirmSlot`'s case 1/case 4. Purpose of the value itself not established.
+Renamed `func_8004DABC` -> `TitleMenu__Exit`. **Tier B**: Calls the base class's `slot94`, copies `self->unk60->unk14` into a stack buffer, and forwards its address to `DreamSysView::slot19C` -- the same "read a value, push it through the view's slot19C out-parameter call" idiom that recurs in `TitleMenu__SaveToCard` and `TitleMenu__RefreshMenu` in this same unit. Also the dispatch target for `TitleMenu__ConfirmSlot`'s case 1/case 4. Purpose of the value itself not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

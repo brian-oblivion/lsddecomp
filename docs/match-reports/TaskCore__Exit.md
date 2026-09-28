@@ -39,7 +39,7 @@ round 2026-09-02, runner echo, unit Task. 1 attempt.
 
 **Tier A.** `func_8003CA94` -> `Obj86B60__RefreshViewValue`. Occupies slot94
 in `gTaskCoreMethods`; `gTitleMenuMethods` overrides the same slot with
-`TitleMenu__RefreshViewValue`, same evidence shape as `Tick`/`SetState`
+`TitleMenu__Exit`, same evidence shape as `Tick`/`SetState`
 above. Corroborated independently: this function's own body invokes
 `self->unk9C(self->unkA0)` when set, which is exactly the callback+ctx pair
 `TaskCore__SetCallback` installs -- see that report.

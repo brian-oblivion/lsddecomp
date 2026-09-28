@@ -221,7 +221,7 @@ void TitleMenu__Reset(TitleMenu *self);
 void TitleMenu__OnDeinit(TitleMenu *self);
 void TitleMenu__SetState(TitleMenu *self, s32 state);
 void TitleMenu__ConfirmSlot(TitleMenu *self);
-void TitleMenu__RefreshViewValue(TitleMenu *self);
+void TitleMenu__Exit(TitleMenu *self);
 void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target);
 void TitleMenu__DestroySaveTitle(TitleMenu *self);
 void TitleMenu__AttachSaveTitle(TitleMenu *self, void *parent);

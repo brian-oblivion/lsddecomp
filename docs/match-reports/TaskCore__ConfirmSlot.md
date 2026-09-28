@@ -66,7 +66,7 @@ not a subtraction) before trusting it.
 - `Unk4CObj::unkC` (s32, +0x00C), `::unk24` (`void **`, +0x024) -- both
   OBSERVED here.
 - `Obj86B60Methods::slot108` (+0x108, external `TaskCore__BeginElementScroll`) and
-  `::slot94` (+0x094, external `TitleMenu__RefreshViewValue`, shared with `TaskCore__SetState`
+  `::slot94` (+0x094, external `TitleMenu__Exit`, shared with `TaskCore__SetState`
   STALL's case `a1==6`).
 
 ## Provenance

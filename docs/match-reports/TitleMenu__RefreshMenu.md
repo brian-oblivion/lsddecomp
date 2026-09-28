@@ -84,7 +84,7 @@ the whole image after any further edit there.)
   forwarding the already-established `unk14` (`void *`, from this round's
   `TitleMenu__BeginCardAccess`) opaquely.
 - `self->unkA4->methods->slot19C(self->unkA4, &buf2);` -- the SAME slot
-  already established (`TitleMenu__RefreshViewValue`), but used here as an OUT
+  already established (`TitleMenu__Exit`), but used here as an OUT
   parameter: `buf2` is uninitialized before the call and its value is read
   afterward (`self->methods->slot11C(self, buf2, 1)`), unlike every
   earlier call site which supplied a value IN. The signature

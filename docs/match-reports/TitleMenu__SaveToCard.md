@@ -36,7 +36,7 @@ SLPS_015.56`.
 
 - `buf = self->unk60->unk14; self->unkA4->methods->slot19C(self->unkA4,
   &buf);` -- the IDENTICAL idiom already matched in this unit's own
-  `TitleMenu__RefreshViewValue` (stack-buffer-out-parameter call on the same
+  `TitleMenu__Exit` (stack-buffer-out-parameter call on the same
   `DreamSysView_3bb8c_c::slot19C`), just without that function's own
   leading `GetTaskCoreMethods()->slot94(self)` base-class call.
 - `self->methods->slot128(self)` -- the slot this round's `TitleMenu__LoadFromCard`
@@ -84,7 +84,7 @@ its own new slot immediately after it.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E0E4` -> `TitleMenu__SaveToCard`. **Tier B, lower confidence**: Refreshes the view (same idiom as `TitleMenu__RefreshViewValue`), calls `slot128`, conditionally clears `sSaveFileName` behind the same `self->unkA4->methods->slot1AC()` gate `TitleMenu__CreateSaveTitle` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `TitleMenu__ConfirmSlot`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
+Renamed `func_8004E0E4` -> `TitleMenu__SaveToCard`. **Tier B, lower confidence**: Refreshes the view (same idiom as `TitleMenu__Exit`), calls `slot128`, conditionally clears `sSaveFileName` behind the same `self->unkA4->methods->slot1AC()` gate `TitleMenu__CreateSaveTitle` also tests, then forwards `self->iconHandle` plus literal flags (0xD, 3) through `unkAC`'s `slot78`. It is `TitleMenu__ConfirmSlot`'s case-2 dispatch target. Purpose beyond "the icon-carrying variant of the two unkAC dispatch calls" is not established.
 
 ## Proposed field names
 

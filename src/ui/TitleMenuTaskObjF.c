@@ -298,7 +298,7 @@ void TitleMenu__ConfirmSlot(TitleMenu *self) {
     fn(self);
 }
 
-void TitleMenu__RefreshViewValue(TitleMenu *self) {
+void TitleMenu__Exit(TitleMenu *self) {
     s32 shake;
 
     GetTaskCoreMethods()->refreshViewValue((TaskCore *)self);
