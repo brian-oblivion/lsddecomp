@@ -220,3 +220,11 @@ The file's banner carried its edge evidence:
 > carve edge cut GameApplication off its getter, so the two units were
 > merged (round 101). Whether FileResource began a file of its own right
 > after the getter the binary cannot say, and no tool splits a unit.
+
+## History (moved from src/app/game_shell.c, track 12)
+
+The `MATCHING:` note above the definition was two lines; its second half,
+the reason the fall-off-the-end spelling costs nothing, moved here:
+
+> MATCHING: the NULL path falls off the end; any explicit return there costs
+> an instruction (BMemPMgrAlloc's NULL is already in $v0).

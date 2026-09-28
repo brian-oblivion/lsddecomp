@@ -26,3 +26,24 @@ function's report under a "History (moved from ..., track 12)" heading.
   all show +0x03C as a null slot (the scan ends gBasicClassMethods itself
   at +0x038). The header now says "NULL in every class's table" and quotes
   no count.
+
+## History (moved from include/file_resource.h, track 12)
+
+- The class banner pointed at `typeviews.py --tree` for the subclass list
+  and said it "lists all sixteen"; the header now names examples and quotes
+  no count.
+- The static tables' interface slots were said to be copied into "the table
+  of every class sDataSourceClientGetters lists"; that array is
+  game_shell.c's own (a NULL-terminated list of table getters), so the
+  header now says "every client class".
+- The `flags` field said "bit 0 set by SetFlag"; the setter is
+  FileResource__OnRequestDone, and the field doc says so.
+
+## History (moved from src/app/game_shell.c's banners, track 12)
+
+The file's two long banners (28 and 26 lines) were split: what
+GameApplication does and the order of its hooks went to the class
+documentation in include/game_application.h, the data-source layer's
+description to include/data_source.h's `@file` block, and FileResource's
+to its class documentation. The .c keeps a short banner per section. No
+process text was in them.
