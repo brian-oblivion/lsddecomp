@@ -153,7 +153,7 @@ rather than API.
   `unk93` (clear colour), `unk96`; TaskCoreTarget `unk8` (initial slot),
   `unk24` (item lists); GameApplication `config->unk14`/`slot228`;
   `APPLICATION_LOOP_SLOT5C`; CdDriver's "part N" notes are off by one.
-- **graphics:** `TmdModel__NoOpSlot4C`, `BasicClass__func_18350`,
+- **graphics:** `TmdModel__NoOpSlot4C`, `BasicClass__NoOpSlot34`,
   `D_8008E248`, `D_80090C18`; `TimImage flag48`; SceneNode link events 2/3/4
   as literals (Actor.h names 5-8); `New_TimBlockSrc(s32 name)` and
   `ModelData__ForwardScan*` take pointers as `s32`; the `+ 0x5C` at

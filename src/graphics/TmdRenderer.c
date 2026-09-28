@@ -63,7 +63,7 @@ void BasicClass__NotifyParents(BasicClass *self, s32 event) {
 /* BasicClassMethods slot +0x034. Empty, and no BasicClass-derived table
  * overrides it, so nothing says what it is for: the name stays a tier-C
  * placeholder (the table census is in the report). */
-void BasicClass__func_18350(void) {}
+void BasicClass__NoOpSlot34(void) {}
 
 /* BasicClassMethods slot +0x038, the receiving half of NotifyParents:
  * `sender` is telling `self` that `event` happened. The base class treats

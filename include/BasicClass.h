@@ -96,7 +96,7 @@ struct BasicClassListNode {
     /* +0x028 */ void (*clearParentRefs)(Self *self);          /* BasicClass__ClearParentRefs */   \
     /* +0x02C */ void (*getNextParentRef)(Self *self, BasicClass **outParent, BasicClassListNode **cursor); /* BasicClass__GetNextParentRef */ \
     /* +0x030 */ void (*notifyParents)(Self *self, s32 event); /* BasicClass__NotifyParents */     \
-    /* +0x034 */ void (*slot34)(void);                         /* BasicClass__func_18350, empty; never overridden, never called */ \
+    /* +0x034 */ void (*slot34)(void);                         /* BasicClass__NoOpSlot34, empty; never overridden, never called */ \
     /* +0x038 */ void (*onNotify)(Self *self, void *sender, s32 event); /* BasicClass__OnNotify */  \
     /* +0x03C */ void *slot3C                                  /* NULL in all 59 method tables */
 /* clang-format on */
@@ -135,7 +135,7 @@ void BasicClass__RemoveParentRef(BasicClass *self, BasicClass *parent);
 void BasicClass__ClearParentRefs(BasicClass *self);
 void BasicClass__GetNextParentRef(BasicClass *self, BasicClass **outParent, BasicClassListNode **cursor);
 void BasicClass__NotifyParents(BasicClass *self, s32 event);
-void BasicClass__func_18350(void);
+void BasicClass__NoOpSlot34(void);
 void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event);
 
 /* The list primitives, BMemPMgr and TmdRenderer. */
