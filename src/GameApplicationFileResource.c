@@ -1,8 +1,21 @@
 /*
- * GameApplicationFileResource -- GameApplication (include/GameApplication.h, which documents
- * the class): the game's Application. Its allocator and ctor, the RNG seed
- * and initSystems overrides, then the hooks Application__RunMainLoop calls,
- * each with the helpers it uses, in ROM order:
+ * GameApplicationFileResource -- two classes, in ROM order: GameApplication,
+ * the game's Application, and FileResource, the base of everything loaded
+ * from a file, with the active-data-source layer and the data directory.
+ *
+ * Edges: libapi/a21 before and Sony's libc2/strcat after are placed objects.
+ * tuboundary.py is silent inside ("boundary possible" at every gap, "start
+ * edge possible" at the old code_1677c|code_171e0 carve edge), so content
+ * decided, and it rules out that edge: the code after it opened with
+ * GetGameApplicationMethods, and in every file of this game that defines a
+ * Get<Class>Methods getter the getter closes its own class's methods. The
+ * carve edge cut GameApplication off its getter, so the two units were
+ * merged (round 101). Whether FileResource began a file of its own right
+ * after the getter the binary cannot say, and no tool splits a unit.
+ *
+ * GameApplication (include/GameApplication.h, which documents the class):
+ * its allocator and ctor, the RNG seed and initSystems overrides, then the
+ * hooks Application__RunMainLoop calls, each with the helpers it uses:
  *  - ShowIntroLogos: ETC\ASMKLOGO.TIM, the ETC\ASMK.STR movie, ETC\OSDLOGO.TIM
  *    (ShowImage for each image);
  *  - PlayOpeningMovie: one of the opening movies, at random;
@@ -18,8 +31,10 @@
  * movie is a StreamTask given the path and movie id GameFiles.c's getters
  * return, the id turned into a frame count by GetMovieFrameCount; an image is
  * a TaskCore showing the TIM. Every movie but the intro's is gated by
- * config->playStreams. The table and its getter are in
- * src/code_171e0.c.
+ * config->playStreams. GetGameApplicationMethods, the table's getter, ends
+ * the class.
+ *
+ * FileResource (include/FileResource.h): see the section banner below.
  */
 #include "common.h"
 #include <libgte.h>
@@ -38,16 +53,12 @@
 #include "VabDriver.h"
 #include "CdDriver.h"
 
-/* The game's allocator, in the uncarved BMemPMgr block. Returns void *
- * rather than a typed pointer because every New_X in the game calls it. */
-extern void *BMemPMgrAlloc(s32 size);
-
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
 
 extern char *GetDefaultDataDirectory(void); /* GameFiles.c: "CDI\\" */
-extern void SetDataDirectory(char *dir);    /* code_171e0.c */
+extern void SetDataDirectory(char *dir);    /* below */
 
-/* code_171e0.c: waits until the data source's driver takes the mode; every
+/* Below: waits until the data source's driver takes the mode; every
  * task here starts with (0, 0, 0). */
 extern void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
 
@@ -354,10 +365,12 @@ void GameApplication__PlayEndingMovie(GameApplication *self) {
     }
 }
 
-/* ---- merged from code_171e0 ---- */
+GameApplicationMethods *GetGameApplicationMethods(void) {
+    return &gGameApplicationMethods;
+}
 
 /*
- * code_171e0 -- FileResource's own methods, the active-data-source dispatch
+ * FileResource's own methods, the active-data-source dispatch
  * layer on top of them, and the data directory that CD paths are built in.
  *
  * FileResource (include/FileResource.h) is the base of every class the
@@ -379,9 +392,8 @@ void GameApplication__PlayEndingMovie(GameApplication *self) {
  * and CdStream__Open put between the root `\` and a file name. It is "" until
  * GameApplication's ctor installs "CDI\". BuildFileName joins an optional
  * directory, a name and an extension. ResourceRequest__Set fills the
- * {buffer, name, mode} descriptor the resource classes' ctors take, and
- * GetGameApplicationMethods is GameApplication's table getter. strcat, which
- * BuildFileName calls, is Sony's libc2 object, linked after this unit.
+ * {buffer, name, mode} descriptor the resource classes' ctors take. strcat,
+ * which BuildFileName calls, is Sony's libc2 object, linked after this file.
  */
 
 /* gActiveDataSource's two observed values are the header words of the two
@@ -389,10 +401,6 @@ void GameApplication__PlayEndingMovie(GameApplication *self) {
  * code_179d8_q.c) and gVabDriverMethods (VabDriver, the SPU/VAB driver, include/VabDriver.h). */
 #define DATASOURCE_CD 0x13
 #define DATASOURCE_SPU 0x23
-
-GameApplicationMethods *GetGameApplicationMethods(void) {
-    return &gGameApplicationMethods;
-}
 
 void *FileResource__Release(FileResource *this) {
     this->freeGuard = 0;
