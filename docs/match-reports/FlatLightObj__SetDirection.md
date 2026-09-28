@@ -19,11 +19,11 @@ void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir) {
         self->light.vy = dir[1];
         self->light.vz = dir[2];
     }
-    GsSetFlatLight(self->lightId, &self->light);
+    GsSetFlatLight(self->lightId, (GsF_LIGHT *)&self->light);
 }
 ```
 
-Declarations (`FlatLightObj`, `FlatLightObjMethods`, `FlatLightParams`, `FlatLightColor`, the local `GsSetFlatLight` prototype) are at the top of `src/code_3311c.c`.
+Declarations: `FlatLightObj`, `FlatLightObjMethods`, `FlatLightParams` and `FlatLightColor` are in `include/FlatLightObj.h`; `GsSetFlatLight` is Sony's prototype from `<libgs.h>` (round 101: the unit's local prototype, which took a `FlatLightParams *`, was replaced by Sony's, and the two calls now cast `&self->light` to `GsF_LIGHT *`; zero bytes changed).
 
 ## Notes
 

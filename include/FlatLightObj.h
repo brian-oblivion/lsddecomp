@@ -13,9 +13,10 @@
  * "FlatLight" is Sony's own name (LIBGS.H's GsF_LIGHT and GsSetFlatLight),
  * not a guess: the object keeps a light id at +0x00C and a GsF_LIGHT at
  * +0x010, and setColor/setDirection update the GsF_LIGHT and hand it by
- * address to GsSetFlatLight(lightId, &light). LIBGS.H is not included (its
- * prototypes collide in shared headers), so FlatLightParams is a local copy
- * of GsF_LIGHT: `int vx,vy,vz; unsigned char r,g,b;`, same offsets.
+ * address to GsSetFlatLight(lightId, &light). FlatLightParams is GsF_LIGHT's
+ * layout (`int vx,vy,vz; unsigned char r,g,b;`, same offsets) with r,g,b
+ * grouped as FlatLightColor, which setColor's whole-struct copy needs;
+ * src/code_3311c.c takes GsSetFlatLight from <libgs.h> and casts to GsF_LIGHT *.
  *
  * Who holds one: LightRig__LightRig (src/Sprite.c, include/LightRig.h)
  * makes three with New_FlatLightObj(0), (1), (2), keeps them in

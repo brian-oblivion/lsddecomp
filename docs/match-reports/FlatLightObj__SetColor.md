@@ -15,13 +15,14 @@ slot +0x044 (`setColor`): if `update`, copy a 3-byte colour into the light's r,g
 ```c
 void FlatLightObj__SetColor(FlatLightObj *self, s32 update, FlatLightColor *rgb) {
     if (update) {
+        /* MATCHING: a whole-struct copy; three per-byte stores compile 3 words longer */
         self->light.rgb = *rgb;
     }
-    GsSetFlatLight(self->lightId, &self->light);
+    GsSetFlatLight(self->lightId, (GsF_LIGHT *)&self->light);
 }
 ```
 
-Declarations (`FlatLightObj`, `FlatLightObjMethods`, `FlatLightParams`, `FlatLightColor`, the local `GsSetFlatLight` prototype) are at the top of `src/code_3311c.c`.
+Declarations: `FlatLightObj`, `FlatLightObjMethods`, `FlatLightParams` and `FlatLightColor` are in `include/FlatLightObj.h`; `GsSetFlatLight` is Sony's prototype from `<libgs.h>` (round 101: the unit's local prototype, which took a `FlatLightParams *`, was replaced by Sony's, and the two calls now cast `&self->light` to `GsF_LIGHT *`; zero bytes changed).
 
 ## Notes
 

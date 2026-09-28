@@ -25,7 +25,7 @@ FlatLightObj *New_FlatLightObj(s32 lightId) {
 }
 ```
 
-Declarations (`FlatLightObj`, `FlatLightObjMethods`, `FlatLightParams`, `FlatLightColor`, the local `GsSetFlatLight` prototype) are at the top of `src/code_3311c.c`.
+Declarations: `FlatLightObj`, `FlatLightObjMethods`, `FlatLightParams` and `FlatLightColor` are in `include/FlatLightObj.h`; `GsSetFlatLight` is Sony's prototype from `<libgs.h>` (round 101: the unit's local prototype, which took a `FlatLightParams *`, was replaced by Sony's, and the two calls now cast `&self->light` to `GsF_LIGHT *`; zero bytes changed).
 
 ## Notes
 
@@ -34,3 +34,26 @@ First spelling `if (self == NULL) return NULL; ctor; return self;` was 1 word LO
 ## Naming
 
 `New_FlatLightObj`, tier A. Mechanics is its purpose: allocate, call the class's ctor slot through the table getter, return the object or NULL -- the same shape as `include/Pad.h`'s `New_Pad`. `New_Class` convention.
+
+## History (moved from the unit banner of `src/code_3311c.c`, round 101)
+
+The unit's banner and its first comment read, verbatim, until round 101:
+
+```
+code_3311c -- GAME code carved from psyq_3311c on 2026-09-25 (FINISHING-PLAN
+revision 18). 0x3311C..0x3328C (vram 0x8004291C..0x80042A8C). It was counted
+as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
+into game code, a method-table entry beside game methods, or contiguity with
+those, and no Sony fingerprint). What it holds: the whole of class
+gFlatLightObjMethods -- allocator, ctor, its three own vtable slots
+(+0x40/+0x44/+0x48), and the table getter.
+
+All six functions matched and named in round 81 (alpha).
+```
+
+```
+The class is declared in include/FlatLightObj.h (track 4, round 87): the
+object, its table and the evidence for the name live there. The unit's
+only outside caller of New_FlatLightObj is LightRig__LightRig
+(src/Sprite.c, include/LightRig.h), with light ids 0, 1, 2.
+```
