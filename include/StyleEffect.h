@@ -108,7 +108,7 @@ typedef void (*StyleEffectUpdateFn)(StyleEffect *self, LongVec3 *pos);
 extern StyleEffectMethods gStyleEffectMethods;
 extern StyleEffectMethods *GetStyleEffectMethods(void); /* ObjMStyleActor.c; returns &gStyleEffectMethods */
 
-/* The class's own methods, in address order (ObjMStyleActor, _s, then _o).
+/* The class's own methods, in address order (src/ObjMStyleActor.c).
  * Four are declared WITHOUT a prototype on purpose: each is one-parameter,
  * but a caller in ObjMStyleActor.c passes a dead second argument that is
  * byte-load-bearing (the `arity-ok` notes there and in the reports). */

@@ -23,7 +23,7 @@
  *  - Its users: TaskCore's listView (the frame behind a scrolled list:
  *    attached at the list's position, then setSize(40, rows * 12)),
  *    GraphRoom's 100 plotted dots, and the style decoration boxes of
- *    ObjMStyleActor/_n (ObjMStyleActor makes its box semi-transparent:
+ *    the style layer (ApplyStyleDecorationIfSet makes its box semi-transparent:
  *    setSemiTransOn(1), setSemiTransRate(0)).
  *
  * Ctor chain: BoxFill__BoxFill calls GetSceneNodeMethods()->ctor first, so
@@ -41,8 +41,8 @@
  *  - +0x04C attachToParent: BoxFill__AttachToParent's third argument is a
  *    screen position (a BoxFillPos) where the slot, SceneNode's, types a
  *    LongVec3 offset; it attaches with a NULL offset, then setPosition.
- *    Callers cast to BoxFillAttachToParentFn (ObjMStyleActor/_n,
- *    Task) or, through a SceneNode pointer, cast the argument
+ *    Callers cast to BoxFillAttachToParentFn (the style layer
+ *    in ObjMStyleActor.c, Task) or, through a SceneNode pointer, cast the argument
  *    (Viewport__SetFadeBox). BoxFill__AttachAbsolute calls it with FOUR
  *    arguments through an unprototyped pointer (see its match report).
  * The ctor itself returns nothing where SceneNode's slot returns `void *`;
