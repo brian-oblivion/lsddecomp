@@ -14,7 +14,7 @@ function matched on the first rebuild.
 
 ## What it does
 
-A single array-of-array index: `sStaircaseSpawns[gLinkDstStage]` is a `StageSpawn*`
+A single array-of-array index: `sStaircaseSpawns[sLinkDstStage]` is a `StageSpawn*`
 (one of a table of per-stage spawn-point arrays, same table
 `TestForStaircaseNodes` already uses a few lines above), indexed a second time
 by `gLinkSpawnIndex`, reading that entry's `.extra` byte (`StageSpawn`'s last
@@ -25,11 +25,11 @@ field, a signed byte at offset 5 -- matches the retail `lb` at `+0x5`).
 ```c
 s32 GetLastSpawnExtra(void)
 {
-	return sStaircaseSpawns[gLinkDstStage][gLinkSpawnIndex].extra;
+	return sStaircaseSpawns[sLinkDstStage][gLinkSpawnIndex].extra;
 }
 ```
 
-`sStaircaseSpawns`, `gLinkDstStage`, `gLinkSpawnIndex` were all already declared in
+`sStaircaseSpawns`, `sLinkDstStage`, `gLinkSpawnIndex` were all already declared in
 `include/DreamSys.h`. Updated the stale header comment on the
 `extern s32 GetLastSpawnExtra(void);` prototype (used to type its still-
 `INCLUDE_ASM` caller `DreamSys__TryStaircaseLink`, same unit) from "blocked by both
@@ -46,7 +46,7 @@ round 43, runner ALPHA, unit DreamSys.
 
 ## Naming
 
-- **Tier A.** Pure leaf: returns the already-named `.extra` field of the last static spawn point found via the gLinkDstStage/C8 scratch indices; its return value indexes the DreamSys__TickStaircaseYawPlus90..3 dispatch table.
+- **Tier A.** Pure leaf: returns the already-named `.extra` field of the last static spawn point found via the sLinkDstStage/C8 scratch indices; its return value indexes the DreamSys__TickStaircaseYawPlus90..3 dispatch table.
 
 ## History (moved from include/DreamSys.h, round 102)
 

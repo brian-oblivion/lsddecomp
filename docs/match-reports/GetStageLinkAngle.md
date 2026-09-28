@@ -11,7 +11,7 @@ via `%gp_rel`). Round 42 RESOLVED that blocker. Rebuilt fresh this round.
 
 ## What it does
 
-`if (gLinkDstStage == 0xC) return 0; else return (s32)&sLinkAngle180;` -- stored
+`if (sLinkDstStage == 0xC) return 0; else return (s32)&sLinkAngle180;` -- stored
 whole into `this->unk_0x880` by `DreamSys__TryStageTimerLink` right before an ExecuteLink
 (per the existing header comment on that field and on the prototype
 `extern s32 GetStageLinkAngle(void);`).
@@ -21,7 +21,7 @@ whole into `this->unk_0x880` by `DreamSys__TryStageTimerLink` right before an Ex
 ```c
 s32 GetStageLinkAngle(void)
 {
-	if (gLinkDstStage == 0xC)
+	if (sLinkDstStage == 0xC)
 		return 0;
 	return (s32)&sLinkAngle180;
 }
@@ -41,7 +41,7 @@ s32 GetStageLinkAngle(void)
 	s32 result;
 
 	result = 0;
-	if (gLinkDstStage != 0xC)
+	if (sLinkDstStage != 0xC)
 		result = (s32)&sLinkAngle180;
 	return result;
 }
@@ -83,7 +83,7 @@ round 43, runner ALPHA, unit DreamSys.
 Renamed from `func_8005BF48`.
 
 A free function (no `this`, and the disassembly's call site sets
-up no arguments): returns `&sLinkAngle180` unless `gLinkDstStage` -- the
+up no arguments): returns `&sLinkAngle180` unless `sLinkDstStage` -- the
 destination stage `GetStaticSpawn` and `TestForStageTransition` record -- is 0xC, in
 which case 0. `DreamSys__TryStageTimerLink` stores the result in
 `stageLinkAngle`, in the same statement group that zeroes `enterRotation` and

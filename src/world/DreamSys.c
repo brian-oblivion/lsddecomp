@@ -1699,7 +1699,7 @@ extern s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading);
 /* Cardinal-direction indices, per stage: the player must face
    sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex] to take the
    tunnel GetStaticSpawn matched, and leaves facing
-   sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex]. */
+   sTunnelExitHeadings[sLinkDstStage][gLinkSpawnIndex]. */
 extern u8 *sTunnelEnterHeadings[];
 extern u8 *sTunnelExitHeadings[];
 
@@ -1721,7 +1721,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
             *outEnter = (s32)&sCardinalRotations[heading];
 
         if (outExit != NULL) {
-            idx = sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex];
+            idx = sTunnelExitHeadings[sLinkDstStage][gLinkSpawnIndex];
             *outExit = (s32)&sCardinalRotations[idx];
         }
         result = 1;
@@ -1781,7 +1781,7 @@ merge:
     if (timer & 1)
         stage = -12;
     result = GetRandomSpawnFromStage(target, stage, timer);
-    gLinkDstStage = result;
+    sLinkDstStage = result;
     return result;
 }
 
@@ -1793,7 +1793,7 @@ s32 GetStageLinkAngle(void) {
     s32 result;
 
     result = 0;
-    if (gLinkDstStage != 12)
+    if (sLinkDstStage != 12)
         result = (s32)&sLinkAngle180;
     return result;
 }
@@ -1851,7 +1851,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
             *outEnter = (s32)&sCardinalRotations[heading];
 
         if (outExit != NULL) {
-            idx = sStaircaseExitHeadings[gLinkDstStage][gLinkSpawnIndex];
+            idx = sStaircaseExitHeadings[sLinkDstStage][gLinkSpawnIndex];
             *outExit = (s32)&sCardinalRotations[idx];
         }
         result = 1;
@@ -1862,7 +1862,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
 }
 
 s32 GetLastSpawnExtra(void) {
-    return sStaircaseSpawns[gLinkDstStage][gLinkSpawnIndex].extra;
+    return sStaircaseSpawns[sLinkDstStage][gLinkSpawnIndex].extra;
 }
 
 s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
@@ -1888,7 +1888,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
         gLinkSrcStage = stage;
         gLinkTriggerIndex = i;
         triggerStage = trig->stage;
-        gLinkDstStage = triggerStage;
+        sLinkDstStage = triggerStage;
         spawnIndex = (u8)trig->spawnpointIndex;
         entry = &spawns[triggerStage][spawnIndex];
         gLinkSpawnIndex = spawnIndex;
@@ -1896,7 +1896,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
         target->position = sSpawnPosAdjust[entry->adjustment];
         if (flag != 0)
             (*gpNavChallengesComplete)[entry->extra] = 1;
-        return gLinkDstStage;
+        return sLinkDstStage;
     }
     return -1;
 }

@@ -132,7 +132,7 @@ extern s8 (*gpNavChallengesComplete)[NAV_CHALLENGE_COUNT];
 extern s32 *gpDinamicLinkPenalty;
 extern s32 gLinkSrcStage;
 extern s32 gLinkTriggerIndex;
-extern s32 gLinkDstStage;
+extern s32 sLinkDstStage;
 extern s32 gLinkSpawnIndex;
 
 /* A single {numerator, denominator} degree ratio. SceneNode__UpdateRotation

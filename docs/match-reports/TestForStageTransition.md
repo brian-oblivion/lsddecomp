@@ -19,7 +19,7 @@ A "link type" dispatcher: for `stage` in `{1, 3, 9, 0xC}` (falling through a
 shared body with an extra check when `stage == 9`), or `stage == 5` (its own
 distinct check), validate `currentPos` against a couple of conditions and
 then call `GetRandomSpawnFromStage(target, (timer & 1) ? -0xC : stage,
-timer)`, stashing the result in `gLinkDstStage`. Any other `stage` value
+timer)`, stashing the result in `sLinkDstStage`. Any other `stage` value
 returns `-1` immediately. Called by `DreamSys__TryStageTimerLink` (still `INCLUDE_ASM`) as
 `TestForStageTransition(&this->linkCoordinates, this->currentStage, currentPos,
 this->dreamTimer)`.
@@ -99,7 +99,7 @@ merge:
 	if (timer & 1)
 		stage = -0xC;
 	result = GetRandomSpawnFromStage(target, stage, timer);
-	gLinkDstStage = result;
+	sLinkDstStage = result;
 	return result;
 }
 ```
