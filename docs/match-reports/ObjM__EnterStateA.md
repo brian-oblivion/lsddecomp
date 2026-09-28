@@ -8,7 +8,7 @@
 
 Sets `self->unk20 = 0xA`, calls `ObjM__StartFadeUp(self, 0, 0, 6, 1)`, then
 makes two further calls on `self->unk3C`: slot `0x13C` with argument 2,
-then slot `0xF4` (the same slot `ObjM__EnterState8` uses) also with argument 2.
+then slot `0xF4` (the same slot `ObjM__EnterLinkTunnel` uses) also with argument 2.
 
 ## The C
 

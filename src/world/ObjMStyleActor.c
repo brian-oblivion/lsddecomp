@@ -950,7 +950,7 @@ void ObjM__EnterLinkFlashback(ObjM *self) {
     self->dreamSys->methods->blockMovement(self->dreamSys);
 }
 
-void ObjM__EnterState8(ObjM *self) {
+void ObjM__EnterLinkTunnel(ObjM *self) {
     self->state = OBJM_STATE_LINK_TUNNEL;
     ObjM__StartFadeUp(self, DREAM_COLOR_BLACK, 0, 6, 1);
     self->dreamSys->methods->setMoveOverride(self->dreamSys, MOVE_OVERRIDE_FORCED);

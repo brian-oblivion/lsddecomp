@@ -1,4 +1,6 @@
-# ObjM__EnterState8
+# ObjM__EnterLinkTunnel
+
+> Renamed from `ObjM__EnterState8` on 2026-09-28 (tools/rename.py). Address 0x80053d9c.
 
 > Renamed from `func_80053D9C` on 2026-09-23 (tools/rename.py). Address 0x80053d9c.
 
@@ -13,7 +15,7 @@ calls the shared helper `ObjM__StartFadeUp(self, 0, 0, 6, 1)`, then tells
 ## The C
 
 ```c
-void ObjM__EnterState8(ObjM *self) {
+void ObjM__EnterLinkTunnel(ObjM *self) {
     self->unk20 = 8;
     ObjM__StartFadeUp(self, 0, 0, 6, 1);
     self->unk3C->methods->slotF4(self->unk3C, 1);
@@ -33,7 +35,7 @@ round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
-**ObjM__EnterState8** -- tier B. Same shape as `ObjM__EnterLinkFlashback` for `ObjM::mode = 8`, forwarding request code 6 and then `dreamSys->setMoveOverride(dreamSys, 1)`. Mechanically described, purpose (why 8) not established.
+**ObjM__EnterLinkTunnel** -- tier B. Same shape as `ObjM__EnterLinkFlashback` for `ObjM::mode = 8`, forwarding request code 6 and then `dreamSys->setMoveOverride(dreamSys, 1)`. Mechanically described, purpose (why 8) not established.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
