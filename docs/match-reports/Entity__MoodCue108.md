@@ -12,14 +12,14 @@ No hits.
 
 `gEntityMoodHandlerTable` handler row that forwards straight to another handler,
 `Entity__MoodCue71` (already matched, `Entity.c`), passing its own `(this,
-out)` through unchanged, then dispatches `slot48(this, 1, SCALE_SIX)`.
+out)` through unchanged, then dispatches `slot48(this, 1, sScaleSix)`.
 
 ## The C
 
 ```c
 void Entity__MoodCue108(Entity *this, EntityMoodHandlerArg *out) {
     Entity__MoodCue71(this, out);
-    this->methods->slot48(this, 1, SCALE_SIX);
+    this->methods->slot48(this, 1, sScaleSix);
 }
 ```
 

@@ -15,15 +15,15 @@ and an unconditional `slotC4`.
 void Entity__MoodCue65(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0) {
         if (rand() % 3 == 0) {
-            this->methods->slot48(this, 1, SCALE_HALF);
+            this->methods->slot48(this, 1, sScaleHalf);
             this->methods->slotCC(this, -0x12C, 0);
-            this->methods->slot44(this, 1, ROTATION_YAW_PLUS90);
+            this->methods->slot44(this, 1, sRotationYawPlus90);
             this->unk44 = 0xB;
         }
     }
     if (this->unk44 == 0xB) {
         if (this->unkFC == 0x7D0) {
-            this->methods->slot44(this, 0, ROTATION_YAW_MINUS90);
+            this->methods->slot44(this, 0, sRotationYawMinus90);
         }
         this->methods->slotC4(this, -0x14, 0);
     }
@@ -44,8 +44,8 @@ to scaling the remainder by a further constant.
 (`void`, `(self, s32, void*)`), and `slotC4` (`void`) are all pre-existing
 vtable slot types from earlier work in this unit and `Entity`; every
 call here discards its return value, consistent with those slots' existing
-types. `ROTATION_YAW_PLUS90` already has an extern/callsite later in this same file
-(`Entity__MoodCue73`); `SCALE_HALF` and `ROTATION_YAW_MINUS90` are new per-unit `extern
+types. `sRotationYawPlus90` already has an extern/callsite later in this same file
+(`Entity__MoodCue73`); `sScaleHalf` and `sRotationYawMinus90` are new per-unit `extern
 u8 [];` data-table externs, same convention as the rest of this file.
 
 No new struct or vtable-slot knowledge.

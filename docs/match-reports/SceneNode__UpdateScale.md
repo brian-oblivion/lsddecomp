@@ -69,7 +69,7 @@ already correct from earlier work.
 
 ## Naming
 
-Round 71 (alpha). `func_8001D008` -> `SceneNode__UpdateScale`, **tier A**. Table slot +0x048 (`updateScale`). Three RatioToFixed12 values assigned (flag != 0) or added into GsCOORD2PARAM.scale.vx/vy/vz (SceneNodeSub44 unk0/4/8), then flg = 0. Reset passes SCALE_ONE ({1/1}x3), i.e. unit scale.
+Round 71 (alpha). `func_8001D008` -> `SceneNode__UpdateScale`, **tier A**. Table slot +0x048 (`updateScale`). Three RatioToFixed12 values assigned (flag != 0) or added into GsCOORD2PARAM.scale.vx/vy/vz (SceneNodeSub44 unk0/4/8), then flg = 0. Reset passes sSceneNodeScaleOne ({1/1}x3), i.e. unit scale.
 
 ## Round 97 (alpha): Sony's GsCOORD2PARAM
 

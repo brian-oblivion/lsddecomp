@@ -20,7 +20,7 @@ void Entity__MoodCue80(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else {
         this->methods->slot130(this);
-        this->methods->slotBC(this, TRANSLATE_Y_MINUS512);
+        this->methods->slotBC(this, sTranslateYMinus512);
     }
     SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
 }
@@ -74,7 +74,7 @@ Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 80
 
 Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity/Entity_d/Entity_g): `attenuation`, `voice0Tone`.
 
-**Data constant renamed this round:** `D_80089D54` -> `TRANSLATE_Y_MINUS512`, tier B. 32-bit value at the Y slot (offset +4) is `0xfffffe00` = -512, matching the `TRANSLATE_Y_MINUS64`/`TRANSLATE_Y_PLUS256` s32-triple format confirmed in `Entity__MoodCue68`'s report.
+**Data constant renamed this round:** `D_80089D54` -> `sTranslateYMinus512`, tier B. 32-bit value at the Y slot (offset +4) is `0xfffffe00` = -512, matching the `sTranslateYMinus64`/`sTranslateYPlus256` s32-triple format confirmed in `Entity__MoodCue68`'s report.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

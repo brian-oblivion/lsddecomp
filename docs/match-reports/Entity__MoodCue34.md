@@ -12,11 +12,11 @@ void Entity__MoodCue34(Entity *this) {
     s32 arg1;
 
     if ((u32)(this->unkFC - 0x190) < 0xA) {
-        this->methods->slot44(this, 0, ROTATION_YAW_PLUS9);
+        this->methods->slot44(this, 0, sRotationYawPlus9);
     } else if ((u32)(this->unkFC - 0x2BC) < 0xA) {
-        this->methods->slot44(this, 0, ROTATION_YAW_MINUS9);
+        this->methods->slot44(this, 0, sRotationYawMinus9);
     } else if ((u32)(this->unkFC - 0x33E) < 0x4) {
-        this->methods->slot44(this, 0, ROTATION_YAW_MINUS9);
+        this->methods->slot44(this, 0, sRotationYawMinus9);
     } else if (this->unkFC >= 0x353) {
         this->methods->slot160(this);
     }
@@ -60,11 +60,11 @@ void Entity__MoodCue34(Entity *this) {
 
 3. **The two disjoint ranges that share a handler
    (`[0x2BC,0x2C6)` and `[0x33E,0x342)`, both calling
-   `slot44(this, 0, ROTATION_YAW_MINUS9)`) must be written as two SEPARATE
+   `slot44(this, 0, sRotationYawMinus9)`) must be written as two SEPARATE
    `else if` arms with duplicated bodies, not combined with `||`.** A
    combined `(u32)(fc-0x2BC)<0xA || (u32)(fc-0x33E)<0x4` compiled to a
    confusingly-scrambled result where the two `slot44` call sites' data
-   arguments (`ROTATION_YAW_PLUS9` vs `ROTATION_YAW_MINUS9`) appeared to land at the wrong
+   arguments (`sRotationYawPlus9` vs `sRotationYawMinus9`) appeared to land at the wrong
    physical addresses in the funcdiff/asm-differ byte dump. **This turned
    out to be a complete red herring, not a real bug**: at that point the
    function was still one instruction short overall (residue #2, above),
@@ -92,7 +92,7 @@ void Entity__MoodCue34(Entity *this) {
 - `(u32)(x - LOW) < COUNT` is the established unsigned-range-check idiom
   already used in `Entity.c` (`Entity__MoodCue11`'s
   `(u32)(this->unkFC - 0xD5D) < 0x78`).
-- Externs added: `ROTATION_YAW_PLUS9`, `ROTATION_YAW_MINUS9`.
+- Externs added: `sRotationYawPlus9`, `sRotationYawMinus9`.
 - Clean of both open toolchain blockers.
 
 Matched on the 4th distinct attempt (~4/30), after the local-caching miss,

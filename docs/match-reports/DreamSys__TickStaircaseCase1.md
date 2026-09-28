@@ -19,7 +19,7 @@ half-open `[lo, lo+len)` band tests on `this->unk_0x914` to conditionally
 set a flag/fire a call; finish by conditionally setting `this->unk_0x88`,
 unconditionally setting `this->unk_0xA0 = 1;`, bumping `this->unk_0x914`,
 and returning 0). This one has THREE bands per arm (its siblings have two),
-and reuses `ROTATION_YAW_MINUS45` (already named, by `DreamSys__TickStaircaseCase3`) for its
+and reuses `sRotationYawMinus45` (already named, by `DreamSys__TickStaircaseCase3`) for its
 `SceneNode__UpdateRotation` call in the `unk_0xAC == 4` arm.
 
 Both blocker screens are clean: no `gp_rel` hit and no
@@ -27,9 +27,9 @@ Both blocker screens are clean: no `gp_rel` hit and no
 
 ## New knowledge
 
-- `STAIRCASE_OFFSET_1` (`struct RelativePos`) — this function's own per-instance
+- `sStaircaseOffset1` (`struct RelativePos`) — this function's own per-instance
   constant passed to `DreamSys__ApplyRelativeOffset`, sibling to the already-named
-  `STAIRCASE_OFFSET_0`/`STAIRCASE_OFFSET_2`/`STAIRCASE_OFFSET_3`.
+  `sStaircaseOffset0`/`sStaircaseOffset2`/`sStaircaseOffset3`.
 
 No struct fields needed new names or types — every field this function
 touches (`unk_0x914`, `unk_0xAC`, `unk_0xA4`, `unk_0x88`, `unk_0xA0`,
@@ -44,7 +44,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 	s32 flag;
 
 	if (this->unk_0x914 == 0) {
-		DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_1, &this->unk_0x91C);
+		DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset1, &this->unk_0x91C);
 	}
 	if (this->unk_0xAC != 4) {
 		if (this->unk_0x914 >= 0x95)
@@ -57,7 +57,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 		if (this->unk_0x914 >= 0x19)
 			return 1;
 		if ((u32)(this->unk_0x914 - 6) < 2 || (u32)(this->unk_0x914 - 0xB) < 2 || (u32)(this->unk_0x914 - 0x14) < 2) {
-			this->vt->SceneNode__UpdateRotation(this, 0, &ROTATION_YAW_MINUS45);
+			this->vt->SceneNode__UpdateRotation(this, 0, &sRotationYawMinus45);
 		}
 		flag = (u32)(this->unk_0x914 - 3) < 0xE;
 	}
@@ -103,4 +103,4 @@ matched code for a template.
 
 ## Naming
 
-- **Tier B.** Table index 1 of the same STAIRCASE_TICK_FNS family as DreamSys__TickStaircaseCase0, against STAIRCASE_OFFSET_1; same evidence and same caveat.
+- **Tier B.** Table index 1 of the same sStaircaseTickFns family as DreamSys__TickStaircaseCase0, against sStaircaseOffset1; same evidence and same caveat.

@@ -54,8 +54,8 @@
 #include "Viewport.h"
 
 /* With no look command pending, StepLookOffset springs the view height back
- * towards 0 by this much a tick (the size of one LOOK_OFFSET_STEPS step), and
- * StepLookYaw turns back by this many degrees (one LOOK_YAW_STEPS step). */
+ * towards 0 by this much a tick (the size of one sLookOffsetSteps step), and
+ * StepLookYaw turns back by this many degrees (one sLookYawSteps step). */
 #define LOOK_OFFSET_RETURN_STEP 600
 #define LOOK_YAW_RETURN_STEP 45
 
@@ -119,7 +119,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, LinkResource *modelSource, s32 soun
 
 void DreamSys__ResetSessionState(DreamSys *this) {
     this->methods->setDisplay(this, 0);
-    this->methods->updateRotation(this, 1, &ROTATION_YAW_180);
+    this->methods->updateRotation(this, 1, &sRotationYaw180);
     this->lookCallback = NULL;
     this->moveCallback = NULL;
     this->soundCueSet.tag = 0;
@@ -165,7 +165,7 @@ void DreamSys__NotifyLinkAttempt(DreamSys *this, s32 event) {
 
     voice = this->linkTarget->flags36 & 0x7F;
     this->voiceSelect = voice;
-    if (voice >= ARRAY_COUNT(VOICE_BY_SELECT))
+    if (voice >= ARRAY_COUNT(sVoiceBySelect))
         this->voiceSelect = 0;
 
     if (this->state == DREAMSYS_LINK_TUNNEL && this->voiceSelect == 0)
@@ -541,8 +541,8 @@ void DreamSys__StepLookOffset(DreamSys *this) {
 
     idx = this->lookOffsetCommand;
     if (idx != 0) {
-        delta = LOOK_OFFSET_STEPS[idx];
-        threshold = LOOK_OFFSET_LIMITS[idx];
+        delta = sLookOffsetSteps[idx];
+        threshold = sLookOffsetLimits[idx];
         sum = delta + this->lookOffset;
         if (sum >= 0) {
             if (sum < threshold)
@@ -581,12 +581,12 @@ void DreamSys__StepLookYaw(DreamSys *this) {
     this->moveCommandLatch = (this->moveCommand == MOVE_COMMAND_FORWARD);
     idx = this->lookYawCommand;
     if (idx != 0) {
-        delta = LOOK_YAW_STEPS[idx];
-        threshold = LOOK_YAW_LIMITS[idx];
+        delta = sLookYawSteps[idx];
+        threshold = sLookYawLimits[idx];
         sum = delta + this->lookYaw;
         if ((sum >= 0) ? (sum < threshold) : ((~sum + 1) < threshold)) {
-            TURN_ROTATION_YAW[0].numerator = delta;
-            this->methods->updateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
+            sTurnRotationYaw[0].numerator = delta;
+            this->methods->updateRotation(this, 0, &sTurnRotationYaw[-1]);
             this->lookYaw = sum;
         }
         this->lookYawCommand = 0;
@@ -595,8 +595,8 @@ void DreamSys__StepLookYaw(DreamSys *this) {
         delta = -LOOK_YAW_RETURN_STEP;
         if (this->lookYaw < 0)
             delta = LOOK_YAW_RETURN_STEP;
-        TURN_ROTATION_YAW[0].numerator = delta;
-        this->methods->updateRotation(this, 0, &TURN_ROTATION_YAW[-1]);
+        sTurnRotationYaw[0].numerator = delta;
+        this->methods->updateRotation(this, 0, &sTurnRotationYaw[-1]);
         this->lookYaw += delta;
         flipTarget = this;
     } else {
@@ -703,10 +703,10 @@ void DreamSys__StartVoice(DreamSys *this) {
         return;
     }
 
-    scratch = VOICE_BY_SELECT[idx];
+    scratch = sVoiceBySelect[idx];
     heading = scratch << 4;
     headingArg = heading;
-    vt->setPitchOffset(obj, VOICE_PITCH_BY_SELECT[idx]);
+    vt->setPitchOffset(obj, sVoicePitchBySelect[idx]);
     this->voiceIndex = vt->playTone(obj, headingArg, 110, 110);
     if (this->voiceSelect != 22) {
         this->voiceIndex = -1;
@@ -736,14 +736,14 @@ s32 DreamSys__ApplyMoveCommand(DreamSys *this, s32 command) {
     PlayerSpawnPoint *pos;
 
     if (command != 0) {
-        delta = MOVE_COMMAND_SIGNS[command] * MOVE_MODE_SPEEDS[this->moveMode];
+        delta = sMoveCommandSigns[command] * sMoveModeSpeeds[this->moveMode];
         this->methods->slot12C(this);
         pos = (PlayerSpawnPoint *)this->grid->methods->getTargetDescriptor(this->grid, 0, 0);
         if (!this->methods->tryStaircaseLink(this, pos) &&
             !this->methods->tryInstantTeleportLink(this, pos) &&
             !this->methods->tryTunnelLink(this, pos)) {
             this->methods->saveLinkSnapshot(this);
-            MOVE_COMMAND_DISPATCH[command](this, delta, (void *)(this->staircaseMoveGate < 1));
+            sMoveCommandDispatch[command](this, delta, (void *)(this->staircaseMoveGate < 1));
             if (this->currentStage == 0 && this->coord2->coord.t[1] < -2000 &&
                 this->coord2->coord.t[0] >= -499) {
                 this->methods->onGridCellLinkCommand(this, this, 4);
@@ -758,14 +758,14 @@ void DreamSys__ApplyPendingTurn(DreamSys *this) {
 
     idx = this->turnCommand;
     if (idx != 0) {
-        this->methods->updateRotation(this, 0, &TURN_ROTATIONS[idx]);
+        this->methods->updateRotation(this, 0, &sTurnRotations[idx]);
         this->turnCommand = 0;
     }
 }
 
 void DreamSys__TickDrift(DreamSys *this) {
     if (this->driftActive != 0) {
-        this->methods->addTranslation(this, &DRIFT_STEP);
+        this->methods->addTranslation(this, &sDriftStep);
         this->viewport->refView.vr.y -= 600;
     }
     if (this->cueServiceActive != 0)
@@ -835,10 +835,10 @@ void DreamSys__SoundCueCallback(void *owner, SoundCueSet *set) {
 }
 
 /* The word every save block starts with. */
-extern s32 SAVE_MAGIC;
+extern s32 sSaveMagic;
 
 void DreamSys__InitNewGame(DreamSys *this) {
-    this->saveMagic = SAVE_MAGIC;
+    this->saveMagic = sSaveMagic;
     this->currentYear = 0;
     this->currentDay = 0;
     this->totalFlasbackUnlockScore = 0;
@@ -1080,7 +1080,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
                 this->staircaseActive = 1;
                 this->staircaseMoveGate = 1;
                 this->staircaseFrame = 0;
-                this->staircaseTickFn = STAIRCASE_TICK_FNS[GetLastSpawnExtra()];
+                this->staircaseTickFn = sStaircaseTickFns[GetLastSpawnExtra()];
                 this->methods->updateRotation(this, 1, (void *)this->enterRotation);
                 this->staircaseTickFn(this);
             }
@@ -1091,7 +1091,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
 
 s32 DreamSys__TickStaircaseCase0(DreamSys *this) {
     if (this->staircaseFrame == 0) {
-        DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_0, &this->staircaseOrigin);
+        DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset0, &this->staircaseOrigin);
     }
     if (this->moveMode != MOVE_MODE_RUN) {
         if (this->staircaseFrame >= 133)
@@ -1103,7 +1103,7 @@ s32 DreamSys__TickStaircaseCase0(DreamSys *this) {
         if (this->staircaseFrame >= 19)
             return 1;
         if ((u32)(this->staircaseFrame - 8) < 2 || (u32)(this->staircaseFrame - 13) < 2) {
-            this->methods->updateRotation(this, 0, &ROTATION_YAW_PLUS45);
+            this->methods->updateRotation(this, 0, &sRotationYawPlus45);
         }
     }
     this->moveCommand = MOVE_COMMAND_FORWARD;
@@ -1115,7 +1115,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this) {
     s32 flag;
 
     if (this->staircaseFrame == 0) {
-        DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_1, &this->staircaseOrigin);
+        DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset1, &this->staircaseOrigin);
     }
     if (this->moveMode != MOVE_MODE_RUN) {
         if (this->staircaseFrame >= 149)
@@ -1130,7 +1130,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this) {
             return 1;
         if ((u32)(this->staircaseFrame - 6) < 2 || (u32)(this->staircaseFrame - 11) < 2 ||
             (u32)(this->staircaseFrame - 20) < 2) {
-            this->methods->updateRotation(this, 0, &ROTATION_YAW_MINUS45);
+            this->methods->updateRotation(this, 0, &sRotationYawMinus45);
         }
         flag = (u32)(this->staircaseFrame - 3) < 14;
     }
@@ -1144,7 +1144,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this) {
 
 s32 DreamSys__TickStaircaseCase2(DreamSys *this) {
     if (this->staircaseFrame == 0) {
-        DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_2, &this->staircaseOrigin);
+        DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset2, &this->staircaseOrigin);
     }
     if (this->moveMode != MOVE_MODE_RUN) {
         if (this->staircaseFrame < 101) {
@@ -1157,7 +1157,7 @@ s32 DreamSys__TickStaircaseCase2(DreamSys *this) {
     } else {
         if (this->staircaseFrame < 15) {
             if ((u32)(this->staircaseFrame - 8) < 2) {
-                this->methods->updateRotation(this, 0, &ROTATION_YAW_PLUS45);
+                this->methods->updateRotation(this, 0, &sRotationYawPlus45);
             }
         } else {
             return 1;
@@ -1172,7 +1172,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this) {
     s32 flag;
 
     if (this->staircaseFrame == 0) {
-        DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_3, &this->staircaseOrigin);
+        DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset3, &this->staircaseOrigin);
     }
     if (this->moveMode != MOVE_MODE_RUN) {
         if (this->staircaseFrame >= 113)
@@ -1185,7 +1185,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this) {
         if (this->staircaseFrame >= 19)
             return 1;
         if ((u32)(this->staircaseFrame - 6) < 2 || (u32)(this->staircaseFrame - 15) < 2) {
-            this->methods->updateRotation(this, 0, &ROTATION_YAW_MINUS45);
+            this->methods->updateRotation(this, 0, &sRotationYawMinus45);
         }
         flag = (u32)this->staircaseFrame < 9;
     }
@@ -1356,7 +1356,7 @@ DreamColors DreamSys__GetDreamColor(DreamSys *this) {
 }
 
 /* Classifies each mood axis as low (< -3), middle or high (>= 4) and looks
-   the pair up in the 3x3 DREAM_COLOR_TABLE, [dynamic][upper]. MATCHING: the
+   the pair up in the 3x3 sDreamColorTable, [dynamic][upper]. MATCHING: the
    lookup goes through a row pointer; a flat `[d * 3 + u]` swaps two
    registers. */
 DreamColors CalcDreamColor(MoodGraphPoint *mood) {
@@ -1378,7 +1378,7 @@ DreamColors CalcDreamColor(MoodGraphPoint *mood) {
             *p = 1;
         }
     }
-    table = (s8(*)[3])DREAM_COLOR_TABLE;
+    table = (s8(*)[3])sDreamColorTable;
     return table[local.axis.dynamic][local.axis.upper];
 }
 
@@ -1527,7 +1527,7 @@ s32 CalcNavigationScore(void) {
 }
 
 s32 GetStageTimeLimit(s32 stage) {
-    return STAGE_TIME_LIMITS[stage];
+    return sStageTimeLimits[stage];
 }
 
 s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 fromStage, s32 unused) {
@@ -1548,22 +1548,22 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 fromStage, s32 unused)
         stage = -fromStage;
     }
 
-    index = rand() % LEN_STAGE_SPAWNPOINTS[stage];
-    entry = &STAGE_SPAWNPOINTS[stage][index];
+    index = rand() % sStageSpawnPointsCount[stage];
+    entry = &sStageSpawnPoints[stage][index];
     *(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
-    target->position = SPAWN_POS_ADJUST[entry->adjustment];
+    target->position = sSpawnPosAdjust[entry->adjustment];
     (*gpDinamicLinkPenalty)++;
     return stage;
 }
 
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
-    return GetStaticSpawn(target, currentPos, stage, LEN_STAGE_PERMALINK_TRIGGERS,
-                          STAGE_PERMALINK_TRIGGERS, STAGE_PERMALINK_SPAWNS, 1);
+    return GetStaticSpawn(target, currentPos, stage, sStagePermalinkTriggersCount,
+                          sStagePermalinkTriggers, sStagePermalinkSpawns, 1);
 }
 
 s32 Test4TunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
-    return GetStaticSpawn(target, currentPos, stage, LEN_TUNNEL_TRIGGERS, TUNNEL_TRIGGERS,
-                          TUNNEL_SPAWNS, 1);
+    return GetStaticSpawn(target, currentPos, stage, sTunnelTriggersCount, sTunnelTriggers,
+                          sTunnelSpawns, 1);
 }
 
 /* The rotation SceneNode__GetRotationDegrees writes, as IsHeadingAligned
@@ -1574,8 +1574,8 @@ typedef struct DirectionCheckArg {
     u16 heading;
 } DirectionCheckArg;
 
-/* CARDINAL_ROTATIONS seen from its yaw: this label starts 4 bytes into that
-   table, so `angle` is CARDINAL_ROTATIONS[i].y.numerator (0, 90, 180, 270
+/* sCardinalRotations seen from its yaw: this label starts 4 bytes into that
+   table, so `angle` is sCardinalRotations[i].y.numerator (0, 90, 180, 270
    degrees). A separate view, because this one reads the angle as a number
    and the other is only handed to SceneNode__UpdateRotation. */
 typedef struct DirectionTableEntry {
@@ -1583,38 +1583,38 @@ typedef struct DirectionTableEntry {
     u16 pad2[5];
 } DirectionTableEntry;
 
-extern DirectionTableEntry CARDINAL_ANGLES[];
+extern DirectionTableEntry sCardinalAngles[];
 
 /* Defined below, in ROM order. */
 extern s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading);
 
 /* Cardinal-direction indices, per stage: the player must face
-   TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex] to take the
+   sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex] to take the
    tunnel GetStaticSpawn matched, and leaves facing
-   TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex]. */
-extern u8 *TUNNEL_ENTER_HEADINGS[];
-extern u8 *TUNNEL_EXIT_HEADINGS[];
+   sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex]. */
+extern u8 *sTunnelEnterHeadings[];
+extern u8 *sTunnelExitHeadings[];
 
 /* The four cardinal rotations, yaw 0, 90, 180 and 270 degrees, in
    SceneNode__UpdateRotation's form. CheckTunnelHeading and
    CheckStaircaseHeading store an entry's address in enterRotation /
    exitRotation, which SetMoveOverride, SpawnAtLink and TryStaircaseLink
    apply. */
-extern RotationRatios CARDINAL_ROTATIONS[];
+extern RotationRatios sCardinalRotations[];
 
 s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     u8 heading;
     s32 idx;
     s32 result;
 
-    heading = TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
+    heading = sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
     if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
         if (outEnter != NULL)
-            *outEnter = (s32)&CARDINAL_ROTATIONS[heading];
+            *outEnter = (s32)&sCardinalRotations[heading];
 
         if (outExit != NULL) {
-            idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
-            *outExit = (s32)&CARDINAL_ROTATIONS[idx];
+            idx = sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex];
+            *outExit = (s32)&sCardinalRotations[idx];
         }
         result = 1;
     } else {
@@ -1626,7 +1626,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
 s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading) {
     s16 diff;
 
-    diff = rotation->heading - CARDINAL_ANGLES[heading].angle;
+    diff = rotation->heading - sCardinalAngles[heading].angle;
     if (diff >= 181) {
         diff -= 360;
     } else if (diff < -180) {
@@ -1637,7 +1637,7 @@ s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading) {
 
 /* Compared against the leading 4 bytes (chunk+tile) of `currentPos` as a
    raw word; only ever compared here, never dereferenced field-by-field. */
-extern s32 STAGE5_TRIGGER_GRIDPOS;
+extern s32 sStage5TriggerGridPos;
 
 s32 Test4StageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer) {
     s32 result;
@@ -1659,7 +1659,7 @@ shared:
 case5:
     if (currentPos->position.y < -4095)
         goto merge;
-    if (*(s32 *)currentPos == STAGE5_TRIGGER_GRIDPOS)
+    if (*(s32 *)currentPos == sStage5TriggerGridPos)
         goto merge;
     return -1;
 
@@ -1679,14 +1679,14 @@ merge:
 
 /* The rotation TryStageTimerLink stores in stageLinkAngle for every
    destination but stage 12. */
-extern s32 LINK_ANGLE_180;
+extern s32 sLinkAngle180;
 
 s32 GetStageLinkAngle(void) {
     s32 result;
 
     result = 0;
     if (gLinkDstStage != 12)
-        result = (s32)&LINK_ANGLE_180;
+        result = (s32)&sLinkAngle180;
     return result;
 }
 
@@ -1700,9 +1700,9 @@ void SetInstantTeleportersEnabled(bool value) {
 
 /* Test4InstantTeleporters' GetStaticSpawn tables: trigger counts,
    triggers and spawns per stage, as for tunnels and staircases. */
-extern s8 LEN_TELEPORT_TRIGGERS[];
-extern StaticLinkTrigger *TELEPORT_TRIGGERS[];
-extern StageSpawn *TELEPORT_SPAWNS[];
+extern s8 sTeleportTriggersCount[];
+extern StaticLinkTrigger *sTeleportTriggers[];
+extern StageSpawn *sTeleportSpawns[];
 
 s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
     s32 result;
@@ -1710,8 +1710,8 @@ s32 Test4InstantTeleporters(PlayerSpawnPoint *target, PlayerSpawnPoint *currentP
     if (gInstantTeleportersEnabled == 0) {
         result = -1;
     } else {
-        result = GetStaticSpawn(target, currentPos, stage, LEN_TELEPORT_TRIGGERS, TELEPORT_TRIGGERS,
-                                TELEPORT_SPAWNS, 0);
+        result = GetStaticSpawn(target, currentPos, stage, sTeleportTriggersCount, sTeleportTriggers,
+                                sTeleportSpawns, 0);
     }
     return result;
 }
@@ -1722,29 +1722,29 @@ s32 GetTeleportTimeBonus(void) {
 
 s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage) {
     if (stage == 0)
-        return GetStaticSpawn(target, currentPos, 0, LEN_STAIRCASE_TRIGGERS, STAIRCASE_TRIGGERS,
-                              STAIRCASE_SPAWNS, 0);
+        return GetStaticSpawn(target, currentPos, 0, sStaircaseTriggersCount, sStaircaseTriggers,
+                              sStaircaseSpawns, 0);
     return -1;
 }
 
 /* CheckStaircaseHeading's pair of heading tables, indexed as
-   TUNNEL_ENTER_HEADINGS / TUNNEL_EXIT_HEADINGS are. */
-extern u8 *STAIRCASE_ENTER_HEADINGS[];
-extern u8 *STAIRCASE_EXIT_HEADINGS[];
+   sTunnelEnterHeadings / sTunnelExitHeadings are. */
+extern u8 *sStaircaseEnterHeadings[];
+extern u8 *sStaircaseExitHeadings[];
 
 s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     u8 heading;
     s32 idx;
     s32 result;
 
-    heading = STAIRCASE_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
+    heading = sStaircaseEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
     if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
         if (outEnter != NULL)
-            *outEnter = (s32)&CARDINAL_ROTATIONS[heading];
+            *outEnter = (s32)&sCardinalRotations[heading];
 
         if (outExit != NULL) {
-            idx = STAIRCASE_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
-            *outExit = (s32)&CARDINAL_ROTATIONS[idx];
+            idx = sStaircaseExitHeadings[gLinkDstStage][gLinkSpawnIndex];
+            *outExit = (s32)&sCardinalRotations[idx];
         }
         result = 1;
     } else {
@@ -1754,7 +1754,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
 }
 
 s32 GetLastSpawnExtra(void) {
-    return STAIRCASE_SPAWNS[gLinkDstStage][gLinkSpawnIndex].extra;
+    return sStaircaseSpawns[gLinkDstStage][gLinkSpawnIndex].extra;
 }
 
 s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
@@ -1785,7 +1785,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
         entry = &spawns[triggerStage][spawnIndex];
         gLinkSpawnIndex = spawnIndex;
         *(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
-        target->position = SPAWN_POS_ADJUST[entry->adjustment];
+        target->position = sSpawnPosAdjust[entry->adjustment];
         if (flag != 0)
             (*gpNavChallengesComplete)[entry->extra] = 1;
         return gLinkDstStage;
@@ -1802,24 +1802,24 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
 
     stage = GetStageChunkFromMood(&chunk, mood);
     if (stage >= 0) {
-        *timeLimit = STAGE_TIME_LIMITS[stage];
+        *timeLimit = sStageTimeLimits[stage];
 
-        count = LEN_STAGE_SPAWNPOINTS[stage];
-        entry = STAGE_SPAWNPOINTS[stage];
+        count = sStageSpawnPointsCount[stage];
+        entry = sStageSpawnPoints[stage];
         for (i = 0; i < count; i++, entry++) {
             if (*(s16 *)&chunk == *(s16 *)&entry->chunk)
                 goto found;
         }
-        entry = &STAGE_SPAWNPOINTS[stage][*(s16 *)&chunk % count];
+        entry = &sStageSpawnPoints[stage][*(s16 *)&chunk % count];
 
     found:
         *(PlayerSpawnGridPos *)dest = *(PlayerSpawnGridPos *)entry;
-        dest->position = SPAWN_POS_ADJUST[entry->adjustment];
+        dest->position = sSpawnPosAdjust[entry->adjustment];
         return stage;
     }
 
     stage = GetRandomSpawnFromStage(dest, stage, day);
-    *timeLimit = STAGE_TIME_LIMITS[stage];
+    *timeLimit = sStageTimeLimits[stage];
     return stage;
 }
 
@@ -1827,10 +1827,10 @@ MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day) {
     s32 i;
 
     for (i = 0; (u32)i < 42; i++) {
-        if (day == SPECIAL_DAYS[i]) {
+        if (day == sSpecialDays[i]) {
             cinematic->entry = rand() % 6;
             cinematic->bank = i % 12;
-            return &SPECIAL_DAY_MOOD;
+            return &sSpecialDayMood;
         }
     }
     return NULL;

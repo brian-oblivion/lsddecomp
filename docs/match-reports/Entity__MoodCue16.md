@@ -16,12 +16,12 @@ words, whole-image build verified byte-exact)
 2. If `this->unk44 == 0`, three-way dispatch on `this->unkFC`:
    - `< 0x40` (64): `this->methods->slotC4(this, -0x5A, 0);`
    - `== 0x40`: rolls `rand() & 1` to pick between two data rows
-     (`ROTATION_YAW_MINUS90` default, `ROTATION_YAW_PLUS90` on a hit), calls
+     (`sRotationYawMinus90` default, `sRotationYawPlus90` on a hit), calls
      `this->methods->slot44(this, 0, arg2);` then
-     `this->methods->slotBC(this, TRANSLATE_Y_PLUS256);`
+     `this->methods->slotBC(this, sTranslateYPlus256);`
    - `> 0x40`: `this->methods->slotD0(this, -0x176, rand() % 2);`
 3. Else if `this->unk44 == 0xB`: if `this->unkFC % 5 == 0`, calls
-   `this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);`; unconditionally calls
+   `this->methods->slot44(this, 0, sRotationYawPlus90);`; unconditionally calls
    `this->methods->slotC4(this, -0x800, 0);` then
    `this->methods->slot60(this, (rand() % 7) == 0);`.
 
@@ -38,7 +38,7 @@ don't imply a shared occupant.
 directly against the existing `void (*slot60)(Entity *self, s32 arg1)`.
 
 Three more `D_8008xxxx` opaque data rows declared at the top of this file:
-`ROTATION_YAW_MINUS90`, `ROTATION_YAW_PLUS90`, `TRANSLATE_Y_PLUS256`.
+`sRotationYawMinus90`, `sRotationYawPlus90`, `sTranslateYPlus256`.
 
 ## Final C
 
@@ -57,18 +57,18 @@ void Entity__MoodCue16(Entity *this) {
             this->methods->slotC4(this, -0x5A, 0);
         } else if (this->unkFC == 0x40) {
             roll = rand() & 1;
-            arg2 = ROTATION_YAW_MINUS90;
+            arg2 = sRotationYawMinus90;
             if (roll != 0) {
-                arg2 = ROTATION_YAW_PLUS90;
+                arg2 = sRotationYawPlus90;
             }
             this->methods->slot44(this, 0, arg2);
-            this->methods->slotBC(this, TRANSLATE_Y_PLUS256);
+            this->methods->slotBC(this, sTranslateYPlus256);
         } else {
             this->methods->slotD0(this, -0x176, rand() % 2);
         }
     } else if (this->unk44 == 0xB) {
         if (this->unkFC % 5 == 0) {
-            this->methods->slot44(this, 0, ROTATION_YAW_PLUS90);
+            this->methods->slot44(this, 0, sRotationYawPlus90);
         }
         this->methods->slotC4(this, -0x800, 0);
         this->methods->slot60(this, (rand() % 7) == 0);
@@ -78,8 +78,8 @@ void Entity__MoodCue16(Entity *this) {
 
 ## Attempt log
 
-Two attempts. First attempt wrote `arg2 = ROTATION_YAW_MINUS90; if ((rand() & 1) !=
-0) { arg2 = ROTATION_YAW_PLUS90; }` directly (default assignment textually before the
+Two attempts. First attempt wrote `arg2 = sRotationYawMinus90; if ((rand() & 1) !=
+0) { arg2 = sRotationYawPlus90; }` directly (default assignment textually before the
 `rand()` call). This compiled the default assignment BEFORE the `jal rand`
 in the RTL, forcing `arg2`'s live range across the call and promoting it
 into a callee-saved register (`$s1`) — 2 extra words (a spurious
@@ -89,7 +89,7 @@ on the built ELF confirmed `Entity__MoodCue17` landed 8 bytes past retail).
 Retail computes the default assignment AFTER `rand()` returns, keeping
 `arg2` entirely in caller-saved `$a2` with no register pressure across the
 call. Hoisting the `rand()` call into its own statement BEFORE the default
-assignment (`roll = rand() & 1; arg2 = ROTATION_YAW_MINUS90; if (roll != 0) ...`)
+assignment (`roll = rand() & 1; arg2 = sRotationYawMinus90; if (roll != 0) ...`)
 matched immediately — with the call now textually first, GCC's RTL for the
 default assignment falls after it, and no callee-saved register is needed.
 
@@ -115,7 +115,7 @@ than a loop.
 
 `Entity__MoodCue16` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005ED30`.
 
-`gEntityMoodHandlerTable` row 16. Body (takes only `this`): on moodTimer 0 a coin flip may set phase `unk44 = 0xB`. In phase 0 it moves -0x5A below moodTimer 64; at 64 it turns +/-90 degrees at random and steps `TRANSLATE_Y_PLUS256`; after that it runs slot +0xD0(-0x176, rand() % 2). In phase 0xB it turns +90 every 5 ticks, moves -0x800, and calls slot +0x60 with `rand() % 7 == 0`.
+`gEntityMoodHandlerTable` row 16. Body (takes only `this`): on moodTimer 0 a coin flip may set phase `unk44 = 0xB`. In phase 0 it moves -0x5A below moodTimer 64; at 64 it turns +/-90 degrees at random and steps `sTranslateYPlus256`; after that it runs slot +0xD0(-0x176, rand() % 2). In phase 0xB it turns +90 every 5 ticks, moves -0x800, and calls slot +0x60 with `rand() % 7 == 0`.
 
 Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `ServiceSoundCueSet` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.
 
@@ -125,7 +125,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 4b (round 93, charlie) — 2026-09-26
 
-The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `arg2`, which holds `ROTATION_YAW_MINUS90` or `ROTATION_YAW_PLUS90` and is passed to `updateRotation`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.
+The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `arg2`, which holds `sRotationYawMinus90` or `sRotationYawPlus90` and is passed to `updateRotation`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.
 
 ## Track 7 (round 94, delta)
 

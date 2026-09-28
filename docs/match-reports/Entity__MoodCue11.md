@@ -26,7 +26,7 @@ smaller handlers established individually:
      (`Unk94Methods::slot100`) that can reset `this->unkFC`/`this->unk44`.
    - `== 0xC`: single `unkFC == 0x7BC` check, sets `row`.
    - `== 0xD`: `this->unk48 = -0x78;` + `SceneNode__FaceTarget(...)` +
-     `slot48(this, 1, SCALE_HALF)` (return discarded) + a `slot144`
+     `slot48(this, 1, sScaleHalf)` (return discarded) + a `slot144`
      threshold check (the SAME 2-argument `slot144` established in
      `Entity__IsTargetInRange`/`Entity__MoodCue12`) gating a `slot30(this, 0xB)` call.
 4. `if (this->unkFC == 0x618) { ... coin flip sets unk44/row ... }`
@@ -89,13 +89,13 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0xB) {
         if (this->unkFC == 0xA8C) {
-            row = ROTATION_YAW_MINUS90;
+            row = sRotationYawMinus90;
         }
         if (this->unkFC == 0xC6C) {
-            row = ROTATION_YAW_PLUS90;
+            row = sRotationYawPlus90;
         }
         if (this->unkFC == 0xE10) {
-            row = ROTATION_YAW_MINUS90;
+            row = sRotationYawMinus90;
         }
         if ((u32)(this->unkFC - 0xD5D) < 0x78) {
             if (this->unk94->methods->slot100(this->unk94) != 0) {
@@ -105,22 +105,22 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
         }
     } else if (this->unk44 == 0xC) {
         if (this->unkFC == 0x7BC) {
-            row = ROTATION_YAW_MINUS90;
+            row = sRotationYawMinus90;
         }
     } else if (this->unk44 == 0xD) {
         this->unk48 = -0x78;
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
-        this->methods->slot48(this, 1, SCALE_HALF);
+        this->methods->slot48(this, 1, sScaleHalf);
         if (this->methods->slot144(this, this->unk94) < 0x400) {
             this->methods->slot30(this, 0xB);
         }
     }
     if (this->unkFC == 0x618) {
         if ((rand() & 1) != 0) {
-            row = ROTATION_YAW_PLUS90;
+            row = sRotationYawPlus90;
             this->unk44 = 0xB;
         } else {
-            row = ROTATION_YAW_MINUS90;
+            row = sRotationYawMinus90;
             this->unk44 = 0xC;
         }
     }
@@ -179,7 +179,7 @@ Two, both stated above as the generalizable versions:
 
 `Entity__MoodCue11` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005E7F8`.
 
-`gEntityMoodHandlerTable` row 11. Body: `unk48 = -20`, sets the attenuation, and requests voice 0 tone 10 (pitch 1) every half `unk80` period. A three-phase `unk44` machine: phase 0xB turns +/-90 degrees at fixed moodTimer values and, inside a 0x78-tick window from 0xD5D, moves to phase 0xD (moodTimer reset) when the target's slot +0x100 is non-zero. Phase 0xC turns at 0x7BC. Phase 0xD sets `unk48 = -120`, faces the target, sets `updateScale(1, SCALE_HALF)`, and calls `notifyParents(this, 0xB)` once `distanceToRegion` to the target is below 0x400. At 0x618 a coin flip picks phase 0xB (+90) or 0xC (-90). Each tick it applies the chosen turn with `updateRotation(0, row)`, runs slot +0xD0 with `unk48`, and outside phase 0xC runs slot +0xCC(-0xC8) when `unk28` is set.
+`gEntityMoodHandlerTable` row 11. Body: `unk48 = -20`, sets the attenuation, and requests voice 0 tone 10 (pitch 1) every half `unk80` period. A three-phase `unk44` machine: phase 0xB turns +/-90 degrees at fixed moodTimer values and, inside a 0x78-tick window from 0xD5D, moves to phase 0xD (moodTimer reset) when the target's slot +0x100 is non-zero. Phase 0xC turns at 0x7BC. Phase 0xD sets `unk48 = -120`, faces the target, sets `updateScale(1, sScaleHalf)`, and calls `notifyParents(this, 0xB)` once `distanceToRegion` to the target is below 0x400. At 0x618 a coin flip picks phase 0xB (+90) or 0xC (-90). Each tick it applies the chosen turn with `updateRotation(0, row)`, runs slot +0xD0 with `unk48`, and outside phase 0xC runs slot +0xCC(-0xC8) when `unk28` is set.
 
 Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `ServiceSoundCueSet` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.
 
@@ -202,7 +202,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 4b (round 93, charlie) — 2026-09-26
 
-The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `row`, which only ever holds `ROTATION_YAW_MINUS90`/`ROTATION_YAW_PLUS90` or 0 and is passed to `updateRotation`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.
+The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `row`, which only ever holds `sRotationYawMinus90`/`sRotationYawPlus90` or 0 and is passed to `updateRotation`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.
 
 ## Track 7 (round 94, delta)
 

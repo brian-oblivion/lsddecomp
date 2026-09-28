@@ -47,9 +47,9 @@ void Entity__MoodCue35(Entity *this) {
     (*slotC4)(this, arg1c, 0);
 
     if (rem500 < 0x20) {
-        this->methods->slotBC(this, TRANSLATE_Y_MINUS64);
+        this->methods->slotBC(this, sTranslateYMinus64);
     } else if (rem500 < 0x40) {
-        this->methods->slotBC(this, TRANSLATE_Y_PLUS64);
+        this->methods->slotBC(this, sTranslateYPlus64);
     }
 }
 ```

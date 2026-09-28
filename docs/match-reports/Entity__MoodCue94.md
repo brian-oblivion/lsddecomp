@@ -10,9 +10,9 @@ On `this->unkFC == 0`: `if (this->unk94->methods->slot200(this->unk94) !=
 7) { this->unk44 = 0xB; }`. Unconditionally: `out->unk10 =
 this->methods->slot148(this); if (out->unk4 % 10 == 0) { out->unk1C =
 0xE; }`. On `this->unkFC == this->unk80`: `slot128(this,1)`; if
-`this->unk44 != 0`, on a `rand()&1` miss calls `slot48(this,1,SCALE_SIX)`
+`this->unk44 != 0`, on a `rand()&1` miss calls `slot48(this,1,sScaleSix)`
 and `slotCC(this,0x800,0)`; independently, on `rand()%3==0`, calls
-`slot44(this,0,ROTATION_YAW_PLUS180)`. Finally, `if (this->unk7C != 0) {
+`slot44(this,0,sRotationYawPlus180)`. Finally, `if (this->unk7C != 0) {
 slotC4(this,-0x80,1); }`.
 
 ## Derivation
@@ -41,7 +41,7 @@ Tier B, same as every sibling `Entity__MoodCueNN` (Entity..Entity_g): the
 row mapping is a fact of the binary, which dream object or state a row is
 for is not established. Row kept decimal so names sort in table order.
 
-What it does, in the unit's current field names: At tick 0, `moodState = 0xB` unless `target->slot200()` is 7; voice-0 tone 14 every 10 set ticks; at `moodDuration`: `slot128(1)`, and when `moodState != 0` a coin-flip `updateScale(1, SCALE_SIX)` + `slotCC(0x800, 0)`, and a 1/3 `updateRotation(0, ROTATION_YAW_PLUS180)`; `slotC4(-0x80, 1)` while `unk7C != 0`.
+What it does, in the unit's current field names: At tick 0, `moodState = 0xB` unless `target->slot200()` is 7; voice-0 tone 14 every 10 set ticks; at `moodDuration`: `slot128(1)`, and when `moodState != 0` a coin-flip `updateScale(1, sScaleSix)` + `slotCC(0x800, 0)`, and a 1/3 `updateRotation(0, sRotationYawPlus180)`; `slotC4(-0x80, 1)` while `unk7C != 0`.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

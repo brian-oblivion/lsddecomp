@@ -138,7 +138,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
  *    DreamSys__UpdateDreamChart and the MoodGraphContributor helpers,
  *    DreamSys__AddFlashback/FlashbackSaving, DreamSys__CalcUnlockScore, and
  *    DreamSys__GetSaveBlock, which hands out the 0x700 bytes of the object
- *    that DreamSys__InitNewGame initializes and that start with SAVE_MAGIC.
+ *    that DreamSys__InitNewGame initializes and that start with sSaveMagic.
  *
  * 4. Linking. DreamSys__WallLink/DynamicLink, the "Try...Link" family and
  *    the free "Test4..."/GetStaticSpawn static-link testers underneath them;

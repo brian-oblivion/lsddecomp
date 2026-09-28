@@ -556,16 +556,16 @@ void Entity__MoodCue00(Entity *this, SoundCueSet *out) {
         if (this->moodTimer < 100) {
             this->methods->moveLocalZ(this, 50, 0);
         } else if (this->moodTimer < 250) {
-            this->methods->addTranslation(this, TRANSLATE_Y_PLUS64_Z_MINUS64);
+            this->methods->addTranslation(this, sTranslateYPlus64ZMinus64);
         }
     } else if (this->moodTimer == 250) {
         this->methods->stopTod(this);
         out->slots[0].program = SOUND_CUE_STOP;
     } else if (this->moodTimer >= 261 && this->moodTimer < 568) {
         this->methods->moveLocalZ(this, -50, 0);
-        this->methods->updateRotation(this, 1, ROTATION_YAW_MINUS120);
+        this->methods->updateRotation(this, 1, sRotationYawMinus120);
     } else if (this->moodTimer >= 569) {
-        this->methods->updateRotation(this, 1, ROTATION_X50_YMINUS120_Z30);
+        this->methods->updateRotation(this, 1, sRotationX50YMinus120Z30);
     }
 }
 
@@ -604,10 +604,10 @@ void Entity__MoodCue07(Entity *this, SoundCueSet *out) {
         out->slots[2].octave = -1;
     }
     if (this->moodTimer >= 121) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
+        this->methods->updateRotation(this, 0, sRotationYawPlus2);
         this->methods->moveLocalZ(this, -320, 0);
     } else if (this->moodTimer >= 56 || Entity__IsNearTarget(this, this->coord2->coord.t, 1, 1) != 0) {
-        this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
+        this->methods->addTranslation(this, sTranslateYMinus64);
     } else if (this->moodTimer >= 10) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         this->methods->moveLocalZ(this, -256, 0);
@@ -617,8 +617,8 @@ void Entity__MoodCue07(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue08(Entity *this) {
-    this->methods->updateScale(this, 1, SCALE_DOUBLE);
-    this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
+    this->methods->updateScale(this, 1, sScaleDouble);
+    this->methods->addTranslation(this, sTranslateYMinus64);
 }
 
 void Entity__MoodCue09(Entity *this, SoundCueSet *out) {
@@ -651,13 +651,13 @@ void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 11) {
         if (this->moodTimer == 2700) {
-            turn = ROTATION_YAW_MINUS90;
+            turn = sRotationYawMinus90;
         }
         if (this->moodTimer == 3180) {
-            turn = ROTATION_YAW_PLUS90;
+            turn = sRotationYawPlus90;
         }
         if (this->moodTimer == 3600) {
-            turn = ROTATION_YAW_MINUS90;
+            turn = sRotationYawMinus90;
         }
         if (this->moodTimer >= 3421 && this->moodTimer < 3541) {
             if (((DreamSys *)this->peer)->methods->getLinkCommandFlag((DreamSys *)this->peer) != 0) {
@@ -667,22 +667,22 @@ void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
         }
     } else if (this->state == 12) {
         if (this->moodTimer == 1980) {
-            turn = ROTATION_YAW_MINUS90;
+            turn = sRotationYawMinus90;
         }
     } else if (this->state == 13) {
         this->lastOffsetValue = -120;
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
-        this->methods->updateScale(this, 1, SCALE_HALF);
+        this->methods->updateScale(this, 1, sScaleHalf);
         if (this->methods->distanceToPeer(this, this->peer) < 1024) {
             this->methods->notifyParents(this, ENTITY_EFFECT_EVENT_VIDEO);
         }
     }
     if (this->moodTimer == 1560) {
         if ((rand() & 1) != 0) {
-            turn = ROTATION_YAW_PLUS90;
+            turn = sRotationYawPlus90;
             this->state = 11;
         } else {
-            turn = ROTATION_YAW_MINUS90;
+            turn = sRotationYawMinus90;
             this->state = 12;
         }
     }
@@ -772,18 +772,18 @@ void Entity__MoodCue16(Entity *this) {
             this->methods->moveLocalZ(this, -90, 0);
         } else if (this->moodTimer == 64) {
             roll = rand() & 1;
-            turn = ROTATION_YAW_MINUS90;
+            turn = sRotationYawMinus90;
             if (roll != 0) {
-                turn = ROTATION_YAW_PLUS90;
+                turn = sRotationYawPlus90;
             }
             this->methods->updateRotation(this, 0, turn);
-            this->methods->addTranslation(this, TRANSLATE_Y_PLUS256);
+            this->methods->addTranslation(this, sTranslateYPlus256);
         } else {
             this->methods->moveLocalZOrFindLink(this, -374, (void *)(rand() % 2));
         }
     } else if (this->state == 11) {
         if (this->moodTimer % 5 == 0) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
+            this->methods->updateRotation(this, 0, sRotationYawPlus90);
         }
         this->methods->moveLocalZ(this, -2048, 0);
         this->methods->setDisplay(this, (rand() % 7) == 0);
@@ -791,7 +791,7 @@ void Entity__MoodCue16(Entity *this) {
 }
 
 void Entity__MoodCue17(Entity *this) {
-    this->methods->updateScale(this, 1, SCALE_HALF);
+    this->methods->updateScale(this, 1, sScaleHalf);
 }
 
 /* ---- MoodCue handlers, rows 19 to 38 and 119 ---------------------------
@@ -829,7 +829,7 @@ void Entity__MoodCue19(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue20(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0 && rand() % 7 == 0) {
-        this->methods->updateScale(this, 1, SCALE_Y2);
+        this->methods->updateScale(this, 1, sScaleY2);
     }
     if ((out->tick & 3) == 0) {
         out->attenuation = this->methods->getProximityRatio(this);
@@ -867,17 +867,17 @@ void Entity__MoodCue23(Entity *this) {
             this->moodTimer = 0;
         }
         if (this->moodTimer >= 7) {
-            this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
+            this->methods->addTranslation(this, sTranslateYMinus64);
             this->methods->moveLocalZ(this, 10, 0);
         } else {
-            this->methods->addTranslation(this, TRANSLATE_X_MINUS64);
+            this->methods->addTranslation(this, sTranslateXMinus64);
         }
     } else if (this->moodTimer == 0) {
-        this->methods->addTranslation(this, TRANSLATE_Y_MINUS4096);
+        this->methods->addTranslation(this, sTranslateYMinus4096);
     } else if (this->moodTimer < 65) {
-        this->methods->addTranslation(this, TRANSLATE_Y_PLUS64);
+        this->methods->addTranslation(this, sTranslateYPlus64);
     } else if (this->moodTimer < 71) {
-        this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
+        this->methods->addTranslation(this, sTranslateYMinus64);
         this->methods->moveLocalZ(this, -30, 0);
     } else {
         EntityMethods *methods = this->methods;
@@ -897,8 +897,8 @@ void Entity__MoodCue24(Entity *this, SoundCueSet *out) {
         out->slots[0].program = 7;
         out->slots[0].octave = -2;
     }
-    this->methods->updateScale(this, 1, SCALE_DOUBLE);
-    this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
+    this->methods->updateScale(this, 1, sScaleDouble);
+    this->methods->updateRotation(this, 0, sRotationYawPlus2);
     this->methods->moveLocalZ(this, -512, 0);
 }
 
@@ -919,7 +919,7 @@ void Entity__MoodCue25(Entity *this, SoundCueSet *out) {
         out->slots[2].octave = -1;
         this->methods->moveLocalY(this, -256, 0);
     } else {
-        this->methods->updateRotation(this, 0, ROTATION_XPLUS_EIGHTH);
+        this->methods->updateRotation(this, 0, sRotationXPlusEighth);
         this->methods->moveLocalY(this, -512, 0);
     }
 }
@@ -968,19 +968,19 @@ void Entity__MoodCue27(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue119(Entity *this) {
-    this->methods->updateScale(this, 1, SCALE_SIX);
+    this->methods->updateScale(this, 1, sScaleSix);
 }
 
 void Entity__MoodCue29(Entity *this) {
     if (this->moodTimer == 0) {
         if (((DreamSys *)this->peer)->methods->getDreamColor((DreamSys *)this->peer) == DREAM_COLOR_WHITE) {
-            this->methods->updateScale(this, 1, SCALE_TRIPLE);
+            this->methods->updateScale(this, 1, sScaleTriple);
             this->methods->moveLocalY(this, -30720, 0);
         }
         this->state = rand() % 5;
     }
     if (this->state == 0) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS1);
+        this->methods->updateRotation(this, 0, sRotationYawPlus1);
     }
 }
 
@@ -994,7 +994,7 @@ void Entity__MoodCue30(Entity *this) {
     }
 
     if (this->state == 12) {
-        this->methods->updateScale(this, 1, SCALE_DOUBLE);
+        this->methods->updateScale(this, 1, sScaleDouble);
         this->methods->moveLocalY(this, -30, 0);
     } else {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
@@ -1007,7 +1007,7 @@ void Entity__MoodCue30(Entity *this) {
             }
         } else if (this->state == 13) {
             this->methods->setTranslation(this, (LongVec3 *)((DreamSys *)this->peer)->coord2->coord.t);
-            this->methods->addTranslation(this, TRANSLATE_Y_MINUS1500_Z_PLUS1024);
+            this->methods->addTranslation(this, sTranslateYMinus1500ZPlus1024);
         }
     }
 }
@@ -1033,7 +1033,7 @@ void Entity__MoodCue32(Entity *this) {
 
 void Entity__MoodCue33(Entity *this, SoundCueSet *out) {
     if (this->targetReached != 0) {
-        this->methods->updateScale(this, 1, SCALE_QUARTER);
+        this->methods->updateScale(this, 1, sScaleQuarter);
     } else if (out->tick % 30 == 0) {
         out->attenuation = 0;
         out->slots[0].program = 3;
@@ -1049,11 +1049,11 @@ void Entity__MoodCue34(Entity *this) {
     s32 zDelta;
 
     if ((u32)(this->moodTimer - 400) < 10) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS9);
+        this->methods->updateRotation(this, 0, sRotationYawPlus9);
     } else if ((u32)(this->moodTimer - 700) < 10) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS9);
+        this->methods->updateRotation(this, 0, sRotationYawMinus9);
     } else if ((u32)(this->moodTimer - 830) < 4) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS9);
+        this->methods->updateRotation(this, 0, sRotationYawMinus9);
     } else if (this->moodTimer >= 851) {
         this->methods->deactivate(this);
     }
@@ -1101,9 +1101,9 @@ void Entity__MoodCue35(Entity *this) {
     (*moveZ)(this, arg1c, 0);
 
     if (rem500 < 32) {
-        this->methods->addTranslation(this, TRANSLATE_Y_MINUS64);
+        this->methods->addTranslation(this, sTranslateYMinus64);
     } else if (rem500 < 64) {
-        this->methods->addTranslation(this, TRANSLATE_Y_PLUS64);
+        this->methods->addTranslation(this, sTranslateYPlus64);
     }
 }
 
@@ -1113,9 +1113,9 @@ void Entity__MoodCue36(Entity *this) {
 
     if (this->state == 0) {
         roll = rand();
-        scaleTemplate = SCALE_SIX;
+        scaleTemplate = sScaleSix;
         if ((roll & 1) != 0) {
-            scaleTemplate = SCALE_DOUBLE;
+            scaleTemplate = sScaleDouble;
         }
         this->methods->updateScale(this, 1, scaleTemplate);
         this->state = 11;
@@ -1162,7 +1162,7 @@ void Entity__MoodCue38(Entity *this, SoundCueSet *out) {
  */
 
 /* The z den of a scale template, three Ratio16s {1/1, 1/1, 1/zDenom} that
- * end here (the range splat labels SCALE_X3 runs on into its first ten
+ * end here (the range splat labels sScaleX3 runs on into its first ten
  * bytes). Entity__MoodCue41 writes the den and passes the template. */
 extern s16 sScaleTemplateZDenom;
 
@@ -1182,7 +1182,7 @@ void Entity__MoodCue39(Entity *this, SoundCueSet *out) {
         } else if (dayYearPhase != 2) {
             goto skipScaleBump;
         }
-        this->methods->updateScale(this, 1, SCALE_Y4);
+        this->methods->updateScale(this, 1, sScaleY4);
     }
 skipScaleBump:
     if (out->tick % 22 == 0) {
@@ -1206,13 +1206,13 @@ void Entity__MoodCue40(Entity *this, SoundCueSet *out) {
         out->slots[0].endVol = 64;
     }
     if (this->moodTimer == 200) {
-        table = ROTATION_YAW_MINUS90;
+        table = sRotationYawMinus90;
     } else if (this->moodTimer == 400) {
-        table = ROTATION_YAW_PLUS180;
+        table = sRotationYawPlus180;
     } else if (this->moodTimer == 600) {
-        table = ROTATION_YAW_PLUS90;
+        table = sRotationYawPlus90;
     } else if (this->moodTimer == 800) {
-        table = ROTATION_YAW_PLUS180;
+        table = sRotationYawPlus180;
         this->moodTimer = -1;
     }
     if (table != NULL) {
@@ -1241,7 +1241,7 @@ void Entity__MoodCue41(Entity *this, SoundCueSet *out) {
             zDenom = &sScaleTemplateZDenom;
             *zDenom = roll % 32 + 1;
             /* Back from the den to the start of its template. MATCHING:
-             * retail relocates against sScaleTemplateZDenom, not SCALE_X3. */
+             * retail relocates against sScaleTemplateZDenom, not sScaleX3. */
             this->methods->updateScale(this, 1, (Ratio16 *)(zDenom + 1) - 3);
         }
     }
@@ -1281,9 +1281,9 @@ void Entity__MoodCue43(Entity *this, SoundCueSet *out) {
         dx = (rand() & 1) ? -60 : 60;
         this->methods->moveLocalX(this, dx, 0);
         rotPick = rand();
-        table = ROTATION_YAW_PLUS9;
+        table = sRotationYawPlus9;
         if ((rotPick & 3) != 0) {
-            table = ROTATION_YAW_MINUS9;
+            table = sRotationYawMinus9;
         }
         this->methods->updateRotation(this, 0, table);
     }
@@ -1303,7 +1303,7 @@ void Entity__MoodCue44(Entity *this, SoundCueSet *out) {
     if (this->moodTimer >= 300 && this->moodTimer < 320) {
         this->methods->moveLocalZ(this, -60, 0);
     } else if (this->moodTimer >= 321 && this->moodTimer < 340) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS9);
+        this->methods->updateRotation(this, 0, sRotationYawMinus9);
     } else if (this->moodTimer >= 321) {
         dxPick = rand();
         dx = -128;
@@ -1312,16 +1312,16 @@ void Entity__MoodCue44(Entity *this, SoundCueSet *out) {
         }
         this->methods->moveLocalX(this, dx, (void *)1);
         rotPick = rand();
-        table = ROTATION_YAW_PLUS9;
+        table = sRotationYawPlus9;
         if ((rotPick & 3) != 0) {
-            table = ROTATION_YAW_MINUS9;
+            table = sRotationYawMinus9;
         }
         this->methods->updateRotation(this, 0, table);
     }
 }
 
 /* At the cue's start, rolls 0..9: 8 or 9 stretches the entity by
- * SCALE_X3, 5 to 7 arms a drift (state 10) that adds TRANSLATE_Z_MINUS256
+ * sScaleX3, 5 to 7 arms a drift (state 10) that adds sTranslateZMinus256
  * every tick from tick 201 on. */
 void Entity__RollScaleOrDelayedDrift(Entity *this) {
     s32 roll;
@@ -1329,13 +1329,13 @@ void Entity__RollScaleOrDelayedDrift(Entity *this) {
     if (this->moodTimer == 0) {
         roll = rand() % 10;
         if (roll >= 8) {
-            this->methods->updateScale(this, 1, SCALE_X3);
+            this->methods->updateScale(this, 1, sScaleX3);
         } else if (roll >= 5) {
             this->state = 10;
         }
     }
     if (this->state == 10 && this->moodTimer >= 201) {
-        this->methods->addTranslation(this, TRANSLATE_Z_MINUS256);
+        this->methods->addTranslation(this, sTranslateZMinus256);
     }
 }
 
@@ -1355,7 +1355,7 @@ void Entity__MoodCue46(Entity *this, SoundCueSet *out) {
         } else if (dayYearPhase != 1) {
             goto skipScaleBump;
         }
-        this->methods->updateScale(this, 1, SCALE_SIX);
+        this->methods->updateScale(this, 1, sScaleSix);
     }
 skipScaleBump:
     if (out->tick == 0) {
@@ -1430,7 +1430,7 @@ void Entity__MoodCue49(Entity *this, SoundCueSet *out) {
                 peerMethods = ((DreamSys *)this->peer)->methods;
                 translation = this->parent ? this->coord2->workm.t : NULL;
                 peerMethods->setTranslation((DreamSys *)this->peer, translation);
-                ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, ROTATION_YAW_MINUS90);
+                ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, sRotationYawMinus90);
                 ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, false);
                 this->moodTimer = 0;
                 this->state = 11;
@@ -1465,7 +1465,7 @@ void Entity__MoodCue51(Entity *this, SoundCueSet *out) {
     Ratio16 *table;
 
     if (this->moodTimer == 0 && rand() % 5 == 0 && this->state == 0) {
-        this->methods->updateScale(this, 1, SCALE_SIX);
+        this->methods->updateScale(this, 1, sScaleSix);
         this->methods->moveLocalY(this, 800, 0);
         this->state = 11;
     }
@@ -1475,12 +1475,12 @@ void Entity__MoodCue51(Entity *this, SoundCueSet *out) {
         out->slots[0].program = 8;
     }
     if (this->moodTimer == 90) {
-        table = ROTATION_YAW_MINUS90;
+        table = sRotationYawMinus90;
     } else if (this->moodTimer == 160) {
-        table = ROTATION_YAW_PLUS90;
+        table = sRotationYawPlus90;
     } else if (this->moodTimer == 220) {
         if (rand() & 1) {
-            table = ROTATION_YAW_PLUS180;
+            table = sRotationYawPlus180;
         }
     }
     if (table != NULL) {
@@ -1493,13 +1493,13 @@ void Entity__MoodCue52(Entity *this, SoundCueSet *out) {
     out->attenuation = this->methods->getProximityRatio(this);
     if (this->moodTimer < 188) {
         if (this->moodTimer == 84) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
+            this->methods->updateRotation(this, 0, sRotationYawPlus180);
         }
         if (out->tick % 20 == 0) {
             out->slots[0].program = 9;
         }
     } else if (this->moodTimer < 200) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS9);
+        this->methods->updateRotation(this, 0, sRotationYawPlus9);
     } else {
         this->methods->deactivate(this);
         out->slots[1].program = 30;
@@ -1513,7 +1513,7 @@ void Entity__MoodCue55(Entity *this, SoundCueSet *out) {
 
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
-            this->methods->updateScale(this, 1, SCALE_Y2);
+            this->methods->updateScale(this, 1, sScaleY2);
         }
     }
     out->attenuation = this->methods->getProximityRatio(this);
@@ -1630,7 +1630,7 @@ void Entity__MoodCue58(Entity *this, SoundCueSet *out) {
             out->slots[0].program = 18;
             out->attenuation = 0;
             out->slots[1].program = 3;
-            this->methods->updateRotation(this, 1, ROTATION_ZMINUS90);
+            this->methods->updateRotation(this, 1, sRotationZMinus90);
             this->methods->moveLocalX(this, 2400, 0);
             this->methods->moveLocalY(this, 1500, 0);
             this->parts[1]->methods->setDisplay(this->parts[1], 0);
@@ -1712,7 +1712,7 @@ tail:
  * startSoundCue, on the cue set's own `tick`, or on todFrame, the frame of
  * its TOD animation, and sends the dream an EntityEffect through
  * notifyParents. Entity__MoodCue108 (below) runs Entity__MoodCue71 and
- * then sets its scale to SCALE_SIX.
+ * then sets its scale to sScaleSix.
  *
  * The literals are left unnamed where they are one handler's tuning: tick
  * counts, distances in world units, TOD frame numbers, VAB program numbers,
@@ -1803,15 +1803,15 @@ void Entity__MoodCue64(Entity *this, SoundCueSet *out) {
 void Entity__MoodCue65(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if (rand() % 3 == 0) {
-            this->methods->updateScale(this, 1, SCALE_HALF);
+            this->methods->updateScale(this, 1, sScaleHalf);
             this->methods->moveLocalY(this, -300, 0);
-            this->methods->updateRotation(this, 1, ROTATION_YAW_PLUS90);
+            this->methods->updateRotation(this, 1, sRotationYawPlus90);
             this->state = 11;
         }
     }
     if (this->state == 11) {
         if (this->moodTimer == 2000) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS90);
+            this->methods->updateRotation(this, 0, sRotationYawMinus90);
         }
         this->methods->moveLocalZ(this, -20, 0);
     }
@@ -1870,8 +1870,8 @@ void Entity__MoodCue68(Entity *this, SoundCueSet *out) {
         this->methods->moveLocalZ(this, this->lastOffsetValue, (void *)1);
     } else if (this->state == 10) {
         if (this->moodTimer < 8) {
-            this->methods->updateRotation(this, 0, ROTATION_ZPLUS9);
-            this->methods->addTranslation(this, TRANSLATE_Y_PLUS8);
+            this->methods->updateRotation(this, 0, sRotationZPlus9);
+            this->methods->addTranslation(this, sTranslateYPlus8);
         } else {
             u32 coin;
 
@@ -1908,7 +1908,7 @@ void Entity__MoodCue70(Entity *this, SoundCueSet *out) {
         }
     }
     if (this->moodTimer == 300) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
+        this->methods->updateRotation(this, 0, sRotationYawPlus180);
     }
     if (this->moodTimer < 600) {
         this->methods->moveLocalZ(this, this->state == 0 ? -256 : 256, 0);
@@ -1933,7 +1933,7 @@ void Entity__MoodCue71(Entity *this, SoundCueSet *out) {
 void Entity__MoodCue73(Entity *this, SoundCueSet *out) {
     out->attenuation = 0;
     if (out->tick == 0) {
-        ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, ROTATION_YAW_PLUS90);
+        ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, sRotationYawPlus90);
         ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, true);
         out->slots[0].program = 25;
         out->slots[1].program = 25;
@@ -1997,11 +1997,11 @@ void Entity__MoodCue76(Entity *this, SoundCueSet *out) {
         ((EntityPlayTodFn)this->methods->playTod)(this);
         if (this->todFrame == this->todFrameCount - 1) {
             this->methods->stopTod(this);
-            this->methods->updateScale(this, 0, SCALE_MINUS_SIXTY_FOURTH);
+            this->methods->updateScale(this, 0, sScaleMinusSixtyFourth);
         }
     } else {
         this->methods->stopTod(this);
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS9);
+        this->methods->updateRotation(this, 0, sRotationYawPlus9);
     }
 }
 
@@ -2023,16 +2023,16 @@ void Entity__MoodCue77(Entity *this, SoundCueSet *out) {
     if (this->state == 0) {
         if (this->moodTimer == 60 || this->moodTimer == 212 || this->moodTimer == 290 ||
             this->moodTimer == 320) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
+            this->methods->updateRotation(this, 0, sRotationYawPlus90);
         }
         if (this->moodTimer == 398) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS90);
+            this->methods->updateRotation(this, 0, sRotationYawMinus90);
         }
         this->methods->moveLocalZOrFindLink(this, -50, 0);
         return;
     }
     if (this->moodTimer == 60 || this->moodTimer == 140) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
+        this->methods->updateRotation(this, 0, sRotationYawPlus90);
     }
     if (this->moodTimer < 174) {
         this->methods->moveLocalZOrFindLink(this, -50, 0);
@@ -2090,18 +2090,18 @@ void Entity__MoodCue78(Entity *this, SoundCueSet *out) {
 
     if (this->state == 11 && out->tick == 510) {
         this->methods->moveLocalY(this, -380, 0);
-        this->methods->updateRotation(this, 0, ROTATION_XPLUS90);
+        this->methods->updateRotation(this, 0, sRotationXPlus90);
         this->methods->stopSoundCue(this);
         this->state = ENTITY_STATE_DONE;
         sMoodCue78TransitionDone = 1;
     } else if (this->state >= 12 && out->tick >= 330 && (out->tick % 60) == 30) {
         rollOrDy = 0;
         if (rand() & 1) {
-            table = SCALE_Y2;
+            table = sScaleY2;
             rollOrDy = (this->state == 12) ? 400 : 0;
             this->state = 13;
         } else {
-            table = SCALE_UNIT;
+            table = sScaleUnit;
             if (this->state == 13) {
                 rollOrDy = -400;
             }
@@ -2123,7 +2123,7 @@ void Entity__MoodCue79(Entity *this, SoundCueSet *out) {
         out->slots[0].program = 25;
         out->slots[0].octave = 2;
     }
-    this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS2);
+    this->methods->updateRotation(this, 0, sRotationYawPlus2);
     if (this->state == 0 && this->targetReached != 0) {
         this->methods->notifyParents(this, ENTITY_EFFECT_EVENT_VIDEO);
         this->state = 11;
@@ -2140,7 +2140,7 @@ void Entity__MoodCue80(Entity *this, SoundCueSet *out) {
         }
     } else {
         this->methods->stopTod(this);
-        this->methods->addTranslation(this, TRANSLATE_Y_MINUS512);
+        this->methods->addTranslation(this, sTranslateYMinus512);
     }
     SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
 }
@@ -2171,7 +2171,7 @@ void Entity__MoodCue81(Entity *this, SoundCueSet *out) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         state = this->state;
         if (state == 1) {
-            this->methods->updateScale(this, 0, SCALE_EIGHT_SEVENTHS);
+            this->methods->updateScale(this, 0, sScaleEightSevenths);
             dz = -374;
             if (this->methods->distanceToPeer(this, this->peer) < 512) {
                 this->methods->deactivate(this);
@@ -2334,7 +2334,7 @@ void Entity__MoodCue85(Entity *this, SoundCueSet *out) {
         }
     } else if (this->state == 10) {
         if (this->moodTimer < 10) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS9);
+            this->methods->updateRotation(this, 0, sRotationYawPlus9);
             if (((DreamSys *)this->peer)->methods->getLinkCommandFlag((DreamSys *)this->peer) != 0) {
                 SetCueTones7_7_7(out);
                 this->state = 12;
@@ -2364,17 +2364,17 @@ void Entity__MoodCue85(Entity *this, SoundCueSet *out) {
                     this->fadeBox->methods->startFadeUp(this->fadeBox, (BasicClass *)this->ticker, 0, 0);
                 }
             }
-            ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 0, ROTATION_ZPLUS1);
+            ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 0, sRotationZPlus1);
         } else {
             SetCueTones18_3_3(out);
-            ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, ROTATION_YAW_PLUS180);
+            ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, sRotationYawPlus180);
             this->methods->notifyParents(this, (rand() % 5 != 0) ? ENTITY_EFFECT_LINK_STAGE
                                                                  : ENTITY_EFFECT_END_DREAM);
             this->state = 14;
         }
     } else if (this->state == 12) {
         if (this->moodTimer < 10) {
-            this->methods->updateRotation(this, 0, ROTATION_ZMINUS9);
+            this->methods->updateRotation(this, 0, sRotationZMinus9);
         } else {
             SetCueTones18_3_3(out);
             this->methods->stopSoundCue(this);
@@ -2463,7 +2463,7 @@ void Entity__MoodCue91(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 0) {
         if (Entity__GetOrCreateFadeBox(this, NULL, NULL, (void *)5, 0) != NULL) {
             if (rand() & 1) {
-                this->methods->addTranslation(this, TRANSLATE_Y_MINUS256);
+                this->methods->addTranslation(this, sTranslateYMinus256);
             }
             this->fadeBox->methods->startFadeDown(this->fadeBox, (BasicClass *)this->ticker, 0, 0);
         }
@@ -2485,7 +2485,7 @@ void Entity__MoodCue91(Entity *this, SoundCueSet *out) {
         out->attenuation = 0;
         out->slots[0].program = 21;
     }
-    this->methods->updateScale(this, 1, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS);
+    this->methods->updateScale(this, 1, sScaleXFourFifthsYSixFifths);
 }
 
 void Entity__MoodCue92(Entity *this, SoundCueSet *out) {
@@ -2510,7 +2510,7 @@ void Entity__MoodCue92(Entity *this, SoundCueSet *out) {
             this->methods->notifyParents(this, ENTITY_EFFECT_LINK_STAGE);
         }
     }
-    this->methods->updateScale(this, 1, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS);
+    this->methods->updateScale(this, 1, sScaleXFourFifthsYSixFifths);
 }
 
 void Entity__MoodCue93(Entity *this, SoundCueSet *out) {
@@ -2540,12 +2540,12 @@ void Entity__MoodCue94(Entity *this, SoundCueSet *out) {
         this->methods->setTod(this, 1);
         if (this->state != 0) {
             if ((rand() & 1) == 0) {
-                this->methods->updateScale(this, 1, SCALE_SIX);
+                this->methods->updateScale(this, 1, sScaleSix);
                 this->methods->moveLocalY(this, 2048, 0);
             }
         }
         if (rand() % 3 == 0) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS180);
+            this->methods->updateRotation(this, 0, sRotationYawPlus180);
         }
     }
     if (this->todIndex != 0) {
@@ -2634,20 +2634,20 @@ void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
         out->slots[1].octave = -2;
     }
     if (this->moodTimer >= 51) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS_THIRD);
+        this->methods->updateRotation(this, 0, sRotationYawMinusThird);
     }
     if (this->moodTimer >= 781) {
         SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
         if (this->moodTimer >= 1936) {
-            scale = SCALE_UNIT;
+            scale = sScaleUnit;
         } else if (this->moodTimer >= 1931) {
-            scale = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
+            scale = sScaleXFourFifthsYSixFifths;
         } else if (this->moodTimer >= 1926) {
-            scale = SCALE_HALF;
+            scale = sScaleHalf;
         } else if (this->moodTimer >= 1921) {
-            scale = SCALE_QUARTER;
+            scale = sScaleQuarter;
         } else {
-            scale = SCALE_EIGHTH;
+            scale = sScaleEighth;
         }
         this->methods->updateScale(this, 1, scale);
         if (this->moodTimer < 2000) {
@@ -2676,7 +2676,7 @@ void Entity__MoodCue103(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 11) {
         if (this->moodTimer < 1020) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS_HALF);
+            this->methods->updateRotation(this, 0, sRotationYawMinusHalf);
             this->methods->moveLocalY(this, 30, 0);
         }
         if (this->moodTimer == 930) {
@@ -2691,7 +2691,7 @@ void Entity__MoodCue103(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue104(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_QUARTER);
+    this->methods->updateScale(this, 1, sScaleQuarter);
     if (this->moodTimer >= 201 && this->moodTimer < 300) {
         this->methods->moveLocalY(this, -32, 0);
     }
@@ -2711,7 +2711,7 @@ void Entity__MoodCue106(Entity *this, SoundCueSet *out) {
         if (this->moodTimer == 0) {
             this->methods->stopTod(this);
         }
-        this->methods->updateScale(this, 1, SCALE_X_EIGHTH_Y2_Z_EIGHTH);
+        this->methods->updateScale(this, 1, sScaleXEighthY2ZEighth);
         return;
     }
     if (this->moodTimer == 0) {
@@ -2722,16 +2722,16 @@ void Entity__MoodCue106(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue108(Entity *this, SoundCueSet *out) {
     Entity__MoodCue71(this, out);
-    this->methods->updateScale(this, 1, SCALE_SIX);
+    this->methods->updateScale(this, 1, sScaleSix);
 }
 
 void Entity__MoodCue109(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_HALF);
+    this->methods->updateScale(this, 1, sScaleHalf);
     this->methods->moveLocalZ(this, -10, 0);
 }
 
 void Entity__MoodCue110(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_TWO_FIFTHS);
+    this->methods->updateScale(this, 1, sScaleTwoFifths);
     this->methods->stopTod(this);
     if (this->state == 0) {
         if (this->methods->distanceToPeer(this, this->peer) < 2048) {
@@ -2741,7 +2741,7 @@ void Entity__MoodCue110(Entity *this, SoundCueSet *out) {
     }
     if (this->state == 10) {
         if (this->moodTimer < 45) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS4);
+            this->methods->updateRotation(this, 0, sRotationYawPlus4);
         }
         if (this->moodTimer >= 501) {
             this->state = 0;
@@ -2803,7 +2803,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *this, SoundCueSet *out, s32 
     if ((timer >= windowStart && timer <= windowStart + 91) ||
         (timer >= windowStart + 341 && timer <= windowStart + 433) ||
         (timer >= windowStart + 698 && timer <= windowStart + 791)) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS1);
+        this->methods->updateRotation(this, 0, sRotationYawPlus1);
     }
     this->methods->moveLocalZ(this, zStep, 0);
     if (this->moodTimer == deactivateTimer) {
@@ -2823,23 +2823,23 @@ void Entity__MoodCue114(Entity *this, SoundCueSet *out) {
         return;
     }
     if (rand() % 3 != 0) {
-        rotation = ROTATION_YAW_PLUS9;
+        rotation = sRotationYawPlus9;
     } else {
-        rotation = ROTATION_YAW_MINUS9;
+        rotation = sRotationYawMinus9;
     }
     this->methods->updateRotation(this, 0, rotation);
 }
 
 void Entity__MoodCue117(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_SIX);
+    this->methods->updateScale(this, 1, sScaleSix);
 }
 
 void Entity__MoodCue118(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_SIX);
+    this->methods->updateScale(this, 1, sScaleSix);
 }
 
 void Entity__MoodCue121(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_QUARTER);
+    this->methods->updateScale(this, 1, sScaleQuarter);
 }
 
 void Entity__MoodCue123(Entity *this, SoundCueSet *out) {
@@ -2868,7 +2868,7 @@ void Entity__MoodCue125(Entity *this, SoundCueSet *out) {
         this->methods->deactivate(this);
         this->state = ENTITY_STATE_DONE;
     }
-    this->methods->updateScale(this, 1, SCALE_TWO_FIFTHS);
+    this->methods->updateScale(this, 1, sScaleTwoFifths);
     out->attenuation = this->methods->getProximityRatio(this);
     if (out->tick % (this->todFrameCount / 2) == 0) {
         out->slots[0].program = 10;
@@ -2879,7 +2879,7 @@ void Entity__MoodCue125(Entity *this, SoundCueSet *out) {
 
 void Entity__MoodCue128(Entity *this, SoundCueSet *out) {
     SceneNode__FaceTarget((SceneNode *)this, (SceneNode *)this->peer, 1, 0, 0);
-    this->methods->updateScale(this, 1, SCALE_THIRTY_SECOND);
+    this->methods->updateScale(this, 1, sScaleThirtySecond);
     this->methods->moveLocalZ(this, -30, (void *)1);
 }
 

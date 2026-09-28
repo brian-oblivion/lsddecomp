@@ -13,7 +13,7 @@ No hits.
 `gEntityMoodHandlerTable` handler row; `out` unused. Sets `this->unk44 = 0xB` on
 `(rand() & 1) == 0` when `this->unkFC == 0`. If `this->unk44 == 0xB`:
 dispatches `slot130` (guarded by `unkFC==0`) then `slot48(this, 1,
-SCALE_X_EIGHTH_Y2_Z_EIGHTH)`. Otherwise: dispatches `slot128` (guarded by `unkFC==0`) then
+sScaleXEighthY2ZEighth)`. Otherwise: dispatches `slot128` (guarded by `unkFC==0`) then
 `slotC8(this, unkFC%20<10 ? 0x20 : -0x20, 0)`.
 
 ## The C
@@ -32,7 +32,7 @@ void Entity__MoodCue106(Entity *this, EntityMoodHandlerArg *out) {
             this->methods->slot130(this);
         }
         fn = this->methods->slot48;
-        ((void (*)(Entity *, s32, void *))fn)(this, 1, SCALE_X_EIGHTH_Y2_Z_EIGHTH);
+        ((void (*)(Entity *, s32, void *))fn)(this, 1, sScaleXEighthY2ZEighth);
         return;
     }
     if (this->unkFC == 0) {
@@ -46,7 +46,7 @@ void Entity__MoodCue106(Entity *this, EntityMoodHandlerArg *out) {
 
 Retail's disassembly reaches a SINGLE `jalr $v0 / nop` instruction pair
 (file `0x55488`/`vram 0x64c88`) from BOTH branches: the `unk44==0xB` path
-sets up `v0`=`slot48`, `a1`=1, `a2`=`&SCALE_X_EIGHTH_Y2_Z_EIGHTH` and jumps there; the other
+sets up `v0`=`slot48`, `a1`=1, `a2`=`&sScaleXEighthY2ZEighth` and jumps there; the other
 path sets up `v0`=`slotC8`, `a1`=`±0x20`, `a2`=0 and falls into the same
 address. This is GCC 2.6.3's tail/cross-jump merge collapsing two
 DIFFERENT call sites (different vtable offsets, different argument types)
@@ -127,7 +127,7 @@ names sort in table order.
 
 ## Data constant left unnamed this round
 
-`SCALE_X_EIGHTH_Y2_Z_EIGHTH` (`updateScale` arg, reached through a raw function-pointer
+`sScaleXEighthY2ZEighth` (`updateScale` arg, reached through a raw function-pointer
 indirect call in the `moodState == 0xB` branch): s16-pair decoded
 `(1,8, 2,1, 1,8, 6,1)` -- X=1/8, Y=2/1, Z=1/8, not uniform across X/Y/Z,
 so it is not one of this project's single-ratio `SCALE_*` names.
@@ -142,7 +142,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_80089E2C` | `SCALE_X_EIGHTH_Y2_Z_EIGHTH` | A (by value) | `.word 0x00080001, 0x00010002, 0x00080001` = {1/8, 2/1, 1/8} |
+| `D_80089E2C` | `sScaleXEighthY2ZEighth` | A (by value) | `.word 0x00080001, 0x00010002, 0x00080001` = {1/8, 2/1, 1/8} |
 
 ### The shared-`jalr` function pointer is no longer needed
 
@@ -151,6 +151,6 @@ The live body called `updateScale` through a local
 the section above found necessary to reproduce retail's single `jalr`
 shared by the `updateScale` and `moveLocalX` paths. With the unified,
 typed Entity slots (track 4) the plain
-`this->methods->updateScale(this, 1, SCALE_X_EIGHTH_Y2_Z_EIGHTH)` is
+`this->methods->updateScale(this, 1, sScaleXEighthY2ZEighth)` is
 byte-exact: funcdiff 73/73, whole image green. The cross-jump happens by
 itself once both calls go through slots of matching shape.

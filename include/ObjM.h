@@ -134,7 +134,7 @@ struct ObjM {
     /* +0x038 */ s32 stage; /* the ctor's; DayTask__StartObjM's stage. PickStageBgm, GetStageMapChunkRecord, GetStageGridDimensions, gStagePendingExtras[stage], EnterState4 */
     /* +0x03C */ struct DreamSys *dreamSys; /* init's third argument (AttachTarget); a child. Every DreamSys slot ObjM calls */
     /* +0x040 */ s32 tickPeriod; /* InitStyleAndWorld: 16; the DreamSys's resetLinkState's tickPeriod (EnterStyleSession) */
-    /* +0x044 */ s32 moveMode; /* InitStyleAndWorld: 2 or 3; resetLinkState's moveMode, a MOVE_MODE_SPEEDS index (EnterStyleSession) */
+    /* +0x044 */ s32 moveMode; /* InitStyleAndWorld: 2 or 3; resetLinkState's moveMode, a sMoveModeSpeeds index (EnterStyleSession) */
     /* +0x048 */ s32 gridSpan; /* onInit's arg1, 0 meaning 0xA000; the StageMap's setGridSpan (SetupSceneStyle) */
     /* +0x04C */ s32 unk4C;                       /* onInit's arg3; no reader */
     /* +0x050 */ struct StyleConfig *styleConfig; /* RegisterStyleConfig's result, or onInit's arg2 */

@@ -10,14 +10,14 @@ No hits.
 
 ## What it does
 
-`gEntityMoodHandlerTable` handler row; `out` unused. `slot48(this, 1, SCALE_HALF)` then
+`gEntityMoodHandlerTable` handler row; `out` unused. `slot48(this, 1, sScaleHalf)` then
 `slotC4(this, -0xA, 0)`.
 
 ## The C
 
 ```c
 void Entity__MoodCue109(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, SCALE_HALF);
+    this->methods->slot48(this, 1, sScaleHalf);
     this->methods->slotC4(this, -0xA, 0);
 }
 ```

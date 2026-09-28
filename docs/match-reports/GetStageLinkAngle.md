@@ -11,7 +11,7 @@ via `%gp_rel`). Round 42 RESOLVED that blocker. Rebuilt fresh this round.
 
 ## What it does
 
-`if (gLinkDstStage == 0xC) return 0; else return (s32)&LINK_ANGLE_180;` -- stored
+`if (gLinkDstStage == 0xC) return 0; else return (s32)&sLinkAngle180;` -- stored
 whole into `this->unk_0x880` by `DreamSys__TryStageTimerLink` right before an ExecuteLink
 (per the existing header comment on that field and on the prototype
 `extern s32 GetStageLinkAngle(void);`).
@@ -23,7 +23,7 @@ s32 GetStageLinkAngle(void)
 {
 	if (gLinkDstStage == 0xC)
 		return 0;
-	return (s32)&LINK_ANGLE_180;
+	return (s32)&sLinkAngle180;
 }
 ```
 
@@ -42,7 +42,7 @@ s32 GetStageLinkAngle(void)
 
 	result = 0;
 	if (gLinkDstStage != 0xC)
-		result = (s32)&LINK_ANGLE_180;
+		result = (s32)&sLinkAngle180;
 	return result;
 }
 ```
@@ -52,9 +52,9 @@ two early returns reproduced retail's exact register choice and its
 delay-slot placement of the zero-initialization. Byte-exact on the second
 attempt.
 
-`LINK_ANGLE_180` (extern `s32`, single `.word` at `asm/data/7B3C0.sdata.s`) is
+`sLinkAngle180` (extern `s32`, single `.word` at `asm/data/7B3C0.sdata.s`) is
 only ever address-taken, matching the existing pattern used by
-`SPECIAL_DAY_MOOD`/`IsDaySpecial` a few hundred lines below in this same unit.
+`sSpecialDayMood`/`IsDaySpecial` a few hundred lines below in this same unit.
 
 ## Verification
 
@@ -83,14 +83,14 @@ round 43, runner ALPHA, unit DreamSys.
 Renamed from `func_8005BF48`.
 
 A free function (no `this`, and the disassembly's call site sets
-up no arguments): returns `&LINK_ANGLE_180` unless `gLinkDstStage` -- the
+up no arguments): returns `&sLinkAngle180` unless `gLinkDstStage` -- the
 destination stage `GetStaticSpawn` and `Test4StageTransition` record -- is 0xC, in
 which case 0. `DreamSys__TryStageTimerLink` stores the result in
 `stageLinkAngle`, in the same statement group that zeroes `enterRotation` and
 `exitRotation`.
-"Angle" is read off the constant: `LINK_ANGLE_180`'s single word is 0x000100B4, a
+"Angle" is read off the constant: `sLinkAngle180`'s single word is 0x000100B4, a
 {numerator 0xB4, denominator 1} degree ratio -- byte-identical to the Y word of
-`ROTATION_YAW_180`, and the same encoding as every `CARDINAL_ANGLES` entry. Tier B:
+`sRotationYaw180`, and the same encoding as every `sCardinalAngles` entry. Tier B:
 no carved code reads `stageLinkAngle` back, so the consumer is unobserved.
 
 ## Comment moved from src/DreamSys.c (round 92, track 7)

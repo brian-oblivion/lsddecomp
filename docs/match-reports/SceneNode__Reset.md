@@ -17,7 +17,7 @@ Psy-Q library helper `func_80012838` (`the 0x2258..0x8220 Psy-Q block (now linke
 out of game-code scope), then calls its own two newly-discovered slots
 `+0x044`/`+0x048` (`SceneNode__UpdateRotation`/`SceneNode__UpdateScale`, both still queued)
 with a literal flag `1` and one of two rodata tables
-(`ROTATION_ZERO`/`SCALE_ONE`), and finally sets `self->unk14->unk0 = 1`.
+(`sRotationZero`/`sSceneNodeScaleOne`), and finally sets `self->unk14->unk0 = 1`.
 
 ## The C
 
@@ -26,8 +26,8 @@ void SceneNode__Reset(SceneNodeObj *self) {
     self->unk24 = 0;
     self->unk10 = 0;
     func_80012838(0, self->unk14);
-    self->methods->slot44(self, 1, ROTATION_ZERO);
-    self->methods->slot48(self, 1, SCALE_ONE);
+    self->methods->slot44(self, 1, sRotationZero);
+    self->methods->slot48(self, 1, sSceneNodeScaleOne);
     self->unk14->unk0 = 1;
 }
 ```
@@ -37,13 +37,13 @@ void SceneNode__Reset(SceneNodeObj *self) {
 round 11 (2026-09-03), runner charlie, unit SceneNode, second pass. Matched on the first build.
 Established `SceneNodeMethods::slot44`/`slot48` (`(self, s32, void*)`,
 still-queued occupants `SceneNode__UpdateRotation`/`SceneNode__UpdateScale`) and the
-`ROTATION_ZERO`/`SCALE_ONE` rodata tables (0xC bytes each, shape confirmed
+`sRotationZero`/`sSceneNodeScaleOne` rodata tables (0xC bytes each, shape confirmed
 independently by `SceneNode__UpdateScale`'s own disassembly reading three
 `{s16,s16}` pairs out of its 3rd argument via `RatioToFixed12`).
 
 ## Naming
 
-Round 71 (alpha). `func_8001CE30` -> `SceneNode__Reset`, **tier B**. Table slot +0x040, called last by the ctor. Zeroes `tick` and the GsDOBJ2 attribute, GsInitCoordinate2(0, coord2) (no parent), sets rotation to ROTATION_ZERO ({0/1}x3) and scale to SCALE_ONE ({1/1}x3), flg = 1. Mechanics are a full reset to an identity transform; tier B because what the game uses a re-run of slot +0x040 for is not established here. Subclass overrides of this slot are named FinishConstruct / Reset / InitDefaults / InitState in other units, all consistent.
+Round 71 (alpha). `func_8001CE30` -> `SceneNode__Reset`, **tier B**. Table slot +0x040, called last by the ctor. Zeroes `tick` and the GsDOBJ2 attribute, GsInitCoordinate2(0, coord2) (no parent), sets rotation to sRotationZero ({0/1}x3) and scale to sSceneNodeScaleOne ({1/1}x3), flg = 1. Mechanics are a full reset to an identity transform; tier B because what the game uses a re-run of slot +0x040 for is not established here. Subclass overrides of this slot are named FinishConstruct / Reset / InitDefaults / InitState in other units, all consistent.
 
 ## Round 95 (bravo): Sony's declarations
 
@@ -58,7 +58,7 @@ is GsCOORDINATE2 offset for offset) becomes Sony's type. Byte-identical.
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 
 ```c
-/* ROTATION_ZERO/SCALE_ONE (rodata): two 3-entry, 0xC-byte tables in the shape
+/* sRotationZero/sSceneNodeScaleOne (rodata): two 3-entry, 0xC-byte tables in the shape
  * RatioToFixed12 reads (see above) -- SceneNode__Reset's own literal `data`
  * arguments to slot +0x044/+0x048. Declared as opaque byte blobs since
  * nothing this unit's chosen functions read out of them directly (only

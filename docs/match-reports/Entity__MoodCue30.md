@@ -22,7 +22,7 @@ void Entity__MoodCue30(Entity *this) {
     }
 
     if (this->unk44 == 0xC) {
-        this->methods->slot48(this, 1, SCALE_DOUBLE);
+        this->methods->slot48(this, 1, sScaleDouble);
         this->methods->slotCC(this, -0x1E, 0);
     } else {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
@@ -35,7 +35,7 @@ void Entity__MoodCue30(Entity *this) {
             }
         } else if (this->unk44 == 0xD) {
             this->methods->slotB8(this, &this->unk94->unk14->x);
-            this->methods->slotBC(this, TRANSLATE_Y_MINUS1500_Z_PLUS1024);
+            this->methods->slotBC(this, sTranslateYMinus1500ZPlus1024);
         }
     }
 }
@@ -48,7 +48,7 @@ the address of the 3-word position vector's `x` field, same "vector
 pointer" convention as `Entity__IsNearTarget`'s still-`INCLUDE_ASM` first argument.
 Third confirmed caller of `Unk94Methods::slot200` after `Entity__MoodCue00` and
 `Entity__MoodCue29` (this one compares its result against `1`; no new signature
-information). `TRANSLATE_Y_MINUS1500_Z_PLUS1024` is a new rodata pointer, extern-declared
+information). `sTranslateYMinus1500ZPlus1024` is a new rodata pointer, extern-declared
 alongside this unit's other `D_80089*` constants.
 
 ## Attempt log (2 attempts)

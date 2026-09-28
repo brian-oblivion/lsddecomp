@@ -28,7 +28,7 @@ void Entity__MoodCue103(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unk44 == 0xB) {
         if (this->unkFC < 0x3FC) {
-            this->methods->slot44(this, 0, ROTATION_YAW_MINUS_HALF);
+            this->methods->slot44(this, 0, sRotationYawMinusHalf);
             this->methods->slotCC(this, 0x1E, 0);
         }
         if (this->unkFC == 0x3A2) {
@@ -48,7 +48,7 @@ Matched on the first build.
 ## Provenance
 
 round 13 (2026-09-03), runner alpha, unit Entity. Matched on the first
-build. Adds `ROTATION_YAW_MINUS_HALF` to this unit's local externs.
+build. Adds `sRotationYawMinusHalf` to this unit's local externs.
 
 
 ## Naming
@@ -65,9 +65,9 @@ names sort in table order.
 
 ## Data constant left unnamed this round
 
-`ROTATION_YAW_MINUS_HALF` (`updateRotation` arg, `moodState == 0xB` branch): s16-pair
+`sRotationYawMinusHalf` (`updateRotation` arg, `moodState == 0xB` branch): s16-pair
 decoded `(0,1, -1,2, 0,1, 0,1)` -- only Y nonzero, -1/2 degree. Same
-reasoning as `ROTATION_YAW_MINUS_THIRD` (Entity__MoodCue102's report): no fractional-degree
+reasoning as `sRotationYawMinusThird` (Entity__MoodCue102's report): no fractional-degree
 rotation constant is named anywhere in the project, so a half-degree
 per-tick wobble rate does not fit the established whole-degree
 `ROTATION_YAW_*` convention.
@@ -82,7 +82,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_80089CB8` | `ROTATION_YAW_MINUS_HALF` | A (by value) | `.word 0x00010000, 0x0002FFFF, 0x00010000` = {0/1, -1/2, 0/1}: yaw -1/2 degree per call |
+| `D_80089CB8` | `sRotationYawMinusHalf` | A (by value) | `.word 0x00010000, 0x0002FFFF, 0x00010000` = {0/1, -1/2, 0/1}: yaw -1/2 degree per call |
 
 The fractional-degree precedent the section above wanted is
-`ROTATION_XPLUS_EIGHTH` (0x80089C58, x = 1/8).
+`sRotationXPlusEighth` (0x80089C58, x = 1/8).

@@ -16,24 +16,24 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
 
 	stage = GetStageChunkFromMood(&chunk, mood);
 	if (stage >= 0) {
-		*timeLimit = STAGE_TIME_LIMITS[stage];
+		*timeLimit = sStageTimeLimits[stage];
 
-		count = LEN_STAGE_SPAWNPOINTS[stage];
-		entry = STAGE_SPAWNPOINTS[stage];
+		count = sStageSpawnPointsCount[stage];
+		entry = sStageSpawnPoints[stage];
 		for (i = 0; i < count; i++, entry++) {
 			if (*(s16 *)&chunk == *(s16 *)&entry->chunk)
 				goto found;
 		}
-		entry = &STAGE_SPAWNPOINTS[stage][*(s16 *)&chunk % count];
+		entry = &sStageSpawnPoints[stage][*(s16 *)&chunk % count];
 
 	found:
 		*(PlayerSpawnGridPos *)dest = *(PlayerSpawnGridPos *)entry;
-		dest->position = SPAWN_POS_ADJUST[entry->adjustment];
+		dest->position = sSpawnPosAdjust[entry->adjustment];
 		return stage;
 	}
 
 	stage = GetRandomSpawnFromStage(dest, stage, day);
-	*timeLimit = STAGE_TIME_LIMITS[stage];
+	*timeLimit = sStageTimeLimits[stage];
 	return stage;
 }
 ```
@@ -56,17 +56,17 @@ regress from either change, and no sibling unit includes `DreamSys.h` with
 a second declaration of either name (`headercontention.py`-style check done
 by hand via grep since these are plain externs, not a padded struct).
 
-- **`include/DreamSys.h`: `extern s8 LEN_STAGE_SPAWNPOINTS[];` -> `u8`.**
+- **`include/DreamSys.h`: `extern s8 sStageSpawnPointsCount[];` -> `u8`.**
   With `s8`, `count` (an `s32` sign-extended from the array) is not provably
   non-negative to the compiler, so the `for` loop's rotation into a
   do/while needs TWO guards (`beqz`+`blez`) to skip the body when count is
   `<= 0`. Retail has exactly one (`beqz`), which only suffices if the
   frontend already knows `count >= 0` -- i.e. the source array element type
   is unsigned. Symptom before the fix: an extra `nop`+`blez` pair (2 words)
-  right after the `LEN_STAGE_SPAWNPOINTS[stage]` load, plus consequent
+  right after the `sStageSpawnPointsCount[stage]` load, plus consequent
   address drift through the rest of the function.
 - **`include/DreamSys.h`: `StageSpawn::adjustment` `s8` -> `u8`.** It indexes
-  `SPAWN_POS_ADJUST` (a `struct RelativePos[]`, stride 6). With `s8`, the
+  `sSpawnPosAdjust` (a `struct RelativePos[]`, stride 6). With `s8`, the
   load is `lb`; retail's is `lbu`. Symptom before the fix: right register
   content, wrong sign-extension instruction, at the one spot the value is
   read.

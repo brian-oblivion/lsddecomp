@@ -15,10 +15,10 @@ unit's mood-dispatch handler family:
    (`unk1C=0x7`, `unk20=-0x2`, `unk30=0x3`, `unk34=-0x2`).
 3. If `out->unk4 % 90 < 3`, sets `out->unk44 = 0x6` and `out->unk48 = -0x1`.
 4. Dispatches on `this->unkFC`:
-   - `>= 0x79` (121): `this->methods->slot44(this, 0, ROTATION_YAW_PLUS2);` then
+   - `>= 0x79` (121): `this->methods->slot44(this, 0, sRotationYawPlus2);` then
      `this->methods->slotC4(this, -0x140, 0);`
    - `< 0x79` and (`>= 0x38` (56) or `Entity__IsNearTarget(this, &this->unk14->x, 1,
-     1) != 0`): `this->methods->slotBC(this, TRANSLATE_Y_MINUS64);`
+     1) != 0`): `this->methods->slotBC(this, sTranslateYMinus64);`
    - `< 0x38` and `Entity__IsNearTarget(...) == 0`, sub-dispatch on `this->unkFC`
      again: `>= 0xA` (10) calls `SceneNode__FaceTarget(...)` then
      `this->methods->slotC4(this, -0x100, 0)`; `< 0xA` calls only
@@ -37,8 +37,8 @@ exactly with no manual constant derivation needed.
 - `EntityMoodHandlerArg::unk20`/`unk34`/`unk48` — each paired one word after
   an already-known field (`unk1C`/`unk30`/`unk44` respectively), splitting
   the existing padding runs.
-- `ROTATION_YAW_PLUS2` — a fourth `D_8008xxxx` opaque data row, same convention as
-  `SCALE_HALF`/`SCALE_DOUBLE`/`TRANSLATE_Y_MINUS64` already declared at the top of this
+- `sRotationYawPlus2` — a fourth `D_8008xxxx` opaque data row, same convention as
+  `sScaleHalf`/`sScaleDouble`/`sTranslateYMinus64` already declared at the top of this
   file.
 
 ## Final C
@@ -57,11 +57,11 @@ void Entity__MoodCue07(Entity *this, EntityMoodHandlerArg *out) {
         out->unk48 = -0x1;
     }
     if (this->unkFC >= 0x79) {
-        this->methods->slot44(this, 0, ROTATION_YAW_PLUS2);
+        this->methods->slot44(this, 0, sRotationYawPlus2);
         this->methods->slotC4(this, -0x140, 0);
     } else if (this->unkFC >= 0x38 ||
                Entity__IsNearTarget(this, &this->unk14->x, 1, 1) != 0) {
-        this->methods->slotBC(this, TRANSLATE_Y_MINUS64);
+        this->methods->slotBC(this, sTranslateYMinus64);
     } else if (this->unkFC >= 0xA) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         this->methods->slotC4(this, -0x100, 0);
@@ -104,7 +104,7 @@ identical C.
 
 `Entity__MoodCue07` -- tier B (round 71, runner echo, FINISHING-PLAN track 3). Renamed from `func_8005E4D0`.
 
-`gEntityMoodHandlerTable` row 7. Body: sets the attenuation. When `unk84 == unk80 / 2` it requests voice 0 tone 7 and voice 1 tone 3 (both pitch -2). On ticks where `tick % 90 < 3` it requests voice 2 tone 6 (pitch -1). Then a moodTimer timeline: from 0x79 it turns by `ROTATION_YAW_PLUS2` (relative) and moves -0x140; from 0x38, or when near the target, it steps `TRANSLATE_Y_MINUS64`; from 10 it faces the target and moves -0x100; before that it only faces the target.
+`gEntityMoodHandlerTable` row 7. Body: sets the attenuation. When `unk84 == unk80 / 2` it requests voice 0 tone 7 and voice 1 tone 3 (both pitch -2). On ticks where `tick % 90 < 3` it requests voice 2 tone 6 (pitch -1). Then a moodTimer timeline: from 0x79 it turns by `sRotationYawPlus2` (relative) and moves -0x140; from 0x38, or when near the target, it steps `sTranslateYMinus64`; from 10 it faces the target and moves -0x100; before that it only faces the target.
 
 Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row NN (`asm/data/79528.data.s`, base 0x80089EB0, stride 0x10; row = (slot address - 0x80089EB0) / 0x10), and nothing else references it. `Entity__StartSoundCue` passes `gEntityMoodHandlerTable[this->moodIndex].handler` to `InitSoundCueSet`, which stores it as `SoundCueSet::callback`; `ServiceSoundCueSet` (the per-tick cue driver, via `Entity__TickSoundCue`) resets the set's three voice slots and calls `callback(set->owner, set)` every tick. So the handler is the mood row's per-tick cue callback, and `out` is the `SoundCueSet` (`EntityMoodHandlerArg` is Entity.h's local view of it; see `Entity__MoodCue07.md` `## Proposed field names`). Tier B: the mechanics are established, which dream object a row belongs to is not. The row number is kept decimal and zero-padded so the names sort in table order.
 

@@ -28,8 +28,8 @@ delay slot loads `ori $v0, $zero, 0xD` — that value is what the NEXT
 link's `bne` compares `this->unk44` against, i.e. the block immediately
 following belongs to `unk44 == 0xD`, not `0xC`. The block's own CONTENT
 (the `unkFC < 0x5A` / `Entity__GetOrCreateFadeBox(...,0xA,...)` / `slotD8` /
-`slot44(unk94,0,ROTATION_ZPLUS1)` logic, vs. the sibling block's `unkFC < 0xA`
-/ `slot44(this,0,ROTATION_ZMINUS9)` / `SetCueTones18_3_3`+`slot16C`+`unk44=1`
+`slot44(unk94,0,sRotationZPlus1)` logic, vs. the sibling block's `unkFC < 0xA`
+/ `slot44(this,0,sRotationZMinus9)` / `SetCueTones18_3_3`+`slot16C`+`unk44=1`
 logic) was derived correctly on the first pass; only the LABEL — which
 `unk44` value routes to which block — was backwards, discovered by
 re-tracing every delay-slot value link-by-link rather than reading each
@@ -95,18 +95,18 @@ Tier B, same as every sibling `Entity__MoodCueNN` (Entity..Entity_g): the
 row mapping is a fact of the binary, which dream object or state a row is
 for is not established. Row kept decimal so names sort in table order.
 
-What it does, in the unit's current field names: Five-state machine (0, 0xA..0xE) that calls `SetCueTones7_7_7`/`SetCueTones18_3_3` at its transitions, yaws with `updateRotation(ROTATION_YAW_PLUS9 / ROTATION_ZMINUS9)`, rotates the target with `target->slot44(ROTATION_ZPLUS1 / ROTATION_YAW_PLUS180)`, drives `unk100` (via `Entity__GetOrCreateFadeBox`) with `slotD4(unk50, 7, 0)`/`slotD8(unk50, 0, 0)`, and ends with `notifyParents(0xA or 0xC)` or stopping the cue.
+What it does, in the unit's current field names: Five-state machine (0, 0xA..0xE) that calls `SetCueTones7_7_7`/`SetCueTones18_3_3` at its transitions, yaws with `updateRotation(sRotationYawPlus9 / sRotationZMinus9)`, rotates the target with `target->slot44(sRotationZPlus1 / sRotationYawPlus180)`, drives `unk100` (via `Entity__GetOrCreateFadeBox`) with `slotD4(unk50, 7, 0)`/`slotD8(unk50, 0, 0)`, and ends with `notifyParents(0xA or 0xC)` or stopping the cue.
 
 ### Data constants named (round 79)
 
 Decoded from `disk/SLPS_015.56` in the format of the existing rotation
-tables (three s16 `{num, den}` pairs, X / Y(yaw) / Z, e.g. `ROTATION_ZPLUS9`
+tables (three s16 `{num, den}` pairs, X / Y(yaw) / Z, e.g. `sRotationZPlus9`
 = `(0,1, 0,1, 9,1)`):
 
 | old | new | tier | bytes |
 | --- | --- | --- | --- |
-| `D_80089CD0` | `ROTATION_ZPLUS1` | A | `(0,1, 0,1, 1,1)` -- same spelling as `ROTATION_ZPLUS9`/`ROTATION_YAW_PLUS4`/`ROTATION_YAW_PLUS1`. Its consumer here is `target->methods->slot44(target, 0, ...)`, the same Unk94Methods slot that takes `ROTATION_YAW_PLUS180` two lines later and `ROTATION_YAW_MINUS90` in `Entity__MoodCue49` |
-| `D_80089CDC` | `ROTATION_ZMINUS9` | A | `(0,1, 0,1, -9,1)`, passed to `updateRotation(this, 0, ...)` like every other `ROTATION_*` |
+| `D_80089CD0` | `sRotationZPlus1` | A | `(0,1, 0,1, 1,1)` -- same spelling as `sRotationZPlus9`/`sRotationYawPlus4`/`sRotationYawPlus1`. Its consumer here is `target->methods->slot44(target, 0, ...)`, the same Unk94Methods slot that takes `sRotationYawPlus180` two lines later and `sRotationYawMinus90` in `Entity__MoodCue49` |
+| `D_80089CDC` | `sRotationZMinus9` | A | `(0,1, 0,1, -9,1)`, passed to `updateRotation(this, 0, ...)` like every other `ROTATION_*` |
 
 The name describes the table's contents, which is all the bytes establish;
 the units of the middle numbers (degrees, per the existing names) are the

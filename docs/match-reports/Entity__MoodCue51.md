@@ -12,7 +12,7 @@ void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out) {
     void *table;
 
     if (this->unkFC == 0 && rand() % 5 == 0 && this->unk44 == 0) {
-        this->methods->slot48(this, 1, SCALE_SIX);
+        this->methods->slot48(this, 1, sScaleSix);
         this->methods->slotCC(this, 0x320, 0);
         this->unk44 = 0xB;
     }
@@ -22,12 +22,12 @@ void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out) {
         out->unk1C = 8;
     }
     if (this->unkFC == 0x5A) {
-        table = ROTATION_YAW_MINUS90;
+        table = sRotationYawMinus90;
     } else if (this->unkFC == 0xA0) {
-        table = ROTATION_YAW_PLUS90;
+        table = sRotationYawPlus90;
     } else if (this->unkFC == 0xDC) {
         if (rand() & 1) {
-            table = ROTATION_YAW_PLUS180;
+            table = sRotationYawPlus180;
         }
     }
     if (table != NULL) {

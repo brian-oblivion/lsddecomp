@@ -11,13 +11,13 @@ No hits.
 ## What it does
 
 `gEntityMoodHandlerTable` handler row; `out` unused. Byte-identical body to
-`Entity__MoodCue117`: `slot48(this, 1, SCALE_SIX)`.
+`Entity__MoodCue117`: `slot48(this, 1, sScaleSix)`.
 
 ## The C
 
 ```c
 void Entity__MoodCue118(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, SCALE_SIX);
+    this->methods->slot48(this, 1, sScaleSix);
 }
 ```
 

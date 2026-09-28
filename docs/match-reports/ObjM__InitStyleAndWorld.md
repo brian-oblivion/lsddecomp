@@ -247,7 +247,7 @@ Naming, all zero bytes:
   Evidence: EnterStyleSession passes them to the DreamSys's resetLinkState,
   and DreamSys__ResetLinkState's own parameters are `(moveMode,
   tickPeriod)`: getSetMoveMode(moveMode), setTickPeriod(tickPeriod). moveMode
-  2/3 index MOVE_MODE_SPEEDS {0, 24, 64, 128, 384}. Tier A (mechanics).
+  2/3 index sMoveModeSpeeds {0, 24, 64, 128, 384}. Tier A (mechanics).
 - local `ret1` split into `record` (PickStageBgm / PickStageTexture results)
   and `day` (getCurrentDayAndYear); the split compiled identically.
 - `0x10` -> 16, `0xA000` -> `DEFAULT_GRID_SPAN` (40960, unit-local; the value

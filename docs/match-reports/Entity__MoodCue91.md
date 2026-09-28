@@ -7,7 +7,7 @@
 ## What it does
 
 On `this->unkFC == 0`: calls `Entity__GetOrCreateFadeBox(this, NULL, NULL, (void*)5,
-0)` and, on a non-NULL result, conditionally `slotBC(this, TRANSLATE_Y_MINUS256)`
+0)` and, on a non-NULL result, conditionally `slotBC(this, sTranslateYMinus256)`
 and unconditionally `this->unk100->methods->slotD4(this->unk100,
 this->unk50, 0, 0)`. On `this->unkFC != 0`: if `this->unk84 == 0`, runs a
 `do { this->unk88 = this->methods->slot134(this, this->unk88, 0);
@@ -15,7 +15,7 @@ this->unk84 += 1; } while (this->unk84 < 0x18);` loop. Independently
 (regardless of which branch above fired), `if (this->unk84 >= 0x19) {
 slotC4(this,-0x14,0); this->unk94->methods->slot130(this->unk94,1); }`.
 Then a further `this->unkFC == 0x32` / `== 0xC` dispatch, and an
-unconditional `slot48(this, 1, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS)`.
+unconditional `slot48(this, 1, sScaleXFourFifthsYSixFifths)`.
 
 ## Derivation
 
@@ -65,15 +65,15 @@ Tier B, same as every sibling `Entity__MoodCueNN` (Entity..Entity_g): the
 row mapping is a fact of the binary, which dream object or state a row is
 for is not established. Row kept decimal so names sort in table order.
 
-What it does, in the unit's current field names: Tick 0: gets/creates `unk100`, `addVec14(TRANSLATE_Y_MINUS256)` on a coin flip, `unk100->slotD4(unk50, 0, 0)`; later, if the TOD frame is 0, fast-forwards 24 frames with `applyTodFrame`; past frame 24 `slotC4(-0x14, 0)` and `target->slot130(1)`; `notifyParents(0xA)` at 50, voice-0 tone 21 at 12; `updateScale(1, SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS)` every tick.
+What it does, in the unit's current field names: Tick 0: gets/creates `unk100`, `addVec14(sTranslateYMinus256)` on a coin flip, `unk100->slotD4(unk50, 0, 0)`; later, if the TOD frame is 0, fast-forwards 24 frames with `applyTodFrame`; past frame 24 `slotC4(-0x14, 0)` and `target->slot130(1)`; `notifyParents(0xA)` at 50, voice-0 tone 21 at 12; `updateScale(1, sScaleXFourFifthsYSixFifths)` every tick.
 
 ### Data constant named (round 79)
 
 | old | new | tier | bytes |
 | --- | --- | --- | --- |
-| `D_80089D90` | `TRANSLATE_Y_MINUS256` | A | three s32 `(0, -256, 0)`, the format of `TRANSLATE_Y_MINUS512`/`TRANSLATE_Y_MINUS64`; passed to `addVec14` like the other `TRANSLATE_*` tables |
+| `D_80089D90` | `sTranslateYMinus256` | A | three s32 `(0, -256, 0)`, the format of `sTranslateYMinus512`/`sTranslateYMinus64`; passed to `addVec14` like the other `TRANSLATE_*` tables |
 
-`SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` (`(4,5, 6,5, 5,5)` as s16 pairs, a non-uniform 4/5, 6/5, 1
+`sScaleXFourFifthsYSixFifths` (`(4,5, 6,5, 5,5)` as s16 pairs, a non-uniform 4/5, 6/5, 1
 scale) is left unnamed, as Entity's header comment already decided for the
 same symbol: no precedent for naming a non-uniform, non-unit-fraction scale.
 

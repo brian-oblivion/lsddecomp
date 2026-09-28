@@ -38,20 +38,20 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
         out->unk34 = -2;
     }
     if (this->unkFC >= 0x33) {
-        this->methods->slot44(this, 0, ROTATION_YAW_MINUS_THIRD);
+        this->methods->slot44(this, 0, sRotationYawMinusThird);
     }
     if (this->unkFC >= 0x30D) {
         SceneNode__FaceTarget(this, this->unk94, 1, 0, 0);
         if (this->unkFC >= 0x790) {
-            a2 = SCALE_UNIT;
+            a2 = sScaleUnit;
         } else if (this->unkFC >= 0x78B) {
-            a2 = SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS;
+            a2 = sScaleXFourFifthsYSixFifths;
         } else if (this->unkFC >= 0x786) {
-            a2 = SCALE_HALF;
+            a2 = sScaleHalf;
         } else if (this->unkFC >= 0x781) {
-            a2 = SCALE_QUARTER;
+            a2 = sScaleQuarter;
         } else {
-            a2 = SCALE_EIGHTH;
+            a2 = sScaleEighth;
         }
         this->methods->slot48(this, 1, a2);
         if (this->unkFC < 0x7D0) {
@@ -76,11 +76,11 @@ void Entity__MoodCue102(Entity *this, EntityMoodHandlerArg *out) {
 ## Residue chased: two swapped row pointers in the cascading chain
 
 First attempt built and scored 146/148, differing only at the LAST two
-`addiu %lo(...)` immediates -- `SCALE_EIGHTH` and `SCALE_QUARTER` swapped. Tracing
+`addiu %lo(...)` immediates -- `sScaleEighth` and `sScaleQuarter` swapped. Tracing
 the `bnez`/delay-slot-recompute chain by hand for the last two arms (each
 delay slot recomputes `$v0` for the NEXT comparison down the chain, and the
-final arm sets `a2 = SCALE_EIGHTH` BEFORE testing whether to overwrite it with
-`SCALE_QUARTER`, i.e. the "set first, conditionally overwrite" idiom applied to
+final arm sets `a2 = sScaleEighth` BEFORE testing whether to overwrite it with
+`sScaleQuarter`, i.e. the "set first, conditionally overwrite" idiom applied to
 which POINTER a2 ends up holding, not a value) showed the two low-end arms
 were reversed from my first reading. Fixed by swapping which arm gets which
 row pointer; closed to 148/148 on the second build.
@@ -129,37 +129,37 @@ names sort in table order.
 
 ## Data constants decoded this round
 
-`SCALE_EIGHTH` (0x80089E20) and `SCALE_QUARTER` (0x80089DCC), both cascade
+`sScaleEighth` (0x80089E20) and `sScaleQuarter` (0x80089DCC), both cascade
 arms in this function's `moodTimer`-threshold chain, decoded directly from
 `disk/SLPS_015.56` as four s16 `{num,den}` pairs (X/Y(yaw)/Z/W, matching
-`SCALE_HALF`/`SCALE_SIX`'s own layout):
+`sScaleHalf`/`sScaleSix`'s own layout):
 
-- `SCALE_EIGHTH`: `(1,8, 1,8, 1,8, 1,8)` -- uniform X=Y=Z=1/8, the same
-  unit-fraction-word convention as `SCALE_HALF` (1/2).
-- `SCALE_QUARTER`: `(1,4, 1,4, 1,4, 1,2)` -- uniform X=Y=Z=1/4, W=1/2
-  (ignored per the established `SCALE_HALF`/`SCALE_SIX`/
-  `ROTATION_YAW_MINUS120` precedent that the 4th pair is never reflected
+- `sScaleEighth`: `(1,8, 1,8, 1,8, 1,8)` -- uniform X=Y=Z=1/8, the same
+  unit-fraction-word convention as `sScaleHalf` (1/2).
+- `sScaleQuarter`: `(1,4, 1,4, 1,4, 1,2)` -- uniform X=Y=Z=1/4, W=1/2
+  (ignored per the established `sScaleHalf`/`sScaleSix`/
+  `sRotationYawMinus120` precedent that the 4th pair is never reflected
   in the name).
 
-Also used by `Entity__MoodCue104`/`Entity__MoodCue121` (`SCALE_QUARTER`)
+Also used by `Entity__MoodCue104`/`Entity__MoodCue121` (`sScaleQuarter`)
 elsewhere in this unit -- same symbol, not redecoded per call site.
 
 ## Three constants left unnamed this round
 
-- `ROTATION_YAW_MINUS_THIRD` (`updateRotation` arg, `moodTimer >= 0x33` branch): s16-pair
+- `sRotationYawMinusThird` (`updateRotation` arg, `moodTimer >= 0x33` branch): s16-pair
   decoded `(0,1, -1,3, 0,1, 0,1)` -- only Y nonzero, but -1/3 degree is not
-  a whole number, so it does not fit the established `ROTATION_YAW_PLUS2`/
-  `ROTATION_YAW_PLUS9`/`ROTATION_YAW_PLUS1` whole-degree convention. No
+  a whole number, so it does not fit the established `sRotationYawPlus2`/
+  `sRotationYawPlus9`/`sRotationYawPlus1` whole-degree convention. No
   fractional-degree rotation constant has a name anywhere in the project
-  yet, so inventing one here (`ROTATION_YAW_MINUS_THIRD`-style) would be a
+  yet, so inventing one here (`sRotationYawMinusThird`-style) would be a
   new naming style, not an application of an existing one.
-- `SCALE_UNIT` (`updateScale` arg, `moodTimer >= 0x790` arm): decoded
+- `sScaleUnit` (`updateScale` arg, `moodTimer >= 0x790` arm): decoded
   `(1,1, 1,1, 1,1, 1,8)` -- uniform X=Y=Z=1/1, i.e. the same VALUE as the
   existing (structurally distinct, different address, 0xC-byte/3-entry)
-  `SCALE_ONE` used by `SceneNode__UpdateScale`. Not renamed to `SCALE_ONE`
+  `sSceneNodeScaleOne` used by `SceneNode__UpdateScale`. Not renamed to `sSceneNodeScaleOne`
   or a variant: two differently-addressed, differently-shaped symbols
   sharing one implied meaning is confusing, not clarifying.
-- `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` (`updateScale` arg, `moodTimer >= 0x78B` arm): decoded
+- `sScaleXFourFifthsYSixFifths` (`updateScale` arg, `moodTimer >= 0x78B` arm): decoded
   `(4,5, 6,5, 5,5, 2,1)` -- X=4/5, Y=6/5, Z=1, not uniform, so it is not
   one of this project's single-ratio `SCALE_*` names.
 
@@ -173,12 +173,12 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_80089CAC` | `ROTATION_YAW_MINUS_THIRD` | A (by value) | `.word 0x00010000, 0x0003FFFF, 0x00010000` = {0/1, -1/3, 0/1}: yaw -1/3 degree per call |
-| `D_80089DE4` | `SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS` | A (by value) | `.word 0x00050004, 0x00050006, 0x00050005` = {4/5, 6/5, 5/5}; z is 5/5 = 1, omitted like `SCALE_Y2`'s unit axes |
+| `D_80089CAC` | `sRotationYawMinusThird` | A (by value) | `.word 0x00010000, 0x0003FFFF, 0x00010000` = {0/1, -1/3, 0/1}: yaw -1/3 degree per call |
+| `D_80089DE4` | `sScaleXFourFifthsYSixFifths` | A (by value) | `.word 0x00050004, 0x00050006, 0x00050005` = {4/5, 6/5, 5/5}; z is 5/5 = 1, omitted like `sScaleY2`'s unit axes |
 | local `a2` | `scale` (now `Ratio16 *`, was `void *`) | -- | the `updateScale` argument; byte-exact |
 
 The "left unnamed" section above predates the precedent: round 94's
-`ROTATION_XPLUS_EIGHTH` (x = 1/8 degree) and `SCALE_X3`/`SCALE_Y2` are the
+`sRotationXPlusEighth` (x = 1/8 degree) and `sScaleX3`/`sScaleY2` are the
 fractional-degree and non-uniform-scale precedents it asked for.
 
 ### `state = 1` at `moodTimer >= 2000` is `ENTITY_STATE_DONE`
@@ -187,7 +187,7 @@ Not a phase of this handler: nothing here reads `state == 1`, and the value
 is the one `Entity__UpdateActivationState` (`this->active == 0 &&
 this->state != 1`) and `Entity__UpdateSoundCueStart` read as "done, do not
 reactivate or restart the cue". By 2000 ticks the scale has settled at
-`SCALE_UNIT` (from 1936) and the handler stops its own `moveLocalZ`; setting
+`sScaleUnit` (from 1936) and the handler stops its own `moveLocalZ`; setting
 1 also stops the `state == 0` link-stage trigger from firing. The same
 value is stored without a `deactivate` by `Entity__MoodCue123` and by
 Entity's MoodCue after `stopSoundCue`, so the header comment's "after

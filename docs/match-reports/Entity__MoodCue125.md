@@ -12,7 +12,7 @@ No hits.
 
 `gEntityMoodHandlerTable` handler row. Dispatches `slot160(this)` + `unk44=1` (ONE
 shared call site) when `(this->unkFC==0 && (rand()&3)==0) || this->unkFC
-== 0xE10`; then unconditionally `slot48(1,SCALE_TWO_FIFTHS)`, `out->unk10 =
+== 0xE10`; then unconditionally `slot48(1,sScaleTwoFifths)`, `out->unk10 =
 slot148(this)`, the established `out->unk4 % (this->unk80/2) == 0` gate
 (setting `out->unk1C=0xA`/`out->unk20=1`), and `slotC4(this,-0xA,0)`.
 
@@ -32,7 +32,7 @@ trigger:
     this->methods->slot160(this);
     this->unk44 = 1;
 merge:
-    this->methods->slot48(this, 1, SCALE_TWO_FIFTHS);
+    this->methods->slot48(this, 1, sScaleTwoFifths);
     out->unk10 = this->methods->slot148(this);
     if (out->unk4 % (this->unk80 / 2) == 0) {
         out->unk1C = 0xA;
@@ -108,5 +108,5 @@ retail's one shared call site, is now
 `if ((moodTimer == 0 && (rand() & 3) == 0) || moodTimer == 3600) { deactivate; state = ENTITY_STATE_DONE; }`.
 Byte-exact (funcdiff 77/77, whole image green): `||` gives GCC the single
 body the goto form spelled out; the section above had only tried two
-separate `if` bodies. `D_80089E44` is now `SCALE_TWO_FIFTHS` (see
+separate `if` bodies. `D_80089E44` is now `sScaleTwoFifths` (see
 `Entity__MoodCue110`).

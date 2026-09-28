@@ -9,7 +9,7 @@ Unit: `Entity`. Runner: bravo.
 ```c
 void Entity__MoodCue33(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkF4 != 0) {
-        this->methods->slot48(this, 1, SCALE_QUARTER);
+        this->methods->slot48(this, 1, sScaleQuarter);
     } else if (out->unk4 % 30 == 0) {
         out->unk10 = 0;
         out->unk1C = 3;
@@ -34,7 +34,7 @@ void Entity__MoodCue33(Entity *this, EntityMoodHandlerArg *out) {
   different shift, different divisor. A reminder that the magic multiplier
   alone does not identify the divisor; the shift and the reconstruction
   chain do.
-- Extern added: `SCALE_QUARTER`.
+- Extern added: `sScaleQuarter`.
 - Clean of both open toolchain blockers.
 
 Matched first attempt (1/30).

@@ -18,7 +18,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 	s32 flag;
 
 	if (this->unk_0x914 == 0) {
-		DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_3, &this->unk_0x91C);
+		DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset3, &this->unk_0x91C);
 	}
 	if (this->unk_0xAC != 4) {
 		if (this->unk_0x914 >= 0x71)
@@ -31,7 +31,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 		if (this->unk_0x914 >= 0x13)
 			return 1;
 		if ((u32)(this->unk_0x914 - 6) < 2 || (u32)(this->unk_0x914 - 0xF) < 2) {
-			this->vt->SceneNode__UpdateRotation(this, 0, &ROTATION_YAW_MINUS45);
+			this->vt->SceneNode__UpdateRotation(this, 0, &sRotationYawMinus45);
 		}
 		flag = (u32)this->unk_0x914 < 9;
 	}
@@ -47,7 +47,7 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 | arm | band guard | in-band windows | in-band action | shared "flag" test |
 | --- | --- | --- | --- | --- |
 | `unk_0xAC != 4` | `< 0x71` | `0x1E..0x2C`, `0x52..0x60` | `unk_0xA4 = 1` | `(unk_0x914-0x1E) < 0x34` |
-| `unk_0xAC == 4` | `< 0x13` | `6..7`, `0xF..0x10` | `vt->SceneNode__UpdateRotation(this,0,&ROTATION_YAW_MINUS45)` | `unk_0x914 < 9` |
+| `unk_0xAC == 4` | `< 0x13` | `6..7`, `0xF..0x10` | `vt->SceneNode__UpdateRotation(this,0,&sRotationYawMinus45)` | `unk_0x914 < 9` |
 
 Matched first attempt, with the `DreamSys__TimerTick`/`DreamSys__TickStaircaseCase0`
 guard-clause lever (invert the band test, early `return 1;`, let the
@@ -60,12 +60,12 @@ additional coaxing.
 
 ## New knowledge
 
-- **`STAIRCASE_OFFSET_3`** (`struct RelativePos`), a third constant in the same table
-  as `DreamSys__TickStaircaseCase2`'s `STAIRCASE_OFFSET_2` and `DreamSys__TickStaircaseCase0`'s `STAIRCASE_OFFSET_0`,
+- **`sStaircaseOffset3`** (`struct RelativePos`), a third constant in the same table
+  as `DreamSys__TickStaircaseCase2`'s `sStaircaseOffset2` and `DreamSys__TickStaircaseCase0`'s `sStaircaseOffset0`,
   passed as `DreamSys__ApplyRelativeOffset`'s `a` argument.
-- **`ROTATION_YAW_MINUS45`**, another opaque forwarded-pointer constant for
+- **`sRotationYawMinus45`**, another opaque forwarded-pointer constant for
   `vt->SceneNode__UpdateRotation`'s `arg2`, same shape as the already-known
-  `ROTATION_YAW_PLUS45`.
+  `sRotationYawPlus45`.
 - **A single flag value can be computed from TWO DIFFERENT numeric
   expressions depending on which arm set it** (`(unk_0x914-0x1E) < 0x34` in
   one arm, `unk_0x914 < 9` in the other) and still merge into ONE shared
@@ -85,4 +85,4 @@ guard clauses into one physical block when retail does so.
 
 ## Naming
 
-- **Tier B.** Table index 3 of the same STAIRCASE_TICK_FNS family, against STAIRCASE_OFFSET_3; same evidence and caveat.
+- **Tier B.** Table index 3 of the same sStaircaseTickFns family, against sStaircaseOffset3; same evidence and caveat.

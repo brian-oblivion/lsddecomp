@@ -7,7 +7,7 @@
 ## What it does
 
 Two independent guarded actions: if `unk_0xC4 != 0`, calls
-`this->vt->Actor__AddTranslation(this, &DRIFT_STEP)` (the same slot `DreamSys__ApplyRelativeOffset`
+`this->vt->Actor__AddTranslation(this, &sDriftStep)` (the same slot `DreamSys__ApplyRelativeOffset`
 calls, this time with a static global vector instead of a computed diff)
 and decrements `this->unk_0x5C->unk_0x24` by `0x258` (600); if `unk_0xC8 !=
 0`, calls `ServiceSoundCueSet(this->unk_0x58, this->unk_0xCC)`.
@@ -18,7 +18,7 @@ and decrements `this->unk_0x5C->unk_0x24` by `0x258` (600); if `unk_0xC8 !=
 void DreamSys__TickDrift(DreamSys *this)
 {
 	if (this->unk_0xC4 != 0) {
-		this->vt->Actor__AddTranslation(this, &DRIFT_STEP);
+		this->vt->Actor__AddTranslation(this, &sDriftStep);
 		this->unk_0x5C->unk_0x24 -= 0x258;
 	}
 	if (this->unk_0xC8 != 0)
@@ -45,7 +45,7 @@ Renamed from `func_8005A0B0`.
 
 The function `DreamSys__SelectCallback98(this, 2)` installs in
 `callback_0x98`. Each tick, while `driftActive`, it adds the constant vector
-`DRIFT_STEP` -- (0, 512, 0), i.e. purely vertical -- to the object's position and
+`sDriftStep` -- (0, 512, 0), i.e. purely vertical -- to the object's position and
 lowers `heightCurve->endValue` by 600; while `cueServiceActive`, it services the
 sound cue set (`ServiceSoundCueSet(soundObj, soundCueSet)`).
 Deliberately NOT called `TickFall` or `TickRise`: this unit never establishes which

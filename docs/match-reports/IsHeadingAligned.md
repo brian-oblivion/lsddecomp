@@ -26,13 +26,13 @@ typedef struct DirectionTableEntry {
 	u16 unkA;
 } DirectionTableEntry;
 
-extern DirectionTableEntry CARDINAL_ANGLES[];
+extern DirectionTableEntry sCardinalAngles[];
 
 s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1)
 {
 	s16 diff;
 
-	diff = a0->heading - CARDINAL_ANGLES[a1].angle;
+	diff = a0->heading - sCardinalAngles[a1].angle;
 	if (diff >= 181) {
 		diff -= 360;
 	} else if (diff < -180) {
@@ -42,7 +42,7 @@ s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1)
 }
 ```
 
-`CARDINAL_ANGLES` (`asm/data/783DC.data.s:1192`) holds 4 entries at a 12-byte
+`sCardinalAngles` (`asm/data/783DC.data.s:1192`) holds 4 entries at a 12-byte
 (6-halfword) stride; the entries' first halfword is `0, 0x5A, 0xB4, 0x10E`
 (0°, 90°, 180°, 270°) — the four cardinal directions. Only that first field is
 read anywhere in this unit's current queue, so the other five halfwords per
@@ -115,9 +115,9 @@ Replaced in the source by a comment that says what the code does; kept here as w
 /* 4-entry cardinal-direction table (12-byte stride); only the first u16 of
    each entry (the angle: 0/90/180/270) is read anywhere in this unit's
    queue. Kept local for the same reason as DirectionCheckArg above.
-   Round 66: this view is a window into CARDINAL_ROTATIONS (below), 4 bytes
+   Round 66: this view is a window into sCardinalRotations (below), 4 bytes
    further on -- `angle` is that entry's yaw NUMERATOR, i.e.
-   CARDINAL_ROTATIONS[i].y.numerator, and `unk2` is its denominator (always
+   sCardinalRotations[i].y.numerator, and `unk2` is its denominator (always
    1). The two views are kept separate because this one reads the angle as a
    bare u16 for arithmetic while the other is only ever address-taken and
    handed to SceneNode__UpdateRotation as a rotation. */

@@ -44,7 +44,7 @@ Three independent facts say which region:
   2. `DreamSys__InitNewGame` initializes precisely that span -- it starts by writing
      offset 0x178 and ends with `memset(&this->unknown_values_0x684, 0, 0x1F4)`,
      and 0x684 + 0x1F4 == 0x878.
-  3. The first word of the span is `SAVE_MAGIC`, whose bytes are 4A 30 31 00 --
+  3. The first word of the span is `sSaveMagic`, whose bytes are 4A 30 31 00 --
      "J01".
 Tier B rather than A: the function has no carved caller, so nothing observed
 actually persists what it hands out.

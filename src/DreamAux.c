@@ -376,11 +376,11 @@ success:
     return true;
 }
 
-/* Whether the player's dream colour is SPECIAL_COLORS' entry for trigger
+/* Whether the player's dream colour is sSpecialColors' entry for trigger
  * condition `condition` (10..17). */
 bool IsCurrentDreamColor(s32 condition) {
     DreamSys *player = gDreamAuxWorld;
-    s32 color = SPECIAL_COLORS[condition - TRIGGER_COND_DREAM_COLOR_FIRST];
+    s32 color = sSpecialColors[condition - TRIGGER_COND_DREAM_COLOR_FIRST];
     s32 current = player->methods->getDreamColor(player);
 
     return color == current;

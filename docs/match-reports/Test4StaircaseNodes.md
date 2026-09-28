@@ -16,8 +16,8 @@ directly when `arg2 != 0`.
 s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 arg2)
 {
 	if (arg2 == 0)
-		return GetStaticSpawn(target, currentPos, 0, LEN_STAIRCASE_TRIGGERS,
-		                       STAIRCASE_TRIGGERS, STAIRCASE_SPAWNS, 0);
+		return GetStaticSpawn(target, currentPos, 0, sStaircaseTriggersCount,
+		                       sStaircaseTriggers, sStaircaseSpawns, 0);
 	return -1;
 }
 ```

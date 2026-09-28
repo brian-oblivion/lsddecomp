@@ -57,22 +57,22 @@ the signature edit).
 
 `gProjectOffsetZ` is the LAST word of an unnamed 3-word (`DreamSysVec3`-shaped)
 global scratch vector. The other two words were NOT independently named --
-splat's dlabel boundary put them inside `VOICE_PITCH_BY_SELECT`'s dlabel as unlabeled
+splat's dlabel boundary put them inside `sVoicePitchBySelect`'s dlabel as unlabeled
 tail bytes (`asm/data/783DC.data.s`), because nothing took their address
 directly until this function. Declared in `include/DreamSys.h` as
 `extern s32 gProjectOffsetZ;` (unchanged type -- it really is a lone word by
 itself); the vector's start is reached with pointer arithmetic off it,
-`(s32 *)&gProjectOffsetZ - 2`, since renaming/resegmenting `VOICE_PITCH_BY_SELECT`'s dlabel
+`(s32 *)&gProjectOffsetZ - 2`, since renaming/resegmenting `sVoicePitchBySelect`'s dlabel
 is a `config/` change and out of scope this round.
 
 **This is not a guess -- two independent pieces of evidence pin it down:**
 
 1. `DreamSys__NotifyLinkAttempt` (this unit, already matched) clamps `this->unk_0xB8 =
    (this->unk_0x28->unk_0x36 & 0x7F); if (unk_0xB8 >= 0x18) unk_0xB8 = 0;`
-   -- i.e. `unk_0xB8` is bounded to `[0, 0x18)`. Both `VOICE_BY_SELECT` and
-   `VOICE_PITCH_BY_SELECT` (each already-named 24+-byte byte tables) are indexed by
-   this SAME bounded value in `DreamSys__StartVoice` (`VOICE_PITCH_BY_SELECT[unk_0xB8]`), so
-   `VOICE_PITCH_BY_SELECT`'s real, ever-read extent is exactly 24 bytes
+   -- i.e. `unk_0xB8` is bounded to `[0, 0x18)`. Both `sVoiceBySelect` and
+   `sVoicePitchBySelect` (each already-named 24+-byte byte tables) are indexed by
+   this SAME bounded value in `DreamSys__StartVoice` (`sVoicePitchBySelect[unk_0xB8]`), so
+   `sVoicePitchBySelect`'s real, ever-read extent is exactly 24 bytes
    (`0x80087EC8`-`0x80087EDF`) -- the 8 trailing zero bytes splat lumped
    into its dlabel (`0x80087EE0`-`0x80087EE7`) are never reached by that
    indexed access and belong to something else.

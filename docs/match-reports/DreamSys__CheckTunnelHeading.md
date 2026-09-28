@@ -14,43 +14,43 @@ assigned queue).
 
 ## What it does
 
-Looks up a "heading" byte from `TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex]`,
+Looks up a "heading" byte from `sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex]`,
 validates it against `currentPos`'s stored heading via the already-matched
 `IsHeadingAligned` (a cardinal-direction proximity test), and on success
 writes one or two computed pointers (into a `DirectionTableEntry`-strided
-table, `CARDINAL_ROTATIONS`) through its two optional output parameters. Called by
+table, `sCardinalRotations`) through its two optional output parameters. Called by
 `DreamSys__TryTunnelLink` (still `INCLUDE_ASM`) as `DreamSys__CheckTunnelHeading(&this->unk_0x888,
 &this->unk_0x884, local)`.
 
 ## New declarations needed
 
-`TUNNEL_ENTER_HEADINGS` and `TUNNEL_EXIT_HEADINGS` are per-stage tables of pointers to byte
+`sTunnelEnterHeadings` and `sTunnelExitHeadings` are per-stage tables of pointers to byte
 arrays (4-byte stride, indexed by `gLinkSrcStage`/`gLinkDstStage` respectively,
 each further indexed by `gLinkTriggerIndex`/`gLinkSpawnIndex` to read a single `u8`):
 
 ```c
-extern u8 *TUNNEL_ENTER_HEADINGS[];
-extern u8 *TUNNEL_EXIT_HEADINGS[];
+extern u8 *sTunnelEnterHeadings[];
+extern u8 *sTunnelExitHeadings[];
 ```
 
-`CARDINAL_ROTATIONS` is more subtle: it is a `DirectionTableEntry`-strided (12-byte)
+`sCardinalRotations` is more subtle: it is a `DirectionTableEntry`-strided (12-byte)
 table whose first element sits exactly 4 bytes before the SEPARATELY
-referenced `CARDINAL_ANGLES` (the angle table `IsHeadingAligned` already indexes,
+referenced `sCardinalAngles` (the angle table `IsHeadingAligned` already indexes,
 matched earlier this round's queue). splat drew a symbol boundary there
-because `CARDINAL_ANGLES` is independently referenced elsewhere, not because the
+because `sCardinalAngles` is independently referenced elsewhere, not because the
 underlying retail data is genuinely two different tables. This function
-only ever ADDRESS-TAKES an element (`&CARDINAL_ROTATIONS[i]`, storing the pointer
+only ever ADDRESS-TAKES an element (`&sCardinalRotations[i]`, storing the pointer
 into an output parameter) and never dereferences one, so the element type
 only needs to fix the STRIDE -- reusing the already-declared
 `DirectionTableEntry` (12 bytes) is exact and avoids inventing a third
 local type for one call site:
 
 ```c
-extern DirectionTableEntry CARDINAL_ROTATIONS[];
+extern DirectionTableEntry sCardinalRotations[];
 ```
 
 Also moved the `DirectionCheckArg` typedef, the `DirectionTableEntry`
-typedef, `extern DirectionTableEntry CARDINAL_ANGLES[];`, and a new forward
+typedef, `extern DirectionTableEntry sCardinalAngles[];`, and a new forward
 declaration `extern s32 IsHeadingAligned(DirectionCheckArg *a0, u8 a1);` to
 BEFORE `DreamSys__CheckTunnelHeading` (they previously sat between it and
 `IsHeadingAligned`'s own definition) -- `DreamSys__CheckTunnelHeading` needs `DirectionCheckArg`
@@ -67,16 +67,16 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	u8 heading;
 	s32 idx;
 
-	heading = TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
+	heading = sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
 	if (!IsHeadingAligned((DirectionCheckArg *)arg2, heading))
 		return 0;
 
 	if (arg1 != NULL)
-		*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
+		*arg1 = (s32)&sCardinalRotations[heading];
 
 	if (arg0 != NULL) {
-		idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
-		*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
+		idx = sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex];
+		*arg0 = (s32)&sCardinalRotations[idx];
 	}
 	return 1;
 }
@@ -101,14 +101,14 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 	s32 idx;
 	s32 result;
 
-	heading = TUNNEL_ENTER_HEADINGS[gLinkSrcStage][gLinkTriggerIndex];
+	heading = sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex];
 	if (IsHeadingAligned((DirectionCheckArg *)arg2, heading)) {
 		if (arg1 != NULL)
-			*arg1 = (s32)&CARDINAL_ROTATIONS[heading];
+			*arg1 = (s32)&sCardinalRotations[heading];
 
 		if (arg0 != NULL) {
-			idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
-			*arg0 = (s32)&CARDINAL_ROTATIONS[idx];
+			idx = sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex];
+			*arg0 = (s32)&sCardinalRotations[idx];
 		}
 		result = 1;
 	} else {
@@ -151,24 +151,24 @@ queue).
 
 ## Naming
 
-- **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (TUNNEL_ENTER_HEADINGS/TUNNEL_EXIT_HEADINGS here); called from DreamSys__TryTunnelLink.
+- **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (sTunnelEnterHeadings/sTunnelExitHeadings here); called from DreamSys__TryTunnelLink.
 
 ## Comment moved from src/DreamSys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 
 ```c
-/* TUNNEL_ENTER_HEADINGS: a per-stage table of pointers to byte arrays (4-byte stride,
+/* sTunnelEnterHeadings: a per-stage table of pointers to byte arrays (4-byte stride,
    indexed by gLinkSrcStage), each further indexed by gLinkTriggerIndex to read the
-   "heading" byte passed to IsHeadingAligned. TUNNEL_EXIT_HEADINGS is the analogous
+   "heading" byte passed to IsHeadingAligned. sTunnelExitHeadings is the analogous
    table for gLinkDstStage/gLinkSpawnIndex. Neither array's own element type is
    dereferenced beyond a single `u8` here. */
 ```
 
 ```c
 /* The 12-byte-stride table whose first element sits 4 bytes before the
-   separately-referenced `CARDINAL_ANGLES` -- splat drew the boundary there
-   because `CARDINAL_ANGLES` is independently referenced, not because the
+   separately-referenced `sCardinalAngles` -- splat drew the boundary there
+   because `sCardinalAngles` is independently referenced, not because the
    underlying data is two different tables. Round 66 types it
    `RotationRatios` (include/DreamSys.h) rather than as a stride-only
    placeholder: every entry is three {numerator, denominator} degree ratios

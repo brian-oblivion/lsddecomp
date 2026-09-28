@@ -18,7 +18,7 @@ cross-unit from `Entity.c`'s own extern
 arg2, s32 arg3, s32 arg4);`). Sets four `out->` fields when `out->unk4 ==
 6`. Tests `this->unkFC` against a cascade of six `arg2`-relative
 thresholds (`arg2`, `arg2+0x5B`, `arg2+0x155`, `arg2+0x1B1`, `arg2+0x2BA`,
-`arg2+0x317`) that collapse to a single `slot44(this, 0, ROTATION_YAW_PLUS1)` call
+`arg2+0x317`) that collapse to a single `slot44(this, 0, sRotationYawPlus1)` call
 when `unkFC` lands in one of three disjoint windows relative to `arg2`
 (`[0,0x5B]`, `[0x155,0x1B1]`, `[0x2BA,0x317]`, all offsets from `arg2`);
 either way, falls through to `slotC4(this, arg4, 0)`, then `slot160`/
@@ -59,7 +59,7 @@ L34:
         goto L74;
     }
 L50:
-    this->methods->slot44(this, 0, ROTATION_YAW_PLUS1);
+    this->methods->slot44(this, 0, sRotationYawPlus1);
 L74:
     this->methods->slotC4(this, arg4, 0);
     if (this->unkFC == arg3) {
@@ -187,7 +187,7 @@ L34:
         goto L74;
     }
 L50:
-    this->methods->slot44(this, 0, ROTATION_YAW_PLUS1);
+    this->methods->slot44(this, 0, sRotationYawPlus1);
 L74:
     this->methods->slotC4(this, arg4, 0);
     if (this->unkFC == arg3) {
@@ -241,7 +241,7 @@ row handlers: `Entity__MoodCue111` (this unit, twice, with different
 one call site). Tier B: the mechanics are fully established from the body
 -- up to three periodic "wobble" windows relative to `arg2`
 (`[arg2,arg2+0x5B]`, `[arg2+0x155,arg2+0x1B1]`, `[arg2+0x2BA,arg2+0x317]`)
-trigger a single `updateRotation(this, 0, ROTATION_YAW_PLUS1)` pulse, then
+trigger a single `updateRotation(this, 0, sRotationYawPlus1)` pulse, then
 every call unconditionally applies `slotC4(this, arg4, 0)` (a continuous
 decay/approach call used identically by many of this unit's own row
 handlers) and deactivates + sets `moodState = 1` once `moodTimer == arg3`
@@ -256,10 +256,10 @@ above is concrete, not a placeholder.
 
 ## Data constant decoded this round
 
-`ROTATION_YAW_PLUS1` (0x80089D18), the wobble-pulse `updateRotation`
+`sRotationYawPlus1` (0x80089D18), the wobble-pulse `updateRotation`
 argument, decoded from `disk/SLPS_015.56` as four s16 `{num,den}` pairs:
 `(0,1, 1,1, 0,1, 0,1)` -- only Y (yaw) nonzero, a whole 1/1 = 1 degree,
-matching the existing `ROTATION_YAW_PLUS2` precedent for small whole-degree
+matching the existing `sRotationYawPlus2` precedent for small whole-degree
 per-tick amounts.
 
 ## Track 4 (2026-09-26, round 88, echo)
@@ -273,6 +273,6 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 The literal-`goto` transcription (labels `L18`/`L34`/`L50`/`L74`) is now
 one `if` over three inclusive windows,
 `[windowStart, +91]`, `[+341, +433]`, `[+698, +791]`, that call
-`updateRotation(ROTATION_YAW_PLUS1)`. Byte-exact (funcdiff 70/70, whole
+`updateRotation(sRotationYawPlus1)`. Byte-exact (funcdiff 70/70, whole
 image green). The parameters were renamed `windowStart`/`deactivateTimer`/
 `zStep` earlier this round.

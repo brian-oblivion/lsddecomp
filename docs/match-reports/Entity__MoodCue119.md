@@ -8,14 +8,14 @@ whole-image build verified byte-exact)
 ## What it does
 
 `(Entity *this) -> s32`. A one-line tail-call wrapper: `return
-this->methods->slot48(this, 1, SCALE_SIX);` -- the same `slot48`
+this->methods->slot48(this, 1, sScaleSix);` -- the same `slot48`
 (already `s32`-returning, established in `Entity`'s `Entity__MoodCue17`) and
 the same `arg1==1` convention as `Entity__MoodCue08`/`Entity__MoodCue17`, just with
 a new data row.
 
 ## New symbol
 
-`SCALE_SIX` -- a fifth `D_8008xxxx` opaque data-row extern, same
+`sScaleSix` -- a fifth `D_8008xxxx` opaque data-row extern, same
 convention as the ones already declared in `Entity.c`. Declared fresh in
 `Entity.c` (a separate translation unit, so it needs its own `extern`).
 
@@ -23,7 +23,7 @@ convention as the ones already declared in `Entity.c`. Declared fresh in
 
 ```c
 s32 Entity__MoodCue119(Entity *this) {
-    return this->methods->slot48(this, 1, SCALE_SIX);
+    return this->methods->slot48(this, 1, sScaleSix);
 }
 ```
 
