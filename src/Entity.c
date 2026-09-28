@@ -2647,7 +2647,7 @@ void Entity__MoodCue102(Entity *this, SoundCueSet *out) {
         } else if (this->moodTimer >= 1921) {
             scale = SCALE_QUARTER;
         } else {
-            scale = SCALE_EIGHTH;
+            scale = sScaleEighth;
         }
         this->methods->updateScale(this, 1, scale);
         if (this->moodTimer < 2000) {
