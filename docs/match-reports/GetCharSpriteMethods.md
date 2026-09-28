@@ -22,7 +22,7 @@ CharSpriteMethods *GetCharSpriteMethods(void) {
 
 ## Naming
 
-- `Get_vtable_D8006EC74` -- tier A. Table getter ("return D_8006EC74;"), the Get_vtable_<Class> convention already used for anonymous classes (GetBasicClassMethods, Get_vtable_Pad, Get_vtable_Entity).
+- `Get_vtable_D8006EC74` -- tier A. Table getter ("return D_8006EC74;"), the Get_vtable_<Class> convention already used for anonymous classes (GetBasicClassMethods, Get_vtable_Pad, GetEntityMethods).
 
 ## Track 4
 

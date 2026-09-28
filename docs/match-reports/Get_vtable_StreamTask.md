@@ -9,7 +9,7 @@
 ## What it does
 
 The class's own "GetMethods" accessor -- returns `&gStreamTaskMethods` and nothing
-else, the same shape as `Get_vtable_Entity` in `include/Entity.h` and
+else, the same shape as `GetEntityMethods` in `include/Entity.h` and
 `GetTodActorMethods` in `src/world/TodActor.c`. Called (still `INCLUDE_ASM`, not
 this batch) by `New_StreamTask` (the allocator) and `StreamTask__StreamTask` (the
 constructor) to fetch the class's ctor at slot `+0x008` and to install the
@@ -67,7 +67,7 @@ second accessor and calls straight through it.
 **Get_vtable_StreamTask** -- tier A. The class's own "GetMethods"
 accessor (returns `&gStreamTaskMethods`, no other side effect), matching
 the established `Get_vtable_<Class>` convention exactly
-(`Get_vtable_Entity`, `Get_vtable_TaskCore`, `Get_vtable_IntermediateBase`).
+(`GetEntityMethods`, `Get_vtable_TaskCore`, `Get_vtable_IntermediateBase`).
 
 ## Track 4 (2026-09-26, round 87)
 

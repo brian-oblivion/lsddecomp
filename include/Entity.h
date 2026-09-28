@@ -9,7 +9,7 @@
 /*
  * Entity -- a TodActor (TOD-animated Actor) driven by a per-mood row of
  * tables (class id 0x1F234, method table gEntityMethods, getter
- * Get_vtable_Entity): TodActor's one subclass (include/TodActor.h); no
+ * GetEntityMethods): TodActor's one subclass (include/TodActor.h); no
  * class derives from it. The ctor calls TodActor's first
  * (GetTodActorMethods()->ctor), so the id parent is the ctor-chain
  * parent. Its methods and its MoodCue handlers are in src/world/Entity.c. The
@@ -130,7 +130,7 @@ enum EntityEffect {
 #define ENTITY_STATE_DONE 1
 
 extern EntityMethods gEntityMethods;
-extern EntityMethods *Get_vtable_Entity(void); /* returns &gEntityMethods */
+extern EntityMethods *GetEntityMethods(void); /* returns &gEntityMethods */
 
 /* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C)
  * is the grid manager, StageMap (include/StageMap.h; DreamAux passes

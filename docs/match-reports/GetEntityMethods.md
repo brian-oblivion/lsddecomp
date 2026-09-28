@@ -1,4 +1,6 @@
-# Get_vtable_Entity
+# GetEntityMethods
+
+> Renamed from `Get_vtable_Entity` on 2026-09-28 (tools/rename.py). Address 0x8005e150.
 
 **Unit:** Entity · **Size:** 4 words · **Status:** MATCHED (4/4 words,
 whole-image build verified byte-exact)
@@ -7,13 +9,13 @@ whole-image build verified byte-exact)
 
 Trivial table-pointer accessor: returns `&gEntityMethods`, the same
 `EntityMethods` table `New_Entity`/`Entity__Entity` assign to
-`this->methods`. Called directly by name (`jal Get_vtable_Entity`), not
+`this->methods`. Called directly by name (`jal GetEntityMethods`), not
 through a vtable slot itself.
 
 ## Final C
 
 ```c
-EntityMethods *Get_vtable_Entity(void) {
+EntityMethods *GetEntityMethods(void) {
     return &gEntityMethods;
 }
 ```
@@ -44,7 +46,7 @@ None beyond what's already documented (`lui`/`addiu` with no surrounding
 
 ## Naming
 
-`Get_vtable_Entity` -- tier A (round 71, runner echo, FINISHING-PLAN track 3).
+`GetEntityMethods` -- tier A (round 71, runner echo, FINISHING-PLAN track 3).
 
 Kept. A getter returning `&gEntityMethods`. `New_Entity` calls it directly by name, and it follows the project's `Get_vtable_X` accessor convention (`GetDreamSysMethods`). Tier A by definition, since the mechanics of a pure getter are its purpose.
 

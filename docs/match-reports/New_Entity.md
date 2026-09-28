@@ -5,7 +5,7 @@
 ## What it does
 
 The allocator for `Entity`: `BMemPMgrAlloc(0x108)` allocates 0x108 bytes,
-then `Get_vtable_Entity()->ctor(obj, arg0, arg1, arg2)` (the vtable's own
+then `GetEntityMethods()->ctor(obj, arg0, arg1, arg2)` (the vtable's own
 `ctor` slot, `Entity__Entity` — see that report) constructs it in place. On
 allocation failure, returns NULL immediately. On construction failure
 (`ctor` returns NULL), frees the allocation via `BMemPMgrFree` and returns
@@ -27,7 +27,7 @@ Entity *New_Entity(void *arg0, void *arg1, void *arg2) {
     result = NULL;
     if (obj != NULL) {
         result = obj;
-        if (Get_vtable_Entity()->ctor(obj, arg0, arg1, arg2) == NULL) {
+        if (GetEntityMethods()->ctor(obj, arg0, arg1, arg2) == NULL) {
             BMemPMgrFree(obj);
             result = NULL;
         }
@@ -103,7 +103,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 - Step 5: the unit banner of src/world/Entity.c was rewritten as documentation. The history it carried, kept here:
   - "The Entity class -- fully matched, no INCLUDE_ASM left (round 56 was a track 3 naming pass, not matching work)."
   - "This is the first 25 of a 142-function block split at Entity__UpdateTargetProximity; the rest (Entity_b through Entity_g, all sharing include/Entity.h) hold the mood-dispatch handler tables and the per-frame behaviour those handlers run."
-  - "Entity's own vtable is gEntityMethods (asm/data/79528.data.s), reached via Get_vtable_Entity (Entity_b.c); `tools/classtable.py gEntityMethods` is the ground truth for which function occupies which slot, including the several self-referential slots this unit's own functions dispatch back into (activate/deactivate/getProximityRatio/startSoundCue/stopSoundCue)."
+  - "Entity's own vtable is gEntityMethods (asm/data/79528.data.s), reached via GetEntityMethods (Entity_b.c); `tools/classtable.py gEntityMethods` is the ground truth for which function occupies which slot, including the several self-referential slots this unit's own functions dispatch back into (activate/deactivate/getProximityRatio/startSoundCue/stopSoundCue)."
   - "The overrides of TodActor's slots are named for their slots (Entity__Finalize, Reset, AttachToParent, DetachFromParent, OnGridCellLinkCommand; track 4, round 88)."
 
 ## History (moved from src/Entity.c, comments pass)

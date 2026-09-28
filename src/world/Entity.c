@@ -1,5 +1,5 @@
 /* Entity -- the class whole (include/Entity.h): its methods, its table
- * getter Get_vtable_Entity, and the MoodCue handlers of its mood rows.
+ * getter GetEntityMethods, and the MoodCue handlers of its mood rows.
  *
  * An Entity is a TodActor driven by one row of gEntityMoodTable, chosen by
  * New_Entity's moodIndex. The first section holds:
@@ -42,7 +42,7 @@ Entity *New_Entity(s32 moodIndex, void *desc, void *sound) {
     if (obj == NULL) {
         return NULL;
     }
-    if (Get_vtable_Entity()->ctor(obj, moodIndex, desc, sound) == NULL) {
+    if (GetEntityMethods()->ctor(obj, moodIndex, desc, sound) == NULL) {
         BMemPMgrFree(obj);
         return NULL;
     }
@@ -51,7 +51,7 @@ Entity *New_Entity(s32 moodIndex, void *desc, void *sound) {
 
 Entity *Entity__Entity(Entity *this, s32 moodIndex, void *desc, void *sound) {
     if (GetTodActorMethods()->ctor((TodActor *)this, desc, sound) != NULL) {
-        this->methods = Get_vtable_Entity();
+        this->methods = GetEntityMethods();
         this->moodIndex = moodIndex;
         this->soundCueSet.tag = 0;
         this->fadeBox = NULL;
@@ -398,7 +398,7 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
  * Entity__UpdateSoundCueStop (+0x180) stops it again when the player leaves
  * that range. Entity__NotifyIfTargetInRange and Entity__IsTargetInRange are
  * the range test Entity__UpdateDeactivationState makes on the row's
- * gEntityEventVideoTable entry; Get_vtable_Entity is the table's getter.
+ * gEntityEventVideoTable entry; GetEntityMethods is the table's getter.
  *
  * The handlers. Each Entity__MoodCueNN is the `handler` of
  * gEntityMoodHandlerTable's row NN: rows 0, 1, 5 and 7 to 17 (rows 2 to 4
@@ -517,7 +517,7 @@ s32 Entity__UpdateSoundCueStop(Entity *this) {
     return this->soundCueActive;
 }
 
-EntityMethods *Get_vtable_Entity(void) {
+EntityMethods *GetEntityMethods(void) {
     return &gEntityMethods;
 }
 
