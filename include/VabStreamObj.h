@@ -68,7 +68,7 @@ enum VabStreamLoadState {
 
 /* slot78 is FileResource's `void *slot78` (NULL there). This class's occupant,
  * VabStreamObj__OnBodyReady, is called through this typedef. That takes no
- * code (FINISHING-PLAN track 4 step 6). */
+ * code. */
 typedef s32 (*VabStreamObjOnBodyReadyFn)(VabStreamObj *self, s32 done);
 
 struct VabStreamObjMethods {

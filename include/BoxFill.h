@@ -33,7 +33,7 @@
  * (FadeBox__FadeBox: GetBoxFillMethods()->ctor).
  *
  * Overrides whose parameter list differs from the inherited slot keep the
- * slot's type (FINISHING-PLAN track 4 step 6); a caller reaching the
+ * slot's type; a caller reaching the
  * override through the slot casts to the typedef below it (no code):
  *  - +0x040 reset: BoxFill__Reset takes the ctor's (size, color, pri) and
  *    initialises the box from them; the ctor calls it through
