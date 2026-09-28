@@ -890,7 +890,7 @@ extern s32 _svm_envx_hist[];
 typedef struct {
     u16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
-} Rec34HalfU2;
+} SvmVoiceEnvx;
 
 extern void SetAutoVol(s16 a0);
 extern void SetAutoPan(s16 a0);
@@ -913,7 +913,7 @@ void SpuVmFlush(void) {
     *slot = 0;
 
     if (count > 0) {
-        Rec34HalfU2 *p98E = (Rec34HalfU2 *)&_svm_voice[0].envx;
+        SvmVoiceEnvx *p98E = (SvmVoiceEnvx *)&_svm_voice[0].envx;
         SpuVoiceRegs *pDad = _svm_sreg->voice;
 
         for (i = 0; i < count; i++) {

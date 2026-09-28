@@ -110,7 +110,7 @@ window:
 
 - `_svm_envx_ptr` (`s32`, ring index 0-15) and `_svm_envx_hist[]` (`s32[16]`, ring
   buffer of per-call "channel ready" bitmasks).
-- `D_8008D98E[]`: needs an UNSIGNED 16-bit view (`Rec34HalfU2`, not the
+- `D_8008D98E[]`: needs an UNSIGNED 16-bit view (`SvmVoiceEnvx`, not the
   existing signed `Rec34Half`) — confirmed by the `lhu` re-read after the
   store, same idiom already established for other members of this 0x34-
   stride family elsewhere in this unit.
@@ -144,7 +144,7 @@ window:
    variable" pattern (index kept alive for a bit-shift, PLUS a pointer
    walked in lockstep for the memory accesses), not something `array[i]`
    indexing reliably reproduces from this compiler.
-2. **Rewrote phase 2 with explicit walking pointers** (`Rec34HalfU2 *p98E`,
+2. **Rewrote phase 2 with explicit walking pointers** (`SvmVoiceEnvx *p98E`,
    `Rec16DAD4C *pDad`, both incremented once per iteration): **231/241 (10
    words too SHORT)** — overshot in the other direction. This was still the
    right lever (phase 2's own instructions became near-exact matches, only
@@ -446,7 +446,7 @@ extern s32 _svm_envx_hist[];
 typedef struct {
     u16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
-} Rec34HalfU2;
+} SvmVoiceEnvx;
 
 /* Flag byte: when set, skip the "channel starved for N frames -> force
  * release" scan below. */
@@ -504,7 +504,7 @@ void SpuVmFlush(void) {
     *slot = 0;
 
     if (count > 0) {
-        Rec34HalfU2 *p98E = (Rec34HalfU2 *) D_8008D98E;
+        SvmVoiceEnvx *p98E = (SvmVoiceEnvx *) D_8008D98E;
         Rec16DAD4C *pDad = (Rec16DAD4C *) _svm_sreg;
 
         for (i = 0; i < count; i++) {
@@ -614,8 +614,8 @@ extern s32 _svm_envx_hist[];
 typedef struct {
     u16 unk0; /* +0x0 */
     u8 pad2[0x34 - 0x2];
-} Rec34HalfU2;
-extern Rec34HalfU2 D_8008D98E[];
+} SvmVoiceEnvx;
+extern SvmVoiceEnvx D_8008D98E[];
 extern Rec34Half D_8008D9A4[];
 
 /* Flag byte: when set, skip the "channel starved for N frames -> force
@@ -679,7 +679,7 @@ void SpuVmFlush(void) {
     *slot = 0;
 
     if (count > 0) {
-        Rec34HalfU2 *p98E = D_8008D98E;
+        SvmVoiceEnvx *p98E = D_8008D98E;
         Rec16DAD4C *pDad = (Rec16DAD4C *) _svm_sreg;
 
         for (i = 0; i < count; i++) {
@@ -834,7 +834,7 @@ Placed in `src/psyq/libsnd_vmanager.c` under `#ifdef NON_MATCHING`, `INCLUDE_ASM
 kept in `#else`. Used the CURRENT best preserved body (round 48 echo,
 236/241 words, 5 short) rather than the older superseded 237/241 one kept
 at the end of this report for reference. All of its supporting
-declarations (the `_svm_envx_hist*` pair, `Rec34HalfU2`,
+declarations (the `_svm_envx_hist*` pair, `SvmVoiceEnvx`,
 `Rec16D7F0Wide`, `Rec16DAD4C`, `SpuSetNoiseVoice`, the `SetAutoVol`/
 `SetAutoPan` externs, `D_8008D7F6`) are new to the unit and were kept
 local to this function's `#ifdef` block, per CLAUDE.md's rule against
@@ -868,7 +868,7 @@ because splat names only addresses some asm references. Byte-identical.
 
 ## Track 6 (round 96, charlie)
 
-Round 96 (charlie, track 6) moved `src/psyq/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `_svm_sreg`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from _svm_okof1/64), `keyOn[0..1]` (+0x188, from _svm_okon1/22C) and `reverbOn[0..1]` (+0x198, from _svm_orev1/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `Rec34HalfU2` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.
+Round 96 (charlie, track 6) moved `src/psyq/libsnd_vmanager.c` onto Sony's headers (`<libsnd.h>`, `<libspu.h>`) and Sony's types; zero bytes changed, whole-image SHA1 green, NON_MATCHING bodies compile. The preserved body's `Rec16DAD4C` (0x10-byte records over `_svm_sreg`) is `SpuVoiceRegs`, one element of `SpuRegs.voice[24]` (the SPU register block at 0x1F801C00; `ObjDAD4` renamed `SpuRegs`). The activity walk reads `envx` (+0xC, the current envelope level); the dirty copy-out writes `voice[i].volL/volR/pitch/addr/adsr1/adsr2`; the tail's byte-offset stores are `keyOff[0..1]` (+0x18C, from _svm_okof1/64), `keyOn[0..1]` (+0x188, from _svm_okon1/22C) and `reverbOn[0..1]` (+0x198, from _svm_orev1/234). `SpuSetNoiseVoice` now comes from `<libspu.h>`. `SvmVoiceEnvx` (the 0x34-stride walk over `_svm_voice[].unk06`) is kept: it is the walk's own element type.
 
 ## History (moved from src/libsnd_vmanager.c, comments pass)
 
