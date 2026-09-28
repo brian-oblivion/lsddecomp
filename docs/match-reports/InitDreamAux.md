@@ -34,7 +34,7 @@
 > per-function window, no drift caveat, just a green `build-and-verify.sh`.
 >
 > **This is now real C in `src/world/DreamAux.c`, committed.** The rodata
-> ownership trap documented below (defining `gMomPathSymSpy`/`gMomPathSymDog` as real
+> ownership trap documented below (defining `gMomPathSymSpy`/`sMomPathSymDog` as real
 > string data ahead of the function) was exactly as described and is now
 > permanent, not a note for a future attempt.
 >
@@ -86,7 +86,7 @@ audio-stream-request object:
 #include "DreamAux.h"
 
 /* const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM"; */
-/* const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM"; */
+/* const char sMomPathSymDog[] = "ETC\\SYMDOG.MOM"; */
 /* ^ These must be defined in this .c file (not just declared extern) when
  * this function is not INCLUDE_ASM'd -- see "Rodata ownership" below. */
 
@@ -106,7 +106,7 @@ void InitDreamAux(void)
 
     for (i = 0; i < 1; i++) {
         sDreamAuxSlots[i].obj = New_ModelData((struct ResourceSource *)&req);
-        req.name = gMomPathSymDog;
+        req.name = sMomPathSymDog;
     }
 }
 ```
@@ -184,7 +184,7 @@ which shows the first ~46 instructions matching before this one diverges).
 
 `config/splat.slps01556.lsdde.yaml` marks the `0x206C` rodata segment
 `.rodata, DreamAux` (dot-prefixed) for `CheckDreamAuxTriggerCondition`'s jump tables, but
-`gMomPathSymSpy`/`gMomPathSymDog` (the two MOM filenames) live in the same run and
+`gMomPathSymSpy`/`sMomPathSymDog` (the two MOM filenames) live in the same run and
 are consumed only by `InitDreamAux`. While this function is `INCLUDE_ASM`,
 its own `.s` file carries these two strings as raw (`nonmatching`) asm
 blocks and the build is green. The MOMENT this function is de-`INCLUDE_ASM`'d,

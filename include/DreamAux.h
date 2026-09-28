@@ -46,7 +46,7 @@ extern DreamAuxTriggerEntry *sDreamAuxTriggerEntries[DREAM_AUX_STAGE_COUNT];
 /* The two ModelData files InitDreamAux can load. With one slot, only
  * SYMSPY.MOM is ever requested. */
 extern const char gMomPathSymSpy[];
-extern const char gMomPathSymDog[];
+extern const char sMomPathSymDog[];
 
 /* TriggerRecord.condition: CheckDreamAuxTriggerCondition's tests, by id. A
  * negative condition tests -condition and passes only while the record has
