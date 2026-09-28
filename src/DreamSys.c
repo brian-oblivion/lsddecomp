@@ -1730,7 +1730,7 @@ s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, 
 /* CheckStaircaseHeading's pair of heading tables, indexed as
    sTunnelEnterHeadings / sTunnelExitHeadings are. */
 extern u8 *sStaircaseEnterHeadings[];
-extern u8 *STAIRCASE_EXIT_HEADINGS[];
+extern u8 *sStaircaseExitHeadings[];
 
 s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     u8 heading;
@@ -1743,7 +1743,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
             *outEnter = (s32)&sCardinalRotations[heading];
 
         if (outExit != NULL) {
-            idx = STAIRCASE_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
+            idx = sStaircaseExitHeadings[gLinkDstStage][gLinkSpawnIndex];
             *outExit = (s32)&sCardinalRotations[idx];
         }
         result = 1;
