@@ -237,6 +237,7 @@ INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmAlloc);
 /* Sets the voice's volumes from _svm_cur's volumes and pans, and its pitch,
  * then marks it to be keyed on (and to or from reverb) at the next flush. */
 #define KEYON_VOICE (*(s16 *)&D_8008EA26)
+
 void SpuVmKeyOnNow(s32 unused, s32 pitch) {
     SsScore *score;
     s32 masterVol;
@@ -323,6 +324,7 @@ void SpuVmKeyOnNow(s32 unused, s32 pitch) {
     _svm_okof1 = _svm_okof1 & ~_svm_okon1;
     _svm_okof2 = _svm_okof2 & ~_svm_okon2;
 }
+
 #undef KEYON_VOICE
 #else
 INCLUDE_ASM("asm/nonmatchings/libsnd_vmanager", SpuVmKeyOnNow);

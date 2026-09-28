@@ -538,8 +538,8 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
 
     self->cachedViewport = vp;
     day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    self->styleConfig =
-        (StyleConfig *)RegisterStyleConfig((s32)self->unk14, self->stage, (s32)&self->ctorSound, day, 0);
+    self->styleConfig = (StyleConfig *)RegisterStyleConfig((s32)self->unk14, self->stage,
+                                                           (s32)&self->ctorSound, day, 0);
     if (style != 0) {
         self->styleConfig = style;
     }

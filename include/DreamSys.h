@@ -647,8 +647,8 @@ struct DreamSys {
  * graphScored, DreamSys +0x5DF, the last byte of unknown_values_0x5d8[8]. */
 typedef struct DreamSaveBlock {
     u8 pad00[0x4];
-    /* +0x004 */ s32 currentYear;              /* DreamSys +0x17C; nonzero: the ring is full, plot all 100 days */
-    /* +0x008 */ s32 currentDay;               /* DreamSys +0x180; days logged this year, the ring's write cursor */
+    /* +0x004 */ s32 currentYear; /* DreamSys +0x17C; nonzero: the ring is full, plot all 100 days */
+    /* +0x008 */ s32 currentDay; /* DreamSys +0x180; days logged this year, the ring's write cursor */
     /* +0x00C */ s32 totalFlasbackUnlockScore; /* DreamSys +0x184: FLASHBACK unlocks past 9999999 */
     u8 pad10[0x18 - 0x10];
     /* +0x018 */ MoodGraphPoint moodPreviousDays[DAYS_PER_YEAR]; /* walked backwards from currentDay - 1 */
