@@ -1,4 +1,6 @@
-# DreamSys__TickStaircaseCase1 — MATCHED
+# DreamSys__TickStaircaseYawMinus135 — MATCHED
+
+> Renamed from `DreamSys__TickStaircaseCase1` on 2026-09-28 (tools/rename.py). Address 0x8005ac24.
 
 > Renamed from `func_8005AC24` on 2026-09-22 (tools/rename.py). Address 0x8005ac24.
 
@@ -23,7 +25,7 @@ and reuses `sRotationYawMinus45` (already named, by `DreamSys__TickStaircaseCase
 `SceneNode__UpdateRotation` call in the `unk_0xAC == 4` arm.
 
 Both blocker screens are clean: no `gp_rel` hit and no
-`addiu $at, $at, %lo` hit anywhere in `DreamSys__TickStaircaseCase1.s`.
+`addiu $at, $at, %lo` hit anywhere in `DreamSys__TickStaircaseYawMinus135.s`.
 
 ## New knowledge
 
@@ -39,7 +41,7 @@ were already established by the sibling functions.
 ## Source
 
 ```c
-s32 DreamSys__TickStaircaseCase1(DreamSys *this)
+s32 DreamSys__TickStaircaseYawMinus135(DreamSys *this)
 {
 	s32 flag;
 

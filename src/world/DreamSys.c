@@ -1101,7 +1101,7 @@ s32 DreamSys__TickStaircaseYawPlus90(DreamSys *this) {
     return 0;
 }
 
-s32 DreamSys__TickStaircaseCase1(DreamSys *this) {
+s32 DreamSys__TickStaircaseYawMinus135(DreamSys *this) {
     s32 flag;
 
     if (this->staircaseFrame == 0) {
