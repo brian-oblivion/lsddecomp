@@ -77,7 +77,7 @@ GameApplication *New_GameApplication(GameApplicationConfig *config) {
 
 /* ctor: Application's ctor with config->dataSource, this table, the config
  * kept, the data directory reset to its default, the DreamSys built from
- * ETC\DREAME5.TMD, config->unk14 handed to it, then the RNG seeded through
+ * ETC\DREAME5.TMD, config->dreamSysConfigOption handed to it, then the RNG seeded through
  * +0x040 (GameApplication__SeedRandom). */
 void GameApplication__GameApplication(GameApplication *self, GameApplicationConfig *config) {
     /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
@@ -92,7 +92,7 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
     req.src.name = sModelPathDreamE5;
     self->dreamSys = New_DreamSys(New_LinkResource(&req.src), 0, 0);
     self->skipGraphRoomPoll = 0;
-    self->dreamSys->methods->slot228(self->dreamSys, config->unk14);
+    self->dreamSys->methods->slot228(self->dreamSys, config->dreamSysConfigOption);
     ((GameApplicationSeedRandomFn)self->methods->setScreenDims)(self);
 }
 
@@ -123,7 +123,7 @@ void GameApplication__ShowIntroLogos(GameApplication *self) {
         moviePath = GetAsmkMovie(&movieId);
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
-                                                (s32)moviePath, frameCount, 1);
+                                                moviePath, frameCount, 1);
         task->methods->release(task);
         GameApplication__ShowImage(self, sLogoPathOsd);
     }
@@ -161,7 +161,7 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
         moviePath = (const char *)PickOpeningMovie(&movieId, 0);
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
-                                                (s32)moviePath, frameCount, 1);
+                                                moviePath, frameCount, 1);
         task->methods->release(task);
     }
 }
@@ -238,13 +238,13 @@ void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
         task->methods->setFrameBound(task, (u32)buf.frameTotal / STREAMTASK_FRAMES_PER_SECOND);
         task->methods->setSkipOnConfirm(task, 0);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
-                                                (s32)moviePath, -1, 1);
+                                                moviePath, -1, 1);
         task->methods->release(task);
     }
 }
 
 /* +0x05C: empty. */
-void GameApplication__NoOpSlot5C(void) {}
+void GameApplication__OnRepeatMenu(void) {}
 
 /* +0x060: runs one DayTask. Its CINEMATIC result plays the cinematic
  * (PlayCinematic), CLOSED sets skipGraphRoomPoll. Returns nonzero when the
@@ -306,7 +306,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
             streamTask->methods->setSkipOnConfirm(streamTask, 0);
             frameCount = GetMovieFrameCount(idBuf.movieId);
             ((StreamTaskInitFn)streamTask->methods->init)(
-                streamTask, (IntermediateBaseInitArgs *)self->aux, (s32)path, frameCount, 1);
+                streamTask, (IntermediateBaseInitArgs *)self->aux, path, frameCount, 1);
             streamTask->methods->release(streamTask);
         }
     } else {
@@ -332,7 +332,7 @@ void GameApplication__PlayEndingMovie(GameApplication *self) {
         moviePath = (const char *)GetEndingMovie(&movieId, 0);
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
-                                                (s32)moviePath, frameCount, 1);
+                                                moviePath, frameCount, 1);
         task->methods->release(task);
     }
 }

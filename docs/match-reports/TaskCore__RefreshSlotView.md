@@ -782,3 +782,11 @@ listView is a BoxFill (include/BoxFill.h); the deleted `Unk68Obj` view's slots a
 ## Track 7 (2026-09-27, round 98, bravo)
 
 The layout literals are unit-local constants: SLOT_LIST_ROW_PITCH 10 (item rows' spacing, also CommitElementScroll's), SLOT_LIST_FRAME_WIDTH 40 and SLOT_LIST_FRAME_ROW_HEIGHT 12 (listView's setSize: 40 by count * 12, BoxFill.h's banner reads the same). `pos` is now `entry->pos` (SlotEntry::pos, see CommitElementScroll's report). Locals: a1 -> parent, a2 -> show, idx -> slot, arr -> item, counter -> cursor, buf -> size, target -> entry.
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+Task.c's local `SlotPos` ({s32 x, y}) is gone: the positions are ScreenSprite.h's `ScreenSpritePos`, the same two words, which setPosition takes, and `TaskCoreTarget::slotPositions` is `ScreenSpritePos *` (was `u8 *`). Byte-identical.

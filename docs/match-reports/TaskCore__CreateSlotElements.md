@@ -127,3 +127,7 @@ cursor from it and CommitElementScroll writes it back), `unk18` ->
 The header comment it carried called it "an unrelated source list
 descriptor"; it is the same TaskCoreTarget::unk24[] record `SlotEntry`
 reads (TitleMenu's `D_80086CA8`: +0x018 is `D_80086C9C`, two strings).
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).

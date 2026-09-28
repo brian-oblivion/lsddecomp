@@ -17,7 +17,7 @@
  * Lifecycle.
  *   ctor(config)   Application's ctor with config->dataSource, this table, the
  *                  config kept, the DreamSys built from "ETC\DREAME5.TMD"
- *                  (New_LinkResource), config->unk14 handed to it, and the RNG
+ *                  (New_LinkResource), config->dreamSysConfigOption handed to it, and the RNG
  *                  seeded (setScreenDims's occupant, below).
  *   initSystems    Application's, unless already initialized.
  *   runMainLoop    Application's: once showIntroLogos, then forever
@@ -29,7 +29,8 @@
  *   +0x058 runTitleMenu    RunTitleMenu: GraphRoom and TitleMenu against
  *                                 the DreamSys; returns 0 or 2 to the loop
  *                                 (enum ApplicationLoopStatus)
- *   +0x05C slot5C                 empty (GameApplication__NoOpSlot5C)
+ *   +0x05C onRepeatMenu           OnRepeatMenu: empty (status 1 is never
+ *                                 returned)
  *   +0x060 runDayTask          RunDayTask: one DayTask (include/DayTask.h),
  *                                 then maybe the current cinematic;
  *                                 nonzero (a year gone by) runs +0x064
@@ -64,8 +65,10 @@ typedef struct GameApplicationConfig {
                                      * PlayCinematic's movie branch, PlayEndingMovie */
     /* +0x0C */ s32 showIntroLogos; /* gates ShowIntroLogos */
     /* +0x10 */ s32 pollGraphRoom;  /* gates RunTitleMenu (0: it returns 2 at once) */
-    /* +0x14 */ s32 unk14; /* the ctor passes it to the DreamSys's slot228 (DreamSys__func_5ba20),
-                            * which stores a value >= 0 at DreamSys +0x924 */
+    /* +0x14 */ s32 dreamSysConfigOption; /* the ctor passes it to the DreamSys's slot228 (DreamSys__func_5ba20),
+                            * which stores a value >= 0 at DreamSys +0x924. The DreamSys ctor
+                            * zeroes that word and no code reads it back, so what it selects is
+                            * not established (sGameApplicationConfig passes 1). */
 } GameApplicationConfig;
 
 struct GameApplicationMethods {
@@ -98,7 +101,7 @@ s32 GameApplication__RegisterFilesCallback(void);
 void GameApplication__PlayOpeningMovie(GameApplication *self);
 s32 GameApplication__RunTitleMenu(GameApplication *self);
 void GameApplication__PlaySpecialDayMovies(GameApplication *self);
-void GameApplication__NoOpSlot5C(void);
+void GameApplication__OnRepeatMenu(void);
 s32 GameApplication__RunDayTask(GameApplication *self);
 void GameApplication__PlayCinematic(GameApplication *self);
 void GameApplication__PlayEndingMovie(GameApplication *self);

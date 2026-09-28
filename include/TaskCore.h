@@ -21,7 +21,7 @@
  *
  * init/deinit (IntermediateBase's) call onInit/onDeinit: onInit hangs the
  * slot widgets and the BgLayer under +0x014, sets the colours, configures
- * the viewport (its +0x048/+0x04C/+0x050 take otLength/unk2C/packetSize) and opens
+ * the viewport (setOtLength/setMaxPackets/setPacketSize take otLength/unk2C/packetSize) and opens
  * its OT; onDeinit closes it. TaskCore__Init returns `result`.
  *
  * The state machine (setState, update). IntermediateBase's update counts
@@ -72,6 +72,7 @@
 typedef struct TaskCore TaskCore;
 typedef struct TaskCoreMethods TaskCoreMethods;
 typedef struct TaskCoreTarget TaskCoreTarget;
+typedef struct TaskCoreItemList TaskCoreItemList; /* defined in src/app/Task.c, its one reader */
 
 /* TaskCore's states, above IntermediateBase's START/STOP. setState passes
  * each to the parents (notifyParents) before acting on it, so the codes from
@@ -128,8 +129,8 @@ struct TaskCoreTarget {
     /* +0x016 */ u8 pad16[2];
     /* +0x018 */ void **hiddenSlots; /* NULL entries are the slots find{Next,Prev}FreeSlot stop at */
     /* +0x01C */ char **names;       /* NULL-terminated; one New_TextRow widget per name */
-    /* +0x020 */ u8 *slotPositions; /* 8 bytes a slot, updateSlotElements' position for each widget */
-    /* +0x024 */ void **unk24; /* per slot: NULL, or the item-list record createSlotElements and the scroll methods read */
+    /* +0x020 */ struct ScreenSpritePos *slotPositions; /* per slot: updateSlotElements' position for its widget */
+    /* +0x024 */ TaskCoreItemList **slotLists; /* per slot: NULL, or the item list the slot opens */
 };
 
 /* clang-format off */
@@ -173,7 +174,7 @@ struct TaskCoreTarget {
     /* +0x0EC */ void (*findPrevFreeSlot)(Self *self);           /* TaskCore__FindPrevFreeSlot */  \
     /* +0x0F0 */ void (*setActiveSlot)(Self *self, s32 slot, s32 withSound); /* TaskCore__SetActiveSlot */ \
     /* +0x0F4 */ s32 (*getActiveSlot)(Self *self);               /* TaskCore__GetActiveSlot */     \
-    /* +0x0F8 */ void (*createSlotElements)(Self *self, void *desc, void *handle); /* TaskCore__CreateSlotElements */ \
+    /* +0x0F8 */ void (*createSlotElements)(Self *self, TaskCoreItemList *list, void *handle); /* TaskCore__CreateSlotElements */ \
     /* +0x0FC */ void (*releaseSlotElements)(Self *self);        /* TaskCore__ReleaseSlotElements */ \
     /* +0x100 */ void (*refreshSlotView)(Self *self, void *parent, s32 show); /* TaskCore__RefreshSlotView */ \
     /* +0x104 */ void (*broadcastToSlotElements)(Self *self, void *color); /* TaskCore__BroadcastToSlotElements */ \
@@ -190,9 +191,9 @@ struct TaskCoreTarget {
 #define TASKCORE_FIELDS(Methods)                                                                   \
     INTERMEDIATEBASE_FIELDS(Methods);                                                              \
     /* +0x028 */ s32 otLength;          /* reset: 3; onInit: the viewport's setOtLength (+0x048) */ \
-    /* +0x02C */ s32 unk2C;             /* reset: 0x12C (GraphRoom 0x190); onInit: viewport +0x04C (SetUnk44) */ \
-    /* +0x030 */ s32 packetSize;        /* reset: 64; onInit: viewport +0x050 (SetUnk48), a factor of the packet area */      \
-    /* +0x034 */ s32 unk34;             /* reset: 1; nonzero: onDeinit hands unk93 to initArgs->unk0's +0x078 */ \
+    /* +0x02C */ s32 unk2C;             /* reset: 300 (TitleMenu, GraphRoom: 400); onInit: the viewport's setMaxPackets */ \
+    /* +0x030 */ s32 packetSize;        /* reset: 64; onInit: the viewport's setPacketSize */      \
+    /* +0x034 */ s32 unk34;             /* reset: 1 (TitleMenu 0); nonzero: onDeinit clears the screen to unk93 */ \
     /* +0x038 */ s32 result;            /* TaskCore__Init returns it; onInit 0, setState(6) 1 */   \
     /* +0x03C */ s32 inputMode;         /* 0 none, 1 choosing a slot, 2 scrolling its items; onPadEvent needs nonzero */ \
     /* +0x040 */ s32 frameBound;        /* setFrameBound; update: frameCounter past it is setState(6) */ \
@@ -270,9 +271,9 @@ void TaskCore__UpdateSlotElements(TaskCore *self, void *parent);
 void TaskCore__BroadcastToSlots(TaskCore *self, void *color);
 void TaskCore__FindNextFreeSlot(TaskCore *self);
 void TaskCore__FindPrevFreeSlot(TaskCore *self);
-void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, void *withSound);
+void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, s32 withSound);
 s32 TaskCore__GetActiveSlot(TaskCore *self);
-void TaskCore__CreateSlotElements(TaskCore *self, void *desc, void *handle);
+void TaskCore__CreateSlotElements(TaskCore *self, TaskCoreItemList *list, void *handle);
 void TaskCore__ReleaseSlotElements(TaskCore *self);
 void TaskCore__RefreshSlotView(TaskCore *self, void *parent, s32 show);
 void TaskCore__BroadcastToSlotElements(TaskCore *self, void *color);
@@ -281,7 +282,7 @@ void TaskCore__CommitElementScroll(TaskCore *self);
 void TaskCore__CancelElementScroll(TaskCore *self);
 void TaskCore__AdvanceSlotCursor(TaskCore *self);
 void TaskCore__RetreatSlotCursor(TaskCore *self);
-void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound);
+void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, s32 withSound);
 s32 TaskCore__GetActiveItemCursor(TaskCore *self);
 
 #endif

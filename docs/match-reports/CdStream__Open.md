@@ -99,3 +99,7 @@ Constants: the path buffer is `CDSTREAM_PATH_SIZE` (32, unit-local; the CD
 driver's `CD_PATH_SIZE` is 64). The `CdlFILE *` cast on `&self->file` is
 because CdStream.h spells Sony's CdlFILE as its own `CdStreamFile`
 (same 24-byte layout) to stay free of `<libcd.h>`.
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+CdStream.h's own `CdStreamFile` is gone: `CdStream::file` is Sony's `CdlFILE` (CdStream.h includes <libcd.h>; every unit that sees the header builds with it), and the seek slot takes `CdlLOC *`. CdSearchFile no longer needs a cast; CdControl/CdControlF take the location as `u_char *`, Sony's parameter type, as in CdDriver.c. Byte-identical.

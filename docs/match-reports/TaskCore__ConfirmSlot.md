@@ -96,3 +96,7 @@ whose confirm ends the menu; why a given menu picks it is data.
 TitleMenu__SetState in TitleMenuTaskObjF reads it, so it is a proposal.
 
 Local `idx` -> `slot`. Byte-identical.
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).

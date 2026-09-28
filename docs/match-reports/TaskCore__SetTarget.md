@@ -198,3 +198,7 @@ New_TimImage. Image byte-identical.
 ## Track 7 (2026-09-27, round 98, bravo)
 
 D_8008A8E8 -> sListViewSize (tier A: the two words are {320, 240}, New_BoxFill's size argument for listView), D_8008A8F0 -> sListViewColor (tier A: bytes 20 20 40, New_BoxFill's colour, now declared a BoxFillRgb and passed as &sListViewColor). Both via rename.py, both declared in this unit now (they were in Task.h, used nowhere else). `size = count * 4` is `count * sizeof(void *)`. Locals: a1 -> target, list -> names, arr -> widget, handle -> texture, extra -> itemList. The two `(char *)path` casts stay: New_TimImage takes `char *` (proposal: `const char *`, TimImage.h).
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).

@@ -89,3 +89,11 @@ Renamed from Obj86B60__SetSlotCursor (tools/rename.py): the class prefix. Occupa
 ## Track 7 (2026-09-27, round 98, bravo)
 
 `(u8 *)target->unk24[idx] + 8` is `&((SlotEntry *)...)->cursorColor`. setState(9) -> TASKCORE_STATE_CURSOR_MOVED, playSound(0) -> TASKCORE_TONE_CURSOR. a1 -> cursor, a2 -> withSound (the prototype's names).
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`withSound` is `s32` here as in its slot (it was `void *` in the definition and the header prototype); every caller passes 0 or 1. Byte-identical.

@@ -109,3 +109,7 @@ Moved here from the source, verbatim (names as they stood then, where the tools 
  * GetAsmkMovie/PickOpeningMovie/GetSpecialDayMovieSpan. */
 extern s32 GetEndingMovie(s32 *out, s32 unused); /* arity-ok: the definition is 1-parameter and reads only $a0 (it neither reads nor forwards $a1), but the 2nd argument IS byte-load-bearing -- retail emits `move a1,zero` in the jal's delay slot at 0x80026974 */
 ```
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.

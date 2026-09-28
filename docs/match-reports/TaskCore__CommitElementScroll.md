@@ -688,3 +688,11 @@ BeginElementScroll/SetSlotCursor as a raw cast; round 98 names it
 now `->savedCursor`. Retail data for the one record the game has,
 TitleMenu's `D_80086CA8`: savedCursor 0, cursorColor (128, 128, 0), pos
 (53, 57), item names `D_80086C9C` (two strings).
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+Task.c's local `SlotPos` ({s32 x, y}) is gone: the positions are ScreenSprite.h's `ScreenSpritePos`, the same two words, which setPosition takes, and `TaskCoreTarget::slotPositions` is `ScreenSpritePos *` (was `u8 *`). Byte-identical.

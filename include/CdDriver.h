@@ -127,7 +127,7 @@ typedef struct CdRequestNode {
 #define CD_OPERATION_LOAD_FILE 4
 
 /* sCdState: the state machines' phase, StartCdOperation's second argument
- * (CdDriver.c's banner; that unit still spells them as literals). */
+ * (the state machines, CdDriver.c part 4). */
 #define CD_STATE_IDLE 0        /* ResetCdStateMachine's value */
 #define CD_STATE_SETLOC 1      /* issue CdControl(CdlSetloc) */
 #define CD_STATE_SETLOC_WAIT 2 /* poll CdSync for it */
