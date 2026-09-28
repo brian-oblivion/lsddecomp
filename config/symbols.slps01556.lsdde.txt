@@ -791,7 +791,7 @@ TmdModel__RaycastFaces = 0x8001F8B8; // type:func
 TmdModel__SetFirstPrimClut = 0x80020510; // type:func
 GetDrawSystem = 0x80020C5C; // type:func
 // unidentified: masked 0.17 SsEnd (libsnd), too weak.
-func_80038E44 = 0x80038E44; // type:func
+_SpuInit = 0x80038E44; // type:func
 New_WBgm = 0x800398E0; // type:func
 IsWBgmActive = 0x8003A05C; // type:func
 GetSsSizeTableBuf = 0x8003A068; // type:func

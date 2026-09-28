@@ -6,24 +6,24 @@
 
 `asm/nonmatchings/libsnd_cres/SpuInitHot.s`, vram `0x80036AA8`, unit
 `libspu_s_ih` (split off `libsnd_cres` in round 34; this report predates
-the split and had not been updated). One-line wrapper: `func_80038E44(1)`.
+the split and had not been updated). One-line wrapper: `_SpuInit(1)`.
 
 ```c
-/* func_80038E44 is defined in the uncarved psyq_SpuSetMute unit; its own
+/* _SpuInit is defined in the uncarved psyq_SpuSetMute unit; its own
  * body is a single straight-line path (no branches) ending in a chain of
  * global stores with $v0 never touched afterward -- genuinely void, not
  * just an unobserved return. */
-extern void func_80038E44(s32 a0);
+extern void _SpuInit(s32 a0);
 
 void SpuInitHot(void)
 {
-    func_80038E44(1);
+    _SpuInit(1);
 }
 ```
 
 Unlike `func_80036024`/`func_80036044` (which wrap `func_80038D74`, a
 function that DOES compute a real return value right before its own `jr
-$ra`), `func_80038E44` is a single straight-line body with no branches at
+$ra`), `_SpuInit` is a single straight-line body with no branches at
 all, ending in a chain of global stores with `$v0` never referenced
 afterward anywhere in the function. Per CLAUDE.md's rule on one-line
 wrappers, the DEFAULT is a real return type absent positive void evidence --
@@ -45,16 +45,16 @@ Kept as `SpuInitHot` -- **tier C**, and deliberately not a class-scoped
 touching this address) and has exactly one caller.
 
 Evidence considered and why it falls short of tier A/B:
-- **Body**: a single unconditional call, `func_80038E44(1)`. No branch, no
+- **Body**: a single unconditional call, `_SpuInit(1)`. No branch, no
   computed value, no field access -- the mechanics ARE "call this one other
   function with the constant 1", which says nothing about game purpose.
-- **Callee**: `func_80038E44` is itself unnamed, uncarved, and lives in the
+- **Callee**: `_SpuInit` is itself unnamed, uncarved, and lives in the
   "game's own libspu build" gap (`0x29644..0x2976C`, no SDK disc covers it;
   see `src/psyq/libspu_s_ih.c`'s header and `config/splat.slps01556.lsdde.yaml`
   line ~1131). It is not a placed Sony object (`tools/sdkstalls.py` has no
   hit for `SpuInitHot`), so this is not the "give no game name to
   anything Sony owns" case -- but its own purpose is equally undetermined
-  (round 78 did not investigate `func_80038E44`'s body; out of scope for
+  (round 78 did not investigate `_SpuInit`'s body; out of scope for
   this one-function unit), so there is nothing to inherit a name from.
 - **Caller**: the ONLY caller is `_SsInit` (`src/psyq/libsnd_ssinit.c`), which
   branches `if (arg0 == 0) SpuInit(); else SpuInitHot();` -- i.e. this is
@@ -70,7 +70,7 @@ Evidence considered and why it falls short of tier A/B:
 
 Net: mechanics are trivial and purpose is unestablished two levels up the
 call chain. `SpuInitHot` stays a placeholder; the next runner to name
-`func_80038E44` (wherever it eventually carves) may retroactively unlock a
+`_SpuInit` (wherever it eventually carves) may retroactively unlock a
 tier-B/A name here.
 
 ## File history
