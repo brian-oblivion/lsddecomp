@@ -1,4 +1,5 @@
 #include "common.h"
+#include <libcd.h>
 #include "CdDriver.h"
 
 /*
@@ -45,24 +46,6 @@
 /* lock/unlock, defined in code_179d8_q.c (runner echo's unit). */
 extern void LockCd(void);
 extern void UnlockCd(void);
-
-/* Psy-Q CD-ROM library, linked from lib/libcd/sys.o. Locally typed the same
- * way code_179d8_h.c already types this unit's own call sites. */
-extern s32 CdControlF(s32 com, void *param);
-extern s32 CdSync(s32 mode, void *result);
-extern s32 CdRead(s32 sectors, void *buf, s32 mode);
-extern s32 CdReadSync(s32 mode, s32 result);
-extern void CdFlush(void);
-
-/* Psy-Q's own command code (include/psyq/libcd.h documents the command list
- * but not the numeric values; this one is confirmed the same way
- * code_179d8_q.c's CD_CMD_SETMODE is, by the sibling unit's independently
- * derived 0x0E == CdlSetmode matching the well-known Psy-Q CdlCommand
- * enumeration -- CdlSetloc is that enumeration's 3rd member, value 2).
- * Spelled locally rather than by including LIBCD.H, same rationale as
- * code_179d8_q.c: this unit's libcd declarations are deliberately
- * per-call-site. */
-#define CD_CMD_SETLOC 2
 
 /* Both state==2 branches below busy-wait this many ticks (~601 service-pump
  * calls) before giving up and retrying the command from state 1. */
@@ -198,7 +181,7 @@ void TickCdStateMachine(void) {
     goto L_end;
 
 L_state1:
-    if (CdControlF(CD_CMD_SETLOC, (u8 *)gCdSeekParam + 0x14) == 0)
+    if (CdControlF(CdlSetloc, (u8 *)gCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
@@ -275,7 +258,7 @@ void TickCdLoadFileStateMachine(void) {
     goto L_end;
 
 L_state1:
-    if (CdControlF(CD_CMD_SETLOC, (u8 *)gCdSeekParam + 0x14) == 0)
+    if (CdControlF(CdlSetloc, (u8 *)gCdSeekParam + 0x14) == 0)
         goto L_end;
     newstate = 2;
     goto L_set;
