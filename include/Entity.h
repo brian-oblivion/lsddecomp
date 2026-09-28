@@ -265,7 +265,7 @@ extern Ratio16 sRotationYawMinus90[];
 extern Ratio16 sRotationYawPlus2[];
 extern Ratio16 ROTATION_YAW_MINUS_THIRD[];
 extern Ratio16 ROTATION_YAW_MINUS_HALF[];
-extern Ratio16 ROTATION_ZPLUS9[];
+extern Ratio16 sRotationZPlus9[];
 extern Ratio16 ROTATION_ZPLUS1[];
 extern Ratio16 ROTATION_ZMINUS9[];
 extern Ratio16 sRotationYawMinus120[];

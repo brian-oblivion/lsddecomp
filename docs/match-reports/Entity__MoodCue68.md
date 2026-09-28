@@ -41,7 +41,7 @@ void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
         this->methods->slotC4(this, this->unk48, 1);
     } else if (this->unk44 == 0xA) {
         if (this->unkFC < 8) {
-            this->methods->slot44(this, 0, ROTATION_ZPLUS9);
+            this->methods->slot44(this, 0, sRotationZPlus9);
             this->methods->slotBC(this, sTranslateYPlus8);
         } else {
             u32 r;
@@ -92,7 +92,7 @@ void Entity__MoodCue68(Entity *this, EntityMoodHandlerArg *out) {
 
 No new struct or vtable-slot knowledge; `slot148`, `slotC4`, `slot44`,
 `slotBC`, `slot16C`, and `Unk94Methods::slot100` were all already typed
-from earlier work in this unit. `ROTATION_ZPLUS9`/`sTranslateYPlus8` are new per-unit
+from earlier work in this unit. `sRotationZPlus9`/`sTranslateYPlus8` are new per-unit
 `extern u8 [];` data-table externs, same convention as the rest of this
 file.
 
@@ -121,7 +121,7 @@ Why `MoodCueNN`: the function's address sits in `gEntityMoodHandlerTable` row 68
 
 Reading this function's `out->` writes with the proposed `SoundCueSet` field names (`Entity__MoodCue07.md` `## Proposed field names`, tier A/B, proposal only -- `EntityMoodHandlerArg` is shared with Entity/Entity_d/Entity_g): `tick`, `attenuation`, `voice0Tone`, `voice1Tone`, `voice1Pitch`, `voice2Tone`, `voice2Pitch`.
 
-**Data constants renamed this round:** `D_80089CC4` -> `ROTATION_ZPLUS9` and `D_80089D6C` -> `sTranslateYPlus8`, tier B. Byte-decoded from `disk/SLPS_015.56` against the existing `sRotationYawPlus9`/`sRotationZMinus90`/`sTranslateYPlus256` tables: rotation tables are four s16 {num,den} pairs for X/Y(yaw)/Z/W, only one pair with den=1; translate tables are three consecutive s32 (X,Y,Z), only one nonzero. `D_80089CC4`'s nonzero pair is the THIRD (Z) slot at (9,1) -- same slot `sRotationX50YMinus120Z30` already confirmed is Z, so `ROTATION_ZPLUS9` follows `sRotationZMinus90`'s no-underscore single-letter-axis convention. `D_80089D6C`'s nonzero 32-bit slot is the second (Y) at +8, matching `TRANSLATE_Y_*`.
+**Data constants renamed this round:** `D_80089CC4` -> `sRotationZPlus9` and `D_80089D6C` -> `sTranslateYPlus8`, tier B. Byte-decoded from `disk/SLPS_015.56` against the existing `sRotationYawPlus9`/`sRotationZMinus90`/`sTranslateYPlus256` tables: rotation tables are four s16 {num,den} pairs for X/Y(yaw)/Z/W, only one pair with den=1; translate tables are three consecutive s32 (X,Y,Z), only one nonzero. `D_80089CC4`'s nonzero pair is the THIRD (Z) slot at (9,1) -- same slot `sRotationX50YMinus120Z30` already confirmed is Z, so `sRotationZPlus9` follows `sRotationZMinus90`'s no-underscore single-letter-axis convention. `D_80089D6C`'s nonzero 32-bit slot is the second (Y) at +8, matching `TRANSLATE_Y_*`.
 
 ## Track 4 (2026-09-26, round 88, echo)
 

@@ -65,7 +65,7 @@ four s16 `{num,den}` pairs: `(0,1, 4,1, 0,1, 90,1)` -- only Z is a whole
 degree (4/1), X=Y=0; W=90/1 is ignored per the established precedent that
 the 4th pair is never reflected in the name (`sRotationYawMinus120` at
 0x80089CE8 has an equally nonzero, equally unnamed W=50/1). Matches the
-existing `ROTATION_ZPLUS9` naming shape exactly, just a different Z
+existing `sRotationZPlus9` naming shape exactly, just a different Z
 amount.
 
 ## Data constant left unnamed this round
@@ -89,7 +89,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_80089E44` | `SCALE_TWO_FIFTHS` | A (by value) | `.word 0x00050002` x3 = uniform 2/5, like `SCALE_EIGHT_SEVENTHS` |
-| `ROTATION_ZPLUS4` | `ROTATION_YAW_PLUS4` | A (by value) | `.word 0x00010000, 0x00010004, 0x00010000` = {0/1, 4/1, 0/1}: the 4 is the SECOND pair, Y (yaw), as in `sRotationYawPlus9` = {0, 9, 0}; `ROTATION_ZPLUS9` = {0, 0, 9} has it third |
+| `ROTATION_ZPLUS4` | `ROTATION_YAW_PLUS4` | A (by value) | `.word 0x00010000, 0x00010004, 0x00010000` = {0/1, 4/1, 0/1}: the 4 is the SECOND pair, Y (yaw), as in `sRotationYawPlus9` = {0, 9, 0}; `sRotationZPlus9` = {0, 0, 9} has it third |
 
 **Correction** to "Data constant decoded this round" above: it read
 `(0,1, 4,1, 0,1, ...)` correctly and then called the second pair Z. The
