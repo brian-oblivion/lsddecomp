@@ -845,7 +845,7 @@ extern StageSpawn *sStageSpawnPoints[];
    `lbu`, and the surrounding loop guard (`count != 0` implying `count > 0`,
    a single `beqz`) only holds if it can't be negative -- a signed `s8` here
    forces GCC to add a second `blez` check that retail does not have. */
-extern u8 LEN_STAGE_SPAWNPOINTS[];
+extern u8 sStageSpawnPointsCount[];
 
 extern StageSpawn *STAGE_PERMALINK_SPAWNS[];
 extern StaticLinkTrigger *STAGE_PERMALINK_TRIGGERS[];

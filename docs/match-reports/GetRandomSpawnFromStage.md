@@ -101,7 +101,7 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 stg, s32 unused)
 		stage = -stg;
 	}
 
-	index = rand() % LEN_STAGE_SPAWNPOINTS[stage];
+	index = rand() % sStageSpawnPointsCount[stage];
 	entry = &sStageSpawnPoints[stage][index];
 	*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
 	target->position = sSpawnPosAdjust[entry->adjustment];
@@ -110,7 +110,7 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 stg, s32 unused)
 }
 ```
 
-The second division (`rand() % LEN_STAGE_SPAWNPOINTS[stage]`) needed no
+The second division (`rand() % sStageSpawnPointsCount[stage]`) needed no
 such treatment -- its divisor is already a runtime ARRAY LOAD, never a
 compile-time constant, so GCC never considers strength-reducing it; only
 the literal `6` triggered the optimization.

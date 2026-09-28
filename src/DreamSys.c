@@ -1548,7 +1548,7 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 fromStage, s32 unused)
         stage = -fromStage;
     }
 
-    index = rand() % LEN_STAGE_SPAWNPOINTS[stage];
+    index = rand() % sStageSpawnPointsCount[stage];
     entry = &sStageSpawnPoints[stage][index];
     *(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
     target->position = sSpawnPosAdjust[entry->adjustment];
@@ -1804,7 +1804,7 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
     if (stage >= 0) {
         *timeLimit = sStageTimeLimits[stage];
 
-        count = LEN_STAGE_SPAWNPOINTS[stage];
+        count = sStageSpawnPointsCount[stage];
         entry = sStageSpawnPoints[stage];
         for (i = 0; i < count; i++, entry++) {
             if (*(s16 *)&chunk == *(s16 *)&entry->chunk)

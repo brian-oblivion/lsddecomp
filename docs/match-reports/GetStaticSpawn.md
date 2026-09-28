@@ -59,7 +59,7 @@ declared type, unsigned retail load) for two different byte fields:
 Both times, the FIELD's own declared type stayed `s8` (correct, and shared
 with other already-matched code); only the specific READ that retail widens
 unsigned needed an explicit `u8 *` cast, exactly like
-`LEN_STAGE_SPAWNPOINTS`'s existing "retyped u8 because retail reads it with
+`sStageSpawnPointsCount`'s existing "retyped u8 because retail reads it with
 `lbu`" precedent -- except here the retype would have broken other callers,
 so the cast is local to this one read instead of on the declaration.
 
