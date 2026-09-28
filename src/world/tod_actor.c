@@ -40,8 +40,8 @@
  * part's coordinate parameters are Sony's GsCOORD2PARAM.
  */
 
-/* Header word of gModelDataMethods (tools/classtable.py), the class New_ModelData
- * allocates and TodActor.modelData points at. */
+/* Header word of gModelDataMethods, the class New_ModelData allocates and
+ * TodActor.modelData points at. */
 #define MODEL_DATA_CLASS_HEADER 0x5F03
 
 /* A TOD rotation is in 1/4096 degree; divided by 360 it is a GTE angle
