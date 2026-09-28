@@ -172,7 +172,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `world` is the viewport (NodeGuardedViewport: setLightMode, setClearColor, setFogNear, setFarColor, setUnkB4, setDrawEnabled), its getSubHandle the FadeBox fade box (setDivisorMode +0x0F0, startFadeDown +0x0D4); `attached` is `inSession`.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `world` is the viewport (NodeGuardedViewport: setLightMode, setClearColor, setFogNear, setFarColor, setUnkB4, setDrawEnabled), its getSubHandle the FadeBox fade box (setDivisorMode +0x0F0, startFadeDown +0x0D4); `attached` is `inSession`.
 
 ## Round 94 (track 6, charlie)
 

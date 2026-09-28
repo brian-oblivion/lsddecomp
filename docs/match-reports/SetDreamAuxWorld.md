@@ -134,7 +134,7 @@ it as Entity's peer. Byte-identical.
 
 Parameters named from the caller (ObjM__SetupSceneStyle, dream_scene.c,
 whose own declaration already says `stage, grid, world, sound, clock`, and
-ObjM.h: unk14 the StageMap, unk10 the FrameClock, TimedTask's sound the
+objm.h: unk14 the StageMap, unk10 the FrameClock, TimedTask's sound the
 VabStreamObj): a0..a4 -> stage, stageMap, world, sound, frameClock. The
 globals it installs were renamed with tools/rename.py: D_8008ABFC ->
 sDreamAuxStageMap (tier A), D_8008AC04 -> sDreamAuxSound (tier A, New_Entity's

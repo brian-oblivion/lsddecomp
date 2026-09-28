@@ -1005,7 +1005,7 @@
         "gObjMMethods": {
           "class": "ObjM",
           "date": "2026-09-26",
-          "header": "include/ObjM.h"
+          "header": "include/objm.h"
         },
         "gPadMethods": {
           "class": "Pad",

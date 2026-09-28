@@ -70,7 +70,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the StageMap's value callback (ChunkFileFn, cast at ObjM__AttachTarget); StageMap's ComputeRateEntry keeps the callback's return as an entry's name, and this body leaves GetStageMapChunkRecord's result in $v0, so its real return is likely that FilePathRecord pointer. The return type is left `void` (not changed this round). The first argument of GetStageMapChunkRecord/XY is now `s32 index`, as their definitions take it.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the StageMap's value callback (ChunkFileFn, cast at ObjM__AttachTarget); StageMap's ComputeRateEntry keeps the callback's return as an entry's name, and this body leaves GetStageMapChunkRecord's result in $v0, so its real return is likely that FilePathRecord pointer. The return type is left `void` (not changed this round). The first argument of GetStageMapChunkRecord/XY is now `s32 index`, as their definitions take it.
 
 ## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
 
@@ -88,7 +88,7 @@ body is a lookup leaf, and its one use is as the StageMap's chunkFileFn
 record). The name mirrors the two functions it forwards to,
 GetStageMapChunkRecord and GetStageMapChunkRecordXY. "Registrant event" described nothing
 the body does. Parameters: `code, arg2, arg3` -> `cell, x, y` (GetStageMapChunkRecord's
-`sub` is a linear cell index; GetStageMapChunkRecordXY takes x, y). ObjM.h's
+`sub` is a linear cell index; GetStageMapChunkRecordXY takes x, y). objm.h's
 prototype follows.
 
 The body stays `void`: class_3bb8c.h declares GetStageMapChunkRecordXY `void`

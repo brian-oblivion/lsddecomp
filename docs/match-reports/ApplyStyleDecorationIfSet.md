@@ -142,17 +142,17 @@ Zero bytes (whole-image SHA1 green, 0 new typeview warnings).
 Evidence: `sStyleSceneRefs` (0x8008AC7C, an `s32` in every unit) is
 RegisterStyleConfig's third argument, which ObjM__InitStyleAndWorld
 (dream_scene) passes as `&self->ctorSound`: it points at ObjM's
-+0x06C..+0x07B block (include/ObjM.h's banner). The holder's +0x00C is
++0x06C..+0x07B block (include/objm.h's banner). The holder's +0x00C is
 therefore ObjM::cachedViewport, a NodeGuardedViewport, and +0x0AC of its
 table is Viewport's `getFadeBox` (include/Viewport.h, `SceneNode *(*)(Self *)`)
--- ObjM.h's banner already said so. dream_scene.c had the same block as
+-- objm.h's banner already said so. dream_scene.c had the same block as
 `StyleSceneRefs {sound, dreamerTmd, etcTim, Viewport *viewport}`; this unit
 now carries the identical view (`typeviews.py --merge StyleSceneRefs`: 2
 views, 0x10, 0 conflicts). Tier A for the type (it names what the pointer
 is, established from the one writer); the name is dream_scene's, not new.
 
 Not applied (outside the edit set): hoisting `StyleSceneRefs` into one
-shared header (ObjM.h, beside the block it views) and dropping both unit
+shared header (objm.h, beside the block it views) and dropping both unit
 copies; retyping the `sStyleSceneRefs` global from `s32` to
 `StyleSceneRefs *` (track 4b, it would remove every cast in _m and _n).
 

@@ -27,7 +27,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
 
 ## Round 95 (track 7, echo)
 
@@ -37,7 +37,7 @@ Its history, moved here verbatim in substance:
 > dream_scene -- sixth carved slice of the dream_day block
 > (0x435E0..0x44518, vram 0x80052DE0..0x80053D18), 20 functions, ALL
 > MATCHED. Carved round 15; fully matched by round 45.
-> This slice is entirely ObjM's own methods (gObjMMethods, include/ObjM.h;
+> This slice is entirely ObjM's own methods (gObjMMethods, include/objm.h;
 > track 4, round 89 unified the dream_scene/_l/_m views there) ...
 > the DreamSys notification dispatcher (OnDreamSysNotify, owning
 > `jtbl_8001174C`) ...

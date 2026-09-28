@@ -67,11 +67,11 @@ round 15 (2026-09-04), runner echo, fresh carve `dream_scene`.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
 
 ## Track 7 (2026-09-27, round 98, delta)
 
-`self->state = OBJM_STATE_LINK_FLASHBACK` (enum ObjMState, include/ObjM.h,
+`self->state = OBJM_STATE_LINK_FLASHBACK` (enum ObjMState, include/objm.h,
 added this round: every link state is the DreamSys code that started it
 less 6, from ObjM__OnDreamSysNotify, and DayTask__OnObjMNotify's cases
 agree). The out-parameter is the `DreamColors` getSetFlashbackSession

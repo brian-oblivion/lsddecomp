@@ -168,7 +168,7 @@ The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as Day
 
 ## Naming (track 7, round 99, charlie)
 
-The cases are ObjM.h's `enum ObjMState` (its banner already names this
+The cases are objm.h's `enum ObjMState` (its banner already names this
 function as the reader of each), the results day_task.h's new `enum
 DayTaskResult`, `setState(3)` IntermediateBase's `INTERMEDIATEBASE_STATE_STOP`.
 Local `pos` -> `cinematic` (getCinematic's CinematicCall).

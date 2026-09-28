@@ -59,7 +59,7 @@ struct DreamSys;
 struct WBgm;
 struct TimImage;
 struct LinkResource;
-struct ObjM; /* include/ObjM.h */
+struct ObjM; /* include/objm.h */
 
 /* DayTask::phase: which ObjM step DayTask__AdvancePhase takes on the next
  * DrawSystem VSync. */

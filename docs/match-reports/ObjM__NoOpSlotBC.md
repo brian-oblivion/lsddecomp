@@ -43,4 +43,4 @@ runner alpha, naming pass (FINISHING-PLAN track 3).
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-Renamed from `func_800541CC` (rename.py), after the class's other empty occupants (`ObjM__NoOpSlot40`, `ObjM__NoOpSlot7C`, `TimedTask__NoOpSlot58`): the empty body of gObjMMethods +0x0BC, which include/ObjM.h names `slotBC`. Tier A (the mechanics are the whole purpose); what the slot is for is unknown.
+Renamed from `func_800541CC` (rename.py), after the class's other empty occupants (`ObjM__NoOpSlot40`, `ObjM__NoOpSlot7C`, `TimedTask__NoOpSlot58`): the empty body of gObjMMethods +0x0BC, which include/objm.h names `slotBC`. Tier A (the mechanics are the whole purpose); what the slot is for is unknown.

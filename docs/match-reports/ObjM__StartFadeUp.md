@@ -61,7 +61,7 @@ Renamed from `ObjM__ForwardToSubChild` (rename.py). The "sub child" is the viewp
 
 ## Track 7 (2026-09-27, round 98, delta)
 
-The third parameter, `arg2`, is now `fadeMode` (here and in ObjM.h's
+The third parameter, `arg2`, is now `fadeMode` (here and in objm.h's
 prototype): it goes to FadeBox's startFadeUp and on to configure, which
 stores it in FadeBox::unk7C; FadeBox__Update does not step the colour
 while it is 9. Every caller passes 0. Tier B (mechanics). Zero bytes.

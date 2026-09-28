@@ -126,7 +126,7 @@ same jump table). The `code >= 9` test keeps its literal: 9 is not a link
 code. The banner's note that this function owns `jtbl_8001174C` moved to
 ObjM__NoOpSlot40.md with the rest of the banner's history.
 
-Proposed for the head (ObjM.h slots, accessors in dream_scene too):
+Proposed for the head (objm.h slots, accessors in dream_scene too):
 enterState4..A / notifyParentsCodeB could be named by the link code that
 reaches each (enterState4 on DREAMSYS_TIME_UP, enterState5 on
 DREAMSYS_LINK_DYNAMIC, enterState6 on DREAMSYS_LINK_WALL, enterState7

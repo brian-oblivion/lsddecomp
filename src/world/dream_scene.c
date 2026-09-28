@@ -9,7 +9,7 @@
  *    (createRows, releaseRows, refreshRows, and the non-virtual helpers
  *    FormatRowText and SetView), stepCursorInView, getCursorIndex and the
  *    table getter GetItemListMethods;
- *  - ObjM (include/ObjM.h), whole: the TimedTask DayTask starts for a day's
+ *  - ObjM (include/objm.h), whole: the TimedTask DayTask starts for a day's
  *    scene;
  *  - the style layer, whose client ObjM is: its setup (RegisterStyleConfig
  *    to ApplyStyleDecorationIfSet), its per-scene objects (StyleFlushDecoration
@@ -33,7 +33,7 @@
 #include "TextRow.h"
 #include "tim_image.h"
 #include "item_list.h"
-#include "ObjM.h"
+#include "objm.h"
 #include "VabStreamObj.h"
 #include "pad.h"
 #include "fade_box.h"
@@ -366,7 +366,7 @@ ItemListMethods *GetItemListMethods(void) {
     return &gItemListMethods;
 }
 
-/* ---- ObjM (include/ObjM.h) ---------------------------------------------
+/* ---- ObjM (include/objm.h) ---------------------------------------------
  *
  * Its allocator, ctor, finalize and onNotify, which dispatches on the
  * sender's class id; then, in the next two sections, its table's slots in
@@ -1166,7 +1166,7 @@ void FillStyleFromConfig(StyleConfig *style, StyleStageConfig *cfg) {
 
 /* What sStyleSceneRefs points at: ObjM's +0x06C..+0x07B block
  * (ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
- * keeps it; include/ObjM.h). */
+ * keeps it; include/objm.h). */
 typedef struct StyleSceneRefs {
     void *sound;        /* +0x000, ObjM::ctorSound: the sound object the cue functions take first */
     void *dreamerTmd;   /* +0x004, ObjM::dreamerTmd */

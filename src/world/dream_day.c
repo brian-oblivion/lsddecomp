@@ -43,7 +43,7 @@
 #include "frame_clock.h"
 #include "dream_sys.h"
 #include "link_resource.h"
-#include "ObjM.h"
+#include "objm.h"
 #include "actor.h"
 #include "light_rig.h"
 #include "TimedTask.h"

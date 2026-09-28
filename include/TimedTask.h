@@ -13,7 +13,7 @@
  * uses its two subclasses, whose ctors call TimedTask__TimedTask first:
  * DayTask (0x1F230, include/day_task.h), built by
  * GameApplication__RunDayTask, which switches on init's return; and ObjM
- * (0x2F230, include/ObjM.h), which DayTask builds and hands its sound.
+ * (0x2F230, include/objm.h), which DayTask builds and hands its sound.
  *
  * Lifecycle. ctor(soundBankPath, sound): with a path, `sound` is
  * New_VabStreamObj(soundBankPath) and finalize releases it; without one it

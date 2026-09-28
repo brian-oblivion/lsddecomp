@@ -32,7 +32,7 @@
  * object as DayTask::bgm (include/day_task.h), and
  * hands it to New_ObjM, whose ObjM keeps it at +0x054 and calls +0x04C
  * pause and +0x050 resume on it (ObjM__AdvancePauseSetup,
- * ObjM__TeardownPauseOverlay; include/ObjM.h).
+ * ObjM__TeardownPauseOverlay; include/objm.h).
  *
  * sWBgmActive is 1 from the ctor to finalize; IsWBgmActive returns it, and
  * VabStreamObj__Finalize (src/sound/vab_sound.c) shuts libsnd down (SsEnd,

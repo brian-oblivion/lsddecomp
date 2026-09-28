@@ -49,4 +49,4 @@ ObjM__Finalize's parameter was `Obj865C8 *` (the sibling class's view); it is no
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-Renamed from `ObjM__Dtor` (rename.py): it occupies +0x00C, BasicClass's `finalize` slot, and its whole body is the base finalize (`GetTimedTaskMethods()->finalize`). Tier A. Parameter now `ObjM *` (include/ObjM.h).
+Renamed from `ObjM__Dtor` (rename.py): it occupies +0x00C, BasicClass's `finalize` slot, and its whole body is the base finalize (`GetTimedTaskMethods()->finalize`). Tier A. Parameter now `ObjM *` (include/objm.h).

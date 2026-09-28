@@ -109,7 +109,7 @@ dream_scene, not this unit, so not applied here):
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Fields stored: bgm +0x054, stage +0x038, ctorSound +0x06C (the sound again, beside TimedTask::sound), etcTim +0x074, dreamerTmd +0x070 (LinkResource, never read by ObjM), timBlockPending +0x060 = 1, unk64/inSession/pauseSetupStep/closeReady zeroed; the last call is resetCounters (+0x040).
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Fields stored: bgm +0x054, stage +0x038, ctorSound +0x06C (the sound again, beside TimedTask::sound), etcTim +0x074, dreamerTmd +0x070 (LinkResource, never read by ObjM), timBlockPending +0x060 = 1, unk64/inSession/pauseSetupStep/closeReady zeroed; the last call is resetCounters (+0x040).
 
 ## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
 

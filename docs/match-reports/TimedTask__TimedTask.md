@@ -156,6 +156,6 @@ Proposed, not applied (accessors outside this job's units):
   (`src/world/dream_scene.c`).
 - field +0x034 `sound` `BasicClass *` -> `struct VabStreamObj *`, with the
   ctor's and New_TimedTask's `sound` parameter: every object that reaches it
-  is a New_VabStreamObj, and four units cast it back. Needs ObjM.h's ctor
+  is a New_VabStreamObj, and four units cast it back. Needs objm.h's ctor
   and New_ObjM parameters retyped with it (ObjM passes its own `BasicClass *`
   sound), or the build gains pointer-type warnings where it has none now.
