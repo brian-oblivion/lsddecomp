@@ -1238,7 +1238,7 @@ void ApplyStyleDecorationIfSet(void) {
  *    position and the viewport's clear colour by the view point's y offset
  *    from its reference point;
  *  - the effect slots: StyleEffect objects of kinds 0..3 (sStyleEffectSlots)
- *    built from one parameter block, gStyleSpawnOffsetX..gStyleSpawnColors,
+ *    built from one parameter block, gStyleSpawnOffsetX..sStyleSpawnColors,
  *    that StyleFillEffectKindN and SetupStyleSpawnParamsRandom/B fill in; each
  *    tick updates them with the target position;
  *  - two positional sound cues (sStyleCueSlots, in sStyleCueSlotPool): a
@@ -1578,7 +1578,7 @@ extern s32 gStyleSpawnYChoices[];
 extern Ratio16 *gStyleSpawnScale;
 extern s32 gStyleSpawnTableIndex;
 /* The first word of the StyleEffectParams block every effect is built from
- * (gStyleSpawnOffsetX .. gStyleSpawnColors, separate symbols in the image). */
+ * (gStyleSpawnOffsetX .. sStyleSpawnColors, separate symbols in the image). */
 extern s32 gStyleSpawnOffsetX;
 extern void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY);
 extern void SetupStyleSpawnParamsDayMod7(LongVec3 *pos, s32 offsetY);
@@ -1633,7 +1633,7 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
 
 extern s32 gStyleSpawnYChoice2;
 extern void SetupStyleSpawnParamsRandom(LongVec3 *pos, s32 offsetY);
-extern s32 gStyleSpawnColors[];
+extern s32 sStyleSpawnColors[];
 extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 gStyleSpawnOffsetY;
@@ -1658,7 +1658,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
         gStyleSpawnOffsetX = -45056;
         gStyleSpawnOffsetY = -8192;
         gStyleSpawnOffsetZ = 0;
-        gStyleSpawnColors[0] = (s32)sStyleKind3Colors[1];
+        sStyleSpawnColors[0] = (s32)sStyleKind3Colors[1];
     } else {
         offsetZ = &gStyleSpawnOffsetZ;
         if (*offsetZ > 0) {
@@ -1667,7 +1667,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
         if (*offsetZ < -30720) {
             *offsetZ = -30720;
         }
-        gStyleSpawnColors[0] = (s32)sStyleKind3Colors[(u32)rand() % 3];
+        sStyleSpawnColors[0] = (s32)sStyleKind3Colors[(u32)rand() % 3];
     }
     rotation = (PtrBoxK3 *)&gStyleSpawnRotation;
     rotation->p = gStyleSpawnRotations[0];
@@ -1681,7 +1681,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
 
 extern s32 sStyleKind2AltColor;
 extern u8 sStyleKind2Colors[][3];
-extern s32 gStyleSpawnColors[];
+extern s32 sStyleSpawnColors[];
 extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 gStyleSpawnTableIndex;
@@ -1701,7 +1701,7 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     Ratio16 **rotation;
 
     r = rand();
-    color = (S32BoxK2 *)gStyleSpawnColors;
+    color = (S32BoxK2 *)sStyleSpawnColors;
     color->v = (s32)sStyleKind2Colors[(u32)r % 3];
     color++;
     altColor = (sStyleDay / 20) * 20; /* MATCHING: not `% 20`, which jump.c folds */
