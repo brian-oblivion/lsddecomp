@@ -2731,7 +2731,7 @@ void Entity__MoodCue109(Entity *this, SoundCueSet *out) {
 }
 
 void Entity__MoodCue110(Entity *this, SoundCueSet *out) {
-    this->methods->updateScale(this, 1, SCALE_TWO_FIFTHS);
+    this->methods->updateScale(this, 1, sScaleTwoFifths);
     this->methods->stopTod(this);
     if (this->state == 0) {
         if (this->methods->distanceToPeer(this, this->peer) < 2048) {
@@ -2868,7 +2868,7 @@ void Entity__MoodCue125(Entity *this, SoundCueSet *out) {
         this->methods->deactivate(this);
         this->state = ENTITY_STATE_DONE;
     }
-    this->methods->updateScale(this, 1, SCALE_TWO_FIFTHS);
+    this->methods->updateScale(this, 1, sScaleTwoFifths);
     out->attenuation = this->methods->getProximityRatio(this);
     if (out->tick % (this->todFrameCount / 2) == 0) {
         out->slots[0].program = 10;

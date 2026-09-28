@@ -19,7 +19,7 @@ range gates on `unk44==0xA`.
 
 ```c
 void Entity__MoodCue110(Entity *this, EntityMoodHandlerArg *out) {
-    this->methods->slot48(this, 1, SCALE_TWO_FIFTHS);
+    this->methods->slot48(this, 1, sScaleTwoFifths);
     this->methods->slot130(this);
     if (this->unk44 == 0) {
         if (this->methods->slot144(this, this->unk94) < 0x800) {
@@ -70,13 +70,13 @@ amount.
 
 ## Data constant left unnamed this round
 
-`SCALE_TWO_FIFTHS` (`updateScale` arg, unconditional at function entry; also
+`sScaleTwoFifths` (`updateScale` arg, unconditional at function entry; also
 used by `Entity__MoodCue125`): s16-pair decoded `(2,5, 2,5, 2,5, 1,1)` --
 uniform X=Y=Z=2/5. A non-unit fraction, unlike every currently-named
 `SCALE_*` (`HALF`=1/2, `EIGHTH`=1/8, `QUARTER`=1/4, all unit fractions, or
 `SIX`/`X3`/`Y2`/`Y4`/`DOUBLE`, all whole multiples) -- no precedent covers
 a fraction like 2/5, so left as `D_` rather than inventing a new word
-(`SCALE_TWO_FIFTHS`) with no anchor in the existing convention.
+(`sScaleTwoFifths`) with no anchor in the existing convention.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
@@ -88,7 +88,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_80089E44` | `SCALE_TWO_FIFTHS` | A (by value) | `.word 0x00050002` x3 = uniform 2/5, like `sScaleEightSevenths` |
+| `D_80089E44` | `sScaleTwoFifths` | A (by value) | `.word 0x00050002` x3 = uniform 2/5, like `sScaleEightSevenths` |
 | `ROTATION_ZPLUS4` | `sRotationYawPlus4` | A (by value) | `.word 0x00010000, 0x00010004, 0x00010000` = {0/1, 4/1, 0/1}: the 4 is the SECOND pair, Y (yaw), as in `sRotationYawPlus9` = {0, 9, 0}; `sRotationZPlus9` = {0, 0, 9} has it third |
 
 **Correction** to "Data constant decoded this round" above: it read
