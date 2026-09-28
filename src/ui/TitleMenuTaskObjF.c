@@ -49,7 +49,7 @@
 #include <kernel.h>
 #include <sys/file.h>
 #include "basic_class.h"
-#include "Pad.h"
+#include "pad.h"
 #include "FrameClock.h"
 #include "ScreenSprite.h"
 #include "TextEntry.h"

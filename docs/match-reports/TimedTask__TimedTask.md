@@ -74,7 +74,7 @@ at. No behavioral ambiguity, just a naming note for the next reader.
 - `IntermediateBaseMethods::ctor` added at +0x008: `void *(*ctor)(void
   *self)` — called with only `self` set up, matching the base-ctor shape
   elsewhere in the project (e.g. `BasicClassMethods::ctor` in
-  `Pad.h`).
+  `pad.h`).
 - `TimedTaskMethods::ctor` retyped from the placeholder `void *(*ctor)(void
   *self, void *arg1, void *arg2)` to the real signature `void (*ctor)(Obj865C8
   *self, s32 arg1, SubObjB *arg2)`. Void: this function's OWN body never

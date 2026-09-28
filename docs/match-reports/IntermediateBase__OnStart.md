@@ -97,7 +97,7 @@ initArgs->drawSystem is the DrawSystem, so the call is its +0x048
 `slot48`. Local `obj0` -> `drawSystem`. Byte-identical.
 
 The unit-local view these calls went through was removed; it read, verbatim
-(the only history in it is the "not established" claim, which Pad.h and
+(the only history in it is the "not established" claim, which pad.h and
 draw_system.h have since settled):
 
 ```c

@@ -52,7 +52,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "scene_node.h"
-#include "Pad.h"
+#include "pad.h"
 #include "FrameClock.h"
 #include "TmdModel.h"
 #include "Actor.h"

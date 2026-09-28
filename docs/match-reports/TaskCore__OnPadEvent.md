@@ -154,7 +154,7 @@ occupant mapping, which had the five handlers reversed; each function's
 
 ## Track 7 (round 98, alpha)
 
-The cases now read `PAD_EVENT_PRESSED + PAD_BUTTON_*` (include/Pad.h):
+The cases now read `PAD_EVENT_PRESSED + PAD_BUTTON_*` (include/pad.h):
 0x12 Lup -> onPadPrev, 0x13 Ldown -> onPadNext, 0x21 Start -> onPadStart,
 0x17 Rdown (cross) -> onPadCancel, 0x19 Rright (circle) -> onPadConfirm.
 The gate is `inputMode != TASKCORE_INPUT_NONE`. Case order is unchanged

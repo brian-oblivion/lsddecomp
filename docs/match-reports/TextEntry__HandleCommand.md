@@ -214,7 +214,7 @@ Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTe
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
-The commands are Pad events (include/Pad.h: `PAD_EVENT_PRESSED` 0x12 /
+The commands are Pad events (include/pad.h: `PAD_EVENT_PRESSED` 0x12 /
 `PAD_EVENT_HELD` 0x02 plus the button index), and the command's sender is
 the child of class 2, the Pad (onNotify). Every case label is now spelled
 that way, zero bytes changed:

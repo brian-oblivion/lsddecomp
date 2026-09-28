@@ -103,7 +103,7 @@ badly); it wants the narrow-then-wide literal if-chain instead. See
 ## Constants (round 98, track 7)
 
 `(id & 0xF) == 2` / `== 5` are `(id & CLASS_ID_ROOT_MASK) == PAD_CLASS_ID` /
-`FRAMECLOCK_CLASS_ID` (basic_class.h, Pad.h, FrameClock.h; gPadMethods' and
+`FRAMECLOCK_CLASS_ID` (basic_class.h, pad.h, FrameClock.h; gPadMethods' and
 gFrameClockMethods' word +0x000 are 0x2 and 0x5). The two-nibble tests stay
 literal: `& 0xFF` against 0x10 (gTextEntryMethods' word +0x000) and 0x20
 (gItemListMethods'), proposed to the head as `TEXTENTRY_CLASS_ID` and

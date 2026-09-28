@@ -29,7 +29,7 @@
 #include "TextRow.h"
 #include "TimImage.h"
 #include "VabStreamObj.h"
-#include "Pad.h"
+#include "pad.h"
 #include "FrameClock.h"
 #include "ItemList.h"
 #include "ScreenSprite.h"

@@ -49,7 +49,7 @@ Obj866E8Methods *GetStageMapMethods(void) {
 ### Proposed learning
 
 None new — confirms the already-established "extern Methods D_xxx; return
-&D_xxx;" getter idiom used throughout the project (`Pad.c`,
+&D_xxx;" getter idiom used throughout the project (`pad.c`,
 `entity.c`, `DayTaskStageMap.c`, `class_3ac78.c`, `Task.c`,
 `TodActor.c`).
 

@@ -81,6 +81,6 @@ Renamed from `TaskObjF__Notify`: it occupies BasicClass's onNotify slot (+0x038)
 `base`, `mask` -> `kind`. `**(s32 **)arg1` reads
 `((BasicClass *)sender)->methods->header`, the class id. The ids are
 written 0x2/0x5/0x10/0x20: Pad's, FrameClock's (matched on the low nibble,
-so subclasses too), TextEntry's and ItemList's (include/Pad.h,
+so subclasses too), TextEntry's and ItemList's (include/pad.h,
 FrameClock.h, TextEntry.h, ItemList.h banners). No class-id constants exist
 yet; proposed. Zero bytes.

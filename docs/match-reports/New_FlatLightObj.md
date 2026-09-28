@@ -33,7 +33,7 @@ First spelling `if (self == NULL) return NULL; ctor; return self;` was 1 word LO
 
 ## Naming
 
-`New_FlatLightObj`, tier A. Mechanics is its purpose: allocate, call the class's ctor slot through the table getter, return the object or NULL -- the same shape as `include/Pad.h`'s `New_Pad`. `New_Class` convention.
+`New_FlatLightObj`, tier A. Mechanics is its purpose: allocate, call the class's ctor slot through the table getter, return the object or NULL -- the same shape as `include/pad.h`'s `New_Pad`. `New_Class` convention.
 
 ## History (moved from the unit banner of `src/code_3311c.c`, round 101)
 

@@ -88,7 +88,7 @@ void FileResource__LoadFile(FileResource *this, s32 arg1) {
 ## Attempt log — the real find
 
 First attempt (`BMemPMgrAlloc(size, 0)`, matching the 2-argument signature
-already on file in `include/Pad.h`) compiled and linked, but produced
+already on file in `include/pad.h`) compiled and linked, but produced
 a single-instruction shape mismatch right at the allocator call: retail's
 delay slot for `jal BMemPMgrAlloc` is just `move a0,s2`; mine additionally
 emitted a **separate, non-delay-slot** `move a0,s2` plus a redundant
@@ -98,12 +98,12 @@ an argument retail's call site never sets up at all.
 Cross-checked against `docs/match-reports/New_GameApplication.md` (a different
 unit, `GameApplicationFileResource`), which independently derived `BMemPMgrAlloc(0x2C)` — one
 argument — for the same function. **The two-argument signature in
-`include/Pad.h` (`s32 size, s32 zone`) is wrong**; it was never
+`include/pad.h` (`s32 size, s32 zone`) is wrong**; it was never
 exercised against a call site where the phantom second argument's register
 happened to differ from whatever was already sitting in `$a1`, so the bug was
 invisible there. `include/GameApplicationFileResource.h` now declares the one-argument form
 locally with a comment pointing at `New_GameApplication.md` as the confirming
-evidence; `Pad.h` is out of this unit's scope to fix, but is flagged
+evidence; `pad.h` is out of this unit's scope to fix, but is flagged
 below as a proposed learning / spawn candidate.
 
 Fixing the call to one argument made this function match immediately (was
@@ -127,15 +127,15 @@ anything writes it, and it is consumed as `addu $t0, $s1, $zero` at
 `0x80017B68` on the path taken when the `$gp` default pool is unset. What
 the two units below measured is that THEIR OWN call sites pass one argument
 and retail emits nothing for a second -- true, and the reason
-`include/Pad.h:74`'s one-parameter declaration is byte-correct for
+`include/pad.h:74`'s one-parameter declaration is byte-correct for
 them. It is a fact about those call sites, not about the callee's arity.
 See `docs/match-reports/BMemPMgrAlloc.md`, `## Extern arity (round 59)`.
 
 **`BMemPMgrAlloc` takes one argument (`size`), not two.**
-`include/Pad.h:74`'s `extern void *BMemPMgrAlloc(s32 size, s32 zone);`
+`include/pad.h:74`'s `extern void *BMemPMgrAlloc(s32 size, s32 zone);`
 should be corrected to `extern void *BMemPMgrAlloc(s32 size);` — confirmed
 independently in two units (`New_GameApplication` in `GameApplicationFileResource`, and this
-function). Left unfixed for now since `Pad.h` is outside this unit's
+function). Left unfixed for now since `pad.h` is outside this unit's
 scope; flagged for a spawned follow-up.
 
 ## Naming

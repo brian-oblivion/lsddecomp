@@ -12,7 +12,7 @@ Round-42's "REOPENED -- ASSIGNABLE" banner applies (previously stub-stalled as
 `gp_rel`-blocked on the same `sPadRefCount` global as `Pad__Pad`). The
 preserved body from the earlier runner/alpha attempt named the guarded call
 as `func_80025F2C()`; re-reading the `.s` directly shows the call target is
-`PadStop` (already declared in `include/Pad.h`,
+`PadStop` (already declared in `include/pad.h`,
 `void PadStop(void)`), not `func_80025F2C`. Matched byte-exact on the FIRST
 build with the corrected call target.
 

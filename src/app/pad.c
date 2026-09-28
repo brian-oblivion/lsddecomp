@@ -1,5 +1,5 @@
 /*
- * The Pad class: a controller port wrapped as a BasicClass (include/Pad.h
+ * The Pad class: a controller port wrapped as a BasicClass (include/pad.h
  * documents the class and its events; main() creates the one instance).
  * Instances share the Psy-Q pad library: the first ctor calls PadInit and
  * the last finalize PadStop (sPadRefCount). On every DrawSystem vsync
@@ -12,10 +12,10 @@
  */
 #include "common.h"
 #include <libetc.h>
-#include "Pad.h"
+#include "pad.h"
 #include "bmem_pmgr.h"
 
-/* What only this file's bodies use; the class itself is include/Pad.h. The
+/* What only this file's bodies use; the class itself is include/pad.h. The
  * pad library it wraps (PadInit, PadRead, PadStop) is Sony's <libetc.h>. */
 
 extern s32 sPadRefCount; /* live instances: the first ctor calls PadInit, the last finalize PadStop */

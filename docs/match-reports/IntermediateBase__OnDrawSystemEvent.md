@@ -98,13 +98,13 @@ The `self->unk10` call is FrameClock's +0x044 `tick` (include/FrameClock.h): the
 The object at initArgs->pad is a Pad (Application__InitSystems passes the
 Pad; include/IntermediateBase.h names the field for it), so the two calls
 are Pad's +0x044 `updateMasks` and +0x048 `dispatchEvents`
-(include/Pad.h), not the unit-local `slot44`/`slot48`. The event test is
+(include/pad.h), not the unit-local `slot44`/`slot48`. The event test is
 draw_system.h's `DRAWSYSTEM_EVENT_VSYNC` (2): this is onNotify's DrawSystem
 case, and DrawSystem__RunLoop sends 2 every VSync pass. Local `obj4` ->
 `pad`. Byte-identical.
 
 The unit-local view these calls went through was removed; it read, verbatim
-(the only history in it is the "not established" claim, which Pad.h and
+(the only history in it is the "not established" claim, which pad.h and
 draw_system.h have since settled):
 
 ```c

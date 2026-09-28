@@ -27,7 +27,7 @@
 #include "BgLayer.h"
 #include "TileMap.h"
 #include "TileAtlas.h"
-#include "Pad.h"
+#include "pad.h"
 #include "TimImage.h"
 #include "Viewport.h"
 #include "LightRig.h"

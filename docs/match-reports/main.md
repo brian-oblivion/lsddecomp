@@ -27,9 +27,9 @@ correctly left untouched per the runner brief).
 ```c
 #include "common.h"
 #include "GameApplication.h"
-#include "Pad.h"
+#include "pad.h"
 
-/* Local, opaque: code_8220.h can't be included alongside Pad.h
+/* Local, opaque: code_8220.h can't be included alongside pad.h
  * (both define `struct BasicClassMethods`, per this project's
  * multiple-independent-local-views convention -- headercontention.py
  * confirms the two units' local views collide), and nothing here

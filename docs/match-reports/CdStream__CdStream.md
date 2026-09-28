@@ -47,7 +47,7 @@ by `grep -rn` over `src/`, `include/`), so these were renamed directly
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_800817E0` (table) | `gCdStreamMethods` | A | `Get_vtable_<Class>` / `g<Class>Methods` convention (`include/Pad.h`) |
+| `D_800817E0` (table) | `gCdStreamMethods` | A | `Get_vtable_<Class>` / `g<Class>Methods` convention (`include/pad.h`) |
 | `D_8008A950` (global) | `sActiveCdStream` | A | the single active-stream pointer every state-changing method compares `self` against |
 | slot +0x044 | `open` | A | dispatches to `CdStream__Open` |
 | slot +0x048 | `close` | A | dispatches to `CdStream__Close` |

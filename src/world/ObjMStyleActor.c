@@ -35,7 +35,7 @@
 #include "ItemList.h"
 #include "ObjM.h"
 #include "VabStreamObj.h"
-#include "Pad.h"
+#include "pad.h"
 #include "FadeBox.h"
 #include "dream_sys.h"
 #include "StageMap.h"

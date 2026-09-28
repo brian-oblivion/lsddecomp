@@ -15,7 +15,7 @@
  */
 #include "common.h"
 #include "GameApplication.h"
-#include "Pad.h"
+#include "pad.h"
 #include "bmem_pmgr.h"
 #include <kernel.h>
 

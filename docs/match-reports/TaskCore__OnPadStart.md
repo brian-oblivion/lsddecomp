@@ -68,7 +68,7 @@ Renamed from Obj86B60__func_8003C7F4 (tools/rename.py): the class prefix. Occupa
 
 **Tier A**: `TaskCore__func_8003C7F4` -> `TaskCore__OnPadStart`, slot +0x074
 `onPad21` -> `onPadStart`. onPadEvent calls this slot on event 0x21, and
-include/Pad.h says what that event is: Pad__DispatchEvents sends
+include/pad.h says what that event is: Pad__DispatchEvents sends
 `PAD_EVENT_PRESSED` (0x12) plus the button's index in sButtonMasks, and
 index 15 is `PAD_BUTTON_START` (PADstart). Its four siblings already carry
 their buttons' names (0x12 Lup, 0x13 Ldown, 0x17 cross, 0x19 circle), so
