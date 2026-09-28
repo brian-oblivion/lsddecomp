@@ -11,7 +11,7 @@
  * BasicClass subclass (its ctor calls Get_vtable_BasicClass()->ctor first;
  * `classtable.py gWBgmMethods --vs gBasicClassMethods` overrides the ctor, finalize
  * and onNotify and adds nine slots). Methods in src/code_2a0e0.c. No class
- * derives from it. Name from rodata D_80010FEC, "Seq Open error in
+ * derives from it. Name from rodata sSeqOpenErrorMsg, "Seq Open error in
  * WBgmHandleMonitorEvent", printed by WBgm__HandleMonitorEvent's own body.
  *
  * A background-music player: one libsnd SEQ played on one VAB bank. The

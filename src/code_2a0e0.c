@@ -9,7 +9,7 @@
  *
  * All 17 functions matched in round 81 (runners echo and delta); named round
  * 82 (runner bravo, FINISHING-PLAN track 3). Class named WBgm from rodata
- * D_80010FEC ("Seq Open error in WBgmHandleMonitorEvent"): the string is part
+ * sSeqOpenErrorMsg ("Seq Open error in WBgmHandleMonitorEvent"): the string is part
  * of WBgm__HandleMonitorEvent's own matched body (the printf sits right where
  * it is read), so it is body evidence for that function's name and, via its
  * "WBgm" prefix, a lead for the class -- weighed as evidence, not proof.
@@ -34,7 +34,7 @@ extern short SsSeqOpen(unsigned long *addr, short vab_id);
 
 extern void *BMemPMgrAlloc(s32 size);
 extern void printf(const char *fmt);
-extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
+extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 
 extern s32 GetSsTicksPerSecond(void);
 
@@ -114,7 +114,7 @@ s32 WBgm__HandleMonitorEvent(WBgm *self) {
     }
     self->seqId = SsSeqOpen(seq->buffer, vab->vabId);
     if (self->seqId == -1) {
-        printf(D_80010FEC);
+        printf(sSeqOpenErrorMsg);
     }
     SsSeqSetVol(self->seqId, 0x34, 0x34);
     self->openState = 2;

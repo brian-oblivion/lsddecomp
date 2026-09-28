@@ -6,16 +6,16 @@ Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot none (called from +0x040, +0x05C, +0x060) (slots resolved with `tools/classtable.py gWBgmMethods`).
-- **What:** try-open: needs the +0x0C VAB object (+0x58 u16 ready, +0x54 s16 vab id) and the +0x10 SEQ data object (+0x2C loaded flag, +0x10 data address); `SsSeqOpen`, prints rodata `D_80010FEC` ("Seq Open error in WBgmHandleMonitorEvent") on -1, sets volume 0x34/0x34, `openState = 2`, returns 1; every failed guard returns 0.
+- **What:** try-open: needs the +0x0C VAB object (+0x58 u16 ready, +0x54 s16 vab id) and the +0x10 SEQ data object (+0x2C loaded flag, +0x10 data address); `SsSeqOpen`, prints rodata `sSeqOpenErrorMsg` ("Seq Open error in WBgmHandleMonitorEvent") on -1, sets volume 0x34/0x34, `openState = 2`, returns 1; every failed guard returns 0.
 - **Result:** byte-exact on the first build. `funcdiff.py` reports 46/46
   words, 0 insertions / 0 deletions, and the whole-image SHA1 is green
   (`OK: build matches retail`).
-- **Levers:** none. The string is referenced as `extern const char D_80010FEC[]`, never a literal. The two `ori a1,0x34` (one after printf, one in the branch delay slot) are the delay-slot filler duplicating the join, not source.
+- **Levers:** none. The string is referenced as `extern const char sSeqOpenErrorMsg[]`, never a literal. The two `ori a1,0x34` (one after printf, one in the branch delay slot) are the delay-slot filler duplicating the join, not source.
 - **Name:** renamed round 82 to `WBgm__HandleMonitorEvent` (see `## Naming` below).
 
 ## Naming
 
-`WBgm__HandleMonitorEvent`, tier A. rodata `D_80010FEC` ("Seq Open error in WBgmHandleMonitorEvent") is read by this exact function's own printf call -- body evidence, not a caller's guess. It checks both dependency objects' readiness and opens the SEQ, matching "handle a monitor event" (an event that should trigger a re-check).
+`WBgm__HandleMonitorEvent`, tier A. rodata `sSeqOpenErrorMsg` ("Seq Open error in WBgmHandleMonitorEvent") is read by this exact function's own printf call -- body evidence, not a caller's guess. It checks both dependency objects' readiness and opens the SEQ, matching "handle a monitor event" (an event that should trigger a re-check).
 
 ## View changes (additive, unit-local)
 
@@ -115,7 +115,7 @@ extern BasicClass *GetDrawSystem(void);
 extern SeqData *New_RequestedFile(s32 arg);
 extern SeqVab *New_VabStreamObj(s32 arg0);
 extern void printf(const char *fmt);
-extern const char D_80010FEC[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
+extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 WBgmMethods *Get_vtable_WBgm(void);
 
 extern s32 GetSsTicksPerSecond(void);
