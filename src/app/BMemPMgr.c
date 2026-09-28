@@ -10,10 +10,11 @@
  *    BMemPMgrAlloc and BMemPMgrFree work on sDefaultBMemPMgr
  *    (SetDefaultBMemPMgr) and fall back to their pool argument only while
  *    no default is set.
- *  - Eleven of BasicClass's methods (include/BasicClass.h), and
+ *  - BasicClass's methods (include/BasicClass.h), with
  *    PushBasicClassListNode/RemoveBasicClassListNode, the pool-backed list
- *    primitives its `children` and `parentRefs` lists share. The rest of its
- *    methods are at the head of TmdRenderer.c.
+ *    primitives its `children` and `parentRefs` lists share, and the list
+ *    helpers, table getter and notification pair that close the file, with
+ *    the pool's busy-flag accessors.
  */
 
 #include "common.h"
@@ -386,4 +387,76 @@ void RemoveBasicClassListNode(BasicClassListNode **head, BasicClass *value) {
         prev = node;
         node = node->next;
     }
+}
+
+/* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
+ * work and back to 0 after (SetBMemPMgrBusy, GetBMemPMgrBusy below). Nothing
+ * in either waits on it. */
+extern s32 sBMemPMgrBusy;
+
+void FreeBasicClassList(BasicClassListNode **head) {
+    BasicClassListNode *node = *head;
+
+    while (node != NULL) {
+        BasicClassListNode *cur = node;
+        node = node->next;
+        BMemPMgrFree(cur);
+    }
+}
+
+/* BasicClassMethods slot +0x030. Tell every object holding a reference to
+ * `self` that `event` happened, by calling each one's onNotify slot with
+ * `self` as the sender. BasicClass__Finalize passes 1, "going away". */
+void BasicClass__NotifyParents(BasicClass *self, s32 event) {
+    BasicClassListNode *cursor = self->parentRefs;
+    BasicClass *parent;
+
+    for (GetNextBasicClass(&parent, &cursor); parent != NULL; GetNextBasicClass(&parent, &cursor)) {
+        parent->methods->onNotify(parent, self, event);
+    }
+}
+
+/* BasicClassMethods slot +0x034. Empty, and no BasicClass-derived table
+ * overrides it. */
+void BasicClass__NoOpSlot34(void) {}
+
+/* BasicClassMethods slot +0x038, the receiving half of NotifyParents:
+ * `sender` is telling `self` that `event` happened. The base class treats
+ * BASICCLASS_EVENT_FINALIZED as "sender is going away" and drops it from its own children.
+ * Subclasses override it, call this first, then look at the sender's class
+ * tag as well, so `event` is a notification code, not a boolean. */
+void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event) {
+    if (event == BASICCLASS_EVENT_FINALIZED) {
+        self->methods->removeChild(self, (BasicClass *)sender);
+    }
+}
+
+BasicClassMethods *GetBasicClassMethods(void) {
+    return &gBasicClassMethods;
+}
+
+void GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor) {
+    if (*cursor != NULL) {
+        *outValue = (*cursor)->value;
+        *cursor = (*cursor)->next;
+    } else {
+        *outValue = NULL;
+    }
+}
+
+void ReleaseBasicClassArray(BasicClass **array, s32 count) {
+    if (count-- > 0) {
+        do {
+            *array = (BasicClass *)(*array)->methods->release(*array);
+            array++;
+        } while (count-- > 0);
+    }
+}
+
+void SetBMemPMgrBusy(s32 busy) {
+    sBMemPMgrBusy = busy;
+}
+
+s32 GetBMemPMgrBusy(void) {
+    return sBMemPMgrBusy;
 }

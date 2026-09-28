@@ -6,7 +6,7 @@
 /*
  * BasicClass -- the root of the game's hand-rolled class framework
  * (docs/research/class-framework.md), class id 0x0, method table gBasicClassMethods.
- * Methods live in src/app/BMemPMgr.c and src/graphics/TmdRenderer.c.
+ * Methods live in src/app/BMemPMgr.c.
  *
  * Every class derives from it: word +0x000 of each method table is a
  * hierarchical class id (each nibble above the lowest non-zero one is one more
@@ -121,8 +121,8 @@ struct BasicClass {
 extern BasicClassMethods gBasicClassMethods;          /* BasicClass's own method table */
 extern BasicClassMethods *GetBasicClassMethods(void); /* returns &gBasicClassMethods */
 
-/* BasicClass's methods: the occupants of its own table, BMemPMgr and
- * TmdRenderer. A subclass reaches them through GetBasicClassMethods(). */
+/* BasicClass's methods: the occupants of its own table, in BMemPMgr.c.
+ * A subclass reaches them through GetBasicClassMethods(). */
 void *BasicClass__Release(BasicClass *self);
 void BasicClass__BasicClass(BasicClass *self);
 void BasicClass__Finalize(BasicClass *self);
@@ -138,7 +138,7 @@ void BasicClass__NotifyParents(BasicClass *self, s32 event);
 void BasicClass__NoOpSlot34(void);
 void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event);
 
-/* The list primitives, BMemPMgr and TmdRenderer. */
+/* The list primitives, in BMemPMgr.c. */
 extern s32 PushBasicClassListNode(BasicClassListNode **head,
                                   BasicClass *value); /* allocate a node, prepend it to *head */
 extern void RemoveBasicClassListNode(BasicClassListNode **head,
@@ -147,7 +147,7 @@ extern void GetNextBasicClass(BasicClass **outValue,
                               BasicClassListNode **cursor); /* *outValue = node value (or NULL); advance *cursor */
 extern void FreeBasicClassList(BasicClassListNode **head); /* free every node; *head is not cleared */
 
-/* Releases each of `count` objects of `array` (TmdRenderer.c). */
+/* Releases each of `count` objects of `array`. */
 extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
 
 #endif

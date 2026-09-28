@@ -1,13 +1,7 @@
 /*
- * TmdRenderer -- the game's TMD renderer, after the end of BasicClass.
+ * TmdRenderer -- the game's TMD renderer.
  *
- * BasicClass (include/BasicClass.h; the rest of it is BMemPMgr.c): the list
- * helpers its methods use (FreeBasicClassList, GetNextBasicClass,
- * ReleaseBasicClassArray), its table getter, the notification pair
- * NotifyParents / OnNotify with the empty slot between them, and the pool
- * allocator's busy-flag accessors.
- *
- * The renderer: SortTmdObject, the game's replacement for Sony's
+ * SortTmdObject, the game's replacement for Sony's
  * GsSortObject4, turns a GsDOBJ2's TMD object into GPU primitives. Per face,
  * SetupPrimCode finishes the primitive's command byte, ProjectTriFace or
  * ProjectQuadFace transforms and culls it through TransformAndCullPoly,
@@ -20,92 +14,15 @@
  * with the helpers that fill a DIVPOLYGON's header and its RVECTOR vertex
  * records, and the ndiv override setter. All GTE work goes through
  * include/gte.h's gte_* macros (Sony's names; never <inline.h>).
- *
- * The BasicClass part ends at GetBMemPMgrBusy and the renderer begins at
- * SortTmdObject. In ROM the BasicClass part follows the end of BMemPMgr.c,
- * which holds the rest of BasicClass.
  */
 
 #include "common.h"
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "BMemPMgr.h"
 #include "DrawSystem.h"
 #include "gte.h"
 #include "TmdRenderer.h"
-
-/* Set to 1 by BMemPMgrAlloc and BMemPMgrFree for the length of their free-list
- * work and back to 0 after (SetBMemPMgrBusy, GetBMemPMgrBusy below). Nothing
- * in either waits on it. */
-extern s32 sBMemPMgrBusy;
-
-void FreeBasicClassList(BasicClassListNode **head) {
-    BasicClassListNode *node = *head;
-
-    while (node != NULL) {
-        BasicClassListNode *cur = node;
-        node = node->next;
-        BMemPMgrFree(cur);
-    }
-}
-
-/* BasicClassMethods slot +0x030. Tell every object holding a reference to
- * `self` that `event` happened, by calling each one's onNotify slot with
- * `self` as the sender. BasicClass__Finalize passes 1, "going away". */
-void BasicClass__NotifyParents(BasicClass *self, s32 event) {
-    BasicClassListNode *cursor = self->parentRefs;
-    BasicClass *parent;
-
-    for (GetNextBasicClass(&parent, &cursor); parent != NULL; GetNextBasicClass(&parent, &cursor)) {
-        parent->methods->onNotify(parent, self, event);
-    }
-}
-
-/* BasicClassMethods slot +0x034. Empty, and no BasicClass-derived table
- * overrides it. */
-void BasicClass__NoOpSlot34(void) {}
-
-/* BasicClassMethods slot +0x038, the receiving half of NotifyParents:
- * `sender` is telling `self` that `event` happened. The base class treats
- * BASICCLASS_EVENT_FINALIZED as "sender is going away" and drops it from its own children.
- * Subclasses override it, call this first, then look at the sender's class
- * tag as well, so `event` is a notification code, not a boolean. */
-void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event) {
-    if (event == BASICCLASS_EVENT_FINALIZED) {
-        self->methods->removeChild(self, (BasicClass *)sender);
-    }
-}
-
-BasicClassMethods *GetBasicClassMethods(void) {
-    return &gBasicClassMethods;
-}
-
-void GetNextBasicClass(BasicClass **outValue, BasicClassListNode **cursor) {
-    if (*cursor != NULL) {
-        *outValue = (*cursor)->value;
-        *cursor = (*cursor)->next;
-    } else {
-        *outValue = NULL;
-    }
-}
-
-void ReleaseBasicClassArray(BasicClass **array, s32 count) {
-    if (count-- > 0) {
-        do {
-            *array = (BasicClass *)(*array)->methods->release(*array);
-            array++;
-        } while (count-- > 0);
-    }
-}
-
-void SetBMemPMgrBusy(s32 busy) {
-    sBMemPMgrBusy = busy;
-}
-
-s32 GetBMemPMgrBusy(void) {
-    return sBMemPMgrBusy;
-}
 
 /* The drawn object's attribute bits, as SortTmdObject publishes them for
  * SetupPrimCode and the submit wrappers. Sony's GsSortObject4 keeps the same
