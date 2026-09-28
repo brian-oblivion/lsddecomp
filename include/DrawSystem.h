@@ -11,7 +11,7 @@
  *
  * main() builds the one instance (New_DrawSystem) and hands it to
  * Application__InitSystems (Application), which stores it as the singleton
- * (SetDrawSystem -> gDrawSystem) and calls its initGraph (GsInitGraph and
+ * (SetDrawSystem -> sDrawSystem) and calls its initGraph (GsInitGraph and
  * GsDefDispBuff for the screen size). Every other unit reaches it through
  * GetDrawSystem(): TimImage and the movie player upload through loadImage,
  * the movie player clears its frame through clearImage, the CD driver
@@ -97,7 +97,7 @@ struct DrawSystem {
 extern DrawSystemMethods gDrawSystemMethods; /* DrawSystem's method table */
 extern DrawSystemMethods *GetDrawSystemMethods(void);
 
-DrawSystem *GetDrawSystem(void); /* returns gDrawSystem, the singleton */
+DrawSystem *GetDrawSystem(void); /* returns sDrawSystem, the singleton */
 void SetDrawSystem(DrawSystem *obj);
 
 DrawSystem *New_DrawSystem(void);

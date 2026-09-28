@@ -15,7 +15,7 @@ byte-identical, and the `## Naming` section at the end of this report
 carries the evidence for each one.
 
 ```c
-extern s32 GetDrawSystem(void); /* returns gDrawSystem, a singleton object */
+extern s32 GetDrawSystem(void); /* returns sDrawSystem, a singleton object */
 extern s32 ServiceCdDriver(void);
 extern s32 sCdBusy;
 extern s32 sCdAsyncEnabled;

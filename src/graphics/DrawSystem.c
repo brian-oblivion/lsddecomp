@@ -20,7 +20,7 @@
 
 extern void *BMemPMgrAlloc(s32 size);
 
-extern DrawSystem *gDrawSystem; /* sdata: the singleton GetDrawSystem returns */
+extern DrawSystem *sDrawSystem; /* sdata: the singleton GetDrawSystem returns */
 
 void ConvertRect(RECT *dst, DrawRect *src);
 
@@ -186,9 +186,9 @@ DrawSystemMethods *GetDrawSystemMethods(void) {
 }
 
 DrawSystem *GetDrawSystem(void) {
-    return gDrawSystem;
+    return sDrawSystem;
 }
 
 void SetDrawSystem(DrawSystem *obj) {
-    gDrawSystem = obj;
+    sDrawSystem = obj;
 }
