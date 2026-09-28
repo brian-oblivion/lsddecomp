@@ -59,7 +59,7 @@ Evidence:
   same value: `SceneNode__OnNotify` (`src/graphics/SceneNode.c`) calls
   `Get_vtable_BasicClass()->slot38(self, other, arg2)` and then dispatches
   to slot `+0x094`/`+0x098`/`+0x09C` **by the sender's class tag**, passing
-  `arg2` through each time; `TodActor__OnNotify` (`src/TodActor.c`) calls the
+  `arg2` through each time; `TodActor__OnNotify` (`src/world/TodActor.c`) calls the
   base and then tests `arg1->tagged->tag == 0x5F03 && arg2 == 1`.
 - Slot census (`tools/classtable.py`, all 60 tables): 27 tables use this
   base implementation at `+0x038` and 14 more override it with

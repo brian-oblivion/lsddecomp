@@ -1794,7 +1794,7 @@ segments:
       #
       # Entity_f: first 17, 0x53CA8..0x54E18.
       # Entity_g: remaining 20, 0x54E18..0x55DD4.
-      - [0x55DD4, c, TodActor]
+      - [0x55DD4, c, world/TodActor]
       # ---- data ------------------------------------------------------------
       # ALL DATA STARTS AS ASSEMBLY, including the slots that belong to the two
       # carved C units. splat's dot-prefixed form (`.data, DreamSys`) means

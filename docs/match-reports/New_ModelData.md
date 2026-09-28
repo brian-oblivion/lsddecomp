@@ -46,7 +46,7 @@ ModelData *New_ModelData(ResourceSource *src) {
 
 ## Naming
 
-- **New_ModelData**, tier A. include/TodActor.h's Unk5CObj already names this object's own +0x2C/+0x30 fields "tmd"/"tods" (populated by New_LinkResource/New_TodSet), and src/TodActor.c's own header comment calls this allocator's result "modelData".
+- **New_ModelData**, tier A. include/TodActor.h's Unk5CObj already names this object's own +0x2C/+0x30 fields "tmd"/"tods" (populated by New_LinkResource/New_TodSet), and src/world/TodActor.c's own header comment calls this allocator's result "modelData".
 
 ## Track 4
 

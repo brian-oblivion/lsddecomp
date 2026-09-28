@@ -42,7 +42,7 @@ void *New_Tod(s32 arg0) {
 
 ## Naming
 
-- **New_Tod**, tier A. Allocator for gTodMethods; the packet fields it decodes (byte value, 4-bit type/sub-type nibbles, byte length) match src/TodActor.c's own description of TOD packets (attribute, coordinate, model-id, parent), and its array-of-these subclass is externally named TodSet.
+- **New_Tod**, tier A. Allocator for gTodMethods; the packet fields it decodes (byte value, 4-bit type/sub-type nibbles, byte length) match src/world/TodActor.c's own description of TOD packets (attribute, coordinate, model-id, parent), and its array-of-these subclass is externally named TodSet.
 
 ## Track 4 (2026-09-26, round 86, charlie)
 

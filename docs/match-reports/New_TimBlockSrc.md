@@ -85,7 +85,7 @@ Verbatim as it stood before the round-93 comment pass; the new banner says what 
  *     (include/TimArraySrc.h, track 4, round 88).
  *   - Tod / TodSet (gTodMethods / gTodSetMethods, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
- *     of them; named from src/TodActor.c's own "TOD set" (Unk30Obj).
+ *     of them; named from src/world/TodActor.c's own "TOD set" (Unk30Obj).
  *   - ModelData / TriggerWorld (gModelDataMethods / gTriggerWorldMethods, TriggerWorld a
  *     ModelData subclass): a LinkResource+TodSet pair, and an array of
  *     those pairs; ModelData named from TodActor.c/.c's own "tmd"/"tods"/

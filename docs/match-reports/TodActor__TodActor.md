@@ -10,7 +10,7 @@
 ## What it does
 
 The constructor for the class at method table `gTodActorMethods` (see
-`src/TodActor.c` for the resolved inheritance:
+`src/world/TodActor.c` for the resolved inheritance:
 `BasicClass -> gActorMethods (intermediate, header 0x34) -> this class`).
 Signature `(self, arg1, arg2)`, matching `New_TodActor`'s call. Sequence:
 
@@ -68,7 +68,7 @@ byte-exact on the first successful build.
 
 ## Notes on the header
 
-The struct/vtable derivation is in `src/TodActor.c`. Key point for
+The struct/vtable derivation is in `src/world/TodActor.c`. Key point for
 future work in this unit: `self->methods->ctor`/`slot_setup5C`/etc. are
 **vtable slots**, resolved indirectly at runtime; calling into
 `TodActor__SetupModelData` (`slot_setup5C`) and `TodActor__Reset` (`slot40`), both still
@@ -98,7 +98,7 @@ Round 75 (charlie), track 3.
 ### Field and slot names (round 75, TodActor.c)
 
 Every rename below was made in the struct definition first; the compiler
-listed 162 accessors, all in `src/TodActor.c`, and `check-nonmatching.sh`
+listed 162 accessors, all in `src/world/TodActor.c`, and `check-nonmatching.sh`
 stayed green, so none needed proposing.
 
 | offset | name | tier | evidence |

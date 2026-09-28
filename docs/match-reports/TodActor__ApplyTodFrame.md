@@ -342,7 +342,7 @@ standing instruction this is **not marked permuter-exhausted** -- a single
 below-base candidate found is disqualified on inspection rather than ruled
 out by exhaustive search.
 
-Remains a STALL at 17/33, `INCLUDE_ASM` restored, `src/TodActor.c`
+Remains a STALL at 17/33, `INCLUDE_ASM` restored, `src/world/TodActor.c`
 confirmed clean.
 
 ### Proposed learning
@@ -535,7 +535,7 @@ campaigns; the only candidates below base score are either a confirmed
 behavioral change (280) or a confirmed real-oracle regression (515), not
 untested leads.**
 
-Remains a STALL at 17/33, `INCLUDE_ASM` restored, `src/TodActor.c`
+Remains a STALL at 17/33, `INCLUDE_ASM` restored, `src/world/TodActor.c`
 confirmed clean (`git status --porcelain` empty for this function after the
 515 real-build check was reverted).
 
@@ -613,7 +613,7 @@ either does not apply to this residue's mechanism or has already been
 tried and negatively confirmed in a prior round. This is now 14 manual
 attempts + 6 isolated-`cc1` probes (rounds 20/31) + 2 permuter campaigns
 (41,561 + 50,313 iterations) without closing the load-routing residue.
-Remains a STALL at 17/33, `INCLUDE_ASM` restored, `src/TodActor.c`
+Remains a STALL at 17/33, `INCLUDE_ASM` restored, `src/world/TodActor.c`
 confirmed clean before and after.
 
 ### Proposed learning
@@ -673,7 +673,7 @@ attempts and 6 isolated-`cc1` probes from prior rounds, this residue
 narrowest, most repeatedly-confirmed search-space convergence of any
 function in this unit — three separate random seeds, three different
 iteration counts, zero new candidates. Remains a STALL at 17/33,
-`INCLUDE_ASM` restored, `src/TodActor.c` confirmed clean before and
+`INCLUDE_ASM` restored, `src/world/TodActor.c` confirmed clean before and
 after.
 
 ### Proposed learning
@@ -699,10 +699,10 @@ Track 1b mechanical promotion. The preserved 17/33 body above (this report's
 only `#if 0` block; hand-derived from the round-14 manual attempts, not a
 permuter output -- the two permuter-found sub-base candidates, 280 and 515,
 were both traced/built and rejected in rounds 24/31/49 and never touched
-`src/`) is placed in `src/TodActor.c` as `#ifdef NON_MATCHING ... #else
+`src/`) is placed in `src/world/TodActor.c` as `#ifdef NON_MATCHING ... #else
 INCLUDE_ASM ... #endif`. No new declarations needed; `slot138`'s signature
 (`void *(*)(TodActor *, void *, void *)`) already matches in
-`src/TodActor.c`. `./build-and-verify.sh` stays green (no bytes
+`src/world/TodActor.c`. `./build-and-verify.sh` stays green (no bytes
 changed) and `tools/check-nonmatching.sh` compiles it clean.
 
 NON_MATCHING body promoted, round 61.

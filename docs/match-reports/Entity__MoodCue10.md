@@ -47,7 +47,7 @@ which needed a correction for the analogous shape).
 ## Proposed learning
 
 Cross-referencing `tools/classtable.py`'s output for a suspicious 3-argument
-vtable call against `src/TodActor.c`'s already-documented
+vtable call against `src/world/TodActor.c`'s already-documented
 `TodActorMethods` slots is a fast way to confirm a shared-ancestor slot's
 signature without deriving it from scratch — the same physical function
 occupying the same offset in two different classes' tables is strong

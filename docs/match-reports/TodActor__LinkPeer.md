@@ -30,7 +30,7 @@ void TodActor__LinkPeer(TodActor *self, TodActor *other)
 This corrects `self->unk94`'s type: the first pass (before any function
 that touched it beyond zeroing it) guessed `s32`, matching the `sw
 $zero, 0x94(...)` in the constructor. It is actually a `TodActor *` —
-retyped in `src/TodActor.c`, along with newly typing `slot10`'s
+retyped in `src/world/TodActor.c`, along with newly typing `slot10`'s
 sibling `slot14` (`+0x014`, inherited from `gActorMethods`, "unlink" companion,
 see `TodActor__UnlinkPeer`).
 

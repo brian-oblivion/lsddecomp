@@ -44,7 +44,7 @@ void *New_TodSet(s32 arg0) {
 
 ## Naming
 
-- **New_TodSet**, tier A. src/TodActor.c's Unk30Obj is already "the TOD set, see Unk30Obj", built by this allocator over an array of Tod objects.
+- **New_TodSet**, tier A. src/world/TodActor.c's Unk30Obj is already "the TOD set, see Unk30Obj", built by this allocator over an array of Tod objects.
 
 ## Track 4 (2026-09-26, round 88, delta)
 

@@ -7,7 +7,7 @@
  * Actor -- a positioned scene object that moves (class id 0x34, method table
  * gActorMethods): a SceneNode subclass. Methods in src/ObjMStyleActor.c.
  * Three classes derive from it directly (`typeviews.py --tree`): TodActor
- * (0x234, src/TodActor.c; Entity below it), DreamSys (0x1F34) and
+ * (0x234, src/world/TodActor.c; Entity below it), DreamSys (0x1F34) and
  * StyleEffect (0xEF34, src/ObjMStyleActor.c).
  *
  * Children and companions. addChild/removeChild/removeAllChildren chain
