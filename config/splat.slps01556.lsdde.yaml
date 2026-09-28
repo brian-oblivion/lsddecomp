@@ -1334,7 +1334,7 @@ segments:
       - [0x322b4, c, graphics/Sprite]       # game code (revision 18; was psyq_322b4)
       # psyq_memset chunk B: three short runs in the libgs/libcd remainder.
       - [0x330F4, o, libgs/gs_110]     # GsSetAmbient
-      - [0x3311c, c, FlatLightObj]       # game code (revision 18; was psyq_3311c)
+      - [0x3311c, c, graphics/FlatLightObj]       # game code (revision 18; was psyq_3311c)
       - [0x3328C, o, libgs/gs_107]     # GsSetFlatLight, gte_set_lc, gte_read_lc
       - [0x33808, c, GraphicsResources] # game code (revision 18; was the head of psyq_33808)
       - [0x36654, asm, psyq_36654]     # libpress/libpress from DecDCTReset
