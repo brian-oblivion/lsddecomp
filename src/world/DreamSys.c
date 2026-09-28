@@ -161,7 +161,8 @@ extern StageSpawn *sStagePermalinkSpawns[];
 extern StaticLinkTrigger *sStagePermalinkTriggers[];
 extern s8 sStagePermalinkTriggersCount[];
 
-extern s16 sSpecialDays[];
+/* The special days, IsDaySpecial's table. */
+extern s16 sSpecialDays[42];
 
 /* The fixed "special day" mood, returned by IsDaySpecial on a match;
    only its address is used. */
@@ -1916,8 +1917,10 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
 MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day) {
     s32 i;
 
-    for (i = 0; (u32)i < 42; i++) {
+    for (i = 0; (u32)i < ARRAY_COUNT(sSpecialDays); i++) {
         if (day == sSpecialDays[i]) {
+            /* One of the special day's six GameFiles records, and one of
+             * twelve special-day banks. */
             cinematic->entry = rand() % 6;
             cinematic->bank = i % 12;
             return &sSpecialDayMood;
