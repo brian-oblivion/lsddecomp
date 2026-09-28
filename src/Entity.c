@@ -980,7 +980,7 @@ void Entity__MoodCue29(Entity *this) {
         this->state = rand() % 5;
     }
     if (this->state == 0) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS1);
+        this->methods->updateRotation(this, 0, sRotationYawPlus1);
     }
 }
 
@@ -2803,7 +2803,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *this, SoundCueSet *out, s32 
     if ((timer >= windowStart && timer <= windowStart + 91) ||
         (timer >= windowStart + 341 && timer <= windowStart + 433) ||
         (timer >= windowStart + 698 && timer <= windowStart + 791)) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS1);
+        this->methods->updateRotation(this, 0, sRotationYawPlus1);
     }
     this->methods->moveLocalZ(this, zStep, 0);
     if (this->moodTimer == deactivateTimer) {

@@ -105,7 +105,7 @@ tables (three s16 `{num, den}` pairs, X / Y(yaw) / Z, e.g. `sRotationZPlus9`
 
 | old | new | tier | bytes |
 | --- | --- | --- | --- |
-| `D_80089CD0` | `ROTATION_ZPLUS1` | A | `(0,1, 0,1, 1,1)` -- same spelling as `sRotationZPlus9`/`ROTATION_YAW_PLUS4`/`ROTATION_YAW_PLUS1`. Its consumer here is `target->methods->slot44(target, 0, ...)`, the same Unk94Methods slot that takes `sRotationYawPlus180` two lines later and `sRotationYawMinus90` in `Entity__MoodCue49` |
+| `D_80089CD0` | `ROTATION_ZPLUS1` | A | `(0,1, 0,1, 1,1)` -- same spelling as `sRotationZPlus9`/`ROTATION_YAW_PLUS4`/`sRotationYawPlus1`. Its consumer here is `target->methods->slot44(target, 0, ...)`, the same Unk94Methods slot that takes `sRotationYawPlus180` two lines later and `sRotationYawMinus90` in `Entity__MoodCue49` |
 | `D_80089CDC` | `ROTATION_ZMINUS9` | A | `(0,1, 0,1, -9,1)`, passed to `updateRotation(this, 0, ...)` like every other `ROTATION_*` |
 
 The name describes the table's contents, which is all the bytes establish;

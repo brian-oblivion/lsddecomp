@@ -23,14 +23,14 @@ void Entity__MoodCue29(Entity *this) {
         this->unk44 = rand() % 5;
     }
     if (this->unk44 == 0) {
-        this->methods->slot44(this, 0, ROTATION_YAW_PLUS1);
+        this->methods->slot44(this, 0, sRotationYawPlus1);
     }
 }
 ```
 
 Second confirmed caller of `Unk94Methods::slot200` (previously known only
 from `Entity__MoodCue00`, compared against the literal `5`; this compares
-against `7`, no new signature information). `SCALE_TRIPLE` and `ROTATION_YAW_PLUS1`
+against `7`, no new signature information). `SCALE_TRIPLE` and `sRotationYawPlus1`
 are new rodata pointers, extern-declared alongside this unit's other
 `D_80089*` constants -- neither yet dereferenced by any carved code.
 
