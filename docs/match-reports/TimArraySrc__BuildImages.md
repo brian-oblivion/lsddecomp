@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-When the buffer is present (or flags bit 0x200 is set): the buffer is a count followed by that many offsets. Store the count at +0x2C, allocate a count-word array at +0x30, and for each offset create a TimImage with New_TimImage(NULL) (no file), point its buffer at buffer+offset (size 0), ask it for its GsIMAGE (its +0x09C, TimImage__GetTimInfo) and set its +0x4C to ((cy - 0x1E0) >> gTimClutRowShift) * 16 + self->+0x34 (a CLUT slot address from the image's CLUT row). Then +0x38 = 1 and the active driver's setFlag.
+When the buffer is present (or flags bit 0x200 is set): the buffer is a count followed by that many offsets. Store the count at +0x2C, allocate a count-word array at +0x30, and for each offset create a TimImage with New_TimImage(NULL) (no file), point its buffer at buffer+offset (size 0), ask it for its GsIMAGE (its +0x09C, TimImage__GetTimInfo) and set its +0x4C to ((cy - 0x1E0) >> sTimClutRowShift) * 16 + self->+0x34 (a CLUT slot address from the image's CLUT row). Then +0x38 = 1 and the active driver's setFlag.
 
 Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x064 (setFlag override).
 
@@ -25,7 +25,7 @@ top of / earlier in `src/graphics/GraphicsResources.c`.
  * build one TimImage (New_TimImage(NULL)) per image of the buffer -- a
  * count, then that many offsets -- into an array at +0x30 (+0x2C entries),
  * each adopting its image in place (size 0), and set each one's +0x4C from
- * the CLUT row its GsGetTimInfo reports (from y 0x1E0, >> gTimClutRowShift, 16
+ * the CLUT row its GsGetTimInfo reports (from y 0x1E0, >> sTimClutRowShift, 16
  * bytes a step past +0x34); then mark +0x38 and the active driver's
  * setFlag. */
 typedef struct Image43CB8 {      /* LIBGS.H GsIMAGE */
@@ -65,7 +65,7 @@ typedef struct Obj43CB8 {
 } Obj43CB8;
 
 extern Tim43CB8 *New_TimImage(char *name);
-extern s16 gTimClutRowShift;
+extern s16 sTimClutRowShift;
 
 void TimArraySrc__BuildImages(Obj43CB8 *self) {
     Image43CB8 info;
@@ -84,7 +84,7 @@ void TimArraySrc__BuildImages(Obj43CB8 *self) {
                 (*objs)->buffer = (u8 *)self->buffer + *offs;
                 (*objs)->bufferSize = 0;
                 (*objs)->methods->getTimInfo(*objs, &info);
-                (*objs)->clutBase = ((info.cy - 0x1E0) >> gTimClutRowShift) * 16 + self->base;
+                (*objs)->clutBase = ((info.cy - 0x1E0) >> sTimClutRowShift) * 16 + self->base;
                 offs++;
                 objs++;
             }

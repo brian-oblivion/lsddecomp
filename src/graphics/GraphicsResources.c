@@ -515,7 +515,7 @@ void TimArraySrc__Finalize(TimArraySrc *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-extern s16 gTimClutRowShift;
+extern s16 sTimClutRowShift;
 
 /* A TimArraySrc's buffer: an image count, then each image's byte offset
  * from the start of the buffer. */
@@ -545,7 +545,7 @@ void TimArraySrc__BuildImages(TimArraySrc *self) {
                 (*objs)->bufferSize = 0;
                 (*objs)->methods->getTimInfo(*objs, &info);
                 (*objs)->clutBase =
-                    ((info.cy - CLUT_FADE_Y) >> gTimClutRowShift) * sizeof(TimBlockSrcEntry) +
+                    ((info.cy - CLUT_FADE_Y) >> sTimClutRowShift) * sizeof(TimBlockSrcEntry) +
                     self->clutBase;
                 offs++;
                 objs++;
