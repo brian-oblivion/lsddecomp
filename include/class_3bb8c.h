@@ -32,10 +32,6 @@
  * reading of the same name in any of them would collide.
  */
 
-/* ---- the pool allocator ------------------------------------------ */
-
-extern void *BMemPMgrAlloc(s32 size);
-
 /* ---- TitleMenu --------------------------------------------------- */
 
 /* TitleMenu's menu description, a TaskCoreTarget: TitleMenu__TitleMenu
