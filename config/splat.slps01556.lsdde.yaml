@@ -100,7 +100,7 @@ segments:
       # slot can see, so they are attached to the unit that owns them.
       # (Round 14's shared-slot dance, docs/PARALLEL-RUNS.md Gate 2.)
       - [0xFD8, rodata]   # D_800107D8, D_800107F4 -> code_179d8_q / _h, NOT ours
-      - [0x1010, .rodata, CdDriver]   # jtbl_80010810, jtbl_80010828
+      - [0x1010, .rodata, code_179d8_o]   # jtbl_80010810, jtbl_80010828
       # ROUND 34 (head): libcd/sys's .rdata is the 5-byte "none" at 0x1040
       # (vram 0x80010840, D_80010840 -- referenced only from sys's own text).
       # It ends at 0x1045; retail has three zero bytes and the plain
