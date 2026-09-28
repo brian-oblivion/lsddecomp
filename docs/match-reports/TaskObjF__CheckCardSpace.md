@@ -59,5 +59,5 @@ and made things worse).
 
 ## Constants (round 98, track 7)
 
-The retry count 10 is `MEMCARD_RETRIES` (include/TaskObjF.h, "Attempts
+The retry count 10 is `MEMCARD_RETRIES` (include/task_objf.h, "Attempts
 after the first before a card operation gives up"). Zero bytes changed.

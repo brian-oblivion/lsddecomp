@@ -82,6 +82,6 @@ TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus
 
 Constants: `event < 0x18` / `>= 0x16` / `== 0x16` are
 `<= TASKOBJF_STATE_ABORTED` / `>= TASKOBJF_STATE_DONE` / `==
-TASKOBJF_STATE_DONE` (include/TaskObjF.h's TaskObjFState: the event is
+TASKOBJF_STATE_DONE` (include/task_objf.h's TaskObjFState: the event is
 the state TaskObjF's setState notifies its parents with). Byte-identical
 (`<= 0x17` compiles to the same `slti 0x18`).

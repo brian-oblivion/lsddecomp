@@ -20,7 +20,7 @@
  * StampSaveTitleDay (called from the ctor with the current day) writes the
  * day as three full-width digits into the save title, "LSD   Day001".
  *
- * TaskObjF (include/TaskObjF.h) is the memory-card task TitleMenu's SAVE
+ * TaskObjF (include/task_objf.h) is the memory-card task TitleMenu's SAVE
  * and LOAD drive: its allocator and ctor, then its child links, card
  * events, checks and file probes, then its file I/O, buffers and the two
  * operations, and last its state machine, its getter and
@@ -45,7 +45,7 @@
 #include "VabStreamObj.h"
 #include "TextRow.h"
 #include "tim_image.h"
-#include "TaskObjF.h"
+#include "task_objf.h"
 #include <kernel.h>
 #include <sys/file.h>
 #include "basic_class.h"
@@ -281,7 +281,7 @@ void StampSaveTitleDay(s32 day) {
 /*
  * TitleMenu's methods (include/TitleMenu.h; its allocator and ctor are
  * above) and its getter, then TaskObjF's allocator and ctor
- * (include/TaskObjF.h).
+ * (include/task_objf.h).
  *
  * TitleMenu is the TaskCore menu between days: START, FLASHBACK, SAVE, LOAD,
  * GRAPH and SHAKE over ETC\TITLE.TIM. In ROM order here: finalize, onNotify,
@@ -585,7 +585,7 @@ void TaskObjF__TaskObjF(TaskObjF *self, s32 padEnable, s32 cardSlot) {
 
 /*
  * TaskObjF's child links, card events, card checks and file probes
- * (include/TaskObjF.h: slots +0x00C..+0x018 and +0x040..+0x060, and the
+ * (include/task_objf.h: slots +0x00C..+0x018 and +0x040..+0x060, and the
  * helpers they call), in address order:
  *
  * - Children. TaskObjF__AddChild files a child by its class id into one of
@@ -906,7 +906,7 @@ s32 TaskObjF__ProbeCardFreeSpace(TaskObjF *self, u8 iconFrames, s32 size) {
 
 /*
  * TaskObjF's file I/O, card events, load buffers and its two operations
- * (include/TaskObjF.h: slots +0x064..+0x078 and the +0x038 onNotify
+ * (include/task_objf.h: slots +0x064..+0x078 and the +0x038 onNotify
  * override), in address order:
  *
  * - Memory-card files. TaskObjF__ReadMemcardFile and

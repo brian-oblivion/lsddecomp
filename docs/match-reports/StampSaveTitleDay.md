@@ -131,7 +131,7 @@ same record title_menu's StampSaveTitleFileLetter copies, so the three
 types (`FullWidthChar`, `FullWidthChars3`, `FullWidthChars6`) moved from
 title_menu.c into `include/TitleMenu.h`: the save title is TitleMenu's
 buffer (its banner: createSaveTitle builds `saveTitle` from the SJIS title
-in sSaveTitle's buffer; both writers serve it), and `TaskObjF.h` only sees
+in sSaveTitle's buffer; both writers serve it), and `task_objf.h` only sees
 a `char *title` passed in. Alignment is still 1 (all-`s8` leaves), so the
 copy is still one `lwl`/`lwr` word plus two `lb`/`sb` pairs, as derived
 above; the header keeps the one `MATCHING:` line. Image byte-identical.

@@ -231,7 +231,7 @@ exact purpose is not re-derived here.
 
 ## Track 4 (2026-09-26, round 89)
 
-Parameters retyped with TaskObjF's unification (include/TaskObjF.h), byte-identical: `a1` is `char *fileName` (TaskObjF::fileName; BuildMemcardPath's suffix), `handle` is `char *title` (TaskObjF::title; strcpy'd into the header), `arg5` is `struct TimImage *icon` (TaskObjF::iconImage, from TitleMenu's iconHandle; the icon source is its FileResource `buffer`, +0x010, so the local McIconSourceRef view is gone), `arg6` is `void *data` and `arg7` is `s32 size`. Only StampSaveTitleFileLetter's own `(s32, s32)` view still takes casts.
+Parameters retyped with TaskObjF's unification (include/task_objf.h), byte-identical: `a1` is `char *fileName` (TaskObjF::fileName; BuildMemcardPath's suffix), `handle` is `char *title` (TaskObjF::title; strcpy'd into the header), `arg5` is `struct TimImage *icon` (TaskObjF::iconImage, from TitleMenu's iconHandle; the icon source is its FileResource `buffer`, +0x010, so the local McIconSourceRef view is gone), `arg6` is `void *data` and `arg7` is `s32 size`. Only StampSaveTitleFileLetter's own `(s32, s32)` view still takes casts.
 
 ## Round 95 (track 7, charlie)
 
@@ -239,7 +239,7 @@ Parameters retyped with TaskObjF's unification (include/TaskObjF.h), byte-identi
 
 `a3` -> `iconFrames` (the vtable slot's name, and TaskObjF::iconFrames is
 what setState passes), `count` -> `retries`, `10` -> `MEMCARD_RETRIES`.
-The prototype in include/TaskObjF.h still says `char a3`: proposed to the
+The prototype in include/task_objf.h still says `char a3`: proposed to the
 head (the header is shared with echo this round, so edits there are
 additive only). The `(s32)` casts on StampSaveTitleFileLetter's arguments
 come from its `(s32, s32)` prototype in include/class_3bb8c.h: proposed.

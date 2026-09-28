@@ -32,7 +32,7 @@
  * selectedIndex, then state 0xE) and ends on result 3 (state 0x17, a
  * terminal state). The strings are TaskObjF's `titles`, the titles of the
  * save files already on the memory card, so in the game this is the
- * load-file picker (include/TaskObjF.h, beginLoad). It is TextEntry's
+ * load-file picker (include/task_objf.h, beginLoad). It is TextEntry's
  * sibling, driven the same way: slots +0x044..+0x060 and fields
  * +0x02C..+0x03C line up one for one (include/TextEntry.h).
  *

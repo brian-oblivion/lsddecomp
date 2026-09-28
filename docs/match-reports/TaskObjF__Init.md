@@ -36,5 +36,5 @@ is set up by a caller outside this unit, not fully visible from
 ## Round 95 (track 7, charlie)
 
 Pointer fields cleared with `NULL`, `state`/`opMode` with
-`TASKOBJF_STATE_IDLE`/`TASKOBJF_OP_NONE` (include/TaskObjF.h, added this
+`TASKOBJF_STATE_IDLE`/`TASKOBJF_OP_NONE` (include/task_objf.h, added this
 round). Zero bytes.

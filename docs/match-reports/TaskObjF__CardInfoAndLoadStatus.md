@@ -60,6 +60,6 @@ None new.
 
 ## Round 98 (track 7)
 
-The source declares it `s32` (as TaskObjF.h does) with the body still
+The source declares it `s32` (as task_objf.h does) with the body still
 falling off the end, and a MATCHING line says why: it returns whatever the
 last call left in `$v0`, and an explicit return adds two words.

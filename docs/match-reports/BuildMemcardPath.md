@@ -130,7 +130,7 @@ The forward declaration's comment, replaced by one line:
 ```c
 /* Forward declarations: these are defined later in this file (strict
  * ROM-address order), but earlier functions call them. The class's own
- * methods are prototyped in include/TaskObjF.h (track 4, round 89); these
+ * methods are prototyped in include/task_objf.h (track 4, round 89); these
  * two are the unit's plain helpers.
  *
  * `BuildMemcardPath`'s entry here fixes a real Gate-0 warning (round 60):

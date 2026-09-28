@@ -1,5 +1,5 @@
-#ifndef TASKOBJF_H
-#define TASKOBJF_H
+#ifndef TASK_OBJF_H
+#define TASK_OBJF_H
 
 #include "basic_class.h"
 

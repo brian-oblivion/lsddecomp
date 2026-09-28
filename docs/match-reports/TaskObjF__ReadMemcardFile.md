@@ -51,7 +51,7 @@ the body plus the callee's own established behaviour.
 
 ### Naming
 
-`count` -> `retries`; the `10` is `MEMCARD_RETRIES` (include/TaskObjF.h:
+`count` -> `retries`; the `10` is `MEMCARD_RETRIES` (include/task_objf.h:
 attempts after the first; the loop runs 11 times). Zero bytes.
 
 ### Moved from src/ui/title_menu.c
@@ -61,7 +61,7 @@ here; the new banner describes the file only):
 
 ```c
 /*
- * title_menu: `TaskObjF` methods (include/TaskObjF.h, track 4 round 89),
+ * title_menu: `TaskObjF` methods (include/task_objf.h, track 4 round 89),
  * slots +0x064..+0x078 and the +0x038 onNotify override, with the unit's
  * helpers:
  *

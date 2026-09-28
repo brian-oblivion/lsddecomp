@@ -182,7 +182,7 @@ are kept as literals rather than invented enum names.
 
 Parameter `arg1` -> `state`, `ret` -> `ok`. The state codes are now
 `enum TaskObjFState` and `opMode` `enum TaskObjFOpMode` (both
-`include/TaskObjF.h`, added this round). The states are no longer
+`include/task_objf.h`, added this round). The states are no longer
 anonymous: `loadCardIcon(self, state)` draws `CARD\<sCardIconNames[state]>.TIM`,
 and the table's strings name every message state (measured from the
 executable: 2 NOCONECT, 3 ERROR, 4 CHANGE, 5 UNFORM1, 6 UNFORM2, 7 FORMING,

@@ -322,8 +322,8 @@ the reading that TaskObjF__OpenAndReadMemcardFile made a 2-argument call)."
 
 Constants: `open(path, 1)` is `O_RDONLY` (`<sys/file.h>`, as
 title_menu.c's TryReadMemcardFile spells it); the 0x80 allocation and
-read are `MEMCARD_SECTOR_SIZE` (include/TaskObjF.h), the title sector;
+read are `MEMCARD_SECTOR_SIZE` (include/task_objf.h), the title sector;
 the path buffer is `char[32]` (was `s32[8]`, byte-identical). The `+ 4`
 is the save header's title (`McSaveHeader::title`, which title_menu.c
 defines locally); the head has the proposal to move that struct into
-TaskObjF.h so this reads `header->title`. Zero bytes changed.
+task_objf.h so this reads `header->title`. Zero bytes changed.

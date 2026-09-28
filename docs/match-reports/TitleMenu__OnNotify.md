@@ -77,6 +77,6 @@ then `andi 0xF`) and `s32 event`.
 
 ## Track 7 (round 96, echo)
 
-Constant: the `0xB` is `TASKOBJF_CLASS_ID` (include/TaskObjF.h, added:
+Constant: the `0xB` is `TASKOBJF_CLASS_ID` (include/task_objf.h, added:
 gTaskObjFMethods word +0x000 is 0xB, a single-nibble id, so `& 0xF` is its
 kind-of test). The 0xF mask stays a literal.

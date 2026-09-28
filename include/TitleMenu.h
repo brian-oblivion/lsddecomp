@@ -47,7 +47,7 @@
  * before cell 9; cycleSaveTitleColor lights one colour channel a frame.
  *
  * The memory card. beginCardAccess makes `saveIcon` (CARD\FILEICN1.TIM) and
- * `saveCtrl` (a TaskObjF, include/TaskObjF.h) on first use, inits saveCtrl
+ * `saveCtrl` (a TaskObjF, include/task_objf.h) on first use, inits saveCtrl
  * with the product code "BISLPS-01556", the file suffix table, the pad and
  * clock sources (initArgs->pad, frameClock), lightRig as sprite parent and `sound`,
  * and hands input to it: saveCtrl is added as a child and the pad and
