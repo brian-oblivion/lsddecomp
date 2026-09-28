@@ -24,7 +24,7 @@ void Entity__MoodCue51(Entity *this, EntityMoodHandlerArg *out) {
     if (this->unkFC == 0x5A) {
         table = ROTATION_YAW_MINUS90;
     } else if (this->unkFC == 0xA0) {
-        table = ROTATION_YAW_PLUS90;
+        table = sRotationYawPlus90;
     } else if (this->unkFC == 0xDC) {
         if (rand() & 1) {
             table = ROTATION_YAW_PLUS180;

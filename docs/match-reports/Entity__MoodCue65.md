@@ -17,7 +17,7 @@ void Entity__MoodCue65(Entity *this, EntityMoodHandlerArg *out) {
         if (rand() % 3 == 0) {
             this->methods->slot48(this, 1, SCALE_HALF);
             this->methods->slotCC(this, -0x12C, 0);
-            this->methods->slot44(this, 1, ROTATION_YAW_PLUS90);
+            this->methods->slot44(this, 1, sRotationYawPlus90);
             this->unk44 = 0xB;
         }
     }
@@ -44,7 +44,7 @@ to scaling the remainder by a further constant.
 (`void`, `(self, s32, void*)`), and `slotC4` (`void`) are all pre-existing
 vtable slot types from earlier work in this unit and `Entity`; every
 call here discards its return value, consistent with those slots' existing
-types. `ROTATION_YAW_PLUS90` already has an extern/callsite later in this same file
+types. `sRotationYawPlus90` already has an extern/callsite later in this same file
 (`Entity__MoodCue73`); `SCALE_HALF` and `ROTATION_YAW_MINUS90` are new per-unit `extern
 u8 [];` data-table externs, same convention as the rest of this file.
 

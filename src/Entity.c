@@ -654,7 +654,7 @@ void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
             turn = ROTATION_YAW_MINUS90;
         }
         if (this->moodTimer == 3180) {
-            turn = ROTATION_YAW_PLUS90;
+            turn = sRotationYawPlus90;
         }
         if (this->moodTimer == 3600) {
             turn = ROTATION_YAW_MINUS90;
@@ -679,7 +679,7 @@ void Entity__MoodCue11(Entity *this, SoundCueSet *out) {
     }
     if (this->moodTimer == 1560) {
         if ((rand() & 1) != 0) {
-            turn = ROTATION_YAW_PLUS90;
+            turn = sRotationYawPlus90;
             this->state = 11;
         } else {
             turn = ROTATION_YAW_MINUS90;
@@ -774,7 +774,7 @@ void Entity__MoodCue16(Entity *this) {
             roll = rand() & 1;
             turn = ROTATION_YAW_MINUS90;
             if (roll != 0) {
-                turn = ROTATION_YAW_PLUS90;
+                turn = sRotationYawPlus90;
             }
             this->methods->updateRotation(this, 0, turn);
             this->methods->addTranslation(this, TRANSLATE_Y_PLUS256);
@@ -783,7 +783,7 @@ void Entity__MoodCue16(Entity *this) {
         }
     } else if (this->state == 11) {
         if (this->moodTimer % 5 == 0) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
+            this->methods->updateRotation(this, 0, sRotationYawPlus90);
         }
         this->methods->moveLocalZ(this, -2048, 0);
         this->methods->setDisplay(this, (rand() % 7) == 0);
@@ -1210,7 +1210,7 @@ void Entity__MoodCue40(Entity *this, SoundCueSet *out) {
     } else if (this->moodTimer == 400) {
         table = ROTATION_YAW_PLUS180;
     } else if (this->moodTimer == 600) {
-        table = ROTATION_YAW_PLUS90;
+        table = sRotationYawPlus90;
     } else if (this->moodTimer == 800) {
         table = ROTATION_YAW_PLUS180;
         this->moodTimer = -1;
@@ -1477,7 +1477,7 @@ void Entity__MoodCue51(Entity *this, SoundCueSet *out) {
     if (this->moodTimer == 90) {
         table = ROTATION_YAW_MINUS90;
     } else if (this->moodTimer == 160) {
-        table = ROTATION_YAW_PLUS90;
+        table = sRotationYawPlus90;
     } else if (this->moodTimer == 220) {
         if (rand() & 1) {
             table = ROTATION_YAW_PLUS180;
@@ -1805,7 +1805,7 @@ void Entity__MoodCue65(Entity *this, SoundCueSet *out) {
         if (rand() % 3 == 0) {
             this->methods->updateScale(this, 1, SCALE_HALF);
             this->methods->moveLocalY(this, -300, 0);
-            this->methods->updateRotation(this, 1, ROTATION_YAW_PLUS90);
+            this->methods->updateRotation(this, 1, sRotationYawPlus90);
             this->state = 11;
         }
     }
@@ -1933,7 +1933,7 @@ void Entity__MoodCue71(Entity *this, SoundCueSet *out) {
 void Entity__MoodCue73(Entity *this, SoundCueSet *out) {
     out->attenuation = 0;
     if (out->tick == 0) {
-        ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, ROTATION_YAW_PLUS90);
+        ((DreamSys *)this->peer)->methods->updateRotation((DreamSys *)this->peer, 1, sRotationYawPlus90);
         ((DreamSys *)this->peer)->methods->clearTickCallbacks((DreamSys *)this->peer, true);
         out->slots[0].program = 25;
         out->slots[1].program = 25;
@@ -2023,7 +2023,7 @@ void Entity__MoodCue77(Entity *this, SoundCueSet *out) {
     if (this->state == 0) {
         if (this->moodTimer == 60 || this->moodTimer == 212 || this->moodTimer == 290 ||
             this->moodTimer == 320) {
-            this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
+            this->methods->updateRotation(this, 0, sRotationYawPlus90);
         }
         if (this->moodTimer == 398) {
             this->methods->updateRotation(this, 0, ROTATION_YAW_MINUS90);
@@ -2032,7 +2032,7 @@ void Entity__MoodCue77(Entity *this, SoundCueSet *out) {
         return;
     }
     if (this->moodTimer == 60 || this->moodTimer == 140) {
-        this->methods->updateRotation(this, 0, ROTATION_YAW_PLUS90);
+        this->methods->updateRotation(this, 0, sRotationYawPlus90);
     }
     if (this->moodTimer < 174) {
         this->methods->moveLocalZOrFindLink(this, -50, 0);

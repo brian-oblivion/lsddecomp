@@ -92,7 +92,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
             row = ROTATION_YAW_MINUS90;
         }
         if (this->unkFC == 0xC6C) {
-            row = ROTATION_YAW_PLUS90;
+            row = sRotationYawPlus90;
         }
         if (this->unkFC == 0xE10) {
             row = ROTATION_YAW_MINUS90;
@@ -117,7 +117,7 @@ void Entity__MoodCue11(Entity *this, EntityMoodHandlerArg *out) {
     }
     if (this->unkFC == 0x618) {
         if ((rand() & 1) != 0) {
-            row = ROTATION_YAW_PLUS90;
+            row = sRotationYawPlus90;
             this->unk44 = 0xB;
         } else {
             row = ROTATION_YAW_MINUS90;
@@ -202,7 +202,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 4b (round 93, charlie) — 2026-09-26
 
-The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `row`, which only ever holds `ROTATION_YAW_MINUS90`/`ROTATION_YAW_PLUS90` or 0 and is passed to `updateRotation`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.
+The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `row`, which only ever holds `ROTATION_YAW_MINUS90`/`sRotationYawPlus90` or 0 and is passed to `updateRotation`, is now `Ratio16 *` (was `u8 *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green.
 
 ## Track 7 (round 94, delta)
 

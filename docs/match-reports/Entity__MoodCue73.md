@@ -14,7 +14,7 @@ exercised as a *call site* in this unit).
 void Entity__MoodCue73(Entity *this, EntityMoodHandlerArg *out) {
     out->unk10 = 0;
     if (out->unk4 == 0) {
-        this->unk94->methods->slot44(this->unk94, 1, ROTATION_YAW_PLUS90);
+        this->unk94->methods->slot44(this->unk94, 1, sRotationYawPlus90);
         this->unk94->methods->slot130(this->unk94, 1);
         out->unk1C = 0x19;
         out->unk30 = 0x19;
