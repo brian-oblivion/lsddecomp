@@ -50,7 +50,7 @@
 #include "TodSet.h"
 #include "TriggerWorld.h"
 #include "tim_image.h"
-#include "TimArraySrc.h"
+#include "tim_array_src.h"
 #include "bg_layer.h"
 #include "tile_map.h"
 #include "tile_atlas.h"

@@ -34,4 +34,4 @@ void *GetTimArraySrcMethods(void) {
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
-Class unified as TimArraySrc: returns `TimArraySrcMethods *` (`&gTimArraySrcMethods`, declared in include/TimArraySrc.h) instead of `void *` over a local `extern s32 gTimArraySrcMethods[]`, which is deleted. Byte-identical.
+Class unified as TimArraySrc: returns `TimArraySrcMethods *` (`&gTimArraySrcMethods`, declared in include/tim_array_src.h) instead of `void *` over a local `extern s32 gTimArraySrcMethods[]`, which is deleted. Byte-identical.

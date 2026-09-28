@@ -82,7 +82,7 @@ Verbatim as it stood before the round-93 comment pass; the new banner says what 
  *     track 4, round 89).
  *   - TimArraySrc  (gTimArraySrcMethods): an array of TimImage objects
  *     (tim_image.c's New_TimImage), one per TimBlockSrc block
- *     (include/TimArraySrc.h, track 4, round 88).
+ *     (include/tim_array_src.h, track 4, round 88).
  *   - Tod / TodSet (gTodMethods / gTodSetMethods, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
  *     of them; named from src/world/tod_actor.c's own "TOD set" (Unk30Obj).

@@ -14,7 +14,7 @@
  * its first 0x24 bytes are a header -- a block count, the blocks' file
  * offsets from +0x04, their sizes from +0x14 (FindMaxTimBlockSize) -- copied
  * into `buffer`. Each block is then read into `sector` and handed to a new
- * TimArraySrc (gTimArraySrcMethods, include/TimArraySrc.h), whose clutBase is
+ * TimArraySrc (gTimArraySrcMethods, include/tim_array_src.h), whose clutBase is
  * `entries`, into `blocks`.
  *
  * Fading. `entries[i]` is CLUT row i's fade ramp: `mask` (1 << shift) rows

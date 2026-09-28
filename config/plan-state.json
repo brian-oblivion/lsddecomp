@@ -1085,7 +1085,7 @@
         "gTimArraySrcMethods": {
           "class": "TimArraySrc",
           "date": "2026-09-26",
-          "header": "include/TimArraySrc.h"
+          "header": "include/tim_array_src.h"
         },
         "gTimBlockSrcMethods": {
           "class": "TimBlockSrc",

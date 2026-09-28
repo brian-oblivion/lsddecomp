@@ -1,5 +1,5 @@
-#ifndef TIMARRAYSRC_H
-#define TIMARRAYSRC_H
+#ifndef TIM_ARRAY_SRC_H
+#define TIM_ARRAY_SRC_H
 
 #include "file_resource.h"
 

@@ -46,7 +46,7 @@ void *New_TimArraySrc(s32 arg0) {
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
-Class unified as TimArraySrc (include/TimArraySrc.h). Now declared `TimArraySrc *New_TimArraySrc(char *name)` and calls the prototyped `GetTimArraySrcMethods()->ctor(obj, name)` instead of casting the table to the unit-local UnprototypedCtorTable: the ctor's second parameter is `name` (TimArraySrc__TimArraySrc passes it to requestLoadFile) and the one caller, TimBlockSrc__AdvanceLoadState, passes 0 (now NULL). Byte-identical.
+Class unified as TimArraySrc (include/tim_array_src.h). Now declared `TimArraySrc *New_TimArraySrc(char *name)` and calls the prototyped `GetTimArraySrcMethods()->ctor(obj, name)` instead of casting the table to the unit-local UnprototypedCtorTable: the ctor's second parameter is `name` (TimArraySrc__TimArraySrc passes it to requestLoadFile) and the one caller, TimBlockSrc__AdvanceLoadState, passes 0 (now NULL). Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

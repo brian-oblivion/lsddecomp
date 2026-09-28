@@ -113,7 +113,7 @@ local `extern` of New_TimImage are deleted; `objs` is `TimImage **`,
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
-Class unified as TimArraySrc (include/TimArraySrc.h); the unit-local Obj43CB8 view is deleted and its fields kept their names except base -> clutBase (+0x034): its one writer, TimBlockSrc__AdvanceLoadState, stores the address of its own four CLUT fade ramps (`entries`) there, and this body adds 16 bytes per CLUT row to it for each TimImage's clutBase. Kept s32, as TimImage's clutBase is. Byte-identical.
+Class unified as TimArraySrc (include/tim_array_src.h); the unit-local Obj43CB8 view is deleted and its fields kept their names except base -> clutBase (+0x034): its one writer, TimBlockSrc__AdvanceLoadState, stores the address of its own four CLUT fade ramps (`entries`) there, and this body adds 16 bytes per CLUT row to it for each TimImage's clutBase. Kept s32, as TimImage's clutBase is. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

@@ -41,4 +41,4 @@ void TimArraySrc__Finalize(DataSrc33808 *self) {
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
-Class unified as TimArraySrc (include/TimArraySrc.h); self retyped from DataSrc33808, unk30/unk2C read as images/count. Byte-identical.
+Class unified as TimArraySrc (include/tim_array_src.h); self retyped from DataSrc33808, unk30/unk2C read as images/count. Byte-identical.

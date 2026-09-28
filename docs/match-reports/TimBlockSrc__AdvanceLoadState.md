@@ -117,7 +117,7 @@ Occupant of FileResource's `setFlag` slot (+0x064); keeps its name because the b
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
-TimArraySrc unified (include/TimArraySrc.h): TimBlockSrc's `blocks` is now `struct TimArraySrc **`, so `p` is a TimArraySrc ** with no cast, New_TimArraySrc(NULL), the store to +0x034 is `clutBase`, and slot78 is called through TimArraySrcUploadFn. Byte-identical.
+TimArraySrc unified (include/tim_array_src.h): TimBlockSrc's `blocks` is now `struct TimArraySrc **`, so `p` is a TimArraySrc ** with no cast, New_TimArraySrc(NULL), the store to +0x034 is `clutBase`, and slot78 is called through TimArraySrcUploadFn. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 
