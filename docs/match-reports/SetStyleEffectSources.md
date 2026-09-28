@@ -14,7 +14,7 @@ never attempted before this round.
 Stashes `self` (arg1) and two more scalar args (arg2, arg3) into `.sbss`
 globals `gStyleEffectTmd`/`gStyleEffectTim`/`gStyleEffectViewport`, then runs a fixed 2-iteration
 loop calling `self->methods->slot80(self, gStyleEffectModelIds[i])` and feeding the
-result plus `&gStyleEffectClutPos` (a 1-word `.sdata` constant, address-only, never
+result plus `&sStyleEffectClutPos` (a 1-word `.sdata` constant, address-only, never
 loaded) to library function `TmdModel__SetFirstPrimClut` (still `psyq_fa50.s`, unrenamed
 Psy-Q object; called with an unused return value). `arg0` (the function's
 first parameter) is never read anywhere in the body -- it is discarded, the
@@ -26,7 +26,7 @@ extern s32 gStyleEffectTmd;
 extern s32 gStyleEffectTim;
 extern s32 gStyleEffectViewport;
 extern s32 gStyleEffectModelIds[3];
-extern s32 gStyleEffectClutPos;
+extern s32 sStyleEffectClutPos;
 
 extern void TmdModel__SetFirstPrimClut(void *arg0, void *arg1);
 
@@ -40,7 +40,7 @@ void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
     i = 0;
     do {
         ret = self->methods->slot80(self, gStyleEffectModelIds[i]);
-        TmdModel__SetFirstPrimClut(ret, &gStyleEffectClutPos);
+        TmdModel__SetFirstPrimClut(ret, &sStyleEffectClutPos);
         i++;
     } while (i < 2);
 }
@@ -97,7 +97,7 @@ method: its one caller, StyleBuildEffectSlots, passes the variant (unused),
 ObjM's DREAMER.TMD resource (a LinkResource, cast to Actor), ETC.TIM and the
 viewport, and it only stores them for StyleEffect's methods and prepares
 the two models the TMD's +0x080 slot (LinkResource's getModel) returns for
-gStyleEffectModelIds[0..1] (TmdModel__SetFirstPrimClut with gStyleEffectClutPos). The stored
+gStyleEffectModelIds[0..1] (TmdModel__SetFirstPrimClut with sStyleEffectClutPos). The stored
 globals were renamed with it (one rename.py run each): D_8008ACA4 ->
 gStyleEffectTmd, D_8008ACA8 -> gStyleEffectTim, D_8008ACAC ->
 gStyleEffectViewport, D_8008AB98 -> gStyleEffectModelIds. PROPOSED (not
@@ -108,4 +108,4 @@ are really `LinkResource *`, and the `setBackClip` calls through it are
 
 ## Track 7 (round 99, alpha)
 
-Parameters named (unused, tmd, tim, viewport), in the prototype in include/Actor.h too; the local `ret` is `TmdModel *model`, and the local prototype of TmdModel__SetFirstPrimClut takes its definition's (TmdModel *, s16 *xy). `python3 tools/rename.py D_8008AB94 gStyleEffectClutPos`, **tier A**: an s16[2] VRAM position, 0x01FF03F0 = (x 1008, y 511), which TmdModel__SetFirstPrimClut turns into a CLUT id (x / 16 + y * 64) for the first primitive of each model; this function is its only accessor. The comment on the three source globals, which said "track 4b, round 85", is covered by the Track 4b section above; it now says what they are. Still PROPOSED from track 6 (bravo): `tmd` and gStyleEffectTmd are a LinkResource (the +0x080 slot is LinkResource's getModel, returning a TmdModel), which would drop the Actor view and the cast; that changes ObjMStyleActor.c's declaration too.
+Parameters named (unused, tmd, tim, viewport), in the prototype in include/Actor.h too; the local `ret` is `TmdModel *model`, and the local prototype of TmdModel__SetFirstPrimClut takes its definition's (TmdModel *, s16 *xy). `python3 tools/rename.py D_8008AB94 sStyleEffectClutPos`, **tier A**: an s16[2] VRAM position, 0x01FF03F0 = (x 1008, y 511), which TmdModel__SetFirstPrimClut turns into a CLUT id (x / 16 + y * 64) for the first primitive of each model; this function is its only accessor. The comment on the three source globals, which said "track 4b, round 85", is covered by the Track 4b section above; it now says what they are. Still PROPOSED from track 6 (bravo): `tmd` and gStyleEffectTmd are a LinkResource (the +0x080 slot is LinkResource's getModel, returning a TmdModel), which would drop the Actor view and the cast; that changes ObjMStyleActor.c's declaration too.

@@ -2746,12 +2746,12 @@ extern Actor *gStyleEffectTmd;
 extern void *gStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
 extern s32 gStyleEffectModelIds[3];
-extern s16 gStyleEffectClutPos[2];
+extern s16 sStyleEffectClutPos[2];
 
 extern void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy);
 
 /* Records the three sources, then points the first primitive of the TMD's
- * models 0 and 2 (gStyleEffectModelIds) at the CLUT at gStyleEffectClutPos. */
+ * models 0 and 2 (gStyleEffectModelIds) at the CLUT at sStyleEffectClutPos. */
 void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
     s32 i;
     TmdModel *model;
@@ -2762,7 +2762,7 @@ void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
     i = 0;
     do {
         model = (TmdModel *)tmd->methods->setBackClip(tmd, gStyleEffectModelIds[i]);
-        TmdModel__SetFirstPrimClut(model, gStyleEffectClutPos);
+        TmdModel__SetFirstPrimClut(model, sStyleEffectClutPos);
         i++;
     } while (i < 2);
 }
