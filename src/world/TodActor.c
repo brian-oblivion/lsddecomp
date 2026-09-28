@@ -40,16 +40,6 @@
  * part's coordinate parameters are Sony's GsCOORD2PARAM.
  */
 
-/* TodActor__OnNotify's sender: any object. Only its method table's header
- * word is read (the low 16 bits), compared with MODEL_DATA_CLASS_HEADER. */
-typedef struct TaggedObj {
-    u16 header; /* +0x000, the method table's header word */
-} TaggedObj;
-
-typedef struct TagCheckArg {
-    TaggedObj *methods; /* +0x000 */
-} TagCheckArg;
-
 /* Header word of gModelDataMethods (tools/classtable.py), the class New_ModelData
  * allocates and TodActor.modelData points at. */
 #define MODEL_DATA_CLASS_HEADER 0x5F03
@@ -170,13 +160,13 @@ void TodActor__Finalize(TodActor *self) {
     GetActorMethods()->finalize((Actor *)self);
 }
 
-void TodActor__OnNotify(TodActor *self, TagCheckArg *sender, s32 event) {
+void TodActor__OnNotify(TodActor *self, BasicClass *sender, s32 event) {
     ActorMethods *base;
 
     base = GetActorMethods();
     base->onNotify((Actor *)self, sender, event);
-    if (sender->methods->header == MODEL_DATA_CLASS_HEADER && event == BASICCLASS_EVENT_FINALIZED &&
-        self->ownsModelData == 0) {
+    if ((u16)sender->methods->header == MODEL_DATA_CLASS_HEADER &&
+        event == BASICCLASS_EVENT_FINALIZED && self->ownsModelData == 0) {
         self->methods->release(self);
     }
 }

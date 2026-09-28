@@ -72,7 +72,6 @@ typedef struct TodActorMethods TodActorMethods;
 struct ModelData;    /* include/ModelData.h */
 struct TodActorDesc; /* the ctor's descriptor: +0x00C a ModelData to borrow */
 struct VabStreamObj; /* include/VabStreamObj.h: the sound bank the ctor's second argument names */
-struct TagCheckArg;  /* onNotify's sender, read only for its table's low id halfword */
 
 /* Occupants in gTodActorMethods named at each slot; `tools/classtable.py
  * gEntityMethods --vs gTodActorMethods` lists Entity's overrides. The
@@ -154,7 +153,7 @@ typedef void (*TodActorAttachToParentFn)(TodActor *self, TodActor *peer, void *c
 void *New_TodActor(void *desc, void *sound);
 TodActor *TodActor__TodActor(TodActor *self, void *desc, void *sound);
 void TodActor__Finalize(TodActor *self);
-void TodActor__OnNotify(TodActor *self, struct TagCheckArg *sender, s32 event);
+void TodActor__OnNotify(TodActor *self, BasicClass *sender, s32 event);
 void TodActor__Reset(TodActor *self);
 void TodActor__AttachToParent(TodActor *self, TodActor *peer, void *companion, void *parent, void *offset);
 void TodActor__DetachFromParent(TodActor *self);
