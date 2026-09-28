@@ -201,6 +201,10 @@ extern StageSpawn *sStaircaseSpawns[];
 #define UNLOCK_SCORE_MAX 50000000
 #define DYNAMIC_LINK_PENALTY 11024
 
+/* The volume, vol and endVol, of every tone StartVoice and ExecuteLink play
+ * through the VabStreamObj's playTone. */
+#define DREAMSYS_TONE_VOLUME 110
+
 /* Defined further down, in ROM order, and called before that. */
 s32 TestForStaticLink(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
 s32 TestForTunnelLinks(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage);
@@ -824,17 +828,17 @@ void DreamSys__StartVoice(DreamSys *self) {
     heading = scratch << 4;
     headingArg = heading;
     vt->setPitchOffset(obj, sVoicePitchBySelect[idx]);
-    self->voiceIndex = vt->playTone(obj, headingArg, 110, 110);
+    self->voiceIndex = vt->playTone(obj, headingArg, DREAMSYS_TONE_VOLUME, DREAMSYS_TONE_VOLUME);
     if (self->voiceSelect != 22) {
         self->voiceIndex = -1;
     }
 
     if (self->voiceSelect == 11) {
         vt->setPitchOffset(obj, 1);
-        vt->playTone(obj, headingArg, 110, 110);
+        vt->playTone(obj, headingArg, DREAMSYS_TONE_VOLUME, DREAMSYS_TONE_VOLUME);
         vt->setPitchOffset(obj, 2);
         scratch = 9 << 4; /* program 9, tone 0 */
-        vt->playTone(obj, scratch, 110, 110);
+        vt->playTone(obj, scratch, DREAMSYS_TONE_VOLUME, DREAMSYS_TONE_VOLUME);
     }
 }
 
@@ -1168,7 +1172,7 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 linkType, s32 playSound) {
     }
     if (playSound != 0) {
         obj = (VabStreamObj *)system->soundObj;
-        obj->methods->playTone(obj, 9 << 4, 110, 110);
+        obj->methods->playTone(obj, 9 << 4, DREAMSYS_TONE_VOLUME, DREAMSYS_TONE_VOLUME);
     }
     return true;
 }
