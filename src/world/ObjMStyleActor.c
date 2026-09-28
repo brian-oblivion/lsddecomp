@@ -1043,7 +1043,7 @@ void ObjM__ClearCloseReadyFlag(ObjM *self) {
     self->closeReady = 0;
 }
 
-void ObjM__CloseAndNotifyD(ObjM *self) {
+void ObjM__CloseAndNotifyNewGame(ObjM *self) {
     if (self->closeReady) {
         self->methods->teardownPauseOverlay(self);
         self->methods->notifyParents(self, OBJM_NOTIFY_CLOSE_NEW_GAME);

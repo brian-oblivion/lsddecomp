@@ -8,7 +8,7 @@
 
 ## What this function does
 
-Same shape as `ObjM__CloseAndNotifyD` (this round), differing only in the literal
+Same shape as `ObjM__CloseAndNotifyNewGame` (this round), differing only in the literal
 passed to `slot30` (`0xC` here vs `0xD` there):
 
 ```c
@@ -22,7 +22,7 @@ void ObjM__CloseAndNotify(ObjM *self) {
 
 ## Residue
 
-None — matched on the first attempt, by copying `ObjM__CloseAndNotifyD`'s already-
+None — matched on the first attempt, by copying `ObjM__CloseAndNotifyNewGame`'s already-
 confirmed shape and changing the one literal (per DECOMPILATION_LEARNINGS'
 "when a function closely resembles an already-matched sibling, copy its
 exact idiom before deriving anything").
@@ -33,7 +33,7 @@ round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
-**ObjM__CloseAndNotify** -- tier B. Identical shape to `ObjM__CloseAndNotifyD`, differing only in the notify code (0xC). Same tier and same caveat.
+**ObjM__CloseAndNotify** -- tier B. Identical shape to `ObjM__CloseAndNotifyNewGame`, differing only in the notify code (0xC). Same tier and same caveat.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

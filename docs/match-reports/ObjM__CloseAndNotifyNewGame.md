@@ -1,4 +1,6 @@
-# ObjM__CloseAndNotifyD
+# ObjM__CloseAndNotifyNewGame
+
+> Renamed from `ObjM__CloseAndNotifyD` on 2026-09-28 (tools/rename.py). Address 0x80054208.
 
 > Renamed from `func_80054208` on 2026-09-23 (tools/rename.py). Address 0x80054208.
 
@@ -11,7 +13,7 @@ nonzero, dispatch `self->methods->slotD4(self)` then
 `self->methods->slot30(self, 0xD)`.
 
 ```c
-void ObjM__CloseAndNotifyD(ObjM *self) {
+void ObjM__CloseAndNotifyNewGame(ObjM *self) {
     if (self->unk84) {
         self->methods->slotD4(self);
         self->methods->slot30(self, 0xD);
@@ -32,7 +34,7 @@ round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
-**ObjM__CloseAndNotifyD** -- tier B. If `self->unk84`, dispatches `teardownPauseOverlay` (CONFIRMED as this unit's own `ObjM__TeardownPauseOverlay` via `tools/classtable.py 0x80087034`, +0x0D4) then `notifyParents(self, 0xD)`. Named for the confirmed mechanics; event code 0xD's game meaning is not established.
+**ObjM__CloseAndNotifyNewGame** -- tier B. If `self->unk84`, dispatches `teardownPauseOverlay` (CONFIRMED as this unit's own `ObjM__TeardownPauseOverlay` via `tools/classtable.py 0x80087034`, +0x0D4) then `notifyParents(self, 0xD)`. Named for the confirmed mechanics; event code 0xD's game meaning is not established.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

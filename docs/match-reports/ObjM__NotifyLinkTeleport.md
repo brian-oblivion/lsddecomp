@@ -21,7 +21,7 @@ void ObjM__NotifyLinkTeleport(ObjM *self) {
 ```
 
 This establishes `ObjMMethods::slot30(ObjM*, s32)`, later reused by
-`ObjM__OnFadeNotify`, `ObjM__CloseAndNotifyD` and `ObjM__CloseAndNotify` (this round, same
+`ObjM__OnFadeNotify`, `ObjM__CloseAndNotifyNewGame` and `ObjM__CloseAndNotify` (this round, same
 slot, different literal arguments each time).
 
 ## Residue
