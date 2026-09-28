@@ -197,7 +197,7 @@ extern s32 sNullDriverModeArg;
  * the size table; the tick mode; SsStart and the master volume. */
 extern s32 sVabSizeTableInited;
 extern s32 sVabStreamInited;
-extern s32 gVabVolumeInited;
+extern s32 sVabVolumeInited;
 extern s32 sOpenVabCount;     /* VabStreamObjs constructed and not yet finalized */
 extern s32 sSsTicksPerSecond; /* the SsSetTickMode rate, for callers timing in ticks */
 /* The .VH buffer, kept from the header state until LoadVagAttrs takes it
@@ -303,7 +303,7 @@ void VabStreamObj__Finalize(VabStreamObj *self) {
     }
     if (sOpenVabCount == 0 && IsWBgmActive() == 0) {
         sVabSizeTableInited = 0;
-        gVabVolumeInited = 0;
+        sVabVolumeInited = 0;
         sVabStreamInited = 0;
         SsEnd();
         SsQuit();
@@ -403,10 +403,10 @@ void VabStreamObj__LoadVagAttrs(VabStreamObj *self) {
             pool++;
         }
     }
-    if (gVabVolumeInited == 0) {
+    if (sVabVolumeInited == 0) {
         SsStart();
         SsSetMVol(VAB_MASTER_VOLUME, VAB_MASTER_VOLUME);
-        gVabVolumeInited = 1;
+        sVabVolumeInited = 1;
     }
 }
 
