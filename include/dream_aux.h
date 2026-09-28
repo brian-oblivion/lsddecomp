@@ -3,95 +3,196 @@
 
 #include "common.h"
 
-/* The dream's aux entities and chunk triggers (src/world/dream_aux.c; its banner
- * describes the subsystem). Only that unit includes this header. */
+/**
+ * @file dream_aux.h
+ * @brief The dream's auxiliary entities: one resident Entity kept near the
+ *        player, and the chunk triggers that spawn Entities as the StageMap
+ *        loads chunks.
+ *
+ * Defined in src/world/dream_aux.c, except IsStyleVariantEven
+ * (src/world/dream_scene.c). DayTask (src/world/dream_day.c) and ObjM
+ * (src/world/dream_scene.c) are its clients.
+ *
+ * Lifecycle: DayTask's ctor calls InitDreamAux, which clears every trigger
+ * record's latch and loads the resident entity's ModelData
+ * (ETC\\SYMSPY.MOM); its finalize calls ReleaseDreamAuxModels. ObjM's scene
+ * setup calls SetDreamAuxWorld with the stage, the StageMap, the player
+ * DreamSys, the VabStreamObj and the FrameClock every Entity here is built
+ * and attached with, which also builds the resident Entity; ObjM's teardown
+ * calls ReleaseDreamAuxEntities. The instant teleporters are on for stages 3
+ * and 11 and off elsewhere, and a trigger that spawns mood row 11, 56, 78 or
+ * 93 turns them on (EnableTeleportsForKind).
+ *
+ * Triggers: when the StageMap has loaded a chunk's data block, ObjM passes
+ * it to TryDreamAuxTrigger with the chunk's coordinates and the day. The
+ * chunk's DreamAuxTriggerEntry names up to three TriggerRecords; on a day
+ * its dayParity allows, a TriggerWorld is built over the data block (its
+ * models), and for each record whose condition holds
+ * (CheckDreamAuxTriggerCondition: the day, the dream colour or the style
+ * variant) one Entity per spawn index is placed in the chunk's cell
+ * (SpawnDreamAuxTriggerEntity). The TriggerWorld goes back to ObjM, which
+ * keeps it with the chunk. When the parity rules the day out, on a stage
+ * other than 0 and an even day, one time in 12 the resident entity is moved
+ * next to the player instead.
+ */
 
-/* The per-stage tables hold 14 pointers each (0x38 bytes between one
- * table's label and the next). */
+/** The stages the per-stage trigger and record tables cover. */
 #define DREAM_AUX_STAGE_COUNT 14
 
-/* Slot i's entity uses mood row DREAM_AUX_FIRST_MOOD + i. */
+/** Slot i's resident entity uses mood row DREAM_AUX_FIRST_MOOD + i. */
 #define DREAM_AUX_FIRST_MOOD 98
 
-/* The resident aux entity. InitDreamAux loads `model` (ETC\SYMSPY.MOM) and
- * SetDreamAuxWorld builds `entity` over it (New_Entity's descriptor word
- * +0x00C). `pos` is the offset from the player PlaceDreamAuxEntityByPlayer
- * puts the entity at, {0, -200, 8000} in the image. There is one slot: the
- * position table follows it at +0x14. */
+/**
+ * @brief The resident auxiliary entity. There is one slot (sDreamAuxSlots).
+ */
 typedef struct DreamAuxSlot {
-    struct ModelData *model;
-    struct Entity *entity;
-    s32 pos[3];
+    struct ModelData *model; /**< ETC\\SYMSPY.MOM, loaded by InitDreamAux. */
+    struct Entity *entity;   /**< Built over `model` by SetDreamAuxWorld. */
+    s32 pos[3]; /**< The offset from the player the entity is moved to: {0, -200, 8000}. */
 } DreamAuxSlot;
 
-/* One chunk trigger. `key` is the chunk's MapChunk (column, then row)
- * read as one s16. `dayParity` restricts the day: 0 any day, 1 odd days, 2
- * even days (CheckTriggerDayParity). `recordIndices` name up to three
- * records of the stage's TriggerRecord table, -1 ending the list early. */
+/**
+ * @brief One chunk trigger of a stage's table (sDreamAuxTriggerEntries).
+ */
 typedef struct DreamAuxTriggerEntry {
-    s16 key;
-    s8 dayParity;
-    s8 recordIndices[3];
+    s16 key;             /**< The chunk's MapChunk (column, then row) read as one s16. */
+    s8 dayParity;        /**< 0 any day, 1 odd days, 2 even days (CheckTriggerDayParity). */
+    s8 recordIndices[3]; /**< Up to three records of the stage's TriggerRecord table; -1 ends the list. */
 } DreamAuxTriggerEntry;
 
-/* TriggerRecord.condition: CheckDreamAuxTriggerCondition's tests, by id. A
- * negative condition tests -condition and passes only while the record has
+/**
+ * @brief TriggerRecord::condition: CheckDreamAuxTriggerCondition's tests, by
+ * id.
+ *
+ * A negative condition tests -condition and passes only while the record has
  * not triggered. Id 0 passes; 18, 19 and ids from 22 up reach the
- * dream-colour test and index sSpecialColors past its 8 entries. */
+ * dream-colour test and index sSpecialColors past its 8 entries.
+ */
 enum TriggerCondition {
-    TRIGGER_COND_ALWAYS = 1,
-    TRIGGER_COND_PERIOD_PHASE_1 = 2, /* 2..4: IsDayInPeriodPhase(day, id - 1) */
-    TRIGGER_COND_PERIOD_PHASE_2 = 3,
-    TRIGGER_COND_PERIOD_PHASE_3 = 4,
-    TRIGGER_COND_DAY_MOD3_IS_0 = 5,
-    TRIGGER_COND_DAY_MOD3_NOT_0 = 6,
-    TRIGGER_COND_STYLE_VARIANT_EVEN = 7, /* IsStyleVariantEven */
-    TRIGGER_COND_DAY_MOD3_IS_1 = 8,      /* 8, 9: day % 3 == id - 7 */
-    TRIGGER_COND_DAY_MOD3_IS_2 = 9,
-    TRIGGER_COND_DREAM_COLOR_FIRST = 10, /* 10..17: IsCurrentDreamColor */
-    TRIGGER_COND_EVEN_DAY = 20,
-    TRIGGER_COND_ODD_DAY = 21
+    TRIGGER_COND_ALWAYS = 1,             /**< Always passes. */
+    TRIGGER_COND_PERIOD_PHASE_1 = 2,     /**< 2..4: IsDayInPeriodPhase(day, id - 1). */
+    TRIGGER_COND_PERIOD_PHASE_2 = 3,     /**< See TRIGGER_COND_PERIOD_PHASE_1. */
+    TRIGGER_COND_PERIOD_PHASE_3 = 4,     /**< See TRIGGER_COND_PERIOD_PHASE_1. */
+    TRIGGER_COND_DAY_MOD3_IS_0 = 5,      /**< day % 3 == 0. */
+    TRIGGER_COND_DAY_MOD3_NOT_0 = 6,     /**< day % 3 != 0. */
+    TRIGGER_COND_STYLE_VARIANT_EVEN = 7, /**< IsStyleVariantEven. */
+    TRIGGER_COND_DAY_MOD3_IS_1 = 8,      /**< day % 3 == 1. */
+    TRIGGER_COND_DAY_MOD3_IS_2 = 9,      /**< day % 3 == 2. */
+    TRIGGER_COND_DREAM_COLOR_FIRST = 10, /**< 10..17: IsCurrentDreamColor(id). */
+    TRIGGER_COND_EVEN_DAY = 20,          /**< An even day. */
+    TRIGGER_COND_ODD_DAY = 21            /**< An odd day. */
 };
 
-/* One spawn record of a stage's table (sDreamAuxGroupRecords[stage], 8-byte
- * stride). `triggered` latches once `condition` has passed; InitDreamAux
- * clears every latch. `modelIndex` picks the ModelData of the chunk's
- * TriggerWorld, and each of `spawnIndices` (-1 ends the list) one
- * sDreamAuxSpawnInfo placement for an Entity of mood row `moodIndex`. A
- * record whose moodIndex is 2 is followed by the one seven records on. */
+/**
+ * @brief One spawn record of a stage's table (sDreamAuxGroupRecords[stage]).
+ * A record whose moodIndex is 2 is followed by the one seven records on.
+ */
 typedef struct TriggerRecord {
-    s8 triggered;
-    s8 condition;
-    s8 modelIndex;
-    u8 moodIndex;
-    s8 spawnIndices[4];
+    s8 triggered;  /**< Latched once `condition` has passed; InitDreamAux clears every latch. */
+    s8 condition;  /**< enum TriggerCondition, negated to fire only once. */
+    s8 modelIndex; /**< The ModelData of the chunk's TriggerWorld. */
+    u8 moodIndex;  /**< The spawned Entities' mood row. */
+    s8 spawnIndices[4]; /**< sDreamAuxSpawnInfo placements, one Entity each; -1 ends the list. */
 } TriggerRecord;
 
+/**
+ * @brief Tests `record`'s condition against `day` and latches `triggered`
+ * when it passes.
+ * @param day    The dream day.
+ * @param record The record to test.
+ * @return Whether the condition holds.
+ */
 extern bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record);
-/* `desc` is New_Entity's descriptor, forwarded untouched; the caller has
- * put the ModelData in its word +0x00C. */
+
+/**
+ * @brief Makes an Entity of mood row `moodIndex`, turns it and attaches it
+ * at placement `spawnIndex` inside `trigger`'s chunk.
+ * @param moodIndex  The Entity's mood row.
+ * @param desc       New_Entity's descriptor, forwarded untouched; word
+ *                   +0x00C holds the ModelData.
+ * @param trigger    The chunk's trigger.
+ * @param spawnIndex The sDreamAuxSpawnInfo placement.
+ * @return True when New_Entity failed.
+ */
 extern bool SpawnDreamAuxTriggerEntity(s32 moodIndex, void *desc, DreamAuxTriggerEntry *trigger,
                                        s32 spawnIndex);
+
+/**
+ * @brief Turns the instant teleporters on when `moodIndex` is 11, 56, 78 or
+ * 93.
+ * @param moodIndex The spawned Entity's mood row.
+ */
 extern void EnableTeleportsForKind(s32 moodIndex);
-extern s32 IsStyleVariantEven(void); /* dream_scene.c */
+
+/**
+ * @brief Whether the style variant PickStyleFallbackConfig chose is even
+ * (a stage with a fixed style config keeps variant -1, which is odd).
+ * @return 1 for an even variant, else 0.
+ */
+extern s32 IsStyleVariantEven(void);
+
+/**
+ * @brief Whether the player's dream colour is sSpecialColors' entry for
+ * trigger condition `condition`.
+ * @param condition TRIGGER_COND_DREAM_COLOR_FIRST and up.
+ * @return Whether the colours are equal.
+ */
 extern bool IsCurrentDreamColor(s32 condition);
+
+/**
+ * @brief Whether `day`'s 30-day period, counted from 1, is phase, phase + 3,
+ * phase + 6 or phase + 9: with phase 1..3, every third period of the 12.
+ * @param day   The dream day, from 1.
+ * @param phase 1, 2 or 3.
+ * @return Whether the day's period is in that phase.
+ */
 extern bool IsDayInPeriodPhase(s32 day, s32 phase);
 
-/* What the rest of the game calls. InitDreamAux loads the aux models and
- * ReleaseDreamAuxModels frees them (DayTask's ctor and finalize);
- * SetDreamAuxWorld keeps the stage, StageMap, DreamSys, sound and FrameClock
- * the aux entities use and ReleaseDreamAuxEntities releases the entities
- * (ObjM); TryDreamAuxTrigger fires the trigger of the chunk whose key (its
- * column and row bytes) `chunkKey` points at. */
 struct StageMap;
 struct DreamSys;
 struct VabStreamObj;
 struct FrameClock;
+
+/**
+ * @brief Clears every trigger record's latch and loads the resident entity's
+ * ModelData. DayTask's ctor calls it.
+ */
 extern void InitDreamAux(void);
+
+/**
+ * @brief Releases the resident entity's ModelData. DayTask's finalize calls
+ * it.
+ */
 extern void ReleaseDreamAuxModels(void);
+
+/**
+ * @brief Keeps what every auxiliary Entity is built and attached with, builds
+ * the resident Entity and sets the instant teleporters for the stage.
+ * ObjM__SetupSceneStyle calls it.
+ * @param stage      The stage.
+ * @param stageMap   The StageMap, every Entity's parent.
+ * @param world      The player's DreamSys, every Entity's peer.
+ * @param sound      The sound bank every Entity is built with.
+ * @param frameClock The FrameClock every Entity attaches as its companion.
+ */
 extern void SetDreamAuxWorld(s32 stage, struct StageMap *stageMap, struct DreamSys *world,
                              struct VabStreamObj *sound, struct FrameClock *frameClock);
+
+/**
+ * @brief Releases the resident Entity. ObjM__TeardownStyle calls it.
+ */
 extern void ReleaseDreamAuxEntities(void);
+
+/**
+ * @brief Fires the trigger of a loaded chunk: builds a TriggerWorld over the
+ * chunk's data block and spawns the Entities of every record whose condition
+ * holds, on a day the trigger's parity allows; otherwise, now and then, moves
+ * the resident entity next to the player.
+ * @param data     The chunk's data block.
+ * @param chunkKey The chunk's key (its column and row bytes).
+ * @param day      The dream day.
+ * @return The TriggerWorld, which the chunk keeps, or 0 when nothing fired.
+ */
 extern s32 TryDreamAuxTrigger(s32 data, s16 *chunkKey, s32 day);
 
 #endif

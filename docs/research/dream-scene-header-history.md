@@ -75,3 +75,13 @@ sActorLocalMoveZ); the header now names the symbol only:
 The banner also listed each override with its occupant in a table, and
 said GraphRoomResetCallFn was "No code"; the method table's doc block and
 the prototypes' @briefs now carry the overrides.
+
+### Corrections
+
+`include/dream_aux.h` opened with "Only that unit includes this header"
+(meaning src/world/dream_aux.c). Measured with
+`grep -ln '"dream_aux.h"' src/*/*.c`: src/world/dream_aux.c,
+src/world/dream_day.c and src/world/dream_scene.c include it, so it is a
+shared header and stays one; its `@file` block now names its clients. The
+subsystem description that was `src/world/dream_aux.c`'s banner moved into
+that `@file` block.
