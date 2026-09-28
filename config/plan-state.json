@@ -348,6 +348,10 @@
     "10": {
       "checklist": {
         "conventions": true,
+        "debt-app-cd": true,
+        "debt-graphics": true,
+        "debt-ui-sound": true,
+        "debt-world": true,
         "prototypes": true,
         "sony-code": true,
         "tabs": true
