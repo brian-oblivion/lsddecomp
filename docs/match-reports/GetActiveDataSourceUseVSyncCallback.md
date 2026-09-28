@@ -18,15 +18,15 @@ Same `if`/`else` tail-call shape as `GetActiveDataSourceMethods`/`GetActiveDataS
 
 ```
 beq $v1, $v0(0x13), .L8002700C   # equal -> GetCdUseVSyncCallback
-  jal GetVabUseVSyncCallback                # fallthrough (not equal)
+  jal GetNullDriverUseVSyncCallback                # fallthrough (not equal)
   j .L80027014
 .L8002700C:
   jal GetCdUseVSyncCallback
 .L80027014:
 ```
 
-`GetVabUseVSyncCallback` is independently confirmed non-void elsewhere in the repo:
-`src/sound/PlacementGridVabSound.c` has `s32 GetVabUseVSyncCallback(void) { return 0; }`. This is
+`GetNullDriverUseVSyncCallback` is independently confirmed non-void elsewhere in the repo:
+`src/sound/PlacementGridVabSound.c` has `s32 GetNullDriverUseVSyncCallback(void) { return 0; }`. This is
 the direct positive evidence CLAUDE.md asks for -- the else-arm really does
 return `s32`, so the whole function (and, by the same shape, its two
 siblings `GetActiveDataSourceMethods`/`GetActiveDataSourceDriverMode`) is correctly typed non-void, not
@@ -37,13 +37,13 @@ merely defaulted to it. `GetCdUseVSyncCallback` is still uncarved
 
 ```c
 extern s32 GetCdUseVSyncCallback(void);
-extern s32 GetVabUseVSyncCallback(void);
+extern s32 GetNullDriverUseVSyncCallback(void);
 
 s32 GetActiveDataSourceUseVSyncCallback(void) {
     if (gActiveDataSource == 0x13) {
         return GetCdUseVSyncCallback();
     } else {
-        return GetVabUseVSyncCallback();
+        return GetNullDriverUseVSyncCallback();
     }
 }
 ```
@@ -52,7 +52,7 @@ s32 GetActiveDataSourceUseVSyncCallback(void) {
 
 See `GetActiveDataSourceMethods.md`. This is the instance that upgrades the family's
 non-void typing from "CLAUDE.md-default assumption" to "independently
-confirmed": `GetVabUseVSyncCallback`'s real definition elsewhere in the tree already
+confirmed": `GetNullDriverUseVSyncCallback`'s real definition elsewhere in the tree already
 declares `s32`.
 
 ## Naming
@@ -65,6 +65,6 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 
 **Evidence.** Forwards to `GetCdUseVSyncCallback` (itself just `return
 gCdUseVSyncCallback;`, an already-named global) when the CD driver is
-active, else `GetVabUseVSyncCallback` (always `0`). The "VSync callback" framing
+active, else `GetNullDriverUseVSyncCallback` (always `0`). The "VSync callback" framing
 comes directly from that already-established global's name, generalised to
 whichever source is active.

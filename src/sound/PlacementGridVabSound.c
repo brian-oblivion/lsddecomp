@@ -159,7 +159,7 @@ void NullDriver__NoOpSlot50(void) {}
  * data source GameApplicationFileResource.c selects when it is not reading the CD; the CD
  * driver (include/CdDriver.h, 0x13) is the other. Its Read, LoadFile,
  * RunRequestQueue, RequestLoadFile, StopService and CancelRequests slots do
- * nothing. GetNullDriverMode, SetNullDriverMode and GetVabUseVSyncCallback
+ * nothing. GetNullDriverMode, SetNullDriverMode and GetNullDriverUseVSyncCallback
  * answer the queries GameApplicationFileResource.c's GetActiveDataSource* functions forward
  * to the CD driver's GetCdDriverMode, SetCdDriverMode and
  * GetCdUseVSyncCallback: they keep the two mode words and report no VSync
@@ -235,7 +235,7 @@ s32 SetNullDriverMode(s32 async, s32 mode2) {
     return 1;
 }
 
-s32 GetVabUseVSyncCallback(void) {
+s32 GetNullDriverUseVSyncCallback(void) {
     return 0;
 }
 

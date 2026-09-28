@@ -616,13 +616,13 @@ s32 GetActiveDataSourceDriverMode(void) {
 }
 
 extern s32 GetCdUseVSyncCallback(void);
-extern s32 GetVabUseVSyncCallback(void);
+extern s32 GetNullDriverUseVSyncCallback(void);
 
 s32 GetActiveDataSourceUseVSyncCallback(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdUseVSyncCallback();
     } else {
-        return GetVabUseVSyncCallback();
+        return GetNullDriverUseVSyncCallback();
     }
 }
 
