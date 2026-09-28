@@ -1,4 +1,6 @@
-# DreamSys__TickStaircaseCase0
+# DreamSys__TickStaircaseYawPlus90
+
+> Renamed from `DreamSys__TickStaircaseCase0` on 2026-09-28 (tools/rename.py). Address 0x8005ab2c.
 
 > Renamed from `func_8005AB2C` on 2026-09-22 (tools/rename.py). Address 0x8005ab2c.
 
@@ -12,7 +14,7 @@
 instead of one, and different thresholds/constants:
 
 ```c
-s32 DreamSys__TickStaircaseCase0(DreamSys *this)
+s32 DreamSys__TickStaircaseYawPlus90(DreamSys *this)
 {
 	if (this->unk_0x914 == 0) {
 		DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset0, &this->unk_0x91C);

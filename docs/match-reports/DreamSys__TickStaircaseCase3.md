@@ -7,7 +7,7 @@
 
 ## What it does
 
-Third sibling of `DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase0` (same retry-counter shape),
+Third sibling of `DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseYawPlus90` (same retry-counter shape),
 with a THIRD extra piece: both arms, after their own window checks, also
 compute a boolean "close to the next trigger" flag that (if set) bumps
 `unk_0x88` to 2 — shared tail logic neither of the other two siblings had:
@@ -49,11 +49,11 @@ s32 DreamSys__TickStaircaseCase3(DreamSys *this)
 | `unk_0xAC != 4` | `< 0x71` | `0x1E..0x2C`, `0x52..0x60` | `unk_0xA4 = 1` | `(unk_0x914-0x1E) < 0x34` |
 | `unk_0xAC == 4` | `< 0x13` | `6..7`, `0xF..0x10` | `vt->SceneNode__UpdateRotation(this,0,&sRotationYawMinus45)` | `unk_0x914 < 9` |
 
-Matched first attempt, with the `DreamSys__TimerTick`/`DreamSys__TickStaircaseCase0`
+Matched first attempt, with the `DreamSys__TimerTick`/`DreamSys__TickStaircaseYawPlus90`
 guard-clause lever (invert the band test, early `return 1;`, let the
 window-check code be the unconditional tail) applied up front rather than
 discovered by iteration — both out-of-band early exits land on the SAME
-physical `return 1;` block in retail (unlike `DreamSys__TickStaircaseCase0`'s two separate
+physical `return 1;` block in retail (unlike `DreamSys__TickStaircaseYawPlus90`'s two separate
 copies), and writing two ordinary `if (x >= limit) return 1;` guard clauses,
 one per arm, let GCC's own tail-merge find that sharing without any
 additional coaxing.
@@ -61,7 +61,7 @@ additional coaxing.
 ## New knowledge
 
 - **`sStaircaseOffset3`** (`struct RelativePos`), a third constant in the same table
-  as `DreamSys__TickStaircaseCase2`'s `sStaircaseOffset2` and `DreamSys__TickStaircaseCase0`'s `sStaircaseOffset0`,
+  as `DreamSys__TickStaircaseCase2`'s `sStaircaseOffset2` and `DreamSys__TickStaircaseYawPlus90`'s `sStaircaseOffset0`,
   passed as `DreamSys__ApplyRelativeOffset`'s `a` argument.
 - **`sRotationYawMinus45`**, another opaque forwarded-pointer constant for
   `vt->SceneNode__UpdateRotation`'s `arg2`, same shape as the already-known
@@ -76,7 +76,7 @@ additional coaxing.
 ### Proposed learning
 
 None new beyond confirming, a third time this round
-(`DreamSys__TimerTick`, `DreamSys__TickStaircaseCase0`, this function), that `if (cond)
+(`DreamSys__TimerTick`, `DreamSys__TickStaircaseYawPlus90`, this function), that `if (cond)
 return N;` as an unconditional guard clause — rather than `if (!cond) {...}
 else return N;` — is the more reliable first attempt for an out-of-band early
 exit in this codebase's `New_X`-adjacent retry-counter family, and that GCC's

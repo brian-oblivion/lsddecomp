@@ -157,7 +157,7 @@ already-confirmed instance.
   (already-named fields, offsets validated by this function's exact byte
   match up to the blocker).
 - Reinforces (does not newly discover) two idioms already logged this round
-  for `DreamSys__TimerTick`/`DreamSys__TickStaircaseCase0`: reusing an already-zero register
+  for `DreamSys__TimerTick`/`DreamSys__TickStaircaseYawPlus90`: reusing an already-zero register
   for a comparison instead of a fresh immediate, and needing statements
   hoisted OUTSIDE a guard to match an unconditional-setup-then-optional-work
   shape.

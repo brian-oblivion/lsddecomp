@@ -46,7 +46,7 @@ round 43, runner ALPHA, unit DreamSys.
 
 ## Naming
 
-- **Tier A.** Pure leaf: returns the already-named `.extra` field of the last static spawn point found via the gLinkDstStage/C8 scratch indices; its return value indexes the DreamSys__TickStaircaseCase0..3 dispatch table.
+- **Tier A.** Pure leaf: returns the already-named `.extra` field of the last static spawn point found via the gLinkDstStage/C8 scratch indices; its return value indexes the DreamSys__TickStaircaseYawPlus90..3 dispatch table.
 
 ## History (moved from include/DreamSys.h, round 102)
 

@@ -267,7 +267,7 @@ All in `include/DreamSys.h`:
   which already covers `currentPos->position`. No other reader of this
   field existed before this round.
 - **`extern s32 (*sStaircaseTickFns[4])(DreamSys *this)`** -- a table of the four
-  already-matched `s32 (DreamSys *this)` functions `DreamSys__TickStaircaseCase0`/
+  already-matched `s32 (DreamSys *this)` functions `DreamSys__TickStaircaseYawPlus90`/
   `DreamSys__TickStaircaseCase1`/`DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase3`, confirmed by their own
   existing definitions in `src/world/DreamSys.c`.
 - **`extern s32 TestForStaircaseNodes(...)`** and **`extern s32
@@ -540,7 +540,7 @@ expression."
 
 ## Naming
 
-- **Tier B.** STALL (still INCLUDE_ASM). Wraps TestForStaircaseNodes and DreamSys__CheckStaircaseHeading, and on success wires up the DreamSys__TickStaircaseCase0..3 dispatch via GetLastSpawnExtra, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink.
+- **Tier B.** STALL (still INCLUDE_ASM). Wraps TestForStaircaseNodes and DreamSys__CheckStaircaseHeading, and on success wires up the DreamSys__TickStaircaseYawPlus90..3 dispatch via GetLastSpawnExtra, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink.
 
 ## Comment moved from src/world/DreamSys.c (round 92, track 7)
 

@@ -325,7 +325,7 @@ extern s32 gProjectOffsetZ;
    by DreamSys__TickStaircaseCase2. */
 extern struct RelativePos sStaircaseOffset2;
 
-/* The same, for DreamSys__TickStaircaseCase0. */
+/* The same, for DreamSys__TickStaircaseYawPlus90. */
 extern struct RelativePos sStaircaseOffset0;
 
 /* The same, for DreamSys__TickStaircaseCase1. */
@@ -335,7 +335,7 @@ extern struct RelativePos sStaircaseOffset1;
 extern struct RelativePos sStaircaseOffset3;
 
 /* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (SceneNode__UpdateRotation)
-   arg2 with flag 0 (relative) by DreamSys__TickStaircaseCase0 and
+   arg2 with flag 0 (relative) by DreamSys__TickStaircaseYawPlus90 and
    DreamSys__TickStaircaseCase2. Its three {numerator, denominator} words
    are {0,1} {0x2D,1} {0,1}, the same form as sRotationYaw180 and every
    sCardinalRotations entry. */
@@ -597,7 +597,7 @@ typedef struct DreamSaveBlock {
    Actor__MoveLocalZOrFindLink/Actor__MoveLocalXOrFindLink (Actor +0x0D0/+0x0D4). */
 extern void (*sMoveCommandDispatch[5])(DreamSys *this, s32 val, void *extra);
 
-/* 4-entry table of `s32 (DreamSys *this)` functions (DreamSys__TickStaircaseCase0,
+/* 4-entry table of `s32 (DreamSys *this)` functions (DreamSys__TickStaircaseYawPlus90,
    DreamSys__TickStaircaseCase1, DreamSys__TickStaircaseCase2, DreamSys__TickStaircaseCase3),
    indexed by GetLastSpawnExtra()'s return value and
    stashed into DreamSys::staircaseTickFn by DreamSys__TryStaircaseLink. */

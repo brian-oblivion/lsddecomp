@@ -10,7 +10,7 @@ runner BRAVO. Matched on the first attempt — no residue.
 ## What it does
 
 A "retry/attempt band" gate, the same family as the already-matched
-`DreamSys__TickStaircaseCase0`/`DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase3` a few functions earlier in
+`DreamSys__TickStaircaseYawPlus90`/`DreamSys__TickStaircaseCase2`/`DreamSys__TickStaircaseCase3` a few functions earlier in
 this unit (all four share the identical skeleton: on the first call,
 initialize `this->unk_0x91C` via `DreamSys__ApplyRelativeOffset` with a per-function
 `struct RelativePos` constant; branch on `this->unk_0xAC != 4`; in each
@@ -74,7 +74,7 @@ s32 DreamSys__TickStaircaseCase1(DreamSys *this)
 
 Read the disassembly cold first (before checking for siblings) and derived
 the band boundaries directly from the `addiu`/`sltiu` immediates. Then
-found `DreamSys__TickStaircaseCase0`/`DreamSys__TickStaircaseCase3` already in this same file just above
+found `DreamSys__TickStaircaseYawPlus90`/`DreamSys__TickStaircaseCase3` already in this same file just above
 the `INCLUDE_ASM` line and confirmed the template — critically, that
 `DreamSys__TickStaircaseCase3` already answers the one real design question this shape
 poses: whether to cache `this->unk_0x914` in a local across the multiple
@@ -103,4 +103,4 @@ matched code for a template.
 
 ## Naming
 
-- **Tier B.** Table index 1 of the same sStaircaseTickFns family as DreamSys__TickStaircaseCase0, against sStaircaseOffset1; same evidence and same caveat.
+- **Tier B.** Table index 1 of the same sStaircaseTickFns family as DreamSys__TickStaircaseYawPlus90, against sStaircaseOffset1; same evidence and same caveat.

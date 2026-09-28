@@ -25,4 +25,4 @@ round 2026-08-30-b, runner ALPHA, address range
 
 ## Naming
 
-- **Tier B.** One-line: moveMode = previousMoveMode. moveMode also gates a `!= 4` family split reused across DreamSys__TickStaircaseCase0..3 and the Try*Link family, consistent with a movement-mode concept; what value 4 specifically represents is not confirmed.
+- **Tier B.** One-line: moveMode = previousMoveMode. moveMode also gates a `!= 4` family split reused across DreamSys__TickStaircaseYawPlus90..3 and the Try*Link family, consistent with a movement-mode concept; what value 4 specifically represents is not confirmed.

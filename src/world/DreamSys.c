@@ -1079,7 +1079,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
     return false;
 }
 
-s32 DreamSys__TickStaircaseCase0(DreamSys *this) {
+s32 DreamSys__TickStaircaseYawPlus90(DreamSys *this) {
     if (this->staircaseFrame == 0) {
         DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset0, &this->staircaseOrigin);
     }
