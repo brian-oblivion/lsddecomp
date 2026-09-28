@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E5D4` on 2026-09-24 (tools/rename.py). Address 0x8004e5d4.
 
-**Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
+**Unit:** class_3bb8c_c (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -49,7 +49,7 @@ it holds `TaskObjF__SetCardSlot` (this function), the exact slot
 
 ```c
 u8 pad3C[0x040 - 0x03C];
-void (*slot40)(TaskObjF *self, s32 arg1);   /* +0x040, TaskObjF__SetCardSlot (class_3bb8c_e), TaskObjF__TaskObjF's own ctor */
+void (*slot40)(TaskObjF *self, s32 arg1);   /* +0x040, TaskObjF__SetCardSlot (class_3bb8c_c), TaskObjF__TaskObjF's own ctor */
 /* the existing slot44 field immediately follows -- no other offset moves */
 ```
 

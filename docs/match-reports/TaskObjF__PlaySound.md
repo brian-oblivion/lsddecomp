@@ -45,7 +45,7 @@ exposure)
 
 Both retyped declarations were introduced by this unit's own earlier
 functions THIS round (not inherited from `main`), so there is nothing to
-flag for `class_3bb8c_e`/`class_3bb8c_f` here -- the correction is fully
+flag for `class_3bb8c_c`/`class_3bb8c_f` here -- the correction is fully
 internal to `class_3bb8c_g`'s own work.
 
 ### Proposed learning

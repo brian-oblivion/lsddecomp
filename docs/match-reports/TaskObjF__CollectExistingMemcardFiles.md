@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004EB88` on 2026-09-24 (tools/rename.py). Address 0x8004eb88.
 
-**Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class). This was one of
+**Unit:** class_3bb8c_c (round 14, `Node3bb8cE` class). This was one of
 the two functions predicted hardest this round (6 distinct callee-saved
 registers, the round's saturation threshold), yet it matched on the
 first attempt — see below for why.

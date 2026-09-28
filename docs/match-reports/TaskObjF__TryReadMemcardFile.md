@@ -104,7 +104,7 @@ The BIOS file-call declarations' comment, whose history is this:
  * (libapi/a50,a52,a51,a54,a69 -- one 0x10-byte object per stub). These used
  * to live as `func_8005xxxx` prototypes in include/class_3bb8c.h; they are
  * LOCAL here on purpose, because a shared header eleven units include is the
- * wrong place for names this generic, and because class_3bb8c_e.c's view of
+ * wrong place for names this generic, and because class_3bb8c_c.c's view of
  * `open` takes a `void *` where this unit's takes a `char *`. Two local
  * views are legitimate; one shared declaration would not be.
  * These are C89 identifiers under -fno-builtin, nothing else claims them. */

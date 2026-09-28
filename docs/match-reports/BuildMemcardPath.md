@@ -53,7 +53,7 @@ two call sites in ONE unit, with different argument counts, both byte-load-beari
 `char *BuildMemcardPath(McDevicePath *dest, s32 selector, char *suffix)` — three
 real arguments, `$a2` being the suffix string it appends.
 
-**SUPERSEDED, round 75 (see the correction at the end): `class_3bb8c_e` now declares a real three-argument prototype.** Original reasoning, kept as history -- **why `src/class_3bb8c_e.c` must declare it unprototyped.** Its two call sites
+**SUPERSEDED, round 75 (see the correction at the end): `class_3bb8c_c` now declares a real three-argument prototype.** Original reasoning, kept as history -- **why `src/class_3bb8c_c.c` must declare it unprototyped.** Its two call sites
 pass different numbers of arguments, and retail's bytes show both:
 
 ```
@@ -75,7 +75,7 @@ the only spelling, and it is the same idiom this unit already uses for
 `strcpy`/`strcat`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to both copies, `src/class_3bb8c_e.c:89` and `:383`. Oracle green.
+added to both copies, `src/class_3bb8c_c.c:89` and `:383`. Oracle green.
 
 ## Naming (round 60, track 3)
 
@@ -90,10 +90,10 @@ building a memory-card path string.
 ## Head correction, round 75
 
 The "must declare it unprototyped" reasoning above is disproved. Round 75
-matched `TaskObjF__OpenAndReadMemcardFile` (class_3bb8c_e) by calling this function with THREE
+matched `TaskObjF__OpenAndReadMemcardFile` (class_3bb8c_c) by calling this function with THREE
 arguments; that call site's third argument is forwarded from its own third
 parameter, already in `$a2`, so no set-up is emitted and it read as a
-two-argument call. `src/class_3bb8c_e.c` now declares
+two-argument call. `src/class_3bb8c_c.c` now declares
 `extern void *BuildMemcardPath(void *dest, s32 selector, void *suffix);`
 and every call site in both units passes three. See `TaskObjF__OpenAndReadMemcardFile.md`.
 

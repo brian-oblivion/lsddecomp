@@ -74,7 +74,7 @@ local prototype. Zero bytes changed.
 Moved here from src/class_3bb8c_i.c (stale history; DecodeFullWidthSjis
 is matched in ScreenWidgets.c since round 38, typed `u8 *(u8 *dst, u8
 *src)`): "This project's own strcpy (matched elsewhere) -- TextEntry__SetText's
-own caller, same local-declaration convention as class_3bb8c_e.c/others."
+own caller, same local-declaration convention as class_3bb8c_c.c/others."
 and "Uncarved helper, `ScreenWidgets`, still INCLUDE_ASM --
 TextEntry__SetText's own call. Translates each byte of `src` (a name
 string) into `dest` (folding a couple of special-case byte ranges) and

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E678` on 2026-09-24 (tools/rename.py). Address 0x8004e678.
 
-**Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
+**Unit:** class_3bb8c_c (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -29,7 +29,7 @@ s32 TaskObjF__CloseEvents(Node3bb8cE *self)
 
 `TaskObjF__DisableEvents`, `TaskObjF__ForEachEvent` (both still `INCLUDE_ASM` in
 `class_3bb8c_f.c`, runner charlie's unit) and `func_8003902C` (uncarved).
-Declared locally in `src/class_3bb8c_e.c`, not in the shared
+Declared locally in `src/class_3bb8c_c.c`, not in the shared
 `include/class_3bb8c.h` — see the file-top comment there for why.
 
 ### Proposed learning

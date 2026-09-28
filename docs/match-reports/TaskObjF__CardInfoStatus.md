@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E7D0` on 2026-09-24 (tools/rename.py). Address 0x8004e7d0.
 
-**Unit:** class_3bb8c_e (round 14, `Node3bb8cE` class).
+**Unit:** class_3bb8c_c (round 14, `Node3bb8cE` class).
 
 ## What it does
 

@@ -22,7 +22,7 @@ callee directly.
 
 **Two classes documented as "unrelated" in different rounds may share
 concrete evidence worth cross-checking before track 4 unifies types.**
-`class_3bb8c_e.c`'s `Node3bb8cE` (a distinct local view, its own header
+`class_3bb8c_c.c`'s `Node3bb8cE` (a distinct local view, its own header
 comment) and this unit's `TaskObjF` were derived independently and never
 declared the same type -- but `Node3bb8cE::threads[4]` at +0x014 is
 filled by `TaskObjF__OpenEvents` via `OpenEvent(0xF4000001, gCardEventSpecs[i], 0x2000, 0)`,

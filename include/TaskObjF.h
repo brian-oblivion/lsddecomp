@@ -9,7 +9,7 @@
  * The name is the old unit view's (FINISHING-PLAN track 4 step 2); what the
  * class does is measured below. Methods: the allocator and ctor in
  * src/class_3bb8c_c.c, BasicClass's overrides and the card primitives
- * (+0x00C..+0x060) in src/class_3bb8c_e.c, the file I/O, events, buffers and
+ * (+0x00C..+0x060) in src/class_3bb8c_c.c, the file I/O, events, buffers and
  * the two operations (+0x064..+0x078, +0x038) in src/class_3bb8c_f.c, the
  * state machine (+0x07C..+0x0B0) in src/class_3bb8c_g.c.
  *

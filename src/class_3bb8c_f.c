@@ -35,7 +35,7 @@ s32 WaitForReadyEvent(s32 *events, s32 count);
 char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix);
 
 /* The PS-X BIOS file calls, linked from Sony's libapi. A local view:
- * class_3bb8c_e.c declares `open` with a `void *` path. */
+ * class_3bb8c_c.c declares `open` with a `void *` path. */
 extern s32 open(char *path, s32 mode);             /* B(0x32) */
 extern s32 read(s32 handle, void *buf, s32 size);  /* B(0x34) */
 extern s32 lseek(s32 handle, s32 pos, s32 whence); /* B(0x33) */

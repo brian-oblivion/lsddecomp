@@ -4,8 +4,8 @@
 
 > Renamed from `func_8004E3F4` on 2026-09-24 (tools/rename.py). Address 0x8004e3f4.
 
-**Unit:** class_3bb8c_e (round 14, first slice of the new `Node3bb8cE` class --
-see `include`-local declarations at the top of `src/class_3bb8c_e.c`; this
+**Unit:** class_3bb8c_c (round 14, first slice of the new `Node3bb8cE` class --
+see `include`-local declarations at the top of `src/class_3bb8c_c.c`; this
 class is unrelated to `Obj866E8`/`gStageMapMethods` in `include/class_3bb8c.h`).
 
 ## What it does
