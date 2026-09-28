@@ -38,7 +38,7 @@
 #include "VabStreamObj.h"
 #include "NodeGuardedViewport.h"
 #include "StageMap.h"
-#include "WBgm.h"
+#include "wbgm.h"
 #include "tim_image.h"
 #include "FrameClock.h"
 #include "dream_sys.h"

@@ -185,7 +185,7 @@ Read each named class's header first; its banner points to the units.
 - **Movies.** `MoviePlayer` (`src/graphics/graphics_resources.c`) decodes MDEC FMV from a
   `CdStream` (`src/cd/cd_stream.c`, over libcd streaming).
 - **Sound.** `VabStreamObj` loads VAB banks, `WBgm` plays background music
-  (`src/sound/WBgm.c`), `src/sound/PlacementGridVabSound.c` holds `VabDriver`, `VabStreamObj` and
+  (`src/sound/wbgm.c`), `src/sound/PlacementGridVabSound.c` holds `VabDriver`, `VabStreamObj` and
   the sound-cue set beside the map chunks' `PlacementGrid`, and
   `src/psyq/libsnd_vmanager.c` is Sony's libsnd voice manager, carried in
   `src/` after the game's `ServiceSoundCueSet`.

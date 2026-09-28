@@ -27,7 +27,7 @@
 #include "SoundCueSet.h"
 #include "bmem_pmgr.h"
 #include <strings.h>
-#include "WBgm.h"
+#include "wbgm.h"
 #include "GameApplicationFileResource.h"
 
 /* What `buffer` points at: 8 bytes nothing here reads, then each cell's

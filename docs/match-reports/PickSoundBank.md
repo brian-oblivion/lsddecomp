@@ -72,7 +72,7 @@ shift.
 
 - **Name:** `PickSoundBank`
 - **Tier:** A
-- **Evidence:** returns sSoundBankPaths[sForcedSoundBank - 1] or a random one of the seven (`% SOUND_BANK_COUNT`); its one caller, DayTask__DayTask, hands the path to New_WBgm as the VAB base (include/WBgm.h). gForcedWeeklyGroup was renamed sForcedSoundBank with it.
+- **Evidence:** returns sSoundBankPaths[sForcedSoundBank - 1] or a random one of the seven (`% SOUND_BANK_COUNT`); its one caller, DayTask__DayTask, hands the path to New_WBgm as the VAB base (include/wbgm.h). gForcedWeeklyGroup was renamed sForcedSoundBank with it.
 
 ## Naming history
 

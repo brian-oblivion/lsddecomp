@@ -52,7 +52,7 @@ Tier A for both. The tier-C note above predates the SDK linking:
 store is `SsSetTickMode(SS_TICK60)` -- 1 is `SS_TICK60`, sixty sequencer
 ticks a second. The store `sSsTicksPerSecond = 60` (was `0x3C`) is that
 rate, set in the same one-time guard, and this getter is its only reader.
-The one caller, `WBgm__Crescendo` (WBgm.c), passes
+The one caller, `WBgm__Crescendo` (wbgm.c), passes
 `GetSsTicksPerSecond() * scale` as `SsSeqSetCrescendo`'s duration, which
 Sony counts in ticks: `scale` is seconds. The value is the tick rate by
 its set site and its use; the getter is a leaf (tier A by definition).

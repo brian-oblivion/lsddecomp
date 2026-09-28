@@ -1,6 +1,6 @@
 /*
  * WBgm, the background-music player: one libsnd SEQ played on one VAB bank
- * (the class is documented in include/WBgm.h). The file holds its allocator,
+ * (the class is documented in include/wbgm.h). The file holds its allocator,
  * constructor and methods in table order, with the non-slot helper
  * WBgm__HandleMonitorEvent (it SsSeqOpens the SEQ once both files have
  * loaded) after update; then the table getter; IsWBgmActive, which
@@ -12,7 +12,7 @@
 #include <libsnd.h>
 #include "basic_class.h"
 #include "draw_system.h"
-#include "WBgm.h"
+#include "wbgm.h"
 #include "bmem_pmgr.h"
 #include <stdio.h>
 #include "VabStreamObj.h"

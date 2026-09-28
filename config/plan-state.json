@@ -826,7 +826,6 @@
         "PlacementGridVabSound": "2026-09-24",
         "TextEntryItemList": "2026-09-24",
         "TitleMenuTaskObjF": "2026-09-22",
-        "WBgm": "2026-09-25",
         "application": "2026-09-25",
         "bmem_pmgr": "2026-09-24",
         "cd_driver": "2026-09-21",
@@ -857,7 +856,8 @@
         "tmd_model": "2026-09-25",
         "tmd_renderer": "2026-09-17",
         "tod_actor": "2026-09-24",
-        "viewport_draw": "2026-09-25"
+        "viewport_draw": "2026-09-25",
+        "wbgm": "2026-09-25"
       }
     },
     "4": {
@@ -1150,7 +1150,7 @@
         "gWBgmMethods": {
           "class": "WBgm",
           "date": "2026-09-26",
-          "header": "include/WBgm.h"
+          "header": "include/wbgm.h"
         }
       },
       "reason": "",
@@ -1558,7 +1558,6 @@
         "PlacementGridVabSound": "2026-09-27",
         "TextEntryItemList": "2026-09-27",
         "TitleMenuTaskObjF": "2026-09-27",
-        "WBgm": "2026-09-28",
         "application": "2026-09-28",
         "bmem_pmgr": "2026-09-27",
         "cd_driver": "2026-09-27",
@@ -1582,7 +1581,8 @@
         "tmd_model": "2026-09-26",
         "tmd_renderer": "2026-09-26",
         "tod_actor": "2026-09-27",
-        "viewport_draw": "2026-09-27"
+        "viewport_draw": "2026-09-27",
+        "wbgm": "2026-09-28"
       }
     },
     "8": {

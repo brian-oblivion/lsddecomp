@@ -11,7 +11,7 @@ Line numbers are as of commit b23bdf545 and drift; search for the name.
 **Verdict.** The function bodies are in good shape: one-line `MATCHING:`
 notes, Sony types under Sony's names, few raw casts. draw_system.c,
 flat_light_obj.c, tim_image.c, pad.c, cd_stream.c, application.c, stage_grid.c,
-tod_actor.c, DayTaskStageMap.c, WBgm.c and screen_widgets.c's FadeBox code
+tod_actor.c, DayTaskStageMap.c, wbgm.c and screen_widgets.c's FadeBox code
 are close to release quality. The debt is in declarations, a few
 conventions, names the code has outgrown, and headers written as analysis
 rather than API.
@@ -45,7 +45,7 @@ rather than API.
   `FormatFullWidthNumber` re-declared at TitleMenuTaskObjF.c:193. One header.
 - **Others without a header or disagreeing:** `BuildFileName`
   (TextEntryItemList.c:155, 629; PlacementGridVabSound.c:185, with `const`);
-  `GetSsSizeTableBuf` (`void *` vs `char *`); `GetSsTicksPerSecond` (WBgm.c:21
+  `GetSsSizeTableBuf` (`void *` vs `char *`); `GetSsTicksPerSecond` (wbgm.c:21
   only); `LockCd`/`UnlockCd` declared `s32` at GameApplicationFileResource.c:535,
   defined `void`; `SetActiveDataSourceDriverMode` `s32` in DayTaskStageMap.h:57
   vs `void` definition; `GetSoundEffectDir(s32)` vs `(void)`;
@@ -59,7 +59,7 @@ rather than API.
   ...): keep one forward block.
 - **Sony names re-declared.** `ResetGraph` (task.h:40), `rand`, `strlen`,
   `strcat`, `strcpy`, `memset`, `memcpy`, `printf` (declared `void (const char *)`
-  at TitleMenuTaskObjF.c:980 and WBgm.c:18 against stdio.h's variadic `int`).
+  at TitleMenuTaskObjF.c:980 and wbgm.c:18 against stdio.h's variadic `int`).
   Use include/psyq's headers (verify bytes: strings.h's `strlen` is K&R).
 - **BIOS and card calls with no declaration at all** (cpp-confirmed in
   TitleMenuTaskObjF.c): OpenEvent, TestEvent, CloseEvent, EnableEvent,

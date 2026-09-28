@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003995C` on 2026-09-25 (tools/rename.py). Address 0x8003995c.
 
-Round 81, runner delta. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
+Round 81, runner delta. Unit `src/sound/wbgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x008 (ctor) (slots resolved with `tools/classtable.py gWBgmMethods`).
@@ -67,7 +67,7 @@ void WBgm__WBgm(WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/sound/WBgm.c`:
+The unit-local view it needs, from the top of `src/sound/wbgm.c`:
 
 ```c
 #include "basic_class.h"
@@ -152,6 +152,6 @@ The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it come
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+The class is now declared once, in `include/wbgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
 
 Parameters retyped to `(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay)`, and the ctor slot with them: both paths are forwarded unchanged to setSeq/setVab, whose bodies hand them to New_RequestedFile(char *) and New_VabStreamObj(char *). See New_WBgm's Track 4 paragraph for the one caller.

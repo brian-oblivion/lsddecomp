@@ -25,7 +25,7 @@
  * GetRequestedFileMethods is in sDataSourceClientGetters, so
  * SetActiveDataSource rebinds this table's file-I/O slots.
  *
- * Its one user is WBgm (include/WBgm.h): WBgm__SetSeq makes one per SEQ
+ * Its one user is WBgm (include/wbgm.h): WBgm__SetSeq makes one per SEQ
  * path (`seqData`), and WBgm__HandleMonitorEvent passes its `buffer` to
  * SsSeqOpen once `loaded` is set.
  */

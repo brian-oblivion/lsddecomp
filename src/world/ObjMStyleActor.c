@@ -41,7 +41,7 @@
 #include "StageMap.h"
 #include "NodeGuardedViewport.h"
 #include "TimBlockSrc.h"
-#include "WBgm.h"
+#include "wbgm.h"
 #include "LbdFile.h"
 #include "BoxFill.h"
 #include "FrameClock.h"
