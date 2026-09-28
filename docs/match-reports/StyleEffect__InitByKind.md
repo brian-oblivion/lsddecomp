@@ -9,7 +9,7 @@
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies: stub-stalled as
-`gp_rel`-blocked on `gStyleEffectViewport`/`sStyleEffectBaseViewY` (and, in an even older revision
+`gp_rel`-blocked on `sStyleEffectViewport`/`sStyleEffectBaseViewY` (and, in an even older revision
 of this report, `addiu_at`, itself resolved round 21). Both globals were
 already present in `config/gp-symbols.txt`. Matched byte-exact this round.
 
@@ -29,7 +29,7 @@ void StyleEffect__InitByKind(LinkNode *self, void *arg1, Vec3S *arg2) {
     Vec3S local;
     s32 state;
 
-    sStyleEffectBaseViewY = *(s32 *)((u8 *)gStyleEffectViewport + 0x18);
+    sStyleEffectBaseViewY = *(s32 *)((u8 *)sStyleEffectViewport + 0x18);
     AddVec3(&local, arg2, &self->unk58);
     AttachWithRotScale(self, arg1, &local, self->unk64, self->unk68);
 
@@ -69,7 +69,7 @@ typedef struct {
 } D_8008ACA4Obj;
 extern D_8008ACA4Obj *sStyleEffectTmd;
 extern void *sStyleEffectTim;
-extern void *gStyleEffectViewport;
+extern void *sStyleEffectViewport;
 extern s32 sStyleEffectBaseViewY;
 extern s32 sStyleEffectModelIds[];
 ```
@@ -135,7 +135,7 @@ the wrong function.
 Round 70 (alpha). `func_80056520` -> `StyleEffect__InitByKind`, **tier B**.
 
 Only caller is the class's ctor `StyleEffect__StyleEffect` (ObjMStyleActor.c), with the
-ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(gStyleEffectViewport + 0x18)`
+ctor's own arg3/arg4 as (parent, pos). Body: snapshot `*(sStyleEffectViewport + 0x18)`
 into sStyleEffectBaseViewY; `AttachWithRotScale(self, parent, pos + offset,
 rotation, scale)`; for kind < 2, `SceneNode__LinkModel(self,
 sStyleEffectTmd->slot80(sStyleEffectModelIds[kind]))`; then kind 0 ->
@@ -151,7 +151,7 @@ four call sites); `StyleEffect__StyleEffect` (table +0x008, the ctor) stores it 
 `SceneNode`/`TodActor` convention.
 
 Globals named in this pass: `sStyleEffectBaseViewY` (was D_8008ACB0, tier B:
-written here from gStyleEffectViewport's +0x018 word, subtracted from it again by
+written here from sStyleEffectViewport's +0x018 word, subtracted from it again by
 StyleEffect__UpdateByKind; only this unit references it).
 
 ### Field and slot names in this unit's local view (applied, round 70)
@@ -204,7 +204,7 @@ For the HEAD, by type scope; none applied here (other units' views).
 
 ## Track 4b (2026-09-25, round 85)
 
-`sStyleEffectTmd`/`sStyleEffectTim`/`gStyleEffectViewport` were `s32` in ObjMStyleActor.c and
+`sStyleEffectTmd`/`sStyleEffectTim`/`sStyleEffectViewport` were `s32` in ObjMStyleActor.c and
 `D_8008ACA4Obj *`/`void *`/`void *` in ObjMStyleActor.c. Both units now
 declare `Actor *`/`void *`/`void *`: the local `D_8008ACA4Methods` view is gone and the +0x080 call reads `getSetUnk10Flag8`, the name `SetStyleEffectSources` calls the same slot by. Byte-identical; no new `-Wall`
 warning.
@@ -218,10 +218,10 @@ ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: 
 Globals renamed with rename.py: D_8008ACA4 -> sStyleEffectTmd (the
 DREAMER.TMD LinkResource SetStyleEffectSources stores; kinds 0 and 1 take
 their model from it), D_8008AB98 -> sStyleEffectModelIds (the model index per
-kind), D_8008ACAC -> gStyleEffectViewport (ObjM's cached Viewport; the +0x018
+kind), D_8008ACAC -> sStyleEffectViewport (ObjM's cached Viewport; the +0x018
 word read here is refView.vp.y, the viewpoint y), gTrackedYSnapshot ->
 sStyleEffectBaseViewY (that y, snapshotted at build). PROPOSED for track 7:
-read the viewpoint y as `gStyleEffectViewport->refView.vp.y` once the global
+read the viewpoint y as `sStyleEffectViewport->refView.vp.y` once the global
 is typed `Viewport *`, and `sStyleEffectTmd` as `LinkResource *` with
 `getModel`. renametype.py rewrote the old class name inside this report's earlier prose too (known, pending an operator decision); those lines are history and were not hand-restored, so read `StyleEffect` in them as `Class876FC`.
 
@@ -266,8 +266,8 @@ Viewport's `refView.vp.y`, see below.)
 
 ## Naming (track 7, round 101)
 
-- `*(s32 *)((u8 *)gStyleEffectViewport + 0x18)` is
-  `((Viewport *)gStyleEffectViewport)->refView.vp.y`: the pointer is
+- `*(s32 *)((u8 *)sStyleEffectViewport + 0x18)` is
+  `((Viewport *)sStyleEffectViewport)->refView.vp.y`: the pointer is
   StyleSceneRefs::viewport, a `Viewport *` (ObjMStyleActor.c passes it to
   SetStyleEffectSources), and +0x018 is `refView` (+0x014) `.vp.y` (+0x004)
   in include/Viewport.h. The extern stays `void *` because ObjMStyleActor.c

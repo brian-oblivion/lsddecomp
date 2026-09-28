@@ -2399,7 +2399,7 @@ extern void NoOpIgnoreArgs();
  * viewport stays `void *` because that is how the next section declares it. */
 extern Actor *sStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
 extern void *sStyleEffectTim;
-extern Viewport *gStyleEffectViewport;
+extern Viewport *sStyleEffectViewport;
 extern s32 sStyleEffectBaseViewY;
 extern s32 sStyleEffectModelIds[];
 
@@ -2415,7 +2415,7 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
     LongVec3 placed;
     s32 kind;
 
-    sStyleEffectBaseViewY = gStyleEffectViewport->refView.vp.y;
+    sStyleEffectBaseViewY = sStyleEffectViewport->refView.vp.y;
     AddVec3(&placed, pos, &self->params.offset);
     AttachWithRotScale((Actor *)self, parent, &placed, self->params.rotation, self->params.scale);
 
@@ -2450,7 +2450,7 @@ void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
     LongVec3 placed;
 
     AddVec3(&placed, pos, &self->params.offset);
-    placed.y += gStyleEffectViewport->refView.vp.y - sStyleEffectBaseViewY;
+    placed.y += sStyleEffectViewport->refView.vp.y - sStyleEffectBaseViewY;
     self->methods->setTranslation(self, &placed);
 
     switch (self->pendingExtra) {
@@ -2744,7 +2744,7 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
  * setBackClip, hence the Actor view. */
 extern Actor *sStyleEffectTmd;
 extern void *sStyleEffectTim;
-extern Viewport *gStyleEffectViewport;
+extern Viewport *sStyleEffectViewport;
 extern s32 sStyleEffectModelIds[3];
 extern s16 sStyleEffectClutPos[2];
 
@@ -2758,7 +2758,7 @@ void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
 
     sStyleEffectTmd = tmd;
     sStyleEffectTim = (void *)tim;
-    gStyleEffectViewport = (Viewport *)viewport;
+    sStyleEffectViewport = (Viewport *)viewport;
     i = 0;
     do {
         model = (TmdModel *)tmd->methods->setBackClip(tmd, sStyleEffectModelIds[i]);

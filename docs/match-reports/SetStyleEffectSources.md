@@ -12,7 +12,7 @@ never attempted before this round.
 ## What it does
 
 Stashes `self` (arg1) and two more scalar args (arg2, arg3) into `.sbss`
-globals `sStyleEffectTmd`/`sStyleEffectTim`/`gStyleEffectViewport`, then runs a fixed 2-iteration
+globals `sStyleEffectTmd`/`sStyleEffectTim`/`sStyleEffectViewport`, then runs a fixed 2-iteration
 loop calling `self->methods->slot80(self, sStyleEffectModelIds[i])` and feeding the
 result plus `&sStyleEffectClutPos` (a 1-word `.sdata` constant, address-only, never
 loaded) to library function `TmdModel__SetFirstPrimClut` (still `psyq_fa50.s`, unrenamed
@@ -24,7 +24,7 @@ its own unrelated `self` there without any indication of shared meaning.
 ```c
 extern s32 sStyleEffectTmd;
 extern s32 sStyleEffectTim;
-extern s32 gStyleEffectViewport;
+extern s32 sStyleEffectViewport;
 extern s32 sStyleEffectModelIds[3];
 extern s32 sStyleEffectClutPos;
 
@@ -36,7 +36,7 @@ void SetStyleEffectSources(s32 arg0, BaseObjO *self, s32 arg2, s32 arg3) {
 
     sStyleEffectTmd = (s32) self;
     sStyleEffectTim = arg2;
-    gStyleEffectViewport = arg3;
+    sStyleEffectViewport = arg3;
     i = 0;
     do {
         ret = self->methods->slot80(self, sStyleEffectModelIds[i]);
@@ -84,7 +84,7 @@ Renamed from `BaseObjO__func_56f5c`. Prefix only: the second parameter is an Act
 
 ## Track 4b (2026-09-25, round 85)
 
-`sStyleEffectTmd`/`sStyleEffectTim`/`gStyleEffectViewport` were `s32` in ObjMStyleActor.c and
+`sStyleEffectTmd`/`sStyleEffectTim`/`sStyleEffectViewport` were `s32` in ObjMStyleActor.c and
 `D_8008ACA4Obj *`/`void *`/`void *` in ObjMStyleActor.c. Both units now
 declare `Actor *`/`void *`/`void *`: this function stores its own `Actor *self` into the first, the two scalars go in through a `(void *)` cast. Byte-identical; no new `-Wall`
 warning.
@@ -100,7 +100,7 @@ the two models the TMD's +0x080 slot (LinkResource's getModel) returns for
 sStyleEffectModelIds[0..1] (TmdModel__SetFirstPrimClut with sStyleEffectClutPos). The stored
 globals were renamed with it (one rename.py run each): D_8008ACA4 ->
 sStyleEffectTmd, D_8008ACA8 -> sStyleEffectTim, D_8008ACAC ->
-gStyleEffectViewport, D_8008AB98 -> sStyleEffectModelIds. PROPOSED (not
+sStyleEffectViewport, D_8008AB98 -> sStyleEffectModelIds. PROPOSED (not
 applied, a prototype and body outside the header): its `Actor *self`
 parameter and the `Actor *` view of sStyleEffectTmd in ObjMStyleActor.c/_s.c
 are really `LinkResource *`, and the `setBackClip` calls through it are

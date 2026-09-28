@@ -9,7 +9,7 @@
 ## Provenance
 
 Round-42's "REOPENED -- ASSIGNABLE" banner applies: stub-stalled as
-`gp_rel`-blocked on `gStyleEffectViewport`/`sStyleEffectBaseViewY`, both already present in
+`gp_rel`-blocked on `sStyleEffectViewport`/`sStyleEffectBaseViewY`, both already present in
 `config/gp-symbols.txt`. Matched byte-exact this round (after fixing an
 unrelated whole-image size regression caused by a sibling function in the
 same session -- see `StyleEffect__SpawnSprites`'s report).
@@ -19,7 +19,7 @@ same session -- see `StyleEffect__SpawnSprites`'s report).
 The second of this unit's three `self->unk54`-dispatch handlers (see
 `StyleEffect__ReleaseByKind`'s comment and `StyleEffect__InitByKind`, the first). Folds
 `*(Vec3S*)arg1 + self->unk58` into a stack-local, adds the delta between
-`gStyleEffectViewport`'s pointee's `+0x18` field and the snapshot `StyleEffect__InitByKind` left
+`sStyleEffectViewport`'s pointee's `+0x18` field and the snapshot `StyleEffect__InitByKind` left
 in `sStyleEffectBaseViewY`, forwards the result through `slotB8`, then dispatches on
 `unk54` to one of three different callees than `StyleEffect__InitByKind`'s own switch.
 
@@ -30,7 +30,7 @@ void StyleEffect__UpdateByKind(LinkNode *self, void *arg1) {
     Vec3S local;
 
     AddVec3(&local, (Vec3S *)arg1, &self->unk58);
-    local.y += *(s32 *)((u8 *)gStyleEffectViewport + 0x18) - sStyleEffectBaseViewY;
+    local.y += *(s32 *)((u8 *)sStyleEffectViewport + 0x18) - sStyleEffectBaseViewY;
     self->methods->slotB8(self, &local);
 
     switch (self->unk54) {
@@ -62,7 +62,7 @@ void StyleEffect__UpdateByKind(LinkNode *self, void *arg1) {
   `INCLUDE_ASM` as of this report) and is likewise called here with a dead
   second argument; same old-style-declaration treatment, needed so the
   eventual real (one-argument) definition doesn't conflict.
-- This function and `StyleEffect__InitByKind` share the `gStyleEffectViewport`/`sStyleEffectBaseViewY`
+- This function and `StyleEffect__InitByKind` share the `sStyleEffectViewport`/`sStyleEffectBaseViewY`
   snapshot-and-diff pattern; `StyleEffect__InitByKind` always runs first for a given
   node (it's the one that WRITES `sStyleEffectBaseViewY`), so the diff computed here is
   "how much did the tracked field move since the last time `StyleEffect__InitByKind`
@@ -128,7 +128,7 @@ Round 70 (alpha). `func_80056640` -> `StyleEffect__UpdateByKind`, **tier B**.
 Only caller is `StyleEffect__Update`, which sits in gStyleEffectMethods's slot +0x0EC
 (asm/data/76DC8.data.s, the table's last word) and increments `tick` (+0x024)
 before the call. Body: owner's slotB8 (Actor__SetTranslation in gStyleEffectMethods,
-i.e. set translation) with pos + offset + (gStyleEffectViewport's +0x018 word now -
+i.e. set translation) with pos + offset + (sStyleEffectViewport's +0x018 word now -
 sStyleEffectBaseViewY); then kind 0 -> StyleEffect__DriftModelChildren, 2 ->
 NoOpIgnoreArgs, 3 -> StyleEffect__RandomizeSprites. "Update" rests on the
 per-frame counter in its one caller, so B.
@@ -139,7 +139,7 @@ ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: 
 
 ## Track 6 (round 93, bravo)
 
-The `(u8 *)D_8008ACAC + 0x18` word is now `gStyleEffectViewport`'s, and it is
+The `(u8 *)D_8008ACAC + 0x18` word is now `sStyleEffectViewport`'s, and it is
 Viewport's refView.vp.y (include/Viewport.h, +0x014 refView + 4): the effect
 follows the viewpoint's vertical movement since sStyleEffectBaseViewY (was
 gTrackedYSnapshot) was taken. PROPOSED for track 7: type the global
@@ -155,6 +155,6 @@ unit comment they came from verbatim.
 
 ## Naming (track 7, round 101)
 
-- The viewpoint read is `((Viewport *)gStyleEffectViewport)->refView.vp.y`
+- The viewpoint read is `((Viewport *)sStyleEffectViewport)->refView.vp.y`
   (evidence in StyleEffect__InitByKind.md).
 - `local` -> `placed`. Cases are StyleEffectKind's members.

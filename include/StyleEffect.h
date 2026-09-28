@@ -17,7 +17,7 @@
  * Who builds it. StyleBuildEffectSlots, on the style layer's first tick,
  * first calls SetStyleEffectSources with the scene's DREAMER.TMD resource,
  * ETC.TIM image and viewport (sStyleEffectTmd, sStyleEffectTim,
- * gStyleEffectViewport), then StyleFillEffectKind0..3 fill
+ * sStyleEffectViewport), then StyleFillEffectKind0..3 fill
  * sStyleEffectSlots with New_StyleEffect(kind, params, gStyleGrid, pos):
  * several of kind 0, of kind 1 for variant 2, then one of kind 3 (variant 0)
  * or kind 2 (variant 2). `params` is one StyleEffectParams laid over the
