@@ -41,11 +41,11 @@ void Viewport__DeinitOt(Unk18Obj *self) {
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__DeinitOt`. Slot +0x090 `deinitOt`; frees `ot[0]`, the start of InitOt's allocation. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__DeinitOt`. Slot +0x090 `deinitOt`; frees `ot[0]`, the start of InitOt's allocation. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/app/task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: none: `DrawSync(0)`'s int return is ignored, as before.
+src/app/task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: none: `DrawSync(0)`'s int return is ignored, as before.
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 

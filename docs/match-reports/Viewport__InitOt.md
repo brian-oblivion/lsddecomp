@@ -672,11 +672,11 @@ otherwise.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__InitOt`. Slot +0x08C `initOt`. Its carving names the fields: `ot[2]` (+0x078, each a 0x14-byte GsOT header, `ViewportOt`, whose `length` and `org` it sets), `otTags[2]` (+0x080, each OT's tag array) and `workBase[2]` (+0x088, each half's packet area). The arithmetic is unchanged: ot[1] is still `(ViewportOt *)(size + (s32)ot[0])`, the int form, and GsClearOt's local prototype takes a `ViewportOt *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__InitOt`. Slot +0x08C `initOt`. Its carving names the fields: `ot[2]` (+0x078, each a 0x14-byte GsOT header, `ViewportOt`, whose `length` and `org` it sets), `otTags[2]` (+0x080, each OT's tag array) and `workBase[2]` (+0x088, each half's packet area). The arithmetic is unchanged: ot[1] is still `(ViewportOt *)(size + (s32)ot[0])`, the int form, and GsClearOt's local prototype takes a `ViewportOt *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/app/task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsClearOt(0, 0, (GsOT *)self->ot[0])` and `[1]`: `ViewportOt` is Sony's GsOT under a local name (include/Viewport.h).
+src/app/task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsClearOt(0, 0, (GsOT *)self->ot[0])` and `[1]`: `ViewportOt` is Sony's GsOT under a local name (include/viewport.h).
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 
@@ -717,11 +717,11 @@ The 0x14 header is `sizeof(GsOT)` (the unit now includes `<libgs.h>`). The local
  * the final addu/addiu pair swaps (round 71). */
 ```
 
-Round 96 (alpha, track 6). include/Viewport.h's local `ViewportOt` (a
+Round 96 (alpha, track 6). include/viewport.h's local `ViewportOt` (a
 0x14-byte view of the GsOT header: length, org, pad) is deleted: `ot[2]` is
 Sony's `GsOT *`, `otTags[2]` Sony's `GsOT_TAG *` (each header's `org`) and
 `workBase[2]` Sony's `PACKET *` (GsSetWorkBase's argument), and every unit
-including Viewport.h takes Sony's headers after common.h. The `(GsOT *)`
+including viewport.h takes Sony's headers after common.h. The `(GsOT *)`
 casts at GsClearOt, GsSortClear, GsDrawOt and drawNode's five sort calls and
 Update's `(PACKET *)` cast are gone. Byte-identical (whole image green).
 

@@ -158,7 +158,7 @@ Renamed from TaskCoreObj__func_8003C238 (tools/rename.py). Occupant of +0x04C (`
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of the local StreamTaskUnk18Obj view, and its slots are called by name: +0x048 setOtLength (unk28), +0x04C setUnk44 (unk2C), +0x050 setUnk48 (unk30), +0x070 attachViewChild (unk14, &sTaskCoreViewOrigin twice, NULL twist), +0x08C initOt. sTaskCoreViewOrigin is a zero LongVec3. Byte-identical.
+The viewport is cast to `Viewport *` (include/viewport.h, round 85) instead of the local StreamTaskUnk18Obj view, and its slots are called by name: +0x048 setOtLength (unk28), +0x04C setUnk44 (unk2C), +0x050 setUnk48 (unk30), +0x070 attachViewChild (unk14, &sTaskCoreViewOrigin twice, NULL twist), +0x08C initOt. sTaskCoreViewOrigin is a zero LongVec3. Byte-identical.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 

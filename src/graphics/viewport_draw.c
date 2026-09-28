@@ -4,7 +4,7 @@
  * the same way.
  *
  * It is slot +0x0A0 (drawNode) of gViewportMethods, inherited unchanged by
- * gNodeGuardedViewportMethods (include/Viewport.h). The node's class id
+ * gNodeGuardedViewportMethods (include/viewport.h). The node's class id
  * picks the draw path, and each path reads the node as the class it tests
  * for:
  *  - a BgLayer: its GsBG to GsSortBg, at the OT's last tag;
@@ -45,7 +45,7 @@
 #include "box_fill.h"
 #include "sprite.h"
 #include "screen_sprite.h"
-#include "Viewport.h"
+#include "viewport.h"
 #include "tmd_renderer.h"
 
 /* The bits of avsz3's OTZ that one OT spans: SortTmdObject files a face at

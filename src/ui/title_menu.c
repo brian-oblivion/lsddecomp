@@ -38,7 +38,7 @@
 #include "dream_sys.h"
 #include "scene_node.h"
 #include "actor.h"
-#include "Viewport.h"
+#include "viewport.h"
 #include "node_guarded_viewport.h"
 #include "grid_cell.h"
 #include "title_menu.h"

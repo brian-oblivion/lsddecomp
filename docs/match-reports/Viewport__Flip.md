@@ -98,11 +98,11 @@ exactly, and is simpler than the first attempt besides.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__Flip`. Slot +0x0A4 `flip`. `unkC` is `drawSystem` (the class-1 child, gDrawSystemMethods), whose +0x054 (DrawSystem__GetActiveBuffer) gives otIndex and +0x050 (DrawSystem__SwapBuffers) swaps; reached through task.h's GenericObj view with a cast, since DrawSystem has no header. `unkB8` is `drawEnabled`; the OT reads are `ot[idx]`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__Flip`. Slot +0x0A4 `flip`. `unkC` is `drawSystem` (the class-1 child, gDrawSystemMethods), whose +0x054 (DrawSystem__GetActiveBuffer) gives otIndex and +0x050 (DrawSystem__SwapBuffers) swaps; reached through task.h's GenericObj view with a cast, since DrawSystem has no header. `unkB8` is `drawEnabled`; the OT reads are `ot[idx]`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/app/task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSortClear(..., (GsOT *)self->ot[idx])` and `GsDrawOt((GsOT *)self->ot[idx])`.
+src/app/task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSortClear(..., (GsOT *)self->ot[idx])` and `GsDrawOt((GsOT *)self->ot[idx])`.
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 
@@ -131,11 +131,11 @@ extern void GsSortClear(u8 a0, u8 a1, u8 a2, ViewportOt *ot);
 
 The clear colour is passed as `self->clearColor.r/.g/.b` (GsSortClear's own `unsigned char` parameters make the load `lbu`), no `u8 *` over the struct; the slot-offset notes (+0x050, +0x054) are gone from the comment, the slot names say it. Byte-identical.
 
-Round 96 (alpha, track 6). include/Viewport.h's local `ViewportOt` (a
+Round 96 (alpha, track 6). include/viewport.h's local `ViewportOt` (a
 0x14-byte view of the GsOT header: length, org, pad) is deleted: `ot[2]` is
 Sony's `GsOT *`, `otTags[2]` Sony's `GsOT_TAG *` (each header's `org`) and
 `workBase[2]` Sony's `PACKET *` (GsSetWorkBase's argument), and every unit
-including Viewport.h takes Sony's headers after common.h. The `(GsOT *)`
+including viewport.h takes Sony's headers after common.h. The `(GsOT *)`
 casts at GsClearOt, GsSortClear, GsDrawOt and drawNode's five sort calls and
 Update's `(PACKET *)` cast are gone. Byte-identical (whole image green).
 

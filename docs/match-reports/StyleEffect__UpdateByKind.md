@@ -140,7 +140,7 @@ dream_scene.c's `LinkNode` view (owner and children under one type) is gone: the
 ## Track 6 (round 93, bravo)
 
 The `(u8 *)D_8008ACAC + 0x18` word is now `sStyleEffectViewport`'s, and it is
-Viewport's refView.vp.y (include/Viewport.h, +0x014 refView + 4): the effect
+Viewport's refView.vp.y (include/viewport.h, +0x014 refView + 4): the effect
 follows the viewpoint's vertical movement since sStyleEffectBaseViewY (was
 gTrackedYSnapshot) was taken. PROPOSED for track 7: type the global
 `Viewport *` and read `->refView.vp.y`; spell the switch with

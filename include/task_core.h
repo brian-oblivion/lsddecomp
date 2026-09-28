@@ -62,7 +62,7 @@
  * list widgets) are declared `BasicClass *`, the parent every one of them
  * has; a unit that calls one past BasicClass's slots casts to its own view
  * of it. The viewport (IntermediateBase's field) is a Viewport
- * (include/Viewport.h); its callers cast to that type. bgLayer is a
+ * (include/viewport.h); its callers cast to that type. bgLayer is a
  * `struct BgLayer *` (include/bg_layer.h), by tag, so a unit that calls it
  * includes bg_layer.h. tileMap likewise is a `struct TileMap *`
  * (include/tile_map.h), and tileAtlas a `struct TileAtlas *`

@@ -78,7 +78,7 @@ following round 78's `GsSetNearClip` precedent. Byte-identical.
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/app/task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: none: the definition already had LIBGS.H's shape; `SetGeomScreen` now comes from `<libgte.h>`.
+src/app/task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: none: the definition already had LIBGS.H's shape; `SetGeomScreen` now comes from `<libgte.h>`.
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 

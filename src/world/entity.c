@@ -34,7 +34,7 @@
 #include "entity.h"
 #include "dream_sys.h"
 #include "stage_map.h"
-#include "Viewport.h"
+#include "viewport.h"
 #include "bmem_pmgr.h"
 
 /* The size and attach offset Entity__GetOrCreateFadeBox substitutes when its

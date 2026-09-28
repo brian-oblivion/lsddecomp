@@ -47,7 +47,7 @@
 #include "frame_clock.h"
 #include "actor.h"
 #include "style_effect.h"
-#include "Viewport.h"
+#include "viewport.h"
 #include "sound_cue_set.h"
 #include "variant_sprite.h"
 #include <rand.h>

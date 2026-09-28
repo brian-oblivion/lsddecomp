@@ -10,7 +10,7 @@
  *    then, in sections 1 to 3 below, its pad dispatch, state machine, fades
  *    and menu methods up to its table getter;
  *  - IntermediateBase (include/intermediate_base.h), TaskCore's parent, whole;
- *  - Viewport (include/Viewport.h), except drawNode (viewport_draw.c): its
+ *  - Viewport (include/viewport.h), except drawNode (viewport_draw.c): its
  *    allocator to its table getter, then GetRootNode;
  *  - Sony's GsSetProjection (libgs/gs_106), carried as C because no SDK
  *    object places it.
@@ -29,7 +29,7 @@
 #include "tile_atlas.h"
 #include "pad.h"
 #include "tim_image.h"
-#include "Viewport.h"
+#include "viewport.h"
 #include "light_rig.h"
 #include "frame_clock.h"
 #include <strings.h>
@@ -1159,7 +1159,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, s32 withSound) {
  * clock and polls the pad, setState with its two state hooks (which start
  * and stop the DrawSystem), and the table getter.
  *
- * Last, Viewport (include/Viewport.h): New_Viewport, the ctor, finalize, and
+ * Last, Viewport (include/viewport.h): New_Viewport, the ctor, finalize, and
  * the addChild/removeChild/removeAllChildren overrides, which cache a
  * DrawSystem child and a SceneNode child (the view node, whose coord2 the
  * reference view hangs from) by root class id. Section 4 holds the rest
@@ -1390,7 +1390,7 @@ void Viewport__RemoveAllChildren(Viewport *self) {
 
 /*
  * Section 4. Viewport's methods from onNotify (+0x038) to the end of
- * gViewportMethods (include/Viewport.h, whose banner says what the class
+ * gViewportMethods (include/viewport.h, whose banner says what the class
  * is); the ctor, finalize and the child overrides are in section 3,
  * drawNode in viewport_draw.c. In table order:
  *  - onNotify and its two per-sender handlers: a FrameClock event runs
@@ -1411,7 +1411,7 @@ void Viewport__RemoveAllChildren(Viewport *self) {
  * Then the table getter, GetRootNode (update's helper) and Sony's
  * GsSetProjection.
  *
- * refView is Viewport.h's ViewportRefView, GsRVIEW2's layout with vp and vr
+ * refView is viewport.h's ViewportRefView, GsRVIEW2's layout with vp and vr
  * as vectors (its comment says why), hence the (GsRVIEW2 *) cast at
  * GsSetRefView2.
  */
@@ -1734,7 +1734,7 @@ tail_check:
  * `fadeBox`, and attaches it under sceneRoot at sFadeBoxAttachPos
  * (-100, -100). A FadeBox's attachToParent (BoxFill__AttachToParent) takes a
  * screen position where SceneNode's slot types a LongVec3 offset, hence the
- * cast (include/Viewport.h, "Not settled here"). */
+ * cast (include/viewport.h, "Not settled here"). */
 void Viewport__SetFadeBox(Viewport *self, SceneNode *fadeBox) {
     if (self->viewNode != NULL) {
         return;

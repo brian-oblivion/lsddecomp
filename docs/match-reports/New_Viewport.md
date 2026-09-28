@@ -62,9 +62,9 @@ placeholder name `Unk18Obj`.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `New_Unk18Obj`. The allocator, `New_<Class>`: BMemPMgrAlloc(0xBC), which is the object size in the header. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `New_Unk18Obj`. The allocator, `New_<Class>`: BMemPMgrAlloc(0xBC), which is the object size in the header. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Track 7 (round 98, echo)
 
-`BMemPMgrAlloc(0xBC)` -> `BMemPMgrAlloc(sizeof(Viewport))`: Viewport.h's
+`BMemPMgrAlloc(0xBC)` -> `BMemPMgrAlloc(sizeof(Viewport))`: viewport.h's
 struct is 0xBC bytes, and the oracle agrees (byte-identical).

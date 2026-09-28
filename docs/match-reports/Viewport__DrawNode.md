@@ -80,7 +80,7 @@ declaration order).
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__DrawNode`. Slot +0x0A0 `drawNode`. `self` is now `Viewport *`: DrawView's names were carried into the header at their offsets (width/height -> screenSize.width/height, otLen -> otLength, buf -> otIndex; ot, projH, nearZ, zDiv unchanged). The node keeps viewport_draw's local DrawNode view, so the method is not prototyped in Viewport.h. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__DrawNode`. Slot +0x0A0 `drawNode`. `self` is now `Viewport *`: DrawView's names were carried into the header at their offsets (width/height -> screenSize.width/height, otLen -> otLength, buf -> otIndex; ot, projH, nearZ, zDiv unchanged). The node keeps viewport_draw's local DrawNode view, so the method is not prototyped in viewport.h. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Unit history (moved from the code_2864.c banner, track 6 round 94)
 
@@ -159,7 +159,7 @@ The unit banner, verbatim, as it was before this pass:
  * (vram 0x80012064..0x80012768).
  *
  * It is slot +0x0A0 (drawNode) of gViewportMethods, inherited unchanged by
- * gNodeGuardedViewportMethods (include/Viewport.h); `self` is the Viewport
+ * gNodeGuardedViewportMethods (include/viewport.h); `self` is the Viewport
  * and `node` a SceneNode (include/scene_node.h). The class-id low byte picks
  * the draw path, and each path reads the node as the subclass that id names:
  * 0x54 a BgLayer (its GsBG at +0x044 to GsSortBg), 0x64 a BoxFill (its GsBOXF

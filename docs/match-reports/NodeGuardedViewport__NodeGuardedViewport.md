@@ -55,7 +55,7 @@ evident from the body and from the vtable dump (`tools/classtable.py
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-NodeGuardedViewport's parent is Viewport (id 0x7, include/Viewport.h, round 85): the base ctor call is `GetViewportMethods()->ctor((Viewport *)self)`, replacing class_3bb8c.h's BaseCtorTable_3bb8c_c view. This is the ctor chain that makes 0x17 Viewport's subclass. NodeGuardedViewport's own views are unchanged. Byte-identical.
+NodeGuardedViewport's parent is Viewport (id 0x7, include/viewport.h, round 85): the base ctor call is `GetViewportMethods()->ctor((Viewport *)self)`, replacing class_3bb8c.h's BaseCtorTable_3bb8c_c view. This is the ctor chain that makes 0x17 Viewport's subclass. NodeGuardedViewport's own views are unchanged. Byte-identical.
 
 ## Track 6 (2026-09-26, round 92, echo)
 

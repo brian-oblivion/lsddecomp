@@ -39,7 +39,7 @@ existing `unkB0` field.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__SetUnkB4`. Slot +0x0B0 `setUnkB4`. unkB4 makes Flip swap once more on buffer 0; what that is for is not shown. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__SetUnkB4`. Slot +0x0B0 `setUnkB4`. unkB4 makes Flip swap once more on buffer 0; what that is for is not shown. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Proposed field names (round 95, alpha)
 
@@ -50,7 +50,7 @@ Viewport's `unkB4` -> `extraSwap`, slot `setUnkB4` -> `setExtraSwap`, this funct
 
 ## Naming
 
-Renamed `Viewport__SetUnkB4` -> `Viewport__SetExtraSwapOnBuffer0` -> `Viewport__SetExtraSwap` with `tools/rename.py` (the second run takes round 95's proposal above): tier B. The field is now `extraSwap` (include/Viewport.h; every accessor is in task.c): while it is set, Flip calls the DrawSystem's swapBuffers once more before the clear and once more after the draw on buffer 0. What that is for is not shown; the only caller in C (dream_scene.c) passes 0, as InitDefaults does. Parameter `value` -> `on`.
+Renamed `Viewport__SetUnkB4` -> `Viewport__SetExtraSwapOnBuffer0` -> `Viewport__SetExtraSwap` with `tools/rename.py` (the second run takes round 95's proposal above): tier B. The field is now `extraSwap` (include/viewport.h; every accessor is in task.c): while it is set, Flip calls the DrawSystem's swapBuffers once more before the clear and once more after the draw on buffer 0. What that is for is not shown; the only caller in C (dream_scene.c) passes 0, as InitDefaults does. Parameter `value` -> `on`.
 
 ## Proposed field names
 

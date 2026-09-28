@@ -63,7 +63,7 @@ support. `unk10`/`unk70` themselves are left unnamed -- no evidence beyond
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-The forward is Viewport's +0x09C `update` (`GetViewportMethods()->update((Viewport *)self)`, include/Viewport.h, round 85). In Viewport's layout, `unk10` is `viewNode` and `unk70` is `otReady`; NodeGuardedViewport's own view keeps its names. Byte-identical.
+The forward is Viewport's +0x09C `update` (`GetViewportMethods()->update((Viewport *)self)`, include/viewport.h, round 85). In Viewport's layout, `unk10` is `viewNode` and `unk70` is `otReady`; NodeGuardedViewport's own view keeps its names. Byte-identical.
 
 ## Track 4 (2026-09-26, round 87)
 

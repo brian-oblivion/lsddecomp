@@ -199,11 +199,11 @@ Outside this job's edit set (the head applies them by type scope):
   `Entity__GetOrCreateUnk100` -> `Entity__GetOrCreateFadeBox` (rename.py;
   the body creates the FadeBox on first call, reattaches it and sets its
   step).
-- Viewport's `subHandle` (+0x0B0, include/Viewport.h) -> `fadeBox`, and its
+- Viewport's `subHandle` (+0x0B0, include/viewport.h) -> `fadeBox`, and its
   getter slot `getSubHandle` -> `getFadeBox`: the ctor fills it with
   New_FadeBox, and both ObjM callers cast the result to `FadeBox *`.
-  Viewport.h's banner still lists it as "not settled"; its type could
-  become `FadeBox *` once Viewport.h can include fade_box.h.
+  viewport.h's banner still lists it as "not settled"; its type could
+  become `FadeBox *` once viewport.h can include fade_box.h.
 - `FadeBox::unk7C` stays: configure stores its third argument there and
   update skips stepping while it is 9, but every caller passes 0, so what
   9 means is not shown.

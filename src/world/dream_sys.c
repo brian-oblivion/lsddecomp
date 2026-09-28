@@ -43,7 +43,7 @@
 #include "stage_map.h"
 #include "lbd_file.h"
 #include "vab_stream_obj.h"
-#include "Viewport.h"
+#include "viewport.h"
 #include "bmem_pmgr.h"
 
 extern s32 sLinkSrcStage;

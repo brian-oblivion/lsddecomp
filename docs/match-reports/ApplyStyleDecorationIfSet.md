@@ -144,7 +144,7 @@ RegisterStyleConfig's third argument, which ObjM__InitStyleAndWorld
 (dream_scene) passes as `&self->ctorSound`: it points at ObjM's
 +0x06C..+0x07B block (include/objm.h's banner). The holder's +0x00C is
 therefore ObjM::cachedViewport, a NodeGuardedViewport, and +0x0AC of its
-table is Viewport's `getFadeBox` (include/Viewport.h, `SceneNode *(*)(Self *)`)
+table is Viewport's `getFadeBox` (include/viewport.h, `SceneNode *(*)(Self *)`)
 -- objm.h's banner already said so. dream_scene.c had the same block as
 `StyleSceneRefs {sound, dreamerTmd, etcTim, Viewport *viewport}`; this unit
 now carries the identical view (`typeviews.py --merge StyleSceneRefs`: 2

@@ -270,7 +270,7 @@ Viewport's `refView.vp.y`, see below.)
   `((Viewport *)sStyleEffectViewport)->refView.vp.y`: the pointer is
   StyleSceneRefs::viewport, a `Viewport *` (dream_scene.c passes it to
   SetStyleEffectSources), and +0x018 is `refView` (+0x014) `.vp.y` (+0x004)
-  in include/Viewport.h. The extern stays `void *` because dream_scene.c
+  in include/viewport.h. The extern stays `void *` because dream_scene.c
   declares it so (proposed to the head: retype both).
 - Locals: `local` -> `placed` (pos + offset), `state` -> `kind` (it is
   `pendingExtra`, the StyleEffectKind), `ret` -> `model` (setBackClip's

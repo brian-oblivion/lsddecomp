@@ -1,7 +1,7 @@
 #ifndef NODE_GUARDED_VIEWPORT_H
 #define NODE_GUARDED_VIEWPORT_H
 
-#include "Viewport.h"
+#include "viewport.h"
 
 /*
  * NodeGuardedViewport -- a Viewport that skips its frame while no view node

@@ -75,4 +75,4 @@ rather than recognizing the guard as already covered by the loop.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__GetTail`. Not a Viewport method: it is in no table, and its one caller, Viewport__Update, passes it the view node, a SceneNode. The chain it walks is +0x00C, SceneNode's `parent` (DrawNode's `parent` too), so it returns the top of the node's hierarchy: renamed GetRootNode, typed `SceneNode *GetRootNode(SceneNode *node)`, byte-identical. The Viewport class is unified in `include/Viewport.h` (round 85).
+Renamed from `Unk18Obj__GetTail`. Not a Viewport method: it is in no table, and its one caller, Viewport__Update, passes it the view node, a SceneNode. The chain it walks is +0x00C, SceneNode's `parent` (DrawNode's `parent` too), so it returns the top of the node's hierarchy: renamed GetRootNode, typed `SceneNode *GetRootNode(SceneNode *node)`, byte-identical. The Viewport class is unified in `include/viewport.h` (round 85).

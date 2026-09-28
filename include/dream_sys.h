@@ -203,7 +203,7 @@ typedef struct {
     s32 day;
 } FlashbackEntry;
 
-/* DreamSys::viewport is a Viewport (include/Viewport.h; tag only here,
+/* DreamSys::viewport is a Viewport (include/viewport.h; tag only here,
    dream_sys.c includes the header). This class moves its GsRVIEW2 refView:
    +0x014 vp and +0x020 vr (the two "points"
    ProjectPointAtDistance interpolates between), +0x018 vp.y and +0x024

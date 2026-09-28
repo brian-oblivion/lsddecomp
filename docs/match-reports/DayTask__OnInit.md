@@ -164,13 +164,13 @@ and 0x8008665C.
 ## Naming (track 7, round 99, charlie)
 
 - `sDayViewPoint` = (0, -1200, 0) and `sDayViewRef` = (0, -1200, 10000)
-  (tier A: they are attachViewChild's `vp` and `vr` arguments, Viewport.h
+  (tier A: they are attachViewChild's `vp` and `vr` arguments, viewport.h
   +0x070). Unit-static (`s`): no other code reads them.
 - Locals `obj`/`ret` -> `drawSystem`/`fadeBox`: the init args' `drawSystem`
   and Viewport's `getFadeBox` result.
 - SubObjE's +0x07C `slot7C` -> `getDims`: the object is the init args'
   `drawSystem`, and draw_system.h's +0x07C is `getDims` (DrawSystem__GetDims).
-- `setUnk44(vp, 1200)`: decimal; Viewport.h says unk44 x unk48 is each
+- `setUnk44(vp, 1200)`: decimal; viewport.h says unk44 x unk48 is each
   buffer's packet area (default 2000) without settling which is the count, so
   the value keeps no name.
 

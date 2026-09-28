@@ -109,7 +109,7 @@ Renamed from TaskCoreObj__func_8003C3D0 (tools/rename.py). Occupant of +0x050 (`
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of the local StreamTaskUnk18Obj view; +0x090 is deinitOt and +0x074 detachViewChild. Byte-identical.
+The viewport is cast to `Viewport *` (include/viewport.h, round 85) instead of the local StreamTaskUnk18Obj view; +0x090 is deinitOt and +0x074 detachViewChild. Byte-identical.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 

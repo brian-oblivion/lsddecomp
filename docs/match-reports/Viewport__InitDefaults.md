@@ -363,7 +363,7 @@ toolchain question, not a per-function one)?
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__InitDefaults`. The +0x040 slot's occupant, named `initDefaults`. The defaults name the fields: screenSize 256x240 (sDefaultViewportWidth/sDefaultViewportHeight), otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 0x10000, drawEnabled 1. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__InitDefaults`. The +0x040 slot's occupant, named `initDefaults`. The defaults name the fields: screenSize 256x240 (sDefaultViewportWidth/sDefaultViewportHeight), otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 0x10000, drawEnabled 1. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## asm sites
 
