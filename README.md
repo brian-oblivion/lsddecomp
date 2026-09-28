@@ -13,9 +13,9 @@ work left is readability (names, types, comments). Measure it rather than
 trust this line:
 
 ```sh
-python3 tools/progress.py      # matched and queued functions, per unit
-python3 tools/plan.py          # the finishing plan's tracks and what is left
-python3 tools/readability.py   # the readability debt, per unit
+python3 tools/progress.py      # matched functions and bytes, per file
+python3 tools/plan.py          # the project's tracks and what is left
+python3 tools/readability.py   # the readability debt, per file
 ```
 
 ## Building it
@@ -36,9 +36,10 @@ cp ~/path/to/'Programmer Tool - Runtime Library Version 3.5 (Japan) (En,Ja)_DTL-
 finds exactly one, verifies it against `check.sha1`, sets up a Python venv,
 clones maspsx, asm-differ, m2c and decomp-permuter, fetches the prebuilt GCC
 2.6.3, builds a `mipsel-linux-gnu` binutils, fetches psyq-obj-parser and
-converts the SDK discs in `sdk/` into `lib/` with it, runs the split, and **proves the result rebuilds byte-for-byte**.
-If that fails it stops. `disk/README.md` covers extracting the executable by
-hand and which dump is expected.
+converts the SDK discs in `sdk/` into `lib/` with it, runs the split
+(`make extract`), and **proves the result rebuilds byte-for-byte**. If that
+fails it stops. `disk/README.md` covers extracting the executable by hand and
+which dump is expected.
 
 After that there is one build command:
 
@@ -46,7 +47,8 @@ After that there is one build command:
 ./build-and-verify.sh          # build, then compare the whole image with retail
 ```
 
-Use it instead of `make`: a bare `make` produces bytes and says nothing about
+It ends `OK: build matches retail SLPS_015.56` when the image is exact. Use it
+instead of `make`: a bare `make` produces bytes and says nothing about
 whether they are the right ones.
 
 ### Where the SDK comes from
@@ -56,20 +58,20 @@ Rather than re-derive that code as C, it links **Sony's own objects**
 (libapi, libc2, libcard, libcd, libetc, libgs, libgte, libpress, libsnd,
 libspu), taken from the "Programmer Tool — Runtime Library" discs and placed
 exactly where the game put them, each as a splat `o` segment. The discs are
-on archive.org; `sdk/README.md` has the link and the file names. The game mixed library builds,
-so objects come from more than one disc version: which disc owns which object
-is measured against retail and recorded in `config/psyq-objects.txt`. The
-manifest currently draws on the 3.3, 3.5 and 3.6 discs; to see which you are
-missing:
+on archive.org; `sdk/README.md` has the link and the file names. The game
+mixed library builds, so objects come from more than one disc version: which
+disc owns which object is measured against retail and recorded in
+`config/psyq-objects.txt` (its first column). The manifest currently draws on
+the 3.3, 3.5 and 3.6 discs; to see which you are missing:
 
 ```sh
 .venv/bin/python3 tools/psyq_sdk.py install    # names any missing disc by its exact file name
+.venv/bin/python3 tools/psyq_sdk.py check      # manifest, splat config and lib/ agree
 ```
 
 Sony code no disc's object matches stays as disassembly in the `psyq_*`
 segments, or is carried in `src/psyq/` (one file per Sony module, C where it
-matched and `INCLUDE_ASM` elsewhere), or sits in a game file whose banner
-says so.
+matched and `INCLUDE_ASM` elsewhere).
 
 ## What the code is
 
@@ -100,133 +102,213 @@ ctor calls its parent's first) is the real inheritance, and
 table starts with its slots (release, ctor, finalize, a child list, a list of
 parent back-references, and `notifyParents`/`onNotify` events, which is how
 objects talk to each other). Each class has exactly one header,
-`include/<class>.h` (the class's name in snake_case, `include/scene_node.h`), holding its object struct, its method-table struct and
-its prototypes; a class with subclasses exports `FIELDS`/`SLOTS` macros its
-children expand first. Each header's banner says what the class does, which
-units hold its methods and who builds it.
+`include/<class>.h` (the class's name in snake_case, `include/scene_node.h`),
+holding its object struct, its method-table struct and its prototypes; a
+class with subclasses exports `FIELDS`/`SLOTS` macros its children expand
+first.
 
 ```sh
 python3 tools/plan.py classes        # every class: id, table, parent, header
 python3 tools/typeviews.py --tree    # the id tree from the method tables
-python3 tools/classtable.py <table>  # a table's slots and their occupants
-python3 tools/classtable.py <table> --vs <parent-table>   # what a subclass overrides
+.venv/bin/python3 tools/classtable.py <table>                    # a table's slots and their occupants
+.venv/bin/python3 tools/classtable.py <table> --vs <parent-table> # what a subclass overrides
 ```
+
+### The headers are the API documentation
+
+Every game header in `include/` is written in Doxygen form: a `@file` block
+saying what it declares, a block on each class (what it is, its parent, which
+files hold its methods, who builds it), a `@brief` with `@param`/`@return`
+on every prototype, and a `/**< @see Class__Method */` on each method-table
+slot. Read them as text, or render them with `doxygen Doxyfile` where
+Doxygen is installed (the output goes to `build/doxygen/`). Each `.c` file
+opens with a banner saying what it holds, in address order.
 
 ### The main subsystems
 
-`src/` is grouped by subsystem. Each file's banner says what it holds, and
-`python3 tools/srcpath.py` lists the directories and how many files each has.
+`src/` is grouped by subsystem; `python3 tools/srcpath.py` lists the
+directories and how many files each has.
 
 | directory | what it holds |
 | --- | --- |
 | `src/main.c` | the entry point: builds the pool, the application, the screen and the pad, and runs the main loop |
-| `src/app/` | the application shell and the object framework: the `BMemPMgr` pool allocator and the first half of `BasicClass`, `Application` and `GameApplication`, `FileResource`, the task classes (`TaskCore`, `IntermediateBase`, `StreamTask`) with `Viewport`, and `Pad` |
+| `src/app/` | the application shell and the object framework: the `BMemPMgr` pool allocator with `BasicClass`'s methods, `Application` and `GameApplication`, `FileResource`, the task classes (`TaskCore`, `IntermediateBase`, `StreamTask`) with `Viewport`, and `Pad` |
 | `src/cd/` | CD access and the game's files: `CdDriver`, `CdStream` streaming, `LbdFile` and the table of file names |
-| `src/graphics/` | the screen, the scene graph and rendering: `DrawSystem`, `SceneNode`, the sprites, `FrameClock`, the lights, `TmdModel` and the TMD renderer (after the rest of `BasicClass`), the Viewport's draw pass, and the loaders that turn TIM, TMD and TOD files into graphics objects (with the tile-map layer and the FMV player) |
-| `src/world/` | the dream world and its actors: `DreamSys`, `DayTask` and `StageMap`, the stage grid, the dream's trigger entities, `Actor`, `TodActor` and `Entity`, and `ObjM` with the style layer and `GraphRoom` (after the second half of `ItemList`) |
+| `src/graphics/` | the screen, the scene graph and rendering: `DrawSystem`, `SceneNode`, the sprites with `FrameClock` and `LightRig`, `FlatLightObj`, `TmdModel` and the TMD renderer, the Viewport's draw pass, and the loaders that turn TIM, TMD and TOD files into graphics objects (with the tile-map layer and the FMV player) |
+| `src/world/` | the dream world and its actors: `DreamSys`, `DayTask`, `TimedTask` and `StageMap`, the stage grid, the dream's trigger entities, `Actor`, `TodActor` and `Entity`, and `ObjM` with the style layer and `GraphRoom` (after the second half of `ItemList`) |
 | `src/sound/` | the game's sound: `WBgm` background music and the VAB backend (`NullDriver`, `VabStreamObj`, sound cues), with the map chunks' `PlacementGrid` at the head of its file |
 | `src/ui/` | menus and 2D widgets: `TitleMenu` and the `TaskObjF` memory-card saves (after `NodeGuardedViewport` and `GridCell`, which the day's code uses), `TextEntry` and the first half of `ItemList`, `FadeBox`, `BoxFill` and `TextRow` |
-| `src/psyq/` | Sony library modules not linked from `lib/`, carried in `src/` as C or `INCLUDE_ASM` instead (`libsnd_*`, `libcd_bios`, `libgs_*`, `libspu_s_ih`, `libcard_card`), each file named for its Sony module; `libsnd_vmanager.c` opens with one game function, `ServiceSoundCueSet` |
+| `src/psyq/` | Sony library modules not linked from `lib/`, carried as C or `INCLUDE_ASM` under Sony's names (`libsnd_*`, `libcd_bios`, `libgs_*`, `libspu_s_ih`, `libcard_card`), each file named for its Sony module |
 
-Read each named class's header first; its banner points to the units.
+Read each named class's header first; its class block points to the files.
 
 - **Boot and the main loop.** `src/main.c` sets up the `BMemPMgr` pool
   allocator (`src/app/bmem_pmgr.c`), the `DrawSystem` screen singleton and a
-  `Pad`, then runs the root object, `GameApplication` (`src/app/game_shell.c`, a
-  subclass of `Application`, `src/app/application.c`). Application's main
-  loop never returns; it calls GameApplication's hooks, which show the intro
-  logos, play an opening movie, run the title menu, run a day, and play the
-  ending movie when a year has gone by. The game's file paths (sound banks, each stage's
-  textures, music and map chunks, the movies) are one table,
-  `src/cd/game_files.c`.
+  `Pad`, then runs the root object, `GameApplication`
+  (`src/app/game_shell.c`, a subclass of `Application`,
+  `src/app/application.c`). Application's main loop never returns; it calls
+  GameApplication's hooks, which show the intro logos, play an opening
+  movie, run the title menu, run a day, and play the ending movie when a year
+  has gone by. The game's file paths (sound banks, each stage's textures,
+  music and map chunks, the movies) are one table, `src/cd/game_files.c`.
 - **Scene objects.** `SceneNode` is the positioned 3D object, wrapping a
-  libgs `GsDOBJ2` and its coordinate system (`src/graphics/scene_node.c`); `Actor`
-  adds movement (`src/world/dream_scene.c`). `LinkResource`, `ModelData` and `Tod`/`TodSet`
-  (`src/graphics/graphics_resources.c`) load models and TOD animations;
-  `TmdModel` (`src/graphics/tmd_model.c`) is one object of a TMD, and
-  `SortTmdObject` (`src/graphics/tmd_renderer.c`) turns it into GPU primitives.
-  `Viewport` (`src/app/task.c`, its draw pass in `src/graphics/viewport_draw.c`)
-  renders a scene through libgs;
-  `FrameClock` (`src/graphics/sprite.c`) is the per-frame tick objects listen to; `Pad` (`src/app/pad.c`)
-  turns the controller into button events; `DrawSystem` (`src/graphics/draw_system.c`)
-  owns the screen and the VSync loop.
-- **The dream.** `DreamSys` (`src/world/dream_sys.c`) is the dream in progress: the
-  dream clock, the player's movement, the mood record that picks the next
-  day's dream, and the "link" teleport that ends one stage and starts
-  another. `Entity` (`src/world/entity.c`, over `TodActor`, `src/world/tod_actor.c`) is a TOD-animated
-  actor driven by per-mood tables. The stage grid maps mood-graph values to
-  stage chunks (`src/world/stage_grid.c`), and `src/world/dream_aux.c` spawns the
-  dream's trigger entities;
-  `StageMap` keeps the seven map chunks around its target loaded, each
-  chunk's `PlacementGrid` linked into a lattice of `GridCell`s. `DayTask` runs one day around the
-  DreamSys's startDay/endDay (both classes in `src/world/dream_day.c`) and
-  builds an `ObjM` per stage (`src/world/dream_scene.c`, with the style layer
-  and `StyleEffect`).
+  libgs `GsDOBJ2` and its coordinate system (`src/graphics/scene_node.c`);
+  `Actor` adds movement (`src/world/dream_scene.c`). `LinkResource`,
+  `ModelData` and `Tod`/`TodSet` (`src/graphics/graphics_resources.c`) load
+  models and TOD animations; `TmdModel` (`src/graphics/tmd_model.c`) is one
+  object of a TMD, and `SortTmdObject` (`src/graphics/tmd_renderer.c`) turns
+  it into GPU primitives. `Viewport` (`src/app/task.c`, its draw pass in
+  `src/graphics/viewport_draw.c`) renders a scene through libgs;
+  `FrameClock` (`src/graphics/sprite.c`) is the per-frame tick objects listen
+  to; `LightRig` (same file) makes the three `FlatLightObj` lights
+  (`src/graphics/flat_light_obj.c`); `Pad` (`src/app/pad.c`) turns the
+  controller into button events; `DrawSystem`
+  (`src/graphics/draw_system.c`) owns the screen and the VSync loop.
+- **The dream.** `DreamSys` (`src/world/dream_sys.c`) is the dream in
+  progress: the dream clock, the player's movement, the mood record that
+  picks the next day's dream, and the "link" teleport that ends one stage and
+  starts another. `Entity` (`src/world/entity.c`, over `TodActor`,
+  `src/world/tod_actor.c`) is a TOD-animated actor driven by per-mood tables.
+  The stage grid maps mood-graph values to stage chunks
+  (`src/world/stage_grid.c`), and `src/world/dream_aux.c` spawns the dream's
+  trigger entities. `StageMap` keeps the seven map chunks around its target
+  loaded, each chunk's `PlacementGrid` linked into a lattice of `GridCell`s.
+  `DayTask` runs one day around the DreamSys's startDay/endDay (both classes,
+  and their parent `TimedTask`, in `src/world/dream_day.c`) and builds an
+  `ObjM` per stage (`src/world/dream_scene.c`, with the style layer and
+  `StyleEffect`).
 - **Screens and menus.** `IntermediateBase` runs one attached job to a
-  result. `TaskCore` (`src/app/task.c`, with `StreamTask`, `IntermediateBase` and
-  `Viewport`) is the base of the menu and screen
+  result. `TaskCore` (`src/app/task.c`, with `StreamTask`,
+  `IntermediateBase` and `Viewport`) is the base of the menu and screen
   tasks: `StreamTask` (plays one movie), `GraphRoom` (the mood graph,
-  `src/world/dream_scene.c`) and `TitleMenu`
-  (`src/ui/title_menu.c`), the START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE
-  menu. `TimedTask`, IntermediateBase's other subclass, is the base of
-  `DayTask` and `ObjM`. The 2D pieces are `Sprite` and its subclasses (`src/graphics/sprite.c`,
-  down to `TextRow`), `BoxFill` and `FadeBox` (`src/ui/screen_widgets.c`) and `TextEntry`
-  (`src/ui/input_dialogs.c`).
+  `src/world/dream_scene.c`) and `TitleMenu` (`src/ui/title_menu.c`), the
+  START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE menu. `TimedTask`, IntermediateBase's
+  other subclass, is the base of `DayTask` and `ObjM`. The 2D pieces are
+  `Sprite`, `ScreenSprite` and `CharSprite` (`src/graphics/sprite.c`);
+  `TextRow`, `BoxFill` and `FadeBox` (`src/ui/screen_widgets.c`); and
+  `TextEntry` (`src/ui/input_dialogs.c`).
 - **Memory-card saves.** `TitleMenu` owns a `TaskObjF`, the save/load
   controller (both in `src/ui/title_menu.c`): a state machine over the
   BIOS memory-card calls, which shows its choices in an `ItemList` scrolling
   list (`src/ui/input_dialogs.c` and `src/world/dream_scene.c`).
-- **CD and data sources.** `FileResource` is the base of every class loaded
-  from a file; its file interface is bound at run time to the active driver: `CdDriver`
-  (`src/cd/cd_driver.c`: blocking file access, the CD request queue, its state
-  machines and the file table)
-  or `NullDriver`. `TimImage` (`src/graphics/tim_image.c`), `TimArraySrc`, `TimBlockSrc`, `TileMap` and
-  `TileAtlas` load and build textures.
-- **Movies.** `MoviePlayer` (`src/graphics/graphics_resources.c`) decodes MDEC FMV from a
-  `CdStream` (`src/cd/cd_stream.c`, over libcd streaming).
-- **Sound.** `VabStreamObj` loads VAB banks, `WBgm` plays background music
-  (`src/sound/wbgm.c`), `src/sound/vab_sound.c` holds `NullDriver`, `VabStreamObj` and
-  the sound-cue set beside the map chunks' `PlacementGrid`, and
-  `src/psyq/libsnd_vmanager.c` is Sony's libsnd voice manager, carried in
-  `src/` after the game's `ServiceSoundCueSet`.
+- **CD and data sources.** `FileResource` (`src/app/game_shell.c`) is the
+  base of every class loaded from a file; its file interface is bound at run
+  time to the active driver: `CdDriver` (`src/cd/cd_driver.c`: blocking file
+  access, the CD request queue, its state machines and the file table) or
+  `NullDriver` (`src/sound/vab_sound.c`). `TimImage`
+  (`src/graphics/tim_image.c`) loads one TIM; `TimArraySrc`, `TimBlockSrc`,
+  `TileMap` and `TileAtlas` (`src/graphics/graphics_resources.c`) load and
+  build textures.
+- **Movies.** `MoviePlayer` (`src/graphics/graphics_resources.c`) decodes
+  MDEC FMV from a `CdStream` (`src/cd/cd_stream.c`, over libcd streaming).
+- **Sound.** `VabStreamObj` loads VAB banks and `WBgm` plays background
+  music (`src/sound/wbgm.c`); `src/sound/vab_sound.c` holds `NullDriver`,
+  `VabStreamObj` and the sound-cue set (`ServiceSoundCueSet` is its per-tick
+  service) after the map chunks' `PlacementGrid`. Sony's libsnd, which they
+  drive, is linked from `lib/` or carried in `src/psyq/libsnd_*.c`.
 
 ### From a function to its class and callers
 
 ```sh
 grep -n 'TaskObjF__SetState' config/symbols.slps01556.lsdde.txt   # its address
 grep -rn 'TaskObjF__SetState' src/ include/                        # definition, prototype, direct calls
-python3 tools/classtable.py gTaskObjFMethods                       # the slot it fills
+.venv/bin/python3 tools/classtable.py gTaskObjFMethods             # the slot it fills
 ```
 
 A method's name gives its class, and the class's header has its table
 struct. Most calls go through a slot, so grep the slot name as well
-(`->setState(`). Every function has a report, `docs/match-reports/<func>.md`,
-with how it matched and the evidence for its name.
+(`->setState(`). Every game function has a report,
+`docs/match-reports/<func>.md`, with how it matched and the evidence for its
+name.
 
 ## Layout
 
 | path | what |
 | --- | --- |
-| `src/` | the C units, one directory per subsystem (the table under "The main subsystems") |
+| `src/` | the C files, one directory per subsystem (the table above) |
 | `include/` | one header per class, subsystem headers, and the Psy-Q SDK headers in `include/psyq/` |
-| `config/` | splat segmentation, symbol names, the SDK object manifest |
-| `asm/` | disassembly generated by `make extract`. Never edited or committed. |
+| `config/` | splat segmentation (`splat.slps01556.lsdde.yaml`), symbol names (`symbols.slps01556.lsdde.txt`), the SDK object manifest (`psyq-objects.txt`) |
+| `asm/` | disassembly generated from the executable by `make extract`. Never edited or committed. |
+| `build/` | the rebuilt `SLPS_015.56` and its link map, `lsdde.map` |
 | `disk/` | your `SLPS_015.56`. Never committed. |
 | `sdk/`, `lib/` | your SDK discs, and the Sony objects converted from them. Never committed. |
-| `tools/` | the toolchain and the project's tools |
-| `docs/` | the guides; `docs/match-reports/` is the per-function record |
+| `tools/` | the toolchain (fetched by `setup.sh`) and the project's scripts |
+| `docs/` | `match-reports/` (one per function), `research/` (the evidence behind the build and the class model), and the project's working notes |
 
-## Contributing
+## Changing code and keeping it matching
 
-- [`CLAUDE.md`](CLAUDE.md): the operating manual, for people as much as for
-  agents, including the rules the hooks in `.claude/hooks/` enforce.
-- [`docs/FINISHING-PLAN.md`](docs/FINISHING-PLAN.md): what "done" means and
-  what is left.
-- [`docs/MATCHING-GUIDE.md`](docs/MATCHING-GUIDE.md): the per-function loop.
-- [`docs/DECOMPILATION_LEARNINGS.md`](docs/DECOMPILATION_LEARNINGS.md): the
-  source idioms that reach retail's bytes.
-- [`docs/PARALLEL-RUNS.md`](docs/PARALLEL-RUNS.md): how the project runs
-  parallel agent sessions.
+The build is exact, so any change to `src/` or `include/` is checked the same
+way: edit, build, verify.
+
+```sh
+./build-and-verify.sh > /tmp/build.log 2>&1; echo "build exit=$?"
+grep -nE 'error:|parse error|undefined reference|\*\*\* \[[^]]*\.o\]' /tmp/build.log | head
+.venv/bin/python3 tools/funcdiff.py <func>        # words matching, for one function
+.venv/bin/python3 tools/asm-differ/diff.py <func> # the side-by-side diff against retail
+```
+
+Read a red build like this:
+
+- **exit 1**: `disk/SLPS_015.56` is missing or not the expected dump.
+- **exit 2 with a grep hit**: the C did not compile. GCC 2.6.3 predates the
+  `error:` prefix (it prints ``conflicting types for `T'`` and nothing else),
+  so the `*** [...o]` pattern, make failing on an object file, is the
+  reliable signal. Any score you read now is from the previous build.
+- **exit 2 and no hit**: it compiled and the image differs from retail.
+  `funcdiff.py` scores the function you touched. If that is clean, the bytes
+  moved elsewhere: `cmp -l build/SLPS_015.56 disk/SLPS_015.56 | head` gives
+  1-based file offsets, `vram = (offset - 1) - 0x800 + 0x80010000`, and
+  `build/lsdde.map` turns the address into a function.
+- **Red after editing only a header**, with no compile error anywhere: the
+  compile rule is a pipeline, so a file that failed to compile once can leave
+  an object make no longer rebuilds. `rm -f build/src/<dir>/<file>.c.o` and
+  build again.
+
+The rules that break the image if you ignore them:
+
+- **Functions in a file stay in ROM-address order.** A function written out
+  of order still links, and the image comes out wrong in functions you did
+  not touch.
+- **C89, as GCC 2.6.3 reads it.** Declarations at block top, `/* */`
+  comments only (`//` is a parse error), and `char` is unsigned
+  (`-funsigned-char`): a signed byte is `s8`.
+- **A string in rodata is a symbol, not a literal.** splat has already
+  emitted every rodata string (`asm/data/*.rodata.s`); writing the literal in
+  C emits a second copy and shifts the image. Declare the named symbol, as
+  the existing code does: `extern const char sTitleTimPath[];`.
+- **A struct edit is never local.** Inserting a field without shrinking the
+  pad beside it, or retyping a slot, moves every offset after it and breaks
+  already-matching functions in other files. Rebuild the whole image after
+  any header change.
+- **Code that does not match does not stay live.** A readable body that
+  does not reach retail's bytes goes in `#ifdef NON_MATCHING`, with the
+  `INCLUDE_ASM` that splices the original disassembly in its `#else`; the
+  verified build never compiles it, and `tools/check-nonmatching.sh` proves
+  it still builds. `src/psyq/libcd_bios.c` has examples.
+- **What justifies an odd spelling is one `MATCHING:` comment** beside it in
+  the `.c`, never in the header; the longer derivation is the function's
+  report in `docs/match-reports/`.
+- **The toolchain is pinned.** The compiler, its flags and `maspsx` (which
+  reproduces Sony's assembler's macro expansions) are part of the retail
+  bytes; changing any of them is not a way to make code match.
+
+Renames go through the tools, which keep every reference in step and
+re-verify (`rename.py` also updates the symbols file and renames the
+function's report):
+
+```sh
+python3 tools/rename.py OLD NEW          # a function or global
+python3 tools/renametype.py OLD NEW      # a type or a class family
+python3 tools/unitfile.py rename OLD NEW # a source file
+```
+
+Never edit `asm/` (it is regenerated) or `check.sha1` (it is the retail
+hash everything is checked against). Run `tools/lint.sh` before sending a
+change.
+
+## Licence
+
+Not yet chosen.
 
 ## Credits
 
