@@ -339,7 +339,7 @@
 > One correction to the report's own accounting, though, went the other way:
 > the preamble residue IS partly reachable, and the fix is below.
 
-Unit `code_4cd08` ("DreamAux"). Restored to `INCLUDE_ASM`; no C left in
+Unit `DreamAux` (was `code_4cd08`). Restored to `INCLUDE_ASM`; no C left in
 `src/`. Owns the `0x206C` rodata slot's jump table (`jtbl_8001188C`, 20
 entries) -- untouched, stays embedded in `asm/nonmatchings/DreamAux/CheckDreamAuxTriggerCondition.s`
 since the function reverted to `INCLUDE_ASM`.

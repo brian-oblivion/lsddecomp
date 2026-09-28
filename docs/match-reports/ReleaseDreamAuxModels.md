@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005C5E8` on 2026-09-21 (tools/rename.py). Address 0x8005c5e8.
 
-Unit `code_4cd08` ("DreamAux"). 26/26 words, `0x4CDE8`-`0x4CE50`. Whole-image
+Unit `DreamAux` (was `code_4cd08`). 26/26 words, `0x4CDE8`-`0x4CE50`. Whole-image
 `build-and-verify.sh` green (`build exit=0`, sha1 OK). First attempt matched.
 
 ## What it does
