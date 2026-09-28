@@ -11,7 +11,26 @@
  * remaining slots are empty and never called.
  */
 #include "common.h"
-#include "class_16334.h"
+#include <libetc.h>
+#include "Pad.h"
+
+/* What only this file's bodies use; the class itself is include/Pad.h. The
+ * pad library it wraps (PadInit, PadRead, PadStop) is Sony's <libetc.h>. */
+
+extern void *BMemPMgrAlloc(s32 size);
+
+extern s32 sPadRefCount; /* live instances: the first ctor calls PadInit, the last finalize PadStop */
+extern u32 sButtonMasks[PAD_BUTTON_COUNT]; /* runtime copy of the button-mask table, filled by Pad__LoadButtonTable */
+
+/* A 0x40-byte block, copied as a whole (GCC's inlined block-move codegen for
+ * a struct assignment, not a word loop) rather than word-indexed. */
+typedef struct {
+    u32 w[16];
+} Block64;
+
+/* The unit's own read-only table of libetc's 16 button masks, in enum
+ * PadButton order (PADLup, PADLdown, ... PADstart). */
+extern Block64 sDefaultButtonMasks;
 
 Pad *New_Pad(s32 mode, s32 port) {
     Pad *self;

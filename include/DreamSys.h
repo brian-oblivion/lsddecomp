@@ -423,7 +423,7 @@ extern const s8 VOICE_BY_SELECT[0x18];
 extern const s8 VOICE_PITCH_BY_SELECT[0x18];
 
 /* BasicClass-family allocator; see GameApplicationFileResource.h / code_55dd4.h / Entity.h /
-   class_16334.h for the other units that also declare it locally. */
+   class_16334.c for the other units that also declare it locally. */
 extern void *BMemPMgrAlloc(s32 size);
 
 /* The object. Actor's fields (include/Actor.h) run to +0x058; DreamSys's

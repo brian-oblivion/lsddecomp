@@ -17,7 +17,7 @@
  */
 #include "common.h"
 #include "GameApplication.h"
-#include "class_16334.h"
+#include "Pad.h"
 
 /* Local, opaque: nothing here dereferences a BMemPMgr (BMemPMgr.h), it
  * only passes the pointer through. */
