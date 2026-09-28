@@ -34,8 +34,8 @@
 
 /* The identity inputs SceneNode__Reset hands to updateRotation and
  * updateScale: three Ratio16s each, {0/1, 0/1, 0/1} and {1/1, 1/1, 1/1}. */
-extern u8 sRotationZero[0xC];
-extern u8 sSceneNodeScaleOne[0xC];
+extern Ratio16 sRotationZero[3];
+extern Ratio16 sSceneNodeScaleOne[3];
 
 /* BMemPMgr.c's pool allocator, in this file's view of it. */
 extern void *BMemPMgrAlloc(s32 size);
