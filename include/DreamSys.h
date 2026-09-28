@@ -43,6 +43,7 @@
 
 #include "common.h"
 #include "Actor.h"
+#include "GameFiles.h"
 /* For StageChunk / GetMoodFromStageChunk, used by DreamSys__LogChunkMood. */
 #include "StageGrid.h"
 #include "SoundCueSet.h"
@@ -137,11 +138,6 @@ extern s32 *gpDinamicLinkPenalty;
    ADDS them modulo a full turn (flag == 0). Every constant this unit hands
    that slot is a Ratio16[3]: see sRotationYaw180 / Plus45 / Minus45 and
    sCardinalRotations (src/world/DreamSys.c). */
-
-typedef struct CinematicCall {
-    s16 bank;
-    s16 entry;
-} CinematicCall;
 
 typedef struct {
     MoodGraphPoint lastMood;

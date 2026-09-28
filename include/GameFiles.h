@@ -16,6 +16,15 @@ typedef struct FilePathRecord {
     u8 data[0x1C];
 } FilePathRecord;
 
+/* The cinematic DreamSys's getCinematic names, and what
+ * GetSpecialDayOrEventRecord takes packed into one word: bank is a special
+ * day and entry one of its records, or, with bank negative, entry is an
+ * event movie. entry -1 is no cinematic. */
+typedef struct CinematicCall {
+    s16 bank;
+    s16 entry;
+} CinematicCall;
+
 /* "CDI\\", the data directory a GameApplication starts with. */
 extern char *GetDefaultDataDirectory(void);
 
@@ -63,7 +72,7 @@ extern FilePathRecord *GetEventMovie(s32 *movieIdOut, s32 event);
 extern FilePathRecord *GetSpecialDayRecords(s32 *movieIdOut, s32 day);
 
 /* A special day's record or an event movie, for DreamSys's getCinematic pair
- * (s32 *movieIdOut, RecPick pick): *movieIdOut is -1 for a special day's TIM
+ * (s32 *movieIdOut, CinematicCall pick): *movieIdOut is -1 for a special day's TIM
  * images. */
 extern FilePathRecord *GetSpecialDayOrEventRecord(); /* MATCHING: unprototyped, PlayCinematic passes the pair packed into one word (arity-ok: one register) */
 
