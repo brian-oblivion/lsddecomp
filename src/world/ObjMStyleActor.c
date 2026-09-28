@@ -1233,7 +1233,7 @@ void ApplyStyleDecorationIfSet(void) {
  *  - the decoration box, gStyleDecorObj, when the config has a colour for
  *    it (ApplyStyleDecorationIfSet builds it, StyleFlushDecoration releases it);
  *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (gStyleDecorSlots)
- *    coloured from gStyleDecorColors and attached under the viewport's fade
+ *    coloured from sStyleDecorColors and attached under the viewport's fade
  *    box; every tick StyleUpdateDecorSet shifts their colours, their
  *    position and the viewport's clear colour by the view point's y offset
  *    from its reference point;
@@ -1301,7 +1301,7 @@ extern s8 *gStyleVariantConfigs[];
 extern const u8 *sStyleClearColor;
 extern u8 gStyleDecorColorsB[];
 extern u8 gStylePalette[][3];
-extern const u8 *gStyleDecorColors;
+extern const u8 *sStyleDecorColors;
 extern u8 gStyleDecorColorsA[];
 extern s32 gStyleDecorVariant;
 
@@ -1334,7 +1334,7 @@ void *PickStyleFallbackConfig(void) {
         if (decorIndex != STYLE_DECOR_B_PALETTE_INDEX) {
             decorColors = gStyleDecorColorsA;
         }
-        gStyleDecorColors = decorColors;
+        sStyleDecorColors = decorColors;
         if (index < 4) {
             gStyleDecorVariant = 1;
         } else if (index < 6) {
@@ -1361,7 +1361,7 @@ struct PairXY {
     s32 y; /* +0x004 */
 };
 
-/* Builds the bands: band 0 in gStyleDecorColors' first colour, bands 1..17
+/* Builds the bands: band 0 in sStyleDecorColors' first colour, bands 1..17
  * attached under it, each 3 pixels lower and 7 shorter than the one before;
  * band 0 then goes under the viewport's fade box. */
 void StyleBuildDecorSet(void) {
@@ -1380,9 +1380,9 @@ void StyleBuildDecorSet(void) {
         pos.y += STYLE_DECOR_VARIANT2_DROP;
     }
     size = *(PairXY *)&gStyleDecorSizeW;
-    gStyleDecorSlots[0] = New_BoxFill(&size, (void *)gStyleDecorColors, STYLE_DECOR_PRI);
+    gStyleDecorSlots[0] = New_BoxFill(&size, (void *)sStyleDecorColors, STYLE_DECOR_PRI);
     for (i = 1; i < STYLE_DECOR_BANDS; i++) {
-        band = New_BoxFill(&size, (void *)(gStyleDecorColors + i * 3), STYLE_DECOR_PRI);
+        band = New_BoxFill(&size, (void *)(sStyleDecorColors + i * 3), STYLE_DECOR_PRI);
         gStyleDecorSlots[i] = band;
         ((BoxFillAttachToParentFn)band->methods->attachToParent)(
             band, (SceneNode *)gStyleDecorSlots[0], (BoxFillPos *)&pos);
@@ -1431,7 +1431,7 @@ void StyleUpdateDecorSet(void) {
     colorOfs = 0;
     pos.y += fade * 3;
     do {
-        AdjustRgbByDelta(rgb, (u8 *)(colorOfs + gStyleDecorColors), fade);
+        AdjustRgbByDelta(rgb, (u8 *)(colorOfs + sStyleDecorColors), fade);
         band = *slot;
         band->methods->setColor(band, 1, rgb);
         band = *slot;
@@ -1654,7 +1654,7 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
     PtrBoxK3 *rotation;
 
     SetupStyleSpawnParamsRandom(pos, gStyleSpawnYChoice2);
-    if (gStyleDecorVariant != 0 && gStyleDecorColors == gStyleDecorColorsB) {
+    if (gStyleDecorVariant != 0 && sStyleDecorColors == gStyleDecorColorsB) {
         gStyleSpawnOffsetX = -45056;
         gStyleSpawnOffsetY = -8192;
         gStyleSpawnOffsetZ = 0;

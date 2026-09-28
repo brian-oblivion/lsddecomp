@@ -92,7 +92,7 @@ void StyleUpdateDecorSet(void) {
     srcOfs = 0;
     pos.y += shift * 3;
     do {
-        AdjustRgbByDelta(rgb, (u8 *) (srcOfs + gStyleDecorColors), shift);
+        AdjustRgbByDelta(rgb, (u8 *) (srcOfs + sStyleDecorColors), shift);
         obj = (ObjSlotB8B8 *) *wp;
         obj->methods->slotB8(obj, 1, rgb);
         obj = (ObjSlotB8B8 *) *wp;

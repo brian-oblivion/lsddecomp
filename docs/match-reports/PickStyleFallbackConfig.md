@@ -27,7 +27,7 @@ extern s32 gStyleVariantConfigs[];       /* array of raw base addresses, indexed
 extern s32 sStyleClearColor;
 extern u8 gStyleDecorColorsB[];        /* address only taken */
 extern u8 gStylePalette[];        /* 3-byte-stride table, indexed by a byte field */
-extern s32 gStyleDecorColors;
+extern s32 sStyleDecorColors;
 extern u8 gStyleDecorColorsA[];        /* address only taken */
 extern s32 gStyleDecorVariant;
 ```
@@ -60,7 +60,7 @@ void *PickStyleFallbackConfig(void) {
         if (b2 != 0x12) {
             tab = gStyleDecorColorsA;
         }
-        gStyleDecorColors = (s32) tab;
+        sStyleDecorColors = (s32) tab;
         if (remainder < 4) {
             gStyleDecorVariant = 1;
         } else if (remainder < 6) {
@@ -154,7 +154,7 @@ A).
 | `D_800872C4` | `gStylePalette` | A | 24 RGB triples (FillStyleFromConfig, ApplyStyleConfig and this function index it by a config byte); this function takes byte 3's entry as `sStyleClearColor`. |
 | `D_80087234`, `D_8008726C` | `gStyleDecorColorsA`, `gStyleDecorColorsB` | B | two 18-triple colour tables (one per decor band); B when config byte 2 is palette entry 18 (`STYLE_DECOR_B_PALETTE_INDEX`), A otherwise. Which look each is, is not established, hence the letters. |
 | `gStyleFlushColor` | `sStyleClearColor` | A | its only reader, StyleUpdateDecorSet, hands the adjusted copy to the viewport's setClearColor. |
-| `gStyleColorTable` | `gStyleDecorColors` | A | the current band colour table: StyleBuildDecorSet colours band i from entry i. |
+| `gStyleColorTable` | `sStyleDecorColors` | A | the current band colour table: StyleBuildDecorSet colours band i from entry i. |
 | `gStyleKind` | `gStyleStage` | A | RegisterStyleConfig stores its arg1 there, and its one caller, ObjM__InitStyleAndWorld, passes `self->stage`. |
 | `gStyleCounter` | `sStyleDay` | A | RegisterStyleConfig stores its arg3 there; its one caller passes `DreamSys__GetCurrentDayAndYear()` (`currentDay + 1`). |
 

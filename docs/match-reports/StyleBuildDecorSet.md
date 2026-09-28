@@ -1,4 +1,4 @@
-# StyleBuildDecorSet -- MATCHED 86/86 (round 76), lever: indexed `for` loop with `gStyleDecorColors + i * 3` (loop.c strength reduction makes the walker and the stride)
+# StyleBuildDecorSet -- MATCHED 86/86 (round 76), lever: indexed `for` loop with `sStyleDecorColors + i * 3` (loop.c strength reduction makes the walker and the stride)
 
 REVISITED, round 76: MATCHED 86/86 in 3 builds, no permuter, no barrier; names/types not relevant (existing names kept).
 
@@ -19,7 +19,7 @@ variables:
 | --- | --- | --- |
 | 1 | preserved body | 17/86, 1 short, ins 4 / del 4 |
 | 2 | `for (i = 1; i < 0x12; i++)`, `gStyleDecorSlots[0] = New(...)` before the loop, `gStyleDecorSlots[i] = obj` and `gStyleDecorSlots[0]` as the dispatch argument inside it; no `arr`/`wp`, no `__asm__("")` | **77/86, length EXACT**, ins 1 / del 1 |
-| 3 | + drop the `s1` counter: `(void *) (gStyleDecorColors + i * 3)` | **86/86**, `OK: build matches retail` |
+| 3 | + drop the `s1` counter: `(void *) (sStyleDecorColors + i * 3)` | **86/86**, `OK: build matches retail` |
 
 - **Build 2 produces retail's `move s3,v1`.** The pre-loop store's address
   is one pseudo (`$v1`); loop.c's invariant `&gStyleDecorSlots` for the
@@ -54,9 +54,9 @@ void StyleBuildDecorSet(void) {
         paramA.y += 0x1E;
     }
     paramB = *(PairXY *) &gStyleDecorSizeW;
-    gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *) gStyleDecorColors, 0x1FFF);
+    gStyleDecorSlots[0] = New_BoxFill(&paramB, (void *) sStyleDecorColors, 0x1FFF);
     for (i = 1; i < 0x12; i++) {
-        obj = New_BoxFill(&paramB, (void *) (gStyleDecorColors + i * 3), 0x1FFF);
+        obj = New_BoxFill(&paramB, (void *) (sStyleDecorColors + i * 3), 0x1FFF);
         gStyleDecorSlots[i] = obj;
         ((ObjSlot4C *) obj)->methods->slot4C(obj, gStyleDecorSlots[0], &paramA);
         paramA.y += 3;
@@ -222,7 +222,7 @@ side effect of the image moving. The honest figures are the two in the title:
 
 Needs, already present earlier in the unit in strict ROM order:
 `extern s32 gStyleDecorVariant, gStyleDecorPosX, gStyleDecorPosY, gStyleDecorSizeW, gStyleDecorSizeH,
-gStyleSceneRefs, gStyleDecorColors;`, `extern void *gStyleDecorSlots[];`,
+gStyleSceneRefs, sStyleDecorColors;`, `extern void *gStyleDecorSlots[];`,
 `extern void *New_BoxFill(void *a0, void *a1, s32 a2);`, and the
 `ObjSlot4C` / `ObjSlotAC` method-table views. `PairXY` is declared just above
 the function in the unit.
@@ -255,13 +255,13 @@ void StyleBuildDecorSet(void) {
     paramB = *(PairXY *) &gStyleDecorSizeW;
     i = 1;
     s1 = 3;
-    obj = New_BoxFill(&paramB, (void *) gStyleDecorColors, 0x1FFF);
+    obj = New_BoxFill(&paramB, (void *) sStyleDecorColors, 0x1FFF);
     __asm__("");
     arr = gStyleDecorSlots;
     wp = arr + 1;
     *arr = obj;
     do {
-        obj = New_BoxFill(&paramB, (void *) (s1 + gStyleDecorColors), 0x1FFF);
+        obj = New_BoxFill(&paramB, (void *) (s1 + sStyleDecorColors), 0x1FFF);
         *wp = obj;
         wp++;
         ((ObjSlot4C *) obj)->methods->slot4C(obj, arr[0], &paramA);
@@ -362,7 +362,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * (attachToParent, +0x04C) to slot 0, then attaches slot 0 to the target object's slotAC
  * result.  MATCHED round 76 (charlie): an indexed for loop -- loop.c's
  * strength reduction produces both the slot walker and the colour-table
- * stride (`gStyleDecorColors + i * 3`), which earlier rounds had written as
+ * stride (`sStyleDecorColors + i * 3`), which earlier rounds had written as
  * hand-rolled pointer/counter variables.  See
  * docs/match-reports/StyleBuildDecorSet.md. */
 ```
