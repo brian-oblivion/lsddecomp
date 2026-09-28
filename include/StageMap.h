@@ -411,35 +411,6 @@ extern StageMapMethods *GetStageMapMethods(void); /* returns &gStageMapMethods *
  * setting its slotIndex: no slot (-1), the whole 20 x 20 cells from (0, 0). */
 extern CellRect gFullSlotRect;
 
-/* The default "enable every element" spec table SetTargetAndLoadChunks
- * passes to buildRateEntries: seven entries, every `flag` nonzero. */
-extern ChunkSlotSpec sDefaultTargetSpecs[7];
-
-/* Indexed by ChunkSlotSpec::key in StageMap__LoadChunksAround: the world
- * offset of that neighbour's cellParent from the centre position. Unsized:
- * `key` is the caller's byte. */
-extern LongVec3 sNeighbourOffsets[];
-
-/* `key`-indexed bitmask table (`1 << key`) StageMap__ComputeChunkLoadEntry
- * tests against ComputeNeighbourMask's result. */
-extern const s32 sNeighbourBits[7];
-
-/* `key`-indexed chunk-index steps to the seven chunks around a centre chunk
- * (ChunkNeighbourDelta, include/StageMap.h). */
-extern const ChunkNeighbourDelta sChunkNeighbourDeltas[7];
-
-/* LbdFile::ownerKey-indexed remap, read signed by
- * StageMap__UpdateFootprintTracking (01 02 03 00 04 05 06 00). The byte
- * (0..6) is UpdateFootprintTracking's return value and the index into
- * sFootprintResultPtrTable. */
-extern const s8 sFootprintResultRemap[8];
-
-/* 7 pointers, the first NULL, the rest to 4-word tables of ChunkSlotSpecs
- * (seven 2-byte entries, padded): UpdateFootprintTracking passes the
- * selected one to buildRateEntries as its spec table, as
- * SetTargetAndLoadChunks passes sDefaultTargetSpecs. */
-extern ChunkSlotSpec *sFootprintResultPtrTable[7];
-
 /* The class's own functions, in address order: the occupants of
  * gStageMapMethods and their non-slot helpers. */
 StageMap *New_StageMap(LongVec3 *origin, s32 autoLoad);

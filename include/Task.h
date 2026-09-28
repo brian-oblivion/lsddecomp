@@ -42,19 +42,11 @@ extern s32 ResetGraph(s32 mode);
 /* Defined in Task.c: &gDefaultMovieFrame. */
 extern DrawRect *GetDefaultMovieFrame(void);
 
-/* resetCounters' colours for setColors, three RGB triples back to back:
- * baseColor {0, 0, 0}, the clear colour {0, 0, 0}, the third {128, 128, 128}. */
-extern u8 sTaskCoreDefaultColors[3][3];
-
 /* {x 640, y 0, w 320, h 240}: the default movie frame. TaskCore__OnInit clears
  * it to baseColor when the task has no sub handle. The same three words are
  * StreamTask's default initData and its MoviePlayer's frame, through
  * GetDefaultMovieFrame. */
 extern DrawRect gDefaultMovieFrame;
-
-/* {0, 0, 0}: TaskCore__OnInit attaches the view with it as both the
- * viewpoint and the reference point. */
-extern LongVec3 sTaskCoreViewOrigin;
 
 /* Viewport's ctor data: gViewportFadeBoxSize is the (320, 240) it passes
  * New_FadeBox; gFadeBoxAttachPos the (-100, -100) screen position the ctor

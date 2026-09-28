@@ -199,11 +199,6 @@ void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 yawOnly, s32 
  * apply it to each of their three entries. */
 extern s32 RatioToFixed12(void *pair);
 
-/* The identity inputs SceneNode__Reset hands to updateRotation and
- * updateScale: three Ratio16s each, {0/1, 0/1, 0/1} and {1/1, 1/1, 1/1}. */
-extern u8 sRotationZero[0xC];
-extern u8 sSceneNodeScaleOne[0xC];
-
 /* dst[i] = m * src[i] over `count` elements, through Sony's ApplyMatrixSV
  * (6-byte s16 vectors) and ApplyMatrixLV (0xC-byte s32 vectors). The first
  * argument is the destination; dst == src transforms in place. */

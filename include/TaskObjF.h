@@ -209,10 +209,6 @@ enum TaskObjFState {
 extern TaskObjFMethods gTaskObjFMethods;
 extern TaskObjFMethods *GetTaskObjFMethods(void); /* returns &gTaskObjFMethods */
 
-/* TaskObjF__TaskObjF's construction count: InitCARD/StartCARD/_bu_init run
- * only on the first construction, when it was 0 before the increment. */
-extern s32 sTaskObjFCount;
-
 /* The kernel event calls TaskObjF's event methods make (OpenEvent,
  * EnableEvent, DisableEvent, TestEvent; Sony's libapi) are declared in the
  * units that call them. */

@@ -33,6 +33,14 @@
 #include "LightRig.h"
 #include "FrameClock.h"
 
+/* resetCounters' colours for setColors, three RGB triples back to back:
+ * baseColor {0, 0, 0}, the clear colour {0, 0, 0}, the third {128, 128, 128}. */
+extern u8 sTaskCoreDefaultColors[3][3];
+
+/* {0, 0, 0}: TaskCore__OnInit attaches the view with it as both the
+ * viewpoint and the reference point. */
+extern LongVec3 sTaskCoreViewOrigin;
+
 StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound,
                            DrawRect *initData) {
     StreamTask *self;
