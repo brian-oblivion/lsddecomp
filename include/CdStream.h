@@ -2,6 +2,7 @@
 #define CDSTREAM_H
 
 #include "BasicClass.h"
+#include <libcd.h>
 
 /*
  * CdStream -- one streamed CD file (an FMV's sectors) read through Sony's
@@ -43,15 +44,6 @@ enum CdStreamState {
     CDSTREAM_STOPPED = 4
 };
 
-/* Sony's CdlFILE (include/psyq/libcd.h, 24 bytes), which CdSearchFile fills.
- * Spelled here so this header does not bring in LIBCD.H's prototypes, which
- * the units declare locally. `pos` is the CdlLOC that seek and CdlSetloc take. */
-typedef struct CdStreamFile {
-    /* +0x00 */ u8 pos[4]; /* CdlLOC: minute, second, sector, track */
-    /* +0x04 */ u32 size;  /* file size in bytes */
-    /* +0x08 */ char name[16];
-} CdStreamFile;
-
 struct CdStreamMethods {
     /* ctor: New_CdStream passes (cdSpeed, fps, reserved); MoviePlayer (cdSpeed, 15, 0). */
     BASICCLASS_SLOTS(CdStream, (CdStream * self, u32 cdSpeed, s32 fps, s32 reserved));
@@ -59,8 +51,8 @@ struct CdStreamMethods {
                                  u32 size); /* CdStream__SetRing: StSetRing(ring, size / 2048) while idle */
     /* +0x044 */ s32 (*open)(CdStream *self, char *name,
                              s32 tries); /* CdStream__Open: 0 once open and seeking, 1 when not */
-    /* +0x048 */ void (*close)(CdStream *self);         /* CdStream__Close */
-    /* +0x04C */ void (*seek)(CdStream *self, u8 *pos); /* CdStream__Seek: CdlSeekL */
+    /* +0x048 */ void (*close)(CdStream *self);             /* CdStream__Close */
+    /* +0x04C */ void (*seek)(CdStream *self, CdlLOC *pos); /* CdStream__Seek: CdlSeekL */
     /* +0x050 */ void (*startRead)(CdStream *self, u32 startFrame,
                                    s32 frameCount); /* CdStream__StartRead: frameCount 0 keeps totalFrames */
     /* +0x054 */ void (*stop)(CdStream *self);    /* CdStream__Stop: CdlPause */
@@ -83,7 +75,7 @@ struct CdStreamMethods {
 
 struct CdStream {
     BASICCLASS_FIELDS(CdStreamMethods);
-    /* +0x00C */ CdStreamFile file; /* CdSearchFile (open); file.pos goes to seek and CdlSetloc */
+    /* +0x00C */ CdlFILE file;      /* CdSearchFile (open); file.pos goes to seek and CdlSetloc */
     /* +0x024 */ u8 cdResult[8];    /* CdSync result buffer (CdStream__Sync) */
     /* +0x02C */ s32 state;         /* enum CdStreamState */
     /* +0x030 */ s32 muted;         /* mute / demute */
@@ -108,7 +100,7 @@ void CdStream__Finalize(CdStream *self);
 void CdStream__SetRing(CdStream *self, u32 *ring, u32 size);
 s32 CdStream__Open(CdStream *self, char *name, s32 tries);
 void CdStream__Close(CdStream *self);
-void CdStream__Seek(CdStream *self, u8 *pos);
+void CdStream__Seek(CdStream *self, CdlLOC *pos);
 void CdStream__StartRead(CdStream *self, u32 startFrame, s32 frameCount);
 void CdStream__Stop(CdStream *self);
 void CdStream__Restart(CdStream *self);

@@ -112,8 +112,7 @@ s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
         strcpy(&path[1], GetDataDirectory());
         strcat(path, name);
         strcat(path, sCdStreamVersionSuffix);
-        /* CdStreamFile is CdlFILE's layout (CdStream.h). */
-        while (CdSearchFile((CdlFILE *)&self->file, path) == 0) {
+        while (CdSearchFile(&self->file, path) == 0) {
             if (n >= 0 && --tries < 0) {
                 return 1;
             }
@@ -121,7 +120,7 @@ s32 CdStream__Open(CdStream *self, char *name, s32 tries) {
         self->totalFrames = self->file.size / self->bytesPerFrame;
         sCdStreamAudioMixSet = SetupCdStreamAudio(self);
         sActiveCdStream = self;
-        self->methods->seek(self, self->file.pos);
+        self->methods->seek(self, &self->file.pos);
         return 0;
     }
     return 1;
@@ -157,11 +156,11 @@ void CdStream__Close(CdStream *self) {
 
 /* With onSeekDone set the seek is asynchronous and OnCdSeekComplete reports
  * it; otherwise it blocks until the drive takes the command. */
-void CdStream__Seek(CdStream *self, u8 *pos) {
+void CdStream__Seek(CdStream *self, CdlLOC *pos) {
     if (self->state != CDSTREAM_READING && sActiveCdStream == self) {
         if (self->onSeekDone != NULL) {
             CdSyncCallback(OnCdSeekComplete);
-            CdControlF(CdlSeekL, pos);
+            CdControlF(CdlSeekL, (u_char *)pos);
         } else {
             while (CdSeekL(pos) == 0) {
             }
@@ -193,7 +192,7 @@ void CdStream__StartRead(CdStream *self, u32 startFrame, s32 frameCount) {
         self->lastFrame = 0;
         StSetStream(0, startFrame, -1, NULL, NULL);
         self->methods->mute(self);
-        while (CdControl(CdlSetloc, self->file.pos, 0) == 0 || CdRead2(mode) == 0) {
+        while (CdControl(CdlSetloc, (u_char *)&self->file.pos, 0) == 0 || CdRead2(mode) == 0) {
         }
         self->methods->demute(self);
         self->state = CDSTREAM_READING;
@@ -219,7 +218,7 @@ void CdStream__Restart(CdStream *self) {
         cur = sActiveCdStream;
         if (cur == self) {
             cur->state = CDSTREAM_IDLE;
-            cur->methods->seek(cur, cur->file.pos);
+            cur->methods->seek(cur, &cur->file.pos);
         }
     }
 }
