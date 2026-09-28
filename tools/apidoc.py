@@ -405,7 +405,7 @@ def main():
         for f, c in rows:
             print(f"{f:<{w}} " + " ".join(f"{c[k] or '.':>7}" for k in KINDS))
     print(f"total {sum(tot.values())}: " + ", ".join(f"{k} {tot[k]}" for k in KINDS))
-    return 1 if tot else 0
+    return 1 if sum(tot.values()) else 0
 
 
 if __name__ == "__main__":
