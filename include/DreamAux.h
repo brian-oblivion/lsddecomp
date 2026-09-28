@@ -24,7 +24,7 @@ typedef struct DreamAuxSlot {
     s32 pos[3];
 } DreamAuxSlot;
 
-/* One chunk trigger. `key` is the chunk's ChunkCoord (column, then row)
+/* One chunk trigger. `key` is the chunk's MapChunk (column, then row)
  * read as one s16. `dayParity` restricts the day: 0 any day, 1 odd days, 2
  * even days (CheckTriggerDayParity). `recordIndices` name up to three
  * records of the stage's TriggerRecord table, -1 ending the list early. */

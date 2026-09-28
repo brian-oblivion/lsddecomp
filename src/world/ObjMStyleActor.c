@@ -915,11 +915,6 @@ void ObjM__EnterLinkWall(ObjM *self) {
  * established; the names describe mechanics.
  */
 
-/* StageMap__SplitChunkIndex's output: the chunk's column and row. */
-typedef struct ChunkCoord {
-    u8 column;
-    u8 row;
-} ChunkCoord;
 
 /* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
@@ -1002,10 +997,10 @@ void ObjM__OnStageMapNotify(ObjM *self, BasicClass *sender, s32 event) {
  * with the slot's chunk coordinates and the day; the block is released
  * unless that returns an object, which the slot keeps as heldObj. */
 s32 ObjM__CheckAuxTrigger(ObjM *self) {
-    ChunkCoord coord;
+    struct MapChunk coord; /* SplitChunkIndex writes the column, then the row */
     s32 held;
     ChunkSlot *slot = ((StageMap *)self->lightRig)
-                          ->methods->getLastEventSlotChunk((StageMap *)self->lightRig, &coord.column);
+                          ->methods->getLastEventSlotChunk((StageMap *)self->lightRig, &coord.col);
     s32 day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     held = TryDreamAuxTrigger((s32)slot->loader->dataBuffer, (s16 *)&coord, day); /* the coord is the trigger key */
     slot->heldObj = (BasicClass *)held;
