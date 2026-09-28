@@ -51,7 +51,7 @@ extern void NoOpIgnoreArgs();
  * viewport stays `void *` because that is how class_3bb8c_o.c declares it. */
 extern Actor *gStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
 extern void *gStyleEffectTim;
-extern void *gStyleEffectViewport;
+extern Viewport *gStyleEffectViewport;
 extern s32 gStyleEffectBaseViewY;
 extern s32 gStyleEffectModelIds[];
 
@@ -67,7 +67,7 @@ void StyleEffect__InitByKind(StyleEffect *self, SceneNode *parent, LongVec3 *pos
     LongVec3 placed;
     s32 kind;
 
-    gStyleEffectBaseViewY = ((Viewport *)gStyleEffectViewport)->refView.vp.y;
+    gStyleEffectBaseViewY = gStyleEffectViewport->refView.vp.y;
     AddVec3(&placed, pos, &self->params.offset);
     AttachWithRotScale((Actor *)self, parent, &placed, self->params.rotation, self->params.scale);
 
@@ -102,7 +102,7 @@ void StyleEffect__UpdateByKind(StyleEffect *self, LongVec3 *pos) {
     LongVec3 placed;
 
     AddVec3(&placed, pos, &self->params.offset);
-    placed.y += ((Viewport *)gStyleEffectViewport)->refView.vp.y - gStyleEffectBaseViewY;
+    placed.y += gStyleEffectViewport->refView.vp.y - gStyleEffectBaseViewY;
     self->methods->setTranslation(self, &placed);
 
     switch (self->pendingExtra) {

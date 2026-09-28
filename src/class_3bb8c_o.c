@@ -29,6 +29,7 @@
 #include "FrameClock.h"
 #include "GridCell.h"
 #include "StageMap.h"
+#include "Viewport.h"
 
 /* STYLE_EFFECT_SPRITES' per-frame step: nothing. Its caller passes
  * (self, pos), which it does not read. */
@@ -85,7 +86,7 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
  * setBackClip, hence the Actor view. */
 extern Actor *gStyleEffectTmd;
 extern void *gStyleEffectTim;
-extern void *gStyleEffectViewport;
+extern Viewport *gStyleEffectViewport;
 extern s32 gStyleEffectModelIds[3];
 extern s16 gStyleEffectClutPos[2];
 
@@ -99,7 +100,7 @@ void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
 
     gStyleEffectTmd = tmd;
     gStyleEffectTim = (void *)tim;
-    gStyleEffectViewport = (void *)viewport;
+    gStyleEffectViewport = (Viewport *)viewport;
     i = 0;
     do {
         model = (TmdModel *)tmd->methods->setBackClip(tmd, gStyleEffectModelIds[i]);
