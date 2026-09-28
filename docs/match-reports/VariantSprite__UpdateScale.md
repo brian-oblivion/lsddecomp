@@ -162,3 +162,44 @@ decision); those lines were left as the tool wrote them.
 
 Its `s16 *ratios` is two `Ratio16` pairs; retyping it is proposed for the
 class's track 7 pass (see `VariantSprite__SetVariantClut`'s report).
+
+## Track 7 (2026-09-28, round 101, echo)
+
+### Naming
+
+| name | tier | evidence |
+| --- | --- | --- |
+| Sprite fields `accumScaleX` / `accumScaleY` (were `unk5C` / `unk60`, `+0x05C` / `+0x060`) | B | Mechanics only: while `unk58` is non-zero this method multiplies each by its axis's 20.12 ratio (`(ratio * v) >> 12`) and stores it back, in place of writing `sprite.scalex/scaley`, so the ratios accumulate into them. Renaming them in `SPRITE_FIELDS` (include/Sprite.h) broke only this unit in the default build and under `-DNON_MATCHING`, so this is their whole accessor set: nothing else reads or writes them, `Viewport__DrawNode` included. What the accumulated value is for is not established (nothing found sets `unk58` non-zero), hence B. |
+| param `ratios`: `s16 *` -> `Ratio16 *` | A | The body reads `[0]/[1]` and `[2]/[3]` as num/den, two SceneNode.h `Ratio16`s (x, y), the type `Sprite__UpdateRotation` and `BgLayer__UpdateScale` already take; round 93's proposal. A type change, so the oracle decided: byte-identical. The prototype in include/VariantSprite.h changed with it; nothing calls it directly (only `gVariantSpriteMethods`' slot). |
+| locals `xWhole`/`xRem`/`xFrac`/`xRatio`, `y...` (were `q1`/`r1`/`q2`/`ratio1`, `q3`/`r3`/`q4`/`ratio2`) | A | The split division: whole part `num / den`, remainder, the remainder's 12 fractional bits, and their 20.12 sum. |
+| locals `xScale` / `yScale` (were `short1` / `short2`) | A | The 16-bit truncations stored into `sprite.scalex` / `.scaley`. |
+
+`unk58` itself is also written by `Sprite__Reset` (src/Sprite.c, outside
+this job), so its name is proposed, not applied: see "Proposed field
+names" below.
+
+### Constants
+
+The six `12`s (`<< 12` three times per axis, `>> 12` on the product) are
+`FIX12_SHIFT` (include/common.h, 20.12 fixed point), as `Sprite.c`'s
+`Sprite__UpdateRotation` spells the same split division.
+
+### Comment history (moved from src/class_3bb8c_q.c, round 101)
+
+The function comment cited `tools/classtable.py gVariantSpriteMethods --vs
+gSceneNodeMethods` for the override (in "Naming" above) and read `ratios`
+"as a raw `s16 *` per the RatioToFixed12 precedent", which the retype to
+`Ratio16 *` retired. The hoisted truncation's derivation (the size drift
+it caused, found through `build/lsdde.map`) stays in "Derivation" above;
+the source keeps one `MATCHING:` line on `xScale`.
+
+## Proposed field names
+
+- Sprite (include/Sprite.h, `SPRITE_FIELDS`) `unk58` (`+0x058`) ->
+  `accumulateScale`, tier B. Accessors: `Sprite__Reset` (src/Sprite.c)
+  zeroes it; this method reads it and, while it is non-zero, multiplies
+  `accumScaleX/Y` by the ratios instead of writing `sprite.scalex/scaley`.
+  No writer of a non-zero value found. Not applied: `Sprite__Reset` is
+  outside this job. The rename touches `self->unk58` in src/Sprite.c and
+  src/class_3bb8c_q.c, plus the comments on the two fields after it and
+  VariantSprite.h's banner line that names it.

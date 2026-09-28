@@ -35,7 +35,7 @@
  *                  CLUT Sprite's reset took from the texture.
  *   +0x048 updateScale  VariantSprite__UpdateScale: two s16 num/den ratios
  *                  (x, y) into sprite.scalex/scaley as 20.12 fixed point,
- *                  or, while Sprite's unk58 is set, into unk5C/unk60.
+ *                  or, while Sprite's unk58 is set, into accumScaleX/Y.
  *   +0x098 update  VariantSprite__Update, empty, as Sprite__Update is (its
  *                  own copy in ROM).
  *
@@ -92,7 +92,7 @@ extern VariantSpriteMethods *GetVariantSpriteMethods(void); /* returns &gVariant
 VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture);
 void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetArg, void *texture);
 void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant);
-void VariantSprite__UpdateScale(VariantSprite *self, s32 set, s16 *ratios);
+void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios);
 void VariantSprite__Update(VariantSprite *self, void *sender, s32 event);
 void VariantSprite__NoOpSlotBC(void);
 void VariantSprite__NoOpSlotC0(void);
