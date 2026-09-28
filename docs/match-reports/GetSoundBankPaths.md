@@ -9,7 +9,7 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** not a slot.
-- **What:** table getter: returns `gSoundBankPaths`.
+- **What:** table getter: returns `sSoundBankPaths`.
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -17,7 +17,7 @@ the first build; whole-image SHA1 green.
 
 ```c
 void *GetSoundBankPaths(void) {
-    return gSoundBankPaths;
+    return sSoundBankPaths;
 }
 ```
 
@@ -25,7 +25,7 @@ void *GetSoundBankPaths(void) {
 
 - **Name:** `GetSoundBankPaths`
 - **Tier:** A
-- **Evidence:** getter: returns gSoundBankPaths (renamed from gWeeklyGroupTable), whose seven words point to "SND\AMBIENT", "SND\CARTOON", "SND\ELECTRO", "SND\ETHNOVA", "SND\HUMAN", "SND\LOVELY", "SND\STANDERD" (retail data at 0x800819CC); the same seven bases as the VH/VB pairs at sRecordTable[0..13]. Nothing in the code or data is weekly.
+- **Evidence:** getter: returns sSoundBankPaths (renamed from gWeeklyGroupTable), whose seven words point to "SND\AMBIENT", "SND\CARTOON", "SND\ELECTRO", "SND\ETHNOVA", "SND\HUMAN", "SND\LOVELY", "SND\STANDERD" (retail data at 0x800819CC); the same seven bases as the VH/VB pairs at sRecordTable[0..13]. Nothing in the code or data is weekly.
 
 ## Naming history
 

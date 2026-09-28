@@ -30,7 +30,7 @@ extern u8 gLbdFileMethods[];   /* method table, 34 slots */
 extern s32 sDefaultDataDirectory;
 extern s32 sForcedSoundBank;
 extern s32 sForcedStageBgm;
-extern u8 gSoundBankPaths[];
+extern u8 sSoundBankPaths[];
 extern u8 sRecordTable[];
 extern char *gSoundEffectDirPtr;  /* -> "SND\\SE" */
 extern const char sAsmkMoviePath[];

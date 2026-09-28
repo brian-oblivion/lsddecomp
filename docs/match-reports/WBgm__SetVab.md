@@ -144,4 +144,4 @@ unchanged.
 
 The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
 
-Parameter retyped `s32 arg` -> `char *vabPath` (slot +0x060 with it); the `(char *)` cast before New_VabStreamObj is gone and the test reads `vabPath != NULL`. Callers: WBgm__WBgm, whose vabPath is one of the gSoundBankPaths VAB paths (see New_WBgm's Track 4 paragraph).
+Parameter retyped `s32 arg` -> `char *vabPath` (slot +0x060 with it); the `(char *)` cast before New_VabStreamObj is gone and the test reads `vabPath != NULL`. Callers: WBgm__WBgm, whose vabPath is one of the sSoundBankPaths VAB paths (see New_WBgm's Track 4 paragraph).

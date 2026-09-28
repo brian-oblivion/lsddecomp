@@ -41,7 +41,7 @@ extern char *GetSoundEffectDir(s32 unused); /* arity-ok: MATCHING: the definitio
  * ReleaseDreamAuxModels. */
 extern void InitDreamAux(void);
 
-/* src/cd/GameFiles.c: one of the seven gSoundBankPaths words, each a VAB
+/* src/cd/GameFiles.c: one of the seven sSoundBankPaths words, each a VAB
  * path string ("SND\\AMBIENT" ... "SND\\STANDERD"), which DayTask's ctor
  * passes to New_WBgm as its vabPath. */
 extern s32 PickSoundBank(s32 unused);

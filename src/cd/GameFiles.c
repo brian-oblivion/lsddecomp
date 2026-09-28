@@ -51,7 +51,7 @@ enum RecordIndex {
  * DAYS_PER_TEXTURE days, repeating every STAGE_TEXTURE_COUNT of those. */
 #define DAYS_PER_TEXTURE 10
 
-/* The seven gSoundBankPaths entries, SND\AMBIENT .. SND\STANDERD. */
+/* The seven sSoundBankPaths entries, SND\AMBIENT .. SND\STANDERD. */
 #define SOUND_BANK_COUNT 7
 
 /* Movie ids: a movie record's index in sMovieFrameCounts, handed back
@@ -200,7 +200,7 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
 extern char *sDefaultDataDirectory; /* "CDI\\" (sdata) */
 extern s32 sForcedSoundBank;
 extern s32 sForcedStageBgm;
-extern u8 gSoundBankPaths[];
+extern u8 sSoundBankPaths[];
 extern u8 sRecordTable[];
 extern char *gSoundEffectDirPtr; /* -> "SND\\SE" */
 extern const char sAsmkMoviePath[];
@@ -247,7 +247,7 @@ void *GetRecordTable(s32 *countOut) {
 }
 
 void *GetSoundBankPaths(void) {
-    return gSoundBankPaths;
+    return sSoundBankPaths;
 }
 
 /* One of the SND\name paths WBgm opens as its VAB, forced or random. */
