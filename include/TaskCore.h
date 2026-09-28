@@ -271,7 +271,7 @@ void TaskCore__UpdateSlotElements(TaskCore *self, void *parent);
 void TaskCore__BroadcastToSlots(TaskCore *self, void *color);
 void TaskCore__FindNextFreeSlot(TaskCore *self);
 void TaskCore__FindPrevFreeSlot(TaskCore *self);
-void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, void *withSound);
+void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, s32 withSound);
 s32 TaskCore__GetActiveSlot(TaskCore *self);
 void TaskCore__CreateSlotElements(TaskCore *self, TaskCoreItemList *list, void *handle);
 void TaskCore__ReleaseSlotElements(TaskCore *self);
@@ -282,7 +282,7 @@ void TaskCore__CommitElementScroll(TaskCore *self);
 void TaskCore__CancelElementScroll(TaskCore *self);
 void TaskCore__AdvanceSlotCursor(TaskCore *self);
 void TaskCore__RetreatSlotCursor(TaskCore *self);
-void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound);
+void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, s32 withSound);
 s32 TaskCore__GetActiveItemCursor(TaskCore *self);
 
 #endif

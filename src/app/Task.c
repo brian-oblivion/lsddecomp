@@ -903,7 +903,7 @@ void TaskCore__FindPrevFreeSlot(TaskCore *self) {
     self->methods->setActiveSlot(self, i, 1);
 }
 
-void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, void *withSound) {
+void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, s32 withSound) {
     s32 prev;
     TextRow *prevWidget;
     TextRow *nextWidget;
@@ -919,7 +919,7 @@ void TaskCore__SetActiveSlot(TaskCore *self, s32 slot, void *withSound) {
     }
     nextWidget->methods->setColor(nextWidget, (SpriteRgb *)self->target->selectedColor);
     self->activeSlot = slot;
-    if (withSound != NULL) {
+    if (withSound != 0) {
         self->methods->playSound(self, TASKCORE_TONE_CURSOR);
     }
     self->methods->setState(self, TASKCORE_STATE_CURSOR_MOVED);
@@ -1129,7 +1129,7 @@ void TaskCore__RetreatSlotCursor(TaskCore *self) {
     self->methods->setSlotCursor(self, cursor, 1);
 }
 
-void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
+void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, s32 withSound) {
     s32 slot;
     s32 prev;
     TextRow **items;
@@ -1146,7 +1146,7 @@ void TaskCore__SetSlotCursor(TaskCore *self, s32 cursor, void *withSound) {
     cursorColor = &self->target->slotLists[slot]->cursorColor;
     nextItem->methods->setColor(nextItem, cursorColor);
     self->itemCursors[slot] = cursor;
-    if (withSound != NULL) {
+    if (withSound != 0) {
         self->methods->playSound(self, TASKCORE_TONE_CURSOR);
     }
     self->methods->setState(self, TASKCORE_STATE_CURSOR_MOVED);

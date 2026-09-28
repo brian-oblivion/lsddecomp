@@ -98,3 +98,7 @@ Renamed from Obj86B60__SetActiveSlot (tools/rename.py): the class prefix. Occupa
 ## Track 7 (2026-09-27, round 98, bravo)
 
 setState(9) -> TASKCORE_STATE_CURSOR_MOVED, playSound(0) -> TASKCORE_TONE_CURSOR. a1 -> slot, a2 -> withSound, elemB/elemA -> prevWidget/nextWidget.
+
+## Track 10 (2026-09-28, round 104, alpha)
+
+`withSound` is `s32` here as in its slot (it was `void *` in the definition and the header prototype); every caller passes 0 or 1. Byte-identical.
