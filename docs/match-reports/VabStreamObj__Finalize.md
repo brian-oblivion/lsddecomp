@@ -15,10 +15,10 @@ the class's "close" method.
 ```c
 s32 VabStreamObj__Finalize(VabStreamObj *self) {
     SsVabClose(self->vabId);
-    if (--gOpenVabCount < 0) {
-        gOpenVabCount = 0;
+    if (--sOpenVabCount < 0) {
+        sOpenVabCount = 0;
     }
-    if (gOpenVabCount == 0 && IsWBgmActive() == 0) {
+    if (sOpenVabCount == 0 && IsWBgmActive() == 0) {
         gVabSizeTableInited = 0;
         gVabVolumeInited = 0;
         gVabStreamInited = 0;

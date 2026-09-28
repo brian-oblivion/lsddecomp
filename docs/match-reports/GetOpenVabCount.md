@@ -9,15 +9,15 @@ whole project (see `docs/research/gp-relative-blocker.md`, "RESOLVED").
 ## Derivation
 
 The prior stall's classification was correct on mechanism: retail is a single
-`lw $v0, %gp_rel(gOpenVabCount)($gp)` then `jr $ra`. With the gp-relative flags
+`lw $v0, %gp_rel(sOpenVabCount)($gp)` then `jr $ra`. With the gp-relative flags
 now passed by the Makefile, an ordinary C accessor compiles straight to that
 same form -- no special handling needed.
 
 ```c
-extern s32 gOpenVabCount;
+extern s32 sOpenVabCount;
 
 s32 GetOpenVabCount(void) {
-    return gOpenVabCount;
+    return sOpenVabCount;
 }
 ```
 
@@ -43,7 +43,7 @@ a maspsx-side fix.
 ## Naming
 
 Renamed `func_8002CC1C` -> `GetOpenVabCount`, tier A. The global it reads
-(`gOpenVabCount`, `D_8008A8C4` before round 52) is incremented once per
+(`sOpenVabCount`, `D_8008A8C4` before round 52) is incremented once per
 object in `VabStreamObj__VabStreamObj` and decremented/clamped-at-zero in
 `VabStreamObj__Finalize`, with a zero-count check gating the shared subsystem
 teardown -- an unambiguous open-object refcount, so this is a plain getter

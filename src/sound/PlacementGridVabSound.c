@@ -170,7 +170,7 @@ void NullDriver__NoOpSlot50(void) {}
  * describes the load sequence and the slots. The first bank constructed
  * initialises libsnd (SsInit, the score size table, a 60 Hz tick); the first
  * whose attributes load starts it (SsStart, the master volume). Finalizing
- * the last open bank (gOpenVabCount) while no WBgm plays ends it.
+ * the last open bank (sOpenVabCount) while no WBgm plays ends it.
  *
  * InitSoundCueSet and FlushSoundCueSet (include/SoundCueSet.h) are free
  * functions, not methods: they take the sound object first, and Flush stops
@@ -198,7 +198,7 @@ extern s32 sNullDriverModeArg;
 extern s32 gVabSizeTableInited;
 extern s32 gVabStreamInited;
 extern s32 gVabVolumeInited;
-extern s32 gOpenVabCount;     /* VabStreamObjs constructed and not yet finalized */
+extern s32 sOpenVabCount;     /* VabStreamObjs constructed and not yet finalized */
 extern s32 gSsTicksPerSecond; /* the SsSetTickMode rate, for callers timing in ticks */
 /* The .VH buffer, kept from the header state until LoadVagAttrs takes it
  * back as the object's buffer. */
@@ -283,7 +283,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
         SsSetTickMode(SS_TICK60);
         gVabStreamInited = 1;
     }
-    gOpenVabCount++;
+    sOpenVabCount++;
     if (path != NULL) {
         buf = BMemPMgrAlloc(strlen(path) + 1);
         if (buf != NULL) {
@@ -298,10 +298,10 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *path) {
 
 void VabStreamObj__Finalize(VabStreamObj *self) {
     SsVabClose(self->vabId);
-    if (--gOpenVabCount < 0) {
-        gOpenVabCount = 0;
+    if (--sOpenVabCount < 0) {
+        sOpenVabCount = 0;
     }
-    if (gOpenVabCount == 0 && IsWBgmActive() == 0) {
+    if (sOpenVabCount == 0 && IsWBgmActive() == 0) {
         gVabSizeTableInited = 0;
         gVabVolumeInited = 0;
         gVabStreamInited = 0;
@@ -496,7 +496,7 @@ VabStreamObjMethods *GetVabStreamObjMethods(void) {
 }
 
 s32 GetOpenVabCount(void) {
-    return gOpenVabCount;
+    return sOpenVabCount;
 }
 
 s32 GetSsTicksPerSecond(void) {

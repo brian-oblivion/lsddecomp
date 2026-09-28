@@ -68,7 +68,7 @@ void VabStreamObj__VabStreamObj(VabStreamObj *self, char *arg1) {
         SsSetTickMode(1);
         gVabStreamInited = 1;
     }
-    gOpenVabCount++;
+    sOpenVabCount++;
     if (arg1 != NULL) {
         buf = BMemPMgrAlloc(strlen(arg1) + 1);
         if (buf != NULL) {
