@@ -8,13 +8,14 @@ toolchain Sony shipped, to an executable that is **byte-for-byte identical**
 to the one on the disc. A paraphrase can be wrong unnoticed; a byte-exact
 rebuild cannot.
 
-**Status:** every game function is C and the build reproduces retail. What
-remains is readability: names, types and docs. Measure it rather than trust
-this line:
+**Status:** every game function is C and the build reproduces retail; the
+work left is readability (names, types, comments). Measure it rather than
+trust this line:
 
 ```sh
 python3 tools/progress.py      # matched and queued functions, per unit
 python3 tools/plan.py          # the finishing plan's tracks and what is left
+python3 tools/readability.py   # the readability debt, per unit
 ```
 
 ## Building it
@@ -25,7 +26,7 @@ this repository contains game data or Sony code.
 ```sh
 git clone <this repo> lsddecomp2 && cd lsddecomp2
 cp ~/path/to/'LSD - Dream Emulator (Japan).bin' .   # or put SLPS_015.56 in disk/
-cp ~/path/to/'Programmer Tool - Runtime Library Version 3.5 (Japan)_DTL-S2300_redump.zip' sdk/
+cp ~/path/to/'Programmer Tool - Runtime Library Version 3.5 (Japan) (En,Ja)_DTL-S2300_redump.zip' sdk/
 # ...plus every other Runtime Library disc the manifest needs (below)
 ./tools/setup.sh
 ```
@@ -34,8 +35,8 @@ cp ~/path/to/'Programmer Tool - Runtime Library Version 3.5 (Japan)_DTL-S2300_re
 `sha1sum`, a C compiler), extracts `SLPS_015.56` from the disc image if it
 finds exactly one, verifies it against `check.sha1`, sets up a Python venv,
 clones maspsx, asm-differ, m2c and decomp-permuter, fetches the prebuilt GCC
-2.6.3, builds a `mipsel-linux-gnu` binutils, converts the SDK discs in `sdk/`
-into `lib/`, runs the split, and **proves the result rebuilds byte-for-byte**.
+2.6.3, builds a `mipsel-linux-gnu` binutils, fetches psyq-obj-parser and
+converts the SDK discs in `sdk/` into `lib/` with it, runs the split, and **proves the result rebuilds byte-for-byte**.
 If that fails it stops. `disk/README.md` covers extracting the executable by
 hand and which dump is expected.
 
@@ -55,7 +56,7 @@ Rather than re-derive that code as C, it links **Sony's own objects**
 (libapi, libc2, libcard, libcd, libetc, libgs, libgte, libpress, libsnd,
 libspu), taken from the "Programmer Tool — Runtime Library" discs and placed
 exactly where the game put them, each as a splat `o` segment. The discs are
-on archive.org; `sdk/README.md` has the link. The game mixed library builds,
+on archive.org; `sdk/README.md` has the link and the file names. The game mixed library builds,
 so objects come from more than one disc version: which disc owns which object
 is measured against retail and recorded in `config/psyq-objects.txt`. The
 manifest currently draws on the 3.3, 3.5 and 3.6 discs; to see which you are
@@ -66,7 +67,9 @@ missing:
 ```
 
 Sony code no disc's object matches stays as disassembly in the `psyq_*`
-segments, or sits in a game unit whose header says so.
+segments, or is carried in `src/psyq/` (one file per Sony module, C where it
+matched and `INCLUDE_ASM` elsewhere), or sits in a game file whose banner
+says so.
 
 ## What the code is
 
