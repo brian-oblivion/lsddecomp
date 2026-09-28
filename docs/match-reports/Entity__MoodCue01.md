@@ -22,7 +22,7 @@ part: it resolves a genuine two-argument call through `Unk94Obj`'s OWN vtable
 table from `Entity`'s own `EntityMethods`, even though both happen to have
 something at offset `+0x130`. Conflating them would have forced
 `EntityMethods::slot130` (already typed self-only, matched via
-`Entity__StopSoundCue` in `src/Entity.c`) to grow a spurious second argument and
+`Entity__StopSoundCue` in `src/world/Entity.c`) to grow a spurious second argument and
 broken that OTHER unit's already-matched function.
 
 ## New struct: `Unk94Obj`/`Unk94Methods` (`include/Entity.h`)
@@ -98,7 +98,7 @@ Matched on the first attempt, once `Unk94Obj`/`Unk94Methods` existed and
 coincidence, and conflating them corrupts an ALREADY-MATCHED function in a
 different unit.** `this->unk94->methods->slot130` (2 args, this function) and
 `this->methods->slot130` (1 arg, `Entity`'s own, matched via `Entity__StopSoundCue`
-in `src/Entity.c`) are unrelated functions that only share the offset
+in `src/world/Entity.c`) are unrelated functions that only share the offset
 `+0x130` because they live in different tables. Before typing a vtable call
 through a field whose OWN class isn't pinned down, check whether the same
 offset is already spoken for on `this`'s own table — and if the two call

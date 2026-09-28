@@ -7,7 +7,7 @@ whole-image build verified byte-exact)
 
 ## What it does
 
-A close sibling of `Entity__UpdateTargetProximity`/`Entity__UpdateSoundCueStart` (both in `src/Entity.c`,
+A close sibling of `Entity__UpdateTargetProximity`/`Entity__UpdateSoundCueStart` (both in `src/world/Entity.c`,
 top of the file): another mood-row-driven "detach if too far" check, keyed off
 `row->unkB` instead of `row->unk6`/`row->unkB` in the other two. Guarded by
 `this->unkF0 != 0 && this->unkF8 != 0` (both must be true to enter the body,
@@ -41,7 +41,7 @@ s32 Entity__UpdateSoundCueStop(Entity *this) {
 ```
 
 `EntityMethods::slot16C` already existed in `include/Entity.h` (called by
-`Entity__Deactivate` in `src/Entity.c`); only its caller-list comment was updated
+`Entity__Deactivate` in `src/world/Entity.c`); only its caller-list comment was updated
 to add this function.
 
 ## Attempt log

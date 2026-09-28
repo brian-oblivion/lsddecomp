@@ -57,7 +57,7 @@ translated to idiomatic naming:
   documents the exact same lever from `ItemList__AttachTarget` ("A `do { ... }
   while (0)` wrapper around an otherwise-unconditional body can be
   load-bearing for delay-slot scheduling... mechanism unexplained"), and
-  `src/Entity.c`'s `Entity__MoodCue26` already ships it in matched,
+  `src/world/Entity.c`'s `Entity__MoodCue26` already ships it in matched,
   committed code with an identical comment ("load-bearing for register
   allocation only... without it GCC swaps which callee-saved register
   holds `this` vs `out`"). This is a THIRD confirmed instance of the same

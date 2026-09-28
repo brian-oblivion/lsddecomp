@@ -74,9 +74,9 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Byte-identical (whole image green).
 
-## Unit notes (moved from src/Entity.c's banner, round 93)
+## Unit notes (moved from src/world/Entity.c's banner, round 93)
 
-The pre-track-7 banner of `src/Entity.c` carried this history, now here:
+The pre-track-7 banner of `src/world/Entity.c` carried this history, now here:
 the unit was carved as the third 20-function slice of the Entity class's
 97-function remainder, after Entity and Entity_d. Its functions are the
 `gEntityMoodHandlerTable` handlers of rows 59, 61-62, 64-71 and 73-81, each

@@ -23,7 +23,7 @@ void Entity__MoodCue20(Entity *this, EntityMoodHandlerArg *out) {
 
 - The first gate is `rand() % 7 == 0`, guarded by `this->unkFC == 0` -- the
   usual "one-shot random effect on entry" shape already seen in
-  `Entity__MoodCue16`/`Entity__MoodCue12` in `src/Entity.c`.
+  `Entity__MoodCue16`/`Entity__MoodCue12` in `src/world/Entity.c`.
 - **`out->unk4 & 3`, not `% 4`.** Retail emits a bare `andi $v0,$v0,0x3` with
   no sign-correction shift, unlike every modulus-by-non-power-of-2 gate in
   this unit (which all carry the mult/mfhi/sra/subu chain). Writing `% 4`

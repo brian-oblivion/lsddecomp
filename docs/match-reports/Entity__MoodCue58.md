@@ -117,7 +117,7 @@ which instruction-scheduling window the receiver's load competes in.
   caller, alongside the callers already on record. No type or name changed
   on any of them.
 
-`extern u8 ROTATION_ZMINUS90[];` added to `src/Entity.c` (file-local, same
+`extern u8 ROTATION_ZMINUS90[];` added to `src/world/Entity.c` (file-local, same
 convention as this unit's other raw data-table externs).
 
 ## Proposed learning

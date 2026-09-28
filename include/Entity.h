@@ -12,7 +12,7 @@
  * Get_vtable_Entity): TodActor's one subclass (include/TodActor.h); no
  * class derives from it. The ctor calls TodActor's first
  * (GetTodActorMethods()->ctor), so the id parent is the ctor-chain
- * parent. Its methods and its MoodCue handlers are in src/Entity.c. The
+ * parent. Its methods and its MoodCue handlers are in src/world/Entity.c. The
  * MoodCue handlers are not in the table: they are
  * the `handler` of gEntityMoodHandlerTable's rows. Spawned by DreamAux
  * (SetDreamAuxWorld, SpawnDreamAuxTriggerEntity).

@@ -199,7 +199,7 @@ L74:
 
 Verified byte-exact: `./build-and-verify.sh` -- `OK: build matches retail
 SLPS_015.56` -- and `tools/funcdiff.py Entity__StepYawInWindowsThenDeactivate` -- `70/70 words
-match`. This is now the live body in `src/Entity.c` (`INCLUDE_ASM`
+match`. This is now the live body in `src/world/Entity.c` (`INCLUDE_ASM`
 removed).
 
 ### New struct knowledge

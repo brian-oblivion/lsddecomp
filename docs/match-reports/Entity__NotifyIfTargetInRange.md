@@ -19,7 +19,7 @@ void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1) {
 }
 ```
 
-with, locally in `src/Entity.c`:
+with, locally in `src/world/Entity.c`:
 
 ```c
 extern s32 Entity__IsTargetInRange(Entity *this, s32 arg1);
@@ -44,7 +44,7 @@ in this function's own disassembly reveals it exists. Writing the obvious
 one-parameter signature is a **`conflicting types` compile error** against the
 long-standing `extern void Entity__NotifyIfTargetInRange(Entity *this, s32 arg1);` in
 `include/Entity.h`, put there by whoever matched the caller
-(`src/Entity.c` passes `Entity__NotifyIfTargetInRange(this, 0)`).
+(`src/world/Entity.c` passes `Entity__NotifyIfTargetInRange(this, 0)`).
 
 **And that error produces ZERO hits on `error:` and `parse error`** — it was
 caught only by the `\*\*\* \[[^]]*\.o\]` alternative added to the oracle grep in

@@ -304,7 +304,7 @@ whole-function raw-register `__asm__`).
 
 Per the coordinator's secondary assignment, audited every `__asm__` block
 in `src/libsnd_ssinit.c`, `src/PlacementGridVabSound.c`, `src/app/Pad.c`,
-`src/Entity.c`, `src/Entity_c.c`, `src/world/DreamSys.c`, and
+`src/world/Entity.c`, `src/Entity_c.c`, `src/world/DreamSys.c`, and
 `src/graphics/TmdRenderer.c` (this unit's own family) for the same mistake found
 in this function -- a whole-function raw-register transcription standing
 in for an idiom ordinary C already expresses via an already-matched

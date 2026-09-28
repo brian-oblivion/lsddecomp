@@ -40,7 +40,7 @@ there is only one such block, hence 7 words short.
 ```
 
 Result: `98/98, insertions 0 / deletions 0`, `OK: build matches retail`,
-`tools/check-nonmatching.sh` green. Plain C in `src/Entity.c`; the
+`tools/check-nonmatching.sh` green. Plain C in `src/world/Entity.c`; the
 NON_MATCHING block and its stall comment are removed.
 
 **Why round 20's "two call sites" variant (104 words) missed:** it also
@@ -393,7 +393,7 @@ mechanism claim through the pinned pipeline before touching anything else.
 ### 1. Rebuilding the recorded figures (PARALLEL-RUNS screen 4)
 
 Dropped the report's preserved body (verbatim, unchanged) back into
-`src/Entity.c` in place of the `INCLUDE_ASM`, ran the full chained oracle:
+`src/world/Entity.c` in place of the `INCLUDE_ASM`, ran the full chained oracle:
 
 ```
 ./build-and-verify.sh  ->  build exit=2, no compile-error grep hits
@@ -417,7 +417,7 @@ range (0x557BC-0x55634 = 0x188 bytes = 98 words) and a direct count of
 
 **91 vs 98 is 7 words short, not the "~4 words" / "94 vs 98" this report
 carried since round 13.** The C body compared is byte-identical to what is
-quoted in this report (diffed the live `src/Entity.c` insertion against
+quoted in this report (diffed the live `src/world/Entity.c` insertion against
 the `#if 0` block above before restoring `INCLUDE_ASM` — no drift). Whether
 the earlier 94-word count came from a different toolchain snapshot, a
 transcription slip, or an objdump range mis-boundary, it does not reproduce
