@@ -371,15 +371,15 @@ extern struct RelativePos STAIRCASE_OFFSET_2;
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
    argument by DreamSys__TickStaircaseCase0 -- same call shape as STAIRCASE_OFFSET_2 above, just a
    different constant (round 2026-09-02). */
-extern struct RelativePos STAIRCASE_OFFSET_0;
+extern struct RelativePos sStaircaseOffset0;
 
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
-   argument by DreamSys__TickStaircaseCase1 -- same call shape as STAIRCASE_OFFSET_0/STAIRCASE_OFFSET_2
+   argument by DreamSys__TickStaircaseCase1 -- same call shape as sStaircaseOffset0/STAIRCASE_OFFSET_2
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos STAIRCASE_OFFSET_1;
 
 /* Another `struct RelativePos` constant, passed as DreamSys__ApplyRelativeOffset's `a`
-   argument by DreamSys__TickStaircaseCase3 -- same call shape as STAIRCASE_OFFSET_2/STAIRCASE_OFFSET_0
+   argument by DreamSys__TickStaircaseCase3 -- same call shape as STAIRCASE_OFFSET_2/sStaircaseOffset0
    above, just a different constant (round 2026-09-02). */
 extern struct RelativePos STAIRCASE_OFFSET_3;
 

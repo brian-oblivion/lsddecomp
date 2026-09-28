@@ -1091,7 +1091,7 @@ bool DreamSys__TryStaircaseLink(DreamSys *this, PlayerSpawnPoint *currentPos) {
 
 s32 DreamSys__TickStaircaseCase0(DreamSys *this) {
     if (this->staircaseFrame == 0) {
-        DreamSys__ApplyRelativeOffset(this, &STAIRCASE_OFFSET_0, &this->staircaseOrigin);
+        DreamSys__ApplyRelativeOffset(this, &sStaircaseOffset0, &this->staircaseOrigin);
     }
     if (this->moveMode != MOVE_MODE_RUN) {
         if (this->staircaseFrame >= 133)
