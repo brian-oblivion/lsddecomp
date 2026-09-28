@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004F638` on 2026-09-20 (tools/rename.py). Address 0x8004f638.
 
-**Unit:** class_3bb8c_f · **Size:** 51 words (0xCC) · **Status:** MATCH
+**Unit:** class_3bb8c_c · **Size:** 51 words (0xCC) · **Status:** MATCH
 
 `void TaskObjF__BeginLoad(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4)`.
 Stores the four params into `self->unk40`/`unk44`/`unk54`/`unk58`, sets

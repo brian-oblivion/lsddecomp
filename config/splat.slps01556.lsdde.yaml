@@ -1435,7 +1435,6 @@ segments:
       # class_3bb8c_d: #0..#19, 0x3DF04..0x3EBF4.
       # class_3bb8c_e: #20..#38, 0x3EBF4..0x3F540.
       # class_3bb8c_f: #39..#58, 0x3F540..0x403E4.
-      - [0x3F540, c, class_3bb8c_f]
       # class_3bb8c_g: the remaining ~246 functions, 0x403E4.. -- UNCARVED
       # deliberately. Both of Gate 2's routine carve hazards are in here and
       # neither is in the three slices above:

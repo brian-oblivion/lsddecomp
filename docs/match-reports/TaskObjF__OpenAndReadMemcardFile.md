@@ -321,9 +321,9 @@ unchanged (round 75; this was an `arity-ok` K&R declaration until then, on
 the reading that TaskObjF__OpenAndReadMemcardFile made a 2-argument call)."
 
 Constants: `open(path, 1)` is `O_RDONLY` (`<sys/file.h>`, as
-class_3bb8c_f.c's TryReadMemcardFile spells it); the 0x80 allocation and
+class_3bb8c_c.c's TryReadMemcardFile spells it); the 0x80 allocation and
 read are `MEMCARD_SECTOR_SIZE` (include/TaskObjF.h), the title sector;
 the path buffer is `char[32]` (was `s32[8]`, byte-identical). The `+ 4`
-is the save header's title (`McSaveHeader::title`, which class_3bb8c_f.c
+is the save header's title (`McSaveHeader::title`, which class_3bb8c_c.c
 defines locally); the head has the proposal to move that struct into
 TaskObjF.h so this reads `header->title`. Zero bytes changed.

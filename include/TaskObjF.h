@@ -10,7 +10,7 @@
  * class does is measured below. Methods: the allocator and ctor in
  * src/class_3bb8c_c.c, BasicClass's overrides and the card primitives
  * (+0x00C..+0x060) in src/class_3bb8c_c.c, the file I/O, events, buffers and
- * the two operations (+0x064..+0x078, +0x038) in src/class_3bb8c_f.c, the
+ * the two operations (+0x064..+0x078, +0x038) in src/class_3bb8c_c.c, the
  * state machine (+0x07C..+0x0B0) in src/class_3bb8c_g.c.
  *
  *  - The ctor runs InitCARD/StartCARD/_bu_init once per boot (sTaskObjFCount)

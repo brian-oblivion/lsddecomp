@@ -36,7 +36,7 @@ void TextEntry__OnNotify(Obj86ED0 *self, void *arg1, s32 arg2)
 ## Residue and how it was closed
 
 First attempt cached `methods = self->methods;` up front (mirroring the
-ALREADY-MATCHED `TaskObjF__OnNotify` in `src/class_3bb8c_f.c`, which does exactly
+ALREADY-MATCHED `TaskObjF__OnNotify` in `src/class_3bb8c_c.c`, which does exactly
 that for its own 4-way dispatch) and scored 13/44 with the frame GROWN by
 8 bytes (`0x28` vs retail's `0x20`) -- an extra callee-saved register
 (`$s3`) spilled to hold the cached `methods` pointer across the two
@@ -61,7 +61,7 @@ its own disassembly, not by analogy); this one was not.
 
 ## Naming
 
-- `TextEntry__OnNotify` -- tier A. gTextEntryMethods +0x038 (classtable.py), overrides BasicClass's slot38 (the last BasicClass-defined slot): dispatches the base slot38, then tag-routes to handleCommand/tickState. Named to match the already-matched sibling TaskObjF__OnNotify (src/class_3bb8c_f.c), which reads the identical tag the identical way.
+- `TextEntry__OnNotify` -- tier A. gTextEntryMethods +0x038 (classtable.py), overrides BasicClass's slot38 (the last BasicClass-defined slot): dispatches the base slot38, then tag-routes to handleCommand/tickState. Named to match the already-matched sibling TaskObjF__OnNotify (src/class_3bb8c_c.c), which reads the identical tag the identical way.
 
 ## Track 4 (2026-09-26, round 87)
 

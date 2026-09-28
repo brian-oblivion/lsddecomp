@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004F32C` on 2026-09-20 (tools/rename.py). Address 0x8004f32c.
 
-**Unit:** class_3bb8c_f · **Size:** 26 words (0x68) · **Status:** MATCH
+**Unit:** class_3bb8c_c · **Size:** 26 words (0x68) · **Status:** MATCH
 
 ## What it does
 
@@ -49,7 +49,7 @@ already documented for `Descriptor10` in `include/class_3bb8c.h`.
 **Verdict: arity-ok idiom**, and the clearest case in the round: one symbol,
 two call sites in ONE unit, with different argument counts, both byte-load-bearing.
 
-**Callee evidence** (the matched definition in `src/class_3bb8c_f.c`):
+**Callee evidence** (the matched definition in `src/class_3bb8c_c.c`):
 `char *BuildMemcardPath(McDevicePath *dest, s32 selector, char *suffix)` — three
 real arguments, `$a2` being the suffix string it appends.
 
@@ -123,7 +123,7 @@ Descriptor10 above" was stale and is gone.
 struct (include/class_3bb8c.h, alignment 1 for the whole-struct copy), so it
 has no `char` member to name. Zero bytes.
 
-### Moved from src/class_3bb8c_f.c
+### Moved from src/class_3bb8c_c.c
 
 The forward declaration's comment, replaced by one line:
 

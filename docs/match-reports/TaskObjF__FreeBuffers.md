@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004F810` on 2026-09-20 (tools/rename.py). Address 0x8004f810.
 
-**Unit:** class_3bb8c_f · **Size:** 37 words (0x94) · **Status:** MATCH
+**Unit:** class_3bb8c_c · **Size:** 37 words (0x94) · **Status:** MATCH
 
 `void TaskObjF__FreeBuffers(TaskObjF *self)`. The mirror teardown of
 `TaskObjF__AllocBuffers`: if `self->unk38` is allocated, frees `self->unk3C`, frees

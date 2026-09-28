@@ -168,9 +168,9 @@ TaskObjF__TryWriteMemcardSaveFile -- STALL. Length: 1 word SHORT (239/240, 0x3BC
 > of source statement order at that point. Not re-attempted further this
 > round; restored to `INCLUDE_ASM` unchanged.
 
-Unit: `class_3bb8c_f`. Not toolchain-blocked: no `gp_rel` hit, no
+Unit: `class_3bb8c_c`. Not toolchain-blocked: no `gp_rel` hit, no
 `addiu $at,$at,%lo` hit, no dense-`switch`/`jr $v0` dispatch in
-`asm/nonmatchings/class_3bb8c_f/TaskObjF__TryWriteMemcardSaveFile.s`.
+`asm/nonmatchings/class_3bb8c_c/TaskObjF__TryWriteMemcardSaveFile.s`.
 
 **This is the first C ever attempted against this function.** The previous
 round's report ("predicted-hard, screened and read but not attempted...
@@ -238,12 +238,12 @@ parameter; retyping either signature risks that caller's own compiled
 bytes for no byte-level benefit (the cast is functionally identical
 either way).
 
-## New types (all local to `class_3bb8c_f.c` -- none shared, no header
+## New types (all local to `class_3bb8c_c.c` -- none shared, no header
 ## changes made this round)
 
 **RENAMED round 60** (track 3 naming pass; these are local typedefs, not
 symbol-table entries, so `tools/rename.py` does not touch them -- edited
-by hand in `src/class_3bb8c_f.c` and re-verified with an isolated
+by hand in `src/class_3bb8c_c.c` and re-verified with an isolated
 `cpp|cc1` syntax check since the body sits in `#if 0` and the normal
 build never compiles it; see `## Naming` below). Original names, carried
 from the round that first derived this body: `StreamSmallSub`/
@@ -357,7 +357,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
 ```
 
 (round 60: this snapshot now matches the LIVE preserved body in
-`src/class_3bb8c_f.c` exactly -- the `func_80050908`/`func_80050938`/
+`src/class_3bb8c_c.c` exactly -- the `func_80050908`/`func_80050938`/
 `func_800508F8`/`func_80013488`/`func_80012C20`-style names in the prose
 above this point in the report are historical, from before round 34
 relinked these as Sony's `delete`/`open`/`close`/`write`/`printf`; the
@@ -450,8 +450,8 @@ duplicate-register materialization), not a new independent class.
 ## Screening
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/class_3bb8c_f/TaskObjF__TryWriteMemcardSaveFile.s        # no hits
-grep -n 'addiu *$at, *$at, *%lo' asm/nonmatchings/class_3bb8c_f/TaskObjF__TryWriteMemcardSaveFile.s  # no hits
+grep -n 'gp_rel' asm/nonmatchings/class_3bb8c_c/TaskObjF__TryWriteMemcardSaveFile.s        # no hits
+grep -n 'addiu *$at, *$at, *%lo' asm/nonmatchings/class_3bb8c_c/TaskObjF__TryWriteMemcardSaveFile.s  # no hits
 ```
 Clean of both open toolchain blockers (per the coordinator's own
 screening this round, not re-run).
@@ -493,7 +493,7 @@ well-known format, not a string/symbol-table fact): `StreamSmallSub` ->
 magic1`, `b2` -> `iconFrameFlag`, `b3` -> `blockCount`, `name` ->
 `title`, `arr` -> `palette`, `blkA/blkB/blkC` -> `frame0/frame1/frame2`).
 These are unit-local typedefs, not symbols in `config/symbols.slps01556.lsdde.txt`,
-so `tools/rename.py` does not apply; edited directly in `src/class_3bb8c_f.c`
+so `tools/rename.py` does not apply; edited directly in `src/class_3bb8c_c.c`
 and confirmed to still parse with an isolated `cpp|cc1` pass (the body is
 `#if 0`, so the normal build never compiles it and could not have caught
 a syntax error here).
@@ -561,7 +561,7 @@ as one field. `McIconSource` reads as a 4bpp TIM with one 16-colour CLUT:
 CLUT to 0x34, a 12-byte pixel block header to 0x40, pixels after -- which
 is why the frames sit at 0x40/0xC0/0x140.
 
-### Moved from src/class_3bb8c_f.c
+### Moved from src/class_3bb8c_c.c
 
 The type block's naming note, the types' comments, and the comments on
 the function's local declarations, as they stood before track 7:

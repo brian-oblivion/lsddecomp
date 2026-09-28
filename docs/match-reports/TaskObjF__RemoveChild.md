@@ -65,5 +65,5 @@ its structural mirror. See that report for the full derivation.
 gFrameClockMethods' word +0x000 are 0x2 and 0x5). The two-nibble tests stay
 literal: `& 0xFF` against 0x10 (gTextEntryMethods' word +0x000) and 0x20
 (gItemListMethods'), proposed to the head as `TEXTENTRY_CLASS_ID` and
-`ITEMLIST_CLASS_ID` because class_3bb8c_f.c's OnNotify spells the same ids.
+`ITEMLIST_CLASS_ID` because class_3bb8c_c.c's OnNotify spells the same ids.
 Zero bytes changed.

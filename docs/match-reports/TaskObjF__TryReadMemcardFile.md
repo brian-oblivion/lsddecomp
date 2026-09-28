@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004EDC0` on 2026-09-20 (tools/rename.py). Address 0x8004edc0.
 
-**Unit:** class_3bb8c_f · **Size:** 56 words (0xE0) · **Status:** MATCH
+**Unit:** class_3bb8c_c · **Size:** 56 words (0xE0) · **Status:** MATCH
 
 ## What it does
 
@@ -95,7 +95,7 @@ with a MATCHING line: the readable
 `(iconFlag - MEMCARD_ICON_FLAG_BASE + 1) * MEMCARD_SECTOR_SIZE` built
 54/56 (two words reordered), measured this round.
 
-### Moved from src/class_3bb8c_f.c
+### Moved from src/class_3bb8c_c.c
 
 The BIOS file-call declarations' comment, whose history is this:
 

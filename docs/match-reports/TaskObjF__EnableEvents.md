@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004F394` on 2026-09-20 (tools/rename.py). Address 0x8004f394.
 
-**Unit:** class_3bb8c_f · **Size:** 10 words (0x28) · **Status:** MATCH
+**Unit:** class_3bb8c_c · **Size:** 10 words (0x28) · **Status:** MATCH
 
 `s32 TaskObjF__EnableEvents(TaskObjF *self) { return TaskObjF__ForEachEvent(self,
 func_80038F6C, 1); }` — a one-line forward to `TaskObjF__ForEachEvent` (see its
@@ -38,7 +38,7 @@ does track 4's class-table unification pass rather than let two separate
 
 ## Round 95 (track 7, charlie)
 
-### Moved from src/class_3bb8c_f.c
+### Moved from src/class_3bb8c_c.c
 
 The kernel event declarations' comment, shortened in the unit:
 

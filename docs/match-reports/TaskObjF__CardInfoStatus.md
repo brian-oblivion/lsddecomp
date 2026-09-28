@@ -8,7 +8,7 @@
 
 `s32 TaskObjF__CardInfoStatus(Node3bb8cE *self, s32 *p1, s32 *p2)`. Zeroes both
 out-parameters, calls `TaskObjF__TestEvents(self)` (a still-INCLUDE_ASM helper in
-`class_3bb8c_f.c`), busy-waits on `func_80050B18(self->unk10)` until it
+`class_3bb8c_c.c`), busy-waits on `func_80050B18(self->unk10)` until it
 returns nonzero, then reads a status code from `TaskObjF__WaitForReadyEvent(self)` and
 maps it to a return value plus the two out-parameters: `0x100` -> success
 already (status 0, no out-param write); `0x8000` -> status 0, `*p1 = 1`;

@@ -108,7 +108,7 @@ somewhere else.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E34C` -> `TaskObjF__TaskObjF`. **Tier A**: `tools/classtable.py 0x80086DC4` places this function exactly at `gTaskObjFMethods`'s own +0x008 ctor slot -- the constructor for the class `class_3bb8c_f.c`/`class_3bb8c_g.c` already name `TaskObjF` tree-wide. Follows the `New_Class`/`Class__Class` constructor convention.
+Renamed `func_8004E34C` -> `TaskObjF__TaskObjF`. **Tier A**: `tools/classtable.py 0x80086DC4` places this function exactly at `gTaskObjFMethods`'s own +0x008 ctor slot -- the constructor for the class `class_3bb8c_c.c`/`class_3bb8c_g.c` already name `TaskObjF` tree-wide. Follows the `New_Class`/`Class__Class` constructor convention.
 
 ## Track 7 (round 96, echo)
 
