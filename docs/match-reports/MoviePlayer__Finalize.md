@@ -49,4 +49,4 @@ The +0x060 object is a CdStream (include/cd_stream.h, unified this round). `Obj4
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; Obj455D4 is gone; `unk60` -> `stream`. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/movie_player.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; Obj455D4 is gone; `unk60` -> `stream`. Byte-identical; `typeviews.py --warnings` 0 new.

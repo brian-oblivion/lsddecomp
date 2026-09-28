@@ -1,5 +1,5 @@
-#ifndef MOVIEPLAYER_H
-#define MOVIEPLAYER_H
+#ifndef MOVIE_PLAYER_H
+#define MOVIE_PLAYER_H
 
 #include "basic_class.h"
 #include "cd_stream.h"

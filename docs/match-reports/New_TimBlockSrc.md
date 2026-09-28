@@ -105,7 +105,7 @@ Verbatim as it stood before the round-93 comment pass; the new banner says what 
  *   - MoviePlayer (gMoviePlayerMethods): a BasicClass subclass driving CD-streamed,
  *     MDEC-decoded FMV playback (open a CD stream, decode/upload strips,
  *     play/stop/tick controls); called from task.c
- *     (include/MoviePlayer.h, track 4, round 89).
+ *     (include/movie_player.h, track 4, round 89).
  *
  * libpress starts right after, at DecDCTReset (now psyq_36654).
  */

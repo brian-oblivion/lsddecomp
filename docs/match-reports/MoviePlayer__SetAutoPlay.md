@@ -41,4 +41,4 @@ void MoviePlayer__SetAutoPlay(Obj6F614 *self, s32 value) {
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; renamed from `MoviePlayer__SetResult` (see Naming); Obj6F614 is gone, `unk68` -> `autoPlay`. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/movie_player.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; renamed from `MoviePlayer__SetResult` (see Naming); Obj6F614 is gone, `unk68` -> `autoPlay`. Byte-identical; `typeviews.py --warnings` 0 new.

@@ -74,4 +74,4 @@ Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, i
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/MoviePlayer.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The +0x004 call is `release`. Byte-identical.
+The player is a MoviePlayer (`include/movie_player.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The +0x004 call is `release`. Byte-identical.

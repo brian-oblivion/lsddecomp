@@ -990,7 +990,7 @@
         "gMoviePlayerMethods": {
           "class": "MoviePlayer",
           "date": "2026-09-26",
-          "header": "include/MoviePlayer.h"
+          "header": "include/movie_player.h"
         },
         "gNodeGuardedViewportMethods": {
           "class": "NodeGuardedViewport",

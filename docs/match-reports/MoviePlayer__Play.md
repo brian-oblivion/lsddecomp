@@ -113,7 +113,7 @@ The +0x060 object is a CdStream (include/cd_stream.h, unified this round). `Stre
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; Obj457C0 is gone. `rect` -> `frame` (a DrawRect, so the clearImage call needs no cast); `unk5C` -> `frameCount` (startRead's frameCount in Advance), `unk58` -> `loops`, `unk68` -> `autoPlay`, `unk3C`/`unk40`/`unk44`/`unk48`/`unk4C` -> `frameIndex`/`haveFrame`/`finished`/`streamEnded`/`frameDone`, `unk54` kept. `gMovieFrameRect` was renamed `sMovieClearColor` (rename.py) and typed `u8[4]`, so the color argument needs no cast either. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/movie_player.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; Obj457C0 is gone. `rect` -> `frame` (a DrawRect, so the clearImage call needs no cast); `unk5C` -> `frameCount` (startRead's frameCount in Advance), `unk58` -> `loops`, `unk68` -> `autoPlay`, `unk3C`/`unk40`/`unk44`/`unk48`/`unk4C` -> `frameIndex`/`haveFrame`/`finished`/`streamEnded`/`frameDone`, `unk54` kept. `gMovieFrameRect` was renamed `sMovieClearColor` (rename.py) and typed `u8[4]`, so the color argument needs no cast either. Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 
@@ -121,5 +121,5 @@ Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, 
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `arg3` | `keepActive` | B | stored in +0x054 (now `keepActive`, include/MoviePlayer.h); while it is set PollActive keeps the player active |
+| `arg3` | `keepActive` | B | stored in +0x054 (now `keepActive`, include/movie_player.h); while it is set PollActive keeps the player active |
 | `100` | `MOVIE_OPEN_TRIES` | A | CdStream open's `tries` parameter |

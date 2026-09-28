@@ -10,7 +10,7 @@
 #include "TaskCore.h"
 #include "StreamTask.h"
 #include "Viewport.h"
-#include "MoviePlayer.h"
+#include "movie_player.h"
 #include "draw_system.h"
 #include "TextRow.h"
 

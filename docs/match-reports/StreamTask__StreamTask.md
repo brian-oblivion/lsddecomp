@@ -117,7 +117,7 @@ Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, i
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/MoviePlayer.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The allocation is `New_MoviePlayer((DrawRect *)GetDefaultMovieFrame(), 0, 0)`: the ctor's frame rectangle (a pointer cast, no code). Byte-identical.
+The player is a MoviePlayer (`include/movie_player.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The allocation is `New_MoviePlayer((DrawRect *)GetDefaultMovieFrame(), 0, 0)`: the ctor's frame rectangle (a pointer cast, no code). Byte-identical.
 
 
 ## Track 6 (2026-09-27, round 99, runner bravo)

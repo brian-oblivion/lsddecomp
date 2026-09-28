@@ -17,7 +17,7 @@
  * GraphRoom and cinematic streams): New_StreamTask(NULL, NULL, NULL, NULL),
  * optionally setFrameBound / setSkipOnConfirm(0), then init with the stream,
  * then release. The player's slots as this class calls them
- * (include/MoviePlayer.h):
+ * (include/movie_player.h):
  * +0x040 play, +0x048 advance, +0x04C abort, +0x06C setAutoPlay, and
  * +0x004 release.
  *

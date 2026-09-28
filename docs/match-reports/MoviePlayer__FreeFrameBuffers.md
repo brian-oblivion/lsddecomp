@@ -55,4 +55,4 @@ void MoviePlayer__FreeFrameBuffers(Obj4575C *self) {
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; Obj4575C is gone: `unkC`/`unk10`/`unk14`/`unk18`/`unk1C` are `external`/`ring`/`frames[0]`/`frames[1]`/`strip`. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/movie_player.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; Obj4575C is gone: `unkC`/`unk10`/`unk14`/`unk18`/`unk1C` are `external`/`ring`/`frames[0]`/`frames[1]`/`strip`. Byte-identical; `typeviews.py --warnings` 0 new.

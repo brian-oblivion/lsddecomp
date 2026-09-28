@@ -58,7 +58,7 @@
 #include "link_resource.h"
 #include "draw_system.h"
 #include "cd_stream.h"
-#include "MoviePlayer.h"
+#include "movie_player.h"
 #include "bmem_pmgr.h"
 #include "data_source.h"
 #include "cd_driver.h"
