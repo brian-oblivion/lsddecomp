@@ -77,3 +77,10 @@ halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
 became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
 BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
 its caller in task passes an `s32 size[2]`).
+
+## History (source comments moved in track 12, round 106)
+
+From `include/box_fill.h`:
+
+> BoxFillSize's comment: "Each word is stored into the u16 boxW/boxH, which
+> reads only its low halfword (lhu at +0x000 and +0x004)."
