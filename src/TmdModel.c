@@ -1,7 +1,7 @@
 /*
  * TmdModel.c -- the TmdModel class (include/TmdModel.h; method table
  * gTmdModelMethods, class tag 9): one object of a TMD file (the "model"
- * SceneNode__LinkModel, src/SceneNode.c, links into a GsDOBJ2). Its
+ * SceneNode__LinkModel, src/graphics/SceneNode.c, links into a GsDOBJ2). Its
  * methods map the TMD to the GS (TmdModel__MapModelingData), walk its
  * primitives one packet at a time (TmdModel__NextPrimitive, which reads
  * each packet through Sony's own <libgs.h> layouts: GPU_COM_* mode codes,

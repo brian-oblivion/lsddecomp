@@ -56,7 +56,7 @@ Evidence:
   notifying. Hence `sender`.
 - `arg2` is not a boolean, and that is why `event` and not `isFinalizing`.
   Two overrides in other units forward to the base and then keep using the
-  same value: `SceneNode__OnNotify` (`src/SceneNode.c`) calls
+  same value: `SceneNode__OnNotify` (`src/graphics/SceneNode.c`) calls
   `Get_vtable_BasicClass()->slot38(self, other, arg2)` and then dispatches
   to slot `+0x094`/`+0x098`/`+0x09C` **by the sender's class tag**, passing
   `arg2` through each time; `TodActor__OnNotify` (`src/TodActor.c`) calls the

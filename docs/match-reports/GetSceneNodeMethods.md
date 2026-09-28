@@ -55,7 +55,7 @@ from a large number of OTHER units with DIFFERENT per-call-site arities
 and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
-`src/SceneNode.c`, `src/TitleMenuTaskObjF.c`, `src/ObjMStyleActor.c`,
+`src/graphics/SceneNode.c`, `src/TitleMenuTaskObjF.c`, `src/ObjMStyleActor.c`,
 `src/ObjMStyleActor.c`, `src/DayTaskStageMap.c`, `src/ScreenWidgets.c`,
 `src/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
 `include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
@@ -74,7 +74,7 @@ round's 17 findings where a declaration was actually wrong rather than
 deliberate.
 
 **Callee evidence** (`0x8001E57C`, and the definition at
-`src/SceneNode.c:736`):
+`src/graphics/SceneNode.c:736`):
 
 ```
 8001e57c:  lui   v0,0x8007

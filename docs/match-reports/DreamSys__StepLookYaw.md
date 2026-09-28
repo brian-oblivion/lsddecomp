@@ -681,7 +681,7 @@ Renamed from `func_800598E8`.
 
 Same spring-with-decay shape as `DreamSys__StepLookOffset`, but
 what it steps is a ROTATION, and that is measured rather than inferred:
-`SceneNode__UpdateRotation` is vtable slot +0x044, matched in src/SceneNode.c, and it reads its
+`SceneNode__UpdateRotation` is vtable slot +0x044, matched in src/graphics/SceneNode.c, and it reads its
 `data` argument as three {numerator, denominator} degree ratios, adding them to the
 object's rotation vector when its `flag` argument is 0 -- which is the flag this
 function passes. The halfword it overwrites first is

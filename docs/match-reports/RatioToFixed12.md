@@ -88,7 +88,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * the pair themselves. */
 ```
 
-## Round 98 (echo): track 7, moved from src/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
 Locals `q1`/`r1`/`q2` -> `whole`/`rem`/`frac`, and `<< 12` -> `* ONE` (GCC emits the same `sll`): byte-identical.
 

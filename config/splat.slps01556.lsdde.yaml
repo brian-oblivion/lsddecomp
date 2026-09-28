@@ -433,7 +433,7 @@ segments:
       # `jr $ra; nop` leaf. Blocker census over the slice: zero gp_rel,
       # zero addiu-$at, zero `jlabel`, zero `jr $t2` -- so no rodata slot
       # to attach and no hasm/.word disposition.
-      - [0xD294, c, SceneNode]     # 0xD294..0xF770: code_d294, _b and _c, merged round 101 (track 8)
+      - [0xD294, c, graphics/SceneNode]     # 0xD294..0xF770: code_d294, _b and _c, merged round 101 (track 8)
       # (carve history; merged into SceneNode above, round 101)
       # code_d294_b: second 20-function slice, 0xDC24..0xED8C.
       # 0xED8C (func_8001E58C) is a real boundary -- func_8001E57C is a

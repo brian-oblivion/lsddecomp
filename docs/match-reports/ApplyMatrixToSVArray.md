@@ -174,7 +174,7 @@ just the trailing increment statements' order (29/37, no change) --
 neither touches WHICH value the loop bound itself is computed from,
 which is what actually mattered.
 
-Final source (verbatim, now in `src/SceneNode.c` in place of the
+Final source (verbatim, now in `src/graphics/SceneNode.c` in place of the
 `INCLUDE_ASM`):
 
 ```c
@@ -267,7 +267,7 @@ swap between a function's own parameters.
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 
 ```c
-/* ApplyMatrixToSVArray (src/SceneNode.c; MATCHED round 19, echo -- see
+/* ApplyMatrixToSVArray (src/graphics/SceneNode.c; MATCHED round 19, echo -- see
  * docs/match-reports/ApplyMatrixToSVArray.md): `dst[i] = m * src[i]` for
  * `count` elements of 6 bytes each. Each iteration copies one element out
  * of `src` into an all-s16 stack local (alignment 2, which is what makes
@@ -281,7 +281,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * shape its callers need. */
 ```
 
-## Round 98 (echo): track 7, moved from src/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
 The definition and its prototype in include/SceneNode.h now take `(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m)` and walk by element (`dst + count`, `src++`), replacing the `(u8 *)p + 6` byte walks; the local `ApplyMatrixSV` extern takes Sony's signature `SVECTOR *(MATRIX *, SVECTOR *, SVECTOR *)` (this SDK's libgte.h omits it). Byte-identical. Measured on the way: keeping `void *` parameters and copying them into typed locals (`out = dst; in = src;`) scores 31/37, because the new pseudos reorder the callee-saved register saves in the prologue; typing the parameters themselves does not.
 

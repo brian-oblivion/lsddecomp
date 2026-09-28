@@ -76,7 +76,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
 
 ```c
 /* CalcBoxOutcode (round 54 correction: this banner was STALE -- it is
- * now carved and MATCHED in src/SceneNode.c):
+ * now carved and MATCHED in src/graphics/SceneNode.c):
  * computes the SAME 6-bit box-vs-point outcode BisectSegmentToBox's own `flags`
  * computation does (bit-for-bit identical comparison chain against the
  * same 6 field offsets) -- MEASURED, not guessed; this is the shared
@@ -85,7 +85,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * repeated `andi ...,0xFF` every time it re-reads a stored result). */
 ```
 
-## Round 98 (echo): track 7, moved from src/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
 The six bits are unit-local `OUTCODE_{X,Y,Z}_{MIN,MAX}` defines in SceneNode.c (no other unit tests an individual bit; ClipSegmentToBox only tests the whole outcode and `r1 & r2`): byte-identical.
 

@@ -168,7 +168,7 @@ extern s8 MOVE_COMMAND_SIGNS[8];
 
 /* A single {numerator, denominator} degree ratio. This is not a guess about
    the LAYOUT any more (round 66): SceneNode__UpdateRotation -- vtable slot +0x044, the
-   inherited rotation setter, MATCHED in src/SceneNode.c -- reads exactly
+   inherited rotation setter, MATCHED in src/graphics/SceneNode.c -- reads exactly
    three of these from its `data` argument, one per axis, converts each with
    RatioToFixed12 and divides by 360, then either STORES them into the
    object's rotation vector (flag != 0) or ADDS them modulo a full turn

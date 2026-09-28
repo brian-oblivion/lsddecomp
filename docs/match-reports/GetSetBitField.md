@@ -36,7 +36,7 @@ u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value) {
 ```
 
 Preserved inline per project convention (`#if 0`, positioned where it
-would compile back into `src/SceneNode.c` in place of the current
+would compile back into `src/graphics/SceneNode.c` in place of the current
 `INCLUDE_ASM`):
 
 ```c
@@ -154,7 +154,7 @@ identical and (per the six prior manual attempts) statement order,
 operand order, and intermediate-naming alone hadn't found this specific
 split.
 
-**Translated to `src/SceneNode.c` verbatim and reverified with the real
+**Translated to `src/graphics/SceneNode.c` verbatim and reverified with the real
 oracle** (not just the permuter's own scorer):
 
 ```
@@ -223,7 +223,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * register and these five functions are its per-field setters. */
 ```
 
-## Round 98 (echo): track 7, moved from src/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
 The mask loop keeps a one-line `MATCHING:` note in the source.
 

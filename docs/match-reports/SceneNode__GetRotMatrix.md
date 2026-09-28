@@ -64,7 +64,7 @@ void SceneNode__GetRotMatrix(SceneNodeObj *self, s32 a1, s32 a2) {
   `{ u8 pad0[0x10]; S16Quad_d294 vec; }`. Only +0x10 is known; the rest of
   the 0x28-byte block is still opaque.
 - `SceneNodeSub14::unk44` retyped from `void *` to `SceneNodeBlock44 *`.
-  Checked both other referencing sites in `src/SceneNode.c` before doing
+  Checked both other referencing sites in `src/graphics/SceneNode.c` before doing
   this (`self->unk14->unk44 = blockB;` where `blockB` is `void *`, and
   `BMemPMgrFree(sub->unk44)`, which takes `void *`) — both are safe under
   implicit pointer conversion, no cast needed.
@@ -107,7 +107,7 @@ rotation matrix, optionally mirrored); tier B because the negate flag's
 in-game meaning (which callers want the mirrored form, and why) is not
 established from this function's own body. Held back from an actual
 rename because this symbol is referenced (in a comment) from
-`src/SceneNode.c:27` -- a different unit -- discussing exactly the
+`src/graphics/SceneNode.c:27` -- a different unit -- discussing exactly the
 slot-84 relationship above. Posted to the broadcast.
 
 ## Round 95 (bravo): Sony's declarations

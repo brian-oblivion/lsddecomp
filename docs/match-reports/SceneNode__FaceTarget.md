@@ -284,7 +284,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
 Parameters named for what their branches do, which is all the body establishes (tier B; the purpose of the modes stays open, as round 50 said): `arg2` -> `zeroPitch` (non-zero clears the pitch entry), `arg3` -> `noHalfTurn` (0 adds 180 degrees to the yaw), `arg4` -> `extraRotation` (a Ratio16[3] handed to updateRotation with set = 0, i.e. added). `table` -> `targetPos`, and the pitch half's reuse of `dx` for the y difference is now its own `dy` local: byte-identical. `4096` is `ONE`, the quarter turn `0x400` is `ONE / 4`, and the half turn `0xB4` is written `180` (degrees).
 

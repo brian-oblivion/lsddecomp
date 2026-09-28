@@ -37,7 +37,7 @@ straight through as `TmdModel__GetHull`'s own `void *` arg0 (which
 `TmdModel__GetHull` forwards unmodified to `TmdModel__ComputeBounds`, which dereferences
 it at `+0x10`) -- genuinely a pointer. Retyped to `void *unk20` in
 `include/SceneNode.h`. The only existing write site, `self->unk20 = 0;` in
-`SceneNode__SceneNode` (`src/SceneNode.c`), is an integer-constant-zero assignment
+`SceneNode__SceneNode` (`src/graphics/SceneNode.c`), is an integer-constant-zero assignment
 and compiles unchanged under the new type (checked: `build exit=0`, full
 image SHA1 still green).
 

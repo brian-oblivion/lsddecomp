@@ -32,7 +32,7 @@ void *AcceptGridElem(void *arg0, void *arg1, void *arg2) {
 ```
 
 `SceneNode__RaycastVertical` is declared locally (`extern s32 SceneNode__RaycastVertical(void);`) --
-it is matched/queued in a different unit (`src/SceneNode.c`), so its
+it is matched/queued in a different unit (`src/graphics/SceneNode.c`), so its
 prototype belongs here, not in a shared header.
 
 ## Shape note
