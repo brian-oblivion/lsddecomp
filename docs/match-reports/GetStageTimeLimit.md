@@ -6,14 +6,14 @@
 
 ## What it does
 
-A one-line accessor: index into the `s16 STAGE_TIME_LIMITS[]` table (already
+A one-line accessor: index into the `s16 sStageTimeLimits[]` table (already
 declared in `include/DreamSys.h:1059`) and return the time limit for a given
 stage.
 
 ```c
 s32 GetStageTimeLimit(s32 stage)
 {
-	return STAGE_TIME_LIMITS[stage];
+	return sStageTimeLimits[stage];
 }
 ```
 
@@ -39,14 +39,14 @@ plain array indexing, no reshaping required.
 
 ## Naming
 
-- **Tier A.** One-line table lookup, STAGE_TIME_LIMITS[stage]. Free function, no `this`.
+- **Tier A.** One-line table lookup, sStageTimeLimits[stage]. Free function, no `this`.
 
 ## Head naming review, round 65: TIER corrected A -> B
 
 The round-65 naming runner recorded this name at tier A on the evidence
-"table lookup". The body is `return STAGE_TIME_LIMITS[stage];` and the whole
+"table lookup". The body is `return sStageTimeLimits[stage];` and the whole
 name is read off that array's symbol — which is an INHERITED name
-(`config/symbols.slps01556.lsdde.txt`, `STAGE_TIME_LIMITS = 0x80087F14`,
+(`config/symbols.slps01556.lsdde.txt`, `sStageTimeLimits = 0x80087F14`,
 predating this round; the runner did not rename it).
 
 Track 3: "Every inherited name is a tier-B hypothesis. Confirm it with

@@ -117,7 +117,7 @@ enum DreamSysMoveOverride {
 
 /* The dream clock counts DreamSys::tick 15 times per unit of
  * dreamTimeLimit's public value (GetSetDreamTimeLimit scales both ways). The
- * unit is seconds: every STAGE_TIME_LIMITS entry is a whole number of
+ * unit is seconds: every sStageTimeLimits entry is a whole number of
  * minutes (240, 180, 480, 420, ...). */
 #define DREAM_TICKS_PER_SECOND 15
 
@@ -836,7 +836,7 @@ typedef struct StaticLinkTrigger {
 /* Jumptable holding all of DreamSys "virtual" methods */
 extern DreamSysMethods gDreamSysMethods;
 
-extern s16 STAGE_TIME_LIMITS[];
+extern s16 sStageTimeLimits[];
 
 extern struct RelativePos SPAWN_POS_ADJUST[];
 

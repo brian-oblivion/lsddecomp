@@ -16,7 +16,7 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
 
 	stage = GetStageChunkFromMood(&chunk, mood);
 	if (stage >= 0) {
-		*timeLimit = STAGE_TIME_LIMITS[stage];
+		*timeLimit = sStageTimeLimits[stage];
 
 		count = LEN_STAGE_SPAWNPOINTS[stage];
 		entry = STAGE_SPAWNPOINTS[stage];
@@ -33,7 +33,7 @@ s32 GenerateInitialSpawn(PlayerSpawnPoint *dest, s32 *timeLimit, MoodGraphPoint 
 	}
 
 	stage = GetRandomSpawnFromStage(dest, stage, day);
-	*timeLimit = STAGE_TIME_LIMITS[stage];
+	*timeLimit = sStageTimeLimits[stage];
 	return stage;
 }
 ```
