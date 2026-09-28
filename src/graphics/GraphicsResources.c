@@ -1524,8 +1524,8 @@ void MoviePlayer__DrawStrip(MoviePlayer *self) {
  * otherwise no movie is active any more (1). */
 s32 MoviePlayer__PollActive(MoviePlayer *self) {
     if (self->keepActive != 0) {
-        if (gMoviePollCounter++ > MOVIE_KEEP_ACTIVE_POLLS) {
-            gMoviePollCounter = 1;
+        if (sMoviePollCounter++ > MOVIE_KEEP_ACTIVE_POLLS) {
+            sMoviePollCounter = 1;
             self->methods->rewind(self);
         }
         return 0;

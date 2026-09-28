@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gMoviePollCounter
 gNameCharTable
 gNullDriverMode
 gNullDriverModeArg
@@ -190,6 +189,7 @@ sMdecInitialized
 sMoodCue74ClearColor
 sMoodCue78TransitionDone
 sMovieClearColor
+sMoviePollCounter
 sNdivOverride
 sNdivOverrideSet
 sPadRefCount
