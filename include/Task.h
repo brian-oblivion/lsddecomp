@@ -39,14 +39,14 @@ extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
  * Viewport__Flip calls it with 1 and ignores the result. */
 extern s32 ResetGraph(s32 mode);
 
-/* Defined in Task.c: &gDefaultMovieFrame. */
+/* Defined in Task.c: &sDefaultMovieFrame. */
 extern DrawRect *GetDefaultMovieFrame(void);
 
 /* {x 640, y 0, w 320, h 240}: the default movie frame. TaskCore__OnInit clears
  * it to baseColor when the task has no sub handle. The same three words are
  * StreamTask's default initData and its MoviePlayer's frame, through
  * GetDefaultMovieFrame. */
-extern DrawRect gDefaultMovieFrame;
+extern DrawRect sDefaultMovieFrame;
 
 /* Viewport's ctor data: gViewportFadeBoxSize is the (320, 240) it passes
  * New_FadeBox; gFadeBoxAttachPos the (-100, -100) screen position the ctor

@@ -8,7 +8,7 @@
 
 ## What it does
 
-A tiny getter: returns the address of the static table `gDefaultMovieFrame`, a
+A tiny getter: returns the address of the static table `sDefaultMovieFrame`, a
 3-word struct per `include/Task.h`'s own `StreamTaskInitData` local
 view (that unit's `StreamTask__StreamTask` uses it as the 5th/stack argument to a
 constructor call, and `GetDefaultMovieFrame()`'s return value feeds the same
@@ -18,11 +18,11 @@ so it is declared here as an opaque `u8[]`.
 ## The C
 
 ```c
-extern u8 gDefaultMovieFrame[];
+extern u8 sDefaultMovieFrame[];
 
 void *GetDefaultMovieFrame(void)
 {
-    return gDefaultMovieFrame;
+    return sDefaultMovieFrame;
 }
 ```
 
@@ -34,7 +34,7 @@ first build.
 ## Naming
 
 **GetDefaultMovieFrame** (renamed from `func_8003DFCC`, round 55,
-runner alpha). Tier A: pure leaf getter, returns `&gDefaultMovieFrame`
+runner alpha). Tier A: pure leaf getter, returns `&sDefaultMovieFrame`
 (formerly `D_8006E854`), already declared `StreamTaskInitData *func_8003DFCC(void)`
 in `include/Task.h` and used there (`Task.c`) as the fallback
 default when a caller supplies no init data -- "Default" is the confirmed
@@ -43,9 +43,9 @@ mechanic (a fixed fallback constant), not a guess.
 
 ## Track 6 (2026-09-27, round 99, runner bravo)
 
-Returns `DrawRect *` now (was `void *` here and a `StreamTaskInitData *` prototype in Task.h; the local type is deleted, StreamTask__StreamTask.md). The C above is the round-12 match; the live body is `return &gDefaultMovieFrame;` over `extern DrawRect gDefaultMovieFrame;`. Byte-identical.
+Returns `DrawRect *` now (was `void *` here and a `StreamTaskInitData *` prototype in Task.h; the local type is deleted, StreamTask__StreamTask.md). The C above is the round-12 match; the live body is `return &sDefaultMovieFrame;` over `extern DrawRect sDefaultMovieFrame;`. Byte-identical.
 
 Names, through `tools/rename.py`:
 
-- `gDefaultStreamTaskInitData` -> **`gDefaultMovieFrame`**, tier B. The data at 0x8006E854 is `{x 640, y 0, w 320, h 240}`. Measured uses: StreamTask__StreamTask passes it as New_MoviePlayer's `frame` (MoviePlayer::frame, the rect `play` clears and `drawStrip` walks); it is StreamTask's `initData` default; TaskCore__OnInit clears it when a task has no sub handle. "Movie frame" names the player's use; "Default" is StreamTask's fallback. Why TaskCore clears it is not established.
+- `gDefaultStreamTaskInitData` -> **`sDefaultMovieFrame`**, tier B. The data at 0x8006E854 is `{x 640, y 0, w 320, h 240}`. Measured uses: StreamTask__StreamTask passes it as New_MoviePlayer's `frame` (MoviePlayer::frame, the rect `play` clears and `drawStrip` walks); it is StreamTask's `initData` default; TaskCore__OnInit clears it when a task has no sub handle. "Movie frame" names the player's use; "Default" is StreamTask's fallback. Why TaskCore clears it is not established.
 - `GetDefaultStreamTaskInitData` -> **`GetDefaultMovieFrame`**, tier A: a leaf getter named for what it returns. (rename.py rewrote the earlier Naming section's identifiers in place; its history reads "renamed from func_8003DFCC, round 55" to the name that function had then, GetDefaultStreamTaskInitData.)

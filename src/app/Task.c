@@ -288,7 +288,7 @@ void TaskCore__OnInit(TaskCore *self) {
     if (self->subHandle == NULL) {
         ((DrawSystem *)self->initArgs->drawSystem)
             ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor,
-                                  &gDefaultMovieFrame);
+                                  &sDefaultMovieFrame);
     }
     ((DrawSystem *)self->initArgs->drawSystem)
         ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor, NULL);
@@ -1175,10 +1175,10 @@ TaskCoreMethods *GetTaskCoreMethods(void) {
 
 /* The default movie frame, {640, 0, 320, 240}: StreamTask's default initData
  * and the rect TaskCore__OnInit clears (Task.h). */
-extern DrawRect gDefaultMovieFrame;
+extern DrawRect sDefaultMovieFrame;
 
 DrawRect *GetDefaultMovieFrame(void) {
-    return &gDefaultMovieFrame;
+    return &sDefaultMovieFrame;
 }
 
 void IntermediateBase__IntermediateBase(IntermediateBase *self) {
