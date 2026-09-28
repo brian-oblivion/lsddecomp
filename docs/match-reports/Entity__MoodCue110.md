@@ -89,7 +89,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_80089E44` | `SCALE_TWO_FIFTHS` | A (by value) | `.word 0x00050002` x3 = uniform 2/5, like `SCALE_EIGHT_SEVENTHS` |
-| `ROTATION_ZPLUS4` | `ROTATION_YAW_PLUS4` | A (by value) | `.word 0x00010000, 0x00010004, 0x00010000` = {0/1, 4/1, 0/1}: the 4 is the SECOND pair, Y (yaw), as in `ROTATION_YAW_PLUS9` = {0, 9, 0}; `ROTATION_ZPLUS9` = {0, 0, 9} has it third |
+| `ROTATION_ZPLUS4` | `ROTATION_YAW_PLUS4` | A (by value) | `.word 0x00010000, 0x00010004, 0x00010000` = {0/1, 4/1, 0/1}: the 4 is the SECOND pair, Y (yaw), as in `sRotationYawPlus9` = {0, 9, 0}; `ROTATION_ZPLUS9` = {0, 0, 9} has it third |
 
 **Correction** to "Data constant decoded this round" above: it read
 `(0,1, 4,1, 0,1, ...)` correctly and then called the second pair Z. The

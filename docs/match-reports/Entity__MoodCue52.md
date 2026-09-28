@@ -18,7 +18,7 @@ void Entity__MoodCue52(Entity *this, EntityMoodHandlerArg *out) {
             out->unk1C = 9;
         }
     } else if (this->unkFC < 0xC8) {
-        this->methods->slot44(this, 0, ROTATION_YAW_PLUS9);
+        this->methods->slot44(this, 0, sRotationYawPlus9);
     } else {
         this->methods->slot160(this);
         out->unk30 = 0x1E;

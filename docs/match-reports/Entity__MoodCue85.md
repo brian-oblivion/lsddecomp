@@ -95,7 +95,7 @@ Tier B, same as every sibling `Entity__MoodCueNN` (Entity..Entity_g): the
 row mapping is a fact of the binary, which dream object or state a row is
 for is not established. Row kept decimal so names sort in table order.
 
-What it does, in the unit's current field names: Five-state machine (0, 0xA..0xE) that calls `SetCueTones7_7_7`/`SetCueTones18_3_3` at its transitions, yaws with `updateRotation(ROTATION_YAW_PLUS9 / ROTATION_ZMINUS9)`, rotates the target with `target->slot44(ROTATION_ZPLUS1 / ROTATION_YAW_PLUS180)`, drives `unk100` (via `Entity__GetOrCreateFadeBox`) with `slotD4(unk50, 7, 0)`/`slotD8(unk50, 0, 0)`, and ends with `notifyParents(0xA or 0xC)` or stopping the cue.
+What it does, in the unit's current field names: Five-state machine (0, 0xA..0xE) that calls `SetCueTones7_7_7`/`SetCueTones18_3_3` at its transitions, yaws with `updateRotation(sRotationYawPlus9 / ROTATION_ZMINUS9)`, rotates the target with `target->slot44(ROTATION_ZPLUS1 / ROTATION_YAW_PLUS180)`, drives `unk100` (via `Entity__GetOrCreateFadeBox`) with `slotD4(unk50, 7, 0)`/`slotD8(unk50, 0, 0)`, and ends with `notifyParents(0xA or 0xC)` or stopping the cue.
 
 ### Data constants named (round 79)
 

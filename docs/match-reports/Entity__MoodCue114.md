@@ -12,7 +12,7 @@ No hits.
 
 `gEntityMoodHandlerTable` handler row; `out` unused. Returns immediately on the first
 `rand() % 3 == 0`. Otherwise dispatches `slot44(this, 0, a2)` where `a2` is
-`ROTATION_YAW_MINUS9` when a SECOND `rand() % 3 == 0`, else `ROTATION_YAW_PLUS9`.
+`ROTATION_YAW_MINUS9` when a SECOND `rand() % 3 == 0`, else `sRotationYawPlus9`.
 
 ## The C
 
@@ -24,7 +24,7 @@ void Entity__MoodCue114(Entity *this, EntityMoodHandlerArg *out) {
         return;
     }
     if (rand() % 3 != 0) {
-        a2 = ROTATION_YAW_PLUS9;
+        a2 = sRotationYawPlus9;
     } else {
         a2 = ROTATION_YAW_MINUS9;
     }
@@ -35,7 +35,7 @@ void Entity__MoodCue114(Entity *this, EntityMoodHandlerArg *out) {
 ## Residue chased: swapped row pointers
 
 First attempt swapped which `rand() % 3` outcome selects `ROTATION_YAW_MINUS9` vs
-`ROTATION_YAW_PLUS9` (also flipping a `beq` to `bne`, a genuine control-flow
+`sRotationYawPlus9` (also flipping a `beq` to `bne`, a genuine control-flow
 difference, not just a value swap) -- 39/42. Reading the `beq
 v0,v1,L8006516C` (branch on remainder==0, i.e. `rand()%3==0`) against
 which `a2` value each fallthrough/branch path sets closed it to 42/42 on
@@ -64,7 +64,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 4b (round 93, charlie) — 2026-09-26
 
-The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `a2`, which holds `ROTATION_YAW_PLUS9` or `ROTATION_YAW_MINUS9` and is passed to `updateRotation`, is now `Ratio16 *` (was `void *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green. (`Entity__MoodCue102`'s `a2` and `Entity__MoodCue76`/`78`'s `table` stay `void *`: they also hold unnamed `u8[]` tables, `SCALE_UNIT`/`SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS`/`SCALE_MINUS_SIXTY_FOURTH`.)
+The motion templates are declared once, in `include/Entity.h` (`ROTATION_*`/`SCALE_*` as `Ratio16[]`, `TRANSLATE_*` as `LongVec3[]`); the unit-local `u8[]` externs are gone. The local `a2`, which holds `sRotationYawPlus9` or `ROTATION_YAW_MINUS9` and is passed to `updateRotation`, is now `Ratio16 *` (was `void *`). A pointer local's pointee type changes no instruction and the slot takes `void *`, so the bytes held: whole image green, 0 new `-Wall` warnings, nonmatching green. (`Entity__MoodCue102`'s `a2` and `Entity__MoodCue76`/`78`'s `table` stay `void *`: they also hold unnamed `u8[]` tables, `SCALE_UNIT`/`SCALE_X_FOUR_FIFTHS_Y_SIX_FIFTHS`/`SCALE_MINUS_SIXTY_FOURTH`.)
 
 ## Track 7 (2026-09-26, round 94, alpha)
 

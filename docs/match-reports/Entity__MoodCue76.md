@@ -29,7 +29,7 @@ void Entity__MoodCue76(Entity *this, EntityMoodHandlerArg *out) {
     } else {
         this->methods->slot130(this);
         fn = this->methods->slot44;
-        table = ROTATION_YAW_PLUS9;
+        table = sRotationYawPlus9;
         fn(this, 0, table);
     }
 }
@@ -43,7 +43,7 @@ regenerate retail's tail-merge.
 
 **First attempt** wrote the natural, idiomatic version -- two separate
 statement calls, `this->methods->slot48(this, 0, SCALE_MINUS_SIXTY_FOURTH);` in one
-branch and `this->methods->slot44(this, 0, ROTATION_YAW_PLUS9);` in the other,
+branch and `this->methods->slot44(this, 0, sRotationYawPlus9);` in the other,
 both with discarded return values. This compiled to the *correct control
 flow* but **did not tail-merge**: each branch got its own `jalr $2 / nop`
 pair before jumping to a shared epilogue, 2 words (8 bytes) longer than

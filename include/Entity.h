@@ -257,7 +257,7 @@ void Entity__StepYawInWindowsThenDeactivate(Entity *self, SoundCueSet *out, s32 
  * holds a second triple, (0, -0x20, 0); SCALE_X3's z den is Entity.c's
  * sScaleTemplateZDenom. */
 extern Ratio16 ROTATION_XPLUS_EIGHTH[];
-extern Ratio16 ROTATION_YAW_PLUS9[];
+extern Ratio16 sRotationYawPlus9[];
 extern Ratio16 ROTATION_YAW_MINUS9[];
 extern Ratio16 ROTATION_YAW_PLUS180[];
 extern Ratio16 sRotationYawPlus90[];

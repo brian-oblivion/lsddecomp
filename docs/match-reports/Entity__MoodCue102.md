@@ -149,7 +149,7 @@ elsewhere in this unit -- same symbol, not redecoded per call site.
 - `ROTATION_YAW_MINUS_THIRD` (`updateRotation` arg, `moodTimer >= 0x33` branch): s16-pair
   decoded `(0,1, -1,3, 0,1, 0,1)` -- only Y nonzero, but -1/3 degree is not
   a whole number, so it does not fit the established `sRotationYawPlus2`/
-  `ROTATION_YAW_PLUS9`/`ROTATION_YAW_PLUS1` whole-degree convention. No
+  `sRotationYawPlus9`/`ROTATION_YAW_PLUS1` whole-degree convention. No
   fractional-degree rotation constant has a name anywhere in the project
   yet, so inventing one here (`ROTATION_YAW_MINUS_THIRD`-style) would be a
   new naming style, not an application of an existing one.
