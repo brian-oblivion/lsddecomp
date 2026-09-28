@@ -224,3 +224,57 @@ gStyleEffectBaseViewY (that y, snapshotted at build). PROPOSED for track 7:
 read the viewpoint y as `gStyleEffectViewport->refView.vp.y` once the global
 is typed `Viewport *`, and `gStyleEffectTmd` as `LinkResource *` with
 `getModel`. renametype.py rewrote the old class name inside this report's earlier prose too (known, pending an operator decision); those lines are history and were not hand-restored, so read `StyleEffect` in them as `Class876FC`.
+
+## History moved from the unit's comments (track 7, round 101)
+
+The unit's comment on the four unprototyped helpers (the source now keeps a
+one-paragraph `MATCHING:` note), verbatim:
+
+```
+/* Four of the class's one-parameter helpers are called here with a dead
+ * second argument that is byte-load-bearing, so include/StyleEffect.h
+ * declares them WITHOUT a prototype (old-style), which is what lets these
+ * calls pass it:
+ *  - StyleEffect__SpawnPlainSprites (class_3bb8c_o.c): its body WRITES
+ *    $a1/$a2/$a3 to zero before any read, but InitByKind's retail emits
+ *    `move a1,zero` at 0x80056624;
+ *  - StyleEffect__RandomizeSprites (class_3bb8c_o.c): its body reads only
+ *    $a0 (`addiu s0,a0,136`), but UpdateByKind's retail emits `move a1,s1`
+ *    at 0x800566FC;
+ *  - StyleEffect__BuildRandomSprites (below): its body reads only $a0
+ *    (`move s1,a0`); InitByKind's retail emits `move a1,zero` at 0x80056614;
+ *  - StyleEffect__DriftModelChildren (below): its body writes $a1 (`move
+ *    a1,zero`) before any read; UpdateByKind's retail emits `move a1,s1` in
+ *    the jal delay slot at 0x800566D8 (round 75).
+ * NoOpIgnoreArgs (class_3bb8c_o.c, empty) is the same idiom. */
+```
+
+And its comment on the SetStyleEffectSources globals, verbatim:
+
+```
+/* Three globals class_3bb8c_o.c's SetStyleEffectSources captures once from its
+ * parameters (declared there with the same types; track 4b, round 85):
+ * gStyleEffectTmd is the Actor it ran on, called here through SceneNode's
+ * +0x080 getSetUnk10Flag8 as that function calls it; gStyleEffectTim is
+ * forwarded opaquely to New_VariantSprite as its third argument; gStyleEffectViewport's
+ * pointee has a field at +0x018 that StyleEffect__InitByKind and
+ * StyleEffect__UpdateByKind snapshot/diff via gStyleEffectBaseViewY. */
+```
+
+(The slot named there is now `setBackClip`; the +0x018 field is the
+Viewport's `refView.vp.y`, see below.)
+
+## Naming (track 7, round 101)
+
+- `*(s32 *)((u8 *)gStyleEffectViewport + 0x18)` is
+  `((Viewport *)gStyleEffectViewport)->refView.vp.y`: the pointer is
+  StyleSceneRefs::viewport, a `Viewport *` (class_3bb8c_n.c passes it to
+  SetStyleEffectSources), and +0x018 is `refView` (+0x014) `.vp.y` (+0x004)
+  in include/Viewport.h. The extern stays `void *` because class_3bb8c_o.c
+  declares it so (proposed to the head: retype both).
+- Locals: `local` -> `placed` (pos + offset), `state` -> `kind` (it is
+  `pendingExtra`, the StyleEffectKind), `ret` -> `model` (setBackClip's
+  model, handed to SceneNode__LinkModel).
+- Cases are StyleEffectKind's members; `kind < 2` is
+  `kind <= STYLE_EFFECT_MODEL` (the two model kinds link a model). Same
+  code: `slti 2` either way.

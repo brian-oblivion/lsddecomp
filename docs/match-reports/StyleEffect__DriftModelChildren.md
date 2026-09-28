@@ -339,3 +339,31 @@ byte-load-bearing. Same idiom as the three sibling externs above it; annotated
 ## Track 4 (2026-09-26, round 88, charlie)
 
 class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+
+## History moved from the unit's comments (track 7, round 101)
+
+The function comment's match note, verbatim (the source keeps a
+`MATCHING:` line at the `stepZ` assignment):
+
+```
+/* After 500 frames (tick >= 0x1F5), ...
+ *
+ * Matched round 75: the step is read straight from the table in the guard,
+ * and the loop's pointer is taken again after the call -- CSE turns that
+ * second &gModelChildDriftZ[idx] into retail's `move s4,s1`. */
+```
+
+## Naming (track 7, round 101)
+
+- `tick >= 0x1F5` is `tick > MODEL_CHILD_DRIFT_DELAY` (500, unit-local
+  #define): the header's banner already says the children drift "after
+  500 ticks"; `sltiu 0x1F5` either way.
+- `24500` is `MODEL_CHILD_DRIFT_RANGE`: the reset period is it divided by
+  the per-tick z step, so child 0 has moved about that far in z when it is
+  snapped back. Tier B (the mechanics; why 24500 is not established).
+- Loop bound `2` is `ARRAY_COUNT(self->modelChildren)`.
+- Locals: `idx` -> `tableIndex`, `accumOffset` -> `extraZ` (child i's extra
+  3 * i per tick), `divq` -> `period`, `modend` -> `tick`, `adivq` ->
+  `absPeriod`, `local` -> `delta`, `p` -> `slot`.
+- gSpinRotStep is declared `Ratio16[3]`: its data is {0/1, 1/10, 0/1}
+  and it only reaches updateRotation.

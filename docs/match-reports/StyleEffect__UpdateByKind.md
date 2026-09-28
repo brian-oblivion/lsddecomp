@@ -145,3 +145,16 @@ follows the viewpoint's vertical movement since gStyleEffectBaseViewY (was
 gTrackedYSnapshot) was taken. PROPOSED for track 7: type the global
 `Viewport *` and read `->refView.vp.y`; spell the switch with
 StyleEffectKind.
+
+## History moved from the unit's comments (track 7, round 101)
+
+The arity notes for this function's two dead-argument calls
+(StyleEffect__RandomizeSprites at 0x800566FC, StyleEffect__DriftModelChildren
+at 0x800566D8) are in StyleEffect__InitByKind.md's history section, with the
+unit comment they came from verbatim.
+
+## Naming (track 7, round 101)
+
+- The viewpoint read is `((Viewport *)gStyleEffectViewport)->refView.vp.y`
+  (evidence in StyleEffect__InitByKind.md).
+- `local` -> `placed`. Cases are StyleEffectKind's members.

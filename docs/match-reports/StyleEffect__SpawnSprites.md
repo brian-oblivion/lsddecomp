@@ -135,3 +135,8 @@ class_3bb8c_s.c's `LinkNode` view (owner and children under one type) is gone: t
 
 D_8008ACA8 -> gStyleEffectTim (rename.py): ObjM's ETC.TIM, stored by
 SetStyleEffectSources and handed to New_VariantSprite as its image.
+
+## Naming (track 7, round 101)
+
+- Locals: `p` -> `slot`, `node` -> `sprite`. Loop bound `5` is
+  `ARRAY_COUNT(((StyleEffect *)self)->sprites)`.
