@@ -576,7 +576,7 @@ void SortTmdObject(void *objIn, void *otSrc, s32 otShift, void *ctxIn)
 
     *(void **)(ctx + 0x0) = *(void **)((u8 *)otSrc + 0x4);
     *(s32 *)(ctx + 0x4) = otShift;
-    InitDivPolygonPtrs(ctx + 0x88, gDivPolygon3, 3);
+    InitDivPolygonPtrs(ctx + 0x88, sDivPolygon3, 3);
     InitDivPolygonPtrs(ctx + 0x94, gDivPolygon4, 4);
 
     remaining = *(s32 *)(*(u8 **)(obj + 0x8) + 0x14);
@@ -1349,7 +1349,7 @@ void SortTmdObject(void *arg0, void *arg1, s32 arg2, void *arg3)
 
     *(void **)(prim + 0x0) = *(void **)((u8 *)arg1 + 0x4);
     *(s32 *)(prim + 0x4) = arg2;
-    InitDivPolygonPtrs(prim + 0x88, gDivPolygon3, 3);
+    InitDivPolygonPtrs(prim + 0x88, sDivPolygon3, 3);
     InitDivPolygonPtrs(prim + 0x94, gDivPolygon4, 4);
 
     {

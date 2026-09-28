@@ -338,11 +338,11 @@ void SubmitPolyF3(void *arg0, void *arg1) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        FillDivPolygonHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
         FillRVectors3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0xC),
                       (PolyUV4 *)((u8 *)arg0 + 0x10));
-        RCpolyF3(arg0, gDivPolygon3);
+        RCpolyF3(arg0, sDivPolygon3);
     }
 }
 #endif
@@ -370,7 +370,7 @@ either splices `arg0` into an OT-style singly-linked list threaded through
 splice, low 24 bits are the address), or — when `arg1->0x78` is set —
 routes through `FillDivPolygonHeader` (gp_rel-blocked, this unit),
 `FillRVectors3` (matched this round, this unit) and `func_8001A564`
-(Psy-Q SDK) instead, passing a shared table `gDivPolygon3`.
+(Psy-Q SDK) instead, passing a shared table `sDivPolygon3`.
 
 ## Best body reached (46/54 words)
 
@@ -399,9 +399,9 @@ void SubmitPolyF3(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)arg0 & 0xFFFFFF);
         }
     } else {
-        FillDivPolygonHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon3, arg1, (u8 *)arg0 + 0x4, 0, 0, 0);
         FillRVectors3((u8 *)arg1 + 0x88, (u8 *)arg1 + 0xA4, (u8 *)arg0 + 0x8, (u8 *)arg0 + 0xC, (u8 *)arg0 + 0x10);
-        func_8001A564(arg0, gDivPolygon3);
+        func_8001A564(arg0, sDivPolygon3);
     }
 }
 #endif
@@ -1300,7 +1300,7 @@ own `extern void *SubmitPolyF3(void *prim, void *ctx);` view already used.
 
 The unit now includes `<libgte.h>` and `<libgpu.h>`, and every raw offset in
 the eight SubmitPoly* wrappers is a Sony field: `prim` is libgpu's
-`POLY_F3` (and siblings), the work buffers `gDivPolygon3`/`gDivPolygon4`
+`POLY_F3` (and siblings), the work buffers `sDivPolygon3`/`gDivPolygon4`
 (renamed from `gPolySubmitTableTri`/`gPolySubmitTableQuad`) are libgte's
 `DIVPOLYGON3`/`DIVPOLYGON4`, `ctx+0x88`/`+0x94` are `RVECTOR *[3]`/`[4]`
 pointing at those buffers' `r0..`, and `ctx+0xA4` is `SVECTOR *[4]`. The
@@ -1309,10 +1309,10 @@ function now reads:
 ```c
 u_long *SubmitPolyF3(POLY_F3 *prim, PolyDrawCtx *ctx) {
     if (ctx->divide != 0) {
-        FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
         FillRVectors3(ctx->triVtx, ctx->srcVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
                       (DVECTOR *)&prim->x2);
-        return RCpolyF3(prim, (DIVPOLYGON3 *)gDivPolygon3);
+        return RCpolyF3(prim, (DIVPOLYGON3 *)sDivPolygon3);
     }
     addPrim(ctx->otSlot, prim);
     return (u_long *)(prim + 1);

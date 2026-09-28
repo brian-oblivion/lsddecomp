@@ -531,7 +531,7 @@ own `extern void *SubmitPolyGT4(void *prim, void *ctx);` view already used.
 
 Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
 report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
-RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+RCpoly* prototype, the renamed `sDivPolygon3`/`gDivPolygon4`). Byte-identical
 on the first build. The field reads, for this primitive:
 
 `clut`/`tpage` to the header; RVECTOR `pad` from `pad2`, `pad2`, `pad3`,

@@ -172,7 +172,7 @@ void SubmitPolyFT3(void *arg0, void *arg1) {
         ((OtTag *)arg0)->addr = (*(OtTag **)((u8 *)arg1 + 0x30))->addr;
         (*(OtTag **)((u8 *)arg1 + 0x30))->addr = (u32)arg0;
     } else {
-        FillDivPolygonHeader(gDivPolygon3, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
+        FillDivPolygonHeader(sDivPolygon3, arg1, (u8 *)arg0 + 0x4, 1, *(u16 *)((u8 *)arg0 + 0xE), *(u16 *)((u8 *)arg0 + 0x16));
         FillRVectors3((PolyVtx **)((u8 *)arg1 + 0x88), (PolyVtx **)((u8 *)arg1 + 0xA4),
                       (PolyUV4 *)((u8 *)arg0 + 0x8), (PolyUV4 *)((u8 *)arg0 + 0x10),
                       (PolyUV4 *)((u8 *)arg0 + 0x18));
@@ -184,7 +184,7 @@ void SubmitPolyFT3(void *arg0, void *arg1) {
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x8C) + 0x8) = *(u16 *)((u8 *)arg0 + 0x14);
         *(u16 *)(*(u8 **)((u8 *)arg1 + 0x90) + 0x8) = *(u16 *)((u8 *)arg0 + 0x1C);
 
-        RCpolyFT3(arg0, gDivPolygon3);
+        RCpolyFT3(arg0, sDivPolygon3);
     }
 }
 #endif
@@ -237,7 +237,7 @@ void SubmitPolyFT3(void *arg0, void *arg1)
             *head1 = (*head1 & 0xFF000000) | ((u32)self & 0xFFFFFF);
         }
     } else {
-        FillDivPolygonHeader(gDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x16));
+        FillDivPolygonHeader(sDivPolygon3, prim, self + 0x4, 1, *(u16 *)(self + 0xE), *(u16 *)(self + 0x16));
         FillRVectors3(prim + 0x88, prim + 0xA4, self + 0x8, self + 0x10, self + 0x18);
 
         *(u16 *)(*(u8 **)(prim + 0x88) + 0xA) = *(u16 *)(self + 0x1E);
@@ -247,7 +247,7 @@ void SubmitPolyFT3(void *arg0, void *arg1)
         *(u16 *)(*(u8 **)(prim + 0x8C) + 0x8) = *(u16 *)(self + 0x14);
         *(u16 *)(*(u8 **)(prim + 0x90) + 0x8) = *(u16 *)(self + 0x1C);
 
-        func_8001B6B4(self, gDivPolygon3);
+        func_8001B6B4(self, sDivPolygon3);
     }
 }
 #endif
@@ -436,10 +436,10 @@ own `extern void *SubmitPolyFT3(void *prim, void *ctx);` view already used.
 
 Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
 report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
-RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+RCpoly* prototype, the renamed `sDivPolygon3`/`gDivPolygon4`). Byte-identical
 on the first build. The field reads, for this primitive:
 
-`FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 1, prim->clut,
+`FillDivPolygonHeader(sDivPolygon3, ctx, (CVECTOR *)&prim->r0, 1, prim->clut,
 prim->tpage)`; RVECTOR `pad` from `prim->pad1` for all three; RVECTOR `uv`
 from `u0v0`, `u1v1`, `u2v2` as one `u_short` each
 (`*(u_short *)ctx->triVtx[i]->uv = *(u_short *)&prim->u0`). Returns

@@ -47,7 +47,6 @@ D_8008AB8C
 D_8008AB90
 D_8008AC68
 D_8008ACA0
-gDivPolygon3
 gDivPolygon4
 gDrawSystem
 gDreamAuxFrameClock
@@ -182,6 +181,7 @@ sDefaultViewportHeight
 sDefaultViewportWidth
 sDivClipHeight
 sDivClipWidth
+sDivPolygon3
 sItemListCardPathPrefix
 sItemListTimExt
 sLinkAngle180

@@ -187,7 +187,7 @@ included by the unit.)
 
 Unit: `src/graphics/TmdRenderer.c`. Quad-flavored sibling of `SubmitPolyF3` (this
 unit, also stalled at the identical residue) — same OT-splice-or-calls
-structure, `gDivPolygon4` instead of `gDivPolygon3`, `FillRVectors4` (also
+structure, `gDivPolygon4` instead of `sDivPolygon3`, `FillRVectors4` (also
 stalled this unit, 6-arg quad-flavored copy) instead of `FillRVectors3`,
 and `func_8001A8D4` (Psy-Q SDK, `asm/psyq_rcpolyf4.s`, quad-flavored
 sibling of `func_8001A564`) instead of `func_8001A564`.
@@ -410,7 +410,7 @@ own `extern void *SubmitPolyF4(void *prim, void *ctx);` view already used.
 
 Retyped with Sony's structs like the rest of the family; SubmitPolyF3's
 report has the details (POLY_*, DIVPOLYGON3/4, RVECTOR, addPrim, Sony's
-RCpoly* prototype, the renamed `gDivPolygon3`/`gDivPolygon4`). Byte-identical
+RCpoly* prototype, the renamed `sDivPolygon3`/`gDivPolygon4`). Byte-identical
 on the first build. The field reads, for this primitive:
 
 `FillDivPolygonHeader(gDivPolygon4, ...)` and `FillRVectors4` over

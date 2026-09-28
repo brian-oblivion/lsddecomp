@@ -150,7 +150,7 @@ typedef struct PolyDrawCtx {
     /* +0x074 */ DVECTOR bboxMax;
     /* +0x078 */ s32 divide; /* set when the face must go through RCpoly* subdivision */
     u8 pad07C[0x088 - 0x07C];
-    /* +0x088 */ RVECTOR *divVtx3[3]; /* gDivPolygon3's r0..r2 */
+    /* +0x088 */ RVECTOR *divVtx3[3]; /* sDivPolygon3's r0..r2 */
     /* +0x094 */ RVECTOR *divVtx4[4]; /* gDivPolygon4's r0..r3 */
     /* +0x0A4 */ SVECTOR *faceVtx[4]; /* the current face's vertices */
 } PolyDrawCtx;
@@ -204,7 +204,7 @@ extern Rgb8 gTexturedFaceColor;
  * RCpoly* packers, a DIVPOLYGON3 and a DIVPOLYGON4 back to back (0x218
  * bytes apart, sizeof(DIVPOLYGON3)). Declared as bytes: InitDivPolygonPtrs
  * takes their addresses and the wrappers cast. */
-extern u8 gDivPolygon3[];
+extern u8 sDivPolygon3[];
 extern u8 gDivPolygon4[];
 
 /* Defined at the bottom of this file, after SortTmdObject and
@@ -281,7 +281,7 @@ void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch) {
 
     ctx->otBase = ot->org;
     ctx->otShift = otShift;
-    InitDivPolygonPtrs(ctx->divVtx3, gDivPolygon3, 3);
+    InitDivPolygonPtrs(ctx->divVtx3, sDivPolygon3, 3);
     InitDivPolygonPtrs(ctx->divVtx4, gDivPolygon4, 4);
 
     packetsLeft = OBJ_TMD(obj)->primn;
@@ -1001,10 +1001,10 @@ void StoreSxyPolyGT4(POLY_GT4 *prim, s32 storeFirst3) {
  */
 void *SubmitPolyF3(POLY_F3 *prim, PolyDrawCtx *ctx) {
     if (ctx->divide != 0) {
-        FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
         FillRVectors3(ctx->divVtx3, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
                       (DVECTOR *)&prim->x2);
-        return RCpolyF3(prim, (DIVPOLYGON3 *)gDivPolygon3);
+        return RCpolyF3(prim, (DIVPOLYGON3 *)sDivPolygon3);
     }
     addPrim(ctx->otSlot, prim);
     return (u_long *)(prim + 1);
@@ -1012,7 +1012,7 @@ void *SubmitPolyF3(POLY_F3 *prim, PolyDrawCtx *ctx) {
 
 void *SubmitPolyG3(POLY_G3 *prim, PolyDrawCtx *ctx) {
     if (ctx->divide != 0) {
-        FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
+        FillDivPolygonHeader(sDivPolygon3, ctx, (CVECTOR *)&prim->r0, 0, 0, 0);
         FillRVectors3(ctx->divVtx3, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
                       (DVECTOR *)&prim->x2);
 
@@ -1024,7 +1024,7 @@ void *SubmitPolyG3(POLY_G3 *prim, PolyDrawCtx *ctx) {
         ctx->divVtx3[1]->c = *(CVECTOR *)&prim->r1;
         ctx->divVtx3[2]->c = *(CVECTOR *)&prim->r2;
 
-        return RCpolyG3(prim, (DIVPOLYGON3 *)gDivPolygon3);
+        return RCpolyG3(prim, (DIVPOLYGON3 *)sDivPolygon3);
     }
     addPrim(ctx->otSlot, prim);
     return (u_long *)(prim + 1);
@@ -1032,7 +1032,7 @@ void *SubmitPolyG3(POLY_G3 *prim, PolyDrawCtx *ctx) {
 
 void *SubmitPolyFT3(POLY_FT3 *prim, PolyDrawCtx *ctx) {
     if (ctx->divide != 0) {
-        FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 1, prim->clut, prim->tpage);
+        FillDivPolygonHeader(sDivPolygon3, ctx, (CVECTOR *)&prim->r0, 1, prim->clut, prim->tpage);
         FillRVectors3(ctx->divVtx3, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
                       (DVECTOR *)&prim->x2);
 
@@ -1043,7 +1043,7 @@ void *SubmitPolyFT3(POLY_FT3 *prim, PolyDrawCtx *ctx) {
         *(u_short *)ctx->divVtx3[1]->uv = *(u_short *)&prim->u1;
         *(u_short *)ctx->divVtx3[2]->uv = *(u_short *)&prim->u2;
 
-        return RCpolyFT3(prim, (DIVPOLYGON3 *)gDivPolygon3);
+        return RCpolyFT3(prim, (DIVPOLYGON3 *)sDivPolygon3);
     }
     addPrim(ctx->otSlot, prim);
     return (u_long *)(prim + 1);
@@ -1105,7 +1105,7 @@ void *SubmitPolyFT4(POLY_FT4 *prim, PolyDrawCtx *ctx) {
 
 void *SubmitPolyGT3(POLY_GT3 *prim, PolyDrawCtx *ctx) {
     if (ctx->divide != 0) {
-        FillDivPolygonHeader(gDivPolygon3, ctx, (CVECTOR *)&prim->r0, 1, prim->clut, prim->tpage);
+        FillDivPolygonHeader(sDivPolygon3, ctx, (CVECTOR *)&prim->r0, 1, prim->clut, prim->tpage);
         FillRVectors3(ctx->divVtx3, ctx->faceVtx, (DVECTOR *)&prim->x0, (DVECTOR *)&prim->x1,
                       (DVECTOR *)&prim->x2);
 
@@ -1121,7 +1121,7 @@ void *SubmitPolyGT3(POLY_GT3 *prim, PolyDrawCtx *ctx) {
         *(u_short *)ctx->divVtx3[1]->uv = *(u_short *)&prim->u1;
         *(u_short *)ctx->divVtx3[2]->uv = *(u_short *)&prim->u2;
 
-        return RCpolyGT3(prim, (DIVPOLYGON3 *)gDivPolygon3);
+        return RCpolyGT3(prim, (DIVPOLYGON3 *)sDivPolygon3);
     }
     addPrim(ctx->otSlot, prim);
     return (u_long *)(prim + 1);
