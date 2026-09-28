@@ -25,7 +25,7 @@ empty trigger list.
 ## Attempt 1: correct algorithm, one word too long (22/79, ~130KB drift)
 
 The first translation read `trig->stage` and `trig->spawnpointIndex` TWICE
-each -- once to store into `sLinkDstStage`/`gLinkSpawnIndex` and again to index
+each -- once to store into `sLinkDstStage`/`sLinkSpawnIndex` and again to index
 `spawns[trig->stage][trig->spawnpointIndex]` -- as two textually separate
 expressions. GCC 2.6.3 did not common-subexpression-eliminate the second
 read of `trig->stage` (it kept the first in a register but re-issued an
@@ -101,7 +101,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
 		sLinkDstStage = triggerStage;
 		spawnIndex = *(u8 *)&trig->spawnpointIndex;
 		entry = &spawns[triggerStage][spawnIndex];
-		gLinkSpawnIndex = spawnIndex;
+		sLinkSpawnIndex = spawnIndex;
 		*(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
 		target->position = sSpawnPosAdjust[entry->adjustment];
 		if (flag != 0)

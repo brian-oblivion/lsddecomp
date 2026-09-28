@@ -1699,7 +1699,7 @@ extern s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading);
 /* Cardinal-direction indices, per stage: the player must face
    sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex] to take the
    tunnel GetStaticSpawn matched, and leaves facing
-   sTunnelExitHeadings[sLinkDstStage][gLinkSpawnIndex]. */
+   sTunnelExitHeadings[sLinkDstStage][sLinkSpawnIndex]. */
 extern u8 *sTunnelEnterHeadings[];
 extern u8 *sTunnelExitHeadings[];
 
@@ -1721,7 +1721,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
             *outEnter = (s32)&sCardinalRotations[heading];
 
         if (outExit != NULL) {
-            idx = sTunnelExitHeadings[sLinkDstStage][gLinkSpawnIndex];
+            idx = sTunnelExitHeadings[sLinkDstStage][sLinkSpawnIndex];
             *outExit = (s32)&sCardinalRotations[idx];
         }
         result = 1;
@@ -1851,7 +1851,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
             *outEnter = (s32)&sCardinalRotations[heading];
 
         if (outExit != NULL) {
-            idx = sStaircaseExitHeadings[sLinkDstStage][gLinkSpawnIndex];
+            idx = sStaircaseExitHeadings[sLinkDstStage][sLinkSpawnIndex];
             *outExit = (s32)&sCardinalRotations[idx];
         }
         result = 1;
@@ -1862,7 +1862,7 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
 }
 
 s32 GetLastSpawnExtra(void) {
-    return sStaircaseSpawns[sLinkDstStage][gLinkSpawnIndex].extra;
+    return sStaircaseSpawns[sLinkDstStage][sLinkSpawnIndex].extra;
 }
 
 s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 stage,
@@ -1891,7 +1891,7 @@ s32 GetStaticSpawn(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, s32 s
         sLinkDstStage = triggerStage;
         spawnIndex = (u8)trig->spawnpointIndex;
         entry = &spawns[triggerStage][spawnIndex];
-        gLinkSpawnIndex = spawnIndex;
+        sLinkSpawnIndex = spawnIndex;
         *(PlayerSpawnGridPos *)target = *(PlayerSpawnGridPos *)entry;
         target->position = sSpawnPosAdjust[entry->adjustment];
         if (flag != 0)

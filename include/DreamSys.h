@@ -133,7 +133,7 @@ extern s32 *gpDinamicLinkPenalty;
 extern s32 gLinkSrcStage;
 extern s32 gLinkTriggerIndex;
 extern s32 sLinkDstStage;
-extern s32 gLinkSpawnIndex;
+extern s32 sLinkSpawnIndex;
 
 /* A single {numerator, denominator} degree ratio. SceneNode__UpdateRotation
    (vtable slot +0x044, the inherited rotation setter) reads three of these
