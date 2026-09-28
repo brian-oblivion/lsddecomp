@@ -156,7 +156,7 @@ void NullDriver__NoOpSlot50(void) {}
  * the two mode words and report no VSync callback.
  */
 
-/* ".VH" and ".VB", in .sdata. */
+/* ".VH" and ".VB". */
 extern char sVabHeaderSuffix[];
 extern char sVabBodySuffix[];
 

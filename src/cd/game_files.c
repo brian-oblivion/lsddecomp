@@ -165,7 +165,7 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
     }
 }
 
-extern char *sDefaultDataDirectory; /* "CDI\\" (sdata) */
+extern char *sDefaultDataDirectory; /* "CDI\\" */
 extern s32 sForcedSoundBank;
 extern s32 sForcedStageBgm;
 extern u8 sSoundBankPaths[];
