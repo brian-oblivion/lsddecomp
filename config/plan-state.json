@@ -406,6 +406,7 @@
         "apidoc-setup": true,
         "area-app": true,
         "area-cd-sound": true,
+        "area-dream-sys": true,
         "area-graphics-core": true,
         "area-graphics-res": true,
         "area-ui": true
