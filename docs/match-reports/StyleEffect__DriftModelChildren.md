@@ -109,7 +109,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self)
         tab70 = &sModelChildDriftZ[idx];
         if (*tab70 != 0 && (u32) self->tick >= 0x1F5) {
             p = self->modelChildren;
-            self->methods->updateRotation(self, 0, (s32) gSpinRotStep);
+            self->methods->updateRotation(self, 0, (s32) sSpinRotStep);
 
             i = 0;
             tab70b = tab70;
@@ -119,7 +119,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self)
                 local.z += accumOffset + *tab70b;
                 (*p)->methods->addTranslation(*p, &local);
                 accumOffset += 3;
-                (*p)->methods->updateRotation(*p, 0, (s32) gSpinRotStep);
+                (*p)->methods->updateRotation(*p, 0, (s32) sSpinRotStep);
                 p++;
             }
 
@@ -160,7 +160,7 @@ LinkNode *modelChildren[2]; /* +0x07C */
 typedef struct LinkNode StyleEffect;
 extern s32 sModelChildDriftZ[];
 extern Vec3S sModelChildDriftInit;
-extern s32 gSpinRotStep[];
+extern s32 sSpinRotStep[];
 ```
 
 ## What round 44 fixed (from 23/121 raw / 1-word-short, to 117/121 raw / length-exact)
@@ -299,7 +299,7 @@ Round 70 (alpha). `func_800569A8` -> `StyleEffect__DriftModelChildren`, **tier B
 
 Named from its preserved body and asm (still a stall, so B): gated on
 modelChildLayout != 0, sModelChildDriftZ[tableIndex] != 0 and tick >= 501;
-adds gSpinRotStep via updateRotation(.., 0, ..) to self and both children,
+adds sSpinRotStep via updateRotation(.., 0, ..) to self and both children,
 adds a z delta via each child's slot +0x0BC (Actor__AddTranslation in
 gActorMethods), and every 24500 / step frames calls
 StyleEffect__PlaceModelChildren(self, 1) to snap them back. Always stores 0
@@ -308,7 +308,7 @@ to `*coord2` (GsCOORDINATE2.flg). Caller: StyleEffect__UpdateByKind, kind 0.
 Globals named in this pass (only this unit references them, tier B):
 `sModelChildDriftZ` (was D_8008780C, s32[8] = {0, 0, 0, -1, -2, -4, -16,
 -256}), `sModelChildDriftInit` (was D_8008782C, all-zero Vec3S) and
-`gSpinRotStep` (was D_80087838, ratio triple {0/1, 1/10, 0/1}, read by
+`sSpinRotStep` (was D_80087838, ratio triple {0/1, 1/10, 0/1}, read by
 RatioToFixed12).
 
 The preserved `#if 0` body (in the .c and above) was renamed with the unit's
@@ -365,5 +365,5 @@ The function comment's match note, verbatim (the source keeps a
 - Locals: `idx` -> `tableIndex`, `accumOffset` -> `extraZ` (child i's extra
   3 * i per tick), `divq` -> `period`, `modend` -> `tick`, `adivq` ->
   `absPeriod`, `local` -> `delta`, `p` -> `slot`.
-- gSpinRotStep is declared `Ratio16[3]`: its data is {0/1, 1/10, 0/1}
+- sSpinRotStep is declared `Ratio16[3]`: its data is {0/1, 1/10, 0/1}
   and it only reaches updateRotation.

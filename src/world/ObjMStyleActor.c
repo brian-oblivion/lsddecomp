@@ -2547,7 +2547,7 @@ extern s32 sModelChildDriftZ[];
 extern LongVec3 sModelChildDriftInit;
 /* Ratio triple {0/1, 1/10, 0/1}: the per-frame rotation increment
  * updateRotation(.., 0, ..) adds to self and to each model child. */
-extern Ratio16 gSpinRotStep[3];
+extern Ratio16 sSpinRotStep[3];
 
 /* Ticks (StyleEffect::tick) before the model children start to drift. */
 #define MODEL_CHILD_DRIFT_DELAY 500
@@ -2574,7 +2574,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
     if (self->params.modelChildLayout != 0 && sModelChildDriftZ[tableIndex] != 0 &&
         (u32)self->tick > MODEL_CHILD_DRIFT_DELAY) {
         slot = self->modelChildren;
-        self->methods->updateRotation(self, 0, gSpinRotStep);
+        self->methods->updateRotation(self, 0, sSpinRotStep);
         i = 0;
         /* MATCHING: the guard reads the step from the table and the pointer
          * is taken only here, after the call; either held earlier in a
@@ -2586,7 +2586,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
             delta.z += extraZ + *stepZ;
             (*slot)->methods->addTranslation(*slot, &delta);
             extraZ += 3;
-            (*slot)->methods->updateRotation(*slot, 0, gSpinRotStep);
+            (*slot)->methods->updateRotation(*slot, 0, sSpinRotStep);
             slot++;
         }
 
