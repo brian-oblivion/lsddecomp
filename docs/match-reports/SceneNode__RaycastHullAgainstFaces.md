@@ -33,9 +33,9 @@ Twelve builds took it to the match, in this order (`funcdiff` / ins-del):
    giv at `&p->z`). `v` and `hi = list->v + 2`, each `+= 4`, give the four
    read pointers. A single `v` with `v[2]` combined all reads into one giv
    (20/199). Two pointers: 59/199, ins/del 5/5.
-3. **Part 3 has no `gHitHeightGate` gate.** Retail's inner test is only
+3. **Part 3 has no `sHitHeightGate` gate.** Retail's inner test is only
    `lw 0x44(sp); slti 0x201; bnez`. The derived body copied Part 2's
-   `gHitHeightGate == 0 ||`. Removing it: 56/199 raw, but ins/del **1/1**, and
+   `sHitHeightGate == 0 ||`. Removing it: 56/199 raw, but ins/del **1/1**, and
    the `m`-loop's early `addiu s2,s2,1` in the delay slot fixed itself.
 4. **The last residue was a loop.c movable decision, read from `cc1 -dL`.**
    Retail hoists the constant `1` of `1 << i` into `$s1` in the Part 2 loop
@@ -52,7 +52,7 @@ Twelve builds took it to the match, in this order (`funcdiff` / ins-del):
    **Closing form:** the `||` is two arms that each set the bit,
 
    ```c
-   if (gHitHeightGate == 0) {
+   if (sHitHeightGate == 0) {
        self->unk2C |= 1 << i;
    } else if (outWord >= 0x201) {
        self->unk2C |= 1 << i;
@@ -84,7 +84,7 @@ moves the hoist to the wrong place (before the entry test, or in the wrong
 movable order), and that difference is the discriminator.
 
 **A body that was DERIVED rather than written can copy one arm's condition
-into another.** Part 3's `gHitHeightGate == 0 ||` was never in retail. Before
+into another.** Part 3's `sHitHeightGate == 0 ||` was never in retail. Before
 anything else, check every branch in the derived body against a `lw`/`beqz`
 in the asm.
 
@@ -178,7 +178,7 @@ residue here is register identity, not branch presence/absence.
 
 ```c
 extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
-extern s32 gHitHeightGate;
+extern s32 sHitHeightGate;
 ```
 
 **Note the signature conflicts with `SceneNode.c`'s own existing local
@@ -236,7 +236,7 @@ register permutation with no tool support for exploring it directly.
 ```c
 #if 0
 extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32 *arg3, Vec3S16_d294 *arg4, Vec3S16_d294 *arg5);
-extern s32 gHitHeightGate;
+extern s32 sHitHeightGate;
 
 s32 SceneNode__RaycastHullAgainstFaces(SceneNodeObj *self, s32 *outFlag, Vec3S16_d294 *diff, void *list) {
     Vec3S16_d294 mid[2];
@@ -277,7 +277,7 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNodeObj *self, s32 *outFlag, Vec3S16
         plane = TmdModel__GetBoundsBuffer(self->unk20, i);
         if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, &mid[0], &mid[1])) {
             if (TmdModel__RaycastFaces(self->unk20, &bigConst, diff, &outWord, &mid[0], &mid[1])) {
-                if (gHitHeightGate == 0 || outWord >= 0x201) {
+                if (sHitHeightGate == 0 || outWord >= 0x201) {
                     self->unk2C |= (1 << i);
                 }
             }
@@ -306,7 +306,7 @@ s32 SceneNode__RaycastHullAgainstFaces(SceneNodeObj *self, s32 *outFlag, Vec3S16
                     u8 *rowMplus1 = rowBase + 0x18;
                     if (ClipSegmentToBox(NULL, (BoundsBox_d294 *)plane, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
                         if (TmdModel__RaycastFaces(self->unk20, &bigConst, diff, &outWord, (Vec3S16_d294 *)rowM, (Vec3S16_d294 *)rowMplus1)) {
-                            if (gHitHeightGate == 0 || outWord >= 0x201) {
+                            if (sHitHeightGate == 0 || outWord >= 0x201) {
                                 self->unk2C |= bitJ;
                                 *outFlag |= bitK;
                             }
@@ -482,7 +482,7 @@ against `nm -S`/`funcdiff.py` -- not adopted on the permuter's own score:**
   `outWord >= 0x201`), and at THAT point `bitJ` already holds a real,
   semantically different value (`1 << j`, the plane bit mask) written
   earlier in the same iteration. Reading `bitJ` there instead of `outWord`
-  is not a cosmetic rename -- it changes which value the `gHitHeightGate`
+  is not a cosmetic rename -- it changes which value the `sHitHeightGate`
   gate compares against, i.e. it can change the game's actual runtime
   behavior (whether `self->unk2C`/`*outFlag` get a bit set), not just the
   compiled bytes. This is exactly the "reject UB candidates" case CLAUDE.md
@@ -505,7 +505,7 @@ does not have to re-derive which are safe.
 
 **Explicit answer to the revisit's own question: the round-54 naming gave NO
 new shape here either**, for the same reason as `NotifyTaggedParents` --
-this function's own symbols (`TmdModel__RaycastFaces`, `gHitHeightGate`,
+this function's own symbols (`TmdModel__RaycastFaces`, `sHitHeightGate`,
 `self->unk2C`/`unk20`, `ClipSegmentToBox`, `TmdModel__GetBoundsBuffer`,
 `TmdModel__GetBoundsCount`) were untouched by round 54's `SceneNodeMethods` slot
 renames. What DID move the investigation forward was reading the

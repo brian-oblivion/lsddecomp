@@ -8,23 +8,23 @@ attempted until now.
 
 ## Round 44 (echo)
 
-Trivial atomic-swap global: reads `gHitHeightGate`, stores the new value, returns
+Trivial atomic-swap global: reads `sHitHeightGate`, stores the new value, returns
 the old one.
 
 ```c
-extern s32 gHitHeightGate;
+extern s32 sHitHeightGate;
 
 s32 GetSetHitHeightGate(s32 value) {
     s32 old;
 
-    old = gHitHeightGate;
-    gHitHeightGate = value;
+    old = sHitHeightGate;
+    sHitHeightGate = value;
     return old;
 }
 ```
 
-`gHitHeightGate` is a plain `.sdata` word (`asm/data/7B018.sdata.s`), already
-present in `config/gp-symbols.txt`, so the `%gp_rel(gHitHeightGate)($gp)` access
+`sHitHeightGate` is a plain `.sdata` word (`asm/data/7B018.sdata.s`), already
+present in `config/gp-symbols.txt`, so the `%gp_rel(sHitHeightGate)($gp)` access
 came out for free once the extern was declared with an ordinary `s32` type --
 no cast, no struct, no retype needed.
 
@@ -40,16 +40,16 @@ pattern held for a 3rd, unrelated unit.
 
 ## Naming (round 50, charlie -- FINISHING-PLAN track 3)
 
-- **KEPT as `GetSetHitHeightGate`. Tier C.** And `gHitHeightGate` keeps its
+- **KEPT as `GetSetHitHeightGate`. Tier C.** And `sHitHeightGate` keeps its
   placeholder too. What IS known:
-  - Mechanically it is a get-and-set of the global `gHitHeightGate`: read the
+  - Mechanically it is a get-and-set of the global `sHitHeightGate`: read the
     old value, store the new one, return the old. That is the shape this
     project spells `GetSet...` (`DreamSys__GetSetScreenShake`,
     `DreamSys__GetSetDreamTimeLimit`), so the FORM of the name is settled
     and only the noun is missing.
   - **The noun is missing because both call sites decline to supply it.**
     The only known reader is `SceneNode__RaycastHullAgainstFaces` (SceneNode, still a
-    documented stall), where `gHitHeightGate == 0 || outWord >= 0x201` gates
+    documented stall), where `sHitHeightGate == 0 || outWord >= 0x201` gates
     whether a `TmdModel__RaycastFaces` result is accepted -- and `TmdModel__RaycastFaces` is
     unidentified Psy-Q, so what is being accepted is unknown. The only
     known writer is `ObjMStyleActor.c`'s `ObjM__InitStyleAndWorld`, which passes a
@@ -58,13 +58,13 @@ pattern held for a 3rd, unrelated unit.
   - Naming it would mean choosing between "a precision/threshold mode", "a
     strict-hit mode" and "a debug gate" on no evidence. Per track 3, a
     wrong tier-A name is worse than `func_`.
-  - `gHitHeightGate` is a plain `.sdata` word (`asm/data/7B018.sdata.s`),
+  - `sHitHeightGate` is a plain `.sdata` word (`asm/data/7B018.sdata.s`),
     already in `config/gp-symbols.txt`; renaming it is a one-command job the
     moment either call site is understood.
 
 ## Naming (round 98, echo -- FINISHING-PLAN track 7)
 
-- **`func_8001EF60` -> `GetSetHitHeightGate`, `D_8008A838` -> `gHitHeightGate`. Tier B.** Round 50 kept both as placeholders because `TmdModel__RaycastFaces` was then unidentified, so what the gate accepted was unknown. It is now matched and documented (src/graphics/TmdModel.c): its 4th argument receives `hit.y - box.min.y`, the hit point's height above the face box's minimum y. So in `SceneNode__RaycastHullAgainstFaces` the global, when non-zero, makes the segment pass accept a hit only when that height is `>= 0x201`, the test the corner-edge pass applies unconditionally. That is the mechanism the name states; why stages 0, 3, 5 and 6 want it (the only writer, `ObjM__InitStyleAndWorld`) is not established, hence tier B. The `GetSet...` form is the project's for read-old-store-new-return-old (`GetSetBitField`, `DreamSys__GetSetScreenShake`).
+- **`func_8001EF60` -> `GetSetHitHeightGate`, `D_8008A838` -> `sHitHeightGate`. Tier B.** Round 50 kept both as placeholders because `TmdModel__RaycastFaces` was then unidentified, so what the gate accepted was unknown. It is now matched and documented (src/graphics/TmdModel.c): its 4th argument receives `hit.y - box.min.y`, the hit point's height above the face box's minimum y. So in `SceneNode__RaycastHullAgainstFaces` the global, when non-zero, makes the segment pass accept a hit only when that height is `>= 0x201`, the test the corner-edge pass applies unconditionally. That is the mechanism the name states; why stages 0, 3, 5 and 6 want it (the only writer, `ObjM__InitStyleAndWorld`) is not established, hence tier B. The `GetSet...` form is the project's for read-old-store-new-return-old (`GetSetBitField`, `DreamSys__GetSetScreenShake`).
 
 ## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
 
@@ -72,12 +72,12 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
 
 ```c
 /* TIER C -- deliberately still `func_`. Mechanically this is a get-and-set
- * of the global `gHitHeightGate` (read old, store new, return old), the shape
+ * of the global `sHitHeightGate` (read old, store new, return old), the shape
  * the project spells `GetSet...` elsewhere. What the global MEANS is not
  * established, so there is no noun to put in the name: its only known
- * reader is SceneNode__RaycastHullAgainstFaces (SceneNode), where `gHitHeightGate == 0 || outWord
+ * reader is SceneNode__RaycastHullAgainstFaces (SceneNode), where `sHitHeightGate == 0 || outWord
  * >= 0x201` gates accepting a hit, and its only known writer is
  * ObjMStyleActor.c's ObjM__InitStyleAndWorld, which passes a flag derived from a
  * stage/mode value of 3, 5 or 6. Two call sites, neither naming the thing.
- * gHitHeightGate keeps its placeholder name for the same reason. */
+ * sHitHeightGate keeps its placeholder name for the same reason. */
 ```

@@ -54,7 +54,7 @@ rather than API.
   `void **` spellings); `GetActiveDataSourceMethods` local in 4 files;
   `GetSetBitField` duplicated (Sprite.c:41, Task.h:36 vs SceneNode.h:216);
   `ApplyMatrixToLVArray` extern at ViewportDraw.c:62 though SceneNode.h is
-  included; `gHitHeightGate` declared twice in SceneNode.c. CdDriver.c
+  included; `sHitHeightGate` declared twice in SceneNode.c. CdDriver.c
   re-declares its own functions two or three times (55/60/794/795, 58/463/907,
   ...): keep one forward block.
 - **Sony names re-declared.** `ResetGraph` (Task.h:40), `rand`, `strlen`,
