@@ -40,10 +40,10 @@ Two real fixes ARE folded into the body below and are worth keeping on record:
 
 ```c
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80024E64 -> CheckCallback, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-extern s32 D_8006D608;
-extern u8 D_8006D61D;
-extern const char *D_8006D620[];
-extern const char *D_8006D6A0[];
+extern s32 CD_debug;
+extern u8 CD_com;
+extern const char *CD_comstr[];
+extern const char *CD_intstr[];
 
 extern volatile u8 *D_8006D8C0;
 extern u8 D_8006D8D8[3];
@@ -55,8 +55,8 @@ extern u8 D_8008B3CC[];
 extern u8 D_8008B3D4[];
 extern u8 D_8008B3DC[];                /* 8-byte record, this function's second flag's snapshot buffer */
 
-extern void (*D_8006D600)(s32 arg0, void *arg1);
-extern void (*D_8006D5FC)(s32 arg0, void *arg1);
+extern void (*CD_cbready)(s32 arg0, void *arg1);
+extern void (*CD_cbsync)(s32 arg0, void *arg1);
 
 extern s32 VSync(s32 arg0);
 extern void puts(const char *arg0);
@@ -86,7 +86,7 @@ s32 CD_ready(s32 arg0, s32 arg1)
     s32 i;
 
     D_8008B3E4 = VSync(-1) + 0x1E0;
-    table = D_8006D6A0;
+    table = CD_intstr;
     state = D_8006D8D8;
     state1 = state + 1;
     state2 = state + 2;
@@ -104,7 +104,7 @@ s32 CD_ready(s32 arg0, s32 arg1)
         }
 timeout:
         puts(D_80010984);
-        printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
+        printf(D_80010994, D_8008B3EC, CD_comstr[CD_com],
                       table[state[0]], table[state[1]]);
         CD_flush();
         result = -1;
@@ -124,13 +124,13 @@ skip_timeout:
                     break;
                 }
                 if (flags & 4) {
-                    if (D_8006D600 != NULL) {
-                        D_8006D600(*state1, D_8008B3D4);
+                    if (CD_cbready != NULL) {
+                        CD_cbready(*state1, D_8008B3D4);
                     }
                 }
                 if (flags & 2) {
-                    if (D_8006D5FC != NULL) {
-                        D_8006D5FC(*state, D_8008B3CC);
+                    if (CD_cbsync != NULL) {
+                        CD_cbsync(*state, D_8008B3CC);
                     }
                 }
             }

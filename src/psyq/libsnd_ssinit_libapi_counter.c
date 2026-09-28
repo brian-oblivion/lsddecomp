@@ -15,11 +15,8 @@
  * root-counter and interrupt-mask accessors the clock above is built on.
  */
 #include "common.h"
-
-extern s32 _snd_seq_no_tick;
-extern s32 _snd_seq_tick_mode;
-extern s32 _snd_video_mode;
-extern u32 VBLANK_MINUS;
+#include "libsnd_internal.h"
+#include <libetc.h>
 
 /* VBLANK_MINUS values SsSetTickMode's rate table selects between.
  * _snd_video_mode (Psy-Q `GetVideoMode`) is 0/1, and cases 0/4/5 pick between
@@ -30,7 +27,7 @@ extern u32 VBLANK_MINUS;
 #define SEQ_TICKRATE_120 0x78
 #define SEQ_TICKRATE_240 0xf0
 
-void SsSetTickMode(s32 a0) {
+void SsSetTickMode(long a0) {
     s32 cmd;
 
     if (a0 & 0x1000) {
@@ -108,14 +105,8 @@ void SsStart2(void) {
 }
 
 extern void EnterCriticalSection(void);
-extern void VSyncCallback(void (*cb)(void));
 extern void (*InterruptCallback(s32 arg0, void (*callback)(void)))(void);
 extern void ExitCriticalSection(void);
-extern s32 _snd_seq_no_tick;
-extern s32 _snd_1per2;
-extern s32 _snd_use_vsync_cb;
-extern s32 _snd_use_interrupt_id;
-extern void (*_snd_vsync_cb)(void);
 
 void SsEnd(void) {
     s32 v;
@@ -153,8 +144,6 @@ void SsQuit(void) {
 
 /* Sony's `SsSeqCalledTbyT` (`libsnd/sscall`). Local view, never a shared
  * header. */
-extern void SsSeqCalledTbyT(void);
-extern void (*_snd_vsync_cb)(void);
 
 void _SsTrapIntrVSync(void) {
     if (_snd_vsync_cb != NULL) {

@@ -3,13 +3,13 @@
 > Renamed from `func_8003221C` on 2026-09-24 (tools/rename.py). Address 0x8003221c.
 
 > **Round 97 (track 6, runner charlie): `VoiceState80090368` is gone.** It was
-> never a per-voice state struct: `D_80090368` is Sony's mark-callback table
+> never a per-voice state struct: `_ss_MarkCallback` is Sony's mark-callback table
 > (libsnd `_SsMarkCallback`), `SsMarkCallbackProc [32][16]` from
 > `include/psyq/libsnd.h` -- the same table `ContNrpn1` (libsnd_seqread) calls
-> through as `D_80090368[ch][sl]`. A row of 16 four-byte function pointers is
+> through as `_ss_MarkCallback[ch][sl]`. A row of 16 four-byte function pointers is
 > the 0x40-byte stride this report measured. The unit now declares it
-> `extern SsMarkCallbackProc D_80090368[0x20][16];` and loop 3 stores
-> `D_80090368[j][i] = NULL;` -- byte-exact, whole image green. The unit also
+> `extern SsMarkCallbackProc _ss_MarkCallback[0x20][16];` and loop 3 stores
+> `_ss_MarkCallback[j][i] = NULL;` -- byte-exact, whole image green. The unit also
 > takes `<libetc.h>`, `<libsnd.h>`, `<libspu.h>` now, so its local
 > `GetVideoMode`, `ResetCallback` and `SpuInit` prototypes are gone (Sony's
 > `long GetVideoMode(void)` replaces a local `s32` one). Bodies quoted below
@@ -39,7 +39,7 @@ into (see those reports). Calls `func_80024D10(arg0)`, then
 2. Copies 16 consecutive halfwords from `D_8006DC6C` straight to
    `0x1F801D80` onward (no repetition, unlike step 1).
 3. Calls `SpuVmInit(0x18)`.
-4. Zeroes the first `0x40` bytes of each of 32 `D_80090368` entries
+4. Zeroes the first `0x40` bytes of each of 32 `_ss_MarkCallback` entries
    (stride `0x40`, confirmed by the pointer increment).
 5. Initializes the whole sound-system global block this unit has been
    working all round: `VBLANK_MINUS=0x3C`, `_snd_openflag=0`, `_snd_use_vsync_cb=0`,
@@ -73,7 +73,7 @@ typedef struct {
     s32 pad0[0x10];
 } VoiceState80090368;
 
-extern VoiceState80090368 D_80090368[0x20];
+extern VoiceState80090368 _ss_MarkCallback[0x20];
 
 void _SsInit(s32 arg0)
 {
@@ -115,7 +115,7 @@ void _SsInit(s32 arg0)
 
     for (i = 0; i < 0x20; i++) {
         for (j = 15; j >= 0; j--) {
-            D_80090368[i].pad0[j] = 0;
+            _ss_MarkCallback[i].pad0[j] = 0;
         }
     }
 
@@ -386,7 +386,7 @@ wrote loop 3 the other way round:
 ```c
     for (j = 0; j < 0x20; j++) {
         for (i = 15; i >= 0; i--) {
-            D_80090368[j].pad0[i] = 0;
+            _ss_MarkCallback[j].pad0[i] = 0;
         }
     }
 ```
@@ -475,7 +475,7 @@ outside this unit (collision rules, PARALLEL-RUNS §2.1/§2.3). Tier: not
 applicable (identification, not a game name).
 
 `D_8006DC5C`/`D_8006DC6C` (SPU voice/control register init templates) and
-`D_80090368` (per-voice state array, already typed `VoiceState80090368`)
+`_ss_MarkCallback` (per-voice state array, already typed `VoiceState80090368`)
 are read only by `_SsInit`, a Sony function -- left unnamed per CLAUDE.md's
 "never write C for a function a Sony object owns" / "a field of a struct
 only Sony functions read" rule (FINISHING-PLAN track 3, round 75
@@ -501,3 +501,21 @@ The file's banner carried its object identification and edge evidence:
 > object libsnd/sstable follows it; inside, both edges are "boundary
 > possible". No merge is possible: the neighbouring C unit is on the other
 > side of the sstable object.
+
+## History (moved from src/psyq/libsnd_ssinit.c, round 103)
+
+The function comment above _SsInit before it was cut to one MATCHING line:
+
+> /*
+>  * Sound-system init.  Reached only through SsInit (arg0 = 0) and
+>  * SsInitHot (arg0 = 1) below.
+>  *
+>  * DO NOT "TIDY" THE LOOP VARIABLES -- the pairing is byte-load-bearing.
+>  * Retail reuses exactly two counter pseudos across all three loops and SWAPS their outer/inner roles in the last one: `i` is the outer
+>  * counter of loops 1-2 and the INNER counter of loop 3, `j` the inner counter
+>  * of loop 1 and the OUTER counter of loop 3.  Writing loop 3 as
+>  * `for (i ...) for (j ...)` costs 35 words to register renames; splitting
+>  * them into per-loop names costs the function's size outright.  Likewise the
+>  * `i = 0;` before each loop is a statement in its own right, not a `for`
+>  * init clause: retail zeroes the counter BEFORE loading the source base.
+>  */

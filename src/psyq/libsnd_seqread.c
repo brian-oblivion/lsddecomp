@@ -33,21 +33,12 @@
  * (Snd_setVabAttr's nested switch).
  */
 #include "common.h"
-#include <libsnd.h>
+#include "libsnd_internal.h"
 
-#include "SsScore.h"
-
-/* Calls into other modules, typed from the registers each call site loads;
- * a prototype for a function another file defines stays in the calling
- * file. */
-extern void SpuVmPitchBend(s32 a0, s16 a1, u8 a2, u8 a3); /* libsnd_vmanager, not yet matched: local guess */
-/* SpuVmKeyOn: Sony libsnd/vmanager internal, no public LIBSND.H prototype
- * (unlike SsUtKeyOn). */
-extern s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4,
-                      u16 a5); /* libsnd_vmanager, not yet matched: local guess, matches libsnd_vmanager's independent reading of the same call shape */
-extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3); /* libsnd_vmanager, not yet matched: local guess, ditto */
-/* Sony libsnd/vm_doff, internal: no public LIBSND.H prototype. */
-extern void SpuVmDamperOff(void);
+/* libsnd/vmanager. MATCHING: the arguments as SetPitchBend passes them; with
+ * the definition's (s16, s16, s16, u16) the call narrows its first
+ * argument, two words retail does not have. */
+s32 SpuVmPitchBend(s32 packed, s16 a1, u8 vol, u8 bend);
 
 /* Shared delta-time decoder: reads a MIDI variable-length value (7 bits
  * per byte, big-endian, continuation bit first) from rec->unk4 (advancing the cursor as it goes), scales the
@@ -62,9 +53,8 @@ extern void GetSeqData(s16 channel, s16 slot);
 
 /* Catch-up scheduler tick.  When the re-armed counter is still reloading
  * its threshold (remain == 0) it copies the threshold rec->unk70 into the
- * counter.  The third parameter is unused; retail reuses its dead register
- * ($a2) to hold rec->unk70 for that store (docs/match-reports/SeqPlay.md). */
-void SeqPlay(s16 a0, s16 a1, s16 a2) {
+ * counter. */
+void SeqPlay(s16 a0, s16 a1) {
     SsScore *rec = &_ss_score[a0][a1];
     s16 last = rec->unk70;
     s32 elapsed = rec->unk88;
@@ -256,15 +246,6 @@ void SetProgramChange(s16 a0, s16 a1, u8 a2) {
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-/* Calls into other modules. SpuVmDamperOn, SsUtSetReverbDepth and
- * SpuVmSetProgVol are Sony's libsnd (`vm_don`, `ut_rev`, `vm_prog`).
- * SpuVmSetVol (libsnd_vmanager.c) is typed from this call site: a 5th
- * argument, on the stack at 0x10($sp), after the packed "(slot<<8)|channel"
- * first argument this file's siblings use. */
-extern void SpuVmDamperOn(void);
-extern s32 SpuVmSetProgVol(s16 p0, s16 p1, s32 p2);
-extern void SpuVmSetVol(s32 packed, s16 note, u8 vol, s32 arg3, s32 arg4);
-
 /* Forward declarations for the handlers defined later in this unit. */
 extern void ContDataEntry(s16 a0, s16 a1, u8 a2);
 extern void ContPortamento(s16 a0, s16 a1, s32 a2);
@@ -454,10 +435,6 @@ void ContResetAll(s16 a0, s16 a1) {
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-/* The mark callbacks SsSetMarkCallback installs, one per (access number,
- * sequence number); ContNrpn1 calls the entry with (access, seq, data). */
-extern SsMarkCallbackProc D_80090368[][16];
-
 /* CC98 (NRPN LSB). While a loop start set by ContNrpn2's kind 0x14 still
  * waits for its count (unk27 == 1, unk10 == 0), the value becomes the loop
  * count unk28. Otherwise, unless the current NRPN kind is 0x14 or 0x1E, it
@@ -482,7 +459,7 @@ void ContNrpn1(s16 a0, s16 a1, u8 a2) {
         s16 ch = a0;
         s16 sl = a1;
 
-        fn = D_80090368[ch][sl];
+        fn = _ss_MarkCallback[ch][sl];
         if (fn != NULL) {
             fn(ch, sl, a2);
         }
@@ -490,7 +467,6 @@ void ContNrpn1(s16 a0, s16 a1, u8 a2) {
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
 
-#if 1
 void ContNrpn2(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
     u8 kind = a2;
@@ -533,7 +509,6 @@ void ContNrpn2(s16 a0, s16 a1, u8 a2) {
             return;
     }
 }
-#endif
 
 void ContRpn1(s16 a0, s16 a1, u8 a2) {
     SsScore *rec = &_ss_score[a0][a1];
@@ -823,7 +798,6 @@ void Snd_setVabAttr(s16 channel, s16 slot, s16 kind, VagAtr scratch, AdsrFields 
     }
 }
 
-#if 1
 void SetPitchBend(s16 a0, s16 a1) {
     SsScore *rec = &_ss_score[a0][a1];
     u8 *cursor = rec->unk4;
@@ -840,18 +814,9 @@ void SetPitchBend(s16 a0, s16 a1) {
     SpuVmPitchBend(packed, rec->unk4C, vol, b);
     rec->unk88 = ReadDeltaValue(a0, a1);
 }
-#endif
 
-/* Calls into other modules, typed from this call site: SpuVmSeqKeyOff
- * (libsnd_vmanager.c) takes the packed "(slot<<8)|channel", as in
- * libsnd_cres.c and libsnd_decre.c; _SsSndNextSep is Sony's libsnd/next. */
-extern s32 SpuVmSeqKeyOff(s32 a0);
+/* libsnd/next. */
 extern void _SsSndNextSep(s32 a0, s32 a1);
-
-/* This unit's own reading of the same global libsnd_decre.c already reads
- * as `VBLANK_MINUS` (a tick-rate/PPQN-style constant) -- independent local
- * view, per project convention. */
-extern u32 VBLANK_MINUS;
 
 /* Meta-event handler, reached from GetSeqData's 0xFF ("running status
  * for a 0xF0 event") and new-status 0xF0 dispatch arms with `a2` = the

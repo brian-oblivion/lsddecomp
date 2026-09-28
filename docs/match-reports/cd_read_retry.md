@@ -60,8 +60,8 @@ s32 cd_read_retry(void)
 
     tmp = &D_8006D8DC;
     n = *tmp;
-    D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbready = 0;
+    CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
 
@@ -72,13 +72,13 @@ s32 cd_read_retry(void)
             if (*pRetry < 7) {
                 counter = 0;
                 puts(D_80010AAC);
-                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+                printf(D_80010ABC, *pRetry, CD_pos, D_8006D619, D_8006D61A);
 
-                if (D_8006D904 < D_8006D614) {
-                    saved = D_8006D5FC;
-                    D_8006D5FC = 0;
+                if (D_8006D904 < CD_nopen) {
+                    saved = CD_cbsync;
+                    CD_cbsync = 0;
 
-                    while (D_8006D60C & 0x10) {
+                    while (CD_status & 0x10) {
                         if ((u8)counter == 0) {
                             puts(D_80010A40);
                         }
@@ -91,14 +91,14 @@ s32 cd_read_retry(void)
                         puts(D_80010A50);
                     }
 
-                    D_8006D5FC = saved;
-                    D_8006D904 = D_8006D614;
+                    CD_cbsync = saved;
+                    D_8006D904 = CD_nopen;
                 }
 
                 if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&CD_pos, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -112,7 +112,7 @@ s32 cd_read_retry(void)
 
             D_8006D8DA = 0;
             q = &D_8006D8D9;
-            D_8006D61C = 0;
+            CD_mode = 0;
             *q = D_8006D8DA;
             D_8006D8D8[0] = 2;
             *D_8006D8C0 = 0;
@@ -120,13 +120,13 @@ s32 cd_read_retry(void)
             *D_8006D8D0 = 0x1325;
 
             buf = (u8)p2[0];
-            if (buf != D_8006D61C) {
+            if (buf != CD_mode) {
                 if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
                     goto tail;
                 }
             }
 
-            D_8006D600 = (s32)cb_read;
+            CD_cbready = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -242,7 +242,7 @@ than what this round's own build actually produced -- see below).
 
 ### Fix 1: `buf`'s stack round-trip (119 -> 149/223)
 
-The round-19 body's `buf = (u8)p2[0]; if (buf != D_8006D61C) { ...
+The round-19 body's `buf = (u8)p2[0]; if (buf != CD_mode) { ...
 &buf ... }` compiled with a genuine RELOAD from the stack slot for the
 comparison (`sb v0,0x18(sp); lbu v1,0x18(sp); lui v0,...; lbu v0,...;
 andi v0,0xff` -- 8 instructions), where retail keeps the loaded value in
@@ -255,7 +255,7 @@ closed this exactly:
 {
     s32 v0 = p2[0];
     buf = (u8)v0;
-    if ((u8)v0 != D_8006D61C) {
+    if ((u8)v0 != CD_mode) {
         if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
             goto tail;
         }
@@ -273,7 +273,7 @@ because the aggregate score doesn't immediately improve.
 ### Fix 2: missing `__asm__("")` barrier before the reused CD_flush tail block (149 -> 171/223)
 
 The round-19/round-17 salvaged body's copy of the driver-reset tail
-(`D_8006D8DA = 0; q = &D_8006D8D9; D_8006D61C = 0; *q = D_8006D8DA;
+(`D_8006D8DA = 0; q = &D_8006D8D9; CD_mode = 0; *q = D_8006D8DA;
 D_8006D8D8[0] = 2; ...`) was MISSING the `__asm__("");` barrier that the
 canonical `CD_flush` version of this exact block carries between
 `*q = D_8006D8DA;` and `D_8006D8D8[0] = 2;`. Adding it back (this
@@ -333,7 +333,7 @@ prologue's own register numbers, accounting for essentially all of the
 21 remaining word mismatches. **Tried two reshapes, both regressed
 severely rather than helping** (declaration-order swap of `n`/`tmp`: no
 change at all, 202/223 unchanged; reordering
-`D_8006D600=0;D_8006D5FC=0;` to before the load: catastrophic
+`CD_cbready=0;CD_cbsync=0;` to before the load: catastrophic
 regression to 9/223, i.e. this exact statement order is otherwise
 load-bearing and fragile). Not spending further attempts on this --
 register-identity-driven pseudo-allocation choices for a function's
@@ -364,8 +364,8 @@ s32 cd_read_retry(void)
 
     tmp = &D_8006D8DC;
     n = *tmp;
-    D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbready = 0;
+    CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
 
@@ -376,13 +376,13 @@ s32 cd_read_retry(void)
             if (*pRetry < 7) {
                 counter = 0;
                 puts(D_80010AAC);
-                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+                printf(D_80010ABC, *pRetry, CD_pos, D_8006D619, D_8006D61A);
 
-                if (D_8006D904 < D_8006D614) {
-                    saved = D_8006D5FC;
-                    D_8006D5FC = 0;
+                if (D_8006D904 < CD_nopen) {
+                    saved = CD_cbsync;
+                    CD_cbsync = 0;
 
-                    while (D_8006D60C & 0x10) {
+                    while (CD_status & 0x10) {
                         if ((u8)counter == 0) {
                             puts(D_80010A40);
                         }
@@ -395,14 +395,14 @@ s32 cd_read_retry(void)
                         puts(D_80010A50);
                     }
 
-                    D_8006D5FC = saved;
-                    D_8006D904 = D_8006D614;
+                    CD_cbsync = saved;
+                    D_8006D904 = CD_nopen;
                 }
 
                 if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&CD_pos, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -416,7 +416,7 @@ s32 cd_read_retry(void)
 
             D_8006D8DA = 0;
             q = &D_8006D8D9;
-            D_8006D61C = 0;
+            CD_mode = 0;
             *q = D_8006D8DA;
             __asm__("");
             D_8006D8D8[0] = 2;
@@ -427,14 +427,14 @@ s32 cd_read_retry(void)
             {
                 s32 v0 = p2[0];
                 buf = (u8)v0;
-                if ((u8)v0 != D_8006D61C) {
+                if ((u8)v0 != CD_mode) {
                     if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
                         goto tail;
                     }
                 }
             }
 
-            D_8006D600 = (s32)cb_read;
+            CD_cbready = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -794,8 +794,8 @@ s32 cd_read_retry(void)
 
     tmp = &D_8006D8DC;
     n = *tmp;
-    D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbready = 0;
+    CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
 
@@ -806,13 +806,13 @@ s32 cd_read_retry(void)
             if (*pRetry < 7) {
                 counter = 0;
                 puts(D_80010AAC);
-                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+                printf(D_80010ABC, *pRetry, CD_pos, D_8006D619, D_8006D61A);
 
-                if (D_8006D904 < D_8006D614) {
-                    saved = D_8006D5FC;
-                    D_8006D5FC = 0;
+                if (D_8006D904 < CD_nopen) {
+                    saved = CD_cbsync;
+                    CD_cbsync = 0;
 
-                    while (D_8006D60C & 0x10) {
+                    while (CD_status & 0x10) {
                         if ((u8)counter == 0) {
                             puts(D_80010A40);
                         }
@@ -825,14 +825,14 @@ s32 cd_read_retry(void)
                         puts(D_80010A50);
                     }
 
-                    D_8006D5FC = saved;
-                    D_8006D904 = D_8006D614;
+                    CD_cbsync = saved;
+                    D_8006D904 = CD_nopen;
                 }
 
                 if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&CD_pos, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -846,7 +846,7 @@ s32 cd_read_retry(void)
 
             D_8006D8DA = 0;
             q = &D_8006D8D9;
-            D_8006D61C = 0;
+            CD_mode = 0;
             *q = D_8006D8DA;
             __asm__("");
             D_8006D8D8[0] = 2;
@@ -857,14 +857,14 @@ s32 cd_read_retry(void)
             {
                 s32 v0 = p2[0];
                 buf = (u8)v0;
-                if ((u8)v0 != D_8006D61C) {
+                if ((u8)v0 != CD_mode) {
                     if (CD_cw(0xE, (s32)&buf, 0, 0) != 0) {
                         goto tail;
                     }
                 }
             }
 
-            D_8006D600 = (s32)cb_read;
+            CD_cbready = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -909,7 +909,7 @@ round's recorded figure exactly.
 trick** (which closed a register-numbering residue in this same unit's
 `CD_readsync` after manual reorders had failed) against the one open
 residue here (the `tmp`/`n` address-vs-value swap at the function's first
-computed temporary). Wrapped the `D_8006D600 = 0;` statement immediately
+computed temporary). Wrapped the `CD_cbready = 0;` statement immediately
 after the load in a duplicated `if (tmp || n) {...} else {...}` referencing
 both contested values:
 
@@ -917,11 +917,11 @@ both contested values:
 tmp = &D_8006D8DC;
 n = *tmp;
 if (tmp || n) {
-    D_8006D600 = 0;
+    CD_cbready = 0;
 } else {
-    D_8006D600 = 0;
+    CD_cbready = 0;
 }
-D_8006D5FC = 0;
+CD_cbsync = 0;
 *tmp = n - 1;
 __asm__("");
 ```
@@ -1046,7 +1046,7 @@ exact program point for a completely different purpose, in the same
 ```c
 s32 v0 = p2[0];
 buf = (u8)v0;
-n = ((u8)v0 != D_8006D61C);      /* was: if ((u8)v0 != D_8006D61C) */
+n = ((u8)v0 != CD_mode);      /* was: if ((u8)v0 != CD_mode) */
 if (n) {
     saved = (s32)&buf;            /* was: CD_cw(0xE, (s32)&buf, 0, 0) */
     if (CD_cw(0xE, saved, 0, 0) != 0) {
@@ -1056,7 +1056,7 @@ if (n) {
 ```
 
 `n` (the retry counter) is not read again until `tail:` overwrites it
-outright; `saved` (used earlier to stash `D_8006D5FC` around the timeout
+outright; `saved` (used earlier to stash `CD_cbsync` around the timeout
 retry loop) is already restored and consumed by this point. Reusing both
 as throwaway sinks for a boolean and a pointer is legal, has no
 observable effect on ANY execution path, and unlike the `output-215-1`
@@ -1135,8 +1135,8 @@ s32 cd_read_retry(void)
 
     tmp = D_8006D8DC;
     n = *tmp;
-    D_8006D600 = 0;
-    D_8006D5FC = 0;
+    CD_cbready = 0;
+    CD_cbsync = 0;
     *tmp = n - 1;
     __asm__("");
 
@@ -1147,13 +1147,13 @@ s32 cd_read_retry(void)
             if (*pRetry < 7) {
                 counter = 0;
                 puts(D_80010AAC);
-                printf(D_80010ABC, *pRetry, D_8006D618, D_8006D619, D_8006D61A);
+                printf(D_80010ABC, *pRetry, CD_pos, D_8006D619, D_8006D61A);
 
-                if (D_8006D904 < D_8006D614) {
-                    saved = D_8006D5FC;
-                    D_8006D5FC = 0;
+                if (D_8006D904 < CD_nopen) {
+                    saved = CD_cbsync;
+                    CD_cbsync = 0;
 
-                    while (D_8006D60C & 0x10) {
+                    while (CD_status & 0x10) {
                         if ((u8)counter == 0) {
                             puts(D_80010A40);
                         }
@@ -1166,14 +1166,14 @@ s32 cd_read_retry(void)
                         puts(D_80010A50);
                     }
 
-                    D_8006D5FC = saved;
-                    D_8006D904 = D_8006D614;
+                    CD_cbsync = saved;
+                    D_8006D904 = CD_nopen;
                 }
 
                 if (CD_cw(9, 0, 0, 0) != 0) {
                     goto tail;
                 }
-                if (CD_cw(2, (s32)&D_8006D618, 0, 0) != 0) {
+                if (CD_cw(2, (s32)&CD_pos, 0, 0) != 0) {
                     goto tail;
                 }
             }
@@ -1187,7 +1187,7 @@ s32 cd_read_retry(void)
 
             D_8006D8DA = 0;
             q = &D_8006D8D9;
-            D_8006D61C = 0;
+            CD_mode = 0;
             *q = D_8006D8DA;
             __asm__("");
             D_8006D8D8[0] = 2;
@@ -1198,7 +1198,7 @@ s32 cd_read_retry(void)
             {
                 s32 v0 = p2[0];
                 buf = (u8)v0;
-                n = ((u8)v0 != D_8006D61C);
+                n = ((u8)v0 != CD_mode);
                 if (n) {
                     saved = (s32)&buf;
                     if (CD_cw(0xE, saved, 0, 0) != 0) {
@@ -1207,7 +1207,7 @@ s32 cd_read_retry(void)
                 }
             }
 
-            D_8006D600 = (s32)cb_read;
+            CD_cbready = (s32)cb_read;
             p2[-1] = p2[-2];
             CD_cw(6, 0, 0, 1);
             p2[2] = p2[-3];
@@ -1383,7 +1383,7 @@ me, not on the round-17 label.
   block is a permuter find (round 41, candidate `output-235-1`). Reviewed
   here against the report's own correctness argument and re-confirmed:
   `n` (the retry counter) is not read again until `tail:` unconditionally
-  overwrites it, and `saved` (holding a stashed `D_8006D5FC`) is already
+  overwrites it, and `saved` (holding a stashed `CD_cbsync`) is already
   consumed earlier on this same path before being reused as `(s32)&buf` --
   both are freshly written on every pass through this code before their
   next read, with no loop-carried path back to a stale value. This is the

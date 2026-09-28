@@ -25,54 +25,16 @@
  * SpuVmFlush writes out once per tick. No jump table and no rodata attach.
  */
 #include "common.h"
-#include <libsnd.h>
+#include "libsnd_internal.h"
 #include <libspu.h>
-#include "SsScore.h"
-#include "SvmData.h"
 
-/*
- * libsnd's _svm_cur (pinned in config/psyq-objects.ld, 0x20 bytes): the
- * key-on request the voice manager is working on, which the key-on paths
- * (SpuVmKeyOn, SsUtKeyOn, SsUtKeyOnV) fill before they call in here. Sony's struct type is not on any
- * SDK disc, so each byte this file reads is its own extern, named by
- * address; beside each, its offset in _svm_cur and what the code here does
- * with it. The three pans cut the right channel below 64 and the left one
- * above.
- */
-extern u8 D_8008EA0E; /* +0x02: the note to key */
-extern u8 D_8008EA10; /* +0x04: volume, scaled by the VAB's mvol */
-extern u8 D_8008EA11; /* +0x05: third pan */
-extern u8 D_8008EA13; /* +0x07: program */
-extern u8 D_8008EA16; /* +0x0A: first volume factor, out of 127 */
-extern u8 D_8008EA17; /* +0x0B: second pan */
-extern u8 D_8008EA18; /* +0x0C: tone within the program */
-extern u8 D_8008EA19; /* +0x0D: second volume factor, out of 127 */
-extern u8 D_8008EA1A; /* +0x0E: first pan */
-extern u8 D_8008EA1B; /* +0x0F: priority, which SpuVmAlloc compares */
-extern u8 D_8008EA1C; /* +0x10: the tone's centre note */
-extern u8 D_8008EA1D; /* +0x11: the tone's fine tune, 8 per pitch-table step */
-extern u8 D_8008EA20; /* +0x14: mode bits; bit 2 sends the voice to reverb */
-extern u16 D_8008EA22; /* +0x16: _ss_score index, low byte then high byte; 33 from SsUtKeyOn/SsUtKeyOnV: no score */
-/* +0x1A: the voice being keyed. volatile u16, the spelling SpuVmInit,
- * SpuVmNoiseOn and SpuVmKeyOff need (the note above SpuVmNoiseOnWithAdsr);
- * SpuVmKeyOnNow's NON_MATCHING body reads it as a plain s16 through a cast
- * (SpuVmKeyOnNow.md: neither scalar nor volatile). */
-extern volatile u16 D_8008EA26;
+/* _svm_cur + 0x0C, the tone within the program (the rest of _svm_cur is in
+ * libsnd_internal.h). MATCHING: plain here; volatile changes SePitchBend
+ * and SpuVmKeyOn. */
+extern u8 D_8008EA18;
 
-/* The rest of libsnd/vmanager's globals this file reads, under Sony's names
- * where a disc gives one (the voice tables are in SvmData.h). The key masks
- * are two halfwords each, voices 0-15 then 16-23. */
-extern VabHdr *_svm_vh;      /* the header of the VAB being played */
-extern VagAtr *_svm_tn;      /* that VAB's tone attributes, 16 per program */
-extern u8 spuVmMaxVoice;     /* voices the allocator may hand out */
-extern s16 _svm_stereo_mono; /* 1: mono, both channels at the louder volume */
-extern u16 _svm_okon1;       /* Sony's _svm_okon1: voices 0-15 to key on at the next flush */
-extern u16 _svm_okon2;
-extern u16 _svm_okof1; /* voices to key off at the next flush */
-extern u16 _svm_okof2;
-extern u16 _svm_orev1; /* voices sent to reverb */
-extern u16 _svm_orev2;
-extern SpuRegs *_svm_sreg; /* the SPU's register block */
+/* The SPU's register block. */
+extern SpuRegs *_svm_sreg;
 /* vmanager's static pitch table: 12 semitones x 16 fine steps, the SPU
  * pitch of each at octave 5. */
 extern u16 D_8006DAD8[];
@@ -81,8 +43,8 @@ extern u16 D_8006DAD8[];
 /* NON_MATCHING: 167/167 words, length exact; the residue is a register
  * rotation through the whole function (docs/match-reports/SpuVmAlloc.md). */
 
-/* `unused`: nothing here reads it, but SpuVmNoiseOn and
- * SpuVmNoiseOnWithAdsr pass one (their prototype's arity-ok note). */
+/* `unused`: nothing here reads it; see its declaration in
+ * libsnd_internal.h. */
 s32 SpuVmAlloc(s32 unused) {
     s32 chosen;
     u16 bestSec;
@@ -481,20 +443,6 @@ void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
  * report gives its residue.
  */
 
-/* libsnd's _svm_vh (pinned at this address): the header of the VAB bank
- * currently selected. SetAutoVol/SetAutoPan scale by its master volume;
- * SpuVmKeyOn bounds the program number by its program count. */
-extern VabHdr *_svm_vh;
-
-extern u8 D_8008EA10;
-extern u8 D_8008EA11;
-extern u8 D_8008EA16;
-extern u8 D_8008EA17;
-extern u8 D_8008EA19;
-extern u8 D_8008EA1A;
-
-extern s16 _svm_stereo_mono;
-
 #ifdef NON_MATCHING
 /* NON_MATCHING: 231/231 words, length exact, 223/231 raw. This is libsnd's
  * SetAutoVol. Residue: in the pan split's `else` arm retail copies the
@@ -689,7 +637,6 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SetAutoPan);
 #endif
 
 extern void _spu_setInTransfer(s32 a0);
-extern void SpuVmFlush(void);
 
 extern char D_8008DEB0[]; /* Sony's _ss_spu_vm_rec + 8 (libsnd/vmanager.o bss; symbols file) */
 
@@ -700,16 +647,8 @@ extern SpuReverbAttr _svm_rattr; /* pinned in config/psyq-objects.ld (libsnd/vm_
 extern u8 _svm_auto_kof_mode;
 extern s16 kMaxPrograms;
 
-extern u8 spuVmMaxVoice;
 extern s16 _svm_vab_count;
 extern u8 _svm_vab_used[];
-extern u16 _svm_okof1;
-extern u16 _svm_okof2;
-extern u16 _svm_okon1;
-extern u16 _svm_okon2;
-
-/* Declared without volatile. */
-extern SpuRegs *_svm_sreg;
 
 /* MATCHING: `scratch` is one local reused for the clamp and for the
  * volL store's index; two locals change the register allocation. */
@@ -820,24 +759,6 @@ void SpuVmInit(s32 a0) {
     SpuVmFlush();
 }
 
-/* "Currently selected channel" scratch global: written as a side
- * effect, then re-read from the global (not a cached register) a few
- * instructions later; this is why the declaration at the top of the file
- * is `volatile u16`.  Genuinely needs
- * `volatile`: without it, this compiler proves (from the narrow range
- * of the values stored here) that the re-read is redundant and elides
- * it entirely, which retail's disassembly shows it does NOT do.
- * `volatile` alone reproduces retail's separate store/reload exactly
- * -- reading it back through `*(u8 *)&D_8008EA26` (a plain, NON-
- * volatile-qualified pointer type) still folds to retail's compact
- * `lui`+`lbu` two-instruction form; it is specifically a
- * VOLATILE-QUALIFIED POINTER TYPE (`volatile u8 *`) that defeats the
- * addressing fold, not the underlying object's volatility. */
-extern volatile u16 D_8008EA26;
-/* Flag byte forced on unconditionally at entry. */
-extern u8 D_8008EA1B;
-
-extern s32 SpuVmAlloc(s32 a0); /* arity-ok: the callee reads no argument register, but the caller sets a0 = 0xFF in the call's delay slot */
 extern void vmNoiseOn2(s32 a0, s32 a1, s32 a2, s32 a3, s32 a4);
 
 void SpuVmNoiseOnWithAdsr(s32 a0, s32 a1, s32 a2, s32 a3) {
@@ -874,19 +795,6 @@ void SpuVmNoiseOn(s32 a0, s32 a1) {
         vmNoiseOn2(*(u8 *)&D_8008EA26, a0 & 0xFFFF, a1 & 0xFFFF, 0x80FF, 0x5FC8);
     }
 }
-
-/* _svm_cur + 7: the current program number. A VAB gives each program 16
- * tone slots, so it indexes _svm_tn in steps of 16, and SpuVmKeyOn
- * refuses one at or past _svm_vh->ps. */
-extern u8 D_8008EA13;
-
-/* libsnd's _svm_tn (pinned at this address): the current VAB's tone
- * attributes, 16 per program. */
-extern VagAtr *_svm_tn;
-
-/* _svm_cur + 0xC: the current tone number within the program. */
-extern u8 D_8008EA18;
-
 
 #ifdef NON_MATCHING
 /* NON_MATCHING: 77/138 words, length exact. Residue: register-class
@@ -950,9 +858,6 @@ s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4) {
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SpuVmPBVoice);
 #endif
 
-
-extern s32 SpuVmVSetUp(s16 a0, s16 a1);
-extern s16 SpuVmPBVoice(s16 a0, s16 a1, s16 a2, s16 a3, u16 a4);
 
 s32 SpuVmPitchBend(s16 a0, s16 a1, s16 a2, u16 a3) {
     s16 i;
@@ -1109,26 +1014,6 @@ INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_vmanager", SpuVmFlush);
  * scheduling point and a mid-loop addressing-cost difference for D_8008EA26
  * and its neighbours (docs/match-reports/SpuVmKeyOn.md). D_8008EA0D has no
  * linker symbol of its own and is read through the D_8008EA24 base pointer. */
-/* libsnd's _svm_pg (pinned at this address): the current VAB's program
- * attributes. */
-extern ProgAtr *_svm_pg;
-
-extern u8 D_8008EA0C;
-extern u8 D_8008EA0E;
-extern u8 D_8008EA0F;
-extern u8 D_8008EA1C;
-extern u8 D_8008EA1D;
-extern u8 D_8008EA1E;
-extern u8 D_8008EA1F;
-extern u8 D_8008EA20;
-extern u16 D_8008EA24;
-
-
-extern void SpuVmDoAllocate(void);
-extern void vmNoiseOn(s32 a0);
-extern s32 note2pitch(void);
-extern s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3);
-
 s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5) {
     SsScore *s6;
     ProgAtr *slot;
@@ -1320,13 +1205,6 @@ s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
  * records it in D_8008EA22, vmanager's current-sequence global
  * (SpuVmGetSeqLVol records only the access byte).
  */
-
-/* vmanager internals, absent from <libsnd.h>; signatures read from the
- * registers each call site loads. */
-extern s32 SpuVmKeyOn(s32 seqSepNo, s16 vabId, s16 prog, u16 note, u16 vol, u16 pan);
-
-/* The packed number of the sequence vmanager is working on. */
-extern u16 D_8008EA22;
 
 /* The pseudo-sequence number sound effects are keyed on and off under;
  * libsnd's SE paths store it in D_8008EA22 and in a voice's owner field. */

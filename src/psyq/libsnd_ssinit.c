@@ -15,7 +15,7 @@
  *
  * Data: _snd_openflag and _snd_ev_flag are pinned by name in
  * config/psyq-objects.ld. D_8006DC5C/D_8006DC6C are read only by _SsInit,
- * a Sony function, so they keep their placeholder names. D_80090368 is
+ * a Sony function, so they keep their placeholder names. _ss_MarkCallback is
  * libsnd's mark-callback table (SsMarkCallbackProc [32][16], <libsnd.h>'s
  * type), which SsSetMarkCallback fills and ContNrpn1 calls through.
  *
@@ -23,40 +23,25 @@
  * libsnd_ssinit_libapi_counter in the yaml, not to this unit.
  */
 #include "common.h"
+#include "libsnd_internal.h"
 #include <libetc.h>
-#include <libsnd.h>
 #include <libspu.h>
 
-extern void SpuInitHot(void); /* Sony libspu/s_ih; not in this SDK's LIBSPU.H */
-extern void SpuVmInit(s32 arg0);
+/* libspu's s_i and s_ih; <libspu.h> declares no functions. */
+extern void SpuInit(void);
+extern void SpuInitHot(void);
+
+/* The register templates _SsInit writes: one voice's, into all 24, and the
+ * control block's. */
 extern u16 D_8006DC5C[8];
 extern u16 D_8006DC6C[0x10];
-extern s32 VBLANK_MINUS;
-extern s32 _snd_openflag;
-extern s32 _snd_use_vsync_cb;
-extern s32 _snd_use_interrupt_id;
-extern s32 _snd_1per2;
-extern void (*_snd_vsync_cb)(void);
-extern s32 _snd_video_mode;
-extern s32 _snd_ev_flag;
-
-/* The mark callbacks SsSetMarkCallback installs, one per (access number,
- * sequence number); _SsInit clears them all.  Same table ContNrpn1
- * (libsnd_seqread) calls through. */
-extern SsMarkCallbackProc D_80090368[0x20][16];
 
 /*
  * Sound-system init.  Reached only through SsInit (arg0 = 0) and
  * SsInitHot (arg0 = 1) below.
  *
- * DO NOT "TIDY" THE LOOP VARIABLES -- the pairing is byte-load-bearing.
- * Retail reuses exactly two counter pseudos across all three loops and SWAPS their outer/inner roles in the last one: `i` is the outer
- * counter of loops 1-2 and the INNER counter of loop 3, `j` the inner counter
- * of loop 1 and the OUTER counter of loop 3.  Writing loop 3 as
- * `for (i ...) for (j ...)` costs 35 words to register renames; splitting
- * them into per-loop names costs the function's size outright.  Likewise the
- * `i = 0;` before each loop is a statement in its own right, not a `for`
- * init clause: retail zeroes the counter BEFORE loading the source base.
+ * MATCHING: two counters shared by all three loops, i outer and j inner
+ * until loop 3 swaps them, each zeroed by its own statement before the loop.
  */
 void _SsInit(s32 arg0) {
     s32 i, j;
@@ -101,7 +86,7 @@ void _SsInit(s32 arg0) {
 
     for (j = 0; j < 0x20; j++) {
         for (i = 15; i >= 0; i--) {
-            D_80090368[j][i] = NULL;
+            _ss_MarkCallback[j][i] = NULL;
         }
     }
 

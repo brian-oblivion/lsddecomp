@@ -20,7 +20,7 @@ because no placed object covers it.
 
 The round-21 title said "219/337, register-identity residue, size matches
 retail exactly". Rebuilt verbatim (plus the two externs it used but did not
-declare, `D_8006D608` and `D_8006D620`), it measured:
+declare, `CD_debug` and `CD_comstr`), it measured:
 
 - **159/337 raw, `.text` 0x54c (2 words LONG)**, whole image drifted;
 - `insertions 71 / deletions 71`, positional skeleton diffs 141.
@@ -31,26 +31,26 @@ residue decomposed into five separate defects, fixed in this order
 
 | # | defect (asm-differ) | fix | result |
 | --- | --- | --- | --- |
-| 1 | `bnez` where mine had `beqz` after `D_8006D60C & 0x10` | **logic**: `!(D_8006D60C & 0x10) && (resp[0] & 0x10)` | -- |
+| 1 | `bnez` where mine had `beqz` after `CD_status & 0x10` | **logic**: `!(CD_status & 0x10) && (resp[0] & 0x10)` | -- |
 | 2 | cases 1/2: `li v0,2`/`li v0,5` swapped around the `beqz s0` | **logic**: retail stores 5 when `flags != 0` (`flags ? 5 : 2`, `flags ? 5 : 1`). Case 2 still needs the if/else-into-a-local form; the ternary unfolds its store | ins/del 71/71, 0x54c |
 | 3 | cases 4/5: mirror store folded (`$at`) where retail unfolds (`lui/addiu/sb 0`) | `*(volatile u8 *)&D_8006D8D9 = D_8006D8DA;` and `*(volatile u8 *)D_8006D8D8 = D_8006D8D9;` (same cast case 3 already used) | 67/67, still 0x54c |
 | 4 | cases 4/5: copy's src pointer computed after the null check, a `nop` in the `beqz` delay slot | initialise the copy's `src` BEFORE `if (dst != NULL)` | **0x544 exact**, 253/337, 27/27 |
 | 5 | all 10 copy sites: dst and counter registers swapped (`$a0`/`$v1`), src right | **the copy as a `static __inline__` function** instead of a `do{}while(0)` macro | **333/337, 0/0** |
-| 6 | one missing `andi v0,v0,0xff` after `lbu v0,0x18(sp)`; mine loaded `resp[0]` twice instead | `D_8006D60C = *(volatile u8 *)&resp[0]; D_8006D610 = resp[1]; flags = D_8006D60C & 0x1D;` | **337/337, OK: build matches retail** |
+| 6 | one missing `andi v0,v0,0xff` after `lbu v0,0x18(sp)`; mine loaded `resp[0]` twice instead | `CD_status = *(volatile u8 *)&resp[0]; CD_status1 = resp[1]; flags = CD_status & 0x1D;` | **337/337, OK: build matches retail** |
 
 About 30 builds in all. No permuter search was spent; Gate 3 was never
 reached.
 
 ### What did not work (defect 6, measured, all with the inline copy in place)
 
-- `flags = D_8006D60C & 0x1D` alone: one load, but no `andi 0xff` (0x540, one short).
+- `flags = CD_status & 0x1D` alone: one load, but no `andi 0xff` (0x540, one short).
 - A `u8 st = resp[0]` local used for both the store and `flags`, at function
   scope, block scope, before the counter test and before the whole `if`;
-  `flags` as `u8` as well as `s32`; reordering the three statements; `D_8006D60C
+  `flags` as `u8` as well as `s32`; reordering the three statements; `CD_status
   = st = resp[0]`; `flags = (st = resp[0]) & 0x1D`: all either one short
   (combine folds the zero-extension into the `lbu`) or worse.
-- `flags = (u8)D_8006D60C & 0x1D` or `D_8006D60C = resp[0] & 0xFF`: these reload
-  the global's low byte (`lbu` of `D_8006D60C`), 2 words long.
+- `flags = (u8)CD_status & 0x1D` or `CD_status = resp[0] & 0xFF`: these reload
+  the global's low byte (`lbu` of `CD_status`), 2 words long.
 - The whole `resp` array `volatile`: 1 word long, and every `resp[1]` read gets
   masked too.
 - `volatile` read of `resp[0]` with `flags = resp[0] & 0x1D` (not from the
@@ -73,7 +73,7 @@ before use, per the project's string-literal rule):
 - `D_800109D8` = `"CDROM: unknown intr"` -- the default-case message.
 - `D_800109B0` = `"DiskError: "`, `D_800109BC` = `"com=%s,code=(%02x:%02x)\n"`
   -- the cause==5 (error) diagnostic, printing a command-name string looked
-  up from `D_8006D620` (the same string table `func_80028CF8`, matched
+  up from `CD_comstr` (the same string table `func_80028CF8`, matched
   earlier this round, indexes) plus two raw status bytes.
 - `D_800109EC` = `"(%d)\n"` -- appended to the unknown-cause message.
 
@@ -90,13 +90,13 @@ missed condition or wrong constant anywhere):
    "data ready" flag (bit `0x20`) is set on `D_8006D8C0`, zero-filling the
    rest of an 8-byte stack buffer if fewer than 8 arrived.
 3. Re-arm the ports (write 1/7/7 to `D_8006D8C0`/`CC`/`C8`).
-4. Unless cause==3 with a false `D_8006D7C0[D_8006D61D]` lookup (a per-mode
-   flag table, same selector family as `D_8006D620`/`D_6006D6A0`), update
-   an error counter (`D_8006D614`) when a flag bit turns on across the
-   read, latch the two response bytes into `D_8006D60C`/`D_8006D610`, and
+4. Unless cause==3 with a false `D_8006D7C0[CD_com]` lookup (a per-mode
+   flag table, same selector family as `CD_comstr`/`D_6006D6A0`), update
+   an error counter (`CD_nopen`) when a flag bit turns on across the
+   read, latch the two response bytes into `CD_status`/`CD_status1`, and
    compute a `flags` value (`resp[0] & 0x1D`) used by cases 1-3 below.
    (Round 70: the counter increments when bit 0x10 turns ON, i.e. the old
-   `D_8006D60C` bit is CLEAR and the new `resp[0]` bit is set.)
+   `CD_status` bit is CLEAR and the new `resp[0]` bit is set.)
 5. On cause==5, log the diagnostic strings above.
 6. Dispatch on cause (1-5, via `jtbl_800109F8`; 6/7/out-of-range and the
    post-mask 0 case fall to a "CDROM: unknown intr (%d)\n" default),
@@ -130,9 +130,9 @@ static __inline__ void copy8(u8 *d, const u8 *s)
     }
 }
 /* ... */
-        D_8006D60C = *(volatile u8 *)&resp[0];
-        D_8006D610 = resp[1];
-        flags = D_8006D60C & 0x1D;
+        CD_status = *(volatile u8 *)&resp[0];
+        CD_status1 = resp[1];
+        flags = CD_status & 0x1D;
 /* ... */
     case 4:
         D_8006D8DA = 4;
@@ -173,7 +173,7 @@ store of an if/else-merged local.
 
 ## Anomalous
 
-None. The round-21 report's `extern u8 D_8006D60C` conflict note is moot
+None. The round-21 report's `extern u8 CD_status` conflict note is moot
 (the unit holds only this function).
 
 ## File history

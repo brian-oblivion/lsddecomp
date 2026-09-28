@@ -18,10 +18,10 @@ Unit: `CdDriver`. Runner: echo, round 17 (second assignment).
 ## Result
 
 ```c
-extern u8 D_8006D60C;
+extern u8 CD_status;
 
 u8 CdStatus(void) {
-    return D_8006D60C;
+    return CD_status;
 }
 ```
 

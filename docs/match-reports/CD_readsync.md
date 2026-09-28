@@ -20,7 +20,7 @@ if (p6A0 || pF8) {
 }
 ```
 
-`p6A0` is `D_8006D6A0` (an array) and `pF8` is `&D_8006D8F8`, so **the
+`p6A0` is `CD_intstr` (an array) and `pF8` is `&D_8006D8F8`, so **the
 condition is a tautology and both arms are identical.** GCC 2.6.3 cross-jumps
 the arms back into the single `sb $s1, 0($v0)` retail has, so the construct
 emits no instruction of its own. Its entire effect is to perturb register
@@ -60,12 +60,12 @@ catalogue is in that table, and none of them reaches it.
 Both operands are spelled in this unit as address-of:
 
 ```c
-extern s32 D_8006D6A0[];      /* p6A0 = D_8006D6A0;   */
+extern s32 CD_intstr[];      /* p6A0 = CD_intstr;   */
 extern s32 D_8006D8F8;        /* pF8  = &D_8006D8F8;  */
 ```
 
 If either is really a **pointer global** in retail's source
-(`extern s32 *D_8006D6A0;`), then `if (p6A0 || pF8)` is an ordinary null test
+(`extern s32 *CD_intstr;`), then `if (p6A0 || pF8)` is an ordinary null test
 that happens to be true at runtime -- the construct stops being a hack, stops
 needing duplicated arms, and the function becomes an honest match. That is a
 data-modelling question, it is cheap to test, and **nobody has tested it.**
@@ -83,7 +83,7 @@ needed to establish it:
 
 | operand | what the data says | where |
 | --- | --- | --- |
-| `D_8006D6A0` | a fixed **8-element table of rodata string addresses** (`0x8001097C`, `0x80010970`, ...) -- an array, so the decay is tautologically non-null | `asm/data/5DDFC.data.s:121-130` |
+| `CD_intstr` | a fixed **8-element table of rodata string addresses** (`0x8001097C`, `0x80010970`, ...) -- an array, so the decay is tautologically non-null | `asm/data/5DDFC.data.s:121-130` |
 | `D_8006D8F8` | **one zero word** that the sibling `cb_read` stores `VSync(-1)`'s return into (`lui`/`addiu`/`sw $v0`) -- an `s32` timestamp | `asm/nonmatchings/libcd_bios/cb_read.s:49-51` |
 
 A pointer global would be a word holding an address; this one holds a frame
@@ -202,9 +202,9 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
   different string (`"CD_datasync"`, `D_80010AE0`).
 - On timeout, prints `"CD timeout: "` then `"%s:(%s) Sync=%s, Ready=%s\n"`
   (`D_80010994`, confirmed 4-`%s` format via `asm/data/FD8.rodata.s`) with
-  args `(D_8008B3EC, D_8006D620[D_6006D61D], D_8006D6A0[D_8006D8D8[0]],
-  D_8006D6A0[D_8006D8D8[1]])`, calls `CD_flush()`, and returns -1.
-  **This means `D_8006D620`/`D_8006D6A0` are STRING-POINTER tables (each
+  args `(D_8008B3EC, CD_comstr[D_6006D61D], CD_intstr[D_8006D8D8[0]],
+  CD_intstr[D_8006D8D8[1]])`, calls `CD_flush()`, and returns -1.
+  **This means `CD_comstr`/`CD_intstr` are STRING-POINTER tables (each
   element is a `char *`, stored as `s32`), not raw values — worth carrying
   forward for whoever next touches `CD_datasync`, see the anomaly note
   below.**
@@ -212,8 +212,8 @@ button/callback dispatch loop, copy 8 bytes, then conditionally chain to
   `(s32)(u16)D_8006C272`, still `INCLUDE_ASM` in `asm/psyq_GsLinkObject4.s`
   — declared here as `extern s32 func_80024E64(void);`); if nonzero, saves
   `*D_8006D8C0 & 3`, runs the same button-dispatch loop as
-  `callback`/`CD_datasync` (bit 4 → `D_8006D600(D_8006D8D8[1],
-  D_8008B3D4)`, bit 2 → `D_8006D5FC(D_8006D8D8[0], D_8008B3CC)`, until
+  `callback`/`CD_datasync` (bit 4 → `CD_cbready(D_8006D8D8[1],
+  D_8008B3D4)`, bit 2 → `CD_cbsync(D_8006D8D8[0], D_8008B3CC)`, until
   `getintr()` returns 0), then restores the saved status byte.
 - Copies 8 bytes from `D_8008B3D4` into `*(u8 *)arg1` — but ONLY if `arg1 !=
   0` (a null-destination guard retail has that is easy to miss reading the
@@ -259,7 +259,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
     s32 result;
 
     now = func_80025900(-1);
-    p6A0 = D_8006D6A0;
+    p6A0 = CD_intstr;
     p8D8 = D_8006D8D8;
     p8D9 = &D_8006D8D8[1];
     pF8 = &D_8006D8F8;
@@ -284,7 +284,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
         idx0 = p8D8[0];
         idx1 = p8D9[0];
         __asm__("");
-        func_80012C20(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
+        func_80012C20(D_80010994, D_8008B3EC, CD_comstr[CD_com],
                       p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
@@ -304,11 +304,11 @@ s32 CD_readsync(s32 arg0, s32 arg1)
                 if (flags == 0) {
                     break;
                 }
-                if ((flags & 4) && D_8006D600 != 0) {
-                    ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
+                if ((flags & 4) && CD_cbready != 0) {
+                    ((void (*)(s32, u8 *))CD_cbready)(p8D9[0], D_8008B3D4);
                 }
-                if ((flags & 2) && D_8006D5FC != 0) {
-                    ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
+                if ((flags & 2) && CD_cbsync != 0) {
+                    ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);
                 }
             }
             *D_8006D8C0 = status;
@@ -415,7 +415,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
    $a0,$a0,2`), and reuses that shifted value ~6 instructions later as the
    address for `p6A0[p8D8[0]]`'s dereference. Every C form tried here
    (direct `p6A0[p8D8[0]]` inline, and hoisting `idx0 = p8D8[0];` into a
-   named local used at both the outer `D_8006D620` index computation and
+   named local used at both the outer `CD_comstr` index computation and
    the `p6A0[idx0]` access) instead RE-LOADS the byte from `$s3`+0 a
    second time at the point of the `p6A0[idx0]` access, rather than
    reusing a value already sitting in a register. **A bare `__asm__("")`
@@ -439,13 +439,13 @@ one of this pass's assigned targets) but worth flagging since it could
 mislead whoever picks that stall back up: the report's preserved body has
 
 ```c
-func_80012C20(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D], p6A0[p8D8[0]]);
+func_80012C20(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[CD_com], p6A0[p8D8[0]]);
 ```
 
 but `asm/nonmatchings/libcd_bios/CD_datasync.s` (lines ~50-70) shows the
 EXACT same instruction shape as this function's own diagnostic block: `a1 =
-D_8008B3EC` (not `p8D8[0]`), `a2 = D_6006D620[D_8006D61D]`, `a3 =
-D_8006D6A0[D_8006D8D8[0]]`, stack-arg = `D_8006D6A0[D_8006D8D8[1]]` —
+D_8008B3EC` (not `p8D8[0]`), `a2 = D_6006D620[CD_com]`, `a3 =
+CD_intstr[D_8006D8D8[0]]`, stack-arg = `CD_intstr[D_8006D8D8[1]]` —
 confirmed by reading the raw `.s` directly and cross-checking against this
 function's own byte-identical-shaped block. `D_80010994`'s format string
 (`"%s:(%s) Sync=%s, Ready=%s\n"`, four `%s`) also only makes sense with
@@ -667,7 +667,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
     s32 result;
 
     now = VSync(-1);
-    p6A0 = D_8006D6A0;
+    p6A0 = CD_intstr;
     p8D8 = D_8006D8D8;
     p8D9 = &D_8006D8D8[1];
     pF8 = &D_8006D8F8;
@@ -697,7 +697,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
          * a plain `D_8008B3EC` reference here compiles FOLDED instead.
          * See this report's round-36 entry. */
         pEC = &D_8008B3EC;
-        printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
+        printf(D_80010994, *pEC, CD_comstr[CD_com],
                p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
@@ -717,11 +717,11 @@ s32 CD_readsync(s32 arg0, s32 arg1)
                 if (flags == 0) {
                     break;
                 }
-                if ((flags & 4) && D_8006D600 != 0) {
-                    ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
+                if ((flags & 4) && CD_cbready != 0) {
+                    ((void (*)(s32, u8 *))CD_cbready)(p8D9[0], D_8008B3D4);
                 }
-                if ((flags & 2) && D_8006D5FC != 0) {
-                    ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
+                if ((flags & 2) && CD_cbsync != 0) {
+                    ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);
                 }
             }
             *D_8006D8C0 = status;
@@ -891,7 +891,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
     s32 result;
 
     now = VSync(-1);
-    p6A0 = D_8006D6A0;
+    p6A0 = CD_intstr;
     p8D8 = D_8006D8D8;
     p8D9 = &D_8006D8D8[1];
     pF8 = &D_8006D8F8;
@@ -920,7 +920,7 @@ s32 CD_readsync(s32 arg0, s32 arg1)
          * unfolded lui/addiu addressing retail uses for this argument;
          * a plain `D_8008B3EC` reference here compiles FOLDED instead. */
         pEC = &D_8008B3EC;
-        printf(D_80010994, *pEC, D_8006D620[D_8006D61D],
+        printf(D_80010994, *pEC, CD_comstr[CD_com],
                p6A0[idx0], p6A0[idx1]);
         CD_flush();
         result = -1;
@@ -940,11 +940,11 @@ s32 CD_readsync(s32 arg0, s32 arg1)
                 if (flags == 0) {
                     break;
                 }
-                if ((flags & 4) && D_8006D600 != 0) {
-                    ((void (*)(s32, u8 *))D_8006D600)(p8D9[0], D_8008B3D4);
+                if ((flags & 4) && CD_cbready != 0) {
+                    ((void (*)(s32, u8 *))CD_cbready)(p8D9[0], D_8008B3D4);
                 }
-                if ((flags & 2) && D_8006D5FC != 0) {
-                    ((void (*)(s32, u8 *))D_8006D5FC)(p8D8[0], D_8008B3CC);
+                if ((flags & 2) && CD_cbsync != 0) {
+                    ((void (*)(s32, u8 *))CD_cbsync)(p8D8[0], D_8008B3CC);
                 }
             }
             /* permuter-found: forcing p6A0/pF8 to be read here (both arms
@@ -992,7 +992,7 @@ cannot score this function because its symbol is absolute, so the evidence is
 `objdump -d -r` of `build/src/libcd_bios.c.o` with and without it): retail
 issues `lbu a0,0(s3)` and `lbu v0,1(s3)` (the two `p8D8` bytes) directly after
 the `puts` call; without the barrier the `p8D8[0]` load sinks below the
-`D_8008B3EC` and `D_8006D61D` loads for the `printf` arguments, and the index
+`D_8008B3EC` and `CD_com` loads for the `printf` arguments, and the index
 arithmetic reshuffles around it. Instruction order.
 
 ## History (moved from src/libcd_bios.c, comments pass)

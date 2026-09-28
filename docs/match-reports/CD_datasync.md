@@ -9,8 +9,8 @@
 Polls `func_80025900(-1)` against a deadline (`D_8008B3E4 = now + 0x1E0`) and
 a retry counter (`D_8008B3E8`, capped at `0x1E0000`) in a loop; on
 timeout/overflow it prints a diagnostic (`func_80025AE4` + `func_80012C20`
-with four values pulled from `D_8006D8D8[0..1]`, `D_8006D6A0[]` and
-`D_8006D620[D_8006D61D]`), calls `CD_flush()`, and returns -1. On
+with four values pulled from `D_8006D8D8[0..1]`, `CD_intstr[]` and
+`CD_comstr[CD_com]`), calls `CD_flush()`, and returns -1. On
 success it checks a hardware status bit through `D_8006D934`; if clear it
 returns 0, if set and `arg0 == 0` it loops again, otherwise returns 1.
 
@@ -27,9 +27,9 @@ s32 CD_datasync(s32 arg0)
     u8 *p8D8;
     s32 *p6A0;
 
-    p620 = D_8006D620;
+    p620 = CD_comstr;
     p8D8 = D_8006D8D8;
-    p6A0 = D_8006D6A0;
+    p6A0 = CD_intstr;
 
     D_8008B3E4 = VSync(-1) + 0x1E0;
     D_8008B3E8 = 0;
@@ -49,7 +49,7 @@ s32 CD_datasync(s32 arg0)
         if (!ok) {
             puts(D_80010984);
             printf(D_80010994, p8D8[0], p6A0[p8D8[1]],
-                          p620[D_8006D61D], p6A0[p8D8[0]]);
+                          p620[CD_com], p6A0[p8D8[0]]);
             CD_flush();
             return -1;
         }
@@ -69,18 +69,18 @@ s32 CD_datasync(s32 arg0)
 
 **This is the SAME "loop-invariant address hoisting" class as
 `callback`, but bigger: retail hoists THREE addresses
-(`&D_8006D620`, `&D_8006D8D8`, `&D_8006D6A0`) into `$s3`/`$s1`/`$s0`
+(`&CD_comstr`, `&D_8006D8D8`, `&CD_intstr`) into `$s3`/`$s1`/`$s0`
 respectively, computed once before the retry loop.** Unlike
 `callback`'s single stubborn case, a genuine `for (;;)` loop
 (replacing an earlier `goto`-based attempt that scored much worse -- see
 axis note below) DOES let GCC hoist these correctly when the addresses are
-assigned to local pointer variables (`s32 *p620 = D_8006D620;` etc.)
+assigned to local pointer variables (`s32 *p620 = CD_comstr;` etc.)
 declared before the loop. Length converged exactly (364/364 bytes) with
 this shape, which rules out a structural/control-flow mismatch.
 
 **What's left is register NUMBERING, not hoisting-or-not**: retail assigns
-`$s3` to `D_8006D620`'s address, `$s1` to `D_8006D8D8`'s, `$s0` to
-`D_8006D6A0`'s (in that specific, non-sequential order); this attempt's
+`$s3` to `CD_comstr`'s address, `$s1` to `D_8006D8D8`'s, `$s0` to
+`CD_intstr`'s (in that specific, non-sequential order); this attempt's
 build assigned different registers to the same three values (confirmed via
 `objdump` -- the `sw $sN` prologue and the `lui $sN` initializations are
 present for all three like retail, but numbered differently), which
@@ -143,13 +143,13 @@ build rather than swapping all three at once.
 **Moving the three pointer assignments (`p620`/`p8D8`/`p6A0`) to AFTER
 the initial `func_80025900(-1)` call (matching retail's own instruction
 order exactly -- retail interleaves the call with the pointer setup,
-computing `D_8006D620`'s address before the call and the other two
-after) improved `D_8006D620`'s mapping to the correct `$s3` immediately**
+computing `CD_comstr`'s address before the call and the other two
+after) improved `CD_comstr`'s mapping to the correct `$s3` immediately**
 (35 -> 43/91). **Reordering just the `p6A0`/`p8D8` assignment statements
 (not their declarations -- declaration order alone was retried and,
 confirming the original report, made no difference) then fixed BOTH
 remaining pointers to their correct registers** (43 -> 45/91,
-`$s1`=`D_8006D8D8`, `$s0`=`D_8006D6A0`, matching retail exactly). The
+`$s1`=`D_8006D8D8`, `$s0`=`CD_intstr`, matching retail exactly). The
 whole prologue and all three hoisted-pointer initializations are now
 byte-identical to retail; verified with `objdump`, still 91 real
 instructions, zero drift.
@@ -159,8 +159,8 @@ instructions, zero drift.
 /* stalesyms --fix 2026-09-22: func_80025900 -> VSync -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
 /* the fix, relative to the original best-C body: */
     D_8008B3E4 = VSync(-1) + 0x1E0;   /* call FIRST */
-    p620 = D_8006D620;                         /* THEN the three pointers, */
-    p6A0 = D_8006D6A0;                         /* in THIS specific order   */
+    p620 = CD_comstr;                         /* THEN the three pointers, */
+    p6A0 = CD_intstr;                         /* in THIS specific order   */
     p8D8 = D_8006D8D8;                         /* (not declaration order)  */
     D_8008B3E8 = 0;
     D_8008B3EC = (s32)D_80010AE0;
@@ -296,7 +296,7 @@ unit siblings reverted.
 
 `CD_readsync.md` (this same unit) recorded an "anomaly spotted in passing":
 this report's diagnostic call, `func_80012C20(D_80010994, p8D8[0],
-p6A0[p8D8[1]], p620[D_8006D61D], p6A0[p8D8[0]])`, looked structurally wrong
+p6A0[p8D8[1]], p620[CD_com], p6A0[p8D8[0]])`, looked structurally wrong
 compared to `CD_readsync`'s own byte-verified analog of the same block
 (which uses `D_8008B3EC` -- not `p8D8[0]` -- as the first `%s` argument).
 **Tried the direct fix first** (swap the first argument to `D_8008B3EC`,
@@ -327,7 +327,7 @@ iterations, best found **1605** (five successive improvements: 1895, 1770,
 this same round's `cb_read` experience that a lower permuter score is a
 LEAD, not a result). The winning mutation is a single, narrow change: the
 diagnostic `printf` call's last argument becomes an assignment expression,
-`printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D], ok =
+`printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[CD_com], ok =
 p6A0[p8D8[0]])`, reusing the ALREADY-LIVE `ok` flag variable as a throwaway
 sink for the same value that was already being computed there (`ok` is
 reassigned again on the next loop iteration before its old value is ever
@@ -379,8 +379,8 @@ s32 CD_datasync(s32 arg0)
     s32 *p6A0;
 
     D_8008B3E4 = VSync(-1) + 0x1E0;
-    p620 = D_8006D620;
-    p6A0 = D_8006D6A0;
+    p620 = CD_comstr;
+    p6A0 = CD_intstr;
     p8D8 = D_8006D8D8;
     D_8008B3E8 = 0;
     D_8008B3EC = (s32)D_80010AE0;
@@ -402,7 +402,7 @@ s32 CD_datasync(s32 arg0)
              * the register target for this last argument's value -- a fresh
              * local here compiles worse (45/91 vs 49/91); see this report's
              * round-36 entry. */
-            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[D_8006D61D],
+            printf(D_80010994, p8D8[0], p6A0[p8D8[1]], p620[CD_com],
                    ok = p6A0[p8D8[0]]);
             CD_flush();
             return -1;
@@ -484,7 +484,7 @@ lead in EITHER direction). Two forms tested at the 995 level:
    branch trick, applied to the function's own final `return 1;`) --
    **regressed to 39/91 with 302094 bytes of real drift** (confirmed via
    `funcdiff.py`'s own outside-range warning, not just the in-range score).
-   Reverted immediately. Also tried the analogous trick on `D_8006D620`
+   Reverted immediately. Also tried the analogous trick on `CD_comstr`
    around the `D_8008B3E8 = D_8008B3E8 + 1;` statement (a different
    candidate from the same 995-scoring diff) and on `arg0` around the
    `continue;` statement -- **both independently regressed with real drift**
@@ -544,7 +544,7 @@ pairing") but then declines to spend the budget on them. Spent it here:
    does not affect this class" finding from round 19.
 3. **One genuinely new axis**: hoisting the four diagnostic-call values
    into locals evaluated in a fixed order before the call (`t0 = p8D8[0];
-   t1 = p6A0[p8D8[1]]; t2 = p620[D_8006D61D]; printf(..., t0, t1, t2, ok =
+   t1 = p6A0[p8D8[1]]; t2 = p620[CD_com]; printf(..., t0, t1, t2, ok =
    p6A0[p8D8[0]]);`) -- **regressed with drift** (294938 bytes
    outside-range). Reverted.
 
@@ -615,7 +615,7 @@ are reviewed here explicitly:
 
 - **The control-flow/hoisting structure is hand-derived**: the `for (;;)`
   loop and the three local pointers (`p620`/`p6A0`/`p8D8`) hoisting
-  `D_8006D620`/`D_8006D6A0`/`D_8006D8D8` were arrived at through rounds
+  `CD_comstr`/`CD_intstr`/`D_8006D8D8` were arrived at through rounds
   0/19/20/39/41's manual reordering experiments (declaration order,
   assignment-statement order, call interleaving), not the permuter.
 - **The diagnostic call's `ok = p6A0[p8D8[0]]` sink IS a permuter find**
@@ -658,3 +658,12 @@ The comment above this function's NON_MATCHING body in src/libcd_bios.c read:
 > CD_datasync.md). Structure is hand-derived; the diagnostic call's
 > `ok =` sink is a permuter find (round 36), reviewed as a semantically
 > inert dead-store reuse and oracle-confirmed.
+
+## History (moved from src/psyq/libcd_bios.c, round 103)
+
+The NON_MATCHING line above the preserved body read:
+
+> NON_MATCHING: 49/91 words, length exact. Residue: register identity
+> (the three hoisted pointers p620/p6A0/p8D8 land in different
+> callee-saved registers than retail's $s3/$s1/$s0) (docs/match-reports/
+> CD_datasync.md).

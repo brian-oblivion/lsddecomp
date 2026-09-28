@@ -17,7 +17,7 @@ Confirmed by two already-matched call sites: `src/psyq/libcd_bios.c:110` (`retur
 Waits for CD-ROM "Sync" status (`D_8008B3EC` is set to `D_80010A0C`, the string `"CD_sync"`). A `do`/`while` loop:
 
 1. Checks a deadline (`D_8008B3E4`, set to `func_80025900(-1) + 0x1E0` before the loop) and a spin counter (`D_8008B3E8`) against a `0x1E0000` threshold. On either timeout condition it prints `"CD timeout: "` + a formatted diagnostic (`"%s:(%s) Sync=%s, Ready=%s\n"`), calls `CD_flush()` (a reset, matched in `libcd_bios.c`), and returns `-1`.
-2. Otherwise, if `func_80024E64()` (a busy/status getter) is nonzero, drains a message-flush loop (`getintr()`, still `INCLUDE_ASM` in `libcd_bios.c` but blocker-clean) that dispatches through two global callback pointers, `D_8006D600` and `D_8006D5FC`.
+2. Otherwise, if `func_80024E64()` (a busy/status getter) is nonzero, drains a message-flush loop (`getintr()`, still `INCLUDE_ASM` in `libcd_bios.c` but blocker-clean) that dispatches through two global callback pointers, `CD_cbready` and `CD_cbsync`.
 3. Reads the CD-ROM's driver state byte `D_8006D8D8[0]`. If it is `2` or `5`, normalizes it to `2`, optionally copies an 8-byte snapshot (`D_8008B3CC`) into `arg1`, and returns the ORIGINAL state value.
 4. Otherwise, loops again if `arg0 == 0` (blocking wait), or returns `0` immediately (single non-blocking poll) if `arg0 != 0`.
 
@@ -36,17 +36,17 @@ This is the exact class documented in `docs/DECOMPILATION_LEARNINGS.md` under **
 Two block-order fixes DID matter and are already folded into the body below (documented here so the next attempt doesn't re-discover them):
 
 1. **The timeout/success join must be `goto`-based with the SUCCESS case placed AFTER the timeout/print code, not inlined at the `if`-body.** Writing `if (counter <= LIMIT) { result = 0; goto skip_timeout; }` puts `result=0` in the branch's own delay slot (too short). Retail's shape is `if (counter <= LIMIT) goto success; timeout: ...print...; result = -1; goto skip_timeout; success: result = 0; skip_timeout: if (result != 0) return result;` -- diagnostic block FIRST (as the fallthrough), success as a trailing landing pad reached by a forward branch. This is the same lever documented for `CD_readsync` (round 25, "Block-order / shared-join fallthrough", 61/174 -> 153/174 in one fix). Applying it here took this function from 160/161 (1 word SHORT) to 162/161 (1 word LONG) by fixing an unrelated 2-word gap in this exact join.
-2. **`table[state[1]]` inside the printf must be indexed directly off the `state` base pointer (`state[1]`), not through a second cached `state+1` pointer** (`state1`, which IS needed, but ONLY for the flush-loop's `D_8006D600` callback argument). Retail computes `state+1` once (register `s4`) and uses it for exactly one access; the printf's second `%s` argument is `lbu $v0, 1($s2)` -- direct offset off the SAME base used for `state[0]`, not off `s4`. Using `state1[0]` for both compiles the printf's operand fetch through the wrong register and desyncs the whole block's scheduling.
+2. **`table[state[1]]` inside the printf must be indexed directly off the `state` base pointer (`state[1]`), not through a second cached `state+1` pointer** (`state1`, which IS needed, but ONLY for the flush-loop's `CD_cbready` callback argument). Retail computes `state+1` once (register `s4`) and uses it for exactly one access; the printf's second `%s` argument is `lbu $v0, 1($s2)` -- direct offset off the SAME base used for `state[0]`, not off `s4`. Using `state1[0]` for both compiles the printf's operand fetch through the wrong register and desyncs the whole block's scheduling.
 
 ## Body, as reached (162/161 words, near-miss)
 
 ```c
 /* stalesyms --fix 2026-09-22: func_80012C20 -> printf, func_80024E64 -> CheckCallback, func_80025900 -> VSync, func_80025AE4 -> puts -- names retrofitted so this body links as written; the residue it recorded is unverified until rebuilt. */
-extern s32 D_8006D608;                 /* verbosity level; libcd_bios.c's func_80028CE0 accessor */
-extern u8 D_8006D61C;
-extern u8 D_8006D61D;                  /* selector into D_8006D620 for the "name" of the current wait */
-extern const char *D_8006D620[];       /* string table, selector 0..0x1B -- shared reading, libcd_bios.c */
-extern const char *D_8006D6A0[];       /* string table, selector 0..0x6 -- shared reading, libcd_bios.c */
+extern s32 CD_debug;                 /* verbosity level; libcd_bios.c's func_80028CE0 accessor */
+extern u8 CD_mode;
+extern u8 CD_com;                  /* selector into CD_comstr for the "name" of the current wait */
+extern const char *CD_comstr[];       /* string table, selector 0..0x1B -- shared reading, libcd_bios.c */
+extern const char *CD_intstr[];       /* string table, selector 0..0x6 -- shared reading, libcd_bios.c */
 
 extern volatile u8 *D_8006D8C0;
 extern u8 D_8006D8D8[3];
@@ -59,8 +59,8 @@ extern u8 D_8008B3D4[];                /* 8-byte record, "Ready" wait's snapshot
 
 /* This unit's own local view: called through, not just stored-and-compared
  * like libcd_bios.c/_g.c's plain-s32 reading of the same globals. */
-extern void (*D_8006D600)(s32 arg0, void *arg1);
-extern void (*D_8006D5FC)(s32 arg0, void *arg1);
+extern void (*CD_cbready)(s32 arg0, void *arg1);
+extern void (*CD_cbsync)(s32 arg0, void *arg1);
 
 extern s32 VSync(s32 arg0);                             /* asm/psyq_15d04.s */
 extern void puts(const char *arg0);                    /* asm/psyq_15d04.s */
@@ -88,7 +88,7 @@ s32 CD_sync(s32 arg0, s32 arg1)
     s32 i;
 
     D_8008B3E4 = VSync(-1) + 0x1E0;
-    table = D_8006D6A0;
+    table = CD_intstr;
     state = D_8006D8D8;
     state1 = state + 1;
     D_8008B3E8 = 0;
@@ -105,7 +105,7 @@ s32 CD_sync(s32 arg0, s32 arg1)
         }
 timeout:
         puts(D_80010984);
-        printf(D_80010994, D_8008B3EC, D_8006D620[D_8006D61D],
+        printf(D_80010994, D_8008B3EC, CD_comstr[CD_com],
                       table[state[0]], table[state[1]]);
         CD_flush();
         result = -1;
@@ -125,13 +125,13 @@ skip_timeout:
                     break;
                 }
                 if (flags & 4) {
-                    if (D_8006D600 != NULL) {
-                        D_8006D600(*state1, D_8008B3D4);
+                    if (CD_cbready != NULL) {
+                        CD_cbready(*state1, D_8008B3D4);
                     }
                 }
                 if (flags & 2) {
-                    if (D_8006D5FC != NULL) {
-                        D_8006D5FC(*state, D_8008B3CC);
+                    if (CD_cbsync != NULL) {
+                        CD_cbsync(*state, D_8008B3CC);
                     }
                 }
             }
@@ -168,7 +168,7 @@ ready:
 - Screened blocker-clean at carve time (round 26): no `gp_rel`, no forward `mflo`/`mfhi`-before-`mult`/`div`, no `jr $t2` trampoline, no `jtbl_`.
 - `D_8008B3E4`/`D_8008B3E8`/`D_8008B3EC` are a poll-deadline/counter/message-pointer trio shared with the unit's other two functions (`CD_ready`, `CD_cw`) -- all three run the identical timeout-and-print idiom against a different `D_8008B3EC` message.
 - `D_8006D8D8` is a 3-byte driver-state array (bytes `[0]`, `[1]`, `[2]` each independently meaningful -- `CD_ready` reads all three, this function only `[0]`/`[1]`).
-- `getintr`'s return value is a bitmask: bit `0x4` gates a call through `D_8006D600(state[1], D_8008B3D4)`, bit `0x2` gates a call through `D_8006D5FC(state[0], D_8008B3CC)`. `CD_readm` (`libcd_bios.c`, matched) independently documents `D_8006D600` being assigned `cb_read` as a callback, consistent with this reading.
+- `getintr`'s return value is a bitmask: bit `0x4` gates a call through `CD_cbready(state[1], D_8008B3D4)`, bit `0x2` gates a call through `CD_cbsync(state[0], D_8008B3CC)`. `CD_readm` (`libcd_bios.c`, matched) independently documents `CD_cbready` being assigned `cb_read` as a callback, consistent with this reading.
 - The format string `D_80010994` is confirmed via `asm/data/FD8.rodata.s`: `"%s:(%s) Sync=%s, Ready=%s\n"` -- 4 `%s`, matching the 4 non-format arguments in the `func_80012C20` call.
 
 ### Proposed learning
@@ -238,7 +238,7 @@ saved (`output-1250-1` through `output-2143-1`); best score **1250**
 **Translated the best candidate (1250) and verified through the real
 oracle -- the result is genuinely mixed, not a clean win, and was NOT
 adopted.** The candidate combines two changes: (1) hoisting
-`D_8006D620[D_8006D61D]` into a named local before the timeout `printf`
+`CD_comstr[CD_com]` into a named local before the timeout `printf`
 call, and (2) routing the literal `2` through an assignment embedded in
 the `st == 2` comparison itself (`if (st == (new_var2 = 2))`) rather than
 declaring it earlier -- a different POSITION for the same

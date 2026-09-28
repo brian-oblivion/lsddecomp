@@ -32,11 +32,11 @@ of three ALREADY-MATCHED siblings in this unit, plus one new tail:
 1. Two debug prints (`func_80025AE4(D_80010A94)`,
    `func_80012C20(D_80010AA0, D_8006D90C)`).
 2. The zero-loop + thread-start sequence from `CD_initintr`, prefixed with
-   `D_8006D61D = 0; D_8006D61C = 0;`.
+   `CD_com = 0; CD_mode = 0;`.
 3. The link-wait loop + "close port" tail from `CD_flush`, followed by
    one extra `CD_cw(1, 0, 0, 0)` call this function adds on top.
-4. A conditional `CD_cw(1, 0, 0, 0)` guarded by `D_8006D60C & 0x10`.
-5. The ENTIRE body of `CD_shell` (the `D_8006D904 < D_8006D614`
+4. A conditional `CD_cw(1, 0, 0, 0)` guarded by `CD_status & 0x10`.
+5. The ENTIRE body of `CD_shell` (the `D_8006D904 < CD_nopen`
    catch-up block), byte-for-byte.
 6. A new tail: two `CD_cw` retry checks (codes `0xA`, `0xC`, each
    returning -1 on failure) then
@@ -58,12 +58,12 @@ s32 CD_init(void)
     puts(D_80010A94);
     printf(D_80010AA0, D_8006D90C);
 
-    D_8006D61D = 0;
-    D_8006D61C = 0;
-    D_8006D600 = 0;
-    D_8006D5FC = 0;
-    D_8006D610 = 0;
-    D_8006D60C = 0;
+    CD_com = 0;
+    CD_mode = 0;
+    CD_cbready = 0;
+    CD_cbsync = 0;
+    CD_status1 = 0;
+    CD_status = 0;
     p = &D_8006D8DC;
     for (i = 9; i != -1; i--) {
         *p = 0;
@@ -81,7 +81,7 @@ s32 CD_init(void)
 
     D_8006D8DA = 0;
     q = &D_8006D8D9;
-    D_8006D61C = 0;
+    CD_mode = 0;
     *q = D_8006D8DA;
     __asm__("");
     D_8006D8D8[0] = 2;
@@ -91,15 +91,15 @@ s32 CD_init(void)
     CD_cw(1, 0, 0, 0);
 
     counter = 0;
-    if (D_8006D60C & 0x10) {
+    if (CD_status & 0x10) {
         CD_cw(1, 0, 0, 0);
     }
 
-    if (D_8006D904 < D_8006D614) {
-        saved = D_8006D5FC;
-        D_8006D5FC = 0;
+    if (D_8006D904 < CD_nopen) {
+        saved = CD_cbsync;
+        CD_cbsync = 0;
 
-        while (D_8006D60C & 0x10) {
+        while (CD_status & 0x10) {
             if ((u8)counter == 0) {
                 puts(D_80010A40);
             }
@@ -112,8 +112,8 @@ s32 CD_init(void)
             puts(D_80010A50);
         }
 
-        D_8006D5FC = saved;
-        D_8006D904 = D_8006D614;
+        CD_cbsync = saved;
+        D_8006D904 = CD_nopen;
     }
 
     if (CD_cw(0xA, 0, 0, 0) == 0) {
@@ -140,7 +140,7 @@ bodies -- consistent with the project's established finding that this GCC
 does not auto-inline.
 
 `counter`'s declaration was left uninitialized at the top and assigned
-`counter = 0;` immediately before the `D_8006D60C & 0x10` check that follows
+`counter = 0;` immediately before the `CD_status & 0x10` check that follows
 the port-close tail -- NOT at function entry -- because retail's `move
 $s0, $zero` sits at that exact point (in the `beqz`'s delay slot), the same
 lesson as `CD_shell`'s report but applied at a different point in a
@@ -166,7 +166,7 @@ SOURCE literally mentioning the constant again at that point, not of an
 optimizer choice.
 
 This function's second, structurally identical
-`CD_cw(1, 0, 0, 0)` call (inside `if (D_8006D60C & 0x10)`) does NOT
+`CD_cw(1, 0, 0, 0)` call (inside `if (CD_status & 0x10)`) does NOT
 show this behavior -- its args materialize normally, right before its own
 call, exactly like ordinary C compiles. So the anomaly is specific to the
 FIRST call, immediately following the loop.
@@ -518,12 +518,12 @@ s32 CD_init(void)
     puts(D_80010A94);
     printf(D_80010AA0, D_8006D90C);
 
-    D_8006D61D = 0;
-    D_8006D61C = 0;
-    D_8006D600 = 0;
-    D_8006D5FC = 0;
-    D_8006D610 = 0;
-    D_8006D60C = 0;
+    CD_com = 0;
+    CD_mode = 0;
+    CD_cbready = 0;
+    CD_cbsync = 0;
+    CD_status1 = 0;
+    CD_status = 0;
     p = &D_8006D8DC;
     for (i = 9; i != -1; i--) {
         *p = 0;
@@ -543,7 +543,7 @@ s32 CD_init(void)
 
     D_8006D8DA = 0;
     q = &D_8006D8D9;
-    D_8006D61C = 0;
+    CD_mode = 0;
     *q = D_8006D8DA;
     __asm__("");
     D_8006D8D8[0] = 2;
@@ -552,15 +552,15 @@ s32 CD_init(void)
     *D_8006D8D0 = 0x1325;
 
     counter = 0;
-    if (D_8006D60C & 0x10) {
+    if (CD_status & 0x10) {
         CD_cw(1, 0, 0, 0);
     }
 
-    if (D_8006D904 < D_8006D614) {
-        saved = D_8006D5FC;
-        D_8006D5FC = 0;
+    if (D_8006D904 < CD_nopen) {
+        saved = CD_cbsync;
+        CD_cbsync = 0;
 
-        while (D_8006D60C & 0x10) {
+        while (CD_status & 0x10) {
             if ((u8)counter == 0) {
                 puts(D_80010A40);
             }
@@ -573,8 +573,8 @@ s32 CD_init(void)
             puts(D_80010A50);
         }
 
-        D_8006D5FC = saved;
-        D_8006D904 = D_8006D614;
+        CD_cbsync = saved;
+        D_8006D904 = CD_nopen;
     }
 
     if (CD_cw(0xA, 0, 0, 0) != 0) {

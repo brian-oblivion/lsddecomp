@@ -13,19 +13,11 @@
  * 3.5 it is the last function of vmanager.o. 3.6's text is 0x138 bytes
  * against retail's 0x20C, so it cannot be linked.
  *
- * This file's declarations stay local, except Sony's _svm_voice, whose one
- * type is include/SvmData.h.
+ * Its declarations are include/libsnd_internal.h's, except _svm_sreg,
+ * which it reads through its own spelling.
  */
 #include "common.h"
-#include "SvmData.h"
-
-/* Written as a side effect, then re-read from the global a few
- * instructions later: it needs volatile, or cc1 proves the re-read
- * redundant and drops it. */
-extern volatile u16 D_8008EA26;
-
-/* "Loop bound / threshold" -- libsnd_vmanager.c's own comment on this symbol. */
-extern u8 spuVmMaxVoice;
+#include "libsnd_internal.h"
 
 /*
  * _svm_sreg as this function reads it: a pointer variable (loaded with `lw`,
@@ -40,24 +32,10 @@ extern u8 spuVmMaxVoice;
  */
 extern volatile u16 *_svm_sreg;
 
-/* PS1 SPU voice key-on/off pair, split low/high across two 16-bit halves
- * (voices 0-15 / 16-31) -- _svm_okof1/64 are the hardware-mirrored "just
- * keyed on" mask, _svm_okon1/22C a software mask this function clears the
- * same bit from (a "no longer fading out" bookkeeping flag). */
-extern u16 _svm_okof1;
-extern u16 _svm_okof2;
-extern u16 _svm_okon1;
-extern u16 _svm_okon2;
-
-/* SsUtAllKeyOff's near-miss body, kept for reading: length exact, with a
- * register-identity residue on bitLo/bitHi
- * (docs/match-reports/SsUtAllKeyOff.md). Its load-bearing spellings:
- * _svm_sreg's pointee is volatile; `s16 woff = i * 8` is signed, which gives
- * the sll 19 / sra 15 pair; the loop is a `for`, not a guard plus
- * `for(;;)`; and the tail does three stores off the reloaded index. */
-#if 0
-void SsUtAllKeyOff(void)
-{
+#ifdef NON_MATCHING
+/* NON_MATCHING: length exact, 131 words; a register-identity residue on
+ * bitLo/bitHi (docs/match-reports/SsUtAllKeyOff.md). */
+void SsUtAllKeyOff(s16 mode) {
     s16 i;
     s16 woff;
     u16 bitpos;
@@ -109,5 +87,6 @@ void SsUtAllKeyOff(void)
         _svm_okon2 = _svm_okon2 & ~hw1;
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_ut_ako", SsUtAllKeyOff);
+#endif

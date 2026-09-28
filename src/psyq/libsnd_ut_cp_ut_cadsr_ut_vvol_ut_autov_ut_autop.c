@@ -31,16 +31,7 @@
  */
 
 #include "common.h"
-#include <libsnd.h>
-#include "SvmData.h"
-
-/* libsnd vmanager internals: <libsnd.h> declares none of them. */
-extern s32 SpuVmKeyOn(s32 a0, s16 a1, s16 a2, u16 a3, u16 a4, u16 a5);
-extern s32 SpuVmKeyOff(s32 a0, s16 a1, s16 a2, u16 a3);
-extern s32 SpuVmVSetUp(s16 a0, s16 a1);
-extern s16 SpuVmPBVoice(s16 a0, s32 a1, s16 a2, s16 a3, u16 a4);
-extern void SeAutoVol(s16 a0, s16 a1, s16 a2, s16 a3);
-extern void SeAutoPan(s16 a0, s16 a1, s16 a2, s16 a3);
+#include "libsnd_internal.h"
 
 extern SpuRegs *_svm_sreg;
 

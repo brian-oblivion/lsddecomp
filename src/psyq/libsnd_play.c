@@ -10,9 +10,8 @@
  * the libsnd object that calls it by relocation.
  */
 #include "common.h"
+#include "libsnd_internal.h"
 
-extern s32 SeqPlay(s16 a0, s16 a1); /* arity-ok: the definition's third parameter is never read (docs/match-reports/SeqPlay.md), and its return type is void there */
-
-s32 Snd_play(s16 a0, s16 a1) {
-    return SeqPlay(a0, a1);
+void Snd_play(s16 access, s16 seq) {
+    SeqPlay(access, seq);
 }

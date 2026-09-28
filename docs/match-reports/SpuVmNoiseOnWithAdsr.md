@@ -86,3 +86,30 @@ contrast to SpuVmNoiseOn's hardcoded-parameter variant.
 The arity-ok note on the SpuVmAlloc prototype above SpuVmNoiseOnWithAdsr read:
 
 > arity-ok: the callee (still INCLUDE_ASM, 0x8002CF18) reads NO argument register, but this unit's argument is byte-load-bearing -- retail emits `li a0,0xff` in the delay slot at 0x8002F244
+
+## History (moved from src/psyq/libsnd_vmanager.c, round 103)
+
+The comments above SpuVmNoiseOnWithAdsr's local declarations of
+D_8008EA26 and D_8008EA1B, before both moved to include/libsnd_internal.h:
+
+> /* "Currently selected channel" scratch global: written as a side
+>  * effect, then re-read from the global (not a cached register) a few
+>  * instructions later; this is why the declaration at the top of the file
+>  * is `volatile u16`.  Genuinely needs
+>  * `volatile`: without it, this compiler proves (from the narrow range
+>  * of the values stored here) that the re-read is redundant and elides
+>  * it entirely, which retail's disassembly shows it does NOT do.
+>  * `volatile` alone reproduces retail's separate store/reload exactly
+>  * -- reading it back through `*(u8 *)&D_8008EA26` (a plain, NON-
+>  * volatile-qualified pointer type) still folds to retail's compact
+>  * `lui`+`lbu` two-instruction form; it is specifically a
+>  * VOLATILE-QUALIFIED POINTER TYPE (`volatile u8 *`) that defeats the
+>  * addressing fold, not the underlying object's volatility. */
+> /* Flag byte forced on unconditionally at entry. */
+
+And the note on D_8008EA26 at the top of libsnd_vmanager.c:
+
+> +0x1A: the voice being keyed. volatile u16, the spelling SpuVmInit,
+> SpuVmNoiseOn and SpuVmKeyOff need (the note above SpuVmNoiseOnWithAdsr);
+> SpuVmKeyOnNow's NON_MATCHING body reads it as a plain s16 through a cast
+> (SpuVmKeyOnNow.md: neither scalar nor volatile).

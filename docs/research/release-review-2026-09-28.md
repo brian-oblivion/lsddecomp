@@ -126,7 +126,7 @@ rather than API.
   CD_cbsync D_8006D5FC, CD_cbready ..600, CD_cbread ..604, CD_debug ..608,
   CD_status ..60C, CD_status1 ..610, CD_nopen ..614, CD_pos ..618, CD_mode
   ..61C, CD_com ..61D, CD_comstr ..620, CD_intstr ..6A0.
-- `func_80038E44` (libspu_s_ih.c) is `_SpuInit`; `D_80090368` (libsnd_ssinit.c)
+- `func_80038E44` (libspu_s_ih.c) is `_SpuInit`; `_ss_MarkCallback` (libsnd_ssinit.c)
   is `_ss_MarkCallback` (0x800 bytes); the `_svm_cur` bytes (vmanager:57-75,
   15 `D_` externs) could be one struct view.
 - SpuVm* prototypes disagree across the libsnd files (`SpuVmPBVoice`,
