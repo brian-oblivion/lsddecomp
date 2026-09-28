@@ -20,7 +20,7 @@ class's method table:
    "'unlink' companion of slot10"). Still `INCLUDE_ASM`; its address
    (`0x80057130`) is below this unit/runner's range.
 3. `GetActorMethods()->slot0x50(this)` -- the shared intermediate base class
-   table (`gActorMethods`), same one `TodActor.c`'s `D800878D4Methods` types
+   table (`gActorMethods`), same one `tod_actor.c`'s `D800878D4Methods` types
    for `TodActor` (a DreamSys sibling under that base, per
    `docs/research/class-framework.md`).
 

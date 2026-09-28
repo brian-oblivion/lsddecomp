@@ -6,7 +6,7 @@
 
 Unit: `ObjMStyleActor` (round 17). `BaseObjOMethods::slot14` -- the
 "unlink" companion of `Actor__AddChild` (`slot10`), already named by both
-`TodActor.c` and `dream_sys.h` at the identical offset in sibling classes.
+`tod_actor.c` and `dream_sys.h` at the identical offset in sibling classes.
 
 ## Final source
 

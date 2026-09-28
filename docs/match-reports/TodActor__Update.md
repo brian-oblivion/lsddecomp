@@ -47,7 +47,7 @@ including `$a1`, un-clobbered by anything in between. That is only
 consistent with the call site **never naming a second argument** — not
 "the value happens to survive", but "the C source never asked the compiler
 to track it as live here". Removing `arg1` from both call sites (typing
-`slot108`/`slot04` as taking only `self` in `src/world/TodActor.c`) is what
+`slot108`/`slot04` as taking only `self` in `src/world/tod_actor.c`) is what
 matched: with no reference to `arg1` after the call, GCC never spills it,
 and `$a1` is left holding whatever it already had — which, from the
 *outside*, looks like "forwarded", but which the source never actually
@@ -80,7 +80,7 @@ Round 75 (charlie), track 3.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-Renamed from `TodActor__OnClass6EF50Notify`. Override of +0x098, SceneNode's `update` (the slot SceneNode__OnNotify routes a class-5 FrameClock sender's events to), named for its slot as Entity's override of the same slot (Entity__Update) already is: code 2 runs tick (+0x108), code 4 release. The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`. Any source block above is the pre-unification spelling; the live body in `src/code_55dd4.c` takes the unified types and slot names, byte-identical.
+Renamed from `TodActor__OnClass6EF50Notify`. Override of +0x098, SceneNode's `update` (the slot SceneNode__OnNotify routes a class-5 FrameClock sender's events to), named for its slot as Entity's override of the same slot (Entity__Update) already is: code 2 runs tick (+0x108), code 4 release. The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/tod_actor.h`. Any source block above is the pre-unification spelling; the live body in `src/code_55dd4.c` takes the unified types and slot names, byte-identical.
 
 ## Track 7 (round 99, bravo)
 

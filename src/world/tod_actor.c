@@ -1,5 +1,5 @@
 /*
- * TodActor's methods (include/TodActor.h: an Actor that owns one Actor part
+ * TodActor's methods (include/tod_actor.h: an Actor that owns one Actor part
  * per object of a TOD animation and plays the TOD over them), in ROM order,
  * ending with its getter GetTodActorMethods. The TOD layouts they read (file,
  * frame and packet headers, a TodSet's table of Tods) are this file's, below
@@ -22,7 +22,7 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
-#include "TodActor.h"
+#include "tod_actor.h"
 #include "ModelData.h"
 #include "Tod.h"
 #include "LinkResource.h"
@@ -31,12 +31,12 @@
 #include "bmem_pmgr.h"
 
 /*
- * This file's own readings of what TodActor (include/TodActor.h) reaches
+ * This file's own readings of what TodActor (include/tod_actor.h) reaches
  * that is not TodActor: the ctor's descriptor, onNotify's sender, the TOD
  * format (file, frame and packet headers, packet types and flags, the
  * rotation unit) and a TodSet's table of Tods, plus the unit's own tuning
  * values. The class itself -- object, table, getter, method prototypes -- is
- * include/TodActor.h's; the sound bank is include/VabStreamObj.h's and a
+ * include/tod_actor.h's; the sound bank is include/VabStreamObj.h's and a
  * part's coordinate parameters are Sony's GsCOORD2PARAM.
  */
 

@@ -39,7 +39,7 @@ fail:
 }
 ```
 
-Adds `TodActorDesc` (`src/world/TodActor.c`) for the constructor's `arg1`,
+Adds `TodActorDesc` (`src/world/tod_actor.c`) for the constructor's `arg1`,
 typed only at its `+0x00C` field (a `Unk5CObj *`, borrowed or freshly
 allocated), and retypes the `arg1` parameter all the way from
 `TodActor__TodActor` through `slot_setup5C`/`TodActor__SetupModelData` to here as
@@ -108,7 +108,7 @@ Round 75 (charlie), track 3.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/tod_actor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 6 (round 93, echo)
 

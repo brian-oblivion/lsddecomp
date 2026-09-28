@@ -13,7 +13,7 @@
 
 `TodActorMethods` slot `+0x124`. Reads `self->arg2` (`+0x58`, the
 constructor's stashed third parameter, of an unidentified class — see
-`src/world/TodActor.c`'s new `UnkArg2Obj`/`UnkArg2Methods`, typed only at its
+`src/world/tod_actor.c`'s new `UnkArg2Obj`/`UnkArg2Methods`, typed only at its
 `+0x080` slot since that is all this function needs). If non-NULL, calls
 that object's own vtable slot `+0x080` with **four** arguments: the object
 itself, this function's own second parameter forwarded verbatim, and the
@@ -59,7 +59,7 @@ Round 75 (charlie), track 3.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/tod_actor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 6 (round 93, echo)
 

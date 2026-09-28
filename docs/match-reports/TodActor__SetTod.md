@@ -34,7 +34,7 @@ void TodActor__SetTod(TodActor *self, s32 index)
 ```
 
 This is the first function in the unit to touch `self->unk5C->unk30`, so it
-derives (and adds to `src/world/TodActor.c`) an entirely new chain of
+derives (and adds to `src/world/tod_actor.c`) an entirely new chain of
 minimal types:
 
 - `Unk5CObj` gained a `+0x30` field, `Unk30Obj *unk30`.
@@ -146,7 +146,7 @@ void TodActor__SetTod(TodActor *self, s32 index)
 
 (Types `GroupObj`, `EntryObj2`, `Unk30Obj`, and the `Unk5CObj::unk30` /
 `TodActor::unk7C..unk88` / `TodActorMethods::slot134` fields this body
-depends on are kept live in `src/world/TodActor.c` — they are confirmed
+depends on are kept live in `src/world/tod_actor.c` — they are confirmed
 correct by the byte-identical first 27 words, independent of this stall.)
 
 ### Proposed learning
@@ -234,7 +234,7 @@ void TodActor__SetTod(TodActor *self, s32 index)
 }
 ```
 
-This is now the committed source in `src/world/TodActor.c`, replacing the
+This is now the committed source in `src/world/tod_actor.c`, replacing the
 `INCLUDE_ASM`. No header/type changes were needed beyond what round 14
 already derived (`GroupObj`, `EntryObj2`, `Unk30Obj`, `Unk5CObj::unk30`,
 and the `TodActor`/`TodActorMethods` fields this body reads) --
@@ -268,14 +268,14 @@ Round 75 (charlie), track 3.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/tod_actor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 6 (round 93, echo)
 
 `GroupObj` (a holder with its data pointer at +0x010) is a `Tod`, whose
 FileResource `buffer` is that pointer: TodSet__BuildTods replaces each word of
 its buffer's counted offset table, from +0x8, with the Tod it built there. The
-expression is now `TODSET_TOD(set, i)` (src/world/TodActor.c), and `EntryObj2`,
+expression is now `TODSET_TOD(set, i)` (src/world/tod_actor.c), and `EntryObj2`,
 the TOD data's header with the frame count at +0x4, is `TodHeader`. Same
 address arithmetic, byte-identical.
 
@@ -286,4 +286,4 @@ As TodActor__Tick: `TodHeader.frames` and the `TodSetBuffer` view replace the
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-TodActor.c's `TodHeader` merged into include/Tod.h's `TodFile` (the same TOD file header: 4 unread bytes, frameCount at +0x004, frames at +0x008); TodActor's `todFramePtr` is `void *` so it takes TodFile's `u32` frames and applyTodFrame's `u8 *` result alike. Byte-identical.
+tod_actor.c's `TodHeader` merged into include/Tod.h's `TodFile` (the same TOD file header: 4 unread bytes, frameCount at +0x004, frames at +0x008); TodActor's `todFramePtr` is `void *` so it takes TodFile's `u32` frames and applyTodFrame's `u8 *` result alike. Byte-identical.

@@ -24,7 +24,7 @@ DreamSysBaseMethods *GetActorMethods(void) {
 A plain no-argument getter for the shared intermediate base-class table
 `gActorMethods` -- whole body is `lui`/`addiu`, no `%gp_rel`. Declares this
 unit's own `extern DreamSysBaseMethods gActorMethods;` locally (not in the
-shared header) since `src/world/TodActor.c` already carries an
+shared header) since `src/world/tod_actor.c` already carries an
 INDEPENDENT typed view of the same table (`D800878D4Methods`) for a
 different unit, per the project's multiple-independent-local-views
 convention.

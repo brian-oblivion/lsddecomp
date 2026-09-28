@@ -34,7 +34,7 @@ reading of the shared base) and simultaneously IS `vtable_DreamSys`'s
 implicit base-construction step -- confirmed three ways:
 
 1. `GetActorMethods()` (TodActor's own getter, already declared in
-   `TodActor.c` returning `D800878D4Methods *`) is called here to
+   `tod_actor.c` returning `D800878D4Methods *`) is called here to
    install `self->methods`, i.e. this function is establishing the exact
    table `GetActorMethods` returns.
 2. The functions this unit defines right after this one --
@@ -104,7 +104,7 @@ base's own constructor, not `TodActor`'s: (1) it installs the exact
 table `GetActorMethods()` returns, (2) the functions defined right after it
 in this unit occupy that same table's `+0x010`/`+0x014`/`+0x018` slots and
 are independently named at the identical offsets in two sibling headers'
-own local views (`dream_sys.h`, `TodActor.h`), (3) `TodActor.c`'s real
+own local views (`dream_sys.h`, `tod_actor.h`), (3) `tod_actor.c`'s real
 `TodActor` constructor (`TodActor__TodActor`) calls THIS function
 through `base->ctor(self)` to chain to it first, then immediately
 overwrites `self->methods` with `TodActor`'s own, more specific table --

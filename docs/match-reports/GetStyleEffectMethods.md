@@ -6,7 +6,7 @@
 
 Unit: `ObjMStyleActor` (round 17). A sibling class's own method-table
 getter, analogous to `GetActorMethods`/`GetTodActorMethods` already documented in
-`TodActor.c`.
+`tod_actor.c`.
 
 ## Final source
 

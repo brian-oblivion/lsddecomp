@@ -485,7 +485,7 @@ typedef enum DreamColors {
  * (DreamSys__WallLink) and +0x0E8 slotE8 (DreamSys__NoOpSlotE8Default).
  *
  * Two inherited slots are called with a type other than their own, each
- * through a function-pointer cast (no code), as TodActor.h's banner does:
+ * through a function-pointer cast (no code), as tod_actor.h's banner does:
  *  - reset (+0x040): DreamSys__DreamSys returns what the call leaves in $v0
  *    (`return self->methods->reset(self)`, a tail position retail keeps), so
  *    it calls through DreamSysResetRetFn below.

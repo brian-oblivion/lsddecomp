@@ -6,7 +6,7 @@
 
 Unit: `ObjMStyleActor` (round 17). `BaseObjOMethods::slot18` -- an
 unconditional full teardown of both companion pointers (no tag check),
-already named `unk18`/`Actor__RemoveAllChildren` in `TodActor.c`'s
+already named `unk18`/`Actor__RemoveAllChildren` in `tod_actor.c`'s
 `D800878D4Methods`.
 
 ## Final source
@@ -39,7 +39,7 @@ already established by `Actor__AddChild`/`Actor__RemoveChild`.
 unconditionally clears BOTH companion fields (no tag check, unlike
 `LinkCompanion`/`UnlinkCompanion`) and chains to the base table's own
 `slot18`. `slot18` has no other established occupant name in any sibling
-header (`TodActor.c` still calls the field `unk18`), so this name is
+header (`tod_actor.c` still calls the field `unk18`), so this name is
 this unit's own contribution.
 
 ## Track 4 (2026-09-25, round 82, delta)

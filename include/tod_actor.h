@@ -1,5 +1,5 @@
-#ifndef TODACTOR_H
-#define TODACTOR_H
+#ifndef TOD_ACTOR_H
+#define TOD_ACTOR_H
 
 #include "Actor.h"
 
@@ -7,7 +7,7 @@
  * TodActor -- an Actor animated by a TOD: it owns one Actor "part" per
  * object of a TOD animation and plays the TOD's frames over them. Class id
  * 0x234, method table gTodActorMethods, getter GetTodActorMethods; methods
- * in src/world/TodActor.c. Its ctor chains to Actor's (include/Actor.h). One
+ * in src/world/tod_actor.c. Its ctor chains to Actor's (include/Actor.h). One
  * class derives from it, Entity (0x1F234, include/entity.h), and it is only
  * ever built as one: New_Entity (from dream_aux's SetDreamAuxWorld and
  * SpawnDreamAuxTriggerEntity) runs this ctor first; New_TodActor has no
@@ -67,7 +67,7 @@
 typedef struct TodActor TodActor;
 typedef struct TodActorMethods TodActorMethods;
 
-/* Tags completed in the unit that reads them (src/world/TodActor.c), so
+/* Tags completed in the unit that reads them (src/world/tod_actor.c), so
  * that any header may repeat these declarations. */
 struct ModelData;    /* include/ModelData.h */
 struct TodActorDesc; /* the ctor's descriptor: +0x00C a ModelData to borrow */

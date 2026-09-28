@@ -2,14 +2,14 @@
 #define ENTITY_H
 
 #include "common.h"
-#include "TodActor.h"
+#include "tod_actor.h"
 #include "FadeBox.h"
 #include "SoundCueSet.h"
 
 /*
  * Entity -- a TodActor (TOD-animated Actor) driven by a per-mood row of
  * tables (class id 0x1F234, method table gEntityMethods, getter
- * GetEntityMethods): TodActor's one subclass (include/TodActor.h); no
+ * GetEntityMethods): TodActor's one subclass (include/tod_actor.h); no
  * class derives from it. The ctor calls TodActor's first
  * (GetTodActorMethods()->ctor), so the id parent is the ctor-chain
  * parent. Its methods and its MoodCue handlers are in src/world/entity.c. The
@@ -52,7 +52,7 @@
  *  - applyTodFrame (+0x134) returns the next frame: Entity__MoodCue91/92
  *    thread todFramePtr through it.
  *  - attachToParent (+0x04C) keeps SceneNode's type; callers of Entity's
- *    occupant cast to TodActorAttachToParentFn (TodActor.h's banner).
+ *    occupant cast to TodActorAttachToParentFn (tod_actor.h's banner).
  *
  * The object is 0x108 bytes (New_Entity); TodActor's fields end at +0x098.
  */

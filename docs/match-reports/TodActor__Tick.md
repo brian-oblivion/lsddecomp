@@ -89,7 +89,7 @@ Round 75 (charlie), track 3.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/tod_actor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 6 (round 93, echo)
 
@@ -104,4 +104,4 @@ the unit's `TodSetBuffer` view (`tods[i]` at +0x8), no byte offsets.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-TodActor.c's `TodHeader` merged into include/Tod.h's `TodFile` (the same TOD file header: 4 unread bytes, frameCount at +0x004, frames at +0x008); TodActor's `todFramePtr` is `void *` so it takes TodFile's `u32` frames and applyTodFrame's `u8 *` result alike. Byte-identical.
+tod_actor.c's `TodHeader` merged into include/Tod.h's `TodFile` (the same TOD file header: 4 unread bytes, frameCount at +0x004, frames at +0x008); TodActor's `todFramePtr` is `void *` so it takes TodFile's `u32` frames and applyTodFrame's `u8 *` result alike. Byte-identical.

@@ -11,7 +11,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Forwarder with six arguments: `return self->unk30->methods->slot80(self->unk30, arg1..arg5);` -- the incoming stack args 5/6 are copied to the outgoing frame's +0x10/+0x14 and +0x30 is loaded twice (once for the table, once for a0).
 
-Table slot (`tools/classtable.py`): gModelDataMethods +0x084 and gTriggerWorldMethods +0x084 (`decodeTodPacket` in src/world/TodActor.c).
+Table slot (`tools/classtable.py`): gModelDataMethods +0x084 and gTriggerWorldMethods +0x084 (`decodeTodPacket` in src/world/tod_actor.c).
 
 ## Source
 

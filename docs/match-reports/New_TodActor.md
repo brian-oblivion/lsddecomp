@@ -11,7 +11,7 @@
 
 The `New_X` allocator for the class whose method table is `gTodActorMethods`
 (resolved with `tools/classtable.py gTodActorMethods --vs 0x800878D4`; see
-`include/TodActor.h` for the full inheritance chain). Allocates a 0x98-byte
+`include/tod_actor.h` for the full inheritance chain). Allocates a 0x98-byte
 instance through the game allocator `BMemPMgrAlloc`, fetches the class's own
 vtable via `GetTodActorMethods()` (a `Get_vtable`-style accessor, matched
 separately, see its own report), and calls the constructor slot (`+0x008`)
@@ -68,7 +68,7 @@ rewrite to every `New_X` residue.
 
 ## Notes on the header
 
-`include/TodActor.h` types `BMemPMgrAlloc` as taking a single `s32 size`
+`include/tod_actor.h` types `BMemPMgrAlloc` as taking a single `s32 size`
 parameter (matching the correction the head made to `pad.h`'s
 `BMemPMgrAlloc` prototype in the same round) — the call site here sets only
 `$a0` before `jal`.
@@ -93,11 +93,11 @@ Round 75 (charlie), track 3.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/tod_actor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, bravo)
 
-Parameters `desc`, `sound` (TodActor.h's banner: the descriptor and the
+Parameters `desc`, `sound` (tod_actor.h's banner: the descriptor and the
 VabStreamObj); the allocation is `sizeof(TodActor)` (0x98). Byte-identical.
 
 ## History (moved from src/TodActor.c, comments pass)
