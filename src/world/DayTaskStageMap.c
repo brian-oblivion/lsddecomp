@@ -697,12 +697,12 @@ void StageMap__ForwardAcceptedCommand(StageMap *self, void *sender, s32 command)
     u8 unused[24]; /* MATCHING: retail's frame is 24 bytes larger than the locals need */
 
     switch (command) {
-        case 2:
-        case 3:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
+        case SCENENODE_EVENT_HULL_FIRST:
+        case SCENENODE_EVENT_HULL_LAST:
+        case ACTOR_EVENT_UNSWEPT:
+        case ACTOR_EVENT_MOVED_Z:
+        case ACTOR_EVENT_MOVED_X:
+        case ACTOR_EVENT_MOVED_Y:
             break;
         default:
             return;

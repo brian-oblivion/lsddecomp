@@ -415,7 +415,7 @@ void DreamSys__DispatchInstanceEffect(DreamSys *self, void *sender, s32 effect) 
 
 void DreamSys__WallLink(DreamSys *self, void *sender, int event) {
     GetActorMethods()->onGridCellLinkCommand((Actor *)self, sender, event);
-    if (event != 4)
+    if (event != SCENENODE_EVENT_LINKED)
         return;
     if (self->state != DREAMSYS_NO_LINK)
         return;
@@ -1344,7 +1344,7 @@ void DreamSys__ProcessChunkChange(DreamSys *self, void *entity, s32 effect) {
 }
 
 /* What an Entity's instance effect does to the dream, while no link is
-   pending: 4 notifies the entity back, 9 logs its mood and adds its unlock
+   pending: SCENENODE_EVENT_LINKED is answered with the same event, 9 logs its mood and adds its unlock
    score (and may record a flashback), 10 links to the stage it names, 11
    ends the dream into its event video, 12 ends the dream. 9, 11 and 12 do
    nothing in a flashback session. */
@@ -1354,13 +1354,13 @@ void DreamSys__InstanceEffectsOnJournal(DreamSys *self, void *entity, s32 effect
     }
 
     switch (effect) {
-        case 4:
+        case SCENENODE_EVENT_LINKED:
             ((BasicClass *)entity)->methods->onNotify((BasicClass *)entity, self, effect);
             break;
-        case 5:
-        case 6:
-        case 7:
-        case 8:
+        case ACTOR_EVENT_UNSWEPT:
+        case ACTOR_EVENT_MOVED_Z:
+        case ACTOR_EVENT_MOVED_X:
+        case ACTOR_EVENT_MOVED_Y:
             break;
         case ENTITY_EFFECT_LOG_MOOD:
             if (self->isFlashbackSession != 0) {

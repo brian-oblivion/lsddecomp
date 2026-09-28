@@ -202,13 +202,13 @@ void GridCell__DispatchLinkCommand(GridCell *self, BasicClass *sender, s32 event
     }
 }
 
-/* SceneNode's handling, then tryAttachNearby for events 5..8, the body of
+/* SceneNode's handling, then tryAttachNearby for the Actor move events (ACTOR_EVENT_UNSWEPT..MOVED_Y), the body of
  * Actor__OnActorLinkCommand. tryAttachNearby keeps SceneNode's one-parameter
  * slot type; this caller passes the sender and event too. */
 void GridCell__OnActorLinkCommand(GridCell *self, void *sender, s32 event) {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
-    if (event < 9) {
-        if (event >= 5) { /* MATCHING: nested, as && folds to one unsigned test */
+    if (event <= ACTOR_EVENT_MOVED_Y) {
+        if (event >= ACTOR_EVENT_UNSWEPT) { /* MATCHING: nested, as && folds to one unsigned test */
             ((void (*)(GridCell *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
         }
     }

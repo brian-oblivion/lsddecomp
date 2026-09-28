@@ -3059,8 +3059,8 @@ void *AcceptGridElem(void *cell, void *offset, void *pos) {
  * event): SceneNode's slot declares self alone, hence the cast. */
 void Actor__OnActorLinkCommand(Actor *self, void *sender, s32 event) {
     GetSceneNodeMethods()->dispatchLinkCommand((SceneNode *)self, sender, event);
-    if (event < 9) {
-        if (event >= 5) { /* MATCHING: nested, as && folds to one unsigned test */
+    if (event <= ACTOR_EVENT_MOVED_Y) {
+        if (event >= ACTOR_EVENT_UNSWEPT) { /* MATCHING: nested, as && folds to one unsigned test */
             ((void (*)(Actor *, void *, s32))self->methods->tryAttachNearby)(self, sender, event);
         }
     }
