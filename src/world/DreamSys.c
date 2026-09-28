@@ -115,7 +115,7 @@ extern s8 sDreamColorTable[9];
    VabStreamObj playTone's `index` argument (program << 4, tone 0);
    sVoicePitchBySelect[voiceSelect] (values include -2..2, hence `s8` not `u8`) feeds
    setPitchOffset's `octave` argument directly. sVoicePitchBySelect is these
-   24 bytes; the zero bytes after it are the gProjectOffsetZ vector above. */
+   24 bytes; the zero bytes after it are the sProjectOffsetZ vector above. */
 extern const s8 sVoiceBySelect[0x18];
 extern const s8 sVoicePitchBySelect[0x18];
 
@@ -536,7 +536,7 @@ s32 DreamSys__ProjectPointAtDistance(DreamSys *this, s32 *out, s32 dist, s32 *re
     long *worldTrans;
     s32 *offsetZ;
 
-    offsetZ = &gProjectOffsetZ;
+    offsetZ = &sProjectOffsetZ;
     *offsetZ = dist;
     SceneNode__LocalOffsetToWorldPos((SceneNode *)this, worldPos, offsetZ - 2, 0);
 

@@ -115,7 +115,7 @@ function's own load/call instructions before being trusted:
   (`0x80087EB0`-`0x80087EDF` combined) from an earlier round's analysis of
   `unk_0xB8`'s bound; this round gives them real extern declarations.
   `sVoicePitchBySelect`'s real extent is exactly these 24 bytes -- the trailing zero
-  bytes splat lumped into its dlabel belong to the `gProjectOffsetZ` vector
+  bytes splat lumped into its dlabel belong to the `sProjectOffsetZ` vector
   documented elsewhere in the header, not to this table.
 - `DreamSys::unk_0xB8`'s comment extended with this function's two literal
   comparisons (`0x16`, `0xB`).

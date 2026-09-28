@@ -267,14 +267,14 @@ typedef struct DreamSysEntityObj {
     DreamSysEntityMethods *methods;
 } DreamSysEntityObj;
 
-/* gProjectOffsetZ is the LAST word of a 3-word (LongVec3-shaped) scratch
+/* sProjectOffsetZ is the LAST word of a 3-word (LongVec3-shaped) scratch
    vector whose first two words have no symbol of their own: they are the 8
    zero bytes after sVoicePitchBySelect's 24, which voiceSelect (bounded to
    [0, 0x18) by DreamSys__NotifyLinkAttempt) never reaches.
    DreamSys__ProjectPointAtDistance writes `dist` into this word and passes
-   `&gProjectOffsetZ - 2` to SceneNode__LocalOffsetToWorldPos as its 3-word
+   `&sProjectOffsetZ - 2` to SceneNode__LocalOffsetToWorldPos as its 3-word
    `src` vector: the local offset (0, 0, dist). */
-extern s32 gProjectOffsetZ;
+extern s32 sProjectOffsetZ;
 
 /* Argument shape for InterpolateKeyframeValue: two "keyframe" points, each with a
    value (+0x4) and a position/time (+0x8); +0x0 is not read.
