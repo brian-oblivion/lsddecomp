@@ -17,16 +17,15 @@
  */
 
 #include "common.h"
+/* MATCHING: BMemPMgrAlloc/Free are defined K&R with a second parameter (BMemPMgr.h) */
+#define BMEMPMGR_DEFINER
 #include "BMemPMgr.h"
 #include <malloc.h>
-
-/* Psy-Q printf, declared with the argument shape this call site passes:
- * it is variadic, and each unit that calls it declares its own. */
-extern void printf(const char *fmt, void *arg1, s32 arg2);
+#include <stdio.h>
 
 /* "bMemPMgr = %p, poolSize = %ld in BMemPMgrInit\n", BMemPMgrInit's
  * malloc-failure message. */
-extern const char sBMemPMgrInitFailFmt[];
+extern char sBMemPMgrInitFailFmt[];
 
 void *BMemPMgrInit(s32 poolSize) {
     BMemPMgr *pool;

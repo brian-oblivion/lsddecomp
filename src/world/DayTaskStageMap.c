@@ -53,6 +53,9 @@
 #include "GridCell.h"
 #include "FlatLightObj.h"
 #include "BMemPMgr.h"
+#include "GameFiles.h"
+#include "GameApplicationFileResource.h"
+#include "DreamAux.h"
 
 /* The viewpoint and view-reference points DayTask__OnInit hands the
  * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000). */
@@ -75,7 +78,7 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     /* MATCHING: mode is never set, but a bare ResourceSource shrinks the
      * frame by 8. */
     ResourceRequest req;
-    s32 vabPath;
+    char *vabPath;
 
     GetTimedTaskMethods()->ctor((TimedTask *)self, GetSoundEffectDir(0), 0);
     self->methods = GetDayTaskMethods();
@@ -87,7 +90,7 @@ void DayTask__DayTask(DayTask *self, IntermediateBaseInitArgs *initArgs, DreamSy
     req.src.name = (char *)sDreamerTmdPath;
     self->dreamerTmd = New_LinkResource(&req.src);
     vabPath = PickSoundBank(0);
-    self->bgm = New_WBgm((char *)vabPath, NULL, 1);
+    self->bgm = New_WBgm(vabPath, NULL, 1);
     RegisterRecordTableFiles(1);
     SetActiveDataSourceDriverMode(syncDriver == 0, 1, 1);
     self->initArgs = initArgs;
@@ -259,14 +262,6 @@ void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event) {
 DayTaskMethods *GetDayTaskMethods(void) {
     return &gDayTaskMethods;
 }
-
-/* src/cd/GameFiles.c: returns gRecordTable and writes its record count to
- * *out. */
-extern void *GetRecordTable(s32 *out);
-/* src/app/GameApplicationFileResource.c: appends `count` records of `table` to the CD driver's
- * file table and resolves them; returns 0 to be retried, and 1 when the CD
- * driver is not the active data source. */
-extern s32 RegisterFileTableEntries(void *table, s32 count);
 
 /* How many times RegisterRecordTableFiles has run (a call with `all` set
  * counts as two), and how many records its first, half-table batch took. */

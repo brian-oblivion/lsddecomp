@@ -7,18 +7,17 @@
  * runTitleMenu's ApplicationLoopStatus, and the table getter.
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libcd.h>
+#include <libsnd.h>
+#include <libgs.h>
 #include "Application.h"
+#include "BMemPMgr.h"
+#include "GameApplicationFileResource.h"
 
 extern s32 gCdInitDone;               /* CdInit has been called */
 extern ScreenDims gDefaultScreenDims; /* {320, 240} */
-
-/* Psy-Q LIBCD.H / LIBSND.H / LIBGS.H prototypes. */
-extern int CdInit(void);
-extern void SsInit(void);
-extern void GsInit3D(void);
-
-extern void SetActiveDataSource(s32 source); /* src/app/GameApplicationFileResource.c */
-extern void *BMemPMgrAlloc(s32 size);
 
 void Application__Application(Application *self, s32 dataSource) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);

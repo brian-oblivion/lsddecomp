@@ -61,4 +61,10 @@ void VabDriver__RequestLoadFile(void); /* +0x06C requestLoadFile */
 void VabDriver__StopService(void);     /* +0x070 stopService */
 void VabDriver__CancelRequests(void);  /* +0x074 cancelRequests */
 
+/* The driver's mode, as GameApplicationFileResource.c's data-source wrappers
+ * read and set it (the CD driver's counterparts take a third argument). */
+extern s32 GetVabDriverMode(s32 *outMode2);
+extern s32 SetVabDriverMode(s32 async, s32 mode2);
+extern s32 GetVabUseVSyncCallback(void);
+
 #endif

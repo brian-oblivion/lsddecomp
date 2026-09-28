@@ -32,6 +32,7 @@
 #include "Viewport.h"
 #include "LightRig.h"
 #include "FrameClock.h"
+#include <strings.h>
 
 StreamTask *New_StreamTask(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound,
                            DrawRect *initData) {
@@ -633,9 +634,6 @@ epilogue:
  * out so that the cursor's row sits at SlotEntry::pos.
  */
 
-/* Psy-Q libc2's strlen, linked from Sony's object. */
-extern s32 strlen(char *s);
-
 /* New_BoxFill's size and colour for listView: (320, 240), (32, 32, 64). */
 extern s32 sListViewSize[2];
 extern BoxFillRgb sListViewColor;
@@ -1164,10 +1162,6 @@ s32 TaskCore__GetActiveSlotCount(TaskCore *self) {
 TaskCoreMethods *Get_vtable_TaskCore(void) {
     return &gTaskCoreMethods;
 }
-
-/* The default movie frame, {640, 0, 320, 240}: StreamTask's default initData
- * and the rect TaskCore__OnInit clears (Task.h). */
-extern DrawRect gDefaultMovieFrame;
 
 DrawRect *GetDefaultMovieFrame(void) {
     return &gDefaultMovieFrame;

@@ -30,10 +30,12 @@
 #include <libgte.h>
 #include <libgpu.h>
 #include <libgs.h>
+#include <rand.h>
 #include "Entity.h"
 #include "DreamSys.h"
 #include "StageMap.h"
 #include "Viewport.h"
+#include "BMemPMgr.h"
 
 Entity *New_Entity(s32 moodIndex, void *desc, void *sound) {
     Entity *obj;
@@ -294,10 +296,6 @@ void Entity__SetTargetReached(Entity *this, s32 reached) {
     }
     this->targetReached = reached;
 }
-
-/* PlacementGridVabSound.c's; SoundCueSet.h does not declare it. */
-extern s32 InitSoundCueSet(struct VabStreamObj *sound, SoundCueSet *set, s32 tag, void *owner,
-                           SoundCueCallbackFn callback);
 
 void Entity__StartSoundCue(Entity *this) {
     InitSoundCueSet(this->sound, &this->soundCueSet, this->moodIndex + 1, this,

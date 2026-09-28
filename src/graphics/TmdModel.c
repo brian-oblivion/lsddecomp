@@ -24,6 +24,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "TmdModel.h"
+#include "BMemPMgr.h"
 
 /* A counted box list of one: TmdModel__GetHull's local (its count is set
  * to 1, as the hull's is, and never read). */
@@ -69,7 +70,6 @@ typedef union VectorOrBox {
 } VectorOrBox;
 
 extern TmdBox gTmdModelBoundsBuf[];
-extern void *BMemPMgrAlloc(s32 size);
 
 TmdModel *New_TmdModel(TmdObject *object) {
     TmdModel *p = BMemPMgrAlloc(sizeof(TmdModel));

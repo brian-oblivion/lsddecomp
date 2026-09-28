@@ -137,8 +137,7 @@ typedef struct CdRequestNode {
 /* A CD-ROM data sector's user data (2048 bytes; <libcd.h>'s CdlModeSize0/1
  * clear). CdRead counts sectors, so byte sizes and offsets are shifted by
  * CD_SECTOR_SHIFT (ReadCdFile, CdDriver__Seek), and GetCdFileSize reports a
- * file's size in whole sectors. CD_SECTOR_SIZE is spelled exactly as
- * GraphicsResources.c's own definition, so the two may meet. */
+ * file's size in whole sectors. */
 #define CD_SECTOR_SIZE 2048
 #define CD_SECTOR_SHIFT 11
 
@@ -148,6 +147,58 @@ typedef struct CdRequestNode {
 /* The file lookups call CdSearchFile this many times before they print
  * "File not found" and give up (OpenCdFile, ResolveFileEntries). */
 #define CD_SEARCH_ATTEMPTS 101
+
+/* The driver's free functions, in CdDriver.c's order. */
+
+/* The drive and its state, as GameApplicationFileResource.c's data-source
+ * wrappers read it. */
+extern void InitCdDrive(void);
+extern s32 IsCdBusy(void);
+extern s32 IsCdIdle(void);
+extern s32 GetCdOperation(void);
+extern s32 GetCdState(void);
+extern s32 GetCdDriverMode(s32 *outSyncQueueMode);
+extern s32 SetCdDriverMode(s32 async, s32 syncQueueMode, s32 useVSyncCallback);
+
+/* The file table: SetFileTable/SetFileTableCount install a CdFileEntry array,
+ * ResolveFileEntries fills each entry's position and size from the disc. */
+extern void SetFileTable(CdFileEntry *table);
+extern void SetFileTableCount(s32 count);
+extern s32 GetFileTableCount(void);
+extern s32 ResolveFileEntries(CdFileEntry *entries, s32 count);
+
+/* The lock, the service and the request queue. */
+extern void LockCd(void);
+extern void UnlockCd(void);
+extern s32 ServiceCdDriver(void);
+extern void StartCdService(void);
+extern void StopCdServiceIfIdle(void);
+extern void DisableCdQueue(void);
+extern void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 param1);
+extern CdRequestNode *AllocCdRequestNode(void);     /* allocate and link at the tail */
+extern void FreeCdRequestNode(CdRequestNode *node); /* unlink and free */
+
+/* The file-table lookups. */
+extern void *FindCdFileEntry(char *name);
+extern s32 FindCdFileIndex(char *name); /* name -> gFileTable index */
+extern void *GetCdFileEntry(s32 index); /* the entry is also its name, its first member */
+
+/* The state machines. op is a CD_OPERATION_* and state the first CD_STATE_*. */
+extern void TickCdStateMachine(void);         /* CD_TICK_STATE_MACHINE */
+extern void TickCdLoadFileStateMachine(void); /* CD_TICK_LOAD_FILE */
+extern void StartCdOperation(s32 op, s32 state);
+extern void ResetCdStateMachine(void); /* end the operation, mark idle */
+extern void SetCdState(s32 state);
+
+/* The blocking file access the read driver's methods use. */
+extern void FileResource__InstallCdReadDriver(FileResource *self);
+extern void FileResource__DestroyCdReadDriver(FileResource *self);
+extern void OpenCdFile(CdDriver *self, char *name);
+extern char *BuildCdFilePath(char *dest, char *name); /* "\\<data directory><name>;1" */
+extern void CloseCdFile(CdDriver *self);
+extern s32 GetCdFileSize(CdDriver *self);
+extern s32 ReadCdFile(CdDriver *self, void *buf, s32 size);
+extern s32 GetCdUseVSyncCallback(void);
 
 /* The module state: the globals two or more of the units above share. A
  * global only one unit touches is a local extern in that unit. */

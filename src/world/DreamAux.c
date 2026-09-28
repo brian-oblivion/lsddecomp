@@ -37,6 +37,7 @@
 #include "TriggerWorld.h"
 #include "DreamSys.h"
 #include "StageMap.h"
+#include <rand.h>
 
 const char gMomPathSymSpy[] = "ETC\\SYMSPY.MOM";
 const char gMomPathSymDog[] = "ETC\\SYMDOG.MOM";
@@ -106,8 +107,6 @@ void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct Vab
     SetTeleportsEnabled(stage);
 }
 
-extern void SetInstantTeleportersEnabled(bool value);
-
 void SetTeleportsEnabled(s32 stage) {
     SetInstantTeleportersEnabled(stage == 11 || stage == 3);
 }
@@ -150,8 +149,6 @@ void ReleaseDreamAuxEntities(void) {
         slot++;
     }
 }
-
-extern s32 rand(void);
 
 DreamAuxTriggerEntry *LookupDreamAuxTrigger(s16 *chunkKey);
 bool CheckTriggerDayParity(s32 day, DreamAuxTriggerEntry *trigger);

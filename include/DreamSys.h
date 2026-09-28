@@ -263,7 +263,6 @@ typedef struct {
     s32 day;
 } FlashbackEntry;
 
-
 /* DreamSys::viewport is a Viewport (include/Viewport.h; tag only here,
    DreamSys.c includes the header). This class moves its GsRVIEW2 refView:
    +0x014 vp and +0x020 vr (the two "points"
@@ -285,7 +284,6 @@ struct LinkResource;
    GameApplication__GameApplication passes New_LinkResource("ETC\DREAME5.TMD")): the
    ctor keeps it in modelSource and adds its getModel(0), a TmdModel, as a
    child. */
-
 
 /* Actor::grid is the grid manager, StageMap (include/StageMap.h);
    DreamSys.c includes that header and calls it directly. */
@@ -370,10 +368,6 @@ extern s8 sDreamColorTable[9];
    24 bytes; the zero bytes after it are the gProjectOffsetZ vector above. */
 extern const s8 sVoiceBySelect[0x18];
 extern const s8 sVoicePitchBySelect[0x18];
-
-/* BasicClass-family allocator; see GameApplicationFileResource.h / TodActor.c / Entity.h /
-   Pad.c for the other units that also declare it locally. */
-extern void *BMemPMgrAlloc(s32 size);
 
 /* The object. Actor's fields (include/Actor.h) run to +0x058; DreamSys's
  * own start there. New_DreamSys allocates 0x928 bytes. */
@@ -780,9 +774,6 @@ extern s16 sSpecialDays[];
    only its address is used. */
 extern MoodGraphPoint sSpecialDayMood;
 
-/* Also declared in Entity.h for the same libc-style function. */
-extern s32 rand(void);
-
 extern s8 sSpecialColors[];
 
 /* Shared by TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/
@@ -972,7 +963,6 @@ DreamSysMethods *Get_vtable_DreamSys(void);
 /* @brief Allocates and constructs a DreamSys instance. */
 DreamSys *New_DreamSys(struct LinkResource *arg0, s32 arg1, s32 arg2);
 
-
 /* @brief Initializes the values that will be used by CalcNavigationScore. */
 /* @param arrayMem Pointer to the array of challenges completed */
 /* @param linkCounter Pointer to an integer counting up the dynamic/instance links */
@@ -1005,7 +995,6 @@ s32 GetRandomSpawnFromStage(PlayerSpawnPoint *target, s32 stg, s32 unused);
 /* @param day The day number to check against (1-indexed). */
 /* @return The pointer to this dream's graph contribution, or NULL if the dream is *not* Special. */
 MoodGraphPoint *IsDaySpecial(CinematicCall *cinematic, int day);
-
 
 /* The occupants of gDreamSysMethods not declared above, in slot order. */
 DreamSys *DreamSys__DreamSys(DreamSys *this, struct LinkResource *arg1, s32 arg2, s32 arg3);
@@ -1072,5 +1061,9 @@ s32 DreamSys__func_5ba20(DreamSys *this, s32 value);
 /* A non-slot helper the staircase ticks call before its definition:
    addTranslation of (a - b) with y forced to 0. */
 void DreamSys__ApplyRelativeOffset(DreamSys *this, struct RelativePos *a, struct RelativePos *b);
+
+/* Enables or disables the instant teleporters TestForInstantTeleporters
+ * tests (DreamAux.c's SetTeleportsEnabled sets it per stage). */
+void SetInstantTeleportersEnabled(bool value);
 
 #endif

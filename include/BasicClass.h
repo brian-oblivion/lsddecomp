@@ -147,4 +147,7 @@ extern void GetNextBasicClass(BasicClass **outValue,
                               BasicClassListNode **cursor); /* *outValue = node value (or NULL); advance *cursor */
 extern void FreeBasicClassList(BasicClassListNode **head); /* free every node; *head is not cleared */
 
+/* Releases each of `count` objects of `array` (TmdRenderer.c). */
+extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
+
 #endif

@@ -34,12 +34,8 @@
 #include "ItemList.h"
 #include "ScreenSprite.h"
 #include "BMemPMgr.h"
-
-/* ScreenWidgets.c's, which types both u8 *(u8 *dst, u8 *src); declared on
- * TextEntry's char buffers. Decode turns full-width SJIS into one byte a
- * character, Encode turns it back. */
-extern char *DecodeFullWidthSjis(char *dest, char *src);
-extern void EncodeFullWidthSjis(char *dest, char *src);
+#include "FullWidthSjis.h"
+#include "GameApplicationFileResource.h"
 
 TextEntry *New_TextEntry(char *text, s32 mode) {
     TextEntry *self;
@@ -149,15 +145,13 @@ void TextEntry__SetText(TextEntry *self, char *text, s32 mode) {
     }
 }
 
-/* LoadCardResources' data. BuildFileName (GameApplicationFileResource.c) writes dir, name
- * and ext into dest and returns it. Positions are percent of half the
- * screen from the centre (include/ScreenSprite.h). */
-extern char *BuildFileName(char *dest, const char *name, const char *dir, const char *ext);
+/* LoadCardResources' data. Positions are percent of half the screen from
+ * the centre (include/ScreenSprite.h). */
 
-extern const char sStrComInput[];          /* "COMINPUT" */
-extern const char sStrFontIcon[];          /* "FONTICON" */
-extern const char sCardPathPrefix[];       /* "CARD\\" */
-extern const char sTimExt[];               /* ".TIM" */
+extern char sStrComInput[];                /* "COMINPUT" */
+extern char sStrFontIcon[];                /* "FONTICON" */
+extern char sCardPathPrefix[];             /* "CARD\\" */
+extern char sTimExt[];                     /* ".TIM" */
 extern SpriteRect gTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0, 0) */
 extern SpriteRgb gTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
 extern ScreenSpritePos gTextEntryPanelPos; /* (-70, -60) */
@@ -165,8 +159,8 @@ extern ScreenSpritePos gTextEntryTextPos;  /* (-62, -15) */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     char path[32];
-    const char *dir;
-    const char *ext;
+    char *dir;
+    char *ext;
     TimImage *panelTim;
     TimImage *fontTim;
 
@@ -449,10 +443,6 @@ void TextEntry__SetCursorPos(TextEntry *self, s32 pos, s32 notify) {
     }
 }
 
-/* The characters an entry can hold, in the order nextChar/prevChar step
- * through them: a pointer to a NUL-terminated byte string (TextEntry.h). */
-extern u8 *gNameCharTable;
-
 void TextEntry__SetCharAt(TextEntry *self, s32 pos, s32 charIndex, s32 notify) {
     TextRow *row;
 
@@ -508,8 +498,6 @@ fail:
  * length in characters (bytes, halved for full-width SJIS), and
  * `maxTextLen` is the longest. Ends with resetView.
  */
-extern char *DecodeFullWidthSjis(char *dest, char *src);
-
 void ItemList__ItemList(ItemList *self, char **items, s32 mode) {
     char **item;
     s32 i;
@@ -626,13 +614,12 @@ void ItemList__ResetView(ItemList *self) {
 /* loadResources' path buffer, BuildFileName's dest: "CARD\\" + name + ".TIM". */
 #define CARD_TIM_PATH_SIZE 32
 
-extern char *BuildFileName(char *dest, const char *name, const char *dir, const char *ext);
-extern const char sStrSelect[];              /* "SELECT" */
-extern const char sItemListCardPathPrefix[]; /* "CARD\\" */
-extern const char sItemListTimExt[];         /* ".TIM" */
-extern SpriteRect gItemListPanelRect;        /* SELECT's cell: 256 x 160 from (0, 0) */
-extern ScreenSpritePos gItemListPanelPos;    /* (-100, -60) */
-extern const char sItemListStrFontIcon[];    /* "FONTICON" */
+extern char sStrSelect[];                 /* "SELECT" */
+extern char sItemListCardPathPrefix[];    /* "CARD\\" */
+extern char sItemListTimExt[];            /* ".TIM" */
+extern SpriteRect gItemListPanelRect;     /* SELECT's cell: 256 x 160 from (0, 0) */
+extern ScreenSpritePos gItemListPanelPos; /* (-100, -60) */
+extern char sItemListStrFontIcon[];       /* "FONTICON" */
 
 /*
  * Loads CARD\SELECT.TIM as the panel sprite, placed at gItemListPanelPos
@@ -642,8 +629,8 @@ extern const char sItemListStrFontIcon[];    /* "FONTICON" */
  */
 void ItemList__LoadResources(ItemList *self, SceneNode *parent) {
     char path[CARD_TIM_PATH_SIZE];
-    const char *dir;
-    const char *ext;
+    char *dir;
+    char *ext;
     TimImage *panelTim; /* MATCHING: two handles, not one reused */
     TimImage *fontTim;
 

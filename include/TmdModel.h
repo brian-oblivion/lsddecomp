@@ -137,4 +137,11 @@ s32 TmdModel__RaycastFaces(TmdModel *self, s32 *best, TmdVec3 *hitOut, s32 *heig
                            TmdVec3 *end);
 TmdPrim *TmdModel__NextPrimitive(TmdModel *self, TmdPrim *p, s32 *n, TmdVec3 *out, u32 *count);
 
+/* Points the first primitive's CLUT id at the CLUT at VRAM (xy[0], xy[1]). */
+void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy);
+
+/* Turns each hull of the list and offsets it by `delta` (TmdModel.c, not a
+ * method). */
+void RotateAndOffsetHullList(TmdHull *h, s32 turn, s32 back, s32 delta);
+
 #endif

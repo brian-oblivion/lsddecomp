@@ -31,10 +31,7 @@
 #include "FrameClock.h"
 #include "TmdModel.h"
 #include "Actor.h"
-
-/* BMemPMgr.c's pool allocator, in this file's view of it. */
-extern void *BMemPMgrAlloc(s32 size);
-extern void BMemPMgrFree(void *arg);
+#include "BMemPMgr.h"
 
 /* UpdateRotation's divisor: its inputs are degrees, and a degree count in
  * 20.12 fixed point divided by 360 is the angle in 4096ths of a turn (ONE to
@@ -310,7 +307,6 @@ u32 SceneNode__SetLightMode(SceneNode *self, u32 mode) {
  * AddToActorParents, the table getter, and ClipSegmentToBox and
  * BisectSegmentToBox (declared in include/SceneNode.h).
  */
-
 
 /* TryAttachNearby's range: the other node is tested only when its world
  * position is within this distance of this node's on each axis. */
@@ -873,7 +869,6 @@ SceneNodeMethods *GetSceneNodeMethods(void) {
  * switch RaycastHullAgainstFaces reads).
  */
 
-
 /* How far RaycastVertical's ray reaches from its origin, first along -y and
  * then along +y, in the model's own units. */
 #define RAYCAST_PROBE_LENGTH 1024
@@ -1198,8 +1193,6 @@ s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b) {
     }
     return 1;
 }
-
-extern s32 gHitHeightGate;
 
 /* Sets gHitHeightGate and returns its old value. While it is non-zero,
  * SceneNode__RaycastHullAgainstFaces's segment test accepts only a hit whose

@@ -182,7 +182,7 @@ void ObjM__Finalize(ObjM *self);
 void ObjM__OnNotify(ObjM *self, BasicClass *sender, s32 event);
 void ObjM__NoOpSlot40(void);
 void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, struct DreamSys *dreamSys);
-void ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y);
+struct FilePathRecord *ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y);
 void ObjM__DetachTarget(ObjM *self);
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, struct StyleConfig *style, s32 arg3);
 void ObjM__TeardownStyle(ObjM *self);

@@ -13,12 +13,11 @@
 #include "BasicClass.h"
 #include "DrawSystem.h"
 #include "WBgm.h"
+#include "BMemPMgr.h"
+#include <stdio.h>
+#include "VabStreamObj.h"
 
-extern void *BMemPMgrAlloc(s32 size);
-extern void printf(const char *fmt);
-extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
-
-extern s32 GetSsTicksPerSecond(void);
+extern char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 
 extern u8 gSsSizeTableBuf[];
 

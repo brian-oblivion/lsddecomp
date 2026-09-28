@@ -59,9 +59,9 @@
 #include "DrawSystem.h"
 #include "CdStream.h"
 #include "MoviePlayer.h"
-
-#define CD_SECTOR_SIZE 2048 /* a CD-ROM data sector: TimBlockSrc's first read */
-#define FIX12_SHIFT 12      /* ONE == 1 << FIX12_SHIFT: 20.12 fixed point */
+#include "BMemPMgr.h"
+#include "GameApplicationFileResource.h"
+#include "CdDriver.h"
 
 /* The fade CLUTs: 256-colour rows from VRAM y 480. TimBlockSrc lays its
  * four ramps out there and TimArraySrc maps an image's CLUT row back to
@@ -110,11 +110,6 @@ typedef struct SubBlockTable {
     /* +0x04 */ u32 count;
     /* +0x08 */ s32 entries[1];
 } SubBlockTable;
-
-extern FileResourceMethods *GetActiveDataSourceMethods(void);
-extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
-extern void BMemPMgrFree(void *arg);
-extern void *BMemPMgrAlloc(s32 size);
 
 /* A method table's ctor slot, unprototyped: the allocators that check the
  * ctor's result call it through this. */
@@ -201,8 +196,6 @@ void TimBlockSrc__Finalize(TimBlockSrc *self) {
     GetActiveDataSourceMethods()->finalize((FileResource *)self);
 }
 
-extern void LockActiveDataSource(void);
-extern void UnlockActiveDataSource(void);
 u32 FindMaxTimBlockSize(FileResource *self);
 
 /* setFlag (+0x064), run when a read completes: once the header sector is

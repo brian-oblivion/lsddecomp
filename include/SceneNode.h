@@ -1,6 +1,10 @@
 #ifndef SCENENODE_H
 #define SCENENODE_H
 
+#include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "BasicClass.h"
 #include "TmdModel.h"
 
@@ -187,8 +191,10 @@ void SceneNode__LocalOffsetToWorldPos(SceneNode *self, s32 *dst, s32 *src, s32 u
 void SceneNode__GetRotationDegrees(SceneNode *self, Ratio16 *out);
 void SceneNode__LinkModel(SceneNode *self, void *model);
 void SceneNode__UnlinkModel(SceneNode *self);
+/* Casts a vertical ray from `target` against the node's model, down and then
+ * up; on a hit writes the hit less the ray's start to `offset` and returns 1. */
+s32 SceneNode__RaycastVertical(SceneNode *self, s32 *offset, s32 *target);
 void SceneNode__FaceTarget(SceneNode *self, SceneNode *target, s32 yawOnly, s32 swapped, void *extra);
-
 
 /* SceneNode's free helpers, defined in src/graphics/SceneNode.c and called there by
  * symbol: the rotation and scale inputs, the matrix-over-array transforms,
@@ -214,6 +220,13 @@ void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
  * the field's old contents. The attribute setters (SceneNode__SetDisplay and
  * the rest) are wrappers around it over GsDOBJ2.attribute. */
 extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
+
+/* 1 when each component of `b` is within `range` of `a`'s, else 0. */
+extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
+
+/* Sets the flag SceneNode__RaycastHullAgainstFaces's height gate tests and
+ * returns its old value. */
+extern s32 GetSetHitHeightGate(s32 value);
 
 /* Bit positions in GsDOBJ2.attribute (include/psyq/libgs.h), the fields the
  * SceneNode attribute setters (src/graphics/SceneNode.c) replace. */

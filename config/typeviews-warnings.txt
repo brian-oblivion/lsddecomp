@@ -19,20 +19,14 @@ GraphicsResources: warning: unused variable `unused'
 GraphicsResources: warning: unused variable `unused'
 ObjMStyleActor: warning: unused variable `pad48Tail'
 ObjMStyleActor: warning: unused variable `unused'
-PlacementGridVabSound: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
-PlacementGridVabSound: warning: passing arg 4 of `BuildFileName' discards `const' from pointer target type
 PlacementGridVabSound: warning: unused variable `unused'
 PlacementGridVabSound: warning: unused variable `unused'
 SceneNode: warning: unused variable `pad'
 SceneNode: warning: unused variable `unused'
-ScreenWidgets: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
 Sprite: warning: unused variable `pad'
 Task: warning: assignment from incompatible pointer type
-Task: warning: passing arg 2 of `ReleaseBasicClassArray' makes pointer from integer without a cast
 TitleMenuTaskObjF: warning: `state' might be used uninitialized in this function
 TitleMenuTaskObjF: warning: control reaches end of non-void function
-TitleMenuTaskObjF: warning: passing arg 2 of `strcat' discards `const' from pointer target type
-TitleMenuTaskObjF: warning: passing arg 2 of `strcat' discards `const' from pointer target type
 TmdModel: warning: `p' might be used uninitialized in this function
 TmdModel: warning: `size' might be used uninitialized in this function
 TmdModel: warning: unused variable `unused'

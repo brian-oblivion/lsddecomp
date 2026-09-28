@@ -42,22 +42,12 @@
 #include "GameApplicationFileResource.h"
 #include "VabDriver.h"
 #include "CdDriver.h"
+#include "BMemPMgr.h"
+#include "GameFiles.h"
+#include <strings.h>
+#include "DayTaskStageMap.h"
 
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
-
-extern char *GetDefaultDataDirectory(void); /* GameFiles.c: "CDI\\" */
-extern void SetDataDirectory(char *dir);    /* below */
-
-/* Below: waits until the data source's driver takes the mode; every
- * task here starts with (0, 0, 0). */
-extern void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
-
-/* GameFiles.c's movie getters. Each returns a movie's path (a gRecordTable
- * record, or "ETC\ASMK.STR") and writes its movie id, which
- * GetMovieFrameCount turns into the frame count a StreamTask plays. */
-extern const char *GetAsmkMovie(s32 *movieIdOut);
-extern const char *PickOpeningMovie(s32 *movieIdOut, s32 unused);
-extern s32 GetMovieFrameCount(s32 movieId);
 
 extern const char sLogoPathAsmk[]; /* "ETC\ASMKLOGO.TIM" */
 extern const char sLogoPathOsd[];  /* "ETC\OSDLOGO.TIM" */
@@ -69,15 +59,6 @@ typedef IntermediateBase *(*NewTaskFn)(struct DreamSys *dreamSys);
 /* Defined below GameApplication__RunTitleMenu, its caller. */
 s32 GameApplication__RunTask(NewTaskFn newTask, struct DreamSys *dreamSys,
                              IntermediateBaseInitArgs *initArgs);
-
-/* The first movie of special day `day`, and the frames of dayCount days'
- * movies from it. */
-extern const char *GetSpecialDayMovieSpan(s32 *frameTotal, s32 day, s32 dayCount);
-extern const char *GetEndingMovie(s32 *movieIdOut, s32 unused); /* arity-ok: the definition takes movieIdOut alone; retail's call still sets $a1 = 0 */
-/* A special day's record or an event movie, for DreamSys's getCinematic
- * pair packed into one word (bank low, entry high, each zero-extended);
- * *movieIdOut is -1 for a record that is a TIM image. */
-extern const char *GetSpecialDayOrEventRecord(s32 *movieIdOut, s32 packedPick);
 
 /* MATCHING: the NULL path falls off the end; any explicit return there costs
  * an instruction (BMemPMgrAlloc's NULL is already in $v0). */
@@ -110,8 +91,6 @@ void GameApplication__GameApplication(GameApplication *self, GameApplicationConf
     self->dreamSys->methods->slot228(self->dreamSys, config->unk14);
     ((GameApplicationSeedRandomFn)self->methods->setScreenDims)(self);
 }
-
-extern s32 SeedAndRandom(s32 seed, s32 unused);
 
 /* +0x040: seeds rand() from the first scratchpad word, mod DAYS_PER_YEAR. */
 void GameApplication__SeedRandom(GameApplication *self) {
@@ -159,8 +138,6 @@ void GameApplication__ShowImage(GameApplication *self, const char *path) {
     task->methods->release(task);
 }
 
-extern s32 RegisterRecordTableFiles(s32 all); /* DayTaskStageMap.c */
-
 /* ShowImage's view callback: registers gRecordTable's files with the CD
  * driver. */
 s32 GameApplication__RegisterFilesCallback(void) {
@@ -177,7 +154,7 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        moviePath = PickOpeningMovie(&movieId, 0);
+        moviePath = (const char *)PickOpeningMovie(&movieId, 0);
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 (s32)moviePath, frameCount, 1);
@@ -253,7 +230,7 @@ void GameApplication__PlaySpecialDayMovies(GameApplication *self) {
     if (self->config->playStreams != 0) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
-        moviePath = GetSpecialDayMovieSpan(&buf.frameTotal, 0, 10);
+        moviePath = (const char *)GetSpecialDayMovieSpan(&buf.frameTotal, 0, 10);
         task->methods->setFrameBound(task, (u32)buf.frameTotal / STREAMTASK_FRAMES_PER_SECOND);
         task->methods->setSkipOnConfirm(task, 0);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
@@ -314,7 +291,8 @@ void GameApplication__PlayCinematic(GameApplication *self) {
     TaskCore *task;
 
     cc = self->dreamSys->methods->getCinematic(self->dreamSys);
-    path = GetSpecialDayOrEventRecord(&idBuf.movieId, (u16)cc.bank | ((u32)(u16)cc.entry << 16));
+    path = (const char *)GetSpecialDayOrEventRecord(&idBuf.movieId,
+                                                    (u16)cc.bank | ((u32)(u16)cc.entry << 16));
     SetActiveDataSourceDriverMode(0, 0, 0);
 
     if (idBuf.movieId != -1) {
@@ -347,7 +325,7 @@ void GameApplication__PlayEndingMovie(GameApplication *self) {
         SetActiveDataSourceDriverMode(0, 0, 0);
         task = New_StreamTask(0, 0, 0, 0);
         task->methods->setSkipOnConfirm(task, 0);
-        moviePath = GetEndingMovie(&movieId, 0);
+        moviePath = (const char *)GetEndingMovie(&movieId, 0);
         frameCount = GetMovieFrameCount(movieId);
         ((StreamTaskInitFn)task->methods->init)(task, (IntermediateBaseInitArgs *)self->aux,
                                                 (s32)moviePath, frameCount, 1);
@@ -470,11 +448,11 @@ FileResourceMethods *GetFileResourceMethods(void) {
 
 extern s32 gActiveDataSource;
 
-void *GetActiveDataSourceMethods(void) {
+FileResourceMethods *GetActiveDataSourceMethods(void) {
     if (gActiveDataSource == DATASOURCE_SPU) {
-        return GetVabDriverMethods();
+        return (FileResourceMethods *)GetVabDriverMethods();
     } else {
-        return GetCdDriverMethods();
+        return (FileResourceMethods *)GetCdDriverMethods();
     }
 }
 
@@ -532,23 +510,17 @@ void CopyDataSourceSlots(FileResourceMethods *dst, FileResourceMethods *src) {
     dst->cancelRequests = src->cancelRequests;
 }
 
-extern s32 LockCd(void);
-
 void LockActiveDataSource(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         LockCd();
     }
 }
 
-extern s32 UnlockCd(void);
-
 void UnlockActiveDataSource(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         UnlockCd();
     }
 }
-
-extern s32 IsCdBusy(void);
 
 s32 IsActiveDataSourceBusy(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
@@ -557,8 +529,6 @@ s32 IsActiveDataSourceBusy(void) {
     return 0;
 }
 
-extern s32 IsCdIdle(void);
-
 s32 IsActiveDataSourceIdle(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         return IsCdIdle();
@@ -566,16 +536,12 @@ s32 IsActiveDataSourceIdle(void) {
     return 1;
 }
 
-extern s32 GetCdOperation(void);
-
 s32 GetActiveDataSourceOperation(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
         return GetCdOperation();
     }
     return 0;
 }
-
-extern s32 GetCdState(void);
 
 s32 GetActiveDataSourceState(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
@@ -585,12 +551,11 @@ s32 GetActiveDataSourceState(void) {
 }
 
 typedef s32 (*DataSourceSetDriverModeFn)(s32, s32, s32);
+
 /* SetVabDriverMode takes two arguments and SetCdDriverMode three. Both are
  * called through the three-argument type, and the VAB driver ignores the
  * third. Assigning SetVabDriverMode to `fn` warns about incompatible pointer
  * types, and that is harmless. */
-extern s32 SetVabDriverMode(s32 async, s32 mode2);
-extern s32 SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback);
 
 void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     DataSourceSetDriverModeFn fn;
@@ -604,19 +569,13 @@ void SetActiveDataSourceDriverMode(s32 async, s32 mode2, s32 useVSyncCallback) {
     } while (fn(async, mode2, useVSyncCallback) == 0);
 }
 
-extern s32 GetCdDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2); retail's tail call passes nothing */
-extern s32 GetVabDriverMode(void); /* arity-ok: the definition takes (s32 *outMode2); retail's tail call passes nothing */
-
-s32 GetActiveDataSourceDriverMode(void) {
+s32 GetActiveDataSourceDriverMode(s32 *outMode2) {
     if (gActiveDataSource == DATASOURCE_CD) {
-        return GetCdDriverMode();
+        return GetCdDriverMode(outMode2);
     } else {
-        return GetVabDriverMode();
+        return GetVabDriverMode(outMode2);
     }
 }
-
-extern s32 GetCdUseVSyncCallback(void);
-extern s32 GetVabUseVSyncCallback(void);
 
 s32 GetActiveDataSourceUseVSyncCallback(void) {
     if (gActiveDataSource == DATASOURCE_CD) {
@@ -627,10 +586,6 @@ s32 GetActiveDataSourceUseVSyncCallback(void) {
 }
 
 extern s32 gFileTableRegistered;
-extern void SetFileTable(CdFileEntry *table);
-extern s32 GetFileTableCount(void);
-extern void SetFileTableCount(s32 count);
-extern s32 ResolveFileEntries(CdFileEntry *entries, s32 count);
 
 s32 RegisterFileTableEntries(CdFileEntry *table, s32 count) {
     s32 first;

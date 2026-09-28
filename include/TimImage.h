@@ -2,6 +2,9 @@
 #define TIMIMAGE_H
 
 #include "FileResource.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 
 /*
  * TimImage -- a FileResource data source (class id 0x103, method table
@@ -30,8 +33,7 @@
  * +0x078 is FileResource's `void *slot78` (NULL there); this table's occupant
  * is TimImage__Upload, called through TimImageUploadFn (no code).
  *
- * `tim` is <libgs.h>'s GsIMAGE, so an includer takes Sony's headers first
- * (`common.h`, <libgte.h>, <libgpu.h>, <libgs.h>).
+ * `tim` is <libgs.h>'s GsIMAGE.
  */
 
 typedef struct TimImage TimImage;
@@ -83,5 +85,16 @@ void TimImage__NoOpSlot90(void);
 void TimImage__NoOpSlot94(void);
 void TimImage__SetFlag48(TimImage *self);
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim);
+
+/* An s16 VRAM point. */
+typedef struct DrawPoint {
+    /* +0x00 */ s16 x;
+    /* +0x02 */ s16 y;
+} DrawPoint;
+
+/* Rotates the VRAM rectangle `area` one column to the right, count times,
+ * through the one-column scratch area at `scratch`. Not a TimImage method. */
+struct DrawRect; /* include/DrawSystem.h */
+void RotateVramRectRight(struct DrawRect *area, s32 count, DrawPoint *scratch);
 
 #endif

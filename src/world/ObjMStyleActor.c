@@ -54,6 +54,10 @@
 #include "TmdModel.h"
 #include "GridCell.h"
 #include "GraphRoom.h"
+#include "BMemPMgr.h"
+#include "GameFiles.h"
+#include <strings.h>
+#include "DreamAux.h"
 
 void ItemList__SetState(ItemList *self, s32 state) {
     /* MATCHING: the gotos keep retail's branch polarity and block order. */
@@ -270,11 +274,6 @@ void ItemList__ReleaseRows(ItemList *self) {
     } while (i < count);
 }
 
-/* Psy-Q's libc2 strlen and memcpy, linked from Sony's objects, typed as
- * ItemList__FormatRowText passes them (memcpy's `void *` as <memory.h>). */
-extern s32 strlen(char *s);
-extern void *memcpy(char *dest, char *src, s32 n);
-
 void ItemList__RefreshRows(ItemList *self, s32 top, s32 column, s32 cursor, s32 notify) {
     s32 count;
     s32 i;
@@ -456,21 +455,17 @@ void ObjM__AttachTarget(ObjM *self, IntermediateBaseInitArgs *args, DreamSys *dr
     self->methods->addChild(self, (BasicClass *)dreamSys);
 }
 
-/* ObjM__GetGridRecord's grid lookups (src/cd/GameFiles.c): a
- * non-negative code is a linear cell index (GetStageMapChunkRecord(index, code)),
- * a negative one sends x/y to GetStageMapChunkRecordXY. */
-extern s32 GetStageMapChunkRecord(s32 index, s32 sub);
-extern void GetStageMapChunkRecordXY(s32 index, s32 x, s32 y);
-
 /* The StageMap's chunkFileFn: a chunk's file record, by linear cell index,
- * or by x/y when the index is negative. The record is left as the return
- * value for the StageMap (GetStageMapChunkRecordXY is declared void). */
-void ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
+ * or by x/y when the index is negative. */
+FilePathRecord *ObjM__GetGridRecord(ObjM *self, s32 cell, s32 x, s32 y) {
+    FilePathRecord *record;
+
     if (cell >= 0) {
-        GetStageMapChunkRecord(self->stage, cell);
+        record = GetStageMapChunkRecord(self->stage, cell);
     } else {
-        GetStageMapChunkRecordXY(self->stage, x, y);
+        record = GetStageMapChunkRecordXY(self->stage, x, y);
     }
+    return record;
 }
 
 void ObjM__DetachTarget(ObjM *self) {
@@ -478,14 +473,9 @@ void ObjM__DetachTarget(ObjM *self) {
     GetTimedTaskMethods()->deinit((TimedTask *)self);
 }
 
-/* Defined elsewhere, no header: src/cd/GameFiles.c (PickStageBgm and
- * PickStageTexture return a FilePathRecord *, a 0x1C-byte record handed on here as a
- * name), src/graphics/SceneNode.c (GetSetHitHeightGate sets the flag
- * SceneNode__RaycastHullAgainstFaces tests). RegisterStyleConfig, which
- * keeps `sceneRefs` as gStyleSceneRefs, is defined below, after ObjM. */
-extern s32 PickStageBgm(s32 stage, s32 unused);
-extern s32 PickStageTexture(s32 stage, s32 unused, s32 day);
-extern s32 GetSetHitHeightGate(s32 value);
+/* Defined elsewhere, no header: src/graphics/SceneNode.c (GetSetHitHeightGate
+ * sets the flag SceneNode__RaycastHullAgainstFaces tests). RegisterStyleConfig,
+ * which keeps `sceneRefs` as gStyleSceneRefs, is defined below, after ObjM. */
 extern s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadArg);
 
 /* The viewport's view point and reference point (attachViewChild), the
@@ -504,7 +494,7 @@ extern CellBounds gStage0Bounds;
 /* onInit (IntermediateBase__Init passes 0, 0, 0). */
 void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 arg3) {
     NodeGuardedViewport *vp = (NodeGuardedViewport *)self->viewport;
-    s32 record;
+    FilePathRecord *record;
     s32 day;
     s32 flag;
 
@@ -515,7 +505,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
 
     day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
     record = PickStageTexture(self->stage, 0, day);
-    self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc(record);
+    self->timBlockSrc = (TimBlockSrc *)New_TimBlockSrc((s32)record);
 
     vp->methods->attachViewChild(vp, (BasicClass *)self->dreamSys, &gObjMViewPoint,
                                  &gObjMViewRefPoint, 0);
@@ -566,7 +556,6 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
 }
 
 /* ObjM__TeardownStyle's helpers (src/world/DreamAux.c, src/world/ObjMStyleActor.c). */
-extern void ReleaseDreamAuxEntities(void);
 extern void StyleTeardown(void);
 
 /* onDeinit. */
@@ -692,13 +681,6 @@ void ObjM__TogglePause(ObjM *self) {
 }
 
 void ObjM__NoOpSlot7C(void) {}
-
-/* src/world/DreamAux.c's; no header declares it. It keeps the stage, the
- * StageMap, the DreamSys (gDreamAuxWorld), the sound and the FrameClock for
- * the dream's aux entities. */
-struct FrameClock;
-extern void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world,
-                             struct VabStreamObj *sound, struct FrameClock *frameClock);
 
 /* Added to the viewport's projection distance; 0 in the image and never
  * written. */
@@ -933,9 +915,6 @@ typedef struct ChunkCoord {
     u8 row;
 } ChunkCoord;
 
-/* src/world/DreamAux.c; it reads `coord` as one s16 trigger key. */
-extern s32 TryDreamAuxTrigger(s32 data, ChunkCoord *coord, s32 day);
-
 /* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
 extern char sPauseText[];             /* "Pause" */
@@ -1022,7 +1001,7 @@ s32 ObjM__CheckAuxTrigger(ObjM *self) {
     ChunkSlot *slot =
         ((StageMap *)self->unk14)->methods->getLastEventSlotChunk((StageMap *)self->unk14, &coord.column);
     s32 day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    held = TryDreamAuxTrigger((s32)slot->loader->dataBuffer, &coord, day);
+    held = TryDreamAuxTrigger((s32)slot->loader->dataBuffer, (s16 *)&coord, day); /* the coord is the trigger key */
     slot->heldObj = (BasicClass *)held;
     if (held != 0) {
         return 0;
@@ -1256,7 +1235,6 @@ void ApplyStyleDecorationIfSet(void) {
  * each function's match report, `## Naming`.
  */
 
-
 /* The decoration set: this many BoxFill bands, stacked 3 pixels apart. */
 #define STYLE_DECOR_BANDS 18
 
@@ -1278,10 +1256,6 @@ void ApplyStyleDecorationIfSet(void) {
  * gStyleDecorColorsB instead of gStyleDecorColorsA (PickStyleFallbackConfig). */
 #define STYLE_DECOR_B_PALETTE_INDEX 18
 
-
-extern const u8 *gStyleDecorColor;
-extern s32 gStyleDecorObj; /* a BoxFill */
-
 /* Releases the decoration box, if ApplyStyleDecorationIfSet made one. */
 void StyleFlushDecoration(void) {
     if (gStyleDecorColor != 0) {
@@ -1290,16 +1264,12 @@ void StyleFlushDecoration(void) {
     }
 }
 
-extern s32 gStyleDay;
-extern s32 gStyleStage;
 extern s8 gStyleVariantPicks[];
-extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];
 extern s32 gStyleConfigIndex;
 extern s8 *gStyleVariantConfigs[];
 extern const u8 *gStyleClearColor;
 extern u8 gStyleDecorColorsB[];
-extern u8 gStylePalette[][3];
 extern const u8 *gStyleDecorColors;
 extern u8 gStyleDecorColorsA[];
 extern s32 gStyleDecorVariant;
@@ -1348,7 +1318,6 @@ extern s32 gStyleDecorPosY;
 extern s32 gStyleDecorSizeW;
 extern s32 gStyleDecorSizeH;
 extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
-extern s32 gStyleSceneRefs; /* a StyleSceneRefs * */
 
 /* gStyleDecorPosX/Y and gStyleDecorSizeW/H are adjacent word pairs.
  * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
@@ -1451,21 +1420,14 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
     dst[2] = src[2] + delta;
 }
 
-extern void ReleaseBasicClassArray(void **array, s32 count);
-extern s32 gStyleDecorVariant;
-extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
-
 /* Releases the bands, if StyleBuildDecorSet made them. */
 void StyleReleaseDecorSet(void) {
     if (gStyleDecorVariant != 0) {
-        ReleaseBasicClassArray((void **)gStyleDecorSlots, ARRAY_COUNT(gStyleDecorSlots));
+        ReleaseBasicClassArray((BasicClass **)gStyleDecorSlots, ARRAY_COUNT(gStyleDecorSlots));
         gStyleDecorVariant = 0;
     }
 }
 
-extern s32 gStyleVariant;
-extern s32 gStyleSceneRefs;
-extern s32 rand(void);
 extern s8 gStyleKind0Counts[];
 extern s32 gStyleEffectSlotCount;
 extern StyleEffect *gStyleEffectSlots[];
@@ -1505,9 +1467,6 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
     gStyleEffectSlotCount = gStyleEffectSlotCount + 1;
 }
 
-extern s32 gStyleVariant;
-extern s32 gStyleEffectSlotCount;
-
 /* Each slot's +0x0EC is StyleEffect__Update, called with the position
  * (include/StyleEffect.h: the slot keeps Actor's setPendingExtra type). */
 void StyleUpdateEffectSlots(LongVec3 *pos) {
@@ -1523,13 +1482,10 @@ void StyleUpdateEffectSlots(LongVec3 *pos) {
     }
 }
 
-extern s32 gStyleVariant;
-extern s32 gStyleEffectSlotCount;
-
 /* Releases the effect slots, if StyleBuildEffectSlots ran. */
 void StyleReleaseEffectSlots(void) {
     if (gStyleVariant >= 0) {
-        ReleaseBasicClassArray((void **)gStyleEffectSlots, gStyleEffectSlotCount);
+        ReleaseBasicClassArray((BasicClass **)gStyleEffectSlots, gStyleEffectSlotCount);
     }
 }
 
@@ -1553,9 +1509,6 @@ struct StyleCueSlot {
 }; /* 0x68 bytes */
 
 extern StyleCueSlot *FlushStyleCue(StyleCueSlot *slot);
-
-extern s32 gStyleGrid; /* a StageMap */
-extern StyleCueSlot *gStyleCueSlots[2];
 
 /* Releases everything TickStyle built and unregisters the scene. */
 void StyleTeardown(void) {
@@ -1630,8 +1583,6 @@ StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos
     return slots;
 }
 
-extern s32 gStyleSpawnYChoice2;
-extern void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY);
 extern s32 gStyleSpawnColors[];
 extern Ratio16 *gStyleSpawnRotation;
 extern Ratio16 gStyleSpawnRotations[][3];
@@ -1680,10 +1631,6 @@ StyleEffect **StyleFillEffectKind3(StyleEffect **slots, LongVec3 *pos) {
 
 extern s32 gStyleKind2AltColor;
 extern u8 gStyleKind2Colors[][3];
-extern s32 gStyleSpawnColors[];
-extern Ratio16 *gStyleSpawnRotation;
-extern Ratio16 gStyleSpawnRotations[][3];
-extern s32 gStyleSpawnTableIndex;
 
 /* MATCHING: the first colour store goes through a one-field struct, as
  * PtrBoxK3's does, so the gStyleDay load may schedule above it. */
@@ -1722,10 +1669,6 @@ StyleEffect **StyleFillEffectKind2(StyleEffect **slots, LongVec3 *pos) {
     return slots;
 }
 
-extern s32 gStyleSpawnOffsetY;
-extern s32 gStyleSpawnOffsetZ;
-extern Ratio16 *gStyleSpawnRotation;
-extern Ratio16 gStyleSpawnRotations[][3];
 extern s32 gStyleSpawnModelLayout;
 
 /* Randomises the spawn parameters: offset y (offsetY, or a random choice
@@ -1751,7 +1694,6 @@ void SetupStyleSpawnParamsA(LongVec3 *pos, s32 offsetY) {
 }
 
 extern s32 gStyleSpawnYChoice1;
-extern s32 gStyleSpawnModelLayout;
 
 /* The every-seventh-day setup: fixed offset y, x of 0..19 steps of 2048, z
  * by day % 3 (40960, -40960, 2048), then the same rotation and layout
@@ -1776,11 +1718,8 @@ void SetupStyleSpawnParamsB(LongVec3 *pos, s32 offsetY) {
     gStyleSpawnModelLayout = rand() % 5;
 }
 
-extern s32 gStyleSceneRefs;
 extern void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target);
 extern SoundCueCallbackFn gStyleCueCallbacks[];
-extern s32 InitSoundCueSet(void *sound, SoundCueSet *set, s32 tag, void *owner,
-                           SoundCueCallbackFn callback);
 
 /* Claims the next record in range for `slot` and starts its cue. A started
  * cue equal to *lastCue is reported back negated. Returns the slot, or NULL. */
@@ -1801,7 +1740,6 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
     return 0;
 }
 
-extern s32 gStyleStage;
 extern s32 gStyleCueRecordIndex;
 extern u8 *gStyleCueRecordLists[];
 extern u8 gStyleCueRecordCounts[];
@@ -1889,9 +1827,6 @@ fail:
     return 0;
 }
 
-extern s32 gStyleSceneRefs;
-extern void FlushSoundCueSet(void *sound, SoundCueSet *set);
-
 /* Stops the slot's cue and frees its record. Returns NULL for the slot. */
 StyleCueSlot *FlushStyleCue(StyleCueSlot *slot) {
     FlushSoundCueSet(((StyleSceneRefs *)gStyleSceneRefs)->sound, &slot->cueSet);
@@ -1900,7 +1835,6 @@ StyleCueSlot *FlushStyleCue(StyleCueSlot *slot) {
 }
 
 extern s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target);
-extern void ServiceSoundCueSet(void *sound, SoundCueSet *set);
 
 /* One service pass of the slot's cue while the target is in range; 0 otherwise. */
 s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused) {
@@ -1910,8 +1844,6 @@ s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused) {
     }
     return 0;
 }
-
-extern s32 gStyleCueDistanceTable[];
 
 /* Whether the target is within the held cue's distance (X+Z); keeps the distance. */
 s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
@@ -1944,8 +1876,6 @@ extern void ApplyStyleDecorationIfSet(void); /* previous section */
 extern void StyleBuildDecorSet(void);
 extern void StyleUpdateDecorSet(void);
 extern void StyleScrollVramStrips(void);
-extern s32 gStyleTickCount;
-extern s32 gStyleCueRecordIndex;
 extern StyleCueSlot gStyleCueSlotPool[];
 extern StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *target, void *unused);
 extern s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused);
@@ -1987,17 +1917,16 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     return lastCue;
 }
 
-extern s32 gStyleStage;
-extern void RotateVramRectRight(DrawRect *rect, s32 count, DrawRect *scratch);
 extern DrawRect gStyleStripRectA;
-extern DrawRect gStyleStripScratchA;
+extern DrawPoint gStyleStripScratchA;
 extern DrawRect gStyleStripRectB;
-extern DrawRect gStyleStripScratchB;
+extern DrawPoint gStyleStripScratchB;
 
 /* One step of RotateVramRectRight's one-column VRAM rotation: stage 2 on the
  * strip at y 496, stages 3..5 on the one at y 504. */
 void StyleScrollVramStrips(void) {
-    DrawRect *rect, *scratch;
+    DrawRect *rect;
+    DrawPoint *scratch;
     s32 count;
 
     if (gStyleStage == 2) {
@@ -2284,7 +2213,6 @@ void StyleCue13(StyleCueParam *ctx, SoundCueSet *set) {
 /* One range per cue record (15), indexed by the record's cue index: the
  * negative of `cue` while a slot has the record claimed. IsStyleCueNear
  * tests the slot's distance against the same row. */
-extern s32 gStyleCueDistanceTable[];
 
 s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
     s32 range = gStyleCueDistanceTable[-ctx->entry->cue];
@@ -2292,8 +2220,6 @@ s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
 
     return ctx->lastDist / stepDist;
 }
-
-extern s32 gStyleVariant;
 
 s32 IsStyleVariantEven(void) {
     return (gStyleVariant & 1) ^ 1;
@@ -2303,9 +2229,6 @@ s32 IsStyleVariantEven(void) {
  * StyleEffect's slot occupants (ctor, finalize, reset = SetParams, +0x0EC =
  * Update), plus its `New_` allocator. The class: include/StyleEffect.h.
  * ------------------------------------------------------------------ */
-
-extern void *BMemPMgrAlloc(s32 size);
-extern void *BMemPMgrFree(void *ptr);
 
 StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *parent, LongVec3 *pos) {
     StyleEffect *self = BMemPMgrAlloc(sizeof(StyleEffect));
@@ -2370,7 +2293,6 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
 /* The class and its children: include/StyleEffect.h (the owner),
  * include/Actor.h (modelChildren) and include/VariantSprite.h (sprites). */
 
-extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gSpriteShiftX[];
 extern Ratio16 gSpriteScaleLarge[3];
 extern Ratio16 gSpriteScaleHalf[3];
@@ -2399,7 +2321,7 @@ extern Actor *gStyleEffectTmd; /* the Actor SetStyleEffectSources ran on */
 extern void *gStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
 extern s32 gStyleEffectBaseViewY;
-extern s32 gStyleEffectModelIds[];
+extern s32 gStyleEffectModelIds[3];
 
 /* Called once, from the class's ctor (StyleEffect__StyleEffect): snapshot the
  * viewpoint y, place self under `parent` at pos + offset, then build the
@@ -2607,7 +2529,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
 /* Release the two model children, if this layout made any. */
 void StyleEffect__ReleaseModelChildren(StyleEffect *self) {
     if (self->params.modelChildLayout != 0) {
-        ReleaseBasicClassArray((void **)self->modelChildren, ARRAY_COUNT(self->modelChildren));
+        ReleaseBasicClassArray((BasicClass **)self->modelChildren, ARRAY_COUNT(self->modelChildren));
     }
 }
 
@@ -2695,8 +2617,6 @@ void NoOpIgnoreArgs(void) {}
  * StyleEffect's sprite kinds (STYLE_EFFECT_SPRITES, _JITTER_SPRITES).
  * ------------------------------------------------------------------ */
 
-extern void ReleaseBasicClassArray(void **array, s32 count);
-
 /* Six scale tables, each three Ratio16s (x, y, z), for the jittering
  * sprites: a thin streak along y or along x, {1/16, 7/1}, {7/1, 1/16}, then
  * the same with 3 and 2; z is 1/1. VariantSprite__UpdateScale reads x and y. */
@@ -2704,7 +2624,7 @@ extern Ratio16 gStyleEffectJitterScales[6][3];
 
 /* Kind 2's release; ReleaseSpritesB, kind 3's, is the same body. */
 void StyleEffect__ReleaseSprites(StyleEffect *self) {
-    ReleaseBasicClassArray((void **)self->sprites, ARRAY_COUNT(self->sprites));
+    ReleaseBasicClassArray((BasicClass **)self->sprites, ARRAY_COUNT(self->sprites));
 }
 
 /* Five sprites of variant 0 at their default scale. */
@@ -2728,7 +2648,7 @@ void StyleEffect__RandomizeSprites(StyleEffect *self) {
 }
 
 void StyleEffect__ReleaseSpritesB(StyleEffect *self) {
-    ReleaseBasicClassArray((void **)self->sprites, ARRAY_COUNT(self->sprites));
+    ReleaseBasicClassArray((BasicClass **)self->sprites, ARRAY_COUNT(self->sprites));
 }
 
 /* StyleEffect's table getter. */
@@ -2740,13 +2660,7 @@ StyleEffectMethods *GetStyleEffectMethods(void) {
  * globals) draw from: the scene's TMD resource, its TIM image and the
  * viewport. The TMD resource's getModel slot sits where Actor has
  * setBackClip, hence the Actor view. */
-extern Actor *gStyleEffectTmd;
-extern void *gStyleEffectTim;
-extern Viewport *gStyleEffectViewport;
-extern s32 gStyleEffectModelIds[3];
 extern s16 gStyleEffectClutPos[2];
-
-extern void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy);
 
 /* Records the three sources, then points the first primitive of the TMD's
  * models 0 and 2 (gStyleEffectModelIds) at the CLUT at gStyleEffectClutPos. */
@@ -2764,9 +2678,6 @@ void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
         i++;
     } while (i < 2);
 }
-
-extern void *BMemPMgrAlloc(s32 size);
-extern void *BMemPMgrFree(void *ptr);
 
 void *New_Actor(void) {
     Actor *self = BMemPMgrAlloc(sizeof(Actor));
@@ -2833,8 +2744,6 @@ void Actor__Reset(Actor *self) {
     self->lastOffsetValue = 300;
     self->pendingExtra = 0;
 }
-
-extern void RotateAndOffsetHullList(TmdHull *hull, s32 turn, s32 back, s32 delta);
 
 /* notifyWithHull: SceneNode's, then, for events ACTOR_EVENT_UNSWEPT to
  * ACTOR_EVENT_MOVED_Y on a model with bounds, the model's hull goes to the
@@ -3186,11 +3095,6 @@ void *Actor__ScanGridWindow(Actor *self, void *offset, void *pos, GridQuery *que
     return NULL;
 }
 
-/* SceneNode.c: casts a vertical ray from `pos` against the node's model,
- * one way and then the other; on a hit writes the hit less the ray's start
- * to `offset` and returns 1. */
-extern s32 SceneNode__RaycastVertical(void *self, void *offset, void *pos);
-
 /* `cell` if it is non-NULL and a vertical ray from `pos` hits its model
  * (the offset to the hit into `offset`), else NULL. */
 void *AcceptGridElem(void *cell, void *offset, void *pos) {
@@ -3233,8 +3137,6 @@ ActorMethods *GetActorMethods(void) {
     return &gActorMethods;
 }
 
-extern void *BMemPMgrAlloc(s32 size);
-
 /* VariantSprite's allocator; its other methods follow in the next two
  * sections. */
 VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
@@ -3275,7 +3177,6 @@ void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *resetA
  * - VariantSprite__UpdateScale (updateScale, +0x048): two num/den ratios
  *   into GsSPRITE scalex/scaley.
  */
-
 
 /*
  * The two variants' CLUT positions, one {x, y} table in VRAM:
@@ -3345,8 +3246,6 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
  * plotted days, and TickHighlight then turns each one's dot green, one
  * every 24 frames once frameCounter passes 30.
  */
-
-extern void *BMemPMgrAlloc(s32 size);
 
 /* gGraphScoreMoods' length: ScoreDayLog's targets, one matchedDayIndices
  * byte and one highlight each. */

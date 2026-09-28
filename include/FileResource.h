@@ -1,6 +1,7 @@
 #ifndef FILERESOURCE_H
 #define FILERESOURCE_H
 
+#include "common.h"
 #include <libcd.h>
 #include "BasicClass.h"
 
