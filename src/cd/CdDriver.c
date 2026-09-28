@@ -46,6 +46,7 @@
 #include "DrawSystem.h"
 #include <strings.h>
 #include "GameApplicationFileResource.h"
+#include "BMemPMgr.h"
 
 /* `pos` (self->pos, CdFileEntry::pos) is Sony's CdlLOC; CdControl takes it
  * as the u_char * parameter bytes, hence those casts. */
@@ -71,8 +72,6 @@ extern char *BuildCdFilePath(char *dest, char *name);
  * into its clients' tables, so the request methods below run on other
  * objects. The ctor runs InitCdDrive (part 3) once per boot. */
 
-/* The game's pool allocator, src/app/BMemPMgr.c. */
-extern void *BMemPMgrAlloc(s32 size);
 /* Defined in CdDriver.c. */
 extern void InitCdDrive(void);
 
@@ -265,8 +264,6 @@ s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
  * arrived. MATCHING: called through a no-argument type, so no argument is
  * reloaded before the jal. */
 typedef void (*LoadFileNoArgsFn)(void);
-
-extern void *BMemPMgrAlloc(s32 size);
 
 void CdDriver__LoadFile(CdDriver *self, char *name) {
     CdFileEntry *entry;
@@ -802,8 +799,6 @@ extern void UnlockCd(void);
 /* Polls of CdSync that answer CdlNoIntr before the seek is issued again. */
 #define CD_WAIT_TIMEOUT 601
 
-/* The game's pool allocator, src/app/BMemPMgr.c. */
-extern void *BMemPMgrAlloc(s32 size);
 /* BMemPMgrFree is GameApplicationFileResource.h's, included above. */
 
 extern s32 gCdTimeoutCounter; /* CD_STATE_SETLOC_WAIT's polls; SetCdState clears it */

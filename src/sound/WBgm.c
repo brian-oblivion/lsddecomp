@@ -13,8 +13,8 @@
 #include "BasicClass.h"
 #include "DrawSystem.h"
 #include "WBgm.h"
+#include "BMemPMgr.h"
 
-extern void *BMemPMgrAlloc(s32 size);
 extern void printf(const char *fmt);
 extern const char sSeqOpenErrorMsg[]; /* "Seq Open error in WBgmHandleMonitorEvent" */
 

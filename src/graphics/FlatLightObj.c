@@ -16,8 +16,7 @@
 #include <libgpu.h>
 #include <libgs.h>
 #include "FlatLightObj.h"
-
-extern void *BMemPMgrAlloc(s32 size);
+#include "BMemPMgr.h"
 
 FlatLightObj *New_FlatLightObj(s32 lightId) {
     FlatLightObj *self;

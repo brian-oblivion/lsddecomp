@@ -41,6 +41,7 @@
 #include "LbdFile.h"
 #include "VabStreamObj.h"
 #include "Viewport.h"
+#include "BMemPMgr.h"
 
 /* With no look command pending, StepLookOffset springs the view height back
  * towards 0 by this much a tick (the size of one sLookOffsetSteps step), and

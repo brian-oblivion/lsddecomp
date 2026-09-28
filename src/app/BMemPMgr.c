@@ -17,6 +17,8 @@
  */
 
 #include "common.h"
+/* MATCHING: BMemPMgrAlloc/Free are defined K&R with a second parameter (BMemPMgr.h) */
+#define BMEMPMGR_DEFINER
 #include "BMemPMgr.h"
 #include <malloc.h>
 

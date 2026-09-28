@@ -555,7 +555,6 @@ char *BuildMemcardPath(McDevicePath *dest, s32 cardSlot, char *suffix);
 /* "TEMP": the name TaskObjF__ProbeCardFreeSpace creates to test for space. */
 extern char sMcTempFileSuffix[];
 
-extern void *BMemPMgrAlloc(s32 size);
 extern char *strcpy(char *dest, char *src);
 
 void TaskObjF__ClearLinks(TaskObjF *self) {

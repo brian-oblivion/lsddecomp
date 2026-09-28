@@ -54,6 +54,7 @@
 #include "TmdModel.h"
 #include "GridCell.h"
 #include "GraphRoom.h"
+#include "BMemPMgr.h"
 
 void ItemList__SetState(ItemList *self, s32 state) {
     /* MATCHING: the gotos keep retail's branch polarity and block order. */
@@ -2304,9 +2305,6 @@ s32 IsStyleVariantEven(void) {
  * Update), plus its `New_` allocator. The class: include/StyleEffect.h.
  * ------------------------------------------------------------------ */
 
-extern void *BMemPMgrAlloc(s32 size);
-extern void *BMemPMgrFree(void *ptr);
-
 StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *parent, LongVec3 *pos) {
     StyleEffect *self = BMemPMgrAlloc(sizeof(StyleEffect));
 
@@ -2764,9 +2762,6 @@ void SetStyleEffectSources(s32 unused, Actor *tmd, s32 tim, s32 viewport) {
         i++;
     } while (i < 2);
 }
-
-extern void *BMemPMgrAlloc(s32 size);
-extern void *BMemPMgrFree(void *ptr);
 
 void *New_Actor(void) {
     Actor *self = BMemPMgrAlloc(sizeof(Actor));
@@ -3233,8 +3228,6 @@ ActorMethods *GetActorMethods(void) {
     return &gActorMethods;
 }
 
-extern void *BMemPMgrAlloc(s32 size);
-
 /* VariantSprite's allocator; its other methods follow in the next two
  * sections. */
 VariantSprite *New_VariantSprite(s32 variant, void *resetArg, void *texture) {
@@ -3345,8 +3338,6 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
  * plotted days, and TickHighlight then turns each one's dot green, one
  * every 24 frames once frameCounter passes 30.
  */
-
-extern void *BMemPMgrAlloc(s32 size);
 
 /* gGraphScoreMoods' length: ScoreDayLog's targets, one matchedDayIndices
  * byte and one highlight each. */

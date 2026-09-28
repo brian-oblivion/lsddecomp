@@ -8,6 +8,7 @@
  */
 #include "common.h"
 #include "Application.h"
+#include "BMemPMgr.h"
 
 extern s32 gCdInitDone;               /* CdInit has been called */
 extern ScreenDims gDefaultScreenDims; /* {320, 240} */
@@ -18,7 +19,6 @@ extern void SsInit(void);
 extern void GsInit3D(void);
 
 extern void SetActiveDataSource(s32 source); /* src/app/GameApplicationFileResource.c */
-extern void *BMemPMgrAlloc(s32 size);
 
 void Application__Application(Application *self, s32 dataSource) {
     Get_vtable_BasicClass()->ctor((BasicClass *)self);

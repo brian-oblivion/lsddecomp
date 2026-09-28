@@ -17,6 +17,7 @@
 #include "BasicClass.h"
 #include "CdStream.h"
 #include "CdDriver.h" /* CD_SECTOR_SHIFT */
+#include "BMemPMgr.h"
 
 /* The ctor: a drive speed below this is double speed. */
 #define CDSTREAM_DOUBLE_SPEED_BELOW 4
@@ -45,7 +46,6 @@
 char *GetDataDirectory(void);
 extern char *strcpy(char *dest, char *src);
 extern char *strcat(char *dest, char *src);
-extern void *BMemPMgrAlloc(s32 size);
 
 extern s32 gCdStreamAudioMixSet;
 extern char gCdStreamVersionSuffix[]; /* ";1" */

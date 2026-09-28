@@ -59,6 +59,7 @@
 #include "DrawSystem.h"
 #include "CdStream.h"
 #include "MoviePlayer.h"
+#include "BMemPMgr.h"
 
 #define CD_SECTOR_SIZE 2048 /* a CD-ROM data sector: TimBlockSrc's first read */
 #define FIX12_SHIFT 12      /* ONE == 1 << FIX12_SHIFT: 20.12 fixed point */
@@ -113,8 +114,6 @@ typedef struct SubBlockTable {
 
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
-extern void BMemPMgrFree(void *arg);
-extern void *BMemPMgrAlloc(s32 size);
 
 /* A method table's ctor slot, unprototyped: the allocators that check the
  * ctor's result call it through this. */

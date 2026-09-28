@@ -34,6 +34,7 @@
 #include "DreamSys.h"
 #include "StageMap.h"
 #include "Viewport.h"
+#include "BMemPMgr.h"
 
 Entity *New_Entity(s32 moodIndex, void *desc, void *sound) {
     Entity *obj;

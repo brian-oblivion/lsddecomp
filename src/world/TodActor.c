@@ -28,6 +28,7 @@
 #include "LinkResource.h"
 #include "VabStreamObj.h"
 #include "FrameClock.h"
+#include "BMemPMgr.h"
 
 /*
  * This file's own readings of what TodActor (include/TodActor.h) reaches
@@ -124,9 +125,6 @@ typedef struct TodActorDesc {
     /* +0x008 */ u8 pad8[4];
     /* +0x00C */ ModelData *modelData;
 } TodActorDesc;
-
-extern void *BMemPMgrAlloc(s32 size);
-extern void *BMemPMgrFree(void *ptr);
 
 void *New_TodActor(void *desc, void *sound) {
     TodActor *self;

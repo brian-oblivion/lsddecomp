@@ -72,15 +72,25 @@ struct BMemPMgr {
 #define BMEMPMGR_SENTINEL_SIZE 4
 #define BMEMPMGR_MIN_POOL_SIZE 1024
 
-/* The pool allocator and its free. Both bodies read a second argument, a
- * fallback pool used only while gDefaultBMemPMgr is unset, that no caller
- * passes: every other unit declares its own one-argument prototype for its
- * own call sites. BMemPMgr.c defines them K&R so their bodies can name the
- * second parameter while its own later one-argument calls still compile; an
- * unprototyped declaration here keeps the earlier ones compiling too. A full
- * prototype here breaks one side or the other. */
-extern void *BMemPMgrAlloc(); /* arity-ok: the body reads $a1 as the fallback pool (BMemPMgrAlloc.md, "Extern arity") */
-extern void *BMemPMgrFree(); /* arity-ok: same as BMemPMgrAlloc (BMemPMgrFree.md, "Extern arity") */
+/* Creates the game's one pool: mallocs its header, poolSize bytes of blocks
+ * (at least BMEMPMGR_MIN_POOL_SIZE) and the sentinel, and makes the blocks one
+ * free block. Returns the pool (a BMemPMgr), or NULL when malloc fails. */
+extern void *BMemPMgrInit(); /* MATCHING: unprototyped, main() passes a dead 2nd argument retail loads (arity-ok: main.md) */
+
+/* Makes `pool` the one the allocator works on. */
+extern void SetDefaultBMemPMgr(BMemPMgr *pool);
+
+/* Frees ptr back to the C heap (free), not to the pool. */
+extern void FreeMem(void *ptr);
+
+/* The pool allocator and its free. BMemPMgr.c defines both K&R with a second
+ * parameter, a fallback pool read only while gDefaultBMemPMgr is unset, that
+ * no caller passes, so it must not see these one-argument prototypes.
+ * BMemPMgrFree always returns NULL. */
+#ifndef BMEMPMGR_DEFINER
+extern void *BMemPMgrAlloc(s32 size); /* arity-ok: the body reads $a1 as the fallback pool (BMemPMgrAlloc.md) */
+extern void *BMemPMgrFree(void *ptr); /* arity-ok: same as BMemPMgrAlloc (BMemPMgrFree.md) */
+#endif
 
 /* Makes the whole pool one free block. One argument: the body also reads a
  * fallback pool from $a1 while gDefaultBMemPMgr is unset, but BMemPMgrInit,

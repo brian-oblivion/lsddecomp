@@ -22,6 +22,7 @@
 #include "FileResource.h"
 #include "DrawSystem.h"
 #include "TimImage.h"
+#include "BMemPMgr.h"
 
 /* An s16 point. */
 typedef struct DrawPoint {
@@ -29,7 +30,6 @@ typedef struct DrawPoint {
     /* +0x02 */ s16 y;
 } DrawPoint;
 
-extern void *BMemPMgrAlloc(s32 size);
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
 /* new TimImage(name). */

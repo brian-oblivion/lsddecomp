@@ -371,10 +371,6 @@ extern s8 sDreamColorTable[9];
 extern const s8 sVoiceBySelect[0x18];
 extern const s8 sVoicePitchBySelect[0x18];
 
-/* BasicClass-family allocator; see GameApplicationFileResource.h / TodActor.c / Entity.h /
-   Pad.c for the other units that also declare it locally. */
-extern void *BMemPMgrAlloc(s32 size);
-
 /* The object. Actor's fields (include/Actor.h) run to +0x058; DreamSys's
  * own start there. New_DreamSys allocates 0x928 bytes. */
 struct DreamSys {

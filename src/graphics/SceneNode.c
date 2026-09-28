@@ -31,10 +31,7 @@
 #include "FrameClock.h"
 #include "TmdModel.h"
 #include "Actor.h"
-
-/* BMemPMgr.c's pool allocator, in this file's view of it. */
-extern void *BMemPMgrAlloc(s32 size);
-extern void BMemPMgrFree(void *arg);
+#include "BMemPMgr.h"
 
 /* UpdateRotation's divisor: its inputs are degrees, and a degree count in
  * 20.12 fixed point divided by 360 is the angle in 4096ths of a turn (ONE to

@@ -13,11 +13,10 @@
 #include "common.h"
 #include <libetc.h>
 #include "Pad.h"
+#include "BMemPMgr.h"
 
 /* What only this file's bodies use; the class itself is include/Pad.h. The
  * pad library it wraps (PadInit, PadRead, PadStop) is Sony's <libetc.h>. */
-
-extern void *BMemPMgrAlloc(s32 size);
 
 extern s32 sPadRefCount; /* live instances: the first ctor calls PadInit, the last finalize PadStop */
 extern u32 sButtonMasks[PAD_BUTTON_COUNT]; /* runtime copy of the button-mask table, filled by Pad__LoadButtonTable */

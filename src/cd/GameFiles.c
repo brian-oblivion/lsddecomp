@@ -28,6 +28,7 @@
 #include "common.h"
 #include "LbdFile.h"
 #include "StageGrid.h"
+#include "BMemPMgr.h"
 
 /* gRecordTable's record indices. The first RECORD_TABLE_COUNT are the
  * sound banks (SND\*.VH/VB) and then each stage's files; the movie records
@@ -82,9 +83,7 @@ typedef struct FilePathRecord {
 
 extern int rand(void);
 extern void srand(unsigned int seed);
-extern void *BMemPMgrFree(void *ptr);
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
-extern void *BMemPMgrAlloc(s32 size);
 
 /* allocator: new LbdFile object */
 LbdFile *New_LbdFile(void) {

@@ -26,9 +26,6 @@ struct SubObjE {
     SubObjEMethods *methods;
 };
 
-/* The object allocator every New_<Class> calls. */
-extern void *BMemPMgrAlloc(s32 size);
-
 /* src/world/DreamAux.c; DayTask's finalize calls it after releasing its
  * resources. */
 extern void ReleaseDreamAuxModels(void);

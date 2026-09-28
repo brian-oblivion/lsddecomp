@@ -25,16 +25,13 @@
 #include <libsnd.h>
 #include "VabStreamObj.h"
 #include "SoundCueSet.h"
+#include "BMemPMgr.h"
 
 /* FileResource's, GameApplicationFileResource.c: the active driver's table (gVabDriverMethods
  * or gCdDriverMethods, both FileResource tables), through which
  * PlacementGrid's and VabStreamObj's ctors and finalizes, and PlacementGrid's
  * setFlag, reach their parent's. */
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
-
-/* The pool allocator (include/BMemPMgr.h, not included here; Pad.c
- * declares it the same way). */
-extern void *BMemPMgrAlloc(s32 size);
 
 /* What `buffer` points at: 8 bytes nothing here reads, then each cell's
  * first record, one per cell of the chunk's 20 x 20 lattice, row-major. A
@@ -178,7 +175,6 @@ void VabDriver__NoOpSlot50(void) {}
  */
 
 /* Defined in other units. */
-extern void *BMemPMgrFree(void *ptr);
 extern char *BuildFileName(char *dest, char *name, char *dir, char *ext);
 extern s32 strlen(char *s);
 extern char *strcpy(char *dest, char *src);

@@ -42,6 +42,7 @@
 #include "GameApplicationFileResource.h"
 #include "VabDriver.h"
 #include "CdDriver.h"
+#include "BMemPMgr.h"
 
 extern char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD"; not const: ResourceSource's name is char * */
 

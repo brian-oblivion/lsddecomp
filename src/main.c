@@ -22,12 +22,6 @@
  * declares it. */
 extern void SetMem(s32 megabytes);
 
-/* BMemPMgr.c defines these; BMemPMgr.h does not declare them. BMemPMgrInit
- * takes one argument, poolSize. It is declared unprototyped so that main can
- * pass the second, unread one. */
-extern void *BMemPMgrInit(); /* arity-ok: main passes a dead 2nd argument that retail loads (main.md, "Two levers") */
-extern void SetDefaultBMemPMgr(BMemPMgr *pool);
-
 extern BMemPMgr *gStartupBMemPMgr;
 extern GameApplication *gGameApplication;
 extern GameApplicationConfig gGameApplicationConfig;

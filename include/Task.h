@@ -22,11 +22,6 @@
  * TaskCore.h, IntermediateBase.h, Viewport.h, BoxFill.h, FadeBox.h, TextRow.h.
  */
 
-/* The pool allocator's pair. BMemPMgrFree returns NULL (its body ends
- * `addu $v0, $zero, $zero`), and ScreenWidgets's caller uses the result. */
-extern void *BMemPMgrAlloc(s32 size);
-extern void *BMemPMgrFree(void *ptr);
-
 /* Releases each element of a BasicClass array (TaskCore's slot elements,
  * TextRow's children). */
 extern void ReleaseBasicClassArray(void *array, void *count);

@@ -29,6 +29,7 @@
 #include "FrameClock.h"
 #include "Task.h"
 #include "TextRow.h"
+#include "BMemPMgr.h"
 
 FadeBox *New_FadeBox(void *size, s32 channels, s32 pri) {
     FadeBox *self;
