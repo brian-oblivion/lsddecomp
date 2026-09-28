@@ -98,7 +98,7 @@ void Pad__DispatchEvents(Pad *self) {
     }
 }
 
-void Pad__func_80025E14(void) {}
+void Pad__NoOpSlot4C(void) {}
 
 void Pad__LoadButtonTable(void) {
     Block64 local;
