@@ -19,7 +19,7 @@ through the pointer each time.
 ## Body
 
 ```c
-extern Vec3S gModelChildOffsetInit;
+extern Vec3S sModelChildOffsetInit;
 extern s32 gModelChildSpacing[];
 
 void StyleEffect__PlaceModelChildren(LinkNode *self, s32 reuse) {
@@ -31,7 +31,7 @@ void StyleEffect__PlaceModelChildren(LinkNode *self, s32 reuse) {
     if (count == 0) {
         return;
     }
-    accum = gModelChildOffsetInit;
+    accum = sModelChildOffsetInit;
     p = self->arr7C;
     for (i = 0; i < 2; i++, p++) {
         if (count < 3) {
@@ -68,7 +68,7 @@ instead of retail's `-0x48`) because two fewer registers needed saving.
 Caching `count = self->unk6C` up front and using `count` everywhere else
 fixed it outright -- one word.
 
-The three-word residue seen along the way (`gModelChildOffsetInit`'s/`gModelChildSpacing`'s own
+The three-word residue seen along the way (`sModelChildOffsetInit`'s/`gModelChildSpacing`'s own
 `%lo` immediates and one `jal` target, all off by exactly 4) was pure address
 drift from `StyleEffect__BuildRandomSprites` (this unit's sixth function this round) not yet
 being byte-exact -- not a real defect in this function. `./build-and-verify.sh`
@@ -99,7 +99,7 @@ scaled by the scale triple's first s16) or y (3-4). "Place" covers both
 paths; B because the layout's purpose on screen is not known.
 
 Globals named in this pass (only this unit references them, tier B):
-`gModelChildOffsetInit` (was D_800877EC, all-zero Vec3S, the accumulator's
+`sModelChildOffsetInit` (was D_800877EC, all-zero Vec3S, the accumulator's
 start value) and `gModelChildSpacing` (was D_800877F8, s32[5] = {0, -0x80,
 0x80, -0x100, 0x40}, indexed by modelChildLayout).
 

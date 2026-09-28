@@ -2507,7 +2507,7 @@ void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, 
  * numerator) for layouts 1-2 and along y for 3-4. reuse = 0 creates them
  * (New_Actor, sharing the owner's model, attached to the owner);
  * reuse = 1 only resets their translation (setTranslation). */
-extern LongVec3 gModelChildOffsetInit;
+extern LongVec3 sModelChildOffsetInit;
 extern s32 gModelChildSpacing[];
 
 void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
@@ -2519,7 +2519,7 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
     if (layout == 0) {
         return;
     }
-    childPos = gModelChildOffsetInit;
+    childPos = sModelChildOffsetInit;
     slot = self->modelChildren;
     for (i = 0; i < ARRAY_COUNT(self->modelChildren); i++, slot++) {
         if (layout < 3) {
