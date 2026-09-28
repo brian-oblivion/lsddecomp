@@ -24,7 +24,7 @@
  * redundant and drops it. */
 extern volatile u16 D_8008EA26;
 
-/* "Loop bound / threshold" -- libsnd_vmanager.c's own comment on this symbol. */
+/* The number of voices the voice manager owns. */
 extern u8 spuVmMaxVoice;
 
 /*
@@ -40,24 +40,18 @@ extern u8 spuVmMaxVoice;
  */
 extern volatile u16 *_svm_sreg;
 
-/* PS1 SPU voice key-on/off pair, split low/high across two 16-bit halves
- * (voices 0-15 / 16-31) -- _svm_okof1/64 are the hardware-mirrored "just
- * keyed on" mask, _svm_okon1/22C a software mask this function clears the
- * same bit from (a "no longer fading out" bookkeeping flag). */
+/* The voice manager's pending key masks, voices 0-15 then 16-23, which
+ * SpuVmFlush writes to the SPU once per tick: each voice's bit is set in
+ * the key-off masks and cleared from the key-on masks. */
 extern u16 _svm_okof1;
 extern u16 _svm_okof2;
 extern u16 _svm_okon1;
 extern u16 _svm_okon2;
 
-/* SsUtAllKeyOff's near-miss body, kept for reading: length exact, with a
- * register-identity residue on bitLo/bitHi
- * (docs/match-reports/SsUtAllKeyOff.md). Its load-bearing spellings:
- * _svm_sreg's pointee is volatile; `s16 woff = i * 8` is signed, which gives
- * the sll 19 / sra 15 pair; the loop is a `for`, not a guard plus
- * `for(;;)`; and the tail does three stores off the reloaded index. */
-#if 0
-void SsUtAllKeyOff(void)
-{
+#ifdef NON_MATCHING
+/* NON_MATCHING: length exact, 131 words; a register-identity residue on
+ * bitLo/bitHi (docs/match-reports/SsUtAllKeyOff.md). */
+void SsUtAllKeyOff(void) {
     s16 i;
     s16 woff;
     u16 bitpos;
@@ -109,5 +103,6 @@ void SsUtAllKeyOff(void)
         _svm_okon2 = _svm_okon2 & ~hw1;
     }
 }
-#endif
+#else
 INCLUDE_ASM("asm/nonmatchings/psyq/libsnd_ut_ako", SsUtAllKeyOff);
+#endif
