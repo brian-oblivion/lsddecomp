@@ -145,7 +145,7 @@ uses as the save title's full-width text; TitleMenuTaskObjF.c writes the day
 into it, hence `g`); `D_8008AA14` -> `sSaveTitleBlanks` (tier A: its ROM
 value points at 19 full-width spaces). Both retyped `void *` -> `char *`
 in include/class_3bb8c.h, which removes the `(char *)` casts. `+ 0x18` is
-`SAVE_TITLE_PADDING * 2`, the same character index class_3bb8c_g.c's
+`SAVE_TITLE_PADDING * 2`, the same character index TitleMenuTaskObjF.c's
 SAVE_TITLE_PADDING (12) names; each character is 2 bytes. Locals:
 `size` -> `cellCount`, `buf` -> `text`.
 

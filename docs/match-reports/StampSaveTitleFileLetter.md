@@ -6,7 +6,7 @@
 
 > Renamed from `func_800507F8` on 2026-09-23 (tools/rename.py). Address 0x800507f8.
 
-**Unit:** class_3bb8c_g · **Size:** 60 words (0xF0 bytes)
+**Unit:** TitleMenuTaskObjF · **Size:** 60 words (0xF0 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 14. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile).
@@ -219,6 +219,6 @@ takes these types they move to the header that owns the save title
 them. `FullWidthChar`, `FullWidthChars3` and `FullWidthChars6` now live in
 `include/TitleMenu.h` (the save title is TitleMenu's buffer; see
 StampSaveTitleDay.md's track 6 section), unchanged in layout, with the
-`MATCHING:` line kept once there; class_3bb8c_g.c's local definitions are
+`MATCHING:` line kept once there; TitleMenuTaskObjF.c's local definitions are
 deleted and it includes TitleMenu.h. TitleMenuTaskObjF's `Buf6_3bb8c_c` is
 retired for `FullWidthChars3`. Image byte-identical.

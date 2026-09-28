@@ -226,7 +226,7 @@ why "SaveFile": the 0x200-byte buffer it submits is structurally exact
 to the documented PS1 memory-card save file header format), bracketed by
 a `StampSaveTitleFileLetter(handle, ...)` registry mark/unmark call (mark before
 the retry loop, unmark only if every attempt failed). The registry call
-itself is a different unit's own helper (`src/class_3bb8c_g.c`) and its
+itself is a different unit's own helper (`src/TitleMenuTaskObjF.c`) and its
 exact purpose is not re-derived here.
 
 ## Track 4 (2026-09-26, round 89)

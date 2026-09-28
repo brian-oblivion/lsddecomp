@@ -6,7 +6,7 @@
 
 > Renamed from `func_800501F0` on 2026-09-23 (tools/rename.py). Address 0x800501f0.
 
-Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TaskObjF__AbortFromState`: 36/36 words match.
 
 ## Source

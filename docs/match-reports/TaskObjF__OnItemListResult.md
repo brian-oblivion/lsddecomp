@@ -6,7 +6,7 @@
 
 > Renamed from `func_80050730` on 2026-09-23 (tools/rename.py). Address 0x80050730.
 
-Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TaskObjF__OnItemListResult`: 46/46 words match.
 
 ## Source
@@ -33,7 +33,7 @@ First attempt, byte-exact. Same two-value `switch` layout lesson as
 re-deriving): out-of-line case bodies reached by forward `beq`s, which a
 plain `switch` reproduces and an `if`/`else if` chain would not.
 
-This is this unit's last fresh function -- all 12 of `class_3bb8c_g`'s
+This is this unit's last fresh function -- all 12 of `TitleMenuTaskObjF`'s
 non-blocked functions are now matched.
 
 ## Struct changes (additive, `include/class_3bb8c.h`)

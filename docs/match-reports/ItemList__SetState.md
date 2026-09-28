@@ -76,7 +76,7 @@ than continuing to reshape nested conditionals.
 
 Round 75 (bravo, track 3). `func_800521D4` -> `ItemList__SetState`, **tier B**.
 
-Slot +0x054 of gItemListMethods (`tools/classtable.py gItemListMethods`). Clears `closeTicks`; for state 2 or 3 it removes the cached `inputSource` child, releases resources (slot +0x048, ItemList__ReleaseResources) and stores the state in `result`; for state 4 it calls notifyParents(self, result). Callers: ItemList__HandleInputCode (2 after input code 25, 3 after code 23) and ItemList__TickClosing (4). The one parent-side reader, TaskObjF__OnItemListResult (class_3bb8c_g), takes code 2 as "read the selected item" and 3 as the other outcome. Tier B: `SetState` names the mechanics; the states' game meaning (confirm/cancel) is only suggested by that one caller.
+Slot +0x054 of gItemListMethods (`tools/classtable.py gItemListMethods`). Clears `closeTicks`; for state 2 or 3 it removes the cached `inputSource` child, releases resources (slot +0x048, ItemList__ReleaseResources) and stores the state in `result`; for state 4 it calls notifyParents(self, result). Callers: ItemList__HandleInputCode (2 after input code 25, 3 after code 23) and ItemList__TickClosing (4). The one parent-side reader, TaskObjF__OnItemListResult (TitleMenuTaskObjF), takes code 2 as "read the selected item" and 3 as the other outcome. Tier B: `SetState` names the mechanics; the states' game meaning (confirm/cancel) is only suggested by that one caller.
 
 ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
 

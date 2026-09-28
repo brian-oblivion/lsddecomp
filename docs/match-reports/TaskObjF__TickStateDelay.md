@@ -4,7 +4,7 @@
 
 > Renamed from `func_80050280` on 2026-09-23 (tools/rename.py). Address 0x80050280.
 
-Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TaskObjF__TickStateDelay`: 48/48 words match.
 
 ## Source
@@ -58,7 +58,7 @@ notification call only fires once the counter has reached 6 or more.
   relative to retail ($v0 holds "old" in retail, used for both the
   increment source and the comparison; my single-variable form let the
   compiler pick the opposite assignment). Confirmed via
-  `objdump -d build/src/class_3bb8c_g.c.o` before touching anything else,
+  `objdump -d build/src/TitleMenuTaskObjF.c.o` before touching anything else,
   per the standing "cross-check the real compiled length/shape" rule.
 - **Attempt 2 (separate `old`/`newVal` locals, still wrong -- this time a
   genuine LENGTH mismatch, not a register swap):** giving the incremented

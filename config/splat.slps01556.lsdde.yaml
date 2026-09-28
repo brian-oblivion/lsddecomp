@@ -1457,7 +1457,6 @@ segments:
       # 5+ callee-saved registers.
       # TWO jump-table owners here, so expect the rodata attach/split dance
       # documented in PARALLEL-RUNS Gate 2.
-      - [0x403E4, c, class_3bb8c_g]
       # class_3bb8c_h: the remaining 230 functions, 0x410E8.. -- UNCARVED.
       # Opens ON the trampoline cluster: all 13 `jr $t2` BIOS trampolines sit
       # at 0x410E8..0x41398. No C compiles to one, so carving from here needs

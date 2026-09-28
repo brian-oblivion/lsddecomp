@@ -6,7 +6,7 @@
 
 > Renamed from `func_80050410` on 2026-09-23 (tools/rename.py). Address 0x80050410.
 
-Unit `class_3bb8c_g`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TaskObjF__DetachTextEntry`: 48/48 words match.
 
 ## Source

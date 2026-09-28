@@ -127,9 +127,9 @@ the six bytes are three full-width Shift-JIS digits, which
 `FormatFullWidthNumber(..., 3, 0)` writes and the copy puts at the save
 title's +0x12, characters 9..11 (the "001" of "LSD   Day001"; the title's
 layout was measured in round 95, StampSaveTitleFileLetter.md). It is the
-same record class_3bb8c_g's StampSaveTitleFileLetter copies, so the three
+same record TitleMenuTaskObjF's StampSaveTitleFileLetter copies, so the three
 types (`FullWidthChar`, `FullWidthChars3`, `FullWidthChars6`) moved from
-class_3bb8c_g.c into `include/TitleMenu.h`: the save title is TitleMenu's
+TitleMenuTaskObjF.c into `include/TitleMenu.h`: the save title is TitleMenu's
 buffer (its banner: createSaveTitle builds `saveTitle` from the SJIS title
 in gSaveTitle's buffer; both writers serve it), and `TaskObjF.h` only sees
 a `char *title` passed in. Alignment is still 1 (all-`s8` leaves), so the
@@ -165,7 +165,7 @@ loads/stores."
   "7654321" string D_8008AA1C.
 
 Constants: `SAVE_TITLE_DAY` (9) and `SAVE_TITLE_DAY_DIGITS` (3),
-unit-local, on class_3bb8c_g.c's `SAVE_TITLE_*` model; the store is
+unit-local, on TitleMenuTaskObjF.c's `SAVE_TITLE_*` model; the store is
 `*(FullWidthChars3 *)&((FullWidthChar *)gSaveTitle)[SAVE_TITLE_DAY]`, as
 StampSaveTitleFileLetter indexes its `FullWidthChar *title`, in place of
 `(s8 *)gSaveTitle + 0x12`. Byte-identical.

@@ -15,7 +15,7 @@
  *   DayTaskStageMap    StageMap (include/StageMap.h), the chunk grid manager
  *   TitleMenuTaskObjF  NodeGuardedViewport, GridCell, TitleMenu
  *                      (include/TitleMenu.h, a TaskCore), TaskObjF
- *   class_3bb8c_g      TaskObjF (include/TaskObjF.h), the memory-card task
+ *   TitleMenuTaskObjF      TaskObjF (include/TaskObjF.h), the memory-card task
  *   class_3bb8c_i, _j  TextEntry (include/TextEntry.h)
  *   class_3bb8c_j, _k  ItemList (include/ItemList.h)
  *   class_3bb8c_k..m   ObjM (include/ObjM.h)
@@ -218,7 +218,7 @@ extern McDevicePath gMcDevicePath0; /* "bu00:" */
 /* The game's own strcat (src/GameApplicationFileResource.c). */
 extern char *strcat(char *dest, char *src);
 
-/* Game code (src/class_3bb8c_g.c). TaskObjF__WriteMemcardSaveFile calls it
+/* Game code (src/TitleMenuTaskObjF.c). TaskObjF__WriteMemcardSaveFile calls it
  * around its retry loop, and with (arg, 0) when the loop gives up. The BIOS
  * file calls (open, read, lseek, close, delete; Sony's libapi) are declared
  * in the units that call them. */

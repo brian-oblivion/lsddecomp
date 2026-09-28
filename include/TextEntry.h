@@ -24,7 +24,7 @@
  *  - Every editing method does nothing until loadCardResources has made
  *    `panelSprite` (CARD\COMINPUT.TIM), the text row and the '_' cursor
  *    (CARD\FONTICON.TIM).
- * Its one maker is TaskObjF__AttachTextEntry (class_3bb8c_g, mode 1), which
+ * Its one maker is TaskObjF__AttachTextEntry (TitleMenuTaskObjF, mode 1), which
  * also drives loadCardResources/attachTarget/detachTarget/release.
  * What the string is in the game is not established.
  *

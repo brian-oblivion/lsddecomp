@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004FBE4` on 2026-09-23 (tools/rename.py). Address 0x8004fbe4.
 
-Unit `class_3bb8c_g`, class `Class86E00_3bb8c_g`. The largest function in
+Unit `TitleMenuTaskObjF`, class `Class86E00_3bb8c_g`. The largest function in
 this round's batch. State-machine driver: normalizes `arg1` to `0x17` if
 it equals the current state, fires three unconditional transition calls,
 then a dense 5-case `switch` (`jtbl_8001157C`) on the normalized value
@@ -75,7 +75,7 @@ void TaskObjF__SetState(Class86E00_3bb8c_g *self, s32 arg1)
 
 ## Deriving the shape
 
-`jtbl_8001157C` (`asm/nonmatchings/class_3bb8c_g/TaskObjF__SetState.s`) has 6
+`jtbl_8001157C` (`asm/nonmatchings/TitleMenuTaskObjF/TaskObjF__SetState.s`) has 6
 entries for the range check `(arg1 - 0x11) unsigned < 5`; the 6th (index 5,
 `arg1==0x16`, unreachable given the `< 5` guard) is a dead `0x00000000`
 placeholder, matching the same "dense switch, one unreachable padding

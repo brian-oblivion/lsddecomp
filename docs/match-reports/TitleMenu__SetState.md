@@ -60,7 +60,7 @@ cover this; filing as a confirming instance rather than a new bullet.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D90C` -> `TitleMenu__SetState`. **Tier B**: Forwards `arg1` to the base class's own state-setter (`Get_vtable_TaskCore()->slot60(self, arg1)`) and does extra dispatch for two literal values (5, 0xA) -- the same "forward-then-special-case" shape already named `SetState` for `TaskObjF` (`class_3bb8c_g.c`). Purpose of the two particular state values not established.
+Renamed `func_8004D90C` -> `TitleMenu__SetState`. **Tier B**: Forwards `arg1` to the base class's own state-setter (`Get_vtable_TaskCore()->slot60(self, arg1)`) and does extra dispatch for two literal values (5, 0xA) -- the same "forward-then-special-case" shape already named `SetState` for `TaskObjF` (`TitleMenuTaskObjF.c`). Purpose of the two particular state values not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 

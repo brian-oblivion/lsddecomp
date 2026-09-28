@@ -11,7 +11,7 @@
  * BasicClass's overrides and the card primitives (+0x00C..+0x060), the file
  * I/O, events, buffers and the two operations (+0x064..+0x078, +0x038) in
  * src/TitleMenuTaskObjF.c, the state machine (+0x07C..+0x0B0) in
- * src/class_3bb8c_g.c.
+ * src/TitleMenuTaskObjF.c.
  *
  *  - The ctor runs InitCARD/StartCARD/_bu_init once per boot (sTaskObjFCount)
  *    and setCardSlot(cardSlot); +0x040..+0x068 wrap the PS-X memory-card
