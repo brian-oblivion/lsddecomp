@@ -1,5 +1,5 @@
-#ifndef TODSET_H
-#define TODSET_H
+#ifndef TOD_SET_H
+#define TOD_SET_H
 
 #include "tod.h"
 

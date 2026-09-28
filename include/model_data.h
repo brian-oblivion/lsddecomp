@@ -2,7 +2,7 @@
 #define MODEL_DATA_H
 
 #include "file_resource.h"
-#include "TodSet.h"
+#include "tod_set.h"
 
 /*
  * ModelData -- a FileResource data source (class id 0x5F03, method table

@@ -1125,7 +1125,7 @@
         "gTodSetMethods": {
           "class": "TodSet",
           "date": "2026-09-26",
-          "header": "include/TodSet.h"
+          "header": "include/tod_set.h"
         },
         "gTriggerWorldMethods": {
           "class": "TriggerWorld",

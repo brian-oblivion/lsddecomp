@@ -67,7 +67,7 @@ Touched by Tod's unification (charlie): the call is now `*p = (DataSrc33808 *)Ne
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `s32 TodSet__BuildTods(TodSet *self)` (include/TodSet.h). The counted array holds `Tod *` (New_Tod's return, released through Tod's +0x004), no longer DataSrc33808 *. It sits in the inherited +0x064 `setFlag` slot and keeps its own name: it builds the Tods, which is more than the slot name says. Bytes unchanged.
+Now `s32 TodSet__BuildTods(TodSet *self)` (include/tod_set.h). The counted array holds `Tod *` (New_Tod's return, released through Tod's +0x004), no longer DataSrc33808 *. It sits in the inherited +0x064 `setFlag` slot and keeps its own name: it builds the Tods, which is more than the slot name says. Bytes unchanged.
 
 ### Track 6 (round 97, alpha)
 

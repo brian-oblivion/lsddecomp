@@ -34,4 +34,4 @@ void *GetTodSetMethods(void) {
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `TodSetMethods *GetTodSetMethods(void)` returning `&gTodSetMethods` (include/TodSet.h), replacing the unit-local `extern s32 gTodSetMethods[]` and `void *` prototype. Bytes unchanged.
+Now `TodSetMethods *GetTodSetMethods(void)` returning `&gTodSetMethods` (include/tod_set.h), replacing the unit-local `extern s32 gTodSetMethods[]` and `void *` prototype. Bytes unchanged.

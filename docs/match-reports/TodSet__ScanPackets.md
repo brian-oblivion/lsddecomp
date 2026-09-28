@@ -48,7 +48,7 @@ u8 TodSet__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel)` (include/TodSet.h), as Tod__ScanPackets was typed in round 86: the pass-through arguments are ScanTodPackets' `out`/`sel`, and it calls the named slot `scanTodPackets` (+0x07C) instead of DataSrc33808's unprototyped `slot7C`. The data pointer is `(u32 *)&buf->entries[buf->count] + 2`, the same arithmetic. Bytes unchanged.
+Now `u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel)` (include/tod_set.h), as Tod__ScanPackets was typed in round 86: the pass-through arguments are ScanTodPackets' `out`/`sel`, and it calls the named slot `scanTodPackets` (+0x07C) instead of DataSrc33808's unprototyped `slot7C`. The data pointer is `(u32 *)&buf->entries[buf->count] + 2`, the same arithmetic. Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 

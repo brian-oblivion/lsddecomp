@@ -71,7 +71,7 @@ First build. The redundant `sw zero, 0x30` on the second failure is an explicit 
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct ResourceSource *)`, so the call reads `self->todSet = (FileResource *)New_TodSet((ResourceSource *)&req)`; the forward declaration that stood before this function is gone. Bytes unchanged.
+New_TodSet is now prototyped in include/tod_set.h as `TodSet *New_TodSet(struct ResourceSource *)`, so the call reads `self->todSet = (FileResource *)New_TodSet((ResourceSource *)&req)`; the forward declaration that stood before this function is gone. Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 

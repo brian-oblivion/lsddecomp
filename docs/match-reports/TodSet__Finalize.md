@@ -44,4 +44,4 @@ void TodSet__Finalize(DataSrc33808 *self) {
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `void TodSet__Finalize(TodSet *self)` (include/TodSet.h); the parent call is `GetTodMethods()->finalize((Tod *)self)`, no longer a cast to the unit-local DataSrc33808Methods. Bytes unchanged.
+Now `void TodSet__Finalize(TodSet *self)` (include/tod_set.h); the parent call is `GetTodMethods()->finalize((Tod *)self)`, no longer a cast to the unit-local DataSrc33808Methods. Bytes unchanged.
