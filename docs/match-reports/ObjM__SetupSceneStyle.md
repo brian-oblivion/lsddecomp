@@ -82,7 +82,7 @@ the middle.
   prototype anywhere, so this unit's own call-site typing (all `s32`,
   matching its real definition) is local, same convention as
   `PickStageBgm`/`PickStageTexture`/etc. already declared in this file.
-- **`GetStageGridDimensions`** (already matched, `src/StageGrid.c`) has a
+- **`GetStageGridDimensions`** (already matched, `src/world/StageGrid.c`) has a
   real prototype in `include/StageGrid.h` returning `StageGridDimensions
   *`, but this unit doesn't include that header and only forwards the
   return value opaquely, so a local `void *`-returning declaration is used

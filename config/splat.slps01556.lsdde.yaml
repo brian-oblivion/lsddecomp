@@ -1370,7 +1370,7 @@ segments:
       # These are the units runners work in. Everything else is still a
       # monolithic `asm` segment awaiting a carve (docs/PARALLEL-RUNS.md
       # Gate 2).
-      - [0x39cb4, c, StageGrid]
+      - [0x39cb4, c, world/StageGrid]
       - [0x39e08, c, world/DayTaskStageMap]
       # class_3bb8c is 365 functions -- the largest uncarved block in the
       # game, and the one holding all 13 PSX BIOS trampolines (`jr $t2`,

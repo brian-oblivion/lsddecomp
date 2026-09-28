@@ -15,7 +15,7 @@ MoodGraphPoint *GetMoodFromStageChunk(s32 stage, StageChunk *chunk) {
 ```
 
 The data was the only thing standing between this function and a one-line body,
-which is why `src/StageGrid.c`'s header comment banked it as head work. Read out
+which is why `src/world/StageGrid.c`'s header comment banked it as head work. Read out
 of the executable:
 
 - `sStageGridDimensions` (`0x800861D4`) is 14 entries of an **8-byte** struct.
@@ -111,7 +111,7 @@ polishes those units, who can see what the two branches do.
 **Globals `STAGE_CHUNK_MOODS` -> `sStageChunkMoods` and `STGnn_CHUNK_MOODS` ->
 `sStageNnChunkMoods`, nn = 00..13 (round 101, track 7; fifteen
 `tools/rename.py` runs).** `sStageChunkMoods` is named in C only by
-`src/StageGrid.c`; the fourteen per-stage arrays are named by nothing but its
+`src/world/StageGrid.c`; the fourteen per-stage arrays are named by nothing but its
 pointer initialisers in splat data. Unit-static data, so `sName`; the stage
 number stays in the name because the arrays are indexed by stage and stage nn
 is the disc's `STGnn` directory.
