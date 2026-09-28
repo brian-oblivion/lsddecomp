@@ -3437,14 +3437,14 @@ void GraphRoom__OnPadConfirm(GraphRoom *self) {
  * below is three lb/sb pairs. */
 extern s32 gGraphPointSize[2];
 extern BoxFillRgb gGraphPointNewestColor;
-extern BoxFillRgb gGraphPointBaseColor;
+extern BoxFillRgb sGraphPointBaseColor;
 
 void GraphRoom__BuildGraphPoints(GraphRoom *self) {
     BoxFillRgb rgb;
     s32 i;
 
     self->points[0] = New_BoxFill(gGraphPointSize, &gGraphPointNewestColor, 0);
-    rgb = gGraphPointBaseColor;
+    rgb = sGraphPointBaseColor;
     for (i = 1; i < ARRAY_COUNT(self->points); i++) {
         s32 step;
 
