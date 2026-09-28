@@ -3252,7 +3252,7 @@ extern char sGraphTimPath[];
 
 void GraphRoom__Reset(GraphRoom *self) {
     self->fadeRate = 5;
-    self->unk2C = 400;
+    self->maxPackets = 400;
     self->methods->setSubHandle(self, sGraphTimPath, NULL);
     self->methods->setFrameBound(self, 10);
 }

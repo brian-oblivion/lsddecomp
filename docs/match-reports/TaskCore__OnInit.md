@@ -212,3 +212,7 @@ to apply by type scope:
 ## Track 6 (2026-09-27, round 99, runner bravo)
 
 `gDefaultStreamTaskInitData` is renamed `sDefaultMovieFrame` (tier B, see GetDefaultMovieFrame.md): the rect this function clears when there is no sub handle is the frame StreamTask builds its MoviePlayer with. That the clear is FOR the movie area is not established; the name records where else the rect goes.
+
+## Track 10 (2026-09-28, round 104, echo)
+
+TaskCore fields renamed (include/TaskCore.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.

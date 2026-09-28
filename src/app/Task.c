@@ -269,11 +269,11 @@ void TaskCore__Reset(TaskCore *self) {
     methods->setFadeOutCallbackEnabled(self, 1);
     self->fadeRate = 9;
     self->otLength = 3;
-    self->unk2C = 300;
+    self->maxPackets = 300;
     self->packetSize = 64;
     self->exitCallback = NULL;
     self->exitCallbackCtx = NULL;
-    self->unk34 = 1;
+    self->clearOnDeinit = 1;
     self->inputMode = TASKCORE_INPUT_NONE;
 }
 
@@ -308,7 +308,7 @@ void TaskCore__OnInit(TaskCore *self) {
     ((DrawSystem *)self->initArgs->drawSystem)
         ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->baseColor, NULL);
     viewportMethods->setOtLength(viewport, self->otLength);
-    viewportMethods->setMaxPackets(viewport, self->unk2C);
+    viewportMethods->setMaxPackets(viewport, self->maxPackets);
     viewportMethods->setPacketSize(viewport, self->packetSize);
     viewportMethods->attachViewChild(viewport, self->lightRig, &sTaskCoreViewOrigin,
                                      &sTaskCoreViewOrigin, NULL);
@@ -317,16 +317,16 @@ void TaskCore__OnInit(TaskCore *self) {
 }
 
 /* Closes the viewport's OT, detaches the view and the BgLayer, and clears the
- * screen to unk93 while unk34 is set. */
+ * screen to clearColor while clearOnDeinit is set. */
 void TaskCore__OnDeinit(TaskCore *self) {
     /* MATCHING: without the local, self->viewport is reloaded and the frame shrinks. */
     Viewport *viewport = (Viewport *)self->viewport;
     viewport->methods->deinitOt(viewport);
     viewport->methods->detachViewChild(viewport);
     self->bgLayer->methods->detachFromParent(self->bgLayer);
-    if (self->unk34 != 0) {
+    if (self->clearOnDeinit != 0) {
         ((DrawSystem *)self->initArgs->drawSystem)
-            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->unk93, NULL);
+            ->methods->clearImage((DrawSystem *)self->initArgs->drawSystem, self->clearColor, NULL);
     }
 }
 
@@ -410,7 +410,7 @@ void TaskCore__SetState(TaskCore *self, s32 state) {
     switch (state) {
         case TASKCORE_STATE_ACTIVE:
             methods->broadcastToSlots(self, self->target->unselectedColor);
-            methods->setActiveSlot(self, self->target->unk8, 0);
+            methods->setActiveSlot(self, self->target->initialSlot, 0);
             self->frameCounter = 0;
             self->inputMode = TASKCORE_INPUT_CHOOSING_SLOT;
             break;
@@ -578,12 +578,12 @@ void TaskCore__SetFadeOutCallbackEnabled(TaskCore *self, s32 enable) {
     }
 }
 
-/* baseColor is where the fade-in starts; unk93 is what onDeinit clears the
+/* baseColor is where the fade-in starts; clearColor is what onDeinit clears the
  * screen to (TaskCore__Reset's defaults: black, black, 128 grey).
  * MATCHING: each colour is copied as a BgLayerRgb (signed bytes: lb/sb). */
 void TaskCore__SetColors(TaskCore *self, u8 *base, u8 *clear, u8 *color96) {
     *(BgLayerRgb *)self->baseColor = *(BgLayerRgb *)base;
-    *(BgLayerRgb *)self->unk93 = *(BgLayerRgb *)clear;
+    *(BgLayerRgb *)self->clearColor = *(BgLayerRgb *)clear;
     *(BgLayerRgb *)self->unk96 = *(BgLayerRgb *)color96;
 }
 
