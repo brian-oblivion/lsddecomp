@@ -15,17 +15,7 @@
  *  - Sony's GsSetProjection (libgs/gs_106), carried as C because no SDK
  *    object places it.
  * include/Task.h holds the declarations this file shares with
- * ScreenWidgets.c and ScreenWidgets.c, which follow it.
- *
- * Edges (tools/tuboundary.py). The start edge is libgs/gs_122, a placed Sony
- * object. Inside, no rodata crossing and no forced boundary, and every edge
- * between the carve slices this file was made of is "probably one file" on
- * single-user data (0x8006e86c >= 0x8006e730, 0x8008a90c >= 0x8008a8f4);
- * content agrees, TaskCore running across the first two slice edges and
- * Viewport across the last. The game's file ended at GetRootNode, since
- * GsSetProjection is Sony's; no tool splits a unit, so it stays. Named for
- * the task classes rather than for one class, whose header already holds
- * that name.
+ * ScreenWidgets.c, which follows it.
  */
 #include "common.h"
 #include <libgte.h>

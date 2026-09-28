@@ -76,3 +76,17 @@ Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, i
 ## Track 6 (2026-09-27, round 99, runner bravo)
 
 The fifth parameter is a `DrawRect *` (DrawSystem.h); `StreamTaskInitData`, its local spelling, is deleted (StreamTask__StreamTask.md). Byte-identical.
+
+## History (moved from src/Task.c, comments pass)
+
+The file's banner carried its edge evidence and the reason for its name:
+
+> Edges (tools/tuboundary.py). The start edge is libgs/gs_122, a placed Sony
+> object. Inside, no rodata crossing and no forced boundary, and every edge
+> between the carve slices this file was made of is "probably one file" on
+> single-user data (0x8006e86c >= 0x8006e730, 0x8008a90c >= 0x8008a8f4);
+> content agrees, TaskCore running across the first two slice edges and
+> Viewport across the last. The game's file ended at GetRootNode, since
+> GsSetProjection is Sony's; no tool splits a unit, so it stays. Named for
+> the task classes rather than for one class, whose header already holds
+> that name.
