@@ -22,7 +22,7 @@ extern const char sTimExt[]; /* ".TIM" */
 extern s32 sTextEntryPanelRect; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
 extern s32 sTextEntryTextColor; /* opaque block, slotB8's arg1, address-only here */
 extern s32 sTextEntryPanelPos; /* opaque block, self->unk48's slot4C arg2, address-only here */
-extern s32 gTextEntryTextPos; /* opaque block, self->unk44's slot4C arg2, address-only here */
+extern s32 sTextEntryTextPos; /* opaque block, self->unk44's slot4C arg2, address-only here */
 extern s32 sTextEntryCursorPos; /* opaque block, self->unk40's slot4C arg2, address-only here */
 
 void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
@@ -54,7 +54,7 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
     self->unk44 = New_TextRow(handle2, self->unk10, self->unk28);
     self->unk40 = (ChildObj86ED0 *)New_CharSprite(handle2, 0x5F);
     handle2->methods->release(handle2);
-    self->unk44->methods->slot4C(self->unk44, arg1, (void *)&gTextEntryTextPos);
+    self->unk44->methods->slot4C(self->unk44, arg1, (void *)&sTextEntryTextPos);
     self->unk44->methods->slotB8(self->unk44, (void *)&sTextEntryTextColor);
     self->unk40->methods->slot4C(self->unk40, arg1, (void *)&sTextEntryCursorPos);
 }
@@ -190,7 +190,7 @@ says what they are):
 | D_80086F7C | sTextEntryPanelRect | New_ScreenSprite's rect for COMINPUT.TIM: {0, 0, 224, 120} |
 | D_8008AAC8 | sTextEntryTextColor | the text row's setColor: (128, 128, 0) |
 | D_8008AACC | sTextEntryPanelPos | the panel's attachToParent position: (-70, -60) |
-| D_8008AAD4 | gTextEntryTextPos | the text row's attachToParent position: (-62, -15) |
+| D_8008AAD4 | sTextEntryTextPos | the text row's attachToParent position: (-62, -15) |
 | D_8008AADC | sTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (TextEntryItemList) reads its x |
 
 The externs are typed `SpriteRect`, `SpriteRgb` and `ScreenSpritePos`

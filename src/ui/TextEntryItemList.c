@@ -161,7 +161,7 @@ extern const char sTimExt[];               /* ".TIM" */
 extern SpriteRect sTextEntryPanelRect;     /* COMINPUT's cell: 224 x 120 from (0, 0) */
 extern SpriteRgb sTextEntryTextColor;      /* the text row's colour: (128, 128, 0) */
 extern ScreenSpritePos sTextEntryPanelPos; /* (-70, -60) */
-extern ScreenSpritePos gTextEntryTextPos;  /* (-62, -15) */
+extern ScreenSpritePos sTextEntryTextPos;  /* (-62, -15) */
 
 void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     char path[32];
@@ -193,7 +193,7 @@ void TextEntry__LoadCardResources(TextEntry *self, void *parent) {
     self->cursorSprite = New_CharSprite(fontTim, '_');
     fontTim->methods->release(fontTim);
     self->textRow->methods->attachToParent(self->textRow, (SceneNode *)parent,
-                                           (LongVec3 *)&gTextEntryTextPos);
+                                           (LongVec3 *)&sTextEntryTextPos);
     self->textRow->methods->setColor(self->textRow, &sTextEntryTextColor);
     self->cursorSprite->methods->attachToParent(self->cursorSprite, (SceneNode *)parent,
                                                 (LongVec3 *)&sTextEntryCursorPos);
