@@ -24,13 +24,13 @@ table, `sCardinalRotations`) through its two optional output parameters. Called 
 
 ## New declarations needed
 
-`sTunnelEnterHeadings` and `TUNNEL_EXIT_HEADINGS` are per-stage tables of pointers to byte
+`sTunnelEnterHeadings` and `sTunnelExitHeadings` are per-stage tables of pointers to byte
 arrays (4-byte stride, indexed by `gLinkSrcStage`/`gLinkDstStage` respectively,
 each further indexed by `gLinkTriggerIndex`/`gLinkSpawnIndex` to read a single `u8`):
 
 ```c
 extern u8 *sTunnelEnterHeadings[];
-extern u8 *TUNNEL_EXIT_HEADINGS[];
+extern u8 *sTunnelExitHeadings[];
 ```
 
 `sCardinalRotations` is more subtle: it is a `DirectionTableEntry`-strided (12-byte)
@@ -75,7 +75,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 		*arg1 = (s32)&sCardinalRotations[heading];
 
 	if (arg0 != NULL) {
-		idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
+		idx = sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex];
 		*arg0 = (s32)&sCardinalRotations[idx];
 	}
 	return 1;
@@ -107,7 +107,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *arg0, s32 *arg1, void *arg2)
 			*arg1 = (s32)&sCardinalRotations[heading];
 
 		if (arg0 != NULL) {
-			idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
+			idx = sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex];
 			*arg0 = (s32)&sCardinalRotations[idx];
 		}
 		result = 1;
@@ -151,7 +151,7 @@ queue).
 
 ## Naming
 
-- **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (sTunnelEnterHeadings/TUNNEL_EXIT_HEADINGS here); called from DreamSys__TryTunnelLink.
+- **Tier B.** Near-identical body to DreamSys__CheckStaircaseHeading, differing only in which per-stage heading table it indexes (sTunnelEnterHeadings/sTunnelExitHeadings here); called from DreamSys__TryTunnelLink.
 
 ## Comment moved from src/DreamSys.c (round 92, track 7)
 
@@ -160,7 +160,7 @@ Replaced in the source by a comment that says what the code does; kept here as w
 ```c
 /* sTunnelEnterHeadings: a per-stage table of pointers to byte arrays (4-byte stride,
    indexed by gLinkSrcStage), each further indexed by gLinkTriggerIndex to read the
-   "heading" byte passed to IsHeadingAligned. TUNNEL_EXIT_HEADINGS is the analogous
+   "heading" byte passed to IsHeadingAligned. sTunnelExitHeadings is the analogous
    table for gLinkDstStage/gLinkSpawnIndex. Neither array's own element type is
    dereferenced beyond a single `u8` here. */
 ```

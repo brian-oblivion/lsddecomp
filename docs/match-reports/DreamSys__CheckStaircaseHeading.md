@@ -17,7 +17,7 @@ assigned queue).
 Byte-for-byte the SAME shape as `DreamSys__CheckTunnelHeading` (matched earlier this
 round) -- literally identical instruction sequence, just against two
 DIFFERENT per-stage tables (`STAIRCASE_ENTER_HEADINGS`/`STAIRCASE_EXIT_HEADINGS` instead of
-`sTunnelEnterHeadings`/`TUNNEL_EXIT_HEADINGS`), and used by a different caller. Called by
+`sTunnelEnterHeadings`/`sTunnelExitHeadings`), and used by a different caller. Called by
 `DreamSys__TryStaircaseLink` (still `INCLUDE_ASM`) as `DreamSys__CheckStaircaseHeading(&this->unk_0x888,
 &this->unk_0x884, local)` -- the header's own comment already flagged this
 ("identical call shape to DreamSys__CheckTunnelHeading above (same `local` buffer, same

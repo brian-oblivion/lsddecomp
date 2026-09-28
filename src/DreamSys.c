@@ -1591,9 +1591,9 @@ extern s32 IsHeadingAligned(DirectionCheckArg *rotation, u8 heading);
 /* Cardinal-direction indices, per stage: the player must face
    sTunnelEnterHeadings[gLinkSrcStage][gLinkTriggerIndex] to take the
    tunnel GetStaticSpawn matched, and leaves facing
-   TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex]. */
+   sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex]. */
 extern u8 *sTunnelEnterHeadings[];
-extern u8 *TUNNEL_EXIT_HEADINGS[];
+extern u8 *sTunnelExitHeadings[];
 
 /* The four cardinal rotations, yaw 0, 90, 180 and 270 degrees, in
    SceneNode__UpdateRotation's form. CheckTunnelHeading and
@@ -1613,7 +1613,7 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
             *outEnter = (s32)&sCardinalRotations[heading];
 
         if (outExit != NULL) {
-            idx = TUNNEL_EXIT_HEADINGS[gLinkDstStage][gLinkSpawnIndex];
+            idx = sTunnelExitHeadings[gLinkDstStage][gLinkSpawnIndex];
             *outExit = (s32)&sCardinalRotations[idx];
         }
         result = 1;
@@ -1728,7 +1728,7 @@ s32 Test4StaircaseNodes(PlayerSpawnPoint *target, PlayerSpawnPoint *currentPos, 
 }
 
 /* CheckStaircaseHeading's pair of heading tables, indexed as
-   sTunnelEnterHeadings / TUNNEL_EXIT_HEADINGS are. */
+   sTunnelEnterHeadings / sTunnelExitHeadings are. */
 extern u8 *STAIRCASE_ENTER_HEADINGS[];
 extern u8 *STAIRCASE_EXIT_HEADINGS[];
 
