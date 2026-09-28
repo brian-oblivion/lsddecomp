@@ -129,8 +129,13 @@ _DEBT = ("second pass on readability.py debt in {}: unk/slot/rawoff/m2c/func_/D_
          "accessors show what they are, literals named only when they mean more than their value; the "
          "area's duplicate types merged into one and its leftovers done (release review, debt passes); "
          "tools/declcheck.py still clean")
-_DOCS = "every header {} documented per track 12 (apidoc.py clean for them), no process text"
-_SRC = "{}: .c comments per track 12, long banners split into class and function docs, no process text"
+# Track 12's items are tools/apidoc.py's areas: each owns a set of .c files
+# AND the headers they define, so a banner moved into its class header or a
+# header's matching note moved into its .c never leaves the item (revision 45).
+import apidoc  # noqa: E402
+_API = ("`python3 tools/apidoc.py --item {}` clean: its headers documented per track 12 (@file; class, "
+        "struct and field docs; @brief, @param, @return per prototype), its .c comments explaining the code "
+        "with long banners split into class and function docs, and no process text left in either")
 PHASE3 = {
     "10": ("declarations and conventions", {
         "prototypes": ("every function and global declared once, in the defining file's header or Sony's "
@@ -157,14 +162,7 @@ PHASE3 = {
     "12": ("documented API", {
         "apidoc-setup": ("tools/apidoc.py (per header: undocumented prototypes, missing @param, process-text "
                          "hits in include/ and src/ comments) and a Doxyfile", "premium", ()),
-        "api-a-e": (_DOCS.format("A to E"), "opus", ("apidoc-setup",)),
-        "api-f-o": (_DOCS.format("F to O"), "opus", ("apidoc-setup",)),
-        "api-p-s": (_DOCS.format("P to S"), "opus", ("apidoc-setup",)),
-        "api-t-z": (_DOCS.format("T to Z, and common.h, types.h, gte.h"), "opus", ("apidoc-setup",)),
-        "src-app-cd": (_SRC.format("src/app and src/cd"), "opus", ("apidoc-setup",)),
-        "src-graphics": (_SRC.format("src/graphics"), "opus", ("apidoc-setup",)),
-        "src-world": (_SRC.format("src/world"), "opus", ("apidoc-setup",)),
-        "src-ui-sound-psyq": (_SRC.format("src/ui, src/sound, src/psyq and src/main.c"), "opus", ("apidoc-setup",)),
+        **{i: (_API.format(i), "opus", ("apidoc-setup",)) for i in apidoc.AREAS},
     }),
     "13": ("publish", {
         "readme": ("README: what the code is, the layout, how to build, verify and change it while "
@@ -220,6 +218,13 @@ DEFAULT_STATE = {
 FUNC_PH = re.compile(r"^(?:\w+__)?func_(?:800)?[0-9A-Fa-f]{5}$")
 DEF_RE = progress.DEF_RE
 NOT_DEF = {"if", "while", "for", "switch", "do", "return", "sizeof"}
+
+
+def defaultdict_count(it):
+    out = {}
+    for x in it:
+        out[x] = out.get(x, 0) + 1
+    return out
 
 
 def phase3_status(tr, prev):
@@ -1479,6 +1484,9 @@ def jobs(d, n):
             if model == "premium":
                 q3.append((k, f"HEAD (premium) setup {i}: {desc} (FINISHING-PLAN track {k})",
                            MODELS["head_when_new_procedure"]))
+            elif k == "12":
+                us = [Path(f).stem for f in apidoc.areas().get(i, []) if f.endswith(".c")]
+                q3.append((k, f"{i}: {desc} (units: {','.join(us)})", model))
             else:
                 q3.append((k, f"{i}: {desc}", model))
     queues = [q_fresh, q_naming, q_stall, q_sdk, q_revisit, q_promote, q_types, q_close, q6, q7, q8, q9, q3]
@@ -1637,6 +1645,10 @@ def print_status(d, n, st):
         if k == "11":
             import unitfile
             extra = f"; {len(unitfile.not_snake())} game file(s) not snake_case (tools/unitfile.py check)"
+        if k == "12" and not t[k]["status"].startswith("waiting"):
+            left = defaultdict_count(x[1] for v in apidoc.census().values() for x in v)
+            extra = (f"; apidoc.py: {sum(left.values())} left (" + ", ".join(f"{left[w]} {w}" for w in apidoc.KINDS if w in left)
+                     + ")" if left else "; apidoc.py clean")
         print(f"  {k:<6} {t[k]['status'].split(' (')[0]:<10} {t[k]['title']}: {sum(ck.values())}/{len(ck)} "
               f"items ticked" + (f"; operator decision: {', '.join(ops)}" if ops else "") + extra)
     for k in ("6", "7", "8", "9", *PHASE3):

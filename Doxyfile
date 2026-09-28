@@ -1,0 +1,43 @@
+# API documentation for the game's C (FINISHING-PLAN track 12).
+#
+#     doxygen Doxyfile        # -> build/doxygen/html/index.html
+#
+# Only settings that differ from Doxygen's defaults are listed. Sony's own
+# headers (include/psyq/) are read for their types but not documented, and
+# tools/apidoc.py is the measurement: this file renders what it checks.
+
+PROJECT_NAME           = "LSD: Dream Emulator"
+PROJECT_BRIEF          = "Decompiled game source (SLPS-01556)"
+OUTPUT_DIRECTORY       = build/doxygen
+INPUT                  = include src
+FILE_PATTERNS          = *.h *.c
+RECURSIVE              = YES
+EXCLUDE                = include/psyq
+EXCLUDE_PATTERNS       = */include/psyq/*
+
+OPTIMIZE_OUTPUT_FOR_C  = YES
+TYPEDEF_HIDES_STRUCT   = YES
+EXTRACT_STATIC         = YES
+SOURCE_BROWSER         = YES
+STRIP_FROM_PATH        = .
+
+# The class framework spells every inherited member through macros
+# (BASICCLASS_FIELDS, BASICCLASS_SLOTS and each subclass's own), so the
+# preprocessor must expand them for a struct to show its full member list.
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = NO
+SEARCH_INCLUDES        = YES
+INCLUDE_PATH           = include include/psyq
+PREDEFINED             = "INCLUDE_ASM(dir, name)=" \
+                         "INCLUDE_RODATA(dir, name)=" \
+                         __attribute__(x)= \
+                         __asm__(x)=
+
+WARN_IF_UNDOCUMENTED   = YES
+WARN_NO_PARAMDOC       = YES
+WARN_LOGFILE           = build/doxygen/warnings.log
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HAVE_DOT               = NO

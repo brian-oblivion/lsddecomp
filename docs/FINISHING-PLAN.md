@@ -19,9 +19,9 @@ and wrong for every round after. Run the tool. The mechanics of a round
 the per-function matching loop is CLAUDE.md and `docs/MATCHING-GUIDE.md`.
 This file does not repeat them.
 
-Plan revision: 44 (2026-09-28, round 105's premium head: track 11's
-file renames are `tools/unitfile.py rename|header|check`; revision 43 the
-declaration census, 42 phase 4, 41 phase 3).
+Plan revision: 45 (2026-09-28, round 106's premium head: track 12's
+items are `tools/apidoc.py`'s areas, each a `.c` set with its headers;
+revision 44 track 11's `unitfile.py`, 43 the declaration census, 42 phase 4).
 Changing the plan is a premium head task (§2); record the change in
 `docs/PROGRESS.md` and bump this line.
 
@@ -242,9 +242,14 @@ the method (`/**< @see Class__Method */`) instead of describing it twice.
 Nothing in a header is process text (retail, registers, cc1, rounds, tools,
 reports): what justifies a C spelling moves to the `.c` as one `MATCHING:`
 line, and any derivation to the report. `.c` comments follow the same rule;
-long banners split into the header's class doc and the functions' docs. The
-setup item writes `tools/apidoc.py` (per header: undocumented prototypes,
-missing `@param`, process-text hits) and a `Doxyfile`.
+long banners split into the header's class doc and the functions' docs.
+`tools/apidoc.py` is the measurement (`-v` lists every hit; `Doxyfile`
+renders it). Each item is one of its areas: a set of `.c` files AND the
+headers they define (`apidoc.py --areas`), so moving text between a header
+and its `.c` never leaves the item, and done is `apidoc.py --item <item>`
+clean. Process text with no function's report to go to (a header-wide
+derivation, gte.h's) goes to a `docs/research/` note the item names, and
+the unit-private headers the review lists fold into their `.c` first.
 
 **Track 13: publish.** README (what the game's code is, the layout, how to
 build and verify, how to change code and keep it matching); a lint that
