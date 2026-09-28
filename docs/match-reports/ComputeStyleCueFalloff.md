@@ -26,10 +26,10 @@ struct StyleCueParam {
     s32 unk44, unk48, unk4C, unk50;
 };
 
-extern s32 gStyleCueDistanceTable[];
+extern s32 sStyleCueDistanceTable[];
 
 s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
-    s32 t = gStyleCueDistanceTable[-ctx->methods->tag];
+    s32 t = sStyleCueDistanceTable[-ctx->methods->tag];
     s32 q = t / ctx->unk28;
 
     return ctx->falloff / q;
@@ -50,10 +50,10 @@ s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
   encoded the WRONG target address, and `funcdiff`'s per-function windows
   read as near-total garbage until the ordering was fixed. Round 17's own
   hard rule about strict ROM-address order is not decorative.
-- **`gStyleCueDistanceTable[-tag]`, not a hand-transcribed `base - tag*4`.** Retail
-  computes `&gStyleCueDistanceTable - tag*4` via `sll`/`subu` (tag is small and
+- **`sStyleCueDistanceTable[-tag]`, not a hand-transcribed `base - tag*4`.** Retail
+  computes `&sStyleCueDistanceTable - tag*4` via `sll`/`subu` (tag is small and
   negative, e.g. -1..-14, landing INSIDE the 15-word table declared at
-  `gStyleCueDistanceTable` itself, confirmed directly against
+  `sStyleCueDistanceTable` itself, confirmed directly against
   `asm/data/76DC8.data.s`). Writing the array-index form with a negated
   index lets GCC regenerate the identical `sll`/`subu` address
   computation, rather than transcribing the lowering by hand.
@@ -80,7 +80,7 @@ s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
 
 ## Naming
 
-**Tier B.** Free function (called with `ctx`, not a `self` of its own type in the class-method sense), so no `Class__` prefix. The name reflects the mechanism, not the game meaning: `gStyleCueDistanceTable` (the same table `IsStyleCueNear`/`FindNextStyleCueInRange`, code_8220_b.c/ObjMStyleActor.c, index with `dist < table[...]` -- confirming it holds distance thresholds) is read at a NEGATIVE tag index, divided down, and used as the divisor for `ctx->falloff`'s own value; `falloff` is used by every `StyleCueNN` occupant that calls this helper first. What the resulting scaled quantity represents in the running game (a cue repeat count? a duration?) is not established.
+**Tier B.** Free function (called with `ctx`, not a `self` of its own type in the class-method sense), so no `Class__` prefix. The name reflects the mechanism, not the game meaning: `sStyleCueDistanceTable` (the same table `IsStyleCueNear`/`FindNextStyleCueInRange`, code_8220_b.c/ObjMStyleActor.c, index with `dist < table[...]` -- confirming it holds distance thresholds) is read at a NEGATIVE tag index, divided down, and used as the divisor for `ctx->falloff`'s own value; `falloff` is used by every `StyleCueNN` occupant that calls this helper first. What the resulting scaled quantity represents in the running game (a cue repeat count? a duration?) is not established.
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
@@ -112,7 +112,7 @@ Locals `kind` became `tick`. Zero bytes.
 ## Track 7 (2026-09-27, round 96, charlie)
 
 - Locals `t` / `q` are now `range` / `stepDist`: `range` is the cue's
-  `gStyleCueDistanceTable` row, the same threshold `IsStyleCueNear` and
+  `sStyleCueDistanceTable` row, the same threshold `IsStyleCueNear` and
   `FindNextStyleCueInRange` compare `dist < table[...]` against, and
   `stepDist` is that range split into `attenuationSteps` (10) steps, so the
   result is the target's distance counted in steps: 0 at the slot, 10 at the
@@ -130,11 +130,11 @@ Derivation above) and now read as documentation. What they said, verbatim:
  * calls it. */
 
 /* A 15-entry table indexed with the NEGATIVE of `ctx->entry->countSign`
- * (`gStyleCueDistanceTable - tag*4`, i.e. `gStyleCueDistanceTable[-tag]` for `tag` in [-14, 0]).
+ * (`sStyleCueDistanceTable - tag*4`, i.e. `sStyleCueDistanceTable[-tag]` for `tag` in [-14, 0]).
  * `asm/data/76DC8.data.s` confirms exactly 15 words at this address. */
 ```
 
 The unit-local record view's +0x006 field is `cue`, not `countSign`: the
 name ObjMStyleActor.c's own view (`StyleCueEntryView::cue`) already gives the
-same byte, which IsStyleCueNear reads as `gStyleCueDistanceTable[-cue]`
+same byte, which IsStyleCueNear reads as `sStyleCueDistanceTable[-cue]`
 exactly as this function does. It is a cue index, not a count. Zero bytes.

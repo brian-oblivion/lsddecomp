@@ -1535,7 +1535,7 @@ void StyleReleaseEffectSlots(void) {
 }
 
 /* A cue record's view here: `cue` is its cue index (the sStyleCueCallbacks
- * and gStyleCueDistanceTable row, InitSoundCueSet's tag), negated while a
+ * and sStyleCueDistanceTable row, InitSoundCueSet's tag), negated while a
  * slot holds the record. EntrySlot, below, is the whole 8-byte record. */
 typedef struct StyleCueEntryView StyleCueEntryView;
 
@@ -1807,7 +1807,7 @@ extern s32 gStyleStage;
 extern s32 gStyleCueRecordIndex;
 extern u8 *gStyleCueRecordLists[];
 extern u8 gStyleCueRecordCounts[];
-extern s32 gStyleCueDistanceTable[];
+extern s32 sStyleCueDistanceTable[];
 
 /* The cell-key halves: a record's four cell bytes and gStyleCueOffsets' s16
  * x/y/z, copied whole into a 10-byte cell key (StageMap's Descriptor10
@@ -1882,7 +1882,7 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
                 dist = dx - dz;
             }
             *outDist = dist;
-            if (dist < gStyleCueDistanceTable[entry->cue]) {
+            if (dist < sStyleCueDistanceTable[entry->cue]) {
                 return entry;
             }
         }
@@ -1913,7 +1913,7 @@ s32 ServiceStyleCueIfNear(StyleCueSlot *slot, LongVec3 *target, void *unused) {
     return 0;
 }
 
-extern s32 gStyleCueDistanceTable[];
+extern s32 sStyleCueDistanceTable[];
 
 /* Whether the target is within the held cue's distance (X+Z); keeps the distance. */
 s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
@@ -1935,7 +1935,7 @@ s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
     }
     slot->lastDist = dist;
     cue = slot->entry->cue;
-    if (dist < gStyleCueDistanceTable[-cue]) {
+    if (dist < sStyleCueDistanceTable[-cue]) {
         dist = 1; /* MATCHING: not `return 1` (jump.c folds that to slt) */
         return dist;
     }
@@ -2055,7 +2055,7 @@ typedef struct StyleCueParamMethods {
     u8 pad0[0x6];
     s8 cue; /* +0x006, the record's cue index (its sStyleCueCallbacks row
              * and InitSoundCueSet tag), negated while a slot has it
-             * claimed; ComputeStyleCueFalloff indexes gStyleCueDistanceTable
+             * claimed; ComputeStyleCueFalloff indexes sStyleCueDistanceTable
              * with its negative. */
 } StyleCueParamMethods;
 
@@ -2286,10 +2286,10 @@ void StyleCue13(StyleCueParam *ctx, SoundCueSet *set) {
 /* One range per cue record (15), indexed by the record's cue index: the
  * negative of `cue` while a slot has the record claimed. IsStyleCueNear
  * tests the slot's distance against the same row. */
-extern s32 gStyleCueDistanceTable[];
+extern s32 sStyleCueDistanceTable[];
 
 s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
-    s32 range = gStyleCueDistanceTable[-ctx->entry->cue];
+    s32 range = sStyleCueDistanceTable[-ctx->entry->cue];
     s32 stepDist = range / ctx->cueSet.attenuationSteps;
 
     return ctx->lastDist / stepDist;
