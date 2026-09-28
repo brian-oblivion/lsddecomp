@@ -1612,16 +1612,16 @@ StyleEffect **StyleFillEffectKind0(StyleEffect **slots, s32 count, LongVec3 *pos
 }
 
 extern s32 gStyleSpawnYChoice2;
-extern Ratio16 gStyleKind1Scale[];
+extern Ratio16 sStyleKind1Scale[];
 
-/* Fills `count` slots with kind-1 effects: gStyleKind1Scale, offset y
+/* Fills `count` slots with kind-1 effects: sStyleKind1Scale, offset y
  * gStyleSpawnYChoice2. */
 StyleEffect **StyleFillEffectKind1(StyleEffect **slots, s32 count, LongVec3 *pos) {
     s32 i;
     s32 offsetY;
 
     offsetY = gStyleSpawnYChoice2;
-    gStyleSpawnScale = gStyleKind1Scale;
+    gStyleSpawnScale = sStyleKind1Scale;
     for (i = 0; i < count; i++) {
         SetupStyleSpawnParamsRandom(pos, offsetY);
         *slots =

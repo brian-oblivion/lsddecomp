@@ -20,9 +20,9 @@ see `StyleTeardown`'s per-index rewrite of `sStyleCueSlots`).
 
 ```c
 extern s32 gStyleSpawnYChoice2;             /* only element [0] read here */
-extern u8 gStyleKind1Scale[];            /* address only taken, never indexed */
+extern u8 sStyleKind1Scale[];            /* address only taken, never indexed */
 extern u8 gStyleSpawnOffsetX[];            /* address only taken, passed to New_X */
-extern u8 *gStyleSpawnScale;             /* set to &gStyleKind1Scale unconditionally */
+extern u8 *gStyleSpawnScale;             /* set to &sStyleKind1Scale unconditionally */
 extern void *SetupStyleSpawnParamsRandom(void *arg0, void *arg1);   /* forward decl, own unit, cold */
 extern void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3); /* ObjMStyleActor.c, ALREADY MATCHED */
 ```
@@ -47,7 +47,7 @@ void **StyleFillEffectKind1(void **arg0, s32 arg1, void *arg2) {
     s32 val;
 
     val = gStyleSpawnYChoice2;
-    gStyleSpawnScale = gStyleKind1Scale;
+    gStyleSpawnScale = sStyleKind1Scale;
     for (i = 0; i < arg1; i++) {
         SetupStyleSpawnParamsRandom(arg2, (void *) val);
         *arg0 = New_StyleEffect((void *) 1, gStyleSpawnOffsetX, (void *) sStyleGrid, arg2);
@@ -107,7 +107,7 @@ loop).
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_80087204` | `gStyleKind1Scale` | A | stored as the params' scale for every kind-1 effect. |
+| `D_80087204` | `sStyleKind1Scale` | A | stored as the params' scale for every kind-1 effect. |
 | `D_80087330` | `gStyleSpawnYChoice2` | A | the word at `gStyleSpawnYChoices[2]` (-0x3800), a separate splat symbol; spelling it as the array element changes StyleFillEffectKind2's bytes (measured round 93), so the symbol stays. |
 
 Locals: `slots`, `count`, `pos`, `offsetY`.
