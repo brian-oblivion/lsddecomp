@@ -56,7 +56,7 @@ CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
     CdStream *obj = BMemPMgrAlloc(sizeof(CdStream));
 
     if (obj != NULL) {
-        Get_vtable_CdStream()->ctor(obj, cdSpeed, fps, reserved);
+        GetCdStreamMethods()->ctor(obj, cdSpeed, fps, reserved);
         return obj;
     }
     return NULL;
@@ -66,7 +66,7 @@ CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved) {
  * lets cc1 hoist its load and reorder the stores. */
 void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved) {
     GetBasicClassMethods()->ctor((BasicClass *)self);
-    self->methods = Get_vtable_CdStream();
+    self->methods = GetCdStreamMethods();
     self->cdSpeed = cdSpeed;
     self->muted = 0;
     self->bytesPerFrame =
@@ -315,6 +315,6 @@ int CdStream__Sync(CdStream *self, int mode) {
 
 void CdStream__NoOpSlot7C(CdStream *self) {}
 
-CdStreamMethods *Get_vtable_CdStream(void) {
+CdStreamMethods *GetCdStreamMethods(void) {
     return &gCdStreamMethods;
 }

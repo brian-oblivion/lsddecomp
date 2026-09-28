@@ -100,8 +100,8 @@ struct CdStream {
 }; /* 0x5C bytes: New_CdStream */
 
 extern CdStreamMethods gCdStreamMethods;
-extern CdStreamMethods *Get_vtable_CdStream(void); /* returns &gCdStreamMethods */
-extern CdStream *gActiveCdStream;                  /* the stream that owns the drive, or NULL */
+extern CdStreamMethods *GetCdStreamMethods(void); /* returns &gCdStreamMethods */
+extern CdStream *gActiveCdStream;                 /* the stream that owns the drive, or NULL */
 
 CdStream *New_CdStream(s32 cdSpeed, s32 fps, s32 reserved);
 void CdStream__CdStream(CdStream *self, u32 cdSpeed, s32 fps, s32 reserved);

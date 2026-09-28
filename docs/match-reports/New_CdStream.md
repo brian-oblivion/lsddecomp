@@ -24,7 +24,7 @@ CdStreamObj *New_CdStream(s32 arg1, s32 arg2, s32 arg3) {
     CdStreamObj *obj = BMemPMgrAlloc(0x5C);
 
     if (obj != NULL) {
-        Get_vtable_CdStream()->ctor(obj, arg1, arg2, arg3);
+        GetCdStreamMethods()->ctor(obj, arg1, arg2, arg3);
         return obj;
     }
     return NULL;

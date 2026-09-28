@@ -1,4 +1,6 @@
-# Get_vtable_CdStream -- MATCHED (exact length, 4/4 words), round 81
+# GetCdStreamMethods -- MATCHED (exact length, 4/4 words), round 81
+
+> Renamed from `Get_vtable_CdStream` on 2026-09-28 (tools/rename.py). Address 0x80047900.
 
 > Renamed from `Get_vtable_CdStreamObj` on 2026-09-26 (tools/rename.py). Address 0x80047900.
 
@@ -15,12 +17,12 @@ the first build; whole-image SHA1 green.
 
 ## Naming
 
-Tier A. `Get_vtable_CdStream` -- returns `&gCdStreamMethods`. Evidence: matches the established `Get_vtable_<Class>` convention used by `GetBasicClassMethods`, `Get_vtable_Pad`, `Get_vtable_Entity`, etc.
+Tier A. `GetCdStreamMethods` -- returns `&gCdStreamMethods`. Evidence: matches the established `Get_vtable_<Class>` convention used by `GetBasicClassMethods`, `Get_vtable_Pad`, `Get_vtable_Entity`, etc.
 
 ## Source
 
 ```c
-CdStreamObjMethods *Get_vtable_CdStream(void) {
+CdStreamObjMethods *GetCdStreamMethods(void) {
     return &gCdStreamMethods;
 }
 ```
