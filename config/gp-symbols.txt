@@ -128,7 +128,6 @@ gNullDriverModeArg
 gObjMProjectionBias
 gOpenVabCount
 gPendingVabBuffer
-gSaveTitle
 gSaveTitleGlyphs
 gSoundEffectDirPtr
 gSsTicksPerSecond
@@ -202,6 +201,7 @@ sRecordFirstBatchCount
 sRecordRegisterCalls
 sSaveFileName
 sSaveMagic
+sSaveTitle
 sSaveTitleBlanks
 sSaveTitleColorChannel
 sSaveTitleColorFrame

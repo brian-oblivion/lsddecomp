@@ -25,7 +25,7 @@ void TitleMenu__RefreshMenu(TitleMenu *self)
     size = self->nameField->unkA9;
     origState = self->state;
     buf1 = BMemPMgrAlloc(size);
-    DecodeFullWidthSjis(buf1, gSaveTitle);
+    DecodeFullWidthSjis(buf1, sSaveTitle);
     self->nameField->methods->slotCC(self->nameField, buf1);
     BMemPMgrFree(buf1);
     UpdateFlashbackLock(self, self->unk4C, self->unkA4);
@@ -59,7 +59,7 @@ the whole image after any further edit there.)
   Read at function entry (before the allocator call) in the disassembly,
   which is why the C statement is placed there too rather than immediately
   before its one use at the very end.
-- `buf1 = BMemPMgrAlloc(size); DecodeFullWidthSjis(buf1, gSaveTitle); self->
+- `buf1 = BMemPMgrAlloc(size); DecodeFullWidthSjis(buf1, sSaveTitle); self->
   nameField->methods->slotCC(self->nameField, buf1); BMemPMgrFree(buf1);` -- the
   identical allocate/fill/consume/free idiom already matched in this unit's
   own `TitleMenu__CreateSaveTitle` (this round), just simpler (no `strcpy`/`strlen`

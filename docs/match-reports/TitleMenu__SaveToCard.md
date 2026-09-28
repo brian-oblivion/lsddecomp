@@ -23,7 +23,7 @@ void TitleMenu__SaveToCard(TitleMenu *self)
     if (self->unkA4->methods->slot1AC(self->unkA4)) {
         *(u8 *)sSaveFileName = 0;
     }
-    self->unkAC->methods->slot78(self->unkAC, sSaveFileName, gSaveTitle, 0xD, 3,
+    self->unkAC->methods->slot78(self->unkAC, sSaveFileName, sSaveTitle, 0xD, 3,
                                   self->iconHandle, self->unkBC, self->unkC0);
 }
 ```
@@ -54,7 +54,7 @@ SLPS_015.56`.
   VALUE, reloaded here with an identical `lw`).
 - The final call, `self->unkAC->methods->slot78(...)`, is an 8-argument
   dispatch (four in registers, four on the stack at `0x10`-`0x1C($sp)`):
-  `self->unkAC`, `sSaveFileName`, `gSaveTitle`, the literal `0xD`, the
+  `self->unkAC`, `sSaveFileName`, `sSaveTitle`, the literal `0xD`, the
   literal `3`, `self->iconHandle`, `self->unkBC`, `self->unkC0`. The offset
   (+0x078) falls immediately after this round's `TitleMenu__LoadFromCard`-derived
   `slot74` (+0x074, 4 bytes) with no gap, so it was appended there.

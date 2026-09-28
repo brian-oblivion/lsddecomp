@@ -164,7 +164,7 @@ data the class itself reads:
 - registrationSlots D_80086CDC = {0, 1, 0, ...}: FLASHBACK starts locked, and
   UpdateFlashbackLock (called from RefreshMenu with `self->target`) writes
   registrationSlots[1];
-- the TextRow shows gSaveTitle's buffer, 0x8001149C, SJIS "LSD   Day001",
+- the TextRow shows sSaveTitle's buffer, 0x8001149C, SJIS "LSD   Day001",
   the memory-card save title; StampSaveTitleDay writes the day at +0x12.
 
 Method renames, each its own `rename.py` commit (tier B: mechanics named,

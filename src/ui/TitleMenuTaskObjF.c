@@ -91,21 +91,21 @@ extern struct ScreenSpritePos sSaveTitleOffset;
  * them (`fileName`, `title`): TitleMenu__SaveToCard and
  * TitleMenu__LoadFromCard pass both. The ROM image points them into the
  * rodata block at D_80011434: sSaveFileName at "BISLPS-01556xxx", which
- * SaveToCard empties on a new game; gSaveTitle at the full-width
+ * SaveToCard empties on a new game; sSaveTitle at the full-width
  * "LSD   Day001" followed by 19 full-width spaces, which
  * TitleMenu__CreateSaveTitle reblanks from its 12th character on a new game
  * and StampSaveTitleDay writes the day into.
  */
 extern char *sSaveFileName;
-extern char *gSaveTitle;
+extern char *sSaveTitle;
 
 /* The buffer StampSaveTitleDay formats the day into
- * (FormatFullWidthNumber) before copying it into gSaveTitle's title. The
+ * (FormatFullWidthNumber) before copying it into sSaveTitle's title. The
  * ROM image points it at the "7654321" string D_8008AA1C. */
 extern void *sDayDigits;
 
 /* 19 full-width spaces, the tail TitleMenu__CreateSaveTitle copies over
- * gSaveTitle's on a new game (the ROM image points it just past
+ * sSaveTitle's on a new game (the ROM image points it just past
  * sSaveFileName's string). */
 extern char *sSaveTitleBlanks;
 
@@ -268,7 +268,7 @@ extern void FormatFullWidthNumber(u8 *dst, s32 value, s32 width, s32 unpadded);
  * copies them into the save title's day number, characters 9..11. */
 void StampSaveTitleDay(s32 day) {
     FormatFullWidthNumber(sDayDigits, day, SAVE_TITLE_DAY_DIGITS, 0);
-    *(FullWidthChars3 *)&((FullWidthChar *)gSaveTitle)[SAVE_TITLE_DAY] = *(FullWidthChars3 *)sDayDigits;
+    *(FullWidthChars3 *)&((FullWidthChar *)sSaveTitle)[SAVE_TITLE_DAY] = *(FullWidthChars3 *)sDayDigits;
 }
 
 /*
@@ -284,7 +284,7 @@ void StampSaveTitleDay(s32 day) {
  * and the memory-card methods that drive `saveCtrl`, a TaskObjF, for SAVE
  * and LOAD. The header's banner describes the class.
  *
- * The data they share is in include/TitleMenu.h: gSaveTitle, the
+ * The data they share is in include/TitleMenu.h: sSaveTitle, the
  * full-width save title the TextRow shows and the card save carries;
  * sSaveFileName; the card's name prefix and suffix table; and the colour
  * cycle's channel and frame counters.
@@ -382,7 +382,7 @@ extern s32 strlen(char *s);
  * nothing here reads its result. */
 extern void DecodeFullWidthSjis(void *dst, void *src);
 
-/* gSaveTitle is 2-byte full-width characters; the characters from here on
+/* sSaveTitle is 2-byte full-width characters; the characters from here on
  * are padding after "LSD   Day001". */
 #define SAVE_TITLE_PADDING 12
 /* beginSave's titleEditPos: the player's text goes in from the character
@@ -402,13 +402,13 @@ void TitleMenu__CreateSaveTitle(TitleMenu *self, TaskCoreTarget *target) {
         return;
     }
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
-        strcpy(gSaveTitle + SAVE_TITLE_PADDING * 2, sSaveTitleBlanks);
-        StampSaveTitleFileLetter(gSaveTitle, NULL);
+        strcpy(sSaveTitle + SAVE_TITLE_PADDING * 2, sSaveTitleBlanks);
+        StampSaveTitleFileLetter(sSaveTitle, NULL);
     }
-    cellCount = strlen(gSaveTitle);
+    cellCount = strlen(sSaveTitle);
     cellCount = (cellCount >> 1) + 4;
     text = BMemPMgrAlloc(cellCount);
-    DecodeFullWidthSjis(text, gSaveTitle);
+    DecodeFullWidthSjis(text, sSaveTitle);
     self->saveTitle = New_TextRow(target->handle, cellCount, text);
     self->saveTitle->visibleCount = 8;
     self->saveTitle->firstVisible = 4;
@@ -481,7 +481,7 @@ void TitleMenu__RefreshMenu(TitleMenu *self) {
     cellCount = self->saveTitle->cellCount;
     origSlot = self->activeSlot;
     text = BMemPMgrAlloc(cellCount);
-    DecodeFullWidthSjis(text, gSaveTitle);
+    DecodeFullWidthSjis(text, sSaveTitle);
     self->saveTitle->methods->setText(self->saveTitle, text);
     BMemPMgrFree(text);
     UpdateFlashbackLock(self, self->target, self->dreamSys);
@@ -524,13 +524,13 @@ void TitleMenu__SaveToCard(TitleMenu *self) {
     if (self->dreamSys->methods->getNewGameFlag(self->dreamSys)) {
         sSaveFileName[0] = '\0';
     }
-    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, gSaveTitle, SAVE_TITLE_EDIT_POS,
+    self->saveCtrl->methods->beginSave(self->saveCtrl, sSaveFileName, sSaveTitle, SAVE_TITLE_EDIT_POS,
                                        3, self->saveIcon, self->saveBlock, self->saveBlockSize);
 }
 
 void TitleMenu__LoadFromCard(TitleMenu *self) {
     self->methods->beginCardAccess(self);
-    self->saveCtrl->methods->beginLoad(self->saveCtrl, sSaveFileName, gSaveTitle, self->saveBlock,
+    self->saveCtrl->methods->beginLoad(self->saveCtrl, sSaveFileName, sSaveTitle, self->saveBlock,
                                        self->saveBlockSize);
 }
 
@@ -1677,12 +1677,12 @@ TaskObjFMethods *GetTaskObjFMethods(void) {
 }
 
 /* The save title is full-width (2-byte SJIS) characters. TitleMenu's (the
- * buffer gSaveTitle points at) starts as "LSD   Day001", all full-width:
+ * buffer sSaveTitle points at) starts as "LSD   Day001", all full-width:
  * "LSD" (0..2), the letter field (3..5), "Day" (6..8), the day number
  * (9..11), then padding. */
 #define SAVE_TITLE_LETTER_FIELD 3
 #define SAVE_TITLE_LETTER 4
-/* SAVE_TITLE_PADDING (12) is defined above, with gSaveTitle. */
+/* SAVE_TITLE_PADDING (12) is defined above, with sSaveTitle. */
 /* gSaveTitleGlyphs: the full-width letters a..o (0..14), one per save file
  * -01..-15, then three full-width spaces and "Day" (15..20). */
 #define SAVE_TITLE_GLYPH_SPACES 15

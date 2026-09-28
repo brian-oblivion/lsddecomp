@@ -17,7 +17,7 @@ and no derivation; this round wrote and matched the function from scratch.
 void TitleMenu__LoadFromCard(TitleMenu *self)
 {
     self->methods->slot128(self);
-    self->unkAC->methods->slot74(self->unkAC, sSaveFileName, gSaveTitle,
+    self->unkAC->methods->slot74(self->unkAC, sSaveFileName, sSaveTitle,
                                   self->unkBC, self->unkC0);
 }
 ```
@@ -36,7 +36,7 @@ Two calls:
    added to `include/class_3bb8c.h` as `void (*slot128)(TitleMenu *self);`.
    No other function in this unit reaches it.
 
-2. `self->unkAC->methods->slot74(self->unkAC, sSaveFileName, gSaveTitle,
+2. `self->unkAC->methods->slot74(self->unkAC, sSaveFileName, sSaveTitle,
    self->unkBC, self->unkC0)` -- five arguments (`self`, two globals'
    VALUES, `self->unkBC`, `self->unkC0`), the fifth going to the stack at
    `0x10($sp)` exactly as a 5-argument call requires. `unkAC`'s methods
@@ -44,16 +44,16 @@ Two calls:
    `TitleMenu__EndCardAccess`); this call reaches +0x074 immediately after `slot70`
    with no gap, so `slot74` was appended there.
 
-   The two `%gp_rel` loads (`sSaveFileName`, `gSaveTitle`) read the globals'
+   The two `%gp_rel` loads (`sSaveFileName`, `sSaveTitle`) read the globals'
    own VALUES, not their addresses (`lw $a1, %gp_rel(sSaveFileName)($gp)`,
    plain `lw`, no `la`) -- unlike every other `D_...` reference in this
    unit's header so far, which are all address-of. Traced both values:
-   `sSaveFileName` = `0x80011464`, `gSaveTitle` = `0x8001149C`
+   `sSaveFileName` = `0x80011464`, `sSaveTitle` = `0x8001149C`
    (`asm/data/7B12C.sdata.s`). Both land inside the still-uncarved rodata
    block `D_80011434` (`asm/data/1C34.rodata.s`, a mixed string/SJIS-glyph
    table spanning 0x80011434-0x800114DC) at offsets 0x30 and 0x68
    respectively -- NEITHER has its own `dlabel`, so neither can be spelled
-   by name. Declared `sSaveFileName`/`gSaveTitle` as `extern void *` (the
+   by name. Declared `sSaveFileName`/`sSaveTitle` as `extern void *` (the
    globals themselves, not what they point to) and forwarded their values
    opaquely, matching how `slot74`'s two middle parameters are used
    (arg1/arg2, untyped beyond "pointer-shaped value forwarded verbatim").
@@ -73,7 +73,7 @@ retype needed.
 - `TitleMenuUnkACObjMethods_3bb8c_d`: `void (*slot74)(TitleMenuUnkACObj_3bb8c_d
   *self, void *arg1, void *arg2, s32 arg3, s32 arg4);` appended immediately
   after `slot70` (+0x070, 4 bytes), landing exactly at +0x074 with no gap.
-- New externs `sSaveFileName`, `gSaveTitle` (both `void *`), documented as
+- New externs `sSaveFileName`, `sSaveTitle` (both `void *`), documented as
   VALUE-of (not address-of) globals holding pointers into unowned rodata.
 
 ### Proposed learning
@@ -97,4 +97,4 @@ TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus
 
 ## Track 7 (round 96, echo)
 
-No change beyond the renames (sSaveFileName, gSaveTitle).
+No change beyond the renames (sSaveFileName, sSaveTitle).
