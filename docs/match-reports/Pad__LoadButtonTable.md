@@ -127,3 +127,12 @@ Rodata follows the code objects' order: `libetc/intr_dma` .rdata at 0xF28 and
 that stretch able to own 0x40 bytes of .rodata at 0xF64 is this unit. The yaml
 line for 0xF64 still says "owner not placed yet (libetc intr?)"; proposed to
 the head, not edited (runners do not edit the yaml).
+
+## History (moved from src/app/pad.c, track 12)
+
+The comment on the unit's `Block64` type read:
+
+> A 0x40-byte block, copied as a whole (GCC's inlined block-move codegen for
+> a struct assignment, not a word loop) rather than word-indexed.
+
+It is now a one-line `MATCHING:` note.

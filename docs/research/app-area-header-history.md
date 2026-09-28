@@ -47,3 +47,9 @@ documentation in include/game_application.h, the data-source layer's
 description to include/data_source.h's `@file` block, and FileResource's
 to its class documentation. The .c keeps a short banner per section. No
 process text was in them.
+
+## History (moved from include/pad.h, track 12)
+
+- The class banner cited `tools/classtable.py gPadMethods --vs
+  gBasicClassMethods` for "overrides ctor and finalize, adds six slots";
+  the method table's doc now states that without the command.
