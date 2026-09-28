@@ -1376,7 +1376,7 @@ s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepAct
 
     if (gActiveMoviePlayer == NULL) {
         if (self->autoPlay != 0) {
-            MoviePlayer__MarkPlaying(self);
+            MoviePlayer__RequestStart(self);
         }
         self->frameCount = frameCount;
         if (self->stream->methods->open(self->stream, name, MOVIE_OPEN_TRIES) == 0) {
@@ -1397,7 +1397,7 @@ s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepAct
     return 0;
 }
 
-void MoviePlayer__MarkPlaying(MoviePlayer *self) {
+void MoviePlayer__RequestStart(MoviePlayer *self) {
     self->pendingStart = 1;
 }
 

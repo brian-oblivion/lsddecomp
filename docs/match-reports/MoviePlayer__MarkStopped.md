@@ -9,7 +9,7 @@ deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior rep
 
 ## What it does
 
-Setter: `li v0,-1; jr ra; sw v0,0x50(a0)` = `self->unk50 = -1;`, same view as MoviePlayer__MarkPlaying.
+Setter: `li v0,-1; jr ra; sw v0,0x50(a0)` = `self->unk50 = -1;`, same view as MoviePlayer__RequestStart.
 
 Table slot (`tools/classtable.py`): none (in no method table; called directly).
 

@@ -100,7 +100,7 @@ void MoviePlayer__Finalize(MoviePlayer *self);
 s32 MoviePlayer__InitFrame(MoviePlayer *self, DrawRect *frame, s32 external);
 void MoviePlayer__FreeFrameBuffers(MoviePlayer *self);
 s32 MoviePlayer__Play(MoviePlayer *self, char *name, s32 frameCount, s32 keepActive, s32 loops);
-void MoviePlayer__MarkPlaying(MoviePlayer *self); /* pendingStart = 1; play's call */
+void MoviePlayer__RequestStart(MoviePlayer *self); /* pendingStart = 1; play's call */
 void MoviePlayer__Rewind(MoviePlayer *self);
 void MoviePlayer__MarkStopped(MoviePlayer *self); /* pendingStart = -1; stop hands it to the stream's slot7C, whose occupant is empty */
 s32 MoviePlayer__Advance(MoviePlayer *self);

@@ -1,4 +1,6 @@
-# MoviePlayer__MarkPlaying -- MATCHED (3/3 words)
+# MoviePlayer__RequestStart -- MATCHED (3/3 words)
+
+> Renamed from `MoviePlayer__MarkPlaying` on 2026-09-28 (tools/rename.py). Address 0x800458ac.
 
 > Renamed from `func_800458AC` on 2026-09-25 (tools/rename.py). Address 0x800458ac.
 
@@ -23,7 +25,7 @@ typedef struct Obj33808_50 {
     s32 unk50;
 } Obj33808_50;
 
-void MoviePlayer__MarkPlaying(Obj33808_50 *self) {
+void MoviePlayer__RequestStart(Obj33808_50 *self) {
     self->unk50 = 1;
 }
 ```
@@ -36,7 +38,7 @@ void MoviePlayer__MarkPlaying(Obj33808_50 *self) {
 
 ## Naming
 
-- **MoviePlayer__MarkPlaying**, tier A. Sets the tri-state play flag (+0x50 in the movie-player's own struct) to 1; called from Play.
+- **MoviePlayer__RequestStart**, tier A. Sets the tri-state play flag (+0x50 in the movie-player's own struct) to 1; called from Play.
 
 ## Track 4 (2026-09-26, round 89)
 

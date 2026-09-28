@@ -9,7 +9,7 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 ## What it does
 
-Start a movie: only when no movie is active (gActiveMoviePlayer NULL). Calls MoviePlayer__MarkPlaying(self) first when +0x68 is set, keeps arg2 at +0x5C and opens `name` on the stream object at +0x60 (its +0x044, with 100). On success it becomes the active movie (gActiveMoviePlayer = self), clears +0x40/+0x3C/+0x48/+0x44, sets +0x4C, keeps arg3/arg4 at +0x54/+0x58 and calls DrawSystem +0x078 with (&gMovieClearColor, &self->rect at +0x20); returns 0. Returns 1 when the open fails, 0 when a movie is already active.
+Start a movie: only when no movie is active (gActiveMoviePlayer NULL). Calls MoviePlayer__RequestStart(self) first when +0x68 is set, keeps arg2 at +0x5C and opens `name` on the stream object at +0x60 (its +0x044, with 100). On success it becomes the active movie (gActiveMoviePlayer = self), clears +0x40/+0x3C/+0x48/+0x44, sets +0x4C, keeps arg3/arg4 at +0x54/+0x58 and calls DrawSystem +0x078 with (&gMovieClearColor, &self->rect at +0x20); returns 0. Returns 1 when the open fails, 0 when a movie is already active.
 
 Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x040.
 
@@ -22,7 +22,7 @@ top of / earlier in `src/graphics/GraphicsResources.c`.
 
 ```c
 /* gMoviePlayerMethods +0x040: start playing -- only when no movie is active
- * (gActiveMoviePlayer): optionally MoviePlayer__MarkPlaying first (+0x68), keep `arg2` at
+ * (gActiveMoviePlayer): optionally MoviePlayer__RequestStart first (+0x68), keep `arg2` at
  * +0x5C, open `name` on the stream object at +0x60 (its +0x044, 100); 1 when
  * that fails. Otherwise become the active movie, reset the state words, keep
  * `arg3`/`arg4` at +0x54/+0x58 and register gMovieClearColor with the frame
@@ -66,14 +66,14 @@ typedef struct DrawSys457C0 {
 extern DataSrc33808 *gActiveMoviePlayer;
 extern s32 gMovieClearColor;
 extern void *GetDrawSystem(void);
-void MoviePlayer__MarkPlaying();
+void MoviePlayer__RequestStart();
 
 s32 MoviePlayer__Play(Obj457C0 *self, char *name, s32 arg2, s32 arg3, s32 arg4) {
     DrawSys457C0 *ds;
 
     if (gActiveMoviePlayer == NULL) {
         if (self->unk68 != 0) {
-            MoviePlayer__MarkPlaying(self);
+            MoviePlayer__RequestStart(self);
         }
         self->unk5C = arg2;
         if (self->unk60->methods->open(self->unk60, name, 100) == 0) {
