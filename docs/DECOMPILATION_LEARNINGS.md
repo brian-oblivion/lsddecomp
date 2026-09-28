@@ -666,17 +666,9 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
 
 ## 4. Verdict classes and how far to trust them
 
-- **A stall report's MEASUREMENT and its residue CLASS decay at different rates, and the class is
-  what goes stale unnoticed.** Both round-59 revisits found the figures correct while the class
-  ("delay-slot scheduling" both times) had never been re-questioned and was wrong both times; each
-  closed in single-digit builds after 14 and 46 rounds. A revisit's first act is to re-derive the
-  CLASS from the disassembly. (a round 59)
-- **A lever's NEGATIVE is scoped to the (function, lever, STATE) triple, and so is a POSITIVE.** A
-  guard polarity inert in round 19 closed three words in round 33; a fix rejected in rounds 19 and
-  20 closed the function in round 49. **If you have changed anything else since a lever was
-  rejected, the rejection has expired.** A class several reports agree on may be one error copied,
-  so re-derive from asm-differ/objdump before acting on any report's DESCRIPTION. (a §"A lever's
-  NEGATIVE is scoped to the state it was tested under")
+- Distilled to the archive (round 101, track 1 closed): §"A stall report's MEASUREMENT and its
+  residue CLASS decay at different rates", §"A lever's NEGATIVE is scoped to the (function, lever,
+  STATE) triple".
 
 ## 5. Withdrawn or SDK-voided — do not re-add
 
