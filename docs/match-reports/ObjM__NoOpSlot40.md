@@ -14,7 +14,7 @@ work done in this round. It fills vtable slot `+0x040` of `gObjMMethods`
 (`tools/classtable.py 0x80087034`), the class whose constructor
 (`ObjM__ObjM`, slot `+0x008`) and destructor (`ObjM__Finalize`, slot `+0x00C`)
 confirm the table is `ObjM`'s own, the same class as sibling unit
-class_3bb8c_m's `ObjM`.
+class_3bb8c_k's `ObjM`.
 
 ## Naming
 

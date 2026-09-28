@@ -2,7 +2,7 @@
 
 > Renamed from `func_800543FC` on 2026-09-23 (tools/rename.py). Address 0x800543fc.
 
-**Unit:** class_3bb8c_m · **Size:** 54 instructions · **Status:** MATCHED (54/54 words)
+**Unit:** class_3bb8c_k · **Size:** 54 instructions · **Status:** MATCHED (54/54 words)
 
 ## Context
 
@@ -59,7 +59,7 @@ field types were in place.
 
 ## Provenance
 
-round 15b (2026-09-04), runner echo, second pass on `class_3bb8c_m`.
+round 15b (2026-09-04), runner echo, second pass on `class_3bb8c_k`.
 
 ## Naming
 

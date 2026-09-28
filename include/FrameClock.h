@@ -24,7 +24,7 @@
  * IntermediateBase's update counts every event; Viewport__OnNotifyTag5
  * redraws on 2 and 3 but not 4; DreamSys__TimerTick advances the dream timer
  * on 2 only; TodActor__Update ticks on 2 and releases itself on 4.
- * `paused` is named from ObjM (src/class_3bb8c_m.c): ObjM__AdvancePauseSetup
+ * `paused` is named from ObjM (src/class_3bb8c_k.c): ObjM__AdvancePauseSetup
  * calls +0x04C pause on its +0x010 FrameClock in the same step as WBgm__Pause
  * on its WBgm (the same slot, +0x04C), and ObjM__TeardownPauseOverlay calls
  * +0x050 resume beside WBgm__Resume. What sets flag14 (+0x058) is not found

@@ -109,7 +109,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_80053984` | `ObjM__OnDreamSysNotify` | B | see below |
 
-**Evidence.** vtable slot +0x090. The class's own state-transition dispatcher: gated on `self->phase == 0`, switches on `code - 0xA` (`jtbl_8001174C`, codes 0xA..0x11) and routes each case onto the SAME class's own `slot94`..`slotAC` -- i.e. `ObjM__EnterState4`, `ObjM__EnterState5`, `ObjM__EnterState6` (this unit) and `ObjM__EnterState7`, `ObjM__EnterState8`, `ObjM__EnterStateA`, `ObjM__NotifyParentsCodeB` (sibling unit class_3bb8c_m) one-to-one, confirmed directly off `tools/classtable.py 0x80087034`'s slot list. When `phase != 0` and `code >= 9` it instead clears `self->target->unk44`.
+**Evidence.** vtable slot +0x090. The class's own state-transition dispatcher: gated on `self->phase == 0`, switches on `code - 0xA` (`jtbl_8001174C`, codes 0xA..0x11) and routes each case onto the SAME class's own `slot94`..`slotAC` -- i.e. `ObjM__EnterState4`, `ObjM__EnterState5`, `ObjM__EnterState6` (this unit) and `ObjM__EnterState7`, `ObjM__EnterState8`, `ObjM__EnterStateA`, `ObjM__NotifyParentsCodeB` (sibling unit class_3bb8c_k) one-to-one, confirmed directly off `tools/classtable.py 0x80087034`'s slot list. When `phase != 0` and `code >= 9` it instead clears `self->target->unk44`.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
@@ -126,7 +126,7 @@ same jump table). The `code >= 9` test keeps its literal: 9 is not a link
 code. The banner's note that this function owns `jtbl_8001174C` moved to
 ObjM__NoOpSlot40.md with the rest of the banner's history.
 
-Proposed for the head (ObjM.h slots, accessors in class_3bb8c_m too):
+Proposed for the head (ObjM.h slots, accessors in class_3bb8c_k too):
 enterState4..A / notifyParentsCodeB could be named by the link code that
 reaches each (enterState4 on DREAMSYS_TIME_UP, enterState5 on
 DREAMSYS_LINK_DYNAMIC, enterState6 on DREAMSYS_LINK_WALL, enterState7

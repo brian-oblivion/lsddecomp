@@ -29,10 +29,10 @@ derivation started.
 jr $ra
 ```
 
-`gStyleSceneRefs` is a plain `s32` (established in `class_3bb8c_m.c`) holding the
+`gStyleSceneRefs` is a plain `s32` (established in `class_3bb8c_k.c`) holding the
 address of a small descriptor object; this function reads *that object's*
 own offset 0 (a value, not the `FieldAC7CHolder.unkC` field
-`class_3bb8c_m.c` names at +0xC -- a different offset of the same base
+`class_3bb8c_k.c` names at +0xC -- a different offset of the same base
 pointer, kept as its own independent local reading rather than importing
 that unit's type). The offset-0 value is passed as `FlushSoundCueSet`'s `self`
 argument, matching that function's existing loose declaration in

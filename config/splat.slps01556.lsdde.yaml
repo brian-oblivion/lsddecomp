@@ -1656,7 +1656,6 @@ segments:
       # func_80054660 (gp_rel). 16 clean, and the four blocked ones are the
       # LAST four in ROM order, so the clean run is contiguous. Owns NO
       # switch jump table.
-      - [0x44518, c, class_3bb8c_m]
       # class_3bb8c_n: functions 0..22 of the old 113-function remainder,
       # 0x44F14..0x46288 (23 functions, 1245 words).  CARVED round 45
       # (2026-09-15) and BANKED -- see the DELIBERATELY UNWORKED note in

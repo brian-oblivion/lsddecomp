@@ -61,7 +61,7 @@ transferable part.** Every other unit in the project that names this slot
 already passes it a second argument:
 
 ```
-src/class_3bb8c_m.c:72   self->unk18->methods->slot64(self->unk18, v);
+src/class_3bb8c_k.c:72   self->unk18->methods->slot64(self->unk18, v);
 src/Entity_e.c:244       this->unk94->unk5C->methods->slot64(..., sMoodCue74ClearColor);
 src/ScreenWidgets.c:319   self->methods->slot64(self, 0);
 src/ScreenWidgets.c:419   methods->slot64(self, 1);

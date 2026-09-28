@@ -9,7 +9,7 @@
  * DayTask). No class derives from it. Methods, in ROM order:
  * src/class_3bb8c_k.c (New_ObjM, ctor, Finalize, OnNotify),
  * src/class_3bb8c_k.c (NoOpSlot40 through EnterState6) and
- * src/class_3bb8c_m.c (EnterState7 through GetObjMMethods). The object is
+ * src/class_3bb8c_k.c (EnterState7 through GetObjMMethods). The object is
  * 0x88 bytes (New_ObjM); its own fields run from TimedTask's 0x38.
  *
  * Built by DayTask__StartObjM (src/class_39e08.c): New_ObjM(DayTask's
@@ -54,7 +54,7 @@
  * The +0x06C..+0x07B words are read as one block from outside:
  * ObjM__InitStyleAndWorld passes &ctorSound to RegisterStyleConfig, which
  * keeps it in gStyleSceneRefs, and ApplyStyleDecorationIfSet
- * (class_3bb8c_m) calls +0x0AC on that block's +0x00C, cachedViewport
+ * (class_3bb8c_k) calls +0x0AC on that block's +0x00C, cachedViewport
  * (Viewport's getFadeBox). The fields are kept flat.
  */
 

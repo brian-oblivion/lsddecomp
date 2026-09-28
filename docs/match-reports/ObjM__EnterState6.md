@@ -25,7 +25,7 @@ CANNOT be called directly here (it would compile to a plain `jal` by
 symbol, not the `jalr` through the vtable pointer retail actually uses),
 so this unit's own `DreamSysMethods_3bb8c_l::slot200` field is dispatched
 through instead. `ObjM__StartFadeUp` is this unit's OWN sibling slice
-`class_3bb8c_m` (still `INCLUDE_ASM` there); its 5th argument (`1`) is
+`class_3bb8c_k` (still `INCLUDE_ASM` there); its 5th argument (`1`) is
 passed on the stack past the four register argument slots, matching a
 plain `extern s32 ObjM__StartFadeUp(Obj87034_3bb8c_l*, s32, s32, s32, s32);`
 declaration with no special handling needed.

@@ -40,7 +40,7 @@ jr $ra
 ```
 
 `gStyleStage` is a plain `s32` (already established as such in
-`class_3bb8c_m.c`, `RegisterStyleConfig`). `(gStyleStage - 3)` cast to unsigned and
+`class_3bb8c_k.c`, `RegisterStyleConfig`). `(gStyleStage - 3)` cast to unsigned and
 compared `< 3` is the standard idiom for a closed range test, matching
 retail's `sltiu` exactly. `RotateVramRectRight` is a not-yet-carved,
 still-`INCLUDE_ASM` function in `asm/psyq_2bb9c.s` (a 4-argument draw-style

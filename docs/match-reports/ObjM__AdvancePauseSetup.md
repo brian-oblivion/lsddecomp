@@ -2,7 +2,7 @@
 
 > Renamed from `func_800542D0` on 2026-09-23 (tools/rename.py). Address 0x800542d0.
 
-**Unit:** class_3bb8c_m · **Size:** 75 instructions · **Status:** MATCHED (75/75 words)
+**Unit:** class_3bb8c_k · **Size:** 75 instructions · **Status:** MATCHED (75/75 words)
 
 ## Context
 
@@ -99,7 +99,7 @@ it into `self->unk80 = state + 1; return;` for clarity, verified to
 score identically.
 
 Nothing in this unit calls `ObjM__AdvancePauseSetup` (still uncalled within
-`class_3bb8c_m`), so there is no caller evidence either way about the
+`class_3bb8c_k`), so there is no caller evidence either way about the
 return type -- the toolchain fact above (only `void` reproduces the
 byte sequence) IS the evidence.
 
@@ -127,7 +127,7 @@ constant needing yet another phrasing.
 
 ## Provenance
 
-round 15b (2026-09-04), runner echo, second pass on `class_3bb8c_m`.
+round 15b (2026-09-04), runner echo, second pass on `class_3bb8c_k`.
 Permuter transcript and the 18 reproducers referenced above were run
 in this session; the reproducers themselves were scratch files under
 `/tmp`, not preserved.

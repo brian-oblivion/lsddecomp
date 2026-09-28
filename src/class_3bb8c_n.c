@@ -3,7 +3,7 @@
  * builds on a scene's first tick, updates on every tick, and StyleTeardown
  * releases.
  *
- * RegisterStyleConfig (class_3bb8c_m.c), called by ObjM__InitStyleAndWorld
+ * RegisterStyleConfig (class_3bb8c_k.c), called by ObjM__InitStyleAndWorld
  * and a no-op until StyleTeardown clears gStyleGrid, sets the state read here: gStyleGrid (the
  * scene's StageMap), gStyleStage (ObjM's stage), gStyleSceneRefs (ObjM's
  * sound, resources and viewport; StyleSceneRefs below) and gStyleDay (the
@@ -13,7 +13,7 @@
  *
  * What TickStyle keeps, each built on the first tick:
  *  - the decoration box, gStyleDecorObj, when the config has a colour for
- *    it (class_3bb8c_m builds it, StyleFlushDecoration releases it);
+ *    it (class_3bb8c_k builds it, StyleFlushDecoration releases it);
  *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (gStyleDecorSlots)
  *    coloured from gStyleDecorColors and attached under the viewport's fade
  *    box; every tick StyleUpdateDecorSet shifts their colours, their
@@ -82,7 +82,7 @@ typedef struct StyleSceneRefs {
 } StyleSceneRefs;
 
 extern const u8 *gStyleDecorColor;
-extern s32 gStyleDecorObj; /* a BoxFill; class_3bb8c_m.c declares it s32 too */
+extern s32 gStyleDecorObj; /* a BoxFill; class_3bb8c_k.c declares it s32 too */
 
 /* Releases the decoration box, if ApplyStyleDecorationIfSet made one. */
 void StyleFlushDecoration(void) {
@@ -150,7 +150,7 @@ extern s32 gStyleDecorPosY;
 extern s32 gStyleDecorSizeW;
 extern s32 gStyleDecorSizeH;
 extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
-extern s32 gStyleSceneRefs; /* a StyleSceneRefs *; class_3bb8c_m.c declares it s32 too */
+extern s32 gStyleSceneRefs; /* a StyleSceneRefs *; class_3bb8c_k.c declares it s32 too */
 
 /* gStyleDecorPosX/Y and gStyleDecorSizeW/H are adjacent word pairs.
  * MATCHING: copied whole, never field by field (a BLKmode copy makes cse
@@ -358,7 +358,7 @@ struct StyleCueSlot {
 
 extern StyleCueSlot *FlushStyleCue(StyleCueSlot *slot);
 
-extern s32 gStyleGrid; /* a StageMap; class_3bb8c_m.c declares it s32 too */
+extern s32 gStyleGrid; /* a StageMap; class_3bb8c_k.c declares it s32 too */
 extern StyleCueSlot *gStyleCueSlots[2];
 
 /* Releases everything TickStyle built and unregisters the scene. */
@@ -744,7 +744,7 @@ s32 IsStyleCueNear(StyleCueSlot *slot, LongVec3 *target) {
     return 0;
 }
 
-extern void ApplyStyleDecorationIfSet(void); /* class_3bb8c_m.c */
+extern void ApplyStyleDecorationIfSet(void); /* class_3bb8c_k.c */
 extern void StyleBuildDecorSet(void);
 extern void StyleUpdateDecorSet(void);
 extern void StyleScrollVramStrips(void);

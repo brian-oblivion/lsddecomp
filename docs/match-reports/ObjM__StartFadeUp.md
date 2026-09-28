@@ -4,7 +4,7 @@
 
 > Renamed from `func_80053EB4` on 2026-09-23 (tools/rename.py). Address 0x80053eb4.
 
-**Unit:** class_3bb8c_m · **Size:** 52 instructions · **Status:** MATCHED (52/52 words)
+**Unit:** class_3bb8c_k · **Size:** 52 instructions · **Status:** MATCHED (52/52 words)
 
 ## Context
 
@@ -48,7 +48,7 @@ either guard.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_k`.
 
 ## Naming
 

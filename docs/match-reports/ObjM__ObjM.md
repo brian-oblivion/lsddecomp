@@ -91,7 +91,7 @@ Slot +0x008 of gObjMMethods (`tools/classtable.py 0x80087034`), the ctor New_Obj
 
 Local view fields named round 75 (class_3bb8c_k's `ObjM_3bb8c_k` only):
 `pauseSetupStep` (+0x080) and `closeReady` (+0x084), tier B, from the
-named class_3bb8c_m methods that read them (ObjM__AdvancePauseSetup counts
+named class_3bb8c_k methods that read them (ObjM__AdvancePauseSetup counts
 +0x080; ObjM__UpdateCloseReadyFlag/ObjM__ClearCloseReadyFlag/
 ObjM__CloseAndNotifyC/D set, clear and test +0x084). The other eight
 fields stay `unkNN`: this ctor only stores arguments or constants into them.
@@ -99,7 +99,7 @@ fields stay `unkNN`: this ctor only stores arguments or constants into them.
 ## Proposed field names
 
 For the SHARED `ObjM` struct in include/class_3bb8c.h (accessors in
-class_3bb8c_m, not this unit, so not applied here):
+class_3bb8c_k, not this unit, so not applied here):
 
 | field | proposed | tier | evidence |
 | --- | --- | --- | --- |

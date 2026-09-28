@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005426C` on 2026-09-23 (tools/rename.py). Address 0x8005426c.
 
-**Unit:** class_3bb8c_m · **Size:** 25 instructions · **Status:** MATCHED (25/25 words)
+**Unit:** class_3bb8c_k · **Size:** 25 instructions · **Status:** MATCHED (25/25 words)
 
 ## What this function does
 
@@ -27,7 +27,7 @@ exact idiom before deriving anything").
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_k`.
 
 ## Naming
 

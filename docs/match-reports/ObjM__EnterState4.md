@@ -128,7 +128,7 @@ void ObjM__EnterState4(Obj87034_3bb8c_l *self) {
   question, not the struct layout.
 - All literal values (`unk20=4`, mask `&3`, case values 0/4/7, `arg3`
   0xA/5, the trailing `1`/`0`) are confirmed against the raw bytes.
-- `ObjM__StartFadeUp` (the sibling-unit helper from `class_3bb8c_m`, matched by
+- `ObjM__StartFadeUp` (the sibling-unit helper from `class_3bb8c_k`, matched by
   echo round 15) is called TWICE in source -- once at the end of the
   `ret==0`+switch path, once for the `ret!=0` path -- not once after a
   shared if/else. This was itself a finding: see "the two-call lever" below.
@@ -302,7 +302,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 | --- | --- | --- | --- |
 | `func_80053ACC` | `ObjM__EnterState4` | B | see below |
 
-**Evidence.** vtable slot +0x094. Sets `self->phase = 4`. The state-code numbering is confirmed, not guessed: sibling unit class_3bb8c_m already established `ObjM__EnterState7`/`ObjM__EnterState8`/`ObjM__EnterStateA` for the SAME field on the SAME class, and this unit's own `ObjM__OnDreamSysNotify` dispatches codes 0xA..0x11 onto exactly the same run of vtable slots (+0x094..+0x0AC) that these three functions occupy, so 4/5/6 continue that one numbering.
+**Evidence.** vtable slot +0x094. Sets `self->phase = 4`. The state-code numbering is confirmed, not guessed: sibling unit class_3bb8c_k already established `ObjM__EnterState7`/`ObjM__EnterState8`/`ObjM__EnterStateA` for the SAME field on the SAME class, and this unit's own `ObjM__OnDreamSysNotify` dispatches codes 0xA..0x11 onto exactly the same run of vtable slots (+0x094..+0x0AC) that these three functions occupy, so 4/5/6 continue that one numbering.
 
 
 ## Track 4 (2026-09-26, round 89, echo)

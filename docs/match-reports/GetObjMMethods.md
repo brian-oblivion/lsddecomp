@@ -2,7 +2,7 @@
 
 > Renamed from `func_800544D4` on 2026-09-23 (tools/rename.py). Address 0x800544d4.
 
-**Unit:** class_3bb8c_m · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
+**Unit:** class_3bb8c_k · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
 ## What this function does
 
@@ -25,7 +25,7 @@ None -- matched on the first attempt.
 
 ## Provenance
 
-round 15b (2026-09-04), runner echo, second pass on `class_3bb8c_m`
+round 15b (2026-09-04), runner echo, second pass on `class_3bb8c_k`
 (the three functions left over the first round's 12-function budget).
 
 ## Naming

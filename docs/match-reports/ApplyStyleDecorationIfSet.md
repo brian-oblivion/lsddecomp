@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054660` on 2026-09-23 (tools/rename.py). Address 0x80054660.
 
-Unit `class_3bb8c_m`. **45/45 words, byte-exact.** Reopened, never attempted
+Unit `class_3bb8c_k`. **45/45 words, byte-exact.** Reopened, never attempted
 before this round.
 
 ## What it does

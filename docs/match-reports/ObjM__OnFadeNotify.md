@@ -4,7 +4,7 @@
 
 > Renamed from `func_80053F84` on 2026-09-23 (tools/rename.py). Address 0x80053f84.
 
-**Unit:** class_3bb8c_m · **Size:** 89 instructions · **Status:** MATCHED (89/89 words)
+**Unit:** class_3bb8c_k · **Size:** 89 instructions · **Status:** MATCHED (89/89 words)
 
 ## What this function does
 
@@ -89,7 +89,7 @@ pattern per arm.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`. This
+round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_k`. This
 residue's fix unblocked accurate scoring for the rest of the unit's
 functions in ROM order after it (`ObjM__OnStageMapNotify` onward), which had all
 been reading as near-total mismatches purely from this function's address

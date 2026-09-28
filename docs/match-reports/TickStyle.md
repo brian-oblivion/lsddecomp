@@ -210,7 +210,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
 Needs (already present earlier in the unit, in strict ROM order, at the
 point this body would compile): the `ObjAB4C`/`ObjAB4CMethods` local view
 above; `extern s32 gStyleGrid;`, `extern s32 gStyleTickCount;`,
-`extern void ApplyStyleDecorationIfSet(void);` (matched, `class_3bb8c_m.c`),
+`extern void ApplyStyleDecorationIfSet(void);` (matched, `class_3bb8c_k.c`),
 `extern void StyleBuildDecorSet(void);`/`extern void StyleUpdateDecorSet(void);`
 (forward, own unit, still cold), `void StyleBuildEffectSlots(void *arg0);` (matched
 earlier this unit, this round), `void StyleUpdateEffectSlots(void *arg0);` (matched,
@@ -281,7 +281,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * cluster (`gStyleStage`/`gStyleDay`/`gStyleSceneRefs`/`gStyleVariant`/
  * `gStyleDecorObj`/`gStyleGrid`/`gStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
- * `class_3bb8c_m.c`'s already-confirmed "Style" subsystem sets
+ * `class_3bb8c_k.c`'s already-confirmed "Style" subsystem sets
  * (`RegisterStyleConfig`/`ApplyStyleConfig`/`FillStyleFromConfig`/
  * `ApplyStyleDecorationIfSet`, round 69) -- a cross-unit fact, not a guess
  * made here.

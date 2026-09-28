@@ -2,7 +2,7 @@
 
 > Renamed from `func_800541CC` on 2026-09-26 (tools/rename.py). Address 0x800541cc.
 
-**Unit:** class_3bb8c_m · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
+**Unit:** class_3bb8c_k · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
 
 ## Context
 
@@ -37,7 +37,7 @@ name on, so it stays `ObjM__NoOpSlotBC` rather than acquiring a guessed
 ## Provenance
 
 Originally matched round 15 (2026-09-04), runner echo, fresh carve
-`class_3bb8c_m`, without its own report. Report backfilled round 69,
+`class_3bb8c_k`, without its own report. Report backfilled round 69,
 runner alpha, naming pass (FINISHING-PLAN track 3).
 
 

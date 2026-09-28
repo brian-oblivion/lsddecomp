@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054120` on 2026-09-23 (tools/rename.py). Address 0x80054120.
 
-**Unit:** class_3bb8c_m · **Size:** 43 instructions · **Status:** MATCHED (43/43 words)
+**Unit:** class_3bb8c_k · **Size:** 43 instructions · **Status:** MATCHED (43/43 words)
 
 ## Context
 
@@ -75,7 +75,7 @@ call.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_m`.
+round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_k`.
 
 ## Naming
 

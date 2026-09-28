@@ -229,7 +229,7 @@ extern s32 StampSaveTitleFileLetter(char *titleText, char *fileName);
 /* ObjM::styleConfig's pointee (include/ObjM.h): the day's scene style, a
  * plain record. RegisterStyleConfig returns sStyleConfig after
  * FillStyleFromConfig fills its last four words from the stage's config
- * bytes (class_3bb8c_m, whose local StyleM views the same words), or
+ * bytes (class_3bb8c_k, whose local StyleM views the same words), or
  * InitStyleAndWorld's caller supplies one. ObjM__SetupSceneStyle hands the
  * first three to the StageMap's lights, ObjM__EnterStyleSession the rest to
  * the viewport, ObjM__PollTimBlockLoad a colour to the TimBlockSrc. */
