@@ -4,7 +4,7 @@
 
 > Renamed from `func_80012064` on 2026-09-25 (tools/rename.py). Address 0x80012064.
 
-Unit `src/graphics/ViewportDraw.c` (the unit's only function, 449 words, 0x80012064..0x80012768).
+Unit `src/graphics/viewport_draw.c` (the unit's only function, 449 words, 0x80012064..0x80012768).
 Byte-exact, whole-image SHA1 green (`./build-and-verify.sh`: OK), `tools/check-nonmatching.sh` green.
 
 ## What it is
@@ -26,8 +26,8 @@ It draws `node` into `self->ot[self->buf]` (the GsOT pointers at +0x78, index at
    optional `ApplyMatrixToLVArray` offset when the parent has a parent, perspective divide by
    `self->projH`, clamp to +-0x200, `GsSortSprite` with a depth-derived priority).
 
-All types (`DrawNode`, `DrawView`, the Gs shapes) are local to `src/graphics/ViewportDraw.c`. No header was
-edited; `include/Task.h` / `include/class_3bb8c.h` untouched as instructed.
+All types (`DrawNode`, `DrawView`, the Gs shapes) are local to `src/graphics/viewport_draw.c`. No header was
+edited; `include/task.h` / `include/class_3bb8c.h` untouched as instructed.
 
 ## Path to the match (build scores)
 
@@ -80,7 +80,7 @@ declaration order).
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__DrawNode`. Slot +0x0A0 `drawNode`. `self` is now `Viewport *`: DrawView's names were carried into the header at their offsets (width/height -> screenSize.width/height, otLen -> otLength, buf -> otIndex; ot, projH, nearZ, zDiv unchanged). The node keeps ViewportDraw's local DrawNode view, so the method is not prototyped in Viewport.h. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__DrawNode`. Slot +0x0A0 `drawNode`. `self` is now `Viewport *`: DrawView's names were carried into the header at their offsets (width/height -> screenSize.width/height, otLen -> otLength, buf -> otIndex; ot, projH, nearZ, zDiv unchanged). The node keeps viewport_draw's local DrawNode view, so the method is not prototyped in viewport.h. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Unit history (moved from the code_2864.c banner, track 6 round 94)
 
@@ -121,7 +121,7 @@ Update's `(PACKET *)` cast are gone. Byte-identical (whole image green).
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
 
-## Round 99 (delta): track 7, moved from src/graphics/ViewportDraw.c
+## Round 99 (delta): track 7, moved from src/graphics/viewport_draw.c
 
 Locals renamed for their roles (zero bytes): `c` -> `coord2`, `m` -> `elem`,
 `sc` -> `scale`, `tag` -> `classId`, `b` -> `box`, the ScreenSprite `n` ->
@@ -138,7 +138,7 @@ gSpriteMethods 0x44, gScreenSpriteMethods 0x144); `>> 12` -> `FIX12_SHIFT`
 (GsCOORD2PARAM.scale is 20.12, ONE = unit); `(void *)0x1F800000` -> libetc's
 `getScratchAddr(0)` (the scratchpad base, as Sony's samples pass
 GsSortObject4); `14` -> unit-local `OTZ_BITS` (SortTmdObject indexes
-`otBase[otz >> otShift]`, TmdRenderer.c, so `14 - otLength` spans a 14-bit
+`otBase[otz >> otShift]`, tmd_renderer.c, so `14 - otLength` spans a 14-bit
 OTZ over 1 << otLength tags); `0x200` -> unit-local `SPRITE_POS_LIMIT 512`.
 Left literal: the class-id nibble masks `0xFF`/`0xFFF` (no name in
 basic_class.h beyond CLASS_ID_ROOT_MASK; proposed), the percent scale `100`
@@ -146,28 +146,28 @@ and `10000` (= 100 * 100, the ScreenSprite spelling of `half * pos / 100`),
 and `0xFFFF`, the GTE's 16-bit screen-z bound, explained where it is used.
 
 The extern `ApplyMatrixToLVArray(void *, void *, s32, void *)` stays in this
-unit: ViewportDraw does NOT include include/SceneNode.h (round 98's note that it
-did came from a grep matching this unit's comment `(include/SceneNode.h)`),
-so typing SceneNode.h's prototype cannot collide here.
+unit: viewport_draw does NOT include include/scene_node.h (round 98's note that it
+did came from a grep matching this unit's comment `(include/scene_node.h)`),
+so typing scene_node.h's prototype cannot collide here.
 
 The unit banner, verbatim, as it was before this pass:
 
 ```c
 /*
- * ViewportDraw -- Viewport__DrawNode, the scene-graph walk that draws one node
+ * viewport_draw -- Viewport__DrawNode, the scene-graph walk that draws one node
  * and its drawable children into the Viewport's current ordering table
  * (vram 0x80012064..0x80012768).
  *
  * It is slot +0x0A0 (drawNode) of gViewportMethods, inherited unchanged by
- * gNodeGuardedViewportMethods (include/Viewport.h); `self` is the Viewport
- * and `node` a SceneNode (include/SceneNode.h). The class-id low byte picks
+ * gNodeGuardedViewportMethods (include/viewport.h); `self` is the Viewport
+ * and `node` a SceneNode (include/scene_node.h). The class-id low byte picks
  * the draw path, and each path reads the node as the subclass that id names:
  * 0x54 a BgLayer (its GsBG at +0x044 to GsSortBg), 0x64 a BoxFill (its GsBOXF
  * placed in percent of the half-screen while `relative` is set), 0x144 a
  * ScreenSprite (its GsSPRITE placed from `screenPos`), any other 0x44 a
  * Sprite projected from its GsCOORDINATE2's world position, and anything
  * else the node's own GsDOBJ2 (+0x010) sorted by SortTmdObject
- * (TmdRenderer.c), the game's replacement for GsSortObject4. A GridCell
+ * (tmd_renderer.c), the game's replacement for GsSortObject4. A GridCell
  * (0x24) whose GsDOFF bit is set is skipped outright.
  *
  * Before drawing, a node whose coord2 is dirty (flg == 0) rebuilds its matrix
@@ -203,7 +203,7 @@ them are "Levers" above):
  */
 ```
 
-The extern's comment was `/* code_d294_c.c (include/SceneNode.h) */`, and `scr`'s was `/* never used; reserves retail's 8 unused frame bytes */`.
+The extern's comment was `/* code_d294_c.c (include/scene_node.h) */`, and `scr`'s was `/* never used; reserves retail's 8 unused frame bytes */`.
 
 ## History (moved from src/ViewportDraw.c, comments pass)
 

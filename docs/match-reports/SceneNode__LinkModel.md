@@ -4,7 +4,7 @@
 
 > Renamed from `func_8001E770` on 2026-09-17 (tools/rename.py). Address 0x8001e770.
 
-Unit: `code_d294_c` (round 14). Called by `SceneNode__AddChild` (`SceneNode.c`)
+Unit: `code_d294_c` (round 14). Called by `SceneNode__AddChild` (`scene_node.c`)
 as its conditional forward target when `other`'s vtable-header tag is 9.
 Stores `other` into `self->unk20`, copies one field out of it, then calls
 the Psy-Q `GsLinkObject4` through a pointer computed off `other->unkC`.
@@ -20,7 +20,7 @@ void SceneNode__LinkModel(SceneNodeObj *self, GenericObj_d294 *other) {
 }
 ```
 
-## New struct/extern knowledge (`include/SceneNode.h`, additive)
+## New struct/extern knowledge (`include/scene_node.h`, additive)
 
 - **`GenericObj_d294` gains `unk10`** (`s32`), immediately following the
   already-known `unkC` (`void *`) with no gap -- read here into
@@ -83,7 +83,7 @@ not in registers.
   generic.
 - **`other` is not narrowed.** Other units call this symbol with a different
   class as the receiver and a plain `s32` second argument
-  (`src/world/TodActor.c`, `src/world/ObjMStyleActor.c`); the `SceneNode__` prefix
+  (`src/world/tod_actor.c`, `src/world/dream_scene.c`); the `SceneNode__` prefix
   is still right, because any caller must carry the GsDOBJ2 layout this body
   dereferences.
 
@@ -92,17 +92,17 @@ not in registers.
 The signature is now `(SceneNode *self, void *model)`. The argument is the
 class-9 child (gTmdModelMethods) that SceneNode__AddChild tag-tests. That class
 has no C yet, so the two words LinkModel reads live in a local
-`ModelObj_d294` view in `src/graphics/SceneNode.c`: `+0x0C tmdFile` and `+0x10 tmd`.
+`ModelObj_d294` view in `src/graphics/scene_node.c`: `+0x0C tmdFile` and `+0x10 tmd`.
 The object fields are renamed: +0x18 `unk18` is now `tmd` (GsDOBJ2.tmd), and
-+0x20 `unk20` is now `model`. The local externs in `src/world/TodActor.c` and
-`src/world/ObjMStyleActor.c`, `(void *self, s32 arg)`, are deleted, and their
++0x20 `unk20` is now `model`. The local externs in `src/world/tod_actor.c` and
+`src/world/dream_scene.c`, `(void *self, s32 arg)`, are deleted, and their
 callers upcast. Byte-identical.
 
 ## Track 4 (2026-09-26, round 87, delta)
 
 The local `ModelObj_d294` view (`tmdFile` at +0x00C, `tmd` at +0x010) was a
 view of TmdModel and is deleted; the body now reads the class header
-(include/TmdModel.h), byte-identical:
+(include/tmd_model.h), byte-identical:
 
 ```c
 void SceneNode__LinkModel(SceneNode *self, void *model) {
@@ -121,12 +121,12 @@ not done here.
 
 `GsLinkObject4` now comes from `<libgs.h>`: `(unsigned long tmd_base, GsDOBJ2
 *objp, int n)`. The call casts `data->objects` to `u_long` (Sony types the
-TMD base as an address) and `&self->attribute` to `GsDOBJ2 *` (SceneNode.h
+TMD base as an address) and `&self->attribute` to `GsDOBJ2 *` (scene_node.h
 spells the embedded GsDOBJ2 as four separate fields; embedding Sony's struct
-there is proposed, not done: SceneNode.h has many includers).
+there is proposed, not done: scene_node.h has many includers).
 Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
 The re-read of `self->model` keeps a one-line `MATCHING:` note in the source.
 
@@ -137,7 +137,7 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * is the GsDOBJ2 embedded in every SceneNode instance (attribute at +0x10,
  * coord2 at +0x14, tmd at +0x18), and Sony's GsLinkObject4(tmd_base, objp,
  * n) links object `n` of a TMD to it. `model` is a TmdModel
- * (include/TmdModel.h): its `data->objects` is the object table past the
+ * (include/tmd_model.h): its `data->objects` is the object table past the
  * 0xC-byte TMD header, and its `object` pointer is what GsDOBJ2.tmd gets.
  * `self->model` keeps the TmdModel.
  *

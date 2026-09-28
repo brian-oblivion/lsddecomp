@@ -6,13 +6,13 @@
 
 > Renamed from `func_8003CD48` on 2026-09-24 (tools/rename.py). Address 0x8003cd48.
 
-**Unit:** Task · **Size:** 38 words · **Result:** byte-exact
+**Unit:** task · **Size:** 38 words · **Result:** byte-exact
 
 ## What it does
 
-`Obj86B60Methods::slotC4` (confirmed by `Task.h`'s own header comment,
+`Obj86B60Methods::slotC4` (confirmed by `task.h`'s own header comment,
 which already recorded this slot as "external (TaskCore__TickFadeOut)" from the
-`Task` unit's own `classtable.py` work before this unit ever attempted
+`task` unit's own `classtable.py` work before this unit ever attempted
 the function). Computes a greyscale-ish colour byte from two fields, fills a
 3-byte buffer with it, forwards the buffer to two other objects, and returns
 whether the byte exceeds a threshold.
@@ -62,10 +62,10 @@ s32 c: li v0,0x80 / subu v0,v0,v1   (matches retail)
 
 ## Header note
 
-No changes to `include/Task.h` were needed — `self->unk1C`,
+No changes to `include/task.h` were needed — `self->unk1C`,
 `self->unk84`, `self->methods->slotE4`, `self->unk78`,
 `self->unk78->methods->slotB8` were all already modelled from the sibling
-unit's (`Task`) prior work on this same class, and every field/slot
+unit's (`task`) prior work on this same class, and every field/slot
 type matched this function's actual usage with no adjustment.
 
 ### Proposed learning
@@ -86,16 +86,16 @@ Renamed `func_` -> `Obj86B60__TickFadeColor`. **Tier B**: Computes a decreasing 
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__TickFadeColor (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__TickFadeColor (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-bgLayer is a `BgLayer *` (include/BgLayer.h): the `Unk78Obj` view is gone and +0x0B8 is called as `setColor(bgLayer, 1, (BgLayerRgb *)buf)`. Byte-identical.
+bgLayer is a `BgLayer *` (include/bg_layer.h): the `Unk78Obj` view is gone and +0x0B8 is called as `setColor(bgLayer, 1, (BgLayerRgb *)buf)`. Byte-identical.
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
-`0x80 - frameCounter * fadeRate` and `(u8)c >= 0x81` are now `TASKCORE_FADE_FULL - ...` and `(u8)level > TASKCORE_FADE_FULL` (TaskCore.h, alpha's constant: 128, the colour that draws a texture at its own brightness). `>= 129` and `> 128` compile to the same sltiu, byte-exact. c -> level, buf -> color.
+`0x80 - frameCounter * fadeRate` and `(u8)c >= 0x81` are now `TASKCORE_FADE_FULL - ...` and `(u8)level > TASKCORE_FADE_FULL` (task_core.h, alpha's constant: 128, the colour that draws a texture at its own brightness). `>= 129` and `> 128` compile to the same sltiu, byte-exact. c -> level, buf -> color.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

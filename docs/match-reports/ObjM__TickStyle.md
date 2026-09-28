@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005393C` on 2026-09-24 (tools/rename.py). Address 0x8005393c.
 
-**Unit:** ObjMStyleActor · **Size:** 18 words (0x48 bytes) ·
+**Unit:** dream_scene · **Size:** 18 words (0x48 bytes) ·
 **Status: MATCHED 18/18**, whole-image SHA1 green.
 
 ## What it does
@@ -14,7 +14,7 @@ void ObjM__TickStyle(Obj87034_3bb8c_l *self) {
 ```
 
 Matched on the first attempt. `TickStyle` is still uncarved ground
-(`asm/ObjMStyleActor.s`), declared locally as
+(`asm/dream_scene.s`), declared locally as
 `extern void TickStyle(void *arg0, void *arg1, s32 arg2);` from this
 call site's own register usage.
 
@@ -41,4 +41,4 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80041C28` on 2026-09-25 (tools/rename.py). Address 0x80041c28.
 
-Round 82, runner alpha (second re-staffed slot of the round). Unit `src/graphics/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (second re-staffed slot of the round). Unit `src/graphics/sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** gCharSpriteMethods slot +0x0C8 (`tools/classtable.py`).
 - **What:** Returns the byte at +0x0A8. Retail opens and closes a 0x10-byte frame around a single `lbu`.
@@ -36,7 +36,7 @@ u8 CharSprite__GetCell(CharSprite *self) {
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/CharSprite.h`. Renamed from `D8006EC74__GetCell`, tier A: slot +0x0C8, named `getCell` in the header (returns `u8`: this occupant's type; no C call through the slot exists). `self` is `CharSprite *` (was `D_8006EC74Obj`). gTextRowMethods overrides the slot with an empty `TextRow__NoOpGetCell` that its own view types as a void setter; that is the subclass's to settle. The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (bravo): class 0x1144 unified as CharSprite in `include/char_sprite.h`. Renamed from `D8006EC74__GetCell`, tier A: slot +0x0C8, named `getCell` in the header (returns `u8`: this occupant's type; no C call through the slot exists). `self` is `CharSprite *` (was `D_8006EC74Obj`). gTextRowMethods overrides the slot with an empty `TextRow__NoOpGetCell` that its own view types as a void setter; that is the subclass's to settle. The Source block above is the unified spelling. Image byte-identical.
 
 ## Track 7 (round 99, charlie)
 

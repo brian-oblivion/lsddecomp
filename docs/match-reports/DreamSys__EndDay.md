@@ -46,7 +46,7 @@ reshaping needed.
   this round's own `DreamSys__UpdateDreamChart`), `->AdvanceDay` (`+0x1A4`,
   already matched), `->InitNewGame` (`+0x198`) -- all resolved via
   `tools/classtable.py gDreamSysMethods` before writing any C, all already
-  declared with matching signatures in `include/DreamSys.h`.
+  declared with matching signatures in `include/dream_sys.h`.
 - `&this->moodPreviousDays[this->currentDay]`: the index arithmetic
   (`currentDay << 1`, i.e. `*2`, then `+0x190`) confirms `moodPreviousDays`
   (a `MoodGraphPoint[365]`, 2 bytes per element) starts at `+0x190` and is

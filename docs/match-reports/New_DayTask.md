@@ -6,7 +6,7 @@
 
 > Renamed from `func_80049608` on 2026-09-23 (tools/rename.py). Address 0x80049608.
 
-**Unit:** DayTaskStageMap · **Status:** MATCHED (31/31 words)
+**Unit:** dream_day · **Status:** MATCHED (31/31 words)
 
 A `New_X` class allocator: allocate 0x50 bytes, and if that succeeds dispatch
 the class's constructor slot (`+0x008`) with the caller's arguments forwarded
@@ -28,7 +28,7 @@ Obj865C8 *New_DayTask(Obj0C *arg1, SubObjD *arg2, s32 arg3)
 }
 ```
 
-See `src/world/DayTaskStageMap.c` for the exact text.
+See `src/world/dream_day.c` for the exact text.
 
 ## Why it matched: `return NULL;` goes LAST
 
@@ -68,7 +68,7 @@ updated with what survived and what did not.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Renamed from New_Obj865C8. Parameters retyped from (Obj0C *, DreamSys *, s32) to (IntermediateBaseInitArgs *, DreamSys *, s32): Obj0C was a view of IntermediateBaseInitArgs (the ctor stores it at +0x00C, IntermediateBase's initArgs, and fills its +0x008/+0x00C/+0x010), and the one caller, GameApplication__RunDayTask, already passed IntermediateBaseInitArgs *. Byte-identical.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from New_Obj865C8. Parameters retyped from (Obj0C *, DreamSys *, s32) to (IntermediateBaseInitArgs *, DreamSys *, s32): Obj0C was a view of IntermediateBaseInitArgs (the ctor stores it at +0x00C, IntermediateBase's initArgs, and fills its +0x008/+0x00C/+0x010), and the one caller, GameApplication__RunDayTask, already passed IntermediateBaseInitArgs *. Byte-identical.
 
 ## Naming (track 7, round 99, charlie)
 

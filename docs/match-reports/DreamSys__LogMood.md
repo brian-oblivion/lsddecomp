@@ -141,7 +141,7 @@ void DreamSys__LogMood(DreamSys *this, MoodGraphContributor *layer, MoodGraphPoi
 
 Verified byte-exact: `./build-and-verify.sh` -- `OK: build matches retail
 SLPS_015.56` -- and `tools/funcdiff.py DreamSys__LogMood` -- `14/14 words
-match`. This is now the live body in `src/world/DreamSys.c` (`INCLUDE_ASM`
+match`. This is now the live body in `src/world/dream_sys.c` (`INCLUDE_ASM`
 removed).
 
 ### Proposed learning

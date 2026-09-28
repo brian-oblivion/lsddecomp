@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005CAB4` on 2026-09-21 (tools/rename.py). Address 0x8005cab4.
 
-Unit `DreamAux` (was `code_4cd08`). 69/69 words, `0x4D2B4`-`0x4D3C8`. Whole-image
+Unit `dream_aux` (was `code_4cd08`). 69/69 words, `0x4D2B4`-`0x4D3C8`. Whole-image
 `build-and-verify.sh` green.
 
 ```c
@@ -63,7 +63,7 @@ next record in the array; otherwise return `false`.
 
 ## Types derived, and what's still unknown
 
-New in `include/DreamAux.h`: `TriggerRecord` (fields at `0x1`-used-by-
+New in `include/dream_aux.h`: `TriggerRecord` (fields at `0x1`-used-by-
 `CheckDreamAuxTriggerCondition`... actually not yet named there, `0x2` `parity`, `0x3`
 `kind`, `0x4..0x7` `entries[4]`, stride `0x38` total), `TriggerWorld` (a
 method-table object per CLAUDE.md's offset-0 convention, only slot `0x88`
@@ -167,7 +167,7 @@ established from this unit alone.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-`world` is now the unified `TriggerWorld *` (include/TriggerWorld.h, class
+`world` is now the unified `TriggerWorld *` (include/trigger_world.h, class
 gTriggerWorldMethods), and the slot-0x22 pointer-array call is its own slot +0x088:
 `callResult = world->methods->getModelData(world, record->parity);`
 (TriggerWorld__GetModelData, `ModelData *(TriggerWorld *, u32)`; the s8 parity
@@ -175,9 +175,9 @@ converts to u32 with the same sign-extended register). The result is a
 ModelData, which is why it goes to `scratch[3]`: New_Entity's descriptor word
 +0x00C is the ModelData TodActor__AcquireModelData borrows. The former
 `TriggerWorld { void **vtable; }` / `TriggerWorldFn` view in
-include/DreamAux.h is gone. Bytes unchanged.
+include/dream_aux.h is gone. Bytes unchanged.
 
-## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
 TriggerRecord is 8 bytes (FireDreamAuxTriggerEntries' and InitDreamAux's
 stride), so the kind-2 recursion, `record + 1` of a 0x38-byte struct, is
@@ -215,8 +215,8 @@ The header comments, as they stood:
  * Everything else is undiscovered padding. */
 
 /* ProcessDreamAuxTriggerRecord's `world` is a TriggerWorld (gTriggerWorldMethods,
- * include/TriggerWorld.h; FireDreamAuxTriggerEntries gets it from
- * New_TriggerWorld), unified in track 4 (round 88); DreamAux.c includes
+ * include/trigger_world.h; FireDreamAuxTriggerEntries gets it from
+ * New_TriggerWorld), unified in track 4 (round 88); dream_aux.c includes
  * that header. This file's former `TriggerWorld { void **vtable; }` view
  * is gone. */
 ```

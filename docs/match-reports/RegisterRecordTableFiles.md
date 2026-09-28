@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004A070` on 2026-09-27 (tools/rename.py). Address 0x8004a070.
 
-**Unit:** DayTaskStageMap · **Size:** 48 words (0xC0 bytes)
+**Unit:** dream_day · **Size:** 48 words (0xC0 bytes)
 
 Filed as a `gp_rel`-blocked stub before round 15. That blocker was RESOLVED
 in round 42 (`--gp-symbols`, pinned in the Makefile).
@@ -61,7 +61,7 @@ s32 RegisterRecordTableFiles(s32 arg0)
 `extern` declaration, per the project's rule against writing C for
 SDK-owned functions.
 
-The return type had to be `s32`, not `void`: `include/DayTaskStageMap.h`
+The return type had to be `s32`, not `void`: `include/dream_day.h`
 already carries `extern s32 RegisterRecordTableFiles(s32 arg1);` (this unit's own
 prior local view, noting "already declared elsewhere as `extern s32
 RegisterRecordTableFiles(s32 a0)`"), and the definition here must match it exactly or
@@ -98,7 +98,7 @@ else.
 
 `RegisterRecordTableFiles` -- left unrenamed (round 73, alpha, track-3 pass). Called
 once from `DayTask__DayTask`'s ctor as `RegisterRecordTableFiles(1)` (return
-discarded) and once from `GameApplicationFileResource.c` as `RegisterRecordTableFiles(0)` (also
+discarded) and once from `game_shell.c` as `RegisterRecordTableFiles(0)` (also
 discarded). It is not a class method (no `self` parameter, not reachable
 through any vtable slot in either the 33-slot or 28-slot table this unit
 resolved), and its own body -- a two-call-deep counter over
@@ -120,8 +120,8 @@ now says so. (The derivation above quotes the old comment as it was.)
 
 `func_8004A070` -> `RegisterRecordTableFiles` (tier B). The body, read with
 its two callees: GetRecordTable returns sRecordTable (0x230 records of 0x1C
-bytes, each a file path first; GameFiles.c's banner) and its count;
-RegisterFileTableEntries (GameApplicationFileResource.c) appends `count` records to the CD
+bytes, each a file path first; game_files.c's banner) and its count;
+RegisterFileTableEntries (game_shell.c) appends `count` records to the CD
 driver's file table and resolves them, returns 0 to be retried, and 1 when
 the CD driver is not the active source. So the function registers the record
 table's files with the CD driver: on its first call all of them when `all`
@@ -138,4 +138,4 @@ GameApplication__RegisterFilesCallback 0) is not, hence B.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into CdDriver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes CdDriver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

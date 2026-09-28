@@ -6,7 +6,7 @@
 /*
  * BasicClass -- the root of the game's hand-rolled class framework
  * (docs/research/class-framework.md), class id 0x0, method table gBasicClassMethods.
- * Methods live in src/app/BMemPMgr.c.
+ * Methods live in src/app/bmem_pmgr.c.
  *
  * Every class derives from it: word +0x000 of each method table is a
  * hierarchical class id (each nibble above the lowest non-zero one is one more
@@ -48,7 +48,7 @@
  * slot differs between a class and its subclasses: an override that needed a
  * different return type or parameter list would be a different slot. The one
  * exception is the ctor's return type, for the same reason as its parameters:
- * BASICCLASS_SLOTS_R takes it (include/SceneNode.h, whose ctor returns self).
+ * BASICCLASS_SLOTS_R takes it (include/scene_node.h, whose ctor returns self).
  */
 
 typedef struct BasicClass BasicClass;
@@ -57,7 +57,7 @@ typedef struct BasicClassListNode BasicClassListNode;
 
 /* The one notifyParents event the base class defines: finalize sends it, and
  * the base onNotify answers it by dropping the sender from its children.
- * Subclasses number their own events (DreamSys.h, entity.h). */
+ * Subclasses number their own events (dream_sys.h, entity.h). */
 enum { BASICCLASS_EVENT_FINALIZED = 1 };
 
 /* A class id's lowest nibble: which direct subclass of BasicClass (id 0x0)
@@ -121,7 +121,7 @@ struct BasicClass {
 extern BasicClassMethods gBasicClassMethods;          /* BasicClass's own method table */
 extern BasicClassMethods *GetBasicClassMethods(void); /* returns &gBasicClassMethods */
 
-/* BasicClass's methods: the occupants of its own table, in BMemPMgr.c.
+/* BasicClass's methods: the occupants of its own table, in bmem_pmgr.c.
  * A subclass reaches them through GetBasicClassMethods(). */
 void *BasicClass__Release(BasicClass *self);
 void BasicClass__BasicClass(BasicClass *self);
@@ -138,7 +138,7 @@ void BasicClass__NotifyParents(BasicClass *self, s32 event);
 void BasicClass__NoOpSlot34(void);
 void BasicClass__OnNotify(BasicClass *self, void *sender, s32 event);
 
-/* The list primitives, in BMemPMgr.c. */
+/* The list primitives, in bmem_pmgr.c. */
 extern s32 PushBasicClassListNode(BasicClassListNode **head,
                                   BasicClass *value); /* allocate a node, prepend it to *head */
 extern void RemoveBasicClassListNode(BasicClassListNode **head,

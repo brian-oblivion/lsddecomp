@@ -6,7 +6,7 @@
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- `sDataDirectory = value;`, as this report predicted. The C is in `src/app/GameApplicationFileResource.c`. Everything below is the
+> the live tests -- `sDataDirectory = value;`, as this report predicted. The C is in `src/app/game_shell.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
@@ -20,7 +20,7 @@
 
 # SetDataDirectory
 
-**Unit:** GameApplicationFileResource · **Size:** 3 instructions · **Status:** STALLED, class TOOLCHAIN
+**Unit:** game_shell · **Size:** 3 instructions · **Status:** STALLED, class TOOLCHAIN
 
 ## What it does
 
@@ -28,7 +28,7 @@ A setter: `sDataDirectory = value;`. `sDataDirectory` is another slot in the sam
 `.sdata` region as `sActiveDataSource` (file `0x7b008`; see
 `asm/data/7B008.sdata.s`), initialized in retail to `0x8006D4A8` — a pointer
 value. `D_8006D4A8` itself sits right at the tail of the `gFileResourceMethods` method
-table as splat has that table carved (see `include/GameApplicationFileResource.h`), which may
+table as splat has that table carved (see `include/data_source.h`), which may
 mean the table's boundary was drawn one word short and `sDataDirectory` actually
 points at the start of a separate, still-unidentified global — not resolved
 here.
@@ -101,11 +101,11 @@ state before these renames.
 **Evidence.** Round 52 found no caller. There are three now, and they agree:
 
 - **Readers.** `BuildCdFilePath` (CdDriver) and `CdStream__Open`
-  (src/cd/CdStream.c) both build `"\\" + GetDataDirectory() + name + ";1"` and
+  (src/cd/cd_stream.c) both build `"\\" + GetDataDirectory() + name + ";1"` and
   pass the result to the CD file lookup. So the value is the directory
   part of an ISO9660 path, and it sits between the root `\` and the file
   name.
-- **Writer.** `GameApplication__GameApplication` (GameApplicationFileResource) calls
+- **Writer.** `GameApplication__GameApplication` (game_shell) calls
   `SetDataDirectory(GetDefaultDataDirectory())` once at startup. `GetDefaultDataDirectory`
   returns `sDefaultDataDirectory`, whose retail initialiser is `&D_8008A958`, the
   `.sdata` string `"CDI\\"`. That string ends in the separator, which is
@@ -119,6 +119,6 @@ state before these renames.
 
 The pair is a plain setter and getter, which is tier A by definition, and
 the readers agree on what the value is for. `char *` is the true type. The
-unit's own declarations say `char *` since round 99. GameApplicationFileResource still
-declares `SetDataDirectory(s32)` and CdStream.c declares
+unit's own declarations say `char *` since round 99. game_shell still
+declares `SetDataDirectory(s32)` and cd_stream.c declares
 `void *GetDataDirectory(void)`. Both are left to their owners and proposed.

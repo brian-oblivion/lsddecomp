@@ -12,7 +12,7 @@ turn. The round-75 section at the end supersedes it.
 
 > Renamed from `func_80057784` on 2026-09-19 (tools/rename.py). Address 0x80057784.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys` family -- plain internal
+Unit: `src/world/dream_scene.c`. Class: `DreamSys` family -- plain internal
 helper, not a vtable slot. Called by this unit's own `Actor__FindNearbyLink`
 (also still queued/stalled -- see its own report, which depends on this
 one).
@@ -37,7 +37,7 @@ New types this function needed, declared once (shared with
 `Actor__FindNearbyLink`, `Actor__ScanLinkCandidates`, `Actor__ScanGridWindow`) above `Actor__FindNearbyLink`
 in this file: `LinkQueryBuf` (`arg3`'s type -- `s8 queryCol`/`queryRow`, `GridArrElem
 *source`), and `DreamSysUnk4C68Obj`/`DreamSysUnk4CObj::unk_0x68` (added to
-`include/DreamSys.h`, additive). `DreamSysUnk4CMethods::queryLinkAtPos`/
+`include/dream_sys.h`, additive). `DreamSysUnk4CMethods::queryLinkAtPos`/
 `getGridArrElemAt` were also added there (splitting the existing
 `pad_0x110[0x11C-0x110]`).
 
@@ -119,7 +119,7 @@ s32 Actor__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **arr2,
 ```
 
 This body is semantically the exact translation of the disassembly
-(verified line-by-line against `asm/nonmatchings/ObjMStyleActor/Actor__BuildLinkQueries.s`
+(verified line-by-line against `asm/nonmatchings/dream_scene/Actor__BuildLinkQueries.s`
 and cross-checked with `m2ctx.py`), truncates and stores every field
 correctly, and takes the right branches. It compiles clean and scores
 13/116 (frame `-0x30` vs retail's `-0x28`, one extra callee-saved
@@ -219,7 +219,7 @@ tools/funcdiff.py Actor__BuildLinkQueries   # still INCLUDE_ASM -- do not trust 
 ## Round: re-verified from raw asm, claim confirmed accurate (runner delta, round 19)
 
 Re-derived this function's control flow directly from
-`asm/nonmatchings/ObjMStyleActor/Actor__BuildLinkQueries.s`, instruction by
+`asm/nonmatchings/dream_scene/Actor__BuildLinkQueries.s`, instruction by
 instruction, as a check against the kind of misread that turned out to be
 real elsewhere this round (`DreamSys__SoundCueCallback`). No discrepancy found -- every
 branch, field offset, and the two `getGridArrElemAt` call sites (including the
@@ -227,7 +227,7 @@ confirmed fact that the SECOND call reuses `f3`/`src` in `$a2`/`$a3`
 unchanged from the first call's setup, rather than retail re-loading them)
 match this report's existing C exactly.
 
-Also rebuilt the exact preserved body into `src/world/ObjMStyleActor.c` directly
+Also rebuilt the exact preserved body into `src/world/dream_scene.c` directly
 (not just re-read) to confirm the score claim itself: **13/116, frame
 `-0x30` vs retail's `-0x28`, confirmed accurate.** No hidden bug found, no
 new axis tried beyond what this report already records exhausted (the
@@ -239,7 +239,7 @@ restored, no source changes.
 
 ## Round: NON_MATCHING body promoted (runner delta, round 74)
 
-Placed the preserved body from this report into `src/world/ObjMStyleActor.c` under
+Placed the preserved body from this report into `src/world/dream_scene.c` under
 `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif` (track 1b). Hand-derived,
 not permuter-searched -- confirmed by this report itself (round 19's
 instruction-by-instruction re-derivation, and the original derivation's own
@@ -247,11 +247,11 @@ residue analysis above), so no separate review was needed beyond checking
 current symbol/field names.
 
 One rename needed: `self->unk_0x4C` is now `self->linkMgr` in
-`include/DreamSys.h` (renamed since this report was written); the promoted
+`include/dream_sys.h` (renamed since this report was written); the promoted
 body uses the current name. Every other name the body references
 (`DreamSysUnk4CObj`, `DreamSysUnk4C68Obj`, `unk_0x68`, `unk_0x4`, `unk_0x2`,
 `getGridArrElemAt`, `LinkQueryBuf::queryCol/queryRow/source`) already matches
-`include/DreamSys.h` as committed; `tools/stalesyms.py` found nothing stale
+`include/dream_sys.h` as committed; `tools/stalesyms.py` found nothing stale
 for this function.
 
 Re-measured the score with the body compiled live (temporarily, in place of
@@ -360,7 +360,7 @@ source shape. A shared header's per-slot type can be overridden with a local
 function-pointer cast at the call site, which leaves the header alone.
 
 The header comment on `DreamSysUnk4CMethods::getGridArrElemAt` in
-`include/DreamSys.h` still describes the 4-argument reading; it is left
+`include/dream_sys.h` still describes the 4-argument reading; it is left
 unedited here (shared header, additive edits only) and should be corrected
 by whoever owns that header: both calls take `(this, pos)`.
 
@@ -374,7 +374,7 @@ tools/check-nonmatching.sh # OK: 45 NON_MATCHING bodies in 15 units
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__BuildLinkQueries`. Helper of Actor__FindNearbyLink; `self->linkMgr` is now `self->grid` (cast to the DreamSysUnk4CObj view). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__BuildLinkQueries`. Helper of Actor__FindNearbyLink; `self->linkMgr` is now `self->grid` (cast to the DreamSysUnk4CObj view). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 
@@ -387,14 +387,14 @@ comment pass, i.e. with this round's renames already applied (the
 | old | new | why |
 | --- | --- | --- |
 | `arr1`, `arr2` | `queries`, `slots` | the GridQuery[] and ChunkSlot *[] it fills |
-| `arg3` | `desc` | computeFootprintDescriptor's `out` (StageMap.h) |
+| `arg3` | `desc` | computeFootprintDescriptor's `out` (stage_map.h) |
 | `arg4` | `span` | the window's width in cells, rounded up to odd; StageMap__SetFootprintFromCell's own name for its span |
 | `f2`, `f3` | `cellCol`, `cellRow` | Descriptor10's b2/b3, the cell column/row in the chunk |
 | `idx` | `count` | the number of queries filled, the return value |
 | `unk4C`, `unk68` | `map`, `dims` | the StageMap and its StageGridDimensions |
 | `src`, `s3`, `pos` | `slot`, `slotKey`, `key` | desc's slot, its loader's elemKey, findSlotByNeighbour's `key` |
 
-- `desc` is now StageMap.h's `Descriptor10Ext *` (this unit's view
+- `desc` is now stage_map.h's `Descriptor10Ext *` (this unit's view
   `LinkQueryBuf` retired: `queryCol`/`queryRow`/`source` are
   `base.b2`/`base.b3`/`slot`; its 4 trailing bytes were not needed, measured).
 - `0x13` is `STAGE_CHUNK_CELLS - 1`, the last cell column/row of a chunk.
@@ -415,7 +415,7 @@ Three comments lost their history; what they said, verbatim:
 ```
 
 ```c
-/* The grid (self->grid) is a StageMap (include/StageMap.h). Its
+/* The grid (self->grid) is a StageMap (include/stage_map.h). Its
  * elements (ChunkSlot) are what Actor__BuildLinkQueries collects: the
  * loader's headerReady gates Actor__ScanLinkCandidates, its ownerKey is the
  * element key BuildLinkQueries steps by one, and `cells` is the 20-wide grid
@@ -425,7 +425,7 @@ Three comments lost their history; what they said, verbatim:
 
 ```c
 /* Output buffer filled in by the grid's computeFootprintDescriptor (a
- * Descriptor10Ext, include/StageMap.h: queryCol/queryRow are base.b2/b3,
+ * Descriptor10Ext, include/stage_map.h: queryCol/queryRow are base.b2/b3,
  * source is unk24; this view is 0x30 bytes, and the frame needs it) and read back by this unit's own Actor__BuildLinkQueries.
  * Only the three fields actually touched are named. `queryCol`/`queryRow`
  * feed straight into GridQuery::startCol/startRow (Actor__BuildLinkQueries,

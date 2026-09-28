@@ -2,7 +2,7 @@
 
 > Renamed from `func_80025E1C` on 2026-09-24 (tools/rename.py). Address 0x80025e1c.
 
-**Unit:** `src/app/Pad.c` (runner ALPHA, `runner/alpha`)
+**Unit:** `src/app/pad.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (30/30 words, full build verified byte-exact)
 **Vtable slot:** `gPadMethods+0x50` (`PadMethods.loadButtonTable`)
 
@@ -23,7 +23,7 @@ surrounding class also drives `func_80025EAC`/`func_80025EFC`/`func_80025F2C`
 yaml at file offset 0x166ac) and does edge-detected held/pressed/released
 button masking (see `Pad__UpdateMasks`), the working hypothesis for this whole
 unit is a Pad/controller wrapper class, and `sDefaultButtonMasks`/`sButtonMasks` are the
-16 canonical digital-button bit masks. See `include/Pad.h` for the
+16 canonical digital-button bit masks. See `include/pad.h` for the
 full writeup and struct layout.
 
 ## Final C
@@ -116,14 +116,14 @@ not `g`: it is this unit's own data, from the link order below.
 
 ### Correction: the table is Pad's rodata, not Psy-Q's
 
-This report and `include/Pad.h` used to call the table "Psy-Q's own
+This report and `include/pad.h` used to call the table "Psy-Q's own
 ... inside the `psyq_15d04` rodata blob". The link order says otherwise.
 Rodata follows the code objects' order: `libetc/intr_dma` .rdata at 0xF28 and
 `libetc/vsync` .rdata at 0xF54 are placed, the next code objects are
 `libc2/puts` (no .rdata; its only data is 7 bytes of .sdata),
 `Pad`, `libetc/pad` (the linked 3.5 `pad.o`: .text and .bss only, no
 .rdata) and `libapi/a22`, and the next rodata slot, 0xFA4, is
-`GameApplicationFileResource`'s (the unit after them). The only object in
+`game_shell`'s (the unit after them). The only object in
 that stretch able to own 0x40 bytes of .rodata at 0xF64 is this unit. The yaml
 line for 0xF64 still says "owner not placed yet (libetc intr?)"; proposed to
 the head, not edited (runners do not edit the yaml).

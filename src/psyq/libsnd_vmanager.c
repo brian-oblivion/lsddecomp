@@ -19,8 +19,8 @@
  *
  * The data keeps Sony's types: the key-on request in _svm_cur, the current
  * VAB through <libsnd.h>'s VabHdr, ProgAtr and VagAtr (_svm_vh, _svm_pg,
- * _svm_tn), the voice tables in include/SvmData.h and the sequence records
- * in include/SsScore.h. A key-on or key-off is not written to the SPU when
+ * _svm_tn), the voice tables in include/svm_data.h and the sequence records
+ * in include/ss_score.h. A key-on or key-off is not written to the SPU when
  * it is requested: it is collected in the _svm_okon/_svm_okof masks, which
  * SpuVmFlush writes out once per tick. No jump table and no rodata attach.
  */
@@ -416,8 +416,8 @@ void SeAutoVol(s16 voice, s16 from, s16 to, s16 duration) {
  * From SetAutoVol to SpuVmKeyOff: voice key-on/off, noise voices, pitch
  * bend, the volume/pan ramps and the per-tick flush. _svm_pg and _svm_tn are
  * pinned in config/psyq-objects.ld and spelled here by their D_ addresses;
- * the per-voice state is include/SvmData.h's _svm_voice/_svm_sreg_buf, and
- * _svm_sreg points at the SPU's own register block, SvmData.h's SpuRegs.
+ * the per-voice state is include/svm_data.h's _svm_voice/_svm_sreg_buf, and
+ * _svm_sreg points at the SPU's own register block, svm_data.h's SpuRegs.
  *
  *   - SpuVmInit: resets the voice manager: every voice, its shadow
  *     registers and the SPU voice registers, the reverb depth to 0x3FFF,
@@ -1201,7 +1201,7 @@ s32 SpuVmKeyOff(s16 a0, s16 a1, s16 a2, u16 a3) {
  *
  * A sequence is named by one packed number: the SEQ/SEP access in the low
  * byte, the sequence within it in the high byte, reaching
- * _ss_score[access][seq] (include/SsScore.h). Each volume accessor
+ * _ss_score[access][seq] (include/ss_score.h). Each volume accessor
  * records it in D_8008EA22, vmanager's current-sequence global
  * (SpuVmGetSeqLVol records only the access byte).
  */

@@ -16,11 +16,11 @@ void FileResource__InstallCdReadDriver(FileResource *self) {
 }
 ```
 
-(`self->unk0C` above was `GameApplicationFileResource.h`'s own field, renamed to
+(`self->unk0C` above was `data_source.h`'s own field, renamed to
 `pendingGeneration` by that unit's owner before this round; this report's
 code sample was stale and is corrected here, round 64.)
 
-with `#include "GameApplicationFileResource.h"` (already-established header, reused
+with `#include "data_source.h"` (already-established header, reused
 UNCHANGED -- not copied or redefined) and a new local
 `extern FileResourceMethods *GetCdDriverMethods(void);`.
 
@@ -30,7 +30,7 @@ Byte-exact, 18/18 words.
 
 The standard "chain to base ctor, then install the derived vtable" idiom:
 calls `gFileResourceMethods`'s own ctor slot (`GetFileResourceMethods()->ctor`, i.e.
-`FileResource__FileResource`, matched in `GameApplicationFileResource.c`) directly rather than through
+`FileResource__FileResource`, matched in `game_shell.c`) directly rather than through
 `self->methods` (since `self->methods` isn't set up yet), then overwrites
 `self->methods` with `GetCdDriverMethods()` -- a DIFFERENT class table
 (`gCdDriverMethods`, confirmed via `tools/classtable.py --scan`: 29 slots, header
@@ -41,20 +41,20 @@ leading slot layout, which is all the type is asked to express here.
 
 Needed an explicit cast (`(FileResourceMethods *)`) on
 `GetFileResourceMethods()`'s result: it returns plain `void *` (per its own
-established signature in `GameApplicationFileResource.c`), so `->ctor` on the bare call
+established signature in `game_shell.c`), so `->ctor` on the bare call
 doesn't compile without one -- first attempt failed with `request for
 member 'ctor' in something not a structure or union`.
 
 ### Proposed learning
 
-`GameApplicationFileResource.h`'s `FileResource`/`FileResourceMethods` describe a
+`data_source.h`'s `FileResource`/`FileResourceMethods` describe a
 class that OTHER units' functions construct/chain into, not just
-`GameApplicationFileResource.c`'s own methods -- worth checking this header before
+`game_shell.c`'s own methods -- worth checking this header before
 redefining a local struct whenever a function dispatches through
 `GetFileResourceMethods()` or receives a `self` whose fields line up with its
 offsets. `GetFileResourceMethods()` itself returns bare `void *`, so every external
 call site needs its own cast to the slot-bearing type; this is not
-`GameApplicationFileResource.c`'s problem to fix (its own call sites go through
+`game_shell.c`'s problem to fix (its own call sites go through
 `this->methods`, already correctly typed).
 
 ## Naming (round 64, runner alpha)
@@ -66,10 +66,10 @@ letter-for-letter ("methods `Class__Method`, where `Class` is the struct's
 type name"). The rest of the name describes only confirmed MECHANICS: chain
 to `FileResource`'s own ctor, then overwrite `self->methods` with
 `GetCdDriverMethods()`'s table -- `gCdDriverMethods`, independently named
-elsewhere in the tree (`src/cd/CdDriver.c`'s own header comment) as "the
+elsewhere in the tree (`src/cd/cd_driver.c`'s own header comment) as "the
 CD-ROM read driver", not a guess coined here. WHICH broader class or game
 subsystem this function itself belongs to (why a `FileResource` instance gets
-reclassified this way here, distinct from `src/cd/CdDriver.c`'s own
+reclassified this way here, distinct from `src/cd/cd_driver.c`'s own
 confirmed ctor `CdDriver__CdDriver` for the same `gCdDriverMethods` class) is NOT
 established -- no caller is visible yet (only referenced from the
 still-uncarved `code_179d8` remainder) and this is flagged as such rather

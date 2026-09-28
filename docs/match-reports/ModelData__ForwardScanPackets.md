@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004497C` on 2026-09-25 (tools/rename.py). Address 0x8004497c.
 
-Round 82, runner echo (GraphicsResources session, echo #6), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #6), 2026-09-25. Unit `graphics_resources`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 15/15 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -11,17 +11,17 @@ drift. Fresh ground (carved revision 18, no prior report).
 
 Forwarder: `return self->unk30->methods->slot78(self->unk30, arg1, arg2);` returning u8 (`andi 0xFF`).
 
-Table slot (`tools/classtable.py`): gModelDataMethods +0x080 and gTriggerWorldMethods +0x080 (src/world/TodActor.c names this slot `getObjectIds` in its Unk5CObj view).
+Table slot (`tools/classtable.py`): gModelDataMethods +0x080 and gTriggerWorldMethods +0x080 (src/world/tod_actor.c names this slot `getObjectIds` in its Unk5CObj view).
 
 ## Source
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-#include "ModelData.h"
+#include "model_data.h"
 
 /* gModelDataMethods/gTriggerWorldMethods +0x080: forwarded to slot +0x078 of the object at +0x30. */
 u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
@@ -31,7 +31,7 @@ u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
 
 ## Notes
 
-- No shared header was edited. `FileResource.h`, `SceneNode.h`, `basic_class.h` are
+- No shared header was edited. `file_resource.h`, `scene_node.h`, `basic_class.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
@@ -42,7 +42,7 @@ u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x080 is `scanPackets`, `u8 (*)(ModelData *self, s32 arg1, s32 arg2)`. The forwarded call reads `todSet->methods->slot78` through FileResource's table, still cast, because the TodSet class (gTodSetMethods) is not unified. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x080 is `scanPackets`, `u8 (*)(ModelData *self, s32 arg1, s32 arg2)`. The forwarded call reads `todSet->methods->slot78` through FileResource's table, still cast, because the TodSet class (gTodSetMethods) is not unified. Image byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 
@@ -50,7 +50,7 @@ u8 ModelData__ForwardScanPackets(ModelData *self, s32 arg1, s32 arg2) {
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `arg1`, `arg2` | `out`, `tmdId` | A | forwarded to TodSet__ScanPackets(self, out, tmdId); still `s32` because include/ModelData.h declares them so |
+| `arg1`, `arg2` | `out`, `tmdId` | A | forwarded to TodSet__ScanPackets(self, out, tmdId); still `s32` because include/model_data.h declares them so |
 
 ## Track 10 (2026-09-28, round 104, echo)
 

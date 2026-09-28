@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043648` on 2026-09-25 (tools/rename.py). Address 0x80043648.
 
-Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #9), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 122/122 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): not in any method table (called by TimBlockS
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/graphics/GraphicsResources.c`.
+top of / earlier in `src/graphics/graphics_resources.c`.
 
 ```c
 /* Fade one 256-colour CLUT row (the entry's `index`, from VRAM y 0x1E0)
@@ -109,7 +109,7 @@ Seventh build. Levers, each measured: (1) the colour held in a `u32 c` read ONCE
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Takes `TimBlockSrcEntry *` (merged from the unit's Ent43068/Ent6F0B8 views); +0x0A is `clutH`, set to `mask` here, +0x0C `color`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Takes `TimBlockSrcEntry *` (merged from the unit's Ent43068/Ent6F0B8 views); +0x0A is `clutH`, set to `mask` here, +0x0C `color`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/tim_block_src.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/graphics_resources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Round 93 polish (charlie, track 7)
 

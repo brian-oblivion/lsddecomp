@@ -7,7 +7,7 @@
 ## ROUND 49 (runner delta): MATCHED -- the asm-label alias defeats the address CSE, then a second independent scheduling residue is exposed and closed by two bare barriers
 
 Re-verified the inherited stall first: spliced the round-46 body
-(unchanged) into `src/app/Task.c` in isolation (both of this
+(unchanged) into `src/app/task.c` in isolation (both of this
 runner's units confirmed at their starting `INCLUDE_ASM` counts first)
 and rebuilt -- **0/41 raw, `WARNING: differs OUTSIDE this range too**,
 reproducing this report's own documented figure exactly. Not stale.
@@ -127,7 +127,7 @@ void Viewport__InitDefaults(Unk18Obj *self) {
 
 No struct/header changes -- all fields and offsets were already known
 from prior rounds (see the round-44 section below). This unit's own
-`Task.h` is untouched by this match.
+`task.h` is untouched by this match.
 
 ### Proposed learning (round 49)
 
@@ -156,7 +156,7 @@ schedule too -- re-measure after the length fix before declaring victory.
 
 ## ROUND 46 (runner delta): drift-checked fresh (consistent), one new lever tried and rejected -- `volatile` on just the READ side regresses even worse than `volatile` on the declaration
 
-Re-spliced the round-44 body (unchanged) into `src/app/Task.c` in
+Re-spliced the round-44 body (unchanged) into `src/app/task.c` in
 isolation and rebuilt: **0/41 raw, `WARNING: differs OUTSIDE this range
 too (176860 bytes)`** -- reproduces this report's own documented figure
 exactly (the raw 0/41 is the known-misleading window-alignment artifact
@@ -213,7 +213,7 @@ narrows (rather than contradicts) the existing round-44 finding that
 worseness is a property of volatile-qualifying an AGGREGATE access in
 this compiler, not of WHERE in the source the qualifier is spelled.
 
-Unit `Task`, carved round 13. Reopened round 42 as `gp_rel`-blocked
+Unit `task`, carved round 13. Reopened round 42 as `gp_rel`-blocked
 (the blocker is RESOLVED, see CLAUDE.md); the stub above was never actually
 attempted until round 44.
 
@@ -359,11 +359,11 @@ toolchain question, not a per-function one)?
 
 ## Naming
 
-`Unk18Obj__InitDefaults` -- tier A. Slot40 occupant, called once from `Viewport__Viewport`'s own constructor tail (`self->methods->slot40(self)`, `Task.c`) immediately after the base ctor. Body is straight-line field initialization to constants. Mechanics (post-ctor default init) are the whole of its purpose.
+`Unk18Obj__InitDefaults` -- tier A. Slot40 occupant, called once from `Viewport__Viewport`'s own constructor tail (`self->methods->slot40(self)`, `task.c`) immediately after the base ctor. Body is straight-line field initialization to constants. Mechanics (post-ctor default init) are the whole of its purpose.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__InitDefaults`. The +0x040 slot's occupant, named `initDefaults`. The defaults name the fields: screenSize 256x240 (sDefaultViewportWidth/sDefaultViewportHeight), otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 0x10000, drawEnabled 1. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__InitDefaults`. The +0x040 slot's occupant, named `initDefaults`. The defaults name the fields: screenSize 256x240 (sDefaultViewportWidth/sDefaultViewportHeight), otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, farZ 0x10000, drawEnabled 1. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## asm sites
 
@@ -415,4 +415,4 @@ Constants in decimal (otLength 13, unk44 2000, unk48 64, projH 256, nearZ 10, fa
 
 ## Constants
 
-The defaults became unit-local `#define`s in Task.c (only InitDefaults uses them): `VIEWPORT_DEFAULT_OT_LENGTH` 13 (8192 tags), `VIEWPORT_DEFAULT_MAX_PACKETS` 2000, `VIEWPORT_DEFAULT_PACKET_SIZE` 64, `VIEWPORT_DEFAULT_PROJ_H` 256, `VIEWPORT_DEFAULT_NEAR_Z` 10, `VIEWPORT_DEFAULT_FAR_Z` 65536, `VIEWPORT_DEFAULT_FOG_NEAR` 20000; `lightMode = 0` -> `GsLMODE_NORMAL` (libgs.h). Fields `unk44`/`unk48`/`unk90`/`unkB4` are now `maxPackets`/`packetSize`/`clockEventCount`/`extraSwap`.
+The defaults became unit-local `#define`s in task.c (only InitDefaults uses them): `VIEWPORT_DEFAULT_OT_LENGTH` 13 (8192 tags), `VIEWPORT_DEFAULT_MAX_PACKETS` 2000, `VIEWPORT_DEFAULT_PACKET_SIZE` 64, `VIEWPORT_DEFAULT_PROJ_H` 256, `VIEWPORT_DEFAULT_NEAR_Z` 10, `VIEWPORT_DEFAULT_FAR_Z` 65536, `VIEWPORT_DEFAULT_FOG_NEAR` 20000; `lightMode = 0` -> `GsLMODE_NORMAL` (libgs.h). Fields `unk44`/`unk48`/`unk90`/`unkB4` are now `maxPackets`/`packetSize`/`clockEventCount`/`extraSwap`.

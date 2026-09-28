@@ -2,14 +2,14 @@
 
 > Renamed from `func_80048E08` on 2026-09-25 (tools/rename.py). Address 0x80048e08.
 
-Round 82, runner echo, 2026-09-25. Unit `GameFiles` (carved revision 18).
+Round 82, runner echo, 2026-09-25. Unit `game_files` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
 (`./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`), funcdiff
 9/9, 0 insertions / 0 deletions, no out-of-range drift. No levers needed.
 
 ## What it does
 
-Returns the string `*GetSoundEffectDirRef()` (the "SND\\SE" pointer sSoundEffectDirPtr). Callers pass one ignored argument (DayTaskStageMap.c declares it `s32 GetSoundEffectDir(s32)`); the body never reads `a0`, so it is written `(void)` here.
+Returns the string `*GetSoundEffectDirRef()` (the "SND\\SE" pointer sSoundEffectDirPtr). Callers pass one ignored argument (dream_day.c declares it `s32 GetSoundEffectDir(s32)`); the body never reads `a0`, so it is written `(void)` here.
 
 ## Source
 
@@ -28,12 +28,12 @@ char *GetSoundEffectDir(void) {
   unit is a whole number of 0x1C-byte records into that table, so the unit
   types the table as `FilePathRecord` (size only). The record's fields are unknown.
 - Callers in other units still declare their own prototypes (`s32` returns in
-  DayTaskStageMap.h / class_3bb8c.h); those are independent declarations and were
+  dream_day.h / class_3bb8c.h); those are independent declarations and were
   not touched.
 
 ## Arity (round 82, alpha, track 3 externcheck)
 
-externcheck flags DayTaskStageMap.h's 1-parameter extern against this 0-parameter
+externcheck flags dream_day.h's 1-parameter extern against this 0-parameter
 definition. It is not the forwarding idiom (the body reads no argument
 register) and the extern cannot drop the argument: the caller's
 `move a0,zero` at 0x800496A8 is retail. The extern line carries
@@ -43,4 +43,4 @@ register) and the extern cannot drop the argument: the caller's
 
 - **Name:** `GetSoundEffectDir`
 - **Tier:** A
-- **Evidence:** dereferences GetSoundEffectDirRef(); its one cross-unit caller (DayTask__DayTask in DayTaskStageMap.c) passes the result straight into a data-source ctor's base-path argument.
+- **Evidence:** dereferences GetSoundEffectDirRef(); its one cross-unit caller (DayTask__DayTask in dream_day.c) passes the result straight into a data-source ctor's base-path argument.

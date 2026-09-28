@@ -143,7 +143,7 @@ Previous title: TaskObjF__CheckCardStatus — NON_MATCHING body promoted, round 
 
 # TaskObjF__CheckCardStatus (ORIGINAL REPORT, rounds 14/19 — see ROUND 37 note above: this residue description does not reproduce against today's toolchain and this exact preserved body; kept for its correct CFG/value derivation, which IS still accurate)
 
-**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class). Predicted hardest
+**Unit:** title_menu (round 14, `Node3bb8cE` class). Predicted hardest
 this round (5 distinct callee-saved registers). Restored to
 `INCLUDE_ASM`.
 
@@ -292,7 +292,7 @@ done:
 #endif
 ```
 
-Needs (already declared locally in `src/ui/TitleMenuTaskObjF.c`): `Node3bb8cE`,
+Needs (already declared locally in `src/ui/title_menu.c`): `Node3bb8cE`,
 `TaskObjF__CardInfoAndLoadStatus` (forward-declared, defined later in this same unit).
 
 ### Direction NOT tried, with reason
@@ -416,5 +416,5 @@ both green with the wrapped form in place.
 
 ## Constants (round 98, track 7)
 
-The retry count 10 is `MEMCARD_RETRIES` (include/TaskObjF.h, "Attempts
+The retry count 10 is `MEMCARD_RETRIES` (include/task_objf.h, "Attempts
 after the first before a card operation gives up"). Zero bytes changed.

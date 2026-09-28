@@ -11,7 +11,7 @@
 > MATCH" at the end for what actually closed it and why the whole prior
 > approach could never have reached retail's own instruction sequence.
 
-Unit: `src/graphics/TmdRenderer.c`. `void FillRVectors4(PolyVtx **dst, PolyVtx **src,
+Unit: `src/graphics/tmd_renderer.c`. `void FillRVectors4(PolyVtx **dst, PolyVtx **src,
 PolyUV4 *uv0, PolyUV4 *uv1, PolyUV4 *uv2, PolyUV4 *uv3)` — calls
 `FillRVectors3(dst, src, uv0, uv1, uv2)` (matched round 13, same unit), then
 does its own single unaligned 8-byte copy (`src[3]->xy` -> `dst[3]->xy`) and
@@ -92,7 +92,7 @@ sw    $ra,0x24($sp)
 jal   FillRVectors3
 ```
 
-My best body's built object (`objdump -d build/src/TmdRenderer.c.o`)
+My best body's built object (`objdump -d build/src/tmd_renderer.c.o`)
 confirms the SAME register assignment (`$s0`=arg0, `$s1`=arg1, `$s2`=arg5,
 each saved at the SAME stack offsets 0x18/0x1c/0x20) — this took several
 attempts to reach (see below) — but orders the four save/load groups
@@ -163,7 +163,7 @@ tries.
 **Second confirmed instance of "prologue callee-save stores in the wrong
 order, same registers and same offsets, not reachable from C, and the
 `__asm__("")` first-statement barrier does not generalise to it."** Unlike
-the original instance (`TmdRenderer`, six declaration-order permutations
+the original instance (`tmd_renderer`, six declaration-order permutations
 producing one identical score), this one show a NEW wrinkle worth
 recording: getting register IDENTITY correct and getting instruction ORDER
 correct are separable sub-problems here, and fixing one did not imply
@@ -177,7 +177,7 @@ order before spending further attempts — an order-only residue with
 correct registers is the stronger signal that no more attempts are likely
 to help, not a reason to keep trying "just one more" reordering.
 
-## RUNNER PASS, permuter round (alpha, TmdRenderer): base confirmed, floor held, two degenerate leads not pursued
+## RUNNER PASS, permuter round (alpha, tmd_renderer): base confirmed, floor held, two degenerate leads not pursued
 
 `--debug` on this report's preserved body (prologue store-order residue,
 28/35 words): base score = **210**, decomposing as 3 reorderings x 60 = 180
@@ -303,9 +303,9 @@ whole-function raw-register `__asm__`).
 ## ROUND 20 (runner echo): raw-`__asm__` audit, secondary assignment
 
 Per the coordinator's secondary assignment, audited every `__asm__` block
-in `src/psyq/libsnd_ssinit.c`, `src/sound/PlacementGridVabSound.c`, `src/app/Pad.c`,
-`src/world/entity.c`, `src/Entity_c.c`, `src/world/DreamSys.c`, and
-`src/graphics/TmdRenderer.c` (this unit's own family) for the same mistake found
+in `src/psyq/libsnd_ssinit.c`, `src/sound/vab_sound.c`, `src/app/pad.c`,
+`src/world/entity.c`, `src/Entity_c.c`, `src/world/dream_sys.c`, and
+`src/graphics/tmd_renderer.c` (this unit's own family) for the same mistake found
 in this function -- a whole-function raw-register transcription standing
 in for an idiom ordinary C already expresses via an already-matched
 sibling.
@@ -313,8 +313,8 @@ sibling.
 **21 blocks total, 21/21 legitimate, zero reworkable.**
 
 - **6 bare `__asm__("");` scheduling barriers**, one each in
-  `libsnd_ssinit.c` (`SetRCnt`), `PlacementGridVabSound.c`, `Pad.c`,
-  `entity.c`, `Entity_c.c`, `DreamSys.c`. Every one is a no-operand,
+  `libsnd_ssinit.c` (`SetRCnt`), `vab_sound.c`, `pad.c`,
+  `entity.c`, `Entity_c.c`, `dream_sys.c`. Every one is a no-operand,
   no-clobber ordering barrier -- exactly HARD RULE 6's always-permitted
   form ("if it only changes instruction ORDER, it is allowed"), each
   cited in its own surrounding comment or an existing match report as
@@ -322,7 +322,7 @@ sibling.
   fix in disguise (no operand constraints, no register names anywhere
   in any of the six).
 - **15 content-bearing `__asm__ volatile (...)` blocks, all in
-  `TmdRenderer.c`**: `ProjectTriFace` (2), `ProjectQuadFace` (4),
+  `tmd_renderer.c`**: `ProjectTriFace` (2), `ProjectQuadFace` (4),
   `TransformAndCullPoly` (1, the large GTE-heavy handwritten function -- rtpt/
   nclip/avsz3 raw `.word` cofunction encodings plus `cfc2`), and the six
   already-matched leaf functions `StoreSxyPolyF3`/`StoreSxyPolyG3`/
@@ -356,4 +356,4 @@ SVECTOR, DVECTOR); body `FillRVectors3(dst, src, sxy0, sxy1, sxy2);
 dst[3]->v = *src[3]; dst[3]->sxy = *sxy3;`, byte-identical. The shared
 header's old extern comment ("extends CopyPolyVtx3 to a 4th vertex ...
 round 20") is this report's ROUND 20 section; the prototype now lives in
-TmdRenderer.c.
+tmd_renderer.c.

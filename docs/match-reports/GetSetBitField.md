@@ -4,7 +4,7 @@
 
 Unit: `SceneNode` (round 14). The generic packed-bitfield accessor
 already MEASURED and documented (before this carve existed) in
-`include/SceneNode.h`'s standing comment: clears `width` bits at bit
+`include/scene_node.h`'s standing comment: clears `width` bits at bit
 offset `shift` in `*word`, ORs in `value << shift`, and returns the
 PREVIOUS contents of that bitfield shifted back to bit 0. Five (now more)
 sibling functions in this class of unit are thin wrappers around it, all
@@ -36,7 +36,7 @@ u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value) {
 ```
 
 Preserved inline per project convention (`#if 0`, positioned where it
-would compile back into `src/graphics/SceneNode.c` in place of the current
+would compile back into `src/graphics/scene_node.c` in place of the current
 `INCLUDE_ASM`):
 
 ```c
@@ -154,7 +154,7 @@ identical and (per the six prior manual attempts) statement order,
 operand order, and intermediate-naming alone hadn't found this specific
 split.
 
-**Translated to `src/graphics/SceneNode.c` verbatim and reverified with the real
+**Translated to `src/graphics/scene_node.c` verbatim and reverified with the real
 oracle** (not just the permuter's own scorer):
 
 ```
@@ -163,7 +163,7 @@ GetSetBitField: 22/22 words match (file 0xF5AC-0xF604)
 OK: build matches retail SLPS_015.56
 ```
 
-Full match, whole-image green. `include/SceneNode.h`'s comment on this
+Full match, whole-image green. `include/scene_node.h`'s comment on this
 function's role (generic packed-bitfield accessor) is unaffected -- no
 struct or signature changes, so no other unit is affected.
 
@@ -191,16 +191,16 @@ residue, before spending a permuter budget on it.
   `DreamSys__GetSetDreamTimeLimit` in the symbols file) and is load-bearing
   here: several callers use the return value
   (`return GetSetBitField(&self->unk10, 0x1F, 1, a1 == 0) == 0;`).
-- Corroborated at scale: thirteen one-line wrappers across `SceneNode.c`,
-  `SceneNode.c` and `ScreenWidgets.c` call it at fixed, non-overlapping
+- Corroborated at scale: thirteen one-line wrappers across `scene_node.c`,
+  `scene_node.c` and `screen_widgets.c` call it at fixed, non-overlapping
   (shift, width) pairs over one word -- the per-field setters of a packed
   register. That word is `SceneNodeObj::unk10`, which the PSY-Q
-  IDENTIFICATION note in include/SceneNode.h pins as `GsDOBJ2.attribute`.
+  IDENTIFICATION note in include/scene_node.h pins as `GsDOBJ2.attribute`.
 - The mask is built by a loop rather than `(1 << width) - 1`; that is
   retail's own source shape and the name does not assert otherwise.
 
 
-## Round 95 (bravo): moved from include/SceneNode.h
+## Round 95 (bravo): moved from include/scene_node.h
 
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 
@@ -223,7 +223,7 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * register and these five functions are its per-field setters. */
 ```
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
 The mask loop keeps a one-line `MATCHING:` note in the source.
 
@@ -234,6 +234,6 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * `*word` with `value` and RETURNS the previous contents of that field,
  * shifted down to bit 0. The mask is built one bit at a time by a loop
  * rather than as `(1 << width) - 1`; that loop is retail's own shape, not
- * an artefact. Thirteen thin per-field setters across SceneNode.c,
- * SceneNode.c and ScreenWidgets.c are wrappers around this. */
+ * an artefact. Thirteen thin per-field setters across scene_node.c,
+ * scene_node.c and screen_widgets.c are wrappers around this. */
 ```

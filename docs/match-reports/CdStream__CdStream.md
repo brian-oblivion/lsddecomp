@@ -4,7 +4,7 @@
 
 > Renamed from `func_80046F88` on 2026-09-25 (tools/rename.py). Address 0x80046f88.
 
-Round 82, runner delta (second session). Unit `src/cd/CdStream.c`. Fresh
+Round 82, runner delta (second session). Unit `src/cd/cd_stream.c`. Fresh
 ground, no prior attempt. Byte-exact on build 8; whole-image SHA1 green.
 
 - **Where:** slot +0x008 (ctor) of gCdStreamMethods; `New_CdStream` (the
@@ -47,7 +47,7 @@ by `grep -rn` over `src/`, `include/`), so these were renamed directly
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_800817E0` (table) | `gCdStreamMethods` | A | `Get_vtable_<Class>` / `g<Class>Methods` convention (`include/Pad.h`) |
+| `D_800817E0` (table) | `gCdStreamMethods` | A | `Get_vtable_<Class>` / `g<Class>Methods` convention (`include/pad.h`) |
 | `D_8008A950` (global) | `sActiveCdStream` | A | the single active-stream pointer every state-changing method compares `self` against |
 | slot +0x044 | `open` | A | dispatches to `CdStream__Open` |
 | slot +0x048 | `close` | A | dispatches to `CdStream__Close` |
@@ -96,7 +96,7 @@ the same instructions.
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
+Class unified as `CdStream` (include/cd_stream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
 
 Renamed from CdStreamObj__CdStreamObj (tools/rename.py), the class rename. Parameters named (speed, fps, arg3): speed < 4 selects 300 sectors a second (double speed) and read mode 0x1C0 in StartRead; the second divides sectors a second into sectors a frame.
 
@@ -111,4 +111,4 @@ Constants (unit-local `#define`s, evidence on each definition):
 `CDSTREAM_DOUBLE_SPEED_BELOW` 4, `CD_SECTORS_PER_SECOND_2X` 300 and
 `_1X` 150 (the CD-ROM's sector rate at each speed), `CDSTREAM_FRAME_UNIT`
 2054 (kept named but unexplained: not the 2048-byte sector size). `state`
-is `enum CdStreamState` in include/CdStream.h.
+is `enum CdStreamState` in include/cd_stream.h.

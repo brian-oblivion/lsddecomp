@@ -54,7 +54,7 @@ closed the last 3 words immediately.
 
 - **`DreamSysBaseMethods` (this unit's local view of the shared `gActorMethods`
   base table) gets a new slot at `+0x04C`: `slot4C`.** Cross-confirmed
-  against `TodActor.c`'s `D800878D4Methods`, which already names this exact
+  against `tod_actor.c`'s `D800878D4Methods`, which already names this exact
   slot (same offset in the same shared table) and describes its call shape
   as `(self, arg1, arg2)` — matching this call site's `(this, arg1, &local)`
   exactly.

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043C60` on 2026-09-25 (tools/rename.py). Address 0x80043c60.
 
-Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #7), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 22/22 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x00C (finalize).
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
 /* gTimArraySrcMethods +0x00C: finalize -- same shape as gTimBlockSrcMethods's. */
@@ -41,4 +41,4 @@ void TimArraySrc__Finalize(DataSrc33808 *self) {
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
-Class unified as TimArraySrc (include/TimArraySrc.h); self retyped from DataSrc33808, unk30/unk2C read as images/count. Byte-identical.
+Class unified as TimArraySrc (include/tim_array_src.h); self retyped from DataSrc33808, unk30/unk2C read as images/count. Byte-identical.

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004A228` on 2026-09-23 (tools/rename.py). Address 0x8004a228.
 
-**Unit:** DayTaskStageMap · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED (27/27 words)
+**Unit:** dream_day · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED (27/27 words)
 
 ## What it does
 
@@ -15,7 +15,7 @@ class of `gDayTaskMethods` (resolved with
 `tools/classtable.py 0x800865C8 --vs 0x8006E878`, then cross-checked against
 `0x80086668` -- both share the same base, `gIntermediateBaseMethods`). If `self->unk30` is
 set, notifies `self->subB` (guarded slot, same pattern as
-`include/GameApplication.h`'s `unk18`/`GameApplication__InitSystems` comment). Then chains to the
+`include/game_application.h`'s `unk18`/`GameApplication__InitSystems` comment). Then chains to the
 BASE class's own dtor, fetched through `GetIntermediateBaseMethods()` (a plain
 no-parameter accessor returning `&gIntermediateBaseMethods`, same shape as
 `GetDreamSysMethods`).
@@ -54,7 +54,7 @@ void TimedTask__Finalize(Obj865C8 *self) {
 `IntermediateBaseMethods` (the base table's own type, only slots +0x00C,
 +0x048, +0x060 typed -- the three this unit calls through explicitly) and
 `SubObjB` (opaque, only slot +0x004 named) are established in
-`include/DayTaskStageMap.h`, added this round.
+`include/dream_day.h`, added this round.
 
 ## Proposed learning
 
@@ -73,4 +73,4 @@ inherited/override code as a subclass relationship.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Renamed from `TimedTask__Dtor`, tier A: it occupies +0x00C, BasicClass's `finalize` slot, and its body is a finalize: release `sound` when `soundBankPath` is set (the ctor made it), then the base finalize through `GetIntermediateBaseMethods()->finalize`. `self` is `TimedTask *`; `unk30`/`subB` are `soundBankPath`/`sound`. DayTask__Finalize and ObjM__Finalize reach it as `GetTimedTaskMethods()->finalize((TimedTask *)self)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Renamed from `TimedTask__Dtor`, tier A: it occupies +0x00C, BasicClass's `finalize` slot, and its body is a finalize: release `sound` when `soundBankPath` is set (the ctor made it), then the base finalize through `GetIntermediateBaseMethods()->finalize`. `self` is `TimedTask *`; `unk30`/`subB` are `soundBankPath`/`sound`. DayTask__Finalize and ObjM__Finalize reach it as `GetTimedTaskMethods()->finalize((TimedTask *)self)`. Image byte-identical.

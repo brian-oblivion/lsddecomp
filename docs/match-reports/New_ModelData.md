@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004468C` on 2026-09-25 (tools/rename.py). Address 0x8004468c.
 
-Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #7), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 28/28 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,10 +17,10 @@ Table slot (`tools/classtable.py`): none (allocator for gModelDataMethods, objec
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
-#include "ModelData.h"
+#include "model_data.h"
 
 /* Allocate and construct a gModelDataMethods object (second constructor argument 1); freed and NULL when the constructor fails. */
 ModelData *New_ModelData(ResourceSource *src) {
@@ -46,11 +46,11 @@ ModelData *New_ModelData(ResourceSource *src) {
 
 ## Naming
 
-- **New_ModelData**, tier A. include/TodActor.h's Unk5CObj already names this object's own +0x2C/+0x30 fields "tmd"/"tods" (populated by New_LinkResource/New_TodSet), and src/world/TodActor.c's own header comment calls this allocator's result "modelData".
+- **New_ModelData**, tier A. include/tod_actor.h's Unk5CObj already names this object's own +0x2C/+0x30 fields "tmd"/"tods" (populated by New_LinkResource/New_TodSet), and src/world/tod_actor.c's own header comment calls this allocator's result "modelData".
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. The allocator now reads `ModelData *New_ModelData(ResourceSource *src)` (was `void *` from `s32 arg0`): its argument is the ctor's descriptor, passed through unchanged in $a1, so the bytes are the same. Its callers cast: TriggerWorld__BuildResources, InitDreamAux (DreamAux) and TodActor__AcquireModelData (TodActor), whose local externs of it are deleted. The ctor is still reached through the unprototyped UnprototypedCtorTable view, because FILERESOURCE_SLOTS declares +0x008 returning void. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`; the unit-shared `DataSrc33808` view no longer types it. The allocator now reads `ModelData *New_ModelData(ResourceSource *src)` (was `void *` from `s32 arg0`): its argument is the ctor's descriptor, passed through unchanged in $a1, so the bytes are the same. Its callers cast: TriggerWorld__BuildResources, InitDreamAux (dream_aux) and TodActor__AcquireModelData (TodActor), whose local externs of it are deleted. The ctor is still reached through the unprototyped UnprototypedCtorTable view, because FILERESOURCE_SLOTS declares +0x008 returning void. Image byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

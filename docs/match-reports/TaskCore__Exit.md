@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003CA94` on 2026-09-24 (tools/rename.py). Address 0x8003ca94.
 
-**Unit:** Task · **Size:** 22 instructions
+**Unit:** task · **Size:** 22 instructions
 
 ## What it does
 
@@ -33,7 +33,7 @@ established first since it is the 3-instruction setter). The `slot60(self,
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit Task. 1 attempt.
+round 2026-09-02, runner echo, unit task. 1 attempt.
 
 ## Naming (round 78, delta)
 
@@ -46,7 +46,7 @@ above. Corroborated independently: this function's own body invokes
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__RefreshViewValue (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__RefreshViewValue (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 98, alpha)
 

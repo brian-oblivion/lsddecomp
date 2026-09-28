@@ -2,7 +2,7 @@
 
 > Renamed from `func_80019710` on 2026-09-17 (tools/rename.py). Address 0x80019710.
 
-**Unit:** TmdRenderer · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** tmd_renderer · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 Third distinct offset pattern in the GTE-store family (see
 `StoreSxyPolyF3.md` for the family overview and reproducer methodology):

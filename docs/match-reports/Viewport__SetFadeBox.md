@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003F1A8` on 2026-09-23 (tools/rename.py). Address 0x8003f1a8.
 
-Unit: `Task`. Round 14, runner delta. 34/34 words, full match (2
+Unit: `task`. Round 14, runner delta. 34/34 words, full match (2
 real attempts).
 
 ## Signature
@@ -60,7 +60,7 @@ guard's own C source structure has to reflect directly.
 
 ## Header changes
 
-`include/Task.h`: `SubHandleObjMethods` gains `slot4`
+`include/task.h`: `SubHandleObjMethods` gains `slot4`
 (`void (*)(SubHandleObj*)`, release-shaped, no extra args), splitting the
 old `pad000[0x04C]` span ahead of the already-typed `slot4C`.
 
@@ -70,7 +70,7 @@ old `pad000[0x04C]` span ahead of the already-typed `slot4C`.
 
 ## Proposed field names
 
-Not applied -- `unkB0`/`unkAC` are both shared with `Task.c`
+Not applied -- `unkB0`/`unkAC` are both shared with `task.c`
 (`Viewport__Viewport` sets both, `Viewport__Finalize` releases `unkAC`), so
 outside this unit's ownership per track 3's rule.
 
@@ -80,11 +80,11 @@ outside this unit's ownership per track 3's rule.
 - `unkAC` -> not proposed beyond the existing `Unk18AcObj` typedef's own
   documentation; this unit only forwards it opaquely (`arg1->methods->
   slot4C(arg1, self->unkAC, sFadeBoxAttachPos)`), no new evidence over what
-  `include/Task.h`'s own comment on `Unk18Obj::unkAC` already records.
+  `include/task.h`'s own comment on `Unk18Obj::unkAC` already records.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__SetSubHandle`. Slot +0x0A8 `setSubHandle`. The handle is a `SceneNode *` (the ctor's is a FadeBox, id 0x164): release is BasicClass's +0x004 and the attach is SceneNode's +0x04C `attachToParent`, whose occupant in FadeBox's table (BoxFill__AttachToParent) takes a screen position, so sFadeBoxAttachPos (-100, -100) is passed with a `(LongVec3 *)` cast (no code). The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__SetSubHandle`. Slot +0x0A8 `setSubHandle`. The handle is a `SceneNode *` (the ctor's is a FadeBox, id 0x164): release is BasicClass's +0x004 and the attach is SceneNode's +0x04C `attachToParent`, whose occupant in FadeBox's table (BoxFill__AttachToParent) takes a screen position, so sFadeBoxAttachPos (-100, -100) is passed with a `(LongVec3 *)` cast (no code). The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 
 ## Track 7 (round 95, alpha, polish pass)

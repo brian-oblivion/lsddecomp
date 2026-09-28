@@ -2,7 +2,7 @@
 
 > Renamed from `func_80052B70` on 2026-09-24 (tools/rename.py). Address 0x80052b70.
 
-**Unit:** ObjMStyleActor · **Size:** 40 instructions (0xA0 bytes) ·
+**Unit:** dream_scene · **Size:** 40 instructions (0xA0 bytes) ·
 **Status: MATCHED 40/40**, whole-image SHA1 green.
 
 ## Role
@@ -19,7 +19,7 @@ this function dispatches to.
 ## Signature
 
 The return type and first-argument type are NOT free choices here: this
-function already has a pre-existing prototype in `include/DayTaskStageMap.h`
+function already has a pre-existing prototype in `include/dream_day.h`
 (established from `DayTask__StartObjM`'s call site, which stores the result
 into `Obj865C8::unk4C`):
 
@@ -27,9 +27,9 @@ into `Obj865C8::unk4C`):
 extern Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);
 ```
 
-`ObjMStyleActor.c` includes `DayTaskStageMap.h`, so this function's definition
+`dream_scene.c` includes `dream_day.h`, so this function's definition
 must match that prototype exactly (return type and arg0 type) or the two
-conflict at compile time. `Obj4C` is `DayTaskStageMap.h`'s own narrow opaque
+conflict at compile time. `Obj4C` is `dream_day.h`'s own narrow opaque
 view of the object this function constructs (methods pointer only) --
 deliberately narrower than this unit's own view (see below), per the
 project's multiple-independent-local-views convention.
@@ -135,13 +135,13 @@ project-wide `New_X` allocator shape before assuming it generalizes.
 
 Round 75 (bravo, track 3). `func_80052B70` -> `New_ObjM`, **tier A**.
 
-New_X allocator: BMemPMgrAlloc(0x88), then GetObjMMethods()->ctor (+0x008 of gObjMMethods, `tools/classtable.py 0x80087034`) with the 5 forwarded arguments; returns the object or NULL. Caller: DayTask__StartObjM (DayTaskStageMap). The class's type name is `ObjM` (include/class_3bb8c.h).
+New_X allocator: BMemPMgrAlloc(0x88), then GetObjMMethods()->ctor (+0x008 of gObjMMethods, `tools/classtable.py 0x80087034`) with the 5 forwarded arguments; returns the object or NULL. Caller: DayTask__StartObjM (dream_day). The class's type name is `ObjM` (include/class_3bb8c.h).
 
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Signature now `ObjM *New_ObjM(BasicClass *sound, WBgm *bgm, TimImage *etcTim, LinkResource *dreamerTmd, s32 stage)`: the arguments are DayTask's `sound`, `bgm`, `etcTim`, `dreamerTmd` (include/DayTask.h), which StartObjM now passes uncast.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Signature now `ObjM *New_ObjM(BasicClass *sound, WBgm *bgm, TimImage *etcTim, LinkResource *dreamerTmd, s32 stage)`: the arguments are DayTask's `sound`, `bgm`, `etcTim`, `dreamerTmd` (include/day_task.h), which StartObjM now passes uncast.
 
 ## Round 99 (delta, track 7)
 
-`BMemPMgrAlloc(0x88)` -> `BMemPMgrAlloc(sizeof(ObjM))` (ObjM is 0x88 bytes, include/ObjM.h; byte-identical). The two returns keep a `MATCHING:` line.
+`BMemPMgrAlloc(0x88)` -> `BMemPMgrAlloc(sizeof(ObjM))` (ObjM is 0x88 bytes, include/objm.h; byte-identical). The two returns keep a `MATCHING:` line.

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80025CC4` on 2026-09-24 (tools/rename.py). Address 0x80025cc4.
 
-**Unit:** `src/app/Pad.c` (runner ALPHA, `runner/alpha`)
+**Unit:** `src/app/pad.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (19/19 words, full build verified byte-exact)
 **Vtable slot:** `gPadMethods+0x44` (`PadMethods.updateMasks`)
 

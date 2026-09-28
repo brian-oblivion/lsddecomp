@@ -2,7 +2,7 @@
 
 > Renamed from `func_80052F10` on 2026-09-24 (tools/rename.py). Address 0x80052f10.
 
-Unit `src/world/ObjMStyleActor.c`. Round 26, runner delta.
+Unit `src/world/dream_scene.c`. Round 26, runner delta.
 
 ## What it is
 
@@ -200,7 +200,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The onInit override: `world` was IntermediateBase::viewport (NodeGuardedViewport: detachViewChild, attachViewChild), `unk54` the bgm (WBgm setSeq), `pendingOther` the New_TimBlockSrc object (`timBlockSrc`), `unk38` the stage, `unk48` gridSpan (the StageMap's setGridSpan), `unk14` the StageMap (setBounds); `&ctorSound` is RegisterStyleConfig's third argument.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The onInit override: `world` was IntermediateBase::viewport (NodeGuardedViewport: detachViewChild, attachViewChild), `unk54` the bgm (WBgm setSeq), `pendingOther` the New_TimBlockSrc object (`timBlockSrc`), `unk38` the stage, `unk48` gridSpan (the StageMap's setGridSpan), `unk14` the StageMap (setBounds); `&ctorSound` is RegisterStyleConfig's third argument.
 
 ## asm sites
 
@@ -242,7 +242,7 @@ text, moved here:
 > which value.
 
 Naming, all zero bytes:
-- `ObjM::unk40` -> `tickPeriod`, `unk44` -> `moveMode` (include/ObjM.h;
+- `ObjM::unk40` -> `tickPeriod`, `unk44` -> `moveMode` (include/objm.h;
   the compiler's accessor list after the rename was this unit only).
   Evidence: EnterStyleSession passes them to the DreamSys's resetLinkState,
   and DreamSys__ResetLinkState's own parameters are `(moveMode,
@@ -256,10 +256,10 @@ Naming, all zero bytes:
 - `arg3` / `unk4C` kept: stored, never read, and IntermediateBase__Init
   passes 0, so nothing names it.
 - `flag` kept: it goes to GetSetHitHeightGate, whose global's meaning is not
-  established (SceneNode.c's tier-C note).
+  established (scene_node.c's tier-C note).
 
 ## Track 10 (2026-09-28, round 104, echo)
 
 Pointer types in place of `s32`: `New_TimBlockSrc(char *name)` returning `TimBlockSrc *`, ModelData's `scanPackets(self, u8 *out, u32 *tmdId)` and `decodePacketWord(self, u32 *packet, u8 *objId, u8 *type, u8 *flag, u8 *len)` slots and their forwarders, so the `(s32)` casts at the callers (ObjM__InitStyleAndWorld, TodActor__CreateParts, TodActor__ApplyTodPacket) and the forwarders' casts back are gone; CreateParts' `tmdId` buffer is `u32[4]` to match. Byte-identical, no new compiler warnings (full rebuild, 37 before and after).
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into CdDriver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes CdDriver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

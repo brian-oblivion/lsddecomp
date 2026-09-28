@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C944` on 2026-09-24 (tools/rename.py). Address 0x8003c944.
 
-**Unit:** Task · **Size:** 27 instructions
+**Unit:** task · **Size:** 27 instructions
 
 ## What it does
 
@@ -92,7 +92,7 @@ address drift on the very first attempt here.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit Task. 2 attempts.
+round 2026-09-02, runner echo, unit task. 2 attempts.
 
 ## Naming (round 78, delta)
 
@@ -106,7 +106,7 @@ target represents, so tier C.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__func_8003C944 (tools/rename.py). Occupant of +0x080 (`onPadPrev`, 0x12): findPrevFreeSlot (inputMode 1) or retreatSlotCursor (inputMode 2). The retreatSlotCursor slot is now void like its occupant, which removed this function's baseline "assignment from incompatible pointer type" warning. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__func_8003C944 (tools/rename.py). Occupant of +0x080 (`onPadPrev`, 0x12): findPrevFreeSlot (inputMode 1) or retreatSlotCursor (inputMode 2). The retreatSlotCursor slot is now void like its occupant, which removed this function's baseline "assignment from incompatible pointer type" warning. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 98, alpha)
 

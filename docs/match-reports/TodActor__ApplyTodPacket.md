@@ -447,7 +447,7 @@ end:
 All types this body depends on (`TimeTargetObj`, `Elem14Obj`, `Unk2CObj`/
 `Unk2CMethods`, the `Unk70ElemObj`/`Unk70ElemMethods`/`Unk5CMethods` field
 and slot additions, and the `SceneNode__LinkModel` signature correction) are kept
-live in `src/world/TodActor.c` — every one of them is confirmed correct by
+live in `src/world/tod_actor.c` — every one of them is confirmed correct by
 byte-identical surrounding code, independent of the six-word residue above.
 
 ### Proposed learning
@@ -529,7 +529,7 @@ for this function this round).
 
 **Per the head's round-19 broadcast asking specifically about this
 function**: re-verified the "252/258, no drift" claim directly by
-dropping the preserved body into `src/world/TodActor.c` and rebuilding.
+dropping the preserved body into `src/world/tod_actor.c` and rebuilding.
 Confirmed: `funcdiff.py` prints no `WARNING: the build differs OUTSIDE
 this range` line, i.e. the function's compiled length matches retail's
 258 words exactly. The 6 differing words are, position-for-position, a
@@ -647,7 +647,7 @@ constant-vs-pointer-assignment ordering), all in the two symmetric
    Reverted immediately.
 
 All three reverted; confirmed the reversion rebuilds `build exit=0`,
-whole-image green, and `git diff --stat src/world/TodActor.c` shows no
+whole-image green, and `git diff --stat src/world/tod_actor.c` shows no
 uncommitted change.
 
 **This makes 9 manual source reshapes (6 from rounds 14/19 + 3 here) and
@@ -710,7 +710,7 @@ targets a compiler-SYNTHESIZED value's scheduling position (every new lever
 found since round 20 -- dead-parameter reuse, pointer elimination, declared
 width -- operates on a named C variable, and this residue's culprit has no
 C-source name at all), no new build attempt was spent this round. Remains a
-STALL at 252/258, `INCLUDE_ASM` restored, `src/world/TodActor.c` confirmed clean.
+STALL at 252/258, `INCLUDE_ASM` restored, `src/world/tod_actor.c` confirmed clean.
 
 ### Proposed learning
 
@@ -942,7 +942,7 @@ ever found) + 3 reproducer-based reshapes (round 31) + 2 more (this round)
 conclusion: **the two 3-word clusters are a compiler-internal decision
 about when to hoist a magic-multiply constant relative to an adjacent
 register-to-register `move`, with no C-source lever found.** Remains a
-STALL at 252/258, `INCLUDE_ASM` restored throughout, `src/world/TodActor.c`
+STALL at 252/258, `INCLUDE_ASM` restored throughout, `src/world/tod_actor.c`
 confirmed clean (`git status --porcelain` empty) before and after.
 
 ### Proposed learning
@@ -998,7 +998,7 @@ negative) — this round's actual search budget went to this unit's two
 never-freshly-searched siblings (`TodActor__CreateParts`, `TodActor__ApplyTodFrame`)
 instead, per the same "search coverage, not just search recency" priority
 recorded in `TodActor__SetDisplay`'s round-49 entry. Remains a STALL at 252/258,
-`INCLUDE_ASM` restored, `src/world/TodActor.c` confirmed clean before and
+`INCLUDE_ASM` restored, `src/world/tod_actor.c` confirmed clean before and
 after.
 
 ### Proposed learning
@@ -1094,13 +1094,13 @@ Round 75 (charlie), track 3.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/tod_actor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (LinkResource)
 
-2026-09-26, round 89 (delta): `Unk2CObj`/`Unk2CMethods` (src/world/TodActor.c)
+2026-09-26, round 89 (delta): `Unk2CObj`/`Unk2CMethods` (src/world/tod_actor.c)
 were a view of LinkResource (gLinkResourceMethods), now unified in
-`include/LinkResource.h`; ModelData's `linkResource` is typed
+`include/link_resource.h`; ModelData's `linkResource` is typed
 `struct LinkResource *`. The model-id packet calls its `getModel` (+0x080,
 LinkResource__GetModel) directly, the `TmdModel *` result cast to the
 existing `s32 v`. Byte-identical.
@@ -1118,12 +1118,12 @@ delay slot, replacing the `nop` retail keeps there. Instruction order.
 ## Track 6 (round 93, echo)
 
 The part's coordinate parameters, read through `coord2->param`, were
-TodActor.c's `TimeTargetObj` ({s32 scale[3]; pad; s16 rotate[3]; pad;
+tod_actor.c's `TimeTargetObj` ({s32 scale[3]; pad; s16 rotate[3]; pad;
 s32 trans[3]}): that is Sony's `GsCOORD2PARAM` ({VECTOR scale; SVECTOR rotate;
 VECTOR trans}), same offsets and same use. The local type is deleted and the
 body reads `&param->rotate.vx`, `&param->scale.vx`, `&param->trans.vx` and
 `trans.vx/vy/vz` (the scale/trans cursors are `long *`, VECTOR's member type);
-TodActor.c now includes <libgte.h>, <libgpu.h>, <libgs.h>. Byte-identical.
+tod_actor.c now includes <libgte.h>, <libgpu.h>, <libgs.h>. Byte-identical.
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
@@ -1132,7 +1132,7 @@ SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX
 ## Track 7 (round 99, bravo): readable spelling, byte-identical
 
 The live body now spells the decoded header as a `TodPacketHeader head`
-(`objectId`, `type`, `flag`, `length`; `src/world/TodActor.c`) instead of
+(`objectId`, `type`, `flag`, `length`; `src/world/tod_actor.c`) instead of
 `u8 outbuf[4]`, and the data as `s32 *data` indexed `data[i]` (still the
 round-75 lever: the blob is indexed, not walked) with `data += 3` / `data += 2`
 for the old `+ 0xC` / `+ 8`. Locals: `packet` (was `acc`), `part` (`elem`),
@@ -1149,4 +1149,4 @@ is `(u32 *)packet + head.length` (was `(u8 *)packet + length * 4`). The
 
 Pointer types in place of `s32`: `New_TimBlockSrc(char *name)` returning `TimBlockSrc *`, ModelData's `scanPackets(self, u8 *out, u32 *tmdId)` and `decodePacketWord(self, u32 *packet, u8 *objId, u8 *type, u8 *flag, u8 *len)` slots and their forwarders, so the `(s32)` casts at the callers (ObjM__InitStyleAndWorld, TodActor__CreateParts, TodActor__ApplyTodPacket) and the forwarders' casts back are gone; CreateParts' `tmdId` buffer is `u32[4]` to match. Byte-identical, no new compiler warnings (full rebuild, 37 before and after).
 
-TodActor.c's `TodPacketHeader` (the four bytes DecodeTodPacketWord writes out) moved to include/Tod.h beside `TodPacket`, and ScanTodPackets decodes into one `TodPacketHeader head` instead of four u8 locals: they already sat at sp+0x18..0x1B in that order, so the frame is unchanged (98/98, whole image green). Tod.h's DecodeTodPacketWord prototype and slot take the definition's parameter names. `TodPacket` (the raw header word plus data) stays a separate type: it is the packet in memory, TodPacketHeader its decoded fields, whose bytes do not line up with the word's (type and flag are nibbles of byte 2).
+tod_actor.c's `TodPacketHeader` (the four bytes DecodeTodPacketWord writes out) moved to include/tod.h beside `TodPacket`, and ScanTodPackets decodes into one `TodPacketHeader head` instead of four u8 locals: they already sat at sp+0x18..0x1B in that order, so the frame is unchanged (98/98, whole image green). tod.h's DecodeTodPacketWord prototype and slot take the definition's parameter names. `TodPacket` (the raw header word plus data) stays a separate type: it is the packet in memory, TodPacketHeader its decoded fields, whose bytes do not line up with the word's (type and flag are nibbles of byte 2).

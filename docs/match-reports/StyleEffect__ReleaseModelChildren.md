@@ -4,14 +4,14 @@
 
 > Renamed from `func_80056B8C` on 2026-09-23 (tools/rename.py). Address 0x80056b8c.
 
-Unit `ObjMStyleActor`. `self` is the owning `LinkNode`.
+Unit `dream_scene`. `self` is the owning `LinkNode`.
 
 ## Classification
 
 Clean on all four carve-time screens. A guarded release of the fixed
 2-element `arr7C` array, using the same `ReleaseBasicClassArray(void **array, s32
-count)` already established in `TmdRenderer.c` and reused (for the SIBLING
-5-element `arr84` array) in `ObjMStyleActor.c`.
+count)` already established in `tmd_renderer.c` and reused (for the SIBLING
+5-element `arr84` array) in `dream_scene.c`.
 
 ## Body
 
@@ -37,7 +37,7 @@ caller StyleEffect__ReleaseByKind (kind 0), itself called from the dtor.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+dream_scene.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/style_effect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
 
 ## Naming (track 7, round 101)
 

@@ -11,7 +11,7 @@ diverge; second attempt (after fixing an if/else-if inversion) matched.
 
 ```c
 /* Local view of the object CdDriver__Close/EnqueueCdRequest/CloseCdFile read
- * through -- the real struct is ObjA34_179D8H (src/cd/CdDriver.c), but that
+ * through -- the real struct is ObjA34_179D8H (src/cd/cd_driver.c), but that
  * type is that unit's own local reading, not a shared header, so this unit
  * carries its own minimal view of the two offsets it actually touches. */
 typedef struct Obj80027480 {
@@ -75,7 +75,7 @@ sibling blocks the compiler places first, driven purely by which one is the
 
 ## Struct note
 
-`self` is `ObjA34_179D8H` (see `src/cd/CdDriver.c`), which this unit does
+`self` is `ObjA34_179D8H` (see `src/cd/cd_driver.c`), which this unit does
 not include -- that type is `CdDriver`'s own local reading, not a shared
 header. This unit's local view (`Obj80027480`) only names the two offsets
 this function touches (`unk0C` at +0xC, a `s32`; `unk28` at +0x28, a `u16`,
@@ -130,7 +130,7 @@ For the head to apply by type scope (out of unit):
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
 | CdDriver | `MethodsA34_179D8H` | `onError` | `close` | A | `+0x048` of `gCdDriverMethods` is `CdDriver__Close`; `ReadCdFile` calls it when the file is not open, which is a close of an unopened file, not an error report |
-| include/GameApplicationFileResource.h | `FileResourceMethods` | `onBufferChanged` | `close` | A | `+0x048`; `FileResource__LoadFile` calls it after the read and on allocation failure, `FileResource__Finalize` before freeing the buffer; the one populated override is `CdDriver__Close` |
+| include/data_source.h | `FileResourceMethods` | `onBufferChanged` | `close` | A | `+0x048`; `FileResource__LoadFile` calls it after the read and on allocation failure, `FileResource__Finalize` before freeing the buffer; the one populated override is `CdDriver__Close` |
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Close` -> `CdDriver__Close` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/cd_driver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Close` -> `CdDriver__Close` by rename.py.

@@ -109,7 +109,7 @@ same root cause:
 an explicit local (`g = o->unkC; o->unkC = g->methods->slot4(g);`) so cc1
 only ever reads the struct field once per step. 74/74 on the rebuild.
 
-## New/corrected struct knowledge (`include/DayTaskStageMap.h`)
+## New/corrected struct knowledge (`include/dream_day.h`)
 
 - `DayTaskMethods::dtor` (+0x00C) and `::slot14` (+0x014) typed (were
   untyped placeholders / grouped `void *` padding).
@@ -179,4 +179,4 @@ from memory each time it's used).
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Renamed from Obj865C8__Dtor: the +0x00C finalize override (it ends in TimedTask's finalize). SubObjG's slot4 is BasicClass's release, so the six `x = x->methods->slot4(x)` calls are `release`; slot14 is removeChild.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__Dtor: the +0x00C finalize override (it ends in TimedTask's finalize). SubObjG's slot4 is BasicClass's release, so the six `x = x->methods->slot4(x)` calls are `release`; slot14 is removeChild.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80040A30` on 2026-09-18 (tools/rename.py). Address 0x80040a30.
 
-Unit: `src/ui/ScreenWidgets.c`. First attempt.
+Unit: `src/ui/screen_widgets.c`. First attempt.
 
 ```c
 void TextRow__Finalize(Obj6EAC0 *self) {
@@ -23,15 +23,15 @@ the PRECEDING call's return" idiom, and it is what motivated retyping
 
 ## Existing declaration retyped
 
-`include/Task.h`'s `BMemPMgrFree` was declared `void
-BMemPMgrFree(void *ptr)`, following `GameApplicationFileResource.h`/`entity.h`'s
+`include/task.h`'s `BMemPMgrFree` was declared `void
+BMemPMgrFree(void *ptr)`, following `data_source.h`/`entity.h`'s
 typing. Its own (still-`INCLUDE_ASM`) disassembly
 (`asm/nonmatchings/BMemPMgr/BMemPMgrFree.s`) ends with an explicit
 `addu $v0, $zero, $zero` -- it genuinely returns `NULL`, and this
 function is the first in this unit to actually USE that return value
 (`self->unkB4 = BMemPMgrFree(self->unkB4)`). Retyped to
 `void *BMemPMgrFree(void *ptr)`. Every other call site in this unit
-(`Task.c`, `code_2cc8c_d.c`) discards the result as a bare
+(`task.c`, `code_2cc8c_d.c`) discards the result as a bare
 statement, so the retype changes no compiled bytes there; confirmed by
 a full green `build-and-verify.sh`.
 
@@ -61,8 +61,8 @@ confirmed.
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->finalize((CharSprite *)self)` (was `->slot0C(self)`): an upcast, no code. Image byte-identical.
+2026-09-26, round 86 (bravo): the parent class 0x1144 is unified as CharSprite (`include/char_sprite.h`, formerly D_8006EC74). The base call is `GetCharSpriteMethods()->finalize((CharSprite *)self)` (was `->slot0C(self)`): an upcast, no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__Destruct`: the +0x00C finalize occupant. Releases `cellCount` cells (ReleaseBasicClassArray), frees `cells`, then CharSprite's finalize. Image byte-identical; the current source is src/ui/ScreenWidgets.c.
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/text_row.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__Destruct`: the +0x00C finalize occupant. Releases `cellCount` cells (ReleaseBasicClassArray), frees `cells`, then CharSprite's finalize. Image byte-identical; the current source is src/ui/screen_widgets.c.

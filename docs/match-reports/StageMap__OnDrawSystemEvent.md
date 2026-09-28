@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004BD14` on 2026-09-24 (tools/rename.py). Address 0x8004bd14.
 
-**Unit:** DayTaskStageMap · **Size:** 80 words · **Status:** MATCHED (first attempt).
+**Unit:** dream_day · **Size:** 80 words · **Status:** MATCHED (first attempt).
 
 ## Result
 
@@ -45,7 +45,7 @@ void StageMap__OnDrawSystemEvent(Obj866E8 *self, void *arg1, s32 mode) {
 ```
 
 `self->arr[7]` walk with stride `0x1C` (matching `Elem`'s already-established
-size). `arg1` (the DayTaskStageMap independent view of this same slot,
+size). `arg1` (the dream_day independent view of this same slot,
 `slot100`, is `void (*)(StageMap *self, void *arg1, s32 arg2)`) is truly
 unused here -- confirmed by register tracing, `$a1` is never read.
 
@@ -59,7 +59,7 @@ the time of the final store the field no longer holds `1`.
 This function is also where `ElemTarget`'s `+0x02A`/`+0x02C`/`+0x02E` fields
 (all read/written through `e->unk4`) were established, and where
 `Obj866E8Methods::slot88`/`slot104` got their signatures (both cross-checked
-against DayTaskStageMap's independent view of the same vtable, which names them
+against dream_day's independent view of the same vtable, which names them
 identically in arity if not in exact parameter types).
 
 ### Proposed learning
@@ -81,7 +81,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BD14` | `StageMap__OnDrawSystemEvent` | B | Occupant of `gStageMapMethods` +0x100 (`slot100`). `DayTaskStageMap`'s `StageMap__OnNotify` (already matched) dispatches this slot, unconditionally, only when `(sender->methods->header & 0xF) == 1` -- i.e. only for one sender class tag. Follows the SAME "OnNotifyTagN" naming convention already established elsewhere in this codebase for identical per-tag dispatch targets (`Viewport__OnFrameClockEvent`/`Viewport__OnDrawSystemEvent`, `src/app/Task.c`). `mode` here is the caller's own `command`, but the body itself early-returns unless `mode == 2` -- narrower than "every tag-1 notification", which the name does not claim (only that this IS the tag-1 dispatch target). |
+| `func_8004BD14` | `StageMap__OnDrawSystemEvent` | B | Occupant of `gStageMapMethods` +0x100 (`slot100`). `dream_day`'s `StageMap__OnNotify` (already matched) dispatches this slot, unconditionally, only when `(sender->methods->header & 0xF) == 1` -- i.e. only for one sender class tag. Follows the SAME "OnNotifyTagN" naming convention already established elsewhere in this codebase for identical per-tag dispatch targets (`Viewport__OnFrameClockEvent`/`Viewport__OnDrawSystemEvent`, `src/app/task.c`). `mode` here is the caller's own `command`, but the body itself early-returns unless `mode == 2` -- narrower than "every tag-1 notification", which the name does not claim (only that this IS the tag-1 dispatch target). |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 
@@ -94,11 +94,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -115,6 +115,6 @@ an operator decision; not hand-reverted).
 
 Parameters and locals: `arg1` -> `sender`, `mode` -> `command` (OnNotify's command, tier A), `e` -> `slot`, `curMode` -> `pending` (`loadsPending`'s value).
 
-Constants: 2 -> `DRAWSYSTEM_EVENT_VSYNC` (include/DrawSystem.h, new): OnNotify calls this method for a sender whose class id's low nibble is 1, DrawSystem's family (class id 0x1), and DrawSystem__RunLoop (src/code_10ee0.c) calls `notifyParents(self, 2)` once per VSync pass; DrawSystem.h's banner says StageMap adds it as a child. 7 -> `STAGEMAP_EVENT_SLOT_DATA_READY`, `headerReady = 2` -> `LBDFILE_HEADER_CONSUMED` (include/LbdFile.h, new; its banner already said "marks the header consumed (headerReady 2)"), loop bound -> `ARRAY_COUNT(self->slots)`.
+Constants: 2 -> `DRAWSYSTEM_EVENT_VSYNC` (include/draw_system.h, new): OnNotify calls this method for a sender whose class id's low nibble is 1, DrawSystem's family (class id 0x1), and DrawSystem__RunLoop (src/code_10ee0.c) calls `notifyParents(self, 2)` once per VSync pass; draw_system.h's banner says StageMap adds it as a child. 7 -> `STAGEMAP_EVENT_SLOT_DATA_READY`, `headerReady = 2` -> `LBDFILE_HEADER_CONSUMED` (include/lbd_file.h, new; its banner already said "marks the header consumed (headerReady 2)"), loop bound -> `ARRAY_COUNT(self->slots)`.
 
-Not renamed: the method name. Viewport has the same `OnNotifyTag1` for its DrawSystem case (src/app/Task.c), so it is a convention across two classes; proposed to the head as one rename of both (e.g. `OnDrawSystemNotify`) rather than breaking the pair here.
+Not renamed: the method name. Viewport has the same `OnNotifyTag1` for its DrawSystem case (src/app/task.c), so it is a convention across two classes; proposed to the head as one rename of both (e.g. `OnDrawSystemNotify`) rather than breaking the pair here.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BAB4` on 2026-09-23 (tools/rename.py). Address 0x8003bab4.
 
-**Unit:** Task · **Size:** 42 words · **Status:** MATCHED (42/42)
+**Unit:** task · **Size:** 42 words · **Status:** MATCHED (42/42)
 
 ## Summary
 
@@ -77,16 +77,16 @@ than guess.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). The onInit up-call casts the slot to `void (*)(TaskCore *)`: IntermediateBase types onInit (self, s32, s32, s32) from init's call, and this call passes self alone.
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green). The onInit up-call casts the slot to `void (*)(TaskCore *)`: IntermediateBase types onInit (self, s32, s32, s32) from init's call, and this call passes self alone.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BAB4. Occupies +0x04C onInit and up-calls TaskCore's first, then MoviePlayer__SetAutoPlay(autoPlay) and MoviePlayer__Play(streamName, streamGroup, unkC4, loopCount); a nonzero Play result is setFrameBound(0).
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BAB4. Occupies +0x04C onInit and up-calls TaskCore's first, then MoviePlayer__SetAutoPlay(autoPlay) and MoviePlayer__Play(streamName, streamGroup, unkC4, loopCount); a nonzero Play result is setFrameBound(0).
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4Obj view is gone and Task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The calls are `setAutoPlay` (+0x06C) and `play` (+0x040), `play`'s name argument cast `(char *)self->streamName` (no code). Byte-identical.
+The player is a MoviePlayer (`include/movie_player.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in stream_task.h) to `MoviePlayer *`. The calls are `setAutoPlay` (+0x06C) and `play` (+0x040), `play`'s name argument cast `(char *)self->streamName` (no code). Byte-identical.
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.
+`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in game_shell.c are gone. Byte-identical.

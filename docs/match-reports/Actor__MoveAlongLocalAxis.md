@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057534` on 2026-09-19 (tools/rename.py). Address 0x80057534.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys` (self+0, vtable
+Unit: `src/world/dream_scene.c`. Class: `DreamSys` (self+0, vtable
 `vtable_DreamSys`, resolved via `tools/classtable.py gDreamSysMethods`).
 
 ## Signature
@@ -34,11 +34,11 @@ void Actor__MoveAlongLocalAxis(DreamSys *self, s16 *slot, s32 val, void *extra, 
 Writes `val` (truncated to 16 bits) into `*slot` and into
 `self->lastOffsetValue`, dispatches through the shared base table's `+0x0C0`
 slot (`Actor__AddLocalTranslation`, resolves to `Actor__MoveLocalZ`'s neighbour -- out of
-this unit's range, see `include/DreamSys.h`) with a hardcoded
+this unit's range, see `include/dream_sys.h`) with a hardcoded
 `&sActorLocalMove[0]` argument (always the FIRST element, regardless of which
 `slot` was written), unconditionally resets `*slot` to 0, then -- only if
 `extra` is non-NULL -- dispatches through `+0x088`
-(`DreamSys__NotifyLinkAttempt`, already named in `include/DreamSys.h`) with `count`.
+(`DreamSys__NotifyLinkAttempt`, already named in `include/dream_sys.h`) with `count`.
 
 The `*slot = 0` reset is unconditional even though it reads as though it
 belongs to the `if`: retail schedules it into the `beqz`'s delay slot,
@@ -92,7 +92,7 @@ into the caller-supplied `slot` pointer AND into
 buffer through the inherited `Actor__AddLocalTranslation`, resets
 `*slot` back to 0, and -- only if `extra` is non-NULL -- forwards `count`
 through `self->vt->DreamSys__NotifyLinkAttempt` (a notify/dispatch call, already named
-in `include/DreamSys.h` but not yet given a friendly name by that slot's
+in `include/dream_sys.h` but not yet given a friendly name by that slot's
 own owning unit). "AndNotify" covers that conditional tail without
 asserting what the notification means.
 
@@ -136,7 +136,7 @@ in the same function; truncate once into a named local instead).
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__ApplyOffsetSlotAndNotify`. The body behind the three moves: store val in one component (`axis`) of the local move vector sActorLocalMove, keep it in lastOffsetValue, addLocalTranslation (+0x0C0) the whole vector, clear the component, and when `notify` is non-NULL call notifyIfUnk20Active (+0x088) with the move's event (6 z, 7 x, 8 y). DreamSys__NotifyLinkAttempt was DreamSys's override of that slot, not the slot. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__ApplyOffsetSlotAndNotify`. The body behind the three moves: store val in one component (`axis`) of the local move vector sActorLocalMove, keep it in lastOffsetValue, addLocalTranslation (+0x0C0) the whole vector, clear the component, and when `notify` is non-NULL call notifyIfUnk20Active (+0x088) with the move's event (6 z, 7 x, 8 y). DreamSys__NotifyLinkAttempt was DreamSys's override of that slot, not the slot. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 
@@ -144,7 +144,7 @@ Comments quoted below are verbatim as the file stood before this round's
 comment pass, i.e. with this round's renames already applied (the
 `LinkQueryBuf` one as it stood before step 2).
 
-- **`volatile` dropped from `event`** (here and in `include/Actor.h`'s
+- **`volatile` dropped from `event`** (here and in `include/actor.h`'s
   prototype). It was never needed: `event` is the fifth argument, so it
   arrives on the caller's stack and GCC loads it there at its one use.
   Measured: 31/31 and the whole image byte-identical without it. The

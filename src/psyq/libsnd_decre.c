@@ -5,7 +5,7 @@
  * Snd_decrescendo is libsnd's per-tick volume fade-out for one sequence,
  * the mirror of Snd_crescendo (libsnd_cres.c): the linked libsnd objects
  * call it by this name (config/psyq-objects.ld). Its record is Sony's
- * _ss_score entry, include/SsScore.h.
+ * _ss_score entry, include/ss_score.h.
  *
  * Which object (nm over sdk/work/<disc>/elf/libsnd): decre.o on 3.0, 3.3
  * and 3.5, decres.o on 3.6, with this one function as its only text

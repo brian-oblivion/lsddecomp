@@ -8,7 +8,7 @@ Entity's constructor, reached both directly (this function) and indirectly
 through the vtable's own `ctor` slot (`GetEntityMethods()->ctor`, see
 `New_Entity`). First calls the shared base-class constructor,
 `GetTodActorMethods()->ctor(this, arg2, arg3)` — `GetTodActorMethods()` (matched in
-`TodActor.c`) returns the SAME shared "BasicClass" ancestor vtable that
+`tod_actor.c`) returns the SAME shared "BasicClass" ancestor vtable that
 `TodActor` also derives from (see the big comment at the top of
 `include/entity.h`). Only on success does it finish initializing: assigns
 `this->methods` to `GetEntityMethods()` (Entity's OWN vtable — the base
@@ -86,7 +86,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Polish (round 96, bravo, track 7)
 
-- Step 3: parameter arg2 -> sound: it is TodActor's ctor's second argument, the sound bank TodActor keeps in `sound` (TodActor.h). Also in entity.h's prototype and ctor slot.
+- Step 3: parameter arg2 -> sound: it is TodActor's ctor's second argument, the sound bank TodActor keeps in `sound` (tod_actor.h). Also in entity.h's prototype and ctor slot.
 
 ## History (moved from include/Entity.h, round 102)
 

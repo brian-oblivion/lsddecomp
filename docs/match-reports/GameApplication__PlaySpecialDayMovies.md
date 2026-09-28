@@ -6,7 +6,7 @@
 
 > Renamed from `func_8002658C` on 2026-09-24 (tools/rename.py). Address 0x8002658c.
 
-**Unit:** GameApplicationFileResource · **Size:** 65 instructions (0x104 bytes) · **Status:** MATCHED (65/65 words, whole-image SHA1 green)
+**Unit:** game_shell · **Size:** 65 instructions (0x104 bytes) · **Status:** MATCHED (65/65 words, whole-image SHA1 green)
 
 ## What it does
 
@@ -72,7 +72,7 @@ field's own address.**
 
 ## New struct/header knowledge
 
-`include/GameApplication.h`: added `StreamTaskMethods.slot6C` and `.slot12C` (new
+`include/game_application.h`: added `StreamTaskMethods.slot6C` and `.slot12C` (new
 slots, both `(void *self, s32 a1)`), retyped `slot44`'s 3rd parameter from
 `const char *path` to plain `s32 arg2` -- confirmed generic by this call
 site passing a computed count where `GameApplication__ShowIntroLogos` passed a string
@@ -118,7 +118,7 @@ mention GraphRoom).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
+game_application.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
 
 ## Track 7 polish (round 100, echo)
 
@@ -144,8 +144,8 @@ extern s32 GetSpecialDayMovieSpan(s32 *out, s32 a1, s32 a2); /* psyq_memset.s: w
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.
+`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in game_shell.c are gone. Byte-identical.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into CdDriver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes CdDriver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

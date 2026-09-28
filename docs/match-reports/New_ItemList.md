@@ -6,19 +6,19 @@
 
 > Renamed from `func_80051A5C` on 2026-09-24 (tools/rename.py). Address 0x80051a5c.
 
-Unit: `src/ui/TextEntryItemList.c`. `New_ItemList` -- the allocator for
+Unit: `src/ui/input_dialogs.c`. `New_ItemList` -- the allocator for
 `ItemList_3bb8c_j` (a small BasicClass-derived sibling class discovered this
 round, alloc size 0x54, vtable gItemListMethods reached through `GetItemListMethods()`
-(ObjMStyleActor) -- NOT `gTextEntryMethods`/`GetTextEntryMethods`, which is a
-DIFFERENT, unrelated class (`Obj86ED0`, established by TextEntryItemList) that
+(dream_scene) -- NOT `gTextEntryMethods`/`GetTextEntryMethods`, which is a
+DIFFERENT, unrelated class (`Obj86ED0`, established by input_dialogs) that
 this function's own body never touches; ROUND 75 CORRECTION, see
 `GetTextEntryMethods.md`).
 
 This function ALREADY had an extern declaration in the shared
-`include/class_3bb8c.h` (TitleMenuTaskObjF's own screening, "Address-of only
+`include/class_3bb8c.h` (title_menu's own screening, "Address-of only
 in this unit's own screening"), with the correct signature
 `void *New_ItemList(void *arg0, s32 arg1)` -- confirms `arg1` is `s32`
-(TitleMenuTaskObjF's own call site passes a literal `1`), which fixed this
+(title_menu's own call site passes a literal `1`), which fixed this
 unit's own ctor-table `+0x008` slot signature to match.
 
 ## Body
@@ -75,5 +75,5 @@ exit"), reinforcing that this sub-shape specifically wants `goto`.
 ## Track 7 (round 100, charlie)
 
 `BMemPMgrAlloc(0x54)` is `BMemPMgrAlloc(sizeof(ItemList))` (the struct in
-include/ItemList.h ends at +0x054). The goto keeps a one-line MATCHING
+include/item_list.h ends at +0x054). The goto keeps a one-line MATCHING
 comment; its derivation is "Residue and how it closed" above.

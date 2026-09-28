@@ -90,13 +90,13 @@ elsewhere in the codebase. Not renamed (already correct).
 
 ## Track 4 (2026-09-26, round 88, echo)
 
-First parameter retyped `void *` -> `s32 moodIndex` (Entity__Entity stores it in `moodIndex`; DreamAux passes `i + 0x62` and `kind` with `(void *)` casts, now dropped). DreamAux's local `extern void *New_Entity` is deleted; it includes entity.h.
+First parameter retyped `void *` -> `s32 moodIndex` (Entity__Entity stores it in `moodIndex`; dream_aux passes `i + 0x62` and `kind` with `(void *)` casts, now dropped). dream_aux's local `extern void *New_Entity` is deleted; it includes entity.h.
 
 The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `include/entity.h`: a TodActor subclass whose table and object expand `TODACTOR_SLOTS`/`TODACTOR_FIELDS`. Any source block above is the pre-unification spelling; the live body takes the inherited names (fields `parent`, `coord2`->`tx/ty/tz`, `tick`, `linkTarget`, `state` (was `moodState`), `lastOffsetValue`, `grid` (was `unk4C`), `ticker` (was `companion2`), `arg2` (was `soundCueChannel`), `parts`, `todPlaying`, `peer` (was `target`, cast to the `Unk94Obj` DreamSys view where its own slots are called); slots `reset`, `setDisplay`, `setLightMode`, `setTranslation`/`addTranslation`, `moveLocalZ/X/Y`, `moveLocalZOrFindLink`, `selectTickCallback`, `enableTickCallback`/`disableTickCallback`, `distanceToPeer`, `setTargetReached`, `updateActivationState`/`updateDeactivationState`), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Polish (round 96, bravo, track 7)
 
-- Step 3: parameter arg2 -> sound: it is TodActor's ctor's second argument, the sound bank TodActor keeps in `sound` (TodActor.h). Also in entity.h's prototype and ctor slot.
+- Step 3: parameter arg2 -> sound: it is TodActor's ctor's second argument, the sound bank TodActor keeps in `sound` (tod_actor.h). Also in entity.h's prototype and ctor slot.
 
 - Step 4: BMemPMgrAlloc(0x108) -> sizeof(Entity) (Entity is 0x108 bytes; byte-identical).
 

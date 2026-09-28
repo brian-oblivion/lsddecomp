@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C408` on 2026-09-26 (tools/rename.py). Address 0x8002c408.
 
-Unit: `PlacementGridVabSound`. Runner: echo, round 17.
+Unit: `vab_sound`. Runner: echo, round 17.
 
 ## Result
 
@@ -21,7 +21,7 @@ Byte-exact, 2/2 words.
 Trivial leaf: `jr $ra; addu $v0,$zero,$zero`. This is `gNullDriverMethods`'s vtable
 slot +0x054 (confirmed with `tools/classtable.py gNullDriverMethods`), a class table
 that `tools/classtable.py --scan` recognises -- see the corrected header
-comment in `src/sound/PlacementGridVabSound.c` for why this unit IS class-framework code,
+comment in `src/sound/vab_sound.c` for why this unit IS class-framework code,
 contrary to the assignment's inherited "not class-framework" note (that
 finding belongs to the sibling slices' different neighbourhood, not this
 one).
@@ -33,10 +33,10 @@ chosen for simplicity.
 
 ### Proposed learning
 
-`PlacementGridVabSound`'s globals (`gNullDriverMethods`, `gVabStreamObjMethods`) ARE class-framework
+`vab_sound`'s globals (`gNullDriverMethods`, `gVabStreamObjMethods`) ARE class-framework
 tables -- `tools/classtable.py --scan` hits both (29 and 39 slots). The
 "code_179d8 is not class-framework code" finding from round 16 is
-neighbourhood-scoped (libcd_bios's SIO globals, PlacementGridVabSound's driver
+neighbourhood-scoped (libcd_bios's SIO globals, vab_sound's driver
 globals), not monolith-wide, and should not be inherited by every future
 slice of this monolith without re-checking `classtable.py --scan` against
 that slice's own globals.
@@ -46,7 +46,7 @@ that slice's own globals.
 Kept `func_8002C408`, tier C (superseded 2026-09-26, Track 4 below). The CLASS is now established (round 52:
 `gNullDriverMethods`, the generic driver-interface base class
 `VabStreamObj` chains its own ctor/close through when
-`sActiveDataSource == 0x23` -- see `src/sound/PlacementGridVabSound.c`'s unit header
+`sActiveDataSource == 0x23` -- see `src/sound/vab_sound.c`'s unit header
 comment), but this SLOT's own purpose within that interface is not: the
 body is `return 0;` and nothing in this unit calls the slot directly (only
 the vtable data references it). No positive evidence for what a caller
@@ -57,15 +57,15 @@ a wrong tier-A guess here would be worse than the placeholder.
 
 Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
 gNullDriverMethods --vs gFileResourceMethods` puts this function at `+0x054`, one of
-FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
+FileResource's run-time-bound driver-interface slots (`include/file_resource.h`
 names it `read`; the CD driver's occupant is `CdDriver__Read`).
-`SetActiveDataSource` (GameApplicationFileResource.c) copies the active driver's interface
+`SetActiveDataSource` (game_shell.c) copies the active driver's interface
 slots into FileResource's table and every client table, and takes this table
 (`GetNullDriverMethods()`) whenever `sActiveDataSource != DATASOURCE_CD`, so
 when the SPU/VAB source is active every `methods->read(...)` in the game
 reaches this body. The purpose evidence the tier-C verdict above lacked is
 the slot's, not the body's: the body does nothing, which is what the VAB
-driver does for that interface call. Unified into `include/NullDriver.h`.
+driver does for that interface call. Unified into `include/null_driver.h`.
 
 ## Unit banner history (moved from src/code_179d8_e.c, round 98, charlie, track 7)
 

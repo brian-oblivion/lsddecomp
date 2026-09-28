@@ -4,13 +4,13 @@
 
 > Renamed from `func_80026CE8` on 2026-09-18 (tools/rename.py). Address 0x80026ce8.
 
-**Unit:** GameApplicationFileResource · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** game_shell · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 ## What it does
 
-Fills a `ResourceRequest` (`include/GameApplicationFileResource.h`) -- `buffer`, `name`,
+Fills a `ResourceRequest` (`include/data_source.h`) -- `buffer`, `name`,
 `mode` -- and returns the pointer. That is the descriptor the LinkResource,
-Tod, TodSet, ModelData and TriggerWorld ctors take (GraphicsResources.c's
+Tod, TodSet, ModelData and TriggerWorld ctors take (graphics_resources.c's
 `ResourceSource` declares only its first two words).
 
 ## Derivation
@@ -27,7 +27,7 @@ The leading `addu $v0, $a0, $zero` copies the incoming pointer into the return
 register before the stores, which only makes sense if the function's C source
 actually returns it — nothing else in the body needs a copy of `$a0` in
 `$v0`. Declared accordingly, rather than as `void`, on that positive evidence
-(the one caller found, in `asm/nonmatchings/DreamAux/InitDreamAux.s`,
+(the one caller found, in `asm/nonmatchings/dream_aux/InitDreamAux.s`,
 discards the return value, so a `void` guess would have looked equally
 plausible from the call site alone — the `addu` in this function's own body is
 what settles it):
@@ -89,53 +89,53 @@ Not `LongVec3` (the words are a pointer, a string and a flag) and not Sony's
 `VECTOR` (no fourth word is touched).
 
 Several unit-local views of this same descriptor remain, under other names:
-`ResourceSource` and `ResourceSourceArgs` (GraphicsResources.c),
-`DreamAuxLoadReq` (DreamAux.h), `LoadRequest` (DayTaskStageMap.h),
-`LoadModelRequest` (GameApplicationFileResource), `ResourceSourceRequest` (DayTaskStageMap.c). Some are
+`ResourceSource` and `ResourceSourceArgs` (graphics_resources.c),
+`DreamAuxLoadReq` (dream_aux.h), `LoadRequest` (dream_day.h),
+`LoadModelRequest` (game_shell), `ResourceSourceRequest` (dream_day.c). Some are
 0x10-byte locals, where the stack slot size may be what matches, so merging
 them is a head decision (proposed below), not a rename.
 
 ## Proposed (not applied: outside this job's edit set)
 
 - One header for the descriptor (e.g. `include/ResourceSource.h`) holding a
-  single definition, retiring `ResourceRequest`, GraphicsResources.c's
+  single definition, retiring `ResourceRequest`, graphics_resources.c's
   `ResourceSource`/`ResourceSourceArgs`, `DreamAuxLoadReq`, `LoadRequest`,
   `LoadModelRequest` and `ResourceSourceRequest`, with `ResourceRequest__Set`'s
   prototype there. Check each 0x10-byte local keeps its size.
-- `include/DreamAux.h`'s comment above `DreamAuxLoadReq` still quotes the
+- `include/dream_aux.h`'s comment above `DreamAuxLoadReq` still quotes the
   old body (`this->x=x; ...`) and calls the record "physically the same shape"
   as the vector; it now reads as the same descriptor as `ResourceRequest`.
-- `ResourceRequest__Set`'s prototype is not in `include/GameApplicationFileResource.h`: three
-  units declare their own (typed to their local view), and DreamAux.h's
+- `ResourceRequest__Set`'s prototype is not in `include/data_source.h`: three
+  units declare their own (typed to their local view), and dream_aux.h's
   would conflict with it in any file including both.
 
 ### Track 6 (round 97, alpha): one definition
 
-`ResourceRequest` now lives in `include/FileResource.h`, beside the
+`ResourceRequest` now lives in `include/file_resource.h`, beside the
 `ResourceSource` it extends, as `{ ResourceSource src; s32 mode; }`, with
-`ResourceRequest__Set`'s one prototype under it. `include/GameApplicationFileResource.h` no
+`ResourceRequest__Set`'s one prototype under it. `include/data_source.h` no
 longer defines it. The body reads `this->src.buffer = buffer;
 this->src.name = name; this->mode = mode;`. Retired onto it:
-GraphicsResources.c's `ResourceSourceArgs` (ModelData__BuildResources,
-TriggerWorld__BuildResources, TodSet__BuildTods) and include/DreamAux.h's
+graphics_resources.c's `ResourceSourceArgs` (ModelData__BuildResources,
+TriggerWorld__BuildResources, TodSet__BuildTods) and include/dream_aux.h's
 `DreamAuxLoadReq` (InitDreamAux), along with the local
 `ResourceRequest__Set` externs typed to them. Every `(ResourceSource *)&req`
 cast became `&req.src`. `mode` stays tier B: every caller passes 1 and no
 code reads it. Image byte-identical after every step.
 
-Kept: `ResourceSourceRequest` (FileResource.h, 0x10 bytes; StageMap__PopulateSlotCells,
+Kept: `ResourceSourceRequest` (file_resource.h, 0x10 bytes; StageMap__PopulateSlotCells,
 DayTask__DayTask, GameApplication__GameApplication). Its callers write only
 `src.buffer` and never call ResourceRequest__Set. Measured this round:
 shrinking its pad to 4 bytes (so it is 0x0C, ResourceRequest's size) still
 builds byte-exact, so its size does not tell the two apart. Retiring it onto
 `ResourceRequest` is proposed, not applied, because its three units are
-outside this job's edit set. `TodActorDesc` (include/TodActor.h) now opens
+outside this job's edit set. `TodActorDesc` (include/tod_actor.h) now opens
 with a `ResourceSource src` but is not a ResourceRequest: see
 TodActor__AcquireModelData.md.
 
 ### Track 6 (round 97, alpha, second job): ResourceSourceRequest retired
 
-`ResourceSourceRequest` is deleted from include/FileResource.h. Its three
+`ResourceSourceRequest` is deleted from include/file_resource.h. Its three
 locals are now `ResourceRequest req;` with `mode` never written:
 
 | function | retail frame | words written | passed |
@@ -154,5 +154,5 @@ array and the frame still shrinks by 8, so the only honest spelling that
 keeps the frame is an existing type of 9..16 bytes, and ResourceRequest is
 the one this descriptor already has. Each local carries a MATCHING line
 saying mode is unset and why the type is not ResourceSource. The
-ResourceRequest comment in FileResource.h now names the three hand-filled
+ResourceRequest comment in file_resource.h now names the three hand-filled
 callers. Image byte-identical after every step.

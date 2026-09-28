@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005CF34` on 2026-09-21 (tools/rename.py). Address 0x8005cf34.
 
-**Unit:** DreamAux · **Size:** 42 words · **Status:** MATCHED round 43
+**Unit:** dream_aux · **Size:** 42 words · **Status:** MATCHED round 43
 (42/42, byte-exact whole-image build).
 
 ## History
@@ -42,20 +42,20 @@ This closes the loop `SetDreamAuxWorld` (matched earlier this round) opened:
 offset 0x4, and `DreamAuxSlot`'s remaining 12 bytes (previously
 `u8 unkC[0xC]`) are exactly a 3-word position vector -- confirmed by this
 function passing `a0->pos` as `SceneNode__LocalOffsetToWorldPos`'s `src` parameter (that
-function, `SceneNode.c`, treats `src` as a 3-word vector unconditionally).
-`DreamAuxSlot` is renamed accordingly in `include/DreamAux.h`
+function, `scene_node.c`, treats `src` as a 3-word vector unconditionally).
+`DreamAuxSlot` is renamed accordingly in `include/dream_aux.h`
 (`void *obj; DreamAuxObj *entity; s32 pos[3];`, still 0x14 bytes).
 
 `SceneNode__LocalOffsetToWorldPos` and `SceneNode__FaceTarget` are both already-matched functions in a
-different unit (`SceneNode.c`), each with its OWN unit's typed view of
-`self`/`target` (`SceneNodeObj *` / `Entity *`, per `SceneNode.h` and
+different unit (`scene_node.c`), each with its OWN unit's typed view of
+`self`/`target` (`SceneNodeObj *` / `Entity *`, per `scene_node.h` and
 `entity.h`'s independent local views of the same shared-ancestor slot). This
 unit adds a third, `void *`-typed, local view rather than pulling in either
 header -- consistent with the project's per-unit-view convention
 (CLAUDE.md's "keep next to your code anything that encodes *your* reading of
 a class"). `SceneNode__LocalOffsetToWorldPos`'s 4th argument register is always 0 at every
 known call site despite the function's own 3-parameter C signature not
-reading it (see `src/world/DreamSys.c`'s identical local prototype); this unit's
+reading it (see `src/world/dream_sys.c`'s identical local prototype); this unit's
 local prototype reproduces that the same way.
 
 Vtable slot 0x13 (byte offset 0x4C) is the SAME shared-ancestor slot
@@ -116,7 +116,7 @@ not read directly off any single instruction.
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
-## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
 ## Naming (round 100)
 

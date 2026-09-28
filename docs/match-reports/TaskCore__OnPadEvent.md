@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C48C` on 2026-09-24 (tools/rename.py). Address 0x8003c48c.
 
-Unit: `Task` · Size: 36 instructions (0x90 bytes) · Round 23 (2026-09-07),
+Unit: `task` · Size: 36 instructions (0x90 bytes) · Round 23 (2026-09-07),
 head. **First of the five `REOPENED -- ASSIGNABLE` functions to be closed, which
 is the measurement that says the round-21 `addiu_at` resolution actually
 returned ground rather than merely retiring paperwork.**
@@ -71,7 +71,7 @@ identical call shapes and needed no encouragement.
 `Obj86B60Methods` slots `+0x074`..`+0x084`, previously inside
 `u8 pad074[0x090 - 0x074]`. **The pad split is additive and preserves the
 original 0x1C total** (5 pointers = 0x14, plus a new `pad088` of 8) — required,
-because `include/Task.h` is shared by six units and any offset movement
+because `include/task.h` is shared by six units and any offset movement
 would have changed an already-matched function's codegen elsewhere. Verified by
 the whole-image SHA1, which is the only thing that can see it.
 
@@ -118,7 +118,7 @@ is its first realised match.
 `gTaskCoreMethods` (the base table), `gTitleMenuMethods` and
 `gGraphRoomMethods` identically (unoverridden by either derived class --
 `tools/classtable.py gTaskCoreMethods`/`gTitleMenuMethods`/`gGraphRoomMethods`).
-`IntermediateBase__OnNotify` (Task.c) dispatches an incoming `EventArg` whose
+`IntermediateBase__OnNotify` (task.c) dispatches an incoming `EventArg` whose
 `target->header & 0xF == 2` through `self->methods->slot58`, matching the
 already-established `onTag1Notify` (header==1, slot54) naming convention one
 slot up. Two independent pieces of evidence agree (the dispatcher's own
@@ -126,7 +126,7 @@ switch and the slot's universal, unoverridden occupancy), so tier A.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__OnTag2Notify (tools/rename.py). Occupant of +0x058 (`onPadEvent`: IntermediateBase__OnNotify's case for a Pad sender), named for the slot. Its cases call +0x074..+0x084 with self alone (byte-identical to passing the sender, which stays in $a1). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__OnTag2Notify (tools/rename.py). Occupant of +0x058 (`onPadEvent`: IntermediateBase__OnNotify's case for a Pad sender), named for the slot. Its cases call +0x074..+0x084 with self alone (byte-identical to passing the sender, which stays in $a1). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Unit history, moved from code_2cc8c.c's banner (round 98, alpha, track 7)
 
@@ -154,7 +154,7 @@ occupant mapping, which had the five handlers reversed; each function's
 
 ## Track 7 (round 98, alpha)
 
-The cases now read `PAD_EVENT_PRESSED + PAD_BUTTON_*` (include/Pad.h):
+The cases now read `PAD_EVENT_PRESSED + PAD_BUTTON_*` (include/pad.h):
 0x12 Lup -> onPadPrev, 0x13 Ldown -> onPadNext, 0x21 Start -> onPadStart,
 0x17 Rdown (cross) -> onPadCancel, 0x19 Rright (circle) -> onPadConfirm.
 The gate is `inputMode != TASKCORE_INPUT_NONE`. Case order is unchanged

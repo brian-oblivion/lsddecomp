@@ -1,4 +1,4 @@
-# TryStartStyleCue -- MATCHED (45/45 words), ObjMStyleActor
+# TryStartStyleCue -- MATCHED (45/45 words), dream_scene
 
 > Renamed from `func_8005556C` on 2026-09-23 (tools/rename.py). Address 0x8005556c.
 
@@ -44,19 +44,19 @@ extern s32 sStyleSceneRefs;                                 /* fresh copy -- see
 extern void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2);  /* forward decl, own unit,
                                                           111w, STALL -- widened round 47,
                                                           see FindNextStyleCueInRange.md */
-extern s32 sStyleCueCallbacks[];                                /* 14-slot table, ObjMStyleActor.c's sStyleCueCallbacks */
+extern s32 sStyleCueCallbacks[];                                /* 14-slot table, dream_scene.c's sStyleCueCallbacks */
 extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 ```
 
-`InitSoundCueSet` is defined in `src/sound/PlacementGridVabSound.c`
+`InitSoundCueSet` is defined in `src/sound/vab_sound.c`
 (`s32 InitSoundCueSet(void *unused, ObjCC34 *obj, s32 arg2, void *arg3, s32
 arg4)`); this call site only needs `void *`/`s32` at the ABI level (matches
-the looser local signatures `entity.c` and `DreamSys.c` already use for the
+the looser local signatures `entity.c` and `dream_sys.c` already use for the
 same cross-unit call, per the multiple-independent-local-views convention).
 `sStyleSceneRefs` is redeclared fresh here (not reusing the copy later in this
 file for `FlushStyleCue`/`ServiceStyleCueIfNear`) because this function's ROM
 address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `sStyleVariant`
-copy. `sStyleCueCallbacks` is `ObjMStyleActor.c`'s already-identified 14-function
+copy. `sStyleCueCallbacks` is `dream_scene.c`'s already-identified 14-function
 table (its own `ParamMethods` slot list); here it is read as a raw `s32`
 bit pattern (a function pointer forwarded opaquely as `InitSoundCueSet`'s 5th
 argument, which just stores it into `obj->unkC` -- confirmed by reading that
@@ -150,4 +150,4 @@ error-log or assert on failure). MATCHED, 45/45.
 
 ### Naming
 
-Parameters: `slot`, `lastCue` (TickStyle's third argument, by address: set to the negated cue when the started cue equals it), `target` (the grid target's world position), `unused`. `sStyleCueCallbacks` typed `SoundCueCallbackFn[]` and InitSoundCueSet given its real prototype (SoundCueSet.h); `EntrySlot::count`/`StyleCueEntryView::countSign` renamed `cue`: it is the record's cue index (sStyleCueCallbacks row, InitSoundCueSet tag, sStyleCueDistanceTable row), positive while free, negated while a slot holds it.
+Parameters: `slot`, `lastCue` (TickStyle's third argument, by address: set to the negated cue when the started cue equals it), `target` (the grid target's world position), `unused`. `sStyleCueCallbacks` typed `SoundCueCallbackFn[]` and InitSoundCueSet given its real prototype (sound_cue_set.h); `EntrySlot::count`/`StyleCueEntryView::countSign` renamed `cue`: it is the record's cue index (sStyleCueCallbacks row, InitSoundCueSet tag, sStyleCueDistanceTable row), positive while free, negated while a slot holds it.

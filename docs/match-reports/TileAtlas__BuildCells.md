@@ -2,7 +2,7 @@
 
 > Renamed from `func_800450B4` on 2026-09-25 (tools/rename.py). Address 0x800450b4.
 
-Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #9), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 61/61 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTileAtlasMethods +0x078.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/graphics/GraphicsResources.c`.
+top of / earlier in `src/graphics/graphics_resources.c`.
 
 ```c
 /* gTileAtlasMethods +0x078: when +0x30 is set, build 300 GsCELLs (16 x 16 texels
@@ -90,7 +90,7 @@ Eleventh build. The cell is LIBGS.H's GsCELL (u, v, cba, flag, tpage), unit-loca
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). `self` is `TileAtlas *` (was `Obj6F514`); the cell type is LIBGS.H's `GsCELL`, now defined in the header (was the unit-local `Cell450B4`, same layout), and the flag at +0x030 is `defaultCells`. `cells` is the array TileMap__BuildMap takes as its GsMAP base. No rename. Byte-identical.
+Class unified in `include/tile_atlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). `self` is `TileAtlas *` (was `Obj6F514`); the cell type is LIBGS.H's `GsCELL`, now defined in the header (was the unit-local `Cell450B4`, same layout), and the flag at +0x030 is `defaultCells`. `cells` is the array TileMap__BuildMap takes as its GsMAP base. No rename. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

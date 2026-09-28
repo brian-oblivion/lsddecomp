@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004B38C` on 2026-09-24 (tools/rename.py). Address 0x8004b38c.
 
-**Unit:** DayTaskStageMap · **Size:** 35 words · **Status:** MATCHED.
+**Unit:** dream_day · **Size:** 35 words · **Status:** MATCHED.
 
 ## Result
 
@@ -43,7 +43,7 @@ to be `s8`/`s16` (no `s32`) -- confirmed by cross-referencing
 bytes at `+0x0..+0x3`, signed halfwords at `+0x4`,`+0x6`,`+0x8`), giving a
 mixed byte/short struct (`Descriptor10`) whose alignment is 2. This is the
 same "no s32 member forces the unaligned-block-copy shape" idiom already
-documented for `FlashbackRotation` in `include/DreamSys.h` -- confirmed as a
+documented for `FlashbackRotation` in `include/dream_sys.h` -- confirmed as a
 second, independent instance.
 
 `self->unk6C = arg2;` (raw pointer store, no dereference in this function)
@@ -77,20 +77,20 @@ Round 78 (track 3, naming pass, bravo).
 ## Proposed field names
 
 Both below are read/written by `Obj866E8`-typed code OUTSIDE this unit
-(`src/world/DayTaskStageMap.c`), confirmed by actually attempting the rename: the
+(`src/world/dream_day.c`), confirmed by actually attempting the rename: the
 field definition was changed, the whole-image oracle re-run, and
-`DayTaskStageMap.c`'s own `StageMap__ComputeFootprintFromRotation`
+`dream_day.c`'s own `StageMap__ComputeFootprintFromRotation`
 (`self->unk6C->unk14->unk44`) failed to compile with no matching member.
 Reverted per track 3 step 3's cross-unit rule; proposing here for the head
 to apply by type scope.
 
 | field | proposed name | tier | evidence |
 | --- | --- | --- | --- |
-| `Obj866E8::unk6C` | `posSource` | B | Stored raw by `StageMap__SetTargetAndLoadChunks` (`self->unk6C = arg2`, never dereferenced there); dereferenced by `StageMap__GetTargetDescriptor` as `self->unk6C->unk14 + 0x18` to obtain the `SplitLongVec3` (world-position triple) fed to `StageMap__ComputeFootprintDescriptor`; `DayTaskStageMap.c`'s `StageMap__ComputeFootprintFromRotation` independently reaches the SAME `->unk14->unk44` chain. "posSource" names the mechanic (an object whose `unk14` substruct supplies positions), not an asserted game identity. |
+| `Obj866E8::unk6C` | `posSource` | B | Stored raw by `StageMap__SetTargetAndLoadChunks` (`self->unk6C = arg2`, never dereferenced there); dereferenced by `StageMap__GetTargetDescriptor` as `self->unk6C->unk14 + 0x18` to obtain the `SplitLongVec3` (world-position triple) fed to `StageMap__ComputeFootprintDescriptor`; `dream_day.c`'s `StageMap__ComputeFootprintFromRotation` independently reaches the SAME `->unk14->unk44` chain. "posSource" names the mechanic (an object whose `unk14` substruct supplies positions), not an asserted game identity. |
 | `Obj866E8::unkBC` | `descriptor` | B | Whole-struct-copied from a caller `Descriptor10*` in `StageMap__SetTargetAndLoadChunks`; overwritten wholesale (44 bytes, past the declared field into trailing padding -- see `StageMap__UpdateFootprintTracking.md`'s own derivation) and read back (`StageMap__GetTargetDescriptor` returns `&self->unkBC` directly) as "the object's current footprint descriptor". Not tested for cross-unit accessors this round (only `unk6C` was); the head should re-run the same compiler check before applying. |
 
 **Head disposition, round 78.** `unk6C` applied by type scope as `target`
-(3 accessors: DayTaskStageMap.c x2, class_3bb8c_b.c x1), not `posSource`: this
+(3 accessors: dream_day.c x2, class_3bb8c_b.c x1), not `posSource`: this
 function (`SetTarget...`) stores it and `GetTargetDescriptor` reads it, so the
 unit's own function names already call it the target. `unkBC` -> `descriptor`
 DECLINED: it restates the field's type (`Descriptor10`), round 77's precedent.
@@ -106,11 +106,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`

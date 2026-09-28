@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BE74` on 2026-09-23 (tools/rename.py). Address 0x8003be74.
 
-**Unit:** Task · **Size:** 2 instructions (0x8 bytes) · **Status:** MATCHED (2/2 words, whole-image SHA1 green), first attempt
+**Unit:** task · **Size:** 2 instructions (0x8 bytes) · **Status:** MATCHED (2/2 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -29,7 +29,7 @@ Matched first attempt.
 
 ## New struct/header knowledge
 
-See `StreamTask__SetKeepActive`'s report — same header, `include/Task.h`.
+See `StreamTask__SetKeepActive`'s report — same header, `include/task.h`.
 
 ## Proposed learning
 
@@ -42,4 +42,4 @@ five described in `StreamTask__SetKeepActive`'s report; same convention.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Own slot +0x130. unkD0 is written by this setter and StreamTask__Reset (0) and read by none of the class's own methods.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Own slot +0x130. unkD0 is written by this setter and StreamTask__Reset (0) and read by none of the class's own methods.

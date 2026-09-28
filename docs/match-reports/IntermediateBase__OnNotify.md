@@ -4,12 +4,12 @@
 
 > Renamed from `func_8003E030` on 2026-09-19 (tools/rename.py). Address 0x8003e030.
 
-**Unit:** Task · **Size:** 52 instructions
+**Unit:** task · **Size:** 52 instructions
 
 ## What it does
 
 `gIntermediateBaseMethods+0x038` (the "IntermediateBase" table): forwards to the
-BasicClass-level slot38 (`BasicClass__OnNotify`, `TmdRenderer`, signature
+BasicClass-level slot38 (`BasicClass__OnNotify`, `tmd_renderer`, signature
 `(BasicClass *self, void *arg1, s32 arg2)` per `include/code_8220.h`), then
 reads `arg1->target->header & 0xF` and dispatches to one of
 `self->methods->slot54/58/5C` (all three called with `(self, arg1, arg2)`)
@@ -42,13 +42,13 @@ void IntermediateBase__OnNotify(Obj86B60 *self, EventArg *arg1, s32 arg2)
 ## Struct/table knowledge established
 
 - `EventArg`/`HeaderObj`: this unit's own local view of the same two-type
-  shape `include/DayTaskStageMap.h` independently derived (`arg1->target->header`).
+  shape `include/dream_day.h` independently derived (`arg1->target->header`).
   Only the one field each touches is modelled.
 - `Obj86B60Methods`: added `slot10` (BasicClass addChild, inherited,
   `IntermediateBase__Init`), `slot40` (`IntermediateBase__ResetCounters`, `IntermediateBase__IntermediateBase`), `slot48`
   (`IntermediateBase__Deinit`, `IntermediateBase__Init`), `slot4C` (external `TaskCore__OnInit`,
   `IntermediateBase__Init`), `slot54` (`IntermediateBase__OnDrawSystemEvent`), `slot58` (external
-  `TaskCore__OnPadEvent`, STALL in unit `Task` -- its own report confirms
+  `TaskCore__OnPadEvent`, STALL in unit `task` -- its own report confirms
   signature `(Obj86B60 *, s32 a1, s32 a2)`; this call site's `a1` is
   genuinely `EventArg *`, an independent local view of the same shared
   slot, not a conflict), `slot5C` (`TaskCore__Update`, already matched
@@ -72,7 +72,7 @@ functions except `New_Viewport`/`Viewport__Viewport`/`Viewport__Finalize`/
 When a unit's queue functions are all small and share a ROM range, run
 `tools/classtable.py <addr>` against every nearby vtable found via
 `grep -rn func_NAME asm/data/*.s` (or a sibling unit's own header comments
-citing the same table, as `Task.h`'s `TaskUtilMethods` did here) before
+citing the same table, as `task.h`'s `TaskUtilMethods` did here) before
 reading any single function's disassembly in isolation. The table dump
 resolves not just the CURRENT function's identity but its callers' and
 callees' argument SHAPES (arity, and often a concrete non-`s32` type) for
@@ -82,14 +82,14 @@ this function's own bytes.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. Matched on the first
+round 13 (2026-09-03), runner alpha, unit task. Matched on the first
 build.
 
 ## Naming
 
 **IntermediateBase__OnNotify** (renamed from `func_8003E030`, round 55, runner
 alpha). Tier A: forwards to `GetBasicClassMethods()->slot38` first (that
-slot IS `BasicClass__OnNotify` per `include/Task.h`'s own
+slot IS `BasicClass__OnNotify` per `include/task.h`'s own
 `BasicClassMethodsCC8C` struct, offset-verified against
 `include/code_8220.h`'s canonical, already-named `BasicClassMethods::slot38`
 = `onNotify`), then adds its own dispatch on the incoming `EventArg`'s
@@ -97,24 +97,24 @@ dynamic class tag -- the textbook "override calls base first, then does its
 own work" shape for a virtual method whose base identity is independently
 confirmed. `GetBasicClassMethods()->slot38` is PROPOSED for rename to
 `onNotify` in this unit's `## Proposed field names` (shared with
-`Task.c`'s own `Viewport__OnNotify`).
+`task.c`'s own `Viewport__OnNotify`).
 
 ## Proposed field names
 
 - `BasicClassMethodsCC8C::slot38` -> `onNotify` (tier A). Offset `+0x038`
   matches `include/code_8220.h`'s own canonical, already-named
   `BasicClassMethods::slot38` = `onNotify` exactly (`IS BasicClass__OnNotify`,
-  TmdRenderer, per this header's own comment). NOT renamed directly:
-  `Task.c`'s `Viewport__OnNotify` also calls
+  tmd_renderer, per this header's own comment). NOT renamed directly:
+  `task.c`'s `Viewport__OnNotify` also calls
   `GetBasicClassMethods()->slot38(self, arg1, arg2)`, so this field is
-  shared within the Task family. Head applies by type scope (rename
+  shared within the task family. Head applies by type scope (rename
   the field in `BasicClassMethodsCC8C`'s own definition,
-  `include/Task.h`, rebuild, fix the compiler-listed accessors in
-  both `Task.c` and `code_2cc8c_d.c`, oracle).
+  `include/task.h`, rebuild, fix the compiler-listed accessors in
+  both `task.c` and `code_2cc8c_d.c`, oracle).
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__OnNotify (class prefix). Occupies +0x038 (BasicClass's onNotify). The argument called `EventArg *arg1` is the SENDER, a BasicClass: `arg1->target->header` was `sender->methods->header`, the class id word, so the parameter is `BasicClass *sender`. The three cases are the sender's root class nibble (typeviews.py --tree): 1 gDrawSystemMethods -> onTag1Notify (+0x054), 2 gPadMethods -> onPadEvent (+0x058, NULL here), 5 gFrameClockMethods -> update (+0x05C), the same split SceneNode's onNotify makes (include/SceneNode.h names its tag-2/5 slots onPadEvent/update).
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/intermediate_base.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__OnNotify (class prefix). Occupies +0x038 (BasicClass's onNotify). The argument called `EventArg *arg1` is the SENDER, a BasicClass: `arg1->target->header` was `sender->methods->header`, the class id word, so the parameter is `BasicClass *sender`. The three cases are the sender's root class nibble (typeviews.py --tree): 1 gDrawSystemMethods -> onTag1Notify (+0x054), 2 gPadMethods -> onPadEvent (+0x058, NULL here), 5 gFrameClockMethods -> update (+0x05C), the same split SceneNode's onNotify makes (include/scene_node.h names its tag-2/5 slots onPadEvent/update).
 
 ## Track 7 (round 98, echo)
 

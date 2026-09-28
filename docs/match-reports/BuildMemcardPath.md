@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004F32C` on 2026-09-20 (tools/rename.py). Address 0x8004f32c.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 26 words (0x68) · **Status:** MATCH
+**Unit:** title_menu · **Size:** 26 words (0x68) · **Status:** MATCH
 
 ## What it does
 
@@ -11,7 +11,7 @@ Copies a fixed 6-byte PS-X BIOS memory-card device-name template
 ("bu10:" when `selector` is nonzero, "bu00:" otherwise —
 `asm/data/7B008.sdata.s`, `sMcDevicePath1`/`sMcDevicePath0`) into `dest`, appends
 `suffix` with this project's own `strcat` (matched elsewhere,
-`src/app/GameApplicationFileResource.c`), and returns `dest`.
+`src/app/game_shell.c`), and returns `dest`.
 
 This function's `dest` argument is **not** the `TaskObjF` class this unit's
 other queued functions operate on (see `TaskObjF__ForEachEvent`'s report for that
@@ -39,8 +39,8 @@ already documented for `Descriptor10` in `include/class_3bb8c.h`.
 - `McDevicePath` (new type) and its two extern instances `sMcDevicePath1`
   ("bu10:") / `sMcDevicePath0` ("bu00:").
 - `extern char *strcat(char *dest, char *src);` — **an extern for a
-  function outside this unit** (matched in `src/app/GameApplicationFileResource.c`, declared in
-  `include/GameApplicationFileResource.h`; this header had no prior declaration of it, so
+  function outside this unit** (matched in `src/app/game_shell.c`, declared in
+  `include/data_source.h`; this header had no prior declaration of it, so
   this is a fresh, independent one, not an edit to an existing
   declaration).
 
@@ -49,11 +49,11 @@ already documented for `Descriptor10` in `include/class_3bb8c.h`.
 **Verdict: arity-ok idiom**, and the clearest case in the round: one symbol,
 two call sites in ONE unit, with different argument counts, both byte-load-bearing.
 
-**Callee evidence** (the matched definition in `src/ui/TitleMenuTaskObjF.c`):
+**Callee evidence** (the matched definition in `src/ui/title_menu.c`):
 `char *BuildMemcardPath(McDevicePath *dest, s32 selector, char *suffix)` — three
 real arguments, `$a2` being the suffix string it appends.
 
-**SUPERSEDED, round 75 (see the correction at the end): `TitleMenuTaskObjF` now declares a real three-argument prototype.** Original reasoning, kept as history -- **why `src/ui/TitleMenuTaskObjF.c` must declare it unprototyped.** Its two call sites
+**SUPERSEDED, round 75 (see the correction at the end): `title_menu` now declares a real three-argument prototype.** Original reasoning, kept as history -- **why `src/ui/title_menu.c` must declare it unprototyped.** Its two call sites
 pass different numbers of arguments, and retail's bytes show both:
 
 ```
@@ -75,7 +75,7 @@ the only spelling, and it is the same idiom this unit already uses for
 `strcpy`/`strcat`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to both copies, `src/ui/TitleMenuTaskObjF.c:89` and `:383`. Oracle green.
+added to both copies, `src/ui/title_menu.c:89` and `:383`. Oracle green.
 
 ## Naming (round 60, track 3)
 
@@ -90,10 +90,10 @@ building a memory-card path string.
 ## Head correction, round 75
 
 The "must declare it unprototyped" reasoning above is disproved. Round 75
-matched `TaskObjF__OpenAndReadMemcardFile` (TitleMenuTaskObjF) by calling this function with THREE
+matched `TaskObjF__OpenAndReadMemcardFile` (title_menu) by calling this function with THREE
 arguments; that call site's third argument is forwarded from its own third
 parameter, already in `$a2`, so no set-up is emitted and it read as a
-two-argument call. `src/ui/TitleMenuTaskObjF.c` now declares
+two-argument call. `src/ui/title_menu.c` now declares
 `extern void *BuildMemcardPath(void *dest, s32 selector, void *suffix);`
 and every call site in both units passes three. See `TaskObjF__OpenAndReadMemcardFile.md`.
 
@@ -123,14 +123,14 @@ Descriptor10 above" was stale and is gone.
 struct (include/class_3bb8c.h, alignment 1 for the whole-struct copy), so it
 has no `char` member to name. Zero bytes.
 
-### Moved from src/ui/TitleMenuTaskObjF.c
+### Moved from src/ui/title_menu.c
 
 The forward declaration's comment, replaced by one line:
 
 ```c
 /* Forward declarations: these are defined later in this file (strict
  * ROM-address order), but earlier functions call them. The class's own
- * methods are prototyped in include/TaskObjF.h (track 4, round 89); these
+ * methods are prototyped in include/task_objf.h (track 4, round 89); these
  * two are the unit's plain helpers.
  *
  * `BuildMemcardPath`'s entry here fixes a real Gate-0 warning (round 60):

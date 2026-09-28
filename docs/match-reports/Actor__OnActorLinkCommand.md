@@ -4,8 +4,8 @@
 
 > Renamed from `func_80057B90` on 2026-09-19 (tools/rename.py). Address 0x80057b90.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0DC`
-(base-class-inherited at this offset; `include/DreamSys.h`'s
+Unit: `src/world/dream_scene.c`. Class: `DreamSys`, own vtable slot `+0x0DC`
+(base-class-inherited at this offset; `include/dream_sys.h`'s
 `DreamSysBaseMethods::slot0xDC` already carried a comment naming this
 exact function as its `+0xDC` resolution, from before this unit converted
 it).
@@ -34,11 +34,11 @@ tables:
 - The first, unconditional, dispatches through
   `GetSceneNodeMethods()`'s return -- the shared base-class table at
   `gSceneNodeMethods` (already established with the project's "per-call-site
-  signature" precedent in `include/SceneNode.h`) -- at its `+0x09C` slot.
+  signature" precedent in `include/scene_node.h`) -- at its `+0x09C` slot.
   This unit's own local view (`SceneNodeBaseTable`, declared in this file)
   types only that one slot.
 - The second, conditional on `5 <= count < 9`, dispatches through
-  `self`'s OWN vtable (`self->vt->slotA0`, `include/DreamSys.h`) at
+  `self`'s OWN vtable (`self->vt->slotA0`, `include/dream_sys.h`) at
   `+0x0A0` -- ordinary polymorphic dispatch, resolves to `SceneNode__TryAttachNearby`
   currently (not overridden at the `DreamSys` level, per
   `tools/classtable.py gDreamSysMethods`), but written as a real vtable
@@ -79,9 +79,9 @@ gates the attach attempt is not established.
 ## Proposed field names
 
 `vtable_DreamSys::slotA0` is accessed from SEVEN other units too
-(`grep -rln -- '->slotA0\b' src/` lists `TitleMenuTaskObjF.c`,
-`ObjMStyleActor.c`, `TitleMenuTaskObjF.c`, `SceneNode.c`, `Task.c`,
-`TextEntryItemList.c`, `Task.c`, besides this unit), so per
+(`grep -rln -- '->slotA0\b' src/` lists `title_menu.c`,
+`dream_scene.c`, `title_menu.c`, `scene_node.c`, `task.c`,
+`input_dialogs.c`, `task.c`, besides this unit), so per
 FINISHING-PLAN.md track 3 step 3 it is proposed here, not renamed, and
 posted to the broadcast for the head to apply at merge.
 
@@ -115,7 +115,7 @@ today (inherited, unoverridden) while being byte-different call shapes.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__DispatchLinkCommandAndTryAttach`. Occupant of +0x0DC, which Actor__DispatchLinkCommand (+0x09C) calls when the SENDER's class byte is 0x34 (an Actor); DreamSys overrides it as DreamSys__DispatchInstanceEffect (testing for an Entity, 0x1F234) and Entity as Entity__NotifyLinkStage. Body: chain SceneNode's dispatchLinkCommand, then tryAttachNearby for events 5..8 -- called through a function-pointer cast with (self, sender, event), since SceneNode's slot declares self alone and both arguments are reloaded after the base call. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__DispatchLinkCommandAndTryAttach`. Occupant of +0x0DC, which Actor__DispatchLinkCommand (+0x09C) calls when the SENDER's class byte is 0x34 (an Actor); DreamSys overrides it as DreamSys__DispatchInstanceEffect (testing for an Entity, 0x1F234) and Entity as Entity__NotifyLinkStage. Body: chain SceneNode's dispatchLinkCommand, then tryAttachNearby for events 5..8 -- called through a function-pointer cast with (self, sender, event), since SceneNode's slot declares self alone and both arguments are reloaded after the base call. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 
@@ -138,4 +138,4 @@ The function comment, verbatim:
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The link-event literals are spelled with their enums: 4 is `SCENENODE_EVENT_LINKED`, 2 and 3 `SCENENODE_EVENT_HULL_FIRST`/`HULL_LAST` (include/SceneNode.h), 5 to 8 `ACTOR_EVENT_UNSWEPT`..`ACTOR_EVENT_MOVED_Y` (include/Actor.h). Every function tested here receives the event through a DispatchLinkCommand/onActorLinkCommand/onGridCellLinkCommand chain from SceneNode's link protocol, so the numbers are that enum's. Byte-identical (`event < 9` spelled `event <= ACTOR_EVENT_MOVED_Y` compiles the same).
+The link-event literals are spelled with their enums: 4 is `SCENENODE_EVENT_LINKED`, 2 and 3 `SCENENODE_EVENT_HULL_FIRST`/`HULL_LAST` (include/scene_node.h), 5 to 8 `ACTOR_EVENT_UNSWEPT`..`ACTOR_EVENT_MOVED_Y` (include/actor.h). Every function tested here receives the event through a DispatchLinkCommand/onActorLinkCommand/onGridCellLinkCommand chain from SceneNode's link protocol, so the numbers are that enum's. Byte-identical (`event < 9` spelled `event <= ACTOR_EVENT_MOVED_Y` compiles the same).

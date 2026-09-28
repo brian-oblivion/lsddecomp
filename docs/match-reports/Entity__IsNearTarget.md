@@ -113,7 +113,7 @@ Every known caller (5+ units, per this report and `entity.h`) compares its
 return against 0, i.e. treats it as a boolean predicate; it applies a mood-
 scaled Y offset and a fixed-point-11 distance conversion, then tail-calls
 `this->unk94`'s own `slot120`. "Target" is not a fresh guess for
-`this->unk94` -- it is `SceneNode__FaceTarget`'s (SceneNode.c, a different
+`this->unk94` -- it is `SceneNode__FaceTarget`'s (scene_node.c, a different
 unit) OWN established name for dereferencing this exact field, cited
 already in `entity.h`'s `Unk94Obj` comment before this round.
 
@@ -140,7 +140,7 @@ symbols, own lui/addiu) ... not sub-fields of the sEntityMoodTable row" was
 wrong: GCC spells a constant-offset field of a global array as
 %hi/%lo(sym + off), which splat labels as its own symbol.
 
-- Step 2: IsNearTarget's local EntityVec3 (three s32s) is SceneNode.h's LongVec3; the local type is deleted.
+- Step 2: IsNearTarget's local EntityVec3 (three s32s) is scene_node.h's LongVec3; the local type is deleted.
 
 - Step 3: parameters arg2, arg3 -> range, tolerance (DreamSys__ProjectPointAtDistance's dist and tolerance, each scaled by ENTITY_RANGE_UNIT); local -> point.
 

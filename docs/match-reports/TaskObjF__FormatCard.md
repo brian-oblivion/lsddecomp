@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E940` on 2026-09-24 (tools/rename.py). Address 0x8004e940.
 
-**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class).
+**Unit:** title_menu (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -63,6 +63,6 @@ The unit declared `format` itself, under: "The PS-X BIOS format(), which
 takes a device name. sMcDevicePath0/1 are the "bu00:"/"bu10:" templates
 include/class_3bb8c.h declares (track 4b, round 85: this unit had its own
 `s32` view for this address-only use)." `format` now comes from
-`<kernel.h>`, and `MEMCARD_RETRIES` (include/TaskObjF.h) replaces the 10.
+`<kernel.h>`, and `MEMCARD_RETRIES` (include/task_objf.h) replaces the 10.
 The `(char *)path` cast stays: `McDevicePath` is the device name typed as a
 struct so BuildMemcardPath's copy matches, and `format` takes the string.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C3A8` on 2026-09-24 (tools/rename.py). Address 0x8002c3a8.
 
-**Unit:** PlacementGridVabSound · **Size:** 4 instructions (0x10 bytes) ·
+**Unit:** vab_sound · **Size:** 4 instructions (0x10 bytes) ·
 **Status: MATCHED 4/4**, whole-image SHA1 green.
 
 ## Role
@@ -38,7 +38,7 @@ Also added `BaseTable6D940` (this file only) -- a SEPARATE table reached
 only via the uncarved accessor `GetActiveDataSourceMethods()`, with three known slots
 (`+0x008`, `+0x00C`, `+0x064`) used by `PlacementGrid__PlacementGrid`/`PlacementGrid__Finalize`/
 `PlacementGrid__OnRequestDone` respectively (all this unit, this round). Kept entirely
-local to `PlacementGridVabSound.c`, no shared header, per this round's rule for the
+local to `vab_sound.c`, no shared header, per this round's rule for the
 `code_179d8` slices.
 
 ## Naming (round 77, charlie -- track 3)
@@ -48,7 +48,7 @@ Renamed `func_8002C3A8 -> GetPlacementGridMethods`, tier A. This unit's earlier
 specifically -- see the unit header comment's round-77 correction.
 `gPlacementGridMethods` is a real 30-slot FileResource-derived vtable
 (`tools/classtable.py 0x8006D940`), and this function is its getter,
-confirmed as the FIRST entry of `sDataSourceClientGetters` (GameApplicationFileResource.c's
+confirmed as the FIRST entry of `sDataSourceClientGetters` (game_shell.c's
 NULL-terminated array of "class-method-table getters of every
 FileResource-derived client", `asm/data/5DB70.data.s`). Matches the
 established `GetXXXMethods` convention for every other entry in that same
@@ -60,7 +60,7 @@ section are authoritative).
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-The paragraph above ("NOT class-framework code") is superseded: gPlacementGridMethods is a FileResource method table and this is its getter, the first entry of sDataSourceClientGetters. Declared in `include/PlacementGrid.h`.
+The paragraph above ("NOT class-framework code") is superseded: gPlacementGridMethods is a FileResource method table and this is its getter, the first entry of sDataSourceClientGetters. Declared in `include/placement_grid.h`.
 
 
 ## Track 6 (2026-09-26, round 93, charlie)
@@ -70,7 +70,7 @@ whole family: object, `Class6D940Methods`, the getter, constructors,
 methods, `Class6D940Record` -> `PlacementGridRecord`,
 `Class6D940ResolveEntryFn` -> `PlacementGridResolveEntryFn`,
 `Class6D940GetModelFn` -> `PlacementGridGetModelFn`, the header
-`include/Class6D940.h` -> `include/PlacementGrid.h`), then
+`include/Class6D940.h` -> `include/placement_grid.h`), then
 `python3 tools/rename.py D_8006D940 gPlacementGridMethods` (the table,
 g<Class>Methods) and
 `python3 tools/renametype.py PlacementGridPlacement CellPlacement --any-stem`
@@ -90,7 +90,7 @@ cell's centre (column/row * 0x800 + 0x400) and returns the model
 linkResource's getModel gives for its index. StageMap__PopulateSlotCells
 points `buffer` at the grid element's LbdFile header block +
 `placementsOffset` (LbdFileHeader's own field name) and puts each result
-into that element's GridCell lattice (20 x 20, 0x800 apart: GridCell.h),
+into that element's GridCell lattice (20 x 20, 0x800 apart: grid_cell.h),
 chained records into the overflow cells. So the class is the placements of
 one grid element's cells. **`CellPlacement`** is ResolveEntry's output, one
 model's placement in one cell. The name says what the records are, not

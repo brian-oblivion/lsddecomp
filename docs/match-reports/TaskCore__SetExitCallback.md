@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003CAEC` on 2026-09-24 (tools/rename.py). Address 0x8003caec.
 
-**Unit:** Task · **Size:** 3 instructions
+**Unit:** task · **Size:** 3 instructions
 
 ## What it does
 
@@ -24,7 +24,7 @@ A pure setter, establishing `Obj86B60::unk9C`/`unkA0` as an
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit Task. 1 attempt.
+round 2026-09-02, runner echo, unit task. 1 attempt.
 
 ## Naming (round 78, delta)
 
@@ -40,7 +40,7 @@ context argument verbatim, no other logic. Corroborated by
 `Obj86B60::unkA0` (`void *`, +0x0A0) -> `viewCallbackCtx`. Tier B (mechanics:
 a callback+context pair invoked by `TaskCore__Exit`, hence
 "view"; not a guess about what the callback itself does). Grep shows
-`unk9C`/`unkA0` textual hits in ObjMStyleActor.c/class_3bb8c_q.c/Task.c/
+`unk9C`/`unkA0` textual hits in dream_scene.c/class_3bb8c_q.c/task.c/
 libsnd_decre.c (unrelated structs sharing the name), so proposal only.
 
 
@@ -48,4 +48,4 @@ libsnd_decre.c (unrelated structs sharing the name), so proposal only.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__SetCallback (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__SetCallback (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

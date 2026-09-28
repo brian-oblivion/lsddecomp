@@ -2,7 +2,7 @@
 
 > Renamed from `func_800453DC` on 2026-09-25 (tools/rename.py). Address 0x800453dc.
 
-Round 82, runner echo (GraphicsResources session, echo #6), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #6), 2026-09-25. Unit `graphics_resources`.
 Byte-exact on the SECOND build (first-build miss described below); whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 19/19 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gTodSetMethods +0x078.
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
@@ -32,7 +32,7 @@ u8 TodSet__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
 
 ## Notes
 
-- No shared header was edited. `FileResource.h`, `SceneNode.h`, `basic_class.h` are
+- No shared header was edited. `file_resource.h`, `scene_node.h`, `basic_class.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
@@ -48,7 +48,7 @@ u8 TodSet__ScanPackets(DataSrc33808 *self, s32 arg1, s32 arg2) {
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel)` (include/TodSet.h), as Tod__ScanPackets was typed in round 86: the pass-through arguments are ScanTodPackets' `out`/`sel`, and it calls the named slot `scanTodPackets` (+0x07C) instead of DataSrc33808's unprototyped `slot7C`. The data pointer is `(u32 *)&buf->entries[buf->count] + 2`, the same arithmetic. Bytes unchanged.
+Now `u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel)` (include/tod_set.h), as Tod__ScanPackets was typed in round 86: the pass-through arguments are ScanTodPackets' `out`/`sel`, and it calls the named slot `scanTodPackets` (+0x07C) instead of DataSrc33808's unprototyped `slot7C`. The data pointer is `(u32 *)&buf->entries[buf->count] + 2`, the same arithmetic. Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 

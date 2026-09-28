@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EA0C` on 2026-09-23 (tools/rename.py). Address 0x8003ea0c.
 
-Unit: `Task`. Round 14, runner delta. 6/6 words, full match (2
+Unit: `task`. Round 14, runner delta. 6/6 words, full match (2
 real attempts).
 
 ## Signature
@@ -38,7 +38,7 @@ unk34` field so `self->unk34 = *pair;` is a single assignment.
 
 ## Header changes
 
-`include/Task.h`: new `Pair32_d294` type (`{ s32 a, b; }`); `Unk18Obj`
+`include/task.h`: new `Pair32_d294` type (`{ s32 a, b; }`); `Unk18Obj`
 gains `unk34` (`+0x034`, `Pair32_d294`, spanning what would have been
 `+0x034`/`+0x038` as two scalars).
 
@@ -59,8 +59,8 @@ to sequential per-field code.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__SetUnk34`. Renamed for the field it stores: +0x034 is `screenSize` (width, height), which Viewport__DrawNode reads as the screen size its box and screen-space sprite paths take percentages of (DrawView's `width`/`height`). Slot +0x044 `setScreenSize`; the parameter is a `ViewportSize *` (the former Pair32_d294, same two words, same lw,lw,sw,sw copy). The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__SetUnk34`. Renamed for the field it stores: +0x034 is `screenSize` (width, height), which Viewport__DrawNode reads as the screen size its box and screen-space sprite paths take percentages of (DrawView's `width`/`height`). Slot +0x044 `setScreenSize`; the parameter is a `ViewportSize *` (the former Pair32_d294, same two words, same lw,lw,sw,sw copy). The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-Viewport's `ViewportSize` merged into DrawSystem.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.
+Viewport's `ViewportSize` merged into draw_system.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.

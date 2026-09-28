@@ -63,7 +63,7 @@ blocks gives 106/114. The naive unscoped `cursor->prev->next = ...` form gives
   (`addiu vA,x,C` ... `subu x,vA,vB`), the source had `t = x + C;` as a
   separate statement.
 
-### Matched body (in `src/app/BMemPMgr.c`)
+### Matched body (in `src/app/bmem_pmgr.c`)
 
 ```c
 void *BMemPMgrAlloc(size, pool)
@@ -111,7 +111,7 @@ before searching, all recorded:
    the residue is not pure register identity and is in principle reachable
    by a source-mutation search, unlike round 45's `ServiceSoundCueSet`.
 3. **Scaffold-vs-in-tree agreement (the new, load-bearing check).** Rebuilt
-   the 92/114 seed body live in `src/app/BMemPMgr.c` first and confirmed
+   the 92/114 seed body live in `src/app/bmem_pmgr.c` first and confirmed
    `funcdiff.py` reproduces round 45's exact 92/114 figure and diff. Then
    objdumped the permuter's `base.o` and compared it instruction-by-
    instruction against `build/lsdde.elf`'s linked disassembly for this
@@ -132,7 +132,7 @@ number** (this project's own history has two prior instances of a permuter
 -local improvement that was fake — `SubmitPolyF3`'s cached-OT-pointer lead
 and `FlagLargePolyForDivide`'s rewritten-`end`-pointer lead, both in
 `SubmitPolyF3.md`/`FlagLargePolyForDivide.md`). Translated verbatim into
-`src/app/BMemPMgr.c`, ran `./build-and-verify.sh` + `funcdiff.py`: **REAL,
+`src/app/bmem_pmgr.c`, ran `./build-and-verify.sh` + `funcdiff.py`: **REAL,
 non-degenerate improvement — 96/114 words, still zero out-of-range drift**
 (the file 0x83DC-0x83F4 cluster shrank and shifted to 0x83CC-0x83E0, net
 4 fewer wrong words). This is genuine: hoisting the address computation
@@ -208,7 +208,7 @@ behaviour.
 
 1. Applied verbatim on top of the committed 96/114 body (adding the
    `BMemBlockHdr *unused;` declaration once at the top, and splitting the
-   `p` declaration/read as shown) in `src/app/BMemPMgr.c`, swapped in for
+   `p` declaration/read as shown) in `src/app/bmem_pmgr.c`, swapped in for
    `INCLUDE_ASM` temporarily.
 2. `./build-and-verify.sh` — clean compile (`build exit=2`, zero hits on the
    `error:`/`parse error`/`undefined reference`/`*** [….o]` grep — an
@@ -245,7 +245,7 @@ words, tested-vs-reused register preference in the per-if unlink hoists) —
 candidates for a further, deeper/longer search seeded from this round's
 101/114 body.
 
-### Preserved body (current best, 101/114) — see `src/app/BMemPMgr.c`, still `#if 0`
+### Preserved body (current best, 101/114) — see `src/app/bmem_pmgr.c`, still `#if 0`
 
 ```c
 void *BMemPMgrAlloc(size, pool)
@@ -389,7 +389,7 @@ The fix is C89's old-style (K&R identifier-list) function definition, which
 does NOT install a prototype for the rest of the translation unit:
 
 ```c
-/* include/BMemPMgr.h -- unspecified-parameter declaration, deliberately,
+/* include/bmem_pmgr.h -- unspecified-parameter declaration, deliberately,
  * so a same-file definition can use K&R syntax without conflicting with
  * the ~15 other headers' single-argument ANSI prototypes, or this same
  * file's own single-argument call sites that appear textually AFTER the
@@ -400,7 +400,7 @@ extern void *BMemPMgrFree();
 ```
 
 ```c
-/* src/app/BMemPMgr.c */
+/* src/app/bmem_pmgr.c */
 void *BMemPMgrAlloc(size, pool)
     s32 size;
     void *pool;
@@ -723,9 +723,9 @@ site passes one argument, and retail emits only `$a0` for it — e.g.
 This is the dead-argument idiom in its ordinary direction: the callee reads a
 register the caller happens to leave loaded.
 
-**Why `include/BMemPMgr.h`'s unprototyped pair must stay unprototyped.** Round
+**Why `include/bmem_pmgr.h`'s unprototyped pair must stay unprototyped.** Round
 45 established this and it re-measures correct. Both functions are DEFINED in
-`src/app/BMemPMgr.c` with old-style (K&R identifier-list) parameter lists, which is
+`src/app/bmem_pmgr.c` with old-style (K&R identifier-list) parameter lists, which is
 the only way to expose the second parameter to their own bodies without
 contradicting either the ~15 external single-argument prototypes or this same
 unit's own later one-argument call sites (`PushBasicClassListNode`'s
@@ -739,7 +739,7 @@ their own call sites correctly, and one describes the definition's translation
 unit correctly. Converging them would break one side or the other.
 
 **Declaration sites changed:** none (no arity anywhere changed).
-`/* arity-ok: ... */` added to the two lines in `include/BMemPMgr.h`. Oracle
+`/* arity-ok: ... */` added to the two lines in `include/bmem_pmgr.h`. Oracle
 green.
 
 ## Naming (round 74)
@@ -747,8 +747,8 @@ green.
 `BMemPMgrAlloc`, **tier A**: fully derived byte-exact free-list allocator
 (round 73), matching `SetupBMemPMgrFreeList`'s setup and `BMemPMgrFree`'s
 (this unit's `BMemPMgrFree`) release, same list, same `sizeAndFlags`
-encoding. Called from a wide cross-section of units (`GameApplicationFileResource`,
-`code_179d8_*`, `Task`, `code_2cc8c_*`, `TodActor`, `SceneNode`,
+encoding. Called from a wide cross-section of units (`game_shell`,
+`code_179d8_*`, `task`, `code_2cc8c_*`, `TodActor`, `SceneNode`,
 `main`, plus this unit's own `PushBasicClassListNode`) — confirming it is
 the game's general small-object pool allocator, not something narrower.
 
@@ -775,7 +775,7 @@ Zero bytes changed; whole-image SHA1 green after each step.
   appends at +0x8, so +0xC is the head and +0x8 the tail. This function
   searches from the tail backward through `prev`.
 
-The constants are defined, with their evidence, in `include/BMemPMgr.h`:
+The constants are defined, with their evidence, in `include/bmem_pmgr.h`:
 `BMEM_SIZE_MASK` 0x0FFFFFFF and `BMEM_FLAG_MASK` 0xF0000000 split
 `sizeAndFlags`; `BMEM_FREE` 0x40000000 is set on every block put on the free
 list (SetupBMemPMgrFreeList, BMemPMgrFree, the split remainder) and cleared

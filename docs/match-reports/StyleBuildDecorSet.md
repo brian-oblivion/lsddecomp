@@ -218,7 +218,7 @@ side effect of the image moving. The honest figures are the two in the title:
 **1 word short**, and the residue enumerated above. Do not read 17/86 as
 "69 words wrong".
 
-## Preserved near-miss body (1 word short, `#if 0` in `src/world/ObjMStyleActor.c`)
+## Preserved near-miss body (1 word short, `#if 0` in `src/world/dream_scene.c`)
 
 Needs, already present earlier in the unit in strict ROM order:
 `extern s32 sStyleDecorVariant, sStyleDecorPosX, sStyleDecorPosY, sStyleDecorSizeW, sStyleDecorSizeH,
@@ -324,7 +324,7 @@ STALL, 1 word short; naming is unaffected by match state per track 3.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-sStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` view's +0x04C is attachToParent, cast to BoxFillAttachToParentFn with the PairXY position cast to BoxFillPos *. Zero bytes.
+sStyleDecorSlots[] hold BoxFills (include/box_fill.h); the deleted `ObjSlot4C` view's +0x04C is attachToParent, cast to BoxFillAttachToParentFn with the PairXY position cast to BoxFillPos *. Zero bytes.
 
 ## Round 93 polish (delta, track 7)
 
@@ -333,15 +333,15 @@ sStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` vi
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `gStyleDecorPosAX`/`AY` | `sStyleDecorPosX`/`Y` | A | copied whole and passed as attachToParent's third argument, BoxFill's screen position (BoxFillPos). |
-| `gStyleDecorPosBX`/`BY` | `sStyleDecorSizeW`/`H` | A | copied whole and passed as New_BoxFill's first argument, the size (BoxFill.h: BoxFillSize, width then height); `h` drops by 7 per band. |
-| `gStyleCueSelf` | `sStyleGrid` | A | RegisterStyleConfig stores its arg0; its one caller passes ObjM's `unk14`, the StageMap (IntermediateBase.h, ObjM.h); this unit calls StageMap's computeCellOffsets on it and parents every effect under it. |
+| `gStyleDecorPosBX`/`BY` | `sStyleDecorSizeW`/`H` | A | copied whole and passed as New_BoxFill's first argument, the size (box_fill.h: BoxFillSize, width then height); `h` drops by 7 per band. |
+| `gStyleCueSelf` | `sStyleGrid` | A | RegisterStyleConfig stores its arg0; its one caller passes ObjM's `unk14`, the StageMap (intermediate_base.h, objm.h); this unit calls StageMap's computeCellOffsets on it and parents every effect under it. |
 | `0x12` | `STYLE_DECOR_BANDS` (18) | A | the band count: New_BoxFill loop bound, ReleaseBasicClassArray count, the colour tables' 18 triples. |
 | `0x1FFF` | `STYLE_DECOR_PRI` | A | New_BoxFill's pri argument; 13 bits, the mask BoxFill__Reset's setMask(13) sets. Hex: a mask-shaped value. |
 | `0x1E` | `STYLE_DECOR_VARIANT2_DROP` (30) | B | added to the y position when `sStyleDecorVariant == 2`, here and in StyleUpdateDecorSet. |
 
 Local views replaced by the real classes: the `+0x0AC` slot on `sStyleSceneRefs`'s `+0x00C` is Viewport's getSubHandle (that word is ObjM's `cachedViewport`; `StyleSceneRefs`); the band objects are BoxFill. Locals: `pos`, `size`, `band`, `viewport`, `parent`.
 
-### Comments moved here from src/world/ObjMStyleActor.c
+### Comments moved here from src/world/dream_scene.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

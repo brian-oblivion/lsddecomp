@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020050` on 2026-09-25 (tools/rename.py). Address 0x80020050.
 
-Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/TmdModel.c`. Fresh ground, no prior attempt.
+Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/tmd_model.c`. Fresh ground, no prior attempt.
 
 - **What:** a TMD primitive iterator over the object `self->object` (TMD object-table entry: +0x10 `prims`, +0x14 `nprims`). Returns NULL once `*count` reaches `nprims`; on `*count == 0` it restarts at `prims`. It switches on the primitive's mode byte (0x20..0x3F, `jtbl_80010354`, which this function owns). Each case picks the three or four vertex-index words out of the primitive (their position depends on the mode and on `flag & 4`) and the primitive's size. It then copies the indexed vertices' x,y,z into `out`, sets `*n` (3, 4, or 0 for an unknown mode), bumps `*count`, and returns `p + size`. `size` is uninitialised on the default path, as in retail.
 - **Result:** byte-exact; 288/288 words, whole-image SHA1 green. Build 14 on this function.

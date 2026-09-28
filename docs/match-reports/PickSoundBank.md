@@ -4,7 +4,7 @@
 
 > Renamed from `func_80048D74` on 2026-09-25 (tools/rename.py). Address 0x80048d74.
 
-Round 82, runner echo (second echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (second echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the fourth build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
 retail SLPS_015.56`), funcdiff 33/33, 0 insertions / 0 deletions, no
 out-of-range drift.
@@ -15,8 +15,8 @@ Weekly table pick: `r = (u32)SeedAndRandom(0, arg) % 7` (unsigned: retail's mult
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
-(`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/FileResource.h`.
+Declarations it needs are the local views at the top of `src/cd/game_files.c`
+(`D_80081940Obj`, `D_80081940Methods`, `FilePathRecord`) and `include/file_resource.h`.
 
 ```c
 s32 PickSoundBank(s32 arg) {
@@ -63,16 +63,16 @@ shift.
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickSoundBank passes one in `$a1`, as GameApplicationFileResource's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as game_shell's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
-  (DayTaskStageMap.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
+  (dream_day.h, class_3bb8c.h, game_application.h) are independent and untouched.
 
 ## Naming
 
 - **Name:** `PickSoundBank`
 - **Tier:** A
-- **Evidence:** returns sSoundBankPaths[sForcedSoundBank - 1] or a random one of the seven (`% SOUND_BANK_COUNT`); its one caller, DayTask__DayTask, hands the path to New_WBgm as the VAB base (include/WBgm.h). gForcedWeeklyGroup was renamed sForcedSoundBank with it.
+- **Evidence:** returns sSoundBankPaths[sForcedSoundBank - 1] or a random one of the seven (`% SOUND_BANK_COUNT`); its one caller, DayTask__DayTask, hands the path to New_WBgm as the VAB base (include/wbgm.h). gForcedWeeklyGroup was renamed sForcedSoundBank with it.
 
 ## Naming history
 

@@ -52,7 +52,7 @@ pattern held for a 3rd, unrelated unit.
     documented stall), where `sHitHeightGate == 0 || outWord >= 0x201` gates
     whether a `TmdModel__RaycastFaces` result is accepted -- and `TmdModel__RaycastFaces` is
     unidentified Psy-Q, so what is being accepted is unknown. The only
-    known writer is `ObjMStyleActor.c`'s `ObjM__InitStyleAndWorld`, which passes a
+    known writer is `dream_scene.c`'s `ObjM__InitStyleAndWorld`, which passes a
     flag it computes as "this stage/mode value is 3, 5 or 6" -- a flag
     whose own meaning that unit does not establish either.
   - Naming it would mean choosing between "a precision/threshold mode", "a
@@ -64,9 +64,9 @@ pattern held for a 3rd, unrelated unit.
 
 ## Naming (round 98, echo -- FINISHING-PLAN track 7)
 
-- **`func_8001EF60` -> `GetSetHitHeightGate`, `D_8008A838` -> `sHitHeightGate`. Tier B.** Round 50 kept both as placeholders because `TmdModel__RaycastFaces` was then unidentified, so what the gate accepted was unknown. It is now matched and documented (src/graphics/TmdModel.c): its 4th argument receives `hit.y - box.min.y`, the hit point's height above the face box's minimum y. So in `SceneNode__RaycastHullAgainstFaces` the global, when non-zero, makes the segment pass accept a hit only when that height is `>= 0x201`, the test the corner-edge pass applies unconditionally. That is the mechanism the name states; why stages 0, 3, 5 and 6 want it (the only writer, `ObjM__InitStyleAndWorld`) is not established, hence tier B. The `GetSet...` form is the project's for read-old-store-new-return-old (`GetSetBitField`, `DreamSys__GetSetScreenShake`).
+- **`func_8001EF60` -> `GetSetHitHeightGate`, `D_8008A838` -> `sHitHeightGate`. Tier B.** Round 50 kept both as placeholders because `TmdModel__RaycastFaces` was then unidentified, so what the gate accepted was unknown. It is now matched and documented (src/graphics/tmd_model.c): its 4th argument receives `hit.y - box.min.y`, the hit point's height above the face box's minimum y. So in `SceneNode__RaycastHullAgainstFaces` the global, when non-zero, makes the segment pass accept a hit only when that height is `>= 0x201`, the test the corner-edge pass applies unconditionally. That is the mechanism the name states; why stages 0, 3, 5 and 6 want it (the only writer, `ObjM__InitStyleAndWorld`) is not established, hence tier B. The `GetSet...` form is the project's for read-old-store-new-return-old (`GetSetBitField`, `DreamSys__GetSetScreenShake`).
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
 The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
 
@@ -77,7 +77,7 @@ The source comment was rewritten as documentation; the one it replaced, verbatim
  * established, so there is no noun to put in the name: its only known
  * reader is SceneNode__RaycastHullAgainstFaces (SceneNode), where `sHitHeightGate == 0 || outWord
  * >= 0x201` gates accepting a hit, and its only known writer is
- * ObjMStyleActor.c's ObjM__InitStyleAndWorld, which passes a flag derived from a
+ * dream_scene.c's ObjM__InitStyleAndWorld, which passes a flag derived from a
  * stage/mode value of 3, 5 or 6. Two call sites, neither naming the thing.
  * sHitHeightGate keeps its placeholder name for the same reason. */
 ```

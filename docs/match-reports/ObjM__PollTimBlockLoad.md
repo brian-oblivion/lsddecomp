@@ -4,7 +4,7 @@
 
 > Renamed from `func_800531CC` on 2026-09-24 (tools/rename.py). Address 0x800531cc.
 
-**Unit:** ObjMStyleActor · **Size:** 99 words (0x18C bytes) ·
+**Unit:** dream_scene · **Size:** 99 words (0x18C bytes) ·
 **Status: MATCHED 99/99**, whole-image SHA1 green. One of the two "large"
 functions in this unit's queue.
 
@@ -56,8 +56,8 @@ void ObjM__PollTimBlockLoad(Obj87034_3bb8c_l *self, Obj87034_3bb8c_l *other) {
 almost certainly `DreamSys *` — see the header comment on
 `DreamSysObj_3bb8c_l`/`DreamSysMethods_3bb8c_l` in `include/class_3bb8c.h`
 for the full cross-check against `tools/classtable.py 0x80087BDC`
-(`gDreamSysMethods`, `include/DreamSys.h`). Declared as this unit's own
-independent minimal view rather than editing `DreamSys.h`, since none of
+(`gDreamSysMethods`, `include/dream_sys.h`). Declared as this unit's own
+independent minimal view rather than editing `dream_sys.h`, since none of
 that header's own named fields cover the offsets this unit reaches
 (`+0x050`, `+0x074`, `+0x0FC`, `+0x104`, `+0x108`, `+0x200` all fall inside
 its `unknown_functions_0x..` padding arrays there).
@@ -107,7 +107,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-Renamed from `ObjM__TransferToOther` (rename.py). **The reading above that `other` is an ObjM is wrong**, and the callers show it (track 4 step 5): its only caller passes `self->timBlockSrc` (+0x058), which `ObjM__InitStyleAndWorld` assigns from `New_TimBlockSrc(PickStageTexture(...))`. The offsets read on it are TimBlockSrc's (include/TimBlockSrc.h): +0x080 `failed`, +0x03C `loaded`, +0x004 `release`, +0x07C `fadeAllEntries(color)`. So: while `timBlockPending` (+0x060), a failed load releases the source, runs setupSceneStyle and adds 0x1E to the DreamSys's dream time limit; a finished load fades the CLUT rows to the styleConfig colour (+0x00C when styleConfig +0x014 is 2, else +0x018), releases it and runs setupSceneStyle. Then, with nothing pending, the StageMap idle (`unk1B4 == 0`) and not yet `inSession`, it sets `unk64` and runs enterStyleSession. Called once per onTag1Notify event 2, so a poll. Tier B. Signature now `(ObjM *self, TimBlockSrc *src)`; byte-identical.
+Renamed from `ObjM__TransferToOther` (rename.py). **The reading above that `other` is an ObjM is wrong**, and the callers show it (track 4 step 5): its only caller passes `self->timBlockSrc` (+0x058), which `ObjM__InitStyleAndWorld` assigns from `New_TimBlockSrc(PickStageTexture(...))`. The offsets read on it are TimBlockSrc's (include/tim_block_src.h): +0x080 `failed`, +0x03C `loaded`, +0x004 `release`, +0x07C `fadeAllEntries(color)`. So: while `timBlockPending` (+0x060), a failed load releases the source, runs setupSceneStyle and adds 0x1E to the DreamSys's dream time limit; a finished load fades the CLUT rows to the styleConfig colour (+0x00C when styleConfig +0x014 is 2, else +0x018), releases it and runs setupSceneStyle. Then, with nothing pending, the StageMap idle (`unk1B4 == 0`) and not yet `inSession`, it sets `unk64` and runs enterStyleSession. Called once per onTag1Notify event 2, so a poll. Tier B. Signature now `(ObjM *self, TimBlockSrc *src)`; byte-identical.
 
 ## Round 94 (track 6, charlie)
 
@@ -124,10 +124,10 @@ Zero bytes changed.
 ## Round 95 (track 7, echo)
 
 Locals `ret` -> `timer`, `sel` -> `colorMode`; the failure path's `0x1E`
-is 30 (seconds, getSetDreamTimeLimit's unit per DreamSys.h's
+is 30 (seconds, getSetDreamTimeLimit's unit per dream_sys.h's
 DREAM_TICKS_PER_SECOND). colorMode's values (1, 2) stay literals:
 StyleConfig belongs to include/class_3bb8c.h, proposed there as an enum.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

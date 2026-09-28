@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003D6D4` on 2026-09-24 (tools/rename.py). Address 0x8003d6d4.
 
-**Unit:** Task · **Size:** 26 words · **Result:** byte-exact, first attempt
+**Unit:** task · **Size:** 26 words · **Result:** byte-exact, first attempt
 
 ## What it does
 
@@ -22,14 +22,14 @@ void TaskCore__ReleaseSlotElements(Obj86B60 *self)
 
 ## Header additions
 
-`include/Task.h`:
+`include/task.h`:
 
 - New fields `unk5C`/`unk64` on `Obj86B60`, both `void **`, carved out of
   existing padding (`0x05C`-`0x070`, previously undifferentiated). No
   existing field's type or offset changed.
 - `extern void *BMemPMgrAlloc(s32 size);` and
   `extern void BMemPMgrFree(void *ptr);` — both already confirmed
-  elsewhere in the project (many units use the allocator; `GameApplicationFileResource.h`
+  elsewhere in the project (many units use the allocator; `data_source.h`
   and `entity.h` both type the release call `void`-returning, and this
   unit's call site discards any return too, consistent with that).
 - `extern void ReleaseBasicClassArray(void *a0, void *a1);` — not previously seen in
@@ -47,4 +47,4 @@ Renamed `func_` -> `Obj86B60__ReleaseSlotElements`. **Tier B**: Releases and fre
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__ReleaseSlotElements (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__ReleaseSlotElements (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

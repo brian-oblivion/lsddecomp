@@ -6,7 +6,7 @@
 
 > Renamed from `func_800488E4` on 2026-09-25 (tools/rename.py). Address 0x800488e4.
 
-Round 82, runner echo (second echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (second echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
 retail SLPS_015.56`), funcdiff 31/31, 0 insertions / 0 deletions, no
 out-of-range drift.
@@ -17,8 +17,8 @@ Slot +0x008 (ctor) of gLbdFileMethods: runs the active data source's ctor on sel
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
-(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/FileResource.h`.
+Declarations it needs are the local views at the top of `src/cd/game_files.c`
+(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/file_resource.h`.
 
 ```c
 /* slot +0x008 of gLbdFileMethods (ctor) */
@@ -46,10 +46,10 @@ void LbdFile__LbdFile(DataSrc39094 *self) {
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickSoundBank passes one in `$a1`, as GameApplicationFileResource's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as game_shell's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
-  (DayTaskStageMap.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
+  (dream_day.h, class_3bb8c.h, game_application.h) are independent and untouched.
 
 ## Naming
 
@@ -59,7 +59,7 @@ void LbdFile__LbdFile(DataSrc39094 *self) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__DataSrc39094` -> `LbdFile__LbdFile` with `rename.py`: the +0x008 ctor occupant, named for the class. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `DataSrc39094__DataSrc39094` -> `LbdFile__LbdFile` with `rename.py`: the +0x008 ctor occupant, named for the class. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/lbd_file.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)
@@ -67,7 +67,7 @@ Renamed `DataSrc39094__DataSrc39094` -> `LbdFile__LbdFile` with `rename.py`: the
 Renamed with `python3 tools/renametype.py Class81940 LbdFile` (the whole
 class family: object, table `gClass81940Methods` -> `gLbdFileMethods`,
 getter, constructors, methods, the header `include/Class81940.h` ->
-`include/LbdFile.h` and its typedefs). The tool rewrote every
+`include/lbd_file.h` and its typedefs). The tool rewrote every
 `Class81940` token in these reports too, so the Track 4 section above now
 says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.
@@ -88,20 +88,20 @@ name follows the siblings named for the format they load (TimImage, Tod,
 VabStreamObj). What the header block's two regions and the data block hold
 beyond what their consumers do with them is not established here.
 
-The unit banner of `src/cd/GameFiles.c` was rewritten as documentation in
+The unit banner of `src/cd/game_files.c` was rewritten as documentation in
 the same pass; its history is kept here verbatim (with the class tokens as
 renamed):
 
 ```
 /*
- * GameFiles -- GAME code carved from psyq_39094 on 2026-09-25 (FINISHING-PLAN
+ * game_files -- GAME code carved from psyq_39094 on 2026-09-25 (FINISHING-PLAN
  * revision 18). 0x39094..0x39C80 (vram 0x80048894..0x80049480). It was counted
  * as Psy-Q SDK by segment name; tools/gameinsdk.py measured it as game (a call
  * into game code, a method-table entry beside game methods, or contiguity with
  * those, and no Sony fingerprint). All 38 functions matched round 82 (three
  * echo sessions); named round 82 (bravo). Two independent groups of code:
  *
- * 1. LbdFile (method table gLbdFileMethods; include/LbdFile.h): a
+ * 1. LbdFile (method table gLbdFileMethods; include/lbd_file.h): a
  *    FileResource data source that streams a header block into its own 0xB358
  *    buffer (state 9, LbdFile__LoadHeader), then, once the read completes
  *    (LbdFile__AdvanceLoadState), an optional data block the header
@@ -112,18 +112,18 @@ renamed):
  *    records (FilePathRecord): random-or-forced pickers (SeedAndRandom,
  *    SetPickOverrides/sForcedSoundBank/sForcedStageBgm), record-group
  *    accessors indexed by sStageFirstRecord and, for GetStageMapChunkRecordXY, by
- *    StageGrid.h's cell columns, and a family of "stream channel" lookups
+ *    stage_grid.h's cell columns, and a family of "stream channel" lookups
  *    (GetAsmkMovie, PickOpeningMovie, GetEndingMovie,
  *    GetSpecialDayOrEventRecord, GetSpecialDayMovieSpan) whose shapes match
- *    their exact call sites in GameApplicationFileResource.c one for one. The records' own
+ *    their exact call sites in game_shell.c one for one. The records' own
  *    fields and the channels' in-game meaning are not established.
  */
 ```
 
 ## Proposed field names
 
-Not applied: every accessor outside `src/cd/GameFiles.c` is in StageMap's
-units (DayTaskStageMap.c, class_3bb8c_b.c), outside this job. For the head to
+Not applied: every accessor outside `src/cd/game_files.c` is in StageMap's
+units (dream_day.c, class_3bb8c_b.c), outside this job. For the head to
 apply by type scope.
 
 - `LbdFile.ownerRate` (+0x030) -> `chunkIndex`. StageMap__ApplyChunkLoads
@@ -132,17 +132,17 @@ apply by type scope.
   no chunk is held (this ctor, LbdFile__ReleaseHeader; ResetElementCells
   tests `>= 0`); StageMap__SplitChunkIndex splits it into column
   (`% divisor`) and row (`/ divisor`); StageMap__FindSlotIndexByChunk
-  finds the element holding a given chunk by it. Accessors: GameFiles.c
-  (LbdFile__LbdFile, LbdFile__ReleaseHeader), DayTaskStageMap.c
+  finds the element holding a given chunk by it. Accessors: game_files.c
+  (LbdFile__LbdFile, LbdFile__ReleaseHeader), dream_day.c
   (ApplyRateEntries, ResetElementCells, ComputeFootprintDescriptor,
-  GetLastTargetRateSplit), DayTaskStageMap.c (FindElemIndexByUnk30).
+  GetLastTargetRateSplit), dream_day.c (FindElemIndexByUnk30).
 - `LbdFile.ownerKey` (+0x032) -> `elemKey`. StageMap's ctor writes the
   element's index, BuildRateEntries copies each element's `key` in, and
-  FindElemByUnk32 / UpdateFootprintTracking / ObjMStyleActor read it back to
-  find an element. Accessors: DayTaskStageMap.c, class_3bb8c.c, class_3bb8c_b.c,
-  ObjMStyleActor.c (none in GameFiles.c; the ctor zeroes it).
+  FindElemByUnk32 / UpdateFootprintTracking / dream_scene read it back to
+  find an element. Accessors: dream_day.c, class_3bb8c.c, class_3bb8c_b.c,
+  dream_scene.c (none in game_files.c; the ctor zeroes it).
 - `LbdFileHeader.gridOffset` / `gridSize` (+0x04 / +0x08) ->
   `placementsOffset` / `placementsSize`. StageMap__PopulateSlotCells
   points the element's PlacementGrid (a 20x20 grid of placement records) at
   header + gridOffset and builds its LinkResource from header + gridOffset +
-  gridSize, i.e. right after the placements. Accessor: DayTaskStageMap.c only.
+  gridSize, i.e. right after the placements. Accessor: dream_day.c only.

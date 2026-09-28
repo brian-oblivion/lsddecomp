@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004F55C` on 2026-09-20 (tools/rename.py). Address 0x8004f55c.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 32 words (0x80) · **Status:** MATCH
+**Unit:** title_menu · **Size:** 32 words (0x80) · **Status:** MATCH
 
 `void TaskObjF__Init(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a5, s32
 a6, s32 a7)`. Stores `a1`/`a2` into `self->unk30`/`unk34`, clears
@@ -36,5 +36,5 @@ is set up by a caller outside this unit, not fully visible from
 ## Round 95 (track 7, charlie)
 
 Pointer fields cleared with `NULL`, `state`/`opMode` with
-`TASKOBJF_STATE_IDLE`/`TASKOBJF_OP_NONE` (include/TaskObjF.h, added this
+`TASKOBJF_STATE_IDLE`/`TASKOBJF_OP_NONE` (include/task_objf.h, added this
 round). Zero bytes.

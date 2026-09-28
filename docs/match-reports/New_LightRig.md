@@ -4,7 +4,7 @@
 
 > Renamed from `func_80042694` on 2026-09-25 (tools/rename.py). Address 0x80042694.
 
-Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/sprite.c`. Fresh ground, no prior attempt.
 
 - **Where:** not in any method table (allocator).
 - **What:** `BMemPMgrAlloc(0x54)`; if non-NULL, calls slot +0x008 (ctor) of `GetLightRigMethods()` (the gLightRigMethods table) on it and returns it, else NULL.
@@ -32,7 +32,7 @@ LightRig *New_LightRig(void) {
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `New_D8006EFAC`, tier A: the allocator, `BMemPMgrAlloc(0x54)` (the object size in include/LightRig.h). Returns `LightRig *` (was `void *`) and calls `GetLightRigMethods()->ctor(obj)` (was a `Slot08Methods_322b4` cast). Its one caller, IntermediateBase__Init, casts the result to IntermediateBase's `BasicClass *unk14`. The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/light_rig.h`. Renamed from `New_D8006EFAC`, tier A: the allocator, `BMemPMgrAlloc(0x54)` (the object size in include/light_rig.h). Returns `LightRig *` (was `void *`) and calls `GetLightRigMethods()->ctor(obj)` (was a `Slot08Methods_322b4` cast). Its one caller, IntermediateBase__Init, casts the result to IntermediateBase's `BasicClass *unk14`. The Source block above is the unified spelling. Image byte-identical.
 
 ## Track 7 (round 99, charlie)
 

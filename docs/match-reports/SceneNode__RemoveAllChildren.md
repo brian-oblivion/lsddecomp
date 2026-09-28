@@ -26,7 +26,7 @@ void SceneNode__RemoveAllChildren(SceneNodeObj *self) {
 round 11 (2026-09-03), runner charlie, unit SceneNode, second pass. Matched on the first build.
 `SceneNode__UnlinkModel`'s own (measured) body is what confirmed
 `SceneNodeObj::unk18`/`unk20` independently of the ctor's own zeroing —
-see `include/SceneNode.h`.
+see `include/scene_node.h`.
 
 ## Naming
 

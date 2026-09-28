@@ -4,7 +4,7 @@
 
 > Renamed from `func_80040EDC` on 2026-09-18 (tools/rename.py). Address 0x80040edc.
 
-Unit: `src/ui/ScreenWidgets.c`. First attempt.
+Unit: `src/ui/screen_widgets.c`. First attempt.
 
 ```c
 void TextRow__SetCellAt(Obj6EAC0 *self, s32 a1, s32 a2) {
@@ -42,4 +42,4 @@ cross-reference; same tier B.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__SetChildChar`: the +0x0C4 setCell occupant, but with an index: `(TextRow *self, s32 cell, s32 index)` sets `cells[index]`'s cell. Named SetCellAt rather than SetCell because the body takes the index the slot does not have; the slot keeps CharSprite's `setCell(self, u8)` type and TextRowSetCellAtFn is the override's (TextEntry__SetCharAt calls it with (char, pos) through its own ChildObj86ED0 view). Image byte-identical; the current source is src/ui/ScreenWidgets.c.
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/text_row.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__SetChildChar`: the +0x0C4 setCell occupant, but with an index: `(TextRow *self, s32 cell, s32 index)` sets `cells[index]`'s cell. Named SetCellAt rather than SetCell because the body takes the index the slot does not have; the slot keeps CharSprite's `setCell(self, u8)` type and TextRowSetCellAtFn is the override's (TextEntry__SetCharAt calls it with (char, pos) through its own ChildObj86ED0 view). Image byte-identical; the current source is src/ui/screen_widgets.c.

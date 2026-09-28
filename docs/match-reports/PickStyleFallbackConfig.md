@@ -1,4 +1,4 @@
-# PickStyleFallbackConfig -- MATCHED (62/62 words), ObjMStyleActor
+# PickStyleFallbackConfig -- MATCHED (62/62 words), dream_scene
 
 > Renamed from `func_80054758` on 2026-09-23 (tools/rename.py). Address 0x80054758.
 
@@ -17,8 +17,8 @@ fresh copy (same reasoning as `StyleUpdateEffectSlots`/`TryStartStyleCue`/
 ## New externs
 
 ```c
-extern s32 sStyleDay;         /* already s32 in ObjMStyleActor.c */
-extern s32 sStyleStage;         /* already s32 in ObjMStyleActor.c and this unit's own StyleScrollVramStrips */
+extern s32 sStyleDay;         /* already s32 in dream_scene.c */
+extern s32 sStyleStage;         /* already s32 in dream_scene.c and this unit's own StyleScrollVramStrips */
 extern s8 sStyleVariantPicks[];        /* 16-entry table, indexed by (sStyleDay+sStyleStage)&0xF */
 extern s32 sStyleVariant;
 extern s8 sStyleVariantConfigCounts[];        /* divisor table, indexed by "kind" -- raw index, no scale */
@@ -131,7 +131,7 @@ inverted branch; second: explicit default-then-override, byte-exact).
 
 **`PickStyleFallbackConfig`, tier B.**
 
-Literal call site in `ApplyStyleConfig` (ObjMStyleActor.c, already matched):
+Literal call site in `ApplyStyleConfig` (dream_scene.c, already matched):
 `cfg = func_80054758();`, used only when the direct per-`sStyleStage` config
 table entry (`sStyleStageConfigs[sStyleStage]`) is NULL -- i.e. this is the fallback
 path. Body hashes `sStyleDay + sStyleStage` into a 16-entry table to pick

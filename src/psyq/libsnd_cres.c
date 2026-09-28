@@ -4,7 +4,7 @@
  *
  * Snd_crescendo is libsnd's per-tick volume fade for one sequence: the
  * linked libsnd objects call it by this name (config/psyq-objects.ld). Its
- * record is Sony's _ss_score entry, include/SsScore.h.
+ * record is Sony's _ss_score entry, include/ss_score.h.
  *
  * Which object (nm over sdk/work/<disc>/elf/libsnd): cres.o on every disc,
  * with this one function as its only text symbol -- Snd_crescendo on 3.0 and

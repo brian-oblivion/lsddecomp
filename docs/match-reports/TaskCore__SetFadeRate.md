@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CBB8` on 2026-09-24 (tools/rename.py). Address 0x8003cbb8.
 
-**Unit:** Task · **Size:** 2 instructions
+**Unit:** task · **Size:** 2 instructions
 
 ## What it does
 
@@ -21,7 +21,7 @@ slot). Confirms `Obj86B60::unk84` (already established as a multiplier by
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit Task. 1 attempt.
+round 2026-09-02, runner echo, unit task. 1 attempt.
 
 ## Naming (round 78, delta)
 
@@ -33,4 +33,4 @@ mechanically, without asserting what the fade itself means in the game.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__SetFadeRate (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__SetFadeRate (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

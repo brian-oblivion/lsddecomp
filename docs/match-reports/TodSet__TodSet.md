@@ -2,7 +2,7 @@
 
 > Renamed from `func_80045228` on 2026-09-25 (tools/rename.py). Address 0x80045228.
 
-Round 82, runner echo (GraphicsResources session, echo #8), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #8), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 33/33 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTodSetMethods +0x008.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/graphics/GraphicsResources.c`.
+`src/graphics/graphics_resources.c`.
 
 ```c
 /* gTodSetMethods +0x008: constructor -- the parent gTodMethods's, then this
@@ -46,7 +46,7 @@ First build. Slot +0x064 is `void setFlag(Self *)` in the unified macro, but thi
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `void *TodSet__TodSet(TodSet *self, struct ResourceSource *src)` (include/TodSet.h). The parent call goes through the typed base table, `GetTodMethods()->ctor((Tod *)self, src)`, instead of UnprototypedCtorTable (Tod__Tod returns nothing, so the void slot fits it). `*arg != 0` is now `src->buffer != NULL`: it is the same first word, the buffer Tod__Tod adopts. The +0x064 call keeps its cast: the inherited slot is `void setFlag`, the occupant TodSet__BuildTods returns s32. Bytes unchanged.
+Now `void *TodSet__TodSet(TodSet *self, struct ResourceSource *src)` (include/tod_set.h). The parent call goes through the typed base table, `GetTodMethods()->ctor((Tod *)self, src)`, instead of UnprototypedCtorTable (Tod__Tod returns nothing, so the void slot fits it). `*arg != 0` is now `src->buffer != NULL`: it is the same first word, the buffer Tod__Tod adopts. The +0x064 call keeps its cast: the inherited slot is `void setFlag`, the occupant TodSet__BuildTods returns s32. Bytes unchanged.
 
 ## History (moved from include/TodSet.h, round 102)
 

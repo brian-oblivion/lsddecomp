@@ -6,7 +6,7 @@
 
 > Renamed from `func_80051F24` on 2026-09-24 (tools/rename.py). Address 0x80051f24.
 
-Unit: `src/ui/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`.
+Unit: `src/ui/input_dialogs.c`. `self` is `ItemList_3bb8c_j`.
 
 ## Semantics (established with reasonable confidence from the disassembly)
 
@@ -126,7 +126,7 @@ register diffs, nothing else).
 **A permuter lead that scores well against the permuter's own stripped
 scaffold does not always transfer to the real build.** Confirmed here:
 a score-30 candidate (down from 140) translated by hand back into
-`src/ui/TextEntryItemList.c` and rebuilt through `./build-and-verify.sh`
+`src/ui/input_dialogs.c` and rebuilt through `./build-and-verify.sh`
 reproduced the ORIGINAL 75/95 score exactly, no improvement. Worth a
 `--debug` re-check of the CANDIDATE (not just the base) before trusting
 a non-zero permuter score as a real lead -- this project's existing
@@ -208,8 +208,8 @@ reshaping).
 ### Proposed learning (reinforces existing entry, does not add a new class)
 
 **Three independent functions across two different header families
-(`DayTaskStageMap`'s `StageMap__BuildFootprintRects`, `TitleMenuTaskObjF`'s `TaskObjF__WriteMemcardSaveFile`,
-`TextEntryItemList`'s `ItemList__LoadResources`) now confirm the same negative result
+(`dream_day`'s `StageMap__BuildFootprintRects`, `title_menu`'s `TaskObjF__WriteMemcardSaveFile`,
+`input_dialogs`'s `ItemList__LoadResources`) now confirm the same negative result
 for the SAME lever (declaration/introduction order of the contested
 locals).** This is strong enough evidence to stop treating "try a
 different declaration order" as a live lever for this residue class at
@@ -225,7 +225,7 @@ reordering attempt first.
 
 Track 1b: the preserved body above (75/95, pure register-identity
 rotation of the two repeated global addresses and the handle across the
-same three registers) is now live in `src/ui/TextEntryItemList.c` under
+same three registers) is now live in `src/ui/input_dialogs.c` under
 `#ifdef NON_MATCHING`, with the verified build still taking the `#else`
 `INCLUDE_ASM` branch. `./build-and-verify.sh` stayed green (no bytes
 changed) and `tools/check-nonmatching.sh` compiles and link-resolves it.
@@ -257,7 +257,7 @@ handle has a short, dense live range, outranks the addresses, and takes `$s0`
 in turn, as retail does.
 
 The template was the MATCHED sibling `TextEntry__LoadCardResources` in
-`src/ui/TextEntryItemList.c`: the same "CARD\\<name>.TIM" resource loader, with
+`src/ui/input_dialogs.c`: the same "CARD\\<name>.TIM" resource loader, with
 `char path[0x20]`, `dir`/`ext` locals and `handle1`/`handle2`. Screen for the
 next case: a cross-unit sibling with the same call skeleton (here
 `BuildFileName` -> `New_TimImage` -> `slot78` -> `New_ScreenSprite`).
@@ -277,7 +277,7 @@ Rounds 18 and 19 tried only reorderings and statement splits of the
 ADDRESS values, never the handle's variable count. Arity was checked and is
 not relevant: every call writes exactly the argument registers its callee's
 declared parameter list names, and `BuildFileName`'s matched definition
-(`GameApplicationFileResource.c`) takes four.
+(`game_shell.c`) takes four.
 
 The names/types are carried into the committed C because they are the
 sibling's established reading. The rodata/sdata strings are referenced as
@@ -304,11 +304,11 @@ cross-unit sibling with the same call skeleton first.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (ItemListHandle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&sItemListPanelRect, 0)`: sItemListPanelRect is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position sItemListPanelPos = (-100, -60). Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/screen_sprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk50 = (ItemListHandle_3bb8c_j *)New_ScreenSprite(handle1, (SpriteRect *)&sItemListPanelRect, 0)`: sItemListPanelRect is the rect (words 0, 256, 160), and unk50's +0x04C call passes the screen position sItemListPanelPos = (-100, -60). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`); this unit's local `extern
+TimImage is unified (`include/tim_image.h`); this unit's local `extern
 ItemListHandle_3bb8c_j *New_TimImage(char *)` is deleted. `handle1`/
 `handle2` are `TimImage *`: +0x078 through `TimImageUploadFn` (occupant
 TimImage__Upload), `slot4` -> the inherited `release`; `handle2` is cast to
@@ -334,11 +334,11 @@ Data this function reads, renamed with tools/rename.py:
 | D_80087028 | sItemListPanelRect | A | the only reference is this New_ScreenSprite call's rect: SELECT.TIM's cell, SpriteRect {0, 0, 256, 160}; sibling of sTextEntryPanelRect |
 | D_8008AAF8 | sItemListPanelPos | A | the panel's attachToParent position (-100, -60), a ScreenSpritePos; sibling of sTextEntryPanelPos |
 | D_8008AB14 | sStrSelect | A | the string "SELECT", the panel TIM's name; sibling of sStrComInput |
-| D_800116E4 | sItemListStrFontIcon | A | this unit's copy of "FONTICON" (TextEntryItemList's is sStrFontIcon, 0x8001161C) |
-| D_8008AB1C | sItemListCardPathPrefix | A | this unit's copy of "CARD\\" (TextEntryItemList's is sCardPathPrefix) |
-| D_8008AB24 | sItemListTimExt | A | this unit's copy of ".TIM" (TextEntryItemList's is sTimExt) |
+| D_800116E4 | sItemListStrFontIcon | A | this unit's copy of "FONTICON" (input_dialogs's is sStrFontIcon, 0x8001161C) |
+| D_8008AB1C | sItemListCardPathPrefix | A | this unit's copy of "CARD\\" (input_dialogs's is sCardPathPrefix) |
+| D_8008AB24 | sItemListTimExt | A | this unit's copy of ".TIM" (input_dialogs's is sTimExt) |
 
 The path buffer's 0x20 is `CARD_TIM_PATH_SIZE` (32, unit-local). The two
 data externs are typed as what they are (`SpriteRect`, `ScreenSpritePos`,
 were `s32`), so the rect needs no cast; the position keeps its `LongVec3 *`
-cast, which SceneNode's attachToParent slot demands (include/ScreenSprite.h).
+cast, which SceneNode's attachToParent slot demands (include/screen_sprite.h).

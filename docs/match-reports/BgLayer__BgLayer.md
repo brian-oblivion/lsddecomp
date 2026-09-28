@@ -2,7 +2,7 @@
 
 > Renamed from `func_80044220` on 2026-09-25 (tools/rename.py). Address 0x80044220.
 
-Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #7), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 29/29 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gBgLayerMethods +0x008 (constructor).
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
 /* A three-byte vector, and the gBgLayerMethods object (a SceneNode subclass). */
@@ -56,9 +56,9 @@ void BgLayer__BgLayer(Obj6F2C4 *self, s32 arg1, s32 arg2) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/BgLayer.h`. `self` is `BgLayer *` (was the unit-local `Obj6F2C4`), the parameters are `(struct Map44294 *src, s32 mode)` (were `s32 arg1, arg2`), and reset is called through `BgLayerResetFn`, a typedef of BgLayer__Reset's own parameter list (was an unprototyped `void (*)()` cast): the inherited +0x040 slot takes self alone (FINISHING-PLAN track 4 step 6). Byte-identical.
+Class unified in `include/bg_layer.h`. `self` is `BgLayer *` (was the unit-local `Obj6F2C4`), the parameters are `(struct Map44294 *src, s32 mode)` (were `s32 arg1, arg2`), and reset is called through `BgLayerResetFn`, a typedef of BgLayer__Reset's own parameter list (was an unprototyped `void (*)()` cast): the inherited +0x040 slot takes self alone (FINISHING-PLAN track 4 step 6). Byte-identical.
 
-Later the same round (alpha, second class): TileMap unified too (`include/TileMap.h`, same round): `src` is `TileMap *` (was `struct Map44294 *`). Byte-identical.
+Later the same round (alpha, second class): TileMap unified too (`include/tile_map.h`, same round): `src` is `TileMap *` (was `struct Map44294 *`). Byte-identical.
 
 ## History (moved from include/BgLayer.h, round 102)
 

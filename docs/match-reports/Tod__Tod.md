@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043EE4` on 2026-09-25 (tools/rename.py). Address 0x80043ee4.
 
-Round 82, runner echo (GraphicsResources session, echo #8), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #8), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 37/37 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTodMethods +0x008.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/graphics/GraphicsResources.c`.
+`src/graphics/graphics_resources.c`.
 
 ```c
 typedef struct ResourceSource {
@@ -49,7 +49,7 @@ First build. The else branch reuses the just-stored table pointer (GCC CSE of `s
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-`self` is now `Tod *` (include/Tod.h), no longer the unit-local `DataSrc33808 *`; `self->methods = GetTodMethods()` is a `TodMethods *` and `setFlag`/`requestLoadFile` are FileResource's inherited slots. Bytes unchanged.
+`self` is now `Tod *` (include/tod.h), no longer the unit-local `DataSrc33808 *`; `self->methods = GetTodMethods()` is a `TodMethods *` and `setFlag`/`requestLoadFile` are FileResource's inherited slots. Bytes unchanged.
 
 ## History (moved from include/Tod.h, round 102)
 

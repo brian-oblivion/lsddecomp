@@ -171,7 +171,7 @@ division 3, as the round-bravo report already noted. This strengthens
 before spending further hand attempts on expression-level variants of
 the third division alone.
 
-Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::configure` (`+0x0DC`,
+Unit `screen_widgets`, carved round 14. `FadeBoxMethods::configure` (`+0x0DC`,
 shared verbatim with `ClassEAC0Methods::configure`).
 
 ## Shape
@@ -401,11 +401,11 @@ The field this method writes at +0x084 is now `maskPerTick` (was `unk84`):
   function from its third argument, zeroed by Reset, read only by Update,
   which skips the colour step while it is 9 (the tick countdown and the stop
   still run, so 9 holds the colour for the fade's length). Every caller in
-  the tree passes 0 (Entity/_f/_g, ObjMStyleActor, and ObjM__StartFadeUp's
+  the tree passes 0 (Entity/_f/_g, dream_scene, and ObjM__StartFadeUp's
   `fadeMode`, whose own callers all pass 0), so no other value is observed;
   "mode" says only that it selects a variant.
 - Parameter `arg3` -> `mode` here, in StartFadeDown and StartFadeUp, and in
-  FadeBox.h's three slots and prototypes; locals `q1` -> `ticks`.
+  fade_box.h's three slots and prototypes; locals `q1` -> `ticks`.
 
 ### History: the in-place division is no longer load-bearing (round 100)
 

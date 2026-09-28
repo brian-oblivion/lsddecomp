@@ -12,7 +12,7 @@
 `self->unk10` to `(a1 == 0)`, and returns whether the field's PREVIOUS
 value was 0 (i.e. it returns the logical negation of the old bit).
 
-See `include/SceneNode.h` for `GetSetBitField`, the generic packed-bitfield
+See `include/scene_node.h` for `GetSetBitField`, the generic packed-bitfield
 accessor all five sibling functions in this file (`SceneNode__SetDisplay`,
 `SceneNode__SetSemiTrans`, `SceneNode__SetSemiTransRate`, `SceneNode__SetLighting`, `SceneNode__SetLightMode`) wrap.
 It lives in the next, still-uncarved slice (`asm/SceneNode.s`) and was
@@ -52,7 +52,7 @@ elsewhere before re-deriving it from scratch.
 
 ## Naming
 
-Round 71 (alpha). `func_8001D344` -> `SceneNode__SetDisplay`, **tier A**. Table slot +0x060. GetSetBitField(&attribute, 31, 1, on == 0): bit 31 of GsDOBJ2.attribute is GsDOFF (LIBGS.H), so on=0 hides the object; returns the previous display state (old DOFF == 0). DreamSys calls it with 0; ObjMStyleActor calls the slot setDisplay.
+Round 71 (alpha). `func_8001D344` -> `SceneNode__SetDisplay`, **tier A**. Table slot +0x060. GetSetBitField(&attribute, 31, 1, on == 0): bit 31 of GsDOBJ2.attribute is GsDOFF (LIBGS.H), so on=0 hides the object; returns the previous display state (old DOFF == 0). DreamSys calls it with 0; dream_scene calls the slot setDisplay.
 
 ## Proposed field names
 

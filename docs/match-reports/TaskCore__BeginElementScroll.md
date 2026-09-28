@@ -4,11 +4,11 @@
 
 > Renamed from `func_8003DA10` on 2026-09-24 (tools/rename.py). Address 0x8003da10.
 
-**Unit:** Task · **Size:** 49 words · **Result:** byte-exact, first attempt
+**Unit:** task · **Size:** 49 words · **Result:** byte-exact, first attempt
 
 ## What it does
 
-`Obj86B60Methods::slot108` (already recorded in `Task.h`). Only acts
+`Obj86B60Methods::slot108` (already recorded in `task.h`). Only acts
 when `self->unk3C == 1`: notifies a new slot (`slot100`), looks up an
 element from a computed doubly-indexed pointer array, hands it an 8-byte-
 offset buffer pointer through its own `+0x0B8` slot, then advances
@@ -37,7 +37,7 @@ void TaskCore__BeginElementScroll(Obj86B60 *self)
 
 ## Header additions
 
-`include/Task.h`:
+`include/task.h`:
 
 - New field `unk14` on `Obj86B60` (`s32`, carved from existing padding
   `0x004`-`0x01C`) — forwarded as an opaque word to `slot100`, never
@@ -66,7 +66,7 @@ No violation found here.
 None — matched on the first attempt. The `self->unk4C->unk24[idx] + 8`
 pointer arithmetic was cast to `u8 *` locally at the point of use rather
 than retyping the shared field `Unk4CObj::unk24` (still `void **`, used
-elsewhere in the sibling unit `Task.c`'s already-matched
+elsewhere in the sibling unit `task.c`'s already-matched
 `TaskCore__ConfirmSlot` as a pure null-check) — avoids a shared-header type change
 for a computation this unit alone needs.
 
@@ -76,7 +76,7 @@ Renamed `func_` -> `Obj86B60__BeginElementScroll`. **Tier B**: Gated on `self->u
 
 ## Proposed field names
 
-Not renamed here -- `self->unk3C` is CROSS-UNIT (`Task.c`'s
+Not renamed here -- `self->unk3C` is CROSS-UNIT (`task.c`'s
 `TaskCore__OnPadConfirm`/`TaskCore__OnPadCancel`/`TaskCore__OnPadPrev`/`TaskCore__OnPadNext` all gate on
 it too, plus the STALL `TaskCore__OnPadEvent`/`TaskCore__SetState`), not attempted as a
 compiler-verified rename this round. Proposing for the head to apply at
@@ -96,7 +96,7 @@ merge:
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__BeginElementScroll (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__BeginElementScroll (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
@@ -104,4 +104,4 @@ Renamed from Obj86B60__BeginElementScroll (tools/rename.py): the class prefix. O
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).

@@ -4,7 +4,7 @@
 
 > Renamed from `func_800518F4` on 2026-09-24 (tools/rename.py). Address 0x800518f4.
 
-**Unit:** TextEntryItemList · **Size:** 41 words (0xA4 bytes)
+**Unit:** input_dialogs · **Size:** 41 words (0xA4 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Matched on the first
@@ -16,12 +16,12 @@ This report originally typed `self` as `Obj866E8` (gStageMapMethods) and typed
 `self->unk40` through a unit-local `Unk40Obj866E8`/`Unk40Obj866E8Methods`
 duplicate. Both were wrong. `tools/classtable.py gTextEntryMethods` places this
 function at that table's +0x0A4 (`gStageMapMethods`'s 80 slots hold none of this
-group's six addresses) -- `self` is `Obj86ED0` (TextEntryItemList's shared
+group's six addresses) -- `self` is `Obj86ED0` (input_dialogs's shared
 type), whose OWN struct in `include/class_3bb8c.h` already types
 `self->unk40` as `ChildObj86ED0 *`. The `+0x0BC` slot this function
 dispatches through was simply missing a name on the shared
 `ChildMethods86ED0` -- added additively there instead of duplicated
-locally. See `src/ui/TextEntryItemList.c`'s file header comment and
+locally. See `src/ui/input_dialogs.c`'s file header comment and
 `TextEntry__PrevChar.md` for the full evidence trail. Zero bytes
 affected (type names are not codegen).
 
@@ -71,11 +71,11 @@ delay slot since it doesn't depend on the branch outcome.
 - `ChildMethods86ED0::slotBC` (offset 0x0BC) — round 75, this function's own
   dispatch target on the ALREADY-shared `ChildObj86ED0` (`self->unk40`).
   `unk28`/`unk40`/`unk44`/`Obj86ED0Methods::slot60` were already present on
-  the shared `Obj86ED0`/`Obj86ED0Methods`, established by TextEntryItemList —
+  the shared `Obj86ED0`/`Obj86ED0Methods`, established by input_dialogs —
   no edit needed for those.
 
 `sTextEntryCursorPos` is read here as a plain VALUE (`s32`, used arithmetically:
-`arg1 * 7 + sTextEntryCursorPos`), a different reading from `TextEntryItemList.c`'s own
+`arg1 * 7 + sTextEntryCursorPos`), a different reading from `input_dialogs.c`'s own
 `extern s32 sTextEntryCursorPos;` (there, only its ADDRESS is taken, as an opaque
 `slot4C` argument). Both are legitimate independent local views of the same
 global per the project's convention — they're in separate translation
@@ -93,14 +93,14 @@ verdict was set aside.
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 Renamed from Obj86ED0__DispatchIndexValue: moves cursorSprite with its setPosition slot (ScreenSprite +0x0BC) to x = pos * 7 + sTextEntryCursorPos, y = D_8008AAE0 (the stack block is a ScreenSpritePos), stores cursorIndex, and calls notifyTarget(0) when `notify`. Occupant of slot +0x0A4, called by MoveCursorRight/Left and ResetAllChars. Tier A (the body is the name).
 
 ## Round 98: sTextEntryCursorPos unified (track 4b)
 
 `sTextEntryCursorPos` (0x8008AADC) now has one declaration, `extern
-ScreenSpritePos sTextEntryCursorPos;` in include/TextEntry.h; this unit's
+ScreenSpritePos sTextEntryCursorPos;` in include/text_entry.h; this unit's
 `extern s32 sTextEntryCursorPos` and `extern s32 D_8008AAE0` are gone. The
 body reads `local.y = sTextEntryCursorPos.y; local.x = pos * 7 +
 sTextEntryCursorPos.x;`. `D_8008AAE0` was that position's y (-12, the word at
@@ -112,6 +112,6 @@ reference.
 ## Track 7 (round 100, charlie)
 
 Locals `local`/`obj` renamed `screenPos`/`cursor`. The `* 7` is
-TEXTROW_DEFAULT_PITCH (include/TextRow.h): sTextEntryCursorPos.x (-62)
-equals sTextEntryTextPos.x (-62, TextEntryItemList), so the cursor steps across
+TEXTROW_DEFAULT_PITCH (include/text_row.h): sTextEntryCursorPos.x (-62)
+equals sTextEntryTextPos.x (-62, input_dialogs), so the cursor steps across
 the text row's cells at the row's own default pitch. Zero bytes changed.

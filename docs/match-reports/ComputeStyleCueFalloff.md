@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005627C` on 2026-09-23 (tools/rename.py). Address 0x8005627c.
 
-Unit: `ObjMStyleActor` (round 17 continuation). The shared helper every
+Unit: `dream_scene` (round 17 continuation). The shared helper every
 `sStyleCueCallbacks` slot occupant calls first: reads a small signed tag byte off
 `ctx->methods`, looks it up with a NEGATIVE index into a 15-entry global
 table, and returns a chained division result.
@@ -80,28 +80,28 @@ s32 ComputeStyleCueFalloff(StyleCueParam *ctx) {
 
 ## Naming
 
-**Tier B.** Free function (called with `ctx`, not a `self` of its own type in the class-method sense), so no `Class__` prefix. The name reflects the mechanism, not the game meaning: `sStyleCueDistanceTable` (the same table `IsStyleCueNear`/`FindNextStyleCueInRange`, code_8220_b.c/ObjMStyleActor.c, index with `dist < table[...]` -- confirming it holds distance thresholds) is read at a NEGATIVE tag index, divided down, and used as the divisor for `ctx->falloff`'s own value; `falloff` is used by every `StyleCueNN` occupant that calls this helper first. What the resulting scaled quantity represents in the running game (a cue repeat count? a duration?) is not established.
+**Tier B.** Free function (called with `ctx`, not a `self` of its own type in the class-method sense), so no `Class__` prefix. The name reflects the mechanism, not the game meaning: `sStyleCueDistanceTable` (the same table `IsStyleCueNear`/`FindNextStyleCueInRange`, code_8220_b.c/dream_scene.c, index with `dist < table[...]` -- confirming it holds distance thresholds) is read at a NEGATIVE tag index, divided down, and used as the divisor for `ctx->falloff`'s own value; `falloff` is used by every `StyleCueNN` occupant that calls this helper first. What the resulting scaled quantity represents in the running game (a cue repeat count? a duration?) is not established.
 
 ## Track 6 (2026-09-26, round 92, alpha): `set` is a SoundCueSet
 
-ObjMStyleActor.c's `StyleCueParam` used to type both parameters of every
+dream_scene.c's `StyleCueParam` used to type both parameters of every
 StyleCueNN callback and of ComputeStyleCueFalloff; its old comment called it
 "very likely a SoundCueSet-shaped object" but kept one local type because
 nothing confirmed `self` and `ctx` were the same object. They are not, and
 the two now have different types:
 
 - The second parameter (was `self`, now `set`) is the SoundCueSet
-  (include/SoundCueSet.h). ServiceSoundCueSet calls `callback(owner, set)`,
+  (include/sound_cue_set.h). ServiceSoundCueSet calls `callback(owner, set)`,
   and every offset the callbacks write agrees: +0x04 (was `kind`, the value
   every callback dispatches on) is `tick`, +0x10 (was `falloff`) is
   `attenuation`, and +0x1C..+0x50 (was `unk1C`..`unk50`) are
   `slots[0..2].program/octave/vol/endVol`. The callbacks' `-1` store to
   +0x04 is the same restart the Entity__MoodCueNN handlers do.
-- The first parameter (`ctx`) is the owner, ObjMStyleActor.c's
+- The first parameter (`ctx`) is the owner, dream_scene.c's
   `StyleCueSlot`: TryStartStyleCue passes the slot as InitSoundCueSet's
   owner and `&slot->cueSet` (+0x14) as the set. So `StyleCueParam` is now a
   local view of StyleCueSlot: `methods` (+0x00) is the claimed record,
-  renamed `entry`, whose +0x06 `tag` is ObjMStyleActor's `countSign`;
+  renamed `entry`, whose +0x06 `tag` is dream_scene's `countSign`;
   `falloff` (+0x10) is `lastDist`; and `unk28` (+0x28) is
   `cueSet.attenuationSteps` (+0x14 + 0x14). ComputeStyleCueFalloff therefore
   scales the slot's last distance into 0..attenuationSteps against the cue's
@@ -116,10 +116,10 @@ Locals `kind` became `tick`. Zero bytes.
   `FindNextStyleCueInRange` compare `dist < table[...]` against, and
   `stepDist` is that range split into `attenuationSteps` (10) steps, so the
   result is the target's distance counted in steps: 0 at the slot, 10 at the
-  edge of the range (SoundCueSet.h: attenuation 10 leaves only `vol % 10`).
+  edge of the range (sound_cue_set.h: attenuation 10 leaves only `vol % 10`).
   Zero bytes (a local's name is not in the object).
 
-Two comments in `src/world/ObjMStyleActor.c` lost their history (it is in the
+Two comments in `src/world/dream_scene.c` lost their history (it is in the
 Derivation above) and now read as documentation. What they said, verbatim:
 
 ```c
@@ -135,6 +135,6 @@ Derivation above) and now read as documentation. What they said, verbatim:
 ```
 
 The unit-local record view's +0x006 field is `cue`, not `countSign`: the
-name ObjMStyleActor.c's own view (`StyleCueEntryView::cue`) already gives the
+name dream_scene.c's own view (`StyleCueEntryView::cue`) already gives the
 same byte, which IsStyleCueNear reads as `sStyleCueDistanceTable[-cue]`
 exactly as this function does. It is a cue index, not a count. Zero bytes.

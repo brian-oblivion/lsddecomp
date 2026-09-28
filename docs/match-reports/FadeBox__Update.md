@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003FF44` on 2026-09-20 (tools/rename.py). Address 0x8003ff44.
 
-Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::update` (`+0x098`).
+Unit `screen_widgets`, carved round 14. `FadeBoxMethods::update` (`+0x098`).
 
 ```c
 void FadeBox__Update(FadeBoxObj *self, void *a1, s32 a2) {
@@ -61,7 +61,7 @@ with a non-trivial body on BOTH sides rather than a bare early return.
 - `self->unk64`/`unk65`/`unk66` are three independent `u8` counters, each
   incremented by the LOW BYTE of `self->step` (a full `s32` elsewhere)
   gated by a separate bit of the `unk78` flags word -- named
-  `FadeBoxObj::unk64`/`unk65`/`unk66` in `include/Task.h`.
+  `FadeBoxObj::unk64`/`unk65`/`unk66` in `include/task.h`.
 
 ## Naming (round 61, track 3)
 
@@ -100,5 +100,5 @@ this report's earlier history too (known, pending an operator decision).
 - `event != 2` is `event != FRAMECLOCK_EVENT_RUNNING`: the sender is the
   fade's source, which every caller passes as a FrameClock (ObjM's
   IntermediateBase `unk10`, "init's own New_FrameClock()"; Entity's
-  `ticker`, Actor.h's class-5 FrameClock child), and FrameClock's tick
+  `ticker`, actor.h's class-5 FrameClock child), and FrameClock's tick
   sends event 2 to its parents when it counts a frame.

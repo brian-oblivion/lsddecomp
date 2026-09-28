@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004575C` on 2026-09-25 (tools/rename.py). Address 0x8004575c.
 
-Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #7), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 25/25 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (not in any table).
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
 /* Unless +0x0C is set, free the four allocations at +0x14, +0x18, +0x10,
@@ -55,4 +55,4 @@ void MoviePlayer__FreeFrameBuffers(Obj4575C *self) {
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; Obj4575C is gone: `unkC`/`unk10`/`unk14`/`unk18`/`unk1C` are `external`/`ring`/`frames[0]`/`frames[1]`/`strip`. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/movie_player.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; Obj4575C is gone: `unkC`/`unk10`/`unk14`/`unk18`/`unk1C` are `external`/`ring`/`frames[0]`/`frames[1]`/`strip`. Byte-identical; `typeviews.py --warnings` 0 new.

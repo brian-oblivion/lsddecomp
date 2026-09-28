@@ -468,7 +468,7 @@ exact signature elsewhere in this unit, see
 `docs/match-reports/StageMap__SplitFootprintRect.md`) if spliced back in — add
 `extern s32 StageMap__SplitFootprintRect(Obj866E8 *self, CellRect *slot, s32 count, s32 baseIdx, s32 p5, s32 p6, s32 p7, s32 p8);`
 before it (this function is defined AFTER `StageMap__BuildFootprintRects` in ROM order in
-`src/world/DayTaskStageMap.c`).
+`src/world/dream_day.c`).
 
 ```c
 #if 0
@@ -602,10 +602,10 @@ sub-cell offsets `h4`/`h6` are computed from `s16` struct fields
 `CellRect` fields (`slot0->h4`, `slot0->h6`) -- exactly the "narrower
 than declared" shape that closed `TaskObjF__WriteMemcardSaveFile`. Retyping BOTH locals
 from `s32` to `s16` (keeping the rest of the preserved 28/109 body
-unchanged) was tried directly against `src/world/DayTaskStageMap.c` and
+unchanged) was tried directly against `src/world/dream_day.c` and
 `build-and-verify.sh`: **1/109, with substantial address drift** -- far
 worse than the existing 28/109 baseline, not better. Reverted immediately
-(`git checkout -- src/world/DayTaskStageMap.c`; confirmed `build exit=0` and a
+(`git checkout -- src/world/dream_day.c`; confirmed `build exit=0` and a
 clean `OK: build matches retail SLPS_015.56` afterward). Unlike
 `TaskObjF__WriteMemcardSaveFile`'s `a3` (used ONLY as `a3 & 0xFF`, no arithmetic on the
 wider value), `h4`/`h6` here have running arithmetic (`+= 0x14`, `+= 0xA`,
@@ -662,7 +662,7 @@ for any other instance's difficulty.
 
 Track 1b promotion. Score re-verified unchanged (45/109, exact length,
 zero drift) before promoting. Placed the existing preserved body — the
-one carried in `src/world/DayTaskStageMap.c` since round 19, git-diff-empty
+one carried in `src/world/dream_day.c` since round 19, git-diff-empty
 against that commit — inside `#ifdef NON_MATCHING`, with `INCLUDE_ASM`
 restored in the `#else`. No source change beyond the wrapper and comment;
 both oracles green: `./build-and-verify.sh` (exit 0, `OK: build matches
@@ -689,11 +689,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -740,5 +740,5 @@ Kept as a one-line `MATCHING:` note under a new descriptive comment.
   of the chunk), `_PREV_ROW_LO`/`_PREV_ROW_HI` (start above it).
   `key + 1`, the slot of the part past the right edge, stays arithmetic.
 - `0x14` -> `STAGE_CHUNK_CELLS`; `>= 0x15` -> `> STAGE_CHUNK_CELLS` (same
-  code); `0xA` -> `STAGE_CHUNK_HALF_CELLS`, new in StageMap.h (additive,
+  code); `0xA` -> `STAGE_CHUNK_HALF_CELLS`, new in stage_map.h (additive,
   `STAGE_CHUNK_CELLS / 2`, the odd-row stagger).

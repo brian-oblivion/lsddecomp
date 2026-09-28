@@ -4,8 +4,8 @@
 
 > Renamed from `func_80056858` on 2026-09-23 (tools/rename.py). Address 0x80056858.
 
-Unit `ObjMStyleActor`. `self` is the owning `LinkNode`; this is the function
-that either attaches a fresh child (via `ObjMStyleActor.c`'s
+Unit `dream_scene`. `self` is the owning `LinkNode`; this is the function
+that either attaches a fresh child (via `dream_scene.c`'s
 `New_Actor`/`SceneNode__LinkModel` plus this unit's own `AttachWithRotScale`) or
 re-touches an existing one (`self->arr7C[i]->methods->slotB8`), driven by its
 own `reuse` argument.
@@ -105,7 +105,7 @@ start value) and `sModelChildSpacing` (was D_800877F8, s32[5] = {0, -0x80,
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+dream_scene.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/style_effect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
 
 ## Naming (track 7, round 101)
 

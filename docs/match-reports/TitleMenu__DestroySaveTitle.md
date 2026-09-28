@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004DC08` on 2026-09-24 (tools/rename.py). Address 0x8004dc08.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__DestroySaveTitle`: 23/23 words match.
 
 ## Source
@@ -42,8 +42,8 @@ Renamed `func_8004DC08` -> `TitleMenu__DestroySaveTitle`. **Tier B**: Unconditio
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The releaseTarget override (+0x0DC). `nameField` is a TextRow; its release is BasicClass's. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The releaseTarget override (+0x0DC). `nameField` is a TextRow; its release is BasicClass's. Byte-identical (whole image green, 0 new warnings, nonmatching green).

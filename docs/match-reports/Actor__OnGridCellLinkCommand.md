@@ -6,12 +6,12 @@
 
 > Renamed from `func_80057C14` on 2026-09-19 (tools/rename.py). Address 0x80057c14.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0E0`
-in the shared base table `gActorMethods` (`include/DreamSys.h`'s
+Unit: `src/world/dream_scene.c`. Class: `DreamSys`, own vtable slot `+0x0E0`
+in the shared base table `gActorMethods` (`include/dream_sys.h`'s
 `DreamSysBaseMethods::slot0xE0` already carried a comment naming this
 exact function as its resolution). Not overridden at the top `DreamSys`
 level, which instead has its own distinct `+0xE0` implementation
-(`DreamSys__WallLink`, `LinkWall` in `include/DreamSys.h`).
+(`DreamSys__WallLink`, `LinkWall` in `include/dream_sys.h`).
 
 ## Signature
 
@@ -49,4 +49,4 @@ tools/funcdiff.py Actor__OnGridCellLinkCommand   # 22/22
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__DispatchLinkCommand`. Occupant of +0x0E0, which Actor__DispatchLinkCommand calls for a 0x24 (GridCell) sender; DreamSys overrides it as DreamSys__WallLink, Entity as Entity__OnGridCellLinkCommand. Body: chain SceneNode's dispatchLinkCommand. The old name also collided with the +0x09C slot's. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__DispatchLinkCommand`. Occupant of +0x0E0, which Actor__DispatchLinkCommand calls for a 0x24 (GridCell) sender; DreamSys overrides it as DreamSys__WallLink, Entity as Entity__OnGridCellLinkCommand. Body: chain SceneNode's dispatchLinkCommand. The old name also collided with the +0x09C slot's. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

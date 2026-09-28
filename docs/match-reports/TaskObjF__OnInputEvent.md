@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004FF90` on 2026-09-23 (tools/rename.py). Address 0x8004ff90.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TaskObjF__OnInputEvent`: 25/25 words match.
 
 ## Source
@@ -57,7 +57,7 @@ Renamed from `TaskObjF__OnNotify` so that name could go to the +0x038 override. 
 ## Track 7 (2026-09-27, round 95)
 
 Parameter `arg2` -> `event`. 0x19 and 0x17 are `PAD_EVENT_PRESSED +
-PAD_BUTTON_RRIGHT` and `PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN` (include/Pad.h:
+PAD_BUTTON_RRIGHT` and `PAD_EVENT_PRESSED + PAD_BUTTON_RDOWN` (include/pad.h:
 0x12 + 7, 0x12 + 5): the sender is the class-id-2 child, a Pad, so circle
 pressed runs advanceState and cross pressed forceIdleFromState. `state != 0`
 is `TASKOBJF_STATE_IDLE`. Image byte-identical.

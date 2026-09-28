@@ -6,7 +6,7 @@
 
 > Renamed from `func_80048B78` on 2026-09-25 (tools/rename.py). Address 0x80048b78.
 
-Round 82, runner echo (second echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (second echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`: `OK: build matches
 retail SLPS_015.56`), funcdiff 18/18, 0 insertions / 0 deletions, no
 out-of-range drift.
@@ -17,8 +17,8 @@ gLbdFileMethods method: calls its own `freeBuffer` (slot +0x05C, FileResource in
 
 ## Source
 
-Declarations it needs are the local views at the top of `src/cd/GameFiles.c`
-(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/FileResource.h`.
+Declarations it needs are the local views at the top of `src/cd/game_files.c`
+(`DataSrc39094`, `DataSrc39094Methods`, `FilePathRecord`) and `include/file_resource.h`.
 
 ```c
 void LbdFile__ReleaseHeader(DataSrc39094 *self) {
@@ -36,10 +36,10 @@ void LbdFile__ReleaseHeader(DataSrc39094 *self) {
   `pad30[4]` is split into `s16 unk30` (init -1) and `u16 unk32`. Byte-neutral
   for the ten functions matched earlier this round (whole image green).
 - `SeedAndRandom`'s local definition gained an unused second parameter
-  (`s32 unused`): PickSoundBank passes one in `$a1`, as GameApplicationFileResource's own
+  (`s32 unused`): PickSoundBank passes one in `$a1`, as game_shell's own
   prototype already says. Byte-neutral for SeedAndRandom.
 - No shared header was edited. Other units' prototypes for these functions
-  (DayTaskStageMap.h, class_3bb8c.h, GameApplication.h) are independent and untouched.
+  (dream_day.h, class_3bb8c.h, game_application.h) are independent and untouched.
 
 ## Naming
 
@@ -49,7 +49,7 @@ void LbdFile__ReleaseHeader(DataSrc39094 *self) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__ReleaseHeader` -> `LbdFile__ReleaseHeader` with `rename.py` (class rename only; +0x07C, this class's first own slot). Its one caller, StageMap__ClearSlotCells, passes a second argument (the element) the body never reads; that call casts through `LbdFileReleaseHeaderElemFn`. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `DataSrc39094__ReleaseHeader` -> `LbdFile__ReleaseHeader` with `rename.py` (class rename only; +0x07C, this class's first own slot). Its one caller, StageMap__ClearSlotCells, passes a second argument (the element) the body never reads; that call casts through `LbdFileReleaseHeaderElemFn`. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/lbd_file.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)
@@ -57,7 +57,7 @@ Renamed `DataSrc39094__ReleaseHeader` -> `LbdFile__ReleaseHeader` with `rename.p
 Renamed with `python3 tools/renametype.py Class81940 LbdFile` (the whole
 class family: object, table `gClass81940Methods` -> `gLbdFileMethods`,
 getter, constructors, methods, the header `include/Class81940.h` ->
-`include/LbdFile.h` and its typedefs). The tool rewrote every
+`include/lbd_file.h` and its typedefs). The tool rewrote every
 `Class81940` token in these reports too, so the Track 4 section above now
 says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004D578` on 2026-09-22 (tools/rename.py). Address 0x8004d578.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 64 words · **Status:** MATCHED (64/64)
+**Unit:** title_menu · **Size:** 64 words · **Status:** MATCHED (64/64)
 
 ## What it does
 
@@ -13,7 +13,7 @@ The ctor (slot +0x008) for the new `TitleMenu` sibling class (allocated by
 (`GetTaskCoreMethods()->slot08`, 4 args), installs this class's own vtable
 directly (rather than fetching it through another getter -- the base-class
 constructor chaining pattern already documented for
-`TaskCoreMethods::slotD8` in `include/Task.h`), tears down an object
+`TaskCoreMethods::slotD8` in `include/task.h`), tears down an object
 handed to it by the base ctor chain (`self->unk48`), stores its own
 `dreamSys` argument, zeroes one field, makes two calls through `dreamSys`'s
 own vtable (storing one result, forwarding the other's return value to the
@@ -53,7 +53,7 @@ presence anywhere in the project. Placed as one new block right before the
   `slot40` (+0x040, this function's own last call), `slotD8` (+0x0D8, this
   function's own second-to-last call). Vtable is `gTitleMenuMethods`, resolved
   via `GetTitleMenuMethods` (still raw asm in the uncarved
-  `asm/TitleMenuTaskObjF.s`, called directly by `jal` -- same "vtable getter"
+  `asm/title_menu.s`, called directly by `jal` -- same "vtable getter"
   shape as `GetNodeGuardedViewportMethods`/`GetGridCellMethods`).
 - `TitleMenu` struct fields: `unk48` (`TitleMenuUnk48Obj *`, set up by
   the base ctor chain, read here), `unkA4` (`void *`, stores `dreamSys`
@@ -64,7 +64,7 @@ presence anywhere in the project. Placed as one new block right before the
   is why this is a confident field boundary and not a guess).
 - `TitleMenuUnk48Obj`/`TitleMenuUnk48ObjMethods`: opaque, only `slot9C`
   (+0x09C, this function's own call, arg `-1`) typed. Deliberately a
-  SEPARATE local type from `include/Task.h`'s `StreamTaskUnkB4Obj`
+  SEPARATE local type from `include/task.h`'s `StreamTaskUnkB4Obj`
   (also a base-ctor-chain output at the same +0x048 offset on ITS class)
   since that type's own known slots don't include +0x09C and nothing ties
   the two classes together -- same independent-view policy used
@@ -72,20 +72,20 @@ presence anywhere in the project. Placed as one new block right before the
 - `DreamSysView_3bb8c_c`/`DreamSysViewMethods_3bb8c_c`: a LOCAL, minimal
   opaque view of `dreamSys`, typing only `slot1A0` (+0x1A0) and `slot1B0`
   (+0x1B0), the two slots this function reaches. The project already has a
-  large canonical `DreamSys` type in `include/DreamSys.h` with its own
+  large canonical `DreamSys` type in `include/dream_sys.h` with its own
   `vt` field, but neither offset is established there yet, and this unit
   does not edit that header -- kept local per this project's established
   independent-view convention.
 - `BaseTaskCtorTable_3bb8c_c`: this function's own local view of
   `GetTaskCoreMethods`'s return type, typing `slot08` (+0x008) as a 4-argument
   call (`self, arg1, arg2, arg3`). **This is the SAME real global,
-  `gTaskCoreMethods`, as `include/Task.h`'s already-established
+  `gTaskCoreMethods`, as `include/task.h`'s already-established
   `TaskCoreMethods`** (that header's own comment documents `GetTaskCoreMethods`
   returning `&gTaskCoreMethods`, and its `slot08` is independently confirmed
   3-argument-plus-self by a byte-exact call in `StreamTask__StreamTask`, matching
   THIS call site's arity exactly -- both units agree on the real arity
   here, unlike the `GetSceneNodeMethods` situation elsewhere in this file). Kept
-  as a separate local declaration rather than `#include "Task.h"`,
+  as a separate local declaration rather than `#include "task.h"`,
   since each translation unit in this project gets its own extern
   prototype for a given external symbol and this unit does not otherwise
   need that header.
@@ -128,11 +128,11 @@ installed table twice more in the same function (`slotD8`, then
 
 Renamed following the compiler-ownership recipe (FINISHING-PLAN.md track
 3 step 3), not assumed safe: `TitleMenuMethods` is otherwise SHARED with
-`src/ui/TitleMenuTaskObjF.c` (most of its other slots are dispatched from
+`src/ui/title_menu.c` (most of its other slots are dispatched from
 functions there). Renamed the field in the struct DEFINITION alone,
 rebuilt, and the compiler's error was confined to this unit's own call
-site (`src/ui/TitleMenuTaskObjF.c`, this function's own last statement) --
-nothing in `TitleMenuTaskObjF.c` or anywhere else references this specific
+site (`src/ui/title_menu.c`, this function's own last statement) --
+nothing in `title_menu.c` or anywhere else references this specific
 slot. Fixed the one call site, oracle green. Same name and same evidence
 shape ("runs right after self->methods is installed") as
 `NodeGuardedViewportMethods::onConstruct`, which this unit's other ctor
@@ -140,11 +140,11 @@ shape ("runs right after self->methods is installed") as
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The body now reads at TaskCore's names: `unk48` is TaskCore's `sound`, called at +0x09C through VabStreamObj (setPitchOffset, as GraphRoom's ctor does); `slotD8` is setTarget, with sTitleMenuTarget retyped TaskCoreTarget; `onConstruct` (+0x040) is resetCounters, called through TitleMenuResetCallFn because the call passes dreamSys and the slot (and TitleMenu__Reset) take self alone; `unkBC`/`unkC0` are `saveBlock` (`s32 *`, getSaveBlock's result, no cast now) and `saveBlockSize`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The body now reads at TaskCore's names: `unk48` is TaskCore's `sound`, called at +0x09C through VabStreamObj (setPitchOffset, as GraphRoom's ctor does); `slotD8` is setTarget, with sTitleMenuTarget retyped TaskCoreTarget; `onConstruct` (+0x040) is resetCounters, called through TitleMenuResetCallFn because the call passes dreamSys and the slot (and TitleMenu__Reset) take self alone; `unkBC`/`unkC0` are `saveBlock` (`s32 *`, getSaveBlock's result, no cast now) and `saveBlockSize`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 6 (2026-09-26, round 93, delta): the class is TitleMenu
 
@@ -185,7 +185,7 @@ from the body and the menu entry that reaches them):
 
 Header edit (one commit): the six own slots take the methods' names, and the
 fields `nameField` -> `saveTitle`, `iconHandle` -> `saveIcon`; all their
-accessors are in src/ui/TitleMenuTaskObjF.c. The old banner's history ("unified
+accessors are in src/ui/title_menu.c. The old banner's history ("unified
 round 88", "Named by its table's address") is this section and the Track 4
 sections above.
 
@@ -228,4 +228,4 @@ calls go through `dreamSys` directly: `struct DreamSys *` and `DreamSys *`
 are one type, and the image is byte-identical. The null `sound` argument,
 the `saveCtrl` clear and getCurrentDayAndYear's `outYear` are `NULL`;
 setPitchOffset(-1) is commented (octave -1: pitchOffset = -1 * 12 - 24 =
--36 semitones, VabStreamObj.h).
+-36 semitones, vab_stream_obj.h).

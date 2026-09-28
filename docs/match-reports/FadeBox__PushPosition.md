@@ -58,7 +58,7 @@ void FadeBox__PushPosition(FadeBoxObj *self, BoxFillSize *a1, BoxFillPos *a2) {
 }
 ```
 
-Everything used is already declared in `include/Task.h`; no header
+Everything used is already declared in `include/task.h`; no header
 or struct change.
 
 ### Proposed learning
@@ -120,13 +120,13 @@ the same lever applied twice. Given two independent permuter searches
 rounds 18/19, not re-spending a further search without a genuinely new
 angle. Restored to `INCLUDE_ASM`; full oracle re-confirmed green.
 
-Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::pushPosition` (`+0x0E8`).
+Unit `screen_widgets`, carved round 14. `FadeBoxMethods::pushPosition` (`+0x0E8`).
 
 **Correction to an earlier version of this report**, which claimed a full
 25/25 match under the stale-build window described in `New_FadeBox.md`.
 Re-verified genuinely fresh, this function has a real residue -- but the
 investigation also found and fixed a genuine FIELD-WIDTH bug in
-`include/Task.h` along the way (see "Field width correction" below),
+`include/task.h` along the way (see "Field width correction" below),
 which is the one part of this report NOT superseded by the correction.
 
 **Second correction (round 19, runner alpha): the "ONE word remaining"
@@ -518,7 +518,7 @@ confirms it, the same discipline already applied to permuter zeros and
 
 NON_MATCHING body promoted, round 59. The exact preserved body above (22/25
 words, length exact, permuter-exhausted redundant-move residue) is now live
-in `src/ui/ScreenWidgets.c` under `#ifdef NON_MATCHING`, with the verified build
+in `src/ui/screen_widgets.c` under `#ifdef NON_MATCHING`, with the verified build
 still taking the `#else INCLUDE_ASM` branch. `./build-and-verify.sh` and
 `tools/check-nonmatching.sh` both green.
 
@@ -561,4 +561,4 @@ an s32 field into the u16 `boxW`/`boxH` still reads only the low halfword
 halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
 became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
 BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
-its caller in Task passes an `s32 size[2]`).
+its caller in task passes an `s32 size[2]`).

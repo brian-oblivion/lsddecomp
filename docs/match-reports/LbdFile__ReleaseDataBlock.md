@@ -6,7 +6,7 @@
 
 > Renamed from `func_80048C98` on 2026-09-25 (tools/rename.py). Address 0x80048c98.
 
-Round 82, runner echo, 2026-09-25. Unit `GameFiles` (carved revision 18).
+Round 82, runner echo, 2026-09-25. Unit `game_files` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
 (`./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`), funcdiff
 16/16, 0 insertions / 0 deletions, no out-of-range drift. No levers needed.
@@ -18,7 +18,7 @@ Method slot +0x084 of gLbdFileMethods (table word at 0x800819C4). Clears `dataRe
 ## Source
 
 ```c
-/* DataSrc39094: the local view at the top of src/cd/GameFiles.c --
+/* DataSrc39094: the local view at the top of src/cd/game_files.c --
  * FILERESOURCE_FIELDS, then u16 headerReady, u16 dataReady, u8 pad30[4], void *dataBuffer, s32 autoLoadData. */
 extern void *BMemPMgrFree(void *ptr);
 
@@ -38,7 +38,7 @@ void LbdFile__ReleaseDataBlock(DataSrc39094 *self) {
   unit is a whole number of 0x1C-byte records into that table, so the unit
   types the table as `FilePathRecord` (size only). The record's fields are unknown.
 - Callers in other units still declare their own prototypes (`s32` returns in
-  DayTaskStageMap.h / class_3bb8c.h); those are independent declarations and were
+  dream_day.h / class_3bb8c.h); those are independent declarations and were
   not touched.
 
 ## Naming
@@ -49,7 +49,7 @@ void LbdFile__ReleaseDataBlock(DataSrc39094 *self) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__ReleaseDataBlock` -> `LbdFile__ReleaseDataBlock` with `rename.py` (class rename only; +0x084). Callers: LbdFile__Finalize, LbdFile__LoadDataBlock, StageMap__UnloadAllSlots and ObjM__CheckAuxTrigger. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `DataSrc39094__ReleaseDataBlock` -> `LbdFile__ReleaseDataBlock` with `rename.py` (class rename only; +0x084). Callers: LbdFile__Finalize, LbdFile__LoadDataBlock, StageMap__UnloadAllSlots and ObjM__CheckAuxTrigger. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/lbd_file.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)
@@ -57,7 +57,7 @@ Renamed `DataSrc39094__ReleaseDataBlock` -> `LbdFile__ReleaseDataBlock` with `re
 Renamed with `python3 tools/renametype.py Class81940 LbdFile` (the whole
 class family: object, table `gClass81940Methods` -> `gLbdFileMethods`,
 getter, constructors, methods, the header `include/Class81940.h` ->
-`include/LbdFile.h` and its typedefs). The tool rewrote every
+`include/lbd_file.h` and its typedefs). The tool rewrote every
 `Class81940` token in these reports too, so the Track 4 section above now
 says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.

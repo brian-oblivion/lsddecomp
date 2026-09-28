@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002C890` on 2026-09-18 (tools/rename.py). Address 0x8002c890.
 
-Unit `PlacementGridVabSound`. Previously filed as a `gp_rel` stall (round 17, never
+Unit `vab_sound`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
 resolved that blocker project-wide. This is `gVabStreamObjMethods`'s own `+0x7C` slot
 (the header comment's original guess was already right here, confirmed
@@ -139,7 +139,7 @@ mechanics ARE the purpose here.
 
 Sony's `ProgAtr` replaces the local `ProgAtrView`; `SsUtGetVabHdr` and
 `SsUtGetVagAtr` now carry `<libsnd.h>`'s prototypes, so the call sites cast
-VabStreamObj.h's reduced views: `(VabHdr *)&self->vabHdr`, `(VagAtr *)pool`.
+vab_stream_obj.h's reduced views: `(VabHdr *)&self->vabHdr`, `(VagAtr *)pool`.
 The two allocations are spelled `vs * sizeof(VabStreamVagAtr)` and
 `ts * sizeof(VabStreamVagAtr *)` (were `<< 5`, `<< 2`), and the master
 volume `VAB_MASTER_VOLUME` (120, was `0x78`). Byte-exact.

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043B88` on 2026-09-25 (tools/rename.py). Address 0x80043b88.
 
-Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #7), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 24/24 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTimArraySrcMethods, obj
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
 /* Allocate and construct a gTimArraySrcMethods object. */
@@ -46,7 +46,7 @@ void *New_TimArraySrc(s32 arg0) {
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
-Class unified as TimArraySrc (include/TimArraySrc.h). Now declared `TimArraySrc *New_TimArraySrc(char *name)` and calls the prototyped `GetTimArraySrcMethods()->ctor(obj, name)` instead of casting the table to the unit-local UnprototypedCtorTable: the ctor's second parameter is `name` (TimArraySrc__TimArraySrc passes it to requestLoadFile) and the one caller, TimBlockSrc__AdvanceLoadState, passes 0 (now NULL). Byte-identical.
+Class unified as TimArraySrc (include/tim_array_src.h). Now declared `TimArraySrc *New_TimArraySrc(char *name)` and calls the prototyped `GetTimArraySrcMethods()->ctor(obj, name)` instead of casting the table to the unit-local UnprototypedCtorTable: the ctor's second parameter is `name` (TimArraySrc__TimArraySrc passes it to requestLoadFile) and the one caller, TimBlockSrc__AdvanceLoadState, passes 0 (now NULL). Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

@@ -2,7 +2,7 @@
 
 > Renamed from `func_800439EC` on 2026-09-25 (tools/rename.py). Address 0x800439ec.
 
-Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #9), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 75/75 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gLinkResourceMethods +0x064 (setFlag overrid
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/graphics/GraphicsResources.c`.
+top of / earlier in `src/graphics/graphics_resources.c`.
 
 ```c
 /* gLinkResourceMethods +0x064: build a NULL-ended array at +0x2C of one
@@ -65,7 +65,7 @@ s32 LinkResource__BuildModels(DataSrc33808 *self) {
 
 ## Notes
 
-Second build (the first did not compile: `Rec6F13C` is defined later in the unit, so the local buffer view uses `u8 recs[1][0x1C]`). Byte-exact at once with the unwinding loop in the shape TodSet__BuildTods established this session -- `while (i != 0) { i--; objs--; release(*objs); }` -- which also yields retail's post-loop `addiu s1,s1,4` fix-up so the array base reaches BMemPMgrFree. The early `if (objs == NULL) return 1;` was fine here. New_TmdModel (TmdModel.c) is prototyped locally with void * return; slot78 is cast at the call site.
+Second build (the first did not compile: `Rec6F13C` is defined later in the unit, so the local buffer view uses `u8 recs[1][0x1C]`). Byte-exact at once with the unwinding loop in the shape TodSet__BuildTods established this session -- `while (i != 0) { i--; objs--; release(*objs); }` -- which also yields retail's post-loop `addiu s1,s1,4` fix-up so the array base reaches BMemPMgrFree. The early `if (objs == NULL) return 1;` was fine here. New_TmdModel (tmd_model.c) is prototyped locally with void * return; slot78 is cast at the call site.
 
 ## Naming
 
@@ -74,11 +74,11 @@ Second build (the first did not compile: `Rec6F13C` is defined later in the unit
 ## Track 4
 
 2026-09-26, round 89 (delta): LinkResource (table `gLinkResourceMethods`,
-renamed from D_8006F13C) is unified in `include/LinkResource.h`. The
+renamed from D_8006F13C) is unified in `include/link_resource.h`. The
 unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 `Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
 `self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
-read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
+read as `TmdFile *` (include/tmd_model.h), the allocator's descriptor is
 `ResourceSource *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.
 

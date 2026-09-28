@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026518` on 2026-09-24 (tools/rename.py). Address 0x80026518.
 
-**Unit:** GameApplicationFileResource · **Size:** 29 instructions (0x74 bytes) · **Status:** MATCHED (29/29 words, whole-image SHA1 green), first attempt
+**Unit:** game_shell · **Size:** 29 instructions (0x74 bytes) · **Status:** MATCHED (29/29 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -86,7 +86,7 @@ caller.
 
 **`GameApplication__RunTask` -- tier A** (renamed from `GameApplication__RunPollTask` with tools/rename.py). Evidence: mechanics are the purpose: newTask(dreamSys), init(initArgs, 0) (IntermediateBase's mode 0 runs the task to its end), release, return init's result. Callers pass New_GraphRoom and New_TitleMenu.
 
-Body changes, all byte-identical: the unit-local PollTask/PollTaskMethods view (slot4 = BasicClass's release, slot44 = IntermediateBase's init) is retired: the task is an IntermediateBase (include/IntermediateBase.h, unified) and the allocator type is NewTaskFn, IntermediateBase *(*)(struct DreamSys *). Parameters ctor/void *dreamSys -> newTask/struct DreamSys *dreamSys. Byte-identical.
+Body changes, all byte-identical: the unit-local PollTask/PollTaskMethods view (slot4 = BasicClass's release, slot44 = IntermediateBase's init) is retired: the task is an IntermediateBase (include/intermediate_base.h, unified) and the allocator type is NewTaskFn, IntermediateBase *(*)(struct DreamSys *). Parameters ctor/void *dreamSys -> newTask/struct DreamSys *dreamSys. Byte-identical.
 
 ### History: code_1677c.c comments before the round-100 polish
 

@@ -57,7 +57,7 @@ first place.
 
 ## Round 95 (delta): Sony's declarations
 
-`include/Pad.h` now takes `PadInit`/`PadRead`/`PadStop` from Sony's
+`include/pad.h` now takes `PadInit`/`PadRead`/`PadStop` from Sony's
 `<libetc.h>` instead of local prototypes (`PadInit(void *)` became Sony's
 `PadInit(int mode)`). The ctor's first parameter forwards straight to
 `PadInit`, so `New_Pad`, `Pad__Pad` and the Pad ctor slot now take

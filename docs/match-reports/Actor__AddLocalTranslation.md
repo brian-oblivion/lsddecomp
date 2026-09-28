@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057444` on 2026-09-18 (tools/rename.py). Address 0x80057444.
 
-Unit: `ObjMStyleActor` (round 17). Converts a source `s16` triple into a
+Unit: `dream_scene` (round 17). Converts a source `s16` triple into a
 stack `Vec3O` via `SceneNode__RotateLocalVector`, then forwards it to `self`'s own
 `slotBC` (= `Actor__AddTranslation`, this unit) through the vtable.
 
@@ -30,15 +30,15 @@ in the `jal`'s own delay slot, overwriting whatever `$a1` held), and `$a2`
 via `addu $a2,$a1,zero` -- note this reads the OLD `$a1`, i.e. `arg1`,
 ahead of the delay slot's overwrite). This establishes `arg1`'s type as
 `s16 *`, matching `SceneNode__RotateLocalVector`'s own already-decompiled signature
-elsewhere (`SceneNode.c`:
+elsewhere (`scene_node.c`:
 `void SceneNode__RotateLocalVector(SceneNodeObj *self, SceneNodeSub44 *dst, s16 *src)`)
 -- declared locally here with this unit's own generic types rather than
-pulling in `SceneNode.h`'s `SceneNodeObj`/`SceneNodeSub44`, per the
+pulling in `scene_node.h`'s `SceneNodeObj`/`SceneNodeSub44`, per the
 project's per-call-site-typing convention for cross-unit calls.
 
 The second call, `self->methods->slotBC(self, &buf)`, dispatches through
 `self`'s OWN vtable (not a fixed/global table) at `+0xBC` -- the exact slot
-`Actor__AddTranslation` (this unit) already occupies per `DreamSys.h`'s
+`Actor__AddTranslation` (this unit) already occupies per `dream_sys.h`'s
 `vtable_DreamSys::Actor__AddTranslation`. This is a self-referential virtual call
 (the class calling its own overridable slot rather than jumping to
 `Actor__AddTranslation` by name), matched by adding `slotBC` to `BaseObjOMethods`
@@ -61,7 +61,7 @@ self-referential virtual dispatch to a function this same unit defines).
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__ApplyRotatedVec14`. Occupant of +0x0C0: SceneNode__RotateLocalVector rotates the s16 local vector by the object's orientation, then addTranslation (+0x0BC) adds the result. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__ApplyRotatedVec14`. Occupant of +0x0C0: SceneNode__RotateLocalVector rotates the s16 local vector by the object's orientation, then addTranslation (+0x0BC) adds the result. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, alpha)
 

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004DB18` on 2026-09-24 (tools/rename.py). Address 0x8004db18.
 
-Unit `TitleMenuTaskObjF`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
+Unit `title_menu`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 5 `gp_rel` hits
 and no derivation; this round wrote and matched the function from scratch.
 
@@ -69,7 +69,7 @@ SLPS_015.56`.
   for this half-length-plus-pad allocation idiom.
 - `buf = BMemPMgrAlloc(size);` (pool allocator, already canonical) then
   `DecodeFullWidthSjis(buf, sSaveTitle)` -- `DecodeFullWidthSjis` is already matched
-  (`src/ui/ScreenWidgets.c`, `u8 *DecodeFullWidthSjis(u8 *dst, u8 *src)`), return
+  (`src/ui/screen_widgets.c`, `u8 *DecodeFullWidthSjis(u8 *dst, u8 *src)`), return
   value unused here, so this unit's own local view stays `void`-returning
   per the project's independent-arities convention (same idiom already
   used for `GetTaskCoreMethods`/`BaseTaskCtorTable_3bb8c_c`).
@@ -100,7 +100,7 @@ SLPS_015.56`.
   fields, offsets +0x0AA/+0x0AB/+0x0AC) via a `pad004[0x0AA-0x004]` gap.
   Noted in the new field's comment: `TitleMenuUnkB0ObjMethods_3bb8c_d`'s
   own slot offsets (`release`+0x004, `slot4C`+0x04C) numerically match
-  `Task.h`'s `Unk64ElemMethods`/this header's own `FieldM7CMethods`
+  `task.h`'s `Unk64ElemMethods`/this header's own `FieldM7CMethods`
   (slot4/slot4C/slotB8 at 0x004/0x04C/0x0B8) -- suggestive that `nameField` is
   the SAME real class those units call `Unk64Elem`/`FieldM7C`, consistent
   with `New_TextRow`'s return value landing there.
@@ -113,9 +113,9 @@ SLPS_015.56`.
   reassigns it, so whatever sets the real value is outside this unit's
   ground. Flagged as a placeholder-value caveat, not resolved further.
 
-`src/ui/TitleMenuTaskObjF.c`: local (not shared-header) type `Arg1DB18_3bb8c_d`
+`src/ui/title_menu.c`: local (not shared-header) type `Arg1DB18_3bb8c_d`
 and externs for `strcpy`/`strlen` (Sony's, linked from `lib/libc2`, same
-per-unit convention as `src/ui/TextEntryItemList.c`/`src/class_3bb8c_j.c`) and
+per-unit convention as `src/ui/input_dialogs.c`/`src/class_3bb8c_j.c`) and
 `DecodeFullWidthSjis` (already matched elsewhere; independent local arity).
 
 No EXISTING declaration was retyped or resized.
@@ -136,16 +136,16 @@ Renamed `func_8004DB18` -> `TitleMenu__CreateSaveTitle`. **Tier B**: SJIS-decode
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The setTarget override (+0x0D8). Its argument is the TaskCoreTarget the ctor passes (&sTitleMenuTarget); the one field read, +0x004, is `handle`, New_TextRow's texture. Arg1DB18_3bb8c_d is gone. `nameField` is a `struct TextRow *` now: unkAB/unkAC/unkAA are visibleCount/firstVisible/gapIndex; the New_TextRow cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The setTarget override (+0x0D8). Its argument is the TaskCoreTarget the ctor passes (&sTitleMenuTarget); the one field read, +0x004, is `handle`, New_TextRow's texture. Arg1DB18_3bb8c_d is gone. `nameField` is a `struct TextRow *` now: unkAB/unkAC/unkAA are visibleCount/firstVisible/gapIndex; the New_TextRow cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 
 Naming: `D_8008AA18` -> `sSaveTitle` (tier A: the pointer every reader
-uses as the save title's full-width text; TitleMenuTaskObjF.c writes the day
+uses as the save title's full-width text; title_menu.c writes the day
 into it, hence `g`); `D_8008AA14` -> `sSaveTitleBlanks` (tier A: its ROM
 value points at 19 full-width spaces). Both retyped `void *` -> `char *`
 in include/class_3bb8c.h, which removes the `(char *)` casts. `+ 0x18` is
-`SAVE_TITLE_PADDING * 2`, the same character index TitleMenuTaskObjF.c's
+`SAVE_TITLE_PADDING * 2`, the same character index title_menu.c's
 SAVE_TITLE_PADDING (12) names; each character is 2 bytes. Locals:
 `size` -> `cellCount`, `buf` -> `text`.
 
@@ -153,8 +153,8 @@ Comments moved here from the unit:
 
 - strcpy/strlen are Sony's, linked from libc2 (config/psyq-objects.txt:
   libc2/strcpy, libc2/strlen), declared locally per the per-unit
-  convention for these two (src/ui/TextEntryItemList.c, src/class_3bb8c_j.c).
+  convention for these two (src/ui/input_dialogs.c, src/class_3bb8c_j.c).
 - DecodeFullWidthSjis is this unit's own view of the matched function in
-  src/ui/ScreenWidgets.c: `void`, because the return value is unused at these
+  src/ui/screen_widgets.c: `void`, because the return value is unused at these
   call sites, unlike that unit's own `u8 *` view (independent-arities
   convention).

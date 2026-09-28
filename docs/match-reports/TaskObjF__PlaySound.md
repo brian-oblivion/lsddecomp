@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004FFF4` on 2026-09-23 (tools/rename.py). Address 0x8004fff4.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TaskObjF__PlaySound`: 16/16 words match.
 
 ## Source
@@ -45,8 +45,8 @@ exposure)
 
 Both retyped declarations were introduced by this unit's own earlier
 functions THIS round (not inherited from `main`), so there is nothing to
-flag for `TitleMenuTaskObjF`/`class_3bb8c_f` here -- the correction is fully
-internal to `TitleMenuTaskObjF`'s own work.
+flag for `title_menu`/`class_3bb8c_f` here -- the correction is fully
+internal to `title_menu`'s own work.
 
 ### Proposed learning
 
@@ -57,7 +57,7 @@ None new.
 `TaskObjF__PlaySound` (was `func_8004FFF4`), tier B: forwards
 `(self->unk6C, arg1, 0x7F, 0x7F)` to `self->unk6C`'s own vtable slot,
 the exact call shape of the already-named `TimedTask__SetChildFlag8` (renamed `TimedTask__PlaySound` in round 84)
-(`src/world/DayTaskStageMap.c`: `sub->methods->setFlag8(sub, value, 0x7F, 0x7F)`,
+(`src/world/dream_day.c`: `sub->methods->setFlag8(sub, value, 0x7F, 0x7F)`,
 that slot itself named `SceneNode__SetBackClip`) -- same argument
 count, same two trailing literals. Named by analogy to that established
 shape rather than from an independent derivation of what `0x7F, 0x7F`
@@ -65,7 +65,7 @@ means here, so kept at tier B rather than A.
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed from `TaskObjF__SetChildFlag8`. The field it calls (+0x06C, was `childC`) is set only by TaskObjF__Init's 7th argument, and Init's one caller, TitleMenu__BeginCardAccess, passes `self->sound` (TaskCore's VabStreamObj, include/TaskCore.h). +0x080 of that table is `playTone(index, vol, endVol)` (include/VabStreamObj.h), called here with (index, 0x7F, 0x7F): the same shape and the same rename as `TimedTask__PlaySound` (round 84). Callers: TaskObjF__AdvanceState (index 0 and 0x10), TaskObjF__AbortFromState (0x10), through slot +0x08C.
+Renamed from `TaskObjF__SetChildFlag8`. The field it calls (+0x06C, was `childC`) is set only by TaskObjF__Init's 7th argument, and Init's one caller, TitleMenu__BeginCardAccess, passes `self->sound` (TaskCore's VabStreamObj, include/task_core.h). +0x080 of that table is `playTone(index, vol, endVol)` (include/vab_stream_obj.h), called here with (index, 0x7F, 0x7F): the same shape and the same rename as `TimedTask__PlaySound` (round 84). Callers: TaskObjF__AdvanceState (index 0 and 0x10), TaskObjF__AbortFromState (0x10), through slot +0x08C.
 
 ## Track 7 (2026-09-27, round 95)
 

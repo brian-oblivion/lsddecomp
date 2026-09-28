@@ -68,7 +68,7 @@ that placement change reads as dead code or as ordinary hoisting depends on
 whether the variable is used elsewhere on the same path, which has to be
 checked per-instance -- it is not something the permuter's score tells you.
 
-**Committed body (identical to the one above, in `src/cd/CdDriver.c`):**
+**Committed body (identical to the one above, in `src/cd/cd_driver.c`):**
 
 ```c
 char *strstr(char *haystack, char *needle) {

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80026FE8` on 2026-09-18 (tools/rename.py). Address 0x80026fe8.
 
-**Unit:** GameApplicationFileResource · **Size:** 15 words · **Status:** MATCHED, round 43
+**Unit:** game_shell · **Size:** 15 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 15/15 words, byte-exact whole-image build.
 
 ## History
@@ -26,7 +26,7 @@ beq $v1, $v0(0x13), .L8002700C   # equal -> GetCdUseVSyncCallback
 ```
 
 `GetNullDriverUseVSyncCallback` is independently confirmed non-void elsewhere in the repo:
-`src/sound/PlacementGridVabSound.c` has `s32 GetNullDriverUseVSyncCallback(void) { return 0; }`. This is
+`src/sound/vab_sound.c` has `s32 GetNullDriverUseVSyncCallback(void) { return 0; }`. This is
 the direct positive evidence CLAUDE.md asks for -- the else-arm really does
 return `s32`, so the whole function (and, by the same shape, its two
 siblings `GetActiveDataSourceMethods`/`GetActiveDataSourceDriverMode`) is correctly typed non-void, not

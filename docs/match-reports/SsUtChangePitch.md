@@ -651,7 +651,7 @@ currently reproduce.
 
 ## Track 2 (round 86, 2026-09-26, alpha)
 
-This function is still `INCLUDE_ASM` and its C was not touched, but the per-field symbols this report uses (`D_8008D988`..`D_8008D9BA` at a 0x34 stride) are ONE Sony table: libsnd/vmanager.o's `_svm_voice` (0x8008D988, 24 x 0x34 = 0x4E0 bytes), typed in `include/SvmData.h` with fields by offset (`D_8008D98C` is `_svm_voice[i].unk04`, `D_8008D9A3` is `unk1B`, and so on: address minus 0x8008D988). The next attempt should write `_svm_voice[i].unkNN`: in every converted accessor (libsnd_vm_vol_ut_key_ut_keyv/j_c/l/m/p) the struct spelling compiled byte-identically to the separate symbols, and two NON_MATCHING bodies moved closer to retail. The other `D_` spellings in preserved bodies below still link (splat keeps them as auto-symbols).
+This function is still `INCLUDE_ASM` and its C was not touched, but the per-field symbols this report uses (`D_8008D988`..`D_8008D9BA` at a 0x34 stride) are ONE Sony table: libsnd/vmanager.o's `_svm_voice` (0x8008D988, 24 x 0x34 = 0x4E0 bytes), typed in `include/svm_data.h` with fields by offset (`D_8008D98C` is `_svm_voice[i].unk04`, `D_8008D9A3` is `unk1B`, and so on: address minus 0x8008D988). The next attempt should write `_svm_voice[i].unkNN`: in every converted accessor (libsnd_vm_vol_ut_key_ut_keyv/j_c/l/m/p) the struct spelling compiled byte-identically to the separate symbols, and two NON_MATCHING bodies moved closer to retail. The other `D_` spellings in preserved bodies below still link (splat keeps them as auto-symbols).
 
 ## Round 97 (bravo, track 6): the unit banner and comments, moved here
 
@@ -722,7 +722,7 @@ code_179d8_j_c.c took <libsnd.h> and its banner was rewritten as documentation. 
  * round 21 and was removed rather than left to be believed.)  See CLAUDE.md's note on this.
  * ------------------------------------------------------------------------ */
 /* SpuVmKeyOn (round 76, was StartNote) is Sony libsnd/vmanager INTERNAL --
- * unlike SsUtKeyOn (PlacementGridVabSound.c), it has no public prototype in
+ * unlike SsUtKeyOn (vab_sound.c), it has no public prototype in
  * LIBSND.H (grep confirms no `Vm`-prefixed extern anywhere in that
  * header), so this stays the byte-exact local-guess signature rather
  * than a header copy. */

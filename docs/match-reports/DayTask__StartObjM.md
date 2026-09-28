@@ -46,7 +46,7 @@ The key to the residue-free read: `DayTask__StartObjM`'s own incoming `arg1`
 spill, but because that slot IS the o32 outgoing-argument home for a call's
 5th parameter, and `New_ObjM` takes 5 args (4 in `$a0-$a3`, the 5th on
 the stack, confirmed from `New_ObjM`'s own prologue in
-`asm/DayTaskStageMap.s`, which loads its 5th param from `0x48($sp)` against its
+`asm/dream_day.s`, which loads its 5th param from `0x48($sp)` against its
 own `0x38`-byte frame). `arg1` is silently forwarded, never touched by name
 inside this function's body.
 
@@ -67,7 +67,7 @@ pointers, and `unk40`/`unk44`/`unk48` when `DayTask__Finalize` proved those
 three are too. See "Correction" below. This snippet reflects the CURRENT
 committed source.)
 
-## New struct knowledge (`include/DayTaskStageMap.h`)
+## New struct knowledge (`include/dream_day.h`)
 
 - `Obj865C8::unk0C`, `unk38`, `unk40`/`unk44`/`unk48`: at the time this
   function was matched, all five were typed `s32` — this function's own
@@ -79,7 +79,7 @@ committed source.)
   unaffected.
 - `DayTaskMethods::slot10` typed `void (*)(Obj865C8 *self, Obj4C *arg1)`
   — a BasicClass-inherited slot (`BasicClass__AddChild`, same address
-  `GameApplication.h` already lists at its own local `+0x010` as an untyped
+  `game_application.h` already lists at its own local `+0x010` as an untyped
   `unk10`; not reconciled there per this project's per-unit local-view
   convention).
 - New opaque type `Obj4C`/`Obj4CMethods`: the object `New_ObjM`
@@ -87,7 +87,7 @@ committed source.)
   (`Obj865C8::unk4C->methods->slot44(unk4C, self->unk0C, self->unk38)`).
   Same "vtable at offset 0, only the reached slot named" policy as this
   unit's existing `SubObjA`/`SubObjB`.
-- `New_ObjM` (uncarved, unit `DayTaskStageMap`) declared locally:
+- `New_ObjM` (uncarved, unit `dream_day`) declared locally:
   `Obj4C *New_ObjM(SubObjB *a0, s32 a1, s32 a2, s32 a3, s32 a4);` — its
   own disassembly is a `New_X`-shaped allocator (0x88-byte alloc via
   `BMemPMgrAlloc`, ctor via `GetObjMMethods`, then dispatches its new
@@ -120,7 +120,7 @@ functions that DO dereference them: `DayTask__Deinit`/`DayTask__Init` settled
 above is left as originally written — it was, and remains, an accurate
 account of what THIS function's disassembly alone shows, which cannot
 distinguish a forwarded scalar from a forwarded pointer. The struct field
-types in `include/DayTaskStageMap.h` and this function's own call sites (both
+types in `include/dream_day.h` and this function's own call sites (both
 the `New_ObjM` call and the `slot44` call) now carry explicit `(s32)`
 casts to preserve the byte-identical register-passthrough behavior; funcdiff
 was reconfirmed at 33/33 after each retyping pass.
@@ -131,9 +131,9 @@ was reconfirmed at 33/33 after each retyping pass.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Renamed from Obj865C8__EnterState2: builds New_ObjM(sound, bgm, etcTim, dreamerTmd, stage), keeps it at +0x04C (objM), adds it as a child, calls its init (+0x044) with (initArgs, dreamSys), phase = 2. Not a slot.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__EnterState2: builds New_ObjM(sound, bgm, etcTim, dreamerTmd, stage), keeps it at +0x04C (objM), adds it as a child, calls its init (+0x044) with (initArgs, dreamSys), phase = 2. Not a slot.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. DayTask::objM is `struct ObjM *`; New_ObjM's arguments go uncast and init/deinit/release are called by name.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. DayTask::objM is `struct ObjM *`; New_ObjM's arguments go uncast and init/deinit/release are called by name.

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80027F18` on 2026-09-17 (tools/rename.py). Address 0x80027f18.
 
-Round 45, runner echo (second sitting), `src/cd/CdDriver.c`.
+Round 45, runner echo (second sitting), `src/cd/cd_driver.c`.
 
 ## Result
 
@@ -92,7 +92,7 @@ drift) and corrected on the second:
    near-miss diff showed `a0`/`a1` register roles and the materialized
    `&ServiceCdDriver` address swapped between them, which was the tell.
 
-`GetDrawSystem` is declared exactly as `DayTaskStageMap.c` already declares it
+`GetDrawSystem` is declared exactly as `dream_day.c` already declares it
 (`extern s32 GetDrawSystem(void);`, cast to a pointer type at the call
 site) — reused convention, not a new one. `ServiceCdDriver` (this unit,
 matched earlier this round) needed only a forward `extern s32
@@ -125,7 +125,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence for the function.** It refuses (returns 0) while `sCdBusy`, and
 otherwise stores its three arguments into `sCdUseVSyncCallback`,
 `sCdAsyncEnabled` and `sCdSyncQueueMode` and returns 1 -- the write half of the
-pair `GetCdDriverMode` reads back. `GameApplicationFileResource.c`'s `SetActiveDataSourceDriverMode` calls it
+pair `GetCdDriverMode` reads back. `game_shell.c`'s `SetActiveDataSourceDriverMode` calls it
 in a `do {} while (fn(...) == 0)` loop, i.e. "retry until the driver accepts
 the new mode", which is what the refusal-while-busy return value is for.
 Parameters are now named `async`, `mode2`, `useVSyncCallback`. Tier B: the
@@ -146,7 +146,7 @@ the type stays a per-call-site local view.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (gDrawSystemMethods unified). Byte-identical.
+The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/draw_system.h` (gDrawSystemMethods unified). Byte-identical.
 
 ## Track 7 (round 101, echo): comments moved here, and names
 

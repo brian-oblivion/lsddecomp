@@ -69,12 +69,12 @@ describes the right SIGNATURE for the shared struct layout; only the actual
 function invoked at runtime differs by which vtable `self->methods` points
 at. No behavioral ambiguity, just a naming note for the next reader.
 
-## New/changed struct knowledge (`include/DayTaskStageMap.h`)
+## New/changed struct knowledge (`include/dream_day.h`)
 
 - `IntermediateBaseMethods::ctor` added at +0x008: `void *(*ctor)(void
   *self)` — called with only `self` set up, matching the base-ctor shape
   elsewhere in the project (e.g. `BasicClassMethods::ctor` in
-  `Pad.h`).
+  `pad.h`).
 - `TimedTaskMethods::ctor` retyped from the placeholder `void *(*ctor)(void
   *self, void *arg1, void *arg2)` to the real signature `void (*ctor)(Obj865C8
   *self, s32 arg1, SubObjB *arg2)`. Void: this function's OWN body never
@@ -111,12 +111,12 @@ particular call site once a subclass's vtable is installed.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `(TimedTask *self, char *soundBankPath, BasicClass *sound)`; `unk30`/`subB` are `soundBankPath`/`sound`, and the final call is IntermediateBase's `resetCounters` slot (was `resetState`), which this class fills with TimedTask__CancelTimeout. Its first call is IntermediateBase's ctor, and both subclass ctors (DayTask__DayTask, ObjM__ObjM) call this one first, so the id tree's parent links hold. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. Signature `(TimedTask *self, char *soundBankPath, BasicClass *sound)`; `unk30`/`subB` are `soundBankPath`/`sound`, and the final call is IntermediateBase's `resetCounters` slot (was `resetState`), which this class fills with TimedTask__CancelTimeout. Its first call is IntermediateBase's ctor, and both subclass ctors (DayTask__DayTask, ObjM__ObjM) call this one first, so the id tree's parent links hold. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
-`include/DayTaskStageMap.h`'s local `extern BasicClass *New_VabStreamObj(char *)`
-is deleted. `src/world/DayTaskStageMap.c` now includes `include/VabStreamObj.h`, where
+`include/dream_day.h`'s local `extern BasicClass *New_VabStreamObj(char *)`
+is deleted. `src/world/dream_day.c` now includes `include/vab_stream_obj.h`, where
 the allocator returns `VabStreamObj *`, and casts the result to
 `BasicClass *` for `TimedTask::sound`. The whole image stays
 byte-identical.
@@ -153,9 +153,9 @@ on init's return through DayTask; 2 and 3 are DayTask's own codes.
 Proposed, not applied (accessors outside this job's units):
 - slot +0x074 `slot74` -> `togglePause`: NULL here, its one occupant is
   ObjM__TogglePause and its one caller ObjM__DispatchPadEvent's 0x21 case
-  (`src/world/ObjMStyleActor.c`).
+  (`src/world/dream_scene.c`).
 - field +0x034 `sound` `BasicClass *` -> `struct VabStreamObj *`, with the
   ctor's and New_TimedTask's `sound` parameter: every object that reaches it
-  is a New_VabStreamObj, and four units cast it back. Needs ObjM.h's ctor
+  is a New_VabStreamObj, and four units cast it back. Needs objm.h's ctor
   and New_ObjM parameters retyped with it (ObjM passes its own `BasicClass *`
   sound), or the build gains pointer-type warnings where it has none now.

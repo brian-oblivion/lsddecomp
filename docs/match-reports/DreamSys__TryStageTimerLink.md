@@ -36,7 +36,7 @@ bool DreamSys__TryStageTimerLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 }
 ```
 
-Header additions (`include/DreamSys.h`):
+Header additions (`include/dream_sys.h`):
 
 ```c
 extern s32 TestForStageTransition(PlayerSpawnPoint *target, s32 stage, PlayerSpawnPoint *currentPos, s32 timer);

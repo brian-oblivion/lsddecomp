@@ -8,7 +8,7 @@
 
 > Renamed from `func_800423E4` on 2026-09-25 (tools/rename.py). Address 0x800423e4.
 
-Round 82, runner alpha (re-staffed slot). Unit `src/graphics/Sprite.c`. Fresh
+Round 82, runner alpha (re-staffed slot). Unit `src/graphics/sprite.c`. Fresh
 ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 
 - **Where:** gRequestedFileMethods slot +0x064 (a FileResource-derived table, id 0xB03) (`tools/classtable.py`).
@@ -16,7 +16,7 @@ ground (carved in FINISHING-PLAN revision 18), no prior attempt.
 - **Result:** byte-exact on the FIRST build; 3/3 words, 0 insertions /
   0 deletions, whole-image SHA1 green. No levers needed.
 - **Types:** SceneNode-derived methods take `SceneNode *` from the UNIFIED
-  `include/SceneNode.h` (untouched). The FrameClock and RequestedFile objects use
+  `include/scene_node.h` (untouched). The FrameClock and RequestedFile objects use
   unit-local views (`D_8006EF50Obj`, `D_8006EED8Obj`) declared at the top of
   the unit; nothing was added to a shared header.
 
@@ -35,13 +35,13 @@ void RequestedFile__MarkLoaded(D_8006EED8Obj *self) {
 
 ## Track 4 (2026-09-26, round 87, delta)
 
-Class id 0xB03 is unified as `RequestedFile` in `include/RequestedFile.h`
+Class id 0xB03 is unified as `RequestedFile` in `include/requested_file.h`
 (FILERESOURCE_SLOTS/FIELDS, 0x30 bytes, one own field `loaded` at +0x02C). The
 unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
 views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
 `CtorArg1Methods_322b4` are gone; `GetActiveDataSourceMethods` is declared
 `FileResourceMethods *`. The Source block above is the round-82 text; the live
-body in `src/graphics/Sprite.c` is byte-identical.
+body in `src/graphics/sprite.c` is byte-identical.
 
 Renamed from `D8006EED8__SetFlag2C` with rename.py: the occupant of
 FileResource's +0x064 `setFlag`, named for its slot as `PlacementGrid__OnRequestDone`
@@ -62,7 +62,7 @@ name because the only thing known beyond those mechanics was the caller's use
 (WBgm loads SEQ files through it); a mechanics name sidesteps that objection
 rather than overriding it, and `SeqFile` was rejected for the same reason.
 The table and getter followed (`gRequestedFileMethods`,
-`GetRequestedFileMethods`), and the header moved to `include/RequestedFile.h`.
+`GetRequestedFileMethods`), and the header moved to `include/requested_file.h`.
 renametype.py also rewrote the old class name inside earlier sections'
 history prose in this and sibling reports (known, pending an operator
 decision; not hand-reverted).

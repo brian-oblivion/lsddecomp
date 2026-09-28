@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004913C` on 2026-09-25 (tools/rename.py). Address 0x8004913c.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the first build; whole-image SHA1 green, funcdiff 36/36,
 0 insertions / 0 deletions.
 
@@ -16,7 +16,7 @@ Random pick within the record block at 0x230: `r = (u32)SeedAndRandom(0, ?) % 7`
 
 ## Source
 
-Declarations: the local views at the top of `src/cd/GameFiles.c` (`FilePathRecord`).
+Declarations: the local views at the top of `src/cd/game_files.c` (`FilePathRecord`).
 
 ```c
 FilePathRecord *PickOpeningMovie(s32 *countOut, s32 arg1) {
@@ -41,7 +41,7 @@ Matched first as a 1-parameter function passing an uninitialised local as
 SeedAndRandom's second argument (cc1: ``'unused' might be used
 uninitialized``). The body never writes `$a1` before `jal SeedAndRandom`, so
 SeedAndRandom receives PickOpeningMovie's own incoming `$a1`, and its
-caller (GameApplicationFileResource.c, via GameApplication.h's 2-parameter extern) loads it
+caller (game_shell.c, via game_application.h's 2-parameter extern) loads it
 explicitly (`move a1,zero` at the jal). Forwarding idiom: the definition now
 takes `s32 arg1` and forwards it, as PickStageTexture does. Byte-identical;
 the warning is gone and the extern agrees with the definition.
@@ -58,4 +58,4 @@ the warning is gone and the extern agrees with the definition.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into CdDriver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes CdDriver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

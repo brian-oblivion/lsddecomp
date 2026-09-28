@@ -233,9 +233,9 @@ runner/round rather than re-deriving the structure.
 **`StyleFillEffectKind0`, tier B.**
 
 Fills `arg1` slots of `sStyleEffectSlots` by repeatedly calling
-`ObjMStyleActor.c`'s `New_StyleEffect` (New_X for the `Obj876FC` class) with a
+`dream_scene.c`'s `New_StyleEffect` (New_X for the `Obj876FC` class) with a
 literal FIRST argument of `0`. That argument is confirmed (by reading
-`New_StyleEffect`'s own ctor chain, `ObjMStyleActor.c`) to become the new
+`New_StyleEffect`'s own ctor chain, `dream_scene.c`) to become the new
 object's `kind` field -- so "Kind0" in the name is the literal tag value
 this function passes, not a guessed category. Selects which of two
 "spawn-parameter" setup functions (`SetupStyleSpawnParamsRandom`/`B`) to call each
@@ -252,7 +252,7 @@ iteration via a `sStyleDay % 7` test. STALL, 93/99, whole-function
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_8008E0A4`..`D_8008E0C0` | `sStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `sStyleSpawnRotation`, `sStyleSpawnScale`, `sStyleSpawnModelLayout`, `sStyleSpawnTableIndex`, `sStyleSpawnColors` | A | the 0x24-byte block passed to New_StyleEffect as its `StyleEffectParams` (include/StyleEffect.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsRandom's match depends on the scalar declarations. |
+| `D_8008E0A4`..`D_8008E0C0` | `sStyleSpawnOffsetX`, `...OffsetY`, `...OffsetZ`, `sStyleSpawnRotation`, `sStyleSpawnScale`, `sStyleSpawnModelLayout`, `sStyleSpawnTableIndex`, `sStyleSpawnColors` | A | the 0x24-byte block passed to New_StyleEffect as its `StyleEffectParams` (include/style_effect.h, which names each member: offset x/y/z, rotation, scale, modelChildLayout, tableIndex, color/altColor). Kept as separate symbols: SetupStyleSpawnParamsRandom's match depends on the scalar declarations. |
 | `D_800871C8` | `sStyleSpawnScales` | A | 5 Ratio16 triples, one picked by `rand() % 5` into the params' scale. |
 | `D_80087328` | `sStyleSpawnYChoices` | A | 4 words {-0x1800, -0x2800, -0x3800, -0x5000}: the offset-y values SetupStyleSpawnParamsRandom picks from. |
 
@@ -260,7 +260,7 @@ Note: the offset-y pick is `rand() % 5`, and 0 means "let SetupStyleSpawnParamsR
 
 Locals: `slots`, `count`, `pos`, `offsetY`, `setup`.
 
-### Comments moved here from src/world/ObjMStyleActor.c
+### Comments moved here from src/world/dream_scene.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

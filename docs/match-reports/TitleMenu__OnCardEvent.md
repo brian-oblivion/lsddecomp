@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004E230` on 2026-09-24 (tools/rename.py). Address 0x8004e230.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__OnCardEvent`: 40/40 words match.
 
 ## Source
@@ -76,12 +76,12 @@ Renamed `func_8004E230` -> `TitleMenu__OnCardEvent`. **Tier B**: The exclusive d
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The occupant of this class's own +0x138, `onTagBValue`, which TitleMenu__OnNotify calls with its (sender, event): the parameters are retyped `BasicClass *sender, s32 event`. slot12C is endMemcardSave, slot124 commitNameEntry. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The occupant of this class's own +0x138, `onTagBValue`, which TitleMenu__OnNotify calls with its (sender, event): the parameters are retyped `BasicClass *sender, s32 event`. slot12C is endMemcardSave, slot124 commitNameEntry. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 
 Constants: `event < 0x18` / `>= 0x16` / `== 0x16` are
 `<= TASKOBJF_STATE_ABORTED` / `>= TASKOBJF_STATE_DONE` / `==
-TASKOBJF_STATE_DONE` (include/TaskObjF.h's TaskObjFState: the event is
+TASKOBJF_STATE_DONE` (include/task_objf.h's TaskObjFState: the event is
 the state TaskObjF's setState notifies its parents with). Byte-identical
 (`<= 0x17` compiles to the same `slti 0x18`).

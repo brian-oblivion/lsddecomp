@@ -4,11 +4,11 @@
 
 > Renamed from `func_8003D3B0` on 2026-09-24 (tools/rename.py). Address 0x8003d3b0.
 
-**Unit:** Task · **Size:** 37 words · **Result:** byte-exact
+**Unit:** task · **Size:** 37 words · **Result:** byte-exact
 
 ## What it does
 
-`Obj86B60Methods::slotE8` (already recorded in `Task.h` as
+`Obj86B60Methods::slotE8` (already recorded in `task.h` as
 `TaskCore__FindNextFreeSlot`). Finds the next free (null) slot in
 `self->unk4C->unk18[]`, starting just after the current index
 `self->unk58` and wrapping at the capacity `self->unk50`, stopping either
@@ -46,7 +46,7 @@ void TaskCore__FindNextFreeSlot(Obj86B60 *self)
 
 ## Header additions
 
-`include/Task.h`:
+`include/task.h`:
 
 - New field `unk50` on `Obj86B60` (`s32`, the wrap capacity for the
   `unk58`-indexed search), carved out of existing padding
@@ -123,4 +123,4 @@ Renamed `func_` -> `Obj86B60__FindNextFreeSlot`. **Tier A**: A pure search: scan
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__FindNextFreeSlot (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__FindNextFreeSlot (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

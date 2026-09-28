@@ -4,7 +4,7 @@
 
 > Renamed from `func_800408A8` on 2026-09-18 (tools/rename.py). Address 0x800408a8.
 
-Unit: `src/ui/ScreenWidgets.c`. First attempt.
+Unit: `src/ui/screen_widgets.c`. First attempt.
 
 ```c
 s32 BoxFill__SetMask(Obj6EAC0 *self, s32 a1) {
@@ -39,4 +39,4 @@ this unit's own exclusive field -- see the struct-field rename commit).
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetMask`: the +0x0CC occupant, BoxFill's own `setMask`; mask = (1 << bits) - 1, and Reset passes 13. Nothing in BoxFill reads +0x068; FadeBox__Configure divides it (as `unk68`). Tier B: the mechanics only. The slot returns s32, the occupant's; Reset ignores it.
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/box_fill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetMask`: the +0x0CC occupant, BoxFill's own `setMask`; mask = (1 << bits) - 1, and Reset passes 13. Nothing in BoxFill reads +0x068; FadeBox__Configure divides it (as `unk68`). Tier B: the mechanics only. The slot returns s32, the occupant's; Reset ignores it.

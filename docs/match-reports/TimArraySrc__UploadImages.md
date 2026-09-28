@@ -4,7 +4,7 @@
 
 > Renamed from `func_80043DFC` on 2026-09-25 (tools/rename.py). Address 0x80043dfc.
 
-Round 82, runner echo (GraphicsResources session, echo #8), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #8), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 30/30 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -20,7 +20,7 @@ Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x078.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/graphics/GraphicsResources.c`.
+`src/graphics/graphics_resources.c`.
 
 ```c
 /* gTimArraySrcMethods +0x078: slot +0x078 of every object in the array at +0x30
@@ -48,7 +48,7 @@ First build. Pointer walk with the increment after the call (the addiu lands in 
 
 The array at +0x30 holds TimImages (TimArraySrc__BuildImages fills it with
 New_TimImage(NULL)), so `objs` is `TimImage **` and the +0x078 call goes
-through `TimImageUploadFn` (include/TimImage.h: FileResource's `void *slot78`,
+through `TimImageUploadFn` (include/tim_image.h: FileResource's `void *slot78`,
 whose occupant here is TimImage__Upload) instead of an unprototyped cast of
 DataSrc33808's slot. Image byte-identical.
 
@@ -58,11 +58,11 @@ Renamed from `TimArraySrc__NotifyImages`. The slot it forwards is +0x078 of
 every object in `images` (+0x030), and every such object is a TimImage:
 TimArraySrc__BuildImages fills the array with `New_TimImage(NULL)` and
 nothing else writes it. TimImage's +0x078 occupant is TimImage__Upload
-(include/TimImage.h), so the body uploads every image of the block; its one
+(include/tim_image.h), so the body uploads every image of the block; its one
 reach is TimBlockSrc__AdvanceLoadState, which calls this slot right after
 setFlag (BuildImages) on each new TimArraySrc. The call goes through
-TimImageUploadFn (no code). Class header: include/TimArraySrc.h.
+TimImageUploadFn (no code). Class header: include/tim_array_src.h.
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
-Class unified: self is TimArraySrc (include/TimArraySrc.h), images read as TimImage ** and each call goes through TimImageUploadFn. Byte-identical.
+Class unified: self is TimArraySrc (include/tim_array_src.h), images read as TimImage ** and each call goes through TimImageUploadFn. Byte-identical.

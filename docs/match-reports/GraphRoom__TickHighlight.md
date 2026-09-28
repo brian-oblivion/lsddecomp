@@ -4,7 +4,7 @@
 
 > Renamed from `func_80058694` on 2026-09-24 (tools/rename.py). Address 0x80058694.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x124`
+Unit: `src/world/dream_scene.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x124`
 (resolved via `tools/classtable.py gGraphRoomMethods`).
 
 ## Signature
@@ -76,11 +76,11 @@ ScoreDayLog match" (in-game trigger cadence not independently confirmed).
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `highlight` (+0x0B8) is setColor(1, &sGraphPointHighlightColor): the highlight is a colour overwrite. Zero bytes.
+points[] are BoxFills (include/box_fill.h); the deleted `GraphRoomPoint` view's `highlight` (+0x0B8) is setColor(1, &sGraphPointHighlightColor): the highlight is a colour overwrite. Zero bytes.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__TickHighlight` -> `GraphRoom__TickHighlight`
 
-The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. The class's own slot +0x124, `tickHighlight`. The field the round-19 view called elapsedHours is IntermediateBase's s32 frameCounter; the body's `sltiu`/`divu` need it unsigned, so it is read as `(u32)self->frameCounter`.
+The class is unified in `include/graph_room.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. The class's own slot +0x124, `tickHighlight`. The field the round-19 view called elapsedHours is IntermediateBase's s32 frameCounter; the body's `sltiu`/`divu` need it unsigned, so it is read as `(u32)self->frameCounter`.
 
 ## Track 7 (2026-09-27, round 97, delta)
 
@@ -89,4 +89,4 @@ The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRo
 
 ## Track 6 (2026-09-27, round 98, delta): `GraphPointColor` -> `BoxFillRgb`
 
-The local `GraphPointColor` (round 97) is retired onto include/BoxFill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (ScreenWidgets's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `sGraphPointNewestColor`, `sGraphPointBaseColor`, `sGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.
+The local `GraphPointColor` (round 97) is retired onto include/box_fill.h's `BoxFillRgb`: it is New_BoxFill's and setColor's colour argument, the same record BoxFill__ApplyColor copies whole into the GsBOXF r, g, b (screen_widgets's `RGB80040790`, retired onto it the same round). Same layout (signed, three bytes); `sGraphPointNewestColor`, `sGraphPointBaseColor`, `sGraphPointHighlightColor` and the local `rgb` are now declared `BoxFillRgb`. Zero bytes changed: whole image green, 0 new typeviews warnings, nonmatching green.

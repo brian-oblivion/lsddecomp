@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004D90C` on 2026-09-24 (tools/rename.py). Address 0x8004d90c.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__SetState`: 50/50 words match.
 
 ## Source
@@ -60,29 +60,29 @@ cover this; filing as a confirming instance rather than a new bullet.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004D90C` -> `TitleMenu__SetState`. **Tier B**: Forwards `arg1` to the base class's own state-setter (`GetTaskCoreMethods()->slot60(self, arg1)`) and does extra dispatch for two literal values (5, 0xA) -- the same "forward-then-special-case" shape already named `SetState` for `TaskObjF` (`TitleMenuTaskObjF.c`). Purpose of the two particular state values not established.
+Renamed `func_8004D90C` -> `TitleMenu__SetState`. **Tier B**: Forwards `arg1` to the base class's own state-setter (`GetTaskCoreMethods()->slot60(self, arg1)`) and does extra dispatch for two literal values (5, 0xA) -- the same "forward-then-special-case" shape already named `SetState` for `TaskObjF` (`title_menu.c`). Purpose of the two particular state values not established.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Slots at their names: slot124 is this class's own `commitNameEntry` (+0x124, TitleMenu__RefreshMenu; the call passes 0 the occupant does not read), slot7C onPadCancel, slotF0 setActiveSlot (its first argument is `target->unk8`, TaskCoreTarget, s32), slot78 onPadConfirm. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). Slots at their names: slot124 is this class's own `commitNameEntry` (+0x124, TitleMenu__RefreshMenu; the call passes 0 the occupant does not read), slot7C onPadCancel, slotF0 setActiveSlot (its first argument is `target->unk8`, TaskCoreTarget, s32), slot78 onPadConfirm. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 
 No change in this body. The state literals 5, 0xA, 0xB and 0xF are
-TaskCore's states and stay until TaskCore.h has an enum (proposed to the
+TaskCore's states and stay until task_core.h has an enum (proposed to the
 head: 5 active, 6 timed out, 0xB runs tick, 0xF commitElementScroll, 0x11
 cancelElementScroll; 9..0x11 all return to 5).
 
 ## Proposed field names
 
-`TaskCoreTarget::unk8` (include/TaskCore.h; TaskCore__SetState reads it)
+`TaskCoreTarget::unk8` (include/task_core.h; TaskCore__SetState reads it)
 -> `initialSlot`: TaskCore selects it on becoming active, and this
 setState(0xA) reselects it before confirming.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-TaskCore fields renamed (include/TaskCore.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.
+TaskCore fields renamed (include/task_core.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.

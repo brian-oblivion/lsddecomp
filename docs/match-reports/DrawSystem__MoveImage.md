@@ -2,7 +2,7 @@
 
 > Renamed from `func_80020A24` on 2026-09-25 (tools/rename.py). Address 0x80020a24.
 
-Round 81, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 81, runner alpha. Unit `src/graphics/draw_system.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x064 (slots resolved with `tools/classtable.py gDrawSystemMethods`).
 - **What:** RECT from ConvertRect, then MoveImage(&rect, x, y). Declaring x/y as `s16` parameters gives retail exactly: the raw args are held in s0/s1 across the call and sign-extended (sll/sra 16) only at the MoveImage call.
@@ -21,7 +21,7 @@ void DrawSystem__MoveImage(Class6C070 *self, Class6C070Rect *src, s16 x, s16 y) 
 }
 ```
 
-The declarations it needs (unit-local view in `src/graphics/DrawSystem.c`; the class
+The declarations it needs (unit-local view in `src/graphics/draw_system.c`; the class
 structs start with `BASICCLASS_SLOTS`/`BASICCLASS_FIELDS` from
 `include/basic_class.h`, and the SDK externs are local copies of the
 LIBGPU.H/LIBGS.H prototypes):
@@ -64,13 +64,13 @@ struct Class6C070 {
 ## Naming
 
 `DrawSystem__MoveImage`, tier A. Wraps LIBGPU.H's `MoveImage`; confirmed by
-convergent naming -- `CdDriver.c`'s own independent local view of this
+convergent naming -- `cd_driver.c`'s own independent local view of this
 class's method table names this exact slot (+0x064) `moveImage`, and
-`TimImage.c`'s `RotateVramRectRight` calls it through a local `moveImage`
+`tim_image.c`'s `RotateVramRectRight` calls it through a local `moveImage`
 function-pointer variable read from the same slot.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
+The class is unified: its one definition is `include/draw_system.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
 
 Slot +0x064 is typed `(DrawRect *, s32 x, s32 y)` in the header, not this occupant's `s16`: measured, an s16 slot prototype makes the one caller, RotateVramRectRight (TimImage), emit a caller-side sll/sra per argument and the image goes red.

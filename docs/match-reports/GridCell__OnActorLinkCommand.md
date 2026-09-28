@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D47C` on 2026-09-22 (tools/rename.py). Address 0x8004d47c.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 33 words · **Status:** MATCHED.
+**Unit:** title_menu · **Size:** 33 words · **Status:** MATCHED.
 Two prior rounds (including a head re-verification) confirmed this as a
 genuine register-identity stall unreachable by every manual reshaping
 lever available (see the full history below, kept for the record). A
@@ -172,7 +172,7 @@ near-miss):
   from `NodeGuardedViewport__Update` via the OTHER getter, `GetViewportMethods` -- a DIFFERENT
   global/table). Same-offset arity conflict means different table/different
   class, per this project's established split policy (see
-  `TaskCoreObjMethods` in `include/Task.h` for the precedent this
+  `TaskCoreObjMethods` in `include/task.h` for the precedent this
   follows). This is a type-NAME change only: `GridCell__GridCell`'s own
   already-matched call (`GetSceneNodeMethods(self)->ctor(self)`) only touches the
   `+0x008 ctor` slot, whose layout is byte-identical in both names, so
@@ -320,7 +320,7 @@ void GridCell__OnActorLinkCommand(GridCell *self, void *sender, s32 event)
 ## Track 7 (round 100)
 
 The early-return and `do { } while (0)` shape above is replaced by the nested
-test Actor__OnActorLinkCommand (src/world/ObjMStyleActor.c) matched with,
+test Actor__OnActorLinkCommand (src/world/dream_scene.c) matched with,
 byte-identical here too:
 
 ```c
@@ -331,11 +331,11 @@ byte-identical here too:
     }
 ```
 
-The literals 5 and 9 stay: include/Actor.h's `ActorMoveEvent` names 5..8 as
+The literals 5 and 9 stay: include/actor.h's `ActorMoveEvent` names 5..8 as
 the events an Actor's moves send through notifyWithHull, but that the link
 commands this receives use the same numbering is not shown by any body here,
 and Actor__OnActorLinkCommand leaves them as literals too.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The link-event literals are spelled with their enums: 4 is `SCENENODE_EVENT_LINKED`, 2 and 3 `SCENENODE_EVENT_HULL_FIRST`/`HULL_LAST` (include/SceneNode.h), 5 to 8 `ACTOR_EVENT_UNSWEPT`..`ACTOR_EVENT_MOVED_Y` (include/Actor.h). Every function tested here receives the event through a DispatchLinkCommand/onActorLinkCommand/onGridCellLinkCommand chain from SceneNode's link protocol, so the numbers are that enum's. Byte-identical (`event < 9` spelled `event <= ACTOR_EVENT_MOVED_Y` compiles the same).
+The link-event literals are spelled with their enums: 4 is `SCENENODE_EVENT_LINKED`, 2 and 3 `SCENENODE_EVENT_HULL_FIRST`/`HULL_LAST` (include/scene_node.h), 5 to 8 `ACTOR_EVENT_UNSWEPT`..`ACTOR_EVENT_MOVED_Y` (include/actor.h). Every function tested here receives the event through a DispatchLinkCommand/onActorLinkCommand/onGridCellLinkCommand chain from SceneNode's link protocol, so the numbers are that enum's. Byte-identical (`event < 9` spelled `event <= ACTOR_EVENT_MOVED_Y` compiles the same).

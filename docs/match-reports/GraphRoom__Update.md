@@ -4,7 +4,7 @@
 
 > Renamed from `func_800580E0` on 2026-09-24 (tools/rename.py). Address 0x800580e0.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x05C`
+Unit: `src/world/dream_scene.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x05C`
 (resolved via `tools/classtable.py gGraphRoomMethods`).
 
 ## Signature
@@ -57,16 +57,16 @@ body alone).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-points[] are BoxFills (include/BoxFill.h); the deleted `GraphRoomPoint` view's `slot60` is setDisplay: points[0] blinks with the hour's low bit. Zero bytes.
+points[] are BoxFills (include/box_fill.h); the deleted `GraphRoomPoint` view's `slot60` is setDisplay: points[0] blinks with the hour's low bit. Zero bytes.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__UpdateFromLog` -> `GraphRoom__Update`
 
-The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Named for its slot, track 4 step 6: +0x05C is `update` (TaskCore__Update in the parent), called with (sender, event). The +0x1B0 call is the DreamSys's DreamSys__GetSaveBlock, now through DreamSys.h's `vt`; its result is read as the unit's DreamSaveBlock record (was DayLog: fullScan/dayCount -> currentYear/currentDay). +0x03C is inputMode, +0x01C IntermediateBase's frameCounter (was elapsedHours), +0x124 the class's own slot tickHighlight (was `tick`).
+The class is unified in `include/graph_room.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Named for its slot, track 4 step 6: +0x05C is `update` (TaskCore__Update in the parent), called with (sender, event). The +0x1B0 call is the DreamSys's DreamSys__GetSaveBlock, now through dream_sys.h's `vt`; its result is read as the unit's DreamSaveBlock record (was DayLog: fullScan/dayCount -> currentYear/currentDay). +0x03C is inputMode, +0x01C IntermediateBase's frameCounter (was elapsedHours), +0x124 the class's own slot tickHighlight (was `tick`).
 
 ## Track 7 (2026-09-27, round 97, delta)
 
-Unchanged. `inputMode == 1` stays a literal: an enum for TaskCore's inputMode (0 none, 1 choosing a slot, 2 scrolling its items) belongs in include/TaskCore.h, whose other includers would change, so it is proposed to the head.
+Unchanged. `inputMode == 1` stays a literal: an enum for TaskCore's inputMode (0 none, 1 choosing a slot, 2 scrolling its items) belongs in include/task_core.h, whose other includers would change, so it is proposed to the head.

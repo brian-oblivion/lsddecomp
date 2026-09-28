@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003B624` on 2026-09-26 (tools/rename.py). Address 0x8003b624.
 
-Round 81, runner echo. Unit `src/graphics/TimImage.c`. Fresh ground, no prior attempt.
+Round 81, runner echo. Unit `src/graphics/tim_image.c`. Fresh ground, no prior attempt.
 Byte-exact on the first build.
 
 - **Where:** after the table getter GetTimImageMethods; it is not a slot of
@@ -24,7 +24,7 @@ Byte-exact on the first build.
 ```c
 typedef struct DrawPoint { s16 x; s16 y; } DrawPoint;
 /* DrawRect { s16 x; s16 y; s32 w; s32 h; }; Class6C070 (the draw singleton,
- * DrawSystem.c) methods slot +0x064:
+ * draw_system.c) methods slot +0x064:
  * void (*moveImage)(Class6C070 *self, DrawRect *rect, s32 x, s32 y); --
  * confirmed against LIBGPU.H's MoveImage(RECT *rect, int x, int y), see
  * ## Naming below. */
@@ -69,25 +69,25 @@ void RotateVramRectRight(DrawRect *r, s32 count, DrawPoint *p) {
   slot), shift the rest of `r` (width `r->w - 1`) right by one pixel
   in-place, then copy the saved column back in as the new leftmost column.
   `count` repeats the whole three-step shift, so it scrolls by `count`
-  columns. Only caller: `ObjMStyleActor.c`'s `StyleScrollVramStrips`, always with
+  columns. Only caller: `dream_scene.c`'s `StyleScrollVramStrips`, always with
   `count = 1`; what visual "table" this scrolls (`sStyleStage`-selected) is
   unestablished, per that unit's own header comment, so tier B rather than
   A. Same rename.py-bug block as `func_8003B39C` (now `New_TimImage`) had; that bug is fixed (FINISHING-PLAN revision 19).
 - **`draw->methods->moveImage`** (this unit's own local field, not a
-  cross-unit rename -- `Class6C070Methods` here is `TimImage.c`'s private
-  partial view of the singleton `DrawSystem.c` owns): tier A. The wrapped
+  cross-unit rename -- `Class6C070Methods` here is `tim_image.c`'s private
+  partial view of the singleton `draw_system.c` owns): tier A. The wrapped
   slot's signature, `void (*)(Class6C070 *self, DrawRect *rect, s32 x, s32
   y)`, matches LIBGPU.H's `extern int MoveImage(RECT *rect, int x, int y)`
   exactly in shape (a rect argument plus a destination x/y), one slot below
   `loadImage`'s equally exact match to `extern int LoadImage(RECT *rect,
-  u_long *p)`. Proposed for `DrawSystem.c`'s own eventual naming of
+  u_long *p)`. Proposed for `draw_system.c`'s own eventual naming of
   `Class6C070`'s table (not renamed here: that struct is owned by
-  `DrawSystem.c`, still mostly `INCLUDE_ASM`, and this unit's copy is an
+  `draw_system.c`, still mostly `INCLUDE_ASM`, and this unit's copy is an
   independent local view per the project's convention).
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (gDrawSystemMethods unified). Byte-identical.
+The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/draw_system.h` (gDrawSystemMethods unified). Byte-identical.
 
 ## History: the unit banner before track 7 (moved from src/code_2bb9c.c, round 100)
 

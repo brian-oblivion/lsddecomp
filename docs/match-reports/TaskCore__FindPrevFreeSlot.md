@@ -4,11 +4,11 @@
 
 > Renamed from `func_8003D444` on 2026-09-24 (tools/rename.py). Address 0x8003d444.
 
-**Unit:** Task · **Size:** 38 words · **Result:** byte-exact, first attempt
+**Unit:** task · **Size:** 38 words · **Result:** byte-exact, first attempt
 
 ## What it does
 
-`Obj86B60Methods::slotEC` (already recorded in `Task.h`). The
+`Obj86B60Methods::slotEC` (already recorded in `task.h`). The
 mirror image of `TaskCore__FindNextFreeSlot`: searches BACKWARD from `self->unk58 - 1`
 for the next free (null) slot in `self->unk4C->unk18[]`, wrapping to
 `self->unk50 - 1` when it goes negative, stopping either on an empty slot
@@ -64,4 +64,4 @@ Renamed `func_` -> `Obj86B60__FindPrevFreeSlot`. **Tier A**: The exact mirror of
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__FindPrevFreeSlot (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__FindPrevFreeSlot (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

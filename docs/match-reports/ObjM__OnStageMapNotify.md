@@ -6,7 +6,7 @@
 
 > Renamed from `func_800540E8` on 2026-09-23 (tools/rename.py). Address 0x800540e8.
 
-**Unit:** ObjMStyleActor · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
+**Unit:** dream_scene · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
 
 ## What this function does
 
@@ -33,7 +33,7 @@ None — matched on the first attempt.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
+round 15 (2026-09-04), runner echo, fresh carve `dream_scene`.
 
 ## Naming
 
@@ -46,5 +46,5 @@ Renamed from `ObjM__HandleEvent7` (rename.py): it occupies +0x0B4, which `ObjM__
 
 ## Track 7 (2026-09-27, round 98, delta)
 
-`event == 7` is `STAGEMAP_EVENT_SLOT_DATA_READY` (include/StageMap.h's
+`event == 7` is `STAGEMAP_EVENT_SLOT_DATA_READY` (include/stage_map.h's
 existing enum: the slot's LbdFile has read its data block). Zero bytes.

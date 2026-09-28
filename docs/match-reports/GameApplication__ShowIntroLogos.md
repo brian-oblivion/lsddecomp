@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026170` on 2026-09-24 (tools/rename.py). Address 0x80026170.
 
-**Unit:** GameApplicationFileResource · **Size:** 57 instructions (0xE4 bytes) · **Status:** MATCHED (57/57 words, whole-image SHA1 green)
+**Unit:** game_shell · **Size:** 57 instructions (0xE4 bytes) · **Status:** MATCHED (57/57 words, whole-image SHA1 green)
 
 ## What it does
 
@@ -133,7 +133,7 @@ inference from the filenames but not confirmed by any code in this unit).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
+game_application.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
 
 ## Track 7 polish (round 100, echo)
 
@@ -159,4 +159,4 @@ extern s32 GetMovieFrameCount(s32 index); /* psyq_memset.s: signed-halfword look
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.
+`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in game_shell.c are gone. Byte-identical.

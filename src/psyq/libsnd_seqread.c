@@ -11,7 +11,7 @@
  * The file is the whole module: its 18 functions are seqread.o's, in
  * seqread.o's order.
  *
- * Each sequence's play state is an SsScore (include/SsScore.h), reached as
+ * Each sequence's play state is an SsScore (include/ss_score.h), reached as
  * _ss_score[access][seq]; the (a0, a1) pair the event handlers take is that
  * (access, seq) pair. Per-channel state (pan, program, volume) is indexed by
  * the event's MIDI channel, channel. SeqPlay is the per-tick scheduler. GetSeqData

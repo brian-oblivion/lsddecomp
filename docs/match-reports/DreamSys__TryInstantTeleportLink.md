@@ -213,7 +213,7 @@ encodes it, at exactly two sites.
   final `GetSetDreamTimeLimit` call.
 
 All of the above are struct/header facts independent of this function's
-own residue and are kept in `include/DreamSys.h` even though the function
+own residue and are kept in `include/dream_sys.h` even though the function
 itself is reverted to `INCLUDE_ASM`.
 
 ## The residue: two swapped delay-slot fillers, same total instruction count
@@ -381,13 +381,13 @@ seed rather than a long blind search.
 Per the coordinator's standing request, checked this function's residue
 against the commutative-add operand/destination-register class confirmed
 this round in `CalcDreamColor` (this same unit) and five prior instances
-across `libsnd_ssinit`/`DayTaskStageMap`. **Not a match.** This function's two
+across `libsnd_ssinit`/`dream_day`. **Not a match.** This function's two
 divergences are both delay-slot-FILL CHOICES -- which independent
 instruction (the hoisted `li $v0,0x1` return-value constant vs. retail's
 `addiu $a1,$sp,0x10`/a genuine `nop`) occupies a branch's delay slot --
 not a commutative `addu`'s operand order or destination register at all.
 No `addu`/`add` instruction appears anywhere in either of the two
-diverging words. Same family as `StageMap__UnloadAllSlots`'s (`DayTaskStageMap`) and
+diverging words. Same family as `StageMap__UnloadAllSlots`'s (`dream_day`) and
 `DreamSys__AdvanceMoveCycle`'s residue #2 (this same unit, this round) -- an
 independent, dependency-free value getting scheduled into an earlier
 delay slot than retail chose -- but a DIFFERENT class from the
@@ -439,7 +439,7 @@ it would not apply here, saving a blind attempt.
 
 - **Tier B.** STALL (still INCLUDE_ASM). Wraps TestForInstantTeleporters and calls ExecuteLink (type 0x11) on success, per the preserved #if 0 body; same family as DreamSys__TryTunnelLink. Renaming a stall's symbol changes no bytes.
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

@@ -50,7 +50,7 @@ bool DreamSys__TryTunnelLink(DreamSys *this, PlayerSpawnPoint *currentPos)
 }
 ```
 
-Supporting header additions (`include/DreamSys.h`):
+Supporting header additions (`include/dream_sys.h`):
 
 ```c
 extern void SceneNode__GetRotationDegrees(DreamSys *this, void *arg1);

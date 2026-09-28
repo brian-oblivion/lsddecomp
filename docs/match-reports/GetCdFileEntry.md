@@ -102,13 +102,13 @@ tend to skip.
 **Tier A.** Direct index-to-pointer helper over the same `sFileTable` table
 (`sFileTable + index * 0x1C`), no search -- distinguished from
 `FindCdFileEntry`/`FindCdFileIndex` (which scan) by the Get/Find naming
-convention. Called from `CdDriver__RunRequestQueue` (CdDriver.c, still `INCLUDE_ASM`)
+convention. Called from `CdDriver__RunRequestQueue` (cd_driver.c, still `INCLUDE_ASM`)
 by table index.
 
 ## Track 4b (2026-09-25, round 85)
 
 The CD driver's shared globals and records are now declared once, in
-`include/CdDriver.h`, and this body uses that one reading: `&base[index]` over `CdFileEntry *` (was `char *` plus `index * 0x1C`). The
+`include/cd_driver.h`, and this body uses that one reading: `&base[index]` over `CdFileEntry *` (was `char *` plus `index * 0x1C`). The
 global's type comes from its accessors (`sFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
@@ -120,5 +120,5 @@ now initialised at its declaration. With the typed pointer that shape is
 byte-exact too (measured round 101), so the declare-then-assign split
 above was a fact about the `char *` / `void *` spelling, not about this
 function; no MATCHING line is needed. The return type stays `void *`
-because CdDriver.c declares it that way (proposal in the round's
+because cd_driver.c declares it that way (proposal in the round's
 summary).

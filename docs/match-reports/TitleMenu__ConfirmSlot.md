@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D9D4` on 2026-09-24 (tools/rename.py). Address 0x8004d9d4.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__ConfirmSlot`: 58/58 words match.
 
 ## Source
@@ -100,7 +100,7 @@ Renamed `func_8004D9D4` -> `TitleMenu__ConfirmSlot`. **Tier B**: Unconditionally
 compiler-ownership recipe (renamed the field alone in the `TitleMenu`
 struct definition, rebuilt default build and
 `tools/check-nonmatching.sh`): the accessor set landed entirely inside
-`src/ui/TitleMenuTaskObjF.c` (this function's own `switch`, and
+`src/ui/title_menu.c` (this function's own `switch`, and
 `TitleMenu__RefreshMenu`'s read/write), so this was renamed directly
 rather than proposed. `unk58` also names unrelated fields on other structs
 in this same header (e.g. `TaskObjF::unk58`) -- untouched, since their own
@@ -108,15 +108,15 @@ definitions were not edited.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `state` (+0x058) is TaskCore's `activeSlot` and `unk38` its `result` (TaskCore__Init returns it: 0 on activeSlot 1, 2 on activeSlot 4, the value GameApplication__RunTitleMenu retries on); slot94 is refreshViewValue, slot130/134 this class's updateMemcardSaveWithIcon/updateMemcardSaveStatus. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `state` (+0x058) is TaskCore's `activeSlot` and `unk38` its `result` (TaskCore__Init returns it: 0 on activeSlot 1, 2 on activeSlot 4, the value GameApplication__RunTitleMenu retries on); slot94 is refreshViewValue, slot130/134 this class's updateMemcardSaveWithIcon/updateMemcardSaveStatus. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 
-Constants: the cases are `enum TitleMenuEntry` (include/TitleMenu.h,
+Constants: the cases are `enum TitleMenuEntry` (include/title_menu.h,
 added: START 0 .. SHAKE 5, the order of the target's `names`), and
 GRAPH's result is `TITLEMENU_RESULT_GRAPH` (2: GameApplication__RunTitleMenu
 reruns GraphRoom while the menu returns it). FLASHBACK's `result = 0`

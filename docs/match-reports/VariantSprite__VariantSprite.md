@@ -6,8 +6,8 @@
 
 > Renamed from `func_80057D10` on 2026-09-19 (tools/rename.py). Address 0x80057d10.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `gVariantSpriteMethods` (49 slots, uncarved --
-`asm/ObjMStyleActor.s`) -- THIS is its own ctor, resolved via
+Unit: `src/world/dream_scene.c`. Class: `gVariantSpriteMethods` (49 slots, uncarved --
+`asm/dream_scene.s`) -- THIS is its own ctor, resolved via
 `tools/classtable.py gVariantSpriteMethods` at `+0x008`, and the callee of this
 unit's own `New_VariantSprite` (`GetVariantSpriteMethods()->ctor(...)`, see its
 report).
@@ -49,7 +49,7 @@ matched with no iteration:
    `GetActorMethods`/`New_VariantSprite`'s reports for the sibling pattern),
    zeroes `self->unk_0xA4`, then TAIL-CALLS its own class's `+0x040` slot
    (`self->methods->postConstruct`, resolves to `VariantSprite__SetVariantClut` -- the first
-   function of this unit's successor `ObjMStyleActor`, out of range) and
+   function of this unit's successor `dream_scene`, out of range) and
    forwards its return value.
 
 `D800879C4Methods` and `D800879C4Obj` (declared once, above
@@ -65,7 +65,7 @@ Mechanics are construction (chains a base-class ctor, sets its own
 vtable pointer and `unk_0xA4`, tail-calls its class's own `postConstruct`
 slot) -- named with the `Class__Class` constructor convention even though
 the CLASS's own purpose in the game remains completely unknown (it lives
-in uncarved ground, `ObjMStyleActor.s`, out of this runner's scope).
+in uncarved ground, `dream_scene.s`, out of this runner's scope).
 
 ## Verify
 
@@ -76,12 +76,12 @@ tools/funcdiff.py VariantSprite__VariantSprite   # 43/43
 
 ## Track 4 (2026-09-25, round 82, alpha)
 
-The base class is unified as `Sprite` (`include/Sprite.h`, table `gSpriteMethods`, formerly `D_8006EE1C`). The unit-local `D8006EE1CMethods` view is gone: the call goes through `SpriteMethods`' ctor, whose parameters are `(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5)` (Sprite__Sprite forwards all five to its +0x040 reset, which reads texture/abr/rect), so `self` is upcast (a pointer cast, no code) and `sVariantSpriteCells` is now `SpriteRect[2]` instead of an opaque 12-byte entry. Byte-identical: whole image green, 0 new warnings.
+The base class is unified as `Sprite` (`include/sprite.h`, table `gSpriteMethods`, formerly `D_8006EE1C`). The unit-local `D8006EE1CMethods` view is gone: the call goes through `SpriteMethods`' ctor, whose parameters are `(Sprite *self, void *texture, s32 abr, SpriteRect *rect, void *arg4, s32 arg5)` (Sprite__Sprite forwards all five to its +0x040 reset, which reads texture/abr/rect), so `self` is upcast (a pointer cast, no code) and `sVariantSpriteCells` is now `SpriteRect[2]` instead of an opaque 12-byte entry. Byte-identical: whole image green, 0 new warnings.
 
 ## Track 4 (2026-09-26, round 87, alpha)
 
 Renamed from `D800879C4__D800879C4` (tools/rename.py). The class is unified
-as `VariantSprite` (`include/VariantSprite.h`, table `gVariantSpriteMethods`,
+as `VariantSprite` (`include/variant_sprite.h`, table `gVariantSpriteMethods`,
 formerly `D_800879C4`), the `ClassXXXXX` convention of StyleEffect and
 FadeBox: the sprites' role in the game is not established, so no
 descriptive name. The unit-local `D800879C4Obj` / `D800879C4Methods` views
@@ -114,7 +114,7 @@ void VariantSprite__VariantSprite(VariantSprite *self, s32 variant, void *arg2, 
 
 ## Track 6 (2026-09-26, round 93, bravo)
 
-The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
+The class `Class879C4` is now `VariantSprite` (`include/variant_sprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds

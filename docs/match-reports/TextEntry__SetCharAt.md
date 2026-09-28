@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051998` on 2026-09-24 (tools/rename.py). Address 0x80051998.
 
-**Unit:** TextEntryItemList · **Size:** 45 words (0xB4 bytes)
+**Unit:** input_dialogs · **Size:** 45 words (0xB4 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Matched on the first
@@ -17,7 +17,7 @@ This report originally typed `self` as `Obj866E8` (gStageMapMethods) and typed
 `self->unk44` through a unit-local `Unk44Obj866E8`/`Unk44Obj866E8Methods`
 duplicate. Both were wrong, for the same reason as its sibling
 `TextEntry__SetCursorPos` (see that report and
-`src/ui/TextEntryItemList.c`'s file header comment): `self` is `Obj86ED0`
+`src/ui/input_dialogs.c`'s file header comment): `self` is `Obj86ED0`
 (`tools/classtable.py gTextEntryMethods` places this function at +0x0A8), whose
 shared struct already types `self->unk44` as `ChildObj86ED0 *`. The
 `+0x0C4` slot is now `ChildMethods86ED0::slotC4`, added additively next to
@@ -59,7 +59,7 @@ executing unconditionally whenever `self->unk48` is set — ordinary
 plain-statement-before-`if` C, same shape as `TextEntry__SetCursorPos`.
 
 `unk28`/`unk44` were already present on the shared `Obj86ED0` (established
-by TextEntryItemList); only `ChildMethods86ED0::slotC4` (offset 0x0C4) is a
+by input_dialogs); only `ChildMethods86ED0::slotC4` (offset 0x0C4) is a
 new additive field in `include/class_3bb8c.h`, alongside the sibling's
 `slotBC` — see `TextEntry__SetCursorPos`'s report for the full set.
 
@@ -76,7 +76,7 @@ notify-on-flag-set tail shape common to both siblings.
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 Renamed from Obj86ED0__DispatchLookupValue: editBuf[pos] = sNameCharTable[charIndex], the same byte to textRow's +0x0C4 (TextRow__SetCellAt) at pos, stores cursorIndex/charIndex, notifyTarget(0) when `notify`. Occupant of slot +0x0A8, called by NextChar/PrevChar/ResetChar/ResetAllChars. Tier A.
 
@@ -84,7 +84,7 @@ Renamed from Obj86ED0__DispatchLookupValue: editBuf[pos] = sNameCharTable[charIn
 
 `ChildObj86ED0`/`ChildMethods86ED0` (include/class_3bb8c.h) are deleted: the
 object behind them is the `New_TextRow` result, so TextEntry::textRow
-(+0x044, include/TextEntry.h) is `struct TextRow *`. The slots map onto
+(+0x044, include/text_entry.h) is `struct TextRow *`. The slots map onto
 TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 (position cast to `LongVec3 *`, as ScreenSprite's banner describes), +0x0B8
 `setColor` (`sTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `ColorRgb *`),

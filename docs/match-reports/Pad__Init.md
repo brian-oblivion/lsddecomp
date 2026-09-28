@@ -2,7 +2,7 @@
 
 > Renamed from `func_80025C84` on 2026-09-24 (tools/rename.py). Address 0x80025c84.
 
-**Unit:** `src/app/Pad.c` (runner ALPHA, `runner/alpha`)
+**Unit:** `src/app/pad.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (16/16 words, full build verified byte-exact)
 **Vtable slot:** `gPadMethods+0x40` (`PadMethods.init`)
 

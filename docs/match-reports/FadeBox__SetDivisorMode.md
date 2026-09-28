@@ -4,7 +4,7 @@
 
 > Renamed from `func_800404B4` on 2026-09-20 (tools/rename.py). Address 0x800404b4.
 
-Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::setDivisorMode` (`+0x0F0`),
+Unit `screen_widgets`, carved round 14. `FadeBoxMethods::setDivisorMode` (`+0x0F0`),
 a plain two-field setter: `void FadeBox__SetDivisorMode(FadeBoxObj *self, s32 a1,
 s32 a2) { self->altMode = a1; self->divisor = a2; }`.
 

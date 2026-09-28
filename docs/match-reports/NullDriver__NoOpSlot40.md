@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C3D0` on 2026-09-26 (tools/rename.py). Address 0x8002c3d0.
 
-**Unit:** PlacementGridVabSound · **Size:** 4 instructions (0x10 bytes) ·
+**Unit:** vab_sound · **Size:** 4 instructions (0x10 bytes) ·
 **Status: MATCHED 4/4**, whole-image SHA1 green.
 
 ## Role
@@ -29,9 +29,9 @@ bytes, not a claim about the original source's intent.
 ## Naming (round 77, charlie -- track 3, no rename)
 
 `tools/classtable.py 0x8006D9BC` confirms this is the `+0x040` slot of
-`gNullDriverMethods` (29-slot FileResource-derived table, `PlacementGridVabSound.c`,
-the SPU/VAB driver base class) -- physically carved into PlacementGridVabSound.c by
-ROM address, semantically owned by that other unit. `PlacementGridVabSound.c`'s own
+`gNullDriverMethods` (29-slot FileResource-derived table, `vab_sound.c`,
+the SPU/VAB driver base class) -- physically carved into vab_sound.c by
+ROM address, semantically owned by that other unit. `vab_sound.c`'s own
 `NullDriverMethods` struct comment leaves this and its four siblings
 (`NullDriver__Open`/`NullDriver__Close`/`NullDriver__Seek`/`NullDriver__NoOpSlot50`) entirely opaque -- `u8 pad000[0x054]`
 covers +0x000..+0x054 with no per-slot field even at the struct level, and
@@ -45,12 +45,12 @@ to fill". Not renamed.
 
 Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
 gNullDriverMethods --vs gFileResourceMethods` puts this function at `+0x040`, one of
-FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
+FileResource's run-time-bound driver-interface slots (`include/file_resource.h`
 names it `slot40`; the CD driver's occupant is `CdDriver__NoOpSlot40`).
-`SetActiveDataSource` (GameApplicationFileResource.c) copies the active driver's interface
+`SetActiveDataSource` (game_shell.c) copies the active driver's interface
 slots into FileResource's table and every client table, and takes this table
 (`GetNullDriverMethods()`) whenever `sActiveDataSource != DATASOURCE_CD`, so
 when the SPU/VAB source is active every `methods->slot40(...)` in the game
 reaches this body. The purpose evidence the tier-C verdict above lacked is
 the slot's, not the body's: the body does nothing, which is what the VAB
-driver does for that interface call. Unified into `include/NullDriver.h`.
+driver does for that interface call. Unified into `include/null_driver.h`.

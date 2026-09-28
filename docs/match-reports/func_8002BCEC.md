@@ -6,7 +6,7 @@
 > `src/` and the game-code count shrank by it -- the correction CLAUDE.md asks
 > for, not a regression. The run `libcd/iso9660` + `libc2/strcmp` +
 > `libc2/strncmp` tiles 0x1BE40..0x1C92C and crosses the libcd_bios /
-> PlacementGridVabSound boundary; both units trimmed. Whole-image SHA1 green. Nothing
+> vab_sound boundary; both units trimmed. Whole-image SHA1 green. Nothing
 > here is assignable and there is no stall left to work. The text below is the
 > pre-conversion record.
 
@@ -46,7 +46,7 @@ it, and the corrected finding is below under "Residue 1, corrected". The
 selection trade-off, not identity, and the next attempt should not be told
 "do not try" on this one.
 
-`PlacementGridVabSound`, vram `0x8002BCEC`, file offset `0x1C4EC`, 175 instructions
+`vab_sound`, vram `0x8002BCEC`, file offset `0x1C4EC`, 175 instructions
 (0x2BC bytes). Blocker-clean per the carve census (no `gp_rel`, no forward
 `mflo`/`mfhi`-then-`mult`/`div`). FRESH ground, no report existed before this
 round, no prior attempt history to inherit.
@@ -535,7 +535,7 @@ incoming parameter's own storage. Negative result, reported as requested.
 
 ## Round 31 update (runner echo) — figures rebuilt, a stale symbol name found and fixed, one more variant tried
 
-Rebuilt the preserved body by splicing it into `src/sound/PlacementGridVabSound.c` (via
+Rebuilt the preserved body by splicing it into `src/sound/vab_sound.c` (via
 `#if 0`/`#endif`) and reproduced the title's figures exactly: `funcdiff.py`
 reports **49/175** raw word-match with the drift warning firing (~299428
 bytes outside range this round vs. the ~299450 quoted before — the small
@@ -554,12 +554,12 @@ as written now fails at link time —
 `undefined reference to 'func_80012C20'` — because the Psy-Q `printf`
 object was linked in the interim (rounds 29-30's SDK-objects work; see
 `include/code_8220.h`'s own note that the old `func_80012C20` declarations
-"moved into src/app/BMemPMgr.c when the SDK objects were linked"). Every other
+"moved into src/app/bmem_pmgr.c when the SDK objects were linked"). Every other
 unit that calls this function now declares it as `printf` directly (see
-`src/psyq/libcd_bios.c`, `src/cd/CdDriver.c`, `src/ui/TitleMenuTaskObjF.c`,
-`src/ui/ScreenWidgets.c`, each with the argument shape their own call site
+`src/psyq/libcd_bios.c`, `src/cd/cd_driver.c`, `src/ui/title_menu.c`,
+`src/ui/screen_widgets.c`, each with the argument shape their own call site
 needs — per-unit local views, not a shared header, matching this project's
-convention). Fixed in `src/sound/PlacementGridVabSound.c` by declaring
+convention). Fixed in `src/sound/vab_sound.c` by declaring
 `extern void printf(const char *fmt, ...);` and renaming all four call
 sites in the preserved body from `func_80012C20(...)` to `printf(...)` —
 this is a pure symbol-name fix, not a codegen change, and the rebuilt score

@@ -5,7 +5,7 @@
 > Renamed from `func_8001E7B0` on 2026-09-17 (tools/rename.py). Address 0x8001e7b0.
 
 Unit: `SceneNode` (round 14, first slice-3 carve). Called by
-`SceneNode__RemoveAllChildren` (`SceneNode.c`) as its forward target for
+`SceneNode__RemoveAllChildren` (`scene_node.c`) as its forward target for
 `SceneNodeMethods::slot18`. `void SceneNode__UnlinkModel(SceneNodeObj *self)`.
 
 ## Final source
@@ -19,10 +19,10 @@ void SceneNode__UnlinkModel(SceneNodeObj *self) {
 
 ## Derivation notes
 
-Already MEASURED and documented verbatim in `include/SceneNode.h`'s own
+Already MEASURED and documented verbatim in `include/scene_node.h`'s own
 standing comment before this carve existed ("SceneNode__UnlinkModel's whole body is
 `self->unk18 = 0; self->unk20 = 0;`") -- this round only had to move the
-body from documentation into `src/graphics/SceneNode.c` and confirm it still
+body from documentation into `src/graphics/scene_node.c` and confirm it still
 matches now that the function has its own real address. No residue.
 Comment in the header updated (round 14) to say "now carved" instead of
 "still uncarved" since the function moved out of `asm/` into this unit;
@@ -38,12 +38,12 @@ No new struct or vtable-slot knowledge.
   is the inverse of its pair BY CONSTRUCTION, not because any Sony call
   pins it -- there is no GS call here at all, which is why this is B where
   `SceneNode__LinkModel` is A.
-- Its one dispatch path supports the pairing: `SceneNode__RemoveAllChildren` (SceneNode.c)
+- Its one dispatch path supports the pairing: `SceneNode__RemoveAllChildren` (scene_node.c)
   forwards `SceneNodeMethods::slot18` straight into it, while
   `SceneNode__AddChild` -- the +0x010 slot -- is what forwards into
   `SceneNode__LinkModel`.
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
 The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
 

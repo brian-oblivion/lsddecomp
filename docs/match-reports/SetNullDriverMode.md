@@ -8,7 +8,7 @@
 > It was blocked by `gp_rel`, which is RESOLVED this round: maspsx gained
 > `--gp-symbols` / `--no-nop-mflo-mfhi` (`tools/patches/maspsx-lsd-flags.patch`),
 > the whole image is byte-exact with the flags on, and this function was one of
-> the live tests -- two stores to `sNullDriverMode`/`sNullDriverModeArg` and `return 1`. The C is in `src/sound/PlacementGridVabSound.c`. Everything below is the
+> the live tests -- two stores to `sNullDriverMode`/`sNullDriverModeArg` and `return 1`. The C is in `src/sound/vab_sound.c`. Everything below is the
 > pre-fix record and is kept as evidence.
 
 > **REOPENED -- WAS ASSIGNABLE, SINCE MATCHED (marker spent), round 42 (2026-09-15).** This function was
@@ -22,12 +22,12 @@
 
 # SetNullDriverMode -- STALL (gp-relative blocker, not attempted)
 
-Unit `PlacementGridVabSound`, carved round 17 (2026-09-04). **Not attempted.**
+Unit `vab_sound`, carved round 17 (2026-09-04). **Not attempted.**
 
 ## Classification
 
 ```sh
-grep -n 'gp_rel' asm/nonmatchings/PlacementGridVabSound/SetNullDriverMode.s
+grep -n 'gp_rel' asm/nonmatchings/vab_sound/SetNullDriverMode.s
 ```
 
 Hit:
@@ -55,7 +55,7 @@ discovering this.
 ## Naming
 
 Renamed `func_8002C468` -> `SetNullDriverMode`, tier B. Same evidence as
-`GetNullDriverMode` (its report): `GameApplicationFileResource.c`'s `func_80026F34` assigns
+`GetNullDriverMode` (its report): `game_shell.c`'s `func_80026F34` assigns
 this function to a `DataSourceSetDriverModeFn` variable used exactly where it assigns
 Sony's `SetCdDriverMode` on the other branch of `sActiveDataSource == 0x13`
 -- a genuine drop-in substitute for a named "set driver mode" call, for
@@ -64,6 +64,6 @@ this backend's own state pair.
 ## Round 98 (charlie, track 7): parameters
 
 `(a, b)` -> `(async, mode2)`, after the CD driver's
-`SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)`: GameApplicationFileResource.c's
+`SetCdDriverMode(s32 async, s32 mode2, s32 useVSyncCallback)`: game_shell.c's
 `SetActiveDataSourceDriverMode` calls one or the other with the same three
 words, and this one ignores the third.

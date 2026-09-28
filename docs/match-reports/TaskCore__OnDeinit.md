@@ -7,10 +7,10 @@
 > **Type rename note (round 73, track 3):** `self->unk18`'s type
 > (`TaskCoreObj *` / `TaskCoreObjMethods *` below) was renamed to
 > `StreamTaskUnk18Obj *` / `StreamTaskUnk18Methods *` in
-> `include/Task.h` -- see `TaskCore__OnInit.md`'s own note
+> `include/task.h` -- see `TaskCore__OnInit.md`'s own note
 > for why. The text below is left as originally written for the history.
 
-**Unit:** Task · **Size:** 47 words · **Status:** MATCHED (47/47)
+**Unit:** task · **Size:** 47 words · **Status:** MATCHED (47/47)
 
 ## Summary
 
@@ -105,24 +105,24 @@ dtor slot, so left `Class__func_xxxxx` rather than assert "Stop" or
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from TaskCoreObj__func_8003C3D0 (tools/rename.py). Occupant of +0x050 (`onDeinit`, IntermediateBase__Deinit's first call), named for the slot. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from TaskCoreObj__func_8003C3D0 (tools/rename.py). Occupant of +0x050 (`onDeinit`, IntermediateBase__Deinit's first call), named for the slot. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of the local StreamTaskUnk18Obj view; +0x090 is deinitOt and +0x074 detachViewChild. Byte-identical.
+The viewport is cast to `Viewport *` (include/viewport.h, round 85) instead of the local StreamTaskUnk18Obj view; +0x090 is deinitOt and +0x074 detachViewChild. Byte-identical.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj cast is gone and +0x050 is called as `detachFromParent` (SceneNode's; returns SceneNode *, discarded, where the view said void). Byte-identical.
+bgLayer is a `BgLayer *` (include/bg_layer.h): the StreamTaskUnk78Obj cast is gone and +0x050 is called as `detachFromParent` (SceneNode's; returns SceneNode *, discarded, where the view said void). Byte-identical.
 
 ## Track 7 (2026-09-27, round 99, alpha)
 
 - The `+0x078` call is `DrawSystem::clearImage(drawSystem, unk93, NULL)`,
   the whole screen cleared to `unk93` while `unk34` is set; the local
-  `TaskTextObj` view is retired for include/DrawSystem.h's type
+  `TaskTextObj` view is retired for include/draw_system.h's type
   (TaskCore__OnInit's report). Byte-identical.
-- `unk34` and `unk93` are also accessed by TitleMenuTaskObjF.c (TitleMenu__Reset,
-  TitleMenu__OnDeinit) and Task.c, so they are proposed, not renamed:
+- `unk34` and `unk93` are also accessed by title_menu.c (TitleMenu__Reset,
+  TitleMenu__OnDeinit) and task.c, so they are proposed, not renamed:
   `unk93` -> `clearColor` (setColors' second triple, `clear` there; both this
   function and TitleMenu__OnDeinit clear the screen to it), `unk34` ->
   `clearOnDeinit` (reset 1, TitleMenu 0; this function clears only while it is
@@ -130,11 +130,11 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj cast is gon
 
 ## Proposed field names
 
-- TaskCore `+0x093 unk93` -> `clearColor`; accessors Task.c,
-  TitleMenuTaskObjF.c, Task.c (TaskCore__SetColors).
-- TaskCore `+0x034 unk34` -> `clearOnDeinit`; accessors Task.c,
-  TitleMenuTaskObjF.c.
+- TaskCore `+0x093 unk93` -> `clearColor`; accessors task.c,
+  title_menu.c, task.c (TaskCore__SetColors).
+- TaskCore `+0x034 unk34` -> `clearOnDeinit`; accessors task.c,
+  title_menu.c.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-TaskCore fields renamed (include/TaskCore.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.
+TaskCore fields renamed (include/task_core.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.

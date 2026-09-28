@@ -11,7 +11,7 @@
 `SceneNode` vtable slot `+0x014`, mirror of `SceneNode__AddChild` (`+0x010`).
 If `other`'s vtable header tag is `9`, first calls `SceneNode__UnlinkModel(self)`
 (zeroes `self->unk18`/`self->unk20` -- MEASURED from its own disassembly,
-see `include/SceneNode.h`), THEN unconditionally forwards to the base
+see `include/scene_node.h`), THEN unconditionally forwards to the base
 class's own `+0x014` slot (`GetBasicClassMethods()->slot14`). "Detach" to
 `SceneNode__AddChild`'s "attach": the pre-work happens before the base call here,
 where `SceneNode__AddChild` did its post-work after.
@@ -43,8 +43,8 @@ round 11 (2026-09-03), runner charlie, unit SceneNode, second pass. Matched on t
 
 ## Naming
 
-Round 71 (alpha). `func_8001CCB4` -> `SceneNode__RemoveChild`, **tier A**. Overrides BasicClass slot +0x014 `removeChild`. If the child's tag is 9, SceneNode__UnlinkModel first, then forwards to the base. Mirror of SceneNode__AddChild; DayTaskStageMap.h already calls this address `removeChild`.
+Round 71 (alpha). `func_8001CCB4` -> `SceneNode__RemoveChild`, **tier A**. Overrides BasicClass slot +0x014 `removeChild`. If the child's tag is 9, SceneNode__UnlinkModel first, then forwards to the base. Mirror of SceneNode__AddChild; dream_day.h already calls this address `removeChild`.
 
 ## Round 101 (delta): track 7
 
-Step 4 (constants): `CLASS_TAG_MASK` / `TAG_TMDMODEL` -> `CLASS_ID_ROOT_MASK` / `TMDMODEL_CLASS_ID` (include/TmdModel.h, new), as in SceneNode__AddChild. Byte-identical.
+Step 4 (constants): `CLASS_TAG_MASK` / `TAG_TMDMODEL` -> `CLASS_ID_ROOT_MASK` / `TMDMODEL_CLASS_ID` (include/tmd_model.h, new), as in SceneNode__AddChild. Byte-identical.

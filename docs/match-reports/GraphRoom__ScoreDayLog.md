@@ -4,7 +4,7 @@
 
 > Renamed from `func_800585B4` on 2026-09-24 (tools/rename.py). Address 0x800585b4.
 
-Unit: `src/world/ObjMStyleActor.c` · Size: 56 words (file 0x48DB4-0x48E94) · Round 41
+Unit: `src/world/dream_scene.c` · Size: 56 words (file 0x48DB4-0x48E94) · Round 41
 (2026-09-14), runner echo, worktree `lsddecomp2-wt-echo`.
 
 Inherited from round 24's stall: length **1 word SHORT at 55/56**, 15/56 raw
@@ -89,7 +89,7 @@ independently, after the byte-exact candidate was found:
 | the chained form, i.e. `p = sGraphScoreMoods; days = log->days;` instead of `p = (days = sGraphScoreMoods); days = log->days;` | regresses to 11/56, length wrong by ~95KB (whole-image drift) |
 
 Both are now commented in-source as **do not simplify without
-re-verifying** (`src/world/ObjMStyleActor.c`, directly above the function). This
+re-verifying** (`src/world/dream_scene.c`, directly above the function). This
 is not a case of dead code surviving by accident; it is dead code that
 cc1's scheduler treats differently depending on its presence, which is
 exactly the kind of compiler-idiosyncrasy the permuter is for.
@@ -106,7 +106,7 @@ mutating already-irrelevant statement shapes, not part of the real fix.
 
 ## Final matched body (56/56, byte-exact)
 
-Live in `src/world/ObjMStyleActor.c`, immediately following the `sGraphScoreMoods`
+Live in `src/world/dream_scene.c`, immediately following the `sGraphScoreMoods`
 declaration:
 
 ```c
@@ -236,13 +236,13 @@ the log against those four targets, feeding `GraphRoom__TickHighlight`.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__ScoreDayLog` -> `GraphRoom__ScoreDayLog`
 
-The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only; not a slot (called by PopulateGraphPoints alone). The log is the DreamSys save block: `days` is moodPreviousDays, `scored` (+0x467 of the block, DreamSys +0x5DF, the last byte of DreamSys's unknown_values_0x5d8) is renamed graphScored in the unit's record. The round-24 "not DreamSys" note compared the offsets against DreamSys's start rather than saveMagic (+0x178).
+The class is unified in `include/graph_room.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only; not a slot (called by PopulateGraphPoints alone). The log is the DreamSys save block: `days` is moodPreviousDays, `scored` (+0x467 of the block, DreamSys +0x5DF, the last byte of DreamSys's unknown_values_0x5d8) is renamed graphScored in the unit's record. The round-24 "not DreamSys" note compared the offsets against DreamSys's start rather than saveMagic (+0x178).
 
 ## Track 7 (2026-09-27, round 97, delta)
 
 - **Naming: `D_80087BD4` -> `sGraphScoreMoods`** (tier B: the mechanics are certain, what the game makes of these four moods is not). Four `.data` halfwords `0x01FF, 0x0101, 0x0000, 0xFD00`, i.e. MoodGraphPoint `(dynamic, upper)` = (-1, 1), (1, 1), (0, 0), (0, -3). This function is its only user. Declared `MoodGraphPoint[GRAPH_SCORE_MOOD_COUNT]` and compared by `.value`; `targets`/`days` are `MoodGraphPoint *`. Zero bytes changed.
 - `GRAPH_SCORE_MOOD_COUNT` (4, unit-local): the table's length, this loop's bound, matchedDayIndices' allocation and TickHighlight's bound.
-- `limit`'s 100s are `ARRAY_COUNT(self->points)`; the wrap index 0x16C is `DAYS_PER_YEAR - 1` (DreamSys.h). Locals: `p` -> `targets`, `idx` -> `day`, `j` -> `dot`, `found` -> `matches`.
+- `limit`'s 100s are `ARRAY_COUNT(self->points)`; the wrap index 0x16C is `DAYS_PER_YEAR - 1` (dream_sys.h). Locals: `p` -> `targets`, `idx` -> `day`, `j` -> `dot`, `found` -> `matches`.
 - The source comments below were replaced by a function comment and a one-line `MATCHING:` note. Verbatim as they stood (with the step-1/3 renames already applied):
 
 ```c

@@ -30,7 +30,7 @@ void *StageMap__GetUnk1CC(Obj866E8 *self) {
   is ever taken here. No caller exists in this executable to cross-check
   against, so the field type is a placeholder (matches the project's
   convention for address-of-only fields, e.g. `StageMap::unk1C0` in
-  `include/DayTaskStageMap.h`).
+  `include/dream_day.h`).
 
 ## Attempts
 
@@ -46,7 +46,7 @@ None new.
 caller found anywhere in the executable. `unk1CC` itself is left
 unrenamed: `StageMap__GetUnk1CC` only ever takes its address, never
 reads through it, so its real type (and therefore any real name) is not
-established from this unit -- DayTaskStageMap's own independent view of the
+established from this unit -- dream_day's own independent view of the
 same offset (`StageMap__Reset`: "set to -1") does not clarify it
 either. Following the "GetSetUnk10Field0"-style precedent for a field
 whose meaning is unknown but whose offset is fixed.
@@ -62,11 +62,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -81,6 +81,6 @@ an operator decision; not hand-reverted).
 
 ## Round 96 (track 7, delta)
 
-Nothing changed. `unk1CC` stays: StageMap__Reset (DayTaskStageMap.c) sets it and
+Nothing changed. `unk1CC` stays: StageMap__Reset (dream_day.c) sets it and
 the three words after it to -1, and this getter takes its address; no code
 reads it, so nothing names it.

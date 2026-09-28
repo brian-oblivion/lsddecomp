@@ -4,7 +4,7 @@
 
 > Renamed from `func_80020C4C` on 2026-09-25 (tools/rename.py). Address 0x80020c4c.
 
-Round 81, runner bravo. Unit `src/graphics/DrawSystem.c` (carved from `psyq_10ee0` in
+Round 81, runner bravo. Unit `src/graphics/draw_system.c` (carved from `psyq_10ee0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** not a method: the table getter (method-table slots resolved with `tools/classtable.py gDrawSystemMethods`).
@@ -23,7 +23,7 @@ Class6C070Methods *GetDrawSystemMethods(void) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/graphics/DrawSystem.c`:
+The unit-local view it needs, from the top of `src/graphics/draw_system.c`:
 
 ```c
 #include "basic_class.h"
@@ -57,4 +57,4 @@ round 81's `GetWBgmMethods`).
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
+The class is unified: its one definition is `include/draw_system.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.

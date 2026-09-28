@@ -43,19 +43,19 @@ below); retyping the field itself was cleaner and is arguably the more
 honest reading anyway -- nothing suggests this quantity is ever negative.
 
 **`ObjA34_179D8H` is a local type, not an extension of
-`GameApplicationFileResource.h`'s `FileResource`**, even though the offsets coincide
+`data_source.h`'s `FileResource`**, even though the offsets coincide
 suspiciously well: `self->isOpen` (offset +0x0C) lines up with
 `FileResource::pendingGeneration` (same offset, "saved/restored around the
 buffer (re)alloc"), and `self->size` falls inside that struct's
 `pad18[0x20-0x18]` gap (explicitly documented there as "unknown, 8 bytes").
 Extending the shared header would require splitting that padding without
 shifting anything after it, which is mechanically safe -- but
-`GameApplicationFileResource.h` is OUT OF UNIT (shared with `GameApplicationFileResource.c` and
-`CdDriver.c`, neither this unit) and the rule is explicit that nothing
+`data_source.h` is OUT OF UNIT (shared with `game_shell.c` and
+`cd_driver.c`, neither this unit) and the rule is explicit that nothing
 outside the assigned unit + its reports gets edited. Kept as this unit's own
 narrower local reading instead, per the project's multiple-independent-
 local-views convention. Worth flagging for the head: if this coincidence
-holds up under more scrutiny, `GameApplicationFileResource.h`'s owner may want to fold
+holds up under more scrutiny, `data_source.h`'s owner may want to fold
 `size` in properly -- though round 64 notes the semantic mismatch this
 would need to resolve first (see `## Naming` below).
 
@@ -107,7 +107,7 @@ reasoning.
 
 ## Naming (round 64, runner alpha)
 
-- `func_80028A50` -> `GetCdFileSize`, tier B. `src/cd/CdDriver.c`'s
+- `func_80028A50` -> `GetCdFileSize`, tier B. `src/cd/cd_driver.c`'s
   `CdDriver__Seek` calls this function directly (ignoring its own `arg1`,
   `arg2`) when CD-async mode is off; its async path, when asked to just
   query size (`arg2 != 0`), does the IDENTICAL `self->unk1C` rounding as a
@@ -115,7 +115,7 @@ reasoning.
   `CloseCdFile`/`ReadCdFile` (also this unit) as an Open/Close/Size/Read
   quad.
 - `ObjA34_179D8H::unk0C` -> `isOpen`, `unk1C` -> `size` (tier B, both).
-  Evidence is cross-unit: `src/cd/CdDriver.c`'s `Obj80027480` is an
+  Evidence is cross-unit: `src/cd/cd_driver.c`'s `Obj80027480` is an
   independent local view of what is very likely the SAME object (see the
   coincidence note above and `CloseCdFile.md`), and its own
   `CdDriver__Open`/`CdDriver__Close`/`CdDriver__Seek` async bodies set/clear
@@ -126,17 +126,17 @@ reasoning.
   uses. Not derived from this function's body in isolation.
 - **Note on the `FileResource::pendingGeneration` coincidence (see `## Notes`
   above): the SEMANTICS now look different, not just the offset.**
-  `pendingGeneration` is documented in `GameApplicationFileResource.h` as "saved/restored
+  `pendingGeneration` is documented in `data_source.h` as "saved/restored
   around the buffer (re)alloc" (implying a counter), while this unit's
   reading at the same offset is a plain 0/1 open flag. These could still be
   the same field serving double duty (0 = no generation yet = "closed"),
   but that is now a SPECIFIC claim to verify, not just an offset match --
   flagged here rather than resolved, per the park-rule spirit for anything
-  short of direct evidence. Not applied to `GameApplicationFileResource.h` (out of unit).
+  short of direct evidence. Not applied to `data_source.h` (out of unit).
 
 ## Naming (round 99, echo, track 7)
 
-`>> 11`/`<< 11` -> `CD_SECTOR_SHIFT` (`include/CdDriver.h`, 2048-byte
+`>> 11`/`<< 11` -> `CD_SECTOR_SHIFT` (`include/cd_driver.h`, 2048-byte
 sectors). The result is always one sector more than the whole sectors in
 `size`, even when `size` is already a multiple of 2048; `CdDriver__Seek`'s
 async path rounds up only when `size & 0x7FF` is nonzero. The source says so

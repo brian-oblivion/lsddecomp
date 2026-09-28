@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043538` on 2026-09-25 (tools/rename.py). Address 0x80043538.
 
-Round 82, runner echo (GraphicsResources session, echo #6), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #6), 2026-09-25. Unit `graphics_resources`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 9/9 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gTimBlockSrcMethods +0x078.
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
@@ -43,7 +43,7 @@ void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
 
 ## Notes
 
-- No shared header was edited. `FileResource.h`, `SceneNode.h`, `basic_class.h` are
+- No shared header was edited. `file_resource.h`, `scene_node.h`, `basic_class.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
@@ -54,4 +54,4 @@ void TimBlockSrc__SetEntryShift(Obj6F0B8 *self, s32 index, s32 shift) {
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-Occupant of +0x078, which is FileResource's untyped `slot78`; not given a TimBlockSrc slot of its own because the slot belongs to the parent's layout. Writes `entries[index].shift`/`.mask`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Occupant of +0x078, which is FileResource's untyped `slot78`; not given a TimBlockSrc slot of its own because the slot belongs to the parent's layout. Writes `entries[index].shift`/`.mask`. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/tim_block_src.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/graphics_resources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -38,7 +38,7 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 **Evidence.** Written in exactly the same two places as `sCdBusy` and always
 to the opposite value: `StartCdOperation` (operation start) sets `sCdBusy = 1`
 and `sCdIdle = 0`, `ResetCdStateMachine` (state-machine reset) sets `sCdIdle = 1`
-and `sCdBusy = 0`. Its initial value in `.sdata` is 1. `GameApplicationFileResource.c`'s
+and `sCdBusy = 0`. Its initial value in `.sdata` is 1. `game_shell.c`'s
 wrapper returns 1 when no CD source is selected, matching "idle". The one
 reader that is not a getter is `CdDriver__CancelRequests`, which only
 aborts a transfer in flight when `sCdIdle == 0`.

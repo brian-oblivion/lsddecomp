@@ -12,7 +12,7 @@
 **2/27, exact length, zero drift, funcdiff `insertions 6 / deletions 6`,
 positional skeleton diffs 25** — the same as round 71.
 
-**The body that matches** (live in `src/world/DayTaskStageMap.c`, `INCLUDE_ASM` and
+**The body that matches** (live in `src/world/dream_day.c`, `INCLUDE_ASM` and
 the `NON_MATCHING` block removed):
 
 ```c
@@ -180,9 +180,9 @@ block live after any checkout.
 > check even harder than round 18's did, so no search was launched.**
 > Rebuilt the round-19 `goto`-form best body (Shape A, reproduced below)
 > from a clean `INCLUDE_ASM` baseline first per Gate 1b: temporarily
-> enabled it in `src/world/DayTaskStageMap.c` and confirmed **2/27, exact length,
+> enabled it in `src/world/dream_day.c` and confirmed **2/27, exact length,
 > no outside-range drift** -- identical to round 19's own recorded figure.
-> Reverted immediately (`git checkout -- src/world/DayTaskStageMap.c`; clean
+> Reverted immediately (`git checkout -- src/world/dream_day.c`; clean
 > `OK: build matches retail` confirmed afterward).
 >
 > Built a brand-new scaffold from scratch (`tools/setup-permuter.sh
@@ -569,7 +569,7 @@ reshaping).
 Assigned as one of three functions in a round-53 Sonnet calibration slot for
 the track-1 stop rule (`docs/FINISHING-PLAN.md`); this report's own text is
 the reason it was picked over the plan's higher-ranked but
-levers-measurably-spent `ScreenWidgets` job — round 18 and round 46 both say
+levers-measurably-spent `screen_widgets` job — round 18 and round 46 both say
 explicitly this is NOT permuter-exhausted, so a real attempt was owed before
 any further stop-rule conclusion.
 
@@ -601,7 +601,7 @@ compiled shape, not a repeat of Shape A or B.** The raw `funcdiff` output
 shows a different instruction sequence throughout (not just a different
 score composition); it does not recover either missing instruction (`move
 a2,a0`; the `sra a0,a3,24` re-extract). No better than the existing best.
-Reverted (`git checkout -- src/world/DayTaskStageMap.c`; clean `OK: build matches
+Reverted (`git checkout -- src/world/dream_day.c`; clean `OK: build matches
 retail` confirmed immediately after).
 
 **Disposition unchanged: `INCLUDE_ASM`, still 2/27, still not
@@ -658,7 +658,7 @@ build looks like.
 ```sh
 tools/setup-permuter.sh IsPointOutOfBounds <Shape-A seed> permuter-work/cd38
 tools/binutils/bin/mipsel-linux-gnu-objdump -d permuter-work/cd38/base.o
-tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/DayTaskStageMap.c.o
+tools/binutils/bin/mipsel-linux-gnu-objdump -d build/src/dream_day.c.o
 ```
 
 The two disassemblies of `IsPointOutOfBounds` are **identical instruction for
@@ -773,7 +773,7 @@ measures; a wrong CAUSE is what the next round acts on."
 Track 1b promotion. Score re-verified unchanged (2/27, exact length, zero
 drift) before promoting. Placed Shape A — the plain four-early-return form
 (`This maps directly onto:` above; byte-identical to attempts 1/3/4/5 per
-rounds 19/46/58) — in `src/world/DayTaskStageMap.c` inside `#ifdef NON_MATCHING`,
+rounds 19/46/58) — in `src/world/dream_day.c` inside `#ifdef NON_MATCHING`,
 with `INCLUDE_ASM` in the `#else`. Chosen over the goto/alias form because
 it is the plainer restatement of the same compiled shape and no more or
 less byte-exact. Both oracles green: `./build-and-verify.sh` (exit 0, `OK:
@@ -803,11 +803,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80019724` on 2026-09-17 (tools/rename.py). Address 0x80019724.
 
-**Unit:** TmdRenderer · **Size:** 10 instructions · **Status:** MATCHED (10/10 words)
+**Unit:** tmd_renderer · **Size:** 10 instructions · **Status:** MATCHED (10/10 words)
 
 Conditional variant of the GTE-store family (see `StoreSxyPolyF3.md` for the
 family overview). `flag` selects between a full 3-register store (same

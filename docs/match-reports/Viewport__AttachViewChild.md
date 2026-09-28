@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EACC` on 2026-09-23 (tools/rename.py). Address 0x8003eacc.
 
-Unit: `Task`. Round 14, runner delta. 46/46 words, full match (3
+Unit: `task`. Round 14, runner delta. 46/46 words, full match (3
 real attempts).
 
 ## Signature
@@ -68,7 +68,7 @@ void Viewport__AttachViewChild(Unk18Obj *self, void *a1, void *a2, void *a3, voi
 
 ## Header changes
 
-`include/Task.h`:
+`include/task.h`:
 - `Unk18Obj` gains `unk14` (`+0x014`, opaque `u8[0x030-0x014]` span,
   address-only — `func_8003F2AC` isn't decompiled in this project).
 - `Unk18ObjMethods` gains `slot78`/`slot7C`/`slot80` (all `void (*)
@@ -77,7 +77,7 @@ void Viewport__AttachViewChild(Unk18Obj *self, void *a1, void *a2, void *a3, voi
   report) and `Viewport__SetTwist` (the documented `gp_rel` blocker, not
   decompiled).
 - New externs `sDefaultViewTwist` (`asm/data/7B008.sdata.s`, address-only) and
-  `func_8003F2AC` (`asm/ScreenWidgets.s`, the next uncarved slice).
+  `func_8003F2AC` (`asm/screen_widgets.s`, the next uncarved slice).
 
 ## Proposed learning
 
@@ -96,11 +96,11 @@ different lever (expression form, not declaration order).
 
 ## Naming
 
-`Unk18Obj__AttachViewChild` -- tier B. One-time init guarded by `self->unk10`: registers `a1` through the inherited `addChild` slot (which, per `Viewport__AddChild` in `Task.c`, sets `self->unk10` itself when `a1`'s dynamic-class tag is 4), forwards `a2`/`a3` to `slot78`/`slot7C` (this unit's own `Viewport__SetViewPoint`/`Viewport__SetViewRef`), then hands `&self->unk14` to Sony's `GsSetRefView2`. "View" is inferred from that GsSetRefView2 hand-off, not proven for the field itself -- tier B, not A, per round 72's rule on asserting what data means.
+`Unk18Obj__AttachViewChild` -- tier B. One-time init guarded by `self->unk10`: registers `a1` through the inherited `addChild` slot (which, per `Viewport__AddChild` in `task.c`, sets `self->unk10` itself when `a1`'s dynamic-class tag is 4), forwards `a2`/`a3` to `slot78`/`slot7C` (this unit's own `Viewport__SetViewPoint`/`Viewport__SetViewRef`), then hands `&self->unk14` to Sony's `GsSetRefView2`. "View" is inferred from that GsSetRefView2 hand-off, not proven for the field itself -- tier B, not A, per round 72's rule on asserting what data means.
 
 ## Proposed field names
 
-Not applied -- `unk10` is shared with `Task.c` (`Viewport__AddChild`/
+Not applied -- `unk10` is shared with `task.c` (`Viewport__AddChild`/
 `Viewport__RemoveChild`/`Viewport__Viewport`/`Viewport__Finalize` all touch
 it), so this unit does not own it per track 3's ownership rule.
 
@@ -113,17 +113,17 @@ it), so this unit does not own it per track 3's ownership rule.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__AttachViewChild`. Slot +0x070 `attachViewChild(self, node, vp, vr, twist)`: the tier-B "view" reading is now settled, since &self+0x014 is the argument of GsSetRefView2, i.e. a GsRVIEW2 (`refView`), and the three setters write its vp, vr and rz. The default twist sDefaultViewTwist is a Ratio16 {0, 1}. TaskCore__OnInit passes a zero LongVec3 (sTaskCoreViewOrigin) as both points. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__AttachViewChild`. Slot +0x070 `attachViewChild(self, node, vp, vr, twist)`: the tier-B "view" reading is now settled, since &self+0x014 is the argument of GsSetRefView2, i.e. a GsRVIEW2 (`refView`), and the three setters write its vp, vr and rz. The default twist sDefaultViewTwist is a Ratio16 {0, 1}. TaskCore__OnInit passes a zero LongVec3 (sTaskCoreViewOrigin) as both points. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/app/Task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSetRefView2((GsRVIEW2 *)&self->refView)`: `ViewportRefView` is Sony's GsRVIEW2 under a local name (include/Viewport.h).
+src/app/task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSetRefView2((GsRVIEW2 *)&self->refView)`: `ViewportRefView` is Sony's GsRVIEW2 under a local name (include/viewport.h).
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 
 ```c
 /* GsSetRefView2 is Sony's (`libgs/gs_131.o`, linked from the SDK object).
-   Declared LOCALLY rather than in include/Task.h, which six units
+   Declared LOCALLY rather than in include/task.h, which six units
    include: the real `LIBGS.H` prototype for this name will collide there.
    This is only the shape THIS unit's call sites use -- the real one takes a
    GsRVIEW2*. */

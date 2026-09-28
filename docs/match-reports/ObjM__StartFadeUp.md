@@ -4,7 +4,7 @@
 
 > Renamed from `func_80053EB4` on 2026-09-23 (tools/rename.py). Address 0x80053eb4.
 
-**Unit:** ObjMStyleActor · **Size:** 52 instructions · **Status:** MATCHED (52/52 words)
+**Unit:** dream_scene · **Size:** 52 instructions · **Status:** MATCHED (52/52 words)
 
 ## Context
 
@@ -48,7 +48,7 @@ either guard.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
+round 15 (2026-09-04), runner echo, fresh carve `dream_scene`.
 
 ## Naming
 
@@ -61,7 +61,7 @@ Renamed from `ObjM__ForwardToSubChild` (rename.py). The "sub child" is the viewp
 
 ## Track 7 (2026-09-27, round 98, delta)
 
-The third parameter, `arg2`, is now `fadeMode` (here and in ObjM.h's
+The third parameter, `arg2`, is now `fadeMode` (here and in objm.h's
 prototype): it goes to FadeBox's startFadeUp and on to configure, which
 stores it in FadeBox::unk7C; FadeBox__Update does not step the colour
 while it is 9. Every caller passes 0. Tier B (mechanics). Zero bytes.

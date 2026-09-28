@@ -2,7 +2,7 @@
 
 > Renamed from `func_80039E7C` on 2026-09-25 (tools/rename.py). Address 0x80039e7c.
 
-Round 81, runner delta. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
+Round 81, runner delta. Unit `src/sound/wbgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x05C (setSeq) (slots resolved with `tools/classtable.py gWBgmMethods`).
@@ -50,7 +50,7 @@ void WBgm__SetSeq(WBgm *self, s32 arg) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/sound/WBgm.c`:
+The unit-local view it needs, from the top of `src/sound/wbgm.c`:
 
 ```c
 #include "basic_class.h"
@@ -134,7 +134,7 @@ extern u8 sSsSizeTableBuf[];
 The unit-local view `SeqData` (BASICCLASS_FIELDS, +0x010 `addr`, +0x02C
 `loaded`) and its `extern SeqData *New_RequestedFile(s32)` are gone: the
 census missed them, as New_RequestedFile's return type. `WBgm::seqData` is
-`RequestedFile *` (`include/RequestedFile.h`, round 87, delta). `addr` is
+`RequestedFile *` (`include/requested_file.h`, round 87, delta). `addr` is
 FileResource's `buffer` (+0x010), `loaded` the same field under the same
 name; the release calls lose their `(BasicClass *)` casts and WBgm__SetSeq
 casts its s32 argument to the ctor's `char *name`. The whole image stays
@@ -142,6 +142,6 @@ byte-identical; the Source block above is the earlier text.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+The class is now declared once, in `include/wbgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
 
 Parameter retyped `s32 arg` -> `char *seqPath` (slot +0x05C with it); the `(char *)` cast before New_RequestedFile is gone and the test reads `seqPath != NULL`. Callers: WBgm__WBgm (its seqPath argument; the one construction passes NULL). No C outside this unit names the slot (grep; INCLUDE_ASM callers through +0x05C were not searched).

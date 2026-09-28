@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004441C` on 2026-09-25 (tools/rename.py). Address 0x8004441c.
 
-Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #9), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 140/140 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -20,7 +20,7 @@ Table slot (`tools/classtable.py`): gBgLayerMethods +0x048.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/graphics/GraphicsResources.c`.
+top of / earlier in `src/graphics/graphics_resources.c`.
 
 ```c
 /* gBgLayerMethods +0x048: the two ratios of `src` (+0 over +2, +4 over +6) in
@@ -109,7 +109,7 @@ Second build. The first build matched everything but the clamp in the `set` arm 
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Renamed from `BgLayer__SetScale` for the slot it overrides: gBgLayerMethods +0x048 is SceneNode's `updateScale` (SceneNode__UpdateScale), set or add from the same `Ratio16` {num, den} ratio table; this override reads entries [0] and [1] (x, y), which were the `Scale4441C` view's xnum/xden/ynum/yden. That view is gone: the live body takes `Ratio16 *src` and reads `src[0].whole`, `src[0].frac`, `src[1].whole`, `src[1].frac`; `self` is `BgLayer *` (include/BgLayer.h). The clamp to 30000 is this override's own, the slot name still says what it does. Byte-identical.
+Renamed from `BgLayer__SetScale` for the slot it overrides: gBgLayerMethods +0x048 is SceneNode's `updateScale` (SceneNode__UpdateScale), set or add from the same `Ratio16` {num, den} ratio table; this override reads entries [0] and [1] (x, y), which were the `Scale4441C` view's xnum/xden/ynum/yden. That view is gone: the live body takes `Ratio16 *src` and reads `src[0].whole`, `src[0].frac`, `src[1].whole`, `src[1].frac`; `self` is `BgLayer *` (include/bg_layer.h). The clamp to 30000 is this override's own, the slot name still says what it does. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

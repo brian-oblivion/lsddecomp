@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D704` on 2026-09-24 (tools/rename.py). Address 0x8004d704.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__Finalize`: 33/33 words match.
 
 ## Source
@@ -24,15 +24,15 @@ void TitleMenu__Finalize(TitleMenu *self)
 
 ## Derivation
 
-This is `TitleMenu`'s own destructor (the first function of `TitleMenuTaskObjF`,
-immediately continuing `TitleMenuTaskObjF`'s work on the same class). Structure:
+This is `TitleMenu`'s own destructor (the first function of `title_menu`,
+immediately continuing `title_menu`'s work on the same class). Structure:
 
 - `self->unkAC` and `self->iconHandle` are two owned sub-objects, each released
   through the shared BasicClass-family `release` slot at `+0x004`
   (`GenericReleaseObj_3bb8c_d`, a local independent view of the same shared
   slot `include/code_8220.h`'s `BasicClassMethods::release` occupies).
 - `GetTaskCoreMethods()` is the class hierarchy's shared base-class method table
-  getter (same real global, `gTaskCoreMethods`, as `include/Task.h`'s
+  getter (same real global, `gTaskCoreMethods`, as `include/task.h`'s
   `TaskCoreMethods`). Its `+0x00C` slot is called unconditionally last —
   the base class's own destructor forward.
 
@@ -58,7 +58,7 @@ byte-exact on the next build.
 - `TitleMenu::iconHandle` — new field, was anonymous padding
   (`pad0A8[0x0AC-0x0A8]`), now named and typed the same as `unkAC`.
 - `BaseTaskCtorTable_3bb8c_c::slot0C` — new slot, `void (*)(void *self)`.
-  Same offset AND arity as `Task.h`'s independently-derived
+  Same offset AND arity as `task.h`'s independently-derived
   `TaskCoreMethods::slot0C` on the same real global (`gTaskCoreMethods`) —
   cross-unit confirmation, not a coincidence.
 - Also added (needed by later functions in this same round, grouped into
@@ -81,14 +81,14 @@ Renamed `func_8004D704` -> `TitleMenu__Finalize`. **Tier A**: matches the
 BasicClass-family destructor shape (release owned sub-objects, then
 forward to the base class's own dtor slot). Field `unkA8` renamed to
 `iconHandle` in the same round (compiler-ownership check: accessor set
-entirely inside `src/ui/TitleMenuTaskObjF.c`).
+entirely inside `src/ui/title_menu.c`).
 
 ## Proposed field names
 
-**Head, round 77:** `unkAC -> saveCtrl` APPLIED by type scope (11 accessors, TitleMenuTaskObjF/_d).
+**Head, round 77:** `unkAC -> saveCtrl` APPLIED by type scope (11 accessors, title_menu/_d).
 
 `TitleMenu::unkAC` has a real accessor outside this unit
-(`src/ui/TitleMenuTaskObjF.c`'s `TitleMenu__TitleMenu` zeroes it), so per the
+(`src/ui/title_menu.c`'s `TitleMenu__TitleMenu` zeroes it), so per the
 compiler-ownership rule this is a PROPOSAL, not a rename. Also posted to
 the round-77 broadcast.
 
@@ -105,7 +105,7 @@ the round-77 broadcast.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

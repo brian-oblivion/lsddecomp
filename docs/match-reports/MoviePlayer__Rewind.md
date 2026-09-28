@@ -4,7 +4,7 @@
 
 > Renamed from `func_800458B8` on 2026-09-25 (tools/rename.py). Address 0x800458b8.
 
-Round 82, runner echo (GraphicsResources session, echo #8), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #8), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 33/33 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -20,7 +20,7 @@ Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x044.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/graphics/GraphicsResources.c`.
+`src/graphics/graphics_resources.c`.
 
 ```c
 typedef struct Methods458B8 {
@@ -76,8 +76,8 @@ First build. Written through a local copy of the global (`cur`) -- retail keeps 
 
 ## Track 4 (2026-09-26, round 87)
 
-The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Sub458B8`/`Methods458B8` are deleted; `unk60` is `CdStream *`; slot58 is `restart`, slot7C stays `slot7C` (empty occupant, typed from this call's arguments). MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+The +0x060 object is a CdStream (include/cd_stream.h, unified this round). `Sub458B8`/`Methods458B8` are deleted; `unk60` is `CdStream *`; slot58 is `restart`, slot7C stays `slot7C` (empty occupant, typed from this call's arguments). MoviePlayer's own view and field names are unchanged. Zero bytes changed.
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; Obj458B8 is gone; `cur` is a `MoviePlayer *` straight from `sActiveMoviePlayer` (now declared `MoviePlayer *`, was the unit's DataSrc33808 view). `unk64` -> `started`. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/movie_player.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; Obj458B8 is gone; `cur` is a `MoviePlayer *` straight from `sActiveMoviePlayer` (now declared `MoviePlayer *`, was the unit's DataSrc33808 view). `unk64` -> `started`. Byte-identical; `typeviews.py --warnings` 0 new.

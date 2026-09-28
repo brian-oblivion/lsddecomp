@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051200` on 2026-09-24 (tools/rename.py). Address 0x80051200.
 
-Unit `TextEntryItemList`, carved round 14.
+Unit `input_dialogs`, carved round 14.
 
 `Obj86ED0`'s vtable slot 0x04C: adds two children via `self->methods->
 addChild` (the class's OWN overridden addChild, `TextEntry__AddChild`, reached
@@ -35,15 +35,15 @@ resolved -- this function's own C never changed.
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 ## Round 94 (track 6, charlie): the target is a VabStreamObj
 
 `TargetObj86ED0`/`TargetMethods86ED0` (include/class_3bb8c.h) are deleted.
-Both attachTarget callers (TaskObjF, src/ui/TitleMenuTaskObjF.c) pass TaskObjF's
+Both attachTarget callers (TaskObjF, src/ui/title_menu.c) pass TaskObjF's
 `sound`, already typed `struct VabStreamObj *`, and the one slot the view
 named, +0x080, is VabStreamObj's `playTone(self, index, vol, endVol)`
-(include/VabStreamObj.h): the `(code, 0x60, 0x60)` call plays tone `code`
+(include/vab_stream_obj.h): the `(code, 0x60, 0x60)` call plays tone `code`
 at volume 0x60. TextEntry::target and ItemList::target (+0x03C) and both
 attachTarget prototypes are `struct VabStreamObj *`, the casts at the call
 sites are gone, and `slot80` is `playTone`. Zero bytes changed.

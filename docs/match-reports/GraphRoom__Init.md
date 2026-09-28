@@ -4,7 +4,7 @@
 
 > Renamed from `func_80058390` on 2026-09-24 (tools/rename.py). Address 0x80058390.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x044`
+Unit: `src/world/dream_scene.c`. Class: `gGraphRoomMethods`, own vtable slot `+0x044`
 (resolved via `tools/classtable.py gGraphRoomMethods`).
 
 ## Signature
@@ -29,7 +29,7 @@ s32 GraphRoom__Init(D_80087AACObj *self, void *arg1, void *arg2) {
 
 Calls the shared base-class table's own `+0x044` slot (`GetTaskCoreMethods()`,
 this unit's own local view -- a plain no-argument getter established
-elsewhere, e.g. `include/Task.h`), then returns `self->unk_0x38` if
+elsewhere, e.g. `include/task.h`), then returns `self->unk_0x38` if
 `self->unk_0x238 == 0`, else the literal `2`.
 
 ## Shape note
@@ -65,8 +65,8 @@ strong enough to name past that -- kept `func_`.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `GraphRoomObj__func_80058390` -> `GraphRoom__Init`
 
-The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Named for its slot, track 4 step 6: +0x044 is IntermediateBase's `init` (TaskCore__Init in the parent). It calls TaskCore's init with (args, mode), now typed `IntermediateBaseInitArgs *` and `s32`, and returns 2 when `scored` is set, else TaskCore's `result` (+0x038, was unk_0x38).
+The class is unified in `include/graph_room.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Named for its slot, track 4 step 6: +0x044 is IntermediateBase's `init` (TaskCore__Init in the parent). It calls TaskCore's init with (args, mode), now typed `IntermediateBaseInitArgs *` and `s32`, and returns 2 when `scored` is set, else TaskCore's `result` (+0x038, was unk_0x38).

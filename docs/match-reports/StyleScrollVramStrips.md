@@ -4,7 +4,7 @@
 
 > Renamed from `func_80055A24` on 2026-09-23 (tools/rename.py). Address 0x80055a24.
 
-Unit `ObjMStyleActor`. **25/25 words, byte-exact.** Second build (one lever).
+Unit `dream_scene`. **25/25 words, byte-exact.** Second build (one lever).
 
 ## What it was
 
@@ -40,7 +40,7 @@ jr $ra
 ```
 
 `sStyleStage` is a plain `s32` (already established as such in
-`ObjMStyleActor.c`, `RegisterStyleConfig`). `(sStyleStage - 3)` cast to unsigned and
+`dream_scene.c`, `RegisterStyleConfig`). `(sStyleStage - 3)` cast to unsigned and
 compared `< 3` is the standard idiom for a closed range test, matching
 retail's `sltiu` exactly. `RotateVramRectRight` is a not-yet-carved,
 still-`INCLUDE_ASM` function in `asm/psyq_2bb9c.s` (a 4-argument draw-style
@@ -116,7 +116,7 @@ every frame. MATCHED, 25/25, second build (one lever: hoist the shared `a1
 
 ### Naming
 
-**Renamed from `DrawStyleTables`, tier B.** The callee, RotateVramRectRight (TimImage.c), does three DrawSystem moveImage calls per step: the rect's rightmost column to the scratch point, the rest one pixel right, the scratch column back to the rect's left edge -- a one-column rotation of a VRAM rectangle. This function does one step per tick on stage 2 (rect 0,496 248x8 via scratch 256,496) and stages 3 to 5 (rect 0,504 via 256,504). Drawing is not what it does; the "12-byte tuple" reading is `DrawRect`. What the strips hold is not established.
+**Renamed from `DrawStyleTables`, tier B.** The callee, RotateVramRectRight (tim_image.c), does three DrawSystem moveImage calls per step: the rect's rightmost column to the scratch point, the rest one pixel right, the scratch column back to the rect's left edge -- a one-column rotation of a VRAM rectangle. This function does one step per tick on stage 2 (rect 0,496 248x8 via scratch 256,496) and stages 3 to 5 (rect 0,504 via 256,504). Drawing is not what it does; the "12-byte tuple" reading is `DrawRect`. What the strips hold is not established.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |

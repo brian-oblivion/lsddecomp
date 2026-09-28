@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054120` on 2026-09-23 (tools/rename.py). Address 0x80054120.
 
-**Unit:** ObjMStyleActor · **Size:** 43 instructions · **Status:** MATCHED (43/43 words)
+**Unit:** dream_scene · **Size:** 43 instructions · **Status:** MATCHED (43/43 words)
 
 ## Context
 
@@ -10,7 +10,7 @@ Establishes several new types: `self->unk14` (`FieldM14`, vtable slot
 `0x114`, returning a new `ChildM114*`), `ChildM114`'s own fields (`unk4`
 a `SubM4*`, `unk14` an `s32` set from this function's own external call),
 `SubM4` (`unk34` an `s32`, vtable slot `0x84`), and calls the uncarved
-sibling `TryDreamAuxTrigger` (`src/world/DreamAux.c`, still `INCLUDE_ASM`) declared
+sibling `TryDreamAuxTrigger` (`src/world/dream_aux.c`, still `INCLUDE_ASM`) declared
 via a local `extern` prototype in `include/class_3bb8c.h`, typed purely
 from this call site's own register setup.
 
@@ -75,16 +75,16 @@ call.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
+round 15 (2026-09-04), runner echo, fresh carve `dream_scene`.
 
 ## Naming
 
-**ObjM__CheckAuxTrigger** -- tier B. Fetches a `ChildM114` via `self->unk14`'s `slot114`, reads the current day/year from `dreamSys->getCurrentDayAndYear`, calls the uncarved `TryDreamAuxTrigger` with both, stores the result, and finalizes the child (`slot84`) on failure. Named for its one external call; the gameplay trigger itself is still uncarved (`src/world/DreamAux.c`), so this stays tier B.
+**ObjM__CheckAuxTrigger** -- tier B. Fetches a `ChildM114` via `self->unk14`'s `slot114`, reads the current day/year from `dreamSys->getCurrentDayAndYear`, calls the uncarved `TryDreamAuxTrigger` with both, stores the result, and finalizes the child (`slot84`) on failure. Named for its one external call; the gameplay trigger itself is still uncarved (`src/world/dream_aux.c`), so this stays tier B.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `unk14` is the StageMap: +0x114 is getLastTargetRateSplit, returning a ChunkSlot whose +0x004 is `loader` (the LbdFile) and +0x014 `heldObj`, which takes TryDreamAuxTrigger's result (cast to BasicClass *).
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `unk14` is the StageMap: +0x114 is getLastTargetRateSplit, returning a ChunkSlot whose +0x004 is `loader` (the LbdFile) and +0x014 `heldObj`, which takes TryDreamAuxTrigger's result (cast to BasicClass *).
 
 ## Track 7 (2026-09-27, round 98, delta)
 
@@ -93,12 +93,12 @@ The out-parameter getLastEventSlotChunk fills was an `s32` passed as
 row), and TryDreamAuxTrigger reads the pair as one `s16` key. It is now a
 unit-local `ChunkCoord { u8 column; u8 row; }` passed as `&coord.column`,
 and TryDreamAuxTrigger's local prototype takes `(s32 data, ChunkCoord
-*coord, s32 day)` -- its definition (src/world/DreamAux.c) takes `(s32, s16 *,
+*coord, s32 day)` -- its definition (src/world/dream_aux.c) takes `(s32, s16 *,
 s32)`, and the third argument is getCurrentDayAndYear's s32, not the
 `void *` the old prototype said. Locals `elem`/`result`/`thing` became
 `slot`/`held`/`day`. Byte-exact on the first build: the two-byte struct
 takes the same stack slot as the s32.
 
 Moved from the source comment: "ObjM__CheckAuxTrigger's one external call,
-src/world/DreamAux.c (MATCHED; its definition reads the second argument as
+src/world/dream_aux.c (MATCHED; its definition reads the second argument as
 `s16 *`)."

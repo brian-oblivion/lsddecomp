@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EBC4` on 2026-09-23 (tools/rename.py). Address 0x8003ebc4.
 
-Unit: `Task`. Round 14, runner delta. 13/13 words, full match.
+Unit: `task`. Round 14, runner delta. 13/13 words, full match.
 
 ## Signature
 
@@ -31,9 +31,9 @@ void Viewport__SetViewPoint(Unk18Obj *self, Vec3_2cc8c *a1) {
 
 ## Header changes
 
-`include/Task.h`:
+`include/task.h`:
 - New `Vec3_2cc8c` type (`{ s32 x, y, z; }`, local view — same shape as
-  `SceneNode.h`'s own `LongVec3`, not unified per this project's
+  `scene_node.h`'s own `LongVec3`, not unified per this project's
   convention).
 - `Unk18Obj::unk14` **retyped** from an opaque `u8[0x030-0x014]` span
   (added earlier this round by `Viewport__AttachViewChild`, which only ever took its
@@ -53,7 +53,7 @@ void Viewport__SetViewPoint(Unk18Obj *self, Vec3_2cc8c *a1) {
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__SetViewPos`. Renamed for the GsRVIEW2 member it writes: `refView.vp`, the viewpoint (&self+0x014 is GsSetRefView2's argument). Slot +0x078 `setViewPoint`, parameter `LongVec3 *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__SetViewPos`. Renamed for the GsRVIEW2 member it writes: `refView.vp`, the viewpoint (&self+0x014 is GsSetRefView2's argument). Slot +0x078 `setViewPoint`, parameter `LongVec3 *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 Round 96 (alpha, track 6): measured whether `refView` can be Sony's
 GsRVIEW2. With `GsRVIEW2 refView` and the copy written as three field stores
@@ -69,7 +69,7 @@ all three words before storing; the field form interleaves). The whole-struct
 copy through `*(LongVec3 *)&self->refView.vpx = *vp;` is byte-identical, as is
 the whole image with that spelling, an `(GsCOORDINATE2 *)` cast on
 AddChild's `super` store (SceneNode's coord2 is still the parked
-SceneNodeSub14 view) and DreamSys/ObjMStyleActor reading `vpy`/`vry`. That is
+SceneNodeSub14 view) and DreamSys/dream_scene reading `vpy`/`vry`. That is
 three casts to save the two at GsSetRefView2, so ViewportRefView stays: Sony's
 layout, with vp and vr as the LongVec3s the game copies and interpolates.
 Revisit when SceneNodeSub14 becomes GsCOORDINATE2 (then it is two for two).

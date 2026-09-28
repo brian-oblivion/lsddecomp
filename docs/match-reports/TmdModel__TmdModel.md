@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001F2B0` on 2026-09-25 (tools/rename.py). Address 0x8001f2b0.
 
-Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/TmdModel.c`. Fresh ground, no prior attempt.
+Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/tmd_model.c`. Fresh ground, no prior attempt.
 
 - **What:** the constructor of class gTmdModelMethods (its slot +0x008): base ctor through `GetBasicClassMethods()->ctor`, install the method table, `object = arg`, `data = (u8 *)arg - 0xC`, then `TmdModel__InitBoundsCount(self)` (sets the flag `sTmdModelBoundsCount = 1`).
 - **Result:** byte-exact; 25/25 words, whole-image SHA1 green. Second build.
@@ -37,8 +37,8 @@ object-table entry and the TMD data header, marks the class constructed.
 
 ## Track 4 (2026-09-26, round 87, delta)
 
-Parameter retyped `void *arg` -> `TmdObject *object` (include/TmdModel.h),
-byte-identical. Callers checked: `LinkResource__BuildModels` (GraphicsResources)
+Parameter retyped `void *arg` -> `TmdObject *object` (include/tmd_model.h),
+byte-identical. Callers checked: `LinkResource__BuildModels` (graphics_resources)
 is the only caller of `New_TmdModel`, passing entry `i` of the loaded TMD's
 0x1C-byte object table (buffer + 0xC); `New_TmdModel` is the only caller of
 the ctor, through slot +0x008. The ctor stores the argument in `object` and
@@ -50,7 +50,7 @@ first).
 `(TmdFile *)((u8 *)object - 0xC)` -> `(TmdFile *)((u8 *)object - offsetof(TmdFile, objects))`,
 the project's standing idiom for a byte-offset conversion between two
 struct views once the target field is known (`include/common.h`'s
-`offsetof`; precedent `src/world/ObjMStyleActor.c`, `src/graphics/TmdRenderer.c`). The `(u8
+`offsetof`; precedent `src/world/dream_scene.c`, `src/graphics/tmd_renderer.c`). The `(u8
 *)` cast itself stays: `object` and `TmdFile` are unrelated types with no
 field expressing the relationship, so byte-granularity pointer arithmetic is
 the only C form. Byte-identical, build and check-nonmatching.sh green.

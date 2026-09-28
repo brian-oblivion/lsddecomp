@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004EDC0` on 2026-09-20 (tools/rename.py). Address 0x8004edc0.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 56 words (0xE0) · **Status:** MATCH
+**Unit:** title_menu · **Size:** 56 words (0xE0) · **Status:** MATCH
 
 ## What it does
 
@@ -70,7 +70,7 @@ See `TaskObjF__ForEachEvent`'s report for the `TaskObjF` class context.
 `func_8004EDC0` -> `TaskObjF__TryReadMemcardFile`. **Tier A.** Single
 attempt (see `TaskObjF__ReadMemcardFile`'s own retry wrapper, hence the
 "Try" prefix -- this project's existing convention for a function a
-caller retries, `SceneNode__TryAttachNearby` in `src/graphics/SceneNode.c`).
+caller retries, `SceneNode__TryAttachNearby` in `src/graphics/scene_node.c`).
 Builds a memory-card path via `BuildMemcardPath` (`self->cardSlot`
 selects `bu00:`/`bu10:`), opens it, reads an 0x80-byte header, computes a
 seek offset from the header's own byte 2, seeks, reads the caller's
@@ -95,7 +95,7 @@ with a MATCHING line: the readable
 `(iconFlag - MEMCARD_ICON_FLAG_BASE + 1) * MEMCARD_SECTOR_SIZE` built
 54/56 (two words reordered), measured this round.
 
-### Moved from src/ui/TitleMenuTaskObjF.c
+### Moved from src/ui/title_menu.c
 
 The BIOS file-call declarations' comment, whose history is this:
 
@@ -104,7 +104,7 @@ The BIOS file-call declarations' comment, whose history is this:
  * (libapi/a50,a52,a51,a54,a69 -- one 0x10-byte object per stub). These used
  * to live as `func_8005xxxx` prototypes in include/class_3bb8c.h; they are
  * LOCAL here on purpose, because a shared header eleven units include is the
- * wrong place for names this generic, and because TitleMenuTaskObjF.c's view of
+ * wrong place for names this generic, and because title_menu.c's view of
  * `open` takes a `void *` where this unit's takes a `char *`. Two local
  * views are legitimate; one shared declaration would not be.
  * These are C89 identifiers under -fno-builtin, nothing else claims them. */

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80052D10` on 2026-09-24 (tools/rename.py). Address 0x80052d10.
 
-**Unit:** ObjMStyleActor · **Size:** 52 instructions (0xD0 bytes) ·
+**Unit:** dream_scene · **Size:** 52 instructions (0xD0 bytes) ·
 **Status: MATCHED 52/52**, whole-image SHA1 green.
 
 ## Role
@@ -11,7 +11,7 @@ Another method of the `gObjMMethods`-vtable class (`New_ObjM`/
 `ObjM__ObjM`'s own class, see those reports) -- forwards to the shared
 base-class event handler (`GetTimedTaskMethods()->slot38`), then reads the
 event's type tag (`arg1->target->header`, both `EventArg`/`HeaderObj`
-already established in `include/DayTaskStageMap.h`) and dispatches to ONE of
+already established in `include/dream_day.h`) and dispatches to ONE of
 three of self's own vtable slots depending on which range the tag falls
 in, or does nothing if it matches none of them.
 
@@ -88,12 +88,12 @@ Slot +0x038 of gObjMMethods (`tools/classtable.py 0x80087034`), the slot called 
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The sender is `BasicClass *` (its methods->header is the class id); the three targets are onStageMapNotify (0x114), onFadeNotify (0x164, cast to FadeBox *) and onDreamSysNotify (0x1F34).
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The sender is `BasicClass *` (its methods->header is the class id); the three targets are onStageMapNotify (0x114), onFadeNotify (0x164, cast to FadeBox *) and onDreamSysNotify (0x1F34).
 
 ## Round 99 (delta, track 7)
 
-The class ids are named in each class's own header, read off the tables' word +0x000 (`plan.py classes`): `STAGEMAP_CLASS_ID` 0x114 (include/StageMap.h), `FADEBOX_CLASS_ID` 0x164 (include/FadeBox.h), `DREAMSYS_CLASS_ID` 0x1F34 (include/DreamSys.h). The masks stay literal (three nibbles, four nibbles), as Actor.h's and Pad.h's comments spell them.
+The class ids are named in each class's own header, read off the tables' word +0x000 (`plan.py classes`): `STAGEMAP_CLASS_ID` 0x114 (include/stage_map.h), `FADEBOX_CLASS_ID` 0x164 (include/fade_box.h), `DREAMSYS_CLASS_ID` 0x1F34 (include/dream_sys.h). The masks stay literal (three nibbles, four nibbles), as actor.h's and pad.h's comments spell them.
 
 ## Proposed field names
 
-- `ObjM::unk64` (include/ObjM.h, +0x064): write-only. ObjM__ObjM (ObjMStyleActor) zeroes it, ObjM__PollTimBlockLoad (class_3bb8c_l) sets 1 immediately before `enterStyleSession`; nothing reads it. A name such as `styleSessionEntered` (tier B) would fit, but the writer outside this unit decides it; padding is not an option while two writers exist.
+- `ObjM::unk64` (include/objm.h, +0x064): write-only. ObjM__ObjM (dream_scene) zeroes it, ObjM__PollTimBlockLoad (class_3bb8c_l) sets 1 immediately before `enterStyleSession`; nothing reads it. A name such as `styleSessionEntered` (tier B) would fit, but the writer outside this unit decides it; padding is not an option while two writers exist.

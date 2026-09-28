@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E770` on 2026-09-19 (tools/rename.py). Address 0x8003e770.
 
-**Unit:** Task · **Size:** 33 instructions
+**Unit:** task · **Size:** 33 instructions
 
 ## What it does
 
@@ -77,7 +77,7 @@ a close cousin one level of indirection removed).
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. Matched on the
+round 13 (2026-09-03), runner alpha, unit task. Matched on the
 first build.
 
 ## Naming
@@ -95,19 +95,19 @@ shape. Mirrored exactly by `Viewport__RemoveChild`.
 - `Unk18ObjMethods::slot10` -> `addChild` (tier A). Offset `+0x010` matches
   the canonical `BasicClassMethods::addChild` offset exactly, and this
   header already documents it as "inherited BasicClass addChild". NOT
-  renamed directly: `Task.c`'s `Viewport__AttachViewChild` also dispatches
+  renamed directly: `task.c`'s `Viewport__AttachViewChild` also dispatches
   `m->slot10(self, a1)` on a `Unk18Obj *`, so this field is shared with
   that unit. Head applies by type scope (rename in `Unk18ObjMethods`'s own
-  definition, fix the compiler-listed accessors in both `Task.c`
-  and `Task.c`, oracle).
+  definition, fix the compiler-listed accessors in both `task.c`
+  and `task.c`, oracle).
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__AddChild`. The +0x010 addChild override. Its parameter is `BasicClass *child`; the class-nibble cache names the fields: 4 -> `viewNode` (a SceneNode; its +0x014 `coord2` goes into `refView.super`, the GsRVIEW2's super coordinate), 1 -> `drawSystem` (gDrawSystemMethods, DrawSystem). The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__AddChild`. The +0x010 addChild override. Its parameter is `BasicClass *child`; the class-nibble cache names the fields: 4 -> `viewNode` (a SceneNode; its +0x014 `coord2` goes into `refView.super`, the GsRVIEW2's super coordinate), 1 -> `drawSystem` (gDrawSystemMethods, DrawSystem). The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Track 7 (round 98, echo)
 
 Local `header` -> `rootClass`, masked with `CLASS_ID_ROOT_MASK` (0xF,
 basic_class.h); the cases are `SCENENODE_CLASS_ID` (4, gSceneNodeMethods,
-SceneNode.h) and `DRAWSYSTEM_CLASS_ID` (1, DrawSystem.h), the classes of the
+scene_node.h) and `DRAWSYSTEM_CLASS_ID` (1, draw_system.h), the classes of the
 two fields it fills. Pointer stores of 0 are spelled NULL. Byte-identical.

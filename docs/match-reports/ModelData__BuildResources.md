@@ -2,7 +2,7 @@
 
 > Renamed from `func_80044858` on 2026-09-25 (tools/rename.py). Address 0x80044858.
 
-Round 82, runner echo (GraphicsResources session, echo #8), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #8), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 40/40 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,10 +18,10 @@ Table slot (`tools/classtable.py`): gModelDataMethods +0x078 (called by ModelDat
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/graphics/GraphicsResources.c`.
+`src/graphics/graphics_resources.c`.
 
 ```c
-#include "ModelData.h"
+#include "model_data.h"
 
 typedef struct ResourceSourceArgs {
     /* +0x00 */ void *buffer;
@@ -57,21 +57,21 @@ s32 ModelData__BuildResources(ModelData *self) {
 
 ## Notes
 
-First build. The redundant `sw zero, 0x30` on the second failure is an explicit `self->unk30 = NULL;` in the source. The request is the same { buffer, name/0, mode } descriptor that gTodMethods's ctor (Tod__Tod) reads; ResourceRequest__Set (GameApplicationFileResource) is declared unprototyped here since each unit carries its own reading of it. The allocators take `s32` in this unit, so the request address is cast.
+First build. The redundant `sw zero, 0x30` on the second failure is an explicit `self->unk30 = NULL;` in the source. The request is the same { buffer, name/0, mode } descriptor that gTodMethods's ctor (Tod__Tod) reads; ResourceRequest__Set (game_shell) is declared unprototyped here since each unit carries its own reading of it. The allocators take `s32` in this unit, so the request address is cast.
 
 ## Naming
 
 - **ModelData__BuildResources**, tier A. Slot +0x078: builds the LinkResource (tmd) and TodSet (tods) sub-objects over the buffer's two sub-blocks.
-- **ResourceSourceArgs** (type, was `Req44858`), tier B (round 95, bravo, track 6). The 12-byte local ResourceRequest__Set fills with (buffer, name, mode) and that is passed cast to `ResourceSource *` to New_LinkResource, New_TodSet (here), New_ModelData (TriggerWorld__BuildResources) and New_Tod (TodSet__BuildTods). Only `buffer` is written directly; the name and mode words are written only by ResourceRequest__Set and never read by a ctor, so they stay padding. include/DreamAux.h's `DreamAuxLoadReq` is the same three words in the same role (InitDreamAux: ResourceRequest__Set then New_ModelData) but names word 0 `flag`; unifying the two is proposed, not applied (another unit's header).
+- **ResourceSourceArgs** (type, was `Req44858`), tier B (round 95, bravo, track 6). The 12-byte local ResourceRequest__Set fills with (buffer, name, mode) and that is passed cast to `ResourceSource *` to New_LinkResource, New_TodSet (here), New_ModelData (TriggerWorld__BuildResources) and New_Tod (TodSet__BuildTods). Only `buffer` is written directly; the name and mode words are written only by ResourceRequest__Set and never read by a ctor, so they stay padding. include/dream_aux.h's `DreamAuxLoadReq` is the same three words in the same role (InitDreamAux: ResourceRequest__Set then New_ModelData) but names word 0 `flag`; unifying the two is proposed, not applied (another unit's header).
 - **ModelDataHeader** (type, was `Buf44858`), tier A (round 95, bravo, track 6). ModelData's buffer as this body reads it: the word at +0x08 is the offset of the TMD New_LinkResource is built over, and +0x0C is where New_TodSet's data starts. Words +0x00 and +0x04 are read by no code (padding). The buffer is a .MOM file by the one file-name caller (InitDreamAux: `ETC\SYMSPY.MOM`), but the name is the class's so it claims no more than the code.
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. +0x02C is `linkResource` (`FileResource *`, New_LinkResource's result; the `(s32)` and `(void *)` casts are gone), +0x030 is `todSet` (`FileResource *`, New_TodSet's result) and +0x034 is `ownsResources`. The failure path calls `releaseResources(self)` (slot +0x07C). Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`; the unit-shared `DataSrc33808` view no longer types it. +0x02C is `linkResource` (`FileResource *`, New_LinkResource's result; the `(s32)` and `(void *)` casts are gone), +0x030 is `todSet` (`FileResource *`, New_TodSet's result) and +0x034 is `ownsResources`. The failure path calls `releaseResources(self)` (slot +0x07C). Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct ResourceSource *)`, so the call reads `self->todSet = (FileResource *)New_TodSet((ResourceSource *)&req)`; the forward declaration that stood before this function is gone. Bytes unchanged.
+New_TodSet is now prototyped in include/tod_set.h as `TodSet *New_TodSet(struct ResourceSource *)`, so the call reads `self->todSet = (FileResource *)New_TodSet((ResourceSource *)&req)`; the forward declaration that stood before this function is gone. Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 
@@ -81,11 +81,11 @@ New_TodSet is now prototyped in include/TodSet.h as `TodSet *New_TodSet(struct R
 | --- | --- | --- | --- |
 | `ModelDataHeader.offset` | `tmdOffset` | A | the sub-block New_LinkResource is built over, which LinkResource__BuildModels reads as a TmdFile |
 | `(u8 *)buffer + 0xC` | `ModelDataHeader.tods` | A | New_TodSet's buffer |
-| `ResourceSourceArgs.unk4`, `unk8` | `pad4[8]` | A | no code here reads them; ResourceRequest__Set writes the name (NULL) and a 1 there. Its prototype's parameters are now `(buffer, name, mode)`, as include/DreamAux.h reads the same call |
+| `ResourceSourceArgs.unk4`, `unk8` | `pad4[8]` | A | no code here reads them; ResourceRequest__Set writes the name (NULL) and a 1 there. Its prototype's parameters are now `(buffer, name, mode)`, as include/dream_aux.h reads the same call |
 
 ### Track 6 (round 97, alpha)
 
-The request local is now include/FileResource.h's `ResourceRequest`
+The request local is now include/file_resource.h's `ResourceRequest`
 (`{ ResourceSource src; s32 mode; }`), and ResourceRequest__Set's prototype
 comes from that header. The unit's own view of the record and its local
 extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`, and

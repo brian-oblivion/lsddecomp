@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003995C` on 2026-09-25 (tools/rename.py). Address 0x8003995c.
 
-Round 81, runner delta. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
+Round 81, runner delta. Unit `src/sound/wbgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x008 (ctor) (slots resolved with `tools/classtable.py gWBgmMethods`).
@@ -20,17 +20,17 @@ FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 ## Proposed names for symbols defined outside this unit
 
 Not renamed here -- both are defined in a unit this round did not touch, and
-one of them (`DrawSystem.c`) has a live matching runner this round
+one of them (`draw_system.c`) has a live matching runner this round
 (`GetDrawSystem`, per the round-82 broadcast: alpha finished it just before
 this pass started). Recorded as proposals for the head to apply with
 `tools/rename.py` once safe.
 
-- `GetDrawSystem` (defined `src/graphics/DrawSystem.c`, returns `Class6C070 *`): called
+- `GetDrawSystem` (defined `src/graphics/draw_system.c`, returns `Class6C070 *`): called
   here only as `addChild`/`removeChild`'s argument, registering `WBgm` as a
   child of that singleton for lifecycle notification -- the same pattern
-  `DayTaskStageMap.c` and `TimImage.c` use it for. No WBgm-specific evidence for
+  `dream_day.c` and `tim_image.c` use it for. No WBgm-specific evidence for
   its own name; not proposing one.
-- `New_RequestedFile` (defined `src/graphics/Sprite.c`, an un-matched `INCLUDE_ASM`
+- `New_RequestedFile` (defined `src/graphics/sprite.c`, an un-matched `INCLUDE_ASM`
   stall, signature `SeqData *New_RequestedFile(s32 arg)`): the only function that
   produces a `SeqData` object (the +0x10 child this unit reads `addr`/`loaded`
   from). A name like `GetSeqData`/`LoadSeqData` is plausible from this call
@@ -67,7 +67,7 @@ void WBgm__WBgm(WBgm *self, s32 vabArg, s32 seqArg, s32 autoPlay) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/sound/WBgm.c`:
+The unit-local view it needs, from the top of `src/sound/wbgm.c`:
 
 ```c
 #include "basic_class.h"
@@ -148,10 +148,10 @@ extern u8 sSsSizeTableBuf[];
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
+The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/draw_system.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+The class is now declared once, in `include/wbgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
 
 Parameters retyped to `(WBgm *self, char *vabPath, char *seqPath, s32 autoPlay)`, and the ctor slot with them: both paths are forwarded unchanged to setSeq/setVab, whose bodies hand them to New_RequestedFile(char *) and New_VabStreamObj(char *). See New_WBgm's Track 4 paragraph for the one caller.

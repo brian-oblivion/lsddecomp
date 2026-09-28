@@ -6,13 +6,13 @@
 
 > Renamed from `func_8003BE84` on 2026-09-23 (tools/rename.py). Address 0x8003be84.
 
-**Unit:** Task · **Size:** 4 instructions (0x10 bytes) · **Status:** MATCHED (4/4 words, whole-image SHA1 green), first attempt
+**Unit:** task · **Size:** 4 instructions (0x10 bytes) · **Status:** MATCHED (4/4 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
 The class's own "GetMethods" accessor -- returns `&gStreamTaskMethods` and nothing
 else, the same shape as `GetEntityMethods` in `include/entity.h` and
-`GetTodActorMethods` in `src/world/TodActor.c`. Called (still `INCLUDE_ASM`, not
+`GetTodActorMethods` in `src/world/tod_actor.c`. Called (still `INCLUDE_ASM`, not
 this batch) by `New_StreamTask` (the allocator) and `StreamTask__StreamTask` (the
 constructor) to fetch the class's ctor at slot `+0x008` and to install the
 methods pointer at object offset 0, respectively.
@@ -45,14 +45,14 @@ Matches the `lui`/`addiu` idiom already confirmed elsewhere in this project:
 
 ## New struct/header knowledge
 
-Added `include/Task.h`'s `StreamTaskObjMethods` (currently just the
+Added `include/task.h`'s `StreamTaskObjMethods` (currently just the
 header word -- no other slot of this table is dereferenced by anything in
 this unit's queue) and `extern StreamTaskObjMethods gStreamTaskMethods;`.
 
 ## Proposed learning
 
 `gStreamTaskMethods` sits right next to a second class's table, `gTaskCoreMethods`
-(`GameApplication.h`'s `LoaderTaskMethods`, established from a completely
+(`game_application.h`'s `LoaderTaskMethods`, established from a completely
 different allocator/unit, `New_TaskCore`). `StreamTaskObj`'s own slots
 `+0x00C`/`+0x080`/`+0x084` (`StreamTask__Finalize`/`StreamTask__OnPadPrev`/`StreamTask__OnPadNext`)
 forward straight through to `gTaskCoreMethods`'s implementations of the *same*
@@ -73,4 +73,4 @@ the established `Get_vtable_<Class>` convention exactly
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Returns &gStreamTaskMethods.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Returns &gStreamTaskMethods.

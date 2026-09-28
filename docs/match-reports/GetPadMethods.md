@@ -4,7 +4,7 @@
 
 > Renamed from `func_80025E9C` on 2026-09-24 (tools/rename.py). Address 0x80025e9c.
 
-**Unit:** `src/app/Pad.c` (runner ALPHA, `runner/alpha`)
+**Unit:** `src/app/pad.c` (runner ALPHA, `runner/alpha`)
 **Status:** MATCHED (4/4 words, full build verified byte-exact)
 **Vtable slot:** none -- this function *returns* the table itself.
 
@@ -24,7 +24,7 @@ PadMethods *GetPadMethods(void) {
 }
 ```
 
-`gPadMethods` and `PadMethods` are declared in `include/Pad.h`. The
+`gPadMethods` and `PadMethods` are declared in `include/pad.h`. The
 table's bytes are NOT owned by this unit -- its file offset (0x5DB70) falls
 inside the anonymous `data` segment starting at file offset 0x57070 in
 `config/splat.slps01556.lsdde.yaml` (still `type: data`, not `.data,

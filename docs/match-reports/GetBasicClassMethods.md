@@ -4,13 +4,13 @@
 
 > Renamed from `func_80018390` on 2026-09-17 (tools/rename.py). Address 0x80018390.
 
-**Unit:** TmdRenderer · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
+**Unit:** tmd_renderer · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
 ## What it does
 
 Returns the address of `gBasicClassMethods`, BasicClass's own 14-slot method table
 (`BASICCLASS_METHODS` per `docs/research/class-framework.md`). Called from
-`BasicClass__BasicClass` (`BMemPMgr.c`) to install the base vtable on a
+`BasicClass__BasicClass` (`bmem_pmgr.c`) to install the base vtable on a
 freshly-constructed `BasicClass`.
 
 ## The C
@@ -23,8 +23,8 @@ BasicClassMethods *GetBasicClassMethods(void)
 ```
 
 `gBasicClassMethods` had no extern declaration anywhere in the tree yet (only prose
-references to it in `Pad.h`, `GameApplicationFileResource.h`, `TodActor.h`,
-`SceneNode.h`, `GameApplication.h`). Added one to `include/code_8220.h`:
+references to it in `pad.h`, `data_source.h`, `tod_actor.h`,
+`scene_node.h`, `game_application.h`). Added one to `include/code_8220.h`:
 
 ```c
 extern BasicClassMethods gBasicClassMethods;
@@ -51,7 +51,7 @@ returning one known address.
 Evidence: the whole body is `return &gBasicClassMethods;`, and `gBasicClassMethods` is
 BasicClass's own 14-slot method table (`tools/classtable.py gBasicClassMethods`).
 The spelling is the house convention rather than an invention:
-`GetDreamSysMethods` (`src/world/DreamSys.c`) and `GetEntityMethods`
+`GetDreamSysMethods` (`src/world/dream_sys.c`) and `GetEntityMethods`
 (`src/world/entity.c`) are the two existing vtable accessors in the tree and
 both are `Get_vtable_<Class>`. 62 files reference this function, which is
 what makes matching the existing convention worth more than a tidier one.
@@ -64,7 +64,7 @@ it matches `gDreamSysMethods`, the one method table in the tree that is
 already named. **`tools/rename.py` refuses it** and I did not work around
 it: its "NEW already appears" guard fires because six files
 (`docs/match-reports/BasicClass__BasicClass.md`, this report,
-`Pad__LoadButtonTable.md`, `GetPadMethods.md`, `include/Pad.h`,
+`Pad__LoadButtonTable.md`, `GetPadMethods.md`, `include/pad.h`,
 `include/class_3bb8c.h`) already contain the string `BASICCLASS_METHODS` as
 PROSE describing this very symbol. The guard is correct in general and
 wrong in this instance; see `### Proposed learning` below.

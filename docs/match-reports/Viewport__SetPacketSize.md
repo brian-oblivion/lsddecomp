@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003EA48` on 2026-09-23 (tools/rename.py). Address 0x8003ea48.
 
-Unit: `Task`. Round 14, runner delta. 7/7 words, full match.
+Unit: `task`. Round 14, runner delta. 7/7 words, full match.
 
 ## Signature
 
@@ -31,7 +31,7 @@ void Viewport__SetPacketSize(Unk18Obj *self, s32 a1) {
 
 ## Header changes
 
-`include/Task.h`: `Unk18Obj` gains `unk48` (`+0x048`), part of the
+`include/task.h`: `Unk18Obj` gains `unk48` (`+0x048`), part of the
 same carve pass as `Viewport__SetMaxPackets`.
 
 ## Naming
@@ -40,19 +40,19 @@ same carve pass as `Viewport__SetMaxPackets`.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__SetUnk48`. Slot +0x050 `setUnk48`; see Viewport__SetMaxPackets. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__SetUnk48`. Slot +0x050 `setUnk48`; see Viewport__SetMaxPackets. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Proposed field names (round 95, alpha)
 
-Viewport's `unk48` -> `packetSize`, slot `setUnk48` -> `setPacketSize`, this function -> `Viewport__SetPacketSize` (tier B; see Viewport__SetMaxPackets.md for the evidence and which factor is which). Slot caller outside this unit: Task.c.
+Viewport's `unk48` -> `packetSize`, slot `setUnk48` -> `setPacketSize`, this function -> `Viewport__SetPacketSize` (tier B; see Viewport__SetMaxPackets.md for the evidence and which factor is which). Slot caller outside this unit: task.c.
 
 
 ## Track 7 (round 100, echo, polish pass)
 
 ## Naming
 
-Renamed from `Viewport__SetUnk48` with `tools/rename.py`: tier B, the other half of `Viewport__SetMaxPackets`'s evidence (see that report). The field is now `packetSize` (include/Viewport.h; every accessor is in Task.c). Parameter `value` -> `size`.
+Renamed from `Viewport__SetUnk48` with `tools/rename.py`: tier B, the other half of `Viewport__SetMaxPackets`'s evidence (see that report). The field is now `packetSize` (include/viewport.h; every accessor is in task.c). Parameter `value` -> `size`.
 
 ## Proposed field names
 
-Slot +0x050 `setUnk48` -> `setPacketSize` (caller outside this unit: Task.c).
+Slot +0x050 `setUnk48` -> `setPacketSize` (caller outside this unit: task.c).

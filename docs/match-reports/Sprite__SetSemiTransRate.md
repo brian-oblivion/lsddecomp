@@ -2,7 +2,7 @@
 
 > Renamed from `func_80042268` on 2026-09-25 (tools/rename.py). Address 0x80042268.
 
-Round 82, runner alpha (third re-staffed slot of the round). Unit `src/graphics/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (third re-staffed slot of the round). Unit `src/graphics/sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** slot +0x068 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods, gTextRowMethods and gVariantSpriteMethods (`tools/classtable.py`).
 - **What:** `GetSetBitField(&self->sprite.attribute, 0x1C, 2, a1)` (bits 28..29 of the GsSPRITE attribute).
@@ -20,7 +20,7 @@ s32 Sprite__SetSemiTransRate(Sprite *self, s32 a1) {
 
 ## Track 4 (2026-09-25, round 82, alpha)
 
-Renamed from `func_80042268` for its slot (+0x068 `setSemiTransRate`): attribute bits 28-29 are the libgs semitransparency rate, as in SceneNode__SetSemiTransRate. And the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
+Renamed from `func_80042268` for its slot (+0x068 `setSemiTransRate`): attribute bits 28-29 are the libgs semitransparency rate, as in SceneNode__SetSemiTransRate. And the class is unified as `Sprite` in `include/sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
 
 ## Track 7 (round 99, charlie)
 

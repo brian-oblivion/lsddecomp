@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004EC5C` on 2026-09-24 (tools/rename.py). Address 0x8004ec5c.
 
-**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class).
+**Unit:** title_menu (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -59,5 +59,5 @@ and made things worse).
 
 ## Constants (round 98, track 7)
 
-The retry count 10 is `MEMCARD_RETRIES` (include/TaskObjF.h, "Attempts
+The retry count 10 is `MEMCARD_RETRIES` (include/task_objf.h, "Attempts
 after the first before a card operation gives up"). Zero bytes changed.

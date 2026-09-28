@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003CAF8` on 2026-09-24 (tools/rename.py). Address 0x8003caf8.
 
-**Unit:** Task · **Size:** 14 instructions
+**Unit:** task · **Size:** 14 instructions
 
 ## What it does
 
@@ -76,7 +76,7 @@ whole function reuses across a `switch`.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit Task. 3 attempts.
+round 2026-09-02, runner echo, unit task. 3 attempts.
 
 ## Naming (round 78, delta)
 
@@ -95,8 +95,8 @@ can see (0 or 1), which is why "Enabled" rather than a generic "Set".
 Tier B: in this unit's own evidence the only value ever stored here besides
 NULL is `self->methods->slotB0` (`TaskCore__TickFadeIn`), and
 `TaskCore__TickFadeInCallback` is its sole invoker. Grep shows `unk88` textual
-hits in Task.c/code_179d8_{k,f}.c/code_2cc8c_{d,e}.c/entity.c
-(several genuinely this same shared Obj86B60 struct, per Task/e), so
+hits in task.c/code_179d8_{k,f}.c/code_2cc8c_{d,e}.c/entity.c
+(several genuinely this same shared Obj86B60 struct, per task/e), so
 proposal only -- the head should apply via type scope on `Obj86B60`, not a
 whole-tree replace.
 
@@ -105,7 +105,7 @@ whole-tree replace.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__SetFadeCallbackEnabled (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__SetFadeCallbackEnabled (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 98, alpha)
 

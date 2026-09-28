@@ -8,7 +8,7 @@
 
 > Renamed from `func_80051E64` on 2026-09-24 (tools/rename.py). Address 0x80051e64.
 
-Unit: `src/ui/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`.
+Unit: `src/ui/input_dialogs.c`. `self` is `ItemList_3bb8c_j`.
 
 ## Body
 
@@ -29,7 +29,7 @@ void ItemList__OnNotify(ItemList_3bb8c_j *self, void *arg1, s32 arg2)
 
 Calls the inherited `BasicClass::slot38` (already declared in
 `include/class_3bb8c.h`'s `BasicMethods866E8F`, established by
-TitleMenuTaskObjF) unconditionally first, then dispatches through ItemList_3bb8c_j's
+title_menu) unconditionally first, then dispatches through ItemList_3bb8c_j's
 OWN vtable (`slot5C`/`slot58`) based on the same tag-nibble convention as
 `ItemList__AddChild`/`ItemList__RemoveChild`. Established `ItemListMethods_3bb8c_j::slot5C`
 (+0x05C, "tag==2") and `slot58` (+0x058, "tag==5") from this function.

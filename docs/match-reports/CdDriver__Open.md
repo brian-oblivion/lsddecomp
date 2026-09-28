@@ -107,7 +107,7 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
    on its own. Re-verified all three still match after the type change.
 
 2. **`OpenCdFile` is void** (established already in its own match report,
-   `CdDriver.c`), so the early-return branch is `OpenCdFile(self,
+   `cd_driver.c`), so the early-return branch is `OpenCdFile(self,
    suffix); return;`, not a forwarded return value -- no ambiguity here since
    the callee's void-ness was already on file, unlike the general wrapper
    caution.
@@ -151,10 +151,10 @@ void CdDriver__Open(Obj80027480 *self, char *suffix, s32 arg2, s32 arg3) {
 
 `Obj80027480.unk18` is now `Pos18` (was `u8[4]`) -- a CdlLOC-shaped 4-byte
 position, alignment 2. `Rec80028448` is a local view of the 0x1C-byte string
-records at `sFileTable` (`src/cd/CdDriver.c`'s own comment already
+records at `sFileTable` (`src/cd/cd_driver.c`'s own comment already
 describes this table); only the trailing two fields this function reads are
 named. `StatBuf80027` is this unit's OWN local view of the CD stat buffer
-`CdDriver.c`'s `OpenCdFile` already independently discovered as
+`cd_driver.c`'s `OpenCdFile` already independently discovered as
 `StatBuf179D8H` -- same shape, declared separately per the project's
 multiple-local-views convention (not shared, since it is that OTHER unit's
 own reading).
@@ -208,9 +208,9 @@ at slot `+0x044`. The prefix names the table, not the developers' class.
 
 ## Field, slot and type names (this unit's local views, APPLIED)
 
-All of these are local typedefs of CdDriver.c, which includes no project
+All of these are local typedefs of cd_driver.c, which includes no project
 header, so the compiler's accessor list after renaming the definitions was
-this unit alone (69 `has no member` errors, all in CdDriver.c); both
+this unit alone (69 `has no member` errors, all in cd_driver.c); both
 oracles green after.
 
 | type (was) | field (was) | now | tier | evidence |
@@ -253,7 +253,7 @@ read here is the `sCdAsyncEnabled == 0 && sCdSyncQueueMode == 0` sync-mode test 
 nothing names the second mode.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Open` -> `CdDriver__Open` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/cd_driver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Open` -> `CdDriver__Open` by rename.py.
 
 ### Round 100 (charlie, track 7): `D_8008A860` -> `sCdSyncQueueMode`, tier B
 
@@ -265,7 +265,7 @@ to CdDriver's blocking call and never touches the queue. `sCdAsyncEnabled`
 `CdDriver__RunRequestQueue` dispatches it back the method runs it as a
 blocking CdControl/CdSync/CdRead spin on the spot. So the word selects
 "synchronous, but through the request queue". Its one nonzero writer is
-`SetCdDriverMode(async, 1, 1)` reached from DayTaskStageMap through
+`SetCdDriverMode(async, 1, 1)` reached from dream_day through
 `SetActiveDataSourceDriverMode(syncDriver == 0, 1, 1)`; every other caller
 passes 0. Tier B: the mechanics are the bodies', why the game wants the
 queued blocking mode is not established.

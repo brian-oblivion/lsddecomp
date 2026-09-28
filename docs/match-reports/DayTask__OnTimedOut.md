@@ -22,4 +22,4 @@ An empty override, byte-exact by construction (`jr $ra` / `nop`). Never had its 
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Renamed from Obj865C8__Noop7C: occupant of TimedTask's +0x07C onState4 (setState(4) calls it), empty.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__Noop7C: occupant of TimedTask's +0x07C onState4 (setState(4) calls it), empty.

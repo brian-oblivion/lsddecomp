@@ -51,6 +51,6 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ### Constants
 
-- `getDreamColor() != 7` is `!= DREAM_COLOR_WHITE`: the slot returns `DreamColors` (include/DreamSys.h), whose eighth member is WHITE.
+- `getDreamColor() != 7` is `!= DREAM_COLOR_WHITE`: the slot returns `DreamColors` (include/dream_sys.h), whose eighth member is WHITE.
 - `state = 0xB` is this handler's own phase, now 11.
 - Every other literal went to decimal (tick counts, TOD frames, distances, VAB programs; no masks): they are this handler's tuning, named by nothing else.

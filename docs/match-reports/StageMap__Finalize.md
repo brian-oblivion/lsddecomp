@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A7C0` on 2026-09-22 (tools/rename.py). Address 0x8004a7c0.
 
-**Unit:** DayTaskStageMap · **Size:** 113 instructions · **Status:** MATCHED,
+**Unit:** dream_day · **Size:** 113 instructions · **Status:** MATCHED,
 whole-image green. See "Round 19 (echo): MATCHED" at the end of this
 report for the winning source, the two idioms recovered from the
 already-matched sibling ctor `StageMap__StageMap`, and the one word-count
@@ -182,7 +182,7 @@ just one attempt at it.
 ## Provenance
 
 round 2026-09-02 (head-requested extension), runner ALPHA, unit
-DayTaskStageMap. Struct/vtable knowledge for the whole function fully derived
+dream_day. Struct/vtable knowledge for the whole function fully derived
 and cross-checked against `StageMap__UnloadAllSlots`'s already-established
 `unkEC[]`/generic-slot patterns; three control-flow-equivalent source
 attempts on the one scan loop that drifts, all byte-identical to each
@@ -195,7 +195,7 @@ Re-verified the "62/113, drifted" claim first: the preserved body above
 does NOT compile as-is against the CURRENT header (`GetDrawSystem` and
 `GetLightRigMethods` have both since been given real, no-argument signatures
 by the sibling ctor `StageMap__StageMap`'s own successful match -- see
-`src/world/DayTaskStageMap.c`'s own declarations, `extern s32 GetDrawSystem(void);`
+`src/world/dream_day.c`'s own declarations, `extern s32 GetDrawSystem(void);`
 and `extern BaseCtorTable_3ac78 *GetLightRigMethods(void);` -- rather than the
 `(self)`-taking guesses this report's preserved body used). This alone
 means the round-13 62/113 score was measuring a body that would not even
@@ -203,7 +203,7 @@ build against today's header; it was not re-derivable verbatim.
 
 **The decisive resource was the ALREADY-MATCHED sibling ctor,
 `StageMap__StageMap` (same unit, same class, right above this function in
-`src/world/DayTaskStageMap.c`), which allocates and fills the SAME `entry->unk10`
+`src/world/dream_day.c`), which allocates and fills the SAME `entry->unk10`
 0x668-byte array this function tears down.** Its own byte-exact source
 was read directly rather than re-guessing the idiom from scratch:
 
@@ -256,7 +256,7 @@ p += 4;
 Result: **113/113, `build exit=0`, whole-image `OK: build matches retail
 SLPS_015.56`.** Full match.
 
-Final source (verbatim, now in `src/world/DayTaskStageMap.c` in place of the
+Final source (verbatim, now in `src/world/dream_day.c` in place of the
 `INCLUDE_ASM`):
 
 ```c
@@ -308,7 +308,7 @@ void StageMap__Finalize(StageMap *self)
 }
 ```
 
-`include/DayTaskStageMap.h` updated: `StageMapMethods::dtor` and the
+`include/dream_day.h` updated: `StageMapMethods::dtor` and the
 ctor/dtor summary comment marked MATCHED; `UnkSlotEntry_3ac78::unk10`'s
 comment extended to note the dtor also treats it as a flat 0x668-byte
 array of cells (consistent with, not contradicting, `StageMap__DispatchToRectCells`'s
@@ -348,7 +348,7 @@ Round 67 (track 3, naming pass).
 | --- | --- | --- | --- |
 | `func_8004A7C0` | `StageMap__Finalize` | A | Occupant of vtable slot `+0x00C`. `include/code_8220.h` establishes that slot as `BasicClassMethods::finalize` (the virtual teardown), distinct from `+0x004` `release` (finalize, then free self). This body matches: it tears down every `elems[]` entry and tail-calls the base table's own `+0x00C`. This CORRECTS the inherited hypothesis -- the field and this report both called it `dtor`, which is `release`'s job, not this slot's. |
 
-Slot name changed in `include/DayTaskStageMap.h` accordingly:
+Slot name changed in `include/dream_day.h` accordingly:
 `StageMapMethods::dtor` -> `finalize`.
 
 This function is also the second independent witness that the shared
@@ -360,11 +360,11 @@ on that basis.
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the last call is `GetLightRigMethods()->finalize((LightRig *)self)` through include/LightRig.h (was `->dtor(self)` on the unit-local `BaseCtorTable_3ac78`: `dtor` was BasicClass's +0x00C `finalize` slot under another name). A pointer cast emits no code; image byte-identical.
+2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/light_rig.h`; the last call is `GetLightRigMethods()->finalize((LightRig *)self)` through include/light_rig.h (was `->dtor(self)` on the unit-local `BaseCtorTable_3ac78`: `dtor` was BasicClass's +0x00C `finalize` slot under another name). A pointer cast emits no code; image byte-identical.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
+The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/draw_system.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
 
 ## Track 6 (2026-09-26, round 93, alpha)
 
@@ -377,11 +377,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -396,4 +396,4 @@ an operator decision; not hand-reverted).
 
 ## Track 7 (2026-09-27, round 98, charlie)
 
-Zero-byte polish: the cell walk indexes `GridCell **` like the ctor's; locals `entry` -> `slot`, `obj` -> `cell`; `0x668` span -> `STAGE_SLOT_CELLS`; event `6` -> `STAGEMAP_EVENT_SLOT_RELEASE`; `i < 7` -> `ARRAY_COUNT(self->slots)`; BMemPMgrFree from include/BMemPMgr.h.
+Zero-byte polish: the cell walk indexes `GridCell **` like the ctor's; locals `entry` -> `slot`, `obj` -> `cell`; `0x668` span -> `STAGE_SLOT_CELLS`; event `6` -> `STAGEMAP_EVENT_SLOT_RELEASE`; `i < 7` -> `ARRAY_COUNT(self->slots)`; BMemPMgrFree from include/bmem_pmgr.h.

@@ -2,7 +2,7 @@
 
 > Renamed from `func_800196D4` on 2026-09-17 (tools/rename.py). Address 0x800196d4.
 
-**Unit:** TmdRenderer · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** tmd_renderer · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 First of a family of GTE-register-store leaves in this unit
 (`StoreSxyPolyF3`/`E8`/`FC`/`80019710`, plus the two conditional siblings
@@ -32,7 +32,7 @@ void StoreSxyPolyF3(void *dst)
 
 `dst` stays `void *` rather than a named struct type — nothing in this round
 established what struct these three functions' callers actually pass (out
-of scope: their callers are outside `TmdRenderer`), so typing the pointer
+of scope: their callers are outside `tmd_renderer`), so typing the pointer
 would be inventing a field name with no evidence behind it.
 
 None of `include/psyq/inline.h`'s `gte_st*` macros (`gte_stlvnl`, `gte_stsv`,
@@ -112,7 +112,7 @@ independent measurements.
 1. **Layout.** The `swc2` offsets `+0x8`/`+0xC`/`+0x10` are POLY_F3's
    `xy0`/`xy1`/`xy2` (tag, then one colour/code word, then three packed
    screen-XY words).
-2. **Call site.** In `asm/nonmatchings/TmdRenderer/SortTmdObject.s`, the
+2. **Call site.** In `asm/nonmatchings/tmd_renderer/SortTmdObject.s`, the
    two cases that pass this function as `ProjectTriFace`'s callback (at
    0x8001889C and 0x80018A28) write `len = 4`, `code = 0x20` into the
    primitive first -- POLY_F3's length and GPU command byte exactly.

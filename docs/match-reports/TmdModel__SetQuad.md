@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001F314` on 2026-09-25 (tools/rename.py). Address 0x8001f314.
 
-Round 82, runner charlie (matching slot). Unit `src/graphics/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner charlie (matching slot). Unit `src/graphics/tmd_model.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** slot +0x040 of gTmdModelMethods (`tools/classtable.py gTmdModelMethods`).
 - **What:** copies four words from `src` into object +0x14..+0x20

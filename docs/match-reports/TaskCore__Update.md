@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C51C` on 2026-09-24 (tools/rename.py). Address 0x8003c51c.
 
-**Unit:** Task · **Size:** 72 instructions -- the second-largest function
+**Unit:** task · **Size:** 72 instructions -- the second-largest function
 in the unit (after the two `addiu_at`-blocked switch dispatchers, see
 `TaskCore__OnPadEvent`/`TaskCore__SetState`'s reports).
 
@@ -44,7 +44,7 @@ void TaskCore__Update(Obj86B60 *self, s32 a1, s32 a2)
 
 First forwards to the shared "IntermediateBase" utility class
 (`GetIntermediateBaseMethods()->slot5C(self, a1, a2)`, same idiom already used in
-`src/app/Task.c`/`src/world/DayTaskStageMap.c`). Then, if `unk3C` is set and
+`src/app/task.c`/`src/world/dream_day.c`). Then, if `unk3C` is set and
 `unk40` is (unsigned) less than `unk1C`, calls `slot60` with reason `6`.
 Finally switches on `unk20` and forwards to one of four more vtable slots
 depending on its value -- two of which (`slotAC`/`slotC0`) ARE this unit's
@@ -141,7 +141,7 @@ under-apply on a function this size:
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit Task. This function was
+round 2026-09-02, runner echo, unit task. This function was
 overlooked during the main pass through the unit (the runner worked the
 smaller queued functions first per the assigned cheapest-first order,
 intended to circle back, and the circle-back was initially missed --
@@ -162,11 +162,11 @@ Tier A.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__OnTag5Notify (tools/rename.py). Occupant of +0x05C (`update`), named for the slot: up-calls IntermediateBase's update (the frame counter) and steps the state machine (include/TaskCore.h banner). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__OnTag5Notify (tools/rename.py). Occupant of +0x05C (`update`), named for the slot: up-calls IntermediateBase's update (the frame counter) and steps the state machine (include/task_core.h banner). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 98, alpha)
 
 The block local `bound` (it holds frameCounter, not the bound) is now
 `frames`, with a MATCHING line for the load order the residue above is
 about. States read as INTERMEDIATEBASE_STATE_START/STOP and
-TASKCORE_STATE_* (include/IntermediateBase.h, include/TaskCore.h). Byte-identical.
+TASKCORE_STATE_* (include/intermediate_base.h, include/task_core.h). Byte-identical.

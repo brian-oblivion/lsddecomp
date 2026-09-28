@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004ACF8` on 2026-09-22 (tools/rename.py). Address 0x8004acf8.
 
-**Unit:** DayTaskStageMap · **Size:** 51 instructions · **Result:** 51/51 words
+**Unit:** dream_day · **Size:** 51 instructions · **Result:** 51/51 words
 
 ## What it does
 
@@ -16,7 +16,7 @@ accumulator that steps by a different amount per call (`arg3 += 3` for
 
 `slotB8` (`LightRig__GetLight`) and the child's own class are not decompiled;
 only the two slots this function reaches on the child are typed, as
-`UnkChildObj_3ac78`/`UnkChildMethods_3ac78` in `include/DayTaskStageMap.h`.
+`UnkChildObj_3ac78`/`UnkChildMethods_3ac78` in `include/dream_day.h`.
 
 ## Final source
 
@@ -44,7 +44,7 @@ no reordering or barrier was needed.
 
 ## Provenance
 
-round 2026-09-02, runner ALPHA, unit DayTaskStageMap.
+round 2026-09-02, runner ALPHA, unit dream_day.
 
 ## Naming
 
@@ -64,7 +64,7 @@ view stays `UnkChildObj_3ac78`/`UnkChildMethods_3ac78`.
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the +0x0B8 slot it calls is LightRig's `getLight` (LightRig__GetLight, `lights[index]`), and the two slots it drives on each result, +0x044 and +0x048, are FlatLightObj's setColor and setDirection (src/code_3311c.c), consistent with the 3- and 6-byte strides. StageMap's own view (include/DayTaskStageMap.h) still names the slot `getChild` and its result `UnkChildObj_3ac78`; the body is untouched.
+2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/light_rig.h`; the +0x0B8 slot it calls is LightRig's `getLight` (LightRig__GetLight, `lights[index]`), and the two slots it drives on each result, +0x044 and +0x048, are FlatLightObj's setColor and setDirection (src/code_3311c.c), consistent with the 3- and 6-byte strides. StageMap's own view (include/dream_day.h) still names the slot `getChild` and its result `UnkChildObj_3ac78`; the body is untouched.
 
 ## Track 6 (2026-09-26, round 93, alpha)
 
@@ -77,11 +77,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -96,8 +96,8 @@ an operator decision; not hand-reverted).
 
 ## Track 7 (2026-09-27, round 98, charlie)
 
-`colors += 3` -> `colors += sizeof(FlatLightColor)`, `dirs += 6` -> `dirs += 3 * sizeof(s16)` (an r,g,b and an s16 vx,vy,vz per light, include/FlatLightObj.h). Zero bytes. The `s32` source parameters stay (the slot's type in StageMap.h; proposed to the head as `FlatLightColor *` / `s16 *`, which would drop the casts and let the steps be `++` / `+= 3`).
+`colors += 3` -> `colors += sizeof(FlatLightColor)`, `dirs += 6` -> `dirs += 3 * sizeof(s16)` (an r,g,b and an s16 vx,vy,vz per light, include/flat_light_obj.h). Zero bytes. The `s32` source parameters stay (the slot's type in stage_map.h; proposed to the head as `FlatLightColor *` / `s16 *`, which would drop the casts and let the steps be `++` / `+= 3`).
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

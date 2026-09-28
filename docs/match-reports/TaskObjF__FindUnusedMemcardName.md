@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004EADC` on 2026-09-24 (tools/rename.py). Address 0x8004eadc.
 
-**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class).
+**Unit:** title_menu (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -48,7 +48,7 @@ char *TaskObjF__FindUnusedMemcardName(Node3bb8cE *self, char *buf, char *middle,
 (`pad00[0x00C]`); this function proves it's a real vtable pointer (the
 object's OWN methods table, distinct from the base-class table obtained
 via `GetBasicClassMethods()`). Added `SelfMethods3bb8cE` (local to
-`src/ui/TitleMenuTaskObjF.c`) with only the one reached slot, `+0x054`.
+`src/ui/title_menu.c`) with only the one reached slot, `+0x054`.
 
 ### Proposed learning
 

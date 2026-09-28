@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C18C` on 2026-09-24 (tools/rename.py). Address 0x8002c18c.
 
-**Unit:** PlacementGridVabSound · **Size:** 29 instructions (0x74 bytes) ·
+**Unit:** vab_sound · **Size:** 29 instructions (0x74 bytes) ·
 **Status: MATCHED 29/29**, whole-image SHA1 green. Matched on the first
 attempt.
 
@@ -64,7 +64,7 @@ whole family: object, `Class6D940Methods`, the getter, constructors,
 methods, `Class6D940Record` -> `PlacementGridRecord`,
 `Class6D940ResolveEntryFn` -> `PlacementGridResolveEntryFn`,
 `Class6D940GetModelFn` -> `PlacementGridGetModelFn`, the header
-`include/Class6D940.h` -> `include/PlacementGrid.h`), then
+`include/Class6D940.h` -> `include/placement_grid.h`), then
 `python3 tools/rename.py D_8006D940 gPlacementGridMethods` (the table,
 g<Class>Methods) and
 `python3 tools/renametype.py PlacementGridPlacement CellPlacement --any-stem`
@@ -84,7 +84,7 @@ cell's centre (column/row * 0x800 + 0x400) and returns the model
 linkResource's getModel gives for its index. StageMap__PopulateSlotCells
 points `buffer` at the grid element's LbdFile header block +
 `placementsOffset` (LbdFileHeader's own field name) and puts each result
-into that element's GridCell lattice (20 x 20, 0x800 apart: GridCell.h),
+into that element's GridCell lattice (20 x 20, 0x800 apart: grid_cell.h),
 chained records into the overflow cells. So the class is the placements of
 one grid element's cells. **`CellPlacement`** is ResolveEntry's output, one
 model's placement in one cell. The name says what the records are, not

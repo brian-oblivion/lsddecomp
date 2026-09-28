@@ -2,7 +2,7 @@
 
 > Renamed from `func_80040824` on 2026-09-25 (tools/rename.py). Address 0x80040824.
 
-Unit: `src/ui/ScreenWidgets.c`. 3 attempts.
+Unit: `src/ui/screen_widgets.c`. 3 attempts.
 
 ```c
 void BoxFill__SetSize(Obj6EAC0 *self, s32 *a1) {
@@ -24,7 +24,7 @@ wrong (`0x2` vs retail's `0x4`).
 First attempt (before this) also caught a real struct bug: I had
 declared `unk60`/`unk62` immediately after `unk58` (a `u32` ending at
 `+0x05C`) with no padding, so they silently landed at `+0x05C`/`+0x05E`
-instead of the intended `+0x060`/`+0x062` -- `include/Task.h` now
+instead of the intended `+0x060`/`+0x062` -- `include/task.h` now
 has an explicit `pad05C[0x060 - 0x05C]` gap. This is exactly the
 "field inserted without its leading padNN" trap CLAUDE.md warns about;
 caught immediately here because the SAME struct's `BoxFill__SetSize` was
@@ -60,7 +60,7 @@ kept `func_`/`unk60`/`unk62` unrenamed rather than assert "size" or
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_80040824`: the +0x0C0 occupant, BoxFill's own `setSize` (tier A): while attached it stores the low halves of a {w, h} word pair into +0x060/+0x062, the GsBOXF w/h. TaskCore__RefreshSlotView calls it on listView with {0x28, count * 12}.
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/box_fill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_80040824`: the +0x0C0 occupant, BoxFill's own `setSize` (tier A): while attached it stores the low halves of a {w, h} word pair into +0x060/+0x062, the GsBOXF w/h. TaskCore__RefreshSlotView calls it on listView with {0x28, count * 12}.
 
 ## Track 7 (round 99, bravo)
 
@@ -76,4 +76,4 @@ an s32 field into the u16 `boxW`/`boxH` still reads only the low halfword
 halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
 became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
 BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
-its caller in Task passes an `s32 size[2]`).
+its caller in task passes an `s32 size[2]`).

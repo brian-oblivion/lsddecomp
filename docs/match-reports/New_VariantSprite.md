@@ -6,7 +6,7 @@
 
 > Renamed from `func_80057C94` on 2026-09-19 (tools/rename.py). Address 0x80057c94.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys` family -- plain
+Unit: `src/world/dream_scene.c`. Class: `DreamSys` family -- plain
 allocator/constructor wrapper (`New_X` shape per CLAUDE.md's own
 description), not a vtable slot itself.
 
@@ -37,16 +37,16 @@ discarded).
 ## `GetVariantSpriteMethods` and `gVariantSpriteMethods` are in UNCARVED ground
 
 `GetVariantSpriteMethods` is a plain no-argument getter (`return &gVariantSpriteMethods;`),
-confirmed by reading its body directly in `asm/ObjMStyleActor.s` -- the
+confirmed by reading its body directly in `asm/dream_scene.s` -- the
 still-monolithic segment immediately behind this unit
-(`ObjMStyleActor.c`'s own file banner already names it as this unit's
-successor, `ObjMStyleActor`). `gVariantSpriteMethods` is a 49-slot table
+(`dream_scene.c`'s own file banner already names it as this unit's
+successor, `dream_scene`). `gVariantSpriteMethods` is a 49-slot table
 (`tools/classtable.py` header `0x1F44`) whose `+0x008` slot resolves to
 THIS unit's own `VariantSprite__VariantSprite` (still queued at the time this was
 written; see its own report). Only the ctor slot is typed here
 (`D800879C4Methods`, local to this file) -- the rest of that class is out
 of this unit's scope (uncarved, belongs to whoever carves
-`ObjMStyleActor`).
+`dream_scene`).
 
 ## Shape note: `return obj;` INSIDE the `if`, not after it
 
@@ -78,7 +78,7 @@ check, construct, return -- mechanics ARE the purpose. `D800879C4` names
 the class this allocates (its own ctor's table, `gVariantSpriteMethods`, with the
 underscore dropped per this project's `D800878D4Methods`-style convention
 for an as-yet-unnamed class, since the class itself lives in uncarved
-ground `ObjMStyleActor.s` this runner cannot rename).
+ground `dream_scene.s` this runner cannot rename).
 
 ## Verify
 
@@ -116,21 +116,21 @@ further work (that one).
 ## Track 4 (2026-09-26, round 87, alpha)
 
 Renamed from `New_D800879C4` (tools/rename.py); the class is `VariantSprite`
-(`include/VariantSprite.h`). The prototype is now
+(`include/variant_sprite.h`). The prototype is now
 `VariantSprite *New_VariantSprite(s32 variant, void *arg2, void *texture)`: the
 three arguments are forwarded unchanged to the ctor, whose parameters they
 name (see `VariantSprite__VariantSprite`'s report), and the result is the object.
 The body is unchanged but for the parameter names; the one caller outside
-this unit, `StyleEffect__SpawnSprites` (ObjMStyleActor.c), passes its `a2`
+this unit, `StyleEffect__SpawnSprites` (dream_scene.c), passes its `a2`
 as the variant without a cast and casts the result to its `LinkNode *`
 view, and its local `extern` of this function is gone. The "UNCARVED
 ground" section above is history: the getter and table are
-`GetVariantSpriteMethods` / `gVariantSpriteMethods` in ObjMStyleActor.c.
+`GetVariantSpriteMethods` / `gVariantSpriteMethods` in dream_scene.c.
 Byte-identical.
 
 ## Track 6 (2026-09-26, round 93, bravo)
 
-The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
+The class `Class879C4` is now `VariantSprite` (`include/variant_sprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
@@ -152,9 +152,9 @@ comment pass, i.e. with this round's renames already applied (the
 `LinkQueryBuf` one as it stood before step 2).
 
 - `BMemPMgrAlloc(0xA8)` became `sizeof(VariantSprite)` (0xA8,
-  VariantSprite.h), byte-identical.
+  variant_sprite.h), byte-identical.
 - Parameter `arg2` -> `resetArg` (tier B), here, in the ctor and in
-  VariantSprite.h's prototypes and CtorParams: it is forwarded to Sprite's
+  variant_sprite.h's prototypes and CtorParams: it is forwarded to Sprite's
   ctor as its `arg4`, which Sprite__Sprite hands on to reset, and
   Sprite__Reset does not read it; the one caller (StyleEffect__SpawnSprites)
   passes 0.
@@ -162,6 +162,6 @@ comment pass, i.e. with this round's renames already applied (the
 The function comment, verbatim:
 
 ```c
-/* VariantSprite (include/VariantSprite.h, track 4, round 87): its allocator and
- * ctor. The other methods are in ObjMStyleActor.c and class_3bb8c_t.c. */
+/* VariantSprite (include/variant_sprite.h, track 4, round 87): its allocator and
+ * ctor. The other methods are in dream_scene.c and class_3bb8c_t.c. */
 ```

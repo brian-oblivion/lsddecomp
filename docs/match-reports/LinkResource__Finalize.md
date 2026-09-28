@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043954` on 2026-09-25 (tools/rename.py). Address 0x80043954.
 
-Round 82, runner echo (GraphicsResources session, echo #8), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #8), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 38/38 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gLinkResourceMethods +0x00C.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/graphics/GraphicsResources.c`.
+`src/graphics/graphics_resources.c`.
 
 ```c
 /* gLinkResourceMethods +0x00C: finalize -- release every object in the NULL-ended
@@ -46,10 +46,10 @@ First build. A plain `while (*objs != NULL)` is rotated by GCC into the top-test
 ## Track 4
 
 2026-09-26, round 89 (delta): LinkResource (table `gLinkResourceMethods`,
-renamed from D_8006F13C) is unified in `include/LinkResource.h`. The
+renamed from D_8006F13C) is unified in `include/link_resource.h`. The
 unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 `Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
 `self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
-read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
+read as `TmdFile *` (include/tmd_model.h), the allocator's descriptor is
 `ResourceSource *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.

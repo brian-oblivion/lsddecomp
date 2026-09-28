@@ -2,7 +2,7 @@
 
 > Renamed from `SetActiveDataSourceDriverMode` on 2026-09-18 (tools/rename.py). Address 0x80026f34.
 
-**Unit:** GameApplicationFileResource · **Size:** 30 words · **Status:** MATCHED, round 43
+**Unit:** game_shell · **Size:** 30 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 30/30 words, byte-exact whole-image build.
 
 ## History
@@ -35,7 +35,7 @@ matching CLAUDE.md's `SetActiveDataSourceDriverMode` prediction area for this un
 accessor-family shape.
 
 `SetNullDriverMode` is independently defined elsewhere
-(`src/sound/PlacementGridVabSound.c`: `s32 SetNullDriverMode(s32 a, s32 b) { sNullDriverMode=a; sNullDriverModeArg=b; return 1; }`)
+(`src/sound/vab_sound.c`: `s32 SetNullDriverMode(s32 a, s32 b) { sNullDriverMode=a; sNullDriverModeArg=b; return 1; }`)
 taking only **2** parameters, not 3. This unit's own local extern declares it
 with 3 (matching the call site's actual register usage: `a0`,`a1`,`a2` are
 all loaded before the `jalr`, since the alternate target `SetCdDriverMode` may
@@ -94,8 +94,8 @@ a 3-argument setter with a retry loop.
 
 **Evidence.** The typedef's only use is this function's local `fn`, and it
 has exactly two occupants, one per branch of `sActiveDataSource ==
-DATASOURCE_CD`: `SetCdDriverMode` (CD driver, `CdDriver.c`, 3 args) and
-`SetNullDriverMode` (SPU/VAB driver, `PlacementGridVabSound.c`, 2 args, ignores the
+DATASOURCE_CD`: `SetCdDriverMode` (CD driver, `cd_driver.c`, 3 args) and
+`SetNullDriverMode` (SPU/VAB driver, `vab_sound.c`, 2 args, ignores the
 third). Both occupants agree on what they do -- set the selected data
 source's driver mode, returning 0 while not yet accepted, which the caller
 polls. The name says that and nothing about why; the placeholder was the

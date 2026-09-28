@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003E418` on 2026-09-19 (tools/rename.py). Address 0x8003e418.
 
-**Unit:** Task · **Size:** 35 instructions
+**Unit:** task · **Size:** 35 instructions
 
 ## What it does
 
@@ -55,7 +55,7 @@ Matched on the first build.
 `arg1` (the `EventArg *` `IntermediateBase__OnNotify` forwards to `slot54`/`58`/`5C`)
 went completely unused here -- a live-but-unconsumed register at this call
 site, same shape as `TaskCore__Update`'s own `$a1` note in
-`include/Task.h`. Declaring the parameter with its full established
+`include/task.h`. Declaring the parameter with its full established
 type (`EventArg *`, matching the vtable field) rather than degrading it to
 `s32`/`void *` costs nothing and keeps the signature consistent with its
 two siblings (`slot58`, `slot5C`) for whoever reads this table's occupants
@@ -70,7 +70,7 @@ side by side.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. Matched on the
+round 13 (2026-09-03), runner alpha, unit task. Matched on the
 first build.
 
 ## Naming
@@ -87,25 +87,25 @@ object; what event code 2 represents in the game is not established
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__OnTag1Notify (class prefix). Occupies +0x054, slot `onTag1Notify`: OnNotify's case for a sender of root class 1 (gDrawSystemMethods). Parameters are (sender, event). The calls on unk10 and initArgs->unk4 use one local view in Task.c (IntermediateBaseLinked); their classes are not established.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/intermediate_base.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__OnTag1Notify (class prefix). Occupies +0x054, slot `onTag1Notify`: OnNotify's case for a sender of root class 1 (gDrawSystemMethods). Parameters are (sender, event). The calls on unk10 and initArgs->unk4 use one local view in task.c (IntermediateBaseLinked); their classes are not established.
 
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 
-The `self->unk10` call is FrameClock's +0x044 `tick` (include/FrameClock.h): the call now casts to `FrameClock *` and names the slot, instead of the `IntermediateBaseLinked` view's `slot44` (that view still covers initArgs->unk4). Byte-identical.
+The `self->unk10` call is FrameClock's +0x044 `tick` (include/frame_clock.h): the call now casts to `FrameClock *` and names the slot, instead of the `IntermediateBaseLinked` view's `slot44` (that view still covers initArgs->unk4). Byte-identical.
 
 ## Track 7 (round 98, echo)
 
 The object at initArgs->pad is a Pad (Application__InitSystems passes the
-Pad; include/IntermediateBase.h names the field for it), so the two calls
+Pad; include/intermediate_base.h names the field for it), so the two calls
 are Pad's +0x044 `updateMasks` and +0x048 `dispatchEvents`
-(include/Pad.h), not the unit-local `slot44`/`slot48`. The event test is
-DrawSystem.h's `DRAWSYSTEM_EVENT_VSYNC` (2): this is onNotify's DrawSystem
+(include/pad.h), not the unit-local `slot44`/`slot48`. The event test is
+draw_system.h's `DRAWSYSTEM_EVENT_VSYNC` (2): this is onNotify's DrawSystem
 case, and DrawSystem__RunLoop sends 2 every VSync pass. Local `obj4` ->
 `pad`. Byte-identical.
 
 The unit-local view these calls went through was removed; it read, verbatim
-(the only history in it is the "not established" claim, which Pad.h and
-DrawSystem.h have since settled):
+(the only history in it is the "not established" claim, which pad.h and
+draw_system.h have since settled):
 
 ```c
 /* One local reading of the objects IntermediateBase calls outside

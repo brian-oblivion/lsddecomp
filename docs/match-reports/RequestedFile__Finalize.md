@@ -6,10 +6,10 @@
 
 > Renamed from `func_800423A8` on 2026-09-25 (tools/rename.py). Address 0x800423a8.
 
-Round 82, runner alpha (third re-staffed slot of the round). Unit `src/graphics/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (third re-staffed slot of the round). Unit `src/graphics/sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** gRequestedFileMethods slot +0x00C (finalize) (`tools/classtable.py`).
-- **What:** Clears +0x02C (the flag `RequestedFile__MarkLoaded` sets), then calls slot +0x00C of `GetActiveDataSourceMethods()` (GameApplicationFileResource). The store lands in the `jal` delay slot. `GetActiveDataSourceMethods` is declared locally with a local `Slot0CMethods_322b4` return type, as `PlacementGridVabSound.c` does with its own view.
+- **What:** Clears +0x02C (the flag `RequestedFile__MarkLoaded` sets), then calls slot +0x00C of `GetActiveDataSourceMethods()` (game_shell). The store lands in the `jal` delay slot. `GetActiveDataSourceMethods` is declared locally with a local `Slot0CMethods_322b4` return type, as `vab_sound.c` does with its own view.
 - **Result:** byte-exact; 15/15 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** local views and prototypes live in the unit; no shared header was touched.
 
@@ -29,13 +29,13 @@ void RequestedFile__Finalize(D_8006EED8Obj *self) {
 
 ## Track 4 (2026-09-26, round 87, delta)
 
-Class id 0xB03 is unified as `RequestedFile` in `include/RequestedFile.h`
+Class id 0xB03 is unified as `RequestedFile` in `include/requested_file.h`
 (FILERESOURCE_SLOTS/FIELDS, 0x30 bytes, one own field `loaded` at +0x02C). The
 unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
 views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
 `CtorArg1Methods_322b4` are gone; `GetActiveDataSourceMethods` is declared
 `FileResourceMethods *`. The Source block above is the round-82 text; the live
-body in `src/graphics/Sprite.c` is byte-identical.
+body in `src/graphics/sprite.c` is byte-identical.
 
 Renamed from `D8006EED8__Finalize` with rename.py (the class name).
 Accessors: `flag2C` -> `loaded`, `slot0C` -> the inherited `finalize`
@@ -54,7 +54,7 @@ name because the only thing known beyond those mechanics was the caller's use
 (WBgm loads SEQ files through it); a mechanics name sidesteps that objection
 rather than overriding it, and `SeqFile` was rejected for the same reason.
 The table and getter followed (`gRequestedFileMethods`,
-`GetRequestedFileMethods`), and the header moved to `include/RequestedFile.h`.
+`GetRequestedFileMethods`), and the header moved to `include/requested_file.h`.
 renametype.py also rewrote the old class name inside earlier sections'
 history prose in this and sibling reports (known, pending an operator
 decision; not hand-reverted).

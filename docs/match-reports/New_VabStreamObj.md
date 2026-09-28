@@ -2,7 +2,7 @@
 
 > Renamed from `func_8002C480` on 2026-09-18 (tools/rename.py). Address 0x8002c480.
 
-Unit: `PlacementGridVabSound`. Runner: echo, round 17.
+Unit: `vab_sound`. Runner: echo, round 17.
 
 ## Result
 
@@ -32,7 +32,7 @@ The `new_class_*`-style constructor for the `gVabStreamObjMethods` class: alloca
 (`VabStreamObj__VabStreamObj`, BLOCKED gp_rel -- not this unit's to write, only its
 prototype's shape matters here) as the actual constructor, which is where
 `self->methods` gets assigned (inside `VabStreamObj__VabStreamObj`'s own body, not here).
-Same idiom as `New_PlacementGrid` in the sibling `PlacementGridVabSound.c`.
+Same idiom as `New_PlacementGrid` in the sibling `vab_sound.c`.
 
 `slot08`'s return value is discarded -- retail overwrites `$v0` with `self`
 unconditionally right after the `jalr`, regardless of what the constructor
@@ -51,4 +51,4 @@ FINISHING-PLAN track 3's own constructor convention (`New_Class` for the
 allocate-and-dispatch entry point, `Class__Class` for the real per-object
 init) -- this function's whole body IS "malloc the object, dispatch to the
 real constructor," the same idiom already named `New_PlacementGrid` in the
-sibling `PlacementGridVabSound.c`.
+sibling `vab_sound.c`.

@@ -64,7 +64,7 @@ shape, not something GCC restructured.
 entries, fields `unk0`/`unk2`) is the SPU voice register block: libsnd
 vmanager's first .data word points at 0x1F801C00, and libsnd_vmanager.c's
 SpuVmInit had already typed it `SpuRegs *` with a 24 x 0x10 `voice[]` array
-at +0. `unk0`/`unk2` are `volL`/`volR`. The type moved to include/SvmData.h.
+at +0. `unk0`/`unk2` are `volL`/`volR`. The type moved to include/svm_data.h.
 
 Measured: `_svm_sreg->voice[idx].volL` is 19/22 -- the two address `addu`s
 come out `addu v0,v0,v1` where retail has `addu v0,v1,v0` (3 words, same

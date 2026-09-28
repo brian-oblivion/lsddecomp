@@ -8,7 +8,7 @@
 
 > Renamed from `func_80026108` on 2026-09-24 (tools/rename.py). Address 0x80026108.
 
-**Unit:** GameApplicationFileResource · **Size:** 26 instructions · **Status:** MATCHED (26/26 words)
+**Unit:** game_shell · **Size:** 26 instructions · **Status:** MATCHED (26/26 words)
 
 ## What it does
 
@@ -49,7 +49,7 @@ that is itself derived from BasicClass, and `classtable.py 0x8006D3C8 --vs
 with that intermediate table — evidence this class's real parent is that
 intermediate class, not BasicClass directly (the earlier `--vs 0x8006B58C`
 comparison only showed a match on the BasicClass-common low slots, which
-both classes inherit). Recorded in `include/GameApplication.h`.
+both classes inherit). Recorded in `include/game_application.h`.
 
 No instruction sets `$v0` after the conditional call, so the function's own
 return value (if used at all) is whatever the base method leaves behind —
@@ -114,7 +114,7 @@ Posted to `tools/broadcast.sh post --from echo`.
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The parent class is declared once, in
-`include/Application.h`, and `MiddleClassMethods` is gone. The base call is
+`include/application.h`, and `MiddleClassMethods` is gone. The base call is
 now `GetApplicationMethods()->initSystems((Application *)self, a1, a2, 0)`: the
 slot is named for its occupant, Application__InitSystems, typed `void` (the
 occupant's; nothing here reads $v0), and keeps the fourth argument this
@@ -123,7 +123,7 @@ body's `move a3,zero` shows. The upcast emits no code. Bytes unchanged.
 ## Track 4 (2026-09-26, round 88)
 
 Renamed for its slot. `+0x044` is Application's `initSystems`
-(`include/Application.h`), and this override does nothing but chain to it:
+(`include/application.h`), and this override does nothing but chain to it:
 `GetApplicationMethods()->initSystems(self, drawSystem, pad, 0)`. The guard
 field `+0x018` is not a GameApplication field at all: it lies inside the parent's
 0x20-byte object, where Application's view already names it `initialized`

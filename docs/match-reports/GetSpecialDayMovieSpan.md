@@ -4,7 +4,7 @@
 
 > Renamed from `func_800493E4` on 2026-09-25 (tools/rename.py). Address 0x800493e4.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on build 12; whole-image SHA1 green, funcdiff 39/39.
 
 ## What it does
@@ -15,7 +15,7 @@ a 10-unit gap between entries), returns `rec`.
 
 ## Source
 
-Declarations: `FilePathRecord` and `extern s16 sMovieFrameCounts[];` in `src/cd/GameFiles.c`.
+Declarations: `FilePathRecord` and `extern s16 sMovieFrameCounts[];` in `src/cd/game_files.c`.
 
 ```c
 FilePathRecord *GetSpecialDayMovieSpan(s32 *total, s32 n, s32 len) {
@@ -68,4 +68,4 @@ extends (`len += start`) rather than a fresh `end`.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into CdDriver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes CdDriver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

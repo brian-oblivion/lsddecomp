@@ -2,7 +2,7 @@
 
 > Renamed from `func_80026FAC` on 2026-09-18 (tools/rename.py). Address 0x80026fac.
 
-**Unit:** GameApplicationFileResource · **Size:** 15 words · **Status:** MATCHED, round 43
+**Unit:** game_shell · **Size:** 15 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 15/15 words, byte-exact whole-image build.
 
 ## History
@@ -26,7 +26,7 @@ beq $v1, $v0(0x13), .L80026FD0   # equal -> GetCdDriverMode
 ```
 
 Both callees (`GetCdDriverMode`, `GetNullDriverMode`) are still uncarved
-(`asm/code_179d8.s` / `asm/nonmatchings/PlacementGridVabSound/GetNullDriverMode.s`).
+(`asm/code_179d8.s` / `asm/nonmatchings/vab_sound/GetNullDriverMode.s`).
 Treated as `s32`-returning per CLAUDE.md's tail-call caution (no positive
 void evidence, so default to non-void).
 

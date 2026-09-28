@@ -4,7 +4,7 @@
 
 > Renamed from `func_800404D0` on 2026-09-20 (tools/rename.py). Address 0x800404d0.
 
-Unit `ScreenWidgets`, carved round 14.
+Unit `screen_widgets`, carved round 14.
 
 > **UPDATE (targeted permuter pass, round 17).** MATCHED, no permuter
 > needed -- same fix as its sibling `New_FadeBox`, applied in the same
@@ -28,7 +28,7 @@ Unit `ScreenWidgets`, carved round 14.
 > **One incidental fix needed along the way**: the preserved body's
 > `GetBoxFillMethods()->ctor(...)` no longer compiles as written --
 > `GetBoxFillMethods`'s declared return type is `Obj6EAC0Methods *` (per
-> `include/Task.h`), which has no field literally named `ctor` (its
+> `include/task.h`), which has no field literally named `ctor` (its
 > ctor-shaped slot is `slot08`, still unidentified as this unit's own). The
 > header's own `ClassEAC0Methods` type (used identically by
 > `FadeBox__FadeBox`, a few lines above this function in the same file) DOES
@@ -79,4 +79,4 @@ the correct cast one statement earlier in the file.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `New_ClassEAC0`: BMemPMgrAlloc(0x6C) then GetBoxFillMethods()->ctor (tier A). Callers: TaskCore__SetTarget (listView), GraphRoom__BuildGraphPoints (100 dots), StyleBuildDecorSet (18 decor slots), ApplyStyleDecorationIfSet (sStyleDecorObj). The first argument is a {w, h} pair of words (read by halfword in Reset), the second the r,g,b bytes, the third the priority, so the parameters are (void *size, void *color, s32 pri).
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/box_fill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `New_ClassEAC0`: BMemPMgrAlloc(0x6C) then GetBoxFillMethods()->ctor (tier A). Callers: TaskCore__SetTarget (listView), GraphRoom__BuildGraphPoints (100 dots), StyleBuildDecorSet (18 decor slots), ApplyStyleDecorationIfSet (sStyleDecorObj). The first argument is a {w, h} pair of words (read by halfword in Reset), the second the r,g,b bytes, the third the priority, so the parameters are (void *size, void *color, s32 pri).

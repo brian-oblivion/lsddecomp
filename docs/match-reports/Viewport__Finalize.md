@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E6CC` on 2026-09-19 (tools/rename.py). Address 0x8003e6cc.
 
-**Unit:** Task · **Size:** 41 instructions
+**Unit:** task · **Size:** 41 instructions
 
 ## What it does
 
@@ -41,7 +41,7 @@ same convention as `IntermediateBase__Deinit`.
   function is the dereferencing counter-evidence. New type
   `Unk18AcObj`/`Unk18AcObjMethods` models the one slot (`slot4`, inherited
   BasicClass release) this function reaches. `New_SceneNode`'s own extern
-  declaration retyped to match (`include/SceneNode.h`'s own view,
+  declaration retyped to match (`include/scene_node.h`'s own view,
   `SceneNodeObj *`, is a separate header and unaffected).
 - `BasicClassMethodsCC8C`: added `slot0C` (`BasicClass__Finalize`,
   "finalize").
@@ -66,7 +66,7 @@ not as a permanent property.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. Matched on the
+round 13 (2026-09-03), runner alpha, unit task. Matched on the
 first build.
 
 ## Naming
@@ -85,4 +85,4 @@ C/unnamed).
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__Finalize`. The +0x00C finalize override: deinitOt (+0x090), detachViewChild (+0x074), releases sceneRoot, setSubHandle(NULL) (+0x0A8), then BasicClass's finalize. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__Finalize`. The +0x00C finalize override: deinitOt (+0x090), detachViewChild (+0x074), releases sceneRoot, setSubHandle(NULL) (+0x0A8), then BasicClass's finalize. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

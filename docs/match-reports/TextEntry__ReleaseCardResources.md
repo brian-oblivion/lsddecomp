@@ -4,7 +4,7 @@
 
 > Renamed from `func_80051174` on 2026-09-24 (tools/rename.py). Address 0x80051174.
 
-Unit `TextEntryItemList`, carved round 14.
+Unit `input_dialogs`, carved round 14.
 
 `Obj86ED0`'s vtable slot 0x048. Releases three owned BasicClass-family
 child pointers (`unk48`/`unk44`/`unk40`), all gated on a single guard
@@ -42,13 +42,13 @@ dispatched on an opaque child pointer.
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 ## Round 94 (track 6, charlie): textRow is a TextRow
 
 `ChildObj86ED0`/`ChildMethods86ED0` (include/class_3bb8c.h) are deleted: the
 object behind them is the `New_TextRow` result, so TextEntry::textRow
-(+0x044, include/TextEntry.h) is `struct TextRow *`. The slots map onto
+(+0x044, include/text_entry.h) is `struct TextRow *`. The slots map onto
 TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 (position cast to `LongVec3 *`, as ScreenSprite's banner describes), +0x0B8
 `setColor` (`sTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `ColorRgb *`),

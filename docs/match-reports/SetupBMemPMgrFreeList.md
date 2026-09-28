@@ -50,7 +50,7 @@ void SetupBMemPMgrFreeList(BMemPMgr *pool)
 }
 ```
 
-`BMemBlockHdr` (new, `include/BMemPMgr.h`) is the pool's free-list node
+`BMemBlockHdr` (new, `include/bmem_pmgr.h`) is the pool's free-list node
 shape: `sizeAndFlags` (28-bit size, top 4 bits flags — `0x40000000` =
 free) at +0x0, doubly-linked `prev`/`next` at +0x4/+0x8. `BMemPMgr` grew
 three fields this round to match what this function actually touches:
@@ -121,11 +121,11 @@ Zero bytes changed.
   block, written by BMemPMgrInit, not a free-list end);
   `freeListStart`/`freeListEnd` -> `freeListTail`/`freeListHead`; `unk10` ->
   `initialized`, tier B: this function writes 1 to it and no code reads it.
-- The `include/BMemPMgr.h` comment that called this function
+- The `include/bmem_pmgr.h` comment that called this function
   "gp_rel-blocked" is gone: that blocker was resolved (CLAUDE.md) and the
   function is matched.
 
-The constants are defined, with their evidence, in `include/BMemPMgr.h`:
+The constants are defined, with their evidence, in `include/bmem_pmgr.h`:
 `BMEM_SIZE_MASK` 0x0FFFFFFF and `BMEM_FLAG_MASK` 0xF0000000 split
 `sizeAndFlags`; `BMEM_FREE` 0x40000000 is set on every block put on the free
 list (SetupBMemPMgrFreeList, BMemPMgrFree, the split remainder) and cleared

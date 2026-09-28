@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026348` on 2026-09-24 (tools/rename.py). Address 0x80026348.
 
-**Unit:** GameApplicationFileResource · **Size:** 50 instructions (0xC8 bytes) · **Status:** MATCHED (50/50 words, whole-image SHA1 green), first attempt
+**Unit:** game_shell · **Size:** 50 instructions (0xC8 bytes) · **Status:** MATCHED (50/50 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -51,7 +51,7 @@ argument from the start).
 
 ## New struct/header knowledge
 
-`include/GameApplication.h`: split `GameApplicationConfig`'s `+0x04..+0x0B` padding
+`include/game_application.h`: split `GameApplicationConfig`'s `+0x04..+0x0B` padding
 to expose `+0x08` (`unk08`, this function's gate) as its own field,
 matching the existing `+0x0C` (`unk0C`, `GameApplication__ShowIntroLogos`'s gate). Declared
 `PickOpeningMovie` (day/week-style helper, `psyq_memset.s`, same "write an
@@ -87,7 +87,7 @@ shape as its three siblings in this unit).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-GameApplication.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
+game_application.h's StreamTask view names +0x004 `release` (BasicClass's, `void *`), was `start` (track 4 round 84; see GameApplication__PlayCinematic for the bytes that settled the return type). Byte-identical.
 
 ## Track 7 polish (round 100, echo)
 
@@ -112,4 +112,4 @@ extern s32 PickOpeningMovie(s32 *out, s32 param2); /* psyq_memset.s: day/week-st
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.
+`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in game_shell.c are gone. Byte-identical.

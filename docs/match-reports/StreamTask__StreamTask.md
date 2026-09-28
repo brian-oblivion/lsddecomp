@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003B8E4` on 2026-09-23 (tools/rename.py). Address 0x8003b8e4.
 
-**Unit:** Task · **Size:** 62 words · **Status:** MATCHED (62/62)
+**Unit:** task · **Size:** 62 words · **Status:** MATCHED (62/62)
 
 ## Summary
 
@@ -109,20 +109,20 @@ codebase (`IntermediateBase__IntermediateBase`, `StageMap__StageMap`).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). The ctor at +0x008.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). The ctor at +0x008.
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4Obj view is gone and Task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The allocation is `New_MoviePlayer((DrawRect *)GetDefaultMovieFrame(), 0, 0)`: the ctor's frame rectangle (a pointer cast, no code). Byte-identical.
+The player is a MoviePlayer (`include/movie_player.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in stream_task.h) to `MoviePlayer *`. The allocation is `New_MoviePlayer((DrawRect *)GetDefaultMovieFrame(), 0, 0)`: the ctor's frame rectangle (a pointer cast, no code). Byte-identical.
 
 
 ## Track 6 (2026-09-27, round 99, runner bravo)
 
-`StreamTaskInitData` was a local spelling of DrawSystem.h's `DrawRect` (the same three words, and `sDefaultMovieFrame`, the fallback, was already `extern DrawRect` in both units that name it); it is deleted. `initData` (+0x0A8), the fifth parameter and `GetDefaultMovieFrame()` are `DrawRect`, so the allocation is `New_MoviePlayer(GetDefaultMovieFrame(), 0, 0)` with no cast. The struct copy is unchanged (both types are 12 bytes, 4-aligned). Byte-identical; `typeviews.py --warnings` 0 new. The getter and the data were renamed this round from `GetDefaultStreamTaskInitData`/`gDefaultStreamTaskInitData` (see GetDefaultMovieFrame.md).
+`StreamTaskInitData` was a local spelling of draw_system.h's `DrawRect` (the same three words, and `sDefaultMovieFrame`, the fallback, was already `extern DrawRect` in both units that name it); it is deleted. `initData` (+0x0A8), the fifth parameter and `GetDefaultMovieFrame()` are `DrawRect`, so the allocation is `New_MoviePlayer(GetDefaultMovieFrame(), 0, 0)` with no cast. The struct copy is unchanged (both types are 12 bytes, 4-aligned). Byte-identical; `typeviews.py --warnings` 0 new. The getter and the data were renamed this round from `GetDefaultStreamTaskInitData`/`gDefaultStreamTaskInitData` (see GetDefaultMovieFrame.md).
 
 ## History (moved from include/StreamTask.h, round 102)
 
@@ -146,4 +146,4 @@ what the code is.
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.
+`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in game_shell.c are gone. Byte-identical.

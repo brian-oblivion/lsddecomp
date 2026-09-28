@@ -2,13 +2,13 @@
 
 > Renamed from `func_8005630C` on 2026-09-23 (tools/rename.py). Address 0x8005630c.
 
-Unit `ObjMStyleActor`. **5/5 words, byte-exact.** First build after reopening.
+Unit `dream_scene`. **5/5 words, byte-exact.** First build after reopening.
 
 ## What it was
 
 Carved round 17, filed as `gp_rel` blocked. Round 42 resolved `gp_rel` via
 `--gp-symbols`; round 44's head reopened this unit's stub as `REOPENED --
-ASSIGNABLE` (see the file banner in `src/world/ObjMStyleActor.c`). Never attempted
+ASSIGNABLE` (see the file banner in `src/world/dream_scene.c`). Never attempted
 until now.
 
 ## Derivation
@@ -27,7 +27,7 @@ until now.
 round's assignment in the sibling unit). Declared locally in this unit as
 `extern s32 sStyleVariant;` -- it is not owned by either of my units, so it
 stays a local extern rather than going in `class_3bb8c.h` (the third owner,
-`ObjMStyleActor`, is still an uncarved monolith and would just as legitimately
+`dream_scene`, is still an uncarved monolith and would just as legitimately
 carry its own local view later).
 
 ```c

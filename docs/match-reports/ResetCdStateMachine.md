@@ -33,7 +33,7 @@ Closed on the first attempt.
 **Tier A.** Zeroes the phase/operation/tick-step globals, marks the driver
 idle (`sCdIdle = 1`) and clears busy/timeout -- the exact mirror image of
 `StartCdOperation`, called from both tick functions on a successful
-`CdReadSync` and from `CdDriver__CancelRequests` (CdDriver.c) when
+`CdReadSync` and from `CdDriver__CancelRequests` (cd_driver.c) when
 cancelling the in-flight head request. Corroborated by that unit's own
 pre-existing comment on this function: "CdDriver: reset the state
 machine".

@@ -14,7 +14,7 @@
 Returns the address of `gTodActorMethods`, this class's own 80-slot method table
 (header word `0x234`, per `tools/classtable.py gTodActorMethods --vs 0x800878D4`).
 The `Get_vtable`-style accessor for this class, same shape as
-`GetDreamSysMethods` and `GetGameApplicationMethods` (`GameApplicationFileResource`'s equivalent for
+`GetDreamSysMethods` and `GetGameApplicationMethods` (`game_shell`'s equivalent for
 `gGameApplicationMethods`): a plain `lui`/`addiu` address computation, no load — this is
 `&gTodActorMethods`, not `*gTodActorMethods`.
 
@@ -50,7 +50,7 @@ Round 75 (charlie), track 3.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/tod_actor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 6 (round 93, echo)
 

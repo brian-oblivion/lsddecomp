@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004AB24` on 2026-09-22 (tools/rename.py). Address 0x8004ab24.
 
-**Unit:** DayTaskStageMap · **Size:** 25 instructions · **Result:** 25/25 words
+**Unit:** dream_day · **Size:** 25 instructions · **Result:** 25/25 words
 
 ## What it does
 
@@ -29,7 +29,7 @@ void StageMap__UpdateIfEnabled(StageMap *self)
 ```
 
 `self->unk70` (a plain `s32`, offset 0x6C..0x74 previously undifferentiated
-padding) is new struct knowledge, added to `include/DayTaskStageMap.h`.
+padding) is new struct knowledge, added to `include/dream_day.h`.
 
 ## Residue
 
@@ -44,7 +44,7 @@ this without any special handling.
 
 ## Provenance
 
-round 2026-09-02, runner ALPHA, unit DayTaskStageMap.
+round 2026-09-02, runner ALPHA, unit dream_day.
 
 ## Naming
 
@@ -52,14 +52,14 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AB24` | `StageMap__UpdateIfEnabled` | B | Occupant of vtable slot `+0x098`. The gate field is `+0x070`, and `DayTaskStageMap`'s two matched accessors pin its meaning exactly: `StageMap__Enable` sets it to 1 and `StageMap__Disable` runs `slotC0` and then clears it to 0 -- an enable/disable pair. When enabled this function dispatches `slotF4` then `slot13C`; `slot13C` is `class_3bb8c_b`'s matched `StageMap__StepScaleRamp`, which decrements a per-object countdown and sweeps every element's cells, i.e. periodic work. Tier B: "update" describes what the two dispatched slots do, not a purpose anyone has established. |
+| `func_8004AB24` | `StageMap__UpdateIfEnabled` | B | Occupant of vtable slot `+0x098`. The gate field is `+0x070`, and `dream_day`'s two matched accessors pin its meaning exactly: `StageMap__Enable` sets it to 1 and `StageMap__Disable` runs `slotC0` and then clears it to 0 -- an enable/disable pair. When enabled this function dispatches `slotF4` then `slot13C`; `slot13C` is `class_3bb8c_b`'s matched `StageMap__StepScaleRamp`, which decrements a per-object countdown and sweeps every element's cells, i.e. periodic work. Tier B: "update" describes what the two dispatched slots do, not a purpose anyone has established. |
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x070` | `enabled` | A | Set to 1 / cleared to 0 by a matched setter pair in `DayTaskStageMap`, and used as a plain boolean gate here. A pure flag whose mechanics are its purpose. |
+| `StageMap+0x070` | `enabled` | A | Set to 1 / cleared to 0 by a matched setter pair in `dream_day`, and used as a plain boolean gate here. A pure flag whose mechanics are its purpose. |
 
 `slotF4` and `slot13C` keep their `slotNN` names: their occupants
-(`StageMap__UpdateFootprintTracking`, `StageMap__StepScaleRamp`) are still `func_` in `DayTaskStageMap`, and
+(`StageMap__UpdateFootprintTracking`, `StageMap__StepScaleRamp`) are still `func_` in `dream_day`, and
 the convention is to name a slot after the method it dispatches to.
 
 ## Track 6 (2026-09-26, round 93, alpha)
@@ -73,11 +73,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`

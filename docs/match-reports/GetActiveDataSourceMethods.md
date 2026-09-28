@@ -2,7 +2,7 @@
 
 > Renamed from `GetActiveDataSourceMethods` on 2026-09-18 (tools/rename.py). Address 0x80026cac.
 
-**Unit:** GameApplicationFileResource · **Size:** 15 words · **Status:** MATCHED, round 43
+**Unit:** game_shell · **Size:** 15 words · **Status:** MATCHED, round 43
 (2026-09-15, runner bravo). 15/15 words, byte-exact whole-image build.
 
 ## History
@@ -36,11 +36,11 @@ inverted-condition idiom GCC sometimes uses) -- confirmed by matching, first
 try, with the straightforward `if`/`else` written in source order.
 
 `GetNullDriverMethods` is confirmed elsewhere in the repo
-(`src/sound/PlacementGridVabSound.c`: `TableD9BC *GetNullDriverMethods(void) { return &gNullDriverMethods; }`)
+(`src/sound/vab_sound.c`: `TableD9BC *GetNullDriverMethods(void) { return &gNullDriverMethods; }`)
 to return a pointer, not void -- direct positive evidence this whole function
 is non-void per CLAUDE.md's tail-call caution. `GetCdDriverMethods` is still
 uncarved (`asm/code_179d8.s`) but is declared elsewhere in the repo
-(`CdDriver.c`, `code_179d8_o.c`) as returning a table pointer too, under
+(`cd_driver.c`, `code_179d8_o.c`) as returning a table pointer too, under
 each unit's own independent local type -- this report follows the same
 "multiple independent local views" convention and declares it `void *` here.
 
@@ -71,7 +71,7 @@ in this unit share this exact shape --  `GetActiveDataSourceMethods` (mode `0x23
 Per CLAUDE.md's caution, a byte match here proves nothing about void-ness on
 its own, but `GetNullDriverUseVSyncCallback` (the `GetActiveDataSourceUseVSyncCallback` else-arm) is independently
 confirmed non-void (`s32 GetNullDriverUseVSyncCallback(void) { return 0; }` in
-`PlacementGridVabSound.c`), so treating all three as `s32`/`void *`-returning tail
+`vab_sound.c`), so treating all three as `s32`/`void *`-returning tail
 calls is not a guess -- it is the only reading consistent with a callee whose
 real return type is already known.
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C6FC` on 2026-09-18 (tools/rename.py). Address 0x8002c6fc.
 
-Unit `PlacementGridVabSound`. Previously filed as a `gp_rel` stall (round 17, never
+Unit `vab_sound`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
 resolved that blocker project-wide. Confirmed against `gVabStreamObjMethods`'s own
 rodata as that table's `+0x64` slot -- the class's own per-frame poll/update
@@ -109,7 +109,7 @@ tier B rather than A.
 Renamed `VabStreamObj__Update` -> `VabStreamObj__AdvanceLoadState` with
 `rename.py`. The slot is +0x064, FileResource's `setFlag`. It is not a
 per-frame poll. The CD driver calls `self->methods->setFlag(self)` when a
-request completes (`src/cd/CdDriver.c`: `CdDriver__LoadFile` and the
+request completes (`src/cd/cd_driver.c`: `CdDriver__LoadFile` and the
 request-queue completion, each right after it ORs a `CD_FLAG_*_DONE` bit
 into `flags`). The 0x200 this body tests is `CD_FLAG_LOAD_FILE_DONE`. So the
 state machine moves forward once per completed file load. First the `.VH`
@@ -120,12 +120,12 @@ TimBlockSrc's override of the same slot, `TimBlockSrc__AdvanceLoadState`.
 The report above says +0x058 and +0x06C are "null in retail". That is only
 true of the static table. `SetActiveDataSource` copies the active driver's
 interface slots into every table `sDataSourceClientGetters` lists
-(`include/FileResource.h`), and `GetVabStreamObjMethods` is on that list
+(`include/file_resource.h`), and `GetVabStreamObjMethods` is on that list
 (gFileResourceMethods +0x098). At run time these calls reach the driver.
 
 ## Round 98 (charlie, track 7)
 
-The states are `enum VabStreamLoadState` (include/VabStreamObj.h:
+The states are `enum VabStreamLoadState` (include/vab_stream_obj.h:
 `VABSTREAM_LOAD_IDLE` 0, `_HEADER` 1, `_BODY` 6) and the flag is
-`CD_FLAG_LOAD_FILE_DONE` (0x200, the bit CdDriver.c's CD driver sets
+`CD_FLAG_LOAD_FILE_DONE` (0x200, the bit cd_driver.c's CD driver sets
 when a load finishes); the path buffer is `VAB_PATH_SIZE` (32). Byte-exact.

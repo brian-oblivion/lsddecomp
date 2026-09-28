@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C008` on 2026-09-23 (tools/rename.py). Address 0x8003c008.
 
-**Unit:** Task · **Size:** 69 words · **Status:** MATCHED (69/69)
+**Unit:** task · **Size:** 69 words · **Status:** MATCHED (69/69)
 
 ## Summary
 
@@ -51,7 +51,7 @@ This function is what triggered the retype documented in
 `self->unk80` were modeled as plain `s32` there (no counter-evidence at the
 time — they were just call results). Here, all three are dereferenced as
 `field->methods->slot04(field)` — impossible for a plain integer. Retyped
-all three to `StreamTaskUnkB4Obj *` in `include/Task.h`; this changes
+all three to `StreamTaskUnkB4Obj *` in `include/task.h`; this changes
 no compiled bytes anywhere (same register width, pure pointer/int
 relabeling) and a full rebuild confirmed every one of this round's nine
 prior matches (`StreamTask__OnPadConfirm` through `TaskCore__TaskCore`) is still
@@ -109,10 +109,10 @@ dtor at the same slot. Same `Class__Destroy` convention as
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from TaskCoreObj__Destroy (tools/rename.py). Occupant of +0x00C (`finalize`), named for the slot: releases bgLayer, tileMap, tileAtlas, `sound` when the ctor made it and `subHandle` when owned, runs releaseTarget, then IntermediateBase's finalize. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from TaskCoreObj__Destroy (tools/rename.py). Occupant of +0x00C (`finalize`), named for the slot: releases bgLayer, tileMap, tileAtlas, `sound` when the ctor made it and `subHandle` when owned, runs releaseTarget, then IntermediateBase's finalize. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-bgLayer is a `BgLayer *` (include/BgLayer.h, was `BasicClass *`); `release` is the same inherited +0x004 slot. Source unchanged, byte-identical.
+bgLayer is a `BgLayer *` (include/bg_layer.h, was `BasicClass *`); `release` is the same inherited +0x004 slot. Source unchanged, byte-identical.
 
-Later the same round (alpha, third class): TaskCore::tileAtlas (+0x080) is `struct TileAtlas *` (include/TileAtlas.h, was `BasicClass *`); its release is BasicClass's +0x004 slot, inherited unchanged by TileAtlasMethods. Byte-identical.
+Later the same round (alpha, third class): TaskCore::tileAtlas (+0x080) is `struct TileAtlas *` (include/tile_atlas.h, was `BasicClass *`); its release is BasicClass's +0x004 slot, inherited unchanged by TileAtlasMethods. Byte-identical.

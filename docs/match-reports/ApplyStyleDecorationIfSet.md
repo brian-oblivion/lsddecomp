@@ -2,7 +2,7 @@
 
 > Renamed from `func_80054660` on 2026-09-23 (tools/rename.py). Address 0x80054660.
 
-Unit `ObjMStyleActor`. **45/45 words, byte-exact.** Reopened, never attempted
+Unit `dream_scene`. **45/45 words, byte-exact.** Reopened, never attempted
 before this round.
 
 ## What it does
@@ -10,7 +10,7 @@ before this round.
 Takes no arguments; gated entirely on the global `sStyleDecorColor` (set by
 `ApplyStyleConfig`, matched earlier this round). If it's non-NULL: builds an
 object via `New_BoxFill(&sStyleDecorBoxSize, sStyleDecorColor, 0)` (already known
-elsewhere as returning `ClassEAC0Obj *` from `include/Task.h`, a header
+elsewhere as returning `ClassEAC0Obj *` from `include/task.h`, a header
 this unit doesn't own -- see below), stashes it in `sStyleDecorObj`, and
 dispatches three method calls on it (`slot64(obj,1)`, `slot68(obj,0)`,
 `slot4C(obj,tmp,&sStyleDecorBoxPos)`) plus one call on a completely different
@@ -19,7 +19,7 @@ feeds the `slot4C` call's middle argument).
 
 ```c
 /* Local view only -- New_BoxFill already returns `ClassEAC0Obj *` per
- * include/Task.h, a header owned by a different unit. This function
+ * include/task.h, a header owned by a different unit. This function
  * only ever reaches slots 0x4C/0x64/0x68, so it gets its own minimal local
  * type instead of pulling that header in. */
 typedef struct LocalM4D0Obj LocalM4D0Obj;
@@ -130,7 +130,7 @@ logic, only a different way of naming the same values.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-sStyleDecorObj is a BoxFill (include/BoxFill.h); the deleted `LocalM4D0Obj` view's slots are setSemiTrans (+0x064, 1), setSemiTransRate (+0x068, 0) and attachToParent (+0x04C, cast to BoxFillAttachToParentFn). Zero bytes.
+sStyleDecorObj is a BoxFill (include/box_fill.h); the deleted `LocalM4D0Obj` view's slots are setSemiTrans (+0x064, 1), setSemiTransRate (+0x068, 0) and attachToParent (+0x04C, cast to BoxFillAttachToParentFn). Zero bytes.
 
 ## Track 6 (2026-09-27, round 96, charlie)
 
@@ -141,18 +141,18 @@ Zero bytes (whole-image SHA1 green, 0 new typeview warnings).
 
 Evidence: `sStyleSceneRefs` (0x8008AC7C, an `s32` in every unit) is
 RegisterStyleConfig's third argument, which ObjM__InitStyleAndWorld
-(ObjMStyleActor) passes as `&self->ctorSound`: it points at ObjM's
-+0x06C..+0x07B block (include/ObjM.h's banner). The holder's +0x00C is
+(dream_scene) passes as `&self->ctorSound`: it points at ObjM's
++0x06C..+0x07B block (include/objm.h's banner). The holder's +0x00C is
 therefore ObjM::cachedViewport, a NodeGuardedViewport, and +0x0AC of its
-table is Viewport's `getFadeBox` (include/Viewport.h, `SceneNode *(*)(Self *)`)
--- ObjM.h's banner already said so. ObjMStyleActor.c had the same block as
+table is Viewport's `getFadeBox` (include/viewport.h, `SceneNode *(*)(Self *)`)
+-- objm.h's banner already said so. dream_scene.c had the same block as
 `StyleSceneRefs {sound, dreamerTmd, etcTim, Viewport *viewport}`; this unit
 now carries the identical view (`typeviews.py --merge StyleSceneRefs`: 2
 views, 0x10, 0 conflicts). Tier A for the type (it names what the pointer
-is, established from the one writer); the name is ObjMStyleActor's, not new.
+is, established from the one writer); the name is dream_scene's, not new.
 
 Not applied (outside the edit set): hoisting `StyleSceneRefs` into one
-shared header (ObjM.h, beside the block it views) and dropping both unit
+shared header (objm.h, beside the block it views) and dropping both unit
 copies; retyping the `sStyleSceneRefs` global from `s32` to
 `StyleSceneRefs *` (track 4b, it would remove every cast in _m and _n).
 
@@ -163,11 +163,11 @@ copies; retyping the `sStyleSceneRefs` global from `s32` to
 | `D_8008AB58` | `sStyleDecorBoxPos` | A | (-100, -100), the box's attachToParent position; now declared `BoxFillPos`, no cast (Viewport places its own fade box there) |
 | `D_8008AB60` | `sStyleDecorBoxSize` | A | (320, 240), New_BoxFill's size pair; now `s32[2]` |
 
-The colour goes in as `(BoxFillRgb *)sStyleDecorColor` (BoxFill.h's
+The colour goes in as `(BoxFillRgb *)sStyleDecorColor` (box_fill.h's
 record, this round) instead of `(void *)`. Zero bytes. The comment "(track
 4b's to retype)" on sStyleDecorObj is gone; the declaration says it holds
 a BoxFill *.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

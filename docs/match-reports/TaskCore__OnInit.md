@@ -7,7 +7,7 @@
 > **Type rename note (round 73, track 3):** every `TaskCoreObjMethods` /
 > `TaskCoreObj` below (the type this function's own body split off from
 > `TaskCoreMethods`) was renamed to `StreamTaskUnk18Methods` /
-> `StreamTaskUnk18Obj` in `include/Task.h` -- `TaskCoreObj` was doing
+> `StreamTaskUnk18Obj` in `include/task.h` -- `TaskCoreObj` was doing
 > double duty for two unrelated classes (this one, and New_TaskCore's own
 > 0xA4-byte allocation), and freeing the name for the latter matches the
 > `StreamTaskUnkNNObj` convention already used for this class's other private
@@ -15,7 +15,7 @@
 > `tools/rename.py` since C type names carry no address for it to resolve.
 > The text below is left as originally written for the history.
 
-**Unit:** Task · **Size:** 102 words · **Status:** MATCHED (102/102)
+**Unit:** task · **Size:** 102 words · **Status:** MATCHED (102/102)
 
 This occupies `TaskCoreMethods`'s (`gTaskCoreMethods`) own slot `+0x04C` (per
 `classtable.py gTaskCoreMethods`, and confirmed by `StreamTask__OnInit`'s own
@@ -72,7 +72,7 @@ function -- and it is unambiguously single-argument (confirmed by
 `StreamTask__OnInit`'s already byte-exact call). A vtable slot's signature has to
 agree across every instance of one class; a genuine arity conflict at a
 shared offset is proof `self->unk18` is a sibling class, not the same one.
-Split into a new `TaskCoreObjMethods` type (`include/Task.h`), moving
+Split into a new `TaskCoreObjMethods` type (`include/task.h`), moving
 `slot74`/`slot90` out of `TaskCoreMethods` into it and adding the three new
 slots plus `+0x08C`. **Updated `TaskCore__OnDeinit.md`'s "New structure
 discovered" section with a correction note** rather than rewriting it.
@@ -154,21 +154,21 @@ verb covers what the function accomplishes as a whole, so left
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from TaskCoreObj__func_8003C238 (tools/rename.py). Occupant of +0x04C (`onInit`, the call IntermediateBase__Init makes after adding the children), named for the slot. IntermediateBase types the slot (self, s32, s32, s32) from that call; this occupant takes self alone. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from TaskCoreObj__func_8003C238 (tools/rename.py). Occupant of +0x04C (`onInit`, the call IntermediateBase__Init makes after adding the children), named for the slot. IntermediateBase types the slot (self, s32, s32, s32) from that call; this occupant takes self alone. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-The viewport is cast to `Viewport *` (include/Viewport.h, round 85) instead of the local StreamTaskUnk18Obj view, and its slots are called by name: +0x048 setOtLength (unk28), +0x04C setUnk44 (unk2C), +0x050 setUnk48 (unk30), +0x070 attachViewChild (unk14, &sTaskCoreViewOrigin twice, NULL twist), +0x08C initOt. sTaskCoreViewOrigin is a zero LongVec3. Byte-identical.
+The viewport is cast to `Viewport *` (include/viewport.h, round 85) instead of the local StreamTaskUnk18Obj view, and its slots are called by name: +0x048 setOtLength (unk28), +0x04C setUnk44 (unk2C), +0x050 setUnk48 (unk30), +0x070 attachViewChild (unk14, &sTaskCoreViewOrigin twice, NULL twist), +0x08C initOt. sTaskCoreViewOrigin is a zero LongVec3. Byte-identical.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj casts are gone, and the two calls are by slot name, `attachToParent(bgLayer, (SceneNode *)unk14, NULL)` (+0x04C, SceneNode's; returns SceneNode *, discarded, where the view said void) and `setColor(bgLayer, 1, (BgLayerRgb *)baseColor)` (+0x0B8). Byte-identical.
+bgLayer is a `BgLayer *` (include/bg_layer.h): the StreamTaskUnk78Obj casts are gone, and the two calls are by slot name, `attachToParent(bgLayer, (SceneNode *)unk14, NULL)` (+0x04C, SceneNode's; returns SceneNode *, discarded, where the view said void) and `setColor(bgLayer, 1, (BgLayerRgb *)baseColor)` (+0x0B8). Byte-identical.
 
 ## Track 7 (2026-09-27, round 99, alpha)
 
 - `TaskTextObj`/`TaskTextMethods`, this unit's local view of
   `initArgs->drawSystem`, is retired: its only slot, `+0x078 slot78`, is
-  `DrawSystem::clearImage(self, color, rect)` (include/DrawSystem.h), which
+  `DrawSystem::clearImage(self, color, rect)` (include/draw_system.h), which
   TitleMenu__OnDeinit already calls through `DrawSystem *`. The calls now cast
   to `DrawSystem *`; byte-identical. The two clears are therefore: the
   default movie frame (`&sDefaultMovieFrame`, a DrawRect
@@ -195,16 +195,16 @@ bgLayer is a `BgLayer *` (include/BgLayer.h): the StreamTaskUnk78Obj casts are g
 
 ## Proposed field names
 
-Accessors outside Task (the compiler's error list), so for the head
+Accessors outside task (the compiler's error list), so for the head
 to apply by type scope:
 
 - IntermediateBase `+0x014 unk14` -> `lightRig`: its own comment says it is
   `initArgs->lightRig` or init's `New_LightRig()`; this function hangs the
   BgLayer and the slot widgets under it and attaches the view to it.
-  Accessors: Task.c, TitleMenuTaskObjF.c, ObjMStyleActor.c, class_3bb8c_m.c.
+  Accessors: task.c, title_menu.c, dream_scene.c, class_3bb8c_m.c.
 - TaskCore `+0x02C unk2C` -> `packetCount` (tier B, TaskCore__Reset's
-  report): handed to the viewport's `setUnk44`. Accessors: Task.c,
-  TitleMenuTaskObjF.c (TitleMenu__Reset), ObjMStyleActor.c (GraphRoom__Reset).
+  report): handed to the viewport's `setUnk44`. Accessors: task.c,
+  title_menu.c (TitleMenu__Reset), dream_scene.c (GraphRoom__Reset).
   Viewport's own `unk44`/`unk48` and `setUnk44`/`setUnk48` would follow as
   `packetCount`/`packetSize`.
 
@@ -215,6 +215,6 @@ to apply by type scope:
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-TaskCore fields renamed (include/TaskCore.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.
+TaskCore fields renamed (include/task_core.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.
 
-The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

@@ -8,7 +8,7 @@
 
 > Renamed from `func_8004A3EC` on 2026-09-23 (tools/rename.py). Address 0x8004a3ec.
 
-**Unit:** DayTaskStageMap · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED (27/27 words)
+**Unit:** dream_day · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED (27/27 words)
 
 ## What it does
 
@@ -73,4 +73,4 @@ not a real retail fact.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Renamed from `TimedTask__OnEventArg`, tier A: it occupies +0x060, IntermediateBase's `setState` slot (IntermediateBase__SetState in the parent table), and its first call is the base setState with the same argument. For state 4 it also sets `result` (was `eventCode`) = 1 and calls +0x07C, now named `onState4` (NULL in this class's own 0x80-byte table; empty DayTask__OnTimedOut and ObjM__NoOpSlot7C in the subclasses). State 4 is what TimedTask__CheckTimeout raises. Signature `(TimedTask *self, s32 state)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Renamed from `TimedTask__OnEventArg`, tier A: it occupies +0x060, IntermediateBase's `setState` slot (IntermediateBase__SetState in the parent table), and its first call is the base setState with the same argument. For state 4 it also sets `result` (was `eventCode`) = 1 and calls +0x07C, now named `onState4` (NULL in this class's own 0x80-byte table; empty DayTask__OnTimedOut and ObjM__NoOpSlot7C in the subclasses). State 4 is what TimedTask__CheckTimeout raises. Signature `(TimedTask *self, s32 state)`. Image byte-identical.

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8002677C` on 2026-09-24 (tools/rename.py). Address 0x8002677c.
 
-**Unit:** GameApplicationFileResource · **Size:** 97 instructions (0x184 bytes) · **Status:** MATCHED (97/97 words, whole-image SHA1 green)
+**Unit:** game_shell · **Size:** 97 instructions (0x184 bytes) · **Status:** MATCHED (97/97 words, whole-image SHA1 green)
 
 ## What it does
 
@@ -103,7 +103,7 @@ void GameApplication__PlayCinematic(GameApplication *self) {
 
 ## New struct/header knowledge
 
-`include/GameApplication.h`: `SetActiveDataSourceDriverMode`'s extern retyped from `void` to
+`include/game_application.h`: `SetActiveDataSourceDriverMode`'s extern retyped from `void` to
 `s32` (it does return a meaningful value -- whatever its internal dispatch
 loop last produced -- confirmed here even though this call site, like
 `GameApplication__ShowIntroLogos`/`GameApplication__PlayOpeningMovie`, discards it). Added `GetSpecialDayOrEventRecord`
@@ -151,7 +151,7 @@ shared by this unit's other four StreamTask launchers.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-The task these functions build with New_TaskCore is a plain TaskCore (include/TaskCore.h, track 4 round 84); GameApplication.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.
+The task these functions build with New_TaskCore is a plain TaskCore (include/task_core.h, track 4 round 84); game_application.h's LoaderTask view is gone and the calls use TaskCore's slot names (setCallback, setFrameBound, setSubHandle, init, release). The old `start` slot at +0x004 is BasicClass's release, and StreamTask's own +0x004 is typed `void *(*release)` too: with one void and one value-returning, StartCinematicStream's two branches stopped cross-jumping into one call (+6 instructions). Byte-identical.
 
 ## Track 7 polish (round 100, echo)
 
@@ -159,7 +159,7 @@ The task these functions build with New_TaskCore is a plain TaskCore (include/Ta
 
 **`GameApplication__PlayCinematic` -- tier B** (renamed from `GameApplication__StartCinematicStream` with tools/rename.py). Evidence: resolves DreamSys's getCinematic pair with GetSpecialDayOrEventRecord: a movie (movie id != -1) is streamed, gated by config->playStreams, with no skip on confirm; a special day's TIM image (movie id -1) is shown by a TaskCore for 10 seconds (setFrameBound(10), TASKCORE_FRAMES_PER_SECOND). Tier B: "cinematic" is DreamSys's slot name, and what the pair selects in the game is not established (GetSpecialDayOrEventRecord.md).
 
-Body changes, all byte-identical: chanBuf {s32 chan; u32 unk04, unk08} -> idBuf {s32 movieId; u8 pad04[8]} (MATCHING: 12 bytes, the read word first); groupId/lookup -> path/frameCount; GetSpecialDayOrEventRecord's extern returns const char * (the record, used as a path by both branches). The old reading ("channel index", a "no cinematic" fallback path, SetActiveDataSourceDriverMode's return "kept") is in the history section below: the value kept across SetActiveDataSourceDriverMode is GetSpecialDayOrEventRecord's return, and SetActiveDataSourceDriverMode returns void (GameApplicationFileResource.c).
+Body changes, all byte-identical: chanBuf {s32 chan; u32 unk04, unk08} -> idBuf {s32 movieId; u8 pad04[8]} (MATCHING: 12 bytes, the read word first); groupId/lookup -> path/frameCount; GetSpecialDayOrEventRecord's extern returns const char * (the record, used as a path by both branches). The old reading ("channel index", a "no cinematic" fallback path, SetActiveDataSourceDriverMode's return "kept") is in the history section below: the value kept across SetActiveDataSourceDriverMode is GetSpecialDayOrEventRecord's return, and SetActiveDataSourceDriverMode returns void (game_shell.c).
 
 ### History: code_1677c.c comments before the round-100 polish
 
@@ -186,10 +186,10 @@ extern s32 GetSpecialDayOrEventRecord(s32 *out, s32 packedBankEntry); /* psyq_me
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in GameApplicationFileResource.c are gone. Byte-identical.
+`StreamTask::streamName`, StreamTask__Init's parameter and StreamTaskInitFn's are `const char *` (were `s32`): every caller passes a path (GetAsmkMovie's string or a FilePathRecord), so the five `(s32)` casts in game_shell.c are gone. Byte-identical.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GetSpecialDayOrEventRecord is now prototyped in include/GameFiles.h with the definition's `(s32 *movieIdOut, CinematicCall pick)`, and PlayCinematic passes `cc` directly instead of packing bank | entry << 16 by hand. cc1 passes the 4-byte struct in $a1 with the same lhu/sll/or the hand packing wrote, so the only change was the frame: the 12-byte `idBuf` struct (movieId plus 8 bytes of pad) had been sized to match the frame the packing produced, and with the struct passed directly a plain `s32 movieId` gives retail's 0x40 frame. Byte-identical (97/97, whole image green).
+GetSpecialDayOrEventRecord is now prototyped in include/game_files.h with the definition's `(s32 *movieIdOut, CinematicCall pick)`, and PlayCinematic passes `cc` directly instead of packing bank | entry << 16 by hand. cc1 passes the 4-byte struct in $a1 with the same lhu/sll/or the hand packing wrote, so the only change was the frame: the 12-byte `idBuf` struct (movieId plus 8 bytes of pad) had been sized to match the frame the packing produced, and with the struct passed directly a plain `s32 movieId` gives retail's 0x40 frame. Byte-identical (97/97, whole image green).
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into CdDriver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes CdDriver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

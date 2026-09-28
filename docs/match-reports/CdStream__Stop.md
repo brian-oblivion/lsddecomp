@@ -4,7 +4,7 @@
 
 > Renamed from `func_800474C8` on 2026-09-25 (tools/rename.py). Address 0x800474c8.
 
-Round 82, runner delta (second session). Unit `src/cd/CdStream.c`. Fresh
+Round 82, runner delta (second session). Unit `src/cd/cd_stream.c`. Fresh
 ground, no prior attempt. Byte-exact on the first build; whole-image SHA1
 green.
 
@@ -39,6 +39,6 @@ void CdStream__Stop(CdStreamObj *self) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `CdStream` (include/CdStream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
+Class unified as `CdStream` (include/cd_stream.h; table gCdStreamObjMethods -> gCdStreamMethods, type CdStreamObj -> CdStream, the Obj suffix dropped per FINISHING-PLAN track 4 step 2). The unit's local view is gone; slots +0x044 open, +0x050 startRead and +0x06C getNextFrame are typed from their occupants, and the object's +0x00C `seekLoc[0x18]` is the CdlFILE `file` (CdStreamFile) that CdSearchFile fills. Zero bytes changed.
 
 Renamed from CdStreamObj__Stop (tools/rename.py), the class rename only.

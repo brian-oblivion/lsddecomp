@@ -4,7 +4,7 @@
 
 > Renamed from `func_80056D18` on 2026-09-23 (tools/rename.py). Address 0x80056d18.
 
-**Unit:** ObjMStyleActor · **Round:** 44 (2026-09-15)
+**Unit:** dream_scene · **Round:** 44 (2026-09-15)
 
 ## Provenance
 
@@ -16,7 +16,7 @@ finding and undoing a self-inflicted whole-image size regression (below).
 ## What it is
 
 Populates all 5 slots of `self->arr84` (already known from
-`ObjMStyleActor.c`'s `LinkOwnerObj::arr84`) with freshly-allocated nodes via
+`dream_scene.c`'s `LinkOwnerObj::arr84`) with freshly-allocated nodes via
 `New_VariantSprite`, wires each one to `self` through `slot4C`, forwards
 `self->unk74` through `slotB8`, and — only when the caller passed a non-NULL
 `tbl` — also calls each new node's `slot48` with it.
@@ -63,14 +63,14 @@ Per CLAUDE.md's own recipe for exactly this signature (`cmp -l` +
 cmp -l build/SLPS_015.56 disk/SLPS_015.56 | head
 #  8073 304 270   (1-based; vram = (8073-1) - 0x800 + 0x80010000 = 0x80011788)
 grep -n 80011788 build/lsdde.map
-#  .rodata  0x80011788  0xe4  build/src/DreamSys.c.o
+#  .rodata  0x80011788  0xe4  build/src/dream_sys.c.o
 ```
 
 The build was also 12 bytes (505868 vs 505856) LARGER than retail overall.
 Since `.rodata` links before `.text` project-wide, a 12-byte GROWTH anywhere
 early enough shifts every subsequent address, including unrelated units'
 `.rodata` — which is exactly what the map showed, even though nothing in
-this session touched `DreamSys.c.o` or its rodata. The actual cause was
+this session touched `dream_sys.c.o` or its rodata. The actual cause was
 local: `LinkNode *sn = self;` added ONE extra callee-saved register to
 `StyleEffect__SpawnSprites`'s own prologue (bigger `-0x30` frame vs retail's `-0x28`),
 growing THIS function by exactly 12 bytes/3 words and cascading forward
@@ -105,7 +105,7 @@ merely aliases an existing pointer/value for readability."
 Round 70 (alpha). `func_80056D18` -> `StyleEffect__SpawnSprites`, **tier B**.
 
 Two callers: StyleEffect__BuildRandomSprites (tbl = sSpriteScaleHalf or NULL)
-and ObjMStyleActor.c's StyleEffect__SpawnPlainSprites (tbl = NULL, kind 3). Body:
+and dream_scene.c's StyleEffect__SpawnPlainSprites (tbl = NULL, kind 3). Body:
 five `New_VariantSprite(a2, 0, sStyleEffectTim)` into +0x084, each attachToParent(self,
 no offset), slotB8(self->color), and updateScale(1, tbl) when tbl != NULL.
 
@@ -119,7 +119,7 @@ is the same rotate. The D800879C4 class itself is still unnamed, so B.
 
 ## Track 4 (2026-09-26, round 87)
 
-The sprites' class is unified as VariantSprite (`include/VariantSprite.h`,
+The sprites' class is unified as VariantSprite (`include/variant_sprite.h`,
 formerly `D_800879C4` / `New_D800879C4`). This unit's local
 `extern void *New_D800879C4(void *, void *, void *)` was a view of it and
 is gone; the header's `VariantSprite *New_VariantSprite(s32 variant, void *arg2,
@@ -129,7 +129,7 @@ the `(void *)` cast and the result is cast to this unit's `LinkNode *`
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+dream_scene.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/style_effect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
 
 ## Track 6 (round 93, bravo)
 

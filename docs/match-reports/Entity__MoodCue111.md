@@ -600,7 +600,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 7 (2026-09-26, round 94, alpha)
 
-- `getDreamColor(...) == 5` is `DREAM_COLOR_PINK` (`include/DreamSys.h`'s
+- `getDreamColor(...) == 5` is `DREAM_COLOR_PINK` (`include/dream_sys.h`'s
   `DreamColors`, the slot's return type); the three `-2` programs are
   `SOUND_CUE_STOP`.
 - The two `(u32)(moodTimer - a) < n` tests are written as ordinary ranges,

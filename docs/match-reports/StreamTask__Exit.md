@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003BDF4` on 2026-09-23 (tools/rename.py). Address 0x8003bdf4.
 
-**Unit:** Task · **Size:** 26 words · **Status:** MATCHED (26/26)
+**Unit:** task · **Size:** 26 words · **Status:** MATCHED (26/26)
 
 ## Summary
 
@@ -52,12 +52,12 @@ left `Class__func_xxxxx`.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-StreamTaskObj now expands TASKCORE_SLOTS (include/TaskCore.h, round 84): its `slot60` call is `setState`. Byte-identical.
+StreamTaskObj now expands TASKCORE_SLOTS (include/task_core.h, round 84): its `slot60` call is `setState`. Byte-identical.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BDF4. Occupies +0x094 refreshViewValue (reached from setState(0x12)). `abortBeforeFade` set: MoviePlayer__Abort at once; clear: setState(7), and SetState's case 8 aborts after the fade.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BDF4. Occupies +0x094 refreshViewValue (reached from setState(0x12)). `abortBeforeFade` set: MoviePlayer__Abort at once; clear: setState(7), and SetState's case 8 aborts after the fade.
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4Obj view is gone and Task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The +0x04C call is `abort`. Byte-identical.
+The player is a MoviePlayer (`include/movie_player.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in stream_task.h) to `MoviePlayer *`. The +0x04C call is `abort`. Byte-identical.

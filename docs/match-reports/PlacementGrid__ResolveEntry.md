@@ -6,7 +6,7 @@
 
 REVISITED, round 76: MATCHED 76/76 byte-exact (from 54/76) by the argument-count lever -- slot80 takes four arguments; names/types used (the unit's own Ctx278/Obj278/Entry278, slot80 retyped)
 
-**Unit:** PlacementGridVabSound · **Size:** 76 instructions (0x130 bytes) ·
+**Unit:** vab_sound · **Size:** 76 instructions (0x130 bytes) ·
 **Status: MATCHED**, round 76 (runner bravo). `./build-and-verify.sh`
 green (SHA1 OK), `tools/check-nonmatching.sh` green. The round-73
 `#ifdef NON_MATCHING` block is gone: the live C replaces it.
@@ -110,7 +110,7 @@ s32 PlacementGrid__ResolveEntry(Ctx278 *ctx, Obj278 *self, s32 index)
 }
 ```
 
-`Ctx278SubMethods` is local to `src/sound/PlacementGridVabSound.c` (no other unit or
+`Ctx278SubMethods` is local to `src/sound/vab_sound.c` (no other unit or
 header names it), so the retype touches no other caller. Which class
 `ctx->unk2C` is, and so which function slot 0x80 resolves to, was not
 established; the four-argument signature is measured from this call
@@ -250,7 +250,7 @@ process:
 #endif
 ```
 
-**The struct definitions above ARE kept live in `src/sound/PlacementGridVabSound.c`**
+**The struct definitions above ARE kept live in `src/sound/vab_sound.c`**
 (not only in this report) -- they compile cleanly as unused types with
 the function itself restored to `INCLUDE_ASM`, per this project's
 established precedent (see e.g. `ChunkLoadEntry`/`ChunkLoadEntryTail` in
@@ -322,7 +322,7 @@ unit (pure scheduling, not register identity) but was not chased further
 > (`libc2/strcmp.o`, `libc2/strncmp.o`), reclassified as linked SDK objects
 > in round 34. They were never game stalls, so **no source shape ever
 > reached those bytes** and there is no residue class to be "the same as".
-> `src/sound/PlacementGridVabSound.c`'s own header comment records the reclassification.
+> `src/sound/vab_sound.c`'s own header comment records the reclassification.
 > The scheduling observation about THIS function's `sw $ra` stands on its
 > own measurement; only the appeal to those two as precedent is void.
 given the larger, register-identity residue makes the function
@@ -433,7 +433,7 @@ change kept in `src/`.**
 ## Round 31 update (runner echo) — reconfirmed, no new attempt
 
 Lowest-priority item in this round's assignment. Rebuilt the exact
-preserved body (spliced into `src/sound/PlacementGridVabSound.c` via `#if 1`/`#else
+preserved body (spliced into `src/sound/vab_sound.c` via `#if 1`/`#else
 INCLUDE_ASM`/`#endif`, then reverted) and reconfirmed **11/76**, no drift
 (compiled length matches retail's 76 words exactly, consistent with this
 being a pure register-allocation-order residue, not a length gap).
@@ -468,7 +468,7 @@ alone; names/types not relevant.**
 On the revisit hypothesis specifically: this unit's own types and names
 (`Entry278`, `Obj278`, `Ctx278`, `Ctx278Sub`) were authored BY this
 function's own earlier attempts and were already live in
-`src/sound/PlacementGridVabSound.c`, so there was nothing newer to import; the unit's
+`src/sound/vab_sound.c`, so there was nothing newer to import; the unit's
 other matched functions (`New_PlacementGrid`, `PlacementGrid__PlacementGrid`,
 `PlacementGrid__Finalize`, `PlacementGrid__OnRequestDone`) touch a different object family
 (`Obj6D940`/`Table6D940`) and share no field with this one. **Nothing in
@@ -667,7 +667,7 @@ Both build. Neither is kept in `src/` — `INCLUDE_ASM` is restored.
 **(A) Highest scoring: 54/76, length EXACT, 0 insertions / 0 deletions.**
 Carries the alias `p`, which is a probe rather than plausible 1998 source
 (retail has two long-lived pointers, this has three). Every declaration it
-needs is in `src/sound/PlacementGridVabSound.c` already (`Entry278`, `Obj278`, `Ctx278`,
+needs is in `src/sound/vab_sound.c` already (`Entry278`, `Obj278`, `Ctx278`,
 `Ctx278Sub`, `Ctx278SubMethods`); drop it in place of the `INCLUDE_ASM`.
 
 ```c
@@ -718,7 +718,7 @@ body to read to understand the function, and the right base for a
 changes the image length, so it must never be live.
 
 **Round 73 (runner echo): this is the body promoted into
-`src/sound/PlacementGridVabSound.c`'s `#ifdef NON_MATCHING` block.** (A)'s alias `p` is a
+`src/sound/vab_sound.c`'s `#ifdef NON_MATCHING` block.** (A)'s alias `p` is a
 probe, not plausible 1998 source (retail has two long-lived pointers,
 that body has three) — exactly what track 1b's "written for the reader"
 rule excludes, and the report itself names (B) as the right base for this
@@ -812,7 +812,7 @@ unique extension beyond FileResource's base layout, confirmed by
 grid-cell-shaped index (cached byte offset, or fresh `index*12+8` lookup),
 and when present computes position-like fields on a 0x800/0x400 lattice
 with row stride 20 before forwarding to `ctx->unk2C->methods->slot80`.
-That lattice/stride matches `DayTaskStageMap.c`'s own header comment for
+That lattice/stride matches `dream_day.c`'s own header comment for
 `StageMap`'s 20-column grid verbatim ("seeds every cell with a world
 position on a 0x800 lattice") -- a real lead for a future round, not
 claimed as proof here, since nothing in this unit confirms `ctx`/`self`
@@ -825,12 +825,12 @@ built and scored).
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Retyped, byte-identical, with the class unified in `include/PlacementGrid.h`. `Ctx278` was the PlacementGrid object itself: this is slot +0x078 of gPlacementGridMethods (`classtable.py gPlacementGridMethods --vs gFileResourceMethods`), called only by StageMap__PopulateSlotCells as `target->methods->slot78(target, &outBuf, i)` on the object New_PlacementGrid built. So `unk10` is FileResource's `buffer` (the caller points it into a loaded resource), `unk2C` is `linkResource` (the caller stores New_LinkResource there), and `Ctx278Sub`'s +0x080 is LinkResource__GetModel (gLinkResourceMethods). `Obj278` is the caller's 0x40-byte stack record, now `CellPlacement` (x/y/z at +0x0C..+0x14 go to the GPU coordinate, rotY +0x1A, `chained` +0x30, `next` +0x34 the offset of the cell's next record, which the caller loops on without advancing the cell); `Entry278` is `PlacementGridRecord`. The cell index splits as row = cell / 20, column = cell % 20, a 20x20 grid of 0x800-unit cells. The four-argument LinkResource call stays: `placement` must be in $a3.
+Retyped, byte-identical, with the class unified in `include/placement_grid.h`. `Ctx278` was the PlacementGrid object itself: this is slot +0x078 of gPlacementGridMethods (`classtable.py gPlacementGridMethods --vs gFileResourceMethods`), called only by StageMap__PopulateSlotCells as `target->methods->slot78(target, &outBuf, i)` on the object New_PlacementGrid built. So `unk10` is FileResource's `buffer` (the caller points it into a loaded resource), `unk2C` is `linkResource` (the caller stores New_LinkResource there), and `Ctx278Sub`'s +0x080 is LinkResource__GetModel (gLinkResourceMethods). `Obj278` is the caller's 0x40-byte stack record, now `CellPlacement` (x/y/z at +0x0C..+0x14 go to the GPU coordinate, rotY +0x1A, `chained` +0x30, `next` +0x34 the offset of the cell's next record, which the caller loops on without advancing the cell); `Entry278` is `PlacementGridRecord`. The cell index splits as row = cell / 20, column = cell % 20, a 20x20 grid of 0x800-unit cells. The four-argument LinkResource call stays: `placement` must be in $a3.
 
 ## Track 4 (LinkResource)
 
 2026-09-26, round 89 (delta): LinkResource is unified in
-`include/LinkResource.h`, and PlacementGrid's `linkResource` is now
+`include/link_resource.h`, and PlacementGrid's `linkResource` is now
 `struct LinkResource *`. The unit-local `LinkResourceView_179d8_d` is gone:
 the call reaches `link->methods->getModel` (+0x080, occupant
 LinkResource__GetModel(self, index)) through `PlacementGridGetModelFn`, a
@@ -845,7 +845,7 @@ whole family: object, `Class6D940Methods`, the getter, constructors,
 methods, `Class6D940Record` -> `PlacementGridRecord`,
 `Class6D940ResolveEntryFn` -> `PlacementGridResolveEntryFn`,
 `Class6D940GetModelFn` -> `PlacementGridGetModelFn`, the header
-`include/Class6D940.h` -> `include/PlacementGrid.h`), then
+`include/Class6D940.h` -> `include/placement_grid.h`), then
 `python3 tools/rename.py D_8006D940 gPlacementGridMethods` (the table,
 g<Class>Methods) and
 `python3 tools/renametype.py PlacementGridPlacement CellPlacement --any-stem`
@@ -865,7 +865,7 @@ cell's centre (column/row * 0x800 + 0x400) and returns the model
 linkResource's getModel gives for its index. StageMap__PopulateSlotCells
 points `buffer` at the grid element's LbdFile header block +
 `placementsOffset` (LbdFileHeader's own field name) and puts each result
-into that element's GridCell lattice (20 x 20, 0x800 apart: GridCell.h),
+into that element's GridCell lattice (20 x 20, 0x800 apart: grid_cell.h),
 chained records into the overflow cells. So the class is the placements of
 one grid element's cells. **`CellPlacement`** is ResolveEntry's output, one
 model's placement in one cell. The name says what the records are, not
@@ -877,7 +877,7 @@ stores that in the GridCell's `flags36`, whose bit 0x80 NotifyGridCell tests
 and whose low seven bits DreamSys__NotifyLinkAttempt reads as a voice
 select. Named for where it goes; what the bits mean in the map is not
 established. `CellPlacement.unk2E` -> `cellFlags` is PROPOSED, not applied:
-its reader is in DayTaskStageMap.c. `unk1` / `unk2C` stay: written here, read
+its reader is in dream_day.c. `unk1` / `unk2C` stay: written here, read
 nowhere.
 
 ## Track 7 (round 100, delta)
@@ -890,7 +890,7 @@ Zero-byte rewrite of the live body, whole image green:
   records). 76/76 on the first build. The chained-record access,
   `(u8 *)self->buffer + placement->next`, stays a byte offset: `next` is a
   byte offset stored in the file.
-- Constants from `include/StageMap.h`, whose grid geometry this is: 0x190
+- Constants from `include/stage_map.h`, whose grid geometry this is: 0x190
   is `STAGE_SLOT_LATTICE_CELLS`, 20 is `STAGE_CHUNK_CELLS`, `<< 11` is
   `<< STAGE_CELL_SHIFT`, `+ 0x400` is `+ STAGE_CELL_SIZE / 2` (the cell's
   centre). `rotY << 10` is `rotY * ANGLE_DEG(90)`: GsCOORD2PARAM's rotate

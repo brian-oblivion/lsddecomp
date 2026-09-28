@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004FB04` on 2026-09-20 (tools/rename.py). Address 0x8004fb04.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 56 words (0xE0) · **Status:** MATCH
+**Unit:** title_menu · **Size:** 56 words (0xE0) · **Status:** MATCH
 
 ## What it does
 
@@ -81,6 +81,6 @@ Renamed from `TaskObjF__Notify`: it occupies BasicClass's onNotify slot (+0x038)
 `base`, `mask` -> `kind`. `**(s32 **)arg1` reads
 `((BasicClass *)sender)->methods->header`, the class id. The ids are
 written 0x2/0x5/0x10/0x20: Pad's, FrameClock's (matched on the low nibble,
-so subclasses too), TextEntry's and ItemList's (include/Pad.h,
-FrameClock.h, TextEntry.h, ItemList.h banners). No class-id constants exist
+so subclasses too), TextEntry's and ItemList's (include/pad.h,
+frame_clock.h, text_entry.h, item_list.h banners). No class-id constants exist
 yet; proposed. Zero bytes.

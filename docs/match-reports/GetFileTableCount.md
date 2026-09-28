@@ -35,6 +35,6 @@ Round 51 (alpha), FINISHING-PLAN track 3.
 | `func_80027FF0` | `GetFileTableCount` | A |
 
 **Evidence.** Returns `sFileTableCount` (see `SetFileTableCount.md`). Its one
-caller, `GameApplicationFileResource.c`'s `RegisterFileTableEntries`, uses the value as the index of the
+caller, `game_shell.c`'s `RegisterFileTableEntries`, uses the value as the index of the
 first free slot before extending the table -- consistent with a count, not a
 capacity. Tier A by the pure-leaf rule.

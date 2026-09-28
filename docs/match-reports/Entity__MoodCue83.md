@@ -65,6 +65,6 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ### Constants
 
-- `program = -2` is `SOUND_CUE_STOP` (include/SoundCueSet.h: ServiceSoundCueSet stops the slot's voice)
+- `program = -2` is `SOUND_CUE_STOP` (include/sound_cue_set.h: ServiceSoundCueSet stops the slot's voice)
 - `state = 1` after `stopSoundCue` is `ENTITY_STATE_DONE`: nothing in this handler reads `state == 1`, and it is the value Entity__UpdateActivationState and Entity__UpdateSoundCueStart read as "do not reactivate / restart the cue"
 - Every other literal went to decimal (tick counts, TOD frames, distances, VAB programs; no masks): they are this handler's tuning, named by nothing else.

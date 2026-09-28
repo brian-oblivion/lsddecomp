@@ -58,7 +58,7 @@ void StageMap__AddScaleStepToCell(Obj866E8 *self, Unk10ChildObj_3bb8c_b *item) {
   (`void (*slot48)(Unk10ChildObj_3bb8c_b *self, s32 arg1, void *arg2)`),
   resolved from this function and its sibling `StageMap__ResetCellScale`.
 - `Elem::unk10` (`Unk10ChildObj_3bb8c_b **`, +0x010) — same real field
-  `DayTaskStageMap.h`'s independent view already names `unk10`
+  `dream_day.h`'s independent view already names `unk10`
   (`GenericObject **`) on its own `UnkSlotEntry_3ac78` type; both
   descriptions agree on offset and "array of pointers, walked to +0x668".
 - `Obj866E8::unk1E4` (`void *`, +0x1E4) — forwarded opaquely as `slot48`'s
@@ -104,11 +104,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`

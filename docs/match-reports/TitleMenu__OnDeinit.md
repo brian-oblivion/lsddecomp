@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D898` on 2026-09-24 (tools/rename.py). Address 0x8004d898.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__OnDeinit`: 29/29 words match.
 
 ## Source
@@ -84,7 +84,7 @@ all along; `&self->unk93` is TaskCore's `u8 unk93[3]`.
 
 Round 93's lead holds. `initArgs->drawSystem` (IntermediateBaseInitArgs +0x000)
 is the DrawSystem Application__InitSystems passes, and DrawSystem's +0x078 is
-`clearImage(self, u8 *color, DrawRect *rect)` (include/DrawSystem.h). The
+`clearImage(self, u8 *color, DrawRect *rect)` (include/draw_system.h). The
 call's arguments agree: `unk93` is a TaskCore colour triple, and `sDisplayBufferRects`
 is two 0xC-byte DrawRects, `{0, 0, 320, 240}` and `{0, 240, 320, 240}`
 (asm/data/76DC8.data.s), the two display buffers, walked at stride 0xC.
@@ -102,10 +102,10 @@ slot +0x050 and does not call the base).
 
 ## Proposed field names
 
-TaskCore's `unk93` (include/TaskCore.h; Task.c and TaskViewport.c
+TaskCore's `unk93` (include/task_core.h; task.c and TaskViewport.c
 access it) -> `clearColor`: both TaskCore__OnDeinit and this override
 pass it as the colour to the DrawSystem's clear.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-TaskCore fields renamed (include/TaskCore.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.
+TaskCore fields renamed (include/task_core.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.

@@ -18,7 +18,7 @@ recorded:
    (insertions) + 2×100=200 (deletions). NOT 0/0 — real insertions/deletions,
    in principle reachable by source mutation.
 3. **Scaffold-vs-in-tree agreement.** Rebuilt the 99/107 seed body live in
-   `src/app/BMemPMgr.c`, confirmed `funcdiff.py` reproduces the round-45 99/107
+   `src/app/bmem_pmgr.c`, confirmed `funcdiff.py` reproduces the round-45 99/107
    figure exactly with zero out-of-range drift. Then objdumped the
    permuter's `base.o` and diffed it mnemonic-by-mnemonic against
    `build/lsdde.elf`'s linked disassembly for this function: **identical
@@ -37,7 +37,7 @@ they were tested separately before either was trusted:**
 1. Retyping the shared `extern void SetBMemPMgrBusy(s32 val);` declaration in
    this file's copy to `extern volatile unsigned long long SetBMemPMgrBusy(s32
    val);` — a fabricated, incompatible prototype against the function's real
-   definition (`void SetBMemPMgrBusy(s32 val)` in `src/graphics/TmdRenderer.c`). This
+   definition (`void SetBMemPMgrBusy(s32 val)` in `src/graphics/tmd_renderer.c`). This
    is exactly the class of scorer exploitation this round's instructions say
    to reject, so it was **not adopted and not even needed** — see below.
 2. In the second (coalesce-with-next) free-list unlink block, replacing
@@ -115,7 +115,7 @@ This function needed exactly the same three structural levers as its sibling
 reusable project-wide, not one-off:
 
 1. **K&R old-style definition** for the dead second `pool` parameter,
-   against the same unspecified-parameter declaration in `BMemPMgr.h`
+   against the same unspecified-parameter declaration in `bmem_pmgr.h`
    (`extern void *BMemPMgrFree();`, already in place from `BMemPMgrAlloc`'s
    round).
 2. **Reuse an existing pointer's register instead of a fresh local** where
@@ -314,7 +314,7 @@ void *BMemPMgrFree(ptr, pool)
 - **`BMemPMgrAlloc`'s three levers generalize.** All three transferred to
   this sibling function with no modification needed beyond the obvious
   per-function field/variable renaming. Worth treating as the default
-  starting shape for any further `BMemPMgr`/`TmdRenderer` pool-management
+  starting shape for any further `BMemPMgr`/`tmd_renderer` pool-management
   function, not something to re-derive.
 - **When reassigning a pointer variable to a NEW value derived from
   something OTHER than its own old value, capture any field of the OLD
@@ -364,9 +364,9 @@ site passes one argument, and retail emits only `$a0` for it — e.g.
 This is the dead-argument idiom in its ordinary direction: the callee reads a
 register the caller happens to leave loaded.
 
-**Why `include/BMemPMgr.h`'s unprototyped pair must stay unprototyped.** Round
+**Why `include/bmem_pmgr.h`'s unprototyped pair must stay unprototyped.** Round
 45 established this and it re-measures correct. Both functions are DEFINED in
-`src/app/BMemPMgr.c` with old-style (K&R identifier-list) parameter lists, which is
+`src/app/bmem_pmgr.c` with old-style (K&R identifier-list) parameter lists, which is
 the only way to expose the second parameter to their own bodies without
 contradicting either the ~15 external single-argument prototypes or this same
 unit's own later one-argument call sites (`PushBasicClassListNode`'s
@@ -380,7 +380,7 @@ their own call sites correctly, and one describes the definition's translation
 unit correctly. Converging them would break one side or the other.
 
 **Declaration sites changed:** none (no arity anywhere changed).
-`/* arity-ok: ... */` added to the two lines in `include/BMemPMgr.h`. Oracle
+`/* arity-ok: ... */` added to the two lines in `include/bmem_pmgr.h`. Oracle
 green.
 
 ## Naming (round 74)
@@ -388,8 +388,8 @@ green.
 `BMemPMgrFree`, **tier A**: fully derived free-list release (round 46,
 99->107/107 permuter match) -- coalesces with the previous and following
 blocks and re-links the free list, the mirror of `BMemPMgrAlloc`. Called
-across the same wide set of units as `BMemPMgrAlloc` (`ScreenWidgets`,
-`TodActor`, `SceneNode`, `TmdRenderer`, `main`, plus this unit's own
+across the same wide set of units as `BMemPMgrAlloc` (`screen_widgets`,
+`TodActor`, `SceneNode`, `tmd_renderer`, `main`, plus this unit's own
 `RemoveBasicClassListNode`), confirming the general-purpose pool pairing.
 
 ## Polish (round 97, runner delta)
@@ -412,7 +412,7 @@ Zero bytes changed; whole-image SHA1 green after each step.
 - Fields: `freeListStart`/`freeListEnd` -> `freeListTail`/`freeListHead`
   (evidence in BMemPMgrAlloc.md, "Polish").
 
-The constants are defined, with their evidence, in `include/BMemPMgr.h`:
+The constants are defined, with their evidence, in `include/bmem_pmgr.h`:
 `BMEM_SIZE_MASK` 0x0FFFFFFF and `BMEM_FLAG_MASK` 0xF0000000 split
 `sizeAndFlags`; `BMEM_FREE` 0x40000000 is set on every block put on the free
 list (SetupBMemPMgrFreeList, BMemPMgrFree, the split remainder) and cleared

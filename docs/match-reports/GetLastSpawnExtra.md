@@ -30,7 +30,7 @@ s32 GetLastSpawnExtra(void)
 ```
 
 `sStaircaseSpawns`, `sLinkDstStage`, `sLinkSpawnIndex` were all already declared in
-`include/DreamSys.h`. Updated the stale header comment on the
+`include/dream_sys.h`. Updated the stale header comment on the
 `extern s32 GetLastSpawnExtra(void);` prototype (used to type its still-
 `INCLUDE_ASM` caller `DreamSys__TryStaircaseLink`, same unit) from "blocked by both
 gp-relative and addiu_at" to MATCHED.

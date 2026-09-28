@@ -34,7 +34,7 @@ this read as scheduling for 59 rounds and why ~94,000 permuter iterations
 could not find it (a permuter never changes a function's parameter list or
 a call's arity).
 
-The shared `FadeBoxMethods::configure` slot (`include/Task.h`) is
+The shared `FadeBoxMethods::configure` slot (`include/task.h`) is
 NOT retyped: the call goes through a file-local
 `typedef s32 (*Configure6E99CFn)(FadeBoxObj *, s32, s32, s32)` cast, per
 3f's "prefer a LOCAL function-pointer view over retyping a shared slot". A
@@ -168,7 +168,7 @@ boundary).
 > a finding about `setup-permuter.sh`'s own behaviour, which is a property
 > of the TOOL and not of whose code it was pointed at.
 
-Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::startFadeToIndex` (`+0x0D4`).
+Unit `screen_widgets`, carved round 14. `FadeBoxMethods::startFadeToIndex` (`+0x0D4`).
 
 **Correction to an earlier version of this report**, which claimed a full
 35/35 match under the stale-build window described in `New_FadeBox.md`
@@ -246,7 +246,7 @@ class rather than two coincidences; see that function's own report.
 
 NON_MATCHING body promoted, round 59. The exact preserved body above (29/35
 words, length exact, instruction-scheduling residue on the `li $a1,1`
-materialization) is now live in `src/ui/ScreenWidgets.c` under `#ifdef
+materialization) is now live in `src/ui/screen_widgets.c` under `#ifdef
 NON_MATCHING`, with the verified build still taking the `#else INCLUDE_ASM`
 branch. `./build-and-verify.sh` and `tools/check-nonmatching.sh` both green.
 

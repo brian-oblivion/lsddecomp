@@ -6,7 +6,7 @@
 
 > Renamed from `func_80050730` on 2026-09-23 (tools/rename.py). Address 0x80050730.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TaskObjF__OnItemListResult`: 46/46 words match.
 
 ## Source
@@ -33,7 +33,7 @@ First attempt, byte-exact. Same two-value `switch` layout lesson as
 re-deriving): out-of-line case bodies reached by forward `beq`s, which a
 plain `switch` reproduces and an `if`/`else if` chain would not.
 
-This is this unit's last fresh function -- all 12 of `TitleMenuTaskObjF`'s
+This is this unit's last fresh function -- all 12 of `title_menu`'s
 non-blocked functions are now matched.
 
 ## Struct changes (additive, `include/class_3bb8c.h`)
@@ -63,5 +63,5 @@ Renamed from `TaskObjF__OnItemSelected`. Slot +0x0B0, which TaskObjF__OnNotify c
 
 Parameters `arg1`/`arg2` -> `list`/`result`; the cases are
 `ITEMLIST_RESULT_CHOSEN`/`_CANCELLED` (enum ItemListResult, added to
-include/ItemList.h this round), the targets LOAD_WARNING and ABORTED.
+include/item_list.h this round), the targets LOAD_WARNING and ABORTED.
 Image byte-identical.

@@ -6,7 +6,7 @@
 
 > Renamed from `func_800260A4` on 2026-09-24 (tools/rename.py). Address 0x800260a4.
 
-**Unit:** GameApplicationFileResource · **Size:** 25 instructions · **Status:** MATCHED (25/25 words)
+**Unit:** game_shell · **Size:** 25 instructions · **Status:** MATCHED (25/25 words)
 
 ## What it does
 
@@ -41,7 +41,7 @@ jal   SeedAndRandom
 
 `0x1F800000` is the PS-X scratchpad region (data cache used as fast RAM,
 not a hardware register) — some running counter lives there as a plain
-`s32`, read once per call. m2c (`tools/m2ctx.py GameApplicationFileResource --sig 'void
+`s32`, read once per call. m2c (`tools/m2ctx.py game_shell --sig 'void
 GameApplication__SeedRandom(void)' --run`) independently produced the same `% 365`
 reading, confirming the divisor and that GCC reproduces its own magic
 constant without any hand-tuning needed:
@@ -87,7 +87,7 @@ occupies Application's `setScreenDims` slot (+0x040) and its only caller, the
 ctor, passes `self` (in `$a0`), which the body never reads, so the added
 parameter emits nothing (image byte-identical). The slot keeps the
 inherited `setScreenDims` type; the ctor calls it through
-`GameApplicationSeedRandomFn` (`include/GameApplication.h`). The name is kept rather than
+`GameApplicationSeedRandomFn` (`include/game_application.h`). The name is kept rather than
 renamed for the slot: the body seeds the RNG from the day count and does
 nothing a screen-dimensions setter would.
 
@@ -96,7 +96,7 @@ nothing a screen-dimensions setter would.
 Renamed `GameApplication__SetDayFromTickCount` -> `GameApplication__SeedRandom`
 (`tools/rename.py`); its cast type `GameApplicationSetDayFn` ->
 `GameApplicationSeedRandomFn`. **Tier A**, from the body alone now that the
-callee is matched C (src/cd/GameFiles.c): `SeedAndRandom(seed, unused)` is
+callee is matched C (src/cd/game_files.c): `SeedAndRandom(seed, unused)` is
 `if (seed != 0) srand(seed); return rand();`, and this function discards the
 result, so all it does is seed the C library's RNG with the scratchpad word at
 0x1F800000 reduced mod 365. Nothing stores a day, so "SetDay" claimed more than
@@ -107,11 +107,11 @@ It fills Application's +0x040 (setScreenDims) with a self-only signature; the
 ctor calls it once through the cast type, after installing this class's table.
 Application's own ctor called the slot earlier under Application's table, so
 the default screen size is still set. The function comment above the body in
-GameApplicationFileResource.c still says "advances the day cursor": that is track 7's to fix.
+game_shell.c still says "advances the day cursor": that is track 7's to fix.
 
 ## Track 7 polish (round 100, echo)
 
-Body changes, all byte-identical: *(s32 *)0x1F800000 % 365 -> *(s32 *)getScratchAddr(0) % DAYS_PER_YEAR (libetc.h's macro; DreamSys.h); the SeedAndRandom extern returns s32, as defined (GameFiles.c).
+Body changes, all byte-identical: *(s32 *)0x1F800000 % 365 -> *(s32 *)getScratchAddr(0) % DAYS_PER_YEAR (libetc.h's macro; dream_sys.h); the SeedAndRandom extern returns s32, as defined (game_files.c).
 
 ### History: code_1677c.c comments before the round-100 polish
 

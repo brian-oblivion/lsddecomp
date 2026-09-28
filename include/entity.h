@@ -2,19 +2,19 @@
 #define ENTITY_H
 
 #include "common.h"
-#include "TodActor.h"
-#include "FadeBox.h"
-#include "SoundCueSet.h"
+#include "tod_actor.h"
+#include "fade_box.h"
+#include "sound_cue_set.h"
 
 /*
  * Entity -- a TodActor (TOD-animated Actor) driven by a per-mood row of
  * tables (class id 0x1F234, method table gEntityMethods, getter
- * GetEntityMethods): TodActor's one subclass (include/TodActor.h); no
+ * GetEntityMethods): TodActor's one subclass (include/tod_actor.h); no
  * class derives from it. The ctor calls TodActor's first
  * (GetTodActorMethods()->ctor), so the id parent is the ctor-chain
  * parent. Its methods and its MoodCue handlers are in src/world/entity.c. The
  * MoodCue handlers are not in the table: they are
- * the `handler` of gEntityMoodHandlerTable's rows. Spawned by DreamAux
+ * the `handler` of gEntityMoodHandlerTable's rows. Spawned by dream_aux.c
  * (SetDreamAuxWorld, SpawnDreamAuxTriggerEntity).
  *
  * The mood row. New_Entity's first argument is `moodIndex`, which selects a
@@ -24,22 +24,22 @@
  * start/stop pair and updateTargetProximity, then TodActor's update.
  *
  * The peer is the player. attachToParent's (self, peer, companion, parent,
- * offset) is TodActor's; DreamAux passes sDreamAuxWorld as the peer, and
+ * offset) is TodActor's; dream_aux.c passes sDreamAuxWorld as the peer, and
  * the slots Entity calls on `peer` (+0x100, +0x120, +0x1A0, +0x200, +0x21C)
  * lie past the end of TodActor's table: their occupants in
  * gDreamSysMethods are DreamSys__GetLinkCommandFlag,
  * DreamSys__ProjectPointAtDistance, DreamSys__GetCurrentDayAndYear,
  * DreamSys__GetDreamColor and DreamSys__ResetFlashbackList. The units that
- * call it include include/DreamSys.h and cast `peer` (TodActor's field,
+ * call it include include/dream_sys.h and cast `peer` (TodActor's field,
  * typed TodActor *) to DreamSys *. Entity's attachToParent keeps its `parent` argument in
  * Actor's `grid` field (+0x04C).
  *
  * Sound cues. startSoundCue calls InitSoundCueSet on `soundCueSet` with
- * TodActor's `sound` (the ctor's third argument; DreamAux passes
+ * TodActor's `sound` (the ctor's third argument; dream_aux.c passes
  * sDreamAuxSound) as the sound object, itself as the owner and the mood row's
  * handler as the callback, and selects tick callback 'B' in reset
  * (Entity__TickSoundCue, +0x11C), which services the set once per tick. So a
- * MoodCue handler is a SoundCueSet callback (include/SoundCueSet.h):
+ * MoodCue handler is a SoundCueSet callback (include/sound_cue_set.h):
  * ServiceSoundCueSet calls it as (owner, set) with this Entity as the owner,
  * and it requests tones by filling the set's slots.
  *
@@ -52,7 +52,7 @@
  *  - applyTodFrame (+0x134) returns the next frame: Entity__MoodCue91/92
  *    thread todFramePtr through it.
  *  - attachToParent (+0x04C) keeps SceneNode's type; callers of Entity's
- *    occupant cast to TodActorAttachToParentFn (TodActor.h's banner).
+ *    occupant cast to TodActorAttachToParentFn (tod_actor.h's banner).
  *
  * The object is 0x108 bytes (New_Entity); TodActor's fields end at +0x098.
  */
@@ -137,7 +137,7 @@ extern EntityMethods gEntityMethods;
 extern EntityMethods *GetEntityMethods(void); /* returns &gEntityMethods */
 
 /* The object Entity__AttachToParent keeps in Actor's `grid` field (+0x04C)
- * is the grid manager, StageMap (include/StageMap.h; DreamAux passes
+ * is the grid manager, StageMap (include/stage_map.h; dream_aux.c passes
  * sDreamAuxStageMap). Entity/_e/_g call its startScaleRamp (+0x138). */
 
 /* One row of the mood table (16 bytes): New_Entity's moodIndex selects it, and
@@ -196,7 +196,7 @@ enum EntityDeactivateKind {
 
 /* The unit of the mood row's ranges and tolerances, in world units: what
  * Entity__IsNearTarget and Entity__GetProximityRatio scale them by (the
- * grid's cell size, STAGE_CELL_SIZE in StageMap.h, has the same value). */
+ * grid's cell size, STAGE_CELL_SIZE in stage_map.h, has the same value). */
 #define ENTITY_RANGE_SHIFT 11
 #define ENTITY_RANGE_UNIT (1 << ENTITY_RANGE_SHIFT)
 

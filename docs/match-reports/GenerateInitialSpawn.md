@@ -52,11 +52,11 @@ not `lb`. Checked before editing (`grep -rn` across `include/` and `src/`):
 neither field nor array is read anywhere outside this one function, so
 neither is a shared-header hazard in the sense the project's struct-edit
 check exists to catch — no other already-matched function's codegen could
-regress from either change, and no sibling unit includes `DreamSys.h` with
+regress from either change, and no sibling unit includes `dream_sys.h` with
 a second declaration of either name (`headercontention.py`-style check done
 by hand via grep since these are plain externs, not a padded struct).
 
-- **`include/DreamSys.h`: `extern s8 sStageSpawnPointsCount[];` -> `u8`.**
+- **`include/dream_sys.h`: `extern s8 sStageSpawnPointsCount[];` -> `u8`.**
   With `s8`, `count` (an `s32` sign-extended from the array) is not provably
   non-negative to the compiler, so the `for` loop's rotation into a
   do/while needs TWO guards (`beqz`+`blez`) to skip the body when count is
@@ -65,7 +65,7 @@ by hand via grep since these are plain externs, not a padded struct).
   is unsigned. Symptom before the fix: an extra `nop`+`blez` pair (2 words)
   right after the `sStageSpawnPointsCount[stage]` load, plus consequent
   address drift through the rest of the function.
-- **`include/DreamSys.h`: `StageSpawn::adjustment` `s8` -> `u8`.** It indexes
+- **`include/dream_sys.h`: `StageSpawn::adjustment` `s8` -> `u8`.** It indexes
   `sSpawnPosAdjust` (a `struct RelativePos[]`, stride 6). With `s8`, the
   load is `lb`; retail's is `lbu`. Symptom before the fix: right register
   content, wrong sign-extension instruction, at the one spot the value is

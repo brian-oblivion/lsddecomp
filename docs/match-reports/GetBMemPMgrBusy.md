@@ -2,7 +2,7 @@
 
 > Renamed from `func_80018458` on 2026-09-17 (tools/rename.py). Address 0x80018458.
 
-**Unit:** `TmdRenderer` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
+**Unit:** `tmd_renderer` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
 
 ## Verdict correction
 
@@ -22,7 +22,7 @@ s32 GetBMemPMgrBusy(void)
 
 Same global as `SetBMemPMgrBusy` (this unit, matched alongside this one this
 round) — the pool allocator/free critical-section flag. Declaration shared
-via `include/BMemPMgr.h`.
+via `include/bmem_pmgr.h`.
 
 ## Provenance
 
@@ -43,7 +43,7 @@ global it returns is written up once, in
 
 The one thing specific to this half: **this function is what pins the
 semantics**, and it does so from outside this unit. `func_800280EC`
-(`src/cd/CdDriver.c`) calls it and returns early when it is non-zero,
+(`src/cd/cd_driver.c`) calls it and returns early when it is non-zero,
 before touching `VSyncCallback` -- interrupt-time code declining to run
 while the pool allocator is walking its free list. The setter's two call
 sites alone would only have shown a flag being raised and lowered.

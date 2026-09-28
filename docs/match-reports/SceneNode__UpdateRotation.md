@@ -111,7 +111,7 @@ over a small fixed count.
 
 ## Naming
 
-Round 71 (alpha). `func_8001CEB4` -> `SceneNode__UpdateRotation`, **tier A**. Table slot +0x044 (round 70 named the slot `updateRotation`). Converts a ratio triple of degrees (RatioToFixed12, /360) into 4096-per-turn units and either assigns (flag != 0) or accumulates mod 4096 into GsCOORD2PARAM.rotate, then clears coord2 flg. Callers agree: DreamSys turns (sRotationYawPlus45 etc., accumulate) and sets headings (assign); ObjMStyleActor calls the slot updateRotation.
+Round 71 (alpha). `func_8001CEB4` -> `SceneNode__UpdateRotation`, **tier A**. Table slot +0x044 (round 70 named the slot `updateRotation`). Converts a ratio triple of degrees (RatioToFixed12, /360) into 4096-per-turn units and either assigns (flag != 0) or accumulates mod 4096 into GsCOORD2PARAM.rotate, then clears coord2 flg. Callers agree: DreamSys turns (sRotationYawPlus45 etc., accumulate) and sets headings (assign); dream_scene calls the slot updateRotation.
 
 ## Proposed field names
 
@@ -121,11 +121,11 @@ For the head to apply by type scope. Each one fails to compile in another unit w
 
 ## Round 97 (alpha): Sony's SVECTOR
 
-GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/SceneNode.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
+GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/scene_node.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
 
 ## Round 101 (delta): track 7
 
-Step 2: the three raw offsets `(u8 *)data + 4` / `+ 8` read the table as what it is, Ratio16[3] (include/SceneNode.h), through a local `Ratio16 *ratios = data`: `&ratios[0]`, `&ratios[1]`, `&ratios[2]`. The parameter stays `void *` because the prototype and the slot type in include/SceneNode.h say so (not this unit's to change; proposed). Byte-identical.
+Step 2: the three raw offsets `(u8 *)data + 4` / `+ 8` read the table as what it is, Ratio16[3] (include/scene_node.h), through a local `Ratio16 *ratios = data`: `&ratios[0]`, `&ratios[1]`, `&ratios[2]`. The parameter stays `void *` because the prototype and the slot type in include/scene_node.h say so (not this unit's to change; proposed). Byte-identical.
 
 Step 3 (locals and parameters): `flag` -> `set`, `data` -> `table` (the prototype's names), `vals` -> `angles`, `dst` -> `param` (GsCOORD2PARAM), `field` -> `next` (the carried pointer the loop advances ahead of `cur`). Byte-identical.
 

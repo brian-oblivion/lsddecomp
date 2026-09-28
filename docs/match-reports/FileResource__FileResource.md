@@ -4,12 +4,12 @@
 
 > Renamed from `func_80026A50` on 2026-09-18 (tools/rename.py). Address 0x80026a50.
 
-**Unit:** GameApplicationFileResource · **Size:** 25 instructions · **Status:** MATCHED (25/25 words, whole-image build verified byte-exact)
+**Unit:** game_shell · **Size:** 25 instructions · **Status:** MATCHED (25/25 words, whole-image build verified byte-exact)
 
 ## What it does
 
 The constructor for the `gFileResourceMethods` class (its own vtable slot `+0x008`,
-per `include/GameApplicationFileResource.h`'s `FileResourceMethods`). Chains the base
+per `include/data_source.h`'s `FileResourceMethods`). Chains the base
 class's constructor first (`GetBasicClassMethods()->ctor(this)`), then installs
 this class's own vtable pointer (fetched via the already-matched
 `GetFileResourceMethods`, which just returns `&gFileResourceMethods`), then zeroes every field
@@ -100,13 +100,13 @@ initialise fields) ARE its purpose, so tier A by the plan's own rule.
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/cd/CdDriver.c:143`
+mis-hit had to be resolved by receiver type: `src/cd/cd_driver.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),
 which is the procedure working in the direction where it can work.
 
-`FileResource` is shared with `code_179d8_h.c`/`CdDriver.c`
+`FileResource` is shared with `code_179d8_h.c`/`cd_driver.c`
 (see `FileResource__LoadFile.md`); every field this constructor zeroes is
 therefore checked, and only `flags` (this round's own rename, zero
 cross-unit hits) renamed outright. The rest:
@@ -125,7 +125,7 @@ zeroed and otherwise untouched" from scratch.
 
 - `Class6D430` -> `FileResource` (`renametype.py`, the whole family: type,
   `Class6D430Methods`, `CLASS6D430_FIELDS`/`_SLOTS`, the `Class6D430__`
-  methods, `GetClass6D430Methods`, the header `include/FileResource.h`), and
+  methods, `GetClass6D430Methods`, the header `include/file_resource.h`), and
   `D_8006D430` -> `gFileResourceMethods` (`rename.py`). **Tier A.** Evidence:
   the body of `FileResource__LoadFile` alone (open a name, size it with
   `seek(0, 2)`, allocate, read the whole file, close), and every non-driver
@@ -138,7 +138,7 @@ zeroed and otherwise untouched" from scratch.
   `TimBlockSrc__SetEntryShift`, `LbdFile__LoadHeader`,
   `VabStreamObj__OnBodyReady`, `PlacementGrid__ResolveEntry`). Callers use it
   as New_<Sub>(name), slot +0x078, `freeBuffer` (`TaskCore__SetSubHandle`,
-  `TitleMenuTaskObjF.c`). The name was chosen over `DataSource` because in this
+  `title_menu.c`). The name was chosen over `DataSource` because in this
   code's existing vocabulary (`SetActiveDataSource`,
   `sDataSourceClientGetters`) the data SOURCE is the active driver and the
   asset classes are its clients.
@@ -158,29 +158,29 @@ zeroed and otherwise untouched" from scratch.
   `struct { u_char minute, second, sector, track; }` compiles to the same
   `lwl`/`lwr` + `swl`/`swr` as `CdLoc16`, at a 4-aligned field and from a
   pointer. The blocker is the include: adding `<libcd.h>` to
-  `include/FileResource.h` (measured with `MAKEFLAGS=-k`) makes exactly four
+  `include/file_resource.h` (measured with `MAKEFLAGS=-k`) makes exactly four
   units fail with `conflicting types`, each re-declaring Cd* functions its
   own way: CdDriver (CdSearchFile, CdControl, CdSync, CdRead,
   CdReadSync), CdDriver (CdControlB, CdSearchFile), code_179d8_r
   (CdControlF, CdRead, CdReadSync, CdSync), CdDriver (CdControl,
   CdIntToPos, CdPosToInt, CdRead, CdReadSync, CdSearchFile, CdSync). Those
   are those units' polish passes (`sonyheaders.py`). Once they take Sony's
-  prototypes, `CdLoc16` is deleted, `FileResource.h` includes `<libcd.h>`,
+  prototypes, `CdLoc16` is deleted, `file_resource.h` includes `<libcd.h>`,
   and `renametype.py --any-stem CdLoc16 CdlLOC` (or a hand edit of the four
-  users: CdDriver.h, code_179d8_s/q/s) finishes it; no field accessor
+  users: cd_driver.h, code_179d8_s/q/s) finishes it; no field accessor
   changes, since the halves are never read apart.
 
 ### Proposed field and slot names (not applied: accessors outside the job)
 
 | member | proposed | tier | evidence | accessors |
 | --- | --- | --- | --- | --- |
-| slot `+0x078` `slot78` | `processBuffer` | B | every subclass occupant consumes the loaded buffer (list above); callers invoke it right after `New_<Sub>` and before `freeBuffer` | TitleMenuTaskObjF/i/j.c, DayTaskStageMap.c, Task.c, PlacementGridVabSound.c |
-| field `+0x02A` `unk2A` | `loadState` | B | the base ctor zeroes it; LbdFile steps it 0 -> 9 (header) -> 0 / 0 -> 10 (data block) -> 0 and VabStreamObj 1 (VH) -> 6 (VB); both advance it from slot +0x064 on a flags completion bit | GameFiles.c, PlacementGridVabSound.c |
+| slot `+0x078` `slot78` | `processBuffer` | B | every subclass occupant consumes the loaded buffer (list above); callers invoke it right after `New_<Sub>` and before `freeBuffer` | title_menu/i/j.c, dream_day.c, task.c, vab_sound.c |
+| field `+0x02A` `unk2A` | `loadState` | B | the base ctor zeroes it; LbdFile steps it 0 -> 9 (header) -> 0 / 0 -> 10 (data block) -> 0 and VabStreamObj 1 (VH) -> 6 (VB); both advance it from slot +0x064 on a flags completion bit | game_files.c, vab_sound.c |
 
 The table in the section above lists `unk22`/`unk28`/`unk2A` as write-only:
 that was true of this unit only. `unk22` and `unk28` have since been named
 (`pendingRequests`, `inQueueDispatch`); `unk2A` is the row just above.
 
 `FileResource__LoadFile`'s local `savedPendingGeneration` keeps `isOpen`
-across the load; its name predates the field's and is GameApplicationFileResource's polish
+across the load; its name predates the field's and is game_shell's polish
 work, not a type change.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003FE2C` on 2026-09-20 (tools/rename.py). Address 0x8003fe2c.
 
-Unit `ScreenWidgets`, carved round 14. `FadeBoxObj`'s own constructor
+Unit `screen_widgets`, carved round 14. `FadeBoxObj`'s own constructor
 (`FadeBoxMethods::ctor`, slot `+0x008`).
 
 ```c
@@ -38,7 +38,7 @@ Textbook "call the further-base ctor first (through a getter for its
 table, not by direct name -- `GetBoxFillMethods` returns `&gBoxFillMethods`), THEN
 overwrite `self->methods` with this class's own table, THEN dispatch
 through it immediately" idiom (DECOMPILATION_LEARNINGS' `TitleMenu__TitleMenu`
-entry). See `include/Task.h`'s header comment above
+entry). See `include/task.h`'s header comment above
 `struct ClassEAC0Obj` for the full class-hierarchy discovery writeup this
 function anchors.
 
@@ -56,7 +56,7 @@ already a pointer.
 
 **`FadeBox__FadeBox`** -- tier A. `FadeBoxMethods::ctor`
 (`+0x008`). Named per the project's `Class__Class` constructor convention
-(see `Entity__Entity`, `DreamSys.c`): calls the further-base ctor
+(see `Entity__Entity`, `dream_sys.c`): calls the further-base ctor
 (`GetBoxFillMethods()->ctor(...)`) first, then installs this class's
 own `&gFadeBoxMethods` table, then redispatches through `finishConstruct` --
 the textbook "base ctor first, then own vtable, then dispatch" idiom
@@ -65,7 +65,7 @@ instance of this class) fully determine the name.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-The base call is now typed through BoxFill's header: `BoxFillMethods *base = GetBoxFillMethods(); base->ctor((BoxFill *)self, ...)` (was a cast to the deleted `ClassEAC0Methods`). BoxFill (0x64, include/BoxFill.h) is this class's ctor-chain parent. Zero bytes.
+The base call is now typed through BoxFill's header: `BoxFillMethods *base = GetBoxFillMethods(); base->ctor((BoxFill *)self, ...)` (was a cast to the deleted `ClassEAC0Methods`). BoxFill (0x64, include/box_fill.h) is this class's ctor-chain parent. Zero bytes.
 
 ## Track 6 (2026-09-26, round 93, charlie)
 

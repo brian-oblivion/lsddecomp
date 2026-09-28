@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E10C` on 2026-09-19 (tools/rename.py). Address 0x8003e10c.
 
-**Unit:** Task · **Size:** 93 instructions
+**Unit:** task · **Size:** 93 instructions
 
 ## What it does
 
@@ -133,7 +133,7 @@ tells you which.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. 2 attempts (address
+round 13 (2026-09-03), runner alpha, unit task. 2 attempts (address
 drift on the first, closed on the second by hoisting `self->unk18` into a
 local at the position retail's own instruction schedule implied).
 
@@ -152,12 +152,12 @@ caller-overridable defaults" idiom this project uses elsewhere. Paired with
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__Init (class prefix). Occupies +0x044, slot `init(self, IntermediateBaseInitArgs *args, s32 mode)`, typed s32 because the callers use the result: GameApplication__RunTask returns `task->methods->slot44(task, extra, 0)` and GameApplication__RunDayTask switches on it; the overrides TimedTask__Init and TaskCore__Init call this base and return a field (eventCode, +0x038). This occupant itself returns nothing. Obj86B60InitArgs is IntermediateBaseInitArgs; its five fields and +0x010/+0x014/+0x018 are only ever added, removed or released through BasicClass slots here, so they are `BasicClass *` (casts dropped). +0x04C, called after the children are added, is `onInit` (NULL here; DayTask__OnInit, ObjM__InitStyleAndWorld, TaskCore__OnInit). The name is kept, tier B: with mode 0 the body also runs setState(2) and deinit, so "Init" says less than it does.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/intermediate_base.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__Init (class prefix). Occupies +0x044, slot `init(self, IntermediateBaseInitArgs *args, s32 mode)`, typed s32 because the callers use the result: GameApplication__RunTask returns `task->methods->slot44(task, extra, 0)` and GameApplication__RunDayTask switches on it; the overrides TimedTask__Init and TaskCore__Init call this base and return a field (eventCode, +0x038). This occupant itself returns nothing. Obj86B60InitArgs is IntermediateBaseInitArgs; its five fields and +0x010/+0x014/+0x018 are only ever added, removed or released through BasicClass slots here, so they are `BasicClass *` (casts dropped). +0x04C, called after the children are added, is `onInit` (NULL here; DayTask__OnInit, ObjM__InitStyleAndWorld, TaskCore__OnInit). The name is kept, tier B: with mode 0 the body also runs setState(2) and deinit, so "Init" says less than it does.
 
 ## Track 4 (2026-09-26, round 86, delta)
 
-Class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; its NULL-args fallback is `self->unk14 = (BasicClass *)New_LightRig();`, the allocator's prototype now coming from include/LightRig.h (was `void *New_LightRig(void)` in include/Task.h). `unk14` stays IntermediateBase's `BasicClass *`; a pointer cast emits no code; image byte-identical.
+Class 0x14 (was D_8006EFAC) unified as LightRig in `include/light_rig.h`; its NULL-args fallback is `self->unk14 = (BasicClass *)New_LightRig();`, the allocator's prototype now coming from include/light_rig.h (was `void *New_LightRig(void)` in include/task.h). `unk14` stays IntermediateBase's `BasicClass *`; a pointer cast emits no code; image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, delta: FrameClock)
 
-`New_D8006EF50` is now `New_FrameClock` (include/FrameClock.h), returning `FrameClock *`; the store into `unk10` (`BasicClass *`, field unchanged) upcasts it. Byte-identical.
+`New_D8006EF50` is now `New_FrameClock` (include/frame_clock.h), returning `FrameClock *`; the store into `unk10` (`BasicClass *`, field unchanged) upcasts it. Byte-identical.

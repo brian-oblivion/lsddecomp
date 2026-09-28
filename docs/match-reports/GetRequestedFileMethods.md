@@ -6,7 +6,7 @@
 
 > Renamed from `func_800423F0` on 2026-09-25 (tools/rename.py). Address 0x800423f0.
 
-Round 82, runner alpha (second re-staffed slot of the round). Unit `src/graphics/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (second re-staffed slot of the round). Unit `src/graphics/sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table (`tools/classtable.py`).
 - **What:** Returns the gRequestedFileMethods method table.
@@ -28,13 +28,13 @@ void *GetRequestedFileMethods(void) {
 
 ## Track 4 (2026-09-26, round 87, delta)
 
-Class id 0xB03 is unified as `RequestedFile` in `include/RequestedFile.h`
+Class id 0xB03 is unified as `RequestedFile` in `include/requested_file.h`
 (FILERESOURCE_SLOTS/FIELDS, 0x30 bytes, one own field `loaded` at +0x02C). The
 unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
 views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
 `CtorArg1Methods_322b4` are gone; `GetActiveDataSourceMethods` is declared
 `FileResourceMethods *`. The Source block above is the round-82 text; the live
-body in `src/graphics/Sprite.c` is byte-identical.
+body in `src/graphics/sprite.c` is byte-identical.
 
 Renamed from `Get_vtable_D8006EED8` with rename.py (the getter
 convention); the table `D_8006EED8` is `gRequestedFileMethods` (rename.py).
@@ -53,7 +53,7 @@ name because the only thing known beyond those mechanics was the caller's use
 (WBgm loads SEQ files through it); a mechanics name sidesteps that objection
 rather than overriding it, and `SeqFile` was rejected for the same reason.
 The table and getter followed (`gRequestedFileMethods`,
-`GetRequestedFileMethods`), and the header moved to `include/RequestedFile.h`.
+`GetRequestedFileMethods`), and the header moved to `include/requested_file.h`.
 renametype.py also rewrote the old class name inside earlier sections'
 history prose in this and sibling reports (known, pending an operator
 decision; not hand-reverted).

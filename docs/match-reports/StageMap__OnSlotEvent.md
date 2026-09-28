@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004AA6C` on 2026-09-22 (tools/rename.py). Address 0x8004aa6c.
 
-**Unit:** DayTaskStageMap · **Size:** 46 instructions · **Result:** 46/46 words
+**Unit:** dream_day · **Size:** 46 instructions · **Result:** 46/46 words
 
 ## What it does
 
@@ -86,7 +86,7 @@ just for forward dispatch instead of a shared tail.
 
 ## Provenance
 
-round 2026-09-02, runner ALPHA, unit DayTaskStageMap. First attempt 33/46 (two
+round 2026-09-02, runner ALPHA, unit dream_day. First attempt 33/46 (two
 distinct residues); second attempt closed both together, 46/46.
 
 ## Naming
@@ -95,7 +95,7 @@ Round 67 (track 3, naming pass).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004AA6C` | `StageMap__OnSlotEvent` | B | Occupant of vtable slot `+0x088`. Three call sites agree on the argument shape `(self, command, elem, index)`: `StageMap__Finalize` and `StageMap__UnloadAllSlots` here (command 6), and `DayTaskStageMap`'s `StageMap__OnDrawSystemEvent` (command 7). The body forwards to the BASE table's `+0x088` -- `SceneNode__NotifyWithHull`, which itself gates on a command code in `{2,3}` -- then, for command 6, releases the element's own held object, and for 6 and 7 records the element in `lastEventElem` and re-emits with `notifyParents(self, command)`. So: an element-scoped event arrives, is handled, and is passed up. Tier B: the mechanics are complete, what commands 6 and 7 MEAN in the game is not established. |
+| `func_8004AA6C` | `StageMap__OnSlotEvent` | B | Occupant of vtable slot `+0x088`. Three call sites agree on the argument shape `(self, command, elem, index)`: `StageMap__Finalize` and `StageMap__UnloadAllSlots` here (command 6), and `dream_day`'s `StageMap__OnDrawSystemEvent` (command 7). The body forwards to the BASE table's `+0x088` -- `SceneNode__NotifyWithHull`, which itself gates on a command code in `{2,3}` -- then, for command 6, releases the element's own held object, and for 6 and 7 records the element in `lastEventElem` and re-emits with `notifyParents(self, command)`. So: an element-scoped event arrives, is handled, and is passed up. Tier B: the mechanics are complete, what commands 6 and 7 MEAN in the game is not established. |
 
 Type correction made this round, byte-neutral and oracle-verified: the third
 parameter was typed `UnkListObj_3ac78 *` (this unit's SENDER type). All three
@@ -105,13 +105,13 @@ callers pass an element, and the field this function reaches is `+0x014` --
 `GenericObject *heldObj`, since the body dereferences it as an object with a
 vtable at `+0x000`. Callers checked: `StageMap__Finalize`,
 `StageMap__UnloadAllSlots` (both in this unit, both pass `&self->elems[i]`),
-and `DayTaskStageMap`'s `StageMap__OnDrawSystemEvent` (passes `Elem *entry`). Whole-image SHA1
+and `dream_day`'s `StageMap__OnDrawSystemEvent` (passes `Elem *entry`). Whole-image SHA1
 green after the change.
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
 | `UnkSlotEntry+0x014` | `heldObj` | B | Released here through the shared BasicClass `release` slot with the store-back shape `x = x->methods->release(x)`, and zeroed by the ctor. The name claims only that the entry holds an object it owns. |
-| `StageMap+0x1BC` | `lastEventElem` | B | Written only here, with the element the event concerned. `DayTaskStageMap`'s `StageMap__GetLastEventSlotChunk` reads `unk1BC->unk4` and treats it as an `ElemTarget *`, which is exactly `Elem::unk4` -- independent confirmation that the pointer is an element. |
+| `StageMap+0x1BC` | `lastEventElem` | B | Written only here, with the element the event concerned. `dream_day`'s `StageMap__GetLastEventSlotChunk` reads `unk1BC->unk4` and treats it as an `ElemTarget *`, which is exactly `Elem::unk4` -- independent confirmation that the pointer is an element. |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 
@@ -124,11 +124,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -145,4 +145,4 @@ This function: `StageMap__OnElementEvent` -> `StageMap__OnSlotEvent` (`python3 t
 
 ## Track 7 (2026-09-27, round 98, charlie)
 
-Events `6`/`7` -> `STAGEMAP_EVENT_SLOT_RELEASE`/`STAGEMAP_EVENT_SLOT_DATA_READY` (include/StageMap.h); labels `handle6`/`merge` -> `release`/`record`; parameter `elem` -> `slot` (the header prototype's name). The `if`+`goto` shape carries a `MATCHING:` line (Residue 2 above). Zero bytes.
+Events `6`/`7` -> `STAGEMAP_EVENT_SLOT_RELEASE`/`STAGEMAP_EVENT_SLOT_DATA_READY` (include/stage_map.h); labels `handle6`/`merge` -> `release`/`record`; parameter `elem` -> `slot` (the header prototype's name). The `if`+`goto` shape carries a `MATCHING:` line (Residue 2 above). Zero bytes.

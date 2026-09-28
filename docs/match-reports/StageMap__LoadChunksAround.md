@@ -100,7 +100,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > in either direction.)
 >
 > Oracle: `build exit=0`, `OK: build matches retail SLPS_015.56`, funcdiff
-> 140/140 ins 0/del 0, no drift. Unit `DayTaskStageMap` INCLUDE_ASM count 4 -> 3
+> 140/140 ins 0/del 0, no drift. Unit `dream_day` INCLUDE_ASM count 4 -> 3
 > (6 -> 3 across delta's three functions this round).
 >
 > ### Proposed learning
@@ -242,7 +242,7 @@ relevant (no header, symbol or type change -- the fix removed a local).
 > targeted, because nothing in the residue's own description as "register
 > identity" pointed at a reload site rather than the loads/stores the
 > manual attempts focused on. **Disposition: 137/140, exact length,
-> `INCLUDE_ASM` restored, preserved body updated in `src/world/DayTaskStageMap.c`.**
+> `INCLUDE_ASM` restored, preserved body updated in `src/world/dream_day.c`.**
 > The remaining 3-word residue (second loop's row pointer) is unchanged
 > register-identity, consistent with everything else already confirmed
 > inert for this class in this unit.
@@ -313,11 +313,11 @@ its use site instead of caching it.
 > trusting a register-identity verdict).** Rebuilt the exact preserved body
 > from a clean `INCLUDE_ASM` baseline (125/140 confirmed, no drift) and
 > disassembled the compiled `.o`'s prologue directly
-> (`mipsel-linux-gnu-objdump -d build/src/DayTaskStageMap.c.o`): saves
+> (`mipsel-linux-gnu-objdump -d build/src/dream_day.c.o`): saves
 > `s3,s5,s2,s1,ra,fp(s8),s7,s6,s4,s0` at offsets `0x8C,0x94,0x88,0x84,0xA4,
 > 0xA0,0x9C,0x98,0x90,0x80` off a `-0xA8` frame -- **the IDENTICAL set, at
 > the IDENTICAL offsets, in the IDENTICAL order**, to retail's own prologue
-> (`asm/nonmatchings/DayTaskStageMap/StageMap__LoadChunksAround.s`, lines 1-16). Same total
+> (`asm/nonmatchings/dream_day/StageMap__LoadChunksAround.s`, lines 1-16). Same total
 > frame size too (`0xA8` both). **The lever does NOT apply: retail does not
 > save fewer callee-saved registers than this body does, so the
 > register-identity verdict for this function is CONFIRMED, not merely
@@ -335,9 +335,9 @@ its use site instead of caching it.
 > the staffing guidance to move to differently-shaped ground once a
 > register-identity wall is this well established.
 
-Unit: `DayTaskStageMap`. Not toolchain-blocked: no `gp_rel` hit, no
+Unit: `dream_day`. Not toolchain-blocked: no `gp_rel` hit, no
 `addiu $at,$at,%lo` hit, no dense-`switch`/`jr $v0` table dispatch in
-`asm/nonmatchings/DayTaskStageMap/StageMap__LoadChunksAround.s`. Has a genuine `div`
+`asm/nonmatchings/dream_day/StageMap__LoadChunksAround.s`. Has a genuine `div`
 (integer divide by a non-constant, `self->unk68->divisor`) via the standard
 maspsx-expanded zero/overflow-check sequence -- matched cleanly from the
 first attempt, no issue there.
@@ -379,7 +379,7 @@ call site only), and `Obj866E8Methods::slotFC` fixed to its real signature
 
 An earlier pass on this function stalled at 52/140 with a `funcdiff`
 DRIFT WARNING, which turned out to matter: direct `.o` inspection
-(`mipsel-linux-gnu-objdump -d build/src/DayTaskStageMap.c.o`, function
+(`mipsel-linux-gnu-objdump -d build/src/dream_day.c.o`, function
 `StageMap__LoadChunksAround`, subtracting its start address from the next function's
 start) showed the compiled body was **138 words, 2 words (8 bytes) SHORT**
 of retail's 140 -- `funcdiff`'s own reported byte RANGE is not proof of
@@ -441,7 +441,7 @@ time expecting monotonic improvement.
 
 ## SUPERSEDED by round 63 -- the matching body
 
-The round-63 match is live in `src/world/DayTaskStageMap.c`. Against the 137/140 body it
+The round-63 match is live in `src/world/dream_day.c`. Against the 137/140 body it
 differs in exactly two places: the `Elem *e2;` declaration is gone and the
 second loop uses `e`, and the first loop's `__asm__("")` barrier is gone (no
 longer needed once `e` is merged; verified by whole-image rebuild).
@@ -581,7 +581,7 @@ This is the Gate 1b "rebuild before trusting" check, and it matters here
 because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
-four preserved bodies in `DayTaskStageMap` were rebuilt this round and all four
+four preserved bodies in `dream_day` were rebuilt this round and all four
 are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
 `StageMap__LoadChunksAround` 125/140, `StageMap__PopulateSlotCells` 130/150. No stale figure and no
 never-linked body in this unit.
@@ -743,11 +743,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -776,7 +776,7 @@ Parameters and locals, tier A: `val` -> `centreChunk`, `arg2` -> `centrePos`, `a
 
 Constants: the key loop runs to `CHUNK_NEIGHBOUR_COUNT` (enum ChunkNeighbour), the slot loop to `ARRAY_COUNT(self->slots)`, `loads` is `[CHUNK_NEIGHBOUR_COUNT]`, 0x5000 -> `STAGE_CHUNK_SIZE / 2`. The reuse of `slot` in the second loop keeps a one-line `/* MATCHING */`.
 
-The comment that stood above the function in `src/world/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/world/dream_day.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 63 (delta): closed a 137/140 stall that had stood since round

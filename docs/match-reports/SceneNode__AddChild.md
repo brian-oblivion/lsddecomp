@@ -48,4 +48,4 @@ For the head to apply by type scope. Each one fails to compile in another unit w
 
 ## Round 101 (delta): track 7
 
-Step 4 (constants): The unit-local `CLASS_TAG_MASK` / `TAG_TMDMODEL` (0xF, 9) -> basic_class.h's `CLASS_ID_ROOT_MASK` and a new `TMDMODEL_CLASS_ID` in include/TmdModel.h (gTmdModelMethods word +0x000 is 0x9, tools/classtable.py --scan; tier A). Byte-identical.
+Step 4 (constants): The unit-local `CLASS_TAG_MASK` / `TAG_TMDMODEL` (0xF, 9) -> basic_class.h's `CLASS_ID_ROOT_MASK` and a new `TMDMODEL_CLASS_ID` in include/tmd_model.h (gTmdModelMethods word +0x000 is 0x9, tools/classtable.py --scan; tier A). Byte-identical.

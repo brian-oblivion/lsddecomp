@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D300` on 2026-09-22 (tools/rename.py). Address 0x8004d300.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 23 words · **Status:** MATCHED (23/23)
+**Unit:** title_menu · **Size:** 23 words · **Status:** MATCHED (23/23)
 
 ## What it does
 
@@ -56,14 +56,14 @@ evident from the body (forward to the base ctor table's `slot9C` iff both
 forward's in-game purpose, is not established -- only that both gate the
 call (see the struct comments). Named on the "NotifyIfUnkNActive"-style
 precedent already used elsewhere in this codebase for a gated-forward shape
-(e.g. `SceneNode__NotifyWithHull`, include/SceneNode.h) rather than
+(e.g. `SceneNode__NotifyWithHull`, include/scene_node.h) rather than
 inventing a semantic verb ("Notify"/"Release"/etc.) the body does not
 support. `unk10`/`unk70` themselves are left unnamed -- no evidence beyond
 "nonzero gate" exists for either.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-The forward is Viewport's +0x09C `update` (`GetViewportMethods()->update((Viewport *)self)`, include/Viewport.h, round 85). In Viewport's layout, `unk10` is `viewNode` and `unk70` is `otReady`; NodeGuardedViewport's own view keeps its names. Byte-identical.
+The forward is Viewport's +0x09C `update` (`GetViewportMethods()->update((Viewport *)self)`, include/viewport.h, round 85). In Viewport's layout, `unk10` is `viewNode` and `unk70` is `otReady`; NodeGuardedViewport's own view keeps its names. Byte-identical.
 
 ## Track 4 (2026-09-26, round 87)
 

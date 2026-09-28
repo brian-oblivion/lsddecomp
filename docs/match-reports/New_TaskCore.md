@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BE94` on 2026-09-23 (tools/rename.py). Address 0x8003be94.
 
-**Unit:** Task · **Status:** MATCHED (31/31 words)
+**Unit:** task · **Status:** MATCHED (31/31 words)
 
 A `New_X` class allocator: allocate 0xA4 bytes, and if that succeeds dispatch
 the class's constructor slot (`+0x008`) with the caller's arguments forwarded
@@ -26,7 +26,7 @@ TaskCoreObj *New_TaskCore(s32 a1, s32 a2, s32 a3)
 }
 ```
 
-See `src/app/Task.c` for the exact text.
+See `src/app/task.c` for the exact text.
 
 ## Why it matched: `return NULL;` goes LAST
 
@@ -62,9 +62,9 @@ updated with what survived and what did not.
 **New_TaskCoreObj** -- tier A. Canonical `New_X` allocator shape for
 `TaskCoreObj` (0xA4 bytes), matching `New_StreamTask`'s own shape one
 class down; the "TaskCore" name is this unit's own local view, kept
-independent of `include/GameApplication.h`'s `LoaderTask` view of the identical
+independent of `include/game_application.h`'s `LoaderTask` view of the identical
 table (per this unit's header comment).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from New_TaskCoreObj (tools/rename.py). The allocator (0xA4 bytes), now `New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound)`, the ctor's own arguments. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from New_TaskCoreObj (tools/rename.py). The allocator (0xA4 bytes), now `New_TaskCore(TaskCoreTarget *target, char *soundBankPath, BasicClass *sound)`, the ctor's own arguments. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

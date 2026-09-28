@@ -25,7 +25,7 @@
  * not cover yet, add the macro here under the SDK's name rather than
  * open-coding the instruction at the call site (docs/MATCHING-GUIDE.md,
  * step 2). Everything around the macros is ordinary C: TransformAndCullPoly in
- * src/graphics/TmdRenderer.c is the worked example of a branching function over
+ * src/graphics/tmd_renderer.c is the worked example of a branching function over
  * eight of them.
  */
 

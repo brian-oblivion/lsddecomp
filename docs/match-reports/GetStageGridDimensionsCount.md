@@ -2,7 +2,7 @@
 
 > Renamed from `func_800494B4` on 2026-09-23 (tools/rename.py). Address 0x800494b4.
 
-**Unit:** StageGrid · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
+**Unit:** stage_grid · **Size:** 2 instructions · **Status:** MATCHED (2/2 words)
 
 ## What it does
 
@@ -46,7 +46,7 @@ The value is the length of two parallel per-stage tables at once
 (`sStageGridDimensions` and `sStageChunkMoods`, whose 14 pointers go to
 `sStage00ChunkMoods` .. `sStage13ChunkMoods`, the stages the disc keeps as
 `STG00` .. `STG13`), so it counts stages, not dimension entries. Defined in
-`src/world/StageGrid.c`, the only unit that uses it; the derivation above keeps the
+`src/world/stage_grid.c`, the only unit that uses it; the derivation above keeps the
 name it was matched under.
 
 ## History (moved from the unit banner, round 101)

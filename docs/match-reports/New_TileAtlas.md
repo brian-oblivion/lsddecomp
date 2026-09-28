@@ -2,7 +2,7 @@
 
 > Renamed from `func_80044F30` on 2026-09-25 (tools/rename.py). Address 0x80044f30.
 
-Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #7), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 24/24 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTileAtlasMethods, objec
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
 /* Allocate and construct a gTileAtlasMethods object. */
@@ -42,11 +42,11 @@ void *New_TileAtlas(s32 arg0) {
 
 ## Naming
 
-- **New_TileAtlas**, tier A. src/app/Task.c builds this object first and hands it to New_TileMap; its BuildCells lays out exactly the 300-cell (20x15) atlas TileMap__BuildMap indexes.
+- **New_TileAtlas**, tier A. src/app/task.c builds this object first and hands it to New_TileMap; its BuildCells lays out exactly the 300-cell (20x15) atlas TileMap__BuildMap indexes.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileAtlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). Returns `TileAtlas *` (was `void *`; include/Task.h's local view returned `StreamTaskUnkB4Obj *` and is deleted); the ctor is reached through the typed `TileAtlasMethods` ctor slot `(TileAtlas *self, s32 arg1)` instead of the unit's `UnprototypedCtorTable` cast. One caller, TaskCore__TaskCore (src/app/Task.c), which stores the result in TaskCore::tileAtlas and passes it to New_TileMap. No rename. Byte-identical.
+Class unified in `include/tile_atlas.h` (gTileAtlasMethods, 0x303, a FileResource subclass, 0x38 bytes). Returns `TileAtlas *` (was `void *`; include/task.h's local view returned `StreamTaskUnkB4Obj *` and is deleted); the ctor is reached through the typed `TileAtlasMethods` ctor slot `(TileAtlas *self, s32 arg1)` instead of the unit's `UnprototypedCtorTable` cast. One caller, TaskCore__TaskCore (src/app/task.c), which stores the result in TaskCore::tileAtlas and passes it to New_TileMap. No rename. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057F68` on 2026-09-24 (tools/rename.py). Address 0x80057f68.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `gVariantSpriteMethods` family -- plain
+Unit: `src/world/dream_scene.c`. Class: `gVariantSpriteMethods` family -- plain
 allocator/constructor wrapper (`New_X` shape), not a vtable slot.
 
 ## Signature
@@ -32,7 +32,7 @@ own `GetGraphRoomMethods`, still queued -- forward-declared here) with `(obj,
 arg1)`, return the allocation regardless of the ctor's own return value.
 `return obj;` sits INSIDE the success `if`, with a trailing `return
 NULL;` -- the shape established as necessary for this exact pattern in
-`ObjMStyleActor`'s `New_VariantSprite` report.
+`dream_scene`'s `New_VariantSprite` report.
 
 This introduces this unit's own view of `gGraphRoomMethods` (73 slots,
 `D_80087AACMethods`/`D_80087AACObj`, currently typing only the ctor slot
@@ -51,24 +51,24 @@ tools/funcdiff.py New_GraphRoom   # 24/24
 
 **`New_GraphRoom`** -- tier B. `New_X`-shaped allocator (allocate
 `0x244` bytes, null-check, dispatch the ctor slot) for the class named
-`GraphRoomObj` this round -- see `src/world/ObjMStyleActor.c`'s own header
+`GraphRoomObj` this round -- see `src/world/dream_scene.c`'s own header
 comment for the class-identity evidence (loads "ETC\HGRAPH.TIM", builds
 100 coloured points from a day-type ring).
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `New_GraphRoomObj` -> `New_GraphRoom`
 
-The class is unified in `include/GraphRoom.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Now returns `GraphRoom *` and takes `struct DreamSys *`: its one caller, GameApplication__RunTitleMenu (src/app/GameApplicationFileResource.c), passes `self->dreamSys` through GameApplication__RunTask, and casts New_GraphRoom to PollTaskCtor there; include/GameApplication.h's own `extern PollTask *New_GraphRoom(void *)` is deleted.
+The class is unified in `include/graph_room.h` (class id 0x2F130, table `gGraphRoomMethods`, parent TaskCore; `tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`). The class name drops round 75's `Obj` suffix (FINISHING-PLAN track 4 step 2); every function prefix moved with it. The unit's GraphRoomObj/GraphRoomMethods views are deleted and `self` is `GraphRoom *`; inherited fields and slots carry TaskCore's and IntermediateBase's names. Zero bytes changed (build-and-verify OK, typeviews --warnings 0 new). Prefix only. Now returns `GraphRoom *` and takes `struct DreamSys *`: its one caller, GameApplication__RunTitleMenu (src/app/game_shell.c), passes `self->dreamSys` through GameApplication__RunTask, and casts New_GraphRoom to PollTaskCtor there; include/game_application.h's own `extern PollTask *New_GraphRoom(void *)` is deleted.
 
 ## Track 7 (2026-09-27, round 97, delta): the unit banner, moved here
 
-The unit banner of `src/world/ObjMStyleActor.c` was rewritten to say what the file holds. Its history, verbatim as it stood before the pass (the class-identity reading and the round-87 correction are this class's, so they live with its allocator):
+The unit banner of `src/world/dream_scene.c` was rewritten to say what the file holds. Its history, verbatim as it stood before the pass (the class-identity reading and the round-87 correction are this class's, so they live with its allocator):
 
 ```c
 /*
- * class_3bb8c_t -- functions 96..112 of the 113-function `ObjMStyleActor`
+ * class_3bb8c_t -- functions 96..112 of the 113-function `dream_scene`
  * remainder, 0x48738..0x48F74 (vram 0x80057F38..0x80058774).  Carved
  * MID-round 17 (2026-09-04) to re-staff a runner whose own unit was
- * exhausted.  This is the LAST slice of the DayTaskStageMap block.
+ * exhausted.  This is the LAST slice of the dream_day block.
  *
  * EXPECT THIS SLICE TO SPAN MORE THAN ONE CLASS.  It is cut at ROM
  * addresses, not class boundaries.  Identify each with tools/classtable.py.
@@ -76,10 +76,10 @@ The unit banner of `src/world/ObjMStyleActor.c` was rewritten to say what the fi
  *
  * - Four empty leaves plus the table getter (VariantSprite__Update,
  *   VariantSprite__NoOpSlotBC/C0/C4, GetVariantSpriteMethods) of the
- *   unrelated VariantSprite (include/VariantSprite.h; its ctor is in
- *   `ObjMStyleActor`, two more methods in `class_3bb8c_q`).
+ *   unrelated VariantSprite (include/variant_sprite.h; its ctor is in
+ *   `dream_scene`, two more methods in `class_3bb8c_q`).
  * - The WHOLE of `GraphRoom` (round 75 name; table `gGraphRoomMethods`,
- *   73 slots), a TaskCore subclass, unified in include/GraphRoom.h (track 4,
+ *   73 slots), a TaskCore subclass, unified in include/graph_room.h (track 4,
  *   round 87; the header's banner has the slots, fields and evidence).
  *   This unit owns the entire class: allocator, ctor, every override,
  *   ScoreDayLog and the getter.

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E34C` on 2026-09-24 (tools/rename.py). Address 0x8004e34c.
 
-Unit `TitleMenuTaskObjF`. **REOPENED -- ASSIGNABLE** from round 42's `gp_rel`
+Unit `title_menu`. **REOPENED -- ASSIGNABLE** from round 42's `gp_rel`
 resolution. The round-14 stub recorded 2 `gp_rel` hits and no derivation;
 this round wrote and matched the function from scratch.
 
@@ -13,7 +13,7 @@ this round wrote and matched the function from scratch.
 table's own **+0x008 ctor slot**. This is the same real class
 `GetTitleMenuMethods`/`New_TaskObjF` (already matched, earlier in this unit)
 allocate and construct through `GetTaskObjFMethods()->ctor(self, arg0, arg1)`,
-and the SAME real object `TitleMenuTaskObjF.c` independently names `Node3bb8cE`
+and the SAME real object `title_menu.c` independently names `Node3bb8cE`
 (its own local view, established there round 14 from ITS 19 functions --
 `TaskObjF__ClearLinks`/`TaskObjF__Finalize`/etc. all operate on this same table).
 
@@ -59,12 +59,12 @@ SLPS_015.56`.
    `libcard/a74`, `libcard/a75`, `libcard/c112`) -- **only on the very
    first construction** of this class (a classic "init memory cards once"
    singleton-style guard).
-4. `TaskObjF__ClearLinks(self)` -- already matched, `TitleMenuTaskObjF.c`, under that
+4. `TaskObjF__ClearLinks(self)` -- already matched, `title_menu.c`, under that
    unit's own `Node3bb8cE *` view; zeroes four resource-slot fields.
 5. `self->methods->slot40(self, arg2)` -- forwards this function's own 3rd
    parameter verbatim to a new table slot at +0x040 (immediately after the
    existing `ctor` field's implicit end, with a `pad00C[0x040-0x00C]` gap
-   filled in). `TitleMenuTaskObjF.c`'s own independent view already names the
+   filled in). `title_menu.c`'s own independent view already names the
    concrete function at this address `TaskObjF__SetCardSlot` (still uncarved
    there).
 
@@ -77,12 +77,12 @@ SLPS_015.56`.
   at +0x008 is untouched).
 - New `GenericCtorObj_3bb8c_d` instance struct (just `methods` at +0x000)
   -- this unit's own minimal, independent local view of the same real
-  object `TitleMenuTaskObjF.c` calls `Node3bb8cE`.
+  object `title_menu.c` calls `Node3bb8cE`.
 - New extern `sTaskObjFCount` (`s32`, the one-shot init counter).
 
-`src/ui/TitleMenuTaskObjF.c`: local (not shared-header) externs for
+`src/ui/title_menu.c`: local (not shared-header) externs for
 `TaskObjF__ClearLinks` (already matched elsewhere, under this unit's own `void *`
-view rather than `TitleMenuTaskObjF`'s `Node3bb8cE *`) and for `InitCARD`/
+view rather than `title_menu`'s `Node3bb8cE *`) and for `InitCARD`/
 `StartCARD`/`_bu_init` (Sony's, linked from `lib/libcard`, declared the
 same way `malloc`/`free`/`printf` are per-unit rather than in a shared
 header -- CLAUDE.md's "To `include/` has one exception").
@@ -94,7 +94,7 @@ this codebase type-checks the two against each other (the vtable's own
 initializer is still raw, uncarved `.data`, not a C initializer), so this
 is the same "independent arities for the same real callee" situation
 already documented for `GetTaskCoreMethods`/`BaseTaskCtorTable_3bb8c_c` versus
-`TaskCoreMethods` in `include/Task.h`.
+`TaskCoreMethods` in `include/task.h`.
 
 ### Proposed learning
 
@@ -108,7 +108,7 @@ somewhere else.
 
 ## Naming (round 77, naming runner delta)
 
-Renamed `func_8004E34C` -> `TaskObjF__TaskObjF`. **Tier A**: `tools/classtable.py 0x80086DC4` places this function exactly at `gTaskObjFMethods`'s own +0x008 ctor slot -- the constructor for the class `TitleMenuTaskObjF.c`/`class_3bb8c_g.c` already name `TaskObjF` tree-wide. Follows the `New_Class`/`Class__Class` constructor convention.
+Renamed `func_8004E34C` -> `TaskObjF__TaskObjF`. **Tier A**: `tools/classtable.py 0x80086DC4` places this function exactly at `gTaskObjFMethods`'s own +0x008 ctor slot -- the constructor for the class `title_menu.c`/`class_3bb8c_g.c` already name `TaskObjF` tree-wide. Follows the `New_Class`/`Class__Class` constructor convention.
 
 ## Track 7 (round 96, echo)
 

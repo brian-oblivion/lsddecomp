@@ -23,8 +23,8 @@ empty body is its own complete mechanics, and FINISHING-PLAN's naming rules
 make a pure leaf whose mechanics are its purpose tier A by definition; the
 round-74 verdict below kept the placeholder only because no caller gave it
 a purpose, which a no-op does not need. Follows the project's existing
-free-function no-op names (`NoOp` in `GameApplicationFileResource.c`, `NoOp2`-`NoOp4` in
-`CdDriver.c`); the suffix is the next free number, for disambiguation
+free-function no-op names (`NoOp` in `game_shell.c`, `NoOp2`-`NoOp4` in
+`cd_driver.c`); the suffix is the next free number, for disambiguation
 only, and implies no link to those functions.
 
 ## Naming (round 74)
@@ -49,7 +49,7 @@ leaf functions; it earns no name here.
 
 ## Provenance
 
-Present in `src/app/BMemPMgr.c` since the unit's initial carve (no report
+Present in `src/app/bmem_pmgr.c` since the unit's initial carve (no report
 previously filed — the FINISHING-PLAN note that a trivial `jr $ra; nop`
 body is often not real decomp work applies here). round 74 (2026-09-24),
 runner alpha: wrote this report as part of the unit's track-3 naming

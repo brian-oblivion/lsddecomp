@@ -2,7 +2,7 @@
 
 > Renamed from `func_800183DC` on 2026-09-17 (tools/rename.py). Address 0x800183dc.
 
-Unit: `src/graphics/TmdRenderer.c`. `void ReleaseBasicClassArray(BasicClass **array, s32 count)`
+Unit: `src/graphics/tmd_renderer.c`. `void ReleaseBasicClassArray(BasicClass **array, s32 count)`
 — releases every element of a `BasicClass*` array (calling each element's
 vtable slot `+0x004`, `release`, and storing the result back into the slot)
 and advances a pointer walk over `count` elements.
@@ -72,7 +72,7 @@ mechanics are its purpose.
 Evidence: walks `count` entries of a `BasicClass *` array, calls each
 element's vtable slot `+0x004` (`release`) and stores the returned pointer
 back into the slot. Every one of the six call sites outside this unit
-(`ObjMStyleActor.c`, `class_3bb8c_o.c`, `class_3bb8c_s.c`, `Task.c`,
-`ScreenWidgets.c`, plus `include/Task.h`'s declaration) passes a
+(`dream_scene.c`, `class_3bb8c_o.c`, `class_3bb8c_s.c`, `task.c`,
+`screen_widgets.c`, plus `include/task.h`'s declaration) passes a
 contiguous array of object pointers and an element count. "Release" is the
 slot's own established name in `BasicClassMethods`, not a new word.

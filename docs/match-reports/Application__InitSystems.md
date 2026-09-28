@@ -43,7 +43,7 @@ gives; a local `aux` would have kept it in a register.
 
 The `source` object's class is unknown (its +0x044 takes a
 `ScreenDims *` and an s32); typed as the local `ApplicationSource`.
-GameApplicationFileResource calls this slot with a 4th argument `0` that this body never
+game_shell calls this slot with a 4th argument `0` that this body never
 reads.
 
 ## Naming
@@ -60,7 +60,7 @@ established, only which SDK calls it makes.
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The class is declared once, in
-`include/Application.h`. The parameters are now `drawSystem` and `pad`, and
+`include/application.h`. The parameters are now `drawSystem` and `pad`, and
 the aux block's first two fields likewise: the one caller chain is main()
 -> GameApplication's +0x044 override -> this slot, and main passes
 `New_DrawSystem()` and `New_Pad(0, 0)` (src/main.c). The draw system's
@@ -73,11 +73,11 @@ typed it `s32`, and its one caller ignores $v0. Bytes unchanged.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/DrawSystem.h` (gDrawSystemMethods unified). Byte-identical.
+The local view of the DrawSystem singleton quoted above is gone; the unit takes DrawSystem, its method table and GetDrawSystem from `include/draw_system.h` (gDrawSystemMethods unified). Byte-identical.
 
 ## Track 7 (round 101, charlie)
 
 `BMemPMgrAlloc(0x14)` is now `BMemPMgrAlloc(sizeof(IntermediateBaseInitArgs))`:
 the block is `self->aux`, typed `IntermediateBaseInitArgs *`, and that struct
-(include/IntermediateBase.h) is five pointers, 0x14 bytes, every one of which
+(include/intermediate_base.h) is five pointers, 0x14 bytes, every one of which
 this body writes. Byte-identical. The Final C above is the pre-track-7 text.

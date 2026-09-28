@@ -101,7 +101,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > **No register pinning and no operand constraint was used or needed.**
 >
 > Oracle: `build exit=0`, `OK: build matches retail SLPS_015.56`, funcdiff
-> 106/106 ins 0/del 0, no drift. Unit `DayTaskStageMap` INCLUDE_ASM count 6 -> 5.
+> 106/106 ins 0/del 0, no drift. Unit `dream_day` INCLUDE_ASM count 6 -> 5.
 >
 > ### Proposed learning
 >
@@ -144,7 +144,7 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > the `lb`-vs-value-propagation sign-extend class), unchanged from round
 > 41.
 >
-> **This function is one of the FIVE `DayTaskStageMap`/`Obj866E8`-family
+> **This function is one of the FIVE `dream_day`/`Obj866E8`-family
 > members round 46 confirmed have a scaffold-vs-real-build MISMATCH**
 > (round 32's own scaffold: 9 insertions/9 deletions isolated vs 0/0 in
 > context; round 40 rebuilt an independent scaffold from scratch and got
@@ -316,9 +316,9 @@ were correct and unchanged -- the stall was purely source SHAPE).
 > "misdiagnosed-missing-field-offset" mechanism the head's broadcast named
 > for this specific residue.
 
-Unit: `DayTaskStageMap`. Slot `Obj866E8Methods::slot110` (verified against
+Unit: `dream_day`. Slot `Obj866E8Methods::slot110` (verified against
 `tools/classtable.py 0x800866E8`). Not toolchain-blocked: no `gp_rel` hit, no
-`addiu $at,$at,%lo` hit in `asm/nonmatchings/DayTaskStageMap/StageMap__ComputeFootprintDescriptor.s`.
+`addiu $at,$at,%lo` hit in `asm/nonmatchings/dream_day/StageMap__ComputeFootprintDescriptor.s`.
 
 ## What it does
 
@@ -349,7 +349,7 @@ from, is in this report's body below and in the header comments for
 
 ## SUPERSEDED by round 63 -- the matching body
 
-The round-63 match is live in `src/world/DayTaskStageMap.c`. It differs from the
+The round-63 match is live in `src/world/dream_day.c`. It differs from the
 72/106 body preserved below in exactly three places: `b2`/`b3` are `s32`
 locals re-read from `out->base.b2`/`b3` (not `s8` locals carrying the
 computed value), the `0x400` sits inside the subtracted group, and
@@ -578,7 +578,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004C1C0` | `StageMap__ComputeFootprintDescriptor` | B | Occupant of `gStageMapMethods` +0x110 (`slot110`). `DayTaskStageMap`'s own `StageMap__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `StageMap__SetFootprintFromCell`/`StageMap__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `SplitLongVec3` world position via `StageMap__FindSlotForPosition` and an `SplitCoord2` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |
+| `func_8004C1C0` | `StageMap__ComputeFootprintDescriptor` | B | Occupant of `gStageMapMethods` +0x110 (`slot110`). `dream_day`'s own `StageMap__ApplyToSenderFootprint` (already matched) calls this exact slot to fill a `buf` that is then fed DIRECTLY to `StageMap__SetFootprintFromCell`/`StageMap__SetFootprintRect` as their own `desc` parameter -- i.e. this function's output IS the footprint descriptor those two already-named functions consume. Computes cell row/column (`base.b2`/`base.b3`) and sub-cell offsets (`base.h4`/`h6`/`h8`) from a `SplitLongVec3` world position via `StageMap__FindSlotForPosition` and an `SplitCoord2` position pair -- a position-to-grid-cell conversion, matching the caller-side evidence exactly. |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 
@@ -591,11 +591,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -624,7 +624,7 @@ Constants: 0x5000 -> `STAGE_CHUNK_SIZE / 2`, 0x7FF -> `STAGE_CELL_SIZE - 1` (the
 
 Left: `StageMap__SplitChunkIndex(self, (u8 *)out, ...)`; the prototype and the +0x114 slot take `u8 *`. Proposed: `Descriptor10 *` (it writes b0/b1).
 
-The comment that stood above the function in `src/world/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/world/dream_day.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 63 (delta): closed a six-round stall (72/106 since round 19)

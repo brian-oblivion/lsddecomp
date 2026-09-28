@@ -129,7 +129,7 @@ trusting it — here both round-25 levers were compensations for wrong types.
 ## Round 97 (echo, track 6): the record is Sony's `SsScore`
 
 The unit's local 0xAC-byte view `Entry90902E8` is deleted; the function now
-uses `SsScore` from `include/SsScore.h`, the record behind libsnd's
+uses `SsScore` from `include/ss_score.h`, the record behind libsnd's
 `_ss_score` (named from Sony's variable, as no libsnd internal header ships
 on any disc). The type is Sony's because only Sony functions read it: this
 function is library code by the `config/psyq-objects.ld` pin, and the other

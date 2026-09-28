@@ -26,10 +26,10 @@ correctly left untouched per the runner brief).
 
 ```c
 #include "common.h"
-#include "GameApplication.h"
-#include "Pad.h"
+#include "game_application.h"
+#include "pad.h"
 
-/* Local, opaque: code_8220.h can't be included alongside Pad.h
+/* Local, opaque: code_8220.h can't be included alongside pad.h
  * (both define `struct BasicClassMethods`, per this project's
  * multiple-independent-local-views convention -- headercontention.py
  * confirms the two units' local views collide), and nothing here
@@ -42,7 +42,7 @@ extern void __main(void);
  * One `s32` argument observed at this, its only call site. */
 extern void SetMem(s32 mode);
 
-/* BMemPMgrInit is fully matched in BMemPMgr.c as a single-argument
+/* BMemPMgrInit is fully matched in bmem_pmgr.c as a single-argument
  * function (`s32 poolSize`, see docs/match-reports/BMemPMgrInit.md,
  * 31/31 words). THIS call site pushes a second, dead argument (0) that the
  * matched body never reads -- an unspecified-parameter declaration lets the
@@ -68,7 +68,7 @@ extern BMemPMgr *sStartupBMemPMgr;
 extern GameApplication *sGameApplication;
 extern GameApplicationConfig sGameApplicationConfig;
 
-/* Matched in GameApplicationFileResource.c; not yet declared in any header (no other carved
+/* Matched in game_shell.c; not yet declared in any header (no other carved
  * caller existed until now). */
 extern GameApplication *New_GameApplication(GameApplicationConfig *arg);
 
@@ -169,7 +169,7 @@ this is a documentation sync only.)
     `main`. Mechanics are clear (it stages the newly created heap
     pointer); whether any still-uncarved code elsewhere also reads this
     exact global (as opposed to `sDefaultBMemPMgr`, a different address,
-    `BMemPMgr.c`) is not established, hence tier B rather than A.
+    `bmem_pmgr.c`) is not established, hence tier B rather than A.
   - `D_8008AC20` -> `sGameApplication`, tier B. The one instance of `GameApplication`
     the game constructs, matching this header's own stated convention of
     keeping the class's identity tied to its vtable address until a
@@ -178,7 +178,7 @@ this is a documentation sync only.)
   - `D_80066828` -> `sGameApplicationConfig`, tier A: purely mechanical, it
     IS the one `GameApplicationConfig` block in the image, passed to
     `New_GameApplication` at its only call site. `{0x13, 0, 1, 1, 1, 1}`, per
-    `include/GameApplication.h`'s existing documentation of which two fields
+    `include/game_application.h`'s existing documentation of which two fields
     (`+0x00`, `+0x14`) `GameApplication__GameApplication` actually reads.
 
   All three: `./build-and-verify.sh` byte-identical, `tools/check-nonmatching.sh`
@@ -202,7 +202,7 @@ fingerprint) evidence that the callee IS that toolchain-standard symbol.
 Use a non-colliding name (`main`, `EntryMain`, etc.) for the game's
 real entry point instead.
 
-Also in `include/GameApplication.h`: `GameApplicationMethods.unk4C` (never dispatched
+Also in `include/game_application.h`: `GameApplicationMethods.unk4C` (never dispatched
 by any carved C before this) is retyped from `void *` to `void
 (*slot4C)(GameApplication *self);` -- this function is its first caller.
 
@@ -215,7 +215,7 @@ by any carved C before this) is retyped from `void *` to `void
    regardless -- `addu $a1,$zero,$zero` right after the `jal`. An
    unspecified-parameter (`void *BMemPMgrInit();`) local declaration lets
    the call push two arguments without contradicting the real, ANSI,
-   single-argument definition seen from `BMemPMgr.c`'s own translation
+   single-argument definition seen from `bmem_pmgr.c`'s own translation
    unit -- the exact idiom `code_8220.h` already documents for
    `BMemPMgrAlloc`/`BMemPMgrFree`. First guess (passing only
    `BMemPMgrInit(0x166C00)`) simply omitted the dead `$a1` instruction and
@@ -278,7 +278,7 @@ failure, not a claim about the code.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
+The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/draw_system.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
 
 ## History (moved from src/main.c, round 101)
 
@@ -351,7 +351,7 @@ The `arity-ok` line's retail evidence: the dead second argument of
 | --- | --- | --- | --- |
 | local `obj` | `drawSystem` | A | it holds `New_DrawSystem()`'s return and is passed as `initSystems`'s `DrawSystem *drawSystem` |
 | `2` (SetMem) | `CONSOLE_RAM_MB` | A | Psy-Q libapi's `SetMem(n)` takes the RAM size in megabytes, 2 on a retail console, 8 on a development board |
-| `0x166C00` | `DEFAULT_POOL_SIZE` = `(1435 * 1024)` | A | `BMemPMgrInit(s32 poolSize)` (src/app/BMemPMgr.c) stores it as `pool->poolSize`; the pool is installed by `SetDefaultBMemPMgr`, whose only caller is `main`, as the `sDefaultBMemPMgr` every `BMemPMgrAlloc` uses |
+| `0x166C00` | `DEFAULT_POOL_SIZE` = `(1435 * 1024)` | A | `BMemPMgrInit(s32 poolSize)` (src/app/bmem_pmgr.c) stores it as `pool->poolSize`; the pool is installed by `SetDefaultBMemPMgr`, whose only caller is `main`, as the `sDefaultBMemPMgr` every `BMemPMgrAlloc` uses |
 
 `New_Pad(0, 0)` keeps its literals with a comment: they are `PadInit`'s mode
 and the port, and a name would restate them.

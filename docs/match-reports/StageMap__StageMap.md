@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A534` on 2026-09-22 (tools/rename.py). Address 0x8004a534.
 
-Unit `DayTaskStageMap`, 177-line body, `StageMapMethods::ctor` (the occupant
+Unit `dream_day`, 177-line body, `StageMapMethods::ctor` (the occupant
 of the ctor slot, dispatched by `New_StageMap`'s `New_StageMap`
 allocator). 8 distinct callee-saved registers (`$s0`-`$s7`, fully
 saturated) -- flagged by the head as being in the band that was 0
@@ -125,7 +125,7 @@ more dispatches on `self->methods` (`slot10` with a fresh `GetDrawSystem()`
 value, then `slot40`, already known gp_rel-blocked as a CALLEE -- irrelevant
 here since this function only DISPATCHES to it, never inlines its body).
 
-## New struct ground opened (all additive; DayTaskStageMap.h is unique to this unit)
+## New struct ground opened (all additive; dream_day.h is unique to this unit)
 
 - `StageMapMethods::slot10` (+0x010, replacing a 4-byte pad) -- the ctor's
   own dispatch, `(self, s32 arg1)`.
@@ -158,7 +158,7 @@ here since this function only DISPATCHES to it, never inlines its body).
 2. **`New_PlacementGrid` takes an argument, not zero.** Retail sets
    `$a0 = 0` right after the `slot88` dispatch and never touches it again
    before the `jal` -- the "leftover register is a forwarded/explicit
-   argument" tell, same family as this round's `TextEntryItemList` slot-arity
+   argument" tell, same family as this round's `input_dialogs` slot-arity
    fixes, except here the argument is a plain literal `0` rather than
    forwarded. Declaring it `(s32 arg1)` and calling `New_PlacementGrid(0)`,
    plus reordering the four field-zeroing statements to match retail's
@@ -217,41 +217,41 @@ Round 67 (track 3, naming pass).
 | `D_8008682C` | `sDefaultOrigin` | A | Its only use is this ctor's fallback when `arg1 == NULL`: `self->origin = sDefaultOrigin`. `asm/data/76DC8.data.s` shows the three words are all zero, so it is literally the default origin. |
 
 Field names this function established (all unit-local -- the compiler listed
-no accessor outside `src/world/DayTaskStageMap.c`):
+no accessor outside `src/world/dream_day.c`):
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
 | `StageMap+0x054` | `origin` | B | A 3-word block, copied here from `arg1` or `sDefaultOrigin`, then passed as the THIRD argument of `cellParent->methods->slot4C(cellParent, self, &self->origin)`. The same parameter position in the sibling call one loop deeper receives `buf = {x, 0, z}`, a literal world position on the 0x800 lattice -- so the slot takes a position and this field is one. |
-| `StageMap+0x0EC` | `elems[7]` | A | Seven 0x1C-byte records, walked 0..6 here, in `StageMap__Finalize` and in `StageMap__UnloadAllSlots`; `DayTaskStageMap` reaches the same array from four more functions and calls it `arr[7]`. |
-| `UnkSlotEntry+0x000` | `flag` | B | Zeroed here and in `StageMap__UnloadAllSlots`; `DayTaskStageMap`'s independent view names the same halfword `Elem::flag`. |
-| `UnkSlotEntry+0x002` | `key` | B | Set to the loop index here and copied on into `target->key`; `DayTaskStageMap`'s `StageMap__LoadChunksAround` copies a caller-supplied key byte into the same field. |
-| `UnkSlotEntry+0x004` | `target` | B | `DayTaskStageMap` types the same pointer `ElemTarget *` from six functions. |
+| `StageMap+0x0EC` | `elems[7]` | A | Seven 0x1C-byte records, walked 0..6 here, in `StageMap__Finalize` and in `StageMap__UnloadAllSlots`; `dream_day` reaches the same array from four more functions and calls it `arr[7]`. |
+| `UnkSlotEntry+0x000` | `flag` | B | Zeroed here and in `StageMap__UnloadAllSlots`; `dream_day`'s independent view names the same halfword `Elem::flag`. |
+| `UnkSlotEntry+0x002` | `key` | B | Set to the loop index here and copied on into `target->key`; `dream_day`'s `StageMap__LoadChunksAround` copies a caller-supplied key byte into the same field. |
+| `UnkSlotEntry+0x004` | `target` | B | `dream_day` types the same pointer `ElemTarget *` from six functions. |
 | `UnkSlotEntry+0x008` | `list` | C-ish/B | Built here by `New_PlacementGrid(0)`; the name records only that it is the list object the entry owns. |
 | `UnkSlotEntry+0x00C` | `cellParent` | B | Initialized here with `slot4C(cellParent, self, &self->origin)` and then passed as the PARENT argument of every grid cell's own `slot4C(cell, cellParent, buf)`. Its role in this function is exactly "the node the cells hang off". |
-| `UnkSlotEntry+0x010` | `cells` | A | 0x668 raw bytes allocated here and filled with freshly built cell objects, one per 4 bytes; `StageMap__Finalize` walks the same span tearing them down; `DayTaskStageMap`'s byte-matched `StageMap__SetFootprintVisible` indexes the same block as a 2D grid. |
+| `UnkSlotEntry+0x010` | `cells` | A | 0x668 raw bytes allocated here and filled with freshly built cell objects, one per 4 bytes; `StageMap__Finalize` walks the same span tearing them down; `dream_day`'s byte-matched `StageMap__SetFootprintVisible` indexes the same block as a 2D grid. |
 
 **The 21-vs-20 discrepancy, recorded not resolved.** This ctor's placement
 loop wraps X after 21 columns (`x = 0x400 + k * 0x800`, reset when
 `x > 0xA400`), and 0x668 bytes is 410 cell pointers -- neither `20 * 20` nor a
 whole number of 21-cell rows. The grid's INDEX stride is 20, byte-verified
-twice over (`DayTaskStageMap`'s matched `StageMap__SetFootprintVisible`, and
+twice over (`dream_day`'s matched `StageMap__SetFootprintVisible`, and
 `sDefaultGridSpan >> 11`). This function is byte-exact, so both constants are
 certainly right; what the extra column and the 10 spare pointers are for is
 unknown. Do not "correct" the stride to 21 on this function's evidence alone.
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/LightRig.h`; the first call is `GetLightRigMethods()->ctor((LightRig *)self)` through include/LightRig.h (was a unit-local `BaseCtorTable_3ac78 *` view of the same getter). A pointer cast emits no code; image byte-identical. StageMap's own view is unchanged.
+2026-09-26, round 86 (delta): class 0x14 (was D_8006EFAC) unified as LightRig in `include/light_rig.h`; the first call is `GetLightRigMethods()->ctor((LightRig *)self)` through include/light_rig.h (was a unit-local `BaseCtorTable_3ac78 *` view of the same getter). A pointer cast emits no code; image byte-identical. StageMap's own view is unchanged.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
+The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/draw_system.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
 
 ## Track 4 (2026-09-26, round 88, alpha: GridCell's unification)
 
 The objects this ctor builds with `New_GridCell()` are typed as what they
 are: `UnkSlotEntry_3ac78::cellParent` is `struct GridCell *` and the
-cell-building local `obj` is `GridCell *` (include/GridCell.h), and the
+cell-building local `obj` is `GridCell *` (include/grid_cell.h), and the
 local `extern GenericObject *New_GridCell(void)` is gone. The generic
 slots resolve to SceneNode's: `slot4C` is `attachToParent` (the cellParent
 attached to the StageMap at `origin`, each cell attached to the
@@ -273,11 +273,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -404,8 +404,8 @@ Zero-byte polish, each step verified whole-image:
 - the cell walk indexes `GridCell **` (`cells`, `cursor`, `end = cells + STAGE_SLOT_CELLS`) instead of a `u8 *` stepped by 4; the round-67 staging fix above (`end` computed from `cells` before `cursor = cells`) still applies and now carries a `MATCHING:` line;
 - the lattice position is a `LongVec3 pos` instead of `s32 buf[3]` cast to `LongVec3 *`;
 - measured this round: dropping the two reloads `cell = *cursor` (reusing the `New_GridCell()` result) breaks the image, so they carry a `MATCHING:` line;
-- constants: `0x668` -> `STAGE_SLOT_CELLS * sizeof(GridCell *)`, `0x400` -> `STAGE_CELL_SIZE / 2`, `0x800` -> `STAGE_CELL_SIZE`, `0xA400` -> `STAGE_CHUNK_SIZE + STAGE_CELL_SIZE / 2` (all include/StageMap.h), `0x80000000` -> Sony's `GsDOFF`, the `setLightMode` 1 annotated `GsFOG` (SceneNode__SetLightMode's 3-bit field at bit 3, as in entity.c and ObjMStyleActor.c), `i < 7` -> `ARRAY_COUNT(self->slots)`, `acceptedTags = 0` -> `NULL`;
-- `BMemPMgrAlloc`/`BMemPMgrFree` come from include/BMemPMgr.h; the unit's local externs and their comment ("all still-uncarved elsewhere, typed purely from this call site's own register usage", stale since BMemPMgr.c was carved) are gone.
+- constants: `0x668` -> `STAGE_SLOT_CELLS * sizeof(GridCell *)`, `0x400` -> `STAGE_CELL_SIZE / 2`, `0x800` -> `STAGE_CELL_SIZE`, `0xA400` -> `STAGE_CHUNK_SIZE + STAGE_CELL_SIZE / 2` (all include/stage_map.h), `0x80000000` -> Sony's `GsDOFF`, the `setLightMode` 1 annotated `GsFOG` (SceneNode__SetLightMode's 3-bit field at bit 3, as in entity.c and dream_scene.c), `i < 7` -> `ARRAY_COUNT(self->slots)`, `acceptedTags = 0` -> `NULL`;
+- `BMemPMgrAlloc`/`BMemPMgrFree` come from include/bmem_pmgr.h; the unit's local externs and their comment ("all still-uncarved elsewhere, typed purely from this call site's own register usage", stale since bmem_pmgr.c was carved) are gone.
 - the in-code comment on the wrap test records the 21-positions-per-row fact from "The 21-vs-20 discrepancy" above, without a reading of it.
 
 ## History (moved from include/class_3bb8c.h, round 102)

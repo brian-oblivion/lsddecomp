@@ -98,7 +98,7 @@ void SceneNode__GetRotationDegrees(SceneNodeObj *self, Ratio16 *out) {
 ```
 
 Preserved inline (`#if 0`, positioned where it would compile back into
-`src/graphics/SceneNode.c` in place of the current `INCLUDE_ASM`):
+`src/graphics/scene_node.c` in place of the current `INCLUDE_ASM`):
 
 ```c
 #if 0
@@ -118,7 +118,7 @@ void SceneNode__GetRotationDegrees(SceneNodeObj *self, Ratio16 *out) {
 
 ## New struct/extern knowledge already committed alongside this report
 
-`include/SceneNode.h` gains a proper named type for the `{s16 whole; s16
+`include/scene_node.h` gains a proper named type for the `{s16 whole; s16
 frac;}` pair `RatioToFixed12` reads and this function produces --
 `Ratio16`, replacing the previous prose-only description. This is
 purely additive (a new typedef/struct; `RatioToFixed12`'s own `void *pair`
@@ -183,7 +183,7 @@ either failure mode equally).
 ## Round 18 (permuter pass, charlie)
 
 Header note: this report's preserved body used `src->unk10/unk12/unk14`
-for the three angle fields, but `include/SceneNode.h`'s `SceneNodeSub44`
+for the three angle fields, but `include/scene_node.h`'s `SceneNodeSub44`
 has since been retyped (a later round's `S16Quad_d294 vec` at `+0x10`,
 fields `vec.x/vec.y/vec.z`) -- the permuter seed was updated to
 `src->vec.x/y/z` accordingly; this is a pure rename with no semantic
@@ -274,7 +274,7 @@ the head cited.
 ## Round 19 (echo): claim re-verified, one more axis tried and closed negative
 
 Re-confirmed this report's own baseline claim before doing anything
-else: `INCLUDE_ASM` was still in place in `src/graphics/SceneNode.c`, a fresh
+else: `INCLUDE_ASM` was still in place in `src/graphics/scene_node.c`, a fresh
 full build was green (`build exit=0`), and `funcdiff.py` reported the
 expected retail-vs-retail full-match warning (meaningless, confirms
 harness sanity only).
@@ -325,7 +325,7 @@ identity vs. pair-swap) before reaching for an axis that closed a
 
 - **`func_8001E6F8` -> `SceneNode__GetRotationDegrees`. Tier A.** Every
   term is measured, none inferred: the source is `self->unk14->unk44->vec`,
-  which the PSY-Q IDENTIFICATION note in include/SceneNode.h pins as
+  which the PSY-Q IDENTIFICATION note in include/scene_node.h pins as
   `GsCOORDINATE2.param->rotate`, Sony's own SVECTOR of Euler angles; the
   conversion `* 45 >> 9` is exactly `* 360 / 4096`, i.e. PSX 4096-per-turn
   units to degrees; and the three outputs are written as a
@@ -339,9 +339,9 @@ identity vs. pair-swap) before reaching for an axis that closed a
 
 ## Round 97 (alpha): Sony's SVECTOR
 
-GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/SceneNode.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
+GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/scene_node.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
 The old comment's `unk14->unk44->vec` is `coord2->param->rotate` (GsCOORD2PARAM.rotate, SVECTOR). The num-before-den order keeps a one-line `MATCHING:` note in the source; the derivation stays in this report.
 

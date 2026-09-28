@@ -23,7 +23,7 @@ void SetDefaultBMemPMgr(BMemPMgr *pool)
 
 `sDefaultBMemPMgr` is the global "current default pool" pointer, the same global
 `SetupBMemPMgrFreeList`, `BMemPMgrAlloc` and `BMemPMgrFree` (this unit) all read.
-Declared `extern BMemPMgr *sDefaultBMemPMgr;` in `include/BMemPMgr.h`, next to
+Declared `extern BMemPMgr *sDefaultBMemPMgr;` in `include/bmem_pmgr.h`, next to
 `SetupBMemPMgrFreeList`'s own doc comment which already named this global. Not
 called from any carved C yet — nothing in this unit or its siblings
 invokes it, so whoever establishes the game's one default pool at startup

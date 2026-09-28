@@ -27,7 +27,7 @@ loose `void *`/`*a1` reads into real fields.
 
 ## New types/fields
 
-- **`GenericCountList_d294`** (new local type, `include/SceneNode.h`): a
+- **`GenericCountList_d294`** (new local type, `include/scene_node.h`): a
   third "just enough to dispatch" view, seen only through this call site.
   `unk0` (its own first field) is read once and multiplied by 8 to form
   `ApplyMatrixToSVArray`'s iteration count; `&unk4` (address only, never
@@ -76,12 +76,12 @@ established. Purely local to this unit + its header.
 
 ## Track 6 (round 91, echo)
 
-The argument type GenericCountList_d294 (`unk0`, `unk4`) is TmdModel.h's TmdHull (`count`, `v`): the buffer NotifyWithHull passes is TmdModel__GetHull's output. Byte-identical.
+The argument type GenericCountList_d294 (`unk0`, `unk4`) is tmd_model.h's TmdHull (`count`, `v`): the buffer NotifyWithHull passes is TmdModel__GetHull's output. Byte-identical.
 
 ## Round 100 (delta): track 7
 
-Parameters `a1`/`a2` -> `verts`/`event` (SceneNode.h's names). `* 8` ->
-`* HULL_BOX_CORNERS` (new in TmdModel.h: a TmdHull box's eight corners).
+Parameters `a1`/`a2` -> `verts`/`event` (scene_node.h's names). `* 8` ->
+`* HULL_BOX_CORNERS` (new in tmd_model.h: a TmdHull box's eight corners).
 `linkTarget = 0` -> `NULL`.
 
 ### History: the comments in src/code_d294_b.c before this pass, verbatim

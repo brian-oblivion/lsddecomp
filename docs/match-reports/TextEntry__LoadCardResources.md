@@ -4,7 +4,7 @@
 
 > Renamed from `func_80050F98` on 2026-09-24 (tools/rename.py). Address 0x80050f98.
 
-Unit `TextEntryItemList`, 125-line body -- the largest function in this round's
+Unit `input_dialogs`, 125-line body -- the largest function in this round's
 batch. Obj86ED0's own "load the two memory-card TIM resources" method:
 builds two `CARD\\<NAME>.TIM` paths, loads each through a short-lived
 resource handle, and wraps/converts each into a `ChildObj86ED0`-shaped
@@ -62,7 +62,7 @@ void TextEntry__LoadCardResources(Obj86ED0 *self, void *arg1)
 
 ## Deriving the shape
 
-`BuildFileName` is already matched (`src/app/GameApplicationFileResource.c`):
+`BuildFileName` is already matched (`src/app/game_shell.c`):
 `dest[0]=0; if (arg2) strcat(dest,arg2); strcat(dest,arg1); strcat(dest,arg3); return dest;`
 -- i.e. it builds `arg2 + arg1 + arg3` into `dest`. The two call sites here
 pass `(path, "COMINPUT", "CARD\\", ".TIM")` and
@@ -73,7 +73,7 @@ rodata bytes at `sStrComInput`/`sStrFontIcon`/`sCardPathPrefix`/`sTimExt`
 
 `New_TimImage` (a resource loader taking a path, returning a handle) is
 already typed at several OTHER call sites in the project
-(`Task.h`/`DayTaskStageMap.h`/`TextEntryItemList.c`, all with their own local
+(`task.h`/`dream_day.h`/`input_dialogs.c`, all with their own local
 return-type view per this project's established convention) -- confirmed
 this is the same function by address, given its own local reading here.
 
@@ -104,7 +104,7 @@ bytes of cost (pointer reinterpretation is free). `New_CharSprite` and
 they got fresh local `extern` declarations here, typed purely from this
 call site's own register usage (same convention as `DecodeFullWidthSjis` above
 in this file) -- and diverge from `New_CharSprite`'s OTHER call-site typing
-in `Task.h` (`(s32, s32)`), which is expected and fine.
+in `task.h` (`(s32, s32)`), which is expected and fine.
 
 ## The one real residue: register identity from live-range shape, not code shape
 
@@ -153,17 +153,17 @@ three-value swap was resolved by touching only the non-persistent one.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&sTextEntryPanelRect, 0)`: sTextEntryPanelRect is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position sTextEntryPanelPos = (-70, -60). Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/screen_sprite.h`; the unit includes it and its local extern is gone. The call reads `self->unk48 = (ChildObj86ED0 *)New_ScreenSprite(handle1, (SpriteRect *)&sTextEntryPanelRect, 0)`: sTextEntryPanelRect is the rect (words 0, 224, 120), and unk48's +0x04C call passes the screen position sTextEntryPanelPos = (-70, -60). Image byte-identical.
 
-2026-09-26, round 86 (bravo): CharSprite (class 0x1144, formerly D_8006EC74) is unified in `include/CharSprite.h`. The local `extern ChildObj86ED0 *New_CharSprite(ChildObj86ED0 *, s32)` is gone; the unit includes the header and casts the result to `unk40`'s `ChildObj86ED0 *`, as it does for New_ScreenSprite. The 0x5F cell it asks for on FONTICON.TIM is '_', one of the facts behind the class name. Image byte-identical.
+2026-09-26, round 86 (bravo): CharSprite (class 0x1144, formerly D_8006EC74) is unified in `include/char_sprite.h`. The local `extern ChildObj86ED0 *New_CharSprite(ChildObj86ED0 *, s32)` is gone; the unit includes the header and casts the result to `unk40`'s `ChildObj86ED0 *`, as it does for New_ScreenSprite. The 0x5F cell it asks for on FONTICON.TIM is '_', one of the facts behind the class name. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`); this unit's local `extern
+TimImage is unified (`include/tim_image.h`); this unit's local `extern
 ChildObj86ED0 *New_TimImage(char *)` is deleted. `handle1`/`handle2` are
 `TimImage *`: +0x078 (FileResource's `void *slot78`, occupant
 TimImage__Upload) through `TimImageUploadFn`, +0x004 the inherited
@@ -173,7 +173,7 @@ TimImage__Upload) through `TimImageUploadFn`, +0x004 the inherited
 
 `ChildObj86ED0`/`ChildMethods86ED0` (include/class_3bb8c.h) are deleted: the
 object behind them is the `New_TextRow` result, so TextEntry::textRow
-(+0x044, include/TextEntry.h) is `struct TextRow *`. The slots map onto
+(+0x044, include/text_entry.h) is `struct TextRow *`. The slots map onto
 TextRow's table offset for offset: +0x004 `release`, +0x04C `attachToParent`
 (position cast to `LongVec3 *`, as ScreenSprite's banner describes), +0x0B8
 `setColor` (`sTextEntryTextColor`, the 0x80/0x80/0x00 word, passed as `ColorRgb *`),
@@ -191,7 +191,7 @@ says what they are):
 | D_8008AAC8 | sTextEntryTextColor | the text row's setColor: (128, 128, 0) |
 | D_8008AACC | sTextEntryPanelPos | the panel's attachToParent position: (-70, -60) |
 | D_8008AAD4 | sTextEntryTextPos | the text row's attachToParent position: (-62, -15) |
-| D_8008AADC | sTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (TextEntryItemList) reads its x |
+| D_8008AADC | sTextEntryCursorPos | the cursor's attachToParent position (-62, -12); SetCursorPos (input_dialogs) reads its x |
 
 The externs are typed `SpriteRect`, `ColorRgb` and `ScreenSpritePos`
 (TaskObjF's sCardIconRect/sCardIconPos are the precedent), so two casts
@@ -200,14 +200,14 @@ cast. Locals `handle1`/`handle2` -> `panelTim`/`fontTim`, parameter
 `arg1` -> `parent`, `path[0x20]` -> `path[32]`, the cursor cell `0x5F` ->
 `'_'`. Zero bytes changed.
 
-Proposed (TextEntryItemList's): D_8008AAE0 is the cursor position's y (-12),
+Proposed (input_dialogs's): D_8008AAE0 is the cursor position's y (-12),
 read by SetCursorPos; a name such as `gTextEntryCursorY`, or reading it as
-`sTextEntryCursorPos.y` once TextEntryItemList types sTextEntryCursorPos as a
+`sTextEntryCursorPos.y` once input_dialogs types sTextEntryCursorPos as a
 ScreenSpritePos.
 
 ## Round 98: sTextEntryCursorPos unified (track 4b)
 
 The local `extern ScreenSpritePos sTextEntryCursorPos` moved to
-include/TextEntry.h, the only declaration; TextEntryItemList's `s32` view and its
+include/text_entry.h, the only declaration; input_dialogs's `s32` view and its
 `D_8008AAE0` (the y) now read `sTextEntryCursorPos.x`/`.y`, byte-exact. The
 proposal above is applied.

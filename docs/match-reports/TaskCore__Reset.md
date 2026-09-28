@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C11C` on 2026-09-23 (tools/rename.py). Address 0x8003c11c.
 
-**Unit:** Task · **Size:** 48 words · **Status:** MATCHED (48/48)
+**Unit:** task · **Size:** 48 words · **Status:** MATCHED (48/48)
 
 ## Summary
 
@@ -77,7 +77,7 @@ this codebase.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from TaskCoreObj__Reset (tools/rename.py): the class prefix. Occupant of +0x040 (IntermediateBase's `resetCounters`, the ctor's last call). Keeps "Reset" rather than the slot's name: it sets eight defaults and makes four slot calls and does not up-call. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from TaskCoreObj__Reset (tools/rename.py): the class prefix. Occupant of +0x040 (IntermediateBase's `resetCounters`, the ctor's last call). Keeps "Reset" rather than the slot's name: it sets eight defaults and makes four slot calls and does not up-call. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 99, alpha)
 
@@ -95,7 +95,7 @@ Renamed from TaskCoreObj__Reset (tools/rename.py): the class prefix. Occupant of
   leaves which is which open; this name is the reading above, not a
   measurement.
 - `unk2C` (-> `packetCount`) and `unk34` (-> `clearOnDeinit`) have accessors
-  in TitleMenuTaskObjF.c / ObjMStyleActor.c: proposed, not renamed.
+  in title_menu.c / dream_scene.c: proposed, not renamed.
 
 ### History moved from include/code_2c054.h
 
@@ -106,4 +106,4 @@ apart, never decoded further, so typed as a plain byte array". It is in
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-TaskCore fields renamed (include/TaskCore.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.
+TaskCore fields renamed (include/task_core.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.

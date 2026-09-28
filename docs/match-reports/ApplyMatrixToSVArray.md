@@ -32,7 +32,7 @@ plain `sh` for `h`, before calling `func_80015D58(fixed, &buf, src)`.
 
 `new struct knowledge (not yet committed -- see below)`: a `Rec6_d294`
 type (`{s32 w; s16 h;}`) was drafted for this but NOT added to
-`include/SceneNode.h`, since every attempt below shows the pinned `cc1`
+`include/scene_node.h`, since every attempt below shows the pinned `cc1`
 does not select the construct this type is meant to describe; committing
 the type without the function it names would be documentation for a
 codegen fact I could not confirm.
@@ -174,7 +174,7 @@ just the trailing increment statements' order (29/37, no change) --
 neither touches WHICH value the loop bound itself is computed from,
 which is what actually mattered.
 
-Final source (verbatim, now in `src/graphics/SceneNode.c` in place of the
+Final source (verbatim, now in `src/graphics/scene_node.c` in place of the
 `INCLUDE_ASM`):
 
 ```c
@@ -201,7 +201,7 @@ void ApplyMatrixToSVArray(void *src, void *dest, s32 count, void *out) {
 }
 ```
 
-**This also corrects a semantic error in `include/SceneNode.h`'s prior
+**This also corrects a semantic error in `include/scene_node.h`'s prior
 comment**, invisible until this function was actually matched: the
 matched code reads FROM `dest` into the stack buffer and forwards `src`
 raw (unchanged) to `func_80015D58` -- the OPPOSITE of the header's
@@ -262,12 +262,12 @@ swap between a function's own parameters.
   trailing s16" the typedef guessed. Byte-identical.
 
 
-## Round 95 (bravo): moved from include/SceneNode.h
+## Round 95 (bravo): moved from include/scene_node.h
 
 The header's banner was rewritten as documentation in round 95; the comment it carried about this function, verbatim:
 
 ```c
-/* ApplyMatrixToSVArray (src/graphics/SceneNode.c; MATCHED round 19, echo -- see
+/* ApplyMatrixToSVArray (src/graphics/scene_node.c; MATCHED round 19, echo -- see
  * docs/match-reports/ApplyMatrixToSVArray.md): `dst[i] = m * src[i]` for
  * `count` elements of 6 bytes each. Each iteration copies one element out
  * of `src` into an all-s16 stack local (alignment 2, which is what makes
@@ -281,9 +281,9 @@ The header's banner was rewritten as documentation in round 95; the comment it c
  * shape its callers need. */
 ```
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
-The definition and its prototype in include/SceneNode.h now take `(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m)` and walk by element (`dst + count`, `src++`), replacing the `(u8 *)p + 6` byte walks; the local `ApplyMatrixSV` extern takes Sony's signature `SVECTOR *(MATRIX *, SVECTOR *, SVECTOR *)` (this SDK's libgte.h omits it). Byte-identical. Measured on the way: keeping `void *` parameters and copying them into typed locals (`out = dst; in = src;`) scores 31/37, because the new pseudos reorder the callee-saved register saves in the prologue; typing the parameters themselves does not.
+The definition and its prototype in include/scene_node.h now take `(TmdVec3 *dst, TmdVec3 *src, s32 count, MATRIX *m)` and walk by element (`dst + count`, `src++`), replacing the `(u8 *)p + 6` byte walks; the local `ApplyMatrixSV` extern takes Sony's signature `SVECTOR *(MATRIX *, SVECTOR *, SVECTOR *)` (this SDK's libgte.h omits it). Byte-identical. Measured on the way: keeping `void *` parameters and copying them into typed locals (`out = dst; in = src;`) scores 31/37, because the new pseudos reorder the callee-saved register saves in the prologue; typing the parameters themselves does not.
 
 The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
 

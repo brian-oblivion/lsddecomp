@@ -2,7 +2,7 @@
 
 > Renamed from `func_800534C8` on 2026-09-24 (tools/rename.py). Address 0x800534c8.
 
-**Unit:** ObjMStyleActor · **Size:** 122 words (0x1E8 bytes)
+**Unit:** dream_scene · **Size:** 122 words (0x1E8 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 15, then re-affirmed "STILL
 BLOCKED, stub report stands" in the round-24 re-screen. That blocker was
@@ -78,12 +78,12 @@ the middle.
   division by 3) are BOTH canonical GCC 2.6.3 constant-division sequences —
   writing `val / 2 * 5 / 3` in ordinary C reproduces both exactly; no need
   to spell out the magic constant or shift amounts by hand.
-- **`SetDreamAuxWorld`** (matched round 43, `src/world/DreamAux.c`) has no header
+- **`SetDreamAuxWorld`** (matched round 43, `src/world/dream_aux.c`) has no header
   prototype anywhere, so this unit's own call-site typing (all `s32`,
   matching its real definition) is local, same convention as
   `PickStageBgm`/`PickStageTexture`/etc. already declared in this file.
-- **`GetStageGridDimensions`** (already matched, `src/world/StageGrid.c`) has a
-  real prototype in `include/StageGrid.h` returning `StageGridDimensions
+- **`GetStageGridDimensions`** (already matched, `src/world/stage_grid.c`) has a
+  real prototype in `include/stage_grid.h` returning `StageGridDimensions
   *`, but this unit doesn't include that header and only forwards the
   return value opaquely, so a local `void *`-returning declaration is used
   instead — a different return type from the canonical one is fine for an
@@ -141,7 +141,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `self->unkC` was IntermediateBase::initArgs (its unk0 is read), `world` the viewport (setProjection +0x054, attachViewChild), `unk14` the StageMap (setAmbientColor +0x0BC, setChildParams, setConfig, setGridSpan, setAcceptedTags), `unk34` TimedTask::sound, `unk10` the FrameClock.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. `self->unkC` was IntermediateBase::initArgs (its unk0 is read), `world` the viewport (setProjection +0x054, attachViewChild), `unk14` the StageMap (setAmbientColor +0x0BC, setChildParams, setConfig, setGridSpan, setAcceptedTags), `unk34` TimedTask::sound, `unk10` the FrameClock.
 
 ## Round 94 (track 6, charlie)
 
@@ -159,24 +159,24 @@ Zero bytes changed.
 
 The unit-local view `UnkCObj_3bb8c_l` / `UnkCObjMethods_3bb8c_l` was deleted:
 it was the DrawSystem (IntermediateBaseInitArgs::drawSystem) seen through
-+0x07C, which include/DrawSystem.h has as `getDims(self, DrawRect *out)`
++0x07C, which include/draw_system.h has as `getDims(self, DrawRect *out)`
 returning `ScreenDims *`. The body now reads
 `drawSystem->methods->getDims(drawSystem, NULL)->w`, byte-identical. Its
 comment, moved here:
 
 > initArgs->unk0 as SetupSceneStyle reads it: its +0x07C returns a pointer
-> to one word (DayTaskStageMap.h's SubObjE is the same call from
+> to one word (dream_day.h's SubObjE is the same call from
 > DayTask__OnInit).
 
-Proposed for the head: DayTaskStageMap.h's `SubObjE` is the same DrawSystem
+Proposed for the head: dream_day.h's `SubObjE` is the same DrawSystem
 call and can go the same way.
 
 Comment history moved from the unit's externs:
 
-> DreamAux.c's (MATCHED round 43); no header declares it. `world` is the
+> dream_aux.c's (MATCHED round 43); no header declares it. `world` is the
 > DreamSys it installs as sDreamAuxWorld (track 4, round 88).
 
-> GetStageGridDimensions comes from include/StageGrid.h, through DreamSys.h.
+> GetStageGridDimensions comes from include/stage_grid.h, through dream_sys.h.
 
 > The StageMap's accepted tags (setAcceptedTags), an opaque .data block
 > (asm/data/76DC8.data.s) reached by address.
@@ -190,6 +190,6 @@ of the GsDOBJ2 attribute, where 1 is libgs's GsFOG (1<<3).
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
 
-Viewport's `ViewportSize` merged into DrawSystem.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.
+Viewport's `ViewportSize` merged into draw_system.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.

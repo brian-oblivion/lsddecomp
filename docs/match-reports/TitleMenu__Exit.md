@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004DABC` on 2026-09-24 (tools/rename.py). Address 0x8004dabc.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__Exit`: 23/23 words match.
 
 ## Source
@@ -50,11 +50,11 @@ Renamed `func_8004DABC` -> `TitleMenu__Exit`. **Tier B**: Calls the base class's
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `unk60->unk14` is TaskCore's `slotCounts[5]` (s32 *, +0x060); the TitleMenuUnk60Obj_3bb8c_d view is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `unk60->unk14` is TaskCore's `slotCounts[5]` (s32 *, +0x060); the TitleMenuUnk60Obj_3bb8c_d view is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 

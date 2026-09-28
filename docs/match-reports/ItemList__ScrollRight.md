@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052430` on 2026-09-24 (tools/rename.py). Address 0x80052430.
 
-Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0; whole-image
+Unit `dream_scene`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py ItemList__ScrollRight`: 26/26 words match.
 
 This is vtable slot `+0x07C` of `gItemListMethods` (not declared in
@@ -75,8 +75,8 @@ Round 75 (bravo, track 3). `func_80052430` -> `ItemList__ScrollRight`, **tier A*
 
 Slot +0x07C (`tools/classtable.py gItemListMethods`). If rows exist (`resource`) and column+26 < maxTextLen, increments `column` (the character offset into every item string) and redraws via refreshRows. Mechanics are the purpose. Dispatched by HandleInputCode on code 5.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/dream_scene.c`).
 
 ## Round 99 (delta, track 7)
 
-Local `tmp` -> `current`; the double read keeps a `MATCHING:` line. `0x1A` -> `ITEMLIST_ROW_CHARS` (new, include/ItemList.h): scrolling stops once the row's 26 characters reach the longest item's end.
+Local `tmp` -> `current`; the double read keeps a `MATCHING:` line. `0x1A` -> `ITEMLIST_ROW_CHARS` (new, include/item_list.h): scrolling stops once the row's 26 characters reach the longest item's end.

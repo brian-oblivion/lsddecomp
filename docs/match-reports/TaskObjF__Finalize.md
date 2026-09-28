@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E40C` on 2026-09-24 (tools/rename.py). Address 0x8004e40c.
 
-**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class).
+**Unit:** title_menu (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -38,4 +38,4 @@ separately-fetched vtable getter" shape.
 `BaseMethods3bb8cE` view had already named `finalize`. `TaskObjF__` prefix:
 round 78 cross-checked the whole `gTaskObjFMethods` table and confirmed
 `Node3bb8cE` (this unit's independent local view) is `TaskObjF`
-(include/class_3bb8c.h) -- see src/ui/TitleMenuTaskObjF.c's unit header comment.
+(include/class_3bb8c.h) -- see src/ui/title_menu.c's unit header comment.

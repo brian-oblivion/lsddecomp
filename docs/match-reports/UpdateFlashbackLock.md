@@ -6,12 +6,12 @@
 
 > Renamed from `func_8004D678` on 2026-09-22 (tools/rename.py). Address 0x8004d678.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 13 words · **Status:** MATCHED (13/13)
+**Unit:** title_menu · **Size:** 13 words · **Status:** MATCHED (13/13)
 
 ## What it does
 
 Not a `NodeGuardedViewport`/`GridCell` method -- called directly (`jal`) from the
-still-uncarved `TitleMenu__RefreshMenu` in `asm/TitleMenuTaskObjF.s`. Given a caller-side
+still-uncarved `TitleMenu__RefreshMenu` in `asm/title_menu.s`. Given a caller-side
 context struct and a result struct, reaches through the context to an
 `Obj866E8` instance, checks one of its fields against a large constant
 (9999999) and a second field against zero, and writes a 0/1 flag into the
@@ -41,7 +41,7 @@ void UpdateFlashbackLock(Ctx678_3bb8c_c *ctx, Result678_3bb8c_c *out)
   (`unk1E4` at +0x1E4) -- appended as `pad1E8[0x2F4-0x1E8]` + `unk2F4`,
   with every existing field/pad left untouched. This is the tail extension
   the round's brief anticipated; flagging here per that brief's request in
-  case runner alpha's own DayTaskStageMap work touches the same tail.
+  case runner alpha's own dream_day work touches the same tail.
 
 ## New types: Ctx678_3bb8c_c / Result678_3bb8c_c
 
@@ -90,11 +90,11 @@ matches the project's existing `New_GameApplication`/`strcat`
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/ui/TitleMenuTaskObjF.c`'s 3-parameter declaration
+**Verdict: arity-ok idiom.** `src/ui/title_menu.c`'s 3-parameter declaration
 stays.
 
 **Callee evidence** (`0x8004D678`, and the matched definition in
-`src/ui/TitleMenuTaskObjF.c`): the body reads `$a0` and `$a1`, and *writes* `$a2`
+`src/ui/title_menu.c`): the body reads `$a0` and `$a1`, and *writes* `$a2`
 before ever reading it:
 
 ```
@@ -125,7 +125,7 @@ a `too many arguments` error, and dropping the argument from the call site would
 delete `lw a2,164(s0)` and break `TitleMenu__RefreshMenu`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/ui/TitleMenuTaskObjF.c:219`. Oracle green.
+added to `src/ui/title_menu.c:219`. Oracle green.
 
 ## Naming
 
@@ -147,13 +147,13 @@ without stronger cause.
 ## Track 4 (2026-09-26, round 89)
 
 Renamed `CheckObj866E8CountFlag` -> `UpdateFlashbackLock` with tools/rename.py
-while unifying StageMap (include/StageMap.h). The old name claimed the
+while unifying StageMap (include/stage_map.h). The old name claimed the
 object it reads is a StageMap; it is not. Its one caller,
 `TitleMenu__RefreshMenu`, passes its own `self` as `ctx`, so
-`ctx->+0x0BC` is `TitleMenu::saveBlock` (include/TitleMenu.h: the DreamSys's
+`ctx->+0x0BC` is `TitleMenu::saveBlock` (include/title_menu.h: the DreamSys's
 `getSaveBlock` result, `&saveMagic`), and a StageMap is only 0x1E8 bytes
 while this reads +0x2F4. From `saveMagic`, +0x00C is DreamSys's
-`totalFlasbackUnlockScore` (include/DreamSys.h: saveMagic, currentYear,
+`totalFlasbackUnlockScore` (include/dream_sys.h: saveMagic, currentYear,
 currentDay, totalFlasbackUnlockScore), which is the word compared against
 9999999. Image byte-identical.
 
@@ -193,5 +193,5 @@ refresh. Tier B because both DreamSys field names are inherited hypotheses.
 The old name described a flag, not what the flag is.
 
 Constants: `FLASHBACK_UNLOCK_SCORE` (9999999, unit-local `#define`; no
-other code has the literal) and `TITLEMENU_FLASHBACK` (include/TitleMenu.h's
+other code has the literal) and `TITLEMENU_FLASHBACK` (include/title_menu.h's
 enum, already defined) for the slot index 1.

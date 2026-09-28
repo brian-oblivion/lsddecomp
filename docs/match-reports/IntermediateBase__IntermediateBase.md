@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003DFDC` on 2026-09-19 (tools/rename.py). Address 0x8003dfdc.
 
-**Unit:** Task · **Size:** 21 instructions
+**Unit:** task · **Size:** 21 instructions
 
 ## What it does
 
@@ -16,7 +16,7 @@ getter `GetIntermediateBaseMethods`), then dispatches its own freshly-installed 
 Same self-typing convention as this unit's other already-matched siblings
 from the same shared table (`IntermediateBase__ResetCounters`, `IntermediateBase__IncrementFrameCounter`, `IntermediateBase__OnStart`):
 `Obj86B60 *self`, even though the class is generically shared across many
-unrelated tables (`Task.h`'s `TaskUtilMethods` names the same function
+unrelated tables (`task.h`'s `TaskUtilMethods` names the same function
 `gIntermediateBaseMethods+0x008`, called there as `GetIntermediateBaseMethods()->slot08(self)` on a
 `StreamTaskObj *self`).
 
@@ -41,14 +41,14 @@ void IntermediateBase__IntermediateBase(Obj86B60 *self)
   function calls through after installing its own vtable -- it IS
   `IntermediateBase__ResetCounters`, already matched elsewhere in this unit.
 - The explicit cast `(Obj86B60Methods *)GetIntermediateBaseMethods()` mirrors
-  `src/world/DayTaskStageMap.c`'s own `self->methods = (DayTaskMethods *)
+  `src/world/dream_day.c`'s own `self->methods = (DayTaskMethods *)
   GetTimedTaskMethods();` -- assigning a shared/generic table getter's return
   into a locally-typed `methods` field is an established idiom in this
   codebase, not a workaround.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. Matched on the first
+round 13 (2026-09-03), runner alpha, unit task. Matched on the first
 build. Classtable dump of `gIntermediateBaseMethods` (26 slots) resolved this and six
 sibling queue functions' exact slot identities in one pass; see
 `IntermediateBase__OnNotify.md` for the full table.
@@ -56,23 +56,23 @@ sibling queue functions' exact slot identities in one pass; see
 ## Naming
 
 **IntermediateBase__IntermediateBase** (renamed from `func_8003DFDC`, round 55,
-runner alpha). Tier A: `include/Task.h` independently documents
+runner alpha). Tier A: `include/task.h` independently documents
 `D_8006E878+0x008 = func_8003DFDC` -- i.e. this function IS the `ctor` slot
 occupant of the shared "IntermediateBase" ancestor table (named identically,
-independently, in `include/TaskViewport.h`, `include/Task.h` and
-`include/DayTaskStageMap.h`, per this project's own established convention for
+independently, in `include/TaskViewport.h`, `include/task.h` and
+`include/dream_day.h`, per this project's own established convention for
 that class). Named `Class__Class` per the constructor convention, matching
 the already-established `BasicClass__BasicClass` precedent at the
 equivalent slot in `BasicClass`'s own table. It is not `Obj86B60`-specific
 despite this local view typing `self` as `Obj86B60 *` -- it is carved here
 only because its address (0x8003DFDC) falls in this unit's window; the
 function itself is the shared ancestor's own ctor, called from at least
-three unrelated class hierarchies (`Task.c`, `DayTaskStageMap.c`, and this
+three unrelated class hierarchies (`task.c`, `dream_day.c`, and this
 unit).
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The ctor (+0x008). `self->methods = GetIntermediateBaseMethods()` needs no cast now.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/intermediate_base.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. The ctor (+0x008). `self->methods = GetIntermediateBaseMethods()` needs no cast now.
 
 ## Unit banner history (round 98, echo, track 7)
 

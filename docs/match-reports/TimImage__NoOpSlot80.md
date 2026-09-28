@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003B5B4` on 2026-09-25 (tools/rename.py). Address 0x8003b5b4.
 
-Round 81, runner echo. Unit `src/graphics/TimImage.c` (carved from `psyq_2bb9c` in
+Round 81, runner echo. Unit `src/graphics/tim_image.c` (carved from `psyq_2bb9c` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** TimImage's table (`gTimImageMethods`) slot +0x080 (resolved with `tools/classtable.py D_8006E558`).
@@ -23,10 +23,10 @@ void TimImage__NoOpSlot80(void) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/graphics/TimImage.c`:
+The unit-local view it needs, from the top of `src/graphics/tim_image.c`:
 
 ```c
-#include "FileResource.h"
+#include "file_resource.h"
 
 typedef struct TimImage {
     FILERESOURCE_FIELDS(FileResourceMethods);
@@ -58,4 +58,4 @@ nothing -- named by the project's empty-slot convention
 `StreamTask__NoOpSlot88`): the class and the table offset it fills
 (gTimImageMethods +0x080, `tools/classtable.py gTimImageMethods`). What the
 slot is for in the class tree is not established; no C calls it. The table
-field stays `slot80`, as the other empty slots' fields do (`include/CdStream.h`).
+field stays `slot80`, as the other empty slots' fields do (`include/cd_stream.h`).

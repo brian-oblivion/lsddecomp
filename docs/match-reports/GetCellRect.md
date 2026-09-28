@@ -2,7 +2,7 @@
 
 > Renamed from `func_80041C4C` on 2026-09-25 (tools/rename.py). Address 0x80041c4c.
 
-Round 82, runner alpha (third re-staffed slot of the round). Unit `src/graphics/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
+Round 82, runner alpha (third re-staffed slot of the round). Unit `src/graphics/sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** not in any method table (called by CharSprite__SetCell) (`tools/classtable.py`).
 - **What:** Copies the 12-byte record `sCharSpriteCellRect` = {u 0, v 0, w 8, h 8} into `*dst`, then adds `(cell & 0x1F) * 8` to u and `(cell >> 5) * 8` to v: an 8x8 cell in a 32-wide grid.
@@ -31,7 +31,7 @@ Retail `andi a1,a1,0xFF` emitted mid-body (after unrelated work), followed by `s
 
 ## Track 4 (2026-09-25, round 82, alpha)
 
-`CellRect_322b4` became `SpriteRect` (include/Sprite.h), the Sprite class's texture-cell type; sCharSpriteCellRect is declared `SpriteRect`. The the class is unified as `Sprite` in `include/Sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
+`CellRect_322b4` became `SpriteRect` (include/sprite.h), the Sprite class's texture-cell type; sCharSpriteCellRect is declared `SpriteRect`. The the class is unified as `Sprite` in `include/sprite.h` (the base sprite class, id 0x44, table `gSpriteMethods`, formerly `D_8006EE1C`); the Source block above is the unified spelling, byte-identical (whole image green, 0 new `-Wall` warnings).
 
 ## Naming
 
@@ -39,11 +39,11 @@ Retail `andi a1,a1,0xFF` emitted mid-body (after unrelated work), followed by `s
 
 ## Track 4
 
-2026-09-26, round 86 (bravo): the class whose methods call it is unified as CharSprite (`include/CharSprite.h`, formerly D_8006EC74); its prototype moved there from the unit, beside the ctor and setCell that share it. The function is unchanged. Image byte-identical.
+2026-09-26, round 86 (bravo): the class whose methods call it is unified as CharSprite (`include/char_sprite.h`, formerly D_8006EC74); its prototype moved there from the unit, beside the ctor and setCell that share it. The function is unchanged. Image byte-identical.
 
 ## Track 7 (round 99, charlie)
 
-`(cell & 0x1F) * 8` and `(cell >> 5) * 8` are spelled `(cell % CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE` and `(cell / CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE` (32 and 8, include/CharSprite.h); `cell` is `u32`, so `%`/`/` by 32 are the same `andi`/`srl`. `cell &= 0xFF` stays: a byte mask, hex.
+`(cell & 0x1F) * 8` and `(cell >> 5) * 8` are spelled `(cell % CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE` and `(cell / CHARSPRITE_GRID_COLUMNS) * CHARSPRITE_CELL_SIZE` (32 and 8, include/char_sprite.h); `cell` is `u32`, so `%`/`/` by 32 are the same `andi`/`srl`. `cell &= 0xFF` stays: a byte mask, hex.
 
 ### Naming: `D_8006ED40` -> `sCharSpriteCellRect`
 

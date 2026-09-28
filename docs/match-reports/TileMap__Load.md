@@ -4,7 +4,7 @@
 
 > Renamed from `func_80044E10` on 2026-09-25 (tools/rename.py). Address 0x80044e10.
 
-Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #7), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 21/21 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -19,7 +19,7 @@ Table slot (`tools/classtable.py`): gTileMapMethods +0x064 (setFlag).
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
 /* gTileMapMethods +0x064: unless +0x2A is set, slot +0x078 and mark +0x42. */
@@ -52,7 +52,7 @@ void TileMap__Load(Obj6F498 *self) {
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. `self` is `TileMap *` (was `Obj6F498`); +0x042 is `loaded`. The no-argument call through FileResource's `void *slot78` is spelled `((TileMapBuildMapFn)self->methods->slot78)()` (a typedef with an empty parameter list, no code). Byte-identical.
+Class unified in `include/tile_map.h`. `self` is `TileMap *` (was `Obj6F498`); +0x042 is `loaded`. The no-argument call through FileResource's `void *slot78` is spelled `((TileMapBuildMapFn)self->methods->slot78)()` (a typedef with an empty parameter list, no code). Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

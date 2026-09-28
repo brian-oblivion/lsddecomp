@@ -2,7 +2,7 @@
 
 > Renamed from `func_800457C0` on 2026-09-25 (tools/rename.py). Address 0x800457c0.
 
-Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #9), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 59/59 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gMoviePlayerMethods +0x040.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/graphics/GraphicsResources.c`.
+top of / earlier in `src/graphics/graphics_resources.c`.
 
 ```c
 /* gMoviePlayerMethods +0x040: start playing -- only when no movie is active
@@ -105,15 +105,15 @@ Ninth build. Every shape with the failing open as an early `if (open(...) != 0) 
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The `DrawSys457C0` view is gone; the call goes through `include/DrawSystem.h`. DrawSystem +0x078 is `clearImage(self, u8 *color, DrawRect *rect)` (occupant DrawSystem__ClearImage), so this call clears the frame rectangle at +0x20 with `gMovieFrameRect` as the COLOR (a zero word: black), not "registers gMovieFrameRect with the rectangle". The source now reads `ds->methods->clearImage(ds, (u8 *)&gMovieFrameRect, (DrawRect *)self->rect)`; pointer casts only, byte-identical. Proposed (not done, not this class): rename `gMovieFrameRect` -> `sMovieClearColor`.
+The `DrawSys457C0` view is gone; the call goes through `include/draw_system.h`. DrawSystem +0x078 is `clearImage(self, u8 *color, DrawRect *rect)` (occupant DrawSystem__ClearImage), so this call clears the frame rectangle at +0x20 with `gMovieFrameRect` as the COLOR (a zero word: black), not "registers gMovieFrameRect with the rectangle". The source now reads `ds->methods->clearImage(ds, (u8 *)&gMovieFrameRect, (DrawRect *)self->rect)`; pointer casts only, byte-identical. Proposed (not done, not this class): rename `gMovieFrameRect` -> `sMovieClearColor`.
 
 ## Track 4 (2026-09-26, round 87)
 
-The +0x060 object is a CdStream (include/CdStream.h, unified this round). `Stream457C0`/`StreamMethods457C0` are deleted; `unk60` is `CdStream *`, the call is `open`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
+The +0x060 object is a CdStream (include/cd_stream.h, unified this round). `Stream457C0`/`StreamMethods457C0` are deleted; `unk60` is `CdStream *`, the call is `open`. MoviePlayer's own view and field names are unchanged. Zero bytes changed.
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; Obj457C0 is gone. `rect` -> `frame` (a DrawRect, so the clearImage call needs no cast); `unk5C` -> `frameCount` (startRead's frameCount in Advance), `unk58` -> `loops`, `unk68` -> `autoPlay`, `unk3C`/`unk40`/`unk44`/`unk48`/`unk4C` -> `frameIndex`/`haveFrame`/`finished`/`streamEnded`/`frameDone`, `unk54` kept. `gMovieFrameRect` was renamed `sMovieClearColor` (rename.py) and typed `u8[4]`, so the color argument needs no cast either. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/movie_player.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; Obj457C0 is gone. `rect` -> `frame` (a DrawRect, so the clearImage call needs no cast); `unk5C` -> `frameCount` (startRead's frameCount in Advance), `unk58` -> `loops`, `unk68` -> `autoPlay`, `unk3C`/`unk40`/`unk44`/`unk48`/`unk4C` -> `frameIndex`/`haveFrame`/`finished`/`streamEnded`/`frameDone`, `unk54` kept. `gMovieFrameRect` was renamed `sMovieClearColor` (rename.py) and typed `u8[4]`, so the color argument needs no cast either. Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 
@@ -121,5 +121,5 @@ Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, 
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `arg3` | `keepActive` | B | stored in +0x054 (now `keepActive`, include/MoviePlayer.h); while it is set PollActive keeps the player active |
+| `arg3` | `keepActive` | B | stored in +0x054 (now `keepActive`, include/movie_player.h); while it is set PollActive keeps the player active |
 | `100` | `MOVIE_OPEN_TRIES` | A | CdStream open's `tries` parameter |

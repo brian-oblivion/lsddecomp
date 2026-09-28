@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E280` on 2026-09-19 (tools/rename.py). Address 0x8003e280.
 
-**Unit:** Task · **Size:** 102 instructions (largest in this
+**Unit:** task · **Size:** 102 instructions (largest in this
 round's queue)
 
 ## What it does
@@ -105,7 +105,7 @@ attempts here.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. Matched on the
+round 13 (2026-09-03), runner alpha, unit task. Matched on the
 first build.
 
 ## Naming
@@ -115,7 +115,7 @@ alpha). Tier A: exact mirror of `IntermediateBase__Init` -- removes the children
 `Init` added (`removeChild`), then releases (`Unk14ObjMethods::release`/
 `Unk10ObjMethods::release`, both renamed this round, and
 `Unk18ObjMethods::release` (also renamed this round, exclusive --
-Task.c never dispatches this exact slot on a Unk18Obj*)) each of the three helper
+task.c never dispatches this exact slot on a Unk18Obj*)) each of the three helper
 objects `Init` may have default-constructed, but ONLY the ones whose
 current value still differs from the caller-supplied `initArgs` field --
 i.e. only the ones this object actually owns. `Obj86B60Methods::deinit`
@@ -126,4 +126,4 @@ confirmed by `tools/classtable.py`/direct table read (see the header's own
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__Deinit (class prefix). Occupies +0x048, slot `deinit`. Its first call, +0x050, is `onDeinit` (NULL here; DayTask__OnDeinit, ObjM__TeardownStyle, TaskCore__OnDeinit override it). The three releases go through BasicClass's release on `BasicClass *` fields (the Unk10Obj/Unk14Obj local views are gone).
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/intermediate_base.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__Deinit (class prefix). Occupies +0x048, slot `deinit`. Its first call, +0x050, is `onDeinit` (NULL here; DayTask__OnDeinit, ObjM__TeardownStyle, TaskCore__OnDeinit override it). The three releases go through BasicClass's release on `BasicClass *` fields (the Unk10Obj/Unk14Obj local views are gone).

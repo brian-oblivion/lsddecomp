@@ -2,7 +2,7 @@
 
 > Renamed from `func_800452FC` on 2026-09-25 (tools/rename.py). Address 0x800452fc.
 
-Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #9), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 56/56 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTodSetMethods +0x064.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/graphics/GraphicsResources.c`.
+top of / earlier in `src/graphics/graphics_resources.c`.
 
 ```c
 /* gTodSetMethods +0x064: build a gTodMethods source over each sub-block of the
@@ -63,15 +63,15 @@ Fourth build. The first shape, `for (p--; i != 0; i--, p--) release(*p);`, measu
 
 ## Track 4 (2026-09-26, round 86, charlie)
 
-Touched by Tod's unification (charlie): the call is now `*p = (DataSrc33808 *)New_Tod((ResourceSource *)&req);`, because New_Tod is prototyped `Tod *New_Tod(ResourceSource *)` in include/Tod.h. Two pointer casts, no code; this function's own views (TodSet's) are unchanged. Bytes unchanged.
+Touched by Tod's unification (charlie): the call is now `*p = (DataSrc33808 *)New_Tod((ResourceSource *)&req);`, because New_Tod is prototyped `Tod *New_Tod(ResourceSource *)` in include/tod.h. Two pointer casts, no code; this function's own views (TodSet's) are unchanged. Bytes unchanged.
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `s32 TodSet__BuildTods(TodSet *self)` (include/TodSet.h). The counted array holds `Tod *` (New_Tod's return, released through Tod's +0x004), no longer DataSrc33808 *. It sits in the inherited +0x064 `setFlag` slot and keeps its own name: it builds the Tods, which is more than the slot name says. Bytes unchanged.
+Now `s32 TodSet__BuildTods(TodSet *self)` (include/tod_set.h). The counted array holds `Tod *` (New_Tod's return, released through Tod's +0x004), no longer DataSrc33808 *. It sits in the inherited +0x064 `setFlag` slot and keeps its own name: it builds the Tods, which is more than the slot name says. Bytes unchanged.
 
 ### Track 6 (round 97, alpha)
 
-The request local is now include/FileResource.h's `ResourceRequest`
+The request local is now include/file_resource.h's `ResourceRequest`
 (`{ ResourceSource src; s32 mode; }`), and ResourceRequest__Set's prototype
 comes from that header. The unit's own view of the record and its local
 extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`, and

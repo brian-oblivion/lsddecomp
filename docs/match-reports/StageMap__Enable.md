@@ -8,10 +8,10 @@
 
 `Obj866E8`'s vtable slot +0x0EC (`gStageMapMethods`, resolved with
 `tools/classtable.py 0x800866E8` — a different, independently-typed local
-view of the same table already exists in `include/DayTaskStageMap.h` as
+view of the same table already exists in `include/dream_day.h` as
 `StageMapMethods`; see `include/class_3bb8c.h`'s header comment for why
 this unit keeps its own, per the project's multiple-local-views
-convention). This is the first function of `DayTaskStageMap`'s newly-carved
+convention). This is the first function of `dream_day`'s newly-carved
 first slice, and the first match report for it.
 
 ## Disassembly
@@ -72,11 +72,11 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B570` | `StageMap__Enable` | A | Occupant of `gStageMapMethods` +0x0EC. Body is exactly `self->enabled = 1;`. Paired with `StageMap__Disable` (+0x0F0, same struct, clears the same field) and cross-confirmed by `DayTaskStageMap`'s own INDEPENDENT local view of the same field, already named `enabled` there (`docs/match-reports/StageMap__UpdateIfEnabled.md`, round 67) from the identical set/clear evidence. A pure setter of a named boolean field is tier A by the naming rule's own "getter/clamp/list-push" clause. |
+| `func_8004B570` | `StageMap__Enable` | A | Occupant of `gStageMapMethods` +0x0EC. Body is exactly `self->enabled = 1;`. Paired with `StageMap__Disable` (+0x0F0, same struct, clears the same field) and cross-confirmed by `dream_day`'s own INDEPENDENT local view of the same field, already named `enabled` there (`docs/match-reports/StageMap__UpdateIfEnabled.md`, round 67) from the identical set/clear evidence. A pure setter of a named boolean field is tier A by the naming rule's own "getter/clamp/list-push" clause. |
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `Obj866E8::unk70` | `enabled` | A | Set 1 here, cleared 0 (after a `slotC0` teardown dispatch) by `StageMap__Disable`. Same field, same evidence, and the same conclusion `DayTaskStageMap`'s independent view already reached for its own copy of this struct -- see `StageMap__UpdateIfEnabled.md`. Renamed in `include/class_3bb8c.h`'s own `Obj866E8` definition; rebuild after the rename touched only `src/class_3bb8c.c` (`StageMap__Enable`/`StageMap__Disable`), confirming no other unit accesses this struct's `unk70`/`enabled` field. |
+| `Obj866E8::unk70` | `enabled` | A | Set 1 here, cleared 0 (after a `slotC0` teardown dispatch) by `StageMap__Disable`. Same field, same evidence, and the same conclusion `dream_day`'s independent view already reached for its own copy of this struct -- see `StageMap__UpdateIfEnabled.md`. Renamed in `include/class_3bb8c.h`'s own `Obj866E8` definition; rebuild after the rename touched only `src/class_3bb8c.c` (`StageMap__Enable`/`StageMap__Disable`), confirming no other unit accesses this struct's `unk70`/`enabled` field. |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 
@@ -89,11 +89,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`

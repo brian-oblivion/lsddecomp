@@ -4,7 +4,7 @@
 
 > Renamed from `func_80040A88` on 2026-09-18 (tools/rename.py). Address 0x80040a88.
 
-Unit: `src/ui/ScreenWidgets.c`. First attempt.
+Unit: `src/ui/screen_widgets.c`. First attempt.
 
 ```c
 void TextRow__Reset(Obj6EAC0 *self, s32 a1) {
@@ -46,4 +46,4 @@ established.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/TextRow.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__FinishConstruct`: the +0x040 reset occupant, `(TextRow *self, char *text)`: setCellPitch(7), setText(text). The slot keeps SceneNode's `reset(self)` type; the ctor casts to TextRowResetFn, as CharSprite's ctor does for its own reset. Image byte-identical; the current source is src/ui/ScreenWidgets.c.
+2026-09-26, round 88 (charlie): class 0x11144 unified as TextRow in `include/text_row.h` (a row of CharSprite cells: the ctor makes `count` New_CharSprite cells, setText hands each the next byte of a string, the layout slots step `cellPitch` along x). The view `Obj6EAC0` (named after BoxFill's old table address) is gone; its +0x00C `hasChildren` is SceneNode's `parent` (--merge CONFLICT s32 vs pointer: only tested against 0, bytes unchanged), `children` (+0x0B4) is `CharSprite **cells`, and the per-cell calls go through CharSprite's slots by name. Renamed from `Obj6EAC0__FinishConstruct`: the +0x040 reset occupant, `(TextRow *self, char *text)`: setCellPitch(7), setText(text). The slot keeps SceneNode's `reset(self)` type; the ctor casts to TextRowResetFn, as CharSprite's ctor does for its own reset. Image byte-identical; the current source is src/ui/screen_widgets.c.

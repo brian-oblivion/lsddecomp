@@ -4,7 +4,7 @@
 
 > Renamed from `func_800524F8` on 2026-09-24 (tools/rename.py). Address 0x800524f8.
 
-Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0; whole-image
+Unit `dream_scene`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py ItemList__CursorUp`: 40/40 words match.
 
 This is vtable slot `+0x084` of `gItemListMethods` (not declared in
@@ -87,8 +87,8 @@ Round 75 (bravo, track 3). `func_800524F8` -> `ItemList__CursorUp`, **tier A**.
 
 Slot +0x084 (`tools/classtable.py gItemListMethods`). Decrements `cursorIndex`: inside the window via stepCursorInView(self, 0, 1), or at the top row by decrementing both `topIndex` and `cursorIndex` and redrawing. Rows are laid out 0xA apart in increasing y (ItemList__CreateRows), so a lower index is higher on screen. Dispatched by HandleInputCode on code 18.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/dream_scene.c`).
 
 ## Round 99 (delta, track 7)
 
-Parameters `arg1`, `arg2`, `arg3` -> `unused1`, `unused2`, `forwarded` (also in include/ItemList.h's prototype): the first two are never read, the third is passed to stepCursorInView as a fourth word its occupant does not read (include/ItemList.h banner). The branch polarity and the newTop/newCursor locals keep a `MATCHING:` line.
+Parameters `arg1`, `arg2`, `arg3` -> `unused1`, `unused2`, `forwarded` (also in include/item_list.h's prototype): the first two are never read, the third is passed to stepCursorInView as a fourth word its occupant does not read (include/item_list.h banner). The branch polarity and the newTop/newCursor locals keep a `MATCHING:` line.

@@ -6,7 +6,7 @@
 
 > Renamed from `func_800507F8` on 2026-09-23 (tools/rename.py). Address 0x800507f8.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 60 words (0xF0 bytes)
+**Unit:** title_menu · **Size:** 60 words (0xF0 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 14. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile).
@@ -55,7 +55,7 @@ s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1)
 ```
 
 **Signature was NOT free to choose.** `include/class_3bb8c.h` already
-carries `extern s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1);` (`ObjMStyleActor`'s
+carries `extern s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1);` (`dream_scene`'s
 own caller, `TaskObjF__WriteMemcardSaveFile`), visible in this same translation unit via the
 shared header, so the definition here has to match it exactly
 (`conflicting types` otherwise) even though every real use inside the body
@@ -114,12 +114,12 @@ copies one or more fixed byte ranges out of the `sSaveTitleGlyphs` template into
 the caller's buffer, optionally selecting a table entry via
 `atoi()` on a field of the caller-supplied `src` when one is given. Named
 from its one real caller context established elsewhere in this project
-(`TaskObjF__WriteMemcardSaveFile`, `ObjMStyleActor`, and `TitleMenuTaskObjF`'s
+(`TaskObjF__WriteMemcardSaveFile`, `dream_scene`, and `title_menu`'s
 own call site) -- a memcard save-file writer building the save's on-card
 icon/header block from a shared template. The exact semantic meaning of
 each copied range (icon pixels vs. a formatted date/glyph, per the
 sibling `sSaveTitle`/`DecodeFullWidthSjis` context nearby in
-`TitleMenuTaskObjF.c`) is not established, so this is named for the
+`title_menu.c`) is not established, so this is named for the
 mechanism (template copy) plus its one known call context rather than a
 specific claim about pixel vs. text content.
 
@@ -153,7 +153,7 @@ glyph 15). The positions are unit-local `#define`s: SAVE_TITLE_LETTER_FIELD
 SAVE_FILE_NAME_NUMBER 13. Image byte-identical at every step.
 
 The signature stays `s32 (s32, s32)`: it is include/class_3bb8c.h's
-prototype, which TitleMenuTaskObjF.c and class_3bb8c_f.c call with casts.
+prototype, which title_menu.c and class_3bb8c_f.c call with casts.
 Proposed: `s32 StampSaveTitleFileLetter(char *title, char *fileName)` there,
 dropping the four casts.
 
@@ -164,7 +164,7 @@ Comments moved out of the source (verbatim):
 - on `sSaveTitleGlyphs`: "VALUE-of `%gp_rel`, round 45's own local view --
   a fixed rodata template (ROM image still-uncarved,
   `asm/data/1C34.rodata.s` region) this function copies raw byte ranges out
-  of; also read by `TitleMenuTaskObjF.c`'s own (differently-typed) local view."
+  of; also read by `title_menu.c`'s own (differently-typed) local view."
   (Round 95: no other unit declares it now.)
 - on the three copy types: "Struct-copy helper types for round 45's
   StampSaveTitleFileLetter, all deliberately all-`s8` (alignment 1) per
@@ -175,7 +175,7 @@ Comments moved out of the source (verbatim):
   does not have." It keeps one line in the source (`MATCHING: all-s8 ...`).
 - above the definition: "Signature is `include/class_3bb8c.h`'s
   ALREADY-shared `extern s32 StampSaveTitleFileLetter(s32 arg0, s32
-  arg1);` (ObjMStyleActor's own caller, TaskObjF__WriteMemcardSaveFile),
+  arg1);` (dream_scene's own caller, TaskObjF__WriteMemcardSaveFile),
   matched exactly -- this unit's own definition must agree with that
   declaration since both are visible in this translation unit. Cast to `u8
   *` internally; retail's own register content at exit (`$v0` left holding
@@ -209,16 +209,16 @@ structs: the source keeps its one `MATCHING:` line. No existing type in
 `include/` or `src/` named a full-width character (grepped for
 Sjis/FullWidth/Glyph), so these are new and stay unit-local.
 
-`TitleMenuTaskObjF`'s `Buf6_3bb8c_c` (`s8 a..f`, the formatted day number
+`title_menu`'s `Buf6_3bb8c_c` (`s8 a..f`, the formatted day number
 copied into the same title at +0x12, characters 9..11) is the same record
 as `FullWidthChars3`: a later job, left untouched here. If a second unit
 takes these types they move to the header that owns the save title
-(proposed: `include/TitleMenu.h`, which describes the SJIS title buffer).
+(proposed: `include/title_menu.h`, which describes the SJIS title buffer).
 
 **Update, same round (alpha, the Buf6_3bb8c_c job):** the second unit took
 them. `FullWidthChar`, `FullWidthChars3` and `FullWidthChars6` now live in
-`include/TitleMenu.h` (the save title is TitleMenu's buffer; see
+`include/title_menu.h` (the save title is TitleMenu's buffer; see
 StampSaveTitleDay.md's track 6 section), unchanged in layout, with the
-`MATCHING:` line kept once there; TitleMenuTaskObjF.c's local definitions are
-deleted and it includes TitleMenu.h. TitleMenuTaskObjF's `Buf6_3bb8c_c` is
+`MATCHING:` line kept once there; title_menu.c's local definitions are
+deleted and it includes title_menu.h. title_menu's `Buf6_3bb8c_c` is
 retired for `FullWidthChars3`. Image byte-identical.

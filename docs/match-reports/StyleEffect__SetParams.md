@@ -4,7 +4,7 @@
 
 > Renamed from `func_800564A4` on 2026-09-23 (tools/rename.py). Address 0x800564a4.
 
-Unit: `ObjMStyleActor` (round 17 continuation). `StyleEffectMethods::slot40`
+Unit: `dream_scene` (round 17 continuation). `StyleEffectMethods::slot40`
 (vtable offset `+0x040` of `gStyleEffectMethods`) -- a plain 0x24-byte block copy
 from the caller's argument into `self+0x58`, plus a single word clear.
 
@@ -28,7 +28,7 @@ void StyleEffect__SetParams(StyleEffect *self, Block24 *src) {
 ## Derivation
 
 - **This closes the identity of `BaseObjOMethods::slot40`, left as
-  "occupant outside this unit" in `ObjMStyleActor.c`'s own
+  "occupant outside this unit" in `dream_scene.c`'s own
   `Actor__Actor` report last pass.** That function called
   `self->methods->slot40(self)` (a plain no-argument dispatch, since its
   OWN concrete class -- a different sibling -- happens to call slot40
@@ -36,7 +36,7 @@ void StyleEffect__SetParams(StyleEffect *self, Block24 *src) {
   (`StyleEffect__StyleEffect`, this unit) calls the SAME shared slot with a real
   second argument, `slot40(self, arg2)`. Both are correct about their own
   call sites: the slot's real arity is 1 argument beyond `self`, and the
-  DreamSys-family sibling in `ObjMStyleActor.c` simply never had a value
+  DreamSys-family sibling in `dream_scene.c` simply never had a value
   worth passing.
 - **`u8 raw[0x24]` (a byte array) miscompiled the copy into a
   runtime-alignment-checked loop** (`or`/`andi`/`beqz` testing pointer
@@ -45,7 +45,7 @@ void StyleEffect__SetParams(StyleEffect *self, Block24 *src) {
   different instruction COUNT and shape, not a subtle residue. Retyping
   the field to a WORD array (`s32 raw[9]`) forced 4-byte alignment and
   fixed it in one step, matching the already-documented
-  `DreamSysUnk14Tail` idiom (`DreamSys.h`) for exactly this situation.
+  `DreamSysUnk14Tail` idiom (`dream_sys.h`) for exactly this situation.
 - Field write ORDER matches retail: the block copy happens first, the
   `self->unk24 = 0` clear happens last (in the delay slot of the
   function's own `jr $ra`) -- writing the C statements in that order
@@ -56,7 +56,7 @@ void StyleEffect__SetParams(StyleEffect *self, Block24 *src) {
 - **A block-copy target field should be declared as a WORD array by
   default when the source is a whole-struct assignment, not as a byte
   array "to be safe about size."** This is not a new idiom --
-  `DreamSys.h`'s `DreamSysUnk14Tail` already documents it -- but this is
+  `dream_sys.h`'s `DreamSysUnk14Tail` already documents it -- but this is
   a second, independent confirmation in a different unit, and the
   failure mode (a completely different, much longer instruction
   sequence, not a near-miss) is worth remembering as the SPECIFIC
@@ -71,4 +71,4 @@ void StyleEffect__SetParams(StyleEffect *self, Block24 *src) {
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Occupies SceneNode's +0x040 `reset` slot; kept its name because it does more than reset (it copies the 0x24-byte block). The block is now `StyleEffectParams` (include/StyleEffect.h), a struct of 4-aligned members, 0x24 bytes: the whole-struct copy compiles to the same aligned block move the old `Block24` word array gave. Image byte-identical.
+Occupies SceneNode's +0x040 `reset` slot; kept its name because it does more than reset (it copies the 0x24-byte block). The block is now `StyleEffectParams` (include/style_effect.h), a struct of 4-aligned members, 0x24 bytes: the whole-struct copy compiles to the same aligned block move the old `Block24` word array gave. Image byte-identical.

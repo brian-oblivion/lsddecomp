@@ -2,7 +2,7 @@
 
 > Renamed from `func_800207DC` on 2026-09-25 (tools/rename.py). Address 0x800207dc.
 
-Round 82, runner alpha. Unit `src/graphics/DrawSystem.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha. Unit `src/graphics/draw_system.c`. Fresh ground, no prior attempt.
 
 - **Where:** gDrawSystemMethods slot +0x044 (`tools/classtable.py gDrawSystemMethods`).
 - **What:** graphics setup. `GsInitGraph(w, h, 0, 1, vramMode)`,
@@ -34,7 +34,7 @@ void DrawSystem__InitGraph(Class6C070 *self, Class6C070Size *size, s32 vramMode)
 }
 ```
 
-Needs the unit-local view at the top of `src/graphics/DrawSystem.c`
+Needs the unit-local view at the top of `src/graphics/draw_system.c`
 (`Class6C070Size` is `{ s32 w; s32 h; }`; `Class6C070` gains
 `/* +0x01C */ s32 unk1C;`).
 
@@ -42,16 +42,16 @@ Needs the unit-local view at the top of `src/graphics/DrawSystem.c`
 
 `DrawSystem__InitGraph`, tier B. Wraps GsInitGraph/GsDefDispBuff; confirmed
 as the object's own +0x044 slot from OUTSIDE the unit too --
-`Application.c`'s `Application__InitSystems` receives this same object as its
+`application.c`'s `Application__InitSystems` receives this same object as its
 `source` argument and dispatches `source->methods->slot44(source, &self->dims,
 self->dimsArg)`, the identical offset.
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The class is unified: its one definition is `include/DrawSystem.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
+The class is unified: its one definition is `include/draw_system.h` (object, method table, `ScreenDims`, `DrawRect`); the unit-local view the declarations above quote is gone. Field renames, settled by this unit's accessors (the only ones): `unk20` -> `vsyncCount` (SetVSyncCount stores, GetVSyncCount returns, RunLoop passes it to VSync, CountFrames compares against it), `unk24` -> `frameCount` (CountFrames counts it). `DrawSystemRect`/`DrawSystemDims` are one type, `DrawRect` {s16 x, y; s32 w, h} (ConvertRect's halfword loads at +0/+2/+4/+8 compile identically from it), and `DrawSystemSize` is `ScreenDims`. The singleton `D_8008A83C` is `sDrawSystem` (rename.py). Byte-identical.
 
-Its dispatching caller, Application__InitSystems (code_2b78c), now takes a `DrawSystem *` (include/Application.h's ApplicationSource view deleted) and passes its own `ScreenDims`.
+Its dispatching caller, Application__InitSystems (code_2b78c), now takes a `DrawSystem *` (include/application.h's ApplicationSource view deleted) and passes its own `ScreenDims`.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-Viewport's `ViewportSize` merged into DrawSystem.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.
+Viewport's `ViewportSize` merged into draw_system.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.

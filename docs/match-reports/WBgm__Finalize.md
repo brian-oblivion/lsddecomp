@@ -2,7 +2,7 @@
 
 > Renamed from `func_80039A34` on 2026-09-25 (tools/rename.py). Address 0x80039a34.
 
-Round 81, runner delta. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
+Round 81, runner delta. Unit `src/sound/wbgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot +0x00C (finalize) (slots resolved with `tools/classtable.py gWBgmMethods`).
@@ -44,7 +44,7 @@ void WBgm__Finalize(WBgm *self) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/sound/WBgm.c`:
+The unit-local view it needs, from the top of `src/sound/wbgm.c`:
 
 ```c
 #include "basic_class.h"
@@ -125,12 +125,12 @@ extern u8 sSsSizeTableBuf[];
 
 ## Track 4 (2026-09-26, round 87, bravo)
 
-The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/DrawSystem.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
+The local GetDrawSystem/New_DrawSystem extern this unit carried is gone; it comes from `include/draw_system.h` (gDrawSystemMethods unified), with a pointer cast where this unit's own slot type asks for one. Byte-identical.
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
 The unit-local view `SeqVab` and its `extern SeqVab *New_VabStreamObj(s32)`
-are gone. `WBgm::vab` is now `VabStreamObj *` (`include/VabStreamObj.h`),
+are gone. `WBgm::vab` is now `VabStreamObj *` (`include/vab_stream_obj.h`),
 and the whole image stays byte-identical. SeqVab's `ready` (+0x058) is
 VabStreamObj's `attrsReady`, which OnBodyReady sets once the VAB body has
 transferred. `vabId` (+0x054) is the same field under the same name. The
@@ -143,7 +143,7 @@ unchanged.
 The unit-local view `SeqData` (BASICCLASS_FIELDS, +0x010 `addr`, +0x02C
 `loaded`) and its `extern SeqData *New_RequestedFile(s32)` are gone: the
 census missed them, as New_RequestedFile's return type. `WBgm::seqData` is
-`RequestedFile *` (`include/RequestedFile.h`, round 87, delta). `addr` is
+`RequestedFile *` (`include/requested_file.h`, round 87, delta). `addr` is
 FileResource's `buffer` (+0x010), `loaded` the same field under the same
 name; the release calls lose their `(BasicClass *)` casts and WBgm__SetSeq
 casts its s32 argument to the ctor's `char *name`. The whole image stays
@@ -151,6 +151,6 @@ byte-identical; the Source block above is the earlier text.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-The class is now declared once, in `include/WBgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
+The class is now declared once, in `include/wbgm.h` (table `gWBgmMethods`, renamed from `D_8006E48C` with tools/rename.py this round); `src/code_2a0e0.c` keeps no view of it, so the view quoted in this report's source section is historical. Image byte-identical after every step.
 
 No change to this function's signature or body.

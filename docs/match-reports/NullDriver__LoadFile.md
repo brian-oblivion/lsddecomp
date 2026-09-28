@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C410` on 2026-09-26 (tools/rename.py). Address 0x8002c410.
 
-Unit: `PlacementGridVabSound`. Report written round 52 (naming pass) -- this function
+Unit: `vab_sound`. Report written round 52 (naming pass) -- this function
 had no report before; it was matched (an empty `void` body, `jr $ra; nop`)
 as part of the unit's original round-17 pass but never separately written
 up. `tools/progress.py` counts a matched function like this without a
@@ -42,12 +42,12 @@ from.
 
 Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
 gNullDriverMethods --vs gFileResourceMethods` puts this function at `+0x058`, one of
-FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
+FileResource's run-time-bound driver-interface slots (`include/file_resource.h`
 names it `loadFile`; the CD driver's occupant is `CdDriver__LoadFile (FileResource__LoadFile in the base table)`).
-`SetActiveDataSource` (GameApplicationFileResource.c) copies the active driver's interface
+`SetActiveDataSource` (game_shell.c) copies the active driver's interface
 slots into FileResource's table and every client table, and takes this table
 (`GetNullDriverMethods()`) whenever `sActiveDataSource != DATASOURCE_CD`, so
 when the SPU/VAB source is active every `methods->loadFile(...)` in the game
 reaches this body. The purpose evidence the tier-C verdict above lacked is
 the slot's, not the body's: the body does nothing, which is what the VAB
-driver does for that interface call. Unified into `include/NullDriver.h`.
+driver does for that interface call. Unified into `include/null_driver.h`.

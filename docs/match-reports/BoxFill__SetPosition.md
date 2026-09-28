@@ -4,7 +4,7 @@
 
 > Renamed from `func_800407F8` on 2026-09-18 (tools/rename.py). Address 0x800407f8.
 
-Unit: `src/ui/ScreenWidgets.c`. Blocker screen clean. Retail's own
+Unit: `src/ui/screen_widgets.c`. Blocker screen clean. Retail's own
 callee-saved count is 0 -- not the saturated-register-file class.
 
 **Round 19 correction: the "missing unconditional cache" framing below
@@ -27,7 +27,7 @@ void BoxFill__SetPosition(Obj6EAC0 *self, BoxFillPos *a1) {
 }
 ```
 
-`BoxFillPos` (`include/Task.h`) is the existing two-`s32`-record
+`BoxFillPos` (`include/task.h`) is the existing two-`s32`-record
 type introduced for `FadeBox__PushPosition`'s own `a2` argument; `self->unk50`/
 `unk54` are already documented there as "first/second word of a 2-word
 struct copied from their own `a1` argument", so this is the same shape,
@@ -99,11 +99,11 @@ evidence `posX`/`posY` really is a position rather than an arbitrary
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetPosition`: the +0x0BC occupant, BoxFill's own `setPosition` (tier A): while attached (`parent`, +0x00C, non-NULL) it copies the pair into posX/posY, which DrawNode turns into the GsBOXF x/y.
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/box_fill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetPosition`: the +0x0BC occupant, BoxFill's own `setPosition` (tier A): while attached (`parent`, +0x00C, non-NULL) it copies the pair into posX/posY, which DrawNode turns into the GsBOXF x/y.
 
 ## Track 6 (2026-09-27, round 96, echo)
 
-The position record, `Pair32E99C` (include/BoxFill.h), is now `BoxFillPos`
+The position record, `Pair32E99C` (include/box_fill.h), is now `BoxFillPos`
 (`python3 tools/renametype.py Pair32E99C BoxFillPos`), fields `a`/`b` now
 `x`/`y`. Tier A: it is the argument type of this method, of
 `BoxFill__AttachToParent` and `BoxFill__AttachAbsolute`, and of
@@ -114,18 +114,18 @@ green with no errors): every use is a whole-record copy. The fields stay
 `s32` rather than becoming padding because the 4-byte alignment is what
 makes those copies `lw`/`sw` pairs.
 
-Not unified with ScreenSprite's `ScreenSpritePos` (include/ScreenSprite.h),
+Not unified with ScreenSprite's `ScreenSpritePos` (include/screen_sprite.h),
 which has the same layout: the old banner's "gTextRowMethods's layout loops
 use the same record" was already stale (TextRow's methods take
 ScreenSpritePos since round 86), and the two do not mean the same thing.
 A ScreenSpritePos is always a percentage of half the screen from the centre;
 a BoxFillPos is that only while `relative` is set, and pixels after
-`attachAbsolute` (GraphRoom's dots, ObjMStyleActor, pass
+`attachAbsolute` (GraphRoom's dots, dream_scene, pass
 `dx * 10 - 5`-style pixel offsets). TaskCore__RefreshSlotView
-(Task.c) passes one local SlotPos to both a BoxFill and its
-TextRows, so a single `ScreenPos` in SceneNode.h is a reasonable proposal
+(task.c) passes one local SlotPos to both a BoxFill and its
+TextRows, so a single `ScreenPos` in scene_node.h is a reasonable proposal
 for the head; it cannot be done through `renametype.py` (the new name
-already exists) and would touch ScreenSprite.h and SceneNode.h, outside
+already exists) and would touch screen_sprite.h and scene_node.h, outside
 this job.
 
 Image byte-identical.

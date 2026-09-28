@@ -4,9 +4,9 @@
 
 > Renamed from `func_800571A8` on 2026-09-18 (tools/rename.py). Address 0x800571a8.
 
-Unit: `ObjMStyleActor` (round 17). `BaseObjOMethods::slot18` -- an
+Unit: `dream_scene` (round 17). `BaseObjOMethods::slot18` -- an
 unconditional full teardown of both companion pointers (no tag check),
-already named `unk18`/`Actor__RemoveAllChildren` in `TodActor.c`'s
+already named `unk18`/`Actor__RemoveAllChildren` in `tod_actor.c`'s
 `D800878D4Methods`.
 
 ## Final source
@@ -39,9 +39,9 @@ already established by `Actor__AddChild`/`Actor__RemoveChild`.
 unconditionally clears BOTH companion fields (no tag check, unlike
 `LinkCompanion`/`UnlinkCompanion`) and chains to the base table's own
 `slot18`. `slot18` has no other established occupant name in any sibling
-header (`TodActor.c` still calls the field `unk18`), so this name is
+header (`tod_actor.c` still calls the field `unk18`), so this name is
 this unit's own contribution.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__ClearCompanions`. Override of +0x018 (removeAllChildren), named for its slot: clears both companions, then chains SceneNode's. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__ClearCompanions`. Override of +0x018 (removeAllChildren), named for its slot: clears both companions, then chains SceneNode's. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

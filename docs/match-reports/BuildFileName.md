@@ -2,7 +2,7 @@
 
 > Renamed from `func_800270C4` on 2026-09-18 (tools/rename.py). Address 0x800270c4.
 
-**Unit:** GameApplicationFileResource · **Size:** 27 instructions · **Status:** MATCHED (27/27 words, whole-image build verified byte-exact)
+**Unit:** game_shell · **Size:** 27 instructions · **Status:** MATCHED (27/27 words, whole-image build verified byte-exact)
 
 ## What it does
 
@@ -68,7 +68,7 @@ Matched on the first attempt.
 ## Proposed learning
 
 None new. Straightforward confirmation that `strcat`'s prototype
-(`char *strcat(char *dest, char *src);`, declared in `include/GameApplicationFileResource.h`
+(`char *strcat(char *dest, char *src);`, declared in `include/data_source.h`
 so this forward reference to a later-defined-in-file function resolves) is
 right in shape even though `strcat`'s own body is still stalled — the two
 are independent findings.
@@ -84,8 +84,8 @@ Round 52 (alpha), FINISHING-PLAN track 3.
 **Evidence.** `dest[0]=0`; conditionally `strcat`s an optional prefix
 (`arg2`, only if non-NULL); unconditionally `strcat`s `arg1` then `arg3`;
 returns `dest`. Confirmed against real call sites across the tree
-(`TextEntryItemList.c`: memory-card icon/font paths with a directory prefix and
-an extension suffix; `PlacementGridVabSound.c`: name+suffix with no prefix) that this
+(`input_dialogs.c`: memory-card icon/font paths with a directory prefix and
+an extension suffix; `vab_sound.c`: name+suffix with no prefix) that this
 is a general-purpose "optional-prefix + name + suffix" path/filename
 composer, not guessed from this function's body alone. Pure string
 composition whose mechanics are its purpose.

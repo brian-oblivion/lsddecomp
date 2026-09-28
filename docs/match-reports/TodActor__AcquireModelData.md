@@ -39,7 +39,7 @@ fail:
 }
 ```
 
-Adds `TodActorDesc` (`src/world/TodActor.c`) for the constructor's `arg1`,
+Adds `TodActorDesc` (`src/world/tod_actor.c`) for the constructor's `arg1`,
 typed only at its `+0x00C` field (a `Unk5CObj *`, borrowed or freshly
 allocated), and retypes the `arg1` parameter all the way from
 `TodActor__TodActor` through `slot_setup5C`/`TodActor__SetupModelData` to here as
@@ -104,18 +104,18 @@ Round 75 (charlie), track 3.
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`. code_55dd4.c includes it, and src/code_55dd4.c's local `extern Unk5CObj *New_ModelData(TodActorDesc *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct ResourceSource *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to TodActor and is left for that class's unification. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`. code_55dd4.c includes it, and src/code_55dd4.c's local `extern Unk5CObj *New_ModelData(TodActorDesc *arg)` is deleted. The call reads `self->modelData = (Unk5CObj *)New_ModelData((struct ResourceSource *)other)`, pointer casts with no code. The field's type, Unk5CObj (a view of ModelData), belongs to TodActor and is left for that class's unification. Image byte-identical.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/tod_actor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 6 (round 93, echo)
 
 The descriptor type `UnkArg1Obj` -> `TodActorDesc` (`tools/renametype.py
 UnkArg1Obj TodActorDesc --any-stem`). Tier B: only its +0x00C (a ModelData to
 borrow) is read here; when that is NULL the whole descriptor goes to
-New_ModelData as GraphicsResources.c's ResourceSource ({buffer, name}). Its +0x000..+0x00B
+New_ModelData as graphics_resources.c's ResourceSource ({buffer, name}). Its +0x000..+0x00B
 stay padding in this view.
 
 ### Track 6 (round 97, alpha)
@@ -124,6 +124,6 @@ stay padding in this view.
 and the fallback reads `New_ModelData(&other->src)` without the cast. Its
 first 8 bytes are a ResourceSource because they go straight to
 New_ModelData, which reads them as one. +0x08 is not typed as
-ResourceRequest's `mode`: no code writes it. The two builders (DreamAux's
+ResourceRequest's `mode`: no code writes it. The two builders (dream_aux's
 SetDreamAuxWorld and ProcessDreamAuxTriggerRecord) fill only word 3 of an
 `s32[4]`, and nothing calls ResourceRequest__Set on it. Byte-identical.

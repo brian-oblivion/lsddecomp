@@ -25,9 +25,9 @@
  *     SeAutoPan).
  *
  * Every call takes a voice number 0..23 and returns -1 for anything else.
- * The shadow registers are include/SvmData.h's _svm_sreg_buf, flushed to
+ * The shadow registers are include/svm_data.h's _svm_sreg_buf, flushed to
  * the SPU by SpuVmFlush; _svm_sreg points at the SPU register block itself
- * (SvmData.h's SpuRegs).
+ * (svm_data.h's SpuRegs).
  */
 
 #include "common.h"

@@ -6,7 +6,7 @@
 
 > Renamed from `func_80051DA0` on 2026-09-24 (tools/rename.py). Address 0x80051da0.
 
-Unit: `src/ui/TextEntryItemList.c`. `self` is `ItemList_3bb8c_j`. The "remove child"
+Unit: `src/ui/input_dialogs.c`. `self` is `ItemList_3bb8c_j`. The "remove child"
 counterpart to `ItemList__AddChild`: clears whichever of the two tagged caches
 `arg1` matches, THEN unregisters it from the inherited
 `BasicClass::removeChild` (order reversed from `ItemList__AddChild`'s

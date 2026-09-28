@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004DF64` on 2026-09-24 (tools/rename.py). Address 0x8004df64.
 
-Unit `TitleMenuTaskObjF`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
+Unit `title_menu`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 1 `gp_rel` hit
 and no derivation; this round wrote and matched the function from scratch.
 
@@ -41,7 +41,7 @@ SLPS_015.56`.
   (`iconHandle`/`unkAC`).
 - `New_TimImage(sSaveIconTimPath)` -- `New_TimImage` is already matched
   project-wide under many independent local arities/return types (see
-  e.g. `src/ui/TitleMenuTaskObjF.c`, `src/ui/TextEntryItemList.c`); this unit's own view
+  e.g. `src/ui/title_menu.c`, `src/ui/input_dialogs.c`); this unit's own view
   returns exactly what it is stored into, `GenericReleaseObj_3bb8c_d *`.
   `sSaveIconTimPath` is a real dlabel string, `"CARD\FILEICN1.TIM"`
   (`asm/data/1C34.rodata.s`) -- referenced by symbol per CLAUDE.md's rule
@@ -82,7 +82,7 @@ SLPS_015.56`.
 - New externs: `sSaveIconTimPath` (`const char[]`, a real string dlabel),
   `sCardFilePrefix` (`void *`, VALUE-of `%gp_rel`), `sSaveFileSuffixes` (`s32`,
   address-of placeholder for a real 16-entry pointer table).
-- `src/ui/TitleMenuTaskObjF.c`: local extern for `New_TimImage` (own arity/
+- `src/ui/title_menu.c`: local extern for `New_TimImage` (own arity/
   return type, per the project's established independent-views
   convention for this widely-shared external symbol).
 
@@ -104,7 +104,7 @@ Renamed `func_8004DF64` -> `TitleMenu__BeginCardAccess`. **Tier B**: Lazy-inits 
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`); this unit's local `extern
+TimImage is unified (`include/tim_image.h`); this unit's local `extern
 GenericReleaseObj_3bb8c_d *New_TimImage(const char *)` is deleted. The call
 casts its argument to `char *` and its result to
 `GenericReleaseObj_3bb8c_d *`, the type TitleMenu's own view gives
@@ -113,7 +113,7 @@ Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `handlerTable->unk4` is TaskCore's `initArgs->unk4`, `unk48` its `sound`; slot10/slot14 are BasicClass's addChild/removeChild (saveCtrl upcast to BasicClass *); iconHandle is a `struct TimImage *`, so the New_TimImage cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `handlerTable->unk4` is TaskCore's `initArgs->unk4`, `unk48` its `sound`; slot10/slot14 are BasicClass's addChild/removeChild (saveCtrl upcast to BasicClass *); iconHandle is a `struct TimImage *`, so the New_TimImage cast is gone. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
 

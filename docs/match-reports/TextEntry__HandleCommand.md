@@ -4,7 +4,7 @@
 
 > Renamed from `func_800513D0` on 2026-09-24 (tools/rename.py). Address 0x800513d0.
 
-Unit `TextEntryItemList`. `Obj86ED0Methods::slot5C` (called by `TextEntry__OnNotify`'s
+Unit `input_dialogs`. `Obj86ED0Methods::slot5C` (called by `TextEntry__OnNotify`'s
 `tag==2` case). No other caller in this unit. Carved with the rodata slot
 (`jtbl_80011628` at file `0x1E28`) already attached per the splat yaml, so no
 carve work needed here.
@@ -131,19 +131,19 @@ No existing declaration's TYPE changed.
 
 ## Naming
 
-- `TextEntry__HandleCommand` -- tier B. gTextEntryMethods +0x05C (handleCommand slot, classtable.py), dispatched by TextEntry__OnNotify's tag==2 case. Dense switch on a command code (2..32): case 25 commits the edited name back into nameBuf (Encode/strcpy) then setState(2); case 23 setState(3); the remaining paired cases (21/5, 20/4, 18/2, 19/3, plus ungated 32/31/28), CONFIRMED against gTextEntryMethods's own table (classtable.py), dispatch to moveCursorRight/moveCursorLeft/advanceCharSelect/advanceCountdown/resetAllAndFinish/resetCountdown/toggleFlag20 respectively -- i.e. this is the full input-command router for the name-entry UI (cursor move, character-select cycle, and the countdown/blink group TextEntryItemList already named). Tier B: the routing mechanics and slot identities are now fully confirmed, but which physical button/event produces each numeric code is not.
+- `TextEntry__HandleCommand` -- tier B. gTextEntryMethods +0x05C (handleCommand slot, classtable.py), dispatched by TextEntry__OnNotify's tag==2 case. Dense switch on a command code (2..32): case 25 commits the edited name back into nameBuf (Encode/strcpy) then setState(2); case 23 setState(3); the remaining paired cases (21/5, 20/4, 18/2, 19/3, plus ungated 32/31/28), CONFIRMED against gTextEntryMethods's own table (classtable.py), dispatch to moveCursorRight/moveCursorLeft/advanceCharSelect/advanceCountdown/resetAllAndFinish/resetCountdown/toggleFlag20 respectively -- i.e. this is the full input-command router for the name-entry UI (cursor move, character-select cycle, and the countdown/blink group input_dialogs already named). Tier B: the routing mechanics and slot identities are now fully confirmed, but which physical button/event produces each numeric code is not.
 
 ## Proposed field names
 
 **Head, round 77:** `unk10 -> nameLen` and `unk18 -> cursorIndex` APPLIED by type scope (set from `strlen(arg1)`; inc/dec by the cursor pair, capped by it). The rest remain PROPOSED for the base-class or track 4 pass; `altInputFlag` was self-rated low confidence.
 
 Cross-unit fields/slots of `Obj86ED0` (shared header `include/class_3bb8c.h`)
-that this unit's own functions read/write but that TextEntryItemList ALSO
+that this unit's own functions read/write but that input_dialogs ALSO
 accesses -- left unrenamed per the field-ownership rule (compiler-checked:
-TextEntryItemList's `TextEntry__PrevChar`/`TextEntry__ToggleActOnHeld`/
+input_dialogs's `TextEntry__PrevChar`/`TextEntry__ToggleActOnHeld`/
 `TextEntry__ResetChar`/`TextEntry__ResetAllChars`/
 `TextEntry__SetCursorPos`/`TextEntry__SetCharAt` are the other
-accessors). PROPOSED for whoever next runs track 3 on TextEntryItemList, or for
+accessors). PROPOSED for whoever next runs track 3 on input_dialogs, or for
 the head to apply by type scope:
 
 - `unk10` -> `nameLen` (tier B). Set by `TextEntry__SetText` from
@@ -152,15 +152,15 @@ the head to apply by type scope:
 - `unk14` -> `charTableLen` (tier B). Set by `TextEntry__TextEntry`'s own hand
   counted walk over `sNameCharTable` until the NUL byte; read as the upper
   bound in `TextEntry__NextChar` and as the countdown's own reset
-  value in TextEntryItemList's `TextEntry__PrevChar`.
+  value in input_dialogs's `TextEntry__PrevChar`.
 - `unk18` -> `cursorIndex` (tier B). The name-buffer edit-cursor index,
   moved by `TextEntry__MoveCursorRight`/`Left`, forwarded as `arg1` to both
-  `slotA4`/`slotA8` (TextEntryItemList's Dispatch* pair) and to `slot60`
+  `slotA4`/`slotA8` (input_dialogs's Dispatch* pair) and to `slot60`
   (`TextEntry__PlaySound`).
 - `unk1C` -- **NOT proposed, dual-use ambiguity found and deliberately left
   alone.** In this unit (`TextEntry__NextChar`) it is INCREMENTED as
   a character-picker selection index, capped by `unk14`, wrapping to 0 on
-  overflow. In TextEntryItemList (`TextEntry__PrevChar`) the SAME field is
+  overflow. In input_dialogs (`TextEntry__PrevChar`) the SAME field is
   DECREMENTED as a countdown, resetting to `unk14` at 0 -- opposite
   direction, same bounds. Whether this is one overloaded "position in
   [0,charTableLen)" value serving both a picker index and a blink/highlight
@@ -171,7 +171,7 @@ the head to apply by type scope:
   against the caller of `TextEntry__HandleCommand`/`TextEntry__OnNotify` (i.e.
   whatever drives the name-entry screen's per-frame tick) to settle it.
 - `unk20` -> tentatively `altInputFlag` (tier C-ish B; NOT confident enough
-  to apply even if it were unit-exclusive). Toggled by TextEntryItemList's
+  to apply even if it were unit-exclusive). Toggled by input_dialogs's
   `TextEntry__ToggleActOnHeld` (`^= 1`), zeroed by `TextEntry__AttachTarget`,
   tested with OPPOSITE polarity by every paired case in this function's own
   switch (`21` vs `5`, `20` vs `4`, `18` vs `2`, `19` vs `3`). Mechanics are
@@ -181,7 +181,7 @@ the head to apply by type scope:
 - `unk28` -> `workName` (tier B). `BMemPMgrAlloc`'d by `TextEntry__TextEntry`,
   freed by `TextEntry__Finalize`; the decode/copy destination in
   `TextEntry__SetText` and the encode SOURCE in this function's own `case 25`;
-  also the per-index byte array TextEntryItemList's `TextEntry__SetCharAt`
+  also the per-index byte array input_dialogs's `TextEntry__SetCharAt`
   writes through `sNameCharTable`. Working (half-width-decoded) copy of the
   name the caller supplies via `nameBuf`.
 - `unk40`/`unk44`/`unk48` -> `iconRes`/`fontRes`/`inputRes` (tier B).
@@ -191,30 +191,30 @@ the head to apply by type scope:
   handle with `nameLen`/`workName` forwarded (renders the name text), `unk40`
   from `New_CharSprite` on the same `FONTICON.TIM` handle with a `0x5F`
   literal (a distinct icon sub-resource of the same TIM). Also accessed by
-  TextEntryItemList's Dispatch* pair (`unk40`/`unk44` only, not `unk48`).
+  input_dialogs's Dispatch* pair (`unk40`/`unk44` only, not `unk48`).
 - `slot60` -> `notifyTarget` (tier B). This IS `TextEntry__PlaySound`'s own
   vtable slot (`gTextEntryMethods +0x060`, classtable.py) -- dispatched by
-  this function's `case 25`/`23` (arg1=`0x10`) and by TextEntryItemList's
+  this function's `case 25`/`23` (arg1=`0x10`) and by input_dialogs's
   `TextEntry__SetCursorPos`/`TextEntry__SetCharAt` (arg1=`0`).
 - `slotA4`/`slotA8` -> `dispatchIndexValue`/`dispatchLookupValue` (tier A --
   these names ALREADY EXIST as the confirmed implementations'
   `TextEntry__SetCursorPos`/`TextEntry__SetCharAt`,
-  TextEntryItemList, round 45/75). Dispatched by this unit's own
+  input_dialogs, round 45/75). Dispatched by this unit's own
   `TextEntry__MoveCursorRight`/`Left`/`TextEntry__NextChar` AND by
-  TextEntryItemList's `TextEntry__ResetAllChars`/`TextEntry__ResetChar`.
+  input_dialogs's `TextEntry__ResetAllChars`/`TextEntry__ResetChar`.
   Naming the slot to match its implementation is the project's own stated
   convention; only left unapplied here because the accessor set spans two
   units' files.
 
-Posted to `tools/broadcast.sh` for whoever is next on TextEntryItemList.
+Posted to `tools/broadcast.sh` for whoever is next on input_dialogs.
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
-The commands are Pad events (include/Pad.h: `PAD_EVENT_PRESSED` 0x12 /
+The commands are Pad events (include/pad.h: `PAD_EVENT_PRESSED` 0x12 /
 `PAD_EVENT_HELD` 0x02 plus the button index), and the command's sender is
 the child of class 2, the Pad (onNotify). Every case label is now spelled
 that way, zero bytes changed:
@@ -235,12 +235,12 @@ So `altCommands` selects between acting on presses (clear) and on held
 buttons (set); the field-name proposal is below. `setState(2)`/`(3)` are
 `TEXTENTRY_RESULT_ACCEPTED`/`CANCELLED`; the sound `0x10` is `1 << 4`,
 VAB program 1 tone 0 (playTone keys program index >> 4, tone index & 0xF;
-TitleMenuTaskObjF/_t's spelling). The `slot94Call` label is `callPrevChar`.
+title_menu/_t's spelling). The `slot94Call` label is `callPrevChar`.
 Parameters `arg1`/`arg2` -> `sender`/`command`.
 
 Moved here from the comment on `EncodeFullWidthSjis` (stale: it is matched
-in ScreenWidgets.c since round 38): "TextEntry__HandleCommand's own
-name-copy helper -- uncarved elsewhere (`ScreenWidgets`, still
+in screen_widgets.c since round 38): "TextEntry__HandleCommand's own
+name-copy helper -- uncarved elsewhere (`screen_widgets`, still
 `INCLUDE_ASM`), typed purely from this call site's own register usage:
 `a0`/`a1` are `self->textBuf`/`self->editBuf` (both `char *`, the same pair
 `strcpy` is fed in the other arm), return value unused. Same
@@ -251,7 +251,7 @@ call site)."
 ### Proposed field names (round 98)
 
 - TextEntry +0x020 `altCommands` -> `actOnHeld` (accessors: this unit's
-  AttachTarget/HandleCommand, TextEntryItemList's ToggleAltCommands); slot
+  AttachTarget/HandleCommand, input_dialogs's ToggleAltCommands); slot
   +0x098 `toggleAltCommands` and `TextEntry__ToggleActOnHeld` would follow
   (`toggleActOnHeld`). Evidence: the table above.
 
@@ -268,5 +268,5 @@ call site)."
   rename.py to TextEntry__ToggleActOnHeld (`actOnHeld ^= 1`); SELECT's press
   calls it.
 
-Accessors were the compiler's error list (TextEntryItemList, class_3bb8c_j);
+Accessors were the compiler's error list (input_dialogs, class_3bb8c_j);
 zero bytes changed.

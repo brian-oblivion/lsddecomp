@@ -89,7 +89,7 @@ void DayTask__OnInit(Obj865C8 *self) {
 }
 ```
 
-## New struct knowledge (`include/DayTaskStageMap.h`)
+## New struct knowledge (`include/dream_day.h`)
 
 - `Obj0C::obj` (+0x000) named: a `SubObjE *`, previously unnamed padding.
   `Obj0C` itself has no vtable of its own; this is the first evidence its
@@ -152,7 +152,7 @@ forward-declared struct bodies as a bare `struct X { ... };`, never repeat
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Renamed from Obj865C8__StartSubA: it is the +0x04C onInit override (IntermediateBase__Init calls it). subA was IntermediateBase's viewport (+0x018), which holds the NodeGuardedViewport the ctor made, and SubObjA's slots are Viewport's: setScreenSize, getSubHandle (then SceneNode setDisplay(1)), setUnk44(0x4B0), attachViewChild(dreamSys, &sDayViewPoint, &sDayViewRef, NULL), initOt. It takes self alone; the slot keeps (self, s32, s32, s32).
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from Obj865C8__StartSubA: it is the +0x04C onInit override (IntermediateBase__Init calls it). subA was IntermediateBase's viewport (+0x018), which holds the NodeGuardedViewport the ctor made, and SubObjA's slots are Viewport's: setScreenSize, getSubHandle (then SceneNode setDisplay(1)), setUnk44(0x4B0), attachViewChild(dreamSys, &sDayViewPoint, &sDayViewRef, NULL), initOt. It takes self alone; the slot keeps (self, s32, s32, s32).
 
 ## History moved from comments (track 7, round 99, charlie)
 
@@ -164,13 +164,13 @@ and 0x8008665C.
 ## Naming (track 7, round 99, charlie)
 
 - `sDayViewPoint` = (0, -1200, 0) and `sDayViewRef` = (0, -1200, 10000)
-  (tier A: they are attachViewChild's `vp` and `vr` arguments, Viewport.h
+  (tier A: they are attachViewChild's `vp` and `vr` arguments, viewport.h
   +0x070). Unit-static (`s`): no other code reads them.
 - Locals `obj`/`ret` -> `drawSystem`/`fadeBox`: the init args' `drawSystem`
   and Viewport's `getFadeBox` result.
 - SubObjE's +0x07C `slot7C` -> `getDims`: the object is the init args'
-  `drawSystem`, and DrawSystem.h's +0x07C is `getDims` (DrawSystem__GetDims).
-- `setUnk44(vp, 1200)`: decimal; Viewport.h says unk44 x unk48 is each
+  `drawSystem`, and draw_system.h's +0x07C is `getDims` (DrawSystem__GetDims).
+- `setUnk44(vp, 1200)`: decimal; viewport.h says unk44 x unk48 is each
   buffer's packet area (default 2000) without settling which is the count, so
   the value keeps no name.
 
@@ -183,4 +183,4 @@ takes (both `{s32, s32}`). Byte-identical (`./build-and-verify.sh` OK).
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-Viewport's `ViewportSize` merged into DrawSystem.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.
+Viewport's `ViewportSize` merged into draw_system.h's `ScreenDims` (both `{s32, s32}`: getDims's result is what DayTask__OnInit hands to setScreenSize), whose fields are now `width`/`height`; DayTask__OnInit's cast between the two is gone. Byte-identical.

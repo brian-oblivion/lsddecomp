@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003FED8` on 2026-09-20 (tools/rename.py). Address 0x8003fed8.
 
-Unit `ScreenWidgets`, carved round 14. `FadeBoxMethods::finishConstruct` (`+0x040`),
+Unit `screen_widgets`, carved round 14. `FadeBoxMethods::finishConstruct` (`+0x040`),
 dispatched by the class's own ctor (`FadeBox__FadeBox`) right after it installs
 `self->methods`.
 
@@ -24,7 +24,7 @@ void FadeBox__Reset(FadeBoxObj *self, s32 a1) {
 ```
 
 `slot60`/`slot64` resolve to `BoxFill__SetDisplay`/`BoxFill__SetSemiTrans`
-(ScreenWidgets, bravo's own functions), dispatched purely through the
+(screen_widgets, bravo's own functions), dispatched purely through the
 vtable -- no extern needed.
 
 ## Two-arg slot, not four
@@ -44,8 +44,8 @@ occupant's own body, and 2 is also all the CALL SITE bothers to configure).
 (`+0x040`), dispatched by `FadeBox__FadeBox` immediately after
 installing `self->methods`. Named to match the architecturally identical
 slot in the same class hierarchy: `Obj6EAC0Methods::slot40` (bravo's own
-unrenamed slot name, `ScreenWidgets`) is already
-named `TextRow__Reset` (round 54, `ScreenWidgets`/this header),
+unrenamed slot name, `screen_widgets`) is already
+named `TextRow__Reset` (round 54, `screen_widgets`/this header),
 and `ClassEAC0Methods::finishConstruct` (this unit, `BoxFill__Reset`)
 occupies the SAME offset one level up the same chain, dispatched the same
 way (right after a ctor installs the vtable). Three independent occupants
@@ -66,7 +66,7 @@ sets `step` to 10, `altMode` to 0, and turns the box's display and
 semi-transparency off (the inherited `setDisplay`/`setSemiTrans`). Its
 parameter list `(self, channels)` differs from the slot's `(self)`, so the
 slot keeps the inherited type and the ctor calls it through
-`FadeBoxResetFn` (include/FadeBox.h). Tier A.
+`FadeBoxResetFn` (include/fade_box.h). Tier A.
 
 ## Track 6 (2026-09-26, round 93, charlie)
 

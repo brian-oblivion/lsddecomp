@@ -33,7 +33,7 @@ tree it gives 17/17 words with the whole-image SHA1 verifying.
 
 Scoring note: the head's first pass at rescoring these 14 bodies read numbers
 from a build that had failed to compile (the spliced file was missing echo's
-`#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
+`#include "dream_sys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
 

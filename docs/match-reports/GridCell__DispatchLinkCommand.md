@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D434` on 2026-09-22 (tools/rename.py). Address 0x8004d434.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 18 words · **Status:** MATCHED (18/18)
+**Unit:** title_menu · **Size:** 18 words · **Status:** MATCHED (18/18)
 
 ## What it does
 
@@ -89,7 +89,7 @@ sender is a BasicClass and the byte is read as Actor's override reads it.
 ## Track 7 (round 100)
 
 `*(u8 *)sender->methods == 0x34` is `(u8)sender->methods->header ==
-ACTOR_CLASS_ID` (include/Actor.h, now included by the unit), the spelling
+ACTOR_CLASS_ID` (include/actor.h, now included by the unit), the spelling
 StageMap__DispatchLinkCommand and Actor__DispatchLinkCommand already use.
 Byte-identical: GCC reads only the low byte either way. The function
 comment was rewritten; as it stood, verbatim: "Only the low byte of the

@@ -1,6 +1,6 @@
 # GetStageChunkFromMood
 
-Unit: `StageGrid` · Size: 43 words (0xAC bytes) · Status: **MATCHED, byte-exact
+Unit: `stage_grid` · Size: 43 words (0xAC bytes) · Status: **MATCHED, byte-exact
 (43/43, whole-image `build exit=0`)** · Round 23 (2026-09-07), head.
 
 ## What it is
@@ -97,12 +97,12 @@ residue with a one-word fix (`u32`), and it survives `return stage;` from an
 **`GetStageChunkFromMood`, tier A.** Inherited from lsddecomp, confirmed:
 the body's own name (`Get<output>From<input>`) matches what it does — search
 every stage's mood table for a value equal to `*mood` and return the owning
-chunk — and the one call site outside this unit, `src/world/DreamSys.c:2003`
+chunk — and the one call site outside this unit, `src/world/dream_sys.c:2003`
 inside `GenerateInitialSpawn` (`stage = GetStageChunkFromMood(&chunk,
 mood);`), passes a `MoodGraphPoint *mood` and uses the returned stage to
 index `sStageTimeLimits`/`sStageSpawnPoints` and the returned `chunk` to
 match a spawn point's own chunk, agreeing with "find the (stage, chunk) a
-mood value belongs to". Confirmed, not renamed. (`include/DreamSys.h:43`'s
+mood value belongs to". Confirmed, not renamed. (`include/dream_sys.h:43`'s
 comment attributing `StageChunk`/`GetMoodFromStageChunk` usage to
 `DreamSys__LogChunkMood` is about the *other* function in this unit, not this
 one — see `GetMoodFromStageChunk.md`.)

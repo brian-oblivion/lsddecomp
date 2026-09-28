@@ -2,7 +2,7 @@
 
 > Renamed from `func_800406E4` on 2026-09-25 (tools/rename.py). Address 0x800406e4.
 
-Unit: `src/ui/ScreenWidgets.c`. First attempt.
+Unit: `src/ui/screen_widgets.c`. First attempt.
 
 ```c
 s32 BoxFill__SetDisplay(Obj6EAC0 *self, s32 a1) {
@@ -11,9 +11,9 @@ s32 BoxFill__SetDisplay(Obj6EAC0 *self, s32 a1) {
 ```
 
 Same generic packed-bitfield-word accessor already documented in
-`include/SceneNode.h` (`GetSetBitField(word, shift, width, value)`),
+`include/scene_node.h` (`GetSetBitField(word, shift, width, value)`),
 here over `self->unk58` (a fresh field, not `SceneNode`'s `unk10`).
-Shift/width/negate shape matches `SceneNode.c`'s own
+Shift/width/negate shape matches `scene_node.c`'s own
 `SceneNode__SetDisplay` verbatim (`GetSetBitField(&self->unk10, 0x1F, 1,
 a1 == 0) == 0`), just against a different field.
 
@@ -22,7 +22,7 @@ a1 == 0) == 0`), just against a different field.
 The `GetSetBitField`-wrapper family generalises past `SceneNode`: any
 unit with a packed-bitfield-word field can reuse the exact same
 shift/width/`==0` idioms already catalogued there. Worth checking
-`SceneNode.h`'s comment block first whenever a new unit's disassembly
+`scene_node.h`'s comment block first whenever a new unit's disassembly
 shows a `jal GetSetBitField` (or the sibling helper it's built from).
 
 ## Naming
@@ -34,9 +34,9 @@ Round 54 (alpha), FINISHING-PLAN track 3.
 | `func_800406E4` | (kept `func_800406E4` at track 3; `BoxFill__SetDisplay` since round 85, see Track 4) | C |
 
 **What is known.** A thin wrapper around `GetSetBitField(&self->flags,
-shift, width, value)` (see `include/Task.h`'s own comment on
+shift, width, value)` (see `include/task.h`'s own comment on
 `flags`, renamed from `unk58` this round), the SAME generic
-packed-bitfield-word accessor `SceneNode.c`'s own sibling functions
+packed-bitfield-word accessor `scene_node.c`'s own sibling functions
 (`SceneNode__SetDisplay`/`D374`/`D3A0`) wrap -- and those, the FIRST instances
 of this exact idiom in the project, are still unnamed too, for the same
 reason: `GetSetBitField` returns the bit's OLD value while setting a
@@ -48,4 +48,4 @@ consistent with this project's own precedent on the sibling group.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_800406E4`: the +0x060 occupant (SceneNode's setDisplay), and the body is SceneNode__SetDisplay's own (GetSetBitField shift 31, width 1, `on == 0`, result `== 0`) over the GsBOXF attribute at +0x058 instead of the GsDOBJ2 one (tier A). GraphRoom__Update calls it on points[0] with the hour's low bit (a blink).
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/box_fill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `func_800406E4`: the +0x060 occupant (SceneNode's setDisplay), and the body is SceneNode__SetDisplay's own (GetSetBitField shift 31, width 1, `on == 0`, result `== 0`) over the GsBOXF attribute at +0x058 instead of the GsDOBJ2 one (tier A). GraphRoom__Update calls it on points[0] with the hour's low bit (a blink).

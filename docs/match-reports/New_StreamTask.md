@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003B854` on 2026-09-23 (tools/rename.py). Address 0x8003b854.
 
-**Unit:** Task · **Status:** MATCHED (36/36 words)
+**Unit:** task · **Status:** MATCHED (36/36 words)
 
 A `New_X` class allocator: allocate 0xDC bytes, and if that succeeds dispatch
 the class's constructor slot (`+0x008`) with the caller's arguments forwarded
@@ -26,7 +26,7 @@ StreamTaskObj *New_StreamTask(s32 a1, s32 a2, s32 a3, s32 a4)
 }
 ```
 
-See `src/app/Task.c` for the exact text.
+See `src/app/task.c` for the exact text.
 
 ## Why it matched: `return NULL;` goes LAST
 
@@ -62,20 +62,20 @@ updated with what survived and what did not.
 **New_StreamTask** -- tier A. Canonical `New_X` allocator shape (allocate,
 dispatch the ctor slot, return); the class is independently established both
 by `gStreamTaskMethods`'s own ctor-slot dispatch (`classtable.py`) and by
-`include/GameApplication.h`'s cross-unit `StreamTask` view of the same call site.
+`include/game_application.h`'s cross-unit `StreamTask` view of the same call site.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-StreamTaskObj's table now expands TASKCORE_SLOTS (include/TaskCore.h, round 84): the ctor call is `ctor` and its fifth argument is cast to the ctor's `StreamTaskInitData *`. Byte-identical.
+StreamTaskObj's table now expands TASKCORE_SLOTS (include/task_core.h, round 84): the ctor call is `ctor` and its fifth argument is cast to the ctor's `StreamTaskInitData *`. Byte-identical.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). The 0xDC-byte allocator.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). The 0xDC-byte allocator.
 
 
 ## Track 6 (2026-09-27, round 99, runner bravo)
 
-The fifth parameter is a `DrawRect *` (DrawSystem.h); `StreamTaskInitData`, its local spelling, is deleted (StreamTask__StreamTask.md). Byte-identical.
+The fifth parameter is a `DrawRect *` (draw_system.h); `StreamTaskInitData`, its local spelling, is deleted (StreamTask__StreamTask.md). Byte-identical.
 
 ## History (moved from src/Task.c, comments pass)
 

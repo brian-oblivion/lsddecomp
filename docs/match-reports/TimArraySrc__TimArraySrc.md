@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043BE8` on 2026-09-25 (tools/rename.py). Address 0x80043be8.
 
-Round 82, runner echo (GraphicsResources session, echo #8), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #8), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 30/30 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTimArraySrcMethods +0x008.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/graphics/GraphicsResources.c`.
+`src/graphics/graphics_resources.c`.
 
 ```c
 /* gTimArraySrcMethods +0x008: constructor -- the active driver's, then this table,
@@ -45,7 +45,7 @@ First build. No lever needed.
 
 
 ## Track 4 (2026-09-26, round 88, runner alpha)
-Class unified as TimArraySrc (include/TimArraySrc.h); self retyped from the unit-local DataSrc33808. Fields: unk2C -> count, unk30 -> images (TimImage **), unk38 -> ready, named from BuildImages, which is the only writer after this ctor. Byte-identical.
+Class unified as TimArraySrc (include/tim_array_src.h); self retyped from the unit-local DataSrc33808. Fields: unk2C -> count, unk30 -> images (TimImage **), unk38 -> ready, named from BuildImages, which is the only writer after this ctor. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

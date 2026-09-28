@@ -9,7 +9,7 @@
 ## What it does
 
 The gApplicationMethods constructor (slot `+0x008`). GameApplication__GameApplication
-(GameApplicationFileResource) calls it through `GetApplicationMethods()->ctor(self, arg->unk00)`.
+(game_shell) calls it through `GetApplicationMethods()->ctor(self, arg->unk00)`.
 
 1. base ctor through BasicClass's table;
 2. installs its own table (GetApplicationMethods);
@@ -42,7 +42,7 @@ by the scheduler. `sCdInitDone` is gp-relative through
 **Round 81 (delta), track 3.** Renamed `func_8003AF8C` -> `Application__Application`
 (constructor convention, `Class__Class`). **Tier A**: it is the +0x008 ctor
 slot (`classtable.py 0x8006E4F0 --vs 0x8006B58C`), confirmed by
-`GameApplication__GameApplication` (GameApplicationFileResource) calling it through
+`GameApplication__GameApplication` (game_shell) calling it through
 `GetApplicationMethods()->ctor(self, arg->unk00)` as the base-constructor step
 before installing its own vtable -- the base-ctor-through-slot+8 shape from
 docs/research/class-framework.md. The body is substantive ctor work (base
@@ -63,7 +63,7 @@ function's own report for the blocker and the broadcast post.
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The class is declared once, in
-`include/Application.h`. The parameter is now `dataSource`: it goes straight
+`include/application.h`. The parameter is now `dataSource`: it goes straight
 to `SetActiveDataSource`, and the one caller passes `sGameApplicationConfig`'s
 first word, 0x13 (the CD driver's class id, gCdDriverMethods). The table getter is
 `GetApplicationMethods` (renamed from `func_8003B20C`). Bytes unchanged.
@@ -138,7 +138,7 @@ Facts the header banner carried as derivation, kept here:
 - Object size 0x20: no allocator, but GameApplication's ctor stores its argument
   at +0x020, which bounds it.
 - ScreenDims and InitSystems's drawSystem argument became DrawSystem's in
-  round 87 (include/DrawSystem.h).
+  round 87 (include/draw_system.h).
 
 ## History (moved from src/Application.c)
 

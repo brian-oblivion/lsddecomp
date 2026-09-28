@@ -6,15 +6,15 @@
 
 > Renamed from `func_800404C0` on 2026-09-20 (tools/rename.py). Address 0x800404c0.
 
-Unit `ScreenWidgets`, carved round 14. `FadeBoxObj`'s own bare
+Unit `screen_widgets`, carved round 14. `FadeBoxObj`'s own bare
 no-argument table getter, same idiom as `GetSceneNodeMethods`
-(`include/SceneNode.h`) for `SceneNodeObj`: `FadeBoxMethods
+(`include/scene_node.h`) for `SceneNodeObj`: `FadeBoxMethods
 *GetFadeBoxMethods(void) { return &gFadeBoxMethods; }`.
 
 ## Naming (round 61, track 3)
 
 **`GetFadeBoxMethods`** -- tier A. Bare no-argument getter,
-`return &gFadeBoxMethods;` -- the exact same idiom as `SceneNode.h`'s
+`return &gFadeBoxMethods;` -- the exact same idiom as `scene_node.h`'s
 `GetSceneNodeMethods` for `SceneNodeObj`'s own table. Mechanics fully
 determine the name.
 

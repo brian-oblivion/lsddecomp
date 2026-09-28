@@ -2,7 +2,7 @@
 
 > Renamed from `func_800447B4` on 2026-09-25 (tools/rename.py). Address 0x800447b4.
 
-Round 82, runner echo (GraphicsResources session, echo #6), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #6), 2026-09-25. Unit `graphics_resources`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 21/21 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,11 +17,11 @@ Table slot (`tools/classtable.py`): gModelDataMethods +0x00C (finalize).
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
-#include "ModelData.h"
+#include "model_data.h"
 
 /* gModelDataMethods +0x00C: finalize -- slot +0x07C, then the active driver's. */
 void ModelData__Finalize(ModelData *self) {
@@ -32,7 +32,7 @@ void ModelData__Finalize(ModelData *self) {
 
 ## Notes
 
-- No shared header was edited. `FileResource.h`, `SceneNode.h`, `basic_class.h` are
+- No shared header was edited. `file_resource.h`, `scene_node.h`, `basic_class.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
@@ -43,4 +43,4 @@ void ModelData__Finalize(ModelData *self) {
 
 ## Track 4
 
-2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/ModelData.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x07C is `releaseResources` (occupant ModelData__ReleaseResources), prototyped `void (*)(ModelData *self)`. The call is now `releaseResources(self)`; before, it was the unprototyped `slot7C()` with no argument. The bytes are the same because self is already in $a0 at the jalr. Image byte-identical.
+2026-09-25, round 84 (delta): ModelData (gModelDataMethods) is unified in `include/model_data.h`; the unit-shared `DataSrc33808` view no longer types it. Slot +0x07C is `releaseResources` (occupant ModelData__ReleaseResources), prototyped `void (*)(ModelData *self)`. The call is now `releaseResources(self)`; before, it was the unprototyped `slot7C()` with no argument. The bytes are the same because self is already in $a0 at the jalr. Image byte-identical.

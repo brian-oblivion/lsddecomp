@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005165C` on 2026-09-24 (tools/rename.py). Address 0x8005165c.
 
-Unit `TextEntryItemList`. Obj86ED0's own "advance frame counter, clamped at
+Unit `input_dialogs`. Obj86ED0's own "advance frame counter, clamped at
 `unk10`" method. Mirror pair with `TextEntry__MoveCursorLeft` (decrement/clamp-at-zero,
 matched alongside it) and `TextEntry__NextChar` (a second increment/clamp pair on
 different fields, also matched this round).
@@ -62,11 +62,11 @@ account.
 
 ## Naming
 
-- `TextEntry__MoveCursorRight` -- tier A. gTextEntryMethods +0x088 (moveCursorRight slot, classtable.py -- also confirmed as HandleCommand's own case 21/5 target). Increments the name-buffer index unk18, bounded by the name length unk10; reverts on overflow. Symmetric with TextEntry__MoveCursorLeft; forwards to TextEntry__SetCursorPos (TextEntryItemList).
+- `TextEntry__MoveCursorRight` -- tier A. gTextEntryMethods +0x088 (moveCursorRight slot, classtable.py -- also confirmed as HandleCommand's own case 21/5 target). Increments the name-buffer index unk18, bounded by the name length unk10; reverts on overflow. Symmetric with TextEntry__MoveCursorLeft; forwards to TextEntry__SetCursorPos (input_dialogs).
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 ## Track 7 (2026-09-27, round 98, bravo)
 

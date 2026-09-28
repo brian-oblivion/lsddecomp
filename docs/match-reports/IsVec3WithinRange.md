@@ -64,7 +64,7 @@ retail's literal shape over the "cleaner" idiomatic form.
   +/- `range` of the matching component of `a`, 0 on the first component
   that does not. `Is...` marks the predicate; the two early returns and the
   trailing `return 1` are the whole body.
-- Corroborated by its one caller: `DreamSys.c`'s `DreamSys__ProjectPointAtDistance` calls it
+- Corroborated by its one caller: `dream_sys.c`'s `DreamSys__ProjectPointAtDistance` calls it
   as `IsVec3WithinRange(local, tolerance, reference)`, where `local` is a
   position it has just computed via `SceneNode__LocalOffsetToWorldPos` --
   a tolerance test between two positions, which is what the name says.
@@ -73,7 +73,7 @@ retail's literal shape over the "cleaner" idiomatic form.
   the code does not have. The explicit pointer walks in the `for`
   increment clause are load-bearing (see the derivation above) and unchanged.
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
 The pointer-bump placement keeps a one-line `MATCHING:` note in the source.
 

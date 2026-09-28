@@ -6,12 +6,12 @@
 
 > Renamed from `func_80048CD8` on 2026-09-25 (tools/rename.py). Address 0x80048cd8.
 
-Round 81, runner echo. Unit `src/cd/GameFiles.c` (carved from psyq_39094 in
+Round 81, runner echo. Unit `src/cd/game_files.c` (carved from psyq_39094 in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt. Byte-exact on
 the first build; whole-image SHA1 green.
 
 - **Where:** slot +0x088 of gLbdFileMethods (`tools/classtable.py gLbdFileMethods`).
-- **What:** setter: stores the second argument at `self+0x38`. The object is a local view `DataSrc39094` (FileResource fields from the unified `include/FileResource.h`, then `pad2C[0xC]`, `s32 autoLoadData`).
+- **What:** setter: stores the second argument at `self+0x38`. The object is a local view `DataSrc39094` (FileResource fields from the unified `include/file_resource.h`, then `pad2C[0xC]`, `s32 autoLoadData`).
 - **Levers:** none needed.
 - **Name:** kept `func_`; role not yet identified beyond the above.
 
@@ -50,7 +50,7 @@ void LbdFile__SetAutoLoadData(DataSrc39094 *self, s32 value) {
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__SetAutoLoadData` -> `LbdFile__SetAutoLoadData` with `rename.py` (class rename only; +0x088, the last slot). Its one caller is StageMap__StageMap, forwarding its own arg2. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `DataSrc39094__SetAutoLoadData` -> `LbdFile__SetAutoLoadData` with `rename.py` (class rename only; +0x088, the last slot). Its one caller is StageMap__StageMap, forwarding its own arg2. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/lbd_file.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)
@@ -58,7 +58,7 @@ Renamed `DataSrc39094__SetAutoLoadData` -> `LbdFile__SetAutoLoadData` with `rena
 Renamed with `python3 tools/renametype.py Class81940 LbdFile` (the whole
 class family: object, table `gClass81940Methods` -> `gLbdFileMethods`,
 getter, constructors, methods, the header `include/Class81940.h` ->
-`include/LbdFile.h` and its typedefs). The tool rewrote every
+`include/lbd_file.h` and its typedefs). The tool rewrote every
 `Class81940` token in these reports too, so the Track 4 section above now
 says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.

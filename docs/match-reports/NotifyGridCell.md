@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004B2D4` on 2026-09-22 (tools/rename.py). Address 0x8004b2d4.
 
-**Unit:** DayTaskStageMap · **Size:** 18 words · **Status:** MATCHED (18/18 words)
+**Unit:** dream_day · **Size:** 18 words · **Status:** MATCHED (18/18 words)
 
 ## What it does
 
@@ -59,11 +59,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -80,4 +80,4 @@ an operator decision; not hand-reverted).
 
 Moved here from the `.c` comment above the function: "Widened this round (StageMap__DispatchToRectCells) from a single-param signature to accept two more, unused, forwarded params: StageMap__DispatchToRectCells's own call sites explicitly set up $a1/$a2 before every call here (unlike GetSceneNodeMethods's "leftover, already-there" args -- these are real, explicit `move` instructions), so the call itself needs a matching 3-param prototype to compile. Confirmed harmless to THIS function's own already-matched body: neither extra param is read, and GCC does not reserve stack space for unused trailing integer/pointer args on this target, so the definition's own bytes are unaffected (reverified 18/18 after the widening)." (Note: the parameters ARE read -- the body forwards them to `onNotify` -- so "neither extra param is read" was already stale.)
 
-Constant: `flags36 & 0x80` is `GRIDCELL_FLAG_TAKES_COMMANDS`, new in include/GridCell.h, tier B: this function forwards a command only to a cell with the bit; the bit comes from the placement record's `cellFlags` (StageMap__PopulateSlotCells). What the game uses such a cell for is not established; DreamSys__NotifyLinkAttempt reads the same word's low seven bits as a voice index.
+Constant: `flags36 & 0x80` is `GRIDCELL_FLAG_TAKES_COMMANDS`, new in include/grid_cell.h, tier B: this function forwards a command only to a cell with the bit; the bit comes from the placement record's `cellFlags` (StageMap__PopulateSlotCells). What the game uses such a cell for is not established; DreamSys__NotifyLinkAttempt reads the same word's low seven bits as a voice index.

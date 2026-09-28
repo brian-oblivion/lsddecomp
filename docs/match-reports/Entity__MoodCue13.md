@@ -77,4 +77,4 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 7 (round 94, delta)
 
-`notifyParents(this, 0xB)` is `ENTITY_EFFECT_EVENT_VIDEO`. A comment explains `out->tick = -1` (SoundCueSet.h: the callback may set -1 to restart the count). Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs and `state` phases (hex remains only for masks). Byte-identical (whole image green).
+`notifyParents(this, 0xB)` is `ENTITY_EFFECT_EVENT_VIDEO`. A comment explains `out->tick = -1` (sound_cue_set.h: the callback may set -1 to restart the count). Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs and `state` phases (hex remains only for masks). Byte-identical (whole image green).

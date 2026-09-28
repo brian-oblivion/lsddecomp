@@ -2,7 +2,7 @@
 
 > Renamed from `func_80052DE8` on 2026-09-24 (tools/rename.py). Address 0x80052de8.
 
-**Unit:** ObjMStyleActor · **Size:** 37 words (0x94 bytes) ·
+**Unit:** dream_scene · **Size:** 37 words (0x94 bytes) ·
 **Status: MATCHED 37/37**, whole-image SHA1 green.
 
 ## What it does
@@ -61,4 +61,4 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the `init` override (+0x044): `arg1` is the building DayTask's IntermediateBaseInitArgs, whose +0x00C is its StageMap (setCallback +0x0C8, the "registrant"), and `arg2` the DreamSys, which DayTask__StartObjM passes as init's s32 `mode`; the slot keeps IntermediateBase's type, the occupant takes `(IntermediateBaseInitArgs *, DreamSys *)`.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the `init` override (+0x044): `arg1` is the building DayTask's IntermediateBaseInitArgs, whose +0x00C is its StageMap (setCallback +0x0C8, the "registrant"), and `arg2` the DreamSys, which DayTask__StartObjM passes as init's s32 `mode`; the slot keeps IntermediateBase's type, the occupant takes `(IntermediateBaseInitArgs *, DreamSys *)`.

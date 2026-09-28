@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004E1C4` on 2026-09-24 (tools/rename.py). Address 0x8004e1c4.
 
-Unit `TitleMenuTaskObjF`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from round
+Unit `title_menu`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from round
 42's `gp_rel` resolution (`--gp-symbols`/`--no-nop-mflo-mfhi`, see CLAUDE.md
 "Open toolchain blockers"). The round-14 stub report recorded 2 `gp_rel` hits
 and no derivation; this round wrote and matched the function from scratch.
@@ -93,7 +93,7 @@ Renamed `func_8004E1C4` -> `TitleMenu__LoadFromCard`. **Tier B, lower confidence
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). slot128 is this class's beginMemcardSave; unkBC/unkC0 are saveBlock/saveBlockSize, saveBlock cast to s32 for the TaskObjF view's s32 parameter (no code). Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). slot128 is this class's beginMemcardSave; unkBC/unkC0 are saveBlock/saveBlockSize, saveBlock cast to s32 for the TaskObjF view's s32 parameter (no code). Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 

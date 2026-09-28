@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EC2C` on 2026-09-23 (tools/rename.py). Address 0x8003ec2c.
 
-Unit `Task`, carved round 13. Reopened round 42 as
+Unit `task`, carved round 13. Reopened round 42 as
 `nop_mflo_mfhi`-blocked (the blocker is RESOLVED, see CLAUDE.md); the stub
 above was never actually attempted until now.
 
@@ -30,7 +30,7 @@ void Viewport__SetTwist(Unk18Obj *self, s16 *pair) {
 }
 ```
 
-Read the input pair as raw `s16 *` rather than reusing `SceneNode.h`'s
+Read the input pair as raw `s16 *` rather than reusing `scene_node.h`'s
 `Ratio16` -- this unit has its own local view of the shape and does
 not include that header; a shared struct across units is a shared-header
 hazard per CLAUDE.md's "one exception" note, and there is no reuse benefit
@@ -39,7 +39,7 @@ adjacent halfwords.
 
 ## Header change
 
-`include/Task.h`: `Unk18Obj`'s `pad2C[4]` retyped to `s32 unk2C`
+`include/task.h`: `Unk18Obj`'s `pad2C[4]` retyped to `s32 unk2C`
 (same offset, same size -- no other field moves). Verified safe: this is
 the FIRST function in the project to touch `+0x02C` of `Unk18Obj`, so there
 is no sibling already-matched function reading/writing that offset to
@@ -65,7 +65,7 @@ often, not a coincidence.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__SetRatio12`. Renamed for the GsRVIEW2 member it writes: `refView.rz`, the twist, as a 20.12 value from a `Ratio16` (the same split division as RatioToFixed12, which reads the same type). Slot +0x080 `setTwist`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__SetRatio12`. Renamed for the GsRVIEW2 member it writes: `refView.rz`, the twist, as a 20.12 value from a `Ratio16` (the same split division as RatioToFixed12, which reads the same type). Slot +0x080 `setTwist`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 
 ## Track 7 (round 95, alpha, polish pass)

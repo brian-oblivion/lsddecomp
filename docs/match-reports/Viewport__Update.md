@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EEC0` on 2026-09-23 (tools/rename.py). Address 0x8003eec0.
 
-Unit: `Task`. Round 14, runner delta. 99/99 words, full match (4
+Unit: `task`. Round 14, runner delta. 99/99 words, full match (4
 real attempts).
 
 ## Signature
@@ -119,7 +119,7 @@ learning below.
 
 ## Header changes
 
-`include/Task.h`:
+`include/task.h`:
 - `GenericObj` gains `unkC` (`+0x00C`, `void *`) plus the corrective
   `pad010` gap.
 - `Unk18Obj` gains `unk4C`/`unk50` (both `s32`, splitting the old
@@ -134,7 +134,7 @@ learning below.
   is this function (not `Viewport__OnFrameClockEvent`, which only dispatches it), and
   `slotA4`'s real occupant is `Viewport__Flip` (not `Viewport__OnDrawSystemEvent`, ditto).
 - New externs: `GsSetNearClip`/`func_8003FC70`/`func_8003FD4C`/
-  `GsSetWorkBase` (all `asm/ScreenWidgets.s`, next slice, uncarved) and
+  `GsSetWorkBase` (all `asm/screen_widgets.s`, next slice, uncarved) and
   `func_80024AE4` (PsyQ, `asm/psyq_GsLinkObject4.s`).
 
 ## Proposed learning
@@ -159,7 +159,7 @@ between two named fields).
 ## Proposed field names
 
 Not applied -- these fields are exclusive to this unit (confirmed: grepped
-every other unit that includes `Task.h`, none touch `Unk18Obj`), so
+every other unit that includes `task.h`, none touch `Unk18Obj`), so
 by the letter of track 3's rule they COULD be renamed here; left as
 proposals instead because their own evidence is materially weaker than the
 six fields this round did rename (`lightMode`/`clearColor`/`farColor`/
@@ -211,17 +211,17 @@ runner.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__Update`. Slot +0x09C `update` (NodeGuardedViewport's override forwards here). +0x0A0 is now typed `drawNode(Self *, SceneNode *)`: all three calls pass a SceneNode (viewNode, sceneRoot, GetRootNode's result), so the function-pointer casts are gone. `self->unk10->unkC` is `viewNode->parent`, `*(s32 *)unk30 = 0` is `refView.super->flg = 0` (mark the super coordinate for recompute), `unk98` is `zDiv` = (farZ - nearZ) / (1 << otLength) + 1, and the raw `self + 0x78/0x88 + idx * 4` reads are `ot[idx]` and `workBase[idx]`, all byte-identical. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__Update`. Slot +0x09C `update` (NodeGuardedViewport's override forwards here). +0x0A0 is now typed `drawNode(Self *, SceneNode *)`: all three calls pass a SceneNode (viewNode, sceneRoot, GetRootNode's result), so the function-pointer casts are gone. `self->unk10->unkC` is `viewNode->parent`, `*(s32 *)unk30 = 0` is `refView.super->flg = 0` (mark the super coordinate for recompute), `unk98` is `zDiv` = (farZ - nearZ) / (1 << otLength) + 1, and the raw `self + 0x78/0x88 + idx * 4` reads are `ot[idx]` and `workBase[idx]`, all byte-identical. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 ## Sony's headers (round 95, alpha, polish pass)
 
-src/app/Task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/Viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSetRefView2((GsRVIEW2 *)&self->refView)` and `GsClearOt(0, 0, (GsOT *)self->ot[idx])`. SetFarColor now takes LIBGTE.H's `long`s; the call still reads the bytes through a `u8 *`, so they zero-extend exactly as the old `u8` prototype made them.
+src/app/task.c now includes `<libgte.h>`, `<libgpu.h>` and `<libgs.h>` and its local prototypes of Sony functions are gone; every call takes Sony's own declaration, byte-identical. Interim casts at this function's call sites, until include/viewport.h's ViewportOt/ViewportRefView become Sony's GsOT/GsRVIEW2: `GsSetRefView2((GsRVIEW2 *)&self->refView)` and `GsClearOt(0, 0, (GsOT *)self->ot[idx])`. SetFarColor now takes LIBGTE.H's `long`s; the call still reads the bytes through a `u8 *`, so they zero-extend exactly as the old `u8` prototype made them.
 
 The comments that sat on the deleted prototypes, moved here verbatim:
 
 ```c
 /* Psy-Q's GTE far-colour register writer (libgte/reg03, linked from Sony's
- * own SDK object). LOCAL to this unit, not Task.h -- see the note on
+ * own SDK object). LOCAL to this unit, not task.h -- see the note on
  * SetGeomScreen below. This call site reads self->farColor's own three bytes
  * UNSIGNED (`lbu`, not `lb`) even though Viewport__SetFarColor writes them as signed
  * bytes; the disagreement is kept as a local cast rather than a retype of the
@@ -230,7 +230,7 @@ extern void SetFarColor(u8 a0, u8 a1, u8 a2);
 
 /* Three more of Sony's, linked from the SDK objects since round 34 and
  * declared LOCALLY for the same reason as GsSetRefView2 above: they used to
- * sit in include/Task.h as `func_8003Fxxx`, and under their real names
+ * sit in include/task.h as `func_8003Fxxx`, and under their real names
  * a header six units include is exactly where LIBGS.H's own prototypes will
  * one day collide. These are only the shapes THIS unit's call sites use.
  *   GsSetLightMode  libgs/gs_108   was func_8003FC70
@@ -239,7 +239,7 @@ extern void SetFarColor(u8 a0, u8 a1, u8 a2);
  * GsClearOt's real third argument is a `GsOT *` (its first two are Sony's
  * `offset` and `point`). This call site already passed it as a plain word, so
  * it is left that way -- the shape the header carried before round 14 retyped
- * it to a `TexPageDesc *`, which was ScreenWidgets.c's reading of that same
+ * it to a `TexPageDesc *`, which was screen_widgets.c's reading of that same
  * GsOT. */
 extern void GsSetLightMode(s32 a0);
 extern void SetFogNear(s32 a0, s32 a1);
@@ -249,13 +249,13 @@ extern void GsClearOt(s32 a0, s32 a1, ViewportOt *ot);
 
 ## Track 7 (round 95, alpha, polish pass)
 
-Light mode 1 is `GsLMODE_FOG` (libgs.h); 3 stays a literal, since LIBGS.H names only modes 0..2 (`GsLMODE_NORMAL`, `GsLMODE_FOG`, `GsLMODE_LOFF`). The far colour is read as `(u8)self->farColor.r` etc. rather than through a `u8 *` over the struct, and `GsSetWorkBase` takes a `(PACKET *)`; byte-identical. Measured for a proposal: retyping ViewportRgb's three fields to `u8` (include/Viewport.h) is byte-identical across the whole image, and would drop the casts.
+Light mode 1 is `GsLMODE_FOG` (libgs.h); 3 stays a literal, since LIBGS.H names only modes 0..2 (`GsLMODE_NORMAL`, `GsLMODE_FOG`, `GsLMODE_LOFF`). The far colour is read as `(u8)self->farColor.r` etc. rather than through a `u8 *` over the struct, and `GsSetWorkBase` takes a `(PACKET *)`; byte-identical. Measured for a proposal: retyping ViewportRgb's three fields to `u8` (include/viewport.h) is byte-identical across the whole image, and would drop the casts.
 
-Round 96 (alpha, track 6). include/Viewport.h's local `ViewportOt` (a
+Round 96 (alpha, track 6). include/viewport.h's local `ViewportOt` (a
 0x14-byte view of the GsOT header: length, org, pad) is deleted: `ot[2]` is
 Sony's `GsOT *`, `otTags[2]` Sony's `GsOT_TAG *` (each header's `org`) and
 `workBase[2]` Sony's `PACKET *` (GsSetWorkBase's argument), and every unit
-including Viewport.h takes Sony's headers after common.h. The `(GsOT *)`
+including viewport.h takes Sony's headers after common.h. The `(GsOT *)`
 casts at GsClearOt, GsSortClear, GsDrawOt and drawNode's five sort calls and
 Update's `(PACKET *)` cast are gone. Byte-identical (whole image green).
 

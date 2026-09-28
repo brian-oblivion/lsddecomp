@@ -269,14 +269,14 @@ search, not a repeat of this one.
 
 ## Preserved bodies
 
-Both need `SsScore` from `include/SsScore.h` (`unk40` is **`s16`** there,
+Both need `SsScore` from `include/ss_score.h` (`unk40` is **`s16`** there,
 as these bodies require) and these declarations, all already present in
 `src/psyq/libsnd_decre.c`:
 
 ```c
 extern s32 SpuVmSetSeqVol(s16 a0, u16 a1, u16 a2, s32 a3);
 extern s32 SpuVmGetSeqVol(s32 p0, s16 *out1, s16 *out2);
-#include "SsScore.h" /* SsScore, extern SsScore *_ss_score[] */
+#include "ss_score.h" /* SsScore, extern SsScore *_ss_score[] */
 ```
 
 ### Body A — 200/202 words, 21/202, `regs=6/0`. THE ONE TO BUILD ON.
@@ -512,12 +512,12 @@ the instruction listing instead.
 ## Round 97: the record is Sony's SsScore
 
 The unit's local `Entry90902E8` (a 0xAC-byte view of `_ss_score[a][s]`) is
-deleted; the unit includes `include/SsScore.h`. Evidence: Snd_decrescendo is
+deleted; the unit includes `include/ss_score.h`. Evidence: Snd_decrescendo is
 Sony's (pinned in `config/psyq-objects.ld`), only libsnd reads `_ss_score`,
 and 0xAC is SS_SEQ_TABSIZ. Every offset the function's disassembly touches
 (`+0x3E` lh, `+0x40` lhu/sh read-modify-write and lh sign test, `+0x42` lh,
 `+0x78`/`+0x7A` by address, `+0x90` lw/sw, `+0x98` lw/sw) is already a
-field of SsScore with the same width, so SsScore.h did not change. The local
+field of SsScore with the same width, so ss_score.h did not change. The local
 view's `unk2B`, `unk44`, `unk4A`, `unk70`, `unk8C`, `unkA0` and
 `unkA4` had no reader in this function and were dropped, not moved. The
 `lhu` at `+0x40` is GCC's load for an `s16` read-modify-write, not

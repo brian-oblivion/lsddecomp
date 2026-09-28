@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003C7F4` on 2026-09-24 (tools/rename.py). Address 0x8003c7f4.
 
-**Unit:** Task · **Size:** 25 instructions
+**Unit:** task · **Size:** 25 instructions
 
 ## What it does
 
@@ -45,14 +45,14 @@ signature even where their own bodies also never read `a1`.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit Task.
+round 2026-09-02, runner echo, unit task.
 
 ## Naming (round 78, delta)
 
 **Tier C** (`Class__func_xxxxx` -- class established via slot occupancy,
 purpose not). `func_8003C7F4` -> `Obj86B60__func_8003C7F4`. One of the five
 message handlers `TaskCore__OnPadEvent` dispatches to (message code 0x21,
-slot74 -- see `include/Task.h`'s round-78 correction of this slot's
+slot74 -- see `include/task.h`'s round-78 correction of this slot's
 occupant, which was previously listed reversed). Body: when `self->unk4C` is
 set, calls `slot70(self, 0x10)` then `slot60(self, 0xA)` -- a conditional
 child-forward followed by a state transition. Same shape as the other four
@@ -62,13 +62,13 @@ class-scoped form rather than guessing.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__func_8003C7F4 (tools/rename.py): the class prefix. Occupant of +0x074 (`onPad21`, onPadEvent's 0x21 case). Kept func_: its only effect past playSound(0x10) is setState(0xA), which sets state 5 and nothing else. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__func_8003C7F4 (tools/rename.py): the class prefix. Occupant of +0x074 (`onPad21`, onPadEvent's 0x21 case). Kept func_: its only effect past playSound(0x10) is setState(0xA), which sets state 5 and nothing else. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Naming (round 98, alpha, track 7)
 
 **Tier A**: `TaskCore__func_8003C7F4` -> `TaskCore__OnPadStart`, slot +0x074
 `onPad21` -> `onPadStart`. onPadEvent calls this slot on event 0x21, and
-include/Pad.h says what that event is: Pad__DispatchEvents sends
+include/pad.h says what that event is: Pad__DispatchEvents sends
 `PAD_EVENT_PRESSED` (0x12) plus the button's index in sButtonMasks, and
 index 15 is `PAD_BUTTON_START` (PADstart). Its four siblings already carry
 their buttons' names (0x12 Lup, 0x13 Ldown, 0x17 cross, 0x19 circle), so
@@ -81,4 +81,4 @@ TaskCore__OnPadEvent (compiler error list).
 
 ## Track 7 (round 98, alpha)
 
-Constants: TASKCORE_TONE_BUTTON, TASKCORE_STATE_START_PRESSED (include/TaskCore.h). Byte-identical.
+Constants: TASKCORE_TONE_BUTTON, TASKCORE_STATE_START_PRESSED (include/task_core.h). Byte-identical.

@@ -325,7 +325,7 @@ this one carried a lever (variable reuse across disjoint live ranges) that
 no amount of the statement-order and declaration-order sweeping I had already
 done would have produced.
 
-## Preserved near-miss body (79/81, `#if 0` in `src/world/ObjMStyleActor.c`)
+## Preserved near-miss body (79/81, `#if 0` in `src/world/dream_scene.c`)
 
 ```c
 extern s32 sStyleDecorVariant;
@@ -453,7 +453,7 @@ as `StyleFillEffectKind0`/`1`/`2`.
 
 Locals: `slots`, `pos`, `offsetZ`, `rotation`.
 
-### Comments moved here from src/world/ObjMStyleActor.c
+### Comments moved here from src/world/dream_scene.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C3E0` on 2026-09-26 (tools/rename.py). Address 0x8002c3e0.
 
-**Unit:** PlacementGridVabSound · **Size:** 4 instructions (0x10 bytes) ·
+**Unit:** vab_sound · **Size:** 4 instructions (0x10 bytes) ·
 **Status: MATCHED 4/4**, whole-image SHA1 green. Identical shape to
 `NullDriver__NoOpSlot40` immediately preceding it (this unit, matched the same
 round) -- same 0x40-byte reserved-and-unused stack frame.
@@ -19,19 +19,19 @@ void NullDriver__Open(void)
 ## Naming (round 77, charlie -- track 3, no rename)
 
 Same finding as `NullDriver__NoOpSlot40`'s report: `+0x044` slot of
-`gNullDriverMethods` (PlacementGridVabSound.c), left opaque even at that unit's own
+`gNullDriverMethods` (vab_sound.c), left opaque even at that unit's own
 struct-comment level. Kept `func_`, not renamed.
 
 ## Track 4 (2026-09-26, round 87, alpha): renamed `func_8002C3E0` -> `NullDriver__Open`
 
 Named for its slot, FINISHING-PLAN track 4 step 6. `classtable.py
 gNullDriverMethods --vs gFileResourceMethods` puts this function at `+0x044`, one of
-FileResource's run-time-bound driver-interface slots (`include/FileResource.h`
+FileResource's run-time-bound driver-interface slots (`include/file_resource.h`
 names it `open`; the CD driver's occupant is `CdDriver__Open`).
-`SetActiveDataSource` (GameApplicationFileResource.c) copies the active driver's interface
+`SetActiveDataSource` (game_shell.c) copies the active driver's interface
 slots into FileResource's table and every client table, and takes this table
 (`GetNullDriverMethods()`) whenever `sActiveDataSource != DATASOURCE_CD`, so
 when the SPU/VAB source is active every `methods->open(...)` in the game
 reaches this body. The purpose evidence the tier-C verdict above lacked is
 the slot's, not the body's: the body does nothing, which is what the VAB
-driver does for that interface call. Unified into `include/NullDriver.h`.
+driver does for that interface call. Unified into `include/null_driver.h`.

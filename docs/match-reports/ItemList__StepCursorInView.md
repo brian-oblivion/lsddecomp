@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052A58` on 2026-09-24 (tools/rename.py). Address 0x80052a58.
 
-**Unit:** ObjMStyleActor · **Size:** 63 instructions (0xFC bytes) ·
+**Unit:** dream_scene · **Size:** 63 instructions (0xFC bytes) ·
 **Status: MATCHED 63/63**, whole-image SHA1 green. Matched on the first
 attempt.
 
@@ -68,8 +68,8 @@ Round 75 (bravo, track 3). `func_80052A58` -> `ItemList__StepCursorInView`, **ti
 
 Slot +0x098 (`tools/classtable.py gItemListMethods`). Re-colours the current cursor row sItemListRowColor, moves `cursorIndex` +1 (dir != 0) or -1, colours the new row sItemListCursorColor, and if `notify` calls forwardToTarget(0). Callers: CursorUp (dir 0), CursorDown (dir 1).
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/ObjMStyleActor.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/world/dream_scene.c`).
 
 ## Round 99 (delta, track 7)
 
-Local `p` -> `row`; the one stepped address keeps a `MATCHING:` line. The notify call is `playSound(self, 0)`. Its slot's unread fourth parameter is `forwarded` (include/ItemList.h).
+Local `p` -> `row`; the one stepped address keeps a `MATCHING:` line. The notify call is `playSound(self, 0)`. Its slot's unread fourth parameter is `forwarded` (include/item_list.h).

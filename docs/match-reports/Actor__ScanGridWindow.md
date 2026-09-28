@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057A18` on 2026-09-19 (tools/rename.py). Address 0x80057a18.
 
-Unit: `src/world/ObjMStyleActor.c`. Class: `DreamSys` family -- plain internal
+Unit: `src/world/dream_scene.c`. Class: `DreamSys` family -- plain internal
 helper, not a vtable slot. Called by this unit's own `Actor__ScanLinkCandidates` (see
 its report) and, indirectly, `Actor__FindNearbyLink` (still queued at the time
 this was written).
@@ -106,7 +106,7 @@ re-dereferenced form before assuming a call is required to trigger it.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__ScanGridWindow`. Helper of Actor__ScanLinkCandidates (self unused). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__ScanGridWindow`. Helper of Actor__ScanLinkCandidates (self unused). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/world/dream_scene.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 

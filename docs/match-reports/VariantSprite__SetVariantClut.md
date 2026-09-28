@@ -6,11 +6,11 @@
 
 > Renamed from `func_80057DBC` on 2026-09-25 (tools/rename.py). Address 0x80057dbc.
 
-Round 47 (runner charlie). Unit: `src/world/ObjMStyleActor.c`, a BRAND NEW carve
+Round 47 (runner charlie). Unit: `src/world/dream_scene.c`, a BRAND NEW carve
 (this unit did not exist before round 47). Class: table `gVariantSpriteMethods` (49
 slots, resolved with `tools/classtable.py 0x800879C4`) -- this is slot40,
 the function tail-called by this class's own ctor `VariantSprite__VariantSprite` (see
-that report, `src/world/ObjMStyleActor.c`) as `self->methods->slot40(self,
+that report, `src/world/dream_scene.c`) as `self->methods->slot40(self,
 arg1)` once construction is otherwise complete.
 
 Frameless leaf, zero `addiu $sp, $sp, -N`. The unit's carve-note history
@@ -25,12 +25,12 @@ void VariantSprite__SetVariantClut(D_800879C4Obj_q *self, s32 arg1);
 ```
 
 `D_800879C4Obj_q` is THIS unit's own local view of the class -- the
-neighbouring `ObjMStyleActor.c` already carries its own, smaller local
+neighbouring `dream_scene.c` already carries its own, smaller local
 view (`D_800879C4Obj`, only the vtable pointer and `+0xA4`) of the SAME
 table/object, established from `VariantSprite__VariantSprite`/`New_VariantSprite`. Per the
 project's multiple-independent-local-views convention this unit does not
 edit that file; it defines its own struct sized for what these two
-functions read/write. The allocator (`ObjMStyleActor.c`'s `New_VariantSprite`)
+functions read/write. The allocator (`dream_scene.c`'s `New_VariantSprite`)
 sizes the object at `0xA8` bytes, which every offset in both views stays
 inside.
 
@@ -104,19 +104,19 @@ below, byte-identical.
 | name | tier | evidence |
 | --- | --- | --- |
 | `VariantSprite__SetVariantClut` (was `func_80057DBC`) | A | Pure leaf whose mechanics are its purpose: stores its argument at `+0xA0` and loads `+0x74`/`+0x76` from a two-entry table indexed by it. `+0x64` is an embedded GsSPRITE: the base class's init `InitGsSprite` (asm/psyq_322b4.s) writes attribute `+0`, w/h `+8`/`+A`, tpage `+C` (from `GetTPage`), u/v `+E`/`+F`, cx/cy `+0x10`/`+0x12` (from the image), r,g,b = 0x80 at `+0x14..0x16`, mx/my = w/2,h/2 at `+0x18`/`+0x1A`, scalex/scaley = 0x1000 at `+0x1C`/`+0x1E`, rotate = 0 at `+0x20`, all at GsSPRITE offsets relative to `+0x64`; `Viewport__DrawNode` (asm/psyq_2864.s) passes `self+0x64` to `GsSortSprite` for tag-0x44 objects (header 0x1F44). So `+0x74`/`+0x76` are GsSPRITE.cx/cy. The values {0x3D0, 0x1FF} and {0x3E0, 0x1FF} are 16-aligned VRAM x on the bottom line, which is where CLUTs go. "Variant": the same argument is the ctor's arg1 (`VariantSprite__VariantSprite`), which also selects the texture cell `&sVariantSpriteCells[arg1]` (u,v = (0x00,0x20) or (0x10,0x20), 16x16) handed to the base ctor. Slot `+0x040` per `tools/classtable.py gVariantSpriteMethods`. |
-| class prefix `D800879C4` | -- | The prefix the tree already uses for this table's class (`VariantSprite__VariantSprite`, `New_VariantSprite`, ObjMStyleActor.c's `D800879C4Obj`/`D800879C4Methods`); `classtable.py` resolves slots `+0x040` and `+0x048` of `gVariantSpriteMethods` to these two functions. No evidence yet for a game-level class name. |
+| class prefix `D800879C4` | -- | The prefix the tree already uses for this table's class (`VariantSprite__VariantSprite`, `New_VariantSprite`, dream_scene.c's `D800879C4Obj`/`D800879C4Methods`); `classtable.py` resolves slots `+0x040` and `+0x048` of `gVariantSpriteMethods` to these two functions. No evidence yet for a game-level class name. |
 | `sVariantSpriteClutX` / `sVariantSpriteClutY` (were `D_80087AA4` / `D_80087AA6`) | A | Read only here, into GsSPRITE.cx / .cy. Really one `{s16 x, y}[2]` array; retail takes two relocations, so it stays two externs (see "The rodata shape"). |
 | field `spriteClutX` / `spriteClutY` (`+0x74`/`+0x76`) | A | GsSPRITE.cx/cy, above. Unit-local struct: renamed in place. |
 | field `variant` (`+0xA0`) | B | Mechanics certain (the index that picks the CLUT and, in the ctor, the texture cell); no reader of `+0xA0` on this class found (`Viewport__DrawNode` reads `+0xA0` only on tag 0x144 objects, a different class). |
 
 ## Proposed field names
 
-- `ObjMStyleActor.c`, `D800879C4Methods::postConstruct` (`+0x040`) -> `setVariantClut`, tier A: the slot resolves to this function (`tools/classtable.py gVariantSpriteMethods`), and slots are named like the method they dispatch to. Only that one local view; do NOT touch `GraphRoomMethods::postConstruct` in class_3bb8c_t.c, which is a different class's slot. Not applied here (another unit's file).
+- `dream_scene.c`, `D800879C4Methods::postConstruct` (`+0x040`) -> `setVariantClut`, tier A: the slot resolves to this function (`tools/classtable.py gVariantSpriteMethods`), and slots are named like the method they dispatch to. Only that one local view; do NOT touch `GraphRoomMethods::postConstruct` in class_3bb8c_t.c, which is a different class's slot. Not applied here (another unit's file).
 
 ## Track 4 (2026-09-26, round 87, alpha)
 
 Renamed from `D800879C4__SetVariantClut` (tools/rename.py); the class is
-`VariantSprite` (`include/VariantSprite.h`). It occupies the inherited `reset`
+`VariantSprite` (`include/variant_sprite.h`). It occupies the inherited `reset`
 slot (+0x040) and keeps its own name: the body does something narrower and
 different from Sprite__Reset (it never binds a texture; it records the
 variant and repoints the CLUT), so the slot-name rule's exception applies.
@@ -124,12 +124,12 @@ The slot keeps SceneNode's type; the ctor calls this through
 `VariantSpriteResetFn` because it passes the variant. Return type `void` (the
 merge's +0x040 CONFLICT: the old `void *` was the ctor's local reading; see
 `VariantSprite__VariantSprite`'s report). The local view's `spriteClutX/Y` are
-now `sprite.cx` / `sprite.cy` (Sprite.h's SpriteGs, the same s16 at
+now `sprite.cx` / `sprite.cy` (sprite.h's SpriteGs, the same s16 at
 +0x074 / +0x076). Byte-identical.
 
 ## Track 6 (2026-09-26, round 93, bravo)
 
-The class `Class879C4` is now `VariantSprite` (`include/VariantSprite.h`,
+The class `Class879C4` is now `VariantSprite` (`include/variant_sprite.h`,
 `python3 tools/renametype.py Class879C4 VariantSprite`), tier B: the
 mechanics are certain and are the whole of what the class adds to Sprite --
 `variant` (0 or 1) picks the texture cell the Sprite ctor binds
@@ -142,7 +142,7 @@ The same tool run rewrote `Class879C4` tokens inside this report's older
 history prose (the known renametype behaviour pending an operator
 decision); those lines were left as the tool wrote them.
 
-History moved here from `src/world/ObjMStyleActor.c`'s banner: the unit is ROM
+History moved here from `src/world/dream_scene.c`'s banner: the unit is ROM
 0x485BC..0x48738, and its two functions were named in round 79 (tiers
 above). `variant` (+0x0A0) keeps its name: it is written here and read by
 nothing, which the header now says.
@@ -150,9 +150,9 @@ nothing, which the header now says.
 ## Proposed (not applied)
 
 - `VariantSprite__UpdateScale`'s `s16 *ratios` -> `Ratio16 *ratios`
-  (SceneNode.h's num/den pair, the type `Sprite__UpdateRotation` already
+  (scene_node.h's num/den pair, the type `Sprite__UpdateRotation` already
   takes): the body reads `ratios[0]/[1]` and `[2]/[3]` as two such pairs.
-  A body edit in `src/world/ObjMStyleActor.c`, so it is track 7's, not this
+  A body edit in `src/world/dream_scene.c`, so it is track 7's, not this
   pass's.
 
 ## Track 7 (2026-09-28, round 101, echo)
@@ -161,7 +161,7 @@ nothing, which the header now says.
 
 | name | tier | evidence |
 | --- | --- | --- |
-| `VARIANT_CLUT_STRIDE` (the literal `2` in `variant * 2`), unit-local in src/world/ObjMStyleActor.c | A | asm/data/76DC8.data.s holds one interleaved `{x, y}` table, `{0x3D0, 0x1FF}, {0x3E0, 0x1FF}`, which splat split into the 2-byte `sVariantSpriteClutX` and 6-byte `sVariantSpriteClutY`; both lookups step over one whole entry, 2 s16s, per variant ("The rodata shape" above). |
+| `VARIANT_CLUT_STRIDE` (the literal `2` in `variant * 2`), unit-local in src/world/dream_scene.c | A | asm/data/76DC8.data.s holds one interleaved `{x, y}` table, `{0x3D0, 0x1FF}, {0x3E0, 0x1FF}`, which splat split into the 2-byte `sVariantSpriteClutX` and 6-byte `sVariantSpriteClutY`; both lookups step over one whole entry, 2 s16s, per variant ("The rodata shape" above). |
 
 The locals and parameter names here were already roles (`self`, `variant`).
 

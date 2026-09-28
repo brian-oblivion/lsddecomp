@@ -2,7 +2,7 @@
 
 > Renamed from `func_800451B8` on 2026-09-25 (tools/rename.py). Address 0x800451b8.
 
-Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #7), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 28/28 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTodSetMethods, object s
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
 /* Allocate and construct a gTodSetMethods object; freed and NULL when the constructor fails. */
@@ -44,11 +44,11 @@ void *New_TodSet(s32 arg0) {
 
 ## Naming
 
-- **New_TodSet**, tier A. src/world/TodActor.c's Unk30Obj is already "the TOD set, see Unk30Obj", built by this allocator over an array of Tod objects.
+- **New_TodSet**, tier A. src/world/tod_actor.c's Unk30Obj is already "the TOD set, see Unk30Obj", built by this allocator over an array of Tod objects.
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Now `TodSet *New_TodSet(struct ResourceSource *src)` (include/TodSet.h): the argument is the construction descriptor TodSet__TodSet hands straight to Tod__Tod, and the object is a TodSet (0x2C bytes, no own fields). The ctor is still reached through the unprototyped UnprototypedCtorTable view, because TOD_SLOTS types +0x008 returning void while this ctor returns self or NULL. ModelData__BuildResources, the one caller, casts `(ResourceSource *)&req` in and `(FileResource *)` out (ModelData.todSet is still `FileResource *`). Bytes unchanged.
+Now `TodSet *New_TodSet(struct ResourceSource *src)` (include/tod_set.h): the argument is the construction descriptor TodSet__TodSet hands straight to Tod__Tod, and the object is a TodSet (0x2C bytes, no own fields). The ctor is still reached through the unprototyped UnprototypedCtorTable view, because TOD_SLOTS types +0x008 returning void while this ctor returns self or NULL. ModelData__BuildResources, the one caller, casts `(ResourceSource *)&req` in and `(FileResource *)` out (ModelData.todSet is still `FileResource *`). Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 

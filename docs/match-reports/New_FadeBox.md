@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003FDB0` on 2026-09-20 (tools/rename.py). Address 0x8003fdb0.
 
-Unit `ScreenWidgets`, carved round 14.
+Unit `screen_widgets`, carved round 14.
 
 > **UPDATE (targeted permuter pass, round 17).** MATCHED, no permuter
 > needed. `docs/research/epilogue-merge-residue.md` (updated 2026-09-02,
@@ -64,10 +64,10 @@ different values" as an earlier draft of that research doc claimed).
 This function's retype (`SubHandleObj *` -> `FadeBoxObj *`) was
 committed alongside a header change that used `ClassEAC0Obj` at a line
 position ABOVE that type's own forward declaration -- a parse error in
-`Task.c` (a DIFFERENT unit) that made `make` skip the final link
+`task.c` (a DIFFERENT unit) that made `make` skip the final link
 entirely, leaving `build/SLPS_015.56` stale. `funcdiff.py`'s own
 STALE-BUILD guard did not catch it because the STALE object here was
-`Task.c.o`, not `ScreenWidgets.c.o` -- this unit's own object kept
+`task.c.o`, not `screen_widgets.c.o` -- this unit's own object kept
 rebuilding fine, so nothing about the guard's usual signal (source newer
 than binary) looked wrong; the binary just never reached the final link
 step at all. Caught only by cross-checking EVERY function's LINKED
@@ -112,7 +112,7 @@ set the start colour and the step's sign, and configure turns on additive
 5/6 "fade down/up done" it handles, and Entity's on-demand `unk100`, which
 the MoodCue handlers fade). The name claims a fading box and no more: which
 game transitions use it is the callers' business. The header moved to
-`include/FadeBox.h`, the family's types followed (`FadeBoxMethods`,
+`include/fade_box.h`, the family's types followed (`FadeBoxMethods`,
 `FadeBoxResetFn`), and the own field `unk84` became `maskPerTick`
 (configure's `BoxFill::mask / ticksLeft`; written, never read). renametype.py
 also rewrote the old class name inside earlier sections' history prose in
@@ -121,7 +121,7 @@ the round-20 working names (`FadeBoxObj`, `FadeBox__GetMethods`, ...): those
 lines name types and functions that were then `Class6E99C...` (known,
 pending an operator decision; not hand-reverted).
 
-### The unit banner and function comments, moved from src/ui/ScreenWidgets.c
+### The unit banner and function comments, moved from src/ui/screen_widgets.c
 
 The banner now says what the file holds. Its history, and the long form of
 three comments now reduced to one `MATCHING:` line each, verbatim (with
@@ -140,11 +140,11 @@ renametype's rewrite of the class name):
  *   [o libgs/gs_108]   GsSetLightMode         was func_8003FC70, matched C
  *   [o libgte/fgo_00]  TransposeMatrix        was func_8003FCFC, a 20w stall
  *   [o libgte/fog_01]  SetFogNear             was func_8003FD4C, matched C
- *   [c ScreenWidgets]   New_FadeBox onward   <- this file
+ *   [c screen_widgets]   New_FadeBox onward   <- this file
  *
  * THIS FILE KEEPS THE NAME deliberately: it holds the unit's remaining
  * INCLUDE_ASM stubs and its class, so every
- * `INCLUDE_ASM("asm/nonmatchings/ScreenWidgets", ...)` path below and every
+ * `INCLUDE_ASM("asm/nonmatchings/screen_widgets", ...)` path below and every
  * match report naming this unit stays valid. Only the two one-function heads
  * needed new names.
  *
@@ -164,15 +164,15 @@ renametype's rewrite of the class name):
  * WHAT THIS UNIT IS (round 61, track 3; revised rounds 85 and 87, track 4).
  * Its 17 functions are the bottom two links of `SceneNode -> BoxFill ->
  * FadeBox`: first FadeBox's (gFadeBoxMethods, 0x164, `New_FadeBox` to
- * `GetFadeBoxMethods`, include/FadeBox.h), then BoxFill's allocator,
- * ctor and Reset (0x64, include/BoxFill.h, a GsBOXF screen rectangle; the
- * rest of its methods open ScreenWidgets).
+ * `GetFadeBoxMethods`, include/fade_box.h), then BoxFill's allocator,
+ * ctor and Reset (0x64, include/box_fill.h, a GsBOXF screen rectangle; the
+ * rest of its methods open screen_widgets).
  *
  * FadeBox fades the box's colour: configure picks the channels (a
  * 4/2/1 = r/g/b mask) and a tick count, StartFadeDown/StartFadeUp set the
  * start colour and the step's sign, Update steps the selected channels once
  * per call until Stop, and PushPosition/PopPosition save and restore the
- * box's size and position (tier B; include/FadeBox.h's banner has the
+ * box's size and position (tier B; include/fade_box.h's banner has the
  * evidence). See each function's own `## Naming` section.
  */
 ```
@@ -199,17 +199,17 @@ Outside this job's edit set (the head applies them by type scope):
   `Entity__GetOrCreateUnk100` -> `Entity__GetOrCreateFadeBox` (rename.py;
   the body creates the FadeBox on first call, reattaches it and sets its
   step).
-- Viewport's `subHandle` (+0x0B0, include/Viewport.h) -> `fadeBox`, and its
+- Viewport's `subHandle` (+0x0B0, include/viewport.h) -> `fadeBox`, and its
   getter slot `getSubHandle` -> `getFadeBox`: the ctor fills it with
   New_FadeBox, and both ObjM callers cast the result to `FadeBox *`.
-  Viewport.h's banner still lists it as "not settled"; its type could
-  become `FadeBox *` once Viewport.h can include FadeBox.h.
+  viewport.h's banner still lists it as "not settled"; its type could
+  become `FadeBox *` once viewport.h can include fade_box.h.
 - `FadeBox::unk7C` stays: configure stores its third argument there and
   update skips stepping while it is 9, but every caller passes 0, so what
   9 means is not shown.
-- `BoxFillPos` (include/BoxFill.h) is named after this class's old
+- `BoxFillPos` (include/box_fill.h) is named after this class's old
   address; it is BoxFill's position record (setPosition, attachToParent,
-  TextRow's layout) and belongs to BoxFill.h's job, not this one.
+  TextRow's layout) and belongs to box_fill.h's job, not this one.
 
 
 ## History (moved from src/ScreenWidgets.c, comments pass)

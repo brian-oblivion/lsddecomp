@@ -6,7 +6,7 @@
 
 > Renamed from `func_80056DF8` on 2026-09-18 (tools/rename.py). Address 0x80056df8.
 
-Unit: `ObjMStyleActor` (round 17). A one-line wrapper releasing a 5-element
+Unit: `dream_scene` (round 17). A one-line wrapper releasing a 5-element
 `BasicClass *` array inline at `self+0x84`.
 
 ## Final source
@@ -40,11 +40,11 @@ void StyleEffect__ReleaseSprites(LinkOwnerObj *this) {
 `addiu $a0, $a0, 0x84` then `jal ReleaseBasicClassArray` with `$a1 = 5` -- the
 address of `this+0x84` is passed directly (not loaded through it), so
 `+0x84` is an INLINE array field, not a pointer field. `ReleaseBasicClassArray` is
-already established elsewhere (`TmdRenderer.c`) as
+already established elsewhere (`tmd_renderer.c`) as
 `void ReleaseBasicClassArray(BasicClass **array, s32 count)` -- a release-all-N loop.
 Kept generic `void **` here rather than pulling in `BasicClass` from
 `code_8220.h`, matching this project's existing looser per-unit reading of
-the same symbol (`Task.h`'s `void ReleaseBasicClassArray(void *a0, void *a1)`).
+the same symbol (`task.h`'s `void ReleaseBasicClassArray(void *a0, void *a1)`).
 
 `this` is NOT the same class as `BaseObjO` (the shared intermediate base
 class the rest of this unit implements, see the file banner) -- `+0x84`
@@ -63,7 +63,7 @@ None beyond what's already documented -- straightforward wrapper.
 **`StyleEffect__ReleaseSprites` -- tier A.** Mechanics ARE the purpose: the
 whole body is `ReleaseBasicClassArray(this->links, 5)`, i.e. "release [all
 of] this object's links". `LinkOwnerObj` is this unit's own established
-local view of the class `ObjMStyleActor.c` independently calls `LinkNode`
+local view of the class `dream_scene.c` independently calls `LinkNode`
 (same object, same `arr84`/`links` array, per that unit's own header
 comment) -- kept distinct per the multiple-independent-local-views
 convention rather than importing that name here.
@@ -71,8 +71,8 @@ convention rather than importing that name here.
 ## Track 4 (2026-09-26, round 88, charlie)
 
 Renamed from the `LinkOwnerObj__` family to `StyleEffect__` with the class's
-unification (`include/StyleEffect.h`). Evidence: the only caller is
-StyleEffect's own per-kind dispatch in `ObjMStyleActor.c`
+unification (`include/style_effect.h`). Evidence: the only caller is
+StyleEffect's own per-kind dispatch in `dream_scene.c`
 (`StyleEffect__InitByKind` kind 3, `StyleEffect__UpdateByKind` kind 3,
 `StyleEffect__ReleaseByKind` kinds 2/3), each passing its own `self`; the
 five-element array at +0x084 ("links") is `StyleEffect::sprites`, filled by
@@ -82,7 +82,7 @@ another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 `updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 
-View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in ObjMStyleActor.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
+View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in dream_scene.c are deleted and the unit includes include/style_effect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
 
 ## Track 7 (round 99, alpha)
 

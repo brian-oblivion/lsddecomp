@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043008` on 2026-09-25 (tools/rename.py). Address 0x80043008.
 
-Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #7), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 24/24 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTimBlockSrcMethods, obj
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
 /* Allocate and construct a gTimBlockSrcMethods object. */
@@ -46,7 +46,7 @@ void *New_TimBlockSrc(s32 arg0) {
 
 ## Track 4 (2026-09-25, round 83, bravo)
 
-The allocator; 0x84 is the class size the header records. It now reaches the ctor through the typed getter (`GetTimBlockSrcMethods()->ctor(obj, (char *)arg0)`) instead of the unit's `UnprototypedCtorTable` cast; its own signature is unchanged because `src/world/ObjMStyleActor.c` declares it `s32 New_TimBlockSrc(s32)` locally. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/TimBlockSrc.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/GraphicsResources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The allocator; 0x84 is the class size the header records. It now reaches the ctor through the typed getter (`GetTimBlockSrcMethods()->ctor(obj, (char *)arg0)`) instead of the unit's `UnprototypedCtorTable` cast; its own signature is unchanged because `src/world/dream_scene.c` declares it `s32 New_TimBlockSrc(s32)` locally. The class (id 0xF03, table `gTimBlockSrcMethods`) is unified as `TimBlockSrc` in `include/tim_block_src.h`. Any source block above is the pre-unification spelling; the live body in `src/graphics/graphics_resources.c` takes the unified types, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Round 93 polish (charlie, track 7)
 
@@ -54,16 +54,16 @@ The allocator; 0x84 is the class size the header records. It now reaches the cto
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `arg0` | `name` | A | passed straight to the ctor as its `char *name` (the file TimBlockSrc__TimBlockSrc opens); still `s32` because include/TimBlockSrc.h declares `New_TimBlockSrc(s32)` |
+| `arg0` | `name` | A | passed straight to the ctor as its `char *name` (the file TimBlockSrc__TimBlockSrc opens); still `s32` because include/tim_block_src.h declares `New_TimBlockSrc(s32)` |
 | `0x84` | `sizeof(TimBlockSrc)` | A | each equals the object size the class header records (and the allocation retail makes); the image is byte-identical |
 
-### The unit banner, moved here from src/graphics/GraphicsResources.c
+### The unit banner, moved here from src/graphics/graphics_resources.c
 
 Verbatim as it stood before the round-93 comment pass; the new banner says what the file holds.
 
 ```c
 /*
- * GraphicsResources -- GAME code carved from the head of psyq_33808 on 2026-09-25
+ * graphics_resources -- GAME code carved from the head of psyq_33808 on 2026-09-25
  * (FINISHING-PLAN revision 18). 0x33808..0x36654 (vram
  * 0x80043008..0x80045E54). It was counted as Psy-Q SDK by segment name;
  * tools/gameinsdk.py measured it as game (a call into game code, a method-
@@ -78,34 +78,34 @@ Verbatim as it stood before the round-93 comment pass; the new banner says what 
  *   - TimBlockSrc  (gTimBlockSrcMethods): a sector-header + block loader with four
  *     CLUT palette-fade channels (FadeClutRow).
  *   - LinkResource (gLinkResourceMethods): a NULL-ended array of TMD models
- *     (New_TmdModel), one per object of a loaded TMD (include/LinkResource.h,
+ *     (New_TmdModel), one per object of a loaded TMD (include/link_resource.h,
  *     track 4, round 89).
  *   - TimArraySrc  (gTimArraySrcMethods): an array of TimImage objects
- *     (TimImage.c's New_TimImage), one per TimBlockSrc block
- *     (include/TimArraySrc.h, track 4, round 88).
+ *     (tim_image.c's New_TimImage), one per TimBlockSrc block
+ *     (include/tim_array_src.h, track 4, round 88).
  *   - Tod / TodSet (gTodMethods / gTodSetMethods, TodSet a Tod subclass): one
  *     TOD's packet stream (ScanTodPackets/DecodeTodPacketWord) and an array
- *     of them; named from src/world/TodActor.c's own "TOD set" (Unk30Obj).
+ *     of them; named from src/world/tod_actor.c's own "TOD set" (Unk30Obj).
  *   - ModelData / TriggerWorld (gModelDataMethods / gTriggerWorldMethods, TriggerWorld a
  *     ModelData subclass): a LinkResource+TodSet pair, and an array of
- *     those pairs; ModelData named from TodActor.c/.c's own "tmd"/"tods"/
- *     "modelData" fields, TriggerWorld from DreamAux.c's own declared
+ *     those pairs; ModelData named from tod_actor.c/.c's own "tmd"/"tods"/
+ *     "modelData" fields, TriggerWorld from dream_aux.c's own declared
  *     return type.
  *   - TileMap / TileAtlas (gTileMapMethods / gTileAtlasMethods): a 20x15 grid of
  *     16x16-cell map data (a GsMAP, consumed by BgLayer as its map source)
  *     and the 300-GsCELL texture atlas it indexes; built together and used
- *     together in src/app/Task.c's TaskCore__TaskCore (include/TileMap.h,
- *     include/TileAtlas.h, track 4, round 88).
+ *     together in src/app/task.c's TaskCore__TaskCore (include/tile_map.h,
+ *     include/tile_atlas.h, track 4, round 88).
  *
  * Two more classes, not FileResource subclasses:
  *
  *   - BgLayer (gBgLayerMethods): a SceneNode subclass wrapping one GsBG
  *     scrolling background layer (its own fields are GsBG's own layout;
- *     include/BgLayer.h, track 4, round 88).
+ *     include/bg_layer.h, track 4, round 88).
  *   - MoviePlayer (gMoviePlayerMethods): a BasicClass subclass driving CD-streamed,
  *     MDEC-decoded FMV playback (open a CD stream, decode/upload strips,
- *     play/stop/tick controls); called from Task.c
- *     (include/MoviePlayer.h, track 4, round 89).
+ *     play/stop/tick controls); called from task.c
+ *     (include/movie_player.h, track 4, round 89).
  *
  * libpress starts right after, at DecDCTReset (now psyq_36654).
  */

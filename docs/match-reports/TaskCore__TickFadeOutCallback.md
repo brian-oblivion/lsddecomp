@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CCDC` on 2026-09-24 (tools/rename.py). Address 0x8003ccdc.
 
-**Unit:** Task · **Size:** 27 instructions
+**Unit:** task · **Size:** 27 instructions
 
 > **UPDATE (targeted permuter pass, round 17).** MATCHED. The lever was a
 > `goto` to a single shared epilogue instead of an early `return` inside the
@@ -173,7 +173,7 @@ needing genuinely different C shapes despite that.
 
 ## Provenance
 
-Originally: round 2026-09-02, runner echo, unit Task. 11 attempts (4
+Originally: round 2026-09-02, runner echo, unit task. 11 attempts (4
 against the real build across two sessions, 5 in an isolated reproducer,
 plus a ~24k-iteration permuter search that found no improvement) — filed as
 a stall at 26/27.
@@ -194,7 +194,7 @@ instead of 5 on completion. Kept tier C for the same reason as `TaskCore__SetFad
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__func_8003CCDC (tools/rename.py). Occupant of +0x0C0 (`tickFadeOutCallback`, update's state 7). It runs +0x08C (fadeOutCallback, see TaskCore__SetFadeOutCallbackEnabled) and moves to state 8 when it reports done. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__func_8003CCDC (tools/rename.py). Occupant of +0x0C0 (`tickFadeOutCallback`, update's state 7). It runs +0x08C (fadeOutCallback, see TaskCore__SetFadeOutCallbackEnabled) and moves to state 8 when it reports done. The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 98, alpha)
 

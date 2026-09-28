@@ -4,7 +4,7 @@
 
 > Renamed from `func_800405D0` on 2026-09-20 (tools/rename.py). Address 0x800405d0.
 
-Unit `ScreenWidgets`, carved round 14. `ClassEAC0Methods::finishConstruct` (`+0x040`),
+Unit `screen_widgets`, carved round 14. `ClassEAC0Methods::finishConstruct` (`+0x040`),
 dispatched by the class's own ctor (`BoxFill__BoxFill`).
 
 ```c
@@ -38,7 +38,7 @@ version of this report read `self->methods` inline at the call and claimed
 deferred it past the `a2` check instead, where retail loads it right after
 storing `unk62`. Hoisting it into a named local restores retail's early
 load. Worth noting as a SHARED-FIELD side effect: a field TYPE change in
-`include/Task.h` regressed an unrelated, already-matched function's
+`include/task.h` regressed an unrelated, already-matched function's
 SCHEDULING (not its correctness) purely by changing surrounding register
 pressure -- a milder cousin of the project's documented "any struct edit
 is potentially non-local" caution, this time via codegen shape rather than
@@ -68,7 +68,7 @@ full three-occupant cross-check.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `ClassEAC0__FinishConstruct`: the +0x040 occupant, SceneNode's `reset` slot, named for its slot (FINISHING-PLAN track 4 step 6; tier A for the slot, the body initialises every BoxFill field: pri from the ctor's third argument, relative = 1, GsBOXF attribute/x/y = 0, w/h from the size pair, colour (default sBoxFillDefaultColor) through setColor, mask through setMask(13)). Its parameter list differs from the slot's (self only); the slot keeps SceneNode's type and the ctor casts to BoxFillResetFn. Unlike SceneNode__Reset it does not reset the coordinate; it never calls the base.
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/box_fill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `ClassEAC0__FinishConstruct`: the +0x040 occupant, SceneNode's `reset` slot, named for its slot (FINISHING-PLAN track 4 step 6; tier A for the slot, the body initialises every BoxFill field: pri from the ctor's third argument, relative = 1, GsBOXF attribute/x/y = 0, w/h from the size pair, colour (default sBoxFillDefaultColor) through setColor, mask through setMask(13)). Its parameter list differs from the slot's (self only); the slot keeps SceneNode's type and the ctor casts to BoxFillResetFn. Unlike SceneNode__Reset it does not reset the coordinate; it never calls the base.
 
 ## Track 6 (round 99, alpha)
 
@@ -80,7 +80,7 @@ an s32 field into the u16 `boxW`/`boxH` still reads only the low halfword
 halfword-and-gap view was never load-bearing. Accessors `size->x`/`->y`
 became `size->w`/`->h` in BoxFill__Reset, FadeBox__PushPosition and
 BoxFill__SetSize (which still casts: the setSize slot keeps `s32 *`, since
-its caller in Task passes an `s32 size[2]`).
+its caller in task passes an `s32 size[2]`).
 
 ## Track 7 (round 100, charlie)
 

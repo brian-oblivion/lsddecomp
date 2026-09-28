@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004DE08` on 2026-09-24 (tools/rename.py). Address 0x8004de08.
 
-Unit `TitleMenuTaskObjF`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
+Unit `title_menu`, class `TitleMenu`. **REOPENED -- ASSIGNABLE** from
 round 42's `gp_rel` resolution. The round-14 stub recorded 1 `gp_rel` hit
 and no derivation; this round wrote and matched the function from scratch.
 
@@ -68,14 +68,14 @@ the whole image after any further edit there.)
   +0x0CC, 0x10 bytes after this round's `slotB8` (+0x0B8) with an
   intervening pad.
 - `UpdateFlashbackLock(self, self->unk4C, self->unkA4);` -- `UpdateFlashbackLock` is
-  ALREADY MATCHED, in a DIFFERENT unit (`src/ui/TitleMenuTaskObjF.c`), as a
+  ALREADY MATCHED, in a DIFFERENT unit (`src/ui/title_menu.c`), as a
   genuinely 2-parameter function (`Ctx678_3bb8c_c *ctx, Result678_3bb8c_c
   *out`). This call site sets up a THIRD argument (`self->unkA4` in `$a2`)
   that unit's own signature never receives -- the same independent-arities
   situation already on file for `GetTaskCoreMethods`/`BaseTaskCtorTable_
-  3bb8c_c` vs. `TaskCoreMethods` (`include/Task.h`). This unit's own
+  3bb8c_c` vs. `TaskCoreMethods` (`include/task.h`). This unit's own
   local 3-argument extern matches what THIS call site actually needs;
-  TitleMenuTaskObjF.c's 2-argument declaration is untouched. (`include/class_
+  title_menu.c's 2-argument declaration is untouched. (`include/class_
   3bb8c.h`'s own comment on `Ctx678_3bb8c_c`, written when this call site
   was still uncarved asm, already named `TitleMenu__RefreshMenu` as UpdateFlashbackLock's
   "one caller" -- now confirmed and closed.)
@@ -119,8 +119,8 @@ the whole image after any further edit there.)
   `slot60` (+0x060, `pad044` split), `slotE0` (+0x0E0, `pad0DC` split),
   `slot11C` (+0x11C, `pad0F4` split).
 
-`src/ui/TitleMenuTaskObjF.c`: local (not shared-header) 3-argument extern for
-`UpdateFlashbackLock`, matching this call site; `TitleMenuTaskObjF.c`'s own
+`src/ui/title_menu.c`: local (not shared-header) 3-argument extern for
+`UpdateFlashbackLock`, matching this call site; `title_menu.c`'s own
 2-argument declaration for the same real function is untouched.
 
 No existing declaration was retyped or resized; `slotF0`'s existing `void
@@ -151,7 +151,7 @@ Renamed `func_8004DE08` -> `TitleMenu__RefreshMenu`. **Tier B**: Allocates/fills
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `nameField->unkA9` is TextRow's cellCount and +0x0CC its setText; `state` is TaskCore's activeSlot; slotE0 updateSlotElements, slot60 setState, slot11C setSlotCursor, slotF0 setActiveSlot (origSlot is s32 now, no cast); `unk4C` is TaskCore's `target`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). `nameField->unkA9` is TextRow's cellCount and +0x0CC its setText; `state` is TaskCore's activeSlot; slotE0 updateSlotElements, slot60 setState, slot11C setSlotCursor, slotF0 setActiveSlot (origSlot is s32 now, no cast); `unk4C` is TaskCore's `target`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 
@@ -163,7 +163,7 @@ setState arguments are TaskCore states (see TitleMenu__SetState's
 report).
 
 Comment moved here from the unit: UpdateFlashbackLock is matched in
-src/ui/TitleMenuTaskObjF.c as a 2-argument function, but this call site sets up
+src/ui/title_menu.c as a 2-argument function, but this call site sets up
 a 3rd argument (self->dreamSys in $a2) that the definition never
 receives; the same independent-arities situation was documented for
 GetTaskCoreMethods until round 84. The extern's arity-ok note said: the
@@ -173,6 +173,6 @@ callee WRITES $a2 (`li a2,0x1` at 0x8004D690) before reading it, but the
 
 ## Proposed field names
 
-IntermediateBase's `unk14` (include/IntermediateBase.h, many accessors)
+IntermediateBase's `unk14` (include/intermediate_base.h, many accessors)
 -> `lightRig`: initArgs' `lightRig`, or init's own New_LightRig(); also
 passed as TaskObjF's sprite parent. `unk10` -> `frameClock`, likewise.

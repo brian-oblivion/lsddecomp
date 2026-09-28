@@ -10,7 +10,7 @@ renamed to `strlen`/`itoa`, so it could not link. Fixed and reconfirmed at
 account at the bottom of this file; the improved body there supersedes the
 one below for splicing purposes.**
 
-Unit: `src/ui/ScreenWidgets.c` · Size: 56 words · Round 23 (2026-09-07), head.
+Unit: `src/ui/screen_widgets.c` · Size: 56 words · Round 23 (2026-09-07), head.
 Blocker screen clean. **Supersedes the round-21 `REOPENED -- ASSIGNABLE`
 disposition and the round-13 "NOT ATTEMPTED, predicted register saturation"
 triage that preceded it.** The function has now been attempted; the body is
@@ -60,12 +60,12 @@ and a length mismatch.
 
 Verified `build exit=2` with zero compile-error hits, so the score is from a
 fresh build. Splice this in place of the `INCLUDE_ASM` and it compiles as
-written; `Obj6EAC0` comes from `include/Task.h`, already included by the
+written; `Obj6EAC0` comes from `include/task.h`, already included by the
 unit.
 
 ```c
 /* Psy-Q libc, called by name from this unit only -- declared HERE rather than in
- * include/Task.h, which six units share (a cross-unit prototype in a
+ * include/task.h, which six units share (a cross-unit prototype in a
  * shared header is the one collision git does not mark). strcpy's RETURN value
  * is load-bearing below: with -fno-builtin the compiler cannot know it equals
  * the destination, so `strlen(strcpy(d, s))` and `strcpy(d, s); strlen(d)`
@@ -187,7 +187,7 @@ build, fewer, or none-on-both-sides (per the third outcome found on
 than re-reasoning from the existing table:
 
 ```sh
-grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/ScreenWidgets/FormatFullWidthNumber.s | sort -u
+grep -oE 'sw +\$(s[0-7]|fp),' asm/nonmatchings/screen_widgets/FormatFullWidthNumber.s | sort -u
 # -> $fp, $s0, $s1, $s2, $s3, $s4, $s5   (7 registers)
 ```
 
@@ -212,7 +212,7 @@ retail lands where it does. No new lever found; not re-attempting.
 
 ## Round 35: the recorded 42/56 was never measured — a broken link, self-consistent on every static reading
 
-Runner delta, `ScreenWidgets`. This round's brief specifically warns "BUILD
+Runner delta, `screen_widgets`. This round's brief specifically warns "BUILD
 any inherited/preserved body ONCE before trusting its recorded score,"
 citing a round-33 case where a preserved body called a symbol that did not
 exist. This function is a second instance of exactly that.
@@ -221,8 +221,8 @@ Splicing the body preserved in this report (as of round 27's re-confirmation)
 back in and building gives:
 
 ```
-tools/binutils/bin/mipsel-linux-gnu-ld: src/ui/ScreenWidgets.c:(.text+0xa94): undefined reference to `func_800411A8'
-tools/binutils/bin/mipsel-linux-gnu-ld: src/ui/ScreenWidgets.c:(.text+0xaa8): undefined reference to `func_80013348'
+tools/binutils/bin/mipsel-linux-gnu-ld: src/ui/screen_widgets.c:(.text+0xa94): undefined reference to `func_800411A8'
+tools/binutils/bin/mipsel-linux-gnu-ld: src/ui/screen_widgets.c:(.text+0xaa8): undefined reference to `func_80013348'
 build exit=2
 ```
 
@@ -242,7 +242,7 @@ strlen = 0x80013348; // type:func  (Psy-Q, from the SDK object)
 itoa = 0x800411A8; // type:func  (Psy-Q libc2/itoa, from the SDK object)
 ```
 
-This function's own disassembly (`asm/nonmatchings/ScreenWidgets/FormatFullWidthNumber.s`)
+This function's own disassembly (`asm/nonmatchings/screen_widgets/FormatFullWidthNumber.s`)
 already shows the `jal` targets by these real names (`jal itoa`, `jal
 strcpy`, `jal strlen`, `jal memset`) — splat resolved them once the SDK
 object conversion work (the round-34 SDK rounds visible in git log) placed
@@ -349,7 +349,7 @@ differs — so still banned from a forcing fix. `INCLUDE_ASM` restored;
 ```c
 #if 0
 /* Psy-Q libc, called by name from this unit only -- declared HERE rather than in
- * include/Task.h, which six units share (a cross-unit prototype in a
+ * include/task.h, which six units share (a cross-unit prototype in a
  * shared header is the one collision git does not mark). strcpy's RETURN value
  * is load-bearing below: with -fno-builtin the compiler cannot know it equals
  * the destination, so `strlen(strcpy(d, s))` and `strcpy(d, s); strlen(d)`
@@ -555,7 +555,7 @@ the plan's own rule for "a getter, a clamp, a list push"): converts `a1`
 to a decimal string (`itoa`+`strcpy`), zero-pads it to `width` unless
 `unpadded` is set, then feeds the result through `EncodeFullWidthSjis`
 (this same unit, confirmed tier A against real SJIS codes). Its own
-caller (`src/ui/TitleMenuTaskObjF.c:168`, `FormatFullWidthNumber(sDayDigits,
+caller (`src/ui/title_menu.c:168`, `FormatFullWidthNumber(sDayDigits,
 arg0, 3, 0)`) passes a plain buffer as the first argument, not an
 `Obj6EAC0 *`, confirming this function (despite living in this file and
 sharing its dominant `self`-typed signature style) is unrelated to the
@@ -563,7 +563,7 @@ sharing its dominant `self`-typed signature style) is unrelated to the
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-The first parameter was typed as the TextRow view `Obj6EAC0 *` and cast to `u8 *` for EncodeFullWidthSjis; it is the output buffer, so it is now `u8 *dst` with no cast (the view is gone: class 0x11144 is TextRow, include/TextRow.h). Image byte-identical.
+The first parameter was typed as the TextRow view `Obj6EAC0 *` and cast to `u8 *` for EncodeFullWidthSjis; it is the output buffer, so it is now `u8 *dst` with no cast (the view is gone: class 0x11144 is TextRow, include/text_row.h). Image byte-identical.
 
 ## History moved from src/code_2cc8c_f.c (round 99, track 7, bravo)
 

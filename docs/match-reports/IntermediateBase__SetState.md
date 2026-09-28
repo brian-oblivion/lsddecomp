@@ -92,7 +92,7 @@ This function had never been permuter-searched (per this round's own
 assignment brief). Ran all three mandated checks first.
 
 **1. Correctness / drift:** the preserved body (byte-identical to the one
-already on file) was spliced into `src/app/Task.c` in isolation
+already on file) was spliced into `src/app/task.c` in isolation
 (every other INCLUDE_ASM across all four of this runner's units
 confirmed still wrapped) and rebuilt through the full oracle. Reproduces
 **exactly 21/32, no outside-range drift** -- matches this report's own
@@ -305,7 +305,7 @@ compile errors in a fresh build.
 ## Blocker screen (mandatory, round 13 head broadcast)
 
 ```
-grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo' asm/nonmatchings/Task/IntermediateBase__SetState.s
+grep -nE 'gp_rel|addiu *\$at, *\$at, *%lo' asm/nonmatchings/task/IntermediateBase__SetState.s
 ```
 
 No hits. NOT toolchain-blocked -- this is a genuine register-identity
@@ -428,7 +428,7 @@ specific queued function, for a reason not visible from the C source shape.
 
 ## Provenance
 
-round 13 (2026-09-03), runner alpha, unit Task. 5 attempts,
+round 13 (2026-09-03), runner alpha, unit task. 5 attempts,
 `INCLUDE_ASM` left in place (never removed from the built source).
 
 ## Naming (round 55, runner alpha)
@@ -451,7 +451,7 @@ stalls the byte match.
 ## NON_MATCHING body promoted, round 62
 
 Placed the round-46 best-reached body (the `__asm__("" ::: "memory")`
-barrier variant, 23/32, zero drift) in `src/app/Task.c` under
+barrier variant, 23/32, zero drift) in `src/app/task.c` under
 `#ifdef NON_MATCHING`/`#else INCLUDE_ASM`, per track 1b. Confirmed
 hand-derived from this report before promoting: round 46's own text
 tried the permuter's tempting sub-baseline candidate (`output-58-1`)
@@ -470,13 +470,13 @@ linked symbols`). The report's recorded 23/32 figure and residue class
 
 ## Track 4 (2026-09-25, round 82, charlie)
 
-The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/IntermediateBase.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyParents. The round-55 name rested on the header's claim that this function is `slot30`'s occupant; it occupies +0x060 (`classtable.py gIntermediateBaseMethods`), and +0x030 is BasicClass__NotifyParents, which it CALLS. It stores its argument in +0x020 (now `state`), passes it to notifyParents, and runs +0x064 (`onState2`) on 2 and +0x068 (`onState3`) on 3. The overrides of +0x060 are named SetState (TaskCore__SetState, TitleMenu__SetState) and forward to this base, so the slot is `setState` and so is this occupant. Tier B. The base call is now the inherited `methods->notifyParents(self, state)` rather than a one-argument `slot30(self)`: byte-identical, the state is already in $a1.
+The class is IntermediateBase (class id 0x30, gIntermediateBaseMethods; `tools/classtable.py gIntermediateBaseMethods` lists this function as one of its own occupants), declared once in include/intermediate_base.h. `self` is now `IntermediateBase *`, not TaskCore's `Obj86B60` view; byte-identical. Renamed from Obj86B60__NotifyParents. The round-55 name rested on the header's claim that this function is `slot30`'s occupant; it occupies +0x060 (`classtable.py gIntermediateBaseMethods`), and +0x030 is BasicClass__NotifyParents, which it CALLS. It stores its argument in +0x020 (now `state`), passes it to notifyParents, and runs +0x064 (`onState2`) on 2 and +0x068 (`onState3`) on 3. The overrides of +0x060 are named SetState (TaskCore__SetState, TitleMenu__SetState) and forward to this base, so the slot is `setState` and so is this occupant. Tier B. The base call is now the inherited `methods->notifyParents(self, state)` rather than a one-argument `slot30(self)`: byte-identical, the state is already in $a1.
 
 ## asm sites
 
 Round 89 (runner delta, track 5 `asm-sites`): the `__asm__("" ::: "memory")`
 after `methods = self->methods;` is **retired**. Measured by deleting it alone
-and rebuilding: `build/src/Task.c.o` came out byte-identical to the
+and rebuilding: `build/src/task.c.o` came out byte-identical to the
 object built with it (`cmp`), and `./build-and-verify.sh` stayed green. The
 "without the barrier, `lw s2,0(s1)` lands late" observation above no longer
 holds for the current source (what changed since was not measured). The

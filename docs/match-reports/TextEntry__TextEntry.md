@@ -4,7 +4,7 @@
 
 > Renamed from `func_80050C14` on 2026-09-24 (tools/rename.py). Address 0x80050c14.
 
-**Unit:** TextEntryItemList · **Size:** 49 words (0xC4 bytes)
+**Unit:** input_dialogs · **Size:** 49 words (0xC4 bytes)
 
 Filed as a `gp_rel`-blocked stub in round 14. That blocker was RESOLVED in
 round 42 (`--gp-symbols`, pinned in the Makefile). Matched on the first
@@ -43,8 +43,8 @@ void TextEntry__TextEntry(Obj86ED0 *self, char *arg1, s32 arg2)
 This is `Obj86ED0`'s own ctor, called through `Obj86ED0Methods::ctor` at
 `New_TextEntry`'s allocation site: base ctor first
 (`GetBasicClassMethods()->ctor(self)`), then `self->methods` overridden to this
-class's own table (`GetTextEntryMethods()`, defined in `TextEntryItemList.c`) — same
-shape as `NodeGuardedViewport__NodeGuardedViewport` in `TitleMenuTaskObjF.c`.
+class's own table (`GetTextEntryMethods()`, defined in `input_dialogs.c`) — same
+shape as `NodeGuardedViewport__NodeGuardedViewport` in `title_menu.c`.
 
 `self->unk10 = strlen(arg1)` then `self->unk28 = BMemPMgrAlloc(self->unk10
 + 4)` allocates a name buffer 4 bytes larger than the string. Retail's own
@@ -74,7 +74,7 @@ strlen` instruction retail does not have.
 
 `TextEntry__ClearChildRefs` (defined later in this same file, ROM order) needed a
 forward `extern` declaration above `TextEntry__TextEntry`, same convention as
-`DayTask__StartObjM` in `src/world/DayTaskStageMap.c` — otherwise C89's implicit
+`DayTask__StartObjM` in `src/world/dream_day.c` — otherwise C89's implicit
 `int`-returning declaration would conflict with its real `void` definition
 further down.
 
@@ -91,7 +91,7 @@ optimized-away call" caution, not a new lever).
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
@@ -100,9 +100,9 @@ Parameters `arg1`/`arg2` -> `text`/`mode` (the prototype's names).
 `extern s32 strlen(char *s)`; the K&R declaration returns int, zero bytes
 changed.
 
-Moved here from the comment on `sNameCharTable` in src/ui/TextEntryItemList.c:
+Moved here from the comment on `sNameCharTable` in src/ui/input_dialogs.c:
 "VALUE-of `%gp_rel`, round 45's own local view -- same global as
-TextEntryItemList's `sNameCharTable` (a byte lookup table whose length this
+input_dialogs's `sNameCharTable` (a byte lookup table whose length this
 function counts by hand rather than via `strlen`, since GCC 2.6.3 with
 `-fno-builtin` never turns a `strlen` CALL into inline code -- the inline
 loop below has to be literal source, not a call)." The source keeps one

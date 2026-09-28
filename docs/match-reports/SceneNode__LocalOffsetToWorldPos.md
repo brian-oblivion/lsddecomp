@@ -32,7 +32,7 @@ void SceneNode__LocalOffsetToWorldPos(SceneNodeObj *self, s32 *dst, s32 *src) {
 }
 ```
 
-## New struct knowledge (`include/SceneNode.h`, additive)
+## New struct knowledge (`include/scene_node.h`, additive)
 
 `SceneNodeSub14` gains `unk38` (`s32[3]`), split out of the previously
 opaque `unk24[0x044-0x024]` byte span (now `unk24[0x038-0x024]` +
@@ -73,7 +73,7 @@ accesses are plain uses of existing fields, not new ones.
   (2) it adds `self->unk14->unk38`, which is `GsCOORDINATE2.workm.t` -- the
   COMPOSED world matrix's translation (`workm` at +0x24, `t` at +0x14 into
   MATRIX, = +0x38; see the PSY-Q IDENTIFICATION note in
-  include/SceneNode.h). `SceneNode__RaycastVertical` is the function that maintains that
+  include/scene_node.h). `SceneNode__RaycastVertical` is the function that maintains that
   field, by summing `coord.t` down the owner chain.
 - **Why B, not A:** "WorldPos" rests on the `workm.t` identification, which
   is solid; "Local" rests on the rotation being the object's own only, which
@@ -81,9 +81,9 @@ accesses are plain uses of existing fields, not new ones.
   rotation. A hierarchy with a rotated parent would make the output not
   literally world-space.
 - **Corroborated by both callers**, which is what makes the direction
-  (offset in, position out) more than a reading: `DreamSys.c`'s
+  (offset in, position out) more than a reading: `dream_sys.c`'s
   `DreamSys__ProjectPointAtDistance` feeds it a 3-word offset and treats the result as a map
-  position; `DreamAux.c`'s `PlaceDreamAuxEntityByPlayer` does the same for an aux slot.
+  position; `dream_aux.c`'s `PlaceDreamAuxEntityByPlayer` does the same for an aux slot.
 
 ## Extern arity (round 59)
 
@@ -91,17 +91,17 @@ accesses are plain uses of existing fields, not new ones.
 
 **Callee evidence** (`0x8001E600`): entry is `move s1,a0` / `move s2,a1` /
 `move s0,a2` and `$a3` is never read — three real arguments, exactly what the
-definition in `src/graphics/SceneNode.c` says.
+definition in `src/graphics/scene_node.c` says.
 
 **Why both externs must keep the 4th parameter.** Every known call site sets
 `$a3` to zero, and that instruction is in retail:
 
 ```
-80059460:  move  a3,zero                                  <- DreamSys__ProjectPointAtDistance (DreamSys.c)
+80059460:  move  a3,zero                                  <- DreamSys__ProjectPointAtDistance (dream_sys.c)
 80059468:  jal   8001e600 <SceneNode__LocalOffsetToWorldPos>
 
 8005cf78:  jal   8001e600 <SceneNode__LocalOffsetToWorldPos>
-8005cf7c:  move  a3,zero                                  <- PlaceDreamAuxEntityByPlayer (DreamAux.c)
+8005cf7c:  move  a3,zero                                  <- PlaceDreamAuxEntityByPlayer (dream_aux.c)
 ```
 
 Reducing either declaration to the definition's three parameters makes the
@@ -110,12 +110,12 @@ the call site deletes the `move a3,zero` and breaks both matches. The callee
 ignores the value; the caller still has to place it.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/world/DreamSys.c:364` and `src/world/DreamAux.c:443`. Oracle green.
+added to `src/world/dream_sys.c:364` and `src/world/dream_aux.c:443`. Oracle green.
 
 ## Track 4 (2026-09-25, round 81, charlie)
 
-The two 4-argument `arity-ok` externs (`src/world/DreamSys.c`, `src/world/DreamAux.c`)
-are gone. SceneNode's one header, `include/SceneNode.h`, declares the
+The two 4-argument `arity-ok` externs (`src/world/dream_sys.c`, `src/world/dream_aux.c`)
+are gone. SceneNode's one header, `include/scene_node.h`, declares the
 method, and a 3-parameter prototype there would make both callers a compile
 error. Both callers set `$a3 = 0` (0x80059460, 0x8005CF7C), so the
 definition now takes that word as an unused 4th parameter, `s32 unused`. The
@@ -127,9 +127,9 @@ parameter added. The callers upcast (`(SceneNode *)this`,
 
 SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX coord, whose t is the offset from the parent; MATRIX workm, whose t is the world position; param, super, sub -- 0x50 bytes, offset for offset). Accessors here follow the compiler's list: tx/ty/tz -> coord.t[0]/[1]/[2], unk38 -> workm.t; a local that holds coord.t or workm.t is `long *` (MATRIX.t is long[3]; s32 is int); any cast to GsCOORDINATE2 * is gone. Byte-identical.
 
-## Round 98 (echo): track 7, moved from src/graphics/SceneNode.c
+## Round 98 (echo): track 7, moved from src/graphics/scene_node.c
 
-The `u8 buf[0x20]` buffer is now `MATRIX rot`, and `table` is `worldPos`: byte-identical. The per-axis parent test was re-measured: hoisting it to one `worldPos` computation scores 17/48 with 294257 bytes drifted, so the source comment keeps a one-line `MATCHING:` note. The old comment's `self->unkC` is `self->parent` (SceneNode.h).
+The `u8 buf[0x20]` buffer is now `MATRIX rot`, and `table` is `worldPos`: byte-identical. The per-axis parent test was re-measured: hoisting it to one `worldPos` computation scores 17/48 with 294257 bytes drifted, so the source comment keeps a one-line `MATCHING:` note. The old comment's `self->unkC` is `self->parent` (scene_node.h).
 
 The source comment was rewritten as documentation; the one it replaced, verbatim (field names as they were then):
 

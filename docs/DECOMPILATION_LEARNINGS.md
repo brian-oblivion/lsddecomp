@@ -277,7 +277,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   `-G0` cc1 still emits `lui`/`addu`/`%lo(tbl+N)` per access and never CSEs the record address:
   libsnd's `_svm_voice` across five units, three NON_MATCHING bodies closer. A read of the other signedness
   or a narrower width is a VALUE cast at the site (`(u8)v.unk10`); the address cast
-  `*(u8 *)&v.unk10` grew SePitchBend's frame by 8. (round 86, alpha; `include/SvmData.h`)
+  `*(u8 *)&v.unk10` grew SePitchBend's frame by 8. (round 86, alpha; `include/svm_data.h`)
 - **splat names a bss address only if some asm references it EXACTLY, and `size:` does nothing
   past the last segment's vram** (no bss segment here). A merged table still shows its old `D_`
   per-field labels in `asm/`, which link beside the C spelling; a base no asm touches cannot be
@@ -458,7 +458,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   callers passing `self` stay legal C. **Neither form is a safe default**: the same situation matched
   as `slot(self)` in `MoviePlayer__PollActive` (the zero-argument form moved a constant out of the delay slot
   and ran one word long) and as `slot()` in `func_80048BC0` and `TileMap__Load`. Try the other
-  first when one misses. (round 82, GameFiles and GraphicsResources)
+  first when one misses. (round 82, game_files and graphics_resources)
 - **The same forward trace applies to a DEAD PARAMETER's register, which 2.6.3 reuses as scratch.**
   A delay-slot `move $aN, $vM` is filler only once `$aN`'s next READ on every path is found; in
   `SeqPlay` a store two blocks on read it, so the source stored the wrong value (the unused
@@ -604,7 +604,7 @@ load through a runtime-indexed global", §"BLOCKED: the `nop_mflo_mfhi` screen r
   (`s + (p + 0x14)` -> `(s + p) + 0x14`), so no spelling containing the literal reaches retail's
   grouping. A local `hdr = 0x14` survives it and cse turns it back into an immediate (`Viewport__InitOt`,
   73/73 after 14 groupings and ~89k permuter iterations); splitting `(w + 20) - span` into two
-  statements closed `StageMap__SplitFootprintRect`. (round 71) The same goes for a multiply and a byte constant: retail's `li; mult` right after storing that constant is the multiply BY THE STORED FIELD (a literal `* 15` strength-reduces to `sll`/`subu`, one word short; round 82, GraphicsResources), and `li 0x80` feeding `s8` stores is `s32 grey = 0x80;` (the literal folds to `li -0x80`; `InitGsSprite`, round 82).
+  statements closed `StageMap__SplitFootprintRect`. (round 71) The same goes for a multiply and a byte constant: retail's `li; mult` right after storing that constant is the multiply BY THE STORED FIELD (a literal `* 15` strength-reduces to `sll`/`subu`, one word short; round 82, graphics_resources), and `li 0x80` feeding `s8` stores is `s32 grey = 0x80;` (the literal folds to `li -0x80`; `InitGsSprite`, round 82).
 - **A flat table indexed `&T[r*C]` then `[c]` wants a named row-pointer local, `T (*tbl)[C] = ...;
   tbl[r][c]`**: the local puts the table-address load before the index arithmetic; the inline
   cast does not. Closed `CalcDreamColor` 28/35. (round 73)

@@ -11,7 +11,7 @@ Round 12, runner delta. `SceneNode`.
 ## Summary
 
 Sibling of the five `self->unk10` bitfield accessors already matched in
-`SceneNode.c` (`SceneNode__SetDisplay`/`D374`/`D3A0`/`D3CC`/`D3F8`). Thin wrapper
+`scene_node.c` (`SceneNode__SetDisplay`/`D374`/`D3A0`/`D3CC`/`D3F8`). Thin wrapper
 around `GetSetBitField(&self->unk10, shift, width, value)`, shift 0, width 3,
 value and result both pass straight through (no `== 0` boolean conversion on
 either side -- same shape as `SceneNode__SetSemiTrans`/`D3A0`/`D3F8`).
@@ -38,7 +38,7 @@ is returned as-is.
 ### Proposed learning
 
 None beyond what's already documented for the sibling family in
-`include/SceneNode.h` -- this just extends the same census (now 9
+`include/scene_node.h` -- this just extends the same census (now 9
 non-overlapping bitfields at `self->unk10`: shifts 0,3,6,7,8,9,28,30,31).
 
 ## Naming (round 54, bravo, track 3)
@@ -57,13 +57,13 @@ independently.
 
 ## Track 6 (round 91, echo): named `SceneNode__SetLightDim`, tier A
 
-`GetSetBitField(&self->attribute, 0, 3, value)`: GsDOBJ2.attribute bits 0-2 are libgs.h's GsLDIM0..GsLDIM7 (light dimming). Was `GetSetUnk10Field0`. Slot +0x074 renamed `setLightDim` (no accessor). The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+`GetSetBitField(&self->attribute, 0, 3, value)`: GsDOBJ2.attribute bits 0-2 are libgs.h's GsLDIM0..GsLDIM7 (light dimming). Was `GetSetUnk10Field0`. Slot +0x074 renamed `setLightDim` (no accessor). The class was renamed Class6B5CC -> SceneNode in the same pass (include/scene_node.h's banner has the evidence).
 
 ## Round 100 (delta): track 7
 
 Parameter `a1` -> `value`. Shift 0 -> `ATTR_LDIM_SHIFT` (unit-local, beside
-SceneNode.c's `ATTR_*_SHIFT`; GsLDIM0..7 are bits 0-2 of GsDOBJ2.attribute,
-include/psyq/libgs.h). The width 3 stays a literal, as in SceneNode.c.
+scene_node.c's `ATTR_*_SHIFT`; GsLDIM0..7 are bits 0-2 of GsDOBJ2.attribute,
+include/psyq/libgs.h). The width 3 stays a literal, as in scene_node.c.
 
 The file's own banner, before this pass, is kept below with this function's
 comment (this is the unit's first function).

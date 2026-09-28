@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BA38` on 2026-09-23 (tools/rename.py). Address 0x8003ba38.
 
-**Unit:** Task · **Size:** 8 instructions (0x20 bytes) · **Status:** MATCHED (8/8 words, whole-image SHA1 green), first attempt
+**Unit:** task · **Size:** 8 instructions (0x20 bytes) · **Status:** MATCHED (8/8 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -43,7 +43,7 @@ this order -- no reshaping needed).
 
 ## New struct/header knowledge
 
-Named the five fields in `include/Task.h`'s `StreamTaskObj` (shared
+Named the five fields in `include/task.h`'s `StreamTaskObj` (shared
 with the setters' report).
 
 ## Proposed learning
@@ -55,10 +55,10 @@ None new beyond `StreamTask__SetKeepActive`'s.
 **StreamTask__Reset** -- tier A. Occupies `gStreamTaskMethods` slot
 `+0x040`, the SAME numbered slot independently named `Reset` in two other,
 unrelated classes in this codebase (`StageMap__Reset`,
-`include/DayTaskStageMap.h`; `SceneNode__Reset`, `include/SceneNode.h`) --
+`include/dream_day.h`; `SceneNode__Reset`, `include/scene_node.h`) --
 both also called from their own class's ctor chain, both also just a run of
 fixed-literal field stores, exactly this function's own shape.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Occupies +0x040 resetCounters, as TaskCore__Reset does: the name follows TaskCore's.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Occupies +0x040 resetCounters, as TaskCore__Reset does: the name follows TaskCore's.

@@ -4,12 +4,12 @@
 
 > Renamed from `func_8004A4C8` on 2026-09-22 (tools/rename.py). Address 0x8004a4c8.
 
-**Unit:** DayTaskStageMap · **Size:** 27 words · **Status:** MATCHED (27/27 words)
+**Unit:** dream_day · **Size:** 27 words · **Status:** MATCHED (27/27 words)
 
 This is the **canonical account of how the `New_X` epilogue-merge residue
 class was closed.** Four other reports point here:
-`New_DayTask`, `New_TimedTask` (DayTaskStageMap), `New_StreamTask`,
-`New_TaskCore` (Task).
+`New_DayTask`, `New_TimedTask` (dream_day), `New_StreamTask`,
+`New_TaskCore` (task).
 
 ## What it does
 
@@ -72,13 +72,13 @@ Five instances closed in one pass, all byte-exact:
 
 | function | unit | words |
 | --- | --- | --- |
-| `New_StageMap` | DayTaskStageMap | 27/27 |
-| `New_TimedTask` | DayTaskStageMap | 27/27 |
-| `New_DayTask` | DayTaskStageMap | 31/31 |
-| `New_StreamTask` | Task | 36/36 |
-| `New_TaskCore` | Task | 31/31 |
+| `New_StageMap` | dream_day | 27/27 |
+| `New_TimedTask` | dream_day | 27/27 |
+| `New_DayTask` | dream_day | 31/31 |
+| `New_StreamTask` | task | 36/36 |
+| `New_TaskCore` | task | 31/31 |
 
-**It does NOT close `New_GameApplication`** (GameApplicationFileResource, 23/24), and that negative
+**It does NOT close `New_GameApplication`** (game_shell, 23/24), and that negative
 matters: the class has **two sub-shapes**, distinguished by what retail puts
 in the `beqz` delay slot.
 
@@ -129,7 +129,7 @@ Round 67 (track 3, naming pass).
 | --- | --- | --- | --- |
 | `func_8004A4C8` | `New_StageMap` | A | Body is the project's established `New_X` shape: allocate `0x1E8` via `BMemPMgrAlloc`, and on success dispatch the class's ctor slot `+0x008` with the caller's two arguments, else return NULL. `New_Class` is the convention named in FINISHING-PLAN.md track 3, and this report already used the phrase before the rename. |
 
-The one call site is `src/world/DayTaskStageMap.c`'s `DayTask__DayTask`, the boot path:
+The one call site is `src/world/dream_day.c`'s `DayTask__DayTask`, the boot path:
 `arg1->unkC = (SubObjG *)New_StageMap(0, 1);`. So exactly one instance of
 this class exists, created at game start.
 
@@ -144,11 +144,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -163,4 +163,4 @@ an operator decision; not hand-reverted).
 
 ## Track 7 (2026-09-27, round 98, charlie)
 
-`BMemPMgrAlloc(0x1E8)` -> `BMemPMgrAlloc(sizeof(StageMap))` (the struct is 0x1E8, include/StageMap.h); zero bytes.
+`BMemPMgrAlloc(0x1E8)` -> `BMemPMgrAlloc(sizeof(StageMap))` (the struct is 0x1E8, include/stage_map.h); zero bytes.

@@ -4,23 +4,23 @@
 
 > Renamed from `func_80051784` on 2026-09-24 (tools/rename.py). Address 0x80051784.
 
-Unit: `src/ui/TextEntryItemList.c` (TextEntryItemList, newly carved round 15).
+Unit: `src/ui/input_dialogs.c` (input_dialogs, newly carved round 15).
 
 ## Class identity
 
 **ROUND 75 CORRECTION.** This section originally claimed `self` is
-`Obj866E8` (the class established across DayTaskStageMap/c/etc, vtable
+`Obj866E8` (the class established across dream_day/c/etc, vtable
 `gStageMapMethods`) and that the header additions below went onto that type.
 That was wrong, caught by `tools/classtable.py gStageMapMethods` (which does
 NOT contain this function's address at any of its 80 slots) versus
 `tools/classtable.py gTextEntryMethods` (which places this function, and all
 five siblings named below, at its +0x094..+0x0A8) -- `gTextEntryMethods` is
 `Obj86ED0`, a DIFFERENT, ALREADY shared and fully-typed class in
-`include/class_3bb8c.h`, established independently by TextEntryItemList,
+`include/class_3bb8c.h`, established independently by input_dialogs,
 whose own struct already carries unk10/unk14/unk18/unk1C/unk20/unk48 and
 whose own comments already tie slotA4/slotA8 to this unit's
 `TextEntry__SetCursorPos`/`TextEntry__SetCharAt` ("outside
-this unit's slice"). See `src/ui/TextEntryItemList.c`'s file header comment for
+this unit's slice"). See `src/ui/input_dialogs.c`'s file header comment for
 the full evidence. Nothing about the matched BYTES was ever affected (a
 type name is not codegen) -- only the class attribution and the `self`
 type were wrong, both now fixed to the already-shared `Obj86ED0`/
@@ -38,10 +38,10 @@ fields (`TextEntry__SetCursorPos`, `TextEntry__SetCharAt`).
 
 None (round 75): the fields and slots below were already present on the
 shared `Obj86ED0`/`Obj86ED0Methods` in `include/class_3bb8c.h`, established
-by TextEntryItemList. (The paragraph that used to describe additive edits to
+by input_dialogs. (The paragraph that used to describe additive edits to
 `Obj866E8`/`Obj866E8Methods` here described edits to the WRONG type --
 see the correction above. `Obj866E8`/`Obj866E8Methods` are untouched,
-correctly used elsewhere by DayTaskStageMap/etc.)
+correctly used elsewhere by dream_day/etc.)
 
 `unk10`/`unk14`/`unk18`/`unk1C`/`unk20`/`unk48` -- already named on
 `Obj86ED0`.
@@ -98,7 +98,7 @@ exact shape (early-exit-style reset vs. a call as the "main" path).
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 Renamed from Obj86ED0__AdvanceCountdown: it decrements charIndex and, while it stays above 0, writes that table byte at the cursor through setCharAt(cursorIndex, charIndex, 1); at 0 it wraps charIndex to charCount without writing. NextChar's mirror. Earlier prose here calling unk1C a 'countdown' predates the class being identified. Tier B.
 

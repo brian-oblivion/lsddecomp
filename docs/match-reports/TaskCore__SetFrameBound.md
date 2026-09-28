@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C794` on 2026-09-24 (tools/rename.py). Address 0x8003c794.
 
-**Unit:** Task · **Size:** 8 instructions
+**Unit:** task · **Size:** 8 instructions
 
 ## What it does
 
@@ -36,8 +36,8 @@ read (compared against `unk1C`) by `TaskCore__Update`.
 
 ## Provenance
 
-round 2026-09-02, runner echo, unit Task (first function of the unit,
-established `include/Task.h` and the `Obj86B60` struct name from the
+round 2026-09-02, runner echo, unit task (first function of the unit,
+established `include/task.h` and the `Obj86B60` struct name from the
 class's base method table gTitleMenuMethods).
 
 ## Naming (round 78, delta)
@@ -57,8 +57,8 @@ game sets one.
 
 `Obj86B60::unk40` (s32, +0x040) -> `frameBound`, matching the function name
 above. Grep shows `unk40` textual hits in many unrelated units
-(DayTaskStageMap.c, GameApplicationFileResource.c, class_3bb8c_*.c, Task.c, code_179d8_*.c,
-Task.c) so this is a PROPOSAL, not a direct rename -- only a
+(dream_day.c, game_shell.c, class_3bb8c_*.c, task.c, code_179d8_*.c,
+task.c) so this is a PROPOSAL, not a direct rename -- only a
 definition-only rename + rebuild can tell which are this same struct.
 
 
@@ -66,11 +66,11 @@ definition-only rename + rebuild can tell which are this same struct.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__SetFrameBound (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__SetFrameBound (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 98, alpha)
 
-`bound * 20` is `bound * TASKCORE_FRAMES_PER_SECOND` (tier B, include/TaskCore.h):
+`bound * 20` is `bound * TASKCORE_FRAMES_PER_SECOND` (tier B, include/task_core.h):
 DrawSystem__Init sets vsyncCount 3, so the game draws 20 frames a second
 and frameCounter counts them, which makes `bound` seconds. A negative bound
 is stored as is, and TaskCore__Update's unsigned compare then never fires:

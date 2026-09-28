@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003A068` on 2026-09-25 (tools/rename.py). Address 0x8003a068.
 
-Round 81, runner echo. Unit `src/sound/WBgm.c` (carved from `psyq_2a0e0` in
+Round 81, runner echo. Unit `src/sound/wbgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** not a class slot; unit-level getter.
@@ -14,7 +14,7 @@ FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 ## Naming
 
-`GetSsSizeTableBuf`, tier B. returns `&sSsSizeTableBuf`; its only caller (`VabStreamObj__VabStreamObj`, PlacementGridVabSound.c) passes it straight to Sony's `SsSetTableSize`. The buffer's role in libsnd's own bookkeeping is established; why this WBgm-owning file holds it (rather than the VAB-streaming unit that consumes it) is not.
+`GetSsSizeTableBuf`, tier B. returns `&sSsSizeTableBuf`; its only caller (`VabStreamObj__VabStreamObj`, vab_sound.c) passes it straight to Sony's `SsSetTableSize`. The buffer's role in libsnd's own bookkeeping is established; why this WBgm-owning file holds it (rather than the VAB-streaming unit that consumes it) is not.
 
 ## Source
 
@@ -24,7 +24,7 @@ void *GetSsSizeTableBuf(void) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/sound/WBgm.c`:
+The unit-local view it needs, from the top of `src/sound/wbgm.c`:
 
 ```c
 #include "basic_class.h"

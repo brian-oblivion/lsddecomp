@@ -4,7 +4,7 @@
 
 > Renamed from `func_80027D40` on 2026-09-17 (tools/rename.py). Address 0x80027d40.
 
-Round 45, runner echo (second sitting), `src/cd/CdDriver.c`. This class's
+Round 45, runner echo (second sitting), `src/cd/cd_driver.c`. This class's
 own method-table slot **+0x070** (see the class-map comment above
 `GetCdDriverMethods` in the `.c`).
 
@@ -59,4 +59,4 @@ Tier B for the class token only (see `CdDriver__RequestLoadFile.md`); the
 method's own behaviour is not in doubt.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__StopCdService` -> `CdDriver__StopService` by rename.py. Renamed from StopCdService for its slot, +0x070 stopService (NullDriver__StopService fills the same slot). Its one caller, CdDriver__RunRequestQueue, passes `self` (retail loads $a0 before the jalr) while FileResource's slot is `void (*)(void)`; that call site casts through StopServiceSelfFn (no code).
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/cd_driver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__StopCdService` -> `CdDriver__StopService` by rename.py. Renamed from StopCdService for its slot, +0x070 stopService (NullDriver__StopService fills the same slot). Its one caller, CdDriver__RunRequestQueue, passes `self` (retail loads $a0 before the jalr) while FileResource's slot is `void (*)(void)`; that call site casts through StopServiceSelfFn (no code).

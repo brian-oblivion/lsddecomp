@@ -2,10 +2,10 @@
 
 > **ROUND 34 (2026-09-12), runner bravo. THIS FUNCTION IS NOW LINKED FROM
 > SONY'S OWN OBJECT `libc2/strcat.o` (Psy-Q 3.3), WHOSE 0xA8 OF TEXT COVERS
-> EXACTLY IT.** It was `GameApplicationFileResource`'s LAST function, so the conversion is a
-> pure suffix split -- `[c GameApplicationFileResource 0x171E0][o libc2/strcat 0x17930]` -- with
+> EXACTLY IT.** It was `game_shell`'s LAST function, so the conversion is a
+> pure suffix split -- `[c game_shell 0x171E0][o libc2/strcat 0x17930]` -- with
 > no new unit name, no function reordering and no rodata attach to move. The C
-> body is deleted from `src/app/GameApplicationFileResource.c`; callers keep spelling it `strcat`
+> body is deleted from `src/app/game_shell.c`; callers keep spelling it `strcat`
 > and now resolve to the object. Whole-image SHA1 green.
 >
 > **This RECLASSIFIES a matched function out of the game-code count, and that
@@ -23,7 +23,7 @@
 > post-increment scan worth 25 words, `return dest` over `return NULL` worth
 > one) are the durable finding and generalise past this function.
 
-**Unit:** GameApplicationFileResource (until round 34) · **Size:** 42 instructions (0xA8 bytes) ·
+**Unit:** game_shell (until round 34) · **Size:** 42 instructions (0xA8 bytes) ·
 **Status: was MATCHED 42/42**, whole-image SHA1 green. Closed by the head in
 round 8 (2026-09-02) with the project's second permuter run.
 
@@ -236,7 +236,7 @@ is 1 word and after both it is netted against retail's own count correctly
 > reachable from C and is now closed. It remains correct for Gap 1 alone.
 
 Both gaps are the same phenomenon documented in
-`docs/match-reports/New_GameApplication.md` (a different unit, `GameApplicationFileResource`,
+`docs/match-reports/New_GameApplication.md` (a different unit, `game_shell`,
 found independently by a different runner): GCC 2.6.3's `-O2` delay-slot
 filler (`fill_eager_delay_slots`/`fill_slots_from_thread` in reorg.c-era
 GCC) sometimes duplicates an already-live value into a delay slot and
@@ -296,7 +296,7 @@ scheduling barriers.
 
 ```c
 #if 0
-/* include/GameApplicationFileResource.h already declares:  extern s32 func_80013348(char *s); */
+/* include/data_source.h already declares:  extern s32 func_80013348(char *s); */
 
 char *strcat(char *dest, char *src) {
     char *origDest;

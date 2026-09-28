@@ -122,7 +122,7 @@ a length/placement cascade off this ONE missing instruction, not 75
 independent residues. Every earlier line in the diff (`sw $s2`/`sw $s1`
 register-number swaps) is a pure rename (`r`), not a real difference.
 
-Unit `TitleMenuTaskObjF`, class `TitleMenu`. The round-14 stub recorded 9
+Unit `title_menu`, class `TitleMenu`. The round-14 stub recorded 9
 `gp_rel` hits and no derivation. This round derived and nearly matched the
 whole function; the residue is a register-CLASS choice on one local value,
 not a control-flow or field-typing error.
@@ -183,7 +183,7 @@ skip:
 ```
 
 This is preserved verbatim, `#if 0`-wrapped, immediately above the
-`INCLUDE_ASM` in `src/ui/TitleMenuTaskObjF.c`.
+`INCLUDE_ASM` in `src/ui/title_menu.c`.
 
 ## Derivation (all confirmed by the diff -- this is not in question)
 
@@ -301,11 +301,11 @@ Renamed `func_8004DCD0` -> `TitleMenu__CycleSaveTitleColor`. **Tier B**: Guarded
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-TitleMenu is unified in include/TitleMenu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The broadcastToSlots override (+0x0E4). Arg1DCD0_3bb8c_d was ColorRgb (include/Sprite.h: three `s8`, the same layout), and the name field's +0x0B8 is setColor(ColorRgb *); `unk3C` is TaskCore's `inputMode`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
+TitleMenu is unified in include/title_menu.h (TASKCORE_SLOTS/TASKCORE_FIELDS plus its own). The broadcastToSlots override (+0x0E4). Arg1DCD0_3bb8c_d was ColorRgb (include/sprite.h: three `s8`, the same layout), and the name field's +0x0B8 is setColor(ColorRgb *); `unk3C` is TaskCore's `inputMode`. Byte-identical (whole image green, 0 new warnings, nonmatching green).
 
 ## Track 7 (round 96, echo)
 

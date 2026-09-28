@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003B9DC` on 2026-09-23 (tools/rename.py). Address 0x8003b9dc.
 
-**Unit:** Task · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
+**Unit:** task · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -43,7 +43,7 @@ is `self->unkB4` itself (a virtual self-call on the sub-object), not `self`.
 
 ## New struct/header knowledge
 
-Added `include/Task.h`'s `StreamTaskUnkB4Obj`/`StreamTaskUnkB4Methods`
+Added `include/task.h`'s `StreamTaskUnkB4Obj`/`StreamTaskUnkB4Methods`
 (a new, previously-unseen 1-slot-vtable object reached through
 `StreamTaskObj::unkB4`, `+0x0B4`) and `TaskCoreMethods::slot0C` (this unit's
 local view of `gTaskCoreMethods`, see `StreamTask__OnPadPrev`'s report).
@@ -58,20 +58,20 @@ convention basis, unconfirmed by any found caller.
 
 **StreamTask__Finalize** -- tier A. Occupies `gStreamTaskMethods`'s dtor
 slot `+0x00C` (a base-class layout convention independently confirmed in
-`include/DayTaskStageMap.h`'s own `ctor`/`dtor` pair at `+0x008`/`+0x00C`, and in
-`include/GameApplicationFileResource.h`'s `FileResource__Finalize`). Tears down the private
+`include/dream_day.h`'s own `ctor`/`dtor` pair at `+0x008`/`+0x00C`, and in
+`include/data_source.h`'s `FileResource__Finalize`). Tears down the private
 `unkB4` sub-object, then up-calls `TaskCore__Finalize` at the same slot --
 the "override, do extra work, call the base" shape this whole unit's slot
 comparison confirms (see the unit header comment).
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__Destroy. It occupies +0x00C, the finalize slot (TaskCore__Finalize in the parent, `classtable.py gStreamTaskMethods --vs gTaskCoreMethods`), releases the MoviePlayer at +0x0B4 and up-calls TaskCore's finalize: named for its slot.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__Destroy. It occupies +0x00C, the finalize slot (TaskCore__Finalize in the parent, `classtable.py gStreamTaskMethods --vs gTaskCoreMethods`), releases the MoviePlayer at +0x0B4 and up-calls TaskCore's finalize: named for its slot.
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4Obj view is gone and Task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The +0x004 call is `release`. Byte-identical.
+The player is a MoviePlayer (`include/movie_player.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in stream_task.h) to `MoviePlayer *`. The +0x004 call is `release`. Byte-identical.

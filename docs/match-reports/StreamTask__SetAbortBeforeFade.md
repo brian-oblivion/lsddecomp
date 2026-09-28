@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BE7C` on 2026-09-23 (tools/rename.py). Address 0x8003be7c.
 
-**Unit:** Task · **Size:** 2 instructions (0x8 bytes) · **Status:** MATCHED (2/2 words, whole-image SHA1 green), first attempt
+**Unit:** task · **Size:** 2 instructions (0x8 bytes) · **Status:** MATCHED (2/2 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -29,7 +29,7 @@ Matched first attempt.
 
 ## New struct/header knowledge
 
-See `StreamTask__SetKeepActive`'s report — same header, `include/Task.h`.
+See `StreamTask__SetKeepActive`'s report — same header, `include/task.h`.
 
 ## Proposed learning
 
@@ -42,4 +42,4 @@ of five described in `StreamTask__SetKeepActive`'s report; same convention.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__SetUnkD4. Own slot +0x134. unkD4 is read by StreamTask__Exit (nonzero: MoviePlayer__Abort at once; zero: fade out first) and StreamTask__SetState case 8 (zero: abort after the fade). Reset: 1. Field `abortBeforeFade`, slot `setAbortBeforeFade`.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__SetUnkD4. Own slot +0x134. unkD4 is read by StreamTask__Exit (nonzero: MoviePlayer__Abort at once; zero: fade out first) and StreamTask__SetState case 8 (zero: abort after the fade). Reset: 1. Field `abortBeforeFade`, slot `setAbortBeforeFade`.

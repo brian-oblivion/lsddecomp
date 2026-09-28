@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E9AC` on 2026-09-24 (tools/rename.py). Address 0x8004e9ac.
 
-**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class).
+**Unit:** title_menu (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -63,7 +63,7 @@ The two-argument / `filterName` reading of `BuildMemcardPath` above is
 superseded. Round 75 matched `TaskObjF__OpenAndReadMemcardFile` by calling it with THREE
 arguments `(pathBuf, self->unkC, suffix)`, the third forwarded from the
 caller's own third parameter already in `$a2` (so no `$a2` set-up is
-emitted, which is why it read as two). `src/ui/TitleMenuTaskObjF.c` now declares
+emitted, which is why it read as two). `src/ui/title_menu.c` now declares
 one real prototype, `extern void *BuildMemcardPath(void *dest, s32 selector,
 void *suffix);`, replacing the unprototyped `arity-ok` declarations; this
 function's bytes are unchanged (see `TaskObjF__OpenAndReadMemcardFile.md`).

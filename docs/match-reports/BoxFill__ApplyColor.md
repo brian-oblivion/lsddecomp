@@ -4,7 +4,7 @@
 
 > Renamed from `func_80040790` on 2026-09-18 (tools/rename.py). Address 0x80040790.
 
-Unit: `src/ui/ScreenWidgets.c`. Blocker screen clean (no `gp_rel`, no
+Unit: `src/ui/screen_widgets.c`. Blocker screen clean (no `gp_rel`, no
 `addiu $at,$at,%lo`, no jump table).
 
 ## Round 19: closed with the whole-struct-assignment axis
@@ -90,13 +90,13 @@ a colour" operation, with `dst` always `self->color` at its one call site
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__ApplyColor`: BoxFill__SetColor's only callee, not a slot (tier A: copy or add three bytes).
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/box_fill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__ApplyColor`: BoxFill__SetColor's only callee, not a slot (tier A: copy or add three bytes).
 
 ## Track 6 (2026-09-27, round 98, delta): `RGB80040790` -> `BoxFillRgb`
 
-- **`BoxFillRgb`** (tier A, include/BoxFill.h): the local copy type, named for this function's address, is BoxFill's own colour record by use. `src` is setColor's `rgb` argument (BoxFill__SetColor forwards it with `dst = self->color`, the GsBOXF r, g, b at +0x064), and the same three bytes arrive through the ctor/Reset colour argument (New_BoxFill). GraphRoom's dot colours (ObjMStyleActor, round 97's `GraphPointColor`) are those arguments too, so the one type is defined once in BoxFill.h and both local views are retired onto it. Same shape and convention as `BgLayerRgb`/`ViewportRgb`: signed, three bytes, whole-struct copy = three lb/sb pairs.
+- **`BoxFillRgb`** (tier A, include/box_fill.h): the local copy type, named for this function's address, is BoxFill's own colour record by use. `src` is setColor's `rgb` argument (BoxFill__SetColor forwards it with `dst = self->color`, the GsBOXF r, g, b at +0x064), and the same three bytes arrive through the ctor/Reset colour argument (New_BoxFill). GraphRoom's dot colours (dream_scene, round 97's `GraphPointColor`) are those arguments too, so the one type is defined once in box_fill.h and both local views are retired onto it. Same shape and convention as `BgLayerRgb`/`ViewportRgb`: signed, three bytes, whole-struct copy = three lb/sb pairs.
 - Byte-identical: whole image green, 0 new typeviews warnings, nonmatching green.
-- **Proposed, not applied:** `BOXFILL_FIELDS`' `u8 color[3]` -> `BoxFillRgb color`, setColor's `void *rgb` and New_BoxFill/Reset's `void *color` -> `BoxFillRgb *`, and this function's `u8 *dst, u8 *src` -> `BoxFillRgb *`. The accumulate arm reads `src[0..2]` as bytes (`lbu` + add), so retyping `src` needs the arm rewritten through `.r/.g/.b` with an s8/u8 load check; callers outside this unit (TaskCore's listView, ObjMStyleActor/_n, FadeBox, Task) pass their own buffer types and would each need a cast. Not measured this round.
+- **Proposed, not applied:** `BOXFILL_FIELDS`' `u8 color[3]` -> `BoxFillRgb color`, setColor's `void *rgb` and New_BoxFill/Reset's `void *color` -> `BoxFillRgb *`, and this function's `u8 *dst, u8 *src` -> `BoxFillRgb *`. The accumulate arm reads `src[0..2]` as bytes (`lbu` + add), so retyping `src` needs the arm rewritten through `.r/.g/.b` with an s8/u8 load check; callers outside this unit (TaskCore's listView, dream_scene/_n, FadeBox, task) pass their own buffer types and would each need a cast. Not measured this round.
 
 ## Track 7 (round 99, bravo)
 
@@ -104,4 +104,4 @@ The `d = dst` copy is gone; the body writes through `dst`. Byte-exact (26/26).
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

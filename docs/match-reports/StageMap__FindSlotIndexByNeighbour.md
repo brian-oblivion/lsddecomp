@@ -60,7 +60,7 @@ s32 StageMap__FindSlotIndexByNeighbour(Obj866E8 *self, s32 key) {
 ## New struct knowledge
 
 None new (reuses `Elem`/`ElemTarget::unk32`, both already established by
-`DayTaskStageMap.c`'s `StageMap__FindSlotByNeighbour`/`StageMap__CountPendingLoads`).
+`dream_day.c`'s `StageMap__FindSlotByNeighbour`/`StageMap__CountPendingLoads`).
 
 ## Attempts
 
@@ -93,14 +93,14 @@ Pure linear-search leaf: the body IS the evidence -- walk `self->arr`,
 compare `e->unk4->unk32` to `key`, return the matching index (default 0).
 Named by the field it searches on (`unk32`, still unrenamed -- it is a
 cross-unit `ElemTarget` field, also read by `StageMap__FindSlotByNeighbour` in
-DayTaskStageMap.c, so this unit does not own it) rather than by a guessed
+dream_day.c, so this unit does not own it) rather than by a guessed
 purpose, per this project's "name what the code does" rule.
 
 ## Proposed field names
 
-**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that StageMap__ComputeFootprintDescriptor sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (DayTaskStageMap.c), where all readers are in one unit.
+**Head, round 76: NOT APPLIED.** The set is internally inconsistent: `unk30` and `unk32` cannot both be `key`, and `include/class_3bb8c.h`'s view records `unk30` as a raw rate that StageMap__ComputeFootprintDescriptor sign-extends, so equality-compared-here is not enough for `key`. `unk2C -> enabled` rests on "nonzero enables" alone. Re-propose from the base class's naming pass (dream_day.c), where all readers are in one unit.
 
-`ElemTarget::unk32` (also read by DayTaskStageMap.c's `StageMap__FindSlotByNeighbour`, so
+`ElemTarget::unk32` (also read by dream_day.c's `StageMap__FindSlotByNeighbour`, so
 cross-unit -- not renamed here). Proposed: `key` -- it is exactly what
 both `FindElemIndexByUnk32` and its caller-side context treat it as, a
 value compared for equality to select an element. Evidence: this
@@ -117,11 +117,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -146,8 +146,8 @@ The unit banner was rewritten (what the file holds); the old one, verbatim:
 
 ```c
 /*
- * DayTaskStageMap -- the last third of StageMap (include/StageMap.h),
- * sharing include/class_3bb8c.h with DayTaskStageMap.c.
+ * dream_day -- the last third of StageMap (include/stage_map.h),
+ * sharing include/class_3bb8c.h with dream_day.c.
  *
  *  - FindSlotIndexByNeighbour, FindSlotIndexByChunk: slot lookups.
  *  - The footprint: once every chunk is loaded, RefreshFootprint sets bit

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003F24C` on 2026-09-23 (tools/rename.py). Address 0x8003f24c.
 
-Unit: `Task`. Round 14, runner delta. 4/4 words, full match.
+Unit: `task`. Round 14, runner delta. 4/4 words, full match.
 
 ## Signature
 
@@ -24,15 +24,15 @@ Unk18ObjMethods *GetViewportMethods(void) {
 
 ## Context
 
-This symbol was already declared `extern` in `include/Task.h` from
+This symbol was already declared `extern` in `include/task.h` from
 round 13 (alpha), with a comment saying it "lives in a still-uncarved
 remainder... not this unit's function to write." Round 14's carve of
-`Task` brought it in, so it's matched here now — updated the
+`task` brought it in, so it's matched here now — updated the
 comment accordingly rather than leaving the stale "external" note.
 
 ## Header changes
 
-`include/Task.h`: added `extern Unk18ObjMethods gViewportMethods;` (the
+`include/task.h`: added `extern Unk18ObjMethods gViewportMethods;` (the
 table itself, `tools/classtable.py gViewportMethods`, needed so this definition
 can return `&gViewportMethods`) and updated the `GetViewportMethods` extern's own
 comment to reflect it is now matched, not external.
@@ -43,4 +43,4 @@ comment to reflect it is now matched, not external.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `GetUnk18ObjMethods`. The table getter, named `Get<Class>Methods` like the other unified classes. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `GetUnk18ObjMethods`. The table getter, named `Get<Class>Methods` like the other unified classes. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

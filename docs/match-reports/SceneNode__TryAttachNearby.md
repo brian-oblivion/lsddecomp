@@ -243,7 +243,7 @@ correct; the residue is a pure peephole-adjacent merge decision.
 
 ## Header changes kept
 
-`include/SceneNode.h`:
+`include/scene_node.h`:
 - `SceneNodeSub14`: added `LongVec3 pos` at `+0x038` (see above). Also
   **moved `LongVec3`'s typedef earlier in the file** (it was previously
   defined AFTER `SceneNodeSub14`, which only worked because nothing inside
@@ -323,7 +323,7 @@ pass is DEFERRED, not run, this round -- the scaffold is left in place
 next, or for a future round of this same runner once `StageMap__UnloadAllSlots`'s
 search completes.
 
-Inlined the literal per-axis body into `src/graphics/SceneNode.c` as `#if 0`
+Inlined the literal per-axis body into `src/graphics/scene_node.c` as `#if 0`
 (the report's own prose placeholder is preserved here as compilable
 code for the first time). No header changes needed -- all supporting
 types/slots were already present from the original round-13 pass.
@@ -406,7 +406,7 @@ interact via cross-jumping with which others.
 
 Preserved body updated below to the 141/143 best. Filing as STALL,
 `INCLUDE_ASM` restored; confirmed clean rebuild (`build exit=0`,
-whole-image OK, `git diff --stat src/graphics/SceneNode.c` shows only the
+whole-image OK, `git diff --stat src/graphics/scene_node.c` shows only the
 preserved-body text differs from the committed state, no functional
 change).
 
@@ -527,7 +527,7 @@ single confirmation check, not a fresh attempt cycle.
 
 **Re-verified the 141/143 claim live first**, per this round's "build
 any inherited body before trusting its score" discipline: dropped the
-preserved round-20 body into `src/graphics/SceneNode.c`, confirmed via `nm -S`
+preserved round-20 body into `src/graphics/scene_node.c`, confirmed via `nm -S`
 on the built object that it compiles to exactly **`0x234` bytes = 141
 words**, matching the report's own figure exactly (retail is `0x23C` =
 143 words, the same 2-word deficit). No drift beyond what the 2-word
@@ -567,7 +567,7 @@ exactly on 143. Filing unchanged as STALL at 141/143 words (2 words
 short), raw funcdiff word-match figure not meaningful without
 realignment (see above), first realigned/real divergence at retail vram
 `0x8001DA18` (the Y-axis positive-branch un-merge). `INCLUDE_ASM`
-restored, `src/graphics/SceneNode.c` confirmed byte-identical to the committed
+restored, `src/graphics/scene_node.c` confirmed byte-identical to the committed
 state after the check.
 
 ### Proposed learning (round 41)
@@ -624,7 +624,7 @@ into the shared merge point instead of ending in its own `slti`/`beqz`).
    as much of the old shared path as retail's own un-merged structure
    implies it should.
 
-Both variants reverted immediately; `git diff --stat src/graphics/SceneNode.c`
+Both variants reverted immediately; `git diff --stat src/graphics/scene_node.c`
 confirmed empty and whole-image build restored to `OK` after each check.
 Filing unchanged as STALL at 141/143 words (2 short), first real diff
 unchanged at retail vram `0x8001DA18`.
@@ -657,18 +657,18 @@ notifying it (`other->methods->slot38`) if ALL three pass. "TryAttachNearby"
 describes the measured gate-then-link mechanics; the game-level meaning
 of "nearby" (why `+/-0x4000` specifically, what kind of object `other`
 is) is not established. Held back from an actual rename because this
-symbol is referenced (in comments) from `include/DreamSys.h:895` and
-`include/Task.h:752` -- two different units, both discussing this
-function as cross-unit precedent (DreamSys.h for the vtable slot
-resolution, Task.h for the `switch`-vs-`if` residue). Posted to
+symbol is referenced (in comments) from `include/dream_sys.h:895` and
+`include/task.h:752` -- two different units, both discussing this
+function as cross-unit precedent (dream_sys.h for the vtable slot
+resolution, task.h for the `switch`-vs-`if` residue). Posted to
 the broadcast.
 
 ### Proposed field names (SceneNodeMethods, shared header)
 
 This function's own dispatch chain touches four vtable slots that are
 still named generically by offset (`slotA0`/`slotA4`/`slotA8`/`slotAC`)
-in `include/SceneNode.h`'s `SceneNodeMethods` struct. That struct is
-shared: `slotA4` is also dispatched from `SceneNode.c` (a different
+in `include/scene_node.h`'s `SceneNodeMethods` struct. That struct is
+shared: `slotA4` is also dispatched from `scene_node.c` (a different
 unit, `self->methods->slotA4(self, 0, buf18, delta, 1)`), so per
 FINISHING-PLAN track 3's field-ownership rule this is PROPOSED, not
 renamed directly. Proposed slot names, backed by this round's function
@@ -685,11 +685,11 @@ renames/proposals:
 | `+0x0AC` | `slotAC` | `classifyAgainstPlanes` | `SceneNode__RaycastHullAgainstFaces` (proposed `SceneNode__RaycastHullAgainstFaces`) |
 
 Apply by type scope (edit `SceneNodeMethods`'s own definition in
-`include/SceneNode.h`, rebuild, fix exactly the accessors the compiler
+`include/scene_node.h`, rebuild, fix exactly the accessors the compiler
 lists), per CLAUDE.md's shared-struct-hazard rule -- a whole-tree text
 replace of e.g. `slotA4` would corrupt every OTHER class's own
-identically-named, unrelated `slotA4` field (measured: `TitleMenuTaskObjF.c`,
-`Task.c`, `TextEntryItemList.c`/`_j.c`/`_l.c` all have their own,
+identically-named, unrelated `slotA4` field (measured: `title_menu.c`,
+`task.c`, `input_dialogs.c`/`_j.c`/`_l.c` all have their own,
 different `slotA4`).
 
 ## Round 55 (charlie): REVISITED (round 55) -- LENGTH closed exactly
@@ -861,7 +861,7 @@ closed 2 more words via a permuter-found pointer-caching lever (138 ->
 hand declaration/caching variants plus two bounded permuter searches
 (79117 + 52653 = 131770 combined iterations, neither beating its own base
 score). `INCLUDE_ASM` restored, preserved body updated below to the new
-best, `git diff --stat src/graphics/SceneNode.c` confirmed clean after the check.
+best, `git diff --stat src/graphics/scene_node.c` confirmed clean after the check.
 
 ### Proposed learning (round 55)
 
@@ -983,7 +983,7 @@ NON_MATCHING body promoted, round 69
 
 ## Track 6 (round 91, echo)
 
-The local corner list AttachCornerList_d294b and `other->notifyVerts`'s GenericCountList_d294 are both TmdModel.h's TmdHull; Vec3S16_d294 is TmdVec3. Byte-identical.
+The local corner list AttachCornerList_d294b and `other->notifyVerts`'s GenericCountList_d294 are both tmd_model.h's TmdHull; Vec3S16_d294 is TmdVec3. Byte-identical.
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 

@@ -6,7 +6,7 @@
 
 > Renamed from `func_800489B4` on 2026-09-25 (tools/rename.py). Address 0x800489b4.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the first build; whole-image SHA1 green, funcdiff 45/45.
 
 ## What it does
@@ -42,7 +42,7 @@ void LbdFile__AdvanceLoadState(DataSrc39094 *self) {
 ## Notes
 
 The local view's `DataSrc39094Methods.loadDataBlock` was retyped from `void *` to
-`void (*)(void)` (local to `src/cd/GameFiles.c`, no other reader), and later in
+`void (*)(void)` (local to `src/cd/game_files.c`, no other reader), and later in
 the same session to the unprototyped `s32 (*)()` once LbdFile__LoadDataBlock (its
 occupant, which returns s32 and reads `self`) was matched; still byte-exact. Retail does
 not set `$a0` before `jalr` on slot +0x080 even though its occupant
@@ -59,7 +59,7 @@ does for the setFlag call), so the source call has no arguments.
 ## Proposed field names
 
 `self->unk2A` is NOT a `DataSrc39094`-local field: it is FileResource's own
-last field (`include/FileResource.h`, `/* +0x02A */ u16 unk2A`), a UNIFIED
+last field (`include/file_resource.h`, `/* +0x02A */ u16 unk2A`), a UNIFIED
 shared header this unit does not own and must not edit. This unit gives it a
 clear, consistent meaning across four of its own functions
 (LbdFile__AdvanceLoadState, LbdFile__CancelRequests, LbdFile__LoadHeader,
@@ -69,9 +69,9 @@ block load in flight.
 - **Proposed name:** `loadState`
 - **Tier:** B (mechanics -- three-value state used consistently as a
   load-in-progress marker -- established only from this one subclass's
-  usage; FileResource.h's own comment says only that it is the last field
+  usage; file_resource.h's own comment says only that it is the last field
   before a subclass's own fields start, with no meaning of its own).
-- **Evidence:** every read/write of `unk2A` in `src/cd/GameFiles.c` (this
+- **Evidence:** every read/write of `unk2A` in `src/cd/game_files.c` (this
   report; LbdFile__CancelRequests, LbdFile__LoadHeader,
   LbdFile__LoadDataBlock).
 - **Caution for the head applying this:** FileResource has sixteen
@@ -83,7 +83,7 @@ block load in flight.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed `DataSrc39094__SetFlag` -> `LbdFile__AdvanceLoadState` with `rename.py`. The slot is +0x064, FileResource's `setFlag`, which the CD driver calls when a request completes (src/cd/CdDriver.c); the bit this body tests, 0x80, is that driver's CD_FLAG_READ_DONE. The body advances the load state (`unk2A` 9 -> 0 with the header ready, maybe starting the data block; 10 -> 0 with the data ready), which is what TimBlockSrc__AdvanceLoadState and VabStreamObj__AdvanceLoadState, the same slot's occupants in two siblings, were named for. Its no-argument call of +0x080 is kept through `LbdFileLoadDataBlockNoArgFn` (include/LbdFile.h): retail sets no $a0 for it. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/LbdFile.h`.
+Renamed `DataSrc39094__SetFlag` -> `LbdFile__AdvanceLoadState` with `rename.py`. The slot is +0x064, FileResource's `setFlag`, which the CD driver calls when a request completes (src/cd/cd_driver.c); the bit this body tests, 0x80, is that driver's CD_FLAG_READ_DONE. The body advances the load state (`unk2A` 9 -> 0 with the header ready, maybe starting the data block; 10 -> 0 with the data ready), which is what TimBlockSrc__AdvanceLoadState and VabStreamObj__AdvanceLoadState, the same slot's occupants in two siblings, were named for. Its no-argument call of +0x080 is kept through `LbdFileLoadDataBlockNoArgFn` (include/lbd_file.h): retail sets no $a0 for it. The class (method table gLbdFileMethods, id 0x903, a FileResource subclass) was named `LbdFile` for its table address, 0x80081940 (renamed from `D_80081940` to `gLbdFileMethods`), as PlacementGrid is (FINISHING-PLAN track 4 step 2); the old `DataSrc39094` was the unit's local view name, and dropping its unit suffix leaves `DataSrc`, which every FileResource subclass is. The unified definition is `include/lbd_file.h`.
 
 
 ## Track 6 (2026-09-26, round 92, echo)
@@ -91,7 +91,7 @@ Renamed `DataSrc39094__SetFlag` -> `LbdFile__AdvanceLoadState` with `rename.py`.
 Renamed with `python3 tools/renametype.py Class81940 LbdFile` (the whole
 class family: object, table `gClass81940Methods` -> `gLbdFileMethods`,
 getter, constructors, methods, the header `include/Class81940.h` ->
-`include/LbdFile.h` and its typedefs). The tool rewrote every
+`include/lbd_file.h` and its typedefs). The tool rewrote every
 `Class81940` token in these reports too, so the Track 4 section above now
 says the class "was named `LbdFile` for its table address"; what it named
 then was `Class81940`.

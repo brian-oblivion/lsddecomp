@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BCF4` on 2026-09-23 (tools/rename.py). Address 0x8003bcf4.
 
-**Unit:** Task · **Size:** 7 instructions (0x1C bytes) · **Status:** MATCHED (7/7 words, whole-image SHA1 green), first attempt
+**Unit:** task · **Size:** 7 instructions (0x1C bytes) · **Status:** MATCHED (7/7 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -42,7 +42,7 @@ by hand.
 
 ## New struct/header knowledge
 
-Named `StreamTaskObj::unk40` in `include/Task.h`.
+Named `StreamTaskObj::unk40` in `include/task.h`.
 
 ## Proposed learning
 
@@ -61,8 +61,8 @@ already used elsewhere for a field of unconfirmed game meaning
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-StreamTaskObj now expands TASKCORE_FIELDS/TASKCORE_SLOTS (include/TaskCore.h, round 84): the field this sets is TaskCore's +0x040 `frameBound`, and this function is StreamTaskObj's override of TaskCore's +0x06C setFrameBound (x15 where TaskCore__SetFrameBound multiplies by 20). Byte-identical.
+StreamTaskObj now expands TASKCORE_FIELDS/TASKCORE_SLOTS (include/task_core.h, round 84): the field this sets is TaskCore's +0x040 `frameBound`, and this function is StreamTaskObj's override of TaskCore's +0x06C setFrameBound (x15 where TaskCore__SetFrameBound multiplies by 20). Byte-identical.
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__SetUnk40 (+0x040 is TaskCore's frameBound word, not a slot). Occupies +0x06C setFrameBound: frameBound = bound * 15 (TaskCore__SetFrameBound: * 20), negative kept. GameApplicationFileResource's GameApplication__PlaySpecialDayMovies calls it with count / 15.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__SetUnk40 (+0x040 is TaskCore's frameBound word, not a slot). Occupies +0x06C setFrameBound: frameBound = bound * 15 (TaskCore__SetFrameBound: * 20), negative kept. game_shell's GameApplication__PlaySpecialDayMovies calls it with count / 15.

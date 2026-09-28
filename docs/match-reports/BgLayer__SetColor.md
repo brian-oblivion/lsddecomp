@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004464C` on 2026-09-25 (tools/rename.py). Address 0x8004464c.
 
-Round 82, runner echo (GraphicsResources session, echo #6), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #6), 2026-09-25. Unit `graphics_resources`.
 Byte-exact on the SECOND build (first-build miss described below); whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 10/10 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gBgLayerMethods +0x0B8 (a SceneNode subclass
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
@@ -44,7 +44,7 @@ void BgLayer__SetColor(Obj6F2C4 *self, s32 enable, Vec3S8 *src) {
 
 ## Notes
 
-- No shared header was edited. `FileResource.h`, `SceneNode.h`, `basic_class.h` are
+- No shared header was edited. `file_resource.h`, `scene_node.h`, `basic_class.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
@@ -63,4 +63,4 @@ structs, where the signed load is the tell.
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/BgLayer.h`: this is its own slot +0x0B8 `setColor`. `self` is `BgLayer *`, the source is `BgLayerRgb *rgb` (was `Vec3S8 *src`), the field `color` (was unk54). The TaskCore callers (TaskCore__OnInit, TaskCore__TickFadeIn, TaskCore__TickFadeOut) now call it by name, casting their u8[3] buffers to `BgLayerRgb *` (no code). Byte-identical.
+Class unified in `include/bg_layer.h`: this is its own slot +0x0B8 `setColor`. `self` is `BgLayer *`, the source is `BgLayerRgb *rgb` (was `Vec3S8 *src`), the field `color` (was unk54). The TaskCore callers (TaskCore__OnInit, TaskCore__TickFadeIn, TaskCore__TickFadeOut) now call it by name, casting their u8[3] buffers to `BgLayerRgb *` (no code). Byte-identical.

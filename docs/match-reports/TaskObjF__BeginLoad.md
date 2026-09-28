@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004F638` on 2026-09-20 (tools/rename.py). Address 0x8004f638.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 51 words (0xCC) · **Status:** MATCH
+**Unit:** title_menu · **Size:** 51 words (0xCC) · **Status:** MATCH
 
 `void TaskObjF__BeginLoad(TaskObjF *self, s32 a1, s32 a2, s32 a3, s32 a4)`.
 Stores the four params into `self->unk40`/`unk44`/`unk54`/`unk58`, sets
@@ -54,4 +54,4 @@ onItemListResult sets after a pick; advanceState re-runs beginLoad from it),
 0xF `LOADING`, 0x12 `CHOOSE_FILE`, 0xD `LOAD_NOT_FOUND`; opMode 1
 `TASKOBJF_OP_LOAD`; `bufCount = 0xF` is `TASKOBJF_MAX_FILES`, so
 FreeBuffers frees all fifteen title buffers AllocBuffers made. Evidence for
-each state name is its comment in include/TaskObjF.h. Zero bytes.
+each state name is its comment in include/task_objf.h. Zero bytes.

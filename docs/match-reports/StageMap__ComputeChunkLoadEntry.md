@@ -90,7 +90,7 @@ were all already correct; the stall was one variable too many).
 > should re-run the oracle after deleting even a provably-empty statement.
 >
 > Oracle: `build exit=0`, `OK: build matches retail SLPS_015.56`, funcdiff
-> 63/63 ins 0/del 0, no drift. Unit `DayTaskStageMap` INCLUDE_ASM count 5 -> 4.
+> 63/63 ins 0/del 0, no drift. Unit `dream_day` INCLUDE_ASM count 5 -> 4.
 >
 > ### Proposed learning
 >
@@ -123,7 +123,7 @@ were all already correct; the stall was one variable too many).
 > unchanged from round 46.**
 >
 > **Checked this round's headline instruction (run permuter check 3 before
-> believing any inherited negative in the `DayTaskStageMap`/`Obj866E8`
+> believing any inherited negative in the `dream_day`/`Obj866E8`
 > family) against this function's own history.** This function's two
 > permuter searches (round 27, round 32) both explicitly ran `--debug`
 > BEFORE searching and recorded the scaffold's base score (25) with the
@@ -146,7 +146,7 @@ were all already correct; the stall was one variable too many).
 > field read shared between an `if`'s condition and its own body.
 >
 > **Disposition unchanged: 58/63.** No new attempt made; time went to
-> confirming this and the other five `DayTaskStageMap` residues' permuter
+> confirming this and the other five `dream_day` residues' permuter
 > check-3 status is what it was recorded as, since that is this round's
 > stated priority for this family. `INCLUDE_ASM` untouched throughout
 > (verification only, `git status` clean before and after).
@@ -172,7 +172,7 @@ were all already correct; the stall was one variable too many).
 > which variables hold which sub-computation -- not declare-vs-assign
 > form). Split all three into separate declaration and assignment
 > statements in one build, rebuilt: **58/63, IDENTICAL diff, no drift --
-> fully inert.** Reverted (`git checkout -- src/world/DayTaskStageMap.c`; clean
+> fully inert.** Reverted (`git checkout -- src/world/dream_day.c`; clean
 > build confirmed after).
 >
 > This is a FOURTH confirmed instance (joining `StageMap__ApplyChunkLoads`,
@@ -308,7 +308,7 @@ were all already correct; the stall was one variable too many).
 > and `StageMap__ComputeFootprintDescriptor` instead, per this round's staffing guidance. Restored
 > to `INCLUDE_ASM` unchanged.
 
-Unit `DayTaskStageMap`. FRESH this round (no prior report). Restored to
+Unit `dream_day`. FRESH this round (no prior report). Restored to
 `INCLUDE_ASM`; no C left in `src/`.
 
 Only a caller-side prototype existed before this round (in
@@ -390,7 +390,7 @@ this function.
 
 ## SUPERSEDED by round 63 -- the matching body
 
-The round-63 match is live in `src/world/DayTaskStageMap.c`. It differs from the 58/63
+The round-63 match is live in `src/world/dream_day.c`. It differs from the 58/63
 body below only inside the `self->unk68->unk4 == 0` block: `fieldVal`, `lo`
 and `sum` collapse into a single `sum`, and `value = val + sum;` is hoisted
 out of both branches. The `do {} while (0);` is load-bearing -- see the
@@ -586,11 +586,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -609,9 +609,9 @@ This function: `StageMap__ComputeRateEntry` -> `StageMap__ComputeChunkLoadEntry`
 
 Parameters and locals, tier A: `arg1` -> `out`, `divisor` -> `columns`, `flag` -> `oddRow`, `val` -> `centreChunk`, `savedResult` -> `onGridMask`, `key` -> `neighbour`, `mask` -> `bit` (sNeighbourBits[neighbour]), `entry` -> `delta` (the sChunkNeighbourDeltas entry), `value` -> `chunk`, `sum` -> `step` (the merged local the match depends on; now marked `/* MATCHING */`).
 
-Left: the two `*(s32 *)((u8 *)out + 4)` writes. ChunkLoadEntry declares `chunkIndex` s16 plus a pad; retyping it `s32` (dropping `pad6`) and writing `out->chunkIndex` builds byte-identical (measured this round, then reverted: include/StageMap.h is shared and the change is not additive). Proposed to the head. The `do {} while (0);` keeps a one-line `/* MATCHING */`.
+Left: the two `*(s32 *)((u8 *)out + 4)` writes. ChunkLoadEntry declares `chunkIndex` s16 plus a pad; retyping it `s32` (dropping `pad6`) and writing `out->chunkIndex` builds byte-identical (measured this round, then reverted: include/stage_map.h is shared and the change is not additive). Proposed to the head. The `do {} while (0);` keeps a one-line `/* MATCHING */`.
 
-The comment that stood above the function in `src/world/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/world/dream_day.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 63 (delta): closed a 58/63 stall that had stood since round

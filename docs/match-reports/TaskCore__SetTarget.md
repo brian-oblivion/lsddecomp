@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003CE98` on 2026-09-24 (tools/rename.py). Address 0x8003ce98.
 
-**Unit:** Task · round 12, one of the unit's 5 round-11-straggler
+**Unit:** task · round 12, one of the unit's 5 round-11-straggler
 functions (fresh ground, no prior report existed for any of the five).
 
 ## What it does
@@ -79,7 +79,7 @@ This function is the FIRST one in the unit to load `*(unk4C+0)` and
 `*(unk4C+4)` — the unit's own header comment previously stated (correctly,
 for the 16 functions attempted through round 11) that nothing ever loads
 offset 0. That statement is now WRONG in general and has been corrected in
-`include/Task.h`'s `Unk4CObj` comment; it was true only of the
+`include/task.h`'s `Unk4CObj` comment; it was true only of the
 evidence available at the time.
 
 - `+0x000 const char *unk0` — a path, passed to `New_TimImage(unk0)` when
@@ -98,7 +98,7 @@ evidence available at the time.
 New `Obj86B60Methods` slot: `+0x0F8 slotF8(self, void *a1, Unk74Obj *a2)`.
 
 New external: `New_BoxFill(void*, void*, s32) -> Unk68Obj*` (lives in the
-still-uncarved `Task` segment, not this unit's function — declared
+still-uncarved `task` segment, not this unit's function — declared
 `extern` for this unit's own local view of what it returns). Its two
 pointer args, `sListViewSize`/`sListViewColor`, are only ever address-taken here,
 so they're typed minimally (`s32[2]`/`char[4]`) matching their observed
@@ -153,9 +153,9 @@ Renamed `func_` -> `Obj86B60__SetTarget`. **Tier B**: Stores `a1` into `self->un
 ## Proposed field names
 
 Not renamed here -- both fields are CROSS-UNIT (read by `TaskCore__SetState`/
-`TaskCore__ConfirmSlot` in `src/app/Task.c`, verified by attempting the rename and
+`TaskCore__ConfirmSlot` in `src/app/task.c`, verified by attempting the rename and
 reading the compiler's own error list: both moved from "0 errors" to errors
-in `Task.c` specifically, none elsewhere). Proposing for the head to
+in `task.c` specifically, none elsewhere). Proposing for the head to
 apply at merge (type scope: rename the definition, rebuild, fix exactly the
 accessors the compiler lists, in both units):
 
@@ -163,10 +163,10 @@ accessors the compiler lists, in both units):
   (see `Unk4CObj`'s own header comment); this report's own function is its
   constructor/setter.
 - `Unk4CObj::unk24` -> `slotEntries`, type `SlotEntry **` (tier B, retype +
-  rename). Every dereference in `Task.c` (`TaskCore__CommitElementScroll`,
+  rename). Every dereference in `task.c` (`TaskCore__CommitElementScroll`,
   `TaskCore__RefreshSlotView`, `TaskCore__CancelElementScroll`, `TaskCore__SetSlotCursor`)
   already casts it to `SlotEntry *`/`(SlotEntry *)...` locally; `TaskCore__ConfirmSlot`
-  (Task.c, not attempted) reads it as a generic word-pointer array and
+  (task.c, not attempted) reads it as a generic word-pointer array and
   would need `(void **)self->unk4C->slotEntries` or an equivalent cast, a
   one-line fix at that one call site.
 - `Unk4CObj::unk10[3]` -> `unselectedColor` (tier B). `TaskCore__CancelElementScroll`/
@@ -174,22 +174,22 @@ accessors the compiler lists, in both units):
   element's `slotB8` right before (or without) a `slot60(elem,1)`
   highlight-on call on the NEW one -- the colour an item reverts to when it
   stops being the current selection, not the selection's own colour.
-  `TaskCore__SetState` (Task.c, not attempted) only takes its address, so a
+  `TaskCore__SetState` (task.c, not attempted) only takes its address, so a
   rename there is a pure rename, no cast needed.
 
 
-**Head disposition, round 78.** `unk4C` -> `target` APPLIED (type scope, 36 accessors across Task*). `Unk4CObj::unk10` -> `unselectedColor` APPLIED (5 accessors). `Unk4CObj::unk24` -> `slotEntries` + retype NOT applied: the retype needs a cast at `TaskCore__ConfirmSlot`'s call site, which is a type change, left for track 4.
+**Head disposition, round 78.** `unk4C` -> `target` APPLIED (type scope, 36 accessors across task*). `Unk4CObj::unk10` -> `unselectedColor` APPLIED (5 accessors). `Unk4CObj::unk24` -> `slotEntries` + retype NOT applied: the retype needs a cast at `TaskCore__ConfirmSlot`'s call site, which is a type change, left for track 4.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__SetTarget (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__SetTarget (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`) and `include/Task.h`'s
+TimImage is unified (`include/tim_image.h`) and `include/task.h`'s
 `Unk74Obj`/`Unk74ObjMethods` view of it is deleted, together with that
 header's local `extern` of New_TimImage. The handle is cast to
-`TimImage *` (TaskCore.h still types the field `BasicClass *`); its slots are
+`TimImage *` (task_core.h still types the field `BasicClass *`); its slots are
 TimImage's: +0x004 `release`, +0x05C `freeBuffer` (was `slot5C`), and
 +0x078, FileResource's `void *slot78` whose occupant is TimImage__Upload,
 called through `TimImageUploadFn`. `path` is cast to `char *` for
@@ -197,8 +197,8 @@ New_TimImage. Image byte-identical.
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
-D_8008A8E8 -> sListViewSize (tier A: the two words are {320, 240}, New_BoxFill's size argument for listView), D_8008A8F0 -> sListViewColor (tier A: bytes 20 20 40, New_BoxFill's colour, now declared a BoxFillRgb and passed as &sListViewColor). Both via rename.py, both declared in this unit now (they were in Task.h, used nowhere else). `size = count * 4` is `count * sizeof(void *)`. Locals: a1 -> target, list -> names, arr -> widget, handle -> texture, extra -> itemList. The two `(char *)path` casts stay: New_TimImage takes `char *` (proposal: `const char *`, TimImage.h).
+D_8008A8E8 -> sListViewSize (tier A: the two words are {320, 240}, New_BoxFill's size argument for listView), D_8008A8F0 -> sListViewColor (tier A: bytes 20 20 40, New_BoxFill's colour, now declared a BoxFillRgb and passed as &sListViewColor). Both via rename.py, both declared in this unit now (they were in task.h, used nowhere else). `size = count * 4` is `count * sizeof(void *)`. Locals: a1 -> target, list -> names, arr -> widget, handle -> texture, extra -> itemList. The two `(char *)path` casts stay: New_TimImage takes `char *` (proposal: `const char *`, tim_image.h).
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).

@@ -2,7 +2,7 @@
 
 > Renamed from `VabStreamObj__VabStreamObj` on 2026-09-18 (tools/rename.py). Address 0x8002c4e0.
 
-Unit `PlacementGridVabSound`. Previously filed as a `gp_rel` stall (round 17, never
+Unit `vab_sound`. Previously filed as a `gp_rel` stall (round 17, never
 attempted); reopened round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi`
 resolved that blocker project-wide. This is the class's own
 `new_class_da34` dispatch target -- `gVabStreamObjMethods`'s own slot +0x08, confirmed
@@ -153,7 +153,7 @@ unit level, not guessed here.
 ## Track 4 (2026-09-26, round 87)
 
 The unit's local `VabStreamObj`/`VabStreamObjMethods` views are replaced by
-`include/VabStreamObj.h`, and the whole image stays byte-identical. The
+`include/vab_stream_obj.h`, and the whole image stays byte-identical. The
 slots this ctor calls now carry their inherited FileResource names:
 `slot9C` -> `setPitchOffset`, `slot6C` -> `requestLoadFile`, and
 `self->loadState` -> `self->unk2A`, which is FileResource's field.

@@ -41,7 +41,7 @@ bool ExecuteLink(DreamSys *system, s32 stage, s32 unk1, s32 unk2)
 `unknwon_int_0x44` was already named at exactly this offset. The other
 three raw offsets this function touches (`0x68`, `0x24`, `0x164`) were NOT
 obviously anything from their surrounding comments, so I hand-summed
-`include/DreamSys.h`'s `DreamSys` struct field-by-field from the top
+`include/dream_sys.h`'s `DreamSys` struct field-by-field from the top
 (every pointer field counted as 4 bytes, matching this project's `-m32`
 verification convention from `DECOMPILATION_LEARNINGS.md` — a real `-m32`
 host build wasn't available in this environment, `gnu/stubs-32.h` missing,
@@ -64,7 +64,7 @@ call sites in this unit still use it as a plain integer).
 
 - `vtable_DreamSys` gained `slot30` (`+0x030`), resolved via
   `tools/classtable.py gDreamSysMethods` to `BasicClass__NotifyParents` — the
-  same shared base-class slot `DayTaskStageMap.h`/`GameApplication.h` already name
+  same shared base-class slot `dream_day.h`/`game_application.h` already name
   `slot30` with an identical `(self, s32 arg1)` signature. Return
   discarded here too.
 - `DreamSysUnk58Vtable` gained `slot0x80` (three `s32` args, all literal
@@ -104,8 +104,8 @@ a store into `*self` just as much as to a scalar return value.
 
 ## Track 4 (2026-09-26, round 87, VabStreamObj)
 
-`include/DreamSys.h`'s `DreamSysUnk58`/`DreamSysUnk58Vtable` view is deleted.
-`DreamSys::soundObj` is cast to `VabStreamObj *` (`include/VabStreamObj.h`),
+`include/dream_sys.h`'s `DreamSysUnk58`/`DreamSysUnk58Vtable` view is deleted.
+`DreamSys::soundObj` is cast to `VabStreamObj *` (`include/vab_stream_obj.h`),
 and the slots are called by the class's names: `slot0x80` -> `playTone`
 (`VabStreamObj__PlayTone`: index = program << 4 | tone, then vol and
 endVol; it returns the voice), `slot0x84` -> `stopVoice`, and `slot0x9C` ->

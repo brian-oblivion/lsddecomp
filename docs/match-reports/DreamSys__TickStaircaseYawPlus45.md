@@ -73,7 +73,7 @@ The two-sided window tests are written as the single unsigned comparison
 what retail has here (`addiu` of the negated low bound followed by `sltiu`).
 Writing them as `x >= LO && x <= HI` produces the two-branch form instead.
 
-## New struct and symbol knowledge (`include/DreamSys.h`)
+## New struct and symbol knowledge (`include/dream_sys.h`)
 
 All of this came in with the salvaged tree and is part of the match:
 
@@ -100,7 +100,7 @@ reasoning that produced the range-check form is lost.
 ## Proposed learning
 
 None specific to this function. The process finding belongs to the round
-rather than the report: bravo produced eleven matches in `Task`, then
+rather than the report: bravo produced eleven matches in `task`, then
 seven more across two DreamSys batches, and the last one existed only as
 uncommitted working-tree state when the runner died. Round 7 opened with the
 same situation inherited from round 6 (three uncommitted matches in a

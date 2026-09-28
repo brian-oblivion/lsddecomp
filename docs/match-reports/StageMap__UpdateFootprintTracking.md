@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004B5BC` on 2026-09-24 (tools/rename.py). Address 0x8004b5bc.
 
-Unit `DayTaskStageMap`. Slot `Obj866E8Methods::slotF4` (verified against
+Unit `dream_day`. Slot `Obj866E8Methods::slotF4` (verified against
 `tools/classtable.py 0x800866E8`, which resolves `gStageMapMethods`'s own
 `+0x0F4` entry directly to `StageMap__UpdateFootprintTracking`).
 
@@ -148,7 +148,7 @@ a pointer-cast read, deliberately, to avoid introducing a union into
   reason -- `Class86E00_3bb8c_g`, `ObjM`, `Obj87034_3bb8c_l`, `ItemList`).
 - **`Obj866E8Methods::slot128`** (new field, appended -- no padding
   needed, `slot124` ends exactly at `+0x128`): resolves via classtable to
-  `StageMap__RefreshFootprint`, already matched in the sibling unit `DayTaskStageMap`
+  `StageMap__RefreshFootprint`, already matched in the sibling unit `dream_day`
   with signature `void StageMap__RefreshFootprint(Obj866E8 *self)`. Typed
   `void (*slot128)(Obj866E8 *self);` to match.
 
@@ -181,7 +181,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B5BC` | `StageMap__UpdateFootprintTracking` | B | Occupant of `gStageMapMethods` +0x0F4 (`slotF4`). `DayTaskStageMap`'s own `StageMap__UpdateIfEnabled` (round 67 report) dispatches this slot then `slot13C` (`StageMap__StepScaleRamp`) back-to-back, guarded by `enabled` -- i.e. this runs every "enabled" tick alongside the rate countdown. Body reads the current footprint query (`slot10C`), resolves an element and its remap byte, conditionally forwards through `slotF8` (`StageMap__LoadChunksAround`), calls `slot128` (`StageMap__RefreshFootprint`), then updates `self->unkBC` (the current descriptor) and notifies (`slot30`) only if the descriptor's leading value changed. "Update...Tracking" names the mechanic (per-tick refresh-and-notify-on-change of the tracked footprint state), not an unproven in-game purpose. |
+| `func_8004B5BC` | `StageMap__UpdateFootprintTracking` | B | Occupant of `gStageMapMethods` +0x0F4 (`slotF4`). `dream_day`'s own `StageMap__UpdateIfEnabled` (round 67 report) dispatches this slot then `slot13C` (`StageMap__StepScaleRamp`) back-to-back, guarded by `enabled` -- i.e. this runs every "enabled" tick alongside the rate countdown. Body reads the current footprint query (`slot10C`), resolves an element and its remap byte, conditionally forwards through `slotF8` (`StageMap__LoadChunksAround`), calls `slot128` (`StageMap__RefreshFootprint`), then updates `self->unkBC` (the current descriptor) and notifies (`slot30`) only if the descriptor's leading value changed. "Update...Tracking" names the mechanic (per-tick refresh-and-notify-on-change of the tracked footprint state), not an unproven in-game purpose. |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 
@@ -194,11 +194,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -213,4 +213,4 @@ an operator decision; not hand-reverted).
 
 ## Track 7 (2026-09-27, round 95, charlie)
 
-Locals, tier A: `buf` -> `desc` (the Descriptor10Ext getTargetDescriptor fills), `e` -> `slot`, `key` -> `neighbour` (the slot loader's `elemKey`, a neighbour key), `result` -> `specIndex` (sFootprintResultRemap's byte, the index into sFootprintResultPtrTable and the return value), `oldRaw` -> `oldChunk` (the old descriptor's b0/b1, chunk column/row, read as one u16). Constant: 5 -> `STAGEMAP_EVENT_CHUNK_CHANGED` (enum StageMapEvent, include/StageMap.h). The one-line pointer comment (`/* StageMap__UpdateFootprintTracking -- see docs/match-reports/... */`) became a comment saying what the function does.
+Locals, tier A: `buf` -> `desc` (the Descriptor10Ext getTargetDescriptor fills), `e` -> `slot`, `key` -> `neighbour` (the slot loader's `elemKey`, a neighbour key), `result` -> `specIndex` (sFootprintResultRemap's byte, the index into sFootprintResultPtrTable and the return value), `oldRaw` -> `oldChunk` (the old descriptor's b0/b1, chunk column/row, read as one u16). Constant: 5 -> `STAGEMAP_EVENT_CHUNK_CHANGED` (enum StageMapEvent, include/stage_map.h). The one-line pointer comment (`/* StageMap__UpdateFootprintTracking -- see docs/match-reports/... */`) became a comment saying what the function does.

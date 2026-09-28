@@ -30,7 +30,7 @@ release call instead of held.
 2. Hold `list = entry->list;` in a local: retail loads it once into `s1`
    and reuses it for the store-back after `release`.
 
-The matched C is the live definition in `src/world/DayTaskStageMap.c`.
+The matched C is the live definition in `src/world/dream_day.c`.
 
 ### Proposed learning
 
@@ -199,7 +199,7 @@ STORE (`StageMap__SetFootprintFromCell`), not by barriers.
 ## Provenance
 
 round 2026-09-02 (head-requested extension), runner ALPHA, unit
-DayTaskStageMap. Six attempts across two structural strategies (array
+dream_day. Six attempts across two structural strategies (array
 indexing / incrementing pointer / offset accumulator), best 9/74 with the
 loop's overall two-register shape reproduced but one instruction's
 delay-slot placement unmoved. Moved on to stay within budget for the
@@ -352,9 +352,9 @@ not to the shipped bytes.
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004ABD0` | `StageMap__UnloadAllSlots` | B | Occupant of vtable slot `+0x0C0`, and `DayTaskStageMap`'s matched `StageMap__Disable` calls exactly that slot immediately before clearing `enabled` -- so this is the shutdown/clear path. The body walks all seven `elems[]` entries and for each: dispatches the target's `slot74`, zeroes the entry's `flag`, dispatches `slot108`, releases the list's held object, raises `onElementEvent(self, 6, entry, i)`, dispatches the target's `slot84`. Then zeroes `unk1B4`/`unk1B8` and dispatches `slot140`. Tier B: "reset all elements" is what the loop does; why the object is reset is not established. |
+| `func_8004ABD0` | `StageMap__UnloadAllSlots` | B | Occupant of vtable slot `+0x0C0`, and `dream_day`'s matched `StageMap__Disable` calls exactly that slot immediately before clearing `enabled` -- so this is the shutdown/clear path. The body walks all seven `elems[]` entries and for each: dispatches the target's `slot74`, zeroes the entry's `flag`, dispatches `slot108`, releases the list's held object, raises `onElementEvent(self, 6, entry, i)`, dispatches the target's `slot84`. Then zeroes `unk1B4`/`unk1B8` and dispatches `slot140`. Tier B: "reset all elements" is what the loop does; why the object is reset is not established. |
 
-The preserved `#if 0` body in `src/world/DayTaskStageMap.c` was updated to the current
+The preserved `#if 0` body in `src/world/dream_day.c` was updated to the current
 field names in the same round (`entry->unk0` -> `flag`, `entry->unk4` ->
 `target`, `entry->unk8` -> `list`, `self->unkEC` -> `self->elems`). Its score
 and residue are unchanged -- no code was altered, only identifiers.
@@ -364,7 +364,7 @@ and residue are unchanged -- no code was altered, only identifiers.
 Round 67 renamed this unit's struct fields. The preserved bodies in THIS
 report are left in their original spelling -- preserved code is a record of
 what was tried, not doctrine -- but they will not compile as written against
-the current `include/DayTaskStageMap.h`. The mapping, for whoever rebuilds one:
+the current `include/dream_day.h`. The mapping, for whoever rebuilds one:
 
 | old | current |
 | --- | --- |
@@ -381,7 +381,7 @@ the current `include/DayTaskStageMap.h`. The mapping, for whoever rebuilds one:
 | `HistoryEntry_3ac78` / `HistoryBlock_3ac78` | `GridRect_3ac78` / `GridRectList_3ac78` |
 | `->methods->unk04(...)` | `->methods->release(...)` |
 
-The `#if 0` copy that lives in `src/world/DayTaskStageMap.c` WAS updated to the current
+The `#if 0` copy that lives in `src/world/dream_day.c` WAS updated to the current
 names in the same round, so that one still compiles; only identifiers changed
 and the recorded score is unaffected.
 
@@ -396,11 +396,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`

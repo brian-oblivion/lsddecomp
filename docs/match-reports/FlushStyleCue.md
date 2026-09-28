@@ -2,7 +2,7 @@
 
 > Renamed from `func_800557DC` on 2026-09-23 (tools/rename.py). Address 0x800557dc.
 
-Unit `ObjMStyleActor`. **20/20 words, byte-exact.** First build.
+Unit `dream_scene`. **20/20 words, byte-exact.** First build.
 
 ## What it was
 
@@ -29,14 +29,14 @@ derivation started.
 jr $ra
 ```
 
-`sStyleSceneRefs` is a plain `s32` (established in `ObjMStyleActor.c`) holding the
+`sStyleSceneRefs` is a plain `s32` (established in `dream_scene.c`) holding the
 address of a small descriptor object; this function reads *that object's*
 own offset 0 (a value, not the `FieldAC7CHolder.unkC` field
-`ObjMStyleActor.c` names at +0xC -- a different offset of the same base
+`dream_scene.c` names at +0xC -- a different offset of the same base
 pointer, kept as its own independent local reading rather than importing
 that unit's type). The offset-0 value is passed as `FlushSoundCueSet`'s `self`
 argument, matching that function's existing loose declaration in
-`include/entity.h`/`include/DreamSys.h` (`extern void FlushSoundCueSet(s32
+`include/entity.h`/`include/dream_sys.h` (`extern void FlushSoundCueSet(s32
 arg0, void *arg1);`) -- each caller already carries its own local reading of
 `self`'s real type, so this unit does the same rather than pulling in
 `ObjDA34`.

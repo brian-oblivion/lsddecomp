@@ -61,7 +61,7 @@ left-hand/`unk1C` operand first, matching retail's load order) and casting
 both operands `(u32)` (forces `sltu` instead of `slt`) fixed both at once —
 one source change, two residue lines.
 
-## New struct knowledge (`include/DayTaskStageMap.h`)
+## New struct knowledge (`include/dream_day.h`)
 
 - `Obj865C8::unk1C` (s32) — compared unsigned against `unk2C`.
 - `IntermediateBaseMethods::slot5C` typed `void (*)(void *self, s32 arg1,
@@ -86,8 +86,8 @@ assuming a scheduling quirk.
 
 ## Naming
 
-`TimedTask__CheckTimeout` -- tier B. Occupies +0x05C. Forwards to the base's own +0x05C (`IntermediateBase__IncrementFrameCounter`, Task.h) then compares `frameCounter > timeoutFrames`, triggering `onEventArg(self, 4)` on overflow -- a timeout check by construction, though what the timeout gates in-game is not established.
+`TimedTask__CheckTimeout` -- tier B. Occupies +0x05C. Forwards to the base's own +0x05C (`IntermediateBase__IncrementFrameCounter`, task.h) then compares `frameCounter > timeoutFrames`, triggering `onEventArg(self, 4)` on overflow -- a timeout check by construction, though what the timeout gates in-game is not established.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. It fills IntermediateBase's `update` slot (+0x05C) and does more than the base's frame count, so the name keeps the part it adds. Signature `(TimedTask *self, BasicClass *sender, s32 event)`, the base update's; the call it makes on timeout is the `setState` slot (was `onEventArg`) with 4. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. It fills IntermediateBase's `update` slot (+0x05C) and does more than the base's frame count, so the name keeps the part it adds. Signature `(TimedTask *self, BasicClass *sender, s32 event)`, the base update's; the call it makes on timeout is the `setState` slot (was `onEventArg`) with 4. Image byte-identical.

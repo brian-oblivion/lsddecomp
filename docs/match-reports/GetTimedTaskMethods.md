@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A4B8` on 2026-09-22 (tools/rename.py). Address 0x8004a4b8.
 
-**Unit:** DayTaskStageMap · **Size:** 4 words · **Status:** MATCHED (4/4 words)
+**Unit:** dream_day · **Size:** 4 words · **Status:** MATCHED (4/4 words)
 
 ## What it does
 
@@ -26,7 +26,7 @@ another reason; either way it isn't the gp-relative blocker since there's no
 `lui`+`lw` pair reading through `$gp`, just address materialization).
 `gTimedTaskMethods` resolved as a 28-slot method table via `tools/classtable.py
 gTimedTaskMethods`; declared `extern TimedTaskMethods gTimedTaskMethods;` in
-`include/DayTaskStageMap.h` (the table's own data bytes remain unmatched/raw —
+`include/dream_day.h` (the table's own data bytes remain unmatched/raw —
 this function only takes its address).
 
 ## Proposed learning
@@ -45,4 +45,4 @@ Round 67 (track 3, naming pass).
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Declared once, in include/TimedTask.h, returning `TimedTaskMethods *`; the local prototypes in DayTaskStageMap.h and ObjMStyleActor.c are gone. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. Declared once, in include/timed_task.h, returning `TimedTaskMethods *`; the local prototypes in dream_day.h and dream_scene.c are gone. Image byte-identical.

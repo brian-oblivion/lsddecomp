@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004D814` on 2026-09-24 (tools/rename.py). Address 0x8004d814.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TitleMenu__Reset`: 33/33 words match.
 
 ## Source
@@ -36,7 +36,7 @@ reshaping needed.
   -- this is the first function to dereference it through its own vtable
   (`slotF0`) rather than only forwarding it opaquely (as
   `TitleMenu__TitleMenu`/`StampSaveTitleDay`, both already matched in
-  `TitleMenuTaskObjF.c`, do). Same size (4 bytes), so no layout change; the
+  `title_menu.c`, do). Same size (4 bytes), so no layout change; the
   existing assignment `self->unkA4 = dreamSys;` in `TitleMenu__TitleMenu` (where
   `dreamSys` is a `void *` parameter) still compiles under ordinary C
   pointer-conversion rules -- confirmed by the full rebuild going green.
@@ -64,7 +64,7 @@ Renamed `func_8004D814` -> `TitleMenu__Reset`. **Tier B**: Passes `&sTitleTimPat
 **Head, round 77:** `unkA4 -> dreamSysView` APPLIED by type scope.
 
 `TitleMenu::unkA4` has a real accessor outside this unit
-(`src/ui/TitleMenuTaskObjF.c`'s `TitleMenu__TitleMenu` sets it from its own
+(`src/ui/title_menu.c`'s `TitleMenu__TitleMenu` sets it from its own
 `dreamSys` parameter), so per the compiler-ownership rule this is a
 PROPOSAL, not a rename. Also posted to the round-77 broadcast.
 
@@ -96,7 +96,7 @@ since `unk2C`'s meaning is not established and 10 is the slot's `bound`.
 
 ## Proposed field names
 
-TaskCore's (include/TaskCore.h, accessed by Task.c/TaskViewport*.c):
+TaskCore's (include/task_core.h, accessed by task.c/TaskViewport*.c):
 `unk34` -> `clearOnDeinit` (TaskCore__OnDeinit clears the display with
 `unk93` only when it is nonzero; this Reset sets 0 and TitleMenu's own
 onDeinit clears both buffers instead). `unk2C` stays: it is the viewport's
@@ -104,4 +104,4 @@ onDeinit clears both buffers instead). `unk2C` stays: it is the viewport's
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-TaskCore fields renamed (include/TaskCore.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.
+TaskCore fields renamed (include/task_core.h): `unk2C` -> `maxPackets` (the value onInit passes to the viewport's setMaxPackets), `unk34` -> `clearOnDeinit` (onDeinit clears the screen only while it is nonzero), `unk93` -> `clearColor` (setColors' `clear` argument, the colour onDeinit clears to); TaskCoreTarget `unk8` -> `initialSlot` (setState(ACTIVE)'s setActiveSlot argument). Byte-identical (whole image green). The 300/400 packet counts stay literal: they are per-class tuning values beside the field that names them, like fadeRate and otLength.

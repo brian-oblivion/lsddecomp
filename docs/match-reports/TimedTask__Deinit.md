@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A324` on 2026-09-23 (tools/rename.py). Address 0x8004a324.
 
-**Unit:** DayTaskStageMap · **Size:** 14 words (0x38 bytes) · **Status:** MATCHED (14/14 words)
+**Unit:** dream_day · **Size:** 14 words (0x38 bytes) · **Status:** MATCHED (14/14 words)
 
 ## What it does
 
@@ -41,4 +41,4 @@ None beyond what's already documented.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. `self` is `TimedTask *`; DayTask__Deinit and ObjM__DetachTarget call it as `GetTimedTaskMethods()->deinit((TimedTask *)self)`. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. `self` is `TimedTask *`; DayTask__Deinit and ObjM__DetachTarget call it as `GetTimedTaskMethods()->deinit((TimedTask *)self)`. Image byte-identical.

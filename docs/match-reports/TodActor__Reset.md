@@ -74,10 +74,10 @@ Round 75 (charlie), track 3.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-Renamed from `TodActor__InitDefaults`. Override of +0x040, SceneNode's `reset` (Actor's occupant is Actor__Reset, renamed from InitDefaults the same way in round 82), named for its slot: it sets the object's defaults through its own and inherited slots, which is what the slot does in both parents. The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`. Any source block above is the pre-unification spelling; the live body in `src/code_55dd4.c` takes the unified types and slot names, byte-identical.
+Renamed from `TodActor__InitDefaults`. Override of +0x040, SceneNode's `reset` (Actor's occupant is Actor__Reset, renamed from InitDefaults the same way in round 82), named for its slot: it sets the object's defaults through its own and inherited slots, which is what the slot does in both parents. The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/tod_actor.h`. Any source block above is the pre-unification spelling; the live body in `src/code_55dd4.c` takes the unified types and slot names, byte-identical.
 
 ## Track 7 (round 99, bravo)
 
-`0x12C` is written decimal (300), unnamed: Actor__Reset (ObjMStyleActor) writes
-the same default into lastOffsetValue, so a name belongs in include/Actor.h
+`0x12C` is written decimal (300), unnamed: Actor__Reset (dream_scene) writes
+the same default into lastOffsetValue, so a name belongs in include/actor.h
 (proposed to the head, not applied here).

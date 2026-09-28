@@ -46,17 +46,17 @@ siblings that use it; the other 7 don't).
 Renamed from `func_8001D450` via `tools/rename.py`. **Tier A** -- pure
 `GetSetBitField` wrapper over `self->unk10`, shift 7 width 1,
 double-inverted boolean shape (same as sibling `SceneNode__SetDisplay` in
-`SceneNode.c`, still unrenamed there). Mechanics are the whole of what
+`scene_node.c`, still unrenamed there). Mechanics are the whole of what
 this function does (a getter/setter over a known bit range), which
 qualifies as tier A "by definition" per FINISHING-PLAN.md track 3 even
 though the FIELD's own game-level meaning (what bit 7 of `unk10`
 represents) is not established. Safe to rename directly: the only
-references outside this unit are this unit's own `include/SceneNode.h`
+references outside this unit are this unit's own `include/scene_node.h`
 and this unit's own `SceneNode__SetBackClip.md` report.
 
 ## Track 6 (round 91, echo): named `SceneNode__SetUseZ`, tier B
 
-`GetSetBitField(&self->attribute, 7, 1, on == 0) == 0`: `on` clears libgs.h's GsZIGNR ("Z ignore"), the SetLighting/GsLOFF shape. The bit is Sony's; what ignoring Z does to this game's draw order is not established, hence B. Was `GetSetUnk10Flag7`. Slot +0x078 renamed `setUseZ` (no accessor). The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+`GetSetBitField(&self->attribute, 7, 1, on == 0) == 0`: `on` clears libgs.h's GsZIGNR ("Z ignore"), the SetLighting/GsLOFF shape. The bit is Sony's; what ignoring Z does to this game's draw order is not established, hence B. Was `GetSetUnk10Flag7`. Slot +0x078 renamed `setUseZ` (no accessor). The class was renamed Class6B5CC -> SceneNode in the same pass (include/scene_node.h's banner has the evidence).
 
 ## Round 100 (delta): track 7
 

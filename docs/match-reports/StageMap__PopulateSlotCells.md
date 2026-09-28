@@ -333,7 +333,7 @@ one real call site, `StageMap__OnDrawSystemEvent`'s `self->methods->slot104(self
 - `EntryChildObj::unk36` -- `s16` at `+0x036`, carved out of the old
   `pad24[0x38-0x24]` (20 bytes -> 18 + 2, same total).
 - Forward typedefs only for `LinkTarget866E8`, `ResInfo866E8`, `EntryGpu`
-  (top-of-file block) -- their FULL bodies live in `DayTaskStageMap.c`, not the
+  (top-of-file block) -- their FULL bodies live in `dream_day.c`, not the
   header, since none of the 11 sibling units touch them. This is the
   "own local view, own file" half of the project's shared-header
   discipline; only the field additions on the three already-shared types
@@ -712,7 +712,7 @@ This is the Gate 1b "rebuild before trusting" check, and it matters here
 because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
-four preserved bodies in `DayTaskStageMap` were rebuilt this round and all four
+four preserved bodies in `dream_day` were rebuilt this round and all four
 are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
 `StageMap__LoadChunksAround` 125/140, `StageMap__PopulateSlotCells` 130/150. No stale figure and no
 never-linked body in this unit.
@@ -739,7 +739,7 @@ premature**:
 **A permuter scaffold's `base.c` is NOT the project's C.**
 `tools/setup-permuter.sh` emits a FLATTENED translation unit -- the function
 plus its own inlined preamble of typedefs. Pasting that body straight into
-`src/world/DayTaskStageMap.c` cannot work, because this function's local types live in
+`src/world/dream_day.c` cannot work, because this function's local types live in
 this report's `#if 0` block, not in the unit. Bring the declarations across
 with the body, build, *then* believe the figure.
 
@@ -804,7 +804,7 @@ sibling it was worth 12 words.
 
 The head applied it and the build failed: ``LinkResource' undeclared``. The
 permuter's `base.c` is a FLATTENED scaffold with its own preamble, so its body
-is not directly pasteable into `src/world/DayTaskStageMap.c` -- this function's local
+is not directly pasteable into `src/world/dream_day.c` -- this function's local
 types live in this report's own `#if 0` block and must come across with it.
 That is a ten-minute job and a runner's, not a head's, and doing it badly
 would have produced a figure that measured the wrong thing.
@@ -830,11 +830,11 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004BE54` | `StageMap__PopulateSlotCells` | B | Occupant of `gStageMapMethods` +0x104 (`slot104`), and its own identity slot -- `StageMap__OnDrawSystemEvent` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/world/DayTaskStageMap.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
+| `func_8004BE54` | `StageMap__PopulateSlotCells` | B | Occupant of `gStageMapMethods` +0x104 (`slot104`), and its own identity slot -- `StageMap__OnDrawSystemEvent` dispatches `self->methods->slot104(self, e)` which resolves to this same function. Body: releases the element's old link resource, issues a new `New_LinkResource` resource-load request, then loops `target->methods->slot78` building `GsLinkObject4`-linked GPU records into the element's cell array (`entry->unk10`). Matches `src/world/dream_day.c`'s own unit-header narrative almost verbatim: "The queries that build those rectangles, and an element's resource AND GPU sides, live in class_3bb8c*" -- this function IS that resource-and-GPU side. |
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-`LinkTarget866E8` and `BE54OutBuf` were views of PlacementGrid and its placement record; both are gone for `include/PlacementGrid.h` (`buffer`, `bufferSize`, `linkResource`; `CellPlacement` x/y/z/rotY/unk2E/chained/next). The slot78 call casts the inherited `void *slot78` to `PlacementGridResolveEntryFn` (no code). The local LinkResource view went with it: `linkResource` is `FileResource *` and its +0x004 is `release`. Byte-identical.
+`LinkTarget866E8` and `BE54OutBuf` were views of PlacementGrid and its placement record; both are gone for `include/placement_grid.h` (`buffer`, `bufferSize`, `linkResource`; `CellPlacement` x/y/z/rotY/unk2E/chained/next). The slot78 call casts the inherited `void *slot78` to `PlacementGridResolveEntryFn` (no code). The local LinkResource view went with it: `linkResource` is `FileResource *` and its +0x004 is `release`. Byte-identical.
 
 ## asm sites
 
@@ -858,11 +858,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -881,13 +881,13 @@ This function: `StageMap__LoadElementResources` -> `StageMap__PopulateSlotCells`
 
 Unit-local views. `LinkResEntry` is gone: it was a view of TmdModel read only
 for its +0x010, and the body now reads `((TmdModel *)(*slot)->model)->object`
-(include/TmdModel.h), cast to `s32` for SceneNode's `tmd` and to `u_long` for
+(include/tmd_model.h), cast to `s32` for SceneNode's `tmd` and to `u_long` for
 Sony's `GsLinkObject4`. The comment that stood on it, moved here: *"PlacementGrid__ResolveEntry's
 non-0/non-(-1) return value (what LinkResource__GetModel returns): a TmdModel
-(include/TmdModel.h), read only for its +0x010, TmdModel's `object`. A view of
+(include/tmd_model.h), read only for its +0x010, TmdModel's `object`. A view of
 TmdModel, left for that class (round 89, LinkResource's unification did not
 retype it)."* `ResourceSourceRequest.field0` is `buffer` (tier A: it is the first word of
-New_LinkResource's descriptor, GraphicsResources.c's `ResourceSource { void *buffer; char
+New_LinkResource's descriptor, graphics_resources.c's `ResourceSource { void *buffer; char
 *name; }`, and holds the address of the chunk header's model block). The type
 keeps its placeholder name (track 6); its 0x10 size is kept, not measured as
 load-bearing. Byte-identical.
@@ -920,11 +920,11 @@ The barrier's two-line comment became `/* MATCHING: keeps the rec.x/.y/.z loads 
 
 `BE54LoadReq` -> `ResourceSourceRequest` (tier A). It is the descriptor the
 body passes to `New_LinkResource`, cast to that ctor's `struct
-ResourceSource` (src/graphics/GraphicsResources.c: `{ void *buffer; char *name; }`,
+ResourceSource` (src/graphics/graphics_resources.c: `{ void *buffer; char *name; }`,
 a buffer to adopt, or with `buffer` NULL a file name to request), and the
 body sets only `buffer`, to the chunk header's model block
 (`header + placementsOffset + placementsSize`). The name follows
-include/LinkResource.h's banner ("the callers outside GraphicsResources
+include/link_resource.h's banner ("the callers outside graphics_resources
 build it in their own 0x10-byte request types").
 
 Its 0x10 size is load-bearing, measured this round: giving it
@@ -935,23 +935,23 @@ unread +0x04..+0x0F stays padding (no code reads or writes it).
 
 **Proposed (head, not applied: outside this job's edit set).** The same
 0x10-byte record is declared twice more, with ResourceSource's fields under
-other names: include/DayTaskStageMap.h `LoadRequest` and src/app/GameApplicationFileResource.c
+other names: include/dream_day.h `LoadRequest` and src/app/game_shell.c
 `LoadModelRequest`, both `{ s32 type; const char *path; s32 unk08; s32
 unk0C; }`, whose callers write `type = 0` (ResourceSource's NULL `buffer`)
 and `path` (its `name`) before `New_LinkResource`. One
 `ResourceSourceRequest { void *buffer; char *name; u8 pad8[8]; }` in the
-header owning ResourceSource (LinkResource.h, or FileResource.h, the
+header owning ResourceSource (link_resource.h, or file_resource.h, the
 common parent of the five ctors that take it, once ResourceSource itself
-moves out of GraphicsResources.c) would retire all three; field renames
+moves out of graphics_resources.c) would retire all three; field renames
 `type` -> `buffer`, `path` -> `name`. The three-word ResourceRequest__Set descriptors
-(GraphicsResources.c `ResourceSourceArgs`, include/DreamAux.h
-`DreamAuxLoadReq`, include/GameApplicationFileResource.h `ResourceRequest`) are the same family
+(graphics_resources.c `ResourceSourceArgs`, include/dream_aux.h
+`DreamAuxLoadReq`, include/data_source.h `ResourceRequest`) are the same family
 at 0x0C and are left to that job.
 
 ## Track 6 (round 96, delta, second job): ResourceSourceRequest unified
 
 The proposal above, applied. `ResourceSource` moved from
-src/graphics/GraphicsResources.c to include/FileResource.h (the parent of the five
+src/graphics/graphics_resources.c to include/file_resource.h (the parent of the five
 ctors that take it), and one `ResourceSourceRequest` sits beside it:
 
 ```c
@@ -965,14 +965,14 @@ The descriptor is embedded rather than spelled as two loose words, so the
 callers pass `&req.src` with no cast; measured byte-exact at all three call
 sites. This unit's local view retired onto it (the local is now `req`, the
 body writes `req.src.buffer`); the `MATCHING` line on the 0x10 size moved to
-the header's type. include/DayTaskStageMap.h `LoadRequest` (DayTask__DayTask)
-and src/app/GameApplicationFileResource.c `LoadModelRequest` (GameApplication__GameApplication)
+the header's type. include/dream_day.h `LoadRequest` (DayTask__DayTask)
+and src/app/game_shell.c `LoadModelRequest` (GameApplication__GameApplication)
 retired onto the same type; their `type`/`path` accessors became
 `src.buffer`/`src.name`, the only ones the compiler listed.
 
 ## Round 97 (alpha): Sony's SVECTOR
 
-GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/SceneNode.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
+GsCOORD2PARAM.rotate is Sony's SVECTOR now (S16Quad_d294 deleted from include/scene_node.h), so the rotation accessors read `rotate.vx`/`.vy`/`.vz` for the old `.x`/`.y`/`.z`. Byte-identical.
 
 ## Round 97 (alpha): Sony's GsCOORDINATE2
 
@@ -981,7 +981,7 @@ SceneNodeSub14 is deleted: SceneNode.coord2 is Sony's GsCOORDINATE2 (flg; MATRIX
 ## Track 6 (round 97, alpha): the request local is ResourceRequest
 
 `ResourceSourceRequest` is deleted. The local is now `ResourceRequest req;`
-(include/FileResource.h, 0x0C) with `mode` left unset; the body is
+(include/file_resource.h, 0x0C) with `mode` left unset; the body is
 unchanged (`req.src...` writes, `&req.src` to New_LinkResource). A plain
 `ResourceSource` (8 bytes) was measured to shrink this function's frame by
 8 and move every callee-save slot, and an unused pad local is dropped by

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80053F84` on 2026-09-23 (tools/rename.py). Address 0x80053f84.
 
-**Unit:** ObjMStyleActor · **Size:** 89 instructions · **Status:** MATCHED (89/89 words)
+**Unit:** dream_scene · **Size:** 89 instructions · **Status:** MATCHED (89/89 words)
 
 ## What this function does
 
@@ -89,7 +89,7 @@ pattern per arm.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`. This
+round 15 (2026-09-04), runner echo, fresh carve `dream_scene`. This
 residue's fix unblocked accurate scoring for the rest of the unit's
 functions in ROM order after it (`ObjM__OnStageMapNotify` onward), which had all
 been reading as near-total mismatches purely from this function's address
@@ -102,12 +102,12 @@ drift.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-Renamed from `ObjM__HandleEvent5Or6` (rename.py): it occupies +0x0B0, which `ObjM__OnNotify` runs for a sender of class id 0x164, FadeBox (include/FadeBox.h), whose stop notifies its parents with 5 after a fade down and 6 after a fade up. The ObjM added that fade box as a child (`ObjM__StartFadeUp`, `ObjM__EnterStyleSession`: the viewport's getSubHandle). On 5 it drops the child, clears the DreamSys's move override and state 0; on 6 it drops the child, sets the viewport's clear colour from the box's getColor (+0x0E4), maps state 0xA to 4 (stopDrift, move override 0) and notifies the parents with the state. Former views ParamM (sender) and FieldM18 (viewport) replaced by FadeBox and NodeGuardedViewport. Tier A for the mechanics.
+Renamed from `ObjM__HandleEvent5Or6` (rename.py): it occupies +0x0B0, which `ObjM__OnNotify` runs for a sender of class id 0x164, FadeBox (include/fade_box.h), whose stop notifies its parents with 5 after a fade down and 6 after a fade up. The ObjM added that fade box as a child (`ObjM__StartFadeUp`, `ObjM__EnterStyleSession`: the viewport's getSubHandle). On 5 it drops the child, clears the DreamSys's move override and state 0; on 6 it drops the child, sets the viewport's clear colour from the box's getColor (+0x0E4), maps state 0xA to 4 (stopDrift, move override 0) and notifies the parents with the state. Former views ParamM (sender) and FieldM18 (viewport) replaced by FadeBox and NodeGuardedViewport. Tier A for the mechanics.
 
 ## Track 7 (2026-09-27, round 98, delta)
 
 Cases named `FADEBOX_EVENT_FADE_DOWN_DONE` / `FADEBOX_EVENT_FADE_UP_DONE`
-(enum FadeBoxEvent, include/FadeBox.h, added this round from FadeBox's
+(enum FadeBoxEvent, include/fade_box.h, added this round from FadeBox's
 banner: stop notifies 5 after a fade down, 6 after a fade up); states
 `OBJM_STATE_IDLE`, `OBJM_STATE_TIME_UP`, `OBJM_STATE_LINK_*`;
 setMoveOverride's 0 is `MOVE_OVERRIDE_NONE`. The three-conjunct guard
@@ -116,4 +116,4 @@ bytes.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The six per-class aliases of `ColorRgb` (include/DrawSystem.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.
+The six per-class aliases of `ColorRgb` (include/draw_system.h) -- BgLayerRgb, BoxFillRgb, FlatLightColor, LightRigRgb, ViewportRgb, TimBlockSrcColor -- are deleted and every use is spelled `ColorRgb`. Byte-identical. Measured for the MATCHING line in TaskCore__SetColors: the whole-struct copy is three `lb` then three `sb`, and rewriting one of the copies byte by byte loads each byte with `lbu` and interleaves the stores (asm-differ on the experiment), so the struct copy stays; the old line's "signed bytes" was wrong (ColorRgb's channels are u8; the lb comes from the block copy, not the type), and the same claim in GraphRoom__BuildGraphPoints' colour comment is corrected.

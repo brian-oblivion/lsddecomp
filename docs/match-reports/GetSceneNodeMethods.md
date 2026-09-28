@@ -9,7 +9,7 @@ Round 12, runner delta. `SceneNode`.
 ## Summary
 
 This unit's own no-argument vtable getter, already well documented in
-`include/SceneNode.h`'s file banner and in `include/class_3bb8c.h` (which
+`include/scene_node.h`'s file banner and in `include/class_3bb8c.h` (which
 calls the same symbol with a different arity from a different unit --
 established cross-unit precedent, not new). Whole body is `lui/addiu
 %hi/%lo(gSceneNodeMethods); jr $ra`.
@@ -39,7 +39,7 @@ jr    $ra
 ### Proposed learning
 
 None new -- this is the same getter/arity-per-call-site precedent already
-documented in `include/SceneNode.h` and `include/class_3bb8c.h`; this round
+documented in `include/scene_node.h` and `include/class_3bb8c.h`; this round
 just supplies the getter's own C body.
 
 ## Naming (round 54, bravo, track 3)
@@ -49,19 +49,19 @@ just supplies the getter's own C body.
 are its whole purpose), following the exact convention this project
 already uses for the same shape elsewhere: `GetCdDriverMethods`,
 `GetGameApplicationMethods`, `GetFileResourceMethods` (all
-`include/GameApplicationFileResource.h`/`CdDriver`'s own file family). Held back
+`include/data_source.h`/`CdDriver`'s own file family). Held back
 from an actual rename because this exact symbol is called, BY NAME,
 from a large number of OTHER units with DIFFERENT per-call-site arities
 and return types (the established "arity/signature is per-call-site,
 not a callee property" precedent this project already documents at
 length -- see this unit's own header banner and `include/class_3bb8c.h`):
-`src/graphics/SceneNode.c`, `src/ui/TitleMenuTaskObjF.c`, `src/world/ObjMStyleActor.c`,
-`src/world/ObjMStyleActor.c`, `src/world/DayTaskStageMap.c`, `src/ui/ScreenWidgets.c`,
-`src/ui/ScreenWidgets.c` (an ACTIVE runner's own unit this exact round),
-`include/class_3bb8c.h`, `include/Task.h`, `include/DreamSys.h`.
+`src/graphics/scene_node.c`, `src/ui/title_menu.c`, `src/world/dream_scene.c`,
+`src/world/dream_scene.c`, `src/world/dream_day.c`, `src/ui/screen_widgets.c`,
+`src/ui/screen_widgets.c` (an ACTIVE runner's own unit this exact round),
+`include/class_3bb8c.h`, `include/task.h`, `include/dream_sys.h`.
 Renaming this symbol would edit every one of those files -- squarely
 out of this round's `SceneNode`-only scope, and a live collision risk
-with this round's `ScreenWidgets` runner. Posted to the broadcast in
+with this round's `screen_widgets` runner. Posted to the broadcast in
 strong terms: this is the single highest-value rename in this unit
 (11 files reference the placeholder name) and the evidence for
 `GetSceneNodeMethods` is as solid as any tier-A name gets, but it
@@ -74,7 +74,7 @@ round's 17 findings where a declaration was actually wrong rather than
 deliberate.
 
 **Callee evidence** (`0x8001E57C`, and the definition at
-`src/graphics/SceneNode.c:736`):
+`src/graphics/scene_node.c:736`):
 
 ```
 8001e57c:  lui   v0,0x8007
@@ -96,10 +96,10 @@ so the declaration has to keep its arity or the call site's bytes change. Here
 it emits nothing — all three call sites already have the value in the register:
 
 ```
-8004a9a0:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnNotify (DayTaskStageMap.c, 2-arg call)
+8004a9a0:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnNotify (dream_day.c, 2-arg call)
 8004a9a4:  move  s2,a2                             ; callee-save SPILL, not argument setup
 
-8004aa88:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnSlotEvent (DayTaskStageMap.c, 2-arg call)
+8004aa88:  jal   8001e57c <GetSceneNodeMethods>   ; StageMap__OnSlotEvent (dream_day.c, 2-arg call)
 8004aa8c:  move  s2,a2                             ; ditto
 
 8004d3e8:  jal   8001e57c <GetSceneNodeMethods>   ; GridCell__GridCell (via include/class_3bb8c.h, 1-arg call)
@@ -121,7 +121,7 @@ reduce either declaration to `(void)` — which is correct and unchanged, since
 `(void)` would make both call sites a `too many arguments` compile error. `()`
 is a different spelling and was never considered.
 
-- `src/world/DayTaskStageMap.c:182` — `extern void *GetSceneNodeMethods(StageMap *self, s32 arg1);` -> `extern void *GetSceneNodeMethods();`
+- `src/world/dream_day.c:182` — `extern void *GetSceneNodeMethods(StageMap *self, s32 arg1);` -> `extern void *GetSceneNodeMethods();`
 - `include/class_3bb8c.h:952` — `extern BaseCtorTableB_3bb8c_c *GetSceneNodeMethods(void *self);` -> `extern BaseCtorTableB_3bb8c_c *GetSceneNodeMethods();`
 
 Return types are untouched (they are this project's multiple-independent-local-views
@@ -150,13 +150,13 @@ ours to change.
 ## Track 4 (2026-09-25, round 81, charlie)
 
 One declaration is left: `extern SceneNodeMethods *GetSceneNodeMethods(void);`
-in `include/SceneNode.h`. The deleted local return-type views were
+in `include/scene_node.h`. The deleted local return-type views were
 `BaseCtorTableB_3bb8c_c` (include/class_3bb8c.h), `FixedBaseTable`
-(src/world/ObjMStyleActor.c), `SceneNodeBaseTable` (src/class_3bb8c_p.c),
-`D6B5CCGetterMethodsCC8C` (include/Task.h) and the untyped `void *` in
-src/world/DayTaskStageMap.c. The one- and two-argument calls in TitleMenuTaskObjF.c and
-DayTaskStageMap.c now pass nothing, because round 59 measured those arguments as
-zero-cost. The raw `+ 0x38`/`+ 0x88` offset calls in DayTaskStageMap.c are now
+(src/world/dream_scene.c), `SceneNodeBaseTable` (src/class_3bb8c_p.c),
+`D6B5CCGetterMethodsCC8C` (include/task.h) and the untyped `void *` in
+src/world/dream_day.c. The one- and two-argument calls in title_menu.c and
+dream_day.c now pass nothing, because round 59 measured those arguments as
+zero-cost. The raw `+ 0x38`/`+ 0x88` offset calls in dream_day.c are now
 `onNotify`/`notifyIfUnk20Active` slot calls. Byte-identical.
 
 ## Round 100 (delta): track 7

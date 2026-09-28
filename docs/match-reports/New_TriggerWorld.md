@@ -2,7 +2,7 @@
 
 > Renamed from `func_80044A0C` on 2026-09-25 (tools/rename.py). Address 0x80044a0c.
 
-Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #7), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 28/28 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTriggerWorldMethods, ob
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
 /* Allocate and construct a gTriggerWorldMethods object; freed and NULL when the constructor fails. */
@@ -44,12 +44,12 @@ void *New_TriggerWorld(s32 arg0) {
 
 ## Naming
 
-- **New_TriggerWorld**, tier B (head review, round 83: was A). DreamAux.c already declares `extern TriggerWorld *func_80044A0C(s32 *ctx)`, and docs/match-reports/FireDreamAuxTriggerEntries.md (a caller in that same unit) already ties this object into the dream-aux trigger system.
-  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (DayTaskStageMap.c round 20 for LinkResource; DreamAux.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
+- **New_TriggerWorld**, tier B (head review, round 83: was A). dream_aux.c already declares `extern TriggerWorld *func_80044A0C(s32 *ctx)`, and docs/match-reports/FireDreamAuxTriggerEntries.md (a caller in that same unit) already ties this object into the dream-aux trigger system.
+  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (dream_day.c round 20 for LinkResource; dream_aux.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
-Now `TriggerWorld *New_TriggerWorld(struct ResourceSource *src)` (include/TriggerWorld.h): the argument is the construction descriptor the ctor hands to ModelData__ModelData, and the object is a TriggerWorld (0x3C bytes, one own field at +0x038). The ctor is still reached through the unprototyped UnprototypedCtorTable view, because MODELDATA_SLOTS types +0x008 returning void while this ctor returns self or NULL. DreamAux's FireDreamAuxTriggerEntries, the one caller, casts its stack array in. Bytes unchanged.
+Now `TriggerWorld *New_TriggerWorld(struct ResourceSource *src)` (include/trigger_world.h): the argument is the construction descriptor the ctor hands to ModelData__ModelData, and the object is a TriggerWorld (0x3C bytes, one own field at +0x038). The ctor is still reached through the unprototyped UnprototypedCtorTable view, because MODELDATA_SLOTS types +0x008 returning void while this ctor returns self or NULL. dream_aux's FireDreamAuxTriggerEntries, the one caller, casts its stack array in. Bytes unchanged.
 
 ## Round 93 polish (charlie, track 7)
 

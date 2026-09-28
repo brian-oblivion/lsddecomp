@@ -2,7 +2,7 @@
 
 > Renamed from `func_80044A7C` on 2026-09-25 (tools/rename.py). Address 0x80044a7c.
 
-Round 82, runner echo (GraphicsResources session, echo #8), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #8), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 34/34 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x008.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable` and `SubBlockTable` sit at the top of
-`src/graphics/GraphicsResources.c`.
+`src/graphics/graphics_resources.c`.
 
 ```c
 /* gTriggerWorldMethods +0x008: constructor -- the parent gModelDataMethods's (third argument
@@ -43,7 +43,7 @@ First build; the same shape as TodSet__TodSet (gTodSetMethods's ctor). The alloc
 ## Naming
 
 - **TriggerWorld__TriggerWorld**, tier B (head review, round 83: was A). Constructor: the parent ModelData's ctor (owns=0), then this table; runs its own Load when the argument's first word is set.
-  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (DayTaskStageMap.c round 20 for LinkResource; DreamAux.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
+  Head review, round 83: the class name rests on one caller's local view type, named by an earlier runner (dream_day.c round 20 for LinkResource; dream_aux.c round 43 for TriggerWorld), not on this body. The body shows mechanics only, so tier B; track 4 may sharpen it.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 

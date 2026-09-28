@@ -489,17 +489,17 @@ by-hand structural one.
 `this->cueServiceActive != 0` (`if (this->cueServiceActive != 0)
 func_8002CD08(...)`), and `DreamSys__StopDrift` calls the sibling
 `FlushSoundCueSet` (a DIFFERENT, already-matched function in
-`PlacementGridVabSound.c`) to tear the same cue set down. A field literally named
+`vab_sound.c`) to tear the same cue set down. A field literally named
 `cueServiceActive` gating the call is about as direct as tier-A evidence
 gets: this is the "service" (per-tick) half of the cue-set's start/stop
-pair, `FlushSoundCueSet` the "flush"/stop half. `include/DreamSys.h` and
+pair, `FlushSoundCueSet` the "flush"/stop half. `include/dream_sys.h` and
 `include/entity.h` both already carried a stale `func_8002CD08/
 FlushSoundCueSet` cross-reference from an earlier round's guess that this
 was the SAME function as `FlushSoundCueSet` -- it is not (confirmed: they
 are two distinct symbols at two distinct addresses, 0x8002CD08 vs
 0x8002CC84, with opposite roles). `rename.py` rewrote every such comment.
 
-Object/field identity (`self`/`set`): confirmed against `PlacementGridVabSound.c`'s
+Object/field identity (`self`/`set`): confirmed against `vab_sound.c`'s
 own `VabStreamObj`/`SoundCueSet`/`SoundCueSlot` and `gVabStreamObjMethods`
 (`tools/classtable.py gVabStreamObjMethods`) -- see the struct comment in
 `src/psyq/libsnd_vmanager.c` above the type definitions, and `FlushSoundCueSet.md`/
@@ -508,15 +508,15 @@ unless noted:
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `Obj179D8CD08` / `Obj179D8CD08Methods` | `VabStreamObj` / `VabStreamObjMethods` | A | same object `PlacementGridVabSound.c` already names; slot offsets match exactly |
+| `Obj179D8CD08` / `Obj179D8CD08Methods` | `VabStreamObj` / `VabStreamObjMethods` | A | same object `vab_sound.c` already names; slot offsets match exactly |
 | `slot80` | `playTone` | A | offset +0x80 == `gVabStreamObjMethods`'s `VabStreamObj__PlayTone` |
 | `slot84` | `stopVoice` | A | offset +0x84 == `VabStreamObj__StopVoice`; same `(self, index)` call shape as `FlushSoundCueSet`'s own call through the identical slot |
 | `slot9C` | `setPitchOffset` | A | offset +0x9C == `VabStreamObj__SetPitchOffset` |
-| `Entry179D8CD08` | `SoundCueSlot` | A | same 0x14-byte-stride struct `PlacementGridVabSound.c` declares |
-| `result` | `index` | A | matches `SoundCueSlot.index` (`PlacementGridVabSound.c`): -1 sentinel, `>= 0` forwarded to `stopVoice` -- identical pattern to `FlushSoundCueSet`'s `if (slot->index >= 0) slot->index = self->methods->slot84(self, slot->index);` |
+| `Entry179D8CD08` | `SoundCueSlot` | A | same 0x14-byte-stride struct `vab_sound.c` declares |
+| `result` | `index` | A | matches `SoundCueSlot.index` (`vab_sound.c`): -1 sentinel, `>= 0` forwarded to `stopVoice` -- identical pattern to `FlushSoundCueSet`'s `if (slot->index >= 0) slot->index = self->methods->slot84(self, slot->index);` |
 | `word0` | `note` | A | `note = e->note * 16` packs directly into `playTone`'s `index` argument (hi/lo split, see `VabStreamObj__PlayTone.md`) |
 | `word1` | `pitchOffset` | A | passed unchanged to `setPitchOffset` |
-| `S179D8CD08` | `SoundCueSet` | A | same object `PlacementGridVabSound.c` names |
+| `S179D8CD08` | `SoundCueSet` | A | same object `vab_sound.c` names |
 | `unk0` | `tag` | A | matches `SoundCueSet.tag`; `> 0` guard here parallels that unit's `!= 0` guard |
 | `unk8` | `owner` | A | matches `SoundCueSet.owner`; passed as `callback`'s first argument unchanged |
 | `entries` | `slots` | A | matches `SoundCueSet.slots` |
@@ -531,13 +531,13 @@ unless noted:
   confirmed against a real Sony signature. Proposed: `volume` / `pan`,
   tier B if adopted.
 - `SoundCueSet.unk4` -- incremented once per `ServiceSoundCueSet` call;
-  `PlacementGridVabSound.c`'s own view of the same struct never reads it. Proposed:
+  `vab_sound.c`'s own view of the same struct never reads it. Proposed:
   `tickCount`, tier B (mechanics-only, purpose in the game not established).
 - `SoundCueSet.unk10` -- zeroed before the callback runs; the callback may
   set it negative to skip processing this tick's slots entirely. No further
   evidence of what a non-negative value beyond 0 means. Proposed:
   `serviceGate` or similar, tier C -- too thin to commit to this pass.
-- `SoundCueSet.unk14` -- matches `PlacementGridVabSound.c`'s own `unk14` (set to the
+- `SoundCueSet.unk14` -- matches `vab_sound.c`'s own `unk14` (set to the
   constant 10 by `InitSoundCueSet`); used here as a divisor
   (`e->word2 - (e->word2/unk14)*unk10`). Purpose beyond "some kind of
   scaling period" not established in either unit.
@@ -550,7 +550,7 @@ not because another unit's file needs editing.
 ## Track 4 (2026-09-26, round 87)
 
 The unit-local `VabStreamObj`/`VabStreamObjMethods` view is gone. The
-function now includes `include/VabStreamObj.h`, and the whole image stays
+function now includes `include/vab_stream_obj.h`, and the whole image stays
 byte-identical. Its three calls use the header's own slot names, which the
 local view already had: `playTone` (+0x080), `stopVoice` (+0x084) and
 `setPitchOffset` (+0x09C). The header names playTone's arguments
@@ -562,8 +562,8 @@ setPitchOffset's argument is an octave: `pitchOffset = octave * 12 - 24`.
 
 ## Track 6 (2026-09-26, round 92, alpha): one SoundCueSet
 
-`include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
-`SoundCueSlot`. It replaced three views: PlacementGridVabSound.c's (named
+`include/sound_cue_set.h` now holds the one definition of `SoundCueSet` and
+`SoundCueSlot`. It replaced three views: vab_sound.c's (named
 `tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
 include/entity.h's `EntityMoodHandlerArg` (all `unkNN`). Zero bytes; the
@@ -576,7 +576,7 @@ reset to -1/0/0x7F/0x40, +0x10 zeroed, callback(owner, set), +0x04
 incremented), FlushSoundCueSet (slot +0x0 through stopVoice, +0x00
 cleared), Entity__GetProximityRatio (+0x14 divisor), the Entity__MoodCueNN
 handlers (+0x04, +0x10, slot 0 +0x4..+0x10, slot 1/2 +0x4/+0x8),
-ObjMStyleActor's StyleCueNN `self` (the same offsets) and DreamSys.h's
+dream_scene's StyleCueNN `self` (the same offsets) and dream_sys.h's
 `SoundCueCallbackArg` (+0x00 == tag 1, +0x04 % 20, slot 0/1 +0x4/+0x8).
 
 Names, tier A, each from what its readers do:
@@ -603,31 +603,31 @@ a pitch offset (that is what setPitchOffset computes from it). `tick` and
 `callback` is typed `SoundCueCallbackFn`, `void (*)(void *owner,
 SoundCueSet *set)`; InitSoundCueSet's parameter takes that type and its
 first parameter is `sound` (it is unused). The three functions have no
-shared prototype: entity.h, DreamSys.c and ObjMStyleActor.c declare them
+shared prototype: entity.h, dream_sys.c and dream_scene.c declare them
 with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.
 
 The comment that stood above libsnd_vmanager.c's local view, moved here:
-round 75 (naming) confirmed `self`/`set` are the objects PlacementGridVabSound.c names
+round 75 (naming) confirmed `self`/`set` are the objects vab_sound.c names
 `VabStreamObj`/`SoundCueSet`: the +0x80/+0x84/+0x9C slots this function
 dispatches are `tools/classtable.py gVabStreamObjMethods`'
 `VabStreamObj__PlayTone`/`StopVoice`/`SetPitchOffset`, and the slot `index`,
 `tag`, `owner` and `slots` usage (the `>= 0`-gated stop-voice call, the
 `> 0` tag guard, callback's first argument) matches. VabStreamObj comes from
-include/VabStreamObj.h since round 87 (track 4). The parameters and locals
+include/vab_stream_obj.h since round 87 (track 4). The parameters and locals
 were renamed with the fields (a0/a1 to sound/set, note/rem1/rem2 to
 toneIndex/vol/endVol).
 
 ## Round 99 (echo, track 7): constants
 
-`-1`/`-2` are SoundCueSet.h's `SOUND_CUE_NONE`/`SOUND_CUE_STOP`; the reset
+`-1`/`-2` are sound_cue_set.h's `SOUND_CUE_NONE`/`SOUND_CUE_STOP`; the reset
 volumes are the new `SOUND_CUE_DEFAULT_VOL` (127, libsnd's full volume) and
 `SOUND_CUE_DEFAULT_END_VOL` (64), whose meaning is `VabStreamObj__PlayTone`'s:
 it keys the tone at `vol` and hands `endVol` to `SsUtAutoVol` as the ramp's
 end. The loop bound is `ARRAY_COUNT(set->slots)`, the tone index `program *
-VAB_TONES_PER_PROG`, defined token-identically to `PlacementGridVabSound.c`'s (the
-move of both `VAB_*` defines into `VabStreamObj.h` is proposed to the head).
+VAB_TONES_PER_PROG`, defined token-identically to `vab_sound.c`'s (the
+move of both `VAB_*` defines into `vab_stream_obj.h` is proposed to the head).
 `e` is `slot`. Byte-identical.
 
 ## History (moved from src/libsnd_vmanager.c, comments pass)

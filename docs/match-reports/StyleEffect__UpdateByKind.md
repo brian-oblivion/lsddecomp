@@ -4,7 +4,7 @@
 
 > Renamed from `func_80056640` on 2026-09-23 (tools/rename.py). Address 0x80056640.
 
-**Unit:** ObjMStyleActor · **Round:** 44 (2026-09-15)
+**Unit:** dream_scene · **Round:** 44 (2026-09-15)
 
 ## Provenance
 
@@ -51,7 +51,7 @@ void StyleEffect__UpdateByKind(LinkNode *self, void *arg1) {
 
 ## Notes
 
-- **`NoOpIgnoreArgs` and `StyleEffect__RandomizeSprites` are `ObjMStyleActor.c` functions with
+- **`NoOpIgnoreArgs` and `StyleEffect__RandomizeSprites` are `dream_scene.c` functions with
   narrower real signatures** (`NoOpIgnoreArgs(void)`, `StyleEffect__RandomizeSprites
   (LinkOwnerObj *this)`) than this call site's two-argument shape. Retail's
   own caller here still sets up the dead second register regardless.
@@ -86,7 +86,7 @@ silent-on-grep semantic errors.
 here the declaration has FEWER parameters than the definition, not more.
 
 **Callee evidence** (`0x80056640`, and the matched definition in
-`src/world/ObjMStyleActor.c`): the body reads both argument registers before writing
+`src/world/dream_scene.c`): the body reads both argument registers before writing
 them, and forwards `$a1` straight on:
 
 ```
@@ -101,7 +101,7 @@ them, and forwards `$a1` straight on:
 (`move a1,s1` at `0x800566D8`, `0x800566EC`, `0x800566FC`). So the definition's
 `void StyleEffect__UpdateByKind(LinkNode *self, void *arg1)` is right: two real arguments.
 
-**Why `src/world/ObjMStyleActor.c`'s one-parameter declaration stays.** Its caller
+**Why `src/world/dream_scene.c`'s one-parameter declaration stays.** Its caller
 `StyleEffect__Update` passes only `self`, and retail sets up nothing else:
 
 ```
@@ -119,7 +119,7 @@ with the difference that here it reproduces retail, so the narrow declaration
 is correct for this unit and must not be widened.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/world/ObjMStyleActor.c:438`. Oracle green.
+added to `src/world/dream_scene.c:438`. Oracle green.
 
 ## Naming
 
@@ -135,12 +135,12 @@ per-frame counter in its one caller, so B.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-ObjMStyleActor.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/StyleEffect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
+dream_scene.c's `LinkNode` view (owner and children under one type) is gone: the owner is `StyleEffect` (include/style_effect.h), `modelChildren` are `Actor *`, `sprites` are `VariantSprite *`, and the local `Vec3S` is `LongVec3`. Accessor renames: `kind` is Actor's `pendingExtra` (+0x054, where the ctor stores it); `offset`/`rotation`/`scale`/`modelChildLayout`/`tableIndex`/`color`/`altColor` are `params.*`; slot `slotB8` is Actor's `setTranslation` on the owner and model children and Sprite's `setColor` on sprites; `*coord2 = 0` is `coord2->flg = 0`. Image byte-identical.
 
 ## Track 6 (round 93, bravo)
 
 The `(u8 *)D_8008ACAC + 0x18` word is now `sStyleEffectViewport`'s, and it is
-Viewport's refView.vp.y (include/Viewport.h, +0x014 refView + 4): the effect
+Viewport's refView.vp.y (include/viewport.h, +0x014 refView + 4): the effect
 follows the viewpoint's vertical movement since sStyleEffectBaseViewY (was
 gTrackedYSnapshot) was taken. PROPOSED for track 7: type the global
 `Viewport *` and read `->refView.vp.y`; spell the switch with

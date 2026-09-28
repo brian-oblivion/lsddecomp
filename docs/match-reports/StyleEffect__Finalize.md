@@ -4,7 +4,7 @@
 
 > Renamed from `func_80056464` on 2026-09-23 (tools/rename.py). Address 0x80056464.
 
-Unit: `ObjMStyleActor` (round 17 continuation). `StyleEffectMethods::dtor`
+Unit: `dream_scene` (round 17 continuation). `StyleEffectMethods::dtor`
 (vtable offset `+0x00C` of `gStyleEffectMethods`) -- calls a teardown helper, then
 tail-calls the shared base class's own dtor (`GetActorMethods()->dtor`) and
 forwards its return.
@@ -30,7 +30,7 @@ confirmed by the disassembly falling straight through the epilogue with
 return type in this unit's own local reading (a fresh `void *` field
 alongside `ctor`) purely because THIS call site's return value is used;
 per the shared getter's already-established per-call-site-typing
-precedent (`ObjMStyleActor.c`, and `class_3bb8c.h`/`SceneNode.h`'s own
+precedent (`dream_scene.c`, and `class_3bb8c.h`/`scene_node.h`'s own
 notes on the sibling symbol `GetSceneNodeMethods`).
 
 ### Proposed learning
@@ -44,11 +44,11 @@ report explicitly contrasts against.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-The base class is unified as `Actor` (`include/Actor.h`). Its +0x00C is the inherited SceneNode `finalize`, whose occupant SceneNode__Finalize returns nothing, so this function no longer returns the base call's value: it is `void`, and the base call a plain statement (`GetActorMethods()->finalize((Actor *)self)`). Same bytes: nothing touches $v0 after the jalr either way. StyleEffect's own table view (`StyleEffectMethods` in ObjMStyleActor.c) still types +0x00C as returning `void *`; that is the subclass's to settle.
+The base class is unified as `Actor` (`include/actor.h`). Its +0x00C is the inherited SceneNode `finalize`, whose occupant SceneNode__Finalize returns nothing, so this function no longer returns the base call's value: it is `void`, and the base call a plain statement (`GetActorMethods()->finalize((Actor *)self)`). Same bytes: nothing touches $v0 after the jalr either way. StyleEffect's own table view (`StyleEffectMethods` in dream_scene.c) still types +0x00C as returning `void *`; that is the subclass's to settle.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-The class's view is now include/StyleEffect.h (round 88); body unchanged, image byte-identical.
+The class's view is now include/style_effect.h (round 88); body unchanged, image byte-identical.
 
 ## Track 7 (2026-09-27, round 96, charlie)
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003DE9C` on 2026-09-24 (tools/rename.py). Address 0x8003de9c.
 
-**Unit:** Task · **Size:** 65 words · **Result:** byte-exact, first attempt
+**Unit:** task · **Size:** 65 words · **Result:** byte-exact, first attempt
 
 ## What it does
 
@@ -84,7 +84,7 @@ Renamed `func_` -> `Obj86B60__SetSlotCursor`. **Tier B**: Un-highlights the item
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__SetSlotCursor (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__SetSlotCursor (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
@@ -92,7 +92,7 @@ Renamed from Obj86B60__SetSlotCursor (tools/rename.py): the class prefix. Occupa
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
 
 ## Track 10 (2026-09-28, round 104, alpha)
 

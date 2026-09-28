@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004B32C` on 2026-09-22 (tools/rename.py). Address 0x8004b32c.
 
-**Unit:** DayTaskStageMap · **Size:** 6 words · **Status:** MATCHED (6/6 words)
+**Unit:** dream_day · **Size:** 6 words · **Status:** MATCHED (6/6 words)
 
 ## What it does
 
@@ -49,7 +49,7 @@ The three numbers, and why they are not a guess:
 - `gridHalfCells = span >> 12` = `0xA000 >> 12` = **10**.
 - The constructor places grid cells `0x800` apart on both axes, and
   `0xA000 / 0x800` = **20**.
-- `DayTaskStageMap`'s `StageMap__SetFootprintVisible` is BYTE-MATCHED and indexes the same cell
+- `dream_day`'s `StageMap__SetFootprintVisible` is BYTE-MATCHED and indexes the same cell
   block with a row stride of **20** (`e->unk10 + slot->h4 + slot->h6 * 20`,
   and `cell += 20 - slot->h8` at each row's end).
 - `StageMap__SetFootprintRect` treats `0x13` = 19 as the last valid column
@@ -61,7 +61,7 @@ an arbitrary bit slice. That is what the names record.
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x074` | `gridSpan` | B | Stored raw here; `DayTaskStageMap`'s `StageMap__ComputeFootprintFromRotation` copies it into a matrix-query template. The world-space extent reading is from the arithmetic above. |
+| `StageMap+0x074` | `gridSpan` | B | Stored raw here; `dream_day`'s `StageMap__ComputeFootprintFromRotation` copies it into a matrix-query template. The world-space extent reading is from the arithmetic above. |
 | `StageMap+0x078` | `gridHalfCells` | B | `span >> 12`, half of `gridCells`. |
 | `StageMap+0x07A` | `gridCells` | B | `span >> 11`; equals the byte-verified row stride. |
 
@@ -78,7 +78,7 @@ so not mine to edit):
 | `Obj866E8` | `unk7A` | `gridCells` | B | as above |
 
 Also posted to the round broadcast. Nothing in THIS unit's build depends on
-them; they are offered because `DayTaskStageMap` reads all three and currently has
+them; they are offered because `dream_day` reads all three and currently has
 only offset names for them.
 
 ## Track 6 (2026-09-26, round 93, alpha)
@@ -92,11 +92,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -111,4 +111,4 @@ an operator decision; not hand-reverted).
 
 ## Track 7 (2026-09-27, round 98, charlie)
 
-`span >> 11` / `>> 12` -> `STAGE_CELL_SHIFT` / `STAGE_CELL_SHIFT + 1` (include/StageMap.h): the span in cells, and half that. Zero bytes.
+`span >> 11` / `>> 12` -> `STAGE_CELL_SHIFT` / `STAGE_CELL_SHIFT + 1` (include/stage_map.h): the span in cells, and half that. Zero bytes.

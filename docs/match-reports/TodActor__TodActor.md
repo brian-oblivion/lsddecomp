@@ -10,7 +10,7 @@
 ## What it does
 
 The constructor for the class at method table `gTodActorMethods` (see
-`src/world/TodActor.c` for the resolved inheritance:
+`src/world/tod_actor.c` for the resolved inheritance:
 `BasicClass -> gActorMethods (intermediate, header 0x34) -> this class`).
 Signature `(self, arg1, arg2)`, matching `New_TodActor`'s call. Sequence:
 
@@ -68,7 +68,7 @@ byte-exact on the first successful build.
 
 ## Notes on the header
 
-The struct/vtable derivation is in `src/world/TodActor.c`. Key point for
+The struct/vtable derivation is in `src/world/tod_actor.c`. Key point for
 future work in this unit: `self->methods->ctor`/`slot_setup5C`/etc. are
 **vtable slots**, resolved indirectly at runtime; calling into
 `TodActor__SetupModelData` (`slot_setup5C`) and `TodActor__Reset` (`slot40`), both still
@@ -95,10 +95,10 @@ Round 75 (charlie), track 3.
 
 - `TodActor__TodActor` (was `class_65650__Constructor`), tier A. Occupies gTodActorMethods +0x008 (`tools/classtable.py gTodActorMethods --vs gActorMethods`: overrides Actor__Actor); chains the base ctor, installs gTodActorMethods, zeroes modelData/mainPart/parts/peer, runs setupModelData, links the model data as a companion, calls initDefaults. `Class__Class` convention; replaces FirecatFG's `class_65650__Constructor`.
 
-### Field and slot names (round 75, TodActor.c)
+### Field and slot names (round 75, tod_actor.c)
 
 Every rename below was made in the struct definition first; the compiler
-listed 162 accessors, all in `src/world/TodActor.c`, and `check-nonmatching.sh`
+listed 162 accessors, all in `src/world/tod_actor.c`, and `check-nonmatching.sh`
 stayed green, so none needed proposing.
 
 | offset | name | tier | evidence |
@@ -106,7 +106,7 @@ stayed green, so none needed proposing.
 | +0x0C | parent | A | SceneNode's +0x0C (code_d294.h `parent`); AttachToParent runs while 0, DetachFromParent while set |
 | +0x14 | coord2 | A | SceneNode's GsCOORDINATE2; Tick zeroes its first word (flg) |
 | +0x24 | tick | B | SceneNode `tick` (tier B there); Tick increments it |
-| +0x50 | companion2 | B | BaseObjO `companion2` (tag-5 companion, ObjMStyleActor.c) |
+| +0x50 | companion2 | B | BaseObjO `companion2` (tag-5 companion, dream_scene.c) |
 | +0x5C | modelData | B | gModelDataMethods instance (header 0x5F03) from New_ModelData or borrowed; supplies part ids, TOD packets, models |
 | +0x60 | ownsModelData | A | 1 when New_ModelData made it, 0 when borrowed; ReleaseModelData releases only when set |
 | +0x64 | unk64 (kept) | C | set by SetUnk64 (1 in InitDefaults), gates TickCallbackA; meaning unknown |
@@ -121,7 +121,7 @@ Method-table slots (TodActorMethods, D800878D4Methods, the part and
 model-data tables) are named for the function `tools/classtable.py` shows
 in each slot. Part views: `attribute` (SceneNode +0x10), `coord2`, and the
 GsCOORDINATE2/GsCOORD2PARAM members `flg`, `tx/ty/tz`, `param`, `scale`,
-`rotate`, `trans` (identified in SceneNode.h).
+`rotate`, `trans` (identified in scene_node.h).
 
 ### Proposed type names (for track 4, not applied)
 
@@ -133,14 +133,14 @@ gModelDataMethods model-data class.
 
 ## Track 4 (2026-09-25, round 85, alpha)
 
-The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/TodActor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+The class (id 0x234, table `gTodActorMethods`) is unified as `TodActor` in `include/tod_actor.h`: an Actor subclass (its ctor chains to Actor's first) and Entity's base. Any source block above is the pre-unification spelling (the local `TodActorMethods` of `include/code_55dd4.h`, `linkCompanion`/`unlinkCompanion`, `companion2`, `Unk5CObj`/`Unk70ElemObj`); the live body in `src/code_55dd4.c` takes the unified types and the inherited slot and field names (`addChild`/`removeChild`, Actor's `ticker`, `Actor *` parts, `ModelData *` modelData), byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 6 (round 93, echo)
 
 Class `Class65650` renamed `TodActor` (`tools/renametype.py Class65650
 TodActor`: the family, `gTodActorMethods`, `New_TodActor`, every
-`TodActor__*` method, the macros, and the header, now `include/TodActor.h`
-with guard `TODACTOR_H`). **Tier A for what it claims**: an Actor whose own
+`TodActor__*` method, the macros, and the header, now `include/tod_actor.h`
+with guard `TOD_ACTOR_H`). **Tier A for what it claims**: an Actor whose own
 methods make one Actor part per TOD object (`CreateParts`, from ModelData's
 `scanPackets`), select a TOD of the ModelData's TodSet (`SetTod`), advance it
 per tick (`Tick`, `PlayTod`/`StopTod`) and write each frame's packets into the

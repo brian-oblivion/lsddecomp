@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003BC14` on 2026-09-23 (tools/rename.py). Address 0x8003bc14.
 
-**Unit:** Task · **Size:** 56 words · **Status:** MATCHED (56/56)
+**Unit:** task · **Size:** 56 words · **Status:** MATCHED (56/56)
 
 ## Summary
 
@@ -80,12 +80,12 @@ meaning.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Its up-calls to TaskCore (include/TaskCore.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Its up-calls to TaskCore (include/task_core.h, track 4 round 84) now go through `GetTaskCoreMethods()` with `self` upcast to `TaskCore *` and TaskCore's slot names; byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BC14. Occupies +0x060 setState and up-calls TaskCore's first: 5 clears `fadingOut`, 7 sets it, 8 aborts the player unless `abortBeforeFade`, 0x12 refreshViewValue.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Was StreamTaskObj__func_8003BC14. Occupies +0x060 setState and up-calls TaskCore's first: 5 clears `fadingOut`, 7 sets it, 8 aborts the player unless `abortBeforeFade`, 0x12 refreshViewValue.
 
 ## Track 4 (2026-09-26, round 89)
 
-The player is a MoviePlayer (`include/MoviePlayer.h`); Task.h's StreamTaskUnkB4Obj view is gone and Task.c's `PLAYER()` casts `player` (still `BasicClass *` in StreamTask.h) to `MoviePlayer *`. The +0x04C call is `abort`. Byte-identical.
+The player is a MoviePlayer (`include/movie_player.h`); task.h's StreamTaskUnkB4Obj view is gone and task.c's `PLAYER()` casts `player` (still `BasicClass *` in stream_task.h) to `MoviePlayer *`. The +0x04C call is `abort`. Byte-identical.

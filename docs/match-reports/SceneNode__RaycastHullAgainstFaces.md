@@ -181,7 +181,7 @@ extern s32 TmdModel__RaycastFaces(void *arg0, s32 *arg1, Vec3S16_d294 *arg2, s32
 extern s32 sHitHeightGate;
 ```
 
-**Note the signature conflicts with `SceneNode.c`'s own existing local
+**Note the signature conflicts with `scene_node.c`'s own existing local
 extern** (`s32 arg3` there, literal `0` at its only call site) -- THIS
 function's own call site passes `&outWord`, a genuine pointer, in that
 position. Both externs are legitimate, independent local views (per this
@@ -366,7 +366,7 @@ the measured mechanics (a plane-membership/clip test, not a specific
 game concept); which planes `self->unk20` holds is not established
 beyond "the same planes `SceneNode__CheckBoundsOverlap` reads." Held
 back from an actual rename because this symbol is referenced (in a
-comment) from `src/graphics/SceneNode.c:414` -- a different unit. Posted to
+comment) from `src/graphics/scene_node.c:414` -- a different unit. Posted to
 the broadcast.
 
 ## Round 55 (charlie): REVISITED (round 55) -- register-identity framing
@@ -378,7 +378,7 @@ unit passed track 3 naming last round. Rebuilt the round-46 preserved body
 live first: reproduces exactly, `build exit=2`, no compile errors,
 `funcdiff.py` confirms **29/199**, no drift, isolated (only this function's
 own `#if 0` wrapper removed; every sibling confirmed still wrapped via
-`grep -c '^INCLUDE_ASM' src/graphics/SceneNode.c`).
+`grep -c '^INCLUDE_ASM' src/graphics/scene_node.c`).
 
 **The round-46 title's own framing -- "register identity: `self` lands in
 $s4 here, $s5 in retail" -- undersells the residue.** Reading
@@ -523,7 +523,7 @@ three candidates found) -- two safe candidates translated and verified
 inert against the real oracle (still 29/199), one candidate rejected
 outright as semantically unsound (reads a bit-mask value where the source
 means a plane-test result) rather than tested. Restored to `INCLUDE_ASM`,
-`git diff --stat src/graphics/SceneNode.c` confirmed clean after the check.
+`git diff --stat src/graphics/scene_node.c` confirmed clean after the check.
 
 ### Proposed learning (round 55)
 
@@ -565,7 +565,7 @@ NON_MATCHING body promoted, round 69
 
 ## Track 6 (round 91, echo)
 
-AttachCornerList_d294b is TmdModel.h's TmdHull and Vec3S16_d294 is TmdVec3. Byte-identical.
+AttachCornerList_d294b is tmd_model.h's TmdHull and Vec3S16_d294 is TmdVec3. Byte-identical.
 
 ## Round 100 (delta): track 7
 
@@ -585,11 +585,11 @@ caller's delta is overwritten with the hit point), `list` -> `hull`; the
 prototype and slot follow. Locals: `mid` -> `center`, `p` -> `c`, `hi` ->
 `opposite`, `v` -> `corner`, `count1` -> `boundsCount`, `plane` -> `bounds`,
 `cnt2` -> `hullCount`, `m` -> `j`, `bigConst` -> `nearest`, `outWord` ->
-`height`. Constants: `0x7FFFFFFF` -> `DIST_NONE` (added to TmdModel.h,
-token-identical to TmdModel.c's own define, which cpp accepts; RaycastFaces
+`height`. Constants: `0x7FFFFFFF` -> `DIST_NONE` (added to tmd_model.h,
+token-identical to tmd_model.c's own define, which cpp accepts; RaycastFaces
 sets `*best = DIST_NONE` itself, so the caller's store is redundant but
 retail's), `>= 0x201` -> `> HIT_HEIGHT_THRESHOLD` 512 (unit-local), the
-corner strides 4 -> `HULL_FACE_CORNERS` (TmdModel.h). The redundant
+corner strides 4 -> `HULL_FACE_CORNERS` (tmd_model.h). The redundant
 `(TmdVec3 *)` casts on TmdVec3 pointers are gone. `u8 pad[0x18]` -> `[24]`.
 
 ### History: the comments in src/code_d294_b.c before this pass, verbatim

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005C7D4` on 2026-09-21 (tools/rename.py). Address 0x8005c7d4.
 
-**Unit:** DreamAux · **Size:** 54 words · **Status:** MATCHED round 43
+**Unit:** dream_aux · **Size:** 54 words · **Status:** MATCHED round 43
 (54/54, byte-exact whole-image build).
 
 ## History
@@ -54,7 +54,7 @@ s32)` signature to be filled in when that function (also queued this round)
 is itself derived; its true parameter types must end up compatible with this
 call site (`a2, record, a0` in that order).
 
-The caller (`ObjMStyleActor.c`, a different unit) has its OWN typed view of
+The caller (`dream_scene.c`, a different unit) has its OWN typed view of
 this function, `extern s32 TryDreamAuxTrigger(s32 arg0, s32 *arg1, void *arg2);`
 (`include/class_3bb8c.h`) -- `s32 *` where this unit reads `s16 *`, and
 `void *` where this unit treats the value as a plain `s32` bitmask (the `& 1`
@@ -103,7 +103,7 @@ the extra `sra` count and final `sll` shift, not off the constant.
 
 ## Naming
 
-**TryDreamAuxTrigger** — tier B. Called externally from `ObjMStyleActor.c`
+**TryDreamAuxTrigger** — tier B. Called externally from `dream_scene.c`
 (`func_8005C7D4(child->unk4->unk34, &out, thing)` at the time of writing).
 Looks up a trigger record by key (`LookupDreamAuxTrigger`); on a hit, either
 dispatches it (`FireDreamAuxTriggerEntries`, whose result it returns) or, on
@@ -113,9 +113,9 @@ a small random/parity chance, silently despawns instead
 broader game meaning of the (value, key, parity) triple it is handed is not
 established from this unit alone, hence B not A.
 
-## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
-Parameters from the caller (ObjM__CheckAuxTrigger, ObjMStyleActor.c): a0 ->
+Parameters from the caller (ObjM__CheckAuxTrigger, dream_scene.c): a0 ->
 `data` (the chunk's loaded data block), a1 -> `chunkKey` (a ChunkCoord read
 as one s16), a2 -> `day` (DreamSys getCurrentDayAndYear); `record` ->
 `trigger`, typed DreamAuxTriggerEntry *. `rand() % 12` stays a literal (a 1

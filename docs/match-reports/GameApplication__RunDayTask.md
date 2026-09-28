@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026698` on 2026-09-24 (tools/rename.py). Address 0x80026698.
 
-**Unit:** GameApplicationFileResource · **Size:** 57 words (0xE4 bytes) ·
+**Unit:** game_shell · **Size:** 57 words (0xE4 bytes) ·
 **Status: MATCHED 57/57**, whole-image SHA1 green. Closed by the head in
 round 8 (2026-09-02).
 
@@ -127,7 +127,7 @@ s32 GameApplication__RunDayTask(GameApplication *self) {
 #endif
 ```
 
-This needs `GameApplication.h`'s `StatusObj`/`StatusObjMethods` (already
+This needs `game_application.h`'s `StatusObj`/`StatusObjMethods` (already
 committed) and the `GameApplication__PlayCinematic` forward declaration (already committed).
 
 ## Derivation and the levers that got this from 1/57 to 53/57
@@ -258,7 +258,7 @@ established from this body alone.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The "StatusObj" is DayTask (gDayTaskMethods, include/DayTask.h):
+The "StatusObj" is DayTask (gDayTaskMethods, include/day_task.h):
 `New_Obj865C8` became `New_DayTask`, and this unit's local
 `StatusObj`/`StatusObjMethods` view was deleted. The body now reads
 `((DayTaskInitFn)obj->methods->init)(obj)` then

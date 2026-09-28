@@ -4,7 +4,7 @@
 
 > Renamed from `func_80025FDC` on 2026-09-24 (tools/rename.py). Address 0x80025fdc.
 
-**Unit:** GameApplicationFileResource · **Size:** 50 instructions (0xC8 bytes) · **Status:** MATCHED (50/50 words, whole-image SHA1 green)
+**Unit:** game_shell · **Size:** 50 instructions (0xC8 bytes) · **Status:** MATCHED (50/50 words, whole-image SHA1 green)
 
 ## What it does
 
@@ -114,7 +114,7 @@ another caller is found that writes them.
 
 ## New struct/header knowledge (recorded in `include/`)
 
-- `include/GameApplication.h`: added `GameApplicationConfig` (the ctor's `arg`
+- `include/game_application.h`: added `GameApplicationConfig` (the ctor's `arg`
   parameter type — only `+0x00` and `+0x14` are read here, observed against
   the one call site's data, `asm/main.s`'s `sGameApplicationConfig` global:
   `{0x13, 0, 1, 1, 1, 1}`), added `LoadModelRequest`, retyped
@@ -124,11 +124,11 @@ another caller is found that writes them.
   to their real pointer types, and declared the small externs this function
   needed (`GetGameApplicationMethods`, `sModelPathDreamE5`, `GetDefaultDataDirectory`, `SetDataDirectory`,
   `New_LinkResource`).
-- `include/DreamSys.h`: extended `struct vtable_DreamSys` past its
+- `include/dream_sys.h`: extended `struct vtable_DreamSys` past its
   previously-documented end (`0x21c`) with 3 padding words and a new named
   slot at `+0x228` (`func_228`), discovered purely from this call site —
   nothing in `DreamSys`'s own unit references it yet. Added the
-  `New_DreamSys` prototype (still `INCLUDE_ASM` in `src/world/DreamSys.c`; this
+  `New_DreamSys` prototype (still `INCLUDE_ASM` in `src/world/dream_sys.c`; this
   is a same-shape cross-unit call as documented in
   `docs/DECOMPILATION_LEARNINGS.md`).
 
@@ -155,7 +155,7 @@ slot+8 shape documented in `docs/research/class-framework.md`.
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The parent class is declared once, in
-`include/Application.h`; the base-ctor call is
+`include/application.h`; the base-ctor call is
 `GetApplicationMethods()->ctor((Application *)self, arg->unk00)`, an upcast
 that emits no code. Bytes unchanged.
 
@@ -181,12 +181,12 @@ Types renamed with it:
   static instance, `{0x13, 0, 1, 1, 1, 1}`, whose words are the data source and
   on/off switches the hooks test (`playStreams`, `showIntroLogos`,
   `pollGraphRoom`). The field that keeps it, `ctorArgs`, is now `config`
-  (header edit; the compiler listed 8 accessors, all in GameApplicationFileResource.c).
+  (header edit; the compiler listed 8 accessors, all in game_shell.c).
 - `Class6D3C8SetDayFn` -> `GameApplicationSeedRandomFn`, following its occupant
   `GameApplication__SeedRandom` (see that report).
 - `Class6D3C8InitSystemsFn` -> `GameApplicationInitSystemsFn`,
   `Class6D3C8Methods` -> `GameApplicationMethods`: the family rename.
-- Header guard `CLASS_6D3C8_H` -> `GAMEAPPLICATION_H` by hand: renametype.py's
+- Header guard `CLASS_6D3C8_H` -> `GAME_APPLICATION_H` by hand: renametype.py's
   upper-case pattern is `CLASS6D3C8`, so an underscored guard is invisible to it.
 
 Kept: `GameApplicationConfig::unk04` (DayTask's ctor passes `unk04 == 0` to
@@ -210,11 +210,11 @@ level the name claims.
 
 ## Track 6 (round 96, delta): the request local is ResourceSourceRequest
 
-src/app/GameApplicationFileResource.c `LoadModelRequest`, `{ s32 type; const char *path; s32 unk08; s32 unk0C; }`, is the same
-0x10-byte record as DayTaskStageMap.c's and the third caller's: the body writes
+src/app/game_shell.c `LoadModelRequest`, `{ s32 type; const char *path; s32 unk08; s32 unk0C; }`, is the same
+0x10-byte record as dream_day.c's and the third caller's: the body writes
 `type = 0` (ResourceSource's NULL `buffer`: no buffer to adopt) and `path`
 (its `name`: the file to request) and passes it to New_LinkResource. It
-retired onto include/FileResource.h's `ResourceSourceRequest` (a
+retired onto include/file_resource.h's `ResourceSourceRequest` (a
 `ResourceSource src` then 8 bytes of padding; tier A: the fields are the
 ctor's own descriptor, read by LinkResource__LinkResource as `src->buffer`
 and `src->name`). The body now writes `req.src.buffer = NULL` and
@@ -224,7 +224,7 @@ size is kept (8 changes the frame, measured on StageMap__PopulateSlotCells).
 ## Track 6 (round 97, alpha): the request local is ResourceRequest
 
 `ResourceSourceRequest` is deleted. The local is now `ResourceRequest req;`
-(include/FileResource.h, 0x0C) with `mode` left unset; the body is
+(include/file_resource.h, 0x0C) with `mode` left unset; the body is
 unchanged (`req.src...` writes, `&req.src` to New_LinkResource). A plain
 `ResourceSource` (8 bytes) was measured to shrink this function's frame by
 8 and move every callee-save slot, and an unused pad local is dropped by
@@ -251,7 +251,7 @@ extern const char sModelPathDreamE5[]; /* "ETC\DREAME5.TMD", asm/data/FA4.rodata
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`GameApplicationConfig::unk14` is `dreamSysConfigOption`, the name charlie gave the DreamSys word it lands in (DreamSys +0x924, `configOption`, set through slot228). Tier B: stored once here (sGameApplicationConfig passes 1); no code reads the word back. Proposed, not applied (DreamSys.h is world's): slot228 -> `getSetConfigOption`.
+`GameApplicationConfig::unk14` is `dreamSysConfigOption`, the name charlie gave the DreamSys word it lands in (DreamSys +0x924, `configOption`, set through slot228). Tier B: stored once here (sGameApplicationConfig passes 1); no code reads the word back. Proposed, not applied (dream_sys.h is world's): slot228 -> `getSetConfigOption`.
 
 ## Track 10 (2026-09-28, round 104, echo)
 

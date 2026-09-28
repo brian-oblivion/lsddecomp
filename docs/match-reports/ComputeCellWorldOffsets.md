@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004B44C` on 2026-09-24 (tools/rename.py). Address 0x8004b44c.
 
-**Unit:** DayTaskStageMap · **Size:** 73 words · **Status:** MATCH (73/73), round 40.
+**Unit:** dream_day · **Size:** 73 words · **Status:** MATCH (73/73), round 40.
 
 ## ROUND 40 (bravo): MATCHED -- first-ever permuter search on this function, zero at iteration 1838
 
@@ -283,7 +283,7 @@ This is the Gate 1b "rebuild before trusting" check, and it matters here
 because round 37 measured roughly one inherited body in six carrying a false
 drift-free claim, plus one body that could never have linked at all (it
 called a symbol since renamed, so its figure had measured nothing). **All
-four preserved bodies in `DayTaskStageMap` were rebuilt this round and all four
+four preserved bodies in `dream_day` were rebuilt this round and all four
 are honest** — `StageMap__FindSlotForPosition` 68/70, `ComputeCellWorldOffsets` 58/73,
 `StageMap__LoadChunksAround` 125/140, `StageMap__PopulateSlotCells` 130/150. No stale figure and no
 never-linked body in this unit.
@@ -298,7 +298,7 @@ Rebuilt the preserved body per Gate 1b before touching anything: confirmed
 58/73, no drift, identical residue at both symmetric blocks
 (`arg0[0]`/outBuf[0] at vram `0x8004B4EC`-`0x8004B510`, `arg0[2]`/outBuf[2] at
 `0x8004B534`-`0x8004B544`). Disassembled both retail's `.s` and
-`build/src/DayTaskStageMap.c.o` side by side to pin the exact mechanism rather
+`build/src/dream_day.c.o` side by side to pin the exact mechanism rather
 than trust the byte-count: **retail reuses the register `a0` (freed the
 moment `a0v`'s last consumer, the `outBuf[2]` addu, executes) to hold the
 `outBuf[0]` reload, and schedules that reload immediately after `arg3->unk4`'s
@@ -360,7 +360,7 @@ Round 78 (track 3, naming pass, bravo).
 
 | symbol | name | tier | evidence |
 | --- | --- | --- | --- |
-| `func_8004B44C` | `ComputeCellWorldOffsets` | B | Free function (no `self` parameter, per the naming convention's `VerbNoun` form for non-methods). Round 40's permuter-found fix hoisted a literal `0x400` used identically in both symmetric output blocks; both blocks compute `(byteN << 11) + outBufN + (halfM + 0x400)`, and `0x800`/`0xA000`/`0x5000` (all powers of the grid's own `0x800` lattice unit and `sDefaultGridSpan`, per `src/world/DayTaskStageMap.c`'s unit header) recur throughout -- consistent with converting a `Descriptor10` grid-cell descriptor plus a base `Unk54Struct` into world-space offsets. The `sum` return value's own meaning is NOT established (no caller-agreed name for it beyond "also returns a scalar derived from the same divisor arithmetic"), so the name covers only the `arg0[]`/`outBuf[]` side, which is the function's dominant, better-evidenced behaviour. |
+| `func_8004B44C` | `ComputeCellWorldOffsets` | B | Free function (no `self` parameter, per the naming convention's `VerbNoun` form for non-methods). Round 40's permuter-found fix hoisted a literal `0x400` used identically in both symmetric output blocks; both blocks compute `(byteN << 11) + outBufN + (halfM + 0x400)`, and `0x800`/`0xA000`/`0x5000` (all powers of the grid's own `0x800` lattice unit and `sDefaultGridSpan`, per `src/world/dream_day.c`'s unit header) recur throughout -- consistent with converting a `Descriptor10` grid-cell descriptor plus a base `Unk54Struct` into world-space offsets. The `sum` return value's own meaning is NOT established (no caller-agreed name for it beyond "also returns a scalar derived from the same divisor arithmetic"), so the name covers only the `arg0[]`/`outBuf[]` side, which is the function's dominant, better-evidenced behaviour. |
 
 ## Track 6 (2026-09-26, round 93, alpha)
 
@@ -373,11 +373,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -394,9 +394,9 @@ an operator decision; not hand-reverted).
 
 Parameters and locals, tier A from the body: `arg0` -> `outPos` (the cell point), `outBuf` -> `chunkPos` (the chunk corner, then +half a chunk, its centre), `arg2` -> `dims`, `arg3` -> `origin`, `arg4` -> `cell`, `idx` -> `row` (the chunk row, `cell->b1`), `factor` -> `rowSpan` (`rows`, or 1 in a vertical grid), `sum` -> `chunkIndex` (column + columns * row, the return value), `v1` -> `x`, `a0v` -> `z`, `off` -> `halfCell`.
 
-Constants: 0x5000 -> `STAGE_CHUNK_SIZE / 2`, 0xA000 -> `STAGE_CHUNK_SIZE`, `<< 11` -> `<< STAGE_CELL_SHIFT`, 0x400 -> `STAGE_CELL_SIZE / 2` (include/StageMap.h; evidence on the definitions). The one-line `/* MATCHING */` on `halfCell` replaces the history below.
+Constants: 0x5000 -> `STAGE_CHUNK_SIZE / 2`, 0xA000 -> `STAGE_CHUNK_SIZE`, `<< 11` -> `<< STAGE_CELL_SHIFT`, 0x400 -> `STAGE_CELL_SIZE / 2` (include/stage_map.h; evidence on the definitions). The one-line `/* MATCHING */` on `halfCell` replaces the history below.
 
-The comment that stood above the function in `src/world/DayTaskStageMap.c`, moved here verbatim (its local names are the pre-track-7 ones):
+The comment that stood above the function in `src/world/dream_day.c`, moved here verbatim (its local names are the pre-track-7 ones):
 
 ```c
 /* MATCH, round 40 (bravo): permuter-found zero, first-ever search on this

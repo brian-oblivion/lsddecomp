@@ -4,7 +4,7 @@
 
 > Renamed from `func_80048F84` on 2026-09-25 (tools/rename.py). Address 0x80048f84.
 
-Round 82, runner echo (third echo session), 2026-09-25. Unit `GameFiles`.
+Round 82, runner echo (third echo session), 2026-09-25. Unit `game_files`.
 Byte-exact on the second build; whole-image SHA1 green, funcdiff 46/46.
 
 ## What it does
@@ -49,7 +49,7 @@ Matched first as `PickStageBgm(s32 index)` passing an uninitialised local as
 SeedAndRandom's second argument (cc1: ``'unused' might be used
 uninitialized``). The body never writes `$a1` before the `jal SeedAndRandom`,
 so the register SeedAndRandom receives is PickStageBgm's own incoming `$a1`,
-and its only caller (ObjM__InitStyleAndWorld, ObjMStyleActor.c) loads it
+and its only caller (ObjM__InitStyleAndWorld, dream_scene.c) loads it
 explicitly (`move a1,zero` at the jal). That is the forwarding idiom:
 PickStageBgm takes a second parameter and forwards it, exactly as
 PickStageTexture does with its `arg1`. Rewritten with the parameter;
@@ -60,7 +60,7 @@ caller's 2-parameter extern now agrees with the definition.
 
 - **Name:** `PickStageBgm`
 - **Tier:** A
-- **Evidence:** random 1-of-5 (or sForcedStageBgm, renamed from gForcedVariant) of GetStageBgmRecords; its caller hands the record to the WBgm's setSeq (ObjMStyleActor.c). Stage 9 skips index 2, BGC.SEQ.
+- **Evidence:** random 1-of-5 (or sForcedStageBgm, renamed from gForcedVariant) of GetStageBgmRecords; its caller hands the record to the WBgm's setSeq (dream_scene.c). Stage 9 skips index 2, BGC.SEQ.
 
 ## Naming history
 
@@ -68,4 +68,4 @@ caller's 2-parameter extern now agrees with the definition.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into CdDriver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes CdDriver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

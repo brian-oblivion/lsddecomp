@@ -4,7 +4,7 @@
 
 > Renamed from `func_80053BE8` on 2026-09-24 (tools/rename.py). Address 0x80053be8.
 
-Unit: `src/world/ObjMStyleActor.c`. Runner: echo, round 16.
+Unit: `src/world/dream_scene.c`. Runner: echo, round 16.
 
 43/43 words, byte-exact. `./build-and-verify.sh` green (whole-image SHA1 verified).
 
@@ -44,7 +44,7 @@ void ObjM__EnterLinkDynamic(Obj87034_3bb8c_l *self) {
   (the class whose table is `gObjMMethods`), a bare `void(Obj87034_3bb8c_l*)`
   dispatch. Added at `+0x09C`, splitting the existing `0x090..0x0C0`
   padding gap additively.
-- `ObjM__StartFadeUp` is the sibling-unit helper (`ObjMStyleActor`, matched by
+- `ObjM__StartFadeUp` is the sibling-unit helper (`dream_scene`, matched by
   echo round 15) already forward-declared in this file for
   `ObjM__EnterLinkWall`'s use; that `extern` declaration was moved earlier in the
   file (still unit-local, not the shared header) since `ObjM__EnterLinkDynamic`
@@ -88,7 +88,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
 
 ## Round 95 (track 7, echo)
 

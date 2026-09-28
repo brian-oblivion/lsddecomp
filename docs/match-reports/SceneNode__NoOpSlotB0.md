@@ -20,7 +20,7 @@ now so track 3's naming pass has somewhere to record the tier decision.
 
 **Kept as `SceneNode__NoOpSlotB0` -- Tier C.** Same shape and same disposition as the
 already-established no-op-stub precedent in this exact class,
-`SceneNode__NoOpSlot5C` (`SceneNode.c`, matched, never renamed): a vtable
+`SceneNode__NoOpSlot5C` (`scene_node.c`, matched, never renamed): a vtable
 override whose entire behavior is "do nothing." Renaming a no-op to
 anything more specific than its offset would assert a purpose ("this
 class disables feature X here") that the empty body cannot support --
@@ -30,7 +30,7 @@ recorded here.
 
 ## Track 6 (round 91, echo): named `SceneNode__NoOpSlotB0`, tier C
 
-Empty. Slot +0x0B0 has no caller; Actor and its subclasses null it. `NoOpSlotNN` precedent. Was `func_8001E49C`. The class was renamed Class6B5CC -> SceneNode in the same pass (include/SceneNode.h's banner has the evidence).
+Empty. Slot +0x0B0 has no caller; Actor and its subclasses null it. `NoOpSlotNN` precedent. Was `func_8001E49C`. The class was renamed Class6B5CC -> SceneNode in the same pass (include/scene_node.h's banner has the evidence).
 
 ## Round 100 (delta): track 7
 

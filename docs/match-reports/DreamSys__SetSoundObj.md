@@ -30,7 +30,7 @@ tree it gives 2/2 words with the whole-image SHA1 verifying.
 
 Scoring note: the head's first pass at rescoring these 14 bodies read numbers
 from a build that had failed to compile (the spliced file was missing echo's
-`#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
+`#include "dream_sys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
 
@@ -43,7 +43,7 @@ Renamed from `func_8005937C`.
 A pure setter for `soundObj`. The field's identity is the
 evidence, and it is cross-unit, three ways:
   1. `FlushSoundCueSet(this->soundObj, this->soundCueSet)` -- that function is
-     matched in src/sound/PlacementGridVabSound.c with the signature
+     matched in src/sound/vab_sound.c with the signature
      `void FlushSoundCueSet(VabStreamObj *self, SoundCueSet *set)`.
   2. This unit reads the same field as an object with a vtable at offset 0 and
      calls +0x84 through it (`DreamSys__StopVoice`). `VabStreamObjMethods::slot84`
@@ -63,14 +63,14 @@ identification comes from other units.
 **None.** Round 66 renamed 31 `struct DreamSys` / `DreamSysUnk5C` fields and 33
 `D_8008xxxx` globals in this unit, and every one of them came back
 compiler-confirmed unit-local: the renames went into the struct DEFINITIONS in
-`include/DreamSys.h` and the only accessors the compiler then listed were in
-`src/world/DreamSys.c` (FINISHING-PLAN track 3 step 3). So there is nothing here for
+`include/dream_sys.h` and the only accessors the compiler then listed were in
+`src/world/dream_sys.c` (FINISHING-PLAN track 3 step 3). So there is nothing here for
 the head to apply by type scope at merge time.
 
 Worth recording because it falsifies a plausible assumption rather than
-confirming one: `DreamSys.h` is shared with four sibling units
-(`ObjMStyleActor/t/r/o`), and a textual `grep` for `unk_0xA4` and `unk_0xA8`
-finds hits in `class_3bb8c_t.c` and `ObjMStyleActor.c` that look exactly like
+confirming one: `dream_sys.h` is shared with four sibling units
+(`dream_scene/t/r/o`), and a textual `grep` for `unk_0xA4` and `unk_0xA8`
+finds hits in `class_3bb8c_t.c` and `dream_scene.c` that look exactly like
 DreamSys accessors. They are fields of unrelated structs with the same
 placeholder spelling -- the round-57 over-count, met again. The compiler said
 so for free; the grep would have cost a revert.

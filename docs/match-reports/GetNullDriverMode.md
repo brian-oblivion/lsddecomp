@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C448` on 2026-09-18 (tools/rename.py). Address 0x8002c448.
 
-Unit `PlacementGridVabSound`. Previously filed as a `gp_rel` stall (round 17); reopened
+Unit `vab_sound`. Previously filed as a `gp_rel` stall (round 17); reopened
 round 42 once `--gp-symbols`/`--no-nop-mflo-mfhi` resolved that blocker for the
 whole project (see `docs/research/gp-relative-blocker.md`, "RESOLVED").
 
@@ -66,7 +66,7 @@ place.
 ## Naming
 
 Renamed `func_8002C448` -> `GetNullDriverMode`, tier B. Evidence:
-`GameApplicationFileResource.c`'s own `func_80026FAC` calls `GetCdDriverMode()` when
+`game_shell.c`'s own `func_80026FAC` calls `GetCdDriverMode()` when
 `sActiveDataSource == 0x13`, else calls this function -- a direct,
 call-site-level substitution for a named Sony "get driver mode" accessor,
 confirming this backend's own `sNullDriverMode`/`sNullDriverModeArg` pair
@@ -76,11 +76,11 @@ itself) is not established, only that it's read/written alongside the mode.
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/app/GameApplicationFileResource.c`'s `(void)` declaration stays.
+**Verdict: arity-ok idiom.** `src/app/game_shell.c`'s `(void)` declaration stays.
 Identical in shape to `GetCdDriverMode`, its sibling on the previous line.
 
 **Callee evidence** (`0x8002C448`): the first instruction is `beqz a0,...`, so
-`$a0` is read before it is written. The definition in `src/sound/PlacementGridVabSound.c`
+`$a0` is read before it is written. The definition in `src/sound/vab_sound.c`
 (`s32 GetNullDriverMode(s32 *arg0)`) is right: one real argument, an optional
 out-pointer written only when non-NULL.
 
@@ -98,10 +98,10 @@ consumes it. A real one-parameter prototype would force an argument retail does
 not have.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/app/GameApplicationFileResource.c:231`. Oracle green.
+added to `src/app/game_shell.c:231`. Oracle green.
 
 ## Round 98 (charlie, track 7): parameter
 
 `arg0` -> `outMode2`, after the CD driver's `GetCdDriverMode(s32 *outMode2)`
-(CdDriver.c): GameApplicationFileResource.c's `GetActiveDataSourceDriverMode` forwards to
+(cd_driver.c): game_shell.c's `GetActiveDataSourceDriverMode` forwards to
 one or the other, so they answer the same query.

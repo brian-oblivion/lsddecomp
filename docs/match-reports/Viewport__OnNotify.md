@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003E8B8` on 2026-09-23 (tools/rename.py). Address 0x8003e8b8.
 
-Unit: `Task`. Round 14, runner delta. 44/44 words, full match.
+Unit: `task`. Round 14, runner delta. 44/44 words, full match.
 
 ## Signature
 
@@ -56,18 +56,18 @@ finding.
 
 ## Header changes
 
-`include/Task.h`: `Unk18ObjMethods` gains `slot94`/`slot98` (both
+`include/task.h`: `Unk18ObjMethods` gains `slot94`/`slot98` (both
 `void (*)(Unk18Obj*, GenericObj*, s32)`, occupants `Viewport__OnFrameClockEvent`/
 `Viewport__OnDrawSystemEvent`, still queued as of this report) plus the corrective
 `pad09C` gap described above.
 
 ## Naming
 
-`Unk18Obj__OnNotify` -- tier A. Body is a supercall to `GetBasicClassMethods()->onNotify` followed by dispatch on the sender's dynamic-class tag nibble (5 -> slot94, 1 -> slot98) -- the exact override shape already established and named for `BasicClass__OnNotify`/`SceneNode__OnNotify` (`include/code_8220.h`, `src/graphics/SceneNode.c`). Matching an adopted, cross-class convention rather than a fresh guess.
+`Unk18Obj__OnNotify` -- tier A. Body is a supercall to `GetBasicClassMethods()->onNotify` followed by dispatch on the sender's dynamic-class tag nibble (5 -> slot94, 1 -> slot98) -- the exact override shape already established and named for `BasicClass__OnNotify`/`SceneNode__OnNotify` (`include/code_8220.h`, `src/graphics/scene_node.c`). Matching an adopted, cross-class convention rather than a fresh guess.
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__OnNotify`. The +0x038 onNotify override: after the base, a class-5 sender (FrameClock) goes to +0x094 onNotifyTag5 and a class-1 sender (DrawSystem) to +0x098 onNotifyTag1. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__OnNotify`. The +0x038 onNotify override: after the base, a class-5 sender (FrameClock) goes to +0x094 onNotifyTag5 and a class-1 sender (DrawSystem) to +0x098 onNotifyTag1. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
 
 
 ## Track 7 (round 100, echo, polish pass)

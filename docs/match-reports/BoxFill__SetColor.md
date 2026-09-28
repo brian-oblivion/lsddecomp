@@ -2,7 +2,7 @@
 
 > Renamed from `Obj6EAC0__SetColor` on 2026-09-25 (tools/rename.py). Address 0x8004076c.
 
-Unit: `src/ui/ScreenWidgets.c`. No prior report on file (oversight -- this is
+Unit: `src/ui/screen_widgets.c`. No prior report on file (oversight -- this is
 a genuine one-line wrapper, not a splat-generated trivial body).
 
 ```c
@@ -29,4 +29,4 @@ what the code does, nothing more to guess at.
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/BoxFill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetColor`: the +0x0B8 occupant, BoxFill's own slot `setColor`. It copies (or, with `overwrite` 0, adds) three bytes into +0x064, the GsBOXF r,g,b DrawNode sorts (tier A). Callers: Reset (the ctor's colour), GraphRoom__TickHighlight (1, &sGraphPointHighlightColor), FadeBox's fades (1, a table entry).
+Class 0x64 (was D_8006EAC0) is unified as BoxFill in include/box_fill.h: Viewport__DrawNode draws a node whose class-id low byte is 0x64 with GsSortBoxFill over the GsBOXF at +0x058 (pri +0x044, `relative` +0x048, x/y +0x050/+0x054). The body now takes `BoxFill *`; zero bytes changed. Renamed from `Obj6EAC0__SetColor`: the +0x0B8 occupant, BoxFill's own slot `setColor`. It copies (or, with `overwrite` 0, adds) three bytes into +0x064, the GsBOXF r,g,b DrawNode sorts (tier A). Callers: Reset (the ctor's colour), GraphRoom__TickHighlight (1, &sGraphPointHighlightColor), FadeBox's fades (1, a table entry).

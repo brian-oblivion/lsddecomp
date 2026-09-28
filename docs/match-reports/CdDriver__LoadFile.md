@@ -18,7 +18,7 @@ the six assigned before `CdDriver__RunRequestQueue`.
 extern void FileResource__LoadFile(void);
 extern void *sCdSavedSeekParam;
 
-/* generic doubly-linked-list node, 0x24 bytes (src/cd/CdDriver.c's own
+/* generic doubly-linked-list node, 0x24 bytes (src/cd/cd_driver.c's own
  * reading); only offset 0x0 is touched here -- declared LOCAL, per the
  * project's multiple-local-views convention. */
 typedef struct Node8008A894 {
@@ -230,24 +230,24 @@ at slot `+0x058`. The prefix names the table, not the developers' class.
 ## Proposed field names
 
 For the head to apply by type scope (out of unit). `FileResource__LoadFile`
-(GameApplicationFileResource), the base method this function overrides and calls in sync
+(game_shell), the base method this function overrides and calls in sync
 mode, drives these slots in the order open, size query, alloc, rewind, read,
 close; the one class that fills them (`gCdDriverMethods`) fills them with the
 methods named here.
 
 | unit | type | field | proposed | tier | evidence |
 | --- | --- | --- | --- | --- | --- |
-| include/GameApplicationFileResource.h | `FileResourceMethods` | `configureBuffer` (+0x44) | `open` | A | called with the file name first; override is `CdDriver__Open` |
-| include/GameApplicationFileResource.h | `FileResourceMethods` | `bufferControl` (+0x4C) | `seek` | B | called `(0, 2)` for the size and `(0, 0)` to rewind; override is `CdDriver__Seek` |
-| include/GameApplicationFileResource.h | `FileResourceMethods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `CdDriver__Read` |
-| include/GameApplicationFileResource.h | `FileResource` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
+| include/data_source.h | `FileResourceMethods` | `configureBuffer` (+0x44) | `open` | A | called with the file name first; override is `CdDriver__Open` |
+| include/data_source.h | `FileResourceMethods` | `bufferControl` (+0x4C) | `seek` | B | called `(0, 2)` for the size and `(0, 0)` to rewind; override is `CdDriver__Seek` |
+| include/data_source.h | `FileResourceMethods` | `installBuffer` (+0x54) | `read` | A | called with the new buffer and its size; override is `CdDriver__Read` |
+| include/data_source.h | `FileResource` | `pendingGeneration` (+0x0C) | `isOpen` | B | same offset as `Class6D4E8::isOpen`; AllocBuffer zeroes it before calling `open` (which opens only when it is 0) and restores it after `close` |
 
-Also noted for whoever names GameApplicationFileResource again: `FileResource__LoadFile`
+Also noted for whoever names game_shell again: `FileResource__LoadFile`
 opens, sizes, allocates for, reads and closes a named file, i.e. it is the
 base-class LoadFile. Not renamed here (out of unit).
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__LoadFile` -> `CdDriver__LoadFile` by rename.py. The arg-less FileResource__LoadFile call goes through the LoadFileNoArgsFn cast (no code) now that FileResource.h's prototype is in scope.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/cd_driver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__LoadFile` -> `CdDriver__LoadFile` by rename.py. The arg-less FileResource__LoadFile call goes through the LoadFileNoArgsFn cast (no code) now that file_resource.h's prototype is in scope.
 
 ## History (moved from code_179d8_s.c, round 100)
 

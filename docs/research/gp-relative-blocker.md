@@ -182,7 +182,7 @@ unit.
 
 ## Scope
 
-**As first written (2026-08-29):** at minimum 8 functions in `GameApplicationFileResource`
+**As first written (2026-08-29):** at minimum 8 functions in `game_shell`
 (runner/delta) and 1 in `Pad` (runner/alpha). Almost certainly far
 more — any function touching a small-data global is affected, and `$gp`
 addressing is pervasive in retail. This likely gates a large fraction of the
@@ -213,9 +213,9 @@ queue.** Round 27 rewrote Gate 2 in `docs/PARALLEL-RUNS.md` accordingly:
 true for twenty rounds and is now false.
 
 The `gp_rel` load in the live queue also concentrates, which matters for
-judging what a fix would return: `GameApplicationFileResource` (14), `DreamSys` (13),
-`DreamAux` (8) and `PlacementGridVabSound` (8) hold over half of it between them.
-`GameApplicationFileResource` is 14 of its 27 queued functions and `DreamAux` is 8 of 17 —
+judging what a fix would return: `game_shell` (14), `DreamSys` (13),
+`dream_aux` (8) and `vab_sound` (8) hold over half of it between them.
+`game_shell` is 14 of its 27 queued functions and `dream_aux` is 8 of 17 —
 two units a fix would roughly halve on its own.
 
 Do not read these figures as current; re-run the two commands. The SHAPE is

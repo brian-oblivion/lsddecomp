@@ -2,13 +2,13 @@
 
 > Renamed from `func_8004F40C` on 2026-09-20 (tools/rename.py). Address 0x8004f40c.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 38 words (0x98) · **Status:** MATCH
+**Unit:** title_menu · **Size:** 38 words (0x98) · **Status:** MATCH
 
 ## The class this unit's back half operates on
 
 Every function from here through `TaskObjF__OnNotify` in this unit shares one
 object type — call it `TaskObjF` — that is **not** `Obj866E8`
-(DayTaskStageMap/c/d/e's class) and not any previously-documented class in
+(dream_day/c/d/e's class) and not any previously-documented class in
 this codebase. Established from first principles across this whole batch:
 
 - `TaskObjF`'s vtable pointer sits at offset 0, and its first several
@@ -27,7 +27,7 @@ this codebase. Established from first principles across this whole batch:
 
 `include/class_3bb8c.h` gets a new, purely additive section
 (`TaskObjF`/`TaskObjFMethods`) for this — a second independent local view
-in the same file as `Obj866E8`, same policy as `DayTaskStageMap.h`'s
+in the same file as `Obj866E8`, same policy as `dream_day.h`'s
 `StageMapMethods` vs. this file's own `Obj866E8Methods`.
 
 ## What TaskObjF__ForEachEvent does
@@ -114,7 +114,7 @@ Sony's TestEvent, and TaskObjF's `field14` became `events` in round 60.
 `flag` -> `critical` (it brackets the loop in Enter/ExitCriticalSection);
 `i < 4` -> `i < ARRAY_COUNT(self->events)`. Zero bytes.
 
-### Moved from src/ui/TitleMenuTaskObjF.c
+### Moved from src/ui/title_menu.c
 
 ```c
 /* Psy-Q's kernel critical-section pair (libapi/a36, libapi/a37, linked from

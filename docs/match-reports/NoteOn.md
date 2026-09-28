@@ -564,7 +564,7 @@ guaranteeing they will move.
 
 ## Round 97 types pass (echo)
 
-code_179d8_k's local `Entry90902E8` view retired onto `include/SsScore.h`:
+code_179d8_k's local `Entry90902E8` view retired onto `include/ss_score.h`:
 the same 0xAC-byte (`SS_SEQ_TABSIZ`) `_ss_score[access][seq]` record that
 libsnd_cres, libsnd_decre and libsnd_vmanager already use. The header gained
 this unit's fields by splitting padding (no offset, size or existing type
@@ -583,7 +583,7 @@ enable flag". It is the sequence's left volume (`SpuVmSetSeqVol` stores voll
 there, clamped to 0x7F; `SpuVmSetVol` scales by it / 127). NoteOn's only use
 is `lhu 0x74` then `beqz` to the return, ahead of both the key-on and key-off
 arms, so a sequence whose left volume is 0 plays no note events. That is one
-use of the volume, not a second meaning; SsScore.h's comment now says both.
+use of the volume, not a second meaning; ss_score.h's comment now says both.
 No reader needed a signedness change (`lhu` here, `u16` in the header).
 
 The old local comment's other readings, kept for the record: `unk88` "a

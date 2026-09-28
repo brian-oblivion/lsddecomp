@@ -4,7 +4,7 @@
 
 > Renamed from `func_80044B88` on 2026-09-25 (tools/rename.py). Address 0x80044b88.
 
-Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #9), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 52/52 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -20,7 +20,7 @@ Table slot (`tools/classtable.py`): gTriggerWorldMethods +0x078.
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/graphics/GraphicsResources.c`.
+top of / earlier in `src/graphics/graphics_resources.c`.
 
 ```c
 /* gTriggerWorldMethods +0x078: build a gModelDataMethods source (not owning) over each
@@ -67,7 +67,7 @@ First build. The loop pointer walks `buf->entries` while the offset is re-read t
 
 ## Track 4
 
-2026-09-25, round 84 (delta): Its parent ModelData (gModelDataMethods) is unified in `include/ModelData.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((ResourceSource *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
+2026-09-25, round 84 (delta): Its parent ModelData (gModelDataMethods) is unified in `include/model_data.h` (this class is still its own job). The part allocation reads `*p = (s32)New_ModelData((ResourceSource *)&req)` (was `(s32)&req`), a pointer cast with no code. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88, bravo)
 
@@ -78,13 +78,13 @@ ModelData__BuildResources; this is TriggerWorld's override of that same step
 failure path calls +0x07C, ModelData's `releaseResources` slot, whose
 TriggerWorld occupant is now TriggerWorld__ReleaseResources. Named after the
 parent's occupant so the pair reads as one. Class unified in
-`include/TriggerWorld.h`.
+`include/trigger_world.h`.
 
 Retyped in the same round: `self` is `TriggerWorld *`, +0x038 is `modelDataCount` (was DataSrc33808.unk38), and the failure path calls `releaseResources(self)` (was the unit-local `slot7C`). Bytes unchanged.
 
 ### Track 6 (round 97, alpha)
 
-The request local is now include/FileResource.h's `ResourceRequest`
+The request local is now include/file_resource.h's `ResourceRequest`
 (`{ ResourceSource src; s32 mode; }`), and ResourceRequest__Set's prototype
 comes from that header. The unit's own view of the record and its local
 extern are gone. `req.buffer`/`req.name` become `req.src.buffer`/`req.src.name`, and

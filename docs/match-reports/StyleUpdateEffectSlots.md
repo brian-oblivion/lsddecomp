@@ -1,4 +1,4 @@
-# StyleUpdateEffectSlots -- MATCHED (34/34 words), ObjMStyleActor
+# StyleUpdateEffectSlots -- MATCHED (34/34 words), dream_scene
 
 > Renamed from `func_80054C74` on 2026-09-23 (tools/rename.py). Address 0x80054c74.
 
@@ -81,7 +81,7 @@ triad. MATCHED, 34/34, first build.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-The `ObjE0C8` view is gone: each slot is a `StyleEffect` (include/StyleEffect.h) and the +0x0EC call is StyleEffect__Update through `StyleEffectUpdateFn` (the slot keeps Actor's `setPendingExtra` type; a cast, no code). `arg0` is the position (`LongVec3 *`), which Update forwards to UpdateByKind. Image byte-identical.
+The `ObjE0C8` view is gone: each slot is a `StyleEffect` (include/style_effect.h) and the +0x0EC call is StyleEffect__Update through `StyleEffectUpdateFn` (the slot keeps Actor's `setPendingExtra` type; a cast, no code). `arg0` is the position (`LongVec3 *`), which Update forwards to UpdateByKind. Image byte-identical.
 
 ## Round 93 polish (delta, track 7)
 

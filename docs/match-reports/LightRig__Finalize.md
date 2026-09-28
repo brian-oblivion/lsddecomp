@@ -4,7 +4,7 @@
 
 > Renamed from `func_80042790` on 2026-09-25 (tools/rename.py). Address 0x80042790.
 
-Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior body attempt.
+Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/sprite.c`. Fresh ground, no prior body attempt.
 
 - **Where:** gLightRigMethods slot +0x00C (finalize) (`tools/classtable.py`).
 - **What:** For i = 0..2, fetches child i through its own slot +0x0B8 (LightRig__GetLight) and calls that child's release (+0x004); then SceneNode's finalize via `GetSceneNodeMethods()`.
@@ -34,7 +34,7 @@ void LightRig__Finalize(LightRig *self) {
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__Finalize`, tier A: slot +0x00C. `self` is `LightRig *` (was `D_8006EFACObj`); the +0x0B8 call is now `getLight` (was `getChild`). The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/light_rig.h`. Renamed from `D8006EFAC__Finalize`, tier A: slot +0x00C. `self` is `LightRig *` (was `D_8006EFACObj`); the +0x0B8 call is now `getLight` (was `getChild`). The Source block above is the unified spelling. Image byte-identical.
 
 ## Track 7 (round 99, charlie)
 

@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004232C` on 2026-09-25 (tools/rename.py). Address 0x8004232c.
 
-Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/sprite.c`. Fresh ground, no prior attempt.
 
 - **Where:** gRequestedFileMethods slot +0x008 (ctor; the object New_RequestedFile allocates).
 - **What:** calls the base ctor (slot +0x008 of `GetActiveDataSourceMethods()`) on self, installs the gRequestedFileMethods table (`GetRequestedFileMethods()`), clears +0x02C, and if `name` is non-NULL copies it into a 32-byte stack buffer with `strcpy` and passes the buffer to slot +0x06C.
@@ -51,13 +51,13 @@ void RequestedFile__RequestedFile(D_8006EED8Obj *self, char *name) {
 
 ## Track 4 (2026-09-26, round 87, delta)
 
-Class id 0xB03 is unified as `RequestedFile` in `include/RequestedFile.h`
+Class id 0xB03 is unified as `RequestedFile` in `include/requested_file.h`
 (FILERESOURCE_SLOTS/FIELDS, 0x30 bytes, one own field `loaded` at +0x02C). The
 unit-local views `D_8006EED8Obj`/`D_8006EED8Methods` and the single-slot cast
 views `Slot0CMethods_322b4`, `Slot08Arg0Methods_322b4` and
 `CtorArg1Methods_322b4` are gone; `GetActiveDataSourceMethods` is declared
 `FileResourceMethods *`. The Source block above is the round-82 text; the live
-body in `src/graphics/Sprite.c` is byte-identical.
+body in `src/graphics/sprite.c` is byte-identical.
 
 Renamed from `D8006EED8__D8006EED8` with rename.py (the class name).
 `flag2C` is `loaded`: the only setter of 1 is `RequestedFile__MarkLoaded`, the
@@ -81,11 +81,11 @@ name because the only thing known beyond those mechanics was the caller's use
 (WBgm loads SEQ files through it); a mechanics name sidesteps that objection
 rather than overriding it, and `SeqFile` was rejected for the same reason.
 The table and getter followed (`gRequestedFileMethods`,
-`GetRequestedFileMethods`), and the header moved to `include/RequestedFile.h`.
+`GetRequestedFileMethods`), and the header moved to `include/requested_file.h`.
 renametype.py also rewrote the old class name inside earlier sections'
 history prose in this and sibling reports (known, pending an operator
 decision; not hand-reverted).
 
 ## Track 7 (round 99, charlie)
 
-`char buf[32]` -> `char nameCopy[REQUESTEDFILE_NAME_SIZE]` (32, include/RequestedFile.h). Byte-exact.
+`char buf[32]` -> `char nameCopy[REQUESTEDFILE_NAME_SIZE]` (32, include/requested_file.h). Byte-exact.

@@ -1,0 +1,62 @@
+#ifndef TOD_SET_H
+#define TOD_SET_H
+
+#include "tod.h"
+
+/*
+ * TodSet -- a Tod subclass (class id 0x14F03, method table gTodSetMethods) over
+ * a buffer holding several TOD animations: a counted offset table, one Tod
+ * per entry, then the packet data. Methods in src/graphics/graphics_resources.c; no
+ * subclasses. Its parent is its id parent: TodSet__TodSet's first call is
+ * GetTodMethods()->ctor.
+ *
+ * What its own methods do: TodSet__BuildTods (its
+ * +0x064) makes one Tod per entry of the buffer's counted offset table
+ * (New_Tod over buffer + entries[i]) and stores each back into the table's
+ * own word; TodSet__Finalize releases that array (ReleaseBasicClassArray);
+ * TodSet__ScanPackets (+0x078) runs Tod's +0x07C scanner over the data past
+ * the counted array. ModelData builds one over its buffer past +0x0C
+ * (ModelData__BuildResources: New_TodSet) and forwards its TOD packet scans
+ * to it (ModelData.todSet, still declared `FileResource *` in
+ * include/model_data.h).
+ *
+ * NO OWN SLOTS: the table is Tod's 0x84 bytes, with +0x008, +0x00C, +0x064
+ * and +0x078 overridden (`classtable.py gTodSetMethods --vs gTodMethods`).
+ * +0x064 keeps the inherited name `onRequestDone` and its void type; the occupant
+ * TodSet__BuildTods returns s32 (0 when every Tod was built), and the ctor
+ * casts the call, as ModelData__ModelData casts its own. +0x078 is
+ * FileResource's processBuffer (NULL there); TodSet__ScanPackets occupies it, as
+ * Tod__ScanPackets does in Tod's table.
+ *
+ * NO OWN FIELDS: the object is 0x2C bytes (New_TodSet), Tod's size.
+ *
+ * The ctor returns self or NULL (New_TodSet tests it), but TOD_SLOTS
+ * declares +0x008 returning void, as Tod's own ctor does; the allocator
+ * reaches it through graphics_resources.c's unprototyped UnprototypedCtorTable view, as every
+ * allocator in that unit does. The descriptor is include/file_resource.h's
+ * ResourceSource.
+ */
+
+struct ResourceSource;
+
+typedef struct TodSet TodSet;
+typedef struct TodSetMethods TodSetMethods;
+
+struct TodSetMethods {
+    TOD_SLOTS(TodSet, (TodSet * self, struct ResourceSource *src));
+};
+
+struct TodSet {
+    TOD_FIELDS(TodSetMethods);
+};
+
+extern TodSetMethods gTodSetMethods;
+extern TodSetMethods *GetTodSetMethods(void);
+
+TodSet *New_TodSet(struct ResourceSource *src);
+void *TodSet__TodSet(TodSet *self, struct ResourceSource *src);
+void TodSet__Finalize(TodSet *self);
+s32 TodSet__BuildTods(TodSet *self);
+u8 TodSet__ScanPackets(TodSet *self, u8 *out, u32 *sel);
+
+#endif

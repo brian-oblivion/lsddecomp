@@ -73,14 +73,14 @@ usual switch.
 **Round 81 (delta), track 3.** Renamed `func_8003B110` -> `Application__RunMainLoop`.
 **Tier B**: "runs forever while initialized, dispatching the subclass's own
 state-machine slots" is evident from the body alone; "main loop" is
-corroborated by `include/GameApplication.h`'s own note that this is the slot
+corroborated by `include/game_application.h`'s own note that this is the slot
 "first dispatched by main" (`src/main.c`), but that is one caller, not two
 agreeing ones, so it stays B rather than A.
 
 ## Track 4
 
 **2026-09-25, round 84 (echo).** The class is declared once, in
-`include/Application.h`. The six slots this function calls, +0x050..+0x064,
+`include/application.h`. The six slots this function calls, +0x050..+0x064,
 are NULL words in gApplicationMethods's own data (the table is 0x68 bytes, past the 19
 slots classtable.py prints); they are named for the subclass's occupants
 (`loadIntroLogoSequence`, `startWeeklyStreamTask`, `pollGraphRoomStatus`,
@@ -90,12 +90,12 @@ GameApplication__RunDayTask, returns `s32`. Bytes unchanged.
 
 ## Track 7 (round 101, charlie)
 
-The status literals are `enum ApplicationLoopStatus` (include/Application.h):
+The status literals are `enum ApplicationLoopStatus` (include/application.h):
 `APPLICATION_LOOP_OPENING` (0, the `break` back to +0x054),
 `APPLICATION_LOOP_SLOT5C` (1, +0x05C then `continue`) and
 `APPLICATION_LOOP_DAY` (2, +0x060 and, on nonzero, +0x064). Evidence: this
 body's own dispatch; the names follow the hooks', which are named for
-GameApplication's occupants, and agree with GameApplication.h's
+GameApplication's occupants, and agree with game_application.h's
 `GameApplicationLoopStatus` (0 = OPENING, 2 = DAY; its RunTitleMenu never
 returns 1). Tier B, like the hook names. Byte-identical. The Final C above is
 the pre-track-7 text.

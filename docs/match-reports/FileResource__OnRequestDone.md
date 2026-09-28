@@ -6,7 +6,7 @@
 
 > Renamed from `func_80026C88` on 2026-09-18 (tools/rename.py). Address 0x80026c88.
 
-**Unit:** GameApplicationFileResource · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** game_shell · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 ## What it does
 
@@ -27,7 +27,7 @@ jr    $ra
 
 Read-modify-write on a single word, no other fields touched. `$a0` is treated
 as `struct-pointer + 0x24`, so it gets a minimal local struct (`FileResource`
-in `include/GameApplicationFileResource.h`) with padding up to that offset — following
+in `include/data_source.h`) with padding up to that offset — following
 CLAUDE.md's guidance to name a field rather than write raw pointer arithmetic,
 while being honest that nothing earlier than `0x24` is known yet:
 
@@ -65,14 +65,14 @@ Mechanics fully known (sets bit 0); what bit 0 signals in the game is not
 established, so named for the mechanic only.
 
 **Field renamed alongside it.** `unknown_value_0x24` -> `flags` (in
-`include/GameApplicationFileResource.h`'s `FileResource`): `grep -rn -- '->unknown_value_0x24\b'
-src/` had zero hits outside `GameApplicationFileResource.c`, so unlike almost every other
+`include/data_source.h`'s `FileResource`): `grep -rn -- '->unknown_value_0x24\b'
+src/` had zero hits outside `game_shell.c`, so unlike almost every other
 field in this struct (see `## Proposed field names
 
 **APPLIED by the head at merge, round 52** -- all four fields, both types
 and all five vtable slots below are now in the tree, each one applied
 separately with `./build-and-verify.sh` green and byte-exact after it. One
-mis-hit had to be resolved by receiver type: `src/cd/CdDriver.c:143`
+mis-hit had to be resolved by receiver type: `src/cd/cd_driver.c:143`
 accesses `pendingGeneration` on a `FileResource *self`, while the same file's
 lines 97/174/175/182 are its OWN `ObjA34_179D8H::unk0C` and were left alone.
 The compiler named that mis-hit (`structure has no member named 'unk0C'`),

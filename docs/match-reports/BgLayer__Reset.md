@@ -2,7 +2,7 @@
 
 > Renamed from `func_80044294` on 2026-09-25 (tools/rename.py). Address 0x80044294.
 
-Round 82, runner echo (GraphicsResources session, echo #9), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #9), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 59/59 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -18,7 +18,7 @@ Table slot (`tools/classtable.py`): gBgLayerMethods +0x040 (the SceneNode `reset
 The unit-local views `DataSrc33808` (FileResource subclass via the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros plus `slot7C`/`slot80` and own
 fields +0x2C..+0x38), `UnprototypedCtorTable`, `SubBlockTable` and `ResourceSourceArgs` sit at the
-top of / earlier in `src/graphics/GraphicsResources.c`.
+top of / earlier in `src/graphics/graphics_resources.c`.
 
 ```c
 /* gBgLayerMethods +0x040: reset -- lay out the GsBG at +0x044 over a map
@@ -74,9 +74,9 @@ A SceneNode subclass whose fields past +0x044 read (u32, s16 x6, three bytes, a 
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/BgLayer.h`. `self` is `BgLayer *` (was `Obj6F2C4`); +0x054 is `color`, a `BgLayerRgb` (was `Vec3S8 unk54`; still signed, which the lb/sb copy needs), +0x064 `rotate` (was unk64); `sBgLayerDefaultColor` is `BgLayerRgb`. The slot +0x040 keeps SceneNode's `reset(self)` type; the ctor casts to `BgLayerResetFn`. Byte-identical.
+Class unified in `include/bg_layer.h`. `self` is `BgLayer *` (was `Obj6F2C4`); +0x054 is `color`, a `BgLayerRgb` (was `Vec3S8 unk54`; still signed, which the lb/sb copy needs), +0x064 `rotate` (was unk64); `sBgLayerDefaultColor` is `BgLayerRgb`. The slot +0x040 keeps SceneNode's `reset(self)` type; the ctor casts to `BgLayerResetFn`. Byte-identical.
 
-Later the same round (alpha, second class): TileMap unified too (`include/TileMap.h`, same round): `src` is `TileMap *` (was the unit-local `Map44294` view, deleted), and the fields read are `src->map.cellw`/`ncellw`/`cellh`/`ncellh`; `map` points at `&src->map` (was `&src->cellw`). Byte-identical.
+Later the same round (alpha, second class): TileMap unified too (`include/tile_map.h`, same round): `src` is `TileMap *` (was the unit-local `Map44294` view, deleted), and the fields read are `src->map.cellw`/`ncellw`/`cellh`/`ncellh`; `map` points at `&src->map` (was `&src->cellw`). Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

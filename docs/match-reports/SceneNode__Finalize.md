@@ -37,7 +37,7 @@ That slot's CURRENT occupant, `SceneNode__NoOpSlot5C`, is already matched
 elsewhere in this unit as a no-argument `void(void)` body (`{}`, a bare
 `jr $ra`). Both are right about their own codegen — the callee ignores
 every argument it's given, so the caller's arity is unconstrained. Typed
-`slot5C` as `void (*)(SceneNodeObj *, s32)` in `include/SceneNode.h`
+`slot5C` as `void (*)(SceneNodeObj *, s32)` in `include/scene_node.h`
 to match THIS call site; did not touch `SceneNode__NoOpSlot5C`'s own declaration.
 Same precedent as `GetSceneNodeMethods`, documented in `include/class_3bb8c.h`.
 

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003B3FC` on 2026-09-25 (tools/rename.py). Address 0x8003b3fc.
 
-Round 81, runner echo. Unit `src/graphics/TimImage.c`. Fresh ground, no prior attempt.
+Round 81, runner echo. Unit `src/graphics/tim_image.c`. Fresh ground, no prior attempt.
 
 - **Where:** TimImage's table (`gTimImageMethods`) slot +0x008 (the ctor; `tools/classtable.py D_8006E558`).
 - **What:** runs the active data-source driver's ctor on `self`
@@ -28,8 +28,8 @@ void TimImage__TimImage(TimImage *self, char *name) {
 ```
 
 `extern FileResourceMethods *GetActiveDataSourceMethods(void);` is a unit-local
-declaration (the definition in `GameApplicationFileResource.c` returns `void *`), following
-the local-view convention `PlacementGridVabSound.c` / `_e.c` already use.
+declaration (the definition in `game_shell.c` returns `void *`), following
+the local-view convention `vab_sound.c` / `_e.c` already use.
 
 ## Naming
 
@@ -47,9 +47,9 @@ the local-view convention `PlacementGridVabSound.c` / `_e.c` already use.
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified in `include/TimImage.h`; `src/code_2bb9c.c`'s local
+TimImage is unified in `include/tim_image.h`; `src/code_2bb9c.c`'s local
 views are gone. The field this ctor clears at +0x04C, `unk4C`, is now
-`clutBase`: TimArraySrc__BuildImages (src/graphics/GraphicsResources.c) stores
+`clutBase`: TimArraySrc__BuildImages (src/graphics/graphics_resources.c) stores
 `((info.cy - 0x1E0) >> sTimClutRowShift) * 16 + base` there for each
 TimImage it makes, which its own view already called `clutBase`. Image
 byte-identical.

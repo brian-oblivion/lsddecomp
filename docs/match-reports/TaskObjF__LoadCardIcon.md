@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004FE24` on 2026-09-23 (tools/rename.py). Address 0x8004fe24.
 
-Unit `TitleMenuTaskObjF`, class `Class86E00_3bb8c_g`. "Load a card-slot resource
+Unit `title_menu`, class `Class86E00_3bb8c_g`. "Load a card-slot resource
 by index, if not already loaded" -- builds a `CARD\<NAME>.TIM` path (same
 naming shape as `TextEntry__LoadCardResources`'s `CARD\COMINPUT.TIM`, a different unit),
 loads it through the `ChildObj86ED0` short-lived-handle idiom, and stashes
@@ -63,7 +63,7 @@ three independent `beqz`/`bnez` to the identical label.
 
 The path-building block does NOT call the already-matched
 `BuildFileName` (`dest[0]=0; if(arg2) strcat(dest,arg2); strcat(dest,arg1);
-strcat(dest,arg3);`, `src/app/GameApplicationFileResource.c`) -- it inlines the same three-strcat
+strcat(dest,arg3);`, `src/app/game_shell.c`) -- it inlines the same three-strcat
 shape directly with no null-guard on the first strcat, which is what rules
 out an actual call to that helper (a call would need the conditional
 branch). Reading the `strcat` argument order off the delay slots
@@ -84,7 +84,7 @@ without needing the full contents.
 The `New_TimImage` / `slot78` / `New_ScreenSprite` / `release` sequence on
 the temp `handle` is the exact idiom already established by
 `TextEntry__LoadCardResources` (`docs/match-reports/TextEntry__LoadCardResources.md`, a DIFFERENT unit,
-`TextEntryItemList`) using the SAME shared `ChildObj86ED0`/`ChildMethods86ED0`
+`input_dialogs`) using the SAME shared `ChildObj86ED0`/`ChildMethods86ED0`
 type from `class_3bb8c.h` (`slot78`/`release` already declared there).
 
 `self->unk70` is ALREADY typed `Class86E00Unk70Obj_3bb8c_g *` in this unit
@@ -152,11 +152,11 @@ or cache-fill.
 
 ## Track 4
 
-2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/ScreenSprite.h`; the unit includes it and its local extern (which typed the return `ChildObj86ED0 *`) is gone. The call reads `newVal = (Class86E00Unk70Obj_3bb8c_g *)New_ScreenSprite(handle, (SpriteRect *)&sCardIconRect, 0)`: sCardIconRect is the rect (words 0, 160, 120). The unit's baseline "assignment from incompatible pointer type" was this line and is gone. `cardIcon`'s type, Class86E00Unk70Obj_3bb8c_g, is Class86E00's view of a ScreenSprite (release at +0x004, attachToParent at +0x04C with the screen position sCardIconPos = (-70, -60)); it is Class86E00's field and is left as it is. Image byte-identical.
+2026-09-25, round 84 (charlie): The class `New_D8006ED4C` constructs is unified as ScreenSprite in `include/screen_sprite.h`; the unit includes it and its local extern (which typed the return `ChildObj86ED0 *`) is gone. The call reads `newVal = (Class86E00Unk70Obj_3bb8c_g *)New_ScreenSprite(handle, (SpriteRect *)&sCardIconRect, 0)`: sCardIconRect is the rect (words 0, 160, 120). The unit's baseline "assignment from incompatible pointer type" was this line and is gone. `cardIcon`'s type, Class86E00Unk70Obj_3bb8c_g, is Class86E00's view of a ScreenSprite (release at +0x004, attachToParent at +0x04C with the screen position sCardIconPos = (-70, -60)); it is Class86E00's field and is left as it is. Image byte-identical.
 
 ## Track 4 (2026-09-26, round 88)
 
-TimImage is unified (`include/TimImage.h`); this unit's local `extern
+TimImage is unified (`include/tim_image.h`); this unit's local `extern
 ChildObj86ED0 *New_TimImage(char *)` is deleted. `handle` is `TimImage *`:
 +0x078 (FileResource's `void *slot78`, occupant TimImage__Upload) is called
 through `TimImageUploadFn`, +0x004 is TimImage's inherited `release`.

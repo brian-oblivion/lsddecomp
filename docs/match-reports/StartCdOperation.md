@@ -37,6 +37,6 @@ Closed on the first attempt.
 of `ResetCdStateMachine`; the "start the operation the head queue node
 represents" purpose is evident from the body (every field it writes is one
 this unit's other functions later read to drive or unwind that operation)
-and confirmed by five call sites across CdDriver.c, each passing a
+and confirmed by five call sites across cd_driver.c, each passing a
 distinct `(op, state)` pair for a distinct request type (open, close, seek,
 read, load-file).

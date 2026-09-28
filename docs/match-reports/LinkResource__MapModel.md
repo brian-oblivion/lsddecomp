@@ -2,7 +2,7 @@
 
 > Renamed from `func_80043B18` on 2026-09-25 (tools/rename.py). Address 0x80043b18.
 
-Round 82, runner echo (GraphicsResources session, echo #6), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #6), 2026-09-25. Unit `graphics_resources`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 9/9 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -17,7 +17,7 @@ Table slot (`tools/classtable.py`): gLinkResourceMethods +0x078.
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 Slot +0x078 is `void *slot78` in the unified macro, so calls cast it.
 
 ```c
@@ -32,7 +32,7 @@ void LinkResource__MapModel(FileResource *self) {
 
 ## Notes
 
-- No shared header was edited. `FileResource.h`, `SceneNode.h`, `basic_class.h` are
+- No shared header was edited. `file_resource.h`, `scene_node.h`, `basic_class.h` are
   included; prototypes for other units' functions (GetActiveDataSourceMethods,
   ReleaseBasicClassArray, BMemPMgrFree) are local to the unit.
 - Types of arguments and returns are readings of the registers used, not proven.
@@ -44,11 +44,11 @@ void LinkResource__MapModel(FileResource *self) {
 ## Track 4
 
 2026-09-26, round 89 (delta): LinkResource (table `gLinkResourceMethods`,
-renamed from D_8006F13C) is unified in `include/LinkResource.h`. The
+renamed from D_8006F13C) is unified in `include/link_resource.h`. The
 unit-local views this body used (`DataSrc33808`, `Obj6F13C`, `Buf439EC`,
 `Rec6F13C`/`Buf6F13C`, the `extern s32 D_8006F13C[]` array) are gone:
 `self` is `LinkResource *`, its +0x02C is `TmdModel **models`, the buffer is
-read as `TmdFile *` (include/TmdModel.h), the allocator's descriptor is
+read as `TmdFile *` (include/tmd_model.h), the allocator's descriptor is
 `ResourceSource *`, and the getter returns `&gLinkResourceMethods`.
 Byte-identical.
 
@@ -58,8 +58,8 @@ Byte-identical.
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| local `GsMapModelingData(u32 *)` | Sony's spelling, `u_long *` | A | <libgs.h> cannot be included yet (TimImage.h, TileMap.h, TileAtlas.h define their own GsIMAGE/GsMAP/GsCELL), so the prototype stays local |
+| local `GsMapModelingData(u32 *)` | Sony's spelling, `u_long *` | A | <libgs.h> cannot be included yet (tim_image.h, tile_map.h, tile_atlas.h define their own GsIMAGE/GsMAP/GsCELL), so the prototype stays local |
 
 ## Round 95 (alpha, track 6: Sony headers)
 
-The unit-local GsMapModelingData prototype (`u_long *`, spelled locally while TimImage.h, TileMap.h and TileAtlas.h re-declared GsIMAGE, GsMAP and GsCELL) is deleted: GraphicsResources.c includes <libgs.h>, whose prototype takes `unsigned long *`, so the call casts `(unsigned long *)`. Byte-identical.
+The unit-local GsMapModelingData prototype (`u_long *`, spelled locally while tim_image.h, tile_map.h and tile_atlas.h re-declared GsIMAGE, GsMAP and GsCELL) is deleted: graphics_resources.c includes <libgs.h>, whose prototype takes `unsigned long *`, so the call casts `(unsigned long *)`. Byte-identical.

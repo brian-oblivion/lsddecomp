@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004ADD8` on 2026-09-22 (tools/rename.py). Address 0x8004add8.
 
-**Unit:** DayTaskStageMap · **Size:** 51 instructions · **Result:** 51/51 words
+**Unit:** dream_day · **Size:** 51 instructions · **Result:** 51/51 words
 
 ## What it does
 
@@ -119,7 +119,7 @@ quirk rather than something specific to those two functions' unit.
 
 ## Provenance
 
-round 2026-09-02, runner ALPHA, unit DayTaskStageMap. First attempt 39/51
+round 2026-09-02, runner ALPHA, unit dream_day. First attempt 39/51
 (pure frame-size gap, logic already exact); second attempt (padding local)
 closed it, 51/51. Follow-up (same day, head-requested): `switch` rewrite
 of the gate, one attempt, also 51/51 — adopted as final.
@@ -142,7 +142,7 @@ slots as `(self, sender, event)`. Renamed `list` -> `sender`,
 `count` -> `command`, in the definition, the slot declarations and the two
 callers. Byte-neutral, oracle green.
 
-Posted to the round broadcast, because `DayTaskStageMap`'s own view of these
+Posted to the round broadcast, because `dream_day`'s own view of these
 slots inherits the same wrong word.
 
 ## Track 6 (2026-09-26, round 93, alpha)
@@ -156,11 +156,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`
@@ -179,4 +179,4 @@ an operator decision; not hand-reverted).
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-The link-event literals are spelled with their enums: 4 is `SCENENODE_EVENT_LINKED`, 2 and 3 `SCENENODE_EVENT_HULL_FIRST`/`HULL_LAST` (include/SceneNode.h), 5 to 8 `ACTOR_EVENT_UNSWEPT`..`ACTOR_EVENT_MOVED_Y` (include/Actor.h). Every function tested here receives the event through a DispatchLinkCommand/onActorLinkCommand/onGridCellLinkCommand chain from SceneNode's link protocol, so the numbers are that enum's. Byte-identical (`event < 9` spelled `event <= ACTOR_EVENT_MOVED_Y` compiles the same).
+The link-event literals are spelled with their enums: 4 is `SCENENODE_EVENT_LINKED`, 2 and 3 `SCENENODE_EVENT_HULL_FIRST`/`HULL_LAST` (include/scene_node.h), 5 to 8 `ACTOR_EVENT_UNSWEPT`..`ACTOR_EVENT_MOVED_Y` (include/actor.h). Every function tested here receives the event through a DispatchLinkCommand/onActorLinkCommand/onGridCellLinkCommand chain from SceneNode's link protocol, so the numbers are that enum's. Byte-identical (`event < 9` spelled `event <= ACTOR_EVENT_MOVED_Y` compiles the same).

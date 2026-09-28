@@ -32,7 +32,7 @@ void InitNavChallengesArray(s8 (*arrayMem)[30], s32 *linkCounter)
 ```
 
 All types (`arrayMem`, `linkCounter`, `gpNavChallengesComplete`,
-`gpDinamicLinkPenalty`) were already declared in `include/DreamSys.h` from
+`gpDinamicLinkPenalty`) were already declared in `include/dream_sys.h` from
 earlier rounds' call-site analysis; nothing new to declare.
 
 ## Verification

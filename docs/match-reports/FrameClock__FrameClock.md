@@ -4,7 +4,7 @@
 
 > Renamed from `func_80042450` on 2026-09-25 (tools/rename.py). Address 0x80042450.
 
-Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/Sprite.c`. Fresh ground, no prior attempt.
+Round 82, runner alpha (fourth slot on Sprite). Unit `src/graphics/sprite.c`. Fresh ground, no prior attempt.
 
 - **Where:** gFrameClockMethods slot +0x008 (ctor).
 - **What:** calls the BasicClass ctor on self, installs the gFrameClockMethods table (`GetFrameClockMethods()`), then calls its slot +0x040 (reset, FrameClock__Reset) with `(self, 0)`. Returns nothing (no `$v0` set after the last call).
@@ -41,4 +41,4 @@ void FrameClock__FrameClock(D_8006EF50Obj *self) {
 
 ## Track 4 (2026-09-26, round 88, delta)
 
-Renamed from `D8006EF50__D8006EF50`: the ctor, named `Class__Class` by convention. The class (id 0x5, table `gFrameClockMethods`, formerly `D_8006EF50`) is unified as `FrameClock` in `include/FrameClock.h`, whose banner holds the evidence for the class name: its tick (+0x044) is called by IntermediateBase__OnDrawSystemEvent on the DrawSystem's per-VSync event 2, counts one frame and tells its parents event 2, or 3 while paused, or 4 while flag14 is set. Fields renamed: `count` -> `frameCount`, `flag10` -> `paused`. Any source block above is the pre-unification spelling (`D_8006EF50Obj`); the live body in `src/graphics/Sprite.c` takes `FrameClock *`, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `D8006EF50__D8006EF50`: the ctor, named `Class__Class` by convention. The class (id 0x5, table `gFrameClockMethods`, formerly `D_8006EF50`) is unified as `FrameClock` in `include/frame_clock.h`, whose banner holds the evidence for the class name: its tick (+0x044) is called by IntermediateBase__OnDrawSystemEvent on the DrawSystem's per-VSync event 2, counts one frame and tells its parents event 2, or 3 while paused, or 4 while flag14 is set. Fields renamed: `count` -> `frameCount`, `flag10` -> `paused`. Any source block above is the pre-unification spelling (`D_8006EF50Obj`); the live body in `src/graphics/sprite.c` takes `FrameClock *`, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052CD8` on 2026-09-24 (tools/rename.py). Address 0x80052cd8.
 
-Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0; whole-image
+Unit `dream_scene`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py ObjM__Finalize`: 14/14 words match.
 
 This is vtable slot `+0x00C` (`dtor`) of `gObjMMethods` -- a SECOND class
@@ -26,13 +26,13 @@ void ObjM__Finalize(Obj865C8 *self)
 
 This class's `dtor` override forwards straight to the shared base class
 dtor (`GetTimedTaskMethods()->dtor(self)`, `TimedTaskMethods::dtor`,
-`include/DayTaskStageMap.h`), the same pattern already documented there for
-`TimedTask__Finalize` (`DayTaskStageMap`'s own sibling override). `Obj865C8` and
-`GetTimedTaskMethods` are both already declared in `include/DayTaskStageMap.h`, so
+`include/dream_day.h`), the same pattern already documented there for
+`TimedTask__Finalize` (`dream_day`'s own sibling override). `Obj865C8` and
+`GetTimedTaskMethods` are both already declared in `include/dream_day.h`, so
 this function needed no new struct at all -- `self` is typed directly as
 the base class's own object type rather than inventing a `Class87034`
 wrapper, since nothing here reads any field specific to this unit's own
-class. `#include "DayTaskStageMap.h"` added to this unit's includes for this
+class. `#include "dream_day.h"` added to this unit's includes for this
 declaration (and `Obj865C8`/`GetTimedTaskMethods` used by nothing else in this
 unit). Matched first attempt.
 
@@ -44,9 +44,9 @@ Slot +0x00C of gObjMMethods (`tools/classtable.py 0x80087034`). Forwards to the 
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-ObjM__Finalize's parameter was `Obj865C8 *` (the sibling class's view); it is now `ObjM_3bb8c_k *`, ObjMStyleActor's own view of this method's class (gObjMMethods). Byte-identical.
+ObjM__Finalize's parameter was `Obj865C8 *` (the sibling class's view); it is now `ObjM_3bb8c_k *`, dream_scene's own view of this method's class (gObjMMethods). Byte-identical.
 
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-Renamed from `ObjM__Dtor` (rename.py): it occupies +0x00C, BasicClass's `finalize` slot, and its whole body is the base finalize (`GetTimedTaskMethods()->finalize`). Tier A. Parameter now `ObjM *` (include/ObjM.h).
+Renamed from `ObjM__Dtor` (rename.py): it occupies +0x00C, BasicClass's `finalize` slot, and its whole body is the base finalize (`GetTimedTaskMethods()->finalize`). Tier A. Parameter now `ObjM *` (include/objm.h).

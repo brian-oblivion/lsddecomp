@@ -6,7 +6,7 @@
 
 > Renamed from `func_8002C238` on 2026-09-24 (tools/rename.py). Address 0x8002c238.
 
-**Unit:** PlacementGridVabSound · **Size:** 16 instructions (0x40 bytes) ·
+**Unit:** vab_sound · **Size:** 16 instructions (0x40 bytes) ·
 **Status: MATCHED 16/16**, whole-image SHA1 green.
 
 ## Role
@@ -47,7 +47,7 @@ That mechanics difference is why this is tier B and not A.
 
 ## Track 4 (2026-09-26, round 87, echo)
 
-Now `void PlacementGrid__OnRequestDone(PlacementGrid *self)`, the type of slot +0x064 (`setFlag`, include/FileResource.h), byte-identical. `self[0xC]` is `loaded` (+0x030), zeroed by the ctor. `BaseTable6D940` was the active driver's table, `FileResourceMethods`; the call is `GetActiveDataSourceMethods()->setFlag`.
+Now `void PlacementGrid__OnRequestDone(PlacementGrid *self)`, the type of slot +0x064 (`setFlag`, include/file_resource.h), byte-identical. `self[0xC]` is `loaded` (+0x030), zeroed by the ctor. `BaseTable6D940` was the active driver's table, `FileResourceMethods`; the call is `GetActiveDataSourceMethods()->setFlag`.
 
 
 ## Track 6 (2026-09-26, round 93, charlie)
@@ -57,7 +57,7 @@ whole family: object, `Class6D940Methods`, the getter, constructors,
 methods, `Class6D940Record` -> `PlacementGridRecord`,
 `Class6D940ResolveEntryFn` -> `PlacementGridResolveEntryFn`,
 `Class6D940GetModelFn` -> `PlacementGridGetModelFn`, the header
-`include/Class6D940.h` -> `include/PlacementGrid.h`), then
+`include/Class6D940.h` -> `include/placement_grid.h`), then
 `python3 tools/rename.py D_8006D940 gPlacementGridMethods` (the table,
 g<Class>Methods) and
 `python3 tools/renametype.py PlacementGridPlacement CellPlacement --any-stem`
@@ -77,7 +77,7 @@ cell's centre (column/row * 0x800 + 0x400) and returns the model
 linkResource's getModel gives for its index. StageMap__PopulateSlotCells
 points `buffer` at the grid element's LbdFile header block +
 `placementsOffset` (LbdFileHeader's own field name) and puts each result
-into that element's GridCell lattice (20 x 20, 0x800 apart: GridCell.h),
+into that element's GridCell lattice (20 x 20, 0x800 apart: grid_cell.h),
 chained records into the overflow cells. So the class is the placements of
 one grid element's cells. **`CellPlacement`** is ResolveEntry's output, one
 model's placement in one cell. The name says what the records are, not

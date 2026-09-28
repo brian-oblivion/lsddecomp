@@ -38,7 +38,7 @@ What the two orders do to the asm:
   of `addiu s1, s1, 1` and fills its own load delay; with `col++` first
   the load follows the increment and costs a `nop`.
 
-The matched C is the live definition in `src/world/DayTaskStageMap.c`.
+The matched C is the live definition in `src/world/dream_day.c`.
 
 ### Proposed learning
 
@@ -113,10 +113,10 @@ void StageMap__DispatchToRectCells(StageMap *self, UnkListObj_3ac78 *arg1, s32 a
 }
 ```
 
-## New/corrected header content (`include/DayTaskStageMap.h`)
+## New/corrected header content (`include/dream_day.h`)
 
 This unit has no additive-only constraint (nobody else holds
-`DayTaskStageMap.h`), so these are real corrections, not just additions.
+`dream_day.h`), so these are real corrections, not just additions.
 Every one was independently reverified after the change: `build exit=0`
 and `StageMap__ApplyToSenderFootprint`/`NotifyGridCell` (the two ALREADY-MATCHED functions
 whose bytes depend on these types) stayed at their full-match scores
@@ -265,7 +265,7 @@ regressions:**
 > loop, register lands in the wrong callee-saved slot" residue, since it
 > is cheap and, here, closed 48 of the function's 70 remaining words in
 > one attempt. The load-delay-slot-fill class itself remains open; this
-> function is the second STALL this round in `DayTaskStageMap`/`TitleMenuTaskObjF`
+> function is the second STALL this round in `dream_day`/`title_menu`
 > where a source-level restructuring provably could not reach a
 > retail-chosen instruction SCHEDULE, even though the SHAPE (branches,
 > registers) was already fully correct -- worth a permuter pass (see
@@ -313,7 +313,7 @@ Per the coordinator's cross-unit transferability question (does the lever
 that closed 5/7 residue words on `libsnd_ssinit`'s `GetRCnt` --
 splitting a combined `base = tableBase; entry = &base[idx];` into two
 independently-live locals instead of one combined expression -- transfer
-to `DayTaskStageMap`), tested it against this function's own base+index
+to `dream_day`), tested it against this function's own base+index
 pointer computation, the closest analogue in this unit:
 
 ```c
@@ -377,27 +377,27 @@ the report and to the preserved body's identifiers, not to the shipped bytes.
 
 | field | name | tier | evidence |
 | --- | --- | --- | --- |
-| `StageMap+0x0BC` | `cellTag` | C-ish/B | Copied verbatim into `curCellTag` before every cell visit and never otherwise touched here. `DayTaskStageMap` reads the same offset as the first halfword of a 10-byte `Descriptor10` that `StageMap__SetTargetAndLoadChunks` block-copies in. The name records only "the tag stamped onto each visited cell". |
+| `StageMap+0x0BC` | `cellTag` | C-ish/B | Copied verbatim into `curCellTag` before every cell visit and never otherwise touched here. `dream_day` reads the same offset as the first halfword of a 10-byte `Descriptor10` that `StageMap__SetTargetAndLoadChunks` block-copies in. The name records only "the tag stamped onto each visited cell". |
 | `StageMap+0x1C0` | `curCellTag` | B | Written per cell visit; `StageMap__GetCurrentCellKey` returns its address. |
 | `StageMap+0x1C2` | `curCellCol` | A | Written per cell visit with the rectangle's start column plus the inner loop offset. |
 | `StageMap+0x1C3` | `curCellRow` | A | Same, row. |
-| `StageMap+0x038` | `nextInCell` | B | The chain this function walks off each grid cell; `DayTaskStageMap`'s `StageMap__SetFootprintVisible` walks the identical chain off `EntryChildObj::unk38`. |
+| `StageMap+0x038` | `nextInCell` | B | The chain this function walks off each grid cell; `dream_day`'s `StageMap__SetFootprintVisible` walks the identical chain off `EntryChildObj::unk38`. |
 
 **Type caveat, recorded not fixed.** This unit declares the cell type as
-`StageMap *`. `DayTaskStageMap`'s independently derived view says
+`StageMap *`. `dream_day`'s independently derived view says
 `EntryChildObj *`, and its evidence is better: the ctor here ORs `0x80000000`
 into each freshly built cell's `+0x010`, which is `EntryChildObj::unk10`
 exactly (`StageMap__ClearSlotCells` sets the same bit, matched `StageMap__SetFootprintVisible` clears
 it), and `flags36`/`nextInCell` line up with `EntryChildObj::unk36`/`unk38`.
 Unifying the two views is track-4 work, so the declared type is unchanged and
-a note sits on the field in `include/DayTaskStageMap.h`. Posted to the broadcast.
+a note sits on the field in `include/dream_day.h`. Posted to the broadcast.
 
 ### Field names in the preserved bodies above
 
 Round 67 renamed this unit's struct fields. The preserved bodies in THIS
 report are left in their original spelling -- preserved code is a record of
 what was tried, not doctrine -- but they will not compile as written against
-the current `include/DayTaskStageMap.h`. The mapping, for whoever rebuilds one:
+the current `include/dream_day.h`. The mapping, for whoever rebuilds one:
 
 | old | current |
 | --- | --- |
@@ -414,7 +414,7 @@ the current `include/DayTaskStageMap.h`. The mapping, for whoever rebuilds one:
 | `HistoryEntry_3ac78` / `HistoryBlock_3ac78` | `GridRect_3ac78` / `GridRectList_3ac78` |
 | `->methods->unk04(...)` | `->methods->release(...)` |
 
-The `#if 0` copy that lives in `src/world/DayTaskStageMap.c` WAS updated to the current
+The `#if 0` copy that lives in `src/world/dream_day.c` WAS updated to the current
 names in the same round, so that one still compiles; only identifiers changed
 and the recorded score is unaffected.
 
@@ -429,11 +429,11 @@ out by the stage's `StageGridDimensions` (`setConfig`, from ObjM's
 `GetStageGridDimensions(stage)`), each slot's placements linked into a 20 x
 20 lattice of GridCells whose drawn window follows the target. Tier B: the
 mechanics are established; "the stage's map" rests on the files it loads and
-the per-stage config. Header now `include/StageMap.h`; evidence in its banner.
+the per-stage config. Header now `include/stage_map.h`; evidence in its banner.
 
 Member types, same pass: `Unk68Struct` is `StageGridDimensions`
-(include/StageGrid.h), `Unk54Struct` is `LongVec3` (include/SceneNode.h),
-`EntryDesc866E8` is `Ratio16[3]` (include/SceneNode.h), all by layout and
+(include/stage_grid.h), `Unk54Struct` is `LongVec3` (include/scene_node.h),
+`EntryDesc866E8` is `Ratio16[3]` (include/scene_node.h), all by layout and
 use; `Class866E8Elem` -> `ChunkSlot`, `QueryPos866E8` -> `SplitLongVec3`,
 `SetupEntry866E8` -> `ChunkLoadEntry`, `SetupSub866E8` ->
 `ChunkLoadEntryTail`, `TargetSpec866E8` -> `ChunkSlotSpec`, `GridSlot866E8`

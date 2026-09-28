@@ -1,6 +1,6 @@
 # GetStageGridDimensions
 
-**Unit:** StageGrid · **Size:** 13 instructions · **Status:** MATCHED (13/13 words)
+**Unit:** stage_grid · **Size:** 13 instructions · **Status:** MATCHED (13/13 words)
 
 ## What it does
 
@@ -21,7 +21,7 @@ addu  $v0, $v0, $s0
 ```
 
 **The `sll $s0, $s0, 3` fixes `sizeof(StageGridDimensions) == 8`**, which
-corroborates the layout in `include/StageGrid.h` (`s16 columns; s16 rows;
+corroborates the layout in `include/stage_grid.h` (`s16 columns; s16 rows;
 bool isVertical;` = 2 + 2 + 4). That is the useful finding here: a scaled index
 is a direct measurement of a struct's size, and this one agrees with a layout
 that was otherwise only a guess.
@@ -46,7 +46,7 @@ context beyond the one function.
 **`GetStageGridDimensions`, tier A.** An indexed table accessor, tier A by
 definition (a getter). The body is literally `table[index]` over the same
 table `GetStageGridDimensionsTable` returns, and the one confirmed caller
-(`src/world/ObjMStyleActor.c:346`, `unk14->methods->slotE0(unk14,
+(`src/world/dream_scene.c:346`, `unk14->methods->slotE0(unk14,
 GetStageGridDimensions((s32)self->unk38))`) is consistent with an index
 lookup, agreeing with the name from the body alone.
 

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8002C438` on 2026-09-18 (tools/rename.py). Address 0x8002c438.
 
-Unit: `PlacementGridVabSound`. Runner: echo, round 17.
+Unit: `vab_sound`. Runner: echo, round 17.
 
 ## Result
 
@@ -24,9 +24,9 @@ Byte-exact, 4/4 words (`lui`/`addiu` computing `&gNullDriverMethods`, then `jr`/
 
 The "get methods table" accessor for the `gNullDriverMethods` class -- same idiom as
 `GetVabStreamObjMethods` (this unit) returning `&gVabStreamObjMethods`, and `GetPlacementGridMethods` in
-the sibling `PlacementGridVabSound.c` returning `&gPlacementGridMethods`. Confirmed void-argument
-by checking its two call sites (`GameApplicationFileResource/func_80026CAC.s`,
-`GameApplicationFileResource/func_80026FE8.s`): both `jal GetNullDriverMethods` with no argument
+the sibling `vab_sound.c` returning `&gPlacementGridMethods`. Confirmed void-argument
+by checking its two call sites (`game_shell/func_80026CAC.s`,
+`game_shell/func_80026FE8.s`): both `jal GetNullDriverMethods` with no argument
 register set up beforehand.
 
 `NullDriverMethods` is declared in this unit's own top-of-file scaffolding
@@ -40,5 +40,5 @@ Renamed `func_8002C438` -> `GetNullDriverMethods`, tier A. Pure getter --
 mechanics ARE its purpose (CLAUDE.md/FINISHING-PLAN's own tier-A rule for a
 leaf getter). Matches the naming already in use for its sibling accessor
 `GetVabStreamObjMethods` and the same-round precedent `GetCdDriverMethods`
-(alpha, GameApplicationFileResource.c) for "return the address of a known class's own
+(alpha, game_shell.c) for "return the address of a known class's own
 methods table."

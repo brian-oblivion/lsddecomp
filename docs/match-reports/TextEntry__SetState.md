@@ -4,7 +4,7 @@
 
 > Renamed from `func_800512C8` on 2026-09-24 (tools/rename.py). Address 0x800512c8.
 
-Unit `TextEntryItemList`, carved round 14.
+Unit `input_dialogs`, carved round 14.
 
 `Obj86ED0`'s vtable slot 0x054, called by `TextEntry__TickState` (that unit's own
 sibling function, still `INCLUDE_ASM` this round) with a literal `4`.
@@ -83,10 +83,10 @@ other. Don't spend a second attempt re-testing that particular pair.
 
 ## Track 4 (2026-09-26, round 87)
 
-Class unified as `TextEntry` (include/TextEntry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/TextEntry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
+Class unified as `TextEntry` (include/text_entry.h; table gObj86ED0Methods -> gTextEntryMethods, type Obj86ED0 -> TextEntry). The class name is for what its methods do: setText keeps a caller's string buffer and a working copy, the cursor and char methods edit the copy, command 25 writes it back, 23 closes without writing (banner of include/text_entry.h). Fields renamed from their accessors: unk14 charCount, unk1C charIndex, unk20 altCommands, nameLen textLen, nameBuf textBuf, unk28 editBuf, unk40 cursorSprite (CharSprite *), unk44 textRow, unk48 panelSprite (ScreenSprite *). Zero bytes changed.
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
 Parameter `arg1` -> `state`. States 2/3 are `TEXTENTRY_RESULT_ACCEPTED`/
-`CANCELLED`, 4 is `TEXTENTRY_STATE_REPORT` (new in include/TextEntry.h:
+`CANCELLED`, 4 is `TEXTENTRY_STATE_REPORT` (new in include/text_entry.h:
 notify the parents with closeState). Zero bytes changed.

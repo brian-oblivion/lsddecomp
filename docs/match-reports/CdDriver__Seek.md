@@ -115,12 +115,12 @@ below.
 `self->unk18` is a 4-byte position buffer (only its ADDRESS is taken here,
 passed to `CdPosToInt`) and `self->unk1C` is a `u32` byte-length field
 (rounded up to a 0x800-byte sector boundary, same formula as
-`GetCdFileSize`'s own `((self->unk1C >> 11) + 1) << 11`, CdDriver.c) --
+`GetCdFileSize`'s own `((self->unk1C >> 11) + 1) << 11`, cd_driver.c) --
 this is the SAME struct as `ObjA34_179D8H` there, and that unit already
 names offset 0x1C the same way, independently. `sCdSeekLoc` is an 8-byte
 zero-initialized buffer (`asm/data/5DB70.data.s`); this function only ever
 takes its address, so it's declared as a plain byte array locally.
-`sCdSeekParam = sCdSeekLoc - 0x14` matches `CdDriver.c`'s existing reads of
+`sCdSeekParam = sCdSeekLoc - 0x14` matches `cd_driver.c`'s existing reads of
 that global (`(u8 *)sCdSeekParam + 0x14`) -- the same pointer, offset the other
 direction.
 
@@ -169,10 +169,10 @@ at slot `+0x04C`. The prefix names the table, not the developers' class.
 ## Track 4b (2026-09-25, round 85)
 
 The CD driver's shared globals and records are now declared once, in
-`include/CdDriver.h`, and this body uses that one reading: the fake seek entry is spelled `(CdFileEntry *)(sCdSeekLoc - 0x14)`, so the state machine's `&sCdSeekParam->pos` lands on the loc. The
+`include/cd_driver.h`, and this body uses that one reading: the fake seek entry is spelled `(CdFileEntry *)(sCdSeekLoc - 0x14)`, so the state machine's `&sCdSeekParam->pos` lands on the loc. The
 global's type comes from its accessors (`sFileTable` is walked at the 0x1C
 `CdFileEntry` stride; `sCdSeekParam` is read for `->size` and sought to at
 `+0x14`, i.e. `pos`). Byte-identical; no new `-Wall` warning.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Seek` -> `CdDriver__Seek` by rename.py.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/cd_driver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Seek` -> `CdDriver__Seek` by rename.py.

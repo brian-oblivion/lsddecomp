@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004F5DC` on 2026-09-20 (tools/rename.py). Address 0x8004f5dc.
 
-**Unit:** TitleMenuTaskObjF · **Size:** 23 words (0x5C) · **Status:** MATCH
+**Unit:** title_menu · **Size:** 23 words (0x5C) · **Status:** MATCH
 
 `void TaskObjF__Deinit(TaskObjF *self)`. Clears `self->unk68`/`unk6C` to 0,
 then unregisters the two children `TaskObjF__Init` had registered, via the

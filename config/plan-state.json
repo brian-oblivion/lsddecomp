@@ -820,35 +820,21 @@
       ],
       "status": "open",
       "units_done": {
-        "Application": "2026-09-25",
-        "BMemPMgr": "2026-09-24",
-        "CdDriver": "2026-09-21",
-        "CdStream": "2026-09-25",
-        "DayTaskStageMap": "2026-09-23",
-        "DrawSystem": "2026-09-25",
-        "DreamAux": "2026-09-21",
-        "DreamSys": "2026-09-22",
-        "FlatLightObj": "2026-09-25",
-        "GameApplicationFileResource": "2026-09-24",
-        "GameFiles": "2026-09-25",
-        "GraphicsResources": "2026-09-25",
-        "ObjMStyleActor": "2026-09-24",
-        "Pad": "2026-09-24",
-        "PlacementGridVabSound": "2026-09-24",
-        "SceneNode": "2026-09-23",
-        "ScreenWidgets": "2026-09-20",
-        "Sprite": "2026-09-25",
-        "StageGrid": "2026-09-23",
-        "Task": "2026-09-23",
-        "TextEntryItemList": "2026-09-24",
-        "TimImage": "2026-09-25",
-        "TitleMenuTaskObjF": "2026-09-22",
-        "TmdModel": "2026-09-25",
-        "TmdRenderer": "2026-09-17",
-        "TodActor": "2026-09-24",
-        "ViewportDraw": "2026-09-25",
-        "WBgm": "2026-09-25",
+        "application": "2026-09-25",
+        "bmem_pmgr": "2026-09-24",
+        "cd_driver": "2026-09-21",
+        "cd_stream": "2026-09-25",
+        "draw_system": "2026-09-25",
+        "dream_aux": "2026-09-21",
+        "dream_day": "2026-09-23",
+        "dream_scene": "2026-09-24",
+        "dream_sys": "2026-09-22",
         "entity": "2026-09-19",
+        "flat_light_obj": "2026-09-25",
+        "game_files": "2026-09-25",
+        "game_shell": "2026-09-24",
+        "graphics_resources": "2026-09-25",
+        "input_dialogs": "2026-09-24",
         "libcard_card": "2026-09-23",
         "libcd_bios": "2026-09-23",
         "libgs_gs_101": "2026-09-24",
@@ -857,7 +843,21 @@
         "libsnd_ssinit_libapi_counter": "2026-09-23",
         "libsnd_vmanager": "2026-09-25",
         "libspu_s_ih": "2026-09-24",
-        "main": "2026-09-25"
+        "main": "2026-09-25",
+        "pad": "2026-09-24",
+        "scene_node": "2026-09-23",
+        "screen_widgets": "2026-09-20",
+        "sprite": "2026-09-25",
+        "stage_grid": "2026-09-23",
+        "task": "2026-09-23",
+        "tim_image": "2026-09-25",
+        "title_menu": "2026-09-22",
+        "tmd_model": "2026-09-25",
+        "tmd_renderer": "2026-09-17",
+        "tod_actor": "2026-09-24",
+        "vab_sound": "2026-09-24",
+        "viewport_draw": "2026-09-25",
+        "wbgm": "2026-09-25"
       }
     },
     "4": {
@@ -865,12 +865,12 @@
         "gActorMethods": {
           "class": "Actor",
           "date": "2026-09-25",
-          "header": "include/Actor.h"
+          "header": "include/actor.h"
         },
         "gApplicationMethods": {
           "class": "Application",
           "date": "2026-09-25",
-          "header": "include/Application.h"
+          "header": "include/application.h"
         },
         "gBasicClassMethods": {
           "class": "BasicClass",
@@ -880,42 +880,42 @@
         "gBgLayerMethods": {
           "class": "BgLayer",
           "date": "2026-09-26",
-          "header": "include/BgLayer.h"
+          "header": "include/bg_layer.h"
         },
         "gBoxFillMethods": {
           "class": "BoxFill",
           "date": "2026-09-26",
-          "header": "include/BoxFill.h"
+          "header": "include/box_fill.h"
         },
         "gCdDriverMethods": {
           "class": "CdDriver",
           "date": "2026-09-26",
-          "header": "include/CdDriver.h"
+          "header": "include/cd_driver.h"
         },
         "gCdStreamMethods": {
           "class": "CdStream",
           "date": "2026-09-26",
-          "header": "include/CdStream.h"
+          "header": "include/cd_stream.h"
         },
         "gCharSpriteMethods": {
           "class": "CharSprite",
           "date": "2026-09-26",
-          "header": "include/CharSprite.h"
+          "header": "include/char_sprite.h"
         },
         "gDayTaskMethods": {
           "class": "DayTask",
           "date": "2026-09-26",
-          "header": "include/DayTask.h"
+          "header": "include/day_task.h"
         },
         "gDrawSystemMethods": {
           "class": "DrawSystem",
           "date": "2026-09-26",
-          "header": "include/DrawSystem.h"
+          "header": "include/draw_system.h"
         },
         "gDreamSysMethods": {
           "class": "DreamSys",
           "date": "2026-09-26",
-          "header": "include/DreamSys.h"
+          "header": "include/dream_sys.h"
         },
         "gEntityMethods": {
           "class": "Entity",
@@ -925,232 +925,232 @@
         "gFadeBoxMethods": {
           "class": "FadeBox",
           "date": "2026-09-26",
-          "header": "include/FadeBox.h"
+          "header": "include/fade_box.h"
         },
         "gFileResourceMethods": {
           "class": "FileResource",
           "date": "2026-09-25",
-          "header": "include/FileResource.h"
+          "header": "include/file_resource.h"
         },
         "gFlatLightObjMethods": {
           "class": "FlatLightObj",
           "date": "2026-09-26",
-          "header": "include/FlatLightObj.h"
+          "header": "include/flat_light_obj.h"
         },
         "gFrameClockMethods": {
           "class": "FrameClock",
           "date": "2026-09-26",
-          "header": "include/FrameClock.h"
+          "header": "include/frame_clock.h"
         },
         "gGameApplicationMethods": {
           "class": "GameApplication",
           "date": "2026-09-26",
-          "header": "include/GameApplication.h"
+          "header": "include/game_application.h"
         },
         "gGraphRoomMethods": {
           "class": "GraphRoom",
           "date": "2026-09-26",
-          "header": "include/GraphRoom.h"
+          "header": "include/graph_room.h"
         },
         "gGridCellMethods": {
           "class": "GridCell",
           "date": "2026-09-26",
-          "header": "include/GridCell.h"
+          "header": "include/grid_cell.h"
         },
         "gIntermediateBaseMethods": {
           "class": "IntermediateBase",
           "date": "2026-09-25",
-          "header": "include/IntermediateBase.h"
+          "header": "include/intermediate_base.h"
         },
         "gItemListMethods": {
           "class": "ItemList",
           "date": "2026-09-26",
-          "header": "include/ItemList.h"
+          "header": "include/item_list.h"
         },
         "gLbdFileMethods": {
           "class": "LbdFile",
           "date": "2026-09-26",
-          "header": "include/LbdFile.h"
+          "header": "include/lbd_file.h"
         },
         "gLightRigMethods": {
           "class": "LightRig",
           "date": "2026-09-26",
-          "header": "include/LightRig.h"
+          "header": "include/light_rig.h"
         },
         "gLinkResourceMethods": {
           "class": "LinkResource",
           "date": "2026-09-26",
-          "header": "include/LinkResource.h"
+          "header": "include/link_resource.h"
         },
         "gModelDataMethods": {
           "class": "ModelData",
           "date": "2026-09-25",
-          "header": "include/ModelData.h"
+          "header": "include/model_data.h"
         },
         "gMoviePlayerMethods": {
           "class": "MoviePlayer",
           "date": "2026-09-26",
-          "header": "include/MoviePlayer.h"
+          "header": "include/movie_player.h"
         },
         "gNodeGuardedViewportMethods": {
           "class": "NodeGuardedViewport",
           "date": "2026-09-26",
-          "header": "include/NodeGuardedViewport.h"
+          "header": "include/node_guarded_viewport.h"
         },
         "gNullDriverMethods": {
           "class": "NullDriver",
           "date": "2026-09-26",
-          "header": "include/NullDriver.h"
+          "header": "include/null_driver.h"
         },
         "gObjMMethods": {
           "class": "ObjM",
           "date": "2026-09-26",
-          "header": "include/ObjM.h"
+          "header": "include/objm.h"
         },
         "gPadMethods": {
           "class": "Pad",
           "date": "2026-09-25",
-          "header": "include/Pad.h"
+          "header": "include/pad.h"
         },
         "gPlacementGridMethods": {
           "class": "PlacementGrid",
           "date": "2026-09-26",
-          "header": "include/PlacementGrid.h"
+          "header": "include/placement_grid.h"
         },
         "gRequestedFileMethods": {
           "class": "RequestedFile",
           "date": "2026-09-26",
-          "header": "include/RequestedFile.h"
+          "header": "include/requested_file.h"
         },
         "gSceneNodeMethods": {
           "class": "SceneNode",
           "date": "2026-09-25",
-          "header": "include/SceneNode.h"
+          "header": "include/scene_node.h"
         },
         "gScreenSpriteMethods": {
           "class": "ScreenSprite",
           "date": "2026-09-25",
-          "header": "include/ScreenSprite.h"
+          "header": "include/screen_sprite.h"
         },
         "gSpriteMethods": {
           "class": "Sprite",
           "date": "2026-09-25",
-          "header": "include/Sprite.h"
+          "header": "include/sprite.h"
         },
         "gStageMapMethods": {
           "class": "StageMap",
           "date": "2026-09-26",
-          "header": "include/StageMap.h"
+          "header": "include/stage_map.h"
         },
         "gStreamTaskMethods": {
           "class": "StreamTask",
           "date": "2026-09-26",
-          "header": "include/StreamTask.h"
+          "header": "include/stream_task.h"
         },
         "gStyleEffectMethods": {
           "class": "StyleEffect",
           "date": "2026-09-26",
-          "header": "include/StyleEffect.h"
+          "header": "include/style_effect.h"
         },
         "gTaskCoreMethods": {
           "class": "TaskCore",
           "date": "2026-09-25",
-          "header": "include/TaskCore.h"
+          "header": "include/task_core.h"
         },
         "gTaskObjFMethods": {
           "class": "TaskObjF",
           "date": "2026-09-26",
-          "header": "include/TaskObjF.h"
+          "header": "include/task_objf.h"
         },
         "gTextEntryMethods": {
           "class": "TextEntry",
           "date": "2026-09-26",
-          "header": "include/TextEntry.h"
+          "header": "include/text_entry.h"
         },
         "gTextRowMethods": {
           "class": "TextRow",
           "date": "2026-09-26",
-          "header": "include/TextRow.h"
+          "header": "include/text_row.h"
         },
         "gTileAtlasMethods": {
           "class": "TileAtlas",
           "date": "2026-09-26",
-          "header": "include/TileAtlas.h"
+          "header": "include/tile_atlas.h"
         },
         "gTileMapMethods": {
           "class": "TileMap",
           "date": "2026-09-26",
-          "header": "include/TileMap.h"
+          "header": "include/tile_map.h"
         },
         "gTimArraySrcMethods": {
           "class": "TimArraySrc",
           "date": "2026-09-26",
-          "header": "include/TimArraySrc.h"
+          "header": "include/tim_array_src.h"
         },
         "gTimBlockSrcMethods": {
           "class": "TimBlockSrc",
           "date": "2026-09-25",
-          "header": "include/TimBlockSrc.h"
+          "header": "include/tim_block_src.h"
         },
         "gTimImageMethods": {
           "class": "TimImage",
           "date": "2026-09-26",
-          "header": "include/TimImage.h"
+          "header": "include/tim_image.h"
         },
         "gTimedTaskMethods": {
           "class": "TimedTask",
           "date": "2026-09-25",
-          "header": "include/TimedTask.h"
+          "header": "include/timed_task.h"
         },
         "gTitleMenuMethods": {
           "class": "TitleMenu",
           "date": "2026-09-26",
-          "header": "include/TitleMenu.h"
+          "header": "include/title_menu.h"
         },
         "gTmdModelMethods": {
           "class": "TmdModel",
           "date": "2026-09-26",
-          "header": "include/TmdModel.h"
+          "header": "include/tmd_model.h"
         },
         "gTodActorMethods": {
           "class": "TodActor",
           "date": "2026-09-25",
-          "header": "include/TodActor.h"
+          "header": "include/tod_actor.h"
         },
         "gTodMethods": {
           "class": "Tod",
           "date": "2026-09-26",
-          "header": "include/Tod.h"
+          "header": "include/tod.h"
         },
         "gTodSetMethods": {
           "class": "TodSet",
           "date": "2026-09-26",
-          "header": "include/TodSet.h"
+          "header": "include/tod_set.h"
         },
         "gTriggerWorldMethods": {
           "class": "TriggerWorld",
           "date": "2026-09-26",
-          "header": "include/TriggerWorld.h"
+          "header": "include/trigger_world.h"
         },
         "gVabStreamObjMethods": {
           "class": "VabStreamObj",
           "date": "2026-09-26",
-          "header": "include/VabStreamObj.h"
+          "header": "include/vab_stream_obj.h"
         },
         "gVariantSpriteMethods": {
           "class": "VariantSprite",
           "date": "2026-09-26",
-          "header": "include/VariantSprite.h"
+          "header": "include/variant_sprite.h"
         },
         "gViewportMethods": {
           "class": "Viewport",
           "date": "2026-09-25",
-          "header": "include/Viewport.h"
+          "header": "include/viewport.h"
         },
         "gWBgmMethods": {
           "class": "WBgm",
           "date": "2026-09-26",
-          "header": "include/WBgm.h"
+          "header": "include/wbgm.h"
         }
       },
       "reason": "",
@@ -1307,24 +1307,24 @@
     "6": {
       "after": {
         "S16Quad_d294": [
-          "include/Sprite.h"
+          "include/sprite.h"
         ],
         "SceneNodeSub14": [
-          "include/Sprite.h"
+          "include/sprite.h"
         ],
         "SceneNodeSub44": [
-          "include/Sprite.h"
+          "include/sprite.h"
         ]
       },
       "checklist": {
         "sdk-headers": true
       },
       "flagged": {
-        "DrawNode": "ViewportDraw's local view of the scene node Viewport.h's drawNode slot types as SceneNode * (echo, round 94) (2026-09-26)",
-        "EntityMoodHandlerArg": "it is SoundCueSet (entity.h's own comment; PlacementGridVabSound.c and libsnd_vmanager.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)",
-        "S16Quad_d294": "IS Sony's SVECTOR by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
-        "SceneNodeSub14": "IS Sony's GsCOORDINATE2 by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
-        "SceneNodeSub44": "IS Sony's GsCOORD2PARAM by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no SceneNode.h includer re-declared a Sony name. SceneNode.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)"
+        "DrawNode": "viewport_draw's local view of the scene node viewport.h's drawNode slot types as SceneNode * (echo, round 94) (2026-09-26)",
+        "EntityMoodHandlerArg": "it is SoundCueSet (entity.h's own comment; vab_sound.c and libsnd_vmanager.c each define SoundCueSet locally): unify into one header, fields become slots[n].note/pitchOffset (2026-09-26)",
+        "S16Quad_d294": "IS Sony's SVECTOR by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no scene_node.h includer re-declared a Sony name. scene_node.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
+        "SceneNodeSub14": "IS Sony's GsCOORDINATE2 by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no scene_node.h includer re-declared a Sony name. scene_node.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)",
+        "SceneNodeSub44": "IS Sony's GsCOORD2PARAM by layout and use (echo, round 91, SceneNode__SceneNode.md); unparked round 96 once no scene_node.h includer re-declared a Sony name. scene_node.h takes <libgs.h>, so its includers take Sony's headers in the same job (2026-09-27)"
       },
       "parked": {},
       "reason": "",
@@ -1552,37 +1552,37 @@
       ],
       "status": "auto",
       "units_done": {
-        "Application": "2026-09-28",
-        "BMemPMgr": "2026-09-27",
-        "CdDriver": "2026-09-27",
-        "CdStream": "2026-09-27",
-        "DayTaskStageMap": "2026-09-27",
-        "DrawSystem": "2026-09-28",
-        "DreamAux": "2026-09-27",
-        "DreamSys": "2026-09-26",
-        "FlatLightObj": "2026-09-28",
-        "GameApplicationFileResource": "2026-09-27",
-        "GameFiles": "2026-09-27",
-        "GraphicsResources": "2026-09-26",
-        "ObjMStyleActor": "2026-09-27",
-        "Pad": "2026-09-28",
-        "PlacementGridVabSound": "2026-09-27",
-        "SceneNode": "2026-09-28",
-        "ScreenWidgets": "2026-09-27",
-        "Sprite": "2026-09-27",
-        "StageGrid": "2026-09-28",
-        "Task": "2026-09-27",
-        "TextEntryItemList": "2026-09-27",
-        "TimImage": "2026-09-27",
-        "TitleMenuTaskObjF": "2026-09-27",
-        "TmdModel": "2026-09-26",
-        "TmdRenderer": "2026-09-26",
-        "TodActor": "2026-09-27",
-        "ViewportDraw": "2026-09-27",
-        "WBgm": "2026-09-28",
+        "application": "2026-09-28",
+        "bmem_pmgr": "2026-09-27",
+        "cd_driver": "2026-09-27",
+        "cd_stream": "2026-09-27",
+        "draw_system": "2026-09-28",
+        "dream_aux": "2026-09-27",
+        "dream_day": "2026-09-27",
+        "dream_scene": "2026-09-27",
+        "dream_sys": "2026-09-26",
         "entity": "2026-09-27",
+        "flat_light_obj": "2026-09-28",
+        "game_files": "2026-09-27",
+        "game_shell": "2026-09-27",
+        "graphics_resources": "2026-09-26",
+        "input_dialogs": "2026-09-27",
         "libsnd_vmanager": "2026-09-27",
-        "main": "2026-09-28"
+        "main": "2026-09-28",
+        "pad": "2026-09-28",
+        "scene_node": "2026-09-28",
+        "screen_widgets": "2026-09-27",
+        "sprite": "2026-09-27",
+        "stage_grid": "2026-09-28",
+        "task": "2026-09-27",
+        "tim_image": "2026-09-27",
+        "title_menu": "2026-09-27",
+        "tmd_model": "2026-09-26",
+        "tmd_renderer": "2026-09-26",
+        "tod_actor": "2026-09-27",
+        "vab_sound": "2026-09-27",
+        "viewport_draw": "2026-09-27",
+        "wbgm": "2026-09-28"
       }
     },
     "8": {

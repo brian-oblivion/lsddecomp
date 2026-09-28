@@ -4,7 +4,7 @@
 
 > Renamed from `func_80044CD4` on 2026-09-25 (tools/rename.py). Address 0x80044cd4.
 
-Round 82, runner echo (GraphicsResources session, echo #7), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session, echo #7), 2026-09-25. Unit `graphics_resources`.
 Byte-exact; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 27/27 words, no out-of-range
 drift. Fresh ground (carved revision 18, no prior report).
@@ -19,7 +19,7 @@ Table slot (`tools/classtable.py`): none (allocator for gTileMapMethods, object 
 
 The unit-local view `DataSrc33808` (a FileResource subclass built with the unified
 `FILERESOURCE_SLOTS`/`FILERESOURCE_FIELDS` macros, plus `slot7C`/`slot80`, and own
-fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/GraphicsResources.c`.
+fields +0x2C..+0x38) and `SubBlockTable` sit at the top of `src/graphics/graphics_resources.c`.
 
 ```c
 /* Allocate and construct a gTileMapMethods object. */
@@ -44,13 +44,13 @@ void *New_TileMap(s32 arg0, s32 arg1) {
 
 ## Naming
 
-- **New_TileMap**, tier A. src/app/Task.c's TaskCore__TaskCore hands this object to New_BgLayer as its map source; this object's own fields (+0x2C..+0x30) are byte-for-byte Map44294/GsMAP's own layout (cellw/cellh/ncellw/ncellh).
+- **New_TileMap**, tier A. src/app/task.c's TaskCore__TaskCore hands this object to New_BgLayer as its map source; this object's own fields (+0x2C..+0x30) are byte-for-byte Map44294/GsMAP's own layout (cellw/cellh/ncellw/ncellh).
 
 ## Track 4 (2026-09-26, round 88, alpha)
 
-Class unified in `include/TileMap.h`. Returns `TileMap *` (was `void *`); the second parameter is `FileResource *atlas` (was `s32 arg1`: a TileAtlas, gTileAtlasMethods, typed by its nearest unified ancestor); the ctor is reached through `GetTileMapMethods()->ctor` (was the unit-local `UnprototypedCtorTable` cast). The prototype `extern StreamTaskUnkB4Obj *New_TileMap(...)` in include/Task.h is gone. Byte-identical.
+Class unified in `include/tile_map.h`. Returns `TileMap *` (was `void *`); the second parameter is `FileResource *atlas` (was `s32 arg1`: a TileAtlas, gTileAtlasMethods, typed by its nearest unified ancestor); the ctor is reached through `GetTileMapMethods()->ctor` (was the unit-local `UnprototypedCtorTable` cast). The prototype `extern StreamTaskUnkB4Obj *New_TileMap(...)` in include/task.h is gone. Byte-identical.
 
-Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter is `TileAtlas *` (was `FileResource *`), in the prototype in include/TileMap.h (`struct TileAtlas *`, by tag) and in the ctor slot's parameter list. Byte-identical.
+Later the same round (alpha, third class): TileAtlas unified; the `atlas` parameter is `TileAtlas *` (was `FileResource *`), in the prototype in include/tile_map.h (`struct TileAtlas *`, by tag) and in the ctor slot's parameter list. Byte-identical.
 
 ## Round 93 polish (charlie, track 7)
 

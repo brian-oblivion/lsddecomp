@@ -159,4 +159,4 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 7 (round 93, bravo)
 
-Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_END_DREAM`, `ENTITY_STATE_DONE`, `DREAM_COLOR_YELLOW` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). clearTickCallbacks' bool clearLook is `false`; getDreamColor's 6 is DREAM_COLOR_YELLOW (DreamColors, DreamSys.h). Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_END_DREAM`, `ENTITY_STATE_DONE`, `DREAM_COLOR_YELLOW` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/entity.h, SOUND_CUE_STOP in include/sound_cue_set.h). clearTickCallbacks' bool clearLook is `false`; getDreamColor's 6 is DREAM_COLOR_YELLOW (DreamColors, dream_sys.h). Byte-identical (whole image green).

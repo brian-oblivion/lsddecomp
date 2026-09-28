@@ -6,7 +6,7 @@
 
 > Renamed from `func_8004A060` on 2026-09-23 (tools/rename.py). Address 0x8004a060.
 
-**Unit:** DayTaskStageMap · **Size:** 4 words (0x10 bytes) · **Status:** MATCHED (4/4 words)
+**Unit:** dream_day · **Size:** 4 words (0x10 bytes) · **Status:** MATCHED (4/4 words)
 
 ## What it does
 
@@ -34,7 +34,7 @@ DayTaskMethods *GetDayTaskMethods(void) {
 ```
 
 `DayTaskMethods` and `gDayTaskMethods`'s extern declaration are established in
-`include/DayTaskStageMap.h`, added this round. The table's DATA itself is still
+`include/dream_day.h`, added this round. The table's DATA itself is still
 raw (`asm/data/76DC8.data.s`) -- out of this round's scope; only the pointer
 type needed for callers is declared.
 
@@ -48,4 +48,4 @@ None beyond what's already documented.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
-The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/DayTask.h; the Obj865C8/DayTaskMethods views in DayTaskStageMap.h are gone. Renamed from GetObj865C8Methods with the class (returns &gDayTaskMethods, was D_800865C8). Tier A.
+The class (table D_800865C8, id 0x1F230, TimedTask's subclass) is unified as DayTask in include/day_task.h; the Obj865C8/DayTaskMethods views in dream_day.h are gone. Renamed from GetObj865C8Methods with the class (returns &gDayTaskMethods, was D_800865C8). Tier A.

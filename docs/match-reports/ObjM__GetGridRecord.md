@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052E7C` on 2026-09-24 (tools/rename.py). Address 0x80052e7c.
 
-**Unit:** ObjMStyleActor · **Size:** 16 words (0x40 bytes) ·
+**Unit:** dream_scene · **Size:** 16 words (0x40 bytes) ·
 **Status: MATCHED 16/16**, whole-image SHA1 green.
 
 ## What it does
@@ -37,7 +37,7 @@ void ObjM__GetGridRecord(Obj87034_3bb8c_l *self, s32 code, s32 arg2, s32 arg3) {
   the branch TARGET. To match a specific target/fallthrough placement,
   solve for the written `C` that makes `NOT(C)` equal the actual machine
   test, don't guess from the semantics alone.
-- `GetStageMapChunkRecord(index, sub)` (now matched, GameFiles.c) reads both `$a0`
+- `GetStageMapChunkRecord(index, sub)` (now matched, game_files.c) reads both `$a0`
   and `$a1`, and this function writes nothing to `$a1` before the jal, so
   the value the callee uses as `sub` is `code`. Until round 82 this call was
   written with one argument against a K&R declaration, reading `code` as a
@@ -70,7 +70,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and DayTaskStageMap.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the StageMap's value callback (ChunkFileFn, cast at ObjM__AttachTarget); StageMap's ComputeRateEntry keeps the callback's return as an entry's name, and this body leaves GetStageMapChunkRecord's result in $v0, so its real return is likely that FilePathRecord pointer. The return type is left `void` (not changed this round). The first argument of GetStageMapChunkRecord/XY is now `s32 index`, as their definitions take it.
+The class is unified as ObjM in include/objm.h (table gObjMMethods, was D_80087034); the dream_scene/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and dream_day.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the StageMap's value callback (ChunkFileFn, cast at ObjM__AttachTarget); StageMap's ComputeRateEntry keeps the callback's return as an entry's name, and this body leaves GetStageMapChunkRecord's result in $v0, so its real return is likely that FilePathRecord pointer. The return type is left `void` (not changed this round). The first argument of GetStageMapChunkRecord/XY is now `s32 index`, as their definitions take it.
 
 ## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
 
@@ -83,20 +83,20 @@ is the second argument; the forwarded form is byte-identical.
 
 Renamed from `ObjM__OnRegistrantEvent` (`tools/rename.py`). Tier A: the
 body is a lookup leaf, and its one use is as the StageMap's chunkFileFn
-(ObjM__AttachTarget's setCallback; StageMap.h: ComputeChunkLoadEntry calls
+(ObjM__AttachTarget's setCallback; stage_map.h: ComputeChunkLoadEntry calls
 `chunkFileFn(ctx, value, 0, 0)` and keeps the result as the entry's file
 record). The name mirrors the two functions it forwards to,
 GetStageMapChunkRecord and GetStageMapChunkRecordXY. "Registrant event" described nothing
 the body does. Parameters: `code, arg2, arg3` -> `cell, x, y` (GetStageMapChunkRecord's
-`sub` is a linear cell index; GetStageMapChunkRecordXY takes x, y). ObjM.h's
+`sub` is a linear cell index; GetStageMapChunkRecordXY takes x, y). objm.h's
 prototype follows.
 
 The body stays `void`: class_3bb8c.h declares GetStageMapChunkRecordXY `void`
-although GameFiles.c defines it returning `FilePathRecord *`, so the record is
+although game_files.c defines it returning `FilePathRecord *`, so the record is
 returned only because it is still in $v0. Proposed for the head: that
 prototype returns `FilePathRecord *` (or `void *`), after which this body can
 `return` both calls.
 
 ## Track 10 (2026-09-28, round 104, echo)
 
-GameFiles.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into CdDriver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. GameFiles.h includes CdDriver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.
+game_files.h's `FilePathRecord` (an opaque `u8 data[0x1C]`) merged into cd_driver.h's `CdFileEntry` ({name[0x14], CdlLOC pos, u32 size}, 0x1C): sRecordTable goes GetRecordTable -> RegisterRecordTableFiles -> RegisterFileTableEntries -> SetFileTable, so its records are the CD driver's file-table entries. game_files.h includes cd_driver.h; sRecordTable is declared `CdFileEntry[]` and GetRecordTable returns `CdFileEntry *`, dropping the casts at its callers, and a record used as a path is spelled `record->name` instead of a `(char *)`/`(const char *)` cast. Byte-identical.

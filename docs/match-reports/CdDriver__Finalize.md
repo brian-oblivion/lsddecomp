@@ -60,10 +60,10 @@ The section above types `slot74` as `void (*)(void)` because its `jalr` has
 a nop delay slot. That reading is wrong about the callee: at that `jalr`,
 `$a0` still holds this function's own `self` (the prologue's `move s0,a0`
 copies it and leaves `$a0` intact), and `CdDriver__CancelRequests`
-(CdDriver.c) reads `self` from `$a0`. So the call does pass `self`.
+(cd_driver.c) reads `self` from `$a0`. So the call does pass `self`.
 Retyped to `void (*cancelRequests)(void *self)` and called as
 `self->methods->cancelRequests(self)`: **byte-identical** (build exit 0,
-SHA1 OK, check-nonmatching green). `FileResource__Finalize` in GameApplicationFileResource.c
+SHA1 OK, check-nonmatching green). `FileResource__Finalize` in game_shell.c
 has the identical compiled shape with `this` passed explicitly, which is
 the precedent. The nop delay slot said only that no argument register
 needed LOADING, not that none was read.
@@ -76,4 +76,4 @@ needed LOADING, not that none was read.
   the slot zero-argument.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Destroy` -> `CdDriver__Finalize` by rename.py. Renamed from Destroy for its slot, +0x00C finalize (track 4 step 6): the body cancels the object's requests and frees its buffer, which is what the slot does.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/cd_driver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `Class6D4E8__Destroy` -> `CdDriver__Finalize` by rename.py. Renamed from Destroy for its slot, +0x00C finalize (track 4 step 6): the body cancels the object's requests and frees its buffer, which is what the slot does.

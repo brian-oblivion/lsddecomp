@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E444` on 2026-09-24 (tools/rename.py). Address 0x8004e444.
 
-**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class).
+**Unit:** title_menu (round 14, `Node3bb8cE` class).
 
 ## What it does
 
@@ -103,9 +103,9 @@ badly); it wants the narrow-then-wide literal if-chain instead. See
 ## Constants (round 98, track 7)
 
 `(id & 0xF) == 2` / `== 5` are `(id & CLASS_ID_ROOT_MASK) == PAD_CLASS_ID` /
-`FRAMECLOCK_CLASS_ID` (basic_class.h, Pad.h, FrameClock.h; gPadMethods' and
+`FRAMECLOCK_CLASS_ID` (basic_class.h, pad.h, frame_clock.h; gPadMethods' and
 gFrameClockMethods' word +0x000 are 0x2 and 0x5). The two-nibble tests stay
 literal: `& 0xFF` against 0x10 (gTextEntryMethods' word +0x000) and 0x20
 (gItemListMethods'), proposed to the head as `TEXTENTRY_CLASS_ID` and
-`ITEMLIST_CLASS_ID` because TitleMenuTaskObjF.c's OnNotify spells the same ids.
+`ITEMLIST_CLASS_ID` because title_menu.c's OnNotify spells the same ids.
 Zero bytes changed.

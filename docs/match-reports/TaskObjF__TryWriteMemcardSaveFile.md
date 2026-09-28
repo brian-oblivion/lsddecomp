@@ -168,9 +168,9 @@ TaskObjF__TryWriteMemcardSaveFile -- STALL. Length: 1 word SHORT (239/240, 0x3BC
 > of source statement order at that point. Not re-attempted further this
 > round; restored to `INCLUDE_ASM` unchanged.
 
-Unit: `TitleMenuTaskObjF`. Not toolchain-blocked: no `gp_rel` hit, no
+Unit: `title_menu`. Not toolchain-blocked: no `gp_rel` hit, no
 `addiu $at,$at,%lo` hit, no dense-`switch`/`jr $v0` dispatch in
-`asm/nonmatchings/TitleMenuTaskObjF/TaskObjF__TryWriteMemcardSaveFile.s`.
+`asm/nonmatchings/title_menu/TaskObjF__TryWriteMemcardSaveFile.s`.
 
 **This is the first C ever attempted against this function.** The previous
 round's report ("predicted-hard, screened and read but not attempted...
@@ -238,12 +238,12 @@ parameter; retyping either signature risks that caller's own compiled
 bytes for no byte-level benefit (the cast is functionally identical
 either way).
 
-## New types (all local to `TitleMenuTaskObjF.c` -- none shared, no header
+## New types (all local to `title_menu.c` -- none shared, no header
 ## changes made this round)
 
 **RENAMED round 60** (track 3 naming pass; these are local typedefs, not
 symbol-table entries, so `tools/rename.py` does not touch them -- edited
-by hand in `src/ui/TitleMenuTaskObjF.c` and re-verified with an isolated
+by hand in `src/ui/title_menu.c` and re-verified with an isolated
 `cpp|cc1` syntax check since the body sits in `#if 0` and the normal
 build never compiles it; see `## Naming` below). Original names, carried
 from the round that first derived this body: `StreamSmallSub`/
@@ -289,11 +289,11 @@ typedef struct McSaveHeader {
 `IconPaletteHalf` deliberately has no `s32` member (alignment 2) so a
 whole-struct copy compiles to the unaligned `lwl`/`lwr` + `swl`/`swr`
 idiom already documented for `Descriptor10`
-(`include/class_3bb8c.h`) and `Block24` (`src/world/ObjMStyleActor.c`).
+(`include/class_3bb8c.h`) and `Block24` (`src/world/dream_scene.c`).
 `IconFrame` is a plain byte array (alignment 1) so a whole-struct
 copy compiles to the RUNTIME-alignment-checked dual-path copy retail
 actually shows for the three 0x80-byte spans -- confirmed against
-`ObjMStyleActor.c`'s own comment on `Block24`: *"a byte array... compiles
+`dream_scene.c`'s own comment on `Block24`: *"a byte array... compiles
 the copy as a generic runtime-alignment-checked memcpy loop instead"*.
 Both idioms transferred to this function unchanged, on the first attempt,
 for all five copy regions.
@@ -357,7 +357,7 @@ s32 TaskObjF__TryWriteMemcardSaveFile(TaskObjF *self, s32 a1, s32 handle, s32 a3
 ```
 
 (round 60: this snapshot now matches the LIVE preserved body in
-`src/ui/TitleMenuTaskObjF.c` exactly -- the `func_80050908`/`func_80050938`/
+`src/ui/title_menu.c` exactly -- the `func_80050908`/`func_80050938`/
 `func_800508F8`/`func_80013488`/`func_80012C20`-style names in the prose
 above this point in the report are historical, from before round 34
 relinked these as Sony's `delete`/`open`/`close`/`write`/`printf`; the
@@ -450,8 +450,8 @@ duplicate-register materialization), not a new independent class.
 ## Screening
 
 ```
-grep -n 'gp_rel' asm/nonmatchings/TitleMenuTaskObjF/TaskObjF__TryWriteMemcardSaveFile.s        # no hits
-grep -n 'addiu *$at, *$at, *%lo' asm/nonmatchings/TitleMenuTaskObjF/TaskObjF__TryWriteMemcardSaveFile.s  # no hits
+grep -n 'gp_rel' asm/nonmatchings/title_menu/TaskObjF__TryWriteMemcardSaveFile.s        # no hits
+grep -n 'addiu *$at, *$at, *%lo' asm/nonmatchings/title_menu/TaskObjF__TryWriteMemcardSaveFile.s  # no hits
 ```
 Clean of both open toolchain blockers (per the coordinator's own
 screening this round, not re-run).
@@ -478,7 +478,7 @@ Evidence: this unit's own `TaskObjF__WriteMemcardSaveFile` (its only
 caller) is the bounded-retry wrapper around it, and the "Try" prefix
 matches this project's existing convention for a single, non-retrying
 attempt a caller may retry (`SceneNode__TryAttachNearby`,
-`src/graphics/SceneNode.c`). "Memcard" is established by `BuildMemcardPath`'s
+`src/graphics/scene_node.c`). "Memcard" is established by `BuildMemcardPath`'s
 own `bu00:`/`bu10:` device templates; "SaveFile" is established by the
 0x200-byte buffer's structural match to the PS1 memory-card save file
 header format (see the local-type naming note below) plus the BIOS
@@ -493,7 +493,7 @@ well-known format, not a string/symbol-table fact): `StreamSmallSub` ->
 magic1`, `b2` -> `iconFrameFlag`, `b3` -> `blockCount`, `name` ->
 `title`, `arr` -> `palette`, `blkA/blkB/blkC` -> `frame0/frame1/frame2`).
 These are unit-local typedefs, not symbols in `config/symbols.slps01556.lsdde.txt`,
-so `tools/rename.py` does not apply; edited directly in `src/ui/TitleMenuTaskObjF.c`
+so `tools/rename.py` does not apply; edited directly in `src/ui/title_menu.c`
 and confirmed to still parse with an isolated `cpp|cc1` pass (the body is
 `#if 0`, so the normal build never compiles it and could not have caught
 a syntax error here).
@@ -529,7 +529,7 @@ a syntax error here).
 
 ## Track 4 (2026-09-26, round 89)
 
-Parameters retyped with TaskObjF's unification (include/TaskObjF.h), byte-identical: `a1` is `char *fileName` (TaskObjF::fileName; BuildMemcardPath's suffix), `handle` is `char *title` (TaskObjF::title; strcpy'd into the header), `arg5` is `struct TimImage *icon` (TaskObjF::iconImage, from TitleMenu's iconHandle; the icon source is its FileResource `buffer`, +0x010, so the local McIconSourceRef view is gone), `arg6` is `void *data` and `arg7` is `s32 size`. Only StampSaveTitleFileLetter's own `(s32, s32)` view still takes casts.
+Parameters retyped with TaskObjF's unification (include/task_objf.h), byte-identical: `a1` is `char *fileName` (TaskObjF::fileName; BuildMemcardPath's suffix), `handle` is `char *title` (TaskObjF::title; strcpy'd into the header), `arg5` is `struct TimImage *icon` (TaskObjF::iconImage, from TitleMenu's iconHandle; the icon source is its FileResource `buffer`, +0x010, so the local McIconSourceRef view is gone), `arg6` is `void *data` and `arg7` is `s32 size`. Only StampSaveTitleFileLetter's own `(s32, s32)` view still takes casts.
 
 ## Round 95 (track 7, charlie)
 
@@ -561,7 +561,7 @@ as one field. `McIconSource` reads as a 4bpp TIM with one 16-colour CLUT:
 CLUT to 0x34, a 12-byte pixel block header to 0x40, pixels after -- which
 is why the frames sit at 0x40/0xC0/0x140.
 
-### Moved from src/ui/TitleMenuTaskObjF.c
+### Moved from src/ui/title_menu.c
 
 The type block's naming note, the types' comments, and the comments on
 the function's local declarations, as they stood before track 7:
@@ -582,7 +582,7 @@ the function's local declarations, as they stood before track 7:
 /* Half of the 16-colour icon CLUT (8 x s16 = 0x10 bytes) -- all s16
  * members (alignment 2, no s32) so a whole-struct copy compiles to the
  * unaligned lwl/lwr + swl/swr idiom already documented (Descriptor10 in
- * class_3bb8c.h, Block24 in ObjMStyleActor.c). Two of these sit back to
+ * class_3bb8c.h, Block24 in dream_scene.c). Two of these sit back to
  * back (0x14..0x33) in the source object and (0x60..0x7F) in the request
  * buffer -- copied as an array of 2, not a loop (matches retail: fully
  * unrolled, no branch, no runtime alignment check). */
@@ -593,7 +593,7 @@ typedef struct IconPaletteHalf {
 /* One 16x16 4bpp icon animation frame -- a raw, opaque 0x80-byte span
  * (alignment 1, a plain byte array), so a whole-struct copy compiles to
  * the RUNTIME-alignment-checked lw/sw-vs-lwl/lwr dual path retail shows
- * for these three chunks (the same idiom src/world/ObjMStyleActor.c's Block24
+ * for these three chunks (the same idiom src/world/dream_scene.c's Block24
  * documents: "a byte array... compiles the copy as a generic
  * runtime-alignment-checked memcpy loop instead"). Three of these are
  * copied in sequence. */

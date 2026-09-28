@@ -2,7 +2,7 @@
 
 > Renamed from `new_class_6bea0` on 2026-09-25 (tools/rename.py). Address 0x8001f250.
 
-Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/TmdModel.c`. Fresh ground, no prior attempt.
+Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/graphics/tmd_model.c`. Fresh ground, no prior attempt.
 
 - **What:** the allocator of class gTmdModelMethods: `p = BMemPMgrAlloc(0x24); if (p != NULL) { GetTmdModelMethods()->ctor(p, arg); return p; } return NULL;`. The ctor (slot +0x008, `TmdModel__TmdModel`) takes the allocator's argument as its second parameter.
 - **Result:** byte-exact; 24/24 words, whole-image SHA1 green. First build (the broadcast allocator shape).
@@ -55,8 +55,8 @@ renamed in the struct definition only, compiler-verified accessor list
 
 ## Track 4 (2026-09-26, round 87, delta)
 
-Parameter retyped `void *arg` -> `TmdObject *object` (include/TmdModel.h),
-byte-identical. Callers checked: `LinkResource__BuildModels` (GraphicsResources)
+Parameter retyped `void *arg` -> `TmdObject *object` (include/tmd_model.h),
+byte-identical. Callers checked: `LinkResource__BuildModels` (graphics_resources)
 is the only caller of `New_TmdModel`, passing entry `i` of the loaded TMD's
 0x1C-byte object table (buffer + 0xC); `New_TmdModel` is the only caller of
 the ctor, through slot +0x008. The ctor stores the argument in `object` and
@@ -67,8 +67,8 @@ first).
 
 `BMemPMgrAlloc(0x24)` -> `BMemPMgrAlloc(sizeof(TmdModel))`, the codebase-wide
 idiom once a class's allocator size matches its now-real struct (e.g.
-`src/graphics/GraphicsResources.c`'s `BMemPMgrAlloc(sizeof(TimBlockSrc))`). `sizeof(TmdModel)`
-is 0x24 (`include/TmdModel.h`'s own banner already states the object is
+`src/graphics/graphics_resources.c`'s `BMemPMgrAlloc(sizeof(TimBlockSrc))`). `sizeof(TmdModel)`
+is 0x24 (`include/tmd_model.h`'s own banner already states the object is
 0x24 bytes); byte-identical, build and check-nonmatching.sh green.
 
 ## Unit history

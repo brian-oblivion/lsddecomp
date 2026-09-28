@@ -2,7 +2,7 @@
 
 > Renamed from `func_8005C650` on 2026-09-21 (tools/rename.py). Address 0x8005c650.
 
-**Unit:** DreamAux · **Size:** 34 words · **Status:** MATCHED round 43
+**Unit:** dream_aux · **Size:** 34 words · **Status:** MATCHED round 43
 (34/34, byte-exact whole-image build).
 
 ## History
@@ -17,7 +17,7 @@ blocker classification. Round 43 derived and matched it fresh.
 ## What it does
 
 The initializer for this unit's five `%gp_rel` globals plus a one-shot
-"spawn an Entity per DreamAux slot" loop:
+"spawn an Entity per dream_aux slot" loop:
 
 ```c
 extern void *New_Entity(void *arg0, void *arg1, void *arg2);
@@ -67,7 +67,7 @@ Two derivation points worth recording:
   confirmed data points for the "run this loop once" idiom, and both need
   the counter unsigned to match.**
 - **The struct field this function writes did not exist yet.** `DreamAuxSlot`
-  (`include/DreamAux.h`) previously had `void *obj; u8 unk4[0x10];`. This
+  (`include/dream_aux.h`) previously had `void *obj; u8 unk4[0x10];`. This
   function's `sw $v0, 0x4($s1)` after the `New_Entity` call writes a pointer
   at the slot's offset 0x4, so `unk4` is now split into a named `void *entity`
   plus the remaining `u8 unkC[0xC]` (unread by anything in this unit still).
@@ -92,7 +92,7 @@ own reading of that argument). The cast to `(void *)` here is cosmetic --
 GCC 2.6.3 does not care about the mismatch for either codegen or scoring, and
 `New_Entity`'s own signature is out of scope for this unit to change. Its
 prototype and the five new `%gp_rel` globals are declared locally in
-`DreamAux.c` (not in `DreamAux.h`), per the shared-header rule: `entity.c`
+`dream_aux.c` (not in `dream_aux.h`), per the shared-header rule: `entity.c`
 owns `New_Entity`, this unit only calls it.
 
 ## Proposed learning
@@ -110,7 +110,7 @@ Two independent instances now confirm it in this unit alone
 shared context globals (`sDreamAuxStage`, `sDreamAuxWorld` and three still-
 unnamed siblings), spawns one entity into `sDreamAuxSlots[0].entity` via
 `New_Entity`, then calls `SetTeleportsEnabled`. Called from
-`ObjM__SetupSceneStyle` (`ObjMStyleActor.c`), itself a per-object/per-level setup
+`ObjM__SetupSceneStyle` (`dream_scene.c`), itself a per-object/per-level setup
 routine. "World" reflects `sDreamAuxWorld`'s own established role (cast
 `TriggerWorld*`, dispatched through vtable slots 0x80/0x22 elsewhere in the
 unit) -- but this function's OWN purpose (why these five values, together,
@@ -125,16 +125,16 @@ Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 ## Track 4 (2026-09-26, round 88)
 
 The third parameter is retyped `s32 a2` -> `DreamSys *world`, and the global
-it is stored in, sDreamAuxWorld, `s32` -> `DreamSys *` (DreamAux.c). Its
-only caller, ObjM__SetupSceneStyle (ObjMStyleActor), passes its DreamSys
-`target`; DreamAux calls +0x200 of its table (getDreamColor) and passes
+it is stored in, sDreamAuxWorld, `s32` -> `DreamSys *` (dream_aux.c). Its
+only caller, ObjM__SetupSceneStyle (dream_scene), passes its DreamSys
+`target`; dream_aux calls +0x200 of its table (getDreamColor) and passes
 it as Entity's peer. Byte-identical.
 
-## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
-Parameters named from the caller (ObjM__SetupSceneStyle, ObjMStyleActor.c,
+Parameters named from the caller (ObjM__SetupSceneStyle, dream_scene.c,
 whose own declaration already says `stage, grid, world, sound, clock`, and
-ObjM.h: unk14 the StageMap, unk10 the FrameClock, TimedTask's sound the
+objm.h: unk14 the StageMap, unk10 the FrameClock, TimedTask's sound the
 VabStreamObj): a0..a4 -> stage, stageMap, world, sound, frameClock. The
 globals it installs were renamed with tools/rename.py: D_8008ABFC ->
 sDreamAuxStageMap (tier A), D_8008AC04 -> sDreamAuxSound (tier A, New_Entity's
@@ -147,5 +147,5 @@ The extern comments, as they stood:
 
 ```c
 extern StageMap *D_8008ABFC; /* the grid manager: SetDreamAuxWorld's a1; Entity__AttachToParent keeps it as the entity's grid */
-extern DreamSys *sDreamAuxWorld; /* the player DreamSys: ObjMStyleActor passes its `target` */
+extern DreamSys *sDreamAuxWorld; /* the player DreamSys: dream_scene passes its `target` */
 ```

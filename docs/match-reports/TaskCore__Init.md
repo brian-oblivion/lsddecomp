@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003C1DC` on 2026-09-23 (tools/rename.py). Address 0x8003c1dc.
 
-**Unit:** Task · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
+**Unit:** task · **Size:** 23 instructions (0x5C bytes) · **Status:** MATCHED (23/23 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -43,7 +43,7 @@ s32 TaskCore__Init(StreamTaskObj *self, s32 a1, s32 a2) {
 
 Matched first attempt.
 
-**Return-type discrepancy with `include/GameApplication.h`, flagged for the
+**Return-type discrepancy with `include/game_application.h`, flagged for the
 head:** that header already types this exact slot (`gTaskCoreMethods::slot44`,
 its own `LoaderTaskMethods::slot44`) as `void`, established from a
 *different, discarding* caller's call sites in another unit. This function's
@@ -53,16 +53,16 @@ purpose except to be the return value (nothing else touches it). A truly
 `void` source would not need this load at all. The two typings are not in
 conflict at the ABI level (a caller that ignores the return through a
 `void`-typed function pointer simply never reads `$v0`, which is exactly
-what `GameApplication.h`'s own caller does), so `GameApplication.h`'s existing callers
+what `game_application.h`'s own caller does), so `game_application.h`'s existing callers
 are unaffected either way -- but the FUNCTION's true return type is `s32`,
-and `GameApplication.h`'s `LoaderTaskMethods::slot44` typing looks incomplete now
+and `game_application.h`'s `LoaderTaskMethods::slot44` typing looks incomplete now
 that the occupant is known. Not fixed here (out of this unit's scope to edit
 that header under the parallel-run rules); worth the head reconciling in
-`GameApplication.h` directly, in a later round.
+`game_application.h` directly, in a later round.
 
 ## New struct/header knowledge
 
-Added `include/Task.h`'s `TaskUtilMethods` (this unit's own local view
+Added `include/task.h`'s `TaskUtilMethods` (this unit's own local view
 of `gIntermediateBaseMethods`) with slot `+0x044` typed
 `void (*)(StreamTaskObj *self, s32 a1, s32 a2)` (its own return is
 discarded at this call site, so its true type is unconfirmed either way).
@@ -94,4 +94,4 @@ for something unconfirmed.
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from TaskCoreObj__func_8003C1DC (tools/rename.py). Occupant of +0x044 (`init`), named for the slot: IntermediateBase's init, then returns +0x038, now `result` (onInit clears it, setState(6) sets 1, StreamTaskObj sets 2). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from TaskCoreObj__func_8003C1DC (tools/rename.py). Occupant of +0x044 (`init`), named for the slot: IntermediateBase's init, then returns +0x038, now `result` (onInit clears it, setState(6) sets 1, StreamTaskObj sets 2). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).

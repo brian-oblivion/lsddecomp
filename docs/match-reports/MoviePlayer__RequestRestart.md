@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004593C` on 2026-09-25 (tools/rename.py). Address 0x8004593c.
 
-Round 82, runner echo (GraphicsResources session), 2026-09-25. Unit `GraphicsResources`.
+Round 82, runner echo (graphics_resources session), 2026-09-25. Unit `graphics_resources`.
 Byte-exact on the FIRST build; whole-image SHA1 green (`./build-and-verify.sh`:
 `OK: build matches retail SLPS_015.56`), funcdiff 3/3, 0 insertions / 0
 deletions, no out-of-range drift. Fresh ground (carved revision 18, no prior report).
@@ -27,7 +27,7 @@ void MoviePlayer__RequestRestart(Obj33808_50 *self) {
 
 - Only `common.h` is included; no shared header was edited. Local declarations
   (the `extern s32 D_...[]` table symbol or the unit-local struct view) sit
-  directly above the function in `src/graphics/GraphicsResources.c`.
+  directly above the function in `src/graphics/graphics_resources.c`.
 
 ## Naming
 
@@ -35,7 +35,7 @@ void MoviePlayer__RequestRestart(Obj33808_50 *self) {
 
 ## Track 4 (2026-09-26, round 89)
 
-Class unified in `include/MoviePlayer.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/GraphicsResources.c` are gone; Obj33808_50 is gone (see MarkPlaying). Stop passes this function and the player to CdStream's slot7C. Byte-identical; `typeviews.py --warnings` 0 new.
+Class unified in `include/movie_player.h` (id 0x70, table `gMoviePlayerMethods`, was `D_8006F614`; a direct BasicClass subclass, 0x6C bytes). The unit-local views in `src/graphics/graphics_resources.c` are gone; Obj33808_50 is gone (see MarkPlaying). Stop passes this function and the player to CdStream's slot7C. Byte-identical; `typeviews.py --warnings` 0 new.
 
 ## Round 93 polish (charlie, track 7)
 

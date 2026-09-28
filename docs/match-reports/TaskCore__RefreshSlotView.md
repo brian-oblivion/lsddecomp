@@ -51,13 +51,13 @@ declarations for one function-level `i` (no effect on the bytes).
 
 ### Header note, for the head
 
-`Unk68ObjMethods.slot4C` in `include/Task.h` is declared
+`Unk68ObjMethods.slot4C` in `include/task.h` is declared
 `(Unk68Obj *self, s32 a1)`; its only observed caller is this function, which
 passes three arguments. The shared header was left untouched (additive-only
 rule); the unit carries a local `Unk68Slot4CFn` call type and casts at the
 call site. Retyping the slot to `(Unk68Obj *self, s32 a1, void *pos)` and
 dropping the cast is a zero-byte cleanup. Likewise `Unk24Elem`'s +0x10/+0x14
-could become one struct member (only `Task.c` uses `Unk24Elem`).
+could become one struct member (only `task.c` uses `Unk24Elem`).
 
 ### Proposed learning
 
@@ -200,7 +200,7 @@ as already-known, cross-function evidence rather than a fresh mystery.
 ## Round 46 (runner delta): drift-checked fresh, no new attempt -- DELIBERATE SKIP, reason recorded
 
 Re-spliced the exact preserved body below (unchanged) into
-`src/app/Task.c` in isolation (every other INCLUDE_ASM in all four of
+`src/app/task.c` in isolation (every other INCLUDE_ASM in all four of
 this runner's units confirmed still wrapped first) and rebuilt through
 the full oracle: reproduces **50/145 words, with the expected
 `WARNING: differs OUTSIDE this range too (232312 bytes)`** -- exactly the
@@ -255,22 +255,22 @@ not read this as "95 words wrong."
 detour:** rebuilding this body threw a much larger-looking failure than
 expected -- the whole-image `cmp -l` first divergence landed at file
 offset `0x1908`, inside a DIFFERENT unit's rodata
-(`ScreenWidgets.c.o`'s `jtbl_80011108`), nowhere near this function's own
+(`screen_widgets.c.o`'s `jtbl_80011108`), nowhere near this function's own
 address range. This is NOT a new bug and NOT evidence of cross-unit
 corruption -- it is the ordinary, fully-expected consequence of this
 function compiling 4 bytes (one instruction) short: with `section_order`
 concatenating every file's output in a fixed order, a 4-byte shrink in
 this unit's `.text` shifts the START address of every later file's
 sections by 4 bytes, which is exactly what showed up as a mismatch deep
-inside `ScreenWidgets`'s already-matched rodata. Confirmed by direct
-section-size diffing (`objdump -h` on `Task.c.o`, INCLUDE_ASM
+inside `screen_widgets`'s already-matched rodata. Confirmed by direct
+section-size diffing (`objdump -h` on `task.c.o`, INCLUDE_ASM
 vs. this body: `.text` `0x1258` -> `0x1254`, exactly 4 bytes) --
 CLAUDE.md's own "one instruction short, everything after it shifted"
 category, not a new failure mode. **Also confirmed, separately: splat's
 `make extract` is match-status-aware of `src/*.c`** -- while this
 function was defined as real C (mid-investigation), a fresh `make
 clean && make extract` did not regenerate
-`asm/nonmatchings/Task/TaskCore__RefreshSlotView.s` at all, because splat
+`asm/nonmatchings/task/TaskCore__RefreshSlotView.s` at all, because splat
 saw the symbol already implemented in C and skipped generating a
 nonmatching stub for it. Restoring `INCLUDE_ASM` and re-running `make
 extract` regenerated it correctly. Recording this because it means **an
@@ -374,7 +374,7 @@ swap, since this looks close to the ideal case for that specific macro
 (two adjacent, provably-independent statements whose ORDER alone
 differs).
 
-Restored to `INCLUDE_ASM`. `asm/nonmatchings/Task/TaskCore__RefreshSlotView.s`
+Restored to `INCLUDE_ASM`. `asm/nonmatchings/task/TaskCore__RefreshSlotView.s`
 regenerated via `make extract` in that state. Full oracle re-confirmed
 green (`build exit=0`, `OK: build matches retail`) before moving on to
 `TaskCore__CommitElementScroll`.
@@ -637,8 +637,8 @@ should do.**
 Measured on the retail side, which settles it:
 
 ```sh
-grep -oE 'sw +\$s[0-9]' asm/nonmatchings/Task/TaskCore__RefreshSlotView.s | sort -u | wc -l   # 8  ($s0..$s7)
-grep -oE 'sw +\$s[0-9]' asm/nonmatchings/Task/TaskCore__CommitElementScroll.s | sort -u | wc -l   # 6  ($s0..$s5)
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/task/TaskCore__RefreshSlotView.s | sort -u | wc -l   # 8  ($s0..$s7)
+grep -oE 'sw +\$s[0-9]' asm/nonmatchings/task/TaskCore__CommitElementScroll.s | sort -u | wc -l   # 6  ($s0..$s5)
 ```
 
 - **`TaskCore__CommitElementScroll` has no register-count problem at all.** Its own report
@@ -751,7 +751,7 @@ void TaskCore__RefreshSlotView(Obj86B60 *self, void *a1, s32 a2)
 }
 ```
 
-Requires (already committed to `include/Task.h`): `Unk24Elem`,
+Requires (already committed to `include/task.h`): `Unk24Elem`,
 `Unk64ElemMethods` with `slot4C`/`slot50`/`slot60`, `Unk68ObjMethods` with
 `slot4C`/`slot50`/`slotC0`, `Obj86B60.unk68`/`unk4C`/`unk58`/`unk14`.
 
@@ -773,20 +773,20 @@ Renamed `func_` -> `Obj86B60__RefreshSlotView`. **Tier B**: Pings every element 
 
 ## Track 4 (2026-09-25, round 84, alpha)
 
-Renamed from Obj86B60__RefreshSlotView (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/TaskCore.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from Obj86B60__RefreshSlotView (tools/rename.py): the class prefix. Occupant of its gTaskCoreMethods slot, named for it in TASKCORE_SLOTS (`classtable.py gTaskCoreMethods`). The class (id 0x130, table gTaskCoreMethods) is unified as `TaskCore` in `include/task_core.h`; `self` is `TaskCore *` (it was the `Obj86B60` or `StreamTaskObj` view). Any source block above is the pre-unification spelling; the live body takes the unified types and slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 4 (2026-09-25, round 85, charlie)
 
-listView is a BoxFill (include/BoxFill.h); the deleted `Unk68Obj` view's slots are BoxFill's: slot4C = attachToParent (cast to BoxFillAttachToParentFn, arguments cast), slotC0 = setSize({0x28, count * 12}), slot50 = detachFromParent. Zero bytes.
+listView is a BoxFill (include/box_fill.h); the deleted `Unk68Obj` view's slots are BoxFill's: slot4C = attachToParent (cast to BoxFillAttachToParentFn, arguments cast), slotC0 = setSize({0x28, count * 12}), slot50 = detachFromParent. Zero bytes.
 
 ## Track 7 (2026-09-27, round 98, bravo)
 
-The layout literals are unit-local constants: SLOT_LIST_ROW_PITCH 10 (item rows' spacing, also CommitElementScroll's), SLOT_LIST_FRAME_WIDTH 40 and SLOT_LIST_FRAME_ROW_HEIGHT 12 (listView's setSize: 40 by count * 12, BoxFill.h's banner reads the same). `pos` is now `entry->pos` (SlotEntry::pos, see CommitElementScroll's report). Locals: a1 -> parent, a2 -> show, idx -> slot, arr -> item, counter -> cursor, buf -> size, target -> entry.
+The layout literals are unit-local constants: SLOT_LIST_ROW_PITCH 10 (item rows' spacing, also CommitElementScroll's), SLOT_LIST_FRAME_WIDTH 40 and SLOT_LIST_FRAME_ROW_HEIGHT 12 (listView's setSize: 40 by count * 12, box_fill.h's banner reads the same). `pos` is now `entry->pos` (SlotEntry::pos, see CommitElementScroll's report). Locals: a1 -> parent, a2 -> show, idx -> slot, arr -> item, counter -> cursor, buf -> size, target -> entry.
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-`SlotEntry` and `SrcDesc` (two views of one record in src/app/Task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
+`SlotEntry` and `SrcDesc` (two views of one record in src/app/task.c) merged into `TaskCoreItemList` (+0x004 savedCursor, +0x008 cursorColor, +0x010 pos, +0x018 itemNames), and `TaskCoreTarget::unk24` (`void **`) is now `TaskCoreItemList **slotLists`, so the casts at every read are gone; createSlotElements takes `TaskCoreItemList *list`. Byte-identical (whole image green).
 
 ## Track 10 (2026-09-28, round 104, alpha)
 
-Task.c's local `SlotPos` ({s32 x, y}) is gone: the positions are ScreenSprite.h's `ScreenSpritePos`, the same two words, which setPosition takes, and `TaskCoreTarget::slotPositions` is `ScreenSpritePos *` (was `u8 *`). Byte-identical.
+task.c's local `SlotPos` ({s32 x, y}) is gone: the positions are screen_sprite.h's `ScreenSpritePos`, the same two words, which setPosition takes, and `TaskCoreTarget::slotPositions` is `ScreenSpritePos *` (was `u8 *`). Byte-identical.

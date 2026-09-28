@@ -4,7 +4,7 @@
 
 > Renamed from `func_8004A130` on 2026-09-23 (tools/rename.py). Address 0x8004a130.
 
-**Unit:** DayTaskStageMap · **Status:** MATCHED (27/27 words)
+**Unit:** dream_day · **Status:** MATCHED (27/27 words)
 
 A `New_X` class allocator: allocate 0x38 bytes, and if that succeeds dispatch
 the class's constructor slot (`+0x008`) with the caller's arguments forwarded
@@ -26,7 +26,7 @@ Obj865C8 *New_TimedTask(s32 arg1, SubObjB *arg2)
 }
 ```
 
-See `src/world/DayTaskStageMap.c` for the exact text.
+See `src/world/dream_day.c` for the exact text.
 
 ## Why it matched: `return NULL;` goes LAST
 
@@ -62,4 +62,4 @@ updated with what survived and what did not.
 
 ## Track 4
 
-2026-09-25, round 84 (bravo): class unified in `include/TimedTask.h`. Not renamed. Signature `TimedTask *New_TimedTask(char *soundBankPath, BasicClass *sound)`, the ctor's parameters; 0x38 is the object size TIMEDTASK_FIELDS ends at. No C caller. Image byte-identical.
+2026-09-25, round 84 (bravo): class unified in `include/timed_task.h`. Not renamed. Signature `TimedTask *New_TimedTask(char *soundBankPath, BasicClass *sound)`, the ctor's parameters; 0x38 is the object size TIMEDTASK_FIELDS ends at. No C caller. Image byte-identical.

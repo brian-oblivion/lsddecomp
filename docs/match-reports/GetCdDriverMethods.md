@@ -21,7 +21,7 @@ vtable is `gCdDriverMethods` (29 slots, header word `0x13`, resolved with
   `CdDriver__CancelRequests` (this unit's next three queued functions, at `+0x06C`/
   `+0x070`/`+0x074`)
 
-Compared against `gFileResourceMethods` (`include/GameApplicationFileResource.h`'s
+Compared against `gFileResourceMethods` (`include/data_source.h`'s
 `FileResourceMethods`) with `classtable.py gCdDriverMethods --vs gFileResourceMethods`:
 `FileResource__Release` at `+0x004` and `FileResource__FreeBuffer`/`NoOp`/
 `FileResource__OnRequestDone` at identical offsets (`+0x05C`/`+0x060`/`+0x064`) are shared
@@ -32,7 +32,7 @@ slot block and several of the same concrete method implementations.
 `GetCdDriverMethods` itself is the same "return my own vtable's address"
 accessor the project already names elsewhere: `GetGameApplicationMethods` for
 `gGameApplicationMethods` and `GetFileResourceMethods` for `gFileResourceMethods` (both in
-`include/GameApplicationFileResource.h`'s doc comment).
+`include/data_source.h`'s doc comment).
 
 ## The C
 
@@ -75,10 +75,10 @@ purpose, so tier A by the plan's own rule. The same accessor shape
 says why.** What the class IS, is now well evidenced: every method reachable
 from this table bottoms out in Psy-Q libcd (`CdSearchFile`, `CdRead`,
 `CdControlF`, `CdSync`, `CdFlush`, `CdPosToInt`/`CdIntToPos`), its objects
-cache a disc position and a byte size, and `GameApplicationFileResource.c` selects this
+cache a disc position and a byte size, and `game_shell.c` selects this
 class's module functions only when `sActiveDataSource == 0x13`, this table's own
 header word -- the other value that gate takes, `0x23`, is `gNullDriverMethods`, the
-SPU/VAB streamer in `PlacementGridVabSound.c`. So the two are interchangeable data
+SPU/VAB streamer in `vab_sound.c`. So the two are interchangeable data
 sources behind one dispatch layer, and this one is the CD-ROM source.
 
 What is NOT established is what the developers CALLED it. Naming it
@@ -101,12 +101,12 @@ worse than a placeholder" bites hardest is exactly here, and the existing
 placeholder CLASS, evidence-based METHOD.
 
 
-Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/CdDriver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `GetClass6D4E8Methods` -> `GetCdDriverMethods` by rename.py. Now returns `CdDriverMethods *` (`&gCdDriverMethods`), not `s32 *`.
+Track 4, 2026-09-26 (round 88). The class of gCdDriverMethods (was D_8006D4E8, id 0x13 = DATASOURCE_CD) is CdDriver, in include/cd_driver.h: its ctor calls InitCdDrive, its slots enqueue CD_OP_* requests and drive the CD read state machine, and it is NullDriver's sibling. The object views this function was typed against are replaced by CdDriver, whose fields are all FileResource's (the driver runs on its clients' objects; FileResource's +0x018/+0x01C were named pos/size for it). Byte-identical. `GetClass6D4E8Methods` -> `GetCdDriverMethods` by rename.py. Now returns `CdDriverMethods *` (`&gCdDriverMethods`), not `s32 *`.
 
 ## Round 96 (track 6, echo): unit comment moved here
 
 Moved from code_179d8_s.c, as history: CdDriver, its table and its methods are
-include/CdDriver.h's since track 4, round 88; the per-call-site views
+include/cd_driver.h's since track 4, round 88; the per-call-site views
 CdDriver declared (Obj6D4E8_C80, Obj6D4E8_D70, Obj6D4E8_282AC, and the
 table views Methods6D4E8_C80 / Methods6D4E8_80EC) were that one class. Round
 96 removed the unit's last two local views: CdRequest_282AC (the writing-side
@@ -118,6 +118,6 @@ The unit carried this comment above the getter; it is derivation (the
 "Why `lui`/`addiu`" section above), so it moved here verbatim:
 
 ```c
-/* The class's own table getter (include/CdDriver.h) -- an address-of, not
+/* The class's own table getter (include/cd_driver.h) -- an address-of, not
  * gp_rel: gCdDriverMethods lives in .data, not .sdata. */
 ```

@@ -2,7 +2,7 @@
 
 > Renamed from `func_8004E588` on 2026-09-24 (tools/rename.py). Address 0x8004e588.
 
-**Unit:** TitleMenuTaskObjF (round 14, `Node3bb8cE` class).
+**Unit:** title_menu (round 14, `Node3bb8cE` class).
 
 ## What it does
 

@@ -2,9 +2,9 @@
 
 > Renamed from `func_8005CDF8` on 2026-09-21 (tools/rename.py). Address 0x8005cdf8.
 
-**Unit:** DreamAux · **Size:** 79 words · **Status:** MATCHED round 43
+**Unit:** dream_aux · **Size:** 79 words · **Status:** MATCHED round 43
 (79/79, byte-exact whole-image build). This was the LAST of the eight
-functions assigned to runner charlie this round -- `DreamAux.c` now has
+functions assigned to runner charlie this round -- `dream_aux.c` now has
 zero `INCLUDE_ASM` lines.
 
 ## History
@@ -173,12 +173,12 @@ The entity is now `Entity *` and its raw `vtable[0x11]`/`vtable[0x13]` calls are
 
 Byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
-## Round 100 (alpha): track 7, moved from src/world/DreamAux.c and include/DreamAux.h
+## Round 100 (alpha): track 7, moved from src/world/dream_aux.c and include/dream_aux.h
 
 Parameters kind/out/ctx/entry -> moodIndex/desc/trigger/spawnIndex (`ctx` is
 the chunk's DreamAuxTriggerEntry; `*(u16 *)ctx` is `trigger->key`; reading it
 through the s16 field is byte-identical). The local cell descriptor
-is StageMap.h's Descriptor10 as computeCellOffsets reads it: `chunk` (the
+is stage_map.h's Descriptor10 as computeCellOffsets reads it: `chunk` (the
 chunk's column/row), `cell` (DreamAuxSpawnInfo.cell, was val0), `offset`
 (sDreamAuxPosTable[offsetIndex], was posIndex). D_80088F18 was renamed
 sDreamAuxSpawnRotations (tools/rename.py, tier A): four Ratio16 triples,

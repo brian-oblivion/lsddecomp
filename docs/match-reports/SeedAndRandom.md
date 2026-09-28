@@ -2,14 +2,14 @@
 
 > Renamed from `func_80048CFC` on 2026-09-25 (tools/rename.py). Address 0x80048cfc.
 
-Round 82, runner echo, 2026-09-25. Unit `GameFiles` (carved revision 18).
+Round 82, runner echo, 2026-09-25. Unit `game_files` (carved revision 18).
 Byte-exact on the FIRST build; whole-image SHA1 green
 (`./build-and-verify.sh`: `OK: build matches retail SLPS_015.56`), funcdiff
 11/11, 0 insertions / 0 deletions, no out-of-range drift. No levers needed.
 
 ## What it does
 
-Seeds the Sony RNG when the argument is nonzero, then returns `rand()`. GameApplicationFileResource.c calls it with a day number (`*(s32 *)0x1F800000 % 365`) and a second argument the body never reads.
+Seeds the Sony RNG when the argument is nonzero, then returns `rand()`. game_shell.c calls it with a day number (`*(s32 *)0x1F800000 % 365`) and a second argument the body never reads.
 
 ## Source
 
@@ -32,12 +32,12 @@ s32 SeedAndRandom(s32 seed, s32 unused) {
   unit is a whole number of 0x1C-byte records into that table, so the unit
   types the table as `FilePathRecord` (size only). The record's fields are unknown.
 - Callers in other units still declare their own prototypes (`s32` returns in
-  DayTaskStageMap.h / class_3bb8c.h); those are independent declarations and were
+  dream_day.h / class_3bb8c.h); those are independent declarations and were
   not touched.
 
 ## The second parameter (round 82, alpha, track 3 externcheck)
 
-The source block above had drifted from `src/cd/GameFiles.c`, which has
+The source block above had drifted from `src/cd/game_files.c`, which has
 always compiled the 2-parameter form. The second parameter is dead in the
 body (`$a1` is never read), but it is real at every call: two callers load
 it explicitly (GameApplication__SeedRandom: `move a1,zero` at

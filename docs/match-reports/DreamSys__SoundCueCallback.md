@@ -92,7 +92,7 @@ void DreamSys__SoundCueCallback(void *arg0, Func8005A1F4Arg *arg1)
 
 This is byte-exact (25/25), confirmed with the real oracle
 (`./build-and-verify.sh` exits 0, whole-image SHA1 matches). Landed in
-`src/world/DreamSys.c` in place of the `INCLUDE_ASM`.
+`src/world/dream_sys.c` in place of the `INCLUDE_ASM`.
 
 ### Proposed learning
 
@@ -289,14 +289,14 @@ Renamed from `func_8005A1F4`.
 Named for where its ADDRESS goes, which is the only thing that
 identifies it: `DreamSys__SelectMoveCallback`'s mode-2 case passes
 `this->vt->DreamSys__SoundCueCallback` as `InitSoundCueSet`'s fifth argument, and
-that function (src/sound/PlacementGridVabSound.c, matched) stores it in `SoundCueSet::callback`.
+that function (src/sound/vab_sound.c, matched) stores it in `SoundCueSet::callback`.
 Nothing in any carved unit calls it, so its own parameter struct stays local and
 opaque: the body only picks one of two field pairs to write 9 and -1 into,
 depending on whether `arg1->value` is a multiple of 20.
 
 ## Track 6 (round 92, head)
 
-`SoundCueCallbackArg` was a local view of `SoundCueSet` (include/SoundCueSet.h,
+`SoundCueCallbackArg` was a local view of `SoundCueSet` (include/sound_cue_set.h,
 unified this round by alpha) and is deleted: mode is `tag`, value is `tick`,
 field_0x1C/0x20 are `slots[0].program`/`.octave`, field_0x30/0x34 are
 `slots[1].program`/`.octave`. `DreamSys::soundCueSet` is a `SoundCueSet`

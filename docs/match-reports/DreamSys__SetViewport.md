@@ -32,7 +32,7 @@ tree it gives 2/2 words with the whole-image SHA1 verifying.
 
 Scoring note: the head's first pass at rescoring these 14 bodies read numbers
 from a build that had failed to compile (the spliced file was missing echo's
-`#include "DreamSys.h"`, so every `DreamSys *` was a parse error). funcdiff's
+`#include "dream_sys.h"`, so every `DreamSys *` was a parse error). funcdiff's
 STALE BUILD guard caught it. The numbers here are from the corrected pass --
 see docs/DECOMPILATION_LEARNINGS.md on salvage splicing.
 
@@ -57,7 +57,7 @@ object is a camera, only that this curve is read out of it.
 
 Renamed from `DreamSys__SetHeightCurve`, and the field it sets from
 `heightCurve` (DreamSysUnk5C *) to `viewport` (struct Viewport *). The
-object is a Viewport: DayTask__Init (DayTaskStageMap) passes it the
+object is a Viewport: DayTask__Init (dream_day) passes it the
 New_NodeGuardedViewport it built (a Viewport subclass) and DayTask__Deinit passes
 NULL; Entity__MoodCue74 calls +0x064 of its table, Viewport's
 setClearColor; and the offsets DreamSysUnk5C named are refView's (GsRVIEW2

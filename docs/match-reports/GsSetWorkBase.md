@@ -8,16 +8,16 @@
 
 > **ROUND 34 (2026-09-12), runner bravo -- UNIT MOVE, nothing else.** This
 > function is still game code and still MATCHED; it simply lives in a
-> different file. Seven of `ScreenWidgets`'s functions turned out to be Sony's
+> different file. Seven of `screen_widgets`'s functions turned out to be Sony's
 > and are now linked from SDK objects, which left this one wedged between
 > `o` segments -- so it has its own one-function unit, **`libgs_gs_124`**
 > (`src/psyq/libgs_gs_124.c`). The body below is unchanged and still compiles
-> byte-exact. `include/Task.h` still declares it for its one caller,
+> byte-exact. `include/task.h` still declares it for its one caller,
 > but that new file does NOT include the header, so the two are no longer
 > cross-checked by the compiler and must be kept in step by hand.
 
 
-Unit `ScreenWidgets`, carved round 14.
+Unit `screen_widgets`, carved round 14.
 
 Plain global-pointer setter, same shape as `func_8003FB0C`:
 `void GsSetWorkBase(void *a0) { GsOUT_PACKET_P = a0; }`.
@@ -29,7 +29,7 @@ Plain global-pointer setter, same shape as `func_8003FB0C`:
 naming rule: "a pure leaf whose mechanics ARE its purpose ... is tier A by
 definition"). `GsOUT_PACKET_P` is the target -- Sony's own name, recovered by
 `tools/rename.py` when it refused a game name for it (pinned in
-`config/psyq-objects.ld`) -- and `SortTmdObject` (`src/graphics/TmdRenderer.c`)
+`config/psyq-objects.ld`) -- and `SortTmdObject` (`src/graphics/tmd_renderer.c`)
 confirms the mechanics from the reader side: its own comment calls this same
 global "the packet-buffer write cursor, reloaded ... at the top of every
 group and advanced by each submit wrapper's return value"
@@ -42,7 +42,7 @@ shows.
 
 `GsOUT_PACKET_P` is Sony's global (pinned; not renamed -- CLAUDE.md/FINISHING-PLAN
 track 3, "do not rename a Sony symbol"). Referenced from two units
-(`libgs_gs_124.c` here, `TmdRenderer.c`), so it is a genuine cross-unit
+(`libgs_gs_124.c` here, `tmd_renderer.c`), so it is a genuine cross-unit
 global, not unit-static -- moot here since it already carries its Sony name.
 
 ### Sibling note

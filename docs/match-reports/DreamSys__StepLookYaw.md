@@ -420,7 +420,7 @@ Reported as a stall on this axis.
 
 **Status: `INCLUDE_ASM`, restored (whole-image SHA1 verified green with it
 restored).** Preserved body (75/77-equivalent, exact CFG match) inlined in
-`src/world/DreamSys.c` under `#if 0`, positioned to compile if reinstated.
+`src/world/dream_sys.c` under `#if 0`, positioned to compile if reinstated.
 
 ## Proposed learning (round 25)
 
@@ -512,7 +512,7 @@ through `unk_0x5C` — writes a 16-bit "pending value" into `sTurnRotationYaw[0]
 and calls the vtable slot `0x44` function (`SceneNode__UpdateRotation`, not yet
 decompiled, still `INCLUDE_ASM` in `code_179d8`) with a pointer to
 `sTurnRotationYaw[-1]` (== `&sTurnRotations`, a distinct label immediately before it —
-see the `sTurnRotationYaw` array's header comment in `include/DreamSys.h`).
+see the `sTurnRotationYaw` array's header comment in `include/dream_sys.h`).
 Unconditionally tail-calls `DreamSys__FlipMoveCommand(this)` at the end (matched
 separately this round, see `DreamSys__FlipMoveCommand.md`).
 
@@ -681,7 +681,7 @@ Renamed from `func_800598E8`.
 
 Same spring-with-decay shape as `DreamSys__StepLookOffset`, but
 what it steps is a ROTATION, and that is measured rather than inferred:
-`SceneNode__UpdateRotation` is vtable slot +0x044, matched in src/graphics/SceneNode.c, and it reads its
+`SceneNode__UpdateRotation` is vtable slot +0x044, matched in src/graphics/scene_node.c, and it reads its
 `data` argument as three {numerator, denominator} degree ratios, adding them to the
 object's rotation vector when its `flag` argument is 0 -- which is the flag this
 function passes. The halfword it overwrites first is
@@ -706,7 +706,7 @@ different residue, and `tools/asm-differ/diff.py` confirms the CFG and
 every instruction still line up one-for-one except the single missing
 `move a0,s0` delay-slot fill this report already documents. No compile
 errors. Reverted, then placed the body under `#ifdef NON_MATCHING ...
-#else INCLUDE_ASM ... #endif` in `src/world/DreamSys.c`, written in its plain
+#else INCLUDE_ASM ... #endif` in `src/world/dream_sys.c`, written in its plain
 form -- the kept body already had no byte-shaped constructs (no
 `do {...} while(0)`, no scheduling barrier; the round-47 do-while(0) lever
 mentioned in round 49's entry above was tried as an experiment and found
@@ -719,7 +719,7 @@ uninitialized-alias candidate and rejected it -- not a permuter output.
 
 NON_MATCHING body promoted, round 70.
 
-## Comment moved from src/world/DreamSys.c (round 92, track 7)
+## Comment moved from src/world/dream_sys.c (round 92, track 7)
 
 Replaced in the source by a comment that says what the code does; kept here as written.
 

@@ -251,7 +251,7 @@ concrete, measured leads for the next attempt:
 
 ## Header changes kept
 
-`include/SceneNode.h`:
+`include/scene_node.h`:
 - New `Sixteen6_d294` (12 bytes, 6×`s16`, all-s16-struct-copy idiom) and
   `CornerList_d294` (`{ s32 count; Vec3S16_d294 hdr; }`) types.
 - New externs `TmdModel__UpdateBoundsBuffer(void *arg0)` and `TmdModel__GetBoundsBuffer(void *arg0,
@@ -282,7 +282,7 @@ shows more than one live pointer-class register surviving the loop.
 **First, a correctness note for whoever resumes this:** while re-deriving
 this function, a bug from earlier in this same session was discovered
 and fixed -- `SceneNode__TryAttachNearby` (this unit's OTHER round-13 stall, addressed
-earlier the same round) had been left LIVE in `src/graphics/SceneNode.c`
+earlier the same round) had been left LIVE in `src/graphics/scene_node.c`
 (missing its `#if 0`/`INCLUDE_ASM` wrapper) after an experiment, which
 silently shifted every function after it in the file by 13 words. This
 made `SceneNode__CheckBoundsOverlap`'s own vram address wrong in the LINKED build
@@ -303,7 +303,7 @@ here, but the natural instinct is to blame the function being worked on,
 not an unrelated sibling).
 
 Dropped the round-13 best-attempt body (never previously committed to
-`src/`, only preserved in this report's prose) into `src/graphics/SceneNode.c`
+`src/`, only preserved in this report's prose) into `src/graphics/scene_node.c`
 in place of the bare `INCLUDE_ASM`. Baseline reproduced: **5/243, frame
 `-0x98` (152 bytes) vs retail's `-0xF8` (248 bytes)**, matching the
 report's own "22-word/96-byte deficit" figure closely (96 bytes exactly).
@@ -520,7 +520,7 @@ CLAUDE.md's per-round instructions flagged explicitly as blocking the next
 round from ranking it. Per the round's "build the inherited body before
 you trust its score" discipline, spliced the round-20 preserved body
 (above, 14/243, frame + self-materialization fixes already folded in)
-back into `src/graphics/SceneNode.c` verbatim, confirmed `SceneNode__TryAttachNearby`
+back into `src/graphics/scene_node.c` verbatim, confirmed `SceneNode__TryAttachNearby`
 (the sibling immediately before it in ROM order) was still properly
 `#if 0`/`INCLUDE_ASM`-wrapped before trusting the address, and rebuilt.
 
@@ -664,7 +664,7 @@ reason to distrust it.
 Filing unchanged as **STALL at 14/243** (built 222/retail 243 words per
 `nm -S`, 21 words short; first real diff at file offset `0xE238` / vram
 `0x8001DA38`, unchanged from round 37's own pinned figures).
-`INCLUDE_ASM` restored, `src/graphics/SceneNode.c` confirmed byte-identical to
+`INCLUDE_ASM` restored, `src/graphics/scene_node.c` confirmed byte-identical to
 the committed state (`git diff --stat` empty) after the check.
 
 ### Proposed learning (round 41)
@@ -835,11 +835,11 @@ operand order, so a min whose default is loaded first is spelled `f > v`.
 
 ## Round 95 (bravo): Sixteen6_d294 and CornerList_d294 retired
 
-Both placeholders in include/SceneNode.h are deleted. `Sixteen6_d294` (six
+Both placeholders in include/scene_node.h are deleted. `Sixteen6_d294` (six
 s16s) was only ever a view of a `TmdModel__GetBoundsBuffer` record, which is a
 `TmdBox`; `SceneNode__RaycastHullAgainstFaces` now holds its `plane` as `TmdBox *`
 with no casts. `CornerList_d294` (a count, then corner[0] with the rest after
-it) is include/TmdModel.h's `TmdHull`, which is what
+it) is include/tmd_model.h's `TmdHull`, which is what
 `SceneNode__TryAttachNearby` passes as this function's `corners`: the body
 reads `list->v` for `&list->hdr`. Byte-identical. The comments the two types
 carried, moved here verbatim:

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8003EBF8` on 2026-09-23 (tools/rename.py). Address 0x8003ebf8.
 
-Unit: `Task`. Round 14, runner delta. 13/13 words, full match.
+Unit: `task`. Round 14, runner delta. 13/13 words, full match.
 
 ## Signature
 
@@ -29,7 +29,7 @@ void Viewport__SetViewRef(Unk18Obj *self, Vec3_2cc8c *a1) {
 
 ## Header changes
 
-`include/Task.h`: `Unk18Obj` gains `unk20` (`+0x020`, `Vec3_2cc8c`,
+`include/task.h`: `Unk18Obj` gains `unk20` (`+0x020`, `Vec3_2cc8c`,
 immediately after `unk14`, no gap); `Unk18ObjMethods::slot7C` retyped from
 `void *` to `Vec3_2cc8c *`.
 
@@ -39,4 +39,4 @@ immediately after `unk14`, no gap); `Unk18ObjMethods::slot7C` retyped from
 
 ## Track 4 (2026-09-25, round 85, bravo)
 
-Renamed from `Unk18Obj__SetUnk20`. Renamed for the GsRVIEW2 member it writes: `refView.vr`, the reference point. Slot +0x07C `setViewRef`, parameter `LongVec3 *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/Viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.
+Renamed from `Unk18Obj__SetUnk20`. Renamed for the GsRVIEW2 member it writes: `refView.vr`, the reference point. Slot +0x07C `setViewRef`, parameter `LongVec3 *`. The class (id 0x7, table `gViewportMethods`, formerly `D_8006E8E4`) is unified as `Viewport` in `include/viewport.h`, whose banner gives the evidence for the name: its methods hold a GsRVIEW2 (GsSetRefView2), the projection and near clip, a double-buffered GsOT pair, draw the scene tree into it and flip it; IntermediateBase and TaskCore already called the field holding it `viewport`. Any source block above is the pre-unification spelling; the live body takes the unified types and field and slot names, byte-identical.

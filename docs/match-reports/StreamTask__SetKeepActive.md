@@ -6,7 +6,7 @@
 
 > Renamed from `func_8003BE5C` on 2026-09-23 (tools/rename.py). Address 0x8003be5c.
 
-**Unit:** Task · **Size:** 2 instructions (0x8 bytes) · **Status:** MATCHED (2/2 words, whole-image SHA1 green), first attempt
+**Unit:** task · **Size:** 2 instructions (0x8 bytes) · **Status:** MATCHED (2/2 words, whole-image SHA1 green), first attempt
 
 ## What it does
 
@@ -23,7 +23,7 @@ identified: `New_StreamTask`'s allocator call sizes the object at `0xDC`
 bytes and constructs it through `GetStreamTaskMethods`'s slot `+0x008`, so all five
 setters, plus `GetStreamTaskMethods` itself, operate on that same `0xDC`-byte
 class (already named `StreamTask`/`StreamTaskMethods` in
-`include/GameApplication.h`, established independently by a different unit from
+`include/game_application.h`, established independently by a different unit from
 `New_StreamTask`'s cross-unit call site).
 
 ## Derivation
@@ -44,10 +44,10 @@ return's delay slot", no residue.
 
 ## New struct/header knowledge
 
-Added `include/Task.h`: this unit's own local view of the `StreamTask`
+Added `include/task.h`: this unit's own local view of the `StreamTask`
 class (named `StreamTaskObj`/`StreamTaskObjMethods` here, independent of
-`GameApplication.h`'s same-named-concept `StreamTask`, per the `entity.h` /
-`TodActor.c` precedent of keeping local views separate rather than editing
+`game_application.h`'s same-named-concept `StreamTask`, per the `entity.h` /
+`tod_actor.c` precedent of keeping local views separate rather than editing
 another unit's header) — fields `unkC4`/`unkC8`/`unkCC`/`unkD0`/`unkD4` (this
 run of setters), plus everything else this unit's other queued functions in
 the same batch needed. See the sibling reports for the rest.
@@ -70,7 +70,7 @@ run of five identical-shape setters at consecutive table slots
 
 ## Track 4 (2026-09-26, round 87)
 
-Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/StreamTask.h): the `Obj` suffix is dropped (track 4 step 2; include/GameApplication.h already viewed the class as `StreamTask`). Own slot +0x124. unkC4 is MoviePlayer__Play's third argument (stored at the player's +0x054); left unnamed until MoviePlayer's class is.
+Renamed with the class unification (gStreamTaskObjMethods -> class StreamTask, include/stream_task.h): the `Obj` suffix is dropped (track 4 step 2; include/game_application.h already viewed the class as `StreamTask`). Own slot +0x124. unkC4 is MoviePlayer__Play's third argument (stored at the player's +0x054); left unnamed until MoviePlayer's class is.
 
 ## Track 7 (2026-09-27, round 99, alpha)
 

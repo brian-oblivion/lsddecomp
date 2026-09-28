@@ -6,7 +6,7 @@
 
 > Renamed from `func_80050340` on 2026-09-23 (tools/rename.py). Address 0x80050340.
 
-Unit `TitleMenuTaskObjF`, round 14. `./build-and-verify.sh` exit 0; whole-image
+Unit `title_menu`, round 14. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py TaskObjF__AttachTextEntry`: 52/52 words match.
 
 ## Source
@@ -89,7 +89,7 @@ call arity) cost one wasted, and materially WORSE, attempt.
 
 `TaskObjF__AttachTextEntry` (was `func_80050340`), tier B: lazily
 allocates `self->unk78` via `New_TextEntry` (an already-named `New_X`-shaped
-factory for the same real class the sibling `TextEntryItemList`/`class_3bb8c_j`
+factory for the same real class the sibling `input_dialogs`/`class_3bb8c_j`
 units call `Obj86ED0`/`Class86ED0`, vtable `gTextEntryMethods`) on first use, then
 attaches and configures it through this class's own vtable. Named "A" to
 distinguish it from the identically-shaped `AttachChildB`
@@ -103,7 +103,7 @@ TaskObjF's childA (+0x078) is now `struct TextEntry *` (it was the Class86E00Sub
 
 ## Track 4 (2026-09-26, round 89)
 
-Renamed from `TaskObjF__AttachChildA`. The child it makes is a TextEntry (New_TextEntry, include/TextEntry.h), kept in `textEntry` (+0x078, was `childA`), the slot TaskObjF__AddChild fills for a child of class id 0x10 (gTextEntryMethods). SetState(0x11) calls it through +0x09C.
+Renamed from `TaskObjF__AttachChildA`. The child it makes is a TextEntry (New_TextEntry, include/text_entry.h), kept in `textEntry` (+0x078, was `childA`), the slot TaskObjF__AddChild fills for a child of class id 0x10 (gTextEntryMethods). SetState(0x11) calls it through +0x09C.
 
 ## Track 7 (2026-09-27, round 95)
 
