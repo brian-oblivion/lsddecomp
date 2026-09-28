@@ -160,7 +160,7 @@ struct TaskCoreTarget {
     /* +0x0B8 */ void *slotB8;                                   /* NULL */                        \
     /* +0x0BC */ void *slotBC;                                   /* NULL */                        \
     /* +0x0C0 */ s32 (*tickFadeOutCallback)(Self *self);         /* TaskCore__TickFadeOutCallback: update's state 7 */ \
-    /* +0x0C4 */ s32 (*tickFadeColor)(Self *self);               /* TaskCore__TickFadeColor: the fade-out callback */ \
+    /* +0x0C4 */ s32 (*tickFadeColor)(Self *self);               /* TaskCore__TickFadeOut: the fade-out callback */ \
     /* +0x0C8 */ void *slotC8;                                   /* NULL */                        \
     /* +0x0CC */ void *slotCC;                                   /* NULL */                        \
     /* +0x0D0 */ void *slotD0;                                   /* NULL */                        \
@@ -262,7 +262,7 @@ void TaskCore__SetFadeRate(TaskCore *self, s32 rate);
 s32 TaskCore__TickFadeCallback(TaskCore *self);
 s32 TaskCore__TickFadeIn(TaskCore *self);
 s32 TaskCore__TickFadeOutCallback(TaskCore *self);
-s32 TaskCore__TickFadeColor(TaskCore *self);
+s32 TaskCore__TickFadeOut(TaskCore *self);
 void TaskCore__SetSubHandle(TaskCore *self, const char *path, BasicClass *handle);
 void TaskCore__SetTarget(TaskCore *self, TaskCoreTarget *target);
 void TaskCore__ReleaseTarget(TaskCore *self);

@@ -188,7 +188,7 @@ changed.
 **Tier C.** `func_8003CCDC` -> `Obj86B60__func_8003CCDC`. Same
 "invoke-optional-callback, transition on nonzero" shape as
 `TaskCore__TickFadeCallback` above, but for the `unk8C`/`slotC4` pair
-(`TaskCore__TickFadeColor`, external, unread here -- see `TaskCore__SetFadeOutCallbackEnabled`), so
+(`TaskCore__TickFadeOut`, external, unread here -- see `TaskCore__SetFadeOutCallbackEnabled`), so
 it is not established as a "fade" tick either; transitions to state 8
 instead of 5 on completion. Kept tier C for the same reason as `TaskCore__SetFadeOutCallbackEnabled`.
 

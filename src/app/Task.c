@@ -674,7 +674,7 @@ typedef struct SrcDesc {
     char **itemNames; /* +0x018 NULL-terminated; one New_TextRow per name */
 } SrcDesc;
 
-s32 TaskCore__TickFadeColor(TaskCore *self) {
+s32 TaskCore__TickFadeOut(TaskCore *self) {
     s32 level = TASKCORE_FADE_FULL - (self->frameCounter * self->fadeRate);
     u8 color[3];
 

@@ -18,7 +18,7 @@
  * TileMap (New_BgLayer(tileMap, 1)) into TaskCore::bgLayer, OnInit attaches
  * it to the scene root (unk14) and sets its colour, OnDeinit detaches it,
  * Finalize releases it, and the colour fades (TaskCore__TickFadeIn,
- * TaskCore__TickFadeColor) call setColor every frame.
+ * TaskCore__TickFadeOut) call setColor every frame.
  *
  * SLOTS (`classtable.py gBgLayerMethods --vs gSceneNodeMethods`, 47 against 45):
  *  - +0x008 ctor, BgLayer__BgLayer(self, src, mode): SceneNode's, this

@@ -1,4 +1,6 @@
-# TaskCore__TickFadeColor — MATCHED (38/38)
+# TaskCore__TickFadeOut — MATCHED (38/38)
+
+> Renamed from `TaskCore__TickFadeColor` on 2026-09-28 (tools/rename.py). Address 0x8003cd48.
 
 > Renamed from `Obj86B60__TickFadeColor` on 2026-09-25 (tools/rename.py). Address 0x8003cd48.
 
@@ -9,14 +11,14 @@
 ## What it does
 
 `Obj86B60Methods::slotC4` (confirmed by `Task.h`'s own header comment,
-which already recorded this slot as "external (TaskCore__TickFadeColor)" from the
+which already recorded this slot as "external (TaskCore__TickFadeOut)" from the
 `Task` unit's own `classtable.py` work before this unit ever attempted
 the function). Computes a greyscale-ish colour byte from two fields, fills a
 3-byte buffer with it, forwards the buffer to two other objects, and returns
 whether the byte exceeds a threshold.
 
 ```c
-s32 TaskCore__TickFadeColor(Obj86B60 *self)
+s32 TaskCore__TickFadeOut(Obj86B60 *self)
 {
     s32 c = 0x80 - (self->unk1C * self->unk84);
     u8 buf[3];
@@ -76,7 +78,7 @@ residue is a `li`/`ori` vs `addiu`-negative-immediate mismatch on an
 otherwise-matching subtraction, widen the intermediate to `s32` and narrow
 only at the point(s) of use (array store, explicit `(u8)` cast in a
 comparison) rather than typing the local at its "natural" narrow width.
-(`TaskCore__TickFadeColor`, 37/38 -> 38/38)
+(`TaskCore__TickFadeOut`, 37/38 -> 38/38)
 
 ## Naming (round 78, naming runner echo)
 
