@@ -216,7 +216,7 @@ void DayTask__StartObjM(DayTask *self, s32 stage) {
     self->phase = DAYTASK_PHASE_RUNNING;
 }
 
-void DayTask__OnState4(void) {}
+void DayTask__OnTimedOut(void) {}
 
 void DayTask__OnDreamSysNotify(void) {}
 

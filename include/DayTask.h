@@ -130,7 +130,7 @@ void DayTask__OnInit(DayTask *self);
 void DayTask__OnDeinit(DayTask *self);
 void DayTask__AdvancePhase(DayTask *self, BasicClass *sender, s32 event);
 void DayTask__StartObjM(DayTask *self, s32 stage);
-void DayTask__OnState4(void);         /* +0x07C; empty, reads no argument */
+void DayTask__OnTimedOut(void);       /* +0x07C; empty, reads no argument */
 void DayTask__OnDreamSysNotify(void); /* +0x080; empty, reads no argument */
 void DayTask__OnObjMNotify(DayTask *self, BasicClass *sender, s32 event);
 

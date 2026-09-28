@@ -1,4 +1,6 @@
-# DayTask__OnState4 -- MATCHED (splat-generated, empty body)
+# DayTask__OnTimedOut -- MATCHED (splat-generated, empty body)
+
+> Renamed from `DayTask__OnState4` on 2026-09-28 (tools/rename.py). Address 0x80049ea4.
 
 > Renamed from `Class865C8__OnState4` on 2026-09-26 (tools/rename.py). Address 0x80049ea4.
 
@@ -7,7 +9,7 @@
 `DayTaskMethods` slot +0x07C. Entire function body:
 
 ```c
-void DayTask__OnState4(Obj865C8 *self) {
+void DayTask__OnTimedOut(Obj865C8 *self) {
 }
 ```
 
@@ -16,7 +18,7 @@ An empty override, byte-exact by construction (`jr $ra` / `nop`). Never had its 
 
 ## Naming
 
-`DayTask__OnState4` -- tier A. Empty body (`{}`), occupies the class's own +0x07C override slot (already named `noop7C` in the header before this round). An empty body is direct evidence of a no-op leaf.
+`DayTask__OnTimedOut` -- tier A. Empty body (`{}`), occupies the class's own +0x07C override slot (already named `noop7C` in the header before this round). An empty body is direct evidence of a no-op leaf.
 
 ## Track 4 (2026-09-26, round 88, DayTask)
 
