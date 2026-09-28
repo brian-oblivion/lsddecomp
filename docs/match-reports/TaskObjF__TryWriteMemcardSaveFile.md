@@ -289,11 +289,11 @@ typedef struct McSaveHeader {
 `IconPaletteHalf` deliberately has no `s32` member (alignment 2) so a
 whole-struct copy compiles to the unaligned `lwl`/`lwr` + `swl`/`swr`
 idiom already documented for `Descriptor10`
-(`include/class_3bb8c.h`) and `Block24` (`src/class_3bb8c_k.c`).
+(`include/class_3bb8c.h`) and `Block24` (`src/ObjMStyleActor.c`).
 `IconFrame` is a plain byte array (alignment 1) so a whole-struct
 copy compiles to the RUNTIME-alignment-checked dual-path copy retail
 actually shows for the three 0x80-byte spans -- confirmed against
-`class_3bb8c_k.c`'s own comment on `Block24`: *"a byte array... compiles
+`ObjMStyleActor.c`'s own comment on `Block24`: *"a byte array... compiles
 the copy as a generic runtime-alignment-checked memcpy loop instead"*.
 Both idioms transferred to this function unchanged, on the first attempt,
 for all five copy regions.
@@ -582,7 +582,7 @@ the function's local declarations, as they stood before track 7:
 /* Half of the 16-colour icon CLUT (8 x s16 = 0x10 bytes) -- all s16
  * members (alignment 2, no s32) so a whole-struct copy compiles to the
  * unaligned lwl/lwr + swl/swr idiom already documented (Descriptor10 in
- * class_3bb8c.h, Block24 in class_3bb8c_k.c). Two of these sit back to
+ * class_3bb8c.h, Block24 in ObjMStyleActor.c). Two of these sit back to
  * back (0x14..0x33) in the source object and (0x60..0x7F) in the request
  * buffer -- copied as an array of 2, not a loop (matches retail: fully
  * unrolled, no branch, no runtime alignment check). */
@@ -593,7 +593,7 @@ typedef struct IconPaletteHalf {
 /* One 16x16 4bpp icon animation frame -- a raw, opaque 0x80-byte span
  * (alignment 1, a plain byte array), so a whole-struct copy compiles to
  * the RUNTIME-alignment-checked lw/sw-vs-lwl/lwr dual path retail shows
- * for these three chunks (the same idiom src/class_3bb8c_k.c's Block24
+ * for these three chunks (the same idiom src/ObjMStyleActor.c's Block24
  * documents: "a byte array... compiles the copy as a generic
  * runtime-alignment-checked memcpy loop instead"). Three of these are
  * copied in sequence. */

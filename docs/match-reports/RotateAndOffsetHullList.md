@@ -4,7 +4,7 @@
 
 Round 82, runner charlie (matching slot, second pass on the unit). Unit `src/TmdModel.c`. Fresh ground, no prior attempt.
 
-- **What:** walks a counted list of box-corner sets (`HullList_fa50`: `s32 n` then `n` x 48-byte `BoxCorners`, eight `{s16 x,y,z}` as two faces of four; `TmdModel__GetHull` writes a list of one). For each: if `turn`, copy the 48 bytes to a stack temp and permute the corners back in (a quarter turn of the box), then add `d` to `.x` of face `back`; otherwise add `d` to `.z` of face `back`. Caller: `class_3bb8c_k.c` (`RotateAndOffsetHullList(&buf, isSeven, nonneg, adjusted)`).
+- **What:** walks a counted list of box-corner sets (`HullList_fa50`: `s32 n` then `n` x 48-byte `BoxCorners`, eight `{s16 x,y,z}` as two faces of four; `TmdModel__GetHull` writes a list of one). For each: if `turn`, copy the 48 bytes to a stack temp and permute the corners back in (a quarter turn of the box), then add `d` to `.x` of face `back`; otherwise add `d` to `.z` of face `back`. Caller: `ObjMStyleActor.c` (`RotateAndOffsetHullList(&buf, isSeven, nonneg, adjusted)`).
 - **Result:** byte-exact; 147/147 words, whole-image SHA1 green. Build 5.
 - **Builds / levers, measured:**
   1. flat `Vec3 v[8]`, face loops as `v[k]` / `v[k + 4]`: 106/147, 1 word long per `+4` loop (`li a1,0x18; addu v0,t1,a1` instead of retail's `move v1,t1` + `0x18(v1)`).
@@ -74,7 +74,7 @@ Several sibling counted loops whose counter and strength-reduced pointer come ou
 
 `RotateAndOffsetHullList` -- KEPT (not renamed this round). Tier C: mechanics fully
 known (rotates a counted list of box-corner sets a quarter turn and offsets
-one face), but its only caller is `src/class_3bb8c_k.c`, a live types-runner
+one face), but its only caller is `src/ObjMStyleActor.c`, a live types-runner
 unit this round; renaming would rewrite that unit's extern declaration and
 call site out from under it.
 
@@ -82,7 +82,7 @@ call site out from under it.
 
 `RotateAndOffsetHullList` -- tier B (mechanics: turn + per-axis offset of a
 `HullList_fa50`; the game-level purpose of the turn is not established).
-Posted to the broadcast for the head to apply once `class_3bb8c_k.c` is not
+Posted to the broadcast for the head to apply once `ObjMStyleActor.c` is not
 live.
 
 ## Track 7, re-send (2026-09-26, round 94, bravo)
@@ -100,7 +100,7 @@ already say what they select. A `MATCHING:` line marks the per-branch `k`
 2026-09-27, delta: `HullList_fa50` (`s32 count; BoxCorners boxes[1];`) is
 deleted and the parameter is `include/TmdModel.h`'s `TmdHull`. Same layout
 (0x34 bytes: the count, then 48 bytes of corners) and the same object: the
-one caller, `Actor__NotifyMove` (class_3bb8c_k.c), fills its buffer through
+one caller, `Actor__NotifyMove` (ObjMStyleActor.c), fills its buffer through
 `getModelHull` (TmdModel__GetHull writes a `TmdHull`) and hands the same
 buffer on as `(TmdHull *)&buf`; TmdHull's own comment already calls it a
 counted list of boxes' corners. Box `i` is `&((corners type *)h->v)[i]`, the

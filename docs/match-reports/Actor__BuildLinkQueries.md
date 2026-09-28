@@ -12,7 +12,7 @@ turn. The round-75 section at the end supersedes it.
 
 > Renamed from `func_80057784` on 2026-09-19 (tools/rename.py). Address 0x80057784.
 
-Unit: `src/class_3bb8c_k.c`. Class: `DreamSys` family -- plain internal
+Unit: `src/ObjMStyleActor.c`. Class: `DreamSys` family -- plain internal
 helper, not a vtable slot. Called by this unit's own `Actor__FindNearbyLink`
 (also still queued/stalled -- see its own report, which depends on this
 one).
@@ -119,7 +119,7 @@ s32 Actor__BuildLinkQueries(DreamSys *self, GridQuery *arr1, GridArrElem **arr2,
 ```
 
 This body is semantically the exact translation of the disassembly
-(verified line-by-line against `asm/nonmatchings/class_3bb8c_k/Actor__BuildLinkQueries.s`
+(verified line-by-line against `asm/nonmatchings/ObjMStyleActor/Actor__BuildLinkQueries.s`
 and cross-checked with `m2ctx.py`), truncates and stores every field
 correctly, and takes the right branches. It compiles clean and scores
 13/116 (frame `-0x30` vs retail's `-0x28`, one extra callee-saved
@@ -219,7 +219,7 @@ tools/funcdiff.py Actor__BuildLinkQueries   # still INCLUDE_ASM -- do not trust 
 ## Round: re-verified from raw asm, claim confirmed accurate (runner delta, round 19)
 
 Re-derived this function's control flow directly from
-`asm/nonmatchings/class_3bb8c_k/Actor__BuildLinkQueries.s`, instruction by
+`asm/nonmatchings/ObjMStyleActor/Actor__BuildLinkQueries.s`, instruction by
 instruction, as a check against the kind of misread that turned out to be
 real elsewhere this round (`DreamSys__SoundCueCallback`). No discrepancy found -- every
 branch, field offset, and the two `getGridArrElemAt` call sites (including the
@@ -227,7 +227,7 @@ confirmed fact that the SECOND call reuses `f3`/`src` in `$a2`/`$a3`
 unchanged from the first call's setup, rather than retail re-loading them)
 match this report's existing C exactly.
 
-Also rebuilt the exact preserved body into `src/class_3bb8c_k.c` directly
+Also rebuilt the exact preserved body into `src/ObjMStyleActor.c` directly
 (not just re-read) to confirm the score claim itself: **13/116, frame
 `-0x30` vs retail's `-0x28`, confirmed accurate.** No hidden bug found, no
 new axis tried beyond what this report already records exhausted (the
@@ -239,7 +239,7 @@ restored, no source changes.
 
 ## Round: NON_MATCHING body promoted (runner delta, round 74)
 
-Placed the preserved body from this report into `src/class_3bb8c_k.c` under
+Placed the preserved body from this report into `src/ObjMStyleActor.c` under
 `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif` (track 1b). Hand-derived,
 not permuter-searched -- confirmed by this report itself (round 19's
 instruction-by-instruction re-derivation, and the original derivation's own
@@ -374,7 +374,7 @@ tools/check-nonmatching.sh # OK: 45 NON_MATCHING bodies in 15 units
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__BuildLinkQueries`. Helper of Actor__FindNearbyLink; `self->linkMgr` is now `self->grid` (cast to the DreamSysUnk4CObj view). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_k.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__BuildLinkQueries`. Helper of Actor__FindNearbyLink; `self->linkMgr` is now `self->grid` (cast to the DreamSysUnk4CObj view). The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 

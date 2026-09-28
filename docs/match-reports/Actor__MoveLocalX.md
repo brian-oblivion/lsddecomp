@@ -4,7 +4,7 @@
 
 > Renamed from `func_800574C4` on 2026-09-19 (tools/rename.py). Address 0x800574c4.
 
-Unit: `src/class_3bb8c_k.c`. Class: `DreamSys`, own vtable slot `+0x0C8`
+Unit: `src/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0C8`
 (base-class-inherited; resolved via `tools/classtable.py gDreamSysMethods`
 and confirmed unchanged in the DreamSys-level table too).
 
@@ -38,7 +38,7 @@ splat's single-word `dlabel gActorLocalMove` (`asm/data/7B008.sdata.s`) is reall
 (`%hi/%lo(gActorLocalMove)`), its sibling `Actor__MoveLocalY` writes element 1
 (`%hi/%lo(gActorLocalMove + 0x2)`). Not referenced anywhere else in the repo
 (checked with `grep -rn gActorLocalMove src/ include/` before this round), so
-declared locally in `src/class_3bb8c_k.c` rather than added to a shared
+declared locally in `src/ObjMStyleActor.c` rather than added to a shared
 header.
 
 ## Naming
@@ -59,7 +59,7 @@ tools/funcdiff.py Actor__MoveLocalX   # 14/14
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__ApplyOffsetSlot0`. Occupant of +0x0C8 in gActorMethods (the BASE table, so the method is Actor's, not DreamSys's): writes gActorLocalMove[0], the x of the local move vector (see Actor__MoveLocalZ), event 7. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_k.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__ApplyOffsetSlot0`. Occupant of +0x0C8 in gActorMethods (the BASE table, so the method is Actor's, not DreamSys's): writes gActorLocalMove[0], the x of the local move vector (see Actor__MoveLocalZ), event 7. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 
@@ -67,13 +67,13 @@ Comments quoted below are verbatim as the file stood before this round's
 comment pass, i.e. with this round's renames already applied (the
 `LinkQueryBuf` one as it stood before step 2).
 
-The unit banner of `src/class_3bb8c_k.c` was rewritten to say what the file
+The unit banner of `src/ObjMStyleActor.c` was rewritten to say what the file
 holds. The old one, verbatim:
 
 ```c
 /*
- * class_3bb8c_k -- vram 0x800574C4..0x80057DBC, carved round 17
- * (2026-09-04), immediately behind class_3bb8c_k. Actor methods
+ * ObjMStyleActor -- vram 0x800574C4..0x80057DBC, carved round 17
+ * (2026-09-04), immediately behind ObjMStyleActor. Actor methods
  * (include/Actor.h; before round 82 they carried DreamSys's name, but they
  * are occupants of the BASE table gActorMethods, +0x0C8..+0x0EC) plus one
  * unrelated constructor:
@@ -108,7 +108,7 @@ holds. The old one, verbatim:
   Evident from the bodies: MoveLocalX/Y write element 0/1, the shared
   Actor__MoveAlongLocalAxis passes `&gActorLocalMove[0]` to
   addLocalTranslation (which rotates a local s16 vector by the actor's
-  orientation, Actor.h) and clears the element again; class_3bb8c_k's
+  orientation, Actor.h) and clears the element again; ObjMStyleActor's
   MoveLocalZ does the same through the next halfword, `gActorLocalMoveZ` (not
   renamed here: not this unit's; proposed as `gActorLocalMoveZ`).
 
@@ -122,6 +122,6 @@ The declaration's comment lost its history; what it said, verbatim:
  * Not referenced anywhere else in the repo (checked with grep), so this is
  * this unit's own reading -- kept local rather than added to a shared
  * header. It is the x and y of Actor's local move vector: the z is the next
- * halfword, gActorLocalMoveZ, which class_3bb8c_k's Actor__MoveLocalZ writes, and
+ * halfword, gActorLocalMoveZ, which ObjMStyleActor's Actor__MoveLocalZ writes, and
  * SceneNode__RotateLocalVector reads src[0..2]. */
 ```

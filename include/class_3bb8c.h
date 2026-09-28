@@ -18,7 +18,7 @@
  *   class_3bb8c_d..g   TaskObjF (include/TaskObjF.h), the memory-card task
  *   class_3bb8c_i, _j  TextEntry (include/TextEntry.h)
  *   class_3bb8c_i, _k  ItemList (include/ItemList.h)
- *   class_3bb8c_k..m   ObjM (include/ObjM.h)
+ *   ObjMStyleActor..m   ObjM (include/ObjM.h)
  *
  * What is here, in that order: StageMap's lookup tables and SplitCoord2,
  * the view of a slot's origin its methods read; TitleMenu's data (menu
@@ -218,7 +218,7 @@ extern s32 StampSaveTitleFileLetter(char *titleText, char *fileName);
 /* ObjM::styleConfig's pointee (include/ObjM.h): the day's scene style, a
  * plain record. RegisterStyleConfig returns sStyleConfig after
  * FillStyleFromConfig fills its last four words from the stage's config
- * bytes (class_3bb8c_k, whose local StyleM views the same words), or
+ * bytes (ObjMStyleActor, whose local StyleM views the same words), or
  * InitStyleAndWorld's caller supplies one. ObjM__SetupSceneStyle hands the
  * first three to the StageMap's lights, ObjM__EnterStyleSession the rest to
  * the viewport, ObjM__PollTimBlockLoad a colour to the TimBlockSrc. */
@@ -239,7 +239,7 @@ typedef struct StyleConfig {
 extern s32 GetStageMapChunkRecord(s32 index, s32 sub);
 extern void GetStageMapChunkRecordXY(s32 index, s32 x, s32 y);
 
-/* ObjM__TeardownStyle's helpers (src/DreamAux.c, src/class_3bb8c_k.c). */
+/* ObjM__TeardownStyle's helpers (src/DreamAux.c, src/ObjMStyleActor.c). */
 extern void ReleaseDreamAuxEntities(void);
 extern void StyleTeardown(void);
 

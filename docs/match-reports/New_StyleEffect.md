@@ -4,10 +4,10 @@
 
 > Renamed from `func_80056320` on 2026-09-23 (tools/rename.py). Address 0x80056320.
 
-Unit: `class_3bb8c_k` (round 17 continuation). `New_X` allocator (0x98
+Unit: `ObjMStyleActor` (round 17 continuation). `New_X` allocator (0x98
 bytes) for the `gStyleEffectMethods` class, dispatching through
 `GetStyleEffectMethods()->ctor` -- a CROSS-UNIT call into the already-matched
-`class_3bb8c_k.c` (previous pass, same round) rather than calling
+`ObjMStyleActor.c` (previous pass, same round) rather than calling
 `StyleEffect__StyleEffect` (this unit's own ctor) by name.
 
 ## Final source
@@ -32,9 +32,9 @@ void *New_StyleEffect(void *arg0, void *arg1, void *arg2, void *arg3) {
 The `New_X` allocator sub-shape #3 from `DECOMPILATION_LEARNINGS.md`
 ("tests BOTH the allocation and the constructor's return, freeing on
 constructor failure -- plain `if`/`return`"), same shape as
-`class_3bb8c_k.c`'s own `New_Actor` from the previous pass. The
+`ObjMStyleActor.c`'s own `New_Actor` from the previous pass. The
 constructor is reached THROUGH THE VTABLE (`GetStyleEffectMethods()->ctor(...)`,
-where `GetStyleEffectMethods` is `class_3bb8c_k.c`'s already-matched getter for
+where `GetStyleEffectMethods` is `ObjMStyleActor.c`'s already-matched getter for
 `&gStyleEffectMethods`) rather than by a direct `jal` to `StyleEffect__StyleEffect` -- both
 resolve to the same function at runtime, but the disassembly's own
 `jal GetStyleEffectMethods` / `lw v0,8(v0)` / `jalr v0` sequence requires the

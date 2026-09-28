@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057954` on 2026-09-19 (tools/rename.py). Address 0x80057954.
 
-Unit: `src/class_3bb8c_k.c`. Class: `DreamSys` family -- plain internal
+Unit: `src/ObjMStyleActor.c`. Class: `DreamSys` family -- plain internal
 helper, not a vtable slot.
 
 ## Signature
@@ -102,7 +102,7 @@ the loop, only the body-statement form can separate them -- the
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__ScanLinkCandidates`. Helper of Actor__FindNearbyLink. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_k.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__ScanLinkCandidates`. Helper of Actor__FindNearbyLink. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 

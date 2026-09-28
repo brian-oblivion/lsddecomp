@@ -9,7 +9,7 @@
 Unit: `src/class_3bb8c_i.c`. `New_ItemList` -- the allocator for
 `ItemList_3bb8c_j` (a small BasicClass-derived sibling class discovered this
 round, alloc size 0x54, vtable gItemListMethods reached through `GetItemListMethods()`
-(class_3bb8c_k) -- NOT `gTextEntryMethods`/`GetTextEntryMethods`, which is a
+(ObjMStyleActor) -- NOT `gTextEntryMethods`/`GetTextEntryMethods`, which is a
 DIFFERENT, unrelated class (`Obj86ED0`, established by class_3bb8c_i) that
 this function's own body never touches; ROUND 75 CORRECTION, see
 `GetTextEntryMethods.md`).

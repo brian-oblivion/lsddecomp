@@ -99,12 +99,12 @@ Renamed `func_8002CC34` -> `InitSoundCueSet`, tier B, and its
 struct/parameters accordingly (`ObjCC34` -> `SoundCueSet`,
 `Slot179D8ECC34` -> `SoundCueSlot`, `arg2`/`arg3`/`arg4` -> `tag`/`owner`/
 `callback`). Evidence: this unit's only caller list (`Entity.c`,
-`DreamSys.c`, `class_3bb8c_k.c`) shows `arg2` is always a small caller-side
+`DreamSys.c`, `ObjMStyleActor.c`) shows `arg2` is always a small caller-side
 tag value -- concretely `this->moodIndex + 1` in `Entity.c` -- `arg3` is
 always the caller's own `this` pointer, and `arg4` is a value indexed out
 of (or read directly from) a function-pointer table in every caller
 (`this->vt->DreamSys__SoundCueCallback` in `DreamSys.c`; `gStyleCueCallbacks[sub->unk6]` in
-`class_3bb8c_k.c`, and `gStyleCueCallbacks` is itself a 14-slot class table per
+`ObjMStyleActor.c`, and `gStyleCueCallbacks` is itself a 14-slot class table per
 `classtable.py --scan`). So `owner`/`callback` are tier A by mechanics
 (store the caller's own context and a function-pointer-shaped value,
 verbatim); `InitSoundCueSet` as the whole function's name is tier B: it's
@@ -131,7 +131,7 @@ reset to -1/0/0x7F/0x40, +0x10 zeroed, callback(owner, set), +0x04
 incremented), FlushSoundCueSet (slot +0x0 through stopVoice, +0x00
 cleared), Entity__GetProximityRatio (+0x14 divisor), the Entity__MoodCueNN
 handlers (+0x04, +0x10, slot 0 +0x4..+0x10, slot 1/2 +0x4/+0x8),
-class_3bb8c_k's StyleCueNN `self` (the same offsets) and DreamSys.h's
+ObjMStyleActor's StyleCueNN `self` (the same offsets) and DreamSys.h's
 `SoundCueCallbackArg` (+0x00 == tag 1, +0x04 % 20, slot 0/1 +0x4/+0x8).
 
 Names, tier A, each from what its readers do:
@@ -158,7 +158,7 @@ a pitch offset (that is what setPitchOffset computes from it). `tick` and
 `callback` is typed `SoundCueCallbackFn`, `void (*)(void *owner,
 SoundCueSet *set)`; InitSoundCueSet's parameter takes that type and its
 first parameter is `sound` (it is unused). The three functions have no
-shared prototype: Entity.h, DreamSys.c and class_3bb8c_k.c declare them
+shared prototype: Entity.h, DreamSys.c and ObjMStyleActor.c declare them
 with their own type for the sound object (TodActor's `arg2` is a
 `struct UnkArg2Obj *`), and a header prototype taking `VabStreamObj *`
 would warn in each.

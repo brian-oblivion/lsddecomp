@@ -2,7 +2,7 @@
 
 > Renamed from `func_80053134` on 2026-09-24 (tools/rename.py). Address 0x80053134.
 
-**Unit:** class_3bb8c_k · **Size:** 27 words (0x6C bytes) ·
+**Unit:** ObjMStyleActor · **Size:** 27 words (0x6C bytes) ·
 **Status: MATCHED 27/27**, whole-image SHA1 green.
 
 ## What it does
@@ -18,7 +18,7 @@ void ObjM__TeardownStyle(Obj87034_3bb8c_l *self) {
 
 Straight-line dispatch chain. `ReleaseDreamAuxEntities` is already matched
 elsewhere (`src/DreamAux.c`); `StyleTeardown` is still uncarved ground
-(`asm/class_3bb8c_k.s`). Both are called with no arguments and their
+(`asm/ObjMStyleActor.s`). Both are called with no arguments and their
 return values are unused, declared as plain `extern void func(void);` in
 `include/class_3bb8c.h`.
 
@@ -49,4 +49,4 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005278C` on 2026-09-24 (tools/rename.py). Address 0x8005278c.
 
-Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
+Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py ItemList__ReleaseRows`: 36/36 words match.
 
 This is vtable slot `+0x090` of `gItemListMethods` (not declared in
@@ -84,7 +84,7 @@ Round 75 (bravo, track 3). `func_8005278C` -> `ItemList__ReleaseRows`, **tier A*
 
 Slot +0x090 (`tools/classtable.py gItemListMethods`), called by ItemList__ReleaseResources. Releases each of the min(itemCount, 4) row objects and clears its `rows[]` entry.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
 
 ## Round 99 (delta, track 7)
 

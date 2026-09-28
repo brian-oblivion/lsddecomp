@@ -402,7 +402,7 @@ void TextEntry__NextChar(TextEntry *self) {
  *    the player picks one from: its allocator and ctor, BasicClass's
  *    overrides (finalize, child bookkeeping, onNotify), and the view and
  *    resource methods resetView, loadResources, releaseResources,
- *    attachTarget and detachTarget. Its list methods are in class_3bb8c_k.
+ *    attachTarget and detachTarget. Its list methods are in ObjMStyleActor.
  *
  * Both classes keep their input and tick children by kind (Pad, FrameClock)
  * and draw through a ScreenSprite panel and TextRows built from CARD\ TIMs;

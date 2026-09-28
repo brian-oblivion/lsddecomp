@@ -2,7 +2,7 @@
 
 > Renamed from `func_80052EBC` on 2026-09-24 (tools/rename.py). Address 0x80052ebc.
 
-**Unit:** class_3bb8c_k · **Size:** 21 words (0x54 bytes) ·
+**Unit:** ObjMStyleActor · **Size:** 21 words (0x54 bytes) ·
 **Status: MATCHED 21/21**, whole-image SHA1 green.
 
 ## What it does
@@ -40,4 +40,4 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.

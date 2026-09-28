@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052A58` on 2026-09-24 (tools/rename.py). Address 0x80052a58.
 
-**Unit:** class_3bb8c_k · **Size:** 63 instructions (0xFC bytes) ·
+**Unit:** ObjMStyleActor · **Size:** 63 instructions (0xFC bytes) ·
 **Status: MATCHED 63/63**, whole-image SHA1 green. Matched on the first
 attempt.
 
@@ -68,7 +68,7 @@ Round 75 (bravo, track 3). `func_80052A58` -> `ItemList__StepCursorInView`, **ti
 
 Slot +0x098 (`tools/classtable.py gItemListMethods`). Re-colours the current cursor row gItemListRowColor, moves `cursorIndex` +1 (dir != 0) or -1, colours the new row gItemListCursorColor, and if `notify` calls forwardToTarget(0). Callers: CursorUp (dir 0), CursorDown (dir 1).
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
 
 ## Round 99 (delta, track 7)
 

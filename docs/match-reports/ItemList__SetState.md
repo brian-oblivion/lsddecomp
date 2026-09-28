@@ -4,7 +4,7 @@
 
 > Renamed from `func_800521D4` on 2026-09-24 (tools/rename.py). Address 0x800521d4.
 
-Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0 (checked once
+Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0 (checked once
 the whole unit's batch of matches was in place); whole-image SHA1 matches
 retail. `funcdiff.py ItemList__SetState`: 42/42 words match.
 
@@ -78,7 +78,7 @@ Round 75 (bravo, track 3). `func_800521D4` -> `ItemList__SetState`, **tier B**.
 
 Slot +0x054 of gItemListMethods (`tools/classtable.py gItemListMethods`). Clears `closeTicks`; for state 2 or 3 it removes the cached `inputSource` child, releases resources (slot +0x048, ItemList__ReleaseResources) and stores the state in `result`; for state 4 it calls notifyParents(self, result). Callers: ItemList__HandleInputCode (2 after input code 25, 3 after code 23) and ItemList__TickClosing (4). The one parent-side reader, TaskObjF__OnItemListResult (class_3bb8c_g), takes code 2 as "read the selected item" and 3 as the other outcome. Tier B: `SetState` names the mechanics; the states' game meaning (confirm/cancel) is only suggested by that one caller.
 
-ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/class_3bb8c_k.c`).
+ItemList, per the round-75 pass, is a scrolling list selector: up to 4 visible rows of 26-character item text, a highlighted cursor row, a horizontal column offset (see the unit header comment of `src/ObjMStyleActor.c`).
 
 ### Globals and fields named in this pass
 
@@ -94,7 +94,7 @@ Globals (`tools/rename.py`):
 
 Fields and slots (`include/class_3bb8c.h`, renamed definition-first; every
 accessor the compiler listed, in both the build and
-`tools/check-nonmatching.sh`, was in class_3bb8c_k, so none are proposed):
+`tools/check-nonmatching.sh`, was in ObjMStyleActor, so none are proposed):
 
 - ItemList: `itemCount` (+0x10), `maxTextLen` (+0x14), `texts` (+0x18),
   `topIndex` (+0x20), `column` (+0x24), `cursorIndex` (+0x28), `result`
@@ -112,7 +112,7 @@ accessor the compiler listed, in both the build and
 ## Proposed field names
 
 None: every field and slot renamed this round had accessors only in
-class_3bb8c_k. For the head: the TYPE name `ItemList` is still an address
+ObjMStyleActor. For the head: the TYPE name `ItemList` is still an address
 name; `ListSelector` or similar would fit the reading above, but renaming it
 touches class_3bb8c_i's local `ItemList_3bb8c_j` and 20+ symbols, so it is
 left for a pass that owns both units.

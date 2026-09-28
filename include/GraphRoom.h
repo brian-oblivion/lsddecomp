@@ -7,7 +7,7 @@
  * GraphRoom -- class id 0x2F130, method table gGraphRoomMethods, a TaskCore
  * subclass (`tools/classtable.py gGraphRoomMethods --vs gTaskCoreMethods`:
  * nine overrides and one slot of its own). No class derives from it.
- * src/class_3bb8c_k.c holds the whole class: allocator, ctor, every
+ * src/ObjMStyleActor.c holds the whole class: allocator, ctor, every
  * override, ScoreDayLog, and the getter.
  *
  * The name is round 75's reading, kept: reset loads "ETC\HGRAPH.TIM" as the
@@ -19,7 +19,7 @@
  * GameApplication__RunTask(New_GraphRoom, self->dreamSys, ...), so the ctor's
  * one argument, kept at +0x0A4, is the game's DreamSys. Its +0x1B0 is
  * DreamSys__GetSaveBlock, which returns &saveMagic; this unit reads that
- * block through its own record (DreamSaveBlock in class_3bb8c_k.c: +0x004
+ * block through its own record (DreamSaveBlock in ObjMStyleActor.c: +0x004
  * currentYear, +0x008 currentDay, +0x018 moodPreviousDays[365], the same
  * offsets as DreamSys's fields from saveMagic at DreamSys +0x178).
  *
@@ -93,7 +93,7 @@ extern GraphRoomMethods *GetGraphRoomMethods(void); /* returns &gGraphRoomMethod
  * then plays GameApplication__PlaySpecialDayMovies. */
 #define GRAPHROOM_RESULT_SCORED 2
 
-/* The class's own methods, in ROM order (class_3bb8c_k). */
+/* The class's own methods, in ROM order (ObjMStyleActor). */
 GraphRoom *New_GraphRoom(struct DreamSys *dreamSys);
 void GraphRoom__GraphRoom(GraphRoom *self, struct DreamSys *dreamSys);
 void GraphRoom__Reset(GraphRoom *self);

@@ -5,7 +5,7 @@
 Round 82, runner alpha (second re-staffed slot of the round). Unit `src/Sprite.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
 - **Where:** slot +0x0B8 of gCharSpriteMethods, gScreenSpriteMethods, gSpriteMethods and gVariantSpriteMethods (the sprite classes) (`tools/classtable.py`).
-- **What:** Copies three bytes from the argument to +0x78..+0x7A (the embedded GsSPRITE r,g,b per `class_3bb8c_k.c`). Retail: `lb,lb,lb` then `sb,sb,sb`, then `jr` with an UNFILLED delay slot.
+- **What:** Copies three bytes from the argument to +0x78..+0x7A (the embedded GsSPRITE r,g,b per `ObjMStyleActor.c`). Retail: `lb,lb,lb` then `sb,sb,sb`, then `jr` with an UNFILLED delay slot.
 - **Result:** byte-exact; 8/8 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK).
 - **Types:** local views and `extern s32 D_XXXXXXXX[];` table declarations live in the unit; no shared header was touched.
 

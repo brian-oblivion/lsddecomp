@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057444` on 2026-09-18 (tools/rename.py). Address 0x80057444.
 
-Unit: `class_3bb8c_k` (round 17). Converts a source `s16` triple into a
+Unit: `ObjMStyleActor` (round 17). Converts a source `s16` triple into a
 stack `Vec3O` via `SceneNode__RotateLocalVector`, then forwards it to `self`'s own
 `slotBC` (= `Actor__AddTranslation`, this unit) through the vtable.
 
@@ -61,7 +61,7 @@ self-referential virtual dispatch to a function this same unit defines).
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `BaseObjO__ApplyRotatedVec14`. Occupant of +0x0C0: SceneNode__RotateLocalVector rotates the s16 local vector by the object's orientation, then addTranslation (+0x0BC) adds the result. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_k.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `BaseObjO__ApplyRotatedVec14`. Occupant of +0x0C0: SceneNode__RotateLocalVector rotates the s16 local vector by the object's orientation, then addTranslation (+0x0BC) adds the result. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (round 99, alpha)
 

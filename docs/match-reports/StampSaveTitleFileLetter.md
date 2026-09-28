@@ -55,7 +55,7 @@ s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1)
 ```
 
 **Signature was NOT free to choose.** `include/class_3bb8c.h` already
-carries `extern s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1);` (`class_3bb8c_k`'s
+carries `extern s32 StampSaveTitleFileLetter(s32 arg0, s32 arg1);` (`ObjMStyleActor`'s
 own caller, `TaskObjF__WriteMemcardSaveFile`), visible in this same translation unit via the
 shared header, so the definition here has to match it exactly
 (`conflicting types` otherwise) even though every real use inside the body
@@ -114,7 +114,7 @@ copies one or more fixed byte ranges out of the `gSaveTitleGlyphs` template into
 the caller's buffer, optionally selecting a table entry via
 `atoi()` on a field of the caller-supplied `src` when one is given. Named
 from its one real caller context established elsewhere in this project
-(`TaskObjF__WriteMemcardSaveFile`, `class_3bb8c_k`, and `class_3bb8c_d`'s
+(`TaskObjF__WriteMemcardSaveFile`, `ObjMStyleActor`, and `class_3bb8c_d`'s
 own call site) -- a memcard save-file writer building the save's on-card
 icon/header block from a shared template. The exact semantic meaning of
 each copied range (icon pixels vs. a formatted date/glyph, per the
@@ -175,7 +175,7 @@ Comments moved out of the source (verbatim):
   does not have." It keeps one line in the source (`MATCHING: all-s8 ...`).
 - above the definition: "Signature is `include/class_3bb8c.h`'s
   ALREADY-shared `extern s32 StampSaveTitleFileLetter(s32 arg0, s32
-  arg1);` (class_3bb8c_k's own caller, TaskObjF__WriteMemcardSaveFile),
+  arg1);` (ObjMStyleActor's own caller, TaskObjF__WriteMemcardSaveFile),
   matched exactly -- this unit's own definition must agree with that
   declaration since both are visible in this translation unit. Cast to `u8
   *` internally; retail's own register content at exit (`$v0` left holding

@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052E7C` on 2026-09-24 (tools/rename.py). Address 0x80052e7c.
 
-**Unit:** class_3bb8c_k · **Size:** 16 words (0x40 bytes) ·
+**Unit:** ObjMStyleActor · **Size:** 16 words (0x40 bytes) ·
 **Status: MATCHED 16/16**, whole-image SHA1 green.
 
 ## What it does
@@ -70,7 +70,7 @@ Round 78 (charlie), FINISHING-PLAN track 3.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the StageMap's value callback (ChunkFileFn, cast at ObjM__AttachTarget); StageMap's ComputeRateEntry keeps the callback's return as an entry's name, and this body leaves GetStageMapChunkRecord's result in $v0, so its real return is likely that FilePathRecord pointer. The return type is left `void` (not changed this round). The first argument of GetStageMapChunkRecord/XY is now `s32 index`, as their definitions take it.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. It is the StageMap's value callback (ChunkFileFn, cast at ObjM__AttachTarget); StageMap's ComputeRateEntry keeps the callback's return as an entry's name, and this body leaves GetStageMapChunkRecord's result in $v0, so its real return is likely that FilePathRecord pointer. The return type is left `void` (not changed this round). The first argument of GetStageMapChunkRecord/XY is now `s32 index`, as their definitions take it.
 
 ## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
 

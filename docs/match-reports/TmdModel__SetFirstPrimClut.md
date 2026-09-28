@@ -6,7 +6,7 @@
 
 Round 82, runner charlie (matching slot). Unit `src/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
-- **Where:** not in any method table; called from class_3bb8c_k.c as `TmdModel__SetFirstPrimClut(obj, &gStyleEffectClutPos)` (`tools/classtable.py gTmdModelMethods`).
+- **Where:** not in any method table; called from ObjMStyleActor.c as `TmdModel__SetFirstPrimClut(obj, &gStyleEffectClutPos)` (`tools/classtable.py gTmdModelMethods`).
 - **What:** `t = self->unk10->unk10; v = xy[0] / 16; t->unk6 = v; t->unk6 = v + xy[1] * 64;`: a double store to one s16 field, the second one reusing the first value without reloading it.
 - **Result:** byte-exact; 14/14 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** local views (`TmdModel`, `ModelData_fa50`, `Quad_fa50`, `TmdObject_fa50`, `Outer_fa50`/`Inner_fa50`/`Target_fa50`) and prototypes live in the unit; no shared header was touched.
@@ -29,7 +29,7 @@ void TmdModel__SetFirstPrimClut(Outer_fa50 *self, s16 *xy) {
 
 `TmdModel__SetFirstPrimClut` -- KEPT (not renamed this round). Tier C: mechanics known
 (`t->unk6 = xy[0]/16; t->unk6 = ... + xy[1]*64;`, a double store overwriting
-the field), but its only caller is `src/class_3bb8c_k.c`, a live types-runner
+the field), but its only caller is `src/ObjMStyleActor.c`, a live types-runner
 unit this round; the class owning the `Outer_fa50`/`Inner_fa50`/`Target_fa50`
 chain is itself unconfirmed (see `TmdModel__AddFirstPrimClut.md`, its sibling).
 
@@ -38,7 +38,7 @@ chain is itself unconfirmed (see `TmdModel__AddFirstPrimClut.md`, its sibling).
 `TmdModel__SetFirstPrimClut` -- tier B, discriminating it from its sibling
 `TmdModel__AddFirstPrimClut` (renamed this round, no collision): this one SETS
 the field from a fresh value, the sibling ACCUMULATES onto the existing
-one. Posted to the broadcast for the head to apply once `class_3bb8c_k.c`
+one. Posted to the broadcast for the head to apply once `ObjMStyleActor.c`
 is not live and the owning class is known.
 
 ## Track 7 (2026-09-26, round 94, bravo)
@@ -47,7 +47,7 @@ Named the fields (see `TmdModel__AddFirstPrimClut.md`'s matching entry for the
 full rationale; both functions share the same three structs and both are
 the only readers/writers, all inside this unit): `Target_fa50::unk6` ->
 `offset`, `Inner_fa50::unk10` -> `target`, `Outer_fa50::unk10` -> `inner`.
-`class_3bb8c_k.c`'s call site (`TmdModel__SetFirstPrimClut(obj, &gStyleEffectClutPos)`) passes
+`ObjMStyleActor.c`'s call site (`TmdModel__SetFirstPrimClut(obj, &gStyleEffectClutPos)`) passes
 opaque pointers and never names these fields itself, so the field rename
 does not touch it. Compiler-verified accessor list, build and
 check-nonmatching.sh green.
@@ -60,10 +60,10 @@ the field is that primitive's CLUT id. All three placeholder types are
 deleted.
 
 - **`Outer_fa50` -> `TmdModel`** (`inner` -> `object`). The one caller,
-  `SetStyleEffectSources` (class_3bb8c_k.c), passes the value
+  `SetStyleEffectSources` (ObjMStyleActor.c), passes the value
   `gStyleEffectTmd`'s slot +0x080 returns for a model id; the same slot's
   result for the same `gStyleEffectModelIds[]` is what
-  `StyleEffect__InitByKind` (class_3bb8c_k.c) hands to
+  `StyleEffect__InitByKind` (ObjMStyleActor.c) hands to
   `SceneNode__LinkModel`, which reads it as a `TmdModel` (`->object`,
   `->data->objects`). TmdModel's +0x010 is `object`.
 - **`Inner_fa50` -> `TmdObject`** (`target` -> `prims`): TmdObject's +0x010

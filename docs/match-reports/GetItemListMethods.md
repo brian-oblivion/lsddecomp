@@ -4,7 +4,7 @@
 
 > Renamed from `func_80052B60` on 2026-09-24 (tools/rename.py). Address 0x80052b60.
 
-Unit `class_3bb8c_k`, round 15. `./build-and-verify.sh` exit 0; whole-image
+Unit `ObjMStyleActor`, round 15. `./build-and-verify.sh` exit 0; whole-image
 SHA1 matches retail. `funcdiff.py GetItemListMethods`: 4/4 words match.
 
 ## Source

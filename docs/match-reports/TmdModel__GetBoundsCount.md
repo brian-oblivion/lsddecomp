@@ -6,7 +6,7 @@
 
 Round 82, runner charlie (matching slot). Unit `src/TmdModel.c`. Fresh ground (carved in FINISHING-PLAN revision 18), no prior attempt, no report before this one.
 
-- **Where:** not in any method table; called from SceneNode (code_d294_b.c) and class_3bb8c_k.c as `TmdModel__GetBoundsCount(model)` (`tools/classtable.py gTmdModelMethods`).
+- **Where:** not in any method table; called from SceneNode (code_d294_b.c) and ObjMStyleActor.c as `TmdModel__GetBoundsCount(model)` (`tools/classtable.py gTmdModelMethods`).
 - **What:** returns the sbss flag `gTmdModelBoundsCount` (reached `%gp_rel`, via `--gp-symbols`); its argument is ignored. Callers use the result both as a truth value and as a count.
 - **Result:** byte-exact; 3/3 words, 0 insertions / 0 deletions, whole-image SHA1 green (`./build-and-verify.sh` OK). First build.
 - **Types:** local views (`TmdModel`, `ModelData_fa50`, `Quad_fa50`, `TmdObject_fa50`, `Outer_fa50`/`Inner_fa50`/`Target_fa50`) and prototypes live in the unit; no shared header was touched.
@@ -24,7 +24,7 @@ s32 TmdModel__GetBoundsCount(void *self) {
 
 `TmdModel__GetBoundsCount` -- KEPT (not renamed this round). Tier C: mechanics fully
 known (returns `gTmdModelBoundsCount`, ignoring its argument), but renaming
-would touch `src/class_3bb8c_k.c`, a live types-runner unit this round
+would touch `src/ObjMStyleActor.c`, a live types-runner unit this round
 (FINISHING-PLAN track 4); `tools/rename.py` rewrites every caller
 tree-wide, so this rename is deferred to avoid the collision.
 
@@ -32,7 +32,7 @@ tree-wide, so this rename is deferred to avoid the collision.
 
 `TmdModel__GetBoundsCount` (or `TmdModel__IsConstructed` if a caller confirms
 it always takes an actual `TmdModel*`) -- tier B. The head should apply this
-with `tools/rename.py` once `class_3bb8c_k.c` is not live, then re-verify.
+with `tools/rename.py` once `ObjMStyleActor.c` is not live, then re-verify.
 Posted to the broadcast.
 
 ## Track 4 (2026-09-26, round 87, delta)

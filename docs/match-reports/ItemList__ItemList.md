@@ -76,7 +76,7 @@ the fix. Settled by address, not by guess:
   established independently by class_3bb8c_i. It has NOTHING to do with
   this constructor's class.
 - This class's REAL table is `gItemListMethods`, reached through
-  `GetItemListMethods()` (class_3bb8c_k, MATCHED) -- `tools/classtable.py
+  `GetItemListMethods()` (ObjMStyleActor, MATCHED) -- `tools/classtable.py
   gItemListMethods` places every one of this unit's remaining functions
   (this ctor at +0x008, plus `ItemList__Finalize`/`AddChild`/
   `RemoveChild`/`RemoveAllChildren`/`NotifyChild`/`ResetCounters`/
@@ -86,7 +86,7 @@ the fix. Settled by address, not by guess:
   resolvable by `classtable.py` after all -- the earlier "no classtable
   entry exists for it" note was itself part of the same mistake (it
   looked up the wrong global).
-- class_3bb8c_k's OWN local view of this same gItemListMethods table already
+- ObjMStyleActor's OWN local view of this same gItemListMethods table already
   carries the name `ItemList`/`ItemListMethods` in the shared header,
   established independently from ITS OWN call sites. Reusing that bare
   name here would collide (both visible in this translation unit through

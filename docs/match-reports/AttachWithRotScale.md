@@ -2,7 +2,7 @@
 
 > Renamed from `func_800567D4` on 2026-09-23 (tools/rename.py). Address 0x800567d4.
 
-Unit `class_3bb8c_k`. `self` here is a `LinkNode` in the CALLEE role (a
+Unit `ObjMStyleActor`. `self` here is a `LinkNode` in the CALLEE role (a
 child, e.g. `self->arr7C[i]`), not the owning node -- see
 `StyleEffect__InitByKind`/`StyleEffect__PlaceModelChildren`'s call sites, which both pass one of the
 owner's own child pointers as `self` here.

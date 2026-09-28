@@ -78,6 +78,6 @@ Renamed from `TodActor__InitDefaults`. Override of +0x040, SceneNode's `reset` (
 
 ## Track 7 (round 99, bravo)
 
-`0x12C` is written decimal (300), unnamed: Actor__Reset (class_3bb8c_k) writes
+`0x12C` is written decimal (300), unnamed: Actor__Reset (ObjMStyleActor) writes
 the same default into lastOffsetValue, so a name belongs in include/Actor.h
 (proposed to the head, not applied here).

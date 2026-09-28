@@ -1,4 +1,4 @@
-# TryStartStyleCue -- MATCHED (45/45 words), class_3bb8c_k
+# TryStartStyleCue -- MATCHED (45/45 words), ObjMStyleActor
 
 > Renamed from `func_8005556C` on 2026-09-23 (tools/rename.py). Address 0x8005556c.
 
@@ -44,7 +44,7 @@ extern s32 gStyleSceneRefs;                                 /* fresh copy -- see
 extern void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2);  /* forward decl, own unit,
                                                           111w, STALL -- widened round 47,
                                                           see FindNextStyleCueInRange.md */
-extern s32 gStyleCueCallbacks[];                                /* 14-slot table, class_3bb8c_k.c's gStyleCueCallbacks */
+extern s32 gStyleCueCallbacks[];                                /* 14-slot table, ObjMStyleActor.c's gStyleCueCallbacks */
 extern s32 InitSoundCueSet(s32 arg0, void *arg1, s32 arg2, void *arg3, s32 arg4);
 ```
 
@@ -56,7 +56,7 @@ same cross-unit call, per the multiple-independent-local-views convention).
 `gStyleSceneRefs` is redeclared fresh here (not reusing the copy later in this
 file for `FlushStyleCue`/`ServiceStyleCueIfNear`) because this function's ROM
 address is earlier -- same pattern as `StyleUpdateEffectSlots`'s fresh `gStyleVariant`
-copy. `gStyleCueCallbacks` is `class_3bb8c_k.c`'s already-identified 14-function
+copy. `gStyleCueCallbacks` is `ObjMStyleActor.c`'s already-identified 14-function
 table (its own `ParamMethods` slot list); here it is read as a raw `s32`
 bit pattern (a function pointer forwarded opaquely as `InitSoundCueSet`'s 5th
 argument, which just stores it into `obj->unkC` -- confirmed by reading that

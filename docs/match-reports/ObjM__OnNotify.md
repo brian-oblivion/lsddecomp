@@ -2,7 +2,7 @@
 
 > Renamed from `func_80052D10` on 2026-09-24 (tools/rename.py). Address 0x80052d10.
 
-**Unit:** class_3bb8c_k · **Size:** 52 instructions (0xD0 bytes) ·
+**Unit:** ObjMStyleActor · **Size:** 52 instructions (0xD0 bytes) ·
 **Status: MATCHED 52/52**, whole-image SHA1 green.
 
 ## Role
@@ -88,7 +88,7 @@ Slot +0x038 of gObjMMethods (`tools/classtable.py 0x80087034`), the slot called 
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The sender is `BasicClass *` (its methods->header is the class id); the three targets are onStageMapNotify (0x114), onFadeNotify (0x164, cast to FadeBox *) and onDreamSysNotify (0x1F34).
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. The sender is `BasicClass *` (its methods->header is the class id); the three targets are onStageMapNotify (0x114), onFadeNotify (0x164, cast to FadeBox *) and onDreamSysNotify (0x1F34).
 
 ## Round 99 (delta, track 7)
 
@@ -96,4 +96,4 @@ The class ids are named in each class's own header, read off the tables' word +0
 
 ## Proposed field names
 
-- `ObjM::unk64` (include/ObjM.h, +0x064): write-only. ObjM__ObjM (class_3bb8c_k) zeroes it, ObjM__PollTimBlockLoad (class_3bb8c_l) sets 1 immediately before `enterStyleSession`; nothing reads it. A name such as `styleSessionEntered` (tier B) would fit, but the writer outside this unit decides it; padding is not an option while two writers exist.
+- `ObjM::unk64` (include/ObjM.h, +0x064): write-only. ObjM__ObjM (ObjMStyleActor) zeroes it, ObjM__PollTimBlockLoad (class_3bb8c_l) sets 1 immediately before `enterStyleSession`; nothing reads it. A name such as `styleSessionEntered` (tier B) would fit, but the writer outside this unit decides it; padding is not an option while two writers exist.

@@ -1,4 +1,4 @@
-# TickStyle -- MATCHED (77/77 words), class_3bb8c_k
+# TickStyle -- MATCHED (77/77 words), ObjMStyleActor
 
 > Renamed from `func_800558F0` on 2026-09-23 (tools/rename.py). Address 0x800558f0.
 
@@ -40,7 +40,7 @@ inside the `if (gStyleCueSlots[i] != 0) { ... }` arm (after the
 perturbs GCC 2.6.3's register allocator enough to swap `ctx`/`i` back into
 retail's colours -- with zero net effect on either variable's value at any
 point downstream (`i` is immediately re-read by the `for`'s own increment
-clause, and the pair cancels exactly). Applied to the real `src/class_3bb8c_k.c`
+clause, and the pair cancels exactly). Applied to the real `src/ObjMStyleActor.c`
 body (not the scaffold) and rebuilt through `./build-and-verify.sh`:
 **77/77 words, whole-image SHA1 verifies.**
 
@@ -210,7 +210,7 @@ s32 TickStyle(void *arg0, void *arg1, s32 arg2) {
 Needs (already present earlier in the unit, in strict ROM order, at the
 point this body would compile): the `ObjAB4C`/`ObjAB4CMethods` local view
 above; `extern s32 gStyleGrid;`, `extern s32 gStyleTickCount;`,
-`extern void ApplyStyleDecorationIfSet(void);` (matched, `class_3bb8c_k.c`),
+`extern void ApplyStyleDecorationIfSet(void);` (matched, `ObjMStyleActor.c`),
 `extern void StyleBuildDecorSet(void);`/`extern void StyleUpdateDecorSet(void);`
 (forward, own unit, still cold), `void StyleBuildEffectSlots(void *arg0);` (matched
 earlier this unit, this round), `void StyleUpdateEffectSlots(void *arg0);` (matched,
@@ -252,7 +252,7 @@ The per-frame orchestrator: on the FIRST call (`gStyleTickCount++ == 0`)
 runs `ApplyStyleDecorationIfSet`/`StyleBuildDecorSet`/`StyleBuildEffectSlots`
 (one-time setup), then every call runs `StyleUpdateDecorSet`/
 `StyleUpdateEffectSlots`/`StyleScrollVramStrips` and the two `gStyleCueSlots`
-flush-or-start steps. Called from `src/class_3bb8c_k.c`'s `ObjM__TickStyle`
+flush-or-start steps. Called from `src/ObjMStyleActor.c`'s `ObjM__TickStyle`
 (the call this unit had already forward-declared as its own entry point),
 which is a genuine per-tick call site -- the evidence for "Tick" over a
 generic "Update", matching this codebase's existing `ReleaseDreamAuxEntities`
@@ -265,13 +265,13 @@ swap).
 
 Round 93: parameters `(Descriptor10 *cell, void *unused, s32 lastCue)` -- ObjM__TickStyle passes the grid's getTargetDescriptor result, 0, 0; `cell` goes through StageMap's computeCellOffsets into `targetPos` (a LongVec3; was `u8 buf[0x10]`, same bytes). The pool is `StyleCueSlot gStyleCueSlotPool[]` (0x68-byte slots, now that `cueSet` is a SoundCueSet).
 
-### Comments moved here from src/class_3bb8c_k.c
+### Comments moved here from src/ObjMStyleActor.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 
 ```c
 /*
- * class_3bb8c_k -- functions 0..22 of the old 113-function class_3bb8c
+ * ObjMStyleActor -- functions 0..22 of the old 113-function class_3bb8c
  * remainder, 0x44F14..0x46288.  23 functions (19 matched, 4 STALL), 1245
  * words.  Carved round 45 (2026-09-15); staffed round 46.
  *
@@ -281,7 +281,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * cluster (`gStyleStage`/`gStyleDay`/`gStyleSceneRefs`/`gStyleVariant`/
  * `gStyleDecorObj`/`gStyleGrid`/`gStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
- * `class_3bb8c_k.c`'s already-confirmed "Style" subsystem sets
+ * `ObjMStyleActor.c`'s already-confirmed "Style" subsystem sets
  * (`RegisterStyleConfig`/`ApplyStyleConfig`/`FillStyleFromConfig`/
  * `ApplyStyleDecorationIfSet`, round 69) -- a cross-unit fact, not a guess
  * made here.
@@ -297,7 +297,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * positional sound-cue subsystem (`gStyleCueSlots`, `TryStartStyleCue`/
  * `FindNextStyleCueInRange`/`FlushStyleCue`/`ServiceStyleCueIfNear`/
  * `IsStyleCueNear`). `TickStyle` is the per-frame entry point (called from
- * `src/class_3bb8c_k.c`); `StyleTeardown` is the scene-exit release of
+ * `src/ObjMStyleActor.c`); `StyleTeardown` is the scene-exit release of
  * everything `TickStyle` builds.
  *
  * What the "Style" subsystem is FOR in gameplay terms -- which dream/link

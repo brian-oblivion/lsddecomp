@@ -50,7 +50,7 @@ first).
 `(TmdFile *)((u8 *)object - 0xC)` -> `(TmdFile *)((u8 *)object - offsetof(TmdFile, objects))`,
 the project's standing idiom for a byte-offset conversion between two
 struct views once the target field is known (`include/common.h`'s
-`offsetof`; precedent `src/class_3bb8c_k.c`, `src/TmdRenderer.c`). The `(u8
+`offsetof`; precedent `src/ObjMStyleActor.c`, `src/TmdRenderer.c`). The `(u8
 *)` cast itself stays: `object` and `TmdFile` are unrelated types with no
 field expressing the relationship, so byte-granularity pointer arithmetic is
 the only C form. Byte-identical, build and check-nonmatching.sh green.

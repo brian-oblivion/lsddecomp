@@ -2,7 +2,7 @@
 
 > Renamed from `func_80053E00` on 2026-09-23 (tools/rename.py). Address 0x80053e00.
 
-**Unit:** class_3bb8c_k · **Size:** 33 instructions · **Status:** MATCHED (33/33 words)
+**Unit:** ObjMStyleActor · **Size:** 33 instructions · **Status:** MATCHED (33/33 words)
 
 ## What this function does
 
@@ -27,7 +27,7 @@ None — matched on the first attempt.
 
 ## Provenance
 
-round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_k`.
+round 15 (2026-09-04), runner echo, fresh carve `ObjMStyleActor`.
 
 ## Naming
 
@@ -36,7 +36,7 @@ round 15 (2026-09-04), runner echo, fresh carve `class_3bb8c_k`.
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical.
 
 ## Track 7 (2026-09-27, round 98, delta)
 

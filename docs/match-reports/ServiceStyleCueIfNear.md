@@ -4,7 +4,7 @@
 
 > Renamed from `func_8005582C` on 2026-09-23 (tools/rename.py). Address 0x8005582c.
 
-Unit `class_3bb8c_k`. **18/18 words, byte-exact.** First build.
+Unit `ObjMStyleActor`. **18/18 words, byte-exact.** First build.
 
 ## What it was
 

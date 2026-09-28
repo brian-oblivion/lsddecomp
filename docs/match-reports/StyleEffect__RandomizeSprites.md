@@ -6,7 +6,7 @@
 
 > Renamed from `func_80056E44` on 2026-09-18 (tools/rename.py). Address 0x80056e44.
 
-Unit: `class_3bb8c_k` (round 17). Walks 4 elements of the 5-element
+Unit: `ObjMStyleActor` (round 17). Walks 4 elements of the 5-element
 `arr84` array (indices 1..4), and for each one calls its own vtable
 `slot48` with a random entry from a 6-element global table, then sets a
 random "angle" field.
@@ -97,11 +97,11 @@ not established).
 
 ## Extern arity (round 59)
 
-**Verdict: arity-ok idiom.** `src/class_3bb8c_k.c`'s unprototyped declaration
+**Verdict: arity-ok idiom.** `src/ObjMStyleActor.c`'s unprototyped declaration
 stays.
 
 **Callee evidence** (`0x80056E44`, and the definition in
-`src/class_3bb8c_k.c`): entry is `addiu s0,a0,136` and `$a1` is never read —
+`src/ObjMStyleActor.c`): entry is `addiu s0,a0,136` and `$a1` is never read —
 one real argument, exactly as `void StyleEffect__RandomizeSprites(LinkOwnerObj *this)`
 says.
 
@@ -121,13 +121,13 @@ one-parameter prototype here would make every arm a `too many arguments`
 error, and dropping the argument would delete `move a1,s1`.
 
 **Declaration sites changed:** none (arity unchanged). `/* arity-ok: ... */`
-added to `src/class_3bb8c_k.c:145`. Oracle green.
+added to `src/ObjMStyleActor.c:145`. Oracle green.
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
 Renamed from the `LinkOwnerObj__` family to `StyleEffect__` with the class's
 unification (`include/StyleEffect.h`). Evidence: the only caller is
-StyleEffect's own per-kind dispatch in `class_3bb8c_k.c`
+StyleEffect's own per-kind dispatch in `ObjMStyleActor.c`
 (`StyleEffect__InitByKind` kind 3, `StyleEffect__UpdateByKind` kind 3,
 `StyleEffect__ReleaseByKind` kinds 2/3), each passing its own `self`; the
 five-element array at +0x084 ("links") is `StyleEffect::sprites`, filled by
@@ -137,7 +137,7 @@ another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 `updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 
-View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in class_3bb8c_k.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
+View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in ObjMStyleActor.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
 
 ## Track 7 (round 99, alpha)
 

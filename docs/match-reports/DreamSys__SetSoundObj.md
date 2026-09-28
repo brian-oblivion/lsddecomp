@@ -69,8 +69,8 @@ the head to apply by type scope at merge time.
 
 Worth recording because it falsifies a plausible assumption rather than
 confirming one: `DreamSys.h` is shared with four sibling units
-(`class_3bb8c_k/t/r/o`), and a textual `grep` for `unk_0xA4` and `unk_0xA8`
-finds hits in `class_3bb8c_t.c` and `class_3bb8c_k.c` that look exactly like
+(`ObjMStyleActor/t/r/o`), and a textual `grep` for `unk_0xA4` and `unk_0xA8`
+finds hits in `class_3bb8c_t.c` and `ObjMStyleActor.c` that look exactly like
 DreamSys accessors. They are fields of unrelated structs with the same
 placeholder spelling -- the round-57 over-count, met again. The compiler said
 so for free; the grep would have cost a revert.

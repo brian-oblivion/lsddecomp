@@ -2,7 +2,7 @@
 
 > Renamed from `func_80052C10` on 2026-09-24 (tools/rename.py). Address 0x80052c10.
 
-**Unit:** class_3bb8c_k · **Size:** 50 instructions (0xC8 bytes) ·
+**Unit:** ObjMStyleActor · **Size:** 50 instructions (0xC8 bytes) ·
 **Status: MATCHED 50/50**, whole-image SHA1 green (matched together with
 `New_ObjM` in the same round; see that report for the residue that
 mattered on the sibling function -- this one matched cleanly on the first
@@ -22,9 +22,9 @@ as a post-construct hook.
 ## Struct/type notes
 
 Added a unit-LOCAL pair of types, `Class87034Methods_3bb8c_k` /
-`Obj87034_3bb8c_k`, in `src/class_3bb8c_k.c` itself (not in the shared
+`Obj87034_3bb8c_k`, in `src/ObjMStyleActor.c` itself (not in the shared
 `include/class_3bb8c.h`) -- deliberately, per this round's header-contention
-rule. `class_3bb8c_k` (echo, live in the same round) already has its OWN
+rule. `ObjMStyleActor` (echo, live in the same round) already has its OWN
 independent view of the SAME table (`Obj87034Methods_3bb8c_l` in the shared
 header), reaching a disjoint set of slots (0x004/0x010/0x014/0x048/0x074/
 0x07C/0x080/0x084/0x088/0x08C/0x0C0/0x0C4/0x0C8/0x0D0/0x0D4). This unit's
@@ -89,9 +89,9 @@ Round 75 (bravo, track 3). `func_80052C10` -> `ObjM__ObjM`, **tier A**.
 
 Slot +0x008 of gObjMMethods (`tools/classtable.py 0x80087034`), the ctor New_ObjM calls. Runs the base TimedTask ctor, sets methods = GetObjMMethods(), stores its arguments and clears fields, then calls +0x040.
 
-Local view fields named round 75 (class_3bb8c_k's `ObjM_3bb8c_k` only):
+Local view fields named round 75 (ObjMStyleActor's `ObjM_3bb8c_k` only):
 `pauseSetupStep` (+0x080) and `closeReady` (+0x084), tier B, from the
-named class_3bb8c_k methods that read them (ObjM__AdvancePauseSetup counts
+named ObjMStyleActor methods that read them (ObjM__AdvancePauseSetup counts
 +0x080; ObjM__UpdateCloseReadyFlag/ObjM__ClearCloseReadyFlag/
 ObjM__CloseAndNotifyC/D set, clear and test +0x084). The other eight
 fields stay `unkNN`: this ctor only stores arguments or constants into them.
@@ -99,7 +99,7 @@ fields stay `unkNN`: this ctor only stores arguments or constants into them.
 ## Proposed field names
 
 For the SHARED `ObjM` struct in include/class_3bb8c.h (accessors in
-class_3bb8c_k, not this unit, so not applied here):
+ObjMStyleActor, not this unit, so not applied here):
 
 | field | proposed | tier | evidence |
 | --- | --- | --- | --- |
@@ -109,7 +109,7 @@ class_3bb8c_k, not this unit, so not applied here):
 
 ## Track 4 (2026-09-26, round 89, echo)
 
-The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the class_3bb8c_k/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Fields stored: bgm +0x054, stage +0x038, ctorSound +0x06C (the sound again, beside TimedTask::sound), etcTim +0x074, dreamerTmd +0x070 (LinkResource, never read by ObjM), timBlockPending +0x060 = 1, unk64/inSession/pauseSetupStep/closeReady zeroed; the last call is resetCounters (+0x040).
+The class is unified as ObjM in include/ObjM.h (table gObjMMethods, was D_80087034); the ObjMStyleActor/_l/_m views (ObjM_3bb8c_k, Obj87034_3bb8c_l, ObjM) and class_39e08.h's Obj4C/SubObjB/EventArg are gone. Byte-identical. Fields stored: bgm +0x054, stage +0x038, ctorSound +0x06C (the sound again, beside TimedTask::sound), etcTim +0x074, dreamerTmd +0x070 (LinkResource, never read by ObjM), timBlockPending +0x060 = 1, unk64/inSession/pauseSetupStep/closeReady zeroed; the last call is resetCounters (+0x040).
 
 ## Round 94 (track 6, charlie): history moved from include/class_3bb8c.h
 

@@ -150,7 +150,7 @@ repositions (`slotB8`/`slotBC`) all 18 objects every frame. MATCHED,
 
 The local views were Viewport (`+0x018`/`+0x024` are `refView.vp.y`/`refView.vr.y`; `+0x064` is setClearColor) and BoxFill (`+0x0B8` setColor, `+0x0BC` setPosition). Locals: `height`, `fade`, `colorOfs`, `slot`, `band`.
 
-### Comments moved here from src/class_3bb8c_k.c
+### Comments moved here from src/ObjMStyleActor.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

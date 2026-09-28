@@ -218,7 +218,7 @@ side effect of the image moving. The honest figures are the two in the title:
 **1 word short**, and the residue enumerated above. Do not read 17/86 as
 "69 words wrong".
 
-## Preserved near-miss body (1 word short, `#if 0` in `src/class_3bb8c_k.c`)
+## Preserved near-miss body (1 word short, `#if 0` in `src/ObjMStyleActor.c`)
 
 Needs, already present earlier in the unit in strict ROM order:
 `extern s32 gStyleDecorVariant, gStyleDecorPosX, gStyleDecorPosY, gStyleDecorSizeW, gStyleDecorSizeH,
@@ -341,7 +341,7 @@ gStyleDecorSlots[] hold BoxFills (include/BoxFill.h); the deleted `ObjSlot4C` vi
 
 Local views replaced by the real classes: the `+0x0AC` slot on `gStyleSceneRefs`'s `+0x00C` is Viewport's getSubHandle (that word is ObjM's `cachedViewport`; `StyleSceneRefs`); the band objects are BoxFill. Locals: `pos`, `size`, `band`, `viewport`, `parent`.
 
-### Comments moved here from src/class_3bb8c_k.c
+### Comments moved here from src/ObjMStyleActor.c
 
 Verbatim as they stood before the round-93 comment pass (identifiers already carry this round's renames).
 

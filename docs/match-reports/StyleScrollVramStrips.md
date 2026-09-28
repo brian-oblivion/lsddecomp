@@ -4,7 +4,7 @@
 
 > Renamed from `func_80055A24` on 2026-09-23 (tools/rename.py). Address 0x80055a24.
 
-Unit `class_3bb8c_k`. **25/25 words, byte-exact.** Second build (one lever).
+Unit `ObjMStyleActor`. **25/25 words, byte-exact.** Second build (one lever).
 
 ## What it was
 
@@ -40,7 +40,7 @@ jr $ra
 ```
 
 `gStyleStage` is a plain `s32` (already established as such in
-`class_3bb8c_k.c`, `RegisterStyleConfig`). `(gStyleStage - 3)` cast to unsigned and
+`ObjMStyleActor.c`, `RegisterStyleConfig`). `(gStyleStage - 3)` cast to unsigned and
 compared `< 3` is the standard idiom for a closed range test, matching
 retail's `sltiu` exactly. `RotateVramRectRight` is a not-yet-carved,
 still-`INCLUDE_ASM` function in `asm/psyq_2bb9c.s` (a 4-argument draw-style

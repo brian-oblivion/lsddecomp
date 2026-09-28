@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057B90` on 2026-09-19 (tools/rename.py). Address 0x80057b90.
 
-Unit: `src/class_3bb8c_k.c`. Class: `DreamSys`, own vtable slot `+0x0DC`
+Unit: `src/ObjMStyleActor.c`. Class: `DreamSys`, own vtable slot `+0x0DC`
 (base-class-inherited at this offset; `include/DreamSys.h`'s
 `DreamSysBaseMethods::slot0xDC` already carried a comment naming this
 exact function as its `+0xDC` resolution, from before this unit converted
@@ -80,7 +80,7 @@ gates the attach attempt is not established.
 
 `vtable_DreamSys::slotA0` is accessed from SEVEN other units too
 (`grep -rln -- '->slotA0\b' src/` lists `class_3bb8c_g.c`,
-`class_3bb8c_k.c`, `class_3bb8c_c.c`, `code_d294_b.c`, `Task.c`,
+`ObjMStyleActor.c`, `class_3bb8c_c.c`, `code_d294_b.c`, `Task.c`,
 `class_3bb8c_i.c`, `Task.c`, besides this unit), so per
 FINISHING-PLAN.md track 3 step 3 it is proposed here, not renamed, and
 posted to the broadcast for the head to apply at merge.
@@ -115,7 +115,7 @@ today (inherited, unoverridden) while being byte-different call shapes.
 
 ## Track 4 (2026-09-25, round 82, delta)
 
-Renamed from `DreamSys__DispatchLinkCommandAndTryAttach`. Occupant of +0x0DC, which Actor__DispatchLinkCommand (+0x09C) calls when the SENDER's class byte is 0x34 (an Actor); DreamSys overrides it as DreamSys__DispatchInstanceEffect (testing for an Entity, 0x1F234) and Entity as Entity__NotifyLinkStage. Body: chain SceneNode's dispatchLinkCommand, then tryAttachNearby for events 5..8 -- called through a function-pointer cast with (self, sender, event), since SceneNode's slot declares self alone and both arguments are reloaded after the base call. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/class_3bb8c_k.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
+Renamed from `DreamSys__DispatchLinkCommandAndTryAttach`. Occupant of +0x0DC, which Actor__DispatchLinkCommand (+0x09C) calls when the SENDER's class byte is 0x34 (an Actor); DreamSys overrides it as DreamSys__DispatchInstanceEffect (testing for an Entity, 0x1F234) and Entity as Entity__NotifyLinkStage. Body: chain SceneNode's dispatchLinkCommand, then tryAttachNearby for events 5..8 -- called through a function-pointer cast with (self, sender, event), since SceneNode's slot declares self alone and both arguments are reloaded after the base call. The class (id 0x34, table `gActorMethods`, formerly `D_800878D4`) is unified as `Actor` in `include/Actor.h`: a SceneNode subclass and the base of TodActor/Entity, DreamSys and StyleEffect. Any source block above is the pre-unification spelling; the live body in `src/ObjMStyleActor.c` takes the unified types and field/slot names, byte-identical (whole image green, 0 new `-Wall` warnings, nonmatching green).
 
 ## Track 7 (2026-09-27, round 96, bravo)
 

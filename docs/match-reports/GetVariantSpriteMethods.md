@@ -4,7 +4,7 @@
 
 > Renamed from `func_80057F58` on 2026-09-26 (tools/rename.py). Address 0x80057f58.
 
-Unit: `src/class_3bb8c_k.c`. Class: `gVariantSpriteMethods` (49 slots) -- plain
+Unit: `src/ObjMStyleActor.c`. Class: `gVariantSpriteMethods` (49 slots) -- plain
 no-argument getter, `return &gVariantSpriteMethods;`. Not itself a vtable slot.
 
 ## Body
@@ -20,12 +20,12 @@ D_800879C4Table *GetVariantSpriteMethods(void) {
 
 This same table was already established with fields
 (`D_800879C4Methods`/`D_800879C4Obj`, ctor at `+0x008`, `slot0x40`) in the
-neighbouring `class_3bb8c_k` unit earlier this round, which owns the
+neighbouring `ObjMStyleActor` unit earlier this round, which owns the
 ctor (`VariantSprite__VariantSprite`) and this table's own leaf slots
 (`VariantSprite__Update/40/48/50`). This function needs none of those fields --
 only the address -- so it's declared here as an opaque incomplete type,
 per the multiple-independent-local-views convention (this unit does not
-include `class_3bb8c_k`'s header).
+include `ObjMStyleActor`'s header).
 
 ## Verify
 
@@ -39,9 +39,9 @@ tools/funcdiff.py GetVariantSpriteMethods   # 4/4
 Renamed from `func_80057F58` (tools/rename.py), tier A: a plain getter for
 `&gVariantSpriteMethods` (formerly `D_800879C4`), named like
 `GetSpriteMethods` / `GetActorMethods`. It now returns `VariantSpriteMethods *`
-(`include/VariantSprite.h`); class_3bb8c_k.c's opaque `D_800879C4Table`
+(`include/VariantSprite.h`); ObjMStyleActor.c's opaque `D_800879C4Table`
 typedef and extern are gone. Its callers are the class's own allocator and
-ctor (class_3bb8c_k.c). Byte-identical.
+ctor (ObjMStyleActor.c). Byte-identical.
 
 ## Track 6 (2026-09-26, round 93, bravo)
 
