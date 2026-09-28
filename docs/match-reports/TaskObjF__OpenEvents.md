@@ -82,7 +82,7 @@ direction: NOT introducing the intermediate pointer.
 (asm/data/76DC8.data.s, 0x80086E78) holds 0x4, 0x8000, 0x100, 0x2000:
 `EvSpIOE`, `EvSpERROR`, `EvSpTIMOUT`, `EvSpNEW`, the spec
 `WaitForReadyEvent` returns for the event that fired. (splat's
-`gCardIconNames` label at 0x80086E80 falls inside that 4-word table; only
+`sCardIconNames` label at 0x80086E80 falls inside that 4-word table; only
 the first two words sit under `sCardEventSpecs`'s own dlabel.) The loop
 bound is `ARRAY_COUNT(self->events)`. Zero bytes changed.
 

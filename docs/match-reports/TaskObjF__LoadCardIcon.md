@@ -14,7 +14,7 @@ the derived object into `self->unk70`.
 extern ChildObj86ED0 *New_TimImage(char *path);
 extern ChildObj86ED0 *New_ScreenSprite(ChildObj86ED0 *arg0, void *arg1, s32 arg2);
 
-extern char *gCardIconNames[];
+extern char *sCardIconNames[];
 extern const char gCardPathPrefix[]; /* "CARD\\" */
 extern const char gCardPathSuffix[]; /* ".TIM" */
 extern s32 gCardIconRect; /* 3-word opaque block, New_ScreenSprite's arg1, address-only here */
@@ -39,7 +39,7 @@ void TaskObjF__LoadCardIcon(Class86E00_3bb8c_g *self, s32 arg1)
     }
 
     buf = path;
-    name = gCardIconNames[arg1];
+    name = sCardIconNames[arg1];
     buf[0] = '\0';
     strcat(buf, gCardPathPrefix);
     strcat(buf, name);
@@ -68,17 +68,17 @@ shape directly with no null-guard on the first strcat, which is what rules
 out an actual call to that helper (a call would need the conditional
 branch). Reading the `strcat` argument order off the delay slots
 (`strcat(buf,"CARD\\")`, `strcat(buf,name)`, `strcat(buf,".TIM")`) gives
-`buf = "CARD\" + name + ".TIM"`, `name = gCardIconNames[arg1]` -- the same
+`buf = "CARD\" + name + ".TIM"`, `name = sCardIconNames[arg1]` -- the same
 `CARD\<NAME>.TIM` shape as `TextEntry__LoadCardResources`'s `CARD\COMINPUT.TIM` (that
 unit builds it via a real `BuildFileName` call instead; this one just
 happens to inline the identical three-piece concatenation).
 
-`gCardIconNames` (`asm/data/76DC8.data.s`) is a flat 17-word (`0x11`, matching
+`sCardIconNames` (`asm/data/76DC8.data.s`) is a flat 17-word (`0x11`, matching
 the `arg1 >= 0x11` guard) array; most entries are `D_8008AAxx` rodata
 string pointers, a handful are raw non-pointer literal words (`0x100`,
 `0x2000`, and three bare `0x800115xx` addresses) that this call site never
 reaches for the `arg1` values this function is actually invoked with --
-declared as a plain `extern char *gCardIconNames[];`, which is enough to index
+declared as a plain `extern char *sCardIconNames[];`, which is enough to index
 without needing the full contents.
 
 The `New_TimImage` / `slot78` / `New_ScreenSprite` / `release` sequence on
@@ -169,14 +169,14 @@ Image byte-identical.
 `gCardIconPos` (declared `ScreenSpritePos`, (-70, -60)), both tier A, by what
 they hold (tools/rename.py). Locals: `arg1` -> `index`, the array `path` ->
 `pathBuf` (size written 32), `buf` -> `path`, `handle` -> `tim`, `newVal`
--> `icon`. The guard `index >= 0x11` is `ARRAY_COUNT(gCardIconNames)`, the
+-> `icon`. The guard `index >= 0x11` is `ARRAY_COUNT(sCardIconNames)`, the
 extern now sized `[TASKOBJF_STATE_EDIT_TITLE]` (one name per message
 state). The residue section above keeps one line: `MATCHING: path and icon
 keep the buffer and the sprite in saved registers`.
 
 Comments moved out of the source (verbatim):
 
-- on `gCardIconNames`: "0x11 (17) entries, indexed by `arg1`
+- on `sCardIconNames`: "0x11 (17) entries, indexed by `arg1`
   (range-checked `< 0x11` below); mostly `char *` string pointers into
   rodata, a few raw literal words at indices never reached from this call
   site. `asm/data/76DC8.data.s`." Entries 0 and 1 are the words 0x100 and

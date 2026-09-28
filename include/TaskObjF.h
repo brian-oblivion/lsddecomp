@@ -89,7 +89,7 @@ struct TaskObjFMethods {
                                    u8 iconFrames, struct TimImage *icon, void *data,
                                    s32 size);                 /* TaskObjF__BeginSave */
     /* +0x07C */ void (*setState)(TaskObjF *self, s32 state); /* TaskObjF__SetState */
-    /* +0x080 */ void (*loadCardIcon)(TaskObjF *self, s32 index); /* TaskObjF__LoadCardIcon: CARD\<gCardIconNames[index]>.TIM */
+    /* +0x080 */ void (*loadCardIcon)(TaskObjF *self, s32 index); /* TaskObjF__LoadCardIcon: CARD\<sCardIconNames[index]>.TIM */
     /* +0x084 */ void (*releaseCardIcon)(TaskObjF *self); /* TaskObjF__ReleaseCardIcon */
     /* +0x088 */ void (*onInputEvent)(TaskObjF *self, void *sender,
                                       s32 event); /* TaskObjF__OnInputEvent (reads self and event) */
@@ -153,7 +153,7 @@ enum TaskObjFOpMode {
 };
 
 /* TaskObjF::state, setState's argument. 0x02..0x10 show a message:
- * loadCardIcon indexes gCardIconNames by the state, and the quoted name is
+ * loadCardIcon indexes sCardIconNames by the state, and the quoted name is
  * the CARD\<name>.TIM each one loads. 0x11..0x15 run an entry action in
  * setState. 0x16 and 0x17 are terminal: setState clears state and opMode
  * on either, and frees beginLoad's buffers. No code sets state 1. */

@@ -66,6 +66,6 @@ EvMdNOINTR -- and the four words, read from retail, are 0x0004, 0x8000,
 0x0100, 0x2000: Sony's EvSpIOE, EvSpERROR, EvSpTIMOUT, EvSpNEW, the standard
 card event set. This function returns the entry of the slot that fired,
 and CardInfoStatus/CardLoadStatus compare it against 0x100/0x8000/0x2000.
-Splat sizes the symbol at two words and starts `gCardIconNames` at
+Splat sizes the symbol at two words and starts `sCardIconNames` at
 0x80086E80, over the last two specs (the head has the proposal). `arr` ->
 `events`. Zero bytes.

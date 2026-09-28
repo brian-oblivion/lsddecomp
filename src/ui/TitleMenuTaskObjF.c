@@ -1445,7 +1445,7 @@ void TaskObjF__SetState(TaskObjF *self, s32 state) {
 /* The message icon's name per state, CARD\<name>.TIM ("NOCONECT" ..
  * "LOADERR" for states 2..16). Entries 0 and 1 are not names; no setState
  * call passes 0 or 1. */
-extern char *gCardIconNames[TASKOBJF_STATE_EDIT_TITLE];
+extern char *sCardIconNames[TASKOBJF_STATE_EDIT_TITLE];
 extern const char gCardPathPrefix[]; /* "CARD\\" */
 extern const char gCardPathSuffix[]; /* ".TIM" */
 /* {0, 0, 160, 120} */
@@ -1462,7 +1462,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
 
     /* MATCHING: `path` and `icon` keep the buffer and the sprite in saved
      * registers across the calls. */
-    if (index >= ARRAY_COUNT(gCardIconNames)) {
+    if (index >= ARRAY_COUNT(sCardIconNames)) {
         return;
     }
     if (self->spriteParent == 0) {
@@ -1473,7 +1473,7 @@ void TaskObjF__LoadCardIcon(TaskObjF *self, s32 index) {
     }
 
     path = pathBuf;
-    name = gCardIconNames[index];
+    name = sCardIconNames[index];
     path[0] = '\0';
     strcat(path, gCardPathPrefix);
     strcat(path, name);
