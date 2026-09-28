@@ -74,7 +74,7 @@ void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
         goto fail;
     }
     base = gStyleCueRecordLists[gStyleStage];
-    n = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
+    n = sStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
     entry = (EntrySlot *) (gStyleCueRecordIndex * 8 + (s32) base);
     for (j = 0; j < n; j++, entry++) {
         gStyleCueRecordIndex++;
@@ -107,7 +107,7 @@ fail:
 Needs (already present earlier in the unit, in strict ROM order): the
 `ObjAB4C`/`ObjAB4CMethods`/`Pos4`/`TabEntry`/`EntrySlot`/`LocalBuf` types and
 `extern s32 gStyleStage, gStyleCueRecordIndex, gStyleGrid, sStyleCueDistanceTable[];`,
-`extern u8 *gStyleCueRecordLists[], gStyleCueRecordCounts[], sStyleCueOffsets[];` (all already
+`extern u8 *gStyleCueRecordLists[], sStyleCueRecordCounts[], sStyleCueOffsets[];` (all already
 declared in `src/world/ObjMStyleActor.c` ahead of this function).
 
 ### Proposed learning
@@ -180,7 +180,7 @@ returning the first such record or `NULL`.
 extern s32 gStyleStage;
 extern s32 gStyleCueRecordIndex;
 extern u8 *gStyleCueRecordLists[];    /* word array of base pointers, indexed by gStyleStage */
-extern u8 gStyleCueRecordCounts[];    /* byte array of counts, same index */
+extern u8 sStyleCueRecordCounts[];    /* byte array of counts, same index */
 extern u8 sStyleCueOffsets[];    /* table, 6-byte stride entries */
 extern s32 sStyleCueDistanceTable[];   /* word table, indexed by entry->count */
 
@@ -203,7 +203,7 @@ void *FindNextStyleCueInRange(void *arg0, s32 *arg1, void *arg2) {
         goto fail;
     }
     base = gStyleCueRecordLists[gStyleStage];
-    n = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
+    n = sStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
     if (n <= 0) {
         goto fail;
     }
@@ -332,7 +332,7 @@ MATCHED, 111/111.
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
 | `D_800876B4` | `gStyleCueRecordLists` | A | per-stage pointer to the stage's 8-byte cue records. |
-| `D_800876EC` | `gStyleCueRecordCounts` | A | per-stage record count, the loop bound. |
+| `D_800876EC` | `sStyleCueRecordCounts` | A | per-stage record count, the loop bound. |
 | `D_800874EC` | `sStyleCueOffsets` | A | 6-byte s16 x/y/z entries, indexed by the record's byte 4; copied after the record's 4 cell bytes to make the 10-byte cell key (StageMap's Descriptor10 shape) computeCellOffsets turns into a world position. |
 
 The `+0x0E8` local view on `gStyleGrid` is StageMap's computeCellOffsets. Locals: `pos`, `outDist`, `target`, `remaining`, `records`, `dx`, `dz`, `grid`.

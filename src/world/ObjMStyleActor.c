@@ -1806,7 +1806,7 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
 extern s32 gStyleStage;
 extern s32 gStyleCueRecordIndex;
 extern u8 *gStyleCueRecordLists[];
-extern u8 gStyleCueRecordCounts[];
+extern u8 sStyleCueRecordCounts[];
 extern s32 sStyleCueDistanceTable[];
 
 /* The cell-key halves: a record's four cell bytes and sStyleCueOffsets' s16
@@ -1862,7 +1862,7 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
         goto fail;
     }
     records = gStyleCueRecordLists[gStyleStage];
-    remaining = gStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
+    remaining = sStyleCueRecordCounts[gStyleStage] - gStyleCueRecordIndex;
     entry = (EntrySlot *)(gStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
     for (j = 0; j < remaining; j++, entry++) {
         gStyleCueRecordIndex++;
