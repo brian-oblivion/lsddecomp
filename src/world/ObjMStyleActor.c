@@ -1098,7 +1098,7 @@ ObjMMethods *GetObjMMethods(void) {
 }
 
 extern s32 sStyleGrid;
-extern s32 gStyleStage;
+extern s32 sStyleStage;
 extern s32 gStyleTickCount;
 extern s32 sStyleDay;
 extern s32 sStyleUnreadArg;
@@ -1118,7 +1118,7 @@ s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadA
         i = ARRAY_COUNT(sStyleCueSlots) - 1;
         slot = &sStyleCueSlots[ARRAY_COUNT(sStyleCueSlots) - 1];
         sStyleGrid = grid;
-        gStyleStage = stage;
+        sStyleStage = stage;
         sStyleSceneRefs = sceneRefs;
         gStyleVariant = -1;
         sStyleDay = day;
@@ -1160,7 +1160,7 @@ extern const u8 *sStyleDecorColor;
  * sStyleConfig, whose first three words (the StageMap's light settings)
  * are fixed. */
 void *ApplyStyleConfig(void) {
-    StyleStageConfig *cfg = sStyleStageConfigs[gStyleStage];
+    StyleStageConfig *cfg = sStyleStageConfigs[sStyleStage];
 
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
@@ -1223,7 +1223,7 @@ void ApplyStyleDecorationIfSet(void) {
  *
  * RegisterStyleConfig (previous section), called by ObjM__InitStyleAndWorld
  * and a no-op until StyleTeardown clears sStyleGrid, sets the state read here: sStyleGrid (the
- * scene's StageMap), gStyleStage (ObjM's stage), sStyleSceneRefs (ObjM's
+ * scene's StageMap), sStyleStage (ObjM's stage), sStyleSceneRefs (ObjM's
  * sound, resources and viewport; StyleSceneRefs below) and sStyleDay (the
  * DreamSys day). ApplyStyleConfig then takes the stage's fixed config or,
  * with none, PickStyleFallbackConfig's: a variant (gStyleVariant, 0..3) and
@@ -1292,7 +1292,7 @@ void StyleFlushDecoration(void) {
 }
 
 extern s32 sStyleDay;
-extern s32 gStyleStage;
+extern s32 sStyleStage;
 extern s8 gStyleVariantPicks[];
 extern s32 gStyleVariant;
 extern s8 gStyleVariantConfigCounts[];
@@ -1319,7 +1319,7 @@ void *PickStyleFallbackConfig(void) {
     s32 decorIndex;
     u8 *decorColors;
 
-    seed = sStyleDay + gStyleStage;
+    seed = sStyleDay + sStyleStage;
     variant = gStyleVariantPicks[seed & 0xF];
     gStyleVariant = variant;
     count = gStyleVariantConfigCounts[variant];
@@ -1803,7 +1803,7 @@ StyleCueSlot *TryStartStyleCue(StyleCueSlot *slot, s32 *lastCue, LongVec3 *targe
     return 0;
 }
 
-extern s32 gStyleStage;
+extern s32 sStyleStage;
 extern s32 sStyleCueRecordIndex;
 extern u8 *sStyleCueRecordLists[];
 extern u8 sStyleCueRecordCounts[];
@@ -1861,8 +1861,8 @@ void *FindNextStyleCueInRange(LongVec3 *pos, s32 *outDist, LongVec3 *target) {
     if (target == 0) {
         goto fail;
     }
-    records = sStyleCueRecordLists[gStyleStage];
-    remaining = sStyleCueRecordCounts[gStyleStage] - sStyleCueRecordIndex;
+    records = sStyleCueRecordLists[sStyleStage];
+    remaining = sStyleCueRecordCounts[sStyleStage] - sStyleCueRecordIndex;
     entry = (EntrySlot *)(sStyleCueRecordIndex * 8 + (s32)records); /* MATCHING: operand order */
     for (j = 0; j < remaining; j++, entry++) {
         sStyleCueRecordIndex++;
@@ -1989,7 +1989,7 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
     return lastCue;
 }
 
-extern s32 gStyleStage;
+extern s32 sStyleStage;
 extern void RotateVramRectRight(DrawRect *rect, s32 count, DrawRect *scratch);
 extern DrawRect gStyleStripRectA;
 extern DrawRect gStyleStripScratchA;
@@ -2002,11 +2002,11 @@ void StyleScrollVramStrips(void) {
     DrawRect *rect, *scratch;
     s32 count;
 
-    if (gStyleStage == 2) {
+    if (sStyleStage == 2) {
         rect = &gStyleStripRectA;
         scratch = &gStyleStripScratchA;
         count = 1; /* MATCHING: a local set in each branch, not a literal argument */
-    } else if ((u32)(gStyleStage - 3) < 3) {
+    } else if ((u32)(sStyleStage - 3) < 3) {
         count = 1;
         rect = &gStyleStripRectB;
         scratch = &gStyleStripScratchB;

@@ -278,7 +278,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * NAMING PASS, round 72 (runner alpha).  Every function, and the thirteen
  * globals its functions set up or gate on, renamed via `tools/rename.py`,
  * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
- * cluster (`gStyleStage`/`sStyleDay`/`sStyleSceneRefs`/`gStyleVariant`/
+ * cluster (`sStyleStage`/`sStyleDay`/`sStyleSceneRefs`/`gStyleVariant`/
  * `sStyleDecorObj`/`sStyleGrid`/`gStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
  * `ObjMStyleActor.c`'s already-confirmed "Style" subsystem sets
@@ -301,7 +301,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * everything `TickStyle` builds.
  *
  * What the "Style" subsystem is FOR in gameplay terms -- which dream/link
- * property `gStyleStage` actually selects -- remains UNESTABLISHED; every
+ * property `sStyleStage` actually selects -- remains UNESTABLISHED; every
  * name above describes MECHANICS, not a guessed purpose, per track 3's
  * naming rule. Full evidence and tier per function: `docs/match-reports/
  * <name>.md`, `## Naming`.

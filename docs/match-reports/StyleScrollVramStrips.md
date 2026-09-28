@@ -14,7 +14,7 @@ Fresh ground, carved round 45, never attempted. No blockers.
 
 ```
 /* 46224 80055A24 E8FFBD27 */  addiu $sp, $sp, -0x18
-/* 46228 80055A28 6404838F */  lw    $v1, %gp_rel(gStyleStage)($gp)
+/* 46228 80055A28 6404838F */  lw    $v1, %gp_rel(sStyleStage)($gp)
 /* 4622C 80055A2C 02000234 */  ori   $v0, $zero, 0x2
 /* 46230 80055A30 07006214 */  bne   $v1, $v0, .L80055A50
 /* 46238 80055A38 0880043C */  lui   $a0, %hi(gStyleStripRectA)
@@ -39,8 +39,8 @@ Fresh ground, carved round 45, never attempted. No blockers.
 jr $ra
 ```
 
-`gStyleStage` is a plain `s32` (already established as such in
-`ObjMStyleActor.c`, `RegisterStyleConfig`). `(gStyleStage - 3)` cast to unsigned and
+`sStyleStage` is a plain `s32` (already established as such in
+`ObjMStyleActor.c`, `RegisterStyleConfig`). `(sStyleStage - 3)` cast to unsigned and
 compared `< 3` is the standard idiom for a closed range test, matching
 retail's `sltiu` exactly. `RotateVramRectRight` is a not-yet-carved,
 still-`INCLUDE_ASM` function in `asm/psyq_2bb9c.s` (a 4-argument draw-style
@@ -50,7 +50,7 @@ matters here, declared loosely as `void RotateVramRectRight(void *arg0, s32 arg1
 void *arg2);`.
 
 ```c
-extern s32 gStyleStage;
+extern s32 sStyleStage;
 extern void RotateVramRectRight(void *arg0, s32 arg1, void *arg2);
 extern s32 gStyleStripRectA[];
 extern s32 gStyleStripScratchA[];
@@ -61,11 +61,11 @@ void StyleScrollVramStrips(void) {
     void *a0, *a2;
     s32 a1;
 
-    if (gStyleStage == 2) {
+    if (sStyleStage == 2) {
         a0 = gStyleStripRectA;
         a2 = gStyleStripScratchA;
         a1 = 1;
-    } else if ((u32) (gStyleStage - 3) < 3) {
+    } else if ((u32) (sStyleStage - 3) < 3) {
         a1 = 1;
         a0 = gStyleStripRectB;
         a2 = gStyleStripScratchB;
@@ -103,7 +103,7 @@ call.
 
 **`StyleScrollVramStrips`, tier B.**
 
-Selects one of two 12-byte-tuple table pairs by `gStyleStage` (`== 2`, or
+Selects one of two 12-byte-tuple table pairs by `sStyleStage` (`== 2`, or
 `3..5`) and forwards them to `RotateVramRectRight`, a not-yet-carved routine this
 unit's OWN header comment (round 45) already characterizes as "a 4-argument
 draw-style routine reading 12-byte tuples through a0/a2" -- that

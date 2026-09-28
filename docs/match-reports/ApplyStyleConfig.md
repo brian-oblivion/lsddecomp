@@ -8,7 +8,7 @@ and `addiu_at` are resolved), never attempted before this round.
 ## What it does
 
 Looks up a "cfg" byte-array pointer for the current style index
-(`gStyleStage`, set by `RegisterStyleConfig`) in the 14-entry pointer table
+(`sStyleStage`, set by `RegisterStyleConfig`) in the 14-entry pointer table
 `sStyleStageConfigs`; if the slot is NULL, falls back to `PickStyleFallbackConfig()` to
 produce one. Feeds `cfg` into the already-matched `FillStyleFromConfig(style,
 cfg)` against the fixed global `sStyleConfig` (a `StyleM` instance, split by
@@ -30,7 +30,7 @@ extern u8 sStylePalette[][3];
 extern const u8 *sStyleDecorColor;
 
 void *ApplyStyleConfig(void) {
-    s8 *cfg = sStyleStageConfigs[gStyleStage];
+    s8 *cfg = sStyleStageConfigs[sStyleStage];
 
     if (cfg == 0) {
         cfg = PickStyleFallbackConfig();
@@ -90,13 +90,13 @@ before anything more invasive.
 
 ## Naming
 
-**ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`sStyleStageConfigs[gStyleStage]`), falling back to the uncarved `PickStyleFallbackConfig` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.
+**ApplyStyleConfig** -- tier B. Looks up the current style's config-byte pointer (`sStyleStageConfigs[sStyleStage]`), falling back to the uncarved `PickStyleFallbackConfig` if unset, fills the shared `StyleM` global via `FillStyleFromConfig`, and conditionally sets a colour-table pointer. Same tier and caveat as `RegisterStyleConfig`.
 
 ## Track 7 (2026-09-27, round 98, delta)
 
 | old | new | tier | evidence |
 | --- | --- | --- | --- |
-| `D_800873EC` | `sStyleStageConfigs` | A | indexed by gStyleStage; NULL entries fall back to PickStyleFallbackConfig |
+| `D_800873EC` | `sStyleStageConfigs` | A | indexed by sStyleStage; NULL entries fall back to PickStyleFallbackConfig |
 | `D_80087424` | `sStyleConfig` | A | the StyleConfig record this returns and ObjM keeps as `styleConfig`; now declared `StyleConfig` |
 | `cfg[1] >= 4` | `cfg->fogLevel >= STYLE_DECOR_FOG_LEVEL` | B | the byte indexes sStyleFogNears; 4 and 5 are its two nearest distances (4096, 2048) |
 
