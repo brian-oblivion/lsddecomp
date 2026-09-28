@@ -31,7 +31,7 @@ rather than API.
   `ServiceSoundCueSet` have three spellings each (dream_sys.c:72-73, 497;
   entity.c:298-299, entity.h:310-311; dream_scene.c:1782, 1893, 1903);
   the definitions take `(VabStreamObj *, SoundCueSet *)`. Declare once in
-  SoundCueSet.h.
+  sound_cue_set.h.
 - **game_files.** No header. `GetStageMapChunkRecord`/`...XY` are declared
   `s32`/`void` in dream_scene.c:462-473 but return `FilePathRecord *`
   (game_files.c:317, 322); `ObjM__GetGridRecord` is declared void and "returns"

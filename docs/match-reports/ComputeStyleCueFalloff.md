@@ -91,7 +91,7 @@ nothing confirmed `self` and `ctx` were the same object. They are not, and
 the two now have different types:
 
 - The second parameter (was `self`, now `set`) is the SoundCueSet
-  (include/SoundCueSet.h). ServiceSoundCueSet calls `callback(owner, set)`,
+  (include/sound_cue_set.h). ServiceSoundCueSet calls `callback(owner, set)`,
   and every offset the callbacks write agrees: +0x04 (was `kind`, the value
   every callback dispatches on) is `tick`, +0x10 (was `falloff`) is
   `attenuation`, and +0x1C..+0x50 (was `unk1C`..`unk50`) are
@@ -116,7 +116,7 @@ Locals `kind` became `tick`. Zero bytes.
   `FindNextStyleCueInRange` compare `dist < table[...]` against, and
   `stepDist` is that range split into `attenuationSteps` (10) steps, so the
   result is the target's distance counted in steps: 0 at the slot, 10 at the
-  edge of the range (SoundCueSet.h: attenuation 10 leaves only `vol % 10`).
+  edge of the range (sound_cue_set.h: attenuation 10 leaves only `vol % 10`).
   Zero bytes (a local's name is not in the object).
 
 Two comments in `src/world/dream_scene.c` lost their history (it is in the

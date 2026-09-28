@@ -83,7 +83,7 @@ nothing confirmed `self` and `ctx` were the same object. They are not, and
 the two now have different types:
 
 - The second parameter (was `self`, now `set`) is the SoundCueSet
-  (include/SoundCueSet.h). ServiceSoundCueSet calls `callback(owner, set)`,
+  (include/sound_cue_set.h). ServiceSoundCueSet calls `callback(owner, set)`,
   and every offset the callbacks write agrees: +0x04 (was `kind`, the value
   every callback dispatches on) is `tick`, +0x10 (was `falloff`) is
   `attenuation`, and +0x1C..+0x50 (was `unk1C`..`unk50`) are

@@ -67,4 +67,4 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 7 (round 93, echo)
 
-Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Local `r` (tick % 300) is `phase`. program -2 is SOUND_CUE_STOP (include/SoundCueSet.h). Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer and cue-set ticks, TOD frames, distances, VAB programs and `state` phases (the unit has no hex literal left). Local `r` (tick % 300) is `phase`. program -2 is SOUND_CUE_STOP (include/sound_cue_set.h). Byte-identical (whole image green).

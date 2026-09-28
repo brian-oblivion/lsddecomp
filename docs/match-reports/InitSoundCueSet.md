@@ -117,7 +117,7 @@ a name beyond "some default/config word").
 
 ## Track 6 (2026-09-26, round 92, alpha): one SoundCueSet
 
-`include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
+`include/sound_cue_set.h` now holds the one definition of `SoundCueSet` and
 `SoundCueSlot`. It replaced three views: vab_sound.c's (named
 `tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and
@@ -166,5 +166,5 @@ would warn in each.
 ## Round 98 (charlie, track 7)
 
 `attenuationSteps = SOUND_CUE_ATTENUATION_STEPS` (10, now in
-include/SoundCueSet.h) and `count = ARRAY_COUNT(set->slots) - 1` (was 2).
+include/sound_cue_set.h) and `count = ARRAY_COUNT(set->slots) - 1` (was 2).
 Byte-exact.

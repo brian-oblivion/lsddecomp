@@ -69,7 +69,7 @@ deleted for `VabStreamObj` (include/VabStreamObj.h). **Tier A** (a pure
 forward): the object at `arg2` is a VabStreamObj -- its `+0x080` is
 `VabStreamObj__PlayTone(self, index, vol, endVol)`, and Entity passes the same
 field to InitSoundCueSet/ServiceSoundCueSet/FlushSoundCueSet as their sound
-object, a VabStreamObj by SoundCueSet.h -- so this plays tone `index` on the
+object, a VabStreamObj by sound_cue_set.h -- so this plays tone `index` on the
 actor's sound bank with vol = endVol = 0x6E. The forwarded parameter is typed
 `s32 index` accordingly; byte-identical. Nothing in C dispatches the slot.
 

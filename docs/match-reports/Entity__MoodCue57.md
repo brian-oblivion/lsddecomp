@@ -171,7 +171,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 7 (round 93, bravo)
 
-Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_EVENT_VIDEO`, `ENTITY_STATE_DONE`, `SOUND_CUE_STOP` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/entity.h, SOUND_CUE_STOP in include/SoundCueSet.h). The `(u32)(moodTimer - 0x80) < 0xC2` window test reads `moodTimer >= 128 && moodTimer < 322`: the same bytes. The local `mood` (a copy of todFrame) is `frame`. Byte-identical (whole image green).
+Every literal in the live body is in its base: decimal for moodTimer ticks, distances, TOD frames, VAB programs, volumes and `state` phases (hex remains only for masks). Named: `ENTITY_EFFECT_EVENT_VIDEO`, `ENTITY_STATE_DONE`, `SOUND_CUE_STOP` (evidence on each definition: EntityEffect and ENTITY_STATE_DONE in include/entity.h, SOUND_CUE_STOP in include/sound_cue_set.h). The `(u32)(moodTimer - 0x80) < 0xC2` window test reads `moodTimer >= 128 && moodTimer < 322`: the same bytes. The local `mood` (a copy of todFrame) is `frame`. Byte-identical (whole image green).
 
 ## Proposed field names
 

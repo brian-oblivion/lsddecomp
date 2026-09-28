@@ -79,4 +79,4 @@ which is cross-unit evidence, not a single-call-site guess. MATCHED,
 
 ### Naming
 
-**Renamed from `StopStyleCueIfNear`, tier A.** While the slot is within range (IsStyleCueNear) it calls ServiceSoundCueSet on the slot's cue set -- the once-per-tick service pass (SoundCueSet.h) -- and returns 1; it stops nothing. The stop is TickStyle's FlushStyleCue on a 0 return. Parameters `slot`, `target`, `unused`.
+**Renamed from `StopStyleCueIfNear`, tier A.** While the slot is within range (IsStyleCueNear) it calls ServiceSoundCueSet on the slot's cue set -- the once-per-tick service pass (sound_cue_set.h) -- and returns 1; it stops nothing. The stop is TickStyle's FlushStyleCue on a 0 return. Parameters `slot`, `target`, `unused`.

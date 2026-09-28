@@ -60,7 +60,7 @@ nothing confirmed `self` and `ctx` were the same object. They are not, and
 the two now have different types:
 
 - The second parameter (was `self`, now `set`) is the SoundCueSet
-  (include/SoundCueSet.h). ServiceSoundCueSet calls `callback(owner, set)`,
+  (include/sound_cue_set.h). ServiceSoundCueSet calls `callback(owner, set)`,
   and every offset the callbacks write agrees: +0x04 (was `kind`, the value
   every callback dispatches on) is `tick`, +0x10 (was `falloff`) is
   `attenuation`, and +0x1C..+0x50 (was `unk1C`..`unk50`) are
@@ -92,7 +92,7 @@ holds (and now names IsStyleVariantEven). The old one, verbatim:
  *
  *  - StyleCue00..StyleCue13, the complete 14-slot table `sStyleCueCallbacks`,
  *    and their helper ComputeStyleCueFalloff. They are SoundCueSet
- *    callbacks (include/SoundCueSet.h): TryStartStyleCue (dream_scene.c)
+ *    callbacks (include/sound_cue_set.h): TryStartStyleCue (dream_scene.c)
  *    starts a style-cue slot's embedded set with the claimed record's cue
  *    index as the tag and that row of the table as the callback, as
  *    Entity does with gEntityMoodHandlerTable's MoodCueNN handlers. Each

@@ -150,4 +150,4 @@ error-log or assert on failure). MATCHED, 45/45.
 
 ### Naming
 
-Parameters: `slot`, `lastCue` (TickStyle's third argument, by address: set to the negated cue when the started cue equals it), `target` (the grid target's world position), `unused`. `sStyleCueCallbacks` typed `SoundCueCallbackFn[]` and InitSoundCueSet given its real prototype (SoundCueSet.h); `EntrySlot::count`/`StyleCueEntryView::countSign` renamed `cue`: it is the record's cue index (sStyleCueCallbacks row, InitSoundCueSet tag, sStyleCueDistanceTable row), positive while free, negated while a slot holds it.
+Parameters: `slot`, `lastCue` (TickStyle's third argument, by address: set to the negated cue when the started cue equals it), `target` (the grid target's world position), `unused`. `sStyleCueCallbacks` typed `SoundCueCallbackFn[]` and InitSoundCueSet given its real prototype (sound_cue_set.h); `EntrySlot::count`/`StyleCueEntryView::countSign` renamed `cue`: it is the record's cue index (sStyleCueCallbacks row, InitSoundCueSet tag, sStyleCueDistanceTable row), positive while free, negated while a slot holds it.

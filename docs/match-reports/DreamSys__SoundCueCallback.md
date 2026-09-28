@@ -296,7 +296,7 @@ depending on whether `arg1->value` is a multiple of 20.
 
 ## Track 6 (round 92, head)
 
-`SoundCueCallbackArg` was a local view of `SoundCueSet` (include/SoundCueSet.h,
+`SoundCueCallbackArg` was a local view of `SoundCueSet` (include/sound_cue_set.h,
 unified this round by alpha) and is deleted: mode is `tag`, value is `tick`,
 field_0x1C/0x20 are `slots[0].program`/`.octave`, field_0x30/0x34 are
 `slots[1].program`/`.octave`. `DreamSys::soundCueSet` is a `SoundCueSet`

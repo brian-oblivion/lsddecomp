@@ -1,5 +1,5 @@
-#ifndef SOUNDCUESET_H
-#define SOUNDCUESET_H
+#ifndef SOUND_CUE_SET_H
+#define SOUND_CUE_SET_H
 
 /*
  * SoundCueSet -- a three-voice sound cue that an owner object drives once

@@ -129,7 +129,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 
 ## Track 6 (2026-09-26, round 92, alpha): one SoundCueSet
 
-`include/SoundCueSet.h` now holds the one definition of `SoundCueSet` and
+`include/sound_cue_set.h` now holds the one definition of `SoundCueSet` and
 `SoundCueSlot`. It replaced three views: vab_sound.c's (named
 `tag`/`owner`/`callback`/`slots[].index` only), libsnd_vmanager.c's (named
 `note`/`pitchOffset`/`word2`/`word3`, `unk4`/`unk10`/`unk14`) and

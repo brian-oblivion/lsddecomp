@@ -24,7 +24,7 @@
 #include "StageMap.h"
 #include <libsnd.h>
 #include "VabStreamObj.h"
-#include "SoundCueSet.h"
+#include "sound_cue_set.h"
 #include "bmem_pmgr.h"
 #include <strings.h>
 #include "wbgm.h"
@@ -166,7 +166,7 @@ void NullDriver__NoOpSlot50(void) {}
  * whose attributes load starts it (SsStart, the master volume). Finalizing
  * the last open bank (sOpenVabCount) while no WBgm plays ends it.
  *
- * InitSoundCueSet and FlushSoundCueSet (include/SoundCueSet.h) are free
+ * InitSoundCueSet and FlushSoundCueSet (include/sound_cue_set.h) are free
  * functions, not methods: they take the sound object first, and Flush stops
  * the cue's voices through its stopVoice slot.
  */

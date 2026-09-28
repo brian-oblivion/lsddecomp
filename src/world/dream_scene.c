@@ -48,7 +48,7 @@
 #include "actor.h"
 #include "StyleEffect.h"
 #include "Viewport.h"
-#include "SoundCueSet.h"
+#include "sound_cue_set.h"
 #include "VariantSprite.h"
 #include <rand.h>
 #include "tmd_model.h"
@@ -1915,7 +1915,7 @@ void StyleScrollVramStrips(void) {
  *
  *  - StyleCue00..StyleCue13, the 14 rows of sStyleCueCallbacks, and their
  *    helper ComputeStyleCueFalloff. Each is a SoundCueSet callback
- *    (include/SoundCueSet.h): TryStartStyleCue (previous section) starts a
+ *    (include/sound_cue_set.h): TryStartStyleCue (previous section) starts a
  *    style-cue slot's embedded set with the claimed cue record's index as the
  *    tag and that row of the table as the callback, as Entity does with its
  *    Entity__MoodCueNN handlers. Every tick a callback sets the set's

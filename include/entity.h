@@ -4,7 +4,7 @@
 #include "common.h"
 #include "tod_actor.h"
 #include "fade_box.h"
-#include "SoundCueSet.h"
+#include "sound_cue_set.h"
 
 /*
  * Entity -- a TodActor (TOD-animated Actor) driven by a per-mood row of
@@ -39,7 +39,7 @@
  * sDreamAuxSound) as the sound object, itself as the owner and the mood row's
  * handler as the callback, and selects tick callback 'B' in reset
  * (Entity__TickSoundCue, +0x11C), which services the set once per tick. So a
- * MoodCue handler is a SoundCueSet callback (include/SoundCueSet.h):
+ * MoodCue handler is a SoundCueSet callback (include/sound_cue_set.h):
  * ServiceSoundCueSet calls it as (owner, set) with this Entity as the owner,
  * and it requests tones by filling the set's slots.
  *
