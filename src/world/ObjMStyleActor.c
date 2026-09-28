@@ -1195,7 +1195,7 @@ typedef struct StyleSceneRefs {
     Viewport *viewport; /* +0x00C, ObjM::cachedViewport */
 } StyleSceneRefs;
 
-extern s32 gStyleDecorObj;           /* a BoxFill * */
+extern s32 sStyleDecorObj;           /* a BoxFill * */
 extern s32 sStyleDecorBoxSize[2];    /* 320 x 240, the screen */
 extern BoxFillPos sStyleDecorBoxPos; /* (-100, -100), as Viewport's own fade box */
 
@@ -1203,15 +1203,15 @@ void ApplyStyleDecorationIfSet(void) {
     SceneNode *fadeBox;
 
     if (sStyleDecorColor != 0) {
-        gStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (BoxFillRgb *)sStyleDecorColor, 0);
-        ((BoxFill *)gStyleDecorObj)->methods->setSemiTransOn((BoxFill *)gStyleDecorObj, 1);
-        ((BoxFill *)gStyleDecorObj)->methods->setSemiTransRate((BoxFill *)gStyleDecorObj, 0);
+        sStyleDecorObj = (s32)New_BoxFill(sStyleDecorBoxSize, (BoxFillRgb *)sStyleDecorColor, 0);
+        ((BoxFill *)sStyleDecorObj)->methods->setSemiTransOn((BoxFill *)sStyleDecorObj, 1);
+        ((BoxFill *)sStyleDecorObj)->methods->setSemiTransRate((BoxFill *)sStyleDecorObj, 0);
 
         fadeBox = ((StyleSceneRefs *)gStyleSceneRefs)
                       ->viewport->methods->getFadeBox(((StyleSceneRefs *)gStyleSceneRefs)->viewport);
 
-        ((BoxFillAttachToParentFn)((BoxFill *)gStyleDecorObj)->methods->attachToParent)(
-            (BoxFill *)gStyleDecorObj, fadeBox, &sStyleDecorBoxPos);
+        ((BoxFillAttachToParentFn)((BoxFill *)sStyleDecorObj)->methods->attachToParent)(
+            (BoxFill *)sStyleDecorObj, fadeBox, &sStyleDecorBoxPos);
     }
 }
 
@@ -1230,7 +1230,7 @@ void ApplyStyleDecorationIfSet(void) {
  * a config record picked from day + stage.
  *
  * What TickStyle keeps, each built on the first tick:
- *  - the decoration box, gStyleDecorObj, when the config has a colour for
+ *  - the decoration box, sStyleDecorObj, when the config has a colour for
  *    it (ApplyStyleDecorationIfSet builds it, StyleFlushDecoration releases it);
  *  - the decor set: STYLE_DECOR_BANDS BoxFill bands (gStyleDecorSlots)
  *    coloured from sStyleDecorColors and attached under the viewport's fade
@@ -1281,12 +1281,12 @@ void ApplyStyleDecorationIfSet(void) {
 
 
 extern const u8 *sStyleDecorColor;
-extern s32 gStyleDecorObj; /* a BoxFill */
+extern s32 sStyleDecorObj; /* a BoxFill */
 
 /* Releases the decoration box, if ApplyStyleDecorationIfSet made one. */
 void StyleFlushDecoration(void) {
     if (sStyleDecorColor != 0) {
-        ((BoxFill *)gStyleDecorObj)->methods->release((BoxFill *)gStyleDecorObj);
+        ((BoxFill *)sStyleDecorObj)->methods->release((BoxFill *)sStyleDecorObj);
         sStyleDecorColor = 0;
     }
 }

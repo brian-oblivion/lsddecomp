@@ -279,7 +279,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * globals its functions set up or gate on, renamed via `tools/rename.py`,
  * tree-wide.  The evidence for the `Style` prefix: this unit's global-state
  * cluster (`gStyleStage`/`sStyleDay`/`gStyleSceneRefs`/`gStyleVariant`/
- * `gStyleDecorObj`/`gStyleGrid`/`gStyleTickCount`, formerly
+ * `sStyleDecorObj`/`gStyleGrid`/`gStyleTickCount`, formerly
  * `D_8008AC6C`/`74`/`7C`/`80`/`94`, `D_8008AB4C`/`70`) is the SAME cluster
  * `ObjMStyleActor.c`'s already-confirmed "Style" subsystem sets
  * (`RegisterStyleConfig`/`ApplyStyleConfig`/`FillStyleFromConfig`/
@@ -289,7 +289,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * None of this unit's functions are themselves class methods (no vtable
  * self-dispatch on their OWN symbol); they are free functions dispatching
  * into THREE separate object families through local method-table views: a
- * decoration object (`gStyleDecorObj`, `New_BoxFill`-allocated), an
+ * decoration object (`sStyleDecorObj`, `New_BoxFill`-allocated), an
  * 18-slot "decor set" array (`gStyleDecorSlots`, same allocator) and an
  * StyleEffect "effect slots" array (`gStyleEffectSlots`, include/
  * StyleEffect.h, `New_StyleEffect`-allocated, kind-tagged 0..3 by
