@@ -174,7 +174,7 @@ extern s8 MOVE_COMMAND_SIGNS[8];
    object's rotation vector (flag != 0) or ADDS them modulo a full turn
    (flag == 0). Every constant this unit hands that slot is three of these,
    and every one of them decodes to a plausible angle: see
-   ROTATION_YAW_180 / _PLUS45 / _MINUS45 and CARDINAL_ROTATIONS below. */
+   sRotationYaw180 / _PLUS45 / _MINUS45 and CARDINAL_ROTATIONS below. */
 typedef struct RotationRatio {
     s16 numerator;
     s16 denominator;
@@ -201,7 +201,7 @@ extern RotationRatios TURN_ROTATIONS[];
 
 /* (0 deg, 180 deg, 0 deg). Address-of only, forwarded as SceneNode__UpdateRotation's
    arg2 with flag 1 (absolute) by DreamSys__ResetSessionState. */
-extern RotationRatios ROTATION_YAW_180;
+extern RotationRatios sRotationYaw180;
 
 typedef struct CinematicCall {
     s16 bank;
@@ -387,7 +387,7 @@ extern struct RelativePos STAIRCASE_OFFSET_3;
    arg2 with flag 0 (relative) by DreamSys__TickStaircaseCase0 and
    DreamSys__TickStaircaseCase2. Typed RotationRatios round 66: its three
    {numerator, denominator} words are {0,1} {0x2D,1} {0,1}, byte-identical in
-   form to ROTATION_YAW_180 and to every CARDINAL_ROTATIONS entry. */
+   form to sRotationYaw180 and to every CARDINAL_ROTATIONS entry. */
 extern RotationRatios ROTATION_YAW_PLUS45;
 
 /* (0 deg, -45 deg, 0 deg) -- the mirror of ROTATION_YAW_PLUS45 above

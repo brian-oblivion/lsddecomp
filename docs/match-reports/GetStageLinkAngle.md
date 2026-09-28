@@ -90,7 +90,7 @@ which case 0. `DreamSys__TryStageTimerLink` stores the result in
 `exitRotation`.
 "Angle" is read off the constant: `LINK_ANGLE_180`'s single word is 0x000100B4, a
 {numerator 0xB4, denominator 1} degree ratio -- byte-identical to the Y word of
-`ROTATION_YAW_180`, and the same encoding as every `CARDINAL_ANGLES` entry. Tier B:
+`sRotationYaw180`, and the same encoding as every `CARDINAL_ANGLES` entry. Tier B:
 no carved code reads `stageLinkAngle` back, so the consumer is unobserved.
 
 ## Comment moved from src/DreamSys.c (round 92, track 7)

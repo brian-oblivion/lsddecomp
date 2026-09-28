@@ -119,7 +119,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *this, LinkResource *modelSource, s32 soun
 
 void DreamSys__ResetSessionState(DreamSys *this) {
     this->methods->setDisplay(this, 0);
-    this->methods->updateRotation(this, 1, &ROTATION_YAW_180);
+    this->methods->updateRotation(this, 1, &sRotationYaw180);
     this->lookCallback = NULL;
     this->moveCallback = NULL;
     this->soundCueSet.tag = 0;
