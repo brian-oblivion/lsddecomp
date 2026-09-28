@@ -3127,7 +3127,7 @@ SetDataDirectory = 0x800270AC; // type:func
 GetDataDirectory = 0x800270B8; // type:func
 sDataDirectory = 0x8008A854;
 gFileTableRegistered = 0x8008A850;
-gDefaultDataDirectory = 0x8008A960;
+sDefaultDataDirectory = 0x8008A960;
 // identified (round 99, echo's evidence, head's rename): as _svm_okon2 --
 // every aligned access at ratio >= 0.95 in libsnd/vmanager (discs 3.3, 3.5)
 // and its 3.6 split objects names it. rename.py refused it until its size

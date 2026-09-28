@@ -197,7 +197,7 @@ void LbdFile__ReleaseDataBlock(LbdFile *self) {
     }
 }
 
-extern char *gDefaultDataDirectory; /* "CDI\\" (sdata) */
+extern char *sDefaultDataDirectory; /* "CDI\\" (sdata) */
 extern s32 gForcedSoundBank;
 extern s32 gForcedStageBgm;
 extern u8 gSoundBankPaths[];
@@ -217,7 +217,7 @@ LbdFileMethods *GetLbdFileMethods(void) {
 }
 
 char *GetDefaultDataDirectory(void) {
-    return gDefaultDataDirectory;
+    return sDefaultDataDirectory;
 }
 
 /* rand(), after srand(seed) when seed is nonzero. */

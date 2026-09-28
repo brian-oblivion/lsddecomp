@@ -107,7 +107,7 @@ state before these renames.
   name.
 - **Writer.** `GameApplication__GameApplication` (GameApplicationFileResource) calls
   `SetDataDirectory(GetDefaultDataDirectory())` once at startup. `GetDefaultDataDirectory`
-  returns `gDefaultDataDirectory`, whose retail initialiser is `&D_8008A958`, the
+  returns `sDefaultDataDirectory`, whose retail initialiser is `&D_8008A958`, the
   `.sdata` string `"CDI\\"`. That string ends in the separator, which is
   what the readers need, because they put nothing between it and the name.
 - **Default.** `sDataDirectory`'s retail initialiser is `0x8006D4A8`. The
