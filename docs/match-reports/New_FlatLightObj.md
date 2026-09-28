@@ -57,3 +57,17 @@ object, its table and the evidence for the name live there. The unit's
 only outside caller of New_FlatLightObj is LightRig__LightRig
 (src/Sprite.c, include/LightRig.h), with light ids 0, 1, 2.
 ```
+
+## History (moved from src/FlatLightObj.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> Edges (track 8): the binary fixes both. The file sits between two placed
+> Sony objects, libgs/gs_110 (GsSetAmbient) before and libgs/gs_107
+> (GsSetFlatLight) after, so neither neighbour can be merged into it and its
+> start and end are real file boundaries. Inside, tools/tuboundary.py finds
+> no rodata tying or splitting the six functions (all five gaps "boundary
+> possible"; the forced boundary it notes spans Sprite.c's jump table at
+> 0x80011290 to DayTaskStageMap.c's at 0x8001140C and is met by Sony edges
+> elsewhere, so it forces nothing here). Content decided the rest: one class,
+> whole, is one file, named for it.
