@@ -486,8 +486,8 @@ BasicClass *LightRig__GetLight(LightRig *self, s32 index) {
 
 /* LightRig slot +0x0BC: set the ambient colour (swapping the old one out
  * into *rgb when asked) and hand it to GsSetAmbient. */
-void LightRig__SetAmbientColor(LightRig *self, LightRigRgb *rgb, s32 swap) {
-    LightRigRgb old;
+void LightRig__SetAmbientColor(LightRig *self, ColorRgb *rgb, s32 swap) {
+    ColorRgb old;
 
     if (swap) {
         old = self->ambient;

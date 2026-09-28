@@ -16,8 +16,8 @@ Round 82, runner alpha (fifth slot on Sprite). Unit `src/graphics/Sprite.c`. Fre
 ```c
 /* LightRig slot +0x0BC: set the ambient colour (swapping the old one out
  * into *rgb when asked) and hand it to GsSetAmbient. */
-void LightRig__SetAmbientColor(LightRig *self, LightRigRgb *rgb, s32 swap) {
-    LightRigRgb old;
+void LightRig__SetAmbientColor(LightRig *self, ColorRgb *rgb, s32 swap) {
+    ColorRgb old;
 
     if (swap) {
         old = self->ambient;
@@ -36,7 +36,7 @@ void LightRig__SetAmbientColor(LightRig *self, LightRigRgb *rgb, s32 swap) {
 
 ## Track 4
 
-2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__SetAmbientColor`, tier A: slot +0x0BC, named `setAmbientColor` in the header. `self` is `LightRig *` (was `D_8006EFACObj`); the colour is `LightRigRgb`, include/LightRig.h's own all-s8 3-byte colour (was Sprite.h's `ColorRgb`, the same shape: the lb,lb,lb/sb,sb,sb copies are unchanged). The Source block above is the unified spelling. Image byte-identical.
+2026-09-26, round 86 (delta): class 0x14 unified as LightRig in `include/LightRig.h`. Renamed from `D8006EFAC__SetAmbientColor`, tier A: slot +0x0BC, named `setAmbientColor` in the header. `self` is `LightRig *` (was `D_8006EFACObj`); the colour is `ColorRgb`, include/LightRig.h's own all-s8 3-byte colour (was Sprite.h's `ColorRgb`, the same shape: the lb,lb,lb/sb,sb,sb copies are unchanged). The Source block above is the unified spelling. Image byte-identical.
 
 ## Track 7 (round 99, charlie)
 
