@@ -1871,7 +1871,7 @@ void Entity__MoodCue68(Entity *this, SoundCueSet *out) {
     } else if (this->state == 10) {
         if (this->moodTimer < 8) {
             this->methods->updateRotation(this, 0, ROTATION_ZPLUS9);
-            this->methods->addTranslation(this, TRANSLATE_Y_PLUS8);
+            this->methods->addTranslation(this, sTranslateYPlus8);
         } else {
             u32 coin;
 
