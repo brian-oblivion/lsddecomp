@@ -120,12 +120,12 @@ python3 tools/classtable.py <table> --vs <parent-table>   # what a subclass over
 | directory | what it holds |
 | --- | --- |
 | `src/main.c` | the entry point: builds the pool, the application, the screen and the pad, and runs the main loop |
-| `src/app/` | the application shell and the object framework: the `BMemPMgr` pool allocator and `BasicClass`, `Application` and `GameApplication`, `FileResource`, the task classes (`TaskCore`, `IntermediateBase`, `StreamTask`) with `Viewport`, and `Pad` |
+| `src/app/` | the application shell and the object framework: the `BMemPMgr` pool allocator and the first half of `BasicClass`, `Application` and `GameApplication`, `FileResource`, the task classes (`TaskCore`, `IntermediateBase`, `StreamTask`) with `Viewport`, and `Pad` |
 | `src/cd/` | CD access and the game's files: `CdDriver`, `CdStream` streaming, `LbdFile` and the table of file names |
-| `src/graphics/` | the screen, the scene graph and rendering: `DrawSystem`, `SceneNode`, the sprites, the lights, `TmdModel` and the TMD renderer, the Viewport's draw pass, and the loaders that turn TIM, TMD and TOD files into graphics objects (with the tile-map layer and the FMV player) |
-| `src/world/` | the dream world and its actors: `DreamSys`, `DayTask` and `StageMap`, the stage grid, `DreamAux`'s triggers, `Actor`, `TodActor` and `Entity`, and `ObjM` with the style layer and `GraphRoom` |
+| `src/graphics/` | the screen, the scene graph and rendering: `DrawSystem`, `SceneNode`, the sprites, `FrameClock`, the lights, `TmdModel` and the TMD renderer (after the rest of `BasicClass`), the Viewport's draw pass, and the loaders that turn TIM, TMD and TOD files into graphics objects (with the tile-map layer and the FMV player) |
+| `src/world/` | the dream world and its actors: `DreamSys`, `DayTask` and `StageMap`, the stage grid, `DreamAux`'s triggers, `Actor`, `TodActor` and `Entity`, and `ObjM` with the style layer and `GraphRoom` (after the second half of `ItemList`) |
 | `src/sound/` | the game's sound: `WBgm` background music and the VAB backend (`VabDriver`, `VabStreamObj`, sound cues), with the map chunks' `PlacementGrid` at the head of its file |
-| `src/ui/` | menus and 2D widgets: `TitleMenu` and the `TaskObjF` memory-card saves, `TextEntry` and `ItemList`, `FadeBox`, `BoxFill` and `TextRow` |
+| `src/ui/` | menus and 2D widgets: `TitleMenu` and the `TaskObjF` memory-card saves (after `NodeGuardedViewport` and `GridCell`, which the day's code uses), `TextEntry` and the first half of `ItemList`, `FadeBox`, `BoxFill` and `TextRow` |
 | `src/psyq/` | Sony library modules not linked from `lib/`, carried in `src/` as C or `INCLUDE_ASM` instead (`libsnd_*`, `libcd_bios`, `libgs_*`, `libspu_s_ih`, `libcard_card`), each file named for its Sony module; `libsnd_vmanager.c` opens with one game function, `ServiceSoundCueSet` |
 
 Read each named class's header first; its banner points to the units.
@@ -133,16 +133,21 @@ Read each named class's header first; its banner points to the units.
 - **Boot and the main loop.** `src/main.c` sets up the `BMemPMgr` pool
   allocator (`src/app/BMemPMgr.c`), the `DrawSystem` screen singleton and a
   `Pad`, then runs the root object, `GameApplication` (`src/app/GameApplicationFileResource.c`, a
-  subclass of `Application`, `src/app/Application.c`). Its loop shows the intro logos, plays an opening
-  movie, runs the title menu, runs a day, and plays the ending movie when a
-  year has gone by. The game's file paths (sound banks, each stage's
+  subclass of `Application`, `src/app/Application.c`). Application's main
+  loop never returns; it calls GameApplication's hooks, which show the intro
+  logos, play an opening movie, run the title menu, run a day, and play the
+  ending movie when a year has gone by. The game's file paths (sound banks, each stage's
   textures, music and map chunks, the movies) are one table,
   `src/cd/GameFiles.c`.
 - **Scene objects.** `SceneNode` is the positioned 3D object, wrapping a
   libgs `GsDOBJ2` and its coordinate system (`src/graphics/SceneNode.c`); `Actor`
-  adds movement (`src/world/ObjMStyleActor.c`). `LinkResource`, `TmdModel`, `ModelData` and `Tod`/`TodSet`
-  load models and TOD animations. `Viewport` renders a scene through libgs;
-  `FrameClock` is the per-frame tick objects listen to; `Pad` (`src/app/Pad.c`)
+  adds movement (`src/world/ObjMStyleActor.c`). `LinkResource`, `ModelData` and `Tod`/`TodSet`
+  (`src/graphics/GraphicsResources.c`) load models and TOD animations;
+  `TmdModel` (`src/graphics/TmdModel.c`) is one object of a TMD, and
+  `SortTmdObject` (`src/graphics/TmdRenderer.c`) turns it into GPU primitives.
+  `Viewport` (`src/app/Task.c`, its draw pass in `src/graphics/ViewportDraw.c`)
+  renders a scene through libgs;
+  `FrameClock` (`src/graphics/Sprite.c`) is the per-frame tick objects listen to; `Pad` (`src/app/Pad.c`)
   turns the controller into button events; `DrawSystem` (`src/graphics/DrawSystem.c`)
   owns the screen and the VSync loop.
 - **The dream.** `DreamSys` (`src/world/DreamSys.c`) is the dream in progress: the
@@ -160,9 +165,12 @@ Read each named class's header first; its banner points to the units.
 - **Screens and menus.** `IntermediateBase` runs one attached job to a
   result. `TaskCore` (`src/app/Task.c`, with `StreamTask`, `IntermediateBase` and
   `Viewport`) is the base of the menu and screen
-  tasks: `StreamTask` (plays one movie), `GraphRoom` (the mood graph) and
-  `TitleMenu`, the START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE menu. The 2D pieces are `Sprite` and its subclasses (down to
-  `TextRow`), `BoxFill` and `FadeBox` (`src/ui/ScreenWidgets.c`) and `TextEntry`
+  tasks: `StreamTask` (plays one movie), `GraphRoom` (the mood graph,
+  `src/world/ObjMStyleActor.c`) and `TitleMenu`
+  (`src/ui/TitleMenuTaskObjF.c`), the START/FLASHBACK/SAVE/LOAD/GRAPH/SHAKE
+  menu. `TimedTask`, IntermediateBase's other subclass, is the base of
+  `DayTask` and `ObjM`. The 2D pieces are `Sprite` and its subclasses (`src/graphics/Sprite.c`,
+  down to `TextRow`), `BoxFill` and `FadeBox` (`src/ui/ScreenWidgets.c`) and `TextEntry`
   (`src/ui/TextEntryItemList.c`).
 - **Memory-card saves.** `TitleMenu` owns a `TaskObjF`, the save/load
   controller (both in `src/ui/TitleMenuTaskObjF.c`): a state machine over the
@@ -179,7 +187,8 @@ Read each named class's header first; its banner points to the units.
 - **Sound.** `VabStreamObj` loads VAB banks, `WBgm` plays background music
   (`src/sound/WBgm.c`), `src/sound/PlacementGridVabSound.c` holds `VabDriver`, `VabStreamObj` and
   the sound-cue set beside the map chunks' `PlacementGrid`, and
-  `src/psyq/libsnd_vmanager.c` is Sony's SPU voice manager written as C.
+  `src/psyq/libsnd_vmanager.c` is Sony's libsnd voice manager, carried in
+  `src/` after the game's `ServiceSoundCueSet`.
 
 ### From a function to its class and callers
 
