@@ -1321,7 +1321,7 @@ void Entity__MoodCue44(Entity *this, SoundCueSet *out) {
 }
 
 /* At the cue's start, rolls 0..9: 8 or 9 stretches the entity by
- * sScaleX3, 5 to 7 arms a drift (state 10) that adds TRANSLATE_Z_MINUS256
+ * sScaleX3, 5 to 7 arms a drift (state 10) that adds sTranslateZMinus256
  * every tick from tick 201 on. */
 void Entity__RollScaleOrDelayedDrift(Entity *this) {
     s32 roll;
@@ -1335,7 +1335,7 @@ void Entity__RollScaleOrDelayedDrift(Entity *this) {
         }
     }
     if (this->state == 10 && this->moodTimer >= 201) {
-        this->methods->addTranslation(this, TRANSLATE_Z_MINUS256);
+        this->methods->addTranslation(this, sTranslateZMinus256);
     }
 }
 
