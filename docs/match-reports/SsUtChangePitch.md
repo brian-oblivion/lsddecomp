@@ -738,3 +738,15 @@ code_179d8_j_c.c took <libsnd.h> and its banner was rewritten as documentation. 
  * function up drastically instead of fixing the swap -- see this round's
  * report update. */
 ```
+
+## History (moved from src/libsnd_ut_cp_ut_cadsr_ut_vvol_ut_autov_ut_autop.c, comments pass)
+
+The file's banner carried its edge evidence and the reason it is parked:
+
+> What decided its edges (python3 tools/tuboundary.py --unit): the placed
+> object libsnd/ut_pb precedes it ("start edge possible"); every edge
+> inside it is "boundary possible". Its neighbour libsnd_ut_ako.c
+> (SsUtAllKeyOff) is not merged into it: that is 3.6's next module,
+> ut_ako.o. PARKED: the content says five files (the 3.6 module edges),
+> but that split is a new carve, not a merge or rename, so the file keeps
+> its carve edges and is named for all five modules.

@@ -649,3 +649,11 @@ extern Entry90902E8 *_ss_score[];
  * word 1 -- the prologue's own `-0x40` vs `-0x38` frame size). The
  * residue is register/stack allocation, not logic. */
 ```
+
+## History (moved from src/libsnd_decre.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> What decided its edges (python3 tools/tuboundary.py --unit): the placed
+> object libsnd/tempo precedes it ("start edge possible") and the placed
+> object libsnd/replay follows it, so there is nothing to merge with.

@@ -5,13 +5,6 @@
  * to func_80038E44, the routine SpuInit itself calls, in the game's own
  * libspu build. That build is on no SDK disc, so the module cannot be
  * linked from lib/ and is matched as C.
- *
- * What decided its edges (python3 tools/tuboundary.py): the placed object
- * libsnd/stop precedes it ("start edge possible"), and the placed object
- * libspu/s_sm (SpuSetMute) follows it. One function between two objects,
- * so nothing to merge with.
- *
- * The carve history is in docs/match-reports/SpuInitHot.md, "File history".
  */
 #include "common.h"
 

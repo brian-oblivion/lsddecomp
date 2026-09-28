@@ -231,3 +231,10 @@ the region is one file. `nm` over `sdk/work/<disc>/elf/libsnd/cres.o` gives
 one text symbol on every disc (`Snd_crescendo` on 3.0/3.3,
 `_SsSndCrescendo` on 3.5/3.6), text 0x474 / 0x57C / 0x2DC / 0x2DC against
 retail's 0x3C0: the module is `cres`, and no disc holds retail's build.
+
+## History (moved from src/libsnd_cres.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> The unit's edges are Sony objects on both sides: libsnd/vm_doff before it,
+> libsnd/stop after it.

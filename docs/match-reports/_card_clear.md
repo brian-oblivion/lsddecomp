@@ -786,3 +786,11 @@ s32 _card_clear(s32 chan) {
   rewrote the line above to quote a command never run; restored by the
   premium session after round 90, and `unitfile.py` now leaves a report's
   history sections alone.
+
+## History (moved from src/libcard_card.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> Edges: both are placed Sony objects (libcard/c171 _card_info before,
+> libcard/a78 _card_write after), so this file cannot merge with a
+> neighbour.

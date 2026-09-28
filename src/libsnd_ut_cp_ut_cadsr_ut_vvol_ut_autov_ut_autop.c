@@ -15,14 +15,6 @@
  * bytes against retail's 0x160, 0xF4, 0x1FC, 0x54 and 0x54), so none can
  * be linked.
  *
- * What decided its edges (python3 tools/tuboundary.py --unit): the placed
- * object libsnd/ut_pb precedes it ("start edge possible"); every edge
- * inside it is "boundary possible". Its neighbour libsnd_ut_ako.c
- * (SsUtAllKeyOff) is not merged into it: that is 3.6's next module,
- * ut_ako.o. PARKED: the content says five files (the 3.6 module edges),
- * but that split is a new carve, not a merge or rename, so the file keeps
- * its carve edges and is named for all five modules.
- *
  *   - SsUtChangePitch: re-pitches a keyed-on voice (still assembly).
  *   - SsUtChangeADSR: if the voice still plays the given vab/program/note,
  *     writes the two ADSR words into its shadow registers and marks them dirty.

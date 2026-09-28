@@ -93,3 +93,17 @@ verbatim, as it stood before the rename.
  * carries a Sony prototype (FINISHING-PLAN track 2).
  */
 ```
+
+## History (moved from src/libgs_gs_101.c, comments pass)
+
+The file's banner carried its edge evidence:
+
+> What decided its edges (python3 tools/tuboundary.py): the placed object
+> libgs/gs_133 precedes it ("start edge possible"), and the placed object
+> libgs/gs_123 follows it. One function between two objects, so nothing to
+> merge with.
+
+The banner's last sentence read:
+
+>  prototype. The carve history is in docs/match-reports/GsSetNearClip.md,
+> "File history".
