@@ -19,4 +19,4 @@
 #include "common.h"
 
 /* MATCHING: unmatchable as C (Sony-assembled `li` form); keep INCLUDE_ASM. */
-INCLUDE_ASM("asm/nonmatchings/libcard_card", _card_clear);
+INCLUDE_ASM("asm/nonmatchings/psyq/libcard_card", _card_clear);
