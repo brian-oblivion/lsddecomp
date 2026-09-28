@@ -64,10 +64,10 @@ void CdDriver__LoadFile(Obj80027480 *self, char *arg1) {
                         self->methods->slot48(self);
                         return;
                     }
-                    gCdReadBuffer = ret;
+                    sCdReadBuffer = ret;
                     self->unk10 = ret;
                 } else {
-                    gCdReadBuffer = self->unk10;
+                    sCdReadBuffer = self->unk10;
                 }
                 if (sCdAsyncEnabled != 0) {
                     self->unk14 = pos;
@@ -123,7 +123,7 @@ not necessarily the order that matters most:
 2. **The SAME polarity lever again, a fifth instance, on `self->unk10 ==
    NULL` vs `!= NULL`**: the fall-through (immediately after the test) must
    be the LONGER continuation (`BMemPMgrAlloc` call and its own nested
-   checks), with the trivial one-line store (`gCdReadBuffer = self->unk10;`)
+   checks), with the trivial one-line store (`sCdReadBuffer = self->unk10;`)
    at the branch target. This is now the clearest pattern in the unit: with
    five confirmed instances across four functions, whichever arm is
    textually longer needs to be read off the `.s` as the fall-through, not

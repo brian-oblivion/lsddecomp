@@ -29,7 +29,7 @@
  *     CD_OP_* request for `self` with EnqueueCdRequest.
  *   - called back by runRequestQueue (inQueueDispatch 1), and the drive not
  *     busy: StartCdOperation, then either hand the work to the state machine
- *     through gCdSeekParam / gCdReadSectorCount / gCdReadBuffer and
+ *     through gCdSeekParam / gCdReadSectorCount / sCdReadBuffer and
  *     gCdTickStep (async mode), or do it on the spot as a CdControl(CdlSetloc)
  *     / CdSync / CdRead / CdReadSync spin and ResetCdStateMachine (queued
  *     synchronous mode).
@@ -238,7 +238,7 @@ s32 CdDriver__Read(CdDriver *self, void *buf, u32 size) {
             StartCdOperation(CD_OPERATION_READ, CD_STATE_READ);
             if (sCdAsyncEnabled != 0) {
                 gCdReadSectorCount = size >> CD_SECTOR_SHIFT;
-                gCdReadBuffer = buf;
+                sCdReadBuffer = buf;
                 gCdTickStep = CD_TICK_STATE_MACHINE;
             } else {
             /* MATCHING: a goto, not do-while: a do-while hoists the -1 into a saved register */
@@ -304,10 +304,10 @@ void CdDriver__LoadFile(CdDriver *self, char *name) {
                     self->methods->close(self);
                     return;
                 }
-                gCdReadBuffer = buffer;
+                sCdReadBuffer = buffer;
                 self->buffer = buffer;
             } else {
-                gCdReadBuffer = self->buffer;
+                sCdReadBuffer = self->buffer;
             }
             if (sCdAsyncEnabled != 0) {
                 self->bufferSize = readSize;
@@ -766,7 +766,7 @@ void EnqueueCdRequest(CdDriver *owner, s32 fileIndex, s32 op, s32 param0, s32 pa
  * (part 3, a VSync callback) runs: it calls TickCdStateMachine or
  * TickCdLoadFileStateMachine as gCdTickStep says, after a CdDriver method
  * (part 2) has started an operation with StartCdOperation and set
- * gCdSeekParam, gCdReadSectorCount and gCdReadBuffer. gCdState walks
+ * gCdSeekParam, gCdReadSectorCount and sCdReadBuffer. gCdState walks
  * CD_STATE_SETLOC (CdControlF(CdlSetloc) to gCdSeekParam->pos),
  * CD_STATE_SETLOC_WAIT (poll CdSync), CD_STATE_READ (CdRead) and
  * CD_STATE_READ_WAIT (poll CdReadSync); SetCdState moves it and
@@ -940,7 +940,7 @@ void TickCdStateMachine(void) {
             }
             break;
         case CD_STATE_READ:
-            if (CdRead(gCdReadSectorCount, gCdReadBuffer, CdlModeSpeed) == 0) {
+            if (CdRead(gCdReadSectorCount, sCdReadBuffer, CdlModeSpeed) == 0) {
                 goto unlock;
             }
             newState = CD_STATE_READ_WAIT;
@@ -996,7 +996,7 @@ void TickCdLoadFileStateMachine(void) {
             }
             break;
         case CD_STATE_READ:
-            if (CdRead(gCdReadSectorCount, gCdReadBuffer, CdlModeSpeed) == 0) {
+            if (CdRead(gCdReadSectorCount, sCdReadBuffer, CdlModeSpeed) == 0) {
                 goto unlock;
             }
             newState = CD_STATE_READ_WAIT;

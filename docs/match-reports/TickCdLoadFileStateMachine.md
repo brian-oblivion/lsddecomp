@@ -125,7 +125,7 @@ L_count:
     goto L_set;
 
 L_state7:
-    if (CdRead(gCdReadSectorCount, gCdReadBuffer, 0x80) == 0)
+    if (CdRead(gCdReadSectorCount, sCdReadBuffer, 0x80) == 0)
         goto L_end;
     newstate = 8;
     goto L_set;

@@ -10,7 +10,7 @@
 
 ```c
 extern s32 gCdReadSectorCount; /* CdRead sector count */
-extern void *gCdReadBuffer; /* CdRead target buffer */
+extern void *sCdReadBuffer; /* CdRead target buffer */
 extern s32 gCdTickStep;
 
 extern void ReadCdFile(Obj80027480 *self, void *arg1, s32 arg2);
@@ -31,7 +31,7 @@ s32 CdDriver__Read(Obj80027480 *self, void *buf, u32 size) {
             StartCdOperation(3, 7);
             if (sCdAsyncEnabled != 0) {
                 gCdReadSectorCount = size >> 11;
-                gCdReadBuffer = buf;
+                sCdReadBuffer = buf;
                 gCdTickStep = 1;
             } else {
             retry:
@@ -124,7 +124,7 @@ Round 79 (charlie), FINISHING-PLAN track 3.
 **Evidence.** `(self, buf, size)`. Sync mode forwards to `ReadCdFile`;
 otherwise it enqueues op 5 with `buf`/`size`, or inside a queue dispatch on
 an open file reads `size >> 11` sectors into `buf` (CdRead + CdReadSync
-retry loop, or hands `gCdReadSectorCount`/`gCdReadBuffer` to the state
+retry loop, or hands `gCdReadSectorCount`/`sCdReadBuffer` to the state
 machine). `FileResource__LoadFile` calls this slot with the buffer it just
 allocated and its size, between the rewind and the close.
 

@@ -161,7 +161,7 @@ extern s32 sCdOperation;               /* StartCdOperation's op, GetCdOperation'
 extern s32 gCdState;                   /* the state machine's phase */
 extern CdFileEntry *gCdSeekParam;      /* the state machines seek to &gCdSeekParam->pos */
 extern s32 gCdReadSectorCount;         /* CdRead sector count */
-extern void *gCdReadBuffer;            /* CdRead target buffer */
+extern void *sCdReadBuffer;            /* CdRead target buffer */
 extern CdFileEntry *gCdSavedSeekParam; /* LoadFile's saved gCdSeekParam */
 extern CdRequestNode *gCdRequestQueue; /* list head */
 extern s32 gCdTickStep;                /* CD_TICK_* */
