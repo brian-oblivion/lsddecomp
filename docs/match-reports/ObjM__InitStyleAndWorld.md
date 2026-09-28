@@ -25,7 +25,7 @@ extern s32 RegisterStyleConfig(void *arg0, s32 arg1, s32 *arg2, s32 arg3, s32 ar
 extern s32 sObjMViewPoint;
 extern s32 sObjMViewRefPoint;
 extern s32 gStagePendingExtras[];
-extern s32 gStage0Bounds;
+extern s32 sStage0Bounds;
 
 void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2, s32 arg3) {
     DreamSysObj_3bb8c_l *unk18 = self->unk18;
@@ -72,7 +72,7 @@ void ObjM__InitStyleAndWorld(Obj87034_3bb8c_l *self, s32 arg1, StyleConfig *arg2
         self->unk40 = 0x10;
         self->unk44 = 2;
         flag = 1;
-        self->unk14->methods->slot134(self->unk14, &gStage0Bounds);
+        self->unk14->methods->slot134(self->unk14, &sStage0Bounds);
     }
 
     self->unk48 = arg1;
@@ -92,7 +92,7 @@ else in the project (all still `INCLUDE_ASM` in their own units), so they
 are declared locally per CLAUDE.md's rule. `sObjMViewPoint`/`sObjMViewRefPoint` are
 referenced only by address (never loaded), so their real type is unknown;
 `gStagePendingExtras` is a plain word array indexed by `self->unk38`;
-`gStage0Bounds` is likewise referenced only by address.
+`sStage0Bounds` is likewise referenced only by address.
 
 ## Three levers, in the order that closed the gap (138 -> 137 words)
 

@@ -495,7 +495,7 @@ extern s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 
 extern LongVec3 sObjMViewPoint;
 extern LongVec3 sObjMViewRefPoint;
 extern s32 gStagePendingExtras[];
-extern CellBounds gStage0Bounds;
+extern CellBounds sStage0Bounds;
 
 /* onInit's gridSpan when it is passed 0: sDefaultGridSpan's value, the one
  * the StageMap starts with (10 half-cells: StageMap::gridHalfCells is
@@ -553,7 +553,7 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
         self->tickPeriod = 16;
         self->moveMode = 2;
         flag = 1;
-        ((StageMap *)self->lightRig)->methods->setBounds((StageMap *)self->lightRig, &gStage0Bounds);
+        ((StageMap *)self->lightRig)->methods->setBounds((StageMap *)self->lightRig, &sStage0Bounds);
     }
 
     self->gridSpan = gridSpan;
