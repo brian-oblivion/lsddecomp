@@ -32,6 +32,7 @@
 #include "BMemPMgr.h"
 #include "FullWidthSjis.h"
 #include <strings.h>
+#include "SceneNode.h"
 
 FadeBox *New_FadeBox(void *size, s32 channels, s32 pri) {
     FadeBox *self;
@@ -383,7 +384,7 @@ void TextRow__TextRow(TextRow *self, void *texture, s32 count, char *text) {
 }
 
 void TextRow__Finalize(TextRow *self) {
-    ReleaseBasicClassArray(self->cells, self->cellCount);
+    ReleaseBasicClassArray((BasicClass **)self->cells, self->cellCount);
     self->cells = BMemPMgrFree(self->cells);
     GetCharSpriteMethods()->finalize((CharSprite *)self);
 }

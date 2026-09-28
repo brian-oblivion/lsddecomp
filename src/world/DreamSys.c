@@ -396,10 +396,8 @@ void DreamSys__RunTickCallbacks(DreamSys *this) {
         this->moveCallback(this);
 }
 
-/* InterpolateKeyframeValue is defined right after its caller;
-   IsVec3WithinRange is another unit's. */
+/* Defined right after its caller. */
 extern s32 InterpolateKeyframeValue(DreamSysInterpPoint *from, DreamSysInterpPoint *to, s32 at);
-extern s32 IsVec3WithinRange(s32 *a, s32 range, s32 *b);
 
 /* Converts the local offset (0, 0, dist) to a world position, takes its
    height from the viewport's two refView points interpolated at `dist`,

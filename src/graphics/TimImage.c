@@ -25,12 +25,6 @@
 #include "BMemPMgr.h"
 #include "GameApplicationFileResource.h"
 
-/* An s16 point. */
-typedef struct DrawPoint {
-    /* +0x00 */ s16 x;
-    /* +0x02 */ s16 y;
-} DrawPoint;
-
 /* new TimImage(name). */
 TimImage *New_TimImage(char *name) {
     TimImage *self;

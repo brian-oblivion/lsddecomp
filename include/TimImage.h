@@ -84,4 +84,15 @@ void TimImage__NoOpSlot94(void);
 void TimImage__SetFlag48(TimImage *self);
 void TimImage__GetTimInfo(TimImage *self, GsIMAGE *tim);
 
+/* An s16 VRAM point. */
+typedef struct DrawPoint {
+    /* +0x00 */ s16 x;
+    /* +0x02 */ s16 y;
+} DrawPoint;
+
+/* Rotates the VRAM rectangle `area` one column to the right, count times,
+ * through the one-column scratch area at `scratch`. Not a TimImage method. */
+struct DrawRect; /* include/DrawSystem.h */
+void RotateVramRectRight(struct DrawRect *area, s32 count, DrawPoint *scratch);
+
 #endif

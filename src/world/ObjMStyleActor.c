@@ -57,6 +57,7 @@
 #include "BMemPMgr.h"
 #include "GameFiles.h"
 #include <strings.h>
+#include "DreamAux.h"
 
 void ItemList__SetState(ItemList *self, s32 state) {
     /* MATCHING: the gotos keep retail's branch polarity and block order. */
@@ -475,7 +476,6 @@ void ObjM__DetachTarget(ObjM *self) {
 /* Defined elsewhere, no header: src/graphics/SceneNode.c (GetSetHitHeightGate
  * sets the flag SceneNode__RaycastHullAgainstFaces tests). RegisterStyleConfig,
  * which keeps `sceneRefs` as gStyleSceneRefs, is defined below, after ObjM. */
-extern s32 GetSetHitHeightGate(s32 value);
 extern s32 RegisterStyleConfig(s32 grid, s32 stage, s32 sceneRefs, s32 day, s32 unreadArg);
 
 /* The viewport's view point and reference point (attachViewChild), the
@@ -556,7 +556,6 @@ void ObjM__InitStyleAndWorld(ObjM *self, s32 gridSpan, StyleConfig *style, s32 a
 }
 
 /* ObjM__TeardownStyle's helpers (src/world/DreamAux.c, src/world/ObjMStyleActor.c). */
-extern void ReleaseDreamAuxEntities(void);
 extern void StyleTeardown(void);
 
 /* onDeinit. */
@@ -682,13 +681,6 @@ void ObjM__TogglePause(ObjM *self) {
 }
 
 void ObjM__NoOpSlot7C(void) {}
-
-/* src/world/DreamAux.c's; no header declares it. It keeps the stage, the
- * StageMap, the DreamSys (gDreamAuxWorld), the sound and the FrameClock for
- * the dream's aux entities. */
-struct FrameClock;
-extern void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world,
-                             struct VabStreamObj *sound, struct FrameClock *frameClock);
 
 /* Added to the viewport's projection distance; 0 in the image and never
  * written. */
@@ -923,9 +915,6 @@ typedef struct ChunkCoord {
     u8 row;
 } ChunkCoord;
 
-/* src/world/DreamAux.c; it reads `coord` as one s16 trigger key. */
-extern s32 TryDreamAuxTrigger(s32 data, ChunkCoord *coord, s32 day);
-
 /* ObjM__AdvancePauseSetup's literals, all reached by address: the "Pause"
  * text, the TextRow's position (attachToParent) and its colour (setColor). */
 extern char sPauseText[];             /* "Pause" */
@@ -1012,7 +1001,7 @@ s32 ObjM__CheckAuxTrigger(ObjM *self) {
     ChunkSlot *slot =
         ((StageMap *)self->unk14)->methods->getLastEventSlotChunk((StageMap *)self->unk14, &coord.column);
     s32 day = self->dreamSys->methods->getCurrentDayAndYear(self->dreamSys, 0);
-    held = TryDreamAuxTrigger((s32)slot->loader->dataBuffer, &coord, day);
+    held = TryDreamAuxTrigger((s32)slot->loader->dataBuffer, (s16 *)&coord, day); /* the coord is the trigger key */
     slot->heldObj = (BasicClass *)held;
     if (held != 0) {
         return 0;
@@ -1439,14 +1428,13 @@ void AdjustRgbByDelta(u8 *dst, u8 *src, s32 delta) {
     dst[2] = src[2] + delta;
 }
 
-extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gStyleDecorVariant;
 extern BoxFill *gStyleDecorSlots[STYLE_DECOR_BANDS];
 
 /* Releases the bands, if StyleBuildDecorSet made them. */
 void StyleReleaseDecorSet(void) {
     if (gStyleDecorVariant != 0) {
-        ReleaseBasicClassArray((void **)gStyleDecorSlots, ARRAY_COUNT(gStyleDecorSlots));
+        ReleaseBasicClassArray((BasicClass **)gStyleDecorSlots, ARRAY_COUNT(gStyleDecorSlots));
         gStyleDecorVariant = 0;
     }
 }
@@ -1516,7 +1504,7 @@ extern s32 gStyleEffectSlotCount;
 /* Releases the effect slots, if StyleBuildEffectSlots ran. */
 void StyleReleaseEffectSlots(void) {
     if (gStyleVariant >= 0) {
-        ReleaseBasicClassArray((void **)gStyleEffectSlots, gStyleEffectSlotCount);
+        ReleaseBasicClassArray((BasicClass **)gStyleEffectSlots, gStyleEffectSlotCount);
     }
 }
 
@@ -1971,16 +1959,16 @@ s32 TickStyle(Descriptor10 *cell, void *unused, s32 lastCue) {
 }
 
 extern s32 gStyleStage;
-extern void RotateVramRectRight(DrawRect *rect, s32 count, DrawRect *scratch);
 extern DrawRect gStyleStripRectA;
-extern DrawRect gStyleStripScratchA;
+extern DrawPoint gStyleStripScratchA;
 extern DrawRect gStyleStripRectB;
-extern DrawRect gStyleStripScratchB;
+extern DrawPoint gStyleStripScratchB;
 
 /* One step of RotateVramRectRight's one-column VRAM rotation: stage 2 on the
  * strip at y 496, stages 3..5 on the one at y 504. */
 void StyleScrollVramStrips(void) {
-    DrawRect *rect, *scratch;
+    DrawRect *rect;
+    DrawPoint *scratch;
     s32 count;
 
     if (gStyleStage == 2) {
@@ -2350,7 +2338,6 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
 /* The class and its children: include/StyleEffect.h (the owner),
  * include/Actor.h (modelChildren) and include/VariantSprite.h (sprites). */
 
-extern void ReleaseBasicClassArray(void **array, s32 count);
 extern s32 gSpriteShiftX[];
 extern Ratio16 gSpriteScaleLarge[3];
 extern Ratio16 gSpriteScaleHalf[3];
@@ -2587,7 +2574,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
 /* Release the two model children, if this layout made any. */
 void StyleEffect__ReleaseModelChildren(StyleEffect *self) {
     if (self->params.modelChildLayout != 0) {
-        ReleaseBasicClassArray((void **)self->modelChildren, ARRAY_COUNT(self->modelChildren));
+        ReleaseBasicClassArray((BasicClass **)self->modelChildren, ARRAY_COUNT(self->modelChildren));
     }
 }
 
@@ -2675,8 +2662,6 @@ void NoOpIgnoreArgs(void) {}
  * StyleEffect's sprite kinds (STYLE_EFFECT_SPRITES, _JITTER_SPRITES).
  * ------------------------------------------------------------------ */
 
-extern void ReleaseBasicClassArray(void **array, s32 count);
-
 /* Six scale tables, each three Ratio16s (x, y, z), for the jittering
  * sprites: a thin streak along y or along x, {1/16, 7/1}, {7/1, 1/16}, then
  * the same with 3 and 2; z is 1/1. VariantSprite__UpdateScale reads x and y. */
@@ -2684,7 +2669,7 @@ extern Ratio16 gStyleEffectJitterScales[6][3];
 
 /* Kind 2's release; ReleaseSpritesB, kind 3's, is the same body. */
 void StyleEffect__ReleaseSprites(StyleEffect *self) {
-    ReleaseBasicClassArray((void **)self->sprites, ARRAY_COUNT(self->sprites));
+    ReleaseBasicClassArray((BasicClass **)self->sprites, ARRAY_COUNT(self->sprites));
 }
 
 /* Five sprites of variant 0 at their default scale. */
@@ -2708,7 +2693,7 @@ void StyleEffect__RandomizeSprites(StyleEffect *self) {
 }
 
 void StyleEffect__ReleaseSpritesB(StyleEffect *self) {
-    ReleaseBasicClassArray((void **)self->sprites, ARRAY_COUNT(self->sprites));
+    ReleaseBasicClassArray((BasicClass **)self->sprites, ARRAY_COUNT(self->sprites));
 }
 
 /* StyleEffect's table getter. */
@@ -2725,8 +2710,6 @@ extern void *gStyleEffectTim;
 extern Viewport *gStyleEffectViewport;
 extern s32 gStyleEffectModelIds[3];
 extern s16 gStyleEffectClutPos[2];
-
-extern void TmdModel__SetFirstPrimClut(TmdModel *self, s16 *xy);
 
 /* Records the three sources, then points the first primitive of the TMD's
  * models 0 and 2 (gStyleEffectModelIds) at the CLUT at gStyleEffectClutPos. */
@@ -2810,8 +2793,6 @@ void Actor__Reset(Actor *self) {
     self->lastOffsetValue = 300;
     self->pendingExtra = 0;
 }
-
-extern void RotateAndOffsetHullList(TmdHull *hull, s32 turn, s32 back, s32 delta);
 
 /* notifyWithHull: SceneNode's, then, for events ACTOR_EVENT_UNSWEPT to
  * ACTOR_EVENT_MOVED_Y on a model with bounds, the model's hull goes to the
@@ -3162,11 +3143,6 @@ void *Actor__ScanGridWindow(Actor *self, void *offset, void *pos, GridQuery *que
     }
     return NULL;
 }
-
-/* SceneNode.c: casts a vertical ray from `pos` against the node's model,
- * one way and then the other; on a hit writes the hit less the ray's start
- * to `offset` and returns 1. */
-extern s32 SceneNode__RaycastVertical(void *self, void *offset, void *pos);
 
 /* `cell` if it is non-NULL and a vertical ray from `pos` hits its model
  * (the offset to the hit into `offset`), else NULL. */

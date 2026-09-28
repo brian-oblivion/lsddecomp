@@ -107,8 +107,6 @@ void SetDreamAuxWorld(s32 stage, StageMap *stageMap, DreamSys *world, struct Vab
     SetTeleportsEnabled(stage);
 }
 
-extern void SetInstantTeleportersEnabled(bool value);
-
 void SetTeleportsEnabled(s32 stage) {
     SetInstantTeleportersEnabled(stage == 11 || stage == 3);
 }

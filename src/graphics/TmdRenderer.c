@@ -31,6 +31,7 @@
 #include <libgs.h>
 #include "BMemPMgr.h"
 #include "gte.h"
+#include "TmdRenderer.h"
 
 void FreeBasicClassList(BasicClassListNode **head) {
     BasicClassListNode *node = *head;

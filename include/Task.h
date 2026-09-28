@@ -22,14 +22,6 @@
  * TaskCore.h, IntermediateBase.h, Viewport.h, BoxFill.h, FadeBox.h, TextRow.h.
  */
 
-/* Releases each element of a BasicClass array (TaskCore's slot elements,
- * TextRow's children). */
-extern void ReleaseBasicClassArray(void *array, void *count);
-
-/* The packed-bitfield accessor SceneNode's attribute setters use
- * (SceneNode.c), reached here by BoxFill's over `&self->boxAttribute`. */
-extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
-
 /* Defined in Task.c: &gDefaultMovieFrame. */
 extern DrawRect *GetDefaultMovieFrame(void);
 

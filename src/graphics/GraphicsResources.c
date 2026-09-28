@@ -113,8 +113,6 @@ typedef struct SubBlockTable {
     /* +0x08 */ s32 entries[1];
 } SubBlockTable;
 
-extern void ReleaseBasicClassArray(BasicClass **array, s32 count);
-
 /* A method table's ctor slot, unprototyped: the allocators that check the
  * ctor's result call it through this. */
 typedef struct UnprototypedCtorTable {

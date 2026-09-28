@@ -55,6 +55,7 @@
 #include "BMemPMgr.h"
 #include "GameFiles.h"
 #include "GameApplicationFileResource.h"
+#include "DreamAux.h"
 
 /* The viewpoint and view-reference points DayTask__OnInit hands the
  * viewport's attachViewChild: (0, -1200, 0) and (0, -1200, 10000). */

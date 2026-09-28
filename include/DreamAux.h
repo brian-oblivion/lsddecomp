@@ -90,8 +90,25 @@ extern bool CheckDreamAuxTriggerCondition(s32 day, TriggerRecord *record);
 extern bool SpawnDreamAuxTriggerEntity(s32 moodIndex, void *desc, DreamAuxTriggerEntry *trigger,
                                        s32 spawnIndex);
 extern void EnableTeleportsForKind(s32 moodIndex);
-extern bool IsStyleVariantEven(void);
+extern s32 IsStyleVariantEven(void); /* ObjMStyleActor.c */
 extern bool IsCurrentDreamColor(s32 condition);
 extern bool IsDayInPeriodPhase(s32 day, s32 phase);
+
+/* What the rest of the game calls. InitDreamAux loads the aux models and
+ * ReleaseDreamAuxModels frees them (DayTask's ctor and finalize);
+ * SetDreamAuxWorld keeps the stage, StageMap, DreamSys, sound and FrameClock
+ * the aux entities use and ReleaseDreamAuxEntities releases the entities
+ * (ObjM); TryDreamAuxTrigger fires the trigger of the chunk whose key (its
+ * column and row bytes) `chunkKey` points at. */
+struct StageMap;
+struct DreamSys;
+struct VabStreamObj;
+struct FrameClock;
+extern void InitDreamAux(void);
+extern void ReleaseDreamAuxModels(void);
+extern void SetDreamAuxWorld(s32 stage, struct StageMap *stageMap, struct DreamSys *world,
+                             struct VabStreamObj *sound, struct FrameClock *frameClock);
+extern void ReleaseDreamAuxEntities(void);
+extern s32 TryDreamAuxTrigger(s32 data, s16 *chunkKey, s32 day);
 
 #endif

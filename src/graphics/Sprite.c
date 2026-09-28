@@ -37,9 +37,9 @@
 #include "BMemPMgr.h"
 #include <strings.h>
 #include "GameApplicationFileResource.h"
+#include "SceneNode.h"
 
 /* Defined in other units. */
-extern u32 GetSetBitField(u32 *word, s32 shift, s32 width, u32 value);
 
 /* The zero offset ScreenSprite__AttachToParent attaches with. */
 extern LongVec3 gVec3Zero;

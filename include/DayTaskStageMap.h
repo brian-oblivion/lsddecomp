@@ -28,11 +28,9 @@ struct SubObjE {
 
 /* src/world/DreamAux.c; DayTask's finalize calls it after releasing its
  * resources. */
-extern void ReleaseDreamAuxModels(void);
 
 /* src/world/DreamAux.c; DayTask's ctor calls it, and its finalize
  * ReleaseDreamAuxModels. */
-extern void InitDreamAux(void);
 
 /* "ETC\\ETC.TIM" and "ETC\\DREAMER.TMD", the files DayTask's ctor loads. */
 extern const char sEtcTimPath[];

@@ -1062,4 +1062,8 @@ s32 DreamSys__func_5ba20(DreamSys *this, s32 value);
    addTranslation of (a - b) with y forced to 0. */
 void DreamSys__ApplyRelativeOffset(DreamSys *this, struct RelativePos *a, struct RelativePos *b);
 
+/* Enables or disables the instant teleporters TestForInstantTeleporters
+ * tests (DreamAux.c's SetTeleportsEnabled sets it per stage). */
+void SetInstantTeleportersEnabled(bool value);
+
 #endif

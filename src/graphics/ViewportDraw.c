@@ -46,6 +46,7 @@
 #include "Sprite.h"
 #include "ScreenSprite.h"
 #include "Viewport.h"
+#include "TmdRenderer.h"
 
 /* The bits of avsz3's OTZ that one OT spans: SortTmdObject files a face at
  * otBase[otz >> (OTZ_BITS - otLength)], so 1 << otLength tags cover OTZ
@@ -58,12 +59,6 @@
  * axis: past the right or bottom edge even of a 640x480 display, whose
  * half-size is 320x240. */
 #define SPRITE_POS_LIMIT 512
-
-/* SceneNode.c. include/SceneNode.h declares it the same way; this unit
- * does not include that header. */
-extern void ApplyMatrixToLVArray(void *dst, void *src, s32 count, void *m);
-/* TmdRenderer.c */
-extern void SortTmdObject(GsDOBJ2 *obj, GsOT *ot, s32 otShift, void *scratch);
 
 /*
  * Draws `node` into self->ot[self->otIndex], after first drawing, in list
