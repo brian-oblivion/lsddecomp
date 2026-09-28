@@ -53,7 +53,7 @@ evidence, and it is cross-unit, three ways:
      `FlushSoundCueSet`'s own `slot->index = self->methods->slot84(self,
      slot->index)`.
   3. +0x9C, called by `DreamSys__StartVoice` with the small signed values in
-     `VOICE_PITCH_BY_SELECT`, is `VabStreamObjMethods::slot9C` ==
+     `sVoicePitchBySelect`, is `VabStreamObjMethods::slot9C` ==
      `VabStreamObj__SetPitchOffset`.
 Tier B rather than A only because the body alone shows a bare store; the
 identification comes from other units.

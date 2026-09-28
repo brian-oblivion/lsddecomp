@@ -19,7 +19,7 @@
 > register-identity swap outright -- 55/72 -> **68/72**, all four registers
 > now matching retail, with the entire remaining gap confined to one
 > already-documented residue (a two-instruction load-order swap between the
-> `sVoiceBySelect`/`VOICE_PITCH_BY_SELECT` byte-table reads). A second permuter search,
+> `sVoiceBySelect`/`sVoicePitchBySelect` byte-table reads). A second permuter search,
 > seeded from this improved 68/72 body, found a score-0 (byte-exact)
 > candidate in a further ~2500-ish iterations (well within a second
 > 900s/`rc=0` bound). The raw candidate was noisy (a Yoda comparison, an
@@ -56,7 +56,7 @@ and `nop_mflo_mfhi`, by the head before assignment).
 Loads `this->unk_0x58` (an opaque object, `DreamSysUnk58` -- vtable pointer at
 offset 0) and `this->unk_0xB8` (an index, already documented as bounded to
 `[0, 0x18)`); if the index is 0, returns immediately. Otherwise it looks up
-two parallel byte tables by that index (`sVoiceBySelect`, `VOICE_PITCH_BY_SELECT`, both new
+two parallel byte tables by that index (`sVoiceBySelect`, `sVoicePitchBySelect`, both new
 externs added this round) and calls through the object's vtable twice
 (`slot0x9C`, a new slot this round, and `slot0x80`, already known from
 `ExecuteLink`), storing the second call's result into `this->unk_0xBC`. Two
@@ -80,7 +80,7 @@ void DreamSys__StartVoice(DreamSys *this)
 
 	heading = sVoiceBySelect[idx];
 	heading <<= 4;
-	vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);
+	vt->slot0x9C(obj, sVoicePitchBySelect[idx]);
 	this->unk_0xBC = vt->slot0x80(obj, heading, 0x6E, 0x6E);
 	if (this->unk_0xB8 != 0x16) {
 		this->unk_0xBC = -1;
@@ -110,11 +110,11 @@ function's own load/call instructions before being trusted:
   -- because none of them ever read `$v0` after the call, so a discarded
   `s32` return compiles identically to a discarded `void` one), plus a new
   `slot0x9C` slot (one argument, at `+0x9C`, appended after `pad88[0x14]`).
-- `extern const s8 sVoiceBySelect[0x18]` and `VOICE_PITCH_BY_SELECT[0x18]` -- both already
+- `extern const s8 sVoiceBySelect[0x18]` and `sVoicePitchBySelect[0x18]` -- both already
   described in prose at `DreamSysUnk28Target`'s neighbourhood
   (`0x80087EB0`-`0x80087EDF` combined) from an earlier round's analysis of
   `unk_0xB8`'s bound; this round gives them real extern declarations.
-  `VOICE_PITCH_BY_SELECT`'s real extent is exactly these 24 bytes -- the trailing zero
+  `sVoicePitchBySelect`'s real extent is exactly these 24 bytes -- the trailing zero
   bytes splat lumped into its dlabel belong to the `gProjectOffsetZ` vector
   documented elsewhere in the header, not to this table.
 - `DreamSys::unk_0xB8`'s comment extended with this function's two literal
@@ -135,8 +135,8 @@ statements moved the score from 50/72 to 55/72 and fixed `obj` and `vt`'s
 register assignment outright**, going from a 3-way cycle
 (`this=$s0,vt=$s2,heading=$s3` vs. retail's `$s2/$s3/$s0`) down to a clean
 2-way swap (`this=$s0,heading=$s2` vs. retail's `$s2/$s0`) plus one
-independent residue: the two byte-table loads (`sVoiceBySelect`, `VOICE_PITCH_BY_SELECT`)
-land in the opposite order from retail (retail loads the `VOICE_PITCH_BY_SELECT` call
+independent residue: the two byte-table loads (`sVoiceBySelect`, `sVoicePitchBySelect`)
+land in the opposite order from retail (retail loads the `sVoicePitchBySelect` call
 argument first, this body loads `sVoiceBySelect` first, matching its own source
 statement order) -- see the two-instruction group at file offsets
 `0x4A550`/`0x4A560` in `funcdiff.py`'s output.
@@ -166,7 +166,7 @@ above moved the needle:**
   (50/72, identical byte pattern to the untyped version).
 - Extra `s8 rawByte` local for the table read, `heading` kept `s32` -- **no
   effect** (50/72).
-- `sVoiceBySelect`/`VOICE_PITCH_BY_SELECT` marked `const` and `heading` removed entirely
+- `sVoiceBySelect`/`sVoicePitchBySelect` marked `const` and `heading` removed entirely
   (both array reads inlined at both use sites, relying on CSE across the
   vtable call) -- **regressed hard**, 16/72 with 99984 bytes of drift: GCC
   did not treat the `const` global as safe to cache across an indirect call,
@@ -346,7 +346,7 @@ one of them is a genuine, verified improvement:
    heading = sVoiceBySelect[idx];
    heading <<= 4;
 +  new_var = heading;
-   vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);
+   vt->slot0x9C(obj, sVoicePitchBySelect[idx]);
 -  this->unk_0xBC = vt->slot0x80(obj, heading, 0x6E, 0x6E);
 +  this->unk_0xBC = vt->slot0x80(obj, new_var, 0x6E, 0x6E);
    if (this->unk_0xB8 != 0x16)
@@ -380,10 +380,10 @@ instruction-for-instruction from the prologue through the epilogue, with
 **one exception**: the two-instruction group at 0x4A550-0x4A568 --
 
 ```
-retail:  addiu at,at,%lo(VOICE_PITCH_BY_SELECT) ; lb a1,0(at)   [call arg, evaluated first]
+retail:  addiu at,at,%lo(sVoicePitchBySelect) ; lb a1,0(at)   [call arg, evaluated first]
          addiu at,at,%lo(sVoiceBySelect) ; lb s0,0(at)   [heading's raw byte, second]
 mine:    addiu at,at,%lo(sVoiceBySelect) ; lb s0,0(at)   [heading first -- source order]
-         addiu at,at,%lo(VOICE_PITCH_BY_SELECT) ; lb a1,0(at)   [call arg second]
+         addiu at,at,%lo(sVoicePitchBySelect) ; lb a1,0(at)   [call arg second]
 ```
 
 -- exactly the "one independent residue" the very first (2026-09-06) section
@@ -396,7 +396,7 @@ register choices at the `lb`s that ripple from the swap).
 **Tried against the remaining residue, both reverted:**
 
 - **Moving the whole `heading = sVoiceBySelect[idx]; heading <<= 4; new_var =
-  heading;` block to AFTER the `vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);` call**
+  heading;` block to AFTER the `vt->slot0x9C(obj, sVoicePitchBySelect[idx]);` call**
   (so the call argument is evaluated first in the C source too, matching
   retail's apparent order). **Regressed sharply** to 55/72 with real address
   drift -- reproducing exactly the finding the original (2026-09-06) section
@@ -404,7 +404,7 @@ register choices at the `lb`s that ripple from the swap).
   the other side of the call regressed to 49/72 or 42/72"), now confirmed
   again on top of the `new_var` fix. This axis remains closed off.
 - **A `byteArg` temp for the call argument**, assigned before `heading`
-  (`byteArg = VOICE_PITCH_BY_SELECT[idx]; heading = sVoiceBySelect[idx]; ...;
+  (`byteArg = sVoicePitchBySelect[idx]; heading = sVoiceBySelect[idx]; ...;
   vt->slot0x9C(obj, byteArg);`) while leaving the call in its original
   position. **Byte-identical to the `new_var`-only form** -- no effect at
   all. GCC's evaluation order for this pair is apparently insensitive to
@@ -434,7 +434,7 @@ new_var3 = sVoiceBySelect[idx];             /* unsigned int, not s32 */
 heading = new_var3;
 heading = heading << 4;
 new_var = heading;
-vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);
+vt->slot0x9C(obj, sVoicePitchBySelect[idx]);
 this->unk_0xBC = vt->slot0x80(obj, new_var, 0x6E, new_var2);
 if (this->unk_0xB8 != 0x16) { this->unk_0xBC = -1; }
 if (0xB == this->unk_0xB8) {            /* Yoda comparison */
@@ -508,7 +508,7 @@ void DreamSys__StartVoice(DreamSys *this)
 	scratch = sVoiceBySelect[idx];
 	heading = scratch << 4;
 	headingArg = heading;
-	vt->slot0x9C(obj, VOICE_PITCH_BY_SELECT[idx]);
+	vt->slot0x9C(obj, sVoicePitchBySelect[idx]);
 	this->unk_0xBC = vt->slot0x80(obj, headingArg, 0x6E, 0x6E);
 	if (this->unk_0xB8 != 0x16) {
 		this->unk_0xBC = -1;
@@ -577,7 +577,7 @@ Renamed from `func_80059D1C`.
 
 Through `soundObj` (a VabStreamObj*, see
 `DreamSys__SetSoundObj.md` for the three-way identification): sets the pitch offset
-to `VOICE_PITCH_BY_SELECT[voiceSelect]` via +0x9C
+to `sVoicePitchBySelect[voiceSelect]` via +0x9C
 (`VabStreamObj__SetPitchOffset`), starts a voice via +0x80 with
 `sVoiceBySelect[voiceSelect] << 4` and two 0x6E constants, and stores the returned
 voice index in `voiceIndex` -- discarding it (setting -1) unless `voiceSelect` is

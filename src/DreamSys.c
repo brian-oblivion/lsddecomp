@@ -706,7 +706,7 @@ void DreamSys__StartVoice(DreamSys *this) {
     scratch = sVoiceBySelect[idx];
     heading = scratch << 4;
     headingArg = heading;
-    vt->setPitchOffset(obj, VOICE_PITCH_BY_SELECT[idx]);
+    vt->setPitchOffset(obj, sVoicePitchBySelect[idx]);
     this->voiceIndex = vt->playTone(obj, headingArg, 110, 110);
     if (this->voiceSelect != 22) {
         this->voiceIndex = -1;
