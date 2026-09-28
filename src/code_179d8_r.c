@@ -281,7 +281,7 @@ void StartCdOperation(s32 op, s32 state) {
 void ResetCdStateMachine(void) {
     gCdOperation = 0;
     gCdState = CD_STATE_IDLE;
-    gCdTickStep = 0;
+    gCdTickStep = CD_TICK_NONE;
     gCdIdle = 1;
     gCdTimeoutCounter = 0;
     gCdBusy = 0;
