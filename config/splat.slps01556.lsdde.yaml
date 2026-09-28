@@ -517,7 +517,7 @@ segments:
       - [0x15FD4, o, libetc/intr_vb]    # startIntrVSync ...
       - [0x16100, o, libetc/vsync]      # VSync, v_wait
       - [0x162E4, o, libc2/puts]        # puts
-      - [0x16334, c, class_16334]
+      - [0x16334, c, Pad]
       - [0x166AC, o, libetc/pad]        # PadInit, PadRead, PadStop   (Psy-Q 3.5 build)
       - [0x1674C, o, libapi/a22]        # BIOS A-function stubs
       - [0x1675C, o, libapi/a20]

@@ -2,7 +2,7 @@
 
 > Renamed from `func_80025BA0` on 2026-09-24 (tools/rename.py). Address 0x80025ba0.
 
-**Unit:** class_16334 · **Round:** 44 (2026-09-15)
+**Unit:** Pad · **Round:** 44 (2026-09-15)
 
 ## Provenance
 
@@ -57,7 +57,7 @@ first place.
 
 ## Round 95 (delta): Sony's declarations
 
-`include/class_16334.h` now takes `PadInit`/`PadRead`/`PadStop` from Sony's
+`include/Pad.h` now takes `PadInit`/`PadRead`/`PadStop` from Sony's
 `<libetc.h>` instead of local prototypes (`PadInit(void *)` became Sony's
 `PadInit(int mode)`). The ctor's first parameter forwards straight to
 `PadInit`, so `New_Pad`, `Pad__Pad` and the Pad ctor slot now take

@@ -21,7 +21,7 @@ BasicClassMethods *Get_vtable_BasicClass(void)
 ```
 
 `gBasicClassMethods` had no extern declaration anywhere in the tree yet (only prose
-references to it in `class_16334.h`, `GameApplicationFileResource.h`, `code_55dd4.h`,
+references to it in `Pad.h`, `GameApplicationFileResource.h`, `code_55dd4.h`,
 `SceneNode.h`, `GameApplication.h`). Added one to `include/code_8220.h`:
 
 ```c
@@ -62,7 +62,7 @@ it matches `gDreamSysMethods`, the one method table in the tree that is
 already named. **`tools/rename.py` refuses it** and I did not work around
 it: its "NEW already appears" guard fires because six files
 (`docs/match-reports/BasicClass__BasicClass.md`, this report,
-`Pad__LoadButtonTable.md`, `Get_vtable_Pad.md`, `include/class_16334.h`,
+`Pad__LoadButtonTable.md`, `Get_vtable_Pad.md`, `include/Pad.h`,
 `include/class_3bb8c.h`) already contain the string `BASICCLASS_METHODS` as
 PROSE describing this very symbol. The guard is correct in general and
 wrong in this instance; see `### Proposed learning` below.

@@ -183,7 +183,7 @@ unit.
 ## Scope
 
 **As first written (2026-08-29):** at minimum 8 functions in `GameApplicationFileResource`
-(runner/delta) and 1 in `class_16334` (runner/alpha). Almost certainly far
+(runner/delta) and 1 in `Pad` (runner/alpha). Almost certainly far
 more — any function touching a small-data global is affected, and `$gp`
 addressing is pervasive in retail. This likely gates a large fraction of the
 remaining 1300+ game functions.

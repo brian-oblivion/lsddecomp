@@ -46,7 +46,7 @@
  * setFlag, reach their parent's. */
 extern FileResourceMethods *GetActiveDataSourceMethods(void);
 
-/* The pool allocator (include/BMemPMgr.h, not included here; class_16334.c
+/* The pool allocator (include/BMemPMgr.h, not included here; Pad.c
  * declares it the same way). */
 extern void *BMemPMgrAlloc(s32 size);
 

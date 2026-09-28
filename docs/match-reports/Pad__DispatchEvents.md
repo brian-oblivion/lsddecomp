@@ -2,7 +2,7 @@
 
 > Renamed from `func_80025D10` on 2026-09-24 (tools/rename.py). Address 0x80025d10.
 
-**Unit:** class_16334 · **Size:** 65 words (0x104 bytes) · **Status:** MATCHED
+**Unit:** Pad · **Size:** 65 words (0x104 bytes) · **Status:** MATCHED
 (byte-exact, whole-image `./build-and-verify.sh` green) · Worked by the head in
 round 2026-08-30-a.
 

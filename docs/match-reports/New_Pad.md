@@ -2,7 +2,7 @@
 
 > Renamed from `func_80025B34` on 2026-09-24 (tools/rename.py). Address 0x80025b34.
 
-**Unit:** class_16334 · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED
+**Unit:** Pad · **Size:** 27 words (0x6C bytes) · **Status:** MATCHED
 (byte-exact, whole-image `./build-and-verify.sh` green) · Worked by the head in
 round 2026-08-30-a.
 
@@ -94,7 +94,7 @@ try both spellings before classifying it as a scheduling stall.
 
 ## Notes on the header
 
-`include/class_16334.h` previously declared `extern void *BMemPMgrAlloc(s32
+`include/Pad.h` previously declared `extern void *BMemPMgrAlloc(s32
 size, s32 zone);`. The call site sets only `$a0`, never `$a1` — and `$a1` still
 holds the incoming `port` at that point, so a genuine second argument would
 have had to be set up explicitly. Corrected to one parameter. The two-parameter
@@ -115,13 +115,13 @@ one shared epilogue. Try both before spending attempts on scheduling barriers.
 `New_DreamSys`, `New_TodActor`, etc. project-wide): allocates the instance
 through `BMemPMgrAlloc`, then calls the class's own ctor slot through
 `Get_vtable_Pad()`. `Pad` is the class name established for this whole unit
-(see `include/class_16334.h`'s header comment, confirmed by the direct
+(see `include/Pad.h`'s header comment, confirmed by the direct
 `PadInit`/`PadRead`/`PadStop` calls in `Pad__Pad`/`Pad__Finalize`/
 `Pad__UpdateMasks`). Only caller: `src/main.c`'s `New_Pad(0, 0)`.
 
 ## Round 95 (delta): Sony's declarations
 
-`include/class_16334.h` now takes `PadInit`/`PadRead`/`PadStop` from Sony's
+`include/Pad.h` now takes `PadInit`/`PadRead`/`PadStop` from Sony's
 `<libetc.h>` instead of local prototypes (`PadInit(void *)` became Sony's
 `PadInit(int mode)`). The ctor's first parameter forwards straight to
 `PadInit`, so `New_Pad`, `Pad__Pad` and the Pad ctor slot now take
