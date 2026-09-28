@@ -30,10 +30,13 @@
 extern const s16 gVariantSpriteClutX[];
 extern const s16 gVariantSpriteClutY[];
 
+/* One {x, y} entry of that table, in s16s: the stride both lookups index by. */
+#define VARIANT_CLUT_STRIDE 2
+
 void VariantSprite__SetVariantClut(VariantSprite *self, s32 variant) {
     self->variant = variant;
-    self->sprite.cx = gVariantSpriteClutX[variant * 2];
-    self->sprite.cy = gVariantSpriteClutY[variant * 2];
+    self->sprite.cx = gVariantSpriteClutX[variant * VARIANT_CLUT_STRIDE];
+    self->sprite.cy = gVariantSpriteClutY[variant * VARIANT_CLUT_STRIDE];
 }
 
 /*
@@ -53,19 +56,19 @@ void VariantSprite__UpdateScale(VariantSprite *self, s32 set, Ratio16 *ratios) {
 
     xWhole = ratios[0].num / ratios[0].den;
     xRem = ratios[0].num % ratios[0].den;
-    xFrac = (xRem << 12) / ratios[0].den;
-    xRatio = (xWhole << 12) + xFrac;
+    xFrac = (xRem << FIX12_SHIFT) / ratios[0].den;
+    xRatio = (xWhole << FIX12_SHIFT) + xFrac;
     xScale = (s16)xRatio;
 
     yWhole = ratios[1].num / ratios[1].den;
     yRem = ratios[1].num % ratios[1].den;
-    yFrac = (yRem << 12) / ratios[1].den;
-    yRatio = (yWhole << 12) + yFrac;
+    yFrac = (yRem << FIX12_SHIFT) / ratios[1].den;
+    yRatio = (yWhole << FIX12_SHIFT) + yFrac;
     yScale = (s16)yRatio;
 
     if (self->unk58 != 0) {
-        self->accumScaleX = ((s16)xRatio * self->accumScaleX) >> 12;
-        self->accumScaleY = ((s16)yRatio * self->accumScaleY) >> 12;
+        self->accumScaleX = ((s16)xRatio * self->accumScaleX) >> FIX12_SHIFT;
+        self->accumScaleY = ((s16)yRatio * self->accumScaleY) >> FIX12_SHIFT;
     } else {
         self->sprite.scalex = xScale;
         self->sprite.scaley = yScale;

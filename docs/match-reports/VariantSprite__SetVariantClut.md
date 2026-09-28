@@ -154,3 +154,13 @@ nothing, which the header now says.
   takes): the body reads `ratios[0]/[1]` and `[2]/[3]` as two such pairs.
   A body edit in `src/class_3bb8c_q.c`, so it is track 7's, not this
   pass's.
+
+## Track 7 (2026-09-28, round 101, echo)
+
+### Naming
+
+| name | tier | evidence |
+| --- | --- | --- |
+| `VARIANT_CLUT_STRIDE` (the literal `2` in `variant * 2`), unit-local in src/class_3bb8c_q.c | A | asm/data/76DC8.data.s holds one interleaved `{x, y}` table, `{0x3D0, 0x1FF}, {0x3E0, 0x1FF}`, which splat split into the 2-byte `gVariantSpriteClutX` and 6-byte `gVariantSpriteClutY`; both lookups step over one whole entry, 2 s16s, per variant ("The rodata shape" above). |
+
+The locals and parameter names here were already roles (`self`, `variant`).

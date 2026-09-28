@@ -177,3 +177,9 @@ class's track 7 pass (see `VariantSprite__SetVariantClut`'s report).
 `unk58` itself is also written by `Sprite__Reset` (src/Sprite.c, outside
 this job), so its name is proposed, not applied: see "Proposed field
 names" below.
+
+### Constants
+
+The six `12`s (`<< 12` three times per axis, `>> 12` on the product) are
+`FIX12_SHIFT` (include/common.h, 20.12 fixed point), as `Sprite.c`'s
+`Sprite__UpdateRotation` spells the same split division.
