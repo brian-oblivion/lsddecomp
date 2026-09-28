@@ -10,6 +10,9 @@
  * All six functions matched and named in round 81 (alpha).
  */
 #include "common.h"
+#include <libgte.h>
+#include <libgpu.h>
+#include <libgs.h>
 #include "FlatLightObj.h"
 
 /*
@@ -20,7 +23,6 @@
  */
 
 extern void *BMemPMgrAlloc(s32 size);
-extern int GsSetFlatLight(int id, FlatLightParams *lt);
 
 FlatLightObj *New_FlatLightObj(s32 lightId) {
     FlatLightObj *self;
@@ -47,7 +49,7 @@ void FlatLightObj__SetColor(FlatLightObj *self, s32 update, FlatLightColor *rgb)
     if (update) {
         self->light.rgb = *rgb;
     }
-    GsSetFlatLight(self->lightId, &self->light);
+    GsSetFlatLight(self->lightId, (GsF_LIGHT *)&self->light);
 }
 
 void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir) {
@@ -56,7 +58,7 @@ void FlatLightObj__SetDirection(FlatLightObj *self, s32 update, s16 *dir) {
         self->light.vy = dir[1];
         self->light.vz = dir[2];
     }
-    GsSetFlatLight(self->lightId, &self->light);
+    GsSetFlatLight(self->lightId, (GsF_LIGHT *)&self->light);
 }
 
 FlatLightObjMethods *Get_vtable_FlatLightObj(void) {
