@@ -317,7 +317,7 @@ residue, verified against the actual instructions below, not assumed.
 records `arg1` into `self->unk20`, dispatches `self->methods->slot30`
 (inherited BasicClass slot, `BasicClass__NotifyParents`) unconditionally, then
 `self->methods->slot64` (`IntermediateBase__OnStart`, already matched) if `arg1 == 2`,
-or `self->methods->slot68` (`IntermediateBase__OnState3`, next in this queue) if
+or `self->methods->slot68` (`IntermediateBase__OnStop`, next in this queue) if
 `arg1 == 3`. Fully understood -- the control flow, every field, and every
 slot identity all check out and are not in question.
 
@@ -443,7 +443,7 @@ unconditionally (`methods->slot30(self)`, itself still `slot30` since the
 occupant/dispatcher pair sits one level up this project doesn't rename
 without a clearer base-vs-derived split) and then, based on its own `arg1`
 parameter (stored into `self->unk20`), forwarding again to
-`IntermediateBase__OnStart` (mode 2) or `IntermediateBase__OnState3`
+`IntermediateBase__OnStart` (mode 2) or `IntermediateBase__OnStop`
 (mode 3) -- fully understood control flow per the report's own "What it
 does" section above, independent of the register-identity residue that
 stalls the byte match.

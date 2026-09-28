@@ -1,4 +1,6 @@
-# IntermediateBase__OnState3 — MATCH (20/20 words)
+# IntermediateBase__OnStop — MATCH (20/20 words)
+
+> Renamed from `IntermediateBase__OnState3` on 2026-09-28 (tools/rename.py). Address 0x8003e578.
 
 > Renamed from `Obj86B60__NotifyChildReset` on 2026-09-25 (tools/rename.py). Address 0x8003e578.
 
@@ -18,7 +20,7 @@ instance and dispatches its `slot4C`, then zeroes `self->unk1C`.
 ## The C
 
 ```c
-void IntermediateBase__OnState3(Obj86B60 *self)
+void IntermediateBase__OnStop(Obj86B60 *self)
 {
     Unk0ArgObj *obj0;
 
@@ -64,7 +66,7 @@ first build.
 
 ## Naming
 
-**IntermediateBase__OnState3** (renamed from `func_8003E578`, round 55,
+**IntermediateBase__OnStop** (renamed from `func_8003E578`, round 55,
 runner alpha). Tier B: `Obj86B60Methods::slot68` occupant (dispatched by
 `IntermediateBase__SetState` on mode 3), mirroring `IntermediateBase__OnStart`'s
 shape exactly but forwarding to `self->initArgs->unk0` instead --

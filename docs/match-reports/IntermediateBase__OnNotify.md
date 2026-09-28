@@ -62,7 +62,7 @@ literally this unit's queue: `+0x008 IntermediateBase__IntermediateBase`, `+0x03
 `+0x040 IntermediateBase__ResetCounters` (already matched), `+0x044 IntermediateBase__Init`,
 `+0x048 IntermediateBase__Deinit`, `+0x054 IntermediateBase__OnDrawSystemEvent`, `+0x05C IntermediateBase__IncrementFrameCounter`
 (already matched), `+0x060 IntermediateBase__SetState`, `+0x064 IntermediateBase__OnStart` (already
-matched), `+0x068 IntermediateBase__OnState3`. Every one of this round's 12 fresh
+matched), `+0x068 IntermediateBase__OnStop`. Every one of this round's 12 fresh
 functions except `New_Viewport`/`Viewport__Viewport`/`Viewport__Finalize`/
 `Viewport__AddChild`/`Viewport__RemoveChild` (a SECOND, unrelated shared table,
 `gViewportMethods`, see `New_Viewport.md`) is a slot of this one table.

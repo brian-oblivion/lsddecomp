@@ -1302,7 +1302,7 @@ void IntermediateBase__OnStart(IntermediateBase *self) {
     drawSystem->methods->start(drawSystem);
 }
 
-void IntermediateBase__OnState3(IntermediateBase *self) {
+void IntermediateBase__OnStop(IntermediateBase *self) {
     DrawSystem *drawSystem;
 
     drawSystem = (DrawSystem *)self->initArgs->drawSystem;
