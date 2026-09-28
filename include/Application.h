@@ -68,7 +68,9 @@ struct Pad; /* initSystems's pad: main()'s New_Pad(0, 0) */
 
 /* What runTitleMenu (+0x058) returns to Application__RunMainLoop, and the
  * hook each value runs; named, like the hooks, for GameApplication's
- * occupants (whose own view is GameApplication.h's GameApplicationLoopStatus). */
+ * occupants. GameApplication__RunTitleMenu returns OPENING when TitleMenu's
+ * result is nonzero (TaskCore's timeout is 1) and DAY when it is 0 or there
+ * is no menu (config->pollGraphRoom 0). */
 enum ApplicationLoopStatus {
     APPLICATION_LOOP_OPENING = 0, /* ends the inner loop: +0x054 (playOpeningMovie) again */
     APPLICATION_LOOP_SLOT5C = 1, /* +0x05C (slot5C), then runTitleMenu again; GameApplication never returns it */

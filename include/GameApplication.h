@@ -27,7 +27,7 @@
  *   +0x054 playOpeningMovie  PlayOpeningMovie: an opening movie
  *   +0x058 runTitleMenu    RunTitleMenu: GraphRoom and TitleMenu against
  *                                 the DreamSys; returns 0 or 2 to the loop
- *                                 (enum GameApplicationLoopStatus)
+ *                                 (enum ApplicationLoopStatus)
  *   +0x05C slot5C                 empty (GameApplication__NoOpSlot5C)
  *   +0x060 runDayTask          RunDayTask: one DayTask (include/DayTask.h),
  *                                 then maybe the current cinematic;
@@ -77,14 +77,6 @@ struct GameApplication {
     /* +0x024 */ s32 skipGraphRoomPoll; /* ctor clears; RunDayTask sets it on DAYTASK_RESULT_CLOSED;
                                          * RunTitleMenu skips its first GraphRoom while set, then clears it */
     /* +0x028 */ struct DreamSys *dreamSys; /* the ctor's New_DreamSys() */
-};
-
-/* What RunTitleMenu (+0x058) returns to Application__RunMainLoop: 0 goes
- * back to +0x054, the opening movie; 2 runs +0x060, a day, then the menu
- * again. (1, +0x05C and the menu again, is never returned.) */
-enum GameApplicationLoopStatus {
-    GAMEAPPLICATION_LOOP_OPENING = 0, /* TitleMenu's result was nonzero (TaskCore's timeout is 1) */
-    GAMEAPPLICATION_LOOP_DAY = 2 /* TitleMenu's result 0, or no menu (config->pollGraphRoom 0) */
 };
 
 /* The two overrides whose parameter lists differ from their slots'. */

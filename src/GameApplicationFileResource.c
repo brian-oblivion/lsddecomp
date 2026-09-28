@@ -199,8 +199,8 @@ void GameApplication__PlayOpeningMovie(GameApplication *self) {
  * it is day 1 or skipGraphRoomPoll is set (the last DayTask CLOSED), runs the
  * GraphRoom, then PlaySpecialDayMovies if it scored. Then the TitleMenu,
  * again after a GraphRoom each time it returns GRAPH. Returns
- * GAMEAPPLICATION_LOOP_DAY for the menu's result 0, else
- * GAMEAPPLICATION_LOOP_OPENING. */
+ * APPLICATION_LOOP_DAY for the menu's result 0, else
+ * APPLICATION_LOOP_OPENING. */
 s32 GameApplication__RunTitleMenu(GameApplication *self) {
     s32 status;
     s32 graphResult; /* MATCHING: set after the GraphRoom check, it holds its 2 in a saved register */
@@ -232,7 +232,7 @@ s32 GameApplication__RunTitleMenu(GameApplication *self) {
         self->skipGraphRoomPoll = 0;
         return ((u32)status < 1) << 1; /* MATCHING: status == 0 ? LOOP_DAY : LOOP_OPENING */
     }
-    return GAMEAPPLICATION_LOOP_DAY;
+    return APPLICATION_LOOP_DAY;
 }
 
 /* Builds a task with newTask(dreamSys), runs its init to the end (mode 0),
