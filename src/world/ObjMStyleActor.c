@@ -209,7 +209,7 @@ void ItemList__CursorDown(ItemList *self, s32 unused1, s32 unused2, s32 forwarde
 /* The first row's position, two sdata words (-92, -15). Read by value into
  * ItemList__CreateRows's `pos`; each further row is ITEMLIST_ROW_SPACING
  * lower. */
-extern s32 gItemListRowOriginX;
+extern s32 sItemListRowOriginX;
 extern s32 gItemListRowOriginY;
 
 /* The y step from one row to the next (createRows). */
@@ -227,7 +227,7 @@ void ItemList__CreateRows(ItemList *self, SceneNode *parent, TimImage *font, s32
         return;
     }
 
-    pos.x = gItemListRowOriginX;
+    pos.x = sItemListRowOriginX;
     pos.y = gItemListRowOriginY;
     count = self->itemCount;
     row = &self->rows[0];
