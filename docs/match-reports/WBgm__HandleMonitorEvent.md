@@ -2,7 +2,7 @@
 
 > Renamed from `func_80039C04` on 2026-09-25 (tools/rename.py). Address 0x80039c04.
 
-Round 81, runner delta. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
+Round 81, runner delta. Unit `src/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). Fresh ground, no prior attempt.
 
 - **Where:** gWBgmMethods slot none (called from +0x040, +0x05C, +0x060) (slots resolved with `tools/classtable.py gWBgmMethods`).
@@ -47,7 +47,7 @@ WBgm *New_WBgm(s32 vabArg, s32 seqArg, s32 autoPlay) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/code_2a0e0.c`:
+The unit-local view it needs, from the top of `src/WBgm.c`:
 
 ```c
 #include "BasicClass.h"

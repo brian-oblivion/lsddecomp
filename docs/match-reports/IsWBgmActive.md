@@ -2,7 +2,7 @@
 
 > Renamed from `func_8003A05C` on 2026-09-25 (tools/rename.py). Address 0x8003a05c.
 
-Round 81, runner echo. Unit `src/code_2a0e0.c` (carved from `psyq_2a0e0` in
+Round 81, runner echo. Unit `src/WBgm.c` (carved from `psyq_2a0e0` in
 FINISHING-PLAN revision 18). This was fresh ground with no prior attempt.
 
 - **Where:** not a class slot; unit-level getter.
@@ -24,7 +24,7 @@ s32 IsWBgmActive(void) {
 }
 ```
 
-The unit-local view it needs, from the top of `src/code_2a0e0.c`:
+The unit-local view it needs, from the top of `src/WBgm.c`:
 
 ```c
 #include "BasicClass.h"
