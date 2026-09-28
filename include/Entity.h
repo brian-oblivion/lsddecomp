@@ -114,7 +114,7 @@ typedef void (*EntityPlayTodFn)(Entity *self);
  * what each does; it ignores them all while a link is pending.
  * Entity__SetTargetReached sends ENTITY_EFFECT_LOG_MOOD, and
  * Entity__NotifyLinkStage picks one of the other three from the mood row's
- * gEntityLinkStageTable and gEntityEventVideoTable entries. */
+ * gEntityLinkStageTable and sEntityEventVideoTable entries. */
 enum EntityEffect {
     ENTITY_EFFECT_LOG_MOOD = 9, /* log getMoodEffect's mood, add getUnlockEffect to the unlock score */
     ENTITY_EFFECT_LINK_STAGE = 10,  /* link to the stage getLinkStage names */
@@ -146,7 +146,7 @@ extern s32 gEntityFadeBoxDefaultOffset[2];
  * every per-mood setting of an Entity is a column of it. Signed columns are
  * `s8` (`lb`); plain `char` would be unsigned here (-funsigned-char).
  *
- * gEntityLinkStageTable and gEntityEventVideoTable are two of its columns
+ * gEntityLinkStageTable and sEntityEventVideoTable are two of its columns
  * seen as flat arrays (the row base + 7 and + 8, indexed moodIndex * 16):
  * GCC spells a constant-offset field of a global array as `%hi`/`%lo(sym +
  * off)`, which splat labels as a symbol of its own. Entity still reads them
@@ -159,7 +159,7 @@ struct EntityMoodRow {
     s8 activeRange; /* +0x05, Entity__IsNearTarget's distance for the activation and deactivation range tests; 0: no range test */
     s8 proximityRange; /* +0x06, read by Entity__UpdateTargetProximity: magnitude (after abs) is Entity__IsNearTarget's distance arg for raising targetReached via setTargetReached; a NEGATIVE value also makes the entity face its target every tick */
     s8 linkStage; /* +0x07, Entity__GetLinkStage and Entity__NotifyLinkStage (gEntityLinkStageTable) */
-    s8 eventVideo; /* +0x08, Entity__GetEventVideo and Entity__NotifyLinkStage (gEntityEventVideoTable) */
+    s8 eventVideo; /* +0x08, Entity__GetEventVideo and Entity__NotifyLinkStage (sEntityEventVideoTable) */
     s8 nearTolerance; /* +0x09, Entity__IsNearTarget's tolerance for every range test on this row (activation, deactivation, proximity, cue start/stop) */
     s8 proximityThreshold; /* +0x0A, Entity__GetProximityRatio's range, in ENTITY_RANGE_UNITs */
     s8 cueRange; /* +0x0B, read by Entity__UpdateSoundCueStart/Entity__UpdateSoundCueStop and Entity__AttachToParent: 0 = the cue starts at attach (when the entity activated there) and never on range; magnitude (after abs) is Entity__IsNearTarget's distance arg for starting the sound cue; a NEGATIVE value also stops it again once the target leaves that range. SEPARATE field from proximityRange (+0x06) */
@@ -204,7 +204,7 @@ enum EntityDeactivateKind {
 
 extern EntityMoodRow gEntityMoodTable[];
 extern s8 gEntityLinkStageTable[];  /* the linkStage column (Entity) */
-extern s8 gEntityEventVideoTable[]; /* the eventVideo column (Entity) */
+extern s8 sEntityEventVideoTable[]; /* the eventVideo column (Entity) */
 
 /* The class's own methods, in ROM order (Entity, then Entity). A caller
  * reaching the base ones goes through GetTodActorMethods() and upcasts. */

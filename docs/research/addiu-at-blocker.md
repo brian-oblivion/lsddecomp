@@ -142,8 +142,8 @@ Retail reaches a **runtime-indexed global** — `sym[reg]` — by fully resolvin
 the symbol into `$at` and then loading at offset zero:
 
 ```
-lui   $at, %hi(gEntityEventVideoTable)
-addiu $at, $at, %lo(gEntityEventVideoTable)
+lui   $at, %hi(sEntityEventVideoTable)
+addiu $at, $at, %lo(sEntityEventVideoTable)
 addu  $at, $at, $v0
 lb    $v0, 0x0($at)
 ```
@@ -152,9 +152,9 @@ The project's pinned pipeline emits the *folded* three-instruction form
 instead, where `%lo` rides in the load's own displacement:
 
 ```
-lui  $at, %hi(gEntityEventVideoTable)
+lui  $at, %hi(sEntityEventVideoTable)
 addu $at, $at, $v0
-lbu  $v0, %lo(gEntityEventVideoTable)($at)
+lbu  $v0, %lo(sEntityEventVideoTable)($at)
 ```
 
 One instruction shorter. As with the gp-relative blocker, the mismatch is not
@@ -168,7 +168,7 @@ cc1 emits a single generic pseudo-op and expresses no opinion about addressing:
 
 ```
 sll  $4,$4,4
-lbu  $2,gEntityEventVideoTable($4)
+lbu  $2,sEntityEventVideoTable($4)
 ```
 
 The expansion happens below cc1. Note `$at` is the assembler's reserved
@@ -179,8 +179,8 @@ is macro expansion, not code generation.
 
 ```c
 typedef signed char s8;
-extern s8 gEntityEventVideoTable[];
-s8 probe(int i) { return gEntityEventVideoTable[i * 16] - 1; }
+extern s8 sEntityEventVideoTable[];
+s8 probe(int i) { return sEntityEventVideoTable[i * 16] - 1; }
 ```
 
 ```sh
@@ -718,7 +718,7 @@ It does not. cc1 emits the **same generic pseudo-op** for both and expresses no
 opinion about addressing:
 
 ```
-indexed global:      lbu $2,gEntityEventVideoTable($4)
+indexed global:      lbu $2,sEntityEventVideoTable($4)
 switch jump table:   lw  $2,$L13($2)
 ```
 

@@ -36,12 +36,12 @@
 
 ```c
 s32 Entity__GetEventVideo(Entity *this) {
-    return gEntityEventVideoTable[this->moodIndex * 0x10] - 1;
+    return sEntityEventVideoTable[this->moodIndex * 0x10] - 1;
 }
 ```
 
 Exactly the expression the report below derived, with the `(s8)` cast
-dropped -- `gEntityEventVideoTable` is already declared `extern s8 []` in
+dropped -- `sEntityEventVideoTable` is already declared `extern s8 []` in
 `include/Entity.h`, so the cast was redundant rather than wrong.
 
 ---
@@ -70,7 +70,7 @@ dropped -- `gEntityEventVideoTable` is already declared `extern s8 []` in
 
 ## What it does
 
-`return (s8)gEntityEventVideoTable[this->moodIndex * 0x10] - 1;` — a signed-byte table
+`return (s8)sEntityEventVideoTable[this->moodIndex * 0x10] - 1;` — a signed-byte table
 lookup indexed by `this->moodIndex` (a 16-byte stride, the same index used
 by `Entity__GetMoodEffect`/`Entity__GetUnlockEffect`/`Entity__GetLinkStage`,
 all four keyed off the same field, each with its own table).
@@ -78,13 +78,13 @@ all four keyed off the same field, each with its own table).
 ## The residue
 
 ```
-retail:  lui   $at,%hi(gEntityEventVideoTable)
-         addiu $at,$at,%lo(gEntityEventVideoTable)
+retail:  lui   $at,%hi(sEntityEventVideoTable)
+         addiu $at,$at,%lo(sEntityEventVideoTable)
          addu  $at,$at,$v0
          lb    $v0,0x0($at)
-built:   lui   $at,%hi(gEntityEventVideoTable)
+built:   lui   $at,%hi(sEntityEventVideoTable)
          addu  $at,$at,$v0
-         lb    $v0,%lo(gEntityEventVideoTable)($at)
+         lb    $v0,%lo(sEntityEventVideoTable)($at)
 ```
 
 Both compute the identical final address; retail fully resolves the symbol
@@ -98,9 +98,9 @@ with the pinned pipeline per CLAUDE.md's reproducer recipe:
 ```c
 typedef signed char s8;
 typedef signed int s32;
-extern s8 gEntityEventVideoTable[];
+extern s8 sEntityEventVideoTable[];
 s32 test(s32 mood) {
-    return gEntityEventVideoTable[mood * 0x10] - 1;
+    return sEntityEventVideoTable[mood * 0x10] - 1;
 }
 ```
 
@@ -109,7 +109,7 @@ pseudo-instruction:
 
 ```
 sll  $4,$4,4
-lb   $2,gEntityEventVideoTable($4)
+lb   $2,sEntityEventVideoTable($4)
 j    $31
 addu $2,$2,-1
 ```
@@ -209,7 +209,7 @@ s32 Entity__GetLinkStage(Entity *this) {
 ```c
 #if 0
 s32 Entity__GetEventVideo(Entity *this) {
-    return gEntityEventVideoTable[this->moodIndex * 0x10] - 1;
+    return sEntityEventVideoTable[this->moodIndex * 0x10] - 1;
 }
 #endif
 ```
@@ -239,7 +239,7 @@ reproducer above is self-contained and takes under a second to re-run.
 ## Naming
 
 **Tier A, pre-existing (round 2026-08-30-a), confirmed this round.** A pure
-getter over `gEntityEventVideoTable` (named this round). Not renamed.
+getter over `sEntityEventVideoTable` (named this round). Not renamed.
 
 ## Track 4 (2026-09-26, round 88, echo)
 
@@ -250,7 +250,7 @@ The class (id 0x1F234, table `gEntityMethods`) is unified as `Entity` in `includ
 - Step 2: The flat mood-row "tables" this body read are columns of gEntityMoodTable's
 16-byte row (their symbols are the row base 0x80089EA4 plus the column
 offset: gEntityUnlockKindTable +0x02, gEntityLinkStageTable +0x07,
-gEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
+sEntityEventVideoTable +0x08, gEntityProximityThresholdTable +0x0A,
 gEntityMoodHandlerTable +0x0C), now EntityMoodRow fields; byte-identical.
 Entity.h's old claim that they were "SEPARATE global arrays (own base
 symbols, own lui/addiu) ... not sub-fields of the gEntityMoodTable row" was

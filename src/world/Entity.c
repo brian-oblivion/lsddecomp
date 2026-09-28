@@ -453,7 +453,7 @@ s32 Entity__UpdateDeactivationState(Entity *this) {
  * Entity__UpdateSoundCueStop (+0x180) stops it again when the player leaves
  * that range. Entity__NotifyIfTargetInRange and Entity__IsTargetInRange are
  * the range test Entity__UpdateDeactivationState makes on the row's
- * gEntityEventVideoTable entry; GetEntityMethods is the table's getter.
+ * sEntityEventVideoTable entry; GetEntityMethods is the table's getter.
  *
  * The handlers. Each Entity__MoodCueNN is the `handler` of
  * gEntityMoodHandlerTable's row NN: rows 0, 1, 5 and 7 to 17 (rows 2 to 4
@@ -524,8 +524,8 @@ s32 Entity__UpdateSoundCueStart(Entity *this) {
  * Entity__UpdateDeactivationState, passes 0. */
 void Entity__NotifyIfTargetInRange(Entity *this, s32 unused) {
     if (gEntityLinkStageTable[this->moodIndex * 16] < 0 &&
-        gEntityEventVideoTable[this->moodIndex * 16] != 0 &&
-        Entity__IsTargetInRange(this, gEntityEventVideoTable[this->moodIndex * 16] << 9)) {
+        sEntityEventVideoTable[this->moodIndex * 16] != 0 &&
+        Entity__IsTargetInRange(this, sEntityEventVideoTable[this->moodIndex * 16] << 9)) {
         this->methods->notifyParents(this, ENTITY_EFFECT_LINK_STAGE);
     }
 }
