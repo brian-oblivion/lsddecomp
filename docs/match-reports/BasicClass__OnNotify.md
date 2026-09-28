@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_18358` on 2026-09-17 (tools/rename.py). Address 0x80018358.
 
-**Unit:** TmdRenderer · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
+**Unit:** tmd_renderer · **Size:** 14 instructions · **Status:** MATCHED (14/14 words)
 
 BasicClass vtable slot `+0x038` (`slot38` in `BasicClassMethods`). Called by
 `BasicClass__NotifyParents` (slot `+0x030`, `notifyParents`, still `INCLUDE_ASM`

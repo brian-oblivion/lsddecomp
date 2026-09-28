@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001844C` on 2026-09-17 (tools/rename.py). Address 0x8001844c.
 
-**Unit:** `TmdRenderer` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
+**Unit:** `tmd_renderer` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
 
 ## Verdict correction
 
@@ -25,7 +25,7 @@ void SetBMemPMgrBusy(s32 val)
 round) bracket their free-list walk with `SetBMemPMgrBusy(1)` on entry and
 `SetBMemPMgrBusy(0)` on exit, per those functions' own (stale-verdict, still
 undecoded) match reports. Declared `extern s32 sBMemPMgrBusy;` in
-`include/bmem_pmgr.h` since both `bmem_pmgr.c` and `TmdRenderer.c` read/
+`include/bmem_pmgr.h` since both `bmem_pmgr.c` and `tmd_renderer.c` read/
 write it.
 
 ## Provenance

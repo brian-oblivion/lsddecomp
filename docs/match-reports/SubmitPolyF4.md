@@ -31,12 +31,12 @@ NON_MATCHING body promoted, round 65.
 ## ROUND 65 (charlie): NON_MATCHING body promoted
 
 Track 1b mechanical promotion. The standing `#if 0` snapshot in
-`src/graphics/TmdRenderer.c` (family-shared register-identity residue, hand-derived
+`src/graphics/tmd_renderer.c` (family-shared register-identity residue, hand-derived
 per the round-13 HEAD PASS analysis this family shares — see
 `SubmitPolyF3.md`) is not a permuter candidate. Wrapped it in
 `#ifdef NON_MATCHING ... #else INCLUDE_ASM ... #endif` in place, no bytes
 changed. `./build-and-verify.sh`: `build exit=0`, `OK: build matches
-retail`. `tools/check-nonmatching.sh TmdRenderer`: `OK`. No stale symbol
+retail`. `tools/check-nonmatching.sh tmd_renderer`: `OK`. No stale symbol
 references (`RCpolyF4` is already the current name).
 
 ## ROUND 48 (bravo): first REAL per-function permuter search — not closed, fifth identical confirmation
@@ -90,14 +90,14 @@ transfer here.
 > cross-reference quotes exactly that evidence. So a faithfully-attributed
 > sibling figure makes this function read as SEARCHED and spent, which is the
 > expensive direction of error (round 37 corrected the same screen once already,
-> when it measured vocabulary instead of runs). Six of the nine `TmdRenderer`
+> when it measured vocabulary instead of runs). Six of the nine `tmd_renderer`
 > RCpoly siblings are in this position; one search covers the family.
 
 
 ## ROUND 40 (alpha): Job 1 rebuild-verify, third independent reproduction — 48/56, byte-identical
 
 Re-ran the Job-1 rebuild independently of round 36 and round 39 (bravo): the
-LIVE `#if 0` body in `src/graphics/TmdRenderer.c` (round-36 symbol-corrected,
+LIVE `#if 0` body in `src/graphics/tmd_renderer.c` (round-36 symbol-corrected,
 `RCpolyF4` not `func_8001A8D4`) toggled over `INCLUDE_ASM`, full oracle in
 isolation, reverted. `build exit=2`, zero compile-error/`undefined
 reference` hits.
@@ -117,7 +117,7 @@ wrapped in `#if 0`), ran the full oracle, reverted: **48/56, byte-identical
 diff to every prior round's report, no drift.**
 
 This round's assignment asked whether `include/gte.h` (new, round 38 --
-`TmdRenderer`'s `TransformAndCullPoly` closed 58/58 by replacing a whole-function
+`tmd_renderer`'s `TransformAndCullPoly` closed 58/58 by replacing a whole-function
 `__asm__` with C over its macros) or the "hoist both values before either is
 consumed" lever moved this family. Both were tested concretely on the family
 ROOT case (`SubmitPolyF3.md`, "ROUND 39" section) rather than repeated
@@ -138,7 +138,7 @@ shared position.
 ## ROUND 36: symbol rename verified, rebuilt LIVE, MEASURED (confirms the figure below)
 
 Round 34's SDK-object conversion renamed this function's Psy-Q callee
-`func_8001A8D4` -> `RCpolyF4` (a real `libgte` symbol). `src/graphics/TmdRenderer.c`'s
+`func_8001A8D4` -> `RCpolyF4` (a real `libgte` symbol). `src/graphics/tmd_renderer.c`'s
 preserved `#if 0` snapshot was updated to the new name in that same commit
 (`50fd52c`) but never rebuilt, so the `48/56` figure below was carried
 forward UNVERIFIED. This round swapped the snapshot in over the
@@ -150,7 +150,7 @@ against the linked SDK object, no `undefined reference`), and re-ran
 drift warning.** The rename did not disturb the residue.
 
 The corrected, LINKABLE snapshot (identical to what's live in
-`src/graphics/TmdRenderer.c`):
+`src/graphics/tmd_renderer.c`):
 
 ```c
 #if 0
@@ -179,13 +179,13 @@ void SubmitPolyF4(void *arg0, void *arg1) {
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyF4);
+INCLUDE_ASM("asm/nonmatchings/tmd_renderer", SubmitPolyF4);
 ```
 
 (`OtTag` and `RCpolyF4`'s prototype come from `include/code_8220.h`, already
 included by the unit.)
 
-Unit: `src/graphics/TmdRenderer.c`. Quad-flavored sibling of `SubmitPolyF3` (this
+Unit: `src/graphics/tmd_renderer.c`. Quad-flavored sibling of `SubmitPolyF3` (this
 unit, also stalled at the identical residue) — same OT-splice-or-calls
 structure, `sDivPolygon4` instead of `sDivPolygon3`, `FillRVectors4` (also
 stalled this unit, 6-arg quad-flavored copy) instead of `FillRVectors3`,
@@ -312,7 +312,7 @@ ruled out (cross-branch local forces a 4th saved register and drifts;
 branch-local unused local is eliminated by `-O2`) rather than re-running
 them here.
 
-## RUNNER PASS, permuter round (alpha, TmdRenderer): base confirmed, cross-reference only
+## RUNNER PASS, permuter round (alpha, tmd_renderer): base confirmed, cross-reference only
 
 Framing correction: HARD RULE 6 bans the asm/operand-constraint MECHANISM
 for register identity, not the outcome of a register differing -- see
@@ -324,7 +324,7 @@ family root: base = **260** (100 insertion + 100 deletion + 12x5 register
 diffs). Not independently full-searched this pass; time budget went to a
 deep single search on `SubmitPolyF3` (40000 iterations, floor held at
 260, two false leads found and falsified against the real oracle) plus
-reading `TmdRenderer`'s `SortTmdObject` for `self`'s real type -- see that
+reading `tmd_renderer`'s `SortTmdObject` for `self`'s real type -- see that
 report's new section for the trace, and `SubmitPolyGT4.md` for the one
 sibling where the caller's own field writes independently confirm the
 size formula. Permuter scaffold left provisioned at
@@ -397,13 +397,13 @@ residue, not a second hidden instance of the ADDIU/ORI blind spot.
 ## Naming (round 77, alpha)
 
 `func_80019B24` -> `SubmitPolyF4`, parameters (`arg0`, `arg1`) -> (`prim`, `ctx`). **Tier
-A.** TmdRenderer's own comment (`src/graphics/TmdRenderer.c`, the "eight submit
+A.** tmd_renderer's own comment (`src/graphics/tmd_renderer.c`, the "eight submit
 wrappers" block) already names this whole family collectively: each is a
 tail call to Sony's `RCpolyF4` (unrenamed, RCpoly* polygon-subdivision
 family, `libgte`) or a direct OT splice, matching every sibling's shape.
 This function's own discriminator: the splice arm returns
 `prim + 0x18` = `sizeof(POLY_F4)`, and the calls arm falls straight
-into `jal RCpolyF4`. `prim`/`ctx` match the parameter names TmdRenderer's
+into `jal RCpolyF4`. `prim`/`ctx` match the parameter names tmd_renderer's
 own `extern void *SubmitPolyF4(void *prim, void *ctx);` view already used.
 
 ## Round 91 polish (bravo)

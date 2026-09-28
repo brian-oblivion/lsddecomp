@@ -40,7 +40,7 @@ void StyleEffect__ReleaseSprites(LinkOwnerObj *this) {
 `addiu $a0, $a0, 0x84` then `jal ReleaseBasicClassArray` with `$a1 = 5` -- the
 address of `this+0x84` is passed directly (not loaded through it), so
 `+0x84` is an INLINE array field, not a pointer field. `ReleaseBasicClassArray` is
-already established elsewhere (`TmdRenderer.c`) as
+already established elsewhere (`tmd_renderer.c`) as
 `void ReleaseBasicClassArray(BasicClass **array, s32 count)` -- a release-all-N loop.
 Kept generic `void **` here rather than pulling in `BasicClass` from
 `code_8220.h`, matching this project's existing looser per-unit reading of

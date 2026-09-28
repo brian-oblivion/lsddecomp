@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001974C` on 2026-09-17 (tools/rename.py). Address 0x8001974c.
 
-**Unit:** TmdRenderer · **Size:** 10 instructions · **Status:** MATCHED (10/10 words)
+**Unit:** tmd_renderer · **Size:** 10 instructions · **Status:** MATCHED (10/10 words)
 
 Sibling of `StoreSxyPolyF4` — same conditional shape (full 3-register store
 vs. single IR3 store), different offsets: full store uses the stride-8

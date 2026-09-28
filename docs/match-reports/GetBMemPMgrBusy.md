@@ -2,7 +2,7 @@
 
 > Renamed from `func_80018458` on 2026-09-17 (tools/rename.py). Address 0x80018458.
 
-**Unit:** `TmdRenderer` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
+**Unit:** `tmd_renderer` · **Size:** 3 words · **Status:** MATCHED, 3/3 words, byte-exact.
 
 ## Verdict correction
 

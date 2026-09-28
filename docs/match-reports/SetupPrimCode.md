@@ -2,7 +2,7 @@
 
 > Renamed from `func_8001934C` on 2026-09-17 (tools/rename.py). Address 0x8001934c.
 
-Unit: `src/graphics/TmdRenderer.c`. Not previously declared in `include/code_8220.h`;
+Unit: `src/graphics/tmd_renderer.c`. Not previously declared in `include/code_8220.h`;
 called only from the still-`INCLUDE_ASM` giant `SortTmdObject` (13 call
 sites), so its two arguments' real struct types are unknown outside this
 function's own body. Treated both as raw byte-offset accesses rather than
@@ -74,7 +74,7 @@ half, and nothing establishes what the original called it.
 `arg0`.** The round-13 report treated both arguments as opaque byte
 offsets because "their real struct types are unknown outside this
 function's own body". They are not unknown any more. In
-`asm/nonmatchings/TmdRenderer/SortTmdObject.s`, every one of the 13
+`asm/nonmatchings/tmd_renderer/SortTmdObject.s`, every one of the 13
 dispatch cases writes a constant into `arg0`'s byte `+0x3` and another into
 byte `+0x7` in the two instructions immediately before `jal
 func_8001934C`, and the eight distinct pairs are Sony's Psy-Q primitive

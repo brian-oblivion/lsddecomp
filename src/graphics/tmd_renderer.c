@@ -1,5 +1,5 @@
 /*
- * TmdRenderer -- the game's TMD renderer.
+ * tmd_renderer -- the game's TMD renderer.
  *
  * SortTmdObject, the game's replacement for Sony's
  * GsSortObject4, turns a GsDOBJ2's TMD object into GPU primitives. Per face,
@@ -22,7 +22,7 @@
 #include <libgs.h>
 #include "draw_system.h"
 #include "gte.h"
-#include "TmdRenderer.h"
+#include "tmd_renderer.h"
 
 /* The drawn object's attribute bits, as SortTmdObject publishes them for
  * SetupPrimCode and the submit wrappers. Sony's GsSortObject4 keeps the same

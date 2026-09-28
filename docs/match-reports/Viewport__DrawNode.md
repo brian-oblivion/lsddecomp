@@ -138,7 +138,7 @@ gSpriteMethods 0x44, gScreenSpriteMethods 0x144); `>> 12` -> `FIX12_SHIFT`
 (GsCOORD2PARAM.scale is 20.12, ONE = unit); `(void *)0x1F800000` -> libetc's
 `getScratchAddr(0)` (the scratchpad base, as Sony's samples pass
 GsSortObject4); `14` -> unit-local `OTZ_BITS` (SortTmdObject indexes
-`otBase[otz >> otShift]`, TmdRenderer.c, so `14 - otLength` spans a 14-bit
+`otBase[otz >> otShift]`, tmd_renderer.c, so `14 - otLength` spans a 14-bit
 OTZ over 1 << otLength tags); `0x200` -> unit-local `SPRITE_POS_LIMIT 512`.
 Left literal: the class-id nibble masks `0xFF`/`0xFFF` (no name in
 basic_class.h beyond CLASS_ID_ROOT_MASK; proposed), the percent scale `100`
@@ -167,7 +167,7 @@ The unit banner, verbatim, as it was before this pass:
  * ScreenSprite (its GsSPRITE placed from `screenPos`), any other 0x44 a
  * Sprite projected from its GsCOORDINATE2's world position, and anything
  * else the node's own GsDOBJ2 (+0x010) sorted by SortTmdObject
- * (TmdRenderer.c), the game's replacement for GsSortObject4. A GridCell
+ * (tmd_renderer.c), the game's replacement for GsSortObject4. A GridCell
  * (0x24) whose GsDOFF bit is set is skipped outright.
  *
  * Before drawing, a node whose coord2 is dirty (flg == 0) rebuilds its matrix

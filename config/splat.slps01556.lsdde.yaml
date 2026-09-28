@@ -399,7 +399,7 @@ segments:
       # not cold-runner ground either -- budget it separately.
       # 0x8A88..0x8C64 (FreeBasicClassList..GetBMemPMgrBusy) is the end of
       # BasicClass and stays in app/BMemPMgr; the renderer starts at SortTmdObject.
-      - [0x8C64, c, graphics/TmdRenderer]
+      - [0x8C64, c, graphics/tmd_renderer]
       # code_8220_c: third and FINAL slice of the code_8220 block,
       # 0x9F74..0xAD64 (the next segment is psyq_rcpolyf3), 16 functions.
       # Carved round 13. Gate 2 checks, all run before the carve and all

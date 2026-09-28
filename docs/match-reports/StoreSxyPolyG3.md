@@ -2,7 +2,7 @@
 
 > Renamed from `func_800196E8` on 2026-09-17 (tools/rename.py). Address 0x800196e8.
 
-**Unit:** TmdRenderer · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
+**Unit:** tmd_renderer · **Size:** 5 instructions · **Status:** MATCHED (5/5 words)
 
 Sibling of `StoreSxyPolyF3` (see that report for the GTE-store family
 overview and the reproducer methodology). This one and `StoreSxyPolyFT3`

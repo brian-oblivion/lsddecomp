@@ -2,7 +2,7 @@
 
 > Renamed from `BasicClass__func_18350` on 2026-09-28 (tools/rename.py). Address 0x80018350.
 
-**Unit:** `TmdRenderer` · **Status:** matched since round 12; splat generated
+**Unit:** `tmd_renderer` · **Status:** matched since round 12; splat generated
 the body itself (`jr $ra; nop`). This report was created in round 51 by the
 naming pass, because a function that was looked at and left with a
 placeholder name needs the reason written down as much as a renamed one

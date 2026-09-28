@@ -4,7 +4,7 @@
 
 > Renamed from `func_80018390` on 2026-09-17 (tools/rename.py). Address 0x80018390.
 
-**Unit:** TmdRenderer · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
+**Unit:** tmd_renderer · **Size:** 4 instructions · **Status:** MATCHED (4/4 words)
 
 ## What it does
 

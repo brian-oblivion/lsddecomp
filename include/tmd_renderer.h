@@ -1,8 +1,8 @@
-#ifndef TMDRENDERER_H
-#define TMDRENDERER_H
+#ifndef TMD_RENDERER_H
+#define TMD_RENDERER_H
 
 /*
- * The TMD renderer, src/graphics/TmdRenderer.c: the per-face projection,
+ * The TMD renderer, src/graphics/tmd_renderer.c: the per-face projection,
  * lighting and subdivision a GsDOBJ2's TMD goes through into an ordering
  * table. The BasicClass methods and the pool allocator's busy flag at the
  * head of that file are declared by include/basic_class.h and

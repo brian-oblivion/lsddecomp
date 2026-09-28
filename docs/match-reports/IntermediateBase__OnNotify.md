@@ -9,7 +9,7 @@
 ## What it does
 
 `gIntermediateBaseMethods+0x038` (the "IntermediateBase" table): forwards to the
-BasicClass-level slot38 (`BasicClass__OnNotify`, `TmdRenderer`, signature
+BasicClass-level slot38 (`BasicClass__OnNotify`, `tmd_renderer`, signature
 `(BasicClass *self, void *arg1, s32 arg2)` per `include/code_8220.h`), then
 reads `arg1->target->header & 0xF` and dispatches to one of
 `self->methods->slot54/58/5C` (all three called with `(self, arg1, arg2)`)
@@ -104,7 +104,7 @@ confirmed. `GetBasicClassMethods()->slot38` is PROPOSED for rename to
 - `BasicClassMethodsCC8C::slot38` -> `onNotify` (tier A). Offset `+0x038`
   matches `include/code_8220.h`'s own canonical, already-named
   `BasicClassMethods::slot38` = `onNotify` exactly (`IS BasicClass__OnNotify`,
-  TmdRenderer, per this header's own comment). NOT renamed directly:
+  tmd_renderer, per this header's own comment). NOT renamed directly:
   `task.c`'s `Viewport__OnNotify` also calls
   `GetBasicClassMethods()->slot38(self, arg1, arg2)`, so this field is
   shared within the task family. Head applies by type scope (rename

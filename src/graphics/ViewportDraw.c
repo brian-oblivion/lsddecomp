@@ -20,7 +20,7 @@
  *    GTE's 16-bit screen z) and past nearZ, its x/y are clamped to
  *    SPRITE_POS_LIMIT, and its depth past nearZ over zDiv is its OT tag;
  *  - anything else: the node's own GsDOBJ2 (+0x010), under GsGetLws's light
- *    and local-screen matrices, to SortTmdObject (TmdRenderer.c), the
+ *    and local-screen matrices, to SortTmdObject (tmd_renderer.c), the
  *    game's replacement for GsSortObject4, when it has a TMD.
  * A GridCell whose GsDOFF bit is set is skipped, children and all.
  *
@@ -46,7 +46,7 @@
 #include "sprite.h"
 #include "ScreenSprite.h"
 #include "Viewport.h"
-#include "TmdRenderer.h"
+#include "tmd_renderer.h"
 
 /* The bits of avsz3's OTZ that one OT spans: SortTmdObject files a face at
  * otBase[otz >> (OTZ_BITS - otLength)], so 1 << otLength tags cover OTZ

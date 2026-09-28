@@ -50,7 +50,7 @@ rather than API.
   defined `void`; `SetActiveDataSourceDriverMode` `s32` in DayTaskStageMap.h:57
   vs `void` definition; `GetSoundEffectDir(s32)` vs `(void)`;
   `IsStyleVariantEven` `bool` vs `s32`; `ReleaseBasicClassArray` in task.h:32
-  `(void *, void *)` vs `(BasicClass **, s32)` at TmdRenderer.c:86 (plus three
+  `(void *, void *)` vs `(BasicClass **, s32)` at tmd_renderer.c:86 (plus three
   `void **` spellings); `GetActiveDataSourceMethods` local in 4 files;
   `GetSetBitField` duplicated (sprite.c:41, task.h:36 vs scene_node.h:216);
   `ApplyMatrixToLVArray` extern at ViewportDraw.c:62 though scene_node.h is
@@ -157,10 +157,10 @@ rather than API.
   `sSortLightOff`, `sSortNdiv`; `TimImage flag48`; SceneNode link events 2/3/4
   as literals (Actor.h names 5-8); `New_TimBlockSrc(s32 name)` and
   `ModelData__ForwardScan*` take pointers as `s32`; the `+ 0x5C` at
-  TmdRenderer.c:1194 is `offsetof(PolyDrawCtx, sxy) - sizeof(DVECTOR)`;
+  tmd_renderer.c:1194 is `offsetof(PolyDrawCtx, sxy) - sizeof(DVECTOR)`;
   stale `unk2A` in TimBlockSrc.h/TileMap.h/TileAtlas.h (now `loadState`);
   scene_node.c's two mid-file banners and self-reference (merge leftovers);
-  TmdRenderer.c opens with BasicClass/BMemPMgr helpers.
+  tmd_renderer.c opens with BasicClass/BMemPMgr helpers.
 - **world:** DreamSys `func_59590`, `func_59598`, `func_5ba20` (a get/set of
   `unk_0x924`); dream_sys.h's `unk_0x*` fields (snake/hex spelling, no offset
   comments; `unknown_values_0x922` looks like padding); dream_aux's

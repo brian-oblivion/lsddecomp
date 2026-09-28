@@ -53,12 +53,12 @@ NON_MATCHING body promoted, round 65.
 
 Track 1b mechanical promotion. The "Best body reached (46/54 words)" section
 below (the HEAD PASS body, already the live `#if 0` snapshot in
-`src/graphics/TmdRenderer.c`, using the current `RCpolyF3` name per the round-36
+`src/graphics/tmd_renderer.c`, using the current `RCpolyF3` name per the round-36
 rename) is hand-derived, not a permuter candidate — see the HEAD PASS/RUNNER
 PASS sections. Wrapped it in `#ifdef NON_MATCHING ... #else INCLUDE_ASM
 ... #endif` in place of the standing `#if 0`/`INCLUDE_ASM` pair, no bytes
 changed. `./build-and-verify.sh`: `build exit=0`, `OK: build matches retail`.
-`tools/check-nonmatching.sh TmdRenderer`: `OK`. No stale symbol references
+`tools/check-nonmatching.sh tmd_renderer`: `OK`. No stale symbol references
 (the body already uses current names; `tools/stalesyms.py` flags only the
 older, already-annotated historical snapshots elsewhere in this report).
 
@@ -108,7 +108,7 @@ analysis, unchanged.
 ## ROUND 40 (alpha): Job 1 rebuild-verify, third independent reproduction — 46/54, byte-identical
 
 Re-ran the Job-1 rebuild independently of round 36 and round 39 (bravo): took
-the LIVE `#if 0` body already sitting in `src/graphics/TmdRenderer.c` (the round-36
+the LIVE `#if 0` body already sitting in `src/graphics/tmd_renderer.c` (the round-36
 symbol-corrected snapshot, `RCpolyF3` not `func_8001A564`), toggled it over
 `INCLUDE_ASM`, ran the full oracle in isolation (no other sibling live), and
 reverted. `build exit=2`, zero compile-error/`undefined reference` hits —
@@ -179,7 +179,7 @@ future round with a genuinely new hypothesis — most plausibly one that
 recovers `self`'s TRUE type from a not-yet-carved caller unit, since round
 13's runner pass already showed the filler formula matches a real record
 stride visible in `SubmitPolyGT4`'s own preceding GTE code in
-`TmdRenderer`'s `SortTmdObject` — is the only kind of attempt likely to
+`tmd_renderer`'s `SortTmdObject` — is the only kind of attempt likely to
 move this family. Spending this round's attempt budget re-running any of
 the above would not have been a new experiment.
 
@@ -187,7 +187,7 @@ the above would not have been a new experiment.
 
 This round's assignment asked two things explicitly, because `include/gte.h`
 (committed round 38, `dc88d61`) closed `TransformAndCullPoly` in the sibling unit
-`TmdRenderer` by replacing a whole-function raw-register `__asm__` with
+`tmd_renderer` by replacing a whole-function raw-register `__asm__` with
 ordinary C over GTE macros, and this whole nine-function family was filed as
 "register-identity residue" before that layer existed — CLAUDE.md's own
 warning about a verdict outliving its premise.
@@ -278,7 +278,7 @@ this round's two candidate levers, for reasons specific to each** (the GTE
 layer's domain doesn't overlap this family's; the hoist lever's precondition
 —two independently-producible values consumed later—doesn't describe a
 single already-atomic bitfield RMW). No new match this round. All eight
-siblings' `src/graphics/TmdRenderer.c` bodies are unchanged (`git diff --stat` empty
+siblings' `src/graphics/tmd_renderer.c` bodies are unchanged (`git diff --stat` empty
 throughout every experiment, confirmed after each revert).
 
 ### Proposed learning
@@ -299,7 +299,7 @@ connect them.
 
 Round 34's SDK-object conversion renamed this function's Psy-Q callee
 `func_8001A564` -> `RCpolyF3` (a real `libgte` symbol, in
-`config/symbols.slps01556.lsdde.txt`). `src/graphics/TmdRenderer.c`'s own preserved
+`config/symbols.slps01556.lsdde.txt`). `src/graphics/tmd_renderer.c`'s own preserved
 `#if 0` snapshot (the HEAD PASS's `OtTag`-bitfield body, below) was updated
 to the new name in that same commit (`50fd52c`), but it was never swapped
 back in and rebuilt — every score this report records for that body,
@@ -317,7 +317,7 @@ attribution).
 `funcdiff` raised no drift warning.** The rename did not disturb the
 residue in any way; it only converts the existing figure from assumed to
 measured. The corrected, LINKABLE snapshot (identical to what's live in
-`src/graphics/TmdRenderer.c` right now):
+`src/graphics/tmd_renderer.c` right now):
 
 ```c
 #if 0
@@ -347,7 +347,7 @@ void SubmitPolyF3(void *arg0, void *arg1) {
 }
 #endif
 
-INCLUDE_ASM("asm/nonmatchings/TmdRenderer", SubmitPolyF3);
+INCLUDE_ASM("asm/nonmatchings/tmd_renderer", SubmitPolyF3);
 ```
 
 (`OtTag`, `PolyVtx`, `PolyUV4` and `RCpolyF3`'s prototype come from
@@ -364,7 +364,7 @@ edit the history to retrofit the new name into it.
 > at 46/54 words and "not reachable from C"; the head reached correct
 > instruction count and length. See the HEAD PASS section.
 
-Unit: `src/graphics/TmdRenderer.c`. `void SubmitPolyF3(void *arg0, void *arg1)` —
+Unit: `src/graphics/tmd_renderer.c`. `void SubmitPolyF3(void *arg0, void *arg1)` —
 either splices `arg0` into an OT-style singly-linked list threaded through
 `arg1->0x30` (packed pointer: top byte is a tag preserved across the
 splice, low 24 bits are the address), or — when `arg1->0x78` is set —
@@ -434,7 +434,7 @@ linked-list splice).
    `*head = (*head & top) | (arg0_as_int & low)`, where `head` is loaded
    TWICE from `arg1->0x30` (a genuine reload each time, not a cache) — a
    THIRD instance of the reload-not-cache idiom already confirmed twice in
-   `TmdRenderer`. First attempt at this shape used one shared `head`/
+   `tmd_renderer`. First attempt at this shape used one shared `head`/
    `headPtr` local reused for both reads — 44/54 still, both reloads landed
    in the SAME hardware register (`$a2` in the build), where retail uses
    TWO DIFFERENT registers (`$v0` then `$a1`) for its two reloads.
@@ -661,7 +661,7 @@ identifying `self`'s real type from a caller of this function (most likely
 signature and its `arg1`/`arg0` roles match those functions' own `(self,
 prim)` calling convention closely enough to suspect these ARE
 `ProjectTriFace`'s `callback` argument) rather than from anything visible
-within `TmdRenderer` alone.
+within `tmd_renderer` alone.
 
 ## HEAD NOTE, round 13: the filler is CODE MOTION, not an arithmetic formula
 
@@ -698,10 +698,10 @@ nested, not about arithmetic.
 And the runner's own closing observation still stands and is probably the
 cheapest route: this is most likely determined by `self`'s real TYPE, which
 is knowable from the family's CALLER rather than from any member of the
-family. `SortTmdObject` in `TmdRenderer` — the deprioritized 958-instruction
+family. `SortTmdObject` in `tmd_renderer` — the deprioritized 958-instruction
 body — calls two of these siblings, and is where that type is visible.
 
-## RUNNER PASS, permuter round (alpha, TmdRenderer): base confirmed, no zero, one lead falsified, self-type partially recovered
+## RUNNER PASS, permuter round (alpha, tmd_renderer): base confirmed, no zero, one lead falsified, self-type partially recovered
 
 **Framing correction first.** An earlier draft of this session's status message
 called the register-identity half of this residue "a STALL, full stop, not a
@@ -761,7 +761,7 @@ real negative, checked, not assumed:**
   is exactly the "one shared local" shape and is DIFFERENT from the round-13
   head's already-tried "cache the fully-formed VALUE" attempts. **Verified
   against the real oracle, not trusted on the permuter's own number:**
-  swapped it into `src/graphics/TmdRenderer.c` in place of the `INCLUDE_ASM`, ran
+  swapped it into `src/graphics/tmd_renderer.c` in place of the `INCLUDE_ASM`, ran
   `./build-and-verify.sh` (build exit=0, no compile error) and
   `funcdiff.py SubmitPolyF3` — **17/54 words, and funcdiff's own drift
   warning fired: "the build differs OUTSIDE this range too (296814 bytes)."**
@@ -770,7 +770,7 @@ real negative, checked, not assumed:**
   re-evaluation rule says must stay — reproducing, from a different angle,
   the same address-drift failure round 13 already hit trying to give the
   "one past self" address a cross-branch-live local. Reverted immediately;
-  `src/graphics/TmdRenderer.c` is back to the committed `INCLUDE_ASM` state (confirmed
+  `src/graphics/tmd_renderer.c` is back to the committed `INCLUDE_ASM` state (confirmed
   via `git diff --stat`, empty).
 - The two 240/215 near-duplicates not individually oracle-tested are the same
   cached-`head` shape or the same truncating-cast shape as the ones above,
@@ -784,7 +784,7 @@ residue remains open, not exhausted, and not disproven-reachable — it simply
 was not closed by 40000 blind iterations or by the specific "cache the OT
 pointer once" reshaping.
 
-**`self`'s real type, read from `TmdRenderer`'s `SortTmdObject` (read-only;
+**`self`'s real type, read from `tmd_renderer`'s `SortTmdObject` (read-only;
 no edit made, per parallel-mode rules — nobody holds that unit this round).**
 Traced all eight `jal` call sites to this family inside `SortTmdObject`
 (`SubmitPolyF3` at two sites, `SubmitPolyG3`/`SubmitPolyFT3`/
@@ -832,7 +832,7 @@ window while failing the whole-image length check outright.
 
 ## RUNNER PASS, permuter round continued (alpha): hinted PERM_GENERAL search on the "one-past-end pointer" hypothesis -- negative, not exhausted
 
-Following the head's lead from the `TmdRenderer` read (`SubmitPolyGT4`'s
+Following the head's lead from the `tmd_renderer` read (`SubmitPolyGT4`'s
 filler independently measured as one-past-the-end of 4 stride-0xC records),
 tested the concrete hypothesis that this function's own filler
 (`addiu $v0,$s1,0x14`, one past `uv2` at `arg0+0x10`) comes from a genuine
@@ -995,7 +995,7 @@ on this family, including this one. If one exists, it most likely comes
 from `self`'s TRUE type having some property (a trailing member whose
 address is computed via a non-constant expression, e.g. indexed by a
 runtime flag already read earlier in this SAME function) rather than from
-any reshaping of the C already written -- and nothing in `TmdRenderer`
+any reshaping of the C already written -- and nothing in `tmd_renderer`
 alone currently suggests such a property exists.
 
 ### Proposed learning
@@ -1033,7 +1033,7 @@ every GTE/COP2 mnemonic.**
 
 ```
 grep -cE 'swc2|lwc2|mfc2|mtc2|cfc2|ctc2|rtps|rtpt|nclip|gte' \
-  asm/nonmatchings/TmdRenderer/{FillRVectors4,SubmitPolyF3,SubmitPolyF4,\
+  asm/nonmatchings/tmd_renderer/{FillRVectors4,SubmitPolyF3,SubmitPolyF4,\
   FlagLargePolyForDivide,SubmitPolyFT3,SubmitPolyG3,SubmitPolyFT4,SubmitPolyG4,\
   SubmitPolyGT3,SubmitPolyGT4}.s
 ```
@@ -1044,7 +1044,7 @@ within its own basic blocks to a single GTE or COP2 instruction. They are
 pure GPR-only OT-splice/struct-copy/bounding-box code; the GTE/COP2 leaves
 in this unit are `StoreSxyPolyFT4`/`StoreSxyPolyGT4` (already matched, distinct
 functions, no call relationship to this family) and the raw-register asm
-blocks GTE work happens in `TmdRenderer`.
+blocks GTE work happens in `tmd_renderer`.
 
 **Conclusion: the COP2-clobber trap cannot be the cause of this family's
 residue, for any of the nine still-open siblings, full stop — there is no
@@ -1071,7 +1071,7 @@ raw-register `__asm__` written for an ordinary struct copy that had a plain
 C form all along, misdiagnosed as a scheduling residue) does NOT recur
 anywhere in this nine-function family.** Every one of these nine functions'
 preserved best-body sources (see each one's own report, and the bodies
-still inlined in `src/graphics/TmdRenderer.c` under `#if 0`) is already ordinary C —
+still inlined in `src/graphics/tmd_renderer.c` under `#if 0`) is already ordinary C —
 the `OtTag` bitfield splice plus the `FillDivPolygonHeader`/`FillRVectors3`/
 `FillRVectors4` call sequence — with no asm block anywhere in any of them.
 So the two residue classes on this unit's work list are genuinely distinct:
@@ -1155,7 +1155,7 @@ still-stalled function before switching to grepping the `.s` files directly).**
 Grepped all eight siblings' own `.s` for the mask-constant `lui`:
 
 ```
-$ grep -n 'lui.*\$a[0-9], (0xFF000000' asm/nonmatchings/TmdRenderer/func_*.s
+$ grep -n 'lui.*\$a[0-9], (0xFF000000' asm/nonmatchings/tmd_renderer/func_*.s
 SubmitPolyF3.s:19:   lui   $a2, (0xFF000000 >> 16)
 SubmitPolyG3.s:19:   lui   $a2, (0xFF000000 >> 16)
 SubmitPolyFT3.s:19:   lui   $a2, (0xFF000000 >> 16)
@@ -1287,13 +1287,13 @@ residue, not a second hidden instance of the ADDIU/ORI blind spot.
 ## Naming (round 77, alpha)
 
 `func_800197C4` -> `SubmitPolyF3`, parameters (`arg0`, `arg1`) -> (`prim`, `ctx`). **Tier
-A.** TmdRenderer's own comment (`src/graphics/TmdRenderer.c`, the "eight submit
+A.** tmd_renderer's own comment (`src/graphics/tmd_renderer.c`, the "eight submit
 wrappers" block) already names this whole family collectively: each is a
 tail call to Sony's `RCpolyF3` (unrenamed, RCpoly* polygon-subdivision
 family, `libgte`) or a direct OT splice, matching every sibling's shape.
 This function's own discriminator: the splice arm returns
 `prim + 0x14` = `sizeof(POLY_F3)`, and the calls arm falls straight
-into `jal RCpolyF3`. `prim`/`ctx` match the parameter names TmdRenderer's
+into `jal RCpolyF3`. `prim`/`ctx` match the parameter names tmd_renderer's
 own `extern void *SubmitPolyF3(void *prim, void *ctx);` view already used.
 
 ## Round 91 polish (bravo): Sony's types, and where the old comments went
@@ -1328,7 +1328,7 @@ Byte-identical on the first build, for all eight wrappers.
   `void *(*)(void *, void *)` casts round 75 needed are gone, and so is the
   `void` extern in include/code_8220.h that carried round 50's
   return-value lead (removed from the header with the other
-  TmdRenderer-only declarations).
+  tmd_renderer-only declarations).
 - **The OT splice is libgpu's `addPrim(ot, p)`.** Round 13's head pass found
   the splice had to be a 24-bit bitfield read-modify-write (a local
   `OtTag { u32 addr : 24; u32 len : 8; }` in include/code_8220.h, "the same
@@ -1339,5 +1339,5 @@ Byte-identical on the first build, for all eight wrappers.
 - The `ctx+0x78` flag is named `divide` in this unit's view (`PolyDrawCtx`):
   its only readers are these eight wrappers, and nonzero sends the face to
   RCpoly*. Its writers are FlagLargePolyForDivide (screen span) and
-  TmdRenderer's TransformAndCullPoly (GTE FLAG 0x40000, screen Z
+  tmd_renderer's TransformAndCullPoly (GTE FLAG 0x40000, screen Z
   saturated), whose own view calls it `saturated`.

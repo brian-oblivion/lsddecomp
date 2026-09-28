@@ -17,7 +17,7 @@ byte-identical, and the `## Naming` section at the end of this report
 carries the evidence for each one.
 
 ```c
-extern s32 GetBMemPMgrBusy(void); /* TmdRenderer */
+extern s32 GetBMemPMgrBusy(void); /* tmd_renderer */
 extern s32 sCdUseVSyncCallback;
 extern s32 sCdTickStep;
 extern void TickCdStateMachine(void); /* CdDriver: state-machine step 1 */
@@ -73,7 +73,7 @@ s32 ServiceCdDriver(void)
 ## Derivation
 
 Two early-return guards (the `sCdLock` latch, then `GetBMemPMgrBusy()`
-gp_rel getter from `TmdRenderer`) both return literal `0` — **not** the
+gp_rel getter from `tmd_renderer`) both return literal `0` — **not** the
 callee's own return value, even for the `GetBMemPMgrBusy()` guard. This was
 the one wrinkle: an intermediate attempt captured `GetBMemPMgrBusy()`'s result
 in a local and did `return result;`, reasoning that the branch target skips
