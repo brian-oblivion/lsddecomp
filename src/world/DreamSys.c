@@ -78,19 +78,19 @@ extern s32 sLookYawLimits[3];
 extern s32 sMoveModeSpeeds[5];
 extern s8 sMoveCommandSigns[8];
 
-/* One 12-byte-stride RotationRatios table under two labels:
+/* One table of Ratio16[3] entries under two labels:
    DreamSys__StepLookYaw references its SECOND word (entry 0's yaw
    numerator, which it overwrites with its own per-tick delta) while
    DreamSys__ApplyPendingTurn address-takes whole entries. Entry 0 is
    (0 deg, 45 deg, 0 deg), the 45 being the +-0x2D DreamSys__StepLookYaw
    writes; entries 1, (0, -6, 0), and 2, (0, +6, 0), are
    DreamSys::turnCommand's values 1 and 2. */
-extern RotationRatio sTurnRotationYaw[]; /* == &sTurnRotations[0].y */
-extern RotationRatios sTurnRotations[];
+extern Ratio16 sTurnRotationYaw[]; /* == &sTurnRotations[0][1] */
+extern Ratio16 sTurnRotations[][3];
 
 /* (0 deg, 180 deg, 0 deg). Address-of only, forwarded as SceneNode__UpdateRotation's
    arg2 with flag 1 (absolute) by DreamSys__ResetSessionState. */
-extern RotationRatios sRotationYaw180;
+extern Ratio16 sRotationYaw180[3];
 
 /* DreamSys__TickDrift's per-tick addTranslation (+0x0BC) step. */
 extern LongVec3 sDriftStep;
@@ -110,15 +110,15 @@ extern struct RelativePos sStaircaseOffset3;
 
 /* (0 deg, +45 deg, 0 deg), forwarded as vtable slot +0x044's (SceneNode__UpdateRotation)
    arg2 with flag 0 (relative) by DreamSys__TickStaircaseYawPlus90 and
-   DreamSys__TickStaircaseYawPlus45. Its three {numerator, denominator} words
+   DreamSys__TickStaircaseYawPlus45. Its three {num, den} Ratio16s
    are {0,1} {0x2D,1} {0,1}, the same form as sRotationYaw180 and every
    sCardinalRotations entry. */
-extern RotationRatios sRotationYawPlus45;
+extern Ratio16 sRotationYawPlus45[3];
 
 /* (0 deg, -45 deg, 0 deg) -- the mirror of sRotationYawPlus45 above
    ({0,1} {0xFFD3,1} {0,1}), used the same way by
    DreamSys__TickStaircaseYawMinus135 and DreamSys__TickStaircaseYawMinus90. */
-extern RotationRatios sRotationYawMinus45;
+extern Ratio16 sRotationYawMinus45[3];
 
 /* 3x3 lookup table indexed by [dynamicClass][upperClass], each axis
    classified into {0,1,2} by CalcDreamColor first. */
@@ -235,7 +235,7 @@ DreamSys *DreamSys__DreamSys(DreamSys *self, LinkResource *modelSource, s32 soun
 
 void DreamSys__ResetSessionState(DreamSys *self) {
     self->methods->setDisplay(self, 0);
-    self->methods->updateRotation(self, 1, &sRotationYaw180);
+    self->methods->updateRotation(self, 1, sRotationYaw180);
     self->lookCallback = NULL;
     self->moveCallback = NULL;
     self->soundCueSet.tag = 0;
@@ -443,7 +443,7 @@ void DreamSys__SetMoveOverride(DreamSys *self, s32 value) {
 }
 
 void DreamSys__ResetLinkState(DreamSys *self, s32 moveMode, s32 tickPeriod) {
-    RotationRatios rotation;
+    Ratio16 rotation[3];
 
     self->methods->logChunkMood(self, &self->linkCoordinates);
     self->methods->selectLookCallback(self, LOOK_CALLBACK_STEP_LOOK);
@@ -471,11 +471,11 @@ void DreamSys__ResetLinkState(DreamSys *self, s32 moveMode, s32 tickPeriod) {
     self->staircaseMoveGate = 0;
     self->staircaseTickFn = 0;
     self->unk_0x78 = 0;
-    SceneNode__GetRotationDegrees((SceneNode *)self, (Ratio16 *)&rotation);
+    SceneNode__GetRotationDegrees((SceneNode *)self, rotation);
 
-    rotation.z.numerator = 0;
-    rotation.z.denominator = 1;
-    self->methods->updateRotation(self, 1, &rotation);
+    rotation[2].num = 0;
+    rotation[2].den = 1;
+    self->methods->updateRotation(self, 1, rotation);
 }
 
 void DreamSys__BlockMovement(DreamSys *self) {
@@ -698,7 +698,7 @@ void DreamSys__StepLookYaw(DreamSys *self) {
         threshold = sLookYawLimits[idx];
         sum = delta + self->lookYaw;
         if ((sum >= 0) ? (sum < threshold) : ((~sum + 1) < threshold)) {
-            sTurnRotationYaw[0].numerator = delta;
+            sTurnRotationYaw[0].num = delta;
             self->methods->updateRotation(self, 0, &sTurnRotationYaw[-1]);
             self->lookYaw = sum;
         }
@@ -708,7 +708,7 @@ void DreamSys__StepLookYaw(DreamSys *self) {
         delta = -LOOK_YAW_RETURN_STEP;
         if (self->lookYaw < 0)
             delta = LOOK_YAW_RETURN_STEP;
-        sTurnRotationYaw[0].numerator = delta;
+        sTurnRotationYaw[0].num = delta;
         self->methods->updateRotation(self, 0, &sTurnRotationYaw[-1]);
         self->lookYaw += delta;
         flipTarget = self;
@@ -871,7 +871,7 @@ void DreamSys__ApplyPendingTurn(DreamSys *self) {
 
     idx = self->turnCommand;
     if (idx != 0) {
-        self->methods->updateRotation(self, 0, &sTurnRotations[idx]);
+        self->methods->updateRotation(self, 0, sTurnRotations[idx]);
         self->turnCommand = 0;
     }
 }
@@ -1216,7 +1216,7 @@ s32 DreamSys__TickStaircaseYawPlus90(DreamSys *self) {
         if (self->staircaseFrame >= 19)
             return 1;
         if ((u32)(self->staircaseFrame - 8) < 2 || (u32)(self->staircaseFrame - 13) < 2) {
-            self->methods->updateRotation(self, 0, &sRotationYawPlus45);
+            self->methods->updateRotation(self, 0, sRotationYawPlus45);
         }
     }
     self->moveCommand = MOVE_COMMAND_FORWARD;
@@ -1243,7 +1243,7 @@ s32 DreamSys__TickStaircaseYawMinus135(DreamSys *self) {
             return 1;
         if ((u32)(self->staircaseFrame - 6) < 2 || (u32)(self->staircaseFrame - 11) < 2 ||
             (u32)(self->staircaseFrame - 20) < 2) {
-            self->methods->updateRotation(self, 0, &sRotationYawMinus45);
+            self->methods->updateRotation(self, 0, sRotationYawMinus45);
         }
         flag = (u32)(self->staircaseFrame - 3) < 14;
     }
@@ -1270,7 +1270,7 @@ s32 DreamSys__TickStaircaseYawPlus45(DreamSys *self) {
     } else {
         if (self->staircaseFrame < 15) {
             if ((u32)(self->staircaseFrame - 8) < 2) {
-                self->methods->updateRotation(self, 0, &sRotationYawPlus45);
+                self->methods->updateRotation(self, 0, sRotationYawPlus45);
             }
         } else {
             return 1;
@@ -1298,7 +1298,7 @@ s32 DreamSys__TickStaircaseYawMinus90(DreamSys *self) {
         if (self->staircaseFrame >= 19)
             return 1;
         if ((u32)(self->staircaseFrame - 6) < 2 || (u32)(self->staircaseFrame - 15) < 2) {
-            self->methods->updateRotation(self, 0, &sRotationYawMinus45);
+            self->methods->updateRotation(self, 0, sRotationYawMinus45);
         }
         flag = (u32)self->staircaseFrame < 9;
     }
@@ -1688,7 +1688,7 @@ typedef struct DirectionCheckArg {
 } DirectionCheckArg;
 
 /* sCardinalRotations seen from its yaw: this label starts 4 bytes into that
-   table, so `angle` is sCardinalRotations[i].y.numerator (0, 90, 180, 270
+   table, so `angle` is sCardinalRotations[i][1].num (0, 90, 180, 270
    degrees). A separate view, because this one reads the angle as a number
    and the other is only handed to SceneNode__UpdateRotation. */
 typedef struct DirectionTableEntry {
@@ -1713,7 +1713,7 @@ extern u8 *sTunnelExitHeadings[];
    CheckStaircaseHeading store an entry's address in enterRotation /
    exitRotation, which SetMoveOverride, SpawnAtLink and TryStaircaseLink
    apply. */
-extern RotationRatios sCardinalRotations[];
+extern Ratio16 sCardinalRotations[][3];
 
 s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     u8 heading;
@@ -1723,11 +1723,11 @@ s32 DreamSys__CheckTunnelHeading(s32 *outExit, s32 *outEnter, void *rotation) {
     heading = sTunnelEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
     if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
         if (outEnter != NULL)
-            *outEnter = (s32)&sCardinalRotations[heading];
+            *outEnter = (s32)sCardinalRotations[heading];
 
         if (outExit != NULL) {
             idx = sTunnelExitHeadings[sLinkDstStage][sLinkSpawnIndex];
-            *outExit = (s32)&sCardinalRotations[idx];
+            *outExit = (s32)sCardinalRotations[idx];
         }
         result = 1;
     } else {
@@ -1853,11 +1853,11 @@ s32 DreamSys__CheckStaircaseHeading(s32 *outExit, s32 *outEnter, void *rotation)
     heading = sStaircaseEnterHeadings[sLinkSrcStage][sLinkTriggerIndex];
     if (IsHeadingAligned((DirectionCheckArg *)rotation, heading)) {
         if (outEnter != NULL)
-            *outEnter = (s32)&sCardinalRotations[heading];
+            *outEnter = (s32)sCardinalRotations[heading];
 
         if (outExit != NULL) {
             idx = sStaircaseExitHeadings[sLinkDstStage][sLinkSpawnIndex];
-            *outExit = (s32)&sCardinalRotations[idx];
+            *outExit = (s32)sCardinalRotations[idx];
         }
         result = 1;
     } else {

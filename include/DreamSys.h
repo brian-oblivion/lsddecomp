@@ -32,7 +32,7 @@
  *
  * Two cross-unit identifications carry the names below: updateRotation
  * (+0x044) is the rotation setter, so every constant passed to it is three
- * degree ratios (RotationRatios below); and soundObj is a VabStreamObj,
+ * degree ratios (Ratio16[3], include/SceneNode.h); and soundObj is a VabStreamObj,
  * whose +0x080/+0x084/+0x09C (playTone/stopVoice/setPitchOffset) name
  * voiceSelect and voiceIndex.
  *
@@ -131,25 +131,12 @@ enum DreamSysMoveOverride {
 extern s8 (*gpNavChallengesComplete)[NAV_CHALLENGE_COUNT];
 extern s32 *gpDinamicLinkPenalty;
 
-/* A single {numerator, denominator} degree ratio. SceneNode__UpdateRotation
-   (vtable slot +0x044, the inherited rotation setter) reads three of these
-   from its `data` argument, one per axis, converts each with
-   RatioToFixed12 and divides by 360, then either STORES them into the
-   object's rotation vector (flag != 0) or ADDS them modulo a full turn
-   (flag == 0). Every constant this unit hands that slot is three of these:
-   see sRotationYaw180 / _PLUS45 / _MINUS45 below and sCardinalRotations
-   (src/world/DreamSys.c). */
-typedef struct RotationRatio {
-    s16 numerator;
-    s16 denominator;
-} RotationRatio;
-
-/* The x/y/z triple SceneNode__UpdateRotation actually consumes. */
-typedef struct RotationRatios {
-    RotationRatio x;
-    RotationRatio y;
-    RotationRatio z;
-} RotationRatios;
+/* SceneNode__UpdateRotation (vtable slot +0x044, the inherited rotation
+   setter) takes three Ratio16s, degrees as {num, den}, one per axis x, y, z,
+   and either STORES them into the object's rotation vector (flag != 0) or
+   ADDS them modulo a full turn (flag == 0). Every constant this unit hands
+   that slot is a Ratio16[3]: see sRotationYaw180 / Plus45 / Minus45 and
+   sCardinalRotations (src/world/DreamSys.c). */
 
 typedef struct CinematicCall {
     s16 bank;
@@ -338,7 +325,7 @@ struct DreamSys {
        DreamSys__StepLookYaw; also toggled/incremented by DreamSys__FlipMoveCommand and forced
        to 1 by DreamSys__TickMoveForced. */
     s32 moveCommand;
-    /* Index into the 12-byte-stride sTurnRotations table; consumed and reset
+    /* Index into the sTurnRotations table (one Ratio16[3] per entry); consumed and reset
        to 0 by DreamSys__ApplyPendingTurn. */
     s32 turnCommand;
     /* (moveCommand == 1) as computed by DreamSys__StepLookYaw; unconditionally cleared
