@@ -2544,7 +2544,7 @@ void StyleEffect__PlaceModelChildren(StyleEffect *self, s32 reuse) {
  * gSpriteShiftX. */
 extern s32 gModelChildDriftZ[];
 /* All-zero LongVec3, the start value of each child's per-frame z delta. */
-extern LongVec3 gModelChildDriftInit;
+extern LongVec3 sModelChildDriftInit;
 /* Ratio triple {0/1, 1/10, 0/1}: the per-frame rotation increment
  * updateRotation(.., 0, ..) adds to self and to each model child. */
 extern Ratio16 gSpinRotStep[3];
@@ -2582,7 +2582,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self) {
         stepZ = &gModelChildDriftZ[tableIndex];
         extraZ = 0;
         for (; i < ARRAY_COUNT(self->modelChildren); i++) {
-            LongVec3 delta = gModelChildDriftInit;
+            LongVec3 delta = sModelChildDriftInit;
             delta.z += extraZ + *stepZ;
             (*slot)->methods->addTranslation(*slot, &delta);
             extraZ += 3;

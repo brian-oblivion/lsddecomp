@@ -115,7 +115,7 @@ void StyleEffect__DriftModelChildren(StyleEffect *self)
             tab70b = tab70;
             accumOffset = 0;
             for (; i < 2; i++) {
-                Vec3S local = gModelChildDriftInit;
+                Vec3S local = sModelChildDriftInit;
                 local.z += accumOffset + *tab70b;
                 (*p)->methods->addTranslation(*p, &local);
                 accumOffset += 3;
@@ -159,7 +159,7 @@ LinkNode *modelChildren[2]; /* +0x07C */
 
 typedef struct LinkNode StyleEffect;
 extern s32 gModelChildDriftZ[];
-extern Vec3S gModelChildDriftInit;
+extern Vec3S sModelChildDriftInit;
 extern s32 gSpinRotStep[];
 ```
 
@@ -307,7 +307,7 @@ to `*coord2` (GsCOORDINATE2.flg). Caller: StyleEffect__UpdateByKind, kind 0.
 
 Globals named in this pass (only this unit references them, tier B):
 `gModelChildDriftZ` (was D_8008780C, s32[8] = {0, 0, 0, -1, -2, -4, -16,
--256}), `gModelChildDriftInit` (was D_8008782C, all-zero Vec3S) and
+-256}), `sModelChildDriftInit` (was D_8008782C, all-zero Vec3S) and
 `gSpinRotStep` (was D_80087838, ratio triple {0/1, 1/10, 0/1}, read by
 RatioToFixed12).
 
