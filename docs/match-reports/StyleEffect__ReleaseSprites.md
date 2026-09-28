@@ -71,7 +71,7 @@ convention rather than importing that name here.
 ## Track 4 (2026-09-26, round 88, charlie)
 
 Renamed from the `LinkOwnerObj__` family to `StyleEffect__` with the class's
-unification (`include/StyleEffect.h`). Evidence: the only caller is
+unification (`include/style_effect.h`). Evidence: the only caller is
 StyleEffect's own per-kind dispatch in `dream_scene.c`
 (`StyleEffect__InitByKind` kind 3, `StyleEffect__UpdateByKind` kind 3,
 `StyleEffect__ReleaseByKind` kinds 2/3), each passing its own `self`; the
@@ -82,7 +82,7 @@ another name; RandomizeSprites' `slot48` is VariantSprite's inherited
 `updateScale` and its `angle` (+0x084) is `sprite.rotate` (Sprite, +0x064 +
 0x020, 4096 per degree -- the `(rand() % 360) << 12` it stores).
 
-View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in dream_scene.c are deleted and the unit includes include/StyleEffect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
+View replaced the same day: the `LinkOwnerObj`/`LinkElemObj` views in dream_scene.c are deleted and the unit includes include/style_effect.h (`this` is `StyleEffect *self`; `links` is `sprites`, `slot48` is `updateScale`, `angle` is `sprite.rotate`). Image byte-identical.
 
 ## Track 7 (round 99, alpha)
 

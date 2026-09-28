@@ -1050,7 +1050,7 @@
         "gStyleEffectMethods": {
           "class": "StyleEffect",
           "date": "2026-09-26",
-          "header": "include/StyleEffect.h"
+          "header": "include/style_effect.h"
         },
         "gTaskCoreMethods": {
           "class": "TaskCore",

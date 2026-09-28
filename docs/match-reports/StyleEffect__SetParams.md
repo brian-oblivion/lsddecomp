@@ -71,4 +71,4 @@ void StyleEffect__SetParams(StyleEffect *self, Block24 *src) {
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Occupies SceneNode's +0x040 `reset` slot; kept its name because it does more than reset (it copies the 0x24-byte block). The block is now `StyleEffectParams` (include/StyleEffect.h), a struct of 4-aligned members, 0x24 bytes: the whole-struct copy compiles to the same aligned block move the old `Block24` word array gave. Image byte-identical.
+Occupies SceneNode's +0x040 `reset` slot; kept its name because it does more than reset (it copies the 0x24-byte block). The block is now `StyleEffectParams` (include/style_effect.h), a struct of 4-aligned members, 0x24 bytes: the whole-struct copy compiles to the same aligned block move the old `Block24` word array gave. Image byte-identical.

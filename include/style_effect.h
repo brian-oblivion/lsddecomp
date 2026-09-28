@@ -1,5 +1,5 @@
-#ifndef STYLEEFFECT_H
-#define STYLEEFFECT_H
+#ifndef STYLE_EFFECT_H
+#define STYLE_EFFECT_H
 
 #include "actor.h"
 #include "VariantSprite.h"

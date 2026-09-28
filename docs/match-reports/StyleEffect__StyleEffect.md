@@ -79,7 +79,7 @@ fail:
 
 ## Track 4 (2026-09-26, round 88, charlie)
 
-Retyped with the class's unification (include/StyleEffect.h): same parameters as New_StyleEffect. The two stores the old view called `unk44` and `kind` are Actor's `state` (+0x044) and `pendingExtra` (+0x054): the ctor keeps `kind` in pendingExtra, and the class overrides pendingExtra's setter slot (+0x0EC) with its update, so nothing else writes it. The old own slot `setParams` at +0x040 is SceneNode's `reset`; the call casts to StyleEffectSetParamsFn (no code). Image byte-identical.
+Retyped with the class's unification (include/style_effect.h): same parameters as New_StyleEffect. The two stores the old view called `unk44` and `kind` are Actor's `state` (+0x044) and `pendingExtra` (+0x054): the ctor keeps `kind` in pendingExtra, and the class overrides pendingExtra's setter slot (+0x0EC) with its update, so nothing else writes it. The old own slot `setParams` at +0x040 is SceneNode's `reset`; the call casts to StyleEffectSetParamsFn (no code). Image byte-identical.
 
 ## Track 6 (round 93, bravo)
 
@@ -94,7 +94,7 @@ y change since it was built (UpdateByKind); what it carries is chosen by
 only creator is the style layer's effect-slot code (StyleFillEffectKind0..3
 into sStyleEffectSlots), whose vocabulary the name reuses. What an effect is
 in the game is not shown. The kinds became `enum StyleEffectKind` in
-include/StyleEffect.h (MODEL_ROW, MODEL, SPRITES, JITTER_SPRITES), from what
+include/style_effect.h (MODEL_ROW, MODEL, SPRITES, JITTER_SPRITES), from what
 each switch arm in dream_scene.c does; the switches still spell numbers.
 
 The header banner was rewritten as documentation (what it is, who builds

@@ -104,7 +104,7 @@ sStyleEffectViewport, D_8008AB98 -> sStyleEffectModelIds. PROPOSED (not
 applied, a prototype and body outside the header): its `Actor *self`
 parameter and the `Actor *` view of sStyleEffectTmd in dream_scene.c/_s.c
 are really `LinkResource *`, and the `setBackClip` calls through it are
-`getModel`; its prototype belongs in include/StyleEffect.h, not actor.h.
+`getModel`; its prototype belongs in include/style_effect.h, not actor.h.
 
 ## Track 7 (round 99, alpha)
 

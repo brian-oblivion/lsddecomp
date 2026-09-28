@@ -100,7 +100,7 @@ holds (and now names IsStyleVariantEven). The old one, verbatim:
  *    (ComputeStyleCueFalloff) and, on the ticks its pattern selects,
  *    requests programs on the three voices; most restart the pattern by setting
  *    `tick` to -1 once it passes a limit.
- *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style
+ *  - StyleEffect (include/style_effect.h), the Actor subclass the style
  *    layer keeps at an offset from its target: this unit supplies its slot
  *    occupants (StyleEffect__StyleEffect/__Finalize/__SetParams/__Update)
  *    and the `New_StyleEffect` allocator; its per-kind work is in

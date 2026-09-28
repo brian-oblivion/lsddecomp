@@ -292,7 +292,7 @@ Verbatim as they stood before the round-93 comment pass (identifiers already car
  * decoration object (`sStyleDecorObj`, `New_BoxFill`-allocated), an
  * 18-slot "decor set" array (`sStyleDecorSlots`, same allocator) and an
  * StyleEffect "effect slots" array (`sStyleEffectSlots`, include/
- * StyleEffect.h, `New_StyleEffect`-allocated, kind-tagged 0..3 by
+ * style_effect.h, `New_StyleEffect`-allocated, kind-tagged 0..3 by
  * `StyleFillEffectKind0`..`3`'s literal first argument), plus a two-slot
  * positional sound-cue subsystem (`sStyleCueSlots`, `TryStartStyleCue`/
  * `FindNextStyleCueInRange`/`FlushStyleCue`/`ServiceStyleCueIfNear`/

@@ -14,7 +14,7 @@
  *  - the style layer, whose client ObjM is: its setup (RegisterStyleConfig
  *    to ApplyStyleDecorationIfSet), its per-scene objects (StyleFlushDecoration
  *    to StyleScrollVramStrips) and its sound cues (StyleCue00..13);
- *  - StyleEffect (include/StyleEffect.h), whole, the Actor the style layer
+ *  - StyleEffect (include/style_effect.h), whole, the Actor the style layer
  *    keeps at an offset from its target, then SetStyleEffectSources;
  *  - Actor (include/actor.h), whole, the base of TodActor, DreamSys and
  *    StyleEffect;
@@ -46,7 +46,7 @@
 #include "box_fill.h"
 #include "frame_clock.h"
 #include "actor.h"
-#include "StyleEffect.h"
+#include "style_effect.h"
 #include "Viewport.h"
 #include "sound_cue_set.h"
 #include "VariantSprite.h"
@@ -1464,7 +1464,7 @@ void StyleBuildEffectSlots(LongVec3 *pos) {
 }
 
 /* Each slot's +0x0EC is StyleEffect__Update, called with the position
- * (include/StyleEffect.h: the slot keeps Actor's setPendingExtra type). */
+ * (include/style_effect.h: the slot keeps Actor's setPendingExtra type). */
 void StyleUpdateEffectSlots(LongVec3 *pos) {
     s32 i;
     StyleEffect *slot;
@@ -1925,7 +1925,7 @@ void StyleScrollVramStrips(void) {
  *    setting `tick` to -1 once it passes a limit.
  *  - IsStyleVariantEven: whether the variant PickStyleFallbackConfig chose
  *    (sStyleVariant) is even.
- *  - StyleEffect (include/StyleEffect.h), the Actor subclass the style layer
+ *  - StyleEffect (include/style_effect.h), the Actor subclass the style layer
  *    keeps at an offset from its target: its ctor, finalize, reset
  *    (StyleEffect__SetParams) and update slot occupants, and the
  *    New_StyleEffect allocator. The per-kind work follows, in the next two
@@ -2175,7 +2175,7 @@ s32 IsStyleVariantEven(void) {
 
 /* ------------------------------------------------------------------ *
  * StyleEffect's slot occupants (ctor, finalize, reset = SetParams, +0x0EC =
- * Update), plus its `New_` allocator. The class: include/StyleEffect.h.
+ * Update), plus its `New_` allocator. The class: include/style_effect.h.
  * ------------------------------------------------------------------ */
 
 StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *parent, LongVec3 *pos) {
@@ -2191,7 +2191,7 @@ StyleEffect *New_StyleEffect(s32 kind, StyleEffectParams *params, SceneNode *par
     return NULL;
 }
 
-/* `kind` goes into Actor's pendingExtra (+0x054): see include/StyleEffect.h. */
+/* `kind` goes into Actor's pendingExtra (+0x054): see include/style_effect.h. */
 StyleEffect *StyleEffect__StyleEffect(StyleEffect *self, s32 kind, StyleEffectParams *params,
                                       SceneNode *parent, LongVec3 *pos) {
     if (GetActorMethods()->ctor((Actor *)self) == NULL) {
@@ -2224,7 +2224,7 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
     StyleEffect__UpdateByKind(self, pos);
 }
 
-/* ---- StyleEffect's per-kind work (include/StyleEffect.h) ---------------
+/* ---- StyleEffect's per-kind work (include/style_effect.h) ---------------
  *
  * The three switches on `kind` (StyleEffectKind) that its ctor, update and
  * finalize run: InitByKind (attach at pos + offset, link the model, build
@@ -2238,7 +2238,7 @@ void StyleEffect__Update(StyleEffect *self, LongVec3 *pos) {
  * rest of the sprite helpers, and SetStyleEffectSources, in the next.
  */
 
-/* The class and its children: include/StyleEffect.h (the owner),
+/* The class and its children: include/style_effect.h (the owner),
  * include/actor.h (modelChildren) and include/VariantSprite.h (sprites). */
 
 extern s32 sSpriteShiftX[];
@@ -2253,7 +2253,7 @@ void AttachWithRotScale(Actor *node, void *parent, void *trans, void *rotation, 
 /* MATCHING: StyleEffect__SpawnPlainSprites, __RandomizeSprites,
  * __BuildRandomSprites and __DriftModelChildren read only `self`, but the
  * calls below pass a second, dead argument that retail loads, so
- * include/StyleEffect.h declares them without a prototype. NoOpIgnoreArgs
+ * include/style_effect.h declares them without a prototype. NoOpIgnoreArgs
  * (next section, empty) is declared the same way here. */
 extern void NoOpIgnoreArgs();
 
@@ -2541,7 +2541,7 @@ void StyleEffect__SpawnSprites(void *self, s32 unused, s32 variant, void *scale)
  * The tail of StyleEffect's sprite helpers, then the first half of Actor's
  * own methods (the second half is the next section):
  *
- *  - StyleEffect (include/StyleEffect.h): the per-kind pieces for its two
+ *  - StyleEffect (include/style_effect.h): the per-kind pieces for its two
  *    sprite kinds that StyleEffect__UpdateByKind and ReleaseByKind
  *    (previous section) call. SpawnPlainSprites builds the five sprites,
  *    RandomizeSprites re-shapes four of them every frame, NoOpIgnoreArgs is
