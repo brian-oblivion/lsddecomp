@@ -7,8 +7,8 @@
 ## What it does
 
 Vtable slot `+0x174`. If `this->unk_0xA4` (a new index field) is nonzero,
-calls `this->vt->SceneNode__UpdateRotation(this, 0, &TURN_ROTATIONS[idx])` and resets
-`unk_0xA4` to 0. `TURN_ROTATIONS` is address-of only here -- never loaded
+calls `this->vt->SceneNode__UpdateRotation(this, 0, &sTurnRotations[idx])` and resets
+`unk_0xA4` to 0. `sTurnRotations` is address-of only here -- never loaded
 through -- so this is safe against the `addiu_at` runtime-indexed-load
 blocker (`docs/research/addiu-at-blocker.md`): "Address-only table
 arithmetic is safe", per `DECOMPILATION_LEARNINGS.md`.
@@ -22,7 +22,7 @@ void DreamSys__ApplyPendingTurn(DreamSys *this)
 
 	idx = this->unk_0xA4;
 	if (idx != 0) {
-		this->vt->SceneNode__UpdateRotation(this, 0, &TURN_ROTATIONS[idx]);
+		this->vt->SceneNode__UpdateRotation(this, 0, &sTurnRotations[idx]);
 		this->unk_0xA4 = 0;
 	}
 }
@@ -34,16 +34,16 @@ typedef struct D_80087E80Entry {
 	s32 unk4;
 	s32 unk8;
 } D_80087E80Entry;
-extern D_80087E80Entry TURN_ROTATIONS[];
+extern D_80087E80Entry sTurnRotations[];
 ```
 
-## Note: `TURN_ROTATIONS` is splat's auto-generated name for TWO seemingly
+## Note: `sTurnRotations` is splat's auto-generated name for TWO seemingly
 different things
 
 An earlier round's comment on `TURN_ROTATION_YAW` says `&TURN_ROTATION_YAW[-1] (==
-&TURN_ROTATIONS, a distinct label immediately before it)`, describing a
+&sTurnRotations, a distinct label immediately before it)`, describing a
 4-byte-stride array (`DreamSys__StepLookYaw`, `D_80087E84Entry` = `{s16, s16}`).
-This function's own `lui`/`addiu %hi/%lo(TURN_ROTATIONS)` uses a 12-byte stride
+This function's own `lui`/`addiu %hi/%lo(sTurnRotations)` uses a 12-byte stride
 (`idx*12`, from `sll,1` + `addu` + `sll,2`) -- incompatible with a 4-byte
 element. Both call sites reference the SAME linker symbol name (splat picked
 the same label because both point at the same byte address), but the
@@ -66,7 +66,7 @@ round 2026-08-30-b, runner ALPHA, address range
 Renamed from `func_8005A050`.
 
 Consumes `turnCommand`: `SceneNode__UpdateRotation(this, 0,
-&TURN_ROTATIONS[idx])` and reset to 0. That slot is the rotation setter (matched,
+&sTurnRotations[idx])` and reset to 0. That slot is the rotation setter (matched,
 src/SceneNode.c) and flag 0 means RELATIVE, so this turns the object; the table
 entries for the only two values `DreamSys__OnPadEvent` ever writes (1 and 2)
 decode to yaw -6 and +6 degrees. Tier B: a 6-degree step per tick is a gradual

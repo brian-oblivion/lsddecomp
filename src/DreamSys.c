@@ -758,7 +758,7 @@ void DreamSys__ApplyPendingTurn(DreamSys *this) {
 
     idx = this->turnCommand;
     if (idx != 0) {
-        this->methods->updateRotation(this, 0, &TURN_ROTATIONS[idx]);
+        this->methods->updateRotation(this, 0, &sTurnRotations[idx]);
         this->turnCommand = 0;
     }
 }

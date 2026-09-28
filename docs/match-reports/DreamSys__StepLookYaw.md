@@ -511,7 +511,7 @@ front unconditionally, and — instead of directly mutating a struct field
 through `unk_0x5C` — writes a 16-bit "pending value" into `TURN_ROTATION_YAW[0]`
 and calls the vtable slot `0x44` function (`SceneNode__UpdateRotation`, not yet
 decompiled, still `INCLUDE_ASM` in `code_179d8`) with a pointer to
-`TURN_ROTATION_YAW[-1]` (== `&TURN_ROTATIONS`, a distinct label immediately before it —
+`TURN_ROTATION_YAW[-1]` (== `&sTurnRotations`, a distinct label immediately before it —
 see the `TURN_ROTATION_YAW` array's header comment in `include/DreamSys.h`).
 Unconditionally tail-calls `DreamSys__FlipMoveCommand(this)` at the end (matched
 separately this round, see `DreamSys__FlipMoveCommand.md`).
@@ -685,7 +685,7 @@ what it steps is a ROTATION, and that is measured rather than inferred:
 `data` argument as three {numerator, denominator} degree ratios, adding them to the
 object's rotation vector when its `flag` argument is 0 -- which is the flag this
 function passes. The halfword it overwrites first is
-`TURN_ROTATIONS[0].y.numerator`, so the delta is a YAW; the table values are +-0x2D
+`sTurnRotations[0].y.numerator`, so the delta is a YAW; the table values are +-0x2D
 (45 degrees) with the accumulator capped at 0xB5 (181).
 Also latches `moveCommandLatch = (moveCommand == 1)` and tail-calls
 `DreamSys__FlipMoveCommand`; that bookkeeping rides along and is not what the name

@@ -196,8 +196,8 @@ typedef struct RotationRatios {
    (0 deg, 45 deg, 0 deg) with the 45 being exactly the +-0x2D
    DreamSys__StepLookYaw writes, entry 1 is (0, -6, 0) and entry 2 is
    (0, +6, 0), which are DreamSys::turnCommand's two values 1 and 2. */
-extern RotationRatio TURN_ROTATION_YAW[]; /* == &TURN_ROTATIONS[0].y */
-extern RotationRatios TURN_ROTATIONS[];
+extern RotationRatio TURN_ROTATION_YAW[]; /* == &sTurnRotations[0].y */
+extern RotationRatios sTurnRotations[];
 
 /* (0 deg, 180 deg, 0 deg). Address-of only, forwarded as SceneNode__UpdateRotation's
    arg2 with flag 1 (absolute) by DreamSys__ResetSessionState. */
@@ -493,7 +493,7 @@ struct DreamSys {
 	   DreamSys__StepLookYaw; also toggled/incremented by DreamSys__FlipMoveCommand and forced
 	   to 1 by DreamSys__TickMoveForced (round 2026-08-30). */
     s32 moveCommand;
-    /* Index into the 12-byte-stride TURN_ROTATIONS table; consumed and reset
+    /* Index into the 12-byte-stride sTurnRotations table; consumed and reset
 	   to 0 by DreamSys__ApplyPendingTurn (round 2026-08-30-b). */
     s32 turnCommand;
     /* (moveCommand == 1) as computed by DreamSys__StepLookYaw; unconditionally cleared
