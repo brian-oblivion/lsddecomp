@@ -861,7 +861,7 @@ extern MoodGraphPoint SPECIAL_DAY_MOOD;
 /* Also declared in Entity.h for the same libc-style function. */
 extern s32 rand(void);
 
-extern s8 SPECIAL_COLORS[];
+extern s8 sSpecialColors[];
 
 /* Shared by TestForStaticLink/Test4TunnelLinks/Test4StaircaseNodes/
    Test4InstantTeleporters, each of which forwards its own three args

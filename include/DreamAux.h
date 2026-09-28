@@ -51,7 +51,7 @@ extern const char gMomPathSymDog[];
 /* TriggerRecord.condition: CheckDreamAuxTriggerCondition's tests, by id. A
  * negative condition tests -condition and passes only while the record has
  * not triggered. Id 0 passes; 18, 19 and ids from 22 up reach the
- * dream-colour test and index SPECIAL_COLORS past its 8 entries. */
+ * dream-colour test and index sSpecialColors past its 8 entries. */
 enum TriggerCondition {
     TRIGGER_COND_ALWAYS = 1,
     TRIGGER_COND_PERIOD_PHASE_1 = 2, /* 2..4: IsDayInPeriodPhase(day, id - 1) */
